@@ -75,6 +75,8 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | Browser attempt               | Focused test could not spawn absent `playwright-cli`; cached Chromium could not load absent `libnspr4.so`. No page navigation occurred, so this is environment-only and not defect evidence. |
 | 2026-09-01 | S2    | Localization                  | Ruled out served-marker loss and layer/slot reachability/identity loss. Client/provider branch remains unmeasured; no product edit made.                                                     |
 | 2026-09-01 | S2    | Hosted receipt                | Staged the browser from `about:blank` and added request/load/failure, module/outer/inner render, singleton/provider/query-hook, hydration-effect, click, and runtime-error observations.     |
+| 2026-09-01 | S2    | Generated scaffold            | Created a no-Aspire local-source SQLite scaffold under `.llm/tmp`, initialized/seeded it, and ran only its service and Fresh Vite processes.                                              |
+| 2026-09-01 | S2    | HTML discriminator            | `GET /examples/users` returned 200 with `Typed query lab`, `Seed User`, `frsh:island:ServiceShowcaseLab`, and its client boot mapping. The client-side branch is selected.                  |
 
 ## Decisions
 
@@ -112,7 +114,8 @@ CLI scaffold templates.
 | Code quality / doctrine     | `deno task quality:gate`                                                             | PASS            | Quality scan has zero findings; doctrine gate has no failures.                           |
 | S2 served direct control    | Package Vite + raw fetch `/examples/service-direct`                                  | PASS            | Island marker, client boot import, initial row, and query hydration all present.         |
 | S2 served hook-layout route | Package Vite + raw fetch `/examples/service`                                         | PASS            | Layout, layer, row, island marker, client boot import, and query hydration all present.  |
-| `deno.lock`                 | SHA-256 worktree versus `HEAD:deno.lock`                                             | PASS            | Both `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.                 |
+| Generated-app discriminator | Generated service + Fresh Vite; fetch `/examples/users`                              | PASS (exit 0)   | HTTP 200; lab, seeded row, exact showcase island comment, and client boot mapping present. |
+| `deno.lock`                 | SHA-256 worktree versus `HEAD:deno.lock`                                             | PASS            | After integrating `origin/main`, both are `01ff3a232713a35e9bd5c9f34db7669568fadd16273cb9c82389832b10b55cbe`. |
 
 ### Runtime gates
 
@@ -132,12 +135,9 @@ Registration-only unit coverage is necessary but not sufficient.
 
 ## Handoff Notes
 
-- PLAN-EVAL remains supervisor-owned and follows completed browser localization.
-- Review `research.md` sections 2-4 first; they are the evidence that kills the original lead.
-- The next action is the exact focused browser command recorded in `research.md`, on a host with the
-  CI-managed Playwright runtime. It is not a product fix.
-- If that fixture passes unchanged, stop and ask the supervisor to rescope. If it throws in the
-  provider path, report the exact exception and request the already-conditional query product
-  authorization. Do not edit any `packages/cli` path.
-- Do not open a PR, alter labels, or self-certify; the supervisor owns hosted dispatch and PLAN-EVAL
-  disposition.
+- The generated-app HTML discriminator selected the client-side branch; served marker loss,
+  module-identity loss, and falsy loader/layer materialization are ruled out for the real scaffold.
+- Open the mandated draft PR with the measurement recorded, then use its managed-browser CI to read
+  the already-landed request/load/provider/query instrumentation.
+- Do not select a product edit until that browser observation names the first failing client
+  boundary. Do not self-certify or mark the draft ready.

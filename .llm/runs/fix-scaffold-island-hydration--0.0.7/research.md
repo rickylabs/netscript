@@ -264,3 +264,33 @@ registration-only unit assertion is necessary but not sufficient.
   without any CLI scaffold asset? **Must resolve before product implementation.**
 - Does the hosted server response already lack the marker, or is it removed between response and
   probe? **Safe to defer to the supervisor-dispatched hosted proof after a package-level fix.**
+
+## Generated-app HTML discriminator — 2026-09-01
+
+The S2 continuation generated a local-source, no-Aspire SQLite workspace from branch head
+`f48d0b86c`, initialized and seeded its SQLite database, and started only the generated `users`
+service and Fresh Vite process. A fetch of the real generated route
+`http://127.0.0.1:52501/examples/users` returned:
+
+```json
+{
+  "status": 200,
+  "length": 135504,
+  "frshIsland": true,
+  "typedQueryLab": true,
+  "initialRows": ["Seed User"],
+  "markers": [
+    "<!--frsh:island:ThemeToggle:0:-->",
+    "<!--frsh:island:ServiceShowcaseLab:1:-->",
+    "<!--frsh:island:DeferComponent:2:-->"
+  ],
+  "clientBootMapping": true
+}
+```
+
+This selects the brief's first branch by direct observation: `ServiceShowcaseLab` is registered,
+reached through the loader/layer/layout tree, recognized with the registered module identity,
+SSR-rendered with its initial row, and included in the served client boot mapping. The real
+generated failure is therefore after served HTML on the client path. This measurement does not yet
+distinguish a missing/failed client entry request from an exception during provider/query hydration;
+the already-landed managed-browser instrumentation is the next discriminator.
