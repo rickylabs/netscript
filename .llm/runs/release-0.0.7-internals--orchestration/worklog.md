@@ -8882,3 +8882,61 @@ hard tests - header-safe dedupe and reconnect - are **capable of failing** rathe
 **#1802** delta PASS, carried onto current main, CI running. **#1846** parked on the deferred runtime
 proof. **#1876** IMPL-EVAL running (17 min). **#1879** launched, not yet pushed. **#1351** plan
 complete, PLAN-EVAL running.
+
+
+## D-202 - #1876 FAIL_IMPL on completeness; the evaluator also corrected my own guidance
+
+The IMPL-EVAL returned **`FAIL_IMPL`** - and the finding is genuinely valuable rather than pedantic.
+
+### The change is correct; the completeness claim is not
+
+Exact specifier match with the established `plugins/workers` pattern, minimal justified lock delta,
+clean scope, gates green, publish question re-derived. But the worklog's design contract claims *every*
+importing member declares the dependency, and that is **false at head**. Verified independently
+before relaying:
+
+| Member | module imports | declares |
+| --- | ---: | ---: |
+| `packages/plugin-workers-core` | 2 | 1 (this PR) |
+| `plugins/triggers` | 3 | 1 (this PR) |
+| **`packages/sdk`** | 1 | **0** |
+| **`packages/plugin-sagas-core`** | 1 | **0** |
+| **`packages/plugin-auth-core`** | 1 | **0** |
+
+Three **publishable** members still undeclared. Worse in one respect than the starting state: sibling
+cores are now **inconsistent with each other** - `plugin-workers-core` declares, `plugin-sagas-core`
+and `plugin-auth-core` do not. This is exactly the "fix two, miss three" failure the brief told the
+evaluator to hunt for, and it found it.
+
+### The evaluator corrected ME, and that correction is the more useful half
+
+I told the author the issue's import list was "incomplete" because it omitted
+`plugins/triggers/src/public/mod.ts:23`. That line is
+`definePlugin('@netscript/plugin-streams-core', ...)` - a **string literal**, not a module import, not
+a dependency edge. **Conflating string references with imports is precisely what hid the three real
+gaps**, and I contributed to that conflation while believing I was sharpening the brief.
+
+Carried into the fix instruction: re-derive the set with **module imports and string references
+separated**, and state which was counted. Also told the author to check `packages/cli/e2e` themselves
+- the evaluator reports 5 importing gate files there, my own grep found 0 - and to **report which is
+right rather than trust either of us**.
+
+### Fix dispatched, not re-scoped
+
+The evaluator offered two routes: complete the fix, or re-scope the slice to the issue's two named
+members and file the rest. Chose **completion** - three more one-line declarations plus a lock refresh
+is cheap, and re-scoping would leave sibling cores mutually inconsistent, which is a worse resting
+state than either doing nothing or doing it fully.
+
+Also required: correct the worklog design contract to match what is delivered, and record the
+completeness gap in `drift.md` - the evaluator noted `drift.md` records no divergence between contract
+and implemented state, which is what let the overclaim stand.
+
+PR stays **draft** at `status:impl`. Cycle 2 after the author reports.
+
+### Lane state
+
+**#1802** `quality`/`code-quality`/`close-gate` pass at `e36b17461`, `check-test` running - body already
+rewritten to current-head truth with the delta PASS and carrier-only carry receipt. **#1846** parked
+on the deferred runtime proof. **#1876** fix dispatched. **#1879** launched, not yet pushed.
+**#1351** PLAN-EVAL running.
