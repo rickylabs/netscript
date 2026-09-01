@@ -1602,3 +1602,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   ceilings. Aspire performs static S7-S13 work continuously and never foreground-polls dependencies.
 - The coordinator independently audits packets and merges exact-green heads; #1864 shipped as
   `38f2ce735` and its completed parent issue #1592 was closed rather than left as phantom work.
+
+## 2026-09-01T16:44:39Z — post-#1862 active fronts
+
+- Main is `82a2527e27aa91baabf35e4b001ed8b6266308e6` after coordinator-merged #1862.
+  Features must complete #1848 corpus regeneration/evaluation against this exact main, then re-stack
+  #1842; #1872 and #1354 remain independent active fronts.
+- Fixes owns the P0 #1877 / #1878 workers-readiness leaf, then integrates it into #1865 for one
+  exact-head two-tier runtime rerun and continues #1858. #1850 full-core implementation remains
+  active in parallel; no routine readiness decision waits for the owner.
+- Aspire owns a current-main S8-S13 static convergence and exact `db init --name init` listener-fault
+  verifier now. It may background-watch hosted checks, but must never foreground-poll or say
+  `standing by`; Phase B starts immediately after the Fixes baseline merges under the runtime mutex.
+- Internals advances #1802/#1543/#1846 after shipped #1862; Docs advances #1756 and the next
+  independent docs leaf. The coordinator verifies each exact packet and merges without owner delay.

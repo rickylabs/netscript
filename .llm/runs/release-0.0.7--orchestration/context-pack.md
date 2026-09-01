@@ -2383,3 +2383,16 @@ continues concurrently because serial ordering is per orchestrator, not global.
   regeneration/delta evaluation; Docs owns the bounded #1756 source repair; Features owns #1872,
   #1848, and #1842 in parallel.
 - No owner decision is pending. Host runtime remains Aspire `[]` and containers 0.
+
+## Resume delta — 2026-09-01T16:44:39Z
+
+- Current main is `82a2527e27aa91baabf35e4b001ed8b6266308e6` after exact-green #1862; issue
+  #1859 is closed and both records are `status:shipped`. Features has consumed that merge and is
+  regenerating #1848's combined corpus with `./navigation` before a focused delta verdict.
+- Fixes #1865 proved its two fixture repairs through Flow-B/readiness and Postgres/Garnet in both
+  hosted tiers. The remaining later workers-startup failure is isolated as #1877 / PR #1878; land
+  that bounded baseline leaf, integrate it into #1865, rerun both tiers, then continue #1858.
+- Aspire's foreground dependency watcher is stopped. S8 reports a bounded post-D248 PASS and is
+  converging S8-S13 statically on current main while only Phase B waits for the Fixes chain. Docs
+  #1756, Internals #1802/#1543/#1846, and Features #1872/#1354 remain active in parallel.
+- No owner decision is pending. Runtime inventory remains Aspire `[]` and containers 0.

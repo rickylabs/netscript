@@ -1770,3 +1770,17 @@ implementation thread.
 - Dependency watching is background-only. Every topic supervisor must advance independent static,
   metadata, evaluation, or next-slice work while a dependency gate runs; repeated "standing by"
   polling is a coordinator intervention trigger.
+
+## 2026-09-01 — a late hosted failure can validate earlier gates and reveal the next baseline leaf
+
+- #1865's full hosted run was red overall, but exact receipts proved its scoped Flow-B/readiness and
+  Postgres/Garnet repairs in both tiers before the run reached a later workers-startup timeout. The
+  red conclusion must not erase those earlier exact gate receipts, nor permit merging while the full
+  required runtime remains red.
+- The workers timeout was a stale consumer contract: the gate required scheduler evidence plus an
+  obsolete Web Worker marker even though the supported in-process runner emitted a different marker.
+  The bounded correction is scheduler plus either supported runner-mode marker, with positive tests
+  for both modes and fail-closed tests for missing scheduler or runner evidence.
+- Baseline blockers discovered by a product PR are isolated and landed first, then integrated into
+  the original immutable product branch for one complete rerun. Aspire and other dependent lanes
+  consume only the exact merged baseline SHA; they continue independent static work meanwhile.

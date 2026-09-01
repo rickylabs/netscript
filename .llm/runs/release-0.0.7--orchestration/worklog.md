@@ -3693,3 +3693,21 @@
 - Milestone state after the merge/closure is 190 closed / 65 open; the increase in admitted work is
   from newly scoped defects, not reopened shipped items. Host inventory remains Aspire `[]` and
   containers 0. No owner decision is pending.
+
+## 2026-09-01T16:44:39Z — #1862 ships; passive Aspire watch replaced by active dispatch
+
+- Internals PR #1862 merged from immutable artifact head `5917c2b36` as main
+  `82a2527e27aa91baabf35e4b001ed8b6266308e6`, closing #1859. The PR and issue are terminal
+  `status:shipped`; the retained corpus/evaluator artifacts remain committed.
+- The coordinator submitted fresh steering through every Remote Control pane and verified active
+  generation or tool work afterward. Features immediately rebased #1848 and regenerated the
+  combined corpus from 271/7782 to 272/7789 with `./navigation`; Aspire obtained a bounded PASS for
+  its post-D248 S8 delta and began current-main convergence instead of foreground polling.
+- The full #1865 hosted run proved Flow-B, readiness, Postgres, and Garnet gates in both tiers, then
+  exposed a later current-main false red: `runtime.wait.workers` still required an obsolete Web
+  Worker log marker after the supported in-process runner became valid. P0 #1877 / PR #1878 owns the
+  bounded scheduler-plus-either-runner repair with four fail-closed/positive cases; Fixes is proving
+  and evaluating it before integrating #1865 for one exact-head runtime rerun.
+- Docs continues #1756 source/negative-test repair, Internals continues #1802/#1543/#1846, and
+  Features continues #1872/#1354 while the ordered #1848 carrier converges. No owner decision is
+  pending. Host inventory is still Aspire `[]` and containers 0.
