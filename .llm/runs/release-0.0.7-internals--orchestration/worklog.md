@@ -8452,3 +8452,57 @@ what is now at `429f1a0a9`.
 Pushed. Fresh independent evaluator still running; exact-head CI started at the integrated head.
 Cycle-1's false PASS remains retained as historical evidence only. PR stays `status:impl` until the
 evaluation and CI complete.
+
+
+## D-194 - #1862 cycle-2 PASS (durable), converged onto d2b33a09b; #1802 PASS and converged
+
+### #1862 - fresh evaluator PASS with a durable artifact
+
+`VERDICT: PASS`, artifact `impl-eval-cycle-2.md` committed `40cf494c4` (artifact-only, 94 insertions).
+All findings info/minor, none blocking. Two are worth propagating rather than filing away:
+
+- **F-1 corrects my own root-cause statement.** `deno doc --json` colourises `repr` **by default** on
+  deno 2.9.5 - bare-environment output is byte-identical to `FORCE_COLOR=1` output - so the defect
+  fired in *any* environment lacking `NO_COLOR=1`, **including plain CI**, not only under
+  colour-forcing callers as my commit message said. The PR body now states this correctly.
+- **F-2**: `CLICOLOR_FORCE` deletion is **defensive, not load-bearing** on 2.9.5; only `FORCE_COLOR`
+  deletion is load-bearing. Kept as hardening, and the body no longer over-claims it.
+
+Converged onto `d2b33a09b` (clean). Head `8fd452a46`. Corpus `bc3f6a2c2786...`, generator
+`20e4587cda8a...` and the cycle-2 artifact `907a82a71a50...` all **byte-identical across the merge**;
+invariance re-proved at the integrated head (`NO_COLOR`/`FORCE_COLOR`/bare all rc=0, same blob),
+regression 5/5, `deno.lock` unchanged, corpus check 0.
+
+PR body **rewritten truthfully**, including an explicit retraction section naming all three earlier
+false claims. Held at `status:impl-eval` - **not** restored to ready-merge - until `check-test` and
+`quality` finish. `build`, `close-gate`, `code-quality` and all classifiers already pass.
+
+### #1802 - PASS, and a real merge seam resolved
+
+`VERDICT: PASS`, artifact pushed `5aea6b287`. Findings non-blocking; **O-2** is the useful one: every
+non-available decision shares exit code 4, with the live-owner / provenance-unknown / conflict /
+repair-required discrimination carried in structured `ownershipKind`/`ownershipReason` JSON rather
+than distinct exit codes. So a consumer branching on **exit code alone** still cannot distinguish
+them - a partial answer to my design challenge, accepted as non-blocking.
+
+Converging onto `d2b33a09b` hit a genuine conflict in `.llm/tools/agentic/codex/codex-resume.ts` -
+**#1750's task-separator normalizer (now on main) against #1802's own changes to the same file**.
+Inspected before resolving: it was an **import union**, not a semantic clash. Resolved by keeping both
+imports, then verified **both intents still hold** rather than trusting the build:
+
+| Check | Exit |
+| --- | ---: |
+| direct `codex-resume.ts --help` | 0 |
+| `deno task agentic:codex-resume -- --help` (#1750 contract) | 0 |
+| `-- --bogus` still fail-closed | 2 |
+| agentic runtime + codex suites | 0 - **253 passed / 0 failed** |
+| `deno.lock` | unchanged |
+
+Ceilings intact across the merge: the two authorized exceptions plus `codex-resume_test.ts` still
+byte-identical at `546b5f018587` - which matters here, because the conflict was in that file's
+production counterpart. Head `7d20e852f` pushed.
+
+### #1846
+
+Unchanged and correctly parked: PASS recorded, box 1 deferred pending the real 3-arrival proof after
+the Aspire runtime queue drains. Still draft at `status:impl`.
