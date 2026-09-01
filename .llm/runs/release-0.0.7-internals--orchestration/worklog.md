@@ -8994,3 +8994,53 @@ nothing pushed.
 **#1802** body truthful, `close-gate`/`quality`/`code-quality` pass, `check-test` running. **#1846**
 parked. **#1876** completeness fix dispatched after `FAIL_IMPL`. **#1879** blocked on the fixture
 decision, partial work unblocked. **#1351** PLAN-EVAL running.
+
+
+## D-204 - #1802 SHIPPED; #1879 unblocked with widened scope; #1351 PLAN-EVAL PASS to implementation
+
+**#1802 merged as `9e3b8bcba`.** Internals shipped this session: **#1823, #1828, #1830, #1832, #1840,
+#1862, #1802**.
+
+### #1879 - ruling applied, and the rationale independently verified
+
+Coordinator chose option (a) narrowly. **Verified the load-bearing rationale before widening scope on
+it**: the exact fixture's history shows it **tracks upstream rather than freezing** - `1.13.5`
+(`82abaa6a1`, 2026-06-11) then `1.14.6` (`6e2f66b95`, 2026-06-15). Raising it to `1.15.0` is
+consistent with its purpose, not a change of meaning. Had it been a frozen oracle, the ruling's
+premise would have failed.
+
+Also pinned down the "**two** exact fixture imports" - both are in the same file:
+`service-query-utils-upstream_type.ts` line 1 (`@orpc/client@1.14.6`) and line 2
+(`@orpc/tanstack-query@1.14.6`). Repo-wide there are no others.
+
+Issue rewritten in place: scope now manifests + catalog + `deno.lock` + those two fixture lines,
+covering **every** `@orpc/*` key including `plugin-workers-core` (whose
+`@netscript/plugin-streams-core` key remains #1876's). The rewrite states plainly that the original
+**lock-only framing was mine and was wrong**, rather than leaving it implicit.
+
+The sharpest line in the dispatch is the boundary on failures: absorb catalog fallout **only** where
+it is direct stale-catalog consequence; any **behavioural** failure must be enumerated by file and
+test name and **left unfixed**. Explicitly warned against letting "it was failing anyway" become a
+licence to touch product code. `status:impl` restored.
+
+### #1351 - PLAN-EVAL PASS, promoted to implementation
+
+`VERDICT: PASS` (artifact `871caac96`). The evaluator confirmed the four LOCKED sections state exact
+signatures, module home and consumer wiring rather than gesturing; 4 ordered contract-first slices
+each with a proving gate; 11 risks with concrete mitigations; a 10-step gate set using the structured
+wrappers with no raw-root-fmt-as-verdict trap; and a seven-item open-decision sweep with one item
+explicitly safe-to-defer.
+
+Briefly mistook this for a transport failure because the process had exited with no artifact **in my
+stale worktree** - it had in fact completed and pushed. Checked the remote before concluding, which is
+the same discipline that saved the #1862 evaluator from being killed mid-success.
+
+Promoted to `status:impl` and dispatched, with the plan to be implemented **as locked** - drift
+reported rather than silently re-decided - and the two hardest properties called out: forward-compat
+enforcement must be *enforced* rather than *intended*, and the header-safe-dedupe/reconnect tests must
+be **capable of failing** rather than shaped to pass.
+
+### Lane state
+
+**#1846** parked on the deferred runtime proof. **#1876** completeness fix delivered to its author.
+**#1879** implementing widened scope. **#1351** implementing after PLAN-EVAL PASS.
