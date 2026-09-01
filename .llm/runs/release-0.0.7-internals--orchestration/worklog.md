@@ -8823,3 +8823,62 @@ Resume confirmed live with a writing transcript.
 
 #1802 otherwise stands: `check-test` **pass** at `0c938c3e6`, `close-gate` PASS on current provenance,
 sole `status:ready-merge`. **No packet until the verdict lands.**
+
+
+## D-201 - #1802 delta PASS and carrier-only carry onto 102ef8a10; #1351 plan complete and under PLAN-EVAL
+
+### #1802 - exact-head attestation supplied, and my own claim corrected
+
+Resumed evaluator returned **`VERDICT: PASS`**, artifact `404285542` over head `0c938c3e6`. The
+transport failure that preceded it is recorded as a **no-verdict transport failure**, not a terminal
+verdict, with its transcript preserved.
+
+**Evaluator finding O-1 corrects me, and I recorded it rather than restating my wording.** I claimed
+"`deno.lock` byte-unchanged" - literally false: the blob advanced `a1522e6e` to `ac2ee042`. That
+advance is `main`'s own #1832 lock change arriving through the required merge `7d20e852f`; HEAD's lock
+is byte-identical to `main`'s tip and no leaf-authored commit touches it. The correct claim is **"no
+leaf-authored lock change"**. O-2 (repository-mode `quality:scan` showing 2 pre-existing findings over
+the whole agentic root) is likewise upstream drift; the changed-file scan this PR is gated on returns
+0.
+
+### Carrier-only carry onto `102ef8a10`, proven not assumed
+
+#1848 touched 24 files - agent-docs prose/provenance, a `.llm/runs` dir, `check-exports-drift.ts`,
+`docs/site` reference, generated CLI assets. None intersect this leaf. Verified by blob comparison
+across the merge:
+
+| Blob | Result |
+| --- | --- |
+| `local-sender-ownership-adapter.ts` `e64bd212ff58` | unchanged |
+| `sender-ownership.ts` `624facd40fe1` | unchanged |
+| `codex-resume.ts` `28cfb24c9d3e` | unchanged |
+| evaluator artifact `impl-eval-delta.md` `0424b02f94ab` | unchanged |
+| `deno.lock` | unchanged by this merge |
+
+Every product blob the evaluation covered **and the evaluator's own artifact** survive byte-identical,
+so the PASS carries on proof. Four unchanged ceilings re-verified; suites **253 passed / 0 failed**.
+Head `e36b17461` pushed, `close-gate` **PASS** with fresh provenance. No packet until CI is terminal.
+
+### #1351 - split ruling landed, plan complete
+
+The split dispatch initially looked failed (attempt 37, `DISPATCH_REAL_EXIT=1`) - **it succeeded on
+attempt 55**. Reading only the first line of a retry log would have produced a wrong conclusion and a
+duplicate dispatch; the loop's later success is what mattered.
+
+The author applied it properly (`6ac7d49ab docs(harness): apply #1351 dependency split ruling`). The
+plan now states the split is **decided, not an open sequencing question**, excludes all oRPC
+dependency/version/lock work, names **#1879** as owner, explicitly records that it must **not** depend
+on #1879 landing, and adds a changed-file audit that rejects dependency-config or lock churn leaking
+back in.
+
+**PLAN-EVAL dispatched.** The brief aims at whether the split is honoured **in substance rather than
+wording**, whether the owned policy function is concretely specified or aspirational prose, whether
+the forward-compat rule ("contributions never observe the HTTP method") is **enforced by design or
+merely intended**, whether deprecated `port`/`timeout` are actually regression-tested, and whether the
+hard tests - header-safe dedupe and reconnect - are **capable of failing** rather than shaped to pass.
+
+### Lane state
+
+**#1802** delta PASS, carried onto current main, CI running. **#1846** parked on the deferred runtime
+proof. **#1876** IMPL-EVAL running (17 min). **#1879** launched, not yet pushed. **#1351** plan
+complete, PLAN-EVAL running.
