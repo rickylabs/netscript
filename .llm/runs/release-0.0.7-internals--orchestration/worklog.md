@@ -7710,3 +7710,39 @@ answer,** and it is more dangerous than an uncertain one because the measurement
 When an instruction asks me to *remove* something, the premise deserves more scrutiny than when it
 asks me to add something — deletion is the direction that destroys context. Saved to durable memory as
 [[harness-run-artifacts-are-never-stripped]].
+
+## D-178 — #1832 cycle 2 and #1750 both PASS; both flipped ready, CI in flight
+
+### #1832 — `VERDICT: PASS` at `af2abed22` (artifact `77720bd9b`)
+
+Cycle 1's two `FAIL_IMPL` findings are repaired, verified by me at the head before relaying:
+
+| Gate | Exit | Result |
+| --- | ---: | --- |
+| Repo-wide `deno task test` | **0** | **4,444 passed / 0 failed / 19 ignored** |
+| `deno task --cwd packages/fresh-ui check` (F1) | **0** | frozen check green, zero pre-bump matches |
+| `TanStack usage:` filter | **0** | 3 passed / 0 failed |
+| #1829's three blocks vs `f59874abd` | — | **byte-identical** |
+
+The "fifth lock" was answered rather than assumed: the only remaining pre-bump lock is a **frozen
+historical evidence fixture** under `.llm/runs/**`, not a workspace member, and regenerating it would
+corrupt recorded evidence. Handed to the evaluator as a claim to falsify; it agreed.
+
+### #1750 — `VERDICT: PASS` at `f11dfadd5` (artifact `2b0cae94f`)
+
+The survey requirement was the whole value of this leaf. The issue named the **hybrid launcher**; the
+survey found **32 tasks / 26 strict parsers, 21 rejecting a leading `--`**. Fixing only the named site
+would have left **twenty** broken entry points. Verified the contract myself in both directions:
+documented form **RC 0**, unknown later argument **RC 2**, non-leading `--` **RC 2** — so the fix did
+not degrade into "ignore tokens we do not recognise".
+
+Ticked #1840's now-true PR-body DoD box ("Mandatory separate-session IMPL-EVAL passes") — a supervisor
+assertion on a PR body, which the acceptance mirror does not own, so hand-ticking is correct here and
+would be wrong for an issue box. Neither issue #1695 nor #1750 has issue-level acceptance checkboxes,
+so no `acceptance-evidence` block is required for either.
+
+Both PRs: review threads **0 / 0**, flipped ready, exact-head CI dispatched. **`status:ready-merge`
+withheld until exact CI is green** — the #1828 lesson applied rather than merely recorded.
+
+Two leaves remain in flight: **#1802** (bounded repair, countermand delivered pending) and **#1846 /
+#1839** (RED committed, working).
