@@ -4612,6 +4612,7 @@
       "plugins/workers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/config@0.0.6",
           "jsr:@netscript/contracts@0.0.6",
           "jsr:@netscript/cron@0.0.6",
           "jsr:@netscript/kv@0.0.6",
