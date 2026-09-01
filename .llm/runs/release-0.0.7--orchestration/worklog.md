@@ -3808,3 +3808,24 @@
   exact scaffold coverage; #1756 restored runtime semantics and is finishing its suite; Internals
   launched #1888 and continues #1876/#1351/#1879; Fixes serializes #1858 behind the currently active
   hosted jobs instead of creating cancellation churn. No owner-only decision is pending.
+
+## 2026-09-01T18:10:00Z — dependency and workers packets ship; hosted queue advances
+
+- Internals PR #1876 reached cycle-2 IMPL-EVAL PASS, a single current acceptance-evidence mapping,
+  exact full CI and close-gate green, zero threads, and a clean merge against main. The coordinator
+  squash-merged it as `43376c50695643919f3080a508ddd132a242bede`, closing and shipping #1543.
+- Stacked Features repair #1884 passed its own exact evaluator and close-gate at `5edfc828e` and was
+  merged into #1872 as `8223bfe7e`. The combined #1872 head then passed run `33540741559` in both
+  Postgres and SQLite/Garnet plus static gates. Its only current-main overlap with #1876 was
+  `deno.lock`, where the declarations occupy disjoint hunks; synthetic merge was conflict-free.
+  Required CI, corrected close-gate, zero threads, and the parent/child evaluator pair were green, so
+  the coordinator merged #1872 as `7d18ef104824734932b5eac247637f4b9c770579`, closing/shipping
+  #1451 and #1874.
+- A label-triggered duplicate #1872 runtime run was cancelled at the identical immutable head after
+  the complete exact run was already green, preventing it from starving #1858. Fixes runtime run
+  `33541672224` is now active at exact `811862835` in both tiers; #1846 remains behind it. #1885's
+  prior exact both-tier run is green, while its evaluator and 404 discriminator continue without
+  consuming the hosted lane.
+- Main is `7d18ef104824734932b5eac247637f4b9c770579`. Milestone 0.0.7 has 41 open issues, all with
+  exactly one of the five topic-orchestrator owners; 21 PRs remain open. No owner-only decision is
+  pending, and all five supervisors were re-steered with the new main and next concrete packet.

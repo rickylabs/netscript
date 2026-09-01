@@ -2457,3 +2457,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   runtime semantics. Internals #1876 has a PASS and current-main convergence and is terminalizing its
   corrected close-gate; #1351/#1879/#1888 continue in parallel. Fixes #1885 is exact both-tier green
   at `14c56b281` and awaits its running evaluator. No owner-only decision is pending.
+
+## Resume delta — 2026-09-01T18:10:00Z
+
+- Current main is `7d18ef104824734932b5eac247637f4b9c770579`. #1876 shipped as `43376c506`,
+  closing #1543. Stacked #1884 then reached #1872 as `8223bfe7e`; exact combined hosted run
+  `33540741559` passed both runtime tiers, and #1872 shipped as `7d18ef104`, closing #1451 and #1874.
+- #1858 exact run `33541672224` now owns the hosted Postgres and SQLite/Garnet lanes at
+  `811862835`; #1846 and #1747/S8 retries remain behind it while their static work continues.
+  Duplicate same-head #1872 runtime was deliberately cancelled after the earlier complete green
+  receipt so it could not consume the lane again.
+- The milestone now has 41 open issues and 21 open PRs. Every open milestone issue retains exactly
+  one topic owner: Aspire 13, Docs 1, Features 9, Fixes 13, Internals 5. #1842/#1590/#1891,
+  #1885, #1756, #1351/#1879/#1888, and #1887/#1747/S8 all remain actively assigned. No owner-only
+  decision is pending.
