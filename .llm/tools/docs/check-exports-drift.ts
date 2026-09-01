@@ -36,6 +36,66 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'fresh',
+    packagePath: 'packages/fresh',
+    docPath: 'docs/site/reference/fresh/index.md',
+    packageName: '@netscript/fresh',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all sixteen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.',
+    },
+  },
+  {
+    name: 'plugin-workers-core',
+    packagePath: 'packages/plugin-workers-core',
+    docPath: 'docs/site/reference/plugin-workers-core/index.md',
+    packageName: '@netscript/plugin-workers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all seventeen entrypoints and inventories all 32 root exports, but omits subpath-only APIs including JobBuilderState, WorkersRuntime, PublicDefinitionSchema, WorkersContractV1, WorkersConfig, WorkerInstrumentation, and TestWorkersRuntime.',
+    },
+  },
+  {
+    name: 'plugin-sagas-core',
+    packagePath: 'packages/plugin-sagas-core',
+    docPath: 'docs/site/reference/plugin-sagas-core/index.md',
+    packageName: '@netscript/plugin-sagas-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page documents every entrypoint and the complete root and agent surfaces, but omits substantial subpath contracts such as transport codecs, store adapters, telemetry contracts, and config schemas.',
+    },
+  },
+  {
+    name: 'ai',
+    packagePath: 'packages/ai',
+    docPath: 'docs/site/reference/ai/index.md',
+    packageName: '@netscript/ai',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all thirteen entrypoints but does not yet inventory every symbol: /skills has no dedicated symbol section; the root prompt APIs, OpenAI-compatible vision exports, Ollama HttpReachabilityConfig, MCP pool/resource APIs, AgentLoop, newer contract/reasoning symbols, vector-memory and provider-factory ports, and retrieval testing helpers remain incomplete.',
+    },
+  },
+  {
+    name: 'auth-kv-oauth',
+    packagePath: 'packages/auth-kv-oauth',
+    docPath: 'docs/site/reference/auth-kv-oauth/index.md',
+    packageName: '@netscript/auth-kv-oauth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eight entrypoints were checked with deno doc; the page omits AUTH_SESSION_STATES, AtomicCheck, AtomicMutation, AtomicResult, AuthBackendPort, AuthPrincipalMapperPort, AuthProviderCapability, AuthProviderDescriptor, AuthProviderRegistryPort, AuthSession, AuthSessionCreateInput, AuthSessionCryptoPort, AuthSessionLookup, AuthSessionPrincipalMapping, AuthSessionState, AuthSessionStorePort, AuthenticatorPort, AuthnRequest, AuthnResult, ClientAuthMethod, InteractiveCallbackResult, InteractiveFlowPort, KvEntry, KvKey, KvListOptions, KvOAuthCookieOptions, KvOAuthEncryptedTokens, KvOAuthErrorCode, KvOAuthFetch, KvOAuthJsonValidator, KvOAuthKeyMaterial, KvOAuthPrincipal, KvOAuthRefreshMode, KvOAuthSessionRecord, KvOAuthStoreOptions, KvOAuthTxn, KvSetOptions, KvStore, NormalizePrincipalContext, OAuthCustomFetch, OAuthEndpointProviderConfig, OAuthIssuerProviderConfig, OAuthProviderBaseConfig, OAuthProviderClientAuthConfig, OAuthTokenCustomFetch, Principal, TenantOAuthProviderOptions, WatchEvent, WatchOptions, WatchPrefixOptions, WatchableKv, clientAuth, describeProvider, discoveryRequestOptions, hashToken, and requestOptions.',
+    },
+  },
+  {
     name: 'plugin-triggers-core',
     packagePath: 'packages/plugin-triggers-core',
     docPath: 'docs/site/reference/plugin-triggers-core/index.md',

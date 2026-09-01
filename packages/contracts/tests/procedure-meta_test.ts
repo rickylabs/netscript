@@ -6,9 +6,23 @@ Deno.test('base contract stores NetScript procedure metadata without a reader po
 
   const authenticatedRoute = baseContract
     .route({ method: 'GET', path: '/metadata-storage' })
-    .meta({ access: { authentication: 'required' } });
+    .meta({
+      access: {
+        authentication: 'required',
+        authorization: {
+          scopes: ['metadata:read'],
+          roles: ['operator'],
+        },
+      },
+    });
 
   assertEquals(authenticatedRoute['~orpc'].meta, {
-    access: { authentication: 'required' },
+    access: {
+      authentication: 'required',
+      authorization: {
+        scopes: ['metadata:read'],
+        roles: ['operator'],
+      },
+    },
   });
 });

@@ -59,33 +59,36 @@ export interface ServiceConfig {
 }
 
 /** Fluent builder for configuring and materializing a NetScript service. */
-export interface ServiceBuilder<TRouter extends ServiceRouter> {
+export interface ServiceBuilder<
+  TRouter extends ServiceRouter,
+  TCustom extends object = Record<never, never>,
+> {
   /** Enables CORS middleware. */
-  withCors(options?: CorsOptions): ServiceBuilder<TRouter>;
+  withCors(options?: CorsOptions): ServiceBuilder<TRouter, TCustom>;
 
   /** Enables structured request logging middleware. */
-  withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter>;
+  withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter, TCustom>;
 
   /** Adds database context, health, and readiness wiring. */
   withDatabase(
     db: DbContext,
     healthCheckDb?: Database,
     healthCheckOptions?: HealthCheckAdapterOptions,
-  ): ServiceBuilder<TRouter>;
+  ): ServiceBuilder<TRouter, TCustom>;
 
   /** Adds a custom health check. */
-  withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter>;
+  withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter, TCustom>;
 
   /** Adds a custom readiness check. */
-  withReadinessCheck(check: () => Promise<boolean>): ServiceBuilder<TRouter>;
+  withReadinessCheck(check: () => Promise<boolean>): ServiceBuilder<TRouter, TCustom>;
 
   /** Configures the OpenAPI JSON endpoint. */
   withOpenAPI(
     options?: { title?: string; description?: string },
-  ): ServiceBuilder<TRouter>;
+  ): ServiceBuilder<TRouter, TCustom>;
 
   /** Configures the Scalar API documentation UI. */
-  withDocs(options?: { specUrl?: string }): ServiceBuilder<TRouter>;
+  withDocs(options?: { specUrl?: string }): ServiceBuilder<TRouter, TCustom>;
 
   /** Configures oRPC RPC and OpenAPI request handlers. */
   withRPC(
@@ -101,7 +104,7 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
       }[];
       rpcRouter?: ServiceRouter;
     },
-  ): ServiceBuilder<TRouter>;
+  ): ServiceBuilder<TRouter, TCustom>;
 
   /**
    * Enables authentication for guarded service paths.
@@ -113,7 +116,7 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
    *   .withRPC();
    * ```
    */
-  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter>;
+  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter, TCustom>;
 
   /**
    * Enables authorization for authenticated requests.
@@ -126,13 +129,15 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
    *   .withRPC();
    * ```
    */
-  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter>;
+  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter, TCustom>;
 
   /** Sets the per-request oRPC context factory. */
-  withContext(factory: ContextFactory): ServiceBuilder<TRouter>;
+  withContext<TNext extends object>(
+    factory: ContextFactory<TNext>,
+  ): ServiceBuilder<TRouter, TNext>;
 
   /** Registers an async startup hook. */
-  onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter>;
+  onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter, TCustom>;
 
   /**
    * Registers an async teardown hook run during graceful shutdown.
@@ -148,25 +153,25 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
    * await running.stop();
    * ```
    */
-  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter>;
+  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter, TCustom>;
 
   /** Configures health check endpoints. */
   withHealth(
     options?: { checks?: HealthCheck[]; includeDetails?: boolean },
-  ): ServiceBuilder<TRouter>;
+  ): ServiceBuilder<TRouter, TCustom>;
 
   /** Adds custom middleware to the service. */
-  use(middleware: ServiceMiddleware): ServiceBuilder<TRouter>;
+  use(middleware: ServiceMiddleware): ServiceBuilder<TRouter, TCustom>;
 
   /** Adds a custom (raw, non-oRPC) route to the service. `'all'` matches every method. */
   route(
     method: ServiceRouteMethod,
     path: string,
     handler: ServiceHandler,
-  ): ServiceBuilder<TRouter>;
+  ): ServiceBuilder<TRouter, TCustom>;
 
   /** Configures the root service information endpoint. */
-  withServiceInfo(): ServiceBuilder<TRouter>;
+  withServiceInfo(): ServiceBuilder<TRouter, TCustom>;
 
   /** Builds a mountable service app without starting a listener. */
   build(): ServiceApp;

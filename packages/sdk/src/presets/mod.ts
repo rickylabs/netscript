@@ -3,8 +3,10 @@
  *
  * Import `defineServices()` from this focused entry when shared or browser
  * modules do not need the SDK root's discovery, telemetry, and OpenAPI exports.
- * The entry is load-time pure and exposes only the preset plus its explicit
- * package-owned type closure.
+ * Each service may attach an explicit literal contribution tuple. Safe tuples
+ * partition full server/TanStack keys; a direct-only tuple keeps its client while
+ * omitting that service from query and query-utils maps. The entry is load-time
+ * pure and exposes only the preset plus its explicit package-owned type closure.
  *
  * @module
  */
@@ -36,11 +38,31 @@ export type {
   CompositeQuery,
   FactoryConfig,
   ProcedureInput,
+  ProcedureMeta,
   ProcedureOutput,
   QueryFactory,
 } from '../ports/query-factory.ts';
-export type { QueryKey, QueryKeyPart } from '../ports/query-key.ts';
+export type {
+  ActionQueryKey,
+  QueryKey,
+  QueryKeyPart,
+  SdkClientServerKeySuffix,
+} from '../ports/query-key.ts';
 export type { CacheQueryOptions, QueryParams } from '../ports/query-options.ts';
+export type {
+  SdkClientCachePartitionOptions,
+  SdkClientContextDeclaration,
+  SdkClientContribution,
+  SdkClientContributionContext,
+  SdkClientContributionId,
+  SdkClientContributionProtocol,
+  SdkClientPrepareOptions,
+  SdkClientProcedureDescriptor,
+  SdkClientRequestPatch,
+  SdkClientResponseCache,
+  SdkClientTransportDescriptor,
+  ValidateSdkClientContributions,
+} from '../ports/sdk-client-contribution.ts';
 export type {
   QueryClientFetchOptions,
   QueryClientFilters,
@@ -85,6 +107,7 @@ export type {
   CreateServiceClientOptions,
   NetScriptProcedureSchemas,
   ProcedureInputFromNode,
+  ProcedureMetaFromNode,
   ProcedureOutputFromNode,
   ServiceClient,
   ServiceClientContext,
@@ -92,4 +115,5 @@ export type {
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
+  ServiceRequestRest,
 } from '../ports/service-client.ts';

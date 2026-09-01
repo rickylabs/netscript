@@ -23,14 +23,22 @@ const listRoute: ListRoute = baseContract
   .route({ method: 'GET', path: '/orders' })
   .input(CursorPaginationInputSchema)
   .output(SuccessSchema)
-  .meta({ access: { authentication: 'required' } });
+  .meta({
+    access: {
+      authentication: 'required',
+      authorization: {
+        scopes: ['orders:read'],
+        roles: ['operator'],
+      },
+    },
+  });
 
-const ordersContract = { list: listRoute };
+const ordersContract = { renamedList: listRoute };
 declare const directClient: ServiceClient<typeof ordersContract>;
 
 type DirectContract = NonNullable<typeof directClient.__netscriptServiceContract>;
-type DirectMeta = ProcedureMetaFromNode<DirectContract['list']>;
-type DirectErrors = DirectContract['list']['~orpc']['errorMap'];
+type DirectMeta = ProcedureMetaFromNode<DirectContract['renamedList']>;
+type DirectErrors = DirectContract['renamedList']['~orpc']['errorMap'];
 type _DirectClientMetaRemainsExact = Assert<Equal<DirectMeta, BaseContractMeta>>;
 type _DirectClientErrorsRemainExact = Assert<Equal<DirectErrors, BaseContractErrors>>;
 
@@ -41,7 +49,9 @@ type ExpectedErrorCode =
   | 'FORBIDDEN'
   | 'RATE_LIMITED'
   | 'SERVICE_UNAVAILABLE';
-type DirectMethodError = NonNullable<ReturnType<typeof directClient.list>['__error']>['type'];
+type DirectMethodError = NonNullable<
+  ReturnType<typeof directClient.renamedList>['__error']
+>['type'];
 type _DirectClientErrorCodesRemainExact = Assert<
   Equal<Extract<DirectMethodError, { readonly defined: true }>['code'], ExpectedErrorCode>
 >;
@@ -60,27 +70,35 @@ const services = defineServices({
 type GeneratedContract = NonNullable<
   typeof services.clients.orders.__netscriptServiceContract
 >;
-type GeneratedMeta = ProcedureMetaFromNode<GeneratedContract['list']>;
-type GeneratedErrors = GeneratedContract['list']['~orpc']['errorMap'];
+type GeneratedMeta = ProcedureMetaFromNode<GeneratedContract['renamedList']>;
+type GeneratedErrors = GeneratedContract['renamedList']['~orpc']['errorMap'];
 type QueryMeta = NonNullable<
-  typeof services.queries.orders.list.__netscriptProcedureMeta
+  typeof services.queries.orders.renamedList.__netscriptProcedureMeta
 >;
 type _GeneratedClientMetaRemainsExact = Assert<Equal<GeneratedMeta, BaseContractMeta>>;
 type _GeneratedClientErrorsRemainExact = Assert<Equal<GeneratedErrors, BaseContractErrors>>;
 type _GeneratedQueryMetaRemainsExact = Assert<Equal<QueryMeta, BaseContractMeta>>;
 type _QueryExtractorMetaRemainsExact = Assert<
-  Equal<ProcedureMeta<typeof ordersContract, 'list'>, BaseContractMeta>
+  Equal<ProcedureMeta<typeof ordersContract, 'renamedList'>, BaseContractMeta>
 >;
 
-const validMeta: ProcedureMeta<typeof ordersContract, 'list'> = {
-  access: { authentication: 'optional' },
+const validMeta: ProcedureMeta<typeof ordersContract, 'renamedList'> = {
+  access: {
+    authentication: 'optional',
+    authorization: {
+      scopes: ['orders:read'],
+      roles: ['operator'],
+    },
+  },
 };
-const invalidAuthentication: ProcedureMeta<typeof ordersContract, 'list'> = {
+const invalidAuthentication: ProcedureMeta<typeof ordersContract, 'renamedList'> = {
   // @ts-expect-error TS2322: SDK metadata preserves the public authentication literal union.
   access: { authentication: 'sometimes' },
 };
 // @ts-expect-error TS2322: SDK metadata preserves the public nested object shape.
-const invalidAccess: ProcedureMeta<typeof ordersContract, 'list'> = { access: 'required' };
+const invalidAccess: ProcedureMeta<typeof ordersContract, 'renamedList'> = { access: 'required' };
+// @ts-expect-error TS2344: SDK metadata keys follow the renamed contract procedure.
+type _OldSdkKeyIsRejected = ProcedureMeta<typeof ordersContract, 'list'>;
 
 void directClient;
 void services;

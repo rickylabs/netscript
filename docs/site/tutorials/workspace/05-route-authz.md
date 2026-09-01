@@ -14,13 +14,12 @@ once, and both must be typed. It has to know *which* team is being asked for —
 the path, not a string you fish out of the URL by hand — and it has to **fail closed**: no credential
 means `401` before the handler runs, and a valid credential without the right scope means `403`.
 
-This chapter builds exactly that pair. You declare the members route once as a **bound route
-contract** — `createRouteReference` / `defineRouteContract` + `bindRoutePattern` from
-`@netscript/fresh/route` — so the URL pattern, the typed `{ workspace }` path param, and the
-pagination search all come from a single object your service and any client share. Then you layer the
-`.withAuthn()` / `.withAuthz()` guard from `@netscript/service/auth` on top of it — the seam
-NetScript ships and proves in its own `builder-auth` test suite. The result is the combination this
-chapter's title promises: a **typed route and its authorization gate, from one source of truth.**
+This chapter builds exactly that pair. You declare the members procedure once with
+`baseContract.route(...).meta({ access: ... })`, so its HTTP method, path, input/output schemas, and
+authorization requirements live on the same contract value used by the service and its clients.
+Then `createContractAuthorizer()` projects that declaration into the service builder's
+`.withAuthn()` / `.withAuthz()` middleware. The result is the combination this chapter's title
+promises: a **typed route and its authorization gate, from one source of truth.**
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
@@ -33,13 +32,13 @@ chapter's title promises: a **typed route and its authorization gate, from one s
 
 ## What you will build
 
-A guarded `GET /api/workspace/:workspace/members` route. One bound route contract declares its
-pattern, its typed `{ workspace }` path param, and its typed `limit`/`offset` pagination. The service
-registers that route, reads its params **through the contract** (no hand-parsing), and gates it with
-`.withAuthn()` (which turns each request into a `Principal`) and `.withAuthz()` (which decides whether
-that principal may reach the route). By the end an unauthenticated request returns `401 UNAUTHORIZED`,
-a request with the wrong scope returns `403 FORBIDDEN`, and a correctly-scoped request returns `200`
-with a typed member list — the exact three outcomes the framework's own test asserts.
+A guarded `GET /api/workspace/:workspace/members` route. One oRPC procedure contract declares its
+path, typed `workspace`/`limit`/`offset` input, typed output, and required `workspace:read` scope. The
+service implements that exact contract and gates it with `.withAuthn()` (which turns each request
+into a `Principal`) and `.withAuthz()` (which enforces the procedure metadata). By the end an
+unauthenticated request returns `401 UNAUTHORIZED`, a request with the wrong scope returns
+`403 FORBIDDEN`, and a correctly-scoped request returns `200` with a typed member list — the exact
+three outcomes the framework's own test asserts.
 
 ## Prerequisites
 
@@ -47,8 +46,8 @@ with a typed member list — the exact three outcomes the framework's own test a
   [chapter 1](/tutorials/workspace/01-scaffold/).
 - The `Member` model and the `workspaceDb` client from
   [chapter 3](/tutorials/workspace/03-workspace-data/) — the route lists members from that datasource.
-- The route-authz seam is built into `@netscript/service`, and the route contract into
-  `@netscript/fresh/route`; neither needs Aspire or the auth plugin to type-check, though you run the
+- The contract metadata vocabulary is built into `@netscript/contracts`, and the route-authz seam
+  into `@netscript/service/auth`; neither needs the auth plugin to type-check, though you run the
   service under Aspire to exercise it live.
 
 Confirm the workspace still builds before you change it:
@@ -67,82 +66,90 @@ service's <code>.withAuthn()</code> turns a request into that <code>Principal</c
 authorization decision.
 {{ /comp }}
 
-## Step 1 — Declare the bound route contract
+## Step 1 — Declare access on the procedure contract
 
-Before the guard, give the route a typed identity. A route contract from `@netscript/fresh/route` is
-the single source of truth for a route's shape: its pattern, its path params, and its search params.
-`createRouteReference` infers the `{ workspace }` param straight from the pattern; `defineRouteContract`
-+ `bindRoutePattern` add typed pagination search with safe defaults. Create the contract in the shared
-`contracts/` tree so the service and any future client import the *same* object:
+Before the guard, give the route a typed identity and policy. Create the procedure in the shared
+`contracts/` tree so the service and every client import the same object. The route uses oRPC's
+`{workspace}` placeholder; the default service REST mount adds `/api` at runtime.
 
 ```ts
-// contracts/routes/workspace-members.ts
-import {
-  bindRoutePattern,
-  createRouteReference,
-  defineRouteContract,
-  fallback,
-  paginationSearchSchema,
-} from '@netscript/fresh/route';
+// contracts/versions/v1/workspace.contract.ts
+import { implement } from '@orpc/server';
+import { baseContract } from '@netscript/contracts';
 import { z } from 'zod';
 
-/** The one place the members route pattern is written. */
-export const MEMBERS_ROUTE_PATTERN = '/api/workspace/[workspace]/members';
+const MembersInput = z.object({
+  workspace: z.string().min(1),
+  limit: z.coerce.number().int().positive().max(100).default(20),
+  offset: z.coerce.number().int().nonnegative().default(0),
+});
 
-/**
- * The bound members route: typed `{ workspace }` path param + typed
- * `limit`/`offset` pagination, all inferred from this one declaration.
- */
-export const membersRoute = bindRoutePattern(
-  defineRouteContract({
-    // A path schema types the dynamic `[workspace]` segment as a non-empty id.
-    pathSchema: z.object({ workspace: z.string().min(1) }),
-    // paginationSearchSchema() gives limit/offset with computed defaults.
-    searchSchema: paginationSearchSchema({ defaultLimit: 20 }).extend({
-      // A junk ?role=banana falls back to undefined instead of throwing.
-      role: fallback(z.enum(['member', 'admin']).optional(), undefined),
-    }),
-  }),
-  MEMBERS_ROUTE_PATTERN,
-);
+const Member = z.object({
+  id: z.string(),
+  workspaceId: z.string(),
+  subject: z.string(),
+  role: z.string(),
+});
+
+const MembersOutput = z.object({
+  workspace: z.string(),
+  limit: z.number().int(),
+  offset: z.number().int(),
+  subject: z.string(),
+  members: z.array(Member),
+});
+
+export const WorkspaceContractV1 = {
+  members: baseContract
+    .route({ method: 'GET', path: '/workspace/{workspace}/members' })
+    .meta({
+      access: {
+        authentication: 'required',
+        authorization: { scopes: ['workspace:read'] },
+      },
+    })
+    .input(MembersInput)
+    .output(MembersOutput),
+};
+
+export const WorkspaceV1 = implement(WorkspaceContractV1);
 ```
 
-`bindRoutePattern` returns one object with everything downstream needs: `membersRoute.parsePath(...)`
-and `membersRoute.parseSearch(...)` turn raw request params into typed values, and
-`membersRoute.href({ path: { workspace } })` builds the URL for a client — so a link and the handler
-that answers it can never disagree about the route's shape.
+The `.meta({ access: ... })` block is the source of truth for the guard. It uses the one
+`NetScriptProcedureMeta.access` vocabulary: `authentication` is `none`, `optional`, or `required`,
+and `authorization` may declare readonly `scopes` and `roles`. There is no separate path-policy map
+to keep aligned with this route.
 
 {{ comp.apiTable({
-  caption: "@netscript/fresh/route — the bound route contract surface",
+  caption: "@netscript/contracts — procedure access metadata",
   rows: [
-    { name: "createRouteReference(pattern)", type: "RouteReference", desc: "Infers typed path params directly from a Fresh route pattern — `/api/workspace/[workspace]/members` yields `{ workspace: string }`." },
-    { name: "defineRouteContract({ pathSchema?, searchSchema? })", type: "DefineRouteContract", desc: "Declares typed path and search schemas; bind it to one or more concrete patterns." },
-    { name: "bindRoutePattern(contract, pattern)", type: "BoundRouteContract", desc: "Binds the contract to a pattern, returning one object with .parsePath / .parseSearch / .href." },
-    { name: "paginationSearchSchema(opts) / fallback(schema, default)", type: "search schema", desc: "Typed limit/offset with computed defaults; fallback() catches junk query strings instead of 500-ing the route." }
+    { name: ".meta({ access })", type: "NetScriptProcedureMeta", desc: "Stores access policy on the procedure that owns the route and schemas." },
+    { name: "authentication", type: "'none' | 'optional' | 'required'", desc: "Declares whether the operation is public, optional-auth, or authenticated." },
+    { name: "authorization.scopes", type: "readonly string[]", desc: "Every declared scope must be present on the authenticated Principal." },
+    { name: "authorization.roles", type: "readonly string[]", desc: "Every declared role must be present on the authenticated Principal." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "One param name, two path syntaxes" } }}
-Route contracts use Fresh's <code>[workspace]</code> pattern syntax; a service (Hono) route registers
-the same segment as <code>:workspace</code>. It is the <strong>same param name</strong> either way —
-the contract owns the typed shape, and <code>membersRoute.parsePath(c.req.param())</code> in Step 3
-bridges the runtime params the service router collected into that typed shape. You write the pattern
-once, in the contract.
+{{ comp callout { type: "important", title: "Optional is declared for future support" } }}
+<code>authentication: 'optional'</code> is part of the metadata vocabulary and appears honestly in
+OpenAPI, but the current runtime adapter rejects it. <code>createContractAuthorizer()</code> throws
+<code>[netscript.service.contract-policy] optional authentication is unsupported: &lt;procedure&gt;</code>
+during construction, before the first request.
 {{ /comp }}
 
-## Step 2 — Build the authenticator and scope authorizer
+## Step 2 — Build the authenticator and contract authorizer
 
-Now the guard. Define the credentials and the scope rule. This mirrors the framework's own
-`builder-auth_test.ts`: a `read` credential carries the `workspace:read` scope, and the authorizer
-requires that scope on the members route. The rule matches the **same prefix** the contract declares,
-so what the contract types and what the guard protects stay in lockstep:
+Now the guard. Define the credentials, then construct the authorizer from the contract itself. A
+`read` credential carries `workspace:read`; a `write` credential does not. The authorizer reads the
+required scope from `WorkspaceContractV1.members` — no duplicated path matcher:
 
 ```ts
 // services/workspace/src/auth.ts
 import {
-  createScopeAuthorizer,
+  createContractAuthorizer,
   createStaticCredentialAuthenticator,
 } from '@netscript/service/auth';
+import { WorkspaceContractV1 } from '../../../contracts/versions/v1/workspace.contract.ts';
 
 export const authenticator = createStaticCredentialAuthenticator({
   credentials: {
@@ -159,74 +166,80 @@ export const authenticator = createStaticCredentialAuthenticator({
   },
 });
 
-export const authorizer = createScopeAuthorizer({
-  rules: [{
-    // Guards every /api/workspace/<id>/members request the contract addresses.
-    match: (request) => request.path.startsWith('/api/workspace/'),
-    requireScopes: ['workspace:read'],
-  }],
-});
+export const authorizer = createContractAuthorizer(WorkspaceContractV1);
 ```
 
 {{ comp.apiTable({
   caption: "@netscript/service/auth — the route-authz surface",
   rows: [
     { name: "createStaticCredentialAuthenticator(opts)", type: "AuthenticatorPort", desc: "Maps bearer tokens to principals — each credential carries a subject, scopes, and roles. Good for tests and machine-to-machine callers." },
-    { name: "createScopeAuthorizer(opts)", type: "AuthorizerPort", desc: "Rules of { match, requireScopes } — the principal must carry every required scope for a matched route." },
+    { name: "createContractAuthorizer(contract, { fallback? })", type: "ContractPolicyAuthorizerPort", desc: "Traverses procedure-local access metadata and binds it to the builder's real REST/RPC paths and aliases." },
+    { name: "createScopeAuthorizer(opts)", type: "MatchAwareAuthorizerPort", desc: "Supported legacy path-rule authorizer; standalone, or a fallback only when a matched procedure has no metadata." },
     { name: ".withAuthn({ authenticator, protect?, allowAnonymous? })", type: "builder stage", desc: "protect defaults to ['/api']; allowAnonymous defaults to ['/health']." },
     { name: ".withAuthz({ authorizer, denyByDefault? })", type: "builder stage", desc: "denyByDefault defaults to true — fail closed when no decision is reachable." }
   ]
 }) }}
 
-## Step 3 — Register the typed route and layer the guard
+This opt-in is the migration boundary. Existing unguarded services, generated scaffolds, and
+standalone `createScopeAuthorizer()` users are unchanged. Contract enforcement starts only when the
+application passes a `createContractAuthorizer(...)` result to `.withAuthz()`.
 
-Register the members route on the service builder, then apply `.withAuthz()` and `.withAuthn()`. The
-handler runs only for an authenticated, authorized caller — and it reads its params **through the
-contract**, so `workspace`, `limit`, and `offset` arrive typed, never hand-sliced from the URL:
+If you are migrating older path rules, pass `createScopeAuthorizer()` as `fallback`. Contract
+metadata always wins on disagreement. The fallback is consulted only for a matched procedure with
+no access metadata; if no fallback rule matches, the adapter denies even when that fallback would
+allow unmatched paths in standalone mode.
+
+## Step 3 — Implement the contract and layer the guard
+
+Bind a handler to `WorkspaceV1.members`, then pass that router to the service builder. The handler
+runs only for an authenticated, authorized caller. Its `input` and output are typed from the same
+procedure that owns the access declaration:
 
 ```ts
 // services/workspace/src/main.ts
-import { createService } from '@netscript/service';
-import type { Principal } from '@netscript/service/auth';
-import { membersRoute } from '../../../contracts/routes/workspace-members.ts';
+import { os } from '@orpc/server';
+import { createService, type ServiceHandlerContext } from '@netscript/service';
+import { WorkspaceV1 } from '../../../contracts/versions/v1/workspace.contract.ts';
 import { workspaceDb } from './db.ts'; // the chapter 3 workspace client
 import { authenticator, authorizer } from './auth.ts';
 
-type RouteCtx = {
-  get(key: string): unknown;
-  json(data: unknown): Response;
-  req: { param(): Record<string, string>; url: string };
-};
+const workspaceV1 = WorkspaceV1.$context<ServiceHandlerContext>();
 
-const app = createService({}, { name: 'workspace' })
-  .route('get', '/api/workspace/:workspace/members', async (c: unknown) => {
-    const ctx = c as RouteCtx;
-    // .withAuthn injected the resolved principal; the handler only sees allowed callers.
-    const principal = ctx.get('principal') as Principal;
-
-    // Typed off the ONE route contract — no manual URL parsing.
-    const { workspace } = membersRoute.parsePath(ctx.req.param());
-    const { limit, offset } = membersRoute.parseSearch(new URL(ctx.req.url).searchParams);
+const router = os.router({
+  members: workspaceV1.members.handler(async ({ input, context }) => {
+    // Auth is runtime-configured, so the public context type is intentionally optional.
+    // This procedure is guarded; narrow once before using the principal.
+    if (!context.principal) throw new Error('authenticated principal required');
 
     const members = await workspaceDb.member.findMany({
-      where: { workspaceId: workspace },
-      take: limit,
-      skip: offset,
+      where: { workspaceId: input.workspace },
+      take: input.limit,
+      skip: input.offset,
       orderBy: { createdAt: 'asc' },
     });
 
-    return ctx.json({ workspace, limit, offset, subject: principal.subject, members });
-  })
-  .withAuthz({ authorizer })
+    return {
+      workspace: input.workspace,
+      limit: input.limit,
+      offset: input.offset,
+      subject: context.principal.subject,
+      members,
+    };
+  }),
+});
+
+const app = createService(router, { name: 'workspace' })
+  .withRPC()
   .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
   .build();
 
 export { app };
 ```
 
-The route pattern the service registers (`:workspace`) and the contract's pattern (`[workspace]`) name
-the same segment; `membersRoute.parsePath(ctx.req.param())` is what turns the router's raw params into
-the typed `{ workspace }` the handler uses.
+The builder binds the contract policy to its actual REST and RPC mounts. If you customize
+`.withRPC({ apiPath, rpcPath, rpcAliases, deprecatedRpcRoutes })`, one shared resolver uses those
+effective paths for both authn and authz; you do not repeat them in the policy.
 
 {{ comp callout { type: "note", title: "Health stays public" } }}
 By default <code>.withAuthn()</code> protects <code>/api</code> and leaves <code>/health</code>
@@ -279,7 +292,7 @@ yet (provision one with the [chapter 4](/tutorials/workspace/04-provision-job/) 
 means the request never reached the query at all.
 
 {{ comp callout { type: "important", title: "Route-Level Scope Authorization Boundary" } }}
-The <code>.withAuthz()</code> helper acts as a route-level filter that evaluates flat scope strings attached to the <code>Principal</code>. This design boundary separates HTTP route gating from complex tenant-ownership check logic. The framework does not automatically evaluate role hierarchies (such as admin permission inheritance) or verify organization-specific boundaries (such as confirming the caller is a member of the requested <code>workspace</code>). Currently, you must perform tenant-membership checks manually within your queries. Integrating typed organization helpers and plugin-aware principal mapping is planned under roadmap items R3 and R5.
+The contract authorizer evaluates the flat scope and role strings declared in procedure metadata against the <code>Principal</code>. This design boundary separates route gating from complex tenant-ownership check logic. The framework does not automatically evaluate role hierarchies (such as admin permission inheritance) or verify organization-specific boundaries (such as confirming the caller is a member of the requested <code>workspace</code>). Currently, you must perform tenant-membership checks manually within your queries. Integrating typed organization helpers and plugin-aware principal mapping is planned under roadmap items R3 and R5.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
@@ -288,12 +301,14 @@ The <code>.withAuthz()</code> helper acts as a route-level filter that evaluates
 The three `curl` calls above are the verification. The unauthenticated call must fail closed, and the
 scoped call must succeed with a typed body:
 
-- [ ] `contracts/routes/workspace-members.ts` exports `membersRoute`, a bound route contract with a
-      typed `{ workspace }` param and pagination search.
-- [ ] `services/workspace/src/auth.ts` defines the authenticator and a scope authorizer.
-- [ ] The `workspace` service registers `GET /api/workspace/:workspace/members` and applies
+- [ ] `contracts/versions/v1/workspace.contract.ts` exports `WorkspaceContractV1` with typed input,
+      output, and `.meta({ access: ... })` requiring `workspace:read`.
+- [ ] `services/workspace/src/auth.ts` defines the authenticator and constructs the authorizer from
+      `WorkspaceContractV1`.
+- [ ] The `workspace` service implements `WorkspaceV1.members`, calls `.withRPC()`, and applies
       `.withAuthn()` and `.withAuthz()`.
-- [ ] The handler reads params via `membersRoute.parsePath(...)` / `.parseSearch(...)`, not by hand.
+- [ ] The handler reads typed `input.workspace`, `input.limit`, and `input.offset`; it does not parse
+      the URL by hand.
 - [ ] An unauthenticated request returns `401 UNAUTHORIZED` (`missing-credential`).
 - [ ] `Bearer write` returns `403 FORBIDDEN` (`authz.missing-scope:workspace:read`).
 - [ ] `Bearer read` returns `200` with a body carrying `workspace`, `limit`, and `subject`.
@@ -301,13 +316,13 @@ scoped call must succeed with a typed body:
 
 ## What you built
 
-A guarded, typed members route: one bound route contract in `contracts/routes/workspace-members.ts`
-owns the pattern, the `{ workspace }` path param, and the pagination search; the `workspace` service
-registers that route, parses its params through the contract, and gates it with `.withAuthn()` and
-`.withAuthz()` — proven by a `401` for an anonymous request, a `403` for the wrong scope, and a `200`
-for a correctly-scoped one. That is the differentiator this chapter exists to show: the URL, its typed
-params, and its authorization gate are **not three hand-maintained facts that can drift** — they are
-one contract plus one guard, checked by the compiler and by the framework's own `builder-auth` test.
+A guarded, typed members procedure: `WorkspaceContractV1.members` owns the HTTP path, typed input
+and output, and required `workspace:read` scope; the service implements that procedure and opts into
+its policy with `createContractAuthorizer()` — proven by a `401` for an anonymous request, a `403`
+for the wrong scope, and a `200` for a correctly-scoped one. That is the differentiator this chapter
+exists to show: the URL, its typed data, and its authorization gate are **not three hand-maintained
+facts that can drift** — they are projections of one contract, checked by the compiler and by the
+framework's own auth tests.
 You also saw the boundary: this is route-level scope authz, not org/role RBAC — the tenancy stays
 yours.
 
@@ -315,9 +330,9 @@ yours.
 
 - **Ship it.** [Chapter 6 · Deploy](/tutorials/workspace/06-deploy/) runs the whole authenticated
   workspace locally under Aspire and takes it to production.
-- **Reuse the contract on the client.** `membersRoute.href({ path: { workspace } })` builds the same
-  URL a frontend link would call — see the typed route contract in action on a page in
-  [the live-dashboard track](/tutorials/live-dashboard/04-definePage-QueryIsland/).
+- **Reuse the contract on the client.** A typed SDK derived from `WorkspaceContractV1` exposes the
+  same `members` procedure and metadata. If that procedure key is renamed, its contract-local
+  metadata follows it and a stale SDK reference to the old key fails to type-check.
 - **Go deeper on identity.** The [auth plugin guide](/tutorials/workspace/02-auth/) covers resolving
   real human sessions into the `Principal` this guard authorizes.
 

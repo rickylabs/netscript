@@ -43,6 +43,7 @@ export const {
   appDesignTokensViewTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
+  appOrderExampleRouteTemplate,
   appHealthRouteTemplate,
   appHealthSharedTemplate,
   appHealthViewTemplate,

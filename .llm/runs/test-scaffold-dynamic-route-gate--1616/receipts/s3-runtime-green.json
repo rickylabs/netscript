@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all",
+    "packages/cli/e2e/tests/application/gates/probe-app-dynamic-route_test.ts",
+    "packages/cli/e2e/tests/application/builders/runtime-gates_test.ts",
+    "packages/cli/e2e/tests/presentation/suite-registry_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1616",
+  "exitCode": 0,
+  "durationMs": 1675,
+  "summary": {
+    "passed": 49,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 49,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

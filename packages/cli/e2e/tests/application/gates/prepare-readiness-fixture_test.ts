@@ -1,4 +1,4 @@
-import { assertStringIncludes, assertThrows } from '@std/assert';
+import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 import { generateRegisterApps } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-apps.ts';
@@ -12,24 +12,39 @@ import {
 
 Deno.test('listener fault splice attaches test-only checks at generator-derived markers', () => {
   const source = generatedInfrastructure();
-  const injected = injectListenerFaultHealthChecks(source);
+  const cases = [
+    { source, postgresBinding: 'db_0_server', garnetBinding: 'cache_0' },
+    {
+      source: withSingleQuotedHealthKeys(source),
+      postgresBinding: 'db_0_server',
+      garnetBinding: 'cache_0',
+    },
+    {
+      source: source.replaceAll('db_0_server', 'db_7_server').replaceAll('cache_0', 'cache_3'),
+      postgresBinding: 'db_7_server',
+      garnetBinding: 'cache_3',
+    },
+  ];
 
-  assertStringIncludes(
-    injected,
-    `builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: 18998 }));`,
-  );
-  assertStringIncludes(
-    injected,
-    `await postgres_server.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`,
-  );
-  assertStringIncludes(
-    injected,
-    `builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: 18999 }));`,
-  );
-  assertStringIncludes(
-    injected,
-    `await garnet.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`,
-  );
+  for (const { source, postgresBinding, garnetBinding } of cases) {
+    const injected = injectListenerFaultHealthChecks(source);
+    assertStringIncludes(
+      injected,
+      `builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: 18998 }));`,
+    );
+    assertStringIncludes(
+      injected,
+      `await ${postgresBinding}.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`,
+    );
+    assertStringIncludes(
+      injected,
+      `builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: 18999 }));`,
+    );
+    assertStringIncludes(
+      injected,
+      `await ${garnetBinding}.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`,
+    );
+  }
 });
 
 Deno.test('readiness app splice injects the controller once at the generated return marker', () => {
@@ -39,10 +54,10 @@ Deno.test('readiness app splice injects the controller once at the generated ret
     denoDefaults: { Permissions: [], WatchMode: false },
   });
   const injected = injectReadinessFixtureApps(source);
-  assertStringIncludes(injected, "apps.set('readiness-dead-port'");
-  assertStringIncludes(injected, "apps.set('listener-fault-controller'");
+  assertStringIncludes(injected, 'apps.set("readiness-dead-port"');
+  assertStringIncludes(injected, 'apps.set("listener-fault-controller"');
   assertThrows(
-    () => injectReadinessFixtureApps(injected),
+    () => injectReadinessFixtureApps(withSingleQuotedAppNames(injected)),
     Error,
     'readiness-dead-port fixture was already registered',
   );
@@ -56,12 +71,14 @@ Deno.test('readiness app splice injects the controller once at the generated ret
 Deno.test('listener fault splice fails closed on missing markers and double registration', () => {
   const source = generatedInfrastructure();
   assertThrows(
-    () =>
-      injectListenerFaultHealthChecks(
-        source.replace("  await garnet.withHealthCheck('garnet_resp');", ''),
-      ),
+    () => injectListenerFaultHealthChecks(withoutHealthAttachment(source, 'garnet_resp')),
     Error,
     'generated register-infrastructure helper has no garnet health-check marker',
+  );
+  assertThrows(
+    () => injectListenerFaultHealthChecks(withoutHealthAttachment(source, 'postgres_listener')),
+    Error,
+    'generated register-infrastructure helper has no postgres health-check marker',
   );
 
   const injected = injectListenerFaultHealthChecks(source);
@@ -112,4 +129,23 @@ function generatedInfrastructure(): string {
     primaryDatabase: 'postgres',
     primaryCache: 'garnet',
   });
+}
+
+function withSingleQuotedHealthKeys(source: string): string {
+  return source
+    .replaceAll('"postgres_listener"', "'postgres_listener'")
+    .replaceAll('"garnet_resp"', "'garnet_resp'");
+}
+
+function withSingleQuotedAppNames(source: string): string {
+  return source
+    .replaceAll('"readiness-dead-port"', "'readiness-dead-port'")
+    .replaceAll('"listener-fault-controller"', "'listener-fault-controller'");
+}
+
+function withoutHealthAttachment(source: string, key: string): string {
+  const lines = source.split('\n');
+  const matches = lines.filter((line) => line.includes('.withHealthCheck(') && line.includes(key));
+  assertEquals(matches.length, 1, `expected one generated ${key} attachment`);
+  return lines.filter((line) => line !== matches[0]).join('\n');
 }

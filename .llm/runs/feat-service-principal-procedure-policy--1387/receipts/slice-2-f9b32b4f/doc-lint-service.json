@@ -1,0 +1,38 @@
+{
+  "gateId": "doc-lint",
+  "invocationId": "1387-s2-doc-lint",
+  "argv": [
+    "deno",
+    "task",
+    "doc:lint",
+    "--root",
+    "packages/service"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "f9b32b4f7a029d9226584b9c170eb44357e10fdb",
+  "actualGitHead": "f9b32b4f7a029d9226584b9c170eb44357e10fdb",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:3405081",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "ae6c8b596bff8b59dc13688aba0a0c3fc1afa2bce2a8d58c562224fc45b026bf",
+  "lifecycleId": "worker:3405081:1387-s2-doc-lint:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T19:16:53.540Z",
+  "startedAt": "2026-08-30T19:16:53.543Z",
+  "finishedAt": "2026-08-30T19:16:53.982Z",
+  "durationMs": 439,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 804,
+    "sha256": "ccf1cf93c2951e5586a5e701eacaa7bc6c8f29e5f05956cae5b484f3651f54e9",
+    "tail": "{\"source\":{\"mode\":\"auto\",\"root\":\"packages/service\",\"entrypoints\":[\"./mod.ts\",\"./src/auth/mod.ts\",\"./src/primitives/rpc-path.ts\"],\"exitCode\":0},\"summary\":{\"totalPackages\":1,\"totalErrors\":0,\"totalPrivateTypeRef\":0,\"totalMissingJSDoc\":0,\"totalOther\":0},\"packages\":[{\"name\":\"@netscript/service\",\"dir\":\"packages/service\",\"entrypoints\":[{\"path\":\"./mod.ts\",\"privateTypeRef\":0,\"missingJSDoc\":0,\"other\":0,\"total\":0},{\"path\":\"./src/auth/mod.ts\",\"privateTypeRef\":0,\"missingJSDoc\":0,\"other\":0,\"total\":0},{\"path\":\"./src/primitives/rpc-path.ts\",\"privateTypeRef\":0,\"missingJSDoc\":0,\"other\":0,\"total\":0}],\"files\":[],\"combinedTotal\":0,\"combinedPrivateTypeRef\":0,\"combinedMissingJSDoc\":0,\"combinedOther\":0,\"combinedExitCode\":0,\"entrypointExitCodes\":{\"./mod.ts\":0,\"./src/auth/mod.ts\":0,\"./src/primitives/rpc-path.ts\":0}}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 148,
+    "sha256": "40483f68e8c026aa25c1f706d90777acd956024cd6172921cc39da6af61c54fb",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdoc:lint\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service'\n",
+    "truncated": false
+  }
+}

@@ -22,7 +22,7 @@ function findNamedNode(value: unknown, name: string): Record<string, unknown> | 
   }
 
   if (!isRecord(value)) return undefined;
-  if (value.name === name) return value;
+  if (value.name === name && Array.isArray(value.declarations)) return value;
 
   for (const entry of Object.values(value)) {
     const found = findNamedNode(entry, name);
@@ -49,5 +49,12 @@ Deno.test('procedure metadata declarations are independent of upstream public ty
     const declaration = JSON.stringify(node);
     assertFalse(declaration.includes('@orpc'), `${symbol} leaks an @orpc public type`);
     assertFalse(declaration.includes('npm:'), `${symbol} leaks an npm public type`);
+  }
+
+  const procedureMeta = findNamedNode(documentation, 'NetScriptProcedureMeta');
+  assert(procedureMeta !== undefined, 'deno doc --json omitted NetScriptProcedureMeta');
+  const declaration = JSON.stringify(procedureMeta);
+  for (const field of ['authorization', 'scopes', 'roles']) {
+    assert(declaration.includes(field), `NetScriptProcedureMeta omits ${field}`);
   }
 });
