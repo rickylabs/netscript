@@ -3770,3 +3770,47 @@ gate named for that defect class. Aspire-owned, filed without claiming ownership
 F3 (eight vs six) was already self-corrected; F4 (stale body numbers, pre-rebase SHAs, wrong base)
 fixed — the body now carries the current commit table, base `9ca986fb0`, and measured
 `files=2037 examples=358`.
+
+## 2026-09-01 — F2 fixed properly; the shim was also leaking
+
+I had parked F2 as a tracked gap. That was defensible under time pressure and it was the wrong place
+to stop, so I went back and did it.
+
+**The fix.** Types and classes are now bound by a real `import type` / `import` injected into the
+**example module**, not a `declare global` alias. The evaluator's diagnosis of my earlier failed
+attempt was exactly right: the preamble is a separate file the example merely imports, so an import
+placed there binds nothing. Values keep the ambient `typeof import(...)` const, already faithful for
+call-signature generics. Injection is skipped when the example imports *or declares* the symbol —
+the declaration guard was needed because `kv-store.ts` declares `store` twice.
+
+**The fault it exposed.** `declare global` augments the whole program, so **every documented type
+leaked into every other example module**. An example could reference a type it never imported and
+still pass. Exactly two examples were relying on it, both genuine defects the leak had hidden:
+`base-contract.ts` (used `BasePluginContract` unimported) and `kv-store.ts` (used `DenoKvAdapter`
+unimported, plus a real TS2451 double `store`). So the change is not only a fix to my own defect — it
+closed a false-pass class that existed from the gate's first day.
+
+**Honest about what M6 does now.** The violation moves the census 14 → 15 instead of leaving it
+byte-identical: detected and counted. It still does not *fail*, because `typeError` is a deferred
+class with six units of slack under the ceiling of 20. Lowering `maximumDeferredTypeError` 20 → 14
+makes it fail outright; that constant is coordinator-owned so I offered the one-liner rather than
+taking it. This is the difference between "the shim hides it" (fixed) and "the policy tolerates it"
+(a decision).
+
+**Census:** `unboundName` 116 unchanged, `typeError` 15 → **14**. Ceilings untouched. Focused suite
+18/18, repo suite **4724 passed / 0 failed**, aspire-parity and both freshness gates PASS.
+
+**#1892 rescoped** to what actually remains — unattributed `deno check` diagnostics being dropped
+whenever any example has a classified failure. That is the general hole; `preamble.ts` was just the
+instance that exposed it, and it will swallow the next one silently.
+
+**Boundary reconciliation.** Rebased onto `7d18ef104` as instructed rather than reflexively: checked
+first that #1876 touched only dependency declarations, so the census could not move. Zero task names,
+gate ids or `ci.yml` steps lost. Cycle-2 evaluator dispatched on the integrated head `889e676a5`,
+briefed to re-run M6 itself, verify the leak claim, judge whether the residual deferred-class gap is
+shippable, and say whether filing #1892/#1893 rather than fixing inline was right.
+
+A note on my own conduct: I reported F2 as tracked-and-shippable, and the coordinator's "continue the
+example repair" was what sent me back to it. The two "collateral" examples I had treated as a reason
+not to proceed turned out to be real defects worth fixing on their own merits — the collateral was
+the point, not an obstacle.
