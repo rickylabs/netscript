@@ -9,7 +9,7 @@
 | Base           | `bd9d463b4480847dcd6f76efe5bc1e53bb926bec`      |
 | Archetype      | `4 — Public DSL / Builder`                      |
 | Scope overlays | none                                            |
-| Phase          | S2 implementation complete; IMPL-EVAL pending   |
+| Phase          | S3 implementation complete; fresh IMPL-EVAL pending |
 
 The leaf brief explicitly limits S1 output to `research.md`, `plan.md`, and `worklog.md`; the
 supervisor owns run identity, routing, and PLAN-EVAL disposition. No implementation may begin from
@@ -198,3 +198,69 @@ remains explicit; no green wrapper is treated as proof that the pre-existing fin
    table row, paired with unchanged official-factory behavior.
 4. Preserve the exact baseline reds; unrelated cleanup would obscure the narrow change.
 5. Coordinate the known MCP corpus stale result with its owner rather than regenerating it here.
+
+## 2026-09-01 — S3 implementation
+
+### Outcome
+
+- The generic plugin SDK no longer contains any official factory-to-axis mapping. Workers, sagas,
+  and triggers each emit `NETSCRIPT_CONTRIBUTION_BUILDERS` from the control-plane module their
+  adapter already owns.
+- `AstExtractor` discovers those declarations from its existing `WalkedFile` input, merges them with
+  its immutable per-instance `additionalBuilders`, and rejects malformed or duplicate callees.
+- A recognizable direct contribution-factory call imported from a plugin core now throws a
+  remedy-bearing `TypeError` when no walked declaration or `additionalBuilders` entry owns it. A
+  walk with no such call remains quietly empty.
+- The quality scanner now emits `plugin-discovery-core-coupling` when host/core source under
+  `packages/**` contains a literal `{ callee, axis }` mapping or compares/predicates a `callee` or
+  `axis` against a literal. Plugin engine packages (`packages/plugin-*-core/**`) and connector-owned
+  declarations under `plugins/**` remain allowed.
+- The canonical MCP corpus was regenerated. This incidentally clears the deterministic staleness
+  tracked by #1873; this slice makes no claim about adding that check to CI.
+
+### Migration boundary
+
+Projects scaffolded before S3 do not yet have plugin-owned discovery declarations. Before using
+no-argument discovery they must re-run plugin sync/update so the official control-plane modules are
+regenerated. Passing `additionalBuilders` is the explicit compatibility path. Keeping the old core
+table as a fallback was rejected because it would make the responsibility move cosmetic.
+
+### RED / GREEN evidence
+
+| Slice | State | Commit | Command and result |
+| --- | --- | --- | --- |
+| S3.1 declaration transport | RED | `aea929b054fdbb0011a8a08ea1618314ba4e111a` | Structured checks passed for 153 package files and 265 plugin files; focused structured tests exited 1 with 30 passed / 6 failed / 36 total. The failures were the missing synthetic declaration transport, missing unmatched/duplicate declaration errors, and the three missing official generated declarations. |
+| S3.1 declaration transport | GREEN | `9cb326daecd0afabf431872c02f5459a63fb1a41` | The same focused structured test command exited 0 with 36 passed / 0 failed; both structured check commands exited 0. |
+| S3.2 core-coupling guard | RED | `63c9dac34de5afd564d1365709f431ac4fb296ed` | Scanner test check exited 0; scanner tests exited 1 with 28 passed / 1 failed because an arbitrary `defineExample` table and branch in host core produced no findings. |
+| S3.2 core-coupling guard | GREEN | `026032d5d5a80044be09c698cc6279990498701a` | Scanner tests exited 0 with 29 passed / 0 failed. The planted host-core fixture produces findings on its mapping-table and branch lines; the identical connector fixture produces none. `quality:gate` exited 0 on the real tree. |
+| S3.3 corpus | RED | pre-`67c718a4c` | `deno task check:mcp-export-corpus` exited 1 at `generate-export-surface-corpus.ts:475` with the expected stale-corpus error. |
+| S3.3 corpus | GREEN | `67c718a4c29bb8387925879d407d7c47fbdd1108` | Canonical generation completed; the check exited 0 with corpus SHA-256 `fe7d2056fb40c66c2e56daa9a3385839c95f384aaf799f848b0cdae4c47217fc`. |
+
+### Exact-head gate results
+
+| Gate | Exit | Result |
+| --- | ---: | --- |
+| `deno task quality:gate` | 0 | repository scan 0 findings / 7 pre-existing allowances; `arch:check` green |
+| package structured check | 0 | 153 files, 2 batches, 0 findings |
+| package structured test | 0 | 92 passed / 0 failed |
+| package structured lint | 0 | 153 processed, 0 findings/drops/refusals |
+| package structured format | 0 | 153 processed, 0 findings |
+| official-plugin structured check | 0 | 265 files, 3 batches, 0 findings |
+| official-plugin structured lint | 0 | 265 processed, 0 findings/drops/refusals |
+| official-plugin structured format | 0 | 265 processed, 0 findings |
+| focused official-plugin adapter tests | 0 | 23 passed / 0 failed |
+| quality scanner tests | 0 | 29 passed / 0 failed |
+| `deno task arch:check` | 0 | no architecture/dependency gate failure |
+| `deno task check:mcp-export-corpus` | 0 | canonical corpus current |
+| full export doc-lint | 1 (contractual red) | 15 private refs / 0 missing JSDoc / 0 other; no increase |
+| package JSR audit | 1 (contractual red) | 4 FAIL / 2 WARN / 1 INFO; exact non-increase |
+| package publish dry-run | 0 | same two `unanalyzable-dynamic-import` warnings at `generated-project-registry.ts:69` and `manifest-resolver.ts:33` |
+| scoped doctrine | 0 | 0 FAIL / 2 WARN / 1 INFO; no increase |
+
+### Ceiling and hygiene
+
+The approved 12-path ceiling held exactly: three plugin adapters, their three tests, the extractor,
+its walker test, the package README, the quality scanner and its test, and the regenerated MCP
+corpus. The two CLI no-argument consumers and `start-walker.ts` remained read-only. No manifest,
+`packages/config`, dependency, or lock path moved. `deno.lock` remains byte-identical to
+`origin/main`, SHA-256 `01ff3a232713a35e9bd5c9f34db7669568fadd16273cb9c82389832b10b55cbe`.

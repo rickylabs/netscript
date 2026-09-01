@@ -29,3 +29,38 @@
 - **Severity:** minor (planned external-scope handoff under D6)
 - **Action:** the supervisor must coordinate the corpus refresh with its owner. This leaf preserves
   the hard six-path product/test ceiling and stops rather than absorbing that generated change.
+
+## 2026-09-01 — S3 scope authorization supersedes the S2 ceiling
+
+- **What:** the supervisor approved `plan-s3.md` and its exact 12-path ceiling, including official
+  connector declarations, the quality guard, and canonical MCP corpus regeneration.
+- **Mandatory addition:** pre-S3 projects with contribution calls but no regenerated declaration
+  must fail loudly, naming the callee and directing the user to plugin sync/update or
+  `additionalBuilders`; an empty project remains quiet.
+- **Impact:** no hard-stop condition was triggered. No manifest schema, `packages/config` constant,
+  or forbidden cross-package dependency edge was needed.
+- **Severity:** planned scope expansion.
+- **Action:** implemented as separate RED/GREEN declaration and guard slices. Fresh exact-head
+  separate-session IMPL-EVAL remains supervisor-owned.
+
+## 2026-09-01 — MCP corpus regenerated under S3 authorization
+
+- **What:** `deno task check:mcp-export-corpus` reproduced the known stale-corpus exit 1; the
+  canonical generator changed only
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`, after which
+  the check exited 0.
+- **Impact:** this incidentally clears the deterministic corpus staleness tracked by #1873. It does
+  not address or claim #1873's separate CI-gating work.
+- **Severity:** planned generated-artifact movement.
+- **Action:** keep the PR body explicit about the incidental fix and the narrower claim.
+
+## 2026-09-01 — static guard limits
+
+- **What:** `plugin-discovery-core-coupling` catches literal factory/axis mapping objects and literal
+  comparisons or string predicates on `callee`/`axis` in host/core `packages/**` source. A fixture
+  using the arbitrary future factory `defineExample` proves the rule is not a snapshot of today's
+  three names.
+- **Limit:** encoded strings, computed property keys, and cross-file aliases are not resolved by this
+  token-level check.
+- **Severity:** accepted bounded-static-analysis limit; existing `PLG-WALKER-AST` debt remains.
+- **Action:** state the limit without overclaiming in PR/handoff evidence.
