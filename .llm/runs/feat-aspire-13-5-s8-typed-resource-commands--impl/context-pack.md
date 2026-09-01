@@ -139,3 +139,21 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   `check:assets-barrel` diff-clean.
 - No Aspire, Docker, AppHost, `e2e:cli`, runtime suite, PR lifecycle/base/label change, or evaluator
   dispatch occurred. CI remains the runtime authority.
+
+## D-235 shared diagnostic budget state
+
+- Resume baseline is `e4464e9f49b4595b0d0edd74bc978d774e30e4a0`. Its generator-authored
+  `evaluate.md` was quarantined by the owner and is deleted; this implementation session does not
+  create or dispatch a replacement evaluator.
+- Option (a) preserves D-224's per-stream 32-line 8/24 retention and UTF-8 truncation while deriving
+  the final allowance from one shared 16-KiB persisted budget. Request JSON is capped as a final
+  artifact, including envelope and promoted-message duplication.
+- The both-stream fixture is RED at the baseline with error/result/flattened byte totals
+  32,767/33,479/32,893 and GREEN after the repair at 16,383/16,384/16,061. It retains 32 lines in
+  each stream and asserts all three artifacts are at most 16 KiB.
+- Failure promotion now follows observed complete-line capture order across both streams rather than
+  scanning all stderr before stdout. Its generic ordering fixture was independently RED before the
+  repair and GREEN after it.
+- The complete static helper/runtime-builder suite passes 285/285, explicitly carrying D-224,
+  D-227, D-231, D-233, and migrate-to-deploy coverage. Scoped check/lint/fmt and `quality:gate`
+  exit 0; repository structured check passes 2,987 files in 25 batches. No runtime command ran.

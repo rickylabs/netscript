@@ -279,3 +279,50 @@ A separate opposite-family IMPL-EVAL remains mandatory after the final product h
 - Deferred: local runtime, Aspire/Docker/AppHost/E2E execution, public package exports, dependencies,
   PR base/lifecycle/labels, and S9/S10 work. JSR audit is N/A because no export, metadata, or JSDoc
   surface changes.
+
+## D-235 shared diagnostic budget correction
+
+PLAN-EVAL is N/A: the supervisor-dispatched evaluator returned one precisely scoped defect and the
+owner supplied both permitted resolutions, the preferred choice, the required RED fixture, the
+ordering follow-up, the no-runtime boundary, the exact baseline, and the push contract.
+
+### Locked decisions
+
+- Take option (a). Preserve each stream's independent 32-line, 8-head/24-tail retention and the
+  existing UTF-8-safe head/tail truncation, then derive the final line allowance from one shared
+  16-KiB persisted budget after both retained sets are known. A stderr-only D-224 flood retains its
+  original 511-byte line allowance; two full streams share the same total rather than doubling it.
+- Bound the atomic request result as the persisted artifact it is. Serialize it under the same
+  16-KiB ceiling, including its envelope and repeated promoted message, so the downstream flattened
+  Aspire-visible message is also within the ceiling.
+- Stamp complete retained lines with their observed cross-stream capture sequence. Select the first
+  generic failure-shaped surviving line in that sequence, with the existing first-line fallback;
+  do not add tool or vendor vocabulary.
+- Delete the quarantined generator-authored `evaluate.md`. This session neither writes nor
+  dispatches an evaluator verdict.
+
+### Slices and proving gates
+
+1. Add one both-stream flood fixture that measures the persisted error file, request result JSON,
+   and flattened message, plus one cross-stream ordering fixture. Execute both against the baseline
+   and retain their failing measurements.
+2. Apply the shared budget and observed-order selection in the emitted runner; regenerate the asset
+   barrel and run the complete static helper/runtime-builder suite carrying D-224, D-227, D-231,
+   D-233, and migrate-to-deploy coverage.
+3. Run scoped structured check/lint/fmt, `quality:gate`, repository structured check, and the
+   clean-head asset-barrel gate. Compare the exact remote ref immediately before a fast-forward
+   push. Run no Aspire, Docker, AppHost, or `e2e:cli` command.
+
+### Risk register and deferred scope
+
+- Risk: sharing the budget weakens stderr-only D-224 detail. Mitigation: derive the allowance from
+  the actual retained count and cap it at the original 511 bytes; the stderr-only fixture remains
+  byte-for-byte at its previous ceiling.
+- Risk: separate pipe readers cannot recover a global kernel write timestamp. Mitigation: define
+  ordering as observed complete-line capture order and pin it with a deterministic generic fixture;
+  this repairs the known stderr-first bias without claiming unavailable timing precision.
+- Risk: JSON escaping or the duplicated selected message exceeds the detail-input budget.
+  Mitigation: binary-search the maximum UTF-8-safe line allowance against the final serialized
+  record bytes.
+- Deferred: formal re-evaluation, all runtime execution, PR lifecycle/labels/base, dependencies,
+  public exports, S9/S10, and unrelated merge-readiness blockers.

@@ -631,3 +631,67 @@ D-224/D-227/D-231 coverage. Structured check processed 3/3 changed TypeScript fi
 diagnostics; standalone-policy lint and fmt wrappers processed both changed tests with exit 0 and
 no findings. `quality:gate` exited 0 with no scanner findings and doctrine `FAIL=0` (existing
 warnings only). No local runtime was executed.
+
+## D-235 design — one shared persisted diagnostic budget
+
+PLAN-EVAL: N/A. The supervisor-dispatched IMPL-EVAL supplied one bounded correction with explicit
+resolution choices, acceptance artifacts, ordering follow-up, static-only boundary, and push rule.
+
+- Public surface: unchanged. Aspire still receives `{ success, message }`; the generated internal
+  record retains separate `actionableStderr` and `actionableStdout` arrays.
+- Domain vocabulary: `RetainedLine` is one normalized complete line plus its observed cross-stream
+  capture sequence. `BoundedDiagnostics` is the two independently selected stream sets plus their
+  chronological projection.
+- Ports/adapters: no new port. The existing emitted process edge owns capture, retention, failure
+  promotion, error-file persistence, and atomic result serialization.
+- Constants: D-224's 32 lines, 8/24 split, 16 KiB, 511-byte maximum line allowance, and UTF-8
+  truncation marker remain. The final allowance is derived from the actual combined retained count;
+  request serialization fits the final JSON artifact to the same byte constant.
+- Semantic tests: a 32-stderr/32-stdout flood pins the byte ceiling on the error file, result JSON,
+  and flattened message. A second generic fixture writes the real stdout error before a later
+  failure-shaped informational stderr line and pins observed-order selection.
+- Commit slice: runner policy + split black-box fixture + regenerated embedded barrel + harness
+  evidence. No runtime or public/package metadata surface is included.
+- Contributor path: change retention/promotion beside `boundDiagnostics`, extend the adjacent
+  black-box diagnostics-budget fixture, regenerate the embedded asset, then run the focused/static
+  gate set.
+
+## D-235 implementation evidence
+
+The both-stream fixture was added before the product repair. Against `e4464e9f4`, the structured
+test wrapper exited 1 with 0 passed / 1 failed and reported: error file 32,767 bytes, request result
+33,479 bytes, flattened message 32,893 bytes. The independent observed-order fixture also exited 1:
+the old stderr-first scan selected `Error reporting is unavailable in this environment.` instead of
+the earlier stdout `Error: the requested operation failed.`
+
+The runner now retains the existing 8-line head and 24-line tail independently for each stream,
+then derives the line allowance from one combined newline-delimited 16-KiB pool. The stderr-only
+D-224 maximum remains 511 bytes per line. Request mode binary-searches the largest safe allowance
+against the actual JSON serialization, covering envelope bytes, escaping, and the promoted-message
+duplicate. The same flood is GREEN with 32 retained lines per stream and measured totals of 16,383
+bytes (error file), 16,384 bytes (result JSON), and 16,061 bytes (flattened message).
+
+Each captured complete line also receives a monotonic sequence shared by the two pipe readers.
+Failure promotion sorts only the surviving retained lines by that sequence before applying D-233's
+unchanged generic failure-shape regex and fallback. The ordering fixture is GREEN. This is observed
+line-completion order; separate OS pipes expose no stronger global timestamp.
+
+Pre-commit static verification:
+
+| Command/gate | Exit/result |
+| --- | --- |
+| both new fixtures against baseline behavior | 1 each; combined over-budget and stderr-first selection proved |
+| both new fixtures after repair | 0 each; 1/1 passed independently |
+| full helper + runtime-builder tests | 0; 285 passed, 0 failed |
+| scoped structured check (`--unstable-kv`) | 0; 2 selected, 1 batch, zero diagnostics |
+| scoped structured lint | 0; 2/2 processed, no drops/findings |
+| scoped structured fmt | 0; 2/2 processed, no drops/findings |
+| `quality:gate` | 0; scanner findings 0; doctrine `FAIL=0` with existing warnings |
+| repository structured check | 0; 2,987 files / 25 batches, `failedBatches: 0` |
+| `gen:assets-barrel` | 0; only the intended embedded run-tool entry changed |
+| `git diff --check` and added-line prohibited-pattern scan | 0; no whitespace error, `any`, cast, or lint-ignore |
+
+The 285-test set includes D-224's stderr head/tail and UTF-8 byte fixtures, D-227's emitted-helper
+compile test, D-231's graph-injection and capability guards, D-233's generic preamble/stdout
+promotion, and the public-migrate/internal-deploy mapping. No Aspire, Docker, AppHost, `e2e:cli`,
+runtime suite, dependency, lockfile, export, PR lifecycle, or evaluator dispatch occurred.

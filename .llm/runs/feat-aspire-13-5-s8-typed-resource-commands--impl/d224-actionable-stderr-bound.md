@@ -63,3 +63,11 @@ Markdown wrap (exit 1), was scoped-formatted (exit 0), and then passed its exact
 No Aspire, Docker, AppHost, runtime process, or `e2e:cli` command ran. The supervisor owns the
 separate bounded delta IMPL-EVAL after this product-byte move; this implementation session does not
 self-certify or dispatch it.
+
+## D-235 clarification — the ceiling is shared by persisted streams
+
+D-233 later retained stdout beside stderr. D-224's 16-KiB contract applies to their combined
+persisted total, not independently to each array. The original stderr-only 32-line fixture and
+511-byte allowance remain unchanged. When both streams retain lines, the final per-line allowance is
+derived from their combined count; the atomic request JSON is also fit to 16 KiB as a final artifact.
+See `d235-shared-diagnostic-budget.md` for the RED/GREEN measurements.
