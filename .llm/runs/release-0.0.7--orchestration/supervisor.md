@@ -1630,3 +1630,15 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Partial PRs must create their next closure lane before merge handoff when the parent stays open:
   #1848 -> #1590 browser slice, #1842 -> #1452 generated consumer-boot proof, and S8 -> #863 gates
   2-3. Docs remains within milestone 27 and may audit other owners' docs without taking ownership.
+
+## 2026-09-01T17:18:00Z — no supervisor may substitute dependency polling for work
+
+- Main is `102ef8a105ed7574c4bc6212f686d16c74465ee4` after shipped #1848. Features opens #1590
+  Slice 2, corrects #1884's stack before review, and keeps #1842/#1872/#1882/#1886 active.
+- Fixes monitors exact #1865 run `33536376814` attempt 2 without launching a duplicate #1878
+  evaluator, while #1883/#1885/#1858/#1868 advance independently. Internals terminalizes #1802 and
+  keeps #1876/#1879/#1351 active. Docs completes #1756 evaluation and advances its next bounded leaf.
+- Aspire closes already-satisfied issues with proof and runs static/product work while dependencies
+  move. `Standing by`, foreground polling, or an empty prompt is an intervention condition whenever
+  #1855 or a static S7-S13 task remains runnable. Only Phase B waits for #1865; the coordinator owns
+  immediate post-merge runtime dispatch and subsequent exact-green merges.

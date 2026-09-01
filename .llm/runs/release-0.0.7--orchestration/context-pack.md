@@ -2408,3 +2408,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   mechanically exact-head delta verdict plus terminal `check-test`, not a product repair.
 - #1351 excludes the dependency family bump. Separate #1879 owns a stable-v1.15 lock-only move with
   frozen-install, single-`@orpc/shared`, and no-mixed-version evidence. No owner decision is pending.
+
+## Resume delta — 2026-09-01T17:18:00Z
+
+- Current main is `102ef8a105ed7574c4bc6212f686d16c74465ee4` after coordinator-merged #1848.
+  Its partial closure is honest: #1590 remains open for the browser Slice 2 now being dispatched,
+  while #1842 is restacked independently.
+- P0 #1865 is the atomic #1863/#1870/#1877 baseline packet at `da8b556fe`. Current-main hosted run
+  `33536376814` attempt 2 is active in both Postgres and SQLite/Garnet tiers after cancellation-only
+  attempt 1. Merge only after exact green, the authoritative #1878 evaluator disposition, current
+  body/evidence, and zero threads; then close #1878 as superseded rather than merging it separately.
+- Aspire must not foreground-watch this dependency. It advances #1855 and static S7-S13 packets now;
+  Phase B alone consumes #1865's exact merge SHA. #1851 is closed with verified already-fixed evidence.
+  #1802 is nearly mergeable at `e36b17461` but still needs terminal exact CI and a truthful body status
+  rewrite. No owner decision is pending; Aspire and Docker inventories are zero.

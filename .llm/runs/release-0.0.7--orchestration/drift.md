@@ -1784,3 +1784,13 @@ implementation thread.
 - Baseline blockers discovered by a product PR are isolated and landed first, then integrated into
   the original immutable product branch for one complete rerun. Aspire and other dependent lanes
   consume only the exact merged baseline SHA; they continue independent static work meanwhile.
+
+## 2026-09-01 — repeated no-change polling is a supervisor failure, not progress
+
+- A detached dependency monitor may preserve responsiveness, but repeated `No change` turns and
+  `Standing by` while independent issue work exists violate the milestone supervisor mandate.
+- Recovery requires an explicit productive task, a submitted Remote Control turn, and observed tool
+  or generation activity. The coordinator must also free scarce hosted/runtime lanes from known-red
+  pre-baseline jobs so the release-critical exact-head proof can start.
+- Dependency sequencing is narrow: #1865 blocks Aspire Phase B, not #1855 implementation, issue
+  evidence closure, static convergence, body repair, review, or preparation of post-merge packets.

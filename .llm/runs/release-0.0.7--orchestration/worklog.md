@@ -3729,3 +3729,28 @@
 - #1351 is ruled as a transport-policy-only refactor. Internals filed #1879 for the separate
   stable-v1.15 whole-family lock move with frozen-install and no-mixed-version proof; no oRPC v2
   migration is admitted. No owner decision is pending.
+
+## 2026-09-01T17:18:00Z — user-facing carrier ships; productive liveness enforced again
+
+- Features PR #1848 passed its current-head delta evaluation, exact required CI, current-main
+  integration, and zero-thread gate at `53398a818`; the coordinator squash-merged it as
+  `102ef8a105ed7574c4bc6212f686d16c74465ee4`. Issue #1590 remains open only for the already-routed
+  browser Slice 2; Features is opening that leaf and restacking #1842 without parking its other
+  independent #1872/#1884/#1882/#1886 work.
+- Fixes converged #1863/#1870/#1877 atomically in PR #1865. The previous full hosted proof was green
+  in both tiers at `03def015b`, but #1848 added the generated navigation closure consumed by this
+  runtime surface, so current-main head `da8b556fe` requires one new exact proof. Attempt 1 was
+  cancellation-only; the coordinator started attempt 2 of run `33536376814`, cancelled the known-
+  pre-baseline Aspire #1747 runtime occupying the hosted lane, and verified both P0 runtime jobs
+  entered `in_progress`. PR #1878 remains superseded and its one authoritative evaluator continues;
+  no duplicate evaluator is permitted.
+- The screenshot-reported Aspire `standing by` loop was treated as a liveness failure. All five Opus
+  supervisors were re-steered and then verified doing concrete work. Aspire closed #1851 with a
+  mutation-backed already-fixed-by-#1837 receipt and continues #1855 plus static S7-S13 preparation;
+  only Phase B waits for #1865's exact merge SHA. Features repaired an invalid stacked base, Fixes
+  dispatched #1883 evaluation, Internals advanced #1802/#1876/#1879/#1351, and Docs launched #1756's
+  repaired evaluation.
+- Internals PR #1802 is at current-main head `e36b17461` with its resumed-session delta PASS, all 34
+  evaluated leaf paths byte-identical, a clean synthetic merge tree, 253/253 focused tests, and zero
+  review threads. Exact required CI is still terminalizing and its stale body status must be rewritten
+  before the coordinator may merge. Host inventory remains Aspire `[]` and containers 0.
