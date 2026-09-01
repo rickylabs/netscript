@@ -8679,3 +8679,51 @@ radius.
 
 Four leaves live and disjoint: **#1802** (ready-merge, CI running), **#1846** (parked on the deferred
 runtime proof), **#1876/#1543** (draft, needs IMPL-EVAL), **#1351** (plan phase, just launched).
+
+
+## D-198 - #1802 attestation gap accepted; #1351 split per ruling and #1879 filed
+
+### #1802 - the audit was right, and the gap is wider than it stated
+
+No ready packet presented. Checked the artifact rather than relaying the audit's head: `impl-eval.md`
+attests **`5ac0275c7`**, not `7d20e852f`. The product has moved **three** times since - `7d20e852f`
+(main merge with the real `codex-resume.ts` conflict), `3a01add4b` (the `unsafe-cast` repair) and
+`0c938c3e6` (current-main merge). So the PASS is not an exact-head attestation, and presenting it as
+merge evidence would have repeated exactly the mistake the #1862 slice cost so much to correct.
+
+**Bounded delta IMPL-EVAL dispatched** at `0c938c3e6` in a separate session, scoped to the delta only:
+the behaviour-preservation of the type-predicate repair (with the optional-field
+absent-vs-present-with-`undefined` distinction called out as the highest-risk part), the
+`codex-resume.ts` conflict resolution preserving **both** intents, ceilings, scope and suites. The
+substantive review of the flake repair, provenance and vocabulary stands and is explicitly not
+repeated. Every supervisor measurement is handed over as a **claim to falsify**, with the note that
+this supervisor has already been wrong on a sibling slice and said so publicly.
+
+PR body rewritten to current-head truth: head `0c938c3e6`, non-draft, current-main converged, the
+three intervening commits enumerated with what each did, ceilings tabulated, and an explicit **"Not
+yet ready"** section stating that no packet is presented until `check-test` is terminal and the delta
+verdict lands. `close-gate` re-verified **PASS** at that head with fresh provenance.
+
+### #1351 - split, per binding ruling
+
+The sequencing question my brief asked the author to judge is now decided by ruling, so it was
+withdrawn rather than left open. #1351 owns **only** the transport-policy refactor, unary/reconnect
+and header-safe dedupe semantics, and explicit deprecated `port`/`timeout` behaviour.
+
+**Filed #1879** - `deps(orpc): move the @orpc/* family to stable v1.15.0 and collapse duplicate
+@orpc/shared` - as the separate **lock-only** slice, with the load-bearing proof named explicitly:
+`deno why @orpc/shared` showing a **single resolved copy**, frozen-install evidence, no-mixed-version
+proof, and per-package before/after lock lines rather than a line count. It also records *why* the
+split matters - coupling a public-surface refactor to a whole-family lock move gives one PR a very
+large blast radius and makes a bisect ambiguous if either half regresses - and marks removal of the
+`Symbol.hasInstance` workaround as a follow-up that is only safe once single-copy holds.
+
+Steered the #1351 author to write the plan against the **currently pinned** version, and told it that
+if any part of the refactor genuinely cannot be done without the bump, that is a **finding to report**,
+not a licence to widen scope.
+
+### Lane state
+
+**#1802** delta eval running, `check-test` pending, close-gate PASS. **#1846** parked on the deferred
+runtime proof. **#1876/#1543** draft, delivered and verified, awaiting IMPL-EVAL. **#1351** plan slice
+with the split ruling delivered. **#1879** filed and unstarted.
