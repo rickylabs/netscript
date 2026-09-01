@@ -9689,3 +9689,35 @@ the box exists to catch.
 **Merge order is a hard constraint, not a preference:** #1890 must land before #1889, because #1351's
 acceptance boxes 1 and 6 require a single resolved `@orpc/shared` and #1889's head still measures two
 copies (`1.14.6`, `1.14.7`).
+
+### D-220 — #1890 delta PASS and packet surfaced; #1905 filed; #1889 held by measurement
+
+**Delta IMPL-EVAL PASS** at `e734453c4`. It re-derived every load-bearing claim rather than accepting
+the supervisor's, and **corrected a framing error**: `packages/fresh-ui` **is** a root workspace
+member (glob `packages/*`; present in both locks' 37-member mirrors). The supervisor's membership
+check tested for a literal entry and missed the glob. The correct defect class is broader — **a second
+`--lock=deno.lock` file over the same workspace graph**, which mirrors every member's declarations and
+stales whenever the catalog *or any member manifest* moves. The narrow "non-member package" framing
+would have under-scoped future sweeps, so `drift.md` was rewritten rather than patched.
+
+Q4 swept for a third surface of that class: **none exists**. The one historical `1.14.x` lockfile
+under `.llm/runs/**` is intentional run evidence and must not be regenerated.
+
+Also disclosed: fresh-ui's private lock had itself been carrying a **two-copy `@orpc/shared` hazard**
+(`1.14.6` + `1.14.8`) — the regeneration removed a real duplicate, in a file the root single-copy
+proof does not cover.
+
+With the sweep clean, #1879's 8 required-evidence boxes were ticked (0 unchecked; box 2's
+"no member left behind" was only then honestly true) and both PR and issue promoted.
+
+**#1890 packet surfaced** at `371c80134`: 10 SUCCESS / 24 SKIPPED / **0 FAILURE**, MERGEABLE/CLEAN
+against current main `9fcdee63e`, 0/0 threads, `close-gate`/`fresh-ui-quality`/`check-test` all
+SUCCESS, 0 unchecked anywhere.
+
+**#1905 filed** for the latent recurrence: `fresh-ui-quality` does not trigger on member-manifest or
+root-lock changes, so a member-manifest-only PR can stale that private lock without the gate running.
+Its acceptance requires a deliberately stalened lock to **fail** the gate — proving the trigger has
+teeth rather than merely runs.
+
+**#1889 remains held at `status:impl`**, not promoted, because its own head measures two `@orpc/shared`
+copies. It is unblocked the moment #1890 merges.
