@@ -97,7 +97,9 @@ export async function checkDetachedStartAccuracy(): Promise<void> {
       'Treat the value as a **secret**',
       'Never `echo` or `cat` the raw `aspire ps --format Json` output in CI.',
       'Never pass the URL as a command-line argument',
-      'Disable shell tracing around the assignment.',
+      "Disable shell tracing for the value's whole lifetime, not just its assignment.",
+      'set +x                      # no-op when tracing is already off',
+      'unset DASHBOARD_URL',
       '${DASHBOARD_URL%%\\?*}',
     ]
   ) {
@@ -356,6 +358,7 @@ export async function runAccuracyCheck(): Promise<void> {
     read('docs/site/orchestration-runtime/how-to/deploy-local-aspire.md'),
   ]);
   checkAspireScaffoldVersionDocs(aspireExplanation, deployLocalAspire);
+  await checkDetachedStartAccuracy();
 
   const cliReference = await read('docs/site/cli-reference.md');
   const commandReferenceSources = await Promise.all(

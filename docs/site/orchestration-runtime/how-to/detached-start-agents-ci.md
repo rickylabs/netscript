@@ -11,11 +11,10 @@ order: 104
 so that CI workflows, test runners, and autonomous AI agents can stand up the full NetScript
 resource graph without an interactive terminal.
 
-{{ comp callout { type: "important", title: "Non-interactive orchestration" } }}
-Interactive development runs <code>aspire start</code> directly in a terminal. CI pipelines and
-agent sessions instead need background execution, structured JSON output for discovery, explicit
-timeout budgets, and port isolation.
-{{ /comp }}
+{{ comp callout { type: "important", title: "Non-interactive orchestration" } }} Interactive
+development runs <code>aspire start</code> directly in a terminal. CI pipelines and agent sessions
+instead need background execution, structured JSON output for discovery, explicit timeout budgets,
+and port isolation. {{ /comp }}
 
 ## Detached startup with JSON output
 
@@ -40,11 +39,10 @@ identifiers, the dashboard URL, and the log file path:
 }
 ```
 
-{{ comp callout { type: "note", title: "Redacting dashboard tokens" } }}
-When authentication is enabled, <code>dashboardUrl</code> may carry an authentication token as a
-query parameter (<code>?t=...</code>). Redact it before storing or logging Aspire output in CI job
-artifacts or agent transcripts.
-{{ /comp }}
+{{ comp callout { type: "note", title: "Redacting dashboard tokens" } }} When authentication is
+enabled, <code>dashboardUrl</code> may carry an authentication token as a query parameter
+(<code>?t=...</code>). Redact it before storing or logging Aspire output in CI job artifacts or
+agent transcripts. {{ /comp }}
 
 ## Inspecting running instances with `aspire ps`
 
@@ -71,14 +69,15 @@ Output:
 ]
 ```
 
-When no AppHost is running, `aspire ps --format Json` returns an empty array (`[]`) with exit code `0`.
+When no AppHost is running, `aspire ps --format Json` returns an empty array (`[]`) with exit code
+`0`.
 
 ### Discovering the dashboard endpoint without printing its token
 
 `dashboardUrl` in that same `aspire ps --format Json` record **is** the supported discovery path for
-headless automation. There is no separate token command to call and no product API to depend on — the
-canonical Aspire inventory JSON already carries it, which is why automation should read this field
-rather than scraping startup output or guessing a port.
+headless automation. There is no separate token command to call and no product API to depend on —
+the canonical Aspire inventory JSON already carries it, which is why automation should read this
+field rather than scraping startup output or guessing a port.
 
 Treat the value as a **secret**. Aspire may append a dashboard login token to that URL, so anything
 that echoes the raw record leaks it into CI logs, run artifacts and issue comments.
@@ -86,12 +85,14 @@ that echoes the raw record leaks it into CI logs, run artifacts and issue commen
 Read the field without printing it:
 
 ```bash
-# Extract only what you need; never echo the whole record.
+# Keep tracing off for the whole lifetime of the value — not just its assignment.
+set +x
 DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
   | deno eval 'const [a] = JSON.parse(await new Response(Deno.stdin.readable).text()); if (a?.dashboardUrl) console.log(a.dashboardUrl);')"
 
-# Pass it on by environment or stdin, not as a logged argument.
+# Pass it on by environment, still untraced: a traced command line expands the value.
 MY_TOOL_DASHBOARD="$DASHBOARD_URL" my-tool
+unset DASHBOARD_URL
 ```
 
 When a URL must appear in a log, redact the query string, which is where a token would live:
@@ -104,30 +105,36 @@ Three rules follow, and they are what keeps a token out of a transcript:
 
 - **Never `echo` or `cat` the raw `aspire ps --format Json` output in CI.** Select the one field you
   need and discard the rest.
-- **Never pass the URL as a command-line argument** in a logged step — arguments are echoed by most CI
-  runners, environment variables and stdin are not.
-- **Disable shell tracing around the assignment.** Under `set -x` (`bash -x`, or a CI runner's debug
-  mode) the shell echoes the expanded command, so the extraction above prints the URL — token included
-  — even though nothing in the snippet calls `echo`. Guard it:
+- **Never pass the URL as a command-line argument** in a logged step — arguments are echoed by most
+  CI runners, environment variables and stdin are not.
+- **Disable shell tracing for the value's whole lifetime, not just its assignment.** Under `set -x`
+  (`bash -x`, or a CI runner's debug mode — GitLab traces script lines by default) the shell echoes
+  every expanded command, so both the extraction _and_ the later pass-on print the URL, token
+  included, even though neither calls `echo`. Re-enabling tracing between them defeats the guard:
+  the pass-on line expands to `+ MY_TOOL_DASHBOARD='https://…?t=…'`.
 
   ```bash
   set +x                      # no-op when tracing is already off
   DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
     | deno eval 'const [a] = JSON.parse(await new Response(Deno.stdin.readable).text()); if (a?.dashboardUrl) console.log(a.dashboardUrl);')"
-  set -x                      # only if the job had tracing on
+  MY_TOOL_DASHBOARD="$DASHBOARD_URL" my-tool
+  unset DASHBOARD_URL
+  set -x                      # only after the value is gone, and only if the job had tracing on
   ```
 
-  This is the one leak route the other two rules do not cover: it bypasses them by echoing the
-  assignment rather than the value.
+  This is the one leak route the other two rules do not cover: tracing echoes the _command_, so the
+  env-versus-argument distinction stops protecting anything until tracing is off. If a traced step
+  must handle the URL, use the redacted form below instead.
 
-Before an AppHost registers, `aspire ps --format Json` returns an empty array — so poll until a record
-appears and carries `dashboardUrl`, rather than assuming the field is readable on the first call.
+Before an AppHost registers, `aspire ps --format Json` returns an empty array — so poll until a
+record appears and carries `dashboardUrl`, rather than assuming the field is readable on the first
+call.
 
 ## Startup timeout budget versus `aspire wait`
 
 An Aspire cold start covers container provisioning (Postgres, Redis), AppHost TypeScript
-compilation, and health-probe convergence. In two recorded 13.5.3 runs, cold start took
-38.62 s and 24.80 s; budget accordingly with `ASPIRE_CLI_START_TIMEOUT`.
+compilation, and health-probe convergence. In two recorded 13.5.3 runs, cold start took 38.62 s and
+24.80 s; budget accordingly with `ASPIRE_CLI_START_TIMEOUT`.
 
 NetScript provides two complementary timeout controls:
 
@@ -154,9 +161,9 @@ isolated user secrets:
 aspire start --isolated --format Json --non-interactive
 ```
 
-The host ports of container resources are not guaranteed unique across isolated starts. To
-randomize the host ports of the containerized infrastructure services explicitly, NetScript
-workspaces can set `DcpPublisher__RandomizePorts=true` in the environment.
+The host ports of container resources are not guaranteed unique across isolated starts. To randomize
+the host ports of the containerized infrastructure services explicitly, NetScript workspaces can set
+`DcpPublisher__RandomizePorts=true` in the environment.
 
 ## Cleanup and teardown
 
@@ -178,7 +185,9 @@ Then verify that `aspire ps --format Json` returns `[]` and that no orphaned pro
   interactive local-development recipe.
 - {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }} — AppHost
   architecture and how the resource graph is derived from plugins.
-- {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }} — the full command-line
-  reference for Aspire and NetScript commands.
+- {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }} — the full command-line reference
+  for Aspire and NetScript commands.
 
-{{ comp.nextPrev({ prev: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }, next: { label: "Roll out runtime overrides", href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Deploy locally with Aspire", href:
+"/orchestration-runtime/how-to/deploy-local-aspire/" }, next: { label: "Roll out runtime overrides",
+href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/" } }) }}
