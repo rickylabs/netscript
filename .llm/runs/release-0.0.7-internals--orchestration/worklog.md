@@ -8054,3 +8054,50 @@ call.
 
 Boundaries unchanged: no root-cause fix in #1841's SDK code, no `packages/sdk`, no merge-gate wiring,
 repo-wide `deno task test` in Tier-A, all run artifacts preserved, draft PR with `Closes #1859`.
+
+## D-186 — #1859 was not stalled, but it HAD produced a wrong corpus; caught before commit
+
+Stall report investigated by measurement rather than accepted. **It was not stalled** — pid `3513228`
+was the repo-wide `deno task test` I required in Tier-A, running 3+ minutes, which is exactly what
+several minutes of apparent silence looks like for this leaf.
+
+**But the artifact it was testing was wrong**, which matters more than the stall question:
+
+| Source | git blob | `sha256` | `uncompressedBytes` |
+| --- | --- | --- | ---: |
+| author's tree | `bc3f6a2c2…` | `f8cc689d7…` | **2177211** |
+| **correct** | `19cdf3783…` | `eb07868a6…` | **2177267** |
+| `main` (stale) | `e26319312…` | `497aa5c20…` | 2177043 |
+
+The author's value is **none of the three**, and `check:mcp-export-corpus` in its tree still returned
+**`REAL_EXIT=1`** — a correctly regenerated corpus makes that check pass immediately, so the check was
+already telling us the artifact was wrong.
+
+**Established the generator is deterministic before blaming the author**: in a clean detached worktree
+I regenerated **three times** and got the identical blob every time, with `check` returning 0. So a
+differing result is not generator noise — it means it ran against a tree that was not clean. Probable
+mechanism: generating **concurrently with the repo-wide suite in the same worktree**, or across my
+base reset. That is worth recording as a hazard in its own right, and the steer says so.
+
+Its whole Tier-A run is therefore **void** — it measured the wrong artifact — and the steer tells the
+author to discard it rather than report it as a gate.
+
+### Base moved again mid-recovery
+
+**#1840 merged as `3b6386e14`** (issues #1750, #1695 shipped; #1832, #1840 merged). Verified at the
+new base rather than assuming #1840's agentic-only paths were irrelevant: RED `REAL_EXIT=1`, generate,
+blob **`19cdf3783…` — identical to the `233828f0f` output** — and `check` `REAL_EXIT=0`. So #1840
+genuinely does not affect MCP generation, but the base still has to move so the commit sits on current
+main.
+
+### Why I steered rather than seized
+
+The coordinator authorized taking over the mechanical work. I did not, because the author is **live**
+(thread idle 4s) and writing into that worktree concurrently would risk a third wrong artifact rather
+than prevent one. Instead I updated the **already-queued** steer in place — the retry loop reads the
+file at dispatch time — so it now carries the new base, the reset command, and the exact reference
+hash the author must match **before** proceeding (`19cdf3783807efbfd092cb857bbb85f296de86a3`), with an
+instruction to stop and report if it gets a third value rather than proceed on it.
+
+If it commits a wrong corpus or goes idle without progress, I take over the generator, receipts,
+commit and PR directly — I already hold the verified correct output.
