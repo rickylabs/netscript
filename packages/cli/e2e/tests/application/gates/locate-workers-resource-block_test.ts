@@ -1,4 +1,10 @@
-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import {
+  assertEquals,
+  assertMatch,
+  assertNotMatch,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
 
 import * as fixtures from '../../../../src/kernel/templates/aspire/helpers/tests/generators-test-support.ts';
 import { generateRegisterBackground } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-background.ts';
@@ -63,12 +69,15 @@ Deno.test('locates workers in real register-background output', () => {
   const range = locateWorkersBackgroundBlock(source);
   const block = source.slice(range.start, range.end);
 
-  assertStringIncludes(block, "addExecutable('workers'");
-  assertStringIncludes(block, "backgroundProcessors.set('workers'");
+  // Quote-agnostic on purpose: the locator matches (['"])name, and this branch routes user-supplied
+  // names through JSON.stringify, so emission is now double-quoted. Asserting a quote style here
+  // would couple the test to emission cosmetics -- the #1837 consumer-coupling defect.
+  assertMatch(block, /addExecutable\((["'])workers\1/);
+  assertMatch(block, /backgroundProcessors\.set\((["'])workers\1/);
   assertEquals(block.split('builder.addExecutable(').length - 1, 1);
   assertEquals(block.split('backgroundProcessors.set(').length - 1, 1);
-  assertEquals(block.includes("'streams'"), false);
-  assertEquals(block.includes("'triggers'"), false);
+  assertNotMatch(block, /(["'])streams\1/);
+  assertNotMatch(block, /(["'])triggers\1/);
 });
 
 // The background generator still emits the resource-name comment `  // --- workers ---`, so on
@@ -89,11 +98,11 @@ Deno.test('locates the background workers block even with the name comment remov
     denoDefaults: fixtures.MINIMAL_DENO_DEFAULTS,
   });
 
-  // Simulate #1837's source-safe rename against the background generator.
-  const renamed = source
-    .replace('  // --- streams ---', '  // --- processor 0 ---')
-    .replace('  // --- workers ---', '  // --- processor 1 ---')
-    .replace('  // --- triggers ---', '  // --- processor 2 ---');
+  // This branch applies #1837's source-safe rename in the generator itself, so genuine output no
+  // longer carries a name-keyed comment and the old string-replace simulation would be a no-op.
+  // Assert the real property instead: no name comment is present anywhere in real output, and the
+  // locator still finds the block -- which is the discriminator the simulation was standing in for.
+  const renamed = source;
   assertEquals(renamed.includes('  // --- workers ---'), false);
 
   const block = renamed.slice(
@@ -101,10 +110,13 @@ Deno.test('locates the background workers block even with the name comment remov
     locateWorkersBackgroundBlock(renamed).end,
   );
 
-  assertStringIncludes(block, "addExecutable('workers'");
-  assertStringIncludes(block, "backgroundProcessors.set('workers'");
-  assertEquals(block.includes("'streams'"), false);
-  assertEquals(block.includes("'triggers'"), false);
+  // Quote-agnostic on purpose: the locator matches (['"])name, and this branch routes user-supplied
+  // names through JSON.stringify, so emission is now double-quoted. Asserting a quote style here
+  // would couple the test to emission cosmetics -- the #1837 consumer-coupling defect.
+  assertMatch(block, /addExecutable\((["'])workers\1/);
+  assertMatch(block, /backgroundProcessors\.set\((["'])workers\1/);
+  assertNotMatch(block, /(["'])streams\1/);
+  assertNotMatch(block, /(["'])triggers\1/);
 });
 
 Deno.test('rejects generated output with no workers resource block', () => {
