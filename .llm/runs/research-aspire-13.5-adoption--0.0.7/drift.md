@@ -5913,3 +5913,25 @@
   - **No slice is currently stripping.** The D-222 brief's "do not re-add the artifacts" line is void;
     the only live dispatch (D-240, the leased SQLite control) neither strips nor writes into a stripped
     directory.
+
+- **D-242 — the restore is already complete, and no S7 artifact was ever deleted. Verified rather than
+  re-executed.**
+  - **`6ef9306ef` deleted exactly six paths**, all under
+    `.llm/runs/fix-aspire-sibling-generator-name-safety--issue-1836/` — `context-pack.md`, `drift.md`,
+    `plan.md`, `research.md`, `supervisor.md`, `worklog.md`. `git show --diff-filter=D --name-only`
+    lists **zero** S7 paths; a grep for `s7-teardown` in that commit returns **0**.
+  - **All six are restored** at `bcb5717e6` (count 6), byte-identical to `01d32c95f`.
+  - **S7's run dir is intact**: **97 paths** on `fix/aspire-13-5-s7-teardown-leak-check`. It shows 0 on
+    `origin/main` only because **#1744 has not merged yet** — that is the normal state of an unmerged
+    branch, not a deletion. Nothing to restore there, and fabricating a "restoration" of files that
+    were never removed would have put 97 paths onto the wrong branch.
+  - **The only merged loss remains #1833's 17 paths**, already addressed by **PR #1852**
+    (`status:ready-merge`, 17 byte-identical, zero product files).
+  - **No scoped run is being stripped anywhere.** The standing instruction is recorded: do not strip,
+    do not classify a scoped run as leakage, do not block a PR for carrying one.
+  - **State after the restore:** #1837 at `bcb5717e6`, `MERGEABLE`, `status:ready-merge`, fresh CI
+    running against current main `60ae56af0` (`BLOCKED` is the required-checks wait, not a conflict).
+  - **#1844 is `status:plan` with `orchestrator:fixes`** — moved off triage, so the Garnet fix is being
+    planned. Standing instruction recorded: **the moment it merges, pull current main into the
+    dependent Aspire branch and finish the Phase-B/merge sequence without parking.** #1744 is the
+    branch gated solely on it.
