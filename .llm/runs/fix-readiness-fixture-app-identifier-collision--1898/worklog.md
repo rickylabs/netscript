@@ -68,6 +68,7 @@ trade-off decision remains.
 | 2026-09-01 | 1 | RED | Wrapper exit 1: passed 4, failed 1, unique failures 1. Duplicate bindings observed: `app_0_workdir`, `app_0`, `app_0_otel`. Product files remained unchanged. |
 | 2026-09-01 | 2 | GREEN | Block-local binding namespace implemented; final wrappers pass. |
 | 2026-09-01 | 2 | slice review | Native Claude Fable 5 low session `3ae23fa3-f6fd-4d57-a7fa-11b1a5151c88` returned PASS after static review of the full uncommitted diff. |
+| 2026-09-01 | 2 | IMPL-EVAL | Native Claude Fable 5 medium session `230754ce-4127-481d-9dc6-b728a1e95b0a` returned PASS at pushed head `09e7b24b5fd2d4c2b24d018be81e93bc295afa89`. |
 
 ## Decisions
 
@@ -117,6 +118,18 @@ GREEN SHA: `38dab6c7932a76b83822902688e61e26dab4ed1c`.
 - `generate-register-apps.ts` unchanged.
 - `listener-unreachable-fixture.ts` and `REPORT_DEADLINE_MS` unchanged.
 - `deno.lock` unchanged.
+
+### IMPL-EVAL
+
+- Verdict: PASS.
+- Route: `formal_impl_evaluation` — native Claude Fable 5, effort medium.
+- Session: `230754ce-4127-481d-9dc6-b728a1e95b0a`.
+- Evaluated head: `09e7b24b5fd2d4c2b24d018be81e93bc295afa89`.
+- Independent evidence: reproduced RED in a disposable worktree; mutation-tested a partial rename
+  to an expected `TS2552`; reran tests/check/fmt/focused-lint at exits 0; verified ceiling and
+  unchanged lock hash.
+- Non-blocking handoff: hosted two-tier runtime acceptance and issue/PR acceptance mirroring remain
+  supervisor-owned. The PR stays draft with DoD unticked.
 
 ## Handoff Notes
 

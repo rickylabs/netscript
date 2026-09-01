@@ -14,7 +14,8 @@
 
 Baseline `7d18ef104` and issue #1898 are verified. Research, plan, and design are locked. PLAN-EVAL
 is N/A for this fully specified mechanical fix. RED is reproduced with three duplicate bindings;
-GREEN implementation and focused gates pass, with separate opposite-family slice-review PASS.
+GREEN implementation and focused gates pass, with separate opposite-family slice-review and
+IMPL-EVAL PASS verdicts.
 
 ## Completed
 
@@ -24,15 +25,16 @@ GREEN implementation and focused gates pass, with separate opposite-family slice
 - RED wrapper exit 1: passed 4, failed 1; duplicates `app_0_workdir`, `app_0`, `app_0_otel`.
 - GREEN fixture namespace rewrite plus tests 120/120, check/fmt/lint exits 0.
 - Fable 5 low slice review PASS, session `3ae23fa3-f6fd-4d57-a7fa-11b1a5151c88`.
+- Fable 5 medium IMPL-EVAL PASS at `09e7b24b5`, session `230754ce-4127-481d-9dc6-b728a1e95b0a`.
 
 ## In Progress
 
-- GREEN sign-off commit `38dab6c7932a76b83822902688e61e26dab4ed1c`.
+- GREEN sign-off commit `38dab6c7932a76b83822902688e61e26dab4ed1c` and IMPL-EVAL PASS.
 
 ## Next Steps
 
-1. Push GREEN and update draft PR evidence.
-2. Obtain separate-session IMPL-EVAL without marking the PR ready.
+1. Commit/push the tracked evaluator artifact and post the PASS phase comment.
+2. Hand back to the supervisor without marking the PR ready or ticking acceptance.
 
 ## Key Decisions
 

@@ -43,7 +43,8 @@ packages/cli/e2e/tests/application/gates/prepare-readiness-fixture_test.ts
 
 - Run dir: `.llm/runs/fix-readiness-fixture-app-identifier-collision--1898/`
 - Phase: evaluate (draft remains `status:impl` per owner instruction)
-- Do not merge until mandatory IMPL-EVAL and supervisor acceptance mirroring are complete.
+- IMPL-EVAL: PASS at `09e7b24b5fd2d4c2b24d018be81e93bc295afa89` (native Fable 5 medium, separate session)
+- Do not merge until supervisor-owned hosted acceptance and acceptance mirroring are complete.
 
 ## Drift / Debt
 
