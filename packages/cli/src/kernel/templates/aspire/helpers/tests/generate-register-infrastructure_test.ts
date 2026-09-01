@@ -23,8 +23,8 @@ function emittedHealthCheckBlock(
   key: string,
   resourceIdentifier: string,
 ): string {
-  const startMarker = `builder.addHealthCheck('${key}', async () => {`
-  const endMarker = `await ${resourceIdentifier}.withHealthCheck('${key}');`
+  const startMarker = `builder.addHealthCheck(${JSON.stringify(key)}, async () => {`
+  const endMarker = `await ${resourceIdentifier}.withHealthCheck(${JSON.stringify(key)});`
   const start = output.indexOf(startMarker)
   const end = output.indexOf(endMarker, start)
   assert(start >= 0, `missing health-check registration ${key}`)
@@ -57,7 +57,7 @@ describe('generateRegisterInfrastructure', () => {
         caches: {},
       })
       const key = `${fixture.name}_listener`
-      const server = `${fixture.name}_server`
+      const server = 'db_0_server'
       const block = emittedHealthCheckBlock(output, key, server)
 
       assert(!output.includes('EndpointProperty'))
@@ -67,11 +67,13 @@ describe('generateRegisterInfrastructure', () => {
       assertStringIncludes(block, 'const port = await endpoint.port();')
       assertStringIncludes(
         block,
-        `return createListenerReadinessCheck({ kind: '${fixture.kind}', host, port })();`,
+        `return createListenerReadinessCheck({ kind: ${
+          JSON.stringify(fixture.kind)
+        }, host, port })();`,
       )
       assert(!block.toLowerCase().includes('password'))
       assert(!block.toLowerCase().includes('username'))
-      assert(!block.includes(`${fixture.name}_password`))
+      assert(!block.includes('db_0_password'))
     }
   })
 
@@ -99,13 +101,13 @@ describe('generateRegisterInfrastructure', () => {
           },
         },
       })
-      const identifier = fixture.name.replaceAll('-', '_')
+      const identifier = 'cache_0'
       const key = `${fixture.name}_resp`
       const block = emittedHealthCheckBlock(output, key, identifier)
 
       assertStringIncludes(output, 'createRespPingCheck')
       assertEquals(
-        countOccurrences(output, `builder.addHealthCheck('${key}', async () => {`),
+        countOccurrences(output, `builder.addHealthCheck(${JSON.stringify(key)}, async () => {`),
         fixture.registrationCount,
       )
       assertStringIncludes(block, `const endpoint = await ${identifier}.getEndpoint('tcp');`)
@@ -249,15 +251,15 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      "builder.addContainer('redis', 'docker.io/library/redis:7')",
+      'builder.addContainer("redis", "docker.io/library/redis:7")',
     )
     assertStringIncludes(
       output,
-      "cacheEndpoints.set('redis', redis_tcpEndpoint);",
+      'cacheEndpoints.set("redis", cache_0_tcpEndpoint);',
     )
     assertStringIncludes(
       output,
-      "const primaryCache = caches.get('redis') ?? null;",
+      'const primaryCache = caches.get("redis") ?? null;',
     )
   })
 
@@ -277,29 +279,29 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.10')",
+      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:1.1.10")',
     )
     assertStringIncludes(
       output,
-      "cacheEndpoints.set('garnet', garnet_tcpEndpoint);",
+      'cacheEndpoints.set("garnet", cache_0_tcpEndpoint);',
     )
     assertStringIncludes(
       output,
-      "const primaryCacheEndpoint = cacheEndpoints.get('garnet') ?? null;",
+      'const primaryCacheEndpoint = cacheEndpoints.get("garnet") ?? null;',
     )
     // Garnet container builds Redis-compatible wiring (host:port + provider tag)
     // consumed once via withCacheReference.
     assertStringIncludes(
       output,
-      'garnet_hostPort = garnet_tcpEndpoint.property(EndpointProperty.HostAndPort)',
+      'cache_0_hostPort = cache_0_tcpEndpoint.property(EndpointProperty.HostAndPort)',
     )
-    assertStringIncludes(output, "cacheWiring.set('garnet', {")
-    assertStringIncludes(output, 'GARNET_URI: garnet_hostPort')
-    assertStringIncludes(output, 'REDIS_URI: garnet_hostPort')
-    assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
+    assertStringIncludes(output, 'cacheWiring.set("garnet", {')
+    assertStringIncludes(output, 'GARNET_URI: cache_0_hostPort')
+    assertStringIncludes(output, 'REDIS_URI: cache_0_hostPort')
+    assertStringIncludes(output, 'CACHE_PROVIDER: "garnet"')
     assertStringIncludes(
       output,
-      "const primaryCacheWiring = cacheWiring.get('garnet') ?? null;",
+      'const primaryCacheWiring = cacheWiring.get("garnet") ?? null;',
     )
   })
 
@@ -340,7 +342,7 @@ describe('generateRegisterInfrastructure', () => {
     assert(!output.includes(`cacheEndpoints.set('deno-kv'`))
     assertStringIncludes(
       output,
-      "cacheWiring.set('deno-kv', { resource: null, reference: null, env: {}, local: true });",
+      'cacheWiring.set("deno-kv", { resource: null, reference: null, env: {}, local: true });',
     )
   })
 
@@ -358,27 +360,27 @@ describe('generateRegisterInfrastructure', () => {
       primaryCache: 'deno-kv',
     })
 
-    assertStringIncludes(output, 'deno_kv_token = _generateAccessToken();')
+    assertStringIncludes(output, 'cache_0_token = _generateAccessToken();')
     assertStringIncludes(
       output,
-      "builder.addContainer('deno-kv', 'ghcr.io/denoland/denokv:0.11.0')",
+      'builder.addContainer("deno-kv", "ghcr.io/denoland/denokv:0.11.0")',
     )
     assertStringIncludes(
       output,
       "withEndpoint({ name: 'http', targetPort: 4512, scheme: 'http' })",
     )
     assertStringIncludes(output, "withArgs(['--sqlite-path', '/data/denokv.sqlite', 'serve'])")
-    assertStringIncludes(output, "withEnvironment('DENO_KV_ACCESS_TOKEN', deno_kv_token)")
-    assertStringIncludes(output, "cacheWiring.set('deno-kv', {")
-    assertStringIncludes(output, 'DENO_KV_ACCESS_TOKEN: deno_kv_token')
+    assertStringIncludes(output, "withEnvironment('DENO_KV_ACCESS_TOKEN', cache_0_token)")
+    assertStringIncludes(output, 'cacheWiring.set("deno-kv", {')
+    assertStringIncludes(output, 'DENO_KV_ACCESS_TOKEN: cache_0_token')
     assertStringIncludes(output, "CACHE_PROVIDER: 'denokv'")
     // Explicit scheme-complete URL so auto-detect resolves KV Connect by env key,
     // not only via the name-bound services__kv__http__0 discovery key.
     assertStringIncludes(
       output,
-      'deno_kv_httpEndpoint.property(EndpointProperty.Url)',
+      'cache_0_httpEndpoint.property(EndpointProperty.Url)',
     )
-    assertStringIncludes(output, 'DENO_KV_URL: deno_kv_httpUrl')
+    assertStringIncludes(output, 'DENO_KV_URL: cache_0_httpUrl')
   })
 
   it('emits garnet Executable cache as a self-provisioned dotnet tool (Docker-less)', () => {
@@ -395,15 +397,15 @@ describe('generateRegisterInfrastructure', () => {
     })
 
     // No container in the executable arm — bare-metal dotnet tool.
-    assert(!output.includes("builder.addContainer('garnet'"))
+    assert(!output.includes('builder.addContainer("garnet"'))
     // Self-provisions the garnet-server tool manifest, then runs it via dotnet.
     assertStringIncludes(
       output,
-      "garnet_workdir = ensureGarnetToolManifest(appHostDir, '1.1.10');",
+      'cache_0_workdir = ensureGarnetToolManifest(appHostDir, "1.1.10");',
     )
     assertStringIncludes(
       output,
-      "builder.addExecutable('garnet', 'dotnet', garnet_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+      "builder.addExecutable(\"garnet\", 'dotnet', cache_0_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
     )
     assertStringIncludes(
       output,
@@ -411,10 +413,10 @@ describe('generateRegisterInfrastructure', () => {
     )
     assertStringIncludes(
       output,
-      'garnet_hostPort = garnet_tcpEndpoint.property(EndpointProperty.HostAndPort)',
+      'cache_0_hostPort = cache_0_tcpEndpoint.property(EndpointProperty.HostAndPort)',
     )
-    assertStringIncludes(output, "cacheWiring.set('garnet', {")
-    assertStringIncludes(output, 'GARNET_URI: garnet_hostPort')
+    assertStringIncludes(output, 'cacheWiring.set("garnet", {')
+    assertStringIncludes(output, 'GARNET_URI: cache_0_hostPort')
     assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
   })
 
@@ -434,7 +436,7 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      "ensureGarnetToolManifest(appHostDir, '1.0.61');",
+      'ensureGarnetToolManifest(appHostDir, "1.0.61");',
     )
   })
 
@@ -452,20 +454,20 @@ describe('generateRegisterInfrastructure', () => {
     })
 
     // Runtime branch on the container-runtime probe, resolved at apphost start.
-    assertStringIncludes(output, 'let garnet_wiring: CacheWiring;')
+    assertStringIncludes(output, 'let cache_0_wiring: CacheWiring;')
     assertStringIncludes(output, 'if (shouldUseContainerCache()) {')
     // Docker present → Redis-compatible Garnet container (default engine kept).
     assertStringIncludes(
       output,
-      "builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:1.1.10')",
+      'builder.addContainer("garnet", "ghcr.io/microsoft/garnet:1.1.10")',
     )
     // Docker absent → self-provisioned Garnet dotnet-tool executable.
     assertStringIncludes(
       output,
-      "builder.addExecutable('garnet', 'dotnet', garnet_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
+      "builder.addExecutable(\"garnet\", 'dotnet', cache_0_workdir, ['tool', 'run', 'garnet-server', '--port', '6379'])",
     )
     assertStringIncludes(output, 'ensureGarnetToolManifest(appHostDir')
-    assertStringIncludes(output, "cacheWiring.set('garnet', garnet_wiring);")
+    assertStringIncludes(output, 'cacheWiring.set("garnet", cache_0_wiring);')
     // Both branches speak Redis, so consumer wiring is provider-stable.
     assertStringIncludes(output, "CACHE_PROVIDER: 'garnet'")
   })
@@ -483,20 +485,20 @@ describe('generateRegisterInfrastructure', () => {
       primaryCache: 'deno-kv',
     })
 
-    assertStringIncludes(output, 'let deno_kv_wiring: CacheWiring;')
+    assertStringIncludes(output, 'let cache_0_wiring: CacheWiring;')
     assertStringIncludes(output, 'if (shouldUseContainerCache()) {')
     // Docker present → DenoKv Connect container (engine-aware container branch).
     assertStringIncludes(
       output,
-      "builder.addContainer('deno-kv', 'ghcr.io/denoland/denokv:0.11.0')",
+      'builder.addContainer("deno-kv", "ghcr.io/denoland/denokv:0.11.0")',
     )
-    assertStringIncludes(output, 'deno_kv_token = _generateAccessToken();')
+    assertStringIncludes(output, 'cache_0_token = _generateAccessToken();')
     // Docker absent → Garnet executable cross-fallback (D6).
     assertStringIncludes(
       output,
-      "builder.addExecutable('deno-kv', 'dotnet', deno_kv_workdir,",
+      'builder.addExecutable("deno-kv", \'dotnet\', cache_0_workdir,',
     )
-    assertStringIncludes(output, "cacheWiring.set('deno-kv', deno_kv_wiring);")
+    assertStringIncludes(output, 'cacheWiring.set("deno-kv", cache_0_wiring);')
   })
 
   it('registers sqlite as a resolved file-backed Aspire resource', () => {
@@ -515,14 +517,14 @@ describe('generateRegisterInfrastructure', () => {
     })
 
     assertStringIncludes(output, 'Sqlite, resolved file-backed resource')
-    assertStringIncludes(output, "builder.addParameter('sqlite', {")
+    assertStringIncludes(output, 'builder.addParameter("sqlite", {')
     assertStringIncludes(
       output,
-      "value: resolveDataPath(appHostDir, 'app.sqlite', 'sqlite'),",
+      'value: resolveDataPath(appHostDir, "app.sqlite", "sqlite"),',
     )
     assertStringIncludes(output, 'secret: false,')
     assert(!output.includes("builder.addConnectionString('sqlite')"))
-    assertStringIncludes(output, "databases.set('sqlite', sqlite);")
+    assertStringIncludes(output, 'databases.set("sqlite", db_0);')
     assert(!output.includes('sqlite_server.addDatabase('))
     assert(!output.includes('const sqlite_server'))
     assert(!output.includes('ContainerLifetime'))
@@ -553,12 +555,12 @@ describe('generateRegisterInfrastructure', () => {
       primaryCache: 'deno-kv',
     })
 
-    assertEquals(countOccurrences(output, "builder.addParameter('sqlite'"), 1)
-    assertEquals(countOccurrences(output, "builder.addContainer('deno-kv'"), 1)
+    assertEquals(countOccurrences(output, 'builder.addParameter("sqlite"'), 1)
+    assertEquals(countOccurrences(output, 'builder.addContainer("deno-kv"'), 1)
     assert(!output.includes("builder.addConnectionString('deno-kv')"))
     assertStringIncludes(
       output,
-      'deno_kv_httpEndpoint.property(EndpointProperty.Url)',
+      'cache_0_httpEndpoint.property(EndpointProperty.Url)',
     )
   })
 
@@ -578,13 +580,13 @@ describe('generateRegisterInfrastructure', () => {
       primaryDatabase: 'mssql',
     })
 
-    assertStringIncludes(output, "builder.addParameter('mssql-password', {")
+    assertStringIncludes(output, 'builder.addParameter("mssql-password", {')
     assertStringIncludes(output, "value: 'NetscriptE2e!Sql2026'")
     assertStringIncludes(output, 'secret: true')
-    assertStringIncludes(output, "builder.addSqlServer('mssql', {")
-    assertStringIncludes(output, 'password: mssql_password')
+    assertStringIncludes(output, 'builder.addSqlServer("mssql", {')
+    assertStringIncludes(output, 'password: db_0_password')
     assertStringIncludes(output, ".withImage('mssql/server')")
-    assertStringIncludes(output, ".withImageTag('2022-latest')")
+    assertStringIncludes(output, '.withImageTag("2022-latest")')
     assertStringIncludes(output, ".withEnvironment('ACCEPT_EULA', 'Y')")
     assertStringIncludes(
       output,
@@ -594,8 +596,8 @@ describe('generateRegisterInfrastructure', () => {
       output,
       ".withEnvironment('MSSQL_SA_PASSWORD', 'NetscriptE2e!Sql2026')",
     )
-    assertStringIncludes(output, "mssql_server.addDatabase('app-mssql-db')")
-    assertStringIncludes(output, "databases.set('mssql', mssql);")
+    assertStringIncludes(output, 'db_0_server.addDatabase("app-mssql-db")')
+    assertStringIncludes(output, 'databases.set("mssql", db_0);')
   })
 
   it('persists container database credentials for resident AppHost restarts', () => {
@@ -607,13 +609,16 @@ describe('generateRegisterInfrastructure', () => {
         primaryDatabase: name,
       })
 
-      assertStringIncludes(output, `builder.addParameter('${name}-password', {`)
-      assertStringIncludes(output, `value: ensureDatabasePassword(appHostDir, '${name}')`)
+      assertStringIncludes(output, `builder.addParameter(${JSON.stringify(`${name}-password`)}, {`)
       assertStringIncludes(
         output,
-        `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}('${name}', {`,
+        `value: ensureDatabasePassword(appHostDir, ${JSON.stringify(name)})`,
       )
-      assertStringIncludes(output, `password: ${name}_password`)
+      assertStringIncludes(
+        output,
+        `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}(${JSON.stringify(name)}, {`,
+      )
+      assertStringIncludes(output, 'password: db_0_password')
     }
   })
 })

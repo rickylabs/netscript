@@ -31,7 +31,7 @@
 
 import type { RegisterAppsOptions } from '../types.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
-import { fileHeader, safeIdentifier } from '../_utils.ts';
+import { fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
@@ -64,16 +64,18 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
 
   const registrationBlocks: string[] = [];
 
-  for (const [name, entry] of entries) {
-    const id = safeIdentifier(name);
+  for (const [appIndex, [name, entry]] of entries.entries()) {
+    const id = `app_${appIndex}`;
     const type = entry.Type ?? 'app';
     const workdir = entry.Workdir ?? `${SCAFFOLD_DIRS.APPS}/${name}`;
     const lines: string[] = [];
-    lines.push(`  // --- ${name} (${type}) ---`);
+    lines.push(`  // --- app ${appIndex} ---`);
 
     // Skip disabled entries
     const enabledCondition = type === 'desktop' ? '=== true' : '!== false';
-    lines.push(`  if (config.Apps['${name}']?.Enabled ${enabledCondition}) {`);
+    lines.push(
+      `  if (config.Apps[${JSON.stringify(name)}]?.Enabled ${enabledCondition}) {`,
+    );
 
     if (type === 'app') {
       buildAppBlock(lines, id, name, entry, workdir);
@@ -90,7 +92,9 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     lines.push(``);
     lines.push(`    // OTEL telemetry (full executable env set)`);
     lines.push(
-      `    const ${id}_otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
+      `    const ${id}_otel = buildOtelEnvVars(${
+        JSON.stringify(name)
+      }, config.Version, 'executable');`,
     );
     lines.push(`    for (const [key, value] of Object.entries(${id}_otel)) {`);
     lines.push(`      await ${id}.withEnvironment(key, value);`);
@@ -138,10 +142,16 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       for (const ref of serviceRefs) {
         lines.push(`    {`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(_services.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_services.get(${
+            JSON.stringify(ref)
+          }), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
-        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(
+          `        await ${id}.withEnvironment(${
+            JSON.stringify(`services__${ref}__http__0`)
+          }, endpoint);`,
+        );
         lines.push(`      }`);
         lines.push(`    }`);
       }
@@ -149,10 +159,16 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       for (const ref of pluginRefs) {
         lines.push(`    {`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(_plugins.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_plugins.get(${
+            JSON.stringify(ref)
+          }), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
-        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(
+          `        await ${id}.withEnvironment(${
+            JSON.stringify(`services__${ref}__http__0`)
+          }, endpoint);`,
+        );
         lines.push(`      }`);
         lines.push(`    }`);
       }
@@ -177,28 +193,40 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
 
       for (const ref of serviceRefs) {
         lines.push(`    {`);
-        lines.push(`      const vite = buildViteEnvVarName('${ref}');`);
+        lines.push(`      const vite = buildViteEnvVarName(${JSON.stringify(ref)});`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(_services.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_services.get(${
+            JSON.stringify(ref)
+          }), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
         lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
         lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
-        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(
+          `        await ${id}.withEnvironment(${
+            JSON.stringify(`services__${ref}__http__0`)
+          }, endpoint);`,
+        );
         lines.push(`      }`);
         lines.push(`    }`);
       }
 
       for (const ref of pluginRefs) {
         lines.push(`    {`);
-        lines.push(`      const vite = buildViteEnvVarName('${ref}');`);
+        lines.push(`      const vite = buildViteEnvVarName(${JSON.stringify(ref)});`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(_plugins.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_plugins.get(${
+            JSON.stringify(ref)
+          }), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
         lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
         lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
-        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(
+          `        await ${id}.withEnvironment(${
+            JSON.stringify(`services__${ref}__http__0`)
+          }, endpoint);`,
+        );
         lines.push(`      }`);
         lines.push(`    }`);
       }
@@ -207,30 +235,34 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       if (entry.Prebuild) {
         lines.push(``);
         lines.push(
-          `    // TODO: Prebuild "${entry.Prebuild}" requires bridge NuGet — see ts-apphost-bridge-nuget.md`,
+          `    // TODO: Configured prebuild requires bridge NuGet — see ts-apphost-bridge-nuget.md`,
         );
       }
     }
 
     // --- tauri type: remote app reference ---
     if (type === 'tauri' && entry.Remote) {
-      const remoteId = safeIdentifier(entry.Remote);
+      const remoteId = `app_remote_${appIndex}`;
       lines.push(``);
       lines.push(`    // Remote app reference — wired via endpoint env var`);
       lines.push(`    {`);
       lines.push(
-        `      const ${remoteId}Endpoint = await getResourceEndpoint(apps.get('${entry.Remote}'), 'http');`,
+        `      const ${remoteId}Endpoint = await getResourceEndpoint(apps.get(${
+          JSON.stringify(entry.Remote)
+        }), 'http');`,
       );
       lines.push(`      if (${remoteId}Endpoint) {`);
       lines.push(
-        `        await ${id}.withEnvironment('services__${entry.Remote}__http__0', ${remoteId}Endpoint);`,
+        `        await ${id}.withEnvironment(${
+          JSON.stringify(`services__${entry.Remote}__http__0`)
+        }, ${remoteId}Endpoint);`,
       );
       lines.push(`      }`);
       lines.push(`    }`);
     }
 
     lines.push(``);
-    lines.push(`    apps.set('${name}', ${id});`);
+    lines.push(`    apps.set(${JSON.stringify(name)}, ${id});`);
     lines.push(`  }`);
 
     registrationBlocks.push(lines.join('\n'));
@@ -271,7 +303,9 @@ function buildHealthProbeBlock(
   lines.push(``);
   lines.push(`    // HTTP health probe — a listening socket alone is not "healthy".`);
   lines.push(
-    `    await ${id}.withHttpHealthCheck({ path: '${path}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+    `    await ${id}.withHttpHealthCheck({ path: ${
+      JSON.stringify(path)
+    }, endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
   );
 }
 
@@ -300,11 +334,15 @@ function buildAppBlock(
   const taskName = entry.TaskName ?? 'dev';
 
   // Resolve working directory
-  lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
+  lines.push(
+    `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
+  );
 
   // Register via addExecutable — Vite dev server started via deno task
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
+    `    const ${id} = builder.addExecutable(${
+      JSON.stringify(name)
+    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
   );
 }
 
@@ -321,9 +359,13 @@ function buildTauriBlock(
 ): void {
   const taskName = entry.TaskName ?? `dev:${name}`;
 
-  lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
+    `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
+  );
+  lines.push(
+    `    const ${id} = builder.addExecutable(${
+      JSON.stringify(name)
+    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
   );
 }
 
@@ -341,12 +383,18 @@ function buildDesktopBlock(
   const buildTaskName = entry.Prebuild ?? 'build';
   const taskName = entry.TaskName ?? 'desktop:predev';
 
-  lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
   lines.push(
-    `    const ${id}_build = builder.addExecutable('${name}-build', 'deno', ${id}_workdir, ['task', '${buildTaskName}']);`,
+    `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
   );
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}', '--backend', 'cef']);`,
+    `    const ${id}_build = builder.addExecutable(${
+      JSON.stringify(`${name}-build`)
+    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(buildTaskName)}]);`,
+  );
+  lines.push(
+    `    const ${id} = builder.addExecutable(${
+      JSON.stringify(name)
+    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}, '--backend', 'cef']);`,
   );
   lines.push(`    await ${id}.waitForCompletion(${id}_build);`);
 }
@@ -364,8 +412,12 @@ function buildTaskBlock(
 ): void {
   const taskName = entry.TaskName ?? `dev:${name}`;
 
-  lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
   lines.push(
-    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
+    `    const ${id}_workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
+  );
+  lines.push(
+    `    const ${id} = builder.addExecutable(${
+      JSON.stringify(name)
+    }, 'deno', ${id}_workdir, ['task', ${JSON.stringify(taskName)}]);`,
   );
 }
