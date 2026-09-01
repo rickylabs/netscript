@@ -6275,3 +6275,33 @@
     S10 → **one serialized Phase-B lease from a clean zero baseline** → Tier-A delta review →
     supervisor-dispatched independent IMPL-EVAL → acceptance/DoD/threads/CI → merge-ready hand-off.
   - Runtime stays untouched until the lease returns to this lane at exact zero.
+
+- **D-255 — #1860 merged (`b66e52cbc`); reconciliation check says NO active leaf needs restarting.
+  Zero path overlap, measured.**
+  - **#1860 is docs + generated-asset only** — `docs(plugins): remove fabricated /scaffolding sub-path
+    from triggers and workers reference`, 14 files: two `docs/site/reference/*` pages, the
+    `agent-docs` prose/provenance assets, two regenerated carriers
+    (`agent-docs.generated.ts`, `publish-assets.generated.ts`), and its own
+    `.llm/runs/docs-plugin-scaffolding-invents--1857/` directory.
+  - **Overlap computed per head against each slice's own changed-file set, not eyeballed:**
+
+    | Slice | Head | own files | overlap with #1860 |
+    | --- | --- | ---: | ---: |
+    | S8 | `854e45cb8` | 72 | **0** |
+    | S9 | `a8cf585b0` | 119 | **0** |
+    | S10 | `21a0bfec6` | 39 | **0** |
+    | S7 | `bd3dbc843` | 112 | **0** |
+    | #1747 | `2032d4ed7` | 19 | **0** |
+
+  - **Therefore no product work restarts.** Per the standing rule — do not restart already-valid
+    product work unless paths overlap — this merge is a **base advance only**, folded into the
+    already-staged top-up rather than triggering its own pass. Restarting a 26-commit reconciliation
+    for a docs merge would have cost a full replay and eight delta verdicts for nothing.
+  - **The base advance is absorbed by work already planned**: the S8 top-up brief re-fetches main at
+    replay time by construction, so `b66e52cbc` (and whatever lands after it) is picked up without
+    editing the brief. The same is true of both restack briefs.
+  - **Partial #1857 remains open** — its run dir landed with #1860, so the scaffolding-sub-path
+    correction is only partly delivered. Not an Aspire dependency; recorded so a later `docs/site`
+    change in this lane does not collide with its remainder.
+  - Blocking fixes unchanged: **#1863** and **#1858** both `status:impl`. Phase B still waits on their
+    merge SHAs plus a clean-zero lease.
