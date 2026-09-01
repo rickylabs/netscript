@@ -63,10 +63,16 @@ function procedureDescriptor(path: readonly string[] = ['echo']) {
 }
 
 function logicalCall(context: Readonly<Record<string, unknown>>): SdkClientLogicalCall<object> {
+  const procedure = procedureDescriptor();
   return Object.freeze({
     context,
     procedurePath: Object.freeze(['echo']),
-    procedureNode: contract.echo,
+    procedure,
+    transportPolicy: Object.freeze({
+      procedure,
+      method: 'POST' as const,
+      cache: 'default' as const,
+    }),
     transport: Object.freeze({
       kind: 'http' as const,
       origin: new URL('https://example.test'),
@@ -78,9 +84,7 @@ function logicalCall(context: Readonly<Record<string, unknown>>): SdkClientLogic
 }
 
 function preparationPort(contributions: unknown) {
-  return createPreparedOutboundHeadersPort(contributions, {
-    describe: (_node, path) => procedureDescriptor(path),
-  });
+  return createPreparedOutboundHeadersPort(contributions);
 }
 
 Deno.test('unknown construction rejects invalid protocol, ids, shapes, and forbidden extras', () => {

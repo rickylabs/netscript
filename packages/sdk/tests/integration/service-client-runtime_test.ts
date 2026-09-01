@@ -4,6 +4,8 @@ import { createService } from '../../../service/mod.ts';
 import { createServiceClient } from '../../src/client/service-client.ts';
 import { createHttpClientLink } from '../../src/client/http-client-link.ts';
 import { createServerServiceEnvKey } from '../../src/discovery/service-url.ts';
+import { resolveTransportPolicy } from '../../src/internal/transport-policy.ts';
+import type { ContractLike } from '../../src/ports/service-client.ts';
 
 const SERVICE_NAME = 'sdk-live';
 const BAD_SERVICE_NAME = 'sdk-missing';
@@ -38,9 +40,9 @@ function createRuntimeRouter() {
   };
 }
 
-function createLink(contract: Parameters<typeof createHttpClientLink>[0]['contract']) {
+function createLink(contract: ContractLike) {
   return createHttpClientLink({
-    contract,
+    transportPolicy: resolveTransportPolicy(contract),
     getTraceHeaders: () => ({}),
     propagateTraceContext: false,
     protocol: 'http',

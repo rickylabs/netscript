@@ -76,6 +76,9 @@ adding a second transport path.
 | 2026-09-01 | plan-gate | complete | Separate evaluator committed `VERDICT: PASS` at `871caac96`. |
 | 2026-09-01 | 1 | contract implemented | Added metadata, public option vocabulary, exact resolver validation, and direct policy tests without wiring HTTP or Desktop dispatch. |
 | 2026-09-01 | 1 | reconcile | No new issue/PR scope or comment changed the approved decisions; #1879 remains excluded. |
+| 2026-09-01 | 2 | HTTP adapter implemented | Stored one frozen decision on each existing logical epoch and projected it into the sole RPC codec/dedupe stack. |
+| 2026-09-01 | 2 | hard semantics proved | Pending same-header GETs coalesced once; differing authorization/locale headers dispatched twice; unary/reconnect decision counts were 1/2. |
+| 2026-09-01 | 2 | reconcile | Draft PR #1889 remains `status:impl`; no new scope or dependency change was admitted. |
 
 ## Decisions
 
@@ -85,6 +88,7 @@ adding a second transport path.
 | Normalize `policy.cache` in the existing metadata port | One descriptor, not a second raw metadata mechanism | locked plan |
 | Keep resolver internal to the package export map | Future upstream adaptation stays one internal function change | locked plan |
 | Build and test on the current pinned oRPC graph | Coordinator excluded dependency work and evaluator proved the v1 seams exist | #1879 ruling + PLAN-EVAL |
+| Bridge stable-v1's narrower method declaration only at the codec edge | Fetch accepts the locked public method vocabulary; policy validation remains authoritative and no upstream type leaks publicly | locked public contract + pinned-v1 adapter |
 
 ## Drift
 
@@ -119,9 +123,20 @@ adding a second transport path.
 | Metadata/policy behavior | PASS (`rc=0`) | structured test wrapper, 7/7 tests | GET/POST/HEAD, cache precedence, override, and invalid-runtime cases |
 | Export neutrality | PASS (`rc=0`) | `procedure-meta-independence_test.ts` | contracts/client/desktop/ports surfaces checked |
 
+### Slice 2 Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| SDK check/lint/fmt | PASS (`rc=0`) | structured wrappers | 101 files, zero findings |
+| Focused HTTP/epoch suite | PASS (`rc=0`) | structured test wrapper, 26/26 | Includes wire baseline, trace ownership, unary retry, reconnect, abort, and dedupe overlap |
+| Header-safe dedupe | PASS (`rc=0`) | two pending-fetch tests | Same auth+locale produced one pending fetch; distinct auth+locale produced two |
+| Contract-derived source boundary | PASS | no-match `rg` returned `rc=1` | HTTP link contains no `request.method`, upstream infer helper, or fallback/max literals |
+| Code quality + doctrine | PASS (`rc=0`) | `deno task quality:gate` | No scanner findings; existing repository warnings unchanged |
+
 ## Handoff Notes
 
 - Inspect `src/internal/transport-policy.ts` first: all later wiring must project this decision and
   must not recreate method/cache policy in either link.
 - Slice 2 must retain one logical decision across unary attempts and create a fresh decision for an
-  iterator reconnect.
+  iterator reconnect. This is now proved; Slice 3 should inspect the private projection and Desktop
+  wrapper rather than changing the epoch lifetime.

@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `refactor-sdk-transport-policy--1351` |
 | Branch | `refactor/sdk-transport-policy` |
-| Current phase | implement — Slice 1 complete pending commit |
+| Current phase | implement — Slice 2 complete pending commit |
 | Archetype | `2 — Integration` |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL passed at `871caac96`. Slice 1 implements the approved public contract and internal
-resolver on the current pinned oRPC graph; HTTP and Desktop dispatch are intentionally not wired
-yet. No dependency configuration or lock file changed.
+PLAN-EVAL passed at `871caac96`. Slices 1–2 implement the approved contract and wire one frozen
+decision through the existing stable-v1 logical epoch and sole HTTP stack. Desktop dispatch remains
+for Slice 3. No dependency configuration or lock file changed.
 
 ## Completed
 
@@ -23,16 +23,22 @@ yet. No dependency configuration or lock file changed.
 - Exact exported-internal `resolveTransportPolicy` with direct behavior/validation tests.
 - Public declaration neutrality and internal non-export proof.
 - Slice 1 structured static, focused runtime, and quality gates.
+- HTTP method/fallback/max-URL/dedupe/cache-group projections now come only from the owned policy.
+- Unary attempts reuse one policy/descriptor/prepared call; iterator reconnect creates a fresh
+  decision and preparation.
+- Real pending-fetch tests prove same authorization/locale headers coalesce and differing headers
+  dispatch separately.
 
 ## In Progress
 
-- Slice 1 commit/push and draft PR creation.
+- Slice 2 commit/push and PR evidence comment.
 
 ## Next Steps
 
-1. Commit and push Slice 1, then open the draft PR with the required taxonomy and milestone.
-2. Wire the resolved decision through the stable-v1 logical epoch and sole HTTP link.
-3. Prove genuinely overlapping header-safe dedupe and unary/reconnect lifetimes.
+1. Commit and push Slice 2 with its PR evidence comment.
+2. Add the policy-aware typed Desktop wrapper without serializing the HTTP method.
+3. Extend compile-time/runtime/private-surface tests so contributions cannot observe transport
+   policy internals.
 
 ## Key Decisions
 
@@ -53,16 +59,19 @@ yet. No dependency configuration or lock file changed.
 | `stable-v1-adapter.ts` | changed | normalize/freeze `policy.cache` in existing metadata port |
 | `packages/sdk/tests/transport-policy_test.ts` | new | direct policy/validation proof |
 | `procedure-meta-independence_test.ts` | changed | public neutrality/private absence |
+| `http-client-link.ts`, `service-client.ts` | changed | sole HTTP link consumes the owned policy |
+| stable-v1 adapter ports/prepared-call | changed | one policy/descriptor per logical epoch |
+| contribution adapter/runtime/observability tests | changed | hard HTTP/retry/reconnect/dedupe proof |
 | scoped run artifacts | new/changed | implementation evidence and resumable state |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slice 1 PASS | structured check/lint/fmt wrappers |
-| Fitness | Slice 1 PASS | `quality:gate`; doc JSON boundary test |
-| Runtime | Slice 1 PASS | structured focused tests, 7/7 |
-| Consumer | Slice 1 PASS | public declaration neutrality/internal absence |
+| Static | Slices 1–2 PASS | structured check/lint/fmt wrappers |
+| Fitness | Slices 1–2 PASS | `quality:gate`; source/doc boundary checks |
+| Runtime | Slice 2 PASS | structured focused suite, 26/26 |
+| Consumer | Slice 2 PASS | byte-identical default wire and trace ownership tests |
 
 ## Open Questions
 
