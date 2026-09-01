@@ -53,77 +53,55 @@ function ownerLabel(block: JsdocExampleBlock): string {
   } · example ${block.exampleOrdinal} · fence ${block.fenceOrdinal}`;
 }
 
-const TYPE_PARAMETER_ARITY = new Map<string, number>();
-
-/**
- * Count a declaration's type parameters so the injected shim can mirror its arity.
- *
- * Returns 0 when the declaration is absent or non-generic. Angle-bracket depth ignores the
- * `>` of an arrow return type so a defaulted function-typed parameter is not miscounted.
- */
-function declarationTypeParameterArity(root: string, sourcePath: string, symbol: string): number {
-  const key = `${sourcePath}::${symbol}`;
-  const cached = TYPE_PARAMETER_ARITY.get(key);
-  if (cached !== undefined) return cached;
-  let arity = 0;
-  try {
-    const source = Deno.readTextFileSync(join(root, sourcePath));
-    const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const declaration = new RegExp(
-      `export\\s+(?:declare\\s+)?(?:abstract\\s+)?(?:type|interface|class)\\s+${escaped}\\s*<`,
-    ).exec(source);
-    if (declaration) {
-      let depth = 1;
-      let commas = 0;
-      for (let i = declaration.index + declaration[0].length; i < source.length && depth > 0; i++) {
-        const char = source[i];
-        if (char === '<') depth += 1;
-        else if (char === '>' && source[i - 1] !== '=') depth -= 1;
-        else if (char === ',' && depth === 1) commas += 1;
-      }
-      if (depth === 0) arity = commas + 1;
-    }
-  } catch {
-    arity = 0;
-  }
-  TYPE_PARAMETER_ARITY.set(key, arity);
-  return arity;
+function importsOwnSymbol(body: string, symbol: string): boolean {
+  const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`import[^;]*\\b${escaped}\\b[^;]*from\\s`, 's').test(body);
 }
 
-function preamble(block: JsdocExampleBlock, repositoryRoot: string): string {
+/** True when the example itself declares the symbol, which a second binding would collide with. */
+function declaresOwnSymbol(body: string, symbol: string): boolean {
+  const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(
+    `\\b(?:type|interface|class|const|let|var|function|enum)\\s+${escaped}\\b`,
+  ).test(body);
+}
+
+/**
+ * Bind the documented symbol's type meaning with a real import in the example module.
+ *
+ * A `declare global` alias cannot carry the declaration's type parameters, and mirroring the arity
+ * with `any` defaults leaves them unconstrained: the alias then fails TS2344 at its own declaration
+ * inside the unattributed preamble, so a violating type argument passed silently. A real import
+ * carries the genuine parameters and their constraints, so violations fail at the usage site.
+ * Skipped when the example already binds the symbol.
+ */
+function exampleTypeImport(block: JsdocExampleBlock): string | undefined {
+  const owner = block.owner;
+  if (owner.kind !== 'symbol' || !owner.symbol || !owner.publicSpecifier) return undefined;
+  if (owner.declarationKind !== 'type' && owner.declarationKind !== 'class') return undefined;
+  if (importsOwnSymbol(block.body, owner.symbol)) return undefined;
+  if (declaresOwnSymbol(block.body, owner.symbol)) return undefined;
+  const keyword = owner.declarationKind === 'type' ? 'import type' : 'import';
+  return `${keyword} { ${owner.symbol} } from ${JSON.stringify(owner.publicSpecifier)};`;
+}
+
+/**
+ * Ambient stand-in for a documented *value*, whose `typeof import(...)` form is already faithful:
+ * it preserves call-signature generics. Types and classes are bound by `exampleTypeImport`.
+ */
+function preamble(block: JsdocExampleBlock): string {
   const owner = block.owner;
   if (owner.kind !== 'symbol' || !owner.symbol || !owner.publicSpecifier) return 'export {};\n';
+  if (owner.declarationKind !== 'value' && owner.declarationKind !== 'class') return 'export {};\n';
+  if (owner.declarationKind === 'class' && exampleTypeImport(block)) return 'export {};\n';
   const importedType = `import(${JSON.stringify(owner.publicSpecifier)}).${owner.symbol}`;
-  const lines = ['export {};', 'declare global {'];
-  if (owner.declarationKind === 'value' || owner.declarationKind === 'class') {
-    lines.push(`  const ${owner.symbol}: typeof ${importedType};`);
-  }
-  if (owner.declarationKind === 'type' || owner.declarationKind === 'class') {
-    // A bare `type X = import(spec).X` alias drops the declaration's type parameters, so a
-    // documented generic type fails TS2315 when its own example applies type arguments. Mirror
-    // the arity instead, with `any` defaults so the bare `X` spelling stays valid.
-    //
-    // KNOWN GAP (#1533 follow-up): this does NOT enforce the declaration's *constraints*. The
-    // mirrored parameters are unconstrained, so for a constrained generic the alias itself fails
-    // TS2344 inside `preamble.ts` — an unattributed module whose diagnostics are dropped whenever
-    // any example has a classified failure. A violating type argument therefore passes silently:
-    // `ServiceHandlerContext<number>` against `TCustom extends object` leaves the gate green.
-    // Injecting a real `import type` into the example module fixes it, but regresses two
-    // pre-existing examples over the ratchet, so it is tracked separately rather than rushed.
-    const arity = declarationTypeParameterArity(repositoryRoot, owner.sourcePath, owner.symbol);
-    if (arity > 0) {
-      const parameters = Array.from({ length: arity }, (_, index) => `P${index + 1}`);
-      lines.push(
-        `  type ${owner.symbol}<${
-          parameters.map((parameter) => `${parameter} = any`).join(', ')
-        }> = ${importedType}<${parameters.join(', ')}>;`,
-      );
-    } else {
-      lines.push(`  type ${owner.symbol} = ${importedType};`);
-    }
-  }
-  lines.push('}', '');
-  return lines.join('\n');
+  return [
+    'export {};',
+    'declare global {',
+    `  const ${owner.symbol}: typeof ${importedType};`,
+    '}',
+    '',
+  ].join('\n');
 }
 
 function forbiddenSpecifier(
@@ -263,12 +241,12 @@ async function materializeModules(
     const directory = join(tempRoot, 'examples', String(index + 1));
     const preamblePath = join(directory, 'preamble.ts');
     const modulePath = join(directory, `example.${block.compilationExtension}`);
-    await writeSnippetFile(preamblePath, preamble(block, repositoryRoot));
-    await writeSnippetFile(
-      modulePath,
-      `// ${ownerLabel(block)}\nimport './preamble.ts';\n${block.body}\n`,
-    );
-    modules.push({ block, path: modulePath, headerLines: 2 });
+    await writeSnippetFile(preamblePath, preamble(block));
+    const typeImport = exampleTypeImport(block);
+    const header = [`// ${ownerLabel(block)}`, `import './preamble.ts';`];
+    if (typeImport) header.push(typeImport);
+    await writeSnippetFile(modulePath, `${header.join('\n')}\n${block.body}\n`);
+    modules.push({ block, path: modulePath, headerLines: header.length });
   }
   return { modules, policyDiagnostics };
 }
