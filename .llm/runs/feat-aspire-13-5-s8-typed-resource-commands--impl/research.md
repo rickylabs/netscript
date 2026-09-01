@@ -214,3 +214,22 @@ stdout and logs its own non-interactive guidance through `console.log`. The type
 non-terminal session. Therefore the next diagnostic delta retains bounded stdout without changing
 D-224's stderr policy and serializes the decisive message first on one Aspire-visible line. This is
 generic stream transport, not a Prisma classifier special case.
+
+### Surfaced cause and behavioral repair — run 33453461545
+
+At `a5f1ab7e0`, PostgreSQL again reached 58 passing gates, then the typed command printed the
+decisive retained stdout line first:
+
+```text
+This headless session could not create a migration. Run this command in an interactive terminal:
+netscript db migrate --name <migration-name>
+```
+
+This confirms the source-level mismatch: S8's runtime `migrate` action was invoking migration
+authoring (`db:migrate:<engine>` / `prisma migrate dev`) in a non-terminal CI environment. It is an
+S8 routing defect, not an external failure. Generated workspaces already provide the intended
+runtime application task, `db:deploy:<engine>` / `prisma migrate deploy`.
+
+The repair keeps the public typed command named `migrate` and maps only its internal task operation
+to `deploy`. Container requests carry public action and task operation separately; External and
+SQLite direct execution use the same mapping helper. Seed and reset remain identity mappings.

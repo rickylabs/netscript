@@ -210,6 +210,51 @@ Deno.exit(16);
   }
 });
 
+Deno.test('run-tool separates the public database action from its task operation', async () => {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-run-tool-task-operation-' });
+  const runnerPath = join(root, 'run-tool.mts');
+  const requestPath = join(root, 'migrate.request.json');
+  const resultPath = join(root, 'migrate.result.json');
+  try {
+    const template = await Deno.readTextFile(
+      new URL('../../../../assets/aspire/helpers/run-tool.ts.template', import.meta.url),
+    );
+    await Promise.all([
+      Deno.writeTextFile(runnerPath, template),
+      Deno.writeTextFile(
+        join(root, 'deno.json'),
+        JSON.stringify({ tasks: { 'db:deploy:postgres': 'deno eval ""' } }),
+      ),
+      Deno.writeTextFile(
+        requestPath,
+        JSON.stringify({
+          NETSCRIPT_PRISMA_OPERATION: 'migrate',
+          NETSCRIPT_PRISMA_TASK_OPERATION: 'deploy',
+          NETSCRIPT_DB_RESULT_FILE: resultPath,
+        }),
+      ),
+    ]);
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: ['run', '--allow-all', runnerPath, '--request', requestPath, 'postgres'],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const result: unknown = JSON.parse(await Deno.readTextFile(resultPath));
+
+    assertEquals(output.code, 0);
+    assertEquals(result, {
+      success: true,
+      message: 'Database migrate completed successfully.',
+      actionableStderr: [],
+      actionableStdout: [],
+    });
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('run-tool promotes a real error after an informational preamble', async () => {
   const root = await Deno.makeTempDir({ prefix: 'netscript-run-tool-preamble-' });
   const runnerPath = join(root, 'run-tool.mts');
