@@ -61,6 +61,14 @@ export interface JobConfig {
   readonly timeout: number;
   /** Maximum retry attempts. */
   readonly maxRetries: number;
+  /** Job priority from 0 (lowest) to 100 (highest). */
+  readonly priority: number;
+  /** Delay between retry attempts in milliseconds. */
+  readonly retryDelay: number;
+  /** Maximum number of concurrent executions. */
+  readonly maxConcurrency: number;
+  /** Whether executions are persisted. */
+  readonly persist: boolean;
   /** Deno permissions granted to the job. */
   readonly permissions?: WorkerConfigPermissions;
   /** Searchable job tags. */
@@ -95,6 +103,10 @@ export const JobConfigZodSchema: z.ZodType<JobConfig> = z.object({
   timezone: z.string().optional(),
   timeout: z.number().default(60000),
   maxRetries: z.number().default(3),
+  priority: z.number().int().min(0).max(100).default(50),
+  retryDelay: z.number().int().nonnegative().default(1000),
+  maxConcurrency: z.number().int().nonnegative().default(1),
+  persist: z.boolean().default(true),
   permissions: TaskPermissionsInputSchema.optional(),
   tags: z.array(z.string()).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
