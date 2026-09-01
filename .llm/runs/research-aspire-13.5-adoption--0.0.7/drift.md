@@ -6344,3 +6344,29 @@
   - **So four of six boxes are runtime-gated and two are already satisfiable now** — meaning the one
     serialized Phase-B pass has to produce exactly four receipts (A1, A2, A4, A5), which is the
     smallest possible ask of a scarce lease.
+
+- **D-257 — runtime mutex released; static work continued. S13 box 4 evidenced, box 1 proven to share
+  box 2's S9 dependency.**
+  - **Mutex release recorded**: #1865's cleanup proved `aspire []`, containers 0, custom networks 0;
+    its run stopped early at an unrelated Fresh/Vite project-boundary gate. **I did not request the
+    next lease** — the coordinator grants it, and static work is not blocked on it. Baseline confirmed
+    read-only: `aspire []`, containers 0, networks 0, volumes 1 (the older foreign `d33e5c2e…`).
+  - **S13 box 4 — evidenced and posted.** Verified at `9b684e176`: `deploy-compose-ghcr` pinned-install
+    surface across **6** files; D-17 telemetry resolution present in **3** files including the Windows
+    env-file path with dedicated coverage in `env-file-dashboard_test.ts` and the telemetry example
+    template; the `aspire ps` resolver step exercised by **7** test/gate files
+    (`apphost-doctor-inspector_test.ts`, `otel-gates.ts`, `validate-aspire-task-traces.ts`,
+    `verify-db-status-preserves-apphost.ts`, …).
+  - **Box 1 is NOT clean, and running the sweep myself is what showed it.** Over the manifest's
+    non-archival, non-`compat-fixture` rows — **725 of 815** paths — the phase-2 grep returns **44
+    hits**, not zero. The dominant cluster is the **skills / dogfood-bundle corpus**
+    (`.agents/generated/consumer-skills/.claude/skills/aspire/SKILL.md`, `help.md`, `skills/aspire`,
+    `skills/`), i.e. **S9's** surface — the same ownership the parity gate reported when all 14
+    phase-2 failures carried `"owner": "S9"`.
+  - **So boxes 1 and 2 share one dependency: S9 landing on `main`.** Neither can be satisfied by any
+    change to S13, and writing evidence for them now would be fabrication. **S13 closes after S9** is
+    now grounded twice over, not once.
+  - Final S13 box status: **1 blocked (S9)**, **2 blocked (S9)**, **3 evidenced**, **4 evidenced**,
+    **5 evidenced**. S13 is 32 behind main and restacks after S8 → S9/S10 → S11 settle.
+  - Remaining static surface in the lane is now genuinely small: everything else waits on either the
+    #1863/#1858 merge SHAs or the Phase-B lease.
