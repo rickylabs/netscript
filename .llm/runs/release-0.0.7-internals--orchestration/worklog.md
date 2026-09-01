@@ -9409,3 +9409,49 @@ oRPC keys across the root catalog and 13 member manifests at 1.15.0.
 **#1351** at `050ef5e6f`, author active. **#1888** author active, not yet pushed. **#1846** disarmed
 behind #1858 on the corrected `gate3` (requires a **real** terminal execution, `cancelled` excluded);
 currently `0/2` real terminal jobs with the lane occupied.
+
+
+## D-213 - #1888 delivered and under IMPL-EVAL; #1879 converged; all lanes reconciled onto 7d18ef104
+
+### #1888 took the correct route on the subtle defect
+
+PR **#1894**, head `eebbbd01e` after converging onto `7d18ef104` (clean).
+
+The trap in this slice was that the naive fix - delete the `eval_phase == ''` gate so evaluators
+commit - would let evaluation **mutate the head it is evaluating**, a worse defect than the one being
+fixed. The implementation avoided it: verdicts are committed to a separate
+**`openhands-eval-artifacts/pr-*/run-*` evidence ref rooted at the immutable head**, so the artifact
+is durable *and* the evaluated branch is never written. It also emits `verdict_artifact_path`,
+`verdict_artifact_commit` and `verdict_artifact_uri` so the status comment's claim can be **provable**
+rather than asserted.
+
+Defect B is handled by counting rather than taking the first match - `marker_count` and `valid_count`
+with explicit branching - so zero **and** more-than-one both fail closed, replacing the `head -n 1`
+that silently swallowed the trailing `PENDING`.
+
+**Acceptance 4 is genuinely covered**, which was the box most likely to be skimped: two new tests are
+named for these defects, including `read-only formal evaluator with pr-comment preserves a durable
+verdict off-head` - the exact combination that reproduced in run `33533773165`. Suite **16 passed /
+0 failed** at the converged head; `deno.lock` unchanged.
+
+IMPL-EVAL dispatched with the invariant stated as the **first** thing to check: *verify the evaluated
+branch head is still never written by an evaluator run* - blocking regardless of what else works. It
+is also asked to judge whether the two new tests would **fail if the fix were reverted**, or merely
+assert the new shape.
+
+### #1879 converged; root suite still running
+
+Head `1914a38c6`, single-copy `@orpc/shared@1.15.0`, 17 oRPC names with zero mixed, `deno ci` /
+`arch:check` / `publish:dry-run` all 0, and #1876's six declarations preserved through the key-level
+union resolution. Root `deno task test` still executing at the integrated head.
+
+### #1846 - correctly still closed
+
+`gate3` reads `1858_real_terminal_tier_jobs=0/2 (run 33541672224) active_runtime_tier_jobs=4`. Note it
+picked up #1858's **new** run automatically - tracking the latest run by branch rather than pinning a
+run ID is what makes that work, after the retry created a fresh ID.
+
+### Lane state
+
+**#1351** at `050ef5e6f`, author active. **#1879** converged, root test running, evaluator next.
+**#1888/#1894** under IMPL-EVAL. **#1846** disarmed behind #1858.
