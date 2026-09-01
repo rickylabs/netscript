@@ -66,6 +66,7 @@ model, then extend semantic generation tests without introducing a second policy
 | 2026-09-01 | G | implementation | Added entry-edge config loading, typed normalized policy input, canonical matching, D7 precedence, generated policy literals, diagnostics, docs, and installed/startup integration. |
 | 2026-09-01 | G | acceptance | Focused structured tests pass 15/15, including real config entry, malformed/absent config, all policy fields, Windows paths, precedence, collision/source/unmatched errors, plugin intrinsic id, generic fallback, and installed runtime consumption without fetch. |
 | 2026-09-01 | G | fitness | Focused check/lint/fmt pass in governed scopes; doc-lint A/B unchanged at plugin 20 / CLI 0; publish dry-run, quality gate, and architecture gate pass. |
+| 2026-09-01 | G | PR handoff | Pushed implementation commit `236ddcf3a`; opened draft PR #1872 with required labels and milestone 0.0.7. GraphQL confirms `closingIssuesReferences: []`. |
 
 ## Decisions
 
@@ -124,6 +125,8 @@ model, then extend semantic generation tests without introducing a second policy
 
 ## Handoff Notes
 
+- Draft PR: `https://github.com/rickylabs/netscript/pull/1872` (`status:impl`, exact requested
+  taxonomy, milestone 0.0.7, `Refs #1451`, no closing relationship).
 - Evaluator should inspect that no generator-owned validation/defaults were introduced and that
   `maxConcurrency: 0` survives normalization and generated-module import.
 - Compare post-change doc lint against plugin 20 / CLI 0 and lock blob against `ac2ee042…`.

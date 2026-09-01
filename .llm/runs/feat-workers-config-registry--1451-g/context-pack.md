@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-workers-config-registry--1451-g` |
 | Branch | `feat/workers-config-aware-registry` |
-| Current phase | implementation complete; PR handoff pending |
+| Current phase | implementation complete; draft PR #1872 awaiting separate evaluation |
 | Archetype | 5 — Plugin Package, with Archetype-6 generator edge |
 | Scope overlays | none |
 
@@ -32,10 +32,9 @@ official-sample drift.
 
 ## Next Steps
 
-1. Restore and verify the byte-identical lockfile.
-2. Commit and push the single Slice G implementation.
-3. Open the draft PR atomically with the required labels/milestone and confirm no closing issue.
-4. Hand off separate IMPL-EVAL and hosted runtime smoke to the supervisor-owned lanes.
+1. Run separate-session IMPL-EVAL for draft PR #1872 at the current head.
+2. Hosted owner triages the official-sample drift and runs the runtime smoke at merge readiness.
+3. Supervisor performs close-gate verification and decides #1451 closure.
 
 ## Key Decisions
 
@@ -74,4 +73,5 @@ official-sample drift.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after the implementation slice lands.
+- Implementation: `236ddcf3a` — config-aware installed job registry Slice G.
+- Draft PR: `https://github.com/rickylabs/netscript/pull/1872`.
