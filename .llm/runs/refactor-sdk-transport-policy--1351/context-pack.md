@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `refactor-sdk-transport-policy--1351` |
 | Branch | `refactor/sdk-transport-policy` |
-| Current phase | implement — Slice 2 complete pending commit |
+| Current phase | implement — Slice 3 complete pending commit |
 | Archetype | `2 — Integration` |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL passed at `871caac96`. Slices 1–2 implement the approved contract and wire one frozen
-decision through the existing stable-v1 logical epoch and sole HTTP stack. Desktop dispatch remains
-for Slice 3. No dependency configuration or lock file changed.
+PLAN-EVAL passed at `871caac96`. Slices 1–3 implement the approved contract, wire one frozen
+decision through the sole HTTP stack, and make the typed Desktop client consume the same resolver
+without changing MessagePort frames. No dependency configuration or lock file changed.
 
 ## Completed
 
@@ -28,17 +28,20 @@ for Slice 3. No dependency configuration or lock file changed.
   decision and preparation.
 - Real pending-fetch tests prove same authorization/locale headers coalesce and differing headers
   dispatch separately.
+- Typed Desktop calls resolve policy before raw link dispatch; invalid override results produce no
+  outbound frame and POST-only adaptation is not serialized.
+- Compile-time exact-key, runtime exact-snapshot, public-doc, and packed-import probes enforce the
+  contribution method-secrecy boundary.
 
 ## In Progress
 
-- Slice 2 commit/push and PR evidence comment.
+- Slice 3 commit/push and PR evidence comment.
 
 ## Next Steps
 
-1. Commit and push Slice 2 with its PR evidence comment.
-2. Add the policy-aware typed Desktop wrapper without serializing the HTTP method.
-3. Extend compile-time/runtime/private-surface tests so contributions cannot observe transport
-   policy internals.
+1. Commit and push Slice 3 with its PR evidence comment.
+2. Document and regression-test the deprecated no-op `port`/`timeout` options.
+3. Take the single final `main` integration and run the approved 10-step validation plan.
 
 ## Key Decisions
 
@@ -62,16 +65,18 @@ for Slice 3. No dependency configuration or lock file changed.
 | `http-client-link.ts`, `service-client.ts` | changed | sole HTTP link consumes the owned policy |
 | stable-v1 adapter ports/prepared-call | changed | one policy/descriptor per logical epoch |
 | contribution adapter/runtime/observability tests | changed | hard HTTP/retry/reconnect/dedupe proof |
+| typed Desktop client + Desktop tests | changed | common policy resolution, unchanged framing |
+| contribution validation/private/type tests | changed | exact method-secrecy enforcement |
 | scoped run artifacts | new/changed | implementation evidence and resumable state |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1–2 PASS | structured check/lint/fmt wrappers |
-| Fitness | Slices 1–2 PASS | `quality:gate`; source/doc boundary checks |
-| Runtime | Slice 2 PASS | structured focused suite, 26/26 |
-| Consumer | Slice 2 PASS | byte-identical default wire and trace ownership tests |
+| Static | Slices 1–3 PASS | structured check/lint/fmt wrappers |
+| Fitness | Slices 1–3 PASS | `quality:gate`; source/doc/packed boundary checks |
+| Runtime | Slice 3 PASS | structured Desktop/secrecy suite, 17/17 |
+| Consumer | Slice 3 PASS | POST-only simulation, no-frame invalid result, exact snapshot |
 
 ## Open Questions
 
@@ -84,4 +89,4 @@ for Slice 3. No dependency configuration or lock file changed.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after Slice 1 lands.
+- See draft PR #1889's commit list and per-slice evidence comments.

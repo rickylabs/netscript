@@ -26,6 +26,7 @@ import type {
   SdkClientContextDeclaration,
   SdkClientContribution,
   SdkClientContributionContext,
+  SdkClientPrepareOptions,
   ValidateSdkClientContributions,
 } from '../../src/ports/sdk-client-contribution.ts';
 import type { CacheKey } from '../../src/ports/cache-store.ts';
@@ -33,6 +34,15 @@ import type { CreateDesktopServiceClientOptions } from '../../src/desktop/domain
 
 type Assert<T extends true> = T;
 type IsAssignable<TFrom, TTo> = [TFrom] extends [TTo] ? true : false;
+type IsEqual<TLeft, TRight> = (<T>() => T extends TLeft ? 1 : 2) extends
+  (<T>() => T extends TRight ? 1 : 2) ? true : false;
+
+type _PrepareOptionsStayExact = Assert<
+  IsEqual<
+    keyof SdkClientPrepareOptions,
+    'context' | 'signal' | 'procedure' | 'transport' | 'input'
+  >
+>;
 
 interface ListOrdersInput {
   readonly page: number;

@@ -79,6 +79,9 @@ adding a second transport path.
 | 2026-09-01 | 2 | HTTP adapter implemented | Stored one frozen decision on each existing logical epoch and projected it into the sole RPC codec/dedupe stack. |
 | 2026-09-01 | 2 | hard semantics proved | Pending same-header GETs coalesced once; differing authorization/locale headers dispatched twice; unary/reconnect decision counts were 1/2. |
 | 2026-09-01 | 2 | reconcile | Draft PR #1889 remains `status:impl`; no new scope or dependency change was admitted. |
+| 2026-09-01 | 3 | Desktop adapter implemented | Wrapped the existing raw MessagePort link with the same resolver; no method is copied into framing. |
+| 2026-09-01 | 3 | secrecy enforced | Added exact compile-time keys, runtime own-key assertions, public-doc probes, and packed-import rejection for private policy identities. |
+| 2026-09-01 | 3 | reconcile | The first check caught an un-narrowed test error and the first format gate found two layouts; both were corrected before final green gates. |
 
 ## Decisions
 
@@ -94,7 +97,7 @@ adding a second transport path.
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| none through Slice 1 | — | n/a |
+| none through Slice 3 | — | n/a |
 
 ## Gate Results
 
@@ -133,10 +136,19 @@ adding a second transport path.
 | Contract-derived source boundary | PASS | no-match `rg` returned `rc=1` | HTTP link contains no `request.method`, upstream infer helper, or fallback/max literals |
 | Code quality + doctrine | PASS (`rc=0`) | `deno task quality:gate` | No scanner findings; existing repository warnings unchanged |
 
+### Slice 3 Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| SDK check/lint/fmt | PASS (`rc=0`) | structured wrappers | 101 files, zero final findings |
+| Desktop + secrecy suite | PASS (`rc=0`) | structured test wrapper, 17/17 | Includes round-trip, POST-only override, invalid-result no-send, exact snapshot, public docs, and packed import rejection |
+| Desktop frame boundary | PASS (`rc=0`) | observed real bind-channel send frames | Resolver observed inferred GET and returned POST; sent frames contained no POST method |
+| Contribution method secrecy | PASS (`rc=0`) | compile-time exact keys + runtime own keys | Callback input remains exactly context/input/procedure/signal/transport |
+| Code quality + doctrine | PASS (`rc=0`) | `deno task quality:gate` | No scanner findings; existing repository warnings unchanged |
+
 ## Handoff Notes
 
 - Inspect `src/internal/transport-policy.ts` first: all later wiring must project this decision and
   must not recreate method/cache policy in either link.
-- Slice 2 must retain one logical decision across unary attempts and create a fresh decision for an
-  iterator reconnect. This is now proved; Slice 3 should inspect the private projection and Desktop
-  wrapper rather than changing the epoch lifetime.
+- Slices 1–3 are closed. Slice 4 owns only no-op compatibility docs/tests, the one final integration,
+  and the approved validation plan.
