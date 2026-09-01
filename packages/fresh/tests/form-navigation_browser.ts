@@ -252,7 +252,10 @@ Deno.test({
         initialRowReached: servedHtml.includes('id="service-showcase-row">Server row</p>'),
       };
 
-      await runPlaywright(['-s', SHOWCASE_ISLAND_SESSION, 'open', url], playwrightOutput);
+      await runPlaywright(
+        ['-s', SHOWCASE_ISLAND_SESSION, 'open', 'about:blank'],
+        playwrightOutput,
+      );
       const result = await runPlaywright([
         '--raw',
         '-s',
@@ -260,20 +263,46 @@ Deno.test({
         'run-code',
         `async page => {
           const runtimeErrors = [];
+          const clientRequests = [];
           const clientResponses = [];
+          const clientRequestFailures = [];
+          const isObservedClientAsset = url =>
+            url.includes('fresh:client-entry') || url.includes('ServiceShowcaseLab');
           page.on('pageerror', error => runtimeErrors.push(String(error)));
           page.on('console', message => {
             if (message.type() === 'error') runtimeErrors.push(message.text());
           });
+          page.on('request', request => {
+            if (isObservedClientAsset(request.url())) clientRequests.push(request.url());
+          });
           page.on('response', response => {
             const responseUrl = response.url();
-            if (responseUrl.includes('_fresh') || responseUrl.includes('ServiceShowcaseLab')) {
+            if (isObservedClientAsset(responseUrl)) {
               clientResponses.push({ url: responseUrl, status: response.status() });
+            }
+          });
+          page.on('requestfailed', request => {
+            if (isObservedClientAsset(request.url())) {
+              clientRequestFailures.push({
+                url: request.url(),
+                error: request.failure()?.errorText ?? 'unknown request failure',
+              });
             }
           });
           await page.addInitScript(() => {
             globalThis.__serviceShowcaseIslandModuleLoaded = false;
             globalThis.__serviceShowcaseIslandRenderAttempts = 0;
+            globalThis.__serviceShowcaseInnerRenderAttempts = 0;
+            globalThis.__serviceShowcaseSingletonClientAttempts = 0;
+            globalThis.__serviceShowcaseSingletonClientResolved = false;
+            globalThis.__serviceShowcaseHydratedCache = false;
+            globalThis.__serviceShowcaseQueryClientHookAttempts = 0;
+            globalThis.__serviceShowcaseQueryClientHookResolved = false;
+            globalThis.__serviceShowcaseQueryClientMatchesSingleton = false;
+            globalThis.__serviceShowcaseQueryClientData = null;
+            globalThis.__serviceShowcaseQueryHookAttempts = 0;
+            globalThis.__serviceShowcaseQueryHookResolved = false;
+            globalThis.__serviceShowcaseHydrationEffectRan = false;
           });
           await page.goto(${JSON.stringify(url)});
           await page.waitForTimeout(500);
@@ -305,6 +334,36 @@ Deno.test({
             await page.waitForTimeout(100);
           }
 
+          const clientExecution = await page.evaluate(() => ({
+            moduleLoaded: globalThis.__serviceShowcaseIslandModuleLoaded === true,
+            islandRenderAttempts: Number(
+              globalThis.__serviceShowcaseIslandRenderAttempts ?? 0
+            ),
+            innerRenderAttempts: Number(
+              globalThis.__serviceShowcaseInnerRenderAttempts ?? 0
+            ),
+            singletonClientAttempts: Number(
+              globalThis.__serviceShowcaseSingletonClientAttempts ?? 0
+            ),
+            singletonClientResolved:
+              globalThis.__serviceShowcaseSingletonClientResolved === true,
+            hydratedCache: globalThis.__serviceShowcaseHydratedCache === true,
+            queryClientHookAttempts: Number(
+              globalThis.__serviceShowcaseQueryClientHookAttempts ?? 0
+            ),
+            queryClientHookResolved:
+              globalThis.__serviceShowcaseQueryClientHookResolved === true,
+            queryClientMatchesSingleton:
+              globalThis.__serviceShowcaseQueryClientMatchesSingleton === true,
+            queryClientData: globalThis.__serviceShowcaseQueryClientData ?? null,
+            queryHookAttempts: Number(
+              globalThis.__serviceShowcaseQueryHookAttempts ?? 0
+            ),
+            queryHookResolved: globalThis.__serviceShowcaseQueryHookResolved === true,
+            hydrationEffectRan:
+              globalThis.__serviceShowcaseHydrationEffectRan === true,
+          }));
+
           return {
             freshIslandMarker,
             labFound,
@@ -312,13 +371,10 @@ Deno.test({
             rowAfterClick: labFound
               ? await page.locator('#service-showcase-row').textContent()
               : null,
-            moduleLoaded: await page.evaluate(() =>
-              globalThis.__serviceShowcaseIslandModuleLoaded === true
-            ),
-            renderAttempts: await page.evaluate(() =>
-              Number(globalThis.__serviceShowcaseIslandRenderAttempts ?? 0)
-            ),
+            clientExecution,
+            clientRequests,
             clientResponses,
+            clientRequestFailures,
             runtimeErrors,
           };
         }`,
@@ -333,40 +389,115 @@ Deno.test({
           readonly row: string | null;
         } | null;
         readonly rowAfterClick: string | null;
-        readonly moduleLoaded: boolean;
-        readonly renderAttempts: number;
+        readonly clientExecution: {
+          readonly moduleLoaded: boolean;
+          readonly islandRenderAttempts: number;
+          readonly innerRenderAttempts: number;
+          readonly singletonClientAttempts: number;
+          readonly singletonClientResolved: boolean;
+          readonly hydratedCache: boolean;
+          readonly queryClientHookAttempts: number;
+          readonly queryClientHookResolved: boolean;
+          readonly queryClientMatchesSingleton: boolean;
+          readonly queryClientData: string | null;
+          readonly queryHookAttempts: number;
+          readonly queryHookResolved: boolean;
+          readonly hydrationEffectRan: boolean;
+        };
+        readonly clientRequests: readonly string[];
         readonly clientResponses: readonly {
           readonly url: string;
           readonly status: number;
         }[];
+        readonly clientRequestFailures: readonly {
+          readonly url: string;
+          readonly error: string;
+        }[];
         readonly runtimeErrors: readonly string[];
       };
 
-      assertEquals(servedEvidence, {
-        directFreshIslandMarker: true,
-        directInitialRowReached: true,
-        freshIslandMarker: true,
-        clientBootImport: true,
-        layerReached: true,
-        layoutReached: true,
-        initialRowReached: true,
-      });
+      const browserVerdict = {
+        freshIslandMarker: browserEvidence.freshIslandMarker?.startsWith(
+          'frsh:island:ServiceShowcaseLab:',
+        ) ?? false,
+        labFound: browserEvidence.labFound,
+        hydrated: browserEvidence.beforeClick?.hydrated === 'true',
+        hydratedCache: browserEvidence.beforeClick?.hydratedCache === 'true',
+        queryClientDomMarker: browserEvidence.beforeClick?.queryClient === 'true',
+        initialRow: browserEvidence.beforeClick?.row === 'Server row',
+        interactiveClick: browserEvidence.rowAfterClick === 'Hydrated row',
+        clientEntryRequested: browserEvidence.clientRequests.some((url) =>
+          url.includes('fresh:client-entry')
+        ),
+        islandEntryRequested: browserEvidence.clientRequests.some((url) =>
+          url.includes('ServiceShowcaseLab')
+        ),
+        clientEntryLoaded: browserEvidence.clientResponses.some((response) =>
+          response.url.includes('fresh:client-entry') && response.status < 400
+        ),
+        islandEntryLoaded: browserEvidence.clientResponses.some((response) =>
+          response.url.includes('ServiceShowcaseLab') && response.status < 400
+        ),
+        moduleLoaded: browserEvidence.clientExecution.moduleLoaded,
+        islandRenderAttempted: browserEvidence.clientExecution.islandRenderAttempts > 0,
+        providerChildRendered: browserEvidence.clientExecution.innerRenderAttempts > 0,
+        singletonClientAttempted: browserEvidence.clientExecution.singletonClientAttempts > 0,
+        singletonClientResolved: browserEvidence.clientExecution.singletonClientResolved,
+        hydratedCacheInClient: browserEvidence.clientExecution.hydratedCache,
+        queryClientHookAttempted: browserEvidence.clientExecution.queryClientHookAttempts > 0,
+        queryClientHookResolved: browserEvidence.clientExecution.queryClientHookResolved,
+        queryClientMatchesSingleton: browserEvidence.clientExecution.queryClientMatchesSingleton,
+        queryClientData: browserEvidence.clientExecution.queryClientData,
+        queryHookAttempted: browserEvidence.clientExecution.queryHookAttempts > 0,
+        queryHookResolved: browserEvidence.clientExecution.queryHookResolved,
+        hydrationEffectRan: browserEvidence.clientExecution.hydrationEffectRan,
+        clientRequestFailures: browserEvidence.clientRequestFailures,
+        runtimeErrors: browserEvidence.runtimeErrors,
+      };
+
       assertEquals(
-        browserEvidence.freshIslandMarker?.startsWith('frsh:island:ServiceShowcaseLab:'),
-        true,
+        { served: servedEvidence, browser: browserVerdict },
+        {
+          served: {
+            directFreshIslandMarker: true,
+            directInitialRowReached: true,
+            freshIslandMarker: true,
+            clientBootImport: true,
+            layerReached: true,
+            layoutReached: true,
+            initialRowReached: true,
+          },
+          browser: {
+            freshIslandMarker: true,
+            labFound: true,
+            hydrated: true,
+            hydratedCache: true,
+            queryClientDomMarker: true,
+            initialRow: true,
+            interactiveClick: true,
+            clientEntryRequested: true,
+            islandEntryRequested: true,
+            clientEntryLoaded: true,
+            islandEntryLoaded: true,
+            moduleLoaded: true,
+            islandRenderAttempted: true,
+            providerChildRendered: true,
+            singletonClientAttempted: true,
+            singletonClientResolved: true,
+            hydratedCacheInClient: true,
+            queryClientHookAttempted: true,
+            queryClientHookResolved: true,
+            queryClientMatchesSingleton: true,
+            queryClientData: 'Server row',
+            queryHookAttempted: true,
+            queryHookResolved: true,
+            hydrationEffectRan: true,
+            clientRequestFailures: [],
+            runtimeErrors: [],
+          },
+        },
+        JSON.stringify({ servedEvidence, browserEvidence }, null, 2),
       );
-      assertEquals(browserEvidence.labFound, true);
-      assertEquals(browserEvidence.beforeClick, {
-        hydrated: 'true',
-        hydratedCache: 'true',
-        queryClient: 'true',
-        row: 'Server row',
-      });
-      assertEquals(browserEvidence.rowAfterClick, 'Hydrated row');
-      assertEquals(browserEvidence.moduleLoaded, true);
-      assertEquals(browserEvidence.renderAttempts > 0, true);
-      assertEquals(browserEvidence.clientResponses.length > 0, true);
-      assertEquals(browserEvidence.runtimeErrors, []);
     } finally {
       await runPlaywright(
         ['-s', SHOWCASE_ISLAND_SESSION, 'close'],

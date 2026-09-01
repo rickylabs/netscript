@@ -74,6 +74,7 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | Served measurement            | Both routes returned the Fresh island comment, client boot import, initial row, and server-hydrated cache; generated-style route also returned its layout and layer markers.                 |
 | 2026-09-01 | S2    | Browser attempt               | Focused test could not spawn absent `playwright-cli`; cached Chromium could not load absent `libnspr4.so`. No page navigation occurred, so this is environment-only and not defect evidence. |
 | 2026-09-01 | S2    | Localization                  | Ruled out served-marker loss and layer/slot reachability/identity loss. Client/provider branch remains unmeasured; no product edit made.                                                     |
+| 2026-09-01 | S2    | Hosted receipt                | Staged the browser from `about:blank` and added request/load/failure, module/outer/inner render, singleton/provider/query-hook, hydration-effect, click, and runtime-error observations.     |
 
 ## Decisions
 
@@ -108,6 +109,7 @@ CLI scaffold templates.
 | S2 focused check            | `deno check --unstable-kv` over fixture entry and browser test                       | PASS            | No product source or dependency change.                                                  |
 | S2 focused lint             | Structured lint wrapper over fixture and browser test                                | PASS            | Zero findings.                                                                           |
 | S2 focused format           | Structured format wrapper over fixture and browser test                              | PASS            | Zero findings before final artifact update.                                              |
+| Code quality / doctrine     | `deno task quality:gate`                                                             | PASS            | Quality scan has zero findings; doctrine gate has no failures.                           |
 | S2 served direct control    | Package Vite + raw fetch `/examples/service-direct`                                  | PASS            | Island marker, client boot import, initial row, and query hydration all present.         |
 | S2 served hook-layout route | Package Vite + raw fetch `/examples/service`                                         | PASS            | Layout, layer, row, island marker, client boot import, and query hydration all present.  |
 | `deno.lock`                 | SHA-256 worktree versus `HEAD:deno.lock`                                             | PASS            | Both `edfa0c24b70e0d830acce68aad6f5da42b66a88527aef4b80f3f82d989d1820c`.                 |
@@ -137,4 +139,5 @@ Registration-only unit coverage is necessary but not sufficient.
 - If that fixture passes unchanged, stop and ask the supervisor to rescope. If it throws in the
   provider path, report the exact exception and request the already-conditional query product
   authorization. Do not edit any `packages/cli` path.
-- No PR is to be opened from this S1.
+- Do not open a PR, alter labels, or self-certify; the supervisor owns hosted dispatch and PLAN-EVAL
+  disposition.

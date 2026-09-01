@@ -87,6 +87,21 @@ Exact focused command for a managed browser host:
 deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --pretty -- --allow-all --filter "definePage hook layout preserves" packages/fresh/tests/form-navigation_browser.ts
 ```
 
+The hosted receipt is deliberately staged from `about:blank`, so no island code runs before its
+listeners and init script are installed. One assertion includes the complete raw receipt on failure
+and discriminates:
+
+- Fresh client-entry and `ServiceShowcaseLab` request, response status, and request failure;
+- island module evaluation and outer island render attempt;
+- provider-child entry, singleton-client construction, and dehydrated-cache completion;
+- `useQueryClient()` attempt/result, equality with the singleton, and cache data at that point;
+- canonical `useQuery()` attempt/result (which delegates through `useIslandQuery()`);
+- hydration effect, interactive cache update, and browser console/page errors.
+
+These fields let a hosted red distinguish an absent bundle, a failure before the provider child, a
+missing provider at `useQueryClient()`, and a failure inside the query hook without inferring from
+unchanged SSR attributes.
+
 ## Measurement chain
 
 ### 1. The scaffold emits a route-local island

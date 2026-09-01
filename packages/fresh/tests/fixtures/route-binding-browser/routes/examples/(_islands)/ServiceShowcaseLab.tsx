@@ -27,14 +27,46 @@ if (typeof document !== 'undefined') {
 }
 
 function ServiceShowcaseLabInner(props: ServiceShowcaseLabProps) {
+  if (typeof document !== 'undefined') {
+    const attempts = Number(browserEvidence.__serviceShowcaseInnerRenderAttempts ?? 0);
+    browserEvidence.__serviceShowcaseInnerRenderAttempts = attempts + 1;
+    browserEvidence.__serviceShowcaseSingletonClientAttempts = Number(
+      browserEvidence.__serviceShowcaseSingletonClientAttempts ?? 0,
+    ) + 1;
+  }
+
   const islandQueryClient = getIslandQueryClient();
   const hydratedCacheRef = useRef(false);
-  const queryClient = useQueryClient();
   const [hydrated, setHydrated] = useState(false);
+
+  if (typeof document !== 'undefined') {
+    browserEvidence.__serviceShowcaseSingletonClientResolved = true;
+  }
 
   if (!hydratedCacheRef.current) {
     hydrateFromDehydrated(islandQueryClient, props.dehydratedState);
     hydratedCacheRef.current = true;
+  }
+
+  if (typeof document !== 'undefined') {
+    browserEvidence.__serviceShowcaseHydratedCache = hydratedCacheRef.current;
+    browserEvidence.__serviceShowcaseQueryClientHookAttempts = Number(
+      browserEvidence.__serviceShowcaseQueryClientHookAttempts ?? 0,
+    ) + 1;
+  }
+
+  const queryClient = useQueryClient();
+
+  if (typeof document !== 'undefined') {
+    browserEvidence.__serviceShowcaseQueryClientHookResolved = true;
+    browserEvidence.__serviceShowcaseQueryClientMatchesSingleton =
+      queryClient === islandQueryClient;
+    browserEvidence.__serviceShowcaseQueryClientData = queryClient.getQueryData<ServiceRow>(
+      listQueryKey,
+    )?.name;
+    browserEvidence.__serviceShowcaseQueryHookAttempts = Number(
+      browserEvidence.__serviceShowcaseQueryHookAttempts ?? 0,
+    ) + 1;
   }
 
   const { data } = useQuery<ServiceRow>({
@@ -45,7 +77,12 @@ function ServiceShowcaseLabInner(props: ServiceShowcaseLabProps) {
     staleTime: 60_000,
   });
 
+  if (typeof document !== 'undefined') {
+    browserEvidence.__serviceShowcaseQueryHookResolved = true;
+  }
+
   useEffect(() => {
+    browserEvidence.__serviceShowcaseHydrationEffectRan = true;
     setHydrated(true);
   }, []);
 
