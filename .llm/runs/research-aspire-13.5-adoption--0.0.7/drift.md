@@ -6801,3 +6801,29 @@
     exercised on something cheap before it is relied on for something scarce.
   - Detach probe reached **105 ticks / 520 s** still running, well past the point where three
     background tasks died.
+
+- **D-269 — the two blocking fixes are ordered, not parallel: #1865's own fix passes and its sole
+  remaining failure sits in the surface #1858 rewrites.**
+  - **Measured, not inferred.** Run `33480533529` at #1865's head `f008315d1`, both runtime tiers:
+    **`passed=35 failed=1`** on each, and it is the **same single test** both times —
+    `runtime.readiness-fixture`, failing
+    `generated register-infrastructure helper has no garnet health-check marker`.
+  - **`runtime.flow-b-fixture` PASSES on both tiers.** That is #1865's own subject (semantic location
+    of the Flow-B workers block), so its fix works. The red is elsewhere, which is the opposite of
+    what "#1865 is failing" suggests at a glance.
+  - **The failing assertion is on the output of the generator #1858 rewrites.** #1858 modifies
+    `generate-register-infrastructure.ts`, `_aspire-compat.ts.template`,
+    `aspire-compat-health-checks_test.ts` and `generate-register-infrastructure_test.ts`. I recorded
+    the **overlap**, deliberately not the precise causal mechanism — that belongs to the Fixes lane —
+    but the one test still red asserts on the one generator #1858 rewrites.
+  - **So the merge order is forced: #1858 → re-run #1865 → #1865.** And #1858 is `MERGEABLE`/`CLEAN`
+    with **all 21 checks green**, i.e. waiting on a merge action rather than on work. The cheap next
+    step for #1865 is a **re-run after #1858 lands**, not more work on its branch.
+  - **This changes my own expectation of the wait.** I had been treating the two gates as independent
+    and both distant. One of them is green and idle; the other is likely one merge plus one re-run
+    from green. Phase B may be closer than the raw "both red" reading implied — and if #1865 had been
+    worked on as though it had an independent defect, that effort would have been spent on a branch
+    whose own fix already passes.
+  - Posted to #1865 as a read-only cross-lane finding with the tier-by-tier evidence. **No change made
+    to either Fixes PR, its labels or its branch** — this lane diagnoses and reports, it does not act
+    on another lane's work.
