@@ -248,27 +248,6 @@ is data, not a guess — `jq -r '.resources[] | "\(.displayName)\t\(.commands|ke
 (and `start` once stopped); `rebuild` exists only on .NET project resources. Calling a command a
 resource lacks fails loudly: `Command 'rebuild' not available for resource 'users'.`
 
-### Upstream cleanup of networks and anonymous volumes (issue #1855)
-
-Stopping an AppHost — `aspire stop`, or the AppHost exiting — tears down its DCP session, and
-DCP's own cleanup controller then reaps Aspire-managed Docker resources it considers abandoned,
-including `aspire-persistent-network-*` networks. That reap is keyed on DCP metadata inside the
-Aspire runtime, not on the calling process, so a foreign run's persistent network can be removed
-as collateral while stopping your own AppHost. Repo code (`agentic:teardown`) only ever removes
-containers and cannot prevent or intercept this from inside `aspire stop`; the mitigation is
-detection, not prevention:
-
-- `agentic:leak-check` enumerates DCP-managed networks before cleanup — by the
-  `com.microsoft.developer.usvc-dev.*` label namespace, never by name pattern — and flags the ones
-  this run cannot positively own as at-risk. Treat those report entries as the record of what
-  existed before cleanup; a network is never a cleanup target.
-- `agentic:teardown` removes owned containers with `docker rm -f -v`, so the run's anonymous
-  volumes die with their containers while named volumes always survive. `agentic:leak-check`
-  reports run-owned volumes as survivors.
-- Upstream references: the aspire.dev networking overview (persistent vs session networks),
-  `dotnet/aspire#9785`, `dotnet/aspire#13320`, and `microsoft/dcp#213`
-  (workload-scoped persistent resource cleanup).
-
 ## Important rules
 
 - **Never kill an `aspire agent mcp` process.** Those are the session's MCP servers, not stray
@@ -331,3 +310,24 @@ default. Run `playwright-cli --help` for available commands.
   `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/receipts/aspire-13.5.3-docs-api-search-help.json`
 - S9-AGENT-MCP-HELP:
   `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/receipts/aspire-13.5.3-agent-mcp-help.json`
+
+### Upstream cleanup of networks and anonymous volumes (issue #1855)
+
+Stopping an AppHost — `aspire stop`, or the AppHost exiting — tears down its DCP session, and
+DCP's own cleanup controller then reaps Aspire-managed Docker resources it considers abandoned,
+including `aspire-persistent-network-*` networks. That reap is keyed on DCP metadata inside the
+Aspire runtime, not on the calling process, so a foreign run's persistent network can be removed
+as collateral while stopping your own AppHost. Repo code (`agentic:teardown`) only ever removes
+containers and cannot prevent or intercept this from inside `aspire stop`; the mitigation is
+detection, not prevention:
+
+- `agentic:leak-check` enumerates DCP-managed networks before cleanup — by the
+  `com.microsoft.developer.usvc-dev.*` label namespace, never by name pattern — and flags the ones
+  this run cannot positively own as at-risk. Treat those report entries as the record of what
+  existed before cleanup; a network is never a cleanup target.
+- `agentic:teardown` removes owned containers with `docker rm -f -v`, so the run's anonymous
+  volumes die with their containers while named volumes always survive. `agentic:leak-check`
+  reports run-owned volumes as survivors.
+- Upstream references: the aspire.dev networking overview (persistent vs session networks),
+  `dotnet/aspire#9785`, `dotnet/aspire#13320`, and `microsoft/dcp#213`
+  (workload-scoped persistent resource cleanup).
