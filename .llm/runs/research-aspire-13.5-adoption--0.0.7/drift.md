@@ -6028,3 +6028,32 @@
     defect the reassigned lease is being spent to fix, which is the right place for it.
   - Main has moved again to **`969e7dfeb`**; both leaves will want a re-run against current main once
     #1844 lands.
+
+- **D-246 — S8's convergence ABORTED correctly on a non-generated conflict; ruling issued and resumed.**
+  - **The abort was right and the diagnosis was better than the abort.** The agent stopped at
+    `bd55c16af` on
+    `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts`,
+    resolved nothing, changed nothing, pushed nothing, and left the worktree clean at `467d0d1fd`.
+    Rule 2 has now prevented a bad merge **three times** in this programme.
+  - **Cause is exactly the #1837 interaction the D-244 brief warned about**, and the agent produced
+    the overlap verbatim:
+    - main (post-#1837): ordinal `tool_0`, **double-quoted escaped** emitted strings,
+      `maybeWithProcessCommand(...)` plus its process-command flag;
+    - S8's replayed commit: semantic binding `prisma_studio`, **single-quoted** strings, pre-#1837
+      monitor/error-file assertions.
+  - **Ruling issued: main wins on the emission contract; S8's test expectations adapt forward.** Same
+    rule already applied twice here — **D-122** (main's shipped D-101 listener contract wins, S8's
+    additive work preserved) and **#1837's own seam repair** (*the consumer adapts to the generator,
+    never the reverse*). The brief forbids reintroducing `prisma_studio`-style bindings or
+    single-quoted emission to make an assertion match.
+  - **The guard that matters most in this ruling:** every S8 assertion about typed-db behaviour must be
+    **carried forward re-expressed**, and if one genuinely cannot be expressed against main's shape the
+    agent must **stop and report** rather than drop it. A silently deleted assertion is the real risk
+    when a test is "adapted" to a new emission shape.
+  - Scope limited to that single file; **any other non-generated conflict must abort again**.
+  - Also recorded from the agent's report: main gained
+    `969e7dfeb chore(harness): restore #1815 run artifacts stripped from #1816 (#1854)` — the
+    artifact-preservation correction is being applied **repo-wide**, not just to this lane. The
+    resumed brief carries the no-strip instruction explicitly.
+  - Runtime boundary restated in the brief: the host lease is assigned to #1844, so no Aspire, Docker,
+    AppHost or `e2e:cli` from this lane; CI remains the runtime authority.
