@@ -60,9 +60,35 @@ mapping without removing any current-main row.
 
 ## Gate Results
 
-- Pre-rebase targeted gate: `deno task docs:exports-drift` exited 0 with all three mappings active.
-- The complete required set will run at the generated-assets commit, then repeat after the final
-  evidence commit so the PR table describes the pushed head.
+Complete pass at generated-assets head `8771c8050`:
+
+| Command | Exit |
+| --- | ---: |
+| `deno task docs:exports-drift` | 0 |
+| `deno task --cwd docs/site check:source-format` | 0 |
+| `deno task --cwd docs/site build` | 0 |
+| `deno task --cwd docs/site check:links` | 0 |
+| `deno task --cwd docs/site check:caveats` | 0 |
+| `deno task docs:links` | 0 |
+| `deno task docs:accuracy` | 0 |
+| `deno task docs:snippets` | 0 |
+| `deno task check:agent-docs-prose` | 0 |
+| `deno task check:assets-barrel` | 0 |
+| `deno task check:publish-assets` | 0 |
+| `deno check --unstable-kv packages/cli/src/kernel/assets/agent-docs.generated.ts packages/mcp/src/publish-assets.generated.ts` | 0 |
+| `git diff --check $(git merge-base origin/main HEAD) HEAD` | 0 |
+| `git diff --quiet origin/main -- deno.lock` | 0 |
+| `git merge-base --is-ancestor f63ad94e9 HEAD` | 0 |
+| Current-main mapping-name retention (29 upstream, 32 current, 0 missing) | 0 |
+| `git status --porcelain` | 0; exact output empty |
+
+The same complete required set is repeated after this evidence commit so the PR validation table
+describes the final pushed head.
+
+Known baseline reproduced independently in detached clean worktree
+`/tmp/netscript-mcp-baseline-cKV1zC` at `origin/main` `b66e52cbc`:
+`deno task check:mcp-export-corpus` exited 1 with “MCP export-surface corpus is stale”; worktree add
+and removal both exited 0. This matches #1668 and is not attributed to this branch.
 
 ## PLAN-EVAL
 

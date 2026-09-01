@@ -15,7 +15,8 @@
 The three source pages now expose all 14/7/7 real package/path rows to the parser, and the mapping
 contains three explicit `entrypoints-only` policies based on measured 56/236, 33/55, and 24/88
 symbol coverage. The branch is rebased onto `b66e52cbc`; current-main mapping retention is
-confirmed and all three generated asset layers are refreshed.
+confirmed, all three generated asset layers are refreshed, and the complete first evidence pass is
+green at `8771c8050`.
 
 ## Completed
 
@@ -24,12 +25,14 @@ confirmed and all three generated asset layers are refreshed.
 - Made the bounded source-page and mapping edits.
 - Ran the targeted drift gate successfully before rebase.
 - Rebased cleanly and regenerated prose → asset barrel → publish assets in order (all exit 0).
+- Ran all required gates at `8771c8050`; every required gate exited 0 and post-gate status was
+  exactly empty.
+- Reproduced the known `check:mcp-export-corpus` exit 1 independently at clean `origin/main`.
 
 ## Next Steps
 
-1. Commit the generated assets and updated run state.
-2. Run and record every required gate, commit its evidence, then repeat at the final head.
-3. Mark the PR ready before first push, push explicitly, create/update metadata, and leave
+1. Commit this gate ledger and repeat the complete required set at that final head.
+2. Mark the PR ready before first push, push explicitly, create/update metadata, and leave
    `status:impl` for the supervisor.
 
 ## Key Decisions
@@ -44,7 +47,8 @@ confirmed and all three generated asset layers are refreshed.
 
 ## Gates
 
-- Targeted `docs:exports-drift`: PASS before rebase; full final-head set pending.
+- Complete generated-head pass: all required gates PASS; final-head repetition pending after the
+  evidence commit.
 
 ## Drift and Debt
 
