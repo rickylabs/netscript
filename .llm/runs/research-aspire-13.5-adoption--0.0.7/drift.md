@@ -7412,3 +7412,104 @@
   - S7 re-expression continues in parallel (8 files staged, fixtures carried, #1887 invariants intact
     on spot-check: zero network removals, label-namespace ownership present, zero name-pattern
     matches).
+
+## D-285 — the close-gate reads PR comments too, so "missing evidence" was actually duplication
+
+`#1744`'s close-gate failed with three `duplicate evidence` errors, which I first read as a
+missing-evidence problem. `mirror-acceptance-evidence.ts:159-160` collects blocks from
+`[pr.body, ...comments.map(c => c.body)]`. A historical close-gate comment
+(`5480974044`) still carried a live ` ```acceptance-evidence ` fence for the same three boxes as
+the body, so every box resolved twice and `validateEvidenceMapping` rejected all three.
+
+Repair: neutralise the fence in the comment (its prose is preserved verbatim) so exactly one entry
+per box survives; the PR body stays canonical. Re-ran the gate on the **unchanged** head — no code,
+no force-push. Result: SUCCESS.
+
+Rule for this run: **an acceptance-evidence block posted in a PR comment is not free.** It competes
+with the body. Post evidence prose in comments, but keep exactly one fenced block per PR, in the body.
+
+## D-286 — `statusCheckRollup` keeps superseded rows; `gh pr checks` is the authority
+
+I read #1744 as having four CANCELLED checks from the raw `statusCheckRollup`, and #1754/#1760's
+runtime tiers likewise. The rollup retains check rows from *superseded runs*; `gh pr checks` dedupes
+to the latest run per check name. On #1744 the same four names were all SUCCESS on run `33560778346`.
+
+Consequence: #1744 is fully green (15 SUCCESS / 6 SKIPPED / 0 not-green) and was already merge-ready
+while I was treating it as blocked. Board reads in this run now use `gh pr checks`, never the raw
+rollup.
+
+## D-287 — S9's two runtime failures are both ambient, not S9-owned
+
+Evidence, per tier:
+
+- **postgres**: `runtime.wait.garnet` — `aspire wait garnet --status healthy --timeout 300` timed out
+  (300340ms). `main`'s own latest `e2e-cli` run (`33413386485`, head `6c195acaf`) fails on the
+  identical command. This is the flake PR **#1858** ("make Garnet readiness deterministic") fixes.
+- **sqlite**: `behavior.otel.stream-consumer` — `Dashboard traces read failed: HTTP 401` in
+  `readJobExecuteIdentity`. S9's diff against its merge-base touches **zero** files matching
+  `flow-b|stream|dashboard|otel|trace`.
+
+So S9 needs no repair for either failure. It is gated on #1858 plus the 401 defect below.
+
+## D-288 — `new URL(path, base)` discards the dashboard token
+
+`consume-flow-b-stream.ts` built its traces URL as
+`new URL('/api/telemetry/traces', dashboardUrl)`. That form resolves against the base's **origin**
+and drops its query string — which is exactly where Aspire puts the dashboard auth token. Proven:
+
+    new URL("/api/telemetry/traces", "https://localhost:18888?t=SECRET")
+      -> https://localhost:18888/api/telemetry/traces        (token gone)
+
+Fixed by setting `pathname` on a parsed copy, with a regression test that asserts both halves and
+prints no token. **Claim boundary:** a dropped token is *a* sufficient cause of HTTP 401 and this
+removes it; I have not proven it is *the* cause. The generated config sets
+`ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS` only inside its `profiles.https` block, so whether that
+profile is active in the sqlite tier is a second candidate cause that needs a runtime lease to
+settle. The next tier run distinguishes them; the fix is correct either way.
+
+Landed on S9 because S10 is a **sibling** branch (both fork from S8), so a fix there would not reach
+S9's tier. The scope departure is stated in the commit.
+
+## D-289 — #1747's brace check was unsatisfiable by construction, and dead
+
+Both #1747 tiers failed with `generated workers resource block did not contain its closing brace`
+while all 121 gate unit tests passed: the fixtures stop at the locator and never exercise the scan
+that `prepare-flow-b-fixture.ts` runs on real generator output.
+
+#1865 narrowed the located range to `end = registration.index + registration[0].length` — it stops
+**at** the `backgroundProcessors.set(...)` line, so the enclosing guard's `\n  }` is outside the
+slice and `workersBackgroundBlock.indexOf('\n  }', …)` could never match. The value was also never
+read: insertion is anchored on the set-line via `replace(workersSetAnchor, …)`.
+
+Repair scans the full source from the range end, preserving the original intent with a condition
+that can hold. Added the missing regression test, which asserts the defect
+(`block.indexOf('\n  }') === -1`) and the repair (`source.indexOf('\n  }', range.end) >= 0`) against
+real generator output.
+
+I first suspected generator drift from main and refuted it in one command
+(`git log <merge-base>..origin/main -- packages/cli/src/kernel/templates` was empty) rather than
+rebasing on the theory.
+
+## D-290 — S11 delta cycles 3-5: three real defects, each found by replay
+
+The docs slice took three more cycles, each catching something a reading would not have:
+
+- **c3** — the guard restored `set -x` *before* the value was consumed, so the page's own pass-on
+  line re-leaked the token. Fixed by holding the guard through consumption + `unset`.
+- **c4** — the primary snippet never restored tracing at all, so copying it silently disabled
+  xtrace for the rest of a caller's job. Fixed by save/restore, using `if …; then set -x; fi`
+  rather than `[ … ] && set -x`, which returns non-zero as a last line and would fail a `set -e` job.
+- **c5** — `xtrace_was_on` was never cleared, so a second invocation inherited the first call's flag
+  and enabled tracing for a caller that had it off. Fixed by resetting **before** sampling `$-`,
+  which is also correct when the block exits early and ignores an inherited value.
+
+Each was verified by replaying the page's own flow with a fake `aspire` emitting a token-bearing
+URL, counting token appearances and asserting the final tracing state.
+
+## D-291 — never-started cancelled jobs cannot be rerun individually
+
+`gh run rerun <run> --job <id>` fails with `job <id> cannot be rerun` for a job the cancellation
+stopped before it started; the postgres tiers reran, the sqlite tiers did not. A whole-run
+`gh run rerun <run>` picks them up, but is refused while any attempt is in flight
+(`This workflow is already running`). Sequenced behind the in-flight attempt instead of pushing an
+empty commit, which would have moved the head and the evidence provenance bound to it.
