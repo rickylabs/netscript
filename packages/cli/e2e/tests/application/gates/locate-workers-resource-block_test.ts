@@ -1,18 +1,16 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 
-interface SourceRange {
-  readonly start: number;
-  readonly end: number;
-}
+import { locateWorkersResourceBlock } from '../../../src/application/gates/scaffold/locate-workers-resource-block.ts';
 
-const currentWorkersBlock = `    const resource = builder.addExecutable('workers-api', 'deno', workdir, [
+const currentWorkersBlock =
+  `    const resource = builder.addExecutable("workers-api", 'deno', workdir, [
       'run', '--config', 'deno.json', '@netscript/plugin-workers/services',
     ])
       .withHttpEndpoint({ name: 'http' });
 
     await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);
 
-    plugins.set('workers-api', resource);`;
+    plugins.set("workers-api", resource);`;
 
 const currentRegisterPlugins = `export async function registerPlugins() {
   // --- plugin 0 ---
@@ -39,13 +37,13 @@ ${currentWorkersBlock}
   }
 }`;
 
-Deno.test('workers range accepts current positional-marker generated output', async () => {
-  const range = await locateWorkersResourceBlock(currentRegisterPlugins);
+Deno.test('workers range accepts current positional-marker generated output', () => {
+  const range = locateWorkersResourceBlock(currentRegisterPlugins);
 
   assertEquals(currentRegisterPlugins.slice(range.start, range.end), currentWorkersBlock);
 });
 
-Deno.test('workers range rejects generated output without a workers resource block', async () => {
+Deno.test('workers range rejects generated output without a workers resource block', () => {
   const withoutWorkersBlock = `export async function registerPlugins() {
   // --- plugin 0 ---
   {
@@ -57,14 +55,14 @@ Deno.test('workers range rejects generated output without a workers resource blo
   const workers = plugins.get('workers-api');
 }`;
 
-  await assertRejects(
+  assertThrows(
     () => locateWorkersResourceBlock(withoutWorkersBlock),
     Error,
     'workers-api resource block',
   );
 });
 
-Deno.test('workers range rejects a malformed workers block without registration', async () => {
+Deno.test('workers range rejects a malformed workers block without registration', () => {
   const malformedWorkersBlock = `export async function registerPlugins() {
   // --- plugin 0 ---
   {
@@ -74,18 +72,9 @@ Deno.test('workers range rejects a malformed workers block without registration'
   }
 }`;
 
-  await assertRejects(
+  assertThrows(
     () => locateWorkersResourceBlock(malformedWorkersBlock),
     Error,
     'workers-api resource block',
   );
 });
-
-async function locateWorkersResourceBlock(source: string): Promise<SourceRange> {
-  const moduleUrl = new URL(
-    '../../../src/application/gates/scaffold/locate-workers-resource-block.ts',
-    import.meta.url,
-  ).href;
-  const module = await import(moduleUrl);
-  return module.locateWorkersResourceBlock(source) as SourceRange;
-}
