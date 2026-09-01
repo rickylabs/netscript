@@ -50,18 +50,27 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio'])",
+      "builder.addExecutable(\"prisma-studio\", 'deno', tool_0_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, tool_0_errorFile, \"studio\"])",
     );
     assertStringIncludes(
       output,
-      "prisma_studio = maybeWithProcessCommand(prisma_studio, 'prisma-studio', 'studio');",
+      'tool_0 = maybeWithProcessCommand(tool_0, "prisma-studio", "studio");',
     );
-    assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
+    assertStringIncludes(
+      output,
+      "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'",
+    );
     assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
-    assertStringIncludes(output, "const prisma_studio_errorFile = resolveToolErrorFile(prisma_studio_workdir, 'prisma-studio');");
-    assertStringIncludes(output, "['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio']");
-    assertStringIncludes(output, "aspire/.helpers/run-tool.mts");
-    assertStringIncludes(output, 'monitorToolFailure(builder, prisma_studio, prisma_studio_errorFile);');
+    assertStringIncludes(
+      output,
+      'const tool_0_errorFile = resolveToolErrorFile(tool_0_workdir, "prisma-studio");',
+    );
+    assertStringIncludes(
+      output,
+      "['run', '--allow-run', '--allow-write', toolRunnerPath, tool_0_errorFile, \"studio\"]",
+    );
+    assertStringIncludes(output, 'aspire/.helpers/run-tool.mts');
+    assertStringIncludes(output, 'monitorToolFailure(builder, tool_0, tool_0_errorFile);');
     assertStringIncludes(output, "targetState: 'Finished'");
     assertStringIncludes(output, 'publishResourceUpdate(resource, {');
     assertStringIncludes(output, 'catch(() => undefined)');
@@ -73,15 +82,15 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { migrate: toolNoTaskName },
     });
-    assertStringIncludes(output, "migrate_errorFile, 'migrate']");
+    assertStringIncludes(output, 'tool_0_errorFile, "migrate"]');
   });
 
-  it('should convert hyphenated names to safe identifiers', () => {
+  it('should use ordinal identifiers independent of resource names', () => {
     const output = generateRegisterTools({
       tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
     });
-    assertStringIncludes(output, 'prisma_studio_workdir');
-    assertStringIncludes(output, 'let prisma_studio = await builder.addExecutable');
+    assertStringIncludes(output, 'tool_0_workdir');
+    assertStringIncludes(output, 'let tool_0 = await builder.addExecutable');
   });
 
   it('should include enabled gate for each tool', () => {
@@ -90,7 +99,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "config.Tools['prisma-studio']?.Enabled !== false",
+      'config.Tools["prisma-studio"]?.Enabled !== false',
     );
   });
 
@@ -98,14 +107,14 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
     });
-    assertStringIncludes(output, '// Named database dependency: main');
+    assertStringIncludes(output, '// Named database dependency');
     assertStringIncludes(
       output,
-      "prisma_studio = await attachToolDatabase(prisma_studio, config, infrastructure, 'main');",
+      'tool_0 = await attachToolDatabase(tool_0, config, infrastructure, "main");',
     );
     assertStringIncludes(
       output,
-      "const prisma_studio_workdir = resolvePrismaStudioWorkdir(appHostDir, config, 'main');",
+      'const tool_0_workdir = resolvePrismaStudioWorkdir(appHostDir, config, "main");',
     );
   });
 
@@ -117,7 +126,7 @@ describe('generateRegisterTools', () => {
     assertStringIncludes(output, '// Primary database dependency (fallback)');
     assertStringIncludes(
       output,
-      'lint = await attachToolDatabase(lint, config, infrastructure);',
+      'tool_0 = await attachToolDatabase(tool_0, config, infrastructure);',
     );
   });
 
