@@ -14,10 +14,10 @@
 
 Final-freeze integration is now at `50431f9cd` after merging fetched `origin/main`
 `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`; all six amended protected baselines and `deno.lock`
-survived byte-identically. The required 50-repetition flake proof is blocked by a second defect in
-the protected live-child fixture: 4/50 runs observed its PID already dead because an unresolved
-top-level promise does not keep Deno alive. The authorized teardown change works, but changing the
-fixture is outside the cleanup-only ceiling exception and awaits coordinator authorization.
+survived byte-identically. The coordinator authorized completing the protected live-child fixture
+repair: the child now waits on a real stdin operation, and an additive case exercises
+already-terminated teardown. The required post-fix proof is green for all 50 repetitions with every
+iteration exit 0. Final smoke and repository gates are in progress.
 
 All seven implementation slices are landed through `1cf52be67`. The branch was parked at
 `de24161b6`; its previously reported single root-suite failure did not reproduce in either of two
@@ -64,8 +64,7 @@ paths and was not regenerated.
 
 ## In Progress
 
-- Handoff is blocked on authorization for the newly exposed protected live-child fixture race. Full
-  final-head gates, smoke, PR update, push, and handoff have not been run.
+- Controlled repair smoke, full final-head gates, PR update, explicit-refspec push, and handoff.
 
 ## Next Steps
 

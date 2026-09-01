@@ -92,6 +92,21 @@ async function stopAndReap(child: Deno.ChildProcess): Promise<void> {
   await status;
 }
 
+Deno.test('stopAndReap tolerates an already-terminated child and still awaits status', async () => {
+  const child = new Deno.Command(Deno.execPath(), {
+    args: ['eval', 'Deno.exit(0)'],
+    stdout: 'null',
+    stderr: 'null',
+  }).spawn();
+  const status = child.status;
+  const exited = await status;
+
+  await stopAndReap(child);
+
+  assert(exited.success);
+  assertEquals(await status, exited);
+});
+
 Deno.test('changed-token CAS race retains the replacement sender record', async () => {
   const root = await Deno.makeTempDir({ prefix: 'netscript-sender-cas-' });
   const senderDirectory = `${root}/senders`;
@@ -169,8 +184,9 @@ Deno.test('a real live child writer preserves its sender record and is boundedly
         JSON.stringify(writerPath)
       }, { create: true, write: true }); ` +
       'await file.write(new TextEncoder().encode("READY\\n")); console.log("READY"); ' +
-      'await new Promise(() => {});',
+      'await Deno.stdin.read(new Uint8Array(1));',
     ],
+    stdin: 'piped',
     stdout: 'piped',
     stderr: 'piped',
   }).spawn();

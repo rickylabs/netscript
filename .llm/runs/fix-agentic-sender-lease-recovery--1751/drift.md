@@ -163,3 +163,17 @@ would be documentation-only. Left for Slice 4's author to add if useful, not req
   promise with a bounded parent-controlled pending operation and retain every assertion, while
   preserving deterministic coverage of the already-terminated cleanup path.
 - **Evidence:** Direct 50-run capture in the implementation session; `worklog.md` stress row.
+
+## 2026-09-01 — protected live-child fixture race resolved
+
+- **What:** The coordinator clarified that both protected-ceiling exceptions authorize completing
+  the repair without another stop.
+- **Expected:** The live writer remains alive through preservation assertions, and teardown also
+  proves that an already-terminated child is accepted narrowly and its status awaited.
+- **Actual:** The child now blocks on parent-held stdin instead of an inert promise. An additive
+  case first awaits a clean child exit, then runs it through `stopAndReap`; all prior assertions
+  remain intact.
+- **Severity:** resolved significant test-fixture drift.
+- **Action:** Re-record the protected blob and require 50 consecutive full-file passes.
+- **Evidence:** New blob `e12c023b90b8debc66d2f6ad720f3a9b9cdd9f14`; iterations 1-50 all
+  exit 0, aggregate exit 0.

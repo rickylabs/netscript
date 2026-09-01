@@ -150,6 +150,7 @@ when the child exit is non-zero.
 | 2026-08-31 | amendment | Focused GREEN | Structured focused suite passed 52/52 with exit 0 after implementation. Final stress, merge, and complete gates remain pending. |
 | 2026-08-31 | amendment | Final-freeze integration | Captured the amended six-test baselines plus `deno.lock`, fetched `origin/main` at `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`, and merged it in `50431f9cd`. Every post-merge blob is byte-identical to its pre-merge capture. |
 | 2026-08-31 | amendment | Stress gate blocked | The required 50-run full-file repetition produced exits 1 at iterations 1, 9, 23, and 40 (46/50 clean). All four failures are `pid.first` actual `dead` versus expected `alive`, not the repaired cleanup exception. A name-filtered diagnostic run made the same fixture defect deterministic. The child uses an unresolved top-level promise, which Deno exits when no pending operation remains, so it is not guaranteed live through observation. No further protected-test change was made without authorization. |
+| 2026-09-01 | amendment | Stress repair authorized | The coordinator confirmed both protected-ceiling exceptions cover completing the repair. The live child now waits on parent-held stdin, an additive case sends an already-terminated child through `stopAndReap`, and every original assertion remains. The required full-file repetitions then passed 50/50; iterations 1-50 and the aggregate exit were all 0. |
 
 ## Decisions
 
@@ -171,8 +172,9 @@ when the child exit is non-zero.
   was removed or weakened.
 - `local-sender-lease-repair-adapter_test.ts`: original
   `2e2817d0c27628e0f9e1ca922c47ec35738102ce`, amended baseline
-  `dacfcc6949b627db7dd99f23aa80c6cc4599a6f3`. The diff touches only `stopAndReap`
-  teardown behavior; no test assertion was changed.
+  `e12c023b90b8debc66d2f6ad720f3a9b9cdd9f14`. The diff narrowly fixes
+  `stopAndReap`, gives the live child a real pending stdin operation, and adds an
+  already-terminated cleanup regression; no existing assertion was changed, removed, or weakened.
 - The other four protected blobs remain `7be38302ac6ed20f29571213d18172283e1aded5`,
   `d3ca0b51fcb87aeee81e4202e5f527ed569fba12`,
   `7113e271dfa15e9f2dc53b6922c4d5055e086430`, and
