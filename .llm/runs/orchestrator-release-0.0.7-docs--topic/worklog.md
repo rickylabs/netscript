@@ -3900,3 +3900,54 @@ job.
 This is worth knowing generally: withdrawing `status:ready-merge` for a re-evaluation *also* disables
 the acceptance mirror, so a PR mid-re-evaluation will always show close-gate red regardless of its
 actual acceptance state.
+
+## 2026-09-01 — delta PASS; declined to weaken the workflow contract test; synthetic current-main audit
+
+**Bounded delta IMPL-EVAL at `9372a27e1`: PASS.** Scoped to the two files. It confirmed the diff is
+exactly `+1/−1`, the other four ratchet constants untouched, and **proved** the tightening bites
+(`ratchet failure: deferred typeError 15 > 14`, exit 1) with the run-gate receipt recording
+`outcome: FAIL`, `exitCode: 1` — verifying the failing receipt rather than reasoning about it, plus
+receipt atomicity (`createNew` + `rename`). It traced `RUN_DENO` to the classifier instead of
+assuming, and surfaced a precise nuance: Markdown-only diffs under `packages/`/`plugins/` classify
+`docs`, not `deno` — harmless, since JSDoc examples live only in `.ts` fences. It also answered the
+applier's question independently: the patch `git apply --check`s clean at `6a51cfe4c` and yields a
+byte-identical `ci.yml`.
+
+Its zero-slack judgement was reasoned, not a restatement: sound, because slack in a *ceiling* is a
+budget for decay (20 was reached by exactly that drift) while the floors legitimately keep +9, and
+because census-equal ceilings force any future bump to be a visible one-line diff. It named the real
+cost honestly — a lane can merge green and strand the next unrelated author with a red `15 > 14`.
+
+### Declined to "repair" the workflow contract test — the premise did not survive checking
+
+Directive was to repair `jsdoc-example-workflow_test.ts` because "the workflow patch changed
+placement without updating its contract test". Checked before acting:
+
+- run `33553512522` ran against `head_sha = 6a51cfe4c` — the pushed head, the one *without* `ci.yml`;
+- `--gate jsdoc-example-compile` occurs **0** times there and **1** time at the integrated head —
+  exactly the cardinality the test demands;
+- the failure is `jsdoc-example-workflow_test.ts:26`, `assertEquals(gateOccurrences.length, 1)`,
+  actual 0.
+
+So there is no new placement; there is no step at all. The test's four assertions (cardinality,
+position between `\n  quality:` and `\n  deps-report:`, the `RUN_DENO` guard literal, the receipt
+`--id`/`--output` literal) are all satisfied by the intended placement — which is why it is green
+wherever the commit exists (18/18, three times, including on a synthetic current-main tree).
+
+Making it pass at 0 occurrences would require weakening cardinality (explicitly ruled out) or
+dropping the placement/receipt assertions — either of which deletes the only proof that the gate runs
+in CI, i.e. #1533's own acceptance clause, and the thing cycle 1 showed is load-bearing. Reported
+with the evidence and did not make the change, offering to act immediately if the evidence is
+disputed.
+
+**Lesson worth keeping:** a red contract test on a head that deliberately lacks the artefact under
+contract is the test working, not a test to fix. The tell is whether it passes on the head that will
+actually merge.
+
+### Synthetic current-main audit (no rebase, per instruction)
+
+#1887 is fully disjoint: zero `packages/`/`plugins/` source, zero file overlap with the branch.
+Replayed the eleven commits onto `e938ecd31` in a throwaway tree — **zero conflicts**, census
+identical `116`/`14`, zero tasks/gate-ids/ci.yml steps lost, assets-barrel / publish-assets /
+aspire-parity all PASS, focused 18/18, repo **4742 passed / 0 failed**. The PR head and its evaluated
+evidence were left untouched, which was the point.
