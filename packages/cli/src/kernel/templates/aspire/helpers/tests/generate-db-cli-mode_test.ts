@@ -189,6 +189,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(runTool, 'export async function runTool(');
     assertStringIncludes(runTool, 'readonly timeoutSeconds?: number');
     assertStringIncludes(runTool, 'readonly actionableStderr: readonly string[]');
+    assertStringIncludes(runTool, 'readonly actionableStdout: readonly string[]');
     assertStringIncludes(runTool, 'stripVTControlCharacters(line)');
     assertStringIncludes(runTool, "child.kill('SIGTERM')");
     assertStringIncludes(aspireCompat, 'DbCliModeExcludeFromMcp: true');
@@ -202,6 +203,7 @@ describe('generateDbCliMode', () => {
     assert(!output.includes('DB_OPERATION_RUNNER'));
     assertStringIncludes(output, "'aspire', '.helpers', 'run-tool.mts'");
     assertStringIncludes(output, 'return false;');
+    assertStringIncludes(output, "message: [result.message, ...context].join(' | ')");
   });
 
   it('excludes exactly the generated database CLI resource from MCP exposure', () => {

@@ -37,6 +37,7 @@ interface DbCliCommandResult {
 
 interface DbCliResultRecord extends DbCliCommandResult {
   readonly actionableStderr: readonly string[];
+  readonly actionableStdout: readonly string[];
 }
 
 const DB_CLI_COMMANDS: readonly DbCliCommand[] = [
@@ -353,27 +354,31 @@ function parseDbCliResult(text: string): DbCliResultRecord {
   const success = Reflect.get(parsed, 'success');
   const message = Reflect.get(parsed, 'message');
   const actionableStderr = Reflect.get(parsed, 'actionableStderr');
+  const actionableStdout = Reflect.get(parsed, 'actionableStdout');
   if (
     typeof success !== 'boolean' || typeof message !== 'string' ||
     !Array.isArray(actionableStderr) ||
-    !actionableStderr.every((line) => typeof line === 'string')
+    !actionableStderr.every((line) => typeof line === 'string') ||
+    !Array.isArray(actionableStdout) ||
+    !actionableStdout.every((line) => typeof line === 'string')
   ) {
     throw new Error(
-      'Database command result must contain boolean success, string message, and string diagnostic lines.',
+      'Database command result must contain boolean success, string message, and bounded diagnostic streams.',
     );
   }
-  return { success, message, actionableStderr };
+  return { success, message, actionableStderr, actionableStdout };
 }
 
 function presentDbCliResult(result: DbCliResultRecord): DbCliCommandResult {
-  if (result.success || result.actionableStderr.length === 0) {
+  const diagnostics = [...result.actionableStderr, ...result.actionableStdout];
+  if (result.success || diagnostics.length === 0) {
     return { success: result.success, message: result.message };
   }
-  const messageIndex = result.actionableStderr.indexOf(result.message);
-  const context = result.actionableStderr.filter((_, index) => index !== messageIndex);
+  const messageIndex = diagnostics.indexOf(result.message);
+  const context = diagnostics.filter((_, index) => index !== messageIndex);
   return {
     success: false,
-    message: [result.message, ...context].join('\n'),
+    message: [result.message, ...context].join(' | '),
   };
 }
 

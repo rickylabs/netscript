@@ -141,3 +141,16 @@ Resolution is diagnostic-first and generic: promote the first failure-shaped ret
 the unchanged bounded array separately, and make the Phase-B verifier report both output streams.
 No vendor-specific classifier or local runtime is permitted. The underlying migrate behavior is
 not changed until the pushed diagnostic slice supplies exact CI evidence.
+
+## D-13 — Aspire truncates typed-command messages and decisive migration guidance is stdout
+
+Run `33452657304` at `592a8e688` proved two additional seams. Aspire renders only the first line of
+a multi-line command result, and its outer process writes that rendered result to stderr. Separately,
+the generated migration script writes non-interactive guidance through `console.log`, while the
+emitted runner retained only stderr. This is why the first generic classifier slice still displayed
+the Prisma preamble.
+
+Resolution: add an independently bounded stdout diagnostic using D-224's existing line/byte policy,
+select the concise message across both retained streams, and flatten message plus context onto one
+Aspire-visible line. D-224's `actionableStderr` order, 8/24 split, 32-line cap, and 16-KiB ceiling
+remain unchanged.
