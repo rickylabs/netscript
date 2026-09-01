@@ -45,6 +45,8 @@ independent and mergeable out of band.
 | #1719 | `Will close (via its PR) #1429` | #1744 body line 11 carries `Closes #1429`; its DoD line 54 records the acceptance close-gate verification for both #1719 and #1429. |
 | #1723 | `Closes #1642` present; #1000 **not** a closing target | #1771 body line 11 carries `Closes #1642`; no closing keyword for #1000 anywhere in the body. |
 | #1721 | `git grep '13\.4\.6'` over skills / `.agents/skills` / `.claude/skills` / CLI assets → 0 | **0** hits at S9 head `a8cf585b0`. |
+| #1724 | `tools/aspire-surface-manifest.ts` re-run yields no diff | At S13 head `9b684e176`: re-run reports `rows=815 unmatched=0`, the committed 816-line TSV is left byte-identical, and the worktree shows **zero** modifications. |
+| #1724 | `check:assets-barrel`, `agentic:sync-claude:check` green | At `9b684e176`: `check:assets-barrel` exit **0** (regenerates then `git diff --exit-code` over all seven carriers); `agentic:sync-claude:check` exit **0** — *"OK: 18 skill(s), 22 mirrored file(s)"*. |
 
 Both A3 and A6 were **re-proven at S8's current head**. The earlier proof was taken at `854e45cb8`,
 which the force-push to `7c6522951` made a non-ancestor — **a static proof is bound to a head and a

@@ -6690,3 +6690,26 @@
     post-#1865/#1858 parents before any verdict is carried; what is fixed here is the **shape** — the
     delta is small and known in advance, so evaluation can be commissioned rather than discovered
     after the lease.
+
+- **D-265 — S13's two mechanically checkable acceptance boxes independently verified at its exact
+  head; a wrong invocation nearly produced a false failure report.**
+  - **Box 3 (`tools/aspire-surface-manifest.ts` re-run yields no diff) — SATISFIED at `9b684e176`.**
+    Re-run reports `rows=815 unmatched=0`; the committed 816-line TSV (815 rows + header) is left
+    **byte-identical**; `git status` shows **zero** worktree modifications.
+  - **Box 5 (`check:assets-barrel`, `agentic:sync-claude:check` green) — SATISFIED at `9b684e176`.**
+    `check:assets-barrel` exit **0** — it regenerates and then `git diff --exit-code`s all seven
+    carriers, so the generated surface is genuinely in sync, not merely present.
+    `agentic:sync-claude:check` exit **0**: *"OK: 18 skill(s), 22 mirrored file(s)"*.
+  - These were **claimed** in D-257 from the slice's own evidence; they are now **independently
+    reproduced by this supervisor at the exact head**, which is the difference between a carried claim
+    and a verdict.
+  - **I nearly reported box 3 as failing, and the reason is worth recording.** My first invocation
+    diffed the tool's **stdout** against the committed TSV and got `816 → 55 rows`, an apparently
+    catastrophic mismatch. The tool's stdout is a **summary** (`rows=815 unmatched=0` plus a class
+    histogram); it writes the TSV itself. The correct test is whether the re-run leaves the tracked
+    file unmodified — which it does. **A tool that both prints a summary and rewrites a file will punish
+    anyone who diffs its stdout**, and a 816-vs-55 number is exactly alarming enough to get reported
+    before it is understood. Checked the invocation before writing the finding; the finding did not
+    exist.
+  - S13's final box status is therefore: **1 blocked (S9)**, **2 blocked (S9)**, **3 verified**,
+    **4 evidenced (D-257)**, **5 verified**.
