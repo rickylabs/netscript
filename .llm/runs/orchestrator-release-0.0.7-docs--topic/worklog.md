@@ -3301,3 +3301,62 @@ exactly how these four arose.
 label-at-open rule. Launcher notes: `--provider` is mandatory, `--dest` must be a **file** path, and
 git-safety refuses a branch that has an upstream — `git branch --unset-upstream` clears it without
 removing the pushed remote branch.
+
+## 2026-09-01 — #1640 MERGED; #1869 (slice B) Tier-A PASS; IMPL-EVAL dispatched
+
+**#1640 merged as `d2b33a09b`, now `origin/main`.** The long-parked Prisma 8 RFC leaf is done. Only
+**#1756** remains parked, still on the owner-only `workflow` credential boundary.
+
+### PR #1869 — Tier-A supervisor review, head `240d67284`, 0 behind main
+
+The worker rebased itself onto `d2b33a09b` after #1640 landed, so no convergence was needed.
+
+| Check | Result |
+| --- | --- |
+| **Cumulative mapping** | main 32 → branch 35; added exactly `plugin-triggers`/`plugin-workers`/`plugin-auth`; **LOST: NONE** |
+| Reference-page coverage | `PASS (36/36; mapped=35; excluded=1)`; none unclassified, none in both |
+| `auth` hub | in `EXCLUDED_REFERENCE_PAGES` only, reason names the five packages its `## Units` table actually indexes |
+| All 13 docs/site/corpus gates | exit 0 |
+| `check-exports-drift_test.ts` | 14 passed / 0 failed |
+| `diff --check` (base-relative) | exit 0 |
+| `git status` / `deno.lock` | clean / unchanged |
+| provenance `1b65f34f7` | in-ancestor |
+| Scope | zero non-generated `packages/`/`plugins/` changes |
+| Run artifacts | **7 retained** |
+| Vento template | `templateEngine: [vento, md]` and `{{ releaseVersion }}` preserved |
+
+**Coverage honesty — independently re-derived, matched the worker exactly:**
+
+| Package | entrypoints | union | documented | gap | verdict |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `plugin-triggers` | 11 | 150 | 17 | 133 | `entrypoints-only` honest |
+| `plugin-workers` | 13 | 175 | 125 | 50 | `entrypoints-only` honest |
+| `plugin-auth` | 9 | 84 | 5 | 79 | `entrypoints-only` honest |
+
+No zero gaps, so none understates coverage to hide an omission. Every new Purpose was checked
+against `deno doc` and is accurate (`/adapter-cli` → `PluginCli*`; `/doctor` → `workersAdapterPlugin`;
+`/jobs/health-check.ts` → `HealthCheckJob*`; `/runtime` → `GeneratedJobRegistry*` + `Start*Process*`).
+
+`plugin-auth`'s `## Sub-path exports` gained the missing **Path column** on all nine rows — the same
+repair as #1803's `auth-kv-oauth`.
+
+**#1668 reproduced on a clean `origin/main` checkout: exit 1 there and exit 1 on the branch —
+pre-existing, not this branch's defect.**
+
+### CI
+
+All substantive checks pass. **`close-gate` fails only on this PR's four unticked Definition-of-Done
+boxes** — supervisor-owned, ticked at finalization after IMPL-EVAL, never by the implementer. Note
+#1857 itself carries **no acceptance checkboxes** (I wrote it as prose), so the gate is reading the
+PR's DoD list rather than an issue mirror.
+
+### Evaluation dispatched — verified real, not inferred
+
+GLM 5.3 Flash · effort `max` · pid **3811312**, session `fbce8ed7`, cwd
+`007-eval-1869` (a dedicated detached worktree at the exact head, to avoid the worktree-contention
+failure that forced two earlier evaluators to self-rescue). Zero guard denials.
+
+Prompt carries an explicit **budget-discipline** clause after the coordinator flagged the #1866
+evaluation running multi-megabyte and near its time bound, and requires the evaluator to **prove the
+new coverage check bites** by deleting an entry and observing a failure — a check that cannot fail
+would be worthless.
