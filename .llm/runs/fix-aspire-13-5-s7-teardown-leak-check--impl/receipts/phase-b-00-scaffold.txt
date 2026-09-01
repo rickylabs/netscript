@@ -1,0 +1,28 @@
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "s7lease"...
+   [32m✓[39m Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   [32m✓[39m Aspire orchestration (TypeScript AppHost, .helpers/, package.json)
+   [32m✓[39m Database workspace (postgres)
+   [32m✓[39m Frontend app "s7lease-web" (Fresh framework)
+   [32m✓[39m Contracts (v1 stub)
+   [32m✓[39m Plugins (empty registry)
+   [32m✓[39m Output formatted (deno fmt)
+
+[32m✅[39m [1mProject scaffolded successfully in 0.8s[22m
+
+  Created: 183 files, 32 directories
+
+Next steps:
+  1. cd s7lease
+  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace
+  3. aspire restore  # download TypeScript AppHost SDK modules (run once)
+  4. cd ..
+  5. deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed
+  6. netscript db init --name init
+  7. netscript db generate
+  8. netscript db seed
+  9. # Postgres provisioned by Aspire (see "Databases" in appsettings.json)
+
