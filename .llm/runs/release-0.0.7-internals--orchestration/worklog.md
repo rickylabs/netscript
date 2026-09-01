@@ -9625,3 +9625,39 @@ rather than workflow configuration** with per-tier `overlap_count: 0`, and head 
 re-proved against run, PR, and raw `ls-remote` refs plus a `synchronize` sweep. A real test failure
 would still be valid evidence that the gate **ran**; it would not be merge readiness, and will be
 reported as such.
+
+### D-218 — #1839 proof COMPLETE; #1879 CI found a real gap; #1351 has a hard merge-order blocker
+
+**#1839 / PR #1846 — box 1 proven, all assertions hold.** All six runtime-tier jobs concluded
+`success`; per-tier serialization asserted from **API job timestamps rather than workflow
+configuration** gives `overlap_count: 0` on both Docker and SQLite; head immutability holds across
+run `head_sha`, PR head, and raw `ls-remote` for all three arrivals with **0** `synchronize` events.
+B and C waited 13 and 6 minutes and executed on the commit they were created with. Admission followed
+FIFO **wait** order (A, C, B), not arrival index — the acceptance property is non-overlap, not
+ordering, and the ~3 s handoffs show the mutex releasing directly into the next waiter rather than a
+gap that could conceal a re-dispatch. The mirror ticked all five acceptance boxes. The body's
+"no acceptance-evidence block, deliberately" note was rewritten rather than deleted: its reasoning
+(an evidence entry reading "DEFERRED…" would tick its box, since `validateEvidenceMapping` never
+inspects evidence text) is exactly why the block had to be added in one piece, and that condition is
+now met.
+
+**#1879 / PR #1890 — CI caught a real defect the family sweep and the evaluator both missed.**
+`fresh-ui-quality` failed on a stale **private** `packages/fresh-ui/deno.lock`. That package is not a
+root workspace member and declares no `@orpc` itself; its ranges arrive through the root catalog this
+slice raised. The completeness proof enumerated the 32 root-workspace manifest keys and the root
+lock — a non-member package with its own lock falls outside that enumeration, so a complete-looking
+sweep was still incomplete. Regenerated via the prescribed `lock:update`; every moved package proven
+inside the oRPC closure (`type-fest` ← `@orpc/shared`; `import-in-the-middle` ←
+`@opentelemetry/instrumentation` ← `@orpc/otel`; the two lexers ← `import-in-the-middle`), nothing
+outside it. Head moved off the evaluated one, so a **bounded delta evaluation is owed** before this
+is presented as a merge packet.
+
+**#1351 / PR #1889 — hard merge-order blocker, found by measurement.** Its acceptance boxes 1 and 6
+require the `@orpc/*` family to resolve **once** at 1.15.0 — but the coordinator split that work into
+#1879. At #1889's head `deno why @orpc/shared` returns **two** copies (`1.14.6`, `1.14.7`). Those two
+boxes are therefore not honestly tickable until #1879 merges and #1889 integrates it. **#1889 must
+merge after #1890**, and box 6 additionally needs the scaffold runtime E2E, whose lane is only now
+free. #1889 stays draft at `status:impl` rather than being promoted on a claim its own head disproves.
+
+Label drift recurred on #1890 (7th) and #1846 (8th); both re-read and restored after every lifecycle
+transition.
