@@ -9661,3 +9661,31 @@ free. #1889 stays draft at `status:impl` rather than being promoted on a claim i
 
 Label drift recurred on #1890 (7th) and #1846 (8th); both re-read and restored after every lifecycle
 transition.
+
+### D-219 — #1888 shipped; #1839 proof closed out; #1890 green and awaiting only its delta verdict
+
+**#1894/#1888 merged as `9fcdee63e`** — main advanced. Its formal OpenHands evaluator (run
+`33553423688`) had already terminalized `PASS` and was **consumed rather than re-run**. Its strongest
+element: revert-sensitivity proven by running the Defect-B reproducer against the trusted base blob,
+where the base parser returns `{state:"parsed", verdict:"PASS"}` for a two-marker summary while the
+head requires `{state:"ambiguous", verdict:null}` — the test catches the regression it guards, which
+is the only thing that matters for a slice whose defect was a false-ready verdict.
+
+**#1846 surfaced as a complete merge packet** at `f826ae7e7`: 7 SUCCESS / 57 SKIPPED / **0 FAILURE**,
+CLEAN, 0/0 threads, sole `status:ready-merge` on PR and issue, **5/5** acceptance boxes mirrored and
+**0** unchecked PR DoD. Proof PRs #1901/#1902/#1903 **closed unmerged** (`merged: false`) with all
+three branches deleted; zero proof branches remain on the remote.
+
+**#1890 is green at `e734453c4`** — 10 SUCCESS / 0 FAILURE, MERGEABLE/CLEAN even after main advanced,
+so no further convergence is needed for merge. `fresh-ui-quality` now **SUCCESS**, confirming the
+private-lock fix. `close-gate` SUCCESS; #1879's five acceptance boxes stay mirrored.
+
+Held deliberately: #1879's eight non-close-gated "Required evidence" boxes are **not** being ticked
+yet. Box 2 claims "the whole family moves together with no member left behind" — that is exactly the
+claim the fresh-ui private lock falsified once, and the running delta evaluator has been briefed to
+hunt for a **third** surface of the same class. Ticking it before that answer would repeat the error
+the box exists to catch.
+
+**Merge order is a hard constraint, not a preference:** #1890 must land before #1889, because #1351's
+acceptance boxes 1 and 6 require a single resolved `@orpc/shared` and #1889's head still measures two
+copies (`1.14.6`, `1.14.7`).
