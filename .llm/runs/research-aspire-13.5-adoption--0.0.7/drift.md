@@ -6092,3 +6092,38 @@
   - Noted for whoever resumes: `origin/main` moved **twice during this single attempt**
     (`969e7dfeb` → `78be0e032`), so the replay must **re-fetch at dispatch time** rather than assume a
     base.
+
+- **D-248 — A6 RULED: S8 deletes the seam. Reconvergence dispatched; #1754's false "parked" claims
+  corrected.**
+  - **Ruling recorded verbatim in the brief:** follow #1720 acceptance exactly — S8 deletes the
+    obsolete `PROCESS_COMMANDS_FLAG` / "Aspire 13.4" seam and its version-bound comment. **#1837's
+    main-side emission wins everywhere that survives**, and its hardening of the one line S8
+    intentionally removes is **superseded by the deletion, not preserved as dead compatibility code**.
+    The A6 supersession rationale must be recorded in `drift.md`, `worklog.md` **and** the PR body:
+    #1837 hardened the *emission* of a line whose *seam* A6 removes, so hardening and removal are
+    orthogonal and the deletion supersedes that one hardened line only.
+  - Brief carries: re-fetch main at replay time (it moved **twice** during the last attempt), expect
+    **five** conflict points, emission-shape → main wins, S8's additive typed-db behaviour preserved
+    **re-expressed**, generated files upstream + **regenerate the embedded carrier**, and **abort on
+    any genuinely new semantic collision** — that rule stays live after two correct aborts.
+    Also required: **A6 grep proof** (zero `PROCESS_COMMANDS_FLAG`, zero `Aspire 13.4` in the named
+    surfaces), a **blob-identity table**, and the `behavior.workers-executions` ownership verdict now
+    that main's commits are in hand.
+  - **Runtime lease now sits with Fixes #1858** (was #1844) until exact zero is returned. Brief forbids
+    all local runtime; hosted CI remains the authority and the supervisor schedules the both-tier
+    `scaffold.runtime` afterwards.
+  - **Corrected three false claims in #1754's body** — this mattered, because the PR was telling
+    reviewers the opposite of what CI shows:
+    1. "Phase B lease-backed runtime receipts — **parked, not failed**" → **not parked**; hosted CI
+       executes both tiers, and at `439959045` docker `passed=66` / sqlite `passed=61` with
+       `database.seed`, `runtime.typed-db-phase-b` and `runtime.health.listener-unreachable` all
+       **passing**;
+    2. "D-42/D-43 … is the only runtime-phase limitation" → it limits the **local NAS host only**;
+       hosted CI is unaffected and is the authority for this PR;
+    3. "blocked by the same parked runtime" → pending a both-tier green after reconvergence, **not**
+       blocked by a parked runtime.
+    **D-43 was a genuine constraint for the NAS host and was never a constraint on GitHub runners** —
+    the body had carried the local limitation forward as if it were universal.
+  - Remaining to close S8 after reconvergence: **#1720's six unchecked boxes**, **#1754's two unchecked
+    DoD boxes**, both-tier full `scaffold.runtime` green, exact Phase-B receipts, Tier-A delta review,
+    supervisor-dispatched IMPL-EVAL, zero unanswered threads, current CI.
