@@ -6,6 +6,7 @@ import {
   deriveExpectedExports,
   type PackageMapping,
   parseDocContent,
+  validateReferencePageCoverage,
 } from './check-exports-drift.ts';
 
 Deno.test('drift checker negative fixture validation', () => {
@@ -134,6 +135,34 @@ Deno.test('symbol parsing is table-aware and normalizes display generics', () =>
 | \`key\` | string |
 `);
   assertEquals([...docSymbols].sort(), ['Alpha', 'DataGridColumn']);
+});
+
+Deno.test('reference page coverage refuses pages in neither classification', () => {
+  const uncovered = 'docs/site/reference/uncovered/index.md';
+  assertEquals(
+    validateReferencePageCoverage(
+      [uncovered],
+      [],
+      [],
+    ),
+    [
+      `Reference Page Coverage Error: ${uncovered} is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES`,
+    ],
+  );
+});
+
+Deno.test('reference page coverage refuses pages in both classifications', () => {
+  const duplicated = 'docs/site/reference/duplicated/index.md';
+  assertEquals(
+    validateReferencePageCoverage(
+      [duplicated],
+      [{ docPath: duplicated }],
+      [{ docPath: duplicated, reason: 'Fixture exclusion.' }],
+    ),
+    [
+      `Reference Page Coverage Error: ${duplicated} is in both AUTHORITATIVE_MAPPING and EXCLUDED_REFERENCE_PAGES`,
+    ],
+  );
 });
 
 interface CapturedCheck {

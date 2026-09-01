@@ -51,6 +51,7 @@ The following entrypoints are published alongside the root export.
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/plugin-triggers` | `./mod.ts` | Public plugin manifest surface (documented above). |
+| `@netscript/plugin-triggers/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
 | `@netscript/plugin-triggers/public` | `./src/public/mod.ts` | Public manifest re-export (identical to the root surface). |
 | `@netscript/plugin-triggers/plugin` | `./src/public/mod.ts` | Plugin lifecycle composition (alias of the public surface). |
 | `@netscript/plugin-triggers/runtime` | `./src/runtime/mod.ts` | Trigger runtime wiring. |
