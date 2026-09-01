@@ -6713,3 +6713,29 @@
     exist.
   - S13's final box status is therefore: **1 blocked (S9)**, **2 blocked (S9)**, **3 verified**,
     **4 evidenced (D-257)**, **5 verified**.
+
+- **D-266 — three killed watchers explained: a long single `sleep` is reaped, not the background task.
+  A working watch is now held. My stated hypothesis was wrong and the experiment refuted it.**
+  - **What I claimed, and what actually happened.** After three merge watchers died with
+    `status: killed` and **empty** output files, I hypothesised that background tasks are killed at
+    turn boundaries, and said so — adding that if a probe came back `[killed]` the hypothesis was
+    confirmed. It came back **`COMPLETED`**: a probe looping `sleep 5` sixty times ran the **full
+    300 s across a turn boundary**, 60/60 ticks. The hypothesis is **refuted**, and the correct
+    conclusion is the opposite one — background tasks survive turns fine.
+  - **The real variable is the sleep length.** All three dead watchers blocked on `sleep 120` between
+    polls; the surviving probe never slept longer than 5 s. A long single `sleep` is reaped; the task
+    is not. Nothing about the network use or the turn boundary mattered.
+  - **Watcher rebuilt and armed** on the tick-loop shape — `sleep 5` inner loop, expensive `gh` poll
+    gated on `i % 24` for a 120 s cadence, 6 h ceiling — and it is **confirmed running** (pid alive by
+    `/proc/<pid>/cmdline`, not by `pgrep -f`, which self-matches) with its first poll logged:
+    `1865=[OPEN UNSTABLE -] 1858=[OPEN CLEAN -]`.
+  - **Each poll is now tee'd to a log file.** The three killed tasks left empty `.output` files, which
+    is precisely why the cause took three attempts to find — a watcher that dies silently teaches
+    nothing.
+  - **This matters beyond watching.** The same reaping would hit a long-running gate during the
+    serialized Phase-B lease — `scaffold.runtime` on both tiers is exactly the shape of command that
+    would be run in the background and waited on. Worth knowing before the lease, not during it.
+  - Saved as durable memory (`background-tasks-long-sleep-reaped`) so the next session does not spend
+    three attempts rediscovering it.
+  - Gates unchanged throughout: #1865 `OPEN/UNSTABLE` at `f008315d1` (close-gate + both runtime tiers
+    red), #1858 `OPEN/CLEAN`, main `1e53e731a`.
