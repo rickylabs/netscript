@@ -106,6 +106,9 @@ export async function verifyTypedDbPhaseB(
       database,
       TEST_ONLY_POSTGRES_HEALTH_KEY,
     );
+    // #1720 A4 / #863 name `netscript db init` as the exact command that must exit bounded
+    // against an Unhealthy-but-Running Postgres. `db migrate` exercised a different code path
+    // and did not prove the acceptance box.
     boundedFailure = await runCommand(
       'deno',
       [
@@ -113,11 +116,13 @@ export async function verifyTypedDbPhaseB(
         '-A',
         cliEntrypoint,
         'db',
-        'migrate',
-        '--db',
-        database,
+        'init',
         '--project-root',
         projectRoot,
+        '--db',
+        database,
+        '--name',
+        'init',
       ],
       projectRoot,
       { ASPIRE_CLI_START_TIMEOUT: String(WAIT_TIMEOUT_SECONDS) },
