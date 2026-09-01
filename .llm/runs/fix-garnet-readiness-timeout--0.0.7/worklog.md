@@ -9,7 +9,7 @@
 | Base             | `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`                 |
 | Parent archetype | `6 — CLI / Tooling`                                        |
 | Scope overlay    | `docs` for S1 artifacts                                    |
-| Constraint       | Artifact-only while #1773 owns E2E; no local runtime lease |
+| Constraint       | Static/package-only; hosted lease remains supervisor-owned |
 
 ## Design
 
@@ -46,9 +46,9 @@
 
 - S1: only this run's `plan.md`, `research.md`, and `worklog.md`.
 - Zero code paths while #1773 owns `packages/cli/e2e/**` and PLAN-EVAL is pending.
-- After both gates clear, exactly the six paths listed in `plan.md`: the compatibility template,
-  mechanical embedded asset, focused probe test, readiness constants/verifier/test.
-- No new `runtime/` child. A seventh code/test path requires rescope.
+- After supervisor clearance, exactly the nine paths listed in `plan.md`: the compatibility
+  template/carrier/test, readiness constants/verifier/test, and Garnet generator/two tests.
+- No new `runtime/` child. A tenth code/test path requires rescope.
 
 ### Commit Slices
 
@@ -61,7 +61,7 @@
 
 ### Deferred Scope
 
-- Additional causal repair selected by the historical split.
+- Historical per-check cause: unrecoverable because the original DCP/AppHost logs were not retained.
 - Runtime execution — this leaf has no lease.
 - Timeout increases — forbidden, not deferred.
 - PLAN-EVAL and PR disposition — supervisor-owned.
@@ -81,7 +81,7 @@ absence/refusal/timeout is observed for no more than 30 seconds; terminal `NOAUT
 may fail immediately. The probe fix is mandatory regardless of the historical split: canonical RESP2
 array PING, bounded CRLF accumulation, exact `+PONG`, all other replies `Unhealthy`, and
 host/port/elapsed/class/received-byte diagnostics. No Redis client is adopted. This design is
-recorded, not implemented: #1773 remains open and PLAN-EVAL remains supervisor-owned.
+implemented under the supervisor's cleared collision and `PLAN-EVAL: N/A` ruling.
 
 ### Contributor Path
 
@@ -92,35 +92,38 @@ revise the plan.
 
 ## Progress Log
 
-| Time (UTC)        | Slice | Step                     | Notes                                                                                                                                                                                                                                    |
-| ----------------- | ----- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-31T19:00Z | S1    | Harness/bootstrap        | Read harness activation/run-loop, plan gate, lane policy, Archetype 6, docs overlay, doctrine, Aspire, CLI, tools, PR, and RTK instructions. `rtk` was unavailable on host; focused `rg` and raw Git were used.                          |
-| 2026-08-31T19:01Z | S1    | Re-baseline              | `HEAD`, `origin/main`, and merge base all `8f1fcb2bc`; clean worktree; target remote branch absent.                                                                                                                                      |
-| 2026-08-31T19:02Z | S1    | First measurement        | Found the failure-path evidence gap: aggregate wait throws before `describe`; no per-check split is present in checked-in artifacts. Diagnosis deliberately withheld.                                                                    |
-| 2026-08-31T19:03Z | S1    | Collision                | PR #1773 remains live and owns `packages/cli/e2e/**`; future diagnostic code stops pending supervisor sequencing.                                                                                                                        |
-| 2026-08-31T19:04Z | S1    | Aspire coordination      | Sent read-only request for both exact run/job pairs plus DCP/per-check logs; did not dispatch runtime.                                                                                                                                   |
-| 2026-08-31T19:05Z | S1    | Base gates               | Measured structured package/focused static gates and tests; recorded broad lint refusal honestly; lock remained unchanged.                                                                                                               |
-| 2026-08-31T19:05Z | S1    | Design checkpoint        | Locked zero product paths, two future E2E paths, no new file, no timeout increase, and hosted proof standard.                                                                                                                            |
-| 2026-08-31T19:06Z | S1    | Aspire evidence returned | Recorded exact run/job/head identities. Both uploaded artifacts contain aggregate timeout only; referenced Aspire logs were runner-local and not uploaded.                                                                               |
-| 2026-08-31T19:15Z | S1    | #1740 lead tested        | Both tier paths provision Garnet `Mode: Auto` without `Port`; unpinned generated endpoint is unchanged across #1740. Lead retained only as a contingent real-check runtime question.                                                     |
-| 2026-08-31T20:32Z | S1R   | Re-baseline/collision    | `origin/main` advanced only by unrelated docs to `9fbc231729`; GitHub reports #1773 open, clean, and still owning `packages/cli/e2e/**` at `bd239f916`. No E2E edit started.                                                             |
-| 2026-08-31T20:35Z | S1R   | Version verification     | Official dotnet package/tool searches confirm Aspire 13.5.3 current, Garnet upstream 2.1.5, image pin 1.1.1, tool pin 1.1.10; Aspire v13.5.3 source defaults to image tag 1.0.                                                           |
-| 2026-08-31T20:38Z | S1R   | Hosted arm comparison    | Downloaded existing report artifacts only: both failed Postgres runs removed three containers; #1773 hosted SQLite removed one and Postgres three. Both tiers select the 1.1.1 container arm.                                            |
-| 2026-08-31T20:40Z | S1R   | Reliability rescope      | Version skew excluded as tier-asymmetry cause and retained as cross-environment risk. Recorded four-state, full-report, 30-second-stability design; no timeout/code/version change.                                                      |
-| 2026-08-31T21:07Z | S1R2  | Client/runtime research  | Verified the D-7 Node boundary, compared current Node Redis client graphs, selected `ioredis` 6.0.0 conditionally, and excluded `@db/redis` from the AppHost/server roles. No code path was unlocked.                                    |
-| 2026-08-31T21:08Z | S1R2  | Auth reachability        | Managed cache schema/commands emit no auth; external mode has no RESP check; Garnet defaults to `NoAuth`. `NOAUTH` is non-causal here but its `Degraded` mapping is a permanent-wait defect.                                             |
-| 2026-08-31T21:09Z | S1R2  | Lock recovery            | Native dependency inspection added transient resolution entries to `deno.lock`; restored only that known-clean file to HEAD and re-verified the original SHA-256 before artifact edits.                                                  |
-| 2026-08-31T21:35Z | S1R3  | Probe contract reversal  | Supervisor client experiment rejected the application-client design. Locked one framed RESP2 PING, split-read accumulation, exact binary verdict, 2-second attempt, 64-byte diagnostics, and six in-process cases.                       |
-| 2026-08-31T21:36Z | S1R3  | Collision recheck        | #1773 remains open at `bd239f916`; mandatory gate work overlaps its `packages/cli/e2e/**` ownership. Locked six post-sequencing paths and made no code/test edit.                                                                        |
-| 2026-08-31T21:38Z | S1R3  | Probe base baseline      | Verified the probe template/test are byte-identical to base and ran the lease-free focused module: 8 passed, 0 failed. Current baseline still expects `NOAUTH` Degraded and has no split-reply case.                                     |
-| 2026-09-01T05:40Z | S2    | Probe RED                | Tests-only commit `2368e8f85`: focused module 3 passed / 6 failed, exposing inline PING, split-reply `EPROTO`, `NOAUTH` Degraded, and missing received-byte diagnostics.                                                                 |
-| 2026-09-01T05:42Z | S2    | Probe GREEN              | Minimal one-attempt RESP2 probe passes 11/11 focused results, including split `+PO`/`NG\r\n`, closed-port fast failure, and accept-without-reply 2-second deadline. Asset barrel regenerated canonically.                                |
-| 2026-09-01T05:44Z | S3    | Gate RED                 | Tests-only commit `26189429e`: type-check failed because named published-unhealthy diagnostics and retained report `data`/`exception` did not exist; Garnet still expected 300 seconds.                                                  |
-| 2026-09-01T05:46Z | S3    | Gate GREEN               | Garnet now polls named `describe` health for 30 seconds, distinguishes resource/key unpublished from published-unhealthy, preserves sibling blockers and full report detail, and fails terminal protocol codes immediately.              |
-| 2026-09-01T05:48Z | S4    | Alignment RED            | Tests-only commit `2d2dab529`: 40 passed / 6 failed because container output remained `1.1.1`; the new guard derives the required tag from read-only `SCAFFOLD_VERSIONS.GARNET_TOOL` (`1.1.10`).                                         |
-| 2026-09-01T05:50Z | S4    | Alignment GREEN          | One-sided container default changed to `1.1.10`; 46/46 generator tests pass and the durable container/tool drift guard is green. `scaffold-versions.ts` remained read-only.                                                              |
-| 2026-09-01T06:01Z | S5    | Main convergence         | Supervisor commits `6e7682dfe`, `f5f052b6c`, and `067d13218` merged current main/#1773, regenerated the sole generated carrier, and reconciled source-safe generator quoting. Final handwritten collision cleared with a clean worktree. |
-| 2026-09-01T06:04Z | S5    | Final static proof       | Post-convergence focused suite passed 62/62, all eight TypeScript carriers checked with zero diagnostics, and `quality:gate` exited 0 (`quality:scan` clean, doctrine `FAIL=0`; baseline warnings retained).                             |
+| Time (UTC)        | Slice | Step                     | Notes                                                                                                                                                                                                                                                |
+| ----------------- | ----- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-31T19:00Z | S1    | Harness/bootstrap        | Read harness activation/run-loop, plan gate, lane policy, Archetype 6, docs overlay, doctrine, Aspire, CLI, tools, PR, and RTK instructions. `rtk` was unavailable on host; focused `rg` and raw Git were used.                                      |
+| 2026-08-31T19:01Z | S1    | Re-baseline              | `HEAD`, `origin/main`, and merge base all `8f1fcb2bc`; clean worktree; target remote branch absent.                                                                                                                                                  |
+| 2026-08-31T19:02Z | S1    | First measurement        | Found the failure-path evidence gap: aggregate wait throws before `describe`; no per-check split is present in checked-in artifacts. Diagnosis deliberately withheld.                                                                                |
+| 2026-08-31T19:03Z | S1    | Collision                | PR #1773 remains live and owns `packages/cli/e2e/**`; future diagnostic code stops pending supervisor sequencing.                                                                                                                                    |
+| 2026-08-31T19:04Z | S1    | Aspire coordination      | Sent read-only request for both exact run/job pairs plus DCP/per-check logs; did not dispatch runtime.                                                                                                                                               |
+| 2026-08-31T19:05Z | S1    | Base gates               | Measured structured package/focused static gates and tests; recorded broad lint refusal honestly; lock remained unchanged.                                                                                                                           |
+| 2026-08-31T19:05Z | S1    | Design checkpoint        | Locked zero product paths, two future E2E paths, no new file, no timeout increase, and hosted proof standard.                                                                                                                                        |
+| 2026-08-31T19:06Z | S1    | Aspire evidence returned | Recorded exact run/job/head identities. Both uploaded artifacts contain aggregate timeout only; referenced Aspire logs were runner-local and not uploaded.                                                                                           |
+| 2026-08-31T19:15Z | S1    | #1740 lead tested        | Both tier paths provision Garnet `Mode: Auto` without `Port`; unpinned generated endpoint is unchanged across #1740. Lead retained only as a contingent real-check runtime question.                                                                 |
+| 2026-08-31T20:32Z | S1R   | Re-baseline/collision    | `origin/main` advanced only by unrelated docs to `9fbc231729`; GitHub reports #1773 open, clean, and still owning `packages/cli/e2e/**` at `bd239f916`. No E2E edit started.                                                                         |
+| 2026-08-31T20:35Z | S1R   | Version verification     | Official dotnet package/tool searches confirm Aspire 13.5.3 current, Garnet upstream 2.1.5, image pin 1.1.1, tool pin 1.1.10; Aspire v13.5.3 source defaults to image tag 1.0.                                                                       |
+| 2026-08-31T20:38Z | S1R   | Hosted arm comparison    | Downloaded existing report artifacts only: both failed Postgres runs removed three containers; #1773 hosted SQLite removed one and Postgres three. Both tiers select the 1.1.1 container arm.                                                        |
+| 2026-08-31T20:40Z | S1R   | Reliability rescope      | Version skew excluded as tier-asymmetry cause and retained as cross-environment risk. Recorded four-state, full-report, 30-second-stability design; no timeout/code/version change.                                                                  |
+| 2026-08-31T21:07Z | S1R2  | Client/runtime research  | Verified the D-7 Node boundary, compared current Node Redis client graphs, selected `ioredis` 6.0.0 conditionally, and excluded `@db/redis` from the AppHost/server roles. No code path was unlocked.                                                |
+| 2026-08-31T21:08Z | S1R2  | Auth reachability        | Managed cache schema/commands emit no auth; external mode has no RESP check; Garnet defaults to `NoAuth`. `NOAUTH` is non-causal here but its `Degraded` mapping is a permanent-wait defect.                                                         |
+| 2026-08-31T21:09Z | S1R2  | Lock recovery            | Native dependency inspection added transient resolution entries to `deno.lock`; restored only that known-clean file to HEAD and re-verified the original SHA-256 before artifact edits.                                                              |
+| 2026-08-31T21:35Z | S1R3  | Probe contract reversal  | Supervisor client experiment rejected the application-client design. Locked one framed RESP2 PING, split-read accumulation, exact binary verdict, 2-second attempt, 64-byte diagnostics, and six in-process cases.                                   |
+| 2026-08-31T21:36Z | S1R3  | Collision recheck        | #1773 remains open at `bd239f916`; mandatory gate work overlaps its `packages/cli/e2e/**` ownership. Locked six post-sequencing paths and made no code/test edit.                                                                                    |
+| 2026-08-31T21:38Z | S1R3  | Probe base baseline      | Verified the probe template/test are byte-identical to base and ran the lease-free focused module: 8 passed, 0 failed. Current baseline still expects `NOAUTH` Degraded and has no split-reply case.                                                 |
+| 2026-09-01T05:40Z | S2    | Probe RED                | Tests-only commit `2368e8f85`: focused module 3 passed / 6 failed, exposing inline PING, split-reply `EPROTO`, `NOAUTH` Degraded, and missing received-byte diagnostics.                                                                             |
+| 2026-09-01T05:42Z | S2    | Probe GREEN              | Minimal one-attempt RESP2 probe passes 11/11 focused results, including split `+PO`/`NG\r\n`, closed-port fast failure, and accept-without-reply 2-second deadline. Asset barrel regenerated canonically.                                            |
+| 2026-09-01T05:44Z | S3    | Gate RED                 | Tests-only commit `26189429e`: type-check failed because named published-unhealthy diagnostics and retained report `data`/`exception` did not exist; Garnet still expected 300 seconds.                                                              |
+| 2026-09-01T05:46Z | S3    | Gate GREEN               | Garnet now polls named `describe` health for 30 seconds, distinguishes resource/key unpublished from published-unhealthy, preserves sibling blockers and full report detail, and fails terminal protocol codes immediately.                          |
+| 2026-09-01T05:48Z | S4    | Alignment RED            | Tests-only commit `2d2dab529`: 40 passed / 6 failed because container output remained `1.1.1`; the new guard derives the required tag from read-only `SCAFFOLD_VERSIONS.GARNET_TOOL` (`1.1.10`).                                                     |
+| 2026-09-01T05:50Z | S4    | Alignment GREEN          | One-sided container default changed to `1.1.10`; 46/46 generator tests pass and the durable container/tool drift guard is green. `scaffold-versions.ts` remained read-only.                                                                          |
+| 2026-09-01T06:01Z | S5    | Main convergence         | Supervisor commits `6e7682dfe`, `f5f052b6c`, and `067d13218` merged current main/#1773, regenerated the sole generated carrier, and reconciled source-safe generator quoting. Final handwritten collision cleared with a clean worktree.             |
+| 2026-09-01T06:04Z | S5    | Final static proof       | Post-convergence focused suite passed 62/62, all eight TypeScript carriers checked with zero diagnostics, and `quality:gate` exited 0 (`quality:scan` clean, doctrine `FAIL=0`; baseline warnings retained).                                         |
+| 2026-09-01T06:07Z | S6    | Hosted proof failed      | Supervisor-held hosted run stopped at `generated.quality-negative`: 27 passed / 1 failed, before `runtime.wait.garnet`. Two generated-helper compiler errors and a later formatter failure are attributable to this branch; no hosted proof claimed. |
+| 2026-09-01T06:10Z | S6    | Emitted helper RED       | Tests-only commit `df7792dd1`: exact emitted-file check reproduced TS2322 (`Uint8Array<ArrayBufferLike>`) and TS2339 (`elapsedMs`) while existing behavior remained green.                                                                           |
+| 2026-09-01T06:12Z | S6    | Emitted helper GREEN     | Buffer-generic accumulator types and declared failure-data fields make the exact emitted helper type-check; generated-config format check is clean, including the expanded permission block. Focused module passes 13/13.                            |
 
 ## Decisions
 
@@ -179,6 +182,9 @@ revise the plan.
 | Post-convergence focused tests | structured test wrapper on all four focused test modules      | PASS                        | 62/62 on current main convergence; required probe, named-health, and version-drift cases remain selected.                                 |
 | Post-convergence carrier check | structured check wrapper on eight TypeScript carriers         | PASS                        | 8 files, 1 batch, 0 diagnostics; wrapper includes `--unstable-kv`.                                                                        |
 | Repository quality gate        | `deno task quality:gate`                                      | PASS                        | Exit 0; scanner findings empty and doctrine reports `FAIL=0`; pre-existing repository warnings remain visible.                            |
+| Emitted helper RED             | structured focused test wrapper                               | RED                         | Commit `df7792dd1`; 10 passed / 3 reported failures, with the causal assertion reproducing exactly TS2322 and TS2339.                     |
+| Emitted helper GREEN           | structured focused test wrapper                               | PASS                        | 13/13; exact emitted content type-checks and generated-config `deno fmt --check` passes.                                                  |
+| Repair carrier check           | structured check wrapper on test plus generated carrier       | PASS                        | 2 files, 1 batch, 0 diagnostics; wrapper includes `--unstable-kv`.                                                                        |
 
 ### Version/hosted comparison evidence
 
@@ -207,11 +213,11 @@ revise the plan.
 
 ### Runtime Gates
 
-| Gate                                  | Result  | Evidence                                                | Notes                                                              |
-| ------------------------------------- | ------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
-| per-check Postgres-tier split         | NOT RUN | Existing runs/artifacts inspected; named detail absent. | Exact future command and pre-cleanup capture are recorded in plan. |
-| `runtime.wait.garnet` hosted fix head | NOT RUN | Supervisor dispatch required at the pushed fix head.    | Authoritative proof; static/unit success is insufficient.          |
-| #1747/#1754 reruns                    | NOT RUN | Supervisor dispatch required at the pushed fix head.    | Both historical reproductions must rerun green.                    |
+| Gate                                  | Result      | Evidence                                                | Notes                                                              |
+| ------------------------------------- | ----------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| per-check Postgres-tier split         | NOT RUN     | Existing runs/artifacts inspected; named detail absent. | Exact future command and pre-cleanup capture are recorded in plan. |
+| `runtime.wait.garnet` hosted fix head | NOT REACHED | Hosted attempt failed at `generated.quality-negative`.  | No hosted proof; supervisor re-run required at repaired head.      |
+| #1747/#1754 reruns                    | NOT RUN     | Supervisor dispatch required at the pushed fix head.    | Both historical reproductions must rerun green.                    |
 
 ## PLAN-EVAL Disposition
 

@@ -70,6 +70,18 @@ evidence. Existing Aspire 13.5 receipt
 confirms that `aspire describe --format Json` is the source that can preserve named `healthReports`
 status/description/exception before cleanup.
 
+### Historical incident disposition
+
+The original runners have been cleaned up and their DCP/AppHost health logs were not retained or
+uploaded. Consequently, no later green run can establish whether historical `garnet_resp`,
+`test_only_garnet_resp`, or both were unhealthy. The incident's per-check root cause is
+unrecoverable from the retained evidence and remains **UNRESOLVED**.
+
+The shippable claim is deliberately narrower: the repair makes the RESP observation deterministic,
+preserves actionable per-key diagnostics for future failures, distinguishes unpublished from
+unhealthy health keys, and aligns the two Garnet 1.x pins. Hosted success validates those repaired
+contracts but must not be described as a retroactive diagnosis.
+
 ## Lead tested — PR #1740 endpoint port change
 
 Supervisor lead: PR #1740, commit `2a1248d33d55a9529d1e4822d9c850bc6caa4c16` (parent
@@ -160,8 +172,9 @@ tier asymmetry** because both select the same `1.1.1` container arm. The later h
 also proves that image/version can satisfy the check, although it does not explain the two earlier
 failures and cannot replace their missing per-check split. The `1.1.1`/`1.1.10` divergence is a
 **contributory cross-environment reliability risk** for Docker versus Docker-less runs, not a
-demonstrated cause of #1844. This issue should not bump to 2.x or align versions without a
-Docker-less failure/compatibility proof; Aspire 13.5.3 itself defaults to the 1.0 image line.
+demonstrated cause of #1844. The supervisor later authorized alignment to the existing `1.1.10` tool
+pin plus a drift guard to remove that independent risk; no 2.x compatibility claim is made, and
+Aspire 13.5.3 itself defaults to the 1.0 image line.
 
 ## RESP client investigation — superseded by minimal-probe evidence
 

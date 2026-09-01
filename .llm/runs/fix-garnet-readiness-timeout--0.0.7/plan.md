@@ -64,8 +64,8 @@ published-but-unhealthy key.
 ## Non-Scope
 
 - No timeout increase, readiness bypass, or check removal.
-- No Garnet 2.x bump or 1.x arm-alignment change without a separate Docker-less compatibility
-  failure proving that version work belongs to #1844.
+- No Garnet 2.x bump. The supervisor-authorized one-sided 1.x alignment to the existing
+  `GARNET_TOOL` pin is reliability scope, not evidence of incident causality.
 - No Redis client dependency, RESP3 negotiation, authentication flow, `CLIENT` command, or reusable
   general-purpose RESP parser. A full client adds handshake surface that a liveness probe does not
   need.
@@ -77,9 +77,8 @@ published-but-unhealthy key.
 
 ## Locked Product Path Ceiling
 
-**LOCKED NOW: zero code paths while PR #1773 owns `packages/cli/e2e/**` and PLAN-EVAL remains
-supervisor-owned.** After both gates clear, the complete code ceiling is exactly these six existing
-paths:
+The supervisor cleared PR #1773 and ruled `PLAN-EVAL: N/A`. The complete implementation ceiling is
+exactly these nine existing paths:
 
 1. `packages/cli/src/kernel/assets/aspire/helpers/_aspire-compat.ts.template`
 2. `packages/cli/src/kernel/assets/embedded.generated.ts` (mechanical regeneration only)
@@ -87,30 +86,34 @@ paths:
 4. `packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts`
 5. `packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts`
 6. `packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts`
+7. `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts`
+8. `packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts`
+9. `packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts`
 
-No new file or runtime-directory child is allowed. Any seventh code/test path requires an explicit
-rescope before editing.
+No new file or runtime-directory child is allowed. Any tenth code/test path requires an explicit
+rescope before editing. Run artifacts remain required cross-agent context and do not expand the
+product ceiling.
 
 ## Locked Decisions
 
-| ID  | Decision                                                                                                                                                   | Rationale                                                                                                                                             |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Poll `aspire describe --format Json` and report the matching resource's complete `healthReports` map.                                                      | The aggregate timeout alone cannot distinguish the checks; complete named reports also preserve host/port/error data for follow-up.                   |
-| D2  | Preserve the last described state and any describe subprocess error as diagnostic context.                                                                 | Diagnostics must not turn a failed observation into false success or erase the command failure.                                                       |
-| D3  | Do not hard-code a diagnosis or remove either check.                                                                                                       | The two possible outcomes require opposite repairs.                                                                                                   |
-| D4  | Replace Garnet's 300-second opaque wait with a 30-second named-health deadline; do not increase any timeout.                                               | Normal hosted readiness is 1007-1758 ms and the fixture already uses 30 seconds as its transition bound.                                              |
-| D5  | Add no file and no gate; edit the existing verifier and its existing test module.                                                                          | The runtime directory is at its 12-child ceiling and carries open debt.                                                                               |
-| D6  | Fix the minimal RESP probe regardless of the historical split or version outcome, while still capturing the split when hosted evidence is available.       | Fragment-sensitive framing and opaque diagnostics are defects independently of the historical trigger.                                                |
-| D7  | Do not treat #1740 as causal from timing alone.                                                                                                            | Both tiers' Garnet entries omit `Port`, so the proposed tier asymmetry is statically absent and the generated endpoint is unchanged for those inputs. |
-| D8  | Model four explicit states: resource absent, health key absent, expected key non-Healthy, and sibling report blocking aggregate health.                    | Those states lead to different ownership and error messages; an aggregate timeout erases the distinction.                                             |
-| D9  | Preserve each report's status, description, data, and exception, and print the blocking key names.                                                         | The RESP factory already exposes code/host/port; reliable evidence must not discard it.                                                               |
-| D10 | Poll named health state once per second for no more than 30 seconds; terminal protocol/configuration failures may fail immediately.                        | Startup-transient absence/refusal remains retryable, while `NOAUTH` and malformed completed replies cannot heal without configuration change.         |
-| D11 | Do not change Garnet versions in this incident plan.                                                                                                       | Both tiers select the same 1.1.1 container arm; skew is cross-environment risk, not the observed tier-asymmetry cause.                                |
-| D12 | Add no Redis client dependency.                                                                                                                            | `@redis/client` adds `HELLO`/`CLIENT SETINFO` handshake behavior and forcing RESP2 still hung against the supervisor's minimal responder.             |
-| D13 | Send exactly `*1\r\n$4\r\nPING\r\n` and accumulate bytes through the first CRLF-terminated reply.                                                          | This is the minimal canonical RESP2 command and removes TCP-segmentation sensitivity.                                                                 |
-| D14 | Make one connection attempt per Aspire health evaluation with one 2000 ms connect-plus-read deadline and a 64-byte diagnostic capture ceiling.             | Aspire already repeats health evaluations; internal retry would add latency and nondeterminism.                                                       |
-| D15 | Treat `NOAUTH` as `Unhealthy`, never `Degraded`, and preserve the server error in health data.                                                             | Aggregate `Healthy` can never be satisfied by `Degraded`; auth is absent today, so reaching this path is a configuration/protocol failure.            |
-| D16 | Render received bytes deterministically: printable ASCII literal, backslash/CR/LF escaped, other bytes as `\xHH`, and a truncation marker beyond 64 bytes. | Diagnostics must be stable, bounded, and useful for binary or malformed replies.                                                                      |
+| ID  | Decision                                                                                                                                                   | Rationale                                                                                                                                               |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Poll `aspire describe --format Json` and report the matching resource's complete `healthReports` map.                                                      | The aggregate timeout alone cannot distinguish the checks; complete named reports also preserve host/port/error data for follow-up.                     |
+| D2  | Preserve the last described state and any describe subprocess error as diagnostic context.                                                                 | Diagnostics must not turn a failed observation into false success or erase the command failure.                                                         |
+| D3  | Do not hard-code a diagnosis or remove either check.                                                                                                       | The two possible outcomes require opposite repairs.                                                                                                     |
+| D4  | Replace Garnet's 300-second opaque wait with a 30-second named-health deadline; do not increase any timeout.                                               | Normal hosted readiness is 1007-1758 ms and the fixture already uses 30 seconds as its transition bound.                                                |
+| D5  | Add no file and no gate; edit the existing verifier and its existing test module.                                                                          | The runtime directory is at its 12-child ceiling and carries open debt.                                                                                 |
+| D6  | Fix the minimal RESP probe regardless of the historical split or version outcome, while still capturing the split when hosted evidence is available.       | Fragment-sensitive framing and opaque diagnostics are defects independently of the historical trigger.                                                  |
+| D7  | Do not treat #1740 as causal from timing alone.                                                                                                            | Both tiers' Garnet entries omit `Port`, so the proposed tier asymmetry is statically absent and the generated endpoint is unchanged for those inputs.   |
+| D8  | Model four explicit states: resource absent, health key absent, expected key non-Healthy, and sibling report blocking aggregate health.                    | Those states lead to different ownership and error messages; an aggregate timeout erases the distinction.                                               |
+| D9  | Preserve each report's status, description, data, and exception, and print the blocking key names.                                                         | The RESP factory already exposes code/host/port; reliable evidence must not discard it.                                                                 |
+| D10 | Poll named health state once per second for no more than 30 seconds; terminal protocol/configuration failures may fail immediately.                        | Startup-transient absence/refusal remains retryable, while `NOAUTH` and malformed completed replies cannot heal without configuration change.           |
+| D11 | Align the Garnet container from `1.1.1` to the existing `GARNET_TOOL` pin `1.1.10`, with a dynamic drift guard.                                            | Both tiers used the same old image, so skew is not the observed tier-asymmetry cause; alignment removes a separate Docker/Docker-less reliability risk. |
+| D12 | Add no Redis client dependency.                                                                                                                            | `@redis/client` adds `HELLO`/`CLIENT SETINFO` handshake behavior and forcing RESP2 still hung against the supervisor's minimal responder.               |
+| D13 | Send exactly `*1\r\n$4\r\nPING\r\n` and accumulate bytes through the first CRLF-terminated reply.                                                          | This is the minimal canonical RESP2 command and removes TCP-segmentation sensitivity.                                                                   |
+| D14 | Make one connection attempt per Aspire health evaluation with one 2000 ms connect-plus-read deadline and a 64-byte diagnostic capture ceiling.             | Aspire already repeats health evaluations; internal retry would add latency and nondeterminism.                                                         |
+| D15 | Treat `NOAUTH` as `Unhealthy`, never `Degraded`, and preserve the server error in health data.                                                             | Aggregate `Healthy` can never be satisfied by `Degraded`; auth is absent today, so reaching this path is a configuration/protocol failure.              |
+| D16 | Render received bytes deterministically: printable ASCII literal, backslash/CR/LF escaped, other bytes as `\xHH`, and a truncation marker beyond 64 bytes. | Diagnostics must be stable, bounded, and useful for binary or malformed replies.                                                                        |
 
 ## Open-Decision Sweep
 
@@ -120,7 +123,7 @@ rescope before editing.
 | Exact repair path              | resolved for the mandatory reliability repair                                                                                    | Fix the probe and gate on their own merits; the split still selects any additional causal repair.                                                             |
 | Host/port resolution follow-up | safe to defer until split                                                                                                        | Inspect report `description`/`data` plus controller/DCP logs for the implicated check.                                                                        |
 | #1740 endpoint-port lead       | resolved for static premise; contingent at runtime                                                                               | No Garnet `Port` differs by tier and unpinned generated output is unchanged. Reopen only if the real check fails with contradictory hosted endpoint evidence. |
-| Garnet version skew            | resolved for this incident; contributory risk only                                                                               | Hosted Postgres and SQLite use the same 1.1.1 container arm. Do not align/bump without a Docker-less compatibility repro.                                     |
+| Garnet version skew            | resolved as contributory reliability risk; excluded as incident cause                                                            | Both tiers used the same 1.1.1 container arm. The image is aligned to the existing 1.1.10 tool pin and a guard prevents future drift; no 2.x bump.            |
 | Redis client                   | rejected                                                                                                                         | Connect-time negotiation adds health-probe failure modes; use one correct framed RESP2 PING.                                                                  |
 | `NOAUTH` reachability          | excluded for the checked-in managed paths; retained as a fail-loud contract                                                      | Cache schema/generator expose no auth input, managed commands pass no auth flags, external mode has no RESP check, and Garnet defaults to `NoAuth`.           |
 | Deno controller library        | resolved now                                                                                                                     | `@db/redis` is client-only; keep the fixture a bounded server that answers the minimal PING contract.                                                         |
@@ -178,12 +181,14 @@ rescope before editing.
 
 ## Commit Slices
 
-| # | Slice                                                                                                               | Proving gate                                                                                             | Files                        |
-| - | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| 1 | Record the no-diagnosis S1 research, locked diagnostic plan, measured base gates, collision, and proof standard.    | Artifact review; base static gate table; `deno.lock` byte comparison.                                    | the three run artifacts only |
-| 2 | After supervisor sequencing and PLAN-EVAL, implement the minimal bounded RESP PING and regenerate the asset barrel. | Six in-process cases pass; focused check/lint/fmt; `deno.lock` unchanged.                                | locked paths 1-3             |
-| 3 | Implement the 30-second named-health classifier and distinct gate diagnostics.                                      | Focused tests distinguish never-published from published-unhealthy and retain key/status/data/exception. | locked paths 4-6             |
-| 4 | Capture the hosted Postgres-tier split and complete authoritative proof.                                            | Hosted `scaffold.runtime` Postgres pass at fix head plus green #1747/#1754 reruns.                       | artifacts only after code    |
+| # | Slice                                                                                                               | Proving gate                                                                                              | Files                        |
+| - | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| 1 | Record the no-diagnosis S1 research, locked diagnostic plan, measured base gates, collision, and proof standard.    | Artifact review; base static gate table; `deno.lock` byte comparison.                                     | the three run artifacts only |
+| 2 | After supervisor sequencing and PLAN-EVAL, implement the minimal bounded RESP PING and regenerate the asset barrel. | Six in-process cases pass; focused check/lint/fmt; `deno.lock` unchanged.                                 | locked paths 1-3             |
+| 3 | Implement the 30-second named-health classifier and distinct gate diagnostics.                                      | Focused tests distinguish never-published from published-unhealthy and retain key/status/data/exception.  | locked paths 4-6             |
+| 4 | Align the Garnet 1.x image with the executable pin and add a dynamic drift guard.                                   | Generator RED/GREEN proves output follows `SCAFFOLD_VERSIONS.GARNET_TOOL`.                                | locked paths 7-9             |
+| 5 | Type-check and format-check the exact emitted compatibility helper.                                                 | Tests-only RED reproduces generated-workspace TS2322/TS2339; GREEN checks emitted content and formatting. | locked paths 1-3             |
+| 6 | Complete supervisor-dispatched hosted reliability proof.                                                            | Hosted `scaffold.runtime` Postgres pass at fix head plus green #1747/#1754 reruns.                        | artifacts only after code    |
 
 ## Gate Table and Measured Base Baselines
 
@@ -205,8 +210,8 @@ rescope before editing.
 
 A unit test is necessary but not sufficient. Final repair acceptance requires all of the following:
 
-1. The diagnostic failing-head run captures the status of both `garnet_resp` and
-   `test_only_garnet_resp`, selecting the correct ownership path.
+1. No artifact, PR, issue, or review claims which historical health key failed. The original DCP and
+   per-key health logs were not retained, so that historical split cannot now be recovered.
 2. `runtime.wait.garnet` passes on the **Postgres tier** in a hosted `scaffold.runtime` run at the
    repair head.
 3. #1747 and #1754 are rerun at that repair head and are green.
@@ -214,6 +219,15 @@ A unit test is necessary but not sufficient. Final repair acceptance requires al
 5. An intentionally absent health key and an intentionally unreachable listener fail with distinct
    diagnostics that name the resource, health key, last state, and observed status/description/
    code/host/port/elapsed/received bytes; the terminal case does not consume a 300-second wall.
+
+## Closing Semantics
+
+This change makes the Garnet readiness signal deterministic and diagnosable, proves the emitted
+AppHost helper compiles and formats, and aligns the two 1.x version pins. A green fix-head hosted
+run proves those repaired contracts; it does **not** retroactively diagnose the two historical
+300-second failures. #1844 may close only on that narrower reliability claim, stated explicitly in
+the issue/PR surface by the supervisor, never on an assertion that `garnet_resp` or
+`test_only_garnet_resp` was historically responsible.
 
 ## Risk Register
 
