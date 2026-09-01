@@ -8727,3 +8727,55 @@ not a licence to widen scope.
 **#1802** delta eval running, `check-test` pending, close-gate PASS. **#1846** parked on the deferred
 runtime proof. **#1876/#1543** draft, delivered and verified, awaiting IMPL-EVAL. **#1351** plan slice
 with the split ruling delivered. **#1879** filed and unstarted.
+
+
+## D-199 - #1879 dispatched in parallel; #1876 under evaluation; five lanes live
+
+### #1879 dispatched - isolation checked, not assumed
+
+Measured the surfaces before running it in parallel:
+
+| Leaf | Manifests | `deno.lock` |
+| --- | --- | --- |
+| #1876 (#1543) | `packages/plugin-workers-core`, `plugins/triggers` | yes |
+| #1879 | root + `packages/service`, `contracts`, `plugin-ai-core`, `plugin`, `cli/e2e` | yes |
+
+**Manifests are disjoint; only the lock is shared.** That is a merge-ordering concern, not a reason to
+serialize the work - so both run concurrently and the brief tells #1879 explicitly that #1876 is
+further along, that its own lock delta is **not final until final freeze**, and that it must take one
+integration at the end and re-capture the single-copy and frozen-install proofs **at the integrated
+head** rather than chasing `main`.
+
+The brief also names the load-bearing proof so it cannot be mistaken for a version bump: `deno why
+@orpc/shared` must show **exactly one** resolved copy. The graph carries **two** today (`1.14.6` and
+`1.14.7`) - a bump that leaves two copies has failed even if everything compiles. It also forbids
+removing the `Symbol.hasInstance` workaround here, since that is only safe once single-copy holds.
+
+Told to enumerate every `@orpc/*` specifier itself rather than trusting the root manifest - a member
+left behind reintroduces the very hazard being removed.
+
+### #1876 IMPL-EVAL dispatched
+
+Brief hands over the pre-dispatch finding (`publish:dry-run` returns **0**, so this is consistency not
+release-integrity, and acceptance box 3 is conditional/N-A) as a **claim to re-derive** - if publishing
+turns out to be affected, that inverts the slice's framing and is blocking. It also flags that the
+issue's import-site list is **incomplete** (`plugins/triggers/src/public/mod.ts` is omitted) and
+requires the evaluator to derive the full set, since a third undeclared member would defeat the slice.
+Open question handed over honestly: is declaring the dependency even the right fix, or was the
+documentation route correct? The issue permits either.
+
+### #1802 - CI green, one gate left
+
+`check-test` **pass** (8m45s) at `0c938c3e6`; `close-gate` PASS with current provenance. The bounded
+delta IMPL-EVAL is running to supply the exact-head attestation the recorded PASS (`5ac0275c7`) does
+not provide. No packet until it returns.
+
+### Lane state - five live, none idle
+
+| Lane | State |
+| --- | --- |
+| #1802 | CI green; delta eval running |
+| #1846 | parked on the deferred 3-arrival runtime proof (correct) |
+| #1876 / #1543 | draft, delivered and verified; IMPL-EVAL running |
+| #1351 | plan slice; split ruling delivered |
+| #1879 | launched; lock-only family move |
