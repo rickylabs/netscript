@@ -93,7 +93,7 @@ class LazyPluginServiceKv implements PluginServiceKv {
  * @example
  * ```ts
  * import { getKv } from '@netscript/kv';
- * import { createPluginServiceContext } from '@netscript/plugin';
+ * import { createPluginServiceContext } from '@netscript/plugin/sdk';
  *
  * // The host owns the database client and supplies it as an async resolver.
  * // Any `() => Promise<unknown>` satisfies the contract, so the plugin package
