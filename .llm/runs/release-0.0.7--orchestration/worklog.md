@@ -3532,3 +3532,22 @@
   Aspire resource. Its bounded delta IMPL-EVAL is active with emitted-output and mutation proof;
   S9/S10/S11/S13 remain dependency-ordered behind S8 rather than idle. Host inventories remain
   exact zero for Aspire applications and DinD containers.
+
+## 2026-09-01T05:28:10Z — owner correction: harness runs are committed continuity, not strip targets
+
+- The owner ruled that `.llm/runs/**` is intentionally committed cross-agent context. Cleanup is
+  considered only after a stable release, only against an owner-selected set, and selected runs may
+  survive into later milestones. Secrets remain forbidden, but session/thread identity, worktree
+  paths, receipts, and resumable state are not leakage merely because they are operational context.
+- The coordinator's earlier application of the NAS handoff rule to repository harness runs was not
+  owner-authorized and contradicted the intended Harness lifecycle. That interpretation is
+  superseded. Root `AGENTS.md`, the harness skill, the milestone profile, and the NAS orientation
+  guide now state the owner-controlled retention rule explicitly.
+- Fixes PR #1773's in-flight 25-file stripping commit `af1c06848` was reverted in full by
+  `550bc44e9` and pushed; its scoped run is restored while fresh CI runs at the restored head.
+- Issue #1847 is a false-positive cleanup proposal under the superseded interpretation and is being
+  closed. Aspire must likewise restore the six S7 run artifacts removed at `6ef9306ef` as part of
+  its bounded compatibility repair. Internals is assigned a preservation leaf to restore the
+  already-merged #1816 and #1835 run directories without changing product blobs.
+- The train remains active: Fixes lands #1773, then immediately implements and ships #1844's Garnet
+  readiness/alignment repair; Aspire consumes that merge and completes the remaining 13.5 sequence.

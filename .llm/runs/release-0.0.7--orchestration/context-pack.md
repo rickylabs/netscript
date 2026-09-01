@@ -2266,3 +2266,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   is in delta IMPL-EVAL; its dependency chain then releases S9, S10, S11, and S13. S7 continues in
   parallel behind the confirmed Garnet readiness repair. No owner-only decision is pending and host
   runtime inventories are zero.
+
+## Resume delta — 2026-09-01T05:28:10Z
+
+- Owner retention ruling supersedes every earlier reference in this pack to stripping or excluding
+  `.llm/runs/**`: repository harness runs are intentionally committed cross-agent context. They are
+  cleaned only after a stable release and only when the owner selects the deletion set; the owner
+  may preserve selected runs across milestones. Secrets remain prohibited.
+- The prior #1816/#1835 stripping decisions were coordinator mistakes under a conflicting NAS rule,
+  not owner decisions. The global and repository instructions plus Harness doctrine are corrected;
+  #1847 is invalid and must close. #1773's stripping was fully reverted at `550bc44e9`; Aspire must
+  restore S7's in-flight run deletion, and a preservation leaf restores already-merged run context.
+- Merge sequence remains execution-focused: merge #1773 after restored-head CI, release #1844 to
+  implement and ship the Garnet 1.1.10/readiness alignment, then have Aspire pull current main and
+  finish its 13.5 dependency chain for canary 6. Independent topic work continues in parallel.

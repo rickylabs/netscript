@@ -55,6 +55,19 @@ only for a single deliverable whose phase groups must integrate before reaching 
 - The milestone's _content_ lands through the delegated PRs, not the orchestrator's branch; the
   orchestrator's own commits are run artifacts and any doctrine promoted at close.
 
+### Run retention and cleanup
+
+`.llm/runs/**` is deliberately git-tracked so coordinators, supervisors, implementers, evaluators,
+and later milestones can recover exact cross-agent context. Scoped run directories—including
+session/thread identity, worktree paths, receipts, and resumable state—ship with their PRs and are
+not operational debris to strip at merge time. Secrets and tokens remain prohibited.
+
+A stable release creates a cleanup opportunity, not an automatic purge. The owner decides which run
+directories, if any, are deleted after the stable cut and may explicitly preserve selected runs for
+later milestones. Before that ruling, every agent preserves the tracked run directories; no
+supervisor, evaluator, cleanup lane, or merge audit may infer retention from age, path shape, host
+metadata, or PR type.
+
 Create the five milestone artifacts from `templates/`, then run:
 
 ```text

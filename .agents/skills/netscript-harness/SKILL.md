@@ -182,6 +182,13 @@ routing here — defer to that file. The items below are the parts of the contra
 
 Run artifacts live under `.llm/runs/<run-id>/` and use templates from `.llm/harness/templates/`.
 
+They are intentionally committed cross-agent context, including the identity, worktree-path,
+receipt, and resumable-state records needed to continue or audit a run. Do not strip, untrack,
+redact, or block a PR merely because its scoped run directory contains those records. Secrets and
+tokens are forbidden in run artifacts. Retention is owner-controlled: after a stable release the
+owner may select run directories for cleanup and may preserve selected runs across milestones; no
+agent may perform that cleanup pre-release or infer a deletion set without the owner's instruction.
+
 `<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
 
 | File                | Purpose                                                                                           |

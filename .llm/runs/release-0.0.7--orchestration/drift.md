@@ -1722,3 +1722,20 @@ implementation thread.
 - A canary tag is not a completed canary. Completion requires registry upload, exact-version install,
   published-CLI scaffold runtime, the seven-verdict quickstart walk, ephemeral-branch cleanup, and a
   green `release/canary-pair` status on the exact source SHA.
+
+## 2026-09-01 — NAS handoff secrecy and repository harness retention are separate policies
+
+- The coordinator incorrectly generalized the NAS rule for untracked migration handoffs to tracked
+  `.llm/runs/**` and stripped run artifacts from merge candidates without owner authorization. The
+  owner clarified that committed harness runs are intentional cross-agent continuity and that this
+  cleanup decision was contrary to their established release lifecycle.
+- Correct boundary: migration handoffs and secrets never publish; repository harness runs normally
+  do. Session/thread identities, worktree paths, receipts, and resumable state are expected harness
+  context, not automatic leakage. No agent may strip or untrack a scoped run merely because it is
+  operational or host-specific.
+- Cleanup is a post-stable-release owner decision, never an automatic release step. The owner selects
+  deletions and may preserve runs into later milestones. Merge audits must treat an unexpected
+  deletion—not the presence of the run—as the retention defect unless the owner authorized it.
+- Recovery is additive and history-preserving: revert in-flight strip commits, restore already
+  merged context in a bounded preservation PR, close false issue #1847, and do not rewrite shared
+  history.
