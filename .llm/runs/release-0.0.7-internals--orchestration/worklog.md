@@ -9152,3 +9152,50 @@ Flagged acceptance 4 as the one most likely to be skimped: a fix without a test 
 
 The only outstanding owner-boundary item remains #1846's runtime proof, which cannot run without
 contending with the globally-serialized queue it protects.
+
+
+## D-207 - #1846 reclassified: a scheduling dependency, not an owner boundary; auto-release armed
+
+**Correction accepted.** I had been reporting #1846's deferred runtime proof as the lane's one true
+owner boundary. It is not - it serialises behind the **hosted** runtime queue only, and the local
+Aspire lease is zero. Calling it an owner boundary made it look like something waiting on a decision
+when it was only waiting on a slot, which is exactly the kind of misclassification that turns into
+idling.
+
+### Measured the actual precondition rather than assuming a slot was free
+
+#1858's runtime tiers **failed at 48s each**, so that retry is not occupying the lane. But the queue
+**is** occupied - by other branches entirely: `feat/plugin-service-context-factory` (pending +
+in_progress) and `fix/scaffold-island-hydration` (in_progress). **4 active runtime-tier jobs** at
+check time.
+
+Built an exact drain check against the two job names the procedure names
+(`scaffold-runtime (aspire + docker + postgres)`, `scaffold-runtime-sqlite (aspire + sqlite + garnet)`)
+across every non-completed `e2e-cli` run - `/home/agent/observability/ns1846-drain-check.sh`, exit 0
+only when zero are active. It currently reports **4**.
+
+### Automatic release armed - no polling by me, no idling
+
+A background watcher evaluates the drain check every 45s for up to 3h and, the moment it clears,
+dispatches the release to the leaf's own thread with its own retry loop. So the proof starts at slot
+availability without a human or supervisor turn in the path.
+
+### The release message keeps the safety property the procedure already had
+
+The author's `exact-runtime-proof-procedure.md` requires a hard drain precondition before opening any
+proof PR. The release explicitly tells it to **re-verify that precondition at execution time** and to
+**stop and report if the lane has re-occupied** between the message and its first command - *"the
+release authorises the proof, not a race."* A drain check performed by me minutes earlier is not proof
+the lane is free when it actually runs.
+
+Also carried forward: the standalone no-op runs stay as general scheduler evidence and must **not**
+appear in box-1 evidence; and the `acceptance-evidence` block must be authored **in one piece once
+every box is satisfiable** - the previous block's `DEFERRED` entries would have ticked unproven boxes,
+since `validateEvidenceMapping` never inspects evidence text.
+
+### Lane state - five lanes, none blocked on me
+
+**#1876** cycle-2 IMPL-EVAL running. **#1351** implementing. **#1879** implementing widened scope.
+**#1888** launched. **#1846** auto-release armed on queue drain.
+
+**No outstanding owner boundary and no second terminal IMPL-EVAL failure.**
