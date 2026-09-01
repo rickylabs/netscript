@@ -3377,3 +3377,47 @@ stands; it needs an owner push, not more agent work.
 **Note on #1857:** it carries no acceptance checkboxes (written as prose), so `close-gate` on #1869
 reads that PR's own Definition-of-Done list instead. That is why the gate's four failures are DoD
 boxes rather than mirror mismatches.
+
+## 2026-09-01 — #1869 IMPL-EVAL PASS; finalization
+
+**VERDICT: PASS** — GLM 5.3 Flash · `max` · session `fbce8ed7` · head `240d67284`.
+
+The evaluator reproduced the cumulative-mapping set-difference (lost=∅), all three coverage
+measurements (17/150, 125/175, 5/84, every gap nonzero), and all seven new Purposes independently,
+and judged the `auth` exclusion on its merits — confirming the `## Units` table indexes exactly the
+five packages the reason names.
+
+**It proved the new coverage check bites**, which a green gate alone cannot show:
+1. emptying `EXCLUDED_REFERENCE_PAGES` → FAIL naming the auth page
+2. deleting the `plugin-workers` row → FAIL naming the workers page
+3. dual-listing a page → FAIL with the "in both" error
+
+Reverted clean and green. Without this, the check could have been inert and every gate would still
+have passed.
+
+### New automation gap — `gh pr edit` is unusable with this token
+
+`gh pr edit` goes through **GraphQL**, which requires `read:org`; this token carries only `repo`. It
+fails with a scope error **and `--body-file`/`--add-label` silently do nothing**, so a naive
+`cmd && echo ok` reports success while nothing changed. I caught it only by re-reading the live PR.
+
+**Workaround (used here, works on `repo` alone):**
+- body → `gh api repos/<o>/<r>/pulls/<n> -X PATCH --input <json>`
+- add label → `gh api repos/<o>/<r>/issues/<n>/labels -X POST -f 'labels[]=<label>'`
+- remove label → `gh api repos/<o>/<r>/issues/<n>/labels/<label> -X DELETE`
+
+This is the same credential boundary that parks #1756 (`workflow` scope), surfacing in a second
+place. **Always verify a `gh pr edit` result by re-reading the live object.**
+
+### Finalization state
+
+- PR body carries the full Tier-A + IMPL-EVAL record
+- `status:impl` → **`status:ready-merge`** (verified live after the write)
+- `orchestrator:docs` present since open, per the coordinator's taxonomy correction
+- thread gate: `review-threads PASS threads=0 unanswered=0`
+- close-gate re-cut dispatched against the corrected body/labels (run `33483167557`)
+
+**Process note recorded on the PR:** the implementer ticked its own Definition-of-Done boxes before
+independent verification. Every claim was subsequently confirmed by Tier-A and IMPL-EVAL, so they
+stand, but the ordering inverts the "tick only once evidenced" rule. Future briefs should state that
+DoD boxes are supervisor-owned.
