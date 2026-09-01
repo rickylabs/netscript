@@ -54,3 +54,97 @@ Deno.test('missing and malformed mount labels expose no path evidence', () => {
   assertEquals(parseMountSource('type=bind,dst=/data'), undefined);
   assertEquals(parseMountSource('type=bind,src=/worktree/.data,dst=/data'), '/worktree/.data');
 });
+
+// Volume/network shapes are synthesized from Docker's documented inspect output: issue #1855 was
+// repaired without a runtime lease, so no live capture existed. Replace with a captured fixture on
+// the next runtime-verification slice.
+Deno.test('volume and network probes observe Aspire-managed resources and skip unlabelled ones', async () => {
+  const containerInspect = [{
+    Id: 'ownedcidfull',
+    Name: '/postgres-owned',
+    Config: { Labels: { 'com.microsoft.developer.usvc-dev.creatorProcessId': '45429' } },
+    Mounts: [{ Type: 'volume', Name: 'anonvolume' }],
+  }];
+  const commands: CommandPort = {
+    run(command) {
+      const [bin, verb, arg] = command;
+      if (bin === 'aspire') return Promise.resolve({ code: 0, stdout: '[]', stderr: '' });
+      if (bin === 'docker' && verb === 'ps') {
+        return Promise.resolve({ code: 0, stdout: 'ownedcid\n', stderr: '' });
+      }
+      if (bin === 'docker' && verb === 'inspect') {
+        return Promise.resolve({ code: 0, stdout: JSON.stringify(containerInspect), stderr: '' });
+      }
+      if (bin === 'docker' && verb === 'volume') {
+        return Promise.resolve(
+          arg === 'ls' ? { code: 0, stdout: 'anonvolume\n', stderr: '' } : {
+            code: 0,
+            stdout: JSON.stringify([{
+              Name: 'anonvolume',
+              Driver: 'local',
+              CreatedAt: '2026-08-01T21:58:00Z',
+              Mountpoint: '/var/lib/docker/volumes/anonvolume/_data',
+              Labels: null,
+            }]),
+            stderr: '',
+          },
+        );
+      }
+      if (bin === 'docker' && verb === 'network') {
+        return Promise.resolve(
+          arg === 'ls' ? { code: 0, stdout: 'net581c13b7\nnetbridge\n', stderr: '' } : {
+            code: 0,
+            stdout: JSON.stringify([
+              {
+                Name: 'aspire-persistent-network-581c13b7-aspire-managed',
+                Id: 'net581c13b7full',
+                Created: '2026-08-01T20:00:00Z',
+                Labels: { 'com.microsoft.developer.usvc-dev.name': 'aspire-managed' },
+                Containers: {},
+              },
+              {
+                // A host default network carries no Aspire labels and must not become a candidate.
+                Name: 'bridge',
+                Id: 'netbridgefull',
+                Created: '2025-01-01T00:00:00Z',
+                Labels: {},
+                Containers: {},
+              },
+            ]),
+            stderr: '',
+          },
+        );
+      }
+      return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+    },
+  };
+  const files: FilePort = {
+    realPath: (path) => Promise.resolve(path),
+    readText: () => Promise.resolve(''),
+  };
+  const resources = await probeResources(commands, files, 50);
+  assertEquals(resources, [
+    {
+      kind: 'container',
+      id: 'ownedcidfull',
+      name: 'postgres-owned',
+      creatorPid: 45429,
+      creatorProcessStartTime: undefined,
+      mountSource: undefined,
+      createdAt: undefined,
+    },
+    {
+      kind: 'volume',
+      id: 'anonvolume',
+      createdAt: '2026-08-01T21:58:00Z',
+      mountedBy: ['ownedcidfull'],
+    },
+    {
+      kind: 'network',
+      id: 'net581c13b7full',
+      name: 'aspire-persistent-network-581c13b7-aspire-managed',
+      createdAt: '2026-08-01T20:00:00Z',
+      attachedContainers: [],
+    },
+  ]);
+});

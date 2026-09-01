@@ -11,6 +11,12 @@ export interface TeardownResult {
   readonly stoppedAppHosts: readonly string[];
   readonly removedContainers: readonly string[];
   readonly escalated: readonly LeakEntry[];
+  /**
+   * DCP-managed networks this run cannot positively own (see `LeakEntry.atRiskFromUpstream`).
+   * They are reported, never mutated: `aspire stop`'s own cleanup controller decides their fate,
+   * and repo code cannot prevent or intercept that — only record what existed before cleanup.
+   */
+  readonly atRiskNetworks: readonly LeakEntry[];
 }
 
 /** Maps a completed teardown to an honest CLI status. */
@@ -53,7 +59,20 @@ async function appHostGone(
   return Boolean(resource.appHostStartedAt && startedAt && startedAt !== resource.appHostStartedAt);
 }
 
-/** Stops/removes only positively owned resources; mutation requires explicit apply=true. */
+/**
+ * Stops/removes only positively owned resources; mutation requires explicit apply=true.
+ *
+ * Two Docker resource classes are deliberately outside mutation. Networks are never removed:
+ * `aspire stop` tears down the AppHost's DCP session, and DCP's own cleanup controller reaps
+ * Aspire-managed networks whose owning workload looks abandoned — keyed on DCP metadata, not on
+ * anything this repo does, so a foreign run's persistent network can be removed as collateral
+ * (issue #1855). The repo cannot prevent or intercept that from inside `aspire stop`; the honest
+ * mitigation is `probeNetworks` + `LeakEntry.atRiskFromUpstream`, which record foreign networks
+ * before cleanup so nothing disappears silently. Standalone volumes are likewise never removed
+ * directly; a run's anonymous volumes die with their containers via `docker rm -f -v`, which
+ * leaves Docker — not a name pattern here — to decide which volumes are anonymous, and named
+ * volumes always survive.
+ */
 export async function runTeardown(
   report: LeakReport,
   registry: RunResourceRegistry,
@@ -65,7 +84,12 @@ export async function runTeardown(
   const stoppedAppHosts: string[] = [];
   const removedContainers: string[] = [];
   const escalated = report.survivors.filter((entry) => entry.ownership !== 'owned');
-  if (!apply) return { applied: false, stoppedAppHosts, removedContainers, escalated };
+  const atRiskNetworks = report.survivors.filter(
+    (entry) => entry.resource.kind === 'network' && entry.atRiskFromUpstream,
+  );
+  if (!apply) {
+    return { applied: false, stoppedAppHosts, removedContainers, escalated, atRiskNetworks };
+  }
 
   const attempts = options.confirmAttempts ?? DEFAULT_CONFIRM_ATTEMPTS;
   const intervalMs = options.confirmIntervalMs ?? DEFAULT_CONFIRM_INTERVAL_MS;
@@ -104,11 +128,11 @@ export async function runTeardown(
       escalated.push(entry);
       continue;
     }
-    const result = await commands.run(['docker', 'rm', '-f', fresh.id], 30_000);
+    const result = await commands.run(['docker', 'rm', '-f', '-v', fresh.id], 30_000);
     if (result.code === 0) removedContainers.push(fresh.id);
     else escalated.push(entry);
   }
-  return { applied: true, stoppedAppHosts, removedContainers, escalated };
+  return { applied: true, stoppedAppHosts, removedContainers, escalated, atRiskNetworks };
 }
 
 function parseArgs(
