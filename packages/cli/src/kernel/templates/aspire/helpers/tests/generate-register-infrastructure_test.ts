@@ -319,7 +319,7 @@ describe('generateRegisterInfrastructure', () => {
 
     assertStringIncludes(
       output,
-      `builder.addContainer('garnet', 'ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}')`,
+      `builder.addContainer("garnet", "ghcr.io/microsoft/garnet:${SCAFFOLD_VERSIONS.GARNET_TOOL}")`,
     )
   })
 
@@ -338,7 +338,7 @@ describe('generateRegisterInfrastructure', () => {
     })
 
     // Local mode: no container, no endpoint — consumers use in-process Deno.openKv().
-    assert(!output.includes(`builder.addContainer('deno-kv'`))
+    assert(!output.includes(`builder.addContainer("deno-kv"`))
     assert(!output.includes(`cacheEndpoints.set('deno-kv'`))
     assertStringIncludes(
       output,
