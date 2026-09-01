@@ -36,6 +36,18 @@ export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
   {
+    name: 'fresh',
+    packagePath: 'packages/fresh',
+    docPath: 'docs/site/reference/fresh/index.md',
+    packageName: '@netscript/fresh',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all sixteen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.',
+    },
+  },
+  {
     name: 'plugin-workers-core',
     packagePath: 'packages/plugin-workers-core',
     docPath: 'docs/site/reference/plugin-workers-core/index.md',
