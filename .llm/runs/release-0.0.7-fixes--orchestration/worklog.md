@@ -7591,3 +7591,64 @@ as "not approved" while that id is simultaneously `OPENROUTER_MODEL_IDS.implEval
 a later identical dispatch succeeded. Worth a guard: the approved-model list should be read at call
 time, or the server restarted on config change, or dispatch failures should name the loaded config
 revision so a stale server is distinguishable from a genuinely unapproved model.
+
+## #1845 discriminating measurement (2026-09-01) — leading hypothesis REFUTED, receipt partly invalid
+
+Read from the local Deno cache: `@fresh/plugin-vite@1.1.2` delegates island discovery to
+`@fresh/core@2.3.3`. Source-verified, not inferred.
+
+### H1 (islandSpecifiers) is dead
+
+`crawlFsItem` (`@fresh/core/2.3.3/src/dev/fs_crawl.ts:124-147`) walks **two** roots and unions them:
+the `islands` dir, **and** `routes`, where `crawlRouteDir:20-30` matches
+`GROUP_REG = /[/\\]\((_[^/\\]+)\)[/\\]/` and treats a captured group of exactly `_islands` as an
+island. **`(_islands)` collocation is a first-class, sufficient discovery path requiring no registered
+specifier.** `islandSpecifiers` is a *third, additive* mechanism for islands shipped from remote
+`jsr:`/`npm:` packages the filesystem crawl cannot reach; it registers the specifier module itself,
+and does **not** mark importers.
+
+Registration is permissive too: `IslandPreparer.prepare` (`build_cache.ts:100-122`) registers every
+function-valued export by reference, mapping `default` -> module name.
+
+The premise that the design islands differ from `ServiceShowcaseLab` by specifier is **false** — none
+of `ServiceShowcaseLab`, `FloatingSurfaceDemo`, or `TokenClipboard` imports
+`@netscript/fresh/defer/island`. All three are discovered purely by `(_islands)` collocation.
+
+### The #1845 receipt's key signal is meaningless
+
+Fresh 2.3.3 emits **no island DOM element**. `wrapWithMarker` emits Preact `UNSTABLE_comment`
+fragments producing HTML **comment nodes** — `<!--frsh:island:<name>:<idx>-->` … `<!--/frsh:island-->`
+— and the client runtime hydrates by scanning comment nodes for the `frsh:` prefix. **Therefore
+`freshIslandElement: null` is equally true of a fully working app.** Any diagnosis resting on it is
+unsupported, which plausibly explains why three prior confident diagnoses failed.
+
+### Cheapest next measurement (no lease needed beyond an already-running app)
+
+`curl -s http://<app>/examples/<service>`, then grep the HTML for `frsh:island` and `Typed query lab`:
+
+- `frsh:island` present -> registered and SSR'd; defect is purely client-side (client entry not
+  loaded, island chunk 404, or a hydration throw).
+- `Typed query lab` present, `frsh:island` absent -> module registered but the rendered component
+  reference did not match `islandRegistry` (module-identity problem).
+- both absent -> the `lab` layer rendered `null`; a data/loader defect, not an island defect.
+
+### Anchors, and one trap
+
+- **Do NOT add `@netscript/fresh/query` to `islandSpecifiers`** (`vite.config.ts.template:40` — note
+  `:40`, not `:45`). Verified harmful-shaped: it would register that module's own exports as islands,
+  not `ServiceShowcaseLab`.
+- Candidate asymmetry (inferred, **not** proven): `define-page/runtime/mod.tsx:177` —
+  `const component = data ? renderLayerComponent(...) : null;`. A layer whose loader resolves falsy
+  renders nothing, silently; the fallback is only consulted on the `shouldDefer` branch. The `lab`
+  layer uses the loader form; the design layers use a props factory returning `{}`, always truthy.
+  Counter-evidence: `service-showcase.ts.template:79-95` always returns an object or throws, and
+  resources are awaited eagerly. Outcome (c) above would prove it.
+- Upstream, **not** the cause: `isIslandPath` in `@fresh/plugin-vite` has a dead second branch (the
+  first `if (!relIsland.startsWith('..'))` always returns), so files added/removed under `(_islands)`
+  mid dev-session need a restart. Cold-start discovery is unaffected.
+- Asset-tree trap: templates under `assets/app/routes/examples/(_islands)/` are **written** to
+  `routes/examples/<serviceName>/(_islands)/` (`write-app-files.ts:113`,
+  `write-example-service-app-files.ts:113`), which is what makes the island's `../(_lib)/` imports
+  resolve.
+
+Root cause remains **undetermined**; no fix is named on purpose.
