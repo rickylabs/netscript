@@ -6885,3 +6885,54 @@
     an inline string — an inline brief fails `File name too long (os error 36)`, and a path-shaped
     prompt fails `readfile`. And `gh pr edit --body-file` trips an **org-scope GraphQL** query on this
     token; `gh api -X PATCH repos/…/pulls/<n>` works and is the route to use for body repairs.
+
+- **D-271 — all seven slices restacked onto `38f2ce735` and packeted; two further S9 defects found and
+  fixed; a cross-lane collision surfaced before Fixes spends a cycle on it.**
+  - **Full chain restacked and pushed** (S7 and #1747 completed this pass):
+
+    | Slice | PR | Head | Own | Conflicts | Carry (identical/own) |
+    | --- | --- | --- | --: | --- | --- |
+    | S8 | #1754 | `d11431fec` | 26 | 0 | eval carry **incomplete** — 10 reconverged blobs |
+    | S9 | #1759 | `b8c59f0c7` | 14+2 | 1 carrier | 113/119 |
+    | S10 | #1760 | `eb97c6a99` | 13 | 2 D-101 | 34/39 |
+    | S11 | #1771 | `d396cd367` | 13 | **0** | **24/24 — carries exactly** |
+    | S13 | #1779 | `ab63b7eb1` | 9 | 3 | 57/65 |
+    | S7 | #1744 | `647d040bd` | 17 | 1 (#1840, pre-ruled) | 110/112 |
+    | #1747 | #1747 | `90c7c45a6` | 15 | **0** | 18/19 |
+
+    Every trial prediction held. **#1747 is the instructive one**: it replayed with *zero conflicts* and
+    still changed one blob, because git auto-merged `generators-background-app_test.ts` against main
+    without stopping. **A clean replay is not an unchanged tree** — scoping its delta eval from conflict
+    count would have handed that file an unearned verdict.
+  - **S9 had TWO independent static defects, and `check-test` is two gates.** Fixing `check` and
+    declaring victory would have been a premature all-clear:
+    1. `check` — the TS2322 from D-262, fixed; CI independently confirms `check` is no longer among the
+       failing gates.
+    2. `test` — the repo-wide suite failed **4683 passed / 1 failed** on
+       `task-separator_test.ts`: S9 adds `agentic:dogfood-skills:check` to `deno.json` but never
+       registered it in the survey that asserts every `agentic:*` task is strict or explicitly
+       permissive. Classified **permissive**, mirroring `agentic:sync-claude:check` beside
+       `agentic:sync-claude` — same entrypoint with `--check`, already permissive. Suite now 5/0.
+       The CI log never showed this; it lives in an uploaded report artifact, so reproducing locally was
+       the only way to see it.
+  - **Cross-lane collision found and surfaced before the Fixes leaf is written.**
+    `wait-for-workers-runtime.ts` is **present on main, S8 and S9, and deleted by S10's own commit
+    `07f9780bf`** — and it is the file the incoming bounded OR-marker leaf targets. S10 does not relax
+    the markers; it **replaces the log-scrape wholesale** with a structured
+    `describe-follow.ts assert … aspire-describe.ndjson workers` gate, so at S10's head there is no Web
+    Worker text requirement to relax at all.
+    - Posted on #1865 and #1760 with three specifics: the leaf is **still** the correct immediate
+      unblock (S10 is several merges away and Phase B needs the baseline green on current main); it
+      should be **scoped as a stopgap** because hardening effort is written off when S10 lands; and
+      **S10 must not be asked to adopt the OR-marker fix** — a reviewer pattern-matching "same gate id,
+      same fix" would be requesting a change with no target. Merge-time resolution pre-ruled:
+      delete-vs-modify, S10's deletion wins.
+  - **Truthfulness repairs completed**: #1720 A4 no longer claims to close #863; #1754's six orphaned
+    SHA citations remapped and its IMPL-EVAL box un-ticked; #1779's eval box un-ticked with bounded
+    scope; #1771's **kept ticked with the 24/24 proof** — un-ticking a true claim would have been an
+    error in the other direction.
+  - **S13's box 5 is half-blocked on main, not on S13**: `agentic:sync-claude:check` fails identically
+    on a clean worktree at `origin/main 38f2ce735` (`stale: .claude/skills/netscript-harness/SKILL.md`).
+    Reported, not absorbed into the slice's scope.
+  - **Bounded post-D248 IMPL-EVAL still running** at `d11431fec` over exactly the 10 reconverged product
+    files. Phase B remains queued behind #1865 plus the workers baseline leaf.
