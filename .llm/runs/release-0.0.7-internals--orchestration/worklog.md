@@ -7871,3 +7871,51 @@ Also corrected #1846's metadata, which was incomplete: added `orchestrator:inter
 Author instructed to prepare — but **not execute** — the exact 3-arrival procedure, naming how
 serialization will be asserted **from run timestamps rather than configuration**, and how head
 immutability will be shown, so the procedure is reviewable *before* it consumes real runtime slots.
+
+## D-182 — #1840 unsafe casts repaired and converged onto current main
+
+Audit confirmed the diagnosis. The author had already written the right fix — an
+`isMember<T extends string>(values: readonly T[], value: string): value is T` guard replacing all four
+`X.includes(y as never)` sites, so the call sites read as **narrowing** rather than as a cast escape
+hatch. It chose that over an allowance independently.
+
+I cancelled my own queued steer once I saw the fix in its working tree: it would have instructed work
+already done, and a stale "do this" instruction is worse than none.
+
+### Verified before and after the convergence
+
+| Check | Exit | Result |
+| --- | ---: | --- |
+| `quality:scan` over all 60 changed files | **0** | **0 findings** (was 4 `unsafe-cast`) |
+| `as never` remaining in the file | — | **0** |
+| `deno task agentic:codex-resume -- --help` | **0** | documented form works |
+| `-- --bogus` | **2** | unknown later argument still fail-closed |
+| non-leading `--` | **2** | still rejected |
+| `provider-canary --profile bogus-profile …` | **2** | still throws `usage()` — **validation unchanged** |
+| `.llm/tools/agentic/lib/` tests | **0** | 79 passed / 0 failed |
+| `deno.lock` | **0** | byte-unchanged |
+
+That `provider-canary` negative is the one that matters: the risk in "fix the cast" is that it quietly
+becomes "loosen the validation". Same inputs accepted, same inputs still throw.
+
+### Convergence
+
+The ruling named `1f50c98ce`; by the time I merged, `main` was **`969e7dfeb`**. Verified `1f50c98ce`
+**is an ancestor** of it — superseded rather than divergent — and merged current `main` instead of a
+stale SHA. `merge-tree` predicted clean; the real merge was clean. New head
+**`000758cd426ac9de34b37ef438f20c9d58509344`**, pushed, local == remote.
+
+**Blob semantics preserved across the merge**, which is what carries the verdict:
+
+| Path | Blob | Post-merge |
+| --- | --- | --- |
+| `.llm/tools/agentic/lib/task-arguments.ts` | `1a67fa3b7…` | unchanged |
+| `.llm/tools/agentic/runtime/cli/provider-canary.ts` | `aa6f3e93d…` | unchanged |
+| `…--1750/impl-eval.md` | `bf9d6f08b…` | unchanged |
+
+**No new evaluator launched.** The GLM `PASS` carries: a typing repair with identical behavior does
+not change the evaluated product, and the only evaluator running on this host is #1846's, which is not
+redundant. Confirmed by process inspection rather than assumption.
+
+Run artifacts untouched. Body/status normalization deliberately deferred until exact-current-main CI
+is green — the #1828 lesson.
