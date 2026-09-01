@@ -53,7 +53,44 @@ function ownerLabel(block: JsdocExampleBlock): string {
   } · example ${block.exampleOrdinal} · fence ${block.fenceOrdinal}`;
 }
 
-function preamble(block: JsdocExampleBlock): string {
+const TYPE_PARAMETER_ARITY = new Map<string, number>();
+
+/**
+ * Count a declaration's type parameters so the injected shim can mirror its arity.
+ *
+ * Returns 0 when the declaration is absent or non-generic. Angle-bracket depth ignores the
+ * `>` of an arrow return type so a defaulted function-typed parameter is not miscounted.
+ */
+function declarationTypeParameterArity(root: string, sourcePath: string, symbol: string): number {
+  const key = `${sourcePath}::${symbol}`;
+  const cached = TYPE_PARAMETER_ARITY.get(key);
+  if (cached !== undefined) return cached;
+  let arity = 0;
+  try {
+    const source = Deno.readTextFileSync(join(root, sourcePath));
+    const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const declaration = new RegExp(
+      `export\\s+(?:declare\\s+)?(?:abstract\\s+)?(?:type|interface|class)\\s+${escaped}\\s*<`,
+    ).exec(source);
+    if (declaration) {
+      let depth = 1;
+      let commas = 0;
+      for (let i = declaration.index + declaration[0].length; i < source.length && depth > 0; i++) {
+        const char = source[i];
+        if (char === '<') depth += 1;
+        else if (char === '>' && source[i - 1] !== '=') depth -= 1;
+        else if (char === ',' && depth === 1) commas += 1;
+      }
+      if (depth === 0) arity = commas + 1;
+    }
+  } catch {
+    arity = 0;
+  }
+  TYPE_PARAMETER_ARITY.set(key, arity);
+  return arity;
+}
+
+function preamble(block: JsdocExampleBlock, repositoryRoot: string): string {
   const owner = block.owner;
   if (owner.kind !== 'symbol' || !owner.symbol || !owner.publicSpecifier) return 'export {};\n';
   const importedType = `import(${JSON.stringify(owner.publicSpecifier)}).${owner.symbol}`;
@@ -62,7 +99,21 @@ function preamble(block: JsdocExampleBlock): string {
     lines.push(`  const ${owner.symbol}: typeof ${importedType};`);
   }
   if (owner.declarationKind === 'type' || owner.declarationKind === 'class') {
-    lines.push(`  type ${owner.symbol} = ${importedType};`);
+    // A bare `type X = import(spec).X` alias drops the declaration's type parameters, so a
+    // documented generic type fails TS2315 when its own example applies type arguments. Mirror
+    // the arity instead; the real constraints are still enforced where the alias applies them,
+    // and `any` defaults keep the bare `X` spelling valid.
+    const arity = declarationTypeParameterArity(repositoryRoot, owner.sourcePath, owner.symbol);
+    if (arity > 0) {
+      const parameters = Array.from({ length: arity }, (_, index) => `P${index + 1}`);
+      lines.push(
+        `  type ${owner.symbol}<${
+          parameters.map((parameter) => `${parameter} = any`).join(', ')
+        }> = ${importedType}<${parameters.join(', ')}>;`,
+      );
+    } else {
+      lines.push(`  type ${owner.symbol} = ${importedType};`);
+    }
   }
   lines.push('}', '');
   return lines.join('\n');
@@ -175,6 +226,7 @@ async function materializeModules(
   tempRoot: string,
   blocks: JsdocExampleBlock[],
   imports: Record<string, string>,
+  repositoryRoot: string,
 ): Promise<{ modules: SyntheticExampleModule[]; policyDiagnostics: PrecompileDiagnostic[] }> {
   const modules: SyntheticExampleModule[] = [];
   const policyDiagnostics: PrecompileDiagnostic[] = [];
@@ -204,7 +256,7 @@ async function materializeModules(
     const directory = join(tempRoot, 'examples', String(index + 1));
     const preamblePath = join(directory, 'preamble.ts');
     const modulePath = join(directory, `example.${block.compilationExtension}`);
-    await writeSnippetFile(preamblePath, preamble(block));
+    await writeSnippetFile(preamblePath, preamble(block, repositoryRoot));
     await writeSnippetFile(
       modulePath,
       `// ${ownerLabel(block)}\nimport './preamble.ts';\n${block.body}\n`,
@@ -348,6 +400,7 @@ export async function compileJsdocExamples(
       tempRoot,
       analysis.blocks,
       workspace.imports,
+      repositoryRoot,
     );
     if (modules.length === 0) {
       const classified = classifyDiagnostics('', modules, policyDiagnostics, analysis);
