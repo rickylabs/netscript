@@ -65,7 +65,7 @@ RFC numbers are assigned by a maintainer at acceptance (next free integer), not 
 
 ### Canonical location and harness provenance
 
-The canonical accepted design record is `rfcs/NNNN-*.md`. Numbered RFCs 0001 through 0005 establish
+The canonical accepted design record is `rfcs/NNNN-*.md`. Numbered RFCs 0001 through 0006 establish
 that practice in this tree. Files under `.llm/runs/*/design/canonical/` are durable research,
 provenance, and draft-design artifacts; despite the historical `canonical` folder name, they do not
 become accepted RFCs unless their decision is reviewed, numbered, and merged here.
