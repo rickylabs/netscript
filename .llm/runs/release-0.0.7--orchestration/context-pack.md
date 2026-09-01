@@ -2326,3 +2326,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   #1848, and the evaluator-proven disjoint #1592/#1451 slices remain active without consuming the
   host runtime lease. Environment remains Aspire `[]`, containers 0, custom networks 0, one foreign
   anonymous volume preserved, zero zombies, and stable NAS load.
+
+## Resume delta — 2026-09-01T08:39:00Z
+
+- Current main is `b66e52cbc279b3c5f582c8036419964cf1c1e564`. Docs PR #1860 merged from immutable
+  head `1a36bc4b2` after current-main merge-tree, exact CI, separate-session PASS, and zero-thread
+  verification. It intentionally leaves #1857 open; all scoped harness artifacts remain tracked.
+- #1858's emitted Garnet helper repair is focused-green, but its second full runtime found a
+  baseline stale consumer of #1837's positional generated-resource markers. #1863 is the isolated
+  direct-to-main blocker; RED `1d045b04c` is committed and its semantic locator is green 3/3 while
+  Fixes finishes the same-class sweep and merge packet.
+- Required dependency chain: merge #1863, rebase and fully runtime-prove/merge #1858, then give
+  Aspire both exact merge SHAs for S8/S7 convergence and the serialized Phase-B proof. Internals
+  #1862 evaluation and Features/Docs independent leaves continue in parallel; no owner decision is
+  pending.

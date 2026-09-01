@@ -3611,3 +3611,21 @@
   main. Features #1842 is demoted during that carrier repair, then must rebase, regenerate its own
   exact corpus, repair the PR template, and rerun CI. Docs #1857 and Features #1592/#1451 continue
   in parallel; Fixes #1845 resumes statically without taking the global runtime lease.
+
+## 2026-09-01T08:39:00Z — plugin reference repair ships; Garnet baseline gate is bounded
+
+- Docs PR #1860 passed its exact-head independent IMPL-EVAL, current docs/corpus/core CI, a fresh
+  current-main merge-tree, and the zero-thread gate at immutable head `1a36bc4b2`. The coordinator
+  squash-merged it as `b66e52cbc`, retained all eight scoped run artifacts, and moved the PR to
+  `status:shipped`. It is an honest partial `Refs #1857`, so #1857 remains open for the measured five
+  omissions and authoritative mapping/IA slices.
+- The second canonical #1858 runtime proof cleared the emitted `_aspire-compat.mts` type/format
+  repair, then exposed a current-main `runtime.flow-b-fixture` false red: the fixture still searched
+  for a `workers-api` comment marker that #1837 intentionally replaced with positional markers.
+  Issue #1863 now owns a separate direct-to-main semantic locator repair. Its committed RED is
+  `1d045b04c`; the first dirty-tree GREEN is 3/3 with formatting clean while the Fixes supervisor
+  completes Tier-A, sweep, commit, evaluation, and CI.
+- Merge order is locked: #1863 ships first; #1858 rebases onto its exact merge SHA and reruns the
+  one full serialized `scaffold.runtime`; after #1858 ships, Aspire consumes both exact merge SHAs
+  into S8/S7 and runs Phase B. Runtime inventory remains Aspire `[]`, containers 0, custom networks
+  0, with the known foreign anonymous volume left untouched.
