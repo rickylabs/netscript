@@ -1,6 +1,9 @@
 import { assert, assertEquals, assertFalse } from '@std/assert';
 
 const PRIVATE_ADAPTER_NAMES = [
+  'createHttpClientLink',
+  'ClientLinkPort',
+  'ClientLinkCallOptions',
   'SdkClientLogicalCall',
   'PreparedOutboundHeaders',
   'PreparedSdkClientCall',
@@ -78,7 +81,7 @@ function outputText(output: Deno.CommandOutput): string {
   return new TextDecoder().decode(output.stderr);
 }
 
-Deno.test('public SDK entrypoints omit every private adapter identity', async () => {
+Deno.test('public SDK entrypoints omit every prohibited link and private adapter identity', async () => {
   const entrypoints = [
     new URL('../mod.ts', import.meta.url).href,
     new URL('../src/client/mod.ts', import.meta.url).href,
