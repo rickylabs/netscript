@@ -3814,3 +3814,45 @@ A note on my own conduct: I reported F2 as tracked-and-shippable, and the coordi
 example repair" was what sent me back to it. The two "collateral" examples I had treated as a reason
 not to proceed turned out to be real defects worth fixing on their own merits — the collateral was
 the point, not an obstacle.
+
+## 2026-09-01 — ceiling tightened, cycle-2 IMPL-EVAL PASS, #1756 at ready-merge
+
+**Ceiling 20 → 14 per coordinator ruling** (`6a51cfe4c`), verified both directions rather than
+assumed: the standing census still passes (`116`/`14`, ratchet empty, exit 0), and the M6 probe now
+**fails** — `ratchet failure: deferred typeError 15 > 14`, exit 1, where the identical probe exited 0
+under the old ceiling. Both ceilings now sit at their exact census with zero slack. F2 is closed end
+to end: the shim no longer hides a violation, and the policy no longer tolerates one.
+
+**IMPL-EVAL cycle 2 at `889e676a5`: PASS.** It reproduced the laundering itself rather than accepting
+my account — running both compilers through `compileJsdocExamples` with synthetic blocks, it showed
+the old shim emitting TS2344 only from the unattributed preamble and, crucially, **the violation
+vanishing entirely (exit 0) when a classified-failing neighbour was present** — the exact condition
+that made it invisible. It confirmed the `declare global` leak structurally and audited the salvage's
+full 47-file blast radius for a seventh semantic revert: none.
+
+**Its one live finding was mine.** The PR body was a full history rewrite behind — all eight SHAs real
+but pre-rewrite, none an ancestor of HEAD, the F2 commit missing, `typeError 15`, `files=2033
+examples=355`, stale base, and the acceptance block still saying "unblocking 8". On a docs-lane PR
+whose doctrine is documentation accuracy that lands harder than anywhere else. Body fully rewritten,
+with the **commit table generated from `git log`** — hand-maintaining it is what let it drift twice.
+
+**The workflow step: authorization was never the blocker.** The coordinator authorized applying it as
+routine release work; I verified the patch first as instructed (sha256 matches, touches only
+`ci.yml`, +8/−0, hunk is exactly the guarded gate step) and attempted both routes. Both are refused
+by GitHub itself: the push with `refusing to allow a Personal Access Token to create or update
+workflow … without workflow scope`, and the contents API with its opaque 404 for workflow files on a
+`repo`-only token. This is a token-scope wall, not a policy one; it needs
+`gh auth refresh -h github.com -s workflow` or a credential that carries it.
+
+**Lifecycle advanced:** `status:impl` → `status:ready-merge`; thread gate PASS (0 threads). Everything
+this lane can do is done at `6a51cfe4c`; `check-test` and `close-gate` stay red on exactly the two
+things the missing step causes, which is the correct reading of that head.
+
+**#1892 gained a second instance** of the same class, from the evaluator's residual observation: value
+owners still bind via `declare global`, so cross-module leakage of documented *values* remains
+possible. Narrower than the type leak and predating #1756, but the same false-pass shape.
+
+A note on judgement: I twice reported a defect as "tracked, acceptable to ship" and twice the right
+answer was to go back and fix it. The tracked-gap framing is legitimate but it is also the
+comfortable one, and both times the "collateral" I cited as a reason to stop turned out to be real
+defects worth fixing on their own merits.
