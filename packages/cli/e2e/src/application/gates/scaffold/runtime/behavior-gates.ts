@@ -21,6 +21,10 @@ const APP_HOME_FAILURE_HINT =
   'here means the app itself is not rendering — check the app resource logs in the Aspire ' +
   'dashboard.';
 
+const APP_DYNAMIC_ROUTE_FAILURE_HINT =
+  'The generated app did not bind its dynamic order path through definePage().withRoute(...). ' +
+  'Inspect the plain/partial request mode and the missing status, data-order-id, or href marker.';
+
 const APP_REFERENCE_FAILURE_HINT =
   'The generated app did not render its canonical resource and design states in a real headless ' +
   'browser at desktop and mobile viewports. Inspect the named path, viewport, and missing semantic marker.';
@@ -266,6 +270,25 @@ export function createRuntimeBehaviorGates(
       undefined,
       'capture',
       APP_HOME_FAILURE_HINT,
+    ),
+    commandGate(
+      GATE.BEHAVIOR_APP_DYNAMIC_ROUTE,
+      'Generated app binds a dynamic route in plain and partial requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1,localhost',
+        '--allow-read',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-dynamic-route.ts`,
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+      ],
+      undefined,
+      'capture',
+      APP_DYNAMIC_ROUTE_FAILURE_HINT,
     ),
     commandGate(
       GATE.BEHAVIOR_APP_REFERENCE,

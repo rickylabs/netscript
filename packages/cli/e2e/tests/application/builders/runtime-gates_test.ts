@@ -17,6 +17,45 @@ import {
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 
+Deno.test('runtime behavior gates register the dynamic route probe id', () => {
+  const dynamicRouteGateId = 'behavior.app-dynamic-route';
+
+  assertEquals((Object.values(GATE) as readonly string[]).includes(dynamicRouteGateId), true);
+  assertEquals(
+    createRuntimeBehaviorGates().map((entry) => String(entry.id)).includes(dynamicRouteGateId),
+    true,
+  );
+});
+
+Deno.test('dynamic route gate runs the HTTP-semantic probe for the project-derived app', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected dynamic route command gate.');
+
+  const command = gate.command({
+    request: { options: { projectName: 'inventory-console' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(gate.critical, true);
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-dynamic-route.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+  ]);
+});
+
 Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
 

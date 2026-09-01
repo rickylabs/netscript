@@ -12,6 +12,13 @@ export const examplesPage = definePage()
     canonicalHref: appRoutes.serviceExample.href(),
     examples: [
       {
+        title: 'Dynamic order route',
+        href: appRoutes.order.href({ path: { id: 'order-42' } }),
+        description: 'Typed dynamic path binding and bound-reference href generation.',
+        status: 'Ready',
+        owner: 'app',
+      },
+      {
         title: '{{modelName}} resource flow',
         href: appRoutes.serviceExample.href(),
         description: 'Canonical contract, resource, layer, managed-form, and optimistic-mutation flow.',

@@ -278,11 +278,21 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_APP), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
+  const dynamicRouteIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE
+  );
+  const referenceIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE);
   assertEquals(waitIndex < homeIndex, true);
+  assertEquals(
+    [homeIndex, dynamicRouteIndex, referenceIndex],
+    [homeIndex, homeIndex + 1, homeIndex + 2],
+    'catalog order must be app-home, dynamic-route, app-reference',
+  );
 });
 
 Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
