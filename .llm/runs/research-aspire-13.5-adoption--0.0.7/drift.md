@@ -6552,3 +6552,51 @@
   - Manifest rewritten at `phase-b-execution-manifest.md` with the corrected S13 base, the measured
     conflict table, and both pre-rulings inline. Nothing here required a lease, a merge, or a label
     change, and none was made.
+
+- **D-262 — merge-packet matrix built for all seven leaves; one static CI defect found and reported;
+  #1747 and S11 identified as the two leaves gated on nothing this lane owns.**
+  - **Review-thread gate is clean across the entire lane** — `agentic:review-threads` returns
+    `unanswered: 0` for **all seven** PRs (#1744, #1747, #1754, #1759, #1760, #1771, #1779). That
+    merge prerequisite is satisfied lane-wide and needs no further work.
+  - **S9 has the lane's only *static* CI failure, and it is a real reproducible defect.** #1759's
+    `check-test` FAILURE is not flake: the gate receipt says
+    `totalOccurrences: 2, uniqueOccurrences: 1, uniqueCodes: 1, uniquePaths: 1`, and I reproduced it
+    locally at `a8cf585b0` with the exact command CI runs —
+    **TS2322 `Type 'Timeout' is not assignable to type 'number'` at
+    `packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/evaluate.ts:314:9`**, in the
+    `timed<T>()` helper of S9's own MCP-smoke gate (`7396abd1d`, carried through `be28d8f39`).
+    `setTimeout` resolves to the `Timeout`-returning overload in that package's lib resolution, so the
+    `number` annotation is wrong irrespective of runtime behaviour.
+    - Fix verified rather than guessed: `let timeout: ReturnType<typeof setTimeout> | undefined;`
+      makes `deno check` green on the file. **Probe reverted immediately and the throwaway worktree
+      removed — nothing pushed from this lane, and no product code written by the supervisor.**
+    - **Reported on #1759** with the reproduction command, the receipt counters, the exact site and
+      the verified fix, plus the S9 restack shape so it lands in one pass instead of being discovered
+      after it.
+    - Worth stating why it was worth chasing: it is the **only** red check in the lane that a lease
+      cannot fix. Every other failure is `close-gate` (expected while boxes are unmirrored) or a
+      runtime tier. Left alone it would have surfaced *after* the scarce serialized lease, costing a
+      second pass.
+  - **Five acceptance boxes verified satisfied and recorded with evidence** rather than left as bare
+    unchecked rows: #1720 A3 and A6 (re-proven at the current head), #1719's `Closes #1429`, #1723's
+    `Closes #1642` with #1000 correctly *not* a closing target, and #1721's zero-`13.4.6` grep.
+  - **#1747 is the closest leaf to merge in the lane** — all **five** of #1732's acceptance boxes are
+    already checked, it replays onto live main with **zero** conflicts across 15 commits, threads are
+    clean, and its one remaining DoD box is hosted `scaffold.runtime` evidence whose only failure was
+    `runtime.wait.garnet`, i.e. **#1858** — which is itself `CLEAN`/`MERGEABLE` with all 21 checks
+    green. Nothing about #1747 is gated on anything this lane owns.
+  - **S11 needs no runtime lease at all, and that had not been stated before.** #1771 has **zero** CI
+    failures across 23 checks, **zero** unchecked DoD boxes of 17, **zero** restack conflicts, and all
+    four of #1723's acceptance boxes are static (doc-manifest rows, `doc:lint`, PR-body closing
+    keyword, docs_audit log). It is gated purely on S10 landing beneath it. Keeping it out of the
+    Phase-B pass keeps that pass at its minimum.
+  - **One real gap found while checking S9's boxes:** `receipts/aspire-13.5-mcp-smoke.json` is
+    **absent** from S9's tree — the gate *implementation* exists
+    (`run-aspire-mcp-smoke.ts`, `aspire-mcp-smoke.ts`, `aspire-mcp-smoke_test.ts`) but the receipt the
+    box names does not. It is lease-produced, so it is now listed in the Phase-B ask rather than
+    assumed present.
+  - Matrix committed at `merge-packet-matrix.md` so the post-lease phase runs from a table instead of
+    re-deriving seven PRs under time pressure.
+  - Watcher armed on **#1865** and **#1858** merge state; the moment both report `MERGED` their exact
+    merge SHAs are consumed into the manifest's `__SHA_1865__` / `__SHA_1858__` slots. Neither PR was
+    touched — both are Fixes-owned.
