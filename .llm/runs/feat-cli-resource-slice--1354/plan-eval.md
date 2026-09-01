@@ -73,3 +73,58 @@ No unlocking of D1–D11 required; design stands. Re-submit for PLAN-EVAL cycle 
   `Refs #1354`; no epic-closing keyword anywhere.
 - Identity note: task requested OpenRouter Qwen 3.8 max on cloud-driven PR review — consistent with
   the protocol's cloud-driven exception to the native opposite-family route.
+
+---
+
+# PLAN-EVAL Cycle 2 — feat-cli-resource-slice--1354
+
+- Evaluator session: OpenHands cloud (Qwen 3.8 Flash via explicit OpenRouter trigger), separate from
+  the plan-generation session. Judged at head `7f9d93188`.
+- **Submission delta: none.** `plan.md` is byte-identical to the cycle-1 submission (`b210f9092`);
+  the only commit since is this file's cycle-1 record. None of the four required fixes was applied,
+  so cycle 1's FAIL_PLAN findings all stand, re-verified below against the tree and the live #1664
+  file list (162 files via API).
+
+## Cycle-1 fix verification (all unaddressed)
+
+1. **Risk register — still absent.** No dedicated section; only "slow-type risk" appears (gate list
+   line). Plan-Gate box remains FAIL.
+2. **D9 slice-level enumeration — still incomplete.** Confirmed against the live #1664 diff that it
+   also touches: `packages/cli/src/kernel/templates/app/route-templates_test.ts` (Slice F item 22),
+   `packages/cli/e2e/suites/scaffold/capability-suites.ts` +
+   `packages/cli/e2e/tests/presentation/suite-registry_test.ts` (Slice G adds gate ids and composes
+   gates but touches neither registration file — the seventh-change stop rule covers stdout only),
+   `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` (Slice E's
+   `check:mcp-export-corpus` gate regenerates it), `packages/sdk/src/query-client/key-bridge.ts`
+   (emitted loaders' import target), `packages/cli/src/kernel/application/scaffold/support/`
+   `format-generated-files.ts` (D8 reuse seam), `packages/fresh/deno.json` (Slice B dependency), and
+   `packages/cli/src/public/features/ui/add/add-ui-input.ts` (Slice E option shape). D9 names none of
+   these. (`packages/cli/deno.json` correctly not in #1664 — cycle-1 retraction holds.)
+3. **D3 apply-phase gaps — still open.** (a) Fresh-writer/IO failure during apply is outside the
+   tested zero-write guarantee (staging covers shared transforms only; no write-phase atomicity
+   test); (b) no missing/stale `.generated/*` rule; (c) no destructive option-transition rule —
+   removing a previously generated option silently strands the old leaf; plus force-then-rerun
+   shared-import behavior and single-instance concurrency remain unstated.
+4. **Fold-ins — still open.** No standing D4 equivalence gate; marker schema unpinned; doc-lint gate
+   is absolute (`run-deno-doc-lint.ts` has no baseline flag) while the reference plan
+   (`feat-workers-runtime--1592-1451`) uses "zero new diagnostics relative to the recorded
+   baseline"; no local static gate for Slice G suite composition.
+
+## Independent re-verification this cycle
+
+- Premise re-confirmed: `generate-group.ts` registers exactly three commands; only
+  `app/routes/examples/service/index.tsx.template` (app assets) references
+  `withResource`/`withRouteContract`.
+- #1664 fail-closed selector semantics re-confirmed from its live `web-scaffold.ts` patch; D2/Slice A
+  adopt-and-extract it with no second mechanism and no auto-pick — prohibition clean.
+- Slice ceilings (4/6/11/18/6/23/6), ordering, per-slice gates, and touch-set enumeration match the
+  reference-plan shape; `deno.lock` movement is addressed (Slice B item 6). Partial semantics
+  (D10, `Refs #1354`, no epic closing keyword) re-confirmed; no #1355/#1664 scope expansion.
+
+## Verdict
+
+`FAIL_PLAN` — **cycle 2 of 2; per protocol, escalate to the owner/supervisor.** The plan's design
+(D1–D11) is sound and needs no re-architecture; the block is plan completion: risk register, slice-
+level D9 enumeration, D3 apply-phase semantics, and the four fold-ins.
+
+OPENHANDS_VERDICT: FAIL_PLAN
