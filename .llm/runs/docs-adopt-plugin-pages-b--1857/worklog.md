@@ -78,6 +78,8 @@ evidence determines the only remaining coverage field.
 | 2026-09-01 | S2 | denominator | Added one-level reference index discovery and exactly-one classification errors for neither/both. |
 | 2026-09-01 | S2 | tests | Initial focused run caught a missing explicit default-parameter type; fixed it, then 14/14 tests passed. |
 | 2026-09-01 | S2 | review | Verified the focused diff, exact failure messages, live `36/36` output, and all 32 baseline mapping names by name. |
+| 2026-09-01 | S3 | full gates | All owner-required implementation-head gates passed except the base-relative whitespace check, which identified trailing blank lines in three run artifacts. |
+| 2026-09-01 | S3 | evidence correction | Removed only the three trailing artifact blank lines; final evidence is rerun after the S3 push. |
 
 ## Decisions
 
@@ -111,15 +113,30 @@ evidence determines the only remaining coverage field.
 | S2 focused test | structured test wrapper over `check-exports-drift_test.ts` | PASS (0) | 14 passed, 0 failed after type fix. |
 | S2 denominator | `deno task docs:exports-drift` | PASS (0) | `36/36; mapped=35; excluded=1`. |
 | S2 32-row survival | compare `origin/main` literal names to current mapping | PASS (0) | Baseline 32, current 35, missing none. |
-| Required final suite | See plan | NOT_RUN | Runs after implementation. |
+| Export classification | `deno task docs:exports-drift` | PASS (0) | `36/36; mapped=35; excluded=1`. |
+| Site source format | `deno task --cwd docs/site check:source-format` | PASS (0) | Implementation head. |
+| Site build | `deno task --cwd docs/site build` | PASS (0) | Implementation head. |
+| Site links | `deno task --cwd docs/site check:links` | PASS (0) | Implementation head. |
+| Site caveats | `deno task --cwd docs/site check:caveats` | PASS (0) | Implementation head. |
+| Repository docs links | `deno task docs:links` | PASS (0) | Implementation head. |
+| Documentation accuracy | `deno task docs:accuracy` | PASS (0) | Implementation head. |
+| Documentation snippets | `deno task docs:snippets` | PASS (0) | Implementation head. |
+| Agent prose convergence | `deno task check:agent-docs-prose` | PASS (0) | Implementation head. |
+| Assets barrel convergence | `deno task check:assets-barrel` | PASS (0) | Implementation head. |
+| Publish assets convergence | `deno task check:publish-assets` | PASS (0) | Implementation head. |
+| Generated carrier typecheck | owner-specified `deno check --unstable-kv` | PASS (0) | Both generated TypeScript carriers. |
+| Full root tests | `deno task test` | PASS (0) | Definitive implementation-head run. |
+| Base-relative whitespace | owner-specified `git diff --check` | FAIL (2) | Found only three trailing blank lines in run artifacts; corrected in S3. |
+| Lock hygiene | compare `deno.lock` with `origin/main` | PASS (0) | Unchanged. |
+| Provenance ancestry | `git merge-base --is-ancestor 1b65f34f7 HEAD` | PASS (0) | Generated input commit is an ancestor. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-5 | PASS | all-entrypoint `deno doc --json` + `docs:exports-drift` | Measured coverage and exact entrypoint tables for 35 mappings. |
-| F-7 | NOT_RUN | site/repo docs gates | Runs after implementation. |
-| F-19 | PASS (focused S2) | structured test wrapper | 14/14; full root test task pending final gate. |
+| F-7 | PASS | site/repo docs gates | All owner-specified site and repository documentation checks exited 0. |
+| F-19 | PASS | focused structured test and `deno task test` | 14/14 focused; full root test task exited 0. |
 
 ### Runtime Gates
 
@@ -131,8 +148,8 @@ evidence determines the only remaining coverage field.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Published reference reader | NOT_RUN | site build/links/caveats | Runs after implementation. |
-| Generated agent/publish corpus | NOT_RUN | generated checks + typecheck | Runs after regeneration. |
+| Published reference reader | PASS | site build/links/caveats | All exited 0. |
+| Generated agent/publish corpus | PASS | generated checks + typecheck | All exited 0. |
 
 ## Handoff Notes
 

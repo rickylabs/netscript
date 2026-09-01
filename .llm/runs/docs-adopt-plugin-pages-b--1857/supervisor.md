@@ -26,4 +26,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   than the canonical Antigravity documentation-authoring lane. The supervisor explicitly owns the
   separate evaluation and lifecycle-label transition; this session leaves PR #1869 at
   `status:impl`.
-

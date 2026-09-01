@@ -41,4 +41,3 @@
 
 - None. The owner locked the auth hub exclusion, exact commit separation, generator order, gate
   set, PR metadata, and final lifecycle ownership.
-
