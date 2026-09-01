@@ -2,6 +2,7 @@ import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { join } from '@std/path';
 import {
   checkAspireScaffoldVersionDocs,
+  checkDetachedStartAccuracy,
   checkForbiddenGoldenPathTerms,
   checkFreshRootImports,
   checkGoldenPathDocs,
@@ -22,6 +23,10 @@ Deno.test('Aspire scaffold docs track the live CLI version pins', async () => {
   ]);
 
   checkAspireScaffoldVersionDocs(explanation, deployLocal);
+});
+
+Deno.test('detached-start page documents dashboard discovery and token redaction (#1642)', async () => {
+  await checkDetachedStartAccuracy();
 });
 
 Deno.test('shipped-corpus vocabulary check rejects every golden-path stale term', () => {

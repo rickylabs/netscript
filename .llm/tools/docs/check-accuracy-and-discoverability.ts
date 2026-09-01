@@ -80,6 +80,29 @@ export function checkAspireScaffoldVersionDocs(
   );
 }
 
+const DETACHED_START_PAGE = 'docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md';
+
+/**
+ * #1642: headless automation must discover the dashboard endpoint from the canonical Aspire
+ * inventory JSON, and must be told to treat it as a secret. Both halves are load-bearing — naming
+ * the field without the redaction rule documents a way to leak a token into CI logs.
+ */
+export async function checkDetachedStartAccuracy(): Promise<void> {
+  const page = await read(DETACHED_START_PAGE);
+  for (
+    const marker of [
+      'aspire ps --format Json',
+      'dashboardUrl',
+      'Discovering the dashboard endpoint without printing its token',
+      'Treat the value as a **secret**',
+      'Never pass the URL as a command-line argument',
+    ]
+  ) {
+    requireText(page, marker, DETACHED_START_PAGE);
+  }
+  forbidText(page, '13.4.6', DETACHED_START_PAGE);
+}
+
 /** Apply the golden-path vocabulary policy to one source or shipped-corpus document. */
 export function checkForbiddenGoldenPathTerms(text: string, location: string): void {
   for (const forbidden of FORBIDDEN_GOLDEN_PATH_TERMS) {

@@ -73,6 +73,43 @@ Output:
 
 When no AppHost is running, `aspire ps --format Json` returns an empty array (`[]`) with exit code `0`.
 
+### Discovering the dashboard endpoint without printing its token
+
+`dashboardUrl` in that same `aspire ps --format Json` record **is** the supported discovery path for
+headless automation. There is no separate token command to call and no product API to depend on — the
+canonical Aspire inventory JSON already carries it, which is why automation should read this field
+rather than scraping startup output or guessing a port.
+
+Treat the value as a **secret**. Aspire may append a dashboard login token to that URL, so anything
+that echoes the raw record leaks it into CI logs, run artifacts and issue comments.
+
+Read the field without printing it:
+
+```bash
+# Extract only what you need; never echo the whole record.
+DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
+  | deno eval 'const [a] = JSON.parse(await new Response(Deno.stdin.readable).text()); if (a?.dashboardUrl) console.log(a.dashboardUrl);')"
+
+# Pass it on by environment or stdin, not as a logged argument.
+MY_TOOL_DASHBOARD="$DASHBOARD_URL" my-tool
+```
+
+When a URL must appear in a log, redact the query string, which is where a token would live:
+
+```bash
+printf 'dashboard: %s\n' "${DASHBOARD_URL%%\?*}"
+```
+
+Two rules follow, and they are what keeps a token out of a transcript:
+
+- **Never `echo` or `cat` the raw `aspire ps --format Json` output in CI.** Select the one field you
+  need and discard the rest.
+- **Never pass the URL as a command-line argument** in a logged step — arguments are echoed by most CI
+  runners, environment variables and stdin are not.
+
+An AppHost that is starting may report `status` other than `running` with `dashboardUrl` absent; poll
+`aspire ps --format Json` until the field appears rather than assuming it is present on the first read.
+
 ## Startup timeout budget versus `aspire wait`
 
 An Aspire cold start covers container provisioning (Postgres, Redis), AppHost TypeScript
