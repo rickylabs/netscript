@@ -6781,3 +6781,23 @@
     before the lease costs one probe; finding it during the lease costs the lease.
   - Gates unchanged through eight further polls (14:46→15:00): #1865 `OPEN/UNSTABLE` at `f008315d1`,
     #1858 `OPEN/CLEAN`, main `1e53e731a`.
+
+- **D-268 — watch moved to a detached process; background tasks abandoned for watching. Sentinel-based
+  handoff so a merge cannot be missed between irregular wakes.**
+  - **Background tasks are now unusable for this**: the last one was killed after **one poll** (~2
+    min), against 4 polls, 7 polls, and one clean 480 s exit for the *same shape* earlier. The kill
+    timing is not predictable and not worth modelling.
+  - **Watch is now a `setsid`-detached process** (`pid 4158673`, **`ppid=1`**, own session id),
+    polling both PRs every 120 s for up to 8 h, logging every poll, and writing
+    `MERGED.sentinel` with **both exact merge SHAs and the resulting main** the moment both are
+    `MERGED`. It also logs a `PARTIAL` line if only one lands, so a single merge between wakes is
+    recorded rather than lost. Verified alive with its first poll at 15:04:16.
+  - **The division of labour is explicit**: the detached watcher gives *continuous coverage* but
+    cannot wake this session; a background task cannot survive but its **kill notification is the
+    wake**. So the arrangement is — detached watcher records the truth, a short background task
+    produces a turn, and every wake begins by reading the sentinel. Neither mechanism alone is
+    sufficient and I am not going to describe either as more than it is.
+  - This is the same mechanism §4a now mandates for the AppHost during the lease, so it is being
+    exercised on something cheap before it is relied on for something scarce.
+  - Detach probe reached **105 ticks / 520 s** still running, well past the point where three
+    background tasks died.
