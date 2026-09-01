@@ -61,6 +61,7 @@ force-push voids it**, and nothing in the tooling flags that.
 | S9 | Static D-45 baseline receipt (14 tools, `toolsMissing: []`, `get_integration_docs` documented-unobserved) | static |
 | S9, S10 | Separate-session IMPL-EVAL / docs-audit records before readiness | evaluation dispatch |
 | S13 | Coordinator close-gate work on referenced issues' `gate:` boxes | coordinator |
+| S10 | #1722's third box — *"#1372 updated with what S10 covers and what remains"* — has substance (3 comments) but its **head reference is stale**: the last update pins `265466059` while S10 is now `21a0bfec6`, and the restack will move it again. Needs one final head-refresh comment **after** the restack, not before | packet step, post-restack |
 
 ## Lease-gated receipts — the whole ask, in one place
 
