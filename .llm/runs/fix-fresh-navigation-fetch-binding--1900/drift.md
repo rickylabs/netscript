@@ -25,3 +25,17 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept and restore the live review surface before implementation.
 - **Evidence:** branch history and empty `head:fix/fresh-navigation-fetch-binding` PR search.
+
+## 2026-09-01 — Full Fresh doc-lint baseline has regressed outside navigation
+
+- **What:** The structured full-package doc-lint reports 45 diagnostics, all in builders, query,
+  route, and streams entrypoints; the navigation entrypoint reports zero.
+- **Source:** `deno task doc:lint --root packages/fresh --pretty` at the #1900 slice head.
+- **Expected:** Doctrine file 10 states the earlier Fresh doc-lint residue was resolved with zero
+  diagnostics in June 2026.
+- **Actual:** Current `origin/main` contains later unrelated public-surface residue (28
+  `private-type-ref`, 17 `missing-jsdoc`). Neither changed product file appears in the report.
+- **Severity:** significant
+- **Action:** defer to the owners of those public surfaces; this P1 transport fix keeps
+  `./navigation` clean and does not widen into unrelated API/doc remediation.
+- **Evidence:** structured report: `./navigation` 0; builders 3; query 8; route 25; streams 11.

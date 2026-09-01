@@ -245,6 +245,30 @@ Deno.test('public navigation entrypoint imports without browser globals or globa
   assertEquals(globalThis.fetch, fetchBefore);
 });
 
+Deno.test('captured platform fetch preserves its Window receiver on both transport paths', async () => {
+  let calls = 0;
+  const receiverSensitiveFetch = function (
+    this: typeof globalThis,
+    _input: RequestInfo | URL,
+    _init?: RequestInit,
+  ): Promise<Response> {
+    if (this !== globalThis) throw new TypeError('detached platform fetch');
+    calls += 1;
+    return Promise.resolve(htmlResponse('receiver-preserved'));
+  } as typeof fetch;
+  const platform = new TestPlatform(receiverSensitiveFetch);
+  const handle = installPartialNavigationCoordinatorForPlatform(platform);
+
+  platform.stageAnchor('/receiver-preserved');
+  const partial = await platform.fetchValue(partialUrl('/receiver-preserved'));
+  assertEquals(await partial.text(), 'receiver-preserved');
+  assertEquals(await (await platform.fetchValue('/asset.css')).text(), 'receiver-preserved');
+  assertEquals(calls, 2);
+
+  await handle.dispose();
+  assertEquals(platform.getFetch(), receiverSensitiveFetch);
+});
+
 Deno.test('page intents order bodies while sibling regions remain independent', async () => {
   const pageA = controlledResponse();
   const pageB = controlledResponse();

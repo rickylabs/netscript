@@ -56,6 +56,11 @@ covered in that pair.
 | ---- | ----- | ---- | ----- |
 | 2026-09-01T20:33:46Z | bootstrap | re-baseline | Confirmed current `origin/main` and exact seven-symbol navigation surface. |
 | 2026-09-01T20:33:46Z | plan | PLAN-EVAL | `N/A` — #1900 supplies a complete mechanical contract, two-file scope, invariant, regression shape, and gate ownership; no architecture or open decision remains. |
+| 2026-09-01T20:35:57Z | bootstrap | PR | Opened draft PR #1904 with all six required labels and milestone 0.0.7 (#27). |
+| 2026-09-01T20:39:04Z | S1 | implement | Kept raw `originalFetch` for restoration, captured bound `platformFetch`, and routed both fetch paths through it. |
+| 2026-09-01T20:39:04Z | S1 | regression | Added a double that throws unless `this === globalThis`; intercepted and pass-through calls both pass. |
+| 2026-09-01T20:39:04Z | S1 | gates | Structured Fresh check/lint/fmt passed over 207 files; source tests passed 254/254; quality gate, JSR audit, and publish dry-run passed. |
+| 2026-09-01T20:39:04Z | S1 | reconcile | #1900 remains open and correctly linked by `Closes #1900`; #1895 is referenced only and untouched; PR #1904 has exactly one `status:impl` label and the requested metadata. |
 
 ## Decisions
 
@@ -70,6 +75,7 @@ covered in that pair.
 | ----- | -------- | ------------------ |
 | Frontend overlay references absent `.claude/05-frontend.md` and `.resources/deps-docs/` paths in this worktree. | minor | yes |
 | Draft PR was not opened with the already-pushed orchestrator brief commit; it will open with the run-plan bootstrap before product implementation. | minor | yes |
+| Full Fresh doc lint currently reports 45 diagnostics outside `./navigation`, despite the doctrine handoff's earlier zero-diagnostic statement; navigation itself reports zero. | significant | yes |
 
 ## Gate Results
 
@@ -77,30 +83,73 @@ covered in that pair.
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| Focused check/test/lint/fmt | structured wrappers | NOT_RUN | Runs after implementation. |
-| Doc lint / publish dry-run | structured doc lint + package task | NOT_RUN | Runs after implementation. |
+| Focused check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 207 files, 2 batches, 0 findings. |
+| Focused source tests | `run-deno-test.ts -- --allow-all packages/fresh/src` | PASS | 254 passed, 0 failed. Navigation-only confirmation was 9 passed. |
+| Focused lint | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | 207/207 processed, 0 findings. |
+| Focused format | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 207/207 processed, 0 findings. |
+| Full package doc lint | `deno task doc:lint --root packages/fresh --pretty` | FAIL | 45 pre-existing diagnostics in builders/query/route/streams; `./navigation` is 0. No changed file is implicated. |
+| Publish dry-run | `deno task publish:dry-run` from `packages/fresh` | PASS | `@netscript/fresh@0.0.6` dry-run completed successfully. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Archetype 4 applicable set | NOT_RUN | `deno task quality:gate` planned | Runs after implementation. |
-| F-6 / F-7 JSR surface | PASS (plan scan) | `deno doc` shows unchanged seven-symbol planned surface | Final gates pending. |
+| Archetype 4 applicable set | PASS | `deno task quality:gate` exit 0 | Quality scan found no findings; doctrine gate completed with baseline warnings only. |
+| F-5 navigation surface | PASS | `deno doc --json` reports 7 symbols | Two values, two aliases, three interfaces; no surface file changed. |
+| F-6 JSR publishability | PASS | package publish dry-run exit 0 | Test remains excluded from publication. |
+| F-7 full package doc lint | FAIL (baseline) | structured report, 45 diagnostics | Navigation entrypoint is clean; unrelated current-main residue is recorded in drift. |
+| F-19 scoped runners | PASS | structured check/test/lint/fmt results above | All requested focused gates green. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Focused navigation semantics | NOT_RUN | colocated test suite planned | No local browser. |
+| Focused navigation semantics | PASS | 9/9 navigation tests; 254/254 Fresh source tests | Receiver, drain, restoration, ordering, and EOF disposal coverage passed. |
 | Hosted `fresh-browser` | NOT_RUN | supervisor-owned | Run `33542380097` is the known pre-fix failure. |
+| Drain-never-abort production scan | PASS | focused `rg` returned no matches | Zero `.abort(`, `AbortController`, or `.cancel(` outside navigation tests. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| Navigation entrypoint | PASS (baseline) | `deno doc packages/fresh/src/runtime/navigation/mod.ts` | Seven symbols before implementation. |
+| Navigation entrypoint | PASS | `deno doc --json packages/fresh/src/runtime/navigation/mod.ts` | Seven symbols after implementation; two values and five types unchanged. |
+| Wrapper restoration | PASS | receiver regression and existing disposal assertion | Final disposal restores the raw original function by identity. |
+
+## Slice Review (Tier-A)
+
+| Field | Value |
+| ----- | ----- |
+| Verdict | **PASS** |
+| Reviewer | Claude · Anthropic · Fable 5 (fresh native opposite-family session, background job `e39b230c`) |
+| Date | 2026-09-01 |
+
+Substantively reviewed and independently re-verified:
+
+1. Raw `originalFetch` retained unbound (`coordinator.ts:118`) and restored by exact identity at
+   final disposal (`coordinator.ts:323`); regression asserts `getFetch() === receiverSensitiveFetch`
+   after dispose.
+2. `platformFetch = originalFetch.bind(globalThis)` (`coordinator.ts:119`) — the Window receiver —
+   is the sole transport callable at both sites: pass-through (`coordinator.ts:238`) and intercepted
+   partial (`coordinator.ts:248`). No remaining unbound transport invocation.
+3. The regression double throws unless `this === globalThis`; `wrappedFetch` is an arrow function,
+   so reverting either site to `this.originalFetch(...)` or detaching the callable fails the test.
+   Both intercepted (`fresh-partial` URL) and pass-through (`/asset.css`) paths asserted, 2 calls.
+4. Drain-never-abort, EOF-awaited disposal loop, history wrapper ownership guards, and
+   unhandled-rejection handling are untouched by the diff.
+5. Product scope is exactly `coordinator.ts` + `coordinator_test.ts`; focused scan confirms zero
+   production `.abort(`/`AbortController`/`.cancel(` tokens in navigation.
+6. Navigation entrypoint re-verified at seven symbols (2 values, 3 interfaces, 2 aliases);
+   `deno.lock` has no diff against worktree or `origin/main`.
+7. Gate evidence re-verified: focused navigation tests 9/9 via the structured test wrapper;
+   full-package doc-lint reproduces exactly the recorded unrelated baseline failure
+   (45 = 28 private-type-ref + 17 missing-jsdoc; navigation 0; builders 3 / query 8 / route 25 /
+   streams 11).
+
+No blocking findings. Sign-off commit follows; IMPL-EVAL remains owned by a separate session.
 
 ## Handoff Notes
 
 - Evaluator should inspect the receiver-sensitive regression first, then raw-vs-bound fetch storage,
   both invocation sites, the disposal identity assertion, and the zero-cancellation production scan.
+- Product diff is exactly `coordinator.ts` and `coordinator_test.ts`; `deno.lock`, navigation
+  `mod.ts`, `types.ts`, and `keyed-partial.tsx` have no diff.
