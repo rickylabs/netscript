@@ -8506,3 +8506,52 @@ production counterpart. Head `7d20e852f` pushed.
 
 Unchanged and correctly parked: PASS recorded, box 1 deferred pending the real 3-arrival proof after
 the Aspire runtime queue drains. Still draft at `status:impl`.
+
+
+## D-195 - #1862 re-converged onto 38f2ce735; corpus regenerated for #1861's JobConfig surface
+
+The re-audit was right: synthetic landing on `38f2ce735` made `check:mcp-export-corpus` red again,
+because **#1861 added exported `JobConfig` fields after the evaluated head**. Confirmed directly -
+`REAL_EXIT=1` immediately after the merge, before any regeneration.
+
+Regenerated on the combined tree through the fixed generator, and re-proved invariance **at the
+integrated head** rather than assuming it survived:
+
+| Environment | `gen` exit | blob |
+| --- | ---: | --- |
+| `NO_COLOR=1` / `FORCE_COLOR=1` / `CLICOLOR_FORCE=1` / bare | **0** each | `dec4f48ececf...` (all four) |
+
+Payload: **0 escapes**, 2,177,411 bytes, and `JobConfig` **present** - so the surface delta is
+explained by #1861 rather than by contamination. `check:mcp-export-corpus` **0**, regression
+**5 passed / 0 failed**, `deno.lock` byte-unchanged. Head `e8eaf6d0c` pushed.
+
+### Issue #1859 rewritten in place, truthfully
+
+The old body framed this as "regenerate one stale generated file" and carried a **false
+`exactly one generated file` acceptance box**. That was never true of the actual repair. Rewritten
+around the real defect - colour-dependent generation - with acceptance that now demands
+**four-path byte-identical regeneration**, a zero-escape payload checked *after decoding* (the
+raw-byte search is a documented false negative), a regression with teeth, and lock/scope invariants.
+CI wiring is explicitly non-scope and pointed at #1867.
+
+### PR body restored in full
+
+Mandatory sections rebuilt: **Slices** (S1-S5), **Scope** table, **Harness** (PLAN-EVAL N/A; cycle 1
+PASS marked **INVALID** with its reason; cycle 2 PASS; delta cycle noted), **Drift / Debt** (#1867 and
+the `deno fmt` coverage boundary), a **Retraction** section naming all four earlier false claims
+including the removed "exactly one file" line, and a complete **Definition of Done** whose only open
+box is exact-head CI.
+
+### Focused delta evaluation dispatched - deliberately narrow
+
+Cycle 2 already validated the invariance repair and the coordinator audit re-confirmed it at
+`8fd452a46` with product paths byte-identical. The new brief says so explicitly and **forbids
+repeating that review**: it evaluates only whether the regeneration is faithful to the integrated
+tree, whether invariance still holds after integration, whether the payload is escape-free, and
+whether the surface delta is genuinely #1861's `JobConfig` rather than contamination. It also carries
+the JSON-encoded-escape false-negative warning, since that already fooled this slice once.
+
+PR held at `status:impl-eval`; ready-merge only after terminal CI **and** the delta verdict.
+`close-gate` already passes at the new head; `check-test` running.
+
+#1802 continues independently at `7d20e852f` (PASS, converged, 253/253 agentic tests, ceilings intact).
