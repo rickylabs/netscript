@@ -7300,3 +7300,50 @@
   - **Both dispatched workers were cut off** mid-analysis by a `stop_sequence` on the open-model route
     after real work (S8 repair: 42 turns; #1887 eval: substantial). Resumed with `--resume` on their
     own session ids rather than restarted, preserving that work.
+
+- **D-282 — #1887 shipped (`e938ecd31`, #1855 closed); S7 re-expression dispatched after a rebase
+  proved wrong-shaped; S9 found to be the one branch that would delete freshly-merged knowledge.**
+  - **#1887 promoted on a real terminal PASS and merged.** Sequence held exactly: verdict → evidence
+    block → `status:ready-merge` → `gh run rerun` on the **unchanged head** `3b9b74539` → mirror ticked
+    **all four** #1855 boxes → close-gate **SUCCESS** → merged. The head never moved through promotion.
+    #1855 is `CLOSED/COMPLETED`.
+  - **The evaluator earned its cost.** It confirmed the load-bearing claims rather than restating them:
+    fail-closed attribution never reaches `owned` with an unknown co-mounter; the exact-command
+    assertion has **no bypass path** because every mutation flows through the injected `CommandPort`;
+    `atRiskFromUpstream` is correct in both directions. Four findings recorded, all residual edges or
+    pre-existing policy, none touching acceptance.
+  - **I moved a DoD box rather than tick it.** The PR carried `- [ ] Final lease-backed proof`, which
+    was **my own addition** beyond #1855's four boxes. Since box 3 explicitly accepts "a test (or
+    receipt-backed gate)" and the local receipt is parked on the owner's topology ruling, I moved it
+    into a labelled follow-up section instead of leaving a self-imposed item blocking close-gate on
+    something the issue never required. It was **not** ticked.
+  - **S7's rebase was the wrong mechanism and I stopped rather than force it.** Both sides rewrote the
+    same four modules (`teardown.ts` 269+/33− vs #1887's 28+/4−; `probes.ts` 181+ vs 194+), and the
+    conflicts **cut through test bodies** — my first union produced a file two braces short with a test
+    left unclosed. Patching seams that damaged, in cleanup-safety code, is the wrong trade. Aborted
+    cleanly (`git rebase --abort`, worktree restored) and dispatched a **re-expression** instead:
+    session `4581e2ab-c13c-40cd-854b-b77f4b185877`, worktree `007-s7-reexpress` off `e938ecd31`.
+  - **Correct sizing mattered.** A naive `git diff` against S7's original branch point showed **256**
+    files — that is everything main gained since, not S7's work. Against the true merge-base
+    (`302409f0c`) it is **17 commits over 15 files**, all in `teardown/` plus a playbook, of which
+    **8 are contended**. Well-scoped, which is why the brief is worth writing rather than the rebase
+    worth forcing.
+  - **Stack audit vs `e938ecd31` — one real finding.** S8, S10, S11 and #1747 are `overlap=0`;
+    **S13 clean-merges** (one-line `aspire mcp` → `aspire agent mcp` in `ownership.ts`, its own
+    stale-surface scope). **S9 is the seam**: it rewrites `.agents/skills/aspire/SKILL.md` **85+/275−**
+    while #1887 added **21 lines** there documenting the DCP upstream constraint, and `merge-tree`
+    reports 2 conflicts.
+    - **The danger is the resolution, not the conflict.** A net −190-line rewrite taking its own side
+      wholesale would drop #1887's paragraph and **nothing would go red** — the file is prose. That
+      paragraph is the written form of the #1855 root cause (DCP reaps on teardown; cannot be prevented
+      from inside `aspire stop`), so losing it re-opens the question that cost a foreign network.
+    - Recorded on #1759 with the specific instruction to re-apply on top of #1887's version, and the
+      caveat that **`agentic:sync-claude:check` cannot catch this**: it proves the two files agree, not
+      that either is correct.
+  - **Model-guard finding:** `z-ai/glm-5.3` and `qwen/qwen3.8-max` are both **denied** by
+    `enforceOpenEvaluatorModels` despite qwen appearing in `OPEN_EVALUATOR_MODEL_IDS`;
+    `z-ai/glm-5.3-flash` passes. Two dispatches were lost to this before I checked the guard rather
+    than guessing again.
+  - S8 repair re-dispatched with the **cause given** rather than to be discovered — session
+    `c4b57622-6521-4cd7-8a37-a41fe201cf88`, on post-#1872 main at `43836386e` with S8's carry re-proven
+    **72/72**.
