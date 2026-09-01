@@ -92,8 +92,16 @@ class LazyPluginServiceKv implements PluginServiceKv {
  *
  * @example
  * ```ts
+ * import { getKv } from '@netscript/kv';
+ * import { createPluginServiceContext } from '@netscript/plugin';
+ *
+ * // The host owns the database client and supplies it as an async resolver.
+ * // Any `() => Promise<unknown>` satisfies the contract, so the plugin package
+ * // never takes a dependency on a concrete database adapter.
+ * declare const openDatabaseClient: () => Promise<unknown>;
+ *
  * const context = await createPluginServiceContext('workers', {
- *   getDatabaseClient: () => import('../../database/mod.ts').then((module) => module.db.getClient()),
+ *   getDatabaseClient: () => openDatabaseClient(),
  *   getKv: () => getKv(),
  * });
  * ```
