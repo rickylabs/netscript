@@ -124,3 +124,37 @@ Read the focused locator test first, then the locator, then its single call site
   registration anchors, valid ordering, and exactly one resource creation/registration in the
   returned range.
 - Separate-session IMPL-EVAL follows; this generator session does not self-certify.
+
+## Convergence onto main b66e52cbc (orchestrator)
+
+- Merged `origin/main` `b66e52cbc` into the leaf at `5cd4aa4a4`; merge commit `2e6a348bb`.
+- Clean merge, no conflicts. All three leaf product paths verified **byte-identical** across the
+  merge (`git rev-parse <sha>:<path>` compared before/after): the locator module, the fixture, and
+  the test file. `deno.lock` unchanged by the merge.
+- Tier-A re-run at the converged head: `packages/cli/e2e` unit suite **210 passed / 0 failed**;
+  `deno lint` clean on all 3 touched files; `deno fmt --check` clean across 178 files.
+
+### Cascade / generated-carrier checks at converged head
+
+| Check | Exit |
+|---|---|
+| `check:agent-docs-prose` | 0 |
+| `check:assets-barrel` | 0 |
+| `check:publish-assets` | 0 |
+| `check:mcp-export-corpus` | **1 — stale** |
+
+`check:mcp-export-corpus` is **stale on clean `origin/main` `b66e52cbc` itself** — verified by
+checking out main into a detached scratch worktree and running the check there in isolation
+(exit 1). It is therefore **pre-existing and not caused by this leaf**, which touches only
+`packages/cli/e2e` and changes no exported surface.
+
+Deliberately **not** regenerated inside this leaf: regenerating a shared carrier here would sweep an
+unrelated main-wide problem into a bounded p0 fix and make this diff dishonest about its own scope.
+Recorded as a stop-and-report supervisor handoff.
+
+### Runtime status
+
+The `340afa724` host-lease receipt is **void for this head** and is not claimed. That head carried
+only the plugins-side locator; the current head additionally rewrites the locator and migrates the
+background consumer, which is product code the Flow-B fixture executes at runtime. Hosted exact-head
+`scaffold.runtime` is required via the `gate:e2e` label.
