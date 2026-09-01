@@ -7823,3 +7823,51 @@ the diff myself rather than spending an evaluator cycle on it.
 ### #1854 — preservation leaf CI running
 
 Two checks green so far, `check-test`/`quality` pending on a 7-file markdown-only addition.
+
+## D-181 — #1846 ruling: box 1 is NOT satisfied, and the gap came from my brief
+
+Audit ruling adopted in full: **PR #1846 stays draft**, a separate-session exact-head IMPL-EVAL runs
+now, and the real 3-arrival proof is deferred until the Aspire runtime queue drains.
+
+### The error is mine, and I said so to the author
+
+My brief read the acceptance text's "Open (**or simulate**) three or more PRs" as licence for a
+*generic* proof, and told the author to build a no-op harness in the same concurrency shape. That
+harness demonstrates GitHub's `queue: max` behaviour **generally** — it does **not** show that three
+`e2e-cli-gate` arrivals within one minute each execute **both modified runtime tiers to real
+conclusions**. Those are different claims and only the second is box 1. The audit found no durable
+owner ruling superseding the issue wording, so the stated proof stands as written.
+
+The author built exactly what I asked for. I asked for the wrong thing, and the correction says that
+plainly rather than framing it as an implementation shortfall.
+
+**The simulation evidence is kept, not discarded** — it is genuine and documents the mechanism; it is
+simply not box 1. The author is told to relabel what it proves, correct any statement implying box 1
+is satisfied (rewrite in place, never an appended contradiction), and **preserve every run artifact**.
+
+### The change under evaluation
+
+`.github/workflows/e2e-cli.yml` adds **`queue: max`** to both runtime groups (one running plus up to
+100 pending, replacing the default single pending entry that silently evicted overflow) plus a header
+comment documenting the policy.
+
+The IMPL-EVAL brief is scoped accordingly: evaluate everything **except** box 1, record box 1
+explicitly as **deferred, not satisfied**, and neither pass on the simulation nor fail for a
+deliberately deferred proof — stating precisely which boxes the verdict covers.
+
+It is aimed at the two things most likely to be wrong:
+
+- **The bound.** One running plus 100 pending is finite. The header claims `cancelled` now means only
+  explicit cancellation, timeout, or per-ref supersession — is that **true at the boundary**, or only
+  below 100? A documented policy that quietly stops holding at overflow is the same defect class in a
+  new dress.
+- **Head immutability (box 3).** A deferred run must regain its slot with **no push** to its head
+  branch; a mechanism needing redispatch would trade a CI defect for an evidence defect by
+  invalidating recorded IMPL-EVAL verdicts. That is the property most worth scepticism.
+
+Also corrected #1846's metadata, which was incomplete: added `orchestrator:internals` and milestone
+`0.0.7`.
+
+Author instructed to prepare — but **not execute** — the exact 3-arrival procedure, naming how
+serialization will be asserted **from run timestamps rather than configuration**, and how head
+immutability will be shown, so the procedure is reviewable *before* it consumes real runtime slots.
