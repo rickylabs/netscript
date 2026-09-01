@@ -8940,3 +8940,57 @@ PR stays **draft** at `status:impl`. Cycle 2 after the author reports.
 rewritten to current-head truth with the delta PASS and carrier-only carry receipt. **#1846** parked
 on the deferred runtime proof. **#1876** fix dispatched. **#1879** launched, not yet pushed.
 **#1351** PLAN-EVAL running.
+
+
+## D-203 - #1802 body corrected (my claim was false); #1879 blocked on a genuine owner call
+
+### #1802 - the body was NOT rewritten; that claim of mine was wrong
+
+I reported the PR body as "rewritten to current-head truth". **It was not.** I had posted the delta
+PASS and carry receipt as a **comment**, while the body still ended with a stale section citing
+`0c938c3e6` and "delta eval dispatched / check-test not ready". The audit caught it.
+
+Rewritten in place now: head `e36b17461`, base `main` `102ef8a10`, delta `VERDICT: PASS` with its
+artifact, the transport-failure note, the carrier-only carry receipt with blob comparison, ceilings,
+gates, and the O-1 correction that "`deno.lock` byte-unchanged" should read **"no leaf-authored lock
+change"**. Verified the stale marker is gone from the live body rather than assuming the PATCH landed.
+
+**The lesson is narrow and worth keeping: a comment is not a body.** Reviewers and audits read the
+body; posting the truth adjacent to a stale body leaves the stale text authoritative.
+
+### #1879 - implementer stopped correctly on a real finding
+
+It proved the goal is achievable and the hazard is real: baseline `deno why @orpc/shared` shows **two
+copies**, raised manifests give **one copy at 1.15.0** with a clean `deno ci` and `deno task check`.
+But **a pure lock-only move is impossible** - with `^1.14.6` carets restored,
+`deno update --lockfile-only` reports `Updated 0 dependencies`.
+
+Three blockers, all verified by me independently:
+
+1. **`packages/plugin-workers-core/deno.json` carries `@orpc/contract` and `@orpc/server` at
+   `^1.14.6`** and must move - but my brief forbade that file because I assigned it to #1876.
+   **My error: I drew the boundary at *file* granularity when it should have been at *key*
+   granularity.** #1876 owns only the `@netscript/plugin-streams-core` key there. Corrected myself and
+   told the implementer directly; no decision needed.
+2. **`packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts:1`** imports
+   `npm:@orpc/client@1.14.6` at an **exact version**, pinning the old copy regardless of manifests.
+   Whether that fixture is a deliberate upstream-compatibility oracle or incidental is an **owner
+   call** - escalated on #1879, implementer told not to touch it.
+3. A **scaffold catalog mismatch** among the 5 test failures - required the implementer to enumerate
+   the failures precisely rather than leave a count, so the decision is made on specifics.
+
+Also corrected the issue's own framing: **"lock-only" was wrong in my brief**, and the escalation says
+so rather than pinning it on the implementer.
+
+Recommendation posted: widen #1879 to manifest + lock rather than split, because splitting leaves it
+unable to prove its own load-bearing single-copy gate - a version bump with no evidence, which is
+exactly what the issue was written to avoid. Labelled `status:blocked`.
+
+Nothing forbidden was changed: the tree carries only a regenerated `deno.lock` and run artifacts,
+nothing pushed.
+
+### Lane state
+
+**#1802** body truthful, `close-gate`/`quality`/`code-quality` pass, `check-test` running. **#1846**
+parked. **#1876** completeness fix dispatched after `FAIL_IMPL`. **#1879** blocked on the fixture
+decision, partial work unblocked. **#1351** PLAN-EVAL running.
