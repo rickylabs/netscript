@@ -7347,3 +7347,33 @@
   - S8 repair re-dispatched with the **cause given** rather than to be discovered — session
     `c4b57622-6521-4cd7-8a37-a41fe201cf88`, on post-#1872 main at `43836386e` with S8's carry re-proven
     **72/72**.
+
+- **D-283 — the S9 DCP-prose hazard confirmed by execution, resolution proven, then rolled back for a
+  base error I made.**
+  - **The hazard is exactly as predicted, and now measured rather than inferred.** Converging S9
+    produced **one** conflict region in `.agents/skills/aspire/SKILL.md`:
+    **HEAD = 20 lines and *is* #1887's DCP section; S9's side = 150 lines and does not contain it.**
+    So the natural resolution for a slice whose purpose is rewriting that file — take its own side —
+    **deletes the section outright**, and nothing goes red: it is prose, no test covers it, and
+    `sync-claude:check` still passes because it proves the two files *agree*, not that either is
+    correct.
+  - **Resolution proven by execution**: keep both — S9's rewrite, then re-append #1887's block, which
+    is a contiguous insertion rather than an interleaved edit. Verified the section and the
+    `microsoft/dcp#213` reference survive in **both** the source and the `.claude/` mirror, and that
+    they survived the full commit replay.
+  - **Then I rolled it back, because I had used the wrong base.** I rebased S9 `--onto origin/main`;
+    **S9 is stacked on S8**, so that drops S8's commits and S9's own commits then conflict against
+    their missing parent (`runtime-gates.ts`, `runtime-scripts.ts`). The abort was correct: completing
+    it would have produced an S9 that silently lost S8's work while looking converged. Aborted cleanly,
+    S9 restored to `b5d9cbad2`.
+  - **The proven resolution is preserved rather than discarded** —
+    `recipes/s9-dcp-prose-preservation.md` records the measured conflict shape, the exact `keep_both`
+    substitution, the verification greps, and why `sync-claude:check` **cannot** be the gate here. The
+    ordering is written down with it: S8 repair lands → S8 converges onto main → **then** S9 onto S8's
+    new head.
+  - **Two dispatches live and producing:**
+    - **S8 repair** (`c4b57622-…`) is editing `runtime-scripts.ts` — the exact file carrying the
+      diagnosed cause — plus a new RED-first test
+      `packages/cli/e2e/tests/application/gates/scaffold/typed-db-background-restart_test.ts`, whose
+      name matches the brief's requirement precisely.
+    - **S7 re-expression** (`4581e2ab-…`) still reading the two designs before writing.
