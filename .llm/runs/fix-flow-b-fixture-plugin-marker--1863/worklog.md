@@ -56,8 +56,8 @@ Read the focused locator test first, then the locator, then its single call site
 | --- | --- | --- | --- |
 | 2026-09-01 | 0 | plan | Ceiling and semantic two-anchor range locked; PLAN-EVAL N/A. |
 | 2026-09-01 | 1 | RED | Structured focused test: exit 1, 0 passed / 3 failed; test-only commit `1d045b04c`. |
-| 2026-09-01 | 2 | GREEN | Identical focused test: exit 0, 3 passed / 0 failed. |
-| 2026-09-01 | 2 | static gates | Three-file structured check/lint/fmt all exit 0; `deno.lock` hash unchanged. |
+| 2026-09-01 | 2 | GREEN | Product slice `142d8ede0`; identical focused test: exit 0, 3 passed / 0 failed. |
+| 2026-09-01 | 2 | static gates | Evidence head `340afa724`; three-file structured check/lint/fmt all exit 0; `deno.lock` hash unchanged. |
 
 ## Decisions
 
@@ -114,7 +114,9 @@ Read the focused locator test first, then the locator, then its single call site
   unchecked hosted/evaluator DoD items.
 - S1: RED commit pushed and PR phase comment posted with exact structured failure counts.
 - S2: Issue #1863 taxonomy reconciled to exactly one `status:` (`status:impl`) and one priority
-  (`priority:p0`); hosted acceptance and separate-session evaluation remain pending.
+  (`priority:p0`). A concurrent supervisor-owned commit, `142d8ede0`, landed the same staged
+  three-file product slice; its history was preserved without rewrite, and every scoped wrapper was
+  rerun at head `340afa724`. Hosted acceptance and separate-session evaluation remain pending.
 
 ## Handoff Notes
 

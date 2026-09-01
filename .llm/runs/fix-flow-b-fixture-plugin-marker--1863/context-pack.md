@@ -23,7 +23,8 @@ runtime acceptance remain deliberately pending.
 - Proposed and locked the minimal product ceiling.
 - Deferred generator-family marker consistency without crossing scope.
 - Landed and pushed the test-only RED commit `1d045b04c`.
-- Implemented the locator and integrated the returned half-open range into Flow-B rewriting.
+- Implemented the locator and integrated the returned half-open range into Flow-B rewriting in
+  product commit `142d8ede0`.
 - Passed focused test/check/lint/fmt gates and supplemental read-only quality/doctrine scans.
 
 ## In Progress

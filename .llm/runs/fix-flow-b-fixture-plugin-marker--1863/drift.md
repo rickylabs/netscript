@@ -24,3 +24,17 @@
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `worklog.md` Fitness Gates; clean lock hash `ac2ee042566bc6b03502c40961c10d624416b061`.
+
+## 2026-09-01 — supervisor-owned product commit landed during slice staging
+
+- **What:** Commit `142d8ede0` landed the same three product/test files while the generator session
+  was staging the GREEN slice; the following commit `340afa724` therefore contains the harness
+  evidence rather than duplicating or rewriting product history.
+- **Source:** Local commit graph and remote branch head.
+- **Expected:** One local GREEN commit containing product files plus run artifacts.
+- **Actual:** Product and harness evidence are two adjacent commits; the test-only RED remains an
+  independent earlier commit.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `git log`: `1d045b04c` (RED) → `142d8ede0` (product GREEN) → `340afa724` (evidence);
+  scoped test/check/lint/fmt were rerun after the concurrent commit and all passed.
