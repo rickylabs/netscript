@@ -9365,3 +9365,47 @@ rather than pattern match after a `pgrep`-style self-match briefly reported a ph
 
 Static lanes continue: **#1876** close-gate re-run armed at unchanged head (`check-test` still
 running), **#1351**, **#1879**, **#1888** all progressing.
+
+
+## D-212 - #1876 SHIPPED; #1879 converged through the predicted manifest seam
+
+**#1876 merged as `43376c506`**; #1543 closed. Internals shipped this session: **#1823, #1828, #1830,
+#1832, #1840, #1862, #1802, #1876** - eight leaves, plus feature #1762 that #1828 unblocked.
+
+Its packet recorded the two derivation errors that made cycle 1 necessary, both mine and both caught
+by the evaluator: a `definePlugin(...)` **string literal** counted as an import, and an exact-match
+grep that **under-counted `packages/cli/e2e` to zero** when it has six sub-path imports.
+
+### #1879 - the #1876/#1879 seam landed exactly where DR predicted, and resolved cleanly
+
+The convergence conflicted in `packages/cli/e2e/deno.json` and
+`packages/plugin-auth-core/deno.json` - the **same manifests, different keys**: #1876 added
+`@netscript/plugin-streams-core` while #1879 raised `@orpc/*` to `^1.15.0`.
+
+This is precisely the boundary I corrected earlier, when my brief had forbidden #1879 from touching
+`plugin-workers-core` at *file* granularity. Resolved as a **key-level union** - both changes belong,
+neither supersedes the other - and verified both intents survive rather than trusting the merge:
+
+| Check | Result |
+| --- | --- |
+| `deno why @orpc/shared` | **exactly one copy: `1.15.0`** |
+| No-mixed audit | **17 oRPC names, zero mixed** |
+| `deno ci` (frozen) | **0** |
+| `arch:check` | **0** |
+| `publish:dry-run` | **0** |
+| #1876's six `plugin-streams-core` declarations | **all preserved** |
+
+Head `1914a38c6` pushed. Root `deno task test` running at the integrated head.
+
+### The slice honoured its hardest boundary
+
+Its own evidence records **"no behavioral failure remained and no behavioral source was changed"** -
+the constraint that mattered most, since the widened scope made it tempting to fix the five failures
+by touching product code. Integrated pre-merge figures: root test **4,704 passed / 0 failed**, all 32
+oRPC keys across the root catalog and 13 member manifests at 1.15.0.
+
+### Lane state
+
+**#1351** at `050ef5e6f`, author active. **#1888** author active, not yet pushed. **#1846** disarmed
+behind #1858 on the corrected `gate3` (requires a **real** terminal execution, `cancelled` excluded);
+currently `0/2` real terminal jobs with the lane occupied.
