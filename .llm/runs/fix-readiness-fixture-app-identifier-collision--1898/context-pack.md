@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-readiness-fixture-app-identifier-collision--1898` |
 | Branch | `fix/readiness-fixture-app-identifier-collision` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | `6 — CLI / Tooling` (CLI-owned E2E harness) |
 | Scope overlays | `none` |
 
@@ -27,11 +27,11 @@ GREEN implementation and focused gates pass, with separate opposite-family slice
 
 ## In Progress
 
-- Slice 2 GREEN sign-off commit.
+- GREEN sign-off commit `38dab6c7932a76b83822902688e61e26dab4ed1c`.
 
 ## Next Steps
 
-1. Commit/push GREEN and update draft PR evidence.
+1. Push GREEN and update draft PR evidence.
 2. Obtain separate-session IMPL-EVAL without marking the PR ready.
 
 ## Key Decisions

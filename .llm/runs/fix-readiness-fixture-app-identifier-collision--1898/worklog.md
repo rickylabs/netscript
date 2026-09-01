@@ -91,7 +91,7 @@ trade-off decision remains.
 | Focused regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests/application/gates/prepare-readiness-fixture_test.ts` | EXPECTED FAIL (exit 1) | passed 4, failed 1, unique failures 1; three duplicate const bindings observed. |
 
 RED SHA: `ad53835ee0b10d23274ae687ffbbc03cd39357a5`.
-GREEN SHA: pending.
+GREEN SHA: `38dab6c7932a76b83822902688e61e26dab4ed1c`.
 
 ### Final Static Gates
 
