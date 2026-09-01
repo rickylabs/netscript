@@ -35,3 +35,21 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** remote workflow commit `e74f8bdc6`; worklog push ledger.
+
+## 2026-09-01 — Generic simulation does not satisfy exact runtime acceptance
+
+- **What:** The standalone no-op simulation was originally described as satisfying the issue's
+  three-arrival acceptance, but it proves only the GitHub queue primitive generally.
+- **Source:** Owner audit ruling on PR #1846.
+- **Expected:** The original owner brief directed simulation and treated the issue's “or simulate”
+  wording as permitting a generic no-op proof.
+- **Actual:** Acceptance box 1 requires three PRs carrying `e2e-cli-gate` to execute both modified
+  runtime tiers to real conclusions; boxes 2, 3, and 5 require corresponding actual-job timestamp,
+  actual-PR head, and run/job evidence.
+- **Severity:** material evidence-scope correction; implementation design is unchanged.
+- **Action:** Rewrite current evidence claims in place, retain the simulation as general mechanism
+  evidence, prepare the exact procedure, and defer its execution until explicit owner release after
+  the Aspire runtime queue drains.
+- **Evidence:** `simulation-evidence.md`; `exact-runtime-proof-procedure.md`; owner audit ruling.
+- **Evaluation currency:** The owner-controlled separate-session IMPL-EVAL targets
+  `a8f3f9e81`; this later artifact correction is not covered by that exact-head evaluation.

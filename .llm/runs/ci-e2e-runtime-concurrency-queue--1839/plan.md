@@ -29,12 +29,15 @@ allowing at least three eligible arrivals to remain pending and execute without 
 
 - Add GitHub's native multi-entry queue to both existing runtime-tier concurrency groups.
 - Document the bounded queue and its run-list semantics beside the workflow cost/selection policy.
-- Prove behavior with a no-op scratch workflow on throwaway branches and timestamp assertions.
-- Preserve exact run IDs, conclusions, head SHAs, and timing evidence in the run directory and PR.
+- Prove the general `queue: max` scheduler behavior with a no-op scratch workflow on throwaway
+  branches and timestamp assertions.
+- After explicit owner release, prove exact issue acceptance with three `e2e-cli-gate` PRs executing
+  both runtime tiers; preserve their run IDs, job conclusions, head SHAs, and timing evidence.
 
 ## Non-Scope
 
-- No real `scaffold.runtime` or `scaffold.runtime.sqlite` execution for acceptance.
+- No real `scaffold.runtime` or `scaffold.runtime.sqlite` execution before the owner confirms the
+  Aspire queue has drained. Exact acceptance is deferred, not waived.
 - No other workflow concurrency cleanup.
 - No package, plugin, agentic runtime, or `deno.lock` edits.
 - No ready-for-review transition or IMPL-EVAL; the owner retains those actions.
@@ -53,7 +56,8 @@ allowing at least three eligible arrivals to remain pending and execute without 
 | D1 | Retain both existing global group keys and `cancel-in-progress: false`. | Preserves independent repo-wide serialization for docker and sqlite. |
 | D2 | Add `queue: max` to each runtime job. | Native GitHub policy queues up to 100 pending jobs instead of replacing the one pending job. |
 | D3 | Do not add a polling action, custom lock, redispatch, or empty production commit. | Native admission is race-safe, needs no runner-held polling loop, and never moves the PR head. |
-| D4 | Simulate with a separate no-op workflow on three or more throwaway branches. | Exercises the same concurrency shape without consuming runtime resources. |
+| D4 | Simulate with a separate no-op workflow on three or more throwaway branches. | Exercises the concurrency primitive without consuming runtime resources; it does not satisfy the exact runtime acceptance. |
+| D5 | Defer the three-PR/two-tier acceptance proof until explicit owner release. | The audit ruling requires real tier conclusions, while the current Aspire lane must not be disturbed. |
 
 ## Open-Decision Sweep
 
@@ -83,8 +87,9 @@ allowing at least three eligible arrivals to remain pending and execute without 
 | Gate | Required | Expected evidence |
 | ---- | -------- | ----------------- |
 | Workflow syntax/shape | yes | Repository workflow validation or a YAML-aware focused check |
-| Behavioral queue simulation | yes | At least three successful no-op runs with non-overlapping job timestamps |
-| Head immutability | yes | Each deferred run retains its triggering head SHA through admission |
+| General queue-mechanism simulation | yes | At least three successful no-op runs with non-overlapping job timestamps; not an exact acceptance verdict |
+| Exact runtime acceptance | deferred | Three `e2e-cli-gate` PRs each execute both runtime tiers after owner release |
+| Exact head immutability | deferred | Each of those three PR heads remains unchanged through actual-tier admission |
 | Scope/lock hygiene | yes | Only the workflow and run dir changed; `deno.lock` SHA-256 unchanged |
 
 ## Arch-Debt Implications
@@ -103,6 +108,7 @@ allowing at least three eligible arrivals to remain pending and execute without 
 | 4 | Timestamp assertion | Query simulation job `started_at`/`completed_at` values | Serialized intervals do not overlap |
 | 5 | Head immutability | Compare each run's recorded `head_sha` before/after waiting | No run needs another push to enter |
 | 6 | Lock hygiene | Compare `sha256sum deno.lock` with baseline | `edfa0c24...1820c` unchanged |
+| 7 | Exact runtime proof | Follow `exact-runtime-proof-procedure.md` only after owner release | All five issue boxes receive actual-run evidence |
 
 ## Dependencies
 

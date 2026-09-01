@@ -15,7 +15,7 @@
 | 1 | `scaffold-runtime` uses `e2e-scaffold-runtime-global`; `scaffold-runtime-sqlite` uses its own sqlite-global group. | `.github/workflows/e2e-cli.yml` job-level `concurrency` blocks |
 | 2 | Default GitHub concurrency retains only one pending entry; a later arrival replaces it. | [GitHub concurrency documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency) |
 | 3 | GitHub's native `queue: max` setting allows up to 100 pending entries in a concurrency group while preserving single execution. | [GitHub queue announcement](https://github.blog/changelog/2026-05-07-github-actions-concurrency-groups-now-allow-larger-queues/) and the concurrency documentation |
-| 4 | The native queue resumes a pending job in the same workflow run; no redispatch and no head movement are part of the mechanism. | Native concurrency semantics; prove with scratch no-op runs and unchanged per-run head SHAs |
+| 4 | The native queue resumes a pending job in the same workflow run; no redispatch and no head movement are part of the mechanism. | Native concurrency semantics; scratch no-op runs prove this generally, while exact acceptance requires unchanged heads from the three real `e2e-cli-gate` runs |
 | 5 | A third-party/polling admission action is unnecessary and would consume runner time while waiting. | Native `queue: max` directly represents the required policy |
 
 ## jsr-audit surface scan
@@ -25,8 +25,11 @@
 ## Open questions
 
 - Closed: use the native bounded queue rather than a polling or redispatch mechanism.
-- Evidence pending: run a no-op scratch workflow from at least three throwaway branches and derive
-  non-overlap from recorded job timestamps. Do not invoke either real runtime tier.
+- General mechanism evidence complete: the no-op scratch workflow retained and serialized three
+  arrivals without head movement.
+- Exact acceptance evidence deferred: after explicit owner release, three `e2e-cli-gate` PRs must
+  execute both actual runtime tiers, with job timestamps and unchanged PR heads recorded according
+  to `exact-runtime-proof-procedure.md`.
 
 ## Out-of-scope concurrency scan
 

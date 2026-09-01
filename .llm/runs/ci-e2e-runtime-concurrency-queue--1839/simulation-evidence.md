@@ -3,6 +3,19 @@
 This proof used a standalone no-op workflow on three throwaway branches. It did not apply
 `e2e-cli-gate`, invoke `e2e-cli.yml`, or consume a docker/sqlite runtime slot.
 
+## Acceptance boundary
+
+This evidence proves GitHub's `queue: max` behavior for the standalone no-op concurrency shape:
+more than one pending arrival was retained, the simulated critical sections ran serially, and each
+run kept its triggering head without a push.
+
+It does **not** satisfy issue acceptance box 1. It did not open three PRs carrying
+`e2e-cli-gate`, and it did not execute either `scaffold-runtime` or
+`scaffold-runtime-sqlite`. Consequently, it also does not supply the actual-tier timestamp,
+actual-PR immutable-head, or per-runtime-job conclusion evidence required by boxes 2, 3, and 5.
+Those boxes are deferred until the owner releases the exact three-arrival runtime proof after the
+Aspire queue drains. The reviewable procedure is in `exact-runtime-proof-procedure.md`.
+
 ## Shape
 
 - Workflow: `.github/workflows/e2e-runtime-queue-simulation-1839.yml` on each throwaway branch only.
@@ -24,9 +37,9 @@ both deferred jobs.
 | [33414868688](https://github.com/rickylabs/netscript/actions/runs/33414868688) | `ci/e2e-runtime-queue-sim-1839-2` / `38d62b366b1b17d3561bb50d8585ff022db8bb68` | `success` | 16:35:16–16:35:49 |
 | [33414870475](https://github.com/rickylabs/netscript/actions/runs/33414870475) | `ci/e2e-runtime-queue-sim-1839-3` / `9427c83d56c5dbd18182ea911b6e7ef9c372f8e8` | `success` | 16:35:52–16:36:27 |
 
-## Assertions
+## Simulation assertions
 
-The acceptance script fetched each run and its job from the GitHub Actions API and failed closed
+The simulation assertion fetched each run and its job from the GitHub Actions API and failed closed
 unless all of these were true:
 
 - all three runs and jobs were `completed/success`;
@@ -39,5 +52,5 @@ Result: `PASS`, `overlap_count: 0`, exit `0`.
 A separate raw `git ls-remote` assertion compared all three remote branch heads to their triggering
 SHAs after the queue drained. Result: unchanged, exit `0`; no deferred run needed a push.
 
-The throwaway branches remain available for evaluator inspection and can be deleted after the
-acceptance evidence is ratified. They are not part of PR #1846.
+The throwaway branches remain available for inspection and can be deleted only when the owner
+authorizes cleanup. They are not part of PR #1846 and are not the exact acceptance-proof branches.
