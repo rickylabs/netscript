@@ -253,3 +253,30 @@ self-certification. Separate-session IMPL-EVAL remains mandatory and supervisor-
    one correct RESP2 PING and the distinct named-health gate; add no Redis client or lock change.
 7. The split remains required before attributing historical cause or adding any seventh-path causal
    repair. The reliability fix itself does not wait for that split.
+
+## Convergence with #1898 (2026-09-01) — circular block, resolved by one head
+
+`scaffold.runtime` cannot be proven by either leaf alone:
+
+| Head | `runtime.wait.garnet` | `runtime.health.listener-unreachable` |
+| --- | --- | --- |
+| #1899 alone (`438ed4f60`, sqlite tier) | PASS 7302 ms | **PASS 30558 ms** |
+| #1899 alone (`438ed4f60`, postgres tier) | **FAIL — 300 s wall (#1844)** | never reached |
+| #1858 alone (`811862835`) | PASS ~2 s | **FAIL — ECONNREFUSED 18999 (#1898)** |
+
+#1899 lacks this branch's Garnet readiness repair, so its postgres tier walls at
+`aspire wait garnet --status healthy --timeout 300`. This branch lacks #1899's fixture-identifier
+repair, so its controller never binds 18999. Same shape as #1865 ← #1871 ← #1878; converged rather
+than deadlocked.
+
+**Merges:** `origin/main` `159ede042` then `origin/fix/readiness-fixture-app-identifier-collision`
+`438ed4f60`, both clean, head `96f074065`, `deno.lock` byte-identical to main.
+
+**Both evaluated fixes carry by product identity:**
+
+| File | Identical to |
+| --- | --- |
+| `verify-listener-readiness.ts` | `fc0b26585` — #1844 `PASS_IMPL` |
+| `prepare-readiness-fixture.ts` | `438ed4f60` — #1898 `PASS_IMPL` |
+
+What the converged head must earn is the runtime proof neither leaf could obtain alone.
