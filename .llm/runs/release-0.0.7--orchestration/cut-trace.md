@@ -360,6 +360,18 @@ artifact-pinned production E2E.
   generated-corpus freshness, acceptance mirror, independent evaluator carry, and zero review
   threads were verified. This docs merge does not trigger a canary and does not block Fixes/Aspire.
 
+## 2026-09-01T06:04:35Z–06:12:57Z — two independent Internals leaves land
+
+- PR #1832 head `d446af9f7` squash-merged as `233828f0f`, closing #1695. It advances the coherent
+  TanStack AI dependency family and records the stable-channel/caret policy with two independent
+  PASS verdicts, current-main CI, zero threads, and all run context intact.
+- PR #1840 head `000758cd4` squash-merged as `3b6386e14`, closing #1750. Its final ready-state run
+  passed 4,627 tests with zero failures and 14 ignored, quality and close-gate; the bounded typing-
+  only evaluator carry and zero path overlap with the intervening dependency merge were verified.
+- Both PRs/issues were normalized to `status:shipped`. These merges are legitimate canary-6 payload
+  members by first-parent history, but they do not trigger publication without the coherent Aspire
+  13.5 user-facing checkpoint.
+
 ## 2026-08-31T16:03:24Z — typed principal/procedure policy joins canary 5 payload
 
 - PR #1762 head `e3852dfb51108a6a49b30fc1f918e164defb90b2` squash-merged as

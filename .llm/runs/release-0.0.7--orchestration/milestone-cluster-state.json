@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "78be0e032624f12bcb30535d40e3a948b08b9784",
+  "currentMainSha": "3b6386e14bd2176de795dad16fe523f5cd1fbcff",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -5338,7 +5338,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "78be0e032624f12bcb30535d40e3a948b08b9784",
+    "gitHead": "3b6386e14bd2176de795dad16fe523f5cd1fbcff",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -5379,7 +5379,7 @@
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-09-01T05:48:53.000Z"
+    "verifiedAt": "2026-09-01T06:13:31.000Z"
   },
-  "updatedAt": "2026-09-01T05:48:53.000Z"
+  "updatedAt": "2026-09-01T06:13:31.000Z"
 }

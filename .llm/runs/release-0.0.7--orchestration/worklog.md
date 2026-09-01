@@ -3587,3 +3587,27 @@
 - Environment preflight is Aspire `[]`, containers 0, custom networks 0. The coordinator removed
   only newly proven run-owned anonymous volume `90d704b4…` after zero-consumer verification; older
   `d33e5c2e…` remains preserved as foreign/unknown-owner. #1855 owns the attribution/tooling repair.
+
+## 2026-09-01T06:13:31Z — dependency policy and launcher separator fixes ship; Garnet proof finds a real generated-consumer red
+
+- PR #1832 head `d446af9f7` passed current-main CI, two independent evaluator passes, zero review
+  threads, truthful close-gate, and preserved its complete run. It squash-merged as `233828f0f`,
+  closing #1695; both issue and PR now carry `status:shipped`.
+- PR #1840 head `000758cd4` completed its label-sensitive fresh run with 4,627 tests, zero failures,
+  14 ignored, full quality, zero threads, and a clean merge tree. The coordinator accepted the
+  already-recorded owner carry across the typing-only terminal delta, and it squash-merged as
+  `3b6386e14`, closing #1750 with shipped lifecycle metadata.
+- #1858's first canonical exact-head `scaffold.runtime` run stopped honestly before Garnet at
+  `generated.quality-negative`: the emitted `_aspire-compat.mts` exposed one `Uint8Array` buffer
+  generic mismatch and one lost `elapsedMs` property type. Cleanup returned to Aspire `[]`, zero
+  containers, and zero custom networks while preserving only foreign volume `d33e5c2e…`. Fixes is
+  adding generated-workspace type/format RED-GREEN coverage, integrating current main, and will
+  rerun the lease before evaluation or merge.
+- The coordinator ruled S8 removes the obsolete `PROCESS_COMMANDS_FLAG` / Aspire 13.4 seam exactly
+  as #1720 requires. #1837 wins on every surviving source-safe ordinal path; its hardening of the
+  intentionally deleted line is superseded with an explicit A6 rationale. Aspire is reconverging
+  statically now and will pull #1858's exact merge SHA before Phase B.
+- Main-side stale MCP corpus issue #1859 is admitted as a one-file Internals repair from current
+  main. Features #1842 is demoted during that carrier repair, then must rebase, regenerate its own
+  exact corpus, repair the PR template, and rerun CI. Docs #1857 and Features #1592/#1451 continue
+  in parallel; Fixes #1845 resumes statically without taking the global runtime lease.

@@ -2308,3 +2308,21 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Runtime baseline is containers 0, Aspire `[]`, custom networks 0, and exactly one older foreign
   anonymous volume `d33e5c2e…` preserved. Newly created run-owned `90d704b4…` was removed after
   zero-consumer proof; #1855 owns the underlying attribution/cleanup repair.
+
+## Resume delta — 2026-09-01T06:13:31Z
+
+- Current main is `3b6386e14bd2176de795dad16fe523f5cd1fbcff`. Dependency-policy PR #1832
+  merged as `233828f0f`, closing #1695, and launcher-separator PR #1840 merged as `3b6386e14`,
+  closing #1750; both exact packets had green CI, independent evaluation coverage, zero threads,
+  truthful closure, preserved runs, and shipped labels.
+- Fixes #1858 contains the deterministic RESP probe and Garnet 1.1.10 alignment, but its first real
+  full runtime proof found two emitted-helper compile errors before Garnet. The host returned clean;
+  the leaf is adding generated-workspace type/format coverage, repairing the two exact types,
+  converging onto current main, and rerunning the proof before evaluation/CI.
+- Aspire S8 is unblocked by coordinator ruling: delete the obsolete 13.4 process-command seam per
+  #1720, preserve #1837 on every surviving path, and record the one-line A6 supersession. It is
+  reconverging statically and must pull #1858's merge SHA before the final Phase-B sequence.
+- #1859 owns the main-side MCP corpus refresh and blocks only #1842's shared carrier. #1845, #1857,
+  #1848, and the evaluator-proven disjoint #1592/#1451 slices remain active without consuming the
+  host runtime lease. Environment remains Aspire `[]`, containers 0, custom networks 0, one foreign
+  anonymous volume preserved, zero zombies, and stable NAS load.
