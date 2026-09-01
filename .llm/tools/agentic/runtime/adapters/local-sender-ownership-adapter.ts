@@ -99,6 +99,25 @@ export class LocalSenderOwnershipAdapter {
   }
 }
 
+function isMember<T>(values: readonly T[], value: unknown): value is T {
+  return values.some((candidate) => candidate === value);
+}
+
+function isSenderOwnershipRecord(
+  entry: Record<string, unknown>,
+): entry is Record<string, unknown> & SenderOwnershipRecord {
+  return entry.schemaVersion === SENDER_OWNERSHIP_SCHEMA_VERSION &&
+    typeof entry.worktree === 'string' && entry.worktree.startsWith('/') &&
+    typeof entry.ownerPid === 'number' && Number.isSafeInteger(entry.ownerPid) &&
+    entry.ownerPid > 0 &&
+    typeof entry.leaseToken === 'string' && Boolean(entry.leaseToken) &&
+    isMember(SENDER_OWNERSHIP_STATES, entry.state) &&
+    typeof entry.acquiredAt === 'string' && typeof entry.updatedAt === 'string' &&
+    (entry.sessionId === undefined || typeof entry.sessionId === 'string') &&
+    (entry.profileHome === undefined ||
+      (typeof entry.profileHome === 'string' && entry.profileHome.startsWith('/')));
+}
+
 /** Strictly parses sender records and rejects payload creep that could leak prompt data. */
 export function parseSenderOwnershipRecord(value: unknown): SenderOwnershipRecord {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -119,17 +138,6 @@ export function parseSenderOwnershipRecord(value: unknown): SenderOwnershipRecor
   if (Object.keys(entry).some((key) => !allowed.has(key))) {
     throw new Error('sender record contains unknown field');
   }
-  if (
-    entry.schemaVersion !== SENDER_OWNERSHIP_SCHEMA_VERSION ||
-    typeof entry.worktree !== 'string' || !entry.worktree.startsWith('/') ||
-    typeof entry.ownerPid !== 'number' || !Number.isSafeInteger(entry.ownerPid) ||
-    entry.ownerPid <= 0 ||
-    typeof entry.leaseToken !== 'string' || !entry.leaseToken ||
-    !SENDER_OWNERSHIP_STATES.includes(entry.state as never) ||
-    typeof entry.acquiredAt !== 'string' || typeof entry.updatedAt !== 'string' ||
-    (entry.sessionId !== undefined && typeof entry.sessionId !== 'string') ||
-    (entry.profileHome !== undefined &&
-      (typeof entry.profileHome !== 'string' || !entry.profileHome.startsWith('/')))
-  ) throw new Error('sender record invalid');
-  return entry as unknown as SenderOwnershipRecord;
+  if (!isSenderOwnershipRecord(entry)) throw new Error('sender record invalid');
+  return entry;
 }
