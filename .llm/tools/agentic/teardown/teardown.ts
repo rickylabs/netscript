@@ -4,6 +4,7 @@ import { systemCommands, systemFiles } from './ports.ts';
 import { probeContainer, processStartedAt } from './probes.ts';
 import { type LeakEntry, type LeakReport, runLeakCheck } from './leak-check.ts';
 import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 export interface TeardownResult {
   readonly applied: boolean;
@@ -113,13 +114,13 @@ export async function runTeardown(
 function parseArgs(
   args: string[],
 ): { sliceDir: string; worktreeRoot: string; apply: boolean; ownedRoots: string[] } {
+  args = normalizeTaskArguments(args);
   let sliceDir = '';
   let worktreeRoot = Deno.cwd();
   let apply = false;
   const ownedRoots: string[] = [];
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--') continue;
-    else if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
+    if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
     else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
     else if (args[i] === '--owned-root') ownedRoots.push(args[++i] ?? '');
     else if (args[i] === '--apply') apply = true;

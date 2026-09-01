@@ -67,6 +67,16 @@ Deno.test('launcher rejects unsafe or contradictory session combinations', () =>
     Error,
     'unsupported characters',
   );
+  assertThrows(
+    () => parseRemoteModelLaunchOptions(['--cwd', '/repo', '--']),
+    Error,
+    'Unknown argument: --',
+  );
+  assertThrows(
+    () => parseRemoteModelLaunchOptions(['--', '--', '--cwd', '/repo']),
+    Error,
+    'Unknown argument: --',
+  );
 });
 
 Deno.test('Claude child receives the gateway URL but no alternate-provider credential', () => {

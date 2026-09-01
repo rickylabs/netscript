@@ -57,6 +57,7 @@ import {
   resolveGithubToken,
   validateHandoffContract,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { requestedLaunchIdentity } from '../runtime/launch-route-identity.ts';
 import { OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
@@ -121,6 +122,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = {
     repo: 'rickylabs/netscript',
     tokenEnv: 'GH_TOKEN',
