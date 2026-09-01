@@ -7461,3 +7461,49 @@ I verified by walking `/proc` that this is a **live writer** (pid 3364860, the e
 dispatch), not a stale lock, and did not force it. The author is `working`, and the brief it already
 holds contains the full nine-path ceiling, the 1.1.1 → 1.1.10 alignment, and the drift-guard
 requirement — my follow-up was redundant.
+
+### #1863 admitted p0 — stale generator-marker consumers, inventory swept
+
+`scaffold.runtime` is blocked on `main` at gate 35. **#1837** (`1f50c98ce`) renamed the emitted
+per-plugin marker from the resource name to a positional ordinal
+(`// --- ${name} ---` → `// --- plugin ${pluginIndex} ---`) and the consuming E2E fixture was not
+updated, so `prepare-flow-b-fixture.ts:117` searches for `'  // --- workers-api ---'`, which is never
+emitted.
+
+**Attribution proven the cheapest way — statically, no run needed:** on `origin/main` the generator
+emits one string (`generate-register-plugins.ts:64`) and the fixture searches for a different one
+(`prepare-flow-b-fixture.ts:117`). #1858 touches neither file. Backed by **real generated output** from
+the retained scratch project: `// --- plugin 0…4 ---` present, `'  // --- workers-api ---'` count
+**0**, while the resource itself is generated correctly (`addExecutable('workers-api'…)`,
+`plugins.set('workers-api', resource)`). The wiring is fine; only the comment coupling broke.
+Filed as **#1863**, p0, not folded into #1858.
+
+**Sweep of same-class consumers** (coordinator asked to prevent a fourth):
+
+| Consumer | Keyed on | State |
+| --- | --- | --- |
+| `prepare-flow-b-fixture.ts:117` | `'  // --- workers-api ---'` | **broken** |
+| `prepare-flow-b-fixture.ts:305` | `'  // --- workers ---'` | **latent** — same file; targets the *background* generator, which still emits name-based markers, so it works today and breaks when background is made source-safe |
+| `prepare-readiness-fixture.ts:213` | `lastIndexOf('  // --- app ')` | latent — apps generator |
+| `service-environment_test.ts:124` | `lastIndexOf('  // --- plugin ')` | **already migrated** to the positional form |
+
+The useful findings are that **a second stale marker sits in the very file being repaired**, and that
+one consumer already migrated — so #1837's migration was partial rather than the pattern being sound.
+The leaf is told to re-anchor on generated **code** (`addExecutable('workers-api'`,
+`plugins.set('workers-api', …)`) rather than on a comment, and explicitly **not** to match
+`// --- plugin <N> ---` positionally, since an ordinal silently points at the wrong plugin when order
+changes — a worse failure than today's loud one.
+
+### Lease released to exact baseline
+
+Verified after the second proof: **containers 0, custom networks 0, `aspire ps` `[]`, volume set
+identical to baseline** (only foreign `d33e5c2e…` preserved, `diff` against the recorded baseline file
+returned equal). Failed receipt retained at `leased-proof2-1844.log` (34 passed / 1 failed in 54 ms).
+
+**#1858 progress from the two leased runs:** first run died at `generated.quality-negative` (27 passed)
+on two type errors that escaped into the *emitted* helper; the repair landed with an
+emitted-workspace type-check whose RED/GREEN I verified independently by stashing the source fix —
+**10 passed / 3 failed without it, 13 / 0 with it**. Second run reached **34 passed** and stopped only
+on the #1863 baseline blocker. Lock intent proven at the integration seam: `deno.lock` moved
+`edfa0c24…` → `01ff3a23…` and is **byte-identical to main's**, with the leaf's own lock delta at
+**0 lines** — the change is entirely #1832's.
