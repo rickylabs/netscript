@@ -199,3 +199,18 @@ interactive migration-authoring runner (`prisma migrate dev`). Generated workspa
 publish `db:deploy:<engine>` backed by `prisma migrate deploy`. The cited CI's retained diagnostic,
 once promoted, decides whether that mismatch is the actual failure. Until then the underlying cause
 remains unreported rather than inferred.
+
+### First diagnostic CI — run 33452657304
+
+At `592a8e688`, PostgreSQL again reached 58 passing gates before
+`runtime.typed-db-phase-b` failed. The Phase-B formatter proved the outer Aspire CLI emits its
+command result on stderr and leaves stdout empty. Aspire displayed only the first line of the
+multi-line command message, so newline-joined retained context was not observable at that boundary.
+
+The promoted message remained `Loaded Prisma config from prisma.config.ts.`. Source tracing explains
+why: `run-tool` retained stderr only, while `packages/database/scripts/migrate.ts` forwards Prisma
+stdout and logs its own non-interactive guidance through `console.log`. The typed command invokes
+`db:migrate:postgres`, which maps to that script and always constructs `prisma migrate dev`; CI is a
+non-terminal session. Therefore the next diagnostic delta retains bounded stdout without changing
+D-224's stderr policy and serializes the decisive message first on one Aspire-visible line. This is
+generic stream transport, not a Prisma classifier special case.

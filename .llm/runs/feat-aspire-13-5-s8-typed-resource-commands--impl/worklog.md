@@ -583,3 +583,28 @@ lockfile delta remains.
 No Aspire, Docker, AppHost, `e2e:cli`, or runtime suite ran. The diagnostic slice deliberately does
 not guess or repair the migrate cause. CI on this pushed slice is the first authorized source for
 the newly surfaced retained diagnostic.
+
+### D-233 first diagnostic CI and stream follow-up
+
+Diagnostic commit `592a8e6888d3906258c3c24c93c15c1d5f8b7070` was pushed only after
+`git ls-remote` returned the expected `927d24beddfb80ea96f1f3ba4df4fd269325a6f2`; the update was a
+fast-forward and clean-head `check:assets-barrel` exited 0. PR comment trail:
+`https://github.com/rickylabs/netscript/pull/1754#issuecomment-5486453123`.
+
+CI run `33452657304`, PostgreSQL job `99685895308`, reached 58 passing gates and failed only
+`runtime.typed-db-phase-b`. It proved that Aspire renders only the first newline-delimited line of
+the returned command message and writes the outer diagnostic to stderr. The promoted message was
+still the Prisma configuration preamble because the decisive migration guidance is emitted on
+stdout; `run-tool` had retained only stderr. The SQLite runtime sibling passed.
+
+The second diagnostic delta leaves `actionableStderr` and every D-224 bound unchanged. It retains
+stdout in a separate array with the same bounded policy, selects the concise failure across both
+streams, and presents the selected line plus bounded context on one ` | `-delimited Aspire-visible
+line. A new black-box cross-stream regression emits a generic stderr preamble and stdout headless
+failure and proves the latter is selected. Focused implementation tests passed 39/39 before barrel
+regeneration. The full helper/runtime-gate set then passed 281/281, including D-224/D-227/D-231.
+Structured check passed 3/3 files with zero diagnostics. The configured lint/fmt wrappers correctly
+refused the excluded template-test roots; the established standalone-policy wrapper fallback
+processed both changed test files with exit 0 and no findings. No local runtime was executed.
+`quality:gate` also exited 0 with zero scanner findings and doctrine `FAIL=0` (existing warnings
+only).
