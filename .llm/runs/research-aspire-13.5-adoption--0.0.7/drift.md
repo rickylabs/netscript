@@ -6239,3 +6239,39 @@
   - **Deferred deliberately:** the restack waits for S8's **final** head after the top-up onto current
     main plus **#1858** and **#1863** SHAs. Restacking onto `854e45cb8` now would force a second
     restack immediately afterwards.
+
+- **D-253/D-254 — Phase-B execution plan staged and ready to fire; nothing waits on me.**
+  - **Stack positions verified at main `3b6386e14`:**
+
+    | Slice | Head | behind | own |
+    | --- | --- | ---: | ---: |
+    | S8 | `854e45cb8` | **0** | 26 |
+    | S9 | `a8cf585b0` | 11 | 28 |
+    | S10 | `21a0bfec6` | 11 | 27 |
+    | S11 | `abe0fd6cc` | 32 | 37 |
+    | S13 | `9b684e176` | 32 | 33 |
+    | S7 | `bd3dbc843` | 20 | 17 |
+    | #1747 | `2032d4ed7` | 18 | 15 |
+
+    S9/S10's "own" counts include S8's commits; their **own-over-old-S8** counts are **14** and **13**,
+    which is what the `--onto` replay actually moves.
+  - **Three briefs staged**, needing only the merge SHAs and S8's final head substituted at dispatch:
+    1. **S8 top-up** — rebase onto current main carrying **#1863** and **#1858**; expects **zero**
+       semantic conflicts (S8 already replayed cleanly across three successive mains, and neither fix
+       touches its typed-`<db>-cli` surface). Preserves the **A6 deletion** explicitly, so a replay
+       cannot reintroduce `maybeWithProcessCommand(...)` from main's side, and re-runs the **A6 grep
+       proof** as a gate.
+    2. **S9 restack** — `git rebase --onto <S8-final> d1c6d8b54`, 14 own commits.
+    3. **S10 restack** — same form, 13 own commits.
+  - **Each restack brief asserts ancestry against S8's head, not `origin/main`** — the correction I got
+    wrong earlier in this programme and which S10 rightly refused to act on. Written into the template
+    so it cannot regress.
+  - **The mechanical expectation is stated so the agent can falsify it**, not assumed: S9/S10 have
+    **0 files** overlapping the A6 seam or the four #1837-hardened generators, so the five conflict
+    points S8 resolved should not recur — and if they do, that is a finding to report rather than a
+    resolution to improvise.
+  - **Blocking fixes both still open**: #1863 `status:impl`, #1858 `status:impl`. On their merge SHAs:
+    pull both → S8 top-up → S9/S10 restacks in parallel (siblings, no file overlap) → S11 restack on
+    S10 → **one serialized Phase-B lease from a clean zero baseline** → Tier-A delta review →
+    supervisor-dispatched independent IMPL-EVAL → acceptance/DoD/threads/CI → merge-ready hand-off.
+  - Runtime stays untouched until the lease returns to this lane at exact zero.
