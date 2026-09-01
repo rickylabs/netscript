@@ -143,3 +143,59 @@ producer's human-readable string: #1837 → #1863 (block comment renamed), #1837
 check vs a dual-arm emission), #1864 → #1877 (log line renamed). Each was invisible until the
 previous one was fixed, because the runtime suite stops at the first failing gate. That is why they
 surfaced one at a time rather than together, and why each cost a full hosted run to find.
+
+## Convergence onto main `102ef8a10` (#1848) — overlap inspected, hosted re-proof required
+
+`origin/main` advanced to `102ef8a10` (`fix(fresh): order partial navigation lifecycle`, #1848) after
+the green run. Merged at **`0ccb7a653`**, zero conflicts, `deno.lock` blob byte-identical to that
+main.
+
+**All seven judged blobs unchanged** — re-verified by `git rev-parse`, not by ancestry:
+
+| File | Identical to |
+| --- | --- |
+| `locate-workers-resource-block.ts` | `f008315d1` |
+| `prepare-flow-b-fixture.ts` | `f008315d1` |
+| `locate-workers-resource-block_test.ts` | `f008315d1` |
+| `prepare-readiness-fixture.ts` | `7b5a31a80` |
+| `prepare-readiness-fixture_test.ts` | `7b5a31a80` |
+| `wait-for-workers-runtime.ts` | `bb5fd4ad3` |
+| `wait-for-workers-runtime_test.ts` | `bb5fd4ad3` |
+
+So all three evaluator verdicts still carry by product identity. What does **not** carry is the
+runtime receipt, for a specific and checkable reason.
+
+### Overlap: #1848 reaches the generated project
+
+Inspected rather than assumed. #1848's product surface is mostly additive
+(`packages/fresh/src/runtime/navigation/**` is new; `packages/fresh/deno.json` gains a `./navigation`
+export and adds it to the `check`/`doc-lint` task lists). No scaffold asset imports
+`runtime/navigation` or `@netscript/fresh/navigation`, so the generated app does not use the new
+module directly.
+
+**But one line does reach the scaffold**, and it is the decisive one:
+
+```diff
+  packages/cli/src/kernel/domain/dependency-closures/netscript-web-runtime-closure.ts
++     './navigation',
+```
+
+That closure is consumed by:
+
+- `packages/cli/src/kernel/adapters/templates/app/generate-app-deno-json.ts` — it materializes the
+  **generated app's `deno.json`**, so scaffolded projects now carry a `@netscript/fresh/navigation`
+  mapping;
+- `packages/cli/src/kernel/templates/workspace/dependency-closure-verifier.ts` — the verifier that
+  runs during the generated `dev` preflight.
+
+Both are exercised by `scaffold.runtime`. A `deno.json` entry that fails to resolve, or a closure the
+verifier rejects, fails the suite well before any gate this PR repairs — so **old-main ancestry is not
+evidence here** and the previous receipt at `03def015b` cannot be carried forward.
+
+Recorded as a side note for **#1868**: this adds one more entry to the closure the `dev` preflight
+verifies, which nudges the same budget that issue is about. It does not change #1868's diagnosis.
+
+### Action
+
+One exact combined hosted two-tier proof at `0ccb7a653`. No repository-native impact gate can
+discharge this: the changed surface is demonstrably consumed by the generated project.
