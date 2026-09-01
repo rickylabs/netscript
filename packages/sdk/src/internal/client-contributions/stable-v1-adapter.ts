@@ -72,17 +72,31 @@ function resolveProcedureNode(contract: object, path: readonly string[]): unknow
 }
 
 function normalizeProcedureMeta(value: unknown): Readonly<NetScriptProcedureMeta> {
-  if (!isRecord(value) || !isRecord(value.access)) return Object.freeze({});
-  const authentication = value.access.authentication;
-  if (
-    authentication !== 'none' &&
-    authentication !== 'optional' &&
-    authentication !== 'required'
-  ) {
-    return Object.freeze({});
+  if (!isRecord(value)) return Object.freeze({});
+
+  let access: NetScriptProcedureMeta['access'];
+  if (isRecord(value.access)) {
+    const authentication = value.access.authentication;
+    if (
+      authentication === 'none' ||
+      authentication === 'optional' ||
+      authentication === 'required'
+    ) {
+      access = Object.freeze({ authentication });
+    }
   }
+
+  let policy: NetScriptProcedureMeta['policy'];
+  if (isRecord(value.policy)) {
+    const cache = value.policy.cache;
+    if (cache === 'no-store' || cache === 'default' || cache === 'force-cache') {
+      policy = Object.freeze({ cache });
+    }
+  }
+
   return Object.freeze({
-    access: Object.freeze({ authentication }),
+    ...(access === undefined ? {} : { access }),
+    ...(policy === undefined ? {} : { policy }),
   });
 }
 

@@ -164,6 +164,35 @@ export interface ServiceClientContext {
   } | null;
 }
 
+/** HTTP methods selectable by the NetScript SDK transport policy. */
+export type SdkClientHttpMethod =
+  | 'GET'
+  | 'POST'
+  | 'PUT'
+  | 'PATCH'
+  | 'DELETE'
+  | 'OPTIONS'
+  | 'TRACE'
+  | 'CONNECT';
+
+/** Immutable inputs supplied to a service-client HTTP method override. */
+export interface SdkClientTransportPolicyMethodOptions {
+  /** NetScript-owned procedure path and metadata. */
+  readonly procedure: import('./sdk-client-contribution.ts').SdkClientProcedureDescriptor;
+  /** Borrowed procedure input for this logical call. */
+  readonly input: unknown;
+  /** Method inferred from the contract before an override is applied. */
+  readonly inferredMethod: SdkClientHttpMethod;
+}
+
+/** Narrow, upstream-neutral override for SDK-owned transport policy. */
+export interface SdkClientTransportPolicy {
+  /** Override the contract-derived HTTP method for one logical call. */
+  readonly method?: (
+    options: Readonly<SdkClientTransportPolicyMethodOptions>,
+  ) => SdkClientHttpMethod;
+}
+
 /**
  * Optional second argument passed to service-client methods.
  */
@@ -288,6 +317,8 @@ export interface CreateServiceClientOptions<
    * disposition.
    */
   timeout?: number;
+  /** Optional HTTP method adaptation resolved before client contributions compose. */
+  transportPolicy?: SdkClientTransportPolicy;
   /** Whether to propagate trace context headers automatically. */
   propagateTraceContext?: boolean;
   /** Explicit literal tuple of typed SDK client contributions. */

@@ -6,6 +6,9 @@ const PROCEDURE_METADATA_SYMBOLS = [
   'BaseContractMeta',
   'ProcedureMetaFromNode',
   'ProcedureMeta',
+  'SdkClientHttpMethod',
+  'SdkClientTransportPolicyMethodOptions',
+  'SdkClientTransportPolicy',
 ];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -33,9 +36,18 @@ function findNamedNode(value: unknown, name: string): Record<string, unknown> | 
 
 Deno.test('procedure metadata declarations are independent of upstream public types', async () => {
   const contractsEntrypoint = new URL('../../contracts/mod.ts', import.meta.url).href;
+  const sdkClientEntrypoint = new URL('../src/client/mod.ts', import.meta.url).href;
+  const sdkDesktopEntrypoint = new URL('../src/desktop/mod.ts', import.meta.url).href;
   const sdkPortsEntrypoint = new URL('../src/ports/mod.ts', import.meta.url).href;
   const output = await new Deno.Command(Deno.execPath(), {
-    args: ['doc', '--json', contractsEntrypoint, sdkPortsEntrypoint],
+    args: [
+      'doc',
+      '--json',
+      contractsEntrypoint,
+      sdkClientEntrypoint,
+      sdkDesktopEntrypoint,
+      sdkPortsEntrypoint,
+    ],
     stdout: 'piped',
     stderr: 'piped',
   }).output();
@@ -54,7 +66,8 @@ Deno.test('procedure metadata declarations are independent of upstream public ty
   const procedureMeta = findNamedNode(documentation, 'NetScriptProcedureMeta');
   assert(procedureMeta !== undefined, 'deno doc --json omitted NetScriptProcedureMeta');
   const declaration = JSON.stringify(procedureMeta);
-  for (const field of ['authorization', 'scopes', 'roles']) {
+  for (const field of ['authorization', 'scopes', 'roles', 'policy', 'cache', 'force-cache']) {
     assert(declaration.includes(field), `NetScriptProcedureMeta omits ${field}`);
   }
+  assertEquals(findNamedNode(documentation, 'resolveTransportPolicy'), undefined);
 });
