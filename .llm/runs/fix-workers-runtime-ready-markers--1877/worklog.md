@@ -16,5 +16,33 @@
 
 ## Evidence
 
-Pending RED/GREEN execution.
+### RED
 
+- Commit: `581d9fef0e25d9c82e6853c8daa35182b2384fe6` (tests only; zero product files).
+- Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests/application/gates`
+- Exit: 1.
+- Observed counts: 0 passed / 0 failed / 0 total results; one process failure before execution.
+- Discriminating failure: TS2305, missing export `hasWorkersRuntimeStartupEvidence`.
+
+### GREEN
+
+- Commit: recorded by exact SHA in the follow-up evidence entry after the product commit exists.
+- Predicate: scheduler marker AND any marker from the named runner-mode collection.
+- Diagnostic: separately names a missing scheduler marker and absence of any runner-mode marker.
+- Required gates at the final formatted tree:
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| focused structured tests | 0 | 111 passed, 0 failed, 0 ignored |
+| scoped structured check | 0 | 188 files, 2 batches, 0 diagnostics |
+| scoped structured format | 0 | 188 processed, 0 findings, 0 refusals |
+
+- Formatting correction loop: the first scoped format check exited 1 with one line-wrap finding in the new test; `deno fmt` was applied only to the two owned TypeScript files, then all required gates were rerun to the results above.
+- Lint: not run; the three gates explicitly required by the leaf brief passed, so the known conditional root-lint refusal path was not encountered.
+- Full `e2e:cli`: not run by instruction; no runtime lease was requested.
+- `deno.lock`: unchanged.
+
+## Reconcile
+
+- Slice RED: issue #1877 remained open; draft PR #1878 carried `Closes #1877`, `status:impl`, and the required taxonomy. RED evidence was posted to the PR before GREEN began.
+- Slice GREEN: scope remains exactly one product module, one focused test, and this run directory. No producer change, related-issue scope, doctrine debt, or runtime lease was introduced.

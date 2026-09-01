@@ -3,8 +3,7 @@ import { assert, assertFalse } from '@std/assert';
 import { hasWorkersRuntimeStartupEvidence } from '../../../src/application/gates/scaffold/wait-for-workers-runtime.ts';
 
 const schedulerStarted = '[Scheduler] Started with 0 scheduled jobs';
-const webWorkerPoolStarted =
-  '[Worker worker-1] Starting with Web Worker pool (1 workers)...';
+const webWorkerPoolStarted = '[Worker worker-1] Starting with Web Worker pool (1 workers)...';
 // Keep this fixture aligned with plugins/workers/worker/worker.ts:156.
 const inProcessRunnerStarted =
   '[Worker worker-1] Starting in-process job runner (queue concurrency: 1)...';
