@@ -9270,3 +9270,52 @@ it. Both times the discrepancy was caught by audit rather than by me, so the fix
 
 `close-gate` re-run remains armed on run `33540526217` to fire at the **unchanged head** once
 `check-test` completes; no push, so the evaluated head stays immutable.
+
+
+## D-210 - My auto-release raced #1858 for the hosted slot; the author's own precondition stopped it
+
+**My watcher was wrong and it fired.** I armed it on a **single** term - hosted queue drain - and it
+released #1846's proof the moment the lane looked free. The coordinator had since assigned that slot
+to **#1858**. A one-term gate cannot express "wait for a specific run to finish"; drain alone is not
+the same as *your turn*.
+
+### No damage, and the reason is worth keeping
+
+The author had **already stopped on its own execution-time drain check** before creating anything:
+
+- no proof branches created locally or remotely
+- no marker commits
+- no proof PRs opened
+- no labels, readiness or artifacts changed
+- **no runtime slot consumed, no workflow run triggered**
+
+That is precisely the safety property I insisted on preserving when I wrote the release - *"re-verify
+the precondition at execution time and stop and report if the lane has re-occupied; the release
+authorises the proof, not a race."* I put that in to guard against a stale check of **mine**, and it
+caught a **wrong dispatch** of mine instead. Defence-in-depth earned its keep: the supervisor's gate
+failed and the leaf's gate held.
+
+### Corrected
+
+Disarmed the one-term watcher and sent an immediate stand-down naming exactly what to do in each of
+the three possible states (nothing created / branches only / PR opened), so the recovery did not
+depend on the author guessing.
+
+Re-armed with a **two-term** gate (`ns1846-gate2.sh`): fires only when **both**
+
+1. #1858's runtime-tier jobs in run `33540720683` are `completed`, **and**
+2. zero runtime-tier jobs are active repo-wide.
+
+Currently reports `1858_runtime_pending=2 active_runtime_tier_jobs=4` - correctly closed. The
+re-release message states the supersession plainly, credits the author's stop as correct, and
+**keeps** the execution-time re-verification requirement rather than treating my gate as sufficient.
+
+**Rule carried forward: an automated release gate must encode every ordering term, not just resource
+availability.** "The lane is free" and "the lane is mine" are different propositions, and only the
+second authorises a dispatch.
+
+### Lane state
+
+**#1876** body de-duplicated and clean, close-gate re-run armed at unchanged head. **#1351** at
+`e4d39cb5b`. **#1879** at `80aaed97c`. **#1888** launched. **#1846** armed behind #1858, static work
+continuing.
