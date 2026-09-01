@@ -3569,3 +3569,21 @@
   convergence; neither lane is parked.
 - The earlier #1816 run deletion remains the only known merged context gap. Internals owns one
   bounded restoration leaf from pre-strip head `16887ad0d`; no product files may enter that PR.
+
+## 2026-09-01T05:48:53Z — all stripped context restored; Fresh export corpus ships
+
+- Recovery PR #1854 restored the remaining seven #1816 run files byte-identically from pre-strip
+  head `16887ad0d`, passed content-only core CI and zero-thread review, and merged as `969e7dfeb`.
+  Together with #1852 and the in-place #1773/#1837 reversions, every run affected by the mistaken
+  stripping episode is present on `main`; no product blob entered either restoration PR.
+- Docs PR #1818 passed 4,604/0/14 repo tests, the complete docs/export-corpus suite, exact 16-of-16
+  Fresh export/path parity, independent GLM PASS carry, acceptance, and zero threads. It merged as
+  `78be0e032`, closing #1817 and advancing the authoritative package mapping from 28 to 29 without
+  dropping `fresh-ui`, workers, sagas, or any prior mapping.
+- Features is performing one ordered #1842 regeneration onto `78be0e032` because #1818 owns shared
+  agent-docs/publish carriers. Fixes #1844 has completed the deterministic RESP and Garnet 1.1.10
+  implementation slices and is resolving its final convergence gates before spending the runtime
+  lease. Aspire is reconciling S8 with #1837's source-safe ordinal contract; main wins that seam.
+- Environment preflight is Aspire `[]`, containers 0, custom networks 0. The coordinator removed
+  only newly proven run-owned anonymous volume `90d704b4…` after zero-consumer verification; older
+  `d33e5c2e…` remains preserved as foreign/unknown-owner. #1855 owns the attribution/tooling repair.

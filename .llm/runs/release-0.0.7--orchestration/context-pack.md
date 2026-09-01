@@ -2293,3 +2293,18 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Aspire #1837 merged as `1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08` with its restored six-file run,
   structural fixture repair, two independent PASS verdicts, and fresh green core CI, closing #1836.
   Aspire continues S8 now and will pull #1844 immediately for S7/Phase-B completion.
+
+## Resume delta — 2026-09-01T05:48:53Z
+
+- Current main is `78be0e032624f12bcb30535d40e3a948b08b9784`. Recovery #1854 restored the last
+  seven stripped #1816 run files and merged as `969e7dfeb`; all known harness context affected by
+  the invalid stripping interpretation is now restored on main.
+- Docs #1818 merged as `78be0e032`, closing #1817 with 16/16 Fresh export parity, mapping 28→29,
+  complete docs/corpus gates, 4,604/0/14 tests, independent PASS carry, and zero review threads.
+- #1844 has pushed deterministic fragmented-RESP readiness, named Garnet diagnostics, a version
+  drift guard, and Garnet 1.1.10 alignment. It has converged once onto current main and is clearing
+  its final generated-asset/test failures before using its serialized runtime lease. Aspire S8 is
+  concurrently resolving #1837 conflicts with main's ordinal/source-safe emission contract winning.
+- Runtime baseline is containers 0, Aspire `[]`, custom networks 0, and exactly one older foreign
+  anonymous volume `d33e5c2e…` preserved. Newly created run-owned `90d704b4…` was removed after
+  zero-consumer proof; #1855 owns the underlying attribution/cleanup repair.

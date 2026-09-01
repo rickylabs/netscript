@@ -348,6 +348,18 @@ artifact-pinned production E2E.
 - These are merge-history members, not a canary trigger by themselves. Canary 6 still requires the
   complete Aspire 13.5 payload; Fixes #1844 and Aspire S8/S7 are actively advancing that boundary.
 
+## 2026-09-01T05:44:57Z–05:48:53Z — final context recovery and Fresh export corpus land
+
+- Recovery PR #1854 head `9a38591af` restored the seven #1816 run files byte-identically and
+  squash-merged as `969e7dfeb`. No product, configuration, lock, redaction, or cleanup guard entered
+  the change. This closes the last known context gap created by the superseded stripping policy.
+- Docs PR #1818 head `b9b4c7aa0` squash-merged as `78be0e032`, closing #1817. It documents all 16
+  real Fresh exports and paths, adds only the `fresh` authoritative mapping (28→29), preserves all
+  prior mappings, and regenerates the derived corpus canonically.
+- Exact core CI passed 4,604 tests with zero failures and 14 ignored; docs build, export drift,
+  generated-corpus freshness, acceptance mirror, independent evaluator carry, and zero review
+  threads were verified. This docs merge does not trigger a canary and does not block Fixes/Aspire.
+
 ## 2026-08-31T16:03:24Z — typed principal/procedure policy joins canary 5 payload
 
 - PR #1762 head `e3852dfb51108a6a49b30fc1f918e164defb90b2` squash-merged as

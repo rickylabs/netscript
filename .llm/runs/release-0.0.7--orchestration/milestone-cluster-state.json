@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08",
+  "currentMainSha": "78be0e032624f12bcb30535d40e3a948b08b9784",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "sessionId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
@@ -5338,7 +5338,7 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "1f50c98cecf8cd02b1ada6f9c0dcb84898eaba08",
+    "gitHead": "78be0e032624f12bcb30535d40e3a948b08b9784",
     "surface": "repository",
     "expectedGateIds": [
       "arch-check",
@@ -5366,20 +5366,20 @@
   },
   "environmentState": {
     "dockerContainers": 0,
-    "dockerVolumes": 0,
+    "dockerVolumes": 1,
     "aspireApplications": 0,
     "registeredWorktrees": 70,
     "terminalTypedErrorWorktreesRemoved": true,
     "stale006Worktree": "absent_after_ownership_audit",
     "worktreesOlderThan21DaysWithHarnessRuns": 0,
-    "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2; identical /home/agent bind visibility is fixed. #1747 attempt 2 proved Aspire/DCP 0.25.13 still advertises and health-checks remote-daemon publications on agent-local 127.0.0.1, which is unsupported upstream. Required host correction is shared network namespace (ai-agents network_mode service:netscript-dind) or a local daemon. Exact current inventories Aspire=0, containers=0, volumes=0, custom networks=0; host Docker remains outside agent authority",
+    "dockerCleanup": "NAS disposable DinD endpoint tcp://netscript-dind:2375 client/server 28.5.2 with identical /home/agent bind visibility and published ports reachable at netscript-dind. Exact current inventories Aspire=0, containers=0, custom networks=0. Aspire control created anonymous volume 90d704b4 at 05:27Z; coordinator proved zero consumers and removed only that run-owned leak. Older anonymous volume d33e5c2e remains as a preserved foreign/unknown-owner baseline and must not be mutated; #1855 owns the cleanup attribution and foreign-network defect.",
     "aspireMcpHelpers": "not counted as AppHost runtimes; no Aspire applications are active",
     "runtimeEnvironment": "Minisforum N5 ai-agents container; mise-managed Deno 2.9.5, Aspire 13.5.3, .NET 10.0.400, and Node 24.20.0; DinD client/server 28.5.2; fs.inotify.max_user_instances 1024",
-    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; current inventories Aspire=0, Docker containers=0, Docker volumes=0; ownership audit reduced registered worktrees from 108 to 70 by removing 38 clean terminal registrations without deleting branches, while 60 live/required and 10 dirty inspection cases were preserved; fixes relinquished maintenance-only #1758 convergence to the sole internals owner",
+    "loadState": "stable after tini PID1 maintenance restart; zombie count 0; current inventories Aspire=0, Docker containers=0, custom networks=0, one preserved foreign anonymous volume; the newly proven run-owned anonymous volume from the Aspire control was removed after zero-consumer verification. Ownership audit reduced registered worktrees from 108 to 70 by removing 38 clean terminal registrations without deleting branches, while live/required and dirty inspection cases were preserved.",
     "pid1": "tini",
     "zombieCount": 0,
     "lifecycleSmoke": "13 passed / 0 failed",
-    "verifiedAt": "2026-08-31T18:41:10.000Z"
+    "verifiedAt": "2026-09-01T05:48:53.000Z"
   },
-  "updatedAt": "2026-09-01T05:41:16.000Z"
+  "updatedAt": "2026-09-01T05:48:53.000Z"
 }
