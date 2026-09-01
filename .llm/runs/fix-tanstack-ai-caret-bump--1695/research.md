@@ -45,4 +45,3 @@
 - None that force rework. Whether a source adaptation is needed is resolved deterministically by
   the upgraded check/test surface; any such adaptation stays inside the existing TanStack adapter
   boundary.
-

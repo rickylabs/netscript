@@ -139,4 +139,3 @@ closure without wholesale regeneration, and prove no unhandled breaking change r
 - Stable versions changing between research and final freeze.
 - A new TanStack call site arriving from `origin/main`.
 - Any touched sibling-leaf config or lock movement not attributable to this family.
-

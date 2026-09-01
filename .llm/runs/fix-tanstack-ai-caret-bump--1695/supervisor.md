@@ -24,4 +24,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 - The launcher supplied a high-effort Codex implementation route for this leaf. The owner explicitly
   reserved IMPL-EVAL for supervisor dispatch.
-
