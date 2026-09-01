@@ -2436,3 +2436,24 @@ continues concurrently because serial ordering is per orchestrator, not global.
   skipped tracked evaluator commit-back and uploaded a summary with PASS plus trailing PENDING even
   though metadata parsed PASS. Actions artifact `9812529942` is the durable recovery receipt; #1888
   is assigned to Internals. No owner decision is pending.
+
+## Resume delta — 2026-09-01T17:58:00Z
+
+- Current main is `9ca986fb0d1c57758ee5f319d3059c4c258f2cf0`. Coordinator-merged #1882 as
+  `d7040976f`, closing/shipping #1875, then merged the disjoint #1886 acceptance slice as
+  `9ca986fb0`; #1349 remains open by design. Stacked repair #1884 passed its immutable-head evaluator,
+  close-gate, and zero-thread audit and merged into #1872 as `8223bfe7e`; #1872's combined exact
+  hosted run `33540741559` owns the current runtime lane, with #1858 queued behind it.
+- Aspire S8 #1754 remains red at exact `71f3cab4d`: typed database Phase B passes, but the preserved
+  AppHost path fails `behavior.workers-executions` in both hosted tiers. #1747 now owns the fixture
+  anchor correction found during diagnosis; S8 still requires the exact post-repair both-tier proof.
+  The Aspire supervisor must advance #1887 and static S9-S13 work independently.
+- The local Phase-B host lease cleaned back to `aspire ps=[]` and zero containers. Aspire 13.5.3/DCP
+  0.25.13 has no supported cross-namespace remote-Docker endpoint override; local proof requires
+  `ai-agents` and `netscript-dind` to share a network namespace, the existing identical home bind,
+  and Docker access through the shared localhost. This host action parks only the local receipt, not
+  product implementation, hosted proof, review, or merge preparation.
+- Docs #1756 is repairing two genuine examples exposed by its stricter compiler after restoring main
+  runtime semantics. Internals #1876 has a PASS and current-main convergence and is terminalizing its
+  corrected close-gate; #1351/#1879/#1888 continue in parallel. Fixes #1885 is exact both-tier green
+  at `14c56b281` and awaits its running evaluator. No owner-only decision is pending.
