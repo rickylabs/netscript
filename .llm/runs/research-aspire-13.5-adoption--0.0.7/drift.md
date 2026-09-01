@@ -5935,3 +5935,38 @@
     planned. Standing instruction recorded: **the moment it merges, pull current main into the
     dependent Aspire branch and finish the Phase-B/merge sequence without parking.** #1744 is the
     branch gated solely on it.
+
+- **D-243 — #1837 body corrected and merge packet surfaced GREEN; the leased SQLite control FAILED to
+  answer its question and the repo's own cleanup destroyed a foreign network.**
+  - **#1837 ready at `bcb5717e6`:** `MERGEABLE`/`CLEAN` against main `d9e0f1ebb` with **zero path
+    overlap**; `pr-checks` **PASS** (21 checks, 0 current failures); mirror dry-run clean. The body's
+    Harness section, which still said the six artifacts "were stripped", now states they are
+    **present and intentionally committed**, names head `bcb5717e6`, and records the byte-identical
+    restore. No extra evaluation: **14/14** of the slice's own product files are byte-identical
+    between `d23276664` and `bcb5717e6`, so the restore is product-identity-only.
+  - **The leased SQLite control did NOT settle D-17.** It never reached
+    `runtime.health.listener-unreachable`: the known remote-DinD loopback topology (D-146) left the
+    real Garnet health key **Unhealthy** and the preceding **300 s** wait failed — the same garnet
+    condition tracked as **#1844**. So the lease was spent without the answer, and SQLite ownership
+    remains **unresolved**. Recording that plainly rather than letting a spent lease read as progress.
+  - **Baseline violation, and the cause matters: it was the tooling, not an agent.** The suite's
+    exact-AppHost cleanup **removed the pre-existing foreign
+    `aspire-persistent-network-581c13b7-aspire-managed`** — the network the lease explicitly required
+    remain untouched — and **left a new anonymous volume** (`90d704b4…`, 05:27:23Z). The agent
+    confirms **no** agent-issued `docker rm` / `volume rm` / `network rm`, no recreation, no relay
+    start, and that it stopped immediately on discovery.
+    - Post-run host: `aspire ps` `[]`, containers **0** (both clean); volumes **2** (baseline 1);
+      custom networks **0** (baseline 1 — the foreign one destroyed).
+    - **I did not recreate it.** Recreating another owner's resource without its configuration would
+      compound the fault rather than repair it.
+  - **Two blind spots this exposed**, both filed as **#1855** (`type:fix`, `area:aspire`,
+    `area:tooling`, `priority:p1`, 0.0.7):
+    1. the suite's **own cleanup gate reported PASS** because it covers the AppHost/container tail,
+      not the foreign-network or anonymous-volume baseline — raw `docker` inspection was the
+      higher-fidelity verdict;
+    2. **`agentic:leak-check` reports `survivors: []` both before and after**, so it cannot see an
+      anonymous volume the run itself just created. A leak reporter blind to that will under-report.
+    Acceptance requires ownership proven by label/creator rather than name pattern, and a test with a
+    pre-existing foreign network + volume that must survive a full start/stop cycle untouched.
+  - Cross-reference recorded: this is precisely the invariant **#1719/#1744 (S7)** exists to prove —
+    owned-only mutation — which makes it a finding against the tooling S7 validates, not against S7.
