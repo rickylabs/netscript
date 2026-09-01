@@ -7513,3 +7513,48 @@ stopped before it started; the postgres tiers reran, the sqlite tiers did not. A
 `gh run rerun <run>` picks them up, but is refused while any attempt is in flight
 (`This workflow is already running`). Sequenced behind the in-flight attempt instead of pushing an
 empty commit, which would have moved the head and the evidence provenance bound to it.
+
+## D-292 — the promotion sequence is evidence → label → rerun, with NO push after
+
+`status:ready-merge` is what makes the mirror run at all: `mirror-acceptance-evidence.ts:137`
+returns early with `changed: []` ("APPLIED: no changes") whenever the label is absent, and the
+gate then reports every box as unchecked — indistinguishable, in the log, from having no evidence
+block at all. That is what happened on #1771: the blocks were present and valid (the real parser
+returns all 8 entries with zero warnings against the live body), but a label automation had reset
+`status:ready-merge` to `status:impl-eval` when I pushed a follow-up commit.
+
+The automation is right — a new head should invalidate a ready-merge ruling. The lesson is
+ordering: **apply evidence and the label last, and never push afterwards.** If a push is
+unavoidable, re-apply the label and re-run; do not read "APPLIED: no changes" as missing evidence.
+
+## D-293 — a generated-carrier-only head move carries the PASS
+
+#1771's `quality` job failed on `check:agent-docs-prose`
+(`Agent docs prose is stale: prose.json.gz, provenance.json`) — S11 changed docs the bundle
+extracts, and its provenance still pointed at `sourceCommit d38158176`. Regenerated with
+`deno task gen:agent-docs-prose`; the check now reports `fresh: true`.
+
+`git diff --name-only 503a90b9e..92568c7db` is exactly the two generated artifacts, with **0**
+non-generated files. Every file the evaluation read is byte-identical, so the five-cycle PASS
+carries and no sixth cycle was spent. Recorded on the PR so the carry is auditable rather than
+asserted.
+
+## D-294 — S13 box 1 fails on main's copies of files S9 and S11 have already fixed
+
+Box 1's sweep returns 43 hits across 16 files at S13's head. Classified against the bar box 1
+itself sets (a `compat-fixture` row must carry a `13.5.3` case):
+
+- **6 files** legitimately retain `13.4.6` **and** already carry `13.5.3` — the version-parity
+  checker's own test data, the compat-fixture test, the MCP and teardown fixture READMEs. They are
+  classified `tooling-doc`/`teardown`/`mcp:fixtures`, so the sweep flags them. Reclassifying those
+  rows to `compat-fixture` is S13's own bounded follow-up.
+- **4 files** are genuinely stale against ground truth `SCAFFOLD_VERSIONS.ASPIRE_SDK = '13.5.3'`,
+  and **all four belong to other slices**: `docs/site/explanation/aspire.md` and
+  `deploy-local-aspire.md` are S11-owned and already fixed at `503a90b9e`; `skills/aspire/SKILL.md`
+  and `skills/help.md` are S9-owned and already fixed at `e72da5161` with #1887's DCP prose intact.
+- The `Aspire 13.4 WithProcessCommand seam` hits are removed by S8 (#1720 box 6), and the
+  `.agents/generated/consumer-skills/**` and `*.generated.ts` hits are carriers of the above.
+
+So S13's box 1 is blocked on S8+S9+S11 merging, not on any S13 defect. I nearly "fixed" the two
+S11 docs inside S11 before checking — they were already correct on S11's branch; only main's copies
+are stale. Checking the owning branch before repairing a cross-slice sweep hit is the rule.
