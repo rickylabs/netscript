@@ -6,14 +6,15 @@
 | --- | --- |
 | Run ID | `deps-orpc-family-1-15--1879` |
 | Branch | `deps/orpc-family-1-15` |
-| Current phase | `implement` — local proof green; final main integration pending |
+| Current phase | `implement` — integrated proof green; draft PR pending |
 | Archetype | N/A — dependency maintenance only |
 | Scope overlays | none |
 
 ## Current State
 
 All manifest/catalog oRPC declarations and the two exact upstream-tracking fixture imports are at
-1.15.0. The graph is single-copy, frozen install succeeds, and the full root test suite is green.
+1.15.0. The branch was integrated once onto `origin/main` `302409f0c9`; the graph is single-copy,
+frozen install succeeds, and every required root gate is green at that integrated head.
 
 ## Completed
 
@@ -22,7 +23,8 @@ All manifest/catalog oRPC declarations and the two exact upstream-tracking fixtu
 - Stable authority, pre-change graph, and exact lock keys captured with exits 0.
 - `PLAN-EVAL: N/A` recorded before implementation.
 - Proved raised manifests can produce a one-copy/frozen/check-green graph.
-- Proved root test then fails because completing the move requires forbidden files.
+- Proved the earlier brief's boundaries could not complete the move, which produced the corrected
+  key-level and upstream-fixture rulings.
 - Restored all dependency manifests and confirmed explicit lock-only updating cannot displace exact
   `1.14.6` source imports.
 - Applied the owner-corrected key-level boundary and raised `plugin-workers-core` oRPC keys without
@@ -37,14 +39,13 @@ All manifest/catalog oRPC declarations and the two exact upstream-tracking fixtu
 
 ## In Progress
 
-- Commit the locally proven slice, integrate then-current `main` exactly once, regenerate/freeze,
-  and capture the complete final proof set at the integrated head.
+- Integrated `origin/main` exactly once and captured all final dependency and root gates with real
+  exits. No behavioral test failure remains.
 
 ## Next Steps
 
-1. Commit the pre-integration slice.
-2. Integrate current `main` once and recapture all final gates.
-3. Push explicitly and open the draft PR; owner retains IMPL-EVAL.
+1. Commit the integrated evidence artifacts.
+2. Push explicitly and open the draft PR; owner retains IMPL-EVAL.
 
 ## Key Decisions
 
@@ -56,7 +57,8 @@ All manifest/catalog oRPC declarations and the two exact upstream-tracking fixtu
 
 ## Drift and Debt
 
-- Drift: corrected boundary plus remaining stale-lock blocker; see `drift.md`.
+- Drift: the lock-only brief and original file-granularity boundary were corrected; both are
+  resolved and evidenced in `drift.md`.
 - Debt: none.
 
 ## Commits

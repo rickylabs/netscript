@@ -89,9 +89,67 @@ surfaces, lock invariant, and required commands. No architecture or material des
 | Corrected-scope `deno ci` | 0 | Frozen install; lock hash unchanged. |
 | Scaffold catalog focused test | 0 | 2 passed, 0 failed. |
 | Corrected-scope root `deno task test` | 0 | 4,639 passed, 0 failed, 19 ignored. |
+| Final integration | 0 | Rebased once onto `origin/main` `302409f0c9062ec01005c74eb9c6a82898a26036`, which contains `9e3b8bcba`. |
+| Integrated `deno install --lockfile-only` | 0 | Lock regeneration completed with no working-tree delta. |
+| Integrated stable authority | 0 | `deps:latest` reports 0 behind / 7 total oRPC direct packages. |
+| Integrated manifest/catalog audit | 0 | All 32 oRPC keys across the root catalog and 13 member manifests declare 1.15.0. |
+| Integrated `deno why @orpc/shared` | 0 | Exactly one resolved copy: `@orpc/shared@1.15.0`. |
+| Integrated no-mixed audit | 0 | 17 oRPC package names, each only `1.15.0`. |
+| Integrated `deno ci` | 0 | Frozen install; SHA-256 remained `b52dec2c91bb6ae8fa191aa6ae7e0b32af6aa715e8669fb16ba932f6a9faca4b`. |
+| Integrated root `deno task check` | 0 | 3,006 files, 26 batches, 0 failed batches. |
+| Integrated root `deno task test` | 0 | 4,704 passed, 0 failed, 19 ignored. |
+| Integrated root `deno task publish:dry-run` | 0 | Workspace publish simulation completed successfully. |
+| Integrated root `deno task arch:check` | 0 | Dependency and doctrine fitness gate passed; warning-only pre-existing debt remains. |
 
-The earlier failed rows are retained as investigation evidence. Final gate rows will be captured
-after the required single integration of then-current `main`.
+The earlier failed rows are retained as investigation evidence; the integrated rows are the final
+verdicts for this implementation session.
+
+## Exact `deno.lock` package lines
+
+Baseline `82a2527e2` (line number and exact package key):
+
+```text
+1607: "@orpc/client@1.14.6_@opentelemetry+api@1.9.1": {
+1616: "@orpc/contract@1.14.6_@opentelemetry+api@1.9.1": {
+1625: "@orpc/interop@1.14.6": {
+1628: "@orpc/json-schema@1.14.6_@opentelemetry+api@1.9.1": {
+1639: "@orpc/openapi-client@1.14.6_@opentelemetry+api@1.9.1": {
+1648: "@orpc/openapi@1.14.6_@opentelemetry+api@1.9.1": {
+1662: "@orpc/otel@1.14.7_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.220.0__@opentelemetry+api@1.9.1": {
+1670: "@orpc/server@1.14.6_@opentelemetry+api@1.9.1": {
+1686: "@orpc/shared@1.14.6_@opentelemetry+api@1.9.1": {
+1697: "@orpc/shared@1.14.7_@opentelemetry+api@1.9.1": {
+1708: "@orpc/standard-server-aws-lambda@1.14.6_@opentelemetry+api@1.9.1": {
+1717: "@orpc/standard-server-fastify@1.14.6_@opentelemetry+api@1.9.1": {
+1725: "@orpc/standard-server-fetch@1.14.6_@opentelemetry+api@1.9.1": {
+1732: "@orpc/standard-server-node@1.14.6_@opentelemetry+api@1.9.1": {
+1740: "@orpc/standard-server-peer@1.14.6_@opentelemetry+api@1.9.1": {
+1747: "@orpc/standard-server@1.14.6_@opentelemetry+api@1.9.1": {
+1753: "@orpc/tanstack-query@1.14.6_@orpc+client@1.14.6__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.0": {
+1761: "@orpc/zod@1.14.6_@orpc+contract@1.14.6__@opentelemetry+api@1.9.1_@orpc+server@1.14.6__@opentelemetry+api@1.9.1_zod@4.4.3": {
+```
+
+Integrated head (line number and exact package key):
+
+```text
+1607: "@orpc/client@1.15.0_@opentelemetry+api@1.9.1": {
+1616: "@orpc/contract@1.15.0_@opentelemetry+api@1.9.1": {
+1625: "@orpc/interop@1.15.0": {
+1628: "@orpc/json-schema@1.15.0_@opentelemetry+api@1.9.1": {
+1639: "@orpc/openapi-client@1.15.0_@opentelemetry+api@1.9.1": {
+1648: "@orpc/openapi@1.15.0_@opentelemetry+api@1.9.1": {
+1662: "@orpc/otel@1.15.0_@opentelemetry+api@1.9.1_@opentelemetry+instrumentation@0.221.0__@opentelemetry+api@1.9.1": {
+1670: "@orpc/server@1.15.0_@opentelemetry+api@1.9.1": {
+1686: "@orpc/shared@1.15.0_@opentelemetry+api@1.9.1": {
+1697: "@orpc/standard-server-aws-lambda@1.15.0_@opentelemetry+api@1.9.1": {
+1706: "@orpc/standard-server-fastify@1.15.0_@opentelemetry+api@1.9.1": {
+1714: "@orpc/standard-server-fetch@1.15.0_@opentelemetry+api@1.9.1": {
+1721: "@orpc/standard-server-node@1.15.0_@opentelemetry+api@1.9.1": {
+1729: "@orpc/standard-server-peer@1.15.0_@opentelemetry+api@1.9.1": {
+1736: "@orpc/standard-server@1.15.0_@opentelemetry+api@1.9.1": {
+1742: "@orpc/tanstack-query@1.15.0_@orpc+client@1.15.0__@opentelemetry+api@1.9.1_@tanstack+query-core@5.101.0_@opentelemetry+api@1.9.1": {
+1750: "@orpc/zod@1.15.0_@orpc+contract@1.15.0__@opentelemetry+api@1.9.1_@orpc+server@1.15.0__@opentelemetry+api@1.9.1_zod@4.4.3_@opentelemetry+api@1.9.1": {
+```
 
 ## Handoff Notes
 
