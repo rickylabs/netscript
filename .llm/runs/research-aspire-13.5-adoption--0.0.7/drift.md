@@ -5886,3 +5886,30 @@
   - **Scope is one question only** — does SQLite `runtime.health.listener-unreachable` fail on an
     S8-free head — with **repair explicitly forbidden under the lease**. Hosted typed-db Phase B
     continues independently on CI.
+
+- **D-241 — OWNER CORRECTION: `.llm/runs` stripping STOPPED and REVERSED. Committed harness run
+  directories are intentional cross-agent context.**
+  - **My D-218/D-219 strips were wrong.** They were carried out on an explicit instruction at the
+    time, but the owner has now ruled that committed run directories are deliberate cross-agent
+    context; cleanup happens only after a stable release, by owner/coordinator selection, and a PR
+    must never be blocked or classified as leaking because it carries its scoped harness run.
+    **The D-218 conclusion I drew — "there is nothing non-publishable to strip" — was right; I should
+    not have stripped on the follow-up instruction without re-raising that evidence.**
+  - **#1837 — fixed in place, before merge.** `d23276664` → **`bcb5717e6`**: all **6**
+    `fix-aspire-sibling-generator-name-safety--issue-1836` paths restored **byte-identical** to
+    `01d32c95f`, verified per file with `git hash-object` against `git rev-parse 01d32c95f:<path>`.
+    **All 14 of the slice's own product files are byte-identical** between `d23276664` and the restored
+    head, so both the base PASS and the seam-repair delta PASS carry by product-blob identity.
+    `status:ready-merge` stands.
+    - Note on method: I first compared against `60ae56af0..d23276664`, which wrongly listed 17
+      "changed" files — those are **main's own** changes, not the slice's. Re-scoped to the branch's
+      merge-base (`71d5fb8e0`) the real answer is **14 compared, 0 changed**. The wrong file set makes
+      a clean restore look like a product change.
+  - **#1835 — already merged, so main is missing its artifacts.** Verified: the directory is **absent
+    from `origin/main`** (0 paths) and present at the pre-strip head `b7d0a60ac` (17 paths). Opened
+    **PR #1852** off current main restoring all **17 byte-identical**, with **zero** product files
+    touched, labelled `status:ready-merge` for the coordinator. `Refs #1833` / `Refs #1835`, no closing
+    keyword — both are already `status:shipped`.
+  - **No slice is currently stripping.** The D-222 brief's "do not re-add the artifacts" line is void;
+    the only live dispatch (D-240, the leased SQLite control) neither strips nor writes into a stripped
+    directory.
