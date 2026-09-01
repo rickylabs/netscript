@@ -30,6 +30,7 @@
     "zod": "catalog:",
     "@netscript/kv": "jsr:@netscript/kv@0.0.6",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.6",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.6",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.6",
     "@orpc/contract": "npm:@orpc/contract@^1.15.0",
     "@orpc/server": "npm:@orpc/server@^1.15.0"
