@@ -6305,3 +6305,42 @@
     change in this lane does not collide with its remainder.
   - Blocking fixes unchanged: **#1863** and **#1858** both `status:impl`. Phase B still waits on their
     merge SHAs plus a clean-zero lease.
+
+- **D-256 — runtime mutex acknowledged (#1865 at `340afa724`); static preparation advanced on three
+  fronts.**
+  - **Confirmed read-only that this lane holds nothing**: `aspire ps` `[]`, running containers **0**.
+    No Aspire or Docker command will issue from here until the mutex returns.
+  - **S11's restack shape computed — and it is NOT what the old cascade map implies.**
+    S11 (`abe0fd6cc`) contains **neither** the current S10 head `21a0bfec6` **nor** the previously
+    recorded `265466059`. Its branch point off the old S10 lineage is **`c9e3fcbe8`**, with **13** own
+    commits over it. So the restack is:
+    ```
+    git rebase --onto <S10-final> c9e3fcbe8      # 13 own commits
+    ```
+    Using `d1c6d8b54` (the S9/S10 branch point) would be wrong for S11 — a different slice needs a
+    different `--onto` base, and assuming one shared base is how a stacked cascade silently duplicates
+    commits.
+  - **S11 also has 0 files overlapping the A6 seam or the four #1837-hardened generators**, so like
+    S9/S10 its restack is expected mechanical — stated as a falsifiable prediction, not an assumption.
+  - **#1720's six unchecked boxes classified by evidence type**, so the merge packet can be assembled
+    the instant Phase B lands rather than started then:
+
+    | Box | Type | Substance |
+    | --- | --- | --- |
+    | A1 | **runtime** | `aspire resource <db>-cli --help` receipt |
+    | A2 | **runtime** | `migrate --timeout 60` succeeds; `reset` refuses without `--confirm true` |
+    | A3 | **static** | generated postgres scaffold contains `.excludeFromMcp()` exactly once, correctly placed |
+    | A4 | **runtime** | `netscript db init` against Unhealthy-but-Running Postgres |
+    | A5 | **runtime** | `scaffold.runtime` green on both tiers; no second AppHost during `db` ops |
+    | A6 | **static** | `PROCESS_COMMANDS_FLAG` seam + its version comment removed |
+
+  - **Both static boxes already have their evidence at S8's head `854e45cb8`:**
+    - **A6** — verified in D-251: `PROCESS_COMMANDS_FLAG` → **0** files; the lone remaining
+      `Aspire 13.4` hit is `render-ts-apphost.ts:81`, a tsconfig-validation comment, not the seam's.
+    - **A3** — `.excludeFromMcp()` is asserted in **three** test files, including an exact-count
+      assertion (`output.match(/\.excludeFromMcp\(\)/g)?.length`) and a placement check
+      (`output.indexOf('.excludeFromMcp()')`) in `generate-db-cli-mode_test.ts`, plus the emitted-helper
+      compile contract. That is the "exactly on the …" requirement asserted, not merely present.
+  - **So four of six boxes are runtime-gated and two are already satisfiable now** — meaning the one
+    serialized Phase-B pass has to produce exactly four receipts (A1, A2, A4, A5), which is the
+    smallest possible ask of a scarce lease.
