@@ -161,7 +161,12 @@ async function readJobExecuteIdentity(dashboardUrl: unknown): Promise<FlowBProdu
   if (typeof dashboardUrl !== 'string') {
     throw new Error('Aspire start metadata did not contain dashboardUrl');
   }
-  const tracesUrl = new URL('/api/telemetry/traces', dashboardUrl);
+  // `new URL(path, base)` keeps only the base's origin — it discards the base's query string,
+  // which is exactly where Aspire puts the dashboard's auth token (`?t=…`). Set the pathname on a
+  // parsed copy instead, so any token the AppHost handed us survives into the request. Harmless
+  // when the dashboard allows anonymous access; required when it does not.
+  const tracesUrl = new URL(dashboardUrl);
+  tracesUrl.pathname = '/api/telemetry/traces';
   for (let attempt = 1; attempt <= 20; attempt++) {
     const response = await fetch(tracesUrl);
     if (!response.ok) throw new Error(`Dashboard traces read failed: HTTP ${response.status}`);
