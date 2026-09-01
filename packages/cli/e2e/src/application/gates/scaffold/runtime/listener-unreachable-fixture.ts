@@ -234,10 +234,41 @@ export function assertOwnedListenerFaultExpectation(
   }
 }
 
+/**
+ * The listener health checks carry a structured failure code in the report's data bag alongside a
+ * human-readable description. Assert on the code whenever it is present: the description is
+ * diagnostic prose and has already been reworded once (`unreachable` -> `unhealthy`, gaining
+ * host/port/elapsed detail), which broke this gate while the behaviour under test was correct.
+ * The description stays a fallback for report shapes that carry no data bag, and now tolerates
+ * both wordings.
+ */
+const EXPECTED_FAILURE_CODES = ['ECONNREFUSED', 'ETIMEDOUT'] as const;
+
+function unhealthyFailureCode(report: ListenerHealthReport): string | undefined {
+  const data = report.data;
+  if (typeof data !== 'object' || data === null) return undefined;
+  const code = Reflect.get(data, 'code');
+  return typeof code === 'string' ? code : undefined;
+}
+
 function expectedUnhealthyDescription(expectation: ListenerFaultExpectation): RegExp {
-  return expectation.controllerListener === 'postgres'
-    ? /tcp listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/
-    : /RESP listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
+  const listener = expectation.controllerListener === 'postgres' ? 'tcp' : 'RESP';
+  return new RegExp(
+    `${listener} listener (?:unreachable|unhealthy): (?:${EXPECTED_FAILURE_CODES.join('|')})`,
+  );
+}
+
+/** True when the report names one of the expected socket failures, by code or by description. */
+function matchesExpectedFailure(
+  report: ListenerHealthReport,
+  expectation: ListenerFaultExpectation,
+): boolean {
+  const code = unhealthyFailureCode(report);
+  if (code !== undefined) {
+    return (EXPECTED_FAILURE_CODES as readonly string[]).includes(code);
+  }
+  return report.description !== undefined &&
+    expectedUnhealthyDescription(expectation).test(report.description);
 }
 
 /** Block on Aspire's own wait until it observes the resource healthy; fail loudly if it does not. */
@@ -278,7 +309,6 @@ async function observeTestOnlyUnhealthy(
   expectation: ListenerFaultExpectation,
   continuity: readonly ListenerFaultExpectation[],
 ): Promise<ListenerHealthReport> {
-  const pattern = expectedUnhealthyDescription(expectation);
   const deadline = Date.now() + DEPARTURE_OBSERVE_DEADLINE_MS;
   let observed = 'no report read';
   while (Date.now() < deadline) {
@@ -290,11 +320,12 @@ async function observeTestOnlyUnhealthy(
       expectation.healthCheckKey,
     );
     observed = `${report.status}: ${report.description ?? '(no description)'}`;
-    if (report.status === 'Unhealthy' && report.description !== undefined) {
-      if (pattern.test(report.description)) return report;
+    if (report.status === 'Unhealthy') {
+      if (matchesExpectedFailure(report, expectation)) return report;
       throw new Error(
-        `${expectation.resource} healthReports.${expectation.healthCheckKey} went Unhealthy but its ` +
-          `description did not match ${pattern}: ${report.description}`,
+        `${expectation.resource} healthReports.${expectation.healthCheckKey} went Unhealthy but ` +
+          `neither its failure code nor its description names ` +
+          `${EXPECTED_FAILURE_CODES.join(' or ')}: ${report.description ?? '(no description)'}`,
       );
     }
     await delay(DEPARTURE_OBSERVE_POLL_MS);
@@ -331,14 +362,12 @@ async function readTestOnlyReport(
         `expected ${expected} after Aspire settled: ${report.description ?? '(no description)'}`,
     );
   }
-  if (expected === 'Unhealthy') {
-    const pattern = expectedUnhealthyDescription(expectation);
-    if (report.description === undefined || !pattern.test(report.description)) {
-      throw new Error(
-        `${expectation.resource} healthReports.${expectation.healthCheckKey} is Unhealthy but its ` +
-          `description did not match ${pattern}: ${report.description ?? '(no description)'}`,
-      );
-    }
+  if (expected === 'Unhealthy' && !matchesExpectedFailure(report, expectation)) {
+    throw new Error(
+      `${expectation.resource} healthReports.${expectation.healthCheckKey} is Unhealthy but ` +
+        `neither its failure code nor its description names ` +
+        `${EXPECTED_FAILURE_CODES.join(' or ')}: ${report.description ?? '(no description)'}`,
+    );
   }
   return report;
 }
