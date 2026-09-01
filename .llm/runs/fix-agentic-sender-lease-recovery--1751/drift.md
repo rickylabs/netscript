@@ -177,3 +177,18 @@ would be documentation-only. Left for Slice 4's author to add if useful, not req
 - **Action:** Re-record the protected blob and require 50 consecutive full-file passes.
 - **Evidence:** New blob `e12c023b90b8debc66d2f6ad720f3a9b9cdd9f14`; iterations 1-50 all
   exit 0, aggregate exit 0.
+
+## 2026-09-01 — final current-main corpus remains stale
+
+- **What:** The true final-freeze merge advanced from the earlier integration to current
+  `origin/main` `969e7dfeb04695ab0ffba474d5cd0ee9a2e83002` at merge `fe51d4a3a`.
+- **Expected:** All four requested generated freshness checks pass at the integrated head.
+- **Actual:** Assets barrel, agent-docs prose, and publish assets pass; MCP export-corpus exits 1.
+  The generated MCP corpus has no diff from `origin/main`, and this leaf changes no package export
+  surface.
+- **Severity:** significant inherited gate drift, outside #1751's declared agentic/run scope.
+- **Action:** Preserve the boundary and report the red exit in the worklog and PR validation; do
+  not regenerate unrelated package output in this leaf.
+- **Evidence:** `git diff --exit-code origin/main --
+  packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` exit 0;
+  final gate table in `worklog.md`.

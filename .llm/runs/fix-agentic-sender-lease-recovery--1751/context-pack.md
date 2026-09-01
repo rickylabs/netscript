@@ -6,33 +6,29 @@
 | --- | --- |
 | Run ID | `fix-agentic-sender-lease-recovery--1751` |
 | Branch | `fix/agentic-sender-lease-recovery` |
-| Current phase | `implement` — current-main integration and revalidation complete; one inherited generated-corpus gate is red |
+| Current phase | `gate` — implementation and final-freeze validation complete; PR handoff pending |
 | Archetype | Operational Archetype 6 — CLI / Tooling |
 | Scope overlays | none |
 
 ## Current State
 
-Final-freeze integration is now at `50431f9cd` after merging fetched `origin/main`
-`8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`; all six amended protected baselines and `deno.lock`
-survived byte-identically. The coordinator authorized completing the protected live-child fixture
-repair: the child now waits on a real stdin operation, and an additive case exercises
-already-terminated teardown. The required post-fix proof is green for all 50 repetitions with every
-iteration exit 0. Final smoke and repository gates are in progress.
+The true final-freeze integration is `fe51d4a3a`, merging fetched `origin/main`
+`969e7dfeb04695ab0ffba474d5cd0ee9a2e83002`. All six protected baselines and `deno.lock` were
+captured independently before and after the merge and remain byte-identical. The two authorized
+test-ceiling baselines are `978cd23d073035e1d578193a299806a0fe9b77fb` for ownership vocabulary
+and `e12c023b90b8debc66d2f6ad720f3a9b9cdd9f14` for deterministic child cleanup.
 
-All seven implementation slices are landed through `1cf52be67`. The branch was parked at
-`de24161b6`; its previously reported single root-suite failure did not reproduce in either of two
-supervisor reruns at that identical head (both 4,464 passed / 0 failed / 19 ignored, exit 0), so it
-is recorded as an unidentified flake whose test identity is unrecoverable because the original run
-had no saved report.
+The branch-owned root flake is identified and repaired. `stopAndReap` narrowly accepts only the
+already-terminated error, retains pre-kill status capture, and awaits status on every path. A real
+stdin operation keeps the live writer alive through every preservation assertion; an additive case
+exercises already-terminated teardown. Fifty full-file repetitions all exited 0. Four persisted
+root-suite confirmations are green overall, including the final-head report at 4,661 passed / 0
+failed / 19 ignored. Agentic is 537/537; scoped check/lint/fmt, `arch:check`, disposable dry-run and
+apply smokes, lock hygiene, and three generated freshness checks pass.
 
-On resume, the six protected test blobs and `deno.lock` were captured before integration. The
-then-current `origin/main` was fetched as `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7` and merged
-exactly once in `2bf9ca1b2114d12547fd988aaaea8a53c9aa95b7`. All seven pre/post blobs are byte-identical.
-The integrated root suite is green with a persisted report (4,498 passed / 0 failed / 19 ignored),
-the agentic suite is 531/531, scoped check/lint/fmt and `arch:check` pass, three of four generated
-freshness checks pass, and `deno.lock` remains unchanged. `check:mcp-export-corpus` alone exits 1
-because the integrated MCP export-surface corpus is stale; it is outside this leaf's authorized
-paths and was not regenerated.
+`check:mcp-export-corpus` alone exits 1. Its generated file is byte-identical to current
+`origin/main`, and #1751 changes no package export surface, so the corpus was not regenerated across
+the declared agentic/run boundary.
 
 ## Completed
 
@@ -56,23 +52,34 @@ paths and was not regenerated.
 - Landed Slice 6 GREEN at `00877bcbd`; the supervisor verified D8, all six protected blobs, Slice 5
   at 2/2, and the full agentic suite at 528/528.
 - Landed Slice 7 documentation and the declared formatting correction at `1cf52be67`.
-- Integrated fetched `origin/main` `62ea359b13b292f5f4335ff77b8b9df1ecdf5ae7` exactly once.
-- Reverified all six protected test ceilings and `deno.lock` before and after the merge.
-- Persisted the integrated root-suite report under `.llm/tmp/`; all 4,517 results are accounted for.
+- Preserved the earlier integration checkpoints and ultimately took the true final freeze from
+  fetched `origin/main` `969e7dfeb04695ab0ffba474d5cd0ee9a2e83002`.
+- Reverified all six amended protected-test baselines and `deno.lock` before and after the final
+  merge.
+- Persisted every root and agentic report under `.llm/tmp/`; the final root report accounts for all
+  4,680 results.
 - Completed the requested integrated-head gate set without E2E, Aspire, Docker, browser, live
   sender-registry, or thread-message activity.
+- Persisted exact launch `profileHome` provenance, resolved repair probes from it, kept legacy
+  records loadable but fail-closed, and covered both default-like and isolated profiles.
+- Replaced the operator-facing `stale` kind with machine-readable blocked/repair-required outcomes
+  that distinguish live ownership, provenance refusal, foreign conflict, and inactive ownership.
+- Repaired the protected live-child fixture and passed 50/50 repetitions without weakening any
+  existing assertion.
+- Ran controlled dry-run/apply smoke against disposable roots only; dry-run retained the record and
+  wrote no evidence, while apply removed the exact record and finalized a dual-pass receipt.
+- Merged final `origin/main` `969e7dfe` at `fe51d4a3a` and revalidated the final head.
 
 ## In Progress
 
-- Controlled repair smoke, full final-head gates, PR update, explicit-refspec push, and handoff.
+- Final run-artifact commit, explicit-refspec push, PR body/phase comment, and supervisor handoff.
 
 ## Next Steps
 
-1. Supervisor reviews the current-main integration evidence and the inherited
-   `check:mcp-export-corpus` failure.
-2. The corpus-owning lane regenerates/lands the stale artifact, or the coordinator records its
-   disposition; #1751 must not mutate that generated surface.
-3. Supervisor owns evidence freeze, Tier-A, readiness/labels, and IMPL-EVAL.
+1. Push by explicit refspec and update PR #1802 with the exact final-head evidence.
+2. Supervisor reviews the inherited `check:mcp-export-corpus` failure and owns its disposition.
+3. Supervisor owns evidence freeze, Tier-A, readiness/labels, and IMPL-EVAL; this session does none
+   of those transitions.
 
 ## Key Decisions
 
@@ -84,6 +91,8 @@ paths and was not regenerated.
 | Repair command under existing `agentic:runtime` | `plan.md` D5 | No `deno.json` edit. |
 | Receipt durable before lease-token CAS removal | `plan.md` D6-D7 | Re-observe immediately before mutation. |
 | Known active-writer rejection forces exit 1 | `plan.md` D8-D9 | Direct subprocess status, no pipeline. |
+| Profile provenance is exact and fail-closed | Coordinator amendment | Recorded `profileHome` selects the session tree; missing/changed provenance never falls back. |
+| Operator outcomes are structured | Coordinator amendment | `blocked` reasons distinguish live, foreign, and unknown provenance; `repair-required/owner_inactive` directs explicit repair. |
 | PLAN-EVAL required | `plan.md` D10 | Separate opposite-family evaluator. |
 
 ## Files Changed
@@ -92,16 +101,16 @@ paths and was not regenerated.
 | --- | --- | --- |
 | `.llm/runs/fix-agentic-sender-lease-recovery--1751/worklog.md` | modified | Current-main integration and exact gate evidence. |
 | `.llm/runs/fix-agentic-sender-lease-recovery--1751/context-pack.md` | modified | Current handoff state. |
-| `.llm/runs/fix-agentic-sender-lease-recovery--1751/drift.md` | modified | Unidentified flake and inherited corpus-staleness records. |
+| `.llm/runs/fix-agentic-sender-lease-recovery--1751/drift.md` | modified | Identified/resolved flake, provenance amendment, final integration, and inherited corpus drift. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Agentic check/lint/fmt: 174 files, exits 0; `arch:check` exit 0; diff/status/lock checks exit 0. |
-| Runtime | PASS | Root 4,498/0/19 and agentic 531/531, both exit 0; root JSON report persisted. |
+| Static | PASS | Agentic check/lint/fmt: 175 files, exits 0; `arch:check`, diff/status/lock checks exit 0. |
+| Runtime | PASS | 50/50 cleanup repetitions; final root 4,661/0/19 and agentic 537/537, exits 0; reports persisted. |
 | Generated freshness | BLOCKED upstream | MCP export corpus exit 1; assets barrel, agent-docs prose, and publish assets exit 0. |
-| Consumer | PASS | Resume output/exit compatibility and explicit repair behavior remain covered; protected tests unchanged. |
+| Consumer | PASS | Resume rejection, profile provenance, explicit repair, preserve-only launch, and disposable dry-run/apply smoke covered. |
 
 ## Open Questions
 
@@ -111,11 +120,12 @@ paths and was not regenerated.
 ## Drift and Debt
 
 - Drift: owner-provided Codex planning route, unavailable expected `rtk` binary, root lint config's
-  `.llm/` exclusion, the unidentified parked-head root flake, and current-main MCP corpus staleness;
+  `.llm/` exclusion, the identified and repaired parked-head root flake, and current-main MCP corpus staleness;
   all are recorded in `drift.md`.
 - Debt: none created or closed.
 
 ## Commits
 
-- Slice 6 GREEN is `00877bcbd`; Slice 7 is `1cf52be67`; parked integration is `de24161b6`; current
-  main integration is `2bf9ca1b2`. V3 has no `commits.md`.
+- Slice 6 GREEN is `00877bcbd`; Slice 7 is `1cf52be67`; profile/outcome amendment is `419aeb471`;
+  deterministic cleanup is `414469033`; final main integration is `fe51d4a3a`. V3 has no
+  `commits.md`.

@@ -151,6 +151,8 @@ when the child exit is non-zero.
 | 2026-08-31 | amendment | Final-freeze integration | Captured the amended six-test baselines plus `deno.lock`, fetched `origin/main` at `8f1fcb2bc3b9b3ef57c222825f50ee2db43a2f1d`, and merged it in `50431f9cd`. Every post-merge blob is byte-identical to its pre-merge capture. |
 | 2026-08-31 | amendment | Stress gate blocked | The required 50-run full-file repetition produced exits 1 at iterations 1, 9, 23, and 40 (46/50 clean). All four failures are `pid.first` actual `dead` versus expected `alive`, not the repaired cleanup exception. A name-filtered diagnostic run made the same fixture defect deterministic. The child uses an unresolved top-level promise, which Deno exits when no pending operation remains, so it is not guaranteed live through observation. No further protected-test change was made without authorization. |
 | 2026-09-01 | amendment | Stress repair authorized | The coordinator confirmed both protected-ceiling exceptions cover completing the repair. The live child now waits on parent-held stdin, an additive case sends an already-terminated child through `stopAndReap`, and every original assertion remains. The required full-file repetitions then passed 50/50; iterations 1-50 and the aggregate exit were all 0. |
+| 2026-09-01 | integration | True final freeze | After the repair was complete, read-only remote inspection showed `main` had advanced. Captured the six amended test baselines plus `deno.lock`, fetched `origin/main` at `969e7dfeb04695ab0ffba474d5cd0ee9a2e83002`, and merged it at `fe51d4a3a`. Every protected blob and the lockfile remained byte-identical. |
+| 2026-09-01 | gate | Final validation | Final-head root suite passed 4,661/0/19 and agentic passed 537/537; check/lint/fmt, `arch:check`, both disposable repair smokes, three generated freshness checks, lock diff, raw status, and diff check all exited 0. MCP export-corpus alone exited 1 and its generated file has no diff from current `origin/main`; it remains an inherited package-corpus defect outside #1751. |
 
 ## Decisions
 
@@ -262,6 +264,41 @@ Protected tests were captured independently before and after the merge and remai
 - `sender-ownership_test.ts` — `74b0ba6118ec4961ed50da639791fe52e3faa09a`
 - `sender-lease-repair_test.ts` — `7be38302ac6ed20f29571213d18172283e1aded5`
 - `local-sender-lease-repair-adapter_test.ts` — `2e2817d0c27628e0f9e1ca922c47ec35738102ce`
+- `codex-thread-read_test.ts` — `d3ca0b51fcb87aeee81e4202e5f527ed569fba12`
+- `agentic-runtime_test.ts` — `7113e271dfa15e9f2dc53b6922c4d5055e086430`
+- `codex-resume_test.ts` — `546b5f0185876fd51c9b5ee28b57a19fe37562b7`
+
+### Final-freeze evidence (`fe51d4a3a`)
+
+All commands below captured the target command directly with `out=$(cmd 2>&1); rc=$?`; none used a
+pipeline. Root reports and agentic reports are persisted under
+`.llm/tmp/fix-agentic-sender-lease-recovery--1751/final/` and are intentionally uncommitted.
+
+| Gate | Exit | Result |
+| --- | ---: | --- |
+| Protected cleanup repetition | 0 | 50/50 full-file repetitions green; iterations 1-50 each exit 0, 4 tests per repetition |
+| Root structured suite, final head (`--output .../root-suite-final.json --pretty`) | 0 | 4,661 passed / 0 failed / 19 ignored / 4,680 total |
+| Root suite-level confirmations | 0 | Four consecutive persisted suite runs green overall: three immediately before the final `main` freeze and one at `fe51d4a3a` |
+| Full `.llm/tools/agentic` suite (`--output .../agentic-suite-final.json --pretty`) | 0 | 537 passed / 0 failed / 0 ignored |
+| Scoped agentic check | 0 | 175 files, 2 batches, 0 failed batches, 0 diagnostics |
+| Scoped agentic lint with `jsr-package-settings.json` | 0 | 175/175 processed, 0 findings |
+| Scoped agentic format | 0 | 175/175 processed, 0 findings |
+| Controlled repair dry-run | 0 | Disposable sender/profile/evidence roots; `planned`, `changed:false`, lease retained, no evidence directory |
+| Controlled repair apply | 0 | Disposable roots; `succeeded`, `changed:true`, exact lease removed, dual-pass `evicted` receipt persisted without `leaseToken` |
+| `deno task arch:check` | 0 | No blocking dependency or doctrine findings; existing warnings remain non-fatal |
+| `deno task check:mcp-export-corpus` | 1 | Inherited stale corpus; generated file is byte-identical to `origin/main` and was not regenerated in this leaf |
+| `deno task check:assets-barrel` | 0 | Fresh; no generated diff left behind |
+| `deno task check:agent-docs-prose` | 0 | `fresh:true`; no stale paths |
+| `deno task check:publish-assets` | 0 | Fresh |
+| `git diff --exit-code -- deno.lock` | 0 | No lockfile diff; blob remains `a1522e6ecc98dd4232312385b0cea4e52f5fa4b2` |
+| Raw `git status --short --branch` | 0 | Clean worktree before final evidence-artifact edits |
+| Raw `git diff --check` | 0 | No whitespace errors |
+
+Final protected baselines, captured before and after the `969e7dfe` merge:
+
+- `sender-ownership_test.ts` — `978cd23d073035e1d578193a299806a0fe9b77fb`
+- `sender-lease-repair_test.ts` — `7be38302ac6ed20f29571213d18172283e1aded5`
+- `local-sender-lease-repair-adapter_test.ts` — `e12c023b90b8debc66d2f6ad720f3a9b9cdd9f14`
 - `codex-thread-read_test.ts` — `d3ca0b51fcb87aeee81e4202e5f527ed569fba12`
 - `agentic-runtime_test.ts` — `7113e271dfa15e9f2dc53b6922c4d5055e086430`
 - `codex-resume_test.ts` — `546b5f0185876fd51c9b5ee28b57a19fe37562b7`
