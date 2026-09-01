@@ -9044,3 +9044,60 @@ be **capable of failing** rather than shaped to pass.
 
 **#1846** parked on the deferred runtime proof. **#1876** completeness fix delivered to its author.
 **#1879** implementing widened scope. **#1351** implementing after PLAN-EVAL PASS.
+
+
+## D-205 - #1888 queued behind P1s; #1876 completeness fixed and under cycle 2
+
+### #1888 admitted to the queue, not dispatched
+
+New bounded tooling defect: an OpenHands pr-comment formal eval **skipped the tracked
+`evaluate.md` commit-back**, then published a comment claiming the tracked artifact existed when Git
+proved it did not - and its summary carried **both** `OPENHANDS_VERDICT: PASS` and a trailing
+`PENDING` while metadata parsed PASS. That is a false-ready gap against the rule that the committed
+run artifact is the verdict of record.
+
+**Queued, not started.** All three implementer lanes are actively working (#1879 idle 1s, #1351 idle
+0s, #1876 mid-cycle), and the instruction was explicit that it must not displace current P1s.
+Dispatching a fourth would do exactly that. It does not reopen #1865.
+
+Worth noting for whoever takes it: this lane has hit the *same class* of defect twice today from the
+other direction - a `status:impl-eval` label written without an evaluator ever running. #1888 is the
+artifact-side twin of that, and both share one root: **a claim of evaluation existing without the
+durable evidence to back it**.
+
+### #1876 - completeness fix delivered; I was wrong twice on the derivation
+
+Head `166c242be`. Every importing member now declares:
+
+| Member | module imports | declares |
+| --- | ---: | ---: |
+| `packages/sdk` | 1 | 1 |
+| `packages/plugin-sagas-core` | 1 | 1 |
+| `packages/plugin-auth-core` | 1 | 1 |
+| `packages/plugin-workers-core` | 2 | 1 |
+| `plugins/triggers` | 3 | 1 |
+| `packages/cli/e2e` | **6** | 1 |
+
+`publish:dry-run` **0**, `arch:check` **0**, lock **+6 lines**.
+
+**The evaluator was right about `cli/e2e` and I was wrong.** I reported 0 imports there; it has
+**six** - they import **sub-paths** (`/telemetry`, `/sse`), which my
+`from '@netscript/plugin-streams-core'` exact-match grep silently missed. That is the second
+derivation error I have made on this one slice: first conflating a `definePlugin` **string literal**
+with an import (inflating the set), now an exact-match pattern that **under-counted a whole member to
+zero**.
+
+Both errors are the same shape - **a pattern chosen for convenience, then trusted as if it were a
+derivation**. Carried into the cycle-2 brief as two named traps, with the instruction to state which
+pattern was used and to report module imports and string references separately. The evaluator is also
+told the supervisor has already been wrong twice here, so its own derivation is the authority rather
+than mine.
+
+Cycle-2 IMPL-EVAL dispatched, scoped to the completeness delta; cycle 1's settled findings are
+explicitly not re-litigated.
+
+### Lane state
+
+**#1879** implementing widened manifests+catalog+lock+fixtures scope. **#1351** implementing after
+PLAN-EVAL PASS. **#1876** cycle-2 eval running. **#1846** parked on the deferred runtime proof.
+**#1888** queued.
