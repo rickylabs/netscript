@@ -9101,3 +9101,54 @@ explicitly not re-litigated.
 **#1879** implementing widened manifests+catalog+lock+fixtures scope. **#1351** implementing after
 PLAN-EVAL PASS. **#1876** cycle-2 eval running. **#1846** parked on the deferred runtime proof.
 **#1888** queued.
+
+
+## D-206 - #1888 dispatched; four implementation lanes plus one evaluation running
+
+#1888 is now coordinator-authorized, so it is dispatched rather than queued. Located both defects
+precisely at base `302409f0c` before writing the brief, so the author starts from evidence rather than
+a re-investigation.
+
+### Defect A is subtler than "the commit-back was skipped"
+
+`.github/workflows/openhands-agent.yml` gates the commit-back step on
+`steps.request.outputs.eval_phase == ''`, so **any** run with an eval phase never commits - and the
+step's own comment explains why:
+
+> Formal evaluators are immutable read-only runs ... so the evaluated head can never be changed by
+> evaluation itself.
+
+**That invariant is deliberate and correct.** The naive fix - delete the condition - would let an
+evaluator commit to the branch it is evaluating, which is a *worse* defect than the one being fixed.
+
+The real defect is the **mismatch**: the run wrote `evaluate.md`, the artifact was discarded, and the
+status comment then **claimed the tracked path existed** when Git proved it did not. The brief says
+this explicitly, forbids simply removing the condition, and leaves the author the two sanctioned
+resolutions - preserve durably somewhere that is not the evaluated head and record that URI
+truthfully, or commit somewhere that does not mutate the evaluated head - with the requirement that
+the comment's claim be **provable**.
+
+### Defect B - `head -n 1` hides a second verdict
+
+The verdict parser takes the first matching line, so a summary carrying both
+`OPENHANDS_VERDICT: PASS` and a trailing `PENDING` parses as `PASS` silently. Must **fail closed** on
+zero or more than one token. Told to **extend** the existing `absent`/`unparseable`/`parsed` state
+vocabulary rather than replace it, and to preserve the fence-stripping and `<...>` template-text
+exclusions - those exist to stop documentation examples being parsed as verdicts, and a careless
+rewrite would reintroduce that.
+
+Flagged acceptance 4 as the one most likely to be skimped: a fix without a test reproducing the
+**read-only-evaluator + `pr-comment`** pairing leaves the defect free to return.
+
+### Lane state - nothing idle, nothing blocked on me
+
+| Lane | State |
+| --- | --- |
+| #1876 | cycle-2 IMPL-EVAL running (completeness fix delivered) |
+| #1351 | implementing after PLAN-EVAL PASS |
+| #1879 | implementing widened manifests+catalog+lock+fixtures scope |
+| #1888 | launched |
+| #1846 | parked on the deferred 3-arrival runtime proof - the one true owner boundary |
+
+The only outstanding owner-boundary item remains #1846's runtime proof, which cannot run without
+contending with the globally-serialized queue it protects.
