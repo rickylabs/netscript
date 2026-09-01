@@ -2,6 +2,7 @@
 
 import { dirname } from '@std/path';
 import { requireValue, UUID, wslHome } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import {
   type CodexLiveEvent,
   codexLiveEvents,
@@ -32,6 +33,7 @@ export function parseSince(value: string): number {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   let threadId: string | undefined;
   let rollout: string | undefined;
   let sessionsDir = defaultSessionsDir();

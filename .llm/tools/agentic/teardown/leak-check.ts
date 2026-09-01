@@ -3,6 +3,7 @@ import { classify, type Ownership, type ResourceCandidate } from './ownership.ts
 import { probeResourceReport, type ProbeStatus } from './probes.ts';
 import { type CommandPort, type FilePort, systemCommands, systemFiles } from './ports.ts';
 import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 export const STALE_AFTER_MS: number = 2 * 60 * 60 * 1000;
 
@@ -177,13 +178,13 @@ export async function runLeakCheck(
 function parseArgs(
   args: string[],
 ): { sliceDir: string; worktreeRoot: string; staleAfterMs: number; ownedRoots: string[] } {
+  args = normalizeTaskArguments(args);
   let sliceDir = '';
   let worktreeRoot = Deno.cwd();
   let staleAfterMs = STALE_AFTER_MS;
   const ownedRoots: string[] = [];
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--') continue;
-    else if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
+    if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
     else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
     else if (args[i] === '--owned-root') ownedRoots.push(args[++i] ?? '');
     else if (args[i] === '--stale-after') staleAfterMs = Number(args[++i]) * 1000;

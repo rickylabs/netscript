@@ -153,20 +153,12 @@ export class Worker {
     }
 
     console.log(
-      `[Worker ${this.workerId}] Starting with Web Worker pool (${this.concurrency} workers)...`,
+      `[Worker ${this.workerId}] Starting in-process job runner (queue concurrency: ${this.concurrency})...`,
     );
 
     this.running = true;
     this.abortController = new AbortController();
     await this.workerPool.initialize();
-
-    this.workerPool.setProgressCallback((jobId, _executionId, percent, message) => {
-      console.log(
-        `[Worker ${this.workerId}] Job '${jobId}' progress: ${percent}%${
-          message ? ` - ${message}` : ''
-        }`,
-      );
-    });
 
     this.workerSpan = startWorkerSpan({
       workerId: this.workerId,

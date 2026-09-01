@@ -26,6 +26,7 @@ import {
 } from '../runtime/adapters/child-process-environment-adapter.ts';
 import { parseOpenRouterApiKey } from '../opencode/opencode-run.ts';
 import { type Options, runClaudePrint } from './claude-print.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 export interface OpenRouterRunOptions {
   readonly model: string;
@@ -49,6 +50,7 @@ const USAGE = 'Usage: claude-openrouter --model <openrouter-id> --effort <level>
  * spend OpenRouter credit.
  */
 export function parseOpenRouterRunArguments(args: readonly string[]): OpenRouterRunOptions {
+  args = normalizeTaskArguments(args);
   const seen = new Map<Flag, string>();
   for (let index = 0; index < args.length; index++) {
     const flag = args[index];
