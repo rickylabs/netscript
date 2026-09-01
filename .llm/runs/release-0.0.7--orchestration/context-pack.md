@@ -2422,3 +2422,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   Phase B alone consumes #1865's exact merge SHA. #1851 is closed with verified already-fixed evidence.
   #1802 is nearly mergeable at `e36b17461` but still needs terminal exact CI and a truthful body status
   rewrite. No owner decision is pending; Aspire and Docker inventories are zero.
+
+## Resume delta — 2026-09-01T17:35:00Z
+
+- Current main is `302409f0c9062ec01005c74eb9c6a82898a26036`. #1802 shipped as `9e3b8bcba`,
+  closing #1751; atomic P0 #1865 then shipped as `302409f0c`, closing #1863/#1870/#1877 after
+  exact Postgres 92/92 and SQLite/Garnet 87/87 receipts. Superseded #1878 is closed and its product
+  plus retained run files survive in main.
+- Aspire now owns immediate S7-S13 Phase B against exact baseline SHA `302409f0c`; Fixes owns #1858
+  Garnet convergence/proof against the same SHA. Both were dispatched after a zero Aspire/zero Docker
+  host proof. Independent feature, docs, and internals work remains active.
+- OpenHands run `33533773165` returned formal PASS but exposed handoff defect #1888: `pr-comment`
+  skipped tracked evaluator commit-back and uploaded a summary with PASS plus trailing PENDING even
+  though metadata parsed PASS. Actions artifact `9812529942` is the durable recovery receipt; #1888
+  is assigned to Internals. No owner decision is pending.

@@ -1642,3 +1642,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   move. `Standing by`, foreground polling, or an empty prompt is an intervention condition whenever
   #1855 or a static S7-S13 task remains runnable. Only Phase B waits for #1865; the coordinator owns
   immediate post-merge runtime dispatch and subsequent exact-green merges.
+
+## 2026-09-01T17:35:00Z — post-baseline active fronts
+
+- Main is `302409f0c9062ec01005c74eb9c6a82898a26036` after shipped #1802 and #1865. Aspire
+  consumes this exact baseline for the staged S7-S13 Phase-B sequence under the host runtime mutex,
+  while reviewing #1855 and advancing static work. Fixes consumes it into #1858 and runs the one
+  full Garnet proof, evaluation, and packet; it does not wait for Aspire.
+- Features repairs #1842's published example with the coordinator-approved resolver-contract form,
+  never by widening the JSDoc alias allowlist, while #1590 Slice 2/#1884/#1872/#1354 continue. Docs
+  completes #1756 and advances #1533. Internals continues #1879/#1351/#1876 and queues #1888 without
+  displacing those active P1s.
+- Coordinator merge authority remains active. A formal evaluator workflow success is not sufficient
+  when its durable-output contract lies: preserve its immutable Actions artifact, file the tooling
+  defect, and require independent exact product/runtime evidence rather than hiding the mismatch.

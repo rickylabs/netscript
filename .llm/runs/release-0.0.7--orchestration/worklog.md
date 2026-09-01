@@ -3754,3 +3754,25 @@
   evaluated leaf paths byte-identical, a clean synthetic merge tree, 253/253 focused tests, and zero
   review threads. Exact required CI is still terminalizing and its stale body status must be rewritten
   before the coordinator may merge. Host inventory remains Aspire `[]` and containers 0.
+
+## 2026-09-01T17:35:00Z — agentic recovery and the P0 runtime baseline ship
+
+- Internals PR #1802 reached terminal exact-head green at `e36b17461`; its body was rewritten in
+  place to the current head, carrier-only merge, resumed-session delta PASS, 253/253 focused suite,
+  exact CI, lock, and zero-thread facts. The coordinator squash-merged it as
+  `9e3b8bcba3a77be3d15c477c4f734600de8a7185`, closing #1751; both records are `status:shipped`.
+- Fixes PR #1865 then passed every exact-head check at `da8b556fe`. Hosted run `33536376814`
+  attempt 2 reports Postgres 92/92 and SQLite/Garnet 87/87, including Flow-B 2753/2885 ms,
+  readiness 98/98 ms, workers 780/869 ms, cleanup, static, and desktop. #1802's delta was proven
+  carrier-only with zero path overlap and a conflict-free synthetic merge. The coordinator merged
+  #1865 as `302409f0c9062ec01005c74eb9c6a82898a26036`, closing #1863/#1870/#1877 and marking all shipped.
+  Duplicate PR #1878 was closed and its branch deleted only after its product blobs and retained run
+  directory were verified in the atomic merge.
+- #1877's formal cloud evaluator finished PASS at immutable `bb5fd4ad`, run `33533773165`; Actions
+  artifact `9812529942` records parsed PASS and the final report. The workflow nevertheless skipped
+  commit-back in `pr-comment` mode and left a contradictory trailing PENDING token in the uploaded
+  summary. New Internals-owned P1 #1888 owns that false-ready handoff defect; it does not reopen the
+  independently evaluated and exact-runtime-green product merge.
+- Host inventory was re-proved Aspire `[]` and containers 0. Aspire received exact baseline SHA
+  `302409f0c` and began the pre-staged S7-S13 Phase-B sequence; Fixes immediately consumed the same
+  SHA into #1858 for its Garnet proof. No owner decision is pending.

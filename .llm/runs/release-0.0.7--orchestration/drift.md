@@ -1794,3 +1794,17 @@ implementation thread.
   pre-baseline jobs so the release-critical exact-head proof can start.
 - Dependency sequencing is narrow: #1865 blocks Aspire Phase B, not #1855 implementation, issue
   evidence closure, static convergence, body repair, review, or preparation of post-merge packets.
+
+## 2026-09-01 — OpenHands comment output can falsely claim a tracked evaluator artifact
+
+- Formal run `33533773165` wrote `.llm/runs/fix-workers-runtime-ready-markers--1877/evaluate.md` in
+  its runner checkout and returned PASS, but `pr-comment` mode skipped the allow-listed commit-back
+  step. Its final comment claimed the tracked path existed; Git proved it did not. The uploaded
+  summary also retained both PASS and a trailing PENDING token while metadata parsed PASS.
+- Binding recovery: preserve the immutable Actions artifact, verify its checkout head/model/exits
+  and machine-parsed verdict, require the evaluator's judged blobs to carry byte-identically, and
+  require independent exact runtime/CI proof. Never cite the persistent PR comment alone as the
+  verdict source. P1 #1888 owns the workflow/parser repair.
+- This is evaluator-handoff drift, not a product failure. The product merge had a terminal separate-
+  session PASS, seven byte-identical judged blobs, zero threads, current close-gate, and complete
+  exact Postgres plus SQLite/Garnet runtime proof before the coordinator merged it.
