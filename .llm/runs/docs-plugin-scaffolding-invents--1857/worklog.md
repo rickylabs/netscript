@@ -40,6 +40,8 @@ Future corrections start at the plugin's `deno.json` export map, inspect the ent
 | --- | --- | --- | --- |
 | 2026-09-01 | 1 | Research | Reproduced all three defect confirmations and inspected both real scaffold entrypoints. |
 | 2026-09-01 | 1 | Edit | Removed fabricated rows/sections and added concise real `/scaffold` rows. |
+| 2026-09-01 | 1 | Regenerate | Ran prose → asset barrel → publish assets in the required order; all exited 0. |
+| 2026-09-01 | 1 | Reconcile | `origin/main` advanced to `233828f0f`; rebased normally and repeated regeneration. |
 
 ## Decisions
 
@@ -49,11 +51,18 @@ Future corrections start at the plugin's `deno.json` export map, inspect the ent
 
 ## Drift
 
-- None observed.
+- Minor: `origin/main` advanced during validation; recorded in `drift.md` and resolved by rebase.
 
 ## Gate Results
 
-- Pending regeneration and committed-head validation.
+First full pass at the pre-rebase docs commit (all exit 0): `docs:exports-drift`, site
+`check:source-format`, site `build`, site `check:links`, site `check:caveats`, `docs:links`,
+`docs:accuracy`, `docs:snippets`, `check:agent-docs-prose`, `check:assets-barrel`,
+`check:publish-assets`, and the targeted generated-source `deno check --unstable-kv`.
+
+The same complete set is repeated after the rebased evidence commit so the PR table describes the
+final pushed head. Base-relative `git diff --check`, lock equality, provenance ancestry, exact
+status, and clean-main `check:mcp-export-corpus` reproduction are recorded with that final pass.
 
 ## PLAN-EVAL
 

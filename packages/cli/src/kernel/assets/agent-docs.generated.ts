@@ -9,7 +9,7 @@ export const EMBEDDED_AGENT_DOCS_GZIP_BASE64: string =
 export const EMBEDDED_AGENT_DOCS_PROVENANCE = {
   'schemaVersion': 1,
   'version': '0.0.6',
-  'sourceCommit': '723390a63',
+  'sourceCommit': 'a635ac0f5',
   'extractionTimestamp': '2026-09-01T06:06:49.319Z',
   'files': [
     'context/01-how-the-web-became-the-default.mdx',

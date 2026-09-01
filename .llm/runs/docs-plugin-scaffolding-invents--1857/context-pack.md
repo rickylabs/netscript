@@ -13,7 +13,8 @@
 ## Current State
 
 Both source pages now name the real `/scaffold` subpath and no longer contain the fabricated
-`/scaffolding` sections. Run artifacts are instantiated; regeneration and gates remain.
+`/scaffolding` sections. The branch was rebased onto current `origin/main`; the first full required
+gate pass was green and final-head repetition remains.
 
 ## Completed
 
@@ -23,8 +24,8 @@ Both source pages now name the real `/scaffold` subpath and no longer contain th
 
 ## Next Steps
 
-1. Regenerate agent-doc prose, the asset barrel, and publish assets in order.
-2. Commit, run every required gate at the committed head, and record real exit codes.
+1. Commit the rebased provenance/run evidence update.
+2. Repeat every required gate at that final committed head and open/push the PR.
 3. Obtain separate-session IMPL-EVAL and leave lifecycle status at `status:impl` for the supervisor.
 
 ## Key Decisions
@@ -38,11 +39,12 @@ Both source pages now name the real `/scaffold` subpath and no longer contain th
 
 ## Gates
 
-- Pending.
+- First committed-head pass: all twelve requested Deno/docs/generated-source commands exited 0;
+  final-head repetition pending after the evidence commit.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: `origin/main` advanced once; branch rebased normally and the complete gate set is repeated.
 - Debt: none created, deepened, or closed.
 
 ## Commits
