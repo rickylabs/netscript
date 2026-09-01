@@ -7,8 +7,8 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Model | OpenAI GPT-5.6 Sol (`gpt-5.6-sol`), high effort |
 | Session | `01a054ff-9028-7333-a6f1-386b94308183` |
 | Host | `ai-agents` / Linux / `agent` |
-| Checkout | `<repo>` |
-| Worktree | `<worktree>` |
+| Checkout | `/home/agent/projects/netscript/repo` |
+| Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1751` |
 | Branch | `fix/agentic-sender-lease-recovery` (no upstream) |
 | Baseline | `main` @ `5197e70b716eafb82fbb12ddb9a910c248ddb86a` (2026-08-31) |
 | Run ID | `fix-agentic-sender-lease-recovery--1751` |
