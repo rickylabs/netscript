@@ -10,12 +10,15 @@ Separates the generated dev chain's dependency/startup allowance from the Fresh 
 ## Slices
 
 - [x] RED: focused slow-preflight, child-exit, and timeout-reporting regression
-- [ ] GREEN: phase-aware startup and HTTP readiness budgets
+- [x] GREEN: phase-aware startup and HTTP readiness budgets
 - [ ] Mandatory separate-session IMPL-EVAL
 
 ## Validation
 
 - Focused structured RED test — exit 1; 0 passed, 3 failed, 3 total.
+- Focused structured GREEN test — exit 0; 3 passed, 0 failed, 3 total.
+- Scoped structured check/lint/format — exit 0 each over the probe and focused test.
+- `deno.lock` — unchanged.
 - Full `deno task e2e:cli` — not run; this leaf has no runtime lease and hosted CI owns the canonical scaffold runtime.
 
 ## Harness

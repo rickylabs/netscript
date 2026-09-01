@@ -58,13 +58,23 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 | --- | --- | --- | --- |
 | 2026-09-01 | 1 | design | Exact probe/test/run-dir ceiling confirmed; no product file edited before this checkpoint. |
 | 2026-09-01 | 1 | RED | Structured focused test exited 1: 0 passed, 3 failed, 3 total; every case reached the current top-level argument guard. |
+| 2026-09-01 | 1 | commit/reconcile | RED committed as `cd2337d36`; pushed by explicit refspec; draft PR #1883 opened with `Closes #1868`, required taxonomy/milestone, and unticked acceptance. Issue remains open at `status:impl`. |
+| 2026-09-01 | 2 | GREEN | Separate 180 s startup/preflight and 60 s HTTP budgets pass all three focused cases; child status races both phases. |
+| 2026-09-01 | 2 | review | Removed a losing one-shot 180 s timer in favor of bounded 250 ms startup races and prevented cleanup from re-killing an already-exited child. |
 
 ## Gate Results
 
 | Gate | Command | Exit | Result / notes |
 | --- | --- | --- | --- |
 | RED focused test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev_test.ts` | 1 | RED: 0 passed, 3 failed, 3 total (`uniqueFailures=1`); no product files changed. |
+| GREEN focused test | same structured test wrapper | 0 | 3 passed, 0 failed, 3 total in 576 ms. |
+| Scoped check | `run-deno-check.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 diagnostics; includes `--unstable-kv`. |
+| Scoped lint | `run-deno-lint.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 findings. |
+| Scoped format | `run-deno-fmt.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 findings. Initial pre-format exploratory run exited 1; corrected before final gate. |
+| Full scaffold runtime | prohibited by brief | NOT_RUN | No runtime lease; hosted CI owns Flow-B/NAS proof. |
+| Lock hygiene | `git diff -- deno.lock` | 0 | Empty; `deno.lock` unchanged. |
 
 ## Handoff Notes
 
 - Evaluator should inspect phase separation, status races, truthful diagnostics, and confirm `deno.lock` stayed unchanged.
+- Commit trail: RED `cd2337d36`; GREEN SHA will be recorded immediately after the GREEN commit exists.

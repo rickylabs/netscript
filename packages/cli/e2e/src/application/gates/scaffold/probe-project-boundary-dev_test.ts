@@ -79,6 +79,7 @@ Deno.test('child exit fails promptly with its real status', async () => {
 
 Deno.test('startup timeout is not reported as a Fresh server failure', async () => {
   const probe = await loadProbeModule();
+  let now = 0;
 
   const error = await assertRejects(
     () =>
@@ -86,8 +87,11 @@ Deno.test('startup timeout is not reported as a Fresh server failure', async () 
         startupSignal: pending<void>(),
         childStatus: pending<Deno.CommandStatus>(),
         fetchRoot: () => Promise.reject(new Error('must not fetch')),
-        now: () => 0,
-        sleep: () => Promise.resolve(),
+        now: () => now,
+        sleep: (milliseconds) => {
+          now += milliseconds;
+          return Promise.resolve();
+        },
         startupBudgetMs: 1,
       }),
     Error,

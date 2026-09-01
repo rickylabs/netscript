@@ -6,18 +6,18 @@
 | --- | --- |
 | Run ID | `fix-dev-probe-startup-budget--1868` |
 | Branch | `fix/dev-probe-startup-budget` |
-| Current phase | implement — RED |
+| Current phase | implement — GREEN |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Baseline `82a2527e2` is confirmed. The focused RED regression exited 1 with 0 passed / 3 failed; product code is unchanged.
+RED `cd2337d36` is pushed and draft PR #1883 is open. GREEN separates the startup and HTTP budgets, preserves actual child-exit reporting, and passes all focused structured gates.
 
 ## Next Steps
 
-1. Commit the RED slice, push by explicit refspec, and immediately open the required draft PR.
-2. Implement GREEN, run scoped wrappers, push/comment, and leave the PR draft.
+1. Commit/push GREEN and record its SHA in the run artifacts and PR timeline.
+2. Hand off for mandatory separate-session IMPL-EVAL; leave PR #1883 draft and do not merge.
 
 ## Key Decisions
 
@@ -28,11 +28,12 @@ Separate the 180 s startup/preflight phase from the 60 s HTTP phase, race real c
 | Path | Status | Notes |
 | --- | --- | --- |
 | `packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev_test.ts` | new | RED regression |
+| `packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev.ts` | changed | Named budgets, phase seam, output mirroring, prompt status races |
 | `.llm/runs/fix-dev-probe-startup-budget--1868/` | changed | Harness state |
 
 ## Gates
 
-Focused structured test RED: exit 1, 0 passed / 3 failed. Full `e2e:cli` prohibited; hosted CI owns Flow-B.
+Final focused structured check/test/lint/fmt all exit 0; test counts are 3 passed / 0 failed. Full `e2e:cli` prohibited; hosted CI owns Flow-B.
 
 ## Drift and Debt
 
