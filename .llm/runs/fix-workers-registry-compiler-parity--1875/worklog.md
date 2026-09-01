@@ -66,6 +66,17 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 | 2026-09-01 | S1 | focused gates | Check/test/lint/fmt wrappers green after replacing literal regex indentation that lint rejected. |
 | 2026-09-01 | S1 | fitness gates | `quality:gate` green; supplemental JSR audit remains red on pre-existing, non-surface-changing findings. |
 | 2026-09-01 | S1 | slice review | PASS from separate Claude Opus 5 low fallback session `9ab1eef0`; reviewer independently re-ran the focused test. |
+| 2026-09-01 | S1 | sign-off | Supervisor sign-off commit `cfbc07fa8` pushed; PLAN and IMPL comments posted to draft PR #1882. |
+
+## Post-Slice Reconcile
+
+- Issue #1875 remains open at milestone 0.0.7; PR #1882 retains `Closes #1875`.
+- PR #1882 has exactly the requested metadata: `orchestrator:features`, `status:impl`, `type:fix`,
+  `priority:p2`, `wave:v1`, `area:workers`, milestone 0.0.7, and draft state.
+- No new review/evaluator comments required a source readjustment after S1.
+- The plan remains unchanged; the live five-field gap was anticipated by its conditional repair
+  scope and is prominently recorded above.
+- Per-slice comments: PLAN `5497517791`; IMPL `5497518145`.
 
 ## Decisions
 

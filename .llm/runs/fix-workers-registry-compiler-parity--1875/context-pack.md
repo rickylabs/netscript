@@ -20,15 +20,15 @@ wrappers and `quality:gate` pass, lock hygiene is clean, and opposite-family sli
 - Harness activation, doctrine/archetype review, re-baseline, JSR surface scan, plan, and design.
 - Draft PR #1882 opened with the full requested labels and milestone 0.0.7.
 - S1 implementation and focused/quality validation.
+- Opposite-family slice review PASS and S1 sign-off commit `cfbc07fa8` pushed with phase comments.
 
 ## In Progress
 
-- S1 sign-off commit, push, and PR comment.
+- Formal separate-session IMPL-EVAL.
 
 ## Next Steps
 
-1. Create the S1 sign-off commit, push, and post the per-slice PR comment.
-2. Run separate-session IMPL-EVAL and update the PR body/status.
+1. Run separate-session IMPL-EVAL and update the PR body/status.
 
 ## Key Decisions
 
