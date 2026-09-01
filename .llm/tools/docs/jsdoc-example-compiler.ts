@@ -101,8 +101,15 @@ function preamble(block: JsdocExampleBlock, repositoryRoot: string): string {
   if (owner.declarationKind === 'type' || owner.declarationKind === 'class') {
     // A bare `type X = import(spec).X` alias drops the declaration's type parameters, so a
     // documented generic type fails TS2315 when its own example applies type arguments. Mirror
-    // the arity instead; the real constraints are still enforced where the alias applies them,
-    // and `any` defaults keep the bare `X` spelling valid.
+    // the arity instead, with `any` defaults so the bare `X` spelling stays valid.
+    //
+    // KNOWN GAP (#1533 follow-up): this does NOT enforce the declaration's *constraints*. The
+    // mirrored parameters are unconstrained, so for a constrained generic the alias itself fails
+    // TS2344 inside `preamble.ts` — an unattributed module whose diagnostics are dropped whenever
+    // any example has a classified failure. A violating type argument therefore passes silently:
+    // `ServiceHandlerContext<number>` against `TCustom extends object` leaves the gate green.
+    // Injecting a real `import type` into the example module fixes it, but regresses two
+    // pre-existing examples over the ratchet, so it is tracked separately rather than rushed.
     const arity = declarationTypeParameterArity(repositoryRoot, owner.sourcePath, owner.symbol);
     if (arity > 0) {
       const parameters = Array.from({ length: arity }, (_, index) => `P${index + 1}`);
