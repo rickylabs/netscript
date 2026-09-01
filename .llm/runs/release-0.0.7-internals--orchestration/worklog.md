@@ -7968,3 +7968,49 @@ produced an unactionable ticket; filing now produces a bisected one.
 
 **#1832 is not the cause and must not be gated on it** — its CI will inherit this red until #1859
 lands.
+
+## D-184 — #1840 packet surfaced; #1859 leaf launched in parallel
+
+### #1840 — exact-head green, packet handed
+
+CI fully green at `000758cd426ac9de34b37ef438f20c9d58509344`: `check-test` **pass** (8m39s,
+**4,627 passed / 0 failed / 14 ignored**), plus `quality`, `code-quality`, `close-gate`,
+`classify changes`. Review threads **0 / 0**. Zero overlap with current main.
+
+- **Stale Harness prose rewritten in place** — it still said "IMPL-EVAL mandatory and pending" and
+  "keep this PR draft". Now records the `PASS` at `f11dfadd5`, the owner-authorized **evaluator carry**
+  across the typing-only `8334c8e34` delta with its behaviour-unchanged proof, and the single
+  main convergence with its blob-identity evidence.
+- **Atomic label transition** `status:impl-eval` → sole `status:ready-merge` on PR **and** issue.
+  Issue #1750 was additionally carrying a stray `status:triage` alongside — taxonomy requires exactly
+  one `status:`, so that was cleared in the same pass.
+- **Label-sensitive CI re-run at the unchanged head** (`gh run rerun`, no push) so `close-gate` reads
+  the live labels without moving the evaluated head.
+- Packet posted with the survey framing that actually matters: the issue named the hybrid launcher,
+  but 21 of 26 strict parsers were broken — fixing only the named site would have left twenty.
+
+### #1859 — bounded corpus repair launched
+
+Coordinator admitted #1859 as an authorized p1 Internals repair; it unblocks #1832 and every other PR
+on current main. Leaf `fix/mcp-export-corpus-refresh` created from `78be0e032`, and **RED confirmed at
+that exact base before dispatch**: `REAL_EXIT=1`,
+`MCP export-surface corpus is stale; run deno task gen:mcp-export-corpus`.
+
+The brief hands over the bisect rather than making the author re-derive it, and constrains the repair
+tightly:
+
+- **Exactly one file may change** —
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`. Anything else
+  means the generator has a wider effect than this repair authorizes, and is a **stop-and-report**.
+- Expect ~4 lines (`sha256`, `uncompressedBytes` +224, `compressedBytes`, payload). A much larger diff
+  means broad drift rather than #1841's single surface — also stop-and-report.
+- **Never hand-edit the generated file**; a hand-patched artifact that satisfies the check is a defect,
+  not a fix.
+- **Do not fix the root cause in #1841's SDK code**, and **do not add the merge gate** the issue
+  mentions as a separate consideration — both would exceed the bounded repair.
+- Repo-wide `deno task test` is required in Tier-A because a generated artifact consumed across the
+  workspace is being changed.
+- **No PLAN-EVAL** per ruling; preserve all run artifacts.
+
+Four leaves now active in parallel on disjoint surfaces: #1802 (`agentic/runtime`), #1846
+(`.github/workflows`), #1859 (`packages/mcp` generated corpus), and #1832 awaiting the corpus unblock.
