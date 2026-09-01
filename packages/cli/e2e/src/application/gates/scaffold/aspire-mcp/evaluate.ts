@@ -306,7 +306,7 @@ function sameSet(left: readonly string[], right: readonly string[]): boolean {
 }
 
 async function timed<T>(label: string, timeoutMs: number, operation: () => Promise<T>): Promise<T> {
-  let timeout: number | undefined;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
       operation(),
