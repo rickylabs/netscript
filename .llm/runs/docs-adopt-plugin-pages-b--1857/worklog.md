@@ -74,6 +74,10 @@ evidence determines the only remaining coverage field.
 | 2026-09-01 | S1 | page adoption | Added six missing rows, repaired nine auth paths/rows, and inserted three cumulative mappings (32 → 35). |
 | 2026-09-01 | S1 | regeneration | Ran `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`, all exit 0. |
 | 2026-09-01 | S1 | review | Inspected the focused diff against all three manifests and per-entrypoint symbols; preserved the Vento release expression and all 32 existing mappings. |
+| 2026-09-01 | S2 | exclusion | Added the typed auth-hub exclusion with all five indexed packages named. |
+| 2026-09-01 | S2 | denominator | Added one-level reference index discovery and exactly-one classification errors for neither/both. |
+| 2026-09-01 | S2 | tests | Initial focused run caught a missing explicit default-parameter type; fixed it, then 14/14 tests passed. |
+| 2026-09-01 | S2 | review | Verified the focused diff, exact failure messages, live `36/36` output, and all 32 baseline mapping names by name. |
 
 ## Decisions
 
@@ -103,16 +107,19 @@ evidence determines the only remaining coverage field.
 | S1 prose convergence | `deno task check:agent-docs-prose` | PASS (0) | Check mode matches regenerated bundle. |
 | S1 publish convergence | `deno task check:publish-assets` | PASS (0) | Publish carrier matches generated inputs. |
 | S1 assets precommit probe | `deno task check:assets-barrel` | expected non-verdict (1) | Task compares the intentionally changed generated carrier to pre-S1 `HEAD`; rerun after commit. |
+| S1 assets committed head | `deno task check:assets-barrel` | PASS (0) | Ran at pushed S1 head `0f1e0dc20`. |
+| S2 focused test | structured test wrapper over `check-exports-drift_test.ts` | PASS (0) | 14 passed, 0 failed after type fix. |
+| S2 denominator | `deno task docs:exports-drift` | PASS (0) | `36/36; mapped=35; excluded=1`. |
+| S2 32-row survival | compare `origin/main` literal names to current mapping | PASS (0) | Baseline 32, current 35, missing none. |
 | Required final suite | See plan | NOT_RUN | Runs after implementation. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-5 | PASS (research) | all-entrypoint `deno doc --json` unions | Final mapping gate pending. |
-| F-5 | PASS (S1) | `docs:exports-drift` | Exact entrypoint coverage for 35 mappings. |
+| F-5 | PASS | all-entrypoint `deno doc --json` + `docs:exports-drift` | Measured coverage and exact entrypoint tables for 35 mappings. |
 | F-7 | NOT_RUN | site/repo docs gates | Runs after implementation. |
-| F-19 | NOT_RUN | `deno task test` | Runs after checker test change. |
+| F-19 | PASS (focused S2) | structured test wrapper | 14/14; full root test task pending final gate. |
 
 ### Runtime Gates
 

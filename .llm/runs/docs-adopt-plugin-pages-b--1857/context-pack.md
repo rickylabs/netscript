@@ -12,11 +12,10 @@
 
 ## Current State
 
-S1 now carries 35 mapped package pages: triggers, workers, and plugin-auth have exact entrypoint
-tables and measured `entrypoints-only` policies. Derived documentation assets were regenerated in
-the required order. The auth page remains the sole unclassified physical reference page until S2
-adds its typed exclusion and exactly-one denominator enforcement. PR #1869 remains
-`status:impl`.
+S1 carries 35 mapped package pages with exact entrypoint tables and measured coverage. S2 now
+records the auth five-package hub as the sole typed exclusion and makes the denominator
+self-enforcing: the live checker reports `36/36; mapped=35; excluded=1`, while focused tests reject
+both neither-classified and doubly-classified pages. PR #1869 remains `status:impl`.
 
 ## Completed
 
@@ -30,17 +29,19 @@ adds its typed exclusion and exactly-one denominator enforcement. PR #1869 remai
   measurements; mapping count is 35 with all 32 prior names retained.
 - S1 `docs:exports-drift`, generators, prose check, and publish check pass. The assets-barrel task
   must be rerun after the expected generated carrier is committed because it compares to `HEAD`.
+- S1 is pushed at `0f1e0dc20`; committed-head `check:assets-barrel` exits 0.
+- S2 implementation passes the focused structured test (14/14), live 36/36 checker, and explicit
+  32-row name survival check.
 
 ## In Progress
 
-- Slice 1 commit/push and PR comment.
+- Slice 2 commit/push and PR comment.
 
 ## Next Steps
 
-1. Commit/push S1 and post its PR comment; rerun the committed assets-barrel check.
-2. Implement/test S2; review, commit, push, and PR comment.
-3. Run full gates, freeze run evidence, rerun at final pushed head, and update PR body/comment.
-4. Hand off to the separate supervisor-owned IMPL-EVAL without changing `status:impl`.
+1. Commit/push S2 and post its PR comment.
+2. Run full gates, freeze run evidence, rerun at final pushed head, and update PR body/comment.
+3. Hand off to the separate supervisor-owned IMPL-EVAL without changing `status:impl`.
 
 ## Key Decisions
 
@@ -56,7 +57,8 @@ adds its typed exclusion and exactly-one denominator enforcement. PR #1869 remai
 | --- | --- | --- |
 | `.llm/runs/docs-adopt-plugin-pages-b--1857/*` | new | Harness bootstrap/research/plan/design state. |
 | `docs/site/reference/{triggers,workers,plugin-auth}/index.md` | changed | Exact missing entrypoints and auth path column. |
-| `.llm/tools/docs/check-exports-drift.ts` | changed | Three cumulative measured mappings. |
+| `.llm/tools/docs/check-exports-drift.ts` | changed | Three mappings plus typed exclusion and exactly-one enforcement. |
+| `.llm/tools/docs/check-exports-drift_test.ts` | changed | Neither/both regression tests. |
 | `.llm/assets/agent-docs/*` | changed | Regenerated prose bundle/provenance. |
 | `packages/{cli,mcp}/**/*.generated.ts` | changed | Regenerated embedded carriers. |
 
@@ -64,8 +66,8 @@ adds its typed exclusion and exactly-one denominator enforcement. PR #1869 remai
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S1 PASS; S2/final pending | 35-row `docs:exports-drift` exit 0; generators 0/0/0 |
-| Fitness | S1 F-5 PASS; final pending | every entrypoint measured; exact tables accepted |
+| Static | S2 PASS; final pending | 36/36 drift exit 0; focused test 14/14; survival exit 0 |
+| Fitness | S1/S2 PASS; final pending | measured F-5 and structured F-19 evidence |
 | Runtime | N/A | no plugin/package source |
 | Consumer | pending | site and generated corpus gates planned |
 
