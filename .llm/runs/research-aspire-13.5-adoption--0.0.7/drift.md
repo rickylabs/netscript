@@ -6143,3 +6143,29 @@
     `d1c6d8b54`, not the new head) → **S11 restack on S10** → **S13 parity box 2 verifies once S9 is on
     main**. #1744 and #1747 remain gated on the garnet fix; both are otherwise complete.
   - Runtime lease remains with Fixes **#1858**; every live dispatch of mine is static and CI-only.
+
+- **D-250 — stall report checked and NOT confirmed: the S8 worker is live and mid-verification. Did not
+  take over.**
+  - **Evidence it is working, not stalled:** thread `01a05b8e-0526` state **`working`**,
+    `activityAgeMs` **875** — active **under one second** before I looked — currently executing a
+    `deno run --all…` verification command. `worklog.md` last written **06:12:33 UTC**, ~3 minutes
+    before the check at **06:15:27 UTC**.
+  - **The rebase itself is DONE**: no `rebase-merge`/`rebase-apply` directory, head `5838c174a`, and
+    the uncommitted set is exactly the shape the brief produces before its commit step — the three
+    run-dir docs, the regenerated `embedded.generated.ts` (**staged**), and the A6-adapted
+    `generators-tools-db-index_test.ts`. It is in the **verification-before-commit** phase, which the
+    brief mandates and which is slow: repo-wide `deno task check`, parity, scoped wrappers and focused
+    tests all run before it is allowed to commit.
+  - **Head-not-moving is the expected signature of that phase, not of a stall.** The brief requires
+    verification *then* commit, so an unchanged head with a live worker and recent file writes is
+    correct behaviour.
+  - **Takeover would have been actively harmful here**: a second writer in the same worktree during a
+    five-conflict resolution risks corrupting the A6 adaptation, and the sender is alive
+    (`ownerPid 3480440`), so a fresh launch would trip `duplicate_sender_risk` rather than help.
+    Recorded because the diagnostic that distinguishes the two cases is cheap and specific —
+    **`activityAgeMs` + file mtimes + presence of a rebase directory** — and a dead worker in this
+    programme has always shown `ownerPid` **not alive**.
+  - The coordinator's takeover authorization is conditional on "no live concrete progress"; that
+    condition is **not met**, so I am holding and watching rather than seizing the worktree.
+  - Main is now **`3b6386e14`**; S8 will need a top-up rebase at final convergence regardless, and
+    #1858's later SHA after that. Neither blocks this static commit.
