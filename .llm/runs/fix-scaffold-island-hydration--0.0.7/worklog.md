@@ -9,7 +9,7 @@
 | Base          | `6c195acaf3f7e650c4235fc3fbc51232e210e7a4`                 |
 | Archetype     | `4 - Public DSL / Builder`                                 |
 | Scope overlay | `frontend`                                                 |
-| Phase         | S2 package reproduction — hydration proven, 404 attribution pending |
+| Phase         | S2 package reproduction — hydration proven, incidental 404 attributed |
 
 ## Design
 
@@ -82,6 +82,7 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | Hosted browser observation    | Run `33539774285` loaded both Fresh client entries with 200 responses, resolved the provider/query client and query hook, ran the hydration effect, and changed the row after click. The package fixture hydrates. |
 | 2026-09-01 | S2    | Assertion correction          | Removed the post-hydration comment-node requirement, split query-client data into pre-click and post-click observations, and added an all-response ledger for the unattributed 404 URL/status/resource type. |
 | 2026-09-01 | S2    | Response-ledger observation   | Run `33541399005` repeated successful hydration; all corrected expectations passed, and only the console-only 404 remained. No response >= 400 was observed, so console location plus all requests/failures are now captured. |
+| 2026-09-01 | S2    | 404 attribution               | Run `33542591593` identified `/favicon.ico`; hydration remained successful and no network response/request failure was observed. The fixture now serves 204 for this incidental browser request while retaining strict application-error assertions. |
 
 ## Decisions
 

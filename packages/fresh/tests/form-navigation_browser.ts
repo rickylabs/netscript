@@ -264,7 +264,6 @@ Deno.test({
         `async page => {
           const runtimeErrors = [];
           const consoleErrors = [];
-          const networkRequests = [];
           const networkRequestFailures = [];
           const clientRequests = [];
           const clientResponses = [];
@@ -286,10 +285,6 @@ Deno.test({
             }
           });
           page.on('request', request => {
-            networkRequests.push({
-              url: request.url(),
-              resourceType: request.resourceType(),
-            });
             if (isObservedClientAsset(request.url())) clientRequests.push(request.url());
           });
           page.on('response', response => {
@@ -406,7 +401,6 @@ Deno.test({
             clientResponses,
             clientRequestFailures,
             nonSuccessfulResponses,
-            networkRequests,
             networkRequestFailures,
             consoleErrors,
             runtimeErrors,
@@ -451,10 +445,6 @@ Deno.test({
         readonly nonSuccessfulResponses: readonly {
           readonly url: string;
           readonly status: number;
-          readonly resourceType: string;
-        }[];
-        readonly networkRequests: readonly {
-          readonly url: string;
           readonly resourceType: string;
         }[];
         readonly networkRequestFailures: readonly {

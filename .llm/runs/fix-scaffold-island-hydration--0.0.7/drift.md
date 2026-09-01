@@ -34,6 +34,11 @@
   page-observed failing HTTP response. The measurement now captures console source location, every
   request URL/resource type, and every request-failure URL/error to attribute the message without
   guessing.
+- **404 attribution:** run `33542591593` located the console error at
+  `http://127.0.0.1:38455/favicon.ico`. There were no response-status failures or request failures,
+  and all hydration/provider/query/interaction observations passed. This is browser-fixture noise,
+  not a Fresh entry, island chunk, query provider, or scaffold defect. The fixture now returns 204
+  for its incidental favicon request and retains strict zero-error assertions for application code.
 - **Scope consequence:** if the unattributed 404 is incidental, the remaining discrepancy is
   generated-scaffold-specific or the carried #1845 receipt is stale relative to current sources.
   The package fixture does not yet establish which; hosted generated-app proof remains authoritative.

@@ -104,6 +104,7 @@ function directServiceShowcasePage() {
 export function createRouteBindingBrowserApp(): App<FixtureState> {
   const app = new App<FixtureState>();
 
+  app.get('/favicon.ico', () => new Response(null, { status: 204 }));
   app.get('/', (ctx) => ctx.render(indexPage()));
   app.get('/examples/service-direct', (ctx) => ctx.render(directServiceShowcasePage()));
   app.get('/orders/:id', async (ctx) => ctx.render(await orderPage.page(ctx)));
