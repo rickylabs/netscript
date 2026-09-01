@@ -8414,3 +8414,41 @@ embedding rendered signatures at all. PR stays `status:impl`; not a merge candid
 Also completed the coordinator's taxonomy correction: verified all three active internals PRs (#1802,
 #1846, #1862) already carry `orchestrator:internals`, and confirmed **no open PR repo-wide** is
 missing an orchestrator label.
+
+
+## D-193 - #1862 colour invariance finished and converged onto 8e01a347a
+
+### The audit's remaining defect was already fixed before commit
+
+The audit flagged that the positive control used `packages/contracts/mod.ts`, which emits **zero**
+escapes even under FORCE_COLOR, making the test vacuous. I had already hit that myself: my control
+assertion **failed**, which is exactly what a control is for, and I switched the fixture to
+`packages/sdk/mod.ts` before committing. Verified the audit's numbers independently at the committed
+head - contracts **0**, sdk **6** - and confirmed line 139 of the committed test uses `packages/sdk`.
+
+The control earning its keep twice in one slice is worth noting: it caught a vacuous test, and its
+failure is what told me the entrypoint choice mattered at all.
+
+### Convergence onto new main
+
+`#1866` merged as `8e01a347a`. Main touched two files adjacent to this slice -
+`.llm/tools/docs/check-exports-drift.ts` and `packages/mcp/src/publish-assets.generated.ts` - so I did
+**not** assume the corpus was unaffected. Merged (clean, `REAL_EXIT=0`, new head `429f1a0a9`), then
+re-verified rather than inferring:
+
+| Check at `429f1a0a9` | Result |
+| --- | --- |
+| corpus blob across the merge | `bc3f6a2c2786...` - **unchanged** |
+| generator blob across the merge | `20e4587cd...` - **unchanged** |
+| `check:mcp-export-corpus` | **0** - still fresh despite main's `packages/mcp` change |
+| regeneration under NO_COLOR / FORCE_COLOR / CLICOLOR_FORCE / bare | **rc=0 each, all `bc3f6a2c2786...`** |
+| regression suite | **5 passed / 0 failed** |
+| `deno.lock` | byte-unchanged |
+
+Product blobs are identical across the convergence, so per the coordinator's rule the in-flight
+evaluation is **not** restarted - it evaluates `4dec2407c`, whose product content is byte-identical to
+what is now at `429f1a0a9`.
+
+Pushed. Fresh independent evaluator still running; exact-head CI started at the integrated head.
+Cycle-1's false PASS remains retained as historical evidence only. PR stays `status:impl` until the
+evaluation and CI complete.
