@@ -6979,3 +6979,40 @@
     because it was **matching my own command line**. Only a foreground smoke test revealed
     `No such file or directory`. Verify a detached job from **its own log**, never from `pgrep`
     ([[process-identity-never-by-self-matching-pattern]]).
+
+- **D-273 — #1855 and #1851 dispatched in parallel as static repairs; #863's gates 2 and 3 given
+  explicit lanes before S8 can strand them.**
+  - **Both dispatched detached** (`setsid`, `ppid=1`) on the checked-in `agentic:claude-openrouter`
+    route into dedicated worktrees off `82a2527e2`, with **STATIC-ONLY** briefs: no `aspire`, no
+    `docker`, no AppHost, no e2e runtime, no lease. Branches
+    `fix/aspire-cleanup-foreign-network-ownership` and `fix/aspire-infrastructure-name-escaping`.
+    **Routing deviation recorded:** doctrine prefers WSL Codex for implementation, which does not exist
+    on the NAS plane; the openrouter route is the available implementation lane here.
+  - **#1855's brief starts from established fact, not the issue's framing.** The issue says the mutation
+    "came from the repo's own cleanup path". I checked before briefing: `teardown.ts` removes
+    **containers only**, and a repo-wide grep finds **no** code anywhere that removes a Docker network
+    or volume. So the network was almost certainly reaped by **`aspire stop` itself**. The brief states
+    this as an inference to **confirm or refute**, and says plainly that box 1 may not be preventable
+    from repo code — in which case the honest deliverable is detect-and-report plus a documented
+    upstream constraint, **explicitly labelled as such**. An overstated "fixed" here would be worse
+    than an honest detector, because this invariant is what stops concurrent lanes destroying each
+    other's resources.
+  - **The one unambiguous, tractable finding handed over:** `leak-check.ts` contains **zero**
+    occurrences of `volume` — it does not enumerate volumes at all, which is exactly why it reported
+    `survivors: []` on both sides of a run that created one.
+  - **Both briefs carry their contention warnings**, because both files are contended by unmerged work:
+    #1855's targets (`teardown.ts`, `leak-check.ts`, `probes.ts`) are **all rewritten by S7 (#1744)**,
+    so the brief asks for additive changes and for a report rather than silent restructuring; #1851's
+    single target is modified by **both S8 (#1754) and #1858**, so the brief scopes it narrowly to
+    escaping and forbids reformatting. #1851's brief also carries the **#1837 consumer-sweep lesson**
+    with its three prior instances named, so a fourth is not discovered at a merge gate.
+  - **#863's gates 2 and 3 had no owner at all.** A search of open issues referencing #863 returned
+    only #1720 and the epic #1712. Filed **#1880** (Postgres `Running`/`Unhealthy` false negative —
+    reproduce and fix, or document a readiness contract) and **#1881** (clean-machine quickstart canary
+    from the root README, without manual recovery), each `Part of #863`, labelled and milestoned to
+    match the parent.
+  - **Recorded the distinction that would otherwise close #1880 wrongly:** gate 1's bounded wait makes
+    the false negative **survivable**; it does not make the probe **correct**. And #863 now carries an
+    explicit closure rule — it closes by hand when all three gates are evidenced, never by a closing
+    keyword on a PR delivering one of them. That is the concrete guard against S8 stranding the
+    remainder, on top of #1720 A4 no longer claiming to close it.
