@@ -13,6 +13,7 @@ import { runCodexRemoteRepair } from '../codex-remote-repair.ts';
 import { runSenderLeaseRepair } from '../sender-lease-repair.ts';
 import { renderRuntimeHuman, renderRuntimeJson, runtimeExitCode } from '../output.ts';
 import type { RuntimeReadPorts } from '../ports.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 interface ParsedRuntimeArgs { readonly command: RuntimeCommand; readonly json: boolean; }
 interface CliOptions { readonly positional: readonly string[]; readonly json: boolean; readonly dryRun: boolean; readonly values: ReadonlyMap<string, string>; }
 interface SenderLeaseCliResult { readonly status: 'planned' | 'succeeded' | 'no_change' | 'blocked' | 'failed'; readonly changed: boolean; }
@@ -55,6 +56,7 @@ function agent(value: string | undefined): AgentKind | undefined {
 }
 /** Parses the finite guarded runtime command surface. */
 export function parseRuntimeArgs(args: readonly string[]): ParsedRuntimeArgs {
+  args = normalizeTaskArguments(args);
   const parsed = options(args);
   const [verb, target, ...rest] = parsed.positional;
   if (!verb || rest.length > 0) throw new Error(usage());

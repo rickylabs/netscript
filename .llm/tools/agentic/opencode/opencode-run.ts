@@ -6,6 +6,7 @@ import { environmentWithOpenRouterApiKey } from '../lib/openrouter-credential.ts
 import { dirname, resolve } from 'node:path';
 import { prepareOpenCodeProjectEnvironment } from './opencode-project-config.ts';
 import { preflightOpenCodeMcp } from './opencode-preflight.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';
 
@@ -119,6 +120,7 @@ function requiredValue(args: readonly string[], index: number, flag: string): st
 }
 
 function parse(args: readonly string[]): CliOptions {
+  args = normalizeTaskArguments(args);
   let message: string | undefined;
   let model: string | undefined;
   let variant: string = OPENCODE_TOOL.defaultVariant;

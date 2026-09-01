@@ -31,6 +31,7 @@ import {
   wsl,
   wslUser,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { classifyCodexResumeOutcome, codexResumeExitCode } from './codex-resume-result.ts';
 
 interface Options {
@@ -64,6 +65,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = { user: wslUser(), dryRun: false };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];

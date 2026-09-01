@@ -6,6 +6,7 @@ import {
   type AntigravityEvidenceProbe,
 } from '../adapters/antigravity-adapter.ts';
 import { LocalRunResourceAggregationAdapter } from '../adapters/run-resource-aggregation-adapter.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 const OWNER_ACCEPTED: readonly AntigravityCapability[] = [
   'headless',
@@ -27,6 +28,7 @@ function usage(): string {
 }
 /** Parses the bounded evidence CLI without accepting prompt or credential values. */
 export function parseAntigravityEvidenceArgs(args: readonly string[]): ParsedEvidenceArgs {
+  args = normalizeTaskArguments(args);
   const values = new Map<string, string>();
   let json = false;
   for (let index = 0; index < args.length; index++) {

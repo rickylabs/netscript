@@ -15,7 +15,7 @@ import { JSR_SPECIFIERS } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 
-const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@0.2.1';
+const TANSTACK_AI_MCP_SPECIFIER = 'npm:@tanstack/ai-mcp@^0.3.8';
 
 /**
  * Maps all scaffold package specifiers to their JSR/npm specifiers.
