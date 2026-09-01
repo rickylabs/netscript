@@ -17,4 +17,3 @@
 | --- | --- | --- |
 | `normal_implementation` | OpenAI / GPT-5.6 Sol / medium | Implement the staged #1817 documentation and tooling slice. |
 | `formal_impl_evaluation` | Separate opposite-family evaluator selected by the supervisor | Mandatory post-implementation evaluation; not performed by this generator session. |
-

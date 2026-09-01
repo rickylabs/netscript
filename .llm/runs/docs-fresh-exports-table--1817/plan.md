@@ -72,4 +72,3 @@ Run all commands listed in issue #1817's staged brief, then record exact exit co
 
 `PLAN-EVAL: N/A` — issue #1817 supplies the exact scope, export map, acceptance criteria, generator
 order, and gates. The only two judgments are bounded and directly resolved by `deno doc --json`.
-

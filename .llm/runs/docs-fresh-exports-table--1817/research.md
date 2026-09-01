@@ -27,4 +27,3 @@
 ## Open questions
 
 - None. The complete/incomplete comparisons require `symbolCoverage.mode: 'entrypoints-only'`.
-
