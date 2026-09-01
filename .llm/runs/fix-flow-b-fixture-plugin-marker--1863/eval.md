@@ -104,3 +104,42 @@ which neither leaf could obtain alone.
 
 The 116 is the union of both leaves' suites (108 from #1870's tree plus #1865's locator cases), so
 neither side's tests were lost in the merge.
+
+## Second convergence — #1877 folded in (2026-09-01)
+
+Manual exact-head run `33531189254` proved both fixture repairs (see the table in the PR) and then
+exposed a **third** baseline blocker in both tiers: `runtime.wait.workers` timed out at 207 s / 208 s
+because #1864 renamed the worker startup log line and `wait-for-workers-runtime.ts` still required the
+old `'Starting with Web Worker pool'` string with `.every()`. Filed as **#1877**, repaired in
+**#1878**.
+
+#1878 is subject to the *same* circular block as #1871 was: branched from `main`, it lacks this
+branch's fixture repairs, so its own runtime tiers cannot get past gates 35/36. Waiting for it to go
+green standalone would deadlock exactly as before. It is therefore converged here.
+
+| Step | Result |
+| --- | --- |
+| `origin/main` `82a2527e2` → branch | merge `53613af47`, zero conflicts |
+| `origin/fix/workers-runtime-ready-markers` `bb5fd4ad3` → branch | merge `7f3630801`, zero conflicts |
+
+**All seven product/test blobs byte-identical to the heads that produced them:**
+
+| File | Identical to |
+| --- | --- |
+| `locate-workers-resource-block.ts` | `f008315d1` (#1863) |
+| `prepare-flow-b-fixture.ts` | `f008315d1` |
+| `locate-workers-resource-block_test.ts` | `f008315d1` |
+| `prepare-readiness-fixture.ts` | `7b5a31a80` (#1870) |
+| `prepare-readiness-fixture_test.ts` | `7b5a31a80` |
+| `wait-for-workers-runtime.ts` | `bb5fd4ad3` (#1877) |
+| `wait-for-workers-runtime_test.ts` | `bb5fd4ad3` |
+
+Suite at the triple head: `packages/cli/e2e/tests/application/gates` **120 passed / 0 failed** — the
+union of all three leaves (108 baseline + 8 locator + 4 workers-marker), so nothing was lost in either
+merge. `deno.lock` blob byte-identical to `origin/main` `82a2527e2`.
+
+**Pattern worth naming.** Three consumer breaks in one milestone, each a consumer keyed on a
+producer's human-readable string: #1837 → #1863 (block comment renamed), #1837 → #1870 (uniqueness
+check vs a dual-arm emission), #1864 → #1877 (log line renamed). Each was invisible until the
+previous one was fixed, because the runtime suite stops at the first failing gate. That is why they
+surfaced one at a time rather than together, and why each cost a full hosted run to find.
