@@ -5,9 +5,11 @@ Declared so a leak-check or teardown sweep does not read these as foreign/unknow
 
 | What | PID | Parent | Kind | Lifetime | Cleanup |
 | ---- | --- | ------ | ---- | -------- | ------- |
-| Merge-gate watcher for #1865 / #1858 | `4158673` | `ppid=1` (setsid-detached, own session) | `bash` loop calling `gh pr view` every 120 s | self-exits after 8 h, or immediately on writing `MERGED.sentinel` | `kill 4158673`; it holds no runtime resource |
+| Phase-B trigger monitor (#1865 merge + S9 hosted CI) | `477213` | `ppid=1` (setsid-detached, own session) | `bash` loop calling `gh pr view` every 180 s | self-exits after 24 h, or immediately on writing `PHASEB-READY.sentinel` | `kill 477213`; it holds no runtime resource |
 
-Log: `<scratchpad>/watch-detached.log` · sentinel: `<scratchpad>/MERGED.sentinel`
+Log: `<scratchpad>/phaseb-monitor.log` · sentinel: `<scratchpad>/PHASEB-READY.sentinel`
+
+The earlier merge-gate watcher was stopped explicitly when the owner directed the lane off dependency polling; it is not running.
 
 It is detached on purpose — background harness tasks are killed unpredictably here (D-267/D-268), so
 a detached process is the only shape that keeps polling across turns. The same shape is what §4a of

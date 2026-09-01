@@ -6936,3 +6936,46 @@
     Reported, not absorbed into the slice's scope.
   - **Bounded post-D248 IMPL-EVAL still running** at `d11431fec` over exactly the 10 reconverged product
     files. Phase B remains queued behind #1865 plus the workers baseline leaf.
+
+- **D-272 — bounded post-D248 IMPL-EVAL returned PASS; whole chain converged onto `82a2527e2`; the
+  verdict carries to the current head by blob identity.**
+  - **`VERDICT: PASS`** from an independent read-only session on the checked-in
+    `agentic:claude-openrouter` route (`z-ai/glm-5.3-flash`, high), scoped to exactly the **10
+    reconverged product files**. Artifact committed at
+    `slices/s8/impl-eval-verdict-delta8-postd248.jsonl`.
+  - **It confirmed more than I had checked myself**, which is the point of dispatching it rather than
+    self-certifying:
+    - `--name` is a **real `db init` flag** (`init-db-command.ts:30`, default `'init'`), so the repaired
+      invocation cannot fail for an unknown-option reason;
+    - `ASPIRE_CLI_START_TIMEOUT` is genuinely consumed via `resolveDbCliTimeoutSeconds()`, so the
+      verifier's env is not inert;
+    - **`db init` routes through `executeOnAppHost → waitForDatabase`, a different code path than
+      `db migrate`'s typed resource command** — which is exactly *why* the previous invocation did not
+      prove A4, stated as mechanism rather than assertion;
+    - the A6 decisive check was `git diff 1f50c98ce(#1837) … -- generate-register-tools.ts` showing
+      **exactly one change**, so every other #1837 hardening survives byte-for-byte.
+  - **Two non-blocking observations recorded rather than dropped:** the negative regression test
+    *"does not retain the Aspire 13.4 process-command seam"* had to be deleted (its own forbidden-string
+    literals were the last matches A6's grep would find), so that guard now lives **solely** in A6's
+    absence check — a future main merge reintroducing both seam and assertions would be caught by
+    nothing; and `requireText([database, "10"])` is a substring check, i.e. assertion strength rather
+    than a correctness defect.
+  - **Whole chain converged onto `82a2527e2`, all `behind=0`:** S8 `f6bcbea9f`, S9 `12eef8832`,
+    S10 `66a7c21be`, S11 `7abaf0222`, S13 `be567b84c`, S7 `62e4bfc28`, #1747 `fa3d44abc`. Zero conflicts
+    across the whole convergence — #1862 touched `deno.json` and an MCP corpus, and the two slices that
+    also touch `deno.json` merged cleanly.
+  - **The PASS was carried, not re-asserted**: 72/72 blob identity from the evaluated head `d11431fec`
+    to `f6bcbea9f`, so the verdict covers current bytes. #1754's IMPL-EVAL box is now ticked **on that
+    evidence**, having been deliberately un-ticked while it was untrue.
+  - **S13's box 3 re-verified at `be567b84c`**: manifest re-run `rows=822 unmatched=0`, committed TSV
+    byte-identical, `check:assets-barrel` exit 0 — #1862 regenerated an MCP corpus S13 also touches, so
+    this needed re-checking rather than assuming.
+  - **Monitoring is detached, not foreground:** a `setsid` monitor (`ppid=1`) polls #1865/#1858, main
+    and **S9's hosted CI** every 180 s into a log, and writes `PHASEB-READY.sentinel` the moment #1865
+    merges. First reading confirms S9's hosted run is live at the converged head (`fail=1 pend=3`).
+    Declared in `owned-processes.md` with its cleanup command.
+  - **A launch failure worth recording:** the monitor's heredoc was silently lost when its shell exited
+    144, so the script did not exist — and `pgrep -f phaseb-monitor.sh` reported live pids anyway
+    because it was **matching my own command line**. Only a foreground smoke test revealed
+    `No such file or directory`. Verify a detached job from **its own log**, never from `pgrep`
+    ([[process-identity-never-by-self-matching-pattern]]).
