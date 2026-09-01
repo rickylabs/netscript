@@ -22,8 +22,9 @@ Therefore:
 - one fetch/retry/dedupe/trace HTTP path remains;
 - unary retry, iterator reconnect, and header-safe dedupe are proved;
 - `port` and `timeout` remain accepted, documented, deprecated no-ops;
-- a dependency move is a separate, whole-family, `deno.lock`-only v1.15.0 decision with frozen
-  install and no-mixed-version evidence;
+- all oRPC dependency/version/lock work is excluded from #1351 and owned by #1879 under the
+  coordinator's binding split; this plan targets the current pinned v1.14.x graph and does not
+  depend on #1879 landing;
 - neither exact manifest pins nor oRPC v2 APIs/behavior land;
 - the accepted narrow contribution protocol stays closed. The older RFC-A proposal to expose raw
   plugins, fetch, links, or callback arrays does not return through this slice.
@@ -289,54 +290,23 @@ method setting is imported.
 - Add a short SDK README “Transport policy” section naming the central contract-derived decision,
   the `transportPolicy` override, contribution method secrecy, and the two no-op migrations.
 
-## Dependency move — separate PR and decision
+## Coordinator dependency ruling
 
-### Decision
+The split is decided, not an open sequencing question. Issue #1879 exclusively owns every
+`@orpc/*` version, lockfile, duplicate-`@orpc/shared`, frozen-install, and no-mixed-version change.
+#1351 changes none of root dependency configuration, `deno.lock`, package manifests, or the
+resolved family.
 
-Use **two PRs**, not one:
-
-1. `chore/orpc-v1-15-family-lock` — partial work referencing #1351 without a closing keyword;
-   changes only root `deno.lock`.
-2. `refactor/sdk-transport-policy` — rebased after PR 1 merges; implements the public/internal
-   policy, metadata, tests, and docs; this PR may carry `Closes #1351` only after all issue
-   acceptance evidence exists.
-
-This split is mandatory in spirit and in risk control: the amendment calls the move a separate
-lock-only decision, while the policy PR changes public types plus call-path behavior. Separate heads
-make dependency regressions distinguishable from policy regressions and avoid one large blast
-radius. No PR is opened in this PLAN slice.
-
-### Exact lock-only operation and proof
-
-After re-running the stable authority, the dependency PR uses Deno 2.9's native lock-only command:
-
-```text
-deno task deps:latest --filter '@orpc/*'
-deno update --lockfile-only --recursive '@orpc/*'
-```
-
-Review must show **only `deno.lock` changed**. Root `deno.json`, every `packages/*/deno.json`,
-`packages/telemetry/package.json`, and source stay byte-identical. Compatible `^1.14.6`/`^1.14.7`
-requirements remain; no exact manifest pin appears.
-
-Required proof on the dependency PR:
-
-- `deno ci --frozen` succeeds without rewriting the lock;
-- raw `deno why @orpc/shared` contains exactly one resolved heading,
-  `@orpc/shared@1.15.0`, and no 1.14.x heading;
-- a family lock census shows every resolved `@orpc/*` v1 package on 1.15.0 and no v2/prerelease;
-- structured root check/test and `deno task publish:dry-run` pass;
-- the full one-pass scaffold runtime E2E passes because the family is workspace-wide;
-- a final raw git diff confirms `deno.lock` is the sole changed file.
-
-Retain `@orpc/otel@1.15.0`. `@orpc/opentelemetry@1.15.0` does not exist, and a rename would violate
-the lock-only boundary. The rename is deferred to the separate v2 migration.
+This plan is intentionally written against the current pinned v1.14.x graph and does not require
+#1879 to merge first. The installed APIs already expose the method, fallback, max-URL, predicate,
+and group seams needed by the NetScript-owned resolver. If implementation disproves that finding,
+the implementer reports a blocker and stops instead of importing dependency work into #1351.
 
 ## Contract-first implementation slices
 
-The implementation sequence below belongs to the later policy PR, after the dependency PR and a
-separate PLAN-EVAL `PASS`. Each slice is independently reviewable and must update the harness
-worklog/context pack when executed.
+The implementation sequence begins only after a separate PLAN-EVAL `PASS`, on the current pinned
+graph. Each slice is independently reviewable and must update the harness worklog/context pack when
+executed.
 
 | # | Slice and proof | Planned files | Slice gate |
 | - | --------------- | ------------- | ---------- |
@@ -384,8 +354,7 @@ without replacing the named behavior.
 | 7 | Package quality | `deno task quality:gate` (`quality:scan` + `arch:check`) | PASS/no new suppression or cast |
 | 8 | Root static/runtime | structured root `deno task check`, `deno task test`, `deno task lint`, `deno task fmt:check` as configured | PASS |
 | 9 | Publish surface | `deno task publish:dry-run` | PASS with only already-sanctioned carve-outs; no internal policy file importable as a subpath |
-| 10 | Dependency graph currency | `deno ci --frozen`; raw `deno why @orpc/shared` | frozen PASS; exactly one `@orpc/shared@1.15.0` after the prerequisite PR |
-| 11 | Full consumer smoke | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | exit 0 in one pass; do not split into individual gates |
+| 10 | Full consumer smoke | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | exit 0 in one pass; do not split into individual gates |
 
 The expensive scaffold gate runs only at merge readiness, not during intermediate loops.
 
@@ -414,11 +383,8 @@ The expensive scaffold gate runs only at merge readiness, not during intermediat
 | Contribution visibility | resolved now | structural/type/runtime/private-surface enforcement; no method field. |
 | Desktop behavior | resolved now | common resolver + unchanged MessagePort framing; no HTTP method serialization. |
 | v2 override point | resolved now | single upstream-neutral synchronous `transportPolicy?` object; no direct dedupe/plugin override. |
-| Dependency target/tool | resolved now | stable v1.15.0 from `deps:latest`; lock-only native Deno update. |
-| One vs two PRs | resolved now | two PRs, dependency first. |
-| v1 telemetry rename | resolved now | retain `@orpc/otel`; v2 rename deferred. |
+| External dependency work | resolved by coordinator | excluded from #1351; #1879 owns it and is not a prerequisite. |
 | Server method policy | safe to defer | explicitly owned by a future v2/server migration, outside #1351. |
-| Generic `deps:why` wrapper stderr defect | safe to defer | raw command is the issue's acceptance source; tooling repair is unrelated. |
 
 No “must resolve now” item remains.
 
@@ -434,8 +400,7 @@ No “must resolve now” item remains.
 | Desktop pretends to be HTTP | Wrapper validates policy but never writes the method into MessagePort frames; framing golden stays unchanged. |
 | Metadata creates a second cache path | One metadata descriptor feeds policy and contribution preparation; no raw link metadata read. |
 | Public option leaks upstream v1 types / slow types | NetScript-owned explicit types, zero-oRPC declaration scan, doc lint, JSR audit, publish dry run. |
-| Dependency regression obscures code regression | Separate lock-only PR first, frozen install and no-mixed-version proof, then rebase policy work. |
-| OTel rename accidentally widens scope | Locked decision retains `@orpc/otel`; no manifest/source changes in dependency PR. |
+| Dependency scope leaks back into #1351 | Changed-file audit rejects root dependency configuration, `deno.lock`, package manifests, or resolved-family churn; refer all such work to #1879. |
 | Active sibling conflicts | No edits to `.llm/tools/agentic/**`, workflows, or `packages/*/deno.json`; explicit final changed-file audit. |
 | Baseline doc-lint failures become false claims | Record exact baseline; require no new diagnostics plus clean changed symbols; do not claim full green without real output. |
 
@@ -449,6 +414,8 @@ No “must resolve now” item remains.
   retry/dedupe/trace defaults, or direct dedupe callbacks.
 - #1320 Zod graph work and #451 in-process/custom link adapters.
 - New semantics for `port` or `timeout`; they remain deprecated no-ops.
+- Every oRPC version, lockfile, duplicate-`@orpc/shared`, stable-channel, frozen-install, and
+  no-mixed-version task; issue #1879 owns that complete dependency slice.
 - Any package manifest, agentic runtime tooling, workflow, or sibling-leaf work.
 - Repair of unrelated pre-existing SDK/contracts doc-lint/cardinality debt.
 
@@ -456,8 +423,8 @@ No “must resolve now” item remains.
 
 Record significant drift before implementation if any of these change after PLAN-EVAL:
 
-- stable-channel authority no longer reports the seven existing packages at v1.15.0;
-- the dependency prerequisite lands with manifest/source changes or mixed `@orpc/shared` copies;
+- the current pinned graph changes through an unrelated merge; re-baseline the installed v1 API
+  seam, but do not make #1879 a prerequisite or modify dependency/lock files;
 - `main` changes contribution snapshot fields, logical epoch/reconnect behavior, Desktop framing, or
   procedure metadata;
 - implementation needs a second HTTP link/fetch/retry/dedupe/trace path;
@@ -472,9 +439,9 @@ improvise during implementation.
 
 **READY_FOR_PLAN_EVAL — not a PLAN-EVAL verdict.** This plan has current research, an exact owned
 function signature and module home, a contract-first type shape, resolved metadata/override/
-Desktop/contribution rules, two-PR dependency sequencing, ordered commit slices, a risk register,
-explicit deferred scope, a JSR surface assessment, and named gates. The known baseline doc-lint
-failures and the `deps:why` wrapper stderr limitation are disclosed rather than presented as green.
+Desktop/contribution rules, the coordinator-enforced exclusion of #1879 dependency scope, ordered
+commit slices, a risk register, explicit deferred scope, a JSR surface assessment, and named gates.
+The known baseline doc-lint failures are disclosed rather than presented as green.
 
 The generator has not run or written `plan-eval.md`, has not evaluated its own plan, and has not
 started implementation. A supervisor-dispatched, separate-session PLAN-EVAL must now apply

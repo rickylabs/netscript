@@ -15,20 +15,27 @@
 - The requested RFC path `docs/architecture/rfcs/` does not exist at this baseline. The accepted
   RFC is under the repository-root `rfcs/` directory. This is a path correction, not an authority
   change.
-- The amendment wins over contradictory issue text. In particular, the old pinned `1.14.15` row
-  is stale; stable v1.15.0 is the only dependency target, any move is a separate whole-family
-  lock-only decision, exact manifest pins do not land, and no oRPC v2 work belongs here.
+- The amendment wins over contradictory issue text. The coordinator's later scope ruling applies
+  that amendment by excluding every oRPC version/lock change from #1351. Issue #1879 owns that
+  dependency slice. This research and plan target the currently pinned v1.14.x graph and do not
+  depend on #1879 landing; no oRPC v2 work belongs here.
 - Facts explicitly supplied by the owner were treated as premises rather than discovery tasks:
   #1349's contribution seam is on main, the family manifests remain `^1.14.6`/`^1.14.7`, and the
   former lock conflict was removed by #1695.
 
 ## Authority and scope reconciliation
 
-The accepted RFC's current Stage 3 row is normative for implementation shape:
+The accepted RFC's current Stage 3 row is normative for implementation shape. The coordinator has
+now made its separate-dependency clause operational: #1351 contains only the transport-policy
+refactor, while #1879 exclusively owns any whole-family dependency move. That split is a binding
+scope rule, not an implementation-sequencing question for this plan.
 
-> Decide separately whether to move the lock-pinned whole oRPC v1 family to stable v1.15.0, keep
-> one fetch/retry/dedupe/trace path, prove unary/reconnect semantics and header-safe dedupe, and
-> deprecate current no-op options. Selecting/renaming v1 OTel belongs here; no v2 migration.
+The Stage 3 transport requirements retained here are:
+
+- keep one fetch/retry/dedupe/trace path;
+- prove unary/reconnect semantics and header-safe dedupe;
+- document and deprecate the accepted no-op options;
+- establish one NetScript-owned transport-policy boundary without adopting v2.
 
 The older seed RFC-A §3.11 remains useful provenance, but its broad contribution-envelope proposal
 was superseded by accepted RFC 0001. Its durable forward-compatibility rule is still reflected in
@@ -79,50 +86,18 @@ now owns access control under `access`.
 | 12 | The public override can stay upstream-neutral. | `CreateServiceClientOptions` and Desktop client options already use NetScript-owned structural types. A synchronous `transportPolicy?` object can expose a method resolver over `SdkClientProcedureDescriptor` without exporting oRPC callbacks/plugins. |
 | 13 | No package manifest needs to change for policy work. | SDK exports already route through `mod.ts`, `./client`, `./ports`, and `./desktop`. The internal resolver can be direct-relative-imported and excluded from every export map. This respects the active sibling manifest leaf. |
 
-## Dependency decision evidence
+## Coordinator dependency ruling
 
-The required stable-channel authority was run exactly from the repository root:
+Issue #1879 (`deps(orpc): move the @orpc/* family to stable v1.15.0 and collapse duplicate
+@orpc/shared`) exclusively owns dependency-version, lockfile, frozen-install, and no-mixed-version
+work. #1351 must not edit or plan changes to root dependency configuration, `deno.lock`, package
+manifests, or the resolved oRPC family.
 
-```text
-$ deno task deps:latest --filter '@orpc/*'
-Task deps:latest deno run --allow-read --allow-net .llm/tools/deps/latest.ts --pretty --behind-only '--filter' '@orpc/*'
-deps:latest — 7 behind / 7 total
-
-  ✗ npm:@orpc/client  ^1.14.6  →  1.15.0
-  ✗ npm:@orpc/contract  ^1.14.6  →  1.15.0
-  ✗ npm:@orpc/openapi  ^1.14.6  →  1.15.0
-  ✗ npm:@orpc/otel  ^1.14.7  →  1.15.0
-  ✗ npm:@orpc/server  ^1.14.6  →  1.15.0
-  ✗ npm:@orpc/tanstack-query  ^1.14.6  →  1.15.0
-  ✗ npm:@orpc/zod  ^1.14.6  →  1.15.0
-```
-
-This establishes stable **v1.15.0** for the seven existing family members. `deno outdated
---latest` was not used and must not be used for the decision.
-
-Baseline graph evidence:
-
-```text
-$ deno why @orpc/shared
-@orpc/shared@1.14.6
-  npm:@orpc/client@^1.14.6 > @orpc/shared@1.14.6
-  npm:@orpc/contract@^1.14.6 > @orpc/shared@1.14.6
-  ...
-
-@orpc/shared@1.14.7
-  (no dependency path found -- try running `deno install` to refresh the lockfile)
-```
-
-The raw command exposes two resolved lock entries today. The repository wrapper
-`deno task deps:why @orpc/shared` currently reports a false “not present” because `deno why` emits
-its tree on stderr while `.llm/tools/deps/why.ts` only records stdout. For this acceptance gate,
-the amended issue explicitly names raw `deno why @orpc/shared`; its post-move output must contain
-exactly one heading, `@orpc/shared@1.15.0`. Repairing the generic wrapper is outside #1351.
-
-The v1 telemetry rename is resolved **against** this lock-only decision: retain `@orpc/otel` and
-move it to 1.15.0 with the family. `npm:@orpc/opentelemetry@1.15.0` does not exist, and adopting
-that name would require manifest/source changes rather than the normative lock-only family move.
-The rename remains for the separate coordinated v2 migration; it does not land in either #1351 PR.
+The policy refactor is implementable on the current pinned graph: findings 9–11 verify that the
+installed stable-v1 APIs already provide contract-derived method inference, method/fallback/max-URL
+codec options, and dedupe predicate/group descriptors. Therefore #1879 is not a prerequisite for
+#1351. If a later implementation session disproves that finding, it must report the blocker and
+stop rather than widening this issue.
 
 ## JSR / publish-surface scan
 
@@ -170,9 +145,7 @@ These should be extended or complemented, not replaced with a new parallel confo
 
 | Question | Resolution |
 | -------- | ---------- |
-| One PR or two? | **Two.** First a whole-family `deno.lock`-only v1.15.0 PR; then the contracts/SDK policy PR. The amendment calls the dependency move separate, and combining a workspace-wide family graph change with a public transport option and runtime refactor would make failures hard to attribute. |
-| Dependency order? | Lock-only family PR first, then rebase the policy branch on that merged head. The policy tests then run on the supported v1.15.0 adapter rather than proving code against a graph immediately replaced underneath it. |
-| OTel package name? | Keep `@orpc/otel` for stable v1.15.0. Do not rename in #1351. |
+| External dependency work? | Excluded by coordinator ruling and owned by #1879. #1351 targets current pins and has no merge-order dependency on that issue. |
 | Internal module home? | `packages/sdk/src/internal/transport-policy.ts`, direct-relative imported, no internal barrel and no package export. |
 | Where is the public override type? | NetScript-owned types in `packages/sdk/src/ports/service-client.ts`, re-exported through the existing root/client/ports/desktop surfaces that already expose the containing options. No oRPC types. |
 | How does metadata participate? | One normalized `SdkClientProcedureDescriptor` is created by the stable-v1 metadata port; `policy.cache` is part of the resolver input and the same descriptor is passed to contributions. No link reads raw metadata independently. |
