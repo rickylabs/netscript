@@ -7507,3 +7507,60 @@ emitted-workspace type-check whose RED/GREEN I verified independently by stashin
 on the #1863 baseline blocker. Lock intent proven at the integration seam: `deno.lock` moved
 `edfa0c24…` → `01ff3a23…` and is **byte-identical to main's**, with the leaf's own lock delta at
 **0 lines** — the change is entirely #1832's.
+
+## #1845 static investigation ingested (2026-09-01) — SCOPE CORRECTION
+
+The lane's working understanding of #1845 was **wrong** and is corrected here. Read-only
+investigation against the issue text itself (zero comments on the issue; body never mentions
+Chromium, CI browsers, or package dependency ownership).
+
+- **Wrong:** "package-level browser localization for off-host execution".
+- **Actual:** `fix(fresh/scaffold): the generated showcase island never hydrates — no island element,
+  no query client, no onMutate`. In a generated project the scaffolded `ServiceShowcaseLab` island
+  never hydrates; there is no Fresh island element in the DOM at all. The failure is at initial
+  render, before any mutation path. Measured receipt on #1664 head `377811da8`, run `33410348563`:
+  `islandHydrated:false, freshIslandElement:null, queryClientFound:false, onMutateRan:false`.
+- The failing gate is **`behavior.service-client-refetch`**, not `behavior.app-reference`. That gate
+  and its `service-client-browser-probe.ts` exist only on #1664's branch
+  (`feat/app-service-client-wiring`) — neither is present on this lane's branch.
+- Direction is **#1664 is blocked by #1845**, and #1845's fix territory is explicitly *outside*
+  #1664's ceiling: `packages/fresh` island hydration / the query provider, or how the scaffold
+  registers route-local islands.
+- **No browser-provisioning issue exists in the tracker.** If one was intended, the number is wrong
+  or it was never filed. Do not plan browser work under #1845.
+
+### Anchors
+
+- `packages/cli/src/kernel/assets/app/vite.config.ts.template:45` — strongest lead: the only
+  registered island specifier is `fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] })`,
+  and `ServiceShowcaseLab` never imports it. `:17` aliases `@app/islands` to a directory the scaffold
+  never creates. No top-level `islands/` template exists; every scaffolded island is route-local under
+  `routes/**/(_islands)/`.
+- `packages/cli/src/kernel/assets/app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template:7,261`
+  — imports/uses `QueryIsland` from `@netscript/fresh/query`, a different export than
+  `./defer/island` (`packages/fresh/deno.json:13` vs `:19`).
+- `packages/fresh/src/application/vite/vite.ts` — `createNetScriptVitePlugin` contains **no** island
+  logic; discovery is delegated entirely to `@fresh/plugin-vite@^1.1.2`.
+
+### Counter-evidence held open
+
+The design-route islands (`TokenClipboard`, `FloatingSurfaceDemo`) use the same `(_islands)` layout.
+If they hydrate, `(_islands)` *is* discovered and the specifier theory is wrong. Three confident
+diagnoses have already failed on this defect, so the hypothesis is **not** adopted; the discriminating
+measurement is whether `(_islands)` modules produce island chunks in generated build output.
+
+### Related finding (own issue candidate)
+
+**No existing gate proves any island hydrates.** `probe-app-reference.ts:26-61` asserts only
+SSR-visible markers (`href="/design"`, `Composition`, `L0`, `data-state`). A fully non-hydrating app
+passes `behavior.app-reference`. That is why this defect stayed invisible, and it is a gate-coverage
+hole independent of #1845's root cause.
+
+### Browser findings (valid regardless, for whenever the real browser issue is filed)
+
+`probe-app-reference.ts:157-186` `findBrowserExecutable` uses a hardcoded absolute-path candidate
+list with **no env-var override** and no provisioning. `.github/workflows/e2e-cli.yml` has **no
+browser install step at all** — the hosted gate works only because `ubuntu-latest` ships Chrome at
+`/usr/bin/google-chrome`, the first candidate. The CI browser dependency is therefore **implicit and
+unpinned**. Minimal future shape: honor a `NETSCRIPT_E2E_BROWSER` override plus an explicit
+provisioning step; ownership sits with `packages/cli/e2e`, not `packages/fresh`.
