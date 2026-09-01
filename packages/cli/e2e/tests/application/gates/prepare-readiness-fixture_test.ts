@@ -1,8 +1,4 @@
-import {
-  assertEquals,
-  assertStringIncludes,
-  assertThrows,
-} from '@std/assert';
+import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { generateRegisterInfrastructure } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-infrastructure.ts';
 import { generateRegisterApps } from '../../../../src/kernel/templates/aspire/helpers/register/generate-register-apps.ts';
@@ -91,6 +87,10 @@ Deno.test('readiness app splice namespaces fixture bindings in a real generated 
 
   assertEquals(duplicateConstBindings(injected), []);
   await assertGeneratedModuleChecks(injected);
+  assertStringIncludes(injected, 'const readiness_fixture_app_0_workdir');
+  assertStringIncludes(injected, 'const readiness_fixture_app_0_otel');
+  assertStringIncludes(injected, 'const readiness_fixture_app_1_workdir');
+  assertStringIncludes(injected, 'const readiness_fixture_app_1_otel');
   assertStringIncludes(injected, 'apps.set("readiness-dead-port"');
   assertStringIncludes(injected, 'apps.set("listener-fault-controller"');
   assertThrows(
@@ -208,6 +208,7 @@ async function assertGeneratedModuleChecks(source: string): Promise<void> {
     await Deno.mkdir(helpers, { recursive: true });
     await Deno.mkdir(modules, { recursive: true });
     await Deno.writeTextFile(`${helpers}/register-apps.mts`, source);
+    // Mirror the generated module's local imports so this stays a compile check, not a runtime test.
     await Deno.writeTextFile(
       `${modules}/aspire.mts`,
       `export interface ExecutableResource {
