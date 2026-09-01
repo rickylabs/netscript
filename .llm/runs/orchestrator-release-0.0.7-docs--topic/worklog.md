@@ -3174,3 +3174,41 @@ the three pages *look* identical in their findings but are not the same defect �
 `plugin-ai` use an unrecognized `## Entrypoints` heading, while `streams` already uses a recognized
 heading and still omits everything, so its fault is structural and must be diagnosed separately.
 Assuming sameness is precisely how the `auth-kv-oauth` Path-column case would have been mis-fixed.
+
+## 2026-09-01 — Control-plane audit: label-vs-evaluator verification (coordinator directive)
+
+Coordinator warning: `ready-for-review` can move a PR to `status:impl-eval` **without launching an
+evaluator**. Evaluation must never be inferred from the label.
+
+**Rule adopted (now mandatory before any finalize):** a leaf is "evaluated" only when BOTH hold —
+1. a real evaluator session exists (live pid with a resolvable model id, or a completed transcript), and
+2. a verdict artifact exists (a `**[PHASE: IMPL-EVAL]**` PR comment naming the exact evaluated head).
+
+The `status:` label is **evidence of neither** and is independently known to be flipped by external
+automation (label race, recurred 6+ times). Label reads are advisory only.
+
+**Audit performed across every active docs leaf:**
+
+| Leaf | Head | Label | Verdict artifacts | Real evaluator? | Verdict |
+| --- | --- | --- | ---: | --- | --- |
+| #1866 | `dd80f5554` | `status:impl` | 0 | **YES** — pid 3663036, `z-ai/glm-5.3-flash` effort `max`, session `2d7ea935`, cwd `007-docs`, 517KB streamed, 0 guard denials | in flight, legitimate |
+| #1860 | `1a36bc4b2` | `status:shipped` | 1 | n/a (merged) | consistent |
+| #1640 | `1de3c65b3` | `status:review` | 2 | n/a | consistent |
+| #1756 | `303be12ea` | `status:impl` | 1 (`FAIL_FIX`, local head `c73fee39c`) | n/a — parked on workflow-scope boundary | consistent; verdict names a **local** head and explicitly does not assert equality with the PR head |
+
+**Result: zero instances of the reported failure mode in the docs queue.** No leaf carries
+`status:impl-eval` without a corresponding verdict artifact, so no manual re-dispatch was required.
+
+**Automation gap recorded.** The defect is real and structural even though it did not bite here: the
+label transition is driven by a GitHub-side ready-for-review event, whereas evaluator dispatch is
+driven by this supervisor session through `.llm/tools/agentic/claude/openrouter-run.ts`. Nothing
+couples them, so a label can assert a phase that never started. Compounding it, the pre-existing
+label race means the label is not even a stable *record* of what the supervisor set. Docs-lane
+mitigation is procedural — the two-condition rule above — because the fix belongs in shared
+automation, not in one topic lane.
+
+**Secondary finding — scope of the sweep.** Querying `labels=orchestrator:docs` returns only #1756
+and #1640; **#1866 is invisible to that query** because `orchestrator:docs` is applied at
+finalization, not at dispatch. Any audit keyed solely on that label silently omits every in-flight
+leaf — exactly the population this check exists to cover. Enumerate active leaves from the lane
+ledger, not from the label.
