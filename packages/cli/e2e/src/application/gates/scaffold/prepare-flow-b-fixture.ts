@@ -1,4 +1,8 @@
 import { configurePublishedWorkersBlock } from './configure-published-workers-block.ts';
+import {
+  locateWorkersBackgroundBlock,
+  locateWorkersResourceBlock,
+} from './locate-workers-resource-block.ts';
 import { prepareLocalSourceFixture } from './local-source-fixture.ts';
 
 const projectRoot = Deno.args[0];
@@ -114,18 +118,14 @@ if (mode === 'local') {
   );
 }
 
-const workersMarker = '  // --- workers-api ---';
-const workersIndex = registerPlugins.indexOf(workersMarker);
-if (workersIndex < 0) {
-  throw new Error('generated register-plugins.mts did not contain the workers-api resource block');
-}
-const followingResourceIndex = registerPlugins.indexOf(
-  '  // --- ',
-  workersIndex + workersMarker.length,
-);
-const nextResourceIndex = followingResourceIndex < 0
-  ? registerPlugins.length
-  : followingResourceIndex;
+// #1837 renamed the per-plugin block comment from the resource name to a positional ordinal
+// (`// --- workers-api ---` became `// --- plugin 3 ---`), silently breaking every consumer keyed
+// on the name. Keying on the ordinal instead would be worse: it shifts with plugin order, so a
+// stale consumer selects the *wrong* block rather than failing. Locate the block from the
+// generated code that names the resource, so it is independent of comment formatting entirely.
+const workersRange = locateWorkersResourceBlock(registerPlugins);
+const workersIndex = workersRange.start;
+const nextResourceIndex = workersRange.end;
 const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
 // The published flow-b config introduces jsr pins that are minutes old at
 // release-verification time; the Aspire-launched service must bypass Deno's
@@ -302,18 +302,9 @@ await Deno.writeTextFile(flowBJobPath, updatedFlowBJob);
 
 const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-background.mts`;
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
-const workersBackgroundMarker = '  // --- workers ---';
-const workersBackgroundIndex = registerBackground.indexOf(workersBackgroundMarker);
-if (workersBackgroundIndex < 0) {
-  throw new Error('generated register-background.mts did not contain the workers resource block');
-}
-const followingBackgroundIndex = registerBackground.indexOf(
-  '  // --- ',
-  workersBackgroundIndex + workersBackgroundMarker.length,
-);
-const nextBackgroundIndex = followingBackgroundIndex < 0
-  ? registerBackground.length
-  : followingBackgroundIndex;
+const workersBackgroundRange = locateWorkersBackgroundBlock(registerBackground);
+const workersBackgroundIndex = workersBackgroundRange.start;
+const nextBackgroundIndex = workersBackgroundRange.end;
 const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,

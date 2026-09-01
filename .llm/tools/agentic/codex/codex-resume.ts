@@ -32,6 +32,7 @@ import {
   wslUser,
 } from '../lib/agentic-lib.ts';
 import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+import { classifyCodexResumeOutcome, codexResumeExitCode } from './codex-resume-result.ts';
 
 interface Options {
   threadId?: string;
@@ -167,7 +168,7 @@ async function main(): Promise<void> {
   const r = await wsl(o.user, script);
   if (r.stdout) console.log(r.stdout);
   if (r.stderr) console.error(r.stderr);
-  Deno.exit(r.code === 0 ? 0 : 1);
+  Deno.exit(codexResumeExitCode(classifyCodexResumeOutcome(r)));
 }
 
 if (import.meta.main) await main();

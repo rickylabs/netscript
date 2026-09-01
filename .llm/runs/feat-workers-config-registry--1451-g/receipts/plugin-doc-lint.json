@@ -1,0 +1,227 @@
+{
+  "source": {
+    "mode": "auto",
+    "root": "plugins/workers",
+    "entrypoints": [
+      "./bin/runtime.ts",
+      "./cli.ts",
+      "./contracts/v1/mod.ts",
+      "./doctor.ts",
+      "./jobs/health-check.ts",
+      "./mod.ts",
+      "./scaffold.ts",
+      "./services/src/main.ts",
+      "./src/aspire/mod.ts",
+      "./src/cli/composition/main.ts",
+      "./streams/mod.ts",
+      "./streams/server.ts",
+      "./worker/mod.ts"
+    ],
+    "exitCode": 1
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 20,
+    "totalPrivateTypeRef": 20,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/plugin-workers",
+      "dir": "plugins/workers",
+      "entrypoints": [
+        {
+          "path": "./bin/runtime.ts",
+          "privateTypeRef": 9,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "./cli.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./contracts/v1/mod.ts",
+          "privateTypeRef": 7,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "./doctor.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./jobs/health-check.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./scaffold.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./services/src/main.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./src/aspire/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/cli/composition/main.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./streams/mod.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "./streams/server.ts",
+          "privateTypeRef": 7,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "./worker/mod.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        }
+      ],
+      "files": [
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/packages/plugin-workers-core/src/streams/schema.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/packages/plugin-workers-core/src/runtime/runtime-types.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/packages/plugin-workers-core/src/contracts/v1/workers.contract-definition.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/packages/plugin-workers-core/src/state/execution-state.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/plugins/workers/worker/worker-options.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/plugins/workers/src/runtime/generated-jobs.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/plugins/workers/src/adapter/plugin.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/plugins/workers/src/public/mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/plugins/workers/services/src/main.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g/packages/plugin-workers-core/src/streams/producer.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        }
+      ],
+      "combinedTotal": 20,
+      "combinedPrivateTypeRef": 20,
+      "combinedMissingJSDoc": 0,
+      "combinedOther": 0,
+      "combinedExitCode": 1,
+      "entrypointExitCodes": {
+        "./bin/runtime.ts": 1,
+        "./cli.ts": 0,
+        "./contracts/v1/mod.ts": 1,
+        "./doctor.ts": 1,
+        "./jobs/health-check.ts": 0,
+        "./mod.ts": 1,
+        "./scaffold.ts": 0,
+        "./services/src/main.ts": 1,
+        "./src/aspire/mod.ts": 0,
+        "./src/cli/composition/main.ts": 0,
+        "./streams/mod.ts": 1,
+        "./streams/server.ts": 1,
+        "./worker/mod.ts": 1
+      }
+    }
+  ]
+}
