@@ -4180,6 +4180,7 @@
       "packages/cli/e2e": {
         "dependencies": [
           "jsr:@cliffy/command@^1.0.0-rc.7",
+          "jsr:@netscript/plugin-streams-core@0.0.6",
           "jsr:@std/assert@1",
           "jsr:@std/fs@1",
           "jsr:@std/path@1",
@@ -4333,6 +4334,7 @@
       },
       "packages/plugin-auth-core": {
         "dependencies": [
+          "jsr:@netscript/plugin-streams-core@0.0.6",
           "jsr:@std/assert@1",
           "npm:@orpc/contract@^1.14.6",
           "npm:@orpc/server@^1.14.6",
@@ -4343,6 +4345,7 @@
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
           "jsr:@netscript/kv@0.0.6",
+          "jsr:@netscript/plugin-streams-core@0.0.6",
           "jsr:@netscript/telemetry@0.0.6",
           "jsr:@std/assert@1",
           "npm:zod@^4.4.3"
@@ -4436,6 +4439,7 @@
       },
       "packages/sdk": {
         "dependencies": [
+          "jsr:@netscript/plugin-streams-core@0.0.6",
           "jsr:@netscript/service@0.0.6",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",

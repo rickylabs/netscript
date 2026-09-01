@@ -37,6 +37,8 @@ exact JSR specifier.
 ## Scope
 
 - Add `@netscript/plugin-streams-core` to the imports maps in the two named manifests.
+- Cycle 2: add the same declaration to the four remaining importing workspace members:
+  `packages/sdk`, `packages/plugin-sagas-core`, `packages/plugin-auth-core`, and `packages/cli/e2e`.
 - Retain `deno.lock` only if Deno resolution genuinely changes it.
 - Preserve and update this run directory.
 
@@ -48,7 +50,8 @@ exact JSR specifier.
 
 ## Hidden Scope
 
-- Verify the sixth import in `plugins/triggers/src/public/mod.ts`.
+- Derive the complete workspace static import/export edge set separately from string references.
+- Verify the evaluator-versus-owner disagreement for `packages/cli/e2e` from source syntax.
 - Prove whether the lockfile moves after the declarations.
 - Run the four generated-corpus freshness checks because manifest metadata feeds generated output.
 
@@ -59,6 +62,7 @@ exact JSR specifier.
 | D1 | Add the dependency to both manifests. | Direct imports should be readable from each member manifest even though workspace resolution silently accepts omission. |
 | D2 | Use `jsr:@netscript/plugin-streams-core@0.0.6`. | Exact match to `plugins/workers/deno.json`. |
 | D3 | Do not add an undeclared-import gate. | Publishing is unaffected; acceptance box 3 is conditional and N/A. |
+| D4 | Declare the dependency in all four remaining importing workspace members. | Owner-authorized cycle-2 fix closes the completeness gap; CLI E2E has five genuine static imports despite being non-publishable. |
 
 ## Open-Decision Sweep
 
@@ -74,6 +78,7 @@ exact JSR specifier.
 | Resolution changes `deno.lock`. | Inspect exact diff and retain only genuine resolution movement. |
 | Generated metadata becomes stale. | Run all four generated-corpus `check:` variants. |
 | Existing workspace changes enter the commit. | Use raw git status and explicit path staging. |
+| String references are mistaken for dependency edges. | Count only static import/export module specifiers; report strings separately. |
 
 ## Anti-Patterns to Resolve or Avoid
 
@@ -112,3 +117,4 @@ exact JSR specifier.
 ## Drift Watch
 
 - Any lockfile movement, generated output drift, source change, or gate failure.
+- Any importing member missing from the workspace-wide static-edge census.

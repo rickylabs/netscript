@@ -12,9 +12,10 @@
 
 ## Current State
 
-Base `38f2ce735` silently publishes despite the two omitted declarations. Both manifests now use the
-exact `jsr:@netscript/plugin-streams-core@0.0.6` pattern from `plugins/workers`. All slice-owned
-gates pass; one requested generated-corpus gate has a confirmed pre-existing base failure.
+Base `38f2ce735` silently publishes despite undeclared imports. S1 fixed the issue-named two members
+but IMPL-EVAL found four additional importing workspace members. S2 adds the exact established
+specifier to all four after a workspace-wide static-edge census separated module imports from
+package-name strings. All cycle-2 gates now pass at the corrected member scope.
 
 ## Completed
 
@@ -25,16 +26,19 @@ gates pass; one requested generated-corpus gate has a confirmed pre-existing bas
 - Captured every requested gate exit and the lockfile's exact two-line movement.
 - Proved `check:mcp-export-corpus` also fails at the untouched base and left forbidden
   `packages/mcp` unchanged.
+- Preserved evaluator commit `4f194dbb1` and accepted its `FAIL_IMPL` completeness finding.
+- Confirmed CLI E2E has five real imports; corrected the triggers public-string misclassification.
+- Refreshed exactly four lock member-dependency lines and completed cycle-2 validation.
 
 ## In Progress
 
-- Final diff review, commit, explicit-refspec push, and draft PR creation.
+- Final diff review, commit, explicit-refspec push, and PR evidence update.
 
 ## Next Steps
 
-1. Commit the owned diff.
-2. Push the explicit refspec and open the labeled draft PR at milestone `0.0.7`.
-3. Stop without IMPL-EVAL or ready-for-review transition.
+1. Commit the four manifest lines, four lock lines, and corrected run artifacts.
+2. Push the explicit refspec and update the draft PR evidence without changing labels/state.
+3. Stop for owner-dispatched IMPL-EVAL cycle 2.
 
 ## Key Decisions
 
@@ -50,16 +54,20 @@ gates pass; one requested generated-corpus gate has a confirmed pre-existing bas
 | `packages/plugin-workers-core/deno.json` | changed | Added exact streams-core dependency. |
 | `plugins/triggers/deno.json` | changed | Added exact streams-core dependency. |
 | `deno.lock` | changed | Added one resolved member-dependency line for each touched manifest. |
+| `packages/sdk/deno.json` | changed | Cycle 2: declare streams-core. |
+| `packages/plugin-sagas-core/deno.json` | changed | Cycle 2: declare streams-core. |
+| `packages/plugin-auth-core/deno.json` | changed | Cycle 2: declare streams-core. |
+| `packages/cli/e2e/deno.json` | changed | Cycle 2: declare streams-core for five real gate imports. |
 | `.llm/runs/chore-declare-streams-core-dependency--1543/` | new | Harness state and evidence. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS with one pre-existing generated-corpus failure | Root/scoped/publish green; MCP corpus fails identically at base |
+| Static | PASS with one unchanged pre-existing generated-corpus failure | S2 root/scoped/publish green; MCP corpus note retained unchanged |
 | Fitness | PASS | `quality:scan` and `arch:check` exits 0 |
 | Runtime | N/A | no behavior change |
-| Consumer | PASS | root/scoped checks exit 0 |
+| Consumer | PASS | S2 root/scoped checks and dependency provenance exit 0 |
 
 ## Open Questions
 
@@ -67,7 +75,8 @@ gates pass; one requested generated-corpus gate has a confirmed pre-existing bas
 
 ## Drift and Debt
 
-- Drift: pre-existing MCP export-corpus staleness; forbidden sibling scope, recorded without fix.
+- Drift: pre-existing MCP export-corpus staleness remains; S1 completeness and string/import
+  misclassification are recorded for correction in S2.
 - Debt: none created, deepened, or resolved.
 
 ## Commits
