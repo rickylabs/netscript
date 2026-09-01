@@ -194,3 +194,20 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
   hosted Phase B dispatch occurred.
 - Runtime work stopped per the lease. Full evidence and verbatim raw outputs are in
   `d240-sqlite-control.md`.
+
+## D-248 reconvergence state
+
+- Coordinator ruling: #1837 hardened the emission of a line whose seam #1720 A6 removes, so
+  hardening and removal are orthogonal and the deletion supersedes that one hardened line only.
+- Old range: 26 commits from `6c195acaf` through `467d0d1fd`. Final main target after the required
+  replay checks is `3b6386e14`; the earlier fetched `78be0e032` and `233828f0f` targets advanced
+  during work.
+- Main's ordinal/`JSON.stringify` source-safety shape survives; S8's typed-db behavior and semantic
+  assertions are re-expressed forward. The obsolete flag/version test block is deleted.
+- Generated carriers took upstream during replay and `embedded.generated.ts` was regenerated once
+  after all source commits landed.
+- `behavior.workers-executions` is not S8-owned by static differential: S8 has no delta in its gate,
+  probe, plugin generator, or workers implementation. No runtime was run; Fixes #1858 owns the host
+  lease and CI remains runtime authority.
+- No evaluator was self-dispatched and no `evaluate.md` was created. A supervisor-dispatched bounded
+  delta IMPL-EVAL follows the push.

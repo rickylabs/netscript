@@ -101,7 +101,7 @@ Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contr
       databases: { main: MINIMAL_DATABASE },
       caches: {},
     });
-    assertStringIncludes(registerInfrastructure, "databases.set('main', main)");
+    assertStringIncludes(registerInfrastructure, 'databases.set("main", db_0)');
     assert(
       !registerInfrastructure.includes('connectionStringExpression()'),
       'compile-clean Container emission must not call an unsupported runtime capability',

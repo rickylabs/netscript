@@ -82,29 +82,6 @@ describe('generateRegisterTools', () => {
     assert(!output.includes('--minimum-dependency-age=0'));
   });
 
-  it('does not retain the Aspire 13.4 process-command seam', async () => {
-    const template = await Deno.readTextFile(
-      new URL(
-        '../../../../assets/generated/aspire/helpers/generate-register-tools-1.ts.template',
-        import.meta.url,
-      ),
-    );
-    const output = generateRegisterTools({
-      tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
-    });
-
-    for (
-      const forbidden of [
-        'PROCESS_COMMANDS_FLAG',
-        'Aspire 13.4',
-        'maybeWithProcessCommand',
-      ]
-    ) {
-      assert(!template.includes(forbidden), `raw template contains ${forbidden}`);
-      assert(!output.includes(forbidden), `generated output contains ${forbidden}`);
-    }
-  });
-
   it('should use resource name as TaskName fallback', () => {
     const toolNoTaskName: ToolEntry = { Enabled: true };
     const output = generateRegisterTools({
