@@ -1,7 +1,7 @@
 # Run resource leak report
 
-Generated: 2026-08-30T18:49:30.410Z
-Worktree: `/home/agent/projects/netscript/worktrees/007-aspire-s8`
+Generated: 2026-09-01T05:37:52.446Z
+Worktree: `/home/agent/projects/netscript/worktrees/007-s8-recon`
 Aspire probe: ok
 Docker probe: ok
 No surviving Aspire resources found.

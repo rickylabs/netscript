@@ -174,3 +174,23 @@ scaffold E2E runtime gate modules. Package/framework boundaries outside `package
 - The regression was RED at 23/24 before the repair; focused tests pass 36/36 and the complete
   helper/runtime-builder set passes 286/286 afterward. Scoped check/lint/fmt and `quality:gate` exit
   0. No runtime command, evaluator dispatch, or `evaluate.md` creation occurred.
+
+## D-240 S8-free SQLite control state
+
+- Fresh `origin/main` `60ae56af0144644db00b0e2fdc28986919ee12ee` was used detached in this
+  same worktree. `git cat-file -e` for S8-owned `verify-typed-db-phase-b.ts` exited 128, proving the
+  head is S8-free.
+- The canonical `scaffold.runtime.sqlite --cleanup` control did not reach
+  `runtime.health.listener-unreachable`; preceding `runtime.wait.garnet` timed out after 300 seconds
+  and suite cleanup passed. The target baseline `Promise.all` never ran, so there is no ownership
+  verdict and no decisive omission evidence.
+- Read-only pre-target inventory showed `garnet_resp` Unhealthy (`ETIMEDOUT`) while
+  `test_only_garnet_resp` was Healthy. This is the known remote-DinD topology blocker, not target
+  gate output.
+- Post-cleanup, the protected foreign network
+  `aspire-persistent-network-581c13b7-aspire-managed` was absent and a new unlabeled anonymous
+  volume `90d704b4…63f` (created `2026-09-01T05:27:23Z`) remained. The protected `d33e5c2e…bbaa2`
+  volume remains unchanged. No manual removal, network recreation, retry, repair, evaluator, or
+  hosted Phase B dispatch occurred.
+- Runtime work stopped per the lease. Full evidence and verbatim raw outputs are in
+  `d240-sqlite-control.md`.
