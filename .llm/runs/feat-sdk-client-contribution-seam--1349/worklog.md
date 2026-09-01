@@ -5,10 +5,10 @@
 | Field          | Value                                                         |
 | -------------- | ------------------------------------------------------------- |
 | Run ID         | `feat-sdk-client-contribution-seam--1349`                     |
-| Branch         | `feat/sdk-client-contribution-seam`                           |
+| Branch         | `feat/sdk-client-contribution-adapter`                        |
 | Archetype      | `2 — Integration`                                             |
 | Scope overlays | none                                                          |
-| Phase          | Slice 1 — implementation and gates complete; draft PR handoff |
+| Phase          | Slice 3 — implementation complete; draft PR handoff with external E2E blocker |
 
 ## Design
 
@@ -100,6 +100,17 @@ descriptors never gain transport controls.
 | 2026-08-31 | Slice 1      | Final gate recut      | Re-ran the full scoped SDK test wrapper after the assertion-budget fix and re-cut every amended Slice-1 gate at the final product content.                                                                         |
 | 2026-08-31 | Slice 1      | Slice review          | Substantive review found no scope creep, internal/link export, upstream identity, unsafe cast/allowance, or compatibility-default drift. The Slice-1-only types-accepted-but-unconsumed window remains draft-only. |
 | 2026-08-31 | Slice 1      | Reconcile             | Merging this partial slice leaves #1349 open. The draft PR uses `Refs #1349`; readiness labels, acceptance-box changes, evaluator dispatch, and merge remain supervisor-owned.                                     |
+| 2026-08-31 | Slice 2      | Private adapter       | Added exactly the RFC's three internal port responsibilities, immutable preparation, and the stable-v1 outer epoch wrapper; no internal barrel, package export, or public adapter identity was added.              |
+| 2026-08-31 | Slice 2      | Retry conformance     | Forced unary retry prepares once and reuses one prepared identity across two attempts while each HTTP dispatch materializes a fresh header container and preserves the terminal transport error identity.        |
+| 2026-08-31 | Slice 2      | Reconnect conformance | Iterator failure rotates credential A to B with exactly two preparation epochs and byte-equivalent attempts inside each epoch; an aborted iterator starts neither preparation nor transport for a reconnect.     |
+| 2026-08-31 | Slice 2      | Surface conformance   | Four-entrypoint documentation scans omit all private identities; the packed SDK rejects all three forbidden subpaths; the public contribution declarations contain no oRPC/npm identity.                         |
+| 2026-08-31 | Slice 2      | Final gates           | Re-cut structured SDK check/test/lint/fmt receipts with non-empty stdout, plus quality, architecture, RFC fixture, doc baseline, SDK dry-run, JSR audit, lock, and ceiling evidence.                               |
+| 2026-08-31 | Slice 2      | Slice review          | Substantive source/test review found the prepared value is the sole contributor-to-transport channel, upstream retry is disabled only for non-empty tuples, omission retains the existing transport retry path, and Slice 3 files remain untouched. |
+| 2026-08-31 | Slice 3      | Validation            | Added closed-shape construction validation, ownership/budget/reserved-name checks, preparation header/context checks, printable partition validation, stable codes, and redacted framework-authored failures. |
+| 2026-08-31 | Slice 3      | Cache/query behavior  | Added canonical sorted partitions to full server/TanStack keys, recursive read-key wrapping, context-forwarding mutations without suffixes, direct-only runtime omission, persisted separation, and unchanged invalidation prefixes. |
+| 2026-08-31 | Slice 3      | Desktop/docs/proof    | Added runtime unsupported-transport rejection, README/export JSDoc plus compiled worked example, and one consumer test proving contributed headers preserve CLIENT spans and final trace injection without leaking values. |
+| 2026-08-31 | Slice 3      | Final SDK gates       | Re-cut structured receipts at 99 SDK files and 113 tests; quality, architecture, RFC fixture, doc baseline, publish simulation, JSR audit, private-surface, lock, and ceiling gates passed. |
+| 2026-08-31 | Slice 3      | Runtime E2E           | Canonical scaffold runtime reached 38 passes, then Aspire canceled the owned Postgres start and returned a missing-resource 404; cleanup passed. A clean retry reproduced the wait but its driver disappeared without a trustworthy summary. Leak reports showed zero survivors. |
 
 ## Decisions
 
@@ -185,13 +196,94 @@ writes this evidence to stderr; it is not the cache-replay trap.
 | Compatibility defaults         | PASS   | Existing three compatibility fixtures plus default client/query-utils assertions                                | Existing call sites compile unchanged.                       |
 | Tuple/key/error/Desktop proofs | PASS   | 16 accepted/17 rejected; exact three/five keys; `TError` third/context fourth; Desktop excess property rejected | All Slice-1 compile-negative/shape assertions remain active. |
 
+## Slice 2 Gate Results
+
+Final durable receipts are under `.llm/tmp/gate-receipts/sdk-1349-s2/` and are intentionally not
+committed. The first format check found two owned files and was followed by formatting only the eight
+Slice-2 TypeScript files; `fmt-final.json` is the final evidence.
+
+### Slice gates 1–6
+
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| Forced unary retry | PASS | `context.retry: 1` produced exactly one preparation and two transport attempts. Both attempts received the same frozen prepared-call identity and byte-equivalent contributor header values; the HTTP integration used distinct header containers. Omitted and explicit-empty calls each match the fixed pre-adapter wire snapshot byte for byte. |
+| Iterator reconnect | PASS | Initial/open retry used credential A, reconnect/open retry used B, preparation count was exactly 2, attempts projected `[A, A, B, B]`, and identities were equal within but different across epochs. |
+| Abort and callback observation | PASS | Abort after the initial item left preparation/transport counts at 1. Contribution callbacks observed only their declared `credential` context plus the RFC snapshot fields—never retry, cache, or trace state. The terminal transport error retained identity. |
+| Private documentation surface | PASS | `deno doc --json` over SDK root, `./client`, `./ports`, and `./desktop` contains none of the three ports, prepared-call types, or `stableV1PreparedCall`. |
+| Packed negative imports | PASS | A real `deno pack` + temporary npm consumer accepted `@netscript/sdk/client` and rejected `@netscript/sdk/internal/client-contributions`, its `adapter-ports` child, and `@netscript/sdk/client-contributions`. |
+| Zero-oRPC declaration scan | PASS | Every new public contribution symbol in the SDK root documentation graph contains neither `@orpc` nor `npm:`; no #1350/#1278 allowance changed. |
+
+### Slice gate 7 and repository fitness
+
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| Scoped SDK check | PASS | Structured wrapper selected 96 TS/TSX files, one batch, zero occurrences; receipt stdout 305 bytes. |
+| Full scoped SDK test | PASS | Structured wrapper: 95 passed, 0 failed, 0 ignored; receipt stdout 287 bytes. This includes all epoch, absence, packed-consumer, and zero-oRPC tests. |
+| Scoped SDK lint | PASS | 96/96 files processed, zero findings/refusals; receipt stdout 355 bytes. |
+| Scoped SDK format | PASS | Final receipt processed 96/96 files with zero findings/refusals; stdout 304 bytes. |
+| `quality:scan` | PASS | Exit 0, no findings or allowance failures; stdout 4,092 bytes and allowance budget remains 7. |
+| `arch:check` | PASS | Exit 0; SDK `FAIL=0`, with only the pre-existing `src/` cardinality warning and architecture-doc info. |
+| RFC fixture | PASS | Exact `deno check --unstable-kv packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` emitted its check line and exited 0. |
+| Doc lint | PASS under baseline gate | Required `--root packages/sdk --pretty` invocation reproduced exactly 3 `private-type-ref` findings in the same out-of-ceiling files, with 0 new findings; receipt stdout 4,359 bytes. |
+| SDK publish dry-run | PASS | Run from `packages/sdk`; exit 0, stderr 8,426 bytes, and normal zero stdout. The three private runtime implementation files are packaged as reachable source but no importable subpath is exported. |
+| JSR audit | PASS | Exit 0; dry-run `OK`; only the existing SDK `src/` cardinality warning and banner-derived slow-types warning remain. |
+| Diff, ceiling, lock | PASS | `git diff --check` passes; product changes are exactly the Slice-2 file list; no internal barrel or export exists; `deno.lock` is byte-identical. |
+
 ## Handoff Notes
 
-- Slice 1 is complete and remains a draft-only intermediate: `contributions` is accepted by the
-  public types but is not consumed until the later runtime slices. Do not publish this head.
+- Slice 2 now consumes the Slice-1 contribution surface for direct HTTP service-client calls and is
+  complete under its seven gates. Slice 3 still owns construction/error validation, cache/query and
+  Desktop behavior, docs, and combined contribution/trace proof. Do not publish this intermediate.
 - The owner-amended doc-lint gate is satisfied as 3 baseline / 0 new; do not repair the three
   foreign/pre-existing findings in this leaf.
-- The pushed commit and draft PR are the Slice-1 commit trail. Merging leaves #1349 open; the PR
+- The pushed commit and draft PR are the Slice-2 commit trail. Merging leaves #1349 open; the PR
   must contain `Refs #1349` and must remain draft.
 - Do not apply readiness labels, tick acceptance boxes, dispatch IMPL-EVAL, or merge. Those actions
   remain with the supervisor.
+
+## Slice 3 Gate Results
+
+Final structured receipts are under `.llm/tmp/gate-receipts/sdk-1349-s3/` and are intentionally not
+committed. The final sources were rechecked after removing three assertion-budget regressions and
+two lint findings without raising any allowance or budget.
+
+### Slice gates 1–6
+
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| Unknown construction | PASS | Runtime tests reject invalid protocol/id/plain-object shape; duplicate id/context/header ownership; reserved context; forbidden or mixed-case headers; tuple/context/header limits; dependency/order/priority/environment extras; and Desktop `contributions`, using the required stable codes. |
+| Preparation and redaction | PASS | Missing context plus undeclared/forbidden/non-string/mixed-case/CR-LF headers reject; empty, overlong, non-printable, async, and throwing partitions reject; abort invokes zero contributors. Error and observability assertions exclude source, context, input, and contributed-header secrets and expose no cause. |
+| Cache conformance | PASS | Exact sorted server and TanStack suffixes, two tenant partitions plus locale, empty/invariant no-suffix behavior, cross-partition server/persister isolation, unsuffixed invalidation prefixes, paired generated collection key/function wiring, and direct-only runtime omission all pass. |
+| Recursive query utilities | PASS | Query, streamed, live, and infinite full keys receive the canonical suffix; mutations retain unsuffixed keys while forwarding request context. Omitted clients retain the unwrapped fast path. |
+| Documentation | PASS | README/export table and root/client/ports/presets JSDoc describe the public contribution surface, cache visibility, direct-only behavior, epoch semantics, and HTTP-only Desktop boundary. The worked README example compiles in `readme-doctest_test.ts`. |
+| Transport observability | PASS | The consumer integration receives the contributed header and final `traceparent`; the emitted `rpc.client` span remains CLIENT-kind and neither captured spans nor stderr contain the contributed value. |
+
+### Slice gate 7 and repository fitness
+
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| Scoped SDK check | PASS | Final structured receipt selected 99 TS/TSX files, one batch, zero occurrences; `stdout.bytes=305`. |
+| Full scoped SDK test | PASS | Final structured receipt: 113 passed, 0 failed, 0 ignored; `stdout.bytes=289`. |
+| Scoped SDK lint | PASS | 99/99 files processed, zero findings/refusals; `stdout.bytes=355`. |
+| Scoped SDK format | PASS | 99/99 files processed, zero findings/refusals; `stdout.bytes=304`. |
+| `quality:scan` | PASS | Exit 0, zero findings/allowance failures, allowance budget remains 7; stdout 4,092 bytes. |
+| `arch:check` | PASS | Exit 0 and SDK `FAIL=0`; only the existing `src/` cardinality warning and architecture-doc info remain. |
+| RFC fixture | PASS | Exact `deno check --unstable-kv packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` emitted its check line and exited 0. |
+| Private-surface/packed consumer | PASS | Full SDK tests repeat four-entrypoint absence, zero-oRPC declarations, and all packed negative imports. No internal barrel, subpath, or re-export was added. |
+| Doc lint | PASS under baseline gate | Required `deno task doc:lint --root packages/sdk --pretty` reproduced exactly 3 `private-type-ref` findings in the same baseline files and 0 new findings; receipt stdout 4,359 bytes. |
+| SDK publish dry-run | PASS | Run from `packages/sdk`; exit 0, `stderr.bytes=8746`, and expected `stdout.bytes=0`. |
+| JSR audit | PASS | Exit 0; dry-run `OK`; only the existing SDK `src/` cardinality warning and banner-derived slow-types warning remain. |
+| MCP export corpus | NOT NEEDED | Slice 3 changes JSDoc and behavior only; the public symbol/export set is unchanged, so symbol delta is zero and the generated corpus was not regenerated. |
+| Diff, ceiling, lock | PASS | `git diff --check` passes; product changes stay inside the Slice-3 file ceiling and focused tests/docs; `deno.lock` remains byte-identical (`edfa0c24…`). |
+
+### Slice gate 8 — merge-readiness scaffold runtime
+
+| Attempt | Result | Evidence |
+| ------- | ------ | -------- |
+| Canonical one-pass run | EXTERNAL FAIL | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` completed 38 gates, then `database.init` failed after Aspire canceled `netscript-db-postgres` startup and its stop path received a 404 for an already-missing executable resource. `cleanup.aspire-stop` passed. |
+| Clean retry after leak report | NO VERDICT | The identical command again cleared all pre-database phases and entered the owned Postgres start, but its driver disappeared without a terminal summary. It is not counted as a pass. |
+| Resource hygiene | PASS | Read-only leak reports after the authoritative failure and retry reported healthy Aspire/Docker probes and zero survivors; final `aspire ps --format Json` returned `[]`. No unrelated process or container was touched. |
+
+Slice 3 implementation and all SDK-local gates are complete, but the branch is not represented as
+merge-ready because the scaffold runtime gate lacks a green verdict. The PR remains draft. No
+IMPL-EVAL was dispatched at the owner's direction.

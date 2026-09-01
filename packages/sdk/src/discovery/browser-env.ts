@@ -33,7 +33,7 @@ export function createBrowserServiceEnvKey(
  * Build the shorthand browser environment key for a service endpoint.
  */
 export function createBrowserServiceShortEnvKey(serviceName: string): string {
-  return `VITE_${serviceName.toUpperCase().replace(/-/g, '_')}_URL`;
+  return `VITE_${normalizeViteIdentifierSegment(serviceName).toUpperCase()}_URL`;
 }
 
 /**

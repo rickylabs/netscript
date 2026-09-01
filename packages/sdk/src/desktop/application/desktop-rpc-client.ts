@@ -2,6 +2,7 @@ import { createORPCClient } from '@orpc/client';
 import { RPCLink } from '@orpc/client/message-port';
 import { createDesktopBindClientPort } from '../adapters/bind-channel.ts';
 import { DESKTOP_RPC_JSON_SERIALIZERS } from '../adapters/orpc-serialization.ts';
+import { SdkClientContributionError } from '../../client/errors.ts';
 import type {
   CreateDesktopRpcLinkOptions,
   CreateDesktopServiceClientOptions,
@@ -25,6 +26,12 @@ export function createDesktopRpcLink(
 export function createDesktopServiceClient<TContract extends ContractLike>(
   options: CreateDesktopServiceClientOptions<TContract>,
 ): DesktopServiceClient<TContract> {
+  if (Object.prototype.hasOwnProperty.call(options, 'contributions')) {
+    throw new SdkClientContributionError({
+      code: 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED',
+      phase: 'construction',
+    });
+  }
   const link = createDesktopRpcLink({
     bindingName: options.bindingName,
     invoke: options.invoke,
