@@ -16,10 +16,8 @@ const compatContent = await Deno.readTextFile(
   ),
 )
 
-await Deno.mkdir('packages/cli/.tmp', { recursive: true })
 const generatedRoot = resolve(
   await Deno.makeTempDir({
-    dir: 'packages/cli/.tmp',
     prefix: 'netscript-aspire-health-',
   }),
 )
@@ -64,9 +62,40 @@ export interface EndpointReferencePromise extends PromiseLike<EndpointReference>
 `,
 )
 const compatPath = `${helpersDir}/_aspire-compat.mts`
+const runtimeCompatPath = `${helpersDir}/_aspire-compat.runtime.mts`
+const generatedConfigPath = `${generatedRoot}/deno.json`
+const zodSpecifier = import.meta.resolve('zod')
+await Deno.writeTextFile(
+  generatedConfigPath,
+  `${JSON.stringify({
+    lock: false,
+    imports: { zod: zodSpecifier },
+    compilerOptions: {
+      strict: true,
+      noImplicitAny: true,
+      noImplicitReturns: true,
+      isolatedDeclarations: false,
+    },
+    fmt: {
+      useTabs: false,
+      lineWidth: 100,
+      indentWidth: 2,
+      semiColons: true,
+      singleQuote: true,
+    },
+  }, null, 2)}\n`,
+)
 await Deno.writeTextFile(compatPath, compatContent)
+await Deno.writeTextFile(
+  runtimeCompatPath,
+  compatContent.replace("from 'zod';", `from '${zodSpecifier}';`),
+)
+await Deno.writeTextFile(
+  `${generatedRoot}/format-sentinel.ts`,
+  'export const formatSentinel = true;\n',
+)
 const compatModule = await import(
-  `${toFileUrl(compatPath).href}?test=${crypto.randomUUID()}`
+  `${toFileUrl(runtimeCompatPath).href}?test=${crypto.randomUUID()}`
 )
 
 afterAll(async () => {
@@ -74,6 +103,44 @@ afterAll(async () => {
 })
 
 describe('generated Aspire listener readiness helpers', () => {
+  it('type-checks the emitted helper in a generated workspace shape', async () => {
+    const result = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'check',
+        '--config',
+        generatedConfigPath,
+        '--no-lock',
+        compatPath,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output()
+
+    assertEquals(result.code, 0, new TextDecoder().decode(result.stderr))
+  })
+
+  it('formats the emitted helper as generated TypeScript', async () => {
+    const result = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'fmt',
+        '--check',
+        '--config',
+        generatedConfigPath,
+        'format-sentinel.ts',
+        '.helpers/_aspire-compat.mts',
+      ],
+      cwd: generatedRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output()
+
+    assertEquals(
+      result.code,
+      0,
+      `${new TextDecoder().decode(result.stdout)}${new TextDecoder().decode(result.stderr)}`,
+    )
+  })
+
   it('reports a local TCP listener as Healthy', async () => {
     const server = await startServer()
     try {
