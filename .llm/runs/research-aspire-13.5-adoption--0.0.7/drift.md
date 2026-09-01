@@ -6127,3 +6127,19 @@
   - Remaining to close S8 after reconvergence: **#1720's six unchecked boxes**, **#1754's two unchecked
     DoD boxes**, both-tier full `scaffold.runtime` green, exact Phase-B receipts, Tier-A delta review,
     supervisor-dispatched IMPL-EVAL, zero unanswered threads, current CI.
+
+- **D-249 — main advanced to `233828f0f` (#1832) mid-reconvergence; S8's replay is in flight and
+  progressing.**
+  - **S8 is actively rebasing**, not stalled: head moved `467d0d1fd` → **`ce33fee88`**, **18** own
+    commits (down from 26 as the replay consolidates), **1 behind** main, worktree dirty (11 paths)
+    — i.e. it converged onto `78be0e032` and main then moved again underneath it.
+  - **Deliberately not interrupting it.** Its brief already requires a re-fetch at replay time, and a
+    **1-commit top-up** onto `233828f0f` afterwards is cheap; aborting a five-conflict replay to chase
+    one commit would risk the careful A6 resolution mid-flight for no gain.
+  - **A top-up was expected regardless:** the coordinator has confirmed the final Aspire convergence
+    will pull **#1858's** later merge SHA before Phase B. So S8 takes one more rebase after #1858
+    lands, and that is the pass that must be exact.
+  - Sequencing recorded, unchanged: S8 final head → **S9/S10 restack** (both currently contain old S8
+    `d1c6d8b54`, not the new head) → **S11 restack on S10** → **S13 parity box 2 verifies once S9 is on
+    main**. #1744 and #1747 remain gated on the garnet fix; both are otherwise complete.
+  - Runtime lease remains with Fixes **#1858**; every live dispatch of mine is static and CI-only.
