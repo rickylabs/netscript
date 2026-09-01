@@ -1,6 +1,6 @@
 {
   "gateId": "check",
-  "invocationId": "1842-r-check",
+  "invocationId": "1842-f-check",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/(plugin|cli)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1452-s2",
-  "gitHead": "10eee3c1e20f626bd8d0d986f1fd51c63e2564b7",
-  "actualGitHead": "10eee3c1e20f626bd8d0d986f1fd51c63e2564b7",
+  "gitHead": "29c4e5d1dc795ceb502470a8b0c5aec6c58472d9",
+  "actualGitHead": "29c4e5d1dc795ceb502470a8b0c5aec6c58472d9",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:3379489",
+  "runnerIdentity": "worker:3434362",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "1ef229b6b44d53dd450f0d01fb15293f61639551c024a67eed1cf067a89d0714",
-  "lifecycleId": "worker:3379489:1842-r-check:1",
+  "requestHash": "0de4a917ccf4c2e7af5eab3aed8a0bc76fb74904572436ba009672bd80c3b85c",
+  "lifecycleId": "worker:3434362:1842-f-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-09-01T05:39:46.250Z",
-  "startedAt": "2026-09-01T05:39:46.252Z",
-  "finishedAt": "2026-09-01T05:40:23.487Z",
-  "durationMs": 37235,
+  "claimedAt": "2026-09-01T05:50:38.692Z",
+  "startedAt": "2026-09-01T05:50:38.693Z",
+  "finishedAt": "2026-09-01T05:51:07.240Z",
+  "durationMs": 28546,
   "exitCode": 0,
   "stdout": {
     "bytes": 307,
-    "sha256": "2ee11285f14cd16fa5f8945374b98d9cc3da17e9accf5a4976d6ea70847d7209",
-    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1061,\"batches\":9,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "2c85c37455ba697ce3665e4fdba25ae18fca5b7b5c29bf74818e2377a0cec9e0",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1062,\"batches\":9,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {
