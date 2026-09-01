@@ -1,0 +1,19 @@
+{
+  "source": {
+    "mode": "selection",
+    "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g"
+  },
+  "command": "deno check --unstable-kv --no-lock <files>",
+  "selection": {
+    "filesSelected": 4,
+    "batches": 1,
+    "failedBatches": 0
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueCodes": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}
