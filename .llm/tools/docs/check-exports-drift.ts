@@ -57,7 +57,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     symbolCoverage: {
       mode: 'entrypoints-only',
       reason:
-        'The page guarantees all sixteen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.',
+        'The page guarantees all seventeen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.',
     },
   },
   {
