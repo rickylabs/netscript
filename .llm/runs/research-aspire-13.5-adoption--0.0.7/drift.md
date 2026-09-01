@@ -6752,3 +6752,32 @@
     execution path.
   - Corrected the durable memory that carried hypothesis 2. Gates unchanged: #1865 `OPEN/UNSTABLE` at
     `f008315d1`, #1858 `OPEN/CLEAN`, main `1e53e731a`.
+
+- **D-267 — the reaper is unpredictable, `setsid` defeats it, and the Phase-B lease recipe is now
+  evidence-backed rather than a warning.**
+  - **My "~10–15 min cap" from D-266 is also wrong.** Watcher v3 run 1 exited cleanly at its 480 s
+    ceiling; **run 2 of the identical script was killed at ~6.5 minutes**, four polls in. Same script,
+    same shape, different outcome. That rules out a fixed duration cap, and together with the earlier
+    results it rules out the sleep-shape and turn-boundary theories too. **I am not proposing a third
+    theory** — the trigger is not something I can pin down from inside, and it does not matter,
+    because:
+  - **A `setsid`-detached process survives.** The detach probe (`ppid=1`, own session id, launched
+    14:55:31) was **still running at 15:01:08 — through the very kill event that terminated the
+    concurrently running background watcher at ~15:01**. One process died, the other did not, in the
+    same instant, and the only difference was detachment. That is the cleanest evidence available and
+    it is enough to act on.
+  - **Also learned, the hard way:** the scratchpad is mounted **`noexec`**. `chmod +x` does nothing
+    and a direct exec fails `Permission denied`; the first detach attempt failed **silently** because
+    I had discarded stderr. Scripts must be invoked as `bash <path>` — which every watcher happened to
+    do, which is why they ran at all.
+  - **Phase-B recipe written into the manifest as §4a**, replacing the bare warning D-266 left:
+    A5 stays on hosted CI; the AppHost is started `setsid nohup … & disown` and verified `ppid=1`
+    before probing; A1/A2/A4 run as separate short foreground calls against it; the AppHost is stopped
+    **explicitly** because nothing will clean up a detached process; every step tees to a log because
+    the harness output is empty on a kill.
+  - **The failure this prevents is specific.** An AppHost started inside a background task would be
+    killed mid-lease at an unpredictable moment and strand its containers — the #1855 leak class,
+    occurring during the one pass whose whole purpose is to prove a clean zero baseline. Finding this
+    before the lease costs one probe; finding it during the lease costs the lease.
+  - Gates unchanged through eight further polls (14:46→15:00): #1865 `OPEN/UNSTABLE` at `f008315d1`,
+    #1858 `OPEN/CLEAN`, main `1e53e731a`.

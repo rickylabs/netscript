@@ -192,6 +192,42 @@ Also required in the same pass:
 - **#1747**: the one remaining DoD box — hosted `scaffold.runtime` evidence. Its `database.seed`
   passes; its only failure was `runtime.wait.garnet`, i.e. #1858.
 
+## 4a. Process-lifetime constraint on the lease — measured, and it changes how the pass is run
+
+**Neither harness execution mode can host a long-running gate.** Foreground Bash caps at 10 minutes.
+Background tasks are killed at **unpredictable** times — the same 480 s watcher script exited cleanly
+on one run and was killed at **~6.5 minutes** on the next — arriving as `status: killed` with an
+**empty** output file and no error.
+
+**A `setsid`-detached process is unaffected.** A detached probe (`ppid=1`, own session id) **survived
+the very kill event that took down a concurrently running background task**, and kept running past
+it. That is the mechanism the lease must use.
+
+**Recipe for the single serialized pass:**
+
+1. **A5 stays on hosted CI.** `scaffold.runtime` on both tiers is a CI receipt, not a local one — it
+   is far longer than any local execution window and hosted CI is already its authority.
+2. **Start the AppHost detached**, never inside a reapable tree:
+   ```
+   setsid nohup bash -c '<aspire start …>' >/dev/null 2>&1 </dev/null & disown
+   ```
+   Confirm `ppid=1` and a distinct session id via `/proc/<pid>/stat` before probing.
+3. **Run A1, A2 and A4 as separate short foreground calls** against the already-running AppHost —
+   `aspire resource <db>-cli --help`, `migrate --timeout 60` plus the `reset` refusal, and
+   `netscript db init` against Unhealthy-but-Running Postgres. Each is short; none needs to hold the
+   AppHost open itself.
+4. **Stop the AppHost explicitly.** A detached process is *not* cleaned up for you — a forgotten one
+   is exactly the leak this run has been fighting.
+5. **Tee every step to a log file.** The harness's own output is empty on a kill, so the log is the
+   only evidence that survives one.
+
+**If step 2 were skipped** and the AppHost ran inside a background task, an unpredictable kill would
+terminate it mid-lease and strand its containers — the #1855 leak class, during the one pass that is
+supposed to prove cleanliness.
+
+Scripts under the scratchpad must be invoked as `bash <path>`: it is mounted **`noexec`**, so
+`chmod +x` does nothing and a direct exec fails with `Permission denied`.
+
 ## 5. Lease release — proof shape
 
 1. `aspire ps --format Json` → `[]`
