@@ -196,8 +196,21 @@ revise the plan.
 
 ## PLAN-EVAL Disposition
 
-Pending supervisor disposition. This generator has not evaluated or certified its own plan, has not
-started implementation, and has not opened a PR.
+`N/A`, ruled by the supervisor on 2026-09-01. The design is closed against measured evidence: a full
+Redis client was tested and rejected because its `HELLO`/connect-time command surface creates
+additional liveness-probe failure modes; the deterministic minimal RESP contract, nine existing-path
+ceiling, and behavioral acceptance are fully specified. This is an owner ruling, not generator
+self-certification. Separate-session IMPL-EVAL remains mandatory and supervisor-dispatched.
+
+## Implementation Resume
+
+- Fetched `origin/main` at `28c4db2b07ba72c16e82503f4df9bc03ff2cbc58`; supervisor baseline
+  `60ae56af0` is an ancestor.
+- Merged cleanly at branch head `abd97ddad159f8b4f039bbba21df393da8865ff3`; no handwritten or
+  generated-carrier conflict occurred.
+- PR #1773 ownership block is lifted by supervisor directive.
+- Expanded code ceiling: the original six probe/gate paths plus the three existing Garnet
+  generator/test paths; no new files and no tenth code/test path.
 
 ## Handoff Notes
 
