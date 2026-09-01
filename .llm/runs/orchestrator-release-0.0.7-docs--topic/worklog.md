@@ -3421,3 +3421,101 @@ place. **Always verify a `gh pr edit` result by re-reading the live object.**
 independent verification. Every claim was subsequently confirmed by Tier-A and IMPL-EVAL, so they
 stand, but the ordering inverts the "tick only once evidenced" rule. Future briefs should state that
 DoD boxes are supervisor-owned.
+
+## 2026-09-01 — Recovery reconciliation: #1869 merged, #1777 closed, #1756 converged
+
+Resumed under a recovery mandate with git and live GitHub as authority. Old Claude job state was
+treated as historical.
+
+### #1869 — verified independently, then merged by the coordinator mid-verification
+
+Reconciled against live GitHub at head `240d67284`. Everything the lane had recorded held up under
+first-hand re-measurement rather than re-reading prior claims:
+
+| Check | Independent result |
+| --- | --- |
+| Head / topology | `240d67284`, non-draft, `MERGEABLE`/`CLEAN`, 0 behind `main` `d2b33a09b`, 6 commits ahead |
+| CI at the **exact** head | every check-run reports `head_sha=240d67284`; `check-test`, `quality`, `build`, `code-quality`, `classify`, `close-gate`, lane visibility all `success` |
+| `close-gate` job log | `close-gate PASS`, `closing issues: #1857 source: body keyword`, mirror `APPLIED: no changes` (correct — #1857 carries no checkboxes) |
+| Review threads | `review-threads PASS threads=0 unanswered=0` |
+| Mapping delta | re-derived by name from both revisions: 32 → 35, **lost=∅**, added exactly `plugin-triggers`/`plugin-workers`/`plugin-auth` |
+| Exclusion | one typed `EXCLUDED_REFERENCE_PAGES` entry naming the five packages the `auth` hub indexes |
+| Gate at head | `deno task docs:exports-drift` exit **0** in a clean detached worktree |
+| Focused test | `check-exports-drift_test.ts` 14 passed / 0 failed |
+| Denominator | 36 physical `reference/*/index.md` on disk = 35 mapped + 1 excluded |
+| Hygiene | base-relative `diff --check` 0; `deno.lock` unchanged; provenance `1b65f34f7` in-ancestor |
+| Scope | zero non-generated `packages/`/`plugins/` changes |
+
+**Three stale `FAIL_RESCOPE` comments were sitting on the PR and would have read as an open
+blocker.** An OpenHands IMPL-EVAL had been dispatched at 07:10Z pinned to `f7ec4a750` — the branch
+head *before* the worker rebased and implemented. `f7ec4a750` is **not an ancestor** of `240d67284`
+(the rebase replayed the brief as `cc58b29ec`), so its finding "the checker file is byte-identical
+to base (32 rows)" described a pre-implementation head and said nothing about the merge candidate.
+Posted an explicit supersession note rather than leaving a reader to infer it.
+
+**One claim in that superseded report is falsifiable and was falsified.** It stated the gate was
+"red identically at base and head (569 pre-existing telemetry symbol-drift errors)". Ran
+`docs:exports-drift` in clean detached worktrees at both `d2b33a09b` and `240d67284`: **exit 0,
+PASS, both**. `telemetry` declares `omitted-symbol-groups=1` and the checker accepts that declared
+omission. There was no red base to inherit. Recorded on the PR as a correction.
+
+**Merged by the coordinator as `1b7effaf9` at 12:01:33Z**, while verification was still running.
+Verified the merge rather than assuming it: it is a **squash** (single parent `d2b33a09b`), which is
+why the evaluated head is not an ancestor of `main` — and `git diff 240d67284 1b7effaf9` is
+**empty**, so the merged content is byte-identical to the evaluated head. `main` now carries 35
+mapping rows with all three adopted and zero lost. #1857 auto-closed by the body keyword.
+
+### #1777 closed — umbrella acceptance verified on live main, not inferred from slice count
+
+Re-measured all three clauses on `main` `1e53e731a` (after #1861 also landed): coverage
+`PASS (36/36; mapped=35; excluded=1)`, gate exit 0, and clause 3 machine-enforced (the checker
+refuses empty/malformed reasons and unknown modes; 14/14 tests). #1861 touched workers and did
+**not** break the newly gated `plugin-workers` page — worth checking, since adoption means feature
+merges can now break a docs gate.
+
+Closed as completed, `status:impl` → `status:shipped`. Left the acceptance boxes unticked and said
+why on the issue: the mirror only fires from a PR carrying a closing keyword, an umbrella never
+carries one, so ticking by hand would fake that provenance. The evidence table is the record.
+
+### #1756 — converged 32 commits forward; the gate is now red, correctly
+
+Boundary re-verified, not assumed: `gh auth status` still reports scopes `'repo'` only. The salvage
+was **32 commits behind** `main`.
+
+Converged onto `1e53e731a` as `salvage/1756-current-base`, tagged
+`salvage/1756-converged-1e53e731a` (the original `salvage/1756-green-complete` `01203d5d8` left
+intact). The split is clean at commit granularity — `4ab2f43fd` is 49 implementation files and is
+pushable on `repo` scope; only `e9c37d768` (the 8-line `ci.yml` step) needs `workflow`.
+
+Two convergence traps avoided, both instances of the class this run keeps hitting:
+- the only conflict was `export-surface-corpus.generated.ts`, a gzip blob — resolved by taking
+  `main`'s copy verbatim (SHA-256 asserted equal), **not** by carrying the salvage's stale corpus
+  delta, which belongs to #1668/#1859;
+- `ci.yml` applied as a diff: **+8/−0**, step-name set-difference **zero lost**, Aspire parity step
+  confirmed present by name.
+
+**New finding — the gate fails on current `main`, and it is right to.** 17 passed / 1 failed; the
+failure is the *ratchet*, not a compile failure (`failures=0`). Dumped the deferred set at both
+revisions and took the set-difference: **four added, zero removed**, census `116/20` → `118/22`
+against ceilings of exactly `116`/`20`:
+
+| Class | Symbol | Introduced by |
+| --- | --- | --- |
+| `typeError` | `ServiceHandlerContext` | `6c195acaf` (#1762) |
+| `typeError` | `defineSdkClientContribution` | `8f1fcb2bc` (#1841) |
+| `unboundName` | `publishSagaOrThrow` | `052f86595` (#1819) |
+| `unboundName` | `createContractAuthorizer` | `6c195acaf` (#1762) |
+
+Four non-compiling published JSDoc examples leaked onto `main` in 32 commits from three feature
+merges in other lanes — direct evidence for #1533's premise, measured rather than argued.
+
+**Decision deliberately not taken.** `jsdoc-example-policy.ts:20` labels these *"coordinator-owned
+deferred-class ceilings"*. Repairing the four edits framework source (a Codex slice); raising the
+ceilings weakens a gate at the moment of its introduction. Both are defensible and neither is a
+routine supervisor call, so it is surfaced on the PR with the four entries named. It also recurs:
+re-measure at whatever base the eventual owner push targets.
+
+### Lane state
+
+Docs queue is empty except #1756/#1533, which are parked on an owner credential and one coordinator
+decision. No docs leaf is awaiting evaluation or convergence.
