@@ -1,6 +1,6 @@
 {
   "gateId": "test",
-  "invocationId": "1452-c5-test",
+  "invocationId": "1842-r-test",
   "argv": [
     "deno",
     "task",
@@ -8,24 +8,24 @@
     "packages/plugin/src/sdk"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1452-s2",
-  "gitHead": "0dac1b759cbadef3981df28858b6bf9ae455f4d1",
-  "actualGitHead": "0dac1b759cbadef3981df28858b6bf9ae455f4d1",
+  "gitHead": "10eee3c1e20f626bd8d0d986f1fd51c63e2564b7",
+  "actualGitHead": "10eee3c1e20f626bd8d0d986f1fd51c63e2564b7",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:2906907",
+  "runnerIdentity": "worker:3384223",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "9332a3ab3144683ca17fc6f63802a554b5c5711fe57c36e6e5be26568e6ae37c",
-  "lifecycleId": "worker:2906907:1452-c5-test:1",
+  "requestHash": "6ea8a74a3306ee7a19ee0a36d08e334388a1dd7de56e90198cab27d35d23a1f4",
+  "lifecycleId": "worker:3384223:1842-r-test:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T18:48:08.671Z",
-  "startedAt": "2026-08-31T18:48:08.673Z",
-  "finishedAt": "2026-08-31T18:48:09.788Z",
-  "durationMs": 1115,
+  "claimedAt": "2026-09-01T05:40:24.891Z",
+  "startedAt": "2026-09-01T05:40:24.893Z",
+  "finishedAt": "2026-09-01T05:40:25.225Z",
+  "durationMs": 333,
   "exitCode": 0,
   "stdout": {
     "bytes": 295,
-    "sha256": "debbc93a50e724479f86de0cfb829032bdbf4412b7146dc871d075949ea5e25b",
-    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin/src/sdk\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\",\"exitCode\":0,\"durationMs\":982,\"summary\":{\"passed\":2,\"failed\":0,\"ignored\":0,\"totalResults\":2,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "sha256": "95c7795067dc988546c28d3add5536d633d50774c7af6b5f54f98bd5d63ac9b1",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/plugin/src/sdk\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\",\"exitCode\":0,\"durationMs\":198,\"summary\":{\"passed\":2,\"failed\":0,\"ignored\":0,\"totalResults\":2,\"uniqueFailures\":0},\"failures\":[]}\n",
     "truncated": false
   },
   "stderr": {

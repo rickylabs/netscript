@@ -1,6 +1,6 @@
 {
   "gateId": "check",
-  "invocationId": "1452-c5-check",
+  "invocationId": "1842-r-check",
   "argv": [
     "deno",
     "task",
@@ -9,24 +9,24 @@
     "^packages/(plugin|cli)/"
   ],
   "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1452-s2",
-  "gitHead": "0dac1b759cbadef3981df28858b6bf9ae455f4d1",
-  "actualGitHead": "0dac1b759cbadef3981df28858b6bf9ae455f4d1",
+  "gitHead": "10eee3c1e20f626bd8d0d986f1fd51c63e2564b7",
+  "actualGitHead": "10eee3c1e20f626bd8d0d986f1fd51c63e2564b7",
   "timeoutMs": 1800000,
-  "runnerIdentity": "worker:2903123",
+  "runnerIdentity": "worker:3379489",
   "attempt": 1,
   "schemaVersion": 1,
-  "requestHash": "959efa86b7f948d3bb576e5fca647d2770b6ed1a736421807017ac1cdce71752",
-  "lifecycleId": "worker:2903123:1452-c5-check:1",
+  "requestHash": "1ef229b6b44d53dd450f0d01fb15293f61639551c024a67eed1cf067a89d0714",
+  "lifecycleId": "worker:3379489:1842-r-check:1",
   "outcome": "PASS",
-  "claimedAt": "2026-08-31T18:47:28.282Z",
-  "startedAt": "2026-08-31T18:47:28.283Z",
-  "finishedAt": "2026-08-31T18:48:07.418Z",
-  "durationMs": 39135,
+  "claimedAt": "2026-09-01T05:39:46.250Z",
+  "startedAt": "2026-09-01T05:39:46.252Z",
+  "finishedAt": "2026-09-01T05:40:23.487Z",
+  "durationMs": 37235,
   "exitCode": 0,
   "stdout": {
     "bytes": 307,
-    "sha256": "35dfcd5d220377b32e3ab8d6b4bd28644a82f4734bfcbe2d04097c8a782c00f3",
-    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1058,\"batches\":9,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "sha256": "2ee11285f14cd16fa5f8945374b98d9cc3da17e9accf5a4976d6ea70847d7209",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1452-s2\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1061,\"batches\":9,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
     "truncated": false
   },
   "stderr": {
