@@ -7,15 +7,15 @@ live issue/PR bodies.
 
 ## The matrix
 
-| Slice | PR | Issue | Restack (`--onto` ← base) | Own | Conflicts | Threads | CI failures | PR DoD ✗ | Issue boxes ✗ | Still gated on |
-| ----- | -- | ----- | ------------------------- | --: | --------- | ------: | ----------- | -------: | ------------: | -------------- |
-| S8 | #1754 | #1720 | `origin/main` (top-up, behind 3) | 26 | **0** | 0 | close-gate, runtime ×2 | 2 | 6 (A3+A6 statically satisfied) | lease |
-| S9 | #1759 | #1721 | `<S8-final>` ← `d1c6d8b54` | 14 | 1 generated | 0 | close-gate, **check-test** | 3 | 6 | S8, **TS2322**, lease |
-| S10 | #1760 | #1722 | `<S8-final>` ← `d1c6d8b54` | 13 | 2 (D-101, pre-ruled) | 0 | close-gate, runtime ×2 | 2 | 3 | S8, lease |
-| S11 | #1771 | #1723 | `<S10-final>` ← `c9e3fcbe8` | 13 | **0** | 0 | **none** | **0** | 4 (1 verified satisfied) | **S10 only** |
-| S13 | #1779 | #1724 | `<S10-final>` ← `c9e3fcbe8` | 9 | 1 generated | 0 | **none** | 1 | 5 (2 blocked on S9) | S10, S9 |
-| S7 | #1744 | #1719 | `origin/main` (independent) | 17 | 1 (#1840, pre-ruled) | 0 | close-gate, runtime | **0** | 3 (1 verified satisfied) | lease |
-| — | #1747 | #1732 | `origin/main` (independent) | 15 | **0** | 0 | close-gate, runtime | 1 | **0 — all 5 checked** | **#1858 only** |
+| Slice | PR | Closes | Restack (`--onto` ← base) | Own | Conflicts | Threads | CI failures | PR DoD ✗ | **Close-gate blocking ✗** | Still gated on |
+| ----- | -- | ------ | ------------------------- | --: | --------- | ------: | ----------- | -------: | ------------------------: | -------------- |
+| S8 | #1754 | #1720 | `origin/main` (top-up) | 26 | **0** | 0 | close-gate, runtime ×2 | 2 | **6** (A3+A6 statically satisfied) | lease |
+| S9 | #1759 | #1721 | `<S8-final>` ← `d1c6d8b54` | 14 | 1 generated | 0 | close-gate, **check-test** | 3 | **6** | S8, **TS2322**, lease |
+| S10 | #1760 | #1722 | `<S8-final>` ← `d1c6d8b54` | 13 | 2 (D-101, pre-ruled) | 0 | close-gate, runtime ×2 | 2 | **3** | S8, lease |
+| S11 | #1771 | **#1642 + #1723** | `<S10-final>` ← `c9e3fcbe8` | 13 | **0** | 0 | **none** | **0** | **8** (#1642×4, #1723×4 — 1 verified satisfied) | **S10 only** |
+| S13 | #1779 | #1724 | `<S10-final>` ← `c9e3fcbe8` | 9 | 1 generated | 0 | **none** | 1 | **5** (2 blocked on S9) | S10, S9 |
+| S7 | #1744 | **#1429 + #1719** | `origin/main` (independent) | 17 | 1 (#1840, pre-ruled) | 0 | close-gate, runtime | **0** | **3** (all #1719; #1429 already clean) | lease |
+| — | #1747 | #1732 | `origin/main` (independent) | 15 | **0** | 0 | close-gate, runtime | 1 | **0 issue boxes — 1 PR DoD box** | **#1858 only** |
 
 Merge order follows the restack DAG: **S8 → {S9, S10} → {S11, S13}**, with **S7** and **#1747**
 independent and mergeable out of band.
@@ -74,3 +74,39 @@ Four for #1720 (**A1**, **A2**, **A4**, **A5**), plus:
 Release with the §5 proof shape: `aspire ps` `[]`, `docker ps -aq` 0, the known foreign volume
 **unchanged**, default networks only, and the `agentic:leak-check` output pasted. **Never remove a
 foreign or unknown-owner resource** (#1855).
+
+## Close-gate — measured, not inferred
+
+`check-close-gate.ts` run live against each PR on 2026-09-01. **Counts include every issue the PR
+closes**, which is why two rows are larger than the backing issue alone suggests:
+
+| PR | Closing issues | Blocking boxes | Where |
+| -- | -------------- | -------------: | ----- |
+| #1744 | #1429, #1719 | 3 | all on **#1719**; #1429 is already clean |
+| #1747 | #1732 | **0 issue boxes** | one **PR-body** DoD box: hosted `scaffold.runtime` evidence |
+| #1754 | #1720 | 6 | A1–A6 |
+| #1759 | #1721 | 6 | — |
+| #1760 | #1722 | 3 | — |
+| #1771 | **#1642, #1723** | **8** | **#1642 ×4** + #1723 ×4 |
+| #1779 | #1724 | 5 | — |
+
+**#1771 closes #1642 as well as #1723**, and #1642 carries four unchecked acceptance boxes of its
+own (non-TTY/detached `aspire start` live-state documentation, dashboard-token discovery for headless
+automation, reuse of `aspire ps --format Json` as the canonical inventory surface, and proving both
+paths from the published documentation surface). An earlier reading of this matrix counted only
+#1723's four and understated S11's close-gate by half. They are documentation boxes on a
+documentation PR, so they are plausibly satisfied by content already in the branch — but they need
+evidence and a mirror pass, and they are **not** covered by S11's own DoD being complete.
+
+**#1747 is confirmed as the lane's nearest leaf**: zero unchecked issue boxes across #1732, and a
+single PR-body DoD box — *"Hosted runtime / `scaffold.runtime` evidence is attached for this head"* —
+whose only prior failure was `runtime.wait.garnet`, i.e. **#1858**.
+
+**Acceptance-mirror dry-run is structurally clean for all seven** — `ok: true`, `changed: 0`,
+`errors: 0` on every PR, so no box reference is malformed and nothing would mis-map when the mirror
+runs for real.
+
+**#1719's third box (`Will close (via its PR) #1429`) is satisfied in substance but still unticked**
+— #1744's body carries `Closes #1429`. Per the close-gate's own remediation text this is a
+mirror-flow step (attach structured evidence → `status:ready-merge` → rerun the existing workflow so
+its live reads observe the label **without moving the evaluated head**), not outstanding work.

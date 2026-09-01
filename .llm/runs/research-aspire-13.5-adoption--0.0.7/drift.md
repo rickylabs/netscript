@@ -6600,3 +6600,54 @@
   - Watcher armed on **#1865** and **#1858** merge state; the moment both report `MERGED` their exact
     merge SHAs are consumed into the manifest's `__SHA_1865__` / `__SHA_1858__` slots. Neither PR was
     touched — both are Fixes-owned.
+
+- **D-263 — close-gate and acceptance-mirror measured live; my own matrix corrected (S11 was
+  understated by half); S11's `doc:lint` exit-1 proven to be main-wide, not S11's.**
+  - **Base advance absorbed, no measurement changed.** Main moved `d2b33a09b` → `1e53e731a`
+    (#1869 docs adoption, #1861 workers job policy). Overlap against each slice's **own** changed-file
+    set: **0** for S8, S9, S10, S11, S7 and #1747; **1** for S13 —
+    `packages/mcp/src/publish-assets.generated.ts`, which is already S13's single known
+    generated-carrier conflict. So the upstream side moved but the conflict class did not, no
+    completed evaluation restarts, and the re-fetch-at-dispatch rule absorbs it without editing a
+    brief.
+  - **Acceptance-mirror dry-run is structurally clean across all seven PRs** — `ok: true`,
+    `changed: 0`, `errors: 0`. No box reference is malformed; nothing would mis-map when the mirror
+    runs for real. That is the §6 prerequisite satisfied lane-wide.
+  - **I got S11's close-gate count wrong in `merge-packet-matrix.md` and corrected it.** I had
+    recorded 4 unchecked boxes from #1723. **#1771 closes #1642 as well**, and #1642 carries **four
+    more** unchecked acceptance boxes — non-TTY/detached `aspire start` live-state documentation,
+    dashboard-token discovery for headless automation, reuse of `aspire ps --format Json` as the
+    canonical inventory surface, and proving both paths from the published documentation surface. The
+    real blocking set is **8**, not 4. The mistake was counting the *backing* issue instead of every
+    *closing* issue; `check-close-gate.ts` counts closing references, which is the gate that actually
+    runs. #1744 has the same shape (closes #1429 **and** #1719) and I had likewise counted one.
+    Matrix rewritten with a measured close-gate table.
+  - **#1747 confirmed as the lane's nearest leaf, now precisely.** Close-gate reports **zero**
+    unchecked issue boxes across #1732 and exactly **one PR-body DoD box** — *"Hosted runtime /
+    `scaffold.runtime` evidence is attached for this head"* — whose only prior failure was
+    `runtime.wait.garnet`, i.e. **#1858**. Nothing else stands between it and merge readiness.
+  - **#1719's third box is satisfied in substance but unticked**: #1744's body carries
+    `Closes #1429` (line 11) and its DoD line 54 records the close-gate verification, yet the box
+    still reads unchecked. The close-gate's own remediation text names the mechanism — attach
+    structured evidence, apply `status:ready-merge`, then **rerun the existing workflow** so its live
+    reads observe the label **without moving the evaluated head**. So this is mirror flow, not
+    outstanding work, and it must not be hand-ticked ([[netscript-acceptance-mirror-not-manual]]).
+  - **S11's `doc:lint` exit 1 is not S11's, and would have read as a failed acceptance box.** At
+    `abe0fd6cc`, root-scoped `run-deno-doc-lint.ts` gives `packages/cli` exit **0** and
+    `packages/aspire` process exit **1** — but with `summary.totalErrors: 0` and
+    `combinedExitCode: 0`. The 1 comes from **per-entrypoint** analysis of five sub-paths
+    (`src/adapters` 2, `src/application` 9, `src/public` 52, `src/testing` 2, `types.ts` 19 —
+    all `privateTypeRef`).
+    - **Ran the identical command on current `origin/main`: byte-identical result.** Same exit 1,
+      same `totalErrors: 0` / `combinedExitCode: 0`, same five entrypoints, same 2/9/52/2/19 counts.
+    - And S11's own 24-file changeset touches **no `packages/aspire` source** — only
+      `packages/aspire/README.md` (prose), 14 `docs/site/**` pages, two `.llm/tools/docs/` files and
+      its run dir.
+    - So #1771's body claim "`packages/aspire` exit 0" is correct under the verdict the tool
+      summarizes, the pre-existing per-entrypoint surface is **main-wide debt**, and the box stands.
+      Posted on #1771 with the main baseline, because a reviewer re-running the command sees exit 1
+      and could reasonably fail the box. The box text already warns that a bare `deno task doc:lint`
+      exits 1 for an unrelated reason; this is a **second** exit-code trap on the same box, and it is
+      now written down.
+  - Nothing in this entry required a lease, a merge, a label change or an issue close, and none was
+    made. Watcher on #1865/#1858 still armed.
