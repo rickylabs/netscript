@@ -8204,3 +8204,38 @@ Head `5ac0275c7`, main merged once at `fe51d4a3a`. Ceiling check: `sender-owners
 `978cd23d0…` (was `74b0ba611…`) — **the authorized second exception** for the vocabulary replacement.
 The other four are **byte-identical** (`7be38302a…`, `d3ca0b51f…`, `7113e271d…`, `546b5f018…`).
 Author idle 26 min; assessment to follow.
+
+## D-189 — Reconciled #1862 against new main `b66e52cbc`; product work is unaffected
+
+**#1860 merged** as `b66e52cbc279b3c5f582c8036419964cf1c1e564` (docs: remove fabricated
+`/scaffolding` sub-path from triggers and workers references). Partial **#1857** remains open.
+
+### Checked path overlap rather than assuming it away
+
+#1860 touched 14 files, and one of them is **inside `packages/mcp`** —
+`packages/mcp/src/publish-assets.generated.ts` — plus `.llm/assets/agent-docs/prose.json.gz`. A
+same-package generated asset is exactly the kind of thing that *could* move the export-surface corpus,
+so "docs-only, no overlap" was not a safe read.
+
+**Verified empirically at the new main:**
+
+| Check at `b66e52cbc` | Result |
+| --- | --- |
+| `check:mcp-export-corpus` | **`REAL_EXIT=1`** — main is still red, so #1862 is still the fix |
+| regenerated corpus blob | **`19cdf3783807efbfd092cb857bbb85f296de86a3`** |
+| our committed blob | `19cdf3783807efbfd092cb857bbb85f296de86a3` — **identical** |
+
+So #1860 does **not** move the corpus. The already-valid product work is not restarted, per the
+directive — the committed artifact remains exactly what the generator produces at current main.
+
+That is now the **third** base at which this output has been independently reproduced (`233828f0f`,
+`3b6386e14`, `b66e52cbc`), which is stronger evidence of determinism than any single-base run.
+
+### Convergence deliberately sequenced after the evaluation
+
+The independent verification is running against `c3a9d8bff`. Merging main now would move the evaluated
+head and void it mid-flight — the same waste I have avoided all session. Order is: let the evaluation
+land, then take **one** integration merge onto then-current main, re-prove blob identity across it,
+push once, exact CI, packet.
+
+Evaluator is live at 7 minutes with an actively-writing transcript. Watcher armed.
