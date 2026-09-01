@@ -155,6 +155,10 @@ const desktopRpc = bindDesktopRpcWindow({
 await desktopRpc.close();
 ```
 
+Each call owns isolated per-window transport state and unbinds exactly once during cleanup. Pair it
+with `createDesktopServiceClient({ contract })` from `@netscript/sdk/desktop` in the webview; both
+sides reuse the same oRPC contract instead of a hand-maintained bindings declaration file.
+
 ### Ordered partial navigation
 
 Install the browser lifecycle explicitly from client code. Repeated installs in one document share
@@ -190,10 +194,6 @@ development servers do not surface transport aborts as overlays. Draining can br
 HTTP/1.1 development-server connection slot, bounded by the finite response body's time to EOF.
 Fresh normalizes colons to underscores when serializing a VNode key into its marker; the wrapper
 uses the unmodified region name as the native Preact key and does not rewrite server HTML markers.
-
-Each call owns isolated per-window transport state and unbinds exactly once during cleanup. Pair it
-with `createDesktopServiceClient({ contract })` from `@netscript/sdk/desktop` in the webview; both
-sides reuse the same oRPC contract instead of a hand-maintained bindings declaration file.
 
 ## Subpaths at a glance
 

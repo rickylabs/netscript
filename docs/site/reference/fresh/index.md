@@ -291,7 +291,7 @@ Applications do not patch `fetch`, `history`, or server HTML markers.
 | Symbol                         | Description                                                                     |
 | ------------------------------ | -------------------------------------------------------------------------------- |
 | `PartialNavigationCoordinator` | Coordinator handle: applies route changes and disposes, awaiting in-flight EOF.  |
-| `RouteChange`                  | A single navigation intent carrying its page generation.                         |
+| `RouteChange`                  | An accepted history mutation: `kind` (push/replace/pop), `url`, and `state`.      |
 | `KeyedPartialProps`            | Props for `KeyedPartial`: partial `name` and `mode`.                             |
 | `ComponentChild`               | Structural child type, avoiding a hard Preact type dependency.                   |
 | `ComponentChildren`            | One or many `ComponentChild` values.                                             |
