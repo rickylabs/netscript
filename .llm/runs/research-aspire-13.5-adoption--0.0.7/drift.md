@@ -6439,3 +6439,29 @@
   - **Practice confirmed for future leaves**: apply `orchestrator:aspire` **at PR open**, not at
     finalization, so orchestrator-keyed audits see the leaf while it is still active. This lane has
     been doing that; the record now says so explicitly.
+
+- **D-260 — #1866 reconciled (main `8e01a347a`); restack sequence + Phase-B manifest committed as a
+  durable artifact.**
+  - **#1866 overlap measured per head, not assumed:** 16 files, only **2** under `packages/`. Overlap
+    is **0** for S8, S9, S10, S11, S7 and #1747; **1** for **S13** —
+    `packages/mcp/src/publish-assets.generated.ts`.
+    That single hit is a **generated carrier**, not authored product: it takes upstream and is
+    regenerated once, per the standing rule. So **no completed evaluation restarts**, which is exactly
+    the distinction the instruction draws.
+  - **Manifest committed** at `.llm/runs/research-aspire-13.5-adoption--0.0.7/phase-b-execution-manifest.md`
+    so the sequence survives this session rather than living in my head.
+  - **Every `--onto` base in it is verified, and one differs from the old cascade map**: S9 and S10
+    branch at `d1c6d8b54`, but **S11 branches at `c9e3fcbe8`** — using the S9/S10 base for S11 would
+    silently duplicate commits. S13, S7 and #1747 are independent and rebase onto main directly.
+  - **Phase B is scoped to exactly four receipts.** #1720's A3 and A6 are **already satisfied
+    statically** at S8's head, so the single serialized lease must produce only **A1, A2, A4, A5** —
+    plus #1747's one hosted-runtime DoD box, and S7's #1719 A1/A2 only if `bd3dbc843` moves. That is
+    the smallest possible ask of a scarce lease, and it is written down rather than rediscovered under
+    time pressure.
+  - **The lease-release proof shape is recorded as "foreign set unchanged", not "zero"** — with the
+    #1855 warning inline that the exact-AppHost cleanup destroyed a foreign network on 2026-09-01
+    while the suite's own cleanup gate reported PASS. Until #1855 lands, the foreign set is verified
+    by hand.
+  - Also carried into the manifest so they cannot be lost: the **blob-identity carry rule** including
+    **absent-on-both counts as identical**, the **abort-on-non-generated-conflict** rule, and
+    **never infer evaluation from a `status:` label**.
