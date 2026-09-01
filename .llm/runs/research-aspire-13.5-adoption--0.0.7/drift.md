@@ -6169,3 +6169,35 @@
     condition is **not met**, so I am holding and watching rather than seizing the worktree.
   - Main is now **`3b6386e14`**; S8 will need a top-up rebase at final convergence regardless, and
     #1858's later SHA after that. Neither blocks this static commit.
+
+- **D-251 — S8 CONVERGED (`behind-main=0`); A6 verified satisfied; #1863 recorded as a shared
+  current-main defect, not S8's.**
+  - **The worker was not stalled, as D-250 said.** It completed: head `467d0d1fd` → **`c821a1897`**
+    (`fix(cli): reconcile S8 with source-safe emission`), **`behind-main=0`**, **26** own commits,
+    worktree **clean**. Thread still live finishing its report; remote not yet updated at the time of
+    check. Holding rather than seizing was the right call.
+  - **A6 grep proof, verified independently at `c821a1897`:**
+    - `PROCESS_COMMANDS_FLAG` in `packages/cli/src` → **0 files**. The seam is gone.
+    - `Aspire 13.4` in `packages/cli/src` → **1 file**, and I checked what it is rather than reporting
+      a bare count:
+      `render-ts-apphost.ts:81  // 3. tsconfig.apphost.json — Aspire 13.4 validates TypeScript
+      AppHosts before startup.`
+      That is a **different** comment — it concerns tsconfig AppHost validation, not the
+      `PROCESS_COMMANDS_FLAG` seam. **A6 says "the seam and *its* 'Aspire 13.4' comment"**, so A6 is
+      **satisfied**; a bare grep count would have wrongly read as a miss.
+    - **But it is still a stale version-bound claim** (says 13.4 on a 13.5.3 branch) and belongs to
+      **S13 (#1724, stale version-bound surface cleanup + parity)**, not to S8. Recorded for S13 rather
+      than widened into S8's scope.
+  - **#1863 recorded — and it is the third instance of the same class.** Current-main's flow-B fixture
+    still searches for the **pre-#1837 named marker** while the generator now emits **source-safe
+    ordinal markers**. p0 with Fixes, landing before the next full runtime, explicitly **not charged to
+    S8**.
+    - This is exactly the defect #1837 fixed twice — `service-environment_test.ts`, then
+      `prepare-readiness-fixture.ts`. After the second I noted that a bounded sweep for remaining
+      consumers reconstructing generator output from a resource name would be worth doing rather than
+      discovering a third at a merge gate. **This is that third one**, found at a merge gate.
+      Worth carrying forward: when an emission contract hardens, sweep the consumers deliberately.
+  - **Phase B must include both #1858's and #1863's merge SHAs**, on top of current main; S8 takes a
+    top-up rebase at final convergence regardless.
+  - `#1858`'s repaired full run **proved generated-quality green**, which independently confirms the
+    D-227/D-229 emitted-helper compile repair on the shared baseline.
