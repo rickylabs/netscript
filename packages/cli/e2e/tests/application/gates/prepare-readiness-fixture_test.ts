@@ -27,6 +27,7 @@ Deno.test('listener fault splice accepts the E2E two-cache Auto generator output
   assertEquals(healthAttachmentCount(source, 'garnet_resp'), 2);
   const injected = injectListenerFaultHealthChecks(source, DATABASE.SQLITE);
   assertEquals(healthAttachmentCount(injected, TEST_ONLY_GARNET_HEALTH_KEY), 2);
+  assertAutoBranchInjectionPlacement(injected);
 });
 
 Deno.test('listener fault splice attaches test-only checks at generator-derived markers', () => {
@@ -92,12 +93,12 @@ Deno.test('listener fault splice fails closed on missing markers and double regi
   assertThrows(
     () => injectListenerFaultHealthChecks(withoutHealthAttachment(source, 'garnet_resp')),
     Error,
-    'generated register-infrastructure helper has no garnet health-check marker',
+    'generated register-infrastructure helper has no garnet health-check attachment',
   );
   assertThrows(
     () => injectListenerFaultHealthChecks(withoutHealthAttachment(source, 'postgres_listener')),
     Error,
-    'generated register-infrastructure helper has no postgres health-check marker',
+    'generated register-infrastructure helper has no postgres health-check attachment',
   );
 
   const injected = injectListenerFaultHealthChecks(source);
@@ -173,4 +174,35 @@ function healthAttachmentCount(source: string, key: string): number {
   return source.split('\n').filter((line) =>
     line.includes('.withHealthCheck(') && line.includes(key)
   ).length;
+}
+
+function assertAutoBranchInjectionPlacement(source: string): void {
+  const lines = source.split('\n');
+  const realAttachmentLines = lines.flatMap((line, index) =>
+    line.includes('.withHealthCheck("garnet_resp")') ? [index] : []
+  );
+  assertEquals(realAttachmentLines.length, 2);
+
+  for (const realAttachmentLine of realAttachmentLines) {
+    assertStringIncludes(
+      lines[realAttachmentLine + 1],
+      `builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}'`,
+    );
+    assertStringIncludes(
+      lines[realAttachmentLine + 2],
+      `await cache_1.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`,
+    );
+  }
+
+  const elseLine = lines.findIndex((line, index) =>
+    index > realAttachmentLines[0] && line.trim() === '} else {'
+  );
+  assertEquals(elseLine > realAttachmentLines[0], true);
+  assertEquals(realAttachmentLines[1] > elseLine, true);
+  assertEquals(
+    lines.slice(elseLine, realAttachmentLines[1] + 3).filter((line) =>
+      line.includes(`builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}'`)
+    ).length,
+    1,
+  );
 }
