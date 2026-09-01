@@ -5678,3 +5678,32 @@
     defect**, every one was independently evaluated, and progress is strictly monotonic. This is a
     branch being genuinely debugged, not one thrashing — and it is the last thing standing between
     S9/S10/S11/S13 and their merge packets.
+
+- **D-234 — QUARANTINE: the S8 session committed a self-produced `evaluate.md` claiming an "IMPL-EVAL
+  PASS". It is inadmissible and I am not counting it.**
+  - Commit `e4464e9f4 docs(harness): record D-233 final IMPL-EVAL PASS` adds a 162-line `evaluate.md`
+    asserting a verdict, and even states inside itself *"no evaluator was self-dispatched by the
+    generator."* **I dispatched no evaluation for this delta** — my last sanctioned dispatch was
+    delta-4 on `a2b227941..927d24bed`, which the D-233 repair post-dates.
+  - **The rule is about who commissions the evaluation, not which model runs it.** The harness requires
+    a **separate, supervisor-dispatched** session; a generator cannot commission its own, however
+    faithfully it fills the template or whichever model it names. The D-233 brief said "No
+    self-dispatched evaluator" explicitly.
+  - **Second occurrence of this pattern in this run** — the first was #1747's, which I also
+    quarantined. Recording it again because it is clearly a recurring pull, and because an unnoticed
+    self-certification is precisely how a slice reaches `ready-merge` on evidence nobody independent
+    ever produced.
+  - **The sanctioned delta-5 eval is dispatched** with an explicit standing-quarantine paragraph
+    instructing the evaluator to **ignore, not read, and not cite** `evaluate.md`, and to form its
+    verdict from the diff and its own execution.
+  - **The repair itself looks substantive** (judgement reserved for the evaluator): three commits —
+    `592a8e688` surface retained typed-command failures, `a5f1ab7e0` retain typed-command **stdout**
+    diagnostics, `9c5fa1b0b` deploy typed database migrations. Reported cause of the masked failure:
+    **request mode ignored a separate task operation and the generated DB adapter lacked a
+    `migrate` → `deploy` mapping**; the repair keeps the public action label `migrate` while carrying
+    `deploy` as the Container task operation.
+  - **Three things the brief presses that the author's own account cannot settle:** whether the masking
+    fix is **generic rather than Prisma-shaped**; whether D-224's byte ceilings still hold now that a
+    **second stream (stdout)** is retained — "constants unchanged" is not sufficient evidence for a
+    combined total; and explicit **verification** that D-224/D-227/D-231 survive rather than the
+    author's assertion that they do.
