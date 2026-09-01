@@ -3951,3 +3951,41 @@ Replayed the eleven commits onto `e938ecd31` in a throwaway tree — **zero conf
 identical `116`/`14`, zero tasks/gate-ids/ci.yml steps lost, assets-barrel / publish-assets /
 aspire-parity all PASS, focused 18/18, repo **4742 passed / 0 failed**. The PR head and its evaluated
 evidence were left untouched, which was the point.
+
+## 2026-09-01 — merge packet published; the duplicate-evidence trap
+
+Restored `status:ready-merge`, reran the close-gate job once, and published the immutable merge
+packet (`1756-merge-packet.md`).
+
+**The close-gate rerun found a real blocker I had created.** The mirror concatenates the PR body with
+**every comment**, and a stale `acceptance-evidence` block sat in comment `5469523773` from
+2026-08-30 (`box-index:` form, seven entries, head `4cdee82f`, `files=2021 examples=351`). Against my
+current body block that duplicated all six shared boxes:
+
+```
+error: box "…" has duplicate evidence; keep exactly one entry for that box.
+```
+
+That comment's own text warned about exactly this — *"the mirror concatenates the PR body with every
+comment… This is the only acceptance-evidence block on this PR; if it needs changing, replace it, do
+not add another"* — and I added another by putting one in the body. Neutralised the stale block in
+place (history preserved as an indented quote), leaving exactly one parseable block across body and
+comments.
+
+**The mirror is all-or-nothing.** With duplicates gone it now fails atomically on the single box I
+deliberately withhold — "The gate runs in CI on `packages/**` and `plugins/**` changes" — so nothing
+ticks while that box is unclaimed. That is correct behaviour, not a defect: the box is false at a head
+without the `ci.yml` step, and claiming it would mirror a false tick onto #1533. It also means
+close-gate cannot go green before the workflow commit lands, which is the same moment the box becomes
+true.
+
+So the packet is a **two-step completion**, not one: apply the patch, then append box 5's evidence to
+the existing block (never a second block) and rerun close-gate once. The exact YAML entry is in the
+packet, ready to paste.
+
+Both remaining reds — `check-test` at 4736/1 and `close-gate` — have the identical root cause and
+clear together.
+
+**Two mirror traps now recorded for the lane:** it is label-gated on `status:ready-merge` (so a PR
+mid-re-evaluation always reads red), and it is body+comments concatenated (so a second block anywhere
+duplicates every shared box). Both cost a cycle here.
