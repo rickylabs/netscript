@@ -62,6 +62,10 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-09-01 | bootstrap | research/design | Re-baselined at `82a2527e2`; confirmed five live omitted keys. |
+| 2026-09-01 | S1 | implementation | Emitted all five missing optional keys as `undefined`; added schema-derived subset assertion to the golden test. |
+| 2026-09-01 | S1 | focused gates | Check/test/lint/fmt wrappers green after replacing literal regex indentation that lint rejected. |
+| 2026-09-01 | S1 | fitness gates | `quality:gate` green; supplemental JSR audit remains red on pre-existing, non-surface-changing findings. |
+| 2026-09-01 | S1 | slice review | PASS from separate Claude Opus 5 low fallback session `9ab1eef0`; reviewer independently re-ran the focused test. |
 
 ## Decisions
 
@@ -75,6 +79,7 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | `rtk` is unavailable on this host despite repo guidance. | minor | yes |
+| Fable slice-review primary quota-blocked; Opus low fallback launched. | minor | yes |
 
 ## Gate Results
 
@@ -82,13 +87,19 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Focused test/check/lint/fmt | Structured wrappers | NOT_RUN | Run after implementation. |
+| Plugin check | `run-deno-check.ts --root plugins/workers --ext ts,tsx --pretty` | PASS | 102 selected; 1 batch; 0 failed; 0 occurrences. |
+| Parity test | `run-deno-test.ts -- --allow-all plugins/workers/tests/cli/registry-compiler-golden_test.ts` | PASS | 1 passed; 0 failed. |
+| Plugin lint | `run-deno-lint.ts --root plugins/workers --ext ts,tsx --pretty` | PASS | 102 selected/processed; 0 findings. |
+| Plugin format | `run-deno-fmt.ts --root plugins/workers --ext ts,tsx --pretty` | PASS | 102 selected/processed; 0 findings. |
+| Lock hygiene | `git diff --exit-code -- deno.lock` | PASS | No lockfile diff. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Quality/doctrine + JSR audit | NOT_RUN | Planned commands | Run after focused gates. |
+| Quality/doctrine | PASS | `deno task quality:gate`, exit 0 | Scanner found no violations; doctrine had no failures. |
+| JSR audit | BASELINE_FAIL | `audit-jsr-package.ts --root plugins/workers --text`, exit 1 | Pre-existing `doctor.ts` module tag, cardinality, and slow-type findings; no export or public-surface change in S1. Existing #1655 debt remains out of scope. |
+| Slice review | PASS | Claude Opus 5 low session `9ab1eef0` | Confirmed correctness, schema direction, future-key failure, thinness, and scope. Fable primary `bd792425` was quota-blocked before review. |
 
 ### Runtime Gates
 
@@ -100,9 +111,12 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Generated registry source | NOT_RUN | Focused golden/parity test | Test is the bounded consumer proof. |
+| Generated registry source | PASS | Focused golden/parity test | Reads all expected keys from `JobConfigSchema.shape`; fails with named missing keys. |
 
 ## Handoff Notes
 
 - Inspect the schema-key derivation first; it must contain no field-name list and no constraints.
 - Confirm the five live omissions are visible in both source and golden output.
+- Non-blocking reviewer notes: explicit `undefined` values would matter only if a future consumer
+  spreads generated definitions over stored definitions; no such merge exists. A separate future
+  required `JobDefinition`-only key is outside #1875's `JobConfig` parity contract.

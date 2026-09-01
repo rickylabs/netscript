@@ -12,23 +12,23 @@
 
 ## Current State
 
-Research and design are locked against `main` at `82a2527e2`. PLAN-EVAL is N/A for this complete,
-mechanical one-slice contract. Five live emitted-shape omissions were found.
+The single source/test repair is implemented. Five live emitted-shape omissions are fixed, focused
+wrappers and `quality:gate` pass, lock hygiene is clean, and opposite-family slice review passed.
 
 ## Completed
 
 - Harness activation, doctrine/archetype review, re-baseline, JSR surface scan, plan, and design.
+- Draft PR #1882 opened with the full requested labels and milestone 0.0.7.
+- S1 implementation and focused/quality validation.
 
 ## In Progress
 
-- Bootstrap commit and draft PR opening, then the single implementation slice.
+- S1 sign-off commit, push, and PR comment.
 
 ## Next Steps
 
-1. Open the draft PR with the required metadata.
-2. Repair the emitted object and add schema-derived parity coverage.
-3. Run focused wrappers, quality/doctrine, JSR audit, and lock-hygiene checks.
-4. Obtain opposite-family slice review and separate-session IMPL-EVAL.
+1. Create the S1 sign-off commit, push, and post the per-slice PR comment.
+2. Run separate-session IMPL-EVAL and update the PR body/status.
 
 ## Key Decisions
 
@@ -43,15 +43,17 @@ mechanical one-slice contract. Five live emitted-shape omissions were found.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-workers-registry-compiler-parity--1875/*` | new | Harness state and staged launcher identity. |
+| `plugins/workers/src/cli/registry-compiler.ts` | changed | Emits five previously missing optional config keys. |
+| `plugins/workers/tests/cli/registry-compiler-golden_test.ts` | changed | Golden output plus schema-derived directional parity assertion. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | Planned structured wrappers. |
-| Fitness | NOT_RUN | Planned quality/doctrine and JSR audit. |
+| Static | PASS | Check/lint/fmt: 102 files, zero findings; focused test: 1/1 pass. |
+| Fitness | PASS + baseline JSR findings | `quality:gate` exit 0; JSR audit exit 1 only on pre-existing public-surface findings. |
 | Runtime | N/A | Explicitly prohibited by owner. |
-| Consumer | NOT_RUN | Focused generated-source parity test. |
+| Consumer | PASS | Focused generated-source parity test. |
 
 ## Open Questions
 
@@ -59,7 +61,7 @@ mechanical one-slice contract. Five live emitted-shape omissions were found.
 
 ## Drift and Debt
 
-- Drift: `rtk` unavailable; raw non-interactive commands used.
+- Drift: `rtk` unavailable; Fable review primary quota-blocked and Opus low fallback used.
 - Debt: no new or deepened debt; existing workers Refactor and #1655 debts remain out of scope.
 
 ## Commits

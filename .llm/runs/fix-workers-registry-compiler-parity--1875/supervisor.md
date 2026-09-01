@@ -16,7 +16,12 @@
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `normal_implementation` | OpenAI / GPT-5.6 Sol / medium | Bounded source-and-test repair |
-| `review_codex` | Anthropic / Fable 5 / low | Opposite-family slice review |
+| `review_codex` | Anthropic / Fable 5 / low → Opus 5 / low fallback | Opposite-family slice review |
 | `formal_impl_evaluation` | Anthropic / Fable 5 / medium | Mandatory separate-session IMPL-EVAL |
 
-No lane overrides are recorded. The launcher-requested and observed implementation identities match.
+## Recorded lane/eval overrides
+
+- The Fable 5 low primary stopped before review at the weekly quota prompt. Session `bd792425` was
+  stopped without authorizing usage credits. The canonical `review_codex` token-limit fallback,
+  Opus 5 low, was launched as session `9ab1eef0`.
+- The launcher-requested and observed implementation identities match.
