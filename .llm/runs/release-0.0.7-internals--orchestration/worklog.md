@@ -8779,3 +8779,47 @@ not provide. No packet until it returns.
 | #1876 / #1543 | draft, delivered and verified; IMPL-EVAL running |
 | #1351 | plan slice; split ruling delivered |
 | #1879 | launched; lock-only family move |
+
+
+## D-200 - #1802 delta evaluator: transport failure recovered by same-session resume
+
+The exact-head delta evaluator (session `8e021db9-9325-4ec0-b6dc-1e6478baf2af`) ended with
+`API Error: stream closed before completion` after 43 turns, with **no artifact and no verdict**.
+
+**Classified as a no-verdict transport failure, not `FAIL_IMPL`** - and therefore **not counted**
+toward the two-terminal-failure budget. That distinction matters: a stream closing is not the
+evaluator reaching a conclusion, and treating it as one would burn a cycle and misrepresent the leaf.
+
+### Preserved first, then recovered
+
+Transcript and log copied to `/home/agent/observability/ns1802-delta-preserve/` (1.55 MB) **before**
+any recovery action, so the partial reasoning survives regardless of what the resume does.
+
+Read the partial findings rather than assuming it had achieved nothing. It had already:
+
+- verified the **fail-closed directions** of #1750's separator contract (exit 2 both ways);
+- correctly diagnosed that its success-path probe threw on **user identity, not parsing**, and was
+  mid-retry with `--user node` when the stream died.
+
+So it was one probe from completing the contract check, not adrift.
+
+### Same-session resume, because the route supports it
+
+Confirmed `.llm/tools/agentic/claude/openrouter-run.ts` accepts `--resume <session>` before choosing a
+strategy - no fresh 203k-token review, no fallback needed. Resumed the **same session** with a short
+prompt that:
+
+- states plainly the failure was transport and not its fault, so it does not restart defensively;
+- supplies the host fact it was missing (`--user node`; the suite defaults to a `codex` user that does
+  not exist here) - it had already inferred this, so the prompt confirms rather than redirects;
+- corrects the malformed non-leading-separator probe, with the exact command and expected `rc=2`, and
+  explains that placing `--` first tests the *accepted* case, so `rc=0` there is the contract working
+  rather than a violation;
+- enumerates only the **remaining** checks - success path, behaviour-preservation of the
+  `unsafe-cast` repair (with the absent-vs-present-with-`undefined` distinction named as highest-risk),
+  the four unchanged ceilings, scope, suites - then artifact, commit, verdict.
+
+Resume confirmed live with a writing transcript.
+
+#1802 otherwise stands: `check-test` **pass** at `0c938c3e6`, `close-gate` PASS on current provenance,
+sole `status:ready-merge`. **No packet until the verdict lands.**
