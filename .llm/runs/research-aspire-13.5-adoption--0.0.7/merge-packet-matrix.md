@@ -110,3 +110,36 @@ runs for real.
 — #1744's body carries `Closes #1429`. Per the close-gate's own remediation text this is a
 mirror-flow step (attach structured evidence → `status:ready-merge` → rerun the existing workflow so
 its live reads observe the label **without moving the evaluated head**), not outstanding work.
+
+## Delta-evaluation scope, pre-computed per slice
+
+Blob identity computed over each slice's **own** changed-file set, comparing its current head with
+the head its trial restack produced (§2 of the manifest). This is the scope an independent IMPL-EVAL
+must cover after the real restack — everything else carries by exact blob identity.
+
+Numbers are against each slice's **current** parent, so they must be recomputed against the final
+post-#1865/#1858 parents before a verdict is carried. The **shape** is what is being fixed here: the
+delta is small and known in advance, so evaluation can be commissioned rather than discovered.
+
+| Slice | Own files | Identical | Δ | Δ files | Product Δ after removing generated carriers |
+| ----- | --------: | --------: | -: | ------- | ------------------------------------------: |
+| S7 | 112 | 110 | **2** | `teardown.ts`, `leak-check.ts` | 2 |
+| S9 | 119 | 114 | **5** | `e2e/src/domain/cli-surface.ts`, `e2e/suites/scaffold/capability-suites.ts`, `e2e/tests/application/builders/runtime-gates_test.ts`, `e2e/tests/presentation/suite-registry_test.ts`, `embedded.generated.ts` | **4** |
+| S10 | 39 | 34 | **5** | `gates/scaffold/wait-for-workers-runtime.ts`, `e2e/src/domain/cli-surface.ts`, `e2e/suites/scaffold/capability-suites.ts`, `e2e/tests/application/builders/runtime-gates_test.ts`, `e2e/tests/presentation/suite-registry_test.ts` | 5 |
+| S11 | 24 | 24 | **0** | — | **0** |
+| S13 | 65 | 61 | **4** | `deno.json`, `packages/mcp/README.md`, `embedded.generated.ts`, `publish-assets.generated.ts` | **2** |
+| #1747 | 19 | 18 | **1** | `generators-background-app_test.ts` | 1 |
+
+**S11's restack changes nothing at all** — 24 of 24 own files come through blob-identical, so its
+existing IMPL-EVAL verdict carries **exactly** and no delta evaluation is warranted. Combined with
+zero conflicts, zero CI failures, zero threads and zero unchecked DoD boxes, S11's only remaining
+work is its eight close-gate boxes and S10 landing beneath it.
+
+**#1747's single Δ is worth noting** because the merge-tree probe reported `CLEAN-MERGE` and the
+replay produced no conflict: git auto-merged `generators-background-app_test.ts` against main without
+stopping, which still changes the blob. **A clean replay is not the same as an unchanged tree** —
+which is exactly why the carry rule is blob identity per file and not "did the rebase conflict".
+
+Generated carriers (`embedded.generated.ts`, `publish-assets.generated.ts`) are excluded from the
+product column: they need a regeneration check (`gen:assets-barrel` + `check:assets-barrel`), not a
+product verdict.

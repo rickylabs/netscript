@@ -6651,3 +6651,42 @@
       now written down.
   - Nothing in this entry required a lease, a merge, a label change or an issue close, and none was
     made. Watcher on #1865/#1858 still armed.
+
+- **D-264 — watcher killed and re-armed; delta-evaluation scope pre-computed for every slice; S11's
+  restack proven to change nothing at all.**
+  - **The background merge watcher was killed** (harness-side, not by me) with empty output. Verified
+    no watcher survived — and verified it **the correct way**: `pgrep -fc 'watch-fixes.sh'` reported
+    **2**, which is the self-matching artefact, not two live watchers. Resolving each pid through
+    `/proc/<pid>/cmdline` showed only the pgrep subshell, already gone
+    ([[process-identity-never-by-self-matching-pattern]]). Re-armed. Neither #1865 nor #1858 had
+    merged; main unchanged at `1e53e731a`.
+  - **Delta-eval scope now pre-computed for all six restacked slices**, by blob identity over each
+    slice's own changed-file set against the head its trial restack produced:
+
+    | Slice | own | identical | Δ | product Δ (carriers excluded) |
+    | --- | --: | --: | --: | --: |
+    | S7 | 112 | 110 | 2 | 2 |
+    | S9 | 119 | 114 | 5 | **4** |
+    | S10 | 39 | 34 | 5 | 5 |
+    | S11 | 24 | **24** | **0** | **0** |
+    | S13 | 65 | 61 | 4 | **2** |
+    | #1747 | 19 | 18 | 1 | 1 |
+
+    Recorded as **file lists, not trial SHAs** — the trial commits are unreferenced now that the
+    worktrees are removed and a `gc` may prune them, so the durable artifact is the path set.
+  - **S11's restack changes nothing**: 24 of 24 own files come through blob-identical, so its
+    existing IMPL-EVAL verdict carries **exactly** and no delta evaluation is warranted. With zero
+    conflicts, zero CI failures, zero threads, zero unchecked DoD boxes and no lease requirement, S11
+    is now the cheapest slice in the lane by every measure — its only remaining work is the eight
+    close-gate boxes and S10 landing beneath it.
+  - **#1747 exposed the distinction the carry rule exists for.** Its merge-tree probe said
+    `CLEAN-MERGE` and its replay produced **no conflict** — yet one file,
+    `generators-background-app_test.ts`, comes through with a **different blob** because git
+    auto-merged it against main without stopping. **A clean replay is not an unchanged tree.** Had I
+    scoped its delta eval from "did the rebase conflict" rather than from per-file blob identity, that
+    file would have carried an unearned verdict. This is precisely why the rule is blob identity per
+    file, and it is the first time in this run the two answers have actually diverged.
+  - Numbers are against each slice's **current** parent and must be recomputed against the final
+    post-#1865/#1858 parents before any verdict is carried; what is fixed here is the **shape** — the
+    delta is small and known in advance, so evaluation can be commissioned rather than discovered
+    after the lease.
