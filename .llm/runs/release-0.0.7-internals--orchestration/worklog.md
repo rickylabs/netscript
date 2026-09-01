@@ -8622,3 +8622,60 @@ Staged and validated: PR body's final DoD box ticked (exact-head CI green is now
 Holding the ready-merge label and packet until the focused delta evaluation returns - it is live at
 11 minutes with an actively-writing transcript. That is the last gate, and after this slice's history
 I am not declaring readiness ahead of it.
+
+
+## D-197 - #1862 SHIPPED; #1802 blocker cleared; #1543 delivered; #1351 dispatched
+
+**#1862 merged** at `82a2527e27aa91baabf35e4b001ed8b6266308e6`; issue #1859 closed. That closes the
+colour-invariance arc: three evaluation cycles (one of them invalid and retained as history), three
+retracted false claims corrected in place, and a generator that no longer depends on who runs it.
+Internals shipped this session: **#1823, #1828, #1830, #1832, #1840, #1862**.
+
+### #1802 - quality blocker cleared, and the fix took the harder correct route
+
+The author replaced both `unsafe-cast` findings with a **type predicate**, not an assertion:
+`isMember<T>(values, value): value is T` for the state membership, and
+`isSenderOwnershipRecord(entry): entry is Record<string, unknown> & SenderOwnershipRecord` in place of
+`return entry as unknown as SenderOwnershipRecord`. **Zero** `as unknown as` / `as never` remain.
+
+It also avoided the trap I flagged: `sessionId` and `profileHome` are still validated as
+`undefined ||` a typed value, so an absent field stays **absent** rather than becoming
+present-with-`undefined` - observable through JSON round-trips, and the protected tests depend on it.
+
+Verified at the converged head `0c938c3e6`: `quality:scan` **0 findings**, agentic suites
+**253 passed / 0 failed**, `deno.lock` byte-unchanged, and all six ceilings correct - two authorized
+exceptions plus four byte-identical. Labels re-aligned to sole `status:ready-merge` after automation
+drifted them back to `status:impl-eval` again (fourth occurrence this session).
+
+### #1543 delivered exactly as briefed
+
+PR **#1876** (draft). Both manifests now declare `@netscript/plugin-streams-core` **matching the
+established `plugins/workers` pattern byte-for-byte** (`jsr:@netscript/plugin-streams-core@0.0.6`),
+which was the whole point of the slice. `deno.lock` moved by **2 lines**; `publish:dry-run` **0**;
+`arch:check` **0**. Added the missing `area:tooling` label.
+
+Answering its central question before dispatch was worth it: `publish:dry-run` already returned **0**
+at base, so the brief could state plainly that this is a **consistency** issue, forbid inflating it to
+release-integrity, and mark acceptance box 3 conditional/N-A - preventing an unnecessary fitness check
+from being invented.
+
+### #1351 dispatched as a PLAN slice
+
+Now genuinely unblocked, verified rather than assumed: **#1349's contribution seam is on `main`**
+(both `sdk-client-contribution.ts` files present), so acceptance box 3 is provable; the `@orpc/*`
+family is still at `^1.14.6`/`^1.14.7` so the bump is real work; and #1695 shipping removed the
+`deno.lock` conflict that previously held it.
+
+Briefed with a **hard stop condition** - research and plan only, no implementation, no PR - because
+the issue is `status:plan` and a plan slice that starts editing code is a failed plan slice. The brief
+puts the **2026-08-13 scope amendment above the issue body** (RFC 0001 Stage 3 governs; no oRPC v2;
+dependency move is a separate lock-only step targeting stable v1.15.0) and requires the author to say
+so explicitly wherever the two conflict rather than silently choosing. It also demands an explicit
+sequencing judgement on whether the policy refactor and the family bump should be one PR or two,
+since carrying a public-surface refactor and a whole-family lock move together is a large blast
+radius.
+
+### Lane state
+
+Four leaves live and disjoint: **#1802** (ready-merge, CI running), **#1846** (parked on the deferred
+runtime proof), **#1876/#1543** (draft, needs IMPL-EVAL), **#1351** (plan phase, just launched).
