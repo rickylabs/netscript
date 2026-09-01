@@ -6827,3 +6827,61 @@
   - Posted to #1865 as a read-only cross-lane finding with the tier-by-tier evidence. **No change made
     to either Fixes PR, its labels or its branch** — this lane diagnoses and reports, it does not act
     on another lane's work.
+
+- **D-270 — chain restacked onto main `38f2ce735` in dependency order; every predicted conflict
+  matched; truthfulness repairs applied across the lane.**
+  - **Owner directive:** stop polling on dependency sentinels, work the independent queue, keep only
+    Phase-B runtime receipts gated on #1865/#1858. Detached watcher stopped (it was declared owned, so
+    it was killed explicitly rather than abandoned), dependency polling moved to a background shell.
+  - **Restack executed, in dependency order, all pushed:**
+
+    | Slice | PR | Command | Own | Conflicts (predicted → actual) | New head |
+    | --- | --- | --- | --: | --- | --- |
+    | S8 | #1754 | `rebase origin/main` | 26 | 0 → **0** | `50617f0bd` → `d11431fec` |
+    | S9 | #1759 | `--onto <S8> d1c6d8b54` | 14 | 1 carrier → **1 carrier** | `e1ac670dd` |
+    | S10 | #1760 | `--onto <S8> d1c6d8b54` | 13 | 2 D-101 → **2 D-101** | `eb97c6a99` |
+    | S11 | #1771 | `--onto <S10> c9e3fcbe8` | 13 | 0 → **0** | `d396cd367` |
+    | S13 | #1779 | `--onto <S10> c9e3fcbe8` | 9 | 1 carrier → **3** (2 carriers + 1 equivalent-regex) | `ab63b7eb1` |
+
+    Every trial-measured prediction held except S13, which produced **two** extra: the second generated
+    carrier, and one non-generated file. **The abort rule worked as designed** — the loop stopped on
+    `route-templates_test.ts` rather than force-resolving, and inspection showed `[ ]{2}` vs ` {2}`,
+    **exactly equivalent regexes**. Took the shipped form; nothing behavioural lost. A blind
+    force-resolve would have been right by luck; stopping made it right by evidence.
+  - **S11 carried perfectly: 24/24 own files blob-identical**, so its accepted cycle-2 PASS covers the
+    current bytes exactly and no delta evaluation is warranted. Recorded on the PR **with the proof**,
+    replacing a citation to a head reviewers can no longer resolve.
+  - **The S9 static defect I reported in D-262 is fixed and verified**: `evaluate.ts:314` TS2322,
+    annotated `ReturnType<typeof setTimeout>`. The `check` gate is now green in CI at `e1ac670dd`
+    (previously the failing half); `check-test`'s remaining red is its **`test`** half, under
+    investigation locally. Fixing `check` without checking `test` would have been a premature
+    all-clear — the job name covers two gates.
+  - **Truthfulness repairs (owner directive), all applied:**
+    - **#1720 A4** claimed *"Will close (via its PR) #863"*. **#863 is OPEN and S8 owns gate 1 only**
+      (D-44); gates 2 and 3 are not delivered here. Rewritten to `Part of #863` with the rationale, and
+      the box now names the exact command.
+    - **#1754 DoD**: **six cited commit SHAs were orphaned** by the rebases — a reviewer could not find
+      them on the branch. Remapped by subject to their current successors. The
+      *"Separate-session IMPL-EVAL completed and accepted"* box was **un-ticked**: its PASS was taken at
+      `bc838a0b3`, and **10 product blobs** have reconverged since. Phase B restated as *queued behind
+      #1865*, not parked.
+    - **#1779**: *"Independent IMPL-EVAL is recorded"* **un-ticked** with its bounded scope (5 product
+      files changed, 57 carry).
+    - **#1771**: eval boxes **kept ticked** — because 24/24 blob identity proves the carry. Un-ticking
+      them would have been false in the other direction.
+  - **The verifier was proving the wrong command.** #1720 A4 and #863 both name `netscript db init`,
+    but the Phase-B listener-fault path ran **`db migrate`** — a different code path than the box it
+    backs. Repaired to the canonical `db init --project-root <root> --db <db> --name init` used by the
+    DATABASE_INIT gate, with the surrounding non-success / bounded-duration / diagnostic assertions
+    unchanged and the fault still reverted in `finally`. `deno check` green, `deno fmt --check` 188
+    files 0 findings, and no test asserted the old invocation.
+  - **Bounded post-D248 IMPL-EVAL dispatched** at `d11431fec` on the checked-in
+    `agentic:claude-openrouter` route (`z-ai/glm-5.3-flash`, high), scoped to exactly the **10**
+    reconverged product files — derived independently and matching the owner's 10-of-29 count once the
+    5 run-directory docs and 1 generated carrier are excluded. Running detached per §4a.
+  - **Phase B stays queued behind #1865**, and the reason is measured (D-269): both runtime tiers stop
+    *earlier* than S8's gates, at #1865's Flow-B fixture.
+  - **Two dispatch details worth keeping:** `--prompt` on the openrouter route is a **file path**, not
+    an inline string — an inline brief fails `File name too long (os error 36)`, and a path-shaped
+    prompt fails `readfile`. And `gh pr edit --body-file` trips an **org-scope GraphQL** query on this
+    token; `gh api -X PATCH repos/…/pulls/<n>` works and is the route to use for body repairs.
