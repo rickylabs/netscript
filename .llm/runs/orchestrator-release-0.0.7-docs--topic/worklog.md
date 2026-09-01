@@ -3724,3 +3724,49 @@ with #1756's tooling reports the whole pre-repair backlog (268 errors) because t
 
 Also confirmed no `docs:exports-drift` impact — `packages/plugin/deno.json` gains no entrypoint and
 the `plugin` page is `entrypoints-only`.
+
+## 2026-09-01 — IMPL-EVAL returned FAIL_FIX; both findings were right, one was mine
+
+Verdict at `239f4b53d`: **FAIL_FIX**, two blocking findings. Preserved at
+`1756-impl-eval-239f4b53d-FAIL_FIX.md`. This is the run's first evaluator verdict that attested a
+real head; the two earlier evaluators were terminated on stale heads without verdicts.
+
+**F1 — silent revert of #1740 in four shipped stream factories.** I had found and fixed the same
+thing independently while chasing the `check-test` failure (`7fbda0e28`), before the verdict landed.
+Its account was sharper than mine: it named the reverted commit (`2a1248d33`), the discovery chain
+(`DURABLE_STREAMS_URL` → Aspire `services__streams__http__0` → VITE), and — most usefully — why the
+exact-match wholesale sweep could not see it: **the files are chimeras**, stale implementation plus
+new example text. "Wholesale restore" was the wrong mental model; partial reverts are the harder case.
+
+**F2 — the arity shim launders constraint violations. This one is mine and I missed it.** The
+mirrored parameters are unconstrained, so a constrained generic's alias fails TS2344 at its own
+declaration inside `preamble.ts`; that module has no owning example, and `unclassifiedCompilerFailure`
+only fires when zero examples have classified failures — never true with 131 deferred. I reproduced
+its M6 before accepting: `ServiceHandlerContext<number>` against `TCustom extends object` leaves the
+gate PASS with a byte-identical census.
+
+**My code comment claimed "the real constraints are still enforced". That was false**, and it was
+shipping. Corrected in `57d49f718`.
+
+I attempted the recommended fix — a real `import type` in the **example module** (its diagnosis of why
+my earlier preamble attempt bound nothing was exactly right: the preamble is a separate file). It
+works and moves the census to 118/14, crossing the ceiling by regressing two pre-existing examples
+(`KvStore`, which also redeclares `store` twice in one block, and `BASE_PLUGIN_CONTRACT_ROUTES`).
+Repairing unrelated examples under time pressure to get back under a ceiling I may not raise is how
+rushed regressions happen, so I reverted and filed **#1892** with the reproduction, the measured cost,
+and the deeper defect: unattributed compiler diagnostics are dropped whenever any example has a
+classified failure.
+
+**Shipping a knowingly-documented gap beats shipping a rushed redesign.** The gate still enforces bad
+specifiers, unbound names, most type errors, and the ratchet; what it misses is a type-argument
+constraint violation inside a generic's own example. Documented at the injection site, in #1892, and
+on the PR.
+
+Also filed **#1893**: `check:aspire-host-ports` reported "OK — no pinned host ports" across 959 files
+on the tree carrying F1's literals, while its own S5 test listed all nine offending lines. The gate
+and its test encode different policies — a branch that reverted discovery in four plugins passed the
+gate named for that defect class. Aspire-owned, filed without claiming ownership.
+
+F3 (eight vs six) was already self-corrected; F4 (stale body numbers, pre-rebase SHAs, wrong base)
+fixed — the body now carries the current commit table, base `9ca986fb0`, and measured
+`files=2037 examples=358`.

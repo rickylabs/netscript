@@ -1,4 +1,4 @@
-From 239f4b53de799445d837ddb2640cebb4bc427b2d Mon Sep 17 00:00:00 2001
+From 3a44a5f88a096a40d5ca40087e64f36d6e741131 Mon Sep 17 00:00:00 2001
 From: Rickylabs <eric.chautems@gmail.com>
 Date: Mon, 31 Aug 2026 06:26:15 +0200
 Subject: [PATCH] ci(docs): enforce JSDoc example imports in the quality job
