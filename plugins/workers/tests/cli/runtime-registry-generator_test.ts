@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 import { type WorkersConfigData, WorkersConfigSchema } from '@netscript/plugin-workers-core/config';
+import { writeOfficialSampleConfiguration } from '../../src/cli/official-sample-configuration.ts';
 import { generateRuntimeRegistries } from '../../src/cli/runtime-registry-generator.ts';
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../..', import.meta.url));
@@ -144,6 +145,25 @@ Deno.test('Windows and POSIX configured entrypoints generate identical policy', 
     assertEquals(posix?.id, 'configured-user-settings');
     assertEquals(posix?.priority, 77);
     assertEquals(definitions.get('windows'), posix);
+  });
+});
+
+Deno.test('official sample config survives config-aware registry regeneration', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkersManifest(projectRoot, true);
+    await writeJob(projectRoot, 'send-welcome-email.ts');
+    await Deno.mkdir(join(projectRoot, 'sagas'), { recursive: true });
+    await writeOfficialSampleConfiguration({ projectRoot, force: false });
+
+    const sampleConfig = await import(
+      `${toFileUrl(join(projectRoot, 'config/official-plugins/mod.ts')).href}?official-sample`
+    ) as Readonly<{ workers: unknown }>;
+    const workers = WorkersConfigSchema.parse(sampleConfig.workers);
+
+    assertEquals(
+      await generateRuntimeRegistries(generatorOptions(projectRoot, workers)),
+      [REGISTRY_PATH],
+    );
   });
 });
 
