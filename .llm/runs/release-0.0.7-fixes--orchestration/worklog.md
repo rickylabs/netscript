@@ -7429,3 +7429,35 @@ across both the strip and its reversal; `deno.lock` unchanged. Because no produc
 in either direction, the IMPL-EVAL `PASS_IMPL` and the hosted four-lane SUCCESS both still carry by
 product identity — no re-evaluation and no hosted rerun performed or required. PR body corrected to
 record the reversal rather than the strip.
+
+### Runtime lease accepted for #1844 — preconditions verified independently, baseline recorded
+
+Coordinator preflight confirmed by my own read, not taken on report: **0 containers running, 0 total**,
+**0 non-default networks**, `aspire ps --format json` → **`[]`**.
+
+**Two pre-existing volumes recorded as the baseline** (`90d704b4…`, `d33e5c2e…`) in
+`lease-baseline-volumes.txt`. They are foreign/unattributed and I did not create them; recording their
+ids now is what will let me prove after the run that I returned to *this* baseline rather than to a
+guessed zero. Cleanup on release means "no volume beyond these two", not "no volumes".
+
+Lease terms accepted: #1844 worktree only, `aspire --isolated --non-interactive`, published ports via
+`netscript-dind`, exact owned cleanup to Docker=0 / Aspire=[] before release.
+
+**The proof is not runnable yet, so the lease is held rather than spent.** Implementation state at
+`26189429e`:
+
+- **Probe framing genuinely fixed** — `once('data'` no longer appears in `_aspire-compat.ts.template`,
+  so the single-segment assumption that could never see a split `+PONG` is gone. RED
+  `2368e8f85` → GREEN `31dc61f2f` pairing present.
+- **Outstanding:** two uncommitted gate files (`listener-readiness-gates.ts`,
+  `verify-listener-readiness.ts` — the "never published" vs "unhealthy" distinction); the Garnet tag is
+  **still `1.1.1`**; and the drift guard does not exist.
+
+Running the hosted proof against a half-finished tree would spend the lease on a result that proves
+nothing about the finished change, so it waits.
+
+**A resume attempt was correctly rejected** — `thread-store conflict: already has an active writer`.
+I verified by walking `/proc` that this is a **live writer** (pid 3364860, the earlier implementation
+dispatch), not a stale lock, and did not force it. The author is `working`, and the brief it already
+holds contains the full nine-path ceiling, the 1.1.1 → 1.1.10 alignment, and the drift-guard
+requirement — my follow-up was redundant.
