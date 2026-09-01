@@ -731,3 +731,26 @@ contract because runtime execution is explicitly prohibited.
 
 No Aspire, Docker, AppHost, `e2e:cli`, runtime suite, evaluator dispatch, or `evaluate.md` creation
 occurred.
+
+## D-240 diagnostic control — S8-free SQLite listener ownership
+
+PLAN-EVAL: N/A. The owner supplied the exact diagnostic question, S8-free criterion, canonical
+SQLite tier, decisive output, immutable baseline, and a mandatory stop-on-cleanup-failure rule.
+IMPL-EVAL is explicitly waived; this dispatch makes no implementation.
+
+- Public/product surface: unchanged.
+- Control head: freshly fetched `origin/main` `60ae56af0144644db00b0e2fdc28986919ee12ee`;
+  S8-owned `verify-typed-db-phase-b.ts` absent (`git cat-file -e` exit 128).
+- Runtime command: detached/polled `scaffold.runtime.sqlite --cleanup`, unique smoke root under this
+  worktree, `DOCKER_HOST=tcp://netscript-dind:2375`.
+- Result: `runtime.wait.garnet` failed after 300,316 ms; 42 gates passed, one failed; exact AppHost
+  cleanup passed in 549 ms. `runtime.health.listener-unreachable` did not start.
+- Decisive-evidence status: NOT OBTAINED. The target baseline `Promise.all` never executed. A
+  read-only earlier snapshot showed the real key Unhealthy and test-only key Healthy, but it is not
+  substituted for target output.
+- Cleanup gate: FAILED at the host-baseline level despite the suite's AppHost cleanup PASS. The
+  protected custom network disappeared and a new unlabeled anonymous volume remained. Runtime work
+  stopped; no force removal or recreation was attempted.
+- Ownership verdict: BLOCKED. Neither “pre-existing” nor “S8-owned” is supported by this run.
+- Reconcile: no issue/PR lifecycle, hosted Phase B, product repair, evaluator, or `evaluate.md`
+  action. Evidence-only harness commit and push are the only authorized handoff actions.

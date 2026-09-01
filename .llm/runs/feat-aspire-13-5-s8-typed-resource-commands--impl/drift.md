@@ -202,3 +202,17 @@ latest non-restarting head lacked the test-only Garnet report at baseline. This 
 and correlation, not ownership: the available S8-free SQLite run timed out before this gate. The
 runtime restriction prevents the missing current-main control, so SQLite is recorded and left
 unchanged.
+
+## D-18 — D-240 control blocked and canonical cleanup changed the protected baseline
+
+The owner-authorized current-main SQLite control was intended to settle D-17. It did not reach the
+listener-unreachable gate: the known remote-DinD loopback topology left the real Garnet health key
+Unhealthy and the preceding 300-second wait failed. Therefore the target baseline `Promise.all`
+and its omission diagnostic were not observed, and D-17 remains unresolved.
+
+More seriously, the suite's exact-AppHost cleanup removed the pre-existing foreign Aspire-managed
+network that the lease required remain unchanged, and left a new anonymous volume. The suite
+reported its own cleanup gate PASS because that gate covers the AppHost/container tail, not the
+foreign network/anonymous-volume baseline. The raw Docker commands are the higher-fidelity verdict
+for this dispatch. No agent-issued `docker rm`, `docker volume rm`, `docker network rm`, network
+recreation, or relay start occurred. Runtime work stopped immediately after discovery.
