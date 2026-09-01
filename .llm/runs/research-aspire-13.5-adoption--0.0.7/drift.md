@@ -5764,3 +5764,34 @@
     multi-byte character at any division), verification that all five earlier deltas survive, and that
     the D-224 artifact, `context-pack.md` and `drift.md` now describe the shared budget accurately —
     **unrecorded drift is what produced this defect in the first place.**
+
+- **D-237 — delta-6 `PASS` (measured); both tiers now fail on LISTENER-FAULT injection, and the sqlite
+  tier REGRESSED. Ownership dispatched before any repair.**
+  - **Delta-6 PASS, earned by measurement:** all three artifacts at `608f8f2da` measured
+    **16,383 / 16,384 / 16,061 B** against the old **32,767 / 33,479 / 32,893 B** — the prior 2×
+    violation reproduced exactly, then closed. The new fixture **pins the artifact** and is red at
+    baseline with the literal message `combined diagnostics exceeded the 16384-byte budget`.
+    Degradation is sane: a 32-line stderr flood plus one real stdout error still selects the **real
+    error** and retains it. Single-stream parity byte-identical at `16,383`. UTF-8 clean across a
+    mixed 3/4-byte flood. All five earlier deltas verified — **36 tests / 226 steps, 0 failed**.
+    A side finding: the old template's stderr-only *request record* was **17,032 B** — already over
+    ceiling before this delta, now 16,372 B.
+  - **New runtime picture at `608f8f2da` (run `33460896691`):**
+    | Tier | Gate | Result |
+    | --- | --- | --- |
+    | docker | `runtime.typed-db-phase-b` | FAILED **34980 ms** (was 2220 ms) — `postgres did not become listener-Unhealthy; last=Healthy` |
+    | sqlite | `runtime.health.listener-unreachable` | FAILED **31392 ms**, `passed=52` — **regressed; passed on every previous head** |
+  - **Two readings, and the second is the one that matters.** The duration jump 2.2 s → 35 s says the
+    `migrate`/`deploy` portion now **gets further** and the failure moved on to the **synthetic
+    listener-fault injection** step. But both failures are in the **D-101 listener architecture (S6,
+    already on `main`)** — a different subsystem from S8's typed commands — and the **sqlite tier
+    regressed**, which it had not done on any earlier head in this chain.
+  - **Dispatched ownership-first, deliberately.** Two defects in this programme were nearly charged to
+    the wrong slice, and the discipline that prevented it both times was a **control**. The brief
+    forbids repairing anything before establishing whether an S8-free head fails the same way, requires
+    the agent to state how the listener-fault mechanism is *supposed* to drive the listener Unhealthy
+    and which step fails, and to check concretely whether any of its five deltas can even reach
+    health-check registration, the controller fixture, resource start ordering or the listener keys.
+    **"Not mine, here is the evidence" is stated as a complete and welcome answer.**
+  - Runtime boundary held: if a live control is genuinely required, the agent must **stop and report
+    what it would run** rather than start anything.
