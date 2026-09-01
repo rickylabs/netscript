@@ -6,15 +6,16 @@
 | --- | --- |
 | Run ID | `refactor-sdk-transport-policy--1351` |
 | Branch | `refactor/sdk-transport-policy` |
-| Current phase | implement — Slice 3 complete pending commit |
+| Current phase | implement — Slice 4 compatibility complete; final integration pending |
 | Archetype | `2 — Integration` |
 | Scope overlays | none |
 
 ## Current State
 
-PLAN-EVAL passed at `871caac96`. Slices 1–3 implement the approved contract, wire one frozen
+PLAN-EVAL passed at `871caac96`. Slices 1–4 implement the approved contract, wire one frozen
 decision through the sole HTTP stack, and make the typed Desktop client consume the same resolver
-without changing MessagePort frames. No dependency configuration or lock file changed.
+without changing MessagePort frames. Deprecated `port`/`timeout` behavior is documented and proved
+as no-op. No dependency configuration or lock file changed.
 
 ## Completed
 
@@ -32,16 +33,18 @@ without changing MessagePort frames. No dependency configuration or lock file ch
   outbound frame and POST-only adaptation is not serialized.
 - Compile-time exact-key, runtime exact-snapshot, public-doc, and packed-import probes enforce the
   contribution method-secrecy boundary.
+- SDK README and public declarations state that `port`/`timeout` are accepted deprecated no-ops;
+  live discovery/dispatch/slow-call/explicit-cancellation regression is green.
 
 ## In Progress
 
-- Slice 3 commit/push and PR evidence comment.
+- Commit compatibility proof, then take the one final `main` integration.
 
 ## Next Steps
 
-1. Commit and push Slice 3 with its PR evidence comment.
-2. Document and regression-test the deprecated no-op `port`/`timeout` options.
-3. Take the single final `main` integration and run the approved 10-step validation plan.
+1. Commit and push the Slice 4 compatibility proof.
+2. Take the single final `main` integration.
+3. Run and record the approved 10-step validation plan.
 
 ## Key Decisions
 
@@ -67,16 +70,17 @@ without changing MessagePort frames. No dependency configuration or lock file ch
 | contribution adapter/runtime/observability tests | changed | hard HTTP/retry/reconnect/dedupe proof |
 | typed Desktop client + Desktop tests | changed | common policy resolution, unchanged framing |
 | contribution validation/private/type tests | changed | exact method-secrecy enforcement |
+| SDK README, service-client declarations/runtime test | changed | no-op compatibility docs/proof |
 | scoped run artifacts | new/changed | implementation evidence and resumable state |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1–3 PASS | structured check/lint/fmt wrappers |
+| Static | Slices 1–4 PASS | structured check/lint/fmt wrappers |
 | Fitness | Slices 1–3 PASS | `quality:gate`; source/doc/packed boundary checks |
-| Runtime | Slice 3 PASS | structured Desktop/secrecy suite, 17/17 |
-| Consumer | Slice 3 PASS | POST-only simulation, no-frame invalid result, exact snapshot |
+| Runtime | Slice 4 compatibility PASS | structured compatibility/README suite, 9/9 |
+| Consumer | Slice 4 compatibility PASS | wrong-port discovery, no timeout, equal cancellation |
 
 ## Open Questions
 

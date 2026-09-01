@@ -304,17 +304,17 @@ export interface CreateServiceClientOptions<
   /** API version segment. */
   apiVersion?: string;
   /**
-   * Reserved override for explicit port selection.
+   * Compatibility-only explicit port selection. The value is accepted but ignored.
    *
-   * @deprecated Migrate explicit service addressing to discovery configuration; #1351 owns the
-   * transport disposition.
+   * @deprecated Configure explicit service addresses through discovery instead. This option is a
+   * no-op and will be removed in a future major version.
    */
   port?: number;
   /**
-   * Reserved request timeout in milliseconds.
+   * Compatibility-only request timeout in milliseconds. The value is accepted but ignored.
    *
-   * @deprecated Use an `AbortSignal` for request cancellation; #1351 owns the transport
-   * disposition.
+   * @deprecated Pass a per-call `AbortSignal` for cancellation instead. This option is a no-op and
+   * will be removed in a future major version.
    */
   timeout?: number;
   /** Optional HTTP method adaptation resolved before client contributions compose. */

@@ -88,6 +88,85 @@ Deno.test('createServiceClient round-trips through live service discovery', asyn
   }
 });
 
+Deno.test('deprecated port and timeout options remain accepted no-ops', async () => {
+  let dispatches = 0;
+  const router = {
+    echo: os.route({ method: 'POST', path: '/echo' }).handler(
+      ({ input }: { input: unknown }) => {
+        dispatches += 1;
+        const payload = input as EchoInput;
+        return { echoed: payload.message } satisfies EchoOutput;
+      },
+    ),
+    slow: os.route({ method: 'POST', path: '/slow' }).handler(
+      async ({ input }: { input: unknown }) => {
+        dispatches += 1;
+        const payload = input as EchoInput;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        return { echoed: payload.message } satisfies EchoOutput;
+      },
+    ),
+  };
+  const running = await createService(router, { name: SERVICE_NAME })
+    .withRPC({ rpcPath: RPC_PATH })
+    .serve({ port: 0 });
+  const envKey = createServerServiceEnvKey(SERVICE_NAME);
+  const previous = Deno.env.get(envKey);
+  Deno.env.set(envKey, clientOrigin(running.addr.hostname, running.addr.port));
+
+  try {
+    const baseline = createServiceClient({
+      contract: router,
+      serviceName: SERVICE_NAME,
+    });
+    const compatibility = createServiceClient({
+      contract: router,
+      serviceName: SERVICE_NAME,
+      port: running.addr.port + 1,
+      timeout: 1,
+    });
+
+    assertEquals(await baseline.echo({ message: 'same-discovery' }), {
+      echoed: 'same-discovery',
+    });
+    assertEquals(await compatibility.echo({ message: 'same-discovery' }), {
+      echoed: 'same-discovery',
+    });
+    assertEquals(await compatibility.slow({ message: 'no-synthetic-timeout' }), {
+      echoed: 'no-synthetic-timeout',
+    });
+    assertEquals(dispatches, 3);
+
+    const reason = new Error('explicit-cancellation');
+    const baselineController = new AbortController();
+    const compatibilityController = new AbortController();
+    baselineController.abort(reason);
+    compatibilityController.abort(reason);
+    const baselineError = await assertRejects(() =>
+      baseline.echo(
+        { message: 'cancel-baseline' },
+        { context: { signal: baselineController.signal } },
+      )
+    );
+    const compatibilityError = await assertRejects(() =>
+      compatibility.echo(
+        { message: 'cancel-compatibility' },
+        { context: { signal: compatibilityController.signal } },
+      )
+    );
+    assertEquals(baselineError, reason);
+    assertEquals(compatibilityError, reason);
+    assertEquals(dispatches, 3);
+  } finally {
+    if (previous === undefined) {
+      Deno.env.delete(envKey);
+    } else {
+      Deno.env.set(envKey, previous);
+    }
+    await running.stop();
+  }
+});
+
 Deno.test('createServiceClient rejects connection failures for bad service URLs', async () => {
   const envKey = createServerServiceEnvKey(BAD_SERVICE_NAME);
   const previous = Deno.env.get(envKey);
