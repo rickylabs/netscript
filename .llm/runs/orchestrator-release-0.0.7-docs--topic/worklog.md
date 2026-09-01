@@ -3614,3 +3614,64 @@ docs-flavoured 0.0.7 issues (#1723, #1721, #1642) are `orchestrator:aspire`; #13
 Fixed one stale lifecycle label in my own lane (#1533 `status:triage` → `status:impl`), and posted
 measured updates to the adjacent 0.0.8 trackers #1765/#1766 whose counts this work changes — those
 are 0.0.8 and were not pulled into the milestone.
+
+## 2026-09-01 — the sixth wholesale-restore, found by another lane's CI gate
+
+Rebased #1756 onto `main` `82a2527e2`. `quality` then failed at **Aspire version parity** — a step
+this branch does not touch. Cause: the salvage carried `deno.json` and
+`.llm/tools/gates/catalog.ts` **wholesale** from a base predating three main changes, silently
+reverting them:
+
+- `check:aspire-version-parity` + its gate id — **another lane's CI gate**;
+- `agentic:claude-openrouter-gateway`, renamed into a collision with the existing
+  `agentic:claude-openrouter` and thus a **duplicate JSON key** whose last-wins made
+  `remote-model-launcher.ts` unreachable;
+- `agentic:claude-hook-log`'s narrowed permissions, reverting **#1774**.
+
+**The task count was 105 before and after.** Only a set-difference exposes this class; a count check
+is blind to a same-size swap. Repaired by taking main's copy and re-inserting only this branch's
+rows, then asserting zero task names and zero gate ids lost, additions exactly the three intended,
+and no duplicate keys. Parity gate now `ok: true`, `fail: 0`; `run-gate` `outcome: PASS`.
+
+Two things made this findable at all, and both are luck rather than design: `ci.yml` still
+*invoked* the deleted gate id, so it failed loudly instead of vanishing; and the branch had never
+had a green CI run, so its very first full run surfaced it. A wholesale revert of a gate that
+nothing else references would still be invisible.
+
+Also set-differenced the other shared files the salvage touched — `preflight-text-imports.ts` and
+`snippet-workspace.ts` removals are internal refactors of its own additions (`memberCount` still
+exists, computed conditionally), not losses of main content.
+
+### Evaluator hygiene (coordinator direction)
+
+The evaluator pinned to synthetic tip `9d2b3696b` was terminated **before any verdict**, because a
+verdict against a head that will never merge cannot attest the merge head. Partial reasoning kept as
+transport evidence only, explicitly marked NO VERDICT, at
+`1756-eval-9d2b3696b-terminated-no-verdict/partial-findings.md`; the 1.4 MB raw stream deliberately
+not committed. Two things worth carrying forward from it: it independently reproduced the
+salvage-head census as **118/22 with both ratchets firing**, and it observed that the compiler skips
+fences failing on a specifier, which depresses the base `typeError` count — now written into the
+fresh brief as a methodology trap.
+
+One fresh evaluator dispatched at the true merge tip `5e8088afe` (pushed head `b23069e85` + the
+`ci.yml` commit): GLM 5.3 Flash · `max` · pid 648185, isolated worktree, zero guard denials. Its
+brief requires it to prove the shim still enforces real constraints, re-derive the task/gate
+set-differences itself, and judge whether withholding the seventh acceptance box was right.
+
+### Docs audit lane (coordinator direction — no milestone scope change)
+
+Audited **#1771** (Aspire S11 public docs) independently: 12 documented commands/flags/env-vars
+checked against the real CLI `13.5.3+b5f1433` or repo source. **All accurate**, including
+`ASPIRE_CLI_START_TIMEOUT` defaulting to 300 for DB/adapter commands
+(`DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = '300'`) and the `aspire resources` alias, which resolves at
+13.5.3 despite being absent from `aspire --help`. Live-verified `aspire ps --format Json` → `[]`
+exit 0. One item flagged as **unverified rather than wrong**: the start-JSON example says `logFile`
+while ps says `logFilePath`; NetScript never parses that payload and confirming needs a live
+AppHost, so I did not take a host runtime lease for a docs audit.
+
+Cross-slice finding handed to **#1721** (S9), not fixed here: the shipped agent skill still says it
+was verified against **13.4.6** and asserts `aspire resources` does not exist. Once #1771 lands the
+docs site documents the alias while the skill denies it. Corroborated independently by the parity
+gate itself, which defers those exact literals to owner S9.
+
+Ownership, labels, and lifecycle were left untouched on both — advisory only.
