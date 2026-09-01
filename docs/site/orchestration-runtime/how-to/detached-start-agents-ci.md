@@ -85,7 +85,9 @@ that echoes the raw record leaks it into CI logs, run artifacts and issue commen
 Read the field without printing it:
 
 ```bash
-# Keep tracing off for the whole lifetime of the value — not just its assignment.
+# Keep tracing off for the whole lifetime of the value — not just its assignment,
+# and hand the caller's tracing back exactly as it was found.
+case $- in *x*) xtrace_was_on=1 ;; esac
 set +x
 DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
   | deno eval 'const [a] = JSON.parse(await new Response(Deno.stdin.readable).text()); if (a?.dashboardUrl) console.log(a.dashboardUrl);')"
@@ -93,6 +95,7 @@ DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
 # Pass it on by environment, still untraced: a traced command line expands the value.
 MY_TOOL_DASHBOARD="$DASHBOARD_URL" my-tool
 unset DASHBOARD_URL
+if [ -n "${xtrace_was_on:-}" ]; then set -x; fi
 ```
 
 When a URL must appear in a log, redact the query string, which is where a token would live:
@@ -114,12 +117,15 @@ Three rules follow, and they are what keeps a token out of a transcript:
   the pass-on line expands to `+ MY_TOOL_DASHBOARD='https://…?t=…'`.
 
   ```bash
+  case $- in *x*) xtrace_was_on=1 ;; esac
   set +x                      # no-op when tracing is already off
   DASHBOARD_URL="$(aspire ps --format Json --non-interactive --nologo \
     | deno eval 'const [a] = JSON.parse(await new Response(Deno.stdin.readable).text()); if (a?.dashboardUrl) console.log(a.dashboardUrl);')"
   MY_TOOL_DASHBOARD="$DASHBOARD_URL" my-tool
   unset DASHBOARD_URL
-  set -x                      # only after the value is gone, and only if the job had tracing on
+  # Only after the value is gone, and only if the job had tracing on. The `if` form
+  # matters: a bare `[ … ] && set -x` as the last line returns non-zero under `set -e`.
+  if [ -n "${xtrace_was_on:-}" ]; then set -x; fi
   ```
 
   This is the one leak route the other two rules do not cover: tracing echoes the _command_, so the
