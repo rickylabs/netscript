@@ -1,5 +1,11 @@
 import { assertEquals } from '@std/assert';
-import { actionable, classify, type ResourceCandidate, validOwnedRoot } from './ownership.ts';
+import {
+  actionable,
+  classify,
+  classifyVolume,
+  type ResourceCandidate,
+  validOwnedRoot,
+} from './ownership.ts';
 
 const root = '/home/codex/repos/fix-1046';
 
@@ -99,6 +105,90 @@ Deno.test('an over-broad owned root cannot claim another run', () => {
     classify(
       { kind: 'container', id: 'other', mountSource: '/tmp/someone-else/.data' },
       { appHosts: [], containers: [], ownedRoots: ['/tmp'] },
+      root,
+    ),
+    'unproven',
+  );
+});
+
+// Issue #1855: a foreign network must never be claimed from its name, however Aspire-shaped it is.
+Deno.test('an Aspire-shaped network name is never ownership evidence', () => {
+  assertEquals(
+    classify(
+      {
+        kind: 'network',
+        id: 'net581c13b7',
+        name: 'aspire-persistent-network-581c13b7-aspire-managed',
+        attachedContainers: [],
+      },
+      { appHosts: [], containers: [] },
+      root,
+    ),
+    'unproven',
+  );
+});
+
+Deno.test('a network with a registered creator identity is owned like a container', () => {
+  assertEquals(
+    classify(
+      {
+        kind: 'network',
+        id: 'net-owned',
+        name: 'aspire-session-network-owned',
+        creatorPid: 42,
+        creatorProcessStartTime: 'ticks',
+        attachedContainers: [],
+      },
+      { appHosts: [], containers: [{ creatorPid: 42, creatorProcessStartTime: 'ticks' }] },
+      root,
+    ),
+    'owned',
+  );
+});
+
+Deno.test('a volume mounted exclusively by owned containers is owned by attribution', () => {
+  const owned = { kind: 'container' as const, id: 'owned-id', mountSource: `${root}/.data` };
+  assertEquals(
+    classifyVolume(
+      { kind: 'volume', id: 'anonhash', mountedBy: ['owned-id'] },
+      [owned],
+      { appHosts: [], containers: [] },
+      root,
+    ),
+    'owned',
+  );
+});
+
+Deno.test('a volume shared with an unattributable container is never claimed', () => {
+  const owned = { kind: 'container' as const, id: 'owned-id', mountSource: `${root}/.data` };
+  // `stranger-id` has no candidate at all, which is exactly the non-owned case.
+  assertEquals(
+    classifyVolume(
+      { kind: 'volume', id: 'anonhash', mountedBy: ['owned-id', 'stranger-id'] },
+      [owned],
+      { appHosts: [], containers: [] },
+      root,
+    ),
+    'unproven',
+  );
+  const foreign = { kind: 'container' as const, id: 'foreign-id', creatorPid: 9 };
+  assertEquals(
+    classifyVolume(
+      { kind: 'volume', id: 'anonhash', mountedBy: ['owned-id', 'foreign-id'] },
+      [owned, foreign],
+      { appHosts: [], containers: [] },
+      root,
+    ),
+    'unproven',
+  );
+});
+
+Deno.test('a dangling volume carries no creation evidence and stays unproven', () => {
+  assertEquals(
+    classifyVolume(
+      { kind: 'volume', id: 'anonhash', mountedBy: [] },
+      [],
+      { appHosts: [], containers: [] },
       root,
     ),
     'unproven',
