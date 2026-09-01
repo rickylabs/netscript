@@ -206,7 +206,10 @@ describe('HelpersGeneratorPipeline', () => {
     assertStringIncludes(compat!.content, 'export function buildViteEnvVarName(');
     assertStringIncludes(compat!.content, 'normalizeViteIdentifierSegment(resourceName)');
     assertStringIncludes(compat!.content, 'normalizeViteIdentifierSegment(endpointName)');
-    assertStringIncludes(compat!.content, 'VITE_services__${normalisedResource}__${normalisedEndpoint}__0');
+    assertStringIncludes(
+      compat!.content,
+      'VITE_services__${normalisedResource}__${normalisedEndpoint}__0',
+    );
     assertStringIncludes(compat!.content, 'VITE_${normalisedResource.toUpperCase()}_URL');
     assertStringIncludes(compat!.content, 'export function buildDatabaseProviderEnvVars(');
     assertStringIncludes(compat!.content, 'DATABASE_PROVIDER: config.PrimaryDatabase');
@@ -263,15 +266,15 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-infrastructure.mts',
     );
     assert(regInfra, 'register-infrastructure.mts should exist');
-    assertStringIncludes(regInfra!.content, "builder.addPostgres('main', {");
-    assertStringIncludes(regInfra!.content, "ensureDatabasePassword(appHostDir, 'main')");
+    assertStringIncludes(regInfra!.content, 'builder.addPostgres("main", {');
+    assertStringIncludes(regInfra!.content, 'ensureDatabasePassword(appHostDir, "main")');
 
     // Register plugins should include our plugin
     const regPlugins = files.find(
       (f) => f.path === '.helpers/register-plugins.mts',
     );
     assert(regPlugins, 'register-plugins.mts should exist');
-    assertStringIncludes(regPlugins!.content, "builder.addExecutable('auth'");
+    assertStringIncludes(regPlugins!.content, 'builder.addExecutable("auth"');
     assertStringIncludes(
       regPlugins!.content,
       'withOtlpExporter({ protocol: OtlpProtocol.HttpProtobuf })',
@@ -288,7 +291,7 @@ describe('HelpersGeneratorPipeline', () => {
     assert(regTools, 'register-tools.mts should exist');
     assertStringIncludes(
       regTools!.content,
-      "builder.addExecutable('prisma-studio'",
+      'builder.addExecutable("prisma-studio"',
     );
   });
 

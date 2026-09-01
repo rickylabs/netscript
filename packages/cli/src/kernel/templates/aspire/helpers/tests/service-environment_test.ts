@@ -108,7 +108,23 @@ function resourceBlock(source: string, name: string, mapName: string): string {
 }
 
 const serviceBlock = (source: string, name: string) => resourceBlock(source, name, 'services');
-const pluginBlock = (source: string, name: string) => resourceBlock(source, name, 'plugins');
+
+/**
+ * Extracts a plugin's ordinal registration block through its semantic map key.
+ *
+ * Plugin comments intentionally contain no user text: generated bindings and source-adjacent
+ * markers must remain safe for reserved words, collisions, and embedded newlines. The map write is
+ * the stable consumer-visible boundary that still carries the original resource name as a JSON
+ * literal.
+ */
+function pluginBlock(source: string, name: string): string {
+  const endMarker = `plugins.set(${JSON.stringify(name)}, resource);`;
+  const end = source.indexOf(endMarker);
+  assert(end >= 0, `generator emitted no plugins.set(...) for ${name}`);
+  const start = source.lastIndexOf('  // --- plugin ', end);
+  assert(start >= 0, `generator emitted no ordinal block for ${name}`);
+  return source.slice(start, end);
+}
 
 const service = (extra: Record<string, unknown>) => ({
   Runtime: 'deno',
@@ -198,7 +214,7 @@ describe('declared service environment (#1447)', () => {
       !block.includes('59147'),
       'a declared PORT must not be applied — the endpoint binding owns it',
     );
-    assertStringIncludes(block, "Declared `PORT` is not applied");
+    assertStringIncludes(block, 'Declared `PORT` is not applied');
     assertStringIncludes(block, 'HostPort');
     // …and the endpoint that does own it is still registered.
     assertStringIncludes(block, "withHttpEndpoint({ env: 'PORT' })");
@@ -282,7 +298,7 @@ describe('declared plugin environment parity (#1447)', () => {
     const block = pluginBlock(renderPlugins(config), 'excalidraw-plugin');
 
     assert(!block.includes('59147'), 'a declared PORT must be refused on plugins as well');
-    assertStringIncludes(block, "Declared `PORT` is not applied");
+    assertStringIncludes(block, 'Declared `PORT` is not applied');
     assertStringIncludes(block, JSON.stringify(MCP_ENV));
   });
 });
