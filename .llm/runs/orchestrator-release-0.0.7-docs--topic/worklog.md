@@ -3856,3 +3856,47 @@ A note on judgement: I twice reported a defect as "tracked, acceptable to ship" 
 answer was to go back and fix it. The tracked-gap framing is legitimate but it is also the
 comfortable one, and both times the "collateral" I cited as a reason to stop turned out to be real
 defects worth fixing on their own merits.
+
+## 2026-09-01 — audit correction: ready-merge withdrawn, bounded delta dispatched
+
+**The coordinator was right and I was wrong to hand ready-merge.** Cycle-2 PASS evaluated
+`889e676a5`; the ceiling change (20 → 14) landed *after* it and was therefore unevaluated. Label
+reverted `status:ready-merge` → `status:impl-eval` before anything else, so the signal was not left
+wrong while I worked.
+
+**One factual detail in the correction was inverted, corrected with evidence rather than asserted.**
+`git diff --stat 889e676a5 9372a27e1` is **one line** — the ceiling. `ci.yml` was *already inside*
+the evaluated head (`git show 889e676a5:.github/workflows/ci.yml | grep -c jsdoc-example-compile`
+→ 3); what changed is that the *pushed* head `6a51cfe4c` **lacks** it, since that is the commit the
+credential cannot push. Against the pushed head the diff therefore reads as ci.yml removed plus the
+ceiling added. I scoped the delta to both files anyway: re-covering the workflow step is worth doing
+on its merits, because it is the one piece someone else will apply from a patch, and cycle 2 verified
+it in passing rather than as a handover artifact.
+
+**Bounded delta dispatched** on the integrated candidate `9372a27e1` (GLM 5.3 Flash · `max` · pid
+1815362), explicitly scoped as a delta over the cycle-2 PASS and told not to re-audit the other nine
+commits. It must prove the tightened ceiling bites, confirm the other four ratchet constants did not
+move, **trace `RUN_DENO` to the classifier rather than assume** it covers `packages/**`/`plugins/**`,
+prove the *failing* receipt case rather than reason about it, judge whether the patch still applies
+cleanly given it was cut against `eaae7a27b`, and give a judgement I deliberately did not pre-empt:
+whether a zero-slack ratchet in both classes is a correctness win or a merge-queue hazard.
+
+### Sequencing constraint discovered — the acceptance mirror is label-gated
+
+Re-running the close-gate tooling produced:
+
+```
+notice: Mirror skipped because live PR labels do not include status:ready-merge
+close-gate FAIL — 7 unchecked boxes on #1533
+```
+
+**`mirror-acceptance-evidence.ts` refuses to run without `status:ready-merge`.** So close-gate can
+never pass while the label is withheld pending evaluation — the two are mutually exclusive by
+construction. The correct order is delta verdict → re-apply the label → rerun the close-gate job so
+its live reads observe it without moving the evaluated head. Running the CI job before that point
+would only bank a guaranteed-red run for a transient reason, so I ran the tooling and deferred the
+job.
+
+This is worth knowing generally: withdrawing `status:ready-merge` for a re-evaluation *also* disables
+the acceptance mirror, so a PR mid-re-evaluation will always show close-gate red regardless of its
+actual acceptance state.
