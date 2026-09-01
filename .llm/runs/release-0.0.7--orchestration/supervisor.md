@@ -1568,3 +1568,14 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - The shared hybrid evaluator server is stale before #1792. Use current-main direct OpenRouter
   launchers for active work, then rotate the shared server only after existing evaluator traffic is
   terminal and prove GLM/Qwen acceptance from current main.
+
+## 2026-09-01T07:08:46Z — active fronts after #1866 and RFC 0006
+
+- Docs owns #1857 slice B from current main `d2b33a09b`; the merged slice A is not a reason to idle.
+- Fixes owns the active hosted #1865 runtime and must flow directly into #1858 Garnet convergence,
+  runtime proof, evaluation, and merge. Aspire must consume both exact merge SHAs immediately and
+  execute the staged S7-S13 Phase-B sequence under one serialized host lease.
+- Internals owns #1862's fresh exact-head CI/evaluation/evidence rewrite. Features continues #1861
+  and #1864 independently while preserving the ordered #1862 -> #1848 -> #1842 carrier chain.
+- The coordinator alone merges verified packets. A lifecycle label is never evidence: premature
+  `status:ready-merge` on #1862 was corrected to `status:impl-eval` until its fresh verdict exists.

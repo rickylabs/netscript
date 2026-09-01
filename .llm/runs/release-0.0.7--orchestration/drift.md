@@ -1739,3 +1739,12 @@ implementation thread.
 - Recovery is additive and history-preserving: revert in-flight strip commits, restore already
   merged context in a bounded preservation PR, close false issue #1847, and do not rewrite shared
   history.
+
+## 2026-09-01 — readiness labels do not replace immutable evidence
+
+- #1862 briefly carried `status:ready-merge` after its repaired head was pushed even though the only
+  durable evaluator artifact still described the superseded, disproven color-dependent corpus.
+  The coordinator demoted it to `status:impl-eval` while fresh exact-head CI and evaluation run.
+- Binding rule: supervisors may stage readiness, but the coordinator verifies the immutable head,
+  current required checks, truthful PR/issue acceptance mapping, independent verdict, and review
+  threads before merging. Transport progress or lifecycle taxonomy alone never satisfies a gate.

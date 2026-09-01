@@ -3629,3 +3629,24 @@
   one full serialized `scaffold.runtime`; after #1858 ships, Aspire consumes both exact merge SHAs
   into S8/S7 and runs Phase B. Runtime inventory remains Aspire `[]`, containers 0, custom networks
   0, with the known foreign anonymous volume left untouched.
+
+## 2026-09-01T07:08:46Z — two parked PRs ship; hosted Garnet prerequisite gate starts
+
+- Docs PR #1866 passed immutable-head audit, exact-head independent IMPL-EVAL, required CI, and the
+  zero-thread gate at `dd80f5554`; the coordinator corrected its lifecycle/taxonomy and squash-merged
+  it as `8e01a347a`. It is an honest partial `Refs #1857`; Docs immediately dispatched slice B.
+- Legacy RFC PR #1640 passed a separate current-main merge-tree audit with no path overlap, carried
+  full plus exact-head delta PASS evidence, and merged as `d2b33a09b`. It accepts RFC 0006 only;
+  `wave:defer` remains authoritative and the Prisma 8 implementation epic stays open.
+- Fixes repaired #1865's vacuous background regression witness after the evaluator surfaced it,
+  preserved the direct-route verdict artifact, advanced the PR from draft, and started the hosted
+  full e2e lanes at head `f008315d1`. A merge still requires exact-head runtime green through both
+  Postgres and Garnet plus truthful #1863 acceptance evidence.
+- Internals repaired #1862's color-dependent corpus generation at `429f1a0a9`; the generator now
+  proves invariant output under bare, NO_COLOR, FORCE_COLOR, and CLICOLOR_FORCE environments. The
+  coordinator demoted a premature ready label while current-head CI and a fresh independent verdict
+  remain outstanding. Features continues #1861/#1864 independently and holds the ordered
+  #1862 -> #1848 -> #1842 carrier chain.
+- Current host runtime remains Aspire `[]`, containers 0, and custom networks 0. No owner decision
+  is pending. Canary 6 remains gated by #1865 -> #1858 -> Aspire S7-S13 Phase B and a coherent
+  user-facing feature/fix payload, not by Docs or Internals completion.

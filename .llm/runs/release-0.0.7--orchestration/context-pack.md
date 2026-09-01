@@ -2340,3 +2340,17 @@ continues concurrently because serial ordering is per orchestrator, not global.
   Aspire both exact merge SHAs for S8/S7 convergence and the serialized Phase-B proof. Internals
   #1862 evaluation and Features/Docs independent leaves continue in parallel; no owner decision is
   pending.
+
+## Resume delta — 2026-09-01T07:08:46Z
+
+- Current main is `d2b33a09bbcb37946e339837238987b79c192fd3`. Milestone Docs PR #1866 merged as
+  `8e01a347a` after immutable-head PASS/CI audit; Docs slice B is dispatched. Backlog RFC PR #1640
+  merged as `d2b33a09b` with `wave:defer`; it accepts RFC 0006 without claiming implementation.
+- Fixes #1865 is non-draft at `f008315d1` with hosted full e2e lanes running after the evaluator
+  exposed and the author repaired one vacuous background witness. It must pass exact-head Postgres
+  and Garnet runtime gates before merge. #1858 then rebases and consumes one serialized full runtime
+  lease; Aspire consumes both merge SHAs and runs S7-S13 Phase B.
+- Internals #1862 is repaired at `429f1a0a9` but intentionally remains `status:impl-eval` until
+  current-head CI, fresh independent evaluation, and truthful evidence replacement complete.
+  Features #1861/#1864 and Docs slice B continue independently; the #1862 -> #1848 -> #1842 carrier
+  order remains binding. No owner decision is pending and the host runtime is clean.
