@@ -1808,3 +1808,31 @@ implementation thread.
 - This is evaluator-handoff drift, not a product failure. The product merge had a terminal separate-
   session PASS, seven byte-identical judged blobs, zero threads, current close-gate, and complete
   exact Postgres plus SQLite/Garnet runtime proof before the coordinator merged it.
+
+## 2026-09-01 — ordinary DinD port reachability does not prove Aspire DCP reachability
+
+- The NAS handover proved an ordinary Docker container published on all interfaces is reachable as
+  `netscript-dind:<port>`, but Aspire DCP created the S8 PostgreSQL and Redis bindings on DinD's
+  `127.0.0.1` only. The service answered inside DinD while both the DinD hostname and direct
+  container address were unreachable from the agent container.
+- Binding the identical project path into DinD solved volume visibility only. It did not solve the
+  separate-network-namespace loopback boundary. A local Phase-B receipt is green only when the
+  generated AppHost can complete its real resource command from the agent container, not when the
+  backing service merely listens inside DinD.
+- Aspire 13.5.3's container tunnel flag cannot repair this direction of traffic. Bundled DCP
+  0.25.13 deliberately maps an all-interface endpoint back to `127.0.0.1` for its own dial target;
+  upstream Aspire #14878/#1650 and maintainer discussion #9899 confirm that a remote Docker daemon
+  in a different network namespace is unsupported. Shared localhost is a host invariant, not an
+  application slice or a reason to invent generated-code endpoint hacks.
+- Runtime leases remain bounded and owned cleanup remains mandatory even when topology makes the
+  product assertion unreachable. The proven recovery returned both Aspire and Docker inventories to
+  zero before static implementation resumed.
+
+## 2026-09-01 — preserved orchestration can expose a real post-command consumer regression
+
+- S8's typed migrate command itself passed in hosted CI while both full tiers later failed worker
+  execution. Because the current-main baseline passes the byte-identical worker probe, this is not a
+  license to extend the timeout or waive the full gate.
+- The correction must preserve the intended no-restart architecture and restore the resident
+  AppHost's ability to process the triggered job. Slice-local success is necessary but cannot replace
+  the complete integration contract at the same immutable head.

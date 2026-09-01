@@ -3776,3 +3776,35 @@
 - Host inventory was re-proved Aspire `[]` and containers 0. Aspire received exact baseline SHA
   `302409f0c` and began the pre-staged S7-S13 Phase-B sequence; Fixes immediately consumed the same
   SHA into #1858 for its Garnet proof. No owner decision is pending.
+
+## 2026-09-01T17:53:00Z — two feature packets ship; Aspire S8 red is isolated
+
+- Features packets #1882 and #1886 completed exact immutable-head review, formal IMPL-EVAL PASS,
+  zero-thread audit, current-main conflict-free synthetic merges, and applicable exact CI. The
+  coordinator squash-merged #1882 as `d7040976f8018746c8949478a874fdde5d1a2a2e`, closing and
+  shipping #1875, then merged the disjoint #1886 acceptance-tripwire slice as
+  `9ca986fb0d1c57758ee5f319d3059c4c258f2cf0`. #1886 intentionally references rather than closes
+  #1349 because the ordered parent work remains open.
+- Aspire S8 PR #1754 at `71f3cab4d` is not mergeable. Hosted run `33538801552` passed its typed
+  database Phase-B slice but failed `behavior.workers-executions` in both Postgres and
+  SQLite/Garnet after the successful no-restart migration path; the current-main baseline completes
+  the same probe in about 0.4 seconds. The Aspire supervisor owns a bounded repair that preserves
+  the AppHost while restoring worker processing, followed by one exact both-tier hosted rerun.
+- The local DinD probe proved bind visibility is fixed but network reachability is not: DCP binds
+  published service ports to DinD's loopback, so the agent cannot reach them through
+  `netscript-dind:<port>`. The hanging migrate probe was interrupted after this decisive evidence.
+  Owned cleanup completed exactly: `aspire ps=[]` and `docker ps -a` empty. A separate read-only
+  research lane is deriving a supported Aspire 13.5 bind/tunnel correction; no local receipt is
+  claimed green until that topology is corrected and the exact probe reruns.
+- The read-only topology research completed against Aspire 13.5.3 and bundled DCP 0.25.13. There is
+  no supported remote-Docker bind or tunnel override for AppHost-to-container traffic;
+  `ASPIRE_ENABLE_CONTAINER_TUNNEL` is the opposite direction, and DCP normalizes all-interface
+  endpoints back to its own loopback. The host acceptance packet therefore requires a shared network
+  namespace (`ai-agents` using `network_mode: service:netscript-dind` or the equivalent), the existing
+  identical `/home/agent` bind, and `DOCKER_HOST=tcp://127.0.0.1:2375`, followed by the exact local
+  Phase-B rerun and cleanup to zero. Aspire product work continues independently of that host action.
+- All five supervisors received the new main SHA and concrete non-watcher assignments. #1842 is
+  repairing its wrong `@netscript/plugin` JSDoc import to the public `/sdk` entrypoint and running
+  exact scaffold coverage; #1756 restored runtime semantics and is finishing its suite; Internals
+  launched #1888 and continues #1876/#1351/#1879; Fixes serializes #1858 behind the currently active
+  hosted jobs instead of creating cancellation churn. No owner-only decision is pending.
