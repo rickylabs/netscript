@@ -7217,3 +7217,41 @@
     adopting rather than re-deriving: S7's *"foreign AppHost reported, never mutated"* invariant now has
     a documented upstream boundary — **report, do not attempt to prevent** — so a reaped foreign network
     is not an S7 defect.
+
+- **D-280 — #1865 baseline consumed; all seven converged onto `302409f0c` and pushed; two collisions
+  resolved with rulings, one of which deleted a test main had just added.**
+  - **`302409f0c` *is* `origin/main`** — #1865's merge commit is the tip, verified by ancestry rather
+    than assumed from the number.
+  - **Overlap measured before rebasing, as the packet requires.** S8 overlap **0** → the IMPL-EVAL PASS
+    carries; re-proven **72/72** at the new head `71f3cab4d`, with A6 (0/0) and the `db init --name`
+    fault path re-gated there. Only two slices overlapped #1865 at all, and both were the collisions
+    already predicted.
+  - **New heads, all `behind=0`:** S8 `71f3cab4d`, S9 `b5d9cbad2`, S10 `9836bc94b`, S11 `0d1ea2588`,
+    S13 `4b3b488f4`, S7 `13762b8d8`, #1747 `74f850415`.
+  - **S10 — the delete-vs-modify played out exactly as pre-ruled, and then went one step further.**
+    S10's deletion of `wait-for-workers-runtime.ts` won over #1865's modification. But #1865 had also
+    **added a test for that module**, so after the convergence the check failed with a single TS2307 —
+    the only error in a 920-file check. Removing that test is the coherent completion of the deletion
+    (the module is gone and nothing invokes it), so it was removed **deliberately and recorded as a
+    supersession**, not left to look like rebase debris.
+    - Worth noting what the removed test asserted: *"workers runtime evidence accepts the real
+      in-process runner mode"* — i.e. **#1865's own OR-marker fix**. The stopgap did its job unblocking
+      the baseline, and S10 removes the surface it patched, exactly as flagged to Fixes before that leaf
+      was written.
+  - **#1747 — resolved toward the shipped contract, then corrected when that broke the build.**
+    #1865 extracted block location into a tested helper (`locateWorkersBackgroundBlock`); #1747 had
+    reconstructed it inline with a regex plus `lastIndexOf` marker search — the fragile shape the
+    extraction replaced. Took HEAD.
+    - **Then the check failed:** the helper returns only a `SourceRange`, not the resource's **binding
+      identifier**, which #1747's later code still needs. Blindly taking one side removed a declaration
+      a subsequent line used. Restored the quote-agnostic pattern for the *different* job it does —
+      extracting the binding *within* the located block — with a comment saying why it is a complement,
+      not a duplicate.
+    - **Verified rather than assumed:** #1865's helper matches `(['"])name`, and #1747 changes the
+      generator to emit `JSON.stringify`'d names — so the shipped locator already handles this slice's
+      emission change without modification. Had it been single-quote-only, taking HEAD would have
+      silently broken the fixture.
+  - **Local runtime baseline reported, unchanged and untouched:** `aspire ps` `[]`, containers **0**,
+    networks `bridge host none` only, volumes **1** — the known foreign `d33e5c2e…`. **No local lease has
+    been taken**, so this is a report, not a cleanup.
+  - Hosted CI is now running on all eight heads; S11 and S13 already at **fail=0**.
