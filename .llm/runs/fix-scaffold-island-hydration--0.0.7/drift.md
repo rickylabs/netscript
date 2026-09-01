@@ -29,6 +29,11 @@
   status of 404 ()`, but the first run captured URLs only for the two Fresh entries. Both were 200.
   The browser test now records every response with status >= 400, including URL, status, and resource
   type. Until that receipt lands, the 404 is unattributed and is not defect evidence.
+- **Response-ledger result:** run `33541399005` repeated successful hydration and interaction. Its
+  all-response ledger was empty for status >= 400, so the browser's console-only 404 did not have a
+  page-observed failing HTTP response. The measurement now captures console source location, every
+  request URL/resource type, and every request-failure URL/error to attribute the message without
+  guessing.
 - **Scope consequence:** if the unattributed 404 is incidental, the remaining discrepancy is
   generated-scaffold-specific or the carried #1845 receipt is stale relative to current sources.
   The package fixture does not yet establish which; hosted generated-app proof remains authoritative.

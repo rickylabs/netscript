@@ -81,6 +81,7 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | Hosted browser scheduling     | Draft PR policy skipped `classify`/`check-test`, so `fresh-browser` did not execute. The in-app browser control runtime is not exposed in this session. No client-path observation exists yet. |
 | 2026-09-01 | S2    | Hosted browser observation    | Run `33539774285` loaded both Fresh client entries with 200 responses, resolved the provider/query client and query hook, ran the hydration effect, and changed the row after click. The package fixture hydrates. |
 | 2026-09-01 | S2    | Assertion correction          | Removed the post-hydration comment-node requirement, split query-client data into pre-click and post-click observations, and added an all-response ledger for the unattributed 404 URL/status/resource type. |
+| 2026-09-01 | S2    | Response-ledger observation   | Run `33541399005` repeated successful hydration; all corrected expectations passed, and only the console-only 404 remained. No response >= 400 was observed, so console location plus all requests/failures are now captured. |
 
 ## Decisions
 

@@ -263,6 +263,9 @@ Deno.test({
         'run-code',
         `async page => {
           const runtimeErrors = [];
+          const consoleErrors = [];
+          const networkRequests = [];
+          const networkRequestFailures = [];
           const clientRequests = [];
           const clientResponses = [];
           const clientRequestFailures = [];
@@ -271,9 +274,22 @@ Deno.test({
             url.includes('fresh:client-entry') || url.includes('ServiceShowcaseLab');
           page.on('pageerror', error => runtimeErrors.push(String(error)));
           page.on('console', message => {
-            if (message.type() === 'error') runtimeErrors.push(message.text());
+            if (message.type() === 'error') {
+              const location = message.location();
+              runtimeErrors.push(message.text());
+              consoleErrors.push({
+                text: message.text(),
+                url: location.url,
+                lineNumber: location.lineNumber,
+                columnNumber: location.columnNumber,
+              });
+            }
           });
           page.on('request', request => {
+            networkRequests.push({
+              url: request.url(),
+              resourceType: request.resourceType(),
+            });
             if (isObservedClientAsset(request.url())) clientRequests.push(request.url());
           });
           page.on('response', response => {
@@ -290,11 +306,14 @@ Deno.test({
             }
           });
           page.on('requestfailed', request => {
+            const failure = {
+              url: request.url(),
+              resourceType: request.resourceType(),
+              error: request.failure()?.errorText ?? 'unknown request failure',
+            };
+            networkRequestFailures.push(failure);
             if (isObservedClientAsset(request.url())) {
-              clientRequestFailures.push({
-                url: request.url(),
-                error: request.failure()?.errorText ?? 'unknown request failure',
-              });
+              clientRequestFailures.push(failure);
             }
           });
           await page.addInitScript(() => {
@@ -387,6 +406,9 @@ Deno.test({
             clientResponses,
             clientRequestFailures,
             nonSuccessfulResponses,
+            networkRequests,
+            networkRequestFailures,
+            consoleErrors,
             runtimeErrors,
           };
         }`,
@@ -431,6 +453,21 @@ Deno.test({
           readonly status: number;
           readonly resourceType: string;
         }[];
+        readonly networkRequests: readonly {
+          readonly url: string;
+          readonly resourceType: string;
+        }[];
+        readonly networkRequestFailures: readonly {
+          readonly url: string;
+          readonly resourceType: string;
+          readonly error: string;
+        }[];
+        readonly consoleErrors: readonly {
+          readonly text: string;
+          readonly url: string;
+          readonly lineNumber: number;
+          readonly columnNumber: number;
+        }[];
         readonly runtimeErrors: readonly string[];
       };
 
@@ -469,6 +506,8 @@ Deno.test({
         hydrationEffectRan: browserEvidence.clientExecution.hydrationEffectRan,
         clientRequestFailures: browserEvidence.clientRequestFailures,
         nonSuccessfulResponses: browserEvidence.nonSuccessfulResponses,
+        networkRequestFailures: browserEvidence.networkRequestFailures,
+        consoleErrors: browserEvidence.consoleErrors,
         runtimeErrors: browserEvidence.runtimeErrors,
       };
 
@@ -511,6 +550,8 @@ Deno.test({
             hydrationEffectRan: true,
             clientRequestFailures: [],
             nonSuccessfulResponses: [],
+            networkRequestFailures: [],
+            consoleErrors: [],
             runtimeErrors: [],
           },
         },
