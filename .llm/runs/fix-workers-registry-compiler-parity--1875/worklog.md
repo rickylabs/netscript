@@ -72,8 +72,10 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 ## Post-Slice Reconcile
 
 - Issue #1875 remains open at milestone 0.0.7; PR #1882 retains `Closes #1875`.
-- PR #1882 has exactly the requested metadata: `orchestrator:features`, `status:impl`, `type:fix`,
-  `priority:p2`, `wave:v1`, `area:workers`, milestone 0.0.7, and draft state.
+- PR #1882 opened with exactly the requested metadata: `orchestrator:features`, `status:impl`,
+  `type:fix`, `priority:p2`, `wave:v1`, `area:workers`, milestone 0.0.7, and draft state. During the
+  formal-evaluation window, an external owner/coordinator transition made it non-draft and advanced
+  the sole status label to `status:impl-eval`; final reconciliation preserved that foreign state.
 - No new review/evaluator comments required a source readjustment after S1.
 - The plan remains unchanged; the live five-field gap was anticipated by its conditional repair
   scope and is prominently recorded above.
@@ -85,6 +87,10 @@ material architecture, sequencing, or trade-off decisions requiring adversarial 
 - The evaluator observed the same five-field defect class in the owner-excluded
   `runtime-registry-generator.ts`. This is a non-blocking follow-up after PR #1872, not
   authorization to touch or file against that in-flight scope during this run.
+- The branch received owner-authored merge commit `ad5eb3041`, syncing current `origin/main`
+  `102ef8a10` after the frozen source candidate. That merge touched Fresh/docs/generated corpus
+  files only; no workers/core/lock path changed between `e400cd3f9` and the final harness head, so
+  the evaluator's product-tree evidence remains exact for this slice.
 
 ## Decisions
 

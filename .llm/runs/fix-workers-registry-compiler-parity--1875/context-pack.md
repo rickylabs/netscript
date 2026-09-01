@@ -27,12 +27,13 @@ against frozen candidate `e400cd3f9` with no blocking findings.
 
 ## In Progress
 
-- Harness-close artifact reconciliation and PR phase update only.
+- Harness-close PR phase update only.
 
 ## Next Steps
 
 1. Commit/push evaluation artifacts and post the IMPL-EVAL PR comment.
-2. Preserve draft `status:impl`; the milestone supervisor owns any later ready/merge close gate.
+2. Preserve the external owner/coordinator transition to non-draft `status:impl-eval`; do not infer
+   merge authority. The milestone supervisor still owns the ready-merge close gate.
 
 ## Key Decisions
 
@@ -71,4 +72,5 @@ against frozen candidate `e400cd3f9` with no blocking findings.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- See PR #1882's commit list + per-slice PR comments. Owner-authored `ad5eb3041` synced current main
+  after evaluation without changing workers/core/lock paths; `d7a96973c` records the PASS artifact.

@@ -22,5 +22,8 @@ native Opus 5 medium session transparently completed the opposite-family formal 
 independently proved that a synthetic future schema key and a removed emitted key both fail loudly,
 and that the new `undefined` emissions introduce no generated-module type regression.
 
-PR #1882 remains draft with `status:impl`, milestone 0.0.7, the requested namespaced labels, and
-`Closes #1875`. Ready/merge close-gate authority remains with the milestone supervisor.
+PR #1882 opened draft with `status:impl`, milestone 0.0.7, the requested namespaced labels, and
+`Closes #1875`. During evaluation, an external owner/coordinator transition made it non-draft and
+advanced it to `status:impl-eval`; that foreign state was preserved. Owner-authored merge commit
+`ad5eb3041` also synced current main without changing workers/core/lock paths. Ready-merge and merge
+close-gate authority remains with the milestone supervisor.
