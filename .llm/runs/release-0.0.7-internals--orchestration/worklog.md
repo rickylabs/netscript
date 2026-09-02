@@ -9807,3 +9807,34 @@ preserved) and is being watched.
 Acceptance box 6 conjoins single-copy **with** a passing scaffold runtime E2E, so it stays unchecked
 until a real conclusion exists. A `cancelled` job is not a conclusion — laundering one into a tick
 would reproduce exactly the defect #1846 was filed to remove.
+
+### D-224 — #1908 repair complete but UNPUSHABLE: this session's token lacks `workflow` scope
+
+The concurrency-key isolation repair is implemented, evidenced and committed locally as `c4a436bf6`
+on `ci/e2e-concurrency-key-isolation` (base main `d5c5810db`), but **cannot be pushed**:
+
+```
+! [remote rejected] refusing to allow a Personal Access Token to create or update workflow
+  `.github/workflows/e2e-cli.yml` without `workflow` scope
+```
+
+`gh auth status` confirms token scopes are **`repo` only**. This is a hard credential boundary, not a
+process choice. The Aspire lane hit the identical refusal attempting the same class of change, so it
+is not specific to this session — and I am deliberately **not** asking that lane to push on my behalf,
+which would launder a permission boundary my own session was denied.
+
+The merge exception does not rescue this case: merging `main` works because the resulting workflow
+blob already exists on the remote, whereas this commit introduces a **new** blob.
+
+**The work itself is complete and verified.** Two group literals versioned to `-v2`;
+`non_comment_non_group_changed_lines=**0**`; both tiers' `cancel-in-progress: false` + `queue: max`
+intact; top-level per-ref group untouched; `YAML_PARSE_REAL_EXIT=0` with the concurrency structure
+read back from the parsed document rather than grepped. Header documents the versioned key, the
+transition semantics, and the four operator facts established with the Aspire lane.
+
+Implementation authored by Codex leaf thread `01a0607f`, which stalled pre-commit (fourth instance of
+that pattern this release); the supervisor completed evidence, worklog and commit with attribution
+preserved.
+
+**Needs an owner/coordinator push from a credential carrying `workflow` scope.** #1846 landed on main
+under the owner's account, so that path exists.
