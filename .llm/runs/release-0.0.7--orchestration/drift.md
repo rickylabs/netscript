@@ -1836,3 +1836,31 @@ implementation thread.
 - The correction must preserve the intended no-restart architecture and restore the resident
   AppHost's ability to process the triggered job. Slice-local success is necessary but cannot replace
   the complete integration contract at the same immutable head.
+
+## D-190 — completed supervisor turns were mistaken for active delivery
+
+- Detected 2026-09-02: Features, Internals, and Docs had completed substantive turns, but their next
+  steering instructions remained in the Remote Control composers rather than being submitted.
+- Impact: no merge was produced overnight despite ready packets #1846/#1890/#1744; the milestone
+  appeared active while three topic queues were not advancing.
+- Correction: re-arm completed supervisors immediately, audit ready packets independently, and make
+  the coordinator merge in the same turn. This produced #1846, #1890, #1744, and #1747 on main.
+  A visible tmux session or background watcher is not delivery evidence; the next concrete commit,
+  immutable packet, evaluator, or hosted receipt must be running.
+
+## D-191 — `status:ready-merge` did not prove evaluator currency
+
+- #1754 and #1771 were both exact-head CI/acceptance green but their last formal evaluator evidence
+  predated the final material repair. The coordinator rejected both labels and requested only the
+  bounded product delta evaluation rather than a full repeat.
+- Rule: before merge, compare the last independently evaluated product head with the immutable PR
+  head. Artifact-only carry is acceptable when proven; a material post-verdict product commit needs
+  a separate delta verdict even if hosted CI is green.
+
+## D-192 — pre-fix PR branches still share the old runtime concurrency contract
+
+- #1846 repaired the runtime queue on main, but reruns from pre-#1846 branches can still cancel one
+  another through the workflow concurrency group. This was captured as milestone issue #1908 and
+  assigned to Internals.
+- Until that bounded repair lands, Aspire S9/S10 must not churn identical hosted reruns. Static and
+  evaluator work continues independently; this is not a global lane pause.

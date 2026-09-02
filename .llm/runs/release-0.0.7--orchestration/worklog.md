@@ -3875,3 +3875,31 @@
 - P0 PR #1899's exact hosted run `33557955381` remains active; on green it merges before its repair
   is integrated into #1858 and #1885. Docs #1756, Features #1904/#1895, Internals #1839/#1846, and
   Aspire S7/S8/S9-S13 continue without routine owner or coordinator pauses.
+
+## 2026-09-02T04:58:22Z — delivery recovery, four merges, and exact canary-6 boundary
+
+- Overnight steering degraded: Features, Internals, and Docs had completed turns with their next
+  commands still sitting unsent. The coordinator re-armed all three, kept the already-active Fixes
+  and Aspire supervisors running, and restored delivery-only operation. Features is consuming the
+  integrated browser receipt for #1895; Fixes is implementing the Aspire event-observation slice;
+  Internals is completing #1889; Aspire is converging S8-S13. Docs #1756 is the sole externally
+  blocked lane because the repository token lacks GitHub `workflow` scope for its real `ci.yml`
+  patch; its carried patch is preserved and no other lane is held behind it.
+- Independent immutable-head audits let the coordinator merge four packets without owner pause:
+  #1846 as `6bb9c00f9344ff6567ffe9705e59eead5c53504c` (closing #1839), #1890 as
+  `9924794bea5d7f3808ed9ff8e454e82eefdcb5f0` (closing #1879), Aspire S7 #1744 as
+  `c532334151372d0a06bb9517c7ab271756c3d489` (closing #1719/#1429), and Aspire #1747 as
+  `d5c5810db23dc0204a5a4cbba002f806e3e63a3e` (closing #1732). Terminal issues and PRs carry
+  `status:shipped`.
+- Canary 6 is not dispatchable yet because the owner requires the coherent Aspire 13.5 payload.
+  S8 #1754 has exact green core and both hosted runtime tiers but needs one active two-file delta
+  IMPL-EVAL at final product head `ce7e82a76`; S11 #1771 similarly needs one generated-file delta
+  verdict plus a truthful body rewrite. S9/S10 hosted receipts exposed #1908: pre-#1846 branches can
+  still collide through the shared concurrency group. Internals owns that bounded repair. S13 then
+  integrates the landed predecessors. No redundant full evaluation or unchanged runtime retry is
+  authorized.
+- Milestone 27 now has 39 open issues and 19 open PRs. Every open milestone issue has exactly one
+  topic owner after assigning new #1908 to Internals. Main is
+  `d5c5810db23dc0204a5a4cbba002f806e3e63a3e`; Aspire inventory is empty, DinD has zero containers,
+  and zombie count is zero. The 139 registered worktrees are preserved pending ownership-aware
+  cleanup because active supervisors and leaf evaluators are using the current milestone set.

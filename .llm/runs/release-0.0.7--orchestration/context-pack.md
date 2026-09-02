@@ -2502,3 +2502,22 @@ continues concurrently because serial ordering is per orchestrator, not global.
   Aspire S7/S8/S9-S13 remain independent active delivery streams.
 - Host inventory was re-proven Aspire `[]` and Docker containers 0. No owner-only decision is
   pending.
+
+## Resume delta — 2026-09-02T04:58:22Z
+
+- Current main: `d5c5810db23dc0204a5a4cbba002f806e3e63a3e` after coordinator merges #1846, #1890,
+  Aspire S7 #1744, and Aspire #1747. Their closing issues #1839, #1879, #1719, #1429, and #1732
+  are terminal/shipped.
+- Live milestone: 39 open issues, 19 open PRs, zero issues without exactly one topic owner. New
+  #1908 is Internals-owned and bounds the remaining cross-branch runtime-concurrency collision.
+- Canary 6 remains gated on the coherent Aspire 13.5 payload: S8 exact-head delta evaluator run
+  `33592611614`; S9/S10 post-#1908 hosted receipts; S11 one-file delta evaluation and body rewrite;
+  then S13 integration. S7 is already on main. Do not dispatch an internal-only canary or repeat
+  already-green runtime/evaluator work.
+- All five Opus 5 Remote Control supervisors are live. Features and Internals have active hosted
+  receipts; Fixes is implementing #1906/#1907; Aspire is executing the bounded delta/runtime train.
+  Docs #1756 is preserved at `216d9ced4` but cannot push its required workflow source until the
+  GitHub credential gains `workflow` scope; this is not a global barrier.
+- Environment at checkpoint: `aspire ps --format Json == []`, DinD container count 0, zombies 0.
+  Registered worktrees are 139 and must not be bulk-pruned while current milestone ownership is
+  active.
