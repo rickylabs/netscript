@@ -1,4 +1,4 @@
-import { assertThrows } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import {
