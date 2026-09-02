@@ -7,6 +7,7 @@
 | Run ID | `deploy-emit-routing--impl` |
 | Branch | `fix/deploy-emit-routing` |
 | Baseline | `origin/main` at `850cc7757d11d420b9061dbe6a61536357ab77fe` |
+| Evaluated implementation head | `2b2ee45fe7e440e5d1e425eddca1a2c55e079d38` |
 | Lane | Codex · OpenAI · GPT-5.6 Sol · medium (`normal_implementation`) |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | none |
@@ -44,7 +45,7 @@ adapter-semantics stop. This supersedes the precondition stop recorded below.
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
 | 1 | RED invariant test proving advertised operations must be routable | affected deploy tests | `a3e135c6872c55a9c2bfae7d37837adf89034c4e` |
-| 2 | Route `emit`, reject divergence, and prove the invariant GREEN | scoped check/test/lint/fmt + `quality:gate` | pending commit |
+| 2 | Route `emit`, reject divergence, and prove the invariant GREEN | scoped check/test/lint/fmt + `quality:gate` | `2b2ee45fe7e440e5d1e425eddca1a2c55e079d38` |
 
 ### Deferred Scope
 
@@ -72,6 +73,7 @@ construction.
 | 2026-09-02 | S2 | implementation | Added `emit` to the routed operations and a runtime invariant covering description-without-route and advertised-without-route divergence. |
 | 2026-09-02 | S2 | negative guard | A synthetic adapter advertises legacy `build`; the test proves command construction throws `advertises unrouted operations: build`. |
 | 2026-09-02 | S2 | GREEN | Affected deploy tests pass: 11 passed, 0 failed. |
+| 2026-09-02 | S2 | GREEN commit/head | `2b2ee45fe7e440e5d1e425eddca1a2c55e079d38`. |
 | 2026-09-02 | S2 | reconcile | #1544 remains open; implementation satisfies all acceptance boxes pending PR/CI/evaluator evidence. No scope expansion or unrelated issue changes. |
 
 ## Decisions
@@ -125,5 +127,5 @@ construction.
 
 - Review `assertDeployRoutingInvariant` beside the command table first.
 - RED commit: `a3e135c6872c55a9c2bfae7d37837adf89034c4e`.
-- GREEN implementation commit: pending.
+- GREEN implementation commit and evaluated head: `2b2ee45fe7e440e5d1e425eddca1a2c55e079d38`.
 - Full `e2e:cli` was deliberately not run per the supervisor's gate selection.
