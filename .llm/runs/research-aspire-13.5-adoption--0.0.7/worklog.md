@@ -661,3 +661,16 @@ before starting SQLite.
   Actor: supervisor consumes the sqlite verdict the minute it lands.
 - S10 #1760 @ `84e4b38f7` — unchanged; #1930 (`fix/desktop-fixture-orpc-contract-dep`) re-pushed
   and is itself queued for runtime tiers. Rerun `desktop-native-linux` on S10 once #1930 merges.
+
+### 2026-09-02 17:13Z — **S13 MERGE PACKET — exact-green**
+
+PR #1779 head `5f0eed0feead7f3dc15191cb5daa85dec6c56fb3`, base `main` @ `850cc7757`, MERGEABLE/CLEAN,
+not draft, `Closes #1724`, sole `status:ready-merge` on PR + #1724 (issue relabeled from
+`status:impl-eval` at 17:12Z), DoD 0 unchecked, #1724 boxes 5/5 mirrored. Checks at this head:
+10 pass / 13 skipped / 0 red — `ci` 33658243495 SUCCESS (`build`, `quality`, `check-test`,
+close-gate), Code quality 33658243425 SUCCESS, Fresh UI quality 33658243339 SUCCESS, docs deploy
+33658243303 SUCCESS. Runtime tiers skipped by the classifier at this head (65-file delta:
+stale-surface cleanup + telemetry example + generated carriers; no docker-tier code). Review-threads
+gate PASS (0 threads). Repairs since the IMPL-EVAL head `435c20170` are carriers + two one-line
+defects (D-325 public resolver mapping; `gen:publish-assets`), all hosted-green. **Coordinator lands
+the merge.**
