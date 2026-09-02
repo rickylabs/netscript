@@ -10981,3 +10981,8 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 
 **Five Features PRs now `status:ready-merge`**: #1944, #1943, #1948, #1895, and #1664 pending only
 #1845. Measuring Slice E next.
+
+## 20:04Z — post-#1944 reconciliation
+
+- main `7d1faa352`. Converged #1943→`7e16727b0`, #1948→`958150d83`, #1664→`9e0936440` (corpus regenerated; only conflict was the generated corpus; four admission gates 0 each; no slice-owned file moved). Detached packet-waits post the exact-head packet on green (`/home/agent/observability/pw-<pr>.log`).
+- Slice E dispatched on `0faae3fde` (main+B+D, zero conflicts). Slice A live on #1664.
