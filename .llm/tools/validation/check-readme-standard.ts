@@ -16,6 +16,13 @@
  * Single responsibility: structural conformance of unit READMEs. It does not
  * lint prose or verify link targets resolve (link-checking is a separate gate).
  *
+ * It also does not compile anything. Requirement 3 asserts that a fenced block
+ * *exists*; whether that block's imports resolve and its symbols type-check is
+ * the separate concern of `.llm/tools/docs/check-readme-fences.ts`
+ * (`deno task docs:readme-fences`). A README can satisfy this gate in full while
+ * its examples name a dead specifier or a renamed symbol, so a pass here is never
+ * evidence that the code in a README runs.
+ *
  * Usage:
  *   deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts [paths...] [--pretty] [--json] [--help]
  *
