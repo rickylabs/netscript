@@ -46,3 +46,10 @@ PLAN-EVAL: N/A — the issue supplies a complete mechanical contract and accepta
 - Regenerated carrier SHA-256 with `"tests/"` temporarily absent: `484005d66dfc4b19669e62fd11bdf82975311d213c396feb131f3f3d92528831`.
 - Regenerated carrier SHA-256 with `"tests/"` present: `484005d66dfc4b19669e62fd11bdf82975311d213c396feb131f3f3d92528831`.
 - The generated delta (12 additional symbols; uncompressed corpus +4,401 bytes; compressed corpus +448 bytes) is byte-identical regardless of this slice. It is unrelated baseline staleness, so the generated file was restored from `HEAD` as the owner directed. The final corpus check truthfully exits 1 for that pre-existing condition.
+
+## Handoff
+
+- Implementation/evidence commit: `73449bd7b650a4adcdadf0fe19bc29904f63d3d0`.
+- Explicit push refspec: `HEAD:refs/heads/build/fresh-publish-tests-exclude` (exit 0).
+- Non-draft PR: #1918 against `main`, opened with the requested labels and milestone 0.0.7 (ID 27).
+- Harness IMPL and IMPL-EVAL comments posted to the PR; `Closes #1897` is present in the body.
