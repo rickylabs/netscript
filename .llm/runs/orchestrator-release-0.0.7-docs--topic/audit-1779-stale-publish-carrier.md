@@ -94,3 +94,24 @@ Predicted collision materialised: #1938, #1943, #1944 (all Fixes, all `ready-mer
 | #1942 (Fixes) | `2a5d01ae1` | 3 | close-gate **fail** | Still needs the rerun. |
 | #1943 (Fixes) | `3a888f398` | 0 | re-headed, CI pending | Conflict resolved by owner; corpus freshness step will verify. |
 | #1944 (Fixes) | `bd3eeac54` | 0 | re-headed, CI pending | Same. |
+
+## Resweep after Fixes' convergence batch (2026-09-02 19:05, main `1ca47b859`)
+
+- **#1856** took the `typeAlias` fix (`511e1a347`), then chased carriers one commit at a time: prose bundle
+  (`34a757d44`, on a 54-behind base → conflicted on `.llm/assets/agent-docs/{prose.json.gz,provenance.json}`;
+  handed off), merged main + regen (`162c6bc49`), corpus (`f8c359317`), asset barrel (`b48aacb07`). Now behind 0,
+  no conflict. **Regen chain for any `docs/site` edit, in one commit after merging main:**
+  `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:mcp-export-corpus` (last only if a reference kind/symbol moved).
+- **#1938** `89ac276bf` resolved the corpus conflict; #1943 `3a888f398`, #1944 `bd3eeac54` re-headed clean.
+- **#1883 / #1909 / #1916 / #1940 / #1942** re-headed as pure main merges (behind 0, no conflict, no docs/carrier
+  delta). #1916/#1942 close-gate went `fail` → `pending` on the new heads with `ready-merge` already applied.
+- **#1759** `4c9def611`: merged main + Aspire surface manifest. 64 added files under
+  `.agents/generated/consumer-skills/` are declared generator output (S2, `agentic:dogfood-skills:check` PASS) — not an
+  accidental add; no CI freshness gate exists for that bundle (pre-existing, not this PR's regression).
+- **#1760** `0b3f13e0c`: +11 Aspire surface-manifest rows only.
+- **#1664** `06cf9c301` (Features): converged main → regenerated corpus in the right order; `packages/cli/README.md` /
+  `packages/fresh/README.md` claims verified against the head (`service generate`, `--dry-run`, `ContractV1`,
+  `initialDataUpdatedAt` in `hooks.ts:128-140`, query-key namespace change matches the template diff).
+- **#1946** `37b3b9b65` (Features): internal `resource-slice/` code only; no export/carrier surface.
+
+No open docs finding. No `orchestrator:docs` issue in 0.0.7.
