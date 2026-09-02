@@ -29,6 +29,19 @@
 - **Action:** kept a narrow line-based reader inside the authorized structural test file. Its
   limitations and fail-closed behavior are recorded in `evidence.md`.
 
+## 2026-09-02 — Post-merge trigger-isolation recipe corrected after IMPL-EVAL
+
+- **Severity:** minor
+- **Previous recipe:** change a member manifest and deliberately stale
+  `packages/fresh-ui/deno.lock` in the same one-shot PR.
+- **Finding:** the private-lock path already matches the pre-existing `packages/fresh-ui/**`
+  workflow glob and already contributes `freshUi: true`, so that two-file diff cannot isolate the
+  new member-manifest trigger.
+- **Action:** after the Fable 5.1 opposite-family IMPL-EVAL finding, corrected `evidence.md` to
+  require a manifest-only dependency-declaration change with no lockfile edit. A workflow start
+  then proves the new trigger glob, while the frozen failure independently proves the
+  manifest-versus-lock mismatch.
+
 ## Scope Drift
 
 None. The two-layer classifier/workflow fix, tests, and evidence remain within the authorized files.

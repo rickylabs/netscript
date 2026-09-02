@@ -80,6 +80,8 @@ test before changing `classifyPath()`.
 | 2026-09-02 10:39 | 3 | live teeth proof | Disposable PR #1919 produced failing run `33620426788` at `Frozen package type-check`; captured annotation, closed PR unmerged, and deleted branch/worktree. |
 | 2026-09-02 | 4 | Tier-A finding T-1 | Extended the latent manifest-form class to `deno.jsonc` across classifier, both workflow arms, and both tests; recorded the rejected YAML-library option. |
 | 2026-09-02 10:50 | 4 | validation | Re-ran the four required gates plus the filtered structural test; all returned real exit code 0 and changed no lock or manifest. |
+| 2026-09-02 | 5 | IMPL-EVAL | Separate-session Fable 5.1 opposite-family review returned `PASS_WITH_FINDINGS` at `7592fa9df`; code and scope were accepted, with one evidence correction and one accepted forward-looking gap to record. |
+| 2026-09-02 | 5 | artifact correction | Replaced the non-isolating two-file post-merge recipe with a manifest-only proof and explicitly recorded the uncovered future `examples/*` / `apps/*` class. No source changed; gates and the stale-lock teeth demonstration were not rerun. |
 
 ## Gate Results
 
@@ -113,11 +115,19 @@ test before changing `classifyPath()`.
   member-manifest triggering. Main PR #1917 remains draft at `status:impl`.
 - Slice 4: Tier-A finding T-1 was accepted. `deno.jsonc` now follows the same classifier and trigger
   path as `deno.json`; all five requested gates passed, and the authorized surface remained exact.
+- Slice 5: IMPL-EVAL accepted the implementation and independently confirmed the code gates and
+  safety properties. Finding F1 corrected the post-merge proof to change only a member manifest,
+  because including the private lock would exercise a pre-existing trigger. Finding F2 records
+  `examples/*` and `apps/*` as a known future gap, not current or covered input. PR #1917 remains
+  draft at `status:impl`; the supervisor owns the ready transition and GitHub record.
 
 ## Handoff
 
 - Implementation PR: #1917 (draft), head to be reported after this evidence commit.
+- IMPL-EVAL: `PASS_WITH_FINDINGS` from a separate Fable 5.1 opposite-family session at
+  `7592fa9df`; no code change was required.
 - Honest acceptance: boxes 2 and 3 are provable now; box 1 remains post-merge because this PR's
   workflow-file diff is independently triggering.
-- Supervisor obligation: separate-session IMPL-EVAL and the one-shot post-merge isolation PR
-  described in `evidence.md`. Do not infer trigger isolation from disposable PR #1919.
+- Supervisor obligation: the manifest-only one-shot post-merge isolation PR described in
+  `evidence.md`. Do not infer trigger isolation from disposable PR #1919, and do not treat the
+  absent `examples/*` / `apps/*` classes as covered.

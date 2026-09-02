@@ -26,6 +26,13 @@ workspace graph. The complete manifest-form trigger class is therefore `deno.jso
 plus root `deno.lock`. No current member uses `deno.jsonc`, but covering it closes the latent
 recurrence admitted by `isDenoConfigBase()` rather than covering only today's instances.
 
+Known forward-looking gap: the declared root workspace globs `examples/*` and `apps/*` are covered
+by neither the workflow trigger layer nor the classifier contribution. They are not staling inputs
+today because neither directory exists and the private lock contains no member from either glob,
+but a future member added under one of them would recreate the same missing-trigger shape. This PR
+does not cover that future class; the contributor path in `worklog.md` records how to add it when it
+becomes real.
+
 ## Acceptance Mapping
 
 1. **Member-manifest-only PR triggers `fresh-ui-quality`: not honestly provable pre-merge.** The
@@ -38,14 +45,17 @@ recurrence admitted by `isDenoConfigBase()` rather than covering only today's in
 
 ## Required Post-Merge Verification for Box 1
 
-After this workflow change merges, open a one-shot PR to `main` whose diff consists only of:
+After this workflow change merges, open a one-shot PR to `main` whose diff changes **only a current
+mirrored member manifest's dependency declaration and touches no lockfile**. For example, in
+`packages/sdk/deno.json`, narrow `npm:@orpc/client@^1.15.0` to `^1.14.0`.
 
-- one actual mirrored member manifest change (for example `packages/sdk/deno.json`), and
-- a deliberately stale edit to an existing entry in `packages/fresh-ui/deno.lock`.
-
-Expected result: `fresh-ui-quality` starts because of the new member-manifest glob, the classifier
-sets `needs_fresh_ui=true`, and the frozen-lock step fails. Close the one-shot PR without merging,
-delete its branch, then link its Actions run on issue #1905 before checking acceptance box 1.
+The manifest-versus-private-lock mismatch is what the frozen operation detects. With a
+manifest-only diff, the only changed path capable of starting `fresh-ui-quality` is the new member
+manifest glob: if the workflow starts, box 1 is proven. The classifier must then set
+`needs_fresh_ui=true`, and the frozen-lock step is expected to fail with `The lockfile is out of
+date`, reproducing the diagnostic from run `33620426788` and proving box 2 again on the same run.
+Close the one-shot PR without merging, delete its branch, then link its Actions run on issue #1905
+before checking acceptance box 1.
 
 ## RED Proof
 
