@@ -2,18 +2,19 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `desktop-orpc-contract-dep--impl` |
-| Branch | `fix/desktop-fixture-orpc-contract-dep` |
-| Current phase | `plan` |
-| Archetype | `6 — CLI / Tooling` (owned harness) |
-| Scope overlays | none |
+| Field          | Value                                   |
+| -------------- | --------------------------------------- |
+| Run ID         | `desktop-orpc-contract-dep--impl`       |
+| Branch         | `fix/desktop-fixture-orpc-contract-dep` |
+| Current phase  | `plan`                                  |
+| Archetype      | `6 — CLI / Tooling` (owned harness)     |
+| Scope overlays | none                                    |
 
 ## Current State
 
 Branch is cleanly based on current `origin/main`. Research and design are locked; PLAN-EVAL is N/A
-because #1926 completely specifies this small repair. No implementation has started.
+because #1926 completely specifies this small repair. Implementation complete; see worklog "Final
+implementation and gates".
 
 ## Completed
 
@@ -34,25 +35,25 @@ because #1926 completely specifies this small repair. No implementation has star
 
 ## Key Decisions
 
-| Decision | Source | Notes |
-| --- | --- | --- |
-| Guard the prepared map | plan D1 | Avoids root-workspace false green and standalone catalog false red. |
-| No packaging refactor | issue #1926 / plan D3 | Duplicate declaration is intentionally retained for bounded scope. |
+| Decision               | Source                | Notes                                                               |
+| ---------------------- | --------------------- | ------------------------------------------------------------------- |
+| Guard the prepared map | plan D1               | Avoids root-workspace false green and standalone catalog false red. |
+| No packaging refactor  | issue #1926 / plan D3 | Duplicate declaration is intentionally retained for bounded scope.  |
 
 ## Files Changed
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/desktop-orpc-contract-dep--impl/**` | new | Harness activation and plan. |
+| Path                                           | Status | Notes                        |
+| ---------------------------------------------- | ------ | ---------------------------- |
+| `.llm/runs/desktop-orpc-contract-dep--impl/**` | new    | Harness activation and plan. |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Static | pending | implementation not started |
-| Fitness | pending | implementation not started |
-| Runtime | pending | implementation not started |
-| Consumer | pending | implementation not started |
+| Gate family | Current status | Evidence                   |
+| ----------- | -------------- | -------------------------- |
+| Static      | pending        | implementation not started |
+| Fitness     | pending        | implementation not started |
+| Runtime     | pending        | implementation not started |
+| Consumer    | pending        | implementation not started |
 
 ## Open Questions
 
@@ -66,3 +67,6 @@ because #1926 completely specifies this small repair. No implementation has star
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
+
+> **Status update:** phase is `impl`. Implementation, guard repair, and gate evidence are recorded
+> in `worklog.md`; the D1 prepared-map correction and the C1 collector widening are in `drift.md`.

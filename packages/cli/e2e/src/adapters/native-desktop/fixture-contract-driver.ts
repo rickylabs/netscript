@@ -64,9 +64,35 @@ async function main(): Promise<void> {
       join(isolatedSdk, 'auto-update', 'mod.ts'),
       join(isolatedSdk, 'desktop', 'mod.ts'),
     ];
-    // `import type` / `export type` are erased by the compiler, so they can never produce the
-    // runtime resolution failure this guard exists to catch. Value imports only.
-    const SPEC = /(?:^|\n)\s*(?:import|export)(?!\s+type\s)[\s\S]{0,400}?from\s+['"]([^'"]+)['"]/g;
+    // Collect every specifier form that requires RUNTIME resolution. Matching only
+    // `... from '...'` missed two material forms: bare side-effect imports (`import 'x'`) and
+    // literal dynamic imports (`import('x')`). Their relative equivalents were invisible to the
+    // traversal too, so a module reachable only through one of them was never visited.
+    //
+    // `import type` / `export type` statements are erased by the compiler and can never produce a
+    // runtime resolution failure, so they are stripped before collection rather than matched around.
+    const TYPE_ONLY =
+      /(?:^|\n)\s*(?:import|export)\s+type\s[\s\S]*?(?:;|\n(?=\s*(?:import|export|const|function|class|type|interface|\/\*|\/\/)))/g;
+    const FROM_SPEC = /\bfrom\s*['"]([^'"]+)['"]/g;
+    const SIDE_EFFECT = /(?:^|\n)\s*import\s*['"]([^'"]+)['"]/g;
+    const DYNAMIC = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+    // Strip comments first: doc examples contain import statements (e.g. `@my-app/contracts` in
+    // sdk/src/desktop/mod.ts) that are not real edges. This is a token-level strip, not a parser —
+    // a specifier appearing inside a string literal that looks like a comment could still slip
+    // through, which would over-report rather than under-report.
+    const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g;
+    const LINE_COMMENT = /(?:^|\n)\s*\/\/[^\n]*/g;
+    const collect = (source: string): string[] => {
+      const stripped = source
+        .replace(BLOCK_COMMENT, '\n')
+        .replace(LINE_COMMENT, '\n')
+        .replace(TYPE_ONLY, '\n');
+      const found: string[] = [];
+      for (const re of [FROM_SPEC, SIDE_EFFECT, DYNAMIC]) {
+        for (const match of stripped.matchAll(re)) found.push(match[1]);
+      }
+      return found;
+    };
     while (queue.length > 0) {
       const file = queue.pop()!;
       if (seen.has(file)) continue;
@@ -77,8 +103,7 @@ async function main(): Promise<void> {
       } catch {
         continue;
       }
-      for (const match of source.matchAll(SPEC)) {
-        const spec = match[1];
+      for (const spec of collect(source)) {
         if (spec.startsWith('.')) {
           queue.push(resolve(join(file, '..'), spec));
           continue;

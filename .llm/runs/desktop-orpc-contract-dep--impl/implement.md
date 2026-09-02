@@ -33,8 +33,8 @@ Reachability chain:
 3. `transport-policy.ts:11` imports `@orpc/contract`.
 4. The fixture declares `@orpc/client` and `@orpc/server` — **not `@orpc/contract`**.
 
-`transport-policy.ts` was added by **#1889 (`f9e485f8b`)**, *"refactor(sdk): centralize transport
-policy"*, which is why every head containing #1889 fails this job and every head without it passes.
+`transport-policy.ts` was added by **#1889 (`f9e485f8b`)**, _"refactor(sdk): centralize transport
+policy"_, which is why every head containing #1889 fails this job and every head without it passes.
 
 `packages/sdk/deno.json:34` already pins `"@orpc/contract": "npm:@orpc/contract@^1.15.0"`. The
 dependency exists; the fixture's map does not carry it.
@@ -51,8 +51,8 @@ Do **not** "fix" this by deleting or deferring #1889's transport-policy centrali
 ## Task 2 — make the class detectable
 
 Adding one string fixes today and leaves the defect class intact: any future npm import added
-anywhere in the SDK's desktop-reachable graph breaks this fixture again, and only a
-release-cut-only job would notice.
+anywhere in the SDK's desktop-reachable graph breaks this fixture again, and only a release-cut-only
+job would notice.
 
 Add a check that fails fast when the fixture's import map cannot satisfy the SDK graph it maps in by
 relative path — e.g. a `deno check`/`deno info` over the fixture's entry points that would have
@@ -66,25 +66,26 @@ worklog with the reason rather than forcing it.
 
 The suite must actually pass. Run the desktop-native fixture path locally as far as this environment
 allows, and state plainly what could not be run here. Exact-green is required: the packet must show
-`desktop-native-linux` **green on a main-facing branch carrying #1889**, so mark the PR ready and let
-the labelled run execute it — a draft skips every runtime job.
+`desktop-native-linux` **green on a main-facing branch carrying #1889**, so mark the PR ready and
+let the labelled run execute it — a draft skips every runtime job.
 
 ## Gates
 
 - `run-deno-check.ts --root packages/cli/e2e/fixtures/desktop-native --ext ts`
 - `deno test` over the fixture's own contract test
 - `run-deno-lint.ts` / `run-deno-fmt.ts` over touched roots
-- `deno.lock` hygiene: report any change and justify it; do not delete or regenerate the lock wholesale.
+- `deno.lock` hygiene: report any change and justify it; do not delete or regenerate the lock
+  wholesale.
 
 ## PR rules
 
 Draft PR on first commit, then mark ready so `desktop-native-linux` actually runs. Body carries
 `Closes #1926` only if every acceptance box is genuinely satisfied — including the recorded green
-`desktop-native` run and the recommendation on running it outside release-cut. Otherwise `Refs #1926`
-with remaining scope stated.
+`desktop-native` run and the recommendation on running it outside release-cut. Otherwise
+`Refs #1926` with remaining scope stated.
 
-Never place a closing keyword in prose that explains a *removed* one; the parser ignores negation and
-that has already caused a false auto-close in this milestone.
+Never place a closing keyword in prose that explains a _removed_ one; the parser ignores negation
+and that has already caused a false auto-close in this milestone.
 
 Labels `type:bug`, `area:sdk`, `priority:p0`, `status:impl`, `orchestrator:fixes`, `ci:full`;
 milestone `0.0.7`. Progress in `.llm/runs/desktop-orpc-contract-dep--impl/worklog.md`.
