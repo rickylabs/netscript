@@ -72,6 +72,141 @@ hookline-db   Running  Healthy  reports=2   <- hookline-db_check, postgres_check
 advertised `http://localhost:42719` and every request timed out for ~30s while the label stayed
 `Healthy`. Treat `reports=0` as _unknown_ and go get evidence.
 
+## Observing resource state: use Aspire's event system, never hand-rolled polling
+
+Aspire is **event-based**. The CLI is a thin client over it, not the platform. Reading only
+`aspire wait --help` and concluding a capability is missing is a recurring, expensive mistake — it
+produced flaky arbitrary-timeout tests that blocked multiple agents. **The CLI surface is not the
+platform surface.**
+
+Choose the observation mechanism in this order. Only fall down the list when the layer above
+genuinely cannot express the thing.
+
+### 1. Resource lifecycle events (push-based, no timing)
+
+Resource events are raised **per resource**, in this startup order:
+
+`InitializeResourceEvent` → `ResourceEndpointsAllocatedEvent` → `ConnectionStringAvailableEvent` →
+`BeforeResourceStartedEvent` → `ResourceReadyEvent`.
+
+`ResourceStoppedEvent` is separate — it is raised after a resource stops, not part of that sequence.
+
+**`ResourceReadyEvent` is raised when a resource _initially_ transitions to a ready state — it fires
+once.** It is the native _first-readiness_ signal, not a health-transition stream. Do not use it to
+assert recovery after an induced failure: it will not fire again, so the test hangs instead of
+failing. For repeated transitions use the stream in section 3.
+
+Handles are **capability-scoped**, not present on every builder:
+
+| Handle                             | Fires when                 | Available on                   |
+| ---------------------------------- | -------------------------- | ------------------------------ |
+| `onInitializeResource(cb)`         | during initialization      | base resource                  |
+| `onBeforeResourceStarted(cb)`      | before start               | base resource                  |
+| `onResourceReady(cb)`              | first transition to ready  | base resource                  |
+| `onResourceStopped(cb)`            | resource stopped           | base resource                  |
+| `onConnectionStringAvailable(cb)`  | connection string resolved | `ResourceWithConnectionString` |
+| `onResourceEndpointsAllocated(cb)` | endpoints allocated        | `ResourceWithEndpoints`        |
+
+**App-level events, TypeScript AppHost.** Subscribe inline on the builder:
+`builder.subscribeBeforeStart(...)`, `builder.subscribeAfterResourcesCreated(...)`,
+`builder.subscribeBeforePublish(...)`, `builder.subscribeAfterPublish(...)`.
+
+`builder.eventing()` is **not** the subscription path — the `DistributedApplicationEventing` it
+returns exposes only `unsubscribe`. The `onBeforeStart` / `onAfterResourcesCreated` /
+`onBeforePublish` / `onAfterPublish` names live on the registration context handed to
+`builder.addEventingSubscriber(...)`, which is how a service or extension library subscribes instead
+of the AppHost doing it inline. `addEventingSubscriber` changes **where** you subscribe from, not
+**when** events fire.
+
+### 2. `ResourceNotificationService` — state waits, and health _arrival_ only
+
+Reached via `builder.notifications()`:
+
+| API                                           | Behaviour                                                              |
+| --------------------------------------------- | ---------------------------------------------------------------------- |
+| `waitForResourceHealthy(name)`                | awaits health **arrival** → `ResourceEventDto`                         |
+| `waitForResourceStates(name, targetStates[])` | awaits any of an arbitrary **lifecycle-state** list, returns which hit |
+| `waitForResourceState(name, options?)`        | awaits a single target lifecycle state                                 |
+| `tryGetResourceState(name)`                   | current state, including `healthStatus`                                |
+| `publishResourceUpdate(resource, options?)`   | pushes a `state` / `stateStyle` update                                 |
+
+`ResourceEventDto` carries `resourceName`, `resourceId`, `state`, `stateStyle`, `healthStatus`,
+`exitCode`.
+
+**This service cannot express a health _departure_.** `targetStates` are lifecycle-state strings,
+not health values, and `healthStatus` is output data on the DTO rather than something you can wait
+on; `publishResourceUpdate` likewise takes state, not health. `waitForResourceHealthy` covers health
+arrival and there is no departure counterpart here. For a healthy → unhealthy transition, or any
+repeated health cycle, use the stream in section 3.
+
+### 3. `aspire describe --follow` — a transition stream from outside the AppHost
+
+```
+aspire describe <resource> --follow --format Json
+```
+
+> `-f, --follow` — Continuously stream resource state changes. In JSON mode, each update emits a
+> single JSON object per line (NDJSON), showing the resource name, state, health and endpoints.
+
+This is the right tool when the observer is **not** inside the AppHost — E2E harnesses, scripts, CI
+gates — and whenever you need **repeated** transitions (healthy → unhealthy → healthy), which the
+one-shot lifecycle events cannot give you.
+
+Two rules:
+
+- **Subscribe before you induce.** Start the follower, _then_ cause the transition, then await.
+  Starting it afterwards reintroduces the race you are removing.
+- **Buffer.** Lines can arrive between subscribing and awaiting; a reader that only listens for
+  future lines will miss them.
+
+Snapshot mode (no `--follow`) wraps resources in `{ "resources": [...] }`; follow mode emits one
+JSON object per line.
+
+### 4. `aspire wait` (CLI) — arrival gating, bounded by what Aspire has evaluated
+
+`aspire wait <resource> --status healthy|up|down` connects to the AppHost over the backchannel and
+**streams resource state changes in real time**. It validates the resource name before entering the
+wait loop, so a typo fails immediately instead of timing out silently.
+
+| Exit | Meaning                                                                      |
+| ---- | ---------------------------------------------------------------------------- |
+| `0`  | resource reached the target status                                           |
+| `7`  | no running AppHost found                                                     |
+| `17` | timeout exceeded before the target status was reached                        |
+| `18` | resource entered a failed or terminal state while waiting for `up`/`healthy` |
+
+Two traps that have both cost time here:
+
+- **`healthy` means "running and healthy, _or_ running with no health checks configured."** A
+  resource with no health check satisfies `--status healthy` immediately, so exit 0 is **not** proof
+  that a health check passed.
+- **It can only report health Aspire has already evaluated.** The stream is real time, but health
+  evaluation is periodic — so immediately after you break something the resource can still be
+  Healthy and `wait --status healthy` returns 0 at once. Measured in this repo at **1409 ms** while
+  the backing listener was already closed. This is a lag in evaluation, not a stale cache read.
+
+Use `wait` to gate on arrival. Never use it to observe a transition you just caused — use the stream
+in section 3.
+
+### Anti-pattern: hand-rolled health/lifecycle checks
+
+Do not write, and remove on sight:
+
+- polling loops with `setTimeout`/sleep against a resource, endpoint, or report file;
+- `*_DEADLINE_MS` / `*_POLL_MS` / `*_TIMEOUT_SECONDS` constants chosen to "exceed Aspire's
+  evaluation interval";
+- retry-until-success `fetch` loops standing in for readiness;
+- parsing repeated `aspire describe`/`aspire ps` **snapshots** to infer a transition — use
+  `--follow` and read the stream.
+
+Every one of these is a local reimplementation of something Aspire already emits, and each is a
+future flaky test. This is AGENTS.md operating rule 3 (_wrap, do not reinvent — prefer upstream APIs
+before local abstractions_) applied to Aspire.
+
+**Test fixtures can use all of this.** E2E fixtures already inject code into the generated AppHost,
+which is exactly where `eventing()` and `notifications()` are available. "It's a test" is not a
+reason to hand-roll.
+
 ## Diagnose by symptom
 
 ### "It says Healthy but nothing responds"
@@ -313,11 +448,11 @@ default. Run `playwright-cli --help` for available commands.
 
 ### Upstream cleanup of networks and anonymous volumes (issue #1855)
 
-Stopping an AppHost — `aspire stop`, or the AppHost exiting — tears down its DCP session, and
-DCP's own cleanup controller then reaps Aspire-managed Docker resources it considers abandoned,
-including `aspire-persistent-network-*` networks. That reap is keyed on DCP metadata inside the
-Aspire runtime, not on the calling process, so a foreign run's persistent network can be removed
-as collateral while stopping your own AppHost. Repo code (`agentic:teardown`) only ever removes
+Stopping an AppHost — `aspire stop`, or the AppHost exiting — tears down its DCP session, and DCP's
+own cleanup controller then reaps Aspire-managed Docker resources it considers abandoned, including
+`aspire-persistent-network-*` networks. That reap is keyed on DCP metadata inside the Aspire
+runtime, not on the calling process, so a foreign run's persistent network can be removed as
+collateral while stopping your own AppHost. Repo code (`agentic:teardown`) only ever removes
 containers and cannot prevent or intercept this from inside `aspire stop`; the mitigation is
 detection, not prevention:
 
@@ -325,9 +460,9 @@ detection, not prevention:
   `com.microsoft.developer.usvc-dev.*` label namespace, never by name pattern — and flags the ones
   this run cannot positively own as at-risk. Treat those report entries as the record of what
   existed before cleanup; a network is never a cleanup target.
-- `agentic:teardown` removes owned containers with `docker rm -f -v`, so the run's anonymous
-  volumes die with their containers while named volumes always survive. `agentic:leak-check`
-  reports run-owned volumes as survivors.
+- `agentic:teardown` removes owned containers with `docker rm -f -v`, so the run's anonymous volumes
+  die with their containers while named volumes always survive. `agentic:leak-check` reports
+  run-owned volumes as survivors.
 - Upstream references: the aspire.dev networking overview (persistent vs session networks),
-  `dotnet/aspire#9785`, `dotnet/aspire#13320`, and `microsoft/dcp#213`
-  (workload-scoped persistent resource cleanup).
+  `dotnet/aspire#9785`, `dotnet/aspire#13320`, and `microsoft/dcp#213` (workload-scoped persistent
+  resource cleanup).
