@@ -7842,3 +7842,17 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   Deliverer `/tmp/deliver1885e.sh` detached. close-gate remains red until the body is corrected.
 - Next: on push → IMPL-EVAL (cycle `status:impl`→`status:impl-eval`), then packet if PASS_IMPL.
 - NOT green as a PR: close-gate red, DoD open, `status:impl`.
+
+## 2026-09-02T22:42Z — #1885 scope corrected at `adff30990`; IMPL-EVAL dispatched
+
+- Worker pushed `adff30990 docs(harness): record hosted island hydration proof` and rewrote the PR
+  body: S0a/S0b/S3(measurement: none failing)/S4 ticked with run 33689942400 job ids; DoD 1,3,4 ticked
+  with evidence; DoD 2 left unticked as "N/A by measurement"; DoD 5 (IMPL-EVAL) open; `Closes #1845`
+  retained (gates prove the issue's hosted-hydration acceptance).
+- Cycled `status:impl` → `status:impl-eval`; Phase-eval dispatch 33691484028 `success`; OpenHands
+  IMPL-EVAL run 33691504282 running at head `adff30990` (trigger comment 22:40:13Z).
+- Open question for packet: DoD 2 as an unticked N/A checkbox keeps close-gate red permanently;
+  if IMPL-EVAL PASS_IMPL confirms no product edit is warranted, it must be reworded to a ticked
+  evidenced statement (no fake tick before that).
+- Still NOT packet-ready: close-gate red, IMPL-EVAL pending. CI on `adff30990` (docs-only delta)
+  in flight; Postgres/SQLite tiers must re-earn green at this exact head.
