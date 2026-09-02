@@ -115,7 +115,7 @@ export async function probeAppReference(
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
-async function resolveProjectAppUrls(
+export async function resolveProjectAppUrls(
   projectRoot: string,
   appName: string,
   appHost?: string,
@@ -157,7 +157,7 @@ async function renderWithHeadlessChrome(
   return stdout;
 }
 
-async function findBrowserExecutable(): Promise<string> {
+export async function findBrowserExecutable(): Promise<string> {
   const candidates = [
     '/usr/bin/google-chrome',
     '/usr/bin/google-chrome-stable',

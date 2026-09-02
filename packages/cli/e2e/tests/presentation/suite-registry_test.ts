@@ -310,6 +310,23 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
+    true,
+  );
+  assertEquals(
+    resolveSuite(SCAFFOLD.RUNTIME_SQLITE).gates.some((gate) =>
+      gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+    ),
+    true,
+  );
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    assertEquals(
+      resolveSuite(suiteId).gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_HYDRATION),
+      true,
+      suiteId,
+    );
+  }
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);

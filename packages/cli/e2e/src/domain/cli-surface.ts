@@ -139,6 +139,8 @@ export const GATE = {
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
+  BEHAVIOR_ISLAND_SERVED_SURFACE: 'behavior.island-served-surface',
+  BEHAVIOR_ISLAND_HYDRATION: 'behavior.island-hydration',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
