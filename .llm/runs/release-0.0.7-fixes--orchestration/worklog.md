@@ -7821,3 +7821,11 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   scope narrowing (`Closes`→`Refs #1845`, tick only evidenced boxes) → keep `status:impl`.
   Retry deliverer `/tmp/deliver1885d.sh` detached.
 - Next: on push, confirm check-test green; IMPL-EVAL only when DoD is truthfully complete.
+
+## 2026-09-02T22:35Z — #1885 GREEN pushed `74ef668cc`
+
+- Worker `01a058a1` pushed `74ef668cc test(cli-e2e): prove generated island hydration` (+394/−6):
+  commits the previously untracked `probe-island-hydration.ts` (305 lines), wires the gate into
+  `behavior-gates.ts`/`capability-suites.ts`, updates the failing test. This targets the exact
+  TS2307/TS7006 pair. check-test queued; close-gate still red (DoD 0/5 — expected until S3/S4).
+- Watching check-test + both runtime tiers at `74ef668cc`; S3/S4 remain open per steer.
