@@ -70,3 +70,27 @@ in `packages/mcp/src/` and both collide with `main` on it. Regenerate-after-merg
 | --- | --- | --- |
 | #1909 (Fixes) | `c3805e1d2` | IMPL-EVAL PASS → `augment-review`; same head already swept clean, no docs/carrier delta. |
 | #1938 (Fixes) | `6ae6cc483` | → `ready-merge`. 0 behind main; quality/check-test/close-gate pass; `Refs #1455` partial with #1451 stated out of scope (correct non-closing form). Corpus carrier fresh. Clean. |
+
+## Landed S13 carrier audit + ready-PR resweep (2026-09-02 18:40, main `c0b7d841a`)
+
+`main` advanced `850cc7757` → `ef8f3bee7` (#1937) → `09c07fd4e` (#1930) → `c0b7d841a` (#1779, S13).
+Audited on a detached worktree at `origin/main` (never on this lagging checkout):
+
+- `check:mcp-export-corpus` exit 0 (`packageCount=35 subpathCount=273 symbolCount=7834`).
+- `check:publish-assets` clean (`packages/mcp/README.md` ↔ `publish-assets.generated.ts`).
+- `check:assets-barrel` exit 0 (`embedded.generated.ts` ↔ S13 telemetry template).
+- `frameworkVersion` in the corpus is `0.0.6` because `deno.json` is still `0.0.6` — expected until the release bump; not a finding.
+
+Predicted collision materialised: #1938, #1943, #1944 (all Fixes, all `ready-merge`, all carrying their own regenerated corpus) conflicted on `export-surface-corpus.generated.ts` the moment #1779's copy landed. Handed to Fixes on each PR (take main's copy, regenerate on a clean tree — #1937 now refuses dirty sources — keep `ready-merge` on before the push).
+
+| PR | Head | behind | State | Verdict |
+| --- | --- | --- | --- | --- |
+| #1760 (Aspire) | `4c64dfc93` | 0 | CI pending | `packages/cli/e2e/README.md` rewrapped (now fmt-clean; main's copy was not) + structured-gate table; every gate id / env var / ndjson path named exists in `packages/cli/e2e/src` on this head. Not embedded in any carrier. Clean. |
+| #1856 (Fixes) | `9d4713d52` | 53 | green, mergeable | `FormCollectionStrategy` reference-kind nit still unanswered. |
+| #1895 (Fixes) | `d0bf0aebf` | 3 | green | `Closes #1590`. No docs/carrier files. Clean. |
+| #1916 (Fixes) | `1c59ae57b` | 19 | close-gate **fail** | Still needs the rerun. |
+| #1938 (Fixes) | `6ae6cc483` | 3 | **CONFLICT** on corpus | Handed off. |
+| #1941 (Fixes) | `4bfded8c8` | 3 | green | Clean. |
+| #1942 (Fixes) | `2a5d01ae1` | 3 | close-gate **fail** | Still needs the rerun. |
+| #1943 (Fixes) | `3a888f398` | 0 | re-headed, CI pending | Conflict resolved by owner; corpus freshness step will verify. |
+| #1944 (Fixes) | `bd3eeac54` | 0 | re-headed, CI pending | Same. |
