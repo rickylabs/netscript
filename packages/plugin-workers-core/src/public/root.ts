@@ -7,6 +7,7 @@ import {
   createSuccessResult as createSuccessResultImpl,
 } from '../domain/job-result.ts';
 import { permissions as permissionsImpl } from '../domain/permissions.ts';
+import type { PublicStandardSchema } from '../domain/public-schema.ts';
 import { startWorkers as startWorkersImpl } from '../presets/mod.ts';
 import {
   createWorkersRuntime as createWorkersRuntimeImpl,
@@ -137,12 +138,20 @@ export type JobHandlerContext<TPayload = unknown> = Readonly<{
   reportProgress?: (percent: number, message?: string) => void | Promise<void>;
 }>;
 
+/** Standard Schema-compatible validator carried by a worker job definition. */
+export type JobPayloadSchema<TPayload = unknown> = PublicStandardSchema<TPayload>;
+
 /** Root-surface job definition derived from the thin public schema. */
-export type JobDefinition<TId extends string = string> = Readonly<{
+export type JobDefinition<
+  TId extends string = string,
+  TPayload = unknown,
+  TResult = unknown,
+> = Readonly<{
   id: JobId<TId>;
   entrypoint?: string;
   name?: string;
   topic?: string;
+  payloadSchema?: JobPayloadSchema<TPayload>;
 }>;
 
 /** Root-surface task definition derived from the thin public schema. */
@@ -213,7 +222,7 @@ export interface JobBuilder<
     this: TConfigured extends 'entrypoint-set' | 'handler-set'
       ? JobBuilder<TId, TConfigured, TPayload, TResult>
       : never,
-  ): JobDefinition<TId>;
+  ): JobDefinition<TId, TPayload, TResult>;
 }
 
 /** Root-surface task builder typestate API. */

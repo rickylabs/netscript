@@ -15,6 +15,7 @@ import {
   parseListenerFaultDatabase,
 } from './listener-readiness-gates.ts';
 import {
+  findListenerHealthReport,
   type ListenerHealthReport,
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
@@ -345,11 +346,19 @@ async function observeTestOnlyUnhealthy(
   while (Date.now() < deadline) {
     const topology = JSON.parse(await describe(appHost));
     assertRealBackingHealthy(topology, continuity);
-    const report = readListenerHealthReport(
+    // A report that has not been published *yet* means keep waiting, not fail. Using the throwing
+    // reader here made a transient absence fatal on the first poll, inside a loop whose whole
+    // purpose is to wait for the report to change — the deadline below is the real budget.
+    const report = findListenerHealthReport(
       topology,
       expectation.resource,
       expectation.healthCheckKey,
     );
+    if (!report) {
+      observed = 'not published yet';
+      await delay(DEPARTURE_OBSERVE_POLL_MS);
+      continue;
+    }
     observed = `${report.status}: ${report.description ?? '(no description)'}`;
     if (report.status === 'Unhealthy') {
       if (matchesExpectedFailure(report, expectation)) return report;
