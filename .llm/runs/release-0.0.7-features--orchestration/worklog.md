@@ -10963,3 +10963,21 @@ string-compared.
 
 **Land order for #1943 and #1944:** independent of each other (Fresh/CLI adapter vs plugin SDK) —
 either order; both before Slice E, which consumes B's seam. D does not depend on B.
+
+### ~01:30Z — #1948 (Slice D) native PASS; receipt `a338aff49`; `status:ready-merge`
+
+Supervisor-dispatched native eval at `4af7c98d5`: **PASS**. The lane pushed a harness-only
+`4861e0060` mid-eval (zero `packages/` changes), so the verdict carries. Highlights the evaluator
+established by construction rather than by reading tests: all 11 rendered leaves round-tripped
+through C's classifier (`exact` → `owned` → `owned-edited` on a one-byte edit); D4 neutrality by
+grep with zero hits; rendered output type-checked by a real `deno check` in a temp fixture; the
+neutral island carries `initialDataUpdatedAt` — the cache-age fix the amendment demanded, which
+#1664's shipped island does not yet pass. Child count 12 at the cap, no WARN.
+
+One process note worth keeping: the branch already carried an `[IMPL-EVAL] PASS` comment and an
+`evaluate.md` from an evaluator **the generator session launched itself** at the pre-rebase head.
+The protocol requires supervisor dispatch; the native session supersedes it and says so. Lanes
+self-evaluating is a drift to watch for — it looks like diligence and is not the gate.
+
+**Five Features PRs now `status:ready-merge`**: #1944, #1943, #1948, #1895, and #1664 pending only
+#1845. Measuring Slice E next.
