@@ -74,11 +74,37 @@ meaning of shared `EmptyRecord`.
   TS2578 (`Unused '@ts-expect-error' directive`) at
   `define-partial.test.tsx:322`. This makes the test non-vacuous: the only reason for failure is
   that the renamed-away consumer key still compiles.
-- RED SHA: pending commit.
-- GREEN SHA: pending.
+- RED SHA: `ce32a94338ac3ec23c11ed84b8ec5eae381ccf88`.
+- GREEN behavior: internal route recursion no longer imports shared `Simplify<T>` and therefore no
+  longer acquires its `Record<PropertyKey, never>` signature. Both route-inference copies use
+  `EmptySegment` for the empty branch and preserve direct `EmptySegment` intersections. Shared
+  `EmptyRecord` and builder `Simplify<T>` are unchanged.
+- Consumer proof without the directive: `deno eval --check` fails only with TS2339,
+  `Property 'project' does not exist`, while `path.workspace` remains `string`.
+- JSR correction: an intermediate private `SimplifyRoutePatternPath` alias added one new
+  `private-type-ref`; it was removed before commit. Final doc-lint returned to the existing
+  45-diagnostic Fresh baseline and reports no finding in `route/types.ts`.
+- GREEN SHA: pending commit.
+- Last package-changing head SHA: pending GREEN commit.
 
 ## Gate evidence
 
 | Stage | Command | Exit | Evidence |
 | --- | --- | ---: | --- |
 | RED | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | 1 | 207 files; one TS2578 at the new consumer directive |
+| GREEN check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | 0 | 207 files, 2 batches, 0 diagnostics |
+| GREEN test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts --cwd packages/fresh -- --allow-all --unstable-kv ./src ./tests` | 0 | 276 passed, 0 failed; includes unchanged dynamic/catch-all/optional/static builder matrix |
+| GREEN lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | 0 | 207/207 files, 0 findings |
+| GREEN fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | 0 | 207/207 files, 0 findings |
+| Quality | `deno task quality:gate` | 0 | code-quality scan and doctrine check pass; no findings from this slice |
+| Publish | `deno task --cwd packages/fresh publish:dry-run` | 0 | dry run complete |
+| JSR audit | `audit-jsr-package.ts --root packages/fresh --text` | 0 | package audit completes; only existing runtime/AI cardinality and slow-type warnings |
+| Doc lint (supplemental) | `deno task doc:lint --root packages/fresh --pretty` | 1 | existing Fresh debt: 45 diagnostics; no `route/types.ts` finding and no diagnostic added by this slice |
+
+## Reconcile
+
+- Draft PR #1916 opened on the RED commit with the required taxonomy and milestone `0.0.7`.
+- #1610 remains open during implementation. All four acceptance boxes are now supported by local
+  evidence; the PR may carry `Closes #1610` when updated after the GREEN commit.
+- No new or deepened architecture debt. Browser validation is N/A because this is compile-time-only
+  route inference with no runtime or rendered UI change.

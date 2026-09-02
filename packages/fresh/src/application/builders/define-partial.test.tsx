@@ -267,11 +267,14 @@ Deno.test('definePartial rejects an incomplete route reference with the page bui
 
 function assertPartialRouteMutationInference(): void {
   type IsNever<T> = [T] extends [never] ? true : false;
+  type HasKey<T, TKey extends PropertyKey> = TKey extends keyof T ? true : false;
   type Expect<T extends true> = T;
 
   const original = createRouteReference('/projects/[project]');
   type OriginalPath = NonNullable<typeof original.$types>['path'];
-  const originalHasNoChannel: Expect<IsNever<OriginalPath['channel']>> = true;
+  const originalHasNoChannel: Expect<
+    HasKey<OriginalPath, 'channel'> extends false ? true : false
+  > = true;
   definePartial({
     name: 'original',
     route: original,
@@ -301,7 +304,9 @@ function assertPartialRouteMutationInference(): void {
 
   const renamed = createRouteReference('/projects/[projectId]');
   type RenamedPath = NonNullable<typeof renamed.$types>['path'];
-  const renamedRemovedProject: Expect<IsNever<RenamedPath['project']>> = true;
+  const renamedRemovedProject: Expect<
+    HasKey<RenamedPath, 'project'> extends false ? true : false
+  > = true;
   definePartial({
     name: 'renamed',
     route: renamed,
