@@ -2593,6 +2593,7 @@ continues concurrently because serial ordering is per orchestrator, not global.
   active diagnosis once on main. Docs repaired #1925's unsafe-cast quality finding at new head
   `eefe776e8`. Features is resolving #1927's main conflict, watching exact evaluators for
   #1921/#1922, and keeping #1895's final runtime pair moving.
-- Live milestone inventory is 34 open issues and 18 open PRs, with exactly one orchestrator owner
-  on every item. New intake explains the issue total (#1926), while the PR total fell despite new
-  #1927 because two merge-ready packets were consumed. No owner-only decision is pending.
+- Live milestone inventory is 33 open issues and 19 open PRs, with exactly one orchestrator owner
+  on every item. #1905 closed after its post-merge proof; Internals converted #1920 into active draft
+  #1929 while Features admitted #1927, so the raw PR total reflects delivery intake despite two
+  merge-ready packets being consumed. No owner-only decision is pending.

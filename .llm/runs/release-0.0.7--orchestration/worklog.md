@@ -3969,5 +3969,6 @@
   retains the honest CLI source, and is running both exact hosted tiers.
 - Fixes took new #1926 as the one shared desktop isolated-package repair. Docs pushed #1925's
   typed-narrowing repair after the scanner rejected one unsafe cast. Features is rebasing conflicted
-  PASS_IMPL #1927 and watching #1895/#1921/#1922. Live inventory is 34 open issues / 18 open PRs,
-  all singly owned; no owner-only decision is pending.
+  PASS_IMPL #1927 and watching #1895/#1921/#1922. After #1905 closed and Internals opened #1929 for
+  #1920, live inventory is 33 open issues / 19 open PRs, all singly owned; no owner-only decision is
+  pending.
