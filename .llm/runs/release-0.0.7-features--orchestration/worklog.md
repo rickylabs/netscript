@@ -10633,3 +10633,13 @@ Resumed to run the **full** gate set (it had run only the focused wrapper), the 
 (surface moved; carriers ceiling-exempt), commit, push, and open the PR — with the closing-keyword
 decision left to the brief's rule and a specific check on whether the mirror recognises #1452's
 plain-bullet rows, which are not checkboxes.
+
+### ~18:05Z — Slice B is PR #1943
+
+`feat/cli-fresh-manifest-seam` → **#1943**, head `5f0a857ff`, non-draft, `MERGEABLE`, milestone
+0.0.7, `Refs #1354`. Body states the partial scope ("no command integration, router transform,
+resource planner, or template wiring"), the `PageModuleRouteForm` closure justification, and the
+lock delta as exactly `jsr:@netscript/fresh@0.0.6` under the CLI workspace member with no churn.
+IMPL-EVAL triggered by `status:impl-eval` only after the lane went idle. This is the first #1354
+implementation slice to land, and it landed **while #1664 is still open** — legitimately, because its
+six files intersect #1664 on nothing.
