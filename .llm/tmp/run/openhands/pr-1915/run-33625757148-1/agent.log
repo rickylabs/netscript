@@ -1,0 +1,400 @@
+`packages/plugin-auth-core/src/`;\n   `packages/sdk/deno.json` exports no 
+`./internal` subpath; `packages/sdk` untouched by the PR \u2014\n   #1349 
+privacy holds.\n5. **Scope \u2014 PASS.** 30 product/docs files = 27 
+hand-authored + 3 regenerated carriers (matches\n   the 27-file ceiling). No 
+`prepared-call.ts`, no `traceparent`/`tracestate`, no `packages/sdk/**`\n   
+file, no `client-contributions/` path in `git diff origin/main...HEAD 
+--name-only` \u2014 #1921/#1353\n   and the #1349 row-7 gap-fill surfaces 
+intact.\n6. **Deferred scope \u2014 honest.** 
+`FetchAuthSessionHttp.list/revoke`\n   
+(`packages/cli/src/public/features/plugins/auth/auth-session-client.ts`) accept 
+raw URLs and\n   issue raw `fetch` with a fixed header set; 
+`AuthSessionHttpPort` has no prepared-header\n   parameter, so the typed SDK 
+transport cannot back it 1:1. Genuinely blocked, not evasive.\n\n## Validation 
+run in this session\n\n- `deno test --no-check -A 
+packages/plugin-auth-core/src/sdk/bearer-contribution_test.ts\n  
+packages/plugin/tests/config/sdk-client-contributions_test.ts` \u2192 ok | 10 
+passed | 0 failed (2s)\n- `deno doc --json 
+packages/plugin-auth-core/src/sdk/mod.ts` \u2192 3-symbol surface (above)\n\n## 
+Notes / risks\n\n- The bearer descriptor ships via the auto-discovered 
+`resources/sdk-client.ts` module; plugins\n  that must omit bearer support drop 
+the resource rather than set a flag. Acceptable per the\n  resources archetype 
+and documented in the plugin README.\n\nOPENHANDS_VERDICT: PASS\n"}
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: 
+"/home/runner/work/netscript/netscript/.llm/runs/feat-sdk-credential-contributio
+n--1352/implement-eval.md"
+  file_text: 
+    # IMPL-EVAL — PR #1915 (issue #1352) at a6fababde
+    
+    Evaluator: OpenHands separate session (action run 33625757148). Verdict: 
+**PASS**.
+    Posted: 
+https://github.com/rickylabs/netscript/pull/1915#issuecomment-5509109094
+    
+    ## Head-diff claim — agreed
+    
+    `git diff 88df4839e a6fababde --stat` → 4 files, all regenerated carriers
+    (`.llm/assets/agent-docs/prose.json.gz` + `provenance.json`,
+    `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+    `packages/mcp/src/publish-assets.generated.ts`), 12+/12−, no product source 
+moved.
+    Prior evaluation at `88df4839e` carries by byte-identity.
+    
+    ## Gate state (cited, not re-derived)
+    
+    CI run `33617994226` `headSha = a6fababde69a6964914207d7bc8ec29cb8b4d84e`:
+    `check-test` pass 10m37s, `quality` pass 3m23s, `code-quality` pass 27s, 
+`build` pass 51s,
+    `core CI lane visibility` pass. `close-gate` red solely on the unticked
+    "Separate-session IMPL-EVAL passes" DoD box — satisfied by this verdict.
+    
+    ## Judgment points
+    
+    1. **Explicit-only contribution — PASS.** Descriptors flow declaratively: 
+builder
+       `withSdkClients()` 
+(`packages/plugin/src/config/builders/plugin-builder.ts:168`) →
+       `contribution-merger.ts` (non-mutating concat) → host discovery
+       (`resolveSdkClientContributions`, `packages/plugin/src/sdk/mod.ts:14`). 
+The bearer descriptor
+       (`plugins/auth/src/adapter/resources/sdk-client.ts`) is registered via 
+the auto-discovered
+       resources module — declaration, not attachment. `grep -rln 
+'@netscript/plugin-auth-core/sdk'`
+       finds only that resource file + docs. Attach happens only inside 
+`createServiceClient` after
+       explicit `$meta({access:{authentication}})` resolution. Test "bearer 
+contribution module is
+       universal and has no ambient credential reader" pins the no-ambient-read 
+property.
+    2. **Non-disclosure — PASS.** Resolution `TypeError` and partition errors 
+rethrown bare; the
+       cleartext-transport error names only the URL protocol. SDK redaction 
+pinned:
+       `SDK_PREPARATION_FAILED` carries only `contributionId` + `procedurePath`
+       (`prepared-call.ts:459`); 
+`client-contribution-validation_test.ts:313-328` asserts
+       `SDK_CACHE_PARTITION_INVALID` messages exclude both the partition-source 
+secret and the
+       context value.
+    3. **Cache partitioning caller-selected, never token-derived — PASS.** Hook 
+signature
+       `partition({ context, procedure })` — token never passed 
+(`bearer-contribution.ts:71-74`,
+       `90-93`); `resolveSdkClientCachePartition` resolves only declared 
+`context`/`procedure`, never
+       `authorization`. `bearer-contribution_test.ts:161-176` uses a 
+`crypto.randomUUID()` credential,
+       asserts `partition === 'tenant-blue'` AND 
+`assertFalse(partition.includes(credential))` — fails
+       if token-derived. Pairs concatenate only after validation.
+    4. **Public surface — PASS.** `deno doc --json 
+packages/plugin-auth-core/src/sdk/mod.ts` →
+       exactly `createBearerSdkClientContribution`, 
+`CreateBearerSdkClientContributionOptions`,
+       `NetScriptAuthenticationRequirement`. Zero references to 
+`createHttpClientLink` /
+       `ClientLinkPort` / `ClientLinkCallOptions` in 
+`packages/plugin-auth-core/src/`;
+       `packages/sdk/deno.json` exports no `./internal` subpath; `packages/sdk` 
+untouched by the PR —
+       #1349 privacy holds.
+    5. **Scope — PASS.** 30 product/docs files = 27 hand-authored + 3 
+regenerated carriers (matches
+       the 27-file ceiling). No `prepared-call.ts`, no 
+`traceparent`/`tracestate`, no `packages/sdk/**`
+       file, no `client-contributions/` path in `git diff origin/main...HEAD 
+--name-only` — #1921/#1353
+       and the #1349 row-7 gap-fill surfaces intact.
+    6. **Deferred scope — honest.** `FetchAuthSessionHttp.list/revoke`
+       (`packages/cli/src/public/features/plugins/auth/auth-session-client.ts`) 
+accept raw URLs and
+       issue raw `fetch` with a fixed header set; `AuthSessionHttpPort` has no 
+prepared-header
+       parameter, so the typed SDK transport cannot back it 1:1. Genuinely 
+blocked, not evasive.
+    
+    ## Validation run in this session
+    
+    - `deno test --no-check -A 
+packages/plugin-auth-core/src/sdk/bearer-contribution_test.ts
+      packages/plugin/tests/config/sdk-client-contributions_test.ts` → ok | 10 
+passed | 0 failed (2s)
+    - `deno doc --json packages/plugin-auth-core/src/sdk/mod.ts` → 3-symbol 
+surface (above)
+    
+    ## Notes / risks
+    
+    - The bearer descriptor ships via the auto-discovered 
+`resources/sdk-client.ts` module; plugins
+      that must omit bearer support drop the resource rather than set a flag. 
+Acceptable per the
+      resources archetype and documented in the plugin README.
+    
+    OPENHANDS_VERDICT: PASS
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 30.7K (total 1.39M) • cache hit 4.79% (total 92.42%) •  
+reasoning 0 (total 12.75K) • ↓ output 1.24K (total 29.3K) • $ (total 0.0345)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File 
+/home/runner/work/netscript/netscript/.llm/runs/feat-sdk-credential-contribution
+--1352/implement-eval.md edited with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL — PR #1915 (issue #1352) at a6fababde
+ 2|
++3|Evaluator: OpenHands separate session (action run 33625757148). Verdict: 
+**PASS**.
++4|Posted: 
+https://github.com/rickylabs/netscript/pull/1915#issuecomment-5509109094
++5|
++6|## Head-diff claim — agreed
++7|
++8|`git diff 88df4839e a6fababde --stat` → 4 files, all regenerated carriers
++9|(`.llm/assets/agent-docs/prose.json.gz` + `provenance.json`,
++10|`packages/cli/src/kernel/assets/agent-docs.generated.ts`,
++11|`packages/mcp/src/publish-assets.generated.ts`), 12+/12−, no product source 
+moved.
++12|Prior evaluation at `88df4839e` carries by byte-identity.
++13|
++14|## Gate state (cited, not re-derived)
++15|
++16|CI run `33617994226` `headSha = a6fababde69a6964914207d7bc8ec29cb8b4d84e`:
++17|`check-test` pass 10m37s, `quality` pass 3m23s, `code-quality` pass 27s, 
+`build` pass 51s,
++18|`core CI lane visibility` pass. `close-gate` red solely on the unticked
++19|"Separate-session IMPL-EVAL passes" DoD box — satisfied by this verdict.
++20|
++21|## Judgment points
++22|
++23|1. **Explicit-only contribution — PASS.** Descriptors flow declaratively: 
+builder
++24|   `withSdkClients()` 
+(`packages/plugin/src/config/builders/plugin-builder.ts:168`) →
++25|   `contribution-merger.ts` (non-mutating concat) → host discovery
++26|   (`resolveSdkClientContributions`, `packages/plugin/src/sdk/mod.ts:14`). 
+The bearer descriptor
++27|   (`plugins/auth/src/adapter/resources/sdk-client.ts`) is registered via 
+the auto-discovered
++28|   resources module — declaration, not attachment. `grep -rln 
+'@netscript/plugin-auth-core/sdk'`
++29|   finds only that resource file + docs. Attach happens only inside 
+`createServiceClient` after
++30|   explicit `$meta({access:{authentication}})` resolution. Test "bearer 
+contribution module is
++31|   universal and has no ambient credential reader" pins the no-ambient-read 
+property.
++32|2. **Non-disclosure — PASS.** Resolution `TypeError` and partition errors 
+rethrown bare; the
++33|   cleartext-transport error names only the URL protocol. SDK redaction 
+pinned:
++34|   `SDK_PREPARATION_FAILED` carries only `contributionId` + `procedurePath`
++35|   (`prepared-call.ts:459`); 
+`client-contribution-validation_test.ts:313-328` asserts
++36|   `SDK_CACHE_PARTITION_INVALID` messages exclude both the partition-source 
+secret and the
++37|   context value.
++38|3. **Cache partitioning caller-selected, never token-derived — PASS.** Hook 
+signature
++39|   `partition({ context, procedure })` — token never passed 
+(`bearer-contribution.ts:71-74`,
++40|   `90-93`); `resolveSdkClientCachePartition` resolves only declared 
+`context`/`procedure`, never
++41|   `authorization`. `bearer-contribution_test.ts:161-176` uses a 
+`crypto.randomUUID()` credential,
++42|   asserts `partition === 'tenant-blue'` AND 
+`assertFalse(partition.includes(credential))` — fails
++43|   if token-derived. Pairs concatenate only after validation.
++44|4. **Public surface — PASS.** `deno doc --json 
+packages/plugin-auth-core/src/sdk/mod.ts` →
++45|   exactly `createBearerSdkClientContribution`, 
+`CreateBearerSdkClientContributionOptions`,
++46|   `NetScriptAuthenticationRequirement`. Zero references to 
+`createHttpClientLink` /
++47|   `ClientLinkPort` / `ClientLinkCallOptions` in 
+`packages/plugin-auth-core/src/`;
++48|   `packages/sdk/deno.json` exports no `./internal` subpath; `packages/sdk` 
+untouched by the PR —
++49|   #1349 privacy holds.
++50|5. **Scope — PASS.** 30 product/docs files = 27 hand-authored + 3 
+regenerated carriers (matches
++51|   the 27-file ceiling). No `prepared-call.ts`, no 
+`traceparent`/`tracestate`, no `packages/sdk/**`
++52|   file, no `client-contributions/` path in `git diff origin/main...HEAD 
+--name-only` — #1921/#1353
++53|   and the #1349 row-7 gap-fill surfaces intact.
++54|6. **Deferred scope — honest.** `FetchAuthSessionHttp.list/revoke`
++55|   (`packages/cli/src/public/features/plugins/auth/auth-session-client.ts`) 
+accept raw URLs and
++56|   issue raw `fetch` with a fixed header set; `AuthSessionHttpPort` has no 
+prepared-header
++57|   parameter, so the typed SDK transport cannot back it 1:1. Genuinely 
+blocked, not evasive.
++58|
++59|## Validation run in this session
++60|
++61|- `deno test --no-check -A 
+packages/plugin-auth-core/src/sdk/bearer-contribution_test.ts
++62|  packages/plugin/tests/config/sdk-client-contributions_test.ts` → ok | 10 
+passed | 0 failed (2s)
++63|- `deno doc --json packages/plugin-auth-core/src/sdk/mod.ts` → 3-symbol 
+surface (above)
++64|
++65|## Notes / risks
++66|
++67|- The bearer descriptor ships via the auto-discovered 
+`resources/sdk-client.ts` module; plugins
++68|  that must omit bearer support drop the resource rather than set a flag. 
+Acceptable per the
++69|  resources archetype and documented in the plugin README.
++70|
++71|OPENHANDS_VERDICT: PASS
++72|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Rename artifact to evaluate.md and verify verdict lines
+
+Reasoning:
+All deliverables are complete:
+
+1. ✅ Verdict PR comment posted: issuecomment-5509109094 (starts with `[PHASE: 
+IMPL-EVAL] [VERDICT: PASS]`, ends with `OPENHANDS_VERDICT: PASS`)
+2. ✅ Summary file at the harness path, ends with `OPENHANDS_VERDICT: PASS`
+3. ✅ Run-artifact `implement-eval.md` in the slice's run dir (explicitly 
+requested by the USER_CONTEXT note: "write `evaluate.md` with verdict" — I named
+it implement-eval.md; hmm, the user context said `evaluate.md`. Should I match 
+the name exactly? The handoff skill's contract is what the supervisor parses. 
+Let me check the openhands-handoff skill quickly for the expected filename... 
+The task prompt from the trigger says "produce `evaluate.md`". To be safe, also 
+create `evaluate.md` — cheap (one tool call). Actually let me check whether 
+there's an existing evaluate.md convention in the run dir. There are: 
+clustered-plan.md, codex-thread-ids.md, context-pack.md, drift.md, implement.md,
+plan.md, research.md, supervisor.md, worklog.md — no evaluate.md. The 
+USER_CONTEXT says "write `evaluate.md` with verdict". I'll create it referencing
+the same content. Cheap insurance.
+
+Actually — to avoid duplicating a 60-line file, evaluate.md can be a short 
+pointer file? No — the contract says the verdict must be in the file with the 
+OPENHANDS_VERDICT line. A pointer file whose last line is OPENHANDS_VERDICT: 
+PASS plus a summary would satisfy. But a full copy is equally easy... A short 
+file with verdict + reference to implement-eval.md and the PR comment is 
+cleanest. Hmm, but if the supervisor parses evaluate.md expecting the full 
+judgment, a pointer might be thin. I'll write evaluate.md as the canonical file 
+with full content (copy of implement-eval.md), and keep implement-eval.md too? 
+Two copies of the same file in the run dir is clutter. Alternative: make 
+evaluate.md the full file and delete implement-eval.md. The skill name used 
+"IMPL-EVAL"; filename either way. The USER_CONTEXT explicitly says `evaluate.md`
+— that's the requested deliverable name. I'll write evaluate.md with full 
+content and remove implement-eval.md (my own file, created this session — 
+removing it is safe and keeps one canonical artifact).
+
+Wait — but this is an eval-only session; "do not edit, commit, push, or repair" 
+— the working tree diff is irrelevant since I can't push. The run dir is 
+`.llm/runs/**` which AGENTS.md says is intentional tracked cross-agent context, 
+but I'm not committing anything, so my files remain untracked working-tree 
+changes (preserved in the Actions artifact per the contract note). Fine.
+
+Let me do: mv implement-eval.md evaluate.md (shell one-liner), then quickly 
+verify both verdict-comment markers didn't accidentally imitate the workflow (my
+comment has no '<!-- openhands-' markers — correct; it starts with the formal 
+header and ends with OPENHANDS_VERDICT: PASS ✓).
+
+Also verify the summary.md is at the right path — the contract says 
+OPENHANDS_SUMMARY_PATH env var defines the run-scoped path. Let me check the env
+var value to be sure my path matches: echo $OPENHANDS_SUMMARY_PATH. If it points
+elsewhere, write there too.
+
+Thought:
+One deliverable-name fix: the run contract asked for `evaluate.md`. Renaming my 
+run artifact and verifying the summary path env var:
+
+$ cd 
+/home/runner/work/netscript/netscript/.llm/runs/feat-sdk-credential-contribution
+--1352 && mv implement-eval.md evaluate.md && ls evaluate.md && echo "---SUMMARY
+PATH ENV---" && echo "$OPENHANDS_SUMMARY_PATH" && echo "---VERDICT LINES---" && 
+tail -1 evaluate.md && tail -1 
+/home/runner/work/_temp/openhands/33625757148-1/summary.md && tail -1 
+/tmp/verdict_comment.md
+
+Tokens: ↑ input 31.97K (total 1.42M) • cache hit 95.88% (total 92.50%) •  
+reasoning 731 (total 13.48K) • ↓ output 894 (total 30.2K) • $ (total 0.0353)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+evaluate.md
+---SUMMARY PATH ENV---
+/home/runner/work/_temp/openhands/33625757148-1/summary.md
+---VERDICT LINES---
+OPENHANDS_VERDICT: PASS
+OPENHANDS_VERDICT: PASS
+OPENHANDS_VERDICT: PASS
+
+📁 Working directory: 
+/home/runner/work/netscript/netscript/.llm/runs/feat-sdk-credential-contribution
+--1352
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+All deliverables are complete. Final state:
+
+**What was done (in order):**
+1. Read `AGENTS.md` + `netscript-harness`/`openhands-handoff` skills; confirmed 
+HEAD = `a6fababde` on `feat/sdk-credential-contribution`.
+2. Re-anchored evidence at this exact head: `git diff 88df4839e a6fababde 
+--stat` (4 regenerated carriers, no product source), `gh pr checks 1915` + `gh 
+run view 33617994226` (head SHA match, all lanes green except the unticked 
+IMPL-EVAL DoD box), focused suites re-run → **10 passed, 0 failed**, `deno doc 
+--json` on the new entrypoint → exactly the 3 described symbols, 
+forbidden-surface grep clean, deferred CLI scope read.
+3. **Posted the verdict PR comment immediately** (before any deep-dive): 
+[#issuecomment-5509109094](https://github.com/rickylabs/netscript/pull/1915#issu
+ecomment-5509109094) — starts with `[PHASE: IMPL-EVAL] [VERDICT: PASS]`, ends 
+with `OPENHANDS_VERDICT: PASS`.
+4. Updated the run-scoped summary at `$OPENHANDS_SUMMARY_PATH` with Summary / 
+Changes / Validation / Remaining risks + verdict line, and wrote the run 
+artifact `.llm/runs/feat-sdk-credential-contribution--1352/evaluate.md` (renamed
+from `implement-eval.md` to match the contract's deliverable name).
+
+**Key findings per judgment point:** explicit-only contribution confirmed 
+through the builder→merger→discovery chain with no implicit attach path; 
+non-disclosure pinned by the `SDK_CACHE_PARTITION_INVALID` and 
+`SDK_PREPARATION_FAILED` redaction tests; cache partitioning hook never receives
+the token and the random-UUID negative test fails if that changes; public 
+surface exact with #1349 link types absent; scope = 27 hand-authored files + 3 
+regenerated carriers with no `prepared-call.ts`/`trace*`/`packages/sdk` touches;
+the CLI auth-session deferral is genuinely blocked by the `AuthSessionHttpPort` 
+signature, not evasive.
+
+**Head-diff claim:** agreed — the prior evaluation at `88df4839e` carries by 
+byte-identity.
+
+No code was edited, committed, or pushed, per the task's immutable-head 
+constraint.
+
+[PHASE: IMPL-EVAL] [VERDICT: PASS]
+
+OPENHANDS_VERDICT: PASS
+
+Tokens: ↑ input 32.28K (total 1.45M) • cache hit 98.93% (total 92.64%) •  
+reasoning 261 (total 13.74K) • ↓ output 814 (total 31.01K) • $ (total 0.0360)
+
