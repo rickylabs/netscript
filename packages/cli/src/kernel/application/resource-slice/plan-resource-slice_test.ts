@@ -1,4 +1,5 @@
 import { assertEquals, assertFalse } from '@std/assert';
+import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import {
   normalizeResourceSliceInput,
   type ResourceSliceOptionalVariant,
@@ -88,6 +89,17 @@ Deno.test('query bindings and plan data contain no forbidden generated-content p
       /JSON\.parse\s*\(/,
     ]
   ) assertFalse(forbidden.test(source));
+});
+
+Deno.test('planner template roster matches the canonical resource-slice asset family', () => {
+  const plannedTemplates = plan(['form', 'partial', 'stream']).leaves
+    .map((leaf) => `resource-slice/${leaf.template}.template`)
+    .sort();
+  const manifestedTemplates = Object.values(TEMPLATE_KEYS)
+    .filter((key) => key.startsWith('resource-slice/'))
+    .sort();
+
+  assertEquals(plannedTemplates, manifestedTemplates);
 });
 
 function assertDelta(

@@ -1,0 +1,164 @@
+{
+  "receipt": "aspire-mcp-tools-static",
+  "capturedAt": "2026-08-30T10:38:42.664Z",
+  "completedAt": "2026-08-30T10:38:45.642Z",
+  "proofScope": "Phase A static tool surface only; this is not the D-12 AppHost smoke receipt.",
+  "cliVersion": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+  "entryPoint": {
+    "command": "aspire",
+    "args": [
+      "agent",
+      "mcp"
+    ],
+    "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s9"
+  },
+  "serverInfo": {
+    "name": "aspire-mcp-server",
+    "version": "13.5.3"
+  },
+  "toolsExpected": [
+    "doctor",
+    "execute_resource_command",
+    "get_doc",
+    "list_apphosts",
+    "list_console_logs",
+    "list_docs",
+    "list_integrations",
+    "list_resources",
+    "list_structured_logs",
+    "list_trace_structured_logs",
+    "list_traces",
+    "refresh_tools",
+    "search_docs",
+    "select_apphost"
+  ],
+  "toolsObserved": [
+    "doctor",
+    "execute_resource_command",
+    "get_doc",
+    "list_apphosts",
+    "list_console_logs",
+    "list_docs",
+    "list_integrations",
+    "list_resources",
+    "list_structured_logs",
+    "list_trace_structured_logs",
+    "list_traces",
+    "refresh_tools",
+    "search_docs",
+    "select_apphost"
+  ],
+  "toolsMissing": [],
+  "toolsExtra": [],
+  "documentedUnobserved": ["get_integration_docs"],
+  "documentedUnobservedObserved": [],
+  "baselineDiff": {
+    "added": [],
+    "removed": []
+  },
+  "doctor": {
+    "checks": [
+      {
+        "category": "aspire",
+        "name": "cli-version",
+        "status": "pass",
+        "message": "Aspire CLI version 13.5.3 (channel: stable)",
+        "metadata": {
+          "currentVersion": "13.5.3",
+          "identityChannel": "stable"
+        }
+      },
+      {
+        "category": "environment",
+        "name": "operating-system",
+        "status": "pass",
+        "message": "Operating system: Linux Debian 12",
+        "metadata": {
+          "osType": "Linux",
+          "displayName": "Linux Debian",
+          "version": "12",
+          "description": "Debian GNU/Linux 12 (bookworm)"
+        }
+      },
+      {
+        "category": "sdk",
+        "name": "dotnet-sdk",
+        "status": "pass",
+        "message": ".NET 10.0.400 installed (x64)"
+      },
+      {
+        "category": "environment",
+        "name": "dev-certs",
+        "status": "warning",
+        "message": "HTTPS development certificate is only partially trusted",
+        "fix": "Set SSL_CERT_DIR in your shell profile: export SSL_CERT_DIR=\"$SSL_CERT_DIR:/usr/lib/ssl/certs:/home/agent/.aspnet/dev-certs/trust\"",
+        "link": "https://aka.ms/aspire-prerequisites#dev-certs",
+        "details": "The certificate is in the trusted store, but SSL_CERT_DIR is not configured to include '/home/agent/.aspnet/dev-certs/trust'. Some applications may not trust the certificate. 'aspire run' will configure this automatically.",
+        "metadata": {
+          "certificates": [
+            {
+              "thumbprint": "B61BC460D594D5C0EF406F52A03D4577A49D1DFC",
+              "version": 6,
+              "trustLevel": "partial",
+              "notBefore": "2026-08-30T10:39:55.0000000+02:00",
+              "notAfter": "2027-08-30T10:39:55.0000000+02:00"
+            }
+          ]
+        }
+      },
+      {
+        "category": "environment",
+        "name": "dev-certs-certutil",
+        "status": "warning",
+        "message": "certutil is not available; browser certificate trust may be incomplete",
+        "fix": "Install certutil from your distribution's NSS tools package (for example, libnss3-tools).",
+        "link": "https://aka.ms/aspire-prerequisites#dev-certs",
+        "details": "Aspire uses certutil to query and update NSS certificate databases used by Firefox and Chromium browsers on Linux."
+      },
+      {
+        "category": "container",
+        "name": "docker",
+        "status": "pass",
+        "message": "Docker v28.5.2: running (auto-detected (default)) ← active"
+      },
+      {
+        "category": "aspire",
+        "name": "dcp-ephemeral-certificate",
+        "status": "pass",
+        "message": "Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded"
+      },
+      {
+        "category": "aspire",
+        "name": "dcp-developer-certificate",
+        "status": "warning",
+        "message": "No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check",
+        "fix": "Run `aspire certs trust` to create and trust a developer certificate.",
+        "details": "No fully trusted exportable developer certificate with a private key was found."
+      }
+    ],
+    "summary": {
+      "passed": 5,
+      "warnings": 3,
+      "failed": 0
+    }
+  },
+  "exit": {
+    "code": 0,
+    "signal": null,
+    "graceful": true
+  },
+  "zeroState": {
+    "before": {
+      "aspirePs": [],
+      "dockerPs": []
+    },
+    "after": {
+      "aspirePs": [],
+      "dockerPs": []
+    }
+  },
+  "notes": [
+    "Captured without an AppHost; no resource visibility, dashboard-only, or redaction claim is made.",
+    "The Phase-B lease must produce receipts/aspire-13.5-mcp-smoke.json for D-12."
+  ]
+}

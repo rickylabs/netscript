@@ -3712,6 +3712,7 @@
           "jsr:@netscript/aspire@0.0.6",
           "jsr:@netscript/config@0.0.6",
           "jsr:@netscript/fresh-ui@0.0.6",
+          "jsr:@netscript/fresh@0.0.6",
           "jsr:@netscript/mcp@0.0.6",
           "jsr:@netscript/plugin@0.0.6",
           "jsr:@netscript/sdk@0.0.6",
