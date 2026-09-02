@@ -465,15 +465,15 @@ export function createJobSubprocessEnv(
  * @example
  * ```ts
  * // In job script (e.g., jobs/my-job.ts)
- * import { initJobTracing, withSpan, getJobTracer } from '@netscript/telemetry';
+ * import { getTracer, initJobTracing, TracerNames, withSpan } from '@netscript/telemetry';
  *
  * const parentContext = initJobTracing();
  *
  * // Create spans that are linked to the worker trace
- * await withSpan(getJobTracer(), 'job.main', async (span) => {
+ * await withSpan(getTracer(TracerNames.JOB), 'job.main', async (span) => {
  *   span.setAttribute('job.step', 'processing');
  *   // ... job logic
- * }, { parentContext });
+ * }, { parentContext: parentContext ?? undefined });
  * ```
  */
 export function initJobTracing(): Context | null {
@@ -505,7 +505,9 @@ export function getJobTraceContext(): SerializedTraceContext | null {
  * @example
  * ```ts
  * // In job script
- * import { runTracedJob } from '@netscript/telemetry/instrumentation/worker';
+ * import { runTracedJob } from '@netscript/telemetry/instrumentation';
+ *
+ * declare function fetchData(): Promise<unknown>;
  *
  * const result = await runTracedJob('my-job', async (span) => {
  *   span.addEvent('step.started', { step: 'fetch' });

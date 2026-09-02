@@ -8,12 +8,14 @@ import type { NetScriptConfig } from '{{__slot4__}}';
 type AspireResource =
   & Parameters<ReturnType<DistributedApplicationBuilder['addExecutable']>['waitFor']>[0]
   & Parameters<ReturnType<DistributedApplicationBuilder['addExecutable']>['withEnvironment']>[1];
+type DatabaseConnectionStringResolver = () => Promise<string>;
 type CacheContainerResource = Awaited<ReturnType<DistributedApplicationBuilder['addContainer']>>;
 type CacheResource = AspireResource | CacheContainerResource;
 
 /** Infrastructure context carrying database and cache resources for downstream registration. */
 export interface InfrastructureContext {
   readonly databases: Map<string, AspireResource>;
+  readonly databaseConnectionStrings: Map<string, DatabaseConnectionStringResolver>;
   readonly caches: Map<string, CacheResource>;
   readonly cacheEndpoints: Map<string, EndpointReference>;
   readonly cacheWiring: Map<string, CacheWiring>;
@@ -38,6 +40,7 @@ export async function registerInfrastructure(
   appHostDir: string,
 ): Promise<InfrastructureContext> {
   const databases = new Map<string, AspireResource>();
+  const databaseConnectionStrings = new Map<string, DatabaseConnectionStringResolver>();
   const caches = new Map<string, CacheResource>();
   const cacheEndpoints = new Map<string, EndpointReference>();
   const cacheWiring = new Map<string, CacheWiring>();
@@ -57,6 +60,7 @@ export async function registerInfrastructure(
 
   return {
     databases,
+    databaseConnectionStrings,
     caches,
     cacheEndpoints,
     cacheWiring,

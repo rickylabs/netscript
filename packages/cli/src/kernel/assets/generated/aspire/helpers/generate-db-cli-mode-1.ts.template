@@ -1,23 +1,62 @@
 {{__slot0__}}
 
 import { resolve } from 'node:path';
-import type { DistributedApplicationBuilder } from '{{__slot1__}}';
-import type { NetScriptConfig } from '{{__slot2__}}';
+import { spawn } from 'node:child_process';
+import { readFile, rm, writeFile } from 'node:fs/promises';
+import process from 'node:process';
+import {
+  InputType,
+  type DistributedApplicationBuilder,
+} from '{{__slot1__}}';
+import { RESOURCE_DEFAULTS, type NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mts';
 
 interface DbCliTarget {
   readonly configKey: string;
-  readonly resourceKey: string;
   readonly databaseName: string;
   readonly envKey: string;
   readonly engine: string;
+  readonly mode: 'Container' | 'External';
   readonly taskSuffix: string;
   readonly workdir: string;
   readonly resource: InfrastructureContext['primaryDatabase'];
 }
 
+type DbCliOperation = 'migrate' | 'seed' | 'reset';
+type DbCliTaskOperation = DbCliOperation | 'deploy';
+
+interface DbCliCommand {
+  readonly name: DbCliOperation;
+  readonly displayName: string;
+  readonly iconName: string;
+}
+
+interface DbCliCommandResult {
+  readonly success: boolean;
+  readonly message: string;
+}
+
+interface DbCliResultRecord extends DbCliCommandResult {
+  readonly actionableStderr: readonly string[];
+  readonly actionableStdout: readonly string[];
+}
+
+const DB_CLI_COMMANDS: readonly DbCliCommand[] = [
+  { name: 'migrate', displayName: 'Migrate database', iconName: 'DatabaseArrowUp' },
+  { name: 'seed', displayName: 'Seed database', iconName: 'DatabaseArrowDown' },
+  { name: 'reset', displayName: 'Reset database', iconName: 'DatabaseLightning' },
+];
+
+const DEFAULT_COMMAND_TIMEOUT_SECONDS = 300;
+const RESOURCE_RESULT_GRACE_MS = 30_000;
+const RESOURCE_RESULT_POLL_MS = 100;
+
+function dbTaskOperation(operation: DbCliOperation): DbCliTaskOperation {
+  return operation === 'migrate' ? 'deploy' : operation;
+}
+
 /**
- * Register explicit-start database operation resources in the resident AppHost.
+ * Register typed database operation resources in the resident AppHost.
  *
  * @param builder - Aspire distributed application builder.
  * @param config - Parsed NetScript config.
@@ -34,18 +73,23 @@ export async function tryHandleDbCliMode(
   const targets = resolveTargets(appHostDir, infrastructure);
 
   for (const target of targets) {
+    const runnerPath = resolve(appHostDir, 'aspire', '.helpers', 'run-tool.mts');
     const requestPath = resolve(
       appHostDir,
       'aspire',
       `.netscript-db-operation-${target.configKey}.json`,
     );
     let resource = await builder.addExecutable(
-      `netscript-db-${target.configKey}`,
+      `${target.configKey}-cli`,
       'deno',
       target.workdir,
       [
-        'eval',
-        DB_OPERATION_RUNNER,
+        'run',
+        '--allow-read',
+        '--allow-run',
+        '--allow-write',
+        runnerPath,
+        '--request',
         requestPath,
         target.taskSuffix,
       ],
@@ -67,28 +111,282 @@ export async function tryHandleDbCliMode(
     }
 
     await resource.withExplicitStart();
+
+    for (const command of DB_CLI_COMMANDS) {
+      await resource.withCommand(
+        command.name,
+        command.displayName,
+        async (context) => {
+          const args = await context.arguments();
+          const timeoutValue = await args.requiredValue('timeout');
+          const timeoutSeconds = Number(timeoutValue);
+          if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 1) {
+            return {
+              success: false,
+              message: `--timeout must be a positive whole number; received "${timeoutValue}".`,
+            };
+          }
+
+          if (command.name === 'reset' && await args.value('confirm') !== 'true') {
+            return {
+              success: false,
+              message: 'Database reset requires --confirm true; no mutation was started.',
+            };
+          }
+
+          try {
+            if (target.mode === 'Container' && target.engine !== 'Sqlite') {
+              return await executeDbCliResource(
+                appHostDir,
+                target,
+                command.name,
+                timeoutSeconds,
+              );
+            }
+            let databaseUrl = `file:./${target.databaseName}`;
+            if (target.engine !== 'Sqlite') {
+              const resolveConnectionString = infrastructure.databaseConnectionStrings.get(
+                target.configKey,
+              );
+              if (!resolveConnectionString) {
+                throw new Error(
+                  `No connection-string resolver is registered for database '${target.configKey}'.`,
+                );
+              }
+              databaseUrl = await resolveConnectionString();
+            }
+            return await executeDbTool(
+              appHostDir,
+              target,
+              command.name,
+              databaseUrl,
+              timeoutSeconds,
+            );
+          } catch (error) {
+            return {
+              success: false,
+              message: error instanceof Error ? error.message : String(error),
+            };
+          }
+        },
+        {
+          commandOptions: {
+            description: `${command.displayName} with the generated NetScript database tooling.`,
+            iconName: command.iconName,
+            arguments: [
+              {
+                name: 'timeout',
+                label: 'Timeout (seconds)',
+                inputType: InputType.Number,
+                required: true,
+                value: String(DEFAULT_COMMAND_TIMEOUT_SECONDS),
+              },
+              ...(command.name === 'reset'
+                ? [{
+                  name: 'confirm',
+                  label: 'Confirm destructive reset',
+                  inputType: InputType.Boolean,
+                  required: true,
+                }]
+                : []),
+            ],
+          },
+        },
+      );
+    }
+
+    if (RESOURCE_DEFAULTS.DbCliModeExcludeFromMcp) {
+      await resource.excludeFromMcp();
+    }
   }
 
   return false;
 }
 
-const DB_OPERATION_RUNNER = `
-const request = JSON.parse(await Deno.readTextFile(Deno.args[0]));
-const operation = request.NETSCRIPT_PRISMA_OPERATION;
-if (typeof operation !== 'string' || !/^[a-z-]+$/.test(operation)) {
-  throw new Error('Invalid NetScript database operation request.');
+async function executeDbCliResource(
+  appHostDir: string,
+  target: DbCliTarget,
+  operation: DbCliOperation,
+  timeoutSeconds: number,
+): Promise<DbCliCommandResult> {
+  const aspireDir = resolve(appHostDir, 'aspire');
+  const appHostPath = resolve(aspireDir, 'apphost.mts');
+  const requestPath = resolve(
+    aspireDir,
+    `.netscript-db-operation-${target.configKey}.json`,
+  );
+  const resultPath = resolve(
+    aspireDir,
+    `.netscript-db-operation-${target.configKey}.result.json`,
+  );
+  await Promise.all([
+    rm(requestPath, { force: true }),
+    rm(resultPath, { force: true }),
+    rm(`${resultPath}.tmp`, { force: true }),
+  ]);
+  await writeFile(
+    requestPath,
+    JSON.stringify({
+      NETSCRIPT_PRISMA_OPERATION: operation,
+      NETSCRIPT_PRISMA_TASK_OPERATION: dbTaskOperation(operation),
+      NETSCRIPT_PRISMA_TARGET: target.configKey,
+      ASPIRE_CLI_START_TIMEOUT: String(timeoutSeconds),
+      NETSCRIPT_DB_RESULT_FILE: resultPath,
+    }),
+    'utf8',
+  );
+
+  try {
+    const child = spawn(
+      'aspire',
+      [
+        'resource',
+        `${target.configKey}-cli`,
+        'start',
+        '--apphost',
+        appHostPath,
+        '--non-interactive',
+        '--nologo',
+      ],
+      {
+        cwd: aspireDir,
+        env: process.env,
+        stdio: 'inherit',
+      },
+    );
+    const startExitCode = await childExitCode(child);
+    const result = await readDbCliResult(resultPath);
+    if (result !== null) return presentDbCliResult(result);
+    if (startExitCode !== 0) {
+      return {
+        success: false,
+        message: `Aspire failed to start ${target.configKey}-cli with exit code ${startExitCode}.`,
+      };
+    }
+    return await waitForDbCliResult(resultPath, timeoutSeconds);
+  } finally {
+    await Promise.all([
+      rm(requestPath, { force: true }),
+      rm(resultPath, { force: true }),
+      rm(`${resultPath}.tmp`, { force: true }),
+    ]);
+  }
 }
-const task = \`db:\${operation}:\${Deno.args[1]}\`;
-const command = new Deno.Command('deno', {
-  args: ['task', task],
-  env: request,
-  stdin: 'inherit',
-  stdout: 'inherit',
-  stderr: 'inherit',
-});
-const status = await command.spawn().status;
-Deno.exit(status.code);
-`;
+
+async function executeDbTool(
+  appHostDir: string,
+  target: DbCliTarget,
+  operation: DbCliOperation,
+  databaseUrl: string,
+  timeoutSeconds: number,
+): Promise<DbCliCommandResult> {
+  const runnerPath = resolve(appHostDir, 'aspire', '.helpers', 'run-tool.mts');
+  const errorFile = resolve(
+    appHostDir,
+    'aspire',
+    `.netscript-db-${target.configKey}-${operation}.error`,
+  );
+  const child = spawn(
+    'deno',
+    [
+      'run',
+      '--allow-run',
+      '--allow-write',
+      runnerPath,
+      errorFile,
+      `db:${dbTaskOperation(operation)}:${target.taskSuffix}`,
+      String(timeoutSeconds),
+    ],
+    {
+      cwd: target.workdir,
+      env: {
+        ...process.env,
+        DATABASE_URL: databaseUrl,
+        [target.envKey]: databaseUrl,
+        NETSCRIPT_PRISMA_OPERATION: operation,
+        NETSCRIPT_PRISMA_TARGET: target.configKey,
+      },
+      stdio: 'inherit',
+    },
+  );
+  const exitCode = await childExitCode(child);
+  const detail = (await readFile(errorFile, 'utf8').catch(() => '')).trim();
+  await rm(errorFile, { force: true });
+
+  return exitCode === 0
+    ? { success: true, message: `Database ${operation} completed successfully.` }
+    : {
+      success: false,
+      message: detail || `Database ${operation} failed with exit code ${exitCode}.`,
+    };
+}
+
+function childExitCode(child: ReturnType<typeof spawn>): Promise<number> {
+  return new Promise<number>((resolveExit, reject) => {
+    child.once('error', reject);
+    child.once('exit', (code) => resolveExit(code ?? 1));
+  });
+}
+
+async function waitForDbCliResult(
+  resultPath: string,
+  timeoutSeconds: number,
+): Promise<DbCliCommandResult> {
+  const deadline = Date.now() + timeoutSeconds * 1_000 + RESOURCE_RESULT_GRACE_MS;
+  while (Date.now() <= deadline) {
+    const result = await readDbCliResult(resultPath);
+    if (result !== null) return result;
+    await new Promise<void>((resolvePoll) => setTimeout(resolvePoll, RESOURCE_RESULT_POLL_MS));
+  }
+  return {
+    success: false,
+    message: `Timed out waiting for the graph-injected database command result after ${timeoutSeconds} seconds.`,
+  };
+}
+
+async function readDbCliResult(resultPath: string): Promise<DbCliResultRecord | null> {
+  const text = await readFile(resultPath, 'utf8').catch((error: unknown) => {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return null;
+    throw error;
+  });
+  return text === null ? null : parseDbCliResult(text);
+}
+
+function parseDbCliResult(text: string): DbCliResultRecord {
+  const parsed: unknown = JSON.parse(text);
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('Database command result must be an object.');
+  }
+  const success = Reflect.get(parsed, 'success');
+  const message = Reflect.get(parsed, 'message');
+  const actionableStderr = Reflect.get(parsed, 'actionableStderr');
+  const actionableStdout = Reflect.get(parsed, 'actionableStdout');
+  if (
+    typeof success !== 'boolean' || typeof message !== 'string' ||
+    !Array.isArray(actionableStderr) ||
+    !actionableStderr.every((line) => typeof line === 'string') ||
+    !Array.isArray(actionableStdout) ||
+    !actionableStdout.every((line) => typeof line === 'string')
+  ) {
+    throw new Error(
+      'Database command result must contain boolean success, string message, and bounded diagnostic streams.',
+    );
+  }
+  return { success, message, actionableStderr, actionableStdout };
+}
+
+function presentDbCliResult(result: DbCliResultRecord): DbCliCommandResult {
+  const diagnostics = [...result.actionableStderr, ...result.actionableStdout];
+  if (result.success || diagnostics.length === 0) {
+    return { success: result.success, message: result.message };
+  }
+  const messageIndex = diagnostics.indexOf(result.message);
+  const context = diagnostics.filter((_, index) => index !== messageIndex);
+  return {
+    success: false,
+    message: [result.message, ...context].join(' | '),
+  };
+}
 
 function resolveTargets(
   appHostDir: string,

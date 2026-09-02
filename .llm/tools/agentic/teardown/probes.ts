@@ -1,4 +1,10 @@
-import type { ContainerCandidate, ResourceCandidate } from './ownership.ts';
+import { basename } from '@std/path';
+import {
+  type ContainerCandidate,
+  MCP_COMMAND,
+  type ProcessEvidence,
+  type ResourceCandidate,
+} from './ownership.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { systemCommands, systemFiles } from './ports.ts';
 
@@ -12,6 +18,9 @@ export const ASPIRE_MOUNTS = 'com.microsoft.developer.usvc-dev.mountsLabel';
  */
 export const ASPIRE_LABEL_PREFIX = 'com.microsoft.developer.usvc-dev.';
 export const DEFAULT_PROBE_TIMEOUT_MS = 10_000;
+const PROCESS_ROW = /^\s*(\d+)\s+(\d+)\s+(\d+)\s+(.+)$/;
+const DCP_ENVIRONMENT_KEY = /^ASPIRE_DCP_APPHOST_PATH$/;
+const ABSOLUTE_PATH = /\/(?:[^\s\0'"=,:]+\/?)+/g;
 
 interface AspireRow {
   readonly appHostPath?: unknown;
@@ -45,6 +54,13 @@ export type ProbeStatus =
   | { readonly state: 'unavailable'; readonly message: string }
   | { readonly state: 'failed'; readonly message: string };
 
+interface ProcessRow {
+  readonly pid: number;
+  readonly ppid: number;
+  readonly elapsedSeconds: number;
+  readonly commandLine: string;
+}
+
 export interface ResourceProbeResult {
   readonly resources: readonly ResourceCandidate[];
   readonly probes: {
@@ -52,6 +68,7 @@ export interface ResourceProbeResult {
     readonly docker: ProbeStatus;
     readonly volumes: ProbeStatus;
     readonly networks: ProbeStatus;
+    readonly process: ProbeStatus;
   };
 }
 
@@ -84,6 +101,170 @@ async function resolvedPath(
   } catch {
     return undefined;
   }
+}
+
+function parseProcessRows(stdout: string): ProcessRow[] {
+  const rows: ProcessRow[] = [];
+  for (const line of stdout.split(/\r?\n/)) {
+    const match = line.match(PROCESS_ROW);
+    if (!match) continue;
+    const pid = Number(match[1]);
+    const ppid = Number(match[2]);
+    const elapsedSeconds = Number(match[3]);
+    const commandLine = match[4]?.trim() ?? '';
+    if (
+      Number.isInteger(pid) && Number.isInteger(ppid) && Number.isFinite(elapsedSeconds) &&
+      commandLine
+    ) {
+      rows.push({ pid, ppid, elapsedSeconds, commandLine });
+    }
+  }
+  return rows;
+}
+
+function commandTokens(rawCommandLine: string, fallback: string): string[] {
+  const tokens = rawCommandLine
+    ? rawCommandLine.split('\0').filter(Boolean)
+    : fallback.trim().split(/\s+/).filter(Boolean);
+  return tokens;
+}
+
+function aspireProcessIdentity(tokens: readonly string[]): 'helper' | 'cli' | undefined {
+  if (
+    tokens.some((token) => {
+      const name = basename(token).toLowerCase();
+      return name === 'aspire-managed' || name === 'dcp' || name.endsWith('.dcp.dll');
+    })
+  ) return 'helper';
+  return tokens.some((token, index) => {
+      const name = basename(token).toLowerCase();
+      return index === 0 && (name === 'aspire' || name === 'aspire.exe');
+    })
+    ? 'cli'
+    : undefined;
+}
+
+function argvPath(tokens: readonly string[], names: readonly string[]): string | undefined {
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index] ?? '';
+    if (names.includes(token)) return tokens[index + 1];
+    const name = names.find((candidate) => token.startsWith(`${candidate}=`));
+    if (name) return token.slice(name.length + 1) || undefined;
+  }
+  return undefined;
+}
+
+function environmentEvidence(environment: string): string[] {
+  const paths: string[] = [];
+  for (const entry of environment.split('\0')) {
+    const separator = entry.indexOf('=');
+    if (separator < 1 || !DCP_ENVIRONMENT_KEY.test(entry.slice(0, separator))) continue;
+    for (const path of entry.slice(separator + 1).match(ABSOLUTE_PATH) ?? []) paths.push(path);
+  }
+  return paths;
+}
+
+async function socketEvidence(files: FilePort, procRoot: string): Promise<string[]> {
+  if (!files.listNames || !files.readLink) return [];
+  let descriptorNames: readonly string[];
+  try {
+    descriptorNames = await files.listNames(`${procRoot}/fd`);
+  } catch {
+    return [];
+  }
+  const inodes = new Set<string>();
+  for (const name of descriptorNames) {
+    try {
+      const inode = (await files.readLink(`${procRoot}/fd/${name}`)).match(/^socket:\[(\d+)\]$/)
+        ?.[1];
+      if (inode) inodes.add(inode);
+    } catch {
+      // File descriptors can close while the process is inspected.
+    }
+  }
+  if (inodes.size === 0) return [];
+  const paths: string[] = [];
+  for (const line of (await readProcessText(files, '/proc/net/unix')).split(/\r?\n/)) {
+    const fields = line.trim().split(/\s+/);
+    if (fields.length >= 8 && inodes.has(fields[6] ?? '') && fields[7]?.startsWith('/')) {
+      paths.push(fields[7]);
+    }
+  }
+  return paths;
+}
+
+async function readProcessText(files: FilePort, path: string): Promise<string> {
+  try {
+    return await files.readText(path);
+  } catch {
+    return '';
+  }
+}
+
+/** Discovers Aspire-related process rows, including helpers re-parented to PID 1. */
+export async function probeProcesses(
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceCandidate[]> {
+  const result = await commands.run(['ps', '-eo', 'pid=,ppid=,etimes=,args='], timeoutMs);
+  if (result.code !== 0) throw new Error(`ps failed (${result.code}): ${result.stderr.trim()}`);
+  const candidates: ResourceCandidate[] = [];
+  for (const row of parseProcessRows(result.stdout)) {
+    const procRoot = `/proc/${row.pid}`;
+    const tokens = commandTokens(
+      await readProcessText(files, `${procRoot}/cmdline`),
+      row.commandLine,
+    );
+    const commandLine = tokens.join(' ');
+    if (MCP_COMMAND.test(commandLine)) continue;
+    const environment = await readProcessText(files, `${procRoot}/environ`);
+    const appHostPath = argvPath(tokens, ['--apphost']);
+    const contentRootPath = argvPath(tokens, ['--contentRoot', '--content-root']);
+    const dcpPaths = environmentEvidence(environment);
+    const socketPaths = await socketEvidence(files, procRoot);
+    const aspireIdentity = aspireProcessIdentity(tokens);
+    if (!aspireIdentity) continue;
+    let cwd: string | undefined;
+    try {
+      cwd = await files.realPath(`${procRoot}/cwd`);
+    } catch {
+      // Process exit between ps and proc reads is expected.
+    }
+    const rawAppHostEvidence: ProcessEvidence[] = appHostPath
+      ? [{ kind: 'apphost-argv', path: appHostPath }]
+      : [];
+    const rawContentRootEvidence: ProcessEvidence[] = contentRootPath
+      ? [{ kind: 'content-root-argv', path: contentRootPath }]
+      : [];
+    const rawCwdEvidence: ProcessEvidence[] = aspireIdentity === 'helper' && cwd
+      ? [{ kind: 'cwd-path', path: cwd }]
+      : [];
+    const rawEvidence: ProcessEvidence[] = [
+      ...dcpPaths.map((path): ProcessEvidence => ({ kind: 'dcp-label', path })),
+      ...rawAppHostEvidence,
+      ...rawContentRootEvidence,
+      ...rawCwdEvidence,
+      ...socketPaths.map((path): ProcessEvidence => ({ kind: 'socket-path', path })),
+    ];
+    const evidence: ProcessEvidence[] = [];
+    for (const entry of rawEvidence) {
+      const path = await resolvedPath(entry.path, files);
+      if (path) evidence.push({ kind: entry.kind, path });
+    }
+    const stat = await readProcessText(files, `${procRoot}/stat`);
+    candidates.push({
+      kind: 'process',
+      pid: row.pid,
+      ppid: row.ppid,
+      processStartedAt: stat ? processStartedAt(stat) : undefined,
+      observedAgeMs: row.elapsedSeconds * 1000,
+      commandLine,
+      cwd,
+      evidence,
+    });
+  }
+  return candidates;
 }
 
 /** Discovers AppHosts using only Aspire and process metadata. */
@@ -274,16 +455,17 @@ async function settledProbe(
   }
 }
 
-/** Runs Aspire and Docker discovery independently and retains each probe's outcome. */
+/** Runs Aspire, Docker, and process discovery independently and retains each probe's outcome. */
 export async function probeResourceReport(
   commands: CommandPort = systemCommands,
   files: FilePort = systemFiles,
   timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
 ): Promise<ResourceProbeResult> {
-  const [aspire, containers, networks] = await Promise.all([
+  const [aspire, containers, networks, process] = await Promise.all([
     settledProbe(() => probeAppHosts(commands, files, timeoutMs)),
     settledContainerProbe(commands, files, timeoutMs),
     settledProbe(() => probeNetworks(commands, timeoutMs)),
+    settledProbe(() => probeProcesses(commands, files, timeoutMs)),
   ]);
   // Volumes depend on the container probe's mount map, so they run after it; their own status
   // covers only their own commands.
@@ -305,12 +487,14 @@ export async function probeResourceReport(
       ...containers.candidates,
       ...volumes.resources,
       ...networks.resources,
+      ...process.resources,
     ],
     probes: {
       aspire: aspire.status,
       docker: containers.status,
       volumes: volumes.status,
       networks: networks.status,
+      process: process.status,
     },
   };
 }
@@ -341,8 +525,8 @@ async function settledContainerProbe(
 }
 
 /**
- * Discovers Aspire AppHosts, Aspire-labelled containers, Aspire-evidenced volumes, and
- * DCP-managed networks with bounded read-only probes.
+ * Discovers Aspire AppHosts, Aspire-labelled containers, Aspire-evidenced volumes,
+ * DCP-managed networks, and Aspire process descendants with bounded read-only probes.
  */
 export async function probeResources(
   commands: CommandPort = systemCommands,

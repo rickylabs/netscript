@@ -63,3 +63,13 @@ that the carrier is genuine tool output, proven by `check:mcp-export-corpus` and
 files *are* byte-identical to the evaluated head, and that is the claim the evaluator verdict rests on.
 
 Neither carrier was ever hand-merged; both were regenerated from tooling at every step.
+
+## D-1452-S2-CORPUS — checked-in main carrier lagged its generator baseline
+
+**Severity: minor.** At Slice 2 baseline `7ae7fe2da`, the checked-in MCP carrier recorded 7,680
+symbols, but regenerating in an isolated checkout of that exact commit produced 7,750. This is
+pre-existing generated-carrier drift on `main`, not 70 symbols introduced by Slice 2.
+
+After changing the public SDK surface, the same generator produces 7,751 symbols. The true
+slice-attributable delta is therefore exactly +1: `createPluginServiceContext`. The carrier is
+committed only as complete tool output, never hand-edited, and `check:mcp-export-corpus` passes.

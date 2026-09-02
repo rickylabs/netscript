@@ -10,10 +10,24 @@ import { generateDbCliMode } from '../generate-db-cli-mode.ts';
 import { generateIndex } from '../generate-index.ts';
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+import { TEMPLATE_KEYS, type TemplateKey } from '../../../../assets/manifest.ts';
 
-// These generators read templates synchronously, which requires a previously-
-// awaited registry hydration. The tests exercise them directly (outside the CLI
-// dispatch path), so hydrate at module load.
+// Generator tests exercise source assets before the embedded snapshot is
+// regenerated in its own slice.
+async function registerSourceTemplate(key: TemplateKey, path: string): Promise<void> {
+  DEFAULT_TEMPLATE_REGISTRY.register(key, {
+    path: key,
+    content: await Deno.readTextFile(new URL(path, import.meta.url)),
+  });
+}
+await registerSourceTemplate(
+  TEMPLATE_KEYS.generatedAspireHelpersGenerateDbCliMode1,
+  '../../../../assets/generated/aspire/helpers/generate-db-cli-mode-1.ts.template',
+);
+await registerSourceTemplate(
+  TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterTools1,
+  '../../../../assets/generated/aspire/helpers/generate-register-tools-1.ts.template',
+);
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateRegisterTools', () => {
@@ -52,15 +66,6 @@ describe('generateRegisterTools', () => {
       output,
       "builder.addExecutable(\"prisma-studio\", 'deno', tool_0_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, tool_0_errorFile, \"studio\"])",
     );
-    assertStringIncludes(
-      output,
-      'tool_0 = maybeWithProcessCommand(tool_0, "prisma-studio", "studio");',
-    );
-    assertStringIncludes(
-      output,
-      "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'",
-    );
-    assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
     assertStringIncludes(
       output,
       'const tool_0_errorFile = resolveToolErrorFile(tool_0_workdir, "prisma-studio");',
@@ -209,13 +214,15 @@ describe('generateDbCliMode', () => {
     assert(!output.includes('--minimum-dependency-age=0'));
   });
 
-  it('registers explicit DB resources without short-circuiting the resident graph', () => {
+  it('registers typed DB CLI resources without short-circuiting the resident graph', () => {
     const output = generateDbCliMode({ databases: {} });
 
     assertStringIncludes(output, 'export async function tryHandleDbCliMode(');
-    assertStringIncludes(output, '`netscript-db-${target.configKey}`');
+    assertStringIncludes(output, '`${target.configKey}-cli`');
     assertStringIncludes(output, 'await resource.withExplicitStart();');
-    assertStringIncludes(output, 'request.NETSCRIPT_PRISMA_OPERATION');
+    assertStringIncludes(output, 'await resource.withCommand(');
+    assert(!output.includes('DB_OPERATION_RUNNER'));
+    assertStringIncludes(output, 'await resource.excludeFromMcp();');
     assertStringIncludes(output, 'return false;');
   });
 });

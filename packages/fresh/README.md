@@ -122,7 +122,10 @@ that cannot parse or fall back to contract defaults throws 400.
 
 ```tsx
 import { definePartial } from '@netscript/fresh/builders';
+// `@app/*` is the scaffolded application's own alias, so it resolves in your app, not here.
 import { routes } from '@app/router.ts';
+
+declare function loadOrder(id: string): Promise<{ total: number }>;
 
 export const orderSummaryPartial = definePartial({
   name: 'order-summary',
@@ -144,6 +147,10 @@ Aspire processes return an explicit disabled lifecycle without registering a bin
 
 ```typescript
 import { bindDesktopRpcWindow } from '@netscript/fresh/desktop';
+import type { DesktopBindableWindow, DesktopRpcRouter } from '@netscript/fresh/desktop';
+
+declare const desktopWindow: DesktopBindableWindow;
+declare const ordersRouter: DesktopRpcRouter;
 
 const desktopRpc = bindDesktopRpcWindow({
   window: desktopWindow,
@@ -167,6 +174,11 @@ that are still package-owned.
 
 ```tsx
 import { installPartialNavigationCoordinator, KeyedPartial } from '@netscript/fresh/navigation';
+import type { Signal } from '@preact/signals';
+import type { ComponentChild } from 'preact';
+
+declare const routeEvents: Signal<readonly string[]>;
+declare function OrderSummary(props: { orderId: string }): ComponentChild;
 
 const navigation = installPartialNavigationCoordinator();
 const unsubscribe = navigation.subscribe(({ kind, url }) => {

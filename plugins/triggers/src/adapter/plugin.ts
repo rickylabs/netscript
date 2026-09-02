@@ -32,7 +32,7 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
     return [
       textArtifact(
         'triggers/plugin.ts',
-        `/** Generated triggers control-plane module. */\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n`,
+        `/** Generated triggers control-plane module. */\n\nexport const NETSCRIPT_CONTRIBUTION_BUILDERS = [\n  { callee: 'defineWebhook', axis: 'triggers' },\n] as const;\n\nexport { triggersPlugin } from '@netscript/plugin-triggers';\n`,
       ),
     ];
   },
