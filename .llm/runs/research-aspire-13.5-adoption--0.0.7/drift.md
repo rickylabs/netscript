@@ -8401,3 +8401,20 @@ the all-service query, neither consulted `.netscript/e2e/flow-b-correlation-id`.
 `validateFlowB` both prefer the execution/trace carrying the fixture correlation, first-match as
 fallback; 3 new unit tests. **Deadline note:** the 17:16:34Z merge deadline passed with S9 still on
 its hosted proof — recorded honestly; the sqlite tier at `77f7ec249` is the next bounded gate.
+
+### D-327 — Aspire CLI JSON drops span-link attributes; TC-14 read path repaired via Dashboard API (2026-09-02)
+
+Hosted run 33660530671 (`77f7ec249`, sqlite tier) failed TC-14's last predicate, "fan-in link
+preserves per-message attributes through the SDK provider", although a local `InMemorySpanExporter`
+probe, the OTLP/JSON exporter, and the package normaliser all carry the link attributes, and a
+main-based branch (run 33662960120) passes the same predicate. Cause: S9 moved the suite's span
+read path from the Dashboard HTTP API to `aspire otel spans --format Json`, and Aspire CLI 13.5's
+`SharedAIHelpers.SerializeSpansToJson` (src/Shared/ConsoleLogs, release/13.5) serialises each link
+as `{ traceId, spanId }` only — attributes never leave the CLI. The Dashboard telemetry API the CLI
+itself reads (`TelemetryExportService.ConvertSpanLink`) keeps `links[].attributes`. Repair
+`568d6ed30` (e2e only): `aspire-dashboard-span-links.ts` exchanges the `aspire ps` login token for
+an API key (`POST /api/telemetry/validateToken`, same flow as the CLI) and re-reads linked spans
+via `GET /api/telemetry/spans?traceId=`; CLI rows borrow those links before normalisation; API
+failure leaves the CLI rows unchanged. Follow-up (not this slice): the gap is an upstream CLI
+projection — worth an upstream issue or a note in the S9 telemetry docs, since any consumer of
+`aspire otel … --format Json` loses link attributes.

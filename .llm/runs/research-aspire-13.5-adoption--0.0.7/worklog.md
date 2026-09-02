@@ -685,3 +685,25 @@ the merge.**
   dispatched. Remaining gate: both runtime tiers (~25–35 min incl. queue) → receipts → evidence →
   ready-merge → close-gate; actor: supervisor; ETA ~17:55Z.
 - S10 #1760 `84e4b38f7` — unchanged; #1930 OPEN.
+
+### 2026-09-02 18:20Z checkpoint — S9/S10/S13 (overdue; covers 17:23Z→18:20Z)
+
+- S9 #1759: sqlite tier 33660530671 at `77f7ec249` (18:03Z) passed the first three TC-14
+  predicates (consumer span exists, `flow-b-stream-consumer`, link → producer trace `b1e9f15e…`,
+  correlation `trg_evt_eb46a8d3…`) and FAILED "fan-in link preserves per-message attributes
+  through the SDK provider": link attributes empty on read-back. Root cause is upstream (D-327):
+  Aspire CLI 13.5 `otel spans --format Json` projects links to `{traceId, spanId}` only. Repair
+  `568d6ed30` (pushed 18:15Z; e2e only, product diff unchanged): linked span rows re-read their
+  links from the Dashboard telemetry API (`POST /api/telemetry/validateToken` with the `aspire ps`
+  login token → `GET /api/telemetry/spans?traceId=` with `X-API-Key`), 4 new unit tests, scaffold
+  gate suite 72/72. Superseded run 33660530671 cancelled (its postgres tier was still queued).
+  New `ci` 33666085055 + `e2e-cli` 33666085011 queued. Remaining gate: sqlite + postgres tiers
+  (~25–35 min incl. shared runtime slot) → receipts → evidence → ready-merge → close-gate.
+  **Also red at `77f7ec249`: `desktop-native-linux`** — identical `@orpc/contract` import failure
+  to #1930 (`packages/sdk/src/internal/transport-policy.ts`), i.e. inherited from main, not S9.
+  S9's e2e-cli cannot be fully green until #1930 merges and S9 takes main. Actor: supervisor;
+  ETA for the tier verdicts ~18:50Z; desktop tier ETA gated on #1930 (ready-merge, its own
+  postgres tier pending, coordinator merges).
+- S13 #1779 `5f0eed0fe`: packet delivered 17:13Z; still OPEN awaiting coordinator merge.
+- S10 #1760 `84e4b38f7`: unchanged; #1930 OPEN (`status:ready-merge`, `ci:full`, runtime tier
+  pending). Rerun `desktop-native-linux` on S10 the moment #1930 merges.
