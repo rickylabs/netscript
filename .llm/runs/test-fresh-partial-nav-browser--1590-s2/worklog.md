@@ -56,3 +56,31 @@ PLAN-EVAL: `PASS` in `.llm/runs/fix-fresh-partial-nav--1590/plan-eval.md` before
 - Slice reconcile: scope still completes #1590 only after the hosted proof passes at the exact
   committed head. PR must open with `Refs #1590`; the supervisor may add `Closes #1590` only after
   that green receipt. Publish-filter drift must be adjudicated before merge readiness.
+
+## Repair — hosted stale-response wait
+
+- Re-baselined the cited hosted job and the installed Fresh 2.3.3 client source before editing.
+  The Vite abort emitted only when the timed-out page closed proves a held request reached the
+  fixture. Both Fresh link/button paths add `fresh-partial=true`; the coordinator does not strip it
+  from the network request.
+- Replaced stale setup's pre-release `waitForResponse` synchronization with the fixture's explicit
+  `arrived` state. Response promises are still registered before activation, but are awaited only
+  after both barriers are explicitly released; `Response.finished()` and server `completed === 1`
+  still prove drain-to-EOF.
+- Added a stale-phase trace for every Playwright request/response URL. The assertions require two
+  held requests, two held responses, and `fresh-partial=true` on every held URL, so a future request
+  shape mismatch fails with the complete trace in the emitted evidence.
+- Kept the 30-second Playwright timeout unchanged. Overlay absence, zero request failures, zero
+  cancellations, final A state, and no late B mutation remain intact.
+
+### Repair gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Hosted failure re-baseline | PASS | Run `33591947512`, job `100127639255`; held request abort appears only when the timed-out page is closed |
+| Fresh request-shape inspection | PASS | Fresh 2.3.3 `partials.ts`: links/buttons converge on `fetchPartials()`, which sets `fresh-partial=true` |
+| Coordinator rewrite inspection | PASS | `withoutPartialFlag()` mutates only a copied actual/history URL; fetch input remains unchanged |
+| Focused check/lint/fmt wrappers | PASS | 1 selected file, 1 batch each, 0 diagnostics/findings |
+| `quality:gate` | PASS | exit 0; repository scan has no findings, doctrine gate reports only existing warnings |
+| Diff/file/lock hygiene | PASS | `git diff --check` clean; browser test remains 500 lines; `deno.lock` unchanged; no `packages/fresh/src` diff |
+| Hosted `fresh-browser` repair | PENDING | Supervisor-owned exact-head run; prohibited locally |

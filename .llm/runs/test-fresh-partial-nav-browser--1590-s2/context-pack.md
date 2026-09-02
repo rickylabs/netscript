@@ -2,23 +2,22 @@
 
 ## Current state
 
-- Baseline/HEAD before sign-off: `102ef8a10` on `test/fresh-partial-nav-browser-proof`.
-- Five planned code files are implemented; `packages/fresh/deno.json`, product source, workflows,
-  and `deno.lock` are untouched.
-- Static/scoped tests and doctrine gates are green. Hosted Chromium evidence is intentionally not
-  run on this worker.
-- The implementation lane has not committed, pushed, opened the PR, or self-certified the slice.
+- Repair baseline is `fd8e0f5be`; local `e6ff1c6e1` adds only the checked-in repair brief.
+- The hosted wait failure is re-baselined: a held request reaches the fixture, Fresh 2.3.3 adds
+  `fresh-partial=true` for both activation paths, and the coordinator forwards that URL unchanged.
+- The proof now synchronizes stale setup on explicit server barrier arrival, records all stale-phase
+  request/response URLs, and defers response/EOF checks until explicit barrier release.
+- `packages/fresh/src`, `packages/fresh/deno.json`, workflows, and `deno.lock` remain untouched.
+- Hosted Chromium evidence is intentionally not run on this worker and remains pending at the
+  repair commit.
 
 ## Supervisor next actions
 
-1. Review the five-file proof and the significant publish-filter drift in `drift.md`.
-2. Decide whether to authorize a `packages/fresh/deno.json` publish-exclusion adjustment or accept
-   the current publish surface explicitly; the implementation lane must not infer that decision.
-3. Perform Tier-A sign-off, commit, explicit-refspec push, and open the draft PR with the requested
-   metadata and `Refs #1590` (no closing keyword).
-4. Trigger/watch the hosted `fresh-browser` durable gate at the exact commit.
-5. Dispatch a fresh opposite-family IMPL-EVAL session. Add `Closes #1590` only after the hosted gate
-   is green and remaining acceptance is verified.
+1. Review the stale-phase barrier synchronization and URL-trace assertions.
+2. Trigger/watch the hosted `fresh-browser` durable gate at the exact repair commit.
+3. Keep the existing publish-filter adjudication in `drift.md` visible for merge readiness.
+4. Dispatch a fresh opposite-family IMPL-EVAL session after hosted green. Add `Closes #1590` only
+   after the hosted gate and remaining acceptance are verified.
 
 ## Required PR metadata
 

@@ -10,6 +10,8 @@
 | Baseline | `102ef8a10` (`origin/main` at launch) |
 | Implementation session | `01a05df4-43cc-7400-8572-1886edca3eb3` |
 | Implementation route | OpenAI GPT-5.6 Sol, high; requested/observed match |
+| Repair session | `01a060be-6b53-7962-88a2-f80a51a4010a`, baseline `e6ff1c6e1` |
+| Repair route | OpenAI GPT-5.6 Sol, high; requested/observed match |
 | IMPL-EVAL route | Fresh native opposite-family Fable 5 medium session, pending supervisor dispatch |
 | Hosted browser lane | `fresh-browser`, pending supervisor trigger at committed head |
 

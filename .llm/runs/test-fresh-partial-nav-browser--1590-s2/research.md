@@ -27,3 +27,17 @@
 The locked plan assumed browser fixtures were excluded from publication. The current publish filter
 includes `tests/fixtures/**/*.ts(x)` and `tests/form-navigation_browser.ts`; the dry-run lists all
 five proof files. Resolving that requires a plan/file-contract decision by the supervisor.
+
+## Hosted wait repair re-baseline — 2026-09-02
+
+- Run `33591947512`, job `100127639255` reaches the held fixture response: when Playwright times
+  out and closes the page, Vite reports the request-side signal aborting inside
+  `@remix-run/node-fetch-server`. The stale request is therefore issued and reaches the server.
+- Fresh 2.3.3's cached client `partials.ts` routes both an `f-partial` link and a non-submit
+  `f-partial` button through `fetchPartials()`, which clones the partial URL, sets
+  `fresh-partial=true`, and then calls `fetch()`.
+- `coordinator.ts` reads that flag to classify the transport request. Its removal at line 467 is
+  confined to a copied history/intent URL; the original fetch input is forwarded unchanged.
+- The proof must not use pre-release `response` observation as its stale-request arrival barrier.
+  Fixture state already exposes the authoritative `arrived` transition; response status and EOF
+  remain assertions after explicit release.

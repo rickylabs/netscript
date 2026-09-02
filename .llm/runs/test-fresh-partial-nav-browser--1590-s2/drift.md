@@ -26,3 +26,15 @@ task already works and needs no adjustment. The implementation lane therefore di
 Supervisor decision is required: authorize a reviewed publish-filter change/rescope, or explicitly
 accept the proof files in the package publish set. This drift blocks a clean claim that the planned
 JSR/published-file gate passed as written.
+
+## 2026-09-02 — stale setup synchronization used the wrong observable (minor)
+
+The original proof awaited Playwright's `response` event before advancing from each held request.
+Hosted job `100127639255` timed out there, then Vite reported the held request's signal aborting as
+the page closed. Static Fresh 2.3.3 inspection also confirms that both fixture activation paths issue
+the request with `fresh-partial=true`, and the coordinator does not remove it from the fetch input.
+
+The repair now treats server-side barrier `arrived` state as the authoritative request-start
+observable, records every stale-phase request/response URL, and waits for response status/EOF only
+after explicit release. No timeout was lengthened, no product source changed, and the planned
+last-intent, drain, cancellation, and overlay assertions remain in force.
