@@ -58,6 +58,8 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | 2026-09-02T23:10Z | 0 | Re-baseline | Clean branch at `93c5fa5a5`; pinned base and lock hash verified; no existing PR. |
 | 2026-09-02T23:10Z | 0 | PLAN-EVAL | `N/A`: issue #1249 and the implement brief fully specify contract, bounded scope, independent admission probes, mapping decisions, and gates; no unresolved architecture or sequencing decision remains. |
 | 2026-09-02T23:12Z | 0 | Pre-push gates | Scoped check/test/lint/fmt and `quality:gate` all exited 0; 81 tests passed. Existing doctrine warnings were advisory and outside this slice. |
+| 2026-09-02T23:16Z | S1 RED | Probe | Package-configured check exited 1 with exactly three TS2322 diagnostics; all three intrinsic controls fail only on `role`. |
+| 2026-09-02T23:16Z | S1 RED | Pre-push gates | Expected RED: check=1, test=1 (type-check); lint=0, fmt=0, quality=0. Lock unchanged. |
 
 ## Decisions
 
@@ -103,6 +105,36 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Preact intrinsic elements | NOT_RUN | S1 RED/GREEN | Pending. |
+
+### S1 RED raw probe
+
+Command:
+
+`deno check --unstable-kv --config packages/fresh/deno.json packages/fresh/src/application/form/control-props-element-assignability_test.tsx`
+
+Exit code: `1`
+
+```text
+TS2322 [ERROR]: Type '{ ... }' is not assignable to type 'InputHTMLAttributes<HTMLInputElement>'.
+  Types of property 'role' are incompatible.
+    Type 'string | undefined' is not assignable to type 'Signalish<AriaRole | undefined>'.
+      <input {...state.fields.email.controlProps({ type: 'email' })} />
+
+TS2322 [ERROR]: Type '{ ... }' is not assignable to type 'SelectHTMLAttributes<HTMLSelectElement>'.
+  Types of property 'role' are incompatible.
+    Type 'string | undefined' is not assignable to type 'Signalish<AriaRole | undefined>'.
+      <select {...state.fields.country.controlProps()} />
+
+TS2322 [ERROR]: Type '{ ... }' is not assignable to type 'TextareaHTMLAttributes<HTMLTextAreaElement>'.
+  Types of property 'role' are incompatible.
+    Type 'string | undefined' is not assignable to type 'Signalish<AriaRole | undefined>'.
+      <textarea {...state.fields.biography.controlProps()} />
+
+Found 3 errors.
+error: Type checking failed.
+```
+
+Structured wrapper confirmation selected 214 files in two batches, reported three occurrences / one code / one path, and exited 1. The test wrapper exited 1 before execution because the same TS2322 diagnostics prevented type checking. Lint, format, and quality gates each exited 0.
 
 ## Handoff Notes
 
