@@ -296,8 +296,26 @@ function createOtlpJsonSpanExporter(endpoint: string): SpanExporter {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
-      }).then((response) => resultCallback({ code: response.ok ? 0 : 1 }))
-        .catch(() => resultCallback({ code: 1 }));
+      }).then((response) => {
+        // A rejected export used to be swallowed here: the callback reported failure and nothing
+        // read it, so the consumer gate passed while its spans never reached the dashboard. TC-14
+        // then failed far downstream with "no real streams consumer span exists" — the symptom at
+        // the read end of a problem that happened at the write end. Surface it where it happens.
+        if (!response.ok) {
+          console.error(
+            `flow-b-stream-consumer OTLP export rejected: HTTP ${response.status} from ` +
+              `${normalizedEndpoint}/v1/traces - spans will be absent from every later query`,
+          );
+        }
+        resultCallback({ code: response.ok ? 0 : 1 });
+      }).catch((error: unknown) => {
+        console.error(
+          `flow-b-stream-consumer OTLP export failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+        resultCallback({ code: 1 });
+      });
     },
     shutdown: () => Promise.resolve(),
   };
