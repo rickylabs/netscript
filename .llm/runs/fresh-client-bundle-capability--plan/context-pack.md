@@ -13,8 +13,8 @@
 ## Current State
 
 The plan contract was committed unchanged after the supervisor waived PLAN-EVAL for this test-only
-leaf. Implementation and all local non-browser gates are green. PR #1940 is non-draft; provisioned
-CI must supply the browser receipt before #1557 can be claimed complete.
+leaf. Implementation, all local gates, and the provisioned CI browser receipt are green. PR #1940
+is non-draft and awaits independent IMPL-EVAL/close-gate reconciliation.
 
 ## Completed
 
@@ -28,16 +28,16 @@ CI must supply the browser receipt before #1557 can be claimed complete.
 - Added direct policy-pair tests and a real-browser cache-miss navigation regression with request,
   exact-one named-boundary swap, and double-swap negative-control evidence.
 - Passed Fresh check/lint/fmt, 278 package tests, and `quality:gate`.
+- Passed CI `fresh-browser` with 3/3 tests, including request + exact-one named-boundary evidence.
 
 ## In Progress
 
-- Provisioned CI browser receipt and independent IMPL-EVAL.
+- Independent IMPL-EVAL and close-gate reconciliation.
 
 ## Next Steps
 
-1. Commit implementation and updated run receipts; explicit-refspec push.
-2. Confirm the provisioned Fresh browser CI receipt.
-3. Obtain a separate-session IMPL-EVAL verdict and reconcile PR #1940.
+1. Commit/push the final CI receipt without changing implementation.
+2. Obtain a separate-session IMPL-EVAL verdict and reconcile PR #1940.
 
 ## Key Decisions
 
@@ -61,7 +61,7 @@ CI must supply the browser receipt before #1557 can be claimed complete.
 | --- | --- | --- |
 | Static | PASS | 213 files check/lint/fmt; check used `--unstable-kv` |
 | Fitness | PASS locally | 278 tests plus `quality:gate`; PLAN-EVAL supervisor-waived |
-| Runtime | blocked locally/pending CI | `playwright-cli` absent locally; existing CI provisions it |
+| Runtime | PASS in CI | `fresh-browser` receipt: 3 passed, 0 failed, 40.115s |
 | Consumer | N/A | No public-surface change |
 
 ## Open Questions
