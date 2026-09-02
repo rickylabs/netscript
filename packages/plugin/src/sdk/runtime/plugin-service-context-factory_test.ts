@@ -2,11 +2,15 @@ import { assert, assertEquals, assertStrictEquals } from '@std/assert';
 import { baseContract } from '@netscript/contracts';
 import { createPluginServiceContext } from './plugin-service-context-factory.ts';
 
-Deno.test('createPluginServiceContext resolves each injected adapter once on first use', async () => {
+Deno.test('createPluginServiceContext resolves assembly values once and adapters lazily', async () => {
   let databaseResolutions = 0;
   let kvResolutions = 0;
+  let appsettingsResolutions = 0;
+  let environmentResolutions = 0;
   const databaseClient = Object.freeze({ provider: 'test' });
   const kvAdapter = createTestKv();
+  const appsettings = Object.freeze({ feature: Object.freeze({ enabled: true }) });
+  const environment = Object.freeze({ PORT: '4321', SERVICE_MODE: 'test' });
 
   const contextPromise = createPluginServiceContext('test-plugin', {
     getDatabaseClient: () => {
@@ -17,14 +21,28 @@ Deno.test('createPluginServiceContext resolves each injected adapter once on fir
       kvResolutions++;
       return Promise.resolve(kvAdapter);
     },
+    getAppsettings: () => {
+      appsettingsResolutions++;
+      return Promise.resolve(appsettings);
+    },
+    getEnvironment: () => {
+      environmentResolutions++;
+      return Promise.resolve(environment);
+    },
   });
 
   assertEquals(databaseResolutions, 0);
   assertEquals(kvResolutions, 0);
+  assertEquals(appsettingsResolutions, 1);
+  assertEquals(environmentResolutions, 1);
 
   const context = await contextPromise;
   assertEquals(databaseResolutions, 0);
   assertEquals(kvResolutions, 0);
+  assertEquals(appsettingsResolutions, 1);
+  assertEquals(environmentResolutions, 1);
+  assertStrictEquals(context.appsettings, appsettings);
+  assertStrictEquals(context.env, environment);
 
   const [firstClient, secondClient] = await Promise.all([
     context.db.getClient(),
@@ -51,7 +69,17 @@ Deno.test('createPluginServiceContext resolves each injected adapter once on fir
   for (const method of ['info', 'warn', 'error', 'debug']) {
     assertEquals(typeof Reflect.get(context.logger, method), 'function');
   }
-  assertEquals(context.env, Deno.env.toObject());
+});
+
+Deno.test('createPluginServiceContext captures Deno.env by default', async () => {
+  const expectedEnvironment = Deno.env.toObject();
+  const context = await createPluginServiceContext('default-environment', {
+    getDatabaseClient: () => Promise.resolve({}),
+    getKv: () => Promise.resolve(createTestKv()),
+  });
+
+  assertEquals(context.env, expectedEnvironment);
+  assertEquals(context.appsettings, undefined);
 });
 
 interface TestKv {
