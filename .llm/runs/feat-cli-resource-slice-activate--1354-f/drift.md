@@ -53,3 +53,19 @@
   authorized by the locked plan's Slice E item 6, this run's explicit scope, and the owner's
   instruction to wire Slice E's dependencies at activation time.
 - **Evidence:** `evaluate.md`, `plan.md § Scope`, and `git diff --name-only be3e3dded..HEAD`.
+
+## 2026-09-03 — full-package lint/format baseline
+
+- **What:** The root Deno config excludes `packages/cli`; a full CLI diagnostic with the isolated
+  CLI quality config reports existing lint and format drift.
+- **Source:** Structured wrappers over all 977 CLI TypeScript files.
+- **Expected:** Slice-authored TypeScript must pass structured lint and format without expanding the
+  locked product footprint to rewrite unrelated baseline files.
+- **Actual:** The 12 authored files pass both wrappers with exit 0 and zero findings. The wider
+  diagnostic exits 1 with 59 lint occurrences across 34 paths and 214 format findings across 214
+  paths; neither path set intersects `git diff --name-only be3e3dded..HEAD`.
+- **Severity:** pre-existing baseline; non-blocking for the slice
+- **Action:** Preserve the touched-file verdict and report the wider diagnostic exactly; do not
+  mutate 248 unrelated paths under a locked 33-file ceiling.
+- **Evidence:** `.llm/tmp/1354-f-full-lint.json`, `.llm/tmp/1354-f-full-fmt.json`, and the recorded
+  changed-path intersection command (temporary reports are ignored and not committed).

@@ -100,6 +100,8 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | structured CLI check | 0 | 977 files, 9 batches, 0 diagnostics |
 | touched CLI lint | 0 | 12 files, 0 findings |
 | touched CLI format | 0 | 12 files, 0 findings |
+| full CLI lint diagnostic | 1 | 977 files; 59 baseline occurrences across 34 paths; 0 paths intersect `be3e3dded..HEAD` |
+| full CLI format diagnostic | 1 | 977 files; 214 baseline findings across 214 paths; 0 paths intersect `be3e3dded..HEAD` |
 | `check:publish-assets` | 0 | freshness pass |
 | `check:emitted-samples` | 0 | 48 samples / 38 paths |
 | `gen:mcp-export-corpus` | 0 | clean committed tree; hash `cc64442f`; no diff |
@@ -118,4 +120,5 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 
 - Product implementation is pushed at `8c27ffe16`; gate evidence is pushed at `de042d23e`.
 - The formal opposite-family evaluator returned PASS. Its additional source-only rerun passed 1316/1316; its broader `packages/cli` discovery encountered two environment-only noexec browser-fixture failures in untouched E2E tests, which it explicitly classified as non-regressions.
+- The root Deno config excludes `packages/cli`; using the isolated CLI quality config across all 977 TypeScript files exposes pre-existing lint/format baselines only. The valid slice verdict is the 12 authored-file run (both exit 0), with raw changed-path intersection proving neither full-package baseline touches this slice.
 - Slice G owns the evaluator's LOW-4 guidance wording note in `routes/examples/index.tsx.template`.
