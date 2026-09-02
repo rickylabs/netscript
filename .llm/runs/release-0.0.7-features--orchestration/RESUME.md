@@ -18,7 +18,7 @@
 | #1353, #1467 | **CLOSED** via #1941 (merged; mirror 14/14) |
 | #1590 | PR **#1895** `d0bf0aebf` — `status:ready-merge`; exact-head `fresh-browser` green, IMPL-EVAL PASS, `close-gate` pass; runtime tiers are Aspire-lane flake (see below) |
 | #1355 / #1360 | PR **#1664** `d155db116` — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
-| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `a5fe753df` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C = PR #1946** `b86524bcb`, native eval pending on idle. Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
+| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `a5fe753df` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C = PR #1946** `f2696ea88` — **native PASS (after one FAIL_FIX on a fail-open State reconciler, fixed), `status:ready-merge`**. Slice D next in plan order. Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
 | #1452 | PR **#1944** `781fe9bd9` — **native PASS, `status:ready-merge`, `Closes #1452`** (rows are plain bullets; no mirror needed, close-gate already pass) |
 | #1348 | epic — receives no leaf PR by design |
 

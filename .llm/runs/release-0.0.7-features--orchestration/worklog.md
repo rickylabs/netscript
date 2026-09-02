@@ -10869,3 +10869,17 @@ property whose type is an object literal*, *conflicts with a quoted same-named p
 the property name inside a nested object member*. Follow-up native IMPL-EVAL dispatched, bounded to
 HIGH-1's closure plus no-regression of the properties the first pass already verified; told to
 construct the counter-examples itself rather than trust the new tests.
+
+### ~23:00Z — Slice C PASS on follow-up; #1946 ready-merge
+
+Follow-up native eval at `37b3b9b65`: **PASS**. HIGH-1 verified by construction — the evaluator
+re-ran both counter-examples plus ten variants against the rewritten `scanStateInterface` /
+`parseNamedProperty` (top-level member split at depth 1, strings/comments skipped, anchored
+bare/quoted key), including a nested same-name inside a function return type that must still
+`insert` and a word-boundary case (`ordersRequestExtra`) proving it is not a substring match. LOW-1
+applied (ICU `localeCompare` → explicit `comparePath`, pinned by a new ordering test). Focused tests
+36/36; no regression on the untouched reconcilers. Receipt `f2696ea88`, `status:ready-merge`,
+PASS summary posted; packet on CI green at the receipt head.
+
+**Four Features PRs ready for the coordinator**: #1944 (closes #1452), #1943, #1946, #1895.
+Measuring Slice D's independence next — C's PASS unblocks it in plan order.
