@@ -7884,3 +7884,16 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   ceiling `packages/fresh/src/application/form/**` + tests). Launched gpt-5.6-sol·medium.
 - #1481: worker at `0c1778026` local, unpushed, nudged. #1885: ready-merge, close-gate rerun +
   label-fired e2e in flight at `adff30990`.
+
+## 2026-09-02T23:30Z — main `ba6f1f49a` (#1957) pulled into #1885/#1959; Canary 7 noted
+
+- Coordinator: #1957 merged (typed-db Phase-B consumes the #1909 follow stream, 120s shared
+  ceiling), main `ba6f1f49a`; Canary 7 run 33693663110 dispatched from it (release refs untouched).
+- **#1885** `adff30990` → `b17aac20e` (mechanical merge, `runtime-gates_test.ts` auto-merged; PR
+  delta line-identical; 22/23 PR blobs identical). PASS_IMPL carries; all gates re-earn at
+  `b17aac20e`. `status:ready-merge` retained. Carry note posted on PR.
+- **#1959** `727ce39bb` → `786b9a06c` (clean; all PR-owned blobs identical → the in-flight
+  IMPL-EVAL at `727ce39bb` carries if PASS). Hosted Postgres evidence now accrues on a #1957-bearing
+  head, which is the point: the diagnostics land alongside the fixed observer.
+- #1249 launched: thread `01a06460-7dea-7fa2-8dd1-655efa8df646`, gpt-5.6-sol·medium.
+- Watcher `/tmp/waitpk2.sh` on both heads; packet + coordinator notify on exact green.
