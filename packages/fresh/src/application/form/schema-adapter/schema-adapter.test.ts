@@ -262,6 +262,8 @@ Deno.test('createZodAdapter getConstraints returns a conservative supported meta
 
   assertDeepEquals(age, {
     required: true,
+    min: 18,
+    max: 120,
   });
 
   assertDeepEquals(website, {
@@ -353,6 +355,20 @@ Deno.test('createZodAdapter getConstraints derives the complete Zod 4 control ma
     'tags[0]': {
       required: true,
       minLength: 2,
+    },
+  });
+});
+
+Deno.test('createZodAdapter omits exclusive number bounds from native constraints', () => {
+  const adapter = createZodAdapter(
+    z.object({
+      quantity: z.number().gt(1).lt(99),
+    }),
+  );
+
+  assertDeepEquals(adapter.getConstraints(), {
+    quantity: {
+      required: true,
     },
   });
 });

@@ -113,11 +113,17 @@ function applyStringChecks(schema: z.ZodString, constraints: MutableFieldConstra
           constraints.pattern = check.regex.source;
         }
         break;
-      case 'string_format':
-        if (typeof check.format === 'string' && check.format === 'url') {
+      case 'string_format': {
+        if (check.format === 'url') {
           constraints.pattern = URL_PATTERN.source;
+        } else if (readCheckString(check, 'format') === 'regex') {
+          const pattern = readCheckRegExp(check, 'pattern');
+          if (pattern !== undefined) {
+            constraints.pattern = pattern.source;
+          }
         }
         break;
+      }
       default:
         break;
     }
@@ -167,6 +173,13 @@ function applyNumberChecks(schema: z.ZodNumber, constraints: MutableFieldConstra
         }
         break;
       }
+      case 'greater_than': {
+        const minimum = readCheckNumber(check, 'value');
+        if (readCheckBoolean(check, 'inclusive') === true && minimum !== undefined) {
+          constraints.min = minimum;
+        }
+        break;
+      }
       case 'max': {
         const maximum = readCheckNumber(check, 'maximum');
         if (maximum !== undefined) {
@@ -174,7 +187,15 @@ function applyNumberChecks(schema: z.ZodNumber, constraints: MutableFieldConstra
         }
         break;
       }
-      case 'multipleOf': {
+      case 'less_than': {
+        const maximum = readCheckNumber(check, 'value');
+        if (readCheckBoolean(check, 'inclusive') === true && maximum !== undefined) {
+          constraints.max = maximum;
+        }
+        break;
+      }
+      case 'multipleOf':
+      case 'multiple_of': {
         const multipleOf = readCheckNumber(check, 'value');
         if (multipleOf !== undefined) {
           constraints.step = multipleOf;
@@ -193,10 +214,10 @@ function readChecks(schema: z.ZodTypeAny): Array<Record<string, unknown>> {
 }
 
 function readCheckKind(check: Record<string, unknown>): string | undefined {
-  const value = check._zod as { def?: { check?: unknown; format?: unknown } } | undefined;
+  const value = readCheckDefinition(check)?.check;
 
-  if (typeof value?.def?.check === 'string') {
-    return value.def.check;
+  if (typeof value === 'string') {
+    return value;
   }
 
   if (typeof check.kind === 'string') {
@@ -210,6 +231,57 @@ function readCheckKind(check: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
+function readCheckDefinition(check: Record<string, unknown>): Record<string, unknown> | undefined {
+  const value = check._zod;
+  if (typeof value !== 'object' || value === null) {
+    return undefined;
+  }
+
+  const definition = (value as { def?: unknown }).def;
+  return typeof definition === 'object' && definition !== null
+    ? definition as Record<string, unknown>
+    : undefined;
+}
+
+function readCheckBoolean(
+  check: Record<string, unknown>,
+  key: 'inclusive',
+): boolean | undefined {
+  const direct = check[key];
+  if (typeof direct === 'boolean') {
+    return direct;
+  }
+
+  const nested = readCheckDefinition(check)?.[key];
+  return typeof nested === 'boolean' ? nested : undefined;
+}
+
+function readCheckRegExp(
+  check: Record<string, unknown>,
+  key: 'pattern',
+): RegExp | undefined {
+  const direct = check[key];
+  if (direct instanceof RegExp) {
+    return direct;
+  }
+
+  const nested = readCheckDefinition(check)?.[key];
+  return nested instanceof RegExp ? nested : undefined;
+}
+
+function readCheckString(
+  check: Record<string, unknown>,
+  key: 'format',
+): string | undefined {
+  const direct = check[key];
+  if (typeof direct === 'string') {
+    return direct;
+  }
+
+  const nested = readCheckDefinition(check)?.[key];
+  return typeof nested === 'string' ? nested : undefined;
+}
+
 function readCheckNumber(
   check: Record<string, unknown>,
   key: 'length' | 'maximum' | 'minimum' | 'value',
@@ -219,7 +291,7 @@ function readCheckNumber(
     return direct;
   }
 
-  const nested = (check._zod as { def?: Record<string, unknown> } | undefined)?.def?.[key];
+  const nested = readCheckDefinition(check)?.[key];
   return typeof nested === 'number' ? nested : undefined;
 }
 

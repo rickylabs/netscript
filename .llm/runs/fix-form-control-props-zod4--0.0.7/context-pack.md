@@ -12,7 +12,7 @@
 
 ## Current State
 
-S1 is GREEN. S2 RED is independently reproduced against locked npm Zod 4.4.3: the exact full-map test lacks `slug.pattern` and `quantity.min/max/step`, while all other expected fields match. S2 is therefore admitted for 0.0.7. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
+S1 and S2 are GREEN after independent RED proofs. The intrinsic consumer compiles; locked npm Zod 4.4.3 now produces the exact five-field map, and exclusive `.gt()`/`.lt()` bounds remain omitted. All S2 GREEN pre-push gates exit 0. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
 
 ## Completed
 
@@ -23,15 +23,16 @@ S1 is GREEN. S2 RED is independently reproduced against locked npm Zod 4.4.3: th
 - Added and ran the independent S1 RED probe.
 - Implemented and validated S1 GREEN; 82 scoped tests pass.
 - Added and ran S2 RED; focused result is 16 passed/1 failed and full scoped result is 82 passed/1 failed.
+- Implemented S2 GREEN; focused adapter tests are 18/18 and full scoped tests are 84/84.
 
 ## In Progress
 
-- S2 GREEN Zod 4 check decoding.
+- S3 public docs/JSR/final gate evidence.
 
 ## Next Steps
 
-1. Land S2 GREEN for regex plus inclusive numeric constraints.
-2. Run S3/full gates and hand off to the separate evaluator without self-certification.
+1. Run S3 public surface, JSR, full local gates, and lock evidence.
+2. Update the draft PR to `Closes #1249` with truthful validation and hand off to the separate evaluator without self-certification.
 
 ## Key Decisions
 
@@ -49,13 +50,14 @@ S1 is GREEN. S2 RED is independently reproduced against locked npm Zod 4.4.3: th
 | `packages/fresh/src/application/form/control-props-element-assignability_test.tsx` | new | S1 TSX consumer RED probe. |
 | `packages/fresh/src/application/form/_internal/prop-types.ts` | changed | Intrinsic-derived `role` property type. |
 | `packages/fresh/src/application/form/schema-adapter/schema-adapter.test.ts` | changed | Exact five-field S2 RED map. |
+| `packages/fresh/src/application/form/schema-adapter/zod-constraints.ts` | changed | Zod 4 regex and inclusive numeric check decoding. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Expected S2 RED | Check/lint/fmt exit 0; tests exit 1 with 82 passed/1 expected failure. |
-| Fitness | PASS at S2 RED | `quality:gate` exit 0; final JSR/doc gates remain planned. |
+| Static | PASS at S2 GREEN | Check/test/lint/fmt exit 0; 84 tests. |
+| Fitness | PASS at S2 GREEN | `quality:gate` exit 0; final JSR/doc gates remain planned. |
 | Runtime | N/A | No runtime/browser workflow change. |
 | Consumer | PASS | Input/select/textarea spreads compile without casts after RED proof. |
 

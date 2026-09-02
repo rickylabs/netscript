@@ -64,6 +64,9 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | 2026-09-02T23:18Z | S1 GREEN | Pre-push gates | check=0, test=0 (82 passed), lint=0, fmt=0, quality=0. Lock unchanged. |
 | 2026-09-02T23:20Z | S2 RED | Probe | Exact locked Zod 4 full-map test exited 1: `slug.pattern` and `quantity.min/max/step` are absent; 16 sibling tests passed. S2 admitted for 0.0.7. |
 | 2026-09-02T23:20Z | S2 RED | Pre-push gates | Expected RED: check=0, test=1 (82 passed/1 failed), lint=0, fmt=0, quality=0. Lock unchanged. |
+| 2026-09-02T23:23Z | S2 GREEN | Implementation | Added Zod 4 regex/inclusive numeric/multiple check decoding; exact map and exclusive-bound regression both pass. |
+| 2026-09-02T23:23Z | S2 GREEN | Reconcile | Preserved the existing direct URL-format behavior; nested format lookup is used only for admitted regex checks. Issue #1249 is now fully implemented pending final gates/eval. |
+| 2026-09-02T23:23Z | S2 GREEN | Pre-push gates | focused=0 (18 passed), check=0, test=0 (84 passed), lint=0, fmt=0, quality=0. Lock unchanged. |
 
 ## Decisions
 
@@ -109,6 +112,7 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Preact intrinsic elements | PASS | Focused package-configured check exit 0; scoped check exit 0 | Input/select/textarea spreads compile without casts. |
+| Zod 4 constraint map | PASS | Focused adapter test 18 passed; full scoped test 84 passed | Full five-field map and exclusive omission are asserted. |
 
 ### S1 RED raw probe
 
