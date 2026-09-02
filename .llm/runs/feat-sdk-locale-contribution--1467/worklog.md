@@ -66,12 +66,18 @@ acceptance, boundaries, touch ceiling, and gate list.
   0 missing JSDoc, 0 other. New diagnostics: 0. The `./client` entrypoint exits 0.
 - `quality:gate`: exit 0. Separate `arch:check`: exit 0.
 - Carrier generation, required order: `gen:agent-docs-prose` 0, `gen:assets-barrel` 0,
-  `gen:publish-assets` 0, `gen:mcp-export-corpus` 0. Post-commit check forms remain pending.
+  `gen:publish-assets` 0, `gen:mcp-export-corpus` 0. After implementation commit
+  `28e6ca75d80b6844dfe028a666650c5dff22d038`, all check forms exited 0 in required order:
+  `check:agent-docs-prose`, `check:assets-barrel`, `check:publish-assets`, and
+  `check:mcp-export-corpus`.
 - MCP carrier package wrappers: check 0 (117 files), lint 0 (116/116), fmt 0 (116/116).
 - CLI carrier package: check 0 (915 files). Lint/fmt wrappers exit 2 with zero findings because the
   workspace deliberately excludes `packages/cli/`; direct changed-file commands return no target.
   See `drift.md`; `check:assets-barrel` is the carrier authority.
 - `git diff --check`: exit 0.
+- Clean-tree `deno publish --dry-run`: SDK 0 (locale source listed), MCP 0 (export/publish carriers
+  listed), CLI 0 (agent-docs carrier listed; seven existing dynamic-analysis warnings). Every run
+  ended with `Success Dry run complete`.
 - Final pre-commit `deno.lock` SHA-256 is unchanged:
   `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
 
