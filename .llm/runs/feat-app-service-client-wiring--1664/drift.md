@@ -29,3 +29,24 @@
 - A clean detached checkout of `origin/main` reproduces the same refusal (723 of 915 files dropped),
   proving it is not introduced by this branch. The result is reported as red rather than weakened
   or relabeled as a pass.
+
+## 2026-09-02 — Cliffy help wrapping can split inside words
+
+- Severity: test-portability trap; no product-surface or architecture change.
+- Expected: collapsing whitespace in rendered help would make complete-description assertions
+  independent of terminal width.
+- Observed: Cliffy 1.2.1 obtains width from `Deno.consoleSize()`, not `COLUMNS`. At an explicit
+  width of 40 its table shrinker splits tokens (`Selec t`, `gener ated`, `servi ce`, `clien t`), so
+  ordinary whitespace normalization cannot reconstruct the original words.
+- Resolution: help contract tests render at a deterministic width of 80 with colors disabled, then
+  normalize whitespace on both actual and expected complete strings. Width 80 still exercises
+  multi-line wrapping without the lossy sub-word behavior.
+- General lesson: tests calling Cliffy's `getHelp()` without explicit render options inherit the
+  runner's console width. Complete-line assertions should use a deliberate test width and one
+  two-sided whitespace-normalization seam.
+
+## 2026-09-02 — documented RTK binary unavailable
+
+- Severity: informational tooling drift; no product impact.
+- The selected `rtk` skill documents a machine-level binary, but `rtk` was not present on PATH in
+  this WSL environment. Ground-truth Git reads used raw Git as permitted by `netscript-tools`.

@@ -341,3 +341,47 @@ Neither intervening Fresh change plausibly repairs `behavior.service-client-refe
 Conclusion: these paths are disjoint. They do not provide a reason to spend a hosted runtime rerun
 on this convergence alone; the previously measured Fresh/Preact hydration/render-propagation
 question remains open for supervisor-owned runtime evidence.
+
+## Width-stable CLI help assertion follow-up (2026-09-02)
+
+### Red-first measurement
+
+- `COLUMNS=40 deno test ... --filter 'ui:add help explains'` remained green (1 passed / 0 failed),
+  because Cliffy 1.2.1 does not read `COLUMNS` for this path. Its `getColumns()` calls
+  `Deno.consoleSize().columns` and otherwise falls back to 150 columns.
+- Calling the same command's public `getHelp({ width: 40, colors: false })` reproduced the CI class
+  deterministically. The existing normalization yielded:
+  `--client <service> - Selec t the gener ated servi ce query clien t for a data- bound page or islan d`.
+  The full-description `assertStringIncludes` exited 1.
+- Root cause: terminal-width-dependent Cliffy table wrapping. At very narrow widths it splits
+  inside words, so collapsing whitespace on only the rendered side cannot restore the advertised
+  sentence.
+
+### Bounded correction
+
+- The help-contract tests now render with `getHelp({ colors: false, width: 80 })`. Width 80 is
+  intentionally narrow enough to exercise ordinary multi-line wrapping while avoiding Cliffy's
+  lossy sub-word column split.
+- `assertHelpIncludes()` collapses all whitespace runs to one space and trims **both** the rendered
+  help and complete expected text before `assertStringIncludes`.
+- All sibling rendered-help assertions in the file use the same helper; the option assertion still
+  requires the complete `--client <service>` line and full description.
+
+### Gate evidence
+
+| Gate | Exit | Counts / evidence |
+| --- | ---: | --- |
+| Named post-fix help test | 0 | 1 passed / 0 failed / 6 filtered out |
+| Exact `ui/add` structured test wrapper | 0 | 7 passed / 0 failed / 0 ignored |
+| Full package-owned CLI suite (`packages/cli/src` + `packages/cli/tests`) | 0 | 1,246 passed / 0 failed / 0 ignored |
+| Structured CLI check | 0 | 930 files / 8 batches / 0 failed / 0 diagnostics |
+| Owned-file lint with a scratch config matching repository style | 0 | 1 selected / 1 processed / 0 findings |
+| Owned-file fmt with a scratch config matching repository style | 0 | 1 selected / 1 processed / 0 findings |
+| `quality:gate` | 0 | Quality scan 0 findings / 7 existing allowances; doctrine 0 failures |
+| Lock integrity | 0 | No diff from pre-slice head; SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d` |
+
+The exact root configuration still refuses CLI lint/fmt wrapper probes as all-excluded, matching the
+already measured main-side coverage issue. Those refusals are not relabeled as passes; a temporary
+non-committed config containing the repository's 100-column/single-quote style was used only to
+prove the owned file itself, and this test-only slice does not alter root configuration. No Aspire,
+Docker, browser, `e2e:cli`, or `scaffold.runtime` command was run.

@@ -152,3 +152,17 @@ repair.
 ## Commits
 
 - See the PR commit list and the per-slice evidence comment after push.
+
+## 2026-09-02 width-stable help-test follow-up
+
+The sole branch-owned converged-head failure was confirmed as Cliffy help wrapping. `COLUMNS=40`
+does not affect Cliffy because it reads `Deno.consoleSize()`, but an explicit 40-column render
+reproduced exit 1 and showed sub-word splits in the complete `--client` description. The test now
+renders at a deterministic wrapped width of 80, disables colors, and normalizes whitespace on both
+the actual and complete expected strings through one helper used by every sibling help assertion.
+
+Required evidence is green: exact `ui/add` wrapper 7/0/0, full package-owned CLI suite 1,246/0/0,
+structured CLI check 930 files / 8 batches / 0 failures, and `quality:gate` exit 0. `deno.lock`
+remains unchanged with SHA-256
+`e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`. No runtime, browser,
+Aspire, Docker, E2E, or scaffold-runtime lane was run.

@@ -9,6 +9,7 @@ import { createUiAddCommand } from './add-ui-command.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const ROUTER_PATH = `${APP_ROOT}/router.ts`;
+const HELP_TEST_WIDTH = 80;
 const ROUTER_SOURCE = `import { createRouteReference } from '@netscript/fresh/route';
 
 export const appRoutes = {
@@ -21,21 +22,21 @@ Deno.test('ui:add help explains the page island query-loader triad', () => {
     installDependencies: { fs: new DenoFileSystem() },
     resolveUiAppRoot: () => Promise.resolve('/workspace'),
   });
-  const help = command.getHelp().replace(/\s+/g, ' ');
+  const help = command.getHelp({ colors: false, width: HELP_TEST_WIDTH });
 
-  assertStringIncludes(
+  assertHelpIncludes(
     help,
     'Creates one data-screen unit: typed page route + colocated hydrating island + query loader.',
   );
-  assertStringIncludes(
+  assertHelpIncludes(
     help,
     'Use it when a route will load data and hydrate an interactive region.',
   );
-  assertStringIncludes(
+  assertHelpIncludes(
     help,
     'Use a registry item when the route already exists and you only need an app-owned component',
   );
-  assertStringIncludes(
+  assertHelpIncludes(
     help,
     '--client <service> - Select the generated service query client for a data-bound page or island',
   );
@@ -48,10 +49,10 @@ Deno.test('ui:add real help advertises exactly the independently planned data-sc
     { projectRoot: APP_ROOT, path: 'incidents', island: true, dryRun: true },
     fs,
   );
-  const help = testCommand(fs).getHelp().replace(/\s+/g, ' ');
+  const help = testCommand(fs).getHelp({ colors: false, width: HELP_TEST_WIDTH });
 
   assertHelpMatchesPlan(help, planned.files);
-  assertStringIncludes(help, 'routes/**/(_islands)/');
+  assertHelpIncludes(help, 'routes/**/(_islands)/');
 });
 
 Deno.test('ui:add help-role seam rejects the stale three-part advertisement', async () => {
@@ -196,12 +197,20 @@ export const ordersQueries = createQueryFactories({
 }
 
 function assertHelpMatchesPlan(help: string, files: readonly UiGeneratedFile[]): void {
-  const advertised = /Data-screen roles: ([^.]+)\./.exec(help)?.[1]
+  const advertised = /Data-screen roles: ([^.]+)\./.exec(normalizeHelpText(help))?.[1]
     .split(',')
     .map((role) => role.trim())
     .sort();
   assert(advertised, 'Real command help must expose the data-screen role list.');
   assertEquals(advertised, [...new Set(files.map((file) => file.role))].sort());
+}
+
+function assertHelpIncludes(help: string, expected: string): void {
+  assertStringIncludes(normalizeHelpText(help), normalizeHelpText(expected));
+}
+
+function normalizeHelpText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
 }
 
 function assertReportedRoles(output: readonly string[], verb: 'Planned' | 'Generated'): void {
