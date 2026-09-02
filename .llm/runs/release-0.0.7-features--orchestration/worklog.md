@@ -9698,3 +9698,58 @@ which is how the pre-existing cycle-3 verdict came to light.
 
 **Standing rule from this:** after any `--phase` dispatch, confirm the run reached the `agent` job.
 `POSTED` is not evidence of dispatch.
+
+### Continuation — ~11:30–11:50Z
+
+**#1918 (#1897) → merge-ready.** IMPL-EVAL **PASS** at `5ae37a143` (run `33624600249`); CI 7/7;
+`close-gate` PASS live with `closing issues: #1897`. Packet posted (`5508929918`),
+`status:ready-merge` applied. **Merging closes #1897**, correctly — the issue's whole scope is the
+publish filter. The evaluator verified the two things that make a bare `"tests/"` exclude safe rather
+than merely green: nothing published reaches under `tests/` (checked against the export map, not by
+grep), and the entry composes with #1895's patterns without rewriting them. Its three findings are
+all disclosed non-blockers, one of which is **#1920** — independently reproducing the stale-corpus
+baseline I filed, with the same "identical regenerated SHA-256 with and without the slice"
+attribution.
+
+**#1915's eval burned its budget without a verdict.** The agent job failed at 34/34 steps after ~80
+minutes: `Agent reached maximum iterations limit (800)`, stuck re-entering an interactive pager
+(`Send quit key to less` / `No previous running command to interact with`), 34.37M tokens, $1.65.
+That is an agent-side loop, not a substantive failure. Re-dispatched at `a6fababde` with a brief that
+(a) forbids pagers explicitly, (b) forbids re-running the repo-wide `check`/`test` that CI already
+proved green at this head, (c) tells it to emit a verdict early rather than exhaust the budget, and
+(d) names the six things actually worth judging — with the cache-partition claim called out as the
+security-relevant one, since a partition derived from a bearer token would leak credential material
+into cache keys. Iterations lowered 800 → 500. Label cycled to mint a generation first.
+
+**#1664's help-test repair landed, and the worker corrected my mechanism.** I hypothesised
+terminal-width wrapping; it confirmed the class and fixed the mechanism:
+
+- `COLUMNS=40` **did not** reproduce — Cliffy 1.2.1 reads `Deno.consoleSize().columns`, not the
+  environment variable. My suggested repro would have produced a false negative.
+- `getHelp({ width: 40, colors: false })` **did** reproduce, exit 1.
+- At width 40 Cliffy splits **inside words**, so whitespace normalisation alone is insufficient —
+  a sharper edge than ordinary newline wrapping.
+
+Fix: render help at a deterministic width 80 with colors disabled (wraps across lines but never
+sub-word), plus one-sided whitespace normalisation. Touch set is the one test file plus run
+artifacts; 1,246 CLI tests pass, `quality:gate` 0 findings. The Cliffy width trap is recorded in
+`drift.md` for the other CLI help tests that share it.
+
+**#1922's repair worked.** `unboundName` census back to **116**, matching main's ceiling exactly;
+snippets gate exit 0; `build` and `quality` both green. Carriers re-verified post-commit at the
+pushed head `f570dcde4`, all four exit 0.
+
+### Board at the end of this stretch
+
+| Issue | Vehicle | State |
+| --- | --- | --- |
+| #1452 | #1842 | **`status:ready-merge`**, packet delivered |
+| #1897 | #1918 | **`status:ready-merge`**, packet delivered, IMPL-EVAL PASS |
+| #1590 | #1895 | hosted proof green; IMPL-EVAL running |
+| #1353 | #1921 | CI 6/6 green; IMPL-EVAL running |
+| #1352 | #1915 | CI green; IMPL-EVAL re-dispatched after budget exhaustion |
+| #1467 | #1922 | docs reds repaired; `check-test` finishing |
+| #1355/#1360 | #1664 | help test fixed; CI re-running; three reds already attributed foreign |
+| #1349 | — | row-7 diagnostics gap-fill worker running |
+| #1354 | #1891 | plan revision worker running (third no-delta FAIL_PLAN; escalated to owner) |
+| #1348 | — | epic; no leaf PR by design |
