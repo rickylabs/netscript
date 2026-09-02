@@ -12,7 +12,9 @@ one agent's head, written down so the next orchestrator does not rediscover them
 artifacts, stage contracts, gate lists, definition of done — is
 [`workflow/milestone-run.md`](../../../.llm/harness/workflow/milestone-run.md); the canary
 **schedule** is [`workflow/canary-cadence.md`](../../../.llm/harness/workflow/canary-cadence.md).
-Nothing in this skill restates them, publish mechanics (`netscript-release`), or lane routing
+The recurring owner-facing status contract is
+[`workflow/milestone-reporting.md`](../../../.llm/harness/workflow/milestone-reporting.md). Nothing
+in this skill restates those contracts, publish mechanics (`netscript-release`), or lane routing
 (`lane-policy.md`).
 
 ## When to Use
@@ -73,6 +75,18 @@ the Step 0 validator is red.
 
 Treat `milestone-cluster-state.json` as the control plane and `milestone-status.md` as its generated
 view. Do not coordinate from chat memory or a hand-edited status page.
+
+## Coordinator reporting and pace
+
+Publish the generated coordinator report at the hourly and event-driven cadence in
+`milestone-reporting.md`. The required shape is deliberately operational: outcome, canary ETA and
+critical path, progress delta, merge queue, plain-English blockers, orchestrator matrix, scope
+coverage, environment hygiene, and only genuine owner decisions. Refresh the evidence first.
+
+A report is also an intervention gate. An orchestrator row with stale concrete progress, vague
+`waiting`, or no next action must cause immediate steering or recovery; it cannot be rendered as
+healthy merely because a session exists. Reporting never ends the coordinator turn and never blocks
+independent lanes. After publishing, keep merging, dispatching, and unblocking.
 
 ## Reading a milestone into PR clusters
 
@@ -203,6 +217,7 @@ raise them, or follow the run's recorded decision.
 | ----------------------------------------------------- | ------------------------------------------------------- |
 | `.llm/harness/workflow/milestone-run.md`              | every milestone run — the run shape, gates, DoD         |
 | `.llm/harness/workflow/canary-cadence.md`             | declaring canary points; label/note/drift contract      |
+| `.llm/harness/workflow/milestone-reporting.md`        | hourly/event-driven owner report and pace gate          |
 | `.llm/harness/workflow/lane-policy.md`                | lane and evaluator routing                              |
 | `.llm/harness/workflow/tooling.md`                    | the agentic launch/watch/steer tool surface for stage C |
 | `.llm/harness/workflow/agent-handoff.md`              | handing work to OpenHands or local agents mid-run       |
