@@ -722,3 +722,19 @@ the merge.**
   green. Superseded run 33666085011 cancelled; new `ci` 33669484243 / `e2e-cli` 33669484139 queued.
   Remaining: both runtime tiers + desktop (now with #1930) → receipts → evidence → ready-merge →
   close-gate. Actor: supervisor; ETA ~19:35Z.
+
+### 2026-09-02 19:20Z checkpoint — S9 sqlite red at 4c9def611 (runtime.wait.workers-api)
+
+- S9 #1759 run 33669484139: `desktop-native-linux` PASS (post-#1930), sqlite tier FAILED at
+  `runtime.wait.workers-api` — "Resource 'workers-api' entered a failed state … failed to start"
+  259 ms into the wait, right after `runtime.aspire-restart-after-db` PASSED; 44 gates passed
+  before it, nothing telemetry-related had run yet (the D-328 read path is not on this path). The
+  same restart/wait sequence passed on S9 at `77f7ec249` and `568d6ed30`, and on S10 `0b3f13e0c`
+  (same main `c0b7d841a`) sqlite PASSED at 19:11Z; `runtime.wait.workers-api` has a recorded
+  transient history (fix-plugin-remove-bare-name-rollback--w5-v3, fix-db-resident-connection-1310).
+  The report carries no resource logs, so the crash cause is not attributable from CI evidence.
+  Action: in-place job rerun refused while the run's postgres tier is still queued; rerun the
+  failed job (`gh run rerun --failed`) as soon as the postgres tier reports. If the rerun fails
+  identically, treat as an S9×main interaction and pull the AppHost log via a runtime lease.
+  Actor: supervisor; ETA postgres verdict ~19:45Z, sqlite rerun verdict ~20:15Z.
+- S10 #1760 `0b3f13e0c`: sqlite PASS, desktop PASS, quality PASS; only the postgres tier pending.
