@@ -148,9 +148,9 @@ await server.finished;
     }).output();
     assert(
       result.success,
-      `probe rejected ${JSON.stringify(banner)}; stdout=${new TextDecoder().decode(result.stdout)}; stderr=${
-        new TextDecoder().decode(result.stderr)
-      }`,
+      `probe rejected ${JSON.stringify(banner)}; stdout=${
+        new TextDecoder().decode(result.stdout)
+      }; stderr=${new TextDecoder().decode(result.stderr)}`,
     );
   } finally {
     await Deno.remove(projectRoot, { recursive: true });

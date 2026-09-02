@@ -6,6 +6,10 @@ export const FRESH_HTTP_READINESS_BUDGET_MS = 60_000;
 
 const HTTP_POLL_INTERVAL_MS = 250;
 const VITE_READY_MARKER = 'Local:';
+const ANSI_ESCAPE_PATTERN = new RegExp(
+  `${String.fromCodePoint(0x1b)}\\[[0-9;]*[A-Za-z]`,
+  'g',
+);
 
 export interface FreshDevServerWaitOptions {
   readonly startupSignal: Promise<void>;
@@ -111,6 +115,7 @@ async function runProbe(projectRoot: string, appName: string): Promise<void> {
       '--strictPort',
     ],
     cwd: projectRoot,
+    env: { NO_COLOR: '1' },
     stdin: 'null',
     stdout: 'piped',
     stderr: 'piped',
@@ -155,13 +160,18 @@ async function mirrorOutput(
       const { done, value } = await reader.read();
       if (done) break;
       await writer.write(value);
-      scanTail = `${scanTail}${decoder.decode(value, { stream: true })}`.slice(-4_096);
+      const scanText = stripAnsi(decoder.decode(value, { stream: true }));
+      scanTail = `${scanTail}${scanText}`.slice(-4_096);
       if (scanTail.includes(VITE_READY_MARKER)) signalStartup();
     }
   } finally {
     reader.releaseLock();
     writer.releaseLock();
   }
+}
+
+function stripAnsi(value: string): string {
+  return value.replace(ANSI_ESCAPE_PATTERN, '');
 }
 
 async function stopChild(child: Deno.ChildProcess, childExited: boolean): Promise<void> {

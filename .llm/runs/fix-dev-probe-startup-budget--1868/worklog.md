@@ -38,6 +38,8 @@
 | - | --- | --- | --- |
 | 1 | RED regression proves current probe lacks phase/budget seam | focused structured test wrapper (expected RED) | focused test + run dir |
 | 2 | GREEN phase-aware probe preserves child exit and truthful reporting | focused structured wrappers | probe + run dir |
+| 3 | FAIL_FIX RED discriminates ANSI-colored and plain readiness banners | focused structured test wrapper (expected 4 pass / 1 fail) | focused test + run dir |
+| 4 | FAIL_FIX GREEN normalizes scan text and requests uncolored child output | whole E2E workspace structured check/test + focused lint/fmt | probe + run dir |
 
 ### Deferred Scope
 
@@ -64,6 +66,9 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 | 2026-09-02 | 3 | evaluator correction | OpenHands `FAIL_FIX` at `bdbaec12c` proved the raw `Local:` scan misses hosted Vite's ANSI-colored `\x1b[1mLocal\x1b[22m:` banner. The prior commit-message claim “3/3 green in hosted CI” was false: the only completed E2E run, `33562257540`, failed `behavior.project-boundary-dev` after 180,248 ms. No hosted green is claimed. |
 | 2026-09-02 | 3 | RED prepared | Added exact colorized-banner and plain-text-banner tests through the output scan path; product code remains unchanged pending observed RED. |
 | 2026-09-02 | 3 | RED observed | Focused structured test exited 1: 4 passed, 1 failed, 5 total. Plain `Local:` passed through the real probe entry point; exact `\x1b[1mLocal\x1b[22m:` failed with child status 0 after the short-lived fixture exited. No product file changed. |
+| 2026-09-02 | 3 | commit/reconcile | ANSI RED committed and pushed as `b9b2e9f0a`; PR #1883 remains the issue-closing review surface. |
+| 2026-09-02 | 4 | GREEN | `stripAnsi` removes CSI escapes from decoded scan text while raw child bytes are still mirrored unchanged; spawned dev receives `NO_COLOR=1`. Focused suite passes 5/5. |
+| 2026-09-02 | 4 | review | Whole E2E workspace structured check/test pass. Equivalent ANSI regex is constructed from code point 27 to satisfy `no-control-regex` without a lint suppression. Runtime remains hosted-owned and is not claimed green. |
 
 ## Gate Results
 
@@ -71,6 +76,11 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 | --- | --- | --- | --- |
 | RED focused test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev_test.ts` | 1 | RED: 0 passed, 3 failed, 3 total (`uniqueFailures=1`); no product files changed. |
 | ANSI FAIL_FIX RED | same structured focused-test wrapper | 1 | 4 passed, 1 failed, 5 total; only the exact colorized banner fails, while plain text passes. Runtime 1,664 ms; no production timeout sleep. |
+| ANSI FAIL_FIX GREEN focused test | same structured focused-test wrapper | 0 | 5 passed, 0 failed, 5 total; exact ANSI and plain banners both pass through the real entry point. |
+| Whole E2E workspace check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts` | 0 | 188 TypeScript files, 2 batches, 0 diagnostics; wrapper invokes `deno check --unstable-kv`. |
+| Whole E2E workspace test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all --unstable-kv packages/cli/e2e` | 0 | 276 passed, 0 failed, 276 total in 10,057 ms. |
+| FAIL_FIX focused lint | `run-deno-lint.ts` over probe + focused test, `--ext ts` | 0 | 2 files, 0 findings. Initial literal-ESC exploratory run exited 1 under `no-control-regex`; fixed without suppression before final gate. |
+| FAIL_FIX focused format | `run-deno-fmt.ts` over probe + focused test, `--ext ts` | 0 | 2 files, 0 findings. Initial exploratory run exited 1; scoped format applied before final gate. |
 | GREEN focused test | same structured test wrapper | 0 | 3 passed, 0 failed, 3 total in 576 ms. |
 | Scoped check | `run-deno-check.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 diagnostics; includes `--unstable-kv`. |
 | Scoped lint | `run-deno-lint.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 findings. |
@@ -84,3 +94,4 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 - Evaluator should inspect phase separation, status races, truthful diagnostics, and confirm `deno.lock` stayed unchanged.
 - Commit trail: RED `cd2337d36`; GREEN `04420a074`.
 - Accepted `FAIL_FIX`: normalize ANSI only in the readiness scan and set `NO_COLOR=1` on the spawned dev process; preserve byte-for-byte mirrored output.
+- FAIL_FIX GREEN implementation SHA will be recorded immediately after the commit exists; no hosted-green claim is made.

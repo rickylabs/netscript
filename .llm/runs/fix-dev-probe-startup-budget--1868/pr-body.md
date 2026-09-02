@@ -11,15 +11,21 @@ Separates the generated dev chain's dependency/startup allowance from the Fresh 
 
 - [x] RED: focused slow-preflight, child-exit, and timeout-reporting regression — `cd2337d36`
 - [x] GREEN: phase-aware startup and HTTP readiness budgets — `04420a074`
-- [ ] Mandatory separate-session IMPL-EVAL
+- [x] FAIL_FIX RED: exact ANSI banner fails while plain text passes — `b9b2e9f0a`
+- [ ] FAIL_FIX GREEN: ANSI-safe scan plus `NO_COLOR=1`
+- [ ] Fresh-head separate-session IMPL-EVAL
 
 ## Validation
 
 - Focused structured RED test — exit 1; 0 passed, 3 failed, 3 total.
 - Focused structured GREEN test — exit 0; 3 passed, 0 failed, 3 total.
 - Scoped structured check/lint/format — exit 0 each over the probe and focused test.
+- FAIL_FIX focused GREEN test — exit 0; 5 passed, 0 failed.
+- Whole `packages/cli/e2e` structured check — exit 0; 188 TypeScript files, 0 diagnostics.
+- Whole `packages/cli/e2e` structured test — exit 0; 276 passed, 0 failed.
 - `deno.lock` — unchanged.
-- Full `deno task e2e:cli` — not run; this leaf has no runtime lease and hosted CI owns the canonical scaffold runtime.
+- Local full `deno task e2e:cli` — NOT_RUN; this leaf has no runtime lease.
+- Hosted run `33562257540` at pre-repair head `bdbaec12c` — FAILED `behavior.project-boundary-dev`; hosted CI owns the new-head verdict. No hosted green is claimed.
 
 ## Harness
 
@@ -28,7 +34,7 @@ Separates the generated dev chain's dependency/startup allowance from the Fresh 
 
 ## Drift / Debt
 
-- None.
+- Significant implementation drift repaired: readiness scanning now normalizes ANSI color only for matching; mirrored output is unchanged.
 
 ## Acceptance
 
