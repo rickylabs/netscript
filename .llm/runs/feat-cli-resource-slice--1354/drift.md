@@ -27,3 +27,16 @@
 - **Lesson:** a plan may only promise behavior some slice's declared touch set can implement. A
   safety mechanism without an owning adapter, tests, and ceiling slot is deferred scope, not an
   implementation promise.
+
+## 2026-09-02 — Slice F retire-set omitted surviving importers and orphans
+
+- **Severity:** enumeration.
+- **Expected:** retiring canonical templates also disposes every file that imports them and every
+  file whose only consumer is retired.
+- **Observed:** Slice F named the primary canonical removals but omitted three dependent importers
+  and five newly orphaned templates that the init writer would continue rendering.
+- **Resolution:** the eight files and their manifest/carrier keys are now explicit Slice-F removals;
+  the real type consumers are named, and the ceiling grows by exactly eight.
+- **Lesson:** a retire-set is only complete when every consumer of a retired file is either retired
+  with it or has a named surviving consumer. Slice F's list was checked for what it removes and not
+  for what still imports it.

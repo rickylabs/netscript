@@ -77,8 +77,10 @@ does not introduce another app or client selection mechanism.
   - multiple candidates and no flag: fail closed, list services, and show `--client`;
   - a flag must match exactly one exported service name; zero/duplicate matches are distinct
     failures.
-- `--route` defaults to `/<resource>` and otherwise accepts a normalized absolute Fresh route
-  pattern. It is not used to infer a client or procedure.
+- `--route` defaults to `/<resource>` and otherwise accepts a normalized static absolute route.
+  #1354 rejects parameterized/catch-all patterns and any segment containing Fresh parameter syntax;
+  mapping `/orders/history` is exactly `routes/orders/history/index.tsx`, with its partial at
+  `routes/partials/orders/history/summary.tsx`. It is not used to infer a client or procedure.
 
 Client resolution and procedure validation occur before filesystem mutation planning. The command
 accepts the sole conventional candidate, but never scans an ambiguous set and silently picks the
@@ -159,8 +161,10 @@ Required proof is:
 4. a later additive option still selects, renders, and dry-runs against an edited base leaf, naming
    manual move/rename as the remedy;
 5. a valid marker with a mismatched body hash is `owned-edited`, conflicts, and is never
-   automatically replaced or replaced under `--force`; and
-6. unmarked/foreign content is unowned, conflicts, and is never replaced, including under `--force`.
+   automatically replaced or replaced under `--force`;
+6. a positively generator-owned divergent leaf is replaced only under explicit `--force`, while all
+   unrelated leaves and shared files remain byte-identical; and
+7. unmarked/foreign content is unowned, conflicts, and is never replaced, including under `--force`.
 
 ### D4 — One neutral template family and one planner are authoritative
 
@@ -171,10 +175,12 @@ The source of truth becomes:
   intended files plus shared edits.
 
 The re-runnable command and the init example writer are two callers of that planner. The existing
-service example becomes an init preset supplying resource/client/procedure/route and the desired
-options. It may retain clearly demonstration-only telemetry or mutation embellishments outside the
-canonical family, but it cannot retain separate copies of the canonical page, route contract,
-loader, island, view/layout, form, or partial templates.
+service example becomes an init preset whose canonical output is exactly `generate resource` with
+`--form --partial` for its fixed resource/client/procedure/route inputs. Convergence removes the
+init-only page bindings `withResource('viewer')`, `withPolicy`, `withTelemetry`, the hero and notes
+layers, and the viewer-gated `mutate`; none survives through a neutral-template extension point. The
+preset cannot retain separate copies of the canonical page, route contract, loader, island,
+view/layout, form, or partial templates.
 
 Convergence is mandatory, not a conditional branch. Slice F may register the public command only
 after the standing equivalence test proves init and the command render byte-identical canonical
@@ -325,9 +331,9 @@ No implementation slice begins until #1664 is merged and the implementation work
 `--client`, generated-query, formatter, and service-query changes. If it is still open, the run
 stops rather than recreating its patch.
 
-The overlap was re-derived on 2026-09-02 from live #1664 head
-`7f076f8751df06fa4b754f360835c4970a274b46` (`163` total files, `59` outside `.llm/`). The nine
-currently planned source/generated overlaps are:
+The overlap was re-derived on 2026-09-02 and rechecked after live #1664 moved from `7f076f875` to
+`5bc900d80`; the intersection remained unchanged except for the Slice-G enumeration defect corrected
+below. The ten currently planned source/generated overlaps are:
 
 | #1354 slice | Shared file                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------------------ |
@@ -340,9 +346,10 @@ currently planned source/generated overlaps are:
 | F           | `packages/cli/src/kernel/templates/app/route-templates_test.ts`                                        |
 | G           | `packages/cli/e2e/src/domain/cli-surface.ts`                                                           |
 | G           | `packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts`                                    |
+| G           | `packages/cli/e2e/suites/scaffold/capability-suites.ts`                                                |
 
 The mechanically regenerated
-`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is a tenth
+`packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is an eleventh
 coordination path once Slice F activates the new CLI surface; it is listed in Slice F and is
 freshness evidence only, not the command-option acceptance gate.
 
@@ -430,11 +437,11 @@ PLAN-EVAL.
 | -------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | #1664 changes again before merge                               | stale overlap list, lost selector/cache-age/formatter work                 | D9 live re-diff at every slice start; record head/intersection; hard stop on movement       |
 | option selection is performed after conflict checking          | later `--form`/`--partial`/`--stream` cannot produce a candidate or remedy | D3 pins selection → render → conflict → write; dry-run test on edited base                  |
-| ownership marker is copied onto edited bytes                   | hand edit is mistaken for generator output                                 | exact marker/body hash; `owned-edited` conflict; sixth proof case                           |
+| ownership marker is copied onto edited bytes                   | hand edit is mistaken for generator output                                 | exact marker/body hash; `owned-edited` conflict; fifth proof case                           |
 | process crash occurs between application renames               | mix of old, new, or absent candidate files                                 | **Deferred:** rerun or move/rename partial output; a later issue owns journal/backup IO     |
 | two invocations race                                           | one preflight invalidates the other's assumptions                          | **Deferred:** not serialized; avoid concurrent runs until a later issue owns a lock adapter |
 | init and command templates diverge                             | frozen example and rerunnable verb teach different architecture            | one planner; standing byte-equivalence gate; Slice F cannot activate on failure             |
-| Slice D/F exceeds 18/24 files                                  | hidden scope expansion or retained duplicate assets                        | hard file ceilings; stop and rescope before touching an unlisted file                       |
+| Slice D/F exceeds 18/32 files                                  | hidden scope expansion or retained duplicate assets                        | hard file ceilings; stop and rescope before touching an unlisted file                       |
 | Fresh public exports add slow types/docs debt                  | publish regression                                                         | before/after doc-lint JSON, jsr-audit, `deps:prod-install`, `publish:dry-run`               |
 | `@netscript/fresh` dependency changes `deno.lock` unexpectedly | unexplained dependency churn                                               | Slice B owns and reviews only the resolved dependency delta; reject unrelated lock changes  |
 | command options are "proved" by MCP export corpus              | false green because corpus follows exports, not Cliffy help/options        | parser/command-tree and E2E domain tests are acceptance; corpus check is freshness only     |
@@ -556,7 +563,8 @@ register a command or alter init.
 1. `packages/cli/src/kernel/application/resource-slice/resource-slice-contract.ts` — normalized
    input, variants, selected client/procedure, owned-leaf metadata, result union.
 2. `packages/cli/src/kernel/application/resource-slice/resource-slice-contract_test.ts` — naming,
-   route, and variant invariants.
+   static nested-route-to-file/partial mapping, parameter/catch-all rejection, and variant
+   invariants.
 3. `packages/cli/src/kernel/application/resource-slice/plan-resource-slice.ts` — pure output plan.
 4. `packages/cli/src/kernel/application/resource-slice/plan-resource-slice_test.ts` — always/form/
    partial/stream delta fixtures and forbidden-pattern assertions.
@@ -568,7 +576,8 @@ register a command or alter init.
 7. `packages/cli/src/kernel/application/resource-slice/reconcile-app-routes.ts` — bounded
    `appRoutes` transform.
 8. `packages/cli/src/kernel/application/resource-slice/reconcile-app-routes_test.ts` — exact,
-   insert, conflict, and customized-shape fixtures.
+   insert, conflict, and customized-shape fixtures; the stock post-Slice-F init `router.ts` is the
+   required recognized-shape/insert fixture.
 9. `packages/cli/src/kernel/application/resource-slice/reconcile-state.ts` — conditional State
    transform.
 10. `packages/cli/src/kernel/application/resource-slice/reconcile-state_test.ts` — both supported
@@ -583,6 +592,11 @@ register a command or alter init.
   response `JSON.parse`;
 - structured package check/lint/fmt;
 - `deno task arch:check` and `deno task quality:gate`.
+
+**Deliberate doctrine observation:** after A+C+D, `application/resource-slice/` has 14 direct
+children and `check-doctrine.ts` warns above 12. Record that WARN in Slice C evidence; it is not a
+gate failure and the cohesive planner/reconciler/render surface stays together. A fifteenth direct
+child requires plan rescope or a named subfolder rather than silently deepening the warning.
 
 ### Slice D — establish the canonical template family (Refs #1354; partial)
 
@@ -667,11 +681,18 @@ template authority.
 
 ### Slice F — converge init and activate the command (Refs #1354; partial)
 
-**Landability:** removes the divergent canonical copies, makes init call the planner preset, then
-registers the command as the second caller of that same authority. It does not change
-telemetry/demo-only files or #1664's service-query template.
+**Landability:** removes the divergent canonical copies and their now-unconsumed demo dependents,
+makes init emit exactly the planner's `--form --partial` preset, then registers the command as the
+second caller of that same authority. It does not extend the neutral template contract and does not
+change #1664's service-query template.
 
-**File ceiling:** 24.
+**File ceiling:** 32.
+
+The ceiling rises from 24 to 32 solely for the eight newly enumerated retired dependents/orphans.
+This remains one Slice F rather than F1/F2 because init convergence, complete manifest/carrier
+retirement, byte-equivalence proof, and command activation form one landability boundary; splitting
+them would permit an intermediate branch state with an incomplete retire-set or an activated command
+before the complete convergence gate.
 
 **Expected touch set:**
 
@@ -701,9 +722,10 @@ telemetry/demo-only files or #1664's service-query template.
     remove canonical summary copy.
 13. `packages/cli/src/kernel/assets/app/routes/partials/examples/service-summary.tsx.template` —
     remove canonical partial copy.
-14. `packages/cli/src/kernel/assets/manifest.ts` — remove retired keys.
+14. `packages/cli/src/kernel/assets/manifest.ts` — remove every retired canonical/dependent key,
+    including the eight items added below.
 15. `packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts` — remove retired
-    carrier fields.
+    carrier fields for the complete enumerated retire-set.
 16. `packages/cli/src/kernel/application/scaffold/writers/write-example-service-app-files_test.ts` —
     focused init-preset/source-authority proof (create if absent; otherwise use the existing focused
     writer test and update this plan before implementation).
@@ -714,7 +736,8 @@ telemetry/demo-only files or #1664's service-query template.
 19. `packages/cli/src/kernel/assets/embedded.generated.ts` — regenerate after retiring the old
     canonical keys; preserve all unrelated embedded assets.
 20. `packages/cli/src/kernel/assets/app/router.ts.template` — remove the init-only manual service
-    reference and alias the planner's Fresh-derived generated route.
+    reference but preserve the `serviceExample` alias, now pointing to the planner's Fresh-derived
+    generated route so `routes/examples/index.tsx.template` remains a surviving consumer unchanged.
 21. `packages/cli/src/kernel/application/scaffold/writers/app-route-seeds.ts` — retire the
     hand-maintained manifest/routes seed once init invokes the Fresh manifest adapter after all
     routes and sidecars exist.
@@ -725,11 +748,29 @@ telemetry/demo-only files or #1664's service-query template.
 24. `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` —
     mechanically regenerate after CLI surface activation; freshness artifact only, not option/help
     acceptance evidence.
+25. `packages/cli/src/kernel/assets/app/routes/examples/(_components)/lab-panel.tsx.template` —
+    retire the real consumer of the retired island and loader.
+26. `packages/cli/src/kernel/assets/app/routes/examples/(_components)/summary-panel.tsx.template` —
+    retire the DB consumer of the retired loader type.
+27. `packages/cli/src/kernel/assets/app/routes/examples/(_components)/summary-panel.memory.tsx.template`
+    — retire the memory consumer of the retired loader type.
+28. `packages/cli/src/kernel/assets/app/routes/examples/(_components)/page-layout.tsx.template` —
+    retire after its only consumer, the old index layout, is retired.
+29. `packages/cli/src/kernel/assets/app/routes/examples/(_components)/hero.tsx.template` — retire
+    after its only consumer, the old index page, is retired.
+30. `packages/cli/src/kernel/assets/app/routes/examples/(_components)/notes-card.tsx.template` —
+    retire after its only consumer, the old index page, is retired.
+31. `packages/cli/src/kernel/assets/app/routes/examples/(_shared)/authorization.ts.template` —
+    retire after its only consumer, the old index page, is retired.
+32. `packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/optimistic-list-mutation.ts.template`
+    — retire after its only consumers, the old showcase islands, are retired.
 
-If the current example's demo-only hero, notes, authorization, optimistic mutation, or telemetry
-still consumes types formerly housed in a retired canonical template, adapt that demo-only caller
-inside the files above or split a follow-up slice after updating this plan; do not preserve a second
-page/loader/island template to avoid the ceiling.
+The three real type/import consumers are `lab-panel.tsx.template`, `summary-panel.tsx.template`, and
+`summary-panel.memory.tsx.template`; they are retired above rather than adapted. The other five
+added templates have no surviving consumer after the old page/layout/islands retire and are also
+removed. If implementation finds any additional importer or rendered consumer of the enumerated
+retire-set, stop and amend the enumeration; do not preserve a second canonical template or add an
+extension point to evade the ceiling.
 
 **Required gates:**
 
@@ -750,7 +791,7 @@ page/loader/island template to avoid the ceiling.
 to the existing scaffold runtime suite. The author lane changes test definitions but does not run
 the runtime suite locally.
 
-**File ceiling:** 6.
+**File ceiling:** 7.
 
 **Expected touch set:**
 
@@ -762,20 +803,24 @@ the runtime suite locally.
    arrays, order, selected client/procedure, partial output, and stdout expectation.
 4. `packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts` — compose the two gates after
    init/service discovery and before generated-project quality/type-check gates.
-5. `packages/cli/src/kernel/templates/app/agent-conventions.ts` — point both rendered `AGENTS.md`
+5. `packages/cli/e2e/suites/scaffold/capability-suites.ts` — add both resource gate ids to
+   `RUNTIME_GATES`; composition in `scaffold-gates.ts` alone does not make them reachable from
+   `scaffold.runtime`.
+6. `packages/cli/src/kernel/templates/app/agent-conventions.ts` — point both rendered `AGENTS.md`
    and `WEB-LAYER.md` one-screen guidance to `generate resource` before manual construction.
-6. `packages/cli/src/kernel/templates/app/agent-conventions_test.ts` — extension cases for the new
+7. `packages/cli/src/kernel/templates/app/agent-conventions_test.ts` — new file covering the
    rendered convention text and referenced paths. Slice F alone owns the existing
    `public-command-tree_test.ts` regression/registration edit, so no file is double-counted.
 
-If the existing E2E gate model cannot assert captured stdout without a seventh shared change, stop
-and update the plan; do not create a parallel suite or split the runtime command.
+If captured-stdout assertions or runtime reachability require any file beyond this seven-file set,
+stop and update the plan. Do not create a parallel suite or split the runtime command; both resource
+ids must be reachable through the existing `RUNTIME_GATES` path.
 
 **Author-lane gates (no runtime):**
 
 - static E2E definition/unit tests only;
-- existing capability-suite/suite-registry regression tests plus the new resource gate extension
-  test; no hosted process is started;
+- direct `RUNTIME_GATES` membership/reachability assertions plus existing capability-suite and
+  suite-registry regression tests; no hosted process is started;
 - generated guidance template tests;
 - structured CLI check/lint/fmt;
 - asset/publish checks, CLI JSR audit, `arch:check`, and `quality:gate`.
@@ -837,6 +882,10 @@ Before the assembled branch is called merge-ready, collect:
 
 ## Explicitly deferred
 
+- Reintroducing the init-only `viewer` resource, policy, telemetry, hero/notes layers, or
+  viewer-gated mutation showcase. Stock init converges exactly to the `--form --partial` planner
+  preset in #1354; any later showcase extension needs its own contract and issue rather than a
+  neutral-template extension point here.
 - Process-crash/mid-rename cross-file atomicity. A crash after apply begins can leave a mix of old,
   new, or absent candidate files; manual recovery is rerun or move/rename of partial output. A later
   issue must scope the journal-store and backup/restore IO adapters needed to close this safely.

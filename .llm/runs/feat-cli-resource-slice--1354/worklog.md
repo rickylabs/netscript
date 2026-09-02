@@ -70,3 +70,33 @@
 | Renumbered D3 proof list                                   | PASS; exactly 6 cases                          |
 | Slice references and closing-keyword scan                  | PASS; 7 partial references, no closing keyword |
 | Product/runtime gates                                      | NOT RUN — plan-only and explicitly prohibited  |
+
+## 2026-09-02 — post-PASS enumeration amendment
+
+- Baseline: `409630338d9db4c94dac33c37a083c29050318ea` after native opposite-family Fable 5
+  `PASS_PLAN_WITH_FINDINGS`.
+- Applied the verdict under settled D4: stock init converges exactly to `generate resource` with
+  `--form --partial`; no neutral-template extension points were added and none of the removed D3
+  flags or IO recovery machinery returned.
+- Slice F now enumerates all eight dependent/orphan templates, removes their manifest/carrier keys,
+  preserves the surviving `serviceExample` route alias, and raises its ceiling from 24 to 32 solely
+  for those eight files. Slice G adds the #1664-owned `capability-suites.ts` runtime-registration
+  path and raises its ceiling from 6 to 7.
+- Bounded follow-ups: reject parameterized routes in #1354, record the 14-child doctrine WARN,
+  require the stock post-F router fixture, add the positive owned-only-force proof, and mark
+  `agent-conventions_test.ts` as new.
+- #1664 moved to `5bc900d80`; the required per-slice live re-diff rule remains the serialization
+  authority and the known intersection is unchanged apart from the newly enumerated Slice-G row.
+- This is an amendment under the passing verdict. No re-evaluation is requested.
+
+### Plan-only validation
+
+| Check                                    | Result                                            |
+| ---------------------------------------- | ------------------------------------------------- |
+| Scoped formatting and `git diff --check` | PASS                                              |
+| Slice F enumeration / ceiling            | PASS; 32 files / ceiling 32                       |
+| Slice G enumeration / ceiling            | PASS; 7 files / ceiling 7                         |
+| Removed-flag and recovery-mechanism scan | PASS; none reinstated                             |
+| D3 proof list                            | PASS; 7 cases including positive owned-only force |
+| Slice references / closing keyword       | PASS; 7 partial references / no closing keyword   |
+| Product/runtime gates                    | NOT RUN — plan-only and explicitly prohibited     |
