@@ -10540,3 +10540,64 @@ later the threads gate turns red and this lane surfaces it.
 
 **#1913 confirmed CLOSED** and its repair merged as `13bb9415e` — the queue item the coordinator was
 concerned might park is fully landed.
+
+### D-241 — 0.0.7 closeout recorded; #1867 F-3 dispatched and implemented; two of my own cautions corrected
+
+**Closeout reported to #1641, not written into central state.** `milestone-cluster-state.json` lives
+in `007-primary`, which had **live processes and a dirty tree** at closeout time, and central state is
+coordinator-owned. Writing it from this session would have raced an active coordinator write, so the
+ledger went to the umbrella issue and to this run's `supervisor.md`. Same upstream-report protocol
+the lane used at attachment. If the coordinator wants the file mutated directly, that is a request I
+can serve when the worktree is quiet.
+
+**#1867 advanced immediately rather than left in triage** — label moved `triage → impl` **at
+dispatch** this time, which is the D-238 lesson applied rather than restated. Branch
+`fix/mcp-corpus-generator-clean-tree-guard` at `3066a0cc5`, thread
+`01a0627a-a28b-7483-a423-990b4380221c`, route matched, launched detached. PR #1937 opened; taxonomy
+and 0.0.8 milestone applied by this supervisor because the author opened it bare.
+
+**The brief carried two design questions rather than a task list**, and both were decided well:
+
+- **D1 — guard the write path only.** Adopted, and implemented *structurally* rather than
+  conditionally: `gen:mcp-export-corpus` gains `--allow-run=deno,git` while
+  `check:mcp-export-corpus` keeps `--allow-run=deno`. The check path therefore **cannot execute the
+  probe at all** — the guard is unrepresentable there rather than merely skipped. Stronger than what
+  I asked for: a runtime `if (!checkMode)` relies on the condition staying correct; a permission
+  boundary does not. This matters because #1929 just made that check a required CI gate.
+- **D3 — `--allow-dirty` with stderr provenance**, and a correction to my brief. I had suggested
+  recording the bypass "in the generated artifact's provenance or stderr". The author rejected the
+  artifact half with better reasoning than mine: embedding override state would make a subsequent
+  clean `--check` **fail by construction**, because the artifact would then differ from a clean
+  regeneration. Stderr only, with the residual stated honestly — attribution survives only where
+  stderr is captured.
+
+**My lock warning was over-broad, and the evidence disproves it.** I told the author a `deno.json`
+change would move the root lock and restale the Fresh UI private lock (#1905's surface). The delta is
+one line inside `tasks`, and lock churn measured **0**. A tasks-only edit changes no dependency
+declaration; the classifier itself treats it as a script alias rather than a toolchain change.
+Recording the correction rather than leaving a caution that would push a future author into a
+pointless workaround.
+
+**RED verified independently and the author caught their own false RED.** At `8a35c571c`:
+`REAL_EXIT=1`, 8 passed / 4 failed, failures exactly the guard behaviours; `write mode generates the
+artifact from a clean committed tree` passes at RED, so the guard tests are not succeeding by
+breaking baseline generation. The author then found that their first no-Git fixture set `PATH` to a
+nonexistent directory, which also prevented Deno resolving its nested executable — so that case
+failed *before* it could test the intended warning. They corrected the fixture and re-established an
+authoritative RED at `33ec78509`. That is the false-RED trap this release hit twice, caught by the
+author on themselves and documented rather than quietly passed.
+
+**GREEN verified independently at `1668173e8`:** generator tests 12/0, `check:mcp-export-corpus`
+`REAL_EXIT=0` (the required gate still passes — proving it unbroken is part of this slice), tools
+check `REAL_EXIT=0`. Surface is three files plus run artifacts; no `packages/`, no `plugins/`, no
+lockfile.
+
+**A near-miss worth recording.** Reading the "locked decisions" I first globbed `.llm/runs/*/plan.md`
+in the leaf worktree and surfaced twelve decisions about evaluator model routing from an unrelated
+slice. I nearly reported them as this slice's design. The leaf worktree carries every run directory
+on `main`, so a glob across `.llm/runs/` is not scoped to the slice — read the slice's own artifact
+path explicitly.
+
+IMPL-EVAL dispatched at `2e5ad4900` (native Fable 5.1, opposite family), aimed at the before-write
+refusal property, check-path isolation, probe scoping, override honesty, and whether the corrected
+RED proves what it claims.
