@@ -56,6 +56,19 @@
 - First implementation / RED commit: `8e7cf697c`.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1938
 
+### 2026-09-02 — bounded GREEN payload carrier
+
+- Added `TPayload`/`TResult` defaults to the root workers `JobDefinition` and preserved them through
+  `JobBuilder.build()`.
+- Added optional package-owned `JobPayloadSchema<TPayload>` to make the payload generic a structural
+  carrier without invalidating legacy definition values.
+- Bound trigger-core `EnqueueJobAction.job` to its payload generic and made `enqueueJob` infer the
+  payload from the selected definition while checking options through `NoInfer`.
+- No runtime expression or returned enqueue action field changed.
+- GREEN command: `deno check --unstable-kv
+  packages/plugin-triggers-core/src/builders/enqueue-job-payload-contract_test.ts`.
+- GREEN result: exit 0; the same negative directive is now consumed by the wrong-job payload error.
+
 ## Commit receipts
 
 | Slice | SHA | Evidence |
