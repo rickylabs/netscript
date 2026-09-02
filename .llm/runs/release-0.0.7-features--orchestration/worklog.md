@@ -10897,3 +10897,17 @@ LOW-4 rather than deepening the WARN. Worktree `007-leaf-1354-d`.
 
 Board: #1944, #1943, #1946, #1895 ready-merge · #1664 sole red #1845 · Slice A gated on #1664 ·
 Slice D running · E–G ordered behind D.
+
+### ~23:35Z — #1664 `quality` red was a third mid-flight gate: Aspire version parity
+
+`Aspire version parity (phase 1)` landed on `main` (S13, via #1779) after #1664's previous
+convergence. Clean `main` `ok:true`; #1664 `ok:false` with **one** finding — `manifest:freshness`,
+"Aspire surface manifest is stale; rerun aspire-surface-manifest.ts". Zero version mismatches; the
+recorded manifest simply predates this branch's file set. Regenerated from the run's own tool,
+committed harness-only as `7af976f44`; parity `ok:true`, 828 checked, 0 fail.
+
+That is the **third** gate to arrive on `main` mid-flight today (corpus-in-`quality`, README fences,
+now Aspire parity), and the third time a converged head went red on a gate that did not exist when
+the branch was written. Standing addition to the convergence checklist: after every merge of `main`,
+run `check:mcp-export-corpus`, `docs:readme-fences`, `docs:jsdoc-examples`, **and**
+`check:aspire-version-parity` locally before pushing — regenerate whichever carrier is stale.

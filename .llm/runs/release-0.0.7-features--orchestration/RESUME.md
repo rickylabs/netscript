@@ -52,7 +52,7 @@ One hosted `scaffold.runtime` attempt; not this lane's to spend.
 2. **An acceptance-evidence block is inert without a closing keyword** — the mirror iterates the
    PR's *closing* issues. Sequence: verdict → `status:ready-merge` → rerun existing CI at the
    **unchanged** head → mirror ticks boxes → close-gate green. Never hand-tick, never push to retrigger.
-3. **Two gates arrived on `main` mid-flight**: `check:mcp-export-corpus` inside `quality` (#1929)
+3. **Three gates arrived on `main` mid-flight** — plus Aspire version parity (S13): regenerate `.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv` via its `tools/aspire-surface-manifest.ts` when `manifest:freshness` fails. Original note:: `check:mcp-export-corpus` inside `quality` (#1929)
    and README fence integrity (#1925, baseline now **7** after #1935). Every convergence must
    regenerate the corpus; every README fence must compile. A converged head re-runs the *current*
    gate set.
