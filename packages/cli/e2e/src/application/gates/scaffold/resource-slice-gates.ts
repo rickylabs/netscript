@@ -4,7 +4,7 @@ import type { RunContext } from '../../../domain/run-context.ts';
 import { cli } from './gate-factory.ts';
 import { generatedAppName } from './runtime/generated-app-name.ts';
 
-const RESOURCE_NAME = 'users';
+const RESOURCE_NAME = 'people';
 const RESOURCE_CLIENT = 'users';
 const RESOURCE_PROCEDURE = 'list';
 const RERUN_SKIP_SUMMARY = 'Resource slice applied: 0 written, 11 skipped, 0 conflicts.';

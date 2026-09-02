@@ -132,6 +132,7 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
         JSON.stringify(cli(context)),
       ],
     ),
+    ...createResourceSliceGates(),
     commandGate(
       GATE.SCAFFOLD_AGENT_INIT,
       'Install generated Claude agent integration',
@@ -145,7 +146,6 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       GATE_PHASE.SCAFFOLD,
       (context) => cli(context, 'service', 'list', '--project-root', context.project.projectRoot),
     ),
-    ...createResourceSliceGates(),
     commandGate(
       GATE.CONTRACT_ADD,
       'Add a generated contract',

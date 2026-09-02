@@ -16,7 +16,7 @@ const EXPECTED_COMMAND = [
   '/repo/packages/cli/bin/netscript.ts',
   'generate',
   'resource',
-  'users',
+  'people',
   '--client',
   'users',
   '--procedure',
@@ -48,33 +48,48 @@ Deno.test('resource slice gates preserve exact first-run and rerun commands', ()
   assertEquals(gates[1].stdoutIncludes, [EXPECTED_RERUN_STDOUT]);
 });
 
-Deno.test('resource slice gates follow service discovery in scaffold composition', () => {
+Deno.test('resource slice gates follow generated client creation in scaffold composition', () => {
   const ids = createScaffoldGates({ plugins: [], samples: false }).map((gate) => gate.id);
-  const serviceList = ids.indexOf(GATE.SERVICE_LIST);
+  const serviceClientGenerate = ids.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE);
   const firstRun = ids.indexOf(GATE.SCAFFOLD_RESOURCE_GENERATE);
   const rerun = ids.indexOf(GATE.SCAFFOLD_RESOURCE_RERUN);
+  const serviceClientContract = ids.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT);
 
-  assert(serviceList >= 0);
-  assertEquals(firstRun, serviceList + 1);
+  assert(serviceClientGenerate >= 0);
+  assert(serviceClientGenerate < serviceClientContract);
+  assertEquals(firstRun, serviceClientContract + 1);
   assertEquals(rerun, firstRun + 1);
 });
 
-Deno.test('scaffold.runtime selects and reaches both resource gates before generated quality', () => {
+Deno.test('scaffold.runtime reaches resource gates after codegen and before generated quality', () => {
   assertEquals(
     RUNTIME_GATES.filter((id) =>
       id === GATE.SCAFFOLD_RESOURCE_GENERATE || id === GATE.SCAFFOLD_RESOURCE_RERUN
     ),
     [GATE.SCAFFOLD_RESOURCE_GENERATE, GATE.SCAFFOLD_RESOURCE_RERUN],
   );
+  const selectedDatabaseCodegen = RUNTIME_GATES.indexOf(GATE.DATABASE_CODEGEN);
+  const selectedServiceClientContract = RUNTIME_GATES.indexOf(
+    GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
+  );
+  const selectedFirstRun = RUNTIME_GATES.indexOf(GATE.SCAFFOLD_RESOURCE_GENERATE);
+  assert(selectedDatabaseCodegen < selectedFirstRun);
+  assertEquals(selectedServiceClientContract, selectedDatabaseCodegen + 1);
+  assertEquals(selectedFirstRun, selectedServiceClientContract + 1);
 
   const runtimeIds = resolveSuite(SCAFFOLD.RUNTIME).gates.map((gate) => gate.id);
   const serviceClientGenerate = runtimeIds.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE);
+  const databaseCodegen = runtimeIds.indexOf(GATE.DATABASE_CODEGEN);
   const firstRun = runtimeIds.indexOf(GATE.SCAFFOLD_RESOURCE_GENERATE);
   const rerun = runtimeIds.indexOf(GATE.SCAFFOLD_RESOURCE_RERUN);
+  const serviceClientContract = runtimeIds.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT);
   const generatedQuality = runtimeIds.indexOf(GATE.GENERATED_QUALITY_NEGATIVE);
   const generatedCheck = runtimeIds.indexOf(GATE.GENERATED_DENO_CHECK);
 
-  assert(serviceClientGenerate < firstRun);
+  assert(serviceClientGenerate < databaseCodegen);
+  assert(databaseCodegen < firstRun);
+  assertEquals(serviceClientContract, databaseCodegen + 1);
+  assertEquals(firstRun, serviceClientContract + 1);
   assertEquals(rerun, firstRun + 1);
   assert(rerun < generatedQuality);
   assert(rerun < generatedCheck);

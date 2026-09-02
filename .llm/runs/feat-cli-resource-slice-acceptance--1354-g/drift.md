@@ -41,3 +41,24 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** minor
 - **Action:** accept; preserve the dispatched implementation ancestry and let the stacked PR merge against the current base.
 - **Evidence:** commits `de042d23e`, `dcf2c4bdf`, and `63b23dae2` contain only `.llm/runs/feat-cli-resource-slice-activate--1354-f/` changes.
+
+## 2026-09-03 — IMPL-EVAL cycle 1 exposed untraced runtime prerequisites
+
+- **What:** The initial design placed both resource gates before `database.codegen` in the executed `RUNTIME_GATES` list and generated a resource named `users`.
+- **Source:** Separate-session IMPL-EVAL cycle 1 and its stock-init CLI reproduction in `evaluate.md`.
+- **Expected:** The first run would resolve client `users` procedure `list`, write 11 files, and the identical rerun would report 11 skips.
+- **Actual:** Procedure resolution imports the generated `@database/zod` CRUD contract, which does not exist before database codegen; after codegen, resource `users` collides with init's existing `appRoutes.users` alias. The exact failures were `Query procedure 'list' does not exist on client 'users'` and `appRoutes.users already has another value.`
+- **Severity:** high
+- **Action:** move `scaffold.resource-generate` and `scaffold.resource-rerun` after `database.codegen` in `RUNTIME_GATES`, preserving the existing invariant that `generated.service-client-contract` remains immediately adjacent to codegen and putting the resource pair immediately after that probe; mirror the same order in `scaffold-gates.ts`, generate non-colliding resource `people`, and encode both prerequisites plus adjacency in focused tests.
+- **Evidence:** evaluator control with `people` produced `Resource slice applied: 11 written, 0 skipped, 0 conflicts.` followed by `Resource slice applied: 0 written, 11 skipped, 0 conflicts.`.
+- **Lesson:** Runtime prerequisites were not traced at design time. Future shell-out gate placement must trace dynamic imports and generated namespace collisions against the stock scaffold before relying on hosted runtime proof.
+
+## 2026-09-03 — Existing service-client adjacency constrains the cycle-2 insertion point
+
+- **What:** The first cycle-2 edit placed the resource pair directly between `database.codegen` and `generated.service-client-contract`, as requested by the evaluator handoff.
+- **Source:** Full structured `packages/cli` test run after the first edit.
+- **Expected:** All 1716 unit tests remain green with the resource pair directly adjacent to codegen.
+- **Actual:** 1715 passed and 1 failed because `service-client-runtime-probe_test.ts` requires `generated.service-client-contract` to remain exactly one position after `database.codegen`; that test is outside the locked eight-file ceiling.
+- **Severity:** significant
+- **Action:** preserve the established codegen-to-contract adjacency and put the resource pair immediately after the contract probe. This still guarantees `database.codegen < scaffold.resource-generate`, remains before generated quality/type-check gates, and requires no ninth file.
+- **Evidence:** failing assertion reported indices 21 and 23; the corrected selected order is `database.codegen`, `generated.service-client-contract`, `scaffold.resource-generate`, `scaffold.resource-rerun`.

@@ -75,14 +75,18 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | author gates | Focused and full CLI unit suites plus check/lint/fmt, assets, publish, docs, JSR, doctrine, and quality gates all passed. Hosted runtime remains CI-owned. |
 | 2026-09-03 | G | implementation commit | Created the Slice G implementation commit with all eight amended product paths and the run artifacts; exact SHA is reported from pushed `HEAD`. |
 | 2026-09-03 | G | push/PR | Pushed implementation commit `97ad667cc0bf99f974e1673ed7d4dfce41932ba3` and opened non-draft stacked PR #1958 with the exact labels and milestone 0.0.7. |
+| 2026-09-03 | G | IMPL-EVAL cycle 1 | Separate evaluator returned `FAIL_IMPL`/`FAIL_FIX`: runtime selection preceded database codegen and resource `users` collided with init's existing route alias. |
+| 2026-09-03 | G | cycle-2 correction | Changed the resource name to `people`; selected the pair after `database.codegen` and its immediately adjacent service-client contract probe; mirrored definition order and strengthened direct/materialized order assertions. |
+| 2026-09-03 | G | stock-init proof | Isolated local-source sqlite init, service generation, codegen, and the exact resource command twice all exited 0; first run wrote 11 and rerun skipped 11 with zero conflicts. No `e2e:cli` runtime suite was run. |
+| 2026-09-03 | G | cycle-2 author gates | Focused 88/88 and full CLI 1716/1716 plus final check/lint/fmt, assets, publish, docs, doctrine, and quality gates all passed; `deno.lock` remains unchanged. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
 | `PLAN-EVAL: N/A` | Owner states the plan is locked and evaluated; this author lane implements only its mechanical Slice G. | user brief |
-| Resource/client `users`, procedure `list` | Matches generated contract vocabulary and explicitly resolves multi-client ambiguity. | locked plan + current scaffold order |
-| Compose after `service.list` | All client generation/discovery prerequisites are complete before first run. | locked plan + `scaffold-gates.ts` |
+| Resource `people`; client `users`; procedure `list` | Keeps explicit client/procedure selection while avoiding init's existing `appRoutes.users` alias. | IMPL-EVAL cycle 1 stock-init reproduction |
+| Execute after database codegen and its service-client contract probe | Procedure resolution imports generated Zod CRUD output; the existing probe must remain immediately adjacent to codegen, so the resource pair follows it and precedes generated quality/type-check gates. | evaluator finding + full-suite invariant |
 | Do not run hosted/runtime commands | Author-lane prohibition is explicit. | user brief |
 
 ## Drift
@@ -91,6 +95,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | ----- | -------- | ------------------ |
 | Captured-stdout reachability required item 8; PR #1891 amended the locked plan and the authorized fixture update is complete. | significant, resolved | yes |
 | Slice F's remote branch advanced by three harness-evidence commits after the dispatched baseline; product files are disjoint and the PR still targets that branch. | minor | yes |
+| Runtime prerequisites were not traced at design time: codegen output and router-alias ownership both blocked the original gate. | high, resolved | yes |
+| Existing service-client order regression requires its contract probe immediately after codegen; the resource pair follows that probe within the same ceiling. | significant, resolved | yes |
 
 ## Gate Results
 
@@ -98,7 +104,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| focused regressions | structured test wrapper over resource/guidance, command-tree, composition, capability, registry, and runner tests | PASS, exit 0 | 55 passed, 0 failed, 0 ignored. |
+| focused regressions | structured test wrapper over resource/guidance, runtime capability, service-client order, registry, and runner tests | PASS, exit 0 | 88 passed, 0 failed, 0 ignored. |
 | CLI check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 980 files, 9 batches, 0 failed batches, 0 diagnostics. |
 | authorized-file lint | structured lint wrapper with no-exclusion temporary config | PASS, exit 0 | 8 selected/processed, 0 findings/refusals. |
 | authorized-file format | structured fmt wrapper with no-exclusion temporary config | PASS, exit 0 | 8 selected/processed, 0 findings/refusals. |
@@ -129,11 +135,12 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| generated guidance/resource acceptance | PASS | focused structured tests: 55/55 | Static author-lane only; hosted proof remains pending. |
+| generated guidance/resource acceptance | PASS | focused structured tests: 88/88 | Static author-lane plus the permitted stock-init CLI proof; hosted runtime remains pending. |
+| stock-init resource command | PASS, exit 0 | sqlite init + service generation + database codegen + exact `generate resource people --client users --procedure list --partial --app cycle2-proof-web` twice | First stdout: `Resource slice applied: 11 written, 0 skipped, 0 conflicts.` Rerun stdout: `Resource slice applied: 0 written, 11 skipped, 0 conflicts.` |
 
 ## Handoff Notes
 
-- Inspect the two stable IDs, exact command arrays, direct `RUNTIME_GATES` selection, materialized runtime order, and identical guidance sentence first.
+- Inspect the two stable IDs, the `people` command arrays, direct `RUNTIME_GATES` selection, codegen/contract/resource materialized order, and identical guidance sentence first.
 - PR #1891 supplied the minimal plan amendment; the authorized item-8 fix is green in both focused and full-suite coverage.
 - Hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` remains required in CI and was not run by this author lane.
 - Non-draft PR #1958 targets `feat/cli-resource-slice-activate` with `orchestrator:features`, `status:impl`, `type:feat`, `area:cli`, `priority:p2`, and `wave:v1`; milestone is 0.0.7.
