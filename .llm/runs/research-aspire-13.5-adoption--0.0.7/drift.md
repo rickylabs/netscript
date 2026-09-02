@@ -7917,3 +7917,59 @@ restoring main's canonical file and re-running it, the gate already exits 1 on m
 the canonical/mirror pair disagrees and the sync arbitrates by deletion, so anything added to
 `.agents/skills/aspire/SKILL.md` is temporary. Until the authoritative direction is decided and the
 gate enforces it, this will keep happening to whoever edits the mirror.
+
+## D-306 — owner ruling reverses skill authority; my canonical carry reverted
+
+Owner ruling: `.agents/skills/**` is the **sole** authoritative skill tree; `.claude/skills/**`
+retains one bridge skill pointing there, and CLAUDE.md will require that lookup. #1907 is explicitly
+not to be copied into `skills/aspire`, and no destructive sync is to be run. The coordinator
+implements the global bridge/sync-tool repair separately.
+
+`712776baf` (D-305's canonical carry) did exactly what the ruling forbids, so it is reverted as
+`37345dc1b`. The original reasoning was sound under its stated assumption — `syncCanonicalAspire()`
+rewrites `.agents` from `skills/aspire`, so canonical looked authoritative — but the ruling resolves
+the divergence in the opposite direction, which makes the copy a duplicate rather than a rescue.
+
+Nothing is lost: #1907's guidance lives in `.agents/skills/aspire/SKILL.md` on main, and S9's own
+#1887 DCP prose is in `.agents/skills/aspire/SKILL.md` (8 mentions) — more than the reverted canonical
+copy held, so the revert removed only the duplicate. Carriers re-verified: `check:assets-barrel` PASS,
+`check:publish-assets` PASS.
+
+## D-307 — file overlap across the live Aspire branches
+
+Reported per the ruling's "file overlap only" instruction. Own-diff-vs-main footprints: S9
+`37345dc1b` 191 files, S10 `4cce17266` 40, S13 `6a04999e3` 63.
+
+**S10 ∩ S9 = 8 files — the only overlap carrying merge-order risk**, because six are shared product
+code both slices edit:
+
+    packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts
+    packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts
+    packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts
+    packages/cli/e2e/src/domain/cli-surface.ts
+    packages/cli/e2e/suites/scaffold/capability-suites.ts
+    packages/cli/e2e/tests/application/builders/runtime-gates_test.ts
+    packages/cli/e2e/tests/presentation/suite-registry_test.ts
+    .llm/tools/gates/catalog.ts
+
+`runtime-gates.ts` already produced a real conflict when S10 converged onto main after S8 merged, and
+the correct resolution there was counter-intuitive (drop the `ASPIRE_START_SCRIPT` import, because S10
+changes *how* the start gate runs rather than removing it). Whichever of S9/S10 merges second will
+meet the same file again.
+
+**S10 ∩ S13 = 1**: `aspire-surface-manifest.tsv`. Benign but ordered — S13 must regenerate the
+manifest after S10 merges, which is already its established post-merge routine.
+
+**S13 ∩ S9 = 2**: `deno.json` and `packages/cli/src/kernel/assets/embedded.generated.ts` (generated
+carrier; regenerate rather than resolve).
+
+**Skill-tree overlap with the coordinator's bridge repair** — the one worth pre-empting:
+
+- S9 touches `.agents/skills/aspire/SKILL.md`, `.claude/skills/aspire/SKILL.md`,
+  `.claude/skills/netscript-harness/SKILL.md`, plus `skills/aspire/SKILL.md` and `skills/help.md`
+  from earlier version-literal work. The last two are now non-authoritative under the ruling.
+- S13 touches `.agents/skills/codex-wsl-remote/SKILL.md` **and** `.claude/skills/codex-wsl-remote/SKILL.md`.
+
+Both branches therefore carry edits under `.claude/skills/**` beyond the single bridge skill the
+ruling preserves. If the bridge repair prunes that tree, those edits conflict or are dropped. Flagged
+rather than acted on.
