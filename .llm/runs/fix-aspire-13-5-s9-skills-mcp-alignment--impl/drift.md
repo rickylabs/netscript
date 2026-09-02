@@ -116,3 +116,22 @@
   unclaimed. Do not restore raw unauthenticated HTTP or weaken anonymous-mode authentication.
 - **Evidence:** realistic adapter regression and upstream source inspection; hosted tiers remain
   coordinator-held until #1908.
+
+## 2026-09-02 — MCP trace summaries are not a span source
+
+- **What:** The authenticated MCP repair encoded an unobserved inline `spans` array on
+  `list_traces`, but Aspire 13.5.3 exposes no MCP span tool.
+- **Source:** `.agents/skills/aspire/SKILL.md` S9-STATIC receipt plus hosted docker run
+  `33592084708`, where TC-1/TC-2 could not find any named spans.
+- **Expected:** `TelemetryQueryPort.queryTraces()` returns spans grouped by trace ID without using
+  unauthenticated Dashboard HTTP.
+- **Actual:** Real `list_traces` summaries normalized to `scopeSpans: [{ spans: [] }]`. The
+  documented `aspire otel spans` projection supplies core span identity, parent, kind, source,
+  status, duration, and attributes, but does not establish timestamp, event, or link fields.
+- **Severity:** significant runtime fixture/evidence correction.
+- **Action:** source trace summaries and flat spans from authenticated `aspire otel traces|spans`,
+  group by `traceId`, keep MCP only for structured logs, and retain deterministic empty/default
+  normalization for fields absent from the documented CLI projection. Hosted acceptance remains
+  explicitly unclaimed.
+- **Evidence:** honest no-inline-span RED and documented-field GREEN in
+  `aspire-dashboard-telemetry_test.ts`; full static E2E tests pass 242/242.

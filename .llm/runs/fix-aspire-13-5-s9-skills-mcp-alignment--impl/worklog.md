@@ -69,6 +69,24 @@ or the canonical generator source and run the documented generators.
   regression; prove with focused wrapper tests, scoped wrappers, quality gates, and root check.
 - **Deferred:** live runtime proof remains CI/supervisor-owned under the host lease.
 
+### Aspire CLI Span-Source Repair Design
+
+- **Public surface:** unchanged. `createLiveAspireTelemetryQuery()` still returns the existing
+  `TelemetryQueryPort`; all four gate consumers keep their current call shape.
+- **Domain vocabulary:** `AspireCliTelemetryCommandRunner` is the injected process seam; trace
+  summaries select trace IDs and flat CLI spans are grouped by `traceId`.
+- **Ports:** MCP remains the authenticated structured-log port. The injected Aspire CLI runner owns
+  `ps` discovery plus `otel traces|spans`; production wiring uses `Deno.Command`, while tests use
+  documented JSON records.
+- **Constants:** exact non-interactive JSON command suffix and `--dashboard-url` derived from the
+  matching AppHost in `aspire ps`.
+- **Commit slice:** first prove the assumed inline-span fixture RED, then route trace/span reads to
+  the CLI seam and close the requested static wrapper gates in one repair commit.
+- **Deferred:** live AppHost execution, hosted tiers, workflow/lifecycle changes, raw HTTP, and
+  fields absent from the documented CLI span projection.
+- **Contributor path:** extend the focused telemetry adapter test with a documented CLI output
+  field before changing the normalizer; keep dashboard log behavior in the MCP half of the adapter.
+
 ## Progress Log
 
 | Time | Slice | Step | Notes |
@@ -189,6 +207,14 @@ or the canonical generator source and run the documented generators.
 | Authenticated telemetry scoped lint/fmt | PASS | Rules-preserving no-exclude config processed 6/6 files; lint and `fmt --check` each exited 0 with zero findings. Temporary config removed after evidence capture. |
 | Authenticated telemetry quality gate | PASS | `deno task quality:gate` exit 0; quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
 | Authenticated telemetry runtime/workflows/evaluator | NOT RUN by ruling | No Aspire, AppHost, Docker, hosted tier, `e2e:cli`, workflow mutation, or evaluator dispatch occurred. |
+| Aspire CLI span-source RED | EXPECTED FAIL | Structured focused wrapper exit 1; 1 passed, 1 failed. With the realistic no-inline-span `list_traces` summary, actual normalization produced `spans: []` and could not expose `job.execute`. |
+| Aspire CLI span-source focused GREEN | PASS | Structured wrapper exit 0; 2 passed, 0 failed. The documented flat CLI span fields group by `traceId`, preserve Flow-B identity, exercise `--trace-id`, and make zero MCP trace calls. |
+| Aspire CLI span-source affected tests | PASS | Structured wrapper exit 0; 21 passed, 0 failed across the adapter, Flow-B validation, producer reconnect, and live DB correlation. The first guessed-path attempt exited 1 with zero tests and is a recorded non-verdict; the corrected colocated paths supplied the verdict. |
+| Aspire CLI span-source requested suite | PASS | Exact `deno test --allow-all packages/cli/e2e/tests/` through the structured wrapper: exit 0; 242 passed, 0 failed. |
+| Aspire CLI span-source scoped check | PASS | Structured wrapper exit 0; 2 changed TypeScript files; `deno check --unstable-kv`; one batch, zero diagnostics. |
+| Aspire CLI span-source scoped lint/fmt | PASS | Rules-preserving no-exclude config processed 2/2 files; lint and `fmt --check` each exited 0 with zero findings. Temporary config removed. |
+| Aspire CLI span-source quality gate | PASS | `deno task quality:gate` exit 0; quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
+| Aspire CLI span-source runtime/workflows/evaluator | NOT RUN by ruling | No Aspire command, AppHost, Docker, hosted tier, `e2e:cli`, workflow mutation, or evaluator dispatch occurred. |
 
 ## Handoff Notes
 
@@ -214,3 +240,6 @@ or the canonical generator source and run the documented generators.
 - The Aspire 13.5.3 MCP projection does not carry every raw OTLP field; static tests prove the
   adapter's declared projection mapping, but only the held hosted tiers can establish the complete
   Flow-B/reconnect runtime verdict after this transport change.
+- The CLI span fixture contains only the field list documented by the Aspire skill. Because that
+  list has no timestamp, event, or link fields, the adapter uses deterministic time zero plus
+  `durationMs` and preserves empty event/link collections; live fidelity remains unclaimed.

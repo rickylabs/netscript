@@ -44,3 +44,16 @@
   pre-start fixtures before `runtime.aspire-start`, then describe and `agent.aspire-mcp-smoke` after
   start. It also eliminated sqlite capability routing: the sqlite tier selects the same start gate
   and differs only through sqlite defaults and removal of Postgres-only gates.
+
+## Aspire CLI span-source repair re-baseline
+
+- HEAD and the remote branch both resolve to `3ba9c414b`; the opening worktree is clean.
+- The repository's Aspire 13.5.3 receipt states that MCP has no span tool. The current adapter still
+  destructures a hypothetical inline `spans` array from `list_traces`, so real trace summaries
+  normalize to traces with zero spans.
+- `aspire otel spans` documents the fields `traceId`, `spanId`, `parentSpanId`, `kind`, `name`,
+  `source`, `status`, `statusMessage`, `durationMs`, and `attributes`; it does not establish span
+  timestamps, events, or links. The fixture and normalization must not invent those input fields.
+- The nested `packages/cli/e2e` workspace is the CLI-owned harness rather than a separately
+  published doctrine unit. The existing package-owned `TelemetryQueryPort` remains the boundary;
+  no public or JSR surface changes.

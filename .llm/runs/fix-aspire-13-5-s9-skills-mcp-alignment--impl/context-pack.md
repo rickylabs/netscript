@@ -12,11 +12,11 @@
 
 ## Current State
 
-The telemetry gate layer now reads authenticated Aspire telemetry through `aspire agent mcp` stdio
-instead of unauthenticated Dashboard HTTP. The shared `TelemetryQueryPort` shape is unchanged, the
-private Flow-B reader uses the same adapter, and the unused compatibility reader was removed. Static
-tests and scoped gates pass; no AppHost, Docker container, hosted runtime tier, workflow mutation,
-or evaluator was started.
+The telemetry gate layer now reads trace summaries and flat spans through authenticated
+`aspire otel traces|spans` CLI calls, while structured logs remain on `aspire agent mcp` stdio. The
+shared `TelemetryQueryPort` shape and all four consumers are unchanged, and no raw Dashboard HTTP
+reader exists in the E2E gate tree. Static tests and scoped gates pass; no AppHost, Docker container,
+hosted runtime tier, workflow mutation, or evaluator was started.
 
 ## Completed
 
@@ -39,10 +39,12 @@ or evaluator was started.
   blob-identical.
 - Authenticated telemetry repair is RED/GREEN complete with realistic MCP output, all raw Dashboard
   readers removed, and the requested static suite green.
+- The follow-up CLI span-source repair replaced the false inline-`spans` assumption with documented
+  Aspire 13.5.3 span records grouped by `traceId`; the focused and full static suites are green.
 
 ## In Progress
 
-- Commit the authenticated telemetry slice and push it to the existing branch.
+- Commit the Aspire CLI span-source repair and push it to the existing branch.
 
 ## Next Steps
 
@@ -57,7 +59,7 @@ or evaluator was started.
 | Phase A only | owner dispatch | Never start an AppHost or containers. |
 | External evaluation | harness + supervisor | This session does not self-certify. |
 | D-213 is convergence, not repair | owner dispatch | Do not chase `database.seed`; preserve product blobs and let CI supply runtime evidence. |
-| MCP owns telemetry authentication | owner dispatch | Keep anonymous mode false; normalize stdio tool results behind the existing query port. |
+| Aspire CLI + MCP own telemetry authentication | owner dispatch | Keep anonymous mode false; CLI supplies traces/spans, MCP supplies structured logs, and the existing query port remains stable. |
 
 ## Files Changed
 
@@ -80,13 +82,14 @@ or evaluator was started.
 | D-194 static repair | PASS | RED-first lifecycle config-path regression; 43 focused tests; 3-file scoped check/lint/fmt; quality gate; repo check with `failedBatches: 0` |
 | D-213 convergence | PASS pending delivery | Exact S8 ancestry; 12-commit mapping; 23/23 non-generated blobs identical; generated barrel reproducible; 21-file scoped gates; 82 tests; parity `fail=0`; quality gate green |
 | Authenticated telemetry static slice | PASS pending delivery | RED captured; focused 2/2; affected 73/73; requested suite 241/241; 6-file check/lint/fmt; quality gate green |
+| Aspire CLI span-source repair | PASS pending delivery | Honest empty-inline-span RED; focused 2/2; affected 21/21; requested suite 242/242; 2-file check/lint/fmt; quality gate green |
 
 ## Open Questions
 
 - How upstream Aspire intends `get_integration_docs` to become available remains unresolved; no
   Phase-A evidence permits claiming it was observed.
-- Aspire's MCP projection omits some raw OTLP fidelity; the held hosted tiers must establish whether
-  every later Flow-B/reconnect assertion can be satisfied through the projected surface.
+- Aspire CLI span output does not document timestamps, events, or links; the held hosted tiers must
+  establish whether every later Flow-B/reconnect assertion can be satisfied through this projection.
 
 ## Drift and Debt
 
@@ -98,6 +101,8 @@ or evaluator was started.
   `d213-converge-onto-s8.md`.
 - Significant drift: Aspire MCP trace/log output is a lossy projection; see the 2026-09-02 entry in
   `drift.md`.
+- Significant drift correction: MCP `list_traces` is summary-only and the CLI span projection is
+  required for span-level detail; see the follow-up 2026-09-02 entry in `drift.md`.
 - Debt: no new debt accepted.
 
 ## Commits

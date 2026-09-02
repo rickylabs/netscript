@@ -3,29 +3,37 @@ import {
   type TelemetryQueryPort,
   type TelemetryTrace,
 } from '@netscript/telemetry/query';
+import { resolve } from '@std/path';
 import type { FlowBProducerIdentity } from './select-flow-b-stream-change.ts';
 import { readAspireMcpEntryPoint } from './aspire-mcp/entry-point.ts';
 import { createStdioAspireMcpTransport } from './aspire-mcp/stdio-transport.ts';
 import { ASPIRE_MCP_DASHBOARD_TOOLS } from './aspire-mcp/tools.ts';
 
-type AspireMcpTelemetryTool =
-  | 'list_traces'
-  | 'list_structured_logs'
-  | 'list_trace_structured_logs';
+type AspireMcpTelemetryTool = 'list_structured_logs' | 'list_trace_structured_logs';
 
 export type AspireMcpTelemetryToolCaller = (
   name: AspireMcpTelemetryTool,
   args: Readonly<Record<string, unknown>>,
 ) => Promise<unknown>;
 
-const MCP_ENDPOINT = 'http://aspire-mcp.invalid';
+export type AspireCliTelemetryCommandRunner = (
+  args: readonly string[],
+) => Promise<unknown>;
 
-/** Create the suite telemetry port over Aspire's authenticated stdio MCP transport. */
+const MCP_ENDPOINT = 'http://aspire-mcp.invalid';
+const ASPIRE_JSON_ARGUMENTS = ['--format', 'Json', '--non-interactive', '--nologo'] as const;
+
+/** Create the suite telemetry port over authenticated Aspire CLI and stdio MCP transports. */
 export async function createLiveAspireTelemetryQuery(
   projectRoot: string,
 ): Promise<TelemetryQueryPort> {
   const entryPoint = await readAspireMcpEntryPoint(projectRoot);
-  return createAspireMcpTelemetryQuery(async (name, args) => {
+  const runAspire = createAspireJsonCommandRunner(projectRoot);
+  const dashboardUrl = selectDashboardUrl(
+    await runAspire(['ps', ...ASPIRE_JSON_ARGUMENTS]),
+    projectRoot,
+  );
+  const callTool: AspireMcpTelemetryToolCaller = async (name, args) => {
     const transport = createStdioAspireMcpTransport(entryPoint);
     try {
       await transport.initialize();
@@ -33,41 +41,54 @@ export async function createLiveAspireTelemetryQuery(
     } finally {
       await transport.close().catch(() => undefined);
     }
-  });
+  };
+  return createAspireMcpTelemetryQuery(callTool, runAspire, dashboardUrl);
 }
 
-/** Adapt authenticated Aspire MCP telemetry tools to the package-owned query contract. */
+/** Adapt authenticated Aspire CLI spans and MCP logs to the package-owned query contract. */
 export function createAspireMcpTelemetryQuery(
   callTool: AspireMcpTelemetryToolCaller,
+  runAspire: AspireCliTelemetryCommandRunner,
+  dashboardUrl: string,
 ): TelemetryQueryPort {
   return new AspireTelemetryQuery({
     endpoint: MCP_ENDPOINT,
-    fetch: createLiveAspireFetch(callTool),
+    fetch: createLiveAspireFetch(callTool, runAspire, dashboardUrl),
   });
 }
 
-/** Translate package query requests into Aspire MCP telemetry tool calls. */
-export function createLiveAspireFetch(callTool: AspireMcpTelemetryToolCaller): typeof fetch {
+/** Translate package query requests into authenticated Aspire CLI and MCP calls. */
+export function createLiveAspireFetch(
+  callTool: AspireMcpTelemetryToolCaller,
+  runAspire: AspireCliTelemetryCommandRunner,
+  dashboardUrl: string,
+): typeof fetch {
   return async (input) => {
     try {
       const url = requestUrl(input);
       const path = url.pathname.replace('/api/telemetry/', '');
       if (path === 'traces') {
-        const traces = await readToolItems(callTool, 'list_traces', traceArguments(url));
-        return Response.json({ traces: filterTraces(traces, url) });
+        const [summaries, spans] = await Promise.all([
+          readAspireTelemetryItems(runAspire, 'traces', dashboardUrl, url),
+          readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url),
+        ]);
+        return Response.json({ traces: groupAspireCliSpans(summaries, spans, url) });
       }
       if (path.startsWith('traces/') && path !== 'traces/export') {
         const traceId = decodeURIComponent(path.slice('traces/'.length));
-        const traces = await readToolItems(callTool, 'list_traces', { search: traceId });
-        const trace = traces.map(normalizeMcpTrace).find((item) =>
-          isRecord(item) && item.traceId === traceId
+        const spans = await readAspireTelemetryItems(
+          runAspire,
+          'spans',
+          dashboardUrl,
+          url,
+          traceId,
         );
+        const trace = groupAspireCliSpans([{ traceId }], spans, url)[0];
         return Response.json({ data: trace });
       }
       if (path === 'spans') {
-        const traces = await readToolItems(callTool, 'list_traces', traceArguments(url));
-        const spans = filterTraces(traces, url).flatMap(mcpTraceSpans);
-        return Response.json({ spans });
+        const spans = await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url);
+        return Response.json({ spans: spans.map(normalizeAspireCliSpan) });
       }
       if (path === 'logs') {
         const logs = await readToolItems(callTool, 'list_structured_logs', traceArguments(url));
@@ -122,6 +143,55 @@ function traceArguments(url: URL): Readonly<Record<string, unknown>> {
   return resourceName ? { resourceName } : {};
 }
 
+function createAspireJsonCommandRunner(projectRoot: string): AspireCliTelemetryCommandRunner {
+  return async (args) => {
+    const output = await new Deno.Command('aspire', {
+      args: [...args],
+      cwd: projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const stdout = new TextDecoder().decode(output.stdout).trim();
+    const stderr = new TextDecoder().decode(output.stderr).trim();
+    if (!output.success) {
+      throw new Error(
+        `aspire ${args.join(' ')} failed (${output.code}): ${stderr || stdout || '(no output)'}`,
+      );
+    }
+    return parseJsonValue(stdout, stdout.includes('[') ? '[' : '{');
+  };
+}
+
+function selectDashboardUrl(value: unknown, projectRoot: string): string {
+  if (!Array.isArray(value)) throw new Error('aspire ps JSON was not an array');
+  const expectedAppHost = resolve(projectRoot, 'aspire', 'apphost.mts');
+  const selected = value.find((entry) =>
+    isRecord(entry) && typeof entry.appHostPath === 'string' &&
+    resolve(entry.appHostPath) === expectedAppHost
+  );
+  if (!isRecord(selected) || typeof selected.dashboardUrl !== 'string') {
+    throw new Error(`aspire ps omitted the AppHost at ${expectedAppHost}`);
+  }
+  return selected.dashboardUrl;
+}
+
+async function readAspireTelemetryItems(
+  runAspire: AspireCliTelemetryCommandRunner,
+  kind: 'traces' | 'spans',
+  dashboardUrl: string,
+  url: URL,
+  traceId?: string,
+): Promise<readonly unknown[]> {
+  const args: string[] = ['otel', kind];
+  const resourceName = url.searchParams.get('resource');
+  if (resourceName) args.push(resourceName);
+  args.push(...ASPIRE_JSON_ARGUMENTS, '--dashboard-url', dashboardUrl);
+  if (traceId) args.push('--trace-id', traceId);
+  const value = await runAspire(args);
+  if (!Array.isArray(value)) throw new Error(`aspire otel ${kind} JSON was not an array`);
+  return value;
+}
+
 async function readToolItems(
   callTool: AspireMcpTelemetryToolCaller,
   name: AspireMcpTelemetryTool,
@@ -137,7 +207,7 @@ async function readToolItems(
   const items = result.items ?? result.entries;
   if (Array.isArray(items)) return items;
   if (typeof result.text !== 'string') throw new Error(`${name} omitted telemetry JSON`);
-  const marker = name === 'list_traces' ? '# TRACES DATA' : '# STRUCTURED LOGS DATA';
+  const marker = '# STRUCTURED LOGS DATA';
   const markerIndex = result.text.indexOf(marker);
   if (markerIndex < 0) throw new Error(`${name} omitted ${marker}`);
   const parsed = parseJsonValue(result.text.slice(markerIndex + marker.length), '[');
@@ -145,25 +215,8 @@ async function readToolItems(
   return parsed;
 }
 
-function filterTraces(items: readonly unknown[], url: URL): readonly unknown[] {
-  let traces = items.map(normalizeMcpTrace);
-  const since = parseDate(url.searchParams.get('since'));
-  if (since !== undefined) traces = traces.filter((trace) => traceTimestamp(trace) >= since);
-  return applyLimit(traces, url.searchParams.get('limit'));
-}
-
-function normalizeMcpTrace(value: unknown): unknown {
+function normalizeAspireCliSpan(value: unknown): unknown {
   if (!isRecord(value)) return value;
-  const { spans, ...trace } = value;
-  return {
-    ...trace,
-    scopeSpans: [{ spans: Array.isArray(spans) ? spans.map(normalizeMcpSpan) : [] }],
-  };
-}
-
-function normalizeMcpSpan(value: unknown): unknown {
-  if (!isRecord(value)) return value;
-  const startTimeUnixMs = parseDate(value.timestamp);
   const durationMs = typeof value.durationMs === 'number' ? value.durationMs : undefined;
   const attributes = isRecord(value.attributes) ? { ...value.attributes } : {};
   if (typeof value.source === 'string' && attributes['service.name'] === undefined) {
@@ -171,13 +224,46 @@ function normalizeMcpSpan(value: unknown): unknown {
   }
   return {
     ...value,
-    startTimeUnixMs: value.timestamp,
-    endTimeUnixMs: startTimeUnixMs !== undefined && durationMs !== undefined
-      ? new Date(startTimeUnixMs + durationMs).toISOString()
-      : undefined,
+    startTimeUnixMs: 0,
+    endTimeUnixMs: durationMs,
     statusCode: normalizeStatus(value.status),
     attributes,
   };
+}
+
+function groupAspireCliSpans(
+  summaries: readonly unknown[],
+  spans: readonly unknown[],
+  url: URL,
+): readonly unknown[] {
+  const since = parseDate(url.searchParams.get('since'));
+  const summaryIds = summaries.filter((summary) => {
+    const timestamp = isRecord(summary) ? parseDate(summary.timestamp) : undefined;
+    return since === undefined || timestamp === undefined || timestamp >= since;
+  }).flatMap((summary) =>
+    isRecord(summary) && typeof summary.traceId === 'string' ? [summary.traceId] : []
+  );
+  const orderedSummaryIds = [...new Set(summaryIds)];
+  const hasTraceSummaries = summaries.some((summary) =>
+    isRecord(summary) && typeof summary.traceId === 'string'
+  );
+  const allowedIds = new Set(orderedSummaryIds);
+  const grouped = new Map<string, unknown[]>();
+  for (const value of spans) {
+    if (!isRecord(value) || typeof value.traceId !== 'string') continue;
+    if (hasTraceSummaries && !allowedIds.has(value.traceId)) continue;
+    const current = grouped.get(value.traceId) ?? [];
+    current.push(normalizeAspireCliSpan(value));
+    grouped.set(value.traceId, current);
+  }
+  const orderedIds = [
+    ...orderedSummaryIds.filter((traceId) => grouped.has(traceId)),
+    ...[...grouped.keys()].filter((traceId) => !allowedIds.has(traceId)),
+  ];
+  return applyLimit(
+    orderedIds.map((traceId) => ({ traceId, scopeSpans: [{ spans: grouped.get(traceId) ?? [] }] })),
+    url.searchParams.get('limit'),
+  );
 }
 
 function filterLogs(items: readonly unknown[], url: URL): readonly unknown[] {
@@ -204,23 +290,6 @@ function normalizeMcpLog(value: unknown): unknown {
     body: value.message,
     attributes,
   };
-}
-
-function traceTimestamp(value: unknown): number {
-  if (!isRecord(value)) return 0;
-  const timestamp = parseDate(value.timestamp);
-  if (timestamp !== undefined) return timestamp;
-  const spanTimes = mcpTraceSpans(value).map((span) =>
-    isRecord(span) ? parseDate(span.startTimeUnixMs) ?? 0 : 0
-  );
-  return spanTimes.length > 0 ? Math.min(...spanTimes) : 0;
-}
-
-function mcpTraceSpans(value: unknown): readonly unknown[] {
-  if (!isRecord(value) || !Array.isArray(value.scopeSpans)) return [];
-  return value.scopeSpans.flatMap((scope) =>
-    isRecord(scope) && Array.isArray(scope.spans) ? scope.spans : []
-  );
 }
 
 function applyLimit(items: readonly unknown[], value: string | null): readonly unknown[] {

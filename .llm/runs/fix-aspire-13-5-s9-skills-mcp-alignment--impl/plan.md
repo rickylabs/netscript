@@ -73,3 +73,18 @@
   the unused compatibility script that still embedded a raw Dashboard telemetry fetch.
 - Deferred: hosted sqlite/docker runtime tiers, Aspire/AppHost/Docker execution, workflow edits,
   evaluator dispatch, PR base/lifecycle changes, and any anonymous-mode reversal.
+
+## Aspire CLI span-source repair
+
+- Plan-Gate: `N/A`. The owner supplied the proven hosted RED, the exact false fixture assumption,
+  the authenticated CLI commands, the unchanged `TelemetryQueryPort` contract, and the complete
+  static gate set; no architecture or scope decision remains open.
+- Locked repair: keep MCP only for structured-log reads; obtain trace summaries and span detail from
+  `aspire otel traces|spans --format Json --dashboard-url <ps-url> --non-interactive --nologo`, and
+  group the documented flat span records by `traceId` behind the existing query port.
+- Regression contract: an Aspire `list_traces`/trace-summary payload with no inline spans is the RED
+  baseline; a fixture containing only the span fields documented in `.agents/skills/aspire/SKILL.md`
+  must populate the grouped trace through the injected CLI seam.
+- Deferred: live AppHost authentication/discovery, hosted sqlite/docker tiers, workflow changes,
+  evaluator dispatch, raw Dashboard HTTP, anonymous-mode reversal, and any telemetry contract
+  expansion for fields the Aspire CLI does not expose.
