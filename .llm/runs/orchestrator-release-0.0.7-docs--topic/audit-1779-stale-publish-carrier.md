@@ -36,3 +36,11 @@ Handed to the Aspire supervisor as a PR comment. No label changes.
 
 Pattern worth the coordinator's eye: two active 0.0.7 PRs (#1779, #1938) stale a generated carrier
 in `packages/mcp/src/` and both collide with `main` on it. Regenerate-after-merge is the rule.
+
+## Closure
+
+- #1779 rebased onto `850cc7757`, carrier + corpus regenerated (`3352583`); `quality` **success** on
+  run 33656583038. Finding closed on the PR.
+- #1938 regenerated the corpus **before** merging `main` → `DIRTY` on the carrier as predicted;
+  fix sequence posted. Awaiting a new head.
+- #1941 (features), #1942 (fixes) opened: code-only, clean. #1883/#1759 heads: code-only, clean.
