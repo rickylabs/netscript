@@ -48,7 +48,9 @@
 - `@netscript/plugin/sdk` publishes `createPluginServiceContext`, third-party plugin factories now
   participate in AST discovery, and `plugin doctor` derives its expected registry sources from the
   same generator selection that writes the registry when a manifest advertises
-  `inspectionProtocol: 1`.
+  `inspectionProtocol: 1`. `createPluginServiceContext` also accepts caller-owned async environment
+  and `getAppsettings` resolvers, resolved once at assembly while the DB and KV adapters stay lazy
+  and memoized.
 - `@netscript/kv` publishes `createLazyKv`; the scaffolded plugin service template consumes it
   instead of emitting a per-project copy.
 - The SDK ships the typed client-contribution seam from RFC 0001: the public descriptor, helper, and
