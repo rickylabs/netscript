@@ -10892,3 +10892,15 @@ top-level `e2e-cli-${ref}` group cancelled the superseded run — designed, not 
 `478450a3c`: merge clean, readiness 4 / stream 4 / polling 0, four `check:` gates 0, lock churn 0,
 tests 4/0 · 3/0 · 10/0, e2e type-check 0. CI `33694943768` and e2e `33694943994` running; the
 watcher now re-keys by branch head so further pushes cannot strand it.
+
+### D-265 — Canary 7: publish green (canary.7 published), prove red on `behavior.live-db-endpoint`; my "not in the prod suite" claim was wrong
+
+Prod E2E `33694087495` 22 steps, 71/1, failed gate `behavior.live-db-endpoint` (`    error: Uncaught (in promise) Error: Postgres resource exposed no TCP URL
+        at tcpUrl (file:///home/runner/work/netscript/netscript/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts:429:9)
+        at readReceipt (file:///home/runner/work/netscript/netscript/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts:226:23)
+        at async verifyLiveDbEndpoint (file:///home/runner/work/netscript/netscript/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts:71:17)` — first line).
+Correction recorded on #1641: the gate IS in the prod suite (71 gates vs 59 on canary.6; my artifact
+grep missed it), so the 13.5.3 describe URL-scheme drift is now the cut blocker. Isolation stands;
+intermittency (pass on #1952's docker run, fail here and twice on #1957) points at a race between
+`describe` and endpoint allocation. Owner aspire; diagnostic leaf offered (capture describe JSON in
+the failure path). #1952 unaffected, awaiting CI at 478450a3c.
