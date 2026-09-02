@@ -115,3 +115,22 @@ Predicted collision materialised: #1938, #1943, #1944 (all Fixes, all `ready-mer
 - **#1946** `37b3b9b65` (Features): internal `resource-slice/` code only; no export/carrier surface.
 
 No open docs finding. No `orchestrator:docs` issue in 0.0.7.
+
+## Stable-cut notes: #1947 → PR #1949, plus S9/#1883/#1948/#1664 resweep (main e341c6f71)
+
+- **#1949** `docs(cli): top up the 0.0.7 changelog before the stable cut` — head `85ca65cc4`
+  on `docs/changelog-0-0-7-topup`, base `e341c6f71`. One file, `packages/cli/CHANGELOG.md`,
+  +52 lines under `## 0.0.7`; hand-wrapped ≤ 100 cols, `check:publish-assets` exit 0 (package
+  CHANGELOGs are not embedded). `Closes #1947`, Docs labels, milestone 0.0.7, `status:impl`.
+  IMPL-EVAL dispatched to GLM 5.3 Flash · max (accuracy audit of every named export / version /
+  behavioural claim against `origin/main`, completeness vs the merged 0.0.7 list). Late merges
+  (#1856, #1943, #1944, #1942, #1895, #1759, #1664) deliberately not described yet — folded in at
+  the cut point.
+- **#1759 (S9)** new head `d2c0a51a0` → `status:ready-merge`: behind 0, no conflict (the earlier
+  code conflict with #1760 is resolved); all four carrier checks exit 0 on the head.
+- **#1883** `48cb86c04` ready-merge: behind 4, no conflict, no carriers/docs touched, `Closes` present.
+- **#1948** `4af7c98d5` impl (Features): behind 0, no conflict; touches `embedded.generated.ts` +
+  `resource-slice/README.md`; assets-barrel / publish-assets / mcp-export-corpus all exit 0. No
+  closing keyword in the body yet — expected at impl stage, owner Features.
+- **#1664** `a30405df1` impl-eval: behind 0, no conflict; corpus + embedded + two READMEs regenerated
+  cleanly (three checks exit 0).
