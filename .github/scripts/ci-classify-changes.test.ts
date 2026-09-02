@@ -140,7 +140,7 @@ Deno.test('docs surfaces are docs-only', () => {
       'docs/architecture/doctrine/x.md',
       '.llm/harness/workflow/run-loop.md',
       '.agents/skills/netscript-pr/SKILL.md',
-      '.claude/skills/repo-skills/SKILL.md',
+      '.claude/skills/x/SKILL.md',
       'CONTRIBUTING.mdx',
       '.github/pull_request_template.md',
     ]
