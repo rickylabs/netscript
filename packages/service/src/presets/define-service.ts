@@ -3,9 +3,10 @@
  *
  * @example
  * ```typescript
- * import { defineService } from '@netscript/service';
- * import { router } from './router.ts';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
  * import { db } from '@database';
+ *
+ * declare const router: ServiceRouter;
  *
  * await defineService(router, { name: 'users', port: 3000, db });
  * ```
@@ -152,8 +153,9 @@ export interface DefineServiceOptions extends ServiceConfig {
  * @example
  * ```typescript
  * // Minimal usage
- * import { defineService } from '@netscript/service';
- * import { router } from './router.ts';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * await defineService(router, { name: 'users', port: 3000 });
  * ```
@@ -161,9 +163,10 @@ export interface DefineServiceOptions extends ServiceConfig {
  * @example
  * ```typescript
  * // With database health check
- * import { defineService } from '@netscript/service';
- * import { router } from './router.ts';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
  * import { db } from '@database';
+ *
+ * declare const router: ServiceRouter;
  *
  * await defineService(router, {
  *   name: 'users',

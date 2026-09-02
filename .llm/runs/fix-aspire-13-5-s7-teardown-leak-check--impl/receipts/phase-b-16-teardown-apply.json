@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "phase": "S7 phase B rerun",
+  "status": "skipped-no-owned-runtime",
+  "reason": "No AppHost, container, volume, or phase-owned Aspire process was created.",
+  "commandsExecuted": [],
+  "terminatedProcesses": [],
+  "removedContainers": [],
+  "removedVolumes": [],
+  "foreignControlMutations": [],
+  "supervisorRelayMutations": []
+}

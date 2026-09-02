@@ -56,6 +56,13 @@ interface PublishConfig {
   exclude?: unknown;
 }
 
+/** One TypeScript source file selected by a publishable NetScript member's publish rules. */
+export interface PublishedSourceFile {
+  member: WorkspaceMember;
+  path: string;
+  memberRelativePath: string;
+}
+
 const sourceExtensions = new Set(['.ts', '.tsx']);
 
 /** Scan one source file for registry-unsafe asset loading. */
@@ -256,8 +263,13 @@ export function blankTemplateLiterals(source: string): string {
 
 /** Discover publishable workspace source files and scan them. */
 export async function scanPublishSurface(root: string): Promise<PreflightFinding[]> {
+  return await scanFiles((await discoverPublishedSourceFiles(root)).map((entry) => entry.path));
+}
+
+/** Discover publish-rule-selected TypeScript sources for publishable `@netscript/*` members. */
+export async function discoverPublishedSourceFiles(root: string): Promise<PublishedSourceFile[]> {
   const members = await discoverPublishableNetscriptMembers(root);
-  const files: string[] = [];
+  const files: PublishedSourceFile[] = [];
   for (const member of members) {
     const rules = await readPublishRules(root, member);
     const memberRoot = join(root, member.root);
@@ -278,11 +290,11 @@ export async function scanPublishSurface(root: string): Promise<PreflightFinding
         isSourceFile(entry.path) && !isTestFile(relativePath) &&
         isPublishedPath(memberRelativePath, rules)
       ) {
-        files.push(entry.path);
+        files.push({ member, path: entry.path, memberRelativePath });
       }
     }
   }
-  return await scanFiles(files);
+  return files.sort((a, b) => a.path.localeCompare(b.path));
 }
 
 /** Discover publishable workspace member source files that import their own bare specifier. */

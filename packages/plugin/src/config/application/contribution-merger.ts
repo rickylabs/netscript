@@ -7,6 +7,7 @@ export function mergeContributions(
 ): PluginContributions {
   return {
     services: [...(left.services ?? []), ...(right.services ?? [])],
+    sdkClients: [...(left.sdkClients ?? []), ...(right.sdkClients ?? [])],
     backgroundProcessors: [
       ...(left.backgroundProcessors ?? []),
       ...(right.backgroundProcessors ?? []),

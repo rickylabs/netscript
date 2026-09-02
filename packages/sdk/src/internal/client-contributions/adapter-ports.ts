@@ -9,12 +9,14 @@ import type {
   SdkClientTransportDescriptor,
 } from '../../ports/sdk-client-contribution.ts';
 import type { ServiceClientContext } from '../../ports/service-client.ts';
+import type { ResolvedCallTransportPolicy } from '../transport-policy.ts';
 
 /** One package-owned logical call epoch before contribution preparation. */
 export interface SdkClientLogicalCall<TContext extends object = object> {
   readonly context: Readonly<ServiceClientContext & TContext>;
   readonly procedurePath: readonly string[];
-  readonly procedureNode: unknown;
+  readonly procedure: SdkClientProcedureDescriptor;
+  readonly transportPolicy: ResolvedCallTransportPolicy;
   readonly transport: SdkClientTransportDescriptor;
   readonly input: unknown;
   readonly signal?: AbortSignal;

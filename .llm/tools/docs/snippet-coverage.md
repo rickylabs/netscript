@@ -53,14 +53,14 @@ without explicit reviewer-approved rationale.
 1. Remaining golden-path families: the rest of `web-layer/**`, `services-sdk/**`, and
    `quickstart/**`.
 2. Runtime guides: `ai/**`, `background-processing/**`, `data-persistence/**`,
-   `durable-workflows/**`, `identity-access/**`, `observability/**`,
-   `orchestration-runtime/**`, and `explanation/**`.
+   `durable-workflows/**`, `identity-access/**`, `observability/**`, `orchestration-runtime/**`, and
+   `explanation/**`.
 3. Tutorials: `tutorials/**`, one tutorial track per change so multi-file context stays reviewable.
-4. Reference prose fences: `reference/**`, coordinated with #1108 but without expanding that
-   issue's export-table scope. Canonicalize the seven `typescript` tags to `ts`; they already compile
-   as checked aliases, so that edit is tag cleanup rather than new coverage.
-5. Non-published source/templates under underscore directories, reported separately. Package
-   READMEs remain #1377.
+4. Reference prose fences: `reference/**`, coordinated with #1108 but without expanding that issue's
+   export-table scope. Canonicalize the seven `typescript` tags to `ts`; they already compile as
+   checked aliases, so that edit is tag cleanup rather than new coverage.
+5. Non-published source/templates under underscore directories, reported separately. Package READMEs
+   remain #1377.
 
 ## Known ratchet window
 
@@ -69,6 +69,6 @@ The demoted positive-presence needles `queryOptions({ input })`, `queryOptions(i
 4. Their positive presence is therefore not asserted in the interim. This is deliberate: literal
 presence was a false-green API check and compilation is its replacement.
 
-The retained exact one-page `createServiceQueryUtils` containment rule still prevents dialect B
-from appearing on golden-path pages. Only positive presence on its sanctioned reference page is in
-the temporary window; dialect placement remains enforced.
+The retained exact one-page `createServiceQueryUtils` containment rule still prevents dialect B from
+appearing on golden-path pages. Only positive presence on its sanctioned reference page is in the
+temporary window; dialect placement remains enforced.

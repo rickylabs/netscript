@@ -35,6 +35,7 @@ package's public surface reported by `deno doc`.
 | `redactAuthPrincipal` | function | Return a redacted principal snapshot for logging and diagnostics. |
 | `authErrorCodeForReason` | function | Map an auth failure reason to an auth error code. |
 | `authOutcomeForReason` | function | Map an auth failure reason to an operation outcome. |
+| `createBearerSdkClientContribution` | function | Create the canonical typed bearer contribution for explicit service-client tuples. |
 
 ## Contracts, schemas, and constants
 
@@ -70,12 +71,15 @@ package's public surface reported by `deno doc`.
 | `AuthUser` | type alias | Auth user payload. |
 | `AuthOperationOutcome` | type alias | Auth operation outcome value. |
 | `AuthStreamEvent` | type alias | Auth stream event payload. |
+| `CreateBearerSdkClientContributionOptions` | interface | Context resolver, cache policy, unmarked-route policy, and cleartext opt-in for the bearer contribution. |
+| `NetScriptAuthenticationRequirement` | type alias | Authentication metadata vocabulary: `none`, `optional`, or `required`. |
 
 ## Sub-path exports
 
 | Export | Path | Purpose |
 | --- | --- | --- |
 | `@netscript/plugin-auth-core` | `./mod.ts` | Root contract, port, schema, stream, and telemetry surface. |
+| `@netscript/plugin-auth-core/sdk` | `./src/sdk/mod.ts` | Universal typed bearer contribution factory and option types. |
 | `@netscript/plugin-auth-core/domain` | `./src/domain/mod.ts` | Domain types and schemas. |
 | `@netscript/plugin-auth-core/ports` | `./src/ports/mod.ts` | Backend, provider, session, and interactive-flow ports. |
 | `@netscript/plugin-auth-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Versioned auth contract. |

@@ -8,6 +8,7 @@ import {
 import { AGENT_KINDS, EFFORTS, PROVIDER_KINDS, type RouteIdentity } from '../contract.ts';
 import { evaluateOpenRouterPresetCanaries } from '../preset-canary.ts';
 import { OPENROUTER_PRESET_IDS, PROVIDER_PROFILE_IDS } from '../provider-profiles.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 export type ProviderCanaryCliOptions =
   | { readonly mode: 'static'; readonly worktree: string }
@@ -29,6 +30,10 @@ function usage(): string {
   ].join('\n');
 }
 
+function isMember<T extends string>(values: readonly T[], value: string): value is T {
+  return values.some((candidate) => candidate === value);
+}
+
 function route(input: ReadonlyMap<string, string>): RouteIdentity {
   const profileId = input.get('--profile');
   const presetId = input.get('--preset');
@@ -36,10 +41,14 @@ function route(input: ReadonlyMap<string, string>): RouteIdentity {
   const effort = input.get('--effort');
   const worktree = input.get('--worktree');
   if (
-    !profileId || !PROVIDER_PROFILE_IDS.includes(profileId as never) || !model || !effort ||
-    !EFFORTS.includes(effort as never) || !worktree
+    !profileId || !isMember(PROVIDER_PROFILE_IDS, profileId) || !model || !effort ||
+    !isMember(EFFORTS, effort) || !worktree
   ) throw new Error(usage());
-  if (presetId && !OPENROUTER_PRESET_IDS.includes(presetId as never)) throw new Error(usage());
+  let selectedPresetId: RouteIdentity['presetId'];
+  if (presetId) {
+    if (!isMember(OPENROUTER_PRESET_IDS, presetId)) throw new Error(usage());
+    selectedPresetId = presetId;
+  }
   const [agent, provider] = profileId === 'claude-anthropic-native'
     ? ['claude', 'anthropic']
     : profileId === 'codex-openai-native'
@@ -49,16 +58,16 @@ function route(input: ReadonlyMap<string, string>): RouteIdentity {
     : profileId.startsWith('claude-')
     ? ['claude', 'openrouter']
     : ['codex', 'openrouter'];
-  if (!AGENT_KINDS.includes(agent as never) || !PROVIDER_KINDS.includes(provider as never)) {
+  if (!isMember(AGENT_KINDS, agent) || !isMember(PROVIDER_KINDS, provider)) {
     throw new Error(usage());
   }
   return {
-    agent: agent as RouteIdentity['agent'],
-    provider: provider as RouteIdentity['provider'],
-    profileId: profileId as RouteIdentity['profileId'],
-    ...(presetId ? { presetId: presetId as RouteIdentity['presetId'] } : {}),
+    agent,
+    provider,
+    profileId,
+    ...(selectedPresetId ? { presetId: selectedPresetId } : {}),
     model,
-    effort: effort as RouteIdentity['effort'],
+    effort,
     worktree,
     mobileRequired: false,
     baseUrl: input.get('--base-url'),
@@ -70,6 +79,7 @@ export function parseProviderCanaryArgs(
   args: readonly string[],
   cwd: string = Deno.cwd(),
 ): ProviderCanaryCliOptions {
+  args = normalizeTaskArguments(args);
   const values = new Map<string, string>();
   let live = false;
   let all = false;
@@ -118,12 +128,13 @@ export function parseProviderCanaryArgs(
 }
 
 async function main(): Promise<number> {
-  if (Deno.args.includes('--help')) {
-    console.log(usage());
-    return 0;
-  }
   try {
-    const options = parseProviderCanaryArgs(Deno.args);
+    const args = normalizeTaskArguments(Deno.args);
+    if (args.includes('--help')) {
+      console.log(usage());
+      return 0;
+    }
+    const options = parseProviderCanaryArgs(args);
     if (options.mode === 'static') {
       const result = evaluateOpenRouterPresetCanaries(options.worktree);
       console.log(JSON.stringify(result));

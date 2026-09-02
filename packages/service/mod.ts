@@ -26,8 +26,9 @@
  *
  * @example Define a generated service entrypoint.
  * ```typescript
- * import { defineService } from '@netscript/service';
- * import { router } from './router.ts';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * const service = await defineService(router, {
  *   name: 'users',

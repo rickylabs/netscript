@@ -42,6 +42,19 @@ interface CompiledProcedure {
  *
  * @example
  * ```ts
+ * import { createService } from '@netscript/service';
+ * import type {
+ *   AuthenticatorPort,
+ *   ContractPolicyContract,
+ *   MatchAwareAuthorizerPort,
+ *   ServiceRouter,
+ * } from '@netscript/service';
+ *
+ * declare const contract: ContractPolicyContract;
+ * declare const legacyAuthorizer: MatchAwareAuthorizerPort;
+ * declare const router: ServiceRouter;
+ * declare const authenticator: AuthenticatorPort;
+ *
  * const authorizer = createContractAuthorizer(contract, { fallback: legacyAuthorizer });
  * createService(router, { name: 'orders' })
  *   .withAuthn({ authenticator })

@@ -1,0 +1,36 @@
+{
+  "capturedAt": "2026-08-30T18:38:35Z",
+  "source": "/proc cmdline/stat snapshot",
+  "leasedRunProcesses": [],
+  "foreignControlProcesses": [
+    {
+      "pid": 3208128,
+      "ppid": 1,
+      "startTimeTicks": "29782259",
+      "role": "aspire-cli",
+      "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control/aspire/apphost.mts"
+    },
+    {
+      "pid": 3208145,
+      "ppid": 3208128,
+      "startTimeTicks": "29782274",
+      "role": "aspire-managed-server"
+    },
+    {
+      "pid": 3208578,
+      "ppid": 1,
+      "startTimeTicks": "29782902",
+      "role": "dcp-apiserver",
+      "monitorPid": 3208145
+    },
+    { "pid": 3208609, "ppid": 3208578, "startTimeTicks": "29782908", "role": "dcp-controllers" },
+    {
+      "pid": 3208859,
+      "ppid": 3208609,
+      "startTimeTicks": "29782954",
+      "role": "aspire-managed-dashboard"
+    }
+  ],
+  "foreignControlMutation": "none",
+  "supervisorRelayMutation": "none"
+}

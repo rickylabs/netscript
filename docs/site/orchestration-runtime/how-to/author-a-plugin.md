@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Author a plugin
 templateEngine: [vento, md]
-order: 107
+order: 108
 oldUrl: /how-to/author-a-plugin/
 ---
 

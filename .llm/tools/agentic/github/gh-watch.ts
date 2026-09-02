@@ -40,6 +40,7 @@ import {
   resolveGithubToken,
   selectLatestOpenHandsComment,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 interface WatchOptions {
   repo: string;
@@ -65,6 +66,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): WatchOptions | null {
+  args = normalizeTaskArguments(args);
   if (args[0] === '--help' || args.length === 0) {
     printHelp();
     return null;

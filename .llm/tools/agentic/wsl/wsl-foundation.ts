@@ -19,6 +19,7 @@ import {
 } from './wsl-foundation-lib.ts';
 import { NODE_DIST_HOST } from '../config/endpoints.ts';
 import { COMPONENT_EXPECTED_VERSIONS } from '../config/versions.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 interface CommandSpec {
   component: RuntimeComponentId;
@@ -572,7 +573,14 @@ function printHuman(report: RuntimeDoctorReport): void {
 }
 
 async function main(): Promise<void> {
-  const [command, ...flags] = Deno.args;
+  let args: string[];
+  try {
+    args = normalizeTaskArguments(Deno.args);
+  } catch {
+    console.error(usage());
+    Deno.exit(EXIT_CODES.executionFailure);
+  }
+  const [command, ...flags] = args;
   const allowed = command === 'doctor'
     ? flags.every((flag) => flag === '--json')
     : command === 'bootstrap'

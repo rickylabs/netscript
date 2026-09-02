@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "phase": "S7 phase B rerun",
+  "observedAt": "2026-08-30T19:15:24Z",
+  "censusMethod": "Scan /proc; retain Aspire-identity executables only when cwd is contained by an authorized root or argv names an authorized root; record PID, PPID, /proc stat start ticks, cwd, and argv.",
+  "authorizedRoots": [
+    "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-rerun",
+    "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control-2"
+  ],
+  "processRows": [],
+  "processCensusStdoutVerbatim": "[]\n",
+  "inventories": {
+    "aspirePs": {
+      "stdoutVerbatim": "[]\n",
+      "normalized": "[]"
+    },
+    "dockerPsAll": {
+      "stdoutVerbatim": "",
+      "normalized": "empty (therefore only relay-* or empty)"
+    },
+    "dockerVolumeLs": {
+      "stdoutVerbatim": "",
+      "normalized": "empty"
+    },
+    "ownedAspireProcesses": {
+      "stdoutVerbatim": "[]\n",
+      "normalized": "no apphost.mts/aspire-managed process for either authorized root"
+    }
+  },
+  "phaseOwnedResourcesCreated": false,
+  "persistentContainerCleanup": "not required",
+  "anonymousVolumeCleanup": "not required"
+}

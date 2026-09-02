@@ -400,6 +400,7 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
     GATE.DATABASE_MIGRATION_ARTIFACTS,
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+    GATE.RUNTIME_TYPED_DB_PHASE_B,
     GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
   ]);
   const databaseWaits = new Set<GateId>([
@@ -434,6 +435,7 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
         GATE.DATABASE_MIGRATION_ARTIFACTS,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+        GATE.RUNTIME_TYPED_DB_PHASE_B,
         GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
       ])).has(gate)
     ),
@@ -481,11 +483,13 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST), true);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND), true);
   assertEquals(runtimeGateIds.includes(GATE.BEHAVIOR_LIVE_DB_ENDPOINT), true);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_TYPED_DB_PHASE_B), true);
 
   assertEquals(sqliteGateIds.includes(GATE.DATABASE_MIGRATION_ARTIFACTS), false);
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST), false);
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND), false);
   assertEquals(sqliteGateIds.includes(GATE.BEHAVIOR_LIVE_DB_ENDPOINT), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_TYPED_DB_PHASE_B), false);
 });
 
 Deno.test('runtime suite selects mssql database resource wait for mssql', () => {

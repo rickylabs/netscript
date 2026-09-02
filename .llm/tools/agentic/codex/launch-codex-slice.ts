@@ -55,6 +55,7 @@ import {
   wslHome,
   wslUser,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import {
   compareLaunchIdentity,
   enforceLaunchIdentity,
@@ -73,7 +74,10 @@ import {
   activateSenderOwnership,
   decideSenderOwnership,
   newSenderOwnershipRecord,
+  type SenderOwnershipDecision,
+  type SenderOwnershipObservation,
 } from '../runtime/sender-ownership.ts';
+import type { RuntimeDiagnostic } from '../runtime/contract.ts';
 
 interface Options {
   mode: 'launch' | 'dry-run' | 'parse-log';
@@ -93,6 +97,27 @@ interface Options {
   model?: string;
   effort?: string;
   allowRouteMismatch: boolean;
+}
+
+/** Returns the diagnostic that makes launch preserve an existing sender lease. */
+export type ExistingSenderLaunchBlocker = RuntimeDiagnostic & {
+  readonly ownershipKind: Exclude<SenderOwnershipDecision, { readonly kind: 'available' }>['kind'];
+  readonly ownershipReason: Exclude<
+    SenderOwnershipDecision,
+    { readonly kind: 'available' }
+  >['reason'];
+};
+
+export function existingSenderLaunchBlocker(
+  worktree: string,
+  observation: SenderOwnershipObservation,
+): ExistingSenderLaunchBlocker | null {
+  const decision = decideSenderOwnership(worktree, observation);
+  return decision.kind === 'available' ? null : {
+    ...decision.diagnostic,
+    ownershipKind: decision.kind,
+    ownershipReason: decision.reason,
+  };
 }
 
 function printHelp(): void {
@@ -125,6 +150,7 @@ function printHelp(): void {
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = {
     mode: 'launch',
     user: wslUser(),
@@ -374,22 +400,24 @@ async function main(): Promise<void> {
   // before process spawn. A returned thread remains the worktree owner so the
   // next operator is directed to resume instead of creating a rival thread.
   if (existing) {
-    const decision = decideSenderOwnership(o.worktree, {
+    const blocker = existingSenderLaunchBlocker(o.worktree, {
       record: existing,
       ownerProcessAlive: ownership.isProcessAlive(existing.ownerPid),
-      sessionActive: Boolean(existing.sessionId),
+      // A recorded id is identity, not proof of a live writer. Explicit repair re-probes it.
+      sessionActive: false,
     });
-    if (decision.kind === 'blocked') {
+    if (blocker) {
       console.log(JSON.stringify({
         stage: 'sender-ownership',
         ok: false,
-        code: decision.diagnostic.code,
-        message: decision.diagnostic.message,
-        operatorAction: decision.diagnostic.operatorAction,
+        code: blocker.code,
+        ownershipKind: blocker.ownershipKind,
+        ownershipReason: blocker.ownershipReason,
+        message: blocker.message,
+        operatorAction: blocker.operatorAction,
       }));
       Deno.exit(4);
     }
-    await ownership.release(o.worktree, existing.leaseToken);
   }
   const leaseToken = crypto.randomUUID();
   const owner = newSenderOwnershipRecord({
@@ -397,6 +425,7 @@ async function main(): Promise<void> {
     ownerPid: Deno.pid,
     leaseToken,
     now: new Date().toISOString(),
+    profileHome: profilePlan?.home ?? `${wslHome()}/.codex`,
   });
   if (!await ownership.create(owner)) {
     console.log(JSON.stringify({

@@ -5,6 +5,8 @@
  *
  * @example
  * ```ts
+ * import { defineStub } from '@netscript/plugin/adapter';
+ *
  * const stub = defineStub({
  *   source: 'export const %%NAME%% = "%%VALUE%%";',
  *   tokens: ['NAME', 'VALUE'] as const,
@@ -25,8 +27,11 @@ export interface StubSource<TToken extends string> {
  *
  * @example
  * ```ts
+ * import { defineStub, type TokenValues } from '@netscript/plugin/adapter';
+ *
  * const stub = defineStub({ source: '%%NAME%%', tokens: ['NAME'] as const });
  * const values: TokenValues<typeof stub> = { NAME: 'worker' };
+ * void values;
  * ```
  */
 export type TokenValues<TStub extends StubSource<string>> = {
@@ -41,6 +46,8 @@ export type TokenValues<TStub extends StubSource<string>> = {
  *
  * @example
  * ```ts
+ * import { defineStub } from '@netscript/plugin/adapter';
+ *
  * const stub = defineStub({ source: 'const name = "%%NAME%%";', tokens: ['NAME'] as const });
  * console.log(stub.tokens);
  * ```
@@ -60,6 +67,8 @@ export function defineStub<const TToken extends string>(
  *
  * @example
  * ```ts
+ * import { defineStub, substituteTokens } from '@netscript/plugin/adapter';
+ *
  * const stub = defineStub({ source: 'export const %%NAME%% = 1;', tokens: ['NAME'] as const });
  * const source = substituteTokens(stub, { NAME: 'count' });
  * console.log(source);
