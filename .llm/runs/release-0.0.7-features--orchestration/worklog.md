@@ -10924,3 +10924,25 @@ run `check:mcp-export-corpus`, `docs:readme-fences`, `docs:jsdoc-examples`, **an
 | #1895 | #1590 | `d0bf0aebf` (alternating Aspire tier) |
 
 Slice D is stacked on #1946 and running; merging #1946 first lets D rebase cleanly.
+
+---
+
+## ~00:30Z (Sep 3) — #1946 merged (`e341c6f71`); three leaves re-converged with proofs and packets
+
+`main` → `e341c6f71` (#1946, #1938, #1916, #1760). All three open product leaves went `CONFLICTING`
+on the shared export corpus and nothing else:
+
+| PR | New head | Slice-owned files moved vs evaluated head | Local admission gates |
+| --- | --- | --- | --- |
+| #1944 | `5bdf46cfc` | **0 / 4** | corpus, assets-barrel, publish-assets, aspire-parity, fences — all **0**; lock identical |
+| #1943 | `387bb1adc` | **0 / 6** | same, all **0**; lock delta is the slice's own `+jsr:@netscript/fresh@0.0.6` |
+| #1664 | `a30405df1` | — | same, all **0**; Aspire surface manifest regenerated again |
+
+#1944 and #1943 re-packeted immediately at the new heads, `status:ready-merge` retained. The
+convergence checklist from ~23:35Z (four local checks before push) was applied to all three and
+caught nothing this time — which is the point.
+
+**Slice D** has 10 commits on top of C's head and is still committing; PR not yet open. With #1946
+merged, D's base branch content is now in `main`, so once its PR opens I rebase it
+(`--onto origin/main f2696ea88`) and retarget the base to `main` — mechanical, and done by me rather
+than by interrupting a lane mid-commit.
