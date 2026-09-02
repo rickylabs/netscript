@@ -210,7 +210,9 @@ export function collectAllEnvVars(
   }
 
   // ── Dashboard ────────────────────────────────────────────────────────────
-  env['ASPIRE_DASHBOARD_PORT'] = String(options.dashboardPort ?? 18888);
+  if (options.dashboardPort !== undefined) {
+    env['ASPIRE_DASHBOARD_PORT'] = String(options.dashboardPort);
+  }
   env['ASPIRE_DASHBOARD_OTLP_HTTP_PORT'] = String(options.dashboardOtlpPort ?? 4318);
 
   // ── Servy service account (propagated from build environment) ────────────
