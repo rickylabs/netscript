@@ -575,3 +575,39 @@ The exact-head CI browser lane remains the decisive hydration observation. The t
   prove a surrogate rather than the generated artifact.
 - No product or test source changed. `deno.lock` remained byte-identical to both HEAD and current
   main, SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
+
+## 2026-09-02 README fence ratchet follow-up
+
+### Design
+
+- Surface: the branch-authored `packages/fresh/README.md` cache-age example only; no runtime or
+  exported API changes.
+- Contract: retain the complete `useQuery` example while binding every contextual name with a real
+  public import or a typed declaration. No `any`, ratchet edits, or baseline-README cleanup.
+- Commit slice: one README example plus append-only harness records, proved by the README fence and
+  JSDoc ratchets, scoped Fresh check, and lock identity.
+- PLAN-EVAL: N/A — this is a mechanical documentation correction with an owner-authorized file,
+  exact seven-error attribution, fixed conventions, and a fixed gate set.
+
+### Red-first attribution and repair
+
+- Baseline head `771548f6d` contains main `3066a0cc5`. The pre-edit README gate exited 1 with
+  `readmes=36 fences=168 ts_like=73 checked=72 syntax_invalid=1 type_errors=39
+  failing_readmes=7 unattributed_failure=false`.
+- Contrary to the initial attribution, `packages/cli/README.md` has the same single checked fence as
+  main and already declares its contextual callback. `git blame` and the ref-level fence census
+  identify commit `1df8a5274` as the author of Fresh's sixth checked fence.
+- The Fresh cache-age fence now imports the public `useQuery` wrapper. Its trailing context block
+  defines `Order` and `OrdersInput`, then declares the query factory's typed `clientKey`, the
+  client's async `list`, the list input, and the server-loaded `initialOrders`/`cachedAt` props.
+  This binds all seven formerly unbound references without casts.
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| `docs:readme-fences` before | 1 | 168 fences / 73 TS-like / 72 checked / 39 type errors / 7 failing READMEs |
+| `docs:readme-fences` after | 0 | 168 fences / 73 TS-like / 72 checked / 32 type errors / 7 failing READMEs |
+| `docs:jsdoc-examples` | 0 | 358 checked / 0 failures; deferred `unboundName=116`, `typeError=14` |
+| Structured Fresh check | 0 | 211 selected / 2 batches / 0 failed / 0 diagnostics |
+| Lock integrity | 0 | Byte-identical to HEAD and main; SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d` |
+
+No Aspire, Docker, browser, runtime-tier, or `e2e:cli` command was run.

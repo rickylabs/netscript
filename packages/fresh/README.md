@@ -226,6 +226,8 @@ that timestamp into the shared client, so `staleTime` is measured from the serve
 from browser hydration:
 
 ```tsx
+import { useQuery } from '@netscript/fresh/query';
+
 useQuery({
   queryKey: ordersQueries.list.clientKey(input),
   queryFn: () => ordersClient.list(input),
@@ -233,6 +235,21 @@ useQuery({
   initialDataUpdatedAt: props.cachedAt,
   staleTime: 15_000,
 });
+
+type Order = { readonly id: number; readonly name: string };
+type OrdersInput = { readonly limit: number; readonly page: number };
+
+declare const ordersQueries: {
+  readonly list: { clientKey(input: OrdersInput): readonly unknown[] };
+};
+declare const ordersClient: {
+  list(input: OrdersInput): Promise<readonly Order[]>;
+};
+declare const input: OrdersInput;
+declare const props: {
+  readonly initialOrders: readonly Order[];
+  readonly cachedAt: number;
+};
 ```
 
 An older server snapshot can therefore refetch immediately on hydration, while a snapshot still

@@ -230,3 +230,18 @@ indeterminate until the existing CDP diagnostics are run against a project emitt
 Rehosting the actual generated island in the focused fixture is not cheap because its contracts,
 client/query/mutation modules, UI aliases, server loader, and route/layer chain are all part of the
 artifact under test. No runtime/browser gate was run and no product/test source changed.
+
+## 2026-09-02 README fence ratchet correction
+
+After convergence to main `3066a0cc5`, the new README-fence quality step exposed seven errors in the
+branch-authored Fresh cache-age example. Ref-level extraction corrected an initially truncated
+touch-set attribution: CLI's checked fence is unchanged, while commit `1df8a5274` added Fresh's
+sixth checked fence. The example now imports `useQuery` and uses a typed trailing declaration block
+for its app-owned query factory, client, input, and loader props; no `any` or baseline change was
+introduced.
+
+The README census moved exactly from 39 to main's tolerated 32 type errors and exits 0. The JSDoc
+example ratchet exits 0 with `unboundName=116`; scoped Fresh check covers 211 files in two successful
+batches. The lock remains byte-identical, SHA-256
+`e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`. No runtime/browser gate was
+run.

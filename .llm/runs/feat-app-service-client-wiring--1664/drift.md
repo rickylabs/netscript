@@ -112,3 +112,25 @@
 - General lesson: comparative attribution needs the same probe at both heads. When the probe is
   branch-only, name the exact clean-baseline experiment instead of inferring a runtime result from
   a passing older suite that never executed the check.
+
+## 2026-09-02 — convergence introduced a new README quality ratchet
+
+- Severity: gate-set drift; branch-owned documentation defect exposed.
+- The branch was green before main added `docs:readme-fences` to `quality`. After convergence, that
+  current gate compiled a branch-authored fence for the first time and rejected its seven unbound
+  contextual references.
+- General lesson: a converged head must run the gate set that exists at the converged revision, not
+  only the gates that existed when the branch content was authored or previously evaluated.
+
+## 2026-09-02 — truncated touch-set caused incorrect fence attribution
+
+- Severity: evidence-attribution correction; no scope expansion after owner authorization.
+- The supervisor initially attributed the added checked fence to `packages/cli/README.md` and
+  classified `packages/fresh/README.md` as main-owned. Ref-level extraction and `git blame` showed
+  the inverse: CLI's one checked fence is unchanged, while branch commit `1df8a5274` added Fresh's
+  sixth checked fence and all seven new errors.
+- The lane stopped rather than editing a prohibited file or forcing an ineffective CLI change; the
+  owner then authorized the measured Fresh README scope.
+- General lesson: on a branch with more than 160 changed files, a truncated touch-set display is not
+  an ownership proof. Use untruncated path queries plus per-ref fence extraction before assigning a
+  ratchet delta.
