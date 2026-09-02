@@ -10883,3 +10883,17 @@ PASS summary posted; packet on CI green at the receipt head.
 
 **Four Features PRs ready for the coordinator**: #1944 (closes #1452), #1943, #1946, #1895.
 Measuring Slice D's independence next — C's PASS unblocks it in plan order.
+
+### ~23:15Z — Slice D dispatched, stacked on #1946
+
+Measured before dispatch: Slice D's 18 hand-authored files intersect #1664 on **nothing**, but D
+extends Slice C's `plan-resource-slice_test.ts` with render cases, so it cannot branch from `main`.
+Branched from C's receipt head `f2696ea88` (`feat/cli-resource-slice-contract`, PASS,
+`status:ready-merge`); the PR opens with **base = C's branch**, and I rebase onto `main` when #1946
+merges. C's five source files are read-only for D; the only C file D touches is the one the plan
+names. `embedded.generated.ts` is a carrier (regenerate, never hand-edit). Told to stop on any
+nineteenth file, and that a fifteenth `application/resource-slice/` child forces rescoping under
+LOW-4 rather than deepening the WARN. Worktree `007-leaf-1354-d`.
+
+Board: #1944, #1943, #1946, #1895 ready-merge · #1664 sole red #1845 · Slice A gated on #1664 ·
+Slice D running · E–G ordered behind D.
