@@ -457,3 +457,33 @@ Deno.test('an example that already binds the symbol gets no second binding', () 
   } as unknown as JsdocExampleBlock;
   assertEquals(exampleSymbolImport(declared), undefined);
 });
+
+Deno.test('an example using a value documented elsewhere, without importing it, is not resolved by that other example', async () => {
+  // The property, exercised through the real materialize + `deno check` path rather than through the
+  // generated binding string: under the previous `declare global` preamble the second block below
+  // compiled, because the first block's ambient const was visible program-wide. Asserting only the
+  // binding string would pass even if the import stopped being injected into the example module.
+  const documented = block(
+    owner('substituteTokens', 'value', '@netscript/plugin/adapter'),
+    "const stub = defineStub({ source: '%%N%%', tokens: ['N'] as const });\nvoid substituteTokens(stub, { N: 'x' });\n",
+  );
+  const borrower = block(
+    owner('defineStub', 'value', '@netscript/plugin/adapter'),
+    // References `substituteTokens` — documented by the block above — without importing it.
+    "const stub = defineStub({ source: '%%N%%', tokens: ['N'] as const });\nvoid substituteTokens(stub, { N: 'x' });\n",
+  );
+
+  const result = await compileJsdocExamples(analysis([documented, borrower]), repositoryRoot);
+  const borrowed = result.deferredExamples.filter((entry) =>
+    entry.owner.symbol === 'defineStub' && entry.failureClass === 'unboundName'
+  );
+  assertEquals(
+    borrowed.length,
+    1,
+    'the borrowing example must be classified, not silently resolved',
+  );
+  assert(
+    borrowed[0]?.tsCodes.includes(2304),
+    'the borrowed symbol must be reported as an unbound name',
+  );
+});
