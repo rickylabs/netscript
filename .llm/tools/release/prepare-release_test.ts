@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
 import { EXPORT_SURFACE_CORPUS_OUTPUT } from '../docs/generate-export-surface-corpus.ts';
+import { GENERATED_CONSUMER_VERSION_FILES } from '../deps/bump-version.ts';
 import {
   collectPreparedReleaseFiles,
   PREPARED_RELEASE_GENERATED_OUTPUTS,
@@ -45,7 +46,7 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
     'bump:0.0.1-canary.1:canary',
     'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
-    'deno task gen:mcp-export-corpus',
+    'deno task gen:mcp-export-corpus --allow-dirty',
     'deno task gen:assets-barrel',
     'deno task check:agent-docs-prose',
     'residue:0.0.1-beta.10',
@@ -55,14 +56,48 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   ]);
 });
 
+Deno.test('shared release preparation explicitly authorizes its expected dirty corpus read set', async () => {
+  const calls: string[] = [];
+  await prepareRelease('/repo', '0.0.7-canary.6', 'release:canary', 'canary', {
+    bump: (_root, version) =>
+      Promise.resolve({
+        oldVersion: '0.0.6',
+        newVersion: version,
+        files: [
+          '/repo/packages/sdk/deno.json',
+          '/repo/plugins/auth/scaffold.plugin.json',
+        ],
+      }),
+    findResidue: () => Promise.resolve([]),
+    runCommand: (command, args) => {
+      calls.push(`${command} ${args.join(' ')}`);
+      return Promise.resolve({ code: 0, stdout: '', stderr: '' });
+    },
+  });
+
+  assertEquals(
+    calls.filter((call) => call.includes('gen:mcp-export-corpus')),
+    ['deno task gen:mcp-export-corpus --allow-dirty'],
+  );
+  assertEquals(
+    calls.filter((call) => call.includes('--allow-dirty')).length,
+    1,
+    'the dirty-write exception must stay scoped to corpus generation inside release preparation',
+  );
+});
+
 Deno.test('shared release preparation stages every generator-owned output', () => {
   assertEquals(PREPARED_RELEASE_GENERATED_OUTPUTS, [
     ...PUBLISH_ASSET_OUTPUTS,
     EXPORT_SURFACE_CORPUS_OUTPUT,
   ]);
-  const prepared = collectPreparedReleaseFiles('/repo', ['/repo/deno.json']);
-  assertEquals(prepared, [
+  const versionFiles = [
     '/repo/deno.json',
+    ...GENERATED_CONSUMER_VERSION_FILES.map((path) => `/repo/${path}`),
+  ];
+  const prepared = collectPreparedReleaseFiles('/repo', versionFiles);
+  assertEquals(prepared, [
+    ...versionFiles,
     ...PUBLISH_ASSET_OUTPUTS.map((path) => `/repo/${path}`),
     `/repo/${EXPORT_SURFACE_CORPUS_OUTPUT}`,
   ]);
@@ -98,7 +133,7 @@ Deno.test('shared release preparation regenerates assets then stops when residue
   assertEquals(calls, [
     'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
-    'deno task gen:mcp-export-corpus',
+    'deno task gen:mcp-export-corpus --allow-dirty',
     'deno task gen:assets-barrel',
     'deno task check:agent-docs-prose',
   ]);
@@ -128,7 +163,7 @@ Deno.test('shared release preparation fails locally when semantic agent-docs fre
   assertEquals(calls, [
     'deno task gen:agent-docs-prose',
     'deno task gen:publish-assets',
-    'deno task gen:mcp-export-corpus',
+    'deno task gen:mcp-export-corpus --allow-dirty',
     'deno task gen:assets-barrel',
     'deno task check:agent-docs-prose',
   ]);

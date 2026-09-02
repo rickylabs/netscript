@@ -2,11 +2,13 @@ import { dirname, relative, resolve } from 'jsr:@std/path@^1';
 import { extractFencedBlocks } from '../docs/snippet-extractor.ts';
 
 export type QualityRule =
+  | 'discarded-saga-publisher-result'
   | 'explicit-any-ignore'
   | 'unsafe-cast'
   | 'explicit-any'
   | 'public-any'
   | 'public-export-unresolved'
+  | 'plugin-discovery-core-coupling'
   | 'plugin-name-check'
   | 'ts-error-suppression';
 
@@ -66,6 +68,48 @@ function collectPluginNameIdents(lines: readonly string[]): Set<string> {
     if (a) tainted.add(a[1]);
   }
   return tainted;
+}
+
+/**
+ * Mark lines that sit inside a multi-line template literal.
+ *
+ * `ruleFor` already exempts fixture source that *begins* a line with a quote or backtick, on the
+ * stated ground that template source strings are data rather than syntax in the scanned module.
+ * That test only sees the first line, so the interior lines of a multi-line template — generated
+ * fixture code — were still scanned as if they were real declarations. Interpolated `${...}`
+ * expressions are genuine syntax and stay scanned.
+ */
+function templateInteriorLines(lines: readonly string[]): boolean[] {
+  const interior: boolean[] = [];
+  let inTemplate = false;
+  let interpolationDepth = 0;
+  for (const line of lines) {
+    // A line that opens an interpolation carries real syntax, so it stays scanned; only
+    // lines that are pure template text are treated as data.
+    interior.push(inTemplate && interpolationDepth === 0 && !line.includes('${'));
+    for (let index = 0; index < line.length; index++) {
+      const char = line[index];
+      if (char === '\\') {
+        index += 1;
+        continue;
+      }
+      if (inTemplate && interpolationDepth === 0) {
+        if (char === '`') inTemplate = false;
+        else if (char === '$' && line[index + 1] === '{') {
+          interpolationDepth = 1;
+          index += 1;
+        }
+        continue;
+      }
+      if (interpolationDepth > 0) {
+        if (char === '{') interpolationDepth += 1;
+        else if (char === '}') interpolationDepth -= 1;
+        continue;
+      }
+      if (char === '`') inTemplate = true;
+    }
+  }
+  return interior;
 }
 
 function ruleFor(line: string, file: string, tainted: Set<string>): QualityRule | undefined {
@@ -860,6 +904,172 @@ interface ScanUnit {
   readonly exemptTsErrorSuppression: boolean;
 }
 
+interface DiscardedSagaPublisherFinding {
+  readonly line: number;
+  readonly text: string;
+}
+
+function sagaPublisherBindings(tokens: readonly SourceToken[]): ReadonlySet<string> {
+  const bindings = new Set<string>();
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+    if (
+      token.kind === 'identifier' && tokens[index + 1]?.value === ':' &&
+      tokens[index + 2]?.value === 'SagaPublisherPort'
+    ) {
+      bindings.add(token.value);
+    }
+    if (
+      token.value === '=' && tokens[index - 1]?.kind === 'identifier' &&
+      tokens[index + 1]?.value === 'createSagaPublisher'
+    ) {
+      bindings.add(tokens[index - 1].value);
+    }
+  }
+  return bindings;
+}
+
+function isStandaloneAwait(tokens: readonly SourceToken[], index: number): boolean {
+  const previous = tokens[index - 1];
+  if (!previous) return true;
+  if ([';', '{', '}'].includes(previous.value)) return true;
+  if (previous.line === tokens[index].line) return false;
+  return !['=', 'return', '(', '[', ',', ':', '?', '=>'].includes(previous.value);
+}
+
+function discardedSagaPublisherResults(
+  source: string,
+  baseLine = 1,
+): DiscardedSagaPublisherFinding[] {
+  const lines = source.split(/\r?\n/);
+  const tokens = tokenizeSource(source);
+  const bindings = sagaPublisherBindings(tokens);
+  const findings: DiscardedSagaPublisherFinding[] = [];
+
+  for (let index = 0; index < tokens.length; index++) {
+    const receiver = tokens[index + 1];
+    const method = tokens[index + 3];
+    if (
+      tokens[index].value !== 'await' || receiver?.kind !== 'identifier' ||
+      !bindings.has(receiver.value) || tokens[index + 2]?.value !== '.' ||
+      (method?.value !== 'publish' && method?.value !== 'publishMany') ||
+      tokens[index + 4]?.value !== '(' || !isStandaloneAwait(tokens, index)
+    ) {
+      continue;
+    }
+    findings.push({
+      line: baseLine + tokens[index].line - 1,
+      text: lines[tokens[index].line - 1]?.trim() ?? '',
+    });
+  }
+
+  for (const token of tokens) {
+    if (
+      token.kind !== 'string' ||
+      (!token.value.includes('createSagaPublisher') && !token.value.includes('SagaPublisherPort'))
+    ) {
+      continue;
+    }
+    findings.push(...discardedSagaPublisherResults(token.value, baseLine + token.line - 1));
+  }
+
+  return findings;
+}
+
+function isHostCoreSource(file: string): boolean {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.startsWith('packages/') &&
+    !/^packages\/plugin-[^/]+-core\//.test(normalized);
+}
+
+function propertyString(
+  tokens: readonly SourceToken[],
+  open: number,
+  close: number,
+  property: string,
+): SourceToken | undefined {
+  for (let index = open + 1; index < close - 1; index++) {
+    const token = tokens[index];
+    if (
+      (token.kind === 'identifier' || token.kind === 'string') && token.value === property &&
+      tokens[index + 1]?.value === ':' && tokens[index + 2]?.kind === 'string'
+    ) {
+      return tokens[index + 2];
+    }
+  }
+  return undefined;
+}
+
+function hasComparison(tokens: readonly SourceToken[], left: number, right: number): boolean {
+  const start = Math.min(left, right) + 1;
+  const end = Math.max(left, right);
+  const between = tokens.slice(start, end).map((token) => token.value).join('');
+  return /^(?:===|!==|==|!=)$/.test(between);
+}
+
+function pluginDiscoveryCoreCoupling(
+  source: string,
+  file: string,
+): QualityFinding[] {
+  if (!isHostCoreSource(file)) return [];
+
+  const tokens = tokenizeSource(source);
+  const lines = source.split(/\r?\n/);
+  const findingLines = new Set<number>();
+
+  const record = (token: SourceToken): void => {
+    findingLines.add(token.line);
+  };
+
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+
+    if (token.value === '{') {
+      const close = matchingToken(tokens, index, '{', '}');
+      const callee = propertyString(tokens, index, close, 'callee');
+      const axis = propertyString(tokens, index, close, 'axis');
+      if (callee && axis) record(callee);
+      continue;
+    }
+
+    if (token.kind !== 'identifier' || (token.value !== 'callee' && token.value !== 'axis')) {
+      continue;
+    }
+
+    for (let candidate = Math.max(0, index - 4); candidate <= index + 4; candidate++) {
+      if (tokens[candidate]?.kind === 'string' && hasComparison(tokens, index, candidate)) {
+        record(token);
+        break;
+      }
+    }
+
+    if (
+      tokens[index + 1]?.value === '.' &&
+      ['startsWith', 'endsWith', 'includes'].includes(tokens[index + 2]?.value) &&
+      tokens[index + 3]?.value === '(' && tokens[index + 4]?.kind === 'string'
+    ) {
+      record(token);
+    }
+
+    if (tokens[index - 2]?.value !== 'switch' || tokens[index - 1]?.value !== '(') continue;
+    const conditionClose = matchingToken(tokens, index - 1, '(', ')');
+    if (tokens[conditionClose + 1]?.value !== '{') continue;
+    const bodyClose = matchingToken(tokens, conditionClose + 1, '{', '}');
+    for (let branch = conditionClose + 2; branch < bodyClose - 1; branch++) {
+      if (tokens[branch]?.value === 'case' && tokens[branch + 1]?.kind === 'string') {
+        record(tokens[branch + 1]);
+      }
+    }
+  }
+
+  return [...findingLines].sort((left, right) => left - right).map((line) => ({
+    rule: 'plugin-discovery-core-coupling',
+    file,
+    line,
+    text: lines[line - 1]?.trim() ?? '',
+  }));
+}
+
 async function scanUnits(file: string, cwd: string): Promise<ScanUnit[]> {
   const sourcePath = relative(cwd, file).replaceAll('\\', '/');
   const source = await Deno.readTextFile(file);
@@ -905,9 +1115,17 @@ export async function scanCodeQualityDetailed(
   for (const file of files) {
     for (const unit of await scanUnits(file, cwd)) {
       const normalized = unit.sourcePath.replaceAll('\\', '/');
+      findings.push(...pluginDiscoveryCoreCoupling(unit.lines.join('\n'), normalized));
+      const discardedFindings = new Map(
+        discardedSagaPublisherResults(unit.lines.join('\n')).map((finding) => [
+          finding.line,
+          finding,
+        ]),
+      );
       const tainted = normalized.includes('/features/plugins/')
         ? collectPluginNameIdents(unit.lines)
         : EMPTY_TAINT;
+      const templateInterior = templateInteriorLines(unit.lines);
       for (let index = 0; index < unit.lines.length; index++) {
         const line = unit.lines[index];
         const allowanceMarkers = [...line.matchAll(/\/\/\s*quality-allow:/g)];
@@ -916,8 +1134,9 @@ export async function scanCodeQualityDetailed(
           // rule — an allowance on a clean line is dead weight, not counted.
           const locationKey = `${unit.sourcePath}:${unit.lineOffset + index + 1}`;
           if (
-            !ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted) &&
-            !publicLocations.has(locationKey)
+            (templateInterior[index] ||
+              !ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) &&
+            !publicLocations.has(locationKey) && !discardedFindings.has(index + 1)
           ) {
             continue;
           }
@@ -945,7 +1164,7 @@ export async function scanCodeQualityDetailed(
           }
           continue;
         }
-        const rule = ruleFor(line, normalized, tainted);
+        const rule = templateInterior[index] ? undefined : ruleFor(line, normalized, tainted);
         if (rule && !(unit.exemptTsErrorSuppression && rule === 'ts-error-suppression')) {
           findings.push({
             rule,
@@ -954,6 +1173,17 @@ export async function scanCodeQualityDetailed(
             text: line.trim(),
             ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
           });
+        } else {
+          const discarded = discardedFindings.get(index + 1);
+          if (discarded) {
+            findings.push({
+              rule: 'discarded-saga-publisher-result',
+              file: unit.sourcePath,
+              line: unit.lineOffset + discarded.line,
+              text: discarded.text,
+              ...(unit.fenceOrdinal === undefined ? {} : { fenceOrdinal: unit.fenceOrdinal }),
+            });
+          }
         }
       }
     }
