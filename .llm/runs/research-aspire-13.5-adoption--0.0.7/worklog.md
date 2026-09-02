@@ -746,3 +746,14 @@ the merge.**
   <https://github.com/rickylabs/netscript/pull/1760#issuecomment-5515098850>. Main is one commit
   ahead (`1ca47b859`, #1941, disjoint paths); GitHub still CLEAN. Coordinator merges.
 - S9 #1759 `4c9def611`: waiting on the postgres tier of run 33669484139 to unlock the sqlite rerun.
+
+### 2026-09-02 19:40Z checkpoint — S9 `d3cc03766`
+
+- S9 #1759: postgres tier at `4c9def611` passed workers-api + TC-14, failed producer-reconnect →
+  D-329 (probe OTLP exports unauthenticated against the secured dashboard). Repair `d3cc03766`
+  pushed; unit suites 71/71 + 145/145; product diff vs main unchanged (8 pre-existing files).
+  `e2e-cli` 33674247140 / `ci` 33674247190 running. The sqlite `workers-api` red at `4c9def611` is
+  classified transient (postgres tier passed the same step; recorded history). Remaining: both
+  tiers + desktop at `d3cc03766` → receipts → evidence → ready-merge → close-gate.
+  Actor: supervisor; ETA ~20:25Z.
+- S10 #1760 `0b3f13e0c`: packet handed 19:28Z; awaiting coordinator merge.

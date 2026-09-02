@@ -8435,3 +8435,19 @@ exchange → `X-API-Key`, full OTLP JSON incl. events and link attributes, which
 normaliser already consumes); `logs` stay on MCP and the CLI projection remains the fallback when
 no reader is supplied. Same main merge (`c0b7d841a`, brings #1930 + S13) and manifest refresh in
 the push. Follow-up (unchanged from D-327): upstream CLI projection gap, worth an upstream issue.
+
+### D-329 — Secured dashboard rejects the producer-reconnect probe's OTLP exports (2026-09-02)
+
+Observed: S9 postgres tier (run 33669484139, `4c9def611`) passed `runtime.wait.workers-api` and
+TC-14 (confirming the sqlite `workers-api` red was transient) but FAILED
+`behavior.streams.producer-reconnect` with "Recovered publish trace … was not found" even with the
+D-328 dashboard-API read path. Cause: S9's `ASPIRE_START_SCRIPT` forces
+`ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=false` (the MCP smoke needs the dashboard API key),
+so the dashboard's OTLP receiver requires `x-otlp-api-key`. `verify-producer-reconnect.ts` exports
+the probe's telemetry through a local capture proxy that forwards to the AppHost OTLP endpoint
+without that header → HTTP 401 → the span never reaches the dashboard. The flow-b consumer had
+already been repaired for the identical failure (`c6ec50214`), but the reconnect gate had never
+executed on S9 before D-328 (earlier runs stopped at TC-14). Repair `d3cc03766` (e2e only):
+`resolveOtlpHeadersFromResource` moved to `otlp-headers.ts` and shared; the reconnect gate borrows
+the ingest key from the running `streams` resource process before stopping it and injects it into
+the proxy's upstream requests.
