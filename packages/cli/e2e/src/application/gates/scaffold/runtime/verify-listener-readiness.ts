@@ -8,6 +8,25 @@ export interface ListenerHealthReport {
   readonly exception?: unknown;
 }
 
+/** One key/status pair published in a resource's Aspire health report map. */
+export interface ListenerHealthSummary {
+  readonly healthCheckKey: string;
+  readonly status: string;
+}
+
+/** One post-deadline resource snapshot used to explain listener-readiness failure. */
+export interface ListenerReadinessSnapshot {
+  readonly resourceName: string;
+  readonly match: 'matched' | 'not-found' | 'unknown';
+  readonly matchedResourceName?: string;
+  readonly state?: string;
+  readonly healthStatus?: string;
+  readonly healthReports: readonly ListenerHealthSummary[];
+  readonly describeError?: string;
+}
+
+const LISTENER_LOG_TAIL_LINES = 20;
+
 /** Read a resource's named object-valued 13.5 health report without accepting array drift. */
 export function readListenerHealthReport(
   topology: unknown,
@@ -43,30 +62,93 @@ export function readListenerHealthReports(
   topology: unknown,
   resourceName: string,
 ): readonly ListenerHealthReport[] {
-  const resources = isRecord(topology) && Array.isArray(topology.resources)
-    ? topology.resources
-    : [];
-  for (const candidate of resources) {
-    if (!isRecord(candidate) || !resourceMatches(candidate, resourceName)) continue;
-    const reports = candidate.healthReports;
-    if (!isRecord(reports)) return [];
-    const parsed: ListenerHealthReport[] = [];
-    for (const [healthCheckKey, report] of Object.entries(reports)) {
-      if (!isRecord(report) || typeof report.status !== 'string') {
-        throw new Error(`${resourceName} healthReports.${healthCheckKey} has no string status`);
-      }
-      parsed.push({
-        resourceName,
-        healthCheckKey,
-        status: report.status,
-        ...(typeof report.description === 'string' ? { description: report.description } : {}),
-        ...('data' in report ? { data: report.data } : {}),
-        ...('exception' in report ? { exception: report.exception } : {}),
-      });
-    }
-    return parsed;
-  }
+  const resource = findListenerResource(topology, resourceName);
+  if (resource) return parseListenerHealthReports(resource, resourceName);
   throw new Error(`resource ${resourceName} was never published`);
+}
+
+/** Select the state and named-health evidence from one described resource. */
+export function readListenerReadinessSnapshot(
+  topology: unknown,
+  resourceName: string,
+): ListenerReadinessSnapshot {
+  const resource = findListenerResource(topology, resourceName);
+  if (!resource) {
+    return { resourceName, match: 'not-found', healthReports: [] };
+  }
+  const healthReports = parseListenerHealthReports(resource, resourceName)
+    .map(({ healthCheckKey, status }) => ({ healthCheckKey, status }))
+    .sort((left, right) => left.healthCheckKey.localeCompare(right.healthCheckKey));
+  return {
+    resourceName,
+    match: 'matched',
+    ...(readResourceName(resource) ? { matchedResourceName: readResourceName(resource) } : {}),
+    ...(typeof resource.state === 'string' ? { state: resource.state } : {}),
+    ...(typeof resource.healthStatus === 'string' ? { healthStatus: resource.healthStatus } : {}),
+    healthReports,
+  };
+}
+
+/** Format one deadline snapshot without treating logs as the readiness authority. */
+export function formatListenerReadinessDeadline(
+  snapshot: ListenerReadinessSnapshot,
+  healthCheckKey: string,
+  timeoutSeconds: number,
+  logLines: readonly string[],
+): string {
+  const expected = snapshot.healthReports.find((report) =>
+    report.healthCheckKey === healthCheckKey
+  );
+  let classification: string;
+  if (snapshot.match === 'unknown') {
+    classification = `resource ${snapshot.resourceName} match is unknown: ${
+      snapshot.describeError ?? 'describe failed without detail'
+    }`;
+  } else if (snapshot.match === 'not-found') {
+    classification = `resource ${snapshot.resourceName} was not matched`;
+  } else if (snapshot.state !== 'Running') {
+    classification = `resource ${snapshot.resourceName} not Running (state=${
+      snapshot.state ?? 'unknown'
+    })`;
+  } else if (!expected) {
+    classification =
+      `resource ${snapshot.resourceName} Running but health key ${healthCheckKey} was never published`;
+  } else if (expected.status !== 'Healthy') {
+    classification =
+      `resource ${snapshot.resourceName} Running with health key ${healthCheckKey}=${expected.status}`;
+  } else {
+    classification =
+      `resource ${snapshot.resourceName} Running with health key ${healthCheckKey}=Healthy but readiness remained blocked`;
+  }
+
+  const published = snapshot.healthReports.length === 0
+    ? 'none'
+    : snapshot.healthReports.map((report) => `${report.healthCheckKey}=${report.status}`).join(', ');
+  const matched = snapshot.match === 'unknown' ? 'unknown' : String(snapshot.match === 'matched');
+  const logs = logLines.length === 0 ? '<none>' : logLines.slice(-LISTENER_LOG_TAIL_LINES).join('\n');
+  return `${classification}; matched=${matched}; matchedResource=${
+    snapshot.matchedResourceName ?? 'none'
+  }; state=${snapshot.state ?? 'unknown'}; healthStatus=${
+    snapshot.healthStatus ?? 'unknown'
+  }; published health reports=${published}; readiness deadline ${timeoutSeconds}s elapsed; ` +
+    `aspire logs (last ${LISTENER_LOG_TAIL_LINES} lines):\n${logs}`;
+}
+
+/** Parse Aspire's JSON array/object or NDJSON console-log output into content lines. */
+export function readAspireLogLines(output: string): readonly string[] {
+  const trimmed = output.trim();
+  if (!trimmed) return [];
+  try {
+    return collectAspireLogLines(JSON.parse(trimmed));
+  } catch {
+    return trimmed.split(/\r?\n/).flatMap((line) => {
+      try {
+        return collectAspireLogLines(JSON.parse(line));
+      } catch {
+        return [line];
+      }
+    });
+  }
 }
 
 /** Format the published-but-unhealthy state without discarding report diagnostics. */
@@ -129,10 +211,70 @@ export async function verifyListenerReadiness(
 
     const remainingMs = deadline - performance.now();
     if (remainingMs <= 0) {
-      throw new Error(`${lastFailure}; readiness deadline ${timeoutSeconds}s elapsed`);
+      throw new Error(
+        await captureListenerReadinessDeadline(
+          appHost,
+          resourceName,
+          healthCheckKey,
+          timeoutSeconds,
+          lastFailure,
+        ),
+      );
     }
     await new Promise((resolve) => setTimeout(resolve, Math.min(1_000, remainingMs)));
   }
+}
+
+async function captureListenerReadinessDeadline(
+  appHost: string,
+  resourceName: string,
+  healthCheckKey: string,
+  timeoutSeconds: number,
+  lastFailure: string,
+): Promise<string> {
+  let snapshot: ListenerReadinessSnapshot;
+  try {
+    const topology = JSON.parse(
+      await runAspire([
+        'describe',
+        '--apphost',
+        appHost,
+        '--format',
+        'Json',
+        '--non-interactive',
+        '--nologo',
+      ]),
+    );
+    snapshot = readListenerReadinessSnapshot(topology, resourceName);
+  } catch (error) {
+    snapshot = {
+      resourceName,
+      match: 'unknown',
+      healthReports: [],
+      describeError: `${lastFailure}; final describe failed: ${renderError(error)}`,
+    };
+  }
+
+  let logLines: readonly string[];
+  try {
+    logLines = readAspireLogLines(
+      await runAspire([
+        'logs',
+        resourceName,
+        '--apphost',
+        appHost,
+        '--tail',
+        String(LISTENER_LOG_TAIL_LINES),
+        '--format',
+        'Json',
+        '--non-interactive',
+        '--nologo',
+      ]),
+    );
+  } catch (error) {
+    logLines = [`<unavailable: ${renderError(error)}>`];
+  }
+  return formatListenerReadinessDeadline(snapshot, healthCheckKey, timeoutSeconds, logLines);
 }
 
 function isTerminalListenerFailure(report: ListenerHealthReport): boolean {
@@ -142,6 +284,59 @@ function isTerminalListenerFailure(report: ListenerHealthReport): boolean {
 
 function renderDiagnostic(value: unknown): string {
   return JSON.stringify(value) ?? String(value);
+}
+
+function renderError(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function findListenerResource(
+  topology: unknown,
+  resourceName: string,
+): Readonly<Record<string, unknown>> | undefined {
+  const resources = isRecord(topology) && Array.isArray(topology.resources)
+    ? topology.resources
+    : [];
+  return resources.find((candidate): candidate is Readonly<Record<string, unknown>> =>
+    isRecord(candidate) && resourceMatches(candidate, resourceName)
+  );
+}
+
+function parseListenerHealthReports(
+  resource: Readonly<Record<string, unknown>>,
+  resourceName: string,
+): readonly ListenerHealthReport[] {
+  const reports = resource.healthReports;
+  if (!isRecord(reports)) return [];
+  return Object.entries(reports).map(([healthCheckKey, report]) => {
+    if (!isRecord(report) || typeof report.status !== 'string') {
+      throw new Error(`${resourceName} healthReports.${healthCheckKey} has no string status`);
+    }
+    return {
+      resourceName,
+      healthCheckKey,
+      status: report.status,
+      ...(typeof report.description === 'string' ? { description: report.description } : {}),
+      ...('data' in report ? { data: report.data } : {}),
+      ...('exception' in report ? { exception: report.exception } : {}),
+    };
+  });
+}
+
+function readResourceName(resource: Readonly<Record<string, unknown>>): string | undefined {
+  for (const key of ['name', 'displayName', 'resourceName']) {
+    if (typeof resource[key] === 'string') return resource[key];
+  }
+  return undefined;
+}
+
+function collectAspireLogLines(value: unknown): readonly string[] {
+  if (Array.isArray(value)) return value.flatMap(collectAspireLogLines);
+  if (!isRecord(value)) return [];
+  if (Array.isArray(value.logs)) return value.logs.flatMap(collectAspireLogLines);
+  if (typeof value.content !== 'string') return [];
+  const prefix = value.isError === true ? '[stderr] ' : '';
+  return value.content.split(/\r?\n/).map((line) => `${prefix}${line}`);
 }
 
 async function runAspire(args: readonly string[]): Promise<string> {

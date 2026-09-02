@@ -24,13 +24,13 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 
 ## In Progress
 
-- S1 RED tests are authored; capture the failing focused-test evidence and commit RED.
+- S1 GREEN is implemented and measured; commit it, then begin S2 RED.
 
 ## Next Steps
 
-1. Commit S1 RED, implement and prove S1 GREEN.
+1. Commit S1 GREEN.
 2. Commit S2 RED, implement and prove S2 GREEN including emitted compile.
-3. Run full local gates, push explicit refspec, open/update the draft PR, and hand off IMPL-EVAL.
+3. Run full local gates, push explicit refspec, open the draft PR, and hand off IMPL-EVAL.
 
 ## Key Decisions
 
@@ -45,6 +45,8 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 | Path | Status | Notes |
 | --- | --- | --- |
 | run artifact set | new | Harness activation, research, design, and resumable state. |
+| `verify-listener-readiness.ts` | changed | One-shot final snapshot, classification, and log-tail capture. |
+| `listener-readiness-gates_test.ts` | changed | Pure diagnostic contract coverage. |
 
 ## Gates
 
