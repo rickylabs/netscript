@@ -128,3 +128,5 @@ would fail the test; the same test also asserts the follower was killed after ex
   is red, which is outside this implementation slice and prevents treating the dependency as landed.
 - No new review comment required an implementation readjustment. PR #1907's confirmed Aspire 13.5.3
   follow-line evidence was incorporated before the final gates and commit.
+
+- 2026-09-02T17:10Z reconcile: rebased onto origin/main `850cc7757` → `3d87111ad`; hardenings re-verified; e2e run 33656315382 dispatched at exact head.
