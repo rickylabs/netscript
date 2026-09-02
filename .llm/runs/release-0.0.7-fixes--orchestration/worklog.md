@@ -7829,3 +7829,16 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   `behavior-gates.ts`/`capability-suites.ts`, updates the failing test. This targets the exact
   TS2307/TS7006 pair. check-test queued; close-gate still red (DoD 0/5 — expected until S3/S4).
 - Watching check-test + both runtime tiers at `74ef668cc`; S3/S4 remain open per steer.
+
+## 2026-09-02T22:45Z — #1885 `74ef668cc`: check-test green; hosted hydration proof GREEN → scope correction
+
+- check-test SUCCESS at `74ef668cc` (exact TS2307/TS7006 pair cleared by committing the module).
+- Both runtime tiers SUCCESS (Postgres job 100446283977 97/97, SQLite/Garnet 100446283691 92/92);
+  `behavior.island-hydration` (managed Chromium clicks Rename, observes `name`→`name*`) PASSED on
+  both — the #1845 defect does not reproduce on the hosted generated scaffold at this head.
+- Therefore S3 has no red boundary to correct; the PR's deliverable is the regression gate + proof.
+  Steer `/tmp/steer1885e.md`: rewrite S3/S4 + DoD truthfully with job ids (box 2 not ticked unless
+  evidenced; box 5 open), decide `Closes` vs `Refs #1845` against the issue's acceptance, push.
+  Deliverer `/tmp/deliver1885e.sh` detached. close-gate remains red until the body is corrected.
+- Next: on push → IMPL-EVAL (cycle `status:impl`→`status:impl-eval`), then packet if PASS_IMPL.
+- NOT green as a PR: close-gate red, DoD open, `status:impl`.
