@@ -88,6 +88,8 @@ loop or a literal timeout at the gate call site.
 | 2026-09-02T22:00Z | 0 | Bootstrap | Read harness, CLI, tools, doctrine, Aspire, PR process, brief, selected Archetype 6 + service overlay, and re-baselined branch setup commits. |
 | 2026-09-02T22:10Z | 0 | Research | Verified log CLI options, the evidence discarded at the deadline, bounded socket behavior, and unbounded endpoint allocation. |
 | 2026-09-02T22:15Z | 0 | Addendum | Locked #1952 reachability semantics: container logs are not authority, empty reports are unknown, and no forced Unhealthy state. |
+| 2026-09-03T00:05Z | 1R | RED authored | Added pure snapshot, classification, and Aspire JSON/NDJSON log-selection contract tests before implementation. |
+| 2026-09-03T00:06Z | 1R | RED measured | Structured focused test exited 1 with TS2305 for the three deliberately absent snapshot/log exports; 0 tests ran. |
 
 ## Decisions
 
@@ -135,4 +137,3 @@ loop or a literal timeout at the gate call site.
 
 - Evaluator should inspect the final deadline classification and confirm the endpoint timeout reports reachability semantics without forcing state.
 - IMPL-EVAL is mandatory and supervisor-dispatched in a separate session.
-

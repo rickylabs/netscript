@@ -24,7 +24,7 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 
 ## In Progress
 
-- S1 RED test for pure final-snapshot formatting.
+- S1 RED tests are authored; capture the failing focused-test evidence and commit RED.
 
 ## Next Steps
 
@@ -68,4 +68,3 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-
