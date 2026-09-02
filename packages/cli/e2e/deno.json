@@ -12,7 +12,7 @@
   "imports": {
     "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.7",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.6",
-    "@orpc/server": "npm:@orpc/server@^1.14.6",
+    "@orpc/server": "npm:@orpc/server@^1.15.0",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/fs": "jsr:@std/fs@^1",
     "@std/path": "jsr:@std/path@^1"

@@ -8,8 +8,8 @@
     "./contracts/v1": "./src/contracts/v1/mod.ts"
   },
   "imports": {
-    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
-    "@orpc/server": "npm:@orpc/server@^1.14.6",
+    "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+    "@orpc/server": "npm:@orpc/server@^1.15.0",
     "@std/assert": "jsr:@std/assert@^1",
     "zod": "catalog:",
     "@netscript/ai": "jsr:@netscript/ai@0.0.6",
