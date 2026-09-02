@@ -645,3 +645,19 @@ before starting SQLite.
 - S10 #1760 @ `84e4b38f7` — green except `desktop-native-linux` (#1930 class, not S10-owned);
   #1930 still open. Remaining gate: rerun `desktop-native-linux` after #1930 merges; actor:
   supervisor; ETA bound to #1930.
+
+### 2026-09-02 17:02Z checkpoint — S9/S10/S13
+
+- S13 #1779 @ `5f0eed0fe` — `check-test` at `335258304` failed 4 tests (public JSR resolver had no
+  `@netscript/mcp` mapping, D-325); one-line repair pushed 16:58:54Z, both test files green locally.
+  `ci` dispatched immediately (MERGEABLE, `status:ready-merge` retained). Remaining gate: `ci`
+  (`quality`, `check-test`, close-gate); actor: supervisor → packet; ETA ~17:12Z.
+- S9 #1759 @ `4c5e0f191` — `ci` green except close-gate (unticked #1721 boxes, evidence applied after
+  tiers). Both runtime tiers still **pending** since 16:49Z: the global runtime-concurrency slot is
+  held by `fix/scaffold-island-hydration` postgres tier (running since 16:50:44Z), with #1930's
+  re-pushed tiers also queued. Honest ETA: sqlite tier ~17:05→17:17Z, postgres tier after it
+  (~17:35Z) — the S9 packet cannot be complete before the 17:16:34Z deadline on the current queue;
+  the coordinator owns the call on merging on the sqlite tier + prior postgres evidence vs waiting.
+  Actor: supervisor consumes the sqlite verdict the minute it lands.
+- S10 #1760 @ `84e4b38f7` — unchanged; #1930 (`fix/desktop-fixture-orpc-contract-dep`) re-pushed
+  and is itself queued for runtime tiers. Rerun `desktop-native-linux` on S10 once #1930 merges.
