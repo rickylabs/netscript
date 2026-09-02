@@ -213,6 +213,18 @@ Deno.test('unsupported protocol diagnostics name the offending descriptor', () =
   }
 });
 
+Deno.test('protocol rejection precedence is preserved when the id is also invalid', () => {
+  assertConstructionDiagnostic([
+    descriptor({
+      id: 'INVALID',
+      protocol: { family: 'other', major: 1 },
+    }),
+  ], {
+    code: 'SDK_CONTRIBUTION_VERSION',
+    phase: 'construction',
+  });
+});
+
 Deno.test('tuple-limit diagnostics name the seventeenth descriptor', () => {
   const tuple = Array.from(
     { length: 17 },

@@ -65,6 +65,9 @@ public role semantics.
 | 2026-09-02 | 1     | implementation commit | `672b67b61` records the source, tests, harness design, and primary gate evidence.                                                        |
 | 2026-09-02 | 1     | clean-tree publish    | SDK `deno publish --dry-run` passed and listed the intended package, including `contribution-diagnostic-id.ts`.                          |
 | 2026-09-02 | 1     | carrier cascade       | All three generators passed; only the expected MCP export corpus/provenance changed.                                                     |
+| 2026-09-02 | 1     | initial IMPL-EVAL     | Native Claude/Fable 5 medium returned PASS with one behavioral and one brief-bookkeeping observation, both non-blocking.                  |
+| 2026-09-02 | 1     | precedence remediation | Restored baseline protocol-before-id rejection order using the non-throwing diagnostic id and added an exact doubly-invalid pin.         |
+| 2026-09-02 | 1     | remediation gates     | Check/lint/fmt, 19 focused tests, 229 SDK tests, quality, and explicit architecture gates all pass; `prepared-call.ts` remains 499 lines. |
 
 ## Decisions
 
@@ -116,8 +119,8 @@ public role semantics.
 
 | Gate                              | Result       | Evidence           | Notes                                                       |
 | --------------------------------- | ------------ | ------------------ | ----------------------------------------------------------- |
-| Focused contribution construction | PASS, exit 0 | structured wrapper | 18 passed, 0 failed, 0 ignored.                             |
-| Full SDK package                  | PASS, exit 0 | structured wrapper | 228 passed, 0 failed, 0 ignored.                            |
+| Focused contribution construction | PASS, exit 0 | structured wrapper | 19 passed, 0 failed, 0 ignored.                             |
+| Full SDK package                  | PASS, exit 0 | structured wrapper | 229 passed, 0 failed, 0 ignored.                            |
 | External runtime                  | N/A          | owner boundary     | No Aspire, Docker, browser, or E2E gate applies or was run. |
 
 ### Consumer Gates

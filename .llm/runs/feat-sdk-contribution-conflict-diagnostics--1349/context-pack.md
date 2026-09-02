@@ -22,7 +22,7 @@ remains.
 - Required skills, harness authority, relevant doctrine, audit artifact, public docs surface, and
   focused validation/error paths were read.
 - `PLAN-EVAL: N/A` recorded before source implementation.
-- Focused 18/18 and full SDK 228/228 tests pass; scoped check/lint/fmt select 102 files with zero
+- Focused 19/19 and full SDK 229/229 tests pass; scoped check/lint/fmt select 102 files with zero
   failures/findings.
 - `deno doc --lint` A/B has zero new diagnostics; docs examples remain at `unboundName=116`.
 - `quality:gate` and explicit `arch:check` pass after removing the transient new F-1 warning.
@@ -63,7 +63,7 @@ remains.
 | ----------- | -------------- | ------------------------------------ |
 | Static      | PASS           | scoped check/lint/fmt; docs examples |
 | Fitness     | PASS           | quality/arch and dry-run exit 0      |
-| Runtime     | PASS           | 228 passed, 0 failed/ignored         |
+| Runtime     | PASS           | 229 passed, 0 failed/ignored         |
 | Consumer    | PASS           | doc A/B delta 0; carrier exit 0      |
 
 ## Open Questions

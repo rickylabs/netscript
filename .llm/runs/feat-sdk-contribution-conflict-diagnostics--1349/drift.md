@@ -31,3 +31,17 @@
 - **Severity:** minor
 - **Action:** fix within the slice; preserve the id pattern and all contribution validation policy.
 - **Evidence:** final quality gate and file-size comparison.
+
+## 2026-09-02 — Preserve doubly-invalid rejection precedence
+
+- **What:** Initial diagnostic enrichment validated the descriptor id before its protocol, changing
+  the code for a descriptor whose id and protocol were both invalid.
+- **Source:** Separate-session IMPL-EVAL low-severity observation.
+- **Expected:** Existing construction rejection precedence remains source-compatible while valid
+  ids are attached to version diagnostics.
+- **Actual:** Pre-remediation code returned `SDK_CONTRIBUTION_INVALID` where baseline returned
+  `SDK_CONTRIBUTION_VERSION`.
+- **Severity:** minor
+- **Action:** validate protocol first with the non-throwing diagnostic id, then validate the id;
+  pin the doubly-invalid case to `SDK_CONTRIBUTION_VERSION` with no fabricated identifier.
+- **Evidence:** `client-contribution-validation_test.ts` precedence test and final IMPL-EVAL.

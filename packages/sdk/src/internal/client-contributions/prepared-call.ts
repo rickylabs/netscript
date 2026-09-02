@@ -111,7 +111,7 @@ function validatedContributionId(value: unknown): SdkClientContributionId {
   return contributionId;
 }
 
-function validateProtocol(value: unknown, contributionId: SdkClientContributionId): void {
+function validateProtocol(value: unknown, contributionId?: SdkClientContributionId): void {
   if (!isPlainRecord(value) || !hasExactFields(value, PROTOCOL_FIELDS)) {
     fail('SDK_CONTRIBUTION_INVALID', 'construction', { contributionId });
   }
@@ -213,8 +213,8 @@ function validateContribution(value: unknown): ValidatedSdkClientContribution {
       contributionId: diagnosticId,
     });
   }
+  validateProtocol(value.protocol, diagnosticId);
   const id = validatedContributionId(value.id);
-  validateProtocol(value.protocol, id);
   const context = validateContextDeclaration(value.context, id);
   const headerKeys = validateHeaderKeys(value.headerKeys, id);
   const responseCache = validateResponseCache(value.responseCache, id);
