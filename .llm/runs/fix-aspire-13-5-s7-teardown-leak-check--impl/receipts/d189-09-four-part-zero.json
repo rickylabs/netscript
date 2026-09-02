@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-31T14:57:52.730Z",
+  "checks": [
+    {
+      "command": [
+        "aspire",
+        "ps",
+        "--format",
+        "Json"
+      ],
+      "exitCode": 0,
+      "stdout": "[]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "ps",
+        "-aq"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "volume",
+        "ls",
+        "-q"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "network",
+        "ls",
+        "--format",
+        "{{.Name}}"
+      ],
+      "exitCode": 0,
+      "stdout": "aspire-persistent-network-0e0a2a9f-aspire-managed\nbridge\nhost\nnone\n",
+      "stderr": ""
+    }
+  ]
+}
