@@ -8208,3 +8208,46 @@ evicted. It stopped being a hazard at the moment of restack, as predicted in D-3
 
 `33f5c4966`, clean merge onto `77ad823dc`. Carries the v2 concurrency keys. Manifest regenerated;
 `check:aspire-version-parity` exit 0, `fail: 0` over 815 paths.
+
+## D-318 — S9 verdict PASS; docker tier failed differently, and the difference is the point
+
+**Exact-head IMPL-EVAL at `3ba9c414b`: PASS.** "Removes the last live raw-dashboard telemetry reader,
+routes the preserved query contract through authenticated Aspire MCP stdio, retains honest
+normalization and Flow-B identity coverage, resolves the restack argv contract consistently, and
+preserves both sides of the Aspire skill merge." All five brief points cleared, including the two
+highest-risk ones — the argv contract (which fails at runtime, not compile time) and the hand-merged
+skill.
+
+**Hosted docker tier: 72 passed / 1 failed.** The surviving failure is `behavior.live-db-endpoint`
+with `Postgres resource exposed no TCP URL` — **not** the pre-repair failure, which was
+`telemetry correlation did not converge... trace ids=[none]`. So the telemetry repair worked; the gate
+now reaches a different, earlier condition.
+
+Attribution is genuinely open and is being treated that way rather than assumed:
+
+- S9 changes **0 lines** of `verify-live-db-endpoint.ts`, and `tcpUrl()` reads
+  `aspire describe --format Json` output (`:368`), not the telemetry adapter S9 rewrote.
+- **But** the pre-repair run got *past* `tcpUrl` (it failed at 10120ms on telemetry), and this one
+  fails inside it at **75ms**. A 75ms failure means `describe` was read essentially immediately after
+  the second Postgres start, before the resource re-published its endpoint.
+
+That is either a readiness flake or something the repair's changed timing unmasked, and one sample
+cannot separate those. A docker-tier retry is armed to fire when the run completes; the sqlite tier is
+still executing. No conclusion published until there is a second data point.
+
+## D-319 — S10 live-process repair: the classification was not total
+
+`daeee1fde`. `evaluatePostStopProbe` bucketed containers owned/foreign/**unproven** but processes
+owned/foreign only, so a matching `aspire`/`aspire-managed`/`dcp` process exposing neither
+`--apphost` argv nor `ASPIRE_DCP_APPHOST_PATH` satisfied neither branch and disappeared from the
+evaluation — a survivor could pass `assertNoOwnedSurvivors` with the receipt showing nothing.
+
+Added `unprovenProcesses` mirroring `unprovenContainers`: reported, never mutated, not a failure on
+its own, which keeps the ownership rule that an unproven resource is surfaced for a human rather than
+torn down. RED/GREEN via fixture pid 45 (a `dcp` process with no path evidence): fails type-checking
+before the change, and the test then asserts **totality** directly rather than just the new bucket —
+every matching pid lands in exactly one of three.
+
+Exact-head receipts at `daeee1fde`: `packages/cli/e2e/tests/` 245 passed / 0 failed, `deno check` and
+`deno lint` clean. Separate-session IMPL-EVAL dispatched, briefed to verify the RED genuinely fails
+against `4cce17266` rather than passing trivially.
