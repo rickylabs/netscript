@@ -201,6 +201,26 @@ describe('generated Aspire listener readiness helpers', () => {
     assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true)
   })
 
+  it('publishes endpoint allocation timeout as Unhealthy instead of hanging', async () => {
+    const startedAt = performance.now()
+    const result = await compatModule.createEndpointListenerReadinessCheck({
+      kind: 'postgres',
+      endpoint: () => new Promise(() => {}),
+    })()
+    const elapsedMs = performance.now() - startedAt
+
+    assertEquals(result.status, 'Unhealthy')
+    assertEquals(
+      result.description,
+      'postgres listener unreachable: endpoint not allocated within 2000ms',
+    )
+    assertEquals(result.data.code, 'ENDPOINT_UNALLOCATED')
+    assertEquals(result.data.host, '<unallocated>')
+    assertEquals(result.data.port, '<unallocated>')
+    assertMatch(result.data.elapsedMs, /^\d+$/)
+    assertEquals(elapsedMs >= 1_900 && elapsedMs < 3_500, true)
+  })
+
   it('sends an array-encoded PING and accepts one-segment +PONG', async () => {
     let request = ''
     const server = await startServer((socket) => {

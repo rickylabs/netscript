@@ -91,6 +91,8 @@ loop or a literal timeout at the gate call site.
 | 2026-09-03T00:05Z | 1R | RED authored | Added pure snapshot, classification, and Aspire JSON/NDJSON log-selection contract tests before implementation. |
 | 2026-09-03T00:06Z | 1R | RED measured | Structured focused test exited 1 with TS2305 for the three deliberately absent snapshot/log exports; 0 tests ran. |
 | 2026-09-03T00:10Z | 1G | GREEN measured | Focused readiness suite passed 10/10; structured E2E source check selected 155 files in two batches with 0 diagnostics. |
+| 2026-09-03T00:13Z | 2R | RED authored | Generator contract now requires lazy bounded endpoint resolution; helper contract requires a never-settling endpoint to return `ENDPOINT_UNALLOCATED` near 2,000 ms. |
+| 2026-09-03T00:14Z | 2R | RED measured | Structured helper test run exited 1: 29 passed / 5 failed; failures name the absent generated wrapper and missing helper function. |
 
 ## Decisions
 

@@ -24,7 +24,7 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 
 ## In Progress
 
-- S1 GREEN is implemented and measured; commit it, then begin S2 RED.
+- S1 GREEN is committed. S2 RED tests are authored and awaiting the failing measurement.
 
 ## Next Steps
 
