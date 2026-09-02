@@ -9540,3 +9540,161 @@ runs from an `acceptance-evidence` block on a PR carrying `status:ready-merge`. 
 merged there is no open PR to carry that block. Closing it therefore needs either a closure PR
 carrying the evidence block and `Closes #1349`, or a coordinator decision. Recorded rather than
 resolved by hand — hand-ticking is exactly what the close-gate exists to prevent.
+
+---
+
+## Delivery continuation — 2026-09-02 ~11:00–11:45Z
+
+`main` advanced to `634b83d64` (#1914, the JSDoc example compiler rewrite). Three new leaf PRs opened
+by workers dispatched earlier: **#1918** (#1897), **#1921** (#1353), **#1922** (#1467).
+
+### #1842 — packet closed, `status:ready-merge` applied
+
+`scaffold-runtime-sqlite` landed **SUCCESS** (job `100206685520`). Final state at `d1697421c`:
+**ten of eleven gates green**, the one red being `scaffold-runtime (postgres)` → #1844.
+
+**The sqlite tier is the control that settles the attribution.** It runs aspire + sqlite + **garnet** —
+the same resource, the same wait mechanism, the same head — and it passed. So the garnet 300 s timeout
+is not this branch's code and not garnet readiness in general; it is the postgres-tier interaction
+#1844 describes, and #1844's own original receipt shows the same asymmetry. Packet posted
+(`5508658968`), label applied, with the caveat stated explicitly: `status:ready-merge` claims every
+gate this branch can affect is green, **not** that the postgres tier is green.
+
+### #1895 — hosted browser proof GREEN, and the marker question answered correctly
+
+At `f44f96928`: `check-test` **success**, including step *Managed form browser regression*; both
+runtime tiers success; every other gate success. The DoD box "Hosted `fresh-browser` proof green at
+the exact committed head (supervisor-owned)" is now true, evidenced, and ticked with the job/step
+receipt. The PR body now carries `Closes #1590`.
+
+The worker resolved the `dynamicMarkers` question as **(a)** — a test-premise error, not a product
+defect — from the resolved Fresh 2.3.3 source: `reviver.ts` sets `SHOW_MARKERS = false`,
+`maybeHideMarker` replaces the comment markers, and `PartialComp.render()` returns children only, so
+`frsh:partial:*` markers are **parser inputs, not durable live-DOM nodes**. `colonMarker` passed all
+along precisely because it reads raw server HTML over `fetch`.
+
+The replacement proof is stronger than what it replaces: `dynamicMarkers` now reads the three HTML
+response bodies the page actually fetched, **plus** a page-side expando tagged on `#region-content`
+before A→B and B→A, asserting `dynamicRemounts === [true, true]`. An ordinary same-node
+reconciliation would preserve the expando; only a genuine remount drops it. That distinguishes
+remount from re-render, which the old marker walk never did.
+
+### #1922 — two docs reds, both diagnosed by measurement
+
+1. **`quality` / JSDoc example gate.** Not a compile failure — `failures=0`,
+   `enforcedFailureCensus` all zeros. It is the **ratchet**. Measured both sides:
+
+   | Revision | Result | `deferredCensus` |
+   | --- | --- | --- |
+   | clean `main` `634b83d64` | **PASS** | `{"unboundName":116,"typeError":14}` |
+   | #1922 with main integrated | **FAIL** | `{"unboundName":117,"typeError":14}` |
+
+   Exactly **one** new deferral, and it is the slice's own: `locale-contribution.ts` · symbol
+   `createLocaleSdkClientContribution` · example 1, with `TS2304 createServiceClient` and `TS18004
+   contract`. Per the recorded doctrine the fix is to repair the example, **not** raise
+   `maximumDeferredUnboundName`. Here that is unambiguous — the new deferral is the slice's own new
+   symbol, so the slice owns it.
+
+2. **`build` / docs snippets.** `TS2307` for
+   `pages/services-sdk_sdk.md/blocks/contracts/accounts.ts`: the new `sdk.md` fence imports
+   `./contracts/accounts.ts` and no fence supplies it. The mechanism already exists —
+   `snippet-compiler.ts:32` `explicitModulePath`: a fence whose **first line** is a `// <path>.ts`
+   comment is materialized at that path.
+
+**A false alarm worth recording.** Diffing the leaf against the *new* `main` made it look as though
+the worker had rewritten `.llm/tools/docs/jsdoc-example-compiler.ts` and stripped imports from
+`packages/plugin` JSDoc examples — a serious scope violation. It had not. Diffing against the leaf's
+**own base** (`77ad823dc`) showed a clean, in-scope touch set; the apparent edits were #1914's content
+arriving on main. **Diff a leaf against its own base before accusing it of scope violation** — against
+a moved `main`, every commit `main` gained reads as something the leaf removed.
+
+Integrated `main` `634b83d64` into the leaf (zero conflicts), regenerated the corpus, pushed
+`a628de1a5`, and dispatched the two repairs with the exact diagnosis.
+
+### #1664 — one red is its own, three are foreign
+
+- **`check-test`** (`4929 passed / 1 failed`): `add-ui-command_test.ts:19`, "ui:add help explains the
+  page island query-loader triad". The expected substring **appears present** in the actual output,
+  and the worker's local focused run was 106/106. Almost certainly **help-text line wrapping** at a
+  CI-vs-local terminal width, with the failure report normalising the newline to a space so the two
+  strings look identical. Dispatched with instructions to confirm the width hypothesis before fixing,
+  and to make the assertion width-insensitive by normalising whitespace — not to weaken it.
+- **`scaffold-runtime` (postgres)**: `72 passed / 1 failed`, sole failure
+  `behavior.service-client-refetch` with `{"islandHydrated":false,"islandInteractive":false,...}` —
+  **#1845** exactly. Posted as a fresh reproduction (`5508747615`), noting that the head moved 44
+  commits of `main` — now containing #1848 and #1900 — **and the defect did not**, which eliminates
+  both as candidate causes.
+- **`scaffold-runtime-sqlite`**: `runtime.health.listener-unreachable` —
+  `garnet healthReports.test_only_garnet_resp missed its 30s transition`. #1844/#1880 class.
+- **`close-gate`**: DoD boxes, supervisor-owned.
+
+The worker's own attribution was sound: it reproduced the CLI lint/fmt wrapper exit 2 on clean `main`
+before charging it anywhere, which is the right instinct and is why that one is not on the list.
+
+### #1349 — audited, and it is genuinely not closable
+
+`AUDIT: GAPS 7; DOCS/CONSUMER_PROOF`. Eight of ten rows SHIPPED with published-surface evidence
+(`deno doc --json` inventories, not greps). Two gaps:
+
+- **Row 7 is structural, not a missing test.** All five rejection classes exist and are reached, but
+  the row demands errors *"naming the conflicting **descriptors**"*, plural. A six-case probe showed
+  an ownership conflict names only the later descriptor, and it **structurally cannot** name the
+  earlier one: `SdkClientContributionDiagnostic` (`errors.ts:24`) carries a single optional
+  `contributionId`. Closing the row is a public type change. Gap-fill slice dispatched.
+- **Docs/consumer proof is already being closed elsewhere.** `packages/sdk/README.md` is done; the
+  two site pages were not, but **#1922 is landing a "Typed request contributions" section in
+  `docs/site/services-sdk/sdk.md` right now**. Deliberately dispatched no duplicate work;
+  `docs/site/reference/sdk/index.md` gets re-assessed after #1922 merges.
+
+Findings posted to #1349 (`5508755752`). Nothing hand-ticked — the boxes mirror from an
+`acceptance-evidence` block on the gap-fill PR, and the gap-fill brief says to omit the block rather
+than write an entry it cannot defend.
+
+### #1354 — a third no-delta `FAIL_PLAN`, and the protocol escalates
+
+My PLAN-EVAL dispatch was redundant: **#1891 already carried a `FAIL_PLAN` from 2026-09-01 20:26** at
+the same head, never acted on. Its closing note is the important part:
+
+> this is the **third** `FAIL_PLAN` cycle on an **unchanged** submission, and plan-gate escalates to
+> the user after two.
+
+Three cycles were spent re-recording a verdict while `plan.md` never changed. The evaluator states
+the required delta is small and fully specified — two subsection rewrites, two missing sections, six
+mechanical edits — with no re-research and the architecture kept as-is. Substantive findings:
+
+- **HIGH-1:** D3's own ordering defeats D3's guarantee. Required order is
+  `option selection → candidate render → conflict check → write`. No remedy surface; the ownership
+  marker format is never pinned, so "never silently destroy user edits" is untestable; the
+  marker-forgery case is missing; atomicity is implied but unstated.
+- **HIGH-2:** D9 names 8 of 9 overlapping files with #1664 —
+  `packages/cli/src/kernel/templates/app/route-templates_test.ts` is missing, exactly the merge-time
+  collision D9 exists to prevent.
+- Plus MEDIUM-3/4/5/6/7/8, LOW-9/10/11, NIT-12/13/14, and **two absent plan-gate sections** (Risk
+  register, Open-decision sweep) that alone force `FAIL_PLAN`.
+
+Dispatched the revision rather than idling on the escalation, and surfaced the escalation to the
+owner. #1354's *implementation* remains serialized behind #1664 by D9 regardless.
+
+### Trap: `--phase` dispatch dies in `authorize`, silently
+
+All three IMPL-EVAL dispatches (#1895, #1921, #1918) reported `POSTED` and exited 0, then **failed
+within seconds** — `authorize` failure, `agent` skipped. The only signal is a `##[notice]` inside
+"Evaluate trusted manual-trigger policy":
+
+```
+Manual comment policy: phase-generation-lookup-exhausted
+```
+
+The visible 403 `Resource not accessible by integration` is the workflow failing to post its own
+refusal comment — a red herring. A formal phase eval binds to a **deliberate generation** minted when
+the phase status label is set; once consumed (by the `ready_for_review` auto-dispatch, or a prior
+eval) further `--phase` dispatches are refused at zero spend. The workflow prints the recovery
+itself: *"Cycle away from and back to the phase status label."*
+
+Swapping `status:impl` → `status:impl-eval` on all three minted new generations **and re-triggered the
+pending dispatch comments automatically** — no re-post needed. All three `authorize` jobs then
+succeeded and their `agent` jobs are running. #1891's stale PLAN-EVAL dispatch failed the same way,
+which is how the pre-existing cycle-3 verdict came to light.
+
+**Standing rule from this:** after any `--phase` dispatch, confirm the run reached the `agent` job.
+`POSTED` is not evidence of dispatch.
