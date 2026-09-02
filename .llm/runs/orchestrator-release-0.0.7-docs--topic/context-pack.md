@@ -1,119 +1,74 @@
 # Context pack — topic-docs-0.0.7
 
-**Lane status: ACTIVE — shipping.** This file was previously and wrongly marked
-`EXHAUSTED / PARKED` with "no docs-lane issues open"; that was stale by an entire work programme.
-Reconciled against live GitHub on 2026-08-31.
+**Lane status: 0.0.7 queue CLEAR.** Reconciled against live GitHub and `origin/main` on 2026-09-02.
+
+This file has twice been wrong in the same direction — claiming live work that had already shipped,
+then claiming a parked lane that was mid-programme. Reconcile against `origin/main` and live GitHub
+before trusting a word of it.
 
 ## Anchor facts
 
 | Fact | Value |
 | --- | --- |
-| Current `main` | `584caa03f474de36b2d6e62e7162ab410c6ccb59` (merged #1798) |
+| Current `main` | `850cc7757` (merged #1935) |
 | Supervisor | native Claude Opus 5 · high |
 | Topic branch | `orchestrator/release-0.0.7-docs` — push by explicit refspec only |
-| Authoritative queue | every open item labelled `orchestrator:docs` — **10 issues + 11 PRs** live |
+| Authoritative queue | every open item labelled `orchestrator:docs` |
+| **0.0.7 docs queue** | **empty** — no open docs-owned issue or PR in milestone 27 |
 | Merge authority | primary milestone coordinator merges; this supervisor **never** merges |
-| Ownership labelling | `orchestrator:docs` is applied **when the leaf PR is opened** (in the `gh pr create` call), never at finalization — deferring it hides in-flight leaves from every orchestrator-keyed audit. `status:` transitions remain supervisor-owned. |
-| Evaluator route (post-#1792) | OpenRouter · **GLM 5.3 Flash** · `max` for IMPL-EVAL; **Qwen 3.8 Flash** · `max` for PLAN-EVAL when warranted. **No DeepSeek for new dispatches.** Existing DeepSeek receipts remain valid and are never re-run. |
-| Evaluator transport | `deno task agentic:claude-openrouter` → `.llm/tools/agentic/claude/openrouter-run.ts`. **Must be launched from a tree containing #1792**, because `claude-print.ts`'s guard reads `OPEN_EVALUATOR_MODEL_IDS` from the *checked-out* tree; launching from a pre-#1792 PR head yields a false `evaluator model request denied`. |
+| Ownership labelling | `orchestrator:docs` applied **when the leaf PR is opened**, never at finalization |
+| Evaluator route | OpenRouter · **GLM 5.3 Flash** · `max` for IMPL-EVAL; **Qwen 3.8 Flash** · `max` for PLAN-EVAL. No DeepSeek for new dispatches. |
+| Evaluator transport | `deno task agentic:claude-openrouter` → `.llm/tools/agentic/claude/openrouter-run.ts` |
+| Workflow-scoped push | `env -u GH_TOKEN -u GITHUB_TOKEN git -c credential.helper= -c credential.helper='!gh auth git-credential' push …` — the injected `GH_TOKEN` and `~/.gitconfig`'s helper are both repo-only |
 
-## Shipped this programme
+## Shipped
 
-`#1794` (5 packages) → `#1790` → **#1796** (`plugin-ai-core`, main `6bb27e46a`) → **#1798**
-(`plugin-streams-core`, main `584caa03f`). Umbrella **#1777** stays open until all slices land.
+- **`docs:exports-drift`** — umbrella **#1777 CLOSED**. 35 mapping rows + 1 typed exclusion = 36/36
+  reference pages, self-enforcing: a newly published reference page fails the gate unless mapped or
+  excluded.
+- **`docs:jsdoc-examples`** — **#1756** merged `0f7fefb6b`; **#1914** (`declare global` program-wide
+  leakage, unattributed diagnostics) merged `634b83d64`. Ceilings 116 / 14.
+- **`docs:readme-fences`** — **#1925** merged (squash) `25a026c0e`, **#1935** merged `850cc7757`.
+  Package and plugin README fences now compile. Census on `main`:
+  `readmes=36 fences=168 ts_like=73 checked=73 syntax_invalid=0 type_errors=7 failing_readmes=5`.
 
-## Ordered shared-corpus seam — the core sequencing constraint
+## Open, deliberately outside 0.0.7
 
-Every `docs:exports-drift` slice mutates the **same four derived artifacts**
-(`.llm/assets/agent-docs/{prose.json.gz,provenance.json}`,
-`packages/cli/src/kernel/assets/agent-docs.generated.ts`,
-`packages/mcp/src/publish-assets.generated.ts`) **and** the same
-`AUTHORITATIVE_MAPPING` array. They therefore conflict pairwise and **must merge serially**.
+**#1939** (`Backlog / Triage`, `status:triage`) — the `@app/router.ts` fence pair. The #1935
+IMPL-EVAL prototyped a `materializeSharedSupports` support stub that clears it and its downstream
+`TS18046` (7→5, failing READMEs 5→4) **with no README change**. Deferred because a fabricated router
+stub is a shared fixture every package's fences compile against and can drift from the real scaffold
+generator silently. Filed to Backlog on purpose so it cannot gate the release train.
 
-**Convergence recipe (do not deviate):**
+## Traps this lane paid for — do not relearn them
 
-1. Reset the branch to current `main`.
-2. Restore *only* the PR's own source: its docs page + its run directory.
-3. **Take `check-exports-drift.ts` from current `main` and insert only this PR's own mapping block.**
-   Never restore that file wholesale from the PR — its pre-merge copy will silently **drop rows that
-   landed meanwhile**. A dropped row still type-checks and passes every docs gate, because removing a
-   row only *reduces* what is policed. Assert every previously-merged row is still present afterwards.
-4. Regenerate in order: `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`.
-   Never hand-merge — one artifact is a gzip binary.
-5. Verify `provenance.json.sourceCommit` is a true ancestor of the new head.
-6. Verify the docs page is **byte-identical** to the evaluated head — that is what lets an existing
-   IMPL-EVAL PASS carry forward without a re-run.
-7. Hygiene: `git diff --check $(git merge-base origin/main HEAD) HEAD`.
-
-## Two methodology errors to not repeat
-
-- **`git diff --check` run bare after committing is a no-op** (working tree vs index) and returns 0.
-  It concealed real trailing-blank-line violations on #1798/#1800/#1803/#1806/#1818 and produced two
-  false "clean" claims in handed packets. Always use the base-relative form above. CI does **not**
-  enforce this; the coordinator's premerge audit does.
-- **`gh run rerun` replays the same commit** and cannot pick up a repaired base. Close/reopen also
-  proved unreliable (it races the merge-ref recompute). The only reliable way to get a current-base
-  `check-test` is to **converge onto current main and push a new head**.
-
-## Live queue — reconciled from GitHub
-
-### Merge packets handed, awaiting coordinator
-
-| PR | Closes | Exact head | State |
-| --- | --- | --- | --- |
-| **#1800** | #1799 | `e122495cb7c0c61ea965e93323ea446d2be3aa79` | CLEAN, all checks pass, mapping 22 rows |
-| **#1806** | #1804 | `b89a242a737b992a651511a42a6d81f215b067f2` | CLEAN, all checks pass, GLM PASS carried forward |
-
-### Evaluated PASS, needs convergence onto post-merge main
-
-| PR | Closes | Head | Evaluator |
-| --- | --- | --- | --- |
-| #1803 | #1801 | `842ee3ede` (DIRTY) | GLM 5.3 Flash max — PASS, 56-symbol gap set-equal |
-| #1808 | #1807 | `eafc1bba4` (DIRTY) | GLM 5.3 Flash max — PASS, 270 symbols / gap 157, root+public+builders 0-missing |
-
-### Converged, awaiting evaluation
-
-| PR | Closes | Head |
-| --- | --- | --- |
-| #1811 | #1809 | `6d5516422` |
-| #1813 | #1812 | `e937b11b6` |
-| #1816 | #1815 | `97d0801af` |
-| #1818 | #1817 | `f09cb03d6` — also has 3 pending whitespace fixes |
-
-### Outside-0.0.7 intake (converged, no milestone — they close no 0.0.7 issue)
-
-| PR | Head | State |
-| --- | --- | --- |
-| #1522 | `49b1c1390` | CLEAN — DevTools RFC closeout; add-only + current-safe FILING-LOG/context merge |
-| #1640 | `d63a95e9a` | CLEAN — Prisma 8 RFC; was 55 commits behind, converged, 44 files byte-identical |
-
-### Newly assigned, not yet started
-
-- **#1756** (`303be12ea`, DIRTY) — JSDoc `@example` compile gate for issue **#1533**. Has its own
-  worktree `007-leaf-1533` and a recorded PLAN-EVAL. Reuses #1374's landed machinery
-  (`snippet-compiler`/`snippet-policy`/`snippet-workspace` are directly reusable; only a JSDoc-block
-  sibling extractor plus symbol-injection and the import-specifier rule are new).
-- **#1533** (`status:triage`) — the issue behind #1756.
-- **#1777** — umbrella; keep open until every slice merges.
-
-## Known recurring hazards
-
-- **Label race**: an external automation repeatedly flips `status:ready-merge` → `status:impl-eval`
-  mid-run, which makes `close-gate` skip the acceptance mirror. Re-check the live label immediately
-  before relying on any CI run's label read. Has recurred 5+ times.
-- **Worktree contention**: converging in the same worktree an evaluation is using re-points the tree
-  under the evaluator. Both #1806 and #1808 evaluators had to self-rescue into detached checkouts.
-  **Allocate a separate worktree per concurrent evaluation** (`007-conv-*`, `007-eval-*`).
-- **Codex `acceptance-evidence` backtick drop**: implementers repeatedly strip the leading backtick
-  from the first identifier in a `box:` string, which breaks the exact-match mirror. Verify box text
-  character-for-character against the issue before promoting.
+- **A ratchet baseline measured on a branch head is stale the moment `main` moves.** #1925's gate
+  failed its own first CI run for exactly this. Measure on the **merge base**.
+- **A stacked PR base silently disables required CI.** `ci.yml` filters
+  `pull_request.branches: [main, 'feat/**', 'epic/**', 'canary/**']`, so a leaf-branch base runs
+  **no** `check-test`/`quality`/`close-gate` while GitHub still reports `MERGEABLE / CLEAN`.
+  Retargeting emits `edited`, not a trigger type — a **new head** is required. Verify a `ci` run
+  exists for the exact head (`gh api "repos/<r>/actions/runs?head_sha=<sha>"`).
+- **Never `deno fmt` a Markdown file to tidy an edit.** Package READMEs are not fmt-enforced;
+  formatting one buries the change in rewrapping and can split inline code spans. And **never check
+  formatting on a copy outside the repo** — `deno fmt` then uses its defaults, not the repo config,
+  and reports false positives. That error put a wrong claim in a PR body.
+- **Flip `status:ready-merge` before the push that triggers CI**, or close-gate races the label and
+  you pay a rerun.
+- **A repaired README stales `packages/mcp/src/publish-assets.generated.ts`**, which embeds it
+  verbatim. Regenerate with `deno task gen:publish-assets`; the sibling artifacts
+  (`check:agent-docs-prose`, `check:assets-barrel`) are unaffected by package READMEs.
+- **Never restore a shared file wholesale when converging.** Take current `main`'s copy, apply only
+  this change's own edit, then assert prior content survived **by name**. Near-missed five times
+  this milestone; on #1935 the add/add resolution was verified line-by-line against `origin/main`
+  for exactly this reason.
+- **`git diff --check` run bare after committing is a no-op.** Use
+  `git diff --check $(git merge-base origin/main HEAD) HEAD`.
 
 ## Exact next actions
 
-1. On merge of #1800 → converge **#1803** onto the new main (mapping cumulative + strip its 4 blank
-   lines), recut CI, hand packet. Its PASS carries forward.
-2. Then **#1808** (PASS already held) — same recipe.
-3. Then evaluate **#1811 → #1813 → #1816 → #1818** on GLM 5.3 Flash max, each converged first so the
-   evaluation runs against the head that will actually merge.
-4. **#1522** and **#1640** are converged and green — hand as packets when the coordinator wants them.
-5. Then **#1756/#1533**.
+None owned in 0.0.7 — the queue is clear. If a slot frees, useful work in priority order:
+
+1. Documentation/claim audits of active 0.0.7 PRs owned by other lanes, handing bounded findings to
+   their owning supervisor **without changing topic ownership**.
+2. **#1939**, only once 0.0.7 has shipped.
