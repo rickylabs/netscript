@@ -853,3 +853,14 @@ the merge.**
 - `status:impl` → `status:impl-eval`; the phase-eval workflow posted its own trigger for head
   `c231fbe5e` (run 33682027704). Monitor `bget0w5o7` covers CI conclusions + verdict comment.
 - #1952 monitor `bq678n5dv` still armed on `1d09636aa` runtime tiers.
+
+### 2026-09-02T21:25Z — Canary 6 prod E2E red → hotfix PR #1957; #1952 label/manifest repair
+
+- **Canary 6** (`156ee67924`, run 33683267941): packages published; `e2e-cli-prod` run 33684157301
+  red on `runtime.typed-db-phase-b` (D-332). Hotfix **PR #1957** @ `9b5f1713d` opened
+  (`type:fix`, `area:aspire`, `area:cli`, `gate:e2e`, `priority:p0`, `status:impl`, `e2e-cli-gate`,
+  0.0.7). Monitor `b9vkp2cek` on quality + both tiers. No release refs touched.
+- **#1952:** `quality` at `1d09636aa` was parity `manifestFresh:false` (new module/test absent from
+  the surface manifest) → TSV-only commit `0d6520b60`. `e2e-cli` had never run: the workflow is
+  opt-in via `e2e-cli-gate`; label applied, tiers dispatched at `0d6520b60` (monitor `byxychrzn`).
+- **#1953:** IMPL-EVAL in flight at `c231fbe5e` (monitor `bget0w5o7`); CI green there.

@@ -8477,3 +8477,26 @@ verdicts supersede the carry.
   hop earlier than "prose → corpus": a docs-site page edit is `site build → agent-docs prose →
   barrel → publish assets`. Run `check:agent-docs-prose` locally before pushing any `docs/site`
   change; it costs ~90 s and would have saved one CI cycle.
+
+### D-332 — Canary 6 prod E2E red: Phase-B duplicated a 30s departure observer (2026-09-02)
+
+- **Observed:** `e2e-cli-prod` run 33684157301 (main `156ee67924`, packages `0.0.7-canary.6`
+  published and immutable), job 100427490701, `runtime.typed-db-phase-b` FAILED:
+  `postgres did not become listener-Unhealthy; last=Healthy: tcp listener ready on
+  localhost:18998`. `runtime.health.listener-unreachable` PASSED 50 s earlier in the same run.
+- **Cause (line-level):** both gates close the same controller-owned synthetic listener
+  (`test_only_postgres_listener`, 18998). The fixture observes departure with
+  `DEPARTURE_OBSERVE_DEADLINE_MS = 90_000` ("departure has no native wait"); Phase-B carried a
+  private `REPORT_DEADLINE_MS = 30_000` and read the not-yet-re-evaluated `Healthy`. A stale report
+  inside Aspire's re-evaluation cadence, not backing health and not a contract change.
+- **Ruling (coordinator, after correction):** preserve the fault-injection invariant — synthetic
+  listener **must** go Unhealthy after the controller ack; real `postgres_listener` continuity stays
+  Healthy. Minimal repair: delete the duplicate observer, export and reuse the fixture's
+  `observeTestOnlyUnhealthy` + budget. An earlier framing ("accept Healthy as the corrected
+  outcome") was withdrawn by the coordinator and is not implemented; #1952's readiness classifier
+  (log-ready + Unhealthy under fault) remains valid.
+- **Repair:** hotfix leaf **PR #1957** `fix/typed-db-phase-b-departure-budget` @ `9b5f1713d` off
+  main `a867ab9cb`, gate code only, 271/271 e2e unit tests, parity fresh. `e2e-cli-gate` applied;
+  postgres tier is the proof. Post-merge proof is the next canary's `e2e-cli-prod` Phase-B PASS.
+- **Lesson:** any gate that closes a synthetic listener must use the shared departure budget; a
+  source-shape test now refuses a private `REPORT_DEADLINE_MS` in Phase-B.
