@@ -17,6 +17,10 @@
  */
 
 import { z } from 'zod';
+import {
+  ASPIRE_RESOURCE_NAME_PATTERN,
+  ASPIRE_RESOURCE_NAME_RULE,
+} from './src/domain/aspire-resource-name.ts';
 
 /** Public parser contract exposed by Aspire schema constants. */
 export interface AspireSchema<Output> {
@@ -612,6 +616,50 @@ export const ToolEntrySchema: AspireSchema<ToolEntry> = ToolEntryZod;
 
 // --- Root Configuration Schemas ---
 
+/** Background processor entries with contextual Aspire resource-name validation. */
+const BackgroundProcessorsZod = z.record(z.string(), BackgroundProcessorEntryZod).default({})
+  .superRefine((processors, context) => {
+    for (const [processorName, entry] of Object.entries(processors)) {
+      if (!ASPIRE_RESOURCE_NAME_PATTERN.test(processorName)) {
+        context.addIssue({
+          code: 'custom',
+          path: [processorName],
+          message: invalidBackgroundResourceNameMessage(
+            processorName,
+            'processor name',
+            processorName,
+          ),
+        });
+      }
+
+      for (const kind of ['ServiceReferences', 'PluginReferences'] as const) {
+        for (const [index, referenceName] of (entry[kind] ?? []).entries()) {
+          if (!ASPIRE_RESOURCE_NAME_PATTERN.test(referenceName)) {
+            context.addIssue({
+              code: 'custom',
+              path: [processorName, kind, index],
+              message: invalidBackgroundResourceNameMessage(
+                processorName,
+                kind,
+                referenceName,
+              ),
+            });
+          }
+        }
+      }
+    }
+  });
+
+function invalidBackgroundResourceNameMessage(
+  processorName: string,
+  kind: 'processor name' | 'ServiceReferences' | 'PluginReferences',
+  rejectedName: string,
+): string {
+  return `Background processor ${JSON.stringify(processorName)} has invalid ${kind} name ${
+    JSON.stringify(rejectedName)
+  }: ${ASPIRE_RESOURCE_NAME_RULE}`;
+}
+
 /** Root NetScript configuration section from `appsettings.json`. */
 const NetScriptConfigZod = z.object({
   Name: z.string(),
@@ -632,7 +680,7 @@ const NetScriptConfigZod = z.object({
   Services: z.record(z.string(), ServiceEntryZod).default({}),
   Apps: z.record(z.string(), AppEntryZod).default({}),
   Plugins: z.record(z.string(), PluginEntryZod).default({}),
-  BackgroundProcessors: z.record(z.string(), BackgroundProcessorEntryZod).default({}),
+  BackgroundProcessors: BackgroundProcessorsZod,
   Databases: z.record(z.string(), DatabaseEntryZod).default({}),
   Cache: z.record(z.string(), CacheEntryZod).default({}),
   Tools: z.record(z.string(), ToolEntryZod).default({}),

@@ -18,9 +18,9 @@
  * Scope: internal/contributor docs only -- the harness (.llm/harness/),
  * architecture doctrine (docs/architecture/doctrine/), agent-skill source
  * (.agents/skills/), and the root agent-surface files (AGENTS.md, CLAUDE.md,
- * README.md, CONTRIBUTING.md). It deliberately does NOT scan the generated
- * .claude/skills/ mirror (regenerated from .agents/skills/; staleness is the job
- * of `deno task agentic:sync-claude:check`) or the user/external doc site.
+ * README.md, CONTRIBUTING.md). The `.claude/skills/repo-skills/SKILL.md` discovery bridge is
+ * validated by `deno task agentic:check-claude`; repository skill content is scanned only from
+ * its authoritative `.agents/skills/` source. The user/external doc site is out of scope.
  *
  * External links (http(s)://, mailto:) are skipped. Relative link targets are
  * always existence-checked regardless of whether the target lives under a scanned
@@ -35,9 +35,8 @@
  *
  * Exit code: 0 when no enforced violation is found, 1 otherwise. Broken links and
  * broken anchors are always enforced; orphans are enforced only with --check-orphans.
- * This is wired into `deno task docs:maintenance` alongside the skill-mirror
- * staleness check (agentic:sync-claude:check) and the Claude-surface check
- * (agentic:check-claude).
+ * This is wired into `deno task docs:maintenance` alongside the Claude-surface check
+ * (`agentic:check-claude`).
  */
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { parseArgs } from 'jsr:@std/cli@^1.0.0/parse-args';
@@ -100,7 +99,7 @@ function findRepoRoot(start: string): string {
 const REPO_ROOT = findRepoRoot(dirname(fromFileUrl(import.meta.url)));
 
 // Default internal doc roots (scanned recursively) plus the explicit root-level
-// agent-surface files. The generated .claude/skills/ mirror is excluded.
+// agent-surface files. The Claude discovery bridge is validated separately.
 const DEFAULT_DIR_ROOTS = [
   '.llm/harness',
   'docs/architecture/doctrine',

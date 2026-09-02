@@ -18,6 +18,8 @@
 export { createServiceClient } from './service-client.ts';
 export { defineSdkClientContribution } from './sdk-client-contribution.ts';
 export type { SdkClientContributionDefinition } from './sdk-client-contribution.ts';
+export { createLocaleSdkClientContribution } from './locale-contribution.ts';
+export type { LocaleSdkClientContext, LocaleSdkClientContribution } from './locale-contribution.ts';
 export { isDefinedError, safe, SdkClientContributionError } from './errors.ts';
 export type {
   DefinedError,
@@ -53,6 +55,9 @@ export type {
   NetScriptProcedureSchemas,
   ProcedureInputFromNode,
   ProcedureOutputFromNode,
+  SdkClientHttpMethod,
+  SdkClientTransportPolicy,
+  SdkClientTransportPolicyMethodOptions,
   ServiceClient,
   ServiceClientContext,
   ServiceClientContract,

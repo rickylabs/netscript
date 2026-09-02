@@ -24,6 +24,8 @@ import type {
  *
  * @example
  * ```ts
+ * import { DenoKvAdapter } from '@netscript/kv';
+ *
  * const store: KvStore = new DenoKvAdapter();
  *
  * // Basic operations
@@ -37,8 +39,8 @@ import type {
  * }
  *
  * // With explicit resource management (Deno 2.3+):
- * await using store = new DenoKvAdapter();
- * await store.set(['key'], 'value');
+ * await using scopedStore = new DenoKvAdapter();
+ * await scopedStore.set(['key'], 'value');
  * // Automatically closed when scope exits
  * ```
  */

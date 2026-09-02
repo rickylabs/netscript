@@ -189,6 +189,23 @@ Deno.test('Codex repair plans one explicit mobile-control action', () => {
   assertEquals(result.changed, false);
 });
 
+Deno.test('sender lease repair plans one explicit guarded state action', () => {
+  for (const mode of ['plan', 'apply'] as const) {
+    const result = plan({
+      kind: 'repair-sender-lease',
+      commandId: `sender-repair-${mode}`,
+      mode,
+      worktree,
+    });
+    assertEquals(result.status, 'planned');
+    assertEquals(result.actions.map((action) => action.kind), ['repair_sender_lease']);
+    assertEquals(result.actions[0]?.effect, mode === 'apply' ? 'write' : 'none');
+    assertEquals(result.actions[0]?.resourceIds, [`worktree:${worktree}`]);
+    assertEquals(result.diagnostics, []);
+    assertEquals(result.changed, false);
+  }
+});
+
 Deno.test('OpenRouter route planning is available after issue 577 profile selection', () => {
   const result = plan({
     kind: 'launch',

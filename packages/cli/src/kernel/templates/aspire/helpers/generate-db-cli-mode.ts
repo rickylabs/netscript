@@ -1,8 +1,8 @@
 /**
  * @module templates/aspire/helpers/generate-db-cli-mode
  *
- * Generator for `.helpers/db-cli-mode.mts`, the AppHost short-circuit used by
- * `netscript db <operation>` commands.
+ * Generator for `.helpers/db-cli-mode.mts`, which registers typed database
+ * operation commands in the resident AppHost.
  */
 
 import type { DbCliModeOptions } from './types.ts';
@@ -18,10 +18,10 @@ export function generateDbCliMode(options: DbCliModeOptions): string {
     const databaseName = entry.DatabaseName ?? name;
     return `    '${name}': {
       configKey: '${name}',
-      resourceKey: '${name}',
       databaseName: '${databaseName}',
       envKey: '${toEnvPrefix(name)}_URI',
       engine: '${entry.Engine}',
+      mode: '${entry.Mode ?? 'Container'}',
       taskSuffix: '${engineTaskSuffix(entry.Engine)}',
       workdir: resolve(appHostDir, 'database', '${engineDir(entry.Engine)}'),
       resource: infrastructure.databases.get('${name}') ?? null,

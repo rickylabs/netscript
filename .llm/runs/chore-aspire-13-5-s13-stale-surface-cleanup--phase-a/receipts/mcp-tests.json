@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","packages/mcp/tests"],"cwd":"/home/agent/projects/netscript/worktrees/007-aspire-s13","exitCode":0,"durationMs":10586,"summary":{"passed":139,"failed":0,"ignored":0,"totalResults":139,"uniqueFailures":0},"failures":[]}

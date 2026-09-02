@@ -16,6 +16,38 @@ const REAL_CONFIG_PATH = new URL(
   import.meta.url,
 ).pathname.replace(/^\/([A-Z]:)/, '$1'); // Fix Windows path
 
+const ASPIRE_RESOURCE_NAME_RULE =
+  'Aspire resource names must be 1-64 characters, start with an ASCII letter, contain only ASCII letters, digits, or hyphens, and contain no consecutive or trailing hyphens.';
+const BACKGROUND_PROCESSOR_NAME = 'notifications';
+
+type BackgroundNamePosition = 'processor name' | 'ServiceReferences' | 'PluginReferences';
+
+function appSettingsWithBackgroundName(name: string, position: BackgroundNamePosition): unknown {
+  const processorName = position === 'processor name' ? name : BACKGROUND_PROCESSOR_NAME;
+  const references = position === 'processor name' ? {} : { [position]: [name] };
+
+  return {
+    NetScript: {
+      Name: 'background-name-matrix',
+      Services: position === 'ServiceReferences' ? { [name]: {} } : {},
+      Plugins: position === 'PluginReferences' ? { [name]: {} } : {},
+      BackgroundProcessors: {
+        [processorName]: references,
+      },
+    },
+  };
+}
+
+function invalidBackgroundNameMessage(
+  processorName: string,
+  position: BackgroundNamePosition,
+  rejectedName: string,
+): string {
+  return `Background processor ${JSON.stringify(processorName)} has invalid ${position} name ${
+    JSON.stringify(rejectedName)
+  }: ${ASPIRE_RESOURCE_NAME_RULE}`;
+}
+
 Deno.test('config', async (t) => {
   await t.step('parseAppSettings: parses real appsettings.json', async () => {
     const { config, warnings } = await parseAppSettings(REAL_CONFIG_PATH);
@@ -172,6 +204,82 @@ Deno.test('config', async (t) => {
     assertEquals(workers.Concurrency, 2);
     assertEquals(workers.ConcurrencyEnvVar, 'WORKER_CONCURRENCY');
   });
+
+  for (
+    const name of [
+      'workers',
+      'workers-api',
+      'Workers-API2',
+      'class',
+      'await',
+      'builder',
+      'a'.repeat(64),
+    ]
+  ) {
+    for (
+      const position of [
+        'processor name',
+        'ServiceReferences',
+        'PluginReferences',
+      ] as const
+    ) {
+      await t.step(
+        `AppSettingsSchema: accepts Aspire ${position} ${JSON.stringify(name)}`,
+        () => {
+          assertEquals(
+            AppSettingsSchema.safeParse(appSettingsWithBackgroundName(name, position)).success,
+            true,
+          );
+        },
+      );
+    }
+  }
+
+  for (
+    const name of [
+      "it's",
+      String.raw`back\slash`,
+      'tick`name',
+      'workers_api',
+      'a--b',
+      'a-',
+      '1worker',
+      'a'.repeat(65),
+    ]
+  ) {
+    for (
+      const position of [
+        'processor name',
+        'ServiceReferences',
+        'PluginReferences',
+      ] as const
+    ) {
+      await t.step(
+        `AppSettingsSchema: rejects Aspire ${position} ${JSON.stringify(name)} contextually`,
+        () => {
+          const result = AppSettingsSchema.safeParse(
+            appSettingsWithBackgroundName(name, position),
+          );
+          if (result.success) {
+            throw new Error(`Expected ${position} ${JSON.stringify(name)} to be rejected`);
+          }
+
+          const processorName = position === 'processor name' ? name : BACKGROUND_PROCESSOR_NAME;
+          const issues = (result.error as { issues: unknown[] }).issues;
+          assertEquals(issues, [{
+            code: 'custom',
+            path: [
+              'NetScript',
+              'BackgroundProcessors',
+              processorName,
+              ...(position === 'processor name' ? [] : [position, 0]),
+            ],
+            message: invalidBackgroundNameMessage(processorName, position, name),
+          }]);
+        },
+      );
+    }
+  }
 
   await t.step('parseAppSettings: parses databases', async () => {
     const { config } = await parseAppSettings(REAL_CONFIG_PATH);

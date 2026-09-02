@@ -90,8 +90,10 @@ const defaultStreamingRenderer: StreamingRenderer = (vnode, context) => {
  * replacement HTML is streamed in-band.
  *
  * @example
- * ```ts
- * import { renderToStream } from '@netscript/fresh/server/stream';
+ * ```tsx
+ * import { renderToStream } from '@netscript/fresh/server';
+ *
+ * const App = () => <main>Hello</main>;
  *
  * const { stream, allReady } = await renderToStream(<App />);
  * await allReady; // optional — wait until fully flushed
@@ -148,8 +150,10 @@ const STREAMING_HEADERS: Record<string, string> = {
  * chunks.
  *
  * @example
- * ```ts
- * import { createStreamingResponse } from '@netscript/fresh/server/stream';
+ * ```tsx
+ * import { createStreamingResponse } from '@netscript/fresh/server';
+ *
+ * const App = () => <main>Hello</main>;
  *
  * export const handler = {
  *   async GET() {

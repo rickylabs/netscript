@@ -1,4 +1,4 @@
-import { isAbsolute, relative, resolve } from '@std/path';
+import { basename, dirname, isAbsolute, relative, resolve } from '@std/path';
 
 export type Ownership = 'owned' | 'foreign' | 'unproven';
 
@@ -25,7 +25,73 @@ export interface ContainerCandidate {
   readonly commandLine?: string;
 }
 
-export type ResourceCandidate = AppHostCandidate | ContainerCandidate;
+/**
+ * A Docker volume. Aspire does not label anonymous volumes and carries no creator identity for
+ * them, so attribution comes from `classifyVolume` (who mounts it), not from `classify`.
+ */
+export interface VolumeCandidate {
+  readonly kind: 'volume';
+  readonly id: string;
+  readonly name?: string;
+  readonly creatorPid?: number;
+  readonly creatorProcessStartTime?: string;
+  /** Wall-clock creation timestamp from `docker volume inspect`, when exposed. */
+  readonly createdAt?: string;
+  /** Full container ids observed mounting the volume at probe time. */
+  readonly mountedBy: readonly string[];
+}
+
+/**
+ * A Docker network. DCP's `ContainerNetworkSpec` carries no per-run creator identity, so a
+ * network can never be positively owned by this run — only registered-creator or nothing.
+ * Aspire-management is recognized from the DCP label namespace, never from the network name.
+ */
+export interface NetworkCandidate {
+  readonly kind: 'network';
+  readonly id: string;
+  readonly name?: string;
+  readonly creatorPid?: number;
+  readonly creatorProcessStartTime?: string;
+  /** Wall-clock creation timestamp from `docker network inspect`, when exposed. */
+  readonly createdAt?: string;
+  /** Full container ids observed attached to the network at probe time. */
+  readonly attachedContainers: readonly string[];
+}
+
+export type ProcessEvidenceKind =
+  | 'dcp-label'
+  | 'apphost-argv'
+  | 'content-root-argv'
+  | 'cwd-path'
+  | 'socket-path';
+
+export interface ProcessEvidence {
+  readonly kind: ProcessEvidenceKind;
+  readonly path: string;
+}
+
+/**
+ * A host process that carries Aspire evidence. Orphaned helpers re-parent to PID 1 after their
+ * launching CLI exits, so PPID is context, never ownership proof; attribution comes only from the
+ * captured evidence paths (see `classify`).
+ */
+export interface ProcessCandidate {
+  readonly kind: 'process';
+  readonly pid: number;
+  readonly ppid: number;
+  readonly processStartedAt?: string;
+  readonly observedAgeMs?: number;
+  readonly commandLine: string;
+  readonly cwd?: string;
+  readonly evidence: readonly ProcessEvidence[];
+}
+
+export type ResourceCandidate =
+  | AppHostCandidate
+  | ContainerCandidate
+  | VolumeCandidate
+  | NetworkCandidate
+  | ProcessCandidate;
 
 export interface RegistryIdentityView {
   readonly appHosts: readonly {
@@ -44,8 +110,7 @@ export interface RegistryIdentityView {
   readonly ownedRoots?: readonly string[];
 }
 
-const WORKTREE_PREFIX = resolve('/home/codex/repos');
-const MCP_COMMAND = /(?:^|\s)aspire\s+mcp\b/i;
+export const MCP_COMMAND: RegExp = /(?:^|\s)aspire\s+(?:agent\s+)?mcp\b/i;
 /** A root shallower than this (`/`, `/tmp`, `/home`) would claim other runs' resources. */
 const MIN_OWNED_ROOT_SEGMENTS = 2;
 
@@ -72,10 +137,12 @@ function ownedByPath(
 }
 
 function foreignWorktree(path: string | undefined, root: string): boolean {
-  if (!path || !isAbsolute(path) || !pathContained(path, WORKTREE_PREFIX)) return false;
-  const candidatePart = relative(WORKTREE_PREFIX, resolve(path)).split(/[\\/]/)[0];
-  const rootPart = relative(WORKTREE_PREFIX, resolve(root)).split(/[\\/]/)[0];
-  return Boolean(candidatePart && rootPart && candidatePart !== rootPart);
+  if (!path || !isAbsolute(path) || !isAbsolute(root)) return false;
+  const siblingRoot = dirname(resolve(root));
+  const delta = relative(siblingRoot, resolve(path));
+  if (delta === '' || delta.startsWith('..') || isAbsolute(delta)) return false;
+  const candidateWorktree = delta.split(/[\\/]/)[0];
+  return Boolean(candidateWorktree && candidateWorktree !== basename(resolve(root)));
 }
 
 function registryMatches(candidate: ResourceCandidate, registry: RegistryIdentityView): boolean {
@@ -86,6 +153,7 @@ function registryMatches(candidate: ResourceCandidate, registry: RegistryIdentit
       entry.appHostStartedAt === candidate.appHostStartedAt
     );
   }
+  if (candidate.kind === 'process') return false;
   if (candidate.creatorPid === undefined || !candidate.creatorProcessStartTime) return false;
   return registry.containers.some((entry) =>
     entry.creatorPid === candidate.creatorPid &&
@@ -99,12 +167,48 @@ export function classify(
   registry: RegistryIdentityView,
   worktreeRoot: string,
 ): Ownership {
-  if (candidate.commandLine && MCP_COMMAND.test(candidate.commandLine)) return 'unproven';
-  const evidencePath = candidate.kind === 'apphost' ? candidate.appHostPath : candidate.mountSource;
-  if (evidencePath && ownedByPath(evidencePath, worktreeRoot, registry.ownedRoots)) return 'owned';
+  if (
+    'commandLine' in candidate && candidate.commandLine && MCP_COMMAND.test(candidate.commandLine)
+  ) {
+    return 'unproven';
+  }
+  const evidencePaths = candidate.kind === 'apphost'
+    ? [candidate.appHostPath]
+    : candidate.kind === 'container'
+    ? candidate.mountSource ? [candidate.mountSource] : []
+    : candidate.kind === 'process'
+    ? candidate.evidence.map((entry) => entry.path)
+    : [];
+  if (evidencePaths.some((path) => ownedByPath(path, worktreeRoot, registry.ownedRoots))) {
+    return 'owned';
+  }
   if (registryMatches(candidate, registry)) return 'owned';
-  if (foreignWorktree(evidencePath, worktreeRoot)) return 'foreign';
+  if (evidencePaths.some((path) => foreignWorktree(path, worktreeRoot))) return 'foreign';
   return 'unproven';
+}
+
+/**
+ * Attributes a volume to the run only when every container mounting it is positively owned.
+ *
+ * Anonymous volumes carry no labels or creator identity, so the mount relationship is the only
+ * positive evidence: Docker creates an anonymous volume with the container that first mounts it.
+ * The claim fails closed — a volume mounted by any container without a candidate (a non-Aspire or
+ * foreign container) or by nothing at all stays `unproven`, and a volume with its own registered
+ * creator identity keeps the `classify` verdict.
+ */
+export function classifyVolume(
+  volume: VolumeCandidate,
+  containers: readonly ContainerCandidate[],
+  registry: RegistryIdentityView,
+  worktreeRoot: string,
+): Ownership {
+  const direct = classify(volume, registry, worktreeRoot);
+  if (direct === 'owned' || volume.mountedBy.length === 0) return direct;
+  const mounters = containers.filter((container) => volume.mountedBy.includes(container.id));
+  if (mounters.length !== volume.mountedBy.length) return direct;
+  return mounters.every((mounter) => classify(mounter, registry, worktreeRoot) === 'owned')
+    ? 'owned'
+    : direct;
 }
 
 /** Selects the only candidates authorized for mutation. */

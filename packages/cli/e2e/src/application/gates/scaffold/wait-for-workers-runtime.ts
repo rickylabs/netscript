@@ -1,46 +1,71 @@
-const appHost = Deno.args[0];
-if (!appHost) throw new Error('AppHost path argument is required');
-
 const resource = 'workers';
-const readyMarkers = [
-  '[Scheduler] Started with',
+const schedulerReadyMarker = '[Scheduler] Started with';
+const runnerReadyMarkers = [
   'Starting with Web Worker pool',
+  'Starting in-process job runner',
 ] as const;
 const maxAttempts = 90;
 const pollIntervalMs = 2_000;
 
-await runAspire([
-  'wait',
-  resource,
-  '--apphost',
-  appHost,
-  '--non-interactive',
-  '--nologo',
-]);
+/** Returns whether logs prove scheduler and runner-mode startup. */
+export function hasWorkersRuntimeStartupEvidence(logs: string): boolean {
+  return logs.includes(schedulerReadyMarker) &&
+    runnerReadyMarkers.some((marker) => logs.includes(marker));
+}
 
-let lastLogs = '';
-for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-  const result = await runAspire([
-    'logs',
+if (import.meta.main) {
+  const appHost = Deno.args[0];
+  if (!appHost) throw new Error('AppHost path argument is required');
+
+  await runAspire([
+    'wait',
     resource,
     '--apphost',
     appHost,
-    '-n',
-    '200',
-  ], false);
-  lastLogs = result.output;
-  if (result.success && readyMarkers.every((marker) => lastLogs.includes(marker))) {
-    console.info(`workers runtime ready after ${attempt} log probe(s)`);
-    break;
+    '--non-interactive',
+    '--nologo',
+  ]);
+
+  let lastLogs = '';
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const result = await runAspire([
+      'logs',
+      resource,
+      '--apphost',
+      appHost,
+      '-n',
+      '200',
+    ], false);
+    lastLogs = result.output;
+    if (result.success && hasWorkersRuntimeStartupEvidence(lastLogs)) {
+      console.info(`workers runtime ready after ${attempt} log probe(s)`);
+      break;
+    }
+    if (attempt === maxAttempts) {
+      const missingRequirements = missingStartupRequirements(lastLogs);
+      throw new Error(
+        `workers process became healthy without runtime startup evidence (${
+          missingRequirements.length > 0
+            ? missingRequirements.join('; ')
+            : 'Aspire log probe did not succeed'
+        }); last logs:\n${tail(lastLogs)}`,
+      );
+    }
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
   }
-  if (attempt === maxAttempts) {
-    throw new Error(
-      `workers process became healthy without runtime startup evidence; last logs:\n${
-        tail(lastLogs)
-      }`,
+}
+
+function missingStartupRequirements(logs: string): string[] {
+  const missing: string[] = [];
+  if (!logs.includes(schedulerReadyMarker)) {
+    missing.push(`scheduler marker missing: ${schedulerReadyMarker}`);
+  }
+  if (!runnerReadyMarkers.some((marker) => logs.includes(marker))) {
+    missing.push(
+      `no runner-mode marker found: ${runnerReadyMarkers.join(' OR ')}`,
     );
   }
-  await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  return missing;
 }
 
 async function runAspire(

@@ -25,7 +25,12 @@ function leaks(ownership: 'owned' | 'foreign' | 'unproven'): LeakReport {
     schemaVersion: 1,
     generatedAt: '2026-08-02T00:00:00Z',
     worktreeRoot: '/worktree',
-    probes: { aspire: { state: 'ok' }, docker: { state: 'ok' } },
+    probes: {
+      aspire: { state: 'ok' },
+      docker: { state: 'ok' },
+      volumes: { state: 'ok' },
+      networks: { state: 'ok' },
+    },
     survivors: [{
       kind: 'apphost',
       identity: '/worktree/apphost.mts (pid 1)',
@@ -34,6 +39,7 @@ function leaks(ownership: 'owned' | 'foreign' | 'unproven'): LeakReport {
       ageMs: 1,
       stale: false,
       command: "aspire stop --apphost '/worktree/apphost.mts' --non-interactive --nologo",
+      atRiskFromUpstream: false,
       resource: { kind: 'apphost', appHostPath: '/worktree/apphost.mts', appHostPid: 1 },
     }],
   };

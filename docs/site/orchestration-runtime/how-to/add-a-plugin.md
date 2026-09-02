@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Add a plugin
 templateEngine: [vento, md]
-order: 106
+order: 107
 oldUrl: /how-to/add-a-plugin/
 ---
 

@@ -9,6 +9,7 @@ import {
   validateSdkClientContributions,
 } from '../src/internal/client-contributions/prepared-call.ts';
 import type { SdkClientContributionErrorCode } from '../src/client/errors.ts';
+import type { SdkClientContributionDiagnostic } from '../src/client/errors.ts';
 import type { SdkClientLogicalCall } from '../src/internal/client-contributions/adapter-ports.ts';
 
 const contract = {
@@ -55,6 +56,21 @@ function assertConstructionCode(
   assertFalse('cause' in error);
 }
 
+function assertConstructionDiagnostic(
+  contributions: unknown,
+  expected: SdkClientContributionDiagnostic,
+): void {
+  const error = constructionError(contributions);
+  assertEquals(error.code, expected.code);
+  assertEquals(error.phase, expected.phase);
+  assertEquals(error.contributionId, expected.contributionId);
+  assertEquals(error.conflictingContributionId, expected.conflictingContributionId);
+  assertEquals(error.procedurePath, expected.procedurePath);
+  assertEquals(error.headerName, expected.headerName);
+  assertEquals(error.toJSON(), expected);
+  assertFalse('cause' in error);
+}
+
 function procedureDescriptor(path: readonly string[] = ['echo']) {
   return Object.freeze({
     path: Object.freeze([...path]),
@@ -63,10 +79,16 @@ function procedureDescriptor(path: readonly string[] = ['echo']) {
 }
 
 function logicalCall(context: Readonly<Record<string, unknown>>): SdkClientLogicalCall<object> {
+  const procedure = procedureDescriptor();
   return Object.freeze({
     context,
     procedurePath: Object.freeze(['echo']),
-    procedureNode: contract.echo,
+    procedure,
+    transportPolicy: Object.freeze({
+      procedure,
+      method: 'POST' as const,
+      cache: 'default' as const,
+    }),
     transport: Object.freeze({
       kind: 'http' as const,
       origin: new URL('https://example.test'),
@@ -78,9 +100,7 @@ function logicalCall(context: Readonly<Record<string, unknown>>): SdkClientLogic
 }
 
 function preparationPort(contributions: unknown) {
-  return createPreparedOutboundHeadersPort(contributions, {
-    describe: (_node, path) => procedureDescriptor(path),
-  });
+  return createPreparedOutboundHeadersPort(contributions);
 }
 
 Deno.test('unknown construction rejects invalid protocol, ids, shapes, and forbidden extras', () => {
@@ -94,7 +114,20 @@ Deno.test('unknown construction rejects invalid protocol, ids, shapes, and forbi
   assertConstructionCode([new Date()], 'SDK_CONTRIBUTION_INVALID');
   assertConstructionCode([descriptor({ context: [] })], 'SDK_CONTRIBUTION_INVALID');
 
-  for (const extra of ['dependsOn', 'before', 'after', 'order', 'priority', 'environment']) {
+  for (
+    const extra of [
+      'dependsOn',
+      'before',
+      'after',
+      'order',
+      'priority',
+      'environment',
+      'plugins',
+      'interceptors',
+      'clientInterceptors',
+      'adapterInterceptors',
+    ]
+  ) {
     assertConstructionCode([
       descriptor({ [extra]: extra === 'priority' ? 1 : ['test:other'] }),
     ], 'SDK_CONTRIBUTION_INVALID');
@@ -124,6 +157,121 @@ Deno.test('unknown construction rejects ownership conflicts and reserved names',
   assertConstructionCode([
     descriptor({ headerKeys: ['sec-private'] }),
   ], 'SDK_CONTRIBUTION_INVALID');
+});
+
+Deno.test('duplicate-id diagnostics name both descriptors by their shared id', () => {
+  assertConstructionDiagnostic([
+    descriptor({ id: 'test:duplicate', context: {}, headerKeys: [] }),
+    descriptor({ id: 'test:duplicate', context: {}, headerKeys: [] }),
+  ], {
+    code: 'SDK_CONTRIBUTION_CONFLICT',
+    phase: 'construction',
+    contributionId: 'test:duplicate',
+    conflictingContributionId: 'test:duplicate',
+  });
+});
+
+Deno.test('ownership diagnostics orient the later claimant against the earlier owner', () => {
+  const owner = descriptor({ id: 'test:owner' });
+
+  assertConstructionDiagnostic([
+    owner,
+    descriptor({ id: 'test:header-claimant', context: {}, headerKeys: ['x-tenant'] }),
+  ], {
+    code: 'SDK_CONTRIBUTION_CONFLICT',
+    phase: 'construction',
+    contributionId: 'test:header-claimant',
+    conflictingContributionId: 'test:owner',
+    headerName: 'x-tenant',
+  });
+
+  assertConstructionDiagnostic([
+    owner,
+    descriptor({ id: 'test:context-claimant', context: { tenant: 'optional' }, headerKeys: [] }),
+  ], {
+    code: 'SDK_CONTRIBUTION_CONFLICT',
+    phase: 'construction',
+    contributionId: 'test:context-claimant',
+    conflictingContributionId: 'test:owner',
+  });
+});
+
+Deno.test('unsupported protocol diagnostics name the offending descriptor', () => {
+  for (
+    const protocol of [
+      { family: 'other', major: 1 },
+      { family: 'netscript.sdk-client', major: 2 },
+    ]
+  ) {
+    assertConstructionDiagnostic([
+      descriptor({ id: 'test:unsupported-version', protocol }),
+    ], {
+      code: 'SDK_CONTRIBUTION_VERSION',
+      phase: 'construction',
+      contributionId: 'test:unsupported-version',
+    });
+  }
+});
+
+Deno.test('protocol rejection precedence is preserved when the id is also invalid', () => {
+  assertConstructionDiagnostic([
+    descriptor({
+      id: 'INVALID',
+      protocol: { family: 'other', major: 1 },
+    }),
+  ], {
+    code: 'SDK_CONTRIBUTION_VERSION',
+    phase: 'construction',
+  });
+});
+
+Deno.test('tuple-limit diagnostics name the seventeenth descriptor', () => {
+  const tuple = Array.from(
+    { length: 17 },
+    (_, index) => descriptor({ id: `test:limit-${index}`, context: {}, headerKeys: [] }),
+  );
+  assertConstructionDiagnostic(tuple, {
+    code: 'SDK_CONTRIBUTION_LIMIT',
+    phase: 'construction',
+    contributionId: 'test:limit-16',
+  });
+});
+
+Deno.test('dependency and ordering diagnostics name the offending descriptor', () => {
+  for (const field of ['dependsOn', 'before', 'after', 'order', 'priority']) {
+    assertConstructionDiagnostic([
+      descriptor({
+        id: `test:${field.toLowerCase()}`,
+        [field]: field === 'priority' ? 1 : ['test:other'],
+      }),
+    ], {
+      code: 'SDK_CONTRIBUTION_INVALID',
+      phase: 'construction',
+      contributionId: `test:${field.toLowerCase()}`,
+    });
+  }
+});
+
+Deno.test('reserved trace header declarations identify the offending descriptor', () => {
+  for (
+    const [contributionId, headerName] of [
+      ['test:traceparent', 'traceparent'],
+      ['test:tracestate', 'tracestate'],
+      ['test:traceparent-case', 'Traceparent'],
+    ] as const
+  ) {
+    const error = constructionError([
+      descriptor({ id: contributionId, headerKeys: [headerName] }),
+    ]);
+    assertEquals(error.code, 'SDK_CONTRIBUTION_INVALID');
+    assertEquals(error.phase, 'construction');
+    assertEquals(error.contributionId, contributionId);
+    assertEquals(error.toJSON(), {
+      code: 'SDK_CONTRIBUTION_INVALID',
+      phase: 'construction',
+      contributionId,
+    });
+  }
 });
 
 Deno.test('unknown construction enforces tuple, context, and header budgets', () => {
@@ -158,6 +306,70 @@ Deno.test('Desktop construction rejects even an empty contributions field at run
   assertEquals(error.phase, 'construction');
 });
 
+Deno.test('Desktop-incompatible diagnostics name the first supplied descriptor', () => {
+  const error = assertThrows(() =>
+    Reflect.apply(createDesktopServiceClient, undefined, [{
+      contract,
+      contributions: [descriptor({ id: 'test:desktop' })],
+    }])
+  );
+  assert(error instanceof SdkClientContributionError);
+  assertEquals(error.code, 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED');
+  assertEquals(error.phase, 'construction');
+  assertEquals(error.contributionId, 'test:desktop');
+  assertEquals(error.conflictingContributionId, undefined);
+  assertEquals(error.procedurePath, undefined);
+  assertEquals(error.headerName, undefined);
+  assertEquals(error.toJSON(), {
+    code: 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED',
+    phase: 'construction',
+    contributionId: 'test:desktop',
+  });
+  assertFalse('cause' in error);
+});
+
+Deno.test('transport policy validation precedes Desktop contribution rejection', () => {
+  const error = assertThrows(() =>
+    Reflect.apply(createDesktopServiceClient, undefined, [{
+      contract,
+      transportPolicy: { method: 'GET' },
+      contributions: [],
+    }])
+  );
+  assert(error instanceof TypeError);
+  assertEquals(error.message, 'SDK transportPolicy.method must be a function');
+});
+
+Deno.test('contribution preparation receives exactly the five public fields', async () => {
+  let observedKeys: readonly string[] = [];
+  const contribution = descriptor({
+    prepare: (options: unknown) => {
+      assert(options !== null && typeof options === 'object');
+      observedKeys = Object.keys(options).sort();
+      for (
+        const forbidden of [
+          'method',
+          'inferredMethod',
+          'fallbackMethod',
+          'maxUrlLength',
+          'dedupePredicate',
+          'retry',
+          'trace',
+          'fetch',
+          'link',
+          'plugins',
+        ]
+      ) {
+        assertFalse(forbidden in options);
+      }
+      return { headers: { 'x-tenant': 'safe' } };
+    },
+  });
+
+  await preparationPort([contribution]).prepare(logicalCall({ tenant: 'tenant' }));
+  assertEquals(observedKeys, ['context', 'input', 'procedure', 'signal', 'transport']);
+});
+
 Deno.test('preparation rejects missing context and every invalid header form', async () => {
   const missing = await assertRejects(() =>
     preparationPort([descriptor()]).prepare(logicalCall({}))
@@ -181,6 +393,28 @@ Deno.test('preparation rejects missing context and every invalid header form', a
     );
     assert(error instanceof SdkClientContributionError);
     assertEquals(error.code, 'SDK_HEADER_INVALID');
+  }
+});
+
+Deno.test('preparation rejects malformed patches with the local runtime taxonomy', async () => {
+  for (
+    const patch of [
+      null,
+      [],
+      { headers: { 'x-tenant': 'safe' }, plugins: [] },
+    ]
+  ) {
+    const error = await assertRejects(() =>
+      preparationPort([
+        descriptor({ prepare: () => patch }),
+      ]).prepare(logicalCall({ tenant: 'tenant' }))
+    );
+    assert(error instanceof SdkClientContributionError);
+    assertEquals(error.code, 'SDK_CONTRIBUTION_RUNTIME');
+    assertEquals(error.phase, 'preparation');
+    assertEquals(error.contributionId, 'test:valid');
+    assertEquals(error.procedurePath, 'echo');
+    assertFalse('cause' in error);
   }
 });
 

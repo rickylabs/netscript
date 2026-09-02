@@ -1,0 +1,24 @@
+S7 Phase-B attempt relay inventory
+head: f8201d4f72dff75882665153f4c0b941a1f8fc96
+owner: s7-rerun
+
+Observed supervisor-owned watcher before the attempt and left untouched during leased-run teardown:
+pid=3368905 ppid=1 startTimeTicks=30005428
+deno run -A .llm/runs/research-aspire-13.5-adoption--0.0.7/tools/loopback-relay.ts watch --owner s7-rerun --registry .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s7/phase-b-rerun/relay-registry.json --interval 1500
+
+Observed supervisor-owned containers and left untouched during leased-run teardown:
+61ea68b0a2d6df1aacc3771035efb492bca668910e6cc725b010b2caaad4dc47 relay-s7-rerun-32784 netscript.relay.owner=s7-rerun
+23b4d1157df84290fe6c1d7a77f3daf17904f3fd1a3934f9f606bdc1737834aa relay-s7-rerun-11990 netscript.relay.owner=s7-rerun
+9e4844a9f493d3fdc866434404c4df8ae64a185a30d50e1fe7766fd68855da22 relay-s7-rerun-32783 netscript.relay.owner=s7-rerun
+6242a15c55348cd91c733dddcfdf0eccb21c9be922fa6fd2f9e162c8a4fe4f28 relay-s7-rerun-20800 netscript.relay.owner=s7-rerun
+
+Terminal cleanup disposition:
+The resumed coordinator instruction authorized removal of these exact S7 relay resources. After
+revalidating the watcher PID/start identity and all four exact owner-labeled containers, targeted
+TERM of PID 3368905 returned `/bin/kill: (3368905): No such process`. The immediate exact
+`netscript.relay.owner=s7-rerun` Docker inventory was also empty. No broader kill/remove command and
+no retry was issued: the supervisor had concurrently removed the watcher and four containers.
+
+Final proof:
+`docker ps -a` -> empty
+`pgrep -af '[l]oopback-relay.ts.*--owner s7-rerun'` -> exit 1, empty stdout

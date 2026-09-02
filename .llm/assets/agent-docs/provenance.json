@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.6",
-  "sourceCommit": "b1422d6b0",
-  "extractionTimestamp": "2026-09-01T12:05:07.814Z",
+  "sourceCommit": "4720596fc",
+  "extractionTimestamp": "2026-09-02T13:44:11.786Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -73,6 +73,7 @@
     "pages/orchestration-runtime/how-to/deploy-deno-deploy/index.md",
     "pages/orchestration-runtime/how-to/deploy-local-aspire/index.md",
     "pages/orchestration-runtime/how-to/deploy/index.md",
+    "pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md",
     "pages/orchestration-runtime/how-to/graceful-shutdown/index.md",
     "pages/orchestration-runtime/how-to/index.md",
     "pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md",
@@ -186,7 +187,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 4862570,
-  "compressedBytes": 1394817,
-  "sha256": "ffa4a1849a0b7322b6802b881245a204556ee9fd76798eeb45ce4819f70c51f8"
+  "uncompressedBytes": 4911587,
+  "compressedBytes": 1411560,
+  "sha256": "2bf56098be6c6238c1f20d6c9058a652540a4c16f294e6cb3c425ece8e929182"
 }

@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"/home/codex/repos/netscript-aspire-13-5-s7","mode":"check","summary":{"filesSelected":12,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":12,"filesProcessed":12,"droppedFiles":[],"refusals":[]},"findings":[]}

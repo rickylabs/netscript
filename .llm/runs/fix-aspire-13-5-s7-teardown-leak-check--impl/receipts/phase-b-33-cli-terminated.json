@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-08-30T19:30:51Z",
+  "signal": "SIGKILL",
+  "targetValidation": {
+    "pid": 3469156,
+    "ppid": 1,
+    "startTimeTicks": 30126839,
+    "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-attempt",
+    "appHostArgv": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-attempt/aspire/apphost.mts",
+    "stableIdentity": true
+  },
+  "command": "/bin/kill -KILL 3469156",
+  "exitCode": 0,
+  "firstPostSignalCensus": {
+    "capturedAt": "2026-08-30T19:31:02.556Z",
+    "elapsedAfterSignalSeconds": 11,
+    "leasedRootRows": [],
+    "foreignControlRowCount": 24,
+    "finding": "The leased AppHost, DCP, and service descendants had already self-terminated before the first post-SIGKILL census. No re-parented leased descendant remained to classify."
+  },
+  "foreignControlPreservation": {
+    "cliPid": 3461184,
+    "cliStartTimeTicks": 30122391,
+    "appHostPid": 3461203,
+    "appHostStartTimeTicks": 30122409,
+    "status": "running-unchanged"
+  },
+  "retry": false
+}

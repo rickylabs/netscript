@@ -1,0 +1,36 @@
+{
+  "gateId": "assets-barrel",
+  "invocationId": "s13-fix-assets-barrel",
+  "argv": [
+    "deno",
+    "task",
+    "check:assets-barrel"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s13",
+  "gitHead": "fc0a0c8ccc02ed8f741931de3455e7778df8697d",
+  "actualGitHead": "fc0a0c8ccc02ed8f741931de3455e7778df8697d",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2872981",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "0167a47f8f803c95d10bc0ad1617d1ee6ff7b2242fa4ff8fe45119c5f30ab5da",
+  "lifecycleId": "worker:2872981:s13-fix-assets-barrel:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T16:17:08.085Z",
+  "startedAt": "2026-08-30T16:17:08.087Z",
+  "finishedAt": "2026-08-30T16:17:08.704Z",
+  "durationMs": 617,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 570,
+    "sha256": "6fc77d278be69f0dc20503a5435f98da17262e66cfb99a0b1b4cf25f75a8802d",
+    "tail": "Task check:assets-barrel deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts\nTask gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n",
+    "truncated": false
+  }
+}

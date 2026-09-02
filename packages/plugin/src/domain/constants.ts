@@ -15,6 +15,7 @@ export const PLUGIN_TYPES: readonly PluginType[] = [
 /** Supported plugin contribution axis value. */
 export type ContributionAxis =
   | 'service'
+  | 'sdk-client'
   | 'background-processor'
   | 'stream-topic'
   | 'database-schema'
@@ -28,6 +29,7 @@ export type ContributionAxis =
 /** Supported plugin contribution axes. */
 export const CONTRIBUTION_AXES: readonly ContributionAxis[] = [
   'service',
+  'sdk-client',
   'background-processor',
   'stream-topic',
   'database-schema',

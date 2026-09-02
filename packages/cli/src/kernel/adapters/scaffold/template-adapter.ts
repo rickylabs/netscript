@@ -13,8 +13,7 @@
  *
  * @example
  * ```typescript
- * import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
- * import { StringTemplateAdapter } from './template-adapter.ts';
+ * import { DenoFileSystem, StringTemplateAdapter } from '@netscript/cli/scaffolding';
  *
  * const fs = new DenoFileSystem();
  * const tpl = new StringTemplateAdapter(fs);
