@@ -91,7 +91,11 @@ export async function prepareRelease(
     label,
     'gen:mcp-export-corpus',
     'deno',
-    ['task', 'gen:mcp-export-corpus'],
+    // Release preparation has already changed the corpus read set deliberately: the coordinated
+    // version bump rewrites package/plugin manifests and gen:publish-assets refreshes versioned
+    // generated sources. Keep the generator's normal clean-tree default, and opt in only at this
+    // release-owned boundary.
+    ['task', 'gen:mcp-export-corpus', '--allow-dirty'],
     root,
     dependencies,
   );

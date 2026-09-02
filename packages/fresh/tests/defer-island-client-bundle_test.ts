@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
+import { createLockedViteCommand } from './_fixtures/vite-runtime.ts';
 
 interface ViteManifestEntry {
   readonly file: string;
@@ -16,12 +17,8 @@ Deno.test('vite build emits the registered defer island in the client bundle', a
   const outputDir = await Deno.makeTempDir({ prefix: 'netscript-defer-island-' });
 
   try {
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await createLockedViteCommand({
       args: [
-        'run',
-        '--no-lock',
-        '-A',
-        'npm:vite@7.2.2',
         'build',
         '--config',
         'vite.config.ts',

@@ -8,6 +8,34 @@ import {
 import { Form } from './form.tsx';
 import { resolveRuntimeFormState } from '../runtime/state.ts';
 import { replyFor } from '../runtime/reply.ts';
+import type { FormCollectionStrategy } from '../mod.ts';
+
+Deno.test('FormCollectionStrategy rejects navigation for client-owned collections', () => {
+  const clientStrategy = {
+    mode: 'client',
+    partial: '/dashboard/framework/forms?mode=client',
+    clientNav: false,
+  } satisfies FormCollectionStrategy;
+  const serverStrategy = {
+    mode: 'server',
+    navigation: 'document',
+  } satisfies FormCollectionStrategy;
+  const hybridStrategy = {
+    mode: 'hybrid',
+    navigation: 'client',
+  } satisfies FormCollectionStrategy;
+
+  const invalidClientStrategy: FormCollectionStrategy = {
+    mode: 'client',
+    // @ts-expect-error Client-owned collection updates do not submit, so navigation is invalid.
+    navigation: 'document',
+  };
+
+  assertEquals(clientStrategy.mode, 'client');
+  assertEquals(serverStrategy.navigation, 'document');
+  assertEquals(hybridStrategy.navigation, 'client');
+  assertEquals(invalidClientStrategy.mode, 'client');
+});
 
 Deno.test('Form renders framework-owned submission and csrf hidden inputs', () => {
   const runtime = resolveRuntimeFormState(
