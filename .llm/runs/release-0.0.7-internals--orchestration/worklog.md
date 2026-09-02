@@ -9865,3 +9865,42 @@ intact, top-level per-ref group untouched.
 **Push boundary unchanged and correctly held.** Both sessions hold `repo` only. The Aspire session
 declined to push on my behalf before I could decline to ask — its framing is better than mine: that it
 *might* succeed is what makes it wrong, not a reason to try. Awaiting an owner push.
+
+### D-226 — my "lane is clear" was wrong; S9 proves key isolation is load-bearing, not insurance
+
+**The error.** After S8 and S10 integrated main I told the Aspire lane collision-free dispatch was
+safe. I enumerated the offender set from the branches active at *first diagnosis* (S8, S10, S11) and
+never re-derived it from live runs before reporting clear. S9 was on my list as a **future** dispatch,
+not a live one. Aspire dispatched S9 on that assurance and it destroyed three queued runtime jobs —
+mine, S8's and S10's. The cost was mine to cause and theirs to absorb.
+
+**The mechanism, which also corrects Aspire's read.** `cancel-in-progress: false` prevents eviction of
+a **running** job; it does nothing for **pending** ones. Without `queue: max`, GitHub's default —
+one running plus one pending, newly queued cancels previously pending — still applies to the shared
+group. A branch can look harmless and still destroy queued jobs.
+
+```
+05:17:03  S9 docker job enters group (run 33592084708 attempt 2, e72da5161, v1 keys, queue_max=0)
+05:17:04  PR #1889 sqlite  CANCELLED  steps: 0   <- evicted from the QUEUE, never executed
+05:17:04  S8  sqlite       CANCELLED
+05:17:20  S10 sqlite       CANCELLED
+05:17:23  S9 sqlite starts
+```
+
+Every `e2e-cli` run created 05:12:30Z–05:18:00Z was enumerated; the only others were two S8 runs, both
+already fixed. **`steps: 0` is the load-bearing detail** — it distinguishes queue eviction from
+mid-execution cancellation, which the run-level `cancelled` conclusion hides. I nearly mis-attributed
+this to per-ref supersession before checking it.
+
+**Priority inverted, in the opposite direction to my last claim.** I had said #1908 was now only
+insurance. It is the reverse: S9 **authors its own content** in `e2e-cli.yml`, so a merge of the fix
+yields a blob on no remote ref and is refused for want of `workflow` scope. S9 therefore cannot adopt
+the fix by merging **and** cannot be repaired in place — key isolation is the *only* remedy, because
+`-v2` stops v1 arrivals sharing a group with fixed branches. #1908 is load-bearing.
+
+Complete taxonomy now recorded on the issue: passive branch → merge works; **authoring branch → cannot
+merge, and evicts pending jobs even with `cancel-in-progress: false`**; writing the fix → blocked on
+scope. Only the first is fixable by branch hygiene.
+
+**Standing rule adopted:** never report a lane clear from a remembered offender set. Re-derive it from
+the live workflow runs at that moment.
