@@ -6,23 +6,29 @@
  * only, and the JSDoc gate covers `@example` blocks in source, not `.md`. A README could therefore
  * name a dead specifier or a renamed symbol and stay green (#1924).
  *
- * Every value below is the exact measured census on `main` `ec848e6b0`, so the corpus can neither
+ * Every value below is the exact measured census on `main` `4720596fc`, so the corpus can neither
  * shrink to manufacture a pass nor grow its failing set silently. Changing one is a one-line,
  * reviewable diff.
+ *
+ * Re-measured from `ec848e6b0` after `plugins/auth/README.md` gained one `typescript` fence in main:
+ * it imports the install-emitted `./auth/sdk-client.ts`, which no repository path resolves, the same
+ * tolerated consumer-owned-module class already carried by `packages/sdk`, `packages/service` and
+ * `packages/prisma-adapter-mysql`. That single fence moved `tsLike` 71→72, `checked` 70→71,
+ * `typeErrors` 31→32 and `failingReadmes` 6→7; no other value changed.
  */
 export const README_FENCE_RATCHET = {
   /** Discovered `packages/*` and `plugins/*` READMEs. */
   minimumReadmes: 36,
   /** `ts`, `tsx` and `typescript` fences across them. */
-  minimumTsLikeFences: 71,
+  minimumTsLikeFences: 72,
   /** Fences actually submitted to the compiler. */
-  minimumChecked: 70,
+  minimumChecked: 71,
   /** Fences tagged TypeScript whose body does not parse; `deno check` aborts the program on these. */
   maximumSyntaxInvalid: 1,
   /** READMEs carrying at least one type error. */
-  maximumFailingReadmes: 6,
+  maximumFailingReadmes: 7,
   /** Total type errors across the corpus. */
-  maximumTypeErrors: 31,
+  maximumTypeErrors: 32,
 } as const;
 
 /** One README fence that could not be parsed as TypeScript. */
