@@ -1,63 +1,50 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertThrows } from '@std/assert';
 
+import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import {
-  HEALTHY_WAIT_TIMEOUT_EXIT_CODE,
+  assertExpectedListenerFailure,
   matchesExpectedFailure,
-  requireHealthyWaitTimeout,
 } from '../../../src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts';
-import type { ListenerFaultExpectation } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
+import {
+  type ListenerFaultExpectation,
+  listenerFaultExpectations,
+} from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import type { ListenerHealthReport } from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
 
-const POSTGRES_TIMEOUT_DIAGNOSTIC =
-  "Timed out waiting for resource 'postgres' to be healthy after 10s.";
+const POSTGRES_EXPECTATION = listenerFaultExpectations(DATABASE.POSTGRES)[0];
 
-Deno.test('listener recovery requires the running-unhealthy wait timeout contract', () => {
-  assertEquals(HEALTHY_WAIT_TIMEOUT_EXIT_CODE, 17);
-  assertEquals(
-    requireHealthyWaitTimeout('postgres', 10, {
-      code: HEALTHY_WAIT_TIMEOUT_EXIT_CODE,
-      stdout: '',
-      stderr: `❌ ${POSTGRES_TIMEOUT_DIAGNOSTIC}`,
-    }),
-    POSTGRES_TIMEOUT_DIAGNOSTIC,
-  );
+Deno.test('listener failure accepts the structured socket code independent of prose', () => {
+  assertExpectedListenerFailure({
+    resourceName: 'postgres',
+    healthCheckKey: 'test_only_postgres_listener',
+    status: 'Unhealthy',
+    description: 'diagnostic wording may change without breaking the gate',
+    data: { code: 'ECONNREFUSED' },
+  }, POSTGRES_EXPECTATION);
 });
 
-Deno.test('listener recovery accepts the ANSI-decorated Aspire 13.5.3 timeout line', () => {
-  assertEquals(
-    requireHealthyWaitTimeout('postgres', 10, {
-      code: HEALTHY_WAIT_TIMEOUT_EXIT_CODE,
-      stdout: '',
-      stderr: `\x1b[31m\x1b[1m❌\x1b[22m \x1b[31m${POSTGRES_TIMEOUT_DIAGNOSTIC}\x1b[39m\x1b[0m`,
-    }),
-    POSTGRES_TIMEOUT_DIAGNOSTIC,
-  );
-});
-
-Deno.test('listener recovery rejects terminal-state exit 18 for the timeout path', () => {
+Deno.test('listener failure gives the structured code precedence over matching prose', () => {
   assertThrows(
     () =>
-      requireHealthyWaitTimeout('postgres', 10, {
-        code: 18,
-        stdout: '',
-        stderr: POSTGRES_TIMEOUT_DIAGNOSTIC,
-      }),
+      assertExpectedListenerFailure({
+        resourceName: 'postgres',
+        healthCheckKey: 'test_only_postgres_listener',
+        status: 'Unhealthy',
+        description: 'tcp listener unhealthy: ECONNREFUSED',
+        data: { code: 'EPROTO' },
+      }, POSTGRES_EXPECTATION),
     Error,
-    'expected exit 17',
+    'neither its failure code nor its description',
   );
 });
 
-Deno.test('listener recovery requires the exact timeout diagnostic', () => {
-  assertThrows(
-    () =>
-      requireHealthyWaitTimeout('postgres', 10, {
-        code: HEALTHY_WAIT_TIMEOUT_EXIT_CODE,
-        stdout: '',
-        stderr: `${POSTGRES_TIMEOUT_DIAGNOSTIC} Retrying.`,
-      }),
-    Error,
-    POSTGRES_TIMEOUT_DIAGNOSTIC,
-  );
+Deno.test('listener failure retains the wording-tolerant description fallback', () => {
+  assertExpectedListenerFailure({
+    resourceName: 'postgres',
+    healthCheckKey: 'test_only_postgres_listener',
+    status: 'Unhealthy',
+    description: 'tcp listener unreachable: ETIMEDOUT at localhost:18998',
+  }, POSTGRES_EXPECTATION);
 });
 
 const GARNET_EXPECTATION = { controllerListener: 'garnet' } as ListenerFaultExpectation;
