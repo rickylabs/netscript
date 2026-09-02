@@ -23,4 +23,3 @@
 
 - The leaf role and branch were assigned directly by `topic-internals-0.0.7`; this session does not
   launch or self-perform IMPL-EVAL.
-

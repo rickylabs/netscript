@@ -48,4 +48,3 @@ not change a package/plugin public or publishable surface.
 - The live Pages scheduler demonstration depends on safely manufacturing a pending default-branch
   victim without reaching a real deployment. The gating must be exercised and observed before any
   claim stronger than structural proof is made.
-

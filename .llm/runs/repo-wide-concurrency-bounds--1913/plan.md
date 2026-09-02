@@ -77,4 +77,3 @@ correct global mutex for Pages publication and per-version canary publication.
 N/A. The issue and implementation brief provide an exact authorized surface, mechanism, acceptance
 criteria, non-scope, and required gates. All per-group trade-offs and the generation-key decision
 are resolved above before implementation; no architecture or sequencing decision remains open.
-

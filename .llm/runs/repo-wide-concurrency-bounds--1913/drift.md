@@ -44,3 +44,14 @@
 - **Action:** accept
 - **Evidence:** `research.md` finding 4.
 
+## 2026-09-02 — Active credential shadowed workflow-scoped credential
+
+- **What:** The first workflow push used the active `GH_TOKEN`, which had only `repo`, and GitHub
+  rejected `.github/workflows/pages.yml` despite a stored secondary credential with `workflow`.
+- **Source:** `gh auth status` and rejected `git push` output.
+- **Expected:** The dispatch-confirmed session credential carried `gist, read:org, repo, workflow`.
+- **Actual:** Environment-token precedence selected a different repo-only token.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** supervisor explicitly resumed this leaf and directed it to commit/push everything;
+  push uses the stored workflow-scoped credential without exposing it.

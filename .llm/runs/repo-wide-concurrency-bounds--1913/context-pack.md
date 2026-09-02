@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `repo-wide-concurrency-bounds--1913` |
 | Branch | `ci/repo-wide-concurrency-bounds` |
-| Current phase | implement — workflow bounds landed locally |
+| Current phase | gate complete locally; hosted acceptance next |
 | Archetype | N/A |
 | Scope overlays | none |
 
@@ -15,6 +15,8 @@
 The issue premise has been corrected with measured Pages traffic. Both workflow groups now keep
 their global/entity keys and carry `queue: max`; the canary key has no generation marker. Header
 comments preserve the pending-eviction mechanism and `steps: 0` diagnostic.
+The parsed regression now matches all 10 blocks across all 13 workflow documents, and all planned
+local gates pass.
 
 ## Completed
 
@@ -24,20 +26,22 @@ comments preserve the pending-eviction mechanism and `steps: 0` diagnostic.
 - Issue #1913 body corrected from dispatch-only to ordinary main-push exposure with measurements.
 - PLAN-EVAL recorded N/A after all decisions were resolved.
 - Added the Pages and release-canary queue bounds plus explanatory headers.
+- Added the exhaustive parsed workflow sweep, including job-level mappings.
+- Passed focused test, `.llm/tools` check/format, and independent YAML readback with exit 0.
 
 ## In Progress
 
-- Parsed sweep test implementation.
+- Commit/push the regression and evidence slice, then construct hosted acceptance if safe.
 
 ## Next Steps
 
-1. Add exhaustive parsed workflow assertions.
-2. Run the required gates with captured real exits.
-3. Attempt the live acceptance only without publishing or foreign contention.
+1. Commit and push the regression/evidence slice.
+2. Attempt the live acceptance only without publishing or foreign contention.
 
 ## Drift and Debt
 
-- Drift: corrected issue premise; missing requested implementation-gate path; `rtk` unavailable.
+- Drift: corrected issue premise; missing requested implementation-gate path; `rtk` unavailable;
+  active token precedence caused the first workflow push rejection.
 - Debt: none.
 
 ## Commits

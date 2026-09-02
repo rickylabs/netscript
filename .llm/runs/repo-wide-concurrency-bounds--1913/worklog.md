@@ -63,6 +63,8 @@ the release workflow test to see the full 13-workflow inventory and the class in
 | 2026-09-02 11:01 | 0 | re-baseline | Clean branch at the required base; corrected issue #1913 after measuring ordinary main traffic. |
 | 2026-09-02 11:05 | 0 | decisions locked | Both groups retain global/entity mutexes and receive `queue: max`; canary key remains generation-neutral. |
 | 2026-09-02 11:08 | 1 | implementation | Added both bounds and headers preserving the running-vs-pending and `steps: 0` diagnostic. |
+| 2026-09-02 11:26 | 2 | regression fix | Corrected the classifier precedence so the mixed OpenHands entity/ref key reaches its specific class; parsed reality remains 13 workflows and 10 blocks. |
+| 2026-09-02 11:29 | 2 | gates | Focused test 6/6, `.llm/tools` check, format, and independent YAML readback all passed with exit 0. |
 
 ## Reconcile — slice 1
 
@@ -71,6 +73,12 @@ the release workflow test to see the full 13-workflow inventory and the class in
 - No new issue or PR comments changed the locked plan.
 - The executable edits remain limited to the two authorized workflow concurrency mappings.
 
+## Reconcile — slice 2
+
+- The parsed fixture matches all 10 mappings across all 13 workflow files, including the two
+  job-level runtime groups. The brief's count was correct; no hidden additional block was found.
+- The class invariant rejects any repo-wide literal arm without `queue: max`.
+- PR #1923 remains draft at `status:impl`; no lifecycle transition was made.
 
 ## Gate Results
 
@@ -79,6 +87,16 @@ the release workflow test to see the full 13-workflow inventory and the class in
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Parsed YAML readback | `deno eval --no-lock` with cached `npm:js-yaml@4.3.2`, both edited workflows | PASS, exit 0 | Both parsed concurrency objects retain their exact group and `cancel-in-progress: false`, with `queue: max`. No lock change. |
+
+### Slice 2 final-head gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Focused regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/release/release-canary-workflow_test.ts` | PASS, exit 0 | 6 passed, 0 failed. |
+| Type check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` | PASS, exit 0 | 342 files, 3 batches, 0 failed batches/occurrences. |
+| Format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools --ext ts` | PASS, exit 0 | 342 files, 2 batches, 0 failed batches/findings. |
+| Parsed YAML readback | `deno eval --no-lock` with `npm:js-yaml@4.3.2` | PASS, exit 0 | Exact Pages and canary concurrency objects read from parsed documents. |
+| Whitespace | `git diff --check 77ad823dcb1874ccfc8964b4679ad92a3a145e0b` | PASS, exit 0 | Base-to-head diff clean after removing three bootstrap trailing blank lines. |
 
 ## Handoff Notes
 
