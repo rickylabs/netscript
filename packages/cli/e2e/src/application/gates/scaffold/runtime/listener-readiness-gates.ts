@@ -91,7 +91,8 @@ export function createListenerReadinessGates(
         'run',
         '--allow-read',
         '--allow-write',
-        '--allow-run=aspire',
+        // `docker` is for the owned-container log quoted by the readiness receipt (#863 gate 2).
+        '--allow-run=aspire,docker',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts`,
         context.project.appHost,
         context.project.projectRoot,

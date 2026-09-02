@@ -162,7 +162,7 @@ Deno.test('failure/recovery gate owns exactly the synthetic Postgres and Garnet 
     'run',
     '--allow-read',
     '--allow-write',
-    '--allow-run=aspire',
+    '--allow-run=aspire,docker',
   ]);
   assertEquals(
     command.at(-4),
