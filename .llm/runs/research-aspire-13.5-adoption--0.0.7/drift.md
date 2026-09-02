@@ -8331,3 +8331,30 @@ the argv-pinning test that failed on the `-n` change was updated rather than loo
 
 Honest CLI span source retained throughout: no MCP spans, no raw HTTP reader, and the
 `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS = "false"` switch untouched.
+
+## D-323 — Route override and hard delivery deadline (owner-authorized, 2026-09-02)
+
+The owner overrode the supervisor route for the final S9/S10/S13 delivery window: **explicit model
+`claude-fable-5-1`, effort medium** (the session was moved through `/model fable`, `/effort low`,
+then `/model claude-fable-5-1` and `/effort medium`; the identity to preserve is
+`claude-fable-5-1` · medium). Supersedes the checkpoint-2 `claude-fable-5` · medium route for this
+window only.
+
+**Deadline:** S9 #1759, S10 #1760 and S13 #1779 must each reach a verified merge packet and be
+merged by the primary milestone coordinator **no later than 2026-09-02T17:16:34Z**. The coordinator
+holds merge authority and consumes each green packet immediately; this session never merges.
+
+Exact heads at the override: S9 `ecce4af0a`, S10 `84e4b38f7`, S13 `435c20170`. S13 has since moved
+to `3bef62a54` — a generated-carrier-only commit (`gen:mcp-export-corpus` output) required to clear
+the `quality` job's `check:mcp-export-corpus` stale verdict; the head-preservation instruction was
+weighed against the deadline and the move was the smallest repair that turns `quality` green.
+
+Mandated posture: act across all three slices in parallel; never wait passively; translate every
+red into exact failing check, slice ownership, smallest repair or rerun, named actor and ETA;
+artifact-based checkpoints at least every 10 minutes.
+
+State at 16:29Z: S9 `ecce4af0a` sqlite tier in progress, postgres tier queued behind the global
+v2 concurrency key, close-gate red only on unticked #1721 boxes (evidence applied after tiers),
+desktop-native red is the #1930 `@orpc/contract` import class (not S9-attributable). S10
+`84e4b38f7` green except desktop-native (#1930, OPEN). S13 `3bef62a54` pushed; awaiting the
+`pull_request` dispatch.
