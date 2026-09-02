@@ -1,169 +1,181 @@
-# Evaluation: Slice E — unregistered `generate resource` command (#1354)
+# Evaluation: Slice E — unregistered `generate resource` command (#1354, PR #1954)
 
 ## Metadata
 
-| Field          | Value                                                                    |
-| -------------- | ------------------------------------------------------------------------ |
-| Run ID         | `feat-cli-resource-slice-command--1354-e`                                |
-| Target         | `packages/cli` — `src/public/features/generate/resource/` (5 new files)  |
-| Archetype      | `6 — CLI / Tooling`                                                      |
-| Scope overlays | `frontend` (hosted runtime acceptance deferred to Slice G)               |
-| Evaluator      | Fresh opposite-family IMPL-EVAL session (Claude, Opus 5), 2026-09-02     |
+| Field          | Value                                                                              |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Run ID         | `feat-cli-resource-slice-command--1354-e`                                          |
+| Target         | `packages/cli` — `src/public/features/generate/resource/` (5 new files)            |
+| Archetype      | `6 — CLI / Tooling`                                                                |
+| Scope overlays | `frontend` (hosted runtime acceptance deferred to Slice G)                         |
+| Evaluator      | Independent IMPL-EVAL session (Claude Fable 5.1), 2026-09-02; read-only on product |
 
-Evaluated state: uncommitted working tree on branch `feat/cli-resource-slice-command`, HEAD
-`3a794be67`, against the locked plan
-`origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md` and
-`origin/main` (`88fc6d69d`). Every gate below was re-run by this session; no product file was
-edited, and no Aspire/Docker/browser/`e2e:cli` execution was attempted.
+Evaluated state: `git diff origin/main...750160fe1` on branch `feat/cli-resource-slice-command`
+(merge-base `9a191bdda`). Worktree HEAD is `85e28ccde`; `git diff --stat 750160fe1 HEAD` touches only
+`.llm/runs/.../implement.md` (3+/1-), so the product diff is identical. Locked plan:
+`origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md` (D1, D2, D3,
+D8, multi-client seam, Slice E). This file replaces the earlier Opus 5 evaluation that assessed the
+uncommitted tree at `3a794be67`; every gate below was re-run by this session.
 
 ## Process Verification
 
-| Check                                  | Result | Evidence                                                                                                                                                                                                                        |
-| -------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Plan-Gate passed before implementation | `PASS` | Run `plan.md` records `PLAN-EVAL: N/A` before product edits, justified by the owner-locked plan. Independently confirmed the parent plan run reached a native opposite-family Fable 5 `PASS_PLAN_WITH_FINDINGS` at `409630338` (parent `worklog.md` § "post-PASS enumeration amendment"), so the gate genuinely passed upstream. See Finding L-3. |
-| Design section exists in worklog       | `PASS` | `worklog.md` § Design — Public Surface / Domain Vocabulary / Ports / Constants / Archetype 6 Spine / Commit Slices / Deferred Scope / Contributor Path.                                                                          |
-| Commit slices match design plan        | `PASS` | One design slice declared ("Compose the unregistered resource flow and command with all D3 proof cases", files = exactly the five product files + run artifacts); working tree contains exactly that set. No commits exist yet, so the protocol's commit-list input is `N/A`. |
-| Each slice has a passing gate          | `PASS` | Named gate (focused resource tests + structured CLI gates) re-run by this session: focused tests exit 0, 12 passed / 0 failed / 0 ignored.                                                                                        |
-| No speculative seams (unused files)    | `PASS` | Non-registration is the plan's explicit Slice E/F boundary, not dead code: all five files are reachable from the two colocated test files. `GenerateResourceUseCase`, `ResourceAppRootResolver`, `ResourceClientResolver`, `ResourceProcedureResolver`, and `ResourceSliceStager` are each consumed by `GenerateResourceDependencies` / the execute path. No unused export found. |
-| Constants used for finite vocabularies | `PASS` | Variants come from the kernel `RESOURCE_SLICE_VARIANTS` / `ResourceSliceOptionalVariant` vocabulary; exit codes are the typed `0 \| 1` union; no parallel command/selector constant table was introduced (`grep` for a local variant or client list returns nothing). |
+| Check                                             | Result | Evidence                                                                                                                                     |
+| ------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Touch set is exactly the five authorized files    | PASS   | `git diff --stat origin/main...750160fe1`: 5 product files + 8 run artifacts; nothing else in `packages/`/`plugins/`                          |
+| `public-command-dependencies.ts` untouched        | PASS   | `git diff origin/main...750160fe1 -- packages/cli/src/public/features/root/public-command-dependencies.ts` → 0 lines                          |
+| `deno.lock` unchanged                             | PASS   | `git diff origin/main...750160fe1 -- deno.lock` → 0 lines                                                                                    |
+| No carriers moved / no generated corpus delta     | PASS   | diff contains only additions (1436 insertions, 0 deletions, no renames)                                                                      |
+| Command is unregistered                           | PASS   | grep for `generate-resource|GenerateResource|generateResource` outside `features/generate/resource/` → no hits; `generate-group.ts` and root dependency/tree files carry no `resource` registration |
+| Drift recorded for the 6→5 file ceiling change    | PASS   | `drift.md` "serialized root dependency overlap removed" (owner directive, #1664 overlap)                                                       |
+| Generator ≠ evaluator                             | PASS   | this session did not author any product file                                                                                                 |
 
 ## Static Gates
 
-| Gate             | Command or check                                                                                                                | Result | Evidence                                                            | Notes                                                     |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------- | --------------------------------------------------------- |
-| Narrow typecheck | `run-deno-check.ts --root packages/cli/src/public/features/generate/resource --ext ts,tsx --pretty`                              | `PASS` | exit 0; 5 files selected, 1 batch, 0 failed batches, 0 diagnostics    | `deno check --unstable-kv`                                 |
-| Slice typecheck  | `run-deno-check.ts --root packages/cli --ext ts,tsx` (generator run)                                                            | `PASS` | generator: exit 0, 942 files, 8 batches, 0 failed, 0 diagnostics      | narrow re-run above is this session's independent proof     |
-| Format           | `run-deno-fmt.ts --root packages/cli --ext ts,tsx --include '^packages/cli/src/public/features/generate/resource/' --config .llm/tmp/slice-e-deno.json` | `PASS` | exit 0; selected 5, processed 5, dropped 0, findings 0               | scoped config verified byte-faithful to root rules — see below |
-| Lint             | `run-deno-lint.ts` same root/include/config                                                                                     | `PASS` | exit 0; selected 5, processed 5, dropped 0, findings 0               | same                                                       |
-| Doc lint         | `deno task docs:jsdoc-examples`; `deno task docs:readme-fences`                                                                 | `PASS` | jsdoc: exit 0, `checked=359 failures=0`, deferred `unboundName=116 typeError=14`. fences: exit 0, `readmes=36 fences=168 checked=73 type_errors=7` | matches `implement.md` exactly                              |
-| Publish dry-run  | `deno task publish:dry-run`                                                                                                     | `PASS` | exit 0; `Success Dry run complete`                                    | workspace-wide                                             |
-| Link/path check  | `check:mcp-export-corpus`; registration grep                                                                                    | `PASS` | corpus exit 0, census `packageCount=35 subpathCount=273 symbolCount=7841`, no generated diff. Repo-wide grep for `generate-resource` / `GenerateResourceCommand` / `createGenerateResourceCommand` / `generate/resource` outside the five files returns zero hits. | carriers require no regeneration                            |
+| Gate                                                                                        | Exit | Result                                                                        |
+| ------------------------------------------------------------------------------------------- | ---: | ----------------------------------------------------------------------------- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` |    0 | 960 files, 8 batches, 0 failed batches, 0 diagnostics                         |
+| `run-deno-test.ts -- --allow-all .../generate-resource_test.ts`                             |    0 | 3 passed, 0 failed, 0 ignored                                                 |
+| `run-deno-test.ts -- --allow-all .../generate-resource-command_test.ts`                     |    0 | 9 passed, 0 failed, 0 ignored                                                 |
+| `deno task arch:check`                                                                      |    0 | all roots `FAIL=0`; `cli` root `FAIL=0 WARN=60 INFO=1` (baseline, unchanged) |
+| `deno task quality:gate`                                                                    |    0 | quality:scan `ok:true`, findings `[]`, 7/7 pre-existing allowances; doctrine `FAIL=0` |
+| `deno task docs:readme-fences`                                                              |    0 | PASS readmes=36 fences=168 checked=73 type_errors=7 (pre-existing)            |
+| `deno task docs:jsdoc-examples`                                                             |    0 | PASS checked=359 failures=0; `deferredCensus.unboundName=116` (≤116 ceiling), `typeError=14` |
 
-**Scoped lint/fmt config is legitimate, not a weakened gate.** Root `deno.json` excludes
-`packages/cli/` from both `lint.exclude` and `fmt.exclude`, so an unqualified wrapper run silently
-drops all five files. I diffed `.llm/tmp/slice-e-deno.json` against root `deno.json`: lint rules are
-identical (`tags: ["recommended","jsr"]`, `include: ["no-process-global","no-node-globals"]`) and
-fmt options are identical (`useTabs:false lineWidth:100 indentWidth:2 semiColons:true
-singleQuote:true`); only `include`/`exclude` differ. Coverage `droppedFiles: []` proves 5/5 were
-actually processed rather than vacuously passing. Drift entry "CLI lint/fmt root exclusion" is
-accurate.
+Production purity: `grep "Deno\.\|console\.\|process\."` over the three non-test files → no hits.
+`any` / `as unknown as` / `deno-lint-ignore` in the five files → none (the two
+`as [string, ...string[]]` narrowings live in test fixtures only).
 
-## Fitness Gates
+## Fitness Gates (plan conformance)
 
-| Gate | Function                          | Result | Evidence                                                                                                                                                    | Violations |
-| ---- | --------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| F-1  | File-size lint                    | `PASS` | 93 / 246 / 44 / 148 / 295 lines; all well under the 500 cap. Plan's own tighter caps met: command 93 ≤ 150, orchestration 246 ≤ 250.                          | none       |
-| F-2  | Helper-reinvention scan           | `PASS` | Uses `@std/path` `join`/`dirname`, `@std/assert`, `@std/fmt/colors` `stripAnsiCode`, existing `planResourceSlice` / `renderResourceSlice` / `reconcile*` / `normalizeResourceSliceInput` / `parseOwnedResourceSliceLeaf` / `markOwnedResourceSliceLeaf`, existing `FileSystemPort` / `TemplatePort` / `MemoryFileSystemAdapter` / `StringTemplateAdapter`. No local path, hashing, marker, or reconciliation reimplementation. | none       |
-| F-3  | Layering check                    | `PASS` | `generate-resource.ts` imports only `kernel/application/*` and `kernel/ports/*` — zero presentation imports. `generate-resource-command.ts` (presentation) imports `@cliffy/command`, `kernel/presentation/*`, and the application module. No kernel file imports this feature (grep confirms zero inbound references). Direction is presentation → application only. | none       |
-| F-4  | Inheritance audit                 | `PASS` | Three `extends`, each exactly one level onto an existing spine/base: `ResourceSliceConflictError extends CliExitError`, `GenerateResourceCommand extends CliCommand<CliffyCommand>`, `GenerateResourceUseCase extends UseCase<…>`. No new abstract added; `arch:check` reports no new A5/AP-5/F-4 warning for these symbols. | none       |
-| F-5  | Public surface audit              | `PASS` | Not added to `packages/cli/deno.json` exports or `mod.ts`; no `export default`; every exported symbol carries a JSDoc summary and an explicit return type.    | none       |
-| F-6  | JSR publishability gate           | `PASS` | `audit-jsr-package.ts --root packages/cli --text` exit 0; `files=942 loc=121921`, `dry-run: OK slowTypeWarnings=1`, 20 warnings — identical to the pre-change baseline reported in `implement.md`, i.e. no new warning introduced. | none       |
-| F-7  | Doc-score gate                    | `PASS` | `deno task quality:gate` exit 0; doctrine section `FAIL=0`.                                                                                                   | none       |
-| F-8  | Workspace `lib` override check    | `N/A`  | No `deno.json`/compiler-option edit in scope.                                                                                                                | —          |
-| F-9  | Permission declaration check      | `PASS` | No `Deno.readTextFile`/`writeTextFile`/`readDir`/`cwd`/`exit` in the five files (grep: none); all IO flows through the injected `FileSystemPort`.             | none       |
-| F-10 | Test-shape audit                  | `PASS` | Two colocated `*_test.ts` beside their subjects; 12 behavioral `Deno.test` cases asserting semantic reports, byte state, write counts, and exit codes — no giant snapshot. | none       |
-| F-11 | Forbidden-folder lint             | `PASS` | New folder is `generate/resource/`; no `utils`/`helpers`/`common`/`lib`/`interfaces` introduced. `arch:check` adds no new F-DOCT-4 row.                        | none       |
-| F-12 | Naming-convention lint            | `PASS` | All five filenames kebab-case, `*_test.ts` suffix, matching sibling `generate/aspire|plugins|runtime-schemas` convention.                                     | none       |
-| F-13 | Saga and runtime invariants       | `N/A`  | No saga/worker/runtime surface in scope.                                                                                                                     | —          |
-| F-14 | Console-log lint                  | `PASS` | grep for `console.` in the five files: none. Output goes through injected `printText`/`printJson`, defaulting to `kernel/presentation/output/default-output.ts`. | none       |
-| F-15 | Re-export-of-upstream lint        | `PASS` | No re-export of `@cliffy`, `@std`, or kernel symbols; the feature exports only its own contracts.                                                             | none       |
-| F-16 | Folder-cardinality lint           | `PASS` | `generate/resource/` has 5 immediate children; parent `generate/` rises to 5 (`aspire`, `plugins`, `resource`, `runtime-schemas`, `generate-group.ts`) — both under the cap of 12. `arch:check` CLI census is `WARN=60 INFO=1`, unchanged from the recorded baseline; no new F-DOCT-5 row. | none       |
-| F-17 | Abstract-derived co-location lint | `PASS` | No abstract introduced; derivations sit with their spine bases in the kernel.                                                                                 | none       |
-| F-18 | Sub-barrel lint                   | `PASS` | No `mod.ts`/barrel added under `generate/resource/`; consumers import concrete modules.                                                                       | none       |
-| F-19 | Scoped source gate runners        | `PASS` | All validation ran through `.llm/tools/run-deno-{check,test,lint,fmt}.ts` with `--root`/`--ext`/`--include`, and coverage `droppedFiles: []` on both scoped runs. | none       |
+### D1 / D8 — layering
+
+- `generate-resource-command.ts` (presentation, Cliffy) composes `generate-resource.ts`
+  (application orchestration) through `GenerateResourceDependencies`; the use case imports only
+  `kernel/application/resource-slice/*`, `kernel/ports/*`, and `@std/path`. No presentation import
+  enters the application file. PASS.
+- Nonzero exit is a typed `ResourceSliceConflictError extends CliExitError`
+  (`generate-resource-command.ts:24-32`) thrown from the action (`:69`); no `Deno.exit` in the
+  feature layer. PASS.
+- Output goes through injected `printText`/`printJson` defaulting to the presentation
+  `outputText`/`outputJson`. PASS.
+
+### D2 / multi-client seam
+
+- `--client` is forwarded unchanged: `toGenerateResourceRequest` copies `input.client`
+  (`generate-resource-input.ts:37`), and `executeGenerateResource` calls
+  `dependencies.resolveClient(appRoot, request.client)` (`generate-resource.ts:120`). No discovery,
+  no default, no `?? first` fallback exists in product code. Proven by
+  `command forwards the explicit client selector unchanged and emits text`
+  (`generate-resource-command_test.ts:57`) and by the `client` rejection case at `:188`
+  (resolver rejection → zero writes). The fail-closed ambiguity rule itself belongs to Slice A's
+  `client-selector.ts` (#1950), which plugs into this `ResourceClientResolver` seam. PASS.
+- Static absolute routes: the command does no route parsing; `normalizeResourceSliceInput` →
+  `normalizeStaticRoute` (`resource-slice-contract.ts:302-309`) rejects non-`/`-prefixed,
+  trailing-slash, `//`, and any `? # : [ ] *` syntax. Command-level proof: the `input` case at
+  `generate-resource-command_test.ts:188` (`--route orders` → rejection, zero writes); kernel proof
+  `rejects empty resource normalization and non-static route syntax`
+  (`resource-slice-contract_test.ts:50`). PASS.
+
+### D3 — proof cases exercised through the command
+
+| D3 proof                                                                                   | Test (file:line)                                                                                       | Status |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------ |
+| 1. every pre-apply failure leaves the app byte-identical (input / client / procedure / Fresh staging / shared transform) | `invalid input, client, procedure, Fresh staging, and shared transform never mutate the app` — `generate-resource-command_test.ts:188` (5 cases; `getFiles()` equals snapshot and `writes()===0` per case) | PROVEN |
+| 2. default unresolved conflict reports every path + manual action, exit non-zero, zero writes | `conflict output is emitted before a typed nonzero exit error` — `:173` (unowned foreign page; `CONFLICT routes/orders/index.tsx`, `exitCode 1`, `writes()===0`) | PROVEN |
+| 3. identical second run exits 0, every output skipped, zero bytes written                  | `identical second command run exits zero and performs zero writes` — `:85`                              | PROVEN |
+| 4. later additive option selects, renders, dry-runs against an edited base, names move/rename | `later option dry-run reports an edited base and performs no writes` — `:97` (`--form --dry-run`; `WRITE ...orders-form` reported, `owned-edited` + `Move or rename`, files equal snapshot, `writes()===0`, `exitCode 1`) | PROVEN |
+| 5. valid marker + mismatched body hash is `owned-edited`, never replaced incl. `--force`  | `force leaves unowned and owned-edited targets byte-identical` — `:129` (PAGE edited after generation, `--force`; conflict list = {PAGE, FORM}; files equal snapshot) | PROVEN |
+| 6. positively owned divergent leaf replaced only under `--force`, exactly one write        | `force replaces exactly one positively owned divergent leaf` — `:156` (`markOwnedResourceSliceLeaf` recomputed marker; `writes()===1`; one `WRITE` line; content restored) | PROVEN |
+| 7. unmarked/foreign content is unowned, conflicts, never replaced incl. `--force`         | `:129` (FORM = `// app-owned form`) and `:173` (foreign page, default run)                              | PROVEN |
+
+Ordering (select → render → conflict → write) is visible in `executeGenerateResource`
+(`generate-resource.ts:111-178`): resolve → `readPriorVariants` (marker metadata only) → union of
+variants → `planResourceSlice` → `renderResourceSlice` → `stage` → `transformSharedSources` →
+`readCurrent` → `reconcileResourceSlice` → early return for `dry-run`/`conflict` → apply loop. The
+apply loop is the only `fs.writeFile` site and is reachable only when `status === 'ready'`. Use-case
+level ordering is also asserted by `resource use case resolves, stages, preflights, then applies
+deterministic paths` (`generate-resource_test.ts:41`, event trace) and additive union by
+`resource use case carries prior marker options into a later request` (`:78`).
+
+Not proven through the command (see Findings): a **conflict-free** `--dry-run` (status `dry-run`,
+exit 0, zero writes on a ready plan). Structurally guaranteed by the `status !== 'ready'` early
+return since the reconciler never emits an `applyPlan` under `dryRun`
+(`reconcile-resource-slice.ts:96-101`), but no test at the command or use-case level asserts it.
 
 ## Runtime Gates
 
-| Gate                                     | Validation                                                                                                    | Result   | Evidence                                                                                                                                                          |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Focused resource tests                   | `run-deno-test.ts --pretty -- --allow-all <both resource test files>`                                          | `PASS`   | exit 0; `passed 12, failed 0, ignored 0`; 206 ms                                                                                                                    |
-| Package-owned CLI tests                  | `run-deno-test.ts --pretty -- --allow-all packages/cli`                                                        | `PASS`   | exit 0; `passed 1626, failed 0, ignored 0`; 59.1 s — reproduces the generator's count exactly and confirms no regression in existing CLI behavior                    |
-| Architecture                             | `deno task arch:check`                                                                                        | `PASS`   | exit 0; grep for `FAIL=[1-9]` across all roots returns nothing; CLI section `FAIL=0 WARN=60 INFO=1`                                                                 |
-| Quality                                  | `deno task quality:gate`                                                                                      | `PASS`   | exit 0; doctrine `FAIL=0`                                                                                                                                          |
-| D3 — preflight before any write          | Source order in `executeGenerateResource` + injected-failure suite                                            | `PASS`   | Order is resolve app → resolve client → resolve procedure → normalize/validate → read prior markers → plan → render → stage (Fresh) → transform shared → read current → reconcile. The only `fs.writeFile` call sits in the terminal `reconciled.status === 'ready'` loop; every earlier failure path throws or returns before it. |
-| D3 — byte-identical pre-apply failures   | `'invalid input, client, procedure, Fresh staging, and shared transform never mutate the app'`                | `PASS`   | Five injected failures (bad `--route orders`, rejected client resolver, rejected procedure resolver, rejected stager, non-conformant `router.ts`) each assert `assertEquals(fs.getFiles(), before)` against a pre-snapshot `new Map(...)` **and** `writes() === 0` via an instrumented `fs.writeFile` counter. |
-| D3 — idempotent second run               | `'identical second command run exits zero and performs zero writes'`                                          | `PASS`   | Second parse writes 0, emits `SKIP routes/orders/index.tsx`, final line contains `0 written`, and no error is thrown (exit 0)                                        |
-| D3 — dry-run reports without writing     | `'later option dry-run reports an edited base and performs no writes'`                                        | `PASS`   | With an edited page and newly selected `--form`, dry-run still reports `WRITE …orders-form` plus an `owned-edited` conflict with a `Move or rename` remedy, mutates zero bytes, and raises `ResourceSliceConflictError` with `exitCode 1`. Confirms option selection precedes conflict checking. Clean-dry-run exit-0 path is unit-covered in the kernel reconciler, not at command level — Finding L-1. |
-| D3 — default non-zero conflict exit      | `'conflict output is emitted before a typed nonzero exit error'`                                              | `PASS`   | Unowned `// foreign page` produces `CONFLICT routes/orders/index.tsx` on the text channel *before* the throw, 0 writes, `ResourceSliceConflictError.exitCode === 1` |
-| D3 — force safety (unowned/owned-edited) | `'force leaves unowned and owned-edited targets byte-identical'`                                              | `PASS`   | With `--force`, an owned-edited page and an app-owned form both remain conflicts (`error.result.conflicts` = exactly those two paths), the whole filesystem map is byte-identical, and `writes() === 0`                                                                     |
-| D3 — force replaces owned divergent only | `'force replaces exactly one positively owned divergent leaf'`                                                | `PASS`   | A leaf re-marked via `markOwnedResourceSliceLeaf` with a matching hash is replaced: `writes() === 1`, exactly one `WRITE ` line, and the restored content contains `OrdersLayout`. This is the positive owned-only-force proof the parent plan amendment required.          |
-| D2 — static absolute route validation    | `--route orders` case + kernel `normalizeStaticRoute`                                                         | `PASS`   | `normalizeStaticRoute` rejects non-leading-`/`, bare `/`, trailing `/`, `//`, `\`, and any of `? # : [ ] *` (so Fresh parameter and catch-all syntax is rejected), then requires kebab-case segments. The command surfaces this: `--route orders` rejects with zero writes. Route is never used to infer a client or procedure. |
-| Aspire / Docker / browser / `e2e:cli`    | Slice G scope                                                                                                 | `NOT_RUN`| Explicitly out of scope for this evaluation and for Slice E; the command is unregistered and therefore unreachable from the shipped CLI.                             |
+Not applicable to this slice: the command is unregistered and the hosted/Aspire acceptance is
+owned by Slice G per the locked plan. No `e2e:cli`, Aspire, Docker, or browser execution attempted.
 
 ## Consumer Gates
 
-| Consumer                                        | Validation                                                                    | Result | Evidence                                                                                                                                                                                                          |
-| ----------------------------------------------- | ----------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Public command tree (deliberate non-consumer)   | Registration grep + `generate-group.ts` read                                  | `PASS` | `generate-group.ts` still registers exactly `aspire`, `runtime-schemas`, `plugins`. Repo-wide grep across `packages/` and `plugins/` for the feature's names finds zero references outside the five files. The command is unreachable, as the Slice E/F boundary requires. |
-| `public-command-dependencies.ts`                | `git status --porcelain --untracked-files=no`                                 | `PASS` | Empty — zero tracked modifications anywhere. The file is untouched, so the live #1664 overlap remains zero.                                                                                                        |
-| Slice A client-selector seam                    | Source read of the resolver boundary                                          | `PASS` | `ResourceClientResolver = (appRoot, client: string \| undefined) => Promise<SelectedResourceClient>`; the use case calls `resolveClient(appRoot, request.client)` and `toGenerateResourceRequest` copies `input.client` verbatim. No `readDir`, candidate enumeration, default, or auto-pick exists anywhere in the five files. The command test asserts `seen === ['billing-v2']` — forwarded unchanged. Slice A's `client-selector.ts` can drop in as this dependency. |
-| Generated carriers / export corpus              | `deno task check:mcp-export-corpus`                                           | `PASS` | exit 0, no generated diff; `embedded.generated.ts` and `skills.generated.ts` untouched                                                                                                                             |
-| `deno.lock`                                     | `git diff --stat origin/main -- deno.lock`                                    | `PASS` | Empty; no dependency added (all imports are pre-existing `@std/*`, `@cliffy/command`, and in-package modules)                                                                                                       |
-| Five-file ceiling                               | `git status --porcelain` + directory listing                                  | `PASS` | Exactly `?? .llm/runs/feat-cli-resource-slice-command--1354-e/` and `?? packages/cli/src/public/features/generate/resource/`, the latter containing exactly the five planned files. Under the plan's Slice E ceiling of 6; the omitted sixth file is the owner-removed `public-command-dependencies.ts`, logged in `drift.md`. |
+`docs:readme-fences` and `docs:jsdoc-examples` re-run green (table above); the slice adds no public
+export, README, or JSDoc example, and `unboundName` stays at the 116 ceiling.
 
 ## Anti-Pattern Check
 
-| AP    | Status  | Evidence                                                                                                                                                             | Notes                                                          |
-| ----- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| AP-1  | `CLEAR` | Largest new file 295 lines (a test); largest source 246 lines. Plan's self-imposed 150/250 caps met.                                                                   | god-file                                                        |
-| AP-2  | `CLEAR` | Every dependency is an explicit constructor/parameter injection; no module-level singleton or global registry mutation.                                                | hidden global state                                             |
-| AP-3  | `CLEAR` | Failures are typed (`UsageError`, `ResourceSliceConflictError extends CliExitError`) or explicit `Error` throws; nothing is swallowed.                                 | swallowed errors                                                |
-| AP-4  | `CLEAR` | Result is a typed `GenerateResourceResult` with a discriminated `status` and a `0 \| 1` `exitCode`; no untyped bag.                                                    | stringly-typed contract                                        |
-| AP-5  | `CLEAR` | One-level inheritance onto existing spine bases only.                                                                                                                 | deep inheritance                                                |
-| AP-6  | `CLEAR` | Only the plan-named variants (`form`/`partial`/`stream`) exist; no recovery/journal/lock/rollback machinery was reinstated.                                            | speculative generality                                          |
-| AP-7  | `CLEAR` | The command delegates immediately; the Cliffy action body is map → call → print → conditional typed throw.                                                             | logic in the command callback                                   |
-| AP-8  | `CLEAR` | Kernel does not import this feature (zero inbound refs); the feature imports kernel only.                                                                             | inverted dependency                                             |
-| AP-9  | `CLEAR` | No duplicated planner/renderer/reconciler/marker logic — all reused from `kernel/application/resource-slice/`.                                                         | copy-paste of kernel logic                                      |
-| AP-10 | `CLEAR` | No selector clone; see the Slice A seam row.                                                                                                                          | duplicated selection mechanism                                  |
-| AP-11 | `CLEAR` | All filesystem access is through the injected `FileSystemPort`; tests run entirely on `MemoryFileSystemAdapter`.                                                       | unhosted IO                                                     |
-| AP-12 | `N/A`   | No configuration surface added.                                                                                                                                        | —                                                              |
-| AP-13 | `CLEAR` | No `Deno.exit`; the binary keeps ownership of process termination via the thrown `CliExitError`.                                                                       | implicit crash boundary                                         |
-| AP-14 | `CLEAR` | No direct console writes; output is injected and defaults to the shared presentation output module.                                                                   | ad-hoc logging                                                  |
-| AP-15 | `CLEAR` | No upstream re-export.                                                                                                                                                 | —                                                              |
-| AP-16 | `CLEAR` | 5 children in the new folder, 5 in `generate/`.                                                                                                                        | folder sprawl                                                   |
-| AP-17 | `N/A`   | No abstract added.                                                                                                                                                     | —                                                              |
-| AP-18 | `CLEAR` | Tests assert semantic report tuples, exact write counts, exact conflict path sets, and byte-map equality — not whole-file golden snapshots.                            | snapshot-only testing                                           |
-| AP-19 | `CLEAR` | The two exported entry points (`generateResource`, `createGenerateResourceCommand`) are both exercised; no unused seam.                                                | dead abstraction                                                |
-| AP-20 | `CLEAR` | Variant vocabulary and exit codes come from typed unions/constants, not free strings.                                                                                  | magic strings                                                   |
-| AP-21 | `CLEAR` | Reconciliation and ownership classification remain single-authority in the kernel; this slice adds no second template or ownership authority.                          | competing authority                                             |
-| AP-22 | `CLEAR` | `deno.lock` and dependency graph unchanged.                                                                                                                            | silent dependency growth                                        |
-| AP-23 | `CLEAR` | `public-command-dependencies.ts`, `generate-group.ts`, `public-command-tree.ts`, and `create-public-cli.ts` are all untouched; zero tracked diff.                        | composition-root edit                                           |
-| AP-24 | `CLEAR` | Drift is recorded in `drift.md` (four entries) rather than silently absorbed.                                                                                          | undocumented drift                                              |
-| AP-25 | `CLEAR` | Fresh derivation and client/procedure discovery are injected function seams, keeping external effects at the boundary.                                                | boundary leakage                                                |
+| Pattern                                   | Result                                                                                   |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Second client selector / auto-pick        | absent — resolver seam only                                                              |
+| Second template authority                 | absent — `loadResourceSliceTemplateAssets` + `renderResourceSlice` reused               |
+| `Deno.*` / console in application code    | absent                                                                                   |
+| Process exit outside `bin/`               | absent; typed `CliExitError` subclass                                                    |
+| `any` / unsafe casts / lint-ignore        | absent in product; quality:scan findings `[]`                                            |
+| Journal / lock / rollback / `--keep|--replace|--abort|--recover` | absent (narrowed D3 honored)                                        |
+| Per-leaf disposition prompts              | absent; report + remedy text only                                                        |
 
 ## Arch-Debt Delta
 
-| Metric                | Count | Evidence                                                                                                                                                    |
-| --------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| New entries           | 0     | `.llm/harness/debt/arch-debt.md` unmodified (`git status --porcelain` on that path is empty); no new doctrine violation requires one.                        |
-| Resolved entries      | 0     | Slice E resolves no standing entry.                                                                                                                          |
-| Deepened violations   | 0     | CLI `arch:check` census unchanged at `FAIL=0 WARN=60 INFO=1`; JSR audit unchanged at 20 warnings and `slowTypeWarnings=1`. No pre-existing WARN class was extended into the new files. |
-| Unrecorded violations | 0     | `FAIL=0` on every `arch:check` root; `quality:gate` doctrine `FAIL=0`.                                                                                        |
+None added. No new allowance, lint-ignore, or `arch:check` warning introduced (cli root stays at
+`WARN=60`).
 
 ## Findings
 
-| Severity | Finding                                                                                                                                                                                              | Evidence                                                                                                                                                                        | Required action                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| low (L-1)| No command-level test for a **conflict-free** `--dry-run` (status `dry-run`, `exitCode 0`, zero writes). The only command dry-run test carries a conflict.                                             | `generate-resource-command_test.ts` covers dry-run only via `'later option dry-run reports an edited base'`. The clean path is covered one layer down by `reconcile-resource-slice.ts:96-99` (`exitCode: conflicts.length ? 1 : 0`) and its kernel tests, and structurally by the `status !== 'ready'` early return that precedes every write. | Optional follow-up in Slice F; not blocking — the plan's stated dry-run gate (report + zero writes) is proven. |
-| low (L-2)| The `UsageError` guard for a blank `--procedure` in `toGenerateResourceRequest` is untested and near-unreachable, since Cliffy declares `--procedure` with `required: true`. It is still reachable via `--procedure ' '`. | `generate-resource-input.ts:24-26`; no test asserts `UsageError`.                                                                                                                 | Optional: add a one-line assertion, or drop the guard when Slice F wires the real parser.            |
-| low (L-3)| Run `plan.md` records a bare `PLAN-EVAL: N/A` rather than citing the parent run's actual passing gate.                                                                                                | Parent `worklog.md` § "post-PASS enumeration amendment" records a native opposite-family Fable 5 `PASS_PLAN_WITH_FINDINGS` at baseline `409630338`. The gate did pass; only the citation is imprecise. | Optional artifact hygiene: cite the parent verdict in `plan.md` when the PR body is written.        |
-| low (L-4)| Branch HEAD `3a794be67` is one commit behind `origin/main` (`88fc6d69d`); all gates above ran at the branch base, not on top of current main.                                                          | `git log HEAD..origin/main` = one commit (#1759). Its `packages/cli` delta is confined to `assets/agent/*`, `assets/embedded.generated.ts`, `assets/skills.generated.ts`, and `features/agent/init/*` — fully disjoint from this slice's imports and from `generate/`. | Rebase onto current `main` before opening the PR and re-run `arch:check` + package CLI tests; no conflict expected. |
+### LOW-1 — conflict-free `--dry-run` not proven through the command
 
-No high or medium finding was identified. Every scope constraint in the brief held: five files, no
-registration, `public-command-dependencies.ts` / carriers / `deno.lock` untouched, and the client
-kept as a pure injected resolver seam.
+`generate-resource-command_test.ts:97` exercises `--dry-run` only together with an `owned-edited`
+conflict, where zero writes would hold even without `--dry-run`. D3 step 6 ("emit the complete
+candidate/conflict report and write no application targets") is otherwise unproven for the
+happy-path case (fresh app, `--dry-run` → `status: 'dry-run'`, `exitCode: 0`, every path reported
+as `write`, `writes()===0`). The implementation is structurally correct
+(`generate-resource.ts:164-173` returns before the apply loop for any non-`ready` status), so this
+is a coverage gap, not a behavior defect. Suggested fix: one additional command test; can ride with
+Slice F.
+
+### LOW-2 — pre-apply failures outside the reconciler are untyped `Error`s
+
+`generate-resource.ts:119` (no app root), `:162` (`preflight-failed`), `:219` (router shape
+conflict), `:230` (state shape conflict) throw plain `Error` rather than a `CliExitError` subclass
+(`UsageError`/`ConfigError`). The reconcile conflict path is correctly typed
+(`ResourceSliceConflictError`). Behavior is fail-closed with zero writes in every case (proven at
+`generate-resource-command_test.ts:188`), and the pattern matches the pre-existing Slice C kernel
+validation, so exit-code mapping falls to the binary's generic handler. Recommend typing these when
+Slice F wires the real resolvers and exit mapping.
+
+### NIT-1 — validation order differs slightly from D3 step 1
+
+D3 step 1 lists "parse and validate all flags" before app/client/procedure resolution;
+`executeGenerateResource` resolves app/client/procedure (`:115-125`) before
+`normalizeResourceSliceInput` (`:126`) validates resource/route. No write-safety impact (both
+precede any staging), but an invalid `--route` currently costs a client/procedure resolution first.
+
+### NIT-2 — `templates: Parameters<typeof renderResourceSlice>[1]`
+
+`generate-resource.ts:72` derives the templates type positionally instead of naming the exported
+asset type; a named type would make the dependency bundle self-describing for Slice F.
 
 ## Lessons for Promotion
 
-| Lesson                                                       | Pattern                                                                                                                                                                                                                                                | Applies to           | Confidence |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- |
-| Prove "no writes" with an instrumented port, not inspection  | Wrapping `fs.writeFile` with a counter **and** snapshotting the whole in-memory file map turns a preflight-ordering claim into a mechanical assertion; a table-driven loop then covers every injected failure mode at constant test cost.                 | 6, and any IO-writing archetype | high       |
-| A scoped tool config can restore coverage a root exclude removed | When a root `deno.json` excludes a package from lint/fmt, a temporary config that copies the rules verbatim minus the exclude — validated by `droppedFiles: []` — yields a real verdict instead of a vacuous pass, without editing repo tooling.          | all                  | high       |
-| Ship the unregistered command with the resolver as a type    | Declaring `ResourceClientResolver` as an injected function type lets a slice land, test, and gate a full command before its selector exists, with the "no auto-pick" prohibition enforced structurally rather than by review vigilance.                    | 6                    | high       |
+- A `--dry-run` proof that only covers the conflicting case does not isolate the flag's own
+  guarantee; pair it with a ready-plan dry-run assertion. Candidate for the D3 proof checklist.
 
 ## Verdict
 
-| Field     | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verdict   | `PASS`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Rationale | Approved Slice E scope is complete and correctly bounded: exactly five new files, the command deliberately unregistered and unreachable, and `public-command-dependencies.ts`, generated carriers, and `deno.lock` provably untouched (zero tracked diff). Every gate reported in `implement.md`/`worklog.md` was re-run independently by this session and reproduced exactly — narrow check 5/0 diagnostics, focused tests 12/12, package CLI tests 1626/1626, scoped lint and fmt 5/5 with `droppedFiles: []`, `arch:check` `FAIL=0` with the CLI census unchanged at `WARN=60 INFO=1`, `quality:gate` exit 0, both docs gates matching their exact censuses, CLI JSR audit `dry-run: OK` at 20 baseline warnings, `publish:dry-run` success, and the export corpus at 35/273/7,841 with no generated diff. D3 is honored structurally — the sole `writeFile` loop is the terminal statement after resolve/validate/plan/render/stage/transform/reconcile — and behaviorally, with five injected failure modes each proving a byte-identical application tree and a zero write count. Static absolute route validation, idempotent zero-write rerun, typed nonzero conflict exit, owned-only force with unowned and owned-edited leaves left untouched, and the positive single-leaf force replacement are all proven at the command level. Presentation/application layering is clean in both directions, and the client remains a pure injected seam that forwards `--client` unchanged with no scan, default, or auto-pick. The Plan-Gate genuinely passed upstream (`PASS_PLAN_WITH_FINDINGS`). The four findings are all low: two optional test-coverage additions, one artifact-citation nit, and a routine rebase onto a disjoint one-commit main advance. No doctrine violation was introduced or deepened, and no arch-debt bookkeeping is owed. |
+PASS_IMPL_WITH_FINDINGS
+
+Slice E lands exactly the five authorized files, leaves the shared dependency root, the command
+tree, `deno.lock`, and carriers untouched, keeps the command unregistered, forwards `--client`
+unchanged through an injected resolver seam with no auto-pick, and proves all seven D3 cases through
+the command with byte-identical snapshots and write counters. All seven requested gates exit 0.
+The two LOW findings (missing happy-path dry-run test; untyped non-reconciler pre-apply errors) do
+not block merge and can be absorbed by Slice F.
