@@ -23,6 +23,7 @@ export type { PluginMetadata } from './domain/plugin-metadata.ts';
 export type { PluginMetadataValue } from '../domain/mod.ts';
 export type { PluginManifestParser } from '../domain/mod.ts';
 export type { RuntimeConfigTopicContribution } from './domain/runtime-config-topic-contribution.ts';
+export type { SdkClientContributionReference } from './domain/sdk-client-contribution-reference.ts';
 export type { ServiceContribution } from './domain/service-contribution.ts';
 export type { StreamTopicContribution } from './domain/stream-topic-contribution.ts';
 export type { TelemetryContribution } from './domain/telemetry-contribution.ts';

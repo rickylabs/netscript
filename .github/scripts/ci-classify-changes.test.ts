@@ -346,6 +346,34 @@ Deno.test('nested workspace deno.json escalates regardless of root discriminatio
   assertEquals(d.runRuntime, true);
 });
 
+Deno.test('Fresh UI private-lock inputs contribute to needs_fresh_ui', () => {
+  for (
+    const path of [
+      'packages/sdk/deno.json',
+      'packages/sdk/deno.jsonc',
+      'packages/cli/e2e/deno.json',
+      'packages/cli/e2e/deno.jsonc',
+      'plugins/ai/deno.json',
+      'plugins/ai/deno.jsonc',
+      'deno.lock',
+    ]
+  ) {
+    assertEquals(classifyPath(path).freshUi, true, path);
+    const d = decide({ eventName: 'pull_request', files: [path], labels: [] });
+    assertEquals(d.needsFreshUi, true, path);
+  }
+});
+
+Deno.test('root deno.json toolchain changes continue to contribute to needs_fresh_ui', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['deno.json'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TOOLCHAIN },
+  });
+  assertEquals(d.needsFreshUi, true);
+});
+
 // ── capability vector per source area ────────────────────────────────────────
 
 Deno.test('packages (non-cli) code: deno+docker+scaffold+surface, NOT desktop', () => {
@@ -852,7 +880,7 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
     true,
   );
   assertEquals(
-    sqliteJob!.includes('group: e2e-scaffold-runtime-sqlite-global'),
+    sqliteJob!.includes('group: e2e-scaffold-runtime-sqlite-global-v2\n'),
     true,
   );
   assertEquals(
@@ -873,7 +901,7 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
   const postgresJob = workflowJob(workflow, 'scaffold-runtime');
   assertEquals(typeof postgresJob, 'string');
   assertEquals(
-    postgresJob!.includes('group: e2e-scaffold-runtime-global'),
+    postgresJob!.includes('group: e2e-scaffold-runtime-global-v2\n'),
     true,
   );
   assertEquals(
@@ -903,6 +931,14 @@ Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', a
   }
   assertEquals(
     sqliteJob!.includes('group: e2e-scaffold-runtime-global\n'),
+    false,
+  );
+  assertEquals(
+    sqliteJob!.includes('group: e2e-scaffold-runtime-sqlite-global\n'),
+    false,
+  );
+  assertEquals(
+    postgresJob!.includes('group: e2e-scaffold-runtime-global\n'),
     false,
   );
   assertEquals(

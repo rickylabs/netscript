@@ -114,17 +114,16 @@ export interface CreateServiceQueryUtilsOptions {
  *
  * @example
  * ```ts
- * import { useQuery } from '@netscript/fresh/query';
  * import { ordersClient } from '@app/lib/orders.ts';
  *
  * const ordersQueryUtils = createServiceQueryUtils(ordersClient, {
  *   path: ['orders'],
  * });
  *
- * // In an island:
- * const { data } = useQuery(
- *   ordersQueryUtils.list.queryOptions({ input: { offset: 0, limit: 20 } }),
- * );
+ * const listOptions = ordersQueryUtils.list.queryOptions({
+ *   input: { offset: 0, limit: 20 },
+ * });
+ * console.log(listOptions.queryKey);
  * ```
  *
  * @typeParam TContract - Contract used by the service client.

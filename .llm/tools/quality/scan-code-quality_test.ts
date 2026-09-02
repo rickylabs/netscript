@@ -117,6 +117,34 @@ Deno.test('scanner catches plugin-identity via const/array indirection (Opus IMP
   assertEquals(findings.filter((f) => f.rule === 'plugin-name-check').length, 3);
 });
 
+Deno.test('scanner rejects plugin-factory branches and mapping tables in host core', async () => {
+  const root = await Deno.makeTempDir();
+  const coreDir = join(root, 'packages/plugin/src/sdk/discovery');
+  const pluginDir = join(root, 'plugins/example/src');
+  await Deno.mkdir(coreDir, { recursive: true });
+  await Deno.mkdir(pluginDir, { recursive: true });
+  const pluginSpecificSource = [
+    "const builders = [{ callee: 'defineExample', axis: 'examples' }];",
+    'export function contributionAxis(callee: string): string | undefined {',
+    "  if (callee === 'defineExample') return 'examples';",
+    '}',
+  ].join('\n');
+  await Deno.writeTextFile(join(coreDir, 'planted.ts'), pluginSpecificSource);
+  await Deno.writeTextFile(join(pluginDir, 'plugin.ts'), pluginSpecificSource);
+
+  const findings = await scanCodeQuality(
+    ['packages/plugin/src', 'plugins/example/src'],
+    root,
+  );
+  assertEquals(
+    findings.map((finding) => `${String(finding.rule)}:${finding.file}:${finding.line}`),
+    [
+      'plugin-discovery-core-coupling:packages/plugin/src/sdk/discovery/planted.ts:1',
+      'plugin-discovery-core-coupling:packages/plugin/src/sdk/discovery/planted.ts:3',
+    ],
+  );
+});
+
 Deno.test('scanner catches @ts-error suppressions and `as never` (source-side type escapes)', async () => {
   const root = await Deno.makeTempDir();
   await Deno.mkdir(`${root}/packages/cli/src`, { recursive: true });
@@ -729,4 +757,25 @@ Deno.test('public-only any tokens require the same verified allowance record', a
   assertEquals(result.allowanceFailures.map((failure) => failure.kind), [
     'malformed-registration',
   ]);
+});
+
+Deno.test('multi-line template fixture source is data, but interpolated expressions are not', async () => {
+  const root = await Deno.makeTempDir();
+  await Deno.writeTextFile(
+    join(root, 'emitter.ts'),
+    [
+      'export const fixture = `',
+      'export const db: any = {};',
+      '`;',
+      'export const interpolated = `',
+      'const x = ${(value as unknown as Target)};',
+      '`;',
+      'const real: any = 1;',
+    ].join('\n'),
+  );
+  const findings = await scanCodeQuality(['emitter.ts'], root);
+  assertEquals(
+    findings.map((finding) => `${finding.rule}:${finding.line}`),
+    ['unsafe-cast:5', 'explicit-any:7'],
+  );
 });

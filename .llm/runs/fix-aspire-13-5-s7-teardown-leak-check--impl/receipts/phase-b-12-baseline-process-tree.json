@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "phase": "S7 phase B rerun",
+  "status": "not-started",
+  "reason": "The mandatory deno install preparation step failed before either AppHost could be restored or started.",
+  "leasedProcessTree": [],
+  "foreignControlProcessTree": [],
+  "identityProof": {
+    "leasedCli": null,
+    "leasedAppHost": null,
+    "foreignControlCli": null,
+    "foreignControlAppHost": null
+  }
+}

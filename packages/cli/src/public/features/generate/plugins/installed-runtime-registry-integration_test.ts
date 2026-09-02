@@ -10,6 +10,7 @@ import {
 } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
+import { registerGeneratedJobRegistry } from '../../../../../../../plugins/workers/src/runtime/generated-jobs.ts';
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../..', import.meta.url));
@@ -138,6 +139,89 @@ export default handler;
     assertEquals(module.registry.has('custom-claim-job'), true);
     assertEquals(module.registry.has('excluded-job-tools'), false);
     assertEquals(module.registry.size, 1);
+  });
+});
+
+Deno.test('installed workers registry carries project policy through runtime startup without fetching', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
+      'workers/jobs/project-policy.ts': `
+export const projectPolicy = async () => undefined;
+`,
+      'netscript.config.ts': `
+export default {
+  name: 'installed-policy',
+  databases: { config: [] },
+  workers: {
+    jobs: [{
+      id: 'project-policy-id',
+      name: 'Project policy',
+      entrypoint: './project-policy.ts',
+      source: 'local',
+      topic: 'billing',
+      timeout: 8123,
+      maxRetries: 4,
+      priority: 87,
+      retryDelay: 345,
+      maxConcurrency: 0,
+      persist: false,
+      enabled: true,
+      tags: ['installed'],
+    }],
+  },
+};
+`,
+    });
+    let fetchCalls = 0;
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => {
+        fetchCalls++;
+        return Promise.reject(new Error('workspace generation must not fetch'));
+      },
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    const registryUrl = toFileUrl(join(projectRoot, WORKERS_REGISTRY_PATH));
+    const module = await import(`${registryUrl.href}?installed-policy`) as {
+      jobDefinitions: Map<string, Readonly<Record<string, unknown>>>;
+    };
+    const registered = new Map<string, Readonly<Record<string, unknown>>>();
+    await registerGeneratedJobRegistry(
+      {
+        get: (id) => Promise.resolve(registered.get(id)),
+        registerJob: (input) => {
+          if (typeof input.id !== 'string') throw new Error('generated job id is required');
+          registered.set(input.id, input);
+          return Promise.resolve(input);
+        },
+      },
+      {
+        status: 'loaded',
+        url: registryUrl,
+        definitions: module.jobDefinitions,
+      },
+    );
+
+    assertEquals(fetchCalls, 0);
+    assertEquals(registered.get('project-policy-id'), {
+      id: 'project-policy-id',
+      name: 'Project policy',
+      entrypoint: './project-policy.ts',
+      source: 'local',
+      topic: 'billing',
+      timeout: 8123,
+      maxRetries: 4,
+      priority: 87,
+      retryDelay: 345,
+      maxConcurrency: 0,
+      persist: false,
+      enabled: true,
+      tags: ['installed'],
+      executionType: 'deno',
+    });
   });
 });
 

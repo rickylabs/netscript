@@ -14,6 +14,7 @@ Deno.test('base contract stores NetScript procedure metadata without a reader po
           roles: ['operator'],
         },
       },
+      policy: { cache: 'force-cache' },
     });
 
   assertEquals(authenticatedRoute['~orpc'].meta, {
@@ -24,5 +25,6 @@ Deno.test('base contract stores NetScript procedure metadata without a reader po
         roles: ['operator'],
       },
     },
+    policy: { cache: 'force-cache' },
   });
 });

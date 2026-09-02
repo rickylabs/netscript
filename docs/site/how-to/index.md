@@ -123,6 +123,9 @@ construction, that alternative is an integration escape hatch, not the default N
   first-party plugin, regenerate the registry, and verify the service answers.
 - [Deploy locally with Aspire]({{ "howto:deploy-local-aspire" |> xref |> url }}) —
   run the full local resource graph from the generated Aspire AppHost.
+- [Detached start for agents and CI]({{ "howto:detached-start-agents-ci" |> xref |> url }}) —
+  start and inspect Aspire non-interactively with structured JSON output, timeout budgets, and
+  `--isolated` parallel mode.
 - [Deploy]({{ "howto:deploy" |> xref |> url }}) — the portability story: raw
   `deno task` entry points and the `--no-aspire` escape hatch when you provision
   dependencies yourself.

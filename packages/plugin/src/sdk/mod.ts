@@ -9,6 +9,7 @@
  */
 
 export { AstExtractor } from './discovery/ast-extractor.ts';
+export type { AstExtractorOptions } from './discovery/ast-extractor.ts';
 export { FilesystemWalker } from './discovery/filesystem-walker.ts';
 export { MemoryManifestResolver, ModuleManifestResolver } from './discovery/manifest-resolver.ts';
 export type { ModuleManifestResolverOptions } from './discovery/manifest-resolver.ts';
@@ -18,7 +19,11 @@ export type { SourceGraph } from './discovery/source-graph.ts';
 export { createWatcherHandle } from './discovery/watcher.ts';
 export type { WatcherHandle } from './discovery/watcher.ts';
 export type { EmitterPort, RegistryEmission } from './discovery/ports/emitter-port.ts';
-export type { ExtractedContribution, ExtractorPort } from './discovery/ports/extractor-port.ts';
+export type {
+  ContributionBuilderPattern,
+  ExtractedContribution,
+  ExtractorPort,
+} from './discovery/ports/extractor-port.ts';
 export type { ManifestResolverPort } from './discovery/ports/manifest-resolver-port.ts';
 export type { WalkedFile, WalkerPort } from './discovery/ports/walker-port.ts';
 export { runWalkerPipeline } from './application/run-walker-pipeline.ts';
@@ -31,6 +36,7 @@ export { createPluginContext } from './runtime/plugin-context.ts';
 export type { PluginContext, PluginLogger } from '../domain/mod.ts';
 export { createPluginHostBootstrap } from './runtime/plugin-host-bootstrap.ts';
 export type { PluginHostBootstrap } from './runtime/plugin-host-bootstrap.ts';
+export { createPluginServiceContext } from './runtime/plugin-service-context-factory.ts';
 export type {
   BackgroundProcessorContribution,
   ContractVersionContribution,
@@ -45,6 +51,7 @@ export type {
   PluginMetadataValue,
   PluginType,
   RuntimeConfigTopicContribution,
+  SdkClientContributionReference,
   ServiceContribution,
   StreamTopicContribution,
   TelemetryContribution,

@@ -172,6 +172,7 @@ declare function defineSdkClientContribution<TContext extends object>(): <TDescr
   readonly responseCache: { readonly mode: string; readonly partition?: (options: { readonly context: Readonly<TContext> }) => string };
   readonly prepare: (options: { readonly context: Readonly<TContext> }) => unknown;
 }>(descriptor: TDescriptor) => TDescriptor;
+declare function createLocaleSdkClientContribution(): unknown;
 declare function createServiceClient(config: unknown): {
   readonly get: (input: unknown) => Promise<unknown>;
   readonly getById: (input: unknown) => Promise<unknown>;

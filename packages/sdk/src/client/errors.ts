@@ -28,6 +28,8 @@ export interface SdkClientContributionDiagnostic {
   readonly phase: 'construction' | 'partition' | 'preparation';
   /** Safe contribution identifier, when known. */
   readonly contributionId?: SdkClientContributionId;
+  /** Earlier owner or opposing contribution identifier, when relevant. */
+  readonly conflictingContributionId?: SdkClientContributionId;
   /** Dot-separated procedure path, when known. */
   readonly procedurePath?: string;
   /** Declared header name, when relevant. */
@@ -42,6 +44,8 @@ export class SdkClientContributionError extends Error {
   readonly phase: 'construction' | 'partition' | 'preparation';
   /** Safe contribution identifier, when known. */
   readonly contributionId?: SdkClientContributionId;
+  /** Earlier owner or opposing contribution identifier, when relevant. */
+  readonly conflictingContributionId?: SdkClientContributionId;
   /** Dot-separated procedure path, when known. */
   readonly procedurePath?: string;
   /** Declared header name, when relevant. */
@@ -58,6 +62,7 @@ export class SdkClientContributionError extends Error {
     this.code = diagnostic.code;
     this.phase = diagnostic.phase;
     this.contributionId = diagnostic.contributionId;
+    this.conflictingContributionId = diagnostic.conflictingContributionId;
     this.procedurePath = diagnostic.procedurePath;
     this.headerName = diagnostic.headerName;
   }
@@ -68,6 +73,9 @@ export class SdkClientContributionError extends Error {
       code: this.code,
       phase: this.phase,
       ...(this.contributionId === undefined ? {} : { contributionId: this.contributionId }),
+      ...(this.conflictingContributionId === undefined
+        ? {}
+        : { conflictingContributionId: this.conflictingContributionId }),
       ...(this.procedurePath === undefined ? {} : { procedurePath: this.procedurePath }),
       ...(this.headerName === undefined ? {} : { headerName: this.headerName }),
     };

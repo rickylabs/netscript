@@ -11,11 +11,13 @@
   `.llm/harness/workflow/lane-policy.md`: native opposite-family sessions are the local default;
   OpenRouter is explicit third-opinion/native-limit escalation, and OpenHands is for explicitly
   cloud-driven work.
-- Before invoking a repo skill by name, check whether it exists in `.claude/skills/`. If it does
-  not, read the matching `.agents/skills/<name>/SKILL.md` directly.
-- Use `.llm/tools/agentic/claude/validate-claude-surface.ts` when Claude configuration, skills, hooks, or
-  agent orchestration docs change.
-- Keep `.claude/skills/` generated from `.agents/skills/`; do not hand-edit mirrored files.
+- Repository skills have one authoritative home: `.agents/skills/`. Before invoking a repo skill by
+  name, read `.agents/skills/<name>/SKILL.md` directly. The lone
+  `.claude/skills/repo-skills/SKILL.md` entry is discovery guidance, not a copy of that tree.
+- Use `.llm/tools/agentic/claude/validate-claude-surface.ts` when Claude configuration, skills,
+  hooks, or agent orchestration docs change.
+- Never copy or synchronize repository skills into `.claude/skills/`; update only the authoritative
+  `.agents/skills/` source.
 
 ## Reasoning Policy
 
@@ -44,8 +46,8 @@
     skills: `jsr-audit`, `netscript-doctrine`, `deno-fresh` as applicable) so output respects
     doctrine, the publish surface, and gates.
   - Route model/provider/effort per slice from `.llm/harness/workflow/lane-policy.md`.
-  - **Validation stays in a separate opposite-family session** with a per-package/per-domain
-    verdict — the Claude workflow is the generator only; it does not self-certify.
+  - **Validation stays in a separate opposite-family session** with a per-package/per-domain verdict
+    — the Claude workflow is the generator only; it does not self-certify.
   - Any change to **framework source** (e.g. the `@netscript/fresh-ui` `*Namespace` type exports)
     remains a **WSL Codex** daemon-attached slice, never the Claude workflow.
 - This exception is scoped to documentation. Framework/plugin implementation slices stay on WSL

@@ -165,18 +165,16 @@ the routing lane→model bindings in `runtime/routing-policy.ts` referencing tho
 work uses `@std/path`. Read the suite [`README`](./agentic/README.md) for the full map and the
 "Maintenance map" that says exactly where to change a model, version, policy, or dep.
 
-The Claude-surface subset keeps the Claude Code project honest and the generated skill mirror in
-sync. The operating rule -- edit `.agents/skills/` source, never hand-edit the `.claude/skills/`
-mirror -- lives in [`CLAUDE.md`](../../CLAUDE.md) (Claude Supervisor Rules); these scripts enforce
-it.
+The Claude-surface subset keeps the Claude Code project honest. Repository skills live only in
+`.agents/skills/`; `.claude/skills/` contains one discovery bridge. The operating rule lives in
+[`CLAUDE.md`](../../CLAUDE.md) (Claude Supervisor Rules), and the surface check enforces that small
+contract without copying or comparing skill trees.
 
-| Task                          | Script                                         | Purpose                                                                                                                                                                                                                                              | Flags                                                               |
-| ----------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `agentic:sync-claude`         | `agentic/claude/sync-claude-skills.ts`         | Regenerate `.claude/skills/` from `.agents/skills/` (source of truth).                                                                                                                                                                               | `--check` (report stale, exit 1, no writes), `--pretty`             |
-| `agentic:sync-claude:check`   | `agentic/claude/sync-claude-skills.ts --check` | Diff-only gate mode: fails if the mirror has drifted from source.                                                                                                                                                                                    | `--check`, `--pretty`                                               |
-| `agentic:check-claude`        | `agentic/claude/validate-claude-surface.ts`    | Validate the Claude surface: `CLAUDE.md` references `@AGENTS.md`, `.claude/settings.json` is valid JSON, `.gitignore` ignores `.claude/settings.local.json`, the skill mirror is in sync, and the hook lock is sound. Exits non-zero on any failure. | `--pretty`                                                          |
-| `agentic:smoke-claude-remote` | `agentic/claude/claude-remote-smoke.ts`        | Fast Claude CLI / remote-control smoke (`--version`, `--help`, `remote-control --help`, `agents --help`); env-aware skip when `claude` is absent from PATH, with an optional live `--bg` launch.                                                     | `--env-aware`, `--live`, `--prompt <path>`, `--timeout`, `--pretty` |
-| (hook target)                 | `agentic/claude/claude-hook-log.ts`            | Reads a hook event from stdin and appends it as JSONL to `.llm/tmp/claude/hooks/$NETSCRIPT_RUN_ID/events.jsonl` (run/session scoped). Invoked by a Claude Code hook, not run by hand.                                                                | (stdin; `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID` env)                |
+| Task                          | Script                                      | Purpose                                                                                                                                                                                          | Flags                                                               |
+| ----------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `agentic:check-claude`        | `agentic/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, settings, gitignore, the single `.claude/skills/repo-skills` bridge, and hook lock hygiene. It does not copy or compare repository skills. Exits non-zero on any failure.  | `--pretty`                                                          |
+| `agentic:smoke-claude-remote` | `agentic/claude/claude-remote-smoke.ts`     | Fast Claude CLI / remote-control smoke (`--version`, `--help`, `remote-control --help`, `agents --help`); env-aware skip when `claude` is absent from PATH, with an optional live `--bg` launch. | `--env-aware`, `--live`, `--prompt <path>`, `--timeout`, `--pretty` |
+| (hook target)                 | `agentic/claude/claude-hook-log.ts`         | Reads a hook event from stdin and appends it as JSONL to `.llm/tmp/claude/hooks/$NETSCRIPT_RUN_ID/events.jsonl` (run/session scoped). Invoked by a Claude Code hook, not run by hand.            | (stdin; `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID` env)                |
 
 The rest of the suite (Codex launch/watch/resume, OpenHands dispatch/status/verdict, GitHub
 PR/watch/ token, the WSL foundation, and the runtime doctor/repair/canaries) is documented per-tool
@@ -210,7 +208,7 @@ Defaults: `--files worklog.md`, `--timeout-seconds 1800`. See
 | Repository validation policy                   | `validation/` and the root `deno.json` task bindings                                 |
 | Scoped Deno gate behavior                      | Stable root `run-deno-*.ts` entry points                                             |
 | Agent models, versions, endpoints, and routing | `agentic/config/` and `agentic/runtime/routing-policy.ts` (excluded from this sweep) |
-| Generated Claude skill mirrors                 | Edit `.agents/skills/`, then run `deno task agentic:sync-claude`                     |
+| Repository skills                              | Edit the single authoritative `.agents/skills/` tree                                 |
 
 ## Tool index
 
@@ -224,8 +222,7 @@ Defaults: `--files worklog.md`, `--timeout-seconds 1800`. See
 | `git/git-commit-paths.ts`                   | Commit/push selected paths without Windows shell quoting issues.                                         |
 | `e2e/scaffold-e2e-test.ts`                  | Retained independent behavioral scaffold diagnostic; not a merge gate.                                   |
 | `deps/*.ts`                                 | Dependency-version, dead-import, audit, and prod-install decisions (see above).                          |
-| `agentic/claude/sync-claude-skills.ts`      | Generate or check `.claude/skills` from `.agents/skills`.                                                |
-| `agentic/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, and skill mirror.                                      |
+| `agentic/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, the repo-skill bridge, and hook lock hygiene.          |
 | `agentic/claude/claude-hook-log.ts`         | Append Claude hook events as run-scoped JSONL (hook target).                                             |
 | `agentic/claude/claude-remote-smoke.ts`     | Fast Claude CLI/remote-control smoke, with env-aware skip and optional live `--bg` launch.               |
 | `agentic/config/*.ts`                       | Single source for volatile values (models, versions, endpoints); see the suite README's Maintenance map. |

@@ -35,7 +35,11 @@ Deno.test('auth is install-only and exposes no add resources', () => {
 Deno.test('auth install emits separate control-plane and userland modules under auth', () => {
   const artifacts = collectInstallArtifacts(authAdapterPlugin);
 
-  assertEquals(artifacts.map((artifact) => artifact.path), ['auth/plugin.ts', 'auth/mod.ts']);
+  assertEquals(artifacts.map((artifact) => artifact.path), [
+    'auth/plugin.ts',
+    'auth/mod.ts',
+    'auth/sdk-client.ts',
+  ]);
   for (const artifact of artifacts) {
     assertEquals(artifact.path.startsWith('auth/'), true);
     for (const forbidden of FORBIDDEN_PREFIXES) {
@@ -46,6 +50,24 @@ Deno.test('auth install emits separate control-plane and userland modules under 
       );
     }
   }
+});
+
+Deno.test('auth SDK starter is explicit, typed, and contains no credential material', () => {
+  const credential = crypto.randomUUID();
+  const artifact = collectInstallArtifacts(authAdapterPlugin).find((candidate) =>
+    candidate.path === 'auth/sdk-client.ts'
+  );
+  const text = artifact === undefined ? '' : artifactText(artifact);
+
+  assertStringIncludes(text, "from '@netscript/plugin-auth-core/sdk'");
+  assertStringIncludes(text, 'createBearerSdkClientContribution<AuthSdkClientContext>');
+  assertStringIncludes(text, 'contributions: [authSdkClientContribution] as const');
+  assertEquals(text.includes(credential), false);
+  assertEquals(text.includes('Deno.env'), false);
+  assertEquals(text.includes('import.meta.env'), false);
+  assertEquals(text.includes('localStorage'), false);
+  assertEquals(text.includes('sessionStorage'), false);
+  assertEquals(text.includes('document.cookie'), false);
 });
 
 Deno.test('auth install records the Prisma contract without emitting database files', () => {

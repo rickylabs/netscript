@@ -1,0 +1,41 @@
+S8 slice 6 — Phase-A static gate receipt
+Date: 2026-08-30 UTC
+Boundary: no aspire start, no AppHost runtime, no containers; Phase-B verifier not executed
+
+Focused implementation evidence:
+  deno check --unstable-kv <S8 adapter/E2E files>
+    PASS (5 initial targets; final listener/phase-B set rechecked after layout refinement)
+  deno test runtime-gates_test.ts listener-readiness-gates_test.ts
+    PASS: 25 passed, 0 failed
+  deno test operation-runner-helpers_test.ts operation-runner_test.ts
+    PASS: 7 tests / 10 DbOperationRunner steps, 0 failed
+
+Scoped tool evidence:
+  run-deno-check: 34 selected, 1 batch, 0 failed, 0 occurrences
+  run-deno-lint (configured E2E scope): 16 selected/processed, 0 failed, 0 findings
+  run-deno-fmt (configured E2E scope): 16 selected/processed, 0 failed, 0 findings
+  raw deno lint --no-config (changed packages/cli TypeScript): PASS
+  raw deno fmt --check --no-config (changed packages/cli TypeScript): PASS
+  Note: the initial combined lint/fmt wrapper selection correctly refused packages/cli/src files
+  excluded by the root config. The final wrapper verdict covers configured E2E files; the required
+  raw commands cover the excluded adapter source.
+
+Repository and scaffold evidence:
+  deno task lint: PASS (2051 selected/processed; 0 findings)
+  deno task quality:scan: PASS (0 findings; existing allowance inventory unchanged)
+  deno task arch:check: PASS (FAIL=0; existing warning inventory reported)
+  deno task check:assets-barrel: PASS (regeneration produced no asset drift)
+  deno task e2e:cli run scaffold.plugins --cleanup --format pretty:
+    PASS: 17 passed, 0 failed, 0 skipped
+  raw/generated PROCESS_COMMANDS_FLAG and "Aspire 13.4" seam absence: PASS
+  added TypeScript any/cast/withHidden/lint-ignore prohibition scan: PASS
+
+Static host state after gates:
+  aspire ps --format Json --nologo --non-interactive: []
+  DOCKER_HOST=tcp://netscript-dind:2375 docker ps -a: empty
+  fs.inotify.max_user_instances: 1024
+  PID 1: tini
+  zombies: 0
+
+D-39 applies: restore/watch/lifecycle reds are real findings; no old inotify/zombie waiver.
+D-42/D-43 remote-DinD bind-mount/loopback topology is the only runtime-phase limitation.
