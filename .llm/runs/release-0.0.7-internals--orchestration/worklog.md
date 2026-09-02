@@ -9987,3 +9987,77 @@ premise.
 
 S9's docker admitted and completed at 05:21:37, closing the last admission that could have reached
 #1889's job.
+
+### D-230 — supervisor resumed; lane reduced to #1905 + #1913; the `workflow` scope wall is gone
+
+**Reconciliation against live state, not against the checkpoint.** `origin/main` is
+`77ad823dcb1874ccfc8964b4679ad92a3a145e0b` (the #1910 merge). Every leaf named in
+`HANDOFF-CHECKPOINT.md` and in the remaining-queue list has since landed or been closed:
+#1802 MERGED, #1823 MERGED, #1828 MERGED, #1737 CLOSED, #1543 CLOSED, #1695 CLOSED, #1351 CLOSED.
+The checkpoint's "immediate obligations" section is therefore **spent** and must not be re-actioned.
+Open internals-labelled 0.0.7 work is exactly **#1905** and **#1913**; #1867 is milestone 0.0.8 and
+out of this lane's scope; **#1641 is the coordinator umbrella and stays open**.
+
+**D-224's hard blocker has cleared and this is worth stating loudly.** `gh auth status` now reports
+token scopes `gist, read:org, repo, workflow`. The credential wall that made #1908's repair
+unpushable — and that shaped D-224 through D-226's whole taxonomy — no longer applies to this
+session. Both remaining issues are `.github/workflows/**` changes and are pushable by their own
+authors. The taxonomy recorded on #1908 stays true as history; it is no longer an operating
+constraint here.
+
+**#1905 dispatched.** Worktree `/home/agent/projects/netscript/worktrees/007-leaf-1905`, branch
+`ci/fresh-ui-lock-gate-triggers` cut at `77ad823dc`. Codex thread
+`01a06193-2960-7a30-8c87-3a8e12b57a6a`, provider `openai` / `gpt-5.6-sol` / effort `high`,
+requested route == observed route, `approval=never`, `sandbox=dangerFullAccess`. Rollout and resume
+command recorded at
+`slices/fresh-ui-lock-gate-triggers/codex-thread-ids.md`. No PLAN-EVAL: the fix is bounded, the
+design is admitted in the issue, and the disagreement I have with the issue body is factual rather
+than architectural.
+
+**Supervisor research corrected the issue's own fix before dispatch — two findings, both measured
+at `77ad823dc`.**
+
+1. **The proposed fix is insufficient.** #1905 asks only for a wider `paths:` filter on
+   `fresh-ui-quality.yml`. But the heavy job is gated a second time by
+   `.github/scripts/ci-classify-changes.ts`, whose nested-config branch contributes
+   `freshUi: path.startsWith('packages/fresh-ui/')`. For `packages/sdk/deno.json`,
+   `plugins/ai/deno.json` and the **root `deno.lock`**, that is `false`. Widening only the trigger
+   produces a workflow that starts and then prints *"Fresh UI quality skipped by policy"* — which is
+   worse than the status quo, because it reads as coverage. Both layers are in the brief's
+   authorized surface.
+2. **The proposed enumeration is too narrow.** `packages/fresh-ui/deno.lock`'s `workspace.members`
+   carries **37 entries** spanning `packages/*`, `packages/cli/e2e` and `plugins/*` — so
+   `packages/*/deno.json` alone misses the plugins and the e2e member. (`examples/*` and `apps/*`
+   are declared root workspace globs but do not appear among the 37; the author re-verifies and
+   states the finding rather than inheriting my read.)
+
+Third acceptance box enumerated in advance: the only second lockfile over the root workspace graph
+is `packages/fresh-ui/deno.lock`. `docs/site/deno.lock` exists, but `docs/site` is not a root
+workspace member and every `docs/site` task that could read it passes `--no-lock`. The author
+re-derives this and widens the fix if I missed a consumer.
+
+**An acceptance box that cannot honestly be ticked pre-merge, recorded now rather than discovered at
+close-gate.** Box 1 wants a member-manifest-only PR to trigger `fresh-ui-quality`. For
+`pull_request`, GitHub evaluates `paths:` from the base+head merge ref and the trigger is restricted
+to `branches: [main]`. Every pre-merge PR carrying this fix therefore also carries
+`.github/workflows/fresh-ui-quality.yml` in its own diff — already a triggering path — so **no
+pre-merge PR can isolate the new trigger**. The classifier half is unit-testable now; the live half
+needs a one-shot PR after merge. The brief requires that limitation stated plainly and forbids
+presenting a demonstration that rides the old trigger as proof of the new one. The supervisor
+carries the post-merge obligation to the issue.
+
+**#1913 researched and briefed, dispatch held behind #1905 per the ordering instruction.** Worktree
+`/home/agent/projects/netscript/worktrees/007-leaf-1913`, branch `ci/repo-wide-concurrency-bounds`
+cut at `77ad823dc`. One finding already contradicts the issue body: it calls `pages-deploy`
+"dispatch-triggered rather than push-triggered" and rests its low-probability claim on that.
+`pages.yml` at `77ad823dc` declares **`push: branches: [main]`** alongside `pull_request`,
+`release: [published]` and `workflow_dispatch`, and the group
+`pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}` collapses every non-PR
+arm onto the literal. The exposure is ordinary main traffic, not a manual dispatch. The brief
+requires the author to re-derive that rather than repeat my reading, and to record the correction.
+
+Also flagged in the brief as a genuine open question rather than a foregone edit: `queue: max` may
+be the **wrong** bound for `release-canary`, because "run every queued publish" is not obviously
+safer than "replace the pending one" for an operation against an immutable registry. The issue's
+acceptance assumes `queue: max`; if the author's analysis rejects it, that is a supervisor decision
+and they stop and report instead of applying it.
