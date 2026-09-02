@@ -21,7 +21,7 @@ Implement exactly locked Slice F: init emits the planner's `--form --partial` pr
 
 ## Scope
 
-- The 32-file enumerated Slice F touch set, with generated carriers mechanically refreshed.
+- The amended 33-file enumerated Slice F touch set, with generated carriers mechanically refreshed.
 - Production composition for Slice E using Slice A's selector and existing adapters.
 - Run artifacts required by the harness.
 
@@ -47,7 +47,7 @@ Implement exactly locked Slice F: init emits the planner's `--form --partial` pr
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Retire-set scope | resolved | Exactly the 16 enumerated template assets and their listed carriers/consumers; any additional consumer stops the slice. |
+| Retire-set scope | resolved | Exactly the 18 enumerated template assets and their listed carriers/consumers; item 33 repairs the one additional rendered convention consumer. |
 | Init client/procedure binding | resolved | Fixed service example values derived from selected init options and #1664's emitted client contract. |
 | Hosted validation | safe to defer | Owned by Slice G; explicitly prohibited here. |
 
@@ -80,5 +80,4 @@ Run focused touched tests, the full CLI package-owned unit suite, assets/publish
 
 ## Drift Watch
 
-- Additional retire-set consumers, changes to `service-query.ts.template`, more than 32 enumerated source/test files, or any `deno.lock` movement are stop conditions.
-
+- Additional retire-set consumers, changes to `service-query.ts.template`, more than 33 product paths (generated carriers exempt), or any `deno.lock` movement are stop conditions.
