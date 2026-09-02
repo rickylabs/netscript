@@ -10028,3 +10028,62 @@ The ruling permits exclusion **only** when both hold. Reported separately rather
 
 Both remaining boxes stay unchecked: `fresh-browser` is not green at this head and the IMPL-EVAL
 `PASS` is pinned to `377811da8`. They tick when true and evidenced, not to clear the gate.
+
+---
+
+## Five merge packets surfaced — 2026-09-02 ~13:20Z
+
+| PR | Issue | Head | State |
+| --- | --- | --- | --- |
+| **#1842** | #1452 S2 | `d789febfd` | `status:ready-merge` — 11/12, postgres red proven baseline |
+| **#1895** | #1590 S2 | `f44f96928` | `status:ready-merge` — packet corrected, runtime tier unstable |
+| **#1921** | #1353 | `a9c732bf6` | `status:ready-merge` — 6/6, exact-head PASS, **zero blocking findings** |
+| **#1922** | #1467 | `af48ec18d` | `status:ready-merge` — 6/6, PASS carried by measured file-by-file identity |
+| **#1927** | #1349 row 7 | `e019fb02f` | `status:ready-merge` — 6/6, PASS, but see the mirror finding |
+
+### The Aspire readiness baseline is now proven, not asserted — and it is broader than garnet
+
+The #1664 ruling required "the same exact failures reproduce on current main". Two unrelated branches
+on `main` `37452f11f` now supply it, and the shape is more informative than expected:
+
+| | #1842 `d789febfd` | #1895 `f44f96928` |
+| --- | --- | --- |
+| Failing gate | **`runtime.wait.postgres` — 300 346 ms** | **`runtime.wait.garnet` — 300 335 ms** |
+| Error | `postgres_listener was never published; readiness deadline 300s elapsed` | `aspire wait garnet … failed (17): Timed out` |
+| sqlite tier | pass | pass |
+
+Three separable facts: **it is not garnet-specific** (postgres times out identically, so the defect is
+in readiness *publication*, closer to #1880 than #1844); **it is not deterministic** (#1895's postgres
+tier passed at `f44f96928` in run `33621810422` and failed at the same head in `33628354184`); and
+**neither branch can cause it** (a plugin service-context factory and a `tests/`-only Fresh proof;
+no Aspire resource, probe, or container in either). Posted to #1844 (`5510226535`).
+
+I corrected #1895's earlier packet rather than leaving its "all pass" table standing — a gate that
+flips at an unchanged head must not be reported from a stale snapshot.
+
+### A mechanism finding: an acceptance-evidence block is inert without a closing keyword
+
+#1927 carries a complete ten-entry block for #1349, and it **will not mirror**.
+`mirror-acceptance-evidence.ts` iterates `classified.issues` — the PR's **closing** issues — so a
+block on a PR that only says `Refs #N` is never applied. Dry-run at the head confirms `no changes`,
+with no diagnostic explaining why. Worth knowing before assuming a block is doing anything.
+
+**And `Closes #1349` would have been wrong.** Measured before deciding:
+
+| #1349 docs/consumer proof | State |
+| --- | --- |
+| `packages/sdk/README.md` export table | done (14 refs) |
+| `docs/site/services-sdk/sdk.md` worked example | done by #1922 (17 refs) |
+| `docs/site/reference/sdk/index.md` worked example | **absent — 0 refs** |
+
+So a genuine residual remains and the closing keyword stays off. A small docs slice for
+`reference/sdk/index.md` carries `Closes #1349` plus the block, and the mirror ticks all ten boxes
+then. Nothing hand-ticked.
+
+### #1922's carry proved by measurement, not assertion
+
+Its PASS is at `f570dcde4`; I had converged it to `af48ec18d` afterwards. Of **8 slice-owned files,
+7 are byte-identical**; the eighth, `sdk.md`, is **+54/−2** where the two deletions are the
+`contributions` and `propagateTraceContext` table rows replaced by main's wording for the same
+fields, and the +54 is #1915's bearer section added. **The slice's own prose section is untouched.**
+That is the difference between a carry claim and a carry proof.
