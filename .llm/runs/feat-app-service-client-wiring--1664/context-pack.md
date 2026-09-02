@@ -166,3 +166,21 @@ structured CLI check 930 files / 8 batches / 0 failures, and `quality:gate` exit
 remains unchanged with SHA-256
 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`. No runtime, browser,
 Aspire, Docker, E2E, or scaffold-runtime lane was run.
+
+## 2026-09-02 Fresh query-fixture startup follow-up
+
+Clearing the CLI help failure exposed the branch-added query-hydration browser fixture for its first
+CI execution. Hosted run `33625391122` reached the generic timeout, not the child-exit branch; under
+the old 100 × 50 ms implementation that proves the Vite process stayed alive through an
+approximately five-second budget. The distinct form-navigation fixture did not warm this Vite root.
+
+The query fixture now uses a 60-second monotonic deadline with 100 ms polling and deadline-bounded
+fetches. Its Vite stdout/stderr are continuously drained into 16 KiB tail buffers and labeled in
+both timeout and early-exit errors. `packages/fresh/src` and the #1895 form-navigation surface remain
+untouched.
+
+Required local evidence is green: Fresh check 211 files / 2 batches / 0 failures and package tests
+276/0/0. Supplemental Fresh lint/fmt and `quality:gate` also exit 0. The package wrapper does not
+select `_browser.ts`; local Chromium exists but `playwright-cli` does not, so no browser verdict is
+claimed and `test:browser` was not run. `deno.lock` remains byte-identical with SHA-256
+`e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.

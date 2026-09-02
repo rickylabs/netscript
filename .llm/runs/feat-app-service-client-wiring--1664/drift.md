@@ -50,3 +50,16 @@
 - Severity: informational tooling drift; no product impact.
 - The selected `rtk` skill documents a machine-level binary, but `rtk` was not present on PATH in
   this WSL environment. Ground-truth Git reads used raw Git as permitted by `netscript-tools`.
+
+## 2026-09-02 — serial gate failure masked a cold fixture budget
+
+- Severity: test-evidence trap; no product-surface or architecture change.
+- At `7f076f875`, the repo-wide test step stopped on the CLI help assertion before the managed Fresh
+  browser step could run. Once that assertion was corrected at `573d01d35`, CI exposed the
+  branch-added query-hydration fixture's approximately five-second startup budget for the first
+  time.
+- The hosted timeout path proves the Vite child was still alive throughout the old budget. The
+  waiter now uses a bounded 60-second wall-clock deadline and emits Vite stdout/stderr on failure.
+- General lesson: a serial gate that stops on its first failure provides no evidence for later
+  phases. Treat everything behind the stop as unmeasured, not implicitly green, and give process
+  startup failures enough captured output to distinguish slowness from a crash on the next run.

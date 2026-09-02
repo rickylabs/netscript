@@ -385,3 +385,59 @@ already measured main-side coverage issue. Those refusals are not relabeled as p
 non-committed config containing the repository's 100-column/single-quote style was used only to
 prove the owned file itself, and this test-only slice does not alter root configuration. No Aspire,
 Docker, browser, `e2e:cli`, or `scaffold.runtime` command was run.
+
+## Fresh query-fixture startup-budget follow-up (2026-09-02)
+
+### Design
+
+- Effective profile: Archetype 4 (`packages/fresh`) plus the frontend overlay, limited to the
+  branch-owned query-hydration browser fixture; `packages/fresh/src`, the #1895 form-navigation
+  fixture, and runtime tiers are excluded.
+- Public surface: none. This is test-harness reliability and failure-evidence work only.
+- Constants: a 60,000 ms monotonic startup deadline, 100 ms poll/fetch interval, and bounded 16 KiB
+  tail capture per Vite output stream.
+- Control flow: retain the `child.status` race for immediate crash detection; bound each readiness
+  fetch by the remaining deadline; include labeled captured stdout/stderr on both startup exit and
+  timeout.
+- Commit slice: one fixture-test edit plus append-only harness records, proven by Fresh structured
+  check/test/lint/fmt, repository quality/doctrine gates, diff hygiene, and lock identity.
+- PLAN-EVAL: N/A — the owner supplied the exact defect contract, scope ceiling, constants, and gate
+  set; no architecture or product decision remains open.
+
+### Confirmed failure mechanism
+
+- Hosted run `33625391122`, job `100231909142`, reached `Timed out waiting for ...` rather than
+  `Vite fixture exited before startup`. In the old implementation that is possible only after all
+  100 races against `child.status` returned their 50 ms timer result; the child remained alive
+  throughout the approximately five-second readiness budget.
+- The two preceding form-navigation tests use a different Vite fixture root. Git history and the
+  branch diff show that `tests/query-hydration-age_browser.ts` and its fixture root are branch-added,
+  so the query fixture still pays its own module-graph startup cost.
+- A local isolated-cache probe was not a CI-speed reproduction: this sandbox exited after 2,550 ms
+  because Rollup's native module could not map from the ephemeral cache. That probe independently
+  demonstrated why discarded Vite streams were inadequate: the old fixture would suppress the only
+  actionable startup error. It is not used as evidence for the hosted runner's slowness.
+
+### Repair and gate evidence
+
+- The waiter now measures a real 60-second wall-clock deadline with `performance.now()`. Sixty
+  seconds gives a cold CI Vite resolve an order-of-magnitude larger startup window while remaining
+  bounded and far below the outer 30-minute gate timeout.
+- Vite stdout and stderr are drained continuously to bounded tail buffers. A timeout reports both
+  labeled streams; an early child exit reports the same evidence after the streams close.
+- `tests/form-navigation_browser.ts` is the only sibling with the old waiter shape and remains
+  untouched as required.
+
+| Gate | Exit | Counts / evidence |
+| --- | ---: | --- |
+| Structured Fresh check | 0 | 211 selected / 2 batches / 0 failed / 0 diagnostics |
+| Structured Fresh package test | 0 | 276 passed / 0 failed / 0 ignored |
+| Structured Fresh lint | 0 | 211 selected / 211 processed / 0 findings |
+| Structured Fresh fmt | 0 | 211 selected / 211 processed / 0 findings |
+| `quality:gate` | 0 | Quality scan 0 findings / 7 existing allowances; doctrine 0 failures |
+| Lock integrity | 0 | No diff from `573d01d35`; SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d` |
+
+The package test wrapper does not select the explicitly named `_browser.ts` files, so its zero
+ignored count is not a browser verdict. A local Chromium executable exists, but `playwright-cli` is
+absent; consequently `deno task --cwd packages/fresh test:browser` was not run. No Aspire, Docker,
+`e2e:cli`, or hosted runtime command was run.

@@ -6,6 +6,9 @@ const FIXTURE_ROOT = fromFileUrl(
   new URL('./fixtures/query-hydration-age-browser/', import.meta.url),
 );
 const HYDRATION_NOW = 1_775_000_000_000;
+const VITE_STARTUP_TIMEOUT_MS = 60_000;
+const VITE_STARTUP_POLL_INTERVAL_MS = 100;
+const FIXTURE_OUTPUT_LIMIT = 16_384;
 
 Deno.test({
   name: 'browser: public query wrapper preserves old and fresh server snapshot ages',
@@ -30,12 +33,13 @@ Deno.test({
         '--strictPort',
       ],
       cwd: FIXTURE_ROOT,
-      stdout: 'null',
-      stderr: 'null',
+      stdout: 'piped',
+      stderr: 'piped',
     }).spawn();
+    const viteOutput = captureProcessOutput(vite);
 
     try {
-      await waitForServer(baseUrl, vite);
+      await waitForServer(baseUrl, vite, viteOutput);
       await runPlaywright([
         '-s',
         PLAYWRIGHT_SESSION,
@@ -111,6 +115,7 @@ Deno.test({
         // The fixture process already stopped; cleanup can continue.
       }
       await vite.status;
+      await viteOutput.done;
       await Deno.remove(playwrightOutput, { recursive: true });
     }
   },
@@ -155,21 +160,112 @@ function reservePort(): number {
   return port;
 }
 
-async function waitForServer(url: string, child: Deno.ChildProcess): Promise<void> {
-  for (let attempt = 0; attempt < 100; attempt++) {
+interface ProcessOutputCapture {
+  readonly stdout: StreamOutputCapture;
+  readonly stderr: StreamOutputCapture;
+  readonly done: Promise<void>;
+}
+
+interface StreamOutputCapture {
+  readonly done: Promise<void>;
+  snapshot(): string;
+}
+
+async function waitForServer(
+  url: string,
+  child: Deno.ChildProcess,
+  output: ProcessOutputCapture,
+): Promise<void> {
+  const deadline = performance.now() + VITE_STARTUP_TIMEOUT_MS;
+
+  while (performance.now() < deadline) {
+    const remaining = deadline - performance.now();
     const status = await Promise.race([
       child.status,
-      new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 50)),
+      new Promise<undefined>((resolve) =>
+        setTimeout(
+          () => resolve(undefined),
+          Math.min(VITE_STARTUP_POLL_INTERVAL_MS, remaining),
+        )
+      ),
     ]);
-    if (status) throw new Error(`Vite fixture exited before startup (${status.code})`);
+    if (status) {
+      await output.done;
+      throw new Error(
+        `Vite fixture exited before startup (${status.code})\n${formatFixtureOutput(output)}`,
+      );
+    }
+
+    const fetchBudget = deadline - performance.now();
+    if (fetchBudget <= 0) break;
 
     try {
-      const response = await fetch(`${url}?hydrationNow=${HYDRATION_NOW}`);
+      const response = await fetch(`${url}?hydrationNow=${HYDRATION_NOW}`, {
+        signal: AbortSignal.timeout(
+          Math.max(1, Math.min(VITE_STARTUP_POLL_INTERVAL_MS, fetchBudget)),
+        ),
+      });
       await response.body?.cancel();
       if (response.ok) return;
     } catch {
       // The fixture is still starting.
     }
   }
-  throw new Error(`Timed out waiting for ${url}`);
+
+  throw new Error(
+    `Timed out waiting ${VITE_STARTUP_TIMEOUT_MS} ms for ${url}\n${formatFixtureOutput(output)}`,
+  );
+}
+
+function captureProcessOutput(child: Deno.ChildProcess): ProcessOutputCapture {
+  const stdout = captureStreamOutput(child.stdout);
+  const stderr = captureStreamOutput(child.stderr);
+
+  return {
+    stdout,
+    stderr,
+    done: Promise.all([stdout.done, stderr.done]).then(() => undefined),
+  };
+}
+
+function captureStreamOutput(stream: ReadableStream<Uint8Array>): StreamOutputCapture {
+  const decoder = new TextDecoder();
+  let captured = '';
+  let truncated = false;
+
+  const append = (value: string) => {
+    captured += value;
+    if (captured.length > FIXTURE_OUTPUT_LIMIT) {
+      captured = captured.slice(-FIXTURE_OUTPUT_LIMIT);
+      truncated = true;
+    }
+  };
+
+  const done = (async () => {
+    try {
+      for await (const chunk of stream) {
+        append(decoder.decode(chunk, { stream: true }));
+      }
+      append(decoder.decode());
+    } catch (error) {
+      append(`\n[fixture output capture failed: ${String(error)}]`);
+    }
+  })();
+
+  return {
+    done,
+    snapshot() {
+      const prefix = truncated ? `[truncated to last ${FIXTURE_OUTPUT_LIMIT} characters]\n` : '';
+      return `${prefix}${captured}`;
+    },
+  };
+}
+
+function formatFixtureOutput(output: ProcessOutputCapture): string {
+  return [
+    'Fixture stdout:',
+    output.stdout.snapshot() || '<empty>',
+    'Fixture stderr:',
+    output.stderr.snapshot() || '<empty>',
+  ].join('\n');
 }
