@@ -243,3 +243,22 @@ the v1 ceiling no longer exists. PR #1664 remains Features-owned and is still fo
 - [ ] S1v2 disposition recorded (A or B) with run ids.
 - [ ] S4v2 receipt `islandHydrated: true` at the final head.
 - [ ] `desktop-native-linux` disposition recorded (out of scope: #1926, cleared by `main ≥ 09c07fd4e`).
+
+### v2.1 amendments (PLAN-EVAL `PASS_PLAN` at `38060e707`, 2026-09-02, six non-blocking findings — all adopted)
+
+- **Supersession (F6).** The v1 "Locked Product Path Ceiling", slice table, and D2 are **superseded** by
+  § Rescope v2 for `packages/cli/e2e/**` gate files only; the v1 forbidden list otherwise stands.
+- **S0a suite id (F5).** Register S0a/S0b through the shared `RUNTIME_GATES` list so both tiers carry
+  them; the discriminator venue is `scaffold.runtime.sqlite` (`deno task e2e:cli gates scaffold.runtime.sqlite`),
+  with postgres presence as the free parity check.
+- **S0b mutation-path receipt (F2).** The interaction is the **Rename** click with a rename-specific row
+  assertion (mirrors #1664's failing `service-client-browser-probe.ts:307`); hydration-only re-render does
+  not satisfy S0b.
+- **S0b fail-closed (F4).** S0b must fail closed when no browser is available — never skip-to-pass. The
+  hosted sqlite tier already runs headless Chromium (`behavior.app-reference`); the `@playwright/cli`
+  install step is dropped from the ceiling unless S0b proves it is needed (then justify the pin in drift).
+- **Branch (B) flake rule (F3).** Branch (B) fires only on a red **inside the S0 gate's own verdict**.
+  Suite-tier infra reds (`runtime.wait.*`, Aspire startup exit 18) are rerun before any disposition.
+- **Branch (A) refutation scope (F1).** A green S0 refutes the premise for **current main's** island
+  sources, not for #1664's modified island. The close comment says so and names the acceptance transfer:
+  #1664's committed probe on a rebased head is the final 72/72 check; #1845 reopens if it reds there.
