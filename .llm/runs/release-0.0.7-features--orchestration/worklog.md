@@ -10133,3 +10133,65 @@ evidence block — which is what finally makes the mirror run, since #1927's ide
 without a closing keyword. The brief tells it to re-verify every entry against merged state rather
 than paste the staged copy, and that a "Mirror skipped" notice at its stage is expected because
 `status:ready-merge` is the supervisor's to apply.
+
+---
+
+## ~14:00Z — #1927 merged; #1664 routed to (b) with the blocker made actionable
+
+`main` → `3066a0cc5`. Merged since the last entry: **#1921** `997b836ba`, **#1922** `4720596fc`,
+**#1927** `cfbb7e706`, plus **#1929** and **#1925**.
+
+**#1929 closes the gap I filed as #1920** — `check:mcp-export-corpus` now runs inside `quality`. The
+practical consequence for this lane is immediate: a stale corpus is a hard CI failure, so **every**
+convergence must regenerate it. #1842 and #1664 were both converged and regenerated on that basis.
+
+### #1664 — route (b), because (a) is not reachable from this branch
+
+The generated-island measurement came back **indeterminate**, for a reason that turns out to be the
+most valuable thing found today:
+
+> **`behavior.service-client-refetch` and the CDP diagnostics that emit
+> `__NETSCRIPT_OPTIMISTIC_RENDER_DIAGNOSTICS__` were introduced by #1664.** No clean-`main` run has
+> ever produced the comparable observation, because the probe does not exist there.
+
+So every `islandHydrated: false` receipt on #1845 came from a branch that also modifies the emitted
+island templates. **Instrument and subject have never been separated**, which is why #1845 has been
+undiagnosable and why four hypotheses could be eliminated without reaching a cause.
+
+Route (a) would require proving the *generated* artifact hydrates; the passing fixture proves the
+**framework** path does. Those are different claims and I am not presenting one as the other.
+Extending the fixture to host the real generated island needs a scaffolded project — the hosted
+runtime lane, not a focused fixture.
+
+So (b), but **not as a park**: posted to #1845 (`5510831739`) the experiment that unblocks it —
+scaffold with **clean main's** CLI, run **#1664's** probe against it, read the same payload. Same
+result → pre-existing and #1664 exonerated; hydrates → the cause is in this branch's templates and
+#1664 owns it. One hosted `scaffold.runtime` attempt settles a P1 that has been stuck since Aug.
+
+The framework layer is now **eliminated** on the record: the focused fixture asserts
+`freshIslandElement: 'main'`, `queryClientFound: true`, `islandHydrated: true`,
+`islandInteractive: true` for both cache-age modes, passing in the same CI job.
+
+### #1936 — #1349's closeout opened
+
+`docs(sdk): document client contribution composition`, head `005c22fd6`, non-draft, full labels,
+milestone 0.0.7, **`Closes #1349`** plus the ten-entry evidence block, and an independent Fable 5.1
+IMPL-EVAL PASS. `docs/site/reference/sdk/index.md` went from **0 → 10** contribution references,
+which was the exact residual measured earlier.
+
+### #1931 — the closing-keyword question is the whole verdict
+
+The lane audited all seven #1352 rows, found the full transport migration **not expressible without
+widening the public SDK**, and migrated the credential path only — stating openly that it "does not
+claim the requests became SDK discovery-transport calls". That is the honest answer I asked for. But
+it carries `Closes #1352`, which asserts row 2 is satisfied, and row 2's words are *"the CLI's direct
+auth requests migrate to the typed SDK path"*. Dispatched an eval pointed at exactly that, told that
+an overclaiming closing keyword is a `FAIL_FIX` rather than a nitpick — it would auto-close a
+milestone issue with open scope.
+
+### Convergences
+
+| PR | New head | Delta |
+| --- | --- | --- |
+| #1842 | `96f777f5a` | corpus only; `status:ready-merge` retained with the reason stated, and I withdraw it the moment anything reds |
+| #1664 | `771548f6d` | corpus only |
