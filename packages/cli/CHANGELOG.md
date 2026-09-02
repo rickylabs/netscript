@@ -78,6 +78,8 @@
   `@netscript/fresh/vite` now publishes route-manifest derivation (`discoverNetScriptRoutes`,
   `resolveNetScriptRouteManifestOptions`, `writeNetScriptRouteManifestSync`) so the CLI can write
   and compare Fresh-owned manifest output.
+  `FormCollectionStrategy` rejects `navigation: 'document'` together with `mode: 'client'` at the
+  type level instead of silently dropping the navigation choice.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
