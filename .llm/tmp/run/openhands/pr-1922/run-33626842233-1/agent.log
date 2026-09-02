@@ -1,0 +1,400 @@
+encoding. Let me check the file content directly with cat.
+
+Thought:
+The file has encoding mojibake (em-dashes and ≤/→/≥ got double-encoded). Let me 
+fix the non-ASCII characters to plainASCII.
+
+$ cd /home/runner/work/netscript/netscript && python3 - << 'PYEOF'
+import re
+p = '.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md'
+raw = open(p, 'rb').read()
+text = raw.decode('utf-8', errors='replace')
+# Normalize mojibake / non-ascii to ascii equivalents
+repl = {
+    '\u00e2\u0089\u00a4': '<=', '\u00e2\u0080\u0093': '-', '\u00e2\u0080\u0094':
+'--',
+    '\u00e2\u0080\u0099': "'", '\u00e2\u0080\u009c': '"', '\u00e2\u0080\u009d': 
+'"',
+    '\u00e2\u0086\u0092': '->', '\u00e2\u0089\u00a5': '>=',
+    '\u2264': '<=', '\u2265': '>=', '\u2192': '->', '\u2013': '-', '\u2014': 
+'--',
+    '\u2019': "'", '\u201c': '"', '\u201d': '"',
+}
+for k, v in repl.items():
+    text = text.replace(k, v)
+text = ''.join(c if ord(c) < 128 else '?' for c in text)
+open(p, 'w', encoding='utf-8').write(text)
+print('normalized; remaining non-ascii:', sum(1 for c in open(p, 
+encoding='utf-8').read() if ord(c) > 127))
+PYEOF
+grep -n "OPENHANDS_VERDICT" 
+.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md; sed -n '20,24p;85,95p'
+.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md
+
+Tokens: ↑ input 27.74K (total 4.55M) • cache hit 74.75% (total 80.80%) •  
+reasoning 157 (total 28.88K) • ↓ output 641 (total 58.78K) • $ (total 0.2669)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+❌ [An error occurred during execution.]
+Cannot execute multiple commands at once.
+Please run each command separately OR chain them into a single command via && or
+;
+Provided commands:
+(1) cd /home/runner/work/netscript/netscript && python3 - << 'PYEOF'
+import re
+p = '.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md'
+raw = open(p, 'rb').read()
+text = raw.decode('utf-8', errors='replace')
+# Normalize mojibake / non-ascii to ascii equivalents
+repl = {
+    '\u00e2\u0089\u00a4': '<=', '\u00e2\u0080\u0093': '-', '\u00e2\u0080\u0094':
+'--',
+    '\u00e2\u0080\u0099': "'", '\u00e2\u0080\u009c': '"', '\u00e2\u0080\u009d': 
+'"',
+    '\u00e2\u0086\u0092': '->', '\u00e2\u0089\u00a5': '>=',
+    '\u2264': '<=', '\u2265': '>=', '\u2192': '->', '\u2013': '-', '\u2014': 
+'--',
+    '\u2019': "'", '\u201c': '"', '\u201d': '"',
+}
+for k, v in repl.items():
+    text = text.replace(k, v)
+text = ''.join(c if ord(c) < 128 else '?' for c in text)
+open(p, 'w', encoding='utf-8').write(text)
+print('normalized; remaining non-ascii:', sum(1 for c in open(p, 
+encoding='utf-8').read() if ord(c) > 127))
+PYEOF
+(2) grep -n "OPENHANDS_VERDICT" 
+.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md; sed -n '20,24p;85,95p'
+.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Normalize evaluate.md encoding to ASCII
+
+$ cd /home/runner/work/netscript/netscript && python3 -c "
+p = '.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md'
+raw = open(p, 'rb').read()
+text = raw.decode('utf-8', errors='replace')
+repl = {
+    '\u00e2\u0089\u00a4': '<=', '\u00e2\u0080\u0093': '-', '\u00e2\u0080\u0094':
+'--',
+    '\u00e2\u0080\u0099': \"'\", '\u00e2\u0080\u009c': '\"', 
+'\u00e2\u0080\u009d': '\"',
+    '\u00e2\u0086\u0092': '->', '\u00e2\u0089\u00a5': '>=',
+    '\u2264': '<=', '\u2265': '>=', '\u2192': '->', '\u2013': '-', '\u2014': 
+'--',
+    '\u2019': \"'\", '\u201c': '\"', '\u201d': '\"',
+}
+for k, v in repl.items():
+    text = text.replace(k, v)
+text = ''.join(c if ord(c) < 128 else '?' for c in text)
+open(p, 'w', encoding='utf-8').write(text)
+print('normalized; remaining non-ascii:', sum(1 for c in open(p, 
+encoding='utf-8').read() if ord(c) > 127))
+"
+
+Tokens: ↑ input 28.7K (total 4.58M) • cache hit 88.31% (total 80.84%) •  
+reasoning 0 (total 28.88K) • ↓ output 370 (total 59.15K) • $ (total 0.2684)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+normalized; remaining non-ascii: 0
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify evaluate.md verdict and readability
+
+$ cd /home/runner/work/netscript/netscript && grep -n "OPENHANDS_VERDICT" 
+.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md && sed -n 
+'20,24p;85,94p' .llm/runs/feat-sdk-locale-contribution--1467/evaluate.md
+
+Tokens: ↑ input 29.14K (total 4.6M) • cache hit 86.97% (total 80.88%) •  
+reasoning 0 (total 28.88K) • ↓ output 96 (total 59.24K) • $ (total 0.2698)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+92:`OPENHANDS_VERDICT: PASS` -- approved scope complete; required static, 
+fitness, runtime, and
+  LOCKED: `createLocaleSdkClientContribution()` beside the existing client 
+descriptor; product
+  ceiling 9.
+- Changed surface audited at head `f570dcde4`: 8 product files (<= ceiling) -- 
+site doc, SDK README,
+  `locale-contribution.ts`, `client/mod.ts`, 3 tests, 1 type fixture; generated 
+carriers tracked
+  separately per plan. Boundary respected: `prepared-call.ts`, transport, trace,
+and query-key
+- Informational (no action): full-suite pass count differs between direct `deno 
+test` (128 + 101
+  steps) and the generator's wrapper run (230) due to reporter granularity; both
+exit 0 with zero
+  failures. No impact on any gate.
+- No severity >= minor findings.
+
+## Verdict
+
+`OPENHANDS_VERDICT: PASS` -- approved scope complete; required static, fitness, 
+runtime, and
+consumer gates have evidence or are not applicable; no unrecorded doctrine 
+violation; no debt
+change; docs and run artifacts sufficient for resume.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final state check of tree and artifacts
+
+$ cd /home/runner/work/netscript/netscript && git status --porcelain; echo ===; 
+ls -la /home/runner/work/_temp/openhands/33626842233-1/; echo ===; head -3 
+/home/runner/work/_temp/openhands/33626842233-1/summary.md
+
+Tokens: ↑ input 29.55K (total 4.63M) • cache hit 85.77% (total 80.91%) •  
+reasoning 0 (total 28.88K) • ↓ output 96 (total 59.34K) • $ (total 0.2712)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+?? .llm/runs/feat-sdk-locale-contribution--1467/evaluate.md
+===
+total 872
+drwxr-xr-x 2 runner runner   4096 Sep  2 12:16 .
+drwxr-xr-x 3 runner runner   4096 Sep  2 11:53 ..
+-rw-r--r-- 1 runner runner 674651 Sep  2 12:17 agent.log
+-rw-r--r-- 1 runner runner      2 Sep  2 11:53 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner 147969 Sep  2 11:53 bootstrap.log
+-rw-r--r-- 1 runner runner  24752 Sep  2 11:53 issue-comments.json
+-rw-r--r-- 1 runner runner      3 Sep  2 11:53 pr-review-comments.json
+-rw-r--r-- 1 runner runner   5154 Sep  2 11:53 request.md
+-rw------- 1 runner runner   5417 Sep  2 12:16 summary.md
+-rw------- 1 runner runner   2519 Sep  2 12:16 verdict.json
+===
+OPENHANDS_VERDICT: PASS
+# IMPL-EVAL — PR #1922 (issue #1467, epic #1348 / RFC 0001 stage 6)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "view"}
+
+Reasoning:
+Everything is in place:
+
+1. `summary.md` at OPENHANDS_SUMMARY_PATH with `OPENHANDS_VERDICT: PASS` as the 
+first line — this becomes the PR comment under `output_mode: pr-comment`. One 
+occurrence, no decoration, no workflow-owned markers (`<!-- openhands-` or `## 
+OpenHands Agent —` — let me double check the summary doesn't contain those. The 
+summary has headings like `## Summary`, `## Changes under evaluation` — that's 
+fine, not `## OpenHands Agent —`).
+
+Wait — I should double check the summary doesn't contain any `<!-- openhands-` 
+marker. It doesn't; I wrote it.
+
+2. `verdict.json` valid with PASS.
+3. `evaluate.md` in the run dir filled in and ASCII-clean — it remains 
+untracked, matching the pre-existing state (untracked run artifact). The 
+workflow commits run artifacts under `.llm/runs/` itself, so leaving it 
+untracked in the working tree is correct per the operational contract ("it only 
+commits run artifacts under .llm/tmp/run/openhands/ and .llm/runs/").
+
+is_pr is true — but I made no source-code changes (read-only evaluator mandate),
+so there is nothing to commit/push. The only file I touched in the repo is the 
+untracked run-dir `evaluate.md`, which the workflow commits itself. No lock 
+churn, no scratch files.
+
+Task tracking: the context said TASK_TRACKING with #1467 nearly complete. I 
+don't have a task_tracker state to view necessarily, but let me check quickly 
+and mark done. Actually the task_tracker tool state is session-scoped; the 
+context describes tasks but my session may have an empty list. Let me view it.
+
+👀 View Task List
+
+Tokens: ↑ input 30.03K (total 4.66M) • cache hit 84.41% (total 80.94%) •  
+reasoning 361 (total 29.24K) • ↓ output 373 (total 59.71K) • $ (total 0.2728)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+📝 Task list is empty
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "plan", "task_list": [{"notes": "Evaluator 
+session for PR #1922: independently verify plan, gates, surface, tests, lock 
+hygiene, process rules. No implementation continuation.", "status": 
+"in_progress", "title": "IMPL-EVAL verification of PR #1922 (#1467, epic 
+#1348)"}]}
+
+📋 Update Task List (1 tasks)
+
+Tokens: ↑ input 30.06K (total 4.69M) • cache hit 91.99% (total 81.01%) •  
+reasoning 0 (total 29.24K) • ↓ output 83 (total 59.8K) • $ (total 0.2741)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 1 in progress
+
+🔄 1. IMPL-EVAL verification of PR #1922 (#1467, epic #1348)
+   Notes: Evaluator session for PR #1922: independently verify plan, gates, 
+surface, tests, lock hygiene, process rules. No implementation continuation.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final verdict rationale check before closing
+
+🤔 Thinking: Final review of the IMPL-EVAL pass before closing out:
+
+1. Verdict rationale check — PASS conditions from verdict-definitions.md, all 
+satisfied by evidence gathered across this run and prior passes:
+- Approved scope complete: 8 product files, all 5 acceptance rows map to named 
+tests, verified in earlier passes and consistent with worklog.
+- Static gates: deno check exit 0 (evaluator-run), generator-recorded 
+check/lint/fmt/audit/dry-run/quality/arch gates all 0, CLI lint/fmt exclusion 
+drift properly recorded in drift.md with check:assets-barrel as authority.
+- Fitness gates: partition law + header ownership verified in tests; Archetype 2
+placement audited (no package split needed).
+- Runtime/consumer gates: 16/0 focused, 128 (101 steps)/0 full suite, type 
+fixture negative case, README doctest in-suite.
+- No doctrine violation: prepared-call/transport/trace/query-key algebra 
+untouched; root barrel re-export; no export-map change needed.
+- Docs/run artifacts: evaluate.md filled with all sections complete (no "(to be 
+completed)" placeholders remain); worklog/context-pack/drift consistent.
+
+2. Process rule verification:
+- PR body uses bare `Issue: #1467` + `Part of #1348` (no closing keyword) — 
+correct per netscript-pr for partial work under epic.
+- Labels + milestone 0.0.7 present; PR OPEN, not draft, status:impl-eval.
+- No review threads to answer (empty reviews list).
+- Lock hash matches baseline — zero churn.
+- Drift log has the one minor bearer-reference ancestry note — treated 
+read-only, correct.
+
+3. Artifacts delivered:
+- evaluate.md in run dir filled completely (PASS verdict recorded).
+- summary.md at OPENHANDS_SUMMARY_PATH with OPENHANDS_VERDICT: PASS as first 
+line.
+- verdict.json at OPENHANDS_SUMMARY_PATH's directory with verdict PASS.
+- All artifacts consistent; summary/verdict.json/evaluate.md all say PASS with 
+no contradictions.
+
+4. No false-done signals: no leftover "(to be completed)" placeholders in 
+evaluate.md; no gate skipped silently.
+
+5. Severity-ranked findings: one informational only (suite-count granularity), 
+no severity >= minor.
+
+The verdict is supported. Task can be marked done and the session can emit the 
+final summary with the verdict line.
+
+Tokens: ↑ input 30.16K (total 4.72M) • cache hit 91.69% (total 81.08%) •  
+reasoning 0 (total 29.24K) • ↓ output 528 (total 60.33K) • $ (total 0.2755)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "plan", "task_list": [{"notes": "Evaluator 
+session for PR #1922: independently verified plan (28e6ca75d, PLAN-EVAL: N/A), 
+8-file touch set vs ceiling 9, gates (deno check 0, generator-recorded static 
+gates 0, CLI lint/fmt drift recorded), tests (16/0 focused, 128/0 full SDK), 
+Archetype 2 placement, lock hash unchanged, PR body form (bare issue ref, no 
+closing keyword, correct for partial epic work), no review threads, no debt 
+entries. Artifacts: evaluate.md filled, summary.md with PASS first line, 
+verdict.json PASS.", "status": "done", "title": "IMPL-EVAL verification of PR 
+#1922 (#1467, epic #1348)"}]}
+
+📋 Update Task List (1 tasks)
+
+Tokens: ↑ input 30.69K (total 4.76M) • cache hit 90.08% (total 81.13%) •  
+reasoning 0 (total 29.24K) • ↓ output 181 (total 60.51K) • $ (total 0.2769)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 1 done
+
+✅ 1. IMPL-EVAL verification of PR #1922 (#1467, epic #1348)
+   Notes: Evaluator session for PR #1922: independently verified plan 
+(28e6ca75d, PLAN-EVAL: N/A), 8-file touch set vs ceiling 9, gates (deno check 0,
+generator-recorded static gates 0, CLI lint/fmt drift recorded), tests (16/0 
+focused, 128/0 full SDK), Archetype 2 placement, lock hash unchanged, PR body 
+form (bare issue ref, no closing keyword, correct for partial epic work), no 
+review threads, no debt entries. Artifacts: evaluate.md filled, summary.md with 
+PASS first line, verdict.json PASS.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS verdict recorded for PR 1922
+
+Finish with message:
+IMPL-EVAL final evaluator pass for PR #1922 (issue #1467, epic #1348, RFC 0001 
+stage 6) is complete. Verdict: PASS.
+
+OPENHANDS_VERDICT: PASS
+
+Evidence and reasoning:
+- Approved plan verified at 
+`.llm/runs/feat-sdk-locale-contribution--1467/plan.md` (impl commit 28e6ca75d); 
+`PLAN-EVAL: N/A` confirmed appropriate for this impl-phase profile; architecture
+LOCKED (locale factory beside existing client descriptor, ceiling 9).
+- Changed surface audited at head f570dcde4: 8 product files (≤ ceiling) — site 
+doc, SDK README, locale-contribution.ts, client/mod.ts, 3 tests, 1 type fixture;
+generated carriers tracked separately per plan; boundary respected 
+(prepared-call/transport/trace/query-key algebra untouched).
+- Tests independently re-run: focused locale tests 16 passed / 0 failed; full 
+SDK suite 128 passed (101 steps) / 0 failed; `deno check --unstable-kv ./mod.ts 
+./src/client/mod.ts` exit 0. Generator's wrapper-run count (230) differs only in
+reporter granularity, both green.
+- Static/consumer gates: generator-recorded check/lint/fmt (103 files), JSR 
+audit, publish dry-run, full-export doc-lint A/B, quality:gate, arch:check, and 
+all four carrier gen/check sequences all exit 0; CLI lint/fmt exclusion drift 
+properly recorded in drift.md with check:assets-barrel as authority.
+- Archetype/geometry: locale has no plugin 
+lifecycle/manifest/backend-adapter/versioned-concern — Archetype 2 Integration 
+placement correct; root barrel re-export means no export-map change needed.
+- Lock hygiene: `sha256sum deno.lock` matches recorded baseline — zero churn.
+- Process rules: PR body uses bare `Issue: #1467` + `Part of #1348` (correct for
+partial work under epic; no closing keyword required/allowed); labels + 
+milestone 0.0.7 present; PR OPEN/not draft; no unanswered review threads.
+- Debt: `.llm/harness/debt/arch-debt.md` has no locale entries — no doctrine 
+violation introduced or deepened; no registry edit required.
+
+Findings: one informational only (suite-count granularity between direct deno 
+test and wrapper run); no severity ≥ minor findings.
+
+Artifacts:
+- `.llm/runs/feat-sdk-locale-contribution--1467/evaluate.md` — IMPL-EVAL record 
+filled (was template placeholder), verdict recorded.
+- `/home/runner/work/_temp/openhands/33626842233-1/summary.md` — 
+OPENHANDS_SUMMARY_PATH deliverable, verdict line as first line.
+- `/home/runner/work/_temp/openhands/33626842233-1/verdict.json` — 
+machine-readable verdict (PASS) with evidence map.
+
+No source changes were made (read-only evaluation per IMPL-EVAL mandate); 
+working tree contains only the run-dir evaluate.md artifact. No commit/push 
+performed, consistent with evaluator role.
+
+Tokens: ↑ input 30.89K (total 4.79M) • cache hit 89.51% (total 81.19%) •  
+reasoning 0 (total 29.24K) • ↓ output 686 (total 61.19K) • $ (total 0.2786)
+
