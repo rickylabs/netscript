@@ -10950,3 +10950,17 @@ old numbers are not carried forward. Review at `29b2b29de` fully green; CI `3369
 `33696044376` queued. Evidence block is now schema-valid (`entries:`) with `status:ready-merge`
 present, so the new run's mirror should write #1880's boxes and close-gate should go green on its
 own. Old close-gate rerun on `33694943768` is moot. Noted on #1952.
+
+### D-271 — #1952 authoritative head is 478450a3c (coordinator force-pushed the main-merge away at 23:39); boxes mirrored; formal IMPL-EVAL dispatched
+
+Reconciled after reset: branch == PR head == `478450a3c`; the `29b2b29de` main-merge was discarded
+by a `head_ref_force_pushed` at 23:39 (coordinator), so the packet re-binds back to `478450a3c` —
+where the review is green and e2e `33694943994` is exact-green (sqlite 17 steps, docker 17 steps,
+**95/0**). The mirror has applied: all three #1880 boxes `[x]`. Close-gate now fails only on two
+PR-body DoD boxes: "Both runtime tiers green at the exact head" — **true, ticked with the run
+evidence** — and "IMPL-EVAL (separate session) PASS recorded" — no formal verdict exists yet, so a
+native Fable 5.1 separate-session IMPL-EVAL is dispatched at `478450a3c` (worktree `007-eval-1952`),
+aimed at the determinism assertion (`assertReadinessDisagreement` must reject unhealthy-without-
+ready-log), ownership-based container selection, semantic-merge integrity, permission-fix blast
+radius, and the hosted receipt. Box 24 is ticked only on a PASS artifact; then close-gate rerun and
+packet. Internals queue otherwise empty (0 owned issues).
