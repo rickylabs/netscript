@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: implementation
+- Phase: gate complete; IMPL-EVAL pending
 - Branch: `ci/e2e-concurrency-key-isolation`
 - Baseline: `origin/main` at `d5c5810db`
 - Implementation lane: Codex · GPT-5.6 Sol · high, session
@@ -144,3 +144,36 @@ REAL_EXIT=0
 The hosted mixed-generation scheduler exercise and independent IMPL-EVAL remain pending. No local
 `scaffold.runtime` run is added: it would test runtime behavior, not GitHub concurrency admission,
 and would duplicate the real hosted job required by issue acceptance.
+
+## Hosted mixed-generation acceptance
+
+Acceptance ran against implementation/test head `5fe82956da1713eb9a9c4679f0e552d078997077`.
+
+| Generation | Run / attempt | Job | Started / eligible | Terminal conclusion |
+| --- | --- | --- | --- | --- |
+| fixed v2 | [`33598546960`](https://github.com/rickylabs/netscript/actions/runs/33598546960) | docker `100147054107` | `06:22:57Z` | **failure**, `06:32:43Z` — non-cancelled after 9m46s |
+| fixed v2 | [`33598546960`](https://github.com/rickylabs/netscript/actions/runs/33598546960) | sqlite `100147054142` | `06:22:56Z` | operator-cancelled `06:40:02Z`, after more than 16 minutes of continued execution |
+| stale v1 | [`33596134134`, attempt 2](https://github.com/rickylabs/netscript/actions/runs/33596134134/attempts/2) | docker `100147234478` | pending `06:23:43Z` | operator-cancelled `06:24:26Z` after admission proof |
+| stale v1 | [`33596134134`, attempt 2](https://github.com/rickylabs/netscript/actions/runs/33596134134/attempts/2) | sqlite `100147234673` | pending `06:23:43Z` | operator-cancelled `06:24:26Z` after admission proof |
+
+The ordering is decisive: both fixed jobs were already running before both stale jobs became
+eligible. The stale-v1 arrival would have shared and applied the old concurrency behavior without
+key isolation. Instead the fixed docker job continued to its own runtime failure and fixed sqlite
+continued for more than 16 minutes. Neither was evicted by the stale arrival. The stale run was
+cancelled as soon as admission was captured to avoid executing a duplicate scaffold runtime; sqlite
+on the fixed run was stopped after docker had reached the required real terminal conclusion and
+sqlite had independently demonstrated sustained post-arrival execution.
+
+### Runtime failure classification
+
+The docker terminal conclusion is an honest runtime failure, not a concurrency failure and not a
+green gate. Its one failing suite step was `runtime.wait.garnet`: Garnet did not become healthy
+within 300 seconds; the suite reported `passed=46 failed=1 skipped=0`. That pre-existing readiness
+defect is owned by PR [#1858](https://github.com/rickylabs/netscript/pull/1858), whose branch run
+[`33597731881`](https://github.com/rickylabs/netscript/actions/runs/33597731881) completed both
+runtime tiers successfully. #1908 changes only concurrency admission, so the Garnet fix is not
+folded into this branch. The hosted receipt is a **PASS for isolation** and a **FAIL for the
+unrelated pre-#1858 runtime baseline**; those verdicts are kept separate.
+
+The opt-in `e2e-cli-gate` label was removed after this one decisive exercise so evidence-only and
+evaluator commits do not repeat the expensive runtime gate.

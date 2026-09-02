@@ -90,16 +90,17 @@ occurrences changed and no other concurrency directive moved.
 
 ## Acceptance
 
-- [ ] Both runtime tier groups use a v2 key; exactly two literals changed, proven by diff.
-- [ ] `cancel-in-progress: false` and `queue: max` are unchanged on both tiers.
-- [ ] The header documents the versioned key, the transition semantics of a `cancelled` v1 job, and
+- [x] Both runtime tier groups use a v2 key; exactly two literals changed, proven by diff.
+- [x] `cancel-in-progress: false` and `queue: max` are unchanged on both tiers.
+- [x] The header documents the versioned key, the transition semantics of a `cancelled` v1 job, and
       the scope of the at-most-one-per-tier promise.
-- [ ] The workflow remains valid YAML and the file parses (`deno task check` unaffected; validate the
+- [x] The workflow remains valid YAML and the file parses (`deno task check` unaffected; validate the
       YAML explicitly).
-- [ ] No file outside `.github/workflows/e2e-cli.yml` and the run artifacts is modified.
+- [x] No product file outside `.github/workflows/e2e-cli.yml` is modified; the co-author slice also
+      tightens the existing workflow regression test and updates only this run directory.
 
 ## Required evidence
 
-- [ ] `git diff` showing exactly the two key literals changed.
-- [ ] A grep of all `concurrency:` blocks before and after, proving no other directive moved.
-- [ ] Real captured exits (`out=$(cmd 2>&1); rc=$?`) — never a pipeline, which discards exit codes.
+- [x] `git diff` showing exactly the two key literals changed.
+- [x] A grep of all `concurrency:` blocks before and after, proving no other directive moved.
+- [x] Real captured exits (`out=$(cmd 2>&1); rc=$?`) — never a pipeline, which discards exit codes.
