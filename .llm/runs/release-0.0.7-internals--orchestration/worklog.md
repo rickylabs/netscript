@@ -10433,3 +10433,56 @@ green from its prior run because `ci.yml` does not fire on label events, so noth
 was spent to buy the second opinion.
 
 **#1920 progressing** at `ec848e6b0` (`1ad32bc02`, plan committed), untouched by any of the above.
+
+### D-238 — #1929 (#1920) PASS with no findings; #1923 second verdict recovered; #1933 watched, not duplicated
+
+**#1923's re-dispatched evaluation returned `OPENHANDS_VERDICT: PASS`** from run `33628586109`,
+`verdict_source: summary-file` — a real artifact this time — at the **unchanged head** `a0aafb18d`.
+The coordinator's ruling that `NONE` is not a PASS was correct: the first runner finished `success`
+while its verdict artifact never materialised, so there was nothing to read. Restored to
+`status:ready-merge`; it now carries two independent verdicts from different families. Nothing
+already banked was spent, because `ci.yml` does not fire on label events and close-gate stayed green.
+
+**#1929 (#1920) — IMPL-EVAL `PASS`, no findings of any severity.** Head `8c028d820`, base
+`37452f11f`, surface exactly `ci.yml` + the regenerated corpus + slice artifacts, zero lock or
+manifest churn. The gate step was read back from **parsed YAML** at `jobs.quality.steps` with the
+sibling gates' id convention and receipt path.
+
+**The evaluation proved an absence rather than confirming a presence**, which is the difference
+between a real result and a search that came up empty. The risk was the #1905 shape — a gate inside
+`quality` is worthless if the classifier can skip `quality` for a corpus-staling change, producing a
+gate that runs, prints *"skipped by policy"*, and reads as coverage. The counter-example hunt
+established that no such path exists:
+
+- Markdown cannot enter the module graph — **0** raw `with { type: 'text' | 'bytes' }` imports across
+  every non-test `.ts/.tsx/.js/.mjs` under `packages/` and `plugins/`;
+- no module-graph escape into the inert prefixes; the only two apparent hits are embedded string
+  literals in scaffolding templates, not imports;
+- no member manifest declares a relative import target outside its own tree;
+- **toolchain drift**, raised by neither the brief nor the author: `deno doc` output is
+  Deno-version dependent, so a pin bump could redden the gate with no repo diff — except `ci.yml`
+  pins `2.9.5` in all five jobs and a bump edits `ci.yml`, so `needs_deno=true` and the gate goes red
+  **at the bump** rather than silently later.
+
+**Determinism cleared the stop-and-report precondition**, and corrected a concern of mine in the
+process. I had worried the recorded sha256 predated the mid-slice main integration. It does not: the
+evidence carries a second post-integration table (`21cfdee7…`, 273 subpaths / 7,809 symbols) matching
+the committed blob, reproduced twice by the evaluator from a detached scratch tree with an empty
+`DENO_DIR`. **Correctness was separated from freshness** — a passing `check:` proves the blob equals
+what the generator produces here, not that the blob is right; byte-identity from a clean detached
+checkout excludes the #1859 shape structurally. The 272→273 / 7,803→7,809 delta traces to the single
+manifest change between cut base and integrated main (`packages/plugin-auth-core`, #1915).
+
+`Closes #1920` is correct with no post-merge caveat — unlike #1905, every claim here is provable
+pre-merge. #1920 carries no acceptance checkboxes, so no `acceptance-evidence` block applies; the
+PR's seven Definition-of-Done boxes were each verified before being allowed to stand.
+
+**#1933 is coordinator-implemented and explicitly not ours to duplicate.** Verified as an independent
+evaluator only: PR head, remote branch, and the coordinator-declared SHA
+`99ce0d64c48dd83c0b73927f7a80aee6982ca926` **agree three ways**. CI green so far (3 pass / 7 skipped,
+`check-test` and `quality` running); `BLOCKED` is review-pending, not a red gate. Watching for repair
+need only — no brief, no dispatch, no edits.
+
+**Lane state:** #1905 CLOSED on its post-merge receipt; #1917 merged; #1923 and #1929 both at
+readiness awaiting coordinator merge; #1913 delivered *by* #1923 and mislabelled `status:plan` until
+this rotation corrected it — a stale label of my own making that read as a parked plan.
