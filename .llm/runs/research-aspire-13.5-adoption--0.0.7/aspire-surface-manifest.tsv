@@ -63,7 +63,6 @@ path	class	owner	disposition
 .agents/generated/consumer-skills/.llm/tools/validation/check-aspire-host-ports.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.mcp.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/AGENTS.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/skills/aspire-upgrade/SKILL.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
 .agents/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
 .agents/skills/netscript-cli/commands.md	skill:internal	S13	wording check; no version literal expected
