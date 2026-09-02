@@ -68,6 +68,7 @@ public role semantics.
 | 2026-09-02 | 1     | initial IMPL-EVAL     | Native Claude/Fable 5 medium returned PASS with one behavioral and one brief-bookkeeping observation, both non-blocking.                  |
 | 2026-09-02 | 1     | precedence remediation | Restored baseline protocol-before-id rejection order using the non-throwing diagnostic id and added an exact doubly-invalid pin.         |
 | 2026-09-02 | 1     | remediation gates     | Check/lint/fmt, 19 focused tests, 229 SDK tests, quality, and explicit architecture gates all pass; `prepared-call.ts` remains 499 lines. |
+| 2026-09-02 | 1     | final IMPL-EVAL       | PASS current for source HEAD `88065c3c3`; remediation gates independently reproduced and no current findings remain.                     |
 
 ## Decisions
 

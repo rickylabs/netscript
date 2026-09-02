@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------------------- |
 | Run ID         | `feat-sdk-contribution-conflict-diagnostics--1349` |
 | Branch         | `feat/sdk-contribution-conflict-diagnostics`       |
-| Current phase  | `evaluate`                                         |
+| Current phase  | `impl-eval` — PASS                                |
 | Archetype      | `2 — Integration`                                  |
 | Scope overlays | `none`                                             |
 
@@ -15,7 +15,8 @@
 The diagnostic and exact acceptance tests are implemented. `contributionId` remains the
 claimant/offender; optional `conflictingContributionId` identifies the earlier owner. All requested
 generator gates, clean-tree publication, and the post-commit carrier cascade pass. IMPL-EVAL
-remains.
+passed in a separate native Claude/Fable 5 medium session and is current for source HEAD
+`88065c3c3`.
 
 ## Completed
 
@@ -27,16 +28,17 @@ remains.
 - `deno doc --lint` A/B has zero new diagnostics; docs examples remain at `unboundName=116`.
 - `quality:gate` and explicit `arch:check` pass after removing the transient new F-1 warning.
 - Clean-tree SDK dry-run passes; carrier cascade updates only the MCP generated export corpus.
+- IMPL-EVAL PASS at `88065c3c3`; both initial low observations were remediated and independently
+  verified with no current findings.
 
 ## In Progress
 
-- Final evidence/generated commit and separate-session evaluation.
+- Commit the evaluator verdict artifact, then publish the branch and PR.
 
 ## Next Steps
 
-1. Commit carrier/evidence state and verify the cascade is idempotent after that commit.
-2. Run separate IMPL-EVAL.
-3. Explicit-refspec push and open the non-draft PR with exact metadata/evidence.
+1. Commit the final `evaluate.md`/context closeout artifact.
+2. Explicit-refspec push and open the non-draft PR with exact metadata/evidence.
 
 ## Key Decisions
 
@@ -72,9 +74,12 @@ remains.
 
 ## Drift and Debt
 
-- Drift: `rtk` unavailable; non-draft PR owner override.
+- Drift: `rtk` unavailable; non-draft PR owner override; doubly-invalid precedence was restored and
+  pinned after the first evaluator pass.
 - Debt: none planned.
 
 ## Commits
 
-- See the PR commit list and per-slice comments after the slice lands.
+- `672b67b61` — public diagnostic addition, validation paths, exact tests, and run bootstrap.
+- `365955dac` — generated public-surface carrier and clean-tree evidence.
+- `88065c3c3` — restore/pin baseline doubly-invalid rejection precedence.
