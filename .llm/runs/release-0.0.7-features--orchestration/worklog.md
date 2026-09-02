@@ -10643,3 +10643,19 @@ lock delta as exactly `jsr:@netscript/fresh@0.0.6` under the CLI workspace membe
 IMPL-EVAL triggered by `status:impl-eval` only after the lane went idle. This is the first #1354
 implementation slice to land, and it landed **while #1664 is still open** — legitimately, because its
 six files intersect #1664 on nothing.
+
+### ~18:20Z — #1943's one red is the private-lock mirror; #1664 postgres is #1845 again
+
+**#1943 `fresh-ui-quality` fails on "Fresh UI private lock is stale."** Slice B's root `deno.lock`
+correctly gained `jsr:@netscript/fresh@0.0.6`, but `packages/fresh-ui/deno.lock` — a *private* lock
+that must mirror workspace resolution — was not regenerated. The #1905 class. Sent back to the Slice
+B lane with the exact remedy the gate names and an instruction to stop if the private-lock diff is
+anything other than that one mirror line. The IMPL-EVAL is queued at `5f0a857ff`; a lock-only push
+changes no product source, so the verdict carries and I will retrigger only if the agent skips on the
+head move.
+
+**#1664 postgres tier**: `passed=72 failed=1`, `behavior.service-client-refetch` — #1845, same as
+the sqlite tier. No Aspire readiness noise this run either; the PR's sole red remains the one thing
+the ruling says cannot be waived.
+
+Evals live: #1941 (`33656495216`, agent in progress), #1943 (`33658230195`, agent queued).
