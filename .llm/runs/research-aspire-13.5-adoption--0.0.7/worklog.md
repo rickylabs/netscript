@@ -674,3 +674,14 @@ stale-surface cleanup + telemetry example + generated carriers; no docker-tier c
 gate PASS (0 threads). Repairs since the IMPL-EVAL head `435c20170` are carriers + two one-line
 defects (D-325 public resolver mapping; `gen:publish-assets`), all hosted-green. **Coordinator lands
 the merge.**
+
+### 2026-09-02 17:23Z checkpoint — S9/S10/S13
+
+- **Deadline 17:16:34Z passed.** S13 packet was delivered green at 17:13Z (awaiting coordinator
+  merge, PR still OPEN). S9 and S10 were not mergeable by the deadline; work continues.
+- S9 #1759 → `77f7ec249` (pushed 17:21:06Z). Sqlite tier at `4c5e0f191` FAILED on TC-14 — consumer
+  and validator picked different Flow-B runs (D-326); repair anchors both on the correlation
+  fixture. Superseded run 33657229220 cancelled; new `ci` 33660530699 + `e2e-cli` 33660530671
+  dispatched. Remaining gate: both runtime tiers (~25–35 min incl. queue) → receipts → evidence →
+  ready-merge → close-gate; actor: supervisor; ETA ~17:55Z.
+- S10 #1760 `84e4b38f7` — unchanged; #1930 OPEN.

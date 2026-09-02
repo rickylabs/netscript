@@ -8387,3 +8387,17 @@ added `@netscript/mcp` to the app `deno.json` imports (telemetry example) and to
 `5f0eed0fe` adds the single mapping; both test files pass locally. Follow-up for the epic: the two
 resolver tables are parallel hand-maintained mirrors — a parity test over `SCAFFOLD_PACKAGES`
 would have caught this before hosted CI.
+
+## D-326 — S9 TC-14: consumer and validator anchored on different Flow-B runs (2026-09-02)
+
+Hosted run 33657229220 (`4c5e0f191`, sqlite tier) cleared the 401 (D-324) — the consumer span now
+exists — and failed the next TC-14 predicate: the consumer's W3C link pointed into trace
+`d9024a3c…` while the validator's "selected Flow-B producer trace" was `db2fab2c…`. Cause: the
+runtime suite fires the generic webhook twice (`behavior.triggers-webhook` step 69, then
+`behavior.otel.webhook` step 82), so two `flow-b-callback` executions coexist; the consumer took the
+first `job.execute` in the workers-scoped query and the validator the first Flow-B-shaped trace in
+the all-service query, neither consulted `.netscript/e2e/flow-b-correlation-id`. Repair
+`77f7ec249` (e2e only; product diff unchanged): `findJobExecuteIdentity(traces, preferred)` and
+`validateFlowB` both prefer the execution/trace carrying the fixture correlation, first-match as
+fallback; 3 new unit tests. **Deadline note:** the 17:16:34Z merge deadline passed with S9 still on
+its hosted proof — recorded honestly; the sqlite tier at `77f7ec249` is the next bounded gate.
