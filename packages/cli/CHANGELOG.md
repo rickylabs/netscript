@@ -51,8 +51,9 @@
   `inspectionProtocol: 1`. `createPluginServiceContext` also accepts caller-owned async environment
   and `getAppsettings` resolvers, resolved once at assembly while the DB and KV adapters stay lazy
   and memoized.
-- `@netscript/kv` publishes `createLazyKv`; the scaffolded plugin service template consumes it
-  instead of emitting a per-project copy.
+- `@netscript/kv` publishes `createLazyKv`, and the scaffolded plugin service template takes its
+  lazy KV from `createPluginServiceContext` (`@netscript/plugin/sdk`) instead of emitting a
+  per-project copy.
 - The SDK ships the typed client-contribution seam from RFC 0001: the public descriptor, helper, and
   error contract; a runtime adapter with closed-shape validation, redacted failures, and cache-safe
   query partitioning; the canonical typed bearer contribution (declared by the auth plugin without
@@ -69,20 +70,22 @@
   deploy prebuild, follow Aspire's Vite identifier normalization so hyphenated resource names
   resolve.
 - Fresh exposes awaited chat persistence and background-work registration through
-  `toNetScriptChatResponse`, preserves readonly query hydration on TanStack Query 5.102.x, orders
-  the partial-navigation lifecycle through the SSR-safe `@netscript/fresh/navigation` surface
-  (superseded responses are drained, native `key` partial boundaries render), invokes the captured
-  navigation fetch with the browser receiver, and rejects undeclared keys on pattern-inferred route
-  params at the property-access site. `@netscript/fresh/vite` now publishes route-manifest
-  derivation (`discoverNetScriptRoutes`, `resolveNetScriptRouteManifestOptions`,
-  `writeNetScriptRouteManifestSync`) so the CLI can write and compare Fresh-owned manifest output.
+  `toNetScriptChatResponse`, keeps readonly query hydration verified against TanStack Query
+  5.102.x, orders the partial-navigation lifecycle through the SSR-safe
+  `@netscript/fresh/navigation` surface (superseded responses are drained, native `key` partial
+  boundaries render), invokes the captured navigation fetch with the browser receiver, and rejects
+  undeclared keys on pattern-inferred route params at the property-access site.
+  `@netscript/fresh/vite` now publishes route-manifest derivation (`discoverNetScriptRoutes`,
+  `resolveNetScriptRouteManifestOptions`, `writeNetScriptRouteManifestSync`) so the CLI can write
+  and compare Fresh-owned manifest output.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
   `api: 'responses'`, preserves nested `TokenUsage` detail through the TanStack bridge, and moves
   the TanStack AI dependency family to its current stable releases.
 - `ui:add page --island` emits a working page, island, and query-loader data screen instead of a
-  counter; the shipped skill bundle points every skill body at the canonical `.agents/skills/` tree;
+  counter; the shipped skill bundle no longer references the derived `.claude/` mirror and resolves
+  to the canonical `.agents/skills/` tree;
   Garnet readiness in scaffolded runtimes is deterministic and its version pins are aligned.
   `netscript deploy <target> emit` is routed, and a fail-fast invariant keeps advertised deploy
   operations from being silently omitted by the command router. The CLI also ships the neutral
@@ -96,7 +99,8 @@
   checks for database and Redis-compatible backing services, ships typed db-cli-mode resource
   commands with bounded readiness waits and `excludeFromMcp`, validates background reference names
   and emits parseable AppHost source for adversarial inputs, and discovers the telemetry endpoint
-  through the D-17 resolver.
+  through `resolveTelemetryEndpoint` (explicit value, `NETSCRIPT_TELEMETRY_ENDPOINT`,
+  `ASPIRE_DASHBOARD_PORT`, the running AppHost, then the named default).
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.
 
 ## 0.0.6
