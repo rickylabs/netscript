@@ -10658,3 +10658,16 @@ offender set.
 
 #1937 watcher is now **event-driven with the action embedded**: on CI completion it applies
 `status:ready-merge` and reruns `--failed`, then watches close-gate to green. No manual polling turn.
+
+### D-245 — #1937 close-gate green at 2e5ad4900; re-packeted; the second red was mine
+
+Attempt 1 red: mirror skipped without `status:ready-merge` at evaluation (phase-eval demotion,
+designed). Attempt 2 red: **duplicate evidence** — the author already had an `acceptance-evidence`
+block and I appended a second without checking; the mirror correctly refused to mutate. Same shape
+as D-234: an artifact I added became an input to the mechanism it was meant to satisfy. Kept exactly
+one block (mine, with run ids/steps/hashes), dry-run clean, attempt 3 **green**: close-gate success,
+`quality` 28 steps, 6/9/0/0. All three #1867 boxes mirrored `[x]`. Head unchanged throughout — no
+push. Re-packeted for coordinator merge.
+
+**Rule kept:** before adding an evidence block to a PR that already carries `Closes #N`, check for an
+existing one; a second entry is a conflict to the mirror, not a supplement.
