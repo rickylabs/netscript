@@ -26,9 +26,7 @@ import {
   streamChangeCorrelationId,
 } from './select-flow-b-stream-change.ts';
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
-import { scanResourceProcesses } from './service-env/process-evidence.ts';
-import { parseOtlpHeaders } from './otlp-headers.ts';
-import { SCAFFOLD_DIRS } from '../../../../../src/kernel/constants/scaffold/scaffold-dirs.ts';
+import { resolveOtlpHeadersFromResource } from './otlp-headers.ts';
 
 const FLOW_B_SELECTION_MAX_BATCHES = 40;
 const FLOW_B_SELECTION_TIMEOUT_MS = 20_000;
@@ -60,7 +58,11 @@ let flowBTracerProvider: BasicTracerProvider | undefined;
 // hosted `c6ec50214` run reported. The AppHost hands every resource the ingest key as
 // `OTEL_EXPORTER_OTLP_HEADERS=x-otlp-api-key=…`; the consumer is not a resource, so it borrows
 // the key from the process the AppHost started for the `streams` resource it consumes from.
-const otlpHeaders = await resolveOtlpHeadersFromResource(projectRoot, 'streams');
+const otlpHeaders = await resolveOtlpHeadersFromResource(
+  projectRoot,
+  'streams',
+  'flow-b-stream-consumer',
+);
 
 const provider = createTelemetryProvider({
   providerId: 'otel-sdk',
@@ -424,39 +426,4 @@ function toOtlpAttributes(
     else if (typeof value === 'number') result.push({ key, value: { doubleValue: value } });
   }
   return result;
-}
-
-/**
- * Reads `OTEL_EXPORTER_OTLP_HEADERS` from the environment of the process the AppHost started
- * for `resourceName`, using the same `/proc`-backed evidence the service-env gate relies on.
- * Returns no headers when the resource process cannot be found or carries none (anonymous
- * dashboard mode), so the export attempt itself stays the authority on whether auth was needed.
- */
-async function resolveOtlpHeadersFromResource(
-  root: string,
-  resourceName: string,
-): Promise<Record<string, string>> {
-  // Services run in `services/<name>`; plugin-backed resources (`generate-register-background`)
-  // default to the project root. Try both rather than guess which one `streams` is.
-  const workdirs = [`${root}/${SCAFFOLD_DIRS.SERVICES}/${resourceName}`, root];
-  const notes: string[] = [];
-  for (const workdir of workdirs) {
-    try {
-      const scan = await scanResourceProcesses(workdir, resourceName);
-      for (const process of scan.processes) {
-        const value = process.environment.get('OTEL_EXPORTER_OTLP_HEADERS');
-        if (value) return parseOtlpHeaders(value);
-      }
-      notes.push(
-        `${workdir}: examined ${scan.diagnostics.examined}, identified ${scan.diagnostics.identified}, none carried OTEL_EXPORTER_OTLP_HEADERS`,
-      );
-    } catch (error: unknown) {
-      notes.push(`${workdir}: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-  console.error(
-    `flow-b-stream-consumer: no OTLP API key found on the ${resourceName} process ` +
-      `(${notes.join('; ')}); exporting without one`,
-  );
-  return {};
 }
