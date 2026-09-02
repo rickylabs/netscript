@@ -196,3 +196,10 @@ heading and exclude the `|` form.
 - CI run 33682553044 at the exact head: success; `mergeable=true state=clean`; behind 0.
 - Docs-only, one-line changelog change — no separate IMPL-EVAL cycle spent (same disposition as
   the #1949 deletion-only fix). Independent of Canary 6; coordinator merges when the train allows.
+
+## #1955 merged — 2026-09-02
+
+- Coordinator merged #1955 at `49393fa53` → `main` `d64682bb0`; #1856 bullet verified on main.
+- Docs queue empty. Remaining user-visible candidates before stable: #1664 (impl-eval), #1952
+  (impl), #1956 (impl — activates `generate resource`; owner should add `Refs`/closing keyword).
+  Swept as no-bullet: #1951, #1953, #1954, #1909, #1957.
