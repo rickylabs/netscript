@@ -204,3 +204,9 @@ lock SHA-256 remains `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df1892
 The local browser task was attempted but could not launch: the CI-pinned CLI found neither branded
 Chrome nor Chromium's `libnspr4.so`, yielding 0 passed / 3 failed before page navigation. Exact-head
 CI must therefore provide the decisive hydration values; no local pass is claimed.
+
+The first exact-head CI observation at branch commit `7f99cbeff` proved query-client access, the
+client effect, and button-driven state change in both modes, but exposed that the initial island
+marker probe assumed a `<fresh-island>` wrapper. The measured fixture response uses Fresh 2's
+comment boundary `frsh:island:app:0:`. The proof now asserts that exact boundary plus the three
+already-true client measurements; a second exact-head CI run is required for the final verdict.

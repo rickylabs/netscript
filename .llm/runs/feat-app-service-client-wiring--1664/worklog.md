@@ -508,3 +508,19 @@ The exact-head CI browser lane remains the decisive hydration observation. The t
 - `quality:gate` passed with 0 quality findings (7 pre-existing allowances) and 0 doctrine
   failures. `deno.lock` remained byte-identical to `1dd976024` with SHA-256
   `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
+
+### First exact-head browser observation and instrumentation correction
+
+- CI run `33631309859`, job `100251294576`, evaluated the PR merge head for branch commit
+  `7f99cbeff`. The browser step reported 2 passed / 1 failed and emitted both complete hydration
+  objects before the assertion:
+  `freshIslandElement=null`, `queryClientFound=true`, `islandHydrated=true`, and
+  `islandInteractive=true` for both old and fresh modes.
+- A direct fixture response then showed the cause of the lone false field: Fresh 2 emits
+  `<!--frsh:island:app:0:-->` and `<!--/frsh:island-->` boundary comments, not a
+  `<fresh-island>` element. The initial ancestor selector therefore measured a DOM shape from a
+  different Fresh representation even though the client effect and click had both executed.
+- The first assertion now checks the exact `frsh:island:app:0:` boundary immediately before the
+  island root. The remaining three assertions and all snapshot-age assertions are unchanged.
+- Final-byte rerun: check 211 files / 2 batches / 0 diagnostics; package tests 276 / 0 / 0 in
+  7,682 ms; lint and fmt each 211 / 211 with 0 findings.

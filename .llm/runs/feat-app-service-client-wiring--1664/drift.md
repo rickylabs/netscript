@@ -76,3 +76,16 @@
 - General lesson: readiness timeouts must carry bounded child stdout/stderr. A URL and elapsed time
   cannot distinguish cold startup, module resolution, process configuration, or a silent crash—the
   information needed to repair the failure is otherwise discarded at the failure boundary.
+
+## 2026-09-02 — Fresh 2 island boundaries are comment markers
+
+- Severity: browser-evidence contract correction; no product-source change.
+- Exact-head CI observed `queryClientFound=true`, `islandHydrated=true`, and
+  `islandInteractive=true` in both modes, but the initial `freshIslandElement` probe returned null
+  because it searched for a `<fresh-island>` ancestor.
+- The fixture's measured HTML uses Fresh 2's actual boundary representation:
+  `<!--frsh:island:app:0:-->...<!--/frsh:island-->`. The proof now asserts that exact opening
+  boundary immediately before the island root, instead of assuming a custom-element wrapper.
+- General lesson: hydration diagnostics must follow the framework version's emitted DOM contract.
+  A missing legacy wrapper is not evidence of failed hydration when the client effect, context,
+  and interaction all execute inside a valid Fresh boundary.
