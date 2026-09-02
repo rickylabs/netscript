@@ -180,9 +180,11 @@ export function createHttpClientLink<
         SpanNames.RPC_CLIENT,
         async (span) => {
           const headers = new Headers(request instanceof Request ? request.headers : undefined);
-          const injected = injectContext({}, contextWithSpan(span));
-          for (const [key, value] of Object.entries(injected)) {
-            headers.set(key, value);
+          if (propagateTraceContext) {
+            const injected = injectContext({}, contextWithSpan(span));
+            for (const [key, value] of Object.entries(injected)) {
+              headers.set(key, value);
+            }
           }
           return await transportFetch(request, {
             ...init,

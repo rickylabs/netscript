@@ -43,15 +43,15 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
       ),
     };
     let firstPreparations = 0;
-    const firstContribution = defineSdkClientContribution()({
+    const authContribution = defineSdkClientContribution()({
       protocol: { family: 'netscript.sdk-client', major: 1 },
-      id: 'test:first-observability',
+      id: 'test:auth-observability',
       context: {},
-      headerKeys: ['x-first-observed'],
+      headerKeys: ['authorization'],
       responseCache: { mode: 'invariant' },
       prepare: () => {
         firstPreparations += 1;
-        return { headers: { 'x-first-observed': firstSecret } };
+        return { headers: { authorization: 'Bearer ' + firstSecret } };
       },
     });
     let secondPreparations = 0;
@@ -66,7 +66,7 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
         return { headers: { 'x-second-observed': secondSecret } };
       },
     });
-    const contributions = [firstContribution, secondContribution];
+    const contributions = [authContribution, secondContribution];
     const attempts = [];
     const captureAttempt = (phase, init) => {
       const headers = new Headers(init?.headers);
@@ -128,7 +128,7 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
     const reconnectValues = [];
     const reconnectLink = createHttpClientLink({
       ...linkOptions,
-      contributions: [secondContribution, firstContribution],
+      contributions: [secondContribution, authContribution],
       fetch: (_request, init) => {
         captureAttempt('reconnect', init);
         const body = reconnectFetches === 0 ? firstStream : secondStream;
@@ -166,6 +166,36 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
       },
     );
 
+    let disabledParentSpanId = null;
+    let disabledAttempt = null;
+    const disabledLink = createHttpClientLink({
+      ...linkOptions,
+      propagateTraceContext: false,
+      contributions,
+      fetch: (_request, init) => {
+        const headers = new Headers(init?.headers);
+        disabledAttempt = {
+          entries: [...headers.entries()],
+          traceparent: headers.get('traceparent'),
+          tracestate: headers.get('tracestate'),
+        };
+        return Promise.reject(new Error('disabled transport stop'));
+      },
+    });
+    await provider.getTracer('sdk-observability-test').startActiveSpan(
+      'test.disabled-parent',
+      async (parentSpan) => {
+        disabledParentSpanId = parentSpan.spanContext().spanId;
+        try {
+          await disabledLink.call(['echo'], { ok: true }, { context: {} });
+        } catch {
+          // Expected: the test fetch seam stops after observing the final request.
+        } finally {
+          parentSpan.end();
+        }
+      },
+    );
+
     await provider.forceFlush();
     const spans = exporter.getFinishedSpans();
     const clientSpans = spans.filter((span) => span.name === 'rpc.client');
@@ -195,6 +225,8 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
       secondPreparations,
       retryParentSpanId,
       reconnectParentSpanId,
+      disabledParentSpanId,
+      disabledAttempt,
       reconnectValues,
       staleTraceparent,
       expectedKind: 2,
@@ -232,6 +264,12 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
     readonly secondPreparations: number;
     readonly retryParentSpanId: string;
     readonly reconnectParentSpanId: string;
+    readonly disabledParentSpanId: string;
+    readonly disabledAttempt: {
+      readonly entries: readonly (readonly [string, string])[];
+      readonly traceparent: string | null;
+      readonly tracestate: string | null;
+    };
     readonly reconnectValues: readonly string[];
     readonly staleTraceparent: string;
     readonly expectedKind: number;
@@ -245,10 +283,10 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
     'reconnect',
     'reconnect',
   ]);
-  assertEquals(result.firstPreparations, 3);
-  assertEquals(result.secondPreparations, 3);
+  assertEquals(result.firstPreparations, 4);
+  assertEquals(result.secondPreparations, 4);
   assertEquals(result.reconnectValues, ['A-item', 'B-item']);
-  assertEquals(result.clientSpanSnapshots.length, result.attempts.length);
+  assertEquals(result.clientSpanSnapshots.length, result.attempts.length + 1);
 
   for (const attempt of result.attempts) {
     assertEquals(attempt.traceparentCount, 1);
@@ -256,8 +294,8 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
     assertFalse(attempt.traceparent === result.staleTraceparent);
     if (attempt.traceparent === null) throw new Error('Expected transport traceparent');
     assertEquals(
-      attempt.entries.filter(([name]) => name === 'x-first-observed'),
-      [['x-first-observed', 'first-header-secret']],
+      attempt.entries.filter(([name]) => name === 'authorization'),
+      [['authorization', 'Bearer first-header-secret']],
     );
     assertEquals(
       attempt.entries.filter(([name]) => name === 'x-second-observed'),
@@ -276,6 +314,23 @@ Deno.test('composed headers retain transport-authored CLIENT spans across retry 
       attempt.phase === 'retry' ? result.retryParentSpanId : result.reconnectParentSpanId,
     );
   }
+  assertEquals(result.disabledAttempt.traceparent, null);
+  assertEquals(result.disabledAttempt.tracestate, null);
+  assertEquals(
+    result.disabledAttempt.entries.filter(([name]) => name === 'authorization'),
+    [['authorization', 'Bearer first-header-secret']],
+  );
+  assertEquals(
+    result.disabledAttempt.entries.filter(([name]) => name === 'x-second-observed'),
+    [['x-second-observed', 'second-header-secret']],
+  );
+  const disabledClientSpan = result.clientSpanSnapshots.find(
+    (span) => span.parentSpanId === result.disabledParentSpanId,
+  );
+  assert(disabledClientSpan !== undefined);
+  assertEquals(disabledClientSpan.kind, result.expectedKind);
+  assertEquals(disabledClientSpan.rpcSystem, 'orpc');
+  assertEquals(disabledClientSpan.serverAddress, '127.0.0.1');
   assertFalse(result.spanLeakedSecret);
   assertFalse(stderr.includes('first-header-secret'));
   assertFalse(stderr.includes('second-header-secret'));
