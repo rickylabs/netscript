@@ -100,7 +100,10 @@
   commands with bounded readiness waits and `excludeFromMcp`, validates background reference names
   and emits parseable AppHost source for adversarial inputs, and discovers the telemetry endpoint
   through `resolveTelemetryEndpoint` (explicit value, `NETSCRIPT_TELEMETRY_ENDPOINT`,
-  `ASPIRE_DASHBOARD_PORT`, the running AppHost, then the named default).
+  `ASPIRE_DASHBOARD_PORT`, the running AppHost, then the named default). The shipped `aspire` skill
+  and `help.md` are re-verified against Aspire CLI 13.5.3 (`aspire agent mcp`, `aspire mcp tools`
+  and `aspire mcp call`, the `aspire resources` alias, `healthReports` as an object) with receipt
+  keys linking each re-verified command to its smoke evidence.
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.
 
 ## 0.0.6
