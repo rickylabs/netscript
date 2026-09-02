@@ -23,6 +23,7 @@
   "imports": {
     "@netscript/aspire": "jsr:@netscript/aspire@0.0.6",
     "@netscript/config": "jsr:@netscript/config@0.0.6",
+    "@netscript/fresh": "jsr:@netscript/fresh@0.0.6",
     "@netscript/fresh-ui": "jsr:@netscript/fresh-ui@0.0.6",
     "@netscript/mcp": "jsr:@netscript/mcp@0.0.6",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.6",
