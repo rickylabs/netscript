@@ -10378,3 +10378,58 @@ requires; **#1917** is the PR with two. Worth recording because a green *job sta
 run reads exactly like an evaluation that agreed, and the two are not the same thing — the same
 `steps: 0` / `cancelled` confusion from D-227 in a different costume: **the wrapper's success is not
 the payload's verdict.**
+
+### D-237 — #1905 CLOSED on a real post-merge receipt; the corrected recipe worked exactly as specified
+
+**#1917 merged as `97eace32d`.** The obligation this lane has carried since dispatch is discharged.
+
+**The isolation proof.** PR **#1928**, head `5e97663fb`, base `main` @ `37452f11f`. Diff versus main
+is **one file, one line, no lockfile**: `packages/sdk/deno.json`, `npm:@orpc/client@^1.15.0` →
+`^1.14.0`. At base that path matched **none** of `fresh-ui-quality`'s trigger paths and classified
+`freshUi: false`, so the member-manifest glob added by #1917 is the only path that can have started
+the workflow. That is isolation rather than another teeth test.
+
+**Run [`33628548637`](https://github.com/rickylabs/netscript/actions/runs/33628548637):**
+
+| Job | ID | Conclusion | Steps |
+| --- | --- | --- | ---: |
+| `classify Fresh UI changes` | `100242032133` | success | 10 |
+| `fresh-ui-quality` | `100242153444` | **failure** | **12** |
+
+**Twelve executed steps is the load-bearing number**, and it is the whole reason the two-layer fix
+mattered: a `Skipped by policy` short-circuit here would have meant the trigger fired and the
+classifier still said no — the exact "gate that looks like coverage" failure this slice was rewritten
+to prevent. Twelve steps proves both layers fired.
+
+Failing step 5, `Frozen package type-check`. Gate receipt `gateId=check`,
+`invocationId=fresh-ui-check`, `outcome=FAIL`, `exitCode=1`,
+`gitHead=cb8356739f97b5fb013bd5f7d7419d58e263ad27`, `durationMs=1407`. The frozen diagnostic named
+the member that staled the private lock:
+
+```
+3998 | -          "npm:@orpc/client@^1.15.0",
+3999 | +          "npm:@orpc/client@^1.14.0",
+```
+
+— inside `workspace.members["packages/sdk"].dependencies` of `packages/fresh-ui/deno.lock`. Emitted
+`::error::Fresh UI private lock is stale…`. **This is #1890 reproduced end-to-end and caught by the
+gate that previously could not see it.**
+
+**Box 2 was re-proven on the same run in its intended shape** — a manifest/lock mismatch rather than
+a hand-stalened lockfile. That is precisely what the corrected recipe bought, and it is the
+difference between demonstrating the gate has teeth and demonstrating the defect class is closed.
+
+All three boxes ticked on evidence and **#1905 closed `completed`**. #1928 closed unmerged, branch
+deleted locally and on origin, worktree removed. The issue was closed *here, on the receipt*, rather
+than automatically on merge — which is exactly what withholding the closing keyword from #1917 was
+for. The close-gate deadlock recorded in D-234 resolved as designed rather than by exception.
+
+**#1923's evaluation re-dispatched on the coordinator's ruling that `NONE` is not a PASS.** Correct:
+the runner had completed `success` while its verdict artifact never materialised, so there was no
+evaluation to read — the wrapper's success is not the payload's verdict (D-236). Moved
+`status:ready-merge` → `status:impl-eval`, the documented rerun path; new trigger posted at
+`12:11:39Z` against the unchanged head `a0aafb18d`, runner `33628586109` executing. Close-gate stays
+green from its prior run because `ci.yml` does not fire on label events, so nothing already banked
+was spent to buy the second opinion.
+
+**#1920 progressing** at `ec848e6b0` (`1ad32bc02`, plan committed), untouched by any of the above.
