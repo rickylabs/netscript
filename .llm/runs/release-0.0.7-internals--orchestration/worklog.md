@@ -10794,3 +10794,15 @@ two version surfaces. Newest `release-canary` run is still the failed Canary 6 (
 rerun has not been dispatched yet. REST canary watcher will report the new run and its result; on
 completion I verify the `gen:mcp-export-corpus` step specifically — the step that killed Canary 6 —
 executed and passed, with step counts, before calling the blocker retired.
+
+### D-256 — Canary 6 re-dispatch: publish green, prove red on the Postgres health-probe gate (aspire-owned)
+
+`33683267941` at `156ee6792`: every step that killed the first attempt is green and
+`v0.0.7-canary.6` is published — the #1951 repair (my lane's guard + release-prep override + bump
+ownership of the bundle version surfaces) is proven on the real path. Failure is downstream: step 17
+awaited `e2e-cli-prod` `33684157301` (22 executed steps — real), which failed one gate,
+`runtime.health.listener-unreachable` (`postgres did not become listener-Unhealthy`), 59/1. Same gate
+passed on canary.5's prod run 08-31 (91/0) → the known Postgres health-probe false-negative class,
+#1880 (aspire p1) with fix PR #1952 in flight. Reported to #1641 with owner and release-control
+consequences (no green pair; one publish-budget slot consumed; republish-vs-canary.7 is the
+captain's call). No release ref mutated; not dispatched by internals; IMPL-EVAL on #1952 offered.
