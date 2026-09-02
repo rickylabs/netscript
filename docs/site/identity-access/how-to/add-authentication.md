@@ -280,6 +280,38 @@ A successful `GET /api/v1/auth/session` after sign-in returns the active session
 returns the authenticated principal. That round trip is the proof the backend is composed, the
 migration is applied, and the provider credentials are correct.
 
+For a typed service-client call, use the `auth/sdk-client.ts` module emitted during install. The
+manifest only advertises the factory; it never auto-attaches credentials. Select the generated
+descriptor on the `auth-api` client and provide its declared context explicitly:
+
+```ts
+import { createServiceClient } from '@netscript/sdk/client';
+import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
+import { authSdkClientContribution } from './auth/sdk-client.ts';
+
+declare const currentSession: { accessToken: string; accountId: string };
+
+const authClient = createServiceClient({
+  contract: authContract,
+  serviceName: 'auth-api',
+  routerName: 'auth',
+  contributions: [authSdkClientContribution] as const,
+});
+
+const session = await authClient.session(undefined, {
+  context: {
+    auth: { getAccessToken: () => currentSession.accessToken },
+    authCachePartition: currentSession.accountId,
+  },
+});
+```
+
+`signin`, `callback`, and `describe` are explicitly public and do not resolve the credential.
+`session`, `me`, and `signout` require it. The generated resolver reads no ambient environment,
+cookie, or browser storage; your application supplies the credential for each logical call. Keep
+`authCachePartition` stable and non-secret—never use a token, session id, email, or another
+reversible identifier. Bearer headers require HTTPS outside localhost and loopback development.
+
 {{ comp callout { type: "tip", title: "Local smoke without real credentials" } }}
 If provider env is missing, the <code>kv-oauth</code> backend falls back to a non-functional
 local-default endpoint set so the service still boots and <code>/health</code>, <code>session</code>,
@@ -305,6 +337,9 @@ auth audit trail.</li>
 <li><strong>Alpha package pins</strong> — scaffolded <code>jsr:...</code> imports use exact
 <code>{{ releaseSpecifier }}</code> pins. Keep the generated workspace on one aligned NetScript
 version.</li>
+<li><strong>Credential contributions are explicit</strong> — installing auth makes the typed bearer
+factory available but does not attach it globally. Add the generated descriptor only to the intended
+service tuple and pass its typed context per call.</li>
 <li><strong>Provider env is required for real login</strong> — without
 <code>NETSCRIPT_AUTH_CLIENT_ID</code>/<code>SECRET</code>/<code>REDIRECT_URI</code> the
 <code>kv-oauth</code> backend boots into a stub fallback; <code>session</code>/<code>me</code> answer

@@ -11,7 +11,12 @@ import {
   textArtifact,
 } from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
-import { authBarrelScaffolder, DEFAULT_AUTH_BARREL_INPUT } from './resources/mod.ts';
+import {
+  authBarrelScaffolder,
+  authSdkClientScaffolder,
+  DEFAULT_AUTH_BARREL_INPUT,
+  DEFAULT_AUTH_SDK_CLIENT_INPUT,
+} from './resources/mod.ts';
 
 const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
   name: 'control-plane-module',
@@ -29,6 +34,7 @@ const controlPlaneModuleScaffolder: ItemScaffolder<Readonly<Record<string, never
 export const authStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: controlPlaneModuleScaffolder, input: {} },
   { scaffolder: authBarrelScaffolder, input: DEFAULT_AUTH_BARREL_INPUT },
+  { scaffolder: authSdkClientScaffolder, input: DEFAULT_AUTH_SDK_CLIENT_INPUT },
 ];
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */

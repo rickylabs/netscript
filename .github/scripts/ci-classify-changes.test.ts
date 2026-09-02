@@ -346,6 +346,34 @@ Deno.test('nested workspace deno.json escalates regardless of root discriminatio
   assertEquals(d.runRuntime, true);
 });
 
+Deno.test('Fresh UI private-lock inputs contribute to needs_fresh_ui', () => {
+  for (
+    const path of [
+      'packages/sdk/deno.json',
+      'packages/sdk/deno.jsonc',
+      'packages/cli/e2e/deno.json',
+      'packages/cli/e2e/deno.jsonc',
+      'plugins/ai/deno.json',
+      'plugins/ai/deno.jsonc',
+      'deno.lock',
+    ]
+  ) {
+    assertEquals(classifyPath(path).freshUi, true, path);
+    const d = decide({ eventName: 'pull_request', files: [path], labels: [] });
+    assertEquals(d.needsFreshUi, true, path);
+  }
+});
+
+Deno.test('root deno.json toolchain changes continue to contribute to needs_fresh_ui', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['deno.json'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TOOLCHAIN },
+  });
+  assertEquals(d.needsFreshUi, true);
+});
+
 // ── capability vector per source area ────────────────────────────────────────
 
 Deno.test('packages (non-cli) code: deno+docker+scaffold+surface, NOT desktop', () => {
