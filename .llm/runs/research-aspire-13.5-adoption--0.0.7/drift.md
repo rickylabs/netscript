@@ -8418,3 +8418,20 @@ via `GET /api/telemetry/spans?traceId=`; CLI rows borrow those links before norm
 failure leaves the CLI rows unchanged. Follow-up (not this slice): the gap is an upstream CLI
 projection — worth an upstream issue or a note in the S9 telemetry docs, since any consumer of
 `aspire otel … --format Json` loses link attributes.
+
+### D-328 — Aspire CLI JSON drops span events; S9 span reads move to the Dashboard telemetry API (2026-09-02)
+
+Observed: S9 sqlite tier 33666085011 at `568d6ed30` passed TC-14 (D-327 repair) and then FAILED
+`behavior.streams.producer-reconnect` (`verify-producer-reconnect.ts:59`, "Recovered publish trace
+… was not found"). That gate never executed under S9's CLI read path before — every earlier run
+stopped at TC-14. Cause: `aspire otel spans|traces --format Json` (`SharedAIHelpers.GetSpanDto`,
+release/13.5) emits no `events` at all, and the gate proves the producer lifecycle through span
+events `stream.producer.buffered/retry/recovered/settled`; the `resource=`+`since` projection
+through CLI summaries also drops the recovered trace. The link-only enrichment of D-327 could not
+cover this. Repair `4c9def611` (e2e only; `packages/cli/src`/`plugins` diff vs main unchanged):
+`aspire-dashboard-api.ts` replaces `aspire-dashboard-span-links.ts`; `createLiveAspireFetch`
+forwards `traces`, `traces/<id>` and `spans` reads to the Dashboard telemetry API (login-token
+exchange → `X-API-Key`, full OTLP JSON incl. events and link attributes, which the package
+normaliser already consumes); `logs` stay on MCP and the CLI projection remains the fallback when
+no reader is supplied. Same main merge (`c0b7d841a`, brings #1930 + S13) and manifest refresh in
+the push. Follow-up (unchanged from D-327): upstream CLI projection gap, worth an upstream issue.

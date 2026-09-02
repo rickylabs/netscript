@@ -707,3 +707,18 @@ the merge.**
 - S13 #1779 `5f0eed0fe`: packet delivered 17:13Z; still OPEN awaiting coordinator merge.
 - S10 #1760 `84e4b38f7`: unchanged; #1930 OPEN (`status:ready-merge`, `ci:full`, runtime tier
   pending). Rerun `desktop-native-linux` on S10 the moment #1930 merges.
+
+### 2026-09-02 18:55Z checkpoint — S9/S10 (covers 18:20Z→18:55Z)
+
+- Coordinator: #1930 (`09c07fd4e`) and S13 #1779 (`c0b7d841a`) MERGED. S13 complete.
+- S10 #1760: `update-branch` onto main → `4c64dfc93`; `quality` red on the S13 parity gate
+  ("Aspire surface manifest is stale") → regenerated manifest, pushed `0b3f13e0c` (local parity ok,
+  831 checked). Checks running (3 pending, 0 red at 18:48Z), incl. `desktop-native-linux` against
+  the landed #1930 fix. Packet goes to the coordinator on exact-green; PR already
+  `status:ready-merge`.
+- S9 #1759: sqlite tier at `568d6ed30` passed TC-14 then FAILED `behavior.streams.producer-reconnect`
+  (D-328: CLI JSON has no span events). Repair pushed `4c9def611` — span reads now go to the
+  Dashboard telemetry API (full OTLP), main merged, manifest refreshed, scaffold gate unit suite
+  green. Superseded run 33666085011 cancelled; new `ci` 33669484243 / `e2e-cli` 33669484139 queued.
+  Remaining: both runtime tiers + desktop (now with #1930) → receipts → evidence → ready-merge →
+  close-gate. Actor: supervisor; ETA ~19:35Z.
