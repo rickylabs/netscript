@@ -2551,3 +2551,29 @@ continues concurrently because serial ordering is per orchestrator, not global.
   separate evaluation. Canary 6 remains correctly held for the coherent S9/S10/S13 Aspire payload,
   not for Internals/Docs-only work.
 - Aspire inventory and Docker containers are zero. No owner-only decision is pending.
+
+## Resume delta — 2026-09-02T11:52:00Z
+
+- Current main is `ec848e6b0334ec8fcd2bc66ba009305d35367b01` after the coordinator merged
+  #1914, #1858, and #1918 in this delivery pass. Their resolved issues #1892, #1898, and #1897
+  are closed with terminal `status:shipped`; #1858 is already handed to Aspire as the S9/S10
+  convergence baseline.
+- Canary 6 is now a bounded Aspire train: S9 #1759 must finish the honest CLI span-source repair,
+  exact evaluator, and both hosted tiers; S10 #1760 must prove or repair the single owned-container
+  cleanup survivor and receive exact-head runtime/evaluator evidence; S13 #1779 then converges once
+  and completes parity/manifest/evaluation. A shared desktop isolated-package failure resolving
+  `@orpc/contract` from SDK transport policy is dispatched once to Fixes for main attribution and
+  repair rather than duplicated in both Aspire branches.
+- Live milestone inventory is 32 open issues and 18 open PRs. All 32 issues and all 18 PRs have
+  exactly one orchestrator owner. A delivery-path audit found eight owner-labelled but previously
+  unscheduled issues; concrete dispatches now exist for Internals #1920, Aspire #1880, and Fixes
+  #1455/#1544/#1601+#1557/#1249/#1481. #1349, #863/#1881, and #1844 retain explicit active or
+  dependency paths.
+- The immediate non-Aspire merge queue is #1917, #1921, #1915, and #1922. #1917 returned exact-head
+  IMPL-EVAL PASS, moved to `status:ready-merge`, and its live-label CI rerun is active. The other
+  evaluators continue independently. Local runtime inventory is `aspire ps=[]`, Docker containers
+  zero, and custom Docker networks zero; the three volumes are preserved until positively owned.
+  No owner-only decision is pending.
+- Subsequent to the ownership snapshot, Docs converted #1924 into active PR #1925 at `0be2fba52`,
+  bringing the live totals to 33 issues and 19 PRs. Its exact-head IMPL-EVAL is dispatched; the leaf
+  remains independent of Canary 6.

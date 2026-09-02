@@ -3934,3 +3934,25 @@
   exact hosted tiers/evaluation while S10 and S13 continue independently.
 - Live state is 49 open / 244 closed milestone issues and 16 open PRs. All 49 issues have one topic
   owner after #1913's repair. Runtime state remains `aspire ps == []` and Docker containers zero.
+
+## 2026-09-02T11:52:00Z — three merges, exact canary reds, and full delivery-path reconciliation
+
+- Independently audited and squash-merged #1914, #1858, and #1918. Current main is
+  `ec848e6b0334ec8fcd2bc66ba009305d35367b01`; the corresponding issues #1892/#1898/#1897 and PRs
+  have terminal shipped lifecycle metadata.
+- Canary 6 is not yet minted. Its exact remaining product gates are S9 #1759 span retrieval from the
+  authenticated CLI rather than the dishonest inline-span fixture, S10 #1760 owned-container
+  teardown proof/repair, and final S13 #1779 convergence/parity. Fixes also owns the shared isolated
+  desktop `@orpc/contract` resolution regression once on main.
+- GitHub audit: 32 open milestone issues, 18 open PRs, zero missing or duplicate orchestrator owners.
+  Twenty issues have open PR paths; #1349/#863/#1881/#1844 have explicit active/dependency paths;
+  the eight missing concrete queues were dispatched to their existing supervisors: #1920,
+  #1880, #1455, #1544, #1601+#1557, #1249, and #1481.
+- #1917 exact-head evaluator passed. The coordinator promoted it to `status:ready-merge` and reran
+  CI against the same immutable head so close-gate reads the live lifecycle state. #1921/#1915
+  evaluators and #1922 evaluation dispatch remain the next independent merge packets.
+- Read-only host proof is clean for runtime leases: Aspire applications `[]`, Docker containers 0,
+  custom networks 0. Three unconsumed volumes remain preserved pending positive ownership proof.
+- Docs immediately converted newly filed #1924 into PR #1925 (`0be2fba52`) and dispatched its
+  exact-head IMPL-EVAL, so current dynamic inventory is 33 open issues / 19 open PRs with one Docs
+  issue and one Docs PR; both remain exactly owned and non-blocking for the canary.

@@ -1876,3 +1876,13 @@ implementation thread.
 - Docs, Fixes, and Aspire had completed turns with steering text staged in the composer. A staged
   prompt is not a dispatched turn; the coordinator resubmitted explicit commands and verified active
   generation. This extends D-190's liveness rule to Remote Control composer state.
+## 2026-09-02T11:52:00Z — live GitHub control-plane drift corrected
+
+- The central ledger had remained at main `0622dc432` with 55 open issues while live GitHub was at
+  `ec848e6b0` with 32. The coordinator reconciled the SHA, issue/PR counts, per-lane ownership, and
+  the concrete no-PR delivery paths. GitHub remains authoritative between atomic harness commits.
+- The apparently common Aspire desktop red is not yet attributed to S9/S10: both branches reproduce
+  isolated dpkg resolution failure for `@orpc/contract` from SDK transport policy. One Fixes-owned
+  current-main attribution/repair was dispatched to prevent duplicate branch-local work.
+- Local runtime inventory is clean (Aspire 0, containers 0, custom networks 0). Docker reports three
+  unconsumed volumes versus the prior ledger's one; none is deleted without positive run ownership.

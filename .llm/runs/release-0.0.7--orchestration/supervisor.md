@@ -1670,3 +1670,16 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   intervention rule remains concrete artifacts or running generation, never a visible prompt alone.
 - The coordinator continues to merge every exact-green milestone packet without owner confirmation.
   Canary 6 cuts only after its coherent user-facing Aspire 13.5 payload is on main.
+## 2026-09-02T11:52:00Z — coordinator steering
+
+- Features: finish #1915/#1921/#1922 readiness, #1664 and #1895 runtime/eval, #1349 gap work; no
+  fourth PLAN-EVAL for #1354 while the coordinator rules on the existing three findings.
+- Fixes: converge #1909 onto main; dispatch #1455, #1544, clustered #1601+#1557, #1249 behind
+  #1856, and plan-first #1481; own one main-facing repair for the shared desktop
+  `@orpc/contract` resolution regression.
+- Internals: finish #1923 and then #1920 corpus regeneration plus deterministic CI wiring; preserve
+  the two-stage post-merge proof for #1905/#1917.
+- Docs: implement #1924 from a measured README-fence baseline; docs remains independent of the
+  canary barrier.
+- Aspire: actively finish S9, retry/repair S10 cleanup, then converge S13; start #1880 static work
+  in parallel and reserve its runtime proof before #1881. Runtime leases remain globally serial.
