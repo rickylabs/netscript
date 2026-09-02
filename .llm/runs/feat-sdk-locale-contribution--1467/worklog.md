@@ -117,3 +117,35 @@ acceptance, boundaries, touch ceiling, and gate list.
 
 `packages/sdk/src/internal/client-contributions/prepared-call.ts` was read for audit/test reuse but
 was not edited. No trace/observability surface was edited.
+
+## 2026-09-02 CI documentation repair
+
+- Verified the clean local and remote branch at `a628de1a54d7babba35385b604ba99b33ffc9277`
+  after `origin/main` `634b83d647c37f60f24a57839333f16c7cc61f12` was integrated; `git pull
+  --ff-only origin feat/sdk-locale-contribution` reported `Already up to date`.
+- `PLAN-EVAL: N/A` remains appropriate: the coordinator supplied both exact failing examples,
+  root causes, boundaries, and proving gates; this is a mechanical repair with no reopened SDK
+  design decision.
+- Before repair, `deno task docs:jsdoc-examples` exited 1 at 359 examples with
+  `deferredCensus={"unboundName":117,"typeError":14}` and zero enforced failures. After binding
+  `createServiceClient` from `@netscript/sdk/client` plus a real oRPC/Zod contract, it exits 0 with
+  `deferredCensus={"unboundName":116,"typeError":14}`.
+- Before repair, `deno task docs:snippets` exited 1 at 597 scanned / 302 TypeScript-like / 24
+  checked fences because `./contracts/accounts.ts` had no materialized module. The example is now
+  self-contained with an inline oRPC/Zod `accountsContract`, keeping the entire auth + locale
+  composition copyable in one fence; the same gate exits 0 with unchanged counts.
+- SDK wrapper evidence after repair: check exit 0 (103 files, zero diagnostics); tests exit 0
+  (230 passed, 0 failed, 0 ignored).
+- Carrier generation in required order: `gen:agent-docs-prose` 0 (docs source format OK, rendered
+  output OK, 642 site files), `gen:assets-barrel` 0, `gen:publish-assets` 0,
+  `gen:mcp-export-corpus` 0 (35 packages, 272 subpaths, 7,809 symbols).
+- Repair touch set before commit: authored files
+  `packages/sdk/src/client/locale-contribution.ts` and `docs/site/services-sdk/sdk.md`; generated
+  carriers `.llm/assets/agent-docs/prose.json.gz`, `.llm/assets/agent-docs/provenance.json`,
+  `packages/cli/src/kernel/assets/agent-docs.generated.ts`,
+  `packages/mcp/src/publish-assets.generated.ts`, and
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`; harness
+  evidence in this run's `worklog.md`, `context-pack.md`, and `drift.md`.
+- `deno.lock` SHA-256 before and after the repair gates/generation remains
+  `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
+- Post-commit carrier checks are pending the repair commit, as required by the coordinator.

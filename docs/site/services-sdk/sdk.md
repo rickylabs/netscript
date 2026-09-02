@@ -181,7 +181,14 @@ import {
   defineSdkClientContribution,
 } from '@netscript/sdk/client';
 import { defineServices } from '@netscript/sdk/presets';
-import { accountsContract } from './contracts/accounts.ts';
+import { oc } from '@orpc/contract';
+import { z } from 'zod';
+
+const accountsContract = {
+  profile: oc.route({ method: 'GET' })
+    .input(z.object({}))
+    .output(z.object({ id: z.string(), displayName: z.string() })),
+};
 
 const locale = createLocaleSdkClientContribution();
 const bearer = defineSdkClientContribution<{

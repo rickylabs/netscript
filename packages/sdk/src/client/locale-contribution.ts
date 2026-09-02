@@ -75,6 +75,16 @@ function localePartition(
  *
  * @example
  * ```ts
+ * import { oc } from '@orpc/contract';
+ * import { createServiceClient } from '@netscript/sdk/client';
+ * import { z } from 'zod';
+ *
+ * const contract = {
+ *   list: oc.route({ method: 'GET' })
+ *     .input(z.object({}))
+ *     .output(z.array(z.string())),
+ * };
+ *
  * const locale = createLocaleSdkClientContribution();
  * const client = createServiceClient({
  *   contract,

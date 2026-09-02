@@ -28,3 +28,13 @@
   override the workspace policy.
 - Response: do not edit unrelated CLI policy. Record the real exit codes and use the mandated
   post-commit `check:assets-barrel` generator/diff check as the authoritative carrier verdict.
+
+## 2026-09-02 — main integration tightened documentation example enforcement
+
+- Severity: minor, coordinator-diagnosed integration drift.
+- Expected: the original locale examples passed the documentation gates used before PR #1914.
+- Observed: after integrating `main` `634b83d64`, the rewritten JSDoc compiler bound the documented
+  symbol but correctly exposed two unbound supporting names, while the snippet compiler correctly
+  rejected a relative import with no materialized companion fence.
+- Response: bind every JSDoc name through real public imports/declarations and make the site example
+  self-contained. No `.llm/tools/docs/**` code or coordinator-owned ratchet was changed.
