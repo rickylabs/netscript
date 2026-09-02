@@ -68,6 +68,28 @@
 - GREEN command: `deno check --unstable-kv
   packages/plugin-triggers-core/src/builders/enqueue-job-payload-contract_test.ts`.
 - GREEN result: exit 0; the same negative directive is now consumed by the wrong-job payload error.
+- GREEN commit: `4903a6afc` (`feat(workers): bind enqueue payload to job definition`).
+- Final product head for this bounded implementation: `4903a6afc`; the following commit is
+  evidence-only run/plan documentation.
+
+### 2026-09-02 — PLAN-EVAL advisories and bounded gates
+
+- The Fixes-lane supervisor reported a separate-session `PASS_PLAN` for plan commit `f655c3405`
+  using `qwen/qwen3.8-flash`.
+- Advisory 1 confirmed: the existing post-handler-set `this` guard on `payload()` remains present;
+  the bounded GREEN did not alter that method.
+- Advisory 2 decided in `plan.md` §1: typed `triggerJob` requires a known non-undefined payload;
+  `EnqueueJobOptions.payload` stays optional for the existing no-payload enqueue state, but any
+  supplied value is bound to the selected definition.
+- Advisory 3 applied: the contract-factory rationale now says emitted payloads are constrained to
+  the route's record domain rather than claiming the narrowing is “proven safe.”
+- Exact gated head: `4903a6afcc44cb050cdbbd51f066845ed99feb23`.
+- Scoped check: exit 0; 373 TypeScript/TSX files selected across
+  `packages/plugin-workers-core`, `packages/plugin-triggers-core`, `plugins/workers`, and
+  `plugins/triggers`; 4/4 batches passed with `--unstable-kv`, 0 diagnostics.
+- Focused test wrapper: exit 0; `enqueue-job-payload-contract_test.ts` passed 1/1 with 0 failures.
+- Scoped lint: exit 0; 373/373 files processed, 0 findings.
+- Scoped format check: exit 0; 373/373 files processed, 0 findings.
 
 ## Commit receipts
 
@@ -75,11 +97,18 @@
 | --- | --- | --- |
 | Contract plan | `f655c3405` | `plan.md` committed alone, before source/type edits |
 | RED consumer proof | `8e7cf697c` | Targeted check fails only because `@ts-expect-error` is unused |
-| GREEN implementation | pending | Same directive must be consumed by the job-id payload mismatch |
+| GREEN implementation | `4903a6afc` | Same directive is consumed by the job-id payload mismatch; focused check and test pass |
 
 ## Gate receipts
 
-No implementation gates have run yet. The plan artifact passed `git diff --check` before commit.
+| Gate | Head | Result |
+| --- | --- | --- |
+| Scoped `run-deno-check.ts` (4 roots, `ts,tsx`, unstable KV) | `4903a6afc` | PASS — 373 files, 0 diagnostics |
+| Focused `run-deno-test.ts` | `4903a6afc` | PASS — 1/1 |
+| Scoped `run-deno-lint.ts` (4 roots, `ts,tsx`) | `4903a6afc` | PASS — 373 files, 0 findings |
+| Scoped `run-deno-fmt.ts` (4 roots, `ts,tsx`) | `4903a6afc` | PASS — 373 files, 0 findings |
+
+No pre-existing or introduced failures appeared in this bounded gate set.
 
 ## Blockers
 

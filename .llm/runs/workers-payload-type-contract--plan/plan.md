@@ -236,9 +236,14 @@ export function createWorkersContract<
 
 `WorkersContractDefinition<TPayloads>` remains the real oRPC contract type; only its `triggerJob`
 route input schema type is parameterized. `createWorkersContract()` returns the same runtime
-contract definition as `workersContract`, with the generic narrowing proven safe because every map
-value is constrained to the route's existing record payload domain. This is the canonical published
-surface, not an EIS-Chat compatibility shim.
+contract definition as `workersContract`, with the generic narrowing constrained so every emitted
+payload stays in the route's record domain. This is the canonical published surface, not an
+EIS-Chat compatibility shim.
+
+Optionality decision: a typed `triggerJob` call requires `payload` when the mapped payload excludes
+`undefined`; `EnqueueJobOptions.payload` remains optional to preserve the supported enqueue-without-
+payload runtime state, but whenever supplied it is checked exclusively against the selected job
+definition.
 
 The existing `workersContract`, `workersContractV1`, and `WorkersContractV1` remain the broad default
 service implementation surfaces. Services must implement the whole runtime route, while a client

@@ -12,9 +12,9 @@
 
 ## Current State
 
-The current-surface investigation is complete and the public contract is committed independently at
-`f655c3405`. Draft PR #1938 is open. No TypeScript or test file has changed. The owner explicitly
-accepted the plan and authorized implementation without PLAN-EVAL.
+The public contract is committed independently at `f655c3405`. Draft PR #1938 carries RED
+`8e7cf697c` and bounded GREEN `4903a6afc`. The selected job definition now binds trigger-core
+enqueue payloads at compile time without changing runtime expressions.
 
 ## Completed
 
@@ -27,16 +27,13 @@ accepted the plan and authorized implementation without PLAN-EVAL.
 
 ## In Progress
 
-- Defect-specific consumer-site RED proof for trigger-core `enqueueJob`.
+- Evidence commit, PR body update, and ready-for-review transition.
 
 ## Next Steps
 
-1. Commit the consumer-site RED fixture and record its failure SHA/evidence.
-2. Implement core type/schema/contract binding until that fixture turns GREEN.
-3. Update both generator paths and schema-backed first-party fixtures without changing #1451
-   operational semantics.
-4. Run scoped, workspace, publish, architecture, documentation, and quality gates.
-5. Obtain fresh IMPL-EVAL and only then decide whether every acceptance box supports issue closure.
+1. Commit and push the GREEN/gate receipts.
+2. Update PR #1938 with RED/GREEN evidence and the honest remaining scope.
+3. Mark the PR ready so the repository's E2E/CI evaluation runs.
 
 ## Key Decisions
 
