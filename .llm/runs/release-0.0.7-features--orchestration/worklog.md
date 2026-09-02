@@ -10789,3 +10789,20 @@ every `jq`-based wait I armed after ~19:00 died silently on first use (`bash: co
 and never fired — the sweep after the monitor timeout is what surfaced the three greens. Replaced with
 `gh --jq` / `awk` in the re-armed monitor and the Slice C wait. Rule: **background scripts get
 `gh --jq` or `awk`, never bare `jq`.**
+
+### ~21:30Z — main advanced (#1937, #1930, #1779); #1944 and #1943 re-converged with proof
+
+`main` → `c0b7d841a`. #1944 and #1943 went `CONFLICTING`; both conflicted **only** on the generated
+export corpus, resolved by taking main's side and regenerating — never hand-merged.
+
+**#1944 → `bd3eeac54`.** All four slice-owned product files **byte-identical** to the evaluated
+head `e703a5ebc` (the boot test is a new file, unchanged). Minimum admission gates locally: three
+carrier checks 0, `check-close-gate` **PASS**, `packages/plugin/deno.json` diff 0, lock identical.
+Fresh packet posted (`5514…`) stating exactly that and that CI is re-running — confirmed on green,
+not asserted early.
+
+**#1943 → `3a888f398`.** All six slice-owned files byte-identical to `2e0699bf3`; carriers 0.
+
+Both keep `status:ready-merge`; the native PASS carries because nothing judged moved. #1941, #1895,
+#1946 were `UNKNOWN` (recomputing) at the time of writing; waits armed on their mergeability and on
+the two converged heads' CI. Slice C's eval still waits on its lane going idle.
