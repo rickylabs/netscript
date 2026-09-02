@@ -10578,3 +10578,16 @@ correctness fix, and the evaluator is told an overclaiming keyword is a `FAIL_FI
 
 Worth keeping: **a closeout audit that only re-reads verdicts finds nothing; one that re-runs the
 negative rows against `main` finds the defect a passing eval missed.**
+
+### ~17:15Z — a phase-eval claim is head-bound; a push during authorize skips the agent
+
+#1941's first IMPL-EVAL trigger fired at `136ea478e`; the lane then pushed a harness-only handoff
+commit (`22cc3e5b8`) ~50 s later. Run `33656176728`: **`authorize` success, `agent` skipped.** The
+claim key is `{generation, phase, head}`, so the live head no longer matching the claimed head
+skips the agent rather than evaluating a stale one — correct behaviour, and silent. The
+`issue_comment` run reads "completed success" because authorize succeeded, which is the third
+run-status shape today that looked like an evaluation and was not.
+
+Rule: **do not cycle the phase label until the lane is idle**, and confirm the agent job — not the
+run — reached `completed` with a non-skipped conclusion. Re-trigger is armed to fire the moment the
+worker exits.
