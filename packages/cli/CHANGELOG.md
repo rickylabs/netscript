@@ -82,6 +82,8 @@
 - `ui:add page --island` emits a working page, island, and query-loader data screen instead of a
   counter; the shipped skill bundle points every skill body at the canonical `.agents/skills/` tree;
   Garnet readiness in scaffolded runtimes is deterministic and its version pins are aligned.
+  `netscript deploy <target> emit` is routed, and a fail-fast invariant keeps advertised deploy
+  operations from being silently omitted by the command router.
 - Aspire moves to the atomic 13.5.3 train with a version-parity gate, re-validates every emitted
   AppHost SDK member and the deploy CLI argv contract against the 13.5 TypeScript API, removes
   runtime literal ports so Aspire owns endpoint allocation (the auth, sagas, and triggers
