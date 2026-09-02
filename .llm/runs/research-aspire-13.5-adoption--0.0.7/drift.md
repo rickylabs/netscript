@@ -7849,3 +7849,24 @@ giving the smoke its own AppHost (violates #1720 box 5's no-second-AppHost requi
 **Latent leak noted:** the same start script does `console.info(\`Aspire dashboard: ${dashboardUrl}\`)`.
 Harmless today because the URL carries no token, but it is exactly the pattern S11's how-to warns
 against and becomes a CI-log token leak the moment Aspire includes one.
+
+## D-303 — S9's docker tier shares the sqlite root cause; the fix seam is the shared telemetry adapter
+
+Run `33592084708` completed with both tiers failing on their merits. The docker tier failed at
+`behavior.live-db-endpoint`: *"users telemetry correlation did not converge after 20 attempt(s):
+structured-log trace ids=[none]"*. Same cause as the sqlite 401 — with dashboard auth on, the
+unauthenticated telemetry read returns nothing, so no trace ids arrive. **A 401 and an empty result
+set are the same defect seen from two angles.**
+
+This corrects the fix scope I posted in D-302. The seam is not `consume-flow-b-stream.ts` but
+`aspire-dashboard-telemetry.ts`: `createLiveAspireTelemetryQuery` builds its endpoint with
+`new URL(metadata.dashboardUrl).origin` — same origin-only truncation — and reads through
+`createLiveAspireFetch` with no credential. Three gates consume it (`verify-live-db-endpoint.ts:99`,
+`validate-flow-b-traces.ts:11`, `verify-producer-reconnect.ts:170`), and `consume-flow-b-stream.ts`
+keeps a fourth private reader.
+
+Correct scope: route the adapter through the stdio transport's `list_traces` /
+`list_structured_logs` / `list_trace_structured_logs`, and fold the fourth reader onto it. Three gates
+fixed at one seam, every raw dashboard reader removed, one place that knows how telemetry is fetched.
+Fixing only the reader named in D-302 would have turned the sqlite tier green and left the docker tier
+failing for the identical reason — the kind of half-fix that reads as progress and costs a full cycle.
