@@ -7868,3 +7868,19 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - Packet on close-gate green + e2e re-earned at `adff30990`.
 - Limit-reset nudges: #1481 worker committed `0c1778026 chore(cli): refresh embedded design route
   assets` (local, unpushed); #1844 nudge delivered 23:04Z (local `4e1530d6e`, `fe68151de` + 7 dirty).
+
+## 2026-09-02T23:20Z — #1959 (#1844) ready-for-review; #1249 dispatched
+
+- **#1959** `fix(e2e,aspire): diagnose and bound postgres listener readiness` opened by worker at
+  `727ce39bb` (Refs #1844, partial; S1/S2 RED→GREEN `e8649ee20`/`4e1530d6e`/`fe68151de`/`65b80691a`,
+  local gates green). Draft pushes schedule no CI jobs (ci.yml header), and hosted Postgres-tier
+  evidence + IMPL-EVAL both need a non-draft PR → marked ready-for-review; `status:impl` →
+  `status:impl-eval` + `openhands`. Watching ci/e2e/OpenHands at `727ce39bb`; need two consecutive
+  green Postgres tiers at one head before packet.
+- **#1249** (p2, unblocked since #1856 merged): leaf `007-leaf-1249`, branch
+  `fix/form-control-props-zod4` off main `8c549c061`, brief `93c5fa5a5`
+  (S1 `ControlProps.role` narrowing RED→GREEN; S2 Zod 4 check-kind derivation RED→GREEN with the
+  issue's admission rule — Zod half moves to 0.0.8 visibly if the probe does not reproduce;
+  ceiling `packages/fresh/src/application/form/**` + tests). Launched gpt-5.6-sol·medium.
+- #1481: worker at `0c1778026` local, unpushed, nudged. #1885: ready-merge, close-gate rerun +
+  label-fired e2e in flight at `adff30990`.
