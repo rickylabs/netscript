@@ -8358,3 +8358,32 @@ v2 concurrency key, close-gate red only on unticked #1721 boxes (evidence applie
 desktop-native red is the #1930 `@orpc/contract` import class (not S9-attributable). S10
 `84e4b38f7` green except desktop-native (#1930, OPEN). S13 `3bef62a54` pushed; awaiting the
 `pull_request` dispatch.
+
+## D-324 — S9 sqlite tier: two attributable defects behind the TC-14 red (2026-09-02)
+
+Two hosted-only failures surfaced in the `scaffold-runtime-sqlite` tier of #1759 that local runs
+never showed, both inside `packages/cli/e2e` gate code (product diff untouched):
+
+1. `ecce4af0a`: `ReferenceError: Cannot access 'flowBTracerProvider' before initialization` — a
+   `let` declared below the top-level `await provider.register()` that assigned it (TDZ). Repair
+   `c6ec50214`: hoist the declaration; `consume-flow-b-stream_test.ts` guards the source order.
+2. `c6ec50214`: TC-14 "real streams consumer span exists" FAIL; the report artifact's `stderrTail`
+   carried `flow-b-stream-consumer OTLP export rejected: HTTP 401`. With
+   `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=false` (required for the MCP dashboard key) the
+   dashboard OTLP receiver rejects unauthenticated exports, and the AppHost injects
+   `OTEL_EXPORTER_OTLP_HEADERS=x-otlp-api-key=…` only into orchestrated resources — the external
+   Flow-B consumer never received it. Repair `4c5e0f191`: read the header from the running
+   `streams` resource via `scanResourceProcesses` (`/proc/<pid>/environ`) and attach it to the
+   OTLP/JSON exporter (`otlp-headers.ts` + tests). Falls back to an unauthenticated export with a
+   stderr note, so TC-14 stays honest rather than skipped. Hosted proof pending at `4c5e0f191`.
+
+## D-325 — S13 `check-test` red: public JSR resolver lacked the `@netscript/mcp` mapping (2026-09-02)
+
+At `335258304` the `ci` `check-test` job failed 4 tests (2 unique): `public init` and the AI plugin
+`no-samples-install` scaffolds threw `No JSR import mapping registered for "@netscript/mcp"`. S13
+added `@netscript/mcp` to the app `deno.json` imports (telemetry example) and to the kernel
+`import-resolver.ts` JSR/local tables, but not to the public adapter's separate
+`REGISTRY_SPECIFIERS` table (`packages/cli/src/public/adapters/jsr-import-resolver.ts`). Repair
+`5f0eed0fe` adds the single mapping; both test files pass locally. Follow-up for the epic: the two
+resolver tables are parallel hand-maintained mirrors — a parity test over `SCAFFOLD_PACKAGES`
+would have caught this before hosted CI.
