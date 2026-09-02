@@ -44,3 +44,11 @@ in `packages/mcp/src/` and both collide with `main` on it. Regenerate-after-merg
 - #1938 regenerated the corpus **before** merging `main` → `DIRTY` on the carrier as predicted;
   fix sequence posted. Awaiting a new head.
 - #1941 (features), #1942 (fixes) opened: code-only, clean. #1883/#1759 heads: code-only, clean.
+
+## ready-merge audits (later 2026-09-02)
+
+- #1938 merged `main` and regenerated on the merged tree (`6ae6cc483`); first `ci` run
+  33659669247 in progress. Finding pending closure on `quality`.
+- #1916 → `ready-merge`: `quality`/`check-test` green, **`close-gate` red** (label applied after
+  the run; mirror never fired). Also 16 behind `main`. Rerun/new-head sequence posted.
+- #1942 → `ready-merge`: same close-gate race; 0 behind `main`. Rerun posted.
