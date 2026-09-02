@@ -80,6 +80,8 @@ later command slice, never here.
 | 2026-09-02 | C | hardening | Restricted State member detection to the interface body and made both source transforms use comment/string-aware matching-brace scans. |
 | 2026-09-02 | C | IMPL-EVAL cycle 1 | Separate native Claude Fable 5/medium session returned `PASS` with two low findings: post-eval PR lifecycle and optional indentation hardening. |
 | 2026-09-02 | C | evaluator follow-up | Replaced indentation-sensitive router entry regexes with depth-aware top-level property parsing; custom indentation now returns exact/conflict without duplicate insertion. Focused tests and scoped wrappers remain green. |
+| 2026-09-02 | C | current-head IMPL-EVAL | Resumed evaluator copy `0e8fa59d…` attested `bc5120684` with `PASS`; technical finding resolved. |
+| 2026-09-02 | C | final author gates | Re-ran full structured check (926/0), full CLI suite (1,569/0), arch, quality, and both docs ceilings at the attested implementation head; all exited 0. |
 
 ## Gate Results
 
@@ -90,7 +92,7 @@ later command slice, never here.
 | Scoped structured lint | 0 | 10 selected/processed; 0 findings. A task-local ignored config was needed because root config excludes `packages/cli`. |
 | Scoped structured fmt | 0 | 10 selected/processed; 0 findings. Same task-local config. |
 | Full structured CLI check | 0 | 926 selected in 8 batches; 0 diagnostics. |
-| Full package-owned CLI tests | 0 | 1,569 passed, 0 failed, 0 ignored. Final rerun follows evaluator if code moves. |
+| Full package-owned CLI tests | 0 | 1,569 passed, 0 failed, 0 ignored on the final implementation. |
 | `deno task arch:check` | 0 | CLI summary `FAIL=0 WARN=59 INFO=1`; no warning names a new Slice C file. Current directory has 10 children. |
 | `deno task quality:gate` | 0 | Quality scanner `ok=true`, no findings, seven accepted existing allowances; nested arch gate green. |
 | `deno task docs:readme-fences` | 0 | PASS; 7 existing type errors, matching baseline ceiling 7. |
@@ -104,3 +106,10 @@ or a named subfolder.
 The planner's negative generated-content test scans its complete core+form+partial+stream plan for
 `any`, raw `fetch(`, handwritten `queryKey: [`, and manual `JSON.parse(`. The bindings are derived
 from the selected query factory; rendered template bodies remain Slice D scope.
+
+## Evaluation
+
+- Initial IMPL-EVAL: native Claude Fable 5/medium, session `f24053fc…`, `PASS` at `03d4c2519`.
+- Follow-up: resumed independent conversation `0e8fa59d…`, `PASS` attesting `bc5120684` after
+  independently re-running 32/32 focused tests and all three 10-file structured wrappers.
+- The sole remaining low observation is the owner-directed post-evaluation push/PR lifecycle step.

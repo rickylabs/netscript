@@ -34,4 +34,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 - Observed: Claude Code displayed `Fable 5 with medium effort`; session
   `f24053fc-051b-4365-bb45-c1d1d50c2479`, worktree `007-leaf-1354-c`.
 - Initial verdict: `PASS`. Its non-blocking indentation-hardening observation was implemented and
-  returned to the same independent evaluator for current-head re-attestation.
+  returned to a resumed copy of the same independent evaluator conversation,
+  `0e8fa59d-304d-4f97-870f-874f2813de58`, for current-head re-attestation.
+- Current-head verdict: `PASS` for `bc51206840f30062822fceaaba94fab938d77702`; the technical
+  finding is recorded resolved in `evaluate.md`.

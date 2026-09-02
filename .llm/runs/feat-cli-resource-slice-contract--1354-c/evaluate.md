@@ -9,6 +9,7 @@ Filled from `.llm/harness/templates/evaluate.md`. Allowed result values: `PASS`,
 | Field          | Value                                                                        |
 | -------------- | ---------------------------------------------------------------------------- |
 | Run ID         | `feat-cli-resource-slice-contract--1354-c`                                   |
+| Attested head  | `bc51206840f30062822fceaaba94fab938d77702` (cycle 1 evaluated `03d4c2519`)   |
 | Target         | `packages/cli/src/kernel/application/resource-slice/` (ten files, internal)  |
 | Archetype      | `6 — CLI / Tooling`                                                          |
 | Scope overlays | Fresh 2.x route-key semantics only; no runtime/browser/publish/release gates |
@@ -148,7 +149,29 @@ exit 0, scanner `ok:true`, 0 findings, 7 pre-existing allowances, no new allowan
 | Severity | Finding | Evidence | Required action |
 | -------- | ------- | -------- | --------------- |
 | low | Branch is unpushed and the PR is not yet open, so the draft-PR commit trail does not exist at evaluation time. This is the owner-directed lifecycle recorded in `supervisor.md`/`drift.md` (non-draft PR with `status:impl` opened after IMPL-EVAL), not a generator omission. | `git ls-remote origin feat/cli-resource-slice-contract` empty; `context-pack.md § Next Steps` | Push and open the metadata-complete non-draft PR with the per-slice comment immediately after this verdict, per the recorded override. No code change. |
-| low | `reconcileAppRoutes` alias/same-value detection assumes deno-fmt two-space top-level entry indentation. An existing alias at non-stock indentation inside an otherwise recognized object would be missed and re-inserted, producing a duplicate object key (a loud TypeScript error, never a silent overwrite, and outside the recognized stock shape the transform targets). | `reconcile-app-routes.ts:47-60` | Optional hardening when Slice E wires the transform; no change required for this slice's locked contract. |
+| low — **RESOLVED at `bc5120684`** | `reconcileAppRoutes` alias/same-value detection assumed deno-fmt two-space top-level entry indentation; a non-stock-indented existing alias would have been re-inserted as a duplicate key. Resolved by the follow-up commit: depth-aware top-level property parsing replaces the indentation-sensitive regexes (see § Follow-up attestation). | `reconcile-app-routes.ts:73-157` at head; custom-indent exact/conflict fixtures in `reconcile-app-routes_test.ts` | None — verified resolved by this evaluator. |
+
+## Follow-up attestation — head `bc5120684` (same evaluator session, 2026-09-02)
+
+The generator returned commit `bc5120684 fix(cli): harden app routes reconciliation` implementing
+the low-severity indentation observation. Independently verified by this session:
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Touch set of the follow-up | `PASS` | `git diff 03d4c2519..bc5120684 --name-only` → `reconcile-app-routes.ts` + `reconcile-app-routes_test.ts` only in product, plus run artifacts (`worklog.md`, `supervisor.md`, `implement.md`, this `evaluate.md`); `deno.lock` diff empty. |
+| Indentation-independence | `PASS` | Regex-per-line alias/same-value matching replaced by `splitTopLevelEntries` + `parseTopLevelProperties` (`reconcile-app-routes.ts:73-157`): comma-splitting at zero curly/paren/square depth with comment/string awareness, then a strict `identifier: value` parse per entry. Alias and same-route-key detection now compare parsed keys/values, not indented lines. |
+| Fail-closed preserved | `PASS` | Spread, computed-key, and shorthand entries fail the property parse → `unsupported entry shape` conflict (replaces the old indent-anchored spread check); unbalanced delimiters or an unterminated string/comment make the split return `undefined` → conflict; duplicate aliases and a different alias resolving the same route key now conflict explicitly. All five prior customized-shape fixtures still conflict. |
+| New fixtures | `PASS` | `reconcile-app-routes_test.ts`: four-space/spaced-colon existing alias returns `exact` without re-insertion; custom-indented alias reuse conflicts. |
+| Focused tests | `PASS` | `deno test --allow-all .../resource-slice/` → 32 passed, 0 failed (re-run at head). |
+| Scoped structured check | `PASS` | 10 files, 1 batch, 0 diagnostics (re-run at head). |
+| Scoped structured lint/fmt | `PASS` | task-local config, 10/10 processed, 0 findings each (re-run at head). |
+| Purity unchanged | `PASS` | grep over `reconcile-app-routes.ts` at head: no `Deno.*`/`console.*`/`fetch(`/`any`/`deno-lint-ignore`. |
+| Run-artifact honesty | `PASS` | `worklog.md` records the eval cycle and follow-up; `supervisor.md` records the requested/observed evaluator identity and cycle-1 verdict accurately. |
+
+The whole-suite, arch, quality, and docs gates were green at `03d4c2519`; the follow-up changes two
+files already inside that verified scope, with the scoped gates re-run green above, so those
+repository-level results remain attested. The remaining low finding (push + open the non-draft
+`status:impl` PR after evaluation) is the recorded owner-directed lifecycle step and is unchanged.
 
 ## Lessons for Promotion
 
@@ -161,4 +184,4 @@ exit 0, scanner `ok:true`, 0 findings, 7 pre-existing allowances, no new allowan
 | Field     | Value  |
 | --------- | ------ |
 | Verdict   | `PASS` |
-| Rationale | The locked Slice C scope is complete and exact: ten files, application-layer pure, the D3 marker/classification/force/zero-write contract is implemented and pinned by tests, planner deltas match D7, and both shared-source transforms fail closed. Every required gate was independently re-run green by this separate session (32/32 focused tests; 10/10 scoped check/lint/fmt; full CLI suite 974 passed/0 failed; `arch:check` and `quality:gate` exit 0 with no slice-named finding; both docs gates at baseline). No doctrine violation was introduced and the debt registry is correctly untouched. The two low findings are a recorded lifecycle step (push/PR after eval) and an optional future hardening; neither blocks the pass. |
+| Rationale | Attested at head `bc5120684`. The locked Slice C scope is complete and exact: ten files, application-layer pure, the D3 marker/classification/force/zero-write contract is implemented and pinned by tests, planner deltas match D7, and both shared-source transforms fail closed. Every required gate was independently re-run green by this separate session at cycle 1 (32/32 focused tests; 10/10 scoped check/lint/fmt; full CLI suite 974 passed/0 failed; `arch:check` and `quality:gate` exit 0 with no slice-named finding; both docs gates at baseline), and the follow-up commit — which resolves the indentation-hardening finding with depth-aware property parsing while preserving every fail-closed behavior — was re-verified green on the focused tests and all scoped wrappers. No doctrine violation was introduced and the debt registry is correctly untouched. The one remaining low finding is the recorded owner-directed lifecycle step (push + non-draft PR after eval); it does not block the pass. |

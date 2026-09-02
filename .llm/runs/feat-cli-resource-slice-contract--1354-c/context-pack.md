@@ -5,7 +5,8 @@
 Harness bootstrap, doctrine research, live #1664 no-overlap measurement, inherited-plan pointer,
 the mandatory Design checkpoint, and the complete ten-file implementation are complete. Focused,
 package, architecture, quality, and documentation gates are green. Separate-session IMPL-EVAL is
-the remaining harness gate before push and PR creation.
+`PASS` at the current implementation head. Only the evidence commit, push, and metadata-complete PR
+creation remain.
 
 ## Key Decisions
 
@@ -17,10 +18,9 @@ the remaining harness gate before push and PR creation.
 
 ## Next Steps
 
-1. Commit the reviewed implementation and run artifacts.
-2. Obtain separate-session IMPL-EVAL and address any findings.
-3. Re-run changed-scope gates if evaluation changes the implementation.
-4. Push and open the metadata-complete non-draft PR.
+1. Commit the current-head evaluator artifact and final evidence updates.
+2. Push and open the metadata-complete non-draft PR.
+3. Post the implementation/evaluation phase summary and verify live metadata.
 
 ## Drift and Debt
 
