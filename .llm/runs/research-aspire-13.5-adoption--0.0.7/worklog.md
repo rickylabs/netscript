@@ -954,3 +954,17 @@ the merge.**
   `.agents/skills/**` files, disjoint from this PR — no re-merge pushed so the running tiers are not
   cancelled again. IMPL-EVAL brief pre-staged at `slices/leaf-1880/impl-eval-brief.md` (hosted
   evidence placeholders filled on tier completion).
+
+## 2026-09-02 23:4xZ — #1952 tiers green at 478450a3c; head restored; IMPL-EVAL dispatched
+
+- Tiers at `478450a3c`: postgres tier SUCCESS (live readiness receipt proven), sqlite tier
+  SUCCESS, `quality`/`check-test` SUCCESS.
+- Coordinator relabelled #1952 `status:impl` → `status:ready-merge` at 23:38Z. My convergence merge
+  of main `f589d251a` (`29b2b29de`, clean auto-merge, 223/223 gate tests locally) was pushed after
+  that relabel and moved the labelled head — reverted by `--force-with-lease` back to exact
+  `478450a3c` so the coordinator's ready-merge head stands; main `f589d251a` auto-merges cleanly
+  with it (verified locally, no conflicts).
+- DoD box 2 (separate-session IMPL-EVAL) still open → dispatched local route
+  (`agentic:claude-openrouter`, z-ai/glm-5.3-flash, xhigh) in detached worktree `007-eval-1952` @
+  `478450a3c`, session `16762a5f-40e0-41a1-96b4-57d02472f738`; brief
+  `slices/leaf-1880/impl-eval-brief.md`. Verdict lands on the PR as a comment; no head change.

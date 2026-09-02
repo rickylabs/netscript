@@ -54,9 +54,7 @@ deterministic reproduction **and** a regression gate. The PR chose the contract.
 
 ## Hosted evidence at this head (do NOT rerun) — filled by supervisor
 
-- `e2e-cli` run __RUN__: `scaffold-runtime (aspire + docker + postgres)` __PG__,
-  `scaffold-runtime-sqlite (aspire + sqlite + garnet)` __SQLITE__; `quality`, `check-test`,
-  `code-quality`, `scaffold-static` __CI__. `close-gate` red only from unticked DoD — never a finding.
+- Hosted evidence at this exact head `478450a3c` (do NOT rerun): `scaffold-runtime (aspire + docker + postgres)` SUCCESS, `scaffold-runtime-sqlite (aspire + sqlite + garnet)` SUCCESS, `quality`/`check-test`/`code-quality`/`scaffold-static` SUCCESS. Current main `f589d251a` (#1885, #1953) auto-merges cleanly with this branch (verified locally: 223/223 gate tests after merge). `close-gate` red only from unticked DoD — never a finding.
 - Canary 7 `behavior.live-db-endpoint` failure (order-dependent resource parser) is a separate
   coordinator-owned microfix; out of scope here, do not raise it.
 
