@@ -1,91 +1,92 @@
-# MERGE PACKET (final) — #1756 · `test(docs): compile published JSDoc examples`
+# MERGE PACKET — #1756 · immutable head `b607bfe260138df616f748973a8f213f5e3f4b7d`
 
-**Immutable pushed head: `216d9ced44425449e6e16b9002573c29c87ff923`** · base `main` `e938ecd31`
-Closes #1533 · `status:ready-merge` · `orchestrator:docs`
+Integrated onto `main` `0622dc432`; still **MERGEABLE / CLEAN** against current `main` `1201d6216`.
+Closes #1533 · milestone 0.0.7 · `status:ready-merge` · `orchestrator:docs`.
 
-## Changed since the previous packet
+**The `ci.yml` gate step is now committed source on this branch, not a carried patch.** That was the
+last substantive blocker for this run.
 
-**`close-gate` now PASSES.** All seven #1533 acceptance boxes are mirrored:
-
-```
-acceptance-mirror APPLIED: #1533
-close-gate PASS rickylabs/netscript#1756
-provenance: head=216d9ced4 · snapshot #1533 bodySha256=7d2f3f47ffa072dd…
-```
-
-Three things got it there, two of them raised by the cycle-3 evaluator that another session
-dispatched against `6a51cfe4c`:
-
-1. **Duplicate evidence cleared.** A stale `acceptance-evidence` block in comment `5469523773`
-   (2026-08-30, `box-index:` form, head `4cdee82f`) duplicated every shared box, because the mirror
-   concatenates the body with every comment. Neutralised in place, history preserved. Verified zero
-   remaining blocks across issue comments, review comments and reviews — cycle 3's R4 reported four
-   in the PR thread, which its snapshot predated; there are now **one block, seven boxes, no
-   duplicates**.
-2. **The promised artifact now exists where a reviewer would look (cycle-3 R3).** It was correct that
-   `find .llm/runs -name '*1756*'` found nothing and the tag was local-only: the patch lived on
-   `orchestrator/release-0.0.7-docs`, not on this branch. It is now committed at
-   **`.llm/runs/test-jsdoc-example-compile-gate--1533/workflow-step.patch`** (sha256
-   `e303f45463cc32d6fafb200ac765fce1bc37c4372d1e6aae2574336be1d7bb54`), cut against this head so a
-   plain `git am` applies it.
-3. **Box 5 evidence added, once, and stated precisely.** Its entry records the wiring *and* that the
-   step is carried as that patch rather than present on the head — so the mirrored tick on #1533
-   carries its own caveat rather than asserting something the head does not do.
-
-## Verdicts — every one against a named head
-
-| Cycle | Head | Verdict |
-| --- | --- | --- |
-| IMPL-EVAL 1 (GLM, this lane) | `239f4b53d` | FAIL_FIX — F1 revert of #1740 in four stream factories, F2 shim laundering. Both fixed. |
-| IMPL-EVAL 2 (GLM, this lane) | `889e676a5` | **PASS** — reproduced the laundering; audited the salvage's 47-file blast radius for a seventh revert (none). |
-| Bounded delta (GLM, this lane) | `9372a27e1` | **PASS** — ceiling + `ci.yml`; proved the tightening bites and the failing receipt. |
-| IMPL-EVAL 3 (OpenHands, other session) | `6a51cfe4c` | FAIL_FIX — R1/R2 the CI wiring (credential-blocked), **R3 and R4 both now resolved above**. |
-
-## Gate state
+## All CI green at this head
 
 | Check | Result |
 | --- | --- |
-| `close-gate` | **PASS** — 7/7 boxes mirrored |
+| **check-test** | **pass** (11m4s) — the plumbing assertion that was red for this entire run |
+| **close-gate** | **pass** — 7/7 #1533 boxes mirrored |
+| quality · code-quality · build | pass · pass · pass |
+| classify changes · docs-site · Fresh UI · fresh-ui-quality | pass |
+| core CI lane visibility | pass |
 | review threads | PASS, 0 threads |
-| `deno task docs:jsdoc-examples` | 0 — `deferredCensus={"unboundName":116,"typeError":14}`, ceilings at exact census |
-| `deno task test` | 4742 / 0 (synthetic tree on current `main`) |
-| focused suite (candidate incl. `ci.yml`) | 18 / 0 |
-| `check:aspire-version-parity` · `assets-barrel` · `publish-assets` | PASS · PASS · PASS |
-| `quality:scan` over changed files | `findings: []` |
-| `check-test` | **1 failure** — see below |
+| `mergeable` | **MERGEABLE / CLEAN** |
 
-## The single remaining blocker
+Local at the same head: repo suite **4855 passed / 0 failed**; scanner suite **45 / 0**;
+`docs:jsdoc-examples` exit 0 with `deferredCensus={"unboundName":116,"typeError":14}` against
+ceilings `116`/`14` — both at exact census, zero slack, never raised.
 
-`check-test` fails only on `jsdoc-example-workflow_test.ts:26` — `assertEquals(gateOccurrences.length,
-1)`, actual 0 — because the head carries **0** occurrences of `--gate jsdoc-example-compile` and the
-merge candidate carries **1**. That is cycle 3's R1+R2, which it correctly called one slice.
+## The credential note, because the instruction's form was not sufficient
 
-The test was deliberately not weakened: it is the only proof the gate runs in CI, which is box 5
-itself.
-
-**This needs `workflow` token scope, which this session does not have.** Verified exhaustively at
-this head, not assumed: the branch push, the tag push, and the contents API are each refused —
+`env -u GH_TOKEN -u GITHUB_TOKEN` alone still failed. `~/.gitconfig` configures a credential helper
+that reads **`$HOME/.gh_token`**, a file holding the repo-only token — unsetting environment
+variables does not touch it. Confirmed by scope, without printing either token:
 
 ```
-! [remote rejected] (refusing to allow a Personal Access Token to create or update workflow
-   `.github/workflows/ci.yml` without `workflow` scope)
+~/.gh_token           -> x-oauth-scopes: repo
+stored gh credential  -> x-oauth-scopes: gist, read:org, repo, workflow
 ```
 
-`gh auth status` → scopes `'repo'`; it is the only credential present. Authorization was never the
-constraint.
-
-## To finish — one command
+Adding the gh helper was also not enough, because git tries helpers in order and the global one won.
+The working form clears the list first, per-invocation, mutating no file:
 
 ```bash
-git fetch origin test/jsdoc-example-compile-gate
-git checkout 216d9ced44425449e6e16b9002573c29c87ff923
-git am .llm/runs/test-jsdoc-example-compile-gate--1533/workflow-step.patch
-git push origin HEAD:test/jsdoc-example-compile-gate
+env -u GH_TOKEN -u GITHUB_TOKEN git \
+  -c credential.helper= \
+  -c credential.helper='!gh auth git-credential' \
+  push …
 ```
 
-+8/−0 to `.github/workflows/ci.yml`; the delta evaluator independently confirmed `git apply --check`
-is clean and the result byte-identical to the evaluated candidate. `check-test` goes green in the
-same act, and nothing else changes — `close-gate` is already passing and does not depend on it.
+Worth recording for the next lane that hits this.
+
+## Integration — one conflict, and a check that it did not eat the branch's work
+
+Twelve commits replayed onto `0622dc432`. One conflict: `agent-tools.generated.ts`, resolved to
+main's copy and then **regenerated** rather than hand-merged, since `check:assets-barrel` is a
+regenerate-then-assert-empty-diff gate.
+
+Rather than assume the rebase was faithful, I compared the branch's own edit **per file** across both
+bases. Identical everywhere except:
+
+- the two new artifacts (`impl-eval-cycle-3.md`, `workflow-step.patch`);
+- the regenerated barrel;
+- `scan-code-quality.ts` / `_test.ts` — where **main itself added 124 lines**. My
+  `templateInteriorLines` fix survived intact, and the scanner suite went 44 → **45/0** because main
+  added a test.
+
+Union assertions vs the new base: zero tasks lost, zero gate ids lost, zero `ci.yml` steps lost,
+`ci.yml` delta exactly **+8/−0**.
+
+## Cycle-3 (OpenHands) FAIL_FIX — all four repairs discharged
+
+| | Repair | Status |
+| --- | --- | --- |
+| R1 | land the `--gate jsdoc-example-compile` step in the `quality` job | **done** — committed source, +8/−0, correct placement and `RUN_DENO` guard |
+| R2 | flip the plumbing test green | **done** — `docs:jsdoc-examples:test` 1/1; `check-test` green |
+| R3 | deliver or drop the promised patch artifact | **done** — carried at `.llm/runs/test-jsdoc-example-compile-gate--1533/workflow-step.patch` |
+| R4 | fix close-gate bookkeeping | **done** — stale duplicate block neutralised; one block, seven boxes, zero duplicates |
+
+## Verdict history — every one against a named head
+
+| Cycle | Head | Verdict |
+| --- | --- | --- |
+| IMPL-EVAL 1 | `239f4b53d` | FAIL_FIX — F1 revert of #1740 in four stream factories; F2 shim laundering. Both fixed. |
+| IMPL-EVAL 2 | `889e676a5` | **PASS** — reproduced the laundering; audited the 47-file blast radius for a seventh revert (none). |
+| Bounded delta | `9372a27e1` | **PASS** — ceiling + `ci.yml`; proved the tightening bites and the failing receipt. |
+| IMPL-EVAL 3 (OpenHands) | `6a51cfe4c` | FAIL_FIX — four repairs, all discharged above. |
+| Bounded delta (final) | `b607bfe26` | **in flight** — scoped to the wiring, the rebase's fidelity, barrel honesty, census, and whether box 5 is now true. Verdict appended when it returns. |
+
+## One staleness I introduced and removed
+
+Box 5's evidence carried a "CARRIED, NOT YET ON THE HEAD" caveat, true when written and false once
+the patch landed. Refreshed to describe the committed step. A caveat that outlives its condition is
+just a wrong claim.
 
 ## Follow-ups filed rather than scope-crept
 
@@ -93,4 +94,4 @@ same act, and nothing else changes — `close-gate` is already passing and does 
   failure; plus value owners still binding via `declare global`.
 - **#1893** — `check:aspire-host-ports` passes on runtime literal service URLs its own S5 test rejects.
 
-This lane does not merge. Everything it can do is done at `216d9ced4`.
+This lane does not merge.

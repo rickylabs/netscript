@@ -4041,3 +4041,31 @@ describe the committed step. A caveat that outlives its condition is just a wron
 Final bounded delta evaluator dispatched on `b607bfe26`, scoped to what changed since the passing
 delta at `9372a27e1`: the wiring, the rebase's preservation of the branch's work, barrel honesty,
 census, and whether box 5 is *now* true.
+
+## 2026-09-02 — final delta PASS at `b607bfe26`; #1756 complete from this lane
+
+**VERDICT: PASS.** Chain, every entry against a named head: FAIL_FIX `239f4b53d` → PASS `889e676a5`
+→ PASS `9372a27e1` → FAIL_FIX `6a51cfe4c` (OpenHands; four repairs all discharged) → **PASS
+`b607bfe26`**.
+
+It established the delta itself before judging, and caught a nuance I had missed: `deno.json` also
+"differs" across the rebase, but **only in its index blob-hash line** — the patch body is identical.
+Its chimera sweep used cycle-3's framing rather than exact-revert matching, and found 55/56 pure main
+advancement with the one residue a hunk offset caused by the branch's own added lines sitting above
+main's hunk. No wholesale or partial reverts.
+
+**Its four PR-body staleness findings were all correct and all applied**: the resolved
+credential-blocker section, the now-self-contradictory "one box deliberately absent" note,
+`files=2037` → `2038`, and a commit table listing pre-rebase SHAs that folded two real commits into
+one row.
+
+**That table has now drifted three times.** It is generated from `git log` rather than hand-written —
+which is what should have happened the first time it drifted. The general lesson: any body content
+that restates git state should be produced from git, not maintained by hand, because every rebase
+silently invalidates it and nothing fails when it does.
+
+Final state: `MERGEABLE / CLEAN`, all CI green including check-test and close-gate, 7/7 acceptance
+boxes, review threads 0, `status:ready-merge`, milestone 0.0.7. Follow-ups #1892 and #1893 carry the
+two defects deliberately not fixed inline.
+
+This lane does not merge; #1756 is complete from here.
