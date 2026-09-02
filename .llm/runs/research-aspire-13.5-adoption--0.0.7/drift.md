@@ -8168,3 +8168,43 @@ the hazard by bringing `queue: max`; and `ec872eb69` already implements the tele
 
 Direction matters and is stated on the PR: alignment flows **from** `.agents/skills` **into** the
 shipped consumer assets, the opposite of my reverted #1907 carry.
+
+## D-316 — S9 restack executed; the credential blocker was configuration, not policy
+
+Owner authorized the stored workflow-scoped credential with `GH_TOKEN`/`GITHUB_TOKEN` unset. Verified
+first: with those unset, `gh auth status` reports `gist, read:org, repo, workflow`. The push then
+succeeded where every prior attempt was refused — so D-309's diagnosis holds exactly, and the fix was
+a shadowed environment variable rather than a missing grant.
+
+**Restacked onto `main 77ad823dc` as `3ba9c414b`.** Seven conflicts, resolved by category:
+
+- **Three deletions accepted, none recreated** (`.claude/skills/aspire`,
+  `.claude/skills/netscript-harness`, `sync-claude-skills.ts`). Checked rather than assumed: S9's
+  `netscript-harness` mirror edit was a reflow plus six substantive run-artifact-retention lines, and
+  the authoritative `.agents` copy already contained both, so the edit was catching the mirror up to
+  the authority and is moot. The 48-line `sync-claude-skills.ts` change dies with the tool.
+- **`.agents/skills/aspire/SKILL.md` — a real content merge.** From a 143-line base S9 rewrote it to
+  333 (the 13.5.3 diagnostic structure with evidence keys) while main reached 294. Main's *own*
+  additions relative to base are exactly #1907's six headings; every other heading present only on
+  main's side is base content S9 deliberately restructured. Merged as S9's version + #1907's section
+  after "Rule zero" → 468 lines, DCP prose intact (8), #1907 present, no duplicate headings.
+- **Two argument-contract conflicts resolved to S9's side, proven by the caller.** S9 adds a
+  `configPath` argument, so the script reads `[0]=appHost, [1]=projectRoot, [2]=configPath,
+  [3]=database`; main's `database = args[2]` would collide. `runtime-gates.ts` passes
+  `aspire.config.json` before `database`, so both files had to move together — a mismatch here fails
+  at runtime, not at compile time.
+- **Test file: S9's version is the superset**, adding the `aspire.config.json` fixture the restart
+  fallback reads.
+
+Validation: `packages/cli/e2e/tests/` 242 passed / 0 failed; `.llm/tools/validation/` 73 passed / 0
+failed; `deno check --unstable-kv` clean.
+
+**`ci:skip-e2e` removed** — the restack brings the v2 keys (`e2e-scaffold-runtime-global-v2`,
+`-sqlite-global-v2`) with `cancel-in-progress: false` and `queue: max`, so S9 can neither evict nor be
+evicted. It stopped being a hazard at the moment of restack, as predicted in D-313. PR is now
+`MERGEABLE`; runtime tiers dispatched on the exact head; exact-head IMPL-EVAL dispatched.
+
+## D-317 — S13 converged onto the isolation baseline
+
+`33f5c4966`, clean merge onto `77ad823dc`. Carries the v2 concurrency keys. Manifest regenerated;
+`check:aspire-version-parity` exit 0, `fail: 0` over 815 paths.
