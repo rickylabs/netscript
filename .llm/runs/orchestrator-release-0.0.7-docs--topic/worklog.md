@@ -4069,3 +4069,47 @@ boxes, review threads 0, `status:ready-merge`, milestone 0.0.7. Follow-ups #1892
 two defects deliberately not fixed inline.
 
 This lane does not merge; #1756 is complete from here.
+
+## 2026-09-02 — #1756 merged and reconciled; #1892 implemented and opened as #1914
+
+**#1756 merged at exact head `b607bfe26`** as `0f7fefb6b`. Verified the merge rather than assuming
+it: main carries the gate step (1 occurrence) and both tightened ceilings. #1533 auto-closed by the
+keyword; GitHub left both lifecycle labels stale, so `status:impl`/`status:ready-merge` →
+`status:shipped` on #1533 and #1756.
+
+**First check after a zero-slack gate lands: is main itself green?** If it were not, every lane would
+be blocked. `docs:jsdoc-examples` at `0f7fefb6b`: PASS, `116`/`14` at exactly the ceilings.
+
+### #1892 — took it immediately, and it was worse than filed
+
+The 0.0.7 docs queue is empty (the remaining docs-surface issues belong to aspire and fixes), so
+#1892 was the highest-value docs leaf. Before writing anything I measured how many diagnostics main
+is currently dropping: **7**, all TS2451, all from `preamble.ts`.
+
+Tracing them gave the root cause, which unified both halves of the issue. `declare global` is
+**program-global** across the single `deno check` run, so the symbol binding both leaked into every
+other example module *and* collided whenever a symbol is documented more than once:
+`resolveWorkspacePath` (exported by both `@netscript/aspire/public` and `@netscript/plugin/adapter`),
+`createParallelQueue` (two examples), `defineService` (three). Those collisions were exactly the
+diagnostics being dropped — the leak and the attribution hole were the same bug seen from two ends.
+
+Fix: bind documented symbols with a real `import`/`import type` **in the example module**, and count
+any diagnostic no module owns, failing on it regardless of how many siblings classified.
+
+**Removing the leak exposed five examples relying on it** — `artifactText` used `textArtifact`
+unimported; `substitute.ts`'s four examples used `defineStub`/`TokenValues`/`substituteTokens`
+unimported. Repaired to import what they use, which is what #1533 exists to require. Census returned
+to exactly `116`/`14`; unattributed **7 → 0**.
+
+**Mutation-proved rather than declared green:** injecting a redeclaration into every preamble now
+reports `unattributed compiler diagnostics: 708` and exits 1, where the identical condition exited 0
+before. Two regression tests cover the precise suppressing condition — an unowned diagnostic
+*alongside* a classified one, which is what `unclassifiedCompilerFailure` could never see.
+
+Repo suite **4860 / 0**; focused 20/20; compiler suite 13/13.
+
+Opened as **#1914**, labelled at open per the standing rule, milestone 0.0.7 with the reasoning
+stated in the body and an explicit offer to move it to Backlog — it repairs a gate that shipped in
+0.0.7 and is dropping diagnostics on main today, which is why I did not leave it unmilestoned.
+
+Still `status:impl`; separate-session IMPL-EVAL is the next step.
