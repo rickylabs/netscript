@@ -9,6 +9,7 @@ import {
   validateSdkClientContributions,
 } from '../src/internal/client-contributions/prepared-call.ts';
 import type { SdkClientContributionErrorCode } from '../src/client/errors.ts';
+import type { SdkClientContributionDiagnostic } from '../src/client/errors.ts';
 import type { SdkClientLogicalCall } from '../src/internal/client-contributions/adapter-ports.ts';
 
 const contract = {
@@ -52,6 +53,21 @@ function assertConstructionCode(
   const error = constructionError(contributions);
   assertEquals(error.code, code);
   assertEquals(error.phase, 'construction');
+  assertFalse('cause' in error);
+}
+
+function assertConstructionDiagnostic(
+  contributions: unknown,
+  expected: SdkClientContributionDiagnostic,
+): void {
+  const error = constructionError(contributions);
+  assertEquals(error.code, expected.code);
+  assertEquals(error.phase, expected.phase);
+  assertEquals(error.contributionId, expected.contributionId);
+  assertEquals(error.conflictingContributionId, expected.conflictingContributionId);
+  assertEquals(error.procedurePath, expected.procedurePath);
+  assertEquals(error.headerName, expected.headerName);
+  assertEquals(error.toJSON(), expected);
   assertFalse('cause' in error);
 }
 
@@ -143,6 +159,99 @@ Deno.test('unknown construction rejects ownership conflicts and reserved names',
   ], 'SDK_CONTRIBUTION_INVALID');
 });
 
+Deno.test('duplicate-id diagnostics name both descriptors by their shared id', () => {
+  assertConstructionDiagnostic([
+    descriptor({ id: 'test:duplicate', context: {}, headerKeys: [] }),
+    descriptor({ id: 'test:duplicate', context: {}, headerKeys: [] }),
+  ], {
+    code: 'SDK_CONTRIBUTION_CONFLICT',
+    phase: 'construction',
+    contributionId: 'test:duplicate',
+    conflictingContributionId: 'test:duplicate',
+  });
+});
+
+Deno.test('ownership diagnostics orient the later claimant against the earlier owner', () => {
+  const owner = descriptor({ id: 'test:owner' });
+
+  assertConstructionDiagnostic([
+    owner,
+    descriptor({ id: 'test:header-claimant', context: {}, headerKeys: ['x-tenant'] }),
+  ], {
+    code: 'SDK_CONTRIBUTION_CONFLICT',
+    phase: 'construction',
+    contributionId: 'test:header-claimant',
+    conflictingContributionId: 'test:owner',
+    headerName: 'x-tenant',
+  });
+
+  assertConstructionDiagnostic([
+    owner,
+    descriptor({ id: 'test:context-claimant', context: { tenant: 'optional' }, headerKeys: [] }),
+  ], {
+    code: 'SDK_CONTRIBUTION_CONFLICT',
+    phase: 'construction',
+    contributionId: 'test:context-claimant',
+    conflictingContributionId: 'test:owner',
+  });
+});
+
+Deno.test('unsupported protocol diagnostics name the offending descriptor', () => {
+  for (
+    const protocol of [
+      { family: 'other', major: 1 },
+      { family: 'netscript.sdk-client', major: 2 },
+    ]
+  ) {
+    assertConstructionDiagnostic([
+      descriptor({ id: 'test:unsupported-version', protocol }),
+    ], {
+      code: 'SDK_CONTRIBUTION_VERSION',
+      phase: 'construction',
+      contributionId: 'test:unsupported-version',
+    });
+  }
+});
+
+Deno.test('protocol rejection precedence is preserved when the id is also invalid', () => {
+  assertConstructionDiagnostic([
+    descriptor({
+      id: 'INVALID',
+      protocol: { family: 'other', major: 1 },
+    }),
+  ], {
+    code: 'SDK_CONTRIBUTION_VERSION',
+    phase: 'construction',
+  });
+});
+
+Deno.test('tuple-limit diagnostics name the seventeenth descriptor', () => {
+  const tuple = Array.from(
+    { length: 17 },
+    (_, index) => descriptor({ id: `test:limit-${index}`, context: {}, headerKeys: [] }),
+  );
+  assertConstructionDiagnostic(tuple, {
+    code: 'SDK_CONTRIBUTION_LIMIT',
+    phase: 'construction',
+    contributionId: 'test:limit-16',
+  });
+});
+
+Deno.test('dependency and ordering diagnostics name the offending descriptor', () => {
+  for (const field of ['dependsOn', 'before', 'after', 'order', 'priority']) {
+    assertConstructionDiagnostic([
+      descriptor({
+        id: `test:${field.toLowerCase()}`,
+        [field]: field === 'priority' ? 1 : ['test:other'],
+      }),
+    ], {
+      code: 'SDK_CONTRIBUTION_INVALID',
+      phase: 'construction',
+      contributionId: `test:${field.toLowerCase()}`,
+    });
+  }
+});
+
 Deno.test('reserved trace header declarations identify the offending descriptor', () => {
   for (
     const [contributionId, headerName] of [
@@ -195,6 +304,28 @@ Deno.test('Desktop construction rejects even an empty contributions field at run
   assert(error instanceof SdkClientContributionError);
   assertEquals(error.code, 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED');
   assertEquals(error.phase, 'construction');
+});
+
+Deno.test('Desktop-incompatible diagnostics name the first supplied descriptor', () => {
+  const error = assertThrows(() =>
+    Reflect.apply(createDesktopServiceClient, undefined, [{
+      contract,
+      contributions: [descriptor({ id: 'test:desktop' })],
+    }])
+  );
+  assert(error instanceof SdkClientContributionError);
+  assertEquals(error.code, 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED');
+  assertEquals(error.phase, 'construction');
+  assertEquals(error.contributionId, 'test:desktop');
+  assertEquals(error.conflictingContributionId, undefined);
+  assertEquals(error.procedurePath, undefined);
+  assertEquals(error.headerName, undefined);
+  assertEquals(error.toJSON(), {
+    code: 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED',
+    phase: 'construction',
+    contributionId: 'test:desktop',
+  });
+  assertFalse('cause' in error);
 });
 
 Deno.test('transport policy validation precedes Desktop contribution rejection', () => {
