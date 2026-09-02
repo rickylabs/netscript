@@ -375,7 +375,12 @@ jobs:
           --output .llm/tmp/gate-receipts/quality/jsdoc-example-compile.json
 
       - name: README fence integrity
-        if: env.RUN_DENO == 'true'
+        # Its subject is README markdown, so it must also run for docs-only
+        # diffs: classify gives `packages/*/README.md` needs_docs, not
+        # needs_deno. `RUN` is this job's own `needs_deno || needs_docs` gate —
+        # guarding on RUN_DENO would skip the gate on the very diffs that edit
+        # the files it checks.
+        if: env.RUN == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate readme-fences
