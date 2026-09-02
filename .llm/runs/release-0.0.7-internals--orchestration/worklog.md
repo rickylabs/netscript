@@ -10915,3 +10915,10 @@ stale fact forward. Lesson: a suite membership claim is head-bound like any othe
 Coordinator's E2E-only microfix agent owns the fix (displayName/name priority, unique TCP-capable
 fallback, regression test); #1952 and #1959 do not touch it. Internals: no duplication, no rescope;
 queue continues at #1952 → CI at 478450a3c.
+
+### D-267 — #1952 ⨯ #1959 overlap checked: same test file, different hunks, merge-tree clean
+
+After the converge, #1952 touches `listener-readiness-gates_test.ts` (allow-run assertion) and so
+does #1959 (fixes, #1844; adds deadline-snapshot tests). `git merge-tree` between the two branches
+is clean — no ordering constraint. Noted on both PRs. My earlier overlap check used a file list
+captured before the converge; re-derived from the live heads, which is the only valid source.
