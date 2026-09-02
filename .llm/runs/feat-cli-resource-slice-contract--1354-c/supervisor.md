@@ -27,6 +27,8 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   IMPL-EVAL.
 - The exact runtime model id and effort are not exposed to this session, so this record does not
   invent them.
+- Handoff PR: `rickylabs/netscript#1946`, opened non-draft with the owner-requested `status:impl`
+  metadata after the current-head evaluator PASS.
 
 ## IMPL-EVAL identity
 

@@ -82,6 +82,7 @@ later command slice, never here.
 | 2026-09-02 | C | evaluator follow-up | Replaced indentation-sensitive router entry regexes with depth-aware top-level property parsing; custom indentation now returns exact/conflict without duplicate insertion. Focused tests and scoped wrappers remain green. |
 | 2026-09-02 | C | current-head IMPL-EVAL | Resumed evaluator copy `0e8fa59d…` attested `bc5120684` with `PASS`; technical finding resolved. |
 | 2026-09-02 | C | final author gates | Re-ran full structured check (926/0), full CLI suite (1,569/0), arch, quality, and both docs ceilings at the attested implementation head; all exited 0. |
+| 2026-09-02 | C | push/PR handoff | Pushed the branch and opened non-draft PR #1946 against `main` with all six requested labels and milestone `0.0.7` in the creation command; posted IMPL and attributed IMPL-EVAL phase comments. |
 
 ## Gate Results
 
@@ -113,3 +114,12 @@ from the selected query factory; rendered template bodies remain Slice D scope.
 - Follow-up: resumed independent conversation `0e8fa59d…`, `PASS` attesting `bc5120684` after
   independently re-running 32/32 focused tests and all three 10-file structured wrappers.
 - The sole remaining low observation is the owner-directed post-evaluation push/PR lifecycle step.
+
+## PR receipt
+
+- PR: `https://github.com/rickylabs/netscript/pull/1946`
+- Creation state verified live: non-draft, base `main`, head `feat/cli-resource-slice-contract`,
+  `orchestrator:features`, `status:impl`, `type:feat`, `area:cli`, `priority:p2`, `wave:v1`, milestone
+  `0.0.7`.
+- Body uses `Refs #1354` with no closing keyword and states that no command calls the planner.
+- Phase comment ids: IMPL `5514035089`; IMPL-EVAL `5514035312`.

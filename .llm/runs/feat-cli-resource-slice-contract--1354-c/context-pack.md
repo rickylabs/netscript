@@ -5,8 +5,8 @@
 Harness bootstrap, doctrine research, live #1664 no-overlap measurement, inherited-plan pointer,
 the mandatory Design checkpoint, and the complete ten-file implementation are complete. Focused,
 package, architecture, quality, and documentation gates are green. Separate-session IMPL-EVAL is
-`PASS` at the current implementation head. Only the evidence commit, push, and metadata-complete PR
-creation remain.
+`PASS` at the current implementation head. The branch is pushed and metadata-complete non-draft PR
+#1946 is open against `main`.
 
 ## Key Decisions
 
@@ -18,9 +18,8 @@ creation remain.
 
 ## Next Steps
 
-1. Commit the current-head evaluator artifact and final evidence updates.
-2. Push and open the metadata-complete non-draft PR.
-3. Post the implementation/evaluation phase summary and verify live metadata.
+1. Await CI and ordinary review on PR #1946.
+2. Keep this partial PR at `status:impl`; later #1354 slices own templates and command activation.
 
 ## Drift and Debt
 
