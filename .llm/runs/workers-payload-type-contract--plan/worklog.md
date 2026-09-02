@@ -91,6 +91,20 @@
 - Scoped lint: exit 0; 373/373 files processed, 0 findings.
 - Scoped format check: exit 0; 373/373 files processed, 0 findings.
 
+### 2026-09-02 — hosted MCP export-corpus freshness repair
+
+- Hosted `Code quality › MCP export corpus freshness` job `100334821218` reported the generated
+  export corpus stale after the workers public-surface change.
+- Ran only the canonical writer: `deno task gen:mcp-export-corpus`.
+- The generator changed only
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` (5 additions,
+  5 deletions); the file was not hand-edited.
+- Generated provenance: SHA-256
+  `c48a1a3e0a8024ed491605f28c7b0ebcc4eb2d03d90d0977ef2e563eecccd5bf`, 35 packages, 272
+  subpaths, 7,803 symbols, 2,185,965 uncompressed bytes, 316,598 compressed bytes.
+- Freshness verification: `deno task check:mcp-export-corpus` exited 0 at pre-commit head
+  `6e546515c34f66f7deafbb684a6d0e4808a059b9`.
+
 ## Commit receipts
 
 | Slice | SHA | Evidence |
@@ -107,6 +121,7 @@
 | Focused `run-deno-test.ts` | `4903a6afc` | PASS — 1/1 |
 | Scoped `run-deno-lint.ts` (4 roots, `ts,tsx`) | `4903a6afc` | PASS — 373 files, 0 findings |
 | Scoped `run-deno-fmt.ts` (4 roots, `ts,tsx`) | `4903a6afc` | PASS — 373 files, 0 findings |
+| `deno task check:mcp-export-corpus` | `6e546515c` + regenerated carrier | PASS — 35 packages, 272 subpaths, 7,803 symbols |
 
 No pre-existing or introduced failures appeared in this bounded gate set.
 
