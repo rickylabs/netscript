@@ -8,9 +8,19 @@ Load `netscript-harness`, `netscript-tools`, `netscript-deno-toolchain`, `netscr
 
 **Role:** implementation author (leaf). **Supervisor:** `topic-internals-0.0.7`.
 **Issue:** #1920 (`type:fix`, `area:tooling`, `area:mcp`, `priority:p2`, milestone `0.0.7`).
-**Base:** the supervisor pins the exact `origin/main` SHA at dispatch. **Do not** start from a
-remembered SHA — this slice regenerates a corpus derived from the published surface, and several
-public-surface leaves are landing concurrently.
+**Worktree:** `/home/agent/projects/netscript/worktrees/007-leaf-1920`
+**Branch:** `ci/mcp-export-corpus-gate` — already created, base
+**`ec848e6b0334ec8fcd2bc66ba009305d35367b01`** (`origin/main`, the #1918 merge). Do not rebase
+without telling me.
+
+**Symptom reproduced at that exact base before dispatch**, so you are not chasing a stale report:
+`deno task check:mcp-export-corpus` → `REAL_EXIT=1`,
+`MCP export-surface corpus is stale; run deno task gen:mcp-export-corpus`.
+
+**Dispatched deliberately ahead of PR #1842**, which also carries a regenerated corpus. The
+coordinator's instruction is not to wait for it. That makes the collision hazard below **expected
+rather than unlikely** — plan for re-integration from the start instead of treating it as a
+surprise at handoff.
 
 You implement. You do not merge, relabel to ready, or close the issue.
 

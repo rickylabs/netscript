@@ -10334,3 +10334,47 @@ the same defect class — a gate that runs and reports "skipped by policy" reads
 also makes generator determinism a **stop-and-report precondition**: wiring a non-deterministic
 generator into a required gate is worse than the drift #1920 describes, because a flaky required gate
 gets disabled and takes the real signal with it.
+
+### D-236 — #1920 dispatched on the coordinator's override; #1923 close-gate green; an OpenHands verdict corrected
+
+**Coordinator overrode the hold on #1920 — dispatched immediately, not after #1842.** Base pinned to
+`ec848e6b0334ec8fcd2bc66ba009305d35367b01` (`origin/main`, the #1918 merge — main had advanced three
+merges past `77ad823dc` while the earlier leaves ran). **Symptom reproduced at that exact head before
+dispatch** rather than inherited from the issue: `check:mcp-export-corpus` → `REAL_EXIT=1`,
+`MCP export-surface corpus is stale`. Worktree `007-leaf-1920`, branch `ci/mcp-export-corpus-gate`,
+thread `01a06201-a4a9-70d0-809d-f15fa5e88c1e`, provider `openai` / `gpt-5.6-sol` / high, route
+matched, launched **detached** (D-231's lesson, now standing practice for this lane).
+
+The brief section covering the #1842 collision was **rewritten rather than left stale**: the hazard is
+now framed as expected rather than unlikely, with instructions to plan for main re-integration from
+the start and re-verify the blob sha256 after every integration. A brief that still says "wait for X"
+after the owner says "do not wait" is worse than no brief.
+
+**Two facts verified for that brief rather than inherited, one of which reversed my own first read.**
+My first check grepped `check:`-prefixed task names in `.github/workflows/` and found nothing for
+*any* corpus gate, which made #1920's "the way `check:assets-barrel` and `check:publish-assets`
+already do" look false. It is not. The siblings run by **gate catalog id** —
+`run-gate.ts --gate assets-barrel|publish-assets|agent-docs-prose` inside `ci.yml`'s `quality` job,
+with receipts under `.llm/tmp/gate-receipts/quality/`. `mcp-export-corpus` is already in the catalog;
+only the workflow step is missing. Had I reported from the first grep I would have contradicted a
+correct issue. Second, the **#1905 lesson is written into the brief as the central risk**: a step
+inside `quality` is only half the fix, because a gate in a job the classifier skips is the same defect
+class — it runs, prints "skipped by policy", and reads as coverage.
+
+**#1923 is fully green and the chain closed as designed rather than by force.** Structured
+`acceptance-evidence` block → `mirror-acceptance-evidence.ts` **APPLIED**, writing #1913's three
+acceptance boxes to `[x]` (mirrored, never hand-ticked) → close-gate then advanced to a *different*
+failure, the PR's own five **Definition of Done** boxes, which are close-gated too but sit outside the
+mirror's scope and are the supervisor's to tick once true and evidenced. All five were, so they were
+ticked and the job rerun. Final: close-gate **success** (9 steps), `MERGEABLE` / `CLEAN`,
+`status:ready-merge`, 5 pass / 9 skipped / 0 fail / 0 pending. Reruns only — never a push, which would
+have moved the head and voided the IMPL-EVAL verdict.
+
+**A claim of mine corrected.** I had said #1923's OpenHands runner would give it a second independent
+verdict. The runner finished `completed/success` but returned **`OPENHANDS_VERDICT: NONE`** with
+`verdict_source: artifact-unavailable` — the job ran and produced no verdict artifact. #1923 therefore
+carries **one** formal verdict, the mandatory native Fable 5.1 IMPL-EVAL, which is what policy
+requires; **#1917** is the PR with two. Worth recording because a green *job status* on an evaluator
+run reads exactly like an evaluation that agreed, and the two are not the same thing — the same
+`steps: 0` / `cancelled` confusion from D-227 in a different costume: **the wrapper's success is not
+the payload's verdict.**
