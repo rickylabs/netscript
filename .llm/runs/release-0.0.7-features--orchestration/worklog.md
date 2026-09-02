@@ -10534,3 +10534,24 @@ a proposed fix, since the lane is not mine.
 #1895's substantive evidence is untouched: exact-head hosted `fresh-browser` green, IMPL-EVAL PASS,
 `close-gate` pass with both DoD boxes evidenced. `status:ready-merge` stands, with the reason stated
 on the PR rather than left implicit.
+
+---
+
+## ~16:45Z — Fable 5.1 · low; two independent leaves dispatched instead of monitoring
+
+Coordinator: a monitor is not the lane mandate. Two leaves were dispatchable **now**, both by
+measurement rather than by waiting for #1664:
+
+**#1354 Slice B** (`feat/cli-fresh-manifest-seam`, worktree `007-leaf-1354-b`). D9 serializes behind
+#1664 by *file overlap*. Slice B's six files ∩ #1664's 51-file touch set = **∅** (measured; #1664
+touches neither `deno.lock` nor `packages/cli/deno.json`). Slice A still waits — it extracts from
+`web-scaffold.ts`, which #1664 owns. The brief tells B to **stop and report** if it needs any file
+outside its six.
+
+**#1452 Slice 3** (`feat/plugin-service-context-s3`, worktree `007-leaf-1452-s3`). Slice 2 (#1842)
+merged with `appsettings` explicitly deferred and no generated-consumer boot test. Audit-first
+against the four acceptance rows; the `@netscript/plugin` no-new-dependency invariant (SHA-256 of its
+`deno.json` unchanged) is a hard constraint, and it is fenced off `packages/cli` where #1664 and
+Slice B are live.
+
+**Live now:** S6/S7 closeout audit · Slice B · #1452 S3 · #1895/#1664 CI on reconciled heads.
