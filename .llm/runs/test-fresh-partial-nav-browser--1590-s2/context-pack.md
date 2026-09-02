@@ -23,3 +23,14 @@
 
 `orchestrator:features`, `status:impl`, `type:test`, `priority:p1`, `wave:v1`, `area:fresh`;
 milestone `0.0.7`.
+
+## 2026-09-02 implementation handoff
+
+- Baseline verified clean at `cb02a24cf`; the browser proof remains exactly 500 lines.
+- The post-final heading observer is page-owned and spans the same pre-release through post-settle
+  window. Before page close, an idempotent cleanup run releases both barriers and waits for
+  released + all-arrived-completed + zero-cancellation fixture state.
+- Scoped check/lint/fmt passed for 211 files; Fresh source tests passed 254/254. `deno.lock` remains
+  at SHA-256 `a269308a7cfd304e04377fbd9ef81d51edf629589aa741e18d367652dcdb2bcd`.
+- `playwright-cli` is unavailable locally, so no browser or hosted proof was run. The supervisor
+  must run the hosted `fresh-browser` gate at the pushed repair SHA before acceptance.

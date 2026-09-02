@@ -117,3 +117,31 @@ PLAN-EVAL: `PASS` in `.llm/runs/fix-fresh-partial-nav--1590/plan-eval.md` before
 | `quality:gate` | PASS | exit 0; repository scan has no findings, doctrine gate reports only existing warnings |
 | Diff/file/lock hygiene | PASS | `git diff --check` clean; browser test remains 500 lines; `deno.lock` unchanged; no `packages/fresh/src` diff |
 | Hosted `fresh-browser` repair | PENDING | Supervisor-owned exact-head run; prohibited locally |
+
+## Repair — page-context observer and deterministic pre-close drain
+
+- Moved the post-final `MutationObserver`, its ordered heading array, and its disconnect into
+  `page.evaluate`, preserving the observation window from immediately before barrier release
+  through the existing double-`requestAnimationFrame` settle.
+- Added an idempotent Playwright cleanup command before session close. It releases both fixture
+  barriers and waits on fixture state until each barrier is released, every arrived response has
+  completed to EOF, and cancellations remain zero. The full Vite stderr abort regex remains
+  unchanged and is evaluated after teardown.
+- Kept the proof at its 500-line ceiling. No fixture, `packages/fresh/src`, package configuration,
+  timeout, sleep, assertion, or `deno.lock` change was made.
+
+### Local gate evidence at implementation head
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| Scoped Fresh check | 0 | 211 files, 2 batches, 0 diagnostics |
+| Scoped Fresh lint | 0 | 211 files, 2 batches, 0 findings |
+| Scoped Fresh format | 0 | 211 files, 2 batches, 0 findings |
+| Fresh source tests | 0 | 254 passed, 0 failed, 0 ignored |
+| Local browser proof | not run | `playwright-cli` unavailable (`command -v` exit 1) |
+| Diff hygiene | 0 | `git diff --check` clean; proof file exactly 500 lines |
+| Lock hygiene | 0 | SHA-256 before/after `a269308a7cfd304e04377fbd9ef81d51edf629589aa741e18d367652dcdb2bcd` |
+
+Hosted `fresh-browser` was not run in this implementation lane and remains supervisor-owned.
+No unplanned drift was found; `drift.md` only records that the prior blocking harness-context
+failure is repaired locally and still awaits the hosted verdict.

@@ -1,6 +1,5 @@
 import { assert, assertEquals } from '@std/assert';
 import { fromFileUrl } from '@std/path';
-
 const PLAYWRIGHT_SESSION = 'netscript-fresh-form-navigation';
 const ROUTE_BINDING_SESSION = 'netscript-fresh-route-binding';
 const PARTIAL_NAVIGATION_SESSION = 'netscript-fresh-partial-navigation';
@@ -13,7 +12,12 @@ const ROUTE_BINDING_FIXTURE_ROOT = fromFileUrl(
 const PARTIAL_NAVIGATION_FIXTURE_ROOT = fromFileUrl(
   new URL('./fixtures/partial-navigation-browser/', import.meta.url),
 );
-
+interface BarrierState {
+  readonly arrived: number;
+  readonly released: boolean;
+  readonly completed: number;
+  readonly cancelled: number;
+}
 Deno.test({
   name: 'browser: document form redirect beats inherited body client nav without runtime errors',
   sanitizeOps: false,
@@ -23,7 +27,6 @@ Deno.test({
     const url = `http://127.0.0.1:${port}/`;
     const playwrightOutput = await Deno.makeTempDir({ prefix: 'netscript-form-browser-' });
     const vite = spawnVite(FIXTURE_ROOT, port, 'null');
-
     try {
       await waitForServer(url, vite);
       await runPlaywright(['-s', PLAYWRIGHT_SESSION, 'open', url], playwrightOutput);
@@ -40,21 +43,17 @@ Deno.test({
           });
           await page.goto(${JSON.stringify(url)});
           await page.waitForFunction(() => history.state?.fClientNav === true);
-
           const documentForm = page.locator('#document-form');
           const clientForm = page.locator('#client-form');
           const documentAttr = await documentForm.getAttribute('f-client-nav');
           const clientAttr = await clientForm.getAttribute('f-client-nav');
-
           await page.evaluate(() => globalThis.__formNavigationSentinel = 'preserved');
           await page.getByRole('button', { name: 'Validate client' }).click();
           await page.getByRole('alert').waitFor();
           const sentinel = await page.evaluate(() => globalThis.__formNavigationSentinel);
-
           await page.getByRole('button', { name: 'Create redirect' }).click();
           await page.waitForURL('**/success');
           await page.getByRole('heading', { name: 'Redirect completed' }).waitFor();
-
           return {
             documentAttr,
             clientAttr,
@@ -71,7 +70,6 @@ Deno.test({
         readonly runtimeErrors: readonly string[];
         readonly finalUrl: string;
       };
-
       assertEquals(evidence.documentAttr, 'false');
       assertEquals(evidence.clientAttr, null);
       assertEquals(evidence.sentinel, 'preserved');
@@ -89,7 +87,6 @@ Deno.test({
     }
   },
 });
-
 Deno.test({
   name: 'browser: ordered partial navigation drains stale A/B bodies and keeps final A',
   sanitizeOps: false,
@@ -192,12 +189,16 @@ Deno.test({
           await page.getByRole('button', { name: 'Update current region' }).click();
           await page.waitForFunction(() => document.querySelector('#region-content')?.textContent === 'a-final-updated');
           const eventsAtFinal = await page.evaluate(() => [...globalThis.__partialNavigationEvents]);
-          const postFinalHeadings = [];
-          const observer = new MutationObserver(() => {
-            const heading = document.querySelector('h1')?.textContent;
-            if (heading !== undefined && heading !== null) postFinalHeadings.push(heading);
+          await page.evaluate(() => {
+            globalThis.__postFinalHeadings = [];
+            globalThis.__postFinalHeadingObserver = new MutationObserver(() => {
+              const heading = document.querySelector('h1')?.textContent;
+              if (heading != null) globalThis.__postFinalHeadings.push(heading);
+            });
+            globalThis.__postFinalHeadingObserver.observe(document.documentElement, {
+              childList: true, subtree: true, characterData: true,
+            });
           });
-          observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
           await page.evaluate(async () => {
             await Promise.all([
               fetch('/control/release/old-region', { method: 'POST' }),
@@ -215,7 +216,10 @@ Deno.test({
             requestAnimationFrame(() => requestAnimationFrame(resolve))
           ));
           traceStaleNetwork = false;
-          observer.disconnect();
+          const postFinalHeadings = await page.evaluate(() => {
+            globalThis.__postFinalHeadingObserver.disconnect();
+            return [...globalThis.__postFinalHeadings];
+          });
           return {
             finalUrl: page.url(),
             title: await page.title(),
@@ -245,6 +249,11 @@ Deno.test({
     } catch (error) {
       executionError = error;
     } finally {
+      try {
+        await releaseAndDrainPartialBarriers(playwrightOutput);
+      } catch (error) {
+        executionError ??= error;
+      }
       await runPlaywright(['-s', PARTIAL_NAVIGATION_SESSION, 'close'], playwrightOutput, false);
       try {
         vite.kill('SIGTERM');
@@ -263,36 +272,12 @@ Deno.test({
       );
     }
     const evidence = JSON.parse(result.trim()) as {
-      readonly finalUrl: string;
-      readonly title: string;
-      readonly heading: string | null;
-      readonly regionContent: string | null;
-      readonly dynamicMarkers: readonly (string | null)[];
-      readonly colonMarker: string | null;
-      readonly bRegion: string | null;
-      readonly aRegion: string | null;
+      readonly [key: string]: unknown;
       readonly routeEvents: readonly string[];
-      readonly eventsAtFinal: readonly string[];
       readonly postFinalHeadings: readonly string[];
-      readonly sentinel: string | null;
-      readonly documentRequests: number;
       readonly partialResponses: readonly { readonly url: string; readonly status: number }[];
       readonly staleNetwork: readonly { readonly kind: string; readonly url: string }[];
-      readonly staleStatuses: readonly number[];
-      readonly barrierState: Record<
-        string,
-        {
-          readonly arrived: number;
-          readonly released: boolean;
-          readonly completed: number;
-          readonly cancelled: number;
-        }
-      >;
-      readonly requestFailures: readonly unknown[];
-      readonly pageErrors: readonly string[];
-      readonly consoleErrors: readonly string[];
-      readonly consoleWarnings: readonly string[];
-      readonly overlayCount: number;
+      readonly barrierState: Readonly<Record<string, BarrierState>>;
     };
     console.log(JSON.stringify({ ...evidence, viteStdout, viteStderr }));
     assertEquals(evidence.finalUrl, `http://127.0.0.1:${port}/a?phase=final`);
@@ -343,7 +328,6 @@ Deno.test({
     assertEquals(/AbortSignal|signal has been aborted|vite-error-overlay/i.test(viteStderr), false);
   },
 });
-
 Deno.test({
   name: 'browser: generated Form-C dynamic route resolves path during fresh partial navigation',
   sanitizeOps: false,
@@ -444,14 +428,33 @@ async function runPlaywright(
   }
   return stdout;
 }
-
 function reservePort(): number {
   const listener = Deno.listen({ hostname: '127.0.0.1', port: 0 });
   const { port } = listener.addr as Deno.NetAddr;
   listener.close();
   return port;
 }
-
+async function releaseAndDrainPartialBarriers(cwd: string): Promise<void> {
+  await runPlaywright([
+    '--raw',
+    '-s',
+    PARTIAL_NAVIGATION_SESSION,
+    'run-code',
+    `async page => {
+      await page.evaluate(async () => await Promise.all([
+        fetch('/control/release/old-region', { method: 'POST' }),
+        fetch('/control/release/stale-b', { method: 'POST' }),
+      ]));
+      await page.waitForFunction(async () => {
+        const state = await (await fetch('/control/state')).json();
+        return ['old-region', 'stale-b'].every(name =>
+          state[name].released && state[name].completed === state[name].arrived &&
+          state[name].cancelled === 0
+        );
+      });
+    }`,
+  ], cwd);
+}
 function spawnVite(
   cwd: string,
   port: number,
@@ -476,7 +479,6 @@ function spawnVite(
     stderr: output,
   }).spawn();
 }
-
 async function waitForServer(url: string, child: Deno.ChildProcess): Promise<void> {
   for (let attempt = 0; attempt < 100; attempt++) {
     const status = await Promise.race([
@@ -486,7 +488,6 @@ async function waitForServer(url: string, child: Deno.ChildProcess): Promise<voi
     if (status) {
       throw new Error(`Vite browser fixture exited before startup (${status.code})`);
     }
-
     try {
       const response = await fetch(url);
       await response.arrayBuffer();
@@ -495,6 +496,5 @@ async function waitForServer(url: string, child: Deno.ChildProcess): Promise<voi
       // The server has not bound its port yet.
     }
   }
-
   throw new Error('Timed out waiting for the Vite browser fixture');
 }

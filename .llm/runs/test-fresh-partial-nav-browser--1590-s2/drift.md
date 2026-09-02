@@ -50,3 +50,12 @@ defect, and it fails before any assertion runs — deterministic, not flaky. Hos
 again shows `Internal server error: The signal has been aborted` for a held stale response
 aborted at page close, so the drain-without-overlay claim is still unproven in the hosted lane.
 Product source remains untouched by this slice.
+
+## 2026-09-02 — driver/page-context harness drift repaired locally
+
+The blocking `MutationObserver` assumption is repaired in the browser proof: observation now lives
+in the page context, while the driver reads the ordered capture only after disconnecting it at the
+original settle point. Teardown now releases and drains both barriers, with zero cancellations,
+before closing the Playwright session, so the unchanged Vite stderr abort check cannot be polluted
+by a live held body at page close. This required no fixture or product-source change and introduced
+no timeout or sleep. The hosted verdict remains pending at the commit produced by this repair.
