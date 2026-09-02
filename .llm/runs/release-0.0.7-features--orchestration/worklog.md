@@ -10291,3 +10291,26 @@ That is **no verdict**, so retrying is the *same* authorized evaluation, not a s
 `status:plan-eval`. Routing around it is not possible: the dispatcher pins PLAN to
 `qwen/qwen3.8-flash` and explicitly rejects `eval:model:glm` for the plan phase
 (`openhands-phase-eval.yml:296-299`). Recorded on the PR.
+
+### ~14:45Z — #1664's fence fixed; two evaluator lanes unblocked differently
+
+**#1664 `docs:readme-fences` now exits 0 at `type_errors=32`** — exactly main's baseline, reached by
+binding the names in the branch-authored Fresh README fence rather than widening the ratchet.
+`docs:jsdoc-examples` also 0 with `unboundName=116`. Pushed `5bc900d80`; CI re-running.
+
+**#1891's PLAN-EVAL hit the same upstream 429 on the immediate retry.** Two attempts ten minutes
+apart, both `qwen/qwen3.8-flash … temporarily rate-limited upstream (Alibaba shared pool)`. Tight
+retrying is waste, and label routing cannot help: the dispatcher pins PLAN to qwen and rejects
+`eval:model:glm` for the plan phase (`openhands-phase-eval.yml:296-299`). Armed a **~25-minute
+backoff** that cycles `status:plan-eval` once, rather than burning cycles against a shared pool.
+
+If the backoff also fails, the fallback is the **policy default rather than an escalation**:
+`lane-policy.md` makes local PLAN-EVAL a *native opposite-family Fable 5 · medium* session and says
+OpenHands "is not a normal local evaluator and is reserved for explicitly cloud-driven work". I have
+been using the cloud lane by habit; the native route is the one the policy names first.
+
+**#1931's phase-eval had never fired at all.** Its `status:impl-eval` label was applied in the same
+action that removed `status:impl`, and no `Phase eval PR #1931` run exists. Cycled the label properly
+(remove, pause, re-add) and armed a watch for the dispatcher. This is the same class as #1891's
+four lost attempts — the trigger is a *label event*, and a label applied as part of a bulk edit does
+not reliably produce one.
