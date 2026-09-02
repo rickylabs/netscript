@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers-core",
-  "version": "0.0.6",
+  "version": "0.0.7-canary.6",
   "description": "Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins.",
   "license": "Apache-2.0",
   "exports": {
@@ -28,10 +28,10 @@
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "zod": "catalog:",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.6",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.6",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.6",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.6",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.7-canary.6",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.7-canary.6",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7-canary.6",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7-canary.6",
     "@orpc/contract": "npm:@orpc/contract@^1.15.0",
     "@orpc/server": "npm:@orpc/server@^1.15.0"
   },

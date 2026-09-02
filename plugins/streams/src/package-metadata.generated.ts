@@ -2,4 +2,4 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published plugin package. */
-export const PLUGIN_PACKAGE_VERSION: string = '0.0.6';
+export const PLUGIN_PACKAGE_VERSION: string = '0.0.7-canary.6';
