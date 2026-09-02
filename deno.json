@@ -31,6 +31,9 @@
       ]
     },
     "check": {
+      "dependencies": [
+        "check:desktop-native-fixture"
+      ],
       "command": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
       "files": [
         "packages/**/*.ts",
@@ -42,6 +45,7 @@
         ".llm/tools/run-deno-check.ts"
       ]
     },
+    "check:desktop-native-fixture": "deno run --allow-all packages/cli/e2e/src/adapters/native-desktop/fixture-contract-driver.ts --repo-root . --check-only",
     "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
     "check:streams-types": "deno task --cwd packages/fresh check:streams-types",
     "test": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all",
