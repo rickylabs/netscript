@@ -10591,3 +10591,24 @@ run-status shape today that looked like an evaluation and was not.
 Rule: **do not cycle the phase label until the lane is idle**, and confirm the agent job — not the
 run — reached `completed` with a non-skipped conclusion. Re-trigger is armed to fire the moment the
 worker exits.
+
+### ~17:35Z — Slice B stopped at its ceiling for the right reason; ruling: carriers are ceiling-exempt
+
+Slice B (`007-leaf-1354-b`) finished its six files, regenerated the export corpus — forced by the
+Fresh re-exports moving the public surface — and then **refused to commit**, because the corpus is
+a seventh file and the plan's touch-set-growth rule says stop. It reported instead of committing
+past the ceiling. That is the rule working.
+
+**Supervisor ruling: generated carrier outputs are ceiling-exempt.** They are regenerated from
+tooling at every converged head, never hand-edited, and #1929 makes a stale corpus a hard `quality`
+failure — so regeneration is a required side effect of moving a public surface, not slice scope. A
+ceiling counts hand-authored files. Recorded as a one-line plan amendment (no ceiling numbers or
+decisions touched) so it binds Slices C–G too; B resumed to commit → post-commit carrier checks →
+push → PR.
+
+Two things B got right that are worth noting: the `deno.lock` delta is exactly one line
+(`+ "jsr:@netscript/fresh@0.0.6"`, dependency-only, as item 6 permits), and it exported
+`PageModuleRouteForm` because `DiscoveredNetScriptRoute.pageModuleForm` would otherwise create a
+new private-type doc-lint diagnostic — a type reachable from an exported type must itself be
+exported — while keeping the page-module rewrite function unexported as the plan requires. Doc-lint
+A/B: Fresh 45→45, CLI 0→0, both byte-identical.
