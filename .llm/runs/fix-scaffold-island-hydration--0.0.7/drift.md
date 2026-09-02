@@ -70,3 +70,14 @@
   workspace and then reports missing catalog package `zod`. It produced zero lint findings. The
   coordinator explicitly narrowed the S0b recovery validation to the touched-file check/test/lint/fmt
   set; no fixture, catalog, or root-config edit is authorized by this slice.
+
+## 2026-09-03 — hosted S0 disposition
+
+- Hosted run `33689942400` refutes the issue premise for current main: both generated-app tiers serve
+  the island client surface, hydrate it, and complete the Rename mutation (`name` → `name*`). There is
+  no first-red client boundary, so plan branch A applies and S3 is cancelled without a product edit.
+- The original failing PR #1664 receipt at `377811da8` cannot be assigned a root cause from this
+  result. Issue #1845's Expected section requires the hosted generated island to hydrate and become
+  interactive; it does not require a retrospective causal attribution. This run therefore retains
+  `Closes #1845` while making no claim about which intervening historical change invalidated the old
+  receipt.

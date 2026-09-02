@@ -89,6 +89,9 @@ CLI scaffold templates.
 | 2026-09-03 | S0b   | RED contract                  | Added the hydration receipt and Rename-transition tests first; `deno test` exited 1 because `probe-island-hydration.ts` did not yet exist (`TS2307`). |
 | 2026-09-03 | S0b   | GREEN implementation          | Added fail-closed headless-Chromium/CDP navigation, `ul[data-state]` island-surface discovery, exact first-row Rename assertion (`name` → `name*`), two-field receipt persistence, shared runtime-suite registration, and command wiring. Focused gate/builder/registry tests pass 53/53. |
 | 2026-09-03 | Gates | Full-tree lint baseline       | Exact S0 brief lint command reached zero findings but exited 2 before linting seven pre-existing `fixtures/desktop-native/**` files: their non-workspace config was ignored and Deno reported `Package 'zod' not found in catalog`. Coordinator steer requires focused touched-file gates for the recovery commit. |
+| 2026-09-03 | S0b   | Pushed GREEN head             | Commit `74ef668cc` pushed by explicit refspec. Structured focused results at that head: check 6/6 files (exit 0), test 53/53 (exit 0), lint 6/6 files (exit 0), format 6/6 files (exit 0), and `deno task quality:gate` (exit 0). |
+| 2026-09-03 | S0    | Hosted generated-app proof    | Run `33689942400`: Postgres job `100446283977` passed 97/97 and SQLite/Garnet job `100446283691` passed 92/92. In both, `behavior.island-served-surface` and `behavior.island-hydration` passed; Chromium completed Rename `name` → `name*` in 1703 ms / 1648 ms. |
+| 2026-09-03 | S3/S4 | Measurement disposition      | No client boundary is red on the current generated scaffold, so S3 is N/A and no product correction is supported. The two hosted tier receipts complete S4 for this head. Issue #1845's Expected section is behavioral rather than a root-cause requirement, so `Closes #1845` remains accurate for the current-main acceptance. |
 
 ## Decisions
 
