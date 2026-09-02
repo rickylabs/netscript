@@ -10754,3 +10754,9 @@ worker owns #1951; the bundle refresh is a separate leaf I offered to dispatch o
 stopped; replaced by one git-protocol watcher (`ls-remote`) on the #1951 branch. REST remained
 available (`gh api`) and is what this audit used. Lesson: watchers must use the cheapest transport
 that answers the question, and the count of watchers is itself a budget.
+
+### D-252 — #1951 amended design accepted in principle; audit pre-staged; amended head not yet pushed
+
+Coordinator confirmed the provenance defect from D-251/F1 (dry-run changes **9** dogfood outputs, prepared set stages **2**) and chose the safer correction: commit the stale dogfood outputs at stable source, and teach the coordinated version bump to **own** the two JSON version surfaces (`consumer-skills/.llm/tools/release.json`, `.mcp.json`). That supersedes my remedy #1 (separate refresh leaf) with an in-PR refresh, and makes "exactly two" sound **by construction** rather than by assertion — the bump writer, not the dogfood generator, becomes the authority for those two files.
+
+At audit time the remote branch and PR head are still `4f5df4e3c` (stage-1 only); the amended head is not pushed. Nothing exists to audit yet. Pre-staged `audit-1951.sh` (gates, guard/deno.json identity, lock churn, bundle residue, dogfood idempotence at head — must be **empty** after the stale-output commit — a simulated bump followed by dogfood to prove the two JSON surfaces carry the new version and the bundle delta is exactly two, and the bump-writer grep). A git-protocol watcher runs it automatically on push; no GraphQL spend. Packet remains held until a clean end-to-end dry-run at the final head.
