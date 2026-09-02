@@ -9958,3 +9958,32 @@ the** cause — so the disproof (`dashboardUrl` carries no `?t=`) was cheap inst
 wrong theory. Same discipline as re-deriving a lane-clear: mark the gap between verified and inferred
 **at the time of writing**, because afterwards the two kinds of claim are indistinguishable. That is
 precisely where D-226's error occurred.
+
+### D-229 — the queue behaved as designed under three-topic contention; diagnostic checklist completed
+
+**First correct multi-topic deferral this session.** #1889's sqlite attempt 4 sits `pending` with
+`steps: 0` behind S8 (`in_progress`) and S10 (`pending`) — three topics contending on one repo-wide
+tier group, admitting in FIFO order, **nobody evicted**. That is the behaviour #1846 intended, now
+observed with every participant carrying `queue: max` and the one v1 branch held. The docker tier's
+**17 executed steps** against `success` confirms it genuinely ran rather than short-circuiting.
+
+**Checklist for a red or cancelled runtime tier, now complete on #1908** (rule 5 contributed by the
+Aspire lane):
+
+1. `steps: 0` on a `cancelled` job ⇒ queue eviction, not a slice defect — look outward.
+2. Enumerate candidates by **job admission time**, not run `created_at`; the culprit's run may predate
+   the window by half an hour.
+3. Check each candidate branch for `queue: max`, not merely `cancel-in-progress`.
+4. Never report a lane clear from a remembered offender set; re-derive from live runs.
+5. **Two failures in one window: prove they are two causes before fixing only the loud one.**
+
+Rules 1–4 distinguish an eviction from a real failure; rule 5 stops the real failure being
+under-scoped once you have it. The Aspire near-miss that produced it: a `401` on one tier and
+`trace ids=[none]` on the other were **one cause** — with auth on, an unauthenticated telemetry read
+returns 401 in one path and empty in another. Fixing the loud symptom would have greened one tier and
+left the other failing identically — **a half-fix that reads as progress is worse than a red**,
+because the green tier becomes evidence for a wrong diagnosis and the next cycle starts from a false
+premise.
+
+S9's docker admitted and completed at 05:21:37, closing the last admission that could have reached
+#1889's job.
