@@ -62,13 +62,25 @@ the release workflow test to see the full 13-workflow inventory and the class in
 | --- | --- | --- | --- |
 | 2026-09-02 11:01 | 0 | re-baseline | Clean branch at the required base; corrected issue #1913 after measuring ordinary main traffic. |
 | 2026-09-02 11:05 | 0 | decisions locked | Both groups retain global/entity mutexes and receive `queue: max`; canary key remains generation-neutral. |
+| 2026-09-02 11:08 | 1 | implementation | Added both bounds and headers preserving the running-vs-pending and `steps: 0` diagnostic. |
+
+## Reconcile — slice 1
+
+- Issue #1913 remains open at `status:plan`; PR #1923 is draft at `status:impl`, milestone `0.0.7`,
+  and carries `Closes #1913`.
+- No new issue or PR comments changed the locked plan.
+- The executable edits remain limited to the two authorized workflow concurrency mappings.
+
 
 ## Gate Results
 
-Pending implementation.
+### Slice 1
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Parsed YAML readback | `deno eval --no-lock` with cached `npm:js-yaml@4.3.2`, both edited workflows | PASS, exit 0 | Both parsed concurrency objects retain their exact group and `cancel-in-progress: false`, with `queue: max`. No lock change. |
 
 ## Handoff Notes
 
 - Evaluator should first inspect exact scope, the 10-row sweep, and whether acceptance box 2 has
   genuine pending-victim evidence rather than a weaker completed-run comparison.
-

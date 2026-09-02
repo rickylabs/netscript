@@ -21,9 +21,21 @@ permissions:
   pull-requests: write
   statuses: write
 
+# Queue policy: one immutable registry version is a global entity across every
+# branch, so the key intentionally stays version-keyed and branch-agnostic. A
+# generation suffix would split that correctness mutex and allow two workflow
+# generations to publish the same version concurrently.
+#
+# `cancel-in-progress: false` protects the RUNNING publish but, by itself,
+# leaves only one PENDING slot; a third dispatch evicts that pending job, whose
+# `cancelled` conclusion and zero executed steps identify queue eviction rather
+# than mid-execution cancellation. Serialize all explicit maintainer requests;
+# redundant later attempts fail closed at the existing registry/publish guards
+# instead of silently replacing an earlier request.
 concurrency:
   group: release-canary-${{ inputs.republish-version || inputs.target-version }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   publish-and-prove:

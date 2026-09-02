@@ -46,9 +46,20 @@ on:
 permissions:
   contents: read
 
+# Queue policy: every non-PR event, including ordinary pushes to main, resolves
+# to the repo-wide `pages-deploy` group because one site is a global resource.
+# `cancel-in-progress: false` protects the RUNNING deployment but, by itself,
+# leaves only one PENDING slot; a third arrival evicts that pending job, whose
+# `cancelled` conclusion and zero executed steps distinguish queue eviction from
+# mid-execution cancellation. Retain every arrival for serial execution.
+#
+# The deploy job's `github-pages` environment applies deployment protections;
+# GitHub environments and concurrency groups are independent, so it does not
+# replace this workflow-level mutex over classify, build, and deploy.
 concurrency:
   group: pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   classify:
