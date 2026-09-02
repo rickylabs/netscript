@@ -879,3 +879,24 @@ the merge.**
 - PR #1957 body/DoD rewritten; `e2e-cli` run 33686579366 (postgres + sqlite tiers) triggered at
   `e23dc30c2`; monitor `bws8u4kkd` replaces `b9vkp2cek`.
 - Open: tiers → `status:impl-eval` → packet. #1952 and #1953 unchanged this checkpoint.
+
+### 2026-09-02T23:0xZ — #1957 IMPL-EVAL PASS via local OpenRouter route; ready-merge packet posted
+
+- Hosted phase-eval could not produce a bounded #1957 verdict (33688043184 >40 min cancelled;
+  33691638180/33691670615 iterations pinned at 800 by `openhands-phase-eval.yml:320`, cancelled by
+  coordinator; direct trigger 33691746633 refused `phase-already-recorded`, zero spend). D-333.
+- Coordinator sanctioned the local route: `agentic:claude-openrouter` z-ai/glm-5.3-flash xhigh in
+  detached worktree `007-eval-1953`-style isolation (`007-eval-1957` @ `e23dc30c2`), compact
+  five-file brief, no suite rerun → **VERDICT: PASS**, two LOW informational findings (scaled
+  ceiling seam; source-shape arity), no required action. Session `66b23656…`, 24 turns, $2.07.
+  Record: `slices/hotfix-1957/{evaluate.md,impl-eval-brief.md,session.md}` @ `a70721e4c`;
+  PR comment 5517592759.
+- DoD ticked from evidence (run 33686579366 both tiers; quality/check-test/code-quality/
+  scaffold-static; IMPL-EVAL PASS); label `status:impl-eval` → `status:ready-merge`;
+  `close-gate` re-ran **success** at `e23dc30c2` (22:59Z). Merge packet posted: comment
+  5517617424. Head immutable; handoff to coordinator complete.
+- **#1953:** cycle-2 hosted IMPL-EVAL (33687786454) also NONE — agent ended at 8 min with
+  "IMPL-EVAL incomplete, no verdict"; `evaluate.md` never written. Two hosted terminal attempts
+  exhausted → dispatched the same sanctioned local route (detached `007-eval-1953` @ `c231fbe5e`,
+  brief `.llm/tmp/impl-eval-1953-brief.md`, citation-resolution focus) rather than stand by.
+- **#1952:** still `dirty` against post-#1909 main; parked until after the next clean canary.

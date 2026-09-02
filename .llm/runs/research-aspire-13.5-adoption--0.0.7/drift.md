@@ -8508,3 +8508,22 @@ verdicts supersede the carry.
   (structured code + real `postgres_listener` Healthy). #1957 force-pushed to `e23dc30c2`.
   Per the efficiency directive, #1957 stays test-observer only: no `owned-container-log`, no
   #1952 prose; #1952 continues after the next canary.
+
+### D-333 — Hosted phase-eval cannot run a bounded recovery evaluation (2026-09-02)
+
+- **Plan:** IMPL-EVAL for #1957 via the GitHub `openhands-phase-eval` automation, recovery attempt
+  bounded to iterations 200 on request.
+- **Reality:** `.github/workflows/openhands-phase-eval.yml:320` hardcodes
+  `iterations = phase==='plan' ? 500 : 800`; the direct-comment path is refused
+  `phase-already-recorded` (`openhands-comment-trigger.mjs:142`) once any prior comment carries the
+  `{generation, phase, head}` marker — cancelling the auto run does not release the claim. Net: no
+  hosted path can honour a bounded retry at the same head. Separately, hosted evaluators for #1953
+  twice returned NONE because the agent never wrote `evaluate.md` (`preserve-eval=failure`).
+- **Resolution:** coordinator sanctioned the local `agentic:claude-openrouter` route
+  (z-ai/glm-5.3-flash xhigh, detached worktree at the exact head, compact brief, evaluator writes
+  `evaluate.md` + PR-comment file; supervisor commits the record on the orchestrator branch and
+  posts the comment). #1957 PASS obtained this way; #1953 dispatched the same way after its second
+  hosted NONE.
+- **Follow-up (not this run):** phase-eval should accept an `iterations=` cap from the trigger
+  comment and release the claim when the claimed run is cancelled before model evaluation; the
+  evaluator prompt should refuse to finish without a verdict file. Candidate issue under #574.
