@@ -10986,3 +10986,6 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 
 - main `7d1faa352`. Converged #1943→`7e16727b0`, #1948→`958150d83`, #1664→`9e0936440` (corpus regenerated; only conflict was the generated corpus; four admission gates 0 each; no slice-owned file moved). Detached packet-waits post the exact-head packet on green (`/home/agent/observability/pw-<pr>.log`).
 - Slice E dispatched on `0faae3fde` (main+B+D, zero conflicts). Slice A live on #1664.
+- 20:14Z — #1943 packet posted at exact head `7e16727b0` (main `b847d6aaa` disjoint, clean merge).
+- 20:16Z — #1943 merged `3c8b0fd18`. #1948 carries clean at `958150d83` (packet posted). #1664 converged → `ad50a5e22` (corpus only; gates 0).
+- 20:17Z — #1948 merged `3a794be67`. Slices B, C, D on main; #1664 `ad50a5e22` MERGEABLE (still on #1845). E base is now a subset of main.
