@@ -7633,3 +7633,56 @@ capacity for a result that cannot stick.
 This needs no owner decision: S8 is already fully green, packeted, and `status:ready-merge`
 (14 SUCCESS / 0 not-green / MERGEABLE / CLEAN at `ce7e82a76`). Merging it in the normal course both
 ships gate 1 of #863 and retargets S9/S10 onto a main that carries #1846.
+
+## D-297 — the eviction mechanism, corrected: stale branches cancel *fixed* branches
+
+D-296 concluded that S8's merge was the only way to get #1846 to S9/S10, because a PAT cannot push
+workflow changes. Both halves of that were wrong in an important way, and the internals session
+(#1908) supplied the real mechanism:
+
+#1846 replaced the runtime tiers' `cancel-in-progress: true` with `cancel-in-progress: false` plus
+bounded `queue: max`. But **GitHub applies the arriving run's own concurrency config**, and the tier
+groups are repo-wide literals (`e2e-scaffold-runtime-global`, `e2e-scaffold-runtime-sqlite-global`).
+A run from a pre-#1846 branch joins the same mutex carrying `cancel-in-progress: true` and cancels
+whatever is in progress — **including branches that already carry the fix**. Internals observed it
+directly on PR #1889 (run `33592310517`): both tiers started 04:50:48Z and were cancelled mid-flight
+with no newer run on that ref, the docker cancellation landing seconds after a run from one of my
+branches arrived.
+
+Two corrections fall out:
+
+1. **My branches were not only victims, they were the cause.** S8, S10 and S11 were all forked from
+   `e938ecd31` (pre-#1846). My earlier serialization correction on #1759 was directionally right —
+   fewer arrivals, fewer evictions — but attributed it to generic contention rather than to stale
+   configs actively evicting fixed ones.
+2. **The scope wall has a way through.** A PAT cannot *author* a workflow change — hand-applying
+   #1846's hunk to a branch is refused at push time — but **merging main is accepted**, because the
+   resulting blob already exists on the remote. Cherry-pick is blocked; merge is not. That is what
+   D-296 missed, and it makes per-branch integration available after all.
+
+Acted on: S10 integrated at `d986566e2` (both tiers now `cancel-in-progress: false` + `queue: max`).
+S8 and S11 are deliberately held — both are mid-verdict on coordinator-required delta evaluations,
+S8's tiers are already green at `ce7e82a76`, and neither has a pending runtime dispatch, so neither
+can evict anyone while it sits. Eviction risk exists only at dispatch time.
+
+## D-298 — S13 converged onto `d5c5810db`; the parity gate is finer-grained than box 1's sweep
+
+Static convergence only, no runtime dispatch. One conflict, `ownership.ts`: S13's own change there
+was a single line narrowing the MCP matcher from `aspire mcp` to `aspire agent mcp`. Main — via S7
+(#1744), now merged — already carries `/(?:^|\s)aspire\s+(?:agent\s+)?mcp\b/i`, which matches both.
+Verified by execution:
+
+    "aspire mcp serve"        main=true   s13=false
+    "aspire agent mcp serve"  main=true   s13=true
+
+S13's line was not merely redundant — it would have **narrowed** detection and lost the bare form.
+Took main's version outright. Teardown suite 58 passed / 0 failed, so #1887's semantics survive.
+
+`check:aspire-version-parity` then reported exactly one `fail`: the surface manifest stale after the
+merge, owner S13. Regenerated; the gate now exits 0 with `fail: 0` over 813 checked paths, 22
+deferred to owning slices, 5 archival info.
+
+**This supersedes part of D-294.** I had reconstructed the ownership split for box 1 by hand. The
+repo's own parity gate already does it, and better: it attributes every remaining stale literal to
+its owning slice (S9, S11, S3, S1/S4, `derived`, `archival`) rather than counting them against S13.
+Box 1's raw `git grep` sweep is the cruder instrument; the gate is the one that reflects ownership.
