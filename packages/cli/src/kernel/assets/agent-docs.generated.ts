@@ -329,6 +329,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
     './domain',
     './ports',
     './presets',
+    './sdk',
     './streams',
     './telemetry',
     './testing',
