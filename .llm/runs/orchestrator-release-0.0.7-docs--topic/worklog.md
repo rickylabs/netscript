@@ -4113,3 +4113,49 @@ stated in the body and an explicit offer to move it to Backlog — it repairs a 
 0.0.7 and is dropping diagnostics on main today, which is why I did not leave it unmilestoned.
 
 Still `status:impl`; separate-session IMPL-EVAL is the next step.
+
+## 2026-09-02 — #1914 evaluation dispatched; bounded adjunct audit of S9 (#1721/#1759)
+
+**#1914 IMPL-EVAL dispatched** at exact head `b00ff6f5f` (GLM 5.3 Flash · `max`, isolated worktree).
+The brief requires it to reproduce the 7 dropped diagnostics on base itself, prove the enforcement
+bites *while siblings classify*, build its own leak probe rather than trust mine, and verify every
+added import specifier against `packages/plugin/deno.json`.
+
+I also put two things in front of it that I would otherwise be marking myself on: that **I edited
+#1892's acceptance criteria before implementing** (unwrapping two hard-wrapped boxes, correcting a
+stale `116/20` — the ceiling became 14 in #1756 after filing — and adding a fourth box for scope the
+issue gained by comment), and whether my box-4 test **actually proves** the no-leak property or is a
+proxy that could pass while the property is false. Editing acceptance to match your own
+implementation is precisely the move that deserves an outside opinion.
+
+That fourth box also caught me short: it demanded a regression test I did not have. Added rather than
+claimed — `exampleSymbolImport` exported and asserted to emit a module-scoped import and never a
+`declare global`, plus the skip cases. Compiler suite 15/15.
+
+Acceptance-evidence block staged in the PR body (one block, four entries). `close-gate` fails for
+exactly one verified reason: `Mirror skipped because live PR labels do not include
+status:ready-merge`. On PASS it is label → rerun once → packet.
+
+### Bounded adjunct audit — S9 (#1721), reported on #1759, ownership untouched
+
+Both findings I had reported to #1721 earlier are **fixed**: no `13.4.6` remains, and
+`aspire resources` is now correctly documented as a 13.5.3 alias of `aspire describe` (confirmed
+against the installed CLI, including `--format <Json|Table>`). The 14-tool table is internally
+consistent with the recorded fixture, and `get_integration_docs` is correctly described as
+documented-but-unobserved.
+
+**One new finding, and the PR's own fixture is the disproof.** `SKILL.md` introduces AppHost mode and
+dashboard-only mode together, says "It exposes the same data", and then presents the 14-tool table
+with no mode distinction. `aspire-13.5.3-mcp-recorded.json` records `dashboardTools` as **3** —
+`list_structured_logs`, `list_traces`, `list_trace_structured_logs` — against `tools` = 14. The code
+already knows: `aspire-mcp-smoke_test.ts` consumes `fixture.dashboardTools` separately in four
+places. Only the prose merges the modes.
+
+It bites rather than being cosmetic because the same section says *"if these tools are absent from
+your tool list, use the CLI"* — which is exactly the symptom of running dashboard-only mode, so the
+documented remedy explains away the real cause. Suggested a one-line fix naming the subset; the
+fixture already carries the evidence, so no new capture is needed.
+
+Three attributed observations (cold-start timings, `otel logs` exit 12, automatic orphan removal)
+were **not** verified — they need a host runtime lease I did not take for a docs audit, and they
+carry S2/S9 evidence keys, which is the right form. Said so rather than implying coverage.
