@@ -61,6 +61,9 @@ export const GATE_PHASE = {
   CLEANUP: 'cleanup',
 } as const;
 
+/** Stable receipt gate id for the generated Aspire MCP server. */
+export const AGENT_ASPIRE_MCP_SMOKE = 'agent.aspire-mcp-smoke';
+
 /** Static gate ids used by the scaffold plugin suite. */
 export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
@@ -68,6 +71,7 @@ export const GATE = {
   SCAFFOLD_INIT: 'scaffold.init',
   SCAFFOLD_SERVICE_CLIENT_ADD: 'scaffold.service-client-add',
   SCAFFOLD_SERVICE_CLIENT_GENERATE: 'scaffold.service-client-generate',
+  SCAFFOLD_AGENT_INIT: 'scaffold.agent-init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
   CONTRACT_LIST: 'contract.list',
@@ -130,6 +134,7 @@ export const GATE = {
   RUNTIME_WAIT_APP: 'runtime.wait.app',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
   RUNTIME_RESOURCE_COMMAND: 'runtime.resource-command',
+  AGENT_ASPIRE_MCP_SMOKE,
   RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',

@@ -1,0 +1,28 @@
+// @netscript/directory-role components: server-rendered markup only
+import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
+import { Card } from '@app/components/ui/mod.ts';
+import {{resourcePascalCase}}Island from '../(_islands)/{{resourcePascalCase}}Island.tsx';
+import { load{{resourcePascalCase}}Resource } from '../(_shared)/{{resource}}-loaders.ts';
+
+type Props = NonNullable<
+  InferDefinePageLayerLoaderProps<typeof load{{resourcePascalCase}}Resource>
+>;
+
+export function {{resourcePascalCase}}View(props: Props) {
+  return (
+    <Card>
+      <Card.Header>
+        <Card.Title>{{resourcePascalCase}}</Card.Title>
+        <Card.Description>
+          Contract-derived data from {{queryFactory}} with server cache hydration.
+        </Card.Description>
+        <div class='flex flex-wrap gap-2 text-xs text-ns-muted-fg'>
+          <span class='rounded-full border border-ns-border px-2 py-1'>Cache-first query</span>
+{{viewOptionLinks}}        </div>
+      </Card.Header>
+      <Card.Body>
+        <{{resourcePascalCase}}Island {...props} />
+      </Card.Body>
+    </Card>
+  );
+}

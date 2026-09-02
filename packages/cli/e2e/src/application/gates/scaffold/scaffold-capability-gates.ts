@@ -2,6 +2,7 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
 import { GATE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
+import { createAspireMcpSmokeGate } from './aspire-mcp-smoke.ts';
 import {
   createBehaviorPluginHealthGates,
   createBehaviorPluginUnhealthyGates,
@@ -64,6 +65,7 @@ export function createScaffoldCapabilityGates(
     ...runtimeGates.slice(0, startIndex + 1),
     ...residentDatabaseGates,
     ...runtimeGates.slice(startIndex + 1),
+    createAspireMcpSmokeGate(),
     ...createListenerReadinessGates(database),
     createTypedDbPhaseBGate(),
     ...createRuntimeBehaviorGates(database),

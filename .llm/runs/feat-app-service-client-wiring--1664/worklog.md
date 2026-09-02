@@ -611,3 +611,56 @@ The exact-head CI browser lane remains the decisive hydration observation. The t
 | Lock integrity | 0 | Byte-identical to HEAD and main; SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d` |
 
 No Aspire, Docker, browser, runtime-tier, or `e2e:cli` command was run.
+
+## 2026-09-02 S9 convergence onto `88fc6d69d`
+
+### Design and merge contract
+
+- Archetype: 6 — CLI / Tooling. This is a mechanical convergence slice with no public or feature
+  contract change.
+- PLAN-EVAL: N/A — the coordinator supplied the exact parents, three conflict paths, resolution
+  rule, generated-carrier policy, and gate set. No architecture or sequencing decision remained.
+- Parent 1: `ad50a5e22820178019cfeafe5989744e25ef9831`; parent 2:
+  `88fc6d69dd3287c2d5bcb75dbef751c982d596e0`.
+- Conflict rule: preserve the branch's service-client gate sequence and S9's agent-init/MCP-smoke
+  registrations, without reordering either side's existing entries.
+
+### Conflict resolutions
+
+| Path | Resolution |
+| --- | --- |
+| `packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts` | Kept the branch's service-client add, generate, and generated-contract command gates in their existing order, then kept S9's scaffold agent-init command gate before the shared service-list tail. |
+| `packages/cli/e2e/src/domain/cli-surface.ts` | Kept the branch's two service-client scaffold IDs and S9's scaffold agent-init ID in their respective order. S9's `agent.aspire-mcp-smoke` receipt-gate ID/export remains present. |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts` | Kept the branch's service-client add/generate entries and S9's agent-init entry before the existing UI/runtime tail. S9's Aspire MCP smoke gate remains in the runtime suite. |
+
+All staged generated paths were first restored from `origin/main`. The MCP corpus generator's
+normal write mode refused the unresolved merge's dirty package read set, so its documented
+`--allow-dirty` merge override was used; the later check mode passed. The Aspire surface manifest
+was regenerated to 915 rows / 0 unmatched. `check:assets-barrel` then regenerated the combined
+branch carrier and passed after that generated result was staged.
+
+### Validation
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| Structured CLI check | 0 | 970 selected files / 9 batches / 0 failed batches / 0 diagnostics |
+| Full `packages/cli/e2e/tests/` unit directory | 1 | 305 passed / 2 failed / 0 ignored; both failures are the previously recorded no-exec sandbox temp-fixture spawn limitation in `service-client-runtime-probe_test.ts` |
+| `suite-registry_test.ts` | 0 | 20 passed / 0 failed / 0 ignored |
+| `check:mcp-export-corpus` | 0 | 35 packages / 273 subpaths / 7,846 symbols; SHA-256 `cc64442fb17e54e59924574afd87a48a7ad25b25f0ebdb5de079c60d6b38d06d` |
+| `check:assets-barrel` | 0 | Combined generated asset carrier is current |
+| `check:publish-assets` | 0 | Published asset set is current |
+| `check:aspire-version-parity` | 0 | Expected 13.5.3; 914 checked / 0 failed / manifest fresh |
+| `docs:readme-fences` | 0 | 169 fences / 74 TS-like / 74 checked / 7 tolerated type errors / 0 unattributed failures |
+| `arch:check` | 0 | Dependency and doctrine scans completed with warnings only / 0 failures |
+| Lock identity | 0 | Byte-identical to both parents; SHA-256 `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` |
+
+### Product-diff attribution
+
+- The staged merge-tree comparison from `ad50a5e22` found 57 non-generated `packages/**` or
+  `plugins/**` paths: 53 are byte-identical to `origin/main` and therefore pure S9 arrivals.
+- The three hand-resolved paths differ from `origin/main` only by this branch's pre-existing gate
+  entries. `suite-registry_test.ts` also differs from both parents because Git merged both sides
+  automatically; `git log ad50a5e22..origin/main -- <path>` attributes S9's side of that file to
+  `88fc6d69d`.
+- No unmerged entries remain. No Aspire, Docker, browser, hosted-runtime, or `e2e:cli` command was
+  run.

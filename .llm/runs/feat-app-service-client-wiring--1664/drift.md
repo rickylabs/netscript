@@ -134,3 +134,15 @@
 - General lesson: on a branch with more than 160 changed files, a truncated touch-set display is not
   an ownership proof. Use untruncated path queries plus per-ref fence extraction before assigning a
   ratchet delta.
+
+## 2026-09-02 — clean-read-set generator guard during a merge
+
+- Severity: convergence mechanics; no scope or product-contract change.
+- `gen:mcp-export-corpus` initially refused to run because an unresolved merge necessarily presents
+  S9's package changes as a dirty staged read set. After the three source conflicts were resolved,
+  the generator was rerun with its explicit `--allow-dirty` override; the non-writing
+  `check:mcp-export-corpus` mode then passed against the combined tree.
+- `check:assets-barrel` also performed the required downstream regeneration: its first diff named
+  only `embedded.generated.ts`, and it passed after that generated combined-head carrier was staged.
+- General lesson: merge convergence can require an explicitly recorded dirty-read override for a
+  generator, but the final clean/check mode remains the verdict and must pass before delivery.

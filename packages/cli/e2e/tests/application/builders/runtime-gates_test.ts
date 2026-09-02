@@ -208,6 +208,22 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command.at(-1), '300');
 });
 
+Deno.test('Aspire restart fallback binds aspire.config.json to the AppHost workspace', () => {
+  const context = s8RuntimeContext();
+
+  for (const gateId of [GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB]) {
+    const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) => entry.id === gateId);
+    if (gate?.kind !== 'command') {
+      throw new Error(`Expected ${gateId} to be a command gate.`);
+    }
+
+    const command = gate.command(context);
+    assertEquals(command[3], '/workspace/app/aspire/apphost.mts');
+    assertEquals(command[4], '/workspace/app');
+    assertEquals(command[5], '/workspace/app/aspire/aspire.config.json');
+  }
+});
+
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
   const gate = createRuntimeBehaviorGates().find((entry) =>
     entry.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT
