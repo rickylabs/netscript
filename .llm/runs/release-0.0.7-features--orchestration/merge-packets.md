@@ -237,3 +237,292 @@ This lands the `#1348` epic's structural entry point, which #1352/#1353/#1467 we
 | --- | --- |
 | **#1762** | **#1828** (`deno.unstable` lib parity) — `MERGEABLE/CLEAN` and close to landing. #1762 then needs only a `check-test` re-run plus its queued hosted `scaffold.runtime`; **no product change**. |
 | **#1664** | `behavior.service-client-refetch`. Now **71/72** runtime gates green after the `--client` repair. The remaining failure is attempt 7's original red, reproduced on **current `main`** rather than the 53-commit-stale base — so D-22's "untestable" objection is retired and the defect is real. Needs a bounded investigation of the optimistic `onSettled`/rollback path: new product work, not integration repair. |
+
+---
+
+## Reconciliation against main `b66e52cbc` (#1860, Docs) — measured 2026-09-01
+
+`#1860` = `docs(plugins): remove fabricated /scaffolding sub-path` — docs prose **plus four
+generated carriers**. Overlap measured per leaf against its own merge-base, not assumed:
+
+| Leaf | Files | Overlap with `#1860` |
+| --- | --- | --- |
+| **#1848** `e820f7b29` | 18 | `packages/cli/src/kernel/assets/agent-docs.generated.ts` — **carrier only** |
+| **#1842** `e84f6fb41` | 14 | none |
+| **#1864** `63e8ab4f5` | 26 | none |
+| **#1861** `ebf8f9ad0` | 8 | none |
+
+**No product overlap anywhere.** Per the coordinator's standing rule, no already-valid product work
+is restarted.
+
+### #1848 — rehearsed, not guessed
+
+Synthetic `merge-tree` is clean (`abe0c347e`). Because a generated carrier that merges *textually*
+is not thereby *canonical*, the merge was rehearsed in a throwaway worktree and the full cascade
+(`gen:agent-docs-prose` → `assets-barrel` → `mcp-export-corpus` → `publish-assets`) run on the
+result. The agent-docs carrier came back **byte-clean** — the textual merge already equals
+regeneration, so #1848 needs no carrier repair for it. Both scratch worktrees were removed.
+
+### Finding — #1848 publishes an export subpath that no gate polices
+
+Regeneration on the merged tree leaves `export-surface-corpus.generated.ts` dirty. A/B against
+**clean main** proves the split:
+
+| | subpaths | symbols |
+| --- | --- | --- |
+| clean `b66e52cbc` regenerated | 271 | 7782 |
+| #1848 merged, regenerated | **272** | **7789** |
+
+Main is stale on its own (that is #1859/#1862's fix, not chargeable here) **and** #1848 adds
+**+1 subpath / +7 symbols** of its own via `./navigation`. #1848 never regenerated the corpus, and
+`check:mcp-export-corpus` is **absent from its CI job list** (trap 6 — it is not in the shared
+catalog). So merging #1848 as-is silently re-creates the staleness class that #1857 exists to close.
+#1848 must carry its own corpus regeneration at the final seam.
+
+### Ordering consequence for the coordinator
+
+`#1862` (corpus fix) must land first; then **#1842 and #1848 each regenerate the corpus**, so they
+collide with each other and cannot be reconciled in parallel. Sequence: `#1862` → one of
+{`#1842`, `#1848`} → the other regenerates on top. Merge order is the coordinator's call.
+
+---
+
+## Evaluator-evidence audit — all five active leaves, 2026-09-01
+
+Per the coordinator's control-plane warning, `status:impl-eval` was treated as **claim, not
+evidence**. Each leaf was checked for a real runner session **and** a genuine verdict artifact.
+
+### How to tell a genuine verdict from a prompt (this filter has misled twice)
+
+Verdict comments and dispatch prompts share the **same author** (`rickylabs` — the runner posts under
+the repo-owner token), and prompts quote `OPENHANDS_VERDICT` verbatim. Author filtering does not
+work. Discriminate by **body shape**:
+
+| Shape | Meaning |
+| --- | --- |
+| opens `@openhands-agent model=…` | dispatch **prompt**, not a verdict |
+| contains `<!-- openhands-agent-summary -->` + `openhands-run: {"run_id":…}` | genuine agent summary |
+| opens `OPENHANDS_VERDICT: <V>` with base/head attestation | genuine **verdict** |
+
+### Findings
+
+| Leaf | Label claimed | Reality found | Action |
+| --- | --- | --- | --- |
+| **#1848** | `status:impl` | real eval live (`33477762017`, `issue_comment`) | none |
+| **#1842** | `status:impl` | none, correctly — held for #1862 | none |
+| **#1864** | `status:impl-eval` | real eval live, **plus a duplicate** | deduped |
+| **#1861** | `status:impl-eval` | real eval live, **plus a duplicate** | deduped |
+| **#1664** | `status:impl-eval` | **phantom** — newest genuine verdict is `FAIL_FIX` at **`3e7a0e2e5`**, three repair slices stale; current head `377811da8` never evaluated | fresh eval dispatched |
+
+### The automation gap, stated precisely
+
+`ready_for_review` fires the runner with `authorize: skipped` / `agent: skipped` — a **2-second
+no-op** (`33478760878`, `33478763335`) — while the label still advances to `status:impl-eval`. A
+separate automation comment *does* spawn a real `issue_comment` run, so evaluation is not always
+absent; what is unreliable is the **coupling**. The label can lead, lag, or outlive the evidence, as
+#1664 shows: it kept `status:impl-eval` across three repair slices with no evaluator at the new head.
+
+**Rule adopted:** never infer evaluation from the label. Require a live runner session **or** a
+shape-verified verdict comment **pinned to the current head**. Before manually dispatching, list
+existing runner runs for the PR — my #1864/#1861 dispatches raced automation comments already in
+flight and created duplicates (`33478766019`, `33478767799`, cancelled; head-pinned briefs kept).
+
+**Second duplication mechanism, measured separately:** a *single* dispatch comment can spawn **two**
+runner runs ~20 s apart (#1664 comment `06:50:03` → `33479325247` at `06:50:06` **and**
+`33479351700` at `06:50:26`). So duplicates arise both from racing automation *and* from one comment
+alone. **Always re-list runner runs ~60 s after dispatching and cancel all but one.**
+
+---
+
+## Ownership-label reconciliation, 2026-09-01
+
+All open PRs enumerated and keyed by `orchestrator:*`. **All five Features leaves already carry
+`orchestrator:features`** and are complete on every taxonomy axis (`type:`/`area:`/`priority:`/
+`wave:` + milestone `0.0.7`): #1664, #1842, #1861, #1864, #1848. No lifecycle status was touched.
+
+One accuracy repair: **#1848 gained `area:cli`** — it changes hand-written
+`packages/cli/.../netscript-web-runtime-closure.ts`, not just `packages/fresh`, so an `area:cli`-keyed
+audit would have missed it.
+
+**Outside this lane — flagged, not claimed:** PR **#1856** (`fix/fresh-form-navigation-drop`,
+`Closes #1609`) is the **only** open PR in the repository with **no `orchestrator:` label at all**. It
+is **not** Features': #1609 is labelled `orchestrator:fixes`. It also carries **no milestone and no
+labels whatsoever**, so it is invisible to every keyed audit including its own lane's. Reported to the
+coordinator rather than labelled here — mislabelling it into Features would corrupt the ownership
+signal the audit depends on.
+
+---
+
+## Evaluator verdicts landed, 2026-09-01
+
+| Leaf | Head | Verdict | Note |
+| --- | --- | --- | --- |
+| **#1848** | `e820f7b29` | **PASS** | fresh verdict; both prior `FAIL_FIX` HIGHs verified closed |
+| **#1664** | `377811da8` | **PASS** | supersedes `FAIL_FIX` at `3e7a0e2e5`; `--client` repair confirmed *by design*, gate diff is exactly `+ '--client', 'users'` — **no gate reordering** |
+| #1861 | `ebf8f9ad0` | running | exact CI green |
+| #1864 | `1b5ef859e` | running | product findings survive convergence (byte-identical) |
+
+### Audit mechanic — the summary comment is created at dispatch and updated in place
+
+`created_at` on an `<!-- openhands-agent-summary -->` comment is **dispatch time, not verdict time**;
+the body is rewritten when the run completes. #1848's summary reads `created_at 06:29:05` while its
+substantive verdict comment is `06:56:13`. Judging elapsed evaluation time from the summary's
+`created_at` makes a 27-minute evaluation look like a 24-second one — i.e. like a rubber stamp. Read
+the linked verdict comment, or the run's own completion time.
+
+### #1864 convergence onto `8e01a347a`
+
+Three-carrier conflict (`prose.json.gz`, `provenance.json`, `agent-docs.generated.ts`) — `prose.json.gz`
+is **binary and cannot be hand-merged at all**. Resolved by taking main's version and regenerating;
+gates green before commit. All **7** Slice P product files verified byte-identical to `1b5ef859e`
+through the merge, so no completed evaluation is restarted. Head `ee841c158`.
+
+### #1864 — the carrier cascade takes two rounds, and CI only shows one at a time
+
+The `quality` job runs carrier gates **sequentially and fails fast**, so each round exposes exactly
+one stale carrier. Two rounds were needed:
+
+| Round | Head | Failing gate | Cause |
+| --- | --- | --- | --- |
+| 1 | `63e8ab4f5` | `check:agent-docs-prose` | Slice P source feeds the prose corpus; never regenerated |
+| 2 | `ee841c158` | `check:publish-assets` | `publish-assets.generated.ts` **embeds** the corpus, so regenerating prose staled it downstream |
+
+Green at **`b1422d6b0`**: `check:agent-docs-prose` 0, `check:assets-barrel` 0, `check:publish-assets` 0.
+**Lesson: after regenerating prose, run the whole downstream cascade locally rather than the one gate
+CI happens to be showing** — `prose → assets-barrel → publish-assets`. `mcp-export-corpus` is
+deliberately excluded: its staleness is main-side and belongs to #1862.
+
+**Product attribution at the converged head.** Seven non-generated product files differ from the
+evaluated `1b5ef859e`, and **all seven are main's own** (each has a non-empty diff in
+`78be0e032..8e01a347a`): `packages/ai/*` ×3, `packages/cli/.../import-resolver*` ×2,
+`packages/fresh-ui/deno.lock`, `packages/fresh/deno.json`. Slice P's own **7 files are byte-identical**
+to the evaluated head, so the running evaluation is not restarted.
+
+---
+
+## MERGE PACKETS — #1861 and #1864, verified 2026-09-01
+
+Both are **`status:ready-merge`**, independently evaluated PASS, and **file-disjoint from each other
+and from the #1862→#1848→#1842 chain**. Neither needs #1862.
+
+| | **#1861** | **#1864** |
+| --- | --- | --- |
+| Issue | #1451 Slice C (JobConfig schema) | #1592 Slice P (progress transport) |
+| Exact head | `ebf8f9ad0` | `b1422d6b0` |
+| IMPL-EVAL | **PASS** (`5490251080`, 07:09:53) | **PASS** (07:12:57) |
+| Failing checks | **0** | **0** |
+| Mergeable | `MERGEABLE/CLEAN` | `MERGEABLE/CLEAN` |
+| Synthetic merge vs `d2b33a09b` | **CLEAN** | **CLEAN** |
+| `closingIssuesReferences` | **0** — merging leaves #1451 open | **0** — merging leaves #1592 open |
+| Milestone | 0.0.7 | 0.0.7 |
+
+#1864 carries a two-round carrier repair on top of the evaluated `63e8ab4f5`; its **7 product files
+are byte-identical** to the evaluated head, so the PASS stands at `b1422d6b0`.
+
+## Evaluator time-bound: #1861's run delivered, so no second evaluator was launched
+
+The coordinator's 15-minute bound was real — run `33478869259` ran **06:43:51 → 07:12:14 (~28 min)**.
+But it **completed `success` with a genuine verdict**: comment `5490251080` at 07:09:53, 4,614 chars,
+`[PHASE: IMPL-EVAL] [VERDICT: PASS]` pinned to head `ebf8f9ad0`, verifying `int().nonnegative()` with
+`maxConcurrency: 0` pinned by test and defaults byte-equal to the pre-existing runtime fallbacks.
+
+Launching the direct OpenRouter evaluator would have **re-evaluated an already-evaluated leaf**, so it
+was not launched. This is a completed evaluation, not a stalled one. A second opinion remains
+available on request — that is a different purpose from recovering a missing verdict.
+
+**Corollary:** a long OpenHands run is not evidence of a stall. Genuine IMPL-EVALs in this lane have
+run 26–28 minutes (#1848: 27 min; #1861: 28 min). Judge liveness by **run status**, never by elapsed
+time or by the summary comment's `created_at` (which is dispatch time).
+
+## Main `d2b33a09b` (#1640, RFC 0006 accepted; Prisma deferred)
+
+**0 carriers, 0 product files** across 44 changed paths — docs/RFC only. Overlap with every active
+leaf: **none**. No leaf is re-converged for it; re-running CI would prove nothing. Recorded as the
+convergence target for the next real seam.
+
+---
+
+## Correction — the corpus ordering claim was wrong (2026-09-01)
+
+I wrote, in `d5e2a68c5` and in reports, that #1848's `+1 subpath / +7 symbols` was "recorded for the
+corpus refresh to pick up" by #1862. **That is not possible.** #1862's head `5917c2b36` does not
+contain the `@netscript/fresh/navigation` surface, so it cannot generate a corpus entry for an
+entrypoint that is not yet on its base. A PR cannot pick up an unmerged surface.
+
+Measured at `d38158176`: committed corpus `271 / 7782` (pre-navigation), `check:mcp-export-corpus`
+**exit 1**, attributable to this PR.
+
+**Correct order, now enforced by `/home/agent/observability/seam-1848.sh`, which aborts if #1862 is
+not an ancestor of main:**
+
+1. #1862 merges (Internals).
+2. #1848 rebases onto that merge.
+3. The **combined** corpus + carriers regenerate in #1848 — one regeneration containing both #1862's
+   main-side refresh and this leaf's navigation entrypoint.
+4. Focused delta eval + current CI.
+5. Packet.
+
+**Consequence for #1842:** it is stacked on #1848 and already regenerated a corpus to `272 / 7790`.
+That regeneration is likewise ahead of #1862 and must be redone after #1848's post-#1862 rebase. Its
+CI *does* gate `check:mcp-export-corpus` (#1848's does not), which is why it regenerated at all — but
+the ordering is the same, so it re-stacks on the corrected #1848 head rather than merging first.
+
+**Generalisation worth keeping:** "a later carrier PR will absorb my delta" is only true when that PR's
+base already contains the surface producing the delta. Check ancestry before making that claim; the
+convenient assumption is the one that fails silently at merge.
+
+---
+
+## MERGE PACKET — #1848 (#1590 Slice 1), head `53398a818`
+
+| Field | Value |
+| --- | --- |
+| Exact head | **`53398a818`** |
+| CI | **5/5 SUCCESS** — check-test, quality, close-gate, build, code-quality |
+| Mergeable | `MERGEABLE/CLEAN`, non-draft |
+| Review threads | **0 threads, 0 unanswered** (`review-threads PASS`) |
+| Milestone | 0.0.7 |
+| `closingIssuesReferences` | **0** — merging leaves #1590 open; Slice 2 owns the hosted A→B→A browser proof |
+| Labels | `orchestrator:features`, `type:fix`, `area:cli`, `area:fresh`, `priority:p1`, `wave:v1` |
+
+**IMPL-EVAL: PASS at `e820f7b29`, carried by byte-identity.** Every source file this leaf authored is
+byte-identical between the evaluated head and `53398a818` — the six navigation modules, the type
+fixture, and `netscript-web-runtime-closure.ts`. **Zero source code changed since the verdict.** Only
+`README.md` (audit-mandated paragraph move) and `deno.json` (main's `@tanstack/ai` bumps arriving
+through the merge, `./navigation` intact) differ.
+
+**Corpus, in the corrected order.** #1862 merged first (`82a2527e2`), then this leaf regenerated:
+`271/7782 -> 272/7789`. The `+1 subpath / +7 symbols` is `./navigation`'s public surface exactly —
+2 values, 5 types — matching the reference page. `check:mcp-export-corpus` **0**, previously red.
+
+**One open item, stated rather than glossed:** the bounded delta evaluation (run `33534554636`) is
+in flight. It verifies the byte-identity carry claim first and judges only the four deltas (corpus,
+reference page, README move, drift-checker count). The packet is complete on every other axis; the
+label flips to `status:ready-merge` on its PASS.
+
+---
+
+## MERGE PACKET — #1842 (#1452 Slice 2), head `826ad4946`
+
+| Field | Value |
+| --- | --- |
+| Exact head | **`826ad4946`** |
+| CI | **5/5 SUCCESS** — check-test, quality, close-gate, build, code-quality |
+| Mergeable | `MERGEABLE/CLEAN`, non-draft |
+| Review threads | **0 / 0 unanswered** |
+| Milestone | 0.0.7 |
+| `closingIssuesReferences` | **0** — merging leaves #1452 open |
+| Labels | `orchestrator:features`, `type:feat`, `area:cli`, `area:plugins`, `priority:p2`, `wave:v1`, `status:ready-merge` |
+
+**IMPL-EVAL PASS at `a203a52f3`**, carried by byte identity: all **5** product files in that head's
+touch set are byte-identical at `826ad4946`. Note the evaluated head is `a203a52f3`, **not** `e84f6fb41`
+— an earlier packet draft compared against the wrong baseline; the carry proof above uses the head the
+verdict actually cites.
+
+**Corpus, in the corrected order.** Re-stacked onto merged main `102ef8a10` after #1848 shipped. Six
+carrier conflicts resolved by taking main's and regenerating. Corpus `272/7789 -> 272/7790`: the `+1`
+is this leaf's own structural service-context surface, while `./navigation`'s `+1/+7` now arrives from
+main via #1848 rather than being carried here.
+
+Design constraint held: **no concrete `@netscript/plugin` -> `@netscript/kv` dependency**. The factory
+stays structural/injected over caller-supplied async resolvers, per the owner ruling.

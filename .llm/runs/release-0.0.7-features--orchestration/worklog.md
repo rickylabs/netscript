@@ -9391,3 +9391,152 @@ optional — an internal inconsistency. Recommended in-ceiling fix recorded on t
 
 Re-dispatched (`qwen/qwen3.8-flash · max`) in detached `ns1349-planeval` at `4b520ea44`. First attempt
 died on SIGTERM/143; relaunched with `setsid nohup`, confirmed alive and reading the SDK type surface.
+
+---
+
+## Rotation resume — 2026-09-02 ~10:00–10:35Z (Opus 5 · xhigh · supervise-only · Remote Control)
+
+Resumed from `RESUME.md`, `queue.md`, `merge-packets.md` and live GitHub. `main` re-fetched to
+`77ad823dc` (#1910 concurrency isolation, #1911 skill single-source, #1889 transport policy, #1756
+JSDoc gate, #1907 aspire skill). Every claim below is measured at a named head.
+
+### Shipped since the last checkpoint, discovered on resume rather than assumed
+
+`#1841` (#1349 S2), `#1886` (#1349 S3), `#1861` (#1451), `#1864` (#1592), `#1848` (#1590 S1) all
+**merged**. #1451 and #1592 are `status:shipped` and closed. **#1349 is still open** with all ten
+acceptance boxes unticked and no open PR to attach an evidence block to — see "Open supervisor debt".
+
+### Live worker roster — five, all detached, all measured alive
+
+| Issue | PR | Worktree | Thread | Route | State |
+| --- | --- | --- | --- | --- | --- |
+| #1590 S2 | #1895 | `007-leaf-1590-s2` | `01a060be-6b53-7962-88a2-f80a51a4010a` | Sol · medium | **completed**, pushed `31f4ff8a1` |
+| #1897 | — | `007-leaf-1897` | `01a0619a-11e3-7c61-963d-6dae0a4a80d3` | Sol · low | running |
+| #1355/#1360 | #1664 | `007-leaf-1664` | `01a0585d-94e1-70b0-a1c2-6f9654179b0e` | Sol · high | running |
+| #1353 | — | `007-leaf-1353` | `01a061a8-2a71-7f33-be7e-72b314c5619c` | Sol · medium | running |
+| #1467 | — | `007-leaf-1467` | `01a061a8-2a32-7733-86fc-2789efcb5dd1` | Sol · high | running |
+
+### #1842 (#1452 S2) — integrated to `77ad823dc`; head `d1697421c`
+
+Merged `main` with **zero conflicts**, then found and repaired a defect the merge could not fix.
+
+**`packages/fresh/README.md` carried a duplicated "Ordered partial navigation" section** — two `###`
+headings, at lines 158 and 198, against main's single one at 162. Cause: the earlier re-stack onto
+#1848 kept the *leaf-side* copy of a section #1848 had **moved** before merging, so main's moved copy
+arrived through the merge alongside the leaf's stale one. The leaf owns nothing in that file;
+main's version was taken verbatim and the file is now byte-identical to `origin/main`.
+
+Generalisation worth keeping: **a re-stack that resolves a file by keeping "our" side is only safe
+when this branch actually owns content in that file.** For a file the branch merely inherited, "ours"
+is a stale snapshot, and the duplication it creates survives every later clean merge silently.
+
+Carriers regenerated at the integrated head — `assets-barrel` and `publish-assets` already current;
+`mcp-export-corpus` refreshed to `4d383b1e…` / 272 subpaths / 7804 symbols, `check` exit **0**.
+`deno.lock` byte-identical to `origin/main`. Scoped `packages/plugin` check: **155 files, 0
+diagnostics**.
+
+### #1842's runtime red is #1844's, and I proved it rather than asserting it
+
+`scaffold-runtime (aspire + docker + postgres)` **FAILED** at `d1697421c`. The uploaded E2E report
+(`e2e-report-scaffold-runtime.json`, run `33617486148`, job `100206685348`) gives
+`passed=46 failed=1`, and the single failure is **`runtime.wait.garnet` at 300338 ms** — the last
+gate in the suite, after the full database sequence and both allocation captures passed.
+`runtime.wait.postgres` passed in **512 ms** on the same run.
+
+That is exactly **#1844** (`orchestrator:fixes`, PR #1858 open). #1844 recorded itself as "a single
+observation, not a confirmed shared defect"; this is a **second independent reproduction** at a
+different head, with the same `passed=46 failed=1` shape and a sharper postgres/garnet asymmetry.
+Posted to #1844 as evidence (comment `5508166737`), with the attribution reasoning stated rather than
+implied. #1842 adds no Aspire resource, health probe or container.
+
+### #1915 (#1352 S5) — promoted non-draft, two real reds found and fixed
+
+The PR sat in **draft**, which per the recorded trap means `check-test`/`quality`/`code-quality`/
+`close-gate` are all *skipped* — it looked green and proved nothing. Integrated `main` (clean),
+regenerated the corpus (`658a3a56…` / 273 subpaths / 7809 symbols; the `+1 subpath` is this slice's
+own `@netscript/plugin-auth-core/sdk`), promoted non-draft via GraphQL
+`markPullRequestReadyForReview` (the token cannot `gh pr ready`).
+
+Promotion immediately paid for itself: **`quality` FAILED** on the *Agent docs corpus freshness*
+step. This slice edits `packages/plugin-auth-core/README.md` and `plugins/auth/README.md`, both of
+which feed the embedded prose bundle. Ran the **whole cascade** rather than the one gate CI was
+showing — `gen:agent-docs-prose` (sha256 `ec8b083c…`, 180 files) → `gen:assets-barrel` →
+`gen:publish-assets` → `gen:mcp-export-corpus` — then verified all four `check:*` forms at the
+committed head: **0 / 0 / 0 / 0**. `check-test` and `quality` are now green at `a6fababde`.
+
+`close-gate` is red for a correct reason: the DoD box *"Separate-session IMPL-EVAL passes"* is
+honestly unticked. Verified locally with `check-close-gate.ts`: `closing issues: none`, one unchecked
+box, that one. It clears when the eval passes — not before, and not by hand.
+
+**IMPL-EVAL is running at `88df4839e`** (run `33617695217`), one commit behind the pushed head. The
+delta `88df4839e..a6fababde` is **generated carriers only**, so the product verdict carries by
+byte-identity; that carry is stated here so the merge packet does not have to assert it later.
+
+### #1895 (#1590 S2) — FAIL_FIX diagnosed, repaired, pushed
+
+The IMPL-EVAL FAIL_FIX at `e4a2a8cdb` was a **test-harness context error**, not a product defect.
+`packages/fresh/tests/form-navigation_browser.ts` builds a `run-code` script of the form
+`async page => { … }`; that body runs in the **Playwright driver** context. At lines ~194–199 it did
+`new MutationObserver(…)` and `document.querySelector('h1')` *directly in the driver*, where neither
+global exists — so it threw `ReferenceError: MutationObserver is not defined` before any assertion
+evaluated. The neighbouring `partialMarker` works because it is *passed to* `page.evaluate`.
+
+Worker `01a060be` completed and pushed **`31f4ff8a1`**: the observer now installs and disconnects
+inside the page, plus an idempotent pre-close drain that waits for `released`,
+`completed === arrived` and `cancelled === 0` — addressing the second finding, where the teardown's
+own abort at page close contaminated the drain-without-overlay assertion. Touch set is **exactly**
+the test file plus three run artifacts; `packages/fresh/src` untouched; file still 500 lines; every
+assertion (`overlayCount === 0`, `cancelled == 0`, stale drain, last-intent-wins) unchanged. Hosted
+runtime gates are executing at that head.
+
+### Dispatch decisions, with the file-overlap measurements behind them
+
+- **#1353 and #1467 run concurrently.** The queue previously serialized both behind #1352 on the
+  premise that all three rewrite `http-client-link.ts:82-101`. **That premise is now stale**:
+  #1352's shipped touch set (measured) is `plugin-auth-core` / `plugin` / `plugins/auth` and does not
+  touch `packages/sdk/src/client/http-client-link.ts` at all. #1353 (amended to a *proof* slice — do
+  not ship `traceContextContribution()`, do not move injection out of the transport) is test-first;
+  #1467 adds a locale contribution. Each brief names the other's branch and forbids its surface, and
+  both are told to stay out of `prepared-call.ts` — #1467 with an instruction to **stop and report**
+  rather than edit it, which converts a silent collision into a serialization decision.
+- **#1353 and #1467 are both audit-first.** `traceparent`/`tracestate` are *already* in
+  `RESERVED_HEADERS` (`prepared-call.ts:37`) and observability tests already exist, so a large part of
+  #1353 may be shipped. #1349 S3 hit exactly this and correctly stopped; both briefs say so and say
+  that "already shipped, nothing outstanding" is a complete answer.
+- **#1897 dispatched despite a known collision with #1895** — both edit `packages/fresh/deno.json`'s
+  `publish.exclude`. Serializing it behind an open-ended repair loop risked it missing 0.0.7 for a
+  two-line change, so #1897's brief instructs it to *compose* with #1895's entries: add without
+  reordering or reformatting, so the merge is a textual addition rather than a rewrite conflict.
+- **#1354 stays serialized behind #1664** — measured, not cautious: #1664 is actively converging
+  `packages/cli`, which is #1354's entire surface. Plan PR #1891 is open and unaffected.
+
+### Launcher traps, both hit today, both now recorded
+
+1. **`launch-codex-slice.ts` blocks for the child's whole lifetime.** A foreground call dies at the
+   Bash tool timeout and **SIGTERMs the worker with it** — #1897's first thread was killed mid-slice
+   with its edits uncommitted. Always `setsid nohup … &`. Recovery is `codex-resume.ts` on the *same
+   thread id*, which preserves both its context and the worktree's uncommitted work; relaunching
+   would have discarded both.
+2. **The launcher does not create `--slice-dir`.** It starts the thread, then crashes writing
+   `codex-thread-ids.md`, leaving a live sender lease and a thread that never received its brief —
+   which is how #1353 and #1467 both had to be recovered by resume. `mkdir -p` the slice dir first,
+   and give each slice its **own** dir: a shared `--slice-dir` silently overwrites the previous
+   slice's thread record.
+
+Two further launcher facts, for the same reason: `--slug X` stages to `/home/<user>/X-brief.md` with
+`codex` hardcoded, so under `--user node` pass `--dest` explicitly; and a worktree created with
+`git worktree add -b <b> <p> origin/main` inherits `origin/main` as upstream, which git-safety
+refuses — `git branch --unset-upstream` first.
+
+Three sender-ownership refusals were resolved today, all `owner_inactive`, all **this slice's own
+prior thread**, all recovered by resume. Liveness was measured each time (rollout mtime plus
+`/proc/<pid>/cwd`), never inferred from the refusal itself.
+
+### Open supervisor debt — stated, not deferred silently
+
+**#1349 has no closure path yet.** S1/S2/S3 all merged; none carried a closing keyword (correctly —
+they were partials at the time); the issue's ten acceptance boxes are unticked; and the mirror only
+runs from an `acceptance-evidence` block on a PR carrying `status:ready-merge`. With every slice
+merged there is no open PR to carry that block. Closing it therefore needs either a closure PR
+carrying the evidence block and `Closes #1349`, or a coordinator decision. Recorded rather than
+resolved by hand — hand-ticking is exactly what the close-gate exists to prevent.

@@ -71,6 +71,13 @@ prompt** (it quotes the verdict tokens) **and this supervisor's own phase commen
 7. Acceptance boxes map by exact text or `box-index` — use `box-index`.
 8. Never hand-merge generated carriers; take `main`'s and regenerate.
 
+9. **Label ownership at PR-open, never at finalization.** Apply `orchestrator:features` (plus
+   `type:`/`area:`/`priority:`/`wave:` and the `0.0.7` milestone) in the **same action that opens the
+   leaf PR**. Coordinator audits are keyed on the orchestrator label, so a leaf labelled only at
+   finalization is **invisible to every audit while it is active** — the window in which it most needs
+   to be seen. Sub-agents open PRs with no metadata by default; the supervisor repairs it immediately,
+   not at merge time.
+
 ## Audit finding — #1354/#1355 both have real residual scope after #1781
 
 Measured on `main` `0274c0a70`, answering the parked question:
@@ -95,3 +102,21 @@ Measured on `main` `0274c0a70`, answering the parked question:
 - **#1592 S2 + #1451** — both workers-runtime plumbing; cluster behind one plan.
 - **#1452 S2** — blocked on the `@netscript/plugin` → `@netscript/kv` dependency decision.
 - **#1590** — needs browser verification this lane cannot perform.
+
+## Watcher conditions — three ways I got these wrong in one session
+
+All three failed **open** (reported completion that had not happened), which is the dangerous
+direction: it invites a merge packet citing evidence that does not exist.
+
+1. **`IN_PROGRESS` is not terminal.** Exiting on `state != "PENDING"` fires on a running gate.
+   Require `SUCCESS`/`FAILURE` explicitly.
+2. **An empty match is not success.** Right after a push the checks do not exist yet, so
+   "no check is pending" is trivially true. Require the expected checks to **exist** —
+   `[…|select(terminal)]|length == 3`, not `[…|select(pending)]|length == 0`.
+3. **Comment-text filters match dispatch prompts.** A prompt quotes `[VERDICT:` /
+   `OPENHANDS_VERDICT`, so a text filter fires on the request, not the answer. **Poll the workflow
+   run status**, or read the summary comment's embedded `openhands-run` JSON (`"verdict"`,
+   `"state"`). This was already recorded as a trap and I repeated it anyway.
+
+Corollary already recorded above: a summary comment's `created_at` is **dispatch** time — it is
+rewritten in place on completion, so elapsed time read from it is meaningless.
