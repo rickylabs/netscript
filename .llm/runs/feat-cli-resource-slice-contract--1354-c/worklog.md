@@ -123,3 +123,32 @@ from the selected query factory; rendered template bodies remain Slice D scope.
   `0.0.7`.
 - Body uses `Refs #1354` with no closing keyword and states that no command calls the planner.
 - Phase comment ids: IMPL `5514035089`; IMPL-EVAL `5514035312`.
+
+## Follow-up D6 remediation — 2026-09-02
+
+The formal current-head IMPL-EVAL recorded `FAIL_FIX` for HIGH-1: the State transform's
+line-oriented `[^;]+` property regex failed open for an object-literal type and a quoted key, while
+also mistaking a nested member for a direct `State` property. The replacement uses the existing
+brace/comment/string-aware interface walk as the single source of both the closing anchor and
+top-level member boundaries. Direct bare or quoted same-name members are now classified by their
+complete type text: one required non-optional type is `exact`; every other declaration is a
+`conflict`. A same-name property nested below another member remains eligible for insertion.
+
+LOW-1 rode along within the approved ten files: the planner and reconciler now use an explicit
+`<`/`>` path comparator instead of ICU-backed `localeCompare`. A punctuation fixture pins the same
+code-point order for both the report and apply plan.
+
+### Red/green evidence
+
+| Check | Exit | Evidence |
+| --- | ---: | --- |
+| Pre-change focused baseline | 0 | 32 passed, 0 failed, 0 ignored at the receipt-only head. |
+| Three new State fixtures against the old scanner | 1 | 5 passed, 3 failed: object-literal and quoted members returned `insert`; the nested member returned `conflict`. |
+| ICU-order fixture against `localeCompare` | 1 | 11 passed, 1 failed: `_b.tsx` preceded `(_components)/a.tsx`. |
+| Final focused resource-slice suite | 0 | 36 passed, 0 failed, 0 ignored across all five test modules. |
+| Scoped structured CLI check | 0 | 926 selected in 8 batches; 0 failed batches and 0 diagnostics. |
+| `deno task arch:check` | 0 | CLI summary remains `FAIL=0 WARN=59 INFO=1`; no new failure. |
+| Targeted formatting diagnostic | 0 | Five changed product/test files checked with the recorded task-local format config. |
+
+Touch-set review: five of the ten approved product/test files changed; no product file outside
+`packages/cli/src/kernel/application/resource-slice/` and no `deno.lock` change was needed.

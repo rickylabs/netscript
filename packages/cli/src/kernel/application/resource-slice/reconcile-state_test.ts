@@ -53,6 +53,36 @@ Deno.test('skips an exact pre-existing property even without a generator marker'
   assertEquals(reconcileState(source, REQUIREMENT), { status: 'exact', content: source });
 });
 
+Deno.test('conflicts with a same-named property whose type is an object literal', () => {
+  const source = `export interface State {
+  readonly ordersRequest: { id: string; };
+}
+`;
+  assertEquals(reconcileState(source, REQUIREMENT).status, 'conflict');
+});
+
+Deno.test('conflicts with a quoted same-named property', () => {
+  const source = `export interface State {
+  'ordersRequest': OtherState;
+}
+`;
+  assertEquals(reconcileState(source, REQUIREMENT).status, 'conflict');
+});
+
+Deno.test('ignores the property name inside a nested object member', () => {
+  const source = `export interface State {
+  readonly session: {
+    readonly ordersRequest: OtherState;
+  };
+}
+`;
+  const result = reconcileState(source, REQUIREMENT);
+  assertEquals(result.status, 'insert');
+  if (result.status !== 'insert') return;
+  assertEquals(result.content.match(/ordersRequest/g)?.length, 2);
+  assertStringIncludes(result.content, 'readonly ordersRequest: OrdersRequestState;');
+});
+
 Deno.test('does not mistake a same-named declaration outside State for a State member', () => {
   const source = `const unrelated = {
   ordersRequest: OrdersRequestState,

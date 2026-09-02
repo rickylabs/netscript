@@ -61,6 +61,24 @@ Deno.test('identical second run skips every path and plans zero writes', async (
   assertEquals(result.report.every((entry) => entry.action === 'skip'), true);
 });
 
+Deno.test('orders reports and writes by code point rather than ICU collation', async () => {
+  const underscore = await leaf('_b.tsx', 'export const underscore = true;\n');
+  const parenthesized = await leaf(
+    '(_components)/a.tsx',
+    'export const parenthesized = true;\n',
+  );
+  const result = await reconcileResourceSlice({
+    staging: staged([underscore, parenthesized]),
+    current: {},
+  });
+
+  assertEquals(result.status, 'ready');
+  if (result.status !== 'ready') return;
+  const expected = [parenthesized.path, underscore.path];
+  assertEquals(result.report.map((entry) => entry.path), expected);
+  assertEquals(result.applyPlan.files.map((file) => file.path), expected);
+});
+
 Deno.test('additive option is selected and fully reported before an edited-base dry-run conflict', async () => {
   const core = await leaf('routes/orders/index.tsx', 'export const page = true;\n');
   const upgraded = await leaf(

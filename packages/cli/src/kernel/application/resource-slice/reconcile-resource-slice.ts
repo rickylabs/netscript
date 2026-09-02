@@ -85,8 +85,8 @@ export async function reconcileResourceSlice(
     if (!exact) writes.push({ path: candidate.path, content: candidate.content });
   }
 
-  report.sort((left, right) => left.path.localeCompare(right.path));
-  writes.sort((left, right) => left.path.localeCompare(right.path));
+  report.sort((left, right) => comparePath(left.path, right.path));
+  writes.sort((left, right) => comparePath(left.path, right.path));
   const skipped = report.filter((entry) => entry.action === 'skip').map((entry) => entry.path);
   const conflicts = report.filter((entry) => entry.action === 'conflict').map((entry) =>
     entry.path
@@ -102,6 +102,12 @@ export async function reconcileResourceSlice(
   }
   if (conflicts.length) return { status: 'conflict', exitCode: 1, ...common };
   return { status: 'ready', exitCode: 0, applyPlan: { files: writes }, ...common };
+}
+
+function comparePath(left: string, right: string): number {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
 }
 
 function decideLeaf(

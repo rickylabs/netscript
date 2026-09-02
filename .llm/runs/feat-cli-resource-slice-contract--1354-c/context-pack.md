@@ -3,10 +3,11 @@
 ## Current State
 
 Harness bootstrap, doctrine research, live #1664 no-overlap measurement, inherited-plan pointer,
-the mandatory Design checkpoint, and the complete ten-file implementation are complete. Focused,
-package, architecture, quality, and documentation gates are green. Separate-session IMPL-EVAL is
-`PASS` at the current implementation head. The branch is pushed and metadata-complete non-draft PR
-#1946 is open against `main`.
+the mandatory Design checkpoint, and the complete ten-file implementation are complete. The formal
+current-head IMPL-EVAL found one local D6 fail-open defect; its brace-aware State reconciliation fix
+and LOW-1 deterministic comparator ride-along are complete. The requested focused, scoped-check,
+and architecture gates are green. Non-draft PR #1946 remains open against `main`; follow-up
+IMPL-EVAL must attest the remediation head.
 
 ## Key Decisions
 
@@ -18,11 +19,11 @@ package, architecture, quality, and documentation gates are green. Separate-sess
 
 ## Next Steps
 
-1. Await CI and ordinary review on PR #1946.
+1. Run the separate-session follow-up IMPL-EVAL on the remediation head.
 2. Keep this partial PR at `status:impl`; later #1354 slices own templates and command activation.
 
 ## Drift and Debt
 
-- Drift: owner-directed non-draft PR lifecycle, RTK unavailable, and explicit no-overlap start while
-  #1664 remains open are recorded in `drift.md`.
+- Drift: owner-directed non-draft PR lifecycle, RTK unavailable, explicit no-overlap start while
+  #1664 remains open, and the corrected D6 parsing primitive are recorded in `drift.md`.
 - Debt: none created; the master plan's future cardinality WARN remains an observation.

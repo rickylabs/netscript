@@ -90,7 +90,7 @@ export function planResourceSlice(
       template: definition.template,
       options: leafOptions(definition, input.variants),
     }))
-    .sort((left, right) => left.path.localeCompare(right.path));
+    .sort((left, right) => comparePath(left.path, right.path));
   const factory = [input.client.queryFactoryName, ...input.procedure.path].join('.');
 
   return {
@@ -108,6 +108,12 @@ export function planResourceSlice(
     },
     state: input.requiredState ? { path: 'utils.ts', requirement: input.requiredState } : undefined,
   };
+}
+
+function comparePath(left: string, right: string): number {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
 }
 
 function inRoute(name: string): (input: NormalizedResourceSliceInput) => string {
