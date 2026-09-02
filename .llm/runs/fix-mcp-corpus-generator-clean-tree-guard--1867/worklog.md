@@ -113,6 +113,7 @@ architecture, sequencing, or scope question remains.
 | 2026-09-02 14:23 | 0 | re-baseline | Branch and `origin/main` are the exact assigned base; tree is clean; #1867 comment confirms F-3-only boundary. |
 | 2026-09-02 14:23 | 0 | design | Locked write-only guard, explicit stderr-recorded override, warn-and-continue fallback, and minimal task permission. |
 | 2026-09-02 14:27 | 1 | RED contracts | Added committed-worktree CLI cases for clean write, package/plugin refusal-before-write, outside dirtiness, check-mode isolation, override provenance, and missing Git. |
+| 2026-09-02 14:29 | 1 | RED refinement | First exact-commit run exited 1 with the expected missing-guard failures, but the no-Git fixture also hid Deno; narrowed PATH to Deno's bin directory before the authoritative RED rerun. |
 
 ## Gate results
 

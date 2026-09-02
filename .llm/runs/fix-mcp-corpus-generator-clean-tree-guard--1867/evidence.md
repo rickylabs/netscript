@@ -16,7 +16,17 @@ is derived from a pipeline.
 
 ## RED
 
-Pending slice 1.
+### Initial committed RED — `8a35c571c`
+
+- Detached worktree add: exit 0.
+- Raw focused test: `RED_TEST_REAL_EXIT=1` — 8 passed, 4 failed.
+- Detached worktree removal: exit 0.
+- Expected product-contract failures: dirty package and dirty plugin generation both returned 0;
+  `--allow-dirty` was rejected as unknown.
+- Fixture correction required: setting PATH to a nonexistent directory also prevented Deno's
+  `--allow-run=deno,git` allowlist from resolving the nested Deno executable, so the no-Git case
+  failed before it could test the intended warning. The authoritative RED rerun uses a PATH that
+  contains Deno but not Git.
 
 ## GREEN and required validation
 

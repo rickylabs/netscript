@@ -349,7 +349,8 @@ Deno.test('--allow-dirty writes and records the offending path on stderr', async
 Deno.test('write mode warns and continues when git is unavailable', async () => {
   await withCommittedWorktree(async (worktree) => {
     const oldTime = await markArtifactOld(worktree);
-    const env = { ...Deno.env.toObject(), PATH: '/nonexistent-mcp-corpus-test-path' };
+    const denoBin = Deno.execPath().slice(0, Deno.execPath().lastIndexOf('/'));
+    const env = { ...Deno.env.toObject(), PATH: denoBin };
 
     const generated = await runGenerator(worktree, [], env);
     assertEquals(generated.code, 0, generated.stderr);
