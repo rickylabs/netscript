@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `docs-sdk-reference-contribution-example--1349` |
 | Branch | `docs/sdk-reference-contribution-example` |
-| Current phase | `gate` |
+| Current phase | `evaluate` |
 | Archetype | N/A — consumer documentation only |
 | Scope overlays | `docs` |
 
 ## Current State
 
-The reference section and compiling tenant-header example are implemented. Documentation gates and
-all four carrier generators pass; the slice is ready to commit before the required clean-tree checks.
+The reference section and compiling tenant-header example are committed at `34747ba4c`.
+Documentation gates, all four carrier generators, and all four post-commit carrier checks pass.
 
 ## Completed
 
@@ -23,16 +23,17 @@ all four carrier generators pass; the slice is ready to commit before the requir
 - Added the compact six-field surface inventory and typed client-composition example.
 - Passed `docs:snippets` and `docs:jsdoc-examples` with `unboundName=116`.
 - Ran the four carrier generators in order with exit 0.
+- Committed the slice and passed every matching `check:*` task on the clean committed tree.
 
 ## In Progress
 
-- Committing the slice and then running clean-tree carrier checks.
+- Running the mandatory fresh opposite-family IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit the reviewed slice.
-2. Run the four matching `check:*` tasks on the committed tree.
-3. Run separate-session IMPL-EVAL, recheck #1927, push, and create the owner-specified non-draft PR.
+1. Run separate-session IMPL-EVAL.
+2. Recheck #1927 and the ten evidence entries.
+3. Push and create the owner-specified non-draft PR, then run the mirror dry-run.
 
 ## Key Decisions
 
@@ -52,7 +53,7 @@ all four carrier generators pass; the slice is ready to commit before the requir
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | passing; post-commit checks pending | Docs gates and generators all exit 0. |
+| Static | PASS | Docs gates, generators, and post-commit checks all exit 0. |
 | Fitness | source aligned; evaluator pending | Six `deno doc` samples plus supervisor slice review. |
 | Runtime | N/A | Docs-only slice. |
 | Consumer | PASS | `docs:snippets`, exit 0. |

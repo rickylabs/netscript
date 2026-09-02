@@ -55,6 +55,8 @@ tenant-header example and replaces its context/header/cache declaration with the
 | 2026-09-02 | 1 | gate | Docs snippets and JSDoc examples passed; deferred `unboundName` remained 116. |
 | 2026-09-02 | 1 | generate | Required four-step carrier cascade completed with exit 0 for every generator. |
 | 2026-09-02 | 1 | slice review | Supervisor compared every public claim with `deno doc`, confirmed the example's cache policy matches its varying tenant header, and inspected the generated-carrier diff. |
+| 2026-09-02 | 1 | commit | Slice committed as `34747ba4c`; the tree was clean before post-commit carrier verification. |
+| 2026-09-02 | 1 | post-commit gate | All four `check:*` carrier tasks exited 0 and left the committed tree clean. |
 
 ## Decisions
 
@@ -81,7 +83,10 @@ tenant-header example and replaces its context/header/cache declaration with the
 | `gen:assets-barrel` | `deno task gen:assets-barrel` | PASS | Exit 0. |
 | `gen:publish-assets` | `deno task gen:publish-assets` | PASS | Exit 0. |
 | `gen:mcp-export-corpus` | `deno task gen:mcp-export-corpus` | PASS | Exit 0; 35 packages, 273 subpaths, 7815 symbols. |
-| Post-commit carrier checks | matching `check:*` tasks | NOT_RUN | Must run after the slice commit on a clean tree. |
+| `check:agent-docs-prose` | `deno task check:agent-docs-prose` | PASS | Exit 0 after commit; `fresh: true`, no stale paths. |
+| `check:assets-barrel` | `deno task check:assets-barrel` | PASS | Exit 0 after commit; generated asset files unchanged. |
+| `check:publish-assets` | `deno task check:publish-assets` | PASS | Exit 0 after commit. |
+| `check:mcp-export-corpus` | `deno task check:mcp-export-corpus` | PASS | Exit 0 after commit; same 35/273/7815 corpus. |
 | Evidence mirror | prescribed dry-run | NOT_RUN | Pending PR creation. |
 
 ### Fitness Gates
@@ -104,4 +109,4 @@ tenant-header example and replaces its context/header/cache declaration with the
 
 ## Handoff Notes
 
-- Post-commit checks, evidence mirror, and separate-session IMPL-EVAL remain.
+- Evidence mirror and separate-session IMPL-EVAL remain.
