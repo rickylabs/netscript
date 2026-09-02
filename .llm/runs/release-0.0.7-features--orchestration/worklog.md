@@ -10989,3 +10989,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 20:14Z — #1943 packet posted at exact head `7e16727b0` (main `b847d6aaa` disjoint, clean merge).
 - 20:16Z — #1943 merged `3c8b0fd18`. #1948 carries clean at `958150d83` (packet posted). #1664 converged → `ad50a5e22` (corpus only; gates 0).
 - 20:17Z — #1948 merged `3a794be67`. Slices B, C, D on main; #1664 `ad50a5e22` MERGEABLE (still on #1845). E base is now a subset of main.
+- 20:20Z — Slice A: worker exited 0 without pushing; supervisor pushed `f0cc2479d` and opened **PR #1950** (base `feat/app-service-client-wiring`, stacked on #1664; ci will not run until rebased on main). Native IMPL-EVAL dispatched. Coordinator deferred #1664 E2E run 33678254035 for the S9 lease: **preserve `ad50a5e22`, rerun after S9/Canary6**; packet-wait retired.
