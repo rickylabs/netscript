@@ -9,6 +9,7 @@ const HYDRATION_NOW = 1_775_000_000_000;
 const VITE_STARTUP_TIMEOUT_MS = 60_000;
 const VITE_STARTUP_POLL_INTERVAL_MS = 100;
 const FIXTURE_OUTPUT_LIMIT = 16_384;
+const HYDRATION_EVIDENCE_MARKER = 'query-hydration-evidence:';
 
 Deno.test({
   name: 'browser: public query wrapper preserves old and fresh server snapshot ages',
@@ -63,6 +64,24 @@ Deno.test({
             );
             const root = page.locator('main[data-hydrated="true"]');
             await root.waitFor();
+            const freshIslandElement = await root.evaluate(element =>
+              element.closest('fresh-island, [data-fresh-island]')?.tagName.toLowerCase() ?? null
+            );
+            const queryClientFound =
+              await root.getAttribute('data-query-client-found') === 'true';
+            const interactionCount = Number(
+              await root.getAttribute('data-interaction-count'),
+            );
+            await page.getByRole('button', {
+              name: 'Prove query island interactivity',
+            }).click();
+            await page.waitForFunction(expected =>
+              document.querySelector('main')?.getAttribute('data-interaction-count') ===
+                String(expected), interactionCount + 1
+            );
+            const islandInteractive = Number(
+              await root.getAttribute('data-interaction-count'),
+            ) === interactionCount + 1;
             if (mode === 'old') {
               await page.waitForFunction(() =>
                 document.querySelector('main')?.getAttribute('data-query-count') === '1'
@@ -71,12 +90,20 @@ Deno.test({
               await page.waitForTimeout(250);
             }
             return {
-              snapshot: await page.locator('#snapshot').textContent(),
-              count: Number(await root.getAttribute('data-query-count')),
-              fetching: await root.getAttribute('data-fetching'),
-              refetching: await root.getAttribute('data-refetching'),
-              updatedAt: Number(await root.getAttribute('data-updated-at')),
-              expectedUpdatedAt: Number(await root.getAttribute('data-expected-updated-at')),
+              hydration: {
+                freshIslandElement,
+                queryClientFound,
+                islandHydrated: await root.getAttribute('data-hydrated') === 'true',
+                islandInteractive,
+              },
+              age: {
+                snapshot: await page.locator('#snapshot').textContent(),
+                count: Number(await root.getAttribute('data-query-count')),
+                fetching: await root.getAttribute('data-fetching'),
+                refetching: await root.getAttribute('data-refetching'),
+                updatedAt: Number(await root.getAttribute('data-updated-at')),
+                expectedUpdatedAt: Number(await root.getAttribute('data-expected-updated-at')),
+              },
             };
           }
 
@@ -91,7 +118,15 @@ Deno.test({
         readonly fresh: Observation;
       };
 
-      assertEquals(evidence.old, {
+      console.log(`${HYDRATION_EVIDENCE_MARKER}${
+        JSON.stringify({
+          old: evidence.old.hydration,
+          fresh: evidence.fresh.hydration,
+        })
+      }`);
+      assertHydrationEvidence(evidence.old.hydration, 'old');
+      assertHydrationEvidence(evidence.fresh.hydration, 'fresh');
+      assertEquals(evidence.old.age, {
         snapshot: 'server snapshot',
         count: 1,
         fetching: 'true',
@@ -99,7 +134,7 @@ Deno.test({
         updatedAt: HYDRATION_NOW - 60_000,
         expectedUpdatedAt: HYDRATION_NOW - 60_000,
       });
-      assertEquals(evidence.fresh, {
+      assertEquals(evidence.fresh.age, {
         snapshot: 'server snapshot',
         count: 0,
         fetching: 'false',
@@ -122,12 +157,31 @@ Deno.test({
 });
 
 interface Observation {
+  readonly hydration: HydrationEvidence;
+  readonly age: SnapshotAgeEvidence;
+}
+
+interface HydrationEvidence {
+  readonly freshIslandElement: string | null;
+  readonly queryClientFound: boolean;
+  readonly islandHydrated: boolean;
+  readonly islandInteractive: boolean;
+}
+
+interface SnapshotAgeEvidence {
   readonly snapshot: string | null;
   readonly count: number;
   readonly fetching: string | null;
   readonly refetching: string | null;
   readonly updatedAt: number;
   readonly expectedUpdatedAt: number;
+}
+
+function assertHydrationEvidence(evidence: HydrationEvidence, mode: string): void {
+  assertEquals(evidence.freshIslandElement, 'fresh-island', `${mode}: freshIslandElement`);
+  assertEquals(evidence.queryClientFound, true, `${mode}: queryClientFound`);
+  assertEquals(evidence.islandHydrated, true, `${mode}: islandHydrated`);
+  assertEquals(evidence.islandInteractive, true, `${mode}: islandInteractive`);
 }
 
 async function runPlaywright(

@@ -19,6 +19,7 @@ function recordRequest(): void {
 
 function QueryHydrationAgeSnapshot(props: QueryHydrationAgeBrowserProps): object {
   const [hydrated, setHydrated] = useState(false);
+  const [interactionCount, setInteractionCount] = useState(0);
   const queryClient = useQueryClient();
   const queryKey = ['query-hydration-age', props.mode] as const;
   const initialDataUpdatedAt = props.mode === 'old'
@@ -42,7 +43,9 @@ function QueryHydrationAgeSnapshot(props: QueryHydrationAgeBrowserProps): object
   return (
     <main
       data-hydrated={String(hydrated)}
+      data-interaction-count={String(interactionCount)}
       data-mode={props.mode}
+      data-query-client-found={String(queryClient.getQueryCache() !== undefined)}
       data-query-count={String(requestCount())}
       data-fetching={String(query.isFetching)}
       data-refetching={String(query.isRefetching)}
@@ -51,6 +54,9 @@ function QueryHydrationAgeSnapshot(props: QueryHydrationAgeBrowserProps): object
     >
       <h1>Query hydration age</h1>
       <p id='snapshot'>{query.data}</p>
+      <button type='button' onClick={() => setInteractionCount((count) => count + 1)}>
+        Prove query island interactivity
+      </button>
     </main>
   );
 }

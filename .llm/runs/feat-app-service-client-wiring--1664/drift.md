@@ -63,3 +63,16 @@
 - General lesson: a serial gate that stops on its first failure provides no evidence for later
   phases. Treat everything behind the stop as unmeasured, not implicitly green, and give process
   startup failures enough captured output to distinguish slowness from a crash on the next run.
+
+## 2026-09-02 — URL-only timeout hid the module-resolution cause
+
+- Severity: test-diagnostics trap; no product-source or architecture change.
+- The query fixture appeared to be merely slow across three CI cycles because its timeout reported
+  only the URL. Once the bounded waiter preserved Vite stderr, the next run named the real failure:
+  Vite could not resolve bare `@opentelemetry/api` reached through the Fresh query/telemetry graph.
+- The exact sibling fixture precedent maps this bare import through the workspace catalog. Applying
+  that one virtual-module mapping produced HTTP 200 with empty Vite stderr and no need for a
+  speculative `zod` bridge.
+- General lesson: readiness timeouts must carry bounded child stdout/stderr. A URL and elapsed time
+  cannot distinguish cold startup, module resolution, process configuration, or a silent crash—the
+  information needed to repair the failure is otherwise discarded at the failure boundary.

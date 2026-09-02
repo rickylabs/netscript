@@ -441,3 +441,70 @@ The package test wrapper does not select the explicitly named `_browser.ts` file
 ignored count is not a browser verdict. A local Chromium executable exists, but `playwright-cli` is
 absent; consequently `deno task --cwd packages/fresh test:browser` was not run. No Aspire, Docker,
 `e2e:cli`, or hosted runtime command was run.
+
+## Query-fixture catalog resolution and explicit hydration proof (2026-09-02)
+
+### Design
+
+- Effective profile: Archetype 4 (`packages/fresh`) plus the frontend overlay, constrained to the
+  branch-owned query-hydration browser fixture and its test. `packages/fresh/src` and every #1895
+  surface remain excluded.
+- Public surface: none. The fixture will mirror the sibling route-binding Vite catalog bridge and
+  make existing client behavior explicit in browser evidence.
+- Catalog bridge: read the root `deno.json` catalog with the precedent's missing-entry error; add a
+  post-enforced, fixture-specific virtual module only for bare specifiers proven necessary by the
+  query fixture's graph.
+- Hydration vocabulary: `freshIslandElement`, `queryClientFound`, `islandHydrated`, and
+  `islandInteractive`. Interactivity requires a real browser click that increments rendered island
+  state; an effect or SSR markup alone is insufficient.
+- Existing contract: retain the exact old/fresh snapshot, request-count, fetching/refetching, and
+  `dataUpdatedAt` assertions after the four named hydration assertions.
+- Commit slice: one fixture config, one fixture island, one browser test, and append-only harness
+  records. The proving gate is `packages/fresh test:browser`; structured Fresh check/test plus lock,
+  diff, lint/fmt, and quality/doctrine checks provide the static evidence.
+- PLAN-EVAL: N/A — the coordinator supplied an exact in-repo implementation precedent, assertion
+  vocabulary, scope ceiling, and gate set; no design choice remains open.
+
+### Implementation and local evidence
+
+- Baseline: converged head `1dd9760246ac93edc9cc264cab14d67f5dbc716f`, containing main
+  `37452f11f`. The worktree was clean and the branch pull was already current before edits.
+- The fixture config now matches `route-binding-browser/vite.config.ts`: it reads the root catalog,
+  preserves the missing-entry error, and uses a post-enforced fixture-specific virtual id. Only
+  `@opentelemetry/api` is mapped; `zod`/`catalog:` was not copied because this graph did not require
+  it.
+- An exact Vite launch and HTTP request passed with status 200, expected page markup, and empty
+  stderr. End-to-end readiness took 5,742 ms locally while Vite reported ready in 585 ms; no second
+  unresolved specifier appeared.
+- The island now exposes a real button-driven interaction counter and a query-client reachability
+  attribute. The browser test records the nearest Fresh island element, query-client reachability,
+  client-effect hydration, and the post-click state change. Four named assertions run for both old
+  and fresh navigation modes before the unchanged snapshot-age assertions.
+- The CI-pinned `@playwright/cli@0.1.17` was provisioned outside the repository for a local attempt.
+  The browser task exited 1 with 0 passed / 3 failed because the sandbox has neither branded Chrome
+  at `/opt/google/chrome/chrome` nor Chromium's required `libnspr4.so`. All failures occurred during
+  browser launch; no hydration value was observed locally and the #1895 test files were not edited.
+
+| Gate | Exit | Counts / evidence |
+| --- | ---: | --- |
+| Exact Vite fixture startup | 0 | HTTP 200 / expected markup / empty stderr; 5,742 ms |
+| `packages/fresh test:browser` | 1 | 0 passed / 3 failed; browser-runtime prerequisite failure before page launch |
+| Structured Fresh check | 0 | 211 selected / 2 batches / 0 failed / 0 diagnostics |
+| Structured Fresh package test | 0 | 276 passed / 0 failed / 0 ignored |
+| Structured Fresh lint | 0 | 211 selected / 211 processed / 0 findings |
+| Structured Fresh fmt | 0 | 211 selected / 211 processed / 0 findings |
+| `quality:gate` | 0 | Quality scan 0 findings / 7 existing allowances; doctrine 0 failures |
+| Lock integrity | 0 | No diff from `1dd976024`; SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d` |
+
+The exact-head CI browser lane remains the decisive hydration observation. The test emits a
+`query-hydration-evidence:` JSON marker so the four old/fresh values survive in the gate output.
+
+### Final-byte validation
+
+- After formatting the evidence statement, structured Fresh check again passed with 211 selected
+  files / 2 batches / 0 failed batches / 0 diagnostics.
+- Structured Fresh package tests again passed 276 / 0 / 0 in 7,377 ms; Fresh lint passed 211 / 211
+  with 0 findings, and the final Fresh fmt wrapper passed 211 / 211 with 0 findings.
+- `quality:gate` passed with 0 quality findings (7 pre-existing allowances) and 0 doctrine
+  failures. `deno.lock` remained byte-identical to `1dd976024` with SHA-256
+  `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.

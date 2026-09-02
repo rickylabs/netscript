@@ -184,3 +184,23 @@ Required local evidence is green: Fresh check 211 files / 2 batches / 0 failures
 select `_browser.ts`; local Chromium exists but `playwright-cli` does not, so no browser verdict is
 claimed and `test:browser` was not run. `deno.lock` remains byte-identical with SHA-256
 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
+
+## 2026-09-02 query catalog bridge and explicit hydration evidence
+
+At converged baseline `1dd976024` (main `37452f11f`), the improved timeout exposed Vite's actual
+failure: the query fixture graph reaches `packages/telemetry/src/context/w3c.ts`, whose bare
+`@opentelemetry/api` import was unresolved. The query fixture now mirrors the route-binding
+fixture's post-enforced catalog virtual-module pattern for that specifier only. An exact Vite launch
+returned HTTP 200 with the expected markup and empty stderr; no `zod`/`catalog:` shim was needed.
+
+The fixture's `QueryIsland` now renders query-client reachability and a button-driven interaction
+counter. Before the unchanged old/fresh snapshot-age assertions, the browser test names and asserts
+`freshIslandElement === "fresh-island"`, `queryClientFound === true`, `islandHydrated === true`,
+and `islandInteractive === true` in both modes. It emits those observed values under the structured
+`query-hydration-evidence:` marker.
+
+Local Fresh check/test/lint/fmt and `quality:gate` are green; package tests report 276/0/0 and the
+lock SHA-256 remains `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
+The local browser task was attempted but could not launch: the CI-pinned CLI found neither branded
+Chrome nor Chromium's `libnspr4.so`, yielding 0 passed / 3 failed before page navigation. Exact-head
+CI must therefore provide the decisive hydration values; no local pass is claimed.
