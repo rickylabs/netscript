@@ -812,3 +812,31 @@ the merge.**
   only). Recorded on #863 with a reconciliation proposal (next #1880/#1881 PR carries an `issue: 863`
   box-1 entry). Gates 2/3 = #1880/#1881, both 0.0.7 `status:triage`, unassigned — the only 0.0.7 Aspire
   items still open. All other epic #1712 children are 0.0.8+ or backlog.
+
+### 2026-09-02T20:55Z — #1952 carrier repair; `aspire-upgrade` skill PR #1953; slice ledger
+
+- **#1952 (#1880, #863 gate 2)** head `4cf4ef849` → `quality` red on agent-docs prose freshness
+  (D-331). Repaired by regeneration only: `917e7269d` (prose + provenance + barrel), `1d09636aa`
+  (mcp publish assets). Current head **`1d09636aa`**; gate code identical to `4cf4ef849`
+  (278/278 e2e unit tests there). `classify` marks the change scaffold-impacting, so both
+  `scaffold-runtime` tiers run at this head; the postgres tier is the decisive gate — it is the only
+  place `verifyListenerFailureRecovery` produces the live `readiness` receipt. Known hazard: #1844
+  (`postgres_listener was never published`, recurrence #8 today on #1909) is a Fixes-lane flake that
+  can red this tier without implicating #1952; if it hits, rerun the tier at the same SHA, do not push.
+- **Skill:** `.agents/skills/aspire-upgrade/SKILL.md` + README scope row, branch
+  `docs/aspire-upgrade-skill` @ `bf634b3c0` off main `88fc6d69d`, **PR #1953** (`type:docs`,
+  `area:aspire`, `area:agent-tooling`, `status:impl`, 0.0.7). `validate-claude-surface` ok,
+  `check:mcp-export-corpus` 0. Docs-only; no mirror needed (`.claude/skills/repo-skills` is a router).
+- **Pinning answer for the owner (recorded in the skill):** Aspire pins are exact literals in
+  `scaffold-versions.ts`, `scaffold-aspire.ts`, `.mise.toml`, three `e2e-cli*` workflows, and the
+  parity constant, plus version-suffixed fixtures in five directories. No `deps:*` wrapper covers
+  NuGet. A patch bump is a manual ~6-file sweep + parity manifest regen + dual-tier proof; a minor
+  additionally re-records fixtures. Follow-up proposal: `aspire:bump` under `.llm/tools/deps/`.
+- **Slice ledger (0.0.7, epic #1712):** S1–S11, S13 → closed `status:shipped` (S9 `88fc6d69d`,
+  S10 merged, S13 merged). S12 (#1725) closed `not_planned`, superseded by 13.6 first-party Deno
+  hosting per owner ruling, milestone 0.0.8. Remaining open Aspire 0.0.7 items: #863 (gate 1 proven
+  by #1754, mirrored via #1952's `issue: 863` block; gate 2 = #1880/#1952; gate 3 = #1881
+  `status:triage`), #1952, #1953, epic #1712 (coordinator-owned closure). Fixes-lane, not Aspire
+  lane: #1909/#1906/#1844.
+- **Release readiness:** nothing Aspire-owned blocks Canary 6; #1951 is Internals'. #1952 is
+  additive gate code and can ride the next canary either side of the cut.

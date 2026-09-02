@@ -8460,3 +8460,20 @@ product surface vs main, generated carriers regenerated (barrel) or verified no-
 Coordinator instruction: "carry the already-valid dual runtime/evaluator evidence only if owned
 runtime blobs are unchanged". If the classify job re-dispatches runtime tiers at `fcce551be`, those
 verdicts supersede the carry.
+
+### D-331 — #1952 quality red: a docs-site prose change is a four-carrier change (2026-09-02)
+
+- **Observed:** PR #1952 head `4cf4ef849` failed `quality` at step "Agent docs corpus freshness"
+  (`check:agent-docs-prose` → `prose.json.gz`, `provenance.json` stale). Local reproduction on the
+  slice worktree matched. Cause: the new "Readiness contract" section in
+  `docs/site/reference/aspire/index.md` is an input to the agent-docs prose bundle.
+- **Ruling:** regenerate in chain order on a clean tree, one carrier hop per commit so each gate is
+  attributable: `gen:agent-docs-prose` (prose + provenance) → `gen:assets-barrel`
+  (`agent-docs.generated.ts`, committed together as `917e7269d`) → `gen:publish-assets`
+  (`packages/mcp/src/publish-assets.generated.ts`, `1d09636aa`). All four checks
+  (`agent-docs-prose`, `assets-barrel`, `mcp-export-corpus`, `publish-assets`) exit 0 at
+  `1d09636aa`. No product code touched; the receipt/gate code is unchanged from `4cf4ef849`.
+- **Lesson (added to the `aspire-upgrade` skill chain description):** the carrier chain starts one
+  hop earlier than "prose → corpus": a docs-site page edit is `site build → agent-docs prose →
+  barrel → publish assets`. Run `check:agent-docs-prose` locally before pushing any `docs/site`
+  change; it costs ~90 s and would have saved one CI cycle.
