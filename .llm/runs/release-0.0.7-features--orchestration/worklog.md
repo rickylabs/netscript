@@ -10507,3 +10507,30 @@ finished.* Dispatched a combined audit-and-closeout for both issues, told to ver
 against merged `main`, cite **code and tests rather than the merged PRs' verdicts**, and to withhold
 a closing keyword for any issue whose rows it cannot defend — closing one and leaving the other open
 is explicitly allowed.
+
+### ~16:25Z — a third Aspire failure mode, and the cross-branch pattern
+
+#1895's sqlite tier failed at the reconciled head on **`runtime.aspire-start`**, code 2,
+`passed=36 failed=1`, after 12 163 ms — *"The connection to the child AppHost was lost."* The
+AppHost child died **during startup**, 36 gates in and before any gate this branch could influence.
+
+That is a **third distinct shape**, neither #1844's 300 s readiness timeout nor #1880's health-probe
+transition. Posted the cross-branch table to #1844 (`5512732188`):
+
+| PR | Touches Aspire? | Observed failures |
+| --- | --- | --- |
+| #1842 | no | `runtime.wait.postgres` 300 s → then **both tiers green** at the same content |
+| #1895 | no | postgres **green → red at one unchanged head**; garnet 300 s; now `aspire-start` code 2 |
+| #1664 | no | `wait.postgres`; `health.listener-unreachable`; then **neither**, leaving only #1845 |
+| #1927 | no | clean |
+
+**Four branches, none touching an Aspire resource, probe or container, producing five different
+failure modes** — each of which has also been observed *passing* at an unchanged or near-identical
+head. Nondeterministic, spread across unrelated failure sites, independent of branch content. Raised
+the possibility that #1844, #1880 and this startup drop share an upstream cause (host contention or
+AppHost lifecycle under parallel jobs) rather than being three separate defects — as evidence, not as
+a proposed fix, since the lane is not mine.
+
+#1895's substantive evidence is untouched: exact-head hosted `fresh-browser` green, IMPL-EVAL PASS,
+`close-gate` pass with both DoD boxes evidenced. `status:ready-merge` stands, with the reason stated
+on the PR rather than left implicit.
