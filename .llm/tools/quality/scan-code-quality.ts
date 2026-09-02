@@ -8,6 +8,7 @@ export type QualityRule =
   | 'explicit-any'
   | 'public-any'
   | 'public-export-unresolved'
+  | 'plugin-discovery-core-coupling'
   | 'plugin-name-check'
   | 'ts-error-suppression';
 
@@ -933,6 +934,100 @@ function discardedSagaPublisherResults(
   return findings;
 }
 
+function isHostCoreSource(file: string): boolean {
+  const normalized = file.replaceAll('\\', '/');
+  return normalized.startsWith('packages/') &&
+    !/^packages\/plugin-[^/]+-core\//.test(normalized);
+}
+
+function propertyString(
+  tokens: readonly SourceToken[],
+  open: number,
+  close: number,
+  property: string,
+): SourceToken | undefined {
+  for (let index = open + 1; index < close - 1; index++) {
+    const token = tokens[index];
+    if (
+      (token.kind === 'identifier' || token.kind === 'string') && token.value === property &&
+      tokens[index + 1]?.value === ':' && tokens[index + 2]?.kind === 'string'
+    ) {
+      return tokens[index + 2];
+    }
+  }
+  return undefined;
+}
+
+function hasComparison(tokens: readonly SourceToken[], left: number, right: number): boolean {
+  const start = Math.min(left, right) + 1;
+  const end = Math.max(left, right);
+  const between = tokens.slice(start, end).map((token) => token.value).join('');
+  return /^(?:===|!==|==|!=)$/.test(between);
+}
+
+function pluginDiscoveryCoreCoupling(
+  source: string,
+  file: string,
+): QualityFinding[] {
+  if (!isHostCoreSource(file)) return [];
+
+  const tokens = tokenizeSource(source);
+  const lines = source.split(/\r?\n/);
+  const findingLines = new Set<number>();
+
+  const record = (token: SourceToken): void => {
+    findingLines.add(token.line);
+  };
+
+  for (let index = 0; index < tokens.length; index++) {
+    const token = tokens[index];
+
+    if (token.value === '{') {
+      const close = matchingToken(tokens, index, '{', '}');
+      const callee = propertyString(tokens, index, close, 'callee');
+      const axis = propertyString(tokens, index, close, 'axis');
+      if (callee && axis) record(callee);
+      continue;
+    }
+
+    if (token.kind !== 'identifier' || (token.value !== 'callee' && token.value !== 'axis')) {
+      continue;
+    }
+
+    for (let candidate = Math.max(0, index - 4); candidate <= index + 4; candidate++) {
+      if (tokens[candidate]?.kind === 'string' && hasComparison(tokens, index, candidate)) {
+        record(token);
+        break;
+      }
+    }
+
+    if (
+      tokens[index + 1]?.value === '.' &&
+      ['startsWith', 'endsWith', 'includes'].includes(tokens[index + 2]?.value) &&
+      tokens[index + 3]?.value === '(' && tokens[index + 4]?.kind === 'string'
+    ) {
+      record(token);
+    }
+
+    if (tokens[index - 2]?.value !== 'switch' || tokens[index - 1]?.value !== '(') continue;
+    const conditionClose = matchingToken(tokens, index - 1, '(', ')');
+    if (tokens[conditionClose + 1]?.value !== '{') continue;
+    const bodyClose = matchingToken(tokens, conditionClose + 1, '{', '}');
+    for (let branch = conditionClose + 2; branch < bodyClose - 1; branch++) {
+      if (tokens[branch]?.value === 'case' && tokens[branch + 1]?.kind === 'string') {
+        record(tokens[branch + 1]);
+      }
+    }
+  }
+
+  return [...findingLines].sort((left, right) => left - right).map((line) => ({
+    rule: 'plugin-discovery-core-coupling',
+    file,
+    line,
+    text: lines[line - 1]?.trim() ?? '',
+  }));
+}
+
 async function scanUnits(file: string, cwd: string): Promise<ScanUnit[]> {
   const sourcePath = relative(cwd, file).replaceAll('\\', '/');
   const source = await Deno.readTextFile(file);
@@ -978,6 +1073,7 @@ export async function scanCodeQualityDetailed(
   for (const file of files) {
     for (const unit of await scanUnits(file, cwd)) {
       const normalized = unit.sourcePath.replaceAll('\\', '/');
+      findings.push(...pluginDiscoveryCoreCoupling(unit.lines.join('\n'), normalized));
       const discardedFindings = new Map(
         discardedSagaPublisherResults(unit.lines.join('\n')).map((finding) => [
           finding.line,

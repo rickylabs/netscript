@@ -25,7 +25,9 @@
 #       for .llm/tools/agentic/openhands/openhands-status.ts compatibility)
 #   <!-- openhands-run: {"run_id":..,"attempt":..,"conclusion":..,
 #        "state":..,"verdict":..,"verdict_source":..,"phase":..,
-#        "evaluated_head":..} -->                              (machine marker, v2)
+#        "evaluated_head":..,"verdict_artifact_path":..,
+#        "verdict_artifact_commit":..,"verdict_artifact_uri":..} -->
+#                                                               (machine marker, v2)
 #   ## OpenHands Agent — <Completed|Completed — no agent summary|Agent failed|
 #        Bootstrap failed|Did not run>                     (heading vocabulary
 #       is frozen; agentic-lib.ts parseOpenHandsStatusComment maps it)
@@ -54,7 +56,9 @@
 # the agent leaves uncommitted outside the allow-list is skipped, counted in
 # the final comment, and preserved as uncommitted.txt/uncommitted.patch in the
 # Actions artifact — never pushed. Lock-file churn on PR branches is designed
-# out, not cleaned up after.
+# out, not cleaned up after. Formal evaluators never push the evaluated branch:
+# their one exact verdict and compact trace are committed to a unique
+# openhands-eval-artifacts/pr-*/run-* evidence ref rooted at the immutable head.
 #
 # Concurrency: group = openhands-<event>-<pr/issue number|ref>, with
 # cancel-in-progress: false. GitHub semantics for this configuration: at most
@@ -927,6 +931,8 @@ jobs:
           ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
           CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
           CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          EVAL_PHASE: ${{ steps.request.outputs.eval_phase }}
+          EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
         run: |
           set -euo pipefail
           if [ -z "${OPENHANDS_RUN_DIR:-}" ]; then
@@ -956,23 +962,32 @@ jobs:
           # line outside code fences, optionally wrapped by a blockquote, markdown
           # heading/emphasis, or "Verdict:" prefix. Template text containing '<'
           # cannot match. Preserve whether an eligible marker was absent or emitted
-          # with an unparseable token/shape.
+          # with an unparseable token/shape, or more than one eligible marker.
           agent_verdict="NONE"
           agent_verdict_state="absent"
+          agent_verdict_source="none"
           if [ -s "$OPENHANDS_SUMMARY_PATH" ]; then
             unfenced="$(awk '/^[[:space:]]*(```|~~~)/{fence=!fence; next} !fence' "$OPENHANDS_SUMMARY_PATH")"
             eligible="$(printf '%s\n' "$unfenced" | grep -v '<' || true)"
-            if printf '%s\n' "$eligible" | grep -Eq 'OPENHANDS_VERDICT[[:space:]]*:'; then
-              agent_verdict_state="unparseable"
-            fi
-            line="$(printf '%s\n' "$eligible" \
+            marker_count="$(printf '%s\n' "$eligible" | grep -Ec 'OPENHANDS_VERDICT[[:space:]]*:' || true)"
+            verdict_lines="$OPENHANDS_RUN_DIR/verdict-lines.txt"
+            printf '%s\n' "$eligible" \
               | grep -E '^[[:space:]]*(>[[:space:]]*)*(#{1,6}[[:space:]]+)?[*_`]*(Verdict[*_`]*[[:space:]]*:?[[:space:]]*[*_`]*)?OPENHANDS_VERDICT[[:space:]]*:[[:space:]]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[[:space:]]*$' \
-              | head -n 1 || true)"
-            if [ -n "$line" ]; then
+              > "$verdict_lines" || true
+            valid_count="$(grep -c . "$verdict_lines" || true)"
+            if [ "$marker_count" -gt 1 ] || [ "$valid_count" -gt 1 ]; then
+              agent_verdict_state="ambiguous"
+              agent_verdict_source="summary-ambiguous"
+            elif [ "$marker_count" -eq 1 ] && [ "$valid_count" -eq 1 ]; then
+              line="$(head -n 1 "$verdict_lines")"
               agent_verdict="$(printf '%s' "$line" \
                 | grep -oE 'PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE' \
                 | tail -n 1)"
               agent_verdict_state="parsed"
+              agent_verdict_source="summary-file"
+            elif [ "$marker_count" -gt 0 ]; then
+              agent_verdict_state="unparseable"
+              agent_verdict_source="summary-unparseable"
             fi
           fi
 
@@ -980,10 +995,12 @@ jobs:
             echo "verdict=$verdict"
             echo "agent_verdict=$agent_verdict"
             echo "agent_verdict_state=$agent_verdict_state"
+            echo "agent_verdict_source=$agent_verdict_source"
             echo "summary_source=$summary_source"
           } >> "$GITHUB_OUTPUT"
           export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" \
-            AGENT_VERDICT_STATE="$agent_verdict_state" SUMMARY_SOURCE="$summary_source"
+            AGENT_VERDICT_STATE="$agent_verdict_state" \
+            AGENT_VERDICT_SOURCE="$agent_verdict_source" SUMMARY_SOURCE="$summary_source"
 
           if [ ! -s "$OPENHANDS_SUMMARY_PATH" ]; then
             {
@@ -1039,6 +1056,9 @@ jobs:
               "verdict": os.environ.get("RUN_VERDICT", "unknown"),
               "agent_verdict": os.environ.get("AGENT_VERDICT", "NONE"),
               "agent_verdict_state": os.environ.get("AGENT_VERDICT_STATE", "absent"),
+              "verdict_source": os.environ.get("AGENT_VERDICT_SOURCE", "none"),
+              "eval_phase": os.environ.get("EVAL_PHASE") or None,
+              "evaluated_head": os.environ.get("EVAL_HEAD") or None,
               "summary_source": os.environ.get("SUMMARY_SOURCE", "none"),
               "model": os.environ["MODEL"],
               "provider": os.environ["PROVIDER"],
@@ -1087,8 +1107,8 @@ jobs:
         id: commit-artifacts
         # always(): trace/run artifacts from a failed or budget-cut run must
         # still land on the branch for the supervisor's local status tooling.
-        # Formal evaluators are immutable read-only runs: their trace stays in the Actions artifact
-        # and final PR comment so the evaluated head can never be changed by evaluation itself.
+        # Formal evaluators are immutable read-only runs: a later step preserves their exact
+        # verdict + trace on an isolated evidence ref, never on the evaluated PR branch.
         # Allow-list: .llm/tmp/run/openhands/** and .llm/runs/** only — never
         # deno.lock, never node_modules, never agent source changes (the agent
         # pushes its own source commits per the request contract). Disallowed
@@ -1160,6 +1180,113 @@ jobs:
             git push "$remote" "HEAD:${CHECKOUT_REF}"
           fi
           echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Preserve formal evaluator verdict on isolated artifact ref
+        id: preserve-eval
+        # Formal evaluators remain read-only with respect to the evaluated PR head. A unique
+        # evidence ref is rooted at that immutable head and contains only the exact verdict plus
+        # compact trace metadata; the checkout branch itself is never pushed by this step.
+        if: >-
+          always() &&
+          steps.request.outputs.eval_phase != '' &&
+          steps.target-ref.outputs.exists == 'true' &&
+          steps.request.outputs.is_pr == 'true' &&
+          steps.artifacts.outputs.trace_dir != ''
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          EVAL_PHASE: ${{ steps.request.outputs.eval_phase }}
+          EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
+          AGENT_VERDICT: ${{ steps.trace.outputs.agent_verdict }}
+          AGENT_VERDICT_STATE: ${{ steps.trace.outputs.agent_verdict_state }}
+          VERDICT_SOURCE: ${{ steps.trace.outputs.agent_verdict_source }}
+          TRACE_DIR: ${{ steps.artifacts.outputs.trace_dir }}
+        run: |
+          set -euo pipefail
+          expected_file="evaluate.md"
+          expected_pattern='evaluate\.md'
+          if [ "$EVAL_PHASE" = "plan" ]; then
+            expected_file="plan-eval.md"
+            expected_pattern='plan-eval\.md'
+          fi
+
+          changed_paths="$RUNNER_TEMP/formal-eval-changed-paths.txt"
+          candidates_file="$RUNNER_TEMP/formal-eval-candidates.txt"
+          {
+            git diff --name-only --diff-filter=ACMRT "$EVAL_HEAD" -- .llm/runs
+            git ls-files --others --exclude-standard -- .llm/runs
+          } | sort -u > "$changed_paths"
+          grep -E "^\.llm/runs/.+/${expected_pattern}$" "$changed_paths" > "$candidates_file" || true
+          mapfile -t candidates < "$candidates_file"
+          if [ "${#candidates[@]}" -ne 1 ]; then
+            echo "Expected exactly one changed ${expected_file}; found ${#candidates[@]}." >&2
+            exit 1
+          fi
+          verdict_path="${candidates[0]}"
+          if [ ! -f "$verdict_path" ]; then
+            echo "Formal verdict candidate is not a file: $verdict_path" >&2
+            exit 1
+          fi
+
+          artifact_ref="openhands-eval-artifacts/pr-${ISSUE_NUMBER}/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_index="$(mktemp)"
+          rm -f "$artifact_index"
+          export GIT_AUTHOR_NAME="OpenHands Bot" GIT_AUTHOR_EMAIL="openhands@all-hands.dev"
+          export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+
+          GIT_INDEX_FILE="$artifact_index" git read-tree "$EVAL_HEAD"
+          GIT_INDEX_FILE="$artifact_index" git add -- "$verdict_path"
+          artifact_tree="$(GIT_INDEX_FILE="$artifact_index" git write-tree)"
+          artifact_commit="$(git commit-tree "$artifact_tree" -p "$EVAL_HEAD" \
+            -m "chore(openhands): preserve formal verdict ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}")"
+          artifact_uri="${GITHUB_SERVER_URL}/${CHECKOUT_REPO}/blob/${artifact_commit}/${verdict_path}"
+
+          export VERDICT_PATH="$verdict_path" ARTIFACT_REF="$artifact_ref"
+          export ARTIFACT_COMMIT="$artifact_commit" ARTIFACT_URI="$artifact_uri"
+          python - <<'PY'
+          import json
+          import os
+
+          metadata_path = os.path.join(os.environ["TRACE_DIR"], "metadata.json")
+          with open(metadata_path, encoding="utf-8") as source:
+              metadata = json.load(source)
+          metadata.update({
+              "eval_phase": os.environ["EVAL_PHASE"],
+              "evaluated_head": os.environ["EVAL_HEAD"],
+              "formal_verdict": os.environ.get("AGENT_VERDICT", "NONE"),
+              "verdict_state": os.environ.get("AGENT_VERDICT_STATE", "absent"),
+              "verdict_source": os.environ.get("VERDICT_SOURCE", "none"),
+              "verdict_artifact_path": os.environ["VERDICT_PATH"],
+              "verdict_artifact_ref": os.environ["ARTIFACT_REF"],
+              "verdict_artifact_commit": os.environ["ARTIFACT_COMMIT"],
+              "verdict_artifact_uri": os.environ["ARTIFACT_URI"],
+          })
+          with open(metadata_path, "w", encoding="utf-8") as target:
+              json.dump(metadata, target, indent=2)
+              target.write("\n")
+          PY
+          cp "$TRACE_DIR/metadata.json" "$OPENHANDS_METADATA_PATH"
+
+          record_index="$(mktemp)"
+          rm -f "$record_index"
+          GIT_INDEX_FILE="$record_index" git read-tree "$artifact_commit"
+          GIT_INDEX_FILE="$record_index" git add -f -- "$TRACE_DIR"
+          record_tree="$(GIT_INDEX_FILE="$record_index" git write-tree)"
+          record_commit="$(git commit-tree "$record_tree" -p "$artifact_commit" \
+            -m "chore(openhands): record formal evaluator trace ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}")"
+
+          remote="https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git"
+          git push "$remote" "${record_commit}:refs/heads/${artifact_ref}"
+          {
+            echo "pushed=true"
+            echo "artifact_ref=$artifact_ref"
+            echo "artifact_commit=$artifact_commit"
+            echo "record_commit=$record_commit"
+            echo "verdict_path=$verdict_path"
+            echo "artifact_uri=$artifact_uri"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create pull request for non-PR triggers
         id: create-pr
@@ -1240,6 +1367,7 @@ jobs:
           ACK_OUTCOME: ${{ steps.ack.outcome }}
           TRACE_OUTCOME: ${{ steps.trace.outcome }}
           COMMIT_OUTCOME: ${{ steps.commit-artifacts.outcome }}
+          PRESERVE_EVAL_OUTCOME: ${{ steps.preserve-eval.outcome }}
           REPLIES_OUTCOME: ${{ steps.replies.outcome }}
           CREATE_PR_OUTCOME: ${{ steps.create-pr.outcome }}
           CREATE_PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
@@ -1250,6 +1378,12 @@ jobs:
           SUMMARY_PATH: ${{ steps.artifacts.outputs.summary }}
           TRACE_DIR: ${{ steps.artifacts.outputs.trace_dir }}
           ARTIFACT_NAME: openhands-agent-${{ github.run_id }}-${{ github.run_attempt }}
+          EVAL_ARTIFACT_PUSHED: ${{ steps.preserve-eval.outputs.pushed }}
+          EVAL_ARTIFACT_REF: ${{ steps.preserve-eval.outputs.artifact_ref }}
+          EVAL_ARTIFACT_COMMIT: ${{ steps.preserve-eval.outputs.artifact_commit }}
+          EVAL_ARTIFACT_PATH: ${{ steps.preserve-eval.outputs.verdict_path }}
+          EVAL_ARTIFACT_URI: ${{ steps.preserve-eval.outputs.artifact_uri }}
+          TRACE_VERDICT_SOURCE: ${{ steps.trace.outputs.agent_verdict_source }}
         with:
           github-token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -1262,20 +1396,28 @@ jobs:
             // own line outside code fences; blockquotes, heading/emphasis wrappers,
             // and an optional "Verdict:" prefix are accepted. Placeholder/template
             // text containing '<' remains ineligible. The result distinguishes a
-            // genuinely absent marker from an emitted-but-unparseable marker.
+            // genuinely absent marker from an emitted-but-unparseable marker, and
+            // rejects multiple eligible markers as ambiguous.
             function verdictOf(text) {
               let inFence = false;
-              let markerSeen = false;
+              let markerCount = 0;
+              const matches = [];
               for (const line of String(text ?? '').split(/\r?\n/)) {
                 if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; continue; }
                 if (inFence || line.includes('<')) continue;
-                if (/OPENHANDS_VERDICT[ \t]*:/.test(line)) markerSeen = true;
+                if (/OPENHANDS_VERDICT[ \t]*:/.test(line)) markerCount += 1;
                 const match = line.match(
                   /^[ \t]*(?:>[ \t]*)*(?:#{1,6}[ \t]+)?[*_`]*(?:Verdict[*_`]*[ \t]*:?[ \t]*[*_`]*)?OPENHANDS_VERDICT[ \t]*:[ \t]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[ \t]*$/,
                 );
-                if (match) return { verdict: match[1], state: 'parsed' };
+                if (match) matches.push(match[1]);
               }
-              return { verdict: null, state: markerSeen ? 'unparseable' : 'absent' };
+              if (markerCount > 1 || matches.length > 1) {
+                return { verdict: null, state: 'ambiguous' };
+              }
+              if (markerCount === 1 && matches.length === 1) {
+                return { verdict: matches[0], state: 'parsed' };
+              }
+              return { verdict: null, state: markerCount ? 'unparseable' : 'absent' };
             }
 
             // 1) Summary file (terminal artifact — authoritative when present).
@@ -1319,8 +1461,11 @@ jobs:
                     commentVerdict = inspection.verdict;
                     commentVerdictUrl = c.html_url;
                     commentVerdictState = 'parsed';
-                  } else if (inspection.state === 'unparseable' && !commentVerdict) {
-                    commentVerdictState = 'unparseable';
+                  } else if (
+                    (inspection.state === 'unparseable' || inspection.state === 'ambiguous') &&
+                    !commentVerdict
+                  ) {
+                    commentVerdictState = inspection.state;
                   }
                 }
               } catch (error) {
@@ -1328,21 +1473,44 @@ jobs:
               }
             }
 
-            const verdict = summaryVerdict ?? commentVerdict ?? 'NONE';
-            const verdictSource = summaryVerdict
+            const isFormalEval = env.EVAL_PHASE === 'plan' || env.EVAL_PHASE === 'impl';
+            const formalArtifactReady = env.EVAL_ARTIFACT_PUSHED === 'true' &&
+              Boolean(env.EVAL_ARTIFACT_URI) && Boolean(env.EVAL_ARTIFACT_PATH) &&
+              Boolean(env.EVAL_ARTIFACT_COMMIT);
+            const verdict = isFormalEval
+              ? summaryInspection.state === 'parsed' && formalArtifactReady
+                ? summaryVerdict
+                : 'NONE'
+              : summaryVerdict ?? commentVerdict ?? 'NONE';
+            const verdictSource = isFormalEval
+              ? !formalArtifactReady
+                ? 'artifact-unavailable'
+                : env.TRACE_VERDICT_SOURCE ||
+                  (summaryInspection.state === 'parsed'
+                    ? 'summary-file'
+                    : `summary-${summaryInspection.state}`)
+              : summaryVerdict
               ? 'summary-file'
               : commentVerdict
               ? 'pr-comment'
+              : summaryInspection.state === 'ambiguous'
+              ? 'summary-ambiguous'
               : summaryInspection.state === 'unparseable'
               ? 'summary-unparseable'
+              : commentVerdictState === 'ambiguous'
+              ? 'pr-comment-ambiguous'
               : commentVerdictState === 'unparseable'
               ? 'pr-comment-unparseable'
               : 'none';
             const verdictMismatch = Boolean(summaryVerdict && commentVerdict && summaryVerdict !== commentVerdict);
             const verdictDiagnostic = verdictSource === 'none'
               ? 'Agent emitted no OPENHANDS_VERDICT token.'
+              : verdictSource.endsWith('-ambiguous')
+              ? 'Agent emitted more than one eligible OPENHANDS_VERDICT marker.'
               : verdictSource.endsWith('-unparseable')
               ? 'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.'
+              : verdictSource === 'artifact-unavailable'
+              ? 'Formal verdict artifact could not be preserved without mutating the evaluated head.'
               : null;
 
             // Heading vocabulary is FROZEN — agentic-lib.ts
@@ -1380,10 +1548,24 @@ jobs:
               verdict_source: verdictSource,
               phase: env.EVAL_PHASE || null,
               evaluated_head: env.EVAL_HEAD || null,
+              verdict_artifact_path: formalArtifactReady ? env.EVAL_ARTIFACT_PATH : null,
+              verdict_artifact_commit: formalArtifactReady ? env.EVAL_ARTIFACT_COMMIT : null,
+              verdict_artifact_uri: formalArtifactReady ? env.EVAL_ARTIFACT_URI : null,
             });
 
             const MAX_SUMMARY = 55000;
             let summaryOut = summary.trim();
+            if (
+              isFormalEval &&
+              (!formalArtifactReady || summaryInspection.state !== 'parsed')
+            ) {
+              summaryOut = [
+                'Formal evaluator summary withheld because its verdict contract failed closed:',
+                `summary state=${summaryInspection.state}, artifact preserved=${formalArtifactReady}.`,
+                'Inspect the workflow logs and runtime Actions artifact. This status comment does',
+                'not repeat an untrusted verdict token or claim an unpreserved tracked path.',
+              ].join(' ');
+            }
             if (summaryOut.length > MAX_SUMMARY) {
               summaryOut = summaryOut.slice(0, MAX_SUMMARY)
                 + '\n\n_[summary truncated; full text is in the Actions artifact]_';
@@ -1393,6 +1575,7 @@ jobs:
               `ack=${outcome(env.ACK_OUTCOME)}`,
               `trace=${outcome(env.TRACE_OUTCOME)}`,
               `commit-artifacts=${outcome(env.COMMIT_OUTCOME)}`,
+              `preserve-eval=${outcome(env.PRESERVE_EVAL_OUTCOME)}`,
               `replies=${outcome(env.REPLIES_OUTCOME)}`,
               `draft-pr=${outcome(env.CREATE_PR_OUTCOME)}`,
             ].join(' ');
@@ -1415,6 +1598,14 @@ jobs:
               ...(verdictDiagnostic ? [`Verdict diagnostic: ${verdictDiagnostic}`] : []),
             ];
             if (commentVerdictUrl) lines.push(`Verdict comment: ${commentVerdictUrl}`);
+            if (formalArtifactReady) {
+              lines.push(
+                `Verdict artifact: [\`${env.EVAL_ARTIFACT_PATH}\`](${env.EVAL_ARTIFACT_URI}) `
+                  + `(isolated ref \`${env.EVAL_ARTIFACT_REF}\`; evaluated head unchanged)`,
+              );
+            } else if (isFormalEval) {
+              lines.push('Verdict artifact: unavailable; no tracked verdict path is claimed.');
+            }
             lines.push(`Summary source: ${env.SUMMARY_SOURCE || 'none'}`);
             lines.push(`Housekeeping: ${housekeeping}`);
             const leftovers = Number(env.LEFTOVER_COUNT || 0);
