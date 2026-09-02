@@ -609,3 +609,25 @@ no `--skip`/`--exclude`/`--only` mechanism exists anywhere in `run-command.ts`/`
 `gate-runner.ts`. `behavior.app-reference` is also a member of `scaffold.runtime.sqlite`'s gate list,
 so a full SQLite run would hit the same missing-Chrome failure. Awaiting coordinator regrant/decision
 before starting SQLite.
+
+## 2026-09-02 16:44Z — delivery-window checkpoint (D-323 route, deadline 17:16:34Z)
+
+- **S13 #1779** → head `335258304` (from `435c20170`). Why it moved: `quality` was red on
+  `check:mcp-export-corpus`; the regenerated corpus (`3bef62a54`) then produced **no**
+  `pull_request` dispatch for 9 min — root cause was a merge conflict with main on the same
+  generated file (GitHub skips `pull_request` workflows on a conflicting PR). Rebased onto main
+  `850cc7757` (`65282c361`; kept main's `.claude/skills` deletions and its exported
+  `MCP_COMMAND`), regenerated manifest + corpus, then `publish-assets.generated.ts`
+  (`335258304`). `check:aspire-version-parity` ok 0 fail / 0 missing, `check:mcp-export-corpus`,
+  `check:publish-assets`, `check:assets-barrel` exit 0, templates 91/0, teardown+parity tests 71/0.
+  PR-body evidence re-pointed at the current head. `status:ready-merge` retained. Remaining:
+  `ci` (`check-test`, `quality`, close-gate) on `335258304`.
+- **S9 #1759** → head `c6ec50214` (from `ecce4af0a`). The `ecce4af0a` sqlite tier failed
+  `behavior.otel.stream-consumer` with `ReferenceError: Cannot access 'flowBTracerProvider'
+  before initialization` (the `let` sat below the top-level `await provider.register()`).
+  Hoisted the declaration and pinned the order with a source-order guard test (RED on old order).
+  `quality`, `code-quality`, `fresh-ui-quality` green; both runtime tiers + `check-test` running.
+  Boxes 3/4 of #1721 evidenced locally at `c6ec50214` (0 stale hits; assets-barrel,
+  check-claude, publish-assets exit 0; `agentic:sync-claude:check` removed by #1911);
+  desktop-native red is the #1930 `@orpc/contract` class, not S9-owned.
+- **S10 #1760** `84e4b38f7` unchanged; only desktop-native (#1930, still OPEN) outstanding.
