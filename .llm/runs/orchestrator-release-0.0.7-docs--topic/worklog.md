@@ -3989,3 +3989,55 @@ clear together.
 **Two mirror traps now recorded for the lane:** it is label-gated on `status:ready-merge` (so a PR
 mid-re-evaluation always reads red), and it is body+comments concatenated (so a second block anywhere
 duplicates every shared box). Both cost a cycle here.
+
+## 2026-09-02 — credential unblocked; ci.yml landed as real source; all CI green
+
+**The push worked, but not the way the instruction assumed.** `env -u GH_TOKEN -u GITHUB_TOKEN` was
+not sufficient: `~/.gitconfig` configures a credential helper that reads **`$HOME/.gh_token`**, a
+file still holding the repo-only token, which unsetting environment variables does not touch.
+Verified by scope, without printing either token:
+
+```
+~/.gh_token           -> x-oauth-scopes: repo
+stored gh credential  -> x-oauth-scopes: gist, read:org, repo, workflow
+```
+
+Adding `-c credential.helper='!gh auth git-credential'` alone still failed, because git tries helpers
+in order and the global one won. The working form clears the list first:
+
+```
+env -u GH_TOKEN -u GITHUB_TOKEN git \
+  -c credential.helper= \
+  -c credential.helper='!gh auth git-credential' \
+  push …
+```
+
+No file was mutated to achieve this — the override is per-invocation.
+
+**Integration onto `0622dc432`.** Twelve commits replayed; one conflict, in
+`agent-tools.generated.ts` — resolved to main's copy and then regenerated, never hand-merged, since
+`check:assets-barrel` is a regenerate-then-assert-empty-diff gate.
+
+**Verified the rebase preserved the branch's work rather than assuming it.** Compared the branch's
+own edit per file across both bases: identical everywhere except the two new artifacts, the
+regenerated barrel, and `scan-code-quality.ts`/`_test.ts` — where **main itself added 124 lines**.
+Confirmed my `templateInteriorLines` fix survived intact and the scanner suite passes **45/0** (44
+before; main added one).
+
+**`ci.yml` is now committed source**, not a carried patch. `docs:jsdoc-examples:test` passes 1/1 —
+the assertion that was the sole `check-test` failure for this entire run.
+
+**All CI green at `b607bfe26`:** check-test **pass (11m4s)**, quality, code-quality, build,
+close-gate, both classifiers, fresh-ui-quality, lane visibility. Repo suite locally **4855 / 0**.
+Census holds at `116`/`14` with ceilings at exact census (`files` 2037 → 2038 as main grew).
+
+**Cycle-3's four repairs are all discharged:** R1/R2 by landing the wiring, R3 by carrying the patch
+inside the branch, R4 by clearing the duplicate evidence blocks.
+
+**One staleness I introduced and then removed:** box 5's evidence still carried its "CARRIED, NOT YET
+ON THE HEAD" caveat after the patch had landed. True when written, false once pushed. Refreshed to
+describe the committed step. A caveat that outlives its condition is just a wrong claim.
+
+Final bounded delta evaluator dispatched on `b607bfe26`, scoped to what changed since the passing
+delta at `9372a27e1`: the wiring, the rebase's preservation of the branch's work, barrel honesty,
+census, and whether box 5 is *now* true.
