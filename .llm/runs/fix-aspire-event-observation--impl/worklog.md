@@ -113,3 +113,18 @@ would fail the test; the same test also asserts the follower was killed after ex
   failure code remains authoritative, with the wording-tolerant description fallback used only when
   the data bag has no code.
 - No other Bucket A/C site and no product source changed.
+
+## Post-slice reconcile
+
+- Draft PR #1909 targets the stacked branch `fix/garnet-readiness-timeout` and records commit
+  `20d9b38bc`, the gate evidence, confirmed follow schema, deferred #1906 scope, and mandatory
+  CI/IMPL-EVAL blockers.
+- PR taxonomy is exact: `type:test`, `area:cli`, `area:aspire`, `gate:e2e`, `priority:p1`, and the
+  sole lifecycle label `status:impl`; milestone `0.0.7` is assigned.
+- #1906 remains open because this slice intentionally uses `Refs #1906` and does not complete the
+  other Bucket A/C sites or regression guard. No closing keyword was added.
+- Stacked PR #1858 remains open, so this branch still targets its head and was not rebased onto
+  `main`. Its substantive check/test/E2E jobs are green in the current snapshot; its close-gate job
+  is red, which is outside this implementation slice and prevents treating the dependency as landed.
+- No new review comment required an implementation readjustment. PR #1907's confirmed Aspire 13.5.3
+  follow-line evidence was incorporated before the final gates and commit.
