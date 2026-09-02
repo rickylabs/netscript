@@ -15,11 +15,19 @@
  * four-backtick fence in `packages/mcp/README.md` also un-masked two blocks the aborted parse had
  * been hiding, so `tsLike` rose 72→73 and `checked` 71→73.
  *
- * The 7 that remain are all `TS2307` on modules that correctly have no repository path — imports of
+ * The 7 that remain are 6 `TS2307` on modules that correctly have no repository path — imports of
  * consumer-owned or installer-emitted files (`blocks/contracts/orders.ts`, `blocks/router.ts`,
- * `.generated/client.server.ts`, `auth/sdk-client.ts`) and the scaffolded app's own `@app/*` alias —
- * plus one `TS18046` downstream of that alias. Repairing those would mean documenting something
- * other than what a reader actually writes, so they stay deferred on purpose.
+ * `.generated/client.server.ts`, `auth/sdk-client.ts`) and the two illustrative aliases
+ * `@app/router.ts` and `@example/contracts` — plus one `TS18046` downstream of the `@app/*` one.
+ *
+ * Five of the six are not honestly repairable in place: the README would have to name something
+ * other than what a reader actually writes. The `@app/router.ts` pair is a **disclosed tradeoff**,
+ * not an impossibility — a faithful `@app/router.ts` support stub in `materializeSharedSupports`,
+ * following the fabrication pattern already used there for `@app/lib/*`, would clear both errors
+ * (7→5, failing READMEs 5→4) without changing a character of the README. It is left out here
+ * because a fabricated router stub can drift from the real scaffold generator, and a shared fixture
+ * that every package's fences compile against deserves its own evaluated slice rather than a
+ * late addition to this one.
  */
 export const README_FENCE_RATCHET = {
   /** Discovered `packages/*` and `plugins/*` READMEs. */
