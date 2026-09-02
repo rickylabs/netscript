@@ -1,3 +1,11 @@
+/** Upstream workflow skills installed beside NetScript's canonical `aspire` skill. */
+export const ASPIRE_WORKFLOW_SKILLS: readonly string[] = [
+  'aspire-init',
+  'aspire-orchestration',
+  'aspire-monitoring',
+  'aspire-deployment',
+];
+
 /** Result of optional Aspire agent initialization. */
 export type AspireAgentInitializationResult =
   | { readonly ok: true }

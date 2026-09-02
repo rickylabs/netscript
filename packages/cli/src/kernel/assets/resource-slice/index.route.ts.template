@@ -1,0 +1,5 @@
+import { defineRouteContract } from '@netscript/fresh/route';
+
+const {{resourceCamelCase}}RouteContract = defineRouteContract({});
+
+export default {{resourceCamelCase}}RouteContract;

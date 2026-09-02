@@ -1,10 +1,67 @@
 path	class	owner	disposition
 .agents/docs/README.md	skill:internal	S13	wording check; no version literal expected
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/aws.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/azure.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/cicd.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/docker-compose.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/github-actions-azure-csharp.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/github-actions-azure-typescript.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/javascript.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/kubernetes.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/preflight.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-init/references/init-workflow.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-init/references/templates.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-init/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/diagnostics-bridge.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/monitoring.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/playwright-handoff.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/agent-workflows.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/app-commands.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/detection.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/resource-management.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/safety-guardrails.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/help.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/netscript-build/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/aws.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/azure.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/cicd.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/docker-compose.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/github-actions-azure-csharp.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/github-actions-azure-typescript.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/javascript.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/kubernetes.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/preflight.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-init/references/init-workflow.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-init/references/templates.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-init/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/diagnostics-bridge.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/monitoring.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/playwright-handoff.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/agent-workflows.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/app-commands.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/detection.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/resource-management.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/safety-guardrails.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/aspire/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/help.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript-build/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/consumer-tools.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/e2e/scaffold-e2e-test.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/README.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/run-deno-lint.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/validation/check-aspire-host-ports.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.mcp.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/AGENTS.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
 .agents/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
@@ -48,6 +105,7 @@ path	class	owner	disposition
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/tools/agentic/claude/hybrid-opencode-adapter_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/codex/run-codex-slice-lib_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/agentic/dogfood-skills.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/opencode/opencode-boundary-plugin.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/opencode/opencode-preflight_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/opencode/opencode-project-config_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -83,6 +141,7 @@ path	class	owner	disposition
 .llm/tools/entry.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/fitness/check-public-jsdoc-codenames_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/gates/catalog.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/gates/run-aspire-mcp-smoke.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/render-milestone-status_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/render-milestone-status.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/validate-milestone-cluster_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -300,13 +359,25 @@ packages/cli/e2e/src/application/builders/suite/suite-builder.ts	e2e	S2/S3/S10	r
 packages/cli/e2e/src/application/builders/workspace/smoke-project-factory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/quickstart/aspire-walk.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-telemetry.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp-smoke.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/contract.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/entry-point.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/evaluate.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/receipt.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/stdio-transport.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/tools.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/database-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/find-job-execute-identity_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/generated-app-endpoint.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/otel-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/otlp-headers.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -314,6 +385,12 @@ packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts	e2e	S2/S3/S10	r
 packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/capture-db-endpoint-allocation.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/doctor.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/resource-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/listener-fault-controller.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -342,7 +419,6 @@ packages/cli/e2e/src/application/gates/scaffold/verify-endpoint-readiness.ts	e2e
 packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
-packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/cli-surface.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/extension-axes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -354,8 +430,15 @@ packages/cli/e2e/tests/adapters/reporting/pretty-reporter_test.ts	e2e	S2/S3/S10	
 packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/builders/runtime-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/builders/suite-builder_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-mcp-smoke_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-structured-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-describe-follow-13.5.3-capture.ndjson	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-13.5.3.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-post-stop-probe.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-stop-transcript.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/cli/e2e/tests/application/gates/http-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -363,6 +446,7 @@ packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts	e2
 packages/cli/e2e/tests/application/gates/locate-workers-resource-block_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/prepare-readiness-fixture_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/resource-command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/behavior-plugins-health-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -373,6 +457,7 @@ packages/cli/e2e/tests/application/gates/scaffold/ui-data-screen-gates_test.ts	e
 packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/runner/gate-runner_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/runner/suite-runner_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/fixtures/aspire-13.5.3-mcp-recorded.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/init-json_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/quickstart-walk-suite_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/suite-registry_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -543,6 +628,7 @@ packages/cli/src/maintainer/features/release/eject/producer-root-files.ts	cli:ot
 packages/cli/src/maintainer/features/release/eject/release-eject.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/maintainer/features/root/maintainer-command-dependencies.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/maintainer/features/root/maintainer-services_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/jsr-import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/domain/scaffold-plan_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
