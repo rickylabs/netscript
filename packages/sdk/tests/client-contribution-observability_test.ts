@@ -3,6 +3,7 @@ import { assert, assertEquals, assertFalse } from '@std/assert';
 const contributionModule = new URL('../src/client/sdk-client-contribution.ts', import.meta.url);
 const linkModule = new URL('../src/client/http-client-link.ts', import.meta.url);
 const discoveryModule = new URL('../src/discovery/service-url.ts', import.meta.url);
+const policyModule = new URL('../src/internal/transport-policy.ts', import.meta.url);
 const sdkConfig = new URL('../deno.json', import.meta.url);
 
 Deno.test('contributed headers retain CLIENT span and final trace injection', async () => {
@@ -18,6 +19,7 @@ Deno.test('contributed headers retain CLIENT span and final trace injection', as
     import { defineSdkClientContribution } from ${JSON.stringify(contributionModule.href)};
     import { createHttpClientLink } from ${JSON.stringify(linkModule.href)};
     import { createServerServiceEnvKey } from ${JSON.stringify(discoveryModule.href)};
+    import { resolveTransportPolicy } from ${JSON.stringify(policyModule.href)};
 
     context.disable();
     trace.disable();
@@ -48,7 +50,7 @@ Deno.test('contributed headers retain CLIENT span and final trace injection', as
     let contributedHeader = null;
     let traceparent = null;
     const link = createHttpClientLink({
-      contract,
+      transportPolicy: resolveTransportPolicy(contract),
       serviceName,
       protocol: 'http',
       rpcPath: '/api/rpc/v1/contribution-observability',

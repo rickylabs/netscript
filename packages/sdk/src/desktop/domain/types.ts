@@ -5,6 +5,7 @@ import type {
 } from './constants.ts';
 import type {
   ContractLike,
+  SdkClientTransportPolicy,
   ServiceClient,
   ServiceClientContext,
 } from '../../ports/service-client.ts';
@@ -149,6 +150,8 @@ export interface CreateDesktopServiceClientOptions<TContract extends ContractLik
   extends CreateDesktopBindClientPortOptions {
   /** Existing NetScript/oRPC contract used only for client type inference. */
   readonly contract: TContract;
+  /** Optional HTTP method adaptation validated before Desktop dispatch. */
+  readonly transportPolicy?: SdkClientTransportPolicy;
 }
 
 /** Typed Desktop client derived from an existing NetScript service contract. */

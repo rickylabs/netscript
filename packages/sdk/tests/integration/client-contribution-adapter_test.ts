@@ -14,9 +14,9 @@ import type { PreparedSdkClientCall } from '../../src/internal/client-contributi
 import { createPreparedOutboundHeadersPort } from '../../src/internal/client-contributions/prepared-call.ts';
 import {
   createStableV1ClientLink,
-  createStableV1ProcedureMetadataPort,
   type StableV1TransportContext,
 } from '../../src/internal/client-contributions/stable-v1-adapter.ts';
+import { resolveTransportPolicy } from '../../src/internal/transport-policy.ts';
 import type { ClientLinkPort } from '../../src/ports/client-link-factory.ts';
 import type { SdkClientPrepareOptions } from '../../src/ports/sdk-client-contribution.ts';
 
@@ -31,6 +31,15 @@ const OMITTED_CONTRIBUTION_BASELINE = JSON.stringify({
 
 interface CredentialContext {
   readonly credential: () => string;
+}
+
+interface IdentityContext extends CredentialContext {
+  readonly locale: () => string;
+}
+
+interface PendingFetch {
+  readonly headers: Headers;
+  readonly reject: (reason?: unknown) => void;
 }
 
 function createContract() {
@@ -53,6 +62,27 @@ function createCredentialContribution(
     prepare: (options) => {
       observations.push(options);
       return { headers: { 'x-test-credential': options.context.credential() } };
+    },
+  });
+}
+
+function createIdentityContribution(
+  observations: SdkClientPrepareOptions<IdentityContext>[],
+) {
+  return defineSdkClientContribution<IdentityContext>()({
+    protocol: { family: 'netscript.sdk-client', major: 1 },
+    id: 'test:identity',
+    context: { credential: 'required', locale: 'required' },
+    headerKeys: ['authorization', 'accept-language'],
+    responseCache: { mode: 'invariant' },
+    prepare: (options) => {
+      observations.push(options);
+      return {
+        headers: {
+          authorization: options.context.credential(),
+          'accept-language': options.context.locale(),
+        },
+      };
     },
   });
 }
@@ -85,6 +115,26 @@ function singleEvent(value: unknown): AsyncGenerator<unknown> {
   })();
 }
 
+async function waitForPendingFetches(
+  pending: readonly PendingFetch[],
+  minimum: number,
+): Promise<void> {
+  for (let attempt = 0; attempt < 50 && pending.length < minimum; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  assert(pending.length >= minimum, `Expected at least ${minimum} pending fetches`);
+}
+
+function createPendingFetch(pending: PendingFetch[]): typeof globalThis.fetch {
+  return (_request, init) =>
+    new Promise<Response>((_resolve, reject) => {
+      pending.push({
+        headers: new Headers(init?.headers),
+        reject,
+      });
+    });
+}
+
 async function captureRejected(error: Error, operation: () => Promise<unknown>): Promise<void> {
   try {
     await operation();
@@ -100,6 +150,8 @@ Deno.test('forced unary retry prepares once and reuses one immutable prepared ca
   const preparedCalls: PreparedSdkClientCall<object>[] = [];
   const headerContainers: Headers[] = [];
   let attempts = 0;
+  let policyCalls = 0;
+  const policyProcedures: SdkClientPrepareOptions<CredentialContext>['procedure'][] = [];
   const finalError = new Error('transport failed');
   const rawLink: ClientLinkPort<
     StableV1TransportContext<object>,
@@ -113,13 +165,20 @@ Deno.test('forced unary retry prepares once and reuses one immutable prepared ca
       return attempts === 1 ? Promise.reject(new Error('retry me')) : Promise.reject(finalError);
     },
   };
+  const contract = createContract();
   const link = createStableV1ClientLink<CredentialContext>({
-    contract: createContract(),
     link: rawLink,
-    preparation: createPreparedOutboundHeadersPort(
-      [contribution],
-      createStableV1ProcedureMetadataPort(),
-    ),
+    preparation: createPreparedOutboundHeadersPort([contribution]),
+    transportPolicy: resolveTransportPolicy(contract, {
+      transportPolicy: {
+        method: (options) => {
+          assertEquals(observations.length, 0);
+          policyCalls += 1;
+          policyProcedures.push(options.procedure);
+          return options.inferredMethod;
+        },
+      },
+    }),
     resolveTransport: transportDescriptor,
     hasContributions: true,
   });
@@ -136,8 +195,11 @@ Deno.test('forced unary retry prepares once and reuses one immutable prepared ca
     }));
 
   assertEquals(observations.length, 1);
+  assertEquals(policyCalls, 1);
   assertEquals(attempts, 2);
   assertStrictEquals(preparedCalls[0], preparedCalls[1]);
+  assertStrictEquals(policyProcedures[0], observations[0].procedure);
+  assertStrictEquals(policyProcedures[0], preparedCalls[0].call.transportPolicy.procedure);
   assertNotStrictEquals(headerContainers[0], headerContainers[1]);
   assertEquals([...headerContainers[0].entries()], [...headerContainers[1].entries()]);
   assertEquals(preparedCalls[0].contributedHeaders.values, {
@@ -173,7 +235,7 @@ Deno.test('HTTP retry materializes fresh transport headers with byte-equivalent 
 
   try {
     const link = createHttpClientLink({
-      contract: createContract(),
+      transportPolicy: resolveTransportPolicy(createContract()),
       serviceName: SERVICE_NAME,
       protocol: 'http',
       rpcPath: RPC_PATH,
@@ -207,6 +269,7 @@ Deno.test('iterator reconnect starts one new preparation epoch and rotates crede
   const contribution = createCredentialContribution(observations);
   const attempts: PreparedSdkClientCall<object>[] = [];
   let transportAttempt = 0;
+  let policyCalls = 0;
   const rawLink: ClientLinkPort<
     StableV1TransportContext<object>,
     PreparedSdkClientCall<object>
@@ -223,13 +286,18 @@ Deno.test('iterator reconnect starts one new preparation epoch and rotates crede
       return Promise.resolve(singleEvent('B-item'));
     },
   };
+  const contract = createContract();
   const link = createStableV1ClientLink<CredentialContext>({
-    contract: createContract(),
     link: rawLink,
-    preparation: createPreparedOutboundHeadersPort(
-      [contribution],
-      createStableV1ProcedureMetadataPort(),
-    ),
+    preparation: createPreparedOutboundHeadersPort([contribution]),
+    transportPolicy: resolveTransportPolicy(contract, {
+      transportPolicy: {
+        method: (options) => {
+          policyCalls += 1;
+          return options.inferredMethod;
+        },
+      },
+    }),
     resolveTransport: transportDescriptor,
     hasContributions: true,
   });
@@ -247,6 +315,7 @@ Deno.test('iterator reconnect starts one new preparation epoch and rotates crede
   assertEquals(await output.next(), { done: false, value: 'B-item' });
 
   assertEquals(observations.length, 2);
+  assertEquals(policyCalls, 2);
   assertEquals(attempts.length, 4);
   assertStrictEquals(attempts[0], attempts[1]);
   assertStrictEquals(attempts[2], attempts[3]);
@@ -270,13 +339,13 @@ Deno.test('aborted iterator failure starts no reconnect epoch', async () => {
       return Promise.resolve(eventThenFailure('first', new Error('after abort')));
     },
   };
+  const contract = createContract();
   const link = createStableV1ClientLink<CredentialContext>({
-    contract: createContract(),
     link: rawLink,
-    preparation: createPreparedOutboundHeadersPort(
-      [createCredentialContribution(observations)],
-      createStableV1ProcedureMetadataPort(),
-    ),
+    preparation: createPreparedOutboundHeadersPort([
+      createCredentialContribution(observations),
+    ]),
+    transportPolicy: resolveTransportPolicy(contract),
     resolveTransport: transportDescriptor,
     hasContributions: true,
   });
@@ -305,7 +374,7 @@ Deno.test('omitted and explicit-empty contributions produce byte-identical reque
   const capture = async (contributions?: readonly []): Promise<string> => {
     let requestBytes = '';
     const link = createHttpClientLink({
-      contract: createContract(),
+      transportPolicy: resolveTransportPolicy(createContract()),
       serviceName: SERVICE_NAME,
       protocol: 'http',
       rpcPath: RPC_PATH,
@@ -335,6 +404,95 @@ Deno.test('omitted and explicit-empty contributions produce byte-identical reque
     assertEquals(await capture(), OMITTED_CONTRIBUTION_BASELINE);
     assertEquals(await capture([]), OMITTED_CONTRIBUTION_BASELINE);
   } finally {
+    if (previous === undefined) Deno.env.delete(envKey);
+    else Deno.env.set(envKey, previous);
+  }
+});
+
+Deno.test('overlapping GETs with identical prepared headers coalesce while pending', async () => {
+  const envKey = createServerServiceEnvKey(SERVICE_NAME);
+  const previous = Deno.env.get(envKey);
+  Deno.env.set(envKey, 'http://127.0.0.1:9');
+  const observations: SdkClientPrepareOptions<IdentityContext>[] = [];
+  const pending: PendingFetch[] = [];
+  const contract = {
+    echo: os.route({ method: 'GET', path: '/echo' }).handler(
+      ({ input }: { input: unknown }) => input,
+    ),
+  };
+  const link = createHttpClientLink({
+    transportPolicy: resolveTransportPolicy(contract),
+    serviceName: SERVICE_NAME,
+    protocol: 'http',
+    rpcPath: RPC_PATH,
+    propagateTraceContext: false,
+    getTraceHeaders: () => ({}),
+    contributions: [createIdentityContribution(observations)],
+    fetch: createPendingFetch(pending),
+  });
+  const first = link.call(['echo'], { message: 'same' }, {
+    context: { credential: () => 'Bearer A', locale: () => 'en-US' },
+  });
+  const second = link.call(['echo'], { message: 'same' }, {
+    context: { credential: () => 'Bearer A', locale: () => 'en-US' },
+  });
+
+  try {
+    await waitForPendingFetches(pending, 1);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assertEquals(pending.length, 1);
+    assertEquals(pending[0].headers.get('authorization'), 'Bearer A');
+    assertEquals(pending[0].headers.get('accept-language'), 'en-US');
+  } finally {
+    for (const request of pending) request.reject(new Error('release coalesced requests'));
+    await Promise.allSettled([first, second]);
+    if (previous === undefined) Deno.env.delete(envKey);
+    else Deno.env.set(envKey, previous);
+  }
+});
+
+Deno.test('overlapping GETs with distinct prepared headers dispatch separately', async () => {
+  const envKey = createServerServiceEnvKey(SERVICE_NAME);
+  const previous = Deno.env.get(envKey);
+  Deno.env.set(envKey, 'http://127.0.0.1:9');
+  const observations: SdkClientPrepareOptions<IdentityContext>[] = [];
+  const pending: PendingFetch[] = [];
+  const contract = {
+    echo: os.route({ method: 'GET', path: '/echo' }).handler(
+      ({ input }: { input: unknown }) => input,
+    ),
+  };
+  const link = createHttpClientLink({
+    transportPolicy: resolveTransportPolicy(contract),
+    serviceName: SERVICE_NAME,
+    protocol: 'http',
+    rpcPath: RPC_PATH,
+    propagateTraceContext: false,
+    getTraceHeaders: () => ({}),
+    contributions: [createIdentityContribution(observations)],
+    fetch: createPendingFetch(pending),
+  });
+  const first = link.call(['echo'], { message: 'same' }, {
+    context: { credential: () => 'Bearer A', locale: () => 'en-US' },
+  });
+  const second = link.call(['echo'], { message: 'same' }, {
+    context: { credential: () => 'Bearer B', locale: () => 'fr-FR' },
+  });
+
+  try {
+    await waitForPendingFetches(pending, 2);
+    assertEquals(pending.length, 2);
+    assertEquals(
+      pending.map((request) => request.headers.get('authorization')).sort(),
+      ['Bearer A', 'Bearer B'],
+    );
+    assertEquals(
+      pending.map((request) => request.headers.get('accept-language')).sort(),
+      ['en-US', 'fr-FR'],
+    );
+  } finally {
+    for (const request of pending) request.reject(new Error('release distinct requests'));
+    await Promise.allSettled([first, second]);
     if (previous === undefined) Deno.env.delete(envKey);
     else Deno.env.set(envKey, previous);
   }

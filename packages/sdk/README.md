@@ -328,6 +328,20 @@ and Linux apply on relaunch.
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).
 
+## Transport policy
+
+Service clients derive the HTTP method, GET deduplication, and cache group from the contract and
+its NetScript procedure metadata through one SDK-owned policy decision. Use the optional
+`transportPolicy.method` callback only when adapting that final method—for example, a future
+POST-only transport. Request contributions receive procedure path, metadata, input, their context
+projection, signal, and the resolved destination; they never receive the HTTP method or control
+retry, deduplication, tracing, fetch, or link plugins.
+
+The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
+but are intentional no-ops. Configure explicit addresses through service discovery instead of
+`port`, and pass a per-call `AbortSignal` instead of `timeout`. Neither option changes discovery,
+dispatch, or cancellation behavior.
+
 ## Docs
 
 - **Services & SDK — the pillar this package implements**:

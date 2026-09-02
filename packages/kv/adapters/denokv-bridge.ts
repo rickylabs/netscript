@@ -319,7 +319,7 @@ class RedisAtomicOperation implements DenoAtomicOperation {
  * @example
  * ```ts
  * import { getKv } from '@netscript/kv';
- * import { WatchableKvBridge } from './denokv-bridge.ts';
+ * import { WatchableKvBridge } from '@netscript/kv/kvdex';
  * import { kvdex, collection, model } from '@olli/kvdex';
  *
  * const watchableKv = await getKv();

@@ -22,6 +22,7 @@ export type NetScriptAuthenticationRequirement = 'none' | 'optional' | 'required
  *     authentication: 'required',
  *     authorization: { scopes: ['orders:read'], roles: ['operator'] },
  *   },
+ *   policy: { cache: 'force-cache' },
  * };
  * ```
  */
@@ -37,5 +38,10 @@ export interface NetScriptProcedureMeta {
       /** Roles required by the procedure. */
       readonly roles?: readonly string[];
     };
+  };
+  /** Client transport policy declared by the procedure contract. */
+  readonly policy?: {
+    /** Advisory cache policy consumed by SDK transport resolution. */
+    readonly cache?: 'no-store' | 'default' | 'force-cache';
   };
 }

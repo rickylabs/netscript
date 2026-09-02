@@ -20,9 +20,9 @@ projections from a single entity schema.
 - **Base contract** — `baseContract` carries NetScript's common oRPC error map (`NOT_FOUND`,
   `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, `SERVICE_UNAVAILABLE`), so every
   service starts from one shared error vocabulary.
-- **Procedure metadata** — `NetScriptProcedureMeta.access` is the single contract-local vocabulary
-  for authentication plus optional scope and role requirements, without exposing oRPC's metadata
-  types to consumers.
+- **Procedure metadata** — `NetScriptProcedureMeta.access` declares authentication/authorization,
+  while `policy.cache` supplies advisory SDK cache intent, without exposing oRPC's metadata types
+  or maintaining a second route-policy map.
 - **Pagination schemas** — offset and cursor query/input/meta schemas
   (`OffsetPaginationQuerySchema`, `CursorPaginationMetaSchema`, and friends) with shared
   limit/offset defaults and string-to-number coercion for query parameters.
@@ -67,6 +67,7 @@ export const listItems = baseContract
         roles: ['operator'],
       },
     },
+    policy: { cache: 'force-cache' },
   })
   .input(OffsetPaginationQuerySchema)
   .output(
@@ -97,6 +98,9 @@ type-check.
 An absent `access` field is unspecified, not public. The service runtime leaves existing consumers
 unchanged until an application explicitly opts into contract enforcement with
 `createContractAuthorizer(contract, { fallback? })` and passes it to `.withAuthz()`.
+
+`policy.cache` accepts `'no-store'`, `'default'`, or `'force-cache'`. It is advisory input to the
+SDK's central transport policy; it does not create a second cache or server-handler mechanism.
 
 `'optional'` is declared for future support, currently rejected. The OpenAPI projection can
 represent the declaration, but `createContractAuthorizer()` throws the stable

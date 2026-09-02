@@ -8,6 +8,8 @@
  * ```ts
  * import { installPartialNavigationCoordinator } from '@netscript/fresh/navigation';
  *
+ * declare const currentRoute: { value: string };
+ *
  * const navigation = installPartialNavigationCoordinator();
  * const unsubscribe = navigation.subscribe((change) => {
  *   currentRoute.value = change.url.pathname;
