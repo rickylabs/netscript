@@ -924,3 +924,21 @@ the merge.**
 - Epic #1712 ledger: S1–S11, S13 `status:shipped`; S12 (#1725) retargeted 0.0.8; #1726 S6b
   0.0.8; #1742 backlog. Open 0.0.7 Aspire closure: #1880 (via #1952), #863 (gates 1–2 via
   #1952, gate 3 = #1881), #1881.
+
+## 2026-09-02 23:3xZ — #1953 PASS handoff · Canary 7 result · #1952 head moved
+
+- **#1953** IMPL-EVAL cycle 2 (local route, session `fb4517d1…`, USD 0.70) → **PASS** at
+  `07c4a0b93`; PASS comment 5517878968, DoD 5/5 ticked via REST, `status:impl-eval` →
+  `status:ready-merge`, exact-head packet 5517885460. Records committed on this branch
+  (`c927251bd`). Close-gate re-runs on the relabel; supervisor does not merge.
+- **Canary 7** (run 33693663110 from `ba6f1f49a`): packages **published**; pinned prod E2E failed
+  only at `behavior.live-db-endpoint`. Coordinator-confirmed root cause: order-dependent parser
+  selects `postgres-password` (`urls=[]`) before the real `postgres-<DCP id>` resource. All
+  DB/runtime/Phase-B gates passed. Neither #1952 nor #1959 covers it; a **separate coordinator
+  E2E-only microfix agent** owns the fix (exact displayName/name priority + unique TCP-capable
+  fallback + regression test). Aspire lane: recorded only, no duplication, no rescope.
+- **#1952** head advanced by the coordinator side `f8b0b4a26` → `478450a3c` (regression test
+  pinning the listener-unreachable `--allow-run` set + run evidence; no product code). Local
+  worktree fast-forwarded. Tiers at `f8b0b4a26` were cancelled by the superseding push; `ci` +
+  `e2e-cli` now running at `478450a3c`. Next: on green → `status:impl-eval` + separate-session
+  IMPL-EVAL.
