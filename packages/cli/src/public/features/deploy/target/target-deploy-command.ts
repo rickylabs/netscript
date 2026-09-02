@@ -1,4 +1,4 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 /**
  * @module public/features/deploy/target/target-deploy-command
  *
@@ -6,7 +6,10 @@ import type { CliffyCommand } from "../../../../kernel/presentation/command-type
  */
 
 import { Command } from '@cliffy/command';
-import type { DeployOperation } from '../../../../kernel/domain/deploy/deploy-target-port.ts';
+import type {
+  DeployOperation,
+  DeployTargetPort,
+} from '../../../../kernel/domain/deploy/deploy-target-port.ts';
 import type { PublicCommandDependencies } from '../../root/public-command-dependencies.ts';
 import { createTargetSecretsCommand } from './target-secrets-command.ts';
 import { runTargetOperation } from './run-target-operation.ts';
@@ -14,6 +17,7 @@ import { runTargetOperation } from './run-target-operation.ts';
 /** Lifecycle verbs the target router exposes; each is routed to the adapter as-is. */
 const ROUTED_OPERATIONS: readonly DeployOperation[] = [
   'plan',
+  'emit',
   'up',
   'down',
   'status',
@@ -34,6 +38,32 @@ const OPERATION_DESCRIPTIONS: Readonly<Record<DeployOperation, string>> = {
   secrets: 'Reconcile deployment secrets',
 };
 
+const ROUTED_OPERATION_NAMES: ReadonlySet<string> = new Set(ROUTED_OPERATIONS);
+
+function assertDeployRoutingInvariant(
+  target: DeployTargetPort | undefined,
+): void {
+  const describedWithoutRoute = Object.keys(OPERATION_DESCRIPTIONS).filter(
+    (operation) => !ROUTED_OPERATION_NAMES.has(operation),
+  );
+  if (describedWithoutRoute.length > 0) {
+    throw new Error(
+      `Deploy operation descriptions have no route: ${describedWithoutRoute.join(', ')}`,
+    );
+  }
+
+  const advertisedWithoutRoute = target?.operations.filter(
+    (operation) => !ROUTED_OPERATION_NAMES.has(operation),
+  ) ?? [];
+  if (advertisedWithoutRoute.length > 0) {
+    throw new Error(
+      `Deploy target "${target?.key}" advertises unrouted operations: ${
+        advertisedWithoutRoute.join(', ')
+      }`,
+    );
+  }
+}
+
 /**
  * Build a thin `deploy <target>` router command.
  *
@@ -45,8 +75,9 @@ const OPERATION_DESCRIPTIONS: Readonly<Record<DeployOperation, string>> = {
 export function createTargetDeployCommand(
   key: string,
   dependencies: PublicCommandDependencies,
-  ): CliffyCommand {
+): CliffyCommand {
   const target = dependencies.deployTargets.get(key);
+  assertDeployRoutingInvariant(target);
   const label = target?.label ?? key;
   const group = new Command()
     .name(key)
