@@ -526,3 +526,98 @@ main via #1848 rather than being carried here.
 
 Design constraint held: **no concrete `@netscript/plugin` -> `@netscript/kv` dependency**. The factory
 stays structural/injected over caller-supplied async resolvers, per the owner ruling.
+
+---
+
+## MERGE PACKET — #1842 (#1452 Slice 2), head `d1697421c` — 2026-09-02
+
+| Field | Value |
+| --- | --- |
+| Exact head | **`d1697421c`** |
+| Base integrated | `main` **`77ad823dc`** (#1910, #1911, #1889, #1756) |
+| Mergeable | `MERGEABLE`, non-draft |
+| Milestone | 0.0.7 |
+| `closingIssuesReferences` | **0** — merging leaves #1452 open |
+| Labels | `orchestrator:features`, `type:feat`, `area:cli`, `area:plugins`, `priority:p2`, `wave:v1`, `e2e-cli-gate`, `status:impl` |
+
+### Gates at the exact head
+
+| Gate | Result |
+| --- | --- |
+| `check-test` | **SUCCESS** |
+| `quality` | **SUCCESS** |
+| `code-quality` | **SUCCESS** |
+| `close-gate` | **SUCCESS** |
+| `build` | **SUCCESS** |
+| `scaffold-static (deno-only)` | **SUCCESS** |
+| `desktop-native-linux` | **SUCCESS** |
+| `scaffold-runtime (aspire + docker + postgres)` | **FAILURE** — attributed to #1844, see below |
+| `scaffold-runtime-sqlite (aspire + sqlite + garnet)` | queued behind the shared e2e-cli runner at packet time |
+
+### The one red is #1844's, proven rather than asserted
+
+The uploaded E2E report (run `33617486148`, job `100206685348`,
+`e2e-report-scaffold-runtime.json`) reports **`passed=46 failed=1`**. The single failure is the
+**last** gate in the suite:
+
+```
+runtime.wait.postgres   ->     512 ms   PASS
+runtime.wait.garnet     -> 300338 ms   FAIL (300 s timeout)
+```
+
+Everything before it passed, including `database.init` (22837 ms),
+`database.migration-artifacts` (27760 ms), `database.generate`, `database.seed`, both
+`capture-db-allocation` gates and `runtime.aspire-restart-after-db`.
+
+That is exactly **#1844** (`orchestrator:fixes`, `status:impl`, PR **#1858** open —
+"make Garnet readiness deterministic and align Garnet version pins"). #1844's own body records it as
+"a single observation, not a confirmed shared defect"; this run is a **second independent
+reproduction** at a different head with the identical `passed=46 failed=1` shape and a sharper
+postgres/garnet asymmetry (512 ms vs 300 s, same wait mechanism, same run). Posted to #1844 as
+evidence — comment `5508166737`.
+
+**Why it is not #1842's.** The slice touches `packages/plugin/src/sdk/`, one CLI asset template, its
+own tests, and the generated export corpus. It adds **no Aspire resource, no health probe, and no
+container**. It cannot affect garnet readiness. This red is therefore *not* a reason to hold the
+PR — but it is also **not something this lane can clear**, and the coordinator should decide whether
+to merge over a known #1844 reproduction or wait for #1858.
+
+### Integration work carried in this head
+
+Merged `main` `77ad823dc` with **zero conflicts**, then repaired a defect the merge could not fix
+and refreshed the carriers:
+
+1. **`packages/fresh/README.md` carried a duplicated "Ordered partial navigation" section** — two
+   `###` headings (158, 198) against main's single one at 162. The earlier re-stack onto #1848 had
+   resolved that file by keeping "our" side, but this branch owns nothing in it: "ours" was a stale
+   snapshot of a section #1848 **moved** before merging, so main's moved copy arrived through the
+   merge alongside the leaf's stale one. Main's version is now taken verbatim; the file is
+   byte-identical to `origin/main`.
+2. Carriers regenerated: `assets-barrel` and `publish-assets` already current;
+   `mcp-export-corpus` → sha256 `4d383b1e…`, 272 subpaths / **7804** symbols, `check` exit **0**.
+3. `deno.lock` byte-identical to `origin/main`. Scoped `packages/plugin` check: 155 files,
+   **0 diagnostics**.
+
+### Note for the coordinator — this head also refreshes a corpus that is stale on `main`
+
+Measured on a clean detached worktree at `origin/main` `77ad823dc`: `check:mcp-export-corpus`
+**exits 1**, and regeneration there produces `eb026322…` / 272 subpaths / **7803** symbols against a
+different committed blob. So **main's committed corpus is itself stale** — the #1862 class has
+recurred, and it drifts silently because `mcp-export-corpus` lives in
+`.llm/tools/gates/catalog.ts` but is not wired into any GitHub workflow.
+
+Consequence for this packet: #1842's corpus (`7804`) is main's fresh corpus (`7803`) **plus exactly
+this slice's own `packages/plugin/src/sdk/mod.ts` export**. The delta is therefore *not* purely
+#1842's, and merging it incidentally also refreshes main. Stated here so the number is not read as
+a larger public-surface change than it is.
+
+### IMPL-EVAL
+
+`PASS` at `a203a52f3` (prior packet). Product files were byte-identical at `826ad4946`; this head
+adds only the `main` integration, the README repair (now byte-identical to main) and the regenerated
+corpus. **No product source authored by this branch has changed since the verdict.**
+
+### Known concurrent edit
+
+#1915 (`feat/sdk-credential-contribution`) also adds one line to `packages/plugin/src/sdk/mod.ts`.
+Both are single-line export additions; whichever merges second takes a one-line textual conflict.
