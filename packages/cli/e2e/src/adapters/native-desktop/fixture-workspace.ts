@@ -39,6 +39,7 @@ export async function prepareDesktopFixture(
     ),
     '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.1',
     '@orpc/client': 'npm:@orpc/client@^1.14.6',
+    '@orpc/contract': 'npm:@orpc/contract@^1.15.0',
     '@orpc/server': 'npm:@orpc/server@^1.14.6',
     '@std/assert': 'jsr:@std/assert@^1',
     '@std/path': 'jsr:@std/path@^1',

@@ -7,6 +7,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_PLUGIN: '@netscript/plugin',
   NETSCRIPT_CONTRACTS: '@netscript/contracts',
   NETSCRIPT_SDK: '@netscript/sdk',
+  NETSCRIPT_MCP: '@netscript/mcp',
   NETSCRIPT_LOGGER: '@netscript/logger',
   NETSCRIPT_LOGGER_MIDDLEWARE: '@netscript/logger/middleware',
   NETSCRIPT_LOGGER_ORPC: '@netscript/logger/orpc',
@@ -25,8 +26,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_AUTH_BETTER_AUTH: '@netscript/auth-better-auth',
   NETSCRIPT_AUTH_KV_OAUTH: '@netscript/auth-kv-oauth',
   NETSCRIPT_PLUGIN_WORKERS_RUNTIME: '@netscript/plugin-workers/runtime',
-  NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK:
-    'jsr:@netscript/plugin-workers/jobs/health-check.ts', // jsr-versionless-ok: import-map alias key maps to an exact release target.
+  NETSCRIPT_PLUGIN_WORKERS_HEALTH_CHECK: 'jsr:@netscript/plugin-workers/jobs/health-check.ts', // jsr-versionless-ok: import-map alias key maps to an exact release target.
   NETSCRIPT_WORKERS: '@netscript/plugin-workers-core',
   NETSCRIPT_WORKERS_RUNTIME: '@netscript/plugin-workers-core/runtime',
   NETSCRIPT_WORKERS_SCHEMAS: '@netscript/plugin-workers-core/schemas',
