@@ -10806,3 +10806,17 @@ not asserted early.
 Both keep `status:ready-merge`; the native PASS carries because nothing judged moved. #1941, #1895,
 #1946 were `UNKNOWN` (recomputing) at the time of writing; waits armed on their mergeability and on
 the two converged heads' CI. Slice C's eval still waits on its lane going idle.
+
+### ~21:45Z — #1941 merged; #1353 and #1467 CLOSED; queue reconciled
+
+`main` → `1ca47b859`. **#1353 and #1467 are CLOSED** by #1941's closing keywords after the mirror
+ticked 14/14. That is the fourth and fifth milestone issue closed by the audit-then-closeout pattern
+today (#1349, #1352, #1897 before).
+
+Post-merge sweep: **#1944 `bd3eeac54` and #1943 `3a888f398` stayed `MERGEABLE`** — #1941's delta did
+not textually collide with their regenerated corpora. **#1664 went `CONFLICTING`** (corpus only) and
+is re-converged to `06cf9c301`: carriers 0, fences at baseline 7, pushed. **#1946 (Slice C) is
+`MERGEABLE/CLEAN` and ALL-GREEN**; its native eval dispatches on lane idle.
+
+Remaining owned queue: #1354 (B and C in flight; A gated on #1664; D–G ordered), #1355 (#1664, sole
+red #1845), #1452 (#1944 ready), #1590 (#1895 ready), #1348 (epic).
