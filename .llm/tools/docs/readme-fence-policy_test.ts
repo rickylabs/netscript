@@ -1,0 +1,75 @@
+import { assertEquals } from '@std/assert';
+import {
+  formatReadmeFenceCensus,
+  README_FENCE_RATCHET,
+  type ReadmeFenceCensus,
+  readmeFenceRatchetFailures,
+} from './readme-fence-policy.ts';
+
+const baseline: ReadmeFenceCensus = {
+  readmes: README_FENCE_RATCHET.minimumReadmes,
+  fences: 166,
+  tsLike: README_FENCE_RATCHET.minimumTsLikeFences,
+  exempt: 0,
+  checked: README_FENCE_RATCHET.minimumChecked,
+  syntaxInvalid: README_FENCE_RATCHET.maximumSyntaxInvalid,
+  typeErrors: README_FENCE_RATCHET.maximumTypeErrors,
+  failingReadmes: README_FENCE_RATCHET.maximumFailingReadmes,
+};
+
+Deno.test('the measured baseline passes and every ceiling sits at its exact census', () => {
+  assertEquals(readmeFenceRatchetFailures(baseline), []);
+});
+
+Deno.test('one more type error, or one more failing README, fails the ratchet', () => {
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, typeErrors: baseline.typeErrors + 1 }),
+    ['type errors 32 > 31'],
+  );
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, failingReadmes: baseline.failingReadmes + 1 }),
+    ['failing readmes 7 > 6'],
+  );
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, syntaxInvalid: baseline.syntaxInvalid + 1 }),
+    ['syntax-invalid fences 2 > 1'],
+  );
+});
+
+Deno.test('the corpus cannot shrink to manufacture a pass', () => {
+  // Deleting a README, dropping its fences, or excluding blocks from the compiler each undershoot a
+  // floor — otherwise the cheapest way to go green would be to stop checking things.
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, readmes: baseline.readmes - 1 }),
+    ['readmes 35 < 36'],
+  );
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, tsLike: baseline.tsLike - 1 }),
+    ['ts-like fences 70 < 71'],
+  );
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, checked: baseline.checked - 1 }),
+    ['checked 69 < 70'],
+  );
+});
+
+Deno.test('every violation is reported, not just the first', () => {
+  assertEquals(
+    readmeFenceRatchetFailures({
+      ...baseline,
+      readmes: 1,
+      typeErrors: 99,
+      failingReadmes: 30,
+    }),
+    ['readmes 1 < 36', 'failing readmes 30 > 6', 'type errors 99 > 31'],
+  );
+});
+
+Deno.test('the census line is printed on pass and fail alike', () => {
+  assertEquals(
+    formatReadmeFenceCensus(baseline, 'PASS'),
+    'readme fences: PASS readmes=36 fences=166 ts_like=71 exempt=0 checked=70 ' +
+      'syntax_invalid=1 type_errors=31 failing_readmes=6',
+  );
+  assertEquals(formatReadmeFenceCensus(baseline, 'FAIL').startsWith('readme fences: FAIL'), true);
+});
