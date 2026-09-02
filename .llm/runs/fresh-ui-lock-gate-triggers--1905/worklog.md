@@ -73,6 +73,7 @@ test before changing `classifyPath()`.
 | --- | --- | --- | --- |
 | 2026-09-02 10:07 | 0 | research | Re-derived the lockfile, member, workflow-trigger, classifier, and docs-site facts at the required base. |
 | 2026-09-02 10:07 | 0 | design | Recorded `PLAN-EVAL: N/A`, locked slices, validation, and acceptance boundaries before implementation. |
+| 2026-09-02 10:28 | 1 | test-first | Added only the private-lock classifier expectations; implementation remains unchanged for the committed RED proof. |
 
 ## Gate Results
 
@@ -91,4 +92,5 @@ test before changing `classifyPath()`.
 - Slice 0: issue #1905 remains owned by milestone `0.0.7`; this leaf will open a draft PR with
   `Closes #1905`, the specified taxonomy, and `status:impl`. No status transition to ready or merge
   is authorized.
-
+- Slice 1 (pre-RED): draft PR #1917 is open with the required taxonomy and milestone. The RED test
+  covers package, CLI E2E, plugin, and root-lock inputs plus the existing root-config contribution.
