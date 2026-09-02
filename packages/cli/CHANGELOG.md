@@ -85,7 +85,10 @@
   counter; the shipped skill bundle points every skill body at the canonical `.agents/skills/` tree;
   Garnet readiness in scaffolded runtimes is deterministic and its version pins are aligned.
   `netscript deploy <target> emit` is routed, and a fail-fast invariant keeps advertised deploy
-  operations from being silently omitted by the command router.
+  operations from being silently omitted by the command router. The CLI also ships the neutral
+  Fresh 2.x resource-slice template family (`packages/cli/src/kernel/assets/resource-slice/`),
+  rendered through the pure slice planner with exact core/form/partial/stream option deltas; no
+  command wires it yet.
 - Aspire moves to the atomic 13.5.3 train with a version-parity gate, re-validates every emitted
   AppHost SDK member and the deploy CLI argv contract against the 13.5 TypeScript API, removes
   runtime literal ports so Aspire owns endpoint allocation (the auth, sagas, and triggers
