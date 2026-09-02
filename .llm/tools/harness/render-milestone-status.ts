@@ -8,6 +8,7 @@ export interface MilestoneClusterStateView {
   readonly leaves?: unknown;
   readonly expensiveGates?: unknown;
   readonly canaryCheckpoints?: unknown;
+  readonly reporting?: unknown;
   readonly releaseCaptain?: unknown;
 }
 
@@ -37,12 +38,28 @@ function records(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value) ? value.filter(isRecord) : [];
 }
 
+function numbers(value: unknown): number[] {
+  return Array.isArray(value)
+    ? value.filter((entry): entry is number => Number.isInteger(entry) && entry > 0)
+    : [];
+}
+
+function cell(value: unknown, fallback = '—'): string {
+  return text(value, fallback).replaceAll('|', '\\|').replaceAll('\n', '<br>');
+}
+
+function itemList(value: unknown): string {
+  if (!Array.isArray(value) || value.length === 0) return '—';
+  return value.map((entry) => typeof entry === 'number' ? `#${entry}` : cell(entry)).join(', ');
+}
+
 export async function renderMilestoneStatus(state: MilestoneClusterStateView): Promise<string> {
   const digest = await stateDigest(state);
   const lanes = records(state.lanes);
   const leaves = records(state.leaves);
   const gates = records(state.expensiveGates);
   const checkpoints = records(state.canaryCheckpoints);
+  const reporting = isRecord(state.reporting) ? state.reporting : null;
   const captain = isRecord(state.releaseCaptain) ? state.releaseCaptain : {};
 
   const lines = [
@@ -54,12 +71,158 @@ export async function renderMilestoneStatus(state: MilestoneClusterStateView): P
     `- Updated: ${text(state.updatedAt)}`,
     `- Current main: \`${text(state.currentMainSha)}\``,
     `- Release captain: ${text(captain.state, 'inactive')}`,
+  ];
+
+  if (reporting) {
+    const canary = isRecord(reporting.canary) ? reporting.canary : {};
+    const eta = isRecord(canary.eta) ? canary.eta : {};
+    const progress = isRecord(reporting.progress) ? reporting.progress : {};
+    const scope = isRecord(reporting.scope) ? reporting.scope : {};
+    const environment = isRecord(reporting.environment) ? reporting.environment : {};
+    const criticalPath = records(canary.criticalPath);
+    const mergeQueue = records(reporting.mergeQueue);
+    const blockers = records(reporting.blockers);
+    const matrix = records(reporting.orchestratorMatrix);
+    const decisions = records(reporting.ownerDecisions);
+
+    lines.push(
+      '',
+      '## Outcome',
+      '',
+      `${cell(reporting.headline)}`,
+      '',
+      `- Reported: ${text(reporting.lastReportAt)}`,
+      `- Next heartbeat due: ${text(reporting.nextReportDueAt)}`,
+      `- Evidence record: ${text(reporting.lastReportRef)}`,
+      '',
+      '## Canary / release path',
+      '',
+      `- Target: ${cell(canary.target)}`,
+      `- State: ${cell(canary.state)}`,
+      `- ETA: ${cell(eta.window)} (${cell(eta.confidence)} confidence)`,
+      `- Basis: ${cell(eta.basis)}`,
+      '',
+    );
+    if (criticalPath.length === 0) {
+      lines.push('_No critical path is currently declared._');
+    } else {
+      lines.push(
+        '| Order | Item | State | Release impact | Next action |',
+        '| ---: | --- | --- | --- | --- |',
+      );
+      criticalPath.forEach((item, index) => {
+        lines.push(
+          `| ${index + 1} | ${cell(item.id)} | ${cell(item.state)} | ${cell(item.impact)} | ${
+            cell(item.nextAction)
+          } |`,
+        );
+      });
+    }
+
+    lines.push(
+      '',
+      '## Progress since previous report',
+      '',
+      `- Merged PRs: ${itemList(progress.mergedPullRequests)}`,
+      `- Closed issues: ${itemList(progress.closedIssues)}`,
+      `- New intake: ${itemList(progress.newIssues)}`,
+      `- Queue delta: ${cell(progress.queueDeltaExplanation)}`,
+      '',
+      '## Next merge queue',
+      '',
+    );
+    if (mergeQueue.length === 0) {
+      lines.push('_No near-term merge candidate is declared._');
+    } else {
+      lines.push(
+        '| PR | Lane | Evidence state | Remaining gate | Next action |',
+        '| --- | --- | --- | --- | --- |',
+      );
+      for (const candidate of mergeQueue) {
+        const pr = typeof candidate.prNumber === 'number' ? `#${candidate.prNumber}` : '—';
+        lines.push(
+          `| ${pr} | ${cell(candidate.lane)} | ${cell(candidate.state)} | ${
+            cell(candidate.nextGate)
+          } | ${cell(candidate.nextAction)} |`,
+        );
+      }
+    }
+
+    lines.push('', '## Current blockers', '');
+    if (blockers.length === 0) {
+      lines.push('_No current blocker._');
+    } else {
+      lines.push(
+        '| ID | Class | Plain-English red | Impact | Owner | Next action | Owner decision |',
+        '| --- | --- | --- | --- | --- | --- | --- |',
+      );
+      for (const blocker of blockers) {
+        lines.push(
+          `| ${cell(blocker.id)} | ${cell(blocker.category)} | ${cell(blocker.summary)} | ${
+            cell(blocker.impact)
+          } | ${cell(blocker.owner)} | ${cell(blocker.nextAction)} | ${
+            blocker.ownerDecisionRequired === true ? 'yes' : 'no'
+          } |`,
+        );
+      }
+    }
+
+    lines.push(
+      '',
+      '## Orchestrator matrix',
+      '',
+      '| Lane | State | Active items | Last concrete progress | Blocker | Next action |',
+      '| --- | --- | --- | --- | --- | --- |',
+    );
+    for (const row of matrix) {
+      lines.push(
+        `| ${cell(row.lane)} | ${cell(row.state)} | ${itemList(row.activeItems)} | ${
+          cell(row.lastConcreteProgressAt)
+        } | ${cell(row.blocker)} | ${cell(row.nextAction)} |`,
+      );
+    }
+
+    lines.push(
+      '',
+      '## Scope coverage',
+      '',
+      `- Open issues: ${String(scope.openIssueCount ?? '—')}`,
+      `- Owned issues: ${String(scope.ownedIssueCount ?? '—')}`,
+      `- Scheduled issues: ${String(scope.scheduledIssueCount ?? '—')}`,
+      `- Unscheduled issues: ${itemList(numbers(scope.unscheduledIssueNumbers))}`,
+      `- Open PRs: ${String(scope.openPullRequestCount ?? '—')}`,
+      '',
+      '## Environment hygiene',
+      '',
+      `- Checked: ${cell(environment.checkedAt)}`,
+      `- Aspire applications: ${String(environment.aspireApplications ?? 'unknown')}`,
+      `- Docker containers: ${String(environment.dockerContainers ?? 'unknown')}`,
+      `- Docker custom networks: ${String(environment.dockerCustomNetworks ?? 'unknown')}`,
+      '',
+      '## Owner decisions',
+      '',
+    );
+    if (decisions.length === 0) {
+      lines.push('_No owner decision needed._');
+    } else {
+      lines.push('| ID | Question | Why owner-only | Blocked items |', '| --- | --- | --- | --- |');
+      for (const decision of decisions) {
+        lines.push(
+          `| ${cell(decision.id)} | ${cell(decision.question)} | ${cell(decision.whyOwnerOnly)} | ${
+            itemList(decision.blockedItems)
+          } |`,
+        );
+      }
+    }
+  }
+
+  lines.push(
     '',
     '## Topic lanes',
     '',
     '| Lane | Orchestrator | Issues | Active implementation | Active evaluation |',
     '| --- | --- | ---: | ---: | ---: |',
-  ];
+  );
 
   for (const lane of lanes) {
     const laneId = text(lane.id);

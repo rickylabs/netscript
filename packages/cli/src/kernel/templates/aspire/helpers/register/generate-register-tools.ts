@@ -72,12 +72,6 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
         JSON.stringify(taskName)
       }]);`,
     );
-    lines.push(
-      `    ${id} = maybeWithProcessCommand(${id}, ${JSON.stringify(name)}, ${
-        JSON.stringify(taskName)
-      });`,
-    );
-
     // Database dependency — named database or primary fallback
     if (entry.Database) {
       lines.push(``);

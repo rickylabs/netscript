@@ -3,6 +3,8 @@
  *
  * @example
  * ```ts
+ * import type { ScaffoldArtifactBody } from '@netscript/plugin/adapter';
+ *
  * const body: ScaffoldArtifactBody = { kind: 'text', text: 'export {};' };
  * console.log(body.kind);
  * ```
@@ -19,6 +21,8 @@ export interface ScaffoldArtifactBody {
  *
  * @example
  * ```ts
+ * import type { ScaffoldArtifact } from '@netscript/plugin/adapter';
+ *
  * const artifact: ScaffoldArtifact = {
  *   path: 'src/jobs/send-email.ts',
  *   body: { kind: 'text', text: 'export {};' },
@@ -61,6 +65,8 @@ export function textArtifact(path: string, text: string): ScaffoldArtifact {
  *
  * @example
  * ```ts
+ * import { artifactText, textArtifact } from '@netscript/plugin/adapter';
+ *
  * const text = artifactText(textArtifact('mod.ts', 'export {};'));
  * console.log(text);
  * ```

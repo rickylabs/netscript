@@ -1,6 +1,9 @@
 import { assert, assertEquals, assertFalse } from '@std/assert';
 
 const PRIVATE_ADAPTER_NAMES = [
+  'createHttpClientLink',
+  'ClientLinkPort',
+  'ClientLinkCallOptions',
   'SdkClientLogicalCall',
   'PreparedOutboundHeaders',
   'PreparedSdkClientCall',
@@ -8,6 +11,10 @@ const PRIVATE_ADAPTER_NAMES = [
   'ProcedureMetadataPort',
   'ClientTransportPolicyPort',
   'stableV1PreparedCall',
+  'resolveTransportPolicy',
+  'ResolvedTransportPolicy',
+  'ResolvedCallTransportPolicy',
+  'ResolvedTransportCacheGroup',
 ] as const;
 
 const CONTRIBUTION_PUBLIC_SYMBOLS = [
@@ -34,6 +41,7 @@ const REJECTED_PACKED_IMPORTS = [
   '@netscript/sdk/internal/client-contributions',
   '@netscript/sdk/internal/client-contributions/adapter-ports',
   '@netscript/sdk/client-contributions',
+  '@netscript/sdk/internal/transport-policy',
 ] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -78,7 +86,7 @@ function outputText(output: Deno.CommandOutput): string {
   return new TextDecoder().decode(output.stderr);
 }
 
-Deno.test('public SDK entrypoints omit every private adapter identity', async () => {
+Deno.test('public SDK entrypoints omit every prohibited link and private adapter identity', async () => {
   const entrypoints = [
     new URL('../mod.ts', import.meta.url).href,
     new URL('../src/client/mod.ts', import.meta.url).href,

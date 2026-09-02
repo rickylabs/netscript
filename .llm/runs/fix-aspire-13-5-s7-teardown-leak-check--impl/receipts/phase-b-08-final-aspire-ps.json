@@ -1,0 +1,18 @@
+{
+  "capturedAt": "2026-08-30T18:38:35Z",
+  "command": "DOCKER_HOST=tcp://netscript-dind:2375 /home/agent/.local/bin/mise exec -- aspire ps --format Json",
+  "appHosts": [
+    {
+      "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control/aspire/apphost.mts",
+      "appHostPid": 3208145,
+      "appHostPidStartTimeTicks": "29782274",
+      "status": "running",
+      "sdkVersion": "13.5.3",
+      "cliPid": 3208128,
+      "cliPidStartTimeTicks": "29782259",
+      "dashboardUrl": "[REDACTED]"
+    }
+  ],
+  "leasedRunAppHostPresent": false,
+  "foreignControlMutation": "none"
+}

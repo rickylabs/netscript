@@ -15,6 +15,7 @@ import {
   validateSdkClientContributions,
 } from '../internal/client-contributions/prepared-call.ts';
 import { createStableV1ProcedureMetadataPort } from '../internal/client-contributions/stable-v1-adapter.ts';
+import { resolveTransportPolicy } from '../internal/transport-policy.ts';
 import type {
   ContractLike,
   CreateServiceClientOptions,
@@ -92,10 +93,14 @@ export function createServiceClient<
   apiVersion = 'v1',
   propagateTraceContext = true,
   contributions,
+  transportPolicy: transportPolicyOverride,
 }: CreateServiceClientOptions<TContract, TContributions>): ServiceClient<
   TContract,
   ServiceClientContext & SdkClientContributionContext<TContributions>
 > {
+  const transportPolicy = resolveTransportPolicy(contract, {
+    transportPolicy: transportPolicyOverride,
+  });
   const contributionTuple = validateSdkClientContributions(contributions ?? []);
   const procedureMetadata = createStableV1ProcedureMetadataPort();
   const pathSegment = routerName ?? serviceName;
@@ -105,7 +110,7 @@ export function createServiceClient<
     apiVersion,
   });
   const link = createHttpClientLink({
-    contract,
+    transportPolicy,
     serviceName,
     protocol,
     rpcPath,

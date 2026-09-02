@@ -13,8 +13,8 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
   (secret/PII-safety, fail-closed, anchored-repair, boundary deferrals, opposite-family evaluation).
 - **Prove before you cut.** No deletion or move without reference analysis (Phase 1). A file or
   symbol with ANY live reference is not dead. When unsure, keep it and record why.
-- **Mirrors are generated.** `.claude/skills/**` is generated from `.agents/skills/**`. Never
-  hand-edit a mirror; edit the source then run `deno task agentic:sync-claude`.
+- **Skills have one source.** Repository skills live in `.agents/skills/**`.
+  `.claude/skills/repo-skills/SKILL.md` is only a discovery bridge; never copy skills into it.
 - **Lock hygiene.** Do not delete `deno.lock` or run `deno cache --reload`. The ONLY sanctioned lock
   change is adding minimal, pinned `@std/*` import-map entries (Phase 4). No non-@std third-party
   deps.
@@ -32,7 +32,7 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
 4. Build the **external reference set** for every file. Grep each basename across ALL of:
    - relative imports repo-wide,
    - `deno.json` tasks (and any `dependencies`/task chains),
-   - `.agents/skills/**` and (mirror) `.claude/skills/**`,
+   - `.agents/skills/**` and the Claude discovery bridge,
    - `.llm/harness/**` docs,
    - `.claude/settings*.json` hooks,
    - `CLAUDE.md` / `AGENTS.md`,
@@ -46,6 +46,52 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
    (e.g. `legacy-*`, `*-compat`, `deferred-*`) but pins live behavior, KEEP it. Expect the common
    outcome to be **zero deletions** — epics usually leave a flat layout, not dead files.
 7. Commit slice 1: the inventory doc alone.
+
+## Aspire 13.5 teardown semantics
+
+The agentic leak reporter and teardown controller deliberately separate **relevance** from
+**ownership**. Aspire 13.5 can leave DCP helpers and `aspire-managed` descendants re-parented to PID
+1 after the launching CLI exits. A process is relevant when its edge-captured facts contain a DCP
+environment path, an exact `--apphost <path>` argument, or a Unix socket opened by that PID whose
+path is under an AppHost root. PPID 1, a process name, or text that merely mentions those tokens is
+never ownership proof.
+
+Path containment against the worktree, slice registration, and any explicit `--owned-root` remains
+the authorization boundary. Resolve paths before comparison. Foreign and unknown-owner resources are
+reported and left untouched; a root broad enough to cover other runs is refused. The protected
+`aspire agent mcp` command family is never classified as a cleanup target.
+
+Aspire 13.5.3 lifecycle receipts establish these operating facts:
+
+- `aspire ps` and scoped `aspire stop --apphost <exact>` prune orphan registration and backchannel
+  sockets automatically. S2 V6 observed the DCP helper exit 385 ms after the CLI disappeared, so
+  teardown confirms the AppHost PID and its associated helpers with six probes spaced 500 ms apart
+  before declaring the run clean.
+- A normal scoped stop preserves persistent resources. When persistent deletion is explicitly
+  required, preview first, then pass both `--apply` and `--force-persistent`. Only after ownership
+  is proven and that AppHost is confirmed running may teardown use
+  `aspire stop --force --apphost <exact> --non-interactive --nologo` as the single stop command. If
+  the owned AppHost is already gone, teardown reports persistent cleanup as action-required instead
+  of trusting Aspire's no-op exit 0. It never emits `--all`.
+- A confirmed owned orphan process may receive one targeted `TERM` only when it is at least 30
+  seconds old, an Aspire census succeeded, no matching live AppHost remains, and its PID start
+  identity is stable across the mutation boundary. A timeout or ambiguous identity is escalated;
+  teardown does not broaden the kill.
+
+Use the read-only command first:
+
+```bash
+deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+```
+
+After reviewing every reported owner and the exact planned argv, apply only to positively proven
+resources:
+
+```bash
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply --force-persistent
+```
 
 ## 2. Concern-folder taxonomy (the restructure)
 
@@ -66,7 +112,7 @@ Derive folders from **concerns**, not file types. Method:
    - child-process script URLs (`new URL('../…', import.meta.url)`),
    - spawn paths inside validators,
    - skill/harness/workflow/CLAUDE/AGENTS references,
-   - then regenerate mirrors: `deno task agentic:sync-claude`.
+   - keep repository-skill references pointed at `.agents/skills/`.
 7. Update any test that asserts file paths (e.g. a deprecation-boundary guard) to the new paths —
    keep the assertions (task names, flags, delegation) unchanged.
 8. Run the full gate set (Phase 8). Commit slice 2.
@@ -193,7 +239,6 @@ deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root 
 deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root <folder> --ext ts,tsx   # 0 findings
 deno test --no-lock -A <folder>/                                                                        # 0 failed
 deno task agentic:check-claude                                                                          # ok (if the folder touches the Claude surface)
-deno task agentic:sync-claude:check                                                                     # clean
 git diff --check                                                                                        # clean
 git diff --stat deno.lock                                                                               # empty, OR only the sanctioned @std workspace-dep additions
 ```

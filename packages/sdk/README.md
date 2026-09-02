@@ -102,38 +102,59 @@ Use the side-effect-free `./presets` subpath for `defineServices` in browser/sha
 
 ### Typed request contributions
 
-Define a contribution once, then attach its literal tuple to the services that should use it. The
-tuple owns its context and lower-case header names; construction rejects malformed descriptors,
-duplicates, reserved names, and unsupported protocol versions. Preparation failures use
-`SdkClientContributionError` with stable codes and framework-authored, redacted messages.
+Use the SDK-owned locale factory or define an application contribution, then attach the literal
+tuple only to the services that should use it. The tuple owns its context and lower-case header
+names; construction rejects malformed descriptors, duplicates, reserved names, and unsupported
+protocol versions. Preparation failures use `SdkClientContributionError` with stable codes and
+framework-authored, redacted messages.
 
 ```ts
-import { defineSdkClientContribution } from '@netscript/sdk/client';
+import {
+  createLocaleSdkClientContribution,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
 import { defineServices } from '@netscript/sdk/presets';
 import { ordersContract } from './contracts/orders.ts';
 
-const locale = defineSdkClientContribution<{ locale: string }>()({
+// Non-auth: the SDK canonicalizes one optional Unicode locale, owns
+// accept-language, and partitions response caches by that locale.
+const locale = createLocaleSdkClientContribution();
+
+// Auth-shaped application example: credential resolution is explicit, and
+// cache partitioning uses a stable non-secret epoch rather than the credential.
+const bearer = defineSdkClientContribution<{
+  auth: {
+    getAccessToken(): Promise<string>;
+    cachePartition: string;
+  };
+}>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
-  id: 'app:locale',
-  context: { locale: 'required' },
-  headerKeys: ['accept-language'],
+  id: 'app:bearer',
+  context: { auth: 'required' },
+  headerKeys: ['authorization'],
   responseCache: {
     mode: 'partitioned',
-    partition: ({ context }) => context.locale,
+    partition: ({ context }) => context.auth.cachePartition,
   },
-  prepare: ({ context }) => ({
-    headers: { 'accept-language': context.locale },
+  prepare: async ({ context }) => ({
+    headers: { authorization: `Bearer ${await context.auth.getAccessToken()}` },
   }),
 });
 
 const services = defineServices({
   orders: {
     contract: ordersContract,
-    contributions: [locale] as const,
+    contributions: [bearer, locale] as const,
   },
 });
 
-const context = { locale: 'de-CH' };
+const context = {
+  auth: {
+    getAccessToken: () => Promise.resolve('runtime-only-test-value'),
+    cachePartition: 'account-epoch-7',
+  },
+  locale: 'de-CH',
+};
 const order = await services.clients.orders.get({ id: 'ord_123' }, { context });
 const query = services.queries.orders.list({ limit: 20, offset: 0 }, { context });
 const queryOptions = services.queryUtils.orders.list.queryOptions({
@@ -142,12 +163,18 @@ const queryOptions = services.queryUtils.orders.list.queryOptions({
 });
 ```
 
+`createLocaleSdkClientContribution()` accepts one optional Unicode BCP 47 locale. A present value is
+canonicalized (for example, `en-us` becomes `en-US`) before it is sent and partitioned; an absent
+value emits no `accept-language` header and uses the stable `default` cache partition. Preference
+lists and quality weights such as `en-US, fr;q=0.8` are deliberately rejected by this single-locale
+factory.
+
 Every contribution declares one response-cache mode:
 
 - `invariant` leaves existing server and TanStack key shapes unchanged.
 - `partitioned` appends sorted `[contributionId, value]` pairs to full keys. Partition values are
-  intentionally visible in caches and developer tools, so they must be stable, printable,
-  non-secret identifiers—not credentials, session ids, personal data, or reversible encodings.
+  intentionally visible in caches and developer tools, so they must be stable, printable, non-secret
+  identifiers—not credentials, session ids, personal data, or reversible encodings.
 - `direct-only` keeps `services.clients.<name>` but omits that service from both `queries` and
   `queryUtils`, at type level and runtime.
 
@@ -327,6 +354,20 @@ and Linux apply on relaunch.
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).
+
+## Transport policy
+
+Service clients derive the HTTP method, GET deduplication, and cache group from the contract and
+its NetScript procedure metadata through one SDK-owned policy decision. Use the optional
+`transportPolicy.method` callback only when adapting that final method—for example, a future
+POST-only transport. Request contributions receive procedure path, metadata, input, their context
+projection, signal, and the resolved destination; they never receive the HTTP method or control
+retry, deduplication, tracing, fetch, or link plugins.
+
+The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
+but are intentional no-ops. Configure explicit addresses through service discovery instead of
+`port`, and pass a per-call `AbortSignal` instead of `timeout`. Neither option changes discovery,
+dispatch, or cancellation behavior.
 
 ## Docs
 

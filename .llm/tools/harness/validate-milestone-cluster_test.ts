@@ -130,7 +130,7 @@ async function validArtifacts(): Promise<MutableArtifacts> {
     waves: [{ index: 0, nodeIds: ['issue:101'], checkpoint: 'canary', rationale: 'first fix' }],
   };
   const state = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     milestone: '0.0.7',
     baselineMainSha,
     currentMainSha: headSha,
@@ -167,6 +167,86 @@ async function validArtifacts(): Promise<MutableArtifacts> {
     }],
     expensiveGates: [],
     canaryCheckpoints: [],
+    reporting: {
+      cadenceMinutes: 60,
+      lastReportAt: '2026-08-13T08:10:00.000Z',
+      nextReportDueAt: '2026-08-13T09:10:00.000Z',
+      lastReportRef: 'worklog.md#2026-08-13-status',
+      headline: 'The milestone is active and the fixes leaf is implementing.',
+      currentMainSha: headSha,
+      canary: {
+        target: '0.0.7-canary.1',
+        state: 'not-planned',
+        eta: {
+          window: 'not scheduled',
+          confidence: 'high',
+          basis: 'No canary checkpoint is selected yet.',
+        },
+        criticalPath: [],
+      },
+      progress: {
+        mergedPullRequests: [],
+        closedIssues: [],
+        newIssues: [],
+        queueDeltaExplanation: 'Initial status report.',
+      },
+      scope: {
+        openIssueCount: 1,
+        ownedIssueCount: 1,
+        scheduledIssueCount: 1,
+        unscheduledIssueNumbers: [],
+        openPullRequestCount: 1,
+      },
+      mergeQueue: [{
+        prNumber: 200,
+        lane: 'fixes',
+        state: 'implementing',
+        nextGate: 'focused tests',
+        nextAction: 'finish the bounded implementation',
+      }],
+      orchestratorMatrix: [
+        {
+          lane: 'docs',
+          state: 'queued',
+          activeItems: [],
+          lastConcreteProgressAt: '2026-08-13T08:10:00.000Z',
+          blocker: null,
+          nextAction: 'consume the next docs item',
+        },
+        {
+          lane: 'internals',
+          state: 'queued',
+          activeItems: [],
+          lastConcreteProgressAt: '2026-08-13T08:10:00.000Z',
+          blocker: null,
+          nextAction: 'consume the next internals item',
+        },
+        {
+          lane: 'fixes',
+          state: 'active',
+          activeItems: [101],
+          lastConcreteProgressAt: '2026-08-13T08:10:00.000Z',
+          blocker: null,
+          nextAction: 'finish issue #101',
+        },
+        {
+          lane: 'features',
+          state: 'queued',
+          activeItems: [],
+          lastConcreteProgressAt: '2026-08-13T08:10:00.000Z',
+          blocker: null,
+          nextAction: 'consume the next features item',
+        },
+      ],
+      blockers: [],
+      environment: {
+        checkedAt: '2026-08-13T08:10:00.000Z',
+        aspireApplications: 0,
+        dockerContainers: 0,
+        dockerCustomNetworks: 0,
+      },
+      ownerDecisions: [],
+    },
     exactMainEvidence: {
       gitHead: headSha,
       surface: 'repository',
@@ -225,6 +305,51 @@ Deno.test('valid milestone cluster passes the Step 0 and control-plane contract'
   assert(result.ok, result.errors.join('\n'));
   assertEquals(result.errors, []);
   assertEquals(result.findings, []);
+});
+
+Deno.test('schema-v2 reporting preserves unknown environment counts without false zeroes', async () => {
+  const artifacts = await validArtifacts();
+  const reporting = artifacts.state.reporting as Record<string, unknown>;
+  const environment = reporting.environment as Record<string, unknown>;
+  environment.aspireApplications = null;
+  environment.dockerContainers = null;
+  environment.dockerCustomNetworks = null;
+  artifacts.status = await renderMilestoneStatus(artifacts.state);
+
+  const result = await validateArtifacts(artifacts);
+  assert(result.ok, result.errors.join('\n'));
+  assertEquals(result.errors, []);
+});
+
+Deno.test('RED: schema-v2 milestone state requires the coordinator reporting contract', async () => {
+  await expectRed((artifacts) => {
+    delete artifacts.state.reporting;
+  }, 'state.reporting is required for schemaVersion 2');
+});
+
+Deno.test('RED: stale coordinator report and overdue heartbeat fail closed', async () => {
+  await expectRed((artifacts) => {
+    const reporting = artifacts.state.reporting as Record<string, unknown>;
+    reporting.lastReportAt = '2026-08-13T06:00:00.000Z';
+    reporting.nextReportDueAt = '2026-08-13T09:00:01.000Z';
+  }, 'state.reporting.nextReportDueAt must be after the report and within cadence');
+  await expectRed((artifacts) => {
+    const reporting = artifacts.state.reporting as Record<string, unknown>;
+    reporting.lastReportAt = '2026-08-13T07:00:00.000Z';
+  }, 'state.reporting is stale relative to state.updatedAt');
+});
+
+Deno.test('RED: unscheduled scope or an incomplete orchestrator matrix fails closed', async () => {
+  await expectRed((artifacts) => {
+    const reporting = artifacts.state.reporting as Record<string, unknown>;
+    const scope = reporting.scope as Record<string, unknown>;
+    scope.scheduledIssueCount = 0;
+    scope.unscheduledIssueNumbers = [101];
+  }, 'state.reporting.scope has unscheduled milestone issues');
+  await expectRed((artifacts) => {
+    const reporting = artifacts.state.reporting as Record<string, unknown>;
+    (reporting.orchestratorMatrix as unknown[]).pop();
+  }, 'state.reporting.orchestratorMatrix must cover every topic lane exactly once');
 });
 
 Deno.test('RED: an allocated leaf with a stale live PR head is a structured finding', async () => {

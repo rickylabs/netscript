@@ -302,6 +302,7 @@ function sagaWorkerGroup(): string {
           name: 'Create User Settings',
           description: 'Completes the UserRegistrationSaga sample onboarding flow',
           entrypoint: '../../plugins/workers/jobs/create-user-settings.ts',
+          source: 'plugin',
           timeout: 30_000,
           maxRetries: 2,
           tags: ['user', 'settings', 'saga', 'onboarding'],
