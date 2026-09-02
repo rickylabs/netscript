@@ -10270,3 +10270,67 @@ moving the evaluated head.
 
 **Incidental confirmation worth recording:** `classify Fresh UI changes` **passed** on #1917 — the
 Fresh UI lane triggers and classifies correctly at the new head.
+
+### D-235 — #1923 to readiness; #1920 queued and briefed; #1867 boundary settled in-lane
+
+**#1923 (#1913) is at readiness at `a0aafb18d`.** IMPL-EVAL `PASS_WITH_FINDINGS` with **all three
+acceptance boxes PASS**; four findings landed after the verdict and the delta is comments and
+evidence only — the parsed `concurrency` mappings are byte-identical to the evaluated head
+`47c3b4241`, proved by diffing comment-stripped blocks rather than by inspection, so the verdict
+carries. Gates re-run at the new head: release test `REAL_EXIT=0` (6/0), `.llm/tools` check
+`REAL_EXIT=0`.
+
+`Closes #1913` is **retained** here, unlike #1917. The distinction is real rather than inconsistent:
+all three of #1913's boxes are provable pre-merge and now carry a validated `acceptance-evidence`
+block (`--dry-run` returns a clean mapping), whereas #1905's box 1 is structurally unprovable before
+merge. Boxes were mirrored, never hand-ticked.
+
+**F1 is the finding worth carrying forward.** Of **158 origin branches, exactly one** carries
+`queue: max` in `pages.yml`; 155 lack it in `release-canary.yml` and 2 lack the file. GitHub applies
+the *arriving* run's config, so a `workflow_dispatch` from any of the other 157 still joins
+`pages-deploy` under old semantics and can evict a pending main deploy. Not an acceptance failure —
+and renaming to `-v2` would be **worse** here, trading eviction for *concurrent* deploys to one
+global site. Now documented in the `pages.yml` header so the next `steps: 0` cancelled main deploy
+after a stale-branch dispatch is read as this residual instead of reopening #1913.
+
+**A safety flag of mine, retired by evidence.** I questioned dispatching the box-2 victim on `main`,
+which sits inside the `github-pages` branch policy. The evaluator supplied the fact I lacked: `main`
+@ `634b83d64` had already deployed successfully at `11:11:52Z`, so a raced cancellation would have
+republished byte-identical content — and box 2 requires a default-branch victim, the other policy
+refs not existing on origin. Recorded because a flag raised and then quietly dropped is worse than
+one resolved in the open.
+
+**Label state machine understood rather than fought.** `openhands-phase-eval.yml` dispatches on
+`ready_for_review`, on `status:impl-eval`, or on the plan-eval label pair — so the `ready-merge` →
+`impl-eval` demotion after my ready transition was the designed initial IMPL-EVAL, not a conflict,
+and re-applying `ready-merge` cannot loop it. Also corrected a misread of my own: the
+`openhands-phase-eval` run that "completed" is the **dispatcher**; the evaluator is the
+`openhands-agent` run it posts. #1917 carries **two** independent PASS verdicts (native Fable 5.1 and
+OpenHands GLM 5.3 Flash at `d5bbb4a16`); #1923's second is still running. Neither claims a reasoning
+effort — the OpenHands adapter cannot attest one, and its comment says so.
+
+**#1867 / #1920 duplication resolved in-lane.** #1920's point 2 *is* #1867's F-2 verbatim — two
+internals issues wiring the same gate into the same file. #1920 (0.0.7) takes regeneration plus CI
+wiring because `main` is stale now and 0.0.7 is active; #1867 (0.0.8) keeps F-3, the generator
+dirty-tree guard. F-3 is not made redundant by F-2 and the reason is worth stating: a freshness gate
+catches a corpus that is **stale**, never one that is **plausibly wrong** — and #1867's evidence is a
+regeneration during a concurrent test run that produced a blob matching neither the correct nor the
+committed output, and survived review. No acceptance box was edited; #1867's F-2 box stays
+satisfiable by reference to #1920's PR.
+
+**#1920 briefed, dispatch held.** Its own body says the current staleness will be *incidentally
+cleared* by merging Features PR #1842, so dispatching now would put a leaf to work regenerating a
+corpus another lane is about to move. Held per the coordinator's "after current public-surface leaves
+settle".
+
+Two things verified for the brief rather than inherited. First, #1920's premise is **correct**: the
+sibling corpus gates do run in CI, wired by **catalog id** through `run-gate.ts --gate <id>` in the
+`quality` job with receipts under `.llm/tmp/gate-receipts/quality/`, and `mcp-export-corpus` is
+already in the catalog with only the workflow step missing. My first grep searched `check:`-prefixed
+task names and found nothing, which would have made the issue look wrong; the second, by catalog id,
+found the real mechanism. Second, the **#1905 lesson applies directly** and is written into the
+brief: a step inside `quality` is only half the fix, because a gate in a job the classifier skips is
+the same defect class — a gate that runs and reports "skipped by policy" reads as coverage. The brief
+also makes generator determinism a **stop-and-report precondition**: wiring a non-deterministic
+generator into a required gate is worse than the drift #1920 describes, because a flaky required gate
+gets disabled and takes the real signal with it.
