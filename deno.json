@@ -85,6 +85,7 @@
     "docs:jsdoc-examples": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts",
     "docs:jsdoc-examples:test": "deno test --allow-read --allow-write --allow-run .llm/tools/docs/jsdoc-example-policy_test.ts .llm/tools/docs/jsdoc-example-compiler_test.ts .llm/tools/gates/jsdoc-example-workflow_test.ts",
     "docs:snippets": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-snippets.ts",
+    "docs:readme-fences": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-readme-fences.ts",
     "docs:snippets:test": "deno test --allow-read --allow-write --allow-run .llm/tools/docs/snippet-extractor_test.ts .llm/tools/docs/snippet-compiler_test.ts .llm/tools/docs/pages-workflow_test.ts .llm/tools/docs/official-saga-publisher-sample-sync_test.ts",
     "docs:snippets:negative": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-snippets.ts --negative",
     "docs:contract-derivation": "deno test --no-lock --allow-read --allow-write --allow-run .llm/tools/docs/check-docs-contract-derivation_test.ts && deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/docs/check-docs-contract-derivation.ts",
