@@ -7789,3 +7789,22 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - **#1885 worker stall suspected**: leaf at `872408a0d` (main merge only) for >1 h, nothing pushed since the S0 brief. Steered thread `01a058a1` to push and execute S0a/S0b (`/tmp/steer1885.md`). #1481 worker active (dirty 9, 2 unpushed commits); #1844 worker at design lock `b5f234753`.
 - **#1885**: worker responded — pushed `872408a0d` then S0a RED `adefca842` (`island-receipts.ts` +21, `probe-island-served-surface_test.ts` +78). PR is **`dirty`** (single conflict: `packages/fresh/tests/form-navigation_browser.ts`, main #1940 vs the branch's v1-S2 +360 additions), so no `pull_request` workflow fires at this head. Steered the worker to merge `origin/main` `8c549c061` keeping both sides, verify, push, confirm non-dirty before S0b (`/tmp/steer1885c.md`). Conflict resolution stays in the worker thread per convergence rule.
 - **#1885 `7ad2d7ca6`**: worker merged `origin/main` itself (S0a GREEN `e0f046b7a`, S0b RED `7fc8c058c` before it); no conflict markers; PR `blocked` (ci/e2e/quality in flight; close-gate red = unfinished DoD, expected at `status:impl`). Queued reconvergence steer withdrawn as redundant.
+
+## 2026-09-02T22:10Z — #1885 check-test red attributed (RED-first, not a defect); stalled-thread nudges
+
+- **#1885 `7ad2d7ca6` check-test FAIL** — child report (`ci-check-test-gate-receipts-33688003508-1`):
+  `packages/cli/e2e/tests/application/gates/probe-island-hydration_test.ts` TS2307 (missing module
+  `.../scaffold/runtime/probe-island-hydration.ts`) + TS7006 (`receipt` implicit any, l.45). This is
+  the S0b RED commit `7fc8c058c` by design: the module exists untracked in `007-leaf-1845`
+  (mtime 21:59Z) and worker `01a058a1` is `working` (status 22:01Z) with `behavior-gates.ts`,
+  `capability-suites.ts`, `runtime-gates_test.ts` dirty = GREEN in progress. No steer; the
+  next push must carry the module and clear check-test before any packet consideration.
+- **#1481 worker `01a06322`** — rollout idle since 20:47Z mid-turn (patch apply on
+  `generated-quality-probes.ts`), 9 dirty. Nudge `/tmp/nudge1481.md` sent (resume hung at 120s =
+  delivered); leaf head advanced `5277a4c17 → 0fd04af6d` `fix(scaffold): exclude design routes
+  from production` (11 files, +185/−14) — local only, not yet pushed to `fix/design-route-prod-gate`.
+- **#1844 worker `01a0592e`** — rollout idle since 21:35Z after a GitHub-tool description lookup
+  (milestone tooling); design lock `b5f234753` pushed, no implementation commit. Resume refused
+  `already has an active writer` (turn still open). Retry deliverer `/tmp/deliver1844n.sh`
+  (nudge: no issue creation, implement S1/S2, push, draft PR via git+gh) running detached.
+- Watch: #1885 GREEN push; #1481 push → local rows green → ready-for-review; #1844 push + draft PR.
