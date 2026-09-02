@@ -11,6 +11,7 @@ import type {
   AspireMcpTimeouts,
   AspireMcpTransport,
 } from './aspire-mcp/contract.ts';
+import { readAspireMcpEntryPoint } from './aspire-mcp/entry-point.ts';
 import { runAspireMcpSmoke } from './aspire-mcp/evaluate.ts';
 import {
   ASPIRE_MCP_BASELINE_TOOLS,
@@ -93,7 +94,7 @@ interface ExecuteOptions {
 }
 
 async function execute(options: ExecuteOptions): Promise<void> {
-  const entryPoint = await readEntryPoint(options.projectRoot);
+  const entryPoint = await readAspireMcpEntryPoint(options.projectRoot);
   const start = await readJsonObject(
     join(options.projectRoot, '.netscript', 'e2e', 'aspire-start.json'),
     'aspire-start.json',
@@ -135,21 +136,6 @@ async function execute(options: ExecuteOptions): Promise<void> {
     now: () => new Date(),
     timeouts: { ...ASPIRE_MCP_SMOKE_TIMEOUTS },
   });
-}
-
-async function readEntryPoint(projectRoot: string): Promise<AspireMcpEntryPoint> {
-  const config = await readJsonObject(join(projectRoot, '.mcp.json'), '.mcp.json');
-  const servers = object(Reflect.get(config, 'mcpServers'), '.mcp.json mcpServers');
-  const aspire = object(Reflect.get(servers, 'aspire'), '.mcp.json mcpServers.aspire');
-  const command = stringField(aspire, 'command');
-  const args = Reflect.get(aspire, 'args');
-  if (!Array.isArray(args) || !args.every((value) => typeof value === 'string')) {
-    throw new Error('.mcp.json mcpServers.aspire.args must be strings');
-  }
-  if (command !== 'aspire' || args.length !== 2 || args[0] !== 'agent' || args[1] !== 'mcp') {
-    throw new Error('.mcp.json mcpServers.aspire must equal aspire agent mcp');
-  }
-  return { source: '.mcp.json', command, args: [...args], cwd: projectRoot };
 }
 
 async function describeResources(

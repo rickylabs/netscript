@@ -15,6 +15,10 @@ import {
   type SpanExporter,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { createTelemetryProvider, type SdkLoader } from '@netscript/telemetry/otel';
+import {
+  createLiveAspireTelemetryQuery,
+  findJobExecuteIdentity,
+} from './aspire-dashboard-telemetry.ts';
 import { runDocumentedStreamExample } from './run-documented-stream-example.ts';
 import {
   type FlowBProducerIdentity,
@@ -52,7 +56,7 @@ const provider = createTelemetryProvider({
 await provider.register();
 
 try {
-  const flowBProducer = await readJobExecuteIdentity(metadata.dashboardUrl);
+  const flowBProducer = await readJobExecuteIdentity(projectRoot);
   const streamBaseUrl = firstResourceUrl(
     await resolveResourceUrlsFromAppHost(appHost, 'streams'),
     'streams',
@@ -157,62 +161,16 @@ function firstResourceUrl(urls: readonly string[], resourceName: string): string
   return url;
 }
 
-async function readJobExecuteIdentity(dashboardUrl: unknown): Promise<FlowBProducerIdentity> {
-  if (typeof dashboardUrl !== 'string') {
-    throw new Error('Aspire start metadata did not contain dashboardUrl');
-  }
-  // `new URL(path, base)` keeps only the base's origin — it discards the base's query string,
-  // which is exactly where Aspire puts the dashboard's auth token (`?t=…`). Set the pathname on a
-  // parsed copy instead, so any token the AppHost handed us survives into the request. Harmless
-  // when the dashboard allows anonymous access; required when it does not.
-  const tracesUrl = new URL(dashboardUrl);
-  tracesUrl.pathname = '/api/telemetry/traces';
+async function readJobExecuteIdentity(projectRoot: string): Promise<FlowBProducerIdentity> {
+  const query = await createLiveAspireTelemetryQuery(projectRoot);
   for (let attempt = 1; attempt <= 20; attempt++) {
-    const response = await fetch(tracesUrl);
-    if (!response.ok) throw new Error(`Dashboard traces read failed: HTTP ${response.status}`);
-    const identity = findJobExecuteIdentity(await response.json());
+    const identity = findJobExecuteIdentity(
+      await query.queryTraces({ serviceName: 'workers', limit: 500 }),
+    );
     if (identity) return identity;
     if (attempt < 20) await new Promise((resolve) => setTimeout(resolve, 500));
   }
   throw new Error('Flow-B job.execute telemetry did not expose correlation and trace identities');
-}
-
-function findJobExecuteIdentity(value: unknown): FlowBProducerIdentity | undefined {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findJobExecuteIdentity(item);
-      if (found) return found;
-    }
-    return undefined;
-  }
-  if (!isRecord(value)) return undefined;
-  if (value.name === 'job.execute' && Array.isArray(value.attributes)) {
-    const attributes = value.attributes;
-    const jobId = attributeString(attributes, ['netscript.job.id', 'job.id']);
-    const correlationId = attributeString(attributes, ['netscript.correlation.id']);
-    if (jobId === 'flow-b-callback' && correlationId && typeof value.traceId === 'string') {
-      return { correlationId, traceId: value.traceId };
-    }
-  }
-  for (const child of Object.values(value)) {
-    const found = findJobExecuteIdentity(child);
-    if (found) return found;
-  }
-  return undefined;
-}
-
-function attributeString(
-  attributes: readonly unknown[],
-  keys: readonly string[],
-): string | undefined {
-  for (const attribute of attributes) {
-    if (
-      !isRecord(attribute) || !keys.includes(String(attribute.key)) ||
-      !isRecord(attribute.value)
-    ) continue;
-    if (typeof attribute.value.stringValue === 'string') return attribute.value.stringValue;
-  }
-  return undefined;
 }
 
 interface NamedStreamReceipt {

@@ -1,144 +1,272 @@
-import { AspireTelemetryQuery, type TelemetryQueryPort } from '@netscript/telemetry/query';
+import {
+  AspireTelemetryQuery,
+  type TelemetryQueryPort,
+  type TelemetryTrace,
+} from '@netscript/telemetry/query';
+import type { FlowBProducerIdentity } from './select-flow-b-stream-change.ts';
+import { readAspireMcpEntryPoint } from './aspire-mcp/entry-point.ts';
+import { createStdioAspireMcpTransport } from './aspire-mcp/stdio-transport.ts';
+import { ASPIRE_MCP_DASHBOARD_TOOLS } from './aspire-mcp/tools.ts';
 
-/**
- * Creates the suite's shared telemetry reader from Aspire start metadata.
- *
- * The detached/non-TTY AppHost writes its reachable dashboard URL to
- * `.netscript/e2e/aspire-start.json`; CLI `aspire otel` discovery is not
- * reliable for that lifecycle. The fetch adapter normalizes the dashboard's
- * OTLP envelopes into the package-owned telemetry query contract.
- */
+type AspireMcpTelemetryTool =
+  | 'list_traces'
+  | 'list_structured_logs'
+  | 'list_trace_structured_logs';
+
+export type AspireMcpTelemetryToolCaller = (
+  name: AspireMcpTelemetryTool,
+  args: Readonly<Record<string, unknown>>,
+) => Promise<unknown>;
+
+const MCP_ENDPOINT = 'http://aspire-mcp.invalid';
+
+/** Create the suite telemetry port over Aspire's authenticated stdio MCP transport. */
 export async function createLiveAspireTelemetryQuery(
   projectRoot: string,
 ): Promise<TelemetryQueryPort> {
-  const metadata = await readObject(`${projectRoot}/.netscript/e2e/aspire-start.json`);
-  if (typeof metadata.dashboardUrl !== 'string') {
-    throw new Error('Aspire start metadata did not contain dashboardUrl');
-  }
-  return new AspireTelemetryQuery({
-    endpoint: new URL(metadata.dashboardUrl).origin,
-    fetch: createLiveAspireFetch(fetch),
+  const entryPoint = await readAspireMcpEntryPoint(projectRoot);
+  return createAspireMcpTelemetryQuery(async (name, args) => {
+    const transport = createStdioAspireMcpTransport(entryPoint);
+    try {
+      await transport.initialize();
+      return await transport.callTool(name, args);
+    } finally {
+      await transport.close().catch(() => undefined);
+    }
   });
 }
 
-/** Normalize live Aspire Dashboard trace and log OTLP envelopes for the shared query adapter. */
-export function createLiveAspireFetch(liveFetch: typeof fetch): typeof fetch {
-  return async (input, init) => {
-    const response = await liveFetch(input, init);
-    if (!response.ok) return response;
+/** Adapt authenticated Aspire MCP telemetry tools to the package-owned query contract. */
+export function createAspireMcpTelemetryQuery(
+  callTool: AspireMcpTelemetryToolCaller,
+): TelemetryQueryPort {
+  return new AspireTelemetryQuery({
+    endpoint: MCP_ENDPOINT,
+    fetch: createLiveAspireFetch(callTool),
+  });
+}
 
-    const path = requestPath(input);
-    if (!path.endsWith('/traces') && !path.endsWith('/logs')) return response;
-
-    const payload: unknown = await response.json();
-    return path.endsWith('/traces')
-      ? Response.json({ spans: flattenOtlpSpans(payload) })
-      : Response.json({ logs: flattenOtlpLogs(payload) });
+/** Translate package query requests into Aspire MCP telemetry tool calls. */
+export function createLiveAspireFetch(callTool: AspireMcpTelemetryToolCaller): typeof fetch {
+  return async (input) => {
+    try {
+      const url = requestUrl(input);
+      const path = url.pathname.replace('/api/telemetry/', '');
+      if (path === 'traces') {
+        const traces = await readToolItems(callTool, 'list_traces', traceArguments(url));
+        return Response.json({ traces: filterTraces(traces, url) });
+      }
+      if (path.startsWith('traces/') && path !== 'traces/export') {
+        const traceId = decodeURIComponent(path.slice('traces/'.length));
+        const traces = await readToolItems(callTool, 'list_traces', { search: traceId });
+        const trace = traces.map(normalizeMcpTrace).find((item) =>
+          isRecord(item) && item.traceId === traceId
+        );
+        return Response.json({ data: trace });
+      }
+      if (path === 'spans') {
+        const traces = await readToolItems(callTool, 'list_traces', traceArguments(url));
+        const spans = filterTraces(traces, url).flatMap(mcpTraceSpans);
+        return Response.json({ spans });
+      }
+      if (path === 'logs') {
+        const logs = await readToolItems(callTool, 'list_structured_logs', traceArguments(url));
+        return Response.json({ logs: filterLogs(logs, url) });
+      }
+      if (path === 'traces/export') return Response.json({ resourceSpans: [] });
+      if (path === 'metrics') return Response.json({ metrics: [] });
+      if (path === 'resources') return Response.json({ resources: [] });
+      return new Response(null, { status: 404 });
+    } catch (error) {
+      return Response.json(
+        { error: error instanceof Error ? error.message : String(error) },
+        { status: 502 },
+      );
+    }
   };
 }
 
-function requestPath(input: RequestInfo | URL): string {
-  const value = input instanceof Request ? input.url : String(input);
-  return new URL(value).pathname;
+/** Read trace-scoped structured logs through Aspire MCP. */
+export async function readAspireTraceStructuredLogs(
+  callTool: AspireMcpTelemetryToolCaller,
+  traceId: string,
+): Promise<readonly unknown[]> {
+  return (await readToolItems(callTool, 'list_trace_structured_logs', { traceId }))
+    .map(normalizeMcpLog);
 }
 
-function flattenOtlpSpans(payload: unknown): unknown[] {
-  const flattened: unknown[] = [];
-  visitResourceSpans(payload, flattened);
-  return flattened;
-}
-
-function visitResourceSpans(value: unknown, flattened: unknown[]): void {
-  if (Array.isArray(value)) {
-    for (const item of value) visitResourceSpans(item, flattened);
-    return;
-  }
-  if (!isRecord(value)) return;
-  if (Array.isArray(value.resourceSpans)) {
-    for (const resourceSpan of value.resourceSpans) flattenResourceSpan(resourceSpan, flattened);
-    return;
-  }
-  for (const child of Object.values(value)) visitResourceSpans(child, flattened);
-}
-
-function flattenResourceSpan(value: unknown, flattened: unknown[]): void {
-  if (!isRecord(value)) return;
-  const resource = isRecord(value.resource) ? value.resource : {};
-  const resourceAttributes = Array.isArray(resource.attributes) ? resource.attributes : [];
-  const serviceName = attributeString(resourceAttributes, 'service.name') ?? 'unknown';
-  const scopeSpans = Array.isArray(value.scopeSpans) ? value.scopeSpans : [];
-  for (const scope of scopeSpans) {
-    if (!isRecord(scope) || !Array.isArray(scope.spans)) continue;
-    for (const span of scope.spans) {
-      if (!isRecord(span)) continue;
-      const attributes = Array.isArray(span.attributes) ? [...span.attributes] : [];
-      attributes.push({ key: 'service.name', value: { stringValue: serviceName } });
-      flattened.push({ ...span, kind: normalizeOtlpKind(span.kind), attributes });
+/** Find the Flow-B callback execution identity in normalized telemetry traces. */
+export function findJobExecuteIdentity(
+  traces: readonly TelemetryTrace[],
+): FlowBProducerIdentity | undefined {
+  for (const span of traces.flatMap((trace) => trace.spans)) {
+    const jobId = span.attributes['netscript.job.id'] ?? span.attributes['job.id'];
+    const correlationId = span.attributes['netscript.correlation.id'];
+    if (
+      span.name === 'job.execute' && jobId === 'flow-b-callback' &&
+      typeof correlationId === 'string'
+    ) {
+      return { correlationId, traceId: span.traceId };
     }
-  }
-}
-
-function flattenOtlpLogs(payload: unknown): unknown[] {
-  const flattened: unknown[] = [];
-  visitResourceLogs(payload, flattened);
-  return flattened;
-}
-
-function visitResourceLogs(value: unknown, flattened: unknown[]): void {
-  if (Array.isArray(value)) {
-    for (const item of value) visitResourceLogs(item, flattened);
-    return;
-  }
-  if (!isRecord(value)) return;
-  if (Array.isArray(value.resourceLogs)) {
-    for (const resourceLog of value.resourceLogs) flattenResourceLog(resourceLog, flattened);
-    return;
-  }
-  for (const child of Object.values(value)) visitResourceLogs(child, flattened);
-}
-
-function flattenResourceLog(value: unknown, flattened: unknown[]): void {
-  if (!isRecord(value)) return;
-  const resource = isRecord(value.resource) ? value.resource : {};
-  const resourceAttributes = Array.isArray(resource.attributes) ? resource.attributes : [];
-  const serviceName = attributeString(resourceAttributes, 'service.name') ?? 'unknown';
-  const scopeLogs = Array.isArray(value.scopeLogs) ? value.scopeLogs : [];
-  for (const scope of scopeLogs) {
-    if (!isRecord(scope) || !Array.isArray(scope.logRecords)) continue;
-    for (const log of scope.logRecords) {
-      if (!isRecord(log)) continue;
-      const attributes = Array.isArray(log.attributes) ? [...log.attributes] : [];
-      attributes.push({ key: 'service.name', value: { stringValue: serviceName } });
-      flattened.push({ ...log, body: otlpString(log.body), attributes });
-    }
-  }
-}
-
-function normalizeOtlpKind(value: unknown): unknown {
-  if (value === 1) return 'internal';
-  if (value === 2) return 'server';
-  if (value === 3) return 'client';
-  if (value === 4) return 'producer';
-  if (value === 5) return 'consumer';
-  return value;
-}
-
-function attributeString(attributes: readonly unknown[], key: string): string | undefined {
-  for (const attribute of attributes) {
-    if (!isRecord(attribute) || attribute.key !== key || !isRecord(attribute.value)) continue;
-    if (typeof attribute.value.stringValue === 'string') return attribute.value.stringValue;
   }
   return undefined;
 }
 
-function otlpString(value: unknown): unknown {
-  return isRecord(value) && typeof value.stringValue === 'string' ? value.stringValue : value;
+function requestUrl(input: RequestInfo | URL): URL {
+  const value = input instanceof Request ? input.url : String(input);
+  return new URL(value);
 }
 
-async function readObject(path: string): Promise<Record<string, unknown>> {
-  const value: unknown = JSON.parse(await Deno.readTextFile(path));
-  if (!isRecord(value)) throw new Error(`${path} did not contain an object`);
-  return value;
+function traceArguments(url: URL): Readonly<Record<string, unknown>> {
+  const resourceName = url.searchParams.get('resource');
+  return resourceName ? { resourceName } : {};
+}
+
+async function readToolItems(
+  callTool: AspireMcpTelemetryToolCaller,
+  name: AspireMcpTelemetryTool,
+  args: Readonly<Record<string, unknown>>,
+): Promise<readonly unknown[]> {
+  if (!ASPIRE_MCP_DASHBOARD_TOOLS.includes(name)) {
+    throw new Error(`Aspire MCP telemetry tool is not declared: ${name}`);
+  }
+  const result = await callTool(name, args);
+  if (Array.isArray(result)) return result;
+  if (!isRecord(result)) throw new Error(`${name} returned a non-object result`);
+  if (result.isError === true) throw new Error(`${name} returned an MCP error`);
+  const items = result.items ?? result.entries;
+  if (Array.isArray(items)) return items;
+  if (typeof result.text !== 'string') throw new Error(`${name} omitted telemetry JSON`);
+  const marker = name === 'list_traces' ? '# TRACES DATA' : '# STRUCTURED LOGS DATA';
+  const markerIndex = result.text.indexOf(marker);
+  if (markerIndex < 0) throw new Error(`${name} omitted ${marker}`);
+  const parsed = parseJsonValue(result.text.slice(markerIndex + marker.length), '[');
+  if (!Array.isArray(parsed)) throw new Error(`${name} telemetry JSON was not an array`);
+  return parsed;
+}
+
+function filterTraces(items: readonly unknown[], url: URL): readonly unknown[] {
+  let traces = items.map(normalizeMcpTrace);
+  const since = parseDate(url.searchParams.get('since'));
+  if (since !== undefined) traces = traces.filter((trace) => traceTimestamp(trace) >= since);
+  return applyLimit(traces, url.searchParams.get('limit'));
+}
+
+function normalizeMcpTrace(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  const { spans, ...trace } = value;
+  return {
+    ...trace,
+    scopeSpans: [{ spans: Array.isArray(spans) ? spans.map(normalizeMcpSpan) : [] }],
+  };
+}
+
+function normalizeMcpSpan(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  const startTimeUnixMs = parseDate(value.timestamp);
+  const durationMs = typeof value.durationMs === 'number' ? value.durationMs : undefined;
+  const attributes = isRecord(value.attributes) ? { ...value.attributes } : {};
+  if (typeof value.source === 'string' && attributes['service.name'] === undefined) {
+    attributes['service.name'] = value.source;
+  }
+  return {
+    ...value,
+    startTimeUnixMs: value.timestamp,
+    endTimeUnixMs: startTimeUnixMs !== undefined && durationMs !== undefined
+      ? new Date(startTimeUnixMs + durationMs).toISOString()
+      : undefined,
+    statusCode: normalizeStatus(value.status),
+    attributes,
+  };
+}
+
+function filterLogs(items: readonly unknown[], url: URL): readonly unknown[] {
+  let logs = items.map(normalizeMcpLog);
+  const since = parseDate(url.searchParams.get('since'));
+  if (since !== undefined) {
+    logs = logs.filter((log) =>
+      !isRecord(log) || typeof log.timeUnixMs !== 'number' || log.timeUnixMs === 0 ||
+      log.timeUnixMs >= since
+    );
+  }
+  return applyLimit(logs, url.searchParams.get('limit'));
+}
+
+function normalizeMcpLog(value: unknown): unknown {
+  if (!isRecord(value)) return value;
+  const attributes = isRecord(value.attributes) ? { ...value.attributes } : {};
+  if (typeof value.resourceName === 'string' && attributes['service.name'] === undefined) {
+    attributes['service.name'] = value.resourceName;
+  }
+  return {
+    ...value,
+    timeUnixMs: parseDate(value.timestamp) ?? 0,
+    body: value.message,
+    attributes,
+  };
+}
+
+function traceTimestamp(value: unknown): number {
+  if (!isRecord(value)) return 0;
+  const timestamp = parseDate(value.timestamp);
+  if (timestamp !== undefined) return timestamp;
+  const spanTimes = mcpTraceSpans(value).map((span) =>
+    isRecord(span) ? parseDate(span.startTimeUnixMs) ?? 0 : 0
+  );
+  return spanTimes.length > 0 ? Math.min(...spanTimes) : 0;
+}
+
+function mcpTraceSpans(value: unknown): readonly unknown[] {
+  if (!isRecord(value) || !Array.isArray(value.scopeSpans)) return [];
+  return value.scopeSpans.flatMap((scope) =>
+    isRecord(scope) && Array.isArray(scope.spans) ? scope.spans : []
+  );
+}
+
+function applyLimit(items: readonly unknown[], value: string | null): readonly unknown[] {
+  if (value === null) return items;
+  const limit = Number(value);
+  if (!Number.isInteger(limit) || limit < 0) return items;
+  return limit === 0 ? [] : items.slice(-limit);
+}
+
+function normalizeStatus(value: unknown): number {
+  if (typeof value !== 'string') return 0;
+  if (value.toLowerCase() === 'ok') return 1;
+  if (value.toLowerCase() === 'error') return 2;
+  return 0;
+}
+
+function parseDate(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value !== 'string') return undefined;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function parseJsonValue(text: string, opening: '{' | '['): unknown {
+  const start = text.indexOf(opening);
+  if (start < 0) throw new Error('MCP result omitted JSON evidence');
+  const closing = opening === '{' ? '}' : ']';
+  let depth = 0;
+  let quoted = false;
+  let escaped = false;
+  for (let index = start; index < text.length; index++) {
+    const character = text[index];
+    if (quoted) {
+      if (escaped) escaped = false;
+      else if (character === '\\') escaped = true;
+      else if (character === '"') quoted = false;
+      continue;
+    }
+    if (character === '"') quoted = true;
+    else if (character === opening) depth += 1;
+    else if (character === closing) {
+      depth -= 1;
+      if (depth === 0) return JSON.parse(text.slice(start, index + 1));
+    }
+  }
+  throw new Error('MCP JSON evidence is incomplete');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

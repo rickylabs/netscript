@@ -94,6 +94,9 @@ or the canonical generator source and run the documented generators.
 | 2026-08-31 | D-194 repair | implementation | Passed the config path derived from `dirname(appHost)` into initial start and restart fallback, shifted the typed database argument without changing its value, and kept absent/malformed config fail-closed. No runtime resource was started. |
 | 2026-08-31 | D-213 convergence | rebase | Replayed exactly 12 S9 commits from `bc838a0b3..29eed9ef9` onto converged S8 `d1c6d8b54`; resolved three conflicts only in `skills.generated.ts` by taking upstream/S8. No non-generated or listener-contract conflict occurred. |
 | 2026-08-31 | D-213 convergence | evidence | Regenerated the assets barrel, committed the one generated delta as `55791043e`, proved 23/23 non-generated package blobs identical, and completed the required non-runtime gates. |
+| 2026-09-02 | authenticated telemetry | RED | Added the realistic `list_traces` adapter regression; the structured test wrapper exited 1 because `createAspireMcpTelemetryQuery` did not exist on the raw-HTTP adapter. |
+| 2026-09-02 | authenticated telemetry | implementation | Routed the shared `TelemetryQueryPort` through short-lived `aspire agent mcp` stdio calls, normalized MCP trace/log projections, folded Flow-B producer identity onto the shared adapter, and removed the remaining raw Dashboard readers. Anonymous mode remains false in the runtime start script. |
+| 2026-09-02 | authenticated telemetry | static evidence | Focused adapter test passed 2/2; affected consumer/registry tests passed 73/73; requested `packages/cli/e2e/tests/` passed 241/241; 6-file check/lint/fmt and repository quality gate passed. No runtime or workflow command ran. |
 
 ## Decisions
 
@@ -104,6 +107,7 @@ or the canonical generator source and run the documented generators.
 | Cycle-2 shape A: secure the E2E scratch dashboard | The launch profile is selected, but its anonymous mode suppresses the dashboard API key required by Aspire MCP; changing the scratch config exercises the real call contract without changing product scaffold output | `packages/cli/src/kernel/templates/aspire/generate-aspire-config.ts`; Aspire `v13.5.3` `GuestAppHostProject.cs`, `DistributedApplicationBuilder.cs`, `DashboardUrlsHelper.cs`, `McpToolHelpers.cs`; hosted run `33330455111` |
 | Coordinator amendment: exact payload on dashboard-gated calls is documented degradation | Hosted CI still proves the headless condition; the ratified correction supersedes the earlier shape choice. Matching is fail-closed by tool, code, and full message. | coordinator steering after cycle 2; hosted run `33330455111` |
 | D-148 selective workflow union | The broad report globs belonged to S9's obsolete base and would restore D-112's `.data` traversal regression. Keep S8's narrow paths, add only the two S9 MCP receipt paths and retention. | coordinator D-148 ruling |
+| Authenticate telemetry through stdio MCP | Anonymous mode must remain false for Aspire MCP, while raw Dashboard HTTP has no credential. Reuse the existing transport and preserve the package-owned query port rather than changing the three consumers' call shape. | owner dispatch; hosted run `33592084708` |
 
 ## Drift
 
@@ -115,6 +119,7 @@ or the canonical generator source and run the documented generators.
 | Requested AGENTS guidance authority moved to a template generator source | minor | yes |
 | HTTPS credential lacked workflow scope for the workflow-only commit | minor | yes |
 | Final host inventory contained foreign S5 runtime resources under `007-aspire-s5-conv`; S9 did not start, inspect beyond ownership, or mutate them | external | no — not S9 drift |
+| Aspire 13.5.3 MCP trace/log JSON is a lossy AI projection rather than raw OTLP (no log timestamp; no span-event or link-attribute fields in upstream projection) | significant | yes |
 
 ## Gate Results
 
@@ -176,6 +181,14 @@ or the canonical generator source and run the documented generators.
 | D-213 Aspire version parity | PASS | Exit 0; phase 1 checked 812 entries and reported `fail=0`. |
 | D-213 quality gate | PASS | Exit 0; code-quality scan clean and doctrine `FAIL=0` with pre-existing warnings only. |
 | D-213 runtime/evaluator | NOT RUN by ruling | No Aspire, Docker, AppHost, `e2e:cli`, PLAN-EVAL, or IMPL-EVAL command was run. |
+| Authenticated telemetry RED | EXPECTED FAIL | Structured adapter test wrapper exit 1; planned `createAspireMcpTelemetryQuery` export was absent from the raw-HTTP adapter. |
+| Authenticated telemetry focused GREEN | PASS | Structured wrapper exit 0; 2 passed, 0 failed against realistic Aspire 13.5.3 trace/log tool text, including Flow-B identity and trace-scoped log routing. |
+| Authenticated telemetry affected tests | PASS | Structured wrapper exit 0; 73 passed, 0 failed across telemetry, MCP smoke, producer reconnect, Flow-B validation, suite registry, and runtime-gate tests. |
+| Authenticated telemetry requested suite | PASS | Exact `deno test --allow-all packages/cli/e2e/tests/` through the structured wrapper: 241 passed, 0 failed. |
+| Authenticated telemetry scoped check | PASS | 6 changed TypeScript files; `deno check --unstable-kv`; 1 batch, 0 failed batches, 0 diagnostics. |
+| Authenticated telemetry scoped lint/fmt | PASS | Rules-preserving no-exclude config processed 6/6 files; lint and `fmt --check` each exited 0 with zero findings. Temporary config removed after evidence capture. |
+| Authenticated telemetry quality gate | PASS | `deno task quality:gate` exit 0; quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
+| Authenticated telemetry runtime/workflows/evaluator | NOT RUN by ruling | No Aspire, AppHost, Docker, hosted tier, `e2e:cli`, workflow mutation, or evaluator dispatch occurred. |
 
 ## Handoff Notes
 
@@ -198,3 +211,6 @@ or the canonical generator source and run the documented generators.
 - **Post-slice reconcile:** PR #1759 remains the delivery surface on the same branch and base; no
   labels, lifecycle state, issue state, or PR base were changed. The supervisor owns the next
   evaluation transition.
+- The Aspire 13.5.3 MCP projection does not carry every raw OTLP field; static tests prove the
+  adapter's declared projection mapping, but only the held hosted tiers can establish the complete
+  Flow-B/reconnect runtime verdict after this transport change.

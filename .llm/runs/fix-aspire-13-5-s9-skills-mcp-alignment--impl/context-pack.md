@@ -6,17 +6,17 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `D-213 convergence onto newly converged S8 — delivery` |
+| Current phase | `authenticated Aspire MCP telemetry adapter — static delivery` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-S9's 12 own commits are replayed onto newly converged S8 head `d1c6d8b54`; the old S8 lineage is not
-replayed. Three generated-only conflicts took upstream/S8 and the barrel was regenerated in
-`55791043e`. Every one of the 23 changed non-generated files under `packages/` has an identical blob
-at old head `29eed9ef9` and the converged head. No AppHost, Docker container, runtime gate, or
-evaluator was started, and no product behavior was changed.
+The telemetry gate layer now reads authenticated Aspire telemetry through `aspire agent mcp` stdio
+instead of unauthenticated Dashboard HTTP. The shared `TelemetryQueryPort` shape is unchanged, the
+private Flow-B reader uses the same adapter, and the unused compatibility reader was removed. Static
+tests and scoped gates pass; no AppHost, Docker container, hosted runtime tier, workflow mutation,
+or evaluator was started.
 
 ## Completed
 
@@ -37,10 +37,12 @@ evaluator was started, and no product behavior was changed.
 - D-213 converged the 12-commit S9 range onto S8 `d1c6d8b54`, recorded all three generated-only
   conflict resolutions, regenerated the barrel, and proved the non-generated product surface is
   blob-identical.
+- Authenticated telemetry repair is RED/GREEN complete with realistic MCP output, all raw Dashboard
+  readers removed, and the requested static suite green.
 
 ## In Progress
 
-- Commit the D-213 harness evidence, obtain a fresh exact remote SHA, and force-push with that lease.
+- Commit the authenticated telemetry slice and push it to the existing branch.
 
 ## Next Steps
 
@@ -55,12 +57,15 @@ evaluator was started, and no product behavior was changed.
 | Phase A only | owner dispatch | Never start an AppHost or containers. |
 | External evaluation | harness + supervisor | This session does not self-certify. |
 | D-213 is convergence, not repair | owner dispatch | Do not chase `database.seed`; preserve product blobs and let CI supply runtime evidence. |
+| MCP owns telemetry authentication | owner dispatch | Keep anonymous mode false; normalize stdio tool results behind the existing query port. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-aspire-13-5-s9-skills-mcp-alignment--impl/**` | new | Implementation run evidence |
+| `packages/cli/e2e/src/application/gates/scaffold/**` | modified | Authenticated MCP telemetry adapter and raw-reader convergence |
+| `packages/cli/e2e/tests/application/gates/**` | modified | Realistic adapter RED/GREEN coverage; obsolete URL-token test removed |
 
 ## Gates
 
@@ -74,11 +79,14 @@ evaluator was started, and no product behavior was changed.
 | D-148 un-stack | PASS | S8 ancestry, 10-commit range map, narrow workflow paths, 60 focused tests, scoped wrappers, repo check, parity, and quality gate |
 | D-194 static repair | PASS | RED-first lifecycle config-path regression; 43 focused tests; 3-file scoped check/lint/fmt; quality gate; repo check with `failedBatches: 0` |
 | D-213 convergence | PASS pending delivery | Exact S8 ancestry; 12-commit mapping; 23/23 non-generated blobs identical; generated barrel reproducible; 21-file scoped gates; 82 tests; parity `fail=0`; quality gate green |
+| Authenticated telemetry static slice | PASS pending delivery | RED captured; focused 2/2; affected 73/73; requested suite 241/241; 6-file check/lint/fmt; quality gate green |
 
 ## Open Questions
 
 - How upstream Aspire intends `get_integration_docs` to become available remains unresolved; no
   Phase-A evidence permits claiming it was observed.
+- Aspire's MCP projection omits some raw OTLP fidelity; the held hosted tiers must establish whether
+  every later Flow-B/reconnect assertion can be satisfied through the projected surface.
 
 ## Drift and Debt
 
@@ -88,6 +96,8 @@ evaluator was started, and no product behavior was changed.
   selective resolution and the resumed rebase completed.
 - Mechanical drift: three D-213 `!` mappings are generated-only and fully explained in
   `d213-converge-onto-s8.md`.
+- Significant drift: Aspire MCP trace/log output is a lossy projection; see the 2026-09-02 entry in
+  `drift.md`.
 - Debt: no new debt accepted.
 
 ## Commits

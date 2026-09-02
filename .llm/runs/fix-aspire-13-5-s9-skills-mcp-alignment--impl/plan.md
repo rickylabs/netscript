@@ -57,3 +57,19 @@
 - Risk: the restart script shares `Deno.args` with the start script. Mitigation: lock the complete
   argument order in the deterministic lifecycle-gate test and retain the typed database argument
   assertion.
+
+## Authenticated telemetry adapter slice
+
+- Plan-Gate: `N/A`. The owner supplied the exact failing transport boundary, required MCP tools,
+  preserved `TelemetryQueryPort` contract, private-reader convergence rule, forbidden runtime and
+  product changes, and static gate set.
+- Locked repair: replace Dashboard HTTP reads with short-lived `aspire agent mcp` stdio sessions;
+  normalize `list_traces`, `list_structured_logs`, and `list_trace_structured_logs` projections at
+  the existing query adapter; close every transport after its tool call.
+- Regression contract: a realistic Aspire 13.5.3 `# TRACES DATA` projection must fail before the
+  adapter exists, then produce the expected normalized `job.execute` span and Flow-B correlation
+  identity after the repair.
+- Cleanup: remove the private Flow-B HTTP trace reader, the obsolete token-preservation test, and
+  the unused compatibility script that still embedded a raw Dashboard telemetry fetch.
+- Deferred: hosted sqlite/docker runtime tiers, Aspire/AppHost/Docker execution, workflow edits,
+  evaluator dispatch, PR base/lifecycle changes, and any anonymous-mode reversal.
