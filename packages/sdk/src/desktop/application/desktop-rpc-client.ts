@@ -3,6 +3,7 @@ import { RPCLink } from '@orpc/client/message-port';
 import { createDesktopBindClientPort } from '../adapters/bind-channel.ts';
 import { DESKTOP_RPC_JSON_SERIALIZERS } from '../adapters/orpc-serialization.ts';
 import { SdkClientContributionError } from '../../client/errors.ts';
+import { getSdkClientContributionDiagnosticId } from '../../internal/client-contributions/contribution-diagnostic-id.ts';
 import { resolveTransportPolicy } from '../../internal/transport-policy.ts';
 import type { ClientLinkPort } from '../../ports/client-link-factory.ts';
 import type {
@@ -32,9 +33,16 @@ export function createDesktopServiceClient<TContract extends ContractLike>(
     transportPolicy: options.transportPolicy,
   });
   if (Object.prototype.hasOwnProperty.call(options, 'contributions')) {
+    const property = Object.getOwnPropertyDescriptor(options, 'contributions');
+    const contributions = property !== undefined && 'value' in property
+      ? property.value
+      : undefined;
     throw new SdkClientContributionError({
       code: 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED',
       phase: 'construction',
+      contributionId: Array.isArray(contributions)
+        ? getSdkClientContributionDiagnosticId(contributions[0])
+        : undefined,
     });
   }
   const rawLink = createDesktopRpcLink({
