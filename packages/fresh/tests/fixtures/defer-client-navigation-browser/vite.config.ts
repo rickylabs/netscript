@@ -1,5 +1,4 @@
 import { fresh } from '@fresh/plugin-vite';
-import { resolve } from 'node:path';
 import type { Plugin, UserConfig } from 'vite';
 
 const workspaceConfig = JSON.parse(
@@ -14,9 +13,18 @@ const catalogSpecifier = (name: string): string => {
 const catalogImports: Plugin = {
   name: 'defer-navigation-fixture-catalog-imports',
   enforce: 'post',
+  resolveId(id) {
+    if (id === '@opentelemetry/api') {
+      return '\0defer-navigation-fixture-opentelemetry';
+    }
+    return null;
+  },
   load(id) {
     if (id === 'catalog:') {
       return `export * from '${catalogSpecifier('zod')}';`;
+    }
+    if (id === '\0defer-navigation-fixture-opentelemetry') {
+      return `export * from '${catalogSpecifier('@opentelemetry/api')}';`;
     }
     return null;
   },
@@ -24,14 +32,6 @@ const catalogImports: Plugin = {
 
 const config: UserConfig = {
   root: import.meta.dirname,
-  resolve: {
-    alias: {
-      '@opentelemetry/api': resolve(
-        import.meta.dirname!,
-        '../defer-island-client/otel-api.ts',
-      ),
-    },
-  },
   plugins: [
     fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] }),
     catalogImports,

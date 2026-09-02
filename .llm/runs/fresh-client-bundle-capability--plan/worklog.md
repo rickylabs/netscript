@@ -74,6 +74,8 @@ requires hydration/client navigation.
 | 2026-09-02T16:48:46Z | 3 | Local gates | Fresh check/lint/fmt, 278 package tests, and repository `quality:gate` passed; browser execution remains CI-owned because this host has no `playwright-cli`. |
 | 2026-09-02T17:07:49Z | 2 | CI RED | Provisioned browser receipt passed both existing tests but timed out before the new fallback appeared; the source page lacked the matching outer Fresh partial needed for client navigation. |
 | 2026-09-02T17:07:49Z | 2 | CI fix | Wrapped both fixture pages in the same `defer-navigation-page` partial; scoped check/lint/fmt and all 278 Fresh tests remain green. |
+| 2026-09-02T17:27:19Z | 2 | CI RED 2 | The rerun still timed out; direct partial probing exposed HTTP 500 from the fixture's underspecified OpenTelemetry stub (`span.setAttribute` absent). |
+| 2026-09-02T17:27:19Z | 2 | CI fix 2 | Reused the established locked catalog resolver for real `@opentelemetry/api`; `/deferred?fresh-partial=true` now returns 200 with both named partials and fallback. Locked client/SSR build and all scoped gates pass. |
 
 ## Decisions
 
@@ -122,6 +124,7 @@ requires hydration/client navigation.
 | Fresh format | PASS | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | 213 files, zero findings. |
 | Browser navigation | BLOCKED_LOCAL | `deno task --cwd packages/fresh test:browser` | All three modules type-checked, then all three tests failed only because `playwright-cli` is absent. CI provisions the pinned driver and Chromium. |
 | Browser navigation attempt 1 | FAIL_RED | CI run `33657607942`, job `100340132927` | Existing tests passed 2/2; new fixture timed out waiting for fallback because no source partial matched the destination page shell. Matching outer partial added; rerun pending. |
+| Browser navigation attempt 2 | FAIL_RED | CI run `33659232209`, job `100345670859` | Existing tests passed 2/2; fixture route returned HTTP 500 because its telemetry stub did not implement the builder span. Replaced with locked catalog resolution; rerun pending. |
 
 ### Consumer Gates
 
