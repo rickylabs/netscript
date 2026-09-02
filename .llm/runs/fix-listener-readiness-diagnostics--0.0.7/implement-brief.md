@@ -1,3 +1,12 @@
+use harness
+
+## SKILL
+
+- `netscript-harness` — run dir, worklog/drift, RED→GREEN discipline, separate-session eval.
+- `netscript-doctrine` — `packages/cli` gates before changing framework/template code.
+- `aspire` — Aspire 13.5 CLI/TS-SDK surface (`describe`, `logs`, health reports).
+- `netscript-pr` — PR body/labels/milestone; no closing keyword on partial work.
+
 # Implement brief — #1844 remaining mandate: `postgres_listener was never published`
 
 Branch `fix/listener-readiness-diagnostics` (from `main` `5ce87fb8b`), worktree `007-leaf-1844`.
