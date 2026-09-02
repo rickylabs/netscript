@@ -15,11 +15,11 @@
 | --- | --- |
 | #1349, #1352 | **CLOSED** via #1936 / #1931 (mirror ticked all boxes) |
 | #1897 | **CLOSED** via #1918 |
-| #1353, #1467 | merged (#1921, #1922) but **open, 7 unticked boxes each** — combined closeout audit running on `chore/sdk-client-s6-s7-closeout` (worktree `007-leaf-s6s7`); it carries `Closes` only for issues whose 7 rows it can defend |
+| #1353, #1467 | PR **#1941** `22cc3e5b8` — `Closes` both; audit found and fixed a real defect (`propagateTraceContext` was never consulted at the injection site); IMPL-EVAL running |
 | #1590 | PR **#1895** `d0bf0aebf` — `status:ready-merge`; exact-head `fresh-browser` green, IMPL-EVAL PASS, `close-gate` pass; runtime tiers are Aspire-lane flake (see below) |
 | #1355 / #1360 | PR **#1664** `d155db116` — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
-| #1354 | plan PR **#1891** `ae6e09caa` — **`PASS_PLAN_WITH_FINDINGS`**, amendment applied (HIGH-1 under settled D4, no re-gate); **Slices A/B gated on #1664 merge/rebase** |
-| #1452 | Slice 2 merged (#1842); later slices remain; no worker |
+| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `2e0699bf3` (disjoint from #1664, measured); IMPL-EVAL running. Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
+| #1452 | Slice 3 pushed `8cd55070d` on `feat/plugin-service-context-s3` (appsettings/env resolvers + real generated-consumer boot test); PR/eval trigger chained |
 | #1348 | epic — receives no leaf PR by design |
 
 ## The single remaining merge-packet gate on #1664
@@ -36,7 +36,9 @@ One hosted `scaffold.runtime` attempt; not this lane's to spend.
 
 | Worktree | Thread | Slice |
 | --- | --- | --- |
-| `007-leaf-s6s7` | see `slices/s6s7/codex-thread-ids.md` | #1353/#1467 closeout audit |
+| `007-leaf-s6s7` | see `slices/s6s7/codex-thread-ids.md` | idle — #1941 open |
+| `007-leaf-1354-b` | `01a062f4-9495-7563-8377-21e2b17ca2ee` | idle — #1943 open |
+| `007-leaf-1452-s3` | `01a062f4-94d3-7852-a1a0-cdc406f23b24` | S3 finalising PR |
 | `007-leaf-1664` | `01a0585d-94e1-70b0-a1c2-6f9654179b0e` | idle; resume for any #1664 follow-up |
 | `007-leaf-1354` | `01a05dc7-d630-7cc2-b155-2b150754d53c` | idle; resume for Slice A/B briefs |
 | `007-leaf-1590-s2` | `01a060be-6b53-7962-88a2-f80a51a4010a` | idle |
@@ -59,7 +61,10 @@ One hosted `scaffold.runtime` attempt; not this lane's to spend.
 5. **Aspire runtime tiers are nondeterministic**: five failure modes across four branches touching no
    Aspire path, each also seen passing at an unchanged head. Attribute off feature PRs with evidence;
    exclusion of #1844/#1880 requires same-failure-on-main **and** delta-not-touching-paths.
-6. Launchers block for the child's lifetime — always `setsid nohup … &`; recover by **resuming the
+6. **Generated carriers are ceiling-exempt** (supervisor ruling, in `plan.md`). A phase-eval claim is
+   **head-bound**: pushing during `authorize` skips the agent silently — cycle the label only on an
+   idle lane, and confirm the *agent* job's conclusion, not the run's.
+7. Launchers block for the child's lifetime — always `setsid nohup … &`; recover by **resuming the
    same thread**. `--slice-dir` must exist; `--slug` hardcodes `/home/codex`, pass `--dest`.
 
 ## Standing rules
