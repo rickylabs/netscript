@@ -10223,3 +10223,50 @@ with a contributor path recorded, not silently.
 
 Author steered to correct `evidence.md` and `drift.md` only; no source change is required and none
 is authorized.
+
+### D-234 — #1905 ready; a close-gate deadlock resolved, and my prose about it re-armed the gate
+
+**Evidence correction landed** as `d5bbb4a16` (documentation only). The four evaluated source blobs
+are **byte-identical** across the post-eval delta —
+`ci-classify-changes.ts=bb79a78fe`, `ci-classify-changes.test.ts=15df8010a`,
+`fresh-ui-quality.yml=037397371`, `fresh-ui-quality_test.ts=f336c5dce` — so the IMPL-EVAL verdict
+bound to `7592fa9df` carries to `d5bbb4a16` rather than needing a rerun. Proved before claiming it,
+per the #1889 precedent. `local == remote`.
+
+**A genuine deadlock between two individually correct rules.** Close-gate fails any PR carrying a
+closing keyword while an acceptance box is unchecked. #1905's box 1 is unprovable before merge —
+GitHub reads a `pull_request` `paths:` filter from the base+head merge ref and the trigger is
+`branches: [main]`, so every pre-merge PR carrying this fix also carries
+`.github/workflows/fresh-ui-quality.yml`, already a triggering path at base. `Closes #1905` would
+therefore make #1917 **permanently unmergeable** — not gated pending work, but unsatisfiable by any
+pre-merge action whatsoever. The IMPL-EVAL had independently tried and failed to construct an
+isolation proof, which is what made me treat this as structural rather than a gap in my imagination.
+
+Resolved the way `AGENTS.md` already prescribes for this shape — *"Partial work references `#N`
+without a keyword and states remaining scope"*. `Closes #1905` became `Refs #1905` plus a
+**Remaining scope** section carrying the corrected post-merge recipe and the note that an earlier
+version of that recipe was wrong. #1905 stays open until the corrected run id is posted, which is
+exactly the behaviour close-gate exists to produce. PR marked ready, `status:impl` →
+`status:ready-merge`.
+
+**Then the gate failed anyway, because of the sentence explaining the decision.**
+`check-close-gate.ts` classifies a PR as close-gated from **any** `Closes/Fixes/Resolves #N` match
+anywhere in the body — including inside backticks. My prose, *"Carrying `Closes #1905` would make
+this PR permanently unmergeable"*, re-armed the gate, which then failed on all three unchecked
+boxes. The log named it exactly: `closing reference: #1905 source: body keyword`.
+
+This is the third self-referential trap this session — after a watcher whose own `sleep` I nearly
+mistook for the worker, and a recipe that defeated the proof it was meant to construct. The common
+shape: **the artifact describing a mechanism becomes an input to that mechanism.** Worth naming as a
+class, because in each case the reasoning was sound and the failure came from forgetting that the
+description is not outside the system it describes.
+
+Rephrased to "a closing keyword for this issue" and swept the body with
+`\b(clos(e|es|ed)|fix(es|ed)?|resolv(e|es|ed))\s+#\d+` — zero residual matches. Rerun deferred:
+`gh run rerun` refuses while the rest of the run is in flight (`This workflow is already running`).
+The first evaluation also reported `Mirror skipped because live PR labels do not include
+status:ready-merge`; that label is now applied, so the rerun's live reads will observe it without
+moving the evaluated head.
+
+**Incidental confirmation worth recording:** `classify Fresh UI changes` **passed** on #1917 — the
+Fresh UI lane triggers and classifies correctly at the new head.
