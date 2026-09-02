@@ -93,6 +93,8 @@ loop or a literal timeout at the gate call site.
 | 2026-09-03T00:10Z | 1G | GREEN measured | Focused readiness suite passed 10/10; structured E2E source check selected 155 files in two batches with 0 diagnostics. |
 | 2026-09-03T00:13Z | 2R | RED authored | Generator contract now requires lazy bounded endpoint resolution; helper contract requires a never-settling endpoint to return `ENDPOINT_UNALLOCATED` near 2,000 ms. |
 | 2026-09-03T00:14Z | 2R | RED measured | Structured helper test run exited 1: 29 passed / 5 failed; failures name the absent generated wrapper and missing helper function. |
+| 2026-09-03T00:18Z | 2G | GREEN measured | Structured generator/helper/emitted-compile run passed 35/35 in 8.4s; helper source check selected 39 files with 0 diagnostics; carrier regenerated canonically. |
+| 2026-09-03T00:22Z | 2G | Full-suite correction | Complete helper directory found one stale old-helper import assertion (276 passed / 2 failed); updated the assertion before rerunning the directory. |
 
 ## Decisions
 
@@ -118,6 +120,7 @@ loop or a literal timeout at the gate call site.
 | --- | --- | --- | --- |
 | required local gates | implement brief command set | NOT_RUN | Run after GREEN slices. |
 | S1 E2E check | structured `run-deno-check` on `packages/cli/e2e/src` | PASS | 155 files, 2 batches, 0 diagnostics. |
+| S2 helper check | structured `run-deno-check` on Aspire templates | PASS | 39 files, 1 batch, 0 diagnostics. |
 
 ### Fitness Gates
 
@@ -135,7 +138,7 @@ loop or a literal timeout at the gate call site.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| emitted AppHost helper | NOT_RUN | focused compile test | Planned in S2. |
+| emitted AppHost helper | PASS | structured focused suite | 35/35 including emitted compile and format checks. |
 
 ## Handoff Notes
 

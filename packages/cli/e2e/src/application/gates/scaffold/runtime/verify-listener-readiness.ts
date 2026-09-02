@@ -123,9 +123,13 @@ export function formatListenerReadinessDeadline(
 
   const published = snapshot.healthReports.length === 0
     ? 'none'
-    : snapshot.healthReports.map((report) => `${report.healthCheckKey}=${report.status}`).join(', ');
+    : snapshot.healthReports.map((report) => `${report.healthCheckKey}=${report.status}`).join(
+      ', ',
+    );
   const matched = snapshot.match === 'unknown' ? 'unknown' : String(snapshot.match === 'matched');
-  const logs = logLines.length === 0 ? '<none>' : logLines.slice(-LISTENER_LOG_TAIL_LINES).join('\n');
+  const logs = logLines.length === 0
+    ? '<none>'
+    : logLines.slice(-LISTENER_LOG_TAIL_LINES).join('\n');
   return `${classification}; matched=${matched}; matchedResource=${
     snapshot.matchedResourceName ?? 'none'
   }; state=${snapshot.state ?? 'unknown'}; healthStatus=${

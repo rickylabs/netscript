@@ -24,13 +24,13 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 
 ## In Progress
 
-- S1 GREEN is committed. S2 RED tests are authored and awaiting the failing measurement.
+- S2 GREEN is implemented and measured; commit it, then run the complete local gate set.
 
 ## Next Steps
 
-1. Commit S1 GREEN.
-2. Commit S2 RED, implement and prove S2 GREEN including emitted compile.
-3. Run full local gates, push explicit refspec, open the draft PR, and hand off IMPL-EVAL.
+1. Commit S2 GREEN.
+2. Run the complete local gates and record exact evidence.
+3. Push explicit refspec, open the draft PR, and hand off IMPL-EVAL.
 
 ## Key Decisions
 
@@ -47,6 +47,10 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 | run artifact set | new | Harness activation, research, design, and resumable state. |
 | `verify-listener-readiness.ts` | changed | One-shot final snapshot, classification, and log-tail capture. |
 | `listener-readiness-gates_test.ts` | changed | Pure diagnostic contract coverage. |
+| `_aspire-compat.ts.template` | changed | Total-budget endpoint allocation and structured `ENDPOINT_UNALLOCATED`. |
+| `generate-register-infrastructure.ts` | changed | Lazy endpoint callback uses the bounded helper. |
+| `embedded.generated.ts` | changed | Canonically regenerated carrier. |
+| helper tests | changed | Generator, timeout, and emitted-compile coverage. |
 
 ## Gates
 
@@ -55,7 +59,7 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 | Static | pending | brief command set |
 | Fitness | pending | quality/doctrine |
 | Runtime | supervisor-owned | no local lease |
-| Consumer | pending | emitted helper compile test |
+| Consumer | PASS | focused helper suite, 35/35 |
 
 ## Open Questions
 

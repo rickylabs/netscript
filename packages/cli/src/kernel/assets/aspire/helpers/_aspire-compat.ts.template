@@ -62,6 +62,16 @@ export interface ListenerReadinessCheckOptions {
   readonly port: number | string;
 }
 
+export interface ListenerEndpoint {
+  host(): Promise<string>;
+  port(): Promise<number | string>;
+}
+
+export interface EndpointListenerReadinessCheckOptions {
+  readonly kind: string;
+  readonly endpoint: () => PromiseLike<ListenerEndpoint>;
+}
+
 export interface RespPingCheckOptions {
   readonly host: string;
   readonly port: number | string;
@@ -168,6 +178,7 @@ export const RESOURCE_DEFAULTS = {
 
 const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
 const LISTENER_READINESS_TIMEOUT_MS = 2_000;
+const ENDPOINT_ALLOCATION_TIMEOUT = 'ENDPOINT_ALLOCATION_TIMEOUT';
 const RESP_PING_COMMAND = '*1\r\n$4\r\nPING\r\n';
 const RESP_REPLY_LIMIT_BYTES = 256;
 const RESP_DIAGNOSTIC_LIMIT_BYTES = 64;
@@ -175,6 +186,30 @@ const RESP_DIAGNOSTIC_LIMIT_BYTES = 64;
 // ============================================================================
 // Listener readiness
 // ============================================================================
+
+/** Creates a listener check whose Aspire endpoint allocation has a total deadline. */
+export function createEndpointListenerReadinessCheck(
+  options: EndpointListenerReadinessCheckOptions,
+): () => Promise<HealthCheckResult> {
+  return async () => {
+    const startedAt = performance.now();
+    let resolved: { readonly host: string; readonly port: number | string };
+    try {
+      const endpoint = Promise.resolve().then(options.endpoint).then(async (reference) => {
+        const [host, port] = await Promise.all([reference.host(), reference.port()]);
+        return { host, port };
+      });
+      resolved = await withTimeout(endpoint, LISTENER_READINESS_TIMEOUT_MS);
+    } catch (error) {
+      return endpointAllocationFailure(options.kind, startedAt, error);
+    }
+    return await createListenerReadinessCheck({
+      kind: options.kind,
+      host: resolved.host,
+      port: resolved.port,
+    })();
+  };
+}
 
 /** Creates a one-socket TCP listener readiness check for an Aspire resource. */
 export function createListenerReadinessCheck(
@@ -303,6 +338,45 @@ function listenerFailure(
     description: `${kind} listener unreachable: ${code}`,
     data: listenerData(code, host, port, startedAt),
   };
+}
+
+function endpointAllocationFailure(
+  kind: string,
+  startedAt: number,
+  error: unknown,
+): HealthCheckResult {
+  const timedOut = error instanceof Error && error.message === ENDPOINT_ALLOCATION_TIMEOUT;
+  const detail = error instanceof Error ? error.message : String(error);
+  return {
+    status: HealthStatus.Unhealthy,
+    description: timedOut
+      ? `${kind} listener unreachable: endpoint not allocated within ${LISTENER_READINESS_TIMEOUT_MS}ms`
+      : `${kind} listener unreachable: endpoint allocation failed (${detail})`,
+    data: {
+      code: 'ENDPOINT_UNALLOCATED',
+      host: '<unallocated>',
+      port: '<unallocated>',
+      elapsedMs: String(Math.round(performance.now() - startedAt)),
+      detail,
+    },
+  };
+}
+
+async function withTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      operation,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(ENDPOINT_ALLOCATION_TIMEOUT)),
+          timeoutMs,
+        );
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
 }
 
 function respFailure(
