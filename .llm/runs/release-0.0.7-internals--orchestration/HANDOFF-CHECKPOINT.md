@@ -1,71 +1,80 @@
 # Internals topic checkpoint — supervisor rotation
 
-Written 2026-08-31 at supervisor context exhaustion. **Ownership unchanged: `topic-internals-0.0.7`.**
-Every thread below is LIVE or intentionally parked — **do not relaunch any of them.** Resume by
-`codex-resume` on the recorded thread id, or read the recorded artifact.
+Rewritten 2026-09-02 on resume. **Ownership unchanged: `topic-internals-0.0.7`.**
+The previous revision (2026-08-31) is superseded in full: every leaf it listed has landed or been
+closed, and acting on its "immediate obligations" would re-chase finished work. Its *standing
+hazards* section is preserved verbatim at the bottom — those are still live.
 
-Base of record: `main` = `eaea940bea4c19593b97b9895b09f512039f4e13`.
+Base of record: `origin/main` = `77ad823dcb1874ccfc8964b4679ad92a3a145e0b` (the #1910 merge).
 
-## Active leaves
+## Everything the previous checkpoint listed is done
 
-| # | PR | Branch | Head (local == remote) | Thread | State |
-| --- | --- | --- | --- | --- | --- |
-| 1751 | #1802 | `fix/agentic-sender-lease-recovery` | `de24161b6b5bdee22fd942f6d776358e52eda2cb` | `01a054ff-9028-7333-a6f1-386b94308183` | **PARKED — open finding** |
-| 1753 | #1823 | `fix/harness-cluster-state-liveness` | `930d37ea4d4d05e42728a3a59618ff4bd1b9b663` | `01a055b6-da11-7652-8942-c56deb75f3eb` (idle) | **Green, held behind #1820 seam** |
-| 1827 | #1828 | `fix/cli-e2e-unstable-parity` | `1c08b8b0afe74c479bd0770c956204e7cad3a5bd` | `01a055f7-4afd-7922-bea7-f85136f59ceb` (idle) | **P0 — IMPL-EVAL RUNNING** |
-| 1737 | none yet | `fix/skills-canonical-tree-refs` | `d338145da144f895d1696d77e25d161c7df3de61` | `01a055b6-e5ed-7e62-a47f-c8f278533a96` | **Author ACTIVE** (4 files dirty) |
+| Item | Disposition |
+| --- | --- |
+| #1751 / PR #1802 (the "DO NOT SHIP" root-suite failure) | **MERGED** |
+| #1753 / PR #1823 (held behind the #1820 seam) | **MERGED** |
+| #1827 / PR #1828 (P0, IMPL-EVAL running) | **MERGED** |
+| #1737 (`fix/skills-canonical-tree-refs`, author active) | **CLOSED** |
+| #1543, #1695, #1351 (remaining unstarted queue) | **CLOSED** |
 
-## Immediate obligations for the next supervisor
+Do not re-open, re-diagnose, or re-dispatch any of them.
 
-1. **#1828 (P0, unblocks Features #1762)** — evaluator pid `1621621` running GLM 5.3 Flash/max
-   against head `1c08b8b0a`, artifact due at
-   `.llm/runs/fix-cli-e2e-unstable-parity--1827/impl-eval.md`, comment due on #1828. On PASS:
-   ready-transition, fresh CI, packet. **Do not rerun the evaluator** — it is dispatched.
-2. **#1823** — current-green (CI 7 SUCCESS/14 SKIPPED/0 FAIL at `930d37ea4`), IMPL-EVAL `PASS`,
-   0 threads, sole `status:ready-merge`, 0 unchecked DoD. **Held behind the #1820 seam by owner
-   instruction.** After #1820 merges: recut only the minimum current-main merge-ref CI, then surface
-   the packet. Byte-identity of `validate-milestone-cluster.ts` (`23d2710ee…`) and its test
-   (`1b07155e6…`) was already proven across the last merge, so **no evaluator rerun is needed**.
-3. **#1751/#1802 — DO NOT SHIP.** All 7 slices are complete and its scoped gates are green
-   (agentic 531/531, check/fmt/arch 0, lock unchanged), **but the root suite at `de24161b6` is
-   `REAL_EXIT=1`, 4,463 passed / 1 failed / 19 ignored, and the single failure is NOT YET
-   IDENTIFIED.** It appeared only after merging main (which lands #1792 routing into the same tree).
-   Diagnosis was interrupted twice by higher-priority work. **This must be identified before #1802
-   is treated as a candidate.**
-4. **#1737** — author active on the resumed thread; boundary is `skills/**` + `.agents/skills/**`
-   only. Needs PR opened with `Closes #1737` when it stops.
+## The `workflow` scope wall is gone
 
-## Protected test ceilings (verify byte-identity before accepting any GREEN)
+D-224 through D-226 were shaped by this session's token lacking PAT `workflow` scope, which made
+`.github/workflows/**` authoring unpushable. `gh auth status` now reports
+`gist, read:org, repo, workflow`. Both remaining issues are workflow changes and their authors can
+push them. The taxonomy recorded on #1908 stays true as history; it is no longer a constraint.
 
-#1751 — six blobs, all verified intact through Slice 7:
-`sender-ownership_test.ts=74b0ba6118ec4961ed50da639791fe52e3faa09a`,
-`sender-lease-repair_test.ts=7be38302ac6ed20f29571213d18172283e1aded5`,
-`local-sender-lease-repair-adapter_test.ts=2e2817d0c27628e0f9e1ca922c47ec35738102ce`,
-`codex-thread-read_test.ts=d3ca0b51fcb87aeee81e4202e5f527ed569fba12`,
-`agentic-runtime_test.ts=7113e271dfa15e9f2dc53b6922c4d5055e086430`,
-`codex-resume_test.ts=546b5f0185876fd51c9b5ee28b57a19fe37562b7`.
+## Live work
 
-## Queue (serial unless collision-checked; owner authorizes parallelism only for proven-disjoint slices)
+| # | Branch | Worktree | Thread | State |
+| --- | --- | --- | --- | --- |
+| 1905 | `ci/fresh-ui-lock-gate-triggers` | `worktrees/007-leaf-1905` | `01a06193-2960-7a30-8c87-3a8e12b57a6a` | **Author working** (openai/gpt-5.6-sol/high, route matched) |
+| 1913 | `ci/repo-wide-concurrency-bounds` | `worktrees/007-leaf-1913` | none yet | **Briefed, dispatch held behind #1905 by ordering instruction** |
 
-Remaining unstarted: **#1543** (holds a `deno.lock` conflict with #1695 — serialize those two),
-**#1695**, **#1351** (`status:plan`, needs its RFC-0001-Stage-3 plan read before an honest brief).
-**#1429 is Aspire-owned** (PR #1744, `epic:aspire-13-5`) — labelled internals but not ours to execute.
-**#1641 is coordinator-owned** — never edit or merge.
+Both branches were cut at `77ad823dc`. Briefs:
+`briefs/fresh-ui-lock-gate-triggers.md`, `briefs/repo-wide-concurrency-bounds.md`.
 
-## Standing hazards learned this run — carry these forward
+**#1641 is the coordinator umbrella — never edit, close, or merge it.** #1867 is milestone 0.0.8 and
+outside this lane.
 
-- **`pipe | tail` destroys exit codes.** Always `out=$(cmd); rc=$?`. This produced a false-green here.
-- **A passing RED is a red flag.** Two false REDs occurred: one from a test edited between RED and
-  GREEN, one from an uncommitted working-tree edit the test read from disk. **Verify RED by checking
-  out the RED commit in a throwaway worktree**, not in the live tree.
-- **`ps`/`pgrep -f` self-matches your own grep** and misses the real Codex child. Use rollout-file
-  mtime plus `git log`, or `/proc/<pid>/cwd`.
-- **Authors stall after completing work but before committing** (happened 3×). Assess the working
-  tree before assuming failure; verify ceilings, then commit on their behalf with attribution stated.
-- **"docs-only" main advances are often not** — several carried product source and generated corpora.
-  Always diff before believing a characterization, and prove corpora freshness with `check:` variants
-  rather than inferring it from a clean merge.
-- **A stale MCP server is latent**: `007-internals`'s hybrid server (pid `5901`, parent `5498` — the
-  OTHER Remote Control session) still serves pre-#1792 code and rejects GLM/Qwen. Code side is fixed
-  and pushed (`6dfba5c1c`); the process restart is owned by that client, not by us. Evaluators
-  dispatched via `agentic:claude-openrouter` from leaf worktrees are unaffected.
+## Obligations this supervisor carries (not the authors')
+
+1. **#1905 acceptance box 1 is not closable pre-merge.** GitHub evaluates a `pull_request` `paths:`
+   filter from the base+head merge ref, and the trigger is `branches: [main]`. Every pre-merge PR
+   carrying the fix also carries `.github/workflows/fresh-ui-quality.yml` in its own diff — already a
+   triggering path — so no pre-merge PR can isolate the new trigger. After merge, open one PR whose
+   diff is a single member manifest plus a deliberately stalened `packages/fresh-ui/deno.lock`,
+   confirm `fresh-ui-quality` runs **and fails**, post the run id on #1905, then close the PR
+   unmerged. **The issue does not close before that receipt exists.** Stated on the issue at
+   dispatch, not discovered at close-gate.
+2. **#1913 may need a supervisor decision.** The issue's acceptance assumes `queue: max` on both
+   groups. For `release-canary` that is not obviously right: the group serializes *publishes* of one
+   version against an immutable registry, where "replace the pending one" may be safer than "run
+   them all". The author is instructed to stop and report if their analysis rejects `queue: max`
+   rather than apply it.
+3. **#1913's issue body contains a false premise.** It calls `pages-deploy` "dispatch-triggered
+   rather than push-triggered" and rests its low-probability claim on that. `pages.yml` at
+   `77ad823dc` declares `push: branches: [main]` as well, and the group
+   `pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}` collapses every
+   non-PR arm onto the literal. Exposure is ordinary main traffic. Correct the record when the slice
+   lands.
+
+## Standing hazards learned this run — carried forward verbatim
+
+- **`pipe | tail` destroys exit codes.** Always `out=$(cmd); rc=$?`. This produced a false-green.
+- **A passing RED is a red flag.** Verify RED by checking out the RED commit in a throwaway
+  worktree, not in the live tree — one false RED came from a test edited between RED and GREEN, one
+  from an uncommitted edit the test read off disk.
+- **`ps`/`pgrep -f` self-matches your own grep.** Use `/proc/<pid>/cwd`, or rollout mtime.
+- **Authors stall after completing work but before committing** (4× this release). Assess the
+  working tree before assuming failure.
+- **"docs-only" main advances are often not.** Diff before believing a characterization.
+- **A `143` from `launch-codex-slice` does not mean the slice died.** The launcher blocks for the
+  whole first turn; a supervisor-side timeout kills the launcher, not the daemon-hosted thread.
+  Check `agentic:codex-status --user node` against the thread id in `codex-thread-ids.md` before
+  relaunching — relaunching would duplicate the slice.
+- **Never report a lane clear from a remembered offender set** (D-226). Re-derive from live runs.
+- **`steps: 0` on a `cancelled` job is queue eviction, not a slice defect** (D-227). Enumerate
+  candidates by job admission time, never run `created_at`.
