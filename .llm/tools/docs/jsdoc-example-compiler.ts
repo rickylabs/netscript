@@ -67,41 +67,29 @@ function declaresOwnSymbol(body: string, symbol: string): boolean {
 }
 
 /**
- * Bind the documented symbol's type meaning with a real import in the example module.
+ * Bind the documented symbol in the example module with a real import.
  *
- * A `declare global` alias cannot carry the declaration's type parameters, and mirroring the arity
- * with `any` defaults leaves them unconstrained: the alias then fails TS2344 at its own declaration
- * inside the unattributed preamble, so a violating type argument passed silently. A real import
- * carries the genuine parameters and their constraints, so violations fail at the usage site.
- * Skipped when the example already binds the symbol.
+ * Every example is checked in one `deno check` program, so a `declare global` binding is visible to
+ * every other example module. That leaked documented symbols across examples, and any symbol
+ * documented more than once — two packages exporting the same name, or one symbol carrying several
+ * `@example` blocks — collided as TS2451 inside `preamble.ts`, a module no example owns, whose
+ * diagnostics were then dropped entirely. A real import is scoped to its module, carries the
+ * declaration's genuine type parameters and constraints, and cannot collide.
+ *
+ * Skipped when the example already imports or declares the symbol itself.
  */
-function exampleTypeImport(block: JsdocExampleBlock): string | undefined {
+export function exampleSymbolImport(block: JsdocExampleBlock): string | undefined {
   const owner = block.owner;
   if (owner.kind !== 'symbol' || !owner.symbol || !owner.publicSpecifier) return undefined;
-  if (owner.declarationKind !== 'type' && owner.declarationKind !== 'class') return undefined;
   if (importsOwnSymbol(block.body, owner.symbol)) return undefined;
   if (declaresOwnSymbol(block.body, owner.symbol)) return undefined;
   const keyword = owner.declarationKind === 'type' ? 'import type' : 'import';
   return `${keyword} { ${owner.symbol} } from ${JSON.stringify(owner.publicSpecifier)};`;
 }
 
-/**
- * Ambient stand-in for a documented *value*, whose `typeof import(...)` form is already faithful:
- * it preserves call-signature generics. Types and classes are bound by `exampleTypeImport`.
- */
-function preamble(block: JsdocExampleBlock): string {
-  const owner = block.owner;
-  if (owner.kind !== 'symbol' || !owner.symbol || !owner.publicSpecifier) return 'export {};\n';
-  if (owner.declarationKind !== 'value' && owner.declarationKind !== 'class') return 'export {};\n';
-  if (owner.declarationKind === 'class' && exampleTypeImport(block)) return 'export {};\n';
-  const importedType = `import(${JSON.stringify(owner.publicSpecifier)}).${owner.symbol}`;
-  return [
-    'export {};',
-    'declare global {',
-    `  const ${owner.symbol}: typeof ${importedType};`,
-    '}',
-    '',
-  ].join('\n');
+/** The example module binds its own symbol; the preamble only makes the module a module. */
+function preamble(): string {
+  return 'export {};\n';
 }
 
 function forbiddenSpecifier(
@@ -241,10 +229,10 @@ async function materializeModules(
     const directory = join(tempRoot, 'examples', String(index + 1));
     const preamblePath = join(directory, 'preamble.ts');
     const modulePath = join(directory, `example.${block.compilationExtension}`);
-    await writeSnippetFile(preamblePath, preamble(block));
-    const typeImport = exampleTypeImport(block);
+    await writeSnippetFile(preamblePath, preamble());
+    const symbolImport = exampleSymbolImport(block);
     const header = [`// ${ownerLabel(block)}`, `import './preamble.ts';`];
-    if (typeImport) header.push(typeImport);
+    if (symbolImport) header.push(symbolImport);
     await writeSnippetFile(modulePath, `${header.join('\n')}\n${block.body}\n`);
     modules.push({ block, path: modulePath, headerLines: header.length });
   }
@@ -306,6 +294,32 @@ function classifyDiagnostics(
       0,
     ),
   };
+}
+
+/**
+ * Count compiler diagnostics that no example module owns.
+ *
+ * `classifyDenoCheckDiagnostics` attributes a diagnostic by matching its `at <path>` against a
+ * synthetic module. Anything it cannot match — a support file, or the preamble — was previously
+ * invisible: `unclassifiedCompilerFailure` only fired when *zero* diagnostics were classified, which
+ * is never true while the deferred corpus is non-empty. A whole class of error could therefore
+ * vanish. These are counted and reported so the gate fails instead.
+ */
+export function unattributedDiagnostics(
+  raw: string,
+  modules: ReadonlyArray<{ path: string }>,
+): string[] {
+  const normalized = stripAnsi(raw);
+  const owned = modules.flatMap((module) => [module.path, toFileUrl(module.path).href]);
+  const unattributed: string[] = [];
+  for (
+    const match of normalized.matchAll(/TS(\d+) \[ERROR\]:[\s\S]*?\n\s+at ([^\n]+):(\d+):(\d+)/g)
+  ) {
+    const location = match[2] ?? '';
+    if (owned.some((path) => location.startsWith(path))) continue;
+    unattributed.push(`TS${match[1]} at ${location}:${match[3]}:${match[4]}`);
+  }
+  return unattributed;
 }
 
 /** Classify each synthetic module from deterministic, ANSI-independent Deno diagnostics. */
@@ -454,6 +468,8 @@ export async function compileJsdocExamples(
       policyDiagnostics,
       analysis,
     );
+    // A diagnostic no example owns must never be silently dropped, even when siblings classified.
+    const unowned = unattributedDiagnostics(stderr, modules);
     const diagnostics = [
       ...policyErrors.map((finding) =>
         `${finding.owner.sourcePath} · ${finding.owner.kind}${
@@ -462,12 +478,18 @@ export async function compileJsdocExamples(
       ),
       ...policyDiagnostics.map((finding) => finding.message),
       mapDiagnostics(stderr, modules).trim(),
+      unowned.length === 0 ? '' : [
+        `unattributed compiler diagnostics: ${unowned.length}`,
+        ...unowned.map((entry) => `  ${entry}`),
+      ].join('\n'),
     ].filter(Boolean).join('\n');
     const enforcedFailureCount = classified.failureCensus.badSpecifier +
       classified.failureCensus.unfenced + classified.failureCensus.malformed;
     const unclassifiedCompilerFailure = output.code !== 0 &&
       classified.classifiedCompilerFailureCount === 0;
-    const code = enforcedFailureCount === 0 && !unclassifiedCompilerFailure ? 0 : 1;
+    const code = enforcedFailureCount === 0 && !unclassifiedCompilerFailure && unowned.length === 0
+      ? 0
+      : 1;
     return {
       code,
       diagnostics,
