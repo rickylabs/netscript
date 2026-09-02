@@ -3,7 +3,9 @@
  */
 
 import {
+  createLocaleSdkClientContribution,
   defineSdkClientContribution,
+  type LocaleSdkClientContext,
   type SdkClientContributionDefinition,
 } from '../../src/client/mod.ts';
 import { defineServices } from '../../src/presets/mod.ts';
@@ -189,18 +191,19 @@ const auth = defineSdkClientContribution<{
   }),
 });
 
-const locale = defineSdkClientContribution<{ locale?: string }>()({
-  protocol: { family: 'netscript.sdk-client', major: 1 },
-  id: 'app:locale',
-  context: { locale: 'optional' },
-  headerKeys: ['accept-language'],
-  responseCache: {
-    mode: 'partitioned',
-    partition: ({ context }) => context.locale ?? 'default',
-  },
-  prepare: ({ context }) =>
-    context.locale ? { headers: { 'accept-language': context.locale } } : {},
-});
+const locale = createLocaleSdkClientContribution();
+type _CanonicalLocaleContextPreserved = Assert<
+  IsAssignable<
+    SdkClientContributionContext<readonly [typeof locale]>,
+    LocaleSdkClientContext
+  >
+>;
+type _CanonicalLocaleContextIsNotWidened = Assert<
+  IsAssignable<
+    LocaleSdkClientContext,
+    SdkClientContributionContext<readonly [typeof locale]>
+  >
+>;
 
 const directOnly = defineSdkClientContribution<{ opaqueSession: string }>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
@@ -317,6 +320,10 @@ const services = defineServices({
   publicCatalog: {
     contract: serviceContract,
   },
+  localizedCatalog: {
+    contract: serviceContract,
+    contributions: [locale] as const,
+  },
   desktopOnly: {
     contract: serviceContract,
     contributions: [directOnly] as const,
@@ -343,6 +350,19 @@ services.queryUtils.accounts.orders.list.queryOptions({
     auth: { token: () => Promise.resolve('secret') },
     locale: 'de-CH',
   },
+});
+
+services.clients.localizedCatalog.orders.list({ page: 1 });
+services.clients.localizedCatalog.orders.list({ page: 1 }, {
+  context: { locale: 'fr-FR' },
+});
+services.queryUtils.localizedCatalog.orders.list.queryOptions({
+  input: { page: 1 },
+  context: { locale: 'fr-FR' },
+});
+services.clients.localizedCatalog.orders.list({ page: 1 }, {
+  // @ts-expect-error canonical locale context remains string-typed on generated clients // quality-allow: negative compile fixture proves the locale factory preserves its inferred context through defineServices
+  context: { locale: 42 },
 });
 
 // A context-bearing service uses this distinct generated shape; the implementation fixture must
