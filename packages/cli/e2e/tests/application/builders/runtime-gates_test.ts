@@ -15,7 +15,10 @@ import {
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
-import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
+import {
+  createListenerReadinessGates,
+  createTypedDbPhaseBGate,
+} from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 import { formatCommandFailure } from '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts';
 
@@ -119,6 +122,23 @@ Deno.test('typed database Phase-B gate stays outside the base runtime gate list'
     ),
     false,
   );
+});
+
+Deno.test('listener-unreachable gate grants every subprocess executable it invokes', () => {
+  const gate = createListenerReadinessGates(DATABASE.POSTGRES).find((entry) =>
+    entry.id === GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected listener-unreachable gate to be a command gate.');
+  }
+
+  const command = gate.command(s8RuntimeContext());
+  const allowRun = command.find((argument) => argument.startsWith('--allow-run='));
+  const allowedExecutables = new Set(allowRun?.slice('--allow-run='.length).split(',') ?? []);
+
+  for (const executable of ['aspire', 'docker']) {
+    assertEquals(allowedExecutables.has(executable), true);
+  }
 });
 
 Deno.test('typed database Phase-B failures surface both captured streams', () => {
