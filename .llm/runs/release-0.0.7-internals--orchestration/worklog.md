@@ -10861,3 +10861,13 @@ non-closing issues, and an unmatched target can fail the mirror without mutation
 packet time, after CI settles: apply `status:ready-merge` → `--dry-run` → if the #863 block errors,
 publish the pre-staged variant with that block removed (prose reference kept) → `gh run rerun
 --failed`. Variant staged at `/home/agent/1952-body-no863.md`; nothing published yet.
+
+### D-262 — #1952 docker-tier red at f4a4169b6 is this PR's: `docker` missing from the listener-unreachable gate's `--allow-run`
+
+`runtime.health.listener-unreachable` 58/1 with `NotCapable: Requires run access to "docker"` —
+`owned-container-log.ts:109` runs `docker` but the gate spec in `runtime-gates.ts` launches with
+`--allow-run=aspire`. Sqlite tier green because it never reaches the Postgres branch; unit tests
+green because Deno permissions bind only when the gate process runs. Worker `01a0645f` resumed with
+a bounded fix (widen only that gate to `aspire,docker`; argv-derived regression test; re-run module
+tests + e2e type-check; push). Aspire notified on #1952. Also recorded: `behavior.live-db-endpoint`
+passed on this run → the 13.5.3 `no TCP URL` drift is intermittent, not deterministic.
