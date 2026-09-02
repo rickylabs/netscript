@@ -166,6 +166,71 @@ touches discovery; `createQueryFactories` is pure wiring over `{ contract, clien
   ]
 }) }}
 
+## Typed request contributions
+
+Contributions add typed per-call context and declare ownership of lower-case request headers. Attach
+the literal tuple to each service that needs it; contributions are explicit and are never installed
+automatically.
+
+This example composes an auth-shaped application contribution with the SDK's non-auth locale
+contribution:
+
+```ts
+import {
+  createLocaleSdkClientContribution,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
+import { defineServices } from '@netscript/sdk/presets';
+import { oc } from '@orpc/contract';
+import { z } from 'zod';
+
+const accountsContract = {
+  profile: oc.route({ method: 'GET' })
+    .input(z.object({}))
+    .output(z.object({ id: z.string(), displayName: z.string() })),
+};
+
+const locale = createLocaleSdkClientContribution();
+const bearer = defineSdkClientContribution<{
+  auth: { getAccessToken(): Promise<string>; cachePartition: string };
+}>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:bearer',
+  context: { auth: 'required' },
+  headerKeys: ['authorization'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.auth.cachePartition,
+  },
+  prepare: async ({ context }) => ({
+    headers: { authorization: `Bearer ${await context.auth.getAccessToken()}` },
+  }),
+});
+
+const sdk = defineServices({
+  accounts: {
+    contract: accountsContract,
+    contributions: [bearer, locale] as const,
+  },
+});
+
+const context = {
+  auth: {
+    getAccessToken: () => Promise.resolve('runtime-only-value'),
+    cachePartition: 'account-epoch-7',
+  },
+  locale: 'de-CH',
+};
+await sdk.clients.accounts.profile({}, { context });
+sdk.queryUtils.accounts.profile.queryOptions({ input: {}, context });
+```
+
+The locale factory canonicalizes one optional Unicode BCP 47 locale, owns `accept-language`, and
+uses the canonical locale as its declared cache partition. An absent locale emits no header and uses
+the stable `default` partition. Preference lists and quality weights are rejected. Other
+contributions must declare whether responses are `invariant`, `partitioned`, or `direct-only`;
+partition values must be stable, printable, and non-secret.
+
 ### Typed bearer credentials
 
 Credential fields do not belong on `CreateServiceClientOptions`. Instead, attach the canonical
