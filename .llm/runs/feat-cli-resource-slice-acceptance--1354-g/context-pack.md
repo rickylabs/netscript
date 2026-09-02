@@ -6,13 +6,13 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `implementation complete — commit/push/PR handoff` |
+| Current phase | `impl PR open — hosted/evaluator gates pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
-Exactly the eight amended product files are implemented on Slice F head `8c27ffe164fc8dab8e16796e602693e6dea95c1e`. PR #1891 authorized item 8; focused tests are 55/55 and the full CLI suite is 1716/1716. All permitted author-lane static, asset, publish, docs, JSR, doctrine, and quality gates are green. Hosted runtime remains CI-owned.
+Exactly the eight amended product files are implemented on Slice F head `8c27ffe164fc8dab8e16796e602693e6dea95c1e`. PR #1891 authorized item 8; focused tests are 55/55 and the full CLI suite is 1716/1716. All permitted author-lane static, asset, publish, docs, JSR, doctrine, and quality gates are green. Non-draft stacked PR #1958 is open with the required metadata. Hosted runtime remains CI-owned.
 
 ## Completed
 
@@ -24,13 +24,13 @@ Exactly the eight amended product files are implemented on Slice F head `8c27ffe
 
 ## In Progress
 
-- Final raw status/lock review, commit, exact push, and non-draft stacked PR creation.
+- Hosted runtime execution and separate IMPL-EVAL by downstream CI/evaluator lanes.
 
 ## Next Steps
 
-1. Verify the eight-file ceiling and `deno.lock` cleanliness against the exact base.
-2. Commit and push `HEAD:refs/heads/feat/cli-resource-slice-acceptance`.
-3. Open the required non-draft PR against `feat/cli-resource-slice-activate` with exact labels and milestone.
+1. Await hosted `scaffold.runtime` evidence on PR #1958.
+2. Run separate-session IMPL-EVAL for the final head.
+3. Advance lifecycle only after those downstream gates pass.
 
 ## Key Decisions
 
@@ -67,4 +67,5 @@ Exactly the eight amended product files are implemented on Slice F head `8c27ffe
 
 ## Commits
 
-- Slice G implementation is committed at local `HEAD`; exact pushed SHA and PR number are recorded in the final handoff after remote creation.
+- Implementation commit: `97ad667cc0bf99f974e1673ed7d4dfce41932ba3`.
+- PR: #1958, base `feat/cli-resource-slice-activate`, head `feat/cli-resource-slice-acceptance`.

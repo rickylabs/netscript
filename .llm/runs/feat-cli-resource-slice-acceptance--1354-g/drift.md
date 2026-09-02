@@ -31,3 +31,13 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** significant
 - **Action:** accept the owner-authorized rescope and resume the remaining author-lane gates.
 - **Evidence:** amended Slice G item 8 and the full/focused unit reruns recorded in `worklog.md`.
+
+## 2026-09-03 — Slice F base advanced with evidence-only commits
+
+- **What:** `origin/feat/cli-resource-slice-activate` advanced from the dispatched product baseline `8c27ffe164fc8dab8e16796e602693e6dea95c1e` to `63b23dae2b9d3bae0fede98dcf035779a10c3234` before PR creation.
+- **Source:** Explicit fetch plus raw left/right log review.
+- **Expected:** Slice G starts from the dispatched Slice F product head and targets Slice F's branch.
+- **Actual:** The three newer base commits modify only Slice F harness evaluation/evidence artifacts; Slice G's product baseline and eight-file scope are unchanged. PR #1958 targets the current Slice F branch as required.
+- **Severity:** minor
+- **Action:** accept; preserve the dispatched implementation ancestry and let the stacked PR merge against the current base.
+- **Evidence:** commits `de042d23e`, `dcf2c4bdf`, and `63b23dae2` contain only `.llm/runs/feat-cli-resource-slice-activate--1354-f/` changes.

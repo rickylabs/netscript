@@ -74,6 +74,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | rescope/resume | Fetched amended plan `8896b3b768798593e3078b3db07170d148550aac`; PR #1891 authorizes item 8 and ceiling 8. Updated only the existing fake's stdout expression. |
 | 2026-09-03 | G | author gates | Focused and full CLI unit suites plus check/lint/fmt, assets, publish, docs, JSR, doctrine, and quality gates all passed. Hosted runtime remains CI-owned. |
 | 2026-09-03 | G | implementation commit | Created the Slice G implementation commit with all eight amended product paths and the run artifacts; exact SHA is reported from pushed `HEAD`. |
+| 2026-09-03 | G | push/PR | Pushed implementation commit `97ad667cc0bf99f974e1673ed7d4dfce41932ba3` and opened non-draft stacked PR #1958 with the exact labels and milestone 0.0.7. |
 
 ## Decisions
 
@@ -89,6 +90,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
 | Captured-stdout reachability required item 8; PR #1891 amended the locked plan and the authorized fixture update is complete. | significant, resolved | yes |
+| Slice F's remote branch advanced by three harness-evidence commits after the dispatched baseline; product files are disjoint and the PR still targets that branch. | minor | yes |
 
 ## Gate Results
 
@@ -134,3 +136,4 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 - Inspect the two stable IDs, exact command arrays, direct `RUNTIME_GATES` selection, materialized runtime order, and identical guidance sentence first.
 - PR #1891 supplied the minimal plan amendment; the authorized item-8 fix is green in both focused and full-suite coverage.
 - Hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` remains required in CI and was not run by this author lane.
+- Non-draft PR #1958 targets `feat/cli-resource-slice-activate` with `orchestrator:features`, `status:impl`, `type:feat`, `area:cli`, `priority:p2`, and `wave:v1`; milestone is 0.0.7.
