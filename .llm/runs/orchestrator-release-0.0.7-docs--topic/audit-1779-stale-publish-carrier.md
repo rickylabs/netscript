@@ -63,3 +63,10 @@ in `packages/mcp/src/` and both collide with `main` on it. Regenerate-after-merg
   `docs/site/reference/fresh/index.md:414` says `FormCollectionStrategy` is `interface`, PR makes it
   a `type` alias; exports-drift checks presence not kind. Handed in-PR with a Docs follow-up offer.
 - #1945 (fixes, plan): `/design` out of production builds — audit scaffold docs when impl lands.
+
+## ready-merge audits (2026-09-02, late)
+
+| PR | Head | Verdict |
+| --- | --- | --- |
+| #1909 (Fixes) | `c3805e1d2` | IMPL-EVAL PASS → `augment-review`; same head already swept clean, no docs/carrier delta. |
+| #1938 (Fixes) | `6ae6cc483` | → `ready-merge`. 0 behind main; quality/check-test/close-gate pass; `Refs #1455` partial with #1451 stated out of scope (correct non-closing form). Corpus carrier fresh. Clean. |
