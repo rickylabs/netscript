@@ -252,6 +252,28 @@ Deno.test('dependency and ordering diagnostics name the offending descriptor', (
   }
 });
 
+Deno.test('reserved trace header declarations identify the offending descriptor', () => {
+  for (
+    const [contributionId, headerName] of [
+      ['test:traceparent', 'traceparent'],
+      ['test:tracestate', 'tracestate'],
+      ['test:traceparent-case', 'Traceparent'],
+    ] as const
+  ) {
+    const error = constructionError([
+      descriptor({ id: contributionId, headerKeys: [headerName] }),
+    ]);
+    assertEquals(error.code, 'SDK_CONTRIBUTION_INVALID');
+    assertEquals(error.phase, 'construction');
+    assertEquals(error.contributionId, contributionId);
+    assertEquals(error.toJSON(), {
+      code: 'SDK_CONTRIBUTION_INVALID',
+      phase: 'construction',
+      contributionId,
+    });
+  }
+});
+
 Deno.test('unknown construction enforces tuple, context, and header budgets', () => {
   const tuple = Array.from(
     { length: 17 },
