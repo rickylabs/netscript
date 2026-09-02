@@ -10946,3 +10946,20 @@ caught nothing this time — which is the point.
 merged, D's base branch content is now in `main`, so once its PR opens I rebase it
 (`--onto origin/main f2696ea88`) and retarget the base to `main` — mechanical, and done by me rather
 than by interrupting a lane mid-commit.
+
+### ~01:00Z (Sep 3) — resumed after quota reset; Slice D is PR #1948, native eval dispatched
+
+`main` still `e341c6f71`. #1944 (`5bdf46cfc`) and #1943 (`387bb1adc`) `MERGEABLE`, `check-test` /
+`quality` still running at the re-converged heads; packets already re-issued.
+
+**Slice D is #1948** at `4af7c98d5`, base `main` — the lane rebased itself after #1946 merged: 2
+commits ahead of `main`, C's commits absorbed, **17 hand-authored files, all inside the 18-file
+ceiling, none outside**. Non-draft, full labels, milestone, `MERGEABLE`; `build`/`code-quality`/
+`close-gate` pass, rest running. Native IMPL-EVAL dispatched at the immutable head, judging D7's
+emitted-file contract, marker rendering round-tripped through C's classifier, D4 neutrality (no
+extension point; old templates untouched until F), Form B, `initialDataUpdatedAt` carried into the
+neutral island per the amendment, and that rendered output is actually type-checked rather than only
+string-compared.
+
+**Land order for #1943 and #1944:** independent of each other (Fresh/CLI adapter vs plugin SDK) —
+either order; both before Slice E, which consumes B's seam. D does not depend on B.
