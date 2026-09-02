@@ -5,7 +5,11 @@ import type {
   JsdocExampleBlock,
   JsdocExampleOwner,
 } from './jsdoc-example-contract.ts';
-import { classifyDenoCheckDiagnostics, compileJsdocExamples } from './jsdoc-example-compiler.ts';
+import {
+  classifyDenoCheckDiagnostics,
+  compileJsdocExamples,
+  unattributedDiagnostics,
+} from './jsdoc-example-compiler.ts';
 import { JSDOC_SCAFFOLD_ALIAS_RULES } from './snippet-supports.ts';
 import { resolveWorkspaceSurface } from './snippet-workspace.ts';
 
@@ -363,4 +367,37 @@ Deno.test('diagnostic classification is identical with compiler color on and off
       { failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] },
     ],
   );
+});
+
+Deno.test('a diagnostic no example owns is reported even when siblings are classified', () => {
+  const owned = '/tmp/x/examples/1/example.ts';
+  const raw = [
+    "TS2304 [ERROR]: Cannot find name 'nope'.",
+    'const a = nope;',
+    `    at ${owned}:3:11`,
+    '',
+    "TS2451 [ERROR]: Cannot redeclare block-scoped variable 'dup'.",
+    'declare const dup: number;',
+    '    at /tmp/x/examples/1/preamble.ts:3:9',
+  ].join('\n');
+
+  // The owned diagnostic classifies, which is exactly the condition that used to suppress the
+  // unowned one: `unclassifiedCompilerFailure` only fires when nothing at all classified.
+  const unowned = unattributedDiagnostics(raw, [{ path: owned }]);
+  assertEquals(unowned.length, 1);
+  assert(unowned[0]?.startsWith('TS2451 at /tmp/x/examples/1/preamble.ts'));
+});
+
+Deno.test('every diagnostic an example owns is attributed, none reported as unowned', () => {
+  const owned = '/tmp/x/examples/7/example.ts';
+  const raw = [
+    "TS2322 [ERROR]: Type 'number' is not assignable to type 'string'.",
+    'const a: string = 1;',
+    `    at file://${owned}:4:7`,
+    '',
+    "TS2304 [ERROR]: Cannot find name 'missing'.",
+    'missing();',
+    `    at ${owned}:5:1`,
+  ].join('\n');
+  assertEquals(unattributedDiagnostics(raw, [{ path: owned }]), []);
 });
