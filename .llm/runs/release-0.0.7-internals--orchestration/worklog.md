@@ -10871,3 +10871,14 @@ green because Deno permissions bind only when the gate process runs. Worker `01a
 a bounded fix (widen only that gate to `aspire,docker`; argv-derived regression test; re-run module
 tests + e2e type-check; push). Aspire notified on #1952. Also recorded: `behavior.live-db-endpoint`
 passed on this run → the 13.5.3 `no TCP URL` drift is intermittent, not deterministic.
+
+### D-263 — #1952 permission fix pushed as f8b0b4a26; review green; CI/e2e re-firing
+
+Fix landed in `listener-readiness-gates.ts:95` (the failure/recovery gate spec), not
+`runtime-gates.ts` as my steering guessed — the worker located the real spec and corrected me.
+Exactly one gate widened to `--allow-run=aspire,docker`; the other two allowlists in that file
+(`aspire`; `aspire,deno`) untouched; the existing test updated to assert the new argv. Auto-review at
+`f8b0b4a26`: merge-tree clean vs `ba6f1f49a`, readiness layer 4 refs on the stream fixture, no
+polling reintroduced, four generated `check:` gates 0, lock churn 0, tests 4/0 · 3/0 · 10/0, e2e
+type-check 0. Aspire independently posted the same diagnosis at 23:21 — no disagreement. CI
+`33694703133` and e2e `33694703090` running at the fixed head; packet follows their result.
