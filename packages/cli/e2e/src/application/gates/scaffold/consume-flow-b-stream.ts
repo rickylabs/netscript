@@ -137,7 +137,16 @@ try {
     throw new Error('malformed control changed the last committed offset');
   }
   const documentedReceipt = await runDocumentedStreamExample(new URL(streamUrl).origin);
-  const span = createStreamsInstrumentation().startSubscribeSpan({
+  // Pass an explicitly-resolved tracer rather than letting the instrumentation call
+  // `@netscript/telemetry`'s `getTracer`. That helper memoises tracers in a module-level cache
+  // keyed by name@version, and `trace.getTracer()` binds to whichever provider is registered at
+  // the FIRST call — so a tracer resolved before this consumer registered its provider is a
+  // no-op, and every later call returns that cached no-op. The span was created and ended
+  // against it, exported nothing, and raised no error, which is why TC-14 saw no
+  // `stream.subscribe` span while this gate itself passed.
+  const span = createStreamsInstrumentation({
+    tracer: trace.getTracer('netscript.streams'),
+  }).startSubscribeSpan({
     streamPath: '/workers/executions',
     collection: 'execution',
     operation: 'fan-in',
