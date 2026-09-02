@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `gate` — source and generated GREEN complete; final local gates running |
+| Current phase | `implement` — local rows complete; hosted CI and IMPL-EVAL pending |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`, RED step 2 remains hosted-pending, and GREEN step 3 is committed at `0fd04af6d`. The embedded barrel has now been regenerated through `deno task gen:assets-barrel`; scoped check/test/lint/fmt rows pass, with freshness/quality/architecture and carrier checks remaining before push.
+PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`; GREEN source is `0fd04af6d`; canonical barrel regeneration is `0c1778026`; and the supervisor-requested mechanical merge of `origin/main` `ba6f1f49a` is `21ee63419`. All local scoped, freshness, quality, architecture, and four-carrier checks pass at the merged implementation head. Hosted RED/GREEN behavior remains pending under `ci:full` by constraint.
 
 ## Completed
 
@@ -27,16 +27,18 @@ PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b
 - Ran RED step 1 through the structured test wrapper; exit 1 is the expected evidence.
 - Implemented GREEN step 3 and passed the focused E2E registration/order tests (32/32).
 - Regenerated the embedded asset barrel through its generator; no lockfile changed.
+- Mechanically merged `origin/main` `ba6f1f49a`, retained both concurrent scaffold gate IDs, and regenerated the conflicted barrel from merged sources.
+- Passed the final local gate set at `21ee63419`: check 733 files; focused tests 88/88; lint/fmt 12 files each; freshness, quality, architecture, and four carrier checks all exit 0.
 
 ## In Progress
 
-- Commit GREEN step 4, then finish freshness/quality/architecture and carrier checks.
+- Hosted `ci:full` accumulation and supervisor-dispatched separate-session IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit generator-produced `embedded.generated.ts` as GREEN step 4.
-2. Run freshness/quality/architecture plus the four-carrier pre-push chain.
-3. Push the GREEN commits, update draft PR #1945, and stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
+1. Keep draft PR #1945 until hosted `behavior.app-reference` and `scaffold.design-production-exclusion` pass.
+2. Supervisor dispatches separate-session IMPL-EVAL against the final pushed head.
+3. Do not run hosted runtime E2E locally without a coordinator lease.
 
 ## Key Decisions
 

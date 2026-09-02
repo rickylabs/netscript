@@ -76,6 +76,8 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | 2026-09-02T19:15:00Z | Implement | RED 2 | `scaffold.design-production-exclusion` production-build baseline probe is `HOSTED_PENDING` under `ci:full`. Per the coordinator constraint, no local `e2e:cli`, Aspire, or Docker command was run. |
 | 2026-09-03T00:35:00Z | Implement | GREEN 3 | Added the typed middleware asset, scaffold load/write plumbing, fail-closed runtime middleware, Vite-mode structural ignore, gate ID/command, mutation/restoration probe, and runtime-suite selection. Focused E2E registration/order tests pass 32/32. Structured E2E-source check reaches only the intentional Step-4 stale-barrel error (`TS2741` for the new middleware asset key). |
 | 2026-09-03T01:05:00Z | Implement | GREEN 4 | Ran `deno task gen:assets-barrel`; only `packages/cli/src/kernel/assets/embedded.generated.ts` changed and `deno.lock` remained untouched. The freshness task's pre-commit diff check rejected that intended uncommitted delta; its authoritative PASS is run after this generator commit. |
+| 2026-09-02T23:45:00Z | Implement | Upstream sync | Mechanically merged `origin/main` `ba6f1f49a` as `21ee63419`. Concurrent scaffold gate IDs were both retained; the only generated-file conflict was resolved by rerunning `deno task gen:assets-barrel`, never by hand-editing the barrel. This supervisor-requested baseline sync is not plan drift. |
+| 2026-09-02T23:45:00Z | Implement | Local validation | At `21ee63419`, scoped check/test/lint/fmt, embedded freshness, `quality:gate`, explicit `arch:check`, and all four carrier checks exited 0. The current wrappers require repeated `--file`; rejected positional lint/fmt invocations ran no lint/fmt and are excluded from verdict evidence. No local `e2e:cli`, Aspire, or Docker command ran. |
 
 ## Decisions
 
@@ -99,17 +101,22 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | RED focused tests | EXPECTED_FAIL | Structured `run-deno-test.ts` over five focused unit/E2E files exited 1 with missing middleware asset key and gate ID; 2026-09-02 |
 | GREEN 3 focused E2E tests | PASS | Structured `run-deno-test.ts`; 32 passed, 0 failed |
 | GREEN 3 source check | EXPECTED_STEP_BOUNDARY | Structured `run-deno-check.ts --root packages/cli/e2e/src --ext ts,tsx`; only stale embedded-barrel `TS2741`, to be resolved by GREEN 4 |
-| Check | PASS | Structured `run-deno-check.ts --root packages/cli/src --ext ts,tsx`; 711 files, 0 failed batches |
-| Focused tests | PASS | Structured `run-deno-test.ts`; 86 passed, 0 failed across five touched test files |
+| Validated implementation head | PASS | `21ee63419` (includes mechanical merge of `origin/main` `ba6f1f49a`) |
+| Check | PASS | Structured `run-deno-check.ts --root packages/cli/src --ext ts,tsx`; exit 0, 733 files, 0 failed batches |
+| Focused tests | PASS | Structured `run-deno-test.ts`; exit 0, 88 passed, 0 failed across five touched test files |
 | Lint | PASS | Structured `run-deno-lint.ts`; 12 touched non-generated TS files processed across CLI/E2E configs, 0 findings |
 | Format | PASS | Structured `run-deno-fmt.ts`; 12 touched non-generated TS files processed across CLI/E2E configs, 0 findings |
 | Embedded generation | PASS | `deno task gen:assets-barrel`; only the CLI embedded barrel changed; `deno.lock` unchanged |
-| Local GREEN rows 5–7 | NOT_RUN | Freshness post-commit, quality, and architecture gates remain |
+| Embedded freshness | PASS | `deno task check:assets-barrel`; exit 0 after merge-time regeneration |
+| Quality | PASS | `deno task quality:gate`; exit 0; existing repository warnings only |
+| Architecture | PASS | `deno task arch:check`; exit 0; existing repository warnings only |
+| Publish assets carrier | PASS | `deno task check:publish-assets`; exit 0 |
+| MCP export corpus carrier | PASS | `deno task check:mcp-export-corpus`; exit 0 |
+| Agent docs prose carrier | PASS | `deno task check:agent-docs-prose`; exit 0 |
 | Hosted development behavior | HOSTED_PENDING | Existing `behavior.app-reference`; local runtime E2E prohibited |
 | Hosted production exclusion | HOSTED_PENDING | New `scaffold.design-production-exclusion` baseline/mutation/restoration probe under `ci:full` |
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge the runtime-signal independence and the selected route-only bundle marker first.
-- Implementation must stop if dev Vite does not expose a literal-development runtime signal; do not substitute an unset→development default.
-- Runtime E2E remains hosted-only under `ci:full`; no local run without a coordinator lease.
+- Local implementation rows are complete at `21ee63419`; runtime E2E remains hosted-only under `ci:full` and was not run locally.
+- Supervisor should keep PR #1945 draft until the hosted development/production probes and separate-session IMPL-EVAL pass.
