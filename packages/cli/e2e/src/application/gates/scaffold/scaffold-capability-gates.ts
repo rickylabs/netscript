@@ -19,7 +19,10 @@ import { createOtelGates } from './otel-gates.ts';
 import { createPluginContractGates } from './plugin-contract-gates.ts';
 import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
 import { createRuntimeBehaviorGates } from './runtime/behavior-gates.ts';
-import { createListenerReadinessGates } from './runtime/listener-readiness-gates.ts';
+import {
+  createListenerReadinessGates,
+  createTypedDbPhaseBGate,
+} from './runtime/listener-readiness-gates.ts';
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
 import { createServiceEnvironmentGates } from './service-env/service-env-gates.ts';
 import { createUiAiGates } from './ui-ai-gates.ts';
@@ -58,6 +61,7 @@ export function createScaffoldCapabilityGates(
     ...residentDatabaseGates,
     ...runtimeGates.slice(startIndex + 1),
     ...createListenerReadinessGates(database),
+    createTypedDbPhaseBGate(),
     ...createRuntimeBehaviorGates(database),
     ...createBehaviorPluginHealthGates(),
     ...createPackageBackedPluginDoctorGates(),
