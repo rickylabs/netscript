@@ -12,12 +12,12 @@
 
 ## Current State
 
-OpenHands returned `FAIL_FIX` at `bdbaec12c`: hosted Vite colorizes `Local:` as `\x1b[1mLocal\x1b[22m:`, so the raw readiness scan never signals and run `33562257540` exhausts the startup budget. RED `b9b2e9f0a` discriminates ANSI failure from plain success. GREEN strips ANSI from scan text, sets `NO_COLOR=1`, and passes the whole E2E workspace check/test locally. The earlier hosted-green claim is retracted; local runtime remains `NOT_RUN`.
+OpenHands returned `FAIL_FIX` at `bdbaec12c`: hosted Vite colorizes `Local:` as `\x1b[1mLocal\x1b[22m:`, so the raw readiness scan never signals and run `33562257540` exhausts the startup budget. RED `b9b2e9f0a` discriminates ANSI failure from plain success. GREEN implementation head `72adf62f2` strips ANSI from scan text, sets `NO_COLOR=1`, and passes the whole E2E workspace check/test locally. The earlier hosted-green claim is retracted; local runtime remains `NOT_RUN`.
 
 ## Next Steps
 
-1. Commit/push the GREEN repair and record its implementation SHA.
-2. Hand off to the supervisor for hosted CI and fresh-head evaluation; do not claim hosted green locally.
+1. Hand off implementation head `72adf62f2` to the supervisor for hosted CI and fresh-head evaluation.
+2. Do not claim hosted green locally.
 
 ## Key Decisions
 

@@ -12,7 +12,7 @@ Separates the generated dev chain's dependency/startup allowance from the Fresh 
 - [x] RED: focused slow-preflight, child-exit, and timeout-reporting regression — `cd2337d36`
 - [x] GREEN: phase-aware startup and HTTP readiness budgets — `04420a074`
 - [x] FAIL_FIX RED: exact ANSI banner fails while plain text passes — `b9b2e9f0a`
-- [ ] FAIL_FIX GREEN: ANSI-safe scan plus `NO_COLOR=1`
+- [x] FAIL_FIX GREEN: ANSI-safe scan plus `NO_COLOR=1` — `72adf62f2`
 - [ ] Fresh-head separate-session IMPL-EVAL
 
 ## Validation

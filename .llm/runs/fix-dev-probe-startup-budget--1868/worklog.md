@@ -67,7 +67,7 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 | 2026-09-02 | 3 | RED prepared | Added exact colorized-banner and plain-text-banner tests through the output scan path; product code remains unchanged pending observed RED. |
 | 2026-09-02 | 3 | RED observed | Focused structured test exited 1: 4 passed, 1 failed, 5 total. Plain `Local:` passed through the real probe entry point; exact `\x1b[1mLocal\x1b[22m:` failed with child status 0 after the short-lived fixture exited. No product file changed. |
 | 2026-09-02 | 3 | commit/reconcile | ANSI RED committed and pushed as `b9b2e9f0a`; PR #1883 remains the issue-closing review surface. |
-| 2026-09-02 | 4 | GREEN | `stripAnsi` removes CSI escapes from decoded scan text while raw child bytes are still mirrored unchanged; spawned dev receives `NO_COLOR=1`. Focused suite passes 5/5. |
+| 2026-09-02 | 4 | GREEN | `stripAnsi` removes CSI escapes from decoded scan text while raw child bytes are still mirrored unchanged; spawned dev receives `NO_COLOR=1`. Focused suite passes 5/5. Implementation head: `72adf62f2`. |
 | 2026-09-02 | 4 | review | Whole E2E workspace structured check/test pass. Equivalent ANSI regex is constructed from code point 27 to satisfy `no-control-regex` without a lint suppression. Runtime remains hosted-owned and is not claimed green. |
 
 ## Gate Results
@@ -94,4 +94,4 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 - Evaluator should inspect phase separation, status races, truthful diagnostics, and confirm `deno.lock` stayed unchanged.
 - Commit trail: RED `cd2337d36`; GREEN `04420a074`.
 - Accepted `FAIL_FIX`: normalize ANSI only in the readiness scan and set `NO_COLOR=1` on the spawned dev process; preserve byte-for-byte mirrored output.
-- FAIL_FIX GREEN implementation SHA will be recorded immediately after the commit exists; no hosted-green claim is made.
+- FAIL_FIX commit trail: RED `b9b2e9f0a`; GREEN implementation head `72adf62f2`. No hosted-green claim is made.
