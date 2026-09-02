@@ -15,7 +15,6 @@ const FIXTURE_ROOT = fromFileUrl(
 
 Deno.test('vite build emits the registered defer island in the client bundle', async () => {
   const outputDir = await Deno.makeTempDir({ prefix: 'netscript-defer-island-' });
-  const npmCacheDir = await Deno.makeTempDir({ prefix: 'netscript-empty-npm-cache-' });
 
   try {
     const output = await createLockedViteCommand({
@@ -29,7 +28,6 @@ Deno.test('vite build emits the registered defer island in the client bundle', a
       cwd: FIXTURE_ROOT,
       stdout: 'piped',
       stderr: 'piped',
-      env: { NPM_CONFIG_CACHE: npmCacheDir },
     }).output();
 
     const stderr = new TextDecoder().decode(output.stderr);
@@ -59,6 +57,5 @@ Deno.test('vite build emits the registered defer island in the client bundle', a
     );
   } finally {
     await Deno.remove(outputDir, { recursive: true });
-    await Deno.remove(npmCacheDir, { recursive: true });
   }
 });
