@@ -374,6 +374,14 @@ jobs:
           --id quality-jsdoc-example-compile
           --output .llm/tmp/gate-receipts/quality/jsdoc-example-compile.json
 
+      - name: README fence integrity
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate readme-fences
+          --id quality-readme-fences
+          --output .llm/tmp/gate-receipts/quality/readme-fences.json
+
       - name: Agent docs corpus freshness
         if: env.RUN == 'true'
         run: >-

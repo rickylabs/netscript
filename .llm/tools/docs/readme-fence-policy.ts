@@ -31,7 +31,14 @@ export interface ReadmeSyntaxFailure {
   readonly codeStartLine: number;
 }
 
-/** Census reported on every run, whether the gate passes or fails. */
+/**
+ * Census reported on every run, whether the gate passes or fails.
+ *
+ * `fences` counts every fenced block for context and deliberately carries **no floor**: this gate
+ * polices TypeScript fences, so deleting a `bash` or `mermaid` block is out of its scope and does
+ * not fail it. `exempt` likewise has no ceiling of its own — exempting a block decrements `checked`,
+ * which the `minimumChecked` floor already catches.
+ */
 export interface ReadmeFenceCensus {
   readonly readmes: number;
   readonly fences: number;
@@ -41,6 +48,12 @@ export interface ReadmeFenceCensus {
   readonly syntaxInvalid: number;
   readonly typeErrors: number;
   readonly failingReadmes: number;
+  /**
+   * The compiler reported failure that this gate could attribute to neither a type error nor an
+   * excluded syntax-invalid fence. Never expected; failing on it stops an unreadable diagnostic
+   * shape from being silently swallowed, which is the defect #1892 found in the sibling gate.
+   */
+  readonly unattributedFailure: boolean;
 }
 
 /** Return every floor or ceiling violation, so a run reports all of them rather than the first. */
@@ -58,6 +71,9 @@ export function readmeFenceRatchetFailures(census: ReadmeFenceCensus): string[] 
   ceiling(census.syntaxInvalid, README_FENCE_RATCHET.maximumSyntaxInvalid, 'syntax-invalid fences');
   ceiling(census.failingReadmes, README_FENCE_RATCHET.maximumFailingReadmes, 'failing readmes');
   ceiling(census.typeErrors, README_FENCE_RATCHET.maximumTypeErrors, 'type errors');
+  if (census.unattributedFailure) {
+    failures.push('compiler reported failure that no fence accounts for');
+  }
   return failures;
 }
 
@@ -69,5 +85,5 @@ export function formatReadmeFenceCensus(
   return `readme fences: ${verdict} readmes=${census.readmes} fences=${census.fences} ` +
     `ts_like=${census.tsLike} exempt=${census.exempt} checked=${census.checked} ` +
     `syntax_invalid=${census.syntaxInvalid} type_errors=${census.typeErrors} ` +
-    `failing_readmes=${census.failingReadmes}`;
+    `failing_readmes=${census.failingReadmes} unattributed_failure=${census.unattributedFailure}`;
 }

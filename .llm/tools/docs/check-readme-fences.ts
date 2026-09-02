@@ -83,12 +83,14 @@ export async function checkReadmeFences(
   const syntaxFailures: ReadmeSyntaxFailure[] = [];
   let checked = tsLike.filter((block) => block.exemptionReason === undefined);
   let plain = '';
+  let compilerCode = 0;
 
   for (let round = 0; round <= MAX_SYNTAX_ROUNDS; round++) {
     const result = await compileSnippetAnalysis(
       analysisFor(all, checked, exempt),
       repositoryRoot,
     );
+    compilerCode = result.code;
     plain = result.diagnostics.replaceAll(ANSI, '');
     const syntax = SYNTAX_FAILURE.exec(plain);
     if (!syntax) break;
@@ -105,6 +107,10 @@ export async function checkReadmeFences(
 
   const typeErrors = [...plain.matchAll(TYPE_ERROR)];
   const failingReadmes = new Set(typeErrors.map((match) => match[2]));
+  // A non-zero compile that produced neither an attributed type error nor an excluded fence means a
+  // diagnostic shape this checker cannot read. Reporting it beats passing on an unread failure.
+  const unattributedFailure = compilerCode !== 0 && typeErrors.length === 0 &&
+    syntaxFailures.length === 0;
   return {
     census: {
       readmes: readmes.length,
@@ -115,6 +121,7 @@ export async function checkReadmeFences(
       syntaxInvalid: syntaxFailures.length,
       typeErrors: typeErrors.length,
       failingReadmes: failingReadmes.size,
+      unattributedFailure,
     },
     syntaxFailures,
     diagnostics: plain,

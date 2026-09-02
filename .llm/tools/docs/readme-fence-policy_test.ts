@@ -15,6 +15,7 @@ const baseline: ReadmeFenceCensus = {
   syntaxInvalid: README_FENCE_RATCHET.maximumSyntaxInvalid,
   typeErrors: README_FENCE_RATCHET.maximumTypeErrors,
   failingReadmes: README_FENCE_RATCHET.maximumFailingReadmes,
+  unattributedFailure: false,
 };
 
 Deno.test('the measured baseline passes and every ceiling sits at its exact census', () => {
@@ -69,7 +70,16 @@ Deno.test('the census line is printed on pass and fail alike', () => {
   assertEquals(
     formatReadmeFenceCensus(baseline, 'PASS'),
     'readme fences: PASS readmes=36 fences=166 ts_like=71 exempt=0 checked=70 ' +
-      'syntax_invalid=1 type_errors=31 failing_readmes=6',
+      'syntax_invalid=1 type_errors=31 failing_readmes=6 unattributed_failure=false',
   );
   assertEquals(formatReadmeFenceCensus(baseline, 'FAIL').startsWith('readme fences: FAIL'), true);
+});
+
+Deno.test('a compiler failure no fence accounts for is reported, not passed over', () => {
+  // The sibling gate's #1892 defect in miniature: a diagnostic shape the checker cannot read must
+  // fail rather than slip through as "no type errors found".
+  assertEquals(
+    readmeFenceRatchetFailures({ ...baseline, unattributedFailure: true }),
+    ['compiler reported failure that no fence accounts for'],
+  );
 });
