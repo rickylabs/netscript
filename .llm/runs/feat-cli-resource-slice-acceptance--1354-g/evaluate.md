@@ -113,3 +113,88 @@ Fresh-derived + `router.ts`) and that the rerun summary string matches the asser
 | --------- | ----- |
 | Verdict   | **FAIL_IMPL** (harness class: `FAIL_FIX`, cycle 1 of 2) |
 | Rationale | All author-lane gates are green (check 0/980 files, 15/15 touched tests, 1716/1716 CLI suite, arch/quality/assets/publish/readme/jsdoc all exit 0; touch set exactly the 8 enumerated files; item 8 minimal; guidance and reachability tests correct). However the slice's purpose is a hosted acceptance hook, and the gate as defined cannot pass on the suite's own project: (1) it runs before `database.codegen`, so procedure resolution fails, and (2) resource `users` collides with init's `users` router alias, so even after codegen the first run exits 1 with zero writes. Both were reproduced with the exact command on a stock init project; the `people` control proves the `11 skipped` rerun expectation is otherwise correct. Both fixes fit inside the 8-file ceiling (`resource-slice-gates.ts`, its test, `capability-suites.ts`). |
+
+---
+
+# Evaluation cycle 2: Slice G — consumer guidance and hosted acceptance hook (#1354, PR #1958)
+
+**Verdict: PASS_IMPL**
+
+## Metadata
+
+| Field          | Value                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Cycle          | 2 of 2 (re-evaluation after cycle-1 `FAIL_IMPL`)                                        |
+| Evaluator      | Claude (Fable 5.1) independent IMPL-EVAL session, 2026-09-03                            |
+| Checkout       | `/home/agent/projects/netscript/worktrees/007-eval-1354-g` (detached, read-only)        |
+| Base / HEAD    | `8c27ffe16` → `178df1726` (`fix(cli): sequence resource acceptance after codegen`, final head; author worker exited) |
+| Fix touch set  | `resource-slice-gates.ts`, `resource-slice-gates_test.ts`, `scaffold-gates.ts`, `capability-suites.ts` + run artifacts (`worklog.md`, `drift.md`, `context-pack.md`) |
+
+## Process Verification
+
+| Check                                   | Result | Evidence |
+| --------------------------------------- | ------ | -------- |
+| Touch set still ⊆ the 8 enumerated files | PASS  | `git diff --stat 8c27ffe16 HEAD -- . ':!.llm'`: exactly the 8 `packages/cli` files (273+/1−); nothing else under `packages/` or `plugins/` |
+| `deno.lock` unchanged                   | PASS   | `git diff 8c27ffe16 HEAD -- deno.lock | wc -l` = 0 |
+| Fix commit scope                        | PASS   | `git show 178df1726 --stat`: 4 product files (all inside the ceiling) + 3 run artifacts |
+| Cycle-1 Finding 1 (sequencing)          | FIXED  | `capability-suites.ts:83-86`: `DATABASE_CODEGEN`, `GENERATED_SERVICE_CLIENT_CONTRACT`, `SCAFFOLD_RESOURCE_GENERATE`, `SCAFFOLD_RESOURCE_RERUN`, then `BEHAVIOR_PROJECT_BOUNDARY_DEV` … `GENERATED_QUALITY_NEGATIVE`/`GENERATED_DENO_CHECK` later — both ids after codegen and before generated quality/type-check |
+| Cycle-1 Finding 2 (name collision)      | FIXED  | `resource-slice-gates.ts:7` `RESOURCE_NAME = 'people'`; `--client users --procedure list --partial` retained |
+| Cycle-1 Finding 3 (test prerequisite)   | FIXED  | `resource-slice-gates_test.ts:74-80` asserts `selectedDatabaseCodegen < selectedFirstRun` on `RUNTIME_GATES` directly and `:83-96` asserts `databaseCodegen < firstRun`, `rerun < generatedQuality`, `rerun < generatedCheck` on the resolved `scaffold.runtime` suite |
+| Composition mirrors selected order      | PASS   | `scaffold-gates.ts:119-135`: `...createResourceSliceGates()` now directly follows the `GENERATED_SERVICE_CLIENT_CONTRACT` gate; test `:51-62` pins `firstRun == serviceClientContract + 1`, `rerun == firstRun + 1` |
+| Codegen→contract adjacency preserved    | PASS   | `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:917-918` still holds (that file is outside the ceiling and was not touched); drift.md records why the pair sits after the probe rather than between codegen and probe |
+| `EXPECTED_COMMAND` / item 8 consistency | PASS   | `resource-slice-gates_test.ts:12-28` = `generate resource people --client users --procedure list --partial --app prod-local-test-web`; `EXPECTED_RERUN_STDOUT` and the suite-runner fake (`suite-runner_test.ts:124-125`, matches on `generate`+`resource`, name-agnostic) both emit `Resource slice applied: 0 written, 11 skipped, 0 conflicts.` |
+| Cycle-1 Finding 4 (drift record)        | PASS   | `drift.md` "IMPL-EVAL cycle 1 exposed untraced runtime prerequisites" records both failures verbatim, the fix, and the design-time lesson; a further entry records the adjacency constraint discovered during the cycle-2 edit |
+
+## Static Gates (eval checkout, `TMPDIR=$HOME/tmp`, all run fresh on `178df1726`)
+
+| Gate                            | Command                                                                                                                  | Exit | Evidence |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---- | -------- |
+| CLI typecheck                   | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx`                        | 0    | 980 files, 9 batches, 0 failed, 0 diagnostics |
+| Touched tests (+ adjacency test) | `run-deno-test.ts -- --allow-all resource-slice-gates_test.ts agent-conventions_test.ts suite-runner_test.ts service-client-runtime-probe_test.ts` | 0 | 40 passed / 0 failed |
+| Full `packages/cli` suite       | `run-deno-test.ts -- --allow-all packages/cli`                                                                           | 0    | 1716 passed / 0 failed / 0 ignored (78.9 s) |
+| Lint (4 fix files)              | `deno lint <4 files>`                                                                                                    | 0    | Checked 4 files |
+| Format (4 fix files)            | `deno fmt --check <4 files>`                                                                                             | 0    | Checked 4 files |
+| Assets barrel                   | `deno task check:assets-barrel`                                                                                          | 0    | |
+| Publish assets                  | `deno task check:publish-assets`                                                                                         | 0    | |
+| Architecture                    | `deno task arch:check`                                                                                                   | 0    | pre-existing F-5/F-6 `export default` WARNs only, none in touched files |
+| Quality gate                    | `deno task quality:gate`                                                                                                 | 0    | `"ok":true` |
+| README fences                   | `deno task docs:readme-fences`                                                                                           | 0    | `PASS readmes=36 fences=169 checked=74` |
+| JSDoc examples                  | `deno task docs:jsdoc-examples`                                                                                          | 0    | `deferredCensus={"unboundName":116,"typeError":14}` — ≤116 ceiling held |
+
+## Runtime reproduction (same method as cycle 1; no Aspire/Docker/browser)
+
+Stock project created under `$HOME/tmp/eval-g2` with the CLI from this checkout and the suite's exact init flags, then the suite's `database.codegen` step, then the exact gate commands.
+
+| Step | Command (cwd)                                                                                                                       | Exit | Output |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------- | ---- | ------ |
+| init | `netscript init evalg --path $HOME/tmp/eval-g2 --db sqlite --cache=false --service --service-name users --ci --yes --no-git --force` | 0 | |
+| service generate | `netscript service generate --project-root <project>`                                                                      | 0    | `Wrote 0 Aspire helper files.` |
+| database.codegen | `deno eval <STANDALONE_DATABASE_CODEGEN_SCRIPT> file:./sqlite.db SQLITE_URI` (cwd `database/sqlite`)                    | 0    | `schema/.generated/zod/crud.ts` produced |
+| first-run gate | `netscript generate resource people --client users --procedure list --partial --app evalg-web` (cwd project root)          | 0    | 11 `WRITE` lines (`.generated/manifest.ts`, `.generated/routes.ts`, `router.ts` [shared] + 8 `routes/people/**` [absent]); **`Resource slice applied: 11 written, 0 skipped, 0 conflicts.`** |
+| rerun gate | identical command                                                                                                              | 0    | 11 `SKIP` lines (3 `[shared]`, 8 `[exact]`); **`Resource slice applied: 0 written, 11 skipped, 0 conflicts.`** — exact match of `stdoutIncludes` (N = 11) |
+| router check | `router.ts` after first run                                                                                                   | —    | `users: generatedRoutes.examples.users.$route` (init) and `people: generatedRoutes.people.$route` coexist; no alias collision |
+| generated check (bonus) | `deno check --unstable-kv router.ts routes/people/index.tsx routes/people/index.route.ts` in `apps/evalg-web`     | 0    | generated slice type-checks with the stock init project |
+| cleanup | `rm -rf $HOME/tmp/eval-g2`                                                                                                       | —    | directory absent afterwards |
+
+## Anti-Pattern Check / Arch-Debt Delta
+
+Unchanged from cycle 1: no new AP violations in the touched files; 0 new / 0 resolved / 0 deepened / 0 unrecorded debt entries.
+
+## Findings
+
+| # | Severity | Finding | Evidence | Required action |
+| - | -------- | ------- | -------- | --------------- |
+| — | none     | Both cycle-1 high findings and both low findings are resolved inside the 8-file ceiling; the exact gate commands now succeed on the suite's own stock project with the expected first-run and skip-only rerun summaries. | tables above | none |
+
+Observation (not a finding): `scaffold-gates.ts` composition order is not the executed order for `scaffold.runtime` (which follows `RUNTIME_GATES`); the author mirrored both anyway and the tests pin both, so the two cannot silently diverge.
+
+## Lessons for Promotion
+
+Cycle-1 lessons stand (trace a shell-out gate's runtime prerequisites; a cheap stock-init CLI repro falsifies gate definitions before the hosted run). Cycle 2 adds: when re-sequencing gates, check existing adjacency assertions in tests outside the ceiling (`service-client-runtime-probe_test.ts:917`) before choosing the insertion point — drift.md records this correctly.
+
+## Verdict
+
+| Field     | Value |
+| --------- | ----- |
+| Verdict   | **PASS_IMPL** (cycle 2 of 2) |
+| Rationale | Head `178df1726` keeps the touch set at exactly the 8 enumerated files with `deno.lock` unchanged; both resource gate ids now execute after `database.codegen` (immediately after the codegen-adjacent service-client probe) and before generated quality/type-check gates, mirrored in composition and pinned by tests; the resource name `people` no longer collides with init's `users` alias and `EXPECTED_COMMAND`/stdout expectation/item-8 fake agree. All author-lane gates are green (check 0/980, touched 40/40, CLI suite 1716/1716, lint/fmt/assets/publish/arch/quality/fences/jsdoc all exit 0, jsdoc deferred 116 ≤ 116). The exact first-run and rerun gate commands were reproduced on a stock init project after codegen: `11 written, 0 skipped, 0 conflicts` then `0 written, 11 skipped, 0 conflicts`, both exit 0; drift.md records both cycle-1 findings and the runtime-prerequisite design gap. Hosted `scaffold.runtime` proof remains the merge-readiness gate per the plan and is outside this lane. |
