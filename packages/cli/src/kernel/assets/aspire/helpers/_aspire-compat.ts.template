@@ -67,6 +67,19 @@ export interface RespPingCheckOptions {
   readonly port: number | string;
 }
 
+type ListenerFailureData = Readonly<{
+  code: string;
+  host: string;
+  port: string;
+  elapsedMs: string;
+}>;
+
+type RespFailureData =
+  & ListenerFailureData
+  & Readonly<{
+    received: string;
+  }>;
+
 // Project-specific config generation extends these schemas to preserve literal
 // resource names without importing Deno-owned framework modules into AppHost.
 const ResourceEntrySchema = z.looseObject({});
@@ -155,6 +168,9 @@ export const RESOURCE_DEFAULTS = {
 
 const GARNET_TOOL_RESTORE_TIMEOUT_MS = 10_000;
 const LISTENER_READINESS_TIMEOUT_MS = 2_000;
+const RESP_PING_COMMAND = '*1\r\n$4\r\nPING\r\n';
+const RESP_REPLY_LIMIT_BYTES = 256;
+const RESP_DIAGNOSTIC_LIMIT_BYTES = 64;
 
 // ============================================================================
 // Listener readiness
@@ -196,7 +212,7 @@ export function createListenerReadinessCheck(
     });
 }
 
-/** Creates a one-socket Redis-compatible PING readiness check. */
+/** Creates one bounded RESP2 PING observation for an Aspire health evaluation. */
 export function createRespPingCheck(
   options: RespPingCheckOptions,
 ): () => Promise<HealthCheckResult> {
@@ -206,6 +222,7 @@ export function createRespPingCheck(
       const port = normalizeListenerPort(options.port);
       const socket = createConnection({ host: options.host, port });
       let settled = false;
+      let received: Uint8Array<ArrayBufferLike> = new Uint8Array();
 
       const finish = (result: HealthCheckResult): void => {
         if (settled) return;
@@ -216,11 +233,19 @@ export function createRespPingCheck(
 
       socket.setTimeout(LISTENER_READINESS_TIMEOUT_MS);
       socket.once('connect', () => {
-        socket.write('PING\r\n');
+        socket.write(RESP_PING_COMMAND);
       });
-      socket.once('data', (data) => {
-        const reply = data.toString('utf8').trim();
-        if (reply.startsWith('+PONG')) {
+      socket.on('data', (data) => {
+        received = appendRespBytes(received, data);
+        if (received.length > RESP_REPLY_LIMIT_BYTES) {
+          finish(respFailure(options.host, port, 'EPROTO', startedAt, received));
+          return;
+        }
+
+        const terminator = findCrlf(received);
+        if (terminator < 0) return;
+        const reply = new TextDecoder().decode(received.subarray(0, terminator));
+        if (reply === '+PONG') {
           finish({
             status: HealthStatus.Healthy,
             description: `RESP listener ready on ${options.host}:${port}`,
@@ -228,22 +253,42 @@ export function createRespPingCheck(
           return;
         }
         if (reply.startsWith('-NOAUTH')) {
-          finish({
-            status: HealthStatus.Degraded,
-            description: 'auth required — readiness only',
-            data: listenerData('NOAUTH', options.host, port, startedAt),
-          });
+          finish(respFailure(options.host, port, 'NOAUTH', startedAt, received));
           return;
         }
-        finish(respFailure(options.host, port, 'EPROTO', startedAt));
+        finish(respFailure(options.host, port, 'EPROTO', startedAt, received));
+      });
+      socket.once('end', () => {
+        finish(respFailure(options.host, port, 'EPROTO', startedAt, received));
       });
       socket.once('error', (error) => {
-        finish(respFailure(options.host, port, socketErrorCode(error), startedAt));
+        finish(respFailure(options.host, port, socketErrorCode(error), startedAt, received));
       });
       socket.once('timeout', () => {
-        finish(respFailure(options.host, port, 'ETIMEDOUT', startedAt));
+        finish(respFailure(options.host, port, 'ETIMEDOUT', startedAt, received));
       });
     });
+}
+
+function appendRespBytes(
+  current: Uint8Array<ArrayBufferLike>,
+  chunk: Uint8Array<ArrayBufferLike>,
+): Uint8Array<ArrayBufferLike> {
+  const nextLength = Math.min(
+    current.length + chunk.length,
+    RESP_REPLY_LIMIT_BYTES + 1,
+  );
+  const combined = new Uint8Array(nextLength);
+  combined.set(current);
+  combined.set(chunk.subarray(0, nextLength - current.length), current.length);
+  return combined;
+}
+
+function findCrlf(bytes: Uint8Array<ArrayBufferLike>): number {
+  for (let index = 1; index < bytes.length; index += 1) {
+    if (bytes[index - 1] === 0x0d && bytes[index] === 0x0a) return index - 1;
+  }
+  return -1;
 }
 
 function listenerFailure(
@@ -265,12 +310,44 @@ function respFailure(
   port: number,
   code: string,
   startedAt: number,
+  received: Uint8Array<ArrayBufferLike>,
 ): HealthCheckResult {
+  const data: RespFailureData = {
+    ...listenerData(code, host, port, startedAt),
+    received: escapeRespBytes(received),
+  };
   return {
     status: HealthStatus.Unhealthy,
-    description: `RESP listener unreachable: ${code}`,
-    data: listenerData(code, host, port, startedAt),
+    description:
+      `RESP listener unhealthy: ${code} at ${host}:${port} after ${data.elapsedMs} ms; received="${data.received}"`,
+    data,
   };
+}
+
+function escapeRespBytes(bytes: Uint8Array<ArrayBufferLike>): string {
+  const captured = bytes.subarray(0, RESP_DIAGNOSTIC_LIMIT_BYTES);
+  let escaped = '';
+  for (const byte of captured) {
+    switch (byte) {
+      case 0x0d:
+        escaped += '\\r';
+        break;
+      case 0x0a:
+        escaped += '\\n';
+        break;
+      case 0x5c:
+        escaped += '\\\\';
+        break;
+      default:
+        escaped += byte >= 0x20 && byte <= 0x7e
+          ? String.fromCharCode(byte)
+          : `\\x${byte.toString(16).padStart(2, '0').toUpperCase()}`;
+    }
+  }
+  if (bytes.length > captured.length) {
+    escaped += `…(+${bytes.length - captured.length} bytes)`;
+  }
+  return escaped;
 }
 
 function listenerData(
@@ -278,7 +355,7 @@ function listenerData(
   host: string,
   port: number,
   startedAt: number,
-): Record<string, string> {
+): ListenerFailureData {
   return {
     code,
     host,
@@ -663,7 +740,12 @@ export function parseAppSettings(
     Otel: netscript.Otel ?? { HttpEndpoint: 'http://localhost:4318', Protocol: 'http/protobuf' },
     Defaults: netscript.Defaults ?? {
       Deno: {
-        Permissions: ['--allow-net', '--allow-env', '--allow-read', '--allow-sys'],
+        Permissions: [
+          '--allow-net',
+          '--allow-env',
+          '--allow-read',
+          '--allow-sys',
+        ],
         WatchMode: false,
       },
     },
