@@ -10714,3 +10714,23 @@ only (cut prerequisite #1947); #1940/#1883 unchanged mechanics; **#1895 sqlite a
 genuine E2E failures at 17 steps** (#1856 sqlite `cancelled` at 17 = supersession, not eviction);
 #1856 also DIRTY. Flagged that `ready-merge` is ahead of evidence on those two per the #1933 `Ready`
 definition. #1942 and #1759 shipped via the audit's remedies. Posted to #1641.
+
+### D-250 — Canary 6 failed at `gen:mcp-export-corpus`: my lane's #1867 guard refused the release path's expected dirty read set
+
+Run `33679983481` at `88fc6d69d`, job `100413945875`, failed at step `Cut ephemeral canary branch
+and tag` **before any publish**. Log signature: `release:canary bumped 0.0.6 -> 0.0.7-canary.6` →
+`release:canary gate: gen:mcp-export-corpus` → `MCP export-corpus generator read set is dirty …
+Refusing to generate from uncommitted package/plugin sources … rerun with --allow-dirty` → exit 1.
+
+**Attribution, stated plainly:** the guard behaved exactly as designed (D1/D3, evaluated PASS), but
+the release path was not in its test matrix — the version bump legitimately dirties every
+package/plugin manifest, then the release script regenerates the corpus without passing the
+`--allow-dirty` override that D3 built for precisely this case. The #1867 slice, its brief, and both
+evaluations enumerated CI `--check` and local `gen` as callers; none enumerated the release
+regeneration. That is a coverage gap in my brief, not in the author's implementation.
+
+**Correct fix shape (audit criterion):** the release preparation step passes `--allow-dirty` (or an
+equivalent explicit, recorded override) at its corpus regeneration only, with the release tree
+otherwise proven clean before the bump. The guard itself must **not** be weakened, and
+`check:mcp-export-corpus` must stay untouched. Coordinator has dispatched a bounded worker for this;
+this lane owns tracking and the immediate audit, and will not duplicate the implementation.
