@@ -10773,3 +10773,14 @@ generator outputs (`provenance.json`, `publish-assets.generated.ts`) — pre-exi
 artefact of my scratch run, not the PR. Wrote it down so the next auditor does not chase it.
 **F3 (low):** dogfood gate removed, so no release-prep freshness assertion remains; `--check` mode
 exists — recommended as a gate before stable. Dry-run at this head: none; packet HELD.
+
+### D-254 — #1951 formal verdict PASS at 706db5a26
+
+Coordinator confirmed the local full canary dry-run passed with staging proof in the PR body
+(`release:canary -- 0.0.7 --dry-run` → canary.6 selected, bump + all generators + residue check
+completed, stopped pre-branch/tag/push/publish; 64-path porcelain fully covered by
+`discoverPreparedReleaseFiles()`). Combined with D-253's executed proofs (0-residual dogfood, real
+bump rewrites exactly the two JSON surfaces, dogfood-after-bump adds 0, 5/0·12/0·12/0, identical
+guard, clean merge) → **PASS**. F3 recorded as advisory pre-stable per coordinator. State at
+verdict: draft=false mergeable=true state=blocked; CI at head: none yet (draft). Packet handed; merge and canary rerun are the
+coordinator's.
