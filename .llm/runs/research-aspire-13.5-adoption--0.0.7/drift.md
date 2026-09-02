@@ -8048,3 +8048,36 @@ Lane consequence: nothing further is wanted from Aspire on the concurrency work.
 transition ends — every branch cut after it carries v2 keys and the temporary doubling window closes.
 S9 stops being a hazard the moment it is restacked, independently of #1910, because merging current
 main gives it `queue: max`.
+
+## D-311 — S13 box 1 after S8/S11 merged: 42 hits / 13 files, and the ruling changes what's left
+
+S13 is fully converged (`6a04999e3`, 0 behind main `c3054794d`), `MERGEABLE`/`CLEAN`, checks green.
+Re-ran #1724 box 1's own sweep: **44 hits / 17 files → 42 / 13** as S8 and S11 landed, clearing
+`docs/site/explanation/aspire.md`, `deploy-local-aspire.md`, the `Aspire 13.4 WithProcessCommand`
+seam and its generator test. The gate keeps tracking the epic rather than needing a nudge —
+`check:aspire-version-parity` is `fail: 0` over 821 paths.
+
+The 13 remaining files are **not one problem**, and two categories are no longer S13's to fix:
+
+1. **Legitimate compat material (6)** — the version-parity checker's own test data, the compat-fixture
+   test, and the teardown/MCP fixture READMEs. All carry a `13.5.3` case, which is exactly what box 1
+   requires of a `compat-fixture` row; they are classified `tooling-doc`/`teardown`/`mcp:fixtures`, so
+   the sweep flags them. Reclassifying those manifest rows is S13's own bounded follow-up.
+2. **`skills/aspire/SKILL.md` and `skills/help.md`** — **the owner's ruling makes these
+   non-authoritative.** `.agents/skills/**` is now the sole authoritative tree. So part of box 1 is
+   gated on a tree that was just deprecated, and S9's version-literal fixes to those files are moot.
+   This should not be resolved until the coordinator's bridge/sync-tool repair settles what `skills/`
+   is.
+3. **Generated carriers of (2)** — `.agents/generated/consumer-skills/**` and
+   `packages/cli/src/kernel/assets/skills.generated.ts` both derive from `skills/`. They clear when
+   (2) does; editing them directly would be wrong.
+4. **Two genuine one-line comments** — `packages/aspire/src/domain/aspire-resource-name.ts:2`
+   ("Aspire 13.4.6 default resource-name grammar", arrived with #1747) and the fixture-suffixed names.
+5. **One false positive worth naming**: `.llm/tools/docs/check-accuracy-and-discoverability.ts`
+   contains `13.4.6` only as `forbidText(...)` arguments at :75, :78 and :110 — the literal is present
+   *to forbid it in the docs*. Box 1's raw grep flags its own enforcement mechanism. The
+   `check:aspire-version-parity` gate, which has an ownership/deferral model, does not make this
+   mistake; the raw sweep is the cruder instrument (see D-298).
+
+Not acting on any of it: (2) and (3) wait on the coordinator's sync repair, and the reclassification
+in (1) is only worth doing once that settles, since it may change which rows exist.
