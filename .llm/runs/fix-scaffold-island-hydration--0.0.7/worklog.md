@@ -86,6 +86,9 @@ CLI scaffold templates.
 | 2026-09-02 | S0a   | RED contract                  | Added the served-surface receipt schema and focused test first; `deno test` exited 1 because `probe-island-served-surface.ts` did not yet exist (`TS2307`). |
 | 2026-09-02 | S0a   | GREEN implementation          | Added `behavior.island-served-surface`, shared runtime-suite registration, live URL resolution, Fresh marker/module extraction, JS status/content-type/export assertions, and durable receipt persistence. Focused gate/builder/registry tests pass 51/51. |
 | 2026-09-02 | Merge | Restore PR mergeability       | Merged `origin/main` at `8c549c061` as directed. Resolved the sole Fresh browser conflict on main's shared locked-Vite helpers while retaining the branch's full route-local query-island browser test. Structured Fresh test-tree check and format gates both pass. |
+| 2026-09-03 | S0b   | RED contract                  | Added the hydration receipt and Rename-transition tests first; `deno test` exited 1 because `probe-island-hydration.ts` did not yet exist (`TS2307`). |
+| 2026-09-03 | S0b   | GREEN implementation          | Added fail-closed headless-Chromium/CDP navigation, `ul[data-state]` island-surface discovery, exact first-row Rename assertion (`name` → `name*`), two-field receipt persistence, shared runtime-suite registration, and command wiring. Focused gate/builder/registry tests pass 53/53. |
+| 2026-09-03 | Gates | Full-tree lint baseline       | Exact S0 brief lint command reached zero findings but exited 2 before linting seven pre-existing `fixtures/desktop-native/**` files: their non-workspace config was ignored and Deno reported `Package 'zod' not found in catalog`. Coordinator steer requires focused touched-file gates for the recovery commit. |
 
 ## Decisions
 

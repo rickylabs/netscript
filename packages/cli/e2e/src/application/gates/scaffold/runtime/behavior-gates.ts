@@ -33,6 +33,10 @@ const ISLAND_SERVED_SURFACE_FAILURE_HINT =
   'The generated service example did not emit its Fresh island marker or serve every referenced ' +
   'JavaScript entry. Inspect the structured served-surface receipt.';
 
+const ISLAND_HYDRATION_FAILURE_HINT =
+  'The generated service example did not hydrate into an interactive island. Inspect the ' +
+  'structured hydration receipt and the headless-browser failure.';
+
 const AI_CHAT_ROUTE_FAILURE_HINT =
   'The generated AI chat route or composition could not be imported, or the self-wired ' +
   '`e2e-tool` was absent or not callable after plugin registry generation. Inspect the captured ' +
@@ -332,6 +336,27 @@ export function createRuntimeBehaviorGates(
       undefined,
       'capture',
       ISLAND_SERVED_SURFACE_FAILURE_HINT,
+    ),
+    commandGate(
+      GATE.BEHAVIOR_ISLAND_HYDRATION,
+      'Hydrate the generated route-local island and complete Rename',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1,localhost',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts`,
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/behavior.island-hydration.json`,
+      ],
+      undefined,
+      'capture',
+      ISLAND_HYDRATION_FAILURE_HINT,
     ),
     commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,

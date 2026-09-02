@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 
 import {
   probeIslandHydration,
@@ -21,15 +21,14 @@ Deno.test('hydration receipt requires the data-state island surface and Rename r
 });
 
 Deno.test('hydration receipt rejects a click that does not perform the Rename transition', () => {
-  assertRejects(
-    async () => {
+  assertThrows(
+    () =>
       receiptFromIslandInteraction({
         initialRow: 'Seed User',
         rowAfterRename: 'Seed User',
         dataState: 'success',
         freshIslandElement: 'ul[data-state="success"]',
-      });
-    },
+      }),
     Error,
     'Rename click did not change',
   );
@@ -41,7 +40,8 @@ Deno.test('hydration probe fails closed and persists negative evidence when Chro
     () =>
       probeIslandHydration('/workspace/project', 'inventory-web', '/workspace/apphost.mts', {
         resolveLiveUrls: () => Promise.resolve(['http://localhost:41234/']),
-        interact: () => Promise.reject(new Error('No supported headless Chrome/Chromium executable')),
+        interact: () =>
+          Promise.reject(new Error('No supported headless Chrome/Chromium executable')),
         persist: (receipt) => {
           persisted.push(receipt);
           return Promise.resolve();

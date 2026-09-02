@@ -56,3 +56,17 @@
   pre-merge version to the version already tracked by `origin/main`; S0 treats the merged hash
   `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` as immutable and makes no
   lockfile edit.
+
+## 2026-09-03 — S0b DOM receipt
+
+- Fresh 2 does not retain a literal `<fresh-island>` element. S0b therefore records
+  `freshIslandElement` as the concrete island-rendered `ul[data-state="…"]` selector found from the
+  Rename row. `islandHydrated` becomes true only after that button changes the row from `name` to
+  `name*`; SSR markup alone cannot satisfy the gate.
+- The existing Chromium allowlist/CDP path was sufficient. No Playwright dependency or workflow
+  installation step was added, and browser absence persists a negative receipt then fails the gate.
+- The exact full-tree CLI E2E lint wrapper is upstream-red after the `8c549c061` merge: Deno refuses
+  the seven pre-existing `fixtures/desktop-native/**` inputs because their config is outside the root
+  workspace and then reports missing catalog package `zod`. It produced zero lint findings. The
+  coordinator explicitly narrowed the S0b recovery validation to the touched-file check/test/lint/fmt
+  set; no fixture, catalog, or root-config edit is authorized by this slice.
