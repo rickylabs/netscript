@@ -103,6 +103,74 @@ export function assertNoOwnedSurvivors(evaluation: PostStopProbeEvaluation): voi
   }
 }
 
+/** One probe observation, retained so a receipt shows what survived and for how long. */
+export interface StopProbeAttempt {
+  readonly attempt: number;
+  readonly forcedBefore: boolean;
+  readonly ownedContainers: readonly string[];
+  readonly ownedProcesses: readonly number[];
+}
+
+/** Bounded waits between re-probes. Container teardown is asynchronous to `aspire stop`. */
+export const OWNED_SURVIVOR_RETRY_WAITS_MS: readonly number[] = [2_000, 5_000];
+
+export interface OwnedSurvivorResolution {
+  readonly evaluation: PostStopProbeEvaluation;
+  readonly attempts: readonly StopProbeAttempt[];
+}
+
+/**
+ * Re-probe for owned survivors, forcing one exact-AppHost stop between attempts.
+ *
+ * `aspire stop --force` returns once it has asked for teardown; Docker removes the containers
+ * afterwards. Probing immediately can therefore observe a container that is already on its way out
+ * and report it as a leak. This waits, forces again, waits, and re-probes — bounded, and every
+ * observation is retained so a receipt shows exactly what survived at each step rather than only
+ * the final verdict.
+ *
+ * Injectable so the retry behaviour is unit-testable without a live AppHost. Ownership is unchanged:
+ * only the exact AppHost is ever stopped, and foreign or unproven resources are never mutated.
+ */
+export async function resolveOwnedSurvivors(
+  probe: () => Promise<PostStopProbeEvaluation>,
+  forceStop: () => Promise<void>,
+  wait: (ms: number) => Promise<void>,
+  waits: readonly number[] = OWNED_SURVIVOR_RETRY_WAITS_MS,
+): Promise<OwnedSurvivorResolution> {
+  const attempts: StopProbeAttempt[] = [];
+  let evaluation = await probe();
+  attempts.push(recordAttempt(1, false, evaluation));
+
+  for (const [index, delay] of waits.entries()) {
+    if (!hasOwnedSurvivors(evaluation)) break;
+    await wait(delay);
+    await forceStop();
+    await wait(delay);
+    evaluation = await probe();
+    attempts.push(recordAttempt(index + 2, true, evaluation));
+  }
+
+  return { evaluation, attempts };
+}
+
+/** True when this observation still maps a container or process to the generated project. */
+export function hasOwnedSurvivors(evaluation: PostStopProbeEvaluation): boolean {
+  return evaluation.ownedContainers.length > 0 || evaluation.ownedProcesses.length > 0;
+}
+
+function recordAttempt(
+  attempt: number,
+  forcedBefore: boolean,
+  evaluation: PostStopProbeEvaluation,
+): StopProbeAttempt {
+  return {
+    attempt,
+    forcedBefore,
+    ownedContainers: evaluation.ownedContainers.map((entry) => entry.id),
+    ownedProcesses: evaluation.ownedProcesses.map((entry) => entry.pid),
+  };
+}
+
 /** Stop one exact AppHost, force only for cleanup runs, then prove no owned container remains. */
 export async function stopAndProbe(
   appHost: string,
@@ -110,28 +178,42 @@ export async function stopAndProbe(
   cleanup: boolean,
   receiptPath: string,
 ): Promise<void> {
-  const commands = [stopCommand(appHost, false), ...(cleanup ? [stopCommand(appHost, true)] : [])];
+  const commands: (readonly string[])[] = [
+    stopCommand(appHost, false),
+    ...(cleanup ? [stopCommand(appHost, true)] : []),
+  ];
   const transcripts = [];
   for (const command of commands) {
     transcripts.push(await capture(command[0] ?? 'aspire', command.slice(1)));
   }
   const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
-  const ids = idsOutput.stdout.split(/\s+/).filter(Boolean);
-  const containers: unknown[] = [];
-  for (const id of ids) {
-    const inspection = await requireSuccess('docker', ['inspect', id]);
-    const parsed: unknown = JSON.parse(inspection.stdout);
-    if (!Array.isArray(parsed)) throw new Error(`docker inspect ${id} did not return an array`);
-    containers.push(...parsed);
-  }
-  const probe = { appHost, projectRoot, containers, processes: [] };
-  const evaluation = evaluatePostStopProbe(probe, projectRoot);
+  const containers = await inspectAllContainers();
+  // Container teardown is asynchronous to `aspire stop`, so a first probe can observe a container
+  // that is already on its way out. Re-probe with one forced exact-AppHost stop between attempts,
+  // bounded, retaining every observation as evidence.
+  let observedContainers = containers;
+  const { evaluation, attempts } = await resolveOwnedSurvivors(
+    async () => {
+      observedContainers = await inspectAllContainers();
+      return evaluatePostStopProbe(
+        { appHost, projectRoot, containers: observedContainers, processes: [] },
+        projectRoot,
+      );
+    },
+    async () => {
+      const forced = stopCommand(appHost, true);
+      transcripts.push(await capture(forced[0] ?? 'aspire', forced.slice(1)));
+      commands.push(forced);
+    },
+    (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  );
   const receipt = {
     appHost,
     cleanup,
     commands,
     transcripts,
-    docker: { ids: idsOutput, containers },
+    docker: { ids: idsOutput, containers: observedContainers },
+    survivorAttempts: attempts,
     evaluation,
   };
   await Deno.mkdir(dirname(receiptPath), { recursive: true });
@@ -145,6 +227,20 @@ export async function stopAndProbe(
       }`,
     );
   }
+}
+
+/** Inspect every container currently known to Docker, so each probe sees the present state. */
+async function inspectAllContainers(): Promise<unknown[]> {
+  const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
+  const ids = idsOutput.stdout.split(/\s+/).filter(Boolean);
+  const containers: unknown[] = [];
+  for (const id of ids) {
+    const inspection = await requireSuccess('docker', ['inspect', id]);
+    const parsed: unknown = JSON.parse(inspection.stdout);
+    if (!Array.isArray(parsed)) throw new Error(`docker inspect ${id} did not return an array`);
+    containers.push(...parsed);
+  }
+  return containers;
 }
 
 export function stopCommand(appHost: string, force: boolean): readonly string[] {

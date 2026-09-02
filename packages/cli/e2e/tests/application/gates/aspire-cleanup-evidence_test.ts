@@ -2,7 +2,9 @@ import { assertEquals, assertThrows } from '@std/assert';
 import {
   assertNoOwnedSurvivors,
   evaluatePostStopProbe,
+  hasOwnedSurvivors,
   pathContained,
+  resolveOwnedSurvivors,
   stopCommand,
 } from '../../../src/application/gates/scaffold/runtime/evidence/cleanup.ts';
 
@@ -81,4 +83,102 @@ Deno.test('a matching process with no path evidence is reported as unproven, not
     Error,
     'post-stop probe found owned containers',
   );
+});
+
+Deno.test('a survivor that Docker is still removing is re-probed, forced, and cleared', async () => {
+  // Exact observed failure: run 33626174632 Postgres tier, cleanup.aspire-stop after 1.73s found one
+  // owned survivor. `aspire stop --force` returns once teardown is requested; Docker removes the
+  // container afterwards, so probing immediately can report a container already on its way out.
+  const survivor = {
+    ownedContainers: [{ id: '5c23e3eb0000' }],
+    foreignContainers: [],
+    unprovenContainers: [],
+    ownedProcesses: [],
+    foreignProcesses: [],
+    unprovenProcesses: [],
+  };
+  const clear = {
+    ownedContainers: [],
+    foreignContainers: [],
+    unprovenContainers: [],
+    ownedProcesses: [],
+    foreignProcesses: [],
+    unprovenProcesses: [],
+  };
+  const observations = [survivor, clear];
+  const waited: number[] = [];
+  let forced = 0;
+
+  const { evaluation, attempts } = await resolveOwnedSurvivors(
+    () => Promise.resolve(observations.shift() ?? clear),
+    () => {
+      forced += 1;
+      return Promise.resolve();
+    },
+    (ms) => {
+      waited.push(ms);
+      return Promise.resolve();
+    },
+  );
+
+  assertEquals(hasOwnedSurvivors(evaluation), false);
+  assertEquals(forced, 1, 'exactly one forced stop should have been needed');
+  assertEquals(waited, [2000, 2000], 'wait before and after the forced stop');
+  // The survivor id is retained as evidence rather than only the final verdict.
+  assertEquals(attempts.map((a) => a.ownedContainers), [['5c23e3eb0000'], []]);
+  assertEquals(attempts.map((a) => a.forcedBefore), [false, true]);
+});
+
+Deno.test('a genuine leak still fails after every bounded attempt', async () => {
+  const survivor = {
+    ownedContainers: [{ id: 'persistent' }],
+    foreignContainers: [],
+    unprovenContainers: [],
+    ownedProcesses: [],
+    foreignProcesses: [],
+    unprovenProcesses: [],
+  };
+  let forced = 0;
+  const { evaluation, attempts } = await resolveOwnedSurvivors(
+    () => Promise.resolve(survivor),
+    () => {
+      forced += 1;
+      return Promise.resolve();
+    },
+    () => Promise.resolve(),
+  );
+  // Bounded: two retry waits are configured, so two forced stops and three observations.
+  assertEquals(forced, 2);
+  assertEquals(attempts.length, 3);
+  assertEquals(hasOwnedSurvivors(evaluation), true);
+  assertThrows(
+    () => assertNoOwnedSurvivors(evaluation),
+    Error,
+    'post-stop probe found owned containers',
+  );
+});
+
+Deno.test('a clean first probe neither waits nor forces', async () => {
+  const clear = {
+    ownedContainers: [],
+    foreignContainers: [],
+    unprovenContainers: [],
+    ownedProcesses: [],
+    foreignProcesses: [],
+    unprovenProcesses: [],
+  };
+  let forced = 0;
+  let waits = 0;
+  const { attempts } = await resolveOwnedSurvivors(
+    () => Promise.resolve(clear),
+    () => {
+      forced += 1;
+      return Promise.resolve();
+    },
+    () => {
+      waits += 1;
+      return Promise.resolve();
+    },
+  );
+  assertEquals([forced, waits, attempts.length], [0, 0, 1]);
 });
