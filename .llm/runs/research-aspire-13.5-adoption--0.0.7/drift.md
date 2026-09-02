@@ -7770,3 +7770,44 @@ to dispatch exactly one run and touch no labels while it is in flight, which is 
 Live confirmation of the fix, from internals: after S8's integration pushed at `daa4dad4d`, their
 #1889 docker tier was `in_progress` and **stayed** `in_progress` — a fresh arrival from a fixed
 branch deferred instead of evicting, on a branch that v1 arrivals had already evicted twice.
+
+## D-301 — correction: `cancel-in-progress: false` protects *running* jobs, not *pending* ones
+
+D-300 stated that S9 "cannot evict other topics; it only risks its own queued job". **That is wrong**,
+and it caused real damage: S9's dispatch evicted three pending sqlite entries — internals' #1889, S8's
+`33593939911`, and S10's `33593009205` — in twenty seconds.
+
+The mechanism I had missed: `cancel-in-progress: false` stops a branch cancelling a job that is
+already *executing*. It says nothing about the queue. Without `queue: max` the group falls back to
+GitHub's default admission of one running plus **one** pending, and each newly queued job **cancels
+the previously pending entry**. So an unfixed branch is still destructive — it operates on the queue
+rather than on running jobs. Internals' timeline:
+
+    05:17:03  S9 docker job enters the group
+    05:17:04  #1889 sqlite   CANCELLED  (steps: 0 — never ran; evicted from the queue)
+    05:17:04  S8  sqlite     CANCELLED
+    05:17:20  S10 sqlite     CANCELLED
+    05:17:23  S9 sqlite starts
+
+`steps: 0` is the discriminator: it proves the job was evicted while pending rather than interrupted
+mid-execution. I had read `cancel-in-progress: false` as "harmless" without checking what governs
+queue admission, and dispatched S9 on that basis.
+
+**The four-case picture** (their refinement of my three):
+
+1. passive branch → merge adopts the fix;
+2. **authoring branch → cannot adopt by merge, and while unfixed still evicts *pending* jobs even with
+   `cancel-in-progress: false`**;
+3. writing the fix itself → blocked on `workflow` scope.
+
+**This inverts #1908's priority for this lane.** I had recorded it as insurance once my branches were
+integrated. It is the load-bearing fix: S9 is precisely the branch that *cannot* be repaired by
+merging, so key isolation (`-v2` group names) is the only remedy — once fixed branches sit on the new
+key, S9's v1 arrivals no longer share a group with them and can evict nothing.
+
+**Action taken:** S9 is held. Its current run `33592084708` is allowed to finish rather than
+cancelled — killing it would repeat the cancel-and-redispatch trap, and its sqlite tier is executing
+toward #1721 box 2's receipt. Verified before deciding that nothing else is pending on either group
+(S10's docker is *running*, hence protected), so S9's remaining docker admission destroys nothing.
+No further S9 runtime dispatch until #1908 lands. S8's and S10's evicted tiers are re-dispatched
+after the queue drains; both carry `queue: max`, so they defer.
