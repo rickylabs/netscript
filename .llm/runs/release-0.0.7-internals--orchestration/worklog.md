@@ -10486,3 +10486,57 @@ need only — no brief, no dispatch, no edits.
 **Lane state:** #1905 CLOSED on its post-merge receipt; #1917 merged; #1923 and #1929 both at
 readiness awaiting coordinator merge; #1913 delivered *by* #1923 and mislabelled `status:plan` until
 this rotation corrected it — a stale label of my own making that read as a parked plan.
+
+### D-239 — #1929 converged onto current main and re-packeted; the scope narrowed to the gate alone
+
+**Coordinator ruling applied:** the exact-head native Fable `PASS` at `8c028d820` plus green required
+CI is sufficient; the redundant OpenHands run is **not** a gate and was not waited on. Its watcher was
+stopped rather than left running to produce a verdict nobody would act on.
+
+**Convergence.** `main` advanced to `4720596fc` (#1921 `997b836ba`, #1922 `4720596fc`, **#1923
+`13bb9415e`**) and #1929 went `DIRTY`/`CONFLICTING`. I scoped the conflict before handing it back:
+`git merge-tree` reported **exactly one** unmerged path, the generated corpus. `ci.yml` did not
+conflict — which is what made the verdict carry possible and is why that check came first rather
+than last.
+
+**The instruction that mattered: regenerate, never merge.** A generated artifact resolved
+line-by-line is precisely how #1859 produced a plausible-but-wrong blob that survived review. The
+author used `git checkout --ours` only to make the index resolvable, then let
+`deno task gen:mcp-export-corpus` write the file from source authority — take-side `0`, stage `0`,
+generator `0`, final stage `0`, unmerged-path query `0` with empty result.
+
+**Carry proved by blob hash, not inspection.** `.github/workflows/ci.yml` is
+`b36057ab6adc68be5bf760637ca2a7998e65e040` at both `8c028d820` and the converged head, so the
+IMPL-EVAL `PASS` carries with no re-evaluation. Determinism re-proved at the new head across two
+independent pristine-cache regenerations in a detached scratch worktree; committed blob and both
+scratch runs byte-identical at `d1a5d3fb…` / `0ce5d306…` / 273 subpaths / 7,815 symbols.
+
+**The delta was explained, which was the stop-and-report condition.** Against the superseded blob:
+subpaths `+0`, symbols `7,809 → 7,815` (`+6`). Cause: #1922 adds
+`packages/sdk/src/client/locale-contribution.ts` and re-exports three symbols from the **existing**
+`@netscript/sdk/client` entrypoint — so no new subpath, exactly six new symbols. An unexplained
+delta would have been a stop; a matching count without a cause is not evidence.
+
+**The PR's scope genuinely narrowed, and the packet says so.** At the converged head the corpus
+differs from `main` by **zero files** — #1921/#1922 already landed a matching corpus. #1920's point 1
+(regenerate) is now satisfied by `main` itself and #1929 delivers only point 2, the gate wiring,
+which the issue always named as the real fix: *"point 1 without it just resets the clock."* Worth
+recording plainly: the corpus was refreshed **incidentally by unrelated PRs**, which is the
+drift-and-accidental-repair cycle this gate exists to break, observed once more while the fix for it
+was still in flight. The gate is now the only thing in the PR, and it is the only thing that was ever
+load-bearing.
+
+**A packet withheld until it was true.** The convergence commit existed locally while `git ls-remote`
+and the PR still reported `8c028d820`, so GitHub still computed `DIRTY`. Posting "ready for immediate
+merge" at that moment would have described my worktree rather than the PR the coordinator would
+merge. Waited for the push (`d747fdfcc`), re-verified head three ways, then posted.
+
+**Two status labels, resolved on evidence rather than preference.** Automation set
+`status:augment-review` at `13:38:38Z` as the post-impl-eval stage marker; adding `status:ready-merge`
+left two, violating the exactly-one-`status:` rule. Before removing either I checked whether the
+marker masked a real gate: `agentic:review-threads` returned **PASS, threads=0, unanswered=0**, and
+the PR carries no reviews at all. Removed `status:augment-review`. If an Augment review posts findings
+later the threads gate turns red and this lane surfaces it.
+
+**#1913 confirmed CLOSED** and its repair merged as `13bb9415e` — the queue item the coordinator was
+concerned might park is fully landed.
