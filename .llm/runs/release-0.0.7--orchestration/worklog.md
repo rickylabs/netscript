@@ -3917,3 +3917,20 @@
   exact CI, and one bounded delta evaluation.
 - Milestone state is 38 open issues and 19 open PRs, with zero unassigned issues. Aspire and Docker
   inventories remain zero. Canary 6 now has S7, #1747, and S8 on main; S9/S10, S11, and S13 remain.
+
+## 2026-09-02T10:01:59Z — ready packets merged and missing supervisors restored
+
+- The coordinator merged #1756 (`0f7fefb6b`), #1889 (`f9e485f8b`), #1911
+  (`fafffd58d`), and #1910 (`77ad823dc`) after independent exact-head packet audits. No other open
+  PR had a complete exact-head green CI/runtime/evaluator/acceptance packet at the sweep.
+- Features and Internals transports had disappeared. They were relaunched as fresh native Claude
+  Opus 5 Remote Control supervisors at the required xhigh/high efforts. Exact session, bridge, PID,
+  cwd, and queue receipts are recorded in the context pack; old blocked job registries were not
+  resumed. Docs, Fixes, and Aspire completed-turn prompts were explicitly submitted rather than
+  mistaken for live work.
+- Features owns #1895, post-#1910 #1842 runtime proof, #1915, and its remaining ten milestone
+  issues. Internals owns #1905 then newly assigned #1913. Fixes owns the #1858/#1909 packets and is
+  closing #1899 as superseded. Docs dispatched #1914's separate IMPL-EVAL. Aspire is running S9
+  exact hosted tiers/evaluation while S10 and S13 continue independently.
+- Live state is 49 open / 244 closed milestone issues and 16 open PRs. All 49 issues have one topic
+  owner after #1913's repair. Runtime state remains `aspire ps == []` and Docker containers zero.

@@ -1656,3 +1656,17 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
 - Coordinator merge authority remains active. A formal evaluator workflow success is not sufficient
   when its durable-output contract lies: preserve its immutable Actions artifact, file the tooling
   defect, and require independent exact product/runtime evidence rather than hiding the mismatch.
+
+## 2026-09-02T10:01:59Z — five-lane delivery state restored
+
+- Features r4 is native Opus 5/xhigh with verified Remote Control bridge
+  `session_01VyeBXMJmj5uPaQFngpkdgn`; it advances #1895, #1842, and #1915 in disjoint threads and
+  consumes the remaining Features queue serially per thread, never cluster-wide.
+- Internals r4 is native Opus 5/high with verified Remote Control bridge
+  `session_01CUWDTC8s7BS9tUWU8nrKge`; it ships #1905 then #1913 while leaving #1641 open until the
+  stable release closes the coordinator umbrella.
+- Aspire, Fixes, and Docs were re-armed with actually submitted commands. Aspire owns active S9
+  tiers/evaluation plus S10/S13 progress; Fixes owns #1858/#1909; Docs owns #1914 evaluation. The
+  intervention rule remains concrete artifacts or running generation, never a visible prompt alone.
+- The coordinator continues to merge every exact-green milestone packet without owner confirmation.
+  Canary 6 cuts only after its coherent user-facing Aspire 13.5 payload is on main.

@@ -1864,3 +1864,15 @@ implementation thread.
   assigned to Internals.
 - Until that bounded repair lands, Aspire S9/S10 must not churn identical hosted reruns. Static and
   evaluator work continues independently; this is not a global lane pause.
+
+## D-193 — live milestone scope and supervisor transport drift after #1910/#1911
+
+- The persisted 38-issue/19-PR checkpoint no longer matched GitHub: live milestone 27 is 49 open / 244
+  closed with 16 open PRs. #1913 was missing a topic label; it is now Internals-owned. Future status
+  reports must query the live milestone rather than decrementing persisted counts.
+- Features and Internals tmux transports were absent even though their durable runs remained. Fresh
+  Opus 5 xhigh/high Remote Control supervisors were launched from the canonical worktrees with exact
+  PID/cwd/session/bridge proof. No historical blocked Claude job was resumed.
+- Docs, Fixes, and Aspire had completed turns with steering text staged in the composer. A staged
+  prompt is not a dispatched turn; the coordinator resubmitted explicit commands and verified active
+  generation. This extends D-190's liveness rule to Remote Control composer state.

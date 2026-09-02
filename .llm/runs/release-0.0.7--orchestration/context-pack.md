@@ -2531,3 +2531,23 @@ continues concurrently because serial ordering is per orchestrator, not global.
   `env -u GH_TOKEN -u GITHUB_TOKEN <gh-or-git-command>`. Docs #1756 has resumed on that route.
 - Live inventory: 38 milestone issues, 19 open PRs, zero ownerless issues, Aspire applications 0,
   Docker containers 0. Canary 6 awaits only the remaining S9/S10, S11, and S13 Aspire convergence.
+
+## Resume delta — 2026-09-02T10:01:59Z
+
+- Current main is `77ad823dcb1874ccfc8964b4679ad92a3a145e0b` after coordinator merges of #1756,
+  #1889, #1911, and #1910. #1911 removes the internal Claude skill mirror and makes
+  `.agents/skills` authoritative; #1910 isolates hosted runtime concurrency with v2 group keys.
+- Live milestone inventory is 49 open / 244 closed issues and 16 open PRs. The apparent increase is
+  live GitHub scope growth, not a ledger rollback. #1913 was the sole ownerless issue and is now
+  assigned to Internals; every open milestone issue again has exactly one topic owner.
+- Fresh native Claude Opus 5 Remote Control supervisors replace the missing Features and Internals
+  transports without recreating old blocked jobs. Features r4 is xhigh, PID 2874435, session
+  `8a722f0a-74b2-4f82-b822-88be00fc9eae`, bridge
+  `session_01VyeBXMJmj5uPaQFngpkdgn`, cwd `007-features`. Internals r4 is high, PID 2874439,
+  session `98833bca-9714-4f63-8230-2e3929f6b103`, bridge
+  `session_01CUWDTC8s7BS9tUWU8nrKge`, cwd `007-internals`. Registry PID/cwd/bridge proof is exact.
+- Aspire S9 is restacked on the v2 runtime keys, exact hosted tiers plus delta IMPL-EVAL are active;
+  S13 is statically converged. S10 still needs honest live-process evidence and an exact-head
+  separate evaluation. Canary 6 remains correctly held for the coherent S9/S10/S13 Aspire payload,
+  not for Internals/Docs-only work.
+- Aspire inventory and Docker containers are zero. No owner-only decision is pending.
