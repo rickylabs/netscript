@@ -10625,3 +10625,23 @@ reported the label absent; I re-apply `status:ready-merge` after the automation 
 
 **Queue scan at `origin/main` = `850cc7757`:** #1867 is the sole open internals issue. 0.0.7
 committed internals queue remains empty; #1641 stays the coordinator umbrella.
+
+### D-243 — reconciliation: no owned 0.0.7 internals leaf remains; reported rather than manufactured
+
+Coordinator directed: do not wait on #1937 CI; reconcile and dispatch the next independent leaf.
+Reconciled at `origin/main` = `850cc7757` against live GitHub and central state: **0** open 0.0.7
+issues carry `orchestrator:internals`; **0** open 0.0.7 issues are unowned (every one is
+`fixes`/`features`/`aspire`); central `committedIssues` for internals is `[]`; open internals PRs
+are #1937 (0.0.8) and the #1641 umbrella.
+
+**Decision: report the empty queue, do not invent a leaf.** Lane ownership is settled by central
+state, not area labels (recorded in memory from the fixes lane), so absorbing another lane's issue
+on my own authority would be a scope violation dressed as initiative. Offered to the coordinator on
+#1641: name any 0.0.7 issue to transfer and I dispatch immediately; otherwise this lane's remaining
+work is #1937 plus on-request exact-head IMPL-EVAL for other lanes — the highest-leverage
+independent contribution an empty-queue lane can make toward the stable cut, as already done for
+#1933.
+
+#1937: CI run `33654919736` still in progress; close-gate red is the designed mirror-skip without
+`status:ready-merge` at evaluation (phase-eval demoted it). Re-apply label + rerun after the run
+completes; never a push.
