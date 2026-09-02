@@ -14,6 +14,7 @@ byte-identical warm-cache and pristine-cache generation.
 - [x] S1 Bootstrap the harness plan and deterministic-generation evidence — `1ad32bc02`
 - [x] S2 Add the CI invocation and complete dispatched-base trigger/teeth validation — implementation commit (see live commit list)
 - [x] S3 Integrate current main, regenerate the collision-prone corpus, and revalidate the final identity — `92ae7df426` + final evidence commit
+- [x] S4 Converge with release main while preserving the evaluated CI blob — `8a8c6a073` + convergence evidence commit
 
 ## Validation
 
@@ -36,6 +37,16 @@ byte-identical warm-cache and pristine-cache generation.
 - Final live-tree fresh GREEN and catalog runner — each `REAL_EXIT=0`
 - Final parsed YAML, nine-case classifier reachability, structured `.llm/tools` check, and lock
   hygiene assertions — each `REAL_EXIT=0`
+- Convergence main `4720596fcd0a4c00d72616bec9739be8796718fe`; sole generated conflict
+  cleared and regenerated rather than line-merged
+- Two detached-worktree pristine-cache regenerations — each `REAL_EXIT=0`, byte-identical to the
+  committed file SHA `d1a5d3fb88fb49a5b4e9303d4350159a7f59945a77fdeebe1e4aaf0243fc70f4`,
+  payload SHA `0ce5d3066d740f2d1170d0eb0ca98022d0d32d22ba8afd37b93f58e383a04758`,
+  273 subpaths, 7,815 symbols
+- `ci.yml` carry proof — `8c028d820` and convergence integration head both have blob hash
+  `b36057ab6adc68be5bf760637ca2a7998e65e040`; byte-diff `REAL_EXIT=0`
+- Convergence freshness, structured `.llm/tools` check, and parsed-YAML read-back — each
+  `REAL_EXIT=0`
 - `deno task e2e:cli` — intentionally not run; explicitly excluded by #1920
 
 ## Harness

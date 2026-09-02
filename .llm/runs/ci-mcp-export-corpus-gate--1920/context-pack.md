@@ -12,9 +12,9 @@
 
 ## Current State
 
-All three implementation slices are complete. The branch merged exact current main
-`37452f11f5045f0f5a98e07d802bcc2a2e94333b` without rebasing, regenerated the expected corpus
-collision, and repeated determinism, trigger, teeth, YAML, tooling, and hygiene validation.
+All implementation and convergence slices are complete. The branch most recently merged exact main
+`4720596fcd0a4c00d72616bec9739be8796718fe`, regenerated the sole expected corpus conflict, and
+repeated pristine determinism, evaluated-surface carry, freshness, YAML, and tooling checks.
 
 ## Completed
 
@@ -32,15 +32,22 @@ collision, and repeated determinism, trigger, teeth, YAML, tooling, and hygiene 
   subpaths, and 7,809 symbols.
 - Repeated current-main RED, integrated GREEN/catalog-runner, parsed YAML, classifier, structured
   check, and lock/diff-scope assertions with the expected real exits.
+- Converged on new release main in `8a8c6a073bb9d56ca6939dd5a35ede8276602252` without
+  line-merging the generated artifact.
+- Proved two independent pristine-cache scratch generations match file SHA `d1a5d3fb…`, payload
+  SHA `0ce5d306…`, 273 subpaths, and 7,815 symbols.
+- Proved the evaluated `ci.yml` blob is unchanged from `8c028d820`: both Git blob hashes are
+  `b36057ab6adc68be5bf760637ca2a7998e65e040`.
 
 ## In Progress
 
-- Commit and publish the final evidence-only slice; supervisor evaluation remains independent.
+- Commit and push convergence evidence for immediate coordinator re-packet.
 
 ## Next Steps
 
-1. Commit/push slice 3 and update the draft PR body/comment.
-2. Hand off to the supervisor for Tier-A slice review and separate-session IMPL-EVAL.
+1. Commit/push convergence evidence and update the draft PR body/comment.
+2. Hand off immediately; coordinator has accepted the native Fable PASS plus required CI and waived
+   waiting for the redundant OpenHands run.
 
 ## Key Decisions
 
@@ -62,19 +69,19 @@ collision, and repeated determinism, trigger, teeth, YAML, tooling, and hygiene 
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS after current-main integration | Parsed YAML, classifier assertion, structured check in `evidence.md` |
-| Fitness | PASS after current-main integration | Warm/pristine determinism and RED/GREEN teeth in `evidence.md` |
+| Static | PASS after convergence integration | Parsed YAML and structured check in `evidence.md` |
+| Fitness | PASS after convergence integration | Two pristine scratch generations and freshness check in `evidence.md` |
 | Runtime | N/A | No runtime behavior change |
 | Consumer | PASS after current-main integration | Current-main RED and integrated-tree GREEN freshness proof |
 
 ## Open Questions
 
-- No design question. Implementation is ready for the supervisor's independent review/evaluation.
+- No open question. Coordinator requested immediate re-packet after this convergence push.
 
 ## Drift and Debt
 
 - Drift: local `rtk` tool unavailable; environment GitHub token lacked workflow scope; the expected
-  main collision materialized and was resolved by regeneration.
+  main collisions materialized and were resolved by regeneration.
 - Debt: none created or deepened.
 
 ## Commits

@@ -39,3 +39,19 @@
 - **Action:** accept
 - **Evidence:** No credential material was printed or persisted. The stored authenticated CLI path
   was used for branch/PR operations; product files and repository configuration were unchanged.
+
+## 2026-09-02 — Second expected corpus collision regenerated, not merged
+
+- **What:** `origin/main` advanced again, from `37452f11f` to `4720596fc`, and the merge conflicted
+  only in the generated MCP export corpus.
+- **Source:** Exact-main fetch/assertion and `git merge`; unmerged-path query named only
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`.
+- **Expected:** #1921/#1922 landed SDK work while this collision-prone leaf remained open.
+- **Actual:** #1922 adds locale contribution exports to `@netscript/sdk/client`, invalidating both
+  sides' independently generated corpus blob.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** The prior branch side was selected only to clear the conflict state; the file was
+  then wholly regenerated with `deno task gen:mcp-export-corpus`. Two detached-worktree generations
+  with independent pristine `DENO_DIR` values exactly matched the committed regenerated blob.
+  No line-level conflict resolution or public-surface edit was performed.

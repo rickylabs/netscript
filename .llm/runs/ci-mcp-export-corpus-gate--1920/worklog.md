@@ -37,6 +37,7 @@
 | 1 | Bootstrap the evidence-backed harness plan | artifact review | `.llm/runs/ci-mcp-export-corpus-gate--1920/**` |
 | 2 | Prove deterministic corpus generation and wire its existing gate into CI | determinism, YAML parse, classifier reachability, RED/GREEN teeth, structured tooling check | generated corpus, `.github/workflows/ci.yml`, run artifacts |
 | 3 | Integrate final main and re-establish the generated corpus/evidence at that exact SHA | regeneration hash/cardinalities, YAML parse, classifier reachability, RED/GREEN freshness, structured tooling check | integration commit, generated corpus, run artifacts |
+| 4 | Converge with release head while preserving the evaluated CI surface | generator-authoritative conflict resolution, two pristine scratch generations, CI blob carry, exact-head checks | integration commit, generated corpus, run artifacts |
 
 ### Deferred Scope
 
@@ -66,6 +67,10 @@ other quality receipts.
 | 2026-09-02 | 3 | Final determinism | Integrated warm generation, warm repeat, and new pristine-`DENO_DIR` generation all exited 0 and were byte-identical: file SHA `21cfdee7…`, payload SHA `81d49c6c…`, 273 subpaths, 7,809 symbols. |
 | 2026-09-02 | 3 | Final teeth | Detached current-main RED exited 1; integrated fresh check and catalog runner each exited 0. |
 | 2026-09-02 | 3 | Final validation | YAML parse, nine-case classifier proof, structured tools check, lockfile assertion, and diff-scope assertion all exited 0. A final fetch confirmed `origin/main` had not moved. |
+| 2026-09-02 | 4 | Convergence merge | Merged exact new main `4720596fc`; the only conflict was the generated corpus. Selected the prior blob solely to clear the index, then replaced it with generator output in merge `8a8c6a073`. |
+| 2026-09-02 | 4 | Determinism | Two detached-worktree generations with independent pristine caches exited 0 and exactly matched the committed file SHA `d1a5d3fb…`, payload SHA `0ce5d306…`, 273 subpaths, and 7,815 symbols. |
+| 2026-09-02 | 4 | Carry proof | `ci.yml` at `8c028d820` and `8a8c6a073` has identical Git blob hash `b36057ab6adc68be5bf760637ca2a7998e65e040`; byte-diff exit 0. |
+| 2026-09-02 | 4 | Exact-head gates | Freshness, structured tools check, and parsed YAML read-back each exited 0 at integration head `8a8c6a073`. |
 
 ## Decisions
 
@@ -80,6 +85,7 @@ other quality receipts.
 | --- | --- | --- |
 | Documented `rtk` executable is absent on this host | minor | yes |
 | Environment GitHub token lacked workflow scope; stored authenticated CLI token used | minor | yes |
+| Second expected generated-corpus collision after SDK locale surface landed | significant | yes |
 
 ## Gate Results
 
@@ -101,6 +107,9 @@ other quality receipts.
 | Integrated current-main stale corpus RED | PASS (`REAL_EXIT=1`) | Detached throwaway worktree at `37452f11f`; expected diagnostic matched. |
 | Integrated fresh corpus GREEN | PASS (`REAL_EXIT=0`) | File SHA `21cfdee7…`, payload SHA `81d49c6c…`, 273 subpaths, 7,809 symbols. |
 | Integrated catalog-runner invocation | PASS (`REAL_EXIT=0`) | Receipt outcome `PASS`, child exit 0. |
+| Convergence pristine determinism | PASS (`REAL_EXIT=0`, twice) | Both detached scratch generations exactly match file SHA `d1a5d3fb…`. |
+| Convergence corpus freshness | PASS (`REAL_EXIT=0`) | Payload `0ce5d306…`, 273 subpaths, 7,815 symbols. |
+| Convergence evaluated-surface carry | PASS (`REAL_EXIT=0`) | Both `ci.yml` blob hashes are `b36057ab6adc68be5bf760637ca2a7998e65e040`. |
 
 ### Runtime Gates
 

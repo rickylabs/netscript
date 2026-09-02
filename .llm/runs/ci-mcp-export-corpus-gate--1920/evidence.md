@@ -132,3 +132,74 @@ quality.
   `37452f11f5045f0f5a98e07d802bcc2a2e94333b`.
 - Diff/lock hygiene assertions returned `REAL_EXIT=0`; only the intended workflow step, generated
   corpus, and harness run artifacts differ from integrated main.
+
+## Convergence — main `4720596fcd0a4c00d72616bec9739be8796718fe`
+
+### Integration and generated-conflict handling
+
+- Fetch and exact-main assertion: `REAL_EXIT=0`; `origin/main` was
+  `4720596fcd0a4c00d72616bec9739be8796718fe`.
+- Merge command: `REAL_EXIT=1`, with exactly one unmerged path:
+  `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts`.
+- Conflict clearing used `git checkout --ours` only to make the index resolvable, then
+  `deno task gen:mcp-export-corpus` replaced the file from source authority: take-side exit `0`,
+  initial stage exit `0`, generator exit `0`, final stage exit `0`, and unmerged-path query exit
+  `0` with an empty result. No generated content was merged line-by-line.
+- Integration commit: `8a8c6a073bb9d56ca6939dd5a35ede8276602252`.
+
+### Exact-head determinism
+
+Both regeneration runs used the detached scratch worktree at integration commit `8a8c6a073` and
+independent pristine caches. The committed blob was not copied into the scratch result after
+generation; each generator run independently left the worktree clean.
+
+| Source | Generator exit | File SHA-256 | Payload SHA-256 | Subpaths | Symbols |
+| --- | ---: | --- | --- | ---: | ---: |
+| Committed integration blob | N/A | `d1a5d3fb88fb49a5b4e9303d4350159a7f59945a77fdeebe1e4aaf0243fc70f4` | `0ce5d3066d740f2d1170d0eb0ca98022d0d32d22ba8afd37b93f58e383a04758` | 273 | 7,815 |
+| Scratch run 1, `DENO_DIR=/ephemeral/tmp/tmp.Oo7egOUafE` | 0 | `d1a5d3fb88fb49a5b4e9303d4350159a7f59945a77fdeebe1e4aaf0243fc70f4` | `0ce5d3066d740f2d1170d0eb0ca98022d0d32d22ba8afd37b93f58e383a04758` | 273 | 7,815 |
+| Scratch run 2, `DENO_DIR=/ephemeral/tmp/tmp.igriltKFGr` | 0 | `d1a5d3fb88fb49a5b4e9303d4350159a7f59945a77fdeebe1e4aaf0243fc70f4` | `0ce5d3066d740f2d1170d0eb0ca98022d0d32d22ba8afd37b93f58e383a04758` | 273 | 7,815 |
+
+- Worktree add, both SHA reads, both clean-status reads, and worktree removal each exited `0`.
+- Both scratch files equal the committed blob and each other byte-for-byte.
+- Shared metadata: framework `0.0.6`, 35 packages, 2,190,664 uncompressed bytes, and 317,621
+  compressed bytes.
+- The pristine Deno caches were not deleted because repository policy forbids cache deletion
+  without approval.
+
+### Explained corpus delta
+
+Against the superseded integrated corpus, the generated-file SHA moves from `21cfdee7…` to
+`d1a5d3fb…`, the payload SHA moves from `81d49c6c…` to `0ce5d306…`, subpaths remain 273 (`delta 0`),
+and symbols move from 7,809 to 7,815 (`delta +6`). The byte counts move by +2,085 uncompressed and
++443 compressed.
+
+The change is explained by #1922 (`4720596fc`): it adds
+`packages/sdk/src/client/locale-contribution.ts` and re-exports
+`createLocaleSdkClientContribution`, `LocaleSdkClientContext`, and
+`LocaleSdkClientContribution` from the existing `@netscript/sdk/client` entrypoint. Therefore no
+new subpath is created, while the new declarations and their documented members add six corpus
+symbol records. #1921 (`997b836ba`) changes tests only and contributes no published symbol; #1923
+(`13bb9415e`) changes workflow concurrency only.
+
+### Evaluated-surface carry
+
+| Revision | `ci.yml` Git blob hash | Hash exit |
+| --- | --- | ---: |
+| Evaluated head `8c028d820` | `b36057ab6adc68be5bf760637ca2a7998e65e040` | 0 |
+| Integration head `8a8c6a073` | `b36057ab6adc68be5bf760637ca2a7998e65e040` | 0 |
+
+`git diff --exit-code 8c028d820 8a8c6a073 -- .github/workflows/ci.yml` returned `0` with no
+output. The authored non-generated CI surface is byte-identical to the native Fable-PASS head; only
+the generated corpus was refreshed for the newly integrated upstream public surface. Per the
+coordinator's convergence ruling, the redundant OpenHands run is not a gate and was not awaited.
+
+### Required exact-head checks
+
+All verdicts below ran at integration head `8a8c6a073bb9d56ca6939dd5a35ede8276602252`
+before this evidence-only commit, with child exits captured directly as `out=$(command); rc=$?`.
+
+| Command/check | Real exit | Result |
+| --- | ---: | --- |
+| `deno task check:mcp-export-corpus` | 0 | PASS — payload `0ce5d306…`, 273 subpaths, 7,815 symbols |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` | 0 | PASS — 342 files, 3 batches, 0 failed batches/findings |
+| Parsed YAML read-back from `jobs.quality.steps` | 0 | PASS — exact name, `RUN_DENO` condition, gate ID, invocation ID, and receipt path |
