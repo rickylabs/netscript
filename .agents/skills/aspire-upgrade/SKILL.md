@@ -44,17 +44,17 @@ example; every rule below was paid for there.
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Generated project SDK        | `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts` (`ASPIRE_SDK`, `ASPIRE_HOSTING_DENO`, `ASPIRE_HOSTING_SQLITE`)                                                            | `aspire.config.json` + AppHost SDK of every scaffolded workspace (`generate-aspire-config.ts`, `plan-init.ts`)              |
 | Generated integrations       | `packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts` (`SCAFFOLD_ASPIRE_INTEGRATIONS.*.VERSION`)                                                                                  | `Aspire.Hosting.{PostgreSQL,MySql,SqlServer,Redis,Garnet,Browsers}` + `CommunityToolkit.Aspire.Hosting.Deno` NuGet versions |
-| Host toolchain               | `.mise.toml` (`aspire = "…"`)                                                                                                                                                               | The CLI every local/NAS agent runs                                                                                          |
+| Host toolchain (external)    | `<project-root>/.mise.toml` (`aspire = "…"`) — **not tracked** in the repo; each host (NAS/WSL) pins its own CLI beside the checkout                                                        | The CLI every local agent runs; keep it equal to the CI pin by hand                                                         |
 | CI toolchain                 | `.github/workflows/e2e-cli.yml`, `e2e-cli-prod.yml`, `e2e-cli-prod-local.yml` (`dotnet tool install Aspire.Cli --version …`, NuGet cache key `nuget-aspire-*-<ver>-v1`, the `13.5.*` guard) | The CLI the runtime tiers run                                                                                               |
 | Parity gate                  | `.llm/tools/validation/check-aspire-version-parity.ts` (`PHASE_TWO_COMPAT_VERSION`) + `.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv`                          | The expected version and the 900+ path manifest with per-path owner and disposition                                         |
 | Recorded surfaces (fixtures) | see "Fixtures that must be re-recorded"                                                                                                                                                     | CLI/MCP/dashboard output shapes at the pinned version                                                                       |
 | Prose                        | `skills/aspire/SKILL.md`, `.agents/skills/aspire/SKILL.md`, docs site `reference/aspire`, `explanation/aspire`, `quickstart/aspire`                                                         | Version-tagged evidence keys (S2-Vn, S9-…) and literal version mentions                                                     |
 
 There is **no single source of truth** today: the product pins (first two rows) are legitimately in
-`packages/cli`, but the mise, workflow and parity literals are hand-duplicated. A patch bump is
-therefore a sweep of ~6 files, not one edit. Until `aspire:bump` tooling exists (see Pitfalls), the
-sweep is the procedure and `git grep -n '<old-version>'` over the whole tree is the completeness
-check.
+`packages/cli`, but the workflow and parity literals are hand-duplicated and the host `mise` pin
+lives outside the repository entirely. A patch bump is therefore a sweep of ~6 files, not one edit.
+Until `aspire:bump` tooling exists (see Pitfalls), the sweep is the procedure and
+`git grep -n '<old-version>'` over the whole tree is the completeness check.
 
 ### Patch vs minor vs major — what each really costs
 
@@ -83,8 +83,12 @@ compat branch is deleted.
 
 ### The generated-carrier chain (four gates)
 
-Any prose or template change ripples: `skills/` + `.agents/skills/` prose -> `gen:mcp-export-corpus`
--> `gen:assets-barrel` (`embedded.generated.ts`, `skills.generated.ts`) -> `check:publish-assets`. A
+Two skill trees exist and only one is a carrier input. `.agents/skills/` is the authoritative
+**agent** source (read directly; `.claude/skills/repo-skills` is the single Claude bridge, no
+mirrors). The **consumer** bundle shipped in the CLI comes from the top-level `skills/` tree
+(`skills/manifest.json`): `skills/` prose -> `gen:mcp-export-corpus` -> `gen:assets-barrel`
+(`embedded.generated.ts`, `skills.generated.ts`) -> `check:publish-assets`. Editing
+`.agents/skills/**` regenerates nothing; editing `skills/**` must be followed by the chain. A
 `docs/site/**` page edit starts one hop earlier: `gen:agent-docs-prose` (site build ->
 `prose.json.gz` + `provenance.json`) -> barrel (`agent-docs.generated.ts`) -> `gen:publish-assets`
 (`packages/mcp/src/publish-assets.generated.ts`); run `check:agent-docs-prose` locally before
@@ -108,8 +112,9 @@ exact-head dual-green, and keep the head immutable once it is green.
    `SCAFFOLD_ASPIRE_INTEGRATIONS`; `CommunityToolkit.Aspire.Hosting.Deno` lags the core line and
    pins separately. A generated project restores all of them — one missing id fails every
    `aspire restore`.
-3. **Sweep the pin map** (all rows), then `git grep -n '<old>'` over the tree; every remaining hit
-   is either archival (documented in the manifest) or a miss.
+3. **Sweep the pin map** (all tracked rows; the external `mise` pin is updated per host), then
+   `git grep -n '<old>'` over the tree; every remaining hit is either archival (documented in the
+   manifest) or a miss.
 4. **Regenerate the manifest and run parity**:
    `deno run --allow-read --allow-run=git --allow-write .llm/runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts`
    then `deno task check:aspire-version-parity`. Update `PHASE_TWO_COMPAT_VERSION` in the same
