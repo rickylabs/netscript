@@ -54,3 +54,12 @@ in `packages/mcp/src/` and both collide with `main` on it. Regenerate-after-merg
 - #1942 → `ready-merge`: same close-gate race; 0 behind `main`. Rerun posted.
 
 - #1938 `quality` **success** on run 33659669247 (`6ae6cc483`). Findings closed on the PR.
+
+## ready-merge audits (evening 2026-09-02)
+
+- #1941, #1944, #1943 (features): label-then-push, close-gate green, 0 behind, corpus regenerated
+  where touched; `quality` green on #1941/#1944, pending on #1943. Clean.
+- #1856 (fixes) → ready-merge: gates green/pending rerun; **stale claim** —
+  `docs/site/reference/fresh/index.md:414` says `FormCollectionStrategy` is `interface`, PR makes it
+  a `type` alias; exports-drift checks presence not kind. Handed in-PR with a Docs follow-up offer.
+- #1945 (fixes, plan): `/design` out of production builds — audit scaffold docs when impl lands.
