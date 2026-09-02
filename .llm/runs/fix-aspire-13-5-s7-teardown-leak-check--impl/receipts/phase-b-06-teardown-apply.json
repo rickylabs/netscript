@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-08-30T18:37:28Z",
+  "argv": [
+    "deno",
+    "task",
+    "agentic:teardown",
+    "--",
+    "--slice-dir",
+    "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl",
+    "--worktree",
+    "/home/agent/projects/netscript/worktrees/007-aspire-s7",
+    "--owned-root",
+    "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b",
+    "--apply",
+    "--force-persistent"
+  ],
+  "exitCode": 4,
+  "applied": true,
+  "plannedCommands": [
+    ["docker", "rm", "-f", "452a19ca9c7ac2b9b474230699f70c83484577c261a08bf25ff5aab4da8775b9"]
+  ],
+  "stoppedAppHosts": [],
+  "terminatedProcesses": [],
+  "removedContainers": ["452a19ca9c7ac2b9b474230699f70c83484577c261a08bf25ff5aab4da8775b9"],
+  "actionsRequired": ["persistent cleanup not performed: no running owned AppHost"],
+  "boundedConfirmation": "not reached: the killed run AppHost was absent from the Aspire registry",
+  "targetedOrphanTermination": "not authorized: live descendants were classified unproven and exited independently before apply",
+  "foreignControlMutation": "none",
+  "supervisorRelayMutation": "none",
+  "verdict": "FAIL: apply removed the positively owned persistent run container but returned the expected nonzero escalation because no running owned AppHost remained."
+}

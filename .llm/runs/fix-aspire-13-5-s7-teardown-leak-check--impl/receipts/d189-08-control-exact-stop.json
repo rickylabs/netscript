@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-31T14:57:07.606Z",
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-d189-foreign",
+  "command": [
+    "aspire",
+    "stop",
+    "--force",
+    "--apphost",
+    "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-d189-foreign/aspire/apphost.mts",
+    "--non-interactive",
+    "--nologo"
+  ],
+  "exitCode": 0,
+  "stdout": "Scanning for running AppHosts...\n📦 Found running AppHost: aspire/apphost.mts\n🛑 Sending stop signal to aspire/apphost.mts...\nStopping aspire/apphost.mts...\n\n✅ aspire/apphost.mts stopped successfully.\n⚙️ Cleaning up persistent resources for aspire/apphost.mts...\n\n✅ Persistent resources for aspire/apphost.mts cleaned up.\n",
+  "stderr": "",
+  "parsed": null
+}

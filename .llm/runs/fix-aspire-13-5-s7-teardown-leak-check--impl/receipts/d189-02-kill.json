@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "signalledAt": "2026-08-31T14:54:35.005Z",
+  "signal": "SIGKILL",
+  "targetPid": 2455225,
+  "validation": {
+    "expectedStart": "37099127",
+    "observedStart": "37099127",
+    "expectedCwd": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-d189-owned",
+    "observedCwd": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-d189-owned",
+    "expectedAppHost": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-d189-owned/aspire/apphost.mts",
+    "observedAppHostArgv": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-d189-owned/aspire/apphost.mts",
+    "cmdline": [
+      "/home/agent/.local/aspire/aspire",
+      "run",
+      "--non-interactive",
+      "--apphost",
+      "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-d189-owned/aspire/apphost.mts",
+      "--log-file",
+      "/home/agent/.local/logs/cli_20260831T145159755_detach-child_f74334989ca24e2fa845b67727434cc0.log",
+      "--isolated"
+    ],
+    "validated": true
+  },
+  "command": [
+    "/bin/kill",
+    "-KILL",
+    "2455225"
+  ],
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": ""
+}

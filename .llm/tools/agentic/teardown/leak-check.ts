@@ -39,6 +39,7 @@ export interface LeakReport {
     readonly docker: ProbeStatus;
     readonly volumes: ProbeStatus;
     readonly networks: ProbeStatus;
+    readonly process?: ProbeStatus;
   };
   readonly survivors: readonly LeakEntry[];
 }
@@ -48,6 +49,7 @@ const OK_PROBES: LeakReport['probes'] = {
   docker: { state: 'ok' },
   volumes: { state: 'ok' },
   networks: { state: 'ok' },
+  process: { state: 'ok' },
 };
 
 function shellQuote(value: string): string {
@@ -61,6 +63,7 @@ export function stopCommand(resource: ResourceCandidate): string {
   }
   if (resource.kind === 'volume') return `docker volume rm ${shellQuote(resource.id)}`;
   if (resource.kind === 'network') return `docker network rm ${shellQuote(resource.id)}`;
+  if (resource.kind === 'process') return `kill -TERM ${shellQuote(String(resource.pid))}`;
   return `docker rm -f ${shellQuote(resource.id)}`;
 }
 
@@ -76,6 +79,8 @@ function ownerFrom(resource: ResourceCandidate, worktreeRoot: string): string {
     ? resource.appHostPath
     : resource.kind === 'container'
     ? resource.mountSource
+    : resource.kind === 'process'
+    ? resource.evidence[0]?.path
     : undefined;
   if (!path || !isAbsolute(path) || !isAbsolute(worktreeRoot)) return 'unknown';
   const siblingRoot = dirname(resolve(worktreeRoot));
@@ -95,6 +100,7 @@ function registeredStart(
       entry.appHostStartedAt === resource.appHostStartedAt
     )?.startedAt;
   }
+  if (resource.kind === 'process') return undefined;
   return registry.containers.find((entry) =>
     entry.creatorPid === resource.creatorPid &&
     entry.creatorProcessStartTime === resource.creatorProcessStartTime
@@ -130,9 +136,14 @@ export function buildLeakReport(
     worktreeRoot,
     probes,
     survivors: resources.map((resource) => {
-      const startedAt = registeredStart(resource, registry) ?? resource.createdAt;
+      const startedAt = registeredStart(resource, registry) ??
+        (resource.kind === 'process' ? undefined : resource.createdAt);
       const parsedStart = parseTimestamp(startedAt);
-      const ageMs = Number.isFinite(parsedStart) ? Math.max(0, nowMs - parsedStart) : null;
+      const ageMs = resource.kind === 'process'
+        ? resource.observedAgeMs ?? null
+        : Number.isFinite(parsedStart)
+        ? Math.max(0, nowMs - parsedStart)
+        : null;
       // A network is this run's own session network only when its attached containers are all
       // positively owned by the run. Attachment is relationship evidence, never creation proof:
       // ownership stays fail-closed for every network regardless of the verdict here.
@@ -143,6 +154,8 @@ export function buildLeakReport(
         kind: resource.kind,
         identity: resource.kind === 'apphost'
           ? `${resource.appHostPath} (pid ${resource.appHostPid ?? 'unknown'})`
+          : resource.kind === 'process'
+          ? `${resource.commandLine} (pid ${resource.pid})`
           : `${resource.name ?? resource.id} (${resource.id})`,
         ownership: resource.kind === 'volume'
           ? classifyVolume(resource, containerCandidates, registry, worktreeRoot)
@@ -169,6 +182,9 @@ export function renderLeakReport(report: LeakReport): string {
     `Docker probe: ${renderProbeStatus(report.probes.docker)}`,
     `Volumes probe: ${renderProbeStatus(report.probes.volumes)}`,
     `Networks probe: ${renderProbeStatus(report.probes.networks)}`,
+    `Process probe: ${
+      renderProbeStatus(report.probes.process ?? { state: 'unavailable', message: 'not recorded' })
+    }`,
     '',
   ];
   if (report.survivors.length === 0) {
