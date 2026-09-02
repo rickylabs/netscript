@@ -51,9 +51,9 @@ The `behavior.app-reference` gate renders every canonical reference state in a r
 Chromium browser at desktop and mobile viewports. It is fail-closed: a missing browser is a failed
 prerequisite, never a skipped or passing browser verdict.
 
-Automatic executable discovery supports Google Chrome or Chromium on Linux; Windows Chrome or
-Edge in a native checkout and through WSL interop; and Chrome, Edge, or Chromium in their standard
-macOS `/Applications` locations. Install one of those browsers before running `scaffold.runtime`.
+Automatic executable discovery supports Google Chrome or Chromium on Linux; Windows Chrome or Edge
+in a native checkout and through WSL interop; and Chrome, Edge, or Chromium in their standard macOS
+`/Applications` locations. Install one of those browsers before running `scaffold.runtime`.
 Non-standard installation paths are intentionally not guessed; add an explicit supported candidate
 with a focused probe test instead of treating a browserless run as evidence.
 
@@ -73,11 +73,11 @@ Run the exact one-pass gate from a native Linux filesystem (WSL paths under `/ho
 deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
 ```
 
-The structured native report is written to
-`.llm/tmp/desktop-native-e2e/evidence.json`. A host-inapplicable gate is `NOT_RUN`, not a pass.
-The current WSL execution reached the signed manifest through ephemeral-CA TLS but failed in the
-packaged runtime because `op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the
-Linux verdict until the consumed runtime/SDK seam is reconciled and the complete gate reruns green.
+The structured native report is written to `.llm/tmp/desktop-native-e2e/evidence.json`. A
+host-inapplicable gate is `NOT_RUN`, not a pass. The current WSL execution reached the signed
+manifest through ephemeral-CA TLS but failed in the packaged runtime because
+`op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the Linux verdict until the
+consumed runtime/SDK seam is reconciled and the complete gate reruns green.
 
 Owner-hosted Windows invocation (from an elevated Developer PowerShell in a native Windows clone):
 
@@ -127,6 +127,28 @@ and requested PR checks should use
 | `scaffold.runtime`        | full scaffold runtime behavior path                        |
 | `scaffold.runtime.sqlite` | reduced-container sqlite runtime tier                      |
 
+### Structured Aspire evidence gates
+
+| Gate                       | Evidence contract                                                                                                                                              |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preflight.aspire`         | `aspire doctor --format Json --non-interactive --nologo`; warnings remain in the child receipt, while `fail` and unknown statuses fail closed                  |
+| `runtime.aspire-start`     | bounded `aspire describe --follow --format Json` NDJSON at `.netscript/e2e/aspire-describe.ndjson`; last-seen state and non-empty health reports must converge |
+| `runtime.resource-command` | typed `<db>-cli` migration plus background-child restarts, followed by describe convergence; absent start evidence is an explicit skip receipt                 |
+| `cleanup.aspire-stop`      | exact-AppHost graceful stop, cleanup-only force stop, then a Docker probe that fails on mount or DCP evidence path-contained by the generated project root     |
+
+Durable receipts are written beneath `.llm/tmp/gate-receipts/<suite>/`. The runtime suites retain
+both the receipt envelope and the doctor, start, resource-command, cleanup, and Docker-probe child
+evidence.
+
+`ASPIRE_CLI_START_TIMEOUT` is one budget for the whole describe-follow convergence, not a
+per-resource allowance. It defaults to 300 seconds. The lease-backed Phase-B MSSQL tier sets it to
+600 seconds because that tier converges more slowly.
+
+The live Phase-A cleanup probe deliberately records `processes: []`; its process-name, argv, and
+`ASPIRE_DCP_APPHOST_PATH` rules are fixture-proven only until Phase B captures live process
+evidence. Likewise, a container with only Aspire's creator-process label remains unproven without
+S7's stable PID/start-time registry identity.
+
 ## Required Permissions
 
 The CLI entrypoint is intended to run with `--allow-all` because smoke tests create files, spawn
@@ -142,6 +164,10 @@ implementation are:
 
 ## Docker Cleanup
 
-Before a smoke run starts, the suite snapshots existing Docker container IDs. After the run
-completes, it stops the generated Aspire AppHost and removes only containers that were created after
-that snapshot. Existing containers from the main checkout are left untouched.
+After the run completes, the suite gracefully stops the exact generated AppHost and, only when
+`--cleanup` is enabled, follows with `aspire stop --force --apphost <exact>`. It then records a
+Docker probe and fails if Aspire mount-label or `ASPIRE_DCP_APPHOST_PATH` evidence resolves beneath
+the generated project root, including `.data/<resource>` bind mounts. Absolute evidence beneath a
+different root is foreign; evidence without an ownership path is unproven. Both are recorded and
+left untouched. This mirrors S7's containment/env/argv rules pending S7's merge, but Phase A does
+not claim S7's live process probe or creator-PID registry.
