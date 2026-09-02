@@ -10555,3 +10555,26 @@ against the four acceptance rows; the `@netscript/plugin` no-new-dependency inva
 Slice B are live.
 
 **Live now:** S6/S7 closeout audit · Slice B · #1452 S3 · #1895/#1664 CI on reconciled heads.
+
+---
+
+## ~17:05Z — S6/S7 closeout is PR #1941, and its audit found a real defect
+
+**#1941** (`chore/sdk-client-s6-s7-closeout`, head `136ea478e`): non-draft, full labels, milestone
+0.0.7, **`Closes #1353` and `Closes #1467`** (verified via `closingIssuesReferences`), one
+`acceptance-evidence` block per issue. Label cycled to `status:impl-eval`; the phase-eval dispatcher
+owns the trigger.
+
+**The audit did what it was for.** It was told to verify the negative rows by looking, not by trusting
+the merged PRs' verdicts — and #1353's *"disabling propagation emits no trace headers"* was **false on
+`main`**. `createHttpClientLink` injected `traceparent`/`tracestate` **unconditionally**; the
+`propagateTraceContext` flag was never consulted at the injection site. #1921's IMPL-EVAL passed the
+*positive* sole-authorship rows while this negative row sat silently unsatisfied.
+
+Fix: a three-line guard around the injection in `http-client-link.ts`, plus +66/−11 on
+`client-contribution-observability_test.ts` to pin the disabled case. The fence on that file is clear
+now that #1921/#1922/#1931 have all merged. So the PR is no longer harness-only — it carries a
+correctness fix, and the evaluator is told an overclaiming keyword is a `FAIL_FIX`.
+
+Worth keeping: **a closeout audit that only re-reads verdicts finds nothing; one that re-runs the
+negative rows against `main` finds the defect a passing eval missed.**
