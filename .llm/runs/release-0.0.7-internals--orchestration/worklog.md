@@ -9721,3 +9721,28 @@ teeth rather than merely runs.
 
 **#1889 remains held at `status:impl`**, not promoted, because its own head measures two `@orpc/shared`
 copies. It is unblocked the moment #1890 merges.
+
+### D-221 — packets re-attested and handed off; #1889 integrated, remeasured, runtime gate dispatched locally
+
+**#1846 and #1890 re-attested live and handed to the coordinator.** Both OPEN, non-draft, CLEAN
+against current main `9fcdee63e`, sole `status:ready-merge` on PR and issue, **0** unchecked boxes
+anywhere, 0/0 threads. #1846: 7 SUCCESS / 0 FAILURE. #1890: 10 SUCCESS / 0 FAILURE with both
+verdicts (IMPL-EVAL at `1914a38c6`, delta at `e734453c4`) PASS. No further supervisor action exists
+on either — they need only the merge.
+
+**#1889 integrated onto `9fcdee63e`** → head `4e3ab2475`. `packages/sdk` tree and `deno.lock` both
+byte-identical across the merge, so the PASS carries.
+
+**Remeasured, and the block is confirmed rather than assumed.** Main does not yet carry #1879
+(`9fcdee63e` = #1894, preceded by #1850, #1887), so `deno why @orpc/shared` still returns **two**
+copies at this head — `1.14.6` plus `1.14.7` pulled by `@orpc/otel@1.14.7` — with all 18 resolved
+`@orpc` entries on `1.14.x`. #1351's acceptance boxes 1 and 6 stay unchecked and the PR stays draft at
+`status:impl`; ticking either would assert what its own head disproves.
+
+**Runtime gate dispatched locally, and the choice matters.** The hosted lane had **4 active
+runtime-tier jobs** across three unrelated topics, and #1846's `queue: max` fix is **not on main yet**
+— so a hosted dispatch would have run under the old cancel-on-arrival semantics and either evicted
+another topic's running tier job or been evicted itself. That is the precise defect #1846 fixes, and
+using the defective path to gather evidence would have produced an unreliable verdict and possibly
+damaged another lane's run. Ran `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+locally at `4e3ab2475` with a real captured exit instead; it contends with nothing.
