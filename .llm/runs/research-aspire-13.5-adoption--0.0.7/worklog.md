@@ -757,3 +757,29 @@ the merge.**
   tiers + desktop at `d3cc03766` → receipts → evidence → ready-merge → close-gate.
   Actor: supervisor; ETA ~20:25Z.
 - S10 #1760 `0b3f13e0c`: packet handed 19:28Z; awaiting coordinator merge.
+
+### 2026-09-02 20:05Z checkpoint — S9 converged head `d2c0a51a0`
+
+- Coordinator: S10 #1760 MERGED (`58280d6ee`); main `e341c6f71`. S9 is the sole 0.0.7 Aspire leaf;
+  epic-inventory work stopped per the priority correction.
+- S9 #1759: merged `origin/main` `e341c6f71` (`dd94ec116`) resolving five paths — kept the shipped
+  S10 structured `cli-e2e-aspire-start` capture contract and moved S9's secured-dashboard
+  requirement into that path (`runtime/dashboard-config.ts` `disableAnonymousDashboard`, called
+  before `aspire start` in `describe-follow.ts` capture mode; the restart fallback keeps the S9
+  config-arg script); GATE ids union (`AGENT_ASPIRE_MCP_SMOKE` + `RUNTIME_RESOURCE_COMMAND`);
+  suite order takes main's describe placement plus the MCP smoke after `runtime.wait.app`; the
+  start-gate test takes main's, the lifecycle test is narrowed to the restart fallback. Manifest
+  regenerated on the resolved tree (parity ok 907 / fail 0); asset barrels already consistent.
+  Decisive checks: check/lint/fmt on `packages/cli/e2e` clean, e2e unit suites 350/350,
+  `git grep 13\.4\.6` over skills/.agents/skills/kernel assets = 0. Product diff vs main
+  unchanged (8 files). Pushed `d2c0a51a0`; `status:impl-eval`→`status:ready-merge` on PR + #1721
+  on the existing evaluator evidence (IMPL-EVAL PASS at `3ba9c414b`, `ce1b80e2f`; every later
+  commit is e2e-gate-only).
+- Correction (own error): a checkpoint commit was mistakenly made on the S9 branch and pushed
+  (`3bcf64d32`), which auto-cancelled the `d2c0a51a0` e2e-cli runs via branch concurrency. The
+  branch was force-restored to `d2c0a51a0` (`--force-with-lease`), the `3bcf64d32` runs
+  cancelled, and e2e-cli 33676071441 rerun (attempt 2) as the exact-head run of record; `ci`
+  33676002428 continues. close-gate at `d2c0a51a0` currently FAIL on the expected six #1721 boxes
+  + three DoD boxes that the staged final body/receipts satisfy once both tiers are green.
+  Remaining: tiers → `s9-receipt.sh 33676071441` → receipts commit → body PATCH → `gh run rerun`
+  close-gate → packet. Actor: supervisor; ETA ~20:50Z.
