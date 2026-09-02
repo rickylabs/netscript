@@ -8127,3 +8127,44 @@ Posted on #1759 as preparation, not execution. The parts that would otherwise be
   comes off when the tiers are actually wanted.
 - The telemetry repair `ec872eb69` already exists; do not rebuild it. My canonical `#1907` carry was
   reverted, and alignment now flows **from** `.agents/skills` into the shipped assets, not into it.
+
+## D-314 — S13 converged on the single-source result; obsolete mirror wording removed, not recreated
+
+#1911 merged as main `fafffd58d`: `.agents/skills` is the sole authoritative repository-skill tree,
+`.claude/skills` keeps only the `repo-skills` bridge, `sync-claude-skills.ts` is deleted.
+
+**The conflict was the one flagged in D-307**: `UD` on `.claude/skills/codex-wsl-remote/SKILL.md` —
+modified by S13, deleted by main. Accepted the deletion. Verified first that nothing was lost: S13's
+substantive change there replaced a `13.3.0` toolchain snapshot with a `toolchain.env` reference, and
+the authoritative `.agents/skills/codex-wsl-remote/SKILL.md` already carries it at line 149 with no
+`13.3.0` remaining.
+
+**Checked the thing that would have silently undone #1911.** S13 regenerates the surface manifest
+from rules, so had #1911 edited only the TSV, regeneration here would have resurrected the six retired
+`.claude` rows. It updated `aspire-surface-manifest.ts` too — confirmed by regenerating and finding
+**0** `.claude/` rows. `check:aspire-version-parity`: `fail: 0` over 815 paths (down from 821 as the
+mirrors left the tree).
+
+**Obsolete acceptance wording removed from #1724 rather than recreated**, per the ruling. Four places
+referenced a mirror flow that no longer exists, and box 5 was outright unsatisfiable —
+`agentic:sync-claude` is gone from `deno.json` (0 occurrences) and the task no longer resolves. Box 5
+now reads `check:assets-barrel` green, with a one-line note that `agentic:sync-claude:check` was
+removed by #1911 because there is nothing left to mirror. The note is deliberate: dropping the
+requirement silently would read later as a quietly weakened gate.
+
+## D-315 — S9 restack queued with its two conflicts identified in advance
+
+Queued on #1759, not executed (assignment C). S9 is 13 commits behind main and will hit:
+
+1. **`UD` on `.claude/skills/aspire/SKILL.md` and `.claude/skills/netscript-harness/SKILL.md`** —
+   accept the deletions, do not recreate. S13 resolved the identical conflict this way after checking
+   the content survived in `.agents`; the same check is owed for `netscript-harness` specifically.
+2. **`.llm/harness/workflow/tooling.md`** — references the deleted `agentic:sync-claude`, and #1911
+   rewrote it (55 lines); take main's side.
+
+Carried forward: it cannot dispatch today (`mergeable=false`, no merge ref); the first push needs
+`workflow` scope that `GH_TOKEN` shadows here; `ci:skip-e2e` is deliberate and the restack itself ends
+the hazard by bringing `queue: max`; and `ec872eb69` already implements the telemetry repair.
+
+Direction matters and is stated on the PR: alignment flows **from** `.agents/skills` **into** the
+shipped consumer assets, the opposite of my reverted #1907 carry.
