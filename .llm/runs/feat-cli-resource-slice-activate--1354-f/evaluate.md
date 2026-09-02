@@ -1,211 +1,115 @@
-IMPL-EVAL: PASS
+# Evaluation: Slice F — converge init and activate `generate resource` (#1354, PR #1956)
 
-# IMPL-EVAL — Slice F activation (#1354), PR #1956
+## Metadata
 
 | Field | Value |
 | --- | --- |
-| Evaluator | Claude / Fable 5 (`claude-fable-5`), fresh native opposite-family session — separate from the Codex generator session |
-| Route | `formal_impl_evaluation` per `supervisor.md` lane table (native opposite-family Claude evaluates Codex-authored work) |
+| Verdict | **PASS_IMPL_WITH_FINDINGS** |
+| Evaluator | separate native opposite-family session, Claude Fable 5.1 (Codex-authored slice) |
+| Checkout | `/home/agent/projects/netscript/worktrees/007-eval-1354-f`, detached at `8c27ffe16`, product code read-only |
+| Evaluated diff | `git diff be3e3dded 8c27ffe16` (base = #1664 head `9295eabaa` + Slice A #1950 + Slice E #1954) |
+| Plan | `origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md`, Slice F amended 2026-09-02 (item 33, ceiling 33) |
+| PR head note | PR #1956 head is `de042d23e`, one commit past the evaluated head; that commit touches only `context-pack.md`/`worklog.md` (`git show --stat de042d23e`), zero product delta. |
 | Date | 2026-09-03 |
-| Branch / worktree | `feat/cli-resource-slice-activate` at `/home/agent/projects/netscript/worktrees/007-leaf-1354-f` |
-| Evaluated range | integration baseline `be3e3dded` → HEAD `de042d23e` (product commit `8c27ffe16`, gate-evidence commit `de042d23e`) |
-| Plan authority | `origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md`, amended Slice F item 33 / ceiling 33 |
-| Constraints honored | read-only verification only; no Aspire/Docker/browser/`e2e:cli`; no product edit, commit, push, or GitHub mutation |
 
-**Verdict: `PASS`. No blocking finding remains.** All findings below are low-severity or
-observational; none requires a change before this slice's sign-off, and none is a doctrine
-violation, an unproven gate, or a scope breach requiring `FAIL_FIX`/`FAIL_RESCOPE`/`FAIL_DEBT`.
+## Process Verification
 
-## Process gates (protocol rules 1–3, 12–13)
-
-- **Plan-Gate.** `worklog.md` Progress Log records `PLAN-EVAL: N/A` before implementation, justified
-  by the owner supplying the locked, separately evaluated #1354 plan (the parent plan itself carries
-  a passing PLAN-EVAL per the Slice E run's L-3 note). Recorded, justified — pass.
-- **Design checkpoint.** `worklog.md § Design` exists with public surface, vocabulary, ports,
-  constants, commit-slice table, extension axes, and test strategy; the single commit slice follows
-  it. Pass.
-- **Generator ≠ evaluator.** Generator was the Codex supervisor session; this evaluation is a fresh
-  Claude/Fable session. Pass.
-- **Commit trail.** PR #1956 carries RESEARCH, PLAN(N/A), and IMPL(PASS) phase comments; product
-  commit `8c27ffe16` pushed; non-draft with `status:impl` is a recorded owner override in
-  `supervisor.md`. Labels are taxonomy-compliant (`type:feat`, `area:cli`, `priority:p2`, `wave:v1`,
-  exactly one `status:`), milestone `0.0.7`. Pass.
-- **Close-gate / MEDIUM-3 (D10).** PR body says `Refs #1354 (partial)` with remaining scope
-  (Slice G) and contains **no** closing keyword anywhere, including prose. Pass.
-- **SKILL chapter.** See finding LOW-2 — `implement.md` has no `## SKILL` chapter.
-
-## Scope verification — exact 33-path compliance
-
-Product diff `be3e3dded..HEAD` (excluding `.llm/runs/**`) touches 33 files. Mapped against the
-amended plan enumeration:
-
-- **31 of the 33 enumerated items appear exactly** (items 1–23, 25–33; item 19
-  `embedded.generated.ts` regenerated, ceiling-exempt).
-- **Item 24** (`export-surface-corpus.generated.ts`) has **no diff**: clean-tree regeneration was
-  deterministic (worklog), and I independently re-ran `deno task check:mcp-export-corpus` → exit 0,
-  hash `cc64442f…` matching the worklog. Registering the fourth Cliffy subcommand adds no package
-  export, so an unchanged corpus is the correct outcome, and the plan itself classifies this file
-  as freshness evidence only. Compliant.
-- **One path outside the Slice F enumeration**: `public-command-dependencies.ts` (+~185 lines,
-  composed resource command dependencies). See finding **LOW-1**: the edit is the locked plan's
-  Slice E expected-touch item 6, implemented verbatim to its description ("typed resource command
-  dependency bundle … from existing filesystem/template/app-root ports plus the Fresh manifest
-  adapter"), was deliberately left out of landed Slice E ("the command deliberately unregistered"
-  — Slice E `evaluate.md`), and this run's `plan.md` declared "Production composition for Slice E"
-  in scope up front. Substantively plan-listed and recorded; formally not in the amended F set.
-- **`deno.lock`**: zero diff; `git hash-object deno.lock` = `202d4c9bfb…`, byte-identical to the
-  research-recorded clean blob. Pass.
-- **`service-query.ts.template`**: zero diff (`git diff … | wc -l` = 0); its manifest key
-  `appRoutesExamplesServiceLibServiceQuery` survives. #1664 ownership respected. Pass.
-
-## Retire-set completeness and absence of extra consumers
-
-- All **18** old canonical/dependent templates are deleted (plan items 4–13, 25–32), and
-  `manifest.ts` removes exactly the **18 corresponding keys**;
-  `scaffold-template-assets.ts` removes the matching carrier fields, and
-  `app-template-test-support.ts` drops every retired export. `app-route-seeds.ts` is deleted.
-- Repo-wide scan (`packages/`, `plugins/`; ts/tsx/template) for every retired identifier/path
-  (`ServiceShowcaseLab`, `service-showcase`, `managed-form`, `summary-card`, `summary-panel`,
-  `lab-panel`, `page-layout`, `notes-card`, `hero.tsx`, `optimistic-list-mutation`,
-  `route-contract.ts.template`, `service-summary`, `authorization.ts.template`,
-  `app-route-seeds`, `generateRouteManifestSeed`, `generateRoutesSeed`) finds only:
-  descriptive prose in `examples/index.tsx.template` (see LOW-4), the *negative* assertions in
-  `write-app-files_test.ts:110-111`, the re-pointed convention ids in `agent-conventions.ts`,
-  the regenerated `embedded.generated.ts` carrier, and unrelated `packages/fresh` test fixtures.
-  **No surviving importer or rendered consumer of the retired set exists.** The asset no-orphan
-  claim (98 disk / 98 declared) is consistent with `check:assets-barrel` and
-  `check:publish-assets`, both re-run green.
-
-## Init emits exactly the planner preset (D4/F)
-
-`write-example-service-app-files.ts` now writes only: the demo `README.md`, `service-query.ts`
-(#1664-owned template), the **planner leaves** from
-`planResourceSlice(normalize({variants: ['form','partial'], …}))`, and the telemetry demo files.
-`write-example-service-app-files_test.ts` proves the effective variant set is exactly
-`['core','form','partial']`, the leaf roles are exactly the 10 canonical roles (page, layout, view,
-island, loaders, route-contract, form-component, form-contract, summary-component, partial-route),
-and every leaf starts with the `// @netscript/resource-slice` ownership marker. No hero/notes/
-authorization/viewer/policy/telemetry page binding or optimistic mutation survives in init's
-canonical slice.
-
-## Byte equivalence by all canonical roles
-
-- `write-app-files_test.ts` `'init preset and command-shaped planner render byte-identical
-  canonical roles'` builds **both** role→content maps with `Object.fromEntries` and `assertEquals`
-  over the complete objects, so key-set equality (all roles, both directions) and byte equality per
-  role are both asserted — not just an intersection.
-- End-to-end, `public-command-tree_test.ts` runs the **production-composed** command with the exact
-  init preset (`generate resource users --procedure list --client users --route /examples/users
-  --form --partial --dry-run`) against a real `init`-generated app and asserts the shared files are
-  byte-identical and nothing was written. A conflict would throw
-  `ResourceSliceConflictError` (`generate-resource-command.ts:69`), so the passing parse proves the
-  rerun is conflict-free — i.e. the on-disk init output byte-matches the command's canonical
-  rendering for every leaf, markers included. This is the strongest available equivalence proof and
-  also absorbs Slice E **LOW-1** (a second, conflict-free dry-run for a new resource `audits`
-  additionally proves zero writes with no conflict present).
-
-## Formatted ownership markers
-
-`createResourceSliceTemplateRenderer` (scaffold-template-assets.ts) wraps the template port so the
-`DenoGeneratedSourceFormatter` formats each rendered body **before**
-`markOwnedResourceSliceLeaf` computes the marker's `bodySha256`. Both callers use it: init via
-`renderExampleServiceResourceSlice` and the production command via
-`generateResourceCommandDependencies.templateRenderer`. The worklog records this as the fix for the
-supervisor-review finding (post-marker init formatting drift making an exact rerun `owned-edited`),
-and the exact-preset rerun test above mechanically confirms markers survive init's pipeline intact.
-
-## Fresh derivation after route emission; no manual seed
-
-`write-app-files.ts` invokes `writeFreshRouteManifestSync(appDir)` (lines 388–402) after every
-route/sidecar write, including the example-service planner leaves, partials, and telemetry routes
-(vite.config, written after, is not a route); dry-run skips derivation. `app-route-seeds.ts` is
-deleted and no `generateRouteManifestSeed`/`generateRoutesSeed` reference remains anywhere.
-`write-app-files_test.ts` asserts both the ordering (source-order assertion; see OBS-2) and the
-seed absence; `public-command-tree_test.ts` verifies the derived `.generated/routes.ts` contains
-`bindRoutePattern(` and `routePatterns.examples.users.$route` in a real init output, and
-`route-templates_test.ts` now derives via `writeFreshRouteManifestSync` with Form-B assertions
-replacing the old seed/manual-route assertions. The `router.ts.template` keeps the `serviceExample`
-alias pointed at the Fresh-derived generated route (via `{{serviceExampleRouteReference}}`) so
-`routes/examples/index.tsx.template` remains a surviving consumer unchanged — exactly plan item 20.
-
-## Fourth registration, composed dependencies, help through the composed tree
-
-`generate-group.ts` registers `resource` as the fourth `.command(…)` after aspire/runtime-schemas/
-plugins. `public-command-tree_test.ts` `'public generate group exposes resource fourth with
-composed dependencies and exact help'` builds the tree from **`createPublicCommandDependencies`**
-(the production graph, not a stub), asserts the exact child-name order
-`['aspire','runtime-schemas','plugins','resource']`, renders the resource help through
-`getHelp()` and asserts the description plus `--procedure/--client/--app/--form/--partial/--stream`,
-and asserts the composed `resolveClient`/`stage` bindings exist. The composed graph binds
-`selectClientBinding` (Slice A's shared selector — `--client` forwarded unchanged, ambiguity stays
-fail-closed in the selector), the formatter-wrapped renderer, `loadResourceSliceTemplateAssetsSync`,
-`resolveUiAppRoot`, a runtime procedure probe, and a Fresh staging stager built on
-`writeFreshRouteManifestSync`. No parallel selection or template authority is introduced.
-
-## Item 33 — convention resolution
-
-`agent-conventions.ts` matches the amendment exactly: `service-route-contract` → `index.route.ts`,
-`service-island` → `${Pascal}Island.tsx`, `service-shared` → `${service}-loaders.ts`,
-`service-form` → `${service}-form.tsx`, and `service-authorization` **dropped** (id removed from the
-union; no standalone planner leaf). No compatibility asset or extension point was added. The
-existing `assertAppConventionsResolve` runs inside the passing tree test (declared-vs-parsed path
-equality plus on-disk existence in the generated app), so F's obligation — keep it green against
-the retired set — is met. Slice G retains the guidance rewording and the new focused test.
-
-## Slice E LOW findings
-
-- **LOW-1 (conflict-free command dry-run): absorbed.** Covered at the command level through the
-  composed tree (`audits` dry-run: zero writes, shared files byte-identical, no conflict thrown).
-- **LOW-2 (blank `--procedure` guard test): deferral valid.** Any fix touches
-  `generate-resource-input.ts`/`generate-resource-command*.ts`, none of which is in the amended
-  33-path Slice F set; the Slice E evaluator classified it optional. Recorded in `worklog.md`,
-  `context-pack.md`, and the PR body. Not blocking, not arch-debt.
-
-## Gate evidence — independently re-verified
-
-| Gate | My run | Result |
+| Check | Result | Evidence |
 | --- | --- | --- |
-| Focused four-file suite | `run-deno-test.ts -- --allow-all` on the two writer tests + `route-templates_test.ts` + `public-command-tree_test.ts` | exit 0; **32 passed, 0 failed** — matches worklog exactly |
-| Package `src` unit suite | `run-deno-test.ts -- --allow-all packages/cli/src` | exit 0; **1316 passed, 0 failed** (see LOW-3 on the worklog's 1324 count basis) |
-| Full `packages/cli` incl. e2e tests | same wrapper on `packages/cli` | 1708/1710; the 2 failures are **environment-caused** (fake browser executables under the noexec temp mount fail to spawn, `Permission denied (os error 13)`) in `e2e/tests/.../service-client-runtime-probe_test.ts` — a file this slice does not touch (`git log be3e3dded..HEAD -- packages/cli/e2e` is empty); not a Slice F regression |
-| `check:assets-barrel` | re-run | exit 0 (regeneration + `git diff --exit-code` clean → `embedded.generated.ts` is fresh) |
-| `check:publish-assets` | re-run | exit 0 |
-| `check:emitted-samples` | re-run | exit 0; 48 samples / 38 paths — matches worklog |
-| `check:mcp-export-corpus` | re-run | exit 0; sha256 `cc64442f…`, 35 pkgs / 273 subpaths / 7846 symbols — matches worklog |
-| `arch:check` | re-run | exit 0 (WARN-only census; no FAIL) |
-| `quality:gate` | re-run | exit 0 |
-| `deno.lock` | `git diff` + `git hash-object` | unchanged, blob matches recorded baseline |
+| Plan-Gate | `PASS` (recorded N/A) | `worklog.md` Progress Log: `PLAN-EVAL: N/A` — owner-supplied locked plan already evaluated upstream (`PASS_PLAN_WITH_FINDINGS`, per the Slice E verdict). |
+| Design checkpoint | `PASS` | `worklog.md` § Design present (public surface, vocabulary, ports, constants, commit slice, test strategy). |
+| Stop-and-amend clause honored | `PASS` | `drift.md` "retire-set consumer required plan amendment": worker stopped on `agent-conventions.ts`, owner added item 33; implementation resumed against the amended plan. |
+| Commit trail | `PASS` | Two commits: `e371dda91` (run bootstrap), `8c27ffe16` (`feat(cli): converge init resource generation`). |
+| Close-gate | `PASS` (partial work) | PR body `Refs #1354`, no closing keyword (`gh pr view 1956 --json body` → closing=false, refs=true); labels `type:feat area:cli priority:p2 wave:v1 status:impl orchestrator:features`, milestone `0.0.7`. |
+| Supervisor identity / route | `PASS` | `supervisor.md` records Codex implementation lane and native opposite-family Fable IMPL-EVAL. |
 
-JSR audit, `publish:dry-run`, `deps:prod-install`, and the two docs gates were not re-executed
-(publish-surface inputs are covered by the re-run `check:publish-assets`/corpus gates and the
-slice adds no new export); their worklog exit-0 records are accepted as evidence. Prohibited
-runtime gates (Aspire/Docker/browser/`e2e:cli`) were correctly **not** run by any lane; hosted
-`scaffold.runtime` acceptance remains Slice G's, per D11 and the run plan.
+## 1. Touch set, ceiling, and forbidden files
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Product files in diff | 33 | `git diff --name-status be3e3dded 8c27ffe16`: 40 paths = 7 run artifacts + 33 product. |
+| Enumerated items touched | 32 of 33 | All items except 24 (MCP corpus — unchanged and proven fresh, see gates). Item 16 created (`write-example-service-app-files_test.ts`). |
+| **Outside the enumeration** | **1 file** | `packages/cli/src/public/features/root/public-command-dependencies.ts` (+185/−?; adds `generateResourceCommandDependencies` bundle, `resolveResourceClient`, `createResourceSliceStager`, `resolveResourceProcedure`). This is Slice E's item 6, which Slice E's evaluator proved E left untouched (`git show be3e3dded:…public-command-dependencies.ts | grep -i resource` → no hits). See M-1. |
+| `deno.lock` | unchanged | `git diff --stat be3e3dded 8c27ffe16 -- deno.lock` → empty. |
+| `service-query.ts.template` | unchanged | same command on that path → empty; still present as `TEMPLATE_KEYS` key (manifest.ts:13). |
+| `packages/` outside `packages/cli` | none | `git diff --name-only … -- packages | grep -v '^packages/cli/'` → empty. |
+| Generated carriers | `embedded.generated.ts` regenerated; corpus untouched | ceiling-exempt per plan. |
+
+## 2. Retire-set completeness
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Items 4–13, 25–32 deleted | `PASS` (18/18) | All 18 templates appear as `D` in name-status. |
+| `manifest.ts` keys | `PASS` | 18 `appRoutesExamples*`/`appRoutesPartialsExamplesServiceSummary` keys removed; remaining `examples/` keys are demo-only (`service-query`, `examples-view`, `crud-view`, `index`, `crud`, `orders/[id]`, telemetry). |
+| `scaffold-template-assets.ts` carriers | `PASS` | 18 `appExampleService*`/`appServiceExample*`/`appServiceSummaryPartial` fields removed; no retired key referenced. |
+| `app-route-seeds.ts` | deleted | `D` in name-status; `grep -rn generateRouteManifestSeed packages` hits only the negative assertion in `write-app-files_test.ts:110`. |
+| Repo-wide importer/consumer scan | `PASS` | `grep -rn` for all 18 retired basenames + seed symbols across `packages plugins tools .llm/tools docs` (excluding `embedded.generated.ts`): only hits are the neutral `resource-slice/` family's own `index.layout.tsx` (a resource-slice role, not the retired path) and two docs pages (`docs/site/web-layer/fresh-ui.md:176-189`, `docs/site/_plan/worklog/quickstart.md`) — Slice G owns consumer guidance. |
+| Item 33 `agent-conventions.ts` | `PASS` | `service-route-contract` → `index.route.ts`; `service-island` → `(_islands)/<Pascal>Island.tsx`; `service-shared` → `(_shared)/<name>-loaders.ts`; `service-form` → `(_components)/<name>-form.tsx`; `service-authorization` dropped (id removed from the union). No compatibility asset added. `assertAppConventionsResolve` in `public-command-tree_test.ts` passes. |
+
+## 3. Init convergence
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Planner delegation, exact preset | `PASS` | `write-example-service-app-files.ts` `planExampleServiceResourceSlice()` calls `planResourceSlice(normalizeResourceSliceInput({… variants: ['form','partial'] …}))`; leaves written via `renderResourceSlice`. Only README, `service-query.ts`, telemetry remain hand-written. `write-example-service-app-files_test.ts` asserts variants `['core','form','partial']` and exactly 10 canonical roles with ownership markers. |
+| Golden byte-equivalence by role | `PASS` (with L-1) | `write-app-files_test.ts` "init preset and command-shaped planner render byte-identical canonical roles" compares `Object.fromEntries(role→content)` of init leaves vs `renderResourceSlice(commandPlan)`. Production-path corroboration: `public-command-tree_test.ts` runs the real `generate resource users --route /examples/users --form --partial --dry-run` on an init-scaffolded app; a divergent leaf would surface as a conflict → `ResourceSliceConflictError` (exit 1) and fail the test. |
+| Fresh derivation after routes, no seed | `PASS` (with L-2) | `write-app-files.ts`: `writeFreshRouteManifestSync(appDir)` runs after `writeExampleServiceAppFiles` and the last route write; seed imports removed. `write-app-files_test.ts` "Fresh derivation follows route emission and no manual seed remains" (source-index proof). `route-templates_test.ts` "derives the service route from the neutral Form-B sidecar after rendering": `pageModuleForm === 'sidecar'`, `routeKeyPath ['examples','teamMembers','$route']`, `bindRoutePattern(routeContract`. |
+| `router.ts.template` alias | `PASS` | Manual `createRouteReference('/examples/{{serviceName}}')` removed; `serviceExample` now `{{serviceExampleRouteReference}}` → `routes.examples.<camel>.$route`, plus `{{serviceResourceRouteAlias}}`; asserted in `route-templates_test.ts`. |
+
+## 4. Activation
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Fourth registration | `PASS` | `generate-group.ts` `.command('resource', createGenerateResourceCommand(dependencies.generateResourceCommandDependencies))` after aspire/runtime-schemas/plugins. |
+| Command/help visibility + composed deps | `PASS` | `public-command-tree_test.ts` "public generate group exposes resource fourth with composed dependencies and exact help": asserts `['aspire','runtime-schemas','plugins','resource']`, description, options `--procedure --client --app --form --partial --stream`, and `resolveClient`/`stage` presence from `createPublicCommandDependencies`. |
+| `--client` seam fail-closed | `PASS` | Composition delegates to Slice A `selectClientBinding` (`client-selector.ts:57-63`): `candidates.length !== 1` without a flag → `bindingError('multiple query clients are ambiguous' / 'no query client found')`; explicit flag zero/duplicate matches are distinct failures (:41-50). No auto-pick added. |
+
+## 5. Slice E LOW-1 / LOW-2
+
+| Item | Status | Evidence |
+| --- | --- | --- |
+| LOW-1 conflict-free `--dry-run` at command level, exit 0, zero writes | **Absorbed** | `public-command-tree_test.ts`: two production-tree dry-runs (`audits` new resource; exact init preset rerun for `users`) assert `routes/audits` absent and `router.ts`, `.generated/manifest.ts`, `.generated/routes.ts`, `routes/examples/users/index.tsx` byte-equal before/after. Non-zero exit would throw `ResourceSliceConflictError` and fail `parse`. |
+| LOW-2 non-reconciler pre-apply failures as `CliExitError` | **Explicitly deferred** | `worklog.md` Decisions / `context-pack.md` Debt: required `generate-resource-command.ts` edit is outside the amended 33-file set. Still true at this head: `generate-resource.ts:119,162,219,230` and the new composition resolvers throw plain `Error`. Must be carried into Slice G or a follow-up. |
+
+## Gates (all run from the eval checkout at `8c27ffe16`)
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | 977 files, 9 batches, 0 failed, 0 diagnostics |
+| touched tests (4 files) via `run-deno-test.ts -- --allow-all …` | 0 | passed 32, failed 0 |
+| full `packages/cli` via `run-deno-test.ts -- --allow-all packages/cli` | 1 | passed 1708, failed 2 — both in `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts` (:550, :620), `Failed to spawn … /ephemeral/tmp/…: Permission denied` = `noexec` temp mount in this sandbox. `packages/cli/e2e` has zero diff. Re-run with `TMPDIR=/home/agent/.cache/eval-tmp` → exit 0, 25/25. Classified environmental, not a regression. Worker's "1324" was the package-owned subset (excludes `e2e/`). |
+| `deno task check:assets-barrel` | 0 | regenerated barrels have no diff |
+| `deno task check:publish-assets` | 0 | freshness pass |
+| `deno task check:emitted-samples` | 0 | 48 samples / 38 artifact paths |
+| `deno task check:mcp-export-corpus` | 0 | sha `cc64442f…`, 35 packages / 273 subpaths / 7846 symbols — corpus is **not stale** at this head |
+| `deno task arch:check` | 0 | `FAIL=0`; only baseline `DEPS-NPM-CATALOG` warnings |
+| `deno task quality:gate` | 0 | existing `export default` allowances only |
+| `deno task docs:readme-fences` | 0 | |
+| `deno task docs:jsdoc-examples` | 0 | `checked=359 failures=0`, `unboundName=116` (≤116 ✔) |
+| `deno task publish:dry-run` | 0 | `Success Dry run complete` |
+| scoped lint (`run-deno-lint.ts --root packages/cli --ext ts,tsx --include <12 touched files> --config <scratch>`) | 0 | 12 selected / 12 processed / 0 dropped / 0 findings. Scratch config copies root `lint.rules` (`tags recommended,jsr` + `no-process-global,no-node-globals`) and `fmt` options (`lineWidth 100, singleQuote, semiColons`) verbatim, dropping only root's `packages/cli/` exclusion — the same legitimacy argument as the Slice E verdict. Unscoped root runs drop every CLI file (exit 2, `failedBatches`), which is the known root exclusion, not a finding. |
+| scoped fmt (same include/config) | 0 | 12/12 processed, 0 findings |
 
 ## Findings
 
-| Severity | Finding | Evidence | Disposition |
+| Severity | Finding | Evidence | Required action |
 | --- | --- | --- | --- |
-| LOW-1 | The "**33/33 planned paths**" claim (PR #1956 body, IMPL comment, `context-pack.md`) is arithmetically coincidental, not exact: plan item 24 (MCP corpus) is unchanged, while `packages/cli/src/public/features/root/public-command-dependencies.ts` — **not** in the amended Slice F enumeration — is modified (+~185). The edit is the locked plan's **Slice E item 6** implemented to its letter, deliberately deferred by landed Slice E, and declared in this run's `plan.md` scope ("Production composition for Slice E"), so it is plan-listed and recorded — but the F enumeration was never formally amended to carry it the way item 33 was for `agent-conventions.ts`, and the evidence surface silently substitutes one path for another. | diff `be3e3dded..HEAD`; plan Slice E item 6; Slice E `evaluate.md` ("public-command-dependencies.ts … provably untouched"); run `plan.md § Scope` | Non-blocking. Accurate accounting belongs in the final #1354 acceptance matrix: state "32 amended-F paths + Slice E item 6 composition" rather than "33/33". |
-| LOW-2 | `implement.md` carries no `## SKILL` chapter (protocol rule 13 names this a finding for implementation briefs). Mitigated: the supervisor implemented in-session rather than briefing a sub-agent, and the run artifacts otherwise record skills/lanes. | `implement.md` (5 lines) | Non-blocking hygiene; add a SKILL line if the brief is reused. |
-| LOW-3 | Worklog's "full package-owned CLI unit suite … 1324 passed" does not state its path basis; `packages/cli/src` reproduces **1316/1316 exit 0** and full `packages/cli` yields 1710 results. The verdict (exit 0 on package-owned code) is confirmed either way; only the count's provenance is imprecise. | this session's wrapper runs | Non-blocking; name the test root next to the count in future gate tables. |
-| LOW-4 | `examples/index.tsx.template` still describes the canonical example as an "optimistic-mutation flow" although the optimistic mutation was retired with the old showcase. Slice G owns the guidance/wording pass; this stale copy should be swept there. | `packages/cli/src/kernel/assets/app/routes/examples/index.tsx.template:24` | Defer to Slice G. |
-| OBS-1 | `createResourceSliceStager` and `resolveResourceProcedure` embed raw `Deno.*`/subprocess adapter logic inline in the composition root (`public-command-dependencies.ts`) instead of under `kernel/adapters/`. D8's letter is honored (no `Deno.*` in the application layer; the composition root instantiates adapters), and `arch:check`/`quality:gate` are clean — but these are the largest inline adapter bodies in that file and a natural extraction candidate if they grow. | `public-command-dependencies.ts:460-543` | Observation only; no action required. |
-| OBS-2 | The Fresh-derivation-ordering proof is a source-text index assertion (`indexOf` ordering in `write-app-files_test.ts:98-112`) rather than instrumented write-order. Sequential `await`s make source order execution order here, and the end-to-end test observing real derived `.generated/*` after init closes the gap. | `write-app-files_test.ts` | Acceptable; instrumented ordering would be sturdier if the writer is ever parallelized. |
-| OBS-3 | Stacked base: the PR targets `feat/app-service-client-wiring`, so the required `ci` workflow does not run on this PR (non-main base skips required checks) and the Slice A/E commits appear in its diff until they merge. Pre-existing stacked-base material (selector, unregistered command, planner/templates/adapters) was **excluded** from this evaluation's scope and was separately evaluated in runs `--1354-a`…`--1354-e`; only `be3e3dded..HEAD` is judged here. The merge coordinator must ensure real CI runs before any merge. | PR #1956 `baseRefName`; drift.md "stacked base advanced" | Known, recorded drift; coordinator-owned. |
+| medium (M-1) | One touched file is outside the amended 33-item enumeration and the absorption is unrecorded. `public-command-dependencies.ts` gained the full resource dependency bundle, a temp-dir stager and a `deno eval` procedure probe. This is Slice E's item 6, which E deferred (E's verdict proves it untouched there). F's `drift.md` has no entry; `context-pack.md` "Files Changed" claims "33 product paths: 32 tracked paths plus the new focused writer test", which miscounts (the 33rd is this file, not the test — the test is enumerated item 16). | `git diff --name-status be3e3dded 8c27ffe16`; `.llm/runs/…-f/drift.md`; `context-pack.md` § Files Changed | Add a `drift.md` entry (severity minor/scope) stating Slice E item 6 was absorbed into F, and correct the file count in `context-pack.md`. Product code needs no change. |
+| medium (M-2) | Adapter-grade IO lives in the composition root. `createResourceSliceStager` (`public-command-dependencies.ts:460-509`) calls `Deno.makeTempDir/mkdir/writeTextFile/remove` and `@std/fs copy` directly, and `resolveResourceProcedure` (:511-544) spawns `deno eval` and parses the client's service name by regex (`/export const \w+Name\s*=\s*['"]…/`, :248). D8 places "filesystem application and the Fresh manifest bridge" in adapters; the Slice E plan text asked for the bundle to be built "from existing filesystem/template/app-root ports plus the Fresh manifest adapter". The application layer itself stays `Deno.*`-free, and the path is exercised end-to-end by the command-tree integration test, so this is not blocking. | file:line above; `run-deno-check` clean; `public-command-tree_test.ts` dry-run cases | Follow-up (Slice G or a debt entry): move the stager and procedure probe under `kernel/adapters/scaffold/` behind the existing `FileSystemPort`/`ProcessPort`, and give the regex-based service-name extraction a focused unit test. |
+| low (L-1) | The "golden equivalence" test builds the command-side plan by hand (`planResourceSlice(normalizeResourceSliceInput({…}))`) rather than invoking `generateResource`; both sides share one code path, so it proves preset identity, not end-to-end command output. The production dry-run rerun in `public-command-tree_test.ts` closes the gap indirectly (a divergent leaf would be a conflict). | `write-app-files_test.ts` (equivalence test); `public-command-tree_test.ts` (`users … --form --partial --dry-run`) | Optional: assert the rerun's JSON result (`status`, `conflicts: []`, all leaves `skip`) to make the byte-identity explicit instead of inferred from "did not throw". |
+| low (L-2) | Fresh-derivation ordering is proven by string-index inspection of `write-app-files.ts` source, and derivation is skipped under `options.dryRun`, so an init `--dry-run` report omits `.generated/manifest.ts`/`routes.ts` that a real run produces. | `write-app-files.ts` `if (!options.dryRun) { writeFreshRouteManifestSync(appDir) … }`; `write-app-files_test.ts` "Fresh derivation follows route emission" | Optional: a behavioural order test (record write order through the injected `write`) and a dry-run note in the init report or docs (Slice G). |
+| low (L-3) | Cosmetic reflow noise: many untouched statements in `write-app-files.ts` and `public-command-dependencies.ts` were re-wrapped to ~80 columns although root `fmt.lineWidth` is 100 (both forms pass `deno fmt --check`). Inflates the diff and obscures the real change. | `git diff be3e3dded 8c27ffe16 -- …/write-app-files.ts` (e.g. `allocateScaffoldDefaultPort(` split) | None required; note for the reviewer. Avoid non-root formatter settings in future slices. |
+| low (L-4) | Slice E LOW-2 remains open: pre-apply failures in `generate-resource.ts` and the new composition resolvers throw plain `Error`, not `CliExitError`. Deferral is explicit and reasoned (outside F's file set). | `generate-resource.ts:119,162,219,230`; `public-command-dependencies.ts:253,486,494,523,540` | Carry into Slice G's scope or open a follow-up issue so it is not lost at merge. |
+| low (L-5) | Full-package suite shows 2 sandbox-only failures (`noexec` `/ephemeral/tmp`). Not attributable to the diff. | see Gates row | None for the author; the merge coordinator should not read the raw exit 1 as a regression. |
 
-## Arch-debt delta
+## Anti-Pattern / Doctrine Check
 
-None owed. `arch:check` FAIL=0 on every root; `quality:gate` exit 0 with only pre-existing
-allowances; no new `deno-lint-ignore`, no new `as unknown as` in the slice diff (the one
-`quality-allow` cast in `public-command-dependencies.ts` predates this slice and carries its #1276
-annotation); no retire-set debt concealed.
+- Application layer (`kernel/application/resource-slice/**`, `scaffold/writers/**`) remains free of `Deno.*` (grep clean); IO added only in the composition root (M-2) and the existing Fresh adapter.
+- No second canonical template authority survives: the neutral `resource-slice/` family is the sole source for both callers (D4 satisfied).
+- No new port, abstract, or registry introduced; R-BASE-L2 not triggered.
+- `arch:check` census unchanged (`FAIL=0`); `quality:gate` clean; JSR publish dry-run clean → no new debt entry owed. No `FAIL_DEBT` condition.
 
 ## Verdict
 
-| Field | Value |
-| --- | --- |
-| Verdict | **`PASS`** |
-| Rationale | The amended locked Slice F contract is implemented completely and provably: the 18-template retire-set plus manifest/carrier/support keys and the manual route seed are gone with no surviving consumer; init emits exactly the planner's `form + partial` preset with formatted, hash-valid ownership markers; init and the production-composed command render byte-identical output for **all** canonical roles, proven both by role-map equality and by a conflict-free exact-preset dry-run of the real command against real init output; Fresh manifest/routes derivation follows all route emission with no seed remaining; `generate resource` is registered fourth with exact help and child-order assertions through the production dependency graph; item 33's five conventions are re-pointed or dropped exactly as amended with `assertAppConventionsResolve` green; Slice E LOW-1 is absorbed and LOW-2 validly deferred; `deno.lock` and `service-query.ts.template` are byte-untouched. Every load-bearing gate was independently re-run in this session and reproduced green (focused 32/32, src suite 1316/1316, all four carrier/publish/sample/corpus checks, `arch:check`, `quality:gate`); the only full-suite failures are environment-caused browser-probe spawns in files this slice does not touch. The four LOW findings are accounting/hygiene items that do not change behavior, scope, or doctrine standing. |
-| Blocking findings | **None.** |
-| Next step | Supervisor commits/pushes this evaluation and posts the IMPL-EVAL phase comment on PR #1956; Slice G proceeds (guidance wording — including the LOW-4 stale copy — and hosted `scaffold.runtime` acceptance); the final #1354 acceptance matrix should carry the LOW-1 path-accounting correction. |
+**PASS_IMPL_WITH_FINDINGS**
+
+Scope is complete against the amended Slice F: the 18-template retire set, manifest and carrier keys, the manual route seed and item 33 are all gone with no surviving importer; init emits exactly the planner's `core+form+partial` preset through the same renderer/formatter as the command; Fresh derives the manifest after route emission; `generate resource` is registered fourth with production-composed dependencies and a still fail-closed `--client` seam; every required gate passes with exit 0 in this session (the two full-suite failures are proven environmental), the MCP corpus is fresh, and `unboundName=116`. The two medium findings are bookkeeping (unrecorded absorption of Slice E item 6) and a layering nit that is functionally covered by integration tests; neither blocks merge. M-1 should be fixed in the run artifacts before `status:ready-merge`; M-2 and L-4 need a recorded owner (Slice G or follow-up issue).
