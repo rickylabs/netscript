@@ -76,4 +76,4 @@ CI must supply the browser receipt before #1557 can be claimed complete.
 ## Commits
 
 - Plan: `1e54fa598b7a58d9a2155d2fb162653c646d25bf`.
-- Implementation: pending final scoped commit/push receipt.
+- Implementation: `e912c414d2da72711e36bbb5daa1d933c3c19d8b`.

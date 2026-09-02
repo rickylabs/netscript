@@ -131,7 +131,7 @@ requires hydration/client navigation.
 | Slice | Commit | Remote receipt |
 | --- | --- | --- |
 | Plan | `1e54fa598b7a58d9a2155d2fb162653c646d25bf` | Explicit refspec pushed to `origin/test/fresh-client-bundle-capability`; PR #1940 opened non-draft. |
-| Implementation | pending | Record the final head SHA immediately after the scoped commit/push. |
+| Implementation | `e912c414d2da72711e36bbb5daa1d933c3c19d8b` | Head SHA after RED/GREEN and all local gates; explicit-refspec push receipt follows in the PR lifecycle record. |
 
 ## Reconcile Notes
 
