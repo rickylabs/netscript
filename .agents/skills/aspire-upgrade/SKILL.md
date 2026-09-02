@@ -38,7 +38,7 @@ example; every rule below was paid for there.
 
 ## Key Concepts
 
-### The pin map — every place the version literal lives
+### The pin map — where the version literal lives
 
 | Surface                      | File(s)                                                                                                                                                                                     | What it pins                                                                                                                |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -46,13 +46,14 @@ example; every rule below was paid for there.
 | Generated integrations       | `packages/cli/src/kernel/constants/scaffold/scaffold-aspire.ts` (`SCAFFOLD_ASPIRE_INTEGRATIONS.*.VERSION`)                                                                                  | `Aspire.Hosting.{PostgreSQL,MySql,SqlServer,Redis,Garnet,Browsers}` + `CommunityToolkit.Aspire.Hosting.Deno` NuGet versions |
 | Host toolchain (external)    | `<project-root>/.mise.toml` (`aspire = "…"`) — **not tracked** in the repo; each host (NAS/WSL) pins its own CLI beside the checkout                                                        | The CLI every local agent runs; keep it equal to the CI pin by hand                                                         |
 | CI toolchain                 | `.github/workflows/e2e-cli.yml`, `e2e-cli-prod.yml`, `e2e-cli-prod-local.yml` (`dotnet tool install Aspire.Cli --version …`, NuGet cache key `nuget-aspire-*-<ver>-v1`, the `13.5.*` guard) | The CLI the runtime tiers run                                                                                               |
+| CI toolchain policy          | `.github/toolchain.env` (Aspire CLI/SDK pins) + `.github/scripts/aspire-nuget-cache-policy.test.ts` (cache-key version literal) — both enforced by the parity gate                          |                                                                                                                             |
 | Parity gate                  | `.llm/tools/validation/check-aspire-version-parity.ts` (`PHASE_TWO_COMPAT_VERSION`) + `.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv`                          | The expected version and the 900+ path manifest with per-path owner and disposition                                         |
 | Recorded surfaces (fixtures) | see "Fixtures that must be re-recorded"                                                                                                                                                     | CLI/MCP/dashboard output shapes at the pinned version                                                                       |
 | Prose                        | `skills/aspire/SKILL.md`, `.agents/skills/aspire/SKILL.md`, docs site `reference/aspire`, `explanation/aspire`, `quickstart/aspire`                                                         | Version-tagged evidence keys (S2-Vn, S9-…) and literal version mentions                                                     |
 
 There is **no single source of truth** today: the product pins (first two rows) are legitimately in
 `packages/cli`, but the workflow and parity literals are hand-duplicated and the host `mise` pin
-lives outside the repository entirely. A patch bump is therefore a sweep of ~6 files, not one edit.
+lives outside the repository entirely. A patch bump is therefore a sweep of ~8 files, not one edit.
 Until `aspire:bump` tooling exists (see Pitfalls), the sweep is the procedure and
 `git grep -n '<old-version>'` over the whole tree is the completeness check.
 
@@ -69,13 +70,13 @@ Decide the class from the **upstream what's-new page**, not from the semver digi
 
 ### Fixtures that must be re-recorded on a minor bump
 
-| Fixture                                                                                                                         | Records                                                         | Re-record with                                                  |
-| ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| `packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-<ver>.json`                                                    | `aspire doctor --format Json` shape                             | the new CLI on a clean host                                     |
-| `packages/cli/e2e/tests/application/gates/fixtures/aspire-<ver>-describe-postgres.json`, `aspire-describe-follow-<ver>*.ndjson` | `describe --follow` stream incl. `healthReports`                | one leased AppHost start, captured through `describe-follow.ts` |
-| `packages/cli/e2e/tests/fixtures/aspire-<ver>-mcp-recorded.json`                                                                | the Aspire MCP tool list (14 tools + `refresh_tools` at 13.5.3) | an AppHost-less stdio MCP session (`aspire mcp start`)          |
-| `packages/mcp/tests/fixtures/telemetry/aspire-<ver>-fixture.ts` (+ README)                                                      | dashboard telemetry API span/trace/log JSON                     | a leased AppHost with OTLP traffic; procedure in that README    |
-| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-<ver>.json`, `process-tree-<ver>-*.json`                                    | `aspire ps` + process tree for ownership probes                 | the leased start above                                          |
+| Fixture                                                                                                                         | Records                                                             | Re-record with                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-<ver>.json`                                                    | `aspire doctor --format Json` shape                                 | the new CLI on a clean host                                     |
+| `packages/cli/e2e/tests/application/gates/fixtures/aspire-<ver>-describe-postgres.json`, `aspire-describe-follow-<ver>*.ndjson` | `describe --follow` stream incl. `healthReports`                    | one leased AppHost start, captured through `describe-follow.ts` |
+| `packages/cli/e2e/tests/fixtures/aspire-<ver>-mcp-recorded.json`                                                                | the Aspire MCP tool list (14 tools incl. `refresh_tools` at 13.5.3) | an AppHost-less stdio MCP session (`aspire mcp start`)          |
+| `packages/mcp/tests/fixtures/telemetry/aspire-<ver>-fixture.ts` (+ README)                                                      | dashboard telemetry API span/trace/log JSON                         | a leased AppHost with OTLP traffic; procedure in that README    |
+| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-<ver>.json`, `process-tree-<ver>-*.json`                                    | `aspire ps` + process tree for ownership probes                     | the leased start above                                          |
 
 Keep the previous version's fixture beside the new one where a test asserts a compat branch
 (`aspire-13.4.6-fixture.ts` stays next to `aspire-13.5.3-fixture.ts`); retire it only when the
@@ -86,8 +87,9 @@ compat branch is deleted.
 Two skill trees exist and only one is a carrier input. `.agents/skills/` is the authoritative
 **agent** source (read directly; `.claude/skills/repo-skills` is the single Claude bridge, no
 mirrors). The **consumer** bundle shipped in the CLI comes from the top-level `skills/` tree
-(`skills/manifest.json`): `skills/` prose -> `gen:mcp-export-corpus` -> `gen:assets-barrel`
-(`embedded.generated.ts`, `skills.generated.ts`) -> `check:publish-assets`. Editing
+(`skills/manifest.json`): `skills/` prose -> `gen:assets-barrel` (`embedded.generated.ts`,
+`skills.generated.ts`) -> `gen:publish-assets` -> `check:publish-assets`. `gen:mcp-export-corpus`
+reads only `packages/`/`plugins/` doc surfaces and is not part of this chain. Editing
 `.agents/skills/**` regenerates nothing; editing `skills/**` must be followed by the chain. A
 `docs/site/**` page edit starts one hop earlier: `gen:agent-docs-prose` (site build ->
 `prose.json.gz` + `provenance.json`) -> barrel (`agent-docs.generated.ts`) -> `gen:publish-assets`
@@ -158,16 +160,16 @@ exact-head dual-green, and keep the head immutable once it is green.
 
 ## Reference Files
 
-| File                                                                                  | Load when                                                            |
-| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `.llm/runs/research-aspire-13.5-adoption--0.0.7/research.md`                          | Building the capability matrix for a minor/major                     |
-| `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md`                              | Slicing an adoption epic (S1–S13 DAG, canary points, rollback)       |
-| `.llm/runs/research-aspire-13.5-adoption--0.0.7/drift.md`                             | Checking whether a surprise was already met and ruled on (D-1…D-330) |
-| `.llm/tools/validation/check-aspire-version-parity.ts`                                | Parity gate red, or changing the expected version                    |
-| `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts` | Re-recording `describe --follow` fixtures                            |
-| `packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api.ts`             | Reading telemetry through the secured dashboard API                  |
-| `packages/mcp/tests/fixtures/telemetry/README.md`                                     | Re-recording the dashboard telemetry fixture                         |
-| `skills/aspire/SKILL.md`                                                              | Re-verifying the version-tagged evidence keys                        |
+| File                                                                                                                              | Load when                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `.llm/runs/research-aspire-13.5-adoption--0.0.7/research.md` (run evidence on branch `research/aspire-13.5-0.0.7`; not on `main`) | Building the capability matrix for a minor/major                     |
+| `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md` (run evidence on branch `research/aspire-13.5-0.0.7`; not on `main`)     | Slicing an adoption epic (S1–S13 DAG, canary points, rollback)       |
+| `.llm/runs/research-aspire-13.5-adoption--0.0.7/drift.md` (run evidence on branch `research/aspire-13.5-0.0.7`; not on `main`)    | Checking whether a surprise was already met and ruled on (D-1…D-330) |
+| `.llm/tools/validation/check-aspire-version-parity.ts`                                                                            | Parity gate red, or changing the expected version                    |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts`                                             | Re-recording `describe --follow` fixtures                            |
+| `packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api.ts`                                                         | Reading telemetry through the secured dashboard API                  |
+| `packages/mcp/tests/fixtures/telemetry/README.md`                                                                                 | Re-recording the dashboard telemetry fixture                         |
+| `skills/aspire/SKILL.md`                                                                                                          | Re-verifying the version-tagged evidence keys                        |
 
 ## Checklist
 
