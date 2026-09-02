@@ -840,3 +840,16 @@ the merge.**
   lane: #1909/#1906/#1844.
 - **Release readiness:** nothing Aspire-owned blocks Canary 6; #1951 is Internals'. #1952 is
   additive gate code and can ride the next canary either side of the cut.
+
+### 2026-09-02T21:00Z — #1953 audit repair; IMPL-EVAL dispatched
+
+- Coordinator audit of #1953 found two factual defects. Verified and repaired in `c231fbe5e`:
+  (1) `.mise.toml` is untracked (`git ls-files .mise.toml` empty; the pin is the external
+  `<project-root>/.mise.toml`, per host) — pin-map row and sweep step corrected; (2) the consumer
+  bundle is generated from top-level `skills/` via `skills/manifest.json`
+  (`generate-cli-assets-barrel.ts:40,226`), while `.agents/skills/` is agent source with the one
+  `.claude/skills/repo-skills` bridge — carrier-chain section now states both trees. PR body gained an
+  explicit DoD (paths resolve; README row; no carriers touched; exact-head CI; separate-session eval).
+- `status:impl` → `status:impl-eval`; the phase-eval workflow posted its own trigger for head
+  `c231fbe5e` (run 33682027704). Monitor `bget0w5o7` covers CI conclusions + verdict comment.
+- #1952 monitor `bq678n5dv` still armed on `1d09636aa` runtime tiers.
