@@ -1,0 +1,53 @@
+import { firstFieldError, type RuntimeFormState } from '@netscript/fresh/form';
+import {
+  Button,
+  Card,
+  FormField,
+  getInputProps,
+  Input,
+  InlineNotice,
+} from '@app/components/ui/mod.ts';
+import type { {{resourcePascalCase}}FormValues } from '../(_lib)/{{resource}}-form.ts';
+
+export function {{resourcePascalCase}}Form(
+  state: RuntimeFormState<{{resourcePascalCase}}FormValues>,
+) {
+  const noteError = firstFieldError(state.fieldErrors, 'note');
+
+  return (
+    <section id='{{resource}}-form'>
+      <Card>
+        <Card.Header>
+          <Card.Title>Update {{resource}}</Card.Title>
+          <Card.Description>Server-validated input with app-owned controls.</Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <form {...state.formProps} f-client-nav>
+            <input {...state.csrfInputProps} />
+            <div class='grid gap-4'>
+              <FormField
+                label='Note'
+                name={state.fields.note.id}
+                required
+                error={noteError}
+              >
+                <Input
+                  {...getInputProps(state.fields.note, { type: 'text' })}
+                  error={Boolean(noteError)}
+                />
+              </FormField>
+              {state.hasErrors
+                ? (
+                  <InlineNotice variant='destructive' title='Check the form' role='alert'>
+                    Correct the validation error before submitting again.
+                  </InlineNotice>
+                )
+                : null}
+              <Button type='submit'>Save note</Button>
+            </div>
+          </form>
+        </Card.Body>
+      </Card>
+    </section>
+  );
+}

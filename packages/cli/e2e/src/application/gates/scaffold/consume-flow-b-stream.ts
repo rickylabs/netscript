@@ -15,6 +15,10 @@ import {
   type SpanExporter,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { createTelemetryProvider, type SdkLoader } from '@netscript/telemetry/otel';
+import {
+  createLiveAspireTelemetryQuery,
+  findJobExecuteIdentity,
+} from './aspire-dashboard-telemetry.ts';
 import { runDocumentedStreamExample } from './run-documented-stream-example.ts';
 import {
   type FlowBProducerIdentity,
@@ -22,6 +26,7 @@ import {
   streamChangeCorrelationId,
 } from './select-flow-b-stream-change.ts';
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
+import { resolveOtlpHeadersFromResource } from './otlp-headers.ts';
 
 const FLOW_B_SELECTION_MAX_BATCHES = 40;
 const FLOW_B_SELECTION_TIMEOUT_MS = 20_000;
@@ -44,15 +49,30 @@ const endpoints = [...logText.matchAll(/OTLP\/HTTP:\s+(https?:\/\/\S+)/g)];
 const endpoint = endpoints.at(-1)?.[1];
 if (!endpoint) throw new Error('Aspire OTLP/HTTP endpoint was not found');
 
+// The consumer's own exporting tracer provider, captured by `createFlowBSdkLoader` during
+// `provider.register()` below. Must be declared before that top-level await executes.
+let flowBTracerProvider: BasicTracerProvider | undefined;
+
+// The dashboard runs with anonymous access disabled (the MCP smoke needs the dashboard API
+// key), so its OTLP receiver rejects unauthenticated exports with HTTP 401 — exactly what the
+// hosted `c6ec50214` run reported. The AppHost hands every resource the ingest key as
+// `OTEL_EXPORTER_OTLP_HEADERS=x-otlp-api-key=…`; the consumer is not a resource, so it borrows
+// the key from the process the AppHost started for the `streams` resource it consumes from.
+const otlpHeaders = await resolveOtlpHeadersFromResource(
+  projectRoot,
+  'streams',
+  'flow-b-stream-consumer',
+);
+
 const provider = createTelemetryProvider({
   providerId: 'otel-sdk',
   options: { endpoint, serviceName: 'flow-b-stream-consumer' },
-  loadSdk: createFlowBSdkLoader(endpoint),
+  loadSdk: createFlowBSdkLoader(endpoint, otlpHeaders),
 });
 await provider.register();
 
 try {
-  const flowBProducer = await readJobExecuteIdentity(metadata.dashboardUrl);
+  const flowBProducer = await readJobExecuteIdentity(projectRoot);
   const streamBaseUrl = firstResourceUrl(
     await resolveResourceUrlsFromAppHost(appHost, 'streams'),
     'streams',
@@ -133,7 +153,16 @@ try {
     throw new Error('malformed control changed the last committed offset');
   }
   const documentedReceipt = await runDocumentedStreamExample(new URL(streamUrl).origin);
-  const span = createStreamsInstrumentation().startSubscribeSpan({
+  // Pass an explicitly-resolved tracer rather than letting the instrumentation call
+  // `@netscript/telemetry`'s `getTracer`. That helper memoises tracers in a module-level cache
+  // keyed by name@version, and `trace.getTracer()` binds to whichever provider is registered at
+  // the FIRST call — so a tracer resolved before this consumer registered its provider is a
+  // no-op, and every later call returns that cached no-op. The span was created and ended
+  // against it, exported nothing, and raised no error, which is why TC-14 saw no
+  // `stream.subscribe` span while this gate itself passed.
+  const span = createStreamsInstrumentation({
+    tracer: flowBConsumerTracer(),
+  }).startSubscribeSpan({
     streamPath: '/workers/executions',
     collection: 'execution',
     operation: 'fan-in',
@@ -157,57 +186,37 @@ function firstResourceUrl(urls: readonly string[], resourceName: string): string
   return url;
 }
 
-async function readJobExecuteIdentity(dashboardUrl: unknown): Promise<FlowBProducerIdentity> {
-  if (typeof dashboardUrl !== 'string') {
-    throw new Error('Aspire start metadata did not contain dashboardUrl');
-  }
-  const tracesUrl = new URL('/api/telemetry/traces', dashboardUrl);
+async function readJobExecuteIdentity(projectRoot: string): Promise<FlowBProducerIdentity> {
+  const query = await createLiveAspireTelemetryQuery(projectRoot);
+  const fixtureCorrelationId = await readFlowBCorrelationFixture(projectRoot);
   for (let attempt = 1; attempt <= 20; attempt++) {
-    const response = await fetch(tracesUrl);
-    if (!response.ok) throw new Error(`Dashboard traces read failed: HTTP ${response.status}`);
-    const identity = findJobExecuteIdentity(await response.json());
+    const identity = findJobExecuteIdentity(
+      await query.queryTraces({ serviceName: 'workers', limit: 500 }),
+      fixtureCorrelationId,
+    );
     if (identity) return identity;
     if (attempt < 20) await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  throw new Error('Flow-B job.execute telemetry did not expose correlation and trace identities');
+  throw new Error(
+    `Flow-B job.execute telemetry did not expose correlation and trace identities${
+      fixtureCorrelationId ? ` for fixture correlation ${fixtureCorrelationId}` : ''
+    }`,
+  );
 }
 
-function findJobExecuteIdentity(value: unknown): FlowBProducerIdentity | undefined {
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findJobExecuteIdentity(item);
-      if (found) return found;
-    }
+/**
+ * The `behavior.otel.webhook` gate records the correlation of the Flow-B run under test; earlier
+ * webhook gates leave older `flow-b-callback` executions in the dashboard, so the consumer must
+ * anchor on this fixture rather than on dashboard ordering. Absent fixture → legacy first-match.
+ */
+async function readFlowBCorrelationFixture(projectRoot: string): Promise<string | undefined> {
+  try {
+    const value = (await Deno.readTextFile(`${projectRoot}/.netscript/e2e/flow-b-correlation-id`))
+      .trim();
+    return value || undefined;
+  } catch {
     return undefined;
   }
-  if (!isRecord(value)) return undefined;
-  if (value.name === 'job.execute' && Array.isArray(value.attributes)) {
-    const attributes = value.attributes;
-    const jobId = attributeString(attributes, ['netscript.job.id', 'job.id']);
-    const correlationId = attributeString(attributes, ['netscript.correlation.id']);
-    if (jobId === 'flow-b-callback' && correlationId && typeof value.traceId === 'string') {
-      return { correlationId, traceId: value.traceId };
-    }
-  }
-  for (const child of Object.values(value)) {
-    const found = findJobExecuteIdentity(child);
-    if (found) return found;
-  }
-  return undefined;
-}
-
-function attributeString(
-  attributes: readonly unknown[],
-  keys: readonly string[],
-): string | undefined {
-  for (const attribute of attributes) {
-    if (
-      !isRecord(attribute) || !keys.includes(String(attribute.key)) ||
-      !isRecord(attribute.value)
-    ) continue;
-    if (typeof attribute.value.stringValue === 'string') return attribute.value.stringValue;
-  }
-  return undefined;
 }
 
 interface NamedStreamReceipt {
@@ -293,11 +302,34 @@ function randomHex(byteLength: number): string {
     .join('');
 }
 
-function createFlowBSdkLoader(endpoint: string): SdkLoader {
+/**
+ * The consumer's own provider, kept addressable.
+ *
+ * `trace.setGlobalTracerProvider` is a **no-op when a provider is already registered** — OTEL
+ * returns false rather than replacing it. Relying on the global therefore silently hands back
+ * someone else's tracer, or a no-op: the span records nothing, `SimpleSpanProcessor` exports
+ * nothing, and no error is raised anywhere. That is exactly what TC-14 kept observing as "no real
+ * streams consumer span exists". Taking the tracer from this instance removes the dependency on
+ * winning the global-registration race.
+ */
+// Declared near the top of the module (before `provider.register()` runs) so the loader's
+// assignment is not a temporal-dead-zone access; see the doc comment on `flowBConsumerTracer`.
+
+/** Tracer guaranteed to belong to the consumer's own exporting provider. */
+function flowBConsumerTracer() {
+  if (!flowBTracerProvider) throw new Error('Flow-B tracer provider was not created');
+  return flowBTracerProvider.getTracer('netscript.streams');
+}
+
+function createFlowBSdkLoader(
+  endpoint: string,
+  headers: Readonly<Record<string, string>>,
+): SdkLoader {
   return () => {
-    const exporter = createOtlpJsonSpanExporter(endpoint);
+    const exporter = createOtlpJsonSpanExporter(endpoint, headers);
     const processor = new SimpleSpanProcessor(exporter);
     const tracerProvider = new BasicTracerProvider({ spanProcessors: [processor] });
+    flowBTracerProvider = tracerProvider;
     return Promise.resolve({
       tracerProvider: {
         register: () => {
@@ -314,7 +346,10 @@ function createFlowBSdkLoader(endpoint: string): SdkLoader {
   };
 }
 
-function createOtlpJsonSpanExporter(endpoint: string): SpanExporter {
+function createOtlpJsonSpanExporter(
+  endpoint: string,
+  headers: Readonly<Record<string, string>>,
+): SpanExporter {
   const normalizedEndpoint = endpoint.replace(/\/$/, '');
   return {
     export(spans: ReadableSpan[], resultCallback: (result: { code: number }) => void): void {
@@ -331,10 +366,28 @@ function createOtlpJsonSpanExporter(endpoint: string): SpanExporter {
       };
       fetch(`${normalizedEndpoint}/v1/traces`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'content-type': 'application/json', ...headers },
         body: JSON.stringify(body),
-      }).then((response) => resultCallback({ code: response.ok ? 0 : 1 }))
-        .catch(() => resultCallback({ code: 1 }));
+      }).then((response) => {
+        // A rejected export used to be swallowed here: the callback reported failure and nothing
+        // read it, so the consumer gate passed while its spans never reached the dashboard. TC-14
+        // then failed far downstream with "no real streams consumer span exists" — the symptom at
+        // the read end of a problem that happened at the write end. Surface it where it happens.
+        if (!response.ok) {
+          console.error(
+            `flow-b-stream-consumer OTLP export rejected: HTTP ${response.status} from ` +
+              `${normalizedEndpoint}/v1/traces - spans will be absent from every later query`,
+          );
+        }
+        resultCallback({ code: response.ok ? 0 : 1 });
+      }).catch((error: unknown) => {
+        console.error(
+          `flow-b-stream-consumer OTLP export failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+        resultCallback({ code: 1 });
+      });
     },
     shutdown: () => Promise.resolve(),
   };
