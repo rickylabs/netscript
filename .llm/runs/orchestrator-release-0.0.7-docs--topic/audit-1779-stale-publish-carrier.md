@@ -178,3 +178,11 @@ heading and exclude the `|` form.
 - #1856 rebased to `bce209422`: behind 0, no conflict, all four carriers zero-diff.
 - GraphQL rate limit exhausted for the shared account at ~20:39 (REST unaffected); the PR-set
   monitor emitted one empty snapshot and re-syncs on reset.
+
+## #1949 merged — 2026-09-02
+
+- Coordinator merged #1949 at head `5c0d6c582` → `main` `9a191bdda`; #1947 auto-closed via `Closes`.
+- Docs queue for 0.0.7 is empty again. Post-merge tracking continues: any user-visible PR that
+  lands before the stable cut gets a small follow-up changelog PR from `origin/main`
+  (staged bullet for #1856 is in the supervisor scratchpad; #1664/#1950–#1953 to be swept at
+  ready-merge).
