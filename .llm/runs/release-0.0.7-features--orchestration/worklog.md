@@ -10314,3 +10314,53 @@ action that removed `status:impl`, and no `Phase eval PR #1931` run exists. Cycl
 (remove, pause, re-add) and armed a watch for the dispatcher. This is the same class as #1891's
 four lost attempts — the trigger is a *label event*, and a label applied as part of a bulk edit does
 not reliably produce one.
+
+---
+
+## ~15:00Z — #1842 exact-green 11/11; #1664 reduced to a single foreign red
+
+`main` → `c099ad982`. **#1936 and #1842 are both `MERGEABLE/CLEAN`** against it — no rebase needed.
+
+### #1842 — 11/11, no caveat
+
+Both runtime tiers pass at `96f777f5a`, including the postgres tier that failed on two earlier runs.
+That is the **fourth** data point on the Aspire readiness baseline being nondeterministic (with
+#1895's tier going green → red → green at one unchanged head). The head also carries the corpus
+regeneration that #1929 now makes mandatory, so this green is against the **current** gate set.
+
+### #1664 — every branch-owned gate green; one red left and it is #1845
+
+`quality` is now **exit 0 at `type_errors=32`**, matching main's baseline exactly, by binding the
+names in the fence rather than widening the ratchet.
+
+**My first attribution of that fence was wrong and the lane caught it.** I named
+`packages/cli/README.md` and told the lane `packages/fresh/README.md` was main's baseline; commit
+`1df8a5274` on *this branch* added the Fresh README section, a pure `+21` addition. My touch-set read
+had been truncated at 30 lines on a 160-file branch. The lane refused the contradictory constraint
+and asked rather than forcing a fix into someone else's file — that refusal is what caught it, and
+it is worth valuing over compliance.
+
+Runtime state at `5bc900d80` is now unusually clean:
+
+| Tier | Result | Failing gate |
+| --- | --- | --- |
+| postgres | `passed=72 failed=1` | `behavior.service-client-refetch` |
+| sqlite | `passed=66 failed=1` | `behavior.service-client-refetch` |
+
+**The Aspire readiness timeouts did not occur at all in this run**, so #1844/#1880 no longer appear
+on this PR and the two failure classes are cleanly separated. The single remaining red is the one the
+ruling says cannot be waived by label.
+
+New evidence for #1845, posted there: **two tiers with different databases and different cache
+backends produce the identical failure.** That is inconsistent with anything Aspire-, database- or
+cache-conditioned, and consistent with the generated app's island registration path — which, combined
+with the framework fixture hydrating correctly on the same head, narrows the search space to
+*between the CLI scaffold's emitted island and the generated app that hosts it*, independent of
+backing services.
+
+### Ready to merge
+
+| PR | Head | State |
+| --- | --- | --- |
+| **#1936** | `005c22fd6` | 6/6, `MERGEABLE/CLEAN`, closes #1349 (mirror applied, 10/10 boxes) |
+| **#1842** | `96f777f5a` | 11/11, `MERGEABLE/CLEAN`, leaves #1452 open |
