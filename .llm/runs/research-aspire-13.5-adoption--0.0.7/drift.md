@@ -8005,3 +8005,46 @@ The `workflow` scope was granted on the OAuth token, but `GH_TOKEN` takes preced
 particular, since S9 authors workflow content and cannot adopt the fix without it. **Not routed
 around**: selecting the other credential to bypass a refusal would be the same boundary-laundering I
 declined to do on internals' behalf earlier. Surfaced as a configuration finding instead.
+
+## D-309 — the `workflow` scope grant is confirmed inert in THIS session, and it blocks S9's restack
+
+Internals compared credential setups directly and the difference is environmental, not a
+misdiagnosis on either side:
+
+| | this session | internals |
+| --- | --- | --- |
+| `GH_TOKEN` | set, scopes `repo` — **takes precedence** | not set |
+| OAuth token | `gist, read:org, repo, workflow` — shadowed | effective |
+| push touching `.github/workflows/**` | refused | succeeded (#1910) |
+
+So the owner's grant landed on the OAuth token and is real, but a `repo`-only `GH_TOKEN` shadows it
+here. **"The scope was granted" and "the scope is in effect" are different claims, and only the second
+one matters.** Concretely this blocks assignment (C): S9 authors its own workflow content
+(`agent.aspire-mcp-smoke` receipt upload paths), so its restack merges a workflow blob that exists on
+no remote, and that push needs `workflow`. Whoever restacks S9 needs the `GH_TOKEN` shadow removed or
+a credential carrying `workflow`.
+
+Deliberately not routed around by selecting the other credential. That would be the same
+boundary-laundering I declined on internals' behalf, and — the part worth recording — it would have
+**hidden a real configuration defect** that now gets fixed once instead of being worked around twice.
+
+## D-310 — #1908 box 1 resolved without S9; the v1 window closes with #1910
+
+Internals obtained a stronger result than the directional demonstration they wanted from S9:
+
+    1889 (v1 keys)  scaffold-runtime-sqlite  06:16:47Z -> 06:23:23Z  success
+    1910 (v2 keys)  scaffold-runtime-sqlite  06:22:56Z -> running
+
+**27 seconds of genuine simultaneous execution in the same tier.** Under a shared repo-wide mutex that
+is impossible — one running per group is the entire mechanism — so simultaneity *proves* the groups
+are disjoint, and disjointness is symmetric: neither generation can evict the other in either
+direction. That subsumes box 1's directional wording rather than satisfying its literal phrasing, and
+internals is presenting it as exactly that rather than quietly claiming the literal text.
+
+The S9 timer argument (D-308) is what made this the right call: waiting for a directional
+demonstration that cannot exist would have held #1910 indefinitely.
+
+Lane consequence: nothing further is wanted from Aspire on the concurrency work. Once #1910 merges the
+transition ends — every branch cut after it carries v2 keys and the temporary doubling window closes.
+S9 stops being a hazard the moment it is restacked, independently of #1910, because merging current
+main gives it `queue: max`.
