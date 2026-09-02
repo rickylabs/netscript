@@ -10806,3 +10806,13 @@ passed on canary.5's prod run 08-31 (91/0) → the known Postgres health-probe f
 #1880 (aspire p1) with fix PR #1952 in flight. Reported to #1641 with owner and release-control
 consequences (no green pair; one publish-budget slot consumed; republish-vs-canary.7 is the
 captain's call). No release ref mutated; not dispatched by internals; IMPL-EVAL on #1952 offered.
+
+### D-257 — #1952 (aspire) converge map posted; one semantic conflict with #1909 on the very gate canary.6 failed
+
+#1952 sits DIRTY against `main` `73890c819`. `merge-tree` (git protocol, no API): four generated
+artifacts (agent-docs prose/provenance, agent-docs barrel, publish-assets) — regenerate, never
+hand-merge — and one real source conflict in `listener-unreachable-fixture.ts` with #1909
+(`308d99c78`), merged after the branch was cut. That fixture backs
+`runtime.health.listener-unreachable`, the gate that failed canary.6's prod E2E, so the semantic
+merge of #1909 + #1952 is what the next canary exercises. Posted read-only on #1952; aspire owns
+the converge; IMPL-EVAL offered on request.
