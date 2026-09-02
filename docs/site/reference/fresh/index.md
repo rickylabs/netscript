@@ -411,7 +411,7 @@ Managed forms: CSRF, intents, progressive enhancement, pagination, and Standard 
 | `FieldConstraints`             | interface | HTML constraint attributes derived from a schema field.                    |
 | `FieldDescriptor`              | interface | Descriptor for one form field and its generated props.                     |
 | `FieldDescriptorMap`           | typeAlias | Field descriptors keyed by form value path.                                |
-| `FormCollectionStrategy`       | interface | Client/server ownership policy for a collection field.                     |
+| `FormCollectionStrategy`       | typeAlias | Client/server ownership policy for a collection field.                     |
 | `FormCollectionStrategyMode`   | typeAlias | Progressive enhancement strategy for collection fields.                    |
 | `FormContent`                  | typeAlias | Renderable content accepted by form helper components.                     |
 | `FormCsrfInputProps`           | interface | Props for the hidden CSRF token input.                                     |
