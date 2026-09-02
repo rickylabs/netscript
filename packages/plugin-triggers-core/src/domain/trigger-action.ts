@@ -20,7 +20,7 @@ export type EnqueueJobAction<
   TPayload = unknown,
 > = Readonly<{
   kind: 'enqueue-job';
-  job: JobDefinition<TJobId>;
+  job: JobDefinition<TJobId, TPayload>;
   jobId: JobId<TJobId>;
   options: EnqueueJobOptions<TPayload>;
 }>;

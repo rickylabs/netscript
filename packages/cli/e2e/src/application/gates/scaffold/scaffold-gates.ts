@@ -17,10 +17,32 @@ export function createPreflightGates(): readonly GateDefinition[] {
       GATE_PHASE.PREFLIGHT,
       () => ['deno', '--version'],
     ),
-    commandGate(GATE.PREFLIGHT_ASPIRE, 'Aspire CLI is available', GATE_PHASE.PREFLIGHT, () => [
-      'aspire',
-      '--version',
-    ]),
+    commandGate(
+      GATE.PREFLIGHT_ASPIRE,
+      'Aspire CLI doctor is healthy',
+      GATE_PHASE.PREFLIGHT,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run=git,deno',
+        `${context.project.repoRoot}/.llm/tools/gates/run-gate.ts`,
+        '--gate',
+        'cli-e2e-aspire-doctor',
+        '--id',
+        `${context.request.suiteId}:preflight.aspire`,
+        '--output',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/preflight.aspire.receipt.json`,
+        '--cwd',
+        context.project.repoRoot,
+        '--child-report',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/preflight.aspire.json`,
+        '--',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/preflight.aspire.json`,
+      ],
+    ),
   ];
 }
 

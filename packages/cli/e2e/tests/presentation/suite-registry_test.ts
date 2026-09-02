@@ -230,6 +230,18 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
+  const resourceCommandIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_RESOURCE_COMMAND
+  );
+  assertEquals(
+    resourceCommandIndex >
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES),
+    true,
+  );
+  assertEquals(
+    resourceCommandIndex < runtime.gates.findIndex((gate) => gate.id === GATE.CLEANUP_ASPIRE_STOP),
+    true,
+  );
 });
 
 Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () => {
@@ -320,8 +332,13 @@ Deno.test('runtime DB mutations run only after the resident AppHost starts', () 
   }
   const seedIndex = gates.findIndex((gate) => gate.id === GATE.DATABASE_SEED);
   const restartIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB);
+  const secondAllocationIndex = gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND
+  );
+  const refreshIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_DESCRIBE);
   const waitIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES);
-  assertEquals(seedIndex < restartIndex && restartIndex < waitIndex, true);
+  assertEquals(seedIndex < restartIndex && restartIndex < secondAllocationIndex, true);
+  assertEquals(secondAllocationIndex < refreshIndex && refreshIndex < waitIndex, true);
 });
 
 Deno.test('runtime suite omits database resource wait for sqlite', () => {
