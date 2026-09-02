@@ -26,6 +26,9 @@ import {
   streamChangeCorrelationId,
 } from './select-flow-b-stream-change.ts';
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
+import { scanResourceProcesses } from './service-env/process-evidence.ts';
+import { parseOtlpHeaders } from './otlp-headers.ts';
+import { SCAFFOLD_DIRS } from '../../../../../src/kernel/constants/scaffold/scaffold-dirs.ts';
 
 const FLOW_B_SELECTION_MAX_BATCHES = 40;
 const FLOW_B_SELECTION_TIMEOUT_MS = 20_000;
@@ -52,10 +55,17 @@ if (!endpoint) throw new Error('Aspire OTLP/HTTP endpoint was not found');
 // `provider.register()` below. Must be declared before that top-level await executes.
 let flowBTracerProvider: BasicTracerProvider | undefined;
 
+// The dashboard runs with anonymous access disabled (the MCP smoke needs the dashboard API
+// key), so its OTLP receiver rejects unauthenticated exports with HTTP 401 — exactly what the
+// hosted `c6ec50214` run reported. The AppHost hands every resource the ingest key as
+// `OTEL_EXPORTER_OTLP_HEADERS=x-otlp-api-key=…`; the consumer is not a resource, so it borrows
+// the key from the process the AppHost started for the `streams` resource it consumes from.
+const otlpHeaders = await resolveOtlpHeadersFromResource(projectRoot, 'streams');
+
 const provider = createTelemetryProvider({
   providerId: 'otel-sdk',
   options: { endpoint, serviceName: 'flow-b-stream-consumer' },
-  loadSdk: createFlowBSdkLoader(endpoint),
+  loadSdk: createFlowBSdkLoader(endpoint, otlpHeaders),
 });
 await provider.register();
 
@@ -288,9 +298,12 @@ function flowBConsumerTracer() {
   return flowBTracerProvider.getTracer('netscript.streams');
 }
 
-function createFlowBSdkLoader(endpoint: string): SdkLoader {
+function createFlowBSdkLoader(
+  endpoint: string,
+  headers: Readonly<Record<string, string>>,
+): SdkLoader {
   return () => {
-    const exporter = createOtlpJsonSpanExporter(endpoint);
+    const exporter = createOtlpJsonSpanExporter(endpoint, headers);
     const processor = new SimpleSpanProcessor(exporter);
     const tracerProvider = new BasicTracerProvider({ spanProcessors: [processor] });
     flowBTracerProvider = tracerProvider;
@@ -310,7 +323,10 @@ function createFlowBSdkLoader(endpoint: string): SdkLoader {
   };
 }
 
-function createOtlpJsonSpanExporter(endpoint: string): SpanExporter {
+function createOtlpJsonSpanExporter(
+  endpoint: string,
+  headers: Readonly<Record<string, string>>,
+): SpanExporter {
   const normalizedEndpoint = endpoint.replace(/\/$/, '');
   return {
     export(spans: ReadableSpan[], resultCallback: (result: { code: number }) => void): void {
@@ -327,7 +343,7 @@ function createOtlpJsonSpanExporter(endpoint: string): SpanExporter {
       };
       fetch(`${normalizedEndpoint}/v1/traces`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'content-type': 'application/json', ...headers },
         body: JSON.stringify(body),
       }).then((response) => {
         // A rejected export used to be swallowed here: the callback reported failure and nothing
@@ -387,4 +403,39 @@ function toOtlpAttributes(
     else if (typeof value === 'number') result.push({ key, value: { doubleValue: value } });
   }
   return result;
+}
+
+/**
+ * Reads `OTEL_EXPORTER_OTLP_HEADERS` from the environment of the process the AppHost started
+ * for `resourceName`, using the same `/proc`-backed evidence the service-env gate relies on.
+ * Returns no headers when the resource process cannot be found or carries none (anonymous
+ * dashboard mode), so the export attempt itself stays the authority on whether auth was needed.
+ */
+async function resolveOtlpHeadersFromResource(
+  root: string,
+  resourceName: string,
+): Promise<Record<string, string>> {
+  // Services run in `services/<name>`; plugin-backed resources (`generate-register-background`)
+  // default to the project root. Try both rather than guess which one `streams` is.
+  const workdirs = [`${root}/${SCAFFOLD_DIRS.SERVICES}/${resourceName}`, root];
+  const notes: string[] = [];
+  for (const workdir of workdirs) {
+    try {
+      const scan = await scanResourceProcesses(workdir, resourceName);
+      for (const process of scan.processes) {
+        const value = process.environment.get('OTEL_EXPORTER_OTLP_HEADERS');
+        if (value) return parseOtlpHeaders(value);
+      }
+      notes.push(
+        `${workdir}: examined ${scan.diagnostics.examined}, identified ${scan.diagnostics.identified}, none carried OTEL_EXPORTER_OTLP_HEADERS`,
+      );
+    } catch (error: unknown) {
+      notes.push(`${workdir}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  console.error(
+    `flow-b-stream-consumer: no OTLP API key found on the ${resourceName} process ` +
+      `(${notes.join('; ')}); exporting without one`,
+  );
+  return {};
 }
