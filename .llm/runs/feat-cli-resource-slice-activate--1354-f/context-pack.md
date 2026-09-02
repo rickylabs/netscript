@@ -15,9 +15,10 @@
 The integration branch contains #1664, Slice A, and Slice E. The owner amended Slice F after the
 mandated stop found `agent-conventions.ts` as an additional rendered consumer; item 33 and ceiling
 33 govern the run. Implementation and the separate-session Fable evaluation are complete. The
-committed verdict is `PASS_IMPL_WITH_FINDINGS`; closeout is resolving M-1 through corrected **33
-enumerated + 1 absorbed** accounting and M-2 through the canonical doctrine debt registry, then
-converging on the current #1664 branch head without product feature changes.
+committed verdict is `PASS_IMPL_WITH_FINDINGS`; closeout resolved M-1 through corrected **33
+enumerated + 1 absorbed** accounting and M-2 through the canonical doctrine debt registry. The
+branch is converged on #1664 head `31d59a656`, all required post-merge gates pass, and no product
+feature code changed during closeout.
 
 ## Completed
 
@@ -35,12 +36,12 @@ converging on the current #1664 branch head without product feature changes.
 
 ## In Progress
 
-- Final evidence commit/push and PR IMPL-EVAL comment.
+- Final harness evidence commit, push, and PR #1956 body/status update.
 
 ## Next Steps
 
-1. Commit and push the evaluator/run evidence.
-2. Post the structured IMPL-EVAL PASS comment and corrected footprint accounting on PR #1956.
+1. Push the converged head to `feat/cli-resource-slice-activate`.
+2. Update PR #1956 with corrected accounting, debt ownership, and convergence evidence.
 3. Hand off Slice G guidance/hosted acceptance.
 
 ## Key Decisions
@@ -59,6 +60,9 @@ converging on the current #1664 branch head without product feature changes.
 - The absorbed path is `public-command-dependencies.ts`, Slice E's deferred item-6 production
   composition seam. It makes the pre-convergence product diff 33 files but is not part of Slice F's
   enumeration.
+- Post-product package changes are base-derived only: excluding `*.generated.ts`,
+  `8c27ffe16..a042c6e57` is 19 files, 1,548 insertions, and 415 deletions, exactly the 19
+  non-Slice-E paths supplied by #1664's current base.
 
 ## Gates
 
@@ -68,6 +72,11 @@ converging on the current #1664 branch head without product feature changes.
 | Fitness     | pass           | JSR audit, publish dry-run, `arch:check`, and `quality:gate` exit 0.                                                                                                                                                          |
 | Runtime     | N/A            | Slice G owns hosted acceptance.                                                                                                                                                                                               |
 | Consumer    | pass           | focused 32/32; full CLI 1324/1324; all carrier/publish/sample/docs gates pass.                                                                                                                                                |
+
+Post-convergence rerun: CLI check 980 files / 9 batches / 0 diagnostics; full CLI unit suite 1,720
+passed / 0 failed / 0 ignored; all asset/corpus/Aspire checks exit 0; `arch:check` and
+`quality:gate` exit 0; README fences retain 7 expected type errors; JSDoc examples retain
+`unboundName=116`; workspace publish dry-run exits 0.
 
 ## Open Questions
 
@@ -87,3 +96,6 @@ converging on the current #1664 branch head without product feature changes.
 - `e371dda91` — harness bootstrap.
 - `8c27ffe16` — reviewed Slice F implementation and pre-evaluation evidence.
 - `de042d23e` — clean-tree gate evidence and evaluator handoff.
+- `e78b9a25a` — IMPL-EVAL finding bookkeeping and canonical doctrine debt.
+- `a042c6e57` — merge current #1664 base `31d59a656`, including generated refresh and dual-receipt
+  conflict resolution.

@@ -88,3 +88,21 @@
   mutate 248 unrelated paths under a locked 33-file ceiling.
 - **Evidence:** `.llm/tmp/1354-f-full-lint.json`, `.llm/tmp/1354-f-full-fmt.json`, and the recorded
   changed-path intersection command (temporary reports are ignored and not committed).
+
+## 2026-09-03 — current stacked-base convergence
+
+- **What:** The owner required convergence from the evaluated branch head onto #1664's current
+  `feat/app-service-client-wiring` head `31d59a656`.
+- **Source:** Slice F closeout instruction after `PASS_IMPL_WITH_FINDINGS`.
+- **Expected:** Generated projections take the base side and regenerate; any non-generated conflict
+  retains both sides and is reported.
+- **Actual:** One non-generated add/add conflict occurred in Slice E's `evaluate.md`. The resolution
+  retains both the historical Opus receipt and the base's superseding Fable receipt under explicit
+  headings. No product-source conflict occurred. Generated assets and the Aspire manifest were
+  refreshed before merge commit `a042c6e57`; the MCP generator's dirty-read guard required the merge
+  commit first, after which regeneration was byte-identical.
+- **Severity:** expected integration drift
+- **Action:** Accept the dual-receipt resolution, report the conflict, and retain only base-derived
+  non-generated package changes after `8c27ffe16`.
+- **Evidence:** conflict-marker scan, generator outputs, merge commit `a042c6e57`, and the 19-file
+  non-generated package diff census in `worklog.md`.
