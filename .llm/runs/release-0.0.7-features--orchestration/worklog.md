@@ -10860,3 +10860,12 @@ tests — which all passed.
 
 Both confirmed on the PRs. With #1895, three Features PRs are ready for the coordinator; #1664's sole
 red is #1845; #1946 is in its fix loop.
+
+### ~22:45Z — Slice C D6 fix landed; follow-up native eval dispatched
+
+`37b3b9b65` — `fix(cli): prevent the D6 State reconciliation fail-open breach`: +99/−18 on
+`reconcile-state.ts`, and the three fixtures exactly as specified — *conflicts with a same-named
+property whose type is an object literal*, *conflicts with a quoted same-named property*, *ignores
+the property name inside a nested object member*. Follow-up native IMPL-EVAL dispatched, bounded to
+HIGH-1's closure plus no-regression of the properties the first pass already verified; told to
+construct the counter-examples itself rather than trust the new tests.
