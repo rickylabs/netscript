@@ -10734,3 +10734,23 @@ equivalent explicit, recorded override) at its corpus regeneration only, with th
 otherwise proven clean before the bump. The guard itself must **not** be weakened, and
 `check:mcp-export-corpus` must stay untouched. Coordinator has dispatched a bounded worker for this;
 this lane owns tracking and the immediate audit, and will not duplicate the implementation.
+
+### D-251 — #1951 interim audit at 4f5df4e3c: chain verified except one real gap; packet held for dry-run
+
+Both stages already on the branch. PASS: guard and `deno.json` byte-identical; override only at the
+release regeneration; tests moved; release 5/0, generator 12/0, corpus check 0, tools check 0; the two
+staged files are the complete 0.0.6 residue set.
+
+**F1 (medium):** `agentic:dogfood-skills` on a clean tree at this head modifies **7 files beyond the
+two staged** — six SKILL.md mirrors and `scan-code-quality.ts` — **deterministically** (run1 == run2,
+no version strings). The committed bundle on `main` is stale vs the generator. In release prep that
+leaves 7 unstaged modifications at the commit and ships an internally inconsistent bundle; "stage
+exactly two" is only sound once `main`'s bundle is refreshed, and only *enforceable* with a
+post-dogfood porcelain ⊆ `RELEASE_DOGFOOD_OUTPUTS` assertion. Remedy proposed, not implemented — the
+worker owns #1951; the bundle refresh is a separate leaf I offered to dispatch on assignment.
+**F2 (low):** no pre-bump clean-tree assertion. **Dry-run:** none exists at this head; packet HELD.
+
+**Operational:** GraphQL rate limit was exhausted by five persistent `gh`-polling watchers. All
+stopped; replaced by one git-protocol watcher (`ls-remote`) on the #1951 branch. REST remained
+available (`gh api`) and is what this audit used. Lesson: watchers must use the cheapest transport
+that answers the question, and the count of watchers is itself a budget.
