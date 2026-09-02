@@ -4159,3 +4159,41 @@ fixture already carries the evidence, so no new capture is needed.
 Three attributed observations (cold-start timings, `otel logs` exit 12, automatic orphan removal)
 were **not** verified — they need a host runtime lease I did not take for a docs audit, and they
 carry S2/S9 evidence keys, which is the right form. Said so rather than implying coverage.
+
+## 2026-09-02 — #1914 IMPL-EVAL PASS; its one real criticism acted on
+
+**VERDICT: PASS** at `b00ff6f5f`. It reproduced every number rather than accepting them — the 7
+dropped TS2451s on base (with the base gate exiting 0), the enforcement probe printing
+`unattributed compiler diagnostics: 7`, ceilings untouched, zero non-comment `packages/` change. It
+also caught and corrected its **own** artifact: a first capture returned 9 because it had inserted
+its leak probe concurrently in the same worktree.
+
+**Its Judgment 2 was right and I acted on it.** My box-4 tests asserted the *binding string*
+`exampleSymbolImport` produces — which would still pass if the import stopped being injected into the
+example module, since the property also depends on `materializeModules`, `deno check` scoping, and
+the TS2304 → `unboundName` → census path. A proxy, not a proof, for a box that claims a test proves
+the property.
+
+So I wrote the test it specified: two synthetic blocks, one documenting a value and one referencing
+that value without importing it, through the real `compileJsdocExamples` path, asserting the
+borrower is classified `unboundName` with TS2304. **Then verified it is not another proxy** —
+temporarily restoring the old `declare global` preamble makes it fail, and the fix makes it pass.
+Compiler suite 16/16. Delta over the evaluated head is that one test file, additive, no production
+path touched — asserted by diff, not claimed.
+
+Also corrected the body's loose "measured on main `0f7fefb6b`" to the real base `77ad823dc` (the
+evaluator noted compiler and policy are byte-identical between them, so the measurement transfers —
+but the label was wrong).
+
+**close-gate PASS**, all four #1892 boxes mirrored. Two caveats the evaluator recorded and I am
+carrying rather than burying: box 4's "fails" is satisfied via the zero-slack ratchet rather than an
+enforced error, and `unattributedDiagnostics` needs the `at path:line:col` shape, so a fatal
+diagnostic without it still evades that specific check (the zero-classified case remains covered).
+
+### S9 adjunct audit delivered (#1759), Aspire ownership untouched
+
+Both earlier findings fixed. One new: `SKILL.md` presents the 14-tool table for both MCP modes while
+the PR's own fixture records `dashboardTools` as **3**; the code already distinguishes them in four
+places. It bites because the section's "if these tools are absent, use the CLI" explains away exactly
+the symptom of running dashboard-only mode. Three attributed runtime observations explicitly not
+verified — no host lease taken for a docs audit.
