@@ -6,17 +6,18 @@
 | --- | --- |
 | Run ID | `feat-cli-auth-session-typed-transport--1352` |
 | Branch | `feat/cli-auth-session-typed-transport` |
-| Current phase | `implement` |
+| Current phase | `IMPL-EVAL` |
 | Archetype | `6 - CLI Tooling`; SDK boundary `2 - Universal Library` |
 | Scope overlays | `none` |
 
 ## Current State
 
-Live issue #1352 was audited at baseline `37452f11f`. Rows 1 and 3-7 are shipped by PR #1915;
-row 2 is partial because `FetchAuthSessionHttp` preserves two caller-supplied exact URLs but does
-not yet route credentials through the typed contribution. The public SDK has no exact-origin
-override. The plan therefore retains the adapter and uses only the public auth-core bearer's typed
-`prepare` protocol.
+Live issue #1352 was audited at baseline `37452f11f`. Rows 1 and 3-7 were shipped by PR #1915. The
+residual row 2 is now implemented through the PLAN-EVAL-approved narrow path: application code
+supplies typed caller context, and `FetchAuthSessionHttp` uses the public auth-core bearer
+contribution protocol for credential preparation while retaining its two caller-supplied exact URLs.
+The public SDK has no exact-origin override, so this deliberately does not claim a full discovery
+transport migration.
 
 ## Completed
 
@@ -27,17 +28,24 @@ override. The plan therefore retains the adapter and uses only the public auth-c
 - Independent PLAN-EVAL passed in Claude Fable 5 medium session
   `0a21b6d5-3914-41b8-8e75-b78617e78574`; it ruled the narrow composition sanctioned and required
   honest URL-derived transport facts plus a focused redaction regression.
+- Product slices committed and pushed: `8bd0e117c` typed adapter preparation and `9fad445ab`
+  application context wiring.
+- Focused tests passed 14/14 and full package-owned CLI tests passed 1233/1233.
+- CLI check, final doc lint, package dry run, JSDoc examples, quality, architecture, source-boundary,
+  and lock gates passed. Doc A/B delta is zero; lock is unchanged.
+- Exact lint/fmt wrapper exit-2 baseline defect is documented, with zero findings and passing
+  changed-file checks.
 
 ## In Progress
 
-- Commit and publish slice 0, then implement the approved product slices.
+- Fresh independent IMPL-EVAL against the complete evidence set.
 
 ## Next Steps
 
-1. Commit/push slice 0 and open the metadata-complete draft PR.
-2. Implement slices 1-2, running and recording their gates.
-3. Run full requested merge-readiness gates and fresh independent IMPL-EVAL.
-4. If all seven rows pass, add one acceptance-evidence block, use `Closes #1352`, and mark non-draft.
+1. Commit/push merge-readiness evidence.
+2. Run a fresh Claude Fable 5 medium IMPL-EVAL and record `evaluate.md`.
+3. If all seven rows pass, add exactly one acceptance-evidence block, use `Closes #1352`, and mark
+   PR #1931 non-draft. Otherwise keep `Refs #1352` and state the remaining scope.
 
 ## Key Decisions
 
@@ -51,26 +59,33 @@ override. The plan therefore retains the adapter and uses only the public auth-c
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/feat-cli-auth-session-typed-transport--1352/**` | new | Harness audit, plan, design, and resume state only |
+| `.llm/runs/feat-cli-auth-session-typed-transport--1352/**` | modified | Audit, plan/eval, implementation, drift, and resumable gate evidence |
+| `packages/cli/src/public/features/plugins/auth/auth-types.ts` | modified | Typed caller context and optional request options |
+| `packages/cli/src/public/features/plugins/auth/auth-session-client.ts` | modified | Public bearer contribution prepares headers for exact URLs |
+| `packages/cli/src/public/features/plugins/auth/auth-session-client_test.ts` | new | Credential, URL, redaction, and import-boundary regressions |
+| `packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts` | modified | Application context resolver wiring |
+| `packages/cli/src/public/features/plugins/auth/auth-plugin-command_test.ts` | modified | Context propagation regression |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PLAN-EVAL PASS / remaining planned | `plan-eval.md`; CLI doc-lint baseline exit 0, 0 diagnostics |
-| Fitness | planned | `plan.md` validation table |
-| Runtime | planned | no external runtime permitted/needed |
-| Consumer | planned | CLI dry-run only |
+| Static | PASS with disclosed baseline wrapper defect | check exit 0; doc A/B +0; lint/fmt wrapper exit 2/zero findings, changed-file checks exit 0 |
+| Fitness | PASS | quality and arch exit 0; JSDoc 357/357, `unboundName=116` |
+| Runtime | PASS | focused 14/14; package-owned 1233/1233; prohibited external gates not run |
+| Consumer | PASS | CLI publish dry-run exit 0, 646 files, 7 existing dynamic-import warnings |
 
 ## Open Questions
 
-- None before implementation. Any need for SDK widening is significant drift and stops the slice.
+- Independent evaluator must decide whether the disclosed lint/fmt baseline defect blocks merge
+  readiness and independently confirm the narrow row-2 interpretation.
 
 ## Drift and Debt
 
-- Drift: `rtk` executable absent; focused raw read-only commands are used and recorded.
+- Drift: `rtk` absent; mandated lint/fmt wrapper ownership mismatch; reverted import-map experiment.
 - Debt: none proposed.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments once slice 0 is approved.
+- `80a53ad42` audit/plan, `8bd0e117c` typed adapter, `9fad445ab` application wiring.
+- Draft PR: #1931 with required labels and milestone 0.0.7.
