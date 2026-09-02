@@ -9776,3 +9776,34 @@ passed — which also reframes the two earlier "external Aspire 404" local failu
 Hosted run `33592310517` is now executing both tiers at `1154800b9`. The two runs at the superseded
 head were `cancelled` by per-ref supersession on push — the disclosed F-3 behaviour, not the defect
 #1846 fixed.
+
+### D-223 — #1889's runtime gate destroyed by a stale-workflow branch; #1908 filed
+
+The hosted runtime gate at `1154800b9` started both tiers and was **cancelled mid-flight**
+(sqlite `04:50:48Z`→`04:51:13Z`, docker `04:50:48Z`→`04:54:51Z`). No newer run existed on the branch,
+so per-ref supersession is ruled out.
+
+**Cause identified rather than guessed.** GitHub applies *the arriving run's own* concurrency config,
+and the runtime-tier groups are repo-wide literals. Three Aspire branches active in that window are
+all forked from `e938ecd31` — **pre-#1846** — and carry `cancel-in-progress: true` with no
+`queue: max`. `feat/aspire-13-5-s8-typed-resource-commands` arrived at `04:54:28Z`, seconds before the
+docker-tier cancellation. Verified by reading `e2e-cli.yml` on each branch: `queue_max=0`,
+`cancel_in_progress_true=1`, `merge_base=e938ecd31` for all three; main and #1889 both have
+`queue_max=3`.
+
+**So #1846's fix is not effective until every live branch carries it** — one stale branch
+re-introduces cancellation for the whole shared group, including branches that already have the fix.
+That also bounds the #1839 acceptance proof: it was valid in its window (no stale-workflow arrivals)
+but does **not** generalize to a repo with mixed workflow versions in flight. Worth stating plainly
+rather than leaving the proof looking stronger than it is.
+
+Filed **#1908** (p1, `type:bug`, `area:tooling`, milestone 0.0.7) with three ordered options and an
+acceptance requiring a demonstrated non-cancellation with run IDs.
+
+**Owner boundary:** those three branches belong to the Aspire lane; integrating main into them is not
+this supervisor's to do. The run was re-run at the **unchanged head** (no push, evaluated head
+preserved) and is being watched.
+
+Acceptance box 6 conjoins single-copy **with** a passing scaffold runtime E2E, so it stays unchecked
+until a real conclusion exists. A `cancelled` job is not a conclusion — laundering one into a tick
+would reproduce exactly the defect #1846 was filed to remove.
