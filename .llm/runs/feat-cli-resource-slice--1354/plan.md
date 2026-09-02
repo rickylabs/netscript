@@ -807,7 +807,7 @@ extension point to evade the ceiling.
 to the existing scaffold runtime suite. The author lane changes test definitions but does not run
 the runtime suite locally.
 
-**File ceiling:** 7.
+**File ceiling:** 8.
 
 **Expected touch set:**
 
@@ -827,6 +827,13 @@ the runtime suite locally.
 7. `packages/cli/src/kernel/templates/app/agent-conventions_test.ts` — new file covering the
    rendered convention text and referenced paths. Slice F alone owns the existing
    `public-command-tree_test.ts` regression/registration edit, so no file is double-counted.
+
+8. `packages/cli/e2e/tests/application/runner/suite-runner_test.ts` — **enumeration amendment
+   (2026-09-03, supervisor, under the captured-stdout clause below):** once
+   `scaffold.resource-rerun` is reachable through `RUNTIME_GATES`, the suite-runner's
+   nominal-success fake must emit the rerun gate's expected captured output
+   (`Resource slice applied: 0 written, 11 skipped, 0 conflicts.`) instead of empty stdout. Update
+   only that fake's stdout; no new helper, no parallel suite.
 
 If captured-stdout assertions or runtime reachability require any file beyond this seven-file set,
 stop and update the plan. Do not create a parallel suite or split the runtime command; both resource
