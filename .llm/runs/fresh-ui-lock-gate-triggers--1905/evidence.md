@@ -30,9 +30,8 @@ explicit nested member `packages/cli/e2e/deno.json`, `plugins/*/deno.json`, and 
    classifier half will be proven by unit tests and the trigger lists by parsed-YAML structural
    tests. A live implementation PR cannot isolate the new trigger because its diff also changes
    `.github/workflows/fresh-ui-quality.yml`, which was already a triggering path.
-2. **Deliberately stale private lock fails the gate: pending live teeth demonstration.** The run
-   id, failing step, and emitted `::error::` line will be recorded below. This will not be claimed
-   as trigger-isolation proof.
+2. **Deliberately stale private lock fails the gate: proven now.** Disposable PR #1919 and run
+   `33620426788` provide the live teeth evidence below. This is not trigger-isolation proof.
 3. **The `--lock=` class is enumerated: proven now** by the baseline enumeration above.
 
 ## Required Post-Merge Verification for Box 1
@@ -93,4 +92,35 @@ also remains green, so the change narrows no existing fail-open escalation.
 
 ## Stale-Lock Teeth Demonstration
 
-Pending slice 3.
+Disposable branch `ci/fresh-ui-lock-gate-teeth-1905` was created from implementation commit
+`099d504023dbb95c964824352bacc1d9c5ddc058`. Its only additional change edited the existing
+`packages/sdk` workspace entry in `packages/fresh-ui/deno.lock` from
+`npm:@orpc/client@^1.15.0` to the valid but stale `npm:@orpc/client@^1.14.0`; the lock was not
+regenerated.
+
+- Disposable PR: #1919, opened draft to `main`, then moved through the workflow's supported
+  `ready_for_review` event because draft PRs are deliberately skipped by the classify-job guard.
+- Fresh UI run: [33620426788](https://github.com/rickylabs/netscript/actions/runs/33620426788),
+  conclusion `failure`.
+- Failing job: `fresh-ui-quality`, job id `100216039828`.
+- Failing step: `Frozen package type-check`.
+- Gate receipt: `fresh-ui-check`, outcome `FAIL`, real exit code `1`.
+- Frozen diagnostic: `The lockfile is out of date`, showing the exact `^1.14.0` → `^1.15.0`
+  correction.
+- Emitted workflow command:
+
+```text
+::error::Fresh UI private lock is stale. Review the dependency diff, then run deno task --cwd packages/fresh-ui lock:update and commit packages/fresh-ui/deno.lock.
+```
+
+GitHub rendered that command in the job log as:
+
+```text
+##[error]Fresh UI private lock is stale. Review the dependency diff, then run deno task --cwd packages/fresh-ui lock:update and commit packages/fresh-ui/deno.lock.
+```
+
+After capture, PR #1919 was closed unmerged, the remote and local disposable branch were deleted,
+and the throwaway worktree was removed. The initial draft-open run `33620345492` was skipped, as
+expected from the draft guard; it is not evidence. The failing `ready_for_review` run proves the
+gate's teeth only. Because the disposable PR also contained the workflow-file change from #1917,
+it cannot and does not prove isolated member-manifest triggering.

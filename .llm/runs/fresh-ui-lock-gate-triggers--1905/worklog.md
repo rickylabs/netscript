@@ -77,6 +77,7 @@ test before changing `classifyPath()`.
 | 2026-09-02 10:29 | 1 | RED | Detached throwaway worktree at `8bdb7f0afdf51e0d63bfbdd021658d5ff81f5a27`: 61 passed, 1 failed; real exit code 1. |
 | 2026-09-02 10:32 | 2 | implementation | Extended the nested-config contribution without narrowing the existing Fresh UI prefix; synchronized both workflow path lists. |
 | 2026-09-02 10:33 | 2 | GREEN | All required local commands and the dedicated YAML parse returned real exit code 0; no lockfile changed. |
+| 2026-09-02 10:39 | 3 | live teeth proof | Disposable PR #1919 produced failing run `33620426788` at `Frozen package type-check`; captured annotation, closed PR unmerged, and deleted branch/worktree. |
 
 ## Gate Results
 
@@ -89,7 +90,7 @@ test before changing `classifyPath()`.
 | scoped `.github` format wrapper | 0 | PASS | 11 files processed, 0 failed batches/findings/refusals. |
 | parsed workflow YAML readback | 0 | PASS | Parsed document: both event arrays equal, all four required inputs present, negations ordered after the positive path. |
 | targeted validation-file format wrapper | 0 | PASS | 1 file processed, 0 findings/refusals. |
-| stale-lock draft PR | NOT_RUN | pending | Run id, failing step, and `::error::` line to be captured |
+| stale-lock live gate | 1 | expected FAIL | Run `33620426788`, job `100216039828`, step `Frozen package type-check`; private-lock stale annotation emitted. |
 
 ## Reconcile Notes
 
@@ -104,3 +105,15 @@ test before changing `classifyPath()`.
 - Slice 2: issue and PR remain at `status:impl`; no new reviewer comments altered scope. The diff
   remains limited to the authorized classifier, classifier test, workflow, structural test, and
   leaf run artifacts. Both repository lockfiles remain unchanged.
+- Slice 3: disposable PR #1919 was opened draft; its first run skipped under the workflow's draft
+  guard, so the supported `ready_for_review` event started the live run. After the expected failure,
+  the PR was closed unmerged and its branch/worktree deleted. This proves teeth only, not isolated
+  member-manifest triggering. Main PR #1917 remains draft at `status:impl`.
+
+## Handoff
+
+- Implementation PR: #1917 (draft), head to be reported after this evidence commit.
+- Honest acceptance: boxes 2 and 3 are provable now; box 1 remains post-merge because this PR's
+  workflow-file diff is independently triggering.
+- Supervisor obligation: separate-session IMPL-EVAL and the one-shot post-merge isolation PR
+  described in `evidence.md`. Do not infer trigger isolation from disposable PR #1919.
