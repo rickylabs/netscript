@@ -1,3 +1,36 @@
+IMPL-EVAL evidence (run 33599996142-1), added at head e4a2a8cdb12969d71a13cc7edd9a3658738a2444:
+
+- Fresh structured check re-derived: 211 files / 2 batches / 0 diagnostics (no divergence).
+- Fresh structured lint re-derived: 211 files / 0 findings. fmt re-derived: 211 files / 0 findings.
+- Navigation unit tests re-run: 9 passed / 0 failed.
+- Publish dry-run re-run: exit 0; stderr contains zero `_browser`, `tests/fixtures`, or
+  `form-navigation` paths; only pre-existing `tests/runtime-catalog-dependencies.ts` residual
+  remains (filed #1897, not charged here).
+- deno.lock byte-diff vs merge-base: empty. git diff --check: clean.
+- Local `deno test --allow-all packages/fresh` NOT REPRODUCED: sandbox lacks `playwright-cli`, and
+  an unrelated pre-existing `defer-island-client-bundle_test.ts` Vite/Rollup
+  `npm:@opentelemetry/api` resolution failure also blocks the full local suite. Environment
+  limitation, not a regression.
+- Hosted `fresh-browser` at merge head c72710bae (check-test job 100149154445, run 33599242516):
+  FAIL with a NEW error. The barrier-arrival repair worked (no 30 s waitForResponse timeout; the
+  first held request arrives and is released), but the run-code script then throws
+  `ReferenceError: MutationObserver is not defined` — the Playwright-cli evaluation sandbox does
+  not expose MutationObserver. Two sibling browser tests passed; the proof fails before any
+  assertion evaluates (deterministic, not flaky). Hosted Vite stderr also again shows
+  "Internal server error: The signal has been aborted" for a held stale response aborted at page
+  close, so drain-without-overlay is still unproven in the hosted lane.
+- Close-gate FAIL at head is expected: `Refs #1590` with empty closingIssuesReferences is the
+  locked partial semantics; it clears only after the hosted proof is green.
+
+Decision points 1-8 all verified: no slice-owned packages/fresh/src edit (first-parent history
+touches src only via the #1904 merge, excluded by scope); 6-file ceiling honored; overlay assertion
+is absence-based with cancelled == 0 at both barriers; A→B→A uses server barriers (no raised
+timeout, no tuned sleeps; the sole setTimeout is the pre-existing 50 ms waitForServer startup
+poll); colon-normalized marker asserted by exact string equality; publish filter drops proof files
+to zero; `Refs #1590` only.
+
+IMPL-EVAL verdict: FAIL_FIX.
+
 # Worklog — deterministic Fresh/Vite A → B → A browser proof
 
 ## Design

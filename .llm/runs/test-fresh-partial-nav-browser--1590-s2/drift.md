@@ -38,3 +38,15 @@ The repair now treats server-side barrier `arrived` state as the authoritative r
 observable, records every stale-phase request/response URL, and waits for response status/EOF only
 after explicit release. No timeout was lengthened, no product source changed, and the planned
 last-intent, drain, cancellation, and overlay assertions remain in force.
+
+## 2026-09-02 — hosted proof fails on MutationObserver at merge head (blocking)
+
+Hosted `check-test`/`fresh-browser` at merge head `c72710bae` (job `100149154445`, run
+`33599242516`) fails with `ReferenceError: MutationObserver is not defined` thrown from the
+run-code evaluation context (observer setup before the release phase). The barrier-arrival
+repair itself worked: the first held request now arrives and is released past the former 30 s
+wait. The remaining failure is a test-harness capability assumption, not a product or fixture
+defect, and it fails before any assertion runs — deterministic, not flaky. Hosted Vite stderr
+again shows `Internal server error: The signal has been aborted` for a held stale response
+aborted at page close, so the drain-without-overlay claim is still unproven in the hosted lane.
+Product source remains untouched by this slice.
