@@ -10675,3 +10675,19 @@ found the rows are **plain bullets** (the mirror recognises Markdown checkboxes 
 exactly that in the body instead of inventing box indices. `close-gate` is already **pass** — there
 are no boxes to gate on — so `Closes #1452` will close the issue on merge with no mirror step needed.
 IMPL-EVAL dispatching. This would complete #1452 across #1820, #1842 and this slice.
+
+### ~19:05Z — #1943's eval ran and its verdict was lost to my own push; Slice C dispatched
+
+Run `33658230195`: `authorize=success agent=success`, yet `verdict: NONE`,
+`verdict_source: artifact-unavailable`, diagnostic *"Formal verdict artifact could not be preserved
+without mutating the evaluated head."* The agent evaluated `5f0a857ff`; my lock-mirror push landed
+`2e0699bf3` mid-run; the housekeeping refused to commit its artifact onto a moved head — correctly
+— and the summary carries no verdict line. **The head-bound rule applies to the whole run, not only
+`authorize`.** A push during an eval does not skip it; it silently discards the result. Retriggered
+at the now-stable `2e0699bf3` with the lane idle; waiting on the *agent* conclusion and a
+`verdict_source` that is not `artifact-unavailable`.
+
+**Slice C dispatched** (`feat/cli-resource-slice-contract`, worktree `007-leaf-1354-c`): ten new
+files under `application/resource-slice/`, intersecting #1664's 51 files, Slice A's four, and Slice
+B on **nothing** — measured. Pure application logic under D3's narrowed contract; told to stop on any
+file outside the ten. Slices A (behind #1664) and D–G (ordered) remain.
