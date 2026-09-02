@@ -291,3 +291,25 @@ killed the worker (D-231), sent detached via `codex-resume.ts --message-file`, m
 `/home/agent/observability/netscript-internals/1905-resume-1.md`. **All launches and resumes for
 this lane are detached under `setsid nohup` from here on** — a foreground call SIGTERMs the worker
 at the tool timeout.
+
+## Lane ledger — 0.0.7 internals closeout (2026-09-02)
+
+Reported to #1641 rather than written into `milestone-cluster-state.json`: that file lives in
+`007-primary`, which had **live processes and a dirty tree** at closeout time, and central state is
+coordinator-owned. Writing it from this session would have raced an active coordinator write. This
+is the same upstream-report protocol the lane used at first attachment.
+
+| Issue | PR | Merge SHA | Closing proof |
+| --- | --- | --- | --- |
+| #1905 | #1917 | `97eace32d` | post-merge isolation run `33628548637`, `fresh-ui-quality` 12 steps, failed at frozen check |
+| #1913 | #1923 | `13bb9415e` | live queue-eviction probe; victim admitted 11:24:49Z after a 11:24:17Z arrival |
+| #1920 | #1929 | `3066a0cc5` | `quality` step 15 `MCP export corpus freshness` success; 26 → 27 steps |
+
+Evaluations supplied: #1917 (Fable + OpenHands PASS), #1923 (Fable PASS_WITH_FINDINGS + recovered
+OpenHands PASS), #1929 (Fable PASS, no findings), #1933 (this lane's formal IMPL-EVAL only —
+`FAIL_FIX` at `99ce0d64c`, `PASS` at `04ddb7b2c`).
+
+**Open owned:** #1867 (0.0.8) — F-3 generator dirty-tree guard, now being advanced.
+**Documented residual:** 157 of 158 origin branches still carry unbounded `pages.yml`; recorded in
+that file's header rather than repaired, because `-v2` renaming would trade eviction for concurrent
+deploys to one global site.
