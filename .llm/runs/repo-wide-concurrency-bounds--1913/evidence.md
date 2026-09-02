@@ -50,5 +50,37 @@ Pages expression.
 
 ## Hosted acceptance
 
-Pending remote push and safe construction. This section will record immutable run IDs, job IDs,
-per-job conclusions, and step counts, or an exact blocker without claiming acceptance.
+### Safety preflight
+
+- Environment API exit `0`: `github-pages` has custom branch policies for `main`,
+  `docs/user-site`, `release/jsr-readiness`, and `v*` only. The feature branch was protected from
+  publication.
+- Pages traffic API exits `0`: zero queued and zero in-progress runs before the exercise.
+- Current `main` remained on the unbounded concurrency mapping; the feature branch carried the
+  fixed mapping.
+
+### Admission sequence and receipts
+
+| Role | Run / branch | Per-job terminal conclusions | Executed-step counts |
+| --- | --- | --- | --- |
+| Occupant | [`33624345836`](https://github.com/rickylabs/netscript/actions/runs/33624345836), feature branch | classify `100228473847`: success; build `100228589261`: success; deploy `100228804476`: failure | classify 10; build 14; deploy **0** |
+| Pending victim | [`33624383095`](https://github.com/rickylabs/netscript/actions/runs/33624383095), `main` | classify `100228814665`: success; build `100228906759`: operator-cancelled; deploy `100228949753`: operator-cancelled | classify 10; build 1; deploy **0** |
+| Fixed third arrival | [`33624408650`](https://github.com/rickylabs/netscript/actions/runs/33624408650), feature branch | operator-cancelled while pending; no jobs admitted | no jobs / no steps |
+
+The occupant's classify job was admitted at `11:23:37Z`. The main victim was observed in
+`pending` state before the third dispatch and remained `pending` after fixed run `33624408650`
+joined the same group. When the occupant released the group, the main victim's classify job was
+admitted at `11:24:49Z` and completed successfully. That later job admission is decisive evidence
+that the third arrival did not evict it. The main run was then deliberately cancelled; only its
+build setup ran and its deploy job had `steps: 0`, so no Pages deployment action executed.
+
+The feature-branch occupant completed before its cancellation request arrived. This stayed safe:
+its environment-protected deploy job failed with `steps: 0`, exactly as the preflight predicted.
+No real deployment occurred in any of the three runs.
+
+### Acceptance interpretation
+
+- Box 1: satisfied by both parsed mappings plus the per-group justification.
+- Box 2: satisfied by the pending-before-and-after observation, later main job admission, and
+  terminal per-job/step receipts above.
+- Box 3: satisfied by the exhaustive parsed 13-workflow/10-block regression test.

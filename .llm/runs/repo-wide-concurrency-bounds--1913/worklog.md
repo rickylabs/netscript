@@ -65,6 +65,7 @@ the release workflow test to see the full 13-workflow inventory and the class in
 | 2026-09-02 11:08 | 1 | implementation | Added both bounds and headers preserving the running-vs-pending and `steps: 0` diagnostic. |
 | 2026-09-02 11:26 | 2 | regression fix | Corrected the classifier precedence so the mixed OpenHands entity/ref key reaches its specific class; parsed reality remains 13 workflows and 10 blocks. |
 | 2026-09-02 11:29 | 2 | gates | Focused test 6/6, `.llm/tools` check, format, and independent YAML readback all passed with exit 0. |
+| 2026-09-02 11:23–11:25 | 3 | hosted acceptance | A fixed-branch arrival did not displace the pending main victim; the victim later started, then was operator-cancelled before any deployment step. |
 
 ## Reconcile — slice 1
 
@@ -79,6 +80,16 @@ the release workflow test to see the full 13-workflow inventory and the class in
   job-level runtime groups. The brief's count was correct; no hidden additional block was found.
 - The class invariant rejects any repo-wide literal arm without `queue: max`.
 - PR #1923 remains draft at `status:impl`; no lifecycle transition was made.
+
+## Reconcile — slice 3
+
+- The hosted exercise began with zero queued or in-progress Pages runs, so no other lane's traffic
+  was involved.
+- The `github-pages` environment allows only `main`, `docs/user-site`,
+  `release/jsr-readiness`, and `v*`; the feature-branch occupant could not publish.
+- The default-branch victim survived the third arrival and reached job admission. It was then
+  deliberately cancelled before `deploy-pages` could execute. PR #1923 remains draft at
+  `status:impl` for supervisor evaluation and lifecycle handling.
 
 ## Gate Results
 
@@ -98,7 +109,22 @@ the release workflow test to see the full 13-workflow inventory and the class in
 | Parsed YAML readback | `deno eval --no-lock` with `npm:js-yaml@4.3.2` | PASS, exit 0 | Exact Pages and canary concurrency objects read from parsed documents. |
 | Whitespace | `git diff --check 77ad823dcb1874ccfc8964b4679ad92a3a145e0b` | PASS, exit 0 | Base-to-head diff clean after removing three bootstrap trailing blank lines. |
 
+### Slice 3 hosted scheduler acceptance
+
+| Role | Run | Branch | Job admission / conclusion | Step evidence |
+| --- | --- | --- | --- | --- |
+| Safe occupant | `33624345836` | `ci/repo-wide-concurrency-bounds` | classify `100228473847` started `11:23:37Z`, success; build `100228589261` started `11:24:00Z`, success; deploy `100228804476` started `11:24:44Z`, failure | deploy `steps: 0`; environment protection stopped publication |
+| Pending main victim | `33624383095` | `main` | observed pending before/after third arrival; classify `100228814665` started `11:24:49Z`, success; build `100228906759` cancelled; deploy `100228949753` cancelled | classify 10 steps; build 1 setup step; deploy `steps: 0`; operator cancellation before publication |
+| Fixed third arrival | `33624408650` | `ci/repo-wide-concurrency-bounds` | observed pending after dispatch; operator-cancelled while pending | no jobs admitted, therefore no steps |
+
+The decisive ordering uses job admission, not a search over run `created_at`: occupant classify
+started `11:23:37Z`; the main run was visibly pending when the fixed third arrival joined; after
+the occupant's protected deploy failed at `11:24:46Z`, the main classify job started at
+`11:24:49Z`. A displaced pending main run could not later start that job.
+
 ## Handoff Notes
 
 - Evaluator should first inspect exact scope, the 10-row sweep, and whether acceptance box 2 has
   genuine pending-victim evidence rather than a weaker completed-run comparison.
+- Hosted acceptance is genuine pending-victim evidence: use runs `33624345836`, `33624383095`, and
+  `33624408650`, plus the per-job table above.
