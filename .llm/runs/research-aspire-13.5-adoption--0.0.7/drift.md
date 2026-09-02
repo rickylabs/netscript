@@ -8295,3 +8295,39 @@ All three clean, no conflicts.
 S10's carry checked rather than assumed: the 15 product files its merge changed are all #1858's own
 content, so S10's delta is untouched and its `daeee1fde` IMPL-EVAL PASS carries. S9's repair is new
 work and has its own evaluation dispatched, briefed to hunt the fixture-honesty failure specifically.
+
+## D-322 — TC-14 was a grouping deletion, and the dead code said so
+
+Hosted Postgres at `ce1b80e2f`: 92/93, sole red `behavior.otel.traces` TC-14 — *real streams
+consumer span exists*. The span was **deleted during grouping**, not missing from emission or from
+the CLI response.
+
+`groupAspireCliSpans` skipped any span whose `traceId` was absent from the `aspire otel traces`
+summary list:
+
+    if (hasTraceSummaries && !allowedIds.has(value.traceId)) continue;
+
+A fan-in consumer emits `stream.subscribe` in its **own** trace, linked to the producer's — that is
+what makes it a fan-in, and it is what TC-14 goes on to assert via `assertConsumerLinksProducer`.
+`aspire otel traces` need not list that trace, so every consumer span was discarded before TC-14
+could find one.
+
+**The function already contradicted itself.** Its ordering step appends
+`[...grouped.keys()].filter((traceId) => !allowedIds.has(traceId))` — orphan traces, ordered after
+the summarised ones — while the skip guaranteed no orphan could reach it. Dead code that describes
+the intended behaviour is strong evidence about intent, and here it was correct.
+
+Repaired at `862f8f366`: only a trace the `since` filter explicitly dropped excludes its spans; a
+trace never summarised is retained. `since` semantics are preserved exactly and the orphan branch
+now does the job it was written for. RED/GREEN summarises only the producer trace while returning
+spans from both. 246 passed / 0 failed.
+
+**Two bounded repairs landed on this path, and the first was necessary but not sufficient.**
+`09f8eae30` passes the caller's limit to the CLI as `-n`, because `applyLimit` sliced client-side
+*after* `aspire otel` had already returned its default tail — a client-side bound can only narrow
+what the CLI truncated. That was a real defect introduced by moving the span source without moving
+the bound with it, but it was not what TC-14 observed; the grouping filter was. Both are fixed, and
+the argv-pinning test that failed on the `-n` change was updated rather than loosened.
+
+Honest CLI span source retained throughout: no MCP spans, no raw HTTP reader, and the
+`ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS = "false"` switch untouched.
