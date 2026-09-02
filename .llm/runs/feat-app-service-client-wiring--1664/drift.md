@@ -98,3 +98,17 @@
   is the alternate form already understood by the #1845 diagnostic selector. The element-presence
   check therefore identifies the actual `main` island root, while the separate effect and click
   checks prove that it is no longer merely SSR markup.
+
+## 2026-09-02 — branch-only probe prevents historical main attribution
+
+- Severity: evidence-boundary clarification; no product impact.
+- The generated service-client browser probe was introduced on this branch, so otherwise-green
+  clean-main scaffold-runtime logs do not contain the same hydration/refetch measurement. Static
+  byte identity can exclude changed source seams, but cannot be promoted into an unobserved browser
+  result.
+- The focused hydration fixture also carries an explicit `data-fresh-island` evidence marker that
+  the generated island does not. That marker makes the fixture assertion stable after Fresh removes
+  its SSR boundary comments, but it is instrumentation rather than a framework-provided wrapper.
+- General lesson: comparative attribution needs the same probe at both heads. When the probe is
+  branch-only, name the exact clean-baseline experiment instead of inferring a runtime result from
+  a passing older suite that never executed the check.

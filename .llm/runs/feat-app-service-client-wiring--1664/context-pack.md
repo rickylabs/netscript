@@ -214,3 +214,19 @@ already-true client measurements; a second exact-head CI run is required for the
 CI run `33633076918` then proved the server comment is removed after boot. The final evidence
 contract uses the #1845 selector's supported `[data-fresh-island]` form on the fixture island root,
 expected as `main`, alongside the already-observed query-client, effect, and click proofs.
+
+## 2026-09-02 generated-island attribution follow-up
+
+At branch head `e979f8b3d` versus freshly fetched main `25a026c0e`, every generated-app hydration
+structure file is byte-identical: scaffold writers, app entry, Vite config, route/layer hosts, and
+showcase loaders. The two island templates add only `initialDataUpdatedAt`; the service-query change
+removes an import, changes the arbitrary query resource name, and derives an invalidation key via
+`clientKey()`. Fresh core 2.3.3 explicitly discovers route-local `(_islands)` directories.
+
+These measurements strongly exclude the branch's template edits as the source of total
+non-hydration, but do not establish the clean-main browser outcome. The exact refetch probe is
+branch-only, so no clean-main run contains the comparable observation. The honest outcome is
+indeterminate until the existing CDP diagnostics are run against a project emitted from clean main.
+Rehosting the actual generated island in the focused fixture is not cheap because its contracts,
+client/query/mutation modules, UI aliases, server loader, and route/layer chain are all part of the
+artifact under test. No runtime/browser gate was run and no product/test source changed.

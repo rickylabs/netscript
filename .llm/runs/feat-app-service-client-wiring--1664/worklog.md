@@ -536,3 +536,42 @@ The exact-head CI browser lane remains the decisive hydration observation. The t
   hydration and post-click state change remain independent assertions against SSR-only markup.
 - Final-byte local rerun: check 211 files / 2 batches / 0 diagnostics; package tests 276 / 0 / 0 in
   7,562 ms; lint and fmt each 211 / 211 with 0 findings.
+
+## 2026-09-02 generated-island attribution measurement
+
+- Measurement baseline: branch `e979f8b3d6e279602f25a0046185324e29f129c5`; freshly fetched
+  `origin/main` `25a026c0e7c494caf714c0a605b1e7a6bce07165`; merge-base
+  `37452f11f5045f0f5a98e07d802bcc2a2e94333b`.
+- Blob comparison found the writers, app entry, Vite config, host component, route page/layout, and
+  both showcase loaders byte-identical between branch and current main. The database and memory
+  island templates differ only by `initialDataUpdatedAt: props.cachedAt`.
+- The service-query template changes no discovery or component structure: it removes the
+  `bridgeInvalidation` import/call, keys `createQueryFactories` by the generated service name, and
+  derives the invalidation prefix from `list.clientKey()`. `createQueryFactories` treats that name
+  as an arbitrary resource string; `clientKey()` returns an array. The branch therefore adds no
+  client import or module-load hazard relative to main.
+- Fresh plugin-vite 1.1.2 delegates initial discovery to Fresh core 2.3.3, whose `crawlRouteDir`
+  explicitly identifies `routes/**/(_islands)/**` as islands. The generated route-local location is
+  supported without listing each generated module in `islandSpecifiers`.
+- Structural comparison: both generated and focused fixtures default-export a component wrapping
+  an inner `useQuery`/`useQueryClient` component in `QueryIsland`. The focused fixture directly
+  registers its single app module, accepts two primitive props, and adds explicit effect/click
+  evidence. The generated app relies on route crawling, crosses the definePage/layer/host-component
+  chain, receives dehydrated service data, and imports the generated client/query/mutation graph.
+  Its source has no stable `data-fresh-island` marker, unlike the evidence-focused fixture.
+- Outcome: runtime attribution is **indeterminate without a clean-main browser observation**. Static
+  attribution strongly excludes this branch's three template changes, but a source comparison is
+  not permission to claim a browser fact that was never measured. The exact
+  `behavior.service-client-refetch` probe is branch-only and does not exist on current main; an
+  inspected clean-main runtime log therefore could not contain that check.
+- Decisive evidence: render the same generated service project from current clean main, navigate to
+  the generated service example with the existing CDP diagnostics, and record initial row,
+  query-client, interaction, island marker, and browser/Vite module-load errors. This remains a
+  supervisor-owned browser measurement; no browser, Aspire, Docker, hosted runtime, or `e2e:cli`
+  command was run here.
+- Hosting the actual generated source in the focused fixture is not cheap: it requires rendering
+  and supplying the generated contracts, service client/query module, showcase loader, optimistic
+  helper, copied UI modules/aliases, and Fresh route/layer registration. Stubbing those seams would
+  prove a surrogate rather than the generated artifact.
+- No product or test source changed. `deno.lock` remained byte-identical to both HEAD and current
+  main, SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
