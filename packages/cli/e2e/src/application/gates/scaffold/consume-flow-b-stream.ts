@@ -145,7 +145,7 @@ try {
   // against it, exported nothing, and raised no error, which is why TC-14 saw no
   // `stream.subscribe` span while this gate itself passed.
   const span = createStreamsInstrumentation({
-    tracer: trace.getTracer('netscript.streams'),
+    tracer: flowBConsumerTracer(),
   }).startSubscribeSpan({
     streamPath: '/workers/executions',
     collection: 'execution',
@@ -265,11 +265,30 @@ function randomHex(byteLength: number): string {
     .join('');
 }
 
+/**
+ * The consumer's own provider, kept addressable.
+ *
+ * `trace.setGlobalTracerProvider` is a **no-op when a provider is already registered** — OTEL
+ * returns false rather than replacing it. Relying on the global therefore silently hands back
+ * someone else's tracer, or a no-op: the span records nothing, `SimpleSpanProcessor` exports
+ * nothing, and no error is raised anywhere. That is exactly what TC-14 kept observing as "no real
+ * streams consumer span exists". Taking the tracer from this instance removes the dependency on
+ * winning the global-registration race.
+ */
+let flowBTracerProvider: BasicTracerProvider | undefined;
+
+/** Tracer guaranteed to belong to the consumer's own exporting provider. */
+function flowBConsumerTracer() {
+  if (!flowBTracerProvider) throw new Error('Flow-B tracer provider was not created');
+  return flowBTracerProvider.getTracer('netscript.streams');
+}
+
 function createFlowBSdkLoader(endpoint: string): SdkLoader {
   return () => {
     const exporter = createOtlpJsonSpanExporter(endpoint);
     const processor = new SimpleSpanProcessor(exporter);
     const tracerProvider = new BasicTracerProvider({ spanProcessors: [processor] });
+    flowBTracerProvider = tracerProvider;
     return Promise.resolve({
       tracerProvider: {
         register: () => {
