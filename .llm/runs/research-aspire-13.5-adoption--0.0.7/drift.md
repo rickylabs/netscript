@@ -7724,3 +7724,49 @@ Also settled: S11 is **not** an offender. Internals proved it at job level — `
 skipped, so the tier jobs' `if: needs.classify.result != 'skipped'` is false and they are never
 admitted, so they never claim the concurrency group. "Shows SKIPPED" and "never claimed the mutex"
 are not the same claim, and only the second one exonerates a branch.
+
+## D-300 — three workflow-scope categories, and both delta verdicts PASS
+
+Both coordinator-required bounded delta evaluations returned **PASS**, separate sessions:
+
+- **S8 tip-delta** (`ce7e82a76^..ce7e82a76`): "refreshes only the three known background runtimes after
+  successful typed migration, preserves the resident AppHost, retains and reaches the pre-existing
+  stop-then-start fallback on either failure path, and adds an honest process-boundary regression
+  test. No S8 carried finding is invalidated." The evaluator specifically judged the new 177-line test
+  honest — it constructs the real gate, executes its generated `deno eval` program, intercepts
+  `aspire` at the process boundary and compares the complete argv sequence, rather than asserting its
+  own mock's shape.
+- **S11 publish-assets delta** (`122e00a83..d77c026f3`): "genuine, deterministic generated output;
+  closes the publish-assets FAIL_FIX without authored-content or public-surface drift, and its
+  provenance is consistent with the committed upstream prose bundle." Two consecutive generator runs
+  produced a byte-identical SHA-256, so it converges rather than oscillating.
+
+Both published as canonical verdicts. S11's stale body claims were rewritten in the same pass
+(stacked-on-S10 base, the `c9e3fcbe8` ancestry check, the "expected red" assets disposition, and an
+IMPL-EVAL line citing only cycle 2).
+
+### The workflow-scope wall has three categories, not two
+
+D-297 recorded that merging main is accepted where cherry-picking is refused. S9 shows that is
+incomplete:
+
+| Branch shape | Adopting #1846 |
+| --- | --- |
+| Passive w.r.t. `e2e-cli.yml` (S8, S10, S13) | **merge works** — the resolved blob already exists on the remote |
+| Authors its own workflow content (S9) | **blocked** — the merge yields *its* additions plus `queue: max`, a combination on no remote blob |
+| Writes the fix itself (internals' #1908) | **blocked** — a genuinely new blob |
+
+S9 adds artifact upload paths for `agent.aspire-mcp-smoke` receipts (`retention-days: 30`), which is
+how #1721 box 2's receipt is produced. Merging S8 into S9 produced blob `b079a311b619` against
+`d69f74835867` on both S8 and main, and the push was refused. So "merging works" is true only for a
+branch that does not touch the file at all — a branch can be in the authoring category without
+intending to be.
+
+**S9 does not need escalation for this.** It already carries `cancel-in-progress: false` on both
+tiers, so it cannot evict other topics; it only risks its own queued job being replaced under
+GitHub's default single-pending-entry behaviour, and only if two S9 runs are stacked. Mitigation is
+to dispatch exactly one run and touch no labels while it is in flight, which is what was done.
+
+Live confirmation of the fix, from internals: after S8's integration pushed at `daa4dad4d`, their
+#1889 docker tier was `in_progress` and **stayed** `in_progress` — a fresh arrival from a fixed
+branch deferred instead of evicting, on a branch that v1 arrivals had already evicted twice.
