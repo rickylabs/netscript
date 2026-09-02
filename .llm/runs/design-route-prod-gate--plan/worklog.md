@@ -73,6 +73,7 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | 2026-09-02T17:27:31Z | Plan | Gate status | PLAN-EVAL selected and pending. No implementation or later-phase gate was run. |
 | 2026-09-02T19:02:00Z | Implement | Plan gate | Resumed only after separate-session `PASS_PLAN` at `5566a89f6` for plan head `f8ed75b41`. |
 | 2026-09-02T19:10:00Z | Implement | RED 1 | Added focused middleware/config/materialization expectations and `scaffold.design-production-exclusion` registration/order expectations. The structured test wrapper failed as required: missing `TEMPLATE_KEYS.appRoutesDesignMiddleware` and missing `GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` (exit 1, five type errors). No implementation exists in this step. |
+| 2026-09-02T19:15:00Z | Implement | RED 2 | `scaffold.design-production-exclusion` production-build baseline probe is `HOSTED_PENDING` under `ci:full`. Per the coordinator constraint, no local `e2e:cli`, Aspire, or Docker command was run. |
 
 ## Decisions
 
@@ -86,7 +87,7 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None | — | `drift.md` records no divergence at plan time. |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts` was omitted from the plan file list but is the existing selector required to put the new registered gate into `scaffold.runtime`. | minor | `drift.md` D-1; bounded inside `packages/cli/**` with no new gate-directory child |
 
 ## Gate Results
 
@@ -95,7 +96,8 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | PLAN-EVAL | PASS | `plan-eval.md`; evaluator commit `5566a89f6`, plan head `f8ed75b41` |
 | RED focused tests | EXPECTED_FAIL | Structured `run-deno-test.ts` over five focused unit/E2E files exited 1 with missing middleware asset key and gate ID; 2026-09-02 |
 | Local GREEN rows 1–7 | NOT_RUN | Awaiting implementation and generated-barrel steps |
-| Hosted rows 8–9 | NOT_RUN | Hosted-only; local runtime E2E prohibited |
+| Hosted development behavior | HOSTED_PENDING | Existing `behavior.app-reference`; local runtime E2E prohibited |
+| Hosted production exclusion | HOSTED_PENDING | New `scaffold.design-production-exclusion` baseline/mutation/restoration probe under `ci:full` |
 
 ## Handoff Notes
 

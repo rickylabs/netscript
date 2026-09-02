@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `implement` — RED expectations landed locally |
+| Current phase | `implement` — RED expectations committed; hosted RED pending |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-PLAN-EVAL passed for plan head `f8ed75b41`. The first implementation step is RED: focused tests now specify the middleware, Vite ignore, emitted file, and hosted gate registration/order contracts, and the structured wrapper fails on the deliberately missing asset key and gate ID.
+PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`: focused tests specify the middleware, Vite ignore, emitted file, and hosted gate registration/order contracts, and the structured wrapper fails on the deliberately missing asset key and gate ID. RED step 2 is hosted-pending; no local runtime E2E was run.
 
 ## Completed
 
@@ -28,12 +28,12 @@ PLAN-EVAL passed for plan head `f8ed75b41`. The first implementation step is RED
 
 ## In Progress
 
-- Commit RED step 1, then record hosted RED as pending without running local runtime E2E.
+- Implement GREEN step 3 without running local runtime E2E.
 
 ## Next Steps
 
-1. Record hosted production RED as `HOSTED_PENDING`; do not run `e2e:cli` locally.
-2. Implement manifest/load/write, middleware, Vite ignore, and hosted mutation probe.
+1. Implement manifest/load/write, middleware, Vite ignore, and hosted mutation probe.
+2. Select the new gate into `scaffold.runtime` through the existing capability suite selector (recorded drift D-1).
 3. Regenerate `embedded.generated.ts` only through `deno task gen:assets-barrel`.
 4. Run local validation rows 1–7 plus the four-carrier pre-push chain.
 5. Stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
@@ -66,7 +66,7 @@ PLAN-EVAL passed for plan head `f8ed75b41`. The first implementation step is RED
 | Plan-Gate | PASS | `plan-eval.md` at `5566a89f6`, evaluated plan head `f8ed75b41` |
 | Static | NOT_RUN | Explicitly deferred to implementation |
 | Fitness | NOT_RUN | Explicitly deferred to implementation |
-| Runtime | NOT_RUN | Hosted only under `ci:full` with coordinator lease |
+| Runtime | HOSTED_PENDING | Hosted only under `ci:full`; no local `e2e:cli`, Aspire, or Docker run |
 | Consumer | NOT_RUN | Explicitly deferred to implementation |
 
 ## Open Questions
@@ -75,7 +75,7 @@ PLAN-EVAL passed for plan head `f8ed75b41`. The first implementation step is RED
 
 ## Drift and Debt
 
-- Drift: none at plan time.
+- Drift: D-1 adds the existing `packages/cli/e2e/suites/scaffold/capability-suites.ts` selector omitted from the plan file list; this is required for runtime-suite inclusion and remains inside authorized `packages/cli/**` scope.
 - Debt: existing `scaffold-runtime-a8-f16-1333` remains open and is not deepened.
 
 ## Commits
