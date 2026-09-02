@@ -10061,3 +10061,41 @@ be the **wrong** bound for `release-canary`, because "run every queued publish" 
 safer than "replace the pending one" for an operation against an immutable registry. The issue's
 acceptance assumes `queue: max`; if the author's analysis rejects it, that is a supervisor decision
 and they stop and report instead of applying it.
+
+### D-231 — I killed my own #1905 author, then briefly recorded the wrong reason
+
+**What happened.** `launch-codex-slice` does not return after starting the child; it holds the
+`codex exec` subprocess for the child's entire run. I called it in the foreground under
+`timeout 300`. At `12:07:24` the timeout fired and **SIGTERMed the worker with the launcher** —
+exit `143`. The thread had produced nothing: worktree clean at `77ad823dc`, no commits, no dirty
+tree.
+
+**The wrong conclusion I drew first, and what disproved it.** Immediately after the `143` I checked
+`agentic:codex-status`, saw thread `01a06193` reporting `state: working`, and concluded the
+daemon-hosted thread had survived the launcher's death. I recorded that as a durable operating fact.
+It was false. **`codex-status`'s `state` field is not liveness** — the daemon never learned the
+worker had been signalled, so it kept reporting the last state it was told. The rollout `.jsonl`
+mtime is the honest signal: frozen at `12:07:24` while wall clock reached `12:23:54`, sixteen minutes
+of silence. On re-check the thread was absent from the session list entirely.
+
+The three processes holding the worktree as `/proc/<pid>/cwd` were **my own monitor shell and its
+`sleep`** — a fresh instance of the self-matching hazard already recorded for `pgrep -f`, arriving
+this time through a watcher I had armed myself. Identify before concluding, including when the
+process is yours.
+
+**Correction made.** The false claim was removed from the durable note rather than left standing
+next to the true one; the correct procedure was already recorded independently — launch detached
+under `setsid nohup`, and on silence check rollout mtime and `/proc/<pid>/cwd` before concluding,
+then **resume the thread id rather than relaunching**.
+
+**Recovery.** Resumed `01a06193-2960-7a30-8c87-3a8e12b57a6a` detached
+(`setsid nohup … codex-resume.ts --message-file … &`), with a follow-up stating plainly that the
+interruption was supervisor-side and not a signal to change approach. Rollout resumed writing at
+`12:24:47`. Nothing was lost — there was no partial work to lose, and the thread's research context
+survives in its own history, which is why resume beat relaunch even with a clean tree.
+
+**Watcher replaced, because the first one could not see this failure.** It polled git state and
+reported `STALLED` only after 20 unchanged polls — silence and death look identical to it, and it
+would have kept reporting a dead worker as merely quiet. The replacement breaks on rollout silence
+exceeding 400s and names it as death, which is the same discipline as D-227's `steps: 0`: pick the
+signal that distinguishes the two states rather than the one that hides the difference.
