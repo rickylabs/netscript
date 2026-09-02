@@ -51,4 +51,3 @@
   test will prove whether the unchanged generated template is sufficient to boot all three service
   consumers without a scaffolded project. If it is not, implementation stops rather than replacing
   the requested generated-consumer proof with an object-shape unit test.
-

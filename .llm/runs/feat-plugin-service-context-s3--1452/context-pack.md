@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `feat-plugin-service-context-s3--1452` |
 | Branch | `feat/plugin-service-context-s3` |
-| Current phase | `sign-off` |
+| Current phase | `impl-eval-complete` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | none |
 
 ## Current State
 
-The single implementation slice passed supervisor review, all pre-commit gates, and all three
-post-commit carrier checks. The generic
+The single implementation slice passed supervisor review, all pre-commit gates, all three
+post-commit carrier checks, and formal opposite-family IMPL-EVAL at PR #1944. The generic
 context assembles caller-resolved appsettings/environment once while retaining lazy memoized DB/KV.
 The unchanged CLI template was materialized at its real generated path and booted the real
 workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-EVAL remains N/A.
@@ -27,12 +27,12 @@ workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-
 
 ## In Progress
 
-- PR bootstrap and mandatory separate-session IMPL-EVAL.
+- Publish the structured evaluator receipt and final harness commit.
 
 ## Next Steps
 
-1. Push and atomically open the required non-draft PR with labels/milestone.
-2. Run the separate-session IMPL-EVAL and publish its structured PR comment.
+1. Commit and push `evaluate.md` plus final run receipts.
+2. Publish the structured IMPL-EVAL PR comment.
 
 ## Key Decisions
 
@@ -77,3 +77,12 @@ workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-
 ## Commits
 
 - `18ace6ac3` — product, consumer proof, generated corpus, and pre-commit gate evidence.
+- `8cd55070d` — post-commit carrier evidence; exact head evaluated by Fable 5.1.
+
+## Evaluation
+
+- Verdict: `PASS_WITH_NOTES` (harness `PASS`), no blocker.
+- Evaluator: native Claude Fable 5.1, medium requested, session
+  `e95813a6-7cb7-4e2e-9d1b-181405a3e8ad`.
+- Main note: pre-existing auth audit-salt presence guard should reuse structural narrowing in a
+  follow-up; no expansion of this owner-reviewed slice.

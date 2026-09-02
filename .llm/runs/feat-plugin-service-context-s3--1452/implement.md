@@ -22,4 +22,3 @@ Implement only `.llm/runs/feat-plugin-service-context-s3--1452/plan.md`.
 5. Do not edit `packages/cli`, `packages/plugin/deno.json`, or `deno.lock`.
 6. Update `worklog.md` and `context-pack.md`; do not commit or push. The supervisor performs slice
    review and the sign-off commit after gates.
-

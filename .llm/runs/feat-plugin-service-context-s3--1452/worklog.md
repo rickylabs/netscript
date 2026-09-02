@@ -65,6 +65,7 @@ Add future host-owned synchronous context values as optional resolver fields in
 | 2026-09-02 | 1 | supervisor review | Accepted the public seam, auth narrowing, and genuine generated-consumer lifecycle proof; no scope expansion required |
 | 2026-09-02 | 1 | full gates | Structured package/auth gates, full plugin tests, doc/publish/docs, quality/architecture, and baseline-sensitive fitness gates completed |
 | 2026-09-02 | 1 | carrier generation | Ran assets barrel, publish assets, then MCP export corpus; only the corpus changed, exactly for the two `@netscript/plugin/sdk` entries whose public documentation/signatures moved |
+| 2026-09-02 | 1 | formal IMPL-EVAL | Fresh native Claude Fable 5.1 session `e95813a6-7cb7-4e2e-9d1b-181405a3e8ad` evaluated PR #1944 at `8cd55070d`: `PASS_WITH_NOTES`, no blocking findings |
 
 ## Decisions
 
@@ -116,6 +117,11 @@ them and are the sign-off verdicts.
 | `deno task check:assets-barrel` after commit `18ace6ac3` | 0 | regenerated carriers match committed assets |
 | `deno task check:publish-assets` after commit `18ace6ac3` | 0 | publish carriers match committed assets |
 | `deno task check:mcp-export-corpus` after commit `18ace6ac3` | 0 | committed corpus matches: 35 packages, 273 subpaths, 7816 symbols, SHA `628133…5d7c` |
+| evaluator focused plugin tests | 0 | 3 passed, 0 failed, 0 ignored |
+| evaluator full plugin tests | 0 | 97 passed, 0 failed, 0 ignored |
+| evaluator checks: plugin/auth/sagas/workers | 0 | 158/39/87/103 files, 0 diagnostics in every root |
+| evaluator plugin/auth lint + fmt | 0 | 158/39 files, 0 findings in every run |
+| evaluator publish, quality, MCP carrier | 0 | every independently repeated verdict gate passed |
 
 MCP corpus provenance changed by +143 uncompressed bytes (2,192,016 → 2,192,159) and +67
 compressed bytes (317,993 → 318,060), with symbol count unchanged at 7,816. Decoded A/B evidence
@@ -130,4 +136,6 @@ Protected-file SHA-256 remains unchanged: `packages/plugin/deno.json`
 
 - Inspect the generated-consumer test first: it must start/ready/stop each real service.
 - Verify `packages/plugin/deno.json` and `deno.lock` remain byte-identical.
-- All post-commit carrier checks passed; separate IMPL-EVAL remains after PR bootstrap.
+- Formal IMPL-EVAL passed with non-blocking notes. Its principal follow-up is the pre-existing
+  `plugins/auth/services/src/main.ts` audit-salt presence guard, which should reuse the new structural
+  narrowing in a later auth hardening slice; this reviewed slice remains unchanged.

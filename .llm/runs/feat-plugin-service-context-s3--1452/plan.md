@@ -128,4 +128,3 @@ ready without Aspire, Docker, browser, or hosted E2E.
 - Generated template proves insufficient to construct and reach ready.
 - Any CLI/template or manifest/lock change becomes necessary.
 - Any appsettings design requires concrete config merging or package dependencies.
-

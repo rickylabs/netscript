@@ -28,4 +28,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 - The owner requires the final PR to open non-draft with `status:impl`, overriding the generic
   draft-PR-on-bootstrap convention. The local commit trail and run artifacts remain authoritative
   until that final open action.
-

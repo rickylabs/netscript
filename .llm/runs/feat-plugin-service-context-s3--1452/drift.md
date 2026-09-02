@@ -38,3 +38,17 @@ Drift is append-only.
 - **Evidence:** Auth now accepts the generic base context and structurally validates/narrows its
   optional appsettings fields before plugin-specific access; no cast or concrete base dependency
   was added. The focused wrapper passes 3/3 tests including real auth boot.
+
+## 2026-09-02 — PR metadata connector parsed the create response incorrectly
+
+- **What:** The PR-create action contained both creation and metadata mutation, but its local result
+  parser expected `structuredContent.result.number` while the connector returned
+  `structuredContent.number`; the metadata sub-call therefore did not run in that action.
+- **Source:** Required atomic PR metadata contract and the live connector response for PR #1944.
+- **Expected:** Non-draft PR creation, six labels, and milestone 0.0.7 in one action.
+- **Actual:** The PR opened non-draft with the correct body, then the exact labels and milestone were
+  applied in the immediately following action eight seconds later.
+- **Severity:** minor
+- **Action:** accept and record; final live metadata is complete.
+- **Evidence:** PR #1944 has labels `orchestrator:features`, `status:impl`, `type:feat`,
+  `area:plugins`, `priority:p2`, `wave:v1`, and milestone 0.0.7.
