@@ -146,43 +146,62 @@ platform surface.**
 Choose the observation mechanism in this order. Only fall down the list when the layer above
 genuinely cannot express the thing.
 
-### 1. Resource lifecycle events (preferred — push-based, no timing)
+### 1. Resource lifecycle events (push-based, no timing)
 
-Every resource builder exposes subscription handles. Resource events are raised **per resource**, in
-the order listed below.
+Resource events are raised **per resource**, in this startup order:
+
+`InitializeResourceEvent` → `ResourceEndpointsAllocatedEvent` → `ConnectionStringAvailableEvent` →
+`BeforeResourceStartedEvent` → `ResourceReadyEvent`.
+
+`ResourceStoppedEvent` is separate — it is raised after a resource stops, not part of that sequence.
 
 **`ResourceReadyEvent` is raised when a resource _initially_ transitions to a ready state — it fires
 once.** It is the native _first-readiness_ signal, not a health-transition stream. Do not use it to
 assert recovery after an induced failure: it will not fire again, so the test hangs instead of
 failing. For repeated transitions use the stream in section 3.
 
-| Handle                             | Fires when                       |
-| ---------------------------------- | -------------------------------- |
-| `onResourceReady(cb)`              | resource reached a healthy state |
-| `onResourceStopped(cb)`            | resource stopped                 |
-| `onBeforeResourceStarted(cb)`      | before start                     |
-| `onInitializeResource(cb)`         | during initialization            |
-| `onConnectionStringAvailable(cb)`  | connection string resolved       |
-| `onResourceEndpointsAllocated(cb)` | endpoints allocated              |
+Handles are **capability-scoped**, not present on every builder:
 
-App-level events come from `builder.eventing()` → `onBeforeStart`, `onAfterResourcesCreated`,
-`onBeforePublish`, `onAfterPublish`.
+| Handle                             | Fires when                 | Available on                   |
+| ---------------------------------- | -------------------------- | ------------------------------ |
+| `onInitializeResource(cb)`         | during initialization      | base resource                  |
+| `onBeforeResourceStarted(cb)`      | before start               | base resource                  |
+| `onResourceReady(cb)`              | first transition to ready  | base resource                  |
+| `onResourceStopped(cb)`            | resource stopped           | base resource                  |
+| `onConnectionStringAvailable(cb)`  | connection string resolved | `ResourceWithConnectionString` |
+| `onResourceEndpointsAllocated(cb)` | endpoints allocated        | `ResourceWithEndpoints`        |
 
-### 2. `ResourceNotificationService` (when you need to await a specific state)
+**App-level events, TypeScript AppHost.** Subscribe inline on the builder:
+`builder.subscribeBeforeStart(...)`, `builder.subscribeAfterResourcesCreated(...)`,
+`builder.subscribeBeforePublish(...)`, `builder.subscribeAfterPublish(...)`.
+
+`builder.eventing()` is **not** the subscription path — the `DistributedApplicationEventing` it
+returns exposes only `unsubscribe`. The `onBeforeStart` / `onAfterResourcesCreated` /
+`onBeforePublish` / `onAfterPublish` names live on the registration context handed to
+`builder.addEventingSubscriber(...)`, which is how a service or extension library subscribes instead
+of the AppHost doing it inline. `addEventingSubscriber` changes **where** you subscribe from, not
+**when** events fire.
+
+### 2. `ResourceNotificationService` — state waits, and health _arrival_ only
 
 Reached via `builder.notifications()`:
 
-| API                                           | Behaviour                                                    |
-| --------------------------------------------- | ------------------------------------------------------------ |
-| `waitForResourceHealthy(name)`                | awaits health arrival → `ResourceEventDto`                   |
-| `waitForResourceStates(name, targetStates[])` | awaits **any** of an arbitrary state list, returns which hit |
-| `waitForResourceState(name, options?)`        | awaits a single target state                                 |
-| `tryGetResourceState(name)`                   | current state, **including `healthStatus`**                  |
-| `publishResourceUpdate(resource, options?)`   | pushes a resource update                                     |
+| API                                           | Behaviour                                                              |
+| --------------------------------------------- | ---------------------------------------------------------------------- |
+| `waitForResourceHealthy(name)`                | awaits health **arrival** → `ResourceEventDto`                         |
+| `waitForResourceStates(name, targetStates[])` | awaits any of an arbitrary **lifecycle-state** list, returns which hit |
+| `waitForResourceState(name, options?)`        | awaits a single target lifecycle state                                 |
+| `tryGetResourceState(name)`                   | current state, including `healthStatus`                                |
+| `publishResourceUpdate(resource, options?)`   | pushes a `state` / `stateStyle` update                                 |
 
-`ResourceEventDto` carries `resourceName`, `resourceId`, `state`, `stateStyle`, **`healthStatus`**,
-and `exitCode`. Because `waitForResourceStates` accepts arbitrary target states and the DTO carries
-health, **both arrival and departure are natively expressible**.
+`ResourceEventDto` carries `resourceName`, `resourceId`, `state`, `stateStyle`, `healthStatus`,
+`exitCode`.
+
+**This service cannot express a health _departure_.** `targetStates` are lifecycle-state strings,
+not health values, and `healthStatus` is output data on the DTO rather than something you can wait
+on; `publishResourceUpdate` likewise takes state, not health. `waitForResourceHealthy` covers health
+arrival and there is no departure counterpart here. For a healthy → unhealthy transition, or any
+repeated health cycle, use the stream in section 3.
 
 ### 3. `aspire describe --follow` — a transition stream from outside the AppHost
 
@@ -268,12 +287,8 @@ reason to hand-roll.
   `aspire docs get <slug>`** over searching NuGet package caches or XML doc files. The CLI provides
   up-to-date content from aspire.dev.
 - Prefer `aspire.dev` and `learn.microsoft.com/microsoft/aspire` for official documentation.
-- **Never hand-roll health, readiness, or lifecycle observation.** Use resource events
-  (`onResourceReady`, `onResourceStopped`) or `builder.notifications()`. Arbitrary poll/timeout
-  constants against an Aspire resource are a defect, not a style choice — see the
-  observation-surface section above.
-
-## Playwright CLI
-
-If configured, use Playwright CLI for functional testing of resources. Get endpoints via
-`aspire describe`. Run `playwright-cli --help` for available commands.
+- **Never hand-roll health, readiness, or lifecycle observation.** Use the lifecycle events for
+  first-occurrence gating, `builder.notifications()` for lifecycle-state waits and health arrival,
+  and `aspire describe --follow` for repeated health transitions. Arbitrary poll/timeout constants
+  against an Aspire resource are a defect, not a style choice — see the observation-surface section
+  above.
