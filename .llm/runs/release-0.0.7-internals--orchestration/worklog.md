@@ -10686,3 +10686,11 @@ turns; on-request evaluation for other lanes remains offered.
 Lane totals this rotation: 4 issues closed (3 × 0.0.7 + 1 × 0.0.8), 4 PRs merged, 5 opposite-family
 IMPL-EVALs dispatched or performed (#1917, #1923, #1929, #1937 authored-leaf; #1933 coordinator leaf),
 1 post-merge proof PR, 0 merges by this supervisor.
+
+### D-247 — reconciliation at e341c6f71: live vs central ledger, no ownership change
+
+Main `e341c6f71` confirmed. Milestone 36 open / 284 closed. Internals live: 0 issues, 1 PR (#1641
+umbrella); unowned 0.0.7: 0. Central ledger ~7h stale (11:52Z, `ec848e6b0`, schema v1, no
+`reporting`); per-lane counts disagree with GitHub across all five lanes. Delta table posted to
+#1641 for coordinator refresh; file not edited (coordinator-owned; will become a v2 hard gate).
+Watchers current. No transfer.
