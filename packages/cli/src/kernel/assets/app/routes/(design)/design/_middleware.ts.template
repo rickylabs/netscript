@@ -1,0 +1,10 @@
+import { define } from '@app/utils.ts';
+
+export const handler = define.middleware(async (ctx) => {
+  const mode = Deno.env.get('MODE') ?? Deno.env.get('NODE_ENV');
+  if (mode !== 'development') {
+    return new Response('Not Found', { status: 404 });
+  }
+
+  return await ctx.next();
+});

@@ -56,6 +56,7 @@ export async function writeNormalizedAppFiles(
     appDesignFloatingSurfaceDemoTemplate,
     appDesignIndexRouteTemplate,
     appDesignLayoutTemplate,
+    appDesignMiddlewareTemplate,
     appDesignRegistryTemplate,
     appDesignTokenClipboardTemplate,
     appDesignTokensLibTemplate,
@@ -258,6 +259,7 @@ export async function writeNormalizedAppFiles(
     join(designRoutesDir, '_layout.tsx'),
     await context.templateAdapter.render(appDesignLayoutTemplate, appTemplateVars),
   );
+  await write(join(designRoutesDir, '_middleware.ts'), appDesignMiddlewareTemplate);
   await write(join(designRoutesDir, 'index.tsx'), appDesignIndexRouteTemplate);
   await write(join(designRoutesDir, 'tokens.tsx'), appDesignTokensRouteTemplate);
   await write(join(designComponentsDir, 'tokens-view.tsx'), appDesignTokensViewTemplate);

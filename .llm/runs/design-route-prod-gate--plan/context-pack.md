@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `implement` — RED expectations committed; hosted RED pending |
+| Current phase | `implement` — source GREEN complete; embedded regeneration next |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`: focused tests specify the middleware, Vite ignore, emitted file, and hosted gate registration/order contracts, and the structured wrapper fails on the deliberately missing asset key and gate ID. RED step 2 is hosted-pending; no local runtime E2E was run.
+PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`, and RED step 2 remains hosted-pending. GREEN step 3 now implements both independent exclusions and the mutation-proved hosted gate. The focused E2E registration/order tests pass 32/32; the only structured check failure is the deliberately stale embedded barrel assigned to GREEN step 4.
 
 ## Completed
 
@@ -25,18 +25,17 @@ PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b
 - Wrote research, plan, design checkpoint, supervisor identity, context, and drift artifacts.
 - Received separate-session `PASS_PLAN` at evaluator commit `5566a89f6`.
 - Ran RED step 1 through the structured test wrapper; exit 1 is the expected evidence.
+- Implemented GREEN step 3 and passed the focused E2E registration/order tests (32/32).
 
 ## In Progress
 
-- Implement GREEN step 3 without running local runtime E2E.
+- Regenerate the embedded barrel through its checked-in generator, then run local rows 1–7.
 
 ## Next Steps
 
-1. Implement manifest/load/write, middleware, Vite ignore, and hosted mutation probe.
-2. Select the new gate into `scaffold.runtime` through the existing capability suite selector (recorded drift D-1).
-3. Regenerate `embedded.generated.ts` only through `deno task gen:assets-barrel`.
-4. Run local validation rows 1–7 plus the four-carrier pre-push chain.
-5. Stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
+1. Regenerate `embedded.generated.ts` only through `deno task gen:assets-barrel`.
+2. Run local validation rows 1–7 plus the four-carrier pre-push chain.
+3. Push the source and generated GREEN commits, update the PR phase surface, and stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
 
 ## Key Decisions
 

@@ -66,6 +66,7 @@ export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
   SCAFFOLD_INIT: 'scaffold.init',
+  SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION: 'scaffold.design-production-exclusion',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
   CONTRACT_LIST: 'contract.list',
