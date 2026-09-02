@@ -621,3 +621,20 @@ corpus. **No product source authored by this branch has changed since the verdic
 
 #1915 (`feat/sdk-credential-contribution`) also adds one line to `packages/plugin/src/sdk/mod.ts`.
 Both are single-line export additions; whichever merges second takes a one-line textual conflict.
+
+## #1354 stack — land order after #1664 (recorded 2026-09-03)
+
+All four leaves are natively evaluated; every one is stacked on `feat/app-service-client-wiring`
+(#1664), where the required `ci` workflow does not run. Land strictly in this order, flipping each
+base to `main` only after the previous PR merges, and issuing the exact-head packet only after the
+flipped head is green:
+
+| Order | PR | Slice | Evaluated head | Verdict | Notes |
+| --- | --- | --- | --- | --- | --- |
+| 0 | #1664 | (#1355/#1360) | `31d59a656` | runtime tiers gated on #1845 → #1885 | converge on the coordinator's #1885 merge SHA, rerun both runtime tiers in one lease, apply `status:ready-merge`, `gh run rerun` the existing ci run so the mirror ticks #1355/#1360 boxes |
+| 1 | #1950 | A — shared client selector | `f0cc2479d` (receipt `2f245956a`) | PASS_IMPL | 3 product files; flip base → `main`, regenerate carriers, ci must be green |
+| 2 | #1956 | F — init convergence + activation | `8c27ffe16` (closeout `ea221d187`) | PASS_IMPL_WITH_FINDINGS (M-1/M-2 recorded, debt `cli-resource-composition-io-1354`) | 33 files + absorbed `public-command-dependencies.ts`; flip base → `main` after #1950 |
+| 3 | #1958 | G — hosted acceptance hook + guidance | `178df1726` (receipt `7778a63b4`) | PASS_IMPL | 8 files; **first PR where `scaffold.runtime` exercises `generate resource`** — the hosted tiers at its flipped head are the plan's merge-readiness proof for #1354 |
+
+Closing: #1354 gets its `Closes` keyword only on #1958's body once its flipped head is green (all
+slices merged); #1348 (epic) is closed by hand after #1354, never by a leaf.
