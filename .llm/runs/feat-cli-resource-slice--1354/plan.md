@@ -19,8 +19,7 @@ netscript generate resource <resource> \
   [--client <service>] \
   [--route <route>] \
   [--form] [--partial] [--stream] \
-  [--dry-run] [--keep <path>...] [--replace <path>...] [--force] [--abort] \
-  [--recover <operation-id>] [--project-root <path>]
+  [--dry-run] [--force] [--project-root <path>]
 ```
 
 It generates a complete Fresh resource slice from one client resolved by #1664's selector, registers
@@ -90,20 +89,20 @@ selector.
 
 The no-silent-overwrite invariant is implemented in this exact order:
 
-1. parse and validate all flags, select the requested options, resolve the app/client/procedure, and
-   acquire the app-scoped single-writer resource-slice lock;
+1. parse and validate all flags, select the requested options, and resolve the app/client/procedure;
 2. read only marker metadata needed to calculate the effective option set; options are additive, so
    the effective set is the union of recognized prior options and the newly requested flags;
 3. render every candidate leaf, shared-source transform, and Fresh-derived output into a staging
    tree; no application target has changed yet;
 4. compare the complete candidate plan with current targets and classify every path as `write`,
-   `skip`, `keep`, `replace`, or an unresolved conflict;
-5. apply repeatable per-leaf remedies, revalidate the complete candidate graph, and report every
-   remaining conflict with its allowed next action;
-6. for `--dry-run` or `--abort`, report the candidate, dispositions, and conflicts and write no app
-   targets; unresolved conflicts exit 2;
-7. only a fully resolved plan enters the journalled apply phase, then reports deterministic
-   `written`/`skipped`/`kept`/`replaced` paths.
+   `skip`, or an unresolved conflict;
+5. build the report for every unresolved conflict and name its available manual action; do not apply
+   a per-leaf disposition;
+6. for `--dry-run`, emit the complete candidate/conflict report and write no application targets;
+   unresolved conflicts exit non-zero;
+7. otherwise, unresolved conflicts exit non-zero with the same report and zero writes; a
+   conflict-free plan applies the fully preflighted staged candidates and reports deterministic
+   `written`/`skipped` paths.
 
 Option selection therefore precedes candidate rendering, candidate rendering precedes conflict
 checking, and conflict checking precedes every application write. A pre-existing edited leaf cannot
@@ -132,60 +131,36 @@ is per-leaf provenance, not a sidecar and not an authenticity/security boundary.
 
 #### Conflict remedy surface
 
-- `--keep <app-relative-path>` is repeatable. It preserves that exact existing leaf and removes its
-  candidate write only if the resulting imports/registrations still form a valid complete plan.
-- `--replace <app-relative-path>` is repeatable and replaces only a syntactically valid,
-  resource/role-matching owned leaf. It never adopts or replaces an unowned leaf or shared source.
-- `--force` is shorthand for `--replace` on every replaceable owned-leaf conflict in the candidate;
-  it does not affect unowned leaves, `router.ts`, `utils.ts`, generated-app composition, or input
-  validation.
-- `--abort` is the explicit abandon path: emit the same report as dry-run, release the lock, exit 2,
-  and leave the application byte-identical. Doing nothing after the default conflict report is also
-  safe; the report prints the exact `--keep`, `--replace`, `--force`, or manual move/rename command
-  available for each path.
-- the same path in `--keep` and `--replace`, an absolute/out-of-app path, or a remedy for a path
-  that is not in the candidate conflict set fails before staging.
+An unresolved conflict produces a deterministic report, exits non-zero, and writes zero application
+targets. For each conflicting path, the report names the available manual move/rename action or
+`--force` when, and only when, the leaf is positively generator-owned. An unowned or `owned-edited`
+leaf is never replaced, including under `--force`. Force never affects `router.ts`, `utils.ts`,
+generated-app composition, another shared source, or input validation.
 
-An unowned collision can be kept when graph validation succeeds, moved/renamed manually, or
-abandoned; it cannot be replaced by `--replace` or `--force`. Resolved remedies permit the remaining
-plan to proceed. Unresolved conflicts prevent all writes.
+#### Deferred cross-file atomicity and concurrency
 
-#### Apply atomicity and recovery
+Process-crash/mid-rename cross-file atomicity and concurrent-invocation locking are explicitly
+deferred. After full preflight succeeds and apply begins, a process crash between renames can leave
+a partially written slice; two concurrent invocations are not serialized. The observable consequence
+is a mix of old, new, or absent candidate files. Manual recovery is to rerun the command after the
+process exits, or move/rename partial output until preflight succeeds. Closing these correctly
+requires journal-store, lock, and backup/restore IO adapters that no declared slice owns; a later
+issue must scope those adapters and tests. #1354 promises zero writes for any pre-apply failure, not
+crash-atomic multi-file emission or concurrency serialization.
 
-Conflict handling is all-or-nothing. Physical multi-file emission is not a filesystem transaction
-and is not crash-atomic, so the adapter makes that limitation explicit:
+Required proof is:
 
-1. Fresh discovery/writing runs against the staging tree first; a Fresh-writer failure produces no
-   app writes.
-2. Before the first target rename, the adapter writes a recovery journal under
-   `.netscript/recovery/resource-slice/<operation-id>.json` and stores same-filesystem backups of
-   every replaced target.
-3. Each staged file is renamed into place. A handled IO failure triggers reverse-order rollback:
-   restore backups and remove newly created targets.
-4. If rollback succeeds, the app returns to its byte-identical pre-run state. If the process crashes
-   or rollback itself fails, the journal remains, the result is `partial-write`, and every later
-   generation refuses to run until `--recover <operation-id>` restores the journalled state.
-5. Recovery is mutually exclusive with generation options, is idempotent, and deletes the journal
-   only after verifying the original hashes. A failed recovery retains the journal and prints the
-   exact unresolved paths.
-
-The app-scoped lock covers option selection through journal removal. A concurrent invocation fails
-before rendering; the command does not promise distributed/network-filesystem locking.
-
-Required proof has seven conflict cases plus apply failure coverage:
-
-1. first run reports written files;
-2. identical second run exits 0, reports every selected output as skipped, and writes zero bytes;
-3. a later additive option selects first, renders, dry-runs, and reports the edited base-leaf
-   remedy;
-4. an owned edited leaf without a remedy exits 2 and leaves the app byte-identical;
-5. explicit per-leaf replace or owned-only force changes only the named owned leaf;
-6. unmarked/foreign content cannot be replaced, including under force;
-7. a copied valid marker with a mismatched body hash is classified `owned-edited`, not silently
-   trusted or replaced;
-8. a late shared-source or Fresh staging failure produces zero app writes; and
-9. an injected mid-apply failure rolls back, while a crash-journal fixture blocks generation until
-   idempotent recovery completes.
+1. every pre-apply failure leaves the app byte-identical: inject invalid input/client/procedure
+   validation, a Fresh staging/writer failure, and a shared-source transform failure as distinct
+   cases, each before the first application write;
+2. a default unresolved conflict reports every path and its manual move/rename or eligible
+   owned-only-force action, exits non-zero, and writes nothing;
+3. an identical second run exits 0, reports every selected output as skipped, and writes zero bytes;
+4. a later additive option still selects, renders, and dry-runs against an edited base leaf, naming
+   manual move/rename as the remedy;
+5. a valid marker with a mismatched body hash is `owned-edited`, conflicts, and is never
+   automatically replaced or replaced under `--force`; and
+6. unmarked/foreign content is unowned, conflicts, and is never replaced, including under `--force`.
 
 ### D4 — One neutral template family and one planner are authoritative
 
@@ -255,7 +230,8 @@ content-compared. They are not parsed as user-owned shared source and are not ha
 `.generated/manifest.ts` or `.generated/routes.ts` is a candidate create; stale generated content is
 a candidate replace because the Fresh header declares it derived. A directory, symlink, unrecognized
 non-generated file, or unreadable target at either path is a preflight conflict. Fresh writer errors
-occur in staging under D3; apply-phase errors use D3's journal and recovery.
+occur in staging under D3 and therefore before the first application write. Errors after apply
+begins fall within D3's explicitly deferred crash/mid-rename scope.
 
 ### D6 — State extension is conditional and bounded
 
@@ -321,7 +297,7 @@ option's leaves. Dry-run names every addition and exact canonical transition bef
 Options are additive: omitting a previously recorded `--form`, `--partial`, or `--stream` flag keeps
 that option in the effective marker-derived set. No invocation silently removes an option leaf or
 shared import. Resource/option removal is deferred; manual deletion or an attempted downgrade is a
-conflict with recreate, keep/manual repair, or abandon remedies.
+conflict with recreate, manual move/rename, or abandon guidance.
 
 ### D8 — Keep IO and rendering behind CLI boundaries
 
@@ -415,7 +391,7 @@ it is not worked around by an out-of-brief local launch.
 | `.generated/manifest.ts`         | Fresh-derived                              | regenerate through Fresh writer, content-compare                        | generated file is regenerated, not hand-merged                |
 | `.generated/routes.ts`           | Fresh-derived                              | regenerate through Fresh writer, content-compare                        | generated file is regenerated, not hand-merged                |
 | `utils.ts` in generated app      | user-owned shared source                   | unchanged unless declared state requirement; bounded property insertion | unsupported/conflicting shape fails preflight; never replaced |
-| template manifest/carrier        | CLI package-generated registry             | add/remove keys atomically with template family                         | asset consistency gate rejects drift                          |
+| template manifest/carrier        | CLI package-generated registry             | add/remove keys in the same preflighted template-family plan            | asset consistency gate rejects drift                          |
 | #1664 service-query template     | #1664                                      | consume selected output only                                            | no #1354 edits                                                |
 
 ## Open-decision sweep
@@ -425,9 +401,10 @@ it is not worked around by an out-of-brief local launch.
 | New command vs `ui:add` mode               | **Resolved now**                         | D1: new `generate resource`; `ui:add --query` keeps #1664 behavior.                                                                                            |
 | App/client ambiguity                       | **Resolved now**                         | D2: exact #1664 selector; sole candidate accepted, ambiguous candidates fail closed, `--client` is the only selector.                                          |
 | Procedure identity                         | **Resolved now**                         | Required `--procedure`, validated before candidate rendering.                                                                                                  |
-| Rerun ordering and remedies                | **Resolved now**                         | D3: option selection → candidate render → conflict check → journalled write; per-leaf keep/replace, owned-only force, abort/recover.                           |
+| Rerun ordering and conflict handling       | **Resolved now**                         | D3: option selection → candidate render → conflict check → write; dry-run reports conflicts, followed by manual move/rename or owned-only force.               |
 | Ownership and marker-forgery behavior      | **Resolved now**                         | D3 pins the first-line JSON marker/body hash and classifies a mismatched hash as `owned-edited`.                                                               |
-| Apply atomicity/concurrency                | **Resolved now**                         | D3 uses staging, an app lock, rollback journal, and explicit recovery; it does not claim crash-atomic filesystem transactions.                                 |
+| Process-crash/mid-rename atomicity         | **Safe to defer**                        | D3 promises zero writes only before apply; a crash can leave a partial slice. Manual recovery is rerun or move/rename; a later issue must own the IO adapters. |
+| Concurrent-invocation locking              | **Safe to defer**                        | Invocations are not serialized. A later issue must scope a lock adapter and race tests.                                                                        |
 | Sidecar vs inline contract                 | **Resolved now**                         | D5: sidecar Form B only.                                                                                                                                       |
 | Manifest derivation                        | **Resolved now**                         | D5: Fresh public writer; no CLI clone; missing/stale derived outputs have explicit dispositions.                                                               |
 | Template authority / D4 convergence branch | **Resolved now**                         | One neutral planner; Slice F cannot activate the command unless the standing init/command equivalence gate passes. Failure requires rescope, never two copies. |
@@ -449,20 +426,20 @@ PLAN-EVAL.
 
 ## Risk register
 
-| Risk                                                           | Consequence                                                                | Mitigation / gate                                                                          |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| #1664 changes again before merge                               | stale overlap list, lost selector/cache-age/formatter work                 | D9 live re-diff at every slice start; record head/intersection; hard stop on movement      |
-| option selection is performed after conflict checking          | later `--form`/`--partial`/`--stream` cannot produce a candidate or remedy | D3 pins selection → render → conflict → write; dry-run test on edited base                 |
-| ownership marker is copied onto edited bytes                   | hand edit is mistaken for generator output                                 | exact marker/body hash; `owned-edited` conflict; seventh marker-forgery test               |
-| handled IO failure or process crash occurs mid-apply           | partial resource slice                                                     | staging + backups + reverse rollback; persistent journal and blocking idempotent recovery  |
-| two invocations race                                           | one preflight invalidates the other's assumptions                          | app-scoped single-writer lock through journal removal; concurrent-invocation test          |
-| init and command templates diverge                             | frozen example and rerunnable verb teach different architecture            | one planner; standing byte-equivalence gate; Slice F cannot activate on failure            |
-| Slice D/F exceeds 18/24 files                                  | hidden scope expansion or retained duplicate assets                        | hard file ceilings; stop and rescope before touching an unlisted file                      |
-| Fresh public exports add slow types/docs debt                  | publish regression                                                         | before/after doc-lint JSON, jsr-audit, `deps:prod-install`, `publish:dry-run`              |
-| `@netscript/fresh` dependency changes `deno.lock` unexpectedly | unexplained dependency churn                                               | Slice B owns and reviews only the resolved dependency delta; reject unrelated lock changes |
-| command options are "proved" by MCP export corpus              | false green because corpus follows exports, not Cliffy help/options        | parser/command-tree and E2E domain tests are acceptance; corpus check is freshness only    |
-| customized `router.ts`/`utils.ts` is outside recognized shapes | destructive or incorrect shared edit                                       | fail closed before apply; force cannot replace shared source; manual remedy reported       |
-| hosted runtime is first place static gate wiring is discovered | slow feedback and leaked resources                                         | Slice G runs local static gate-id/suite-composition tests only; runtime remains hosted     |
+| Risk                                                           | Consequence                                                                | Mitigation / gate                                                                           |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| #1664 changes again before merge                               | stale overlap list, lost selector/cache-age/formatter work                 | D9 live re-diff at every slice start; record head/intersection; hard stop on movement       |
+| option selection is performed after conflict checking          | later `--form`/`--partial`/`--stream` cannot produce a candidate or remedy | D3 pins selection → render → conflict → write; dry-run test on edited base                  |
+| ownership marker is copied onto edited bytes                   | hand edit is mistaken for generator output                                 | exact marker/body hash; `owned-edited` conflict; sixth proof case                           |
+| process crash occurs between application renames               | mix of old, new, or absent candidate files                                 | **Deferred:** rerun or move/rename partial output; a later issue owns journal/backup IO     |
+| two invocations race                                           | one preflight invalidates the other's assumptions                          | **Deferred:** not serialized; avoid concurrent runs until a later issue owns a lock adapter |
+| init and command templates diverge                             | frozen example and rerunnable verb teach different architecture            | one planner; standing byte-equivalence gate; Slice F cannot activate on failure             |
+| Slice D/F exceeds 18/24 files                                  | hidden scope expansion or retained duplicate assets                        | hard file ceilings; stop and rescope before touching an unlisted file                       |
+| Fresh public exports add slow types/docs debt                  | publish regression                                                         | before/after doc-lint JSON, jsr-audit, `deps:prod-install`, `publish:dry-run`               |
+| `@netscript/fresh` dependency changes `deno.lock` unexpectedly | unexplained dependency churn                                               | Slice B owns and reviews only the resolved dependency delta; reject unrelated lock changes  |
+| command options are "proved" by MCP export corpus              | false green because corpus follows exports, not Cliffy help/options        | parser/command-tree and E2E domain tests are acceptance; corpus check is freshness only     |
+| customized `router.ts`/`utils.ts` is outside recognized shapes | destructive or incorrect shared edit                                       | fail closed before apply; force cannot replace shared source; manual remedy reported        |
+| hosted runtime is first place static gate wiring is discovered | slow feedback and leaked resources                                         | Slice G runs local static gate-id/suite-composition tests only; runtime remains hosted      |
 
 ## Gate-set selection
 
@@ -572,7 +549,7 @@ reviewed `deno.lock` slot.
 **Landability:** pure application contracts/planning/reconciliation with fixtures. It does not
 register a command or alter init.
 
-**File ceiling:** 11.
+**File ceiling:** 10.
 
 **Expected touch set:**
 
@@ -584,10 +561,10 @@ register a command or alter init.
 4. `packages/cli/src/kernel/application/resource-slice/plan-resource-slice_test.ts` — always/form/
    partial/stream delta fixtures and forbidden-pattern assertions.
 5. `packages/cli/src/kernel/application/resource-slice/reconcile-resource-slice.ts` — absent/exact/
-   owned-divergent/foreign classification and atomic preflight result.
+   owned/owned-edited/unowned classification and full-preflight result.
 6. `packages/cli/src/kernel/application/resource-slice/reconcile-resource-slice_test.ts` — second
-   run, option-before-conflict ordering, seven conflict cases, remedies, marker forgery, rollback,
-   recovery, concurrency, and late-conflict zero-write tests.
+   run, option-before-conflict ordering, default conflict exit, owned-only force, marker forgery,
+   and pre-apply zero-write tests.
 7. `packages/cli/src/kernel/application/resource-slice/reconcile-app-routes.ts` — bounded
    `appRoutes` transform.
 8. `packages/cli/src/kernel/application/resource-slice/reconcile-app-routes_test.ts` — exact,
@@ -596,13 +573,12 @@ register a command or alter init.
    transform.
 10. `packages/cli/src/kernel/application/resource-slice/reconcile-state_test.ts` — both supported
     shapes and fail-closed fixtures.
-11. `packages/cli/src/kernel/application/resource-slice/README.md` — ownership boundary and the pure
-    plan/apply contract for maintainers; not end-user prose.
 
 **Required gates:**
 
 - all resource-slice unit tests;
-- injected Fresh staging and mid-apply failures proving zero-write/rollback/recovery behavior;
+- injected validation and shared-source transform failures proving they occur before the first
+  application write;
 - negative generated-content scan for `any`, raw `fetch(`, handwritten query-key arrays, and manual
   response `JSON.parse`;
 - structured package check/lint/fmt;
@@ -652,7 +628,7 @@ complete; it is independently safe because no public command selects the new fam
 - structured CLI check/lint/fmt;
 - JSR audit for `packages/cli`, publish dry-run, `arch:check`, and `quality:gate`.
 
-### Slice E — compose the unregistered command and atomic apply path (Refs #1354; partial)
+### Slice E — compose the unregistered command and preflighted apply path (Refs #1354; partial)
 
 **Landability:** implements and tests the command using the already tested planner, selector, and
 adapters, but deliberately does not register it in the public `generate` group. The command remains
@@ -681,10 +657,11 @@ template authority.
 
 - focused feature, parser, and composition tests;
 - twice-run temp-project test proving second run writes zero and exits 0;
-- missing-procedure/ambiguous-client/foreign-target/marker-forgery/late-router-conflict zero-write
-  tests;
-- `--dry-run`, per-leaf `--keep`/`--replace`, `--abort`, `--recover`, and constrained owned-only
-  `--force` tests;
+- injected invalid-input/client/procedure validation, Fresh staging/writer failure, and
+  shared-source transform failure tests, each proving the app is byte-identical because failure
+  occurs before the first application write;
+- `--dry-run`, default non-zero conflict exit, constrained owned-only `--force`, and proof that
+  `owned-edited`/unowned leaves remain unchanged even under force;
 - structured CLI check/lint/fmt;
 - CLI JSR audit, publish dry-run, `arch:check`, and `quality:gate`.
 
@@ -860,6 +837,12 @@ Before the assembled branch is called merge-ready, collect:
 
 ## Explicitly deferred
 
+- Process-crash/mid-rename cross-file atomicity. A crash after apply begins can leave a mix of old,
+  new, or absent candidate files; manual recovery is rerun or move/rename of partial output. A later
+  issue must scope the journal-store and backup/restore IO adapters needed to close this safely.
+- Concurrent-invocation locking. Two invocations are not serialized and can invalidate one another's
+  completed preflight; operators must avoid concurrent runs until a later issue scopes a lock
+  adapter and race tests.
 - #1355/#1664-owned client/query generation, cache-key identity, invalidation behavior, and the
   `service-query` template; #1354 consumes their merged output only.
 - Plugin-contributed route/SDK surface inclusion pending its RFC/owner issue.

@@ -12,3 +12,18 @@
 - **Lesson:** a new evaluator artifact is not progress by itself. Before dispatching another cycle,
   the supervisor must verify that `git diff <last-evaluated-head> -- plan.md` contains the required
   submission delta and record that verification in `worklog.md`.
+
+## 2026-09-02 — D3 exceeded its declared touch-set capability
+
+- **Severity:** scope.
+- **Expected:** every planned behavior is implementable by a file and IO boundary named in a
+  declared slice touch set.
+- **Observed:** D3 grew four flags (`--keep`, `--replace`, `--abort`, `--recover`) and three IO
+  adapter concerns (journal storage, invocation locking, and backup/restore), but no slice owned
+  those adapters and #1354 acceptance does not require them.
+- **Resolution:** coordinator-directed subtraction removed the mechanisms, preserved all pre-apply
+  safety guarantees, and explicitly deferred crash/mid-rename atomicity and concurrent-invocation
+  locking to a later issue with the necessary IO-adapter scope.
+- **Lesson:** a plan may only promise behavior some slice's declared touch set can implement. A
+  safety mechanism without an owning adapter, tests, and ceiling slot is deferred scope, not an
+  implementation promise.
