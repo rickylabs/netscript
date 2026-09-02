@@ -7856,3 +7856,15 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   evidenced statement (no fake tick before that).
 - Still NOT packet-ready: close-gate red, IMPL-EVAL pending. CI on `adff30990` (docs-only delta)
   in flight; Postgres/SQLite tiers must re-earn green at this exact head.
+
+## 2026-09-02T23:08Z — #1885 IMPL-EVAL PASS at `adff30990`; ready-merge; #1481 progress
+
+- OpenHands IMPL-EVAL run 33691504282 → `OPENHANDS_VERDICT: PASS` (23:02:27Z), no blocking findings;
+  LOW: two unticked DoD boxes (product-correction N/A, IMPL-EVAL) are the only close-gate cause.
+- Ticked DoD 2 (reworded: "not required by measurement", evidenced by the eval run) and DoD 5
+  (verdict ref). `status:impl-eval` → `status:ready-merge` (re-fires e2e-cli 33693389618 at the
+  same head; earlier 33691483751 already green on both tiers). close-gate rerun requested on ci
+  run 33691379465 (attempt 2) so the mirror runs under ready-merge.
+- Packet on close-gate green + e2e re-earned at `adff30990`.
+- Limit-reset nudges: #1481 worker committed `0c1778026 chore(cli): refresh embedded design route
+  assets` (local, unpushed); #1844 nudge delivered 23:04Z (local `4e1530d6e`, `fe68151de` + 7 dirty).
