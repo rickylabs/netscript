@@ -17,7 +17,7 @@
 | #1897 | **CLOSED** via #1918 |
 | #1353, #1467 | **CLOSED** via #1941 (merged; mirror 14/14) |
 | #1590 | PR **#1895** `d0bf0aebf` — `status:ready-merge`; exact-head `fresh-browser` green, IMPL-EVAL PASS, `close-gate` pass; runtime tiers are Aspire-lane flake (see below) |
-| #1355 / #1360 | PR **#1664** `e8983cca5` (converged on 5ce87fb8b) — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
+| #1355 / #1360 | PR **#1664** `31d59a656` — gated on #1845; **#1885 is the fix** (converge + runtime rerun after it merges) — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
 | #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = #1943 MERGED** `3c8b0fd18` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C = #1946 MERGED** `e341c6f71`. **Slice D = #1948 MERGED** `3a794be67`, base main — **native PASS, `status:ready-merge`**. **Slice E dispatched** (`007-leaf-1354-e`, base `0faae3fde` = main+B+D; hard fence: no `public-command-dependencies.ts`). **Slice A = PR #1950** `2f245956a` PASS_IMPL (stacked on #1664). **Slice E = #1954 MERGED** `a867ab9cb` (F absorbs LOW-1/LOW-2). **Slice F = PR #1956** `de042d23e` (eval head `8c27ffe16`, native eval running; must converge onto #1664 `31d59a656`). **Slice G** dispatched (`007-leaf-1354-g`, base `8c27ffe16`, stacked on F). Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
 | #1452 | **CLOSED** via #1944 (merged `7d1faa352`) |
 | #1348 | epic — receives no leaf PR by design |
