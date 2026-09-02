@@ -50,6 +50,7 @@ export type {
   PluginMetadataValue,
   PluginType,
   RuntimeConfigTopicContribution,
+  SdkClientContributionReference,
   ServiceContribution,
   StreamTopicContribution,
   TelemetryContribution,

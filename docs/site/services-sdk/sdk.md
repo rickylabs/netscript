@@ -161,9 +161,62 @@ touches discovery; `createQueryFactories` is pure wiring over `{ contract, clien
     { name: "routerName", type: "string?", desc: "Router-name segment for URL path construction. Required for plugin API services, omitted for plain services." },
     { name: "protocol", type: "'http' | 'https'?", desc: "Resolved protocol for service discovery." },
     { name: "apiPath / apiVersion", type: "string?", desc: "Base RPC path and API version segment overrides." },
-    { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call." }
+    { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call." },
+    { name: "contributions", type: "readonly SdkClientContribution[]?", desc: "Explicit literal tuple of typed request contributions. The tuple infers required per-call context and reserves its declared headers." }
   ]
 }) }}
+
+### Typed bearer credentials
+
+Credential fields do not belong on `CreateServiceClientOptions`. Instead, attach the canonical
+auth contribution through the versioned client-contribution seam. Its resolver receives only the
+context fields it declares, runs once per logical retry epoch, and owns only the lower-case
+`authorization` header:
+
+```ts
+import { createServiceClient } from '@netscript/sdk/client';
+import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
+import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
+
+declare const applicationSession: { accessToken: string; accountId: string };
+
+const bearer = createBearerSdkClientContribution<{
+  auth: { getAccessToken(): string | undefined | PromiseLike<string | undefined> };
+  accountPartition: string;
+}>({
+  context: { auth: 'required', accountPartition: 'required' },
+  resolveCredential: ({ context }) => context.auth.getAccessToken(),
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.accountPartition,
+  },
+});
+
+const authClient = createServiceClient({
+  contract: authContract,
+  serviceName: 'auth-api',
+  routerName: 'auth',
+  contributions: [bearer] as const,
+});
+
+await authClient.me(undefined, {
+  context: {
+    auth: { getAccessToken: () => applicationSession.accessToken },
+    accountPartition: applicationSession.accountId,
+  },
+});
+```
+
+Procedure metadata controls resolution: `none` skips the resolver, `optional` omits the header when
+no credential is available, and `required` fails preparation when it is missing. Unmarked routes
+default to `none`. Bearer credentials require HTTPS except on localhost, `.localhost`, IPv4
+`127/8`, and IPv6 `::1`; other cleartext origins require an explicit opt-in.
+
+Choose `responseCache: { mode: 'direct-only' }` if authenticated responses must bypass generated
+query helpers. A `partitioned` cache must use a stable, non-secret tenant/account partition. Never
+derive a partition from a credential, session id, email address, or another reversible identity.
+Contribution factories do not read ambient environment variables, cookies, or browser storage.
+Plugin manifest references only make factories discoverable—they do not activate them.
 
 The L3 alternative builds all three layers from one map:
 `defineServices({ orders: { contract, serviceName: 'orders' } })` returns
