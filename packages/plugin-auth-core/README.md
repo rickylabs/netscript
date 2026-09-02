@@ -31,7 +31,10 @@ NetScript host.
   `AuthProviderConfigSchema` normalize settings into a defaulted `AuthConfig` (secure `__Host-`
   cookies, TTL, refresh window).
 - **A versioned API contract** — `authContract` / `authContractV1` define the signin, callback,
-  session, me, and signout routes, so services and clients share one typed source of truth.
+  session, me, and signout routes with explicit authentication metadata, so services and clients
+  share one typed source of truth.
+- **Typed client credentials** — `createBearerSdkClientContribution` resolves credentials from
+  explicit per-call context and contributes only the declared `authorization` header.
 - **Observable and streamable** — `authStreamSchema` projects `auth.*` session events into durable
   streams, and `createAuthTelemetry` plus `redactAuthPrincipal` emit redacted spans, keeping
   principals out of your telemetry backend.
@@ -93,6 +96,7 @@ const session = await backend.sessions.getSession({ token: 'opaque-session-token
 | `./domain`       | Account, session, and user schemas plus the state vocabularies              |
 | `./config`       | `AuthConfigSchema` and the session/provider policy schemas                  |
 | `./contracts/v1` | `authContract` / `authContractV1` — the versioned auth API routes           |
+| `./sdk`          | Typed bearer credential contribution for NetScript service clients         |
 | `./streams`      | `authStreamSchema` and the `auth.*` session-event types                     |
 | `./telemetry`    | `createAuthTelemetry`, span names, and `redactAuthPrincipal`                |
 | `./presets`      | Provider and backend preset registry                                        |
@@ -101,6 +105,22 @@ const session = await backend.sessions.getSession({ token: 'opaque-session-token
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-auth-core@<version>`](https://jsr.io/@netscript/plugin-auth-core/doc)
 (pin `<version>` on the pre-release line, as above).
+
+## Bearer credentials for service clients
+
+Import `createBearerSdkClientContribution` from `@netscript/plugin-auth-core/sdk`, then attach the
+returned descriptor explicitly to the intended service client's `contributions` tuple. The resolver
+receives only the contribution's declared context projection. The module never reads environment
+variables, cookies, browser storage, or another ambient credential source.
+
+Choose `responseCache: { mode: 'direct-only' }` when authenticated responses must not enter generated
+query caches. For partitioned caching, return a stable, non-secret tenant or account partition. Never
+use a bearer token, session identifier, email address, or another reversible credential-derived value
+as the partition because cache keys may appear in diagnostics and developer tools.
+
+Credentials are sent over HTTPS and local-development loopback origins by default. Enabling
+`allowInsecureTransport` for another cleartext origin is an explicit security exception and should be
+limited to controlled development environments.
 
 ## Docs
 
