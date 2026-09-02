@@ -48,7 +48,19 @@ delete its branch, then link its Actions run on issue #1905 before checking acce
 
 ## RED Proof
 
-Pending slice 1.
+The classifier expectations were committed before implementation as
+`8bdb7f0afdf51e0d63bfbdd021658d5ff81f5a27`. That exact commit was checked out detached in a
+throwaway worktree and run with:
+
+```text
+deno test --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.test.ts
+```
+
+Real exit code: `1` (captured directly from the command substitution, never through a pipeline).
+Result: `61 passed | 1 failed`. The only failure was
+`Fresh UI private-lock inputs contribute to needs_fresh_ui`, at the first input
+`packages/sdk/deno.json`, with actual `false` versus expected `true`. The separate root
+`deno.json` toolchain regression assertion passed.
 
 ## GREEN Gates
 
@@ -57,4 +69,3 @@ Pending slice 2.
 ## Stale-Lock Teeth Demonstration
 
 Pending slice 3.
-

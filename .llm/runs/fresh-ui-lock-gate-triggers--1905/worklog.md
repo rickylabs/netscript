@@ -74,12 +74,13 @@ test before changing `classifyPath()`.
 | 2026-09-02 10:07 | 0 | research | Re-derived the lockfile, member, workflow-trigger, classifier, and docs-site facts at the required base. |
 | 2026-09-02 10:07 | 0 | design | Recorded `PLAN-EVAL: N/A`, locked slices, validation, and acceptance boundaries before implementation. |
 | 2026-09-02 10:28 | 1 | test-first | Added only the private-lock classifier expectations; implementation remains unchanged for the committed RED proof. |
+| 2026-09-02 10:29 | 1 | RED | Detached throwaway worktree at `8bdb7f0afdf51e0d63bfbdd021658d5ff81f5a27`: 61 passed, 1 failed; real exit code 1. |
 
 ## Gate Results
 
 | Gate | Real exit code | Result | Evidence |
 | --- | ---: | --- | --- |
-| RED classifier test in committed throwaway worktree | NOT_RUN | pending | Slice 1 |
+| RED classifier test in committed throwaway worktree | 1 | expected FAIL | New test failed on `packages/sdk/deno.json`: actual `freshUi=false`, expected `true`; 61 other tests passed. |
 | classifier unit test | NOT_RUN | pending | Required command |
 | Fresh UI validation test wrapper | NOT_RUN | pending | Required command |
 | scoped `.github` check wrapper | NOT_RUN | pending | Required command |
@@ -94,3 +95,6 @@ test before changing `classifyPath()`.
   is authorized.
 - Slice 1 (pre-RED): draft PR #1917 is open with the required taxonomy and milestone. The RED test
   covers package, CLI E2E, plugin, and root-lock inputs plus the existing root-config contribution.
+- Slice 1 (post-RED): the committed test was checked out detached in a disposable worktree. The only
+  failure was the intended private-lock classifier gap; the existing root-config behavior remained
+  green. No implementation file was present to rescue the test.
