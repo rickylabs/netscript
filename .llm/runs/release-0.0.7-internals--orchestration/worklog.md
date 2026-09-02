@@ -9933,3 +9933,28 @@ with mine by **deferral rather than eviction** now that all three carry `queue: 
 Error attribution settled with the Aspire lane: their S9-is-harmless read was a reasonable inference
 from `cancel-in-progress: false`; the distinctly-mine failure was asserting a **lane-wide** clear —
 a claim only this session could verify — from a remembered set instead of re-deriving it.
+
+### D-228 — #1889 sqlite queued as attempt 4; drain-gating abandoned as unreachable
+
+**Changed approach, deliberately.** The drain-gated watcher waited for the sqlite group to reach zero
+repo-wide. Once the Aspire lane's S8/S10 re-dispatches queued, `sqlite_tier_busy` went back to 2 and a
+full drain may simply never arrive — the gate would have stalled indefinitely rather than protected
+anything.
+
+Queuing is now safe on its own terms: S8, S10 and #1889 all carry `queue: max` and S9 is held, so
+arrivals **defer into FIFO admission order rather than evict**. The drain gate was protection against
+v1 arrivals, and with none live it bought nothing while risking an unbounded wait. Watcher stopped;
+rerun fired as **attempt 4** (`33592310517`, sqlite queued `05:29:05Z`).
+
+**One hazard checked rather than assumed:** S9's run `33592084708` still has a **docker** job pending.
+If admitted it can evict pending *docker* entries — but this rerun is **sqlite-only**, because
+`--failed` re-runs just the cancelled job and the docker tier keeps its attempt-2 `success`. S9's
+remaining admission therefore cannot reach it. Flagged to the Aspire lane since their S8/S10 docker
+tiers *are* in that group.
+
+**Cross-lane methodology converged.** Their 401 diagnosis landed in one command because an earlier
+note had recorded that a dropped dashboard token was *a* sufficient cause but was **not proven to be
+the** cause — so the disproof (`dashboardUrl` carries no `?t=`) was cheap instead of becoming a second
+wrong theory. Same discipline as re-deriving a lane-clear: mark the gap between verified and inferred
+**at the time of writing**, because afterwards the two kinds of claim are indistinguishable. That is
+precisely where D-226's error occurred.
