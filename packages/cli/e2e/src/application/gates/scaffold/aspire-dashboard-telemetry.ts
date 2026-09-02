@@ -8,6 +8,11 @@ import type { FlowBProducerIdentity } from './select-flow-b-stream-change.ts';
 import { readAspireMcpEntryPoint } from './aspire-mcp/entry-point.ts';
 import { createStdioAspireMcpTransport } from './aspire-mcp/stdio-transport.ts';
 import { ASPIRE_MCP_DASHBOARD_TOOLS } from './aspire-mcp/tools.ts';
+import {
+  createDashboardLinkedSpanReader,
+  enrichAspireCliSpanLinks,
+  type LinkedSpanReader,
+} from './aspire-dashboard-span-links.ts';
 
 type AspireMcpTelemetryTool = 'list_structured_logs' | 'list_trace_structured_logs';
 
@@ -42,7 +47,12 @@ export async function createLiveAspireTelemetryQuery(
       await transport.close().catch(() => undefined);
     }
   };
-  return createAspireMcpTelemetryQuery(callTool, runAspire, dashboardUrl);
+  return createAspireMcpTelemetryQuery(
+    callTool,
+    runAspire,
+    dashboardUrl,
+    createDashboardLinkedSpanReader(dashboardUrl),
+  );
 }
 
 /** Adapt authenticated Aspire CLI spans and MCP logs to the package-owned query contract. */
@@ -50,18 +60,24 @@ export function createAspireMcpTelemetryQuery(
   callTool: AspireMcpTelemetryToolCaller,
   runAspire: AspireCliTelemetryCommandRunner,
   dashboardUrl: string,
+  readLinkedSpans?: LinkedSpanReader,
 ): TelemetryQueryPort {
   return new AspireTelemetryQuery({
     endpoint: MCP_ENDPOINT,
-    fetch: createLiveAspireFetch(callTool, runAspire, dashboardUrl),
+    fetch: createLiveAspireFetch(callTool, runAspire, dashboardUrl, readLinkedSpans),
   });
 }
 
-/** Translate package query requests into authenticated Aspire CLI and MCP calls. */
+/**
+ * Translate package query requests into authenticated Aspire CLI and MCP calls. When
+ * `readLinkedSpans` is given, linked span rows borrow their attribute-bearing links from the
+ * Dashboard telemetry API, which the CLI's JSON projection drops.
+ */
 export function createLiveAspireFetch(
   callTool: AspireMcpTelemetryToolCaller,
   runAspire: AspireCliTelemetryCommandRunner,
   dashboardUrl: string,
+  readLinkedSpans?: LinkedSpanReader,
 ): typeof fetch {
   return async (input) => {
     try {
@@ -70,24 +86,25 @@ export function createLiveAspireFetch(
       if (path === 'traces') {
         const [summaries, spans] = await Promise.all([
           readAspireTelemetryItems(runAspire, 'traces', dashboardUrl, url),
-          readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url),
+          readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url)
+            .then((rows) => enrichAspireCliSpanLinks(rows, readLinkedSpans)),
         ]);
         return Response.json({ traces: groupAspireCliSpans(summaries, spans, url) });
       }
       if (path.startsWith('traces/') && path !== 'traces/export') {
         const traceId = decodeURIComponent(path.slice('traces/'.length));
-        const spans = await readAspireTelemetryItems(
-          runAspire,
-          'spans',
-          dashboardUrl,
-          url,
-          traceId,
+        const spans = await enrichAspireCliSpanLinks(
+          await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url, traceId),
+          readLinkedSpans,
         );
         const trace = groupAspireCliSpans([{ traceId }], spans, url)[0];
         return Response.json({ data: trace });
       }
       if (path === 'spans') {
-        const spans = await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url);
+        const spans = await enrichAspireCliSpanLinks(
+          await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url),
+          readLinkedSpans,
+        );
         return Response.json({ spans: spans.map(normalizeAspireCliSpan) });
       }
       if (path === 'logs') {
