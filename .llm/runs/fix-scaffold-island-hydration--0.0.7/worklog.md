@@ -83,6 +83,8 @@ CLI scaffold templates.
 | 2026-09-01 | S2    | Assertion correction          | Removed the post-hydration comment-node requirement, split query-client data into pre-click and post-click observations, and added an all-response ledger for the unattributed 404 URL/status/resource type. |
 | 2026-09-01 | S2    | Response-ledger observation   | Run `33541399005` repeated successful hydration; all corrected expectations passed, and only the console-only 404 remained. No response >= 400 was observed, so console location plus all requests/failures are now captured. |
 | 2026-09-01 | S2    | 404 attribution               | Run `33542591593` identified `/favicon.ico`; hydration remained successful and no network response/request failure was observed. The fixture now serves 204 for this incidental browser request while retaining strict application-error assertions. |
+| 2026-09-02 | S0a   | RED contract                  | Added the served-surface receipt schema and focused test first; `deno test` exited 1 because `probe-island-served-surface.ts` did not yet exist (`TS2307`). |
+| 2026-09-02 | S0a   | GREEN implementation          | Added `behavior.island-served-surface`, shared runtime-suite registration, live URL resolution, Fresh marker/module extraction, JS status/content-type/export assertions, and durable receipt persistence. Focused gate/builder/registry tests pass 51/51. |
 
 ## Decisions
 

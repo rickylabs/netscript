@@ -24,18 +24,22 @@ Deno.test('served-surface receipt proves marker and every referenced Fresh modul
       const url = String(input);
       requested.push(url);
       if (url.endsWith('/examples/users')) {
-        return Promise.resolve(new Response(PAGE, {
-          status: 200,
-          headers: { 'content-type': 'text/html; charset=utf-8' },
-        }));
+        return Promise.resolve(
+          new Response(PAGE, {
+            status: 200,
+            headers: { 'content-type': 'text/html; charset=utf-8' },
+          }),
+        );
       }
       const body = url.includes('ServiceShowcaseLab')
         ? 'export default function ServiceShowcaseLab() {}'
         : 'export function boot() {}';
-      return Promise.resolve(new Response(body, {
-        status: 200,
-        headers: { 'content-type': 'application/javascript; charset=utf-8' },
-      }));
+      return Promise.resolve(
+        new Response(body, {
+          status: 200,
+          headers: { 'content-type': 'application/javascript; charset=utf-8' },
+        }),
+      );
     },
   });
 
@@ -59,12 +63,14 @@ Deno.test('served-surface probe persists its receipt before rejecting a missing 
         resolveLiveUrls: () => Promise.resolve(['http://localhost:41234/']),
         fetch: (input) => {
           const url = String(input);
-          return Promise.resolve(url.endsWith('/examples/users')
-            ? new Response(PAGE, { status: 200, headers: { 'content-type': 'text/html' } })
-            : new Response('export const unrelated = true;', {
-              status: 200,
-              headers: { 'content-type': 'text/javascript' },
-            }));
+          return Promise.resolve(
+            url.endsWith('/examples/users')
+              ? new Response(PAGE, { status: 200, headers: { 'content-type': 'text/html' } })
+              : new Response('export const unrelated = true;', {
+                status: 200,
+                headers: { 'content-type': 'text/javascript' },
+              }),
+          );
         },
         persist: (receipt) => {
           persisted.push(receipt);

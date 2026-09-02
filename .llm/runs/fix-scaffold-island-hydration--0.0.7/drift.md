@@ -49,3 +49,10 @@
 - Drift from v1: the CLI collision boundary (#1773) no longer exists (merged); v2 opens `packages/cli/e2e/**` for the discriminator and `.github/workflows/e2e-cli.yml` for the browser install step only.
 - `desktop-native-linux` red at `dd039a791`: out of scope (#1926, `@orpc/contract` isolated install), cleared by `main ≥ 09c07fd4e`; main merged into this branch on 2026-09-02.
 - Sqlite tier reds at `dd039a791`: `runtime.wait.auth` (run `33656167222` era) and `runtime.wait.workers-api` (run `33663531932`) — Aspire startup flakes, same tier passed at the same head earlier; unattributable.
+
+## 2026-09-02 — S0 implementation baseline
+
+- Merged `origin/main` before S0 as required. The merge commit updated `deno.lock` from the branch's
+  pre-merge version to the version already tracked by `origin/main`; S0 treats the merged hash
+  `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` as immutable and makes no
+  lockfile edit.
