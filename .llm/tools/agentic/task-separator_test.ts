@@ -37,6 +37,7 @@ const STRICT_AGENTIC_TASKS = {
 const PERMISSIVE_AGENTIC_TASKS = [
   'agentic:check-claude',
   'agentic:dogfood-skills',
+  'agentic:dogfood-skills:check',
   'agentic:smoke-claude-remote',
   'agentic:claude-hook-log',
 ] as const;

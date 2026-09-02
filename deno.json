@@ -31,6 +31,9 @@
       ]
     },
     "check": {
+      "dependencies": [
+        "check:desktop-native-fixture"
+      ],
       "command": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
       "files": [
         "packages/**/*.ts",
@@ -42,6 +45,7 @@
         ".llm/tools/run-deno-check.ts"
       ]
     },
+    "check:desktop-native-fixture": "deno run --allow-all packages/cli/e2e/src/adapters/native-desktop/fixture-contract-driver.ts --repo-root . --check-only",
     "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
     "check:streams-types": "deno task --cwd packages/fresh check:streams-types",
     "test": "deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all",
@@ -75,6 +79,7 @@
     "agentic:leak-check": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/leak-check.ts",
     "agentic:teardown": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/teardown.ts",
     "agentic:dogfood-skills": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/dogfood-skills.ts",
+    "agentic:dogfood-skills:check": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/dogfood-skills.ts --check",
     "agentic:antigravity-evidence": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/antigravity-evidence-cli.ts",
     "agentic:provider-canary": "deno run --no-lock --allow-run --allow-env .llm/tools/agentic/runtime/cli/provider-canary.ts",
     "agentic:rollout-canary": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/rollout-canary-cli.ts",
@@ -85,6 +90,7 @@
     "docs:jsdoc-examples": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts",
     "docs:jsdoc-examples:test": "deno test --allow-read --allow-write --allow-run .llm/tools/docs/jsdoc-example-policy_test.ts .llm/tools/docs/jsdoc-example-compiler_test.ts .llm/tools/gates/jsdoc-example-workflow_test.ts",
     "docs:snippets": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-snippets.ts",
+    "docs:readme-fences": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-readme-fences.ts",
     "docs:snippets:test": "deno test --allow-read --allow-write --allow-run .llm/tools/docs/snippet-extractor_test.ts .llm/tools/docs/snippet-compiler_test.ts .llm/tools/docs/pages-workflow_test.ts .llm/tools/docs/official-saga-publisher-sample-sync_test.ts",
     "docs:snippets:negative": "deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-snippets.ts --negative",
     "docs:contract-derivation": "deno test --no-lock --allow-read --allow-write --allow-run .llm/tools/docs/check-docs-contract-derivation_test.ts && deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/docs/check-docs-contract-derivation.ts",
@@ -111,14 +117,14 @@
     "agentic:opencode-web": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-web.ts",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "gen:agent-docs-prose": "deno task --cwd docs/site build && deno run --no-lock --allow-read --allow-write --allow-run=git .llm/tools/docs/build-agent-docs-bundle.ts --site-dir docs/site/_site",
-    "gen:mcp-export-corpus": "deno run --no-lock --allow-read --allow-write --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts",
+    "gen:mcp-export-corpus": "deno run --no-lock --allow-read --allow-write --allow-env --allow-run=deno,git .llm/tools/docs/generate-export-surface-corpus.ts",
     "check:mcp-export-corpus": "deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/generate-export-surface-corpus.ts --check",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
     "check:agent-docs-prose": "deno task gen:agent-docs-prose --check",
     "gen:publish-assets": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts",
     "check:publish-assets": "deno task gen:publish-assets --check",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
-    "check:aspire-version-parity": "deno run --allow-read .llm/tools/validation/check-aspire-version-parity.ts",
+    "check:aspire-version-parity": "deno run --allow-read --allow-run=git .llm/tools/validation/check-aspire-version-parity.ts",
     "check:netscript-jsr-specifiers": "deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty",
     "check:aspire-host-ports": "deno run --allow-read .llm/tools/validation/check-aspire-host-ports.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",

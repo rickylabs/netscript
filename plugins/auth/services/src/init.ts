@@ -20,7 +20,7 @@ export interface AuthPluginServiceContext extends PluginServiceContext {
 
 /** Resolve and construct the auth backend registry from host service context. */
 export async function initializeAuthService(
-  ctx: AuthPluginServiceContext,
+  ctx: PluginServiceContext,
   dbClient?: unknown,
 ): Promise<ResolvedAuthBackendRegistry> {
   const kv = watchableKv(ctx.kv);
@@ -32,8 +32,42 @@ export async function initializeAuthService(
   });
 }
 
-function serviceAppsettings(ctx: AuthPluginServiceContext): AuthServiceAppsettings | undefined {
-  return ctx.appsettings;
+function serviceAppsettings(ctx: PluginServiceContext): AuthServiceAppsettings | undefined {
+  if (ctx.appsettings === undefined) return undefined;
+  return isAuthServiceAppsettings(ctx.appsettings) ? ctx.appsettings : undefined;
+}
+
+function isAuthServiceAppsettings(value: unknown): value is AuthServiceAppsettings {
+  if (typeof value !== 'object' || value === null) return false;
+  return isAuthSettingsGroup(Reflect.get(value, 'auth'), 'lower') &&
+    isAuthSettingsGroup(Reflect.get(value, 'Auth'), 'upper');
+}
+
+function isAuthSettingsGroup(value: unknown, style: 'lower' | 'upper'): boolean {
+  if (value === undefined) return true;
+  if (typeof value !== 'object' || value === null) return false;
+  const backendKey = style === 'lower' ? 'backend' : 'Backend';
+  const auditKey = style === 'lower' ? 'audit' : 'Audit';
+  const saltKey = style === 'lower' ? 'salt' : 'Salt';
+  const environmentKey = style === 'lower' ? 'environment' : 'Environment';
+  return optionalString(Reflect.get(value, backendKey)) &&
+    isAuditSettings(Reflect.get(value, auditKey), saltKey) &&
+    isStringRecord(Reflect.get(value, environmentKey));
+}
+
+function optionalString(value: unknown): boolean {
+  return value === undefined || typeof value === 'string';
+}
+
+function isAuditSettings(value: unknown, saltKey: 'salt' | 'Salt'): boolean {
+  return value === undefined ||
+    (typeof value === 'object' && value !== null && optionalString(Reflect.get(value, saltKey)));
+}
+
+function isStringRecord(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (typeof value !== 'object' || value === null) return false;
+  return Object.values(value).every((entry) => typeof entry === 'string');
 }
 
 function watchableKv(value: unknown): WatchableKv {

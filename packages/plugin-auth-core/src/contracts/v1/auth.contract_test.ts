@@ -30,6 +30,15 @@ Deno.test('authContract exposes the v1 auth procedures', () => {
   ]);
 });
 
+Deno.test('authContract declares public and credential-required routes', () => {
+  assertEquals(authContract.describe['~orpc'].meta.access?.authentication, 'none');
+  assertEquals(authContract.signin['~orpc'].meta.access?.authentication, 'none');
+  assertEquals(authContract.callback['~orpc'].meta.access?.authentication, 'none');
+  assertEquals(authContract.signout['~orpc'].meta.access?.authentication, 'required');
+  assertEquals(authContract.session['~orpc'].meta.access?.authentication, 'required');
+  assertEquals(authContract.me['~orpc'].meta.access?.authentication, 'required');
+});
+
 Deno.test('authContractV1 exposes typed context-bound procedures and errors', () => {
   const router = authContractV1.$context<AuthTestContext>();
 

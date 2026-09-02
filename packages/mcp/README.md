@@ -273,10 +273,13 @@ Three entrypoints carry the package:
 The projection subpath accepts an already-loaded OpenAPI document. It keeps discovery and I/O at the
 caller's boundary:
 
-````ts
+```ts
 import { indexOpenApiOperations } from '@netscript/mcp/openapi-projection';
 
+declare const openApiDocument: unknown;
+
 const index = indexOpenApiOperations(openApiDocument);
+```
 
 Every tool flow depends on a port interface, so embedders and tests supply their own adapters and
 assert against the published schemas. The always-current symbol list is
@@ -302,7 +305,7 @@ const endpoints = createServiceEndpointDirectory({
 });
 
 const { entries, sources } = await endpoints.list();
-````
+```
 
 The effective per-service precedence is `override > aspire-cli > run-manifest > appsettings`. Every
 source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale
@@ -349,7 +352,8 @@ requests. Tests and custom hosts can replace every source and the probe through
 ## Configuration at a glance
 
 - **Telemetry endpoint discovery** (tools and `doctor`): explicit `--endpoint`, then
-  `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`.
+  `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then the running AppHost reported by
+  `aspire ps --format Json`, then `http://localhost:18888`.
 - **Docs corpus**: explicit `--docs-root <path>`, then `NETSCRIPT_DOCS_ROOT`, then an indexable
   `<projectRoot>/.netscript/docs`, then the bounded generated release fallback. `agent init
   --with-docs` writes the installed root into every generated host command. `list_docs.corpus`

@@ -1,0 +1,59 @@
+{
+  "source": "origin/test/aspire-13-5-s2-runtime-verification receipt 03-v8-mcp-transcript.json, minimized to assertion fields",
+  "initialize": {
+    "serverInfo": { "name": "aspire-mcp-server", "version": "13.5.3" }
+  },
+  "tools": [
+    "list_resources",
+    "list_console_logs",
+    "execute_resource_command",
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs",
+    "select_apphost",
+    "list_apphosts",
+    "list_integrations",
+    "doctor",
+    "refresh_tools",
+    "list_docs",
+    "search_docs",
+    "get_doc"
+  ],
+  "apphosts": {
+    "inScope": [{ "appHostPath": "/workspace/fixture/aspire/apphost.mts" }],
+    "outOfScope": []
+  },
+  "doctor": {
+    "checks": [
+      {
+        "name": "cli-version",
+        "status": "pass",
+        "metadata": { "currentVersion": "13.5.3" }
+      }
+    ],
+    "summary": { "passed": 6, "warnings": 4, "failed": 0 }
+  },
+  "resources": [
+    { "display_name": "postgres", "environment": {} },
+    { "display_name": "fixture-web", "environment": { "PORT": null } },
+    { "display_name": "users", "environment": { "DATABASE_URL": null } },
+    {
+      "display_name": "postgres-password",
+      "resource_type": "Parameter",
+      "properties": { "Value": null },
+      "environment": {}
+    }
+  ],
+  "usersConsole": { "lines": ["users service listening"] },
+  "excludedConsole": { "lines": [] },
+  "structuredLogs": { "items": [] },
+  "dashboardTools": [
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs"
+  ],
+  "transcript": [
+    { "direction": "request", "method": "tools/call", "tool": "list_resources" },
+    { "direction": "response", "resource": "postgres-password", "Value": null }
+  ]
+}
