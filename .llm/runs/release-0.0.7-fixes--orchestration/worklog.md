@@ -7916,3 +7916,14 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   from `adff30990`. `Closes #1845`. Packet comment posted; handed to coordinator. NOT merged.
 - #1249: S2 GREEN `20949a04d` — both halves implemented; awaiting draft PR from worker.
 - #1481: worker merged main locally (`21ee63419`), push pending.
+
+## 2026-09-03T00:00Z — Canary 7 red recorded (not Fixes-owned)
+
+- Coordinator: Canary 7 (from `ba6f1f49a`, run 33693663110) packages published; pinned prod E2E
+  failed only at `behavior.live-db-endpoint`. Root cause (confirmed by coordinator): order-dependent
+  resource parser selects `postgres-password` (`urls=[]`) before the real `postgres-<DCP id>`
+  resource. All DB/runtime/Phase-B gates passed. Neither #1952 nor #1959 addresses it; a separate
+  coordinator-owned bounded E2E-only microfix (exact displayName/name priority + unique
+  TCP-capable fallback + regression test) is in flight.
+- Fixes lane action: none — no duplication, no rescope of #1959/#1249/#1481. If the microfix lands
+  on main before #1959 packets, #1959 pulls it mechanically like #1957.
