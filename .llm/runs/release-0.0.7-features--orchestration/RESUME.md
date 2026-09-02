@@ -1,78 +1,72 @@
-# RESUME CHECKPOINT — features orchestrator (rewritten 2026-09-02 ~10:40Z)
+# RESUME CHECKPOINT — features orchestrator (rewritten 2026-09-02 ~16:30Z)
 
-## Exact state
+## Identity and authority
 
 | Thing | Value |
 | --- | --- |
-| `main` | `77ad823dc` (#1910) — moves fast, always re-fetch |
+| Route | **Claude · `claude-fable-5-1` · low** · Remote Control attached · supervise-only · **never merges** (primary coordinator merges) |
+| `origin/main` | **`850cc7757`** — moves fast, always re-fetch |
 | Topic branch | `orchestrator/release-0.0.7-features`, worktree `007-features` |
-| Route | Opus 5 · xhigh · supervise-only · never merge |
-| Eval routes | IMPL `z-ai/glm-5.3-flash` · max; PLAN `qwen/qwen3.8-flash` · max |
+| Eval routes | IMPL: `status:impl-eval` label cycle → OpenHands GLM · max. PLAN: **native Fable 5 · medium subagent** (OpenHands qwen is rate-limited upstream and pinned for the plan phase; the native lane is the policy default anyway) |
 
-## Every Features-owned milestone issue has active work or a measured dependency
+## Owned queue — every issue has a vehicle or a named, measured dependency
 
-| Issue | Vehicle | State |
+| Issue | State |
+| --- | --- |
+| #1349, #1352 | **CLOSED** via #1936 / #1931 (mirror ticked all boxes) |
+| #1897 | **CLOSED** via #1918 |
+| #1353, #1467 | merged (#1921, #1922) but **open, 7 unticked boxes each** — combined closeout audit running on `chore/sdk-client-s6-s7-closeout` (worktree `007-leaf-s6s7`); it carries `Closes` only for issues whose 7 rows it can defend |
+| #1590 | PR **#1895** `d0bf0aebf` — `status:ready-merge`; exact-head `fresh-browser` green, IMPL-EVAL PASS, `close-gate` pass; runtime tiers are Aspire-lane flake (see below) |
+| #1355 / #1360 | PR **#1664** `d155db116` — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
+| #1354 | plan PR **#1891** `ae6e09caa` — **`PASS_PLAN_WITH_FINDINGS`**, amendment applied (HIGH-1 under settled D4, no re-gate); **Slices A/B gated on #1664 merge/rebase** |
+| #1452 | Slice 2 merged (#1842); later slices remain; no worker |
+| #1348 | epic — receives no leaf PR by design |
+
+## The single remaining merge-packet gate on #1664
+
+**#1845** ("generated showcase island never hydrates") cannot be waived by label per coordinator
+ruling. Route (a) — prove the *generated* island hydrates — is not reachable from a focused fixture:
+#1664's `query-hydration-age_browser.ts` proves the **framework** path hydrates (all four #1845
+signals true), not the scaffold's emitted artifact. **The probe that observes #1845 exists only on
+#1664's branch**, so no clean-main run has ever produced the comparable observation. The unblocking
+experiment, posted to #1845: scaffold with **clean main's** CLI, run **#1664's** probe against it.
+One hosted `scaffold.runtime` attempt; not this lane's to spend.
+
+## Live workers
+
+| Worktree | Thread | Slice |
 | --- | --- | --- |
-| **#1452** | PR **#1842** `d1697421c` | **Merge packet delivered** (comment `5508264615`). All static gates green; postgres runtime red is **#1844**, proven, second reproduction. sqlite gate queued. |
-| **#1352** | PR **#1915** `a6fababde` | Non-draft; `check-test`+`quality` green. IMPL-EVAL running at `88df4839e` (run `33617695217`) — delta to head is **generated carriers only**, so the product verdict carries by byte-identity. `close-gate` red only on the honest unticked "IMPL-EVAL passes" DoD box. |
-| **#1590** | PR **#1895** `31f4ff8a1` | MutationObserver + teardown-abort both **fixed and confirmed hosted** (`viteStderr: ""`, `overlayCount: 0`, barriers `cancelled: 0`). One assertion left: `dynamicMarkers` all `null`. Worker resumed to determine (a) hydration consumes the markers → test bug, or (b) `KeyedPartial` isn't registering → **product defect in merged #1848**. |
-| **#1355/#1360** | PR **#1664** | Converging onto `77ad823dc` (was 44 behind, `CONFLICTING`). Holds IMPL-EVAL **PASS** at `377811da8`; worker must prove byte-identity carry or say it is void. |
-| **#1897** | PR **#1918** `5ae37a143` | Opened non-draft, full labels, milestone, `Closes #1897`. One line: `"tests/"` added to `packages/fresh/deno.json` excludes. |
-| **#1354** | plan PR **#1891** `f23ca6c05` | **PLAN-EVAL dispatched** (comment `5508205019`). Implementation stays behind #1664 by the plan's own **D9**, not by caution — #1664 is rewriting `packages/cli`. |
-| **#1349** | — | S1/S2/S3 all merged (`#1834`/`#1841`/`#1886`); ten acceptance boxes unticked; **no open PR to carry an evidence block**. Audit worker running in `007-leaf-1349-audit` to produce a truthful row-by-row verdict. |
-| **#1353** | — | Worker running. Amended scope: a **proof** slice — do NOT ship `traceContextContribution()`, do NOT move injection out of the transport. Audit-first: `traceparent`/`tracestate` are already in `RESERVED_HEADERS`. |
-| **#1467** | — | Worker running. New locale contribution owning `accept-language`. Told to **stop and report** rather than edit `prepared-call.ts`. |
-| **#1348** | — | Epic. Receives no leaf PR; stays open until every child is verified. |
+| `007-leaf-s6s7` | see `slices/s6s7/codex-thread-ids.md` | #1353/#1467 closeout audit |
+| `007-leaf-1664` | `01a0585d-94e1-70b0-a1c2-6f9654179b0e` | idle; resume for any #1664 follow-up |
+| `007-leaf-1354` | `01a05dc7-d630-7cc2-b155-2b150754d53c` | idle; resume for Slice A/B briefs |
+| `007-leaf-1590-s2` | `01a060be-6b53-7962-88a2-f80a51a4010a` | idle |
 
-## Live workers — all detached, all measured alive at checkpoint
+## Mechanisms learned today — do not relearn
 
-| Worktree | Thread | Route | Slice |
-| --- | --- | --- | --- |
-| `007-leaf-1590-s2` | `01a060be-6b53-7962-88a2-f80a51a4010a` | Sol · medium | #1895 `dynamicMarkers` |
-| `007-leaf-1664` | `01a0585d-94e1-70b0-a1c2-6f9654179b0e` | Sol · high | #1664 convergence |
-| `007-leaf-1353` | `01a061a8-2a71-7f33-be7e-72b314c5619c` | Sol · medium | #1353 |
-| `007-leaf-1467` | `01a061a8-2a32-7733-86fc-2789efcb5dd1` | Sol · high | #1467 |
-| `007-leaf-1349-audit` | see `slices/1349-audit/codex-thread-ids.md` | Sol · medium | #1349 acceptance audit |
-
-## Traps — the ones that cost time today
-
-1. **`launch-codex-slice.ts` / `codex-resume.ts` block for the child's whole lifetime.** A
-   foreground call dies at the Bash tool timeout and **SIGTERMs the worker**. Always
-   `setsid nohup … &`. Recovery is **resume the same thread id**, never relaunch — context and
-   uncommitted worktree state both survive.
-2. **The launcher does not `mkdir` `--slice-dir`.** It starts the thread, then crashes writing
-   `codex-thread-ids.md`, leaving a live sender lease and a thread that never got its brief. Create
-   the dir first, and give every slice its **own** dir — a shared one silently overwrites the
-   previous slice's thread record.
-3. `--slug X` stages to `/home/<user>/X-brief.md` with `codex` hardcoded; under `--user node` pass
-   `--dest` explicitly.
-4. `git worktree add -b <b> <p> origin/main` inherits `origin/main` as upstream and git-safety
-   refuses it — `git branch --unset-upstream` first.
-5. **A re-stack that keeps "our" side of a file this branch does not own re-introduces a stale
-   snapshot**, and it survives every later clean merge silently. #1842 carried a duplicated
-   README section this way for two integrations.
-6. **Draft PRs get no real CI** (`ci.yml` gates on `draft == false`). #1915 sat in draft looking
-   green and proving nothing; promoting it immediately exposed a real `quality` failure.
-7. **After changing any README or docs page, run the whole cascade** —
-   `prose → assets-barrel → publish-assets → mcp-export-corpus` — not the one gate CI shows. The
-   `check:*` forms are `gen && git diff --exit-code`, so verify them **after committing**.
-8. `gh pr ready` fails on this token; use GraphQL `markPullRequestReadyForReview`.
-9. Sender-ownership refusals: measure liveness (rollout mtime + `/proc/<pid>/cwd`), never infer it
-   from the refusal. Three today were all `owner_inactive` and all the slice's **own** prior thread.
-
-## Cross-lane findings raised, not absorbed
-
-- **#1844** — second independent reproduction of the `runtime.wait.garnet` 300 s timeout, from
-  #1842's head. Comment `5508166737`.
-- **#1920** (new, `orchestrator:internals`) — `check:mcp-export-corpus` is in
-  `.llm/tools/gates/catalog.ts` but wired into **no** workflow, and `main` `77ad823dc` is stale
-  again (regenerates to `eb026322…` / 7803 on a clean detached worktree). The #1862 class recurred
-  because nothing on the merge path enforces it.
+1. **Phase evals are label-triggered.** PLAN: `openhands` + **`status:plan-eval`**. IMPL: cycle
+   **`status:impl-eval`** (or `ready_for_review`). `status:plan` triggers nothing. A hand-posted
+   `dispatch-openhands --phase` can never carry the workflow's claim marker →
+   `phase-generation-lookup-exhausted`. Runs API returns the un-interpolated name `"Phase eval PR"`.
+2. **An acceptance-evidence block is inert without a closing keyword** — the mirror iterates the
+   PR's *closing* issues. Sequence: verdict → `status:ready-merge` → rerun existing CI at the
+   **unchanged** head → mirror ticks boxes → close-gate green. Never hand-tick, never push to retrigger.
+3. **Two gates arrived on `main` mid-flight**: `check:mcp-export-corpus` inside `quality` (#1929)
+   and README fence integrity (#1925, baseline now **7** after #1935). Every convergence must
+   regenerate the corpus; every README fence must compile. A converged head re-runs the *current*
+   gate set.
+4. **Diff a leaf against its own base, not against a moved `main`** — and never truncate the
+   touch-set read on a 160-file branch. Both produced confident wrong attributions today.
+5. **Aspire runtime tiers are nondeterministic**: five failure modes across four branches touching no
+   Aspire path, each also seen passing at an unchanged head. Attribute off feature PRs with evidence;
+   exclusion of #1844/#1880 requires same-failure-on-main **and** delta-not-touching-paths.
+6. Launchers block for the child's lifetime — always `setsid nohup … &`; recover by **resuming the
+   same thread**. `--slice-dir` must exist; `--slug` hardcodes `/home/codex`, pass `--dest`.
 
 ## Standing rules
 
-- Never merge; the primary coordinator merges.
-- Never hand-tick acceptance boxes — evidence block + `status:ready-merge` + rerun the existing CI
-  run at the **unchanged** head.
-- Label leaves at PR-open, never at finalization: coordinator audits key on `orchestrator:features`.
-- A closing keyword only on a PR that fully resolves an issue, never on an epic.
+- Serial queues apply only within this orchestrator; exploit disjoint parallelism; no idle waits
+  on routine decisions.
+- Hand every **exact-green** packet to the primary coordinator immediately; withdraw
+  `status:ready-merge` when a head moves without green evidence, restore on green.
+- Closing keyword only when the issue is complete; never on the #1348 epic.
+- Keep dispatching until every Features issue is merged and stable 0.0.7 is cut.
