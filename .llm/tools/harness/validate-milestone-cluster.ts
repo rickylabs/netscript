@@ -131,6 +131,10 @@ function nonNegativeInteger(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) >= 0;
 }
 
+function knownResourceCountOrUnknown(value: unknown): value is number | null {
+  return value === null || nonNegativeInteger(value);
+}
+
 function timestamp(value: unknown): number | null {
   if (!nonEmpty(value)) return null;
   const parsed = Date.parse(value);
@@ -316,12 +320,12 @@ function validateReporting(
   const environment = isRecord(reporting.environment) ? reporting.environment : {};
   if (
     timestamp(environment.checkedAt) === null ||
-    !nonNegativeInteger(environment.aspireApplications) ||
-    !nonNegativeInteger(environment.dockerContainers) ||
-    !nonNegativeInteger(environment.dockerCustomNetworks)
+    !knownResourceCountOrUnknown(environment.aspireApplications) ||
+    !knownResourceCountOrUnknown(environment.dockerContainers) ||
+    !knownResourceCountOrUnknown(environment.dockerCustomNetworks)
   ) {
     errors.push(
-      'state.reporting.environment needs a timestamp and non-negative owned-resource counts',
+      'state.reporting.environment needs a timestamp and non-negative owned-resource counts or null when unknown',
     );
   }
 

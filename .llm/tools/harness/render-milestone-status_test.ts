@@ -113,7 +113,7 @@ Deno.test('schema-v2 milestone status renders the legible coordinator report', a
       }],
       environment: {
         checkedAt: '2026-09-02T12:00:00.000Z',
-        aspireApplications: 0,
+        aspireApplications: null,
         dockerContainers: 0,
         dockerCustomNetworks: 0,
       },
@@ -128,5 +128,6 @@ Deno.test('schema-v2 milestone status renders the legible coordinator report', a
   assertStringIncludes(rendered, '| #1895 | features | runtime running | dual-tier result |');
   assertStringIncludes(rendered, '## Current blockers');
   assertStringIncludes(rendered, '## Orchestrator matrix');
+  assertStringIncludes(rendered, '- Aspire applications: unknown');
   assertStringIncludes(rendered, '_No owner decision needed._');
 });

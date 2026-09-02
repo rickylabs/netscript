@@ -307,6 +307,20 @@ Deno.test('valid milestone cluster passes the Step 0 and control-plane contract'
   assertEquals(result.findings, []);
 });
 
+Deno.test('schema-v2 reporting preserves unknown environment counts without false zeroes', async () => {
+  const artifacts = await validArtifacts();
+  const reporting = artifacts.state.reporting as Record<string, unknown>;
+  const environment = reporting.environment as Record<string, unknown>;
+  environment.aspireApplications = null;
+  environment.dockerContainers = null;
+  environment.dockerCustomNetworks = null;
+  artifacts.status = await renderMilestoneStatus(artifacts.state);
+
+  const result = await validateArtifacts(artifacts);
+  assert(result.ok, result.errors.join('\n'));
+  assertEquals(result.errors, []);
+});
+
 Deno.test('RED: schema-v2 milestone state requires the coordinator reporting contract', async () => {
   await expectRed((artifacts) => {
     delete artifacts.state.reporting;
