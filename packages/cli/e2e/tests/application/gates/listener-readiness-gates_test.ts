@@ -203,3 +203,32 @@ function runContext(): RunContext {
     },
   };
 }
+
+Deno.test('an unpublished health report is absent, not an error', async () => {
+  // Hosted regression: run 33629394228 failed at `runtime.health.listener-unreachable` with
+  // "resource postgres health key postgres_listener was never published" after only 56 gates.
+  // The wait loop used the throwing reader, so a report that had not appeared *yet* was fatal on
+  // the first poll — inside a loop written to wait for that very report to change.
+  const { findListenerHealthReport, readListenerHealthReport } = await import(
+    '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts'
+  );
+  const topology = { resources: [{ name: 'postgres', healthReports: {} }] };
+
+  assertEquals(findListenerHealthReport(topology, 'postgres', 'postgres_listener'), undefined);
+  assertThrows(
+    () => readListenerHealthReport(topology, 'postgres', 'postgres_listener'),
+    Error,
+    'was never published',
+  );
+
+  const published = {
+    resources: [{
+      name: 'postgres',
+      healthReports: { postgres_listener: { status: 'Unhealthy', description: 'ECONNREFUSED' } },
+    }],
+  };
+  assertEquals(
+    findListenerHealthReport(published, 'postgres', 'postgres_listener')?.status,
+    'Unhealthy',
+  );
+});
