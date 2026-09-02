@@ -10784,3 +10784,13 @@ bump rewrites exactly the two JSON surfaces, dogfood-after-bump adds 0, 5/0·12/
 guard, clean merge) → **PASS**. F3 recorded as advisory pre-stable per coordinator. State at
 verdict: draft=false mergeable=true state=blocked; CI at head: none yet (draft). Packet handed; merge and canary rerun are the
 coordinator's.
+
+### D-255 — #1951 merged as 156ee6792; Canary 7 pending
+
+Coordinator merged #1951 at 21:05:59Z (`156ee6792`, now `origin/main`). The Canary 6 blocker —
+my lane's #1867 guard refusing the release path's expected dirty read set — is closed at source:
+override scoped to the release corpus regeneration, bundle committed fresh, bump writer owning the
+two version surfaces. Newest `release-canary` run is still the failed Canary 6 (`33679983481`); the
+rerun has not been dispatched yet. REST canary watcher will report the new run and its result; on
+completion I verify the `gen:mcp-export-corpus` step specifically — the step that killed Canary 6 —
+executed and passed, with step counts, before calling the blocker retired.
