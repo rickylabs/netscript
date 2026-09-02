@@ -18,7 +18,7 @@
 | #1353, #1467 | PR **#1941** `4bfded8c8` — **native PASS, `status:ready-merge`**; `Closes` both; real `propagateTraceContext` fix; mirror ticks 14 boxes on CI at receipt head |
 | #1590 | PR **#1895** `d0bf0aebf` — `status:ready-merge`; exact-head `fresh-browser` green, IMPL-EVAL PASS, `close-gate` pass; runtime tiers are Aspire-lane flake (see below) |
 | #1355 / #1360 | PR **#1664** `d155db116` — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
-| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `a5fe753df` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C** dispatched on `feat/cli-resource-slice-contract` (ten new files, disjoint from #1664 and A). Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
+| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `a5fe753df` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C = PR #1946** `b86524bcb`, native eval pending on idle. Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
 | #1452 | PR **#1944** `781fe9bd9` — **native PASS, `status:ready-merge`, `Closes #1452`** (rows are plain bullets; no mirror needed, close-gate already pass) |
 | #1348 | epic — receives no leaf PR by design |
 
@@ -64,7 +64,8 @@ One hosted `scaffold.runtime` attempt; not this lane's to spend.
 6. **Generated carriers are ceiling-exempt** (supervisor ruling, in `plan.md`). A phase-eval claim is
    **head-bound**: pushing during `authorize` skips the agent silently — cycle the label only on an
    idle lane, and confirm the *agent* job's conclusion, not the run's.
-7. Launchers block for the child's lifetime — always `setsid nohup … &`; recover by **resuming the
+7. **Detached bash has no `jq`** — background waits must use `gh --jq` or `awk`, or they die silently.
+8. Launchers block for the child's lifetime — always `setsid nohup … &`; recover by **resuming the
    same thread**. `--slice-dir` must exist; `--slug` hardcodes `/home/codex`, pass `--dest`.
 
 ## Standing rules

@@ -10767,3 +10767,25 @@ current 117 files. One shared generated file (the corpus) — whichever merges s
 
 **Ready for the coordinator:** #1944 (closes #1452), #1941 (closes #1353 + #1467, mirror pending
 CI at the receipt head), #1943 (partial, `Refs #1354`), plus #1895 on the alternating Aspire tier.
+
+---
+
+## ~21:00Z — three exact-green packets; #1353 and #1467 mirrored 7/7; Slice C is #1946
+
+| PR | Head | CI | Closes |
+| --- | --- | --- | --- |
+| **#1941** | `4bfded8c8` | **6/6** incl. close-gate — **#1353 7/7, #1467 7/7 ticked by the mirror** | #1353, #1467 |
+| **#1943** | `a5fe753df` | **7/7** incl. `fresh-ui-quality` | — (Slice B, partial) |
+| **#1944** | `781fe9bd9` | **6/6** incl. close-gate | #1452 |
+
+All three: native Fable IMPL-EVAL PASS with the receipt committed as the head; `status:ready-merge`;
+packets posted. With #1895 that is four PRs for the coordinator.
+
+**Slice C is PR #1946** (`feat/cli-resource-slice-contract`, `b86524bcb`), lane finalising. Its eval
+goes **native** on idle, per the standing rule.
+
+**A tooling slip that cost four background waits:** the detached-bash environment has no `jq`, so
+every `jq`-based wait I armed after ~19:00 died silently on first use (`bash: command not found: jq`)
+and never fired — the sweep after the monitor timeout is what surfaced the three greens. Replaced with
+`gh --jq` / `awk` in the re-armed monitor and the Slice C wait. Rule: **background scripts get
+`gh --jq` or `awk`, never bare `jq`.**
