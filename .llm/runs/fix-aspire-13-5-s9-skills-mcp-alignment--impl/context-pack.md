@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-aspire-13-5-s9-skills-mcp-alignment--impl` |
 | Branch | `fix/aspire-13-5-s9-skills-mcp-alignment` |
-| Current phase | `authenticated Aspire MCP telemetry adapter — static delivery` |
+| Current phase | `authenticated Aspire MCP telemetry adapter — co-author audit` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -39,10 +39,13 @@ or evaluator was started.
   blob-identical.
 - Authenticated telemetry repair is RED/GREEN complete with realistic MCP output, all raw Dashboard
   readers removed, and the requested static suite green.
+- Independent co-author audit confirmed all three shared-query consumers and Flow-B's former private
+  reader use the MCP adapter, then made the observed HTTP 401 and HTTP-200/empty bypasses explicit in
+  the focused regression names and assertions.
 
 ## In Progress
 
-- Commit the authenticated telemetry slice and push it to the existing branch.
+- Deliver the focused co-author evidence commit for supervisor cherry-pick and separate review.
 
 ## Next Steps
 
@@ -80,6 +83,7 @@ or evaluator was started.
 | D-194 static repair | PASS | RED-first lifecycle config-path regression; 43 focused tests; 3-file scoped check/lint/fmt; quality gate; repo check with `failedBatches: 0` |
 | D-213 convergence | PASS pending delivery | Exact S8 ancestry; 12-commit mapping; 23/23 non-generated blobs identical; generated barrel reproducible; 21-file scoped gates; 82 tests; parity `fail=0`; quality gate green |
 | Authenticated telemetry static slice | PASS pending delivery | RED captured; focused 2/2; affected 73/73; requested suite 241/241; 6-file check/lint/fmt; quality gate green |
+| Authenticated telemetry co-author audit | PASS pending delivery | Pre-adapter RED at `e72da5161`; focused 2/2 GREEN; 401 and silent-empty raw Dashboard guards each observed zero HTTP reads; one-file check/lint/fmt green |
 
 ## Open Questions
 
@@ -87,6 +91,9 @@ or evaluator was started.
   Phase-A evidence permits claiming it was observed.
 - Aspire's MCP projection omits some raw OTLP fidelity; the held hosted tiers must establish whether
   every later Flow-B/reconnect assertion can be satisfied through the projected surface.
+- The owner has superseded the repository's skill-mirroring model. Global `.agents/skills` authority,
+  the `.claude` bridge, and sync-tool removal belong to the separately coordinated bridge repair;
+  this telemetry co-author branch intentionally does not overlap those files.
 
 ## Drift and Debt
 

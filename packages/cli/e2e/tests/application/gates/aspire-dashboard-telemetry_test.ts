@@ -5,7 +5,7 @@ import {
   readAspireTraceStructuredLogs,
 } from '../../../src/application/gates/scaffold/aspire-dashboard-telemetry.ts';
 
-Deno.test('Aspire MCP telemetry adapter normalizes realistic list_traces output', async () => {
+Deno.test('Aspire MCP telemetry adapter bypasses the raw Dashboard HTTP 401 path', async () => {
   const calls: Array<{
     readonly name: string;
     readonly args: Readonly<Record<string, unknown>>;
@@ -22,12 +22,17 @@ Deno.test('Aspire MCP telemetry adapter normalizes realistic list_traces output'
     });
   });
 
-  const traces = await query.queryTraces({
-    serviceName: 'workers',
-    sinceUnixMs: Date.parse('2026-09-02T09:59:00Z'),
-    limit: 10,
-  });
+  const { value: traces, rawDashboardReads } = await withRawDashboardFetch(
+    () => new Response(null, { status: 401 }),
+    () =>
+      query.queryTraces({
+        serviceName: 'workers',
+        sinceUnixMs: Date.parse('2026-09-02T09:59:00Z'),
+        limit: 10,
+      }),
+  );
 
+  assertEquals(rawDashboardReads, 0);
   assertEquals(calls, [{ name: 'list_traces', args: { resourceName: 'workers' } }]);
   assertEquals(traces, [{
     traceId: '0123456789abcdef0123456789abcdef',
@@ -56,7 +61,7 @@ Deno.test('Aspire MCP telemetry adapter normalizes realistic list_traces output'
   });
 });
 
-Deno.test('Aspire MCP telemetry adapter routes resource and trace-scoped structured logs', async () => {
+Deno.test('Aspire MCP telemetry adapter bypasses the raw Dashboard silent-empty path', async () => {
   const calls: string[] = [];
   const callTool = (name: string, args: Readonly<Record<string, unknown>>) => {
     calls.push(`${name}:${JSON.stringify(args)}`);
@@ -71,12 +76,19 @@ Deno.test('Aspire MCP telemetry adapter routes resource and trace-scoped structu
   };
   const query = createAspireMcpTelemetryQuery(callTool);
 
-  const logs = await query.queryLogs({ serviceName: 'workers', limit: 10 });
-  const traceLogs = await readAspireTraceStructuredLogs(
-    callTool,
-    '0123456789abcdef0123456789abcdef',
+  const { value: [logs, traceLogs], rawDashboardReads } = await withRawDashboardFetch(
+    () => Response.json({ traces: [], logs: [] }),
+    async () => {
+      const logs = await query.queryLogs({ serviceName: 'workers', limit: 10 });
+      const traceLogs = await readAspireTraceStructuredLogs(
+        callTool,
+        '0123456789abcdef0123456789abcdef',
+      );
+      return [logs, traceLogs] as const;
+    },
   );
 
+  assertEquals(rawDashboardReads, 0);
   assertEquals(calls, [
     'list_structured_logs:{"resourceName":"workers"}',
     'list_trace_structured_logs:{"traceId":"0123456789abcdef0123456789abcdef"}',
@@ -108,3 +120,20 @@ Deno.test('Aspire MCP telemetry adapter routes resource and trace-scoped structu
     body: 'job completed',
   }]);
 });
+
+async function withRawDashboardFetch<T>(
+  response: () => Response,
+  run: () => Promise<T>,
+): Promise<{ readonly value: T; readonly rawDashboardReads: number }> {
+  const originalFetch = globalThis.fetch;
+  let rawDashboardReads = 0;
+  globalThis.fetch = () => {
+    rawDashboardReads += 1;
+    return Promise.resolve(response());
+  };
+  try {
+    return { value: await run(), rawDashboardReads };
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+}

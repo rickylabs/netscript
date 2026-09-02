@@ -97,6 +97,7 @@ or the canonical generator source and run the documented generators.
 | 2026-09-02 | authenticated telemetry | RED | Added the realistic `list_traces` adapter regression; the structured test wrapper exited 1 because `createAspireMcpTelemetryQuery` did not exist on the raw-HTTP adapter. |
 | 2026-09-02 | authenticated telemetry | implementation | Routed the shared `TelemetryQueryPort` through short-lived `aspire agent mcp` stdio calls, normalized MCP trace/log projections, folded Flow-B producer identity onto the shared adapter, and removed the remaining raw Dashboard readers. Anonymous mode remains false in the runtime start script. |
 | 2026-09-02 | authenticated telemetry | static evidence | Focused adapter test passed 2/2; affected consumer/registry tests passed 73/73; requested `packages/cli/e2e/tests/` passed 241/241; 6-file check/lint/fmt and repository quality gate passed. No runtime or workflow command ran. |
+| 2026-09-02 | authenticated telemetry co-author audit | RED/GREEN | Audited live PR head `712776baf`: pre-adapter parent `e72da5161` failed the structured wrapper because the MCP adapter export was absent; the live adapter passed 2/2 while explicit 401 and HTTP-200/empty raw Dashboard fakes each recorded zero reads. One-file structured check/lint/fmt also passed. |
 
 ## Decisions
 
@@ -189,6 +190,9 @@ or the canonical generator source and run the documented generators.
 | Authenticated telemetry scoped lint/fmt | PASS | Rules-preserving no-exclude config processed 6/6 files; lint and `fmt --check` each exited 0 with zero findings. Temporary config removed after evidence capture. |
 | Authenticated telemetry quality gate | PASS | `deno task quality:gate` exit 0; quality scan had zero findings and doctrine reported `FAIL=0` with pre-existing warnings only. |
 | Authenticated telemetry runtime/workflows/evaluator | NOT RUN by ruling | No Aspire, AppHost, Docker, hosted tier, `e2e:cli`, workflow mutation, or evaluator dispatch occurred. |
+| Authenticated telemetry co-author RED | EXPECTED FAIL | Detached pre-adapter parent `e72da5161`; structured wrapper exit 1 with TS2724 because `createAspireMcpTelemetryQuery` did not exist. Temporary worktree removed after capture. |
+| Authenticated telemetry co-author GREEN | PASS | Structured wrapper exit 0; 2 passed, 0 failed. The 401 and HTTP-200/empty Dashboard fakes each recorded zero reads while MCP trace/log calls returned normalized evidence. |
+| Authenticated telemetry co-author scoped check/lint/fmt | PASS | One selected/processed test file; `deno check --unstable-kv`, lint, and `fmt --check` each exited 0 with zero diagnostics/findings. |
 
 ## Handoff Notes
 
@@ -214,3 +218,6 @@ or the canonical generator source and run the documented generators.
 - The Aspire 13.5.3 MCP projection does not carry every raw OTLP field; static tests prove the
   adapter's declared projection mapping, but only the held hosted tiers can establish the complete
   Flow-B/reconnect runtime verdict after this transport change.
+- Owner ruling now makes `.agents/skills/**` authoritative and replaces `.claude/skills/**` with one
+  bridge. That global bridge/sync-tool repair is separately coordinated; this co-author slice did
+  not edit any skill, bridge, generated asset, workflow, or sync-tool file.
