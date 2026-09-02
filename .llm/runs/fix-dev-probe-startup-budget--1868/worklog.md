@@ -61,20 +61,26 @@ N/A before implementation: issue #1868 fully specifies the measured defect, exac
 | 2026-09-01 | 1 | commit/reconcile | RED committed as `cd2337d36`; pushed by explicit refspec; draft PR #1883 opened with `Closes #1868`, required taxonomy/milestone, and unticked acceptance. Issue remains open at `status:impl`. |
 | 2026-09-01 | 2 | GREEN | Separate 180 s startup/preflight and 60 s HTTP budgets pass all three focused cases; child status races both phases. Committed as `04420a074`. |
 | 2026-09-01 | 2 | review | Removed a losing one-shot 180 s timer in favor of bounded 250 ms startup races and prevented cleanup from re-killing an already-exited child. |
+| 2026-09-02 | 3 | evaluator correction | OpenHands `FAIL_FIX` at `bdbaec12c` proved the raw `Local:` scan misses hosted Vite's ANSI-colored `\x1b[1mLocal\x1b[22m:` banner. The prior commit-message claim “3/3 green in hosted CI” was false: the only completed E2E run, `33562257540`, failed `behavior.project-boundary-dev` after 180,248 ms. No hosted green is claimed. |
+| 2026-09-02 | 3 | RED prepared | Added exact colorized-banner and plain-text-banner tests through the output scan path; product code remains unchanged pending observed RED. |
+| 2026-09-02 | 3 | RED observed | Focused structured test exited 1: 4 passed, 1 failed, 5 total. Plain `Local:` passed through the real probe entry point; exact `\x1b[1mLocal\x1b[22m:` failed with child status 0 after the short-lived fixture exited. No product file changed. |
 
 ## Gate Results
 
 | Gate | Command | Exit | Result / notes |
 | --- | --- | --- | --- |
 | RED focused test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev_test.ts` | 1 | RED: 0 passed, 3 failed, 3 total (`uniqueFailures=1`); no product files changed. |
+| ANSI FAIL_FIX RED | same structured focused-test wrapper | 1 | 4 passed, 1 failed, 5 total; only the exact colorized banner fails, while plain text passes. Runtime 1,664 ms; no production timeout sleep. |
 | GREEN focused test | same structured test wrapper | 0 | 3 passed, 0 failed, 3 total in 576 ms. |
 | Scoped check | `run-deno-check.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 diagnostics; includes `--unstable-kv`. |
 | Scoped lint | `run-deno-lint.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 findings. |
 | Scoped format | `run-deno-fmt.ts` over probe + test, `--ext ts` | 0 | 2 files; 0 findings. Initial pre-format exploratory run exited 1; corrected before final gate. |
 | Full scaffold runtime | prohibited by brief | NOT_RUN | No runtime lease; hosted CI owns Flow-B/NAS proof. |
+| Hosted scaffold runtime at `bdbaec12c` | Actions run `33562257540` | 1 | **FAIL**: `behavior.project-boundary-dev` exhausted 180,000 ms because ANSI color split `Local:`. This is the only completed hosted E2E run; the local runtime gate remains `NOT_RUN`. |
 | Lock hygiene | `git diff -- deno.lock` | 0 | Empty; `deno.lock` unchanged. |
 
 ## Handoff Notes
 
 - Evaluator should inspect phase separation, status races, truthful diagnostics, and confirm `deno.lock` stayed unchanged.
 - Commit trail: RED `cd2337d36`; GREEN `04420a074`.
+- Accepted `FAIL_FIX`: normalize ANSI only in the readiness scan and set `NO_COLOR=1` on the spawned dev process; preserve byte-for-byte mirrored output.

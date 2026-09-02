@@ -6,18 +6,19 @@
 | --- | --- |
 | Run ID | `fix-dev-probe-startup-budget--1868` |
 | Branch | `fix/dev-probe-startup-budget` |
-| Current phase | implement — GREEN |
+| Current phase | implement — FAIL_FIX repair RED |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-RED `cd2337d36` and GREEN `04420a074` are pushed; draft PR #1883 is open. GREEN separates the startup and HTTP budgets, preserves actual child-exit reporting, and passes all focused structured gates.
+OpenHands returned `FAIL_FIX` at `bdbaec12c`: hosted Vite colorizes `Local:` as `\x1b[1mLocal\x1b[22m:`, so the raw readiness scan never signals and run `33562257540` exhausts the startup budget. The earlier hosted-green claim is retracted; local runtime remains `NOT_RUN`.
 
 ## Next Steps
 
-1. Hand off for mandatory separate-session IMPL-EVAL.
-2. Leave PR #1883 draft and do not merge.
+1. Commit/push the discriminating RED: exit 1, 4 passed / 1 failed; plain banner passes and ANSI banner fails.
+2. Strip ANSI from decoded scan text and set child `NO_COLOR=1`.
+3. Run the required whole-`packages/cli/e2e` structured check/test gates, commit, push, and record the implementation SHA.
 
 ## Key Decisions
 
