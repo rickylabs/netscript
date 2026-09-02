@@ -19,6 +19,7 @@
     "./worker": "./worker/mod.ts"
   },
   "imports": {
+    "@netscript/config": "jsr:@netscript/config@0.0.6",
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.6",
     "@netscript/cron": "jsr:@netscript/cron@0.0.6",
     "@netscript/kv": "jsr:@netscript/kv@0.0.6",

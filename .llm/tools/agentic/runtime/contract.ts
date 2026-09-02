@@ -2,7 +2,7 @@ export const RUNTIME_SCHEMA_VERSION = '1.0' as const;
 // deno-fmt-ignore
 export const RUNTIME_COMMANDS = [
   'doctor', 'bootstrap', 'configure', 'launch', 'resume', 'smoke', 'fallback', 'restore',
-  'status', 'repair-codex-remote', 'rollback',
+  'status', 'repair-codex-remote', 'repair-sender-lease', 'rollback',
 ] as const;
 export type RuntimeCommandKind = typeof RUNTIME_COMMANDS[number];
 export const RUNTIME_MODES = ['inspect', 'plan', 'apply'] as const;
@@ -14,7 +14,8 @@ export const LEGAL_COMMAND_MODES: Readonly<
   doctor: ['inspect'], bootstrap: ['plan', 'apply'], configure: ['plan', 'apply'],
   launch: ['plan', 'apply'], resume: ['plan', 'apply'], smoke: ['plan', 'apply'],
   fallback: ['plan', 'apply'], restore: ['plan', 'apply'], status: ['inspect'],
-  'repair-codex-remote': ['plan', 'apply'], rollback: ['plan', 'apply'],
+  'repair-codex-remote': ['plan', 'apply'], 'repair-sender-lease': ['plan', 'apply'],
+  rollback: ['plan', 'apply'],
 };
 export type RuntimeCommandMode<K extends RuntimeCommandKind> = K extends 'doctor' | 'status'
   ? 'inspect'
@@ -67,7 +68,7 @@ export type ActionEffect = typeof ACTION_EFFECTS[number];
 export const ACTION_KINDS = [
   'install_component', 'create_state_directory', 'configure_auth_route', 'persist_desired_state',
   'launch_session', 'resume_session', 'smoke_session', 'switch_route', 'restore_route',
-  'repair_codex_remote', 'rollback_checkpoint', 'blocked_intent',
+  'repair_codex_remote', 'repair_sender_lease', 'rollback_checkpoint', 'blocked_intent',
 ] as const;
 export type RuntimeActionKind = typeof ACTION_KINDS[number];
 // deno-fmt-ignore
@@ -159,6 +160,7 @@ export type RuntimeCommand =
     readonly worktree: string;
     readonly sessionId?: string;
   })
+  | (RuntimeCommandBase<'repair-sender-lease'> & { readonly worktree: string })
   | (RuntimeCommandBase<'rollback'> & { readonly checkpointId: string });
 
 export interface RuntimeDiagnostic {

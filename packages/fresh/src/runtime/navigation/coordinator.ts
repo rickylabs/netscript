@@ -107,6 +107,7 @@ class NavigationRuntime {
   disposed = false;
 
   readonly originalFetch: typeof fetch;
+  readonly platformFetch: typeof fetch;
   readonly originalPushState: History['pushState'];
   readonly originalReplaceState: History['replaceState'];
   readonly wrappedFetch: typeof fetch;
@@ -115,6 +116,7 @@ class NavigationRuntime {
 
   constructor(readonly platform: NavigationPlatform) {
     this.originalFetch = platform.getFetch();
+    this.platformFetch = this.originalFetch.bind(globalThis);
     this.originalPushState = platform.history.pushState;
     this.originalReplaceState = platform.history.replaceState;
     this.wrappedFetch = ((input: RequestInfo | URL, init?: RequestInit) => {
@@ -233,7 +235,7 @@ class NavigationRuntime {
       method !== 'GET' || url.origin !== this.platform.location.origin ||
       url.searchParams.get('fresh-partial') !== 'true'
     ) {
-      return await this.originalFetch(input, init);
+      return await this.platformFetch(input, init);
     }
     const signal = requestSignal(input, init);
     const staged = this.intent;
@@ -243,7 +245,7 @@ class NavigationRuntime {
     const actualUrl = staged?.actualUrl ?? withoutPartialFlag(url);
     const lease: NavigationLease = { kind, generation, actualUrl, signal };
     const [safeInput, safeInit] = insulateSignal(input, init);
-    const response = await this.originalFetch(safeInput, safeInit);
+    const response = await this.platformFetch(safeInput, safeInit);
     const body = new ManagedPartialBody(this, response, lease);
     if (this.invalidReason(lease) !== undefined) return await body.drainAndDrop();
     return body.response;
