@@ -82,6 +82,12 @@ Compose every in-process runtime behind one bounded shutdown handle without repl
 ```ts
 import { createRuntimeHost } from '@netscript/service';
 
+// Your own components — the host only needs something to call.
+declare const service: { stop(): Promise<void> };
+declare const workers: { stop(reason: string): Promise<void> };
+declare const queue: { stop(): Promise<void> };
+declare const database: { disconnect(): Promise<void> };
+
 const host = createRuntimeHost({
   timeoutMs: 15_000,
   drains: [
@@ -155,6 +161,9 @@ declare metadata:
 
 ```ts
 import { createContractAuthorizer, createScopeAuthorizer } from '@netscript/service/auth';
+import type { ContractPolicyContract } from '@netscript/service/auth';
+
+declare const OrdersContractV1: ContractPolicyContract;
 
 const legacyFallback = createScopeAuthorizer({
   rules: [{
@@ -179,8 +188,10 @@ path-prefix form remains valid and behavior-compatible; new services should pref
 metadata plus `createContractAuthorizer()` as shown above:
 
 ```ts
-import { defineService } from '@netscript/service';
+import { defineService, type ServiceRouter } from '@netscript/service';
 import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+
+declare const router: ServiceRouter;
 
 const running = await defineService(router, {
   name: 'orders',
