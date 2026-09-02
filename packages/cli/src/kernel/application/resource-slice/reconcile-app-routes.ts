@@ -40,27 +40,26 @@ export function reconcileAppRoutes(
   if (laterStart >= 0) return conflict('More than one appRoutes declaration was found.');
 
   const block = source.slice(start, closeBrace);
-  if (/^ {2}(?:\.\.\.|\[)/m.test(block)) {
-    return conflict('Spread or computed appRoutes entries are not safe to transform.');
-  }
+  const properties = parseTopLevelProperties(block);
+  if (!properties) return conflict('The appRoutes object contains an unsupported entry shape.');
   const value = `generatedRoutes.${requirement.routeKeyPath.join('.')}`;
-  const aliasLine = new RegExp(
-    `^  ${escapePattern(requirement.alias)}\\s*:\\s*([^\\n]+)$`,
-    'm',
-  ).exec(block);
-  if (aliasLine) {
-    return aliasLine[1].trim() === `${value},`
-      ? { status: 'exact', content: source }
-      : conflict(`appRoutes.${requirement.alias} already has another value.`);
+  const aliases = properties.filter((property) => property.key === requirement.alias);
+  const sameValues = properties.filter((property) => property.value === value);
+  if (aliases.length > 1) {
+    return conflict(`appRoutes.${requirement.alias} is declared more than once.`);
   }
-
-  const sameValue = new RegExp(
-    `^  ([A-Za-z_$][A-Za-z0-9_$]*)\\s*:\\s*${escapePattern(value)},\\s*$`,
-    'm',
-  ).exec(block);
-  if (sameValue) {
+  if (aliases.length === 1) {
+    if (aliases[0].value !== value) {
+      return conflict(`appRoutes.${requirement.alias} already has another value.`);
+    }
+    if (sameValues.some((property) => property.key !== requirement.alias)) {
+      return conflict('Another appRoutes alias already resolves the requested Fresh route key.');
+    }
+    return { status: 'exact', content: source };
+  }
+  if (sameValues.length) {
     return conflict(
-      `appRoutes.${sameValue[1]} already resolves the requested Fresh route key path.`,
+      `appRoutes.${sameValues[0].key} already resolves the requested Fresh route key path.`,
     );
   }
 
@@ -69,6 +68,92 @@ export function reconcileAppRoutes(
     status: 'insert',
     content: source.slice(0, closeBrace) + entry + source.slice(closeBrace),
   };
+}
+
+function parseTopLevelProperties(
+  block: string,
+): readonly Readonly<{ key: string; value: string }>[] | undefined {
+  const entries = splitTopLevelEntries(block);
+  if (!entries) return undefined;
+  const properties: Array<Readonly<{ key: string; value: string }>> = [];
+  for (const entry of entries) {
+    const candidate = stripLeadingTrivia(entry);
+    if (!candidate) continue;
+    const match = /^([A-Za-z_$][A-Za-z0-9_$]*)\s*:\s*([\s\S]+?)\s*$/.exec(candidate);
+    if (!match) return undefined;
+    properties.push({ key: match[1], value: match[2].trim() });
+  }
+  return properties;
+}
+
+function splitTopLevelEntries(block: string): readonly string[] | undefined {
+  const entries: string[] = [];
+  let start = 0;
+  let curly = 0;
+  let parentheses = 0;
+  let square = 0;
+  let quote = '';
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+  for (let index = 0; index < block.length; index++) {
+    const character = block[index];
+    const next = block[index + 1];
+    if (lineComment) {
+      if (character === '\n') lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (character === '*' && next === '/') {
+        blockComment = false;
+        index++;
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (character === '\\') escaped = true;
+      else if (character === quote) quote = '';
+      continue;
+    }
+    if (character === '/' && next === '/') {
+      lineComment = true;
+      index++;
+      continue;
+    }
+    if (character === '/' && next === '*') {
+      blockComment = true;
+      index++;
+      continue;
+    }
+    if (character === "'" || character === '"' || character === '`') {
+      quote = character;
+      continue;
+    }
+    if (character === '{') curly++;
+    else if (character === '}' && --curly < 0) return undefined;
+    else if (character === '(') parentheses++;
+    else if (character === ')' && --parentheses < 0) return undefined;
+    else if (character === '[') square++;
+    else if (character === ']' && --square < 0) return undefined;
+    else if (character === ',' && curly === 0 && parentheses === 0 && square === 0) {
+      entries.push(block.slice(start, index));
+      start = index + 1;
+    }
+  }
+  if (quote || blockComment || curly || parentheses || square) return undefined;
+  entries.push(block.slice(start));
+  return entries;
+}
+
+function stripLeadingTrivia(value: string): string {
+  let candidate = value.trimStart();
+  while (candidate.startsWith('//') || candidate.startsWith('/*')) {
+    const end = candidate.startsWith('//') ? candidate.indexOf('\n') : candidate.indexOf('*/') + 2;
+    if (end <= 1) return '';
+    candidate = candidate.slice(end).trimStart();
+  }
+  return candidate.trim();
 }
 
 function matchingBrace(source: string, openBrace: number): number {
@@ -123,8 +208,4 @@ function conflict(reason: string): AppRoutesReconcileResult {
 
 function isIdentifier(value: string): boolean {
   return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(value);
-}
-
-function escapePattern(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

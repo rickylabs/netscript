@@ -53,12 +53,21 @@ Deno.test('returns exact without changing bytes', () => {
     status: 'exact',
     content: source,
   });
+
+  const customIndent = source.replace(
+    '  ordersHistory: generatedRoutes.orders.history.$route,',
+    '    ordersHistory : generatedRoutes.orders.history.$route,',
+  );
+  assertEquals(reconcileAppRoutes(customIndent, REQUIREMENT), {
+    status: 'exact',
+    content: customIndent,
+  });
 });
 
 Deno.test('conflicts on alias reuse or a different alias for the same route key', () => {
   const aliasConflict = STOCK_POST_SLICE_F_ROUTER.replace(
     '  home: routes.$route,',
-    '  ordersHistory: routes.orders.$route,\n  home: routes.$route,',
+    '    ordersHistory: routes.orders.$route,\n  home: routes.$route,',
   );
   assertEquals(reconcileAppRoutes(aliasConflict, REQUIREMENT).status, 'conflict');
 

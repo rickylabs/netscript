@@ -23,7 +23,8 @@ source. Preserve deterministic path and report ordering.
   the complete deterministic report, and exposes an apply plan only for a conflict-free non-dry
   run. Canonical additive transitions are exact-byte and prior-render constrained.
 - `reconcile-app-routes.ts` recognizes the stock post-Slice-F router imports/object anchor, safely
-  finds the matching object brace, and inserts only a generated-route property chain.
+  finds the matching object brace, parses top-level properties independent of indentation, and
+  inserts only a generated-route property chain.
 - `reconcile-state.ts` recognizes only the empty `Record<string, never>` alias and unextended
   `State` interface. It preserves unrelated bytes and scans property conflicts inside the State
   body rather than elsewhere in `utils.ts`.

@@ -18,7 +18,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `complex_implementation` | Codex / GPT-5 family / session effort | Slice C generator |
-| `formal_impl_evaluation` | Separate evaluator session; identity recorded when launched | Mandatory IMPL-EVAL |
+| `formal_impl_evaluation` | Native Claude Fable 5 / medium | Separate mandatory IMPL-EVAL session `f24053fc-051b-4365-bb45-c1d1d50c2479` |
 
 ## Recorded lane/eval overrides
 
@@ -27,3 +27,11 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   IMPL-EVAL.
 - The exact runtime model id and effort are not exposed to this session, so this record does not
   invent them.
+
+## IMPL-EVAL identity
+
+- Requested: native Claude Fable 5, medium effort, separate background session.
+- Observed: Claude Code displayed `Fable 5 with medium effort`; session
+  `f24053fc-051b-4365-bb45-c1d1d50c2479`, worktree `007-leaf-1354-c`.
+- Initial verdict: `PASS`. Its non-blocking indentation-hardening observation was implemented and
+  returned to the same independent evaluator for current-head re-attestation.

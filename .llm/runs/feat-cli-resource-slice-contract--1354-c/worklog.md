@@ -78,6 +78,8 @@ later command slice, never here.
 | 2026-09-02 | C | contract/planner | Added normalized static-route contract, canonical ownership marker, D7 roster, query-factory bindings, and option delta tests. |
 | 2026-09-02 | C | reconciliation | Added full-preflight leaf reconciliation, all D3 ownership/force/zero-write proofs, and bounded router/State transforms. |
 | 2026-09-02 | C | hardening | Restricted State member detection to the interface body and made both source transforms use comment/string-aware matching-brace scans. |
+| 2026-09-02 | C | IMPL-EVAL cycle 1 | Separate native Claude Fable 5/medium session returned `PASS` with two low findings: post-eval PR lifecycle and optional indentation hardening. |
+| 2026-09-02 | C | evaluator follow-up | Replaced indentation-sensitive router entry regexes with depth-aware top-level property parsing; custom indentation now returns exact/conflict without duplicate insertion. Focused tests and scoped wrappers remain green. |
 
 ## Gate Results
 
