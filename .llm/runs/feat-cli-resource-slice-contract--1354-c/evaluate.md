@@ -1,3 +1,124 @@
+# Evaluation: Slice C resource contract and safe reconciler — follow-up IMPL-EVAL (PR #1946, pass 2)
+
+Bounded follow-up to the `FAIL_FIX` receipt below (attested at `b86524bcb`). Criteria 1–5, 7, 8 of that
+pass are **not re-derived**; this pass judges only the four items in the follow-up brief.
+
+## Metadata
+
+| Field          | Value                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------- |
+| Run ID         | `feat-cli-resource-slice-contract--1354-c`                                             |
+| PR             | #1946 — `feat/cli-resource-slice-contract` → `main`, `Refs #1354`, no closing keyword  |
+| Attested head  | `37b3b9b6554484b4a15e1f84877595d8eb6cceda` (`git rev-parse HEAD`; `--ff-only` merge: already up to date; tree clean) |
+| Prior head     | `b86524bcb9a74279f1960f9ad9f470e38a1d8f5b` (`FAIL_FIX`, HIGH-1)                         |
+| Evaluator      | Separate native Claude Fable 5.1 session (`claude-fable-5-1`), 2026-09-02; product tree read-only, no product byte authored |
+
+Generator ≠ evaluator holds.
+
+## Diff under judgement (`git diff --name-only b86524bcb..37b3b9b65`)
+
+Product: `reconcile-state.ts` (+99/−18), `reconcile-state_test.ts` (+30), `reconcile-resource-slice_test.ts`
+(+18), and — for LOW-1 — `plan-resource-slice.ts` (+7/−1) and `reconcile-resource-slice.ts` (+8/−2).
+Run artifacts: `context-pack.md`, `drift.md`, `evaluate.md`, `worklog.md`. `git diff --name-only … -- packages`
+lists exactly those five files; `reconcile-app-routes.ts`, its test, and `resource-slice-contract.ts` are
+byte-identical to the prior head. No generated carrier, lockfile, or public export touched; still ten
+children in the directory.
+
+## Judgement
+
+### 1. HIGH-1 closed — `PASS`
+
+- **Mechanism.** `reconcile-state.ts` no longer has a `propertyPattern`; `grep -nE 'propertyPattern|\[\^;\]'`
+  returns nothing. `scanStateInterface` (the brace/quote/comment-aware scan already used for the closing
+  anchor) now also splits the interface body into members at `;` only when `depth === 1` and no
+  parentheses/brackets are open (`reconcile-state.ts:132-135`, plus the trailing unterminated member at the
+  close brace). Each member goes through `parseNamedProperty`, which strips leading trivia and an optional
+  `readonly`, then anchor-matches the key as bare identifier (with a `(?![A-Za-z0-9_$])` boundary), `'name'`,
+  or `"name"` — the only remaining `RegExp` and it runs on an already-isolated top-level member, not on
+  source lines, so it is not a resurrection of the line regex. Any match with `optional`, a non-`:`
+  remainder, or a type text ≠ `requirement.type.trim()` → `conflict`; a single exact non-optional match →
+  `exact`; no match → `insert` (`:48-57`).
+- **Counter-examples re-run by this session** (pure probe script in scratchpad, `deno run --allow-read`,
+  exit 0), against requirement `{ordersRequest: OrdersRequestState}`:
+
+  | Fixture                                                            | Result     | Occurrences of name in output |
+  | ------------------------------------------------------------------ | ---------- | ----------------------------- |
+  | `readonly ordersRequest: { id: string; };` (prior repro 1)         | `conflict` | —                             |
+  | `'ordersRequest': Other;` (prior repro 2)                          | `conflict` | —                             |
+  | `"ordersRequest": OrdersRequestState;`                             | `exact`    | 1 (unchanged source)          |
+  | `readonly ordersRequest?: OrdersRequestState;`                     | `conflict` | —                             |
+  | `readonly ordersRequest: OrdersRequestState;`                      | `exact`    | 1                             |
+  | `readonly ordersRequest: (a: string) => void;`                     | `conflict` | —                             |
+  | `readonly label: '}'; readonly ordersRequest: Other;`              | `conflict` | — (string-brace handled)      |
+  | nested: `readonly session: { readonly ordersRequest: Other; };`    | `insert`   | 2 (nested + one new member)   |
+  | nested in fn return type at depth 2                                | `insert`   | 3 (two nested + one new)      |
+  | `readonly ordersRequestExtra: Other;`                              | `insert`   | 2 (boundary, not substring)   |
+  | `// readonly ordersRequest: Other;` line comment                   | `insert`   | 2                             |
+  | `export type State = Record<string, never>;`                       | `insert`   | 1                             |
+
+  Neither prior counter-example can reach `insert` any more; no path yields a duplicate top-level member.
+- **Fixtures.** `reconcile-state_test.ts` adds exactly the three required tests: `conflicts with a same-named
+  property whose type is an object literal`, `conflicts with a quoted same-named property`, and `ignores the
+  property name inside a nested object member`. The nested test asserts `insert`, exactly two occurrences of
+  `ordersRequest` in the output, and the literal inserted line — that is the depth-aware proof: a substring
+  match would have produced `conflict` and a naive line match would have produced `exact`/`conflict`; only a
+  depth-1 member scan yields `insert` with the count 2. The pre-existing `does not mistake a same-named
+  declaration outside State for a State member` test still passes.
+
+### 2. No regression — `PASS`
+
+- Product diff limited to the five files above; `reconcile-app-routes.ts`/`_test` and the contract are
+  unchanged (`git diff --quiet` true), and the `STOCK_POST_SLICE_F_ROUTER` fixture is still referenced 10
+  times in the app-routes test. The prior criterion-6 app-routes findings therefore carry over verbatim.
+- State shapes: `export type State = Record<string, never>;` → interface conversion still `insert`
+  (probe, and test `converts the empty Record State alias to a marked interface once`); existing
+  `export interface State {` → `insert` preserving unrelated members; `fails closed for conflicting, extended,
+  aliased, intersected, duplicate, or missing State` still present and green. Anchors (`INTERFACE_START`,
+  `EMPTY_STATE`, `scanStateInterface` close brace) unchanged.
+- Test count 32 → 36 = +3 state fixtures +1 ordering test; zero failures, zero ignored.
+
+### 3. LOW-1 — applied
+
+`localeCompare` no longer appears anywhere under `resource-slice/`. Both `plan-resource-slice.ts:113-117` and
+`reconcile-resource-slice.ts:107-111` add a local `comparePath` using `<`/`>` (UTF-16 code-unit order,
+ICU-independent) and use it for the leaf plan, report, and write-list sorts. New test `orders reports and
+writes by code point rather than ICU collation` pins `(_components)/a.tsx` before `_b.tsx` for both `report`
+and `applyPlan.files` — the exact pair where ICU and code-point order differ. The two identical private
+helpers are a minor duplication; not a finding.
+
+### 4. Layering — `PASS`
+
+`reconcile-state.ts` imports only `type { RequiredResourceState } from './resource-slice-contract.ts'`.
+Grep over the five non-test files for `Deno.`, `node:fs`, `@std/fs`, `@std/path`, `fetch(` is empty.
+
+## Gate Results (independently re-run at `37b3b9b65`)
+
+| Gate                    | Command                                                                                  | Result | Evidence                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------- |
+| Focused tests           | `run-deno-test.ts -- --allow-all packages/cli/src/kernel/application/resource-slice/`     | `PASS` | exit 0; 36 passed / 0 failed / 0 ignored                                                        |
+| Structured check        | `run-deno-check.ts --root packages/cli --ext ts,tsx`                                     | `PASS` | exit 0; 926 files, 8 batches, 0 failed batches, 0 diagnostics                                   |
+| `deno task arch:check`  |                                                                                          | `PASS` | exit 0; zero `FAIL=[1-9]`; zero `resource-slice` occurrences; only pre-existing DEPS-NPM-CATALOG and F-5/F-6 WARNs |
+| `deno task quality:gate`|                                                                                          | `PASS` | exit 0; zero `FAIL=[1-9]`; zero `resource-slice` occurrences                                     |
+| PR CI at head           | `gh pr view 1946 --json statusCheckRollup`                                               | `PENDING` | head `37b3b9b65`; `code-quality`, `build`, `close-gate`, `classify docs-site changes` SUCCESS; `check-test` and `quality` still running at evaluation time (their local equivalents above are green) |
+| Aspire / Docker / e2e   |                                                                                          | `N/A`  | prohibited for this slice                                                                        |
+
+## Findings
+
+None blocking. Carried observations from the prior pass (LOW-2 union helper → Slice E; LOW-3 task-local
+lint/fmt config) are unchanged and remain non-findings against this PR.
+
+## Verdict
+
+| Field     | Value |
+| --------- | ----- |
+| Verdict   | `PASS` |
+| Rationale | HIGH-1 is closed by construction: same-name `State` member detection now runs on top-level members isolated by the depth-aware scan, both original counter-examples and every probed variant classify as `conflict`/`exact`, and the three required fixtures (object-literal type, quoted key, nested-at-depth insert with occurrence count) prove the fix is not a substring match. The line-regex path is removed, not bypassed. The product diff is confined to `reconcile-state.ts`, its test, the ordering test, and the LOW-1 comparator swap; app-routes and the contract are byte-identical; both `State` shapes, anchors, and fail-closed cases still hold; layering is unchanged. Tests 36/36, check 926/0, arch and quality exit 0 with `FAIL=0`. |
+| Next step | Merge-readiness is the coordinator's call once `check-test`/`quality` CI finish at `37b3b9b65`; no further IMPL-EVAL cycle is required for Slice C. |
+
+[PHASE: IMPL-EVAL] [VERDICT: PASS]
+
+---
+
 # Evaluation: Slice C resource contract and safe reconciler — formal IMPL-EVAL (PR #1946)
 
 Filled from `.llm/harness/templates/evaluate.md`. Allowed result values: `PASS`, `FAIL`, `N/A`,
