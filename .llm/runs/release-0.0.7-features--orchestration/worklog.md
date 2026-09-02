@@ -10820,3 +10820,13 @@ is re-converged to `06cf9c301`: carriers 0, fences at baseline 7, pushed. **#194
 
 Remaining owned queue: #1354 (B and C in flight; A gated on #1664; D–G ordered), #1355 (#1664, sole
 red #1845), #1452 (#1944 ready), #1590 (#1895 ready), #1348 (epic).
+
+### ~21:55Z — #1946 (Slice C) native eval dispatched
+
+#1946: non-draft, full labels, milestone 0.0.7, `Refs #1354 — partial Slice C only; remaining scope
+is Slices D–G`, `closingIssuesReferences` empty, **ALL-GREEN** at `b86524bcb`. The lane's process
+count settled at 2 (a lingering app-server child, as with S3 earlier) rather than 0, so waiting for
+strict idleness would never fire; the head has been stable across CI, and a native eval writes only
+`evaluate.md`, so it was dispatched. Judging D3's narrowed contract byte-for-byte: marker format,
+three-way fail-closed classification, additive options, zero-writes-by-plan-shape, shared-file
+anchors, and that nothing removed by the narrowing crept back.
