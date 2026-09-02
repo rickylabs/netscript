@@ -1,0 +1,123 @@
+{
+  "receipt": "aspire-mcp-smoke",
+  "capturedAt": "2026-09-02T20:09:27.159Z",
+  "cliVersion": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+  "scaffoldPin": "13.5.3",
+  "entryPoint": {
+    "source": ".mcp.json",
+    "command": "aspire",
+    "args": [
+      "agent",
+      "mcp"
+    ],
+    "cwd": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260902-200533"
+  },
+  "serverInfo": {
+    "name": "aspire-mcp-server",
+    "version": "13.5.3"
+  },
+  "appHost": {
+    "path": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260902-200533/aspire/apphost.mts",
+    "inScope": true,
+    "selected": true
+  },
+  "toolsExpected": [
+    "list_resources",
+    "list_console_logs",
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs",
+    "execute_resource_command",
+    "list_apphosts",
+    "select_apphost",
+    "list_integrations",
+    "list_docs",
+    "search_docs",
+    "get_doc",
+    "doctor",
+    "refresh_tools"
+  ],
+  "toolsObserved": [
+    "list_resources",
+    "list_console_logs",
+    "execute_resource_command",
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs",
+    "select_apphost",
+    "list_apphosts",
+    "list_integrations",
+    "doctor",
+    "refresh_tools",
+    "list_docs",
+    "search_docs",
+    "get_doc"
+  ],
+  "toolsMissing": [],
+  "toolsExtra": [],
+  "documentedUnobserved": [
+    "get_integration_docs"
+  ],
+  "documentedUnobservedObserved": [],
+  "baselineDiff": {
+    "added": [],
+    "removed": []
+  },
+  "doctor": {
+    "cliVersion": "pass",
+    "currentVersion": "13.5.3",
+    "summary": {
+      "passed": 6,
+      "warnings": 2,
+      "failed": 0
+    }
+  },
+  "visibility": {
+    "expectedVisible": [
+      "sqlite",
+      "plugin-smoke-20260902-200533-web",
+      "users"
+    ],
+    "expectedMcpExcluded": [
+      "sqlite-cli"
+    ],
+    "observedMcpVisible": [
+      "sqlite",
+      "plugin-smoke-20260902-200533-web",
+      "users"
+    ],
+    "observedMcpExcluded": [
+      "sqlite-cli"
+    ],
+    "describeListsExcluded": true,
+    "ok": true
+  },
+  "redaction": {
+    "secretParamsNull": true,
+    "plaintextLeak": false
+  },
+  "structuredLogs": {
+    "entryCount": 89,
+    "isError": false,
+    "dashboardAvailable": true
+  },
+  "dashboardDegradation": {
+    "documented": false,
+    "tool": null
+  },
+  "lifecycle": {
+    "initializeMs": 64,
+    "toolsListMs": 21,
+    "exit": {
+      "code": 0,
+      "signal": null,
+      "graceful": true
+    }
+  },
+  "dashboardOnlyTools": [
+    "list_structured_logs",
+    "list_traces",
+    "list_trace_structured_logs"
+  ],
+  "transcript": "agent.aspire-mcp-smoke.transcript.jsonl"
+}
