@@ -116,10 +116,40 @@ architecture, sequencing, or scope question remains.
 | 2026-09-02 14:29 | 1 | RED refinement | First exact-commit run exited 1 with the expected missing-guard failures, but the no-Git fixture also hid Deno; narrowed PATH to Deno's bin directory before the authoritative RED rerun. |
 | 2026-09-02 14:31 | 1 | authoritative RED | Detached `33ec78509` run exited 1: 8 passed, 4 failed for the four absent guard/override/warning contracts; cleanup exited 0. |
 | 2026-09-02 14:32 | 2 | implementation | Added the exact scoped Git preflight before corpus construction, default refusal, stderr-recorded override, warning fallback, and minimal generator task permission. |
+| 2026-09-02 14:34 | 2 | GREEN | Raw and structured focused tests passed 12/12; required freshness, scoped check, and scoped fmt commands all exited 0. |
+| 2026-09-02 14:36 | 3 | task/scope proof | Actual task refused a dirty package path at exit 1 with identical artifact hashes; forbidden-scope and whitespace audits exited 0. |
+
+## Reconcile — slice 1
+
+- Issue #1867 remains open at `status:impl`, milestone `0.0.8`; its comment still assigns F-2 to
+  merged #1929 and F-3 to this leaf.
+- Draft PR #1937 carries `Closes #1867`, every requested label, exactly one `status:impl`, and
+  milestone `0.0.8`.
+- No review or issue comment changed the locked design.
+
+## Reconcile — slices 2–3
+
+- `origin/main` advanced by one non-overlapping harness-report commit after dispatch. Per the
+  owner's explicit no-rebase instruction, this leaf remains on the assigned `3066a0cc5` base;
+  PR #1937 is mergeable and no convergence operation was performed.
+- The diff remains limited to the two tool files, the minimal task permission, and the three
+  owner-authorized run artifacts.
+- The topic supervisor still owns substantive slice review and mandatory separate-session
+  IMPL-EVAL; the draft was not marked ready.
 
 ## Gate results
 
-Pending RED-first implementation.
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Authoritative RED | raw focused test in detached `33ec78509` worktree | PASS, expected exit 1 | 8 passed/4 failed for absent package refusal, plugin refusal, override, and no-Git warning; cleanup exit 0. |
+| Focused GREEN | `deno test --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts` | PASS, exit 0 | 12 passed, 0 failed. |
+| Structured GREEN | structured test wrapper | PASS, exit 0 | 12 passed, 0 failed/ignored. |
+| Required freshness | `deno task check:mcp-export-corpus` | PASS, exit 0 | Check mode remained independent; 273 subpaths and 7,815 symbols. |
+| Type check | requested `.llm/tools` check wrapper | PASS, exit 0 | 346 files, 3 batches, no occurrences. |
+| Format | requested `.llm/tools` fmt wrapper | PASS, exit 0 | 346 files, no findings/refusals. |
+| Actual task refusal | `deno task gen:mcp-export-corpus` in detached dirty worktree | PASS, expected exit 1 | Names `packages/sdk/README.md`; artifact SHA identical before/after. |
+| Forbidden scope | diff against assigned base for `.github`, `deno.lock`, `packages`, `plugins` | PASS, exit 0 | No changed content. |
+| Whitespace | `git diff --check 3066a0cc5...HEAD` | PASS, exit 0 | No findings. |
 
 ## Handoff notes
 
@@ -127,3 +157,5 @@ Pending RED-first implementation.
   `--check` bypass, and whether each test executes from a committed detached worktree.
 - Mandatory IMPL-EVAL is assigned to the separate topic-supervisor route; this leaf will not
   self-certify.
+- Acceptance: all three issue boxes now have evidence (#1929 for F-2; this run's RED/GREEN and task
+  refusal for F-3). They remain unchecked on the issue pending supervisor evaluation/mirroring.

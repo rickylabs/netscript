@@ -42,8 +42,50 @@ is derived from a pipeline.
 
 ## GREEN and required validation
 
-Pending slices 2–3.
+All GREEN verdicts ran at implementation commit
+`1668173e82c6d378d90dd59c1638a425c7fd490a`.
+
+| Command / check | Real exit | Result |
+| --- | ---: | --- |
+| `deno test --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts` | 0 | PASS — 12 passed, 0 failed in 36 seconds |
+| structured test wrapper over the same focused test | 0 | PASS — 12 passed, 0 failed, 0 ignored; `durationMs: 36152` |
+| `deno task check:mcp-export-corpus` | 0 | PASS — schema 1, framework 0.0.6, 35 packages, 273 subpaths, 7,815 symbols |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` | 0 | PASS — 346 files, 3 batches, 0 failed batches/occurrences |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools --ext ts` | 0 | PASS — 346/346 files processed, 2 batches, 0 findings/refusals |
+| `git diff --check 3066a0cc5...HEAD` | 0 | PASS — no whitespace errors |
+
+The focused integration suite creates a detached worktree from committed `HEAD` for every case:
+
+| Behavior | Result | Load-bearing evidence |
+| --- | --- | --- |
+| Clean tree writes | PASS | Generated process exit 0; corpus bytes remain deterministic; deliberately old mtime is replaced. |
+| Dirty package refuses | PASS | Non-zero exit; stderr names `packages/sdk/mod.ts`; output bytes equal the pre-run snapshot. |
+| Dirty plugin refuses | PASS | Non-zero exit; stderr names `plugins/ai/mod.ts`; output bytes equal the pre-run snapshot. |
+| Outside dirty path writes | PASS | Modified `AGENTS.md` does not enter the scoped probe; process exits 0 and replaces old artifact mtime. |
+| Dirty `--check` remains freshness-only | PASS | Modified `packages/sdk/README.md`; check exits 0 and emits no dirty-path diagnostic. |
+| Explicit override | PASS | Dirty write exits 0; stderr names `--allow-dirty` and `packages/sdk/README.md`; artifact is written. |
+| Git unavailable | PASS | PATH retains Deno but not Git; generator warns loudly and writes successfully. |
+
+## Official task refusal
+
+A detached worktree at `1668173e8` exercised the actual task wiring with
+`packages/sdk/README.md` dirty:
+
+- Worktree add: exit 0.
+- `deno task gen:mcp-export-corpus`: real exit 1.
+- Diagnostic includes the exact porcelain line ` M packages/sdk/README.md`, the refusal, and the
+  explicit `--allow-dirty` recovery path.
+- Artifact SHA-256 before and after:
+  `d63bf0a1e6bff7f2f588f804e8779b0fc1fa8dd5c185bb2434a9a5dc6cfd1b4f`.
+- Worktree removal: exit 0.
 
 ## Scope and hygiene
 
-Pending final audit.
+- `git diff --exit-code 3066a0cc5 HEAD -- .github deno.lock packages plugins`: real exit 0.
+  Therefore no workflow, lockfile, corpus, package, or plugin content changed.
+- Changed-file enumeration: real exit 0; exactly the generator, its test, `deno.json`, and the
+  three authorized run artifacts.
+- The `deno.json` delta only expands `gen:mcp-export-corpus` from `--allow-run=deno` to
+  `--allow-run=deno,git`; `check:mcp-export-corpus` is byte-unchanged.
+- `git diff --check 3066a0cc5...HEAD`: real exit 0.
+- `deno task e2e:cli` was not run, per explicit instruction.
