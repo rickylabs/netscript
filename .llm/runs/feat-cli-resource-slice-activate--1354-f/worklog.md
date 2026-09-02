@@ -35,7 +35,7 @@
 
 | # | Slice | Gate | Files |
 | - | --- | --- | --- |
-| F | Converge init, retire complete old authority, compose and register command, regenerate carriers/corpus | focused tests + complete Slice F gate set | amended 33-file enumeration; generated carriers exempt |
+| F | Converge init, retire complete old authority, compose and register command, regenerate carriers/corpus | focused tests + complete Slice F gate set | 32 amended-F paths changed + the plan-scoped Slice E composition seam; item 24 corpus stayed byte-identical, so the product diff remains 33 paths; generated carriers exempt |
 
 ### Extension Axes and Composition
 
@@ -71,6 +71,8 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | 2026-09-03 | F | Product commit | Committed the reviewed implementation as `8c27ffe16` and pushed the exact required refspec. |
 | 2026-09-03 | F | Clean-tree carriers | MCP corpus regeneration was deterministic with no diff; all four carrier/publish/sample checks passed on the committed tree. |
 | 2026-09-03 | F | PR evidence | Updated PR #1956's body and posted the structured implementation PASS comment. |
+| 2026-09-03 | F | IMPL-EVAL | Fresh native Claude/Fable 5 medium session `bb222ada` returned `IMPL-EVAL: PASS`; no blocking findings. |
+| 2026-09-03 | F | Accounting correction | Replaced the ambiguous `33/33 planned paths` wording with the exact result: 32 amended-F paths changed, item 24 regenerated with no diff, and the explicitly plan-scoped Slice E item-6 composition seam supplies the 33rd product diff path. |
 
 ## Decisions
 
@@ -94,7 +96,7 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | Gate | Exit | Evidence |
 | --- | ---: | --- |
 | focused four-file suite | 0 | 32 passed, 0 failed |
-| full package-owned CLI unit suite | 0 | 1324 passed, 0 failed |
+| full package-owned CLI unit suite | 0 | 1324 passed, 0 failed across `packages/cli/src`, `packages/cli/tests`, and the three package-root unit files (`module_import_side_effect_test.ts`, `scaffolding_test.ts`, `testing_test.ts`) |
 | structured CLI check | 0 | 977 files, 9 batches, 0 diagnostics |
 | touched CLI lint | 0 | 12 files, 0 findings |
 | touched CLI format | 0 | 12 files, 0 findings |
@@ -114,5 +116,6 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 
 ## Handoff Notes
 
-- Product implementation is pushed at `8c27ffe16`; the next step is the formal opposite-family IMPL-EVAL.
-- Evaluator should first inspect retire-set completeness, planner equivalence, Fresh derivation order, and composed command dependencies.
+- Product implementation is pushed at `8c27ffe16`; gate evidence is pushed at `de042d23e`.
+- The formal opposite-family evaluator returned PASS. Its additional source-only rerun passed 1316/1316; its broader `packages/cli` discovery encountered two environment-only noexec browser-fixture failures in untouched E2E tests, which it explicitly classified as non-regressions.
+- Slice G owns the evaluator's LOW-4 guidance wording note in `routes/examples/index.tsx.template`.

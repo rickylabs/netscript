@@ -38,3 +38,18 @@
   guidance rewrite and new focused convention test.
 - **Evidence:** amended plan at `origin/feat/cli-resource-slice-plan` and the existing
   `assertAppConventionsResolve` failure in `public-command-tree_test.ts`.
+
+## 2026-09-03 — production-composition path accounting
+
+- **What:** The product diff contains `public-command-dependencies.ts`, while enumerated item 24
+  (`export-surface-corpus.generated.ts`) regenerated deterministically without a diff.
+- **Source:** Formal IMPL-EVAL LOW-1 and raw `be3e3dded..HEAD` path accounting.
+- **Expected:** Slice F activates the command using the Slice E integration point and reports its
+  footprint against the amended 33-item list.
+- **Actual:** 32 amended-F paths changed; the plan-scoped Slice E item-6 production composition
+  seam is the 33rd product diff path. Item 24 is freshness evidence only and stayed byte-identical.
+- **Severity:** evidence wording; non-blocking
+- **Action:** Report the exact accounting instead of `33/33 planned paths`. The composition edit is
+  authorized by the locked plan's Slice E item 6, this run's explicit scope, and the owner's
+  instruction to wire Slice E's dependencies at activation time.
+- **Evidence:** `evaluate.md`, `plan.md § Scope`, and `git diff --name-only be3e3dded..HEAD`.

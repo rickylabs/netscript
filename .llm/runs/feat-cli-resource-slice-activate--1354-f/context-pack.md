@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `feat-cli-resource-slice-activate--1354-f` |
 | Branch | `feat/cli-resource-slice-activate` |
-| Current phase | `impl-eval` |
+| Current phase | `complete` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | frontend consumer output; runtime/hosted excluded |
 
 ## Current State
 
-The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at `be3e3dded`. The owner amended Slice F after the mandated stop found `agent-conventions.ts` as an additional rendered consumer; item 33 and ceiling 33 now govern the run. Implementation, supervisor review, clean-tree carrier verification, and all required implementation gates are complete at pushed commit `8c27ffe16`; formal IMPL-EVAL remains.
+The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at `be3e3dded`. The owner amended Slice F after the mandated stop found `agent-conventions.ts` as an additional rendered consumer; item 33 and ceiling 33 now govern the run. Implementation, supervisor review, clean-tree carrier verification, all required implementation gates, and the separate-session Fable evaluation are complete. `IMPL-EVAL: PASS`; no blocking findings remain.
 
 ## Completed
 
@@ -23,16 +23,17 @@ The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at 
 - Focused 32/32 and full CLI 1324/1324 test suites pass; structured check/lint/fmt and precommit fitness gates pass.
 - Clean-tree MCP regeneration produced no diff; all four carrier/publish/sample checks pass.
 - PR #1956 body and implementation-phase PASS comment carry the amended contract and evidence.
+- Fresh native Claude/Fable 5 medium evaluator session `bb222ada` independently reproduced the load-bearing gates and returned PASS.
 
 ## In Progress
 
-- Formal opposite-family IMPL-EVAL.
+- Final evidence commit/push and PR IMPL-EVAL comment.
 
 ## Next Steps
 
-1. Run the opposite-family IMPL-EVAL against pushed commit `8c27ffe16`.
-2. Address any evaluator finding within the locked scope, or record PASS.
-3. Commit and push the final evaluator/run evidence and update PR #1956.
+1. Commit and push the evaluator/run evidence.
+2. Post the structured IMPL-EVAL PASS comment and corrected footprint accounting on PR #1956.
+3. Hand off Slice G guidance/hosted acceptance.
 
 ## Key Decisions
 
@@ -44,7 +45,9 @@ The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at 
 
 ## Files Changed
 
-- 33 product paths: 32 tracked paths plus the new focused writer test; the generated MCP corpus is unchanged.
+- Product diff: 33 paths total.
+- 32 amended-F enumerated paths changed; item 24's MCP corpus regenerated deterministically with no diff.
+- The 33rd diff path is `public-command-dependencies.ts`, the locked plan's Slice E item-6 production composition seam, explicitly included in this run's scope because Slice E left the command unregistered/uncomposed.
 
 ## Gates
 
@@ -57,7 +60,7 @@ The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at 
 
 ## Open Questions
 
-- Formal IMPL-EVAL remains; no implementation question is open.
+- None for Slice F. Slice G owns guidance wording and hosted acceptance.
 
 ## Drift and Debt
 
@@ -68,3 +71,4 @@ The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at 
 
 - `e371dda91` — harness bootstrap.
 - `8c27ffe16` — reviewed Slice F implementation and pre-evaluation evidence.
+- `de042d23e` — clean-tree gate evidence and evaluator handoff.

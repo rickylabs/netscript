@@ -1,5 +1,13 @@
 # Implementation Brief — Slice F (#1354)
 
+## SKILL
+
+- `netscript-harness` — slice discipline, run artifacts, and separate-session evaluation.
+- `netscript-cli` — scaffold writers, asset manifest/carriers, and command registration.
+- `netscript-doctrine` — package layering and generated-carrier ceiling treatment.
+- `netscript-tools` — structured validation, durable evidence, and lock hygiene.
+- `netscript-pr` — stacked PR body, phase comments, labels, and milestone contract.
+
 Implement the owner-provided locked Slice F only. Converge init on `planResourceSlice` with exactly the `form` and `partial` variants, retain only the demo README/telemetry/service-query additions, Fresh-derive generated route modules after route emission, retire the complete enumerated canonical/dependent family, and register `generate resource` fourth only after convergence. Bind production composition to Slice A's client selector and the existing app/procedure/Fresh/file-system/template/formatter seams. Item 33 re-points `serviceReferences()` from five retired paths to surviving planner leaves and drops authorization because it has no standalone leaf. Do not touch `service-query.ts.template`, `main`, `deno.lock`, or Slice G/runtime acceptance.
 
 Supervisor review strengthened the acceptance proof in two places: init now exposes both the planner's resource alias and the retained `serviceExample` alias to the same Fresh-derived route, and both callers format rendered bodies before ownership markers hash them. The production composed command can therefore dry-run the exact init preset with all canonical leaves and shared files byte-identical.

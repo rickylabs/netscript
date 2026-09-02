@@ -25,3 +25,13 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 - The owner supplied a locked, already evaluated plan and explicitly required `PLAN-EVAL: N/A` for this implementation run.
 - The owner requires the PR to open non-draft with `status:impl`; this overrides the harness default of a draft PR on the bootstrap commit.
 
+## Evaluator receipt
+
+| Field | Value |
+| --- | --- |
+| Session | `bb222ada-e015-4051-b71a-ac89fba1fb79` (`bb222ada`) |
+| Model / effort | Claude Fable 5 / medium |
+| Evaluated range | `be3e3dded..de042d23e` (product commit `8c27ffe16`) |
+| Verdict | `IMPL-EVAL: PASS` |
+| Product mutations | none |
+| Allowed artifact | `.llm/runs/feat-cli-resource-slice-activate--1354-f/evaluate.md` only |
