@@ -10754,3 +10754,16 @@ rather than assume. Its receipt lands in the run dir on the branch.
 
 Standing rule from here: **formal evals go native first**; the cloud lane is used only where the
 work is explicitly cloud-driven, as `lane-policy.md` already says.
+
+### ~20:25Z — #1943 native PASS; three PRs ready-merge
+
+**#1943** (#1354 Slice B): native Fable IMPL-EVAL **PASS**, receipt `a5fe753df`, packet posted,
+`status:ready-merge`. The evaluator confirmed the `PageModuleRouteForm` re-export is the correct
+minimal closure (it types a field on a required export; omitting it raises a private-type-ref), that
+the rewrite function and binding pass stay unexported, that both lock deltas are exactly one line
+each, and that the adapter's staging story rests on `routesDir`/`outputPath` overrides that really
+exist at `manifest.ts:279-294`. It re-verified zero hand-authored overlap with #1664 against its
+current 117 files. One shared generated file (the corpus) — whichever merges second regenerates.
+
+**Ready for the coordinator:** #1944 (closes #1452), #1941 (closes #1353 + #1467, mirror pending
+CI at the receipt head), #1943 (partial, `Refs #1354`), plus #1895 on the alternating Aspire tier.

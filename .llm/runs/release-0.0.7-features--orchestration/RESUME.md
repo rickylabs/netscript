@@ -7,7 +7,7 @@
 | Route | **Claude · `claude-fable-5-1` · low** · Remote Control attached · supervise-only · **never merges** (primary coordinator merges) |
 | `origin/main` | **`850cc7757`** — moves fast, always re-fetch |
 | Topic branch | `orchestrator/release-0.0.7-features`, worktree `007-features` |
-| Eval routes | IMPL: `status:impl-eval` label cycle → OpenHands GLM · max. PLAN: **native Fable 5 · medium subagent** (OpenHands qwen is rate-limited upstream and pinned for the plan phase; the native lane is the policy default anyway) |
+| Eval routes | **Native Fable 5 subagent first** for both PLAN and IMPL — it writes `evaluate.md` itself (commit it as the receipt). The OpenHands lane lost 3/3 parsed PASSes today (`Expected exactly one changed evaluate.md; found 0`, reported on #1894); use it only for explicitly cloud-driven work |
 
 ## Owned queue — every issue has a vehicle or a named, measured dependency
 
@@ -15,11 +15,11 @@
 | --- | --- |
 | #1349, #1352 | **CLOSED** via #1936 / #1931 (mirror ticked all boxes) |
 | #1897 | **CLOSED** via #1918 |
-| #1353, #1467 | PR **#1941** `22cc3e5b8` — `Closes` both; audit found and fixed a real defect (`propagateTraceContext` was never consulted at the injection site); IMPL-EVAL running |
+| #1353, #1467 | PR **#1941** `4bfded8c8` — **native PASS, `status:ready-merge`**; `Closes` both; real `propagateTraceContext` fix; mirror ticks 14 boxes on CI at receipt head |
 | #1590 | PR **#1895** `d0bf0aebf` — `status:ready-merge`; exact-head `fresh-browser` green, IMPL-EVAL PASS, `close-gate` pass; runtime tiers are Aspire-lane flake (see below) |
 | #1355 / #1360 | PR **#1664** `d155db116` — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
-| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `2e0699bf3` (disjoint from #1664, measured); IMPL-EVAL running. Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
-| #1452 | Slice 3 pushed `8cd55070d` on `feat/plugin-service-context-s3` (appsettings/env resolvers + real generated-consumer boot test); PR/eval trigger chained |
+| #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = PR #1943** `a5fe753df` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C** dispatched on `feat/cli-resource-slice-contract` (ten new files, disjoint from #1664 and A). Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
+| #1452 | PR **#1944** `781fe9bd9` — **native PASS, `status:ready-merge`, `Closes #1452`** (rows are plain bullets; no mirror needed, close-gate already pass) |
 | #1348 | epic — receives no leaf PR by design |
 
 ## The single remaining merge-packet gate on #1664
