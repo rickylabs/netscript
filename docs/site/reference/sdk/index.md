@@ -61,6 +61,65 @@ These symbols are available from the root export and the focused, browser-safe
 | `SafeSuccess` | type alias | Success branch returned by `safe`. |
 | `SafeFailure` | type alias | Failure branch returned by `safe`. |
 
+### Client contributions (`SdkClientContribution`)
+
+`CreateServiceClientOptions.contributions` accepts an explicit literal tuple of request
+contributions. Tuple type inference projects the combined context declared across all
+contributions onto the per-call client `context`.
+
+Every `SdkClientContribution` descriptor contains six required fields:
+
+- `protocol`: Protocol version discriminator (`{ family: 'netscript.sdk-client', major: 1 }`).
+- `id`: Globally unique contribution identifier (`${string}:${string}`).
+- `context`: Runtime declaration mapping owned context keys to `'required'` or `'optional'`.
+- `headerKeys`: Readonly array of exclusive lower-case HTTP request-header names owned by this
+  contribution.
+- `responseCache`: Response-cache policy declaration (`{ mode: 'invariant' }`,
+  `{ mode: 'partitioned', partition: ... }`, or `{ mode: 'direct-only' }`).
+- `prepare`: Synchronous or async hook returning a header patch (`{ headers?: Record<string, string> }`)
+  for one logical request epoch.
+
+```ts
+import { oc } from '@orpc/contract';
+import {
+  createServiceClient,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
+import { z } from 'zod';
+
+const contract = {
+  echo: oc
+    .route({ method: 'POST', path: '/echo' })
+    .input(z.object({ message: z.string() }))
+    .output(z.object({ echoed: z.string() })),
+};
+
+const tenantHeader = defineSdkClientContribution<{ tenantId: string }>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:tenant-header',
+  context: { tenantId: 'required' },
+  headerKeys: ['x-tenant-id'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.tenantId,
+  },
+  prepare: ({ context }) => ({
+    headers: { 'x-tenant-id': context.tenantId },
+  }),
+});
+
+const client = createServiceClient({
+  contract,
+  serviceName: 'tenant-service',
+  contributions: [tenantHeader] as const,
+});
+
+await client.echo(
+  { message: 'hello' },
+  { context: { tenantId: 'tenant_123' } },
+);
+```
+
 ## Server-side query factories (`@netscript/sdk/query`)
 
 | Symbol | Kind | Signature / Description |
