@@ -123,7 +123,22 @@ export type {
   TelemetryProbePort,
   TelemetryProbeResult,
 } from './src/domain/telemetry-probe-port.ts';
-export type { TelemetryEndpointEnvironment } from './src/domain/telemetry-endpoint.ts';
+export {
+  DEFAULT_TELEMETRY_ENDPOINT,
+  resolveTelemetryEndpoint,
+} from './src/domain/telemetry-endpoint.ts';
+export type {
+  AspirePsDashboardPort,
+  ResolvedTelemetryEndpoint,
+  TelemetryEndpointEnvironment,
+  TelemetryEndpointSource,
+} from './src/domain/telemetry-endpoint.ts';
+export { AspirePsDashboardReader } from './src/infrastructure/aspire-ps-dashboard-reader.ts';
+export type {
+  AspirePsCommand,
+  AspirePsCommandResult,
+  AspirePsDashboardReaderOptions,
+} from './src/infrastructure/aspire-ps-dashboard-reader.ts';
 export {
   DocsCorpusUnavailableError,
   MAX_INDEXED_DOC_LENGTH,

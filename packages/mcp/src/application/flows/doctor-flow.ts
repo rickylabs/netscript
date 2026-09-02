@@ -8,7 +8,10 @@ import {
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 import { isRecord } from '../../domain/schema.ts';
-import type { TelemetryEndpointEnvironment } from '../../domain/telemetry-endpoint.ts';
+import type {
+  AspirePsDashboardPort,
+  TelemetryEndpointEnvironment,
+} from '../../domain/telemetry-endpoint.ts';
 import { createTelemetryDoctorFamily } from './telemetry-doctor-family.ts';
 
 const MAX_FAMILY_CHECKS = 20;
@@ -62,12 +65,13 @@ export function createDoctorFlow(
   environment: TelemetryEndpointEnvironment = {},
   families: readonly DoctorCheckFamily[] = [],
   projectRoot = '.',
+  aspirePs?: AspirePsDashboardPort,
 ): ToolFlow {
   return async (input: unknown): Promise<ToolExecutionResult> => {
     const explicit = isRecord(input) && typeof input.endpoint === 'string'
       ? input.endpoint
       : undefined;
-    const telemetry = createTelemetryDoctorFamily(probe, explicit, environment);
+    const telemetry = createTelemetryDoctorFamily(probe, explicit, environment, aspirePs);
     const context = { projectRoot, explicitTelemetryEndpoint: explicit !== undefined };
     const results: DoctorFamilyResult[] = [];
     for (const family of [telemetry, ...families]) {
