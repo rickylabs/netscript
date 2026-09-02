@@ -155,42 +155,6 @@ const desktopRpc = bindDesktopRpcWindow({
 await desktopRpc.close();
 ```
 
-### Ordered partial navigation
-
-Install the browser lifecycle explicitly from client code. Repeated installs in one document share
-the same coordinator; every caller owns a handle and the final `dispose()` restores only wrappers
-that are still package-owned.
-
-```tsx
-import { installPartialNavigationCoordinator, KeyedPartial } from '@netscript/fresh/navigation';
-
-const navigation = installPartialNavigationCoordinator();
-const unsubscribe = navigation.subscribe(({ kind, url }) => {
-  routeEvents.value = [...routeEvents.value, `${kind}:${url.pathname}`];
-});
-
-navigation.navigate('/orders');
-
-export function OrderRegion({ orderId }: { orderId: string }) {
-  return (
-    <KeyedPartial name={`order-${orderId}`}>
-      <OrderSummary orderId={orderId} />
-    </KeyedPartial>
-  );
-}
-
-// Client cleanup waits for every superseded finite HTML body to reach EOF.
-unsubscribe();
-await navigation.dispose();
-```
-
-This compatibility adapter targets Fresh 2.3.3's current partial-fetch and history sequence. It
-never aborts or cancels a superseded transport: stale bodies are read to EOF and discarded so Vite
-development servers do not surface transport aborts as overlays. Draining can briefly retain an
-HTTP/1.1 development-server connection slot, bounded by the finite response body's time to EOF.
-Fresh normalizes colons to underscores when serializing a VNode key into its marker; the wrapper
-uses the unmodified region name as the native Preact key and does not rewrite server HTML markers.
-
 Each call owns isolated per-window transport state and unbinds exactly once during cleanup. Pair it
 with `createDesktopServiceClient({ contract })` from `@netscript/sdk/desktop` in the webview; both
 sides reuse the same oRPC contract instead of a hand-maintained bindings declaration file.
