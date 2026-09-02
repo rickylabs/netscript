@@ -66,14 +66,14 @@ Deno.test('missing or unparseable mount evidence fails closed', () => {
   }
 });
 
-Deno.test('aspire mcp command line is rejected despite otherwise owned path', () => {
+Deno.test('aspire agent mcp command line is rejected despite otherwise owned path', () => {
   assertEquals(
     classify(
       {
         kind: 'apphost',
         appHostPath: `${root}/apphost.mts`,
         appHostPid: 7,
-        commandLine: 'aspire mcp start --stdio',
+        commandLine: 'aspire agent mcp',
       },
       { appHosts: [], containers: [] },
       root,

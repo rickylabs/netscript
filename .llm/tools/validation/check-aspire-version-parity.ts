@@ -6,12 +6,14 @@
  * in CI until the S13 slice.
  */
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
+import { buildAspireSurfaceManifest } from '../../runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts';
 
 export const ASPIRE_SURFACE_MANIFEST_PATH =
   '.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv';
 
 export type ParityPhase = 1 | 2;
 export type FindingStatus = 'fail' | 'deferred' | 'info';
+export const PHASE_TWO_COMPAT_VERSION = '13.5.3';
 
 export interface ManifestRow {
   path: string;
@@ -46,6 +48,7 @@ export interface ParityReport {
   findings: ParityFinding[];
   skipped: string[];
   missing: string[];
+  manifestFresh: boolean;
 }
 
 interface EvaluateOptions {
@@ -54,6 +57,9 @@ interface EvaluateOptions {
   expectedVersion: string;
   readText: (path: string) => Promise<string | null>;
   manifestPath?: string;
+  manifestSource?: string;
+  generatedManifestSource?: string;
+  generatedManifestUnmatched?: readonly string[];
 }
 
 const STALE_PATTERNS = [/13\.[0-4]\.[0-9]+/g, /Aspire 13\.[0-4]/g] as const;
@@ -147,6 +153,27 @@ export async function evaluateAspireVersionParity(
   const skipped: string[] = [];
   const missing: string[] = [];
   let checked = 0;
+  const sourcesMatch = options.manifestSource === undefined ||
+    options.generatedManifestSource === undefined ||
+    options.manifestSource === options.generatedManifestSource;
+  const unmatched = options.generatedManifestUnmatched ?? [];
+  const manifestFresh = sourcesMatch && unmatched.length === 0;
+
+  if (!manifestFresh) {
+    findings.push(parityFinding(
+      {
+        path: options.manifestPath ?? ASPIRE_SURFACE_MANIFEST_PATH,
+        class: 'manifest:freshness',
+        owner: 'S13',
+        disposition: 'regenerate before parity evaluation',
+      },
+      'fail',
+      [...unmatched],
+      unmatched.length > 0
+        ? 'Aspire surface manifest has paths without an ownership rule'
+        : 'Aspire surface manifest is stale; rerun aspire-surface-manifest.ts',
+    ));
+  }
 
   for (const row of options.rows) {
     if (row.class === 'lockfile') {
@@ -170,7 +197,7 @@ export async function evaluateAspireVersionParity(
     const exactMismatches = options.phase === 1 ? unexpectedPhaseOneVersions(row.path, source) : [];
     const matches = [...new Set([...staleMatches(source), ...exactMismatches])];
 
-    if (row.owner === 'archival') {
+    if (row.owner === 'archival' || row.class.startsWith('archival:')) {
       if (matches.length > 0) {
         findings.push(
           parityFinding(row, 'info', matches, 'archival owner is informational only'),
@@ -180,14 +207,17 @@ export async function evaluateAspireVersionParity(
     }
 
     if (options.phase === 2 && row.class === 'compat-fixture') {
-      const hasExpectedVersion = containsExactAspireVersionToken(source, options.expectedVersion);
+      const hasExpectedVersion = containsExactAspireVersionToken(
+        source,
+        PHASE_TWO_COMPAT_VERSION,
+      );
       findings.push(parityFinding(
         row,
         hasExpectedVersion ? 'info' : 'fail',
         matches,
         hasExpectedVersion
-          ? `compat fixture contains the required ${options.expectedVersion} literal`
-          : `compat fixture is missing the required ${options.expectedVersion} literal`,
+          ? `compat fixture contains the required ${PHASE_TWO_COMPAT_VERSION} literal`
+          : `compat fixture is missing the required ${PHASE_TWO_COMPAT_VERSION} literal`,
       ));
       continue;
     }
@@ -226,10 +256,12 @@ export async function evaluateAspireVersionParity(
     findings,
     skipped,
     missing,
+    manifestFresh,
   };
 }
 
-function parsePhase(args: string[]): ParityPhase {
+/** Parse the optional phase selector while preserving phase 1 as the default. */
+export function parsePhase(args: string[]): ParityPhase {
   const index = args.indexOf('--phase');
   if (index === -1) return 1;
   const value = args[index + 1];
@@ -248,16 +280,21 @@ async function readRepositoryFile(path: string): Promise<string | null> {
 
 export async function runParityGate(args: string[] = Deno.args): Promise<ParityReport> {
   const manifestSource = await Deno.readTextFile(ASPIRE_SURFACE_MANIFEST_PATH);
+  const generatedManifest = await buildAspireSurfaceManifest();
+  const phase = parsePhase(args);
   return await evaluateAspireVersionParity({
     rows: parseManifest(manifestSource),
-    phase: parsePhase(args),
-    expectedVersion: SCAFFOLD_VERSIONS.ASPIRE_SDK,
+    phase,
+    expectedVersion: phase === 2 ? PHASE_TWO_COMPAT_VERSION : SCAFFOLD_VERSIONS.ASPIRE_SDK,
     readText: readRepositoryFile,
+    manifestSource,
+    generatedManifestSource: generatedManifest.body,
+    generatedManifestUnmatched: generatedManifest.unmatched,
   });
 }
 
 if (import.meta.main) {
   const report = await runParityGate();
   console.log(JSON.stringify(report));
-  Deno.exit(report.ok ? 0 : 1);
+  Deno.exit(report.ok || Deno.args.includes('--report') ? 0 : 1);
 }

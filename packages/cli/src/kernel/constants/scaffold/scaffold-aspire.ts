@@ -6,11 +6,6 @@ export const SCAFFOLD_ASPIRE_MODULES = {
   ASPIRE_COMPAT_IMPORT: './_aspire-compat.mts',
 } as const;
 
-export const SCAFFOLD_COMMUNITY_TOOLKIT = {
-  PACKAGE_ID: 'CommunityToolkit.Aspire.Hosting.Deno',
-  VERSION: '13.5.0',
-} as const;
-
 export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
   POSTGRES: {
     PACKAGE_ID: 'Aspire.Hosting.PostgreSQL',

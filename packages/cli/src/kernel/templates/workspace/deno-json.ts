@@ -17,7 +17,9 @@ import {
   SCAFFOLD_WORKSPACE_PACKAGES,
 } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { WorkspaceDenoJsonOptions } from '../../domain/scaffold/scaffold-options.ts';
+import { resolveNetScriptImports } from '../../adapters/scaffold/import-resolver.ts';
 
 /**
  * Generates the root `deno.json` workspace configuration file.
@@ -44,8 +46,7 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
   const dbEngine = options.dbEngines?.[0];
   const generatedImports = dbEngine
     ? {
-      '@database/zod':
-        `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/crud.ts`,
+      '@database/zod': `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/crud.ts`,
     }
     : {};
   const jsrImports = options.importMode === 'jsr'
@@ -56,16 +57,20 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
       '@netscript/plugin': netscriptJsrSpecifier('plugin'),
     }
     : {};
-  const imports = { ...jsrImports, ...generatedImports };
+  const aspireTaskImports = options.noAspire || useWorkspaceMembers ? {} : {
+    [SCAFFOLD_PACKAGES.NETSCRIPT_MCP]: resolveNetScriptImports(
+      options.importMode,
+      options.localBase,
+    )[SCAFFOLD_PACKAGES.NETSCRIPT_MCP],
+  };
+  const imports = { ...jsrImports, ...aspireTaskImports, ...generatedImports };
   const minimumDependencyAge = options.importMode === 'jsr'
     ? {
       age: 'P1D',
       // Deno matches minimum-age exclusions by package identity. Adding the release version here
       // leaves newly published packages subject to the age window and breaks generated apps for
       // roughly 24 hours after every release.
-      exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
-        `jsr:@netscript/${packageName}`
-      ),
+      exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) => `jsr:@netscript/${packageName}`),
     }
     : undefined;
 
@@ -96,14 +101,10 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
             'deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export',
         }
         : {}),
-      check:
-        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check',
-      lint:
-        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint',
-      'fmt:check':
-        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check',
-      fmt:
-        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write',
+      check: 'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check',
+      lint: 'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint',
+      'fmt:check': 'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check',
+      fmt: 'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write',
       test: 'deno test --allow-all',
     },
   };
