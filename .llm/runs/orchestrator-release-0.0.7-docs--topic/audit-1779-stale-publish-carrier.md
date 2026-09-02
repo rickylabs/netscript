@@ -203,3 +203,11 @@ heading and exclude the `|` form.
 - Docs queue empty. Remaining user-visible candidates before stable: #1664 (impl-eval), #1952
   (impl), #1956 (impl — activates `generate resource`; owner should add `Refs`/closing keyword).
   Swept as no-bullet: #1951, #1953, #1954, #1909, #1957.
+
+## Reconcile at main `8c549c061` — 2026-09-03
+
+- Docs 0.0.7 queue: empty (no open `orchestrator:docs` item in milestone 27; #1939 stays Backlog).
+- All four docs carrier gates pass on exact `origin/main` `8c549c061`: assets-barrel,
+  publish-assets, mcp-export-corpus, agent-docs-prose.
+- Changelog current through every user-visible merge (#1949 + #1955). Staged follow-up bullets
+  for #1664/#1956 (stacked; fold once both land) and #1885/#1952 pending ready-merge.
