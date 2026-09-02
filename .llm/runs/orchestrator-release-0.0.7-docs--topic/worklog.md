@@ -4197,3 +4197,44 @@ the PR's own fixture records `dashboardTools` as **3**; the code already disting
 places. It bites because the section's "if these tools are absent, use the CLI" explains away exactly
 the symptom of running dashboard-only mode. Three attributed runtime observations explicitly not
 verified — no host lease taken for a docs audit.
+
+## 2026-09-02 — audit lane: #1915 (features), and the README gating gap it exposed
+
+Audited **#1915** `feat(sdk): add typed bearer credential contribution` at head `a6fababde`.
+Reported on the PR; **ownership untouched** (`orchestrator:features`).
+
+Chose it deliberately: a new *published credential* surface is where inaccurate documentation costs
+most, and it is exactly the kind of onboarding example a developer copies verbatim.
+
+**Eight claims verified, all accurate** — each specifier resolved against the real `deno.json`
+exports, each symbol confirmed re-exported, and the example's `context: { auth: { getAccessToken },
+authCachePartition }` matched the generated template's declaration character for character. `session`
+is a real procedure carrying `AUTHENTICATION_REQUIRED_META`, so supplying the credential is correct
+rather than incidental. The "no environment variable, cookie, or browser storage" and "HTTPS plus
+local loopback" claims both hold against `bearer-contribution.ts`.
+
+**F1 (moderate)** — `allowInsecureTransport` appears **0 times** in the README. The doc states the
+secure-transport default but never names its supported opt-out, while the runtime error says
+"explicit insecure-transport consent" without naming it either. The likely failure is not that a
+developer finds the option; it is that they drop the contribution and hand-roll an `Authorization`
+header, losing the guard.
+
+**F2 (minor)** — "local loopback origins" understates the accepted set: `isLocalDevelopmentOrigin`
+also accepts `*.localhost`, a hostname suffix rather than a loopback address. Someone auditing the
+security boundary from the README would not expect `tenant-a.localhost` to qualify.
+
+### F3 — the finding worth more than the PR-specific ones
+
+`plugins/*/README.md` fences are gated by **nothing**. Verified rather than assumed:
+`docs:snippets` walks only `docs/site`; `check-readme-standard` asserts a fence *exists*
+(`FENCE_RE.test`) and never compiles it; the JSDoc gate covers `@example` in source, not `.md`.
+
+So a README can name a dead specifier, a renamed symbol, or a stale call shape and every gate stays
+green — on the JSR-published landing page for each package. Filed as **#1924** in my own lane rather
+than added to another lane's PR, with the shape sketched (the extractor/compiler/workspace machinery
+already generalises; `docs:snippets` is simply pointed at one root) and an explicit requirement to
+**measure a floor before enforcing**, as #1777 and #1533 both did.
+
+That is the second time an audit has been worth more for what it revealed about coverage than for
+what it found in the PR — the #1842 audit surfaced the dynamic-`import()` specifier trap the same
+way.
