@@ -234,3 +234,30 @@ Deno.test('the caller limit reaches aspire otel as -n, not only the client-side 
     assertEquals(args[n + 1], '500');
   }
 });
+
+Deno.test('a fan-in consumer span in its own trace is retained, not filtered away', async () => {
+  // TC-14 regression. The Flow-B stream consumer emits `stream.subscribe` in its OWN trace, linked
+  // to the producer's — that is what a fan-in is. Spans were dropped when their traceId was absent
+  // from the `aspire otel traces` summary list, so the consumer's trace vanished and TC-14's first
+  // assertion ("real streams consumer span exists") saw nothing at all.
+  const producerTrace = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  const consumerTrace = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+  const query = createAspireMcpTelemetryQuery(
+    () => Promise.resolve({ text: '# STRUCTURED LOGS DATA\n[]' }),
+    (args: readonly string[]) => {
+      if (args[1] === 'traces') {
+        // Only the producer trace is summarised — the consumer's is not listed.
+        return Promise.resolve([{ traceId: producerTrace }]);
+      }
+      return Promise.resolve([
+        { traceId: producerTrace, spanId: '1111111111111111', name: 'job.execute' },
+        { traceId: consumerTrace, spanId: '2222222222222222', name: 'stream.subscribe' },
+      ]);
+    },
+    'https://dashboard.invalid',
+  );
+
+  const traces = await query.queryTraces({ limit: 500 });
+  const names = traces.flatMap((trace) => trace.spans).map((span) => span.name).sort();
+  assertEquals(names, ['job.execute', 'stream.subscribe']);
+});

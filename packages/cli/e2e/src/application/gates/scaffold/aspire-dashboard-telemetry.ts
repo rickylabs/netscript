@@ -250,14 +250,25 @@ function groupAspireCliSpans(
     isRecord(summary) && typeof summary.traceId === 'string' ? [summary.traceId] : []
   );
   const orderedSummaryIds = [...new Set(summaryIds)];
-  const hasTraceSummaries = summaries.some((summary) =>
-    isRecord(summary) && typeof summary.traceId === 'string'
+  // Only a trace the `since` filter explicitly dropped may exclude its spans. A trace that was
+  // never summarised at all must NOT — a fan-in consumer emits `stream.subscribe` in its own
+  // trace, linked to the producer's, and `aspire otel traces` need not list it. Filtering those
+  // away deleted the consumer's telemetry entirely, which is what TC-14 observed as "no real
+  // streams consumer span exists". The ordering below already anticipates orphan traces; this
+  // filter is what made that branch unreachable.
+  const summarisedIds = new Set(
+    summaries.flatMap((summary) =>
+      isRecord(summary) && typeof summary.traceId === 'string' ? [summary.traceId] : []
+    ),
   );
   const allowedIds = new Set(orderedSummaryIds);
+  const excludedBySince = new Set(
+    [...summarisedIds].filter((traceId) => !allowedIds.has(traceId)),
+  );
   const grouped = new Map<string, unknown[]>();
   for (const value of spans) {
     if (!isRecord(value) || typeof value.traceId !== 'string') continue;
-    if (hasTraceSummaries && !allowedIds.has(value.traceId)) continue;
+    if (excludedBySince.has(value.traceId)) continue;
     const current = grouped.get(value.traceId) ?? [];
     current.push(normalizeAspireCliSpan(value));
     grouped.set(value.traceId, current);
