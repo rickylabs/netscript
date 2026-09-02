@@ -10838,3 +10838,17 @@ to converge onto `main` `8c549c061` (post-#1909): regenerate the four generated 
 semantic fixture merge (#1909 base + #1952 additive), no #1957 content pulled in, residual
 merge-tree vs #1957 recorded verbatim. Coordination posted on #1952 (Aspire hold pushes; land #1957
 first) and cross-linked on #1957. Not waiting on canary.
+
+### D-260 — #1952 converged at f4a4169b6 (review green); `no TCP URL` contract isolated as 13.5.3 describe drift, not in the prod suite
+
+Worker re-targeted to `ba6f1f49a` (post-#1957) mid-flight and pushed `f4a4169b6`. Review script at
+that head: main merged, merge-tree clean, readiness layer (4 refs) present on the #1909+#1957 stream
+fixture (4 refs), no pre-#1909 polling, all four generated `check:` gates 0, lock churn 0, tests
+4/0 · 3/0 · 10/0, e2e type-check 0. CI at head in progress; close-gate red on "Referenced issue
+acceptance gate" (mechanics, handled at packet).
+`Postgres resource exposed no TCP URL`: `tcpUrl()` at `verify-live-db-endpoint.ts:429` via
+`readReceipt` (first-start), reading `aspire describe --format Json`; requires a `urls[]` entry with
+`tcp://|postgres(ql)://`; observed: `urls[]` present, no such scheme. File untouched by
+#1909/#1957/#1952; last change = 13.5.3 pin bump #1727. Docker tier only. **Not in the prod
+suite** (canary.6 prod artifact has no `live-db-endpoint` gate) → cannot block Canary 7; reddens PR
+docker-tier e2e. Posted to #1641 with what the aspire owner needs (capture the 13.5.3 `urls[]`).
