@@ -10601,3 +10601,27 @@ path explicitly.
 IMPL-EVAL dispatched at `2e5ad4900` (native Fable 5.1, opposite family), aimed at the before-write
 refusal property, check-path isolation, probe scoping, override honesty, and whether the corrected
 RED proves what it claims.
+
+### D-242 — #1937 (#1867 F-3) PASS_WITH_FINDINGS, packeted at 2e5ad4900; route now claude-fable-5-1 low
+
+**Supervisor route changed by owner:** `/model claude-fable-5-1`, `/effort low`. Recorded as the
+explicit route for this controller from here; requested == observed via the local command receipts.
+
+**IMPL-EVAL `PASS_WITH_FINDINGS`** (Fable 5.1, opposite family). Both properties I asked to be
+*proved* held by execution: refusal before any write (artifact SHA-256 **and mtime** identical
+across a refused run, modified and untracked files alike; guard sequenced before
+`buildExportSurfaceCorpus()`), and check-path isolation (`check:` keeps `--allow-run=deno`, guard
+under `if (!check)`, executed dirty-tree `check` exits 0, `--check --allow-dirty` rejected up front).
+F1 low: no-git fixture is host-layout dependent — false RED only, never false green. F2 sharpened my
+own framing: the clean-checkout `--check` is the real verifier, so a wrong `--allow-dirty` artifact
+fails the gate regardless; an embedded marker adds nothing and breaks correct artifacts. F3 info.
+
+**Packet posted; `acceptance-evidence` block covers all three #1867 boxes** — box 1 by reference to
+#1920/#1929 (merged as `3066a0cc5`, this branch's base) per the recorded scope boundary; boxes 2–3
+by this PR. Marked ready; the `ready_for_review` transition dispatched the phase-eval automation,
+which demotes to `status:impl-eval` while it runs (designed, per D-235). Mirror dry-run therefore
+reported the label absent; I re-apply `status:ready-merge` after the automation settles, then rerun
+`ci.yml` so the mirror reads it live — never a push. Issue #1867 advanced to `status:impl-eval`.
+
+**Queue scan at `origin/main` = `850cc7757`:** #1867 is the sole open internals issue. 0.0.7
+committed internals queue remains empty; #1641 stays the coordinator umbrella.
