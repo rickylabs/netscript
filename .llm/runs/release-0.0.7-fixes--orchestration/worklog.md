@@ -7666,3 +7666,11 @@ Root cause remains **undetermined**; no fix is named on purpose.
 - **#1610 / PR #1916** (`01a06198`), **#1544** (`01a06208`), **#1601+#1557** (`01a06209`): all three Codex threads were dead (absent from daemon sessions); resumed on their exact threads with continuation steers (`/tmp/r1610.md`, `/tmp/r1544.md`, `/tmp/r1601.md`). `01a06198` and `01a06208` confirmed working again.
 - **#1883 / #1868** (`01a05de2`): OpenHands FAIL_FIX at `bdbaec12c` accepted — `VITE_READY_MARKER='Local:'` scanned against raw ANSI-coloured Vite output can never match on hosted CI. Bounded repair resumed on the exact thread: ANSI strip + `NO_COLOR`, RED test with the captured banner bytes, correct the false "3/3 green in hosted CI" record.
 - **#1885 / #1845**: OpenHands FAIL_FIX was evidence-incomplete only because hosted runtime died on the Garnet `aspire wait … (17)` timeout at `0fe214875` — the defect #1858 fixed on main. Merged `origin/main` `850cc7757` → `dd039a791`, pushed; synchronize re-dispatches the managed-browser gate.
+
+## 2026-09-02T17:40Z — hosted results triage
+
+- **#1938 at `6e546515c`**: `Code quality › MCP export corpus freshness` FAIL (job 100334821218) — public-surface change made the generated corpus stale; regeneration steer sent to exact thread `01a06201` (canonical generator only). `desktop-native-linux` FAIL = #1926 `@orpc/contract` isolated-install error, not PR-attributable.
+- **#1885 at `dd039a791`**: `desktop-native-linux` FAIL = same #1926 error (log line 2467, `transport-policy.ts`); runtime tiers pending. Clears when #1930 merges.
+- **#1856 at `9d4713d52`**: marked ready; `code-quality`/`quality` SUCCESS, `check-test` running, e2e skipped by classify → `ci:full` added for a runtime verdict; `close-gate` red only because not `status:ready-merge`. All DoD boxes ticked; `Closes #1609`.
+- **#1883**: RED `b9b2e9f0a` `test(e2e): reproduce ANSI dev readiness miss` landed on thread `01a05de2`.
+- **#1930 merge dependency is now explicit**: #1885, #1938 (and any `ci:full` PR) cannot show desktop green until `b3a861918` lands — coordinator should merge #1930 first on its PASS.
