@@ -10705,3 +10705,12 @@ unticked DoD box. **Expected pre-ready reds:** #1949, #1664, #1891, #1885; #1909
 **Cut readiness:** last canary success 08-31 18:19 at a pre-#1917 head; ≥12 merges since, no
 post-fix canary; 15 p0/p1 open incl. #1712 (p0) and #1947 (p1). Posted as an actionable packet to
 #1641 with exact remedies drawn from D-234/D-245. No edits to other lanes' PRs.
+
+### D-249 — reconcile at 88fc6d69d: Canary 6 in flight; #1895/#1856 reds are real, not eviction
+
+Main `88fc6d69d` (S9 merged). Canary 6 `33679983481` in progress, 23 steps — first canary from a
+post-fix head. Milestone 32/292; 14 p0/p1. Ready-merge set classified by executed steps: #1949 review
+only (cut prerequisite #1947); #1940/#1883 unchanged mechanics; **#1895 sqlite and #1856 docker are
+genuine E2E failures at 17 steps** (#1856 sqlite `cancelled` at 17 = supersession, not eviction);
+#1856 also DIRTY. Flagged that `ready-merge` is ahead of evidence on those two per the #1933 `Ready`
+definition. #1942 and #1759 shipped via the audit's remedies. Posted to #1641.
