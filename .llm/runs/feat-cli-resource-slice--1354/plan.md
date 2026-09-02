@@ -693,7 +693,7 @@ makes init emit exactly the planner's `--form --partial` preset, then registers 
 second caller of that same authority. It does not extend the neutral template contract and does not
 change #1664's service-query template.
 
-**File ceiling:** 32.
+**File ceiling:** 33.
 
 The ceiling rises from 24 to 32 solely for the eight newly enumerated retired dependents/orphans.
 This remains one Slice F rather than F1/F2 because init convergence, complete manifest/carrier
@@ -771,6 +771,15 @@ before the complete convergence gate.
     retire after its only consumer, the old index page, is retired.
 32. `packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/optimistic-list-mutation.ts.template`
     — retire after its only consumers, the old showcase islands, are retired.
+
+33. `packages/cli/src/kernel/templates/app/agent-conventions.ts` — **enumeration amendment
+    (2026-09-02, supervisor, under the stop-and-amend clause below):** `serviceReferences()`
+    points five conventions (`service-route-contract`, `service-island`, `service-shared`,
+    `service-form`, `service-authorization`) at retired canonical templates. Re-point each to the
+    planner's surviving generated output for the same canonical role, or drop the reference when
+    the role no longer has a standalone file; do not add compatibility assets. Slice G still owns
+    the one-screen guidance rewording and the new `agent-conventions_test.ts`; F must keep the
+    existing `assertAppConventionsResolve` green against the retired set.
 
 The three real type/import consumers are `lab-panel.tsx.template`, `summary-panel.tsx.template`, and
 `summary-panel.memory.tsx.template`; they are retired above rather than adapted. The other five
