@@ -2,10 +2,13 @@ import { oc } from '@orpc/contract';
 import type {
   AnySchema,
   ContractProcedureBuilderWithInputOutput,
+  ContractProcedureBuilderWithOutput,
   ErrorMap,
   MergedErrorMap,
+  Schema,
 } from '@orpc/contract';
 import { implement } from '@orpc/server';
+import type { NetScriptProcedureMeta } from '@netscript/contracts';
 import { z } from 'zod';
 import {
   BASE_PLUGIN_CONTRACT_ROUTES,
@@ -179,7 +182,7 @@ const AUTH_SPECIFIC_ERRORS: Readonly<{
   },
 };
 
-const baseContract: ReturnType<typeof oc.errors> = oc.errors(
+const baseContract = oc.$meta<NetScriptProcedureMeta>({}).errors(
   { ...CONTRACT_BASE_ERRORS, ...AUTH_SPECIFIC_ERRORS } satisfies ErrorMap,
 );
 
@@ -202,8 +205,27 @@ type Route<TIn extends AnySchema, TOut extends AnySchema> = ContractProcedureBui
   TIn,
   TOut,
   BaseErrors,
-  Record<never, never>
+  NetScriptProcedureMeta
 >;
+
+const AUTHENTICATION_NONE_META = {
+  access: { authentication: 'none' },
+} as const satisfies NetScriptProcedureMeta;
+
+const AUTHENTICATION_REQUIRED_META = {
+  access: { authentication: 'required' },
+} as const satisfies NetScriptProcedureMeta;
+
+type AuthDescribeRoute = ContractProcedureBuilderWithOutput<
+  Schema<unknown, unknown>,
+  NonNullable<BasePluginDescribeRoute['~orpc']['outputSchema']>,
+  BasePluginDescribeRoute['~orpc']['errorMap'],
+  NetScriptProcedureMeta
+>;
+
+const authDescribeRoute: AuthDescribeRoute = BASE_PLUGIN_CONTRACT_ROUTES.describe.meta(
+  AUTHENTICATION_NONE_META,
+);
 
 // --- Route input/output schemas ----------------------------------------------
 // Every inline `z.object(...)` is named and explicitly annotated with concrete
@@ -408,8 +430,8 @@ export const MeResponseSchema: AuthSchema<MeResponse> = MeResponseZodSchema;
  * because each member derives from a named, annotated schema via `typeof`, the
  * contract type can never silently drift from the schemas.
  */
-interface AuthContractDefinitionShape extends BasePluginContract {
-  readonly describe: BasePluginDescribeRoute;
+interface AuthContractDefinitionShape extends Omit<BasePluginContract, 'describe'> {
+  readonly describe: typeof authDescribeRoute;
   readonly signin: Route<typeof SigninInputZodSchema, typeof SigninResponseZodSchema>;
   readonly callback: Route<typeof CallbackInputZodSchema, typeof CallbackResponseZodSchema>;
   readonly signout: Route<typeof SignoutInputZodSchema, typeof SignoutResponseZodSchema>;
@@ -432,30 +454,35 @@ interface AuthContractDefinitionShape extends BasePluginContract {
 const authContractDefinition: AuthContractDefinitionShape = {
   // Mandatory base seam route: every feature plugin contract carries the typed
   // `describe` route (GET /describe) returning a `PluginCapabilities` document.
-  ...BASE_PLUGIN_CONTRACT_ROUTES,
+  describe: authDescribeRoute,
 
   signin: baseContract
     .route({ method: 'POST', path: '/signin' })
+    .meta(AUTHENTICATION_NONE_META)
     .input(SigninInputZodSchema)
     .output(SigninResponseZodSchema),
 
   callback: baseContract
     .route({ method: 'POST', path: '/callback' })
+    .meta(AUTHENTICATION_NONE_META)
     .input(CallbackInputZodSchema)
     .output(CallbackResponseZodSchema),
 
   signout: baseContract
     .route({ method: 'POST', path: '/signout' })
+    .meta(AUTHENTICATION_REQUIRED_META)
     .input(SignoutInputZodSchema)
     .output(SignoutResponseZodSchema),
 
   session: baseContract
     .route({ method: 'GET', path: '/session' })
+    .meta(AUTHENTICATION_REQUIRED_META)
     .input(sessionRouteInput)
     .output(SessionResponseZodSchema),
 
   me: baseContract
     .route({ method: 'GET', path: '/me' })
+    .meta(AUTHENTICATION_REQUIRED_META)
     .input(meRouteInput)
     .output(MeResponseZodSchema),
 };

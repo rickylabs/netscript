@@ -15,6 +15,7 @@ import {
 } from './listener-fault-controller.ts';
 
 const DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS = 300;
+const GARNET_LISTENER_WAIT_TIMEOUT_SECONDS = 30;
 const MSSQL_LISTENER_WAIT_TIMEOUT_SECONDS = 600;
 
 /** Describe-derived listener health contract for one backing service resource. */
@@ -52,7 +53,7 @@ export function listenerReadinessExpectation(
       return {
         resource,
         healthCheckKey: `${resource}_resp`,
-        timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+        timeoutSeconds: GARNET_LISTENER_WAIT_TIMEOUT_SECONDS,
       };
     default:
       return undefined;

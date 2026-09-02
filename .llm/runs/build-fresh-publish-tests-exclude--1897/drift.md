@@ -1,0 +1,6 @@
+# Drift
+
+- 2026-09-02 — Intentional process override: issue contract requires opening a non-draft PR after implementation with all metadata in the creation action, superseding the harness default of a draft PR at bootstrap.
+- 2026-09-02 — Tooling environment: `rtk` was not available on PATH despite repo guidance; raw focused commands are used where required, and gate exit codes remain unfiltered.
+- 2026-09-02 — Corpus correction: `check:mcp-export-corpus` exits 1 on a stale baseline. Diagnostic regeneration changed the corpus by 12 symbols (+4,401 uncompressed bytes, +448 compressed bytes), but produced the exact same file SHA-256 with and without the new Fresh publish exclusion. The delta cannot be attributed to #1897, so the generated carrier was restored from `HEAD` per owner direction; the nonzero gate is recorded rather than masked by unrelated churn.
+- 2026-09-02 — Evaluator transport: native Fable background session `ec97b9dc` stalled after completing checks and was stopped; its preserved session was resumed in a fresh fork `e300572e-3af6-4431-8629-f655c5ed42ea`, which wrote `evaluate.md` and returned PASS. Requested Fable medium; observed `claude-fable-5-1` with medium effort.

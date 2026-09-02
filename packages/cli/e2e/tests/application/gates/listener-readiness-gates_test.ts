@@ -10,7 +10,10 @@ import {
   listenerReadinessWaitCommand,
 } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { assertOwnedListenerFaultExpectation } from '../../../src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts';
-import { readListenerHealthReport } from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
+import {
+  listenerReadinessFailure,
+  readListenerHealthReport,
+} from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
 
 Deno.test('listener readiness maps database and RESP resources to stable report keys', () => {
   assertEquals(listenerReadinessExpectation(ASPIRE_RESOURCE.POSTGRES), {
@@ -26,7 +29,7 @@ Deno.test('listener readiness maps database and RESP resources to stable report 
   assertEquals(listenerReadinessExpectation(ASPIRE_RESOURCE.GARNET), {
     resource: 'garnet',
     healthCheckKey: 'garnet_resp',
-    timeoutSeconds: 300,
+    timeoutSeconds: 30,
   });
   assertEquals(listenerReadinessExpectation(ASPIRE_RESOURCE.AUTH), undefined);
 });
@@ -41,6 +44,8 @@ Deno.test('describe-derived listener report requires the object-valued 13.5 shap
           postgres_listener: {
             status: 'Healthy',
             description: 'postgres listener ready on localhost:49152',
+            data: { host: 'localhost', port: '49152' },
+            exception: 'none',
           },
         },
       }],
@@ -53,17 +58,47 @@ Deno.test('describe-derived listener report requires the object-valued 13.5 shap
     healthCheckKey: 'postgres_listener',
     status: 'Healthy',
     description: 'postgres listener ready on localhost:49152',
+    data: { host: 'localhost', port: '49152' },
+    exception: 'none',
   });
 
   assertThrows(
+    () => readListenerHealthReport({ resources: [] }, 'garnet', 'garnet_resp'),
+    Error,
+    'resource garnet was never published',
+  );
+  assertThrows(
     () =>
       readListenerHealthReport(
-        { resources: [{ displayName: 'postgres', healthReports: [] }] },
-        'postgres',
-        'postgres_listener',
+        { resources: [{ displayName: 'garnet', healthReports: {} }] },
+        'garnet',
+        'garnet_resp',
       ),
     Error,
-    'omitted healthReports.postgres_listener',
+    'health key garnet_resp was never published',
+  );
+});
+
+Deno.test('published unhealthy listener report retains actionable diagnostic detail', () => {
+  assertEquals(
+    listenerReadinessFailure({
+      resourceName: 'garnet',
+      healthCheckKey: 'test_only_garnet_resp',
+      status: 'Unhealthy',
+      description: 'RESP listener unhealthy: EPROTO',
+      data: {
+        code: 'EPROTO',
+        host: 'localhost',
+        port: '18999',
+        elapsedMs: '7',
+        received: 'garbage\\r\\n',
+      },
+      exception: 'protocol mismatch',
+    }),
+    'garnet health key test_only_garnet_resp exists but is unhealthy: ' +
+      'status=Unhealthy description="RESP listener unhealthy: EPROTO" ' +
+      'data={"code":"EPROTO","host":"localhost","port":"18999","elapsedMs":"7","received":"garbage\\\\r\\\\n"} ' +
+      'exception="protocol mismatch"',
   );
 });
 

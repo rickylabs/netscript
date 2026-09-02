@@ -19,6 +19,7 @@ import {
 export { TEST_ONLY_GARNET_HEALTH_KEY, TEST_ONLY_POSTGRES_HEALTH_KEY };
 
 const RETURN_APPS_MARKER = '  return apps;';
+const FIXTURE_APP_IDENTIFIER_PREFIX = 'readiness_fixture_';
 const POSTGRES_REAL_HEALTH_KEY = 'postgres_listener';
 const GARNET_REAL_HEALTH_KEY = 'garnet_resp';
 
@@ -244,7 +245,24 @@ function appBlock(generated: string, name: string): string {
   if (blockStart < 0 || blockEnd < 0) {
     throw new Error(`generator did not emit ${name} fixture block`);
   }
-  return generated.slice(blockStart, blockEnd);
+  const block = generated.slice(blockStart, blockEnd);
+  const generatedBinding = registrations[0][3];
+  if (!generatedBinding) {
+    throw new Error(`generator did not emit ${name} fixture binding`);
+  }
+  return namespaceFixtureAppBinding(block, generatedBinding);
+}
+
+function namespaceFixtureAppBinding(block: string, generatedBinding: string): string {
+  const escapedBinding = generatedBinding.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+  const bindingPrefix = new RegExp(
+    `(?<![\\w$])${escapedBinding}(?=_|[^\\w$]|$)`,
+    'gu',
+  );
+  return block.replaceAll(
+    bindingPrefix,
+    `${FIXTURE_APP_IDENTIFIER_PREFIX}${generatedBinding}`,
+  );
 }
 
 async function writeControllerFixture(projectRoot: string): Promise<void> {

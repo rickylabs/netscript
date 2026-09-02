@@ -13,6 +13,7 @@ Deno.test('plugin domain constants expose finite vocabularies', () => {
   assertEquals(PLUGIN_TYPES, ['background-processor', 'api', 'frontend', 'utility']);
   assertEquals(CONTRIBUTION_AXES, [
     'service',
+    'sdk-client',
     'background-processor',
     'stream-topic',
     'database-schema',
