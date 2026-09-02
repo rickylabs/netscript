@@ -1,314 +1,165 @@
-# Evaluation: Slice D neutral resource template family — formal IMPL-EVAL
+# Evaluation: Slice D neutral resource template family — formal IMPL-EVAL (PR #1948)
 
-Filled from `.llm/harness/templates/evaluate.md`. Allowed result values: `PASS`, `FAIL`, `N/A`,
-`PENDING_SCRIPT`, `DEBT_ACCEPTED`, `NOT_RUN`. Anti-pattern status values: `CLEAR`, `VIOLATION`,
-`DEBT_ACCEPTED`, `N/A`.
+Filled from `.llm/harness/templates/evaluate.md`. Result values: `PASS`, `FAIL`, `N/A`,
+`NOT_RUN`. This file replaces the earlier `evaluate.md` committed in `4af7c98d5`, which was
+produced by an evaluator launched from the generator session at pre-rebase head `5fd40ef13`
+(see Process observations). This receipt is the supervisor-dispatched formal IMPL-EVAL.
 
 ## Metadata
 
-| Field          | Value                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| Run ID         | `feat-cli-resource-slice-templates--1354-d`                                               |
-| Attested head  | `5fd40ef1368bce264ec2aa5f8ab66bd301f8e340` (verified `git rev-parse HEAD`; tree clean)    |
-| Stacked base   | `f2696ea88700b7f8e9db3a77a307719e802bc7f9` (`origin/feat/cli-resource-slice-contract`; verified as sole parent of HEAD) |
-| PR             | none yet — owner-directed lifecycle (drift.md) opens the non-draft PR after this eval     |
-| Target         | `packages/cli` internal assets, typed carrier, and application renderer (Slice D of #1354) |
-| Archetype      | `6 — CLI / Tooling`                                                                       |
-| Scope overlays | Fresh 2.x generated route/island/form/partial/stream shapes; static/consumer validation only |
-| Evaluator      | Separate native Claude Fable 5 session, 2026-09-02                                        |
+| Field          | Value                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| Run ID         | `feat-cli-resource-slice-templates--1354-d`                                                     |
+| PR             | #1948 `feat(cli): establish neutral resource slice templates` — open, non-draft, base `main`, milestone `0.0.7`, labels `area:cli,status:impl,wave:v1,type:feat,priority:p2,orchestrator:features` |
+| Attested head  | `4af7c98d5a180eeaf989fcf8f08ab4c4c25f74de` (`git rev-parse HEAD` after `merge --ff-only origin/feat/cli-resource-slice-templates` → "Already up to date") |
+| Base           | `origin/main` = `e341c6f71033658099f694c4d8542a9676e6c68d` (#1946 / Slice C squash)             |
+| Product commit | `792b7199b feat(cli): add neutral resource slice templates`; `4af7c98d5` is harness-only        |
+| Later head     | `4861e0060 chore(harness): record Slice D PR handoff` landed on the branch during this evaluation; `git diff --name-only 4af7c98d5..4861e0060 -- packages` is empty (harness-only), so the product attestation at `4af7c98d5` holds unchanged |
+| Master plan    | `origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md` — D3, D4, D5, D7, D8, Slice D |
+| PLAN-EVAL      | `N/A` recorded in run `plan.md`/`supervisor.md` (locked master plan already PLAN-EVAL'd)         |
+| Archetype      | `6 — CLI / Tooling`; Fresh 2.x generated-shape overlay, static validation only                  |
+| Evaluator      | Native opposite-family Claude Fable 5.1 session (`claude-fable-5-1`), separate from the Codex implementation session; 2026-09-02 |
+| Worktree state | Product tree clean; two uncommitted harness-only edits (`drift.md`, `worklog.md`) in the working tree — not part of `4af7c98d5` |
+| Writes by this session | this file only; one throwaway round-trip script was created under `packages/cli/` and deleted (`git status` clean afterwards) |
 
-### Evaluator identity (requested vs observed)
+## Verdict summary
 
-| Field  | Requested                                                            | Observed                                                                                  |
-| ------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Route  | fresh native opposite-family formal IMPL-EVAL session (`supervisor.md`: Native Claude Fable 5 / medium) | Claude Code session `session_01RzoTEujrWaZjRysSYzSk8T`, model `claude-fable-5`             |
-| Author | Codex / GPT-5 family implementation session (`supervisor.md`)        | no product byte authored by this session; only this `evaluate.md` written                  |
-| Effort | per `lane-policy.md`                                                 | session default; no explicit effort attestation surface in this transport                  |
+No HIGH or MEDIUM finding. Four LOW findings, none blocking. All 11 required gates exit 0 at head.
 
-Generator ≠ evaluator holds. `rtk` is absent in this environment (exit 127), matching the run's
-recorded drift; wrapper-sourced structured commands were used for all verdict evidence.
+## 1. Ceiling and layering — PASS
 
-## Authority read
+- `git diff --name-only origin/main..4af7c98d5 -- packages` = **18 files**, exactly the Slice D
+  roster (11 `resource-slice/*.template`, `README.md`, `manifest.ts`, `embedded.generated.ts`,
+  `scaffold-template-assets.ts`, `render-resource-slice.ts`, `render-resource-slice_test.ts`,
+  `plan-resource-slice_test.ts`). Ceiling 18 met with the ceiling-exempt generated carrier
+  included; hand-authored count is 17.
+- `deno.lock` not in the diff. Outside `assets/resource-slice/`, the only `assets/` changes are
+  `manifest.ts` (11 additive keys, zero removals) and the regenerated carrier.
+- Overlap: `#1664` (100 files) ∩ D = ∅; `#1943` (Slice B, open) ∩ D = ∅; Slice A's four
+  (`client-selector.ts`/`_test.ts`, `ui/web-scaffold.ts`/`_test.ts`) ∩ D = ∅ (`comm -12`).
+- Layering: `render-resource-slice.ts` imports only `TemplatePort` (type), C's contract types and
+  `markOwnedResourceSliceLeaf`, and the carrier *type*. No `Deno.*`, no filesystem, no asset read;
+  `TemplatePort.render(template, context)` resolves synchronously via the pure `renderTemplate`.
+  Asset IO lives solely in `adapters/templates/scaffold-template-assets.ts`
+  (`loadResourceSliceTemplateAssets` → `loadTemplateMap`). D8 honoured.
+- Slice C source untouched except `plan-resource-slice_test.ts` (one added roster-parity test).
 
-- Master plan: `git show origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md`
-  — D3 (selection → render → conflict → write order, marker format, prior-canonical transition
-  comparison), D4 (one neutral family + one planner, no extension point, no service-query copy,
-  convergence deferred to F), D7 (emitted file contract, directory-role headers, cache path), Slice D
-  section (18-file expected touch set, required gates, carrier exemption), and the Slice C 14-child
-  observation.
-- Run artifacts: `plan.md`, `research.md`, `implement.md`, `worklog.md` (§ Design present),
-  `drift.md` (4 entries), `context-pack.md`, `supervisor.md`.
-- Protocol: `.llm/harness/evaluator/protocol.md`, `verdict-definitions.md`, `netscript-harness`,
-  `netscript-cli`, `deno-fresh`, `netscript-doctrine`, `jsr-audit` skills.
+## 2. D7 emitted-file contract and D3 marker — PASS
 
-## Process Verification
+- Planned paths for `orders` at `/orders` match D7's table one-for-one: 6 core leaves
+  (`index.route.ts`, `index.tsx`, `index.layout.tsx`, `(_components)/orders-view.tsx`,
+  `(_islands)/OrdersIsland.tsx`, `(_shared)/orders-loaders.ts`), `--form` → `orders-form.tsx` +
+  `(_lib)/orders-form.ts`, `--partial` → `orders-summary.tsx` + `routes/partials/orders/summary.tsx`,
+  `--stream` → `(_islands)/OrdersStream.tsx`. Test "each option changes only page/view and adds
+  its declared leaves" proves option isolation; "combined render records every strict canonical
+  page/view predecessor" proves the 7 prior-subset renderings for additive transitions.
+- Page contract: one `.withResource('orders', () => loadOrdersResource())`, one markup layer to
+  the view, option layers only when selected, `.withLayout` + `.withMeta`, no view markup in the
+  page. View uses app-owned `Card` primitives; no raw table. Loader path: factory
+  `queryOptions` + `clientKey` through `fetchQuery`, `dehydrateQueryClient`, `cachedAt`; no raw
+  `fetch(`, no handwritten `queryKey: [`, no `any`, no `JSON.parse(` (asserted by test and by my
+  grep over the family: zero hits).
+- Directory-role headers: `(_components)` on the view, `(_islands)` on the island, `(_shared)` on
+  loaders, `(_lib)` on the form contract — the always-first leaf of each helper directory, as D7
+  and the README specify; sibling optional leaves do not repeat them.
+- Marker: the renderer does not hand-roll the marker; it calls C's `markOwnedResourceSliceLeaf`,
+  which enforces an LF-terminated body and computes `sha256ResourceSliceBody(body)` over the
+  entire body after the marker line including its final newline. Independent round-trip run by
+  this session over the full 11-leaf render: every leaf's first line begins with
+  `// @netscript/resource-slice {"schema":1,"resource":"orders","role":"…`, key order
+  `schema,resource,role,options,bodySha256`, recomputed hash equals `bodySha256`, content ends
+  with LF, `classifyResourceSliceLeaf(content, candidate)` → `exact`; same bytes against a
+  changed candidate → `owned`; a one-byte body edit → `owned-edited`. **11/11 leaves.**
 
-| Check                                  | Result | Evidence                                                                                                                                      |
-| -------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plan-Gate passed before implementation | `PASS` | `PLAN-EVAL: N/A` recorded in leaf `plan.md` § Locked scope and `worklog.md` bootstrap; the master plan carries its own evaluated PLAN-EVAL and the owner forbids re-planning for this leaf. |
-| Design section exists in worklog       | `PASS` | `worklog.md` § Design: public surface (none), vocabulary, ports (`TemplatePort` only), constants (eleven keys, form→partial→stream order), one commit slice, deferred scope, contributor path. |
-| Commit slices match design plan        | `PASS` | Exactly one implementation commit `5fd40ef13` on parent `f2696ea88`; `git diff --name-status` = 18 product paths + 7 run artifacts; `deno.lock` untouched. |
-| Each slice has a passing gate          | `PASS` | All required Slice D gates independently re-run green at the attested head (Gate Results below), including the post-commit freshness set the worklog left pending. |
-| No speculative seams (unused files)    | `PASS` | Every added template is mapped by the closed renderer roster and loaded by the typed carrier; grep for `loadResourceSliceTemplateAssets`/`ResourceSliceTemplateAssets` outside the carrier finds only `render-resource-slice.ts` and its test — no premature consumer, no dead file. |
-| Constants used for finite vocabularies | `PASS` | Eleven `TEMPLATE_KEYS.resourceSlice*` manifest constants; closed `TEMPLATE_ASSET_NAMES` map with a throw on any unregistered name (`render-resource-slice.ts:97-101`); no string-literal template dispatch. |
-| Brief carries `## SKILL` chapter       | `PASS` (see LOW-1) | The evaluator brief (this session's prompt) carries `## SKILL`. `implement.md` as recorded lacks one — LOW-1, non-blocking; `worklog.md` bootstrap documents the skills/doctrine actually read. |
-| Close-gate                             | `N/A`  | No PR yet; slice is `Refs #1354` partial work with no closing keyword planned; close-gate applies at ready-merge, owned by the supervisor.       |
-| Release-gate class                     | `N/A`  | Not a cut or release-gating run.                                                                                                                |
+## 3. D4 — one neutral family, no extension point — PASS
 
-## Judgement against the caller's specific criteria
+- `grep -rnE "viewer|withPolicy|withTelemetry|hero|notes|extension|preset|fetch\(|JSON\.parse|\bany\b"`
+  across `assets/resource-slice/` (excluding README): **zero hits**. The form layer's `mutate` is
+  `(input) => copyOrdersFormValues(input)` — no viewer gate.
+- No variable, slot, or hook exists in the templates or `renderVariables()` for a preset to inject
+  layers; option fragments are renderer-owned and closed over `form|partial|stream`. README states
+  "there is no neutral-template extension registry".
+- Old canonical service-example templates (`assets/app/routes/examples/**`) are neither deleted
+  nor edited (diff on `assets/` shows only `manifest.ts` + carrier outside the new family).
+  Retirement correctly remains Slice F.
 
-### 1. Exact 18 product paths — `PASS`
+## 4. D5 — Fresh declaration Form B and cache-age — PASS
 
-`git diff --name-status f2696ea88..5fd40ef13` minus the 7 `.llm/runs/feat-cli-resource-slice-templates--1354-d/`
-artifacts is exactly the master plan's Slice D enumeration, item for item: the eleven
-`assets/resource-slice/**.template` files (numbered 1–11), `assets/manifest.ts` (12, additive keys
-only), `adapters/templates/scaffold-template-assets.ts` (13, additive carrier), new
-`render-resource-slice.ts` (14) and `render-resource-slice_test.ts` (15), `assets/resource-slice/README.md`
-(16), modified `plan-resource-slice_test.ts` (17), and regenerated `embedded.generated.ts` (18).
-Nothing outside this set. Note the planned path `resource-slice/(_components)/resource-summary.tsx.template`
-lands exactly as enumerated; the partial route template is `resource-slice/partials/summary.tsx.template`
-as planned. `deno.lock` is untouched.
+- `index.route.ts` → `defineRouteContract({})` default export; `index.tsx` → `.withRoute(appRoutes.{{routeAlias}})`, and `withRouteContract` appears nowhere in the family.
+- Island: `QueryIsland` wrapper + `useIslandQuery({...queryOptions, queryKey: clientKey, initialData: props.initialData, initialDataUpdatedAt: props.cachedAt})`. The `initialDataUpdatedAt` cache-age behaviour is **present, not deferred**. (For lineage: #1664's shipped `ServiceShowcaseLab` island passes `initialData` and displays `cachedAt` but does not pass `initialDataUpdatedAt`; the neutral island therefore carries the HIGH-1 improvement.)
+- The plan's D7 names `useIslandQuery`; the dispatch brief said `useQuery` — the template follows the plan and Fresh's `query/mod.ts` export.
 
-### 2. Carrier generation provenance — `PASS`
+## 5. Templates compile as emitted — PASS
 
-`deno task check:assets-barrel` at the attested head regenerates via `gen:assets-barrel` and
-`git diff --exit-code` over all seven generated carriers exits 0 — `embedded.generated.ts` is a true
-regeneration of the manifest, not hand-edited. `check:publish-assets` (gen with `--check`) exits 0,
-so the new template family is inside the publish asset surface. `check:mcp-export-corpus` exits 0
-with `{packageCount:35, subpathCount:273, symbolCount:7816}` — byte-consistent with the worklog's
-recorded cascade output, confirming no public-surface movement.
+- Test `full render type-checks as a consumer without starting a server` renders all 11 leaves
+  (form+partial+stream) into a temp fixture under `packages/cli/`, writes a consumer `deno.json`
+  mapping `@netscript/fresh/*` and `@netscript/sdk/*` to the **workspace source modules**, a
+  `router.ts`, `utils.ts`, a `createQueryFactories`-based `lib/orders.ts`, and runs
+  `deno check --no-lock --unstable-kv` over the rendered files; asserts exit 0. Rendered output is
+  checked, not merely string-compared. Ran green in this session (see gate table).
+- `check:emitted-samples` also exit 0 (48 samples / 38 artifact paths).
 
-### 3. Slice C read-only except the named test — `PASS`
+## 6. Carriers — PASS
 
-Within `application/resource-slice/`, the diff contains only the modification of
-`plan-resource-slice_test.ts` (one additive roster-parity test importing `TEMPLATE_KEYS`) plus the
-two new Slice-D render files. `resource-slice-contract.ts`, `plan-resource-slice.ts`, all three
-reconcilers, and their tests are byte-identical to the base (absent from `--name-status`).
+- `manifest.ts`: 11 `resourceSlice*` keys; `plan-resource-slice_test.ts` asserts planner roster ==
+  manifest `resource-slice/` keys. `scaffold-template-assets.ts`: `RESOURCE_SLICE_TEMPLATE_URLS`
+  covers all 11; renderer's `TEMPLATE_ASSET_NAMES` maps every planner template name to a carrier key.
+- `check:assets-barrel`, `check:publish-assets`, `check:mcp-export-corpus` (35 pkgs / 273 subpaths /
+  7,834 symbols, sha `087da112…`) all exit 0 at head.
+- `docs:readme-fences`: PASS, `type_errors=7` — baseline held, no raise.
 
-### 4. No command or init activation — `PASS`
+## 7. LOW-4 child count / arch — PASS
 
-No file under `src/public/` is touched (`generate-group.ts`, `public-command-dependencies.ts`,
-command tree all unchanged); no scaffold writer or init template is touched. Grep confirms the only
-consumers of the new carrier are the renderer and its test. The family is inert until Slice E/F, as
-D4 requires; init keeps its old copies.
+- `application/resource-slice/` direct children: **12** (cap 12; no F-16 WARN emitted for it).
+  The plan's projected 14 assumes Slice A's two selector files, which are not on this base
+  (recorded in `drift.md`). Rescope threshold (15) not approached.
+- `arch:check` exit 0, CLI block `FAIL=0 WARN=60 INFO=1`.
 
-### 5. D3 prior canonical page/view transitions — `PASS`
+## Gate table (run by this session at `4af7c98d5`, raw exit codes)
 
-`renderResourceSlice` attaches `previousCanonicalContents` to page and view leaves only, rendering
-every strict subset of the selected options that contains `core` (`strictOptionSubsets`,
-`render-resource-slice.ts:231-245`). Independently re-run tests prove: a full
-`--form --partial --stream` render records exactly 7 strict predecessors per page/view leaf with
-marker option sets `core`, `core+form`, `core+partial`, `core+form+partial`, `core+stream`,
-`core+form+stream`, `core+partial+stream`; each single-option render records `[core]` and changes
-only the `page` and `view` roles versus core while adding exactly its declared leaves
-(form: form-component + form-contract; partial: partial-route + summary-component; stream:
-stream-island). Every candidate content passes `parseOwnedResourceSliceLeaf` — the byte-canonical
-schema-1 marker from Slice C — so the reconciler's `isCanonicalAdditiveTransition` has exactly the
-prior renderings D3 step 2 requires. Golden SHA-256 hashes pin all four selections' full content.
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| `run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | 935 files, 8 batches, 0 failed batches, 0 diagnostics |
+| `run-deno-test.ts -- --allow-all …/application/resource-slice/` | 0 | 42 passed / 0 failed / 0 ignored (3.6 s) |
+| `check:assets-barrel` | 0 | — |
+| `check:publish-assets` | 0 | — |
+| `check:mcp-export-corpus` | 0 | 35 / 273 / 7,834; sha `087da112…` |
+| `check:emitted-samples` | 0 | 48 samples from 38 artifact paths |
+| `check:aspire-version-parity` | 0 | `ok:true`, fail 0, deferred 18 (pre-existing), missing 0 |
+| `docs:readme-fences` | 0 | PASS, 36 READMEs, 73 checked, `type_errors=7` (baseline) |
+| `docs:jsdoc-examples` | 0 | PASS, 359 checked, failures 0, deferred `unboundName=116` (baseline) |
+| `arch:check` | 0 | CLI `FAIL=0 WARN=60 INFO=1`; no `resource-slice` warning |
+| `quality:gate` | 0 | scanner `ok:true`, findings `[]`, 7 accepted allowances (pre-existing), boundary `ok:true` |
 
-### 6. D4 neutrality — `PASS`
-
-- Grep over the family for `viewer`, `withPolicy`, `withTelemetry`, `\bhero\b`, `notes-card`,
-  `JSON.parse`, `fetch(`, `: any`/`as any`, and handwritten `queryKey: [` arrays: zero matches
-  (the form's neutral `note` field is a plain string field, not the retired notes layer). The render
-  test enforces the same forbidden-pattern set on rendered output.
-- The cache path is exactly D7's contract: selected factory `queryOptions` + `clientKey` through
-  `createNetScriptQueryClient().fetchQuery`, `dehydrateQueryClient`, `cachedAt`, `QueryIsland` +
-  `useIslandQuery` with `initialData`/`initialDataUpdatedAt: props.cachedAt` (the #1664 behavior).
-- No extension point: the renderer's template roster is a closed typed map that throws on an
-  unregistered name; the README states "there is no neutral-template extension registry" and admits
-  variables only when derived from `ResourceSlicePlan`.
-- `service-query.ts.template` is not copied — no such key or file exists in the family, and #1664's
-  template and add-ui surface are untouched.
-- Directory-role headers land once per helper directory in the always-present first file
-  (`(_components)` on view, `(_islands)` on island, `(_shared)` on loaders, `(_lib)` on the form
-  contract — a form-only selection still renders core, so each header's carrier always exists);
-  sibling optional leaves do not repeat them, matching D7 and the README contract.
-- Route sidecar is Fresh Form B (`defineRouteContract` sidecar; page uses
-  `.withRoute(appRoutes.{{routeAlias}})`, never `withRouteContract`); the partial uses
-  `definePartial` with the derived `{{partialName}}`/`{{partialRoute}}`; the stream island is an
-  isolated `@netscript/fresh/streams` consumer. Templates contain no IO and no command parsing.
-
-### 7. Actual resource-slice child count — `PASS` (12, drift-recorded)
-
-`ls application/resource-slice/` = 12 direct children. The master plan predicts 14 after A+C+D, but
-the mandated stacked base contains Slice C's ten files and not Slice A's selector pair; drift.md
-records this sequencing observation with the correct instruction not to manufacture the count.
-`arch:check` output contains zero `resource-slice` findings — 12 is at, not above, the F-16 cap of
-12, so no WARN exists to record yet; the 14-child WARN materializes when A is assembled.
-
-## Gate Results (independently re-run at `5fd40ef13`)
-
-| Gate                        | Command                                                                                             | Result | Evidence                                                                                                          |
-| --------------------------- | ---------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
-| Focused planner/render tests | `run-deno-test.ts -- --allow-all …/plan-resource-slice_test.ts …/render-resource-slice_test.ts`     | `PASS` | exit 0; 12 passed / 0 failed / 0 ignored — includes golden hashes, option deltas, strict-predecessor proof, and roster parity |
-| Consumer-shaped typecheck    | inside `render-resource-slice_test.ts` (`full render type-checks as a consumer without starting a server`) | `PASS` | temp fixture writes all 11 rendered leaves + `createQueryFactories` consumer stubs; subprocess `deno check` exit 0; no server started |
-| Structured check             | `run-deno-check.ts --root packages/cli --ext ts,tsx`                                                | `PASS` | exit 0; 928 files, 8 batches, 0 failed batches, 0 diagnostics                                                      |
-| Scoped lint                  | `deno lint --config <task-local: recommended tags>` on the 5 changed hand-authored TS files          | `PASS` | exit 0, "Checked 5 files". Root `deno.json` excludes `packages/cli` so the wrapper refuses `all-excluded` — the pre-existing repo config fact recorded in this run's worklog and the Slice C eval (LOW-3 carryover), not a slice defect. |
-| Scoped fmt                   | `deno fmt --check --config <task-local>` on the same 5 files                                        | `PASS` | exit 0, "Checked 5 files"                                                                                          |
-| `check:assets-barrel`        |                                                                                                      | `PASS` | exit 0; regeneration byte-identical across all seven generated carriers                                            |
-| `check:publish-assets`       |                                                                                                      | `PASS` | exit 0                                                                                                             |
-| `check:emitted-samples`      |                                                                                                      | `PASS` | exit 0; 48 emitted TypeScript samples from 38 artifact paths checked                                               |
-| `check:mcp-export-corpus`    |                                                                                                      | `PASS` | exit 0; 35 packages / 273 subpaths / 7,816 symbols — matches worklog cascade record                                 |
-| `deno task arch:check`       |                                                                                                      | `PASS` | exit 0; zero `resource-slice` occurrences; only pre-existing WARNs in unrelated packages                            |
-| `deno task quality:scan`     | (with `arch:check` = `quality:gate`)                                                                 | `PASS` | exit 0; `findings: []`; allowance census unchanged at 7 (all pre-existing #1276 entries)                            |
-| `deno task publish:dry-run`  |                                                                                                      | `PASS` | exit 0; "Success: Dry run complete" across the workspace — JSR publishability of `packages/cli` with the new assets holds |
-| `docs:readme-fences`         |                                                                                                      | `PASS` | exit 0; `type_errors=7` = held baseline (new `assets/resource-slice/README.md` introduces no fence regression)      |
-| `docs:jsdoc-examples`        |                                                                                                      | `PASS` | exit 0; deferred census `unboundName=116` = held baseline                                                           |
-| jsr-audit rubric             | publish surface spot-check                                                                           | `PASS` | no new public export from `packages/cli` (manifest/carrier/renderer are internal); templates ship via the regenerated embedded carrier and publish-assets surface; publish dry-run green; no slow-type risk added |
-| Server / browser / Aspire / Docker / `e2e:cli` |                                                                                    | `N/A`  | prohibited for this slice (D11); none started                                                                       |
-
-## Anti-pattern / doctrine status
-
-| Item                                  | Status  | Evidence                                                                                                      |
-| ------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
-| AP-1 / F-1 file size                  | `CLEAR` | largest new file `render-resource-slice_test.ts` 445 lines; renderer 249 lines                                  |
-| Layering (application ↔ IO, F-3)      | `CLEAR` | renderer imports only the carrier type, `TemplatePort`, and the Slice C contract; zero `Deno.*`/fs/network in application code (test IO is test-local fixture plumbing) |
-| Folder cardinality (F-16)             | `CLEAR` | 12 children = cap; zero `resource-slice` output in `arch:check`                                                 |
-| Template asset hygiene                | `CLEAR` | templates contain no IO, no command parsing, no `any`, no raw fetch, no manual JSON parsing                     |
-| Console / `any` / casting             | `CLEAR` | `quality:scan` findings empty; no new `deno-lint-ignore` or `as unknown as` in the diff                         |
-| Architecture debt delta               | `CLEAR` | `debt/arch-debt.md` untouched; new entries 0, resolved 0, deepened 0, unrecorded 0                              |
+CI at head: `build`, `code-quality`, `close-gate`, `classify changes` pass; `check-test`, `quality`
+pending at evaluation time (lane to confirm before merge; local equivalents above are green).
 
 ## Findings (severity-ranked)
 
-### LOW-1 — `implement.md` lacks a `## SKILL` chapter
+- **LOW-1 (evidence gap, non-blocking).** `render-resource-slice_test.ts` proves markers via
+  `parseOwnedResourceSliceLeaf` and hash goldens but never routes a rendered leaf through C's
+  `classifyResourceSliceLeaf`. This session performed that round-trip (11/11 `owned`); Slice E
+  should add the assertion so the reconciler contract is pinned in-tree.
+- **LOW-2 (fixture fidelity, non-blocking).** The consumer type-check fixture stubs
+  `@app/components/ui/mod.ts` with hand-written `Card`/`FormField`/`Input`/`InlineNotice`/`Button`/
+  `getInputProps` shapes rather than the real scaffold's `ui/mod.ts`. The real module exports every
+  imported symbol, and the existing scaffold-tested `managed-form.tsx` uses identical props, so the
+  risk is low; Slice F's init-equivalence and the hosted lane cover the real primitives.
+- **LOW-3 (evidence discrepancy).** Worklog/PR body report CLI `WARN=59`; this session measured
+  `WARN=60`. The new `assets/resource-slice/` directory deepens the pre-existing F-16 WARN on
+  `src/kernel/assets` (16 children) — WARN class, plan-mandated location, no debt entry required.
+- **LOW-4 (process).** The IMPL-EVAL comment already on #1948 (`5515502617`) and the
+  `evaluate.md` committed in `4af7c98d5` come from an evaluator launched by the generator session
+  at pre-rebase head `5fd40ef13`; the committed file self-references `4af7c98d5`, the commit that
+  contains it. Protocol requires the supervisor to trigger the evaluator; this session is that
+  dispatch and supersedes the earlier receipt. Lane should also commit the two pending harness-only
+  edits (`drift.md`, `worklog.md`).
 
-Protocol rule 13 requires every recorded agent brief/prompt to carry a `## SKILL` chapter.
-`implement.md` in this run dir has none. Non-blocking: the worklog bootstrap explicitly records the
-skills, harness references, doctrine, and Fresh surfaces read before implementation, and the
-evaluator brief in scope (this session's) carries its chapter. Recommend adding the chapter when the
-supervisor commits this evaluation, so the recorded prompt matches the rule for future audits.
+## Concept of Done / close-gate
 
-### Observation (not a finding) — worklog gate table is labeled pre-commit
-
-`worklog.md` records its gate evidence as pre-commit and leaves the post-commit freshness/quality
-boxes unchecked. This evaluation independently supplies all of them green at the attested head; the
-supervisor should tick the carrier-cascade/full-gates progress boxes and append the post-commit
-results when recording this verdict, keeping the run resumable.
-
-## Lessons for Promotion
-
-| Lesson | Pattern | Applies to | Confidence |
-| ------ | ------- | ---------- | ---------- |
-| Strict-subset predecessor rendering | Recording every strict prior option subset at render time gives the reconciler exact canonical bytes for additive transitions without a migration engine | Archetype 6 template families | medium |
-
-## Verdict
-
-| Field     | Value  |
-| --------- | ------ |
-| Verdict   | `PASS` |
-| Rationale | The commit at `5fd40ef13` lands exactly the master plan's 18 Slice D product paths on the mandated stacked base with nothing else touched and `deno.lock` unchanged. The eleven-template family is neutral by grep and by test (no viewer/policy/telemetry/hero/notes, no raw fetch, `any`, handwritten query keys, or manual JSON parsing), has no extension point (closed typed roster, throw on unregistered), does not copy the service-query template, and is consumed by no command or init path. The renderer satisfies D3 by attaching byte-canonical strict-subset predecessors to page/view leaves — proven by the 7-predecessor combined-render test and the single-option delta tests — with schema-1 markers parseable by the Slice C contract. Carrier provenance is proven by regeneration (`check:assets-barrel` byte-identical). All required gates were independently re-run green at the attested head: focused tests 12/12 with the no-server consumer typecheck, package check 928/0, scoped lint/fmt clean, all four freshness checks, `arch:check`/`quality:scan` exit 0 with no new findings, publish dry-run success, and both doc baselines held. The 12-child count (vs the plan's assembled 14) is a correctly drift-recorded stacking fact, not a deviation. The two LOW items are bookkeeping and do not block. |
-| Next step | Supervisor records this verdict (ticking the worklog progress boxes and ideally adding the `## SKILL` chapter to `implement.md`), pushes, and opens the owner-mandated non-draft stacked PR (`Refs #1354`, base `feat/cli-resource-slice-contract`, `status:impl`) per drift.md. |
-
-[PHASE: IMPL-EVAL] [VERDICT: PASS]
-
-## Post-#1946 rebase verification
-
-Fresh, independent, read-only-first IMPL-EVAL of the rebased Slice D, performed after #1946
-(`feat/cli-resource-slice-contract`) squash-merged to `main` as `e341c6f71` and its head branch was
-deleted.
-
-### Evaluator identity (requested vs observed)
-
-| Field  | Requested                                                       | Observed                                                                      |
-| ------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Route  | separate formal IMPL-EVAL session, native Claude family           | Claude Code session `session_01WzYLuPFGFShNKrTpGzAWfj`, model `claude-fable-5` |
-| Author | Codex / GPT-5 family implementation session (`supervisor.md`)     | no product byte authored by this session; only this appended section written    |
-| Effort | per `lane-policy.md`                                              | session default; no explicit effort attestation surface in this transport      |
-
-Generator ≠ evaluator holds. This is a different session from the pre-rebase evaluator
-(`session_01RzoTEujrWaZjRysSYzSk8T`); both are native Claude Fable 5, opposite-family to the Codex
-generator. `rtk` remains absent in this environment (drift-recorded); structured wrappers and raw
-`git`/`gh` were used for all verdict evidence.
-
-### Attested head and base
-
-| Field | Value | Evidence |
-| --- | --- | --- |
-| Current head | `4af7c98d5a180eeaf989fcf8f08ab4c4c25f74de` | `git rev-parse HEAD` |
-| Base | `origin/main` = `e341c6f71033658099f694c4d8542a9676e6c68d` (#1946 squash) | `git rev-parse origin/main`; `git merge-base HEAD origin/main` = same SHA |
-| Commit chain | `792b7199b` (product, parent `e341c6f71`) → `4af7c98d5` (harness eval record) | `git log --format='%H %P' origin/main..HEAD` |
-| PR | #1948, base `main`, non-draft, OPEN, head `4af7c98d5` (= local HEAD), milestone `0.0.7`, labels `type:feat`/`area:cli`/`priority:p2`/`wave:v1`/`status:impl`/`orchestrator:features` | `gh pr view 1948 --json headRefOid,baseRefName,…` |
-
-### Caller criteria
-
-1. **Exact 18 product paths, no lockfile/unrelated source — `PASS`.**
-   `git diff --name-status origin/main...HEAD` = 26 paths: the master plan's Slice D enumeration
-   item-for-item (11 `assets/resource-slice/**.template`, `manifest.ts`,
-   `scaffold-template-assets.ts`, `render-resource-slice.ts` + `_test.ts`,
-   `assets/resource-slice/README.md`, `plan-resource-slice_test.ts`, regenerated
-   `embedded.generated.ts`) plus the 8 run-dir artifacts. `git diff origin/main HEAD -- deno.lock`
-   is empty. Nothing else is touched.
-
-2. **Slice C untouched except the named test — `PASS`.**
-   Within `application/resource-slice/`, the diff contains only `plan-resource-slice_test.ts` (M)
-   and the two new render files (A). Contract, planner, and all three reconcilers plus their tests
-   are absent from the diff, i.e. byte-identical to the merged #1946 base.
-
-3. **Rebase fidelity — `PASS`.**
-   `git diff 5fd40ef13 792b7199b` restricted to the 18 product paths differs in exactly one file:
-   `embedded.generated.ts`. All 17 hand-authored product paths are byte-identical to the content
-   that received the pre-rebase independent PASS. The carrier difference is the regeneration on the
-   merged base, as the rebase record claims.
-
-4. **Generated-carrier provenance and freshness on the merged base — `PASS`.**
-   Independently re-run at `4af7c98d5`: `check:assets-barrel` exit 0 (regeneration byte-identical
-   across all seven carriers — `embedded.generated.ts` is a true generator output, not hand-merged),
-   `check:publish-assets` exit 0, `check:mcp-export-corpus` exit 0 with
-   `{packageCount:35, subpathCount:273, symbolCount:7834}` and hash `087da112…` (matching the
-   worklog's post-rebase record; the 7,816→7,834 symbol movement is `main`'s, not this slice's),
-   `check:emitted-samples` exit 0 (48 samples from 38 artifact paths). Freshness quartet:
-   `0 / 0 / 0 / 0`.
-
-5. **D3 strict-prior-canonical renderings — `PASS`.**
-   `render-resource-slice.ts` attaches `previousCanonicalContents` via `strictOptionSubsets` and
-   renders every strict prior subset through the same `renderOwnedLeaf` path; each leaf is marked by
-   the Slice C contract's `markOwnedResourceSliceLeaf` (schema-1 marker) and the test parses every
-   candidate back through `parseOwnedResourceSliceLeaf`. The combined-render test asserts exactly 7
-   strict predecessors for page/view; re-run green (12/12).
-
-6. **D4 neutrality — `PASS`.**
-   Grep over the template family for `viewer`, `withPolicy`, `withTelemetry`, `\bhero\b`,
-   `notes-card`, `JSON.parse`, `fetch(`, `: any`/`as any`, and handwritten `queryKey: [`: zero
-   matches. No `withRouteContract` (Form B sidecar: `defineRouteContract` in the sidecar, page uses
-   `.withRoute(appRoutes.{{routeAlias}})`). No extension point: the renderer's roster is the closed
-   typed map with a throw on unregistered names; the only consumers of the carrier/renderer are
-   `scaffold-template-assets.ts`, `render-resource-slice.ts`, and its test. No file under
-   `src/public/`, no scaffold writer, and no init template is in the diff — no command, no init
-   activation. `service-query` is not copied (no such key/file in the family).
-
-7. **Tests, checks, child count on the merged base (authoritative) — `PASS`.**
-   Focused tests: 12 passed / 0 failed / 0 ignored (exit 0). Structured CLI check: 935 files, 8
-   batches, 0 diagnostics. `arch:check` exit 0 with **zero** `resource-slice` findings and all
-   packages `FAIL=0`; `application/resource-slice/` has exactly 12 direct children (at the F-16 cap
-   of 12, no WARN — `main` does not yet contain Slice A's selector pair, so the plan's assembled
-   14-child WARN remains future, consistent with the drift record). `quality:scan` exit 0,
-   `findings: []`, allowance census unchanged at 7 pre-existing #1276 entries. No server, browser,
-   Aspire, Docker, or `e2e:cli` was started (D11).
-
-8. **Validity of the existing PASS — upheld.**
-   The pre-rebase PASS at `5fd40ef13` evaluated content whose 17 hand-authored paths are
-   byte-identical to `792b7199b`; the sole divergent file is machine-regenerated and its provenance
-   is re-proven by regeneration on the merged base. Every gate class the prior verdict relied on was
-   independently re-run green at the new head. Nothing in the rebase invalidates that verdict; this
-   section extends it to the merged base. The prior LOW-1 (`implement.md` missing `## SKILL`) was
-   addressed — the chapter now exists at line 3.
-
-### Findings (severity-ranked)
-
-- **LOW-R1 — post-rebase run bookkeeping is uncommitted.** The working tree carries unstaged
-  `worklog.md`/`drift.md` edits recording the rebase evidence and PR #1948; PR head `4af7c98d5`
-  therefore does not yet contain that bookkeeping. Non-blocking: the content is accurate (its corpus
-  hash/counts match this session's independent runs) and the supervisor commits it together with
-  this appended evaluation. No product byte is affected.
-
-No other findings. No new debt; `debt/arch-debt.md` untouched.
-
-### Verdict
-
-The rebase replayed exactly the two Slice D commits onto the #1946 squash with byte-identical
-hand-authored content, a machine-regenerated carrier, an unchanged `deno.lock`, untouched Slice C
-production sources, and every re-run gate green on the merged base. The existing PASS remains valid
-and is re-attested at head `4af7c98d5` on base `e341c6f71`.
+- `Refs #1354` only; no closing keyword; #1354 remains open. `close-gate` CI job passes.
+- Definition-of-Done boxes in the PR body are consistent with measured evidence (with LOW-3's count
+  delta). Debt registry: no new doctrine violation introduced; nothing to record.
+- Design checkpoint present in `worklog.md` (§ Design, 7 items) ahead of the product commit.
 
 [PHASE: IMPL-EVAL] [VERDICT: PASS]
