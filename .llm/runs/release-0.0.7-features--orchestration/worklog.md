@@ -10364,3 +10364,53 @@ backing services.
 | --- | --- | --- |
 | **#1936** | `005c22fd6` | 6/6, `MERGEABLE/CLEAN`, closes #1349 (mirror applied, 10/10 boxes) |
 | **#1842** | `96f777f5a` | 11/11, `MERGEABLE/CLEAN`, leaves #1452 open |
+
+---
+
+## ~15:20Z — #1931 PASS on the exact question I sent it to answer; #1891 rerouted to the native lane
+
+### #1931 (#1352 residual) — IMPL-EVAL PASS, `status:ready-merge`
+
+I had flagged the one contestable thing: the PR carries `Closes #1352` while migrating only the
+**credential** path, because the CLI's session listing GETs a stream URL and revoke POSTs an auth URL
+plus `/signout`, neither expressible through the discovery-only SDK transport. Row 2 says *"the CLI's
+direct auth requests migrate to the typed SDK path"*, so the keyword was contestable and an overclaim
+would auto-close a milestone issue with open scope.
+
+The evaluator was pointed at exactly that and returned **"no SDK-transport-migration overclaim"**,
+with all seven rows evidenced from live product/test evidence. It also independently confirmed two
+things I would otherwise have taken on trust: transport facts derive from the **actual request URL**
+rather than a hardcoded `secure: true`, and the non-disclosure test genuinely asserts
+`assertFalse(String(error).includes(credential))`.
+
+Gates at the trigger head: CLI auth 14/14, full `packages/cli` 1233/1233, `deno check` clean,
+`doc --lint` clean, `publish --dry-run` clean, `arch:check` PASS, `check-doctrine --all-roots` PASS,
+`quality:scan` 0/0, threads 0 unanswered, `deno.lock` unchanged across base/prior/current head.
+
+Label applied → mirror dry-run now reports `acceptance-mirror DRY-RUN: #1352`; existing CI re-running
+at the **unchanged head** to tick the seven boxes. Nothing hand-ticked.
+
+### #1891 — rerouted after three upstream 429s
+
+Three OpenHands attempts across ~45 minutes, all `qwen/qwen3.8-flash temporarily rate-limited
+upstream (Alibaba shared pool)`, all `verdict: NONE`. Retrying a shared pool harder is waste, and
+label routing cannot help — the dispatcher pins PLAN to qwen and rejects `eval:model:glm` for the
+plan phase.
+
+**Switched to the native opposite-family lane, which `lane-policy.md` names as the local default
+anyway**: local PLAN-EVAL is *native opposite-family Fable 5 · medium* for a Codex-authored plan, and
+OpenHands "is not a normal local evaluator and is reserved for explicitly cloud-driven work". I had
+been reaching for the cloud lane out of habit; the policy-correct route was available the whole time.
+Dispatched a fresh Fable session with the same coordinator-restricted scope — plan gate plus cycle-1
+blockers only, with the settled decisions named as non-actionable.
+
+Still exactly **one** authorized PLAN-EVAL: three of the four attempts produced no verdict at all.
+
+### A dispatcher-name trap that cost a wrong conclusion
+
+I reported #1931's phase-eval as "never fired" on the strength of
+`select(.name|test("Phase eval PR #1931")) | length == 0`. It had fired — successfully, at 14:28:23.
+The workflow's `run-name` interpolates `github.event.pull_request.number`, but the **runs API returns
+the un-interpolated `name`** (`"Phase eval PR"`), so a number-qualified match never hits. Match on the
+bare workflow name and disambiguate by timestamp or by following through to the `OpenHands runner ·
+issue_comment · <n>` run instead.
