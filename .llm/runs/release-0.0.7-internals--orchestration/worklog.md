@@ -10852,3 +10852,12 @@ acceptance gate" (mechanics, handled at packet).
 #1909/#1957/#1952; last change = 13.5.3 pin bump #1727. Docker tier only. **Not in the prod
 suite** (canary.6 prod artifact has no `live-db-endpoint` gate) → cannot block Canary 7; reddens PR
 docker-tier e2e. Posted to #1641 with what the aspire owner needs (capture the 13.5.3 `urls[]`).
+
+### D-261 — #1952 evidence mapping: #1880 block correct; a second block targets `Part of #863`, which the mirror never mutates
+
+Body carries `Closes #1880` with a three-box block (correct) and a second `acceptance-evidence`
+block for #863 (box-index 1,2) although #863 is only `Part of`. The mirror never mutates
+non-closing issues, and an unmatched target can fail the mirror without mutation. Sequence at
+packet time, after CI settles: apply `status:ready-merge` → `--dry-run` → if the #863 block errors,
+publish the pre-staged variant with that block removed (prose reference kept) → `gh run rerun
+--failed`. Variant staged at `/home/agent/1952-body-no863.md`; nothing published yet.
