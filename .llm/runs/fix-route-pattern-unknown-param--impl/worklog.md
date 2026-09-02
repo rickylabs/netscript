@@ -84,8 +84,8 @@ meaning of shared `EmptyRecord`.
 - JSR correction: an intermediate private `SimplifyRoutePatternPath` alias added one new
   `private-type-ref`; it was removed before commit. Final doc-lint returned to the existing
   45-diagnostic Fresh baseline and reports no finding in `route/types.ts`.
-- GREEN SHA: pending commit.
-- Last package-changing head SHA: pending GREEN commit.
+- GREEN SHA: `e79c88dcaadac6f6f57a98f25a3369791fb920ab`.
+- Last package-changing head SHA: `e79c88dcaadac6f6f57a98f25a3369791fb920ab`.
 
 ## Gate evidence
 
@@ -100,6 +100,15 @@ meaning of shared `EmptyRecord`.
 | Publish | `deno task --cwd packages/fresh publish:dry-run` | 0 | dry run complete |
 | JSR audit | `audit-jsr-package.ts --root packages/fresh --text` | 0 | package audit completes; only existing runtime/AI cardinality and slow-type warnings |
 | Doc lint (supplemental) | `deno task doc:lint --root packages/fresh --pretty` | 1 | existing Fresh debt: 45 diagnostics; no `route/types.ts` finding and no diagnostic added by this slice |
+
+Structured gate receipt summaries at GREEN head `e79c88dcaadac6f6f57a98f25a3369791fb920ab`:
+
+```text
+check  selection.filesSelected=207 batches=2 failedBatches=0 totalOccurrences=0
+test   exitCode=0 passed=276 failed=0 ignored=0 totalResults=276
+lint   filesSelected=207 filesProcessed=207 failedBatches=0 totalOccurrences=0
+fmt    filesSelected=207 filesProcessed=207 failedBatches=0 findings=0
+```
 
 ## Reconcile
 
