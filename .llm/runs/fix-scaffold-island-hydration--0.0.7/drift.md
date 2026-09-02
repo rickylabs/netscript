@@ -42,3 +42,10 @@
 - **Scope consequence:** if the unattributed 404 is incidental, the remaining discrepancy is
   generated-scaffold-specific or the carried #1845 receipt is stale relative to current sources.
   The package fixture does not yet establish which; hosted generated-app proof remains authoritative.
+
+## 2026-09-02 — IMPL-EVAL FAIL_RESCOPE → plan v2
+
+- Verdict `FAIL_RESCOPE` at `dd039a791` (comment 5515285439): v1 stop clause fired; premise undetermined; hosted receipt stale.
+- Drift from v1: the CLI collision boundary (#1773) no longer exists (merged); v2 opens `packages/cli/e2e/**` for the discriminator and `.github/workflows/e2e-cli.yml` for the browser install step only.
+- `desktop-native-linux` red at `dd039a791`: out of scope (#1926, `@orpc/contract` isolated install), cleared by `main ≥ 09c07fd4e`; main merged into this branch on 2026-09-02.
+- Sqlite tier reds at `dd039a791`: `runtime.wait.auth` (run `33656167222` era) and `runtime.wait.workers-api` (run `33663531932`) — Aspire startup flakes, same tier passed at the same head earlier; unattributable.

@@ -206,3 +206,40 @@ registration/marker emission without proving hydration is necessary but **not su
   event, stop rather than edit.
 - Query cache semantics, optimistic behavior, selector correctness, general scaffold refactors,
   dependency upgrades, and doc-lint debt cleanup are deferred.
+
+---
+
+## Rescope v2 (2026-09-02, after IMPL-EVAL `FAIL_RESCOPE` at `dd039a791`)
+
+**Trigger.** The v1 stop clause fired: the package-level fixture hydrates in hosted CI (runs
+`33539774285`, `33541399005`, `33542591593`). The only red receipt is PR #1664's hosted probe at
+`377811da8` (`islandHydrated: false`, `freshIslandElement: null`), which predates every relevant
+main commit. The premise of #1845 is therefore **undetermined**, not confirmed. v2 makes the
+discriminator the first slice and conditions every product edit on its output.
+
+**Ownership change.** #1773 (dynamic scaffold route gate) is MERGED; the CLI collision that locked
+the v1 ceiling no longer exists. PR #1664 remains Features-owned and is still forbidden.
+
+### v2 slices
+
+| Slice | Purpose | Gate | Ceiling |
+| ----- | ------- | ---- | ------- |
+| S0a | **Served-surface discriminator.** New `scaffold.runtime` gate `behavior.island-served-surface`: on the real generated app, fetch the island page and assert (1) the Fresh island marker for the scaffold's data island is present, (2) every island `<script type="module">` / preload `src` resolves `200` with a JS content type, (3) the resolved bundle text contains the island export name. Emits a JSON receipt (`markers`, `scripts[]`, `bundleHit`). | `deno task e2e:cli gates scaffold.runtime` (hosted sqlite tier) | `packages/cli/e2e/src/application/gates/scaffold/**`, `packages/cli/e2e/tests/**`, suite registration only |
+| S0b | **Browser discriminator.** Hosted managed-browser leg on the same generated app: navigate, wait for the island element, read `islandHydrated` via the same DOM contract #1664's probe reads (`data-*` marker + post-interaction row change), emit `{ islandHydrated, freshIslandElement }`. Reuses the `ci.yml:255` `@playwright/cli@0.1.17` install step, added to the e2e-cli sqlite tier. | e2e-cli sqlite tier, gate `behavior.island-hydration` | `.github/workflows/e2e-cli.yml` (install step only) + the S0a paths |
+| S1v2 | **Disposition.** Record the S0 receipts in `worklog.md` and `drift.md`. Branch: **(A)** S0a+S0b green → the #1664 receipt was stale; #1845 premise refuted; S3 is *cancelled*; the PR ships S0a/S0b as regression guards and closes #1845 with the receipts as acceptance evidence. **(B)** any S0 leg red → the red leg names the first failing boundary (marker missing → `define-page` materialization; marker present but script 404 → scaffold asset/manifest emission in `packages/cli/src/kernel/assets/app/**`; script 200 but not hydrated → `packages/fresh/src/application/query/**`). Only that one boundary is opened. | run artifacts | none |
+| S3v2 | **Minimal correction** (branch B only), in exactly the boundary S1v2 named; focused test colocated; no public-surface change (any `yes` → new PLAN-EVAL). | focused test + `surface-diff` + S0a/S0b re-run green | one boundary |
+| S4v2 | **Completion receipt.** Hosted `scaffold.runtime` run at the final head with `behavior.island-hydration` → `islandHydrated: true`, non-null `freshIslandElement`. This replaces the v1 D5 dependency on PR #1664's probe. | e2e-cli at head | none |
+
+### v2 forbidden
+
+- PR #1664 files (`service-client-browser-probe.ts` and product files) — Features-owned.
+- `deno.lock`, catalogs, Fresh vendoring/patches, cache-key/optimistic/selector changes (unchanged from v1).
+- Any `packages/fresh/src/**` or `packages/cli/src/**` edit before S1v2 names the boundary.
+
+### v2 DoD
+
+- [ ] S0a gate present and green on hosted sqlite tier at head.
+- [ ] S0b gate present and green (or red with a named boundary, then S3v2 green) at head.
+- [ ] S1v2 disposition recorded (A or B) with run ids.
+- [ ] S4v2 receipt `islandHydrated: true` at the final head.
+- [ ] `desktop-native-linux` disposition recorded (out of scope: #1926, cleared by `main ≥ 09c07fd4e`).
