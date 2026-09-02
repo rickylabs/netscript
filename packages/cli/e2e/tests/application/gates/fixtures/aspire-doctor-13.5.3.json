@@ -1,0 +1,70 @@
+{
+  "checks": [
+    {
+      "category": "aspire",
+      "name": "cli-version",
+      "status": "pass",
+      "message": "Aspire CLI version 13.5.3 (channel: stable)",
+      "metadata": { "currentVersion": "13.5.3", "identityChannel": "stable" }
+    },
+    {
+      "category": "environment",
+      "name": "operating-system",
+      "status": "pass",
+      "message": "Operating system: Linux Debian 12"
+    },
+    {
+      "category": "sdk",
+      "name": "dotnet-sdk",
+      "status": "pass",
+      "message": ".NET 10.0.400 installed (x64)"
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs",
+      "status": "warning",
+      "message": "HTTPS development certificate is only partially trusted"
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs-certutil",
+      "status": "warning",
+      "message": "certutil is not available; browser certificate trust may be incomplete"
+    },
+    {
+      "category": "container",
+      "name": "docker",
+      "status": "pass",
+      "message": "Docker v28.5.2: running (auto-detected (default)) ← active"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-ephemeral-certificate",
+      "status": "pass",
+      "message": "Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-developer-certificate",
+      "status": "warning",
+      "message": "No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check"
+    }
+  ],
+  "summary": { "passed": 5, "warnings": 3, "failed": 0 },
+  "installations": [
+    {
+      "path": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire",
+      "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+      "channel": "stable",
+      "pathStatus": "active",
+      "status": "ok"
+    },
+    {
+      "path": "/home/agent/.local/aspire/aspire",
+      "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+      "channel": "stable",
+      "pathStatus": "shadowed",
+      "status": "ok"
+    }
+  ]
+}
