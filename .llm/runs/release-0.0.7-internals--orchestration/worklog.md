@@ -10964,3 +10964,18 @@ aimed at the determinism assertion (`assertReadinessDisagreement` must reject un
 ready-log), ownership-based container selection, semantic-merge integrity, permission-fix blast
 radius, and the hosted receipt. Box 24 is ticked only on a PASS artifact; then close-gate rerun and
 packet. Internals queue otherwise empty (0 owned issues).
+
+### D-272 — INCIDENT: withdrawing my duplicate #1952 evaluator killed Aspire's authoritative GLM session (`16762a5f`)
+
+Coordinator ordered only my duplicate Fable evaluator stopped. I terminated by `/proc/<pid>/cwd`
+match on `worktrees/007-eval-1952` — and Aspire's authoritative OpenRouter GLM xhigh evaluator was
+running in that **same path** (both lanes named the worktree identically for the same PR; my
+dispatch script had force-removed and re-created it). Six processes killed, Aspire's among them;
+worktree removed; no GLM verdict reached GitHub; its in-worktree artifact is lost. Reported on
+#1952 and #1641 with pids and the required re-dispatch. PR head untouched.
+
+**Lesson, hard:** `/proc/<pid>/cwd` is not ownership when paths can collide. Kill only by an
+identity this lane created (thread id, launcher pid recorded at dispatch), and never share a
+worktree name with another lane for the same PR — suffix by lane. Also: check the central
+`evaluatorLeases` before dispatching an evaluator on a transferred leaf; the lease would have shown
+Aspire already held it and this duplicate would never have existed.
