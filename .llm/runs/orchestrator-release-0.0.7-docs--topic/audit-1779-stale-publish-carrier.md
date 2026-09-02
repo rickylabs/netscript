@@ -186,3 +186,13 @@ heading and exclude the `|` form.
   lands before the stable cut gets a small follow-up changelog PR from `origin/main`
   (staged bullet for #1856 is in the supervisor scratchpad; #1664/#1950–#1953 to be swept at
   ready-merge).
+
+## #1955 follow-up fold (#1856) — exact-green packet
+
+- #1856 merged `5ce87fb8b` (user-visible: `FormCollectionStrategy` client-mode navigation rejected
+  at the type level). Folded into `packages/cli/CHANGELOG.md` Fresh bullet on a branch cut from
+  `origin/main` `5ce87fb8b`: PR **#1955**, head `49393fa53`, `Refs #1856` (no closing keyword —
+  #1609 already closed via #1856).
+- CI run 33682553044 at the exact head: success; `mergeable=true state=clean`; behind 0.
+- Docs-only, one-line changelog change — no separate IMPL-EVAL cycle spent (same disposition as
+  the #1949 deletion-only fix). Independent of Canary 6; coordinator merges when the train allows.
