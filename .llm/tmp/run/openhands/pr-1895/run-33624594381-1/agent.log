@@ -1,0 +1,400 @@
+effort not attested
+(OpenHands adapter does not expose it).
+
+## Changes (this evaluator session)
+
+- `.llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md` — IMPL-EVAL 
+artifact written.
+- No source files touched.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `git diff 634b83d6..f44f96928 -- packages/fresh/src` | EMPTY (no product 
+source; branch owns src only via the pre-merged #1904/#1900 fix branch, 
+identical to trusted base) |
+| `git diff e938ecd31..f44f96928 -- deno.lock` | 0 lines (no branch lock delta; 
+trusted-base orpc rows are main's own #1890 bump, `9924794be`, ancestor of the 
+trusted base; head root specs `^1.14.x` consistent with lock) |
+| Hosted `fresh-browser` at exact head | Run 33621810422, check-test job 
+100218639224, "Managed form browser regression" SUCCESS (PR body's `33628…` is a
+truncated citation of the same run) |
+| Publish dry-run (packages/fresh) | exit 0; proof files excluded 
+(`tests/fixtures/`, `**/*_browser.ts(x)`) |
+| review-threads (agentic) | PASS — threads=0 unanswered=0 |
+| Prior hosted failure at merge head c72710bae | superseded — 
+MutationObserver-in-driver defect repaired at 31f4ff8a1; green hosted run 
+already exists at final head, so no further CI cycle is required |
+| Full-export doc-lint | 45 pre-existing baseline diagnostics on main (#1914); 
+navigation 0/0; out of proof-only scope |
+
+## Responses to review comments / issue comments
+
+None pending: PR has 0 review threads (0 unanswered). Issue #1590 acceptance 
+requires the browser
+proof without abort overlays — proven by the hosted run (staleStatuses 200/200, 
+cancelled 0,
+overlayCount 0, abort regex clean).
+
+## Remaining risks
+
+1. Close-gate remains red until the two PR DoD checkboxes are ticked (hosted 
+proof — now
+   evidenced by job 100218639224 — and this IMPL-EVAL pass). Maintainer action 
+per gate design.
+2. Pre-existing doc-lint baseline (45 diagnostics) and publish residual (#1897) 
+tracked on main.
+
+OPENHANDS_VERDICT: PASS
+EOF
+echo "written"; grep -c 'OPENHANDS_VERDICT: PASS' 
+/home/runner/work/_temp/openhands/33624594381-1/summary.md
+
+Tokens: ↑ input 31.75K (total 3.08M) • cache hit 0.00% (total 78.26%) •  
+reasoning 0 (total 39.78K) • ↓ output 752 (total 54.54K) • $ (total 0.0999)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+❌ [An error occurred during execution.]
+Cannot execute multiple commands at once.
+Please run each command separately OR chain them into a single command via && or
+;
+Provided commands:
+(1) cat > /home/runner/work/_temp/openhands/33624594381-1/summary.md <<'EOF'
+# IMPL-EVAL Summary — PR #1895 (Slice 2 browser proof, #1590)
+
+OPENHANDS_VERDICT: PASS
+
+## Summary
+
+Formal IMPL-EVAL of PR #1895 at the immutable head `f44f96928` against trusted 
+base `634b83d6`,
+under the netscript-harness IMPL-EVAL protocol. All required static gates, the 
+runtime
+`fresh-browser` gate at the exact head, the consumer import path, lock hygiene, 
+and the close-gate
+semantics verified. Evaluated independently as a separate session; reasoning 
+effort not attested
+(OpenHands adapter does not expose it).
+
+## Changes (this evaluator session)
+
+- `.llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md` — IMPL-EVAL 
+artifact written.
+- No source files touched.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `git diff 634b83d6..f44f96928 -- packages/fresh/src` | EMPTY (no product 
+source; branch owns src only via the pre-merged #1904/#1900 fix branch, 
+identical to trusted base) |
+| `git diff e938ecd31..f44f96928 -- deno.lock` | 0 lines (no branch lock delta; 
+trusted-base orpc rows are main's own #1890 bump, `9924794be`, ancestor of the 
+trusted base; head root specs `^1.14.x` consistent with lock) |
+| Hosted `fresh-browser` at exact head | Run 33621810422, check-test job 
+100218639224, "Managed form browser regression" SUCCESS (PR body's `33628…` is a
+truncated citation of the same run) |
+| Publish dry-run (packages/fresh) | exit 0; proof files excluded 
+(`tests/fixtures/`, `**/*_browser.ts(x)`) |
+| review-threads (agentic) | PASS — threads=0 unanswered=0 |
+| Prior hosted failure at merge head c72710bae | superseded — 
+MutationObserver-in-driver defect repaired at 31f4ff8a1; green hosted run 
+already exists at final head, so no further CI cycle is required |
+| Full-export doc-lint | 45 pre-existing baseline diagnostics on main (#1914); 
+navigation 0/0; out of proof-only scope |
+
+## Responses to review comments / issue comments
+
+None pending: PR has 0 review threads (0 unanswered). Issue #1590 acceptance 
+requires the browser
+proof without abort overlays — proven by the hosted run (staleStatuses 200/200, 
+cancelled 0,
+overlayCount 0, abort regex clean).
+
+## Remaining risks
+
+1. Close-gate remains red until the two PR DoD checkboxes are ticked (hosted 
+proof — now
+   evidenced by job 100218639224 — and this IMPL-EVAL pass). Maintainer action 
+per gate design.
+2. Pre-existing doc-lint baseline (45 diagnostics) and publish residual (#1897) 
+tracked on main.
+
+OPENHANDS_VERDICT: PASS
+EOF
+(2) echo "written"; grep -c 'OPENHANDS_VERDICT: PASS' 
+/home/runner/work/_temp/openhands/33624594381-1/summary.md
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write final summary.md via heredoc
+
+$ cat > /home/runner/work/_temp/openhands/33624594381-1/summary.md <<'EOF'
+# IMPL-EVAL Summary — PR #1895 (Slice 2 browser proof, #1590)
+
+OPENHANDS_VERDICT: PASS
+
+## Summary
+
+Formal IMPL-EVAL of PR #1895 at the immutable head `f44f96928` against trusted 
+base `634b83d6`,
+under the netscript-harness IMPL-EVAL protocol. All required static gates, the 
+runtime
+`fresh-browser` gate at the exact head, the consumer import path, lock hygiene, 
+and the close-gate
+semantics verified. Evaluated independently as a separate session; reasoning 
+effort not attested
+(OpenHands adapter does not expose it).
+
+## Changes (this evaluator session)
+
+- `.llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md` — IMPL-EVAL 
+artifact written.
+- No source files touched.
+
+## Validation
+
+| Check | Result |
+| --- | --- |
+| `git diff 634b83d6..f44f96928 -- packages/fresh/src` | EMPTY (no product 
+source; branch owns src only via the pre-merged #1904/#1900 fix branch, 
+identical to trusted base) |
+| `git diff e938ecd31..f44f96928 -- deno.lock` | 0 lines (no branch lock delta; 
+trusted-base orpc rows are main's own #1890 bump, `9924794be`, ancestor of the 
+trusted base; head root specs `^1.14.x` consistent with lock) |
+| Hosted `fresh-browser` at exact head | Run 33621810422, check-test job 
+100218639224, "Managed form browser regression" SUCCESS (PR body's `33628…` is a
+truncated citation of the same run) |
+| Publish dry-run (packages/fresh) | exit 0; proof files excluded 
+(`tests/fixtures/`, `**/*_browser.ts(x)`) |
+| review-threads (agentic) | PASS — threads=0 unanswered=0 |
+| Prior hosted failure at merge head c72710bae | superseded — 
+MutationObserver-in-driver defect repaired at 31f4ff8a1; green hosted run 
+already exists at final head, so no further CI cycle is required |
+| Full-export doc-lint | 45 pre-existing baseline diagnostics on main (#1914); 
+navigation 0/0; out of proof-only scope |
+
+## Responses to review comments / issue comments
+
+None pending: PR has 0 review threads (0 unanswered). Issue #1590 acceptance 
+requires the browser
+proof without abort overlays — proven by the hosted run (staleStatuses 200/200, 
+cancelled 0,
+overlayCount 0, abort regex clean).
+
+## Remaining risks
+
+1. Close-gate remains red until the two PR DoD checkboxes are ticked (hosted 
+proof — now
+   evidenced by job 100218639224 — and this IMPL-EVAL pass). Maintainer action 
+per gate design.
+2. Pre-existing doc-lint baseline (45 diagnostics) and publish residual (#1897) 
+tracked on main.
+
+OPENHANDS_VERDICT: PASS
+EOF
+
+Tokens: ↑ input 33.3K (total 3.11M) • cache hit 20.18% (total 77.64%) •  
+reasoning 0 (total 39.78K) • ↓ output 715 (total 55.25K) • $ (total 0.1021)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+cat > /home/runner/work/_temp/openhands/33624594381-1/summary.md <<'EOF'
+# IMPL-EVAL Summary — PR #1895 (Slice 2 browser proof, #1590)
+OPENHANDS_VERDICT: PASS
+## Summary
+Formal IMPL-EVAL of PR #1895 at the immutable head `f44f96928` against trusted 
+base `634b83d6`,
+under the netscript-harness IMPL-EVAL protocol. All required static gates, the 
+runtime
+`fresh-browser` gate at the exact head, the consumer import path, lock hygiene, 
+and the close-gate
+semantics verified. Evaluated independently as a separate session; reasoning 
+effort not attested
+(OpenHands adapter does not expose it).
+## Changes (this evaluator session)
+- `.llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md` — IMPL-EVAL 
+artifact written.
+- No source files touched.
+## Validation
+| Check | Result |
+| --- | --- |
+| `git diff 634b83d6..f44f96928 -- packages/fresh/src` | EMPTY (no product 
+source; branch owns src only via the pre-merged #1904/#1900 fix branch, 
+identical to trusted base) |
+| `git diff e938ecd31..f44f96928 -- deno.lock` | 0 lines (no branch lock delta; 
+trusted-base orpc rows are main's own #1890 bump, `9924794be`, ancestor of the 
+trusted base; head root specs `^1.14.x` consistent with lock) |
+| Hosted `fresh-browser` at exact head | Run 33621810422, check-test job 
+100218639224, "Managed form browser regression" SUCCESS (PR body's `33628…` is a
+truncated citation of the same run) |
+| Publish dry-run (packages/fresh) | exit 0; proof files excluded 
+(`tests/fixtures/`, `**/*_browser.ts(x)`) |
+| review-threads (agentic) | PASS — threads=0 unanswered=0 |
+| Prior hosted failure at merge head c72710bae | superseded — 
+MutationObserver-in-driver defect repaired at 31f4ff8a1; green hosted run 
+already exists at final head, so no further CI cycle is required |
+| Full-export doc-lint | 45 pre-existing baseline diagnostics on main (#1914); 
+navigation 0/0; out of proof-only scope |
+## Responses to review comments / issue comments
+None pending: PR has 0 review threads (0 unanswered). Issue #1590 acceptance 
+requires the browser
+proof without abort overlays — proven by the hosted run (staleStatuses 200/200, 
+cancelled 0,
+overlayCount 0, abort regex clean).
+## Remaining risks
+1. Close-gate remains red until the two PR DoD checkboxes are ticked (hosted 
+proof — now
+   evidenced by job 100218639224 — and this IMPL-EVAL pass). Maintainer action 
+per gate design.
+2. Pre-existing doc-lint baseline (45 diagnostics) and publish residual (#1897) 
+tracked on main.
+OPENHANDS_VERDICT: PASS
+EOF
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify summary and post PR verdict comment
+
+$ grep -c 'OPENHANDS_VERDICT: PASS' 
+/home/runner/work/_temp/openhands/33624594381-1/summary.md && head -3 
+/home/runner/work/_temp/openhands/33624594381-1/summary.md && echo '=== post 
+verdict comment (first line = verdict) ===' && gh pr comment 1895 --repo 
+rickylabs/netscript --body-file 
+/home/runner/work/_temp/openhands/33624594381-1/summary.md
+
+Tokens: ↑ input 34.75K (total 3.14M) • cache hit 91.35% (total 77.79%) •  
+reasoning 0 (total 39.78K) • ↓ output 136 (total 55.39K) • $ (total 0.1029)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+2
+# IMPL-EVAL Summary — PR #1895 (Slice 2 browser proof, #1590)
+
+OPENHANDS_VERDICT: PASS
+=== post verdict comment (first line = verdict) ===
+https://github.com/rickylabs/netscript/pull/1895#issuecomment-5509200016
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check working tree and evaluate.md ignore status
+
+$ cd /home/runner/work/netscript/netscript && git status --porcelain && git 
+check-ignore .llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md && 
+echo IGNORED || echo NOT-IGNORED
+
+Tokens: ↑ input 35.02K (total 3.18M) • cache hit 99.05% (total 78.02%) •  
+reasoning 0 (total 39.78K) • ↓ output 75 (total 55.46K) • $ (total 0.1034)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+?? .llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md
+NOT-IGNORED
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark diagnosis and IMPL-EVAL tasks complete
+
+📋 Update Task List (2 tasks)
+
+Tokens: ↑ input 35.21K (total 3.21M) • cache hit 94.52% (total 78.20%) •  
+reasoning 0 (total 39.78K) • ↓ output 137 (total 55.6K) • $ (total 0.1041)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 2 done
+
+✅ 1. Diagnose close-gate FAILURE on PR #1895
+   Notes: close-gate FAIL on 2 unticked DoD boxes; check-test green; verdict 
+evidence complete
+✅ 2. IMPL-EVAL evaluation pass and verdict publication
+   Notes: protocol, plan, drift, worklog, gates, surface, AP sweep verified; 
+PASS artifacts written; PR comment 5509200016 posted
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS verdict published for PR 1895
+
+Finish with message:
+IMPL-EVAL session for PR #1895 (#1590 Slice 2) completed at immutable head 
+f44f96928 against trusted base 634b83d6.
+
+Root cause of the close-gate FAILURE: the gate tool (`check-close-gate.ts`) 
+found exactly two unticked PR-body Definition-of-Done checkboxes — "Hosted 
+`fresh-browser` proof green at the exact committed head" (line 57) and 
+"Separate-session IMPL-EVAL passes" (line 58). This is the gate's designed final
+state: `Refs #1590` (no closing keyword) with an empty closingIssuesReferences 
+is the locked partial-slice semantics; the gate clears when the two boxes are 
+ticked, and ticking requires the hosted green receipt plus this IMPL-EVAL pass. 
+Not a product defect.
+
+Key evidence:
+- No product source change: `git diff 634b83d6..f44f96928 -- packages/fresh/src`
+is EMPTY; branch-visible src changes come only via the pre-merged #1904/#1900 
+fix branch (identical to trusted base) and a JSDoc-only #1913 doc-binding 
+change.
+- Lock hygiene: `git diff e938ecd31..f44f96928 -- deno.lock` is 0 lines; the 
+trusted-base orpc lock delta is main's own #1890 bump (9924794be, ancestor of 
+the trusted base), with head root specs ^1.14.x consistent with the lock. No 
+deno.lock changes were made or committed.
+- Hosted fresh-browser gate at the exact head: run 33621810422 / check-test job 
+100218639224 → SUCCESS ("Managed form browser regression"); the prior 
+MutationObserver hosted failure at c72710bae was repaired at 31f4ff8a1 and the 
+green run already exists at final head, so no further CI cycle is required.
+- Publish dry-run exit 0 with proof files excluded (`tests/fixtures/`, 
+`**/*_browser.ts(x)`); review threads 0/0 unanswered; static scoped 
+check/lint/fmt and Fresh source tests all green per worklog gate tables.
+- Remount-evidence review: live-DOM marker walking was correctly invalidated 
+(installed @fresh/core@2.3.3 reviver consumes markers into keyed PartialComp 
+VNodes, recorded in drift.md); the expando-stamp node-identity check plus exact 
+response-marker equality proves keyed remounts without touching source. Findings
+are minor/pre-existing only (45 doc-lint baseline diagnostics from #1914, 
+publish residual #1897, truncated run-id citation in the PR body).
+
+Deliverables: formal IMPL-EVAL artifact written to 
+`.llm/runs/test-fresh-partial-nav-browser--1590-s2/evaluate.md` (left 
+uncommitted per evaluator-session non-mutation policy; the workflow preserves it
+in run artifacts). Run-scoped summary with the verdict written to 
+`/home/runner/work/_temp/openhands/33624594381-1/summary.md`, and the same 
+verdict posted as PR comment 
+https://github.com/rickylabs/netscript/pull/1895#issuecomment-5509200016 with 
+the verdict as its first line.
+
+Verdict: OPENHANDS_VERDICT: PASS
+
+Next steps for the supervisor: tick the two DoD boxes in the PR body (hosted 
+proof — now evidenced by job 100218639224 — and this IMPL-EVAL pass), apply 
+`status:ready-merge`, then rerun the existing CI workflow so the close-gate and 
+acceptance mirroring observe the live labels; no code changes and no new CI 
+cycle are needed.
+
+Tokens: ↑ input 35.34K (total 3.25M) • cache hit 99.07% (total 78.43%) •  
+reasoning 0 (total 39.78K) • ↓ output 804 (total 56.4K) • $ (total 0.1049)
+
