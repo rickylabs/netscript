@@ -186,3 +186,49 @@ failure is repaired locally and still awaits the hosted verdict.
 
 Reconcile: Slice 2 remains proof-only and `Refs #1590` until the supervisor's new hosted run proves
 the changed observation at the exact pushed head. No product issue is indicated by this finding.
+
+## 2026-09-03 — convergence onto origin/main
+
+- Began clean at `d0bf0aebfb1dc8ccd475b240462862530505e732` and merged the fetched
+  `origin/main`. The sole content conflict was
+  `packages/fresh/tests/form-navigation_browser.ts`.
+- Preserved all three browser scenarios and every assertion from both parents. Main's ordinary
+  form-navigation and generated Form-C fixtures now use its shared `reservePort`, `runPlaywright`,
+  `startLockedVite`, `stopVite`, and `waitForServer` helpers. The Slice 2 barrier-drain helper and
+  piped Vite stdout/stderr evidence remain. The piped launcher now delegates to main's
+  `createLockedViteCommand`, retaining capture while honoring #1940's frozen/cached-only Vite
+  capability lock. #1856 introduced no runtime type adaptation for this proof.
+- Reset 78 generated paths (`*.generated.ts`, `.agents/generated/**`, and the Aspire surface
+  manifest) to `origin/main`, then regenerated the MCP export corpus and Aspire manifest. The
+  generated outputs match `origin/main` exactly.
+- The prescribed bare `deno task gen:mcp-export-corpus` exited 1 because #1867's clean-tree guard
+  classifies the merge's staged package/plugin changes as dirty. Its explicit supported recovery,
+  `deno task gen:mcp-export-corpus --allow-dirty`, exited 0; the subsequent check gate independently
+  passed and the generated corpus remained identical to main.
+
+### Convergence gate evidence
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| Fresh structured check | 0 | 217 files, 2 batches, 0 diagnostics |
+| Fresh unit task | 0 | 280 passed, 0 failed |
+| `check:mcp-export-corpus` | 0 | 35 packages, 273 subpaths, 7,841 symbols; hash `284917fc...` |
+| `check:assets-barrel` | 0 | regeneration produced no diff |
+| `check:publish-assets` | 0 | generated publish assets current |
+| `check:aspire-version-parity` | 0 | 908 checked, 0 failed, 0 missing; manifest fresh |
+| `docs:readme-fences` | 0 | 36 READMEs, 168 fences, 73 TS-like checked |
+| `arch:check` | 0 | dependency checks and doctrine scan completed with 0 failures |
+| `quality:scan` | 0 | 0 findings; 7 existing allowances |
+| Browser task | not run | `playwright-cli` unavailable (`command -v` exit 1); hosted `fresh-browser` is durable |
+| Lock hygiene | 0 | worktree lock equals `origin/main`, SHA-256 `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` |
+
+- Post-commit `git diff d0bf0aebf HEAD -- packages | grep -v generated` exited 0. Of its
+  non-generated paths, 165 non-conflict/non-`deno.json` trees match `origin/main` exactly; the
+  `packages/fresh/deno.json` first-parent patch has the same stable patch-id as #1940, and the only
+  authored resolution is `form-navigation_browser.ts`.
+- Conflict-marker grep and `git diff --check` both exited 0. The three browser test names remain
+  present. The pre-merge lock SHA was `e52c167e...`; the merge inherited main's `6c8f90a2...`, and
+  generators/gates introduced no further lock delta.
+
+Reconcile: this is a convergence-only merge after the recorded IMPL-EVAL PASS. No feature scope or
+assertion changed; CI must re-establish the hosted `fresh-browser` verdict at the pushed merge SHA.

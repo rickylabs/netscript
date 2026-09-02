@@ -49,3 +49,15 @@ milestone `0.0.7`.
   and the lock SHA-256 remains `a269308a7cfd304e04377fbd9ef81d51edf629589aa741e18d367652dcdb2bcd`.
 - No local or hosted browser proof was run in this lane because `playwright-cli` is unavailable and
   hosted execution remains supervisor-owned. Run hosted `fresh-browser` at the pushed repair SHA.
+
+## 2026-09-03 convergence handoff
+
+- Merged current `origin/main` into the IMPL-EVAL-PASS head `d0bf0aebf`. The sole conflict kept
+  main's shared locked browser-runtime helpers and all three existing browser scenarios, including
+  the complete Slice 2 partial-navigation proof.
+- The partial fixture still captures Vite stdout/stderr, but its launcher now uses main's
+  frozen/cached-only `createLockedViteCommand`; no #1856 runtime type change affected the proof.
+- Fresh check passed with 217 files and 0 diagnostics; Fresh units passed 280/280. All requested
+  generation, asset, Aspire parity, README fence, architecture, and quality gates exited 0.
+- Generated outputs and `deno.lock` exactly match `origin/main`. `playwright-cli` remains absent, so
+  the supervisor/CI must run the durable `fresh-browser` job at the pushed merge SHA.

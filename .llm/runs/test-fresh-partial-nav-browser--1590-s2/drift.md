@@ -75,3 +75,11 @@ fetched for initial A, B mount, and A mount. It additionally tags the live regio
 expando immediately before A→B and B→A; the tag is absent after both transitions, proving node
 replacement/remount rather than same-node reconciliation. No `packages/fresh/src` or fixture
 change is warranted.
+
+## 2026-09-03 — MCP generator clean-tree guard during merge (minor)
+
+The prescribed bare `deno task gen:mcp-export-corpus` exited 1 because the #1867 guard correctly
+reported the merge's staged `origin/main` package/plugin changes as dirty. The generator explicitly
+supports deliberate convergence through `--allow-dirty`; that rerun exited 0, its check gate exited
+0, and every generated output remained byte-identical to `origin/main`. No product or proof scope
+changed.

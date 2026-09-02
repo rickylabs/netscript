@@ -23,7 +23,18 @@ import type {
   ResolvedNetScriptRouteManifestOptions,
 } from '../route/manifest.ts';
 
-export type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
+export {
+  discoverNetScriptRoutes,
+  resolveNetScriptRouteManifestOptions,
+  writeNetScriptRouteManifestSync,
+} from '../route/manifest.ts';
+export type {
+  DiscoveredNetScriptRoute,
+  NetScriptRouteManifestOptions,
+  PageModuleRouteForm,
+  ResolvedNetScriptRouteManifestOptions,
+  WriteNetScriptRouteManifestResult,
+} from '../route/manifest.ts';
 
 const ROUTE_MANIFEST_WATCH_DEBOUNCE_MS = 25;
 const ABSOLUTE_PATH_PATTERN = /^(?:[A-Za-z]:\/|\/)/;

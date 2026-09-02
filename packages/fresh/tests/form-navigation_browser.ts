@@ -1,5 +1,14 @@
 import { assert, assertEquals } from '@std/assert';
 import { fromFileUrl } from '@std/path';
+import {
+  reservePort,
+  runPlaywright,
+  startLockedVite,
+  stopVite,
+  waitForServer,
+} from './_fixtures/browser-runtime.ts';
+import { createLockedViteCommand } from './_fixtures/vite-runtime.ts';
+
 const PLAYWRIGHT_SESSION = 'netscript-fresh-form-navigation';
 const ROUTE_BINDING_SESSION = 'netscript-fresh-route-binding';
 const PARTIAL_NAVIGATION_SESSION = 'netscript-fresh-partial-navigation';
@@ -26,7 +35,8 @@ Deno.test({
     const port = reservePort();
     const url = `http://127.0.0.1:${port}/`;
     const playwrightOutput = await Deno.makeTempDir({ prefix: 'netscript-form-browser-' });
-    const vite = spawnVite(FIXTURE_ROOT, port, 'null');
+    const vite = startLockedVite(FIXTURE_ROOT, port);
+
     try {
       await waitForServer(url, vite);
       await runPlaywright(['-s', PLAYWRIGHT_SESSION, 'open', url], playwrightOutput);
@@ -77,12 +87,7 @@ Deno.test({
       assertEquals(evidence.finalUrl, `http://127.0.0.1:${port}/success`);
     } finally {
       await runPlaywright(['-s', PLAYWRIGHT_SESSION, 'close'], playwrightOutput, false);
-      try {
-        vite.kill('SIGTERM');
-      } catch {
-        // The fixture process already stopped; cleanup can continue.
-      }
-      await vite.status;
+      await stopVite(vite);
       await Deno.remove(playwrightOutput, { recursive: true });
     }
   },
@@ -337,7 +342,8 @@ Deno.test({
     const port = reservePort();
     const url = `http://127.0.0.1:${port}/`;
     const playwrightOutput = await Deno.makeTempDir({ prefix: 'netscript-route-browser-' });
-    const vite = spawnVite(ROUTE_BINDING_FIXTURE_ROOT, port, 'null');
+    const vite = startLockedVite(ROUTE_BINDING_FIXTURE_ROOT, port);
+
     try {
       await waitForServer(url, vite);
       await runPlaywright(['-s', ROUTE_BINDING_SESSION, 'open', url], playwrightOutput);
@@ -398,42 +404,11 @@ Deno.test({
       assertEquals(evidence.finalUrl, `http://127.0.0.1:${port}/orders/order-42`);
     } finally {
       await runPlaywright(['-s', ROUTE_BINDING_SESSION, 'close'], playwrightOutput, false);
-      try {
-        vite.kill('SIGTERM');
-      } catch {
-        // The fixture process already stopped; cleanup can continue.
-      }
-      await vite.status;
+      await stopVite(vite);
       await Deno.remove(playwrightOutput, { recursive: true });
     }
   },
 });
-async function runPlaywright(
-  args: readonly string[],
-  cwd: string,
-  check = true,
-): Promise<string> {
-  const output = await new Deno.Command('playwright-cli', {
-    args: [...args],
-    cwd,
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  const stdout = new TextDecoder().decode(output.stdout);
-  const stderr = new TextDecoder().decode(output.stderr);
-  if (check && (!output.success || stdout.startsWith('### Error'))) {
-    throw new Error(
-      `playwright-cli ${args.join(' ')} failed (${output.code})\n${stdout}\n${stderr}`,
-    );
-  }
-  return stdout;
-}
-function reservePort(): number {
-  const listener = Deno.listen({ hostname: '127.0.0.1', port: 0 });
-  const { port } = listener.addr as Deno.NetAddr;
-  listener.close();
-  return port;
-}
 async function releaseAndDrainPartialBarriers(cwd: string): Promise<void> {
   await runPlaywright([
     '--raw',
@@ -460,12 +435,8 @@ function spawnVite(
   port: number,
   output: 'null' | 'piped',
 ): Deno.ChildProcess {
-  return new Deno.Command(Deno.execPath(), {
+  return createLockedViteCommand({
     args: [
-      'run',
-      '--no-lock',
-      '-A',
-      'npm:vite@7.2.2',
       '--config',
       'vite.config.ts',
       '--host',
@@ -478,23 +449,4 @@ function spawnVite(
     stdout: output,
     stderr: output,
   }).spawn();
-}
-async function waitForServer(url: string, child: Deno.ChildProcess): Promise<void> {
-  for (let attempt = 0; attempt < 100; attempt++) {
-    const status = await Promise.race([
-      child.status,
-      new Promise<undefined>((resolve) => setTimeout(resolve, 50)),
-    ]);
-    if (status) {
-      throw new Error(`Vite browser fixture exited before startup (${status.code})`);
-    }
-    try {
-      const response = await fetch(url);
-      await response.arrayBuffer();
-      if (response.ok) return;
-    } catch {
-      // The server has not bound its port yet.
-    }
-  }
-  throw new Error('Timed out waiting for the Vite browser fixture');
 }

@@ -83,6 +83,7 @@ export const appServiceSummaryPanelTemplate =
 export const appServiceExampleIndexTemplate = exampleTemplates.appServiceExampleIndexTemplate;
 export const appServiceExampleLayoutTemplate = exampleTemplates.appServiceExampleLayoutTemplate;
 export const appServiceSummaryPartialTemplate = exampleTemplates.appServiceSummaryPartialTemplate;
+export const appTelemetryExampleSharedTemplate = exampleTemplates.appTelemetryExampleSharedTemplate;
 
 export const serviceContractTemplate = await readTemplateAsset(TEMPLATE_KEYS.serviceContract);
 export const serviceV1RouterTemplate = await readTemplateAsset(TEMPLATE_KEYS.serviceRoutersV1);

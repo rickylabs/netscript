@@ -4,6 +4,7 @@ import {
   evaluateAspireVersionParity,
   EXACT_ASPIRE_VERSION_TOKEN_MATCH,
   parseManifest,
+  parsePhase,
 } from './check-aspire-version-parity.ts';
 
 const manifest = `path\tclass\towner\tdisposition
@@ -39,6 +40,12 @@ Deno.test('manifest parser skips the TSV header and preserves owner/disposition 
     disposition: 'enforce',
   });
   assertEquals(parseManifest(manifest).length, 9);
+});
+
+Deno.test('phase 1 remains the default while phase 2 requires an explicit selector', () => {
+  assertEquals(parsePhase([]), 1);
+  assertEquals(parsePhase(['--report']), 1);
+  assertEquals(parsePhase(['--phase', '2']), 2);
 });
 
 Deno.test('phase 1 limits stale failures to owned classes and fails required missing paths', async () => {
@@ -112,6 +119,19 @@ Deno.test('phase 2 fails a compat fixture that lacks the current train literal',
   assertEquals(report.findings[0].reason, 'compat fixture is missing the required 13.5.3 literal');
 });
 
+Deno.test('phase 2 requires the 13.5.3 compat case independently of the current scaffold pin', async () => {
+  const report = await evaluateAspireVersionParity({
+    rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
+    phase: 2,
+    expectedVersion: '13.4.6',
+    readText: () => Promise.resolve("const versions = ['13.4.6', '13.5.3'];"),
+  });
+
+  assertEquals(report.ok, true);
+  assertEquals(report.findings[0]?.status, 'info');
+  assertEquals(report.findings[0]?.reason, 'compat fixture contains the required 13.5.3 literal');
+});
+
 Deno.test('phase 2 rejects a longer compat peer token that only contains the required pin', async () => {
   const report = await evaluateAspireVersionParity({
     rows: parseManifest('path\tclass\towner\tdisposition\ncompat.ts\tcompat-fixture\tS3\tkeep\n'),
@@ -146,6 +166,46 @@ Deno.test('exact Aspire version comparison never accepts longer or suffixed toke
     EXACT_ASPIRE_VERSION_TOKEN_MATCH('13.5.3-preview.1.26425.3', '13.5.3'),
     false,
   );
+});
+
+Deno.test('archival classes remain informational even when their owner field is not archival', async () => {
+  const report = await evaluateAspireVersionParity({
+    rows: parseManifest(
+      'path\tclass\towner\tdisposition\nhistory.md\tarchival:rfc\tlegacy-owner\tkeep\n',
+    ),
+    phase: 2,
+    expectedVersion: '13.5.3',
+    readText: () => Promise.resolve('Aspire 13.2 historical evidence'),
+  });
+
+  assertEquals(report.ok, true);
+  assertEquals(report.findings[0]?.status, 'info');
+});
+
+Deno.test('stale or unmatched manifest generation fails closed before row evaluation', async () => {
+  const stale = await evaluateAspireVersionParity({
+    rows: [],
+    phase: 2,
+    expectedVersion: '13.5.3',
+    readText,
+    manifestSource: 'committed',
+    generatedManifestSource: 'generated',
+  });
+  assertEquals(stale.ok, false);
+  assertEquals(stale.manifestFresh, false);
+  assertEquals(stale.findings[0]?.class, 'manifest:freshness');
+
+  const unmatched = await evaluateAspireVersionParity({
+    rows: [],
+    phase: 2,
+    expectedVersion: '13.5.3',
+    readText,
+    manifestSource: 'same',
+    generatedManifestSource: 'same',
+    generatedManifestUnmatched: ['new-aspire-surface.ts'],
+  });
+  assertEquals(unmatched.ok, false);
+  assertEquals(unmatched.findings[0]?.matches, ['new-aspire-surface.ts']);
 });
 
 Deno.test('missing archival paths remain non-failing but missing required paths fail closed', async () => {
