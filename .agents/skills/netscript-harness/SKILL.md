@@ -295,7 +295,7 @@ Record rescope evidence in `drift.md` with severity `significant` or `architectu
 | Generic run mechanics                         | `.llm/harness/workflow/`             |
 | Archetype-specific gates or false-done states | `.llm/harness/archetypes/`           |
 | Stable repeated cross-run lessons             | `.llm/harness/lessons/`              |
-| Package/plugin doctrine navigation            | `.claude/skills/netscript-doctrine/` |
+| Package/plugin doctrine navigation            | `.agents/skills/netscript-doctrine/` |
 | Deep domain expertise                         | a focused skill                      |
 | Deferred doctrine violations                  | `.llm/harness/debt/arch-debt.md`     |
 
