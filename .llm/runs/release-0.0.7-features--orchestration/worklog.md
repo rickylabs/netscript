@@ -11002,3 +11002,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 21:02Z — **Correction**: packet-wait misfired on #1954 (no checks yet at new head → pend=0). Comment retracted in place; script now requires quality/check-test/build SUCCESS. Re-armed for #1954 `2c205c601` and #1664 `e8983cca5`.
 - 21:09Z — Slice F opened **PR #1956** early at `e371dda91` (harness artifacts only, 0 product files vs base `be3e3dded`); worker alive and implementing; eval when the implementation head lands.
 - 21:18Z — **#1954 exact-green packet** at `2c205c601`: MERGEABLE/CLEAN, quality/check-test/build/close-gate SUCCESS; posted on the PR (verified this time). Coordinator to merge at that SHA.
+- 21:20Z — #1664 sqlite tier at `e8983cca5`: sole red `behavior.service-client-refetch` = #1845 hydration signature (islandHydrated:false, no QueryClient). S9 smoke gate passed. No new blocker; postgres tier pending.
