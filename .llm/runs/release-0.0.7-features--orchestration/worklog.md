@@ -10830,3 +10830,23 @@ strict idleness would never fire; the head has been stable across CI, and a nati
 `evaluate.md`, so it was dispatched. Judging D3's narrowed contract byte-for-byte: marker format,
 three-way fail-closed classification, additive options, zero-writes-by-plan-shape, shared-file
 anchors, and that nothing removed by the narrowing crept back.
+
+### ~22:15Z — #1946 (Slice C) FAIL_FIX: a fail-open reconciler the plan's own contract forbids
+
+Native eval at `b86524bcb`: every D3 property verified byte-for-byte (the evaluator reproduced the
+pinned marker hash with `sha256sum`), all gates at baseline — and **one blocking finding**.
+`reconcile-state.ts:48-56` detects same-name `State` members with a line regex ending in
+`([^;]+);`, which cannot match a member whose type contains `;` (`{ id: string; }`) or whose key is
+quoted. Result: `status: 'insert'` and a **duplicate member** (TS2717) where D6 says "a
+same-name/different-type property is a conflict before any write". Object-literal member types are
+the shape the slice's own `session` fixture uses, so this would have bitten the first real project.
+
+The brace-aware scan the file already has is the correct primitive; the regex was a second, weaker
+path. Fix dispatched with three fixtures (object-literal type, quoted key, nested same-name at
+depth > 0 that must still insert). LOW-1 (ICU `localeCompare` → explicit comparator) rides along;
+LOW-2 is Slice E's; LOW-3 is a repo fact. Receipt committed as `f25292433`; follow-up native eval on
+the fixed head.
+
+Worth keeping: **a line-regex on a `;`-terminated member is the wrong primitive for a language whose
+types contain `;`.** The evaluator found it by constructing the counter-example, not by reading the
+tests — which all passed.
