@@ -10825,3 +10825,16 @@ only the #1641 umbrella. Internals-owned open issues at any milestone: **0**. Un
 internals 1 (umbrella). The instruction to "finish/packet all owned exact-green PRs; dispatch
 remaining milestone issues" resolves to **nothing owned** — reported, not manufactured; a named
 transfer is dispatched on sight. Watchers re-armed after the reset.
+
+### D-259 — #1880/#1952 taken as a bounded cross-concern Internals leaf; disposition: complementary to #1957, converge not supersede
+
+Coordinator transferred #1952's converge to Internals. Audit: #1957 (aspire, ready-merge) fixes the
+canary.6 red itself (duplicate 30 s observer in `verify-typed-db-phase-b.ts`; shared 120 s ceiling
+exported from the fixture). #1952 delivers #1880's deterministic Running/Unhealthy reproduction
+(`readiness-disagreement.ts`, `owned-container-log.ts`, docs contract) and adds a `readiness` field
+to the fixture's Postgres expectation. Same file, **different hunks**, plus both add TSV rows →
+mechanical second-order overlap; neither supersedes the other. Worker dispatched (Codex, detached)
+to converge onto `main` `8c549c061` (post-#1909): regenerate the four generated conflicts, one
+semantic fixture merge (#1909 base + #1952 additive), no #1957 content pulled in, residual
+merge-tree vs #1957 recorded verbatim. Coordination posted on #1952 (Aspire hold pushes; land #1957
+first) and cross-linked on #1957. Not waiting on canary.
