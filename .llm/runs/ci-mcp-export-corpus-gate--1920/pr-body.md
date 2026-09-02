@@ -13,7 +13,7 @@ byte-identical warm-cache and pristine-cache generation.
 
 - [x] S1 Bootstrap the harness plan and deterministic-generation evidence — `1ad32bc02`
 - [x] S2 Add the CI invocation and complete dispatched-base trigger/teeth validation — implementation commit (see live commit list)
-- [ ] S3 Integrate current main, regenerate the collision-prone corpus, and revalidate the final identity
+- [x] S3 Integrate current main, regenerate the collision-prone corpus, and revalidate the final identity — `92ae7df426` + final evidence commit
 
 ## Validation
 
@@ -27,7 +27,15 @@ byte-identical warm-cache and pristine-cache generation.
 - Throwaway-worktree stale RED — `REAL_EXIT=1`; expected diagnostic matched
 - Live-tree fresh GREEN and exact catalog runner — each `REAL_EXIT=0`
 - Structured `.llm/tools` check — `REAL_EXIT=0`; 342 files, 3 batches, 0 findings
-- Final integrated-main repeat — pending S3 after detected corpus/classifier collision
+- Integrated main SHA `37452f11f5045f0f5a98e07d802bcc2a2e94333b` by merge (no rebase)
+- Final warm repeat and new pristine-`DENO_DIR` generation — each `REAL_EXIT=0`, byte-identical
+  file SHA-256 `21cfdee7c2f48ab48358dd0fbe0ab18749aac12ff2c00a9c6aafa748e6e38c9d`,
+  payload SHA-256 `81d49c6cc3f8cf6ea8bee59330ec562998ce6def0ea137d06287bd21376214df`,
+  273 subpaths, 7,809 symbols
+- Throwaway-worktree current-main stale RED — `REAL_EXIT=1`; expected diagnostic matched
+- Final live-tree fresh GREEN and catalog runner — each `REAL_EXIT=0`
+- Final parsed YAML, nine-case classifier reachability, structured `.llm/tools` check, and lock
+  hygiene assertions — each `REAL_EXIT=0`
 - `deno task e2e:cli` — intentionally not run; explicitly excluded by #1920
 
 ## Harness
@@ -49,4 +57,4 @@ byte-identical warm-cache and pristine-cache generation.
 - [x] Every input class that can stale the corpus selects the gate's CI path.
 - [x] A stale corpus fails and the fresh corpus passes with captured real exits.
 - [x] The requested structured tooling check and parsed-YAML assertion pass.
-- [ ] The implementation evidence is committed and the branch is clean for supervisor review.
+- [x] The implementation evidence is committed and the branch is clean for supervisor review.

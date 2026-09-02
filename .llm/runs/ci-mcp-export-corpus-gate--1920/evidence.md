@@ -29,6 +29,23 @@ uncommitted and do not participate in corpus discovery.
 - The task-owned pristine cache was not deleted because repository policy forbids cache deletion
   without approval.
 
+After integrating current `origin/main` at
+`37452f11f5045f0f5a98e07d802bcc2a2e94333b`, the corpus was regenerated from the integrated
+surface and the environment comparison was repeated:
+
+| Environment | Generator exit | Generated-file SHA-256 | Payload SHA-256 | Subpaths | Symbols |
+| --- | ---: | --- | --- | ---: | ---: |
+| Integrated warm cache 1 | 0 | `21cfdee7c2f48ab48358dd0fbe0ab18749aac12ff2c00a9c6aafa748e6e38c9d` | `81d49c6cc3f8cf6ea8bee59330ec562998ce6def0ea137d06287bd21376214df` | 273 | 7,809 |
+| Integrated warm cache 2 | 0 | `21cfdee7c2f48ab48358dd0fbe0ab18749aac12ff2c00a9c6aafa748e6e38c9d` | `81d49c6cc3f8cf6ea8bee59330ec562998ce6def0ea137d06287bd21376214df` | 273 | 7,809 |
+| Integrated pristine `DENO_DIR=/ephemeral/tmp/tmp.oMEjBhPcXR` | 0 | `21cfdee7c2f48ab48358dd0fbe0ab18749aac12ff2c00a9c6aafa748e6e38c9d` | `81d49c6cc3f8cf6ea8bee59330ec562998ce6def0ea137d06287bd21376214df` | 273 | 7,809 |
+
+- Integrated warm repeat byte equality: `true`.
+- Integrated warm/pristine byte equality: `true`.
+- Integrated provenance also agrees on framework `0.0.6`, 35 packages, 2,188,579 uncompressed
+  bytes, and 317,178 compressed bytes.
+- The final pristine generation left the Git tree clean, and its task-reported metadata agreed
+  with the generated file read-back.
+
 ## Trigger path
 
 The generator reads the root manifest, each immediate `packages/*` and `plugins/*` manifest, each
@@ -79,6 +96,9 @@ quality.
 | RED | Detached throwaway worktree at `ec848e6b0334ec8fcd2bc66ba009305d35367b01` | 1 | Expected stale-corpus diagnostic matched; worktree add/remove each exited 0. |
 | GREEN | Fresh generated corpus in live worktree | 0 | Provenance payload SHA `749a692a…`, 272 subpaths, 7,803 symbols. |
 | GREEN through CI runner | Exact `run-gate.ts --gate mcp-export-corpus --id quality-mcp-export-corpus` invocation | 0 | Receipt outcome `PASS`; child exit 0. |
+| RED after integration | Detached throwaway worktree at current main `37452f11f5045f0f5a98e07d802bcc2a2e94333b` | 1 | Expected stale-corpus diagnostic matched; worktree add/remove each exited 0. |
+| GREEN after integration | Fresh regenerated corpus in live integrated tree | 0 | Payload SHA `81d49c6…`, 273 subpaths, 7,809 symbols. |
+| GREEN through CI runner after integration | `run-gate.ts --gate mcp-export-corpus` with an isolated final evidence ID/receipt | 0 | Receipt outcome `PASS`; child exit 0. |
 
 ## Required validation
 
@@ -88,6 +108,8 @@ quality.
 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` | 0 | PASS — 342 files, 3 batches, 0 failed batches/findings |
 | Parsed YAML assertion | 0 | PASS |
 | Classifier reachability assertion | 0 | PASS |
+| Final integrated pristine-cache generation | 0 | PASS — byte-identical to the integrated warm result |
+| Generated-corpus lockfile diff | 0 | PASS — no `deno.lock` change |
 
 `deno task e2e:cli` was not run, per the explicit non-scope instruction.
 
@@ -96,7 +118,17 @@ quality.
 - First remote-main fetch: `REAL_EXIT=0`; `origin/main` advanced during the slice to
   `37452f11f5045f0f5a98e07d802bcc2a2e94333b`.
 - The intervening changes include #1917's classifier repair and #1915's package/plugin public
-  surface plus regenerated corpus, so integration/regeneration is required rather than assuming
-  the dispatched-base blob carried.
-- Final integrated-main SHA, regenerated SHA/cardinalities, lock verdict, and clean status: pending
-  slice 3.
+  surface plus regenerated corpus, so the branch merged that exact main SHA without rebasing.
+- The expected generated-file conflict was resolved exclusively by
+  `deno task gen:mcp-export-corpus`; no concurrent public surface was hand-edited.
+- Integration merge: `92ae7df426f069be2700bbd6b093fb55d8a4d1b3`.
+- Current main itself remained stale after its merge: its corpus payload SHA was `658a3a563acf6041d3446c298d2349c86c01968ade340cb971ba895ee8a9c33f`, while regeneration from
+  that exact public surface produced the final `81d49c6c…` payload. The current-main throwaway RED
+  independently confirmed the stale state.
+- Final generated-file SHA is `21cfdee7c2f48ab48358dd0fbe0ab18749aac12ff2c00a9c6aafa748e6e38c9d`;
+  payload SHA is `81d49c6cc3f8cf6ea8bee59330ec562998ce6def0ea137d06287bd21376214df`;
+  cardinalities are 273 subpaths and 7,809 symbols.
+- `origin/main` was fetched again after the final pristine-cache check and remained exactly
+  `37452f11f5045f0f5a98e07d802bcc2a2e94333b`.
+- Diff/lock hygiene assertions returned `REAL_EXIT=0`; only the intended workflow step, generated
+  corpus, and harness run artifacts differ from integrated main.

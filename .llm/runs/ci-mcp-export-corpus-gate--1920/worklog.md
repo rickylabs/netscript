@@ -62,6 +62,10 @@ other quality receipts.
 | 2026-09-02 | 2 | Teeth | Detached throwaway worktree at stale base returned exit 1; the fresh live tree and exact catalog runner each returned exit 0. |
 | 2026-09-02 | 2 | Static validation | Parsed YAML assertion returned 0; requested structured tools check selected 342 files/3 batches and returned 0. |
 | 2026-09-02 | 2 | Reconcile | Draft PR #1929 is open with exact requested taxonomy/milestone. `origin/main` advanced to `37452f11f`; it changes both the classifier (#1905/#1917) and corpus (#1915), so planned integration slice 3 is required. |
+| 2026-09-02 | 3 | Integrate | Merged exact `origin/main` SHA `37452f11f` without rebasing. The sole expected generated-corpus conflict was resolved by regeneration, producing merge `92ae7df42`. |
+| 2026-09-02 | 3 | Final determinism | Integrated warm generation, warm repeat, and new pristine-`DENO_DIR` generation all exited 0 and were byte-identical: file SHA `21cfdee7…`, payload SHA `81d49c6c…`, 273 subpaths, 7,809 symbols. |
+| 2026-09-02 | 3 | Final teeth | Detached current-main RED exited 1; integrated fresh check and catalog runner each exited 0. |
+| 2026-09-02 | 3 | Final validation | YAML parse, nine-case classifier proof, structured tools check, lockfile assertion, and diff-scope assertion all exited 0. A final fetch confirmed `origin/main` had not moved. |
 
 ## Decisions
 
@@ -75,6 +79,7 @@ other quality receipts.
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Documented `rtk` executable is absent on this host | minor | yes |
+| Environment GitHub token lacked workflow scope; stored authenticated CLI token used | minor | yes |
 
 ## Gate Results
 
@@ -93,6 +98,9 @@ other quality receipts.
 | Stale corpus RED | PASS (`REAL_EXIT=1`) | Detached throwaway worktree at dispatched stale base; expected diagnostic matched. |
 | Fresh corpus GREEN | PASS (`REAL_EXIT=0`) | Live tree at dispatched surface state. |
 | Catalog-runner invocation | PASS (`REAL_EXIT=0`) | Receipt outcome `PASS`, command `deno task check:mcp-export-corpus`. |
+| Integrated current-main stale corpus RED | PASS (`REAL_EXIT=1`) | Detached throwaway worktree at `37452f11f`; expected diagnostic matched. |
+| Integrated fresh corpus GREEN | PASS (`REAL_EXIT=0`) | File SHA `21cfdee7…`, payload SHA `81d49c6c…`, 273 subpaths, 7,809 symbols. |
+| Integrated catalog-runner invocation | PASS (`REAL_EXIT=0`) | Receipt outcome `PASS`, child exit 0. |
 
 ### Runtime Gates
 
@@ -100,7 +108,8 @@ N/A — no runtime behavior changed. `deno task e2e:cli` is explicitly prohibite
 
 ## Handoff Notes
 
-- Supervisor should inspect the exact workflow step, determinism hashes/cardinalities, classifier
-  derivation, throwaway-worktree RED, live-tree GREEN, and remote-main comparison.
+- Supervisor should inspect the exact workflow step, final determinism hashes/cardinalities,
+  classifier derivation, current-main throwaway-worktree RED, integrated-tree GREEN, and the
+  main-integration merge.
 - Tier-A slice review and separate-session IMPL-EVAL remain pending; this author will not mark the
   PR ready or merge it.
