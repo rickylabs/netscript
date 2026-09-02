@@ -7897,3 +7897,14 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   head, which is the point: the diagnostics land alongside the fixed observer.
 - #1249 launched: thread `01a06460-7dea-7fa2-8dd1-655efa8df646`, gpt-5.6-sol·medium.
 - Watcher `/tmp/waitpk2.sh` on both heads; packet + coordinator notify on exact green.
+
+## 2026-09-02T23:40Z — #1249 S1 done; #1481 commits pushed by supervisor
+
+- **#1249** worker (`01a06460`): plan lock `e6bc67ea2`, S1 RED `01199099a`
+  `test(fresh/form): reproduce controlProps role incompatibility`, S1 GREEN `63c9610f7`
+  `fix(fresh/form): make control props element-assignable`. On to S2 (Zod 4 probe).
+- **#1481/#1945** worker `01a06322` stalled again mid-turn (14 min after a command) with clean tree
+  and `0fd04af6d`+`0c1778026` unpushed → supervisor pushed exactly (no rebase; 18 files
+  +459/−185 over the brief). Nudge `/tmp/nudge1481c.md`: merge main `ba6f1f49a`, gates, PR body,
+  worklog. PR #1945 is draft → no CI until ready-for-review.
+- #1959 close-gate red = open DoD (hosted ×2, IMPL-EVAL) — expected, watcher tolerates it.
