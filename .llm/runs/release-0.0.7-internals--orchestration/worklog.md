@@ -10904,3 +10904,14 @@ grep missed it), so the 13.5.3 describe URL-scheme drift is now the cut blocker.
 intermittency (pass on #1952's docker run, fail here and twice on #1957) points at a race between
 `describe` and endpoint allocation. Owner aspire; diagnostic leaf offered (capture describe JSON in
 the failure path). #1952 unaffected, awaiting CI at 478450a3c.
+
+### D-266 — `no TCP URL` root cause confirmed by coordinator: order-dependent `findResource` picks `postgres-password` (urls=[]) before `postgres-<DCP id>`; my race hypothesis withdrawn
+
+Contract isolation (D-260) stands; the cause I proposed (timing race) was wrong — it is a
+resource-selection precedence bug in `findResource()` (`name.startsWith('postgres-')`). Also
+sharpened D-265's correction: "not in the prod suite" was true at canary.6 (59 gates, none named
+live-db-endpoint) and false at canary.7 (71 gates) — the suite grew between cuts and I carried the
+stale fact forward. Lesson: a suite membership claim is head-bound like any other receipt.
+Coordinator's E2E-only microfix agent owns the fix (displayName/name priority, unique TCP-capable
+fallback, regression test); #1952 and #1959 do not touch it. Internals: no duplication, no rescope;
+queue continues at #1952 → CI at 478450a3c.
