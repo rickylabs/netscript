@@ -10691,3 +10691,21 @@ at the now-stable `2e0699bf3` with the lane idle; waiting on the *agent* conclus
 files under `application/resource-slice/`, intersecting #1664's 51 files, Slice A's four, and Slice
 B on **nothing** — measured. Pure application logic under D3's narrowed contract; told to stop on any
 file outside the ten. Slices A (behind #1664) and D–G (ordered) remain.
+
+### ~19:30Z — the cloud lane is discarding PASS verdicts; #1941 rerouted native
+
+#1941's eval: `authorize=success agent=success`, and the preserve step's own log shows
+**`AGENT_VERDICT: PASS`, `AGENT_VERDICT_STATE: parsed`** — then
+**`Expected exactly one changed evaluate.md; found 0.`** → exit 1 → `verdict: NONE`,
+`artifact-unavailable`. The head never moved (`22cc3e5b8` throughout), so this is **not** the
+mid-run push I blamed for #1943; both losses are the same cause — the GLM agent does not write the
+`evaluate.md` that #1894's durability gate requires, and the gate correctly refuses to publish a
+verdict without its artifact. A ~45-minute evaluation reached PASS and the PR cannot see it.
+
+Correction to my earlier record: #1943's loss was very likely this too, not my push. The
+diagnostic's "without mutating the evaluated head" wording is misleading for the unchanged-head
+case. Reported on #1894 with both runs.
+
+Dispatched a **native Fable 5 IMPL-EVAL** for #1941, instructed to write `evaluate.md` into the run
+dir itself so the receipt is durable — the lane-policy local default, and the route that worked for
+#1891. #1943's retrigger is still running; if it fails the same way it goes native too.
