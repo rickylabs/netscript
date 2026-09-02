@@ -148,8 +148,13 @@ genuinely cannot express the thing.
 
 ### 1. Resource lifecycle events (preferred — push-based, no timing)
 
-Every resource builder exposes subscription handles. `onResourceReady` fires for _"the resource that
-is in a healthy state"_ — it **is** the native readiness signal.
+Every resource builder exposes subscription handles. Resource events are raised **per resource**, in
+the order listed below.
+
+**`ResourceReadyEvent` is raised when a resource _initially_ transitions to a ready state — it fires
+once.** It is the native _first-readiness_ signal, not a health-transition stream. Do not use it to
+assert recovery after an induced failure: it will not fire again, so the test hangs instead of
+failing. For repeated transitions use the stream in section 3.
 
 | Handle                             | Fires when                       |
 | ---------------------------------- | -------------------------------- |
@@ -179,12 +184,35 @@ Reached via `builder.notifications()`:
 and `exitCode`. Because `waitForResourceStates` accepts arbitrary target states and the DTO carries
 health, **both arrival and departure are natively expressible**.
 
-### 3. `aspire wait` (CLI) — arrival only, and it answers from cache
+### 3. `aspire describe --follow` — a transition stream from outside the AppHost
 
-`aspire wait --status healthy|up|down` is fine for coarse arrival gating from outside the AppHost.
-It is **not** an observation primitive: it answers from the last completed evaluation, so
-immediately after you induce a transition it can return the _previous_ verdict and exit 0. Never use
-it to observe a transition you just caused.
+```
+aspire describe <resource> --follow --format Json
+```
+
+> `-f, --follow` — Continuously stream resource state changes. In JSON mode, each update emits a
+> single JSON object per line (NDJSON), showing the resource name, state, health and endpoints.
+
+This is the right tool when the observer is **not** inside the AppHost — E2E harnesses, scripts, CI
+gates — and whenever you need **repeated** transitions (healthy → unhealthy → healthy), which the
+one-shot lifecycle events cannot give you.
+
+Two rules:
+
+- **Subscribe before you induce.** Start the follower, _then_ cause the transition, then await.
+  Starting it afterwards reintroduces the race you are removing.
+- **Buffer.** Lines can arrive between subscribing and awaiting; a reader that only listens for
+  future lines will miss them.
+
+Snapshot mode (no `--follow`) wraps resources in `{ "resources": [...] }`; follow mode emits one
+JSON object per line.
+
+### 4. `aspire wait` (CLI) — arrival gating only, and it answers from cache
+
+`aspire wait --status healthy|up|down` is fine for coarse arrival gating. It is **not** an
+observation primitive: it answers from the last completed evaluation, so immediately after you
+induce a transition it can return the _previous_ verdict and exit 0 — measured at 1409 ms in a real
+case. Never use it to observe a transition you just caused.
 
 ### Anti-pattern: hand-rolled health/lifecycle checks
 
@@ -194,7 +222,8 @@ Do not write, and remove on sight:
 - `*_DEADLINE_MS` / `*_POLL_MS` / `*_TIMEOUT_SECONDS` constants chosen to "exceed Aspire's
   evaluation interval";
 - retry-until-success `fetch` loops standing in for readiness;
-- parsing `aspire describe`/`aspire ps` output to infer a transition.
+- parsing repeated `aspire describe`/`aspire ps` **snapshots** to infer a transition — use
+  `--follow` and read the stream.
 
 Every one of these is a local reimplementation of something Aspire already emits, and each is a
 future flaky test. This is AGENTS.md operating rule 3 (_wrap, do not reinvent — prefer upstream APIs
