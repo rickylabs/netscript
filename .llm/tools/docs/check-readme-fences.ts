@@ -89,8 +89,7 @@ export async function checkReadmeFences(
       analysisFor(all, checked, exempt),
       repositoryRoot,
     );
-    plain = String((result as unknown as { diagnostics?: string }).diagnostics ?? '')
-      .replaceAll(ANSI, '');
+    plain = result.diagnostics.replaceAll(ANSI, '');
     const syntax = SYNTAX_FAILURE.exec(plain);
     if (!syntax) break;
     const [, sourcePath, line] = syntax;
