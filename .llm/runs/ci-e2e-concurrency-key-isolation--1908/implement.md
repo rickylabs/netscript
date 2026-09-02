@@ -1,3 +1,12 @@
+use harness
+
+## SKILL
+
+Activate `netscript-harness` for this slice, plus `netscript-tools` (repo tooling, validation
+evidence, real captured exits, lock hygiene) and `netscript-pr` (branch/PR/issue process: the closing
+keyword is mandatory in the PR body, and exactly one `status:` label plus an explicit milestone).
+`netscript-doctrine` is **not** engaged: this slice touches no `packages/**` or `plugins/**` path.
+
 # Implementation brief — #1908
 
 Read `plan.md` in this directory first; it carries the defect proof, the trade-off, and the slices.
