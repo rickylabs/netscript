@@ -9746,3 +9746,33 @@ another topic's running tier job or been evicted itself. That is the precise def
 using the defective path to gather evidence would have produced an unreliable verdict and possibly
 damaged another lane's run. Ran `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
 locally at `4e3ab2475` with a real captured exit instead; it contends with nothing.
+
+### D-222 — #1846 and #1890 shipped; #1889's prerequisite cleared and its runtime gate is running
+
+**Both packets merged:** #1846 as `6bb9c00f9`, #1890 as `9924794be`. Main is now `9924794be`.
+
+**#1889 integrated twice in sequence, each at a real boundary.**
+
+1. Onto `6bb9c00f9` (post-#1846) → `186d14bb1`. `deno why` still measured **two** copies, so boxes 1
+   and 6 stayed unchecked — the block was re-confirmed by measurement rather than carried forward as
+   an assumption.
+2. Onto `9924794be` (post-#1890) → `32a16eb51`, pushed as `1154800b9`. `deno why @orpc/shared` now
+   returns **exactly one** copy at `1.15.0`. The prerequisite cleared exactly where predicted.
+
+**The second merge changed `packages/sdk`, so the verdict's carry was re-proved rather than assumed.**
+The delta is precisely #1879's authorized surface — the six `@orpc/*` manifest pins and the two
+upstream fixture imports — and **`packages/sdk/src` is byte-identical across it** (`bc426f364` both
+sides). The slice's evaluated behavioural surface is untouched, so the IMPL-EVAL PASS carries.
+Zero dependency churn vs main; `packages/sdk` type check `REAL_EXIT=0`, 101 files, 0 failures.
+
+**Runtime-lane decision reversed once, on evidence, in both directions.** Earlier a hosted dispatch
+was refused because the lane held 4 active tier jobs while #1846's fix was not yet on main — the old
+cancel-on-arrival semantics would have evicted another topic's run or been evicted. After #1846
+merged and the branch carried `queue: max`, hosted became the correct lane and the local attempt was
+stopped and reaped (`survivors: []`). That local run was doomed regardless: the probe reported
+`docker ps failed … Cannot connect to the Docker daemon`, so the local Docker tier could never have
+passed — which also reframes the two earlier "external Aspire 404" local failures.
+
+Hosted run `33592310517` is now executing both tiers at `1154800b9`. The two runs at the superseded
+head were `cancelled` by per-ref supersession on push — the disclosed F-3 behaviour, not the defect
+#1846 fixed.
