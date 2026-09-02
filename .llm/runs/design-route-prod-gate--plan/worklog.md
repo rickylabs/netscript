@@ -75,6 +75,7 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | 2026-09-02T19:10:00Z | Implement | RED 1 | Added focused middleware/config/materialization expectations and `scaffold.design-production-exclusion` registration/order expectations. The structured test wrapper failed as required: missing `TEMPLATE_KEYS.appRoutesDesignMiddleware` and missing `GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` (exit 1, five type errors). No implementation exists in this step. |
 | 2026-09-02T19:15:00Z | Implement | RED 2 | `scaffold.design-production-exclusion` production-build baseline probe is `HOSTED_PENDING` under `ci:full`. Per the coordinator constraint, no local `e2e:cli`, Aspire, or Docker command was run. |
 | 2026-09-03T00:35:00Z | Implement | GREEN 3 | Added the typed middleware asset, scaffold load/write plumbing, fail-closed runtime middleware, Vite-mode structural ignore, gate ID/command, mutation/restoration probe, and runtime-suite selection. Focused E2E registration/order tests pass 32/32. Structured E2E-source check reaches only the intentional Step-4 stale-barrel error (`TS2741` for the new middleware asset key). |
+| 2026-09-03T01:05:00Z | Implement | GREEN 4 | Ran `deno task gen:assets-barrel`; only `packages/cli/src/kernel/assets/embedded.generated.ts` changed and `deno.lock` remained untouched. The freshness task's pre-commit diff check rejected that intended uncommitted delta; its authoritative PASS is run after this generator commit. |
 
 ## Decisions
 
@@ -98,7 +99,12 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | RED focused tests | EXPECTED_FAIL | Structured `run-deno-test.ts` over five focused unit/E2E files exited 1 with missing middleware asset key and gate ID; 2026-09-02 |
 | GREEN 3 focused E2E tests | PASS | Structured `run-deno-test.ts`; 32 passed, 0 failed |
 | GREEN 3 source check | EXPECTED_STEP_BOUNDARY | Structured `run-deno-check.ts --root packages/cli/e2e/src --ext ts,tsx`; only stale embedded-barrel `TS2741`, to be resolved by GREEN 4 |
-| Local GREEN rows 1–7 | NOT_RUN | Awaiting generated-barrel step |
+| Check | PASS | Structured `run-deno-check.ts --root packages/cli/src --ext ts,tsx`; 711 files, 0 failed batches |
+| Focused tests | PASS | Structured `run-deno-test.ts`; 86 passed, 0 failed across five touched test files |
+| Lint | PASS | Structured `run-deno-lint.ts`; 12 touched non-generated TS files processed across CLI/E2E configs, 0 findings |
+| Format | PASS | Structured `run-deno-fmt.ts`; 12 touched non-generated TS files processed across CLI/E2E configs, 0 findings |
+| Embedded generation | PASS | `deno task gen:assets-barrel`; only the CLI embedded barrel changed; `deno.lock` unchanged |
+| Local GREEN rows 5–7 | NOT_RUN | Freshness post-commit, quality, and architecture gates remain |
 | Hosted development behavior | HOSTED_PENDING | Existing `behavior.app-reference`; local runtime E2E prohibited |
 | Hosted production exclusion | HOSTED_PENDING | New `scaffold.design-production-exclusion` baseline/mutation/restoration probe under `ci:full` |
 

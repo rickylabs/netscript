@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `implement` — source GREEN complete; embedded regeneration next |
+| Current phase | `gate` — source and generated GREEN complete; final local gates running |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`, and RED step 2 remains hosted-pending. GREEN step 3 now implements both independent exclusions and the mutation-proved hosted gate. The focused E2E registration/order tests pass 32/32; the only structured check failure is the deliberately stale embedded barrel assigned to GREEN step 4.
+PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`, RED step 2 remains hosted-pending, and GREEN step 3 is committed at `0fd04af6d`. The embedded barrel has now been regenerated through `deno task gen:assets-barrel`; scoped check/test/lint/fmt rows pass, with freshness/quality/architecture and carrier checks remaining before push.
 
 ## Completed
 
@@ -26,16 +26,17 @@ PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b
 - Received separate-session `PASS_PLAN` at evaluator commit `5566a89f6`.
 - Ran RED step 1 through the structured test wrapper; exit 1 is the expected evidence.
 - Implemented GREEN step 3 and passed the focused E2E registration/order tests (32/32).
+- Regenerated the embedded asset barrel through its generator; no lockfile changed.
 
 ## In Progress
 
-- Regenerate the embedded barrel through its checked-in generator, then run local rows 1–7.
+- Commit GREEN step 4, then finish freshness/quality/architecture and carrier checks.
 
 ## Next Steps
 
-1. Regenerate `embedded.generated.ts` only through `deno task gen:assets-barrel`.
-2. Run local validation rows 1–7 plus the four-carrier pre-push chain.
-3. Push the source and generated GREEN commits, update the PR phase surface, and stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
+1. Commit generator-produced `embedded.generated.ts` as GREEN step 4.
+2. Run freshness/quality/architecture plus the four-carrier pre-push chain.
+3. Push the GREEN commits, update draft PR #1945, and stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
 
 ## Key Decisions
 
