@@ -33,6 +33,8 @@ them to a NetScript host.
   projection for the `authSession` entity, with server-side emit helpers on `./streams/server`.
 - **Provisioning recorded up front** — auth requires Postgres (schema) and Deno KV (sessions); the
   install records both from the manifest so `netscript db` and Aspire provision them for you.
+- **Typed bearer client opt-in** — the manifest advertises a browser/server-safe bearer factory,
+  and install emits `auth/sdk-client.ts` for explicit placement on the `auth-api` client only.
 
 ## Architecture
 
@@ -100,6 +102,36 @@ console.log(
 );
 ```
 
+The manifest reference makes the bearer factory discoverable; it does not activate credentials.
+The install-owned `auth/sdk-client.ts` exports `authSdkClientContribution`. Add it explicitly to the
+named auth service and supply its required context on authenticated calls:
+
+```typescript
+import { createServiceClient } from '@netscript/sdk/client';
+import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
+import { authSdkClientContribution } from './auth/sdk-client.ts';
+
+declare const applicationSession: { accessToken: string; accountId: string };
+
+const auth = createServiceClient({
+  contract: authContract,
+  serviceName: 'auth-api',
+  routerName: 'auth',
+  contributions: [authSdkClientContribution] as const,
+});
+
+await auth.session(undefined, {
+  context: {
+    auth: { getAccessToken: () => applicationSession.accessToken },
+    // Stable and non-secret; never put a token, session id, or email in a cache key.
+    authCachePartition: applicationSession.accountId,
+  },
+});
+```
+
+The generated module reads no environment variable, cookie, or browser storage. Credential lookup
+remains application-owned and per call; bearer headers default to HTTPS plus local loopback origins.
+
 ## Public surface
 
 | Entry              | What it gives you                                                    |
@@ -129,8 +161,9 @@ The always-current symbol list is
 ## Compatibility
 
 The auth API service requires Deno 2.9+ and needs Postgres for the auth schema and Deno KV for
-sessions (both provisioned through `netscript db` and Aspire). The manifest and the browser-safe
-`./streams` subpath are importable in any TypeScript environment.
+sessions (both provisioned through `netscript db` and Aspire). The manifest, typed SDK contribution
+reference, generated bearer starter, and browser-safe `./streams` subpath are importable in any
+TypeScript environment.
 
 ## License
 
