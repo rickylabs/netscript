@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-listener-readiness-diagnostics--0.0.7` |
 | Branch | `fix/listener-readiness-diagnostics` |
-| Current phase | `implement` |
+| Current phase | `gate` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service` |
 
@@ -21,16 +21,19 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 - Aspire 13.5 `logs` non-interactive surface verification.
 - H1 credibility decision and #1952 contract reconciliation.
 - PLAN-EVAL recorded N/A with rationale.
+- S1 RED `e8649ee20`, GREEN `4e1530d6e`.
+- S2 RED `fe68151de`, GREEN `65b80691a`.
+- Focused behavior, check, E2E lint/fmt, parity, quality, and doctrine gates.
 
 ## In Progress
 
-- S2 GREEN is implemented and measured; commit it, then run the complete local gate set.
+- Record final evidence, push the explicit refspec, and open the draft PR.
 
 ## Next Steps
 
-1. Commit S2 GREEN.
-2. Run the complete local gates and record exact evidence.
-3. Push explicit refspec, open the draft PR, and hand off IMPL-EVAL.
+1. Commit final evidence and push the explicit refspec.
+2. Open the draft PR with the brief's labels/milestone.
+3. Leave separate-session IMPL-EVAL and hosted consecutive runs to the supervisor.
 
 ## Key Decisions
 
@@ -56,10 +59,10 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | brief command set |
-| Fitness | pending | quality/doctrine |
+| Static | PASS with two config refusals | checks/tests/E2E lint+fmt green; template lint and CLI-wide fmt excluded by repository config |
+| Fitness | PASS | quality scan and doctrine check exit 0 |
 | Runtime | supervisor-owned | no local lease |
-| Consumer | PASS | focused helper suite, 35/35 |
+| Consumer | PASS | complete helper suite, 278/278 including emitted compile/format |
 
 ## Open Questions
 

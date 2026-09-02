@@ -95,6 +95,8 @@ loop or a literal timeout at the gate call site.
 | 2026-09-03T00:14Z | 2R | RED measured | Structured helper test run exited 1: 29 passed / 5 failed; failures name the absent generated wrapper and missing helper function. |
 | 2026-09-03T00:18Z | 2G | GREEN measured | Structured generator/helper/emitted-compile run passed 35/35 in 8.4s; helper source check selected 39 files with 0 diagnostics; carrier regenerated canonically. |
 | 2026-09-03T00:22Z | 2G | Full-suite correction | Complete helper directory found one stale old-helper import assertion (276 passed / 2 failed); updated the assertion before rerunning the directory. |
+| 2026-09-03T01:05Z | 2G | Full-suite GREEN | Complete helper directory passed 278/278; E2E gate directory passed 183/183. Both source checks passed with zero diagnostics. |
+| 2026-09-03T01:07Z | 3 | Quality gates | E2E lint and focused E2E format passed. Root configuration excludes `packages/cli` template sources, so template lint/fmt wrappers refused with `all-excluded`; emitted helper format is independently green in the 278-test helper suite. Version parity, quality scan, and doctrine check passed. |
 
 ## Decisions
 
@@ -118,15 +120,25 @@ loop or a literal timeout at the gate call site.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| required local gates | implement brief command set | NOT_RUN | Run after GREEN slices. |
-| S1 E2E check | structured `run-deno-check` on `packages/cli/e2e/src` | PASS | 155 files, 2 batches, 0 diagnostics. |
-| S2 helper check | structured `run-deno-check` on Aspire templates | PASS | 39 files, 1 batch, 0 diagnostics. |
+| E2E source check | structured `run-deno-check` on `packages/cli/e2e/src` | PASS | 155 files, 2 batches, 0 diagnostics. |
+| Aspire template check | structured `run-deno-check` on template root | PASS | 39 files, 1 batch, 0 diagnostics. |
+| E2E gate tests | structured `run-deno-test` on gate directory | PASS | 183 passed / 0 failed. |
+| Aspire helper tests | structured `run-deno-test` on helper test directory | PASS | 278 passed / 0 failed. |
+| E2E lint | structured `run-deno-lint` on E2E source | PASS | 155/155 processed, 0 findings/refusals. |
+| Template lint | structured `run-deno-lint` on Aspire template source | REFUSAL | Repository lint config excludes `packages/cli`; 39 selected / 0 processed, `all-excluded`. |
+| E2E source format | structured `run-deno-fmt` | PASS | 155/155 processed, 0 findings/refusals. |
+| E2E test format | structured `run-deno-fmt` | PASS | 27/27 processed, 0 findings/refusals. |
+| CLI-wide format | brief command | REFUSAL | Root fmt config excludes `packages/cli`; 955 selected / 214 processed. Emitted helper format test passes. |
+| Aspire parity | `deno task check:aspire-version-parity` | PASS | 907 checked, 0 failures, manifest fresh. |
+| Lock hygiene | `git diff 5ce87fb8b..HEAD -- deno.lock` | PASS | No output; byte-identical. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-1…F-19 / F-CLI | NOT_RUN | `quality:scan`, `arch:check`, manual review | Planned after GREEN. |
+| `quality:scan` | PASS | repository scanner | 0 findings; 7 pre-existing allowances. |
+| `arch:check` | PASS | doctrine/dependency composite | Exit 0; existing warnings only, including recorded CLI cardinality debt. |
+| F-CLI manual | PASS | diff review | No command, composition, registry, folder, or public-surface change. |
 
 ### Runtime Gates
 
