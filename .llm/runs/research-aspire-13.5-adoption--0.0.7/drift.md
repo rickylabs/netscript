@@ -7973,3 +7973,35 @@ carrier; regenerate rather than resolve).
 Both branches therefore carry edits under `.claude/skills/**` beyond the single bridge skill the
 ruling preserves. If the bridge repair prunes that tree, those edits conflict or are dropped. Flagged
 rather than acted on.
+
+## D-308 — S9 cannot produce a v1 runtime receipt in any state, and the scope grant may be inert
+
+Internals asked me to dispatch S9's runtime while #1910's v2-key tiers were executing, to supply
+#1908's acceptance box 1 (the missing direction: a **fixed** branch surviving a **pre-#1846**
+arrival). Declined, on three grounds.
+
+**Hard block.** #1759 is `mergeable=false` with `merge_commit_sha=none` — it went `CONFLICTING` when
+S8 merged as `0622dc432` while it still carried S8's pre-merge commits. GitHub cannot compute a merge
+ref, so a `pull_request` run has nothing to build against. Removing `ci:skip-e2e` would not change
+that.
+
+**Ownership.** The owner reassigned #1759's repair *and restack* to the coordinator, with an explicit
+instruction not to duplicate. Dispatching runtime there, or lifting a hold label I applied, is now
+theirs.
+
+**The finding worth more than the run.** S9 cannot supply box 1 in *any* state, and the reason is
+structural rather than scheduling: restacking merges current `main`, which carries #1846, so the
+branch stops being pre-#1846 exactly when it becomes dispatchable. It is either
+unrestacked-and-undispatchable or restacked-and-no-longer-v1 — there is no state where it is both.
+Told internals so they weigh the #1889 label route as the only path rather than as second-best.
+
+**Scope grant may be inert.** `gh auth status` shows two credentials:
+
+    GH_TOKEN (ghp_…)  scopes: 'repo'                                  <- active
+            (gho_…)   scopes: 'gist', 'read:org', 'repo', 'workflow'
+
+The `workflow` scope was granted on the OAuth token, but `GH_TOKEN` takes precedence and carries only
+`repo`, so a push touching `.github/workflows/**` is still refused. This blocks S9's restack in
+particular, since S9 authors workflow content and cannot adopt the fix without it. **Not routed
+around**: selecting the other credential to bypass a refusal would be the same boundary-laundering I
+declined to do on internals' behalf earlier. Surfaced as a configuration finding instead.
