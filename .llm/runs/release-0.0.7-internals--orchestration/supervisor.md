@@ -249,3 +249,45 @@ thread recorded in `HANDOFF-CHECKPOINT.md` was **adopted**, not recreated.
 - **#1737 / leaf 1737** — worktree at `d338145da…` with the same 4 dirty files; no process holds the
   worktree as cwd, but the rollout for thread `01a055b6-e5ed-7e62-a47f-c8f278533a96` was last
   written ~6 min before resume, so the resumed author is treated as recently active, not dead.
+
+## 2026-09-02 resume — active Claude topic controller (Opus 5 / high), r4
+
+Supersedes the 2026-08-15 attachment block above, whose `cwd`
+(`/home/codex/repos/netscript-007-internals`) no longer exists — `/home/codex` was a symlink to
+`/home/agent` and was removed in the 2026-08-30 host restart. That block is history only; the
+session it describes is not resumable.
+
+| Field | Value |
+| --- | --- |
+| Role | `topic-internals-0.0.7` |
+| Claude session ID | `98833bca-9714-4f63-8230-2e3929f6b103` |
+| Bridge session ID | `session_01CUWDTC8s7BS9tUWU8nrKge` (non-empty → Remote Control attached) |
+| Remote Control URL | `https://claude.ai/code/session_01CUWDTC8s7BS9tUWU8nrKge` |
+| Registry name | `007-internals-7e` (derived) |
+| PID | `2874439` (ancestry: `2874439` → tmux `1311`) |
+| `pidDomain` | `linux:df023242ddc6478dbe458151b0032ff1:pid:[4026533730]` |
+| tmux | `netscript-007-internals-r4:@76.%76` |
+| cwd | `/home/agent/projects/netscript/worktrees/007-internals` |
+| CLI version | `2.1.257` |
+| Observed launch flags | `--model claude-opus-5 --effort high --remote-control "netscript-0.0.7 internals supervisor r4" --dangerously-skip-permissions` |
+
+Requested route (`claude-opus-5`, effort `high`) equals observed route, read from
+`/proc/2874439/cmdline` rather than from a status field. Identity confirmed by matching `pid`, `cwd`
+and `bridgeSessionId` in `~/.claude/sessions/2874439.json` against the walked process ancestry.
+Several stale entries exist for this cwd from pre-restart hosts; they differ by `pidDomain`.
+
+**Credential posture changed since the last block:** `gh auth status` reports scopes
+`gist, read:org, repo, workflow`. The `workflow`-scope wall that shaped D-224 through D-226 is gone.
+
+### Dispatch ledger for this rotation
+
+| Issue | Branch | Worktree | Thread | Route (requested == observed) |
+| --- | --- | --- | --- | --- |
+| #1905 | `ci/fresh-ui-lock-gate-triggers` | `worktrees/007-leaf-1905` | `01a06193-2960-7a30-8c87-3a8e12b57a6a` | openai · gpt-5.6-sol · high |
+| #1913 | `ci/repo-wide-concurrency-bounds` | `worktrees/007-leaf-1913` | not yet dispatched | openai · gpt-5.6-sol · high (planned) |
+
+Steering issued on `01a06193`: one resume after the supervisor's own foreground-launcher timeout
+killed the worker (D-231), sent detached via `codex-resume.ts --message-file`, message archived at
+`/home/agent/observability/netscript-internals/1905-resume-1.md`. **All launches and resumes for
+this lane are detached under `setsid nohup` from here on** — a foreground call SIGTERMs the worker
+at the tool timeout.
