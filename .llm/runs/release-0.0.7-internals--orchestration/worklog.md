@@ -10157,3 +10157,69 @@ manufacture a false green. Separately, the new `paths:` entries sit after the `.
 negations, but they are positive patterns that do not overlap the exclusions, so last-match-wins
 ordering is unaffected — and the author added a test pinning the negations after the positive
 Fresh UI glob anyway.
+
+### D-233 — IMPL-EVAL PASS_WITH_FINDINGS on #1905, and it caught a supervisor error I had propagated to five places
+
+Evaluator: native opposite-family **Fable 5.1**, effort medium, per lane policy for Codex-authored
+work (`formal_impl_evaluation`). Fresh session `27ba1af4-168b-4c20-aa45-095d071956b2`, headless via
+`claude-print.ts`, detached, from a dedicated worktree `007-eval-1905` detached at `7592fa9df`.
+Requested route == observed route, read from the session's own `init` event (`model:
+claude-fable-5-1`) rather than from a status field — the same discipline D-231 had to learn the hard
+way. The generator never evaluated itself.
+
+**Verdict `PASS_WITH_FINDINGS`.** The code is accepted: scope exact at seven paths with no lockfile
+in the diff; a 250-path corpus comparison against the base classifier found **0 narrowed** capability
+contributions and 150 widened, all of them the intended `freshUi` ones; the frozen fail-open safety
+property intact; both `paths:` arms byte-identical with negation ordering preserved; gates green at
+real exit 0. The structural reader was proven to **fail closed** under eight mutations — empty file,
+doubled indentation, entries deleted, empty `paths:` keys, one-arm divergence, negations reordered —
+each producing the right failing assertion, with only a quote-style change correctly tolerated. That
+is a stronger proof of the fail-closed property than my own reasoning about it, which was analytical
+rather than tested.
+
+**F1 (MAJOR, evidence) — the post-merge box-1 recipe was self-defeating, and it was mine.** The
+recipe said: one PR whose diff is a member manifest change **plus a stalened
+`packages/fresh-ui/deno.lock`**. But at base `77ad823dc` that lockfile **already** matches the
+pre-existing `packages/fresh-ui/**` glob and **already** classifies `freshUi: true` through
+`path.startsWith('packages/fresh-ui/')`. Verified directly against the base tree before propagating
+the correction:
+
+```
+BASE classifier freshUi(packages/fresh-ui/deno.lock) = true
+BASE classifier freshUi(packages/sdk/deno.json)      = false
+base fresh-ui-quality.yml: 'packages/fresh-ui/**' on both arms (lines 8, 21)
+```
+
+Such a PR triggers with or without the fix. It re-proves box 2 and proves nothing about box 1 —
+**the exact conflation I had written three separate warnings against**, reintroduced inside the
+instruction that issued them. The issue's own wording of box 1 ("changes only a member manifest's
+dependency declaration") already described the right test; my recipe contradicted the issue text and
+neither the author nor I noticed, because the author inherited it from me and had no reason to
+re-derive it.
+
+**Corrected recipe:** the one-shot post-merge PR changes **only** a member manifest's dependency
+declaration (e.g. `packages/sdk/deno.json`, `^1.15.0` → `^1.14.0`) and touches **no lockfile**. The
+manifest-versus-lock mismatch is what `--frozen` detects — the #1890 shape. With a manifest-only
+diff the only path that can have matched the trigger is the new glob, so a started run proves box 1
+and a failing frozen step re-proves box 2 on the same run.
+
+**The error had spread to five places, all now corrected:** the implementation brief, my dispatch
+comment on #1905, the PR #1917 packet, `HANDOFF-CHECKPOINT.md` obligation 1, and D-230 above (this
+entry supersedes its recipe). A wrong instruction propagates as fast as a right one, and mine had a
+day's head start on the evaluator.
+
+**The general lesson, which is the reason the evaluator is mandatory rather than discretionary.** I
+verified the author's work three times — RED, GREEN, teeth — and each check confirmed something the
+author had *done*. None of them could catch a defect in what I had *specified*, because the author
+was faithfully executing my specification and my verification was aimed at their execution of it.
+Only a party with no stake in my instructions was positioned to find it. Self-review scales to
+execution errors and not to specification errors.
+
+**F2 (MINOR, accepted as follow-up):** `examples/*` and `apps/*` are declared root workspace globs
+uncovered by either layer. Not a staling input today — neither directory exists at this head and the
+private lock carries no such member — but when the first member lands there the lock goes stale at
+the same moment the trigger is missing, which is the #1890 shape once more. Deferred deliberately
+with a contributor path recorded, not silently.
+
+Author steered to correct `evidence.md` and `drift.md` only; no source change is required and none
+is authorized.

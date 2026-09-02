@@ -41,14 +41,26 @@ outside this lane.
 
 ## Obligations this supervisor carries (not the authors')
 
-1. **#1905 acceptance box 1 is not closable pre-merge.** GitHub evaluates a `pull_request` `paths:`
-   filter from the base+head merge ref, and the trigger is `branches: [main]`. Every pre-merge PR
-   carrying the fix also carries `.github/workflows/fresh-ui-quality.yml` in its own diff — already a
-   triggering path — so no pre-merge PR can isolate the new trigger. After merge, open one PR whose
-   diff is a single member manifest plus a deliberately stalened `packages/fresh-ui/deno.lock`,
-   confirm `fresh-ui-quality` runs **and fails**, post the run id on #1905, then close the PR
-   unmerged. **The issue does not close before that receipt exists.** Stated on the issue at
-   dispatch, not discovered at close-gate.
+1. **#1905 acceptance box 1 is not closable pre-merge, and the recipe was wrong once already.**
+   GitHub evaluates a `pull_request` `paths:` filter from the base+head merge ref, and the trigger
+   is `branches: [main]`. Every pre-merge PR carrying the fix also carries
+   `.github/workflows/fresh-ui-quality.yml` in its own diff — already a triggering path — so no
+   pre-merge PR can isolate the new trigger. IMPL-EVAL confirmed this after independently trying to
+   construct an isolation proof and failing.
+
+   **The corrected post-merge recipe** (the first one, written by this supervisor, was self-defeating
+   and is superseded): open one PR whose diff changes **only a member manifest's dependency
+   declaration** — e.g. narrow `npm:@orpc/client@^1.15.0` to `^1.14.0` in `packages/sdk/deno.json` —
+   and touches **no lockfile**. The manifest-versus-lock mismatch is what `--frozen` detects.
+   With a manifest-only diff the only path that can have matched the trigger is the new glob, so a
+   started run proves box 1 and a failing frozen step re-proves box 2 on the same run. Post the run
+   id on #1905, then close the PR unmerged.
+
+   **Why the first recipe was wrong, so it is not reinvented:** it also stalened
+   `packages/fresh-ui/deno.lock`, which at base already matches `packages/fresh-ui/**` and already
+   classifies `freshUi: true`. Such a PR triggers with or without the fix. **#1905 does not close
+   before the corrected receipt exists.**
+
 2. **#1913 may need a supervisor decision.** The issue's acceptance assumes `queue: max` on both
    groups. For `release-canary` that is not obviously right: the group serializes *publishes* of one
    version against an immutable registry, where "replace the pending one" may be safer than "run
