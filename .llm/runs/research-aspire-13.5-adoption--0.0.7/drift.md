@@ -8527,3 +8527,17 @@ verdicts supersede the carry.
 - **Follow-up (not this run):** phase-eval should accept an `iterations=` cap from the trigger
   comment and release the claim when the claimed run is cancelled before model evaluation; the
   evaluator prompt should refuse to finish without a verdict file. Candidate issue under #574.
+
+## D-334 — eval worktree removed externally mid-evaluation (2026-09-02 23:47Z)
+
+- Detached eval worktree `worktrees/007-eval-1952` (@ `478450a3c`, evaluator session
+  `16762a5f-40e0-41a1-96b4-57d02472f738`, ~7 min in, 14+ turns) vanished from disk and from
+  `git worktree list` at ~23:47Z; this lane did not remove it and no teardown was run here. The
+  evaluator process died with its cwd; stream, brief copy and any partial `evaluate.md` are lost.
+- Likely cause: generic `007-eval-<n>` naming collided with another lane's cleanup (the internals
+  lane owns `007-leaf-1952` on `fix/aspire-1880-readiness-contract-internals` at the same head).
+  Not proven.
+- Mitigation: re-dispatched as `worktrees/007-aspire-eval-1952` (lane-prefixed name), session
+  `a27d7dd5-88ac-4654-9e65-477f6e21c3d3`, same brief and head. Rule for this lane going forward:
+  eval worktrees are named `007-aspire-eval-<n>`; the wait loop also exits if the worktree
+  disappears so the loss is detected at once instead of reading as a hang.
