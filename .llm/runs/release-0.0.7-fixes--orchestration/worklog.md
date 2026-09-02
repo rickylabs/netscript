@@ -7652,3 +7652,10 @@ unsupported, which plausibly explains why three prior confident diagnoses failed
   resolve.
 
 Root cause remains **undetermined**; no fix is named on purpose.
+
+## 2026-09-02T16:40Z — resumed after compaction (Fable 5.1 low)
+
+- **#1455 / PR #1938**: PLAN-EVAL on `f655c3405` = `PASS_PLAN` (qwen/qwen3.8-flash, separate session; three non-blocking notes). Worker thread `01a06201` produced GREEN `4903a6afc` (feat(workers): bind enqueue payload to job definition) then stalled 20 min unpushed; supervisor pushed the exact commit (no rebase) and resumed the same thread with gates → worklog receipt → PR body/ready steer (`/tmp/green1455.md`). RED `8e7cf697c`, receipt `c9045f7a5`.
+- **#1930 (#1926)**: at `b3a861918` `desktop-native-linux` = **success** (regression repaired on CI), `scaffold-static`/`sqlite` success, postgres runtime in progress (run 33653416477). `ci` run 33653416445 fails only at `close-gate` — expected while `status:impl-eval` and DoD box open.
+- **#1844 recurrence evidence**: run 33638728013 at `f8df31782` (desktop-fixture-only diff) failed `scaffold-runtime (aspire + docker + postgres)` with `resource postgres health key postgres_listener was never published; readiness deadline 300s elapsed`. Not attributable to #1930; it is the observational flake #1844 tracks. Recorded here for #1844's honest acceptance resolution.
+- **#1909**: rebased `--onto origin/main 850cc7757` (old base `4720596fc`): `1664b489e` → `3d87111ad`. Hardenings verified post-rebase: `status !== 'Unhealthy'` guard 1, `(?=$|\s)` 1, `(?!\w)` 0, `resource-state-stream.ts` 9,230 B, direct `deno check` clean. Force-pushed; awaiting e2e-cli dispatch. Prior run 33637525449 desktop failure was the #1926 `@orpc/contract` isolated-install error — not #1909-attributable.
