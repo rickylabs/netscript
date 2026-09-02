@@ -1,0 +1,138 @@
+# Plan: Slice G consumer guidance and hosted acceptance hook
+
+## Run Metadata
+
+| Field | Value |
+| ----- | ----- |
+| Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
+| Branch | `feat/cli-resource-slice-acceptance` |
+| Phase | `plan` |
+| Target | `packages/cli` and its nested E2E harness |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `none` |
+
+## Archetype
+
+Archetype 6 applies because the touched package ships the CLI and scaffold tooling. This slice adds no new command or application abstraction; it registers semantic E2E definitions and updates generated consumer guidance while preserving the existing kernel/surface split.
+
+## Current Doctrine Verdict
+
+`packages/cli` is **Keep**: preserve the Archetype-6 kernel/surface split.
+
+## Axioms in Play
+
+| Axiom | Why it matters |
+| ----- | -------------- |
+| A2 | Generated guidance must make the safe consumer path explicit. |
+| A8 | New E2E definitions stay in the existing scaffold-gate concern folder. |
+| A10 | Suite composition remains declarative and gate definitions stay separate. |
+| A14 | Static tests must prove command shape, ordering, reachability, and rerun expectations before hosted execution. |
+
+## Goal
+
+Add two resource-generation gates to the existing `scaffold.runtime` route and teach generated consumers to run `netscript generate resource` before manually constructing the web-layer pattern.
+
+## Scope
+
+- Add stable first-run and rerun gate IDs.
+- Define an explicit users/list/partial resource command and a captured rerun skip assertion.
+- Compose both gates after generated service discovery and expose them through `RUNTIME_GATES`.
+- Add focused definition, order, membership, reachability, and guidance tests.
+- Reword both rendered one-screen guides.
+- Teach the existing runtime-suite success fake to emit the rerun gate's expected captured output.
+
+The amended eight-file ceiling applies to product files. Required `.llm/runs/feat-cli-resource-slice-acceptance--1354-g/` harness artifacts are tracked run context and are outside that product touch set.
+
+## Non-Scope
+
+- Running Aspire, Docker, browser, or any `e2e:cli` runtime command locally.
+- Changing resource generation, selection, templates, command registration, generated service clients, or `service-query`.
+- Adding a suite, splitting the runtime command, or changing runner/output infrastructure beyond the explicitly authorized success-fake stdout fixture.
+- Closing #1354 or its umbrella.
+
+## Hidden Scope
+
+- `RUNTIME_GATES` must be exported from its existing module so the new test can directly prove membership.
+- The rerun gate must retain output capture and require the exact `0 written, 11 skipped, 0 conflicts` summary.
+- Both resource IDs must be selected before generated-project quality/type-check gates, not merely registered.
+
+## Locked Decisions
+
+| ID | Decision | Rationale |
+| -- | -------- | --------- |
+| G1 | Gate IDs are `scaffold.resource-generate` and `scaffold.resource-rerun`. | Stable, action-oriented IDs follow the existing scaffold namespace. |
+| G2 | Generate resource `users` with `--client users --procedure list --partial --app <generated app>`. | Proves explicit selection after multiple generated clients exist and uses the canonical partial demonstration. |
+| G3 | Run from the generated project root and select the app by generated name. | Reuses the existing app-root selector and avoids confusing the workspace root with the Fresh app root. |
+| G4 | Compose immediately after `service.list`. | Service discovery and client generation have completed, while all generated-project quality gates remain later. |
+| G5 | Assert rerun stdout includes `Resource slice applied: 0 written, 11 skipped, 0 conflicts.`. | The summary proves every one of the 11 reported candidates was skipped. |
+| G6 | Use one shared rendered sentence in both convention builders. | Keeps the consumer instruction byte-consistent without another template authority. |
+| G7 | The existing suite-runner success fake emits the skip-only summary for `generate resource` requests. | Makes the newly reachable rerun assertion pass without a helper, parallel suite, or weakened hosted check. |
+
+## Open-Decision Sweep
+
+| Decision | Status | Notes |
+| -------- | ------ | ----- |
+| Product touch set | resolved now | Exactly the eight amended locked files. |
+| Runtime proof | safe to defer | Hosted `scaffold.runtime` CI only, per owner direction. |
+| IMPL-EVAL | safe to defer | Separate evaluator/automation owns it; this is the author lane. |
+
+## Risk Register
+
+| Risk | Mitigation |
+| ---- | ---------- |
+| Gate definitions are registered but unreachable. | Direct `RUNTIME_GATES` membership plus `resolveSuite(SCAFFOLD.RUNTIME)` reachability assertions. |
+| Resource command runs before clients exist or selects ambiguously. | Order after service discovery and explicit `--client users`; exact command-array test. |
+| Rerun succeeds while rewriting files. | Captured exact zero-write/zero-conflict/11-skip summary requirement. |
+| Guidance mentions nonexistent files. | Exact referenced-path tests with and without the example service. |
+| Scope expands beyond eight product files. | Stop instead of changing runner infrastructure, registry tests, or parallel suites. |
+
+## Anti-Patterns to Resolve or Avoid
+
+| AP | Status | Plan |
+| -- | ------ | ---- |
+| AP-18 | risk | Assert semantic command arrays, membership, ordering, and required text rather than snapshotting whole documents. |
+| AP-23 | avoided | Keep suite composition declarative; gate behavior lives in `resource-slice-gates.ts`. |
+| AP-25 | avoided | Static definitions and pure template tests introduce no new side effects. |
+
+## Fitness Gates
+
+| Gate | Required | Expected evidence |
+| ---- | -------- | ----------------- |
+| Structured check/lint/fmt | yes | CLI-scoped wrappers, exit 0 and explicit counts. |
+| Focused/unit tests | yes | Resource gate, convention, capability/suite-registry, and full CLI unit test wrapper evidence. |
+| `arch:check` | yes | Exit 0, FAIL=0. |
+| `quality:gate` | yes | Exit 0. |
+| Asset/publish/docs | yes | Existing plan-named regression commands with exit/count evidence. |
+| Hosted runtime | hosted only | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; never run locally. |
+
+## Arch-Debt Implications
+
+| Entry | Action | Notes |
+| ----- | ------ | ----- |
+| none | none | No new or deepened doctrine violation. |
+
+## Validation Plan
+
+| Order | Gate | Command or check | Expected result |
+| ----- | ---- | ---------------- | --------------- |
+| 1 | Focused tests | structured test wrapper over the two new tests plus capability/suite registry regressions | exit 0; all selected tests pass |
+| 2 | Full CLI unit tests | structured test wrapper for `packages/cli` | exit 0; report counts |
+| 3 | Static | structured CLI check/lint/fmt wrappers | exit 0; zero diagnostics/findings/unformatted files |
+| 4 | Assets/publish/docs | plan-named tasks and CLI JSR audit | exit 0; report counts |
+| 5 | Fitness | `deno task arch:check`; `deno task quality:gate` | exit 0; FAIL=0 |
+| 6 | Git hygiene | raw diff/status and `deno.lock` comparison | only eight product files plus required run artifacts; no lock change |
+
+## Risks
+
+- Hosted execution may reveal environment-specific behavior that static tests cannot run locally; the PR must state the hosted command is pending/CI-owned and must not claim merge readiness without its receipt.
+
+## Dependencies
+
+- Slice F / PR #1956 head `8c27ffe164fc8dab8e16796e602693e6dea95c1e`.
+- Existing #1664-generated client/query surface consumed without modification.
+
+## Drift Watch
+
+- Any need to edit outside the amended eight product files.
+- Any change to the expected 11-candidate rerun summary.
+- Any movement of the Slice F base or `deno.lock`.

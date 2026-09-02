@@ -6,6 +6,7 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { generatedAppName } from './runtime/generated-app-name.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
+import { createResourceSliceGates } from './resource-slice-gates.ts';
 
 const DISABLE_CACHE_ARGUMENT = '--cache=false';
 
@@ -144,6 +145,7 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       GATE_PHASE.SCAFFOLD,
       (context) => cli(context, 'service', 'list', '--project-root', context.project.projectRoot),
     ),
+    ...createResourceSliceGates(),
     commandGate(
       GATE.CONTRACT_ADD,
       'Add a generated contract',

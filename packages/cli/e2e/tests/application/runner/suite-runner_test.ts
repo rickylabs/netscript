@@ -121,6 +121,8 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
             'deno run -A jsr:@netscript/plugin-workers@',
             'deno run -A jsr:@netscript/plugin-sagas@',
           ].join('\n')
+          : request.command.includes('generate') && request.command.includes('resource')
+          ? 'Resource slice applied: 0 written, 11 skipped, 0 conflicts.'
           : '',
         stderr: '',
         timedOut: false,

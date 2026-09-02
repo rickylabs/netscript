@@ -74,6 +74,8 @@ export const GATE = {
   SCAFFOLD_INIT: 'scaffold.init',
   SCAFFOLD_SERVICE_CLIENT_ADD: 'scaffold.service-client-add',
   SCAFFOLD_SERVICE_CLIENT_GENERATE: 'scaffold.service-client-generate',
+  SCAFFOLD_RESOURCE_GENERATE: 'scaffold.resource-generate',
+  SCAFFOLD_RESOURCE_RERUN: 'scaffold.resource-rerun',
   SCAFFOLD_AGENT_INIT: 'scaffold.agent-init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
