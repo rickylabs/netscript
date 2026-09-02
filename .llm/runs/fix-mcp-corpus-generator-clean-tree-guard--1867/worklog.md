@@ -114,6 +114,8 @@ architecture, sequencing, or scope question remains.
 | 2026-09-02 14:23 | 0 | design | Locked write-only guard, explicit stderr-recorded override, warn-and-continue fallback, and minimal task permission. |
 | 2026-09-02 14:27 | 1 | RED contracts | Added committed-worktree CLI cases for clean write, package/plugin refusal-before-write, outside dirtiness, check-mode isolation, override provenance, and missing Git. |
 | 2026-09-02 14:29 | 1 | RED refinement | First exact-commit run exited 1 with the expected missing-guard failures, but the no-Git fixture also hid Deno; narrowed PATH to Deno's bin directory before the authoritative RED rerun. |
+| 2026-09-02 14:31 | 1 | authoritative RED | Detached `33ec78509` run exited 1: 8 passed, 4 failed for the four absent guard/override/warning contracts; cleanup exited 0. |
+| 2026-09-02 14:32 | 2 | implementation | Added the exact scoped Git preflight before corpus construction, default refusal, stderr-recorded override, warning fallback, and minimal generator task permission. |
 
 ## Gate results
 

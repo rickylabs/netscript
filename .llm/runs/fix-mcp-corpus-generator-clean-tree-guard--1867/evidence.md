@@ -28,6 +28,18 @@ is derived from a pipeline.
   failed before it could test the intended warning. The authoritative RED rerun uses a PATH that
   contains Deno but not Git.
 
+### Authoritative committed RED — `33ec78509`
+
+- Detached worktree add: exit 0.
+- Raw focused test: `RED_TEST_REAL_EXIT=1` — 8 passed, 4 failed in 41 seconds.
+- Detached worktree removal: exit 0.
+- Dirty package generation and dirty plugin generation both wrongly returned 0.
+- `--allow-dirty` returned 1 as an unknown argument.
+- With Deno still resolvable and Git unavailable, generation returned 0 but emitted only Deno's
+  permission-resolution information, not the required generator warning.
+- Clean write, outside-read-set write, and dirty-tree `--check` all returned 0, establishing the
+  unaffected direction before implementation.
+
 ## GREEN and required validation
 
 Pending slices 2–3.
