@@ -7870,3 +7870,50 @@ Correct scope: route the adapter through the stdio transport's `list_traces` /
 fixed at one seam, every raw dashboard reader removed, one place that knows how telemetry is fetched.
 Fixing only the reader named in D-302 would have turned the sqlite tier green and left the docker tier
 failing for the identical reason — the kind of half-fix that reads as progress and costs a full cycle.
+
+## D-304 — reassignment: coordinator takes #1910/#1760/#1759; supervisor role narrows
+
+Owner authorized direct coordinator co-authoring (Fable unavailable). Coordinator/Codex now owns
+(A) #1910 CI/concurrency acceptance, (B) #1760 S10 evaluator + close-gate finalization, (C) #1759 S9
+authenticated telemetry repair/restack. This session remains Aspire supervisor: preserve S7-S13
+architecture, review outputs, keep S13 convergence ready, flag cross-slice conflicts.
+
+Acted immediately to avoid duplication:
+
+- **Stopped my own S10 current-head evaluator mid-run** (3 processes in `007-eval-slot`) rather than
+  race two evaluations to the same verdict. Nothing it produced is a verdict; DoD box 58 is (B)'s.
+- **Handed over S10's prepared material** without applying any of it: both tiers green at `4cce17266`
+  run `33596323882` (docker 93/0/0, sqlite 87/0/0, read from the report JSON not the badges); the
+  evaluation scope bounded to S10's own 26 product files (`0622dc432..4cce17266`) rather than the
+  misleading 316-file raw delta; and a 3-entry #1722 evidence block drafted and validated locally
+  against the real parser (`validateEvidenceMapping` → 3 boxes mapped) but deliberately not patched in.
+- **Handed over S9 with the critical fact up front: the repair already exists.** Head is `712776baf`,
+  not `e72da5161`; `ec872eb69` routes telemetry through the MCP stdio adapter (+455/−519, a net
+  deletion) and folds the fourth private reader onto it. Starting from the diagnosis would rebuild it.
+
+## D-305 — cross-slice: #1907 landed only in generated mirrors and is scheduled for deletion
+
+Flagged on #1907. `syncCanonicalAspire()` in `sync-claude-skills.ts` declares
+`canonicalAspireRoot = 'skills/aspire'` and rewrites `.agents/skills/aspire` from it after
+`removeGeneratedTarget` — delete-then-write, not merge. #1907 changed only
+`.agents/skills/aspire/SKILL.md` and `.claude/skills/aspire/SKILL.md` (267 lines each), both
+downstream of a canonical file it never touched. The next `agentic:sync-claude` erases all of it,
+silently.
+
+It also never reached the shipped surface: `skills/manifest.json` lists `aspire/SKILL.md` and
+`generate-cli-assets-barrel.ts:226` reads `skills/` into `skills.generated.ts`. On main `c3054794d`
+the canonical file contained the new section **0** times against **1** in the mirror — a PR making the
+event system the *required observation surface* left consumers the old guidance.
+
+Carried canonically in `712776baf` (S9 branch), placed after "Rule zero: `Healthy` is not proof",
+with both derived carriers regenerated. All six added headings verified present.
+
+Two deliberate non-actions, both owner decisions: I did **not** run the sync write-back (canonical and
+mirror differ by 499 lines on main, 259 only in the mirror — deleting those is not this slice's call),
+and I did **not** treat the failing `agentic:sync-claude:check` as a regression — verified by
+restoring main's canonical file and re-running it, the gate already exits 1 on main's own content.
+
+**This is the same defect class as #1887's DCP prose, now recurring.** The structural problem is that
+the canonical/mirror pair disagrees and the sync arbitrates by deletion, so anything added to
+`.agents/skills/aspire/SKILL.md` is temporary. Until the authoritative direction is decided and the
+gate enforces it, this will keep happening to whoever edits the mirror.
