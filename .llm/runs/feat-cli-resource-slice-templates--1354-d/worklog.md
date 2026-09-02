@@ -37,9 +37,9 @@
 - [x] Product touch set probed; no pre-existing Slice D files.
 - [x] Neutral templates and typed carriers implemented.
 - [x] Golden and consumer-shaped tests green.
-- [ ] Carrier cascade committed and four post-commit freshness checks green.
-- [ ] Full package gates green.
-- [ ] Separate-session IMPL-EVAL complete.
+- [x] Carrier cascade committed and four post-commit freshness checks green.
+- [x] Full package gates green.
+- [x] Separate-session IMPL-EVAL complete.
 - [ ] Non-draft stacked PR opened with required metadata.
 
 ## Implementation evidence
@@ -65,4 +65,31 @@
 | Full package-owned CLI suite | 0 | 1,579 passed, 0 failed, 0 ignored. |
 | Carrier generation cascade | 0 | `gen:assets-barrel` → `gen:publish-assets` → `gen:mcp-export-corpus`; corpus reports 35 packages, 273 subpaths, 7,816 symbols. |
 
-Post-commit freshness, architecture, quality, docs, JSR, and publish evidence remains pending.
+## Gate evidence (post-commit at `5fd40ef13`)
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| `check:assets-barrel` | 0 | Regenerated all seven declared carriers; `git diff --exit-code` clean. |
+| `check:publish-assets` | 0 | Publish assets regenerated with `--check`; no drift. |
+| `check:mcp-export-corpus` | 0 | 35 packages, 273 subpaths, 7,816 symbols; corpus hash `a3eb6325…`. |
+| `check:emitted-samples` | 0 | 48 emitted TypeScript samples from 38 artifact paths. |
+| `arch:check` | 0 | CLI `FAIL=0 WARN=59 INFO=1`; 12 resource-slice children, so no F-16 warning on this mandated base. |
+| `quality:gate` | 0 | Scanner `ok=true`, zero findings, seven accepted existing allowances; nested arch gate green. |
+| `docs:readme-fences` | 0 | PASS; 36 READMEs, 73 TS-like fences checked, baseline `type_errors=7`. |
+| `docs:jsdoc-examples` | 0 | PASS; 2,052 files, 359 candidates checked, baseline `unboundName=116`. |
+| CLI JSR audit / package dry-run | 0 | Metadata/exports unchanged; all eleven templates present in publish list; seven pre-existing dynamic-resolution warnings, no slow-type failure. |
+| Workspace `publish:dry-run` | 0 | All publishable workspace packages completed successfully. |
+
+The post-commit freshness quartet exits, in required reporting order, is `0 / 0 / 0 / 0` for
+assets barrel, publish assets, MCP export corpus, and emitted samples.
+
+## Formal evaluation
+
+- Native opposite-family Claude Fable 5 launched with explicit medium effort.
+- Background handle: `5d303daa`; full session id:
+  `5d303daa-e2ad-46b9-974d-b00589ed5a5b`.
+- Claude's native terminal identified `Fable 5 with medium effort`; the evaluator artifact records
+  its provider session as `session_01RzoTEujrWaZjRysSYzSk8T`.
+- Verdict: `PASS` at product/implementation head `5fd40ef1368bce264ec2aa5f8ab66bd301f8e340`.
+- `evaluate.md` independently reproduces the touch-set, D3/D4, carrier, focused test, consumer,
+  check, lint/fmt, architecture, quality, publish, and docs evidence.

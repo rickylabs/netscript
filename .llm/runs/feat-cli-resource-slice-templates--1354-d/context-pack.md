@@ -2,9 +2,9 @@
 
 ## Current state
 
-Harness bootstrap and research are complete on the exact requested Slice C baseline `f2696ea88`.
-The master plan is locked and PLAN-EVAL is inherited, so this leaf records `PLAN-EVAL: N/A` and is
-ready for implementation. No product file has been changed yet.
+Implementation is complete on the exact requested Slice C baseline `f2696ea88`. The product tree
+is independently attested `IMPL-EVAL: PASS` at `5fd40ef13`; all required author and evaluator gates
+are green. The master plan remains locked and this leaf records `PLAN-EVAL: N/A`.
 
 ## Key decisions
 
@@ -16,9 +16,9 @@ ready for implementation. No product file has been changed yet.
 
 ## Next steps
 
-1. Implement the eleven templates, manifest/typed carrier, renderer, and tests.
-2. Regenerate carriers, run focused and full gates, commit, and run post-commit freshness checks.
-3. Obtain a separate-session IMPL-EVAL, push, and open the required stacked PR.
+1. Commit the evaluation and bookkeeping artifact update.
+2. Push and open the required non-draft PR against `feat/cli-resource-slice-contract`.
+3. Post IMPL/IMPL-EVAL comments and verify exact labels, milestone, base, head, and SHA.
 
 ## Drift and debt
 
