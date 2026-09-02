@@ -8,8 +8,8 @@ import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import { generateTsAspireConfig } from '../../templates/aspire/generate-aspire-config.ts';
 import {
-  buildDefaultTools,
   buildCacheBlock,
+  buildDefaultTools,
   deriveContainerDbResourceName,
   deriveSqliteDbFileName,
 } from '../../templates/aspire/generate-appsettings.ts';
@@ -78,7 +78,7 @@ export async function scaffoldTsAppHost(
     filesSkipped.push(packageJsonPath);
   }
 
-  // 3. tsconfig.apphost.json — Aspire 13.4 validates TypeScript AppHosts before startup.
+  // 3. tsconfig.apphost.json — Aspire ≥ 13.4 validates TypeScript AppHosts before startup.
   const tsconfigApphostContent = JSON.stringify(
     {
       compilerOptions: {

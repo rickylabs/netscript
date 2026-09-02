@@ -88,9 +88,11 @@ export function TelemetryView({ data, examplesHref }: TelemetryViewProps) {
                 Fire webhook trace
               </Button>
             </form>
-            <Button type='link' href={data.dashboardUrl} variant='outline' size='sm'>
-              Open Dashboard
-            </Button>
+            {data.dashboardUrl && (
+              <Button type='link' href={data.dashboardUrl} variant='outline' size='sm'>
+                Open Dashboard
+              </Button>
+            )}
             <span class='text-xs text-ns-muted-fg'>
               {data.totalSpans} total spans &middot; {data.traces.length} traces shown
             </span>

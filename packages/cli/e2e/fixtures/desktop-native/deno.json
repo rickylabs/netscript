@@ -16,6 +16,7 @@
     "@netscript/telemetry": "../../../../telemetry/mod.ts",
     "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.1",
     "@orpc/client": "npm:@orpc/client@^1.15.0",
+    "@orpc/contract": "npm:@orpc/contract@^1.15.0",
     "@orpc/server": "npm:@orpc/server@^1.15.0",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
