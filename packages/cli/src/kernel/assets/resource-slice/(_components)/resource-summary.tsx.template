@@ -1,0 +1,25 @@
+import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
+import { Card } from '@app/components/ui/mod.ts';
+import { load{{resourcePascalCase}}Resource } from '../(_shared)/{{resource}}-loaders.ts';
+
+type Props = NonNullable<
+  InferDefinePageLayerLoaderProps<typeof load{{resourcePascalCase}}Resource>
+>;
+
+export function {{resourcePascalCase}}Summary({ initialData, cachedAt }: Props) {
+  return (
+    <section id='{{resource}}-summary'>
+      <Card>
+        <Card.Header>
+          <Card.Title>{{resourcePascalCase}} summary</Card.Title>
+          <Card.Description>
+            Deferred at {new Date(cachedAt).toLocaleTimeString()}.
+          </Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <pre class='overflow-x-auto text-sm'>{JSON.stringify(initialData, null, 2)}</pre>
+        </Card.Body>
+      </Card>
+    </section>
+  );
+}

@@ -1,0 +1,24 @@
+import type { ComponentChildren } from 'preact';
+
+interface {{resourcePascalCase}}LayoutProps {
+  readonly resource: ComponentChildren;
+  readonly form?: ComponentChildren;
+  readonly summary?: ComponentChildren;
+  readonly stream?: ComponentChildren;
+}
+
+export function {{resourcePascalCase}}Layout({
+  resource,
+  form,
+  summary,
+  stream,
+}: {{resourcePascalCase}}LayoutProps) {
+  return (
+    <main class='mx-auto grid w-full max-w-5xl gap-6 px-4 py-8 sm:px-6'>
+      {resource}
+      {form}
+      {summary}
+      {stream}
+    </main>
+  );
+}
