@@ -207,12 +207,31 @@ Two rules:
 Snapshot mode (no `--follow`) wraps resources in `{ "resources": [...] }`; follow mode emits one
 JSON object per line.
 
-### 4. `aspire wait` (CLI) — arrival gating only, and it answers from cache
+### 4. `aspire wait` (CLI) — arrival gating, bounded by what Aspire has evaluated
 
-`aspire wait --status healthy|up|down` is fine for coarse arrival gating. It is **not** an
-observation primitive: it answers from the last completed evaluation, so immediately after you
-induce a transition it can return the _previous_ verdict and exit 0 — measured at 1409 ms in a real
-case. Never use it to observe a transition you just caused.
+`aspire wait <resource> --status healthy|up|down` connects to the AppHost over the backchannel and
+**streams resource state changes in real time**. It validates the resource name before entering the
+wait loop, so a typo fails immediately instead of timing out silently.
+
+| Exit | Meaning                                                                      |
+| ---- | ---------------------------------------------------------------------------- |
+| `0`  | resource reached the target status                                           |
+| `7`  | no running AppHost found                                                     |
+| `17` | timeout exceeded before the target status was reached                        |
+| `18` | resource entered a failed or terminal state while waiting for `up`/`healthy` |
+
+Two traps that have both cost time here:
+
+- **`healthy` means "running and healthy, _or_ running with no health checks configured."** A
+  resource with no health check satisfies `--status healthy` immediately, so exit 0 is **not** proof
+  that a health check passed.
+- **It can only report health Aspire has already evaluated.** The stream is real time, but health
+  evaluation is periodic — so immediately after you break something the resource can still be
+  Healthy and `wait --status healthy` returns 0 at once. Measured in this repo at **1409 ms** while
+  the backing listener was already closed. This is a lag in evaluation, not a stale cache read.
+
+Use `wait` to gate on arrival. Never use it to observe a transition you just caused — use the stream
+in section 3.
 
 ### Anti-pattern: hand-rolled health/lifecycle checks
 
