@@ -10612,3 +10612,24 @@ Two things B got right that are worth noting: the `deno.lock` delta is exactly o
 new private-type doc-lint diagnostic — a type reachable from an exported type must itself be
 exported — while keeping the page-module rewrite function unexported as the plan requires. Doc-lint
 A/B: Fresh 45→45, CLI 0→0, both byte-identical.
+
+### ~17:50Z — #1452 S3 done but paused for sign-off; authorized to finish
+
+The lane implemented the full residual and then stopped "for supervisor review, full gates, and
+sign-off" — more cautious than the brief asked, but harmless, and reviewed before resuming:
+
+- `appsettings?: unknown` on `PluginServiceContext`, plus optional async `getAppsettings` /
+  `getEnvironment` resolvers, resolved once at assembly; DB/KV stay lazy and memoized. Same resolver
+  shape as Slice 2 — the consistent design.
+- **A genuine generated-consumer boot test**: materializes the *unchanged* CLI template, imports the
+  generated module, boots the real workers/auth/sagas factories, proves `/health` 200 on bound TCP
+  listeners, then tears everything down. That is row 3, not a unit test that asserts an object exists.
+- `plugins/auth/services/src/init.ts`: the `AuthPluginServiceContext` cast replaced by a structural
+  `isAuthServiceAppsettings` guard — the correct downstream of an opaque `appsettings`, recorded as
+  minor drift.
+- `packages/plugin/deno.json` and `deno.lock` unchanged: the no-new-dependency invariant holds.
+
+Resumed to run the **full** gate set (it had run only the focused wrapper), the carrier cascade
+(surface moved; carriers ceiling-exempt), commit, push, and open the PR — with the closing-keyword
+decision left to the brief's rule and a specific check on whether the mirror recognises #1452's
+plain-bullet rows, which are not checkboxes.
