@@ -10931,3 +10931,13 @@ requires the same scheme regex as `tcpUrl` (477/499 identical) so the fallback c
 `tcpUrl` rejects. Fixture shows the exact failing shape: `postgres-password` (Parameter, urls=[])
 before `postgres-2226b6f5` (Container, displayName `postgres`, `tcp://localhost:10538`). Tests
 14/0, e2e check 0. Posted on #1962; no edits, no relabel, no duplication of the coordinator's agent.
+
+### D-269 — #1952 exact-green at 478450a3c (docker tier 95/0); evidence block had a schema error (`boxes:` vs `entries:`)
+
+e2e at `478450a3c`: sqlite 17 steps green, **docker tier `scaffold-runtime` 95 passed / 0 failed**
+(the permission fix holds and `behavior.live-db-endpoint` passed on this run); ci `check-test` 16
+and `quality` 28 green; only `close-gate` red. Applied `status:ready-merge`; mirror dry-run then
+failed on **YAML schema**: the author's blocks use `boxes:` where the contract requires `entries:`
+— a key my earlier regex did not check (I read `box-index` lines, not their parent). Fixed block 1
+(#1880) to `entries:`, removed block 2 (#863 is `Part of`, never mutated; its `boxes:` key would have
+failed too), original body saved for restore, dry-run re-run, close-gate rerun fired on success.
