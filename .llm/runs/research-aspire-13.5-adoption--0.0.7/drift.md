@@ -8251,3 +8251,47 @@ every matching pid lands in exactly one of three.
 Exact-head receipts at `daeee1fde`: `packages/cli/e2e/tests/` 245 passed / 0 failed, `deno check` and
 `deno lint` clean. Separate-session IMPL-EVAL dispatched, briefed to verify the RED genuinely fails
 against `4cce17266` rather than passing trivially.
+
+## D-320 — the S9 span-source defect, and why two green gates missed it
+
+The docker-tier red at `3ba9c414b` was `behavior.otel.traces` → `TC-1/TC-2 FAIL: named,
+explicitly-kind-ed Flow-B spans share one trace`. Root cause is stated in this repo's own 13.5.3
+receipt, `.agents/skills/aspire/SKILL.md:365`:
+
+> There is no MCP tool for spans — use `aspire otel spans` for span-level detail.
+
+`ec872eb69` sourced spans from the MCP `list_traces` tool, so every trace normalised to
+`scopeSpans: [{ spans: [] }]` and `validateFlowB` could never find one carrying
+`trigger.ingress`/`queue.enqueue`/`queue.dequeue`/`job.execute`. **TC-1/TC-2 was unsatisfiable by
+construction** — not flaky, not timing.
+
+**Two gates passed over it, and the reason is the same in both.** The unit suite passed because
+`aspire-dashboard-telemetry_test.ts` fed a hand-written `list_traces` payload with an *invented*
+inline `spans` array; the separate-session IMPL-EVAL then judged normalisation "honest" against those
+same fixtures. A fixture that encodes an assumption about a tool, rather than its observed output,
+proves nothing — and it is exactly the failure mode I had been briefing evaluators to hunt on other
+slices while it went through on my own. Fixture honesty is now an explicit acceptance bar in both the
+repair brief and the re-evaluation brief.
+
+Repaired in `0291213af`: `list_traces` has **zero** references in the adapter and spans come from
+`aspire otel spans` — the CLI authenticates itself, which was the property the MCP route was chosen
+for in the first place, so the fix keeps the auth win while correcting the data source.
+
+Also settled by the retry: the earlier `Postgres resource exposed no TCP URL` at 75ms **was a flake**
+— the rerun reached 92 passed, well past `tcpUrl`. Holding the conclusion for a second data point was
+right; repairing it would have been work against a phantom.
+
+## D-321 — #1858 integrated into all three active branches, repairs preserved
+
+Main `732b1f0eb` (deterministic Garnet readiness, aligned version pins) merged into S9, S10 and S13.
+All three clean, no conflicts.
+
+| Branch | Head | Repair preserved | Validation |
+| --- | --- | --- | --- |
+| S9 `#1759` | `ce1b80e2f` | span source = CLI, `list_traces` refs 0 | e2e 244 passed / 0 failed |
+| S10 `#1760` | `96be42114` | `unprovenProcesses` present (4 refs) | e2e 247 passed / 0 failed |
+| S13 `#1779` | `03a7208dd` | manifest regenerated | parity `fail: 0` over 815 |
+
+S10's carry checked rather than assumed: the 15 product files its merge changed are all #1858's own
+content, so S10's delta is untouched and its `daeee1fde` IMPL-EVAL PASS carries. S9's repair is new
+work and has its own evaluation dispatched, briefed to hunt the fixture-honesty failure specifically.
