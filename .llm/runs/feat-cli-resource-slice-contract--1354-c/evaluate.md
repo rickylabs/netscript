@@ -1,187 +1,156 @@
-# Evaluation: Slice C resource contract and safe reconciler
+# Evaluation: Slice C resource contract and safe reconciler — formal IMPL-EVAL (PR #1946)
 
 Filled from `.llm/harness/templates/evaluate.md`. Allowed result values: `PASS`, `FAIL`, `N/A`,
 `PENDING_SCRIPT`, `DEBT_ACCEPTED`, `NOT_RUN`. Anti-pattern status values: `CLEAR`, `VIOLATION`,
 `DEBT_ACCEPTED`, `N/A`.
 
+This report supersedes the earlier cycle-1/cycle-2 evaluation text that lived in this file (attested
+at `bc5120684`). It is the formal IMPL-EVAL for the immutable PR head.
+
 ## Metadata
 
-| Field          | Value                                                                        |
-| -------------- | ---------------------------------------------------------------------------- |
-| Run ID         | `feat-cli-resource-slice-contract--1354-c`                                   |
-| Attested head  | `bc51206840f30062822fceaaba94fab938d77702` (cycle 1 evaluated `03d4c2519`)   |
-| Target         | `packages/cli/src/kernel/application/resource-slice/` (ten files, internal)  |
-| Archetype      | `6 — CLI / Tooling`                                                          |
-| Scope overlays | Fresh 2.x route-key semantics only; no runtime/browser/publish/release gates |
-| Evaluator      | Separate IMPL-EVAL session, 2026-09-02                                       |
+| Field          | Value                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Run ID         | `feat-cli-resource-slice-contract--1354-c`                                               |
+| PR             | #1946 — `feat/cli-resource-slice-contract` → `main`, `Refs #1354`, no closing keyword    |
+| Attested head  | `b86524bcb9a74279f1960f9ad9f470e38a1d8f5b` (verified `git rev-parse HEAD` in worktree)   |
+| Merge-base     | `850cc7757d11d420b9061dbe6a61536357ab77fe` (`git merge-base HEAD origin/main`)           |
+| Target         | `packages/cli/src/kernel/application/resource-slice/` (ten files, internal, IO-free)     |
+| Archetype      | `6 — CLI / Tooling`                                                                      |
+| Scope overlays | Fresh 2.x static route / `appRoutes` / `State` contract semantics only; no runtime gates |
+| Evaluator      | Separate native Claude Fable 5.1 session (`claude-fable-5-1`), 2026-09-02                |
 
 ### Evaluator identity (requested vs observed)
 
-| Field | Requested (brief)            | Observed                                                              |
-| ----- | ---------------------------- | --------------------------------------------------------------------- |
-| Model | native Claude Fable 5        | `claude-fable-5` (Claude Code)                                         |
-| Effort | medium                      | session-default reasoning; no explicit effort attestation surface      |
-| Session | separate from Codex generator | `https://claude.ai/code/session_01AM6zB9u6jKBxDjoMysrg6A` (background job, worktree `007-leaf-1354-c`) |
+| Field   | Requested                                             | Observed                                                                            |
+| ------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Route   | native opposite-family Claude Fable 5, separate session | Claude Code session `session_01VyeBXMJmj5uPaQFngpkdgn`, model `claude-fable-5-1`  |
+| Author  | Codex implementation session (`supervisor.md`)        | no product byte authored by this session; product tree read-only                    |
+| Effort  | per `lane-policy.md`                                  | session default; no explicit effort attestation surface in this transport            |
 
-Generator was a Codex/GPT-5-family session (`supervisor.md`); this session is native Claude and did
-not author any product byte. Generator ≠ evaluator holds.
+Generator ≠ evaluator holds.
+
+## Authority read
+
+- Master plan: `git show origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md` — D3 (narrowed conflict contract, ownership marker exact format, conflict remedy surface, seven-point required proof), D6 (State shapes), shared-file mutation matrix, Slice C section (ten-file ceiling, expected touch set, required gates, 14-child WARN observation), ceiling rules (generated carriers exempt).
+- PLAN-EVAL trail: `plan-eval.md` (cycles 1–2 `FAIL_PLAN`), `plan-eval-cycle3.md` (MEDIUM-3 = #1355 fence + `Refs #1354` shape); the leaf `research.md`/`plan.md` record the final `PASS_PLAN_WITH_FINDINGS` and `PLAN-EVAL: N/A` for this leaf. Note: the caller's brief describes MEDIUM-3 as "static absolute routes only"; the plan text that actually carries that rule is D2/Slice C item 2 ("parameter/catch-all rejection"). Both were judged.
+- Leaf run artifacts: `plan.md`, `research.md`, `worklog.md` (§ Design present), `drift.md`, `implement.md`, `context-pack.md`, `supervisor.md`, evaluator briefs.
 
 ## Process Verification
 
-| Check                                  | Result | Evidence                                                                                                                                    |
-| -------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plan-Gate passed before implementation | `PASS` | `PLAN-EVAL: N/A` justified and recorded in `plan.md`/`worklog.md` before implementation: the master plan (`origin/feat/cli-resource-slice-plan:.llm/runs/feat-cli-resource-slice--1354/plan.md`) carries its own evaluated verdict (`PASS_PLAN_WITH_FINDINGS` per `research.md`), and this leaf implements locked Slice C without re-planning. |
-| Design section exists in worklog       | `PASS` | `worklog.md § Design` names public surface (none moved), domain vocabulary, ports (none — IO-free), constants, commit slice, deferred scope, and contributor path, matching the Archetype 6 checkpoint expectations for an internal application slice. |
-| Commit slices match design plan        | `PASS` | One slice planned, one commit `03d4c2519 feat(cli): define resource slice reconciliation contract` against baseline `850cc7757`; diff touches exactly the ten product files + run dir. |
-| Each slice has a passing gate          | `PASS` | Independently re-run: focused tests 32/32; scoped check/lint/fmt 10/10 files, 0 findings; `arch:check` exit 0; `quality:gate` exit 0; docs gates PASS (all below). |
-| No speculative seams (unused files)    | `PASS` | The five modules are the contract-first deliverable master-plan Slices D/E explicitly consume; no other product file imports `resource-slice/` yet (`grep -rl "resource-slice/" packages plugins` → only the slice itself), which is the locked plan shape, not an orphan seam. |
-| Constants used for finite vocabularies | `PASS` | `RESOURCE_SLICE_VARIANTS`, `RESOURCE_SLICE_LEAF_ROLES` (eleven D7 roles), `RESOURCE_SLICE_MARKER_PREFIX`, `RESOURCE_SLICE_MARKER_SCHEMA`, and the `ResourceSlicePreflightPhase` literal union in `resource-slice-contract.ts:3-28,121-127`. |
+| Check                                        | Result | Evidence                                                                                                                                                                              |
+| -------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plan-Gate passed before implementation       | `PASS` | `PLAN-EVAL: N/A` recorded in leaf `plan.md` § Locked scope and `worklog.md` bootstrap row before commit `03d4c2519`; master plan carries its own evaluated verdict.                    |
+| Design section exists in worklog             | `PASS` | `worklog.md` § Design names surface (none moved), vocabulary, constants, ports (none — IO-free), one commit slice, deferred scope.                                                     |
+| Commit slices match design plan              | `PASS` | `03d4c2519` feat, `bc5120684` fix (appRoutes hardening from cycle-1 finding), `ed38ae599`/`b86524bcb` docs. Product diff `850cc7757..b86524bcb` = exactly the ten files + run dir.    |
+| Each slice has a passing gate                | `PASS` | Independently re-run at `b86524bcb` (see Gate Results).                                                                                                                               |
+| Brief carries `## SKILL` chapter             | `PASS` | `evaluator-brief.md` and `evaluator-followup-brief.md` present in run dir; harness rule satisfied for the briefs in scope.                                                              |
+| Close-gate                                   | `N/A`  | `Refs #1354` partial work, no closing keyword, `status:impl`; no `ready-merge` label; close-gate check green on PR.                                                                    |
+| Release-gate class                           | `N/A`  | Not a cut or release-gating run.                                                                                                                                                      |
 
-## Scope and locked-decision verification
+## Judgement against D3 / Slice C (the caller's eight criteria)
 
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Ten-file touch set exact | `PASS` | `git diff 850cc7757..HEAD --name-only` → the ten master-plan Slice C paths plus `.llm/runs/feat-cli-resource-slice-contract--1354-c/**` only; `deno.lock` diff is empty. |
-| Application-layer purity | `PASS` | Non-test modules import only `@std/text` and sibling contract; `grep -rnE "Deno\.|console\.|fetch\("` over the five product modules → no hits; no adapter/presentation import; SHA-256 via doctrine-authorized `crypto.subtle`. |
-| Exact D3 marker format | `PASS` | `RESOURCE_SLICE_MARKER_PREFIX + JSON.stringify` with fixed key order schema/resource/role/options/bodySha256; `parseOwnedResourceSliceLeaf` enforces canonical round-trip (re-stringify equality, `resource-slice-contract.ts:291-293`); test pins the exact 64-hex marker line and rejects reordered keys, bad JSON, and schema 2. |
-| Classifications exact | `PASS` | `ResourceSliceLeafClassification` = `absent`/`exact`/`owned`/`owned-edited`/`unowned`; missing/malformed/wrong-schema/wrong-resource/wrong-role → `unowned`; hash mismatch → `owned-edited` (force-ineligible); recomputed forgery → `owned` needing force — each pinned by a passing test. |
-| Zero-write preflight structure | `PASS` | Only the `status: 'ready'` union arm carries `applyPlan` (`resource-slice-contract.ts:165-196`); dry-run, conflict, and all six `ResourceSlicePreflightPhase` failures structurally omit it; test injects each phase plus invalid staged metadata and proves the application map stays byte-identical. |
-| Owned-only `--force` | `PASS` | `decideLeaf` writes under force only for `kind === 'owned'`; `owned-edited` and `unowned` conflict under force (tests: mismatched-hash, unowned-under-force); shared candidates never consult force. |
-| Planner deltas | `PASS` | Core = six always-on leaves at exact D7 paths; form/partial/stream each add only their declared leaves plus page/view option transitions; `utils.ts` state edit absent for all shipped variant sets; query bindings factory-derived (`queryOptions`/`clientKey`) — `plan-resource-slice_test.ts` pins all of it, including the nested-route partial path `routes/partials/orders/history/summary.tsx`. |
-| Fail-closed router transform | `PASS` | `reconcileAppRoutes` requires both stock generated-route imports and a single `export const appRoutes = { ... } as const` anchor; comment/string-aware `matchingBrace`; spread/computed entries, `Object.freeze`, `satisfies`, alias reuse, and same-route-key different-alias all conflict; the stock post-Slice-F router fixture is the recognized insert case and re-running returns `exact`. |
-| Fail-closed State transform | `PASS` | `reconcileState` accepts only the empty `Record<string, never>` alias or a single unextended `export interface State`; property conflicts detected inside the interface body only (brace-in-comment fixture passes); extended/aliased/intersected/duplicate/missing shapes conflict. |
-| Fresh 2.x route semantics | `PASS` | Route normalization rejects `[id]`, `[...path]`, `:id`, `*`, query strings, and non-kebab segments (static-only per locked D2); router alias value is a `generatedRoutes.<routeKeyPath>` property chain, never an inline `createRouteReference`. |
+### 1. Ceiling and layering — `PASS`
 
-## Static Gates
+- `git diff --name-only 850cc7757..b86524bcb`: ten product files under `application/resource-slice/` plus ten `.llm/runs/...` artifacts. No generated carrier touched, no lockfile, no public export.
+- Imports (non-test): `resource-slice-contract.ts` → `@std/text` only; the other four import only `./resource-slice-contract.ts`. Zero `Deno.*`, `node:fs`, `@std/fs`, `@std/path`, `fetch(`, presentation, or Fresh runtime import. No reconciler reads or writes a filesystem — inputs are `current: Record<string, string|undefined>` and staged strings.
+- Overlap with PR #1664's file list (`gh pr view 1664 --json files`): `comm -12` empty. Slice A's four files (`client-selector.ts`/`_test`, `web-scaffold.ts`/`_test`) untouched.
 
-| Gate             | Command or check                                                                                     | Result | Evidence                                            | Notes |
-| ---------------- | ---------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------- | ----- |
-| Narrow typecheck | `run-deno-check.ts --root .../resource-slice --ext ts,tsx`                                           | `PASS` | 10 selected, 1 batch, 0 diagnostics                 | re-run by evaluator |
-| Slice typecheck  | `deno test --allow-all packages/cli/` (type-checks all modules)                                      | `PASS` | 974 passed (595 steps), 0 failed, exit 0            | matches worklog's 1,569 total count |
-| Format           | `run-deno-fmt.ts --root .../resource-slice --ext ts,tsx --config <task-local>`                       | `PASS` | 10/10 processed, 0 findings                         | task-local config required; root `deno.json` fmt excludes `packages/cli/` (worklog drift confirmed) |
-| Lint             | `run-deno-lint.ts --root .../resource-slice --ext ts,tsx --config <task-local>`                      | `PASS` | 10/10 processed, 0 findings; no `deno-lint-ignore` in the slice | same task-local config |
-| Doc lint         | `deno task docs:readme-fences`; `deno task docs:jsdoc-examples`                                      | `PASS` | fences PASS `type_errors=7` = baseline 7; jsdoc PASS `unboundName=116` = baseline 116; both exit 0 | no baseline growth |
-| Publish dry-run  | —                                                                                                    | `N/A`  | no export/`mod.ts`/`deno.json` change; brief marks publish gates N/A | assembled-wave gate |
-| Link/path check  | ten paths vs master-plan Slice C enumeration                                                          | `PASS` | one-to-one match, `git diff --name-only`            | |
+### 2. Ownership marker is exact — `PASS`
 
-## Fitness Gates
+- `markOwnedResourceSliceLeaf` emits `RESOURCE_SLICE_MARKER_PREFIX + JSON.stringify({schema, resource, role, options, bodySha256}) + '\n' + body` with object literal key order `schema, resource, role, options, bodySha256` (`resource-slice-contract.ts:243-256`); options pass `normalizeMarkerOptions` (must include `core`, unique, `.sort()` lexicographic); body must end with LF (rejected otherwise); hash = SHA-256 over `TextEncoder().encode(body)` (UTF-8 bytes after the marker line, final newline included).
+- `parseOwnedResourceSliceLeaf` re-serialises and requires `line === PREFIX + JSON.stringify(metadata)` — byte-for-byte canonical acceptance; key-order drift, schema≠1, unknown role/variant, non-64-hex are rejected.
+- Test pins the literal line `// @netscript/resource-slice {"schema":1,"resource":"orders","role":"page","options":["core","form"],"bodySha256":"68ce9f71…84af"}`. Independently reproduced: `printf 'export const page = true;\n' | sha256sum` = `68ce9f712800f8006bc8177f4525c6a5d69e9fe0e449dfc631f8cd0851ca84af`. Key-order-swapped and `schema:2` markers are pinned as rejected.
 
-`deno task arch:check` exit 0; CLI package summary `FAIL=0 WARN=59 INFO=1`; zero occurrences of
-`resource-slice` anywhere in the report — no warning names a Slice C file. `deno task quality:gate`
-exit 0, scanner `ok:true`, 0 findings, 7 pre-existing allowances, no new allowance.
+### 3. Three-way fail-closed classification — `PASS`
 
-| Gate | Function                     | Result | Evidence | Violations |
-| ---- | ---------------------------- | ------ | -------- | ---------- |
-| F-1  | File-size lint               | `PASS` | largest new file `resource-slice-contract.ts` 373 lines < 500 cap; no A8/AP-1 warning names a slice file | none |
-| F-2  | Helper-reinvention scan      | `PASS` | casing from `@std/text`, hashing from `crypto.subtle`; no local re-wrap | none |
-| F-3  | Layering check               | `PASS` | application imports domain/contract + platform-pure libs only (purity grep above) | none |
-| F-4  | Inheritance audit            | `N/A`  | no class in the slice | — |
-| F-5  | Public surface audit         | `N/A`  | no export map/`mod.ts` change | — |
-| F-6  | JSR publishability gate      | `N/A`  | internal-only slice; assembled-wave gate | — |
-| F-7  | Doc-score gate               | `PASS` | `docs:jsdoc-examples` PASS without baseline growth | none |
-| F-8  | Workspace `lib` override     | `N/A`  | no config change | — |
-| F-9  | Permission declaration check | `N/A`  | no new permission; slice is IO-free | — |
-| F-10 | Test-shape audit             | `PASS` | five colocated `_test.ts` with semantic assertions (no giant snapshots) | none |
-| F-11 | Forbidden-folder lint        | `PASS` | single role-named `resource-slice/` folder; no utils/helpers/lib | none |
-| F-12 | Naming-convention lint       | `PASS` | `plan-`/`reconcile-` verb-noun application files; contract file name is the master-plan-locked path | none |
-| F-13 | Saga/runtime invariants      | `N/A`  | not touched | — |
-| F-14 | Console-log lint             | `PASS` | zero `console.*` in the slice (grep) | none |
-| F-15 | Re-export-of-upstream lint   | `PASS` | no upstream symbol re-exported | none |
-| F-16 | Folder-cardinality lint      | `PASS` | `resource-slice/` has 10 direct children ≤ 12; depth 3 from `src/`; no F-16 warning names the folder. Locked observation: A+C+D assembly will reach 14 and WARN — recorded, not a failure, per master plan | none |
-| F-17 | Abstract-derived co-location | `N/A`  | no abstract introduced | — |
-| F-18 | Sub-barrel lint              | `PASS` | no `mod.ts`/`index.ts` in the folder | none |
-| F-19 | Scoped source gate runners   | `PASS` | structured wrappers used for check/lint/fmt verdicts (above) | none |
+- `classifyResourceSliceLeaf`: `absent` / `exact` (byte-equal, reported `skip`) / `owned` (valid marker, resource+role match, hash matches) / `owned-edited` (hash mismatch) / `unowned` (missing, malformed, unsupported schema, wrong resource, wrong role). `absent`/`exact` are operational states; the D3 three-way ownership split is exact.
+- `decideLeaf`: `owned-edited` and `unowned` always `conflict`, remedy never mentions `--force`, and `force` is never consulted for them; `owned` conflicts unless canonical additive transition or `--force`.
+- Forgery limitation documented and tested, not hidden: test `recomputed marker forgery is owned by convention but needs force` (default → conflict; `--force` → replaced). Matches D3 verbatim.
 
-## Runtime Gates
+### 4. Additive options — `PASS` with observation (LOW-2)
 
-| Gate | Validation | Result | Evidence |
-| ---- | ---------- | ------ | -------- |
-| runtime/browser/E2E/release | — | `N/A` | Pure internal application slice; no command calls the planner; brief and plan mark runtime, browser, publish, public-surface, and release gates N/A. |
+- `normalizeVariants` dedupes and sorts (`['core', ...new Set(variants)].sort()`); planner gives page/view the full selected set and each optional leaf `['core', variant]`.
+- `isCanonicalAdditiveTransition` accepts a write without force only when the recorded options are a strict subset of the candidate's and the current bytes equal a caller-supplied prior canonical rendering for those options — D3's "compared with the canonical rendering for its recorded schema/options".
+- Later option against an edited base leaf: test `additive option is selected and fully reported before an edited-base dry-run conflict` — dry-run status, exit 1, `form` leaf reported `write/absent`, base leaf `conflict/owned-edited` with "Move or rename" remedy; no `applyPlan`.
+- Observation: the D3 step-2 union itself (recognised prior marker options ∪ new flags → effective set) is not computed by any of the ten files; the test hands the union in. Slice E owns "resolve, validate, plan, preflight" and no Slice C touch-set item names a union helper, so this is not a Slice C gap — recorded so Slice E does not inline it into the command file.
 
-## Consumer Gates
+### 5. Zero writes before apply, by construction — `PASS`
 
-| Consumer | Validation | Result | Evidence |
-| -------- | ---------- | ------ | -------- |
-| Master-plan Slices D/E (future) | contract shape matches the locked D3/D5/D6/D7 inputs they will consume | `PASS` | `ResourceSliceStagingResult`/`ResourceSliceReconcileResult` union and the two transform result types cover every downstream branch named in D3 steps 1–7; no current consumer exists to break (`grep` shows zero imports outside the slice). |
-| Full `packages/cli` suite | no regression from the added files | `PASS` | `deno test --allow-all packages/cli/` → 974 passed (595 steps), 0 failed, exit 0. |
+- Only the `status: 'ready'` arm of `ResourceSliceReconcileResult` carries `applyPlan`; `dry-run`, `conflict`, and `preflight-failed` structurally cannot expose a write list (`resource-slice-contract.ts:165-196`). `preflight-failed` covers all six `ResourceSlicePreflightPhase` values including `fresh-staging` and `shared-source-transform`, and `candidate-validation` is raised internally for duplicate paths / invalid staged markers.
+- D3 proof map to named tests in `reconcile-resource-slice_test.ts`: (3) identical second run → `identical second run skips every path and plans zero writes`; (2) default conflict → `default conflict reports every path, force eligibility, and no apply plan`; (4) later option vs edited base → test above; (5) owned-edited under force → `mismatched body hash is owned-edited and never replaceable under force`; (6) owned-only force, exactly one leaf, shared untouched → `force replaces only positively owned leaves and leaves shared/exact bytes alone`; (7) unowned never replaced → `unowned content remains a conflict under force` + five-fixture unowned test; forgery → named above; (1) every pre-apply failure → `each injected pre-apply failure structurally proves zero application writes` + `invalid staged ownership metadata fails before an apply plan exists`.
 
-## Anti-Pattern Check
+### 6. Shared files fail closed — `FAIL` (HIGH-1 below)
 
-| AP    | Status  | Evidence | Notes |
-| ----- | ------- | -------- | ----- |
-| AP-1  | `CLEAR` | largest file 373 lines; arch:check reports no size warning for the slice | |
-| AP-2  | `CLEAR` | `@std/text` and `crypto.subtle` used directly | |
-| AP-3  | `CLEAR` | interfaces are narrow single-purpose contracts | |
-| AP-4  | `N/A`   | no inheritance | |
-| AP-5  | `N/A`   | no abstract chain | |
-| AP-6  | `N/A`   | no base class | |
-| AP-7  | `CLEAR` | options objects throughout (`ReconcileResourceSliceInput`, requirement objects) | |
-| AP-8  | `N/A`   | no DI container | |
-| AP-9  | `CLEAR` | contract-first modules with named Slice D/E consumers in the locked plan | |
-| AP-10 | `CLEAR` | `try/catch` only around `JSON.parse`/option normalization to return typed `undefined`, not to swallow handler errors | |
-| AP-11 | `CLEAR` | no module-load client/env/logger/store; all inputs injected | |
-| AP-12 | `N/A`   | no time/scheduling | |
-| AP-13 | `CLEAR` | zero `console.*` (grep) | |
-| AP-14 | `CLEAR` | no re-export of upstream | |
-| AP-15 | `CLEAR` | no `IFoo`/`FooT` naming | |
-| AP-16 | `CLEAR` | no generic folder | |
-| AP-17 | `CLEAR` | contracts named by role in the feature folder | |
-| AP-18 | `CLEAR` | tests assert structured reports/classifications, plus one exact one-line marker pin (canonical-format requirement, not a giant snapshot) | |
-| AP-19 | `N/A`   | no permission change; IO-free | |
-| AP-20 | `N/A`   | no config change | |
-| AP-21 | `N/A`   | no presentation/feature surface touched | |
-| AP-22 | `CLEAR` | no barrel added | |
-| AP-23 | `N/A`   | composition untouched | |
-| AP-24 | `CLEAR` | variant/role vocabularies drive data (`LEAF_DEFINITIONS` table), not switch-over-union implementations | |
-| AP-25 | `CLEAR` | no side effect in any slice file | |
+- `reconcile-app-routes.ts`: requires both stock generated imports; exactly one `export const appRoutes = {` at column 0; brace/quote/comment-aware close; `} as const;` closing anchor; depth-aware top-level property split; quoted/computed/spread entries → conflict; alias reuse, alias-with-other-value, other-alias-same-value → conflict; insert is a single `  alias: generatedRoutes.<keyPath>,\n` line before the close brace; never rewrites the file. The stock post-Slice-F `router.ts` fixture (LOW-5) is present as `STOCK_POST_SLICE_F_ROUTER` and is the must-pass insert case; the current `packages/cli/src/kernel/assets/app/router.ts.template` (pre-Slice-F) has the same import lines and `export const appRoutes = {` / `} as const;` anchors, so the anchor choice survives F. Probe: a same-line trailing block comment on the alias value correctly conflicts rather than duplicating.
+- `reconcile-state.ts`: both D6 shapes handled (`export type State = Record<string, never>;` → interface conversion; existing `export interface State {`), extension/alias/intersection/duplicate/missing → conflict, exact same-type property → `exact`, optional or different simple type → conflict, brace-in-comment handled, `utils.ts` never replaced. The stock `utils.ts.template` is exactly the empty-Record shape.
+- **Defect:** the same-name detection regex `^\s*(?:readonly\s+)?<prop>(\?)?\s*:\s*([^;]+);\s*$` cannot match a member whose type contains `;` (object-literal type) or whose key is quoted, so the transform falls through to `insert` and emits a second `ordersRequest` member. See HIGH-1.
 
-## Arch-Debt Delta
+### 7. Nothing removed by the narrowing crept back — `PASS`
 
-| Metric                | Count | Evidence |
-| --------------------- | ----- | -------- |
-| New entries           | 0     | `git diff 850cc7757..HEAD -- .llm/harness/debt/arch-debt.md` empty |
-| Resolved entries      | 0     | same |
-| Deepened violations   | 0     | arch:check CLI `FAIL=0`; no new warning; future 14-child WARN is a master-plan-locked observation, correctly not a debt entry |
-| Unrecorded violations | 0     | quality:gate `ok:true`, 0 findings, no new allowance |
+- Grep over the ten files for `keep|replace|abort|recover|journal|lock|backup|rollback`: only hits are `blockComment` locals, `.replace(` regex-escaping, test-fixture `.replace(` calls, and the single remedy string "use --force to replace this generator-owned leaf". No per-leaf disposition, journal, lock, backup, or rollback concept exists.
 
-## Findings
+### 8. Static absolute routes only — `PASS`
 
-| Severity | Finding | Evidence | Required action |
-| -------- | ------- | -------- | --------------- |
-| low | Branch is unpushed and the PR is not yet open, so the draft-PR commit trail does not exist at evaluation time. This is the owner-directed lifecycle recorded in `supervisor.md`/`drift.md` (non-draft PR with `status:impl` opened after IMPL-EVAL), not a generator omission. | `git ls-remote origin feat/cli-resource-slice-contract` empty; `context-pack.md § Next Steps` | Push and open the metadata-complete non-draft PR with the per-slice comment immediately after this verdict, per the recorded override. No code change. |
-| low — **RESOLVED at `bc5120684`** | `reconcileAppRoutes` alias/same-value detection assumed deno-fmt two-space top-level entry indentation; a non-stock-indented existing alias would have been re-inserted as a duplicate key. Resolved by the follow-up commit: depth-aware top-level property parsing replaces the indentation-sensitive regexes (see § Follow-up attestation). | `reconcile-app-routes.ts:73-157` at head; custom-indent exact/conflict fixtures in `reconcile-app-routes_test.ts` | None — verified resolved by this evaluator. |
+- `normalizeStaticRoute` rejects non-leading-slash, `/`, trailing slash, `//`, backslash, any of `? # : [ ] *`, and non-kebab segments. Contract test pins positive (`/orders/history` → `routes/orders/history`, `routes/partials/orders/history/summary.tsx`) and ten rejection cases including `[id]`, `[...path]`, `:id`, `*path`, `?tab=all`, `/Orders`.
 
-## Follow-up attestation — head `bc5120684` (same evaluator session, 2026-09-02)
+## Gate Results (independently re-run at `b86524bcb`)
 
-The generator returned commit `bc5120684 fix(cli): harden app routes reconciliation` implementing
-the low-severity indentation observation. Independently verified by this session:
+| Gate                       | Command                                                                                                    | Result | Evidence                                                                                                                              |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Structured check           | `run-deno-check.ts --root packages/cli --ext ts,tsx`                                                       | `PASS` | exit 0; 926 files, 8 batches, 0 failed batches, 0 diagnostics                                                                         |
+| Focused tests              | `run-deno-test.ts -- --allow-all packages/cli/src/kernel/application/resource-slice/`                       | `PASS` | exit 0; 32 passed / 0 failed / 0 ignored (all ten files, five `_test.ts`)                                                              |
+| Scoped lint                | `deno lint --config <task-local: root rule tags>` on the directory                                          | `PASS` | exit 0, "Checked 10 files". Root `deno.json` excludes `packages/cli/` from lint/fmt, so wrappers refuse `all-excluded` — a repo config fact, recorded in `worklog.md`, not a slice defect. |
+| Scoped fmt                 | `deno fmt --check --config <task-local: root fmt options>` on the directory                                 | `PASS` | exit 0, "Checked 10 files"                                                                                                            |
+| `deno task arch:check`     |                                                                                                            | `PASS` | exit 0; every package `FAIL=0`; zero occurrences of `resource-slice` in the report (directory has 10 children; the LOW-4 14-child WARN is expected only after A+C+D) |
+| `deno task quality:gate`   |                                                                                                            | `PASS` | exit 0; nested arch gate `FAIL=0`; zero `resource-slice` findings                                                                     |
+| `docs:readme-fences`       |                                                                                                            | `PASS` | exit 0; `type_errors=7` = baseline 7                                                                                                  |
+| `docs:jsdoc-examples`      |                                                                                                            | `PASS` | exit 0; `unboundName=116` = baseline 116                                                                                              |
+| `check:mcp-export-corpus`  |                                                                                                            | `PASS` | exit 0                                                                                                                                |
+| PR CI at head              | `gh pr view 1946 --json statusCheckRollup`                                                                 | `PASS` | code-quality, check-test, quality, build, close-gate all SUCCESS at `b86524bcb`                                                       |
+| Aspire / Docker / e2e:cli  |                                                                                                            | `N/A`  | prohibited for this slice; no IO exists to exercise                                                                                   |
 
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Touch set of the follow-up | `PASS` | `git diff 03d4c2519..bc5120684 --name-only` → `reconcile-app-routes.ts` + `reconcile-app-routes_test.ts` only in product, plus run artifacts (`worklog.md`, `supervisor.md`, `implement.md`, this `evaluate.md`); `deno.lock` diff empty. |
-| Indentation-independence | `PASS` | Regex-per-line alias/same-value matching replaced by `splitTopLevelEntries` + `parseTopLevelProperties` (`reconcile-app-routes.ts:73-157`): comma-splitting at zero curly/paren/square depth with comment/string awareness, then a strict `identifier: value` parse per entry. Alias and same-route-key detection now compare parsed keys/values, not indented lines. |
-| Fail-closed preserved | `PASS` | Spread, computed-key, and shorthand entries fail the property parse → `unsupported entry shape` conflict (replaces the old indent-anchored spread check); unbalanced delimiters or an unterminated string/comment make the split return `undefined` → conflict; duplicate aliases and a different alias resolving the same route key now conflict explicitly. All five prior customized-shape fixtures still conflict. |
-| New fixtures | `PASS` | `reconcile-app-routes_test.ts`: four-space/spaced-colon existing alias returns `exact` without re-insertion; custom-indented alias reuse conflicts. |
-| Focused tests | `PASS` | `deno test --allow-all .../resource-slice/` → 32 passed, 0 failed (re-run at head). |
-| Scoped structured check | `PASS` | 10 files, 1 batch, 0 diagnostics (re-run at head). |
-| Scoped structured lint/fmt | `PASS` | task-local config, 10/10 processed, 0 findings each (re-run at head). |
-| Purity unchanged | `PASS` | grep over `reconcile-app-routes.ts` at head: no `Deno.*`/`console.*`/`fetch(`/`any`/`deno-lint-ignore`. |
-| Run-artifact honesty | `PASS` | `worklog.md` records the eval cycle and follow-up; `supervisor.md` records the requested/observed evaluator identity and cycle-1 verdict accurately. |
+## Findings (severity-ranked)
 
-The whole-suite, arch, quality, and docs gates were green at `03d4c2519`; the follow-up changes two
-files already inside that verified scope, with the scoped gates re-run green above, so those
-repository-level results remain attested. The remaining low finding (push + open the non-draft
-`status:impl` PR after evaluation) is the recorded owner-directed lifecycle step and is unchanged.
+### HIGH-1 — `reconcileState` inserts a duplicate `State` member instead of conflicting (D6 breach)
 
-## Lessons for Promotion
+- **Where:** `packages/cli/src/kernel/application/resource-slice/reconcile-state.ts:48-56` — `propertyPattern` uses `([^;]+);` for the type and an unquoted identifier for the key.
+- **Repro (pure, no IO):**
+  - `export interface State {\n  readonly ordersRequest: { id: string; };\n}\n` with requirement `{property:'ordersRequest', type:'OrdersRequestState'}` → `{"status":"insert"}` whose content contains **two** `ordersRequest` members.
+  - `export interface State {\n  'ordersRequest': Other;\n}\n` → `insert`, same duplicate.
+  - (`readonly ordersRequest?: OrdersRequestState;` correctly → `conflict`.)
+- **Why it matters:** D6 says "A same-name/different-type property … is a conflict before any write" and the matrix says `utils.ts` is "never replaced" on unsupported/conflicting shapes. Here the transform reports `insert` and would write a `utils.ts` that fails `deno check` (TS2717 subsequent property declarations must have the same type) in the user's app. Object-literal member types are a first-class shape in this slice's own fixture (`readonly session: { readonly userId: string; }`), so the case is realistic, not exotic. The shared-candidate path in `reconcileResourceSlice` then treats the insert result as a plain `write`, so nothing downstream catches it.
+- **Fix (small, inside the ten files):** detect an existing member by name with the same depth-aware scan already used for the brace matching (any top-level interface member whose key — bare or quoted — equals `property`, regardless of type text), then classify exact-type → `exact`, anything else → `conflict`. Add fixtures: object-literal type, quoted key, and a nested-object member that contains the property name at depth > 0 (must still insert). Re-run the five focused tests and the scoped wrappers.
+- **Verdict impact:** blocks `PASS`. Plan remains valid; this is implementation work → `FAIL_FIX`.
 
-| Lesson | Pattern | Applies to | Confidence |
-| ------ | ------- | ---------- | ---------- |
-| Structural zero-write proof | Encode "no apply plan" in the result union (only the `ready` arm carries `applyPlan`) so pre-apply safety is type-structural, then snapshot-compare an application map per injected failure | Archetype 6 generators/reconcilers | medium |
+### LOW-1 — Planner leaf order uses `localeCompare` (ICU collation), not code-point order
+
+- `plan-resource-slice.ts:98` and `reconcile-resource-slice.ts:73,80` sort by `localeCompare`. Under Deno's bundled ICU the result was identical with `LC_ALL=C` and default, and the planner test pins `(_components)` before `index.*`, so the plan is reproducible today. But ICU collation is not code-point order (`_b.tsx` sorts before `(_components)`), and "deterministic plan" is a stated property. Prefer an explicit `<`/`>` comparator so ordering is independent of ICU data. Non-blocking; may ride along with HIGH-1.
+
+### LOW-2 — D3 step-2 option union is not provided as a pure helper
+
+- No function in the ten files computes `recognisedPriorOptions ∪ requestedFlags`; tests supply the union. Not a Slice C touch-set item (Slice E owns resolve/plan/preflight), so not a finding against this PR. Record for Slice E so the union lands in application logic with its own test rather than inline in `generate-resource.ts`.
+
+### LOW-3 — Scoped lint/fmt verdicts depend on a task-local config
+
+- Root `deno.json` excludes `packages/cli/` from `lint` and `fmt`; `run-deno-lint.ts`/`run-deno-fmt.ts --root …/resource-slice` refuse with `all-excluded`, and raw `deno lint`/`deno fmt` report "No target files found". The PR body's "structured scoped check/lint/fmt — 10/10 files" is true only with the task-local config recorded in `worklog.md`. Pre-existing repo state, not a slice defect; the `code-quality` CI job at head is green.
+
+## Anti-pattern / doctrine status
+
+| Item                                | Status  | Evidence                                                                                          |
+| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| AP-1 file size                      | `CLEAR` | largest `resource-slice-contract.ts` 372 lines                                                    |
+| Layering (application ↔ IO)         | `CLEAR` | no IO/presentation/Fresh import; inputs are strings and maps                                      |
+| Folder cardinality (F-16)           | `CLEAR` | 10 children now; 14-child WARN after A+C+D is master-plan-locked and not a debt entry             |
+| Console / `any` / raw `fetch(`      | `CLEAR` | grep zero in the ten files; planner test scans plan JSON for forbidden generated-content patterns |
+| Architecture debt delta             | `CLEAR` | `debt/arch-debt.md` untouched; nothing introduced or deepened                                     |
 
 ## Verdict
 
-| Field     | Value  |
-| --------- | ------ |
-| Verdict   | `PASS` |
-| Rationale | Attested at head `bc5120684`. The locked Slice C scope is complete and exact: ten files, application-layer pure, the D3 marker/classification/force/zero-write contract is implemented and pinned by tests, planner deltas match D7, and both shared-source transforms fail closed. Every required gate was independently re-run green by this separate session at cycle 1 (32/32 focused tests; 10/10 scoped check/lint/fmt; full CLI suite 974 passed/0 failed; `arch:check` and `quality:gate` exit 0 with no slice-named finding; both docs gates at baseline), and the follow-up commit — which resolves the indentation-hardening finding with depth-aware property parsing while preserving every fail-closed behavior — was re-verified green on the focused tests and all scoped wrappers. No doctrine violation was introduced and the debt registry is correctly untouched. The one remaining low finding is the recorded owner-directed lifecycle step (push + non-draft PR after eval); it does not block the pass. |
+| Field     | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verdict   | `FAIL_FIX`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Rationale | At `b86524bcb` the ten-file ceiling, application-layer purity, the byte-exact ownership marker, the three-way fail-closed leaf classification with the documented forgery limitation, additive-option semantics, the type-structural zero-write guarantee with every D3 proof case named in a test, the `appRoutes` transform with the stock post-Slice-F fixture, static-route rejection, and the absence of every narrowed-away concept all verify, and every required gate is independently green (check 926/0, tests 32/32, scoped lint/fmt 10/10, arch/quality exit 0, docs baselines 7 and 116 held). One defect blocks: `reconcileState` fails open for a same-named `State` member with an object-literal type or quoted key and plans a duplicate member instead of a conflict, breaching D6 and the "never corrupt `utils.ts`" invariant. The plan is valid; the fix is local to `reconcile-state.ts` + its test. |
+| Next step | Fix HIGH-1 in `reconcile-state.ts` with the three named fixtures (LOW-1 may ride along), re-run the focused tests and scoped wrappers, then request a follow-up IMPL-EVAL at the new head.                                                                                                                                                                                                                                                                                                       |
+
+[PHASE: IMPL-EVAL] [VERDICT: FAIL_FIX]
