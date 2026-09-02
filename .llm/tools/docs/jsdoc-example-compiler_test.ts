@@ -8,6 +8,7 @@ import type {
 import {
   classifyDenoCheckDiagnostics,
   compileJsdocExamples,
+  exampleSymbolImport,
   unattributedDiagnostics,
 } from './jsdoc-example-compiler.ts';
 import { JSDOC_SCAFFOLD_ALIAS_RULES } from './snippet-supports.ts';
@@ -400,4 +401,59 @@ Deno.test('every diagnostic an example owns is attributed, none reported as unow
     `    at ${owned}:5:1`,
   ].join('\n');
   assertEquals(unattributedDiagnostics(raw, [{ path: owned }]), []);
+});
+
+Deno.test('a documented value binds module-scoped, so it cannot leak into sibling examples', () => {
+  const owner: JsdocExampleOwner = {
+    memberName: '@netscript/plugin',
+    memberRoot: 'packages/plugin',
+    sourcePath: 'packages/plugin/src/adapter/item/substitute.ts',
+    kind: 'symbol',
+    symbol: 'substituteTokens',
+    publicSpecifier: '@netscript/plugin/adapter',
+    declarationKind: 'value',
+  };
+  const block = {
+    owner,
+    body: 'const source = substituteTokens(stub, { NAME: 1 });\n',
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+
+  const binding = exampleSymbolImport(block);
+  // A real import is scoped to the one example module. A `declare global` const would be visible to
+  // every other example in the same `deno check` program, which is how examples used to resolve
+  // symbols they never imported.
+  assertEquals(binding, 'import { substituteTokens } from "@netscript/plugin/adapter";');
+  assert(!binding?.includes('declare global'));
+});
+
+Deno.test('an example that already binds the symbol gets no second binding', () => {
+  const owner: JsdocExampleOwner = {
+    memberName: '@netscript/plugin',
+    memberRoot: 'packages/plugin',
+    sourcePath: 'packages/plugin/src/adapter/item/substitute.ts',
+    kind: 'symbol',
+    symbol: 'substituteTokens',
+    publicSpecifier: '@netscript/plugin/adapter',
+    declarationKind: 'value',
+  };
+  const imported = {
+    owner,
+    body: "import { substituteTokens } from '@netscript/plugin/adapter';\nsubstituteTokens();\n",
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+  assertEquals(exampleSymbolImport(imported), undefined);
+
+  const declared = {
+    owner,
+    body: 'const substituteTokens = () => 1;\n',
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+  assertEquals(exampleSymbolImport(declared), undefined);
 });

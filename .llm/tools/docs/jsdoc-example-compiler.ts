@@ -78,7 +78,7 @@ function declaresOwnSymbol(body: string, symbol: string): boolean {
  *
  * Skipped when the example already imports or declares the symbol itself.
  */
-function exampleSymbolImport(block: JsdocExampleBlock): string | undefined {
+export function exampleSymbolImport(block: JsdocExampleBlock): string | undefined {
   const owner = block.owner;
   if (owner.kind !== 'symbol' || !owner.symbol || !owner.publicSpecifier) return undefined;
   if (importsOwnSymbol(block.body, owner.symbol)) return undefined;
