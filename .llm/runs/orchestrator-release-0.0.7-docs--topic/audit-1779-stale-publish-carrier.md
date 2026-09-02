@@ -153,3 +153,11 @@ No open docs finding. No `orchestrator:docs` issue in 0.0.7.
   sweep.
 - Trap paid again: `pkill -f openrouter-run.ts` matched the invoking shell (exit 144). Use the
   `/proc/<pid>/cmdline` filter loop; never `pkill -f` a pattern the shell itself carries.
+
+## #1949 exact-green packet (be6a4d471)
+
+Delta IMPL-EVAL **PASS**; close-gate pass after the `acceptance-evidence` block + label + `gh run
+rerun --failed` on the unchanged head; 4/4 boxes mirrored on #1947. Packet:
+`1949-merge-packet-be6a4d471.md`. Handed to the coordinator. Trap: a monitor grepping for the verdict
+heading matched the prompt's `PASS|FAIL_FIX` echo in the evaluator's thinking — anchor on the `# `
+heading and exclude the `|` form.
