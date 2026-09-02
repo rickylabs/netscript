@@ -161,3 +161,20 @@ rerun --failed` on the unchanged head; 4/4 boxes mirrored on #1947. Packet:
 `1949-merge-packet-be6a4d471.md`. Handed to the coordinator. Trap: a monitor grepping for the verdict
 heading matched the prompt's `PASS|FAIL_FIX` echo in the evaluator's thinking — anchor on the `# `
 heading and exclude the `|` form.
+
+## #1949: S9 fold → delta2 FAIL_FIX → 5c0d6c582
+
+- #1759 (S9) merged as main `88fc6d69d`; folded into #1949 at `cf43a85c4` (CI run 33680033011
+  green incl. close-gate — label + evidence block carried over).
+- Delta2 IMPL-EVAL on `cf43a85c4`: **FAIL_FIX**, one finding — `aspire mcp tools` / `aspire mcp call`
+  carry no S2/S9 receipt key, so listing them as "re-verified" overclaims. Five other clauses
+  VERIFIED with file:line. Artifact `1949-delta2-eval-cf43a85c4-FAIL_FIX.md`.
+- Applied the evaluator's prescribed minimal fix in `5c0d6c582`: the two names are removed from the
+  re-verified parenthetical; nothing else changed (deletion-only delta, `git diff --check` clean,
+  `check:publish-assets` exit 0). No further eval cycle spent on a deletion the evaluator itself
+  specified — recorded here as the disposition.
+- Canary 6 (run 33679983481) failed on release-tool dirty-guard ordering — not docs content; owner
+  unchanged, nothing duplicated here.
+- #1856 rebased to `bce209422`: behind 0, no conflict, all four carriers zero-diff.
+- GraphQL rate limit exhausted for the shared account at ~20:39 (REST unaffected); the PR-set
+  monitor emitted one empty snapshot and re-syncs on reset.
