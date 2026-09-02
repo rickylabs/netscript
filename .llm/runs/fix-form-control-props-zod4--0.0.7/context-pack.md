@@ -12,7 +12,7 @@
 
 ## Current State
 
-S1 is GREEN: after the three-diagnostic RED proof, `ControlProps.role` derives from Preact's intrinsic HTML role type and the input/select/textarea consumer compiles. All scoped S1 GREEN gates exit 0. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
+S1 is GREEN. S2 RED is independently reproduced against locked npm Zod 4.4.3: the exact full-map test lacks `slug.pattern` and `quantity.min/max/step`, while all other expected fields match. S2 is therefore admitted for 0.0.7. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
 
 ## Completed
 
@@ -22,14 +22,15 @@ S1 is GREEN: after the three-diagnostic RED proof, `ControlProps.role` derives f
 - Opened draft PR #1960 with requested labels and 0.0.7 milestone.
 - Added and ran the independent S1 RED probe.
 - Implemented and validated S1 GREEN; 82 scoped tests pass.
+- Added and ran S2 RED; focused result is 16 passed/1 failed and full scoped result is 82 passed/1 failed.
 
 ## In Progress
 
-- S2 RED exact locked-family five-field constraint probe.
+- S2 GREEN Zod 4 check decoding.
 
 ## Next Steps
 
-1. Land S2 RED; proceed only if the exact locked family fails as expected, then S2 GREEN.
+1. Land S2 GREEN for regex plus inclusive numeric constraints.
 2. Run S3/full gates and hand off to the separate evaluator without self-certification.
 
 ## Key Decisions
@@ -47,13 +48,14 @@ S1 is GREEN: after the three-diagnostic RED proof, `ControlProps.role` derives f
 | `.llm/runs/fix-form-control-props-zod4--0.0.7/*` | new | Harness activation, research, plan, worklog, context, drift. |
 | `packages/fresh/src/application/form/control-props-element-assignability_test.tsx` | new | S1 TSX consumer RED probe. |
 | `packages/fresh/src/application/form/_internal/prop-types.ts` | changed | Intrinsic-derived `role` property type. |
+| `packages/fresh/src/application/form/schema-adapter/schema-adapter.test.ts` | changed | Exact five-field S2 RED map. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS at S1 GREEN | Focused check plus scoped check/test/lint/fmt exit 0; 82 tests. |
-| Fitness | PASS at S1 GREEN | `quality:gate` exit 0; final JSR/doc gates remain planned. |
+| Static | Expected S2 RED | Check/lint/fmt exit 0; tests exit 1 with 82 passed/1 expected failure. |
+| Fitness | PASS at S2 RED | `quality:gate` exit 0; final JSR/doc gates remain planned. |
 | Runtime | N/A | No runtime/browser workflow change. |
 | Consumer | PASS | Input/select/textarea spreads compile without casts after RED proof. |
 

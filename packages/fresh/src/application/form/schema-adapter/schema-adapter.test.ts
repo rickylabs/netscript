@@ -314,6 +314,49 @@ Deno.test('createZodAdapter getConstraints exposes array collection bounds', () 
   });
 });
 
+Deno.test('createZodAdapter getConstraints derives the complete Zod 4 control map', () => {
+  const adapter = createZodAdapter(
+    z.object({
+      email: z.string().min(3).max(120),
+      slug: z.string().regex(/^[a-z-]+$/),
+      homepage: z.string().url().optional(),
+      quantity: z.number().min(1).max(99).multipleOf(5),
+      tags: z.array(z.string().min(2)).min(1).max(4),
+    }),
+  );
+
+  assertDeepEquals(adapter.getConstraints(), {
+    email: {
+      required: true,
+      minLength: 3,
+      maxLength: 120,
+    },
+    slug: {
+      required: true,
+      pattern: '^[a-z-]+$',
+    },
+    homepage: {
+      required: false,
+      pattern: /^https?:\/\/[^\s/$.?#].[^\s]*$/i.source,
+    },
+    quantity: {
+      required: true,
+      min: 1,
+      max: 99,
+      step: 5,
+    },
+    tags: {
+      required: true,
+      minItems: 1,
+      maxItems: 4,
+    },
+    'tags[0]': {
+      required: true,
+      minLength: 2,
+    },
+  });
+});
+
 Deno.test('createZodAdapter is intent-agnostic and validates values independently of form intent', async () => {
   const adapter = createZodAdapter(demoSchema);
   const intent: FormIntent = {

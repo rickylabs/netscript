@@ -62,6 +62,8 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | 2026-09-02T23:16Z | S1 RED | Pre-push gates | Expected RED: check=1, test=1 (type-check); lint=0, fmt=0, quality=0. Lock unchanged. |
 | 2026-09-02T23:18Z | S1 GREEN | Implementation | `ControlProps.role` now derives from `JSX.HTMLAttributes<HTMLElement>['role']`; focused consumer check exits 0. |
 | 2026-09-02T23:18Z | S1 GREEN | Pre-push gates | check=0, test=0 (82 passed), lint=0, fmt=0, quality=0. Lock unchanged. |
+| 2026-09-02T23:20Z | S2 RED | Probe | Exact locked Zod 4 full-map test exited 1: `slug.pattern` and `quantity.min/max/step` are absent; 16 sibling tests passed. S2 admitted for 0.0.7. |
+| 2026-09-02T23:20Z | S2 RED | Pre-push gates | Expected RED: check=0, test=1 (82 passed/1 failed), lint=0, fmt=0, quality=0. Lock unchanged. |
 
 ## Decisions
 
@@ -137,6 +139,27 @@ error: Type checking failed.
 ```
 
 Structured wrapper confirmation selected 214 files in two batches, reported three occurrences / one code / one path, and exited 1. The test wrapper exited 1 before execution because the same TS2322 diagnostics prevented type checking. Lint, format, and quality gates each exited 0.
+
+### S2 RED raw probe
+
+Command:
+
+`deno test --allow-all packages/fresh/src/application/form/schema-adapter/schema-adapter.test.ts`
+
+Exit code: `1`
+
+```text
+createZodAdapter getConstraints derives the complete Zod 4 control map ... FAILED
+Error: Expected
+{"email":{"required":true,"minLength":3,"maxLength":120},"slug":{"required":true,"pattern":"^[a-z-]+$"},"homepage":{"required":false,"pattern":"^https?:\\/\\/[^\\s/$.?#].[^\\s]*$"},"quantity":{"required":true,"min":1,"max":99,"step":5},"tags":{"required":true,"minItems":1,"maxItems":4},"tags[0]":{"required":true,"minLength":2}},
+received
+{"email":{"required":true,"minLength":3,"maxLength":120},"slug":{"required":true},"homepage":{"required":false,"pattern":"^https?:\\/\\/[^\\s/$.?#].[^\\s]*$"},"quantity":{"required":true},"tags":{"required":true,"minItems":1,"maxItems":4},"tags[0]":{"required":true,"minLength":2}}
+
+FAILED | 16 passed | 1 failed
+error: Test failed
+```
+
+This is the admission probe required by issue #1249: the locked npm Zod 4.4.3 family reproduces both named omissions, so the Zod half remains in 0.0.7. The structured full test wrapper confirms 82 passed / 1 failed; check, lint, format, and quality each exit 0.
 
 ## Handoff Notes
 
