@@ -148,4 +148,7 @@ was not edited. No trace/observability surface was edited.
   evidence in this run's `worklog.md`, `context-pack.md`, and `drift.md`.
 - `deno.lock` SHA-256 before and after the repair gates/generation remains
   `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
-- Post-commit carrier checks are pending the repair commit, as required by the coordinator.
+- Repair commit `6969d330b68ee3ffde1b054831a795468b299587` was clean before verification.
+  Post-commit carrier checks all exited 0 in required order: `check:agent-docs-prose` (docs source
+  format OK, rendered output OK, carriers fresh), `check:assets-barrel`, `check:publish-assets`, and
+  `check:mcp-export-corpus` (35 packages, 272 subpaths, 7,809 symbols).

@@ -19,4 +19,5 @@ Repair gates before commit are green: JSDoc examples exit 0 with 359 examples an
 116 unbound-name / 14 type-error; docs snippets exit 0 with 597 scanned and 24 checked; SDK check
 exits 0 over 103 files; SDK tests are 230/0/0. Required carrier generation exits 0 in order. The
 lock remains `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`. Remaining work is
-commit, post-commit carrier checks, explicit-refspec push, and a PR repair comment.
+the evidence commit, final carrier recheck, explicit-refspec push, and a PR repair comment. Repair
+commit `6969d330b` passed all four post-commit carrier checks in the required order.
