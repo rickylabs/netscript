@@ -10760,3 +10760,16 @@ that answers the question, and the count of watchers is itself a budget.
 Coordinator confirmed the provenance defect from D-251/F1 (dry-run changes **9** dogfood outputs, prepared set stages **2**) and chose the safer correction: commit the stale dogfood outputs at stable source, and teach the coordinated version bump to **own** the two JSON version surfaces (`consumer-skills/.llm/tools/release.json`, `.mcp.json`). That supersedes my remedy #1 (separate refresh leaf) with an in-PR refresh, and makes "exactly two" sound **by construction** rather than by assertion — the bump writer, not the dogfood generator, becomes the authority for those two files.
 
 At audit time the remote branch and PR head are still `4f5df4e3c` (stage-1 only); the amended head is not pushed. Nothing exists to audit yet. Pre-staged `audit-1951.sh` (gates, guard/deno.json identity, lock churn, bundle residue, dogfood idempotence at head — must be **empty** after the stale-output commit — a simulated bump followed by dogfood to prove the two JSON surfaces carry the new version and the bundle delta is exactly two, and the bump-writer grep). A git-protocol watcher runs it automatically on push; no GraphQL spend. Packet remains held until a clean end-to-end dry-run at the final head.
+
+### D-253 — #1951 amended head 706db5a26 audited: provenance defect fixed by construction; packet held for dry-run only
+
+Auto-audit fired on push. PASS: dogfood idempotent at head (0 residual); real `version:bump` rewrites
+exactly the two bundle JSON surfaces to the new version and dogfood on the bumped tree adds 0 — so
+the release-time bundle delta is exactly the bump-owned pair, staged by the bump writer's discovery.
+Guard/deno.json identical, lock churn 0, tests 5/0 + 12/0 + 12/0, clean merge vs main `9a191bdda`.
+**Non-finding recorded:** bare `version:bump` exits 1 on `Version residue remains` for two
+generator outputs (`provenance.json`, `publish-assets.generated.ts`) — pre-existing check;
+`prepare-release` regenerates them in order (`gen:agent-docs-prose gen:agent-docs-prose>gen:publish-assets gen:publish-assets gen:mcp-export-corpus>gen:mcp-export-corpus gen:assets-barrel gen:assets-barrel>check:agent-docs-prose check:agent-docs-prose`) before it re-checks, so it is a harness
+artefact of my scratch run, not the PR. Wrote it down so the next auditor does not chase it.
+**F3 (low):** dogfood gate removed, so no release-prep freshness assertion remains; `--check` mode
+exists — recommended as a gate before stable. Dry-run at this head: none; packet HELD.
