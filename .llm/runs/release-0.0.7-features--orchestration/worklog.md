@@ -10709,3 +10709,14 @@ case. Reported on #1894 with both runs.
 Dispatched a **native Fable 5 IMPL-EVAL** for #1941, instructed to write `evaluate.md` into the run
 dir itself so the receipt is durable — the lane-policy local default, and the route that worked for
 #1891. #1943's retrigger is still running; if it fails the same way it goes native too.
+
+### ~19:40Z — #1944 is exact-green; native eval dispatched pre-emptively
+
+**#1944 CI 7/7 at `e703a5ebc`** including `close-gate` (no boxes to gate — #1452's rows are plain
+bullets, which the PR states rather than papers over). No cloud eval run has appeared despite
+`dispatch=pass`, and the cloud lane has discarded 2/2 parsed PASSes today, so a **native Fable 5
+IMPL-EVAL** is dispatched in parallel rather than waiting ~45 min to learn the artifact was lost
+again. It writes `evaluate.md` into the run dir itself. If the cloud run later lands a durable
+verdict too, both are recorded; nothing is wasted but a session.
+
+Two native evals now live (#1941, #1944); #1943's cloud retrigger still pending.
