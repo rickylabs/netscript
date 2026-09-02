@@ -10816,3 +10816,12 @@ hand-merge — and one real source conflict in `listener-unreachable-fixture.ts`
 `runtime.health.listener-unreachable`, the gate that failed canary.6's prod E2E, so the semantic
 merge of #1909 + #1952 is what the next canary exercises. Posted read-only on #1952; aspire owns
 the converge; IMPL-EVAL offered on request.
+
+### D-258 — post-reset reconciliation (2026-09-03): no owned PR to packet, no owned issue to dispatch
+
+`origin/main` = `8c549c061` (23:49Z). Milestone 29 open / 303 closed. Internals-owned open PRs:
+only the #1641 umbrella. Internals-owned open issues at any milestone: **0**. Unowned 0.0.7 issues:
+**0** (all 29 are fixes/features/aspire/docs). Open PRs by lane: features 6, fixes 2, aspire 1,
+internals 1 (umbrella). The instruction to "finish/packet all owned exact-green PRs; dispatch
+remaining milestone issues" resolves to **nothing owned** — reported, not manufactured; a named
+transfer is dispatched on sight. Watchers re-armed after the reset.
