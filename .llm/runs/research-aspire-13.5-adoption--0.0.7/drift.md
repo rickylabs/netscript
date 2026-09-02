@@ -7811,3 +7811,41 @@ toward #1721 box 2's receipt. Verified before deciding that nothing else is pend
 (S10's docker is *running*, hence protected), so S9's remaining docker admission destroys nothing.
 No further S9 runtime dispatch until #1908 lands. S8's and S10's evicted tiers are re-dispatched
 after the queue drains; both carry `queue: max`, so they defer.
+
+## D-302 — S9's 401 settled: its own auth switch versus two raw HTTP dashboard readers
+
+S9's sqlite tier finally *ran* rather than being evicted (run `33592084708`) and failed on its merits:
+`behavior.otel.stream-consumer` → `Dashboard traces read failed: HTTP 401`. Real conclusion, and the
+cause is S9-owned.
+
+Commit `cdd347475` ("authenticate the Aspire dashboard for MCP smoke") — on this branch only, not on
+main — rewrites the generated `aspire.config.json` before launch to set
+`ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS = "false"`. The worklog gives the reason and it holds:
+*anonymous mode suppresses the dashboard API key that Aspire MCP requires*. So the switch is
+necessary; reverting is not an option.
+
+With auth on, two readers hit `/api/telemetry/traces` over plain HTTP with no credential —
+`consume-flow-b-stream.ts:169` (the failing one) and `otel-gates.ts:193`.
+
+**This closes the claim boundary I set in `e72da5161`.** That commit fixed `new URL(path, base)`
+discarding the base's query string, and said explicitly that a dropped token is *a* sufficient cause
+of 401 but that I had not proven it was *the* cause, naming the `profiles.https` anonymous setting as
+the second candidate. The second candidate is the real one: the reported `dashboardUrl` carries **no**
+`?t=` at all, so there was never a token on that path to preserve. The fix was still correct — it
+removed a genuine defect — it just was not this failure's cause. Stating the boundary at the time is
+what made this cheap to settle instead of a second wrong theory.
+
+**Why the MCP smoke is unaffected:** `aspire-mcp/stdio-transport.ts` launches `aspire agent mcp` as a
+subprocess, so the CLI authenticates internally. The dashboard API key exists but is never exposed to
+the gate layer — the raw readers have no credential available, rather than merely failing to send one.
+
+**Resolution identified:** `ASPIRE_MCP_DASHBOARD_TOOLS` already includes **`list_traces`**. Routing the
+Flow-B trace read through the existing stdio transport removes the last raw dashboard reader and reuses
+the authentication path the smoke already has. The remaining work is adapting `findJobExecuteIdentity`
+from the OTLP envelope shape to `list_traces` output — a real adaptation, owed its own RED/GREEN rather
+than a same-night edit. Rejected alternatives: scraping the API key from an undocumented location, and
+giving the smoke its own AppHost (violates #1720 box 5's no-second-AppHost requirement).
+
+**Latent leak noted:** the same start script does `console.info(\`Aspire dashboard: ${dashboardUrl}\`)`.
+Harmless today because the URL carries no token, but it is exactly the pattern S11's how-to warns
+against and becomes a CI-log token leak the moment Aspire includes one.
