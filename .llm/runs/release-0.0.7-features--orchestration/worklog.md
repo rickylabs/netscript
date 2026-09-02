@@ -10087,3 +10087,49 @@ Its PASS is at `f570dcde4`; I had converged it to `af48ec18d` afterwards. Of **8
 `contributions` and `propagateTraceContext` table rows replaced by main's wording for the same
 fields, and the +54 is #1915's bearer section added. **The slice's own prose section is untouched.**
 That is the difference between a carry claim and a carry proof.
+
+---
+
+## #1927 re-converged after #1921/#1922 merged — 2026-09-02 ~13:45Z
+
+`main` `4720596fc`. Re-packet posted (`5510412632`); head `4eb736910`, `status:ready-merge` retained.
+
+### A real conflict, not a carrier one — and both slices survive
+
+`packages/sdk/tests/client-contribution-validation_test.ts` conflicted because **#1921 appended its
+reserved-trace-header test in the same region** this slice appended its diagnostic-orientation tests.
+Both sides ended mid-statement on a shared closing tail, so a naive "take one side" resolution would
+have silently deleted a merged slice's test.
+
+Resolved by splicing: this slice's block, a copy of the shared tail to close it, then #1921's block
+closed by the original tail. Verified by name — `ownership diagnostics orient the later claimant
+against the earlier owner` **and** `reserved trace header declarations identify the offending
+descriptor` both present, 20 `Deno.test` blocks, `deno fmt --check` and `deno check` both exit 0.
+
+### The delta-from-evaluated-head proof the coordinator asked for
+
+Evaluated head `9a7d86b1a`, merge-base `634b83d64`, five slice-owned files:
+
+| File | vs evaluated head |
+| --- | --- |
+| `client/errors.ts` | byte-identical |
+| `internal/client-contributions/prepared-call.ts` | byte-identical |
+| `internal/client-contributions/contribution-diagnostic-id.ts` | byte-identical |
+| `desktop/application/desktop-rpc-client.ts` | byte-identical |
+| `tests/client-contribution-validation_test.ts` | **+22 / −0**, sole added test is #1921's |
+
+**All four product-source files unchanged; zero deletions anywhere.** That is a proof, not a claim —
+the distinction that matters when a packet asserts a verdict still carries.
+
+Exact-head gates re-run locally: SDK check 104 files / 0 diagnostics; SDK tests **238/0/0**; lint
+exit 0; fmt 0 findings; three carrier gates 0; `deno.lock` byte-identical.
+
+### #1349's last gap dispatched independently
+
+`docs/site/reference/sdk/index.md` had **0** contribution references against `packages/sdk/README.md`'s
+14 and `docs/site/services-sdk/sdk.md`'s 17 (the latter via #1922). Slice dispatched on
+`docs/sdk-reference-contribution-example`, carrying **`Closes #1349`** and the **full ten-entry**
+evidence block — which is what finally makes the mirror run, since #1927's identical block is inert
+without a closing keyword. The brief tells it to re-verify every entry against merged state rather
+than paste the staged copy, and that a "Mirror skipped" notice at its stage is expected because
+`status:ready-merge` is the supervisor's to apply.
