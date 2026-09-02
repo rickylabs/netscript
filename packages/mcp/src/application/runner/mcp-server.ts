@@ -1,6 +1,7 @@
 import { createDoctorFlow } from '../flows/doctor-flow.ts';
 import { createToolRegistry } from '../tool-registry.ts';
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
+import type { AspirePsDashboardPort } from '../../domain/telemetry-endpoint.ts';
 import { validateSchema } from '../../domain/schema.ts';
 import type {
   ToolDefinition,
@@ -34,6 +35,8 @@ export interface McpServerOptions {
   }>;
   /** Backward-compatible S1 endpoint injection. */
   readonly environmentEndpoint?: string;
+  /** Injectable running-AppHost telemetry endpoint reader. */
+  readonly aspirePs?: AspirePsDashboardPort;
   /** Optional server-side output bounds. */
   readonly truncation?: TruncationPolicy;
   /** Optional flow overrides for composition and contract testing. */
@@ -51,11 +54,17 @@ export interface McpServer {
 export function createMcpServer(options: McpServerOptions): McpServer {
   const tools = createToolRegistry({
     ...options.flows,
-    doctor: options.flows?.doctor ?? createDoctorFlow(options.probe, {
-      ...options.environment,
-      NETSCRIPT_TELEMETRY_ENDPOINT: options.environment?.NETSCRIPT_TELEMETRY_ENDPOINT ??
-        options.environmentEndpoint,
-    }),
+    doctor: options.flows?.doctor ?? createDoctorFlow(
+      options.probe,
+      {
+        ...options.environment,
+        NETSCRIPT_TELEMETRY_ENDPOINT: options.environment?.NETSCRIPT_TELEMETRY_ENDPOINT ??
+          options.environmentEndpoint,
+      },
+      [],
+      '.',
+      options.aspirePs,
+    ),
   });
   const policy = options.truncation ?? DEFAULT_TRUNCATION_POLICY;
   return {

@@ -6,10 +6,11 @@
  * static workspace imports.
  */
 
-import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createPluginLogger } from '@netscript/plugin/loader';
-import { createLazyKv } from '@netscript/kv';
-import { baseContract } from '@netscript/contracts';
+import {
+  createPluginServiceContext as createHostPluginServiceContext,
+  type PluginServiceContext,
+} from '@netscript/plugin/sdk';
+import { getKv } from '@netscript/kv';
 
 type DatabaseModule = {
   readonly db?: {
@@ -28,16 +29,8 @@ async function getDatabaseClient(): Promise<unknown> {
 export function createPluginServiceContext(
   pluginName: string,
 ): Promise<PluginServiceContext> {
-  return Promise.resolve({
-    db: {
-      getClient: getDatabaseClient,
-    },
-    contracts: {
-      base: baseContract,
-      versions: {},
-    },
-    kv: createLazyKv(),
-    logger: createPluginLogger(pluginName),
-    env: Deno.env.toObject(),
+  return createHostPluginServiceContext(pluginName, {
+    getDatabaseClient,
+    getKv,
   });
 }
