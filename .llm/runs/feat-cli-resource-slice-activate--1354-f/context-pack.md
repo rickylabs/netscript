@@ -53,7 +53,7 @@ The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at 
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pass | CLI check 0 diagnostics; touched lint/fmt 0 findings. |
+| Static | pass for slice | CLI check 0 diagnostics; 12 authored-file lint/fmt 0 findings. Full-package diagnostics expose only baseline drift: lint 59 occurrences / 34 paths and format 214 findings / 214 paths, with zero changed-path intersections. |
 | Fitness | pass | JSR audit, publish dry-run, `arch:check`, and `quality:gate` exit 0. |
 | Runtime | N/A | Slice G owns hosted acceptance. |
 | Consumer | pass | focused 32/32; full CLI 1324/1324; all carrier/publish/sample/docs gates pass. |
@@ -65,6 +65,7 @@ The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at 
 ## Drift and Debt
 
 - Drift: RTK absence, stacked-base movement, and the item-33 rescope are recorded.
+- Baseline: whole-package lint/format diagnostics fail outside the Slice F diff; exact counts and zero-intersection proof are recorded in `worklog.md`/`drift.md`.
 - Debt: Slice E LOW-2 remains deferred because its required `generate-resource-command.ts` edit is outside Slice F's amended file set.
 
 ## Commits
