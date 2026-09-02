@@ -5,7 +5,12 @@ import type {
   JsdocExampleBlock,
   JsdocExampleOwner,
 } from './jsdoc-example-contract.ts';
-import { classifyDenoCheckDiagnostics, compileJsdocExamples } from './jsdoc-example-compiler.ts';
+import {
+  classifyDenoCheckDiagnostics,
+  compileJsdocExamples,
+  exampleSymbolImport,
+  unattributedDiagnostics,
+} from './jsdoc-example-compiler.ts';
 import { JSDOC_SCAFFOLD_ALIAS_RULES } from './snippet-supports.ts';
 import { resolveWorkspaceSurface } from './snippet-workspace.ts';
 
@@ -362,5 +367,123 @@ Deno.test('diagnostic classification is identical with compiler color on and off
       { failureClass: 'unboundName', fenceOrdinal: 2, tsCodes: [2304] },
       { failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] },
     ],
+  );
+});
+
+Deno.test('a diagnostic no example owns is reported even when siblings are classified', () => {
+  const owned = '/tmp/x/examples/1/example.ts';
+  const raw = [
+    "TS2304 [ERROR]: Cannot find name 'nope'.",
+    'const a = nope;',
+    `    at ${owned}:3:11`,
+    '',
+    "TS2451 [ERROR]: Cannot redeclare block-scoped variable 'dup'.",
+    'declare const dup: number;',
+    '    at /tmp/x/examples/1/preamble.ts:3:9',
+  ].join('\n');
+
+  // The owned diagnostic classifies, which is exactly the condition that used to suppress the
+  // unowned one: `unclassifiedCompilerFailure` only fires when nothing at all classified.
+  const unowned = unattributedDiagnostics(raw, [{ path: owned }]);
+  assertEquals(unowned.length, 1);
+  assert(unowned[0]?.startsWith('TS2451 at /tmp/x/examples/1/preamble.ts'));
+});
+
+Deno.test('every diagnostic an example owns is attributed, none reported as unowned', () => {
+  const owned = '/tmp/x/examples/7/example.ts';
+  const raw = [
+    "TS2322 [ERROR]: Type 'number' is not assignable to type 'string'.",
+    'const a: string = 1;',
+    `    at file://${owned}:4:7`,
+    '',
+    "TS2304 [ERROR]: Cannot find name 'missing'.",
+    'missing();',
+    `    at ${owned}:5:1`,
+  ].join('\n');
+  assertEquals(unattributedDiagnostics(raw, [{ path: owned }]), []);
+});
+
+Deno.test('a documented value binds module-scoped, so it cannot leak into sibling examples', () => {
+  const owner: JsdocExampleOwner = {
+    memberName: '@netscript/plugin',
+    memberRoot: 'packages/plugin',
+    sourcePath: 'packages/plugin/src/adapter/item/substitute.ts',
+    kind: 'symbol',
+    symbol: 'substituteTokens',
+    publicSpecifier: '@netscript/plugin/adapter',
+    declarationKind: 'value',
+  };
+  const block = {
+    owner,
+    body: 'const source = substituteTokens(stub, { NAME: 1 });\n',
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+
+  const binding = exampleSymbolImport(block);
+  // A real import is scoped to the one example module. A `declare global` const would be visible to
+  // every other example in the same `deno check` program, which is how examples used to resolve
+  // symbols they never imported.
+  assertEquals(binding, 'import { substituteTokens } from "@netscript/plugin/adapter";');
+  assert(!binding?.includes('declare global'));
+});
+
+Deno.test('an example that already binds the symbol gets no second binding', () => {
+  const owner: JsdocExampleOwner = {
+    memberName: '@netscript/plugin',
+    memberRoot: 'packages/plugin',
+    sourcePath: 'packages/plugin/src/adapter/item/substitute.ts',
+    kind: 'symbol',
+    symbol: 'substituteTokens',
+    publicSpecifier: '@netscript/plugin/adapter',
+    declarationKind: 'value',
+  };
+  const imported = {
+    owner,
+    body: "import { substituteTokens } from '@netscript/plugin/adapter';\nsubstituteTokens();\n",
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+  assertEquals(exampleSymbolImport(imported), undefined);
+
+  const declared = {
+    owner,
+    body: 'const substituteTokens = () => 1;\n',
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+  assertEquals(exampleSymbolImport(declared), undefined);
+});
+
+Deno.test('an example using a value documented elsewhere, without importing it, is not resolved by that other example', async () => {
+  // The property, exercised through the real materialize + `deno check` path rather than through the
+  // generated binding string: under the previous `declare global` preamble the second block below
+  // compiled, because the first block's ambient const was visible program-wide. Asserting only the
+  // binding string would pass even if the import stopped being injected into the example module.
+  const documented = block(
+    owner('substituteTokens', 'value', '@netscript/plugin/adapter'),
+    "const stub = defineStub({ source: '%%N%%', tokens: ['N'] as const });\nvoid substituteTokens(stub, { N: 'x' });\n",
+  );
+  const borrower = block(
+    owner('defineStub', 'value', '@netscript/plugin/adapter'),
+    // References `substituteTokens` — documented by the block above — without importing it.
+    "const stub = defineStub({ source: '%%N%%', tokens: ['N'] as const });\nvoid substituteTokens(stub, { N: 'x' });\n",
+  );
+
+  const result = await compileJsdocExamples(analysis([documented, borrower]), repositoryRoot);
+  const borrowed = result.deferredExamples.filter((entry) =>
+    entry.owner.symbol === 'defineStub' && entry.failureClass === 'unboundName'
+  );
+  assertEquals(
+    borrowed.length,
+    1,
+    'the borrowing example must be classified, not silently resolved',
+  );
+  assert(
+    borrowed[0]?.tsCodes.includes(2304),
+    'the borrowed symbol must be reported as an unbound name',
   );
 });
