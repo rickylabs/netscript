@@ -23,3 +23,18 @@ this file or elsewhere under the run directory.
 - **Severity:** minor.
 - **Action:** accept; use raw `git` only for ground truth and structured Deno wrappers for gates.
 - **Evidence:** bootstrap command output; no gate was substituted with filtered output.
+
+## 2026-09-02 — export-map reference page required by accuracy gate
+
+- **What:** Adding the planned `@netscript/plugin-auth-core/sdk` export caused the repository's
+  export-drift gate to require the package reference page to name that entrypoint.
+- **Source:** `deno task docs:accuracy` / `docs:exports-drift`.
+- **Expected:** The locked S5 touch set listed two consumer guides but omitted
+  `docs/site/reference/plugin-auth-core/index.md`; omitted conditional files were not intended to
+  license unrelated replacements.
+- **Actual:** The gate fails while the new export is absent from the package reference table.
+- **Severity:** design drift, gate-required.
+- **Action:** update the reference page as implementation file 27. This preserves the hard 27-file
+  ceiling and documents the actual public export instead of suppressing or weakening the gate.
+- **Evidence:** initial gate failure named only the missing `@netscript/plugin-auth-core/sdk`
+  entrypoint; rerun result is recorded in `worklog.md`.
