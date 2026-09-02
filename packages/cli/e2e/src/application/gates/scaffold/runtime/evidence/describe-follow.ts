@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { disableAnonymousDashboard } from '../dashboard-config.ts';
 import { resolveDbCliTimeoutSeconds } from '../../../../../../../src/kernel/adapters/database/operation-runner-helpers.ts';
 
 const READY_STATES: readonly string[] = ['Healthy', 'Ready', 'Running', 'Finished'];
@@ -142,6 +143,7 @@ export async function captureAspireStartAndDescribe(
   expectedResources: readonly string[],
   minimumTimeoutSeconds = 0,
 ): Promise<void> {
+  await disableAnonymousDashboard(appHost);
   const start = await commandOutput('aspire', [
     'start',
     '--apphost',

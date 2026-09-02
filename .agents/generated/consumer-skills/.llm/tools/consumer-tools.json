@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "installRoot": ".llm/tools",
+  "supportFiles": ["consumer-tools.json", "README.md", "release.json"],
+  "modules": [
+    {
+      "source": ".llm/tools/docs/snippet-extractor.ts",
+      "path": "docs/snippet-extractor.ts"
+    }
+  ],
+  "tools": [
+    {
+      "source": ".llm/tools/run-deno-check.ts",
+      "path": "run-deno-check.ts",
+      "symptom": "Type errors, or a suspiciously green deno check that may have excluded files",
+      "permissions": ["read", "run"]
+    },
+    {
+      "source": ".llm/tools/run-deno-lint.ts",
+      "path": "run-deno-lint.ts",
+      "symptom": "Broad lint output hides the actionable findings",
+      "permissions": ["read", "run"]
+    },
+    {
+      "source": ".llm/tools/run-deno-doc-lint.ts",
+      "path": "run-deno-doc-lint.ts",
+      "symptom": "Published APIs may have missing docs or slow types",
+      "permissions": ["read", "run"]
+    },
+    {
+      "source": ".llm/tools/validation/check-aspire-host-ports.ts",
+      "path": "validation/check-aspire-host-ports.ts",
+      "symptom": "Generated Aspire apps collide on pinned host ports",
+      "permissions": ["read"]
+    },
+    {
+      "source": ".llm/tools/quality/scan-code-quality.ts",
+      "path": "quality/scan-code-quality.ts",
+      "symptom": "Architecture review needs a fail-closed scan that verifies allowance owners in rickylabs/netscript",
+      "permissions": ["read", "env", "net"]
+    },
+    {
+      "source": ".llm/tools/deps/outdated.ts",
+      "path": "deps/outdated.ts",
+      "symptom": "Dependency freshness must use stable registry versions",
+      "permissions": ["read", "env", "net"]
+    },
+    {
+      "source": ".llm/tools/deps/why.ts",
+      "path": "deps/why.ts",
+      "symptom": "An unexpected dependency needs an import-chain explanation",
+      "permissions": ["read", "run"]
+    },
+    {
+      "source": ".llm/tools/e2e/scaffold-e2e-test.ts",
+      "path": "e2e/scaffold-e2e-test.ts",
+      "symptom": "A generated project needs the full CLI, plugin, database, and Aspire smoke",
+      "permissions": ["read", "write", "run", "net", "env"]
+    }
+  ]
+}

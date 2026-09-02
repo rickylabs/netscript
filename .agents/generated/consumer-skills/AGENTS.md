@@ -1,5 +1,33 @@
 <!-- netscript-agent:start -->
-## NetScript agent tooling
+## NetScript build and tooling map
 
-Use the installed `netscript`, `netscript-build`, `netscript-operate`, `aspire`, and `deno` skills with the NetScript MCP server. Start with `.claude/skills/help.md` when a symptom is unclear; use `aspire` for orchestration and runtime-state problems, and `deno` for runtime and toolchain problems.
+### Build in the framework's order
+
+Use the architectural spine: database-derived schemas → contract → service → typed SDK and query factories → `definePage` composition → islands. The app build guide at `apps/<app>/AGENTS.md` explains the local examples and the project's `definePage`, `withResource`, and `withForm` composition conventions; read it before app work instead of inventing a parallel pattern, and use MCP `find_guidance` or the installed offline docs for `defineRouteContract`, `staleTime`, dehydration, and optimistic UI.
+
+Use the CLI for mutations: `netscript contract`, `netscript service`, `netscript db`, and `netscript generate`. Create UI through `netscript ui:add page <path> --island`, `netscript ui:add island <Name> --query`, or `netscript ui:add data-table` rather than hand-building generated seams.
+
+### Inspect Deno before implementing
+
+The canonical primer is <https://deno.com/agents.md>. Its setup prompt is: "Read https://deno.com/agents.md and set up Deno in this project."
+
+Use `deno doc <module>` or `deno doc --filter <symbol> <module>` to learn a package's public API, `deno info` to inspect the resolved graph, and `deno eval` for a quick behavioural probe. These come before reading package source over HTTP. For dependency work, use `deno outdated`, `deno why`, and `deno add` instead of hand-editing imports.
+
+Run the workspace quality verbs it defines: `deno task check`, `deno task test`, `deno task lint`, and `deno task fmt:check`. A run is not finished until `deno task test` has run. For the deeper command map, invoke `.agents/skills/deno/SKILL.md`; this file only points to it.
+
+### Invoke the right installed skill
+
+- Use `.agents/skills/netscript/SKILL.md` to route an unfamiliar NetScript task.
+- Use `.agents/skills/netscript-build/SKILL.md` before scaffolding, adding, or generating contracts, services, database assets, plugins, or UI.
+- Use `.agents/skills/netscript-operate/SKILL.md` for health, failures, recent runs, documentation lookup, and performance evidence.
+- Use `.agents/skills/aspire/SKILL.md` for AppHost lifecycle, resources, dashboards, logs, spans, and traces.
+- Use the installed `aspire-init`, `aspire-orchestration`, `aspire-monitoring`, and `aspire-deployment` workflow skills for their named lifecycle phases; NetScript's `aspire` skill remains the diagnostic authority.
+- Use `.agents/skills/deno/SKILL.md` for Deno runtime, types, permissions, dependencies, or module resolution.
+- If something hangs, vanishes, stays silent, or is Healthy but does not respond, start at `.agents/skills/help.md`.
+
+### Ask the connected tools first
+
+Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task. Use `search_docs` for literal lookup and `get_doc` for exact retrieval. Use MCP `doctor` for NetScript, Aspire, project-wiring, and plugin prerequisites; use `get_app_status`, `get_recent_errors`, and the `analyze_*` tools for bounded runtime evidence. Need offline framework or API guidance? Run `netscript agent init --with-docs`.
+
+Before hand-rolled curl probes or print debugging, run `netscript plugin doctor`, `aspire doctor --format Json`, `aspire logs`, and `aspire otel logs`, `aspire otel spans`, or `aspire otel traces`. Drift is evidence-gated: `netscript agent drift record` and MCP `record_drift` require a recent successful diagnostic receipt. Receipts live under `.netscript/agent/diagnostics/`; accepted entries append to `.netscript/agent/drift.jsonl`.
 <!-- netscript-agent:end -->
