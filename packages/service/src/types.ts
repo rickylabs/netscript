@@ -6,6 +6,7 @@
 
 import type { Context, ErrorHandler, Handler, MiddlewareHandler, NotFoundHandler } from 'hono';
 import type { cors } from 'hono/cors';
+import type { Principal } from './auth/types.ts';
 
 /** Router definition accepted by the service builder and handler factories. */
 export type ServiceRouter = Record<string, unknown>;
@@ -208,7 +209,7 @@ export interface FetchHandler {
   /** Handles a request with path prefix and service context options. */
   handle(
     request: Request,
-    options: { prefix: `/${string}`; context?: Record<string, unknown> },
+    options: { prefix: `/${string}`; context?: object },
   ): Promise<FetchHandlerResult>;
 }
 
@@ -266,7 +267,26 @@ export interface Database {
 /** Database context injected into service handler context. */
 export type DbContext = object;
 
-/** Creates per-request service handler context. */
-export type ContextFactory = (
+/** Creates typed custom fields for a per-request service handler context. */
+export type ContextFactory<TCustom extends object = Record<never, never>> = (
   context: Context,
-) => Record<string, unknown>;
+) => TCustom;
+
+/**
+ * Context visible to service handlers after framework-owned fields are composed.
+ *
+ * @example
+ * ```typescript
+ * type HandlerContext = ServiceHandlerContext<{ readonly tenant: string }>;
+ * ```
+ */
+export type ServiceHandlerContext<TCustom extends object = Record<never, never>> =
+  & Readonly<TCustom>
+  & {
+    /** Database context configured by `withDatabase()`. */
+    readonly db?: DbContext;
+    /** Distributed trace headers propagated for the request. */
+    readonly traceHeaders?: Readonly<Record<string, string>>;
+    /** Authenticated identity, when authentication succeeds. */
+    readonly principal?: Principal;
+  };

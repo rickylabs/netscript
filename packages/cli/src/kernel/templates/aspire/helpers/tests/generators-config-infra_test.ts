@@ -135,6 +135,10 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'type AspireResource =');
     assertStringIncludes(output, '& Parameters<');
     assertStringIncludes(output, 'readonly databases: Map<string, AspireResource>');
+    assertStringIncludes(
+      output,
+      'readonly databaseConnectionStrings: Map<string, DatabaseConnectionStringResolver>',
+    );
     assertStringIncludes(output, 'type CacheResource = AspireResource | CacheContainerResource;');
     assertStringIncludes(output, 'readonly caches: Map<string, CacheResource>');
     assertStringIncludes(output, 'readonly cacheEndpoints: Map<string, EndpointReference>');
@@ -164,10 +168,19 @@ describe('generateRegisterInfrastructure', () => {
       databases: { main: fixtures.MINIMAL_DATABASE },
       caches: {},
     });
-    assertStringIncludes(output, "builder.addPostgres('main', {");
-    assertStringIncludes(output, "ensureDatabasePassword(appHostDir, 'main')");
-    assertStringIncludes(output, "databases.set('main',");
-    assertStringIncludes(output, '(Postgres, Container)');
+    assertStringIncludes(output, 'builder.addPostgres("main", {');
+    assertStringIncludes(output, 'ensureDatabasePassword(appHostDir, "main")');
+    assertStringIncludes(output, 'databases.set("main",');
+    assert(
+      !output.includes('databaseConnectionStrings.set(\n    "main"'),
+      'Container commands must consume Aspire graph-injected environment instead of a callback resolver',
+    );
+    assert(
+      !output.includes('connectionStringExpression()'),
+      'Container registration must not emit a compile-clean runtime capability call',
+    );
+    assert(!output.includes('.getValue()'));
+    assertStringIncludes(output, '(Container)');
   });
 
   it('should use addConnectionString for External mode', () => {
@@ -175,8 +188,13 @@ describe('generateRegisterInfrastructure', () => {
       databases: { 'ext-db': fixtures.DATABASE_EXTERNAL },
       caches: {},
     });
-    assertStringIncludes(output, "builder.addConnectionString('ext-db')");
-    assertStringIncludes(output, '(Postgres, External)');
+    assertStringIncludes(output, 'builder.addConnectionString("ext-db")');
+    assertStringIncludes(
+      output,
+      'await builder.getConfiguration().getConnectionString("ext-db")',
+    );
+    assertStringIncludes(output, 'databaseConnectionStrings.set(\n    "ext-db"');
+    assertStringIncludes(output, '(External)');
   });
 
   // #970: a configured-persistent container must fall back to a session lifetime under
@@ -202,7 +220,7 @@ describe('generateRegisterInfrastructure', () => {
     });
     assertStringIncludes(
       output,
-      ".withDataBindMount(resolveDataPath(appHostDir, '.data/postgres', 'main'))",
+      '.withDataBindMount(resolveDataPath(appHostDir, ".data/postgres", "main"))',
     );
   });
 
@@ -211,7 +229,7 @@ describe('generateRegisterInfrastructure', () => {
       databases: { main: fixtures.DATABASE_WITH_OPTIONS },
       caches: {},
     });
-    assertStringIncludes(output, "main_server.addDatabase('app_db')");
+    assertStringIncludes(output, 'db_0_server.addDatabase("app_db")');
   });
 
   it('should assign server directly when no DatabaseName', () => {
@@ -219,7 +237,7 @@ describe('generateRegisterInfrastructure', () => {
       databases: { main: fixtures.MINIMAL_DATABASE },
       caches: {},
     });
-    assertStringIncludes(output, 'const main = main_server;');
+    assertStringIncludes(output, 'const db_0 = db_0_server;');
   });
 
   it('should use a Redis-compatible Garnet container for Garnet cache engine', () => {
@@ -229,15 +247,15 @@ describe('generateRegisterInfrastructure', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addContainer('kv', 'ghcr.io/microsoft/garnet:1.1.1')",
+      'builder.addContainer("kv", "ghcr.io/microsoft/garnet:1.1.1")',
     );
     assertStringIncludes(
       output,
       ".withEndpoint({ name: 'tcp', targetPort: 6379, scheme: 'tcp' })",
     );
-    assertStringIncludes(output, "const kv_tcpEndpoint = await kv.getEndpoint('tcp');");
-    assertStringIncludes(output, "cacheEndpoints.set('kv', kv_tcpEndpoint);");
-    assertStringIncludes(output, "caches.set('kv',");
+    assertStringIncludes(output, "const cache_0_tcpEndpoint = await cache_0.getEndpoint('tcp');");
+    assertStringIncludes(output, 'cacheEndpoints.set("kv", cache_0_tcpEndpoint);');
+    assertStringIncludes(output, 'caches.set("kv",');
   });
 
   it('should resolve primary database from config', () => {
@@ -246,7 +264,7 @@ describe('generateRegisterInfrastructure', () => {
       caches: {},
       primaryDatabase: 'main',
     });
-    assertStringIncludes(output, "const primaryDatabase = databases.get('main')");
+    assertStringIncludes(output, 'const primaryDatabase = databases.get("main")');
   });
 
   it('should resolve primary cache from config', () => {
@@ -255,8 +273,8 @@ describe('generateRegisterInfrastructure', () => {
       caches: { kv: fixtures.MINIMAL_CACHE },
       primaryCache: 'kv',
     });
-    assertStringIncludes(output, "const primaryCache = caches.get('kv')");
-    assertStringIncludes(output, "const primaryCacheEndpoint = cacheEndpoints.get('kv')");
+    assertStringIncludes(output, 'const primaryCache = caches.get("kv")');
+    assertStringIncludes(output, 'const primaryCacheEndpoint = cacheEndpoints.get("kv")');
   });
 
   it('should set null primaries when not configured', () => {

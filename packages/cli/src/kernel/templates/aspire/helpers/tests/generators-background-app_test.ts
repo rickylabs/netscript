@@ -54,9 +54,9 @@ describe('generateRegisterBackground', () => {
       ...emptyOptions,
       processors: { workers: fixtures.MINIMAL_BACKGROUND },
     });
-    assertStringIncludes(output, "builder.addExecutable('workers', 'deno', workers_workdir,");
+    assertStringIncludes(output, 'builder.addExecutable("workers", \'deno\', bg_0_workdir,');
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
-    assertStringIncludes(output, "backgroundProcessors.set('workers'");
+    assertStringIncludes(output, 'backgroundProcessors.set("workers"');
   });
 
   it('emits SQLite FFI exactly once for background processors', () => {
@@ -120,7 +120,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      "config.BackgroundProcessors['workers']?.Enabled !== false",
+      'config.BackgroundProcessors["workers"]?.Enabled !== false',
     );
   });
 
@@ -131,7 +131,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('workers', config.Version, 'executable')",
+      'buildOtelEnvVars("workers", config.Version, \'executable\')',
     );
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
   });
@@ -144,11 +144,11 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// Telemetry disabled \u2014 opt out explicitly');
     assertStringIncludes(
       output,
-      "benchmark.withEnvironment('OTEL_DENO', 'false')",
+      "bg_0.withEnvironment('OTEL_DENO', 'false')",
     );
     assertStringIncludes(
       output,
-      "benchmark.withEnvironment('OTEL_TRACES_SAMPLER', 'always_off')",
+      "bg_0.withEnvironment('OTEL_TRACES_SAMPLER', 'always_off')",
     );
   });
 
@@ -159,7 +159,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      "workers.withEnvironment('WORKERS_CONCURRENCY', String(4))",
+      'bg_0.withEnvironment("WORKERS_CONCURRENCY", String(4))',
     );
   });
 
@@ -171,12 +171,12 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
     assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
-    assertStringIncludes(output, "workers_sqliteDatabase?.Engine === 'Sqlite'");
+    assertStringIncludes(output, "bg_0_sqliteDatabase?.Engine === 'Sqlite'");
     assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
     assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
     assertStringIncludes(output, 'else if (infrastructure.primaryDatabase)');
     assert(
-      output.indexOf("workers_sqliteDatabase?.Engine === 'Sqlite'") <
+      output.indexOf("bg_0_sqliteDatabase?.Engine === 'Sqlite'") <
         output.indexOf('else if (infrastructure.primaryDatabase)'),
       'SQLite background resources must not enter the Aspire reference branch',
     );
@@ -196,7 +196,7 @@ describe('generateRegisterBackground', () => {
     // Single seam over the pre-built primary-cache wiring.
     assertStringIncludes(
       output,
-      'await _withCacheReference(triggers, infrastructure.primaryCacheWiring)',
+      'await _withCacheReference(bg_0, infrastructure.primaryCacheWiring)',
     );
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty no longer imported — endpoint resolution moved to wiring.
@@ -215,7 +215,7 @@ describe('generateRegisterBackground', () => {
     });
 
     assertStringIncludes(output, '_services: Map<string, ExecutableResource>');
-    assertStringIncludes(output, "_services.get('users')?.getEndpoint('http')");
+    assertStringIncludes(output, '_services.get("users")?.getEndpoint(\'http\')');
     assert(!output.includes(" services.get('users')"));
   });
 
@@ -230,7 +230,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(
       output,
-      'sagas.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
+      'bg_0.withEnvironment(\'NETSCRIPT_SAGA_STORE\', "prisma")',
     );
   });
 
@@ -245,10 +245,10 @@ describe('generateRegisterBackground', () => {
       processors: { sagas: sagaProcessor },
     });
 
-    assertStringIncludes(output, "await sagas.withHttpEndpoint({ env: 'PORT' })");
+    assertStringIncludes(output, "await bg_0.withHttpEndpoint({ env: 'PORT' })");
     assertStringIncludes(
       output,
-      `await sagas.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' })`,
+      `await bg_0.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' })`,
     );
     assert(
       output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
@@ -271,7 +271,7 @@ describe('generateRegisterBackground', () => {
     );
     assertStringIncludes(
       output,
-      "triggers.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', triggers_triggerRegistryModule)",
+      "bg_0.withEnvironment('NETSCRIPT_TRIGGER_REGISTRY_MODULE', bg_0_triggerRegistryModule)",
     );
   });
 
@@ -320,9 +320,9 @@ describe('generateRegisterApps', () => {
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, "builder.addExecutable('frontend', 'deno',");
+    assertStringIncludes(output, 'builder.addExecutable("frontend", \'deno\',');
     assert(!output.includes('--minimum-dependency-age=0'));
-    assertStringIncludes(output, "apps.set('frontend'");
+    assertStringIncludes(output, 'apps.set("frontend"');
   });
 
   it('should include enabled gate for each app', () => {
@@ -332,7 +332,7 @@ describe('generateRegisterApps', () => {
     });
     assertStringIncludes(
       output,
-      "config.Apps['frontend']?.Enabled !== false",
+      'config.Apps["frontend"]?.Enabled !== false',
     );
   });
 
@@ -343,7 +343,7 @@ describe('generateRegisterApps', () => {
     });
     assertStringIncludes(
       output,
-      "buildOtelEnvVars('frontend', config.Version, 'executable')",
+      'buildOtelEnvVars("frontend", config.Version, \'executable\')',
     );
   });
 
@@ -361,9 +361,9 @@ describe('generateRegisterApps', () => {
       apps: { frontend: fixtures.MINIMAL_APP },
     });
 
-    assertStringIncludes(output, 'await frontend.withBrowserLogs();');
+    assertStringIncludes(output, 'await app_0.withBrowserLogs();');
     assert(
-      output.indexOf('frontend.withHttpEndpoint(') < output.indexOf('frontend.withBrowserLogs()'),
+      output.indexOf('app_0.withHttpEndpoint(') < output.indexOf('app_0.withBrowserLogs()'),
       'browser logs must be registered after the HTTP endpoint they browse',
     );
   });
@@ -373,7 +373,7 @@ describe('generateRegisterApps', () => {
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, "['task', 'dev']");
+    assertStringIncludes(output, '[\'task\', "dev"]');
   });
 
   it('should include VITE service-discovery injection for service references', () => {
@@ -382,7 +382,7 @@ describe('generateRegisterApps', () => {
       apps: { dashboard: fixtures.APP_WITH_REFS },
     });
     assertStringIncludes(output, '// VITE service-discovery injection');
-    assertStringIncludes(output, "buildViteEnvVarName('users')");
+    assertStringIncludes(output, 'buildViteEnvVarName("users")');
     assertStringIncludes(output, 'services__users__http__0');
   });
 
@@ -392,8 +392,8 @@ describe('generateRegisterApps', () => {
       apps: { dashboard: fixtures.DESKTOP_APP },
     });
 
-    assertStringIncludes(output, '// --- dashboard (desktop) ---');
-    assertStringIncludes(output, "config.Apps['dashboard']?.Enabled === true");
+    assertStringIncludes(output, '// --- app 0 ---');
+    assertStringIncludes(output, 'config.Apps["dashboard"]?.Enabled === true');
   });
 
   it('should make desktop launch wait for the Fresh build resource', () => {
@@ -402,10 +402,10 @@ describe('generateRegisterApps', () => {
       apps: { dashboard: fixtures.DESKTOP_APP },
     });
     const buildDeclaration =
-      "const dashboard_build = builder.addExecutable('dashboard-build', 'deno', dashboard_workdir, ['task', 'build']);";
+      'const app_0_build = builder.addExecutable("dashboard-build", \'deno\', app_0_workdir, [\'task\', "build"]);';
     const windowDeclaration =
-      "const dashboard = builder.addExecutable('dashboard', 'deno', dashboard_workdir, ['task', 'desktop:predev', '--backend', 'cef']);";
-    const buildDependency = 'await dashboard.waitForCompletion(dashboard_build);';
+      "const app_0 = builder.addExecutable(\"dashboard\", 'deno', app_0_workdir, ['task', \"desktop:predev\", '--backend', 'cef']);";
+    const buildDependency = 'await app_0.waitForCompletion(app_0_build);';
 
     assertStringIncludes(output, buildDeclaration);
     assertStringIncludes(output, windowDeclaration);
@@ -427,8 +427,8 @@ describe('generateRegisterApps', () => {
       },
     });
 
-    assertStringIncludes(output, "['task', 'build']");
-    assertStringIncludes(output, "['task', 'desktop:predev', '--backend', 'cef']");
+    assertStringIncludes(output, '[\'task\', "build"]');
+    assertStringIncludes(output, "['task', \"desktop:predev\", '--backend', 'cef']");
   });
 
   it('should inject server-side discovery without an Aspire HTTP endpoint for desktop', () => {
@@ -438,15 +438,15 @@ describe('generateRegisterApps', () => {
     });
 
     assertStringIncludes(output, '// Server-side service-discovery injection');
-    assertStringIncludes(output, "getResourceEndpoint(_services.get('users'), 'http')");
-    assertStringIncludes(output, "dashboard.withEnvironment('services__users__http__0', endpoint)");
-    assertStringIncludes(output, "getResourceEndpoint(_plugins.get('workers-api'), 'http')");
+    assertStringIncludes(output, 'getResourceEndpoint(_services.get("users"), \'http\')');
+    assertStringIncludes(output, 'app_0.withEnvironment("services__users__http__0", endpoint)');
+    assertStringIncludes(output, 'getResourceEndpoint(_plugins.get("workers-api"), \'http\')');
     assertStringIncludes(
       output,
-      "dashboard.withEnvironment('services__workers-api__http__0', endpoint)",
+      'app_0.withEnvironment("services__workers-api__http__0", endpoint)',
     );
     assert(!output.includes('buildViteEnvVarName('));
-    assert(!output.includes('dashboard.withHttpEndpoint('));
+    assert(!output.includes('app_0.withHttpEndpoint('));
     assert(!output.includes("port: 8999, env: 'PORT'"));
   });
 
@@ -455,7 +455,7 @@ describe('generateRegisterApps', () => {
       ...emptyOptions,
       apps: { frontend: fixtures.MINIMAL_APP },
     });
-    assertStringIncludes(output, '// --- frontend (app) ---');
+    assertStringIncludes(output, '// --- app 0 ---');
   });
 
   // Regression guard for #954: without a registered health check Aspire treats a
@@ -469,7 +469,9 @@ describe('generateRegisterApps', () => {
     });
     assertStringIncludes(
       output,
-      `await frontend.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+      `await app_0.withHttpHealthCheck({ path: ${
+        JSON.stringify(RESOURCE_DEFAULTS.AppHealthCheckPath)
+      }, endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
     );
     assert(
       output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
@@ -484,8 +486,8 @@ describe('generateRegisterApps', () => {
         frontend: { ...fixtures.MINIMAL_APP, HealthCheckPath: '/_status' },
       },
     });
-    assertStringIncludes(output, "path: '/_status'");
-    assert(!output.includes(`path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}'`));
+    assertStringIncludes(output, 'path: "/_status"');
+    assert(!output.includes(`path: ${JSON.stringify(RESOURCE_DEFAULTS.AppHealthCheckPath)}`));
   });
 
   it('should omit the health probe when HealthCheckPath is false', () => {
@@ -505,9 +507,9 @@ describe('generateRegisterApps', () => {
         chores: fixtures.TASK_APP,
       },
     });
-    assertStringIncludes(output, 'await shell.withHttpHealthCheck(');
-    assertStringIncludes(output, 'await chores.withHttpHealthCheck(');
-    assert(!output.includes('await desktop.withHttpHealthCheck('));
+    assertStringIncludes(output, 'await app_0.withHttpHealthCheck(');
+    assertStringIncludes(output, 'await app_2.withHttpHealthCheck(');
+    assert(!output.includes('await app_1.withHttpHealthCheck('));
   });
 
   it('should not register a health probe for an endpoint-less task', () => {

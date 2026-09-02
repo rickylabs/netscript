@@ -245,3 +245,99 @@ The timeout object records:
 - The bounded correction moves installation before that assertion and gives both initial-row and
   optimistic-row timeouts the same structured payload. The single commit is amended rather than
   adding a second commit.
+
+## Convergence onto current main (2026-09-02)
+
+### Baseline and merge
+
+- Evaluated branch head: `377811da85045be055059d836c524c213794a71d`.
+- Integrated `origin/main`: `77ad823dcb1874ccfc8964b4679ad92a3a145e0b` (44 commits ahead of
+  the branch at fetch time).
+- Merge conflicts:
+  - `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` — took
+    `main`'s side, then regenerated with `deno task gen:mcp-export-corpus`.
+  - `packages/fresh/deno.json` — preserved `main`'s navigation export/check/doc-lint and dependency
+    updates, plus the evaluated branch's `query-hydration-age_browser.ts` browser-test registration.
+- Because the branch changes package READMEs, carriers were regenerated in dependency order:
+  `gen:agent-docs-prose` (exit 0), `gen:assets-barrel` (exit 0), `gen:publish-assets` (exit 0), and
+  `gen:mcp-export-corpus` (exit 0). The MCP corpus reports 35 packages, 272 subpaths, 7,808 symbols,
+  and SHA-256 `a3c6de8ebcdec1fffbc2711b84ae331b8adb90778348f02566d2b23a021990e8`.
+
+### Evaluated-head carry measurement
+
+- Relative to merge-base `72599120a435c49e5791e795fd5c84b55f02be03`, the branch touches 57
+  non-generated files under `packages/`.
+- 51 remain byte-identical to evaluated head `377811da8`.
+- Six are not byte-identical, all attributable to commits already on `origin/main`:
+  `packages/cli/e2e/src/domain/cli-surface.ts`,
+  `packages/cli/e2e/suites/scaffold/capability-suites.ts`,
+  `packages/cli/e2e/tests/presentation/suite-registry_test.ts`,
+  `packages/cli/src/kernel/templates/app/route-templates_test.ts`,
+  `packages/fresh/README.md`, and `packages/fresh/deno.json`.
+- This is genuine product/test/config movement, so the formal PASS at `377811da8` does **not** carry
+  wholesale to the converged head. A fresh evaluation is required. The branch's implementation
+  files for service-client generation, query bridging, UI selection, showcase templates, and the
+  optimistic-render diagnostic remain byte-identical.
+
+### Lock hygiene
+
+- `deno.lock` is byte-identical to `origin/main` and has SHA-256
+  `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`.
+
+### Gate boundary
+
+- This convergence slice does not run Aspire, Docker, a browser, `e2e:cli`, or
+  `scaffold.runtime`; the hosted singleton runtime lane remains supervisor-owned.
+- Structured static/package test results and post-commit generator checks are appended after the
+  converged commit is created and measured.
+
+### Converged-head gate results
+
+| Gate | Exit | Counts / evidence |
+| --- | ---: | --- |
+| `check:agent-docs-prose` | 0 | Non-empty build/check output; `fresh: true`, `stalePaths: []` |
+| `check:assets-barrel` | 0 | Regeneration plus scoped `git diff --exit-code` clean |
+| `check:publish-assets` | 0 | Check-mode regeneration clean |
+| `check:mcp-export-corpus` | 0 | 35 packages / 272 subpaths / 7,808 symbols; corpus SHA-256 `a3c6de8e…` |
+| Structured check — CLI | 0 | 930 files / 8 batches / 0 failed; stdout 303 bytes |
+| Structured lint — CLI, exact requested command | 2 | 930 selected / 6 batches / 5 failed / 733 dropped / 0 findings; stdout 104,106 bytes |
+| Structured fmt — CLI, exact requested command | 2 | 930 selected / 6 batches / 4 failed / 733 dropped / 0 findings / 197 processed; stdout 102,778 bytes |
+| Structured check — Fresh | 0 | 211 files / 2 batches / 0 failed; stdout 303 bytes |
+| Structured lint — Fresh | 0 | 211 files / 2 batches / 0 findings; stdout 355 bytes |
+| Structured fmt — Fresh | 0 | 211 files / 2 batches / 0 findings; stdout 304 bytes |
+| Structured check — SDK | 0 | 102 files / 1 batch / 0 failed; stdout 303 bytes |
+| Structured lint — SDK | 0 | 102 files / 1 batch / 0 findings; stdout 355 bytes |
+| Structured fmt — SDK | 0 | 102 files / 1 batch / 0 findings; stdout 304 bytes |
+| Focused branch-touched CLI tests, excluding browser-probe lane | 0 | 106 passed / 0 failed / 0 ignored across 16 files; stdout 1,441 bytes |
+| Fresh query unit suite | 0 | 12 passed / 0 failed / 0 ignored; stdout 308 bytes |
+| SDK key-bridge suite | 0 | 2 passed / 0 failed / 0 ignored; stdout 318 bytes |
+| `quality:gate` | 0 | Quality scan has 0 findings and 7 existing allowances; doctrine scan has 0 failures; stdout 46,238 bytes |
+
+The exact CLI lint/fmt wrapper failures are configuration coverage refusals, not findings. A clean
+detached `origin/main` worktree reproduces them: lint exit 2 with 915 selected / 723 dropped / 0
+findings, and fmt exit 2 with 915 selected / 723 dropped / 0 findings. Root `deno.json` deliberately
+excludes `packages/cli/` from both lint and fmt. An explicit scratch-config diagnostic can process
+the full package but exposes unrelated existing CLI debt; it is not substituted for the requested
+verdict and this convergence slice does not rewrite that surface.
+
+### Behavioral question: partial-navigation changes
+
+Neither intervening Fresh change plausibly repairs `behavior.service-client-refetch`:
+
+- Commit `102ef8a10` adds the opt-in `installPartialNavigationCoordinator()`, whose
+  `NavigationRuntime` wraps document fetch/history for Fresh partial requests, and `KeyedPartial()`,
+  whose Preact key remounts a named Fresh partial boundary. The generated service showcase imports
+  neither API. The hosted probe reaches the page through CDP page navigation and then clicks Rename
+  inside the already-loaded island; no package coordinator or Fresh partial boundary participates.
+- Commit `556690a99` (the implementation for issue 1900, merged as PR 1904) changes only
+  `NavigationRuntime`: it captures `platformFetch = originalFetch.bind(globalThis)` and calls that
+  receiver-safe function from `interceptFetch()`. That can prevent a detached-fetch `TypeError`
+  after the optional coordinator is installed, but it does not touch island hydration,
+  `QueryClientProvider`, TanStack observer notification, or Preact rendering.
+- `QueryIsland`, the query singleton/hooks, both service-showcase/optimistic template paths, and
+  the optimistic helper are byte-identical between evaluated head and the converged head; the
+  intervening `main` log is empty for those paths.
+
+Conclusion: these paths are disjoint. They do not provide a reason to spend a hosted runtime rerun
+on this convergence alone; the previously measured Fresh/Preact hydration/render-propagation
+question remains open for supervisor-owned runtime evidence.

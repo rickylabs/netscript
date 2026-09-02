@@ -1,5 +1,9 @@
 import { describeOpenApiOperation } from '../../domain/openapi/description-ladder.ts';
 import { indexOpenApiOperations } from '../../domain/openapi/operation-index.ts';
+import {
+  deriveOperationAccessSummary,
+  type OperationAccessSummary,
+} from '../../domain/openapi/operation-access.ts';
 import type { ServiceEndpointDirectoryPort } from '../../ports/service-endpoint-directory-port.ts';
 import type { ToolFlow } from '../../domain/tool-types.ts';
 
@@ -13,6 +17,8 @@ export interface ServiceOperationSummary {
   /** Exact OpenAPI path template. */ readonly path: string;
   /** S4 description-ladder result. */ readonly summary: string;
   /** Declared OpenAPI tags. */ readonly tags: readonly string[];
+  /** Bounded declared access facts; absent when access is undeclared. */
+  readonly access?: OperationAccessSummary;
 }
 
 /** Successful operation-list value. */
@@ -46,15 +52,19 @@ export function createListServiceOperationsFlow(directory: ServiceEndpointDirect
 
     const needle = parsed.filter?.toLocaleLowerCase('en-US');
     const matching = indexOpenApiOperations(row.spec).operations
-      .map((operation): ServiceOperationSummary => ({
-        operation: operation.canonicalId,
-        method: operation.method,
-        path: operation.path,
-        summary: describeOpenApiOperation(operation),
-        tags: Array.isArray(operation.operation.tags)
-          ? operation.operation.tags.filter((tag): tag is string => typeof tag === 'string')
-          : [],
-      }))
+      .map((operation): ServiceOperationSummary => {
+        const access = deriveOperationAccessSummary(operation.operation);
+        return {
+          operation: operation.canonicalId,
+          method: operation.method,
+          path: operation.path,
+          summary: describeOpenApiOperation(operation),
+          tags: Array.isArray(operation.operation.tags)
+            ? operation.operation.tags.filter((tag): tag is string => typeof tag === 'string')
+            : [],
+          ...(access ? { access } : {}),
+        };
+      })
       .filter((operation) => !needle || operationSearchText(operation).includes(needle));
     const limit = Math.min(
       parsed.limit ?? SERVICE_OPERATION_RESULT_LIMIT,

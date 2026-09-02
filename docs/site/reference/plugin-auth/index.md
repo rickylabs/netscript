@@ -30,14 +30,16 @@ inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 
 ## Sub-path exports
 
-| Export | Purpose |
-| --- | --- |
-| `@netscript/plugin-auth` | Root plugin manifest. |
-| `@netscript/plugin-auth/public` | Public plugin entrypoint. |
-| `@netscript/plugin-auth/plugin` | Plugin manifest entrypoint. |
-| `@netscript/plugin-auth/contracts` | Auth contract contribution entrypoint. |
-| `@netscript/plugin-auth/services` | Auth service contribution entrypoint. |
-| `@netscript/plugin-auth/streams` | Auth stream contribution entrypoint. |
-| `@netscript/plugin-auth/streams/server` | Server-side auth stream helpers. |
+| Export | Path | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-auth` | `./mod.ts` | Root plugin manifest. |
+| `@netscript/plugin-auth/public` | `./src/public/mod.ts` | Public plugin entrypoint. |
+| `@netscript/plugin-auth/plugin` | `./src/public/mod.ts` | Plugin manifest entrypoint. |
+| `@netscript/plugin-auth/contracts` | `./contracts/v1/mod.ts` | Auth contract contribution entrypoint. |
+| `@netscript/plugin-auth/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
+| `@netscript/plugin-auth/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
+| `@netscript/plugin-auth/services` | `./services/src/main.ts` | Auth service contribution entrypoint. |
+| `@netscript/plugin-auth/streams` | `./streams/mod.ts` | Auth stream contribution entrypoint. |
+| `@netscript/plugin-auth/streams/server` | `./streams/server.ts` | Server-side auth stream helpers. |
 
 Back to the [auth reference hub](/reference/auth/).

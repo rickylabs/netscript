@@ -75,6 +75,12 @@ export interface WorkerExecutionState {
   create(options: WorkerCreateExecutionOptions): Promise<WorkerExecutionRecord>;
   /** Mark an execution as running. */
   start(executionId: string): Promise<WorkerExecutionRecord | null>;
+  /** Persist the latest progress for an execution. */
+  progress(
+    executionId: string,
+    percent: number,
+    message?: string,
+  ): Promise<WorkerExecutionRecord | null>;
   /** Complete an execution record. */
   complete(
     executionId: string,
@@ -140,7 +146,7 @@ export interface WorkerOptions {
   jobsDir?: string;
   /** Additional queue triggers. */
   queueTriggers?: QueueTriggerConfig[];
-  /** Custom Web Worker entry point URL for the worker pool. */
+  /** @deprecated The current runner is in-process and ignores a worker entry point URL. */
   workerUrl?: string;
   /** Options for in-process job handler resolution. */
   workerPoolOptions?: WorkerPoolOptions;

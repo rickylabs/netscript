@@ -199,6 +199,8 @@ export async function buildExportSurfaceCorpus(
     const command = new Deno.Command(Deno.execPath(), {
       args: ['doc', '--json', ...packageSources.map((source) => source.entrypoint)],
       cwd: root,
+      env: colorInvariantChildEnv(),
+      clearEnv: true,
       stdout: 'piped',
       stderr: 'piped',
     });
@@ -446,10 +448,29 @@ function hex(buffer: ArrayBuffer): string {
   return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Canonical child environment for nested `deno` invocations.
+ *
+ * `deno doc --json` embeds ANSI escape sequences in its emitted strings when colour is
+ * enabled, so the corpus content would otherwise depend on the *caller's* terminal
+ * environment: `NO_COLOR=1` and `FORCE_COLOR=1` produced two different committed blobs.
+ * `FORCE_COLOR` takes precedence over `NO_COLOR`, and even `FORCE_COLOR=0` forces colour,
+ * so it must be **removed** from the child environment rather than overridden.
+ */
+export function colorInvariantChildEnv(): Record<string, string> {
+  const env = Deno.env.toObject();
+  delete env.FORCE_COLOR;
+  delete env.CLICOLOR_FORCE;
+  env.NO_COLOR = '1';
+  return env;
+}
+
 async function formatTypeScript(source: string): Promise<string> {
   const child = new Deno.Command(Deno.execPath(), {
     args: ['fmt', '--ext', 'ts', '-'],
     cwd: REPO_ROOT,
+    env: colorInvariantChildEnv(),
+    clearEnv: true,
     stdin: 'piped',
     stdout: 'piped',
     stderr: 'piped',

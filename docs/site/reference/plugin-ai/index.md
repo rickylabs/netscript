@@ -17,7 +17,7 @@ dependencies directly. This page is written against the package public surface r
 `deno doc`. For the full index of packages and plugins return to the
 [reference overview](/reference/).
 
-## Entrypoints
+## Exports
 
 The plugin publishes the following entrypoints. Each is documented against its own `deno doc`
 surface.

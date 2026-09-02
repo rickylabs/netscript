@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "s8-seed-observability-red",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s8",
+  "gitHead": "18923b54ee85fa35046432f9b75fa446091e8f77",
+  "actualGitHead": "18923b54ee85fa35046432f9b75fa446091e8f77",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:3499350",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "fa514468b0179e2573decb141c3d51cf58308aae9566c008b5042ef656ff2f3a",
+  "lifecycleId": "worker:3499350:s8-seed-observability-red:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-30T19:32:40.018Z",
+  "startedAt": "2026-08-30T19:32:40.021Z",
+  "finishedAt": "2026-08-30T19:32:40.701Z",
+  "durationMs": 681,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 973,
+    "sha256": "051a804211f14200004d572f19d4c5387a3336546574e1740d9843659b5f1de5",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-aspire-s8\",\"exitCode\":1,\"durationMs\":566,\"summary\":{\"passed\":0,\"failed\":1,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   \\u001b[0G\\u001b[2K\\u001b[JTask db:seed:postgres deno task db:seed\\n+   Seed cause: required fixture users.json was not found.\\n\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"run-tool persists actionable seed stderr after an ANSI task banner\",\"file\":\"./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts\",\"line\":8}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 184,
+    "sha256": "ecf969c7f6f96ac43e3f8fdc3a6cdcf619011a21e687a469bf467e026f077dd1",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts'\n",
+    "truncated": false
+  }
+}

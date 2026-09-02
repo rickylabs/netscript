@@ -1,0 +1,38 @@
+{
+  "gateId": "doc-lint",
+  "invocationId": "1387-s4-doc-lint",
+  "argv": [
+    "deno",
+    "task",
+    "doc:lint",
+    "--root",
+    "packages/service"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
+  "gitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "actualGitHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:3781823",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "4674cf83547bda8717cd168bd382832d0545951d674661c62cdc1a3e7df35ac7",
+  "lifecycleId": "worker:3781823:1387-s4-doc-lint:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T20:23:52.718Z",
+  "startedAt": "2026-08-30T20:23:52.720Z",
+  "finishedAt": "2026-08-30T20:23:53.259Z",
+  "durationMs": 540,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 804,
+    "sha256": "ccf1cf93c2951e5586a5e701eacaa7bc6c8f29e5f05956cae5b484f3651f54e9",
+    "tail": "{\"source\":{\"mode\":\"auto\",\"root\":\"packages/service\",\"entrypoints\":[\"./mod.ts\",\"./src/auth/mod.ts\",\"./src/primitives/rpc-path.ts\"],\"exitCode\":0},\"summary\":{\"totalPackages\":1,\"totalErrors\":0,\"totalPrivateTypeRef\":0,\"totalMissingJSDoc\":0,\"totalOther\":0},\"packages\":[{\"name\":\"@netscript/service\",\"dir\":\"packages/service\",\"entrypoints\":[{\"path\":\"./mod.ts\",\"privateTypeRef\":0,\"missingJSDoc\":0,\"other\":0,\"total\":0},{\"path\":\"./src/auth/mod.ts\",\"privateTypeRef\":0,\"missingJSDoc\":0,\"other\":0,\"total\":0},{\"path\":\"./src/primitives/rpc-path.ts\",\"privateTypeRef\":0,\"missingJSDoc\":0,\"other\":0,\"total\":0}],\"files\":[],\"combinedTotal\":0,\"combinedPrivateTypeRef\":0,\"combinedMissingJSDoc\":0,\"combinedOther\":0,\"combinedExitCode\":0,\"entrypointExitCodes\":{\"./mod.ts\":0,\"./src/auth/mod.ts\":0,\"./src/primitives/rpc-path.ts\":0}}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 122,
+    "sha256": "b80c96ea9ec041fc23e0fce86b7d0c1fdeb2d8e0da001b59fc0aaa2727c7fea5",
+    "tail": "Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service'\n",
+    "truncated": false
+  }
+}

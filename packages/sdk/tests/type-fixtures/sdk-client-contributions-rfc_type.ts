@@ -1,35 +1,48 @@
 /**
- * Compile-only RFC-A inference proof against the current SDK contract and query surfaces.
- *
- * This file deliberately models the proposed types locally. It is not product implementation;
- * it keeps the RFC's 16-contribution budget and compatibility claims reproducible in-tree until
- * the accepted implementation replaces the local model with public imports.
+ * Compile-only RFC-A inference proof against the public SDK contract and query surfaces.
  */
 
-import { type DefineServiceConfig, defineServices } from '../../src/presets/define-services.ts';
+import {
+  defineSdkClientContribution,
+  type SdkClientContributionDefinition,
+} from '../../src/client/mod.ts';
+import { defineServices } from '../../src/presets/mod.ts';
 import type {
   ContractLike,
   ContractProcedureLike,
   ContractSchema,
-  ProcedureInputFromNode,
-  ProcedureOutputFromNode,
   ServiceClient,
   ServiceClientContext,
-  ServiceClientContract,
+  ServiceClientMethod,
 } from '../../src/ports/service-client.ts';
-import type {
-  ServiceProcedureQueryResult,
-  ServiceQueryUtils,
-} from '../../src/ports/service-query-utils.ts';
+import type { ServiceQueryUtils } from '../../src/ports/service-query-utils.ts';
 import type { ActionMethod, FactoryConfig, QueryFactory } from '../../src/ports/query-factory.ts';
-import { createActionQueryKey, type QueryKeyPart } from '../../src/ports/query-key.ts';
+import {
+  type ActionQueryKey,
+  createActionQueryKey,
+  type QueryKeyPart,
+} from '../../src/ports/query-key.ts';
+import type {
+  SdkClientContextDeclaration,
+  SdkClientContribution,
+  SdkClientContributionContext,
+  SdkClientPrepareOptions,
+  ValidateSdkClientContributions,
+} from '../../src/ports/sdk-client-contribution.ts';
 import type { CacheKey } from '../../src/ports/cache-store.ts';
 import type { CreateDesktopServiceClientOptions } from '../../src/desktop/domain/types.ts';
 
 type Assert<T extends true> = T;
 type IsAssignable<TFrom, TTo> = [TFrom] extends [TTo] ? true : false;
-type StringKey<T> = Extract<keyof T, string>;
-type EmptyContext = Record<never, never>;
+type IsEqual<TLeft, TRight> = (<T>() => T extends TLeft ? 1 : 2) extends
+  (<T>() => T extends TRight ? 1 : 2) ? true : false;
+
+type _PrepareOptionsStayExact = Assert<
+  IsEqual<
+    keyof SdkClientPrepareOptions,
+    'context' | 'signal' | 'procedure' | 'transport' | 'input'
+  >
+>;
 
 interface ListOrdersInput {
   readonly page: number;
@@ -61,195 +74,33 @@ declare const serviceContract: {
 
 type _RealContract = Assert<IsAssignable<typeof serviceContract, ContractLike>>;
 
-type RfcCacheMode = 'invariant' | 'partitioned' | 'direct-only';
-
-type RfcContextDeclaration<TContext extends object> = {
-  readonly [K in StringKey<TContext>]-?: EmptyContext extends Pick<TContext, K> ? 'optional'
-    : 'required';
-};
-
-interface RfcContribution<
-  TId extends string = string,
-  TContext extends object = EmptyContext,
-  THeaderKeys extends readonly string[] = readonly string[],
-  TCacheMode extends RfcCacheMode = RfcCacheMode,
-> {
-  /** Compile-only stand-in for the accepted implementation's generic context identity. */
-  readonly __context?: TContext;
-  readonly protocol: {
-    readonly family: 'netscript.sdk-client';
-    readonly major: 1;
-  };
-  readonly id: TId;
-  readonly context: RfcContextDeclaration<TContext>;
-  readonly headerKeys: THeaderKeys;
-  readonly responseCache: { readonly mode: TCacheMode };
-  readonly prepare: (options: {
-    readonly context: Readonly<TContext>;
-    readonly signal?: AbortSignal;
-    readonly input: unknown;
-  }) => unknown;
-}
-
-interface AnyRfcContribution {
-  readonly __context?: object;
-  readonly protocol: {
-    readonly family: 'netscript.sdk-client';
-    readonly major: 1;
-  };
-  readonly id: string;
-  readonly context: Readonly<Record<string, 'optional' | 'required'>>;
-  readonly headerKeys: readonly string[];
-  readonly responseCache: { readonly mode: RfcCacheMode };
-}
-
-function defineRfcContribution<TContext extends object = EmptyContext>() {
-  return <
-    const TId extends string,
-    const THeaderKeys extends readonly string[],
-    const TCacheMode extends RfcCacheMode,
-  >(
-    contribution: RfcContribution<TId, TContext, THeaderKeys, TCacheMode>,
-  ): RfcContribution<TId, TContext, THeaderKeys, TCacheMode> => contribution;
-}
-
-type RfcIdOf<T> = T extends { readonly id: infer TId extends string } ? TId : never;
-type RfcContextOf<T> = T extends { readonly __context?: infer TContext extends object } ? TContext
-  : never;
-type RfcContextKeysOf<T> = StringKey<RfcContextOf<T>>;
-type RfcHeaderKeysOf<T> = T extends { readonly headerKeys: infer TKeys extends readonly string[] }
-  ? TKeys[number]
-  : never;
-
-interface RfcConflict<TKind extends string, TKey extends string> {
-  readonly __netscriptContributionConflict: `${TKind}:${TKey}`;
-}
-
-type RfcMergeTuple<
-  TContributions extends readonly AnyRfcContribution[],
-  TContext extends object = EmptyContext,
-  TIds extends string = never,
-  TContextKeys extends string = never,
-  THeaderKeys extends string = 'content-type' | 'traceparent' | 'tracestate',
-> = TContributions extends readonly [
-  infer THead extends AnyRfcContribution,
-  ...infer TTail extends AnyRfcContribution[],
-] ? RfcIdOf<THead> extends TIds ? RfcConflict<'id', RfcIdOf<THead>>
-  : [Extract<RfcContextKeysOf<THead>, TContextKeys>] extends [never]
-    ? [Extract<RfcHeaderKeysOf<THead>, THeaderKeys>] extends [never] ? RfcMergeTuple<
-        TTail,
-        TContext & RfcContextOf<THead>,
-        TIds | RfcIdOf<THead>,
-        TContextKeys | RfcContextKeysOf<THead>,
-        THeaderKeys | RfcHeaderKeysOf<THead>
-      >
-    : RfcConflict<'header', Extract<RfcHeaderKeysOf<THead>, THeaderKeys>>
-  : RfcConflict<'context', Extract<RfcContextKeysOf<THead>, TContextKeys>>
-  : TContext;
-
-type RfcAtMostSixteen<TContributions extends readonly AnyRfcContribution[]> = TContributions extends
-  readonly [
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    AnyRfcContribution,
-    ...AnyRfcContribution[],
-  ] ? RfcConflict<'limit', 'more-than-16'>
-  : unknown;
-
-type RfcValidateTuple<TContributions extends readonly AnyRfcContribution[]> =
-  RfcMergeTuple<TContributions> extends RfcConflict<string, string> ? RfcMergeTuple<TContributions>
-    : RfcAtMostSixteen<TContributions>;
-
-type RfcContributionContext<TContributions extends readonly AnyRfcContribution[]> =
-  RfcMergeTuple<TContributions> extends infer TResult extends object ? TResult : never;
-
-declare function acceptRfcContributions<
-  const TContributions extends readonly AnyRfcContribution[],
+declare function acceptSdkClientContributions<
+  const TContributions extends readonly object[],
 >(
-  contributions: TContributions & RfcValidateTuple<TContributions>,
-): RfcContributionContext<TContributions>;
-
-type RequiredKeys<TContext extends object> = {
-  [K in keyof TContext]-?: EmptyContext extends Pick<TContext, K> ? never : K;
-}[keyof TContext];
-
-type RfcRequestRest<TContext extends object> = RequiredKeys<TContext> extends never
-  ? [options?: { readonly context?: TContext }]
-  : [options: { readonly context: TContext }];
-
-type RfcServiceClientMethod<
-  TInput,
-  TOutput,
-  TContext extends object = ServiceClientContext,
-> = (input: TInput, ...request: RfcRequestRest<TContext>) => Promise<TOutput>;
-
-type RfcServiceClientShape<
-  TContract extends ContractLike,
-  TContext extends object = ServiceClientContext,
-> = TContract extends ContractProcedureLike ? RfcServiceClientMethod<
-    ProcedureInputFromNode<TContract>,
-    ProcedureOutputFromNode<TContract>,
-    TContext
-  >
-  : {
-    [K in keyof TContract]: TContract[K] extends ContractLike
-      ? RfcServiceClient<TContract[K], TContext>
-      : never;
-  };
-
-type RfcServiceClient<
-  TContract extends ContractLike,
-  TContext extends object = ServiceClientContext,
-> = RfcServiceClientShape<TContract, TContext> & ServiceClientContract<TContract>;
+  contributions: TContributions & ValidateSdkClientContributions<TContributions>,
+): SdkClientContributionContext<TContributions>;
 
 declare const currentClient: ServiceClient<typeof serviceContract>;
-const defaultCompatibleClient: RfcServiceClient<typeof serviceContract> = currentClient;
+const defaultCompatibleClient: ServiceClient<typeof serviceContract> = currentClient;
 void defaultCompatibleClient;
 
-type RfcProcedureQueryOptions<TInput, TContext extends object> =
-  & (undefined extends TInput ? { readonly input?: TInput } : { readonly input: TInput })
-  & (RequiredKeys<TContext> extends never ? { readonly context?: TContext }
-    : { readonly context: TContext });
-
-interface RfcContextualProcedureQueryUtils<TInput, TOutput, TContext extends object> {
-  readonly call: RfcServiceClientMethod<TInput, TOutput, TContext>;
-  queryOptions(
-    options: RfcProcedureQueryOptions<TInput, TContext>,
-  ): ServiceProcedureQueryResult<TOutput>;
-}
-
-type RfcServiceQueryUtils<
-  TContract extends ContractLike,
-  TContext extends object = EmptyContext,
-> = StringKey<TContext> extends never ? ServiceQueryUtils<TContract>
-  : TContract extends ContractProcedureLike ? RfcContextualProcedureQueryUtils<
-      ProcedureInputFromNode<TContract>,
-      ProcedureOutputFromNode<TContract>,
-      TContext
-    >
-  : {
-    [K in keyof TContract]: TContract[K] extends ContractLike
-      ? RfcServiceQueryUtils<TContract[K], TContext>
-      : never;
-  };
-
 declare const currentQueryUtils: ServiceQueryUtils<typeof serviceContract>;
-const defaultCompatibleQueryUtils: RfcServiceQueryUtils<typeof serviceContract> = currentQueryUtils;
+const defaultCompatibleQueryUtils: ServiceQueryUtils<typeof serviceContract> = currentQueryUtils;
 void defaultCompatibleQueryUtils;
+
+type PreservedClientError = Error & { readonly code: 'PRESERVED' };
+type PreservedErrorMethod = ServiceClientMethod<
+  ListOrdersInput,
+  ListOrdersOutput,
+  PreservedClientError,
+  { readonly tenant: string }
+>;
+type _TErrorRemainsThirdAndContextIsFourth = Assert<
+  IsAssignable<
+    ReturnType<PreservedErrorMethod>,
+    Promise<ListOrdersOutput> & { __error?: { type: PreservedClientError } }
+  >
+>;
 
 const currentDefinedServices = defineServices({
   publicCatalog: { contract: serviceContract },
@@ -282,29 +133,34 @@ type _CurrentFactoryClientKeepsDefaultContext = Assert<
 
 const currentServerKey = createActionQueryKey('orders', 'list', { page: 1 });
 const currentExactServerKey: readonly [string, string, string] = currentServerKey;
+const currentPartitionedServerKey = createActionQueryKey(
+  'orders',
+  'list',
+  { page: 1 },
+  ['$netscript.sdk-context', '[["app:locale","de-CH"]]'] as const,
+);
+const currentExactPartitionedServerKey: readonly [
+  string,
+  'list',
+  string,
+  '$netscript.sdk-context',
+  string,
+] = currentPartitionedServerKey;
 void currentExactServerKey;
-
-type RfcServerKeySuffix =
-  | readonly []
-  | readonly ['$netscript.sdk-context', string];
-
-type RfcActionQueryKey<
-  TAction extends string = string,
-  TSuffix extends RfcServerKeySuffix = readonly [],
-> = readonly [string, TAction, string, ...TSuffix];
+void currentExactPartitionedServerKey;
 
 type _DefaultKeyPartsRemainValid = Assert<
-  IsAssignable<RfcActionQueryKey<'list'>[number], QueryKeyPart>
+  IsAssignable<ActionQueryKey<'list'>[number], QueryKeyPart>
 >;
 type _PartitionedServerKeyRemainsCacheKey = Assert<
   IsAssignable<
-    RfcActionQueryKey<'list', readonly ['$netscript.sdk-context', string]>,
+    ActionQueryKey<'list', readonly ['$netscript.sdk-context', string]>,
     CacheKey
   >
 >;
 
-const defaultServerKey: RfcActionQueryKey<'list'> = ['orders', 'list', '{"page":1}'];
-const partitionedServerKey: RfcActionQueryKey<
+const defaultServerKey: ActionQueryKey<'list'> = ['orders', 'list', '{"page":1}'];
+const partitionedServerKey: ActionQueryKey<
   'list',
   readonly ['$netscript.sdk-context', string]
 > = [
@@ -317,31 +173,117 @@ const partitionedServerKey: RfcActionQueryKey<
 void defaultServerKey;
 void partitionedServerKey;
 
-const auth = defineRfcContribution<{ auth: { readonly token: () => Promise<string> } }>()({
+const auth = defineSdkClientContribution<{
+  auth: { readonly token: () => Promise<string> };
+}>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
   id: '@netscript/plugin-auth:bearer',
   context: { auth: 'required' },
   headerKeys: ['authorization'],
-  responseCache: { mode: 'partitioned' },
-  prepare: ({ context }) => context.auth.token(),
+  responseCache: {
+    mode: 'partitioned',
+    partition: () => 'auth-partition',
+  },
+  prepare: async ({ context }) => ({
+    headers: { authorization: await context.auth.token() },
+  }),
 });
 
-const locale = defineRfcContribution<{ locale?: string }>()({
+const locale = defineSdkClientContribution<{ locale?: string }>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
   id: 'app:locale',
   context: { locale: 'optional' },
   headerKeys: ['accept-language'],
-  responseCache: { mode: 'partitioned' },
-  prepare: ({ context }) => context.locale,
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.locale ?? 'default',
+  },
+  prepare: ({ context }) =>
+    context.locale ? { headers: { 'accept-language': context.locale } } : {},
 });
 
-const directOnly = defineRfcContribution<{ opaqueSession: string }>()({
+const directOnly = defineSdkClientContribution<{ opaqueSession: string }>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
   id: 'app:opaque-session',
   context: { opaqueSession: 'required' },
   headerKeys: ['x-session'],
   responseCache: { mode: 'direct-only' },
-  prepare: ({ context }) => context.opaqueSession,
+  prepare: ({ context }) => ({ headers: { 'x-session': context.opaqueSession } }),
+});
+
+const helperSignature: SdkClientContributionDefinition<{ locale?: string }> =
+  defineSdkClientContribution<{ locale?: string }>();
+void helperSignature;
+
+const defineClosedContribution = defineSdkClientContribution();
+const closedDescriptor = {
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:closed-shape',
+  context: {},
+  headerKeys: [],
+  responseCache: { mode: 'invariant' },
+  prepare: () => ({}),
+} as const;
+
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error dependency ordering is not part of protocol major 1
+  before: ['app:locale'],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error dependency ordering is not part of protocol major 1
+  after: ['app:locale'],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error dependency ordering is not part of protocol major 1
+  requires: ['app:locale'],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error priority ordering is not part of protocol major 1
+  priority: 1,
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error environment flags are not part of protocol major 1
+  environment: 'browser',
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply a transport link
+  link: {},
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply fetch
+  fetch,
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream link plugins
+  plugins: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream interceptors
+  interceptors: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream client interceptors
+  clientInterceptors: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot supply upstream adapter interceptors
+  adapterInterceptors: [],
+});
+defineClosedContribution({
+  ...closedDescriptor,
+  // @ts-expect-error contributions cannot control retry policy
+  retry: 1,
 });
 
 const rejectedDesktopOptions: CreateDesktopServiceClientOptions<typeof serviceContract> = {
@@ -351,73 +293,23 @@ const rejectedDesktopOptions: CreateDesktopServiceClientOptions<typeof serviceCo
 };
 void rejectedDesktopOptions;
 
-acceptRfcContributions([auth, locale]);
+acceptSdkClientContributions([auth, locale]);
 
-const duplicateAuthContext = defineRfcContribution<{ auth?: { readonly apiKey: string } }>()({
+const duplicateAuthContext = defineSdkClientContribution<{
+  auth?: { readonly apiKey: string };
+}>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
   id: 'app:other-auth',
   context: { auth: 'optional' },
   headerKeys: ['x-api-key'],
   responseCache: { mode: 'direct-only' },
-  prepare: () => undefined,
+  prepare: () => ({}),
 });
 
 // @ts-expect-error duplicate context ownership is rejected at the tuple boundary // quality-allow: negative compile fixture proves tuple validation rejects two contributions that both claim the auth context key
-acceptRfcContributions([auth, duplicateAuthContext]);
+acceptSdkClientContributions([auth, duplicateAuthContext]);
 
-type RfcDefineServiceConfig<
-  TContract extends ContractLike,
-  TContributions extends readonly AnyRfcContribution[] = readonly [],
-> = DefineServiceConfig<TContract> & {
-  readonly contributions?: TContributions & RfcValidateTuple<TContributions>;
-};
-
-type RfcContractOf<TConfig> = TConfig extends {
-  readonly contract: infer TContract extends ContractLike;
-} ? TContract
-  : never;
-
-type RfcContributionsOf<TConfig> = TConfig extends {
-  readonly contributions: infer TContributions extends readonly AnyRfcContribution[];
-} ? TContributions
-  : readonly [];
-
-type RfcHasDirectOnly<TContributions extends readonly AnyRfcContribution[]> = Extract<
-  TContributions[number]['responseCache'],
-  { readonly mode: 'direct-only' }
-> extends never ? false : true;
-
-type RfcDefinedQueryContext<TConfig> = RfcContributionsOf<TConfig> extends readonly []
-  ? EmptyContext
-  : ServiceClientContext & RfcContributionContext<RfcContributionsOf<TConfig>>;
-
-type RfcDefinedServices<TServices> = {
-  readonly clients: {
-    readonly [K in keyof TServices]: RfcServiceClient<
-      RfcContractOf<TServices[K]>,
-      ServiceClientContext & RfcContributionContext<RfcContributionsOf<TServices[K]>>
-    >;
-  };
-  readonly queryUtils: {
-    readonly [
-      K in keyof TServices as RfcHasDirectOnly<
-        RfcContributionsOf<TServices[K]>
-      > extends true ? never : K
-    ]: RfcServiceQueryUtils<
-      RfcContractOf<TServices[K]>,
-      RfcDefinedQueryContext<TServices[K]>
-    >;
-  };
-};
-
-declare function rfcDefineServices<
-  const TServices extends Record<
-    string,
-    RfcDefineServiceConfig<ContractLike, readonly AnyRfcContribution[]>
-  >,
->(services: TServices): RfcDefinedServices<TServices>;
-
-const services = rfcDefineServices({
+const services = defineServices({
   accounts: {
     contract: serviceContract,
     contributions: [auth, locale] as const,
@@ -456,21 +348,26 @@ services.queryUtils.accounts.orders.list.queryOptions({
 // A context-bearing service uses this distinct generated shape; the implementation fixture must
 // construct it through the contribution-aware wrapper rather than extending the default
 // upstream-assignability assertion above to this specialization.
-declare const contributedQueryUtils: RfcServiceQueryUtils<
+declare const contributedQueryUtils: ServiceQueryUtils<
   typeof serviceContract,
-  ServiceClientContext & RfcContributionContext<readonly [typeof auth, typeof locale]>
+  ServiceClientContext & SdkClientContributionContext<readonly [typeof auth, typeof locale]>
 >;
 void contributedQueryUtils;
 
 // @ts-expect-error direct-only services are omitted from the generated query-utils map // quality-allow: negative compile fixture proves mapped query-utils keys exclude a service whose contribution declares direct-only response caching
 services.queryUtils.desktopOnly;
 
-type SyntheticContribution<TNumber extends string> = RfcContribution<
-  `app:c${TNumber}`,
-  Record<`c${TNumber}`, string>,
-  readonly [`x-c${TNumber}`],
-  'invariant'
->;
+type SyntheticContribution<TNumber extends string> =
+  & Omit<
+    SdkClientContribution<
+      `app:c${TNumber}`,
+      Record<`c${TNumber}`, string>,
+      SdkClientContextDeclaration<Record<`c${TNumber}`, string>>,
+      readonly [`x-c${TNumber}`]
+    >,
+    'responseCache'
+  >
+  & { readonly responseCache: { readonly mode: 'invariant' } };
 
 type SixteenContributions = readonly [
   SyntheticContribution<'01'>,
@@ -492,7 +389,7 @@ type SixteenContributions = readonly [
 ];
 
 declare const sixteen: SixteenContributions;
-acceptRfcContributions(sixteen);
+acceptSdkClientContributions(sixteen);
 
 declare const seventeen: readonly [
   ...SixteenContributions,
@@ -500,4 +397,4 @@ declare const seventeen: readonly [
 ];
 
 // @ts-expect-error the RFC-A public inference budget is sixteen contributions per service // quality-allow: negative compile fixture proves tuple validation rejects a seventeenth contribution while accepting sixteen
-acceptRfcContributions(seventeen);
+acceptSdkClientContributions(seventeen);

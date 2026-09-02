@@ -4,7 +4,8 @@
  * Ports define the SDK's public type vocabulary without re-exporting upstream
  * implementation types. They cover cache stores and entries, service-client
  * contract inference, query factories, TanStack Query client width,
- * service-query utils, discovery metadata, and the transport seam.
+ * service-query utils, discovery metadata, and the versioned client-contribution
+ * contract for typed per-call context, owned HTTP headers, and cache safety.
  *
  * Import this subpath when another NetScript package needs to accept or return
  * SDK-compatible shapes without depending on concrete adapters. Runtime
@@ -37,9 +38,28 @@ export type {
   ProcedureOutput,
   QueryFactory,
 } from './query-factory.ts';
-export type { QueryKey, QueryKeyPart } from './query-key.ts';
+export type {
+  ActionQueryKey,
+  QueryKey,
+  QueryKeyPart,
+  SdkClientServerKeySuffix,
+} from './query-key.ts';
 export { createActionQueryKey, serializeQueryKeyInput } from './query-key.ts';
 export type { CacheQueryOptions, QueryParams } from './query-options.ts';
+export type {
+  SdkClientCachePartitionOptions,
+  SdkClientContextDeclaration,
+  SdkClientContribution,
+  SdkClientContributionContext,
+  SdkClientContributionId,
+  SdkClientContributionProtocol,
+  SdkClientPrepareOptions,
+  SdkClientProcedureDescriptor,
+  SdkClientRequestPatch,
+  SdkClientResponseCache,
+  SdkClientTransportDescriptor,
+  ValidateSdkClientContributions,
+} from './sdk-client-contribution.ts';
 export type {
   QueryClientFetchOptions,
   QueryClientFilters,
@@ -87,10 +107,14 @@ export type {
   ProcedureInputFromNode,
   ProcedureMetaFromNode,
   ProcedureOutputFromNode,
+  SdkClientHttpMethod,
+  SdkClientTransportPolicy,
+  SdkClientTransportPolicyMethodOptions,
   ServiceClient,
   ServiceClientContext,
   ServiceClientContract,
   ServiceClientMethod,
   ServiceClientShape,
   ServiceRequestOptions,
+  ServiceRequestRest,
 } from './service-client.ts';

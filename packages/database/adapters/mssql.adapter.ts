@@ -316,8 +316,9 @@ export type MssqlIsolationLevel = IsolationLevel | 'Snapshot';
  *
  * @example
  * ```typescript
- * import { MssqlAdapter, getMssqlConfig } from '@netscript/database/adapters';
- * import { PrismaClient } from './generated/client';
+ * import { PrismaMssql } from '@prisma/adapter-mssql';
+ * import { MssqlAdapter, getMssqlConfig } from '@netscript/database/adapters/mssql';
+ * import { PrismaClient } from '@database';
  *
  * // Using structured options
  * const adapter = new MssqlAdapter({
@@ -330,9 +331,9 @@ export type MssqlIsolationLevel = IsolationLevel | 'Snapshot';
  *
  * // Or using environment config
  * const config = getMssqlConfig();
- * const adapter = new PrismaMssql(config);
+ * const envAdapter = new PrismaMssql(config);
  *
- * const client = new PrismaClient({ adapter: adapter.getDriverAdapter() });
+ * const client = new PrismaClient({ adapter: envAdapter });
  * ```
  */
 export class MssqlAdapter<

@@ -12,7 +12,7 @@
  * Supports standard 5-field cron syntax: minute hour day month weekday
  *
  * @example
- * ```
+ * ```text
  * '0 * * * *'     - Every hour
  * '*\/5 * * * *'  - Every 5 minutes
  * '0 0 * * *'     - Every day at midnight

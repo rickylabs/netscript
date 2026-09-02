@@ -9,7 +9,7 @@
 
 import type { CacheEntry } from '@netscript/aspire/types'
 import type { RegisterInfrastructureOptions } from '../types.ts'
-import { fileHeader, safeIdentifier } from '../_utils.ts'
+import { fileHeader } from '../_utils.ts'
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts'
 import { SCAFFOLD_VERSIONS } from '../../../../constants/scaffold/scaffold-versions.ts'
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts'
@@ -105,32 +105,36 @@ export function generateRegisterInfrastructure(
 
   // Build database registration blocks
   const dbBlocks: string[] = []
-  for (const [name, entry] of dbEntries) {
-    const id = safeIdentifier(name)
+  for (const [databaseIndex, [name, entry]] of dbEntries.entries()) {
+    const id = `db_${databaseIndex}`
     const mode = entry.Mode ?? 'Container'
 
     if (entry.Engine === 'Sqlite') {
       const sqlitePath = entry.DataPath ?? entry.DatabaseName ?? `${name}.sqlite`
-      dbBlocks.push(`  // ${name} (Sqlite, resolved file-backed resource)
-  const ${id} = await builder.addParameter('${name}', {
-    value: resolveDataPath(appHostDir, '${sqlitePath}', '${name}'),
+      dbBlocks.push(`  // database ${databaseIndex} (Sqlite, resolved file-backed resource)
+  const ${id} = await builder.addParameter(${JSON.stringify(name)}, {
+    value: resolveDataPath(appHostDir, ${JSON.stringify(sqlitePath)}, ${JSON.stringify(name)}),
     secret: false,
   });
-  databases.set('${name}', ${id});`)
+  databases.set(${JSON.stringify(name)}, ${id});`)
       continue
     }
 
     if (mode === 'External') {
-      dbBlocks.push(`  // ${name} (${entry.Engine}, External)
-  const ${id} = await builder.addConnectionString('${name}');
-  databases.set('${name}', ${id});`)
+      dbBlocks.push(`  // database ${databaseIndex} (External)
+  const ${id} = await builder.addConnectionString(${JSON.stringify(name)});
+  databases.set(${JSON.stringify(name)}, ${id});
+  databaseConnectionStrings.set(
+    ${JSON.stringify(name)},
+    async () => await builder.getConfiguration().getConnectionString(${JSON.stringify(name)}),
+  );`)
       continue
     }
 
     const method = DB_ENGINE_METHODS[entry.Engine] ?? 'addConnectionString'
     const lines: string[] = []
 
-    lines.push(`  // ${name} (${entry.Engine}, Container)`)
+    lines.push(`  // database ${databaseIndex} (Container)`)
     // TypeScript Aspire SDK: every `builder.addXxx(...)` and `.addDatabase(...)`
     // returns a ResourcePromise. The chained configuration methods
     // (`withLifetime`, `withDataBindMount`, …) are defined on the promise,
@@ -139,11 +143,15 @@ export function generateRegisterInfrastructure(
     // "Argument 'source' is a Promise-like value". So we `await` the entire
     // chain here.
     if (entry.Engine === 'Postgres' || entry.Engine === 'Mysql') {
-      lines.push(`  const ${id}_password = await builder.addParameter('${name}-password', {`)
-      lines.push(`    value: ensureDatabasePassword(appHostDir, '${name}'),`)
+      lines.push(
+        `  const ${id}_password = await builder.addParameter(${
+          JSON.stringify(`${name}-password`)
+        }, {`,
+      )
+      lines.push(`    value: ensureDatabasePassword(appHostDir, ${JSON.stringify(name)}),`)
       lines.push(`    secret: true,`)
       lines.push(`  });`)
-      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      lines.push(`  const ${id}_server = await builder.${method}(${JSON.stringify(name)}, {`)
       if (entry.Port !== undefined) {
         lines.push(`    port: ${entry.Port},`)
       }
@@ -151,19 +159,21 @@ export function generateRegisterInfrastructure(
       lines.push(`  })`)
     } else if (entry.Engine === 'Mssql') {
       lines.push(
-        `  const ${id}_password = await builder.addParameter('${name}-password', {`,
+        `  const ${id}_password = await builder.addParameter(${
+          JSON.stringify(`${name}-password`)
+        }, {`,
       )
       lines.push(`    value: '${MSSQL_SA_PASSWORD}',`)
       lines.push(`    secret: true,`)
       lines.push(`  });`)
-      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      lines.push(`  const ${id}_server = await builder.${method}(${JSON.stringify(name)}, {`)
       if (entry.Port !== undefined) {
         lines.push(`    port: ${entry.Port},`)
       }
       lines.push(`    password: ${id}_password,`)
       lines.push(`  })`)
     } else {
-      lines.push(`  const ${id}_server = await builder.${method}('${name}')`)
+      lines.push(`  const ${id}_server = await builder.${method}(${JSON.stringify(name)})`)
     }
 
     if (entry.Persistent) {
@@ -176,13 +186,15 @@ export function generateRegisterInfrastructure(
     }
     if (entry.DataPath) {
       lines.push(
-        `    .withDataBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'))`,
+        `    .withDataBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
+          JSON.stringify(name)
+        }))`,
       )
     }
     if (entry.Engine === 'Mssql') {
       lines.push(`    .withImage('${MSSQL_CONTAINER_IMAGE}')`)
       lines.push(
-        `    .withImageTag('${entry.ImageTag ?? MSSQL_CONTAINER_TAG}')`,
+        `    .withImageTag(${JSON.stringify(entry.ImageTag ?? MSSQL_CONTAINER_TAG)})`,
       )
       lines.push(`    .withEnvironment('ACCEPT_EULA', 'Y')`)
       lines.push(`    .withEnvironment('SA_PASSWORD', '${MSSQL_SA_PASSWORD}')`)
@@ -197,51 +209,57 @@ export function generateRegisterInfrastructure(
 
     if (['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine)) {
       const healthCheckKey = `${name}_listener`
-      lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`)
+      lines.push(`  builder.addHealthCheck(${JSON.stringify(healthCheckKey)}, async () => {`)
       lines.push(`    const endpoint = await ${id}_server.getEndpoint('tcp');`)
       lines.push(`    const host = await endpoint.host();`)
       lines.push(`    const port = await endpoint.port();`)
       lines.push(
-        `    return createListenerReadinessCheck({ kind: '${entry.Engine.toLowerCase()}', host, port })();`,
+        `    return createListenerReadinessCheck({ kind: ${
+          JSON.stringify(entry.Engine.toLowerCase())
+        }, host, port })();`,
       )
       lines.push(`  });`)
-      lines.push(`  await ${id}_server.withHealthCheck('${healthCheckKey}');`)
+      lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`)
     }
 
     // Add database child resource if DatabaseName is specified
     if (entry.DatabaseName) {
       lines.push(
-        `  const ${id} = await ${id}_server.addDatabase('${entry.DatabaseName}');`,
+        `  const ${id} = await ${id}_server.addDatabase(${JSON.stringify(entry.DatabaseName)});`,
       )
     } else {
       lines.push(`  const ${id} = ${id}_server;`)
     }
 
-    lines.push(`  databases.set('${name}', ${id});`)
+    lines.push(`  databases.set(${JSON.stringify(name)}, ${id});`)
     dbBlocks.push(lines.join('\n'))
   }
 
   // Build cache registration blocks
   const cacheBlocks: string[] = []
-  for (const [name, entry] of cacheEntries) {
-    const id = safeIdentifier(name)
+  for (const [cacheIndex, [name, entry]] of cacheEntries.entries()) {
+    const id = `cache_${cacheIndex}`
     const mode = entry.Mode ?? 'Container'
 
     // DenoKv Local — in-process Deno.openKv(), no Aspire resource.
     if (entry.Engine === 'DenoKv' && mode === 'Local') {
       cacheBlocks.push(
-        `  // ${name} (DenoKv, Local — in-process Deno.openKv(), no Aspire resource)\n` +
-          `  cacheWiring.set('${name}', { resource: null, reference: null, env: {}, local: true });`,
+        `  // cache ${cacheIndex} (DenoKv, Local — in-process Deno.openKv(), no Aspire resource)\n` +
+          `  cacheWiring.set(${
+            JSON.stringify(name)
+          }, { resource: null, reference: null, env: {}, local: true });`,
       )
       continue
     }
 
     // External — connection-string resource; consumer wires by reference only.
     if (mode === 'External') {
-      cacheBlocks.push(`  // ${name} (${entry.Engine}, External)
-  const ${id} = await builder.addConnectionString('${name}');
-  caches.set('${name}', ${id});
-  cacheWiring.set('${name}', { resource: ${id}, reference: ${id}, env: {}, local: false });`)
+      cacheBlocks.push(`  // cache ${cacheIndex} (External)
+  const ${id} = await builder.addConnectionString(${JSON.stringify(name)});
+  caches.set(${JSON.stringify(name)}, ${id});
+  cacheWiring.set(${
+        JSON.stringify(name)
+      }, { resource: ${id}, reference: ${id}, env: {}, local: false });`)
       continue
     }
 
@@ -256,13 +274,10 @@ export function generateRegisterInfrastructure(
         ? denokvContainerSetup(id, name, entry)
         : redisGarnetContainerSetup(id, name, entry)
       const executable = garnetExecutableSetup(id, name, entry)
-      const containerLabel = entry.Engine === 'DenoKv'
-        ? 'DenoKv container'
-        : `${entry.Engine} container`
       const lines: string[] = []
 
       lines.push(
-        `  // ${name} (${entry.Engine}, Auto — Docker → ${containerLabel}; Docker-less → Garnet executable)`,
+        `  // cache ${cacheIndex} (Auto — Docker container; Docker-less Garnet executable)`,
       )
       lines.push(`  let ${id}_wiring: CacheWiring;`)
       lines.push(`  if (shouldUseContainerCache()) {`)
@@ -272,7 +287,7 @@ export function generateRegisterInfrastructure(
       for (const line of executable.lines) lines.push(`  ${line}`)
       lines.push(`    ${id}_wiring = ${executable.wiring};`)
       lines.push(`  }`)
-      lines.push(`  cacheWiring.set('${name}', ${id}_wiring);`)
+      lines.push(`  cacheWiring.set(${JSON.stringify(name)}, ${id}_wiring);`)
       cacheBlocks.push(lines.join('\n'))
       continue
     }
@@ -281,9 +296,9 @@ export function generateRegisterInfrastructure(
     if (entry.Engine === 'DenoKv') {
       const setup = denokvContainerSetup(id, name, entry)
       const lines = [
-        `  // ${name} (DenoKv, Container — Deno KV Connect)`,
+        `  // cache ${cacheIndex} (DenoKv, Container — Deno KV Connect)`,
         ...setup.lines,
-        `  cacheWiring.set('${name}', ${setup.wiring});`,
+        `  cacheWiring.set(${JSON.stringify(name)}, ${setup.wiring});`,
       ]
       cacheBlocks.push(lines.join('\n'))
       continue
@@ -293,9 +308,9 @@ export function generateRegisterInfrastructure(
     if (entry.Engine === 'Garnet' && mode === 'Executable') {
       const setup = garnetExecutableSetup(id, name, entry)
       const lines = [
-        `  // ${name} (Garnet, Executable — Docker-less dotnet tool)`,
+        `  // cache ${cacheIndex} (Garnet, Executable — Docker-less dotnet tool)`,
         ...setup.lines,
-        `  cacheWiring.set('${name}', ${setup.wiring});`,
+        `  cacheWiring.set(${JSON.stringify(name)}, ${setup.wiring});`,
       ]
       cacheBlocks.push(lines.join('\n'))
       continue
@@ -304,25 +319,25 @@ export function generateRegisterInfrastructure(
     // Redis / Garnet Container — Redis-compatible TCP endpoint.
     const setup = redisGarnetContainerSetup(id, name, entry)
     const lines = [
-      `  // ${name} (${entry.Engine}, Container)`,
+      `  // cache ${cacheIndex} (Container)`,
       ...setup.lines,
-      `  cacheWiring.set('${name}', ${setup.wiring});`,
+      `  cacheWiring.set(${JSON.stringify(name)}, ${setup.wiring});`,
     ]
     cacheBlocks.push(lines.join('\n'))
   }
 
   // Primary resolution
   const primaryDbLine = primaryDatabase
-    ? `  const primaryDatabase = databases.get('${primaryDatabase}') ?? null;`
+    ? `  const primaryDatabase = databases.get(${JSON.stringify(primaryDatabase)}) ?? null;`
     : `  const primaryDatabase = null;`
   const primaryCacheLine = primaryCache
-    ? `  const primaryCache = caches.get('${primaryCache}') ?? null;`
+    ? `  const primaryCache = caches.get(${JSON.stringify(primaryCache)}) ?? null;`
     : `  const primaryCache = null;`
   const primaryCacheEndpointLine = primaryCache
-    ? `  const primaryCacheEndpoint = cacheEndpoints.get('${primaryCache}') ?? null;`
+    ? `  const primaryCacheEndpoint = cacheEndpoints.get(${JSON.stringify(primaryCache)}) ?? null;`
     : `  const primaryCacheEndpoint = null;`
   const primaryCacheWiringLine = primaryCache
-    ? `  const primaryCacheWiring = cacheWiring.get('${primaryCache}') ?? null;`
+    ? `  const primaryCacheWiring = cacheWiring.get(${JSON.stringify(primaryCache)}) ?? null;`
     : `  const primaryCacheWiring = null;`
 
   return renderTemplateAssetSync(
@@ -392,7 +407,11 @@ function denokvContainerSetup(
   const lines: string[] = []
 
   lines.push(`  const ${id}_token = _generateAccessToken();`)
-  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
+  lines.push(
+    `  const ${id} = await builder.addContainer(${JSON.stringify(name)}, ${
+      JSON.stringify(imageRef)
+    })`,
+  )
   lines.push(
     `    .withEndpoint({ name: 'http', targetPort: ${DENOKV_HTTP_PORT}, scheme: 'http' })`,
   )
@@ -401,7 +420,9 @@ function denokvContainerSetup(
   lines.push(`    .withEnvironment('DENO_KV_ACCESS_TOKEN', ${id}_token)`)
   if (entry.DataPath) {
     lines.push(
-      `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+      `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
+        JSON.stringify(name)
+      }), '/data')`,
     )
   }
 
@@ -412,8 +433,8 @@ function denokvContainerSetup(
   lines.push(
     `  const ${id}_httpUrl = ${id}_httpEndpoint.property(EndpointProperty.Url);`,
   )
-  lines.push(`  caches.set('${name}', ${id});`)
-  lines.push(`  cacheEndpoints.set('${name}', ${id}_httpEndpoint);`)
+  lines.push(`  caches.set(${JSON.stringify(name)}, ${id});`)
+  lines.push(`  cacheEndpoints.set(${JSON.stringify(name)}, ${id}_httpEndpoint);`)
 
   // DENO_KV_URL is injected explicitly (scheme-complete, via EndpointProperty.Url)
   // so the consumer's autoDetectProvider() resolves the KV Connect URL from an env
@@ -441,10 +462,12 @@ function garnetExecutableSetup(
   const lines: string[] = []
 
   lines.push(
-    `  const ${id}_workdir = ensureGarnetToolManifest(appHostDir, '${version}');`,
+    `  const ${id}_workdir = ensureGarnetToolManifest(appHostDir, ${JSON.stringify(version)});`,
   )
   lines.push(
-    `  const ${id} = await builder.addExecutable('${name}', 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
+    `  const ${id} = await builder.addExecutable(${
+      JSON.stringify(name)
+    }, 'dotnet', ${id}_workdir, ['tool', 'run', 'garnet-server', '--port', '${CACHE_DEFAULT_PORT}'])`,
   )
   lines.push(
     `    .withEndpoint(${cacheEndpointOptions(entry.Port)});`,
@@ -456,8 +479,8 @@ function garnetExecutableSetup(
   if (['Redis', 'Garnet'].includes(entry.Engine)) {
     appendRespReadinessLines(lines, id, name)
   }
-  lines.push(`  caches.set('${name}', ${id});`)
-  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+  lines.push(`  caches.set(${JSON.stringify(name)}, ${id});`)
+  lines.push(`  cacheEndpoints.set(${JSON.stringify(name)}, ${id}_tcpEndpoint);`)
 
   const wiring =
     `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: 'garnet' }, local: false }`
@@ -481,11 +504,17 @@ function redisGarnetContainerSetup(
   const provider = entry.Engine === 'Garnet' ? 'garnet' : 'redis'
   const lines: string[] = []
 
-  lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
+  lines.push(
+    `  const ${id} = await builder.addContainer(${JSON.stringify(name)}, ${
+      JSON.stringify(imageRef)
+    })`,
+  )
   lines.push(`    .withEndpoint(${cacheEndpointOptions(entry.Port)})`)
   if (entry.DataPath) {
     lines.push(
-      `    .withBindMount(resolveDataPath(appHostDir, '${entry.DataPath}', '${name}'), '/data')`,
+      `    .withBindMount(resolveDataPath(appHostDir, ${JSON.stringify(entry.DataPath)}, ${
+        JSON.stringify(name)
+      }), '/data')`,
     )
   }
 
@@ -499,23 +528,25 @@ function redisGarnetContainerSetup(
   if (['Redis', 'Garnet'].includes(entry.Engine)) {
     appendRespReadinessLines(lines, id, name)
   }
-  lines.push(`  caches.set('${name}', ${id});`)
-  lines.push(`  cacheEndpoints.set('${name}', ${id}_tcpEndpoint);`)
+  lines.push(`  caches.set(${JSON.stringify(name)}, ${id});`)
+  lines.push(`  cacheEndpoints.set(${JSON.stringify(name)}, ${id}_tcpEndpoint);`)
 
   const wiring =
-    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: '${provider}' }, local: false }`
+    `{ resource: ${id}, reference: ${id}_tcpEndpoint, env: { GARNET_URI: ${id}_hostPort, REDIS_URI: ${id}_hostPort, CACHE_PROVIDER: ${
+      JSON.stringify(provider)
+    } }, local: false }`
   return { lines, wiring }
 }
 
 function appendRespReadinessLines(lines: string[], id: string, name: string): void {
   const healthCheckKey = `${name}_resp`
-  lines.push(`  builder.addHealthCheck('${healthCheckKey}', async () => {`)
+  lines.push(`  builder.addHealthCheck(${JSON.stringify(healthCheckKey)}, async () => {`)
   lines.push(`    const endpoint = await ${id}.getEndpoint('tcp');`)
   lines.push(`    const host = await endpoint.host();`)
   lines.push(`    const port = await endpoint.port();`)
   lines.push(`    return createRespPingCheck({ host, port })();`)
   lines.push(`  });`)
-  lines.push(`  await ${id}.withHealthCheck('${healthCheckKey}');`)
+  lines.push(`  await ${id}.withHealthCheck(${JSON.stringify(healthCheckKey)});`)
 }
 
 function cacheEndpointOptions(port: number | undefined): string {

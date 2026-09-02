@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Roll out runtime overrides
 templateEngine: [vento, md]
-order: 104
+order: 105
 oldUrl: /how-to/roll-out-runtime-overrides/
 ---
 
@@ -111,6 +111,6 @@ The next watcher reload sees the previous version and calls `onChange` again.
 - Look up the package surface in [runtime-config reference](/reference/runtime-config/).
 
 {{ comp.nextPrev({
-  prev: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" },
+  prev: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" },
   next: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" }
 }) }}

@@ -36,6 +36,8 @@ export const GATE_CATALOG = {
   'quality-scan': ['deno', 'task', 'quality:scan'],
   'quality-scan-repo': ['deno', 'task', 'quality:scan:repo'],
   'arch-check': ['deno', 'task', 'arch:check'],
+  'exports-drift': ['deno', 'task', 'docs:exports-drift'],
+  'mcp-export-corpus': ['deno', 'task', 'check:mcp-export-corpus'],
   'allowance-budget': [
     'deno',
     'run',
@@ -57,6 +59,7 @@ export const GATE_CATALOG = {
   'docs-source-format-test': ['deno', 'task', 'test:source-format'],
   'docs-tagline': ['deno', 'task', 'docs:tagline:check'],
   'docs-accuracy': ['deno', 'task', 'docs:accuracy'],
+  'jsdoc-example-compile': ['deno', 'task', 'docs:jsdoc-examples'],
   'agent-docs-prose': ['deno', 'task', 'check:agent-docs-prose'],
   'assets-barrel': ['deno', 'task', 'check:assets-barrel'],
   'publish-assets': ['deno', 'task', 'check:publish-assets'],

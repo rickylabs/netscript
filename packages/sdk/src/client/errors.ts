@@ -5,6 +5,74 @@
  */
 
 import { isDefinedError as orpcIsDefinedError } from '@orpc/client';
+import type { SdkClientContributionId } from '../ports/sdk-client-contribution.ts';
+
+/** Stable failure codes emitted by SDK client contribution handling. */
+export type SdkClientContributionErrorCode =
+  | 'SDK_CONTRIBUTION_INVALID'
+  | 'SDK_CONTRIBUTION_VERSION'
+  | 'SDK_CONTRIBUTION_CONFLICT'
+  | 'SDK_CONTRIBUTION_LIMIT'
+  | 'SDK_CONTRIBUTION_RUNTIME'
+  | 'SDK_CONTEXT_MISSING'
+  | 'SDK_HEADER_INVALID'
+  | 'SDK_CACHE_PARTITION_INVALID'
+  | 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED'
+  | 'SDK_PREPARATION_FAILED';
+
+/** Redacted diagnostic shape exposed by SDK client contribution failures. */
+export interface SdkClientContributionDiagnostic {
+  /** Stable machine-readable failure code. */
+  readonly code: SdkClientContributionErrorCode;
+  /** Lifecycle phase in which the failure occurred. */
+  readonly phase: 'construction' | 'partition' | 'preparation';
+  /** Safe contribution identifier, when known. */
+  readonly contributionId?: SdkClientContributionId;
+  /** Dot-separated procedure path, when known. */
+  readonly procedurePath?: string;
+  /** Declared header name, when relevant. */
+  readonly headerName?: string;
+}
+
+/** Package-owned, redacted error for SDK client contribution failures. */
+export class SdkClientContributionError extends Error {
+  /** Stable machine-readable failure code. */
+  readonly code: SdkClientContributionErrorCode;
+  /** Lifecycle phase in which the failure occurred. */
+  readonly phase: 'construction' | 'partition' | 'preparation';
+  /** Safe contribution identifier, when known. */
+  readonly contributionId?: SdkClientContributionId;
+  /** Dot-separated procedure path, when known. */
+  readonly procedurePath?: string;
+  /** Declared header name, when relevant. */
+  readonly headerName?: string;
+
+  /**
+   * Create a framework-authored contribution failure from redacted fields.
+   *
+   * @param diagnostic - Stable diagnostic fields safe for consumer observation.
+   */
+  constructor(diagnostic: SdkClientContributionDiagnostic) {
+    super(`SDK client contribution failure: ${diagnostic.code}`);
+    this.name = 'SdkClientContributionError';
+    this.code = diagnostic.code;
+    this.phase = diagnostic.phase;
+    this.contributionId = diagnostic.contributionId;
+    this.procedurePath = diagnostic.procedurePath;
+    this.headerName = diagnostic.headerName;
+  }
+
+  /** Return the stable redacted diagnostic representation. */
+  toJSON(): SdkClientContributionDiagnostic {
+    return {
+      code: this.code,
+      phase: this.phase,
+      ...(this.contributionId === undefined ? {} : { contributionId: this.contributionId }),
+      ...(this.procedurePath === undefined ? {} : { procedurePath: this.procedurePath }),
+      ...(this.headerName === undefined ? {} : { headerName: this.headerName }),
+    };
+  }
+}
 
 /**
  * Public shape of an oRPC defined error.

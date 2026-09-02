@@ -1,6 +1,17 @@
 import { assertEquals } from '@std/assert';
 import { implement, os } from '@orpc/server';
-import { assemblePluginContractRouter, createPluginService } from '../../src/service/mod.ts';
+import type { ServiceBuilder, ServiceRouter } from '@netscript/service';
+import type {
+  Principal as RootPrincipal,
+  ServiceHandlerContext as RootServiceHandlerContext,
+} from '../../mod.ts';
+import {
+  assemblePluginContractRouter,
+  createPluginService,
+  type PluginServiceConfig,
+  type Principal as ServicePrincipal,
+  type ServiceHandlerContext as ServiceSurfaceHandlerContext,
+} from '../../src/service/mod.ts';
 import {
   BASE_PLUGIN_CONTRACT_ROUTES,
   type BasePluginContract,
@@ -29,6 +40,28 @@ const router = assemblePluginContractRouter(
   { router: () => handlers },
   { version: 'v1', namespace: 'sample', handlers },
 );
+
+Deno.test('createPluginService preserves typed custom context and identity re-exports', () => {
+  type CustomContext = { readonly tenant: 'alpha' };
+
+  const config = {
+    name: 'sample',
+    context: () => ({ tenant: 'alpha' as const }),
+  } satisfies PluginServiceConfig<CustomContext>;
+
+  const builder: ServiceBuilder<ServiceRouter, CustomContext> = createPluginService(router, config);
+  const context: RootServiceHandlerContext<CustomContext> = {
+    tenant: 'alpha',
+    principal: undefined,
+  };
+  const serviceContext: ServiceSurfaceHandlerContext<CustomContext> = context;
+  const rootPrincipal: RootPrincipal | undefined = context.principal;
+  const servicePrincipal: ServicePrincipal | undefined = rootPrincipal;
+
+  assertEquals(typeof builder.build, 'function');
+  assertEquals(serviceContext.tenant, 'alpha');
+  assertEquals(servicePrincipal, undefined);
+});
 
 Deno.test('createPluginService serves health, service info, and the describe oRPC route', async () => {
   const app = createPluginService(router, {

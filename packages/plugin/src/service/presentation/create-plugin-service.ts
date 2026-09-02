@@ -60,7 +60,9 @@ export interface PluginRawRoute {
  * applies in the mandated builder order. Every field is plain data so a
  * connector cannot reorder the chain.
  */
-export interface PluginServiceConfig extends ServiceConfig {
+export interface PluginServiceConfig<
+  TCustom extends object = Record<never, never>,
+> extends ServiceConfig {
   /** Forwarded to `withRPC({ traceContext })`; defaults to `true`. */
   readonly traceContext?: boolean;
   /** API version used in the canonical RPC mount path; defaults to `v1`. */
@@ -70,7 +72,7 @@ export interface PluginServiceConfig extends ServiceConfig {
   /** Base API path shared with generated clients; defaults to `/api`. */
   readonly apiPath?: string;
   /** Per-request oRPC context factory applied via `withContext()`. */
-  readonly context?: ContextFactory;
+  readonly context?: ContextFactory<TCustom>;
   /** Database wiring applied via `withDatabase()`. */
   readonly database?: PluginDatabaseConfig;
   /** Middleware applied in order via `use()`, before context. */
@@ -129,12 +131,19 @@ export interface PluginServiceConfig extends ServiceConfig {
  * await running.stop();
  * ```
  */
-export function createPluginService<TRouter extends ServiceRouter>(
+export function createPluginService<
+  TRouter extends ServiceRouter,
+  TCustom extends object = Record<never, never>,
+>(
   router: TRouter,
-  config: PluginServiceConfig,
-): ServiceBuilder<TRouter> {
+  config: PluginServiceConfig<TCustom>,
+): ServiceBuilder<TRouter, TCustom> {
   const { name, version, port } = config;
-  let builder: ServiceBuilder<TRouter> = createService<TRouter>(router, { name, version, port });
+  let builder: ServiceBuilder<TRouter, TCustom> = createService<TRouter>(router, {
+    name,
+    version,
+    port,
+  });
 
   if (config.enableCors !== false) {
     builder = builder.withCors(config.cors);

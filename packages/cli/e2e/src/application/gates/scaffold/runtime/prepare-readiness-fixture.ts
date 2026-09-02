@@ -44,7 +44,7 @@ export async function prepareReadinessFixture(
   );
 }
 
-/** Attach the two test-only checks at markers derived from the real infrastructure generator. */
+/** Attach the two test-only checks at boundaries derived from the real infrastructure generator. */
 export function injectListenerFaultHealthChecks(
   source: string,
   database: DatabaseEngine = DATABASE.POSTGRES,
@@ -57,27 +57,41 @@ export function injectListenerFaultHealthChecks(
   }
 
   const reference = listenerInfrastructureReference();
-  const postgresMarker = healthAttachmentMarker(reference, POSTGRES_REAL_HEALTH_KEY);
-  const garnetMarker = healthAttachmentMarker(reference, GARNET_REAL_HEALTH_KEY);
-  if (!source.includes(garnetMarker)) {
-    throw new Error('generated register-infrastructure helper has no garnet health-check marker');
+  assertGeneratedHealthAttachment(reference, GARNET_REAL_HEALTH_KEY);
+  const garnetAttachments = healthAttachments(source, GARNET_REAL_HEALTH_KEY);
+  if (garnetAttachments.length === 0) {
+    throw new Error(
+      'generated register-infrastructure helper has no garnet health-check attachment',
+    );
   }
   const includePostgres = listenerFaultExpectations(database).some((expectation) =>
     expectation.controllerListener === 'postgres'
   );
-  if (includePostgres && !source.includes(postgresMarker)) {
-    throw new Error('generated register-infrastructure helper has no postgres health-check marker');
+  let withPostgres = source;
+  if (includePostgres) {
+    assertGeneratedHealthAttachment(reference, POSTGRES_REAL_HEALTH_KEY);
+    const postgresAttachments = healthAttachments(source, POSTGRES_REAL_HEALTH_KEY);
+    if (postgresAttachments.length === 0) {
+      throw new Error(
+        'generated register-infrastructure helper has no postgres health-check attachment',
+      );
+    }
+    withPostgres = injectAtHealthAttachments(
+      source,
+      postgresAttachments,
+      (attachment, indentation) =>
+        `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
+${indentation}await ${attachment.resourceBinding}.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`,
+    );
   }
 
-  const postgresBlock = `${postgresMarker}
-  builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
-  await postgres_server.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`;
-  const garnetBlock = `${garnetMarker}
-  builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: ${GARNET_TEST_LISTENER_PORT} }));
-  await garnet.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`;
-
-  const withPostgres = includePostgres ? source.replace(postgresMarker, postgresBlock) : source;
-  return withPostgres.replace(garnetMarker, garnetBlock);
+  return injectAtHealthAttachments(
+    withPostgres,
+    healthAttachments(withPostgres, GARNET_REAL_HEALTH_KEY),
+    (attachment, indentation) =>
+      `${indentation}builder.addHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}', createRespPingCheck({ host: 'localhost', port: ${GARNET_TEST_LISTENER_PORT} }));
+${indentation}await ${attachment.resourceBinding}.withHealthCheck('${TEST_ONLY_GARNET_HEALTH_KEY}');`,
+  );
 }
 
 /** Inject the existing dead-port app plus the Aspire-managed listener controller task. */
@@ -120,7 +134,7 @@ export function injectReadinessFixtureApps(
     ? ['readiness-dead-port', 'listener-fault-controller']
     : ['readiness-dead-port'];
   for (const name of fixtureNames) {
-    if (injected.includes(`apps.set('${name}'`)) {
+    if (appRegistrations(injected, name).length > 0) {
       throw new Error(`${name} fixture was already registered`);
     }
     injected = injected.replace(RETURN_APPS_MARKER, appBlock(generated, name) + RETURN_APPS_MARKER);
@@ -150,18 +164,81 @@ function listenerInfrastructureReference(): string {
   });
 }
 
-function healthAttachmentMarker(source: string, key: string): string {
-  const marker = source.split('\n').find((line) =>
-    line.trimStart().startsWith('await ') && line.includes(`.withHealthCheck('${key}');`)
+interface HealthAttachment {
+  readonly endOffset: number;
+  readonly healthCheckKey: string;
+  readonly resourceBinding: string;
+  readonly startOffset: number;
+  readonly statement: string;
+}
+
+const HEALTH_ATTACHMENT_PATTERN =
+  /^[ \t]*await[ \t]+([A-Za-z_$][\w$]*)\.withHealthCheck\((?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)')\);[ \t]*$/gm;
+
+const APP_REGISTRATION_PATTERN =
+  /^[ \t]*apps\.set\((?:"((?:\\.|[^"\\])*)"|'((?:\\.|[^'\\])*)'),[ \t]*([A-Za-z_$][\w$]*)\);[ \t]*$/gm;
+
+function healthAttachments(source: string, key: string): readonly HealthAttachment[] {
+  const attachments: HealthAttachment[] = [];
+  for (const match of source.matchAll(HEALTH_ATTACHMENT_PATTERN)) {
+    const healthCheckKey = match[2] ?? match[3];
+    const resourceBinding = match[1];
+    const startOffset = match.index;
+    if (healthCheckKey === key && resourceBinding && startOffset !== undefined) {
+      attachments.push({
+        endOffset: startOffset + match[0].length,
+        healthCheckKey,
+        resourceBinding,
+        startOffset,
+        statement: match[0],
+      });
+    }
+  }
+  return attachments;
+}
+
+function assertGeneratedHealthAttachment(source: string, key: string): void {
+  const attachments = healthAttachments(source, key);
+  if (attachments.length === 0) {
+    throw new Error(`infrastructure generator omitted ${key} attachment marker`);
+  }
+}
+
+function injectAtHealthAttachments(
+  source: string,
+  attachments: readonly HealthAttachment[],
+  injectedBlock: (attachment: HealthAttachment, indentation: string) => string,
+): string {
+  let injected = source;
+  const descendingAttachments = [...attachments].sort((left, right) =>
+    right.startOffset - left.startOffset
   );
-  if (!marker) throw new Error(`infrastructure generator omitted ${key} attachment marker`);
-  return marker;
+  for (const attachment of descendingAttachments) {
+    const indentation = attachment.statement.match(/^[ \t]*/u)?.[0] ?? '';
+    injected = `${injected.slice(0, attachment.endOffset)}\n${
+      injectedBlock(attachment, indentation)
+    }${injected.slice(attachment.endOffset)}`;
+  }
+  return injected;
+}
+
+function appRegistrations(source: string, name: string): readonly RegExpMatchArray[] {
+  return [...source.matchAll(APP_REGISTRATION_PATTERN)].filter((match) =>
+    (match[1] ?? match[2]) === name
+  );
 }
 
 function appBlock(generated: string, name: string): string {
-  const startMarker = `  // --- ${name} (task) ---`;
-  const blockStart = generated.indexOf(startMarker);
-  const nextBlock = generated.indexOf('\n\n  // --- ', blockStart + startMarker.length);
+  const registrations = appRegistrations(generated, name);
+  if (registrations.length !== 1) {
+    throw new Error(`generator did not emit ${name} fixture block`);
+  }
+  const registrationIndex = registrations[0].index;
+  if (registrationIndex === undefined) {
+    throw new Error(`generator did not emit ${name} fixture block`);
+  }
+  const blockStart = generated.lastIndexOf('  // --- app ', registrationIndex);
+  const nextBlock = generated.indexOf('\n\n  // --- app ', registrationIndex);
   const returnIndex = generated.indexOf(RETURN_APPS_MARKER, blockStart);
   const blockEnd = nextBlock >= 0 && nextBlock < returnIndex ? nextBlock + 2 : returnIndex;
   if (blockStart < 0 || blockEnd < 0) {

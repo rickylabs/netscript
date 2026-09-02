@@ -1,0 +1,30 @@
+S8 Phase-B runtime gate tails
+Suite report: phase-b-scaffold-runtime.json
+Suite started: 2026-08-30T18:47:05Z
+Suite verdict: failed (passed=26 failed=1 skipped=0)
+
+Only two runtime.* gates executed before the critical generated.quality-negative failure stopped
+the suite. runtime.typed-db-phase-b and the remaining runtime gates were not reached.
+
+runtime.aspire-restore
+  verdict: passed
+  exit code: 0
+  stdout tail:
+    Restoring SDK code...
+    The installed Aspire CLI version (13.5.3) differs from the configured Aspire SDK version
+    (13.4.6). If you run into errors, run 'aspire update' to align them.
+    SDK code restored successfully for apphost.mts.
+  stderr tail: <empty>
+
+runtime.service-env-fixture
+  verdict: passed
+  exit code: 0
+  stdout tail:
+    declared environment wired for users (discovered, not named):
+    NETSCRIPT_E2E_SERVICE_ENV=declared-wins, NETSCRIPT_E2E_SERVICE_MODE=declared-wins,
+    OTEL_SERVICE_NAME=generated-wins, DATABASE_URL=generated-wins, PORT=refused,
+    DB_PROVIDER=generated-wins, POSTGRES_URI=generated-wins,
+    services__users__http__0=generated-wins
+  stderr tail: <empty>
+
+The authoritative unabridged command arrays and tails are retained in phase-b-scaffold-runtime.json.

@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 
 import {
   ASPIRE_RESOURCE,
@@ -15,7 +15,48 @@ import {
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
+import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
+import { formatCommandFailure } from '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts';
+
+Deno.test('runtime behavior gates register the dynamic route probe id', () => {
+  const dynamicRouteGateId = 'behavior.app-dynamic-route';
+
+  assertEquals((Object.values(GATE) as readonly string[]).includes(dynamicRouteGateId), true);
+  assertEquals(
+    createRuntimeBehaviorGates().map((entry) => String(entry.id)).includes(dynamicRouteGateId),
+    true,
+  );
+});
+
+Deno.test('dynamic route gate runs the HTTP-semantic probe for the project-derived app', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected dynamic route command gate.');
+
+  const command = gate.command({
+    request: { options: { projectName: 'inventory-console' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(gate.critical, true);
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-dynamic-route.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+  ]);
+});
 
 Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
@@ -32,6 +73,111 @@ Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', ()
     maxRetries: 2,
   });
 });
+
+Deno.test('runtime preserves the AppHost after typed migrate and refreshes background runtimes', () => {
+  const gate = createRuntimeGates(DATABASE.POSTGRES).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected a command gate.');
+  const command = gate.command(s8RuntimeContext());
+
+  assertEquals(command.at(-1), DATABASE.POSTGRES);
+  assertEquals(command[2].includes('`${database}-cli`'), true);
+  assertEquals(command[2].includes('"migrate", "--timeout", "60"'), true);
+  // #1720: a background processor started before the migration never runs the health-check
+  // job, so the success path must refresh the KV-backed runtimes without restarting the
+  // AppHost, and keep the full restart as the fallback.
+  assertEquals(command[2].includes('restartBackgroundRuntimes'), true);
+  assertEquals(command[2].includes('"resource", resource, "restart"'), true);
+  assertEquals(command[2].includes('using restart fallback'), true);
+  assertEquals(command[2].includes('"stop"'), true);
+  assertEquals(command[2].includes('"start"'), true);
+});
+
+Deno.test('typed database Phase-B gate stays outside the base runtime gate list', () => {
+  const gate = createTypedDbPhaseBGate();
+  if (gate.kind !== 'command') throw new Error('Expected a command gate.');
+  const context = s8RuntimeContext();
+
+  assertEquals(gate.cwd(context), '/workspace/app');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire,deno',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts',
+    '/workspace/app/aspire/apphost.mts',
+    '/workspace/app',
+    '/repo/packages/cli/bin/netscript.ts',
+    DATABASE.POSTGRES,
+  ]);
+  assertEquals(
+    createRuntimeGates(DATABASE.POSTGRES).some((entry) =>
+      entry.id === GATE.RUNTIME_TYPED_DB_PHASE_B
+    ),
+    false,
+  );
+});
+
+Deno.test('typed database Phase-B failures surface both captured streams', () => {
+  const failure = formatCommandFailure('aspire', ['resource', 'postgres-cli', 'migrate'], {
+    code: 16,
+    success: false,
+    stderr: 'Error: retained typed-command failure',
+    stdout: 'bounded tool context',
+    durationMs: 25,
+  });
+
+  assertStringIncludes(failure, 'stderr:\nError: retained typed-command failure');
+  assertStringIncludes(failure, 'stdout:\nbounded tool context');
+});
+
+Deno.test('typed database Phase-B faults the controller-owned listener without stopping the resource', async () => {
+  const source = await Deno.readTextFile(
+    new URL(
+      '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts',
+      import.meta.url,
+    ),
+  );
+
+  assertStringIncludes(source, 'commandListenerFaultController');
+  assertStringIncludes(source, 'TEST_ONLY_POSTGRES_HEALTH_KEY');
+  assertEquals(source.includes("'resource',\n      database,\n      'stop'"), false);
+  assertEquals(source.includes("'resource',\n        database,\n        'start'"), false);
+});
+
+function s8RuntimeContext(): RunContext {
+  return {
+    request: {
+      suiteId: 'scaffold.runtime',
+      options: {
+        repoRoot: '/repo',
+        cliEntrypoint: 'packages/cli/bin/netscript.ts',
+        smokeRoot: '/workspace',
+        projectName: 'generated',
+        database: DATABASE.POSTGRES,
+        packageSource: 'local',
+        plugins: [],
+        samples: true,
+        cache: true,
+        cleanup: true,
+        format: 'pretty',
+        commandTimeoutMs: 900_000,
+        httpTimeoutMs: 30_000,
+      },
+    },
+    project: {
+      repoRoot: '/repo',
+      cliEntrypoint: 'packages/cli/bin/netscript.ts',
+      smokeRoot: '/workspace',
+      projectName: 'generated',
+      appHost: '/workspace/app/aspire/apphost.mts',
+      projectRoot: '/workspace/app',
+    },
+  };
+}
 
 Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_START);

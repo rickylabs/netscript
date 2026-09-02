@@ -1,0 +1,54 @@
+D-227 generated-quality diagnosis and repair evidence
+Date: 2026-09-01 UTC
+Baseline: bbf866d59bf74d55614583898bb632d2ab223b1e
+
+Original unmodified probe
+  exit: 1
+  stdout bytes: 0
+  stderr bytes: 23763
+  stdout SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  stderr SHA-256: 1b1f8578727376577bae9fe332205e32f6379437517dca499aaa899bf5a13ad4
+  exact throw:
+    error: Uncaught (in promise) Error: generated check did not recover after quality probes
+  exact decisive diagnostic:
+    aspire/.helpers/register-infrastructure.mts(83,69): error TS2339: Property 'getValueAsync' does not exist on type 'ReferenceExpression'.
+  stack site:
+    at runQualityProbes (packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts:144:11)
+
+Original emitted-helper checks against complete restored Aspire 13.5.3 SDK
+  aspire/.helpers/run-tool.mts: exit 0
+  aspire/.helpers/register-infrastructure.mts: exit 2
+  diagnostic:
+    .helpers/register-infrastructure.mts(83,69): error TS2339: Property 'getValueAsync' does not exist on type 'ReferenceExpression'.
+
+Static regression RED before repair
+  exit: 1
+  passed: 0
+  failed: 1
+  diagnostic:
+    TS2339 [ERROR]: Property 'getValueAsync' does not exist on type 'ReferenceExpression'.
+
+Fixed consumer proof
+  emitted run-tool.mts check: exit 0
+  emitted register-infrastructure.mts check: exit 0
+  generated pre-probe check: exit 0
+  generated pre-probe lint: exit 0
+  unmodified generated-quality-probes.ts: exit 0
+  cleanupCheckExitCode: 0
+  cleanupLintExitCode: 0
+  stdout SHA-256: f2d0cbf6e4d96e3e23a6e9553af499199a4c0af209a0b794afe05b90f96c8cd3
+  stderr bytes: 0
+  stderr SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+Final static gates
+  focused helper tests: exit 0, passed 254, failed 0
+  scoped check: exit 0, files 3, failedBatches 0
+  scoped lint: exit 0, filesProcessed 3/3, failedBatches 0
+  scoped fmt: exit 0, filesProcessed 3/3, failedBatches 0
+  quality:gate: exit 0, quality findings 0, doctrine FAIL=0
+  repository check: exit 0, files 2986, batches 25, failedBatches 0
+  gen:assets-barrel: exit 0
+  check:assets-barrel: exit 0, generated barrel diff-clean
+
+No AppHost start, Docker, container, or E2E runtime suite was executed. Aspire restore was used
+only to materialize the SDK for static compilation. No evaluator was dispatched or claimed.

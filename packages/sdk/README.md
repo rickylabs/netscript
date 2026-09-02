@@ -25,6 +25,8 @@ and deployed endpoints without a registry or a config file.
   the map key.
 - **Typed service clients** — `createServiceClient` builds a fully inferred oRPC client from a
   shared contract router; input and output types come from the contract, never from you.
+- **Typed request contributions** — explicit versioned tuples add required per-call context and
+  declared HTTP headers without exposing transport links, retries, fetch, or upstream types.
 - **Declaration-safe procedure metadata** — `ProcedureMetaFromNode` on `./ports` and `ProcedureMeta`
   on `./ports` and `./query` recover the exact NetScript-owned metadata carried by direct clients,
   `defineServices`, and query actions without exposing upstream oRPC types.
@@ -97,6 +99,67 @@ const ordersQueryUtils = queryUtils.orders;
 
 Use the side-effect-free `./presets` subpath for `defineServices` in browser/shared modules. Drop to
 `./client`, `./query`, and `./query-client` when an app only needs one of the three pieces.
+
+### Typed request contributions
+
+Define a contribution once, then attach its literal tuple to the services that should use it. The
+tuple owns its context and lower-case header names; construction rejects malformed descriptors,
+duplicates, reserved names, and unsupported protocol versions. Preparation failures use
+`SdkClientContributionError` with stable codes and framework-authored, redacted messages.
+
+```ts
+import { defineSdkClientContribution } from '@netscript/sdk/client';
+import { defineServices } from '@netscript/sdk/presets';
+import { ordersContract } from './contracts/orders.ts';
+
+const locale = defineSdkClientContribution<{ locale: string }>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:locale',
+  context: { locale: 'required' },
+  headerKeys: ['accept-language'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.locale,
+  },
+  prepare: ({ context }) => ({
+    headers: { 'accept-language': context.locale },
+  }),
+});
+
+const services = defineServices({
+  orders: {
+    contract: ordersContract,
+    contributions: [locale] as const,
+  },
+});
+
+const context = { locale: 'de-CH' };
+const order = await services.clients.orders.get({ id: 'ord_123' }, { context });
+const query = services.queries.orders.list({ limit: 20, offset: 0 }, { context });
+const queryOptions = services.queryUtils.orders.list.queryOptions({
+  input: { limit: 20, offset: 0 },
+  context,
+});
+```
+
+Every contribution declares one response-cache mode:
+
+- `invariant` leaves existing server and TanStack key shapes unchanged.
+- `partitioned` appends sorted `[contributionId, value]` pairs to full keys. Partition values are
+  intentionally visible in caches and developer tools, so they must be stable, printable,
+  non-secret identifiers—not credentials, session ids, personal data, or reversible encodings.
+- `direct-only` keeps `services.clients.<name>` but omits that service from both `queries` and
+  `queryUtils`, at type level and runtime.
+
+Prefixes used for invalidation stay unsuffixed. Persisted TanStack keys retain the full partition,
+and generated collection wiring must take `queryKey` and `queryFn` from the same generated options
+result. Contributions prepare once per logical call epoch; ordinary retries reuse that immutable
+result, while a stream reconnect begins a fresh epoch.
+
+Version 1 is HTTP-only. `createDesktopServiceClient()` uses a MessagePort transport with no HTTP
+header channel, so its options do not accept `contributions`; JavaScript or widened input carrying
+the field throws `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED` instead of silently ignoring it. Create a
+separate HTTP service client in the native host when the host needs contributed request headers.
 
 ### Server cache registration
 
@@ -250,7 +313,7 @@ and Linux apply on relaunch.
 | ---------------- | --------------------------------------------------------------------------------- |
 | `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
 | `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
-| `./client`       | `createServiceClient`, `isDefinedError`                                           |
+| `./client`       | service clients, contribution definitions, redacted errors                        |
 | `./discovery`    | `getServiceUrl`, `getServiceInfo`, `getPostgresConnection`, `getKvConnection`, …  |
 | `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
 | `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
@@ -260,10 +323,24 @@ and Linux apply on relaunch.
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
 | `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
 | `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
-| `./ports`        | structural client/query contracts plus procedure metadata extractors              |
+| `./ports`        | structural client/query and contribution contracts, upstream-type-free            |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).
+
+## Transport policy
+
+Service clients derive the HTTP method, GET deduplication, and cache group from the contract and
+its NetScript procedure metadata through one SDK-owned policy decision. Use the optional
+`transportPolicy.method` callback only when adapting that final method—for example, a future
+POST-only transport. Request contributions receive procedure path, metadata, input, their context
+projection, signal, and the resolved destination; they never receive the HTTP method or control
+retry, deduplication, tracing, fetch, or link plugins.
+
+The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
+but are intentional no-ops. Configure explicit addresses through service discovery instead of
+`port`, and pass a per-call `AbortSignal` instead of `timeout`. Neither option changes discovery,
+dispatch, or cancellation behavior.
 
 ## Docs
 

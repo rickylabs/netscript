@@ -124,6 +124,24 @@ is being amended to install immediately after page load and diagnose both row as
 The hosted payload must decide the cause. Any result pointing at Fresh island hydration or the query
 provider is a rescope stop; inferred causes are not accepted.
 
+## 2026-09-02 convergence handoff
+
+Current `main` `77ad823dcb1874ccfc8964b4679ad92a3a145e0b` is merged into the evaluated
+`377811da8` head. The generated MCP carrier was resolved from `main` and regenerated; the
+non-generated `packages/fresh/deno.json` conflict preserves both `main`'s navigation surface and the
+branch's query-hydration browser-test registration. Of 57 branch-touched non-generated package
+files, 51 are byte-identical and six moved solely through intervening `main` commits. Therefore the
+old formal PASS does not carry wholesale and the converged head requires fresh evaluation. No
+runtime/browser/E2E gate is run in this convergence slice.
+
+Post-merge carrier checks, package checks, Fresh/SDK lint+fmt, focused tests (CLI 106, Fresh 12, SDK
+2), and `quality:gate` are green. The exact CLI lint/fmt wrapper commands remain red with exit 2
+because root configuration excludes the CLI package; a clean `origin/main` worktree reproduces the
+same zero-finding coverage refusal. Fresh partial-navigation commits `102ef8a10` and `556690a99`
+are opt-in coordinator/transport changes and do not touch the byte-identical query provider,
+showcase island, query hooks, or optimistic helper, so they are not a plausible render-propagation
+repair.
+
 ## Drift and Debt
 
 - Drift: the named help test was already green at the follow-up baseline because it loosely checked

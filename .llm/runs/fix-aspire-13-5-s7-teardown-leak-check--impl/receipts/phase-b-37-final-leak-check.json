@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30T19:33:10.480Z",
+  "command": "/home/agent/.local/bin/mise exec -- deno task agentic:leak-check -- --slice-dir /home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl --worktree /home/agent/projects/netscript/worktrees/007-aspire-s7 --owned-root /home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-attempt",
+  "exitCode": 0,
+  "probes": {
+    "aspire": "ok",
+    "docker": "ok",
+    "process": "ok"
+  },
+  "ownedSurvivors": [],
+  "foreignControl": {
+    "status": "running-unchanged-before-own-exact-stop",
+    "cliPid": 3461184,
+    "cliStartTimeTicks": 30122391,
+    "appHostPid": 3461203,
+    "appHostStartTimeTicks": 30122409,
+    "appHostOwnership": "foreign",
+    "postgresOwnership": "foreign",
+    "redisOwnership": "foreign",
+    "mutationRecordedByLeasedTeardown": false
+  },
+  "relayResourcesReportedAsLeaks": false
+}
