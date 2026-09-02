@@ -9838,3 +9838,30 @@ preserved.
 
 **Needs an owner/coordinator push from a credential carrying `workflow` scope.** #1846 landed on main
 under the owner's account, so that path exists.
+
+### D-225 — all v1 offenders cleared; the fix's premise validated live before it shipped
+
+The Aspire lane integrated `main` into both remaining offenders: S8 `daa4dad4d`, S10 `d986566e2`,
+each now `queue_max=3`. S11 was exonerated at job level. **No v1 arrivals remain.**
+
+**The S8 push validated #1908's premise for free.** PR #1889's docker tier was `in_progress` when
+`daa4dad4d` landed and **remained in_progress** — an arrival from a now-fixed branch deferred behind
+it instead of evicting it. The third eviction did not occur, on the same branch that had been evicted
+twice by v1 arrivals earlier in the session. That is the fixed-generation behaviour the `-v2` key
+preserves across the transition, demonstrated live at zero cost. Recorded as D-05 in the slice's
+`drift.md`.
+
+**Consequence for priority, stated plainly:** with every live branch carrying `queue: max`, #1908 is
+**no longer an active unblock** — it is insurance for the next branch cut from an older base. Told the
+Aspire lane not to hold S9/S10 runtime on it, and confirmed collision-free dispatch is safe in both
+directions.
+
+**Sharp edge added to the header** (Aspire's catch): the merge-vs-cherry-pick asymmetry rescues only
+branches *adopting* an already-merged fix; *authoring* one still requires `workflow` scope. This
+slice's own refused push is the proof. Commit amended in place to `541eb914b`; re-verified after
+amend — `non_comment_non_group_changed_lines=0`, `YAML_PARSE_REAL_EXIT=0`, both tiers' queue policy
+intact, top-level per-ref group untouched.
+
+**Push boundary unchanged and correctly held.** Both sessions hold `repo` only. The Aspire session
+declined to push on my behalf before I could decline to ask — its framing is better than mine: that it
+*might* succeed is what makes it wrong, not a reason to try. Awaiting an owner push.
