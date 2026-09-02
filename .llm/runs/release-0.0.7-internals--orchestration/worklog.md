@@ -10979,3 +10979,11 @@ identity this lane created (thread id, launcher pid recorded at dispatch), and n
 worktree name with another lane for the same PR — suffix by lane. Also: check the central
 `evaluatorLeases` before dispatching an evaluator on a transferred leaf; the lease would have shown
 Aspire already held it and this duplicate would never have existed.
+
+### D-273 — #1962 (live-db-endpoint resolver) merged; Canary 8 expected
+
+Microfix merged with ci green and docker-tier e2e success at `998f8e031` — the head I audited PASS
+(D-268). The order-dependent `findResource` defect that failed Canary 7's prove phase is closed at
+source. Next canary's pinned prod E2E is the receipt; a dedicated watcher reports per-step and the
+`behavior.live-db-endpoint` gate outcome. #1952 still awaits Aspire's re-dispatched verdict after my
+incident (D-272); no internals action on it.
