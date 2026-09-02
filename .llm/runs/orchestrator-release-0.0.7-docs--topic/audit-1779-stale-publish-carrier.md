@@ -211,3 +211,10 @@ heading and exclude the `|` form.
   publish-assets, mcp-export-corpus, agent-docs-prose.
 - Changelog current through every user-visible merge (#1949 + #1955). Staged follow-up bullets
   for #1664/#1956 (stacked; fold once both land) and #1885/#1952 pending ready-merge.
+
+## #1885 merged `9464ab223` — no changelog fold (2026-09-03)
+
+- Merge file set verified: `packages/cli/e2e/**` runtime gates (island hydration / served-surface
+  probes) + `packages/fresh/tests/**` browser fixtures only. No published package source, no
+  scaffold template. The 0.0.7 changelog records shipped surface only → no bullet; the title's
+  "hydrate" refers to proving hydration in the E2E suite. Not on the #1961 canary path.
