@@ -57,7 +57,9 @@ import type {
  * @example
  * ```ts
  * import { createQueue } from '@netscript/queue';
- * import { TracedQueue } from '@netscript/telemetry/instrumentation/queue';
+ * import { TracedQueue } from '@netscript/telemetry/instrumentation';
+ *
+ * type JobMessage = { jobId: string; payload: unknown };
  *
  * const innerQueue = createQueue<JobMessage>('jobs');
  * const queue = new TracedQueue(innerQueue, {
@@ -69,10 +71,8 @@ import type {
  * await queue.enqueue({ jobId: 'test', payload: {} });
  *
  * // Listen with automatic tracing
- * await queue.listen(async (message, context) => {
- *   // context.span is the processing span
- *   context.span.setAttribute('custom.attr', 'value');
- *   // ... process message
+ * await queue.listen(async (message) => {
+ *   console.log(`processing ${message.jobId}`);
  * });
  * ```
  */

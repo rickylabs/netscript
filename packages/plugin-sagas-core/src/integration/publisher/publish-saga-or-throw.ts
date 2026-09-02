@@ -16,6 +16,11 @@ import type {
  *
  * @example
  * ```ts
+ * import type { SagaMessage, SagaPublisherPort } from '@netscript/plugin-sagas/runtime';
+ *
+ * declare const publisher: SagaPublisherPort<SagaMessage>;
+ * declare const message: SagaMessage;
+ *
  * const receipt = await publishSagaOrThrow(publisher, message);
  * console.log(receipt.acceptedAt);
  * ```

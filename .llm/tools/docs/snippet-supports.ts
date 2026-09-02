@@ -1,5 +1,44 @@
 import { dirname, join, toFileUrl } from '@std/path';
 
+export interface JsdocScaffoldAliasRule {
+  readonly prefix: string;
+  readonly scaffoldKind: 'app' | 'service' | 'workspace';
+  readonly allowedMemberNames: readonly string[];
+}
+
+/** Generator-aligned alias families accepted by the published JSDoc gate. */
+export const JSDOC_SCAFFOLD_ALIAS_RULES: readonly JsdocScaffoldAliasRule[] = [
+  {
+    prefix: '@app/',
+    scaffoldKind: 'app',
+    allowedMemberNames: ['@netscript/fresh', '@netscript/sdk'],
+  },
+  {
+    prefix: '@database',
+    scaffoldKind: 'service',
+    allowedMemberNames: [
+      '@netscript/contracts',
+      '@netscript/database',
+      '@netscript/prisma-adapter-mysql',
+      '@netscript/service',
+    ],
+  },
+] as const;
+
+/** Reject a generated alias when its documented owner is not a matching scaffold context. */
+export function scaffoldAliasViolation(
+  specifier: string,
+  memberName: string,
+): string | undefined {
+  const rule = JSDOC_SCAFFOLD_ALIAS_RULES.find((candidate) =>
+    specifier.startsWith(candidate.prefix)
+  );
+  if (!rule || rule.allowedMemberNames.includes(memberName)) return undefined;
+  return `${rule.scaffoldKind}-generated alias ${
+    JSON.stringify(specifier)
+  } is not generated for ${memberName}`;
+}
+
 /** Write a generated support/module file after creating its parent directory. */
 export async function writeSnippetFile(path: string, content: string): Promise<void> {
   await Deno.mkdir(dirname(path), { recursive: true });
@@ -12,13 +51,34 @@ export async function materializeSharedSupports(
 ): Promise<Record<string, string>> {
   const supportRoot = join(tempRoot, '_support');
   const supports: Record<string, string> = {
+    '@database': join(supportRoot, 'database.ts'),
     '@database/zod': join(supportRoot, 'database-zod.ts'),
     '@playground/contracts': join(supportRoot, 'playground-contracts.ts'),
     '@my-app/contracts': join(supportRoot, 'my-app-contracts.ts'),
     '@app/utils.ts': join(supportRoot, 'app-utils.ts'),
     '@app/lib/contacts.ts': join(supportRoot, 'contacts.ts'),
+    '@app/lib/orders.ts': join(supportRoot, 'orders.ts'),
+    '@app/streams/schemas.ts': join(supportRoot, 'app-stream-schemas.ts'),
   };
 
+  await writeSnippetFile(
+    supports['@database'],
+    `export class PrismaClient {
+  constructor(_options?: unknown) {}
+  readonly sagaInstance = {
+    async create(input: unknown): Promise<unknown> { return input; },
+    async findFirst(): Promise<{ state: Record<string, unknown> }> { return { state: {} }; },
+  };
+  async $queryRawUnsafe(_query: string): Promise<unknown> { return undefined; }
+  async $disconnect(): Promise<void> {}
+  $extends(_extension: unknown): PrismaClient { return this; }
+}
+export const Prisma = {
+  defineExtension<T>(config: T): T { return config; },
+};
+export const db: any = {};
+`,
+  );
   await writeSnippetFile(
     supports['@database/zod'],
     `import { z } from 'zod';
@@ -28,6 +88,8 @@ export const UserSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
 });
+export const CreateUserSchema = UserSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export const UpdateUserSchema = CreateUserSchema;
 `,
   );
   await writeSnippetFile(
@@ -51,6 +113,15 @@ export const WidgetsContractV1 = {
   list: oc.route({ method: 'POST' })
     .input(z.object({}))
     .output(z.array(z.object({ id: z.string(), name: z.string() }))),
+};
+
+export const ordersContract = {
+  get: oc.route({ method: 'POST' })
+    .input(z.object({ id: z.string() }))
+    .output(z.object({ id: z.string() })),
+  list: oc.route({ method: 'POST' })
+    .input(z.object({ offset: z.number(), limit: z.number() }))
+    .output(z.array(z.object({ id: z.string() }))),
 };
 
 const UsersContractV1 = {
@@ -79,6 +150,29 @@ export const v1 = { users: implement(UsersContractV1) };
   },
   async invalidateList(): Promise<void> {},
 };
+`,
+  );
+  await writeSnippetFile(
+    supports['@app/lib/orders.ts'],
+    `import { createServiceClient } from '@netscript/sdk/client';
+import { ordersContract } from '@my-app/contracts';
+export const ordersClient = createServiceClient({
+  contract: ordersContract,
+  serviceName: 'orders',
+});
+`,
+  );
+  await writeSnippetFile(
+    supports['@app/streams/schemas.ts'],
+    `import { createStateSchema } from '@durable-streams/state';
+import { z } from 'zod';
+export const myStreamSchema = createStateSchema({
+  myEntity: {
+    schema: z.object({ id: z.string() }),
+    type: 'my-entity',
+    primaryKey: 'id',
+  },
+});
 `,
   );
 

@@ -85,7 +85,8 @@ export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefin
  * @example
  * ```ts
  * import { createNetScriptStreamDB } from '@netscript/fresh/streams';
- * import { myStreamSchema } from '../schemas.ts';
+ * import { useLiveQuery } from '@tanstack/react-db';
+ * import { myStreamSchema } from '@app/streams/schemas.ts';
  *
  * const db = createNetScriptStreamDB({
  *   streamPath: '/my-service/my-stream',

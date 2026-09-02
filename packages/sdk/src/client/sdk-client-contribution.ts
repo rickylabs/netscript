@@ -63,9 +63,11 @@ export interface SdkClientContributionDefinition<TContext extends object> {
  *   context: { locale: 'optional' },
  *   headerKeys: ['accept-language'],
  *   responseCache: { mode: 'invariant' },
- *   prepare: ({ context }) => ({
- *     headers: context.locale ? { 'accept-language': context.locale } : {},
- *   }),
+ *   prepare: ({ context }) => {
+ *     const headers: Record<string, string> = {};
+ *     if (context.locale) headers['accept-language'] = context.locale;
+ *     return { headers };
+ *   },
  * });
  * ```
  *

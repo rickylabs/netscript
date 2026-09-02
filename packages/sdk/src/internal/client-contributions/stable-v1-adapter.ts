@@ -17,6 +17,7 @@ import type {
   ProcedureMetadataPort,
   SdkClientLogicalCall,
 } from './adapter-ports.ts';
+import type { ResolvedTransportPolicy } from '../transport-policy.ts';
 
 /** Package-private transport-context key carrying only an already prepared call. */
 export const stableV1PreparedCall: unique symbol = Symbol('netscript.sdk.prepared-call');
@@ -36,12 +37,12 @@ interface RetryState {
 
 /** Inputs needed to compose the private stable-v1 logical-call wrapper. */
 export interface StableV1ClientLinkOptions {
-  readonly contract: object;
   readonly link: ClientLinkPort<
     StableV1TransportContext<object>,
     PreparedSdkClientCall<object>
   >;
   readonly preparation: PreparedOutboundHeadersPort;
+  readonly transportPolicy: ResolvedTransportPolicy;
   readonly resolveTransport: () => SdkClientTransportDescriptor;
   readonly hasContributions: boolean;
 }
@@ -60,29 +61,32 @@ function isAsyncIterator(value: unknown): value is AsyncIteratorObject<unknown> 
     typeof candidate[Symbol.asyncIterator] === 'function';
 }
 
-function resolveProcedureNode(contract: object, path: readonly string[]): unknown {
-  let node: unknown = contract;
-  for (const segment of path) {
-    if (!isRecord(node) || !(segment in node)) {
-      throw new TypeError(`Service client procedure does not exist: ${path.join('.')}`);
-    }
-    node = node[segment];
-  }
-  return node;
-}
-
 function normalizeProcedureMeta(value: unknown): Readonly<NetScriptProcedureMeta> {
-  if (!isRecord(value) || !isRecord(value.access)) return Object.freeze({});
-  const authentication = value.access.authentication;
-  if (
-    authentication !== 'none' &&
-    authentication !== 'optional' &&
-    authentication !== 'required'
-  ) {
-    return Object.freeze({});
+  if (!isRecord(value)) return Object.freeze({});
+
+  let access: NetScriptProcedureMeta['access'];
+  if (isRecord(value.access)) {
+    const authentication = value.access.authentication;
+    if (
+      authentication === 'none' ||
+      authentication === 'optional' ||
+      authentication === 'required'
+    ) {
+      access = Object.freeze({ authentication });
+    }
   }
+
+  let policy: NetScriptProcedureMeta['policy'];
+  if (isRecord(value.policy)) {
+    const cache = value.policy.cache;
+    if (cache === 'no-store' || cache === 'default' || cache === 'force-cache') {
+      policy = Object.freeze({ cache });
+    }
+  }
+
   return Object.freeze({
-    access: Object.freeze({ authentication }),
+    ...(access === undefined ? {} : { access }),
+    ...(policy === undefined ? {} : { policy }),
   });
 }
 
@@ -155,10 +159,11 @@ async function waitForRetry(
 function createAttemptContext<TContext extends object>(
   context: Readonly<ServiceClientContext & TContext>,
   preparedCall: PreparedSdkClientCall<TContext>,
+  disableLinkRetry: boolean,
 ): StableV1TransportContext<TContext> {
   const attemptContext = {
     ...context,
-    retry: 0,
+    ...(disableLinkRetry ? { retry: 0 } : {}),
     [stableV1PreparedCall]: preparedCall,
   };
   return attemptContext;
@@ -184,9 +189,7 @@ function createTransportPolicy(
       > = {
         signal: call.call.signal,
         lastEventId,
-        context: hasContributions
-          ? createAttemptContext(call.call.context, call)
-          : call.call.context,
+        context: createAttemptContext(call.call.context, call, hasContributions),
         preparedCall: call,
       };
 
@@ -223,10 +226,16 @@ export function createStableV1ClientLink<TContext extends object = object>(
 
       const startEpoch = async (lastEventId?: string): Promise<unknown> => {
         if (signal?.aborted) throw abortReason(signal);
+        const transportPolicy = options.transportPolicy.resolveCall(
+          path,
+          input,
+          callOptions.context,
+        );
         const logicalCall: SdkClientLogicalCall<TContext> = Object.freeze({
           context: callOptions.context,
-          procedurePath: Object.freeze([...path]),
-          procedureNode: resolveProcedureNode(options.contract, path),
+          procedurePath: transportPolicy.procedure.path,
+          procedure: transportPolicy.procedure,
+          transportPolicy,
           transport: options.resolveTransport(),
           input,
           signal,

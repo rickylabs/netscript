@@ -259,8 +259,9 @@ export function buildMysqlConnectionString(parts: {
  *
  * @example
  * ```typescript
- * import { MysqlAdapter, getMysqlConfig } from '@netscript/database/adapters';
- * import { PrismaClient } from './generated/client';
+ * import { PrismaMySql } from '@netscript/prisma-adapter-mysql';
+ * import { MysqlAdapter, getMysqlConfig } from '@netscript/database/adapters/mysql';
+ * import { PrismaClient } from '@database';
  *
  * // Using structured options
  * const adapter = new MysqlAdapter({

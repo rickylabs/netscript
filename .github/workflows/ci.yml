@@ -366,6 +366,14 @@ jobs:
           .llm/tools/gates/run-gate.ts --gate docs-accuracy --id quality-docs-accuracy
           --output .llm/tmp/gate-receipts/quality/docs-accuracy.json
 
+      - name: JSDoc example import and fence integrity
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate jsdoc-example-compile
+          --id quality-jsdoc-example-compile
+          --output .llm/tmp/gate-receipts/quality/jsdoc-example-compile.json
+
       - name: Agent docs corpus freshness
         if: env.RUN == 'true'
         run: >-

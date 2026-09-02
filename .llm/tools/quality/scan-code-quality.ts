@@ -70,6 +70,48 @@ function collectPluginNameIdents(lines: readonly string[]): Set<string> {
   return tainted;
 }
 
+/**
+ * Mark lines that sit inside a multi-line template literal.
+ *
+ * `ruleFor` already exempts fixture source that *begins* a line with a quote or backtick, on the
+ * stated ground that template source strings are data rather than syntax in the scanned module.
+ * That test only sees the first line, so the interior lines of a multi-line template — generated
+ * fixture code — were still scanned as if they were real declarations. Interpolated `${...}`
+ * expressions are genuine syntax and stay scanned.
+ */
+function templateInteriorLines(lines: readonly string[]): boolean[] {
+  const interior: boolean[] = [];
+  let inTemplate = false;
+  let interpolationDepth = 0;
+  for (const line of lines) {
+    // A line that opens an interpolation carries real syntax, so it stays scanned; only
+    // lines that are pure template text are treated as data.
+    interior.push(inTemplate && interpolationDepth === 0 && !line.includes('${'));
+    for (let index = 0; index < line.length; index++) {
+      const char = line[index];
+      if (char === '\\') {
+        index += 1;
+        continue;
+      }
+      if (inTemplate && interpolationDepth === 0) {
+        if (char === '`') inTemplate = false;
+        else if (char === '$' && line[index + 1] === '{') {
+          interpolationDepth = 1;
+          index += 1;
+        }
+        continue;
+      }
+      if (interpolationDepth > 0) {
+        if (char === '{') interpolationDepth += 1;
+        else if (char === '}') interpolationDepth -= 1;
+        continue;
+      }
+      if (char === '`') inTemplate = true;
+    }
+  }
+  return interior;
+}
+
 function ruleFor(line: string, file: string, tainted: Set<string>): QualityRule | undefined {
   // Template/fixture source strings are data, not syntax in the scanned module.
   if (/^\s*[`'\"]/.test(line)) return undefined;
@@ -1083,6 +1125,7 @@ export async function scanCodeQualityDetailed(
       const tainted = normalized.includes('/features/plugins/')
         ? collectPluginNameIdents(unit.lines)
         : EMPTY_TAINT;
+      const templateInterior = templateInteriorLines(unit.lines);
       for (let index = 0; index < unit.lines.length; index++) {
         const line = unit.lines[index];
         const allowanceMarkers = [...line.matchAll(/\/\/\s*quality-allow:/g)];
@@ -1091,7 +1134,8 @@ export async function scanCodeQualityDetailed(
           // rule — an allowance on a clean line is dead weight, not counted.
           const locationKey = `${unit.sourcePath}:${unit.lineOffset + index + 1}`;
           if (
-            !ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted) &&
+            (templateInterior[index] ||
+              !ruleFor(line.replace(/\/\/\s*quality-allow:.*$/, ''), normalized, tainted)) &&
             !publicLocations.has(locationKey) && !discardedFindings.has(index + 1)
           ) {
             continue;
@@ -1120,7 +1164,7 @@ export async function scanCodeQualityDetailed(
           }
           continue;
         }
-        const rule = ruleFor(line, normalized, tainted);
+        const rule = templateInterior[index] ? undefined : ruleFor(line, normalized, tainted);
         if (rule && !(unit.exemptTsErrorSuppression && rule === 'ts-error-suppression')) {
           findings.push({
             rule,

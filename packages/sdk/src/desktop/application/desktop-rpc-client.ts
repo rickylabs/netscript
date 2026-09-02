@@ -3,6 +3,8 @@ import { RPCLink } from '@orpc/client/message-port';
 import { createDesktopBindClientPort } from '../adapters/bind-channel.ts';
 import { DESKTOP_RPC_JSON_SERIALIZERS } from '../adapters/orpc-serialization.ts';
 import { SdkClientContributionError } from '../../client/errors.ts';
+import { resolveTransportPolicy } from '../../internal/transport-policy.ts';
+import type { ClientLinkPort } from '../../ports/client-link-factory.ts';
 import type {
   CreateDesktopRpcLinkOptions,
   CreateDesktopServiceClientOptions,
@@ -26,15 +28,24 @@ export function createDesktopRpcLink(
 export function createDesktopServiceClient<TContract extends ContractLike>(
   options: CreateDesktopServiceClientOptions<TContract>,
 ): DesktopServiceClient<TContract> {
+  const transportPolicy = resolveTransportPolicy(options.contract, {
+    transportPolicy: options.transportPolicy,
+  });
   if (Object.prototype.hasOwnProperty.call(options, 'contributions')) {
     throw new SdkClientContributionError({
       code: 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED',
       phase: 'construction',
     });
   }
-  const link = createDesktopRpcLink({
+  const rawLink = createDesktopRpcLink({
     bindingName: options.bindingName,
     invoke: options.invoke,
   });
+  const link: ClientLinkPort<ServiceClientContext> = {
+    call(path, input, callOptions): Promise<unknown> {
+      transportPolicy.resolveCall(path, input, callOptions.context);
+      return rawLink.call(path, input, callOptions);
+    },
+  };
   return createORPCClient<DesktopServiceClient<TContract>>(link);
 }
