@@ -7715,3 +7715,11 @@ Root cause remains **undetermined**; no fix is named on purpose.
 - **#1940 `09a38b187`**: F1 landed (`49c889897` drops `NPM_CONFIG_CACHE`; `09a38b187` corrects artifacts; PR body reworded, box 1 now states the warmed-cache mechanism). check-test ✅. Delta IMPL-EVAL dispatched (`z-ai/glm-5.3-flash`) → `.llm/tmp/eval1940b/verdict.md`.
 - **#1942 `2a5d01ae1`** postgres = `runtime.typed-db-phase-b` listener-Unhealthy flake (#1906 family, 58/59) — noted on PR + #1906, rerun queued. **#1916 `1c59ae57b`** postgres = #1844 signature (recurrence 7 today, 45/46) — noted, rerun queued. **#1885 `dd039a791`** label-fired re-run sqlite = `runtime.wait.auth` Aspire auth failed to start (49/50; same head passed earlier; 2nd `wait.auth` today after #1883) — noted, rerun queued on completion.
 - **#1883 `52785e4b4`**: both runtime tiers ✅ after reruns. Cycled `status:impl-eval` → trusted OpenHands IMPL-EVAL run `33666984209` at exact head; watcher armed.
+
+### 2026-09-02T18:40Z — #1930 MERGED (`09c07fd4e`); main now `c0b7d841a`
+
+- **#1926** closed as completed with evidence comment; label → `status:shipped`. PR #1930 body carried no closing keyword, so no auto-close and no acceptance mirror; boxes left un-ticked (never hand-ticked) — recorded on the issue.
+- **#1938**: went `DIRTY` on the corpus carrier again (main `ef8f3bee7` #1937 + `c0b7d841a`). Worker `01a06201` no longer in codex-status (dead). Supervisor merged `origin/main` (`7dd984e57`, carrier placeholder) then regenerated via `gen:mcp-export-corpus` from a clean tree (#1937's `--allow-dirty` guard refuses mid-merge) → `89ac276bf`, symbolCount 7834, `check:mcp-export-corpus` exit 0. No rebase. Pushed; awaiting ci/e2e at `89ac276bf`, then re-packet.
+- **#1856**: coordinator audit drift fixed — `docs/site/reference/fresh/index.md:379` `interface`→`typeAlias` → `511e1a347`; `docs:exports-drift`/`docs:accuracy`/`docs:links` PASS locally; product blobs unchanged (PASS_IMPL `cfec41cb8` holds). Awaiting ci + close-gate at `511e1a347`, then re-packet.
+- Dependent leaves notified (#1909/#1916/#1942/#1883/#1885/#1940): desktop red no longer attributable; no forced main-merge on active RED/GREEN.
+- **#1930 `405d25033`** postgres rerun `33658083108` was green before merge — no flake residue in the merged head.
