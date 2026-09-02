@@ -10099,3 +10099,61 @@ reported `STALLED` only after 20 unchanged polls — silence and death look iden
 would have kept reporting a dead worker as merely quiet. The replacement breaks on rollout silence
 exceeding 400s and names it as death, which is the same discipline as D-227's `steps: 0`: pick the
 signal that distinguishes the two states rather than the one that hides the difference.
+
+### D-232 — #1905 implementation reviewed; two claims re-verified independently, one finding open
+
+PR **#1917** (draft, base `main`, `Closes #1905`, taxonomy and milestone applied by this supervisor
+because the author opened it bare). Head `3a2c8ee6c` over base `77ad823dc`. Authorized surface held
+exactly: `ci-classify-changes.ts`, `ci-classify-changes.test.ts`, `fresh-ui-quality.yml`,
+`fresh-ui-quality_test.ts`, plus the slice's own run artifacts. No fifth surface, no lock, no
+dependency change.
+
+**Both layers changed together, which was the point.** The classifier's nested-config branch now
+contributes `freshUi` for member manifests and the root `deno.lock`; the workflow's two `paths:`
+arms gained the matching globs. `packages/cli/e2e/deno.json` correctly carries its own glob —
+`packages/*` cannot match a three-segment path, and the same asymmetry is handled explicitly in the
+classifier regex.
+
+**Two of the author's claims were re-verified by this supervisor rather than accepted on report.**
+This run has produced two false REDs and one false green, so agreement between two independent
+checks is the bar.
+
+- *RED.* Checked out the RED commit `8bdb7f0af` detached in a throwaway worktree and ran the
+  classifier suite there: `REAL_EXIT=1`, `61 passed | 1 failed`, sole failure
+  `Fresh UI private-lock inputs contribute to needs_fresh_ui`. Matches the author's record exactly,
+  including method. Their non-regression guard — root `deno.json` under a `toolchain` verdict must
+  keep setting `freshUi: true`, the path that caught #1890 — passes at RED, which is what proves the
+  new test isolates the real gap instead of moving the goalposts.
+- *Teeth.* Run `33620426788` on the disposable branch, event `pull_request`, conclusion `failure`;
+  `classify` `success` with **10 steps**, `fresh-ui-quality` `failure` with **12 steps**. Steps > 0
+  on both is the D-227 discriminator: the job was admitted and genuinely executed rather than
+  evicted or skipped. PR #1919 `CLOSED` with `mergedAt: null`, remote branch deleted (0 refs).
+  Every claim checks out.
+
+The author also recorded, correctly and unprompted, that the teeth run **cannot** prove isolated
+member-manifest triggering because the disposable branch carried the workflow change too. That is
+the distinction the brief demanded be kept separate, and they kept it without being reminded.
+
+**Operational finding from their run, worth carrying:** draft PRs are skipped by the classify job's
+`github.event.pull_request.draft == false` guard, so a teeth demonstration must move the disposable
+PR through `ready_for_review` to get a real verdict. The initial draft-open run `33620345492` was
+skipped and is correctly excluded from evidence.
+
+**Open finding T-1, queued for the author's next turn: `deno.jsonc` is uncovered.** The new
+classifier regex terminates `\/deno\.json$` and the workflow globs are `packages/*/deno.json` and
+peers. But this code sits *inside* the `isDenoConfigBase` branch, which admits `deno.jsonc`, and the
+sibling `pages:` computation three lines above already uses `deno\.jsonc?`. A member manifest
+written as `deno.jsonc` would therefore enter the branch, stale the private lock, and still classify
+`freshUi: false`. No member uses `.jsonc` today — which is exactly what makes this the *latent
+recurrence* class acceptance box 3 was written to close, rather than a cosmetic inconsistency.
+
+**Two things deliberately not raised.** The structural test hand-rolls a line-based YAML reader
+instead of parsing with a library, which is weaker than my brief asked for — but `@std/yaml` is
+imported nowhere in this repo, so adding it would touch root `deno.json` and `deno.lock` and thereby
+**stale `packages/fresh-ui/deno.lock` inside the very PR forbidden from regenerating it**. The
+constraint makes the bespoke reader the correct call, and I traced its failure mode: a format shift
+yields `undefined` paths and the `includes` assertions then fail, so it fails closed and cannot
+manufacture a false green. Separately, the new `paths:` entries sit after the `.md`/`.mdx`
+negations, but they are positive patterns that do not overlap the exclusions, so last-match-wins
+ordering is unaffected — and the author added a test pinning the negations after the positive
+Fresh UI glob anyway.
