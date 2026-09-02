@@ -1,122 +1,78 @@
-# RESUME CHECKPOINT — features orchestrator (rewritten 2026-08-31 ~04:10Z)
-
-**Ownership retained across rotation.** This lane owns #1762/#1387, #1805/#1591, #1810/#1458,
-#1814/#1592, #1820/#1452, plus the unstarted #1348 epic cluster.
+# RESUME CHECKPOINT — features orchestrator (rewritten 2026-09-02 ~10:40Z)
 
 ## Exact state
 
 | Thing | Value |
 | --- | --- |
-| `main` | `0274c0a707e36ded3b4470a3911315f963e642d4` (#1800) — moves fast, always re-fetch |
-| Topic branch | `orchestrator/release-0.0.7-features`, worktree `/home/agent/projects/netscript/worktrees/007-features` |
+| `main` | `77ad823dc` (#1910) — moves fast, always re-fetch |
+| Topic branch | `orchestrator/release-0.0.7-features`, worktree `007-features` |
 | Route | Opus 5 · xhigh · supervise-only · never merge |
-| Eval routes | IMPL `z-ai/glm-5.3-flash` · max; PLAN `qwen/qwen3.8-flash` · max. DeepSeek is LEGACY. |
+| Eval routes | IMPL `z-ai/glm-5.3-flash` · max; PLAN `qwen/qwen3.8-flash` · max |
 
-## PR control plane — 2026-08-31 ~06:05Z
+## Every Features-owned milestone issue has active work or a measured dependency
 
-| PR | Issue | Head | State | Blocked on |
-| --- | --- | --- | --- | --- |
-| **#1814** | #1592 partial | `0dc5ef539` | exact-head CI **green**; 10 blobs identical; disjoint from #1823/#1803 (proven, clean synthetic merge) — **no rebase taken** | eval verdict → tick DoD |
-| **#1762** | #1387 | `3ba369f51` | converged onto live main; `close-gate` + `quality` **green**; DoD added; ledger corrected 3→**6** integrations | **#1828** (`deno.unstable` lib parity) — nothing else |
-| **#1664** | #1355/#1360 | `270c31d4d` | recovered from Aug-15 park; `scaffold-static` green; all 17 acceptance rows verified | `--client` selector slice (dispatched) |
-| **#1834** | #1349 S1 | `903cd520e` | Tier-A ACCEPTED; core CI **green** | eval verdict → tick DoD |
+| Issue | Vehicle | State |
+| --- | --- | --- |
+| **#1452** | PR **#1842** `d1697421c` | **Merge packet delivered** (comment `5508264615`). All static gates green; postgres runtime red is **#1844**, proven, second reproduction. sqlite gate queued. |
+| **#1352** | PR **#1915** `a6fababde` | Non-draft; `check-test`+`quality` green. IMPL-EVAL running at `88df4839e` (run `33617695217`) — delta to head is **generated carriers only**, so the product verdict carries by byte-identity. `close-gate` red only on the honest unticked "IMPL-EVAL passes" DoD box. |
+| **#1590** | PR **#1895** `31f4ff8a1` | MutationObserver + teardown-abort both **fixed and confirmed hosted** (`viteStderr: ""`, `overlayCount: 0`, barriers `cancelled: 0`). One assertion left: `dynamicMarkers` all `null`. Worker resumed to determine (a) hydration consumes the markers → test bug, or (b) `KeyedPartial` isn't registering → **product defect in merged #1848**. |
+| **#1355/#1360** | PR **#1664** | Converging onto `77ad823dc` (was 44 behind, `CONFLICTING`). Holds IMPL-EVAL **PASS** at `377811da8`; worker must prove byte-identity carry or say it is void. |
+| **#1897** | PR **#1918** `5ae37a143` | Opened non-draft, full labels, milestone, `Closes #1897`. One line: `"tests/"` added to `packages/fresh/deno.json` excludes. |
+| **#1354** | plan PR **#1891** `f23ca6c05` | **PLAN-EVAL dispatched** (comment `5508205019`). Implementation stays behind #1664 by the plan's own **D9**, not by caution — #1664 is rewriting `packages/cli`. |
+| **#1349** | — | S1/S2/S3 all merged (`#1834`/`#1841`/`#1886`); ten acceptance boxes unticked; **no open PR to carry an evidence block**. Audit worker running in `007-leaf-1349-audit` to produce a truthful row-by-row verdict. |
+| **#1353** | — | Worker running. Amended scope: a **proof** slice — do NOT ship `traceContextContribution()`, do NOT move injection out of the transport. Audit-first: `traceparent`/`tracestate` are already in `RESERVED_HEADERS`. |
+| **#1467** | — | Worker running. New locale contribution owning `accept-language`. Told to **stop and report** rather than edit `prepared-call.ts`. |
+| **#1348** | — | Epic. Receives no leaf PR; stays open until every child is verified. |
 
-**Shipped this session:** #1805/#1591, #1810/#1458, #1820/#1452 (partial; #1452 correctly left open).
+## Live workers — all detached, all measured alive at checkpoint
 
-## Live workers (all watched, none stalled)
+| Worktree | Thread | Route | Slice |
+| --- | --- | --- | --- |
+| `007-leaf-1590-s2` | `01a060be-6b53-7962-88a2-f80a51a4010a` | Sol · medium | #1895 `dynamicMarkers` |
+| `007-leaf-1664` | `01a0585d-94e1-70b0-a1c2-6f9654179b0e` | Sol · high | #1664 convergence |
+| `007-leaf-1353` | `01a061a8-2a71-7f33-be7e-72b314c5619c` | Sol · medium | #1353 |
+| `007-leaf-1467` | `01a061a8-2a32-7733-86fc-2789efcb5dd1` | Sol · high | #1467 |
+| `007-leaf-1349-audit` | see `slices/1349-audit/codex-thread-ids.md` | Sol · medium | #1349 acceptance audit |
 
-- #1814 eval — run `33359533524`, agent step 17/32, ~55 min (long but genuinely running; do **not**
-  kill without checking the agent job's step counter).
-- #1834 eval — run `33361000853`, agent step 17/32.
-- #1664 `--client` selector — Codex thread `01a05668-1a29-77c0-9a01-4dd740c59db9`.
+## Traps — the ones that cost time today
 
-## Watcher-filter trap (cost two false wakeups)
+1. **`launch-codex-slice.ts` / `codex-resume.ts` block for the child's whole lifetime.** A
+   foreground call dies at the Bash tool timeout and **SIGTERMs the worker**. Always
+   `setsid nohup … &`. Recovery is **resume the same thread id**, never relaunch — context and
+   uncommitted worktree state both survive.
+2. **The launcher does not `mkdir` `--slice-dir`.** It starts the thread, then crashes writing
+   `codex-thread-ids.md`, leaving a live sender lease and a thread that never got its brief. Create
+   the dir first, and give every slice its **own** dir — a shared one silently overwrites the
+   previous slice's thread record.
+3. `--slug X` stages to `/home/<user>/X-brief.md` with `codex` hardcoded; under `--user node` pass
+   `--dest` explicitly.
+4. `git worktree add -b <b> <p> origin/main` inherits `origin/main` as upstream and git-safety
+   refuses it — `git branch --unset-upstream` first.
+5. **A re-stack that keeps "our" side of a file this branch does not own re-introduces a stale
+   snapshot**, and it survives every later clean merge silently. #1842 carried a duplicated
+   README section this way for two integrations.
+6. **Draft PRs get no real CI** (`ci.yml` gates on `draft == false`). #1915 sat in draft looking
+   green and proving nothing; promoting it immediately exposed a real `quality` failure.
+7. **After changing any README or docs page, run the whole cascade** —
+   `prose → assets-barrel → publish-assets → mcp-export-corpus` — not the one gate CI shows. The
+   `check:*` forms are `gen && git diff --exit-code`, so verify them **after committing**.
+8. `gh pr ready` fails on this token; use GraphQL `markPullRequestReadyForReview`.
+9. Sender-ownership refusals: measure liveness (rollout mtime + `/proc/<pid>/cwd`), never infer it
+   from the refusal. Three today were all `owner_inactive` and all the slice's **own** prior thread.
 
-A comment filter of `^\*\*\[PHASE: IMPL-EVAL\]` or `OPENHANDS_VERDICT` matches **the dispatch
-prompt** (it quotes the verdict tokens) **and this supervisor's own phase comments**. Poll the
-**workflow run status** instead — that is unambiguous.
+## Cross-lane findings raised, not absorbed
 
-## Corrections to the previous checkpoint — both were wrong, both cost time
+- **#1844** — second independent reproduction of the `runtime.wait.garnet` 300 s timeout, from
+  #1842's head. Comment `5508166737`.
+- **#1920** (new, `orchestrator:internals`) — `check:mcp-export-corpus` is in
+  `.llm/tools/gates/catalog.ts` but wired into **no** workflow, and `main` `77ad823dc` is stale
+  again (regenerates to `eb026322…` / 7803 on a clean detached worktree). The #1862 class recurred
+  because nothing on the merge path enforces it.
 
-1. **#1762 `close-gate` is not failing.** It passes. The CI red was a race against the acceptance
-   mirror mid-apply (gate read the `03:22:22Z` issue snapshot). Live re-evaluation at the exact head
-   returns `close-gate PASS`.
-2. **The `check-test` "batch-composition" diagnosis was wrong** (mine, twice). Root cause, since
-   confirmed by the coordinator and independently reproduced here: `packages/cli/e2e/deno.json` sets
-   `compilerOptions.lib = ["deno.ns","dom"]`, omitting `deno.unstable`, while both root `deno.json`
-   and `packages/cli/deno.json` include it. Deno 2.9.5 honors the explicit omission, so **the
-   `--unstable-kv` CLI flag has no effect** — reproduced with and without the flag, byte-identical
-   `TS2551`. #1762's new `packages/plugin/mod.ts:48` type-only re-export pulls `@netscript/service`'s
-   root into that stable-lib graph, reaching `health.ts:184`'s `Deno.openKv`. **Owned by P0 #1827
-   (`fix/cli-e2e-unstable-parity`); no product change belongs in #1762.**
+## Standing rules
 
-## Traps — do not relearn
-
-1. **Draft PRs get no real CI.** `ci.yml` gates `check-test`/`quality`/`code-quality`/`close-gate` on
-   `pull_request.draft == false`. A draft shows `build` + `classify` green and everything else
-   `skipping` — it looks green and proves nothing. Promote non-draft, and apply `impl-eval:skip`
-   first if an IMPL-EVAL is already running, or `ready_for_review` auto-dispatches a duplicate.
-2. **Evaluator allowlist is read per-worktree.** Dispatch from a worktree carrying post-#1792
-   `models.ts`, or the model is refused. The control worktree `007-features` is **stale** — dispatch
-   from a leaf.
-3. `dispatch-openhands --prompt-file` content **must begin with `use harness`**; the tool prepends
-   the base/head metadata itself.
-4. `gh pr edit` / `gh pr ready` fail on this token (org scopes). Use `gh api -X PATCH .../pulls/N`
-   with a JSON body file, and GraphQL `markPullRequestReadyForReview` for draft→ready.
-5. **D-1:** `run-gate.ts` can return `PASS`/exit 0 with **zero-byte stdout** `(cached, inputs
-   unchanged)`. Always read `stdout.bytes`. Exception: `assets-barrel` is `gen && git diff
-   --exit-code`, so zero bytes is legitimately clean — prove it by checking the worktree is clean.
-6. `exports-drift` / `mcp-export-corpus` are **not** in the shared gate catalog — only #1762's leaf
-   added them. Elsewhere run `deno task docs:exports-drift` / `check:mcp-export-corpus` directly.
-7. Acceptance boxes map by exact text or `box-index` — use `box-index`.
-8. Never hand-merge generated carriers; take `main`'s and regenerate.
-
-9. **Label ownership at PR-open, never at finalization.** Apply `orchestrator:features` (plus
-   `type:`/`area:`/`priority:`/`wave:` and the `0.0.7` milestone) in the **same action that opens the
-   leaf PR**. Coordinator audits are keyed on the orchestrator label, so a leaf labelled only at
-   finalization is **invisible to every audit while it is active** — the window in which it most needs
-   to be seen. Sub-agents open PRs with no metadata by default; the supervisor repairs it immediately,
-   not at merge time.
-
-## Audit finding — #1354/#1355 both have real residual scope after #1781
-
-Measured on `main` `0274c0a70`, answering the parked question:
-
-- **#1355 is NOT resolved.** The symbol-collision half was fixed (the template is now
-  `routes/examples/service/(_lib)/service-query.ts.template` with `{{serviceName}}` placeholders), but
-  the **dead invalidation is still live**: the template still calls
-  `createQueryFactories({ service: {...} }).service`, and `createQueryFactories` uses the **object
-  key** as the resource (`query-factory.ts:222`), so real keys are `['service', action, …]` while the
-  generated `…ListInvalidation = bridgeInvalidation(routerName, 'list')` produces `[routerName,
-  'list']`. They never match — the showcase's invalidation and optimistic `onSettled` are still
-  silent no-ops in generated user code. Still no verb for a second service.
-- **#1354 is essentially untouched.** Exactly one generated app asset references
-  `withResource`/`withRouteContract` (the frozen `examples/service/index.tsx.template`), and
-  `generate-group.ts` still registers only three commands. No resource-slice verb exists.
-
-## Remaining unimplemented, clustered
-
-- **#1349** PLAN-EVAL running (`qwen/qwen3.8-flash · max`, detached in `ns1349-planeval` at
-  `4b520ea44`, log `/home/agent/observability/planeval-1349-b.log`). A first attempt died with
-  SIGTERM/143; relaunch detached with `setsid nohup`. #1349 strictly precedes #1352/#1353/#1467.
-- **#1592 S2 + #1451** — both workers-runtime plumbing; cluster behind one plan.
-- **#1452 S2** — blocked on the `@netscript/plugin` → `@netscript/kv` dependency decision.
-- **#1590** — needs browser verification this lane cannot perform.
-
-## Watcher conditions — three ways I got these wrong in one session
-
-All three failed **open** (reported completion that had not happened), which is the dangerous
-direction: it invites a merge packet citing evidence that does not exist.
-
-1. **`IN_PROGRESS` is not terminal.** Exiting on `state != "PENDING"` fires on a running gate.
-   Require `SUCCESS`/`FAILURE` explicitly.
-2. **An empty match is not success.** Right after a push the checks do not exist yet, so
-   "no check is pending" is trivially true. Require the expected checks to **exist** —
-   `[…|select(terminal)]|length == 3`, not `[…|select(pending)]|length == 0`.
-3. **Comment-text filters match dispatch prompts.** A prompt quotes `[VERDICT:` /
-   `OPENHANDS_VERDICT`, so a text filter fires on the request, not the answer. **Poll the workflow
-   run status**, or read the summary comment's embedded `openhands-run` JSON (`"verdict"`,
-   `"state"`). This was already recorded as a trap and I repeated it anyway.
-
-Corollary already recorded above: a summary comment's `created_at` is **dispatch** time — it is
-rewritten in place on completion, so elapsed time read from it is meaningless.
+- Never merge; the primary coordinator merges.
+- Never hand-tick acceptance boxes — evidence block + `status:ready-merge` + rerun the existing CI
+  run at the **unchanged** head.
+- Label leaves at PR-open, never at finalization: coordinator audits key on `orchestrator:features`.
+- A closing keyword only on a PR that fully resolves an issue, never on an epic.
