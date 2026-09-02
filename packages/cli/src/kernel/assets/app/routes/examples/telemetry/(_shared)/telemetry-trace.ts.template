@@ -1,4 +1,5 @@
 import { getServiceUrl } from '@netscript/sdk';
+import { AspirePsDashboardReader, resolveTelemetryEndpoint } from '@netscript/mcp';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -24,7 +25,7 @@ export interface TelemetryTrace {
 export interface TelemetryTraceData {
   readonly traces: readonly TelemetryTrace[];
   readonly totalSpans: number;
-  readonly dashboardUrl: string;
+  readonly dashboardUrl?: string;
   readonly error?: string;
 }
 
@@ -66,9 +67,16 @@ interface DashboardTraceResponse {
   totalCount: number;
 }
 
-function getDashboardBaseUrl(): string {
-  const port = Deno.env.get('ASPIRE_DASHBOARD_PORT') ?? '18888';
-  return `https://localhost:${port}`;
+const DASHBOARD_UNAVAILABLE = 'dashboard unavailable — run `aspire ps`';
+
+function getDashboardBaseUrl(): string | undefined {
+  const resolved = resolveTelemetryEndpoint(undefined, {
+    NETSCRIPT_TELEMETRY_ENDPOINT: Deno.env.get('NETSCRIPT_TELEMETRY_ENDPOINT'),
+    ASPIRE_DASHBOARD_PORT: Deno.env.get('ASPIRE_DASHBOARD_PORT'),
+  }, new AspirePsDashboardReader());
+  return resolved.source === 'default'
+    ? undefined
+    : resolved.httpsFallback ?? resolved.endpoint;
 }
 
 function getServiceName(resource: OtlpResource): string {
@@ -84,6 +92,9 @@ function nanoDuration(start: string, end: string): number {
 
 export async function fetchDashboardTraces(): Promise<TelemetryTraceData> {
   const baseUrl = getDashboardBaseUrl();
+  if (!baseUrl) {
+    return { traces: [], totalSpans: 0, error: DASHBOARD_UNAVAILABLE };
+  }
   const url = `${baseUrl}/api/telemetry/traces`;
 
   try {

@@ -14,6 +14,7 @@ export type NetscriptPackage =
   | 'fresh-ui'
   | 'kv'
   | 'logger'
+  | 'mcp'
   | 'plugin'
   | 'plugin-workers'
   | 'plugin-auth-core'
@@ -55,6 +56,7 @@ export const JSR_SPECIFIERS: Readonly<Record<NetscriptPackage, string>> = {
   'fresh-ui': netscriptJsrSpecifier('fresh-ui'),
   kv: netscriptJsrSpecifier('kv'),
   logger: netscriptJsrSpecifier('logger'),
+  mcp: netscriptJsrSpecifier('mcp'),
   plugin: netscriptJsrSpecifier('plugin'),
   'plugin-workers': netscriptJsrSpecifier('plugin-workers'),
   'plugin-auth-core': netscriptJsrSpecifier('plugin-auth-core'),
