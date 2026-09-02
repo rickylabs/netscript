@@ -9802,3 +9802,94 @@ evidence; worker still running its gate set before pushing.
    fixed/being fixed. Merge readiness therefore depends on a coordinator ruling on merging over two
    known, separately-owned reds — the same class of ruling already open for #1842.
 2. **#1842 and #1918 are `status:ready-merge`** and need only the merge decision.
+
+---
+
+## COORDINATOR RULING — #1354 / #1891, recorded 2026-09-02 ~12:00Z
+
+Recorded verbatim in substance, because it overturns a protocol escalation this lane had raised.
+
+### The ruling
+
+1. **PLAN-EVAL cycles 2 and 3 were orchestration defects, not architecture failures.** Both
+   re-evaluated a **byte-identical `b210f9092`** and returned `FAIL_PLAN` against an unchanged
+   submission. They are **not** two further architecture failures, and the "third FAIL_PLAN →
+   escalate to user" trigger I surfaced is discharged by this ruling rather than by another
+   evaluation.
+2. **`b5dcb23e` is the first substantive repair, and the architecture is settled.** No broad
+   redesign, no advisory loop.
+3. **One harness-only sync commit**: add the mandatory `supervisor.md`, update `context-pack.md` to
+   the current command flags / safety contract and the current #1664 head `573d01d35`, and correct
+   obsolete `research.md` source paths.
+4. **Then exactly ONE narrow exact-head PLAN-EVAL**, restricted to the **formal plan gate and the
+   cycle-1 blockers**.
+5. **On PASS**: wait only for #1664 merge/rebase, then dispatch implementation **Slices A and B**.
+
+### Refinement after a touch-set audit — narrow D3 before the final gate
+
+**Keep:** deterministic full preflight; `owned` / `owned-edited` / `unowned` classification; additive
+options; `--dry-run`; the **existing** `--force` scoped to positively generator-owned leaves only;
+Fresh derivation in staging; fail-closed shared files.
+
+**Remove:** the new public `--keep` / `--replace` / `--abort` / `--recover` flags, the crash/recovery
+journal, the app-scoped lock, and the backup-rollback promise. Reason: **their IO adapters are absent
+from the declared touch set**, and they exceed #1354's acceptance. A plan may only promise behaviour
+some slice's declared touch set can implement.
+
+**Explicitly defer:** process-crash / mid-rename cross-file atomicity, and concurrent-invocation
+locking.
+
+**The bar that replaces them:** validation, Fresh-staging, and shared-source-transform failures all
+occur **before apply** and must prove **zero writes**; default conflict exit plus manual move/rename
+or owned-only `--force` is sufficient.
+
+### Why this correction matters beyond #1354
+
+My own record had treated cycles 2 and 3 as three independent architecture verdicts and escalated on
+that basis. The coordinator's reading is better supported by the evidence I myself gathered: each
+cycle artifact says "no submission delta", and a verdict re-issued against an unchanged head is one
+verdict observed three times, not three findings. **A repeated verdict on a byte-identical submission
+is an orchestration defect — the loop failed to apply a delta — and counting it as new evidence
+inflates the apparent severity of the plan.** That is the lesson, and it generalises to any gate that
+re-runs without a head change.
+
+### Execution status
+
+- **D3 narrowing dispatched** to the plan lane (thread `01a05dc7-d630-7cc2-b155-2b150754d53c`) as a
+  pure subtraction, with the keep/remove/defer lists above given verbatim and an explicit
+  instruction to **shrink slice ceilings** where a promise is removed rather than leave a ceiling
+  sized for work that no longer exists.
+- **Harness sync staged** and blocked only on that commit landing, so the sync is a single clean
+  commit on top rather than racing the worker in the same worktree. `research.md`'s stale paths are
+  already resolved against `origin/main`:
+
+  | Stale | Current |
+  | --- | --- |
+  | `.llm/harness/workflow/plan-gate.md` | `.llm/harness/gates/plan-gate.md` |
+  | `.llm/harness/workflow/archetype-gate-matrix.md` | `.llm/harness/gates/archetype-gate-matrix.md` |
+  | `.llm/harness/scopes/SCOPE-frontend.md` | `.llm/harness/archetypes/SCOPE-frontend.md` |
+  | `doctrine/01-core-principles.md` | `01-thesis-and-axioms.md` |
+  | `doctrine/02-package-archetypes.md` | `06-archetypes.md` |
+  | `doctrine/07-dependency-graph.md` | `07-composition-and-extension.md` |
+  | `doctrine/09-anti-patterns.md` / `10-doctrine-fitness.md` | `09-anti-patterns-and-fitness-functions.md` |
+  | `doctrine/06-quality-gates.md` | `.llm/harness/gates/fitness-gates.md` (+ doctrine 09) |
+  | `doctrine/05-testing.md` | **no doctrine successor** — testing gates live in `.llm/harness/gates/static-gates.md` |
+
+  The last row is recorded as "no successor" rather than mapped to a plausible-looking file: a
+  fabricated citation is worse than an acknowledged gap.
+- **PLAN-EVAL not yet dispatched** — it is authorized but must run at the exact head *after* the
+  sync commit, once, with restricted scope.
+
+## #1915 (#1352 S5) → `status:ready-merge`
+
+IMPL-EVAL **PASS** at `a6fababde` (run `33625757148`). Packet posted (`5509186239`). The evaluator
+verified my byte-identity carry claim itself — `git diff 88df4839e a6fababde --stat` is exactly four
+regenerated carriers, 12 lines, no product source — rather than accepting it.
+
+Three claims mattered and all hold: the contribution is **declared, never implicitly attached**; the
+cache partition is **never token-derived**, pinned by a test that generates the credential with
+`crypto.randomUUID()` and asserts `assertFalse(partition.includes(credential))`, so it fails the
+moment a partition starts deriving from the token; and diagnostics disclose only `contributionId` and
+`procedurePath`. The published `plugin-auth-core/sdk` surface is exactly three symbols and #1349's
+privacy boundary holds. `close-gate` now **PASS**; the DoD box was already ticked and the verdict
+makes the claim true.
