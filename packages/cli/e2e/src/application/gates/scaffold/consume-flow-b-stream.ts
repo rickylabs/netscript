@@ -48,6 +48,10 @@ const endpoints = [...logText.matchAll(/OTLP\/HTTP:\s+(https?:\/\/\S+)/g)];
 const endpoint = endpoints.at(-1)?.[1];
 if (!endpoint) throw new Error('Aspire OTLP/HTTP endpoint was not found');
 
+// The consumer's own exporting tracer provider, captured by `createFlowBSdkLoader` during
+// `provider.register()` below. Must be declared before that top-level await executes.
+let flowBTracerProvider: BasicTracerProvider | undefined;
+
 const provider = createTelemetryProvider({
   providerId: 'otel-sdk',
   options: { endpoint, serviceName: 'flow-b-stream-consumer' },
@@ -275,7 +279,8 @@ function randomHex(byteLength: number): string {
  * streams consumer span exists". Taking the tracer from this instance removes the dependency on
  * winning the global-registration race.
  */
-let flowBTracerProvider: BasicTracerProvider | undefined;
+// Declared near the top of the module (before `provider.register()` runs) so the loader's
+// assignment is not a temporal-dead-zone access; see the doc comment on `flowBConsumerTracer`.
 
 /** Tracer guaranteed to belong to the consumer's own exporting provider. */
 function flowBConsumerTracer() {
