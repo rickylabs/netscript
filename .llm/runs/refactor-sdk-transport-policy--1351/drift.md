@@ -66,3 +66,29 @@ only after PR #1890 merges and this branch integrates it — which is why the me
 Box 6 additionally requires the scaffold runtime E2E. The runtime lane is free for the first time
 this cycle (the #1839 three-arrival proof completed and released it), so that gate is being dispatched
 now rather than deferred again.
+
+## D — integration onto main `6bb9c00f9` (post-#1846), and the runtime-lane decision reversed
+
+Fifth integration merge → head `186d14bb1`. Verdict carries: `packages/sdk` tree `5db60b947` and
+`deno.lock` `23cb256ba` are **byte-identical** across the merge. Required exact-head gates re-run:
+
+| Gate | Result |
+| --- | --- |
+| Zero dependency churn vs `origin/main` | **0** lock diff lines, **0** manifests changed |
+| `packages/sdk` type check | `SDK_CHECK_REAL_EXIT=0`; 101 files, 0 failures |
+| `deno why @orpc/shared` | `REAL_EXIT=0`; **still 2 copies** (`1.14.6`, `1.14.7`) |
+
+Boxes 1 and 6 therefore remain unchecked: #1890 is still open, so main does not yet carry the family
+move.
+
+**Runtime lane — the earlier local-only decision is now reversed, and why.** #1846 merged as
+`6bb9c00f9`, so this branch now carries `queue: max` on both tier jobs (`e2e-cli.yml:264,351`). A
+hosted dispatch will therefore **defer** behind other topics' runtime work instead of evicting it or
+being evicted — the condition that made a hosted run unsafe an hour ago no longer holds.
+
+The local attempt started at the previous head was stopped and its processes reaped (leak-check:
+`survivors: []`). That was not a loss: the probe reported
+`docker ps failed … Cannot connect to the Docker daemon`, so the local Docker tier **could not have
+passed regardless**. This also puts the two earlier "external Aspire 404" local failures in a clearer
+light — the local environment cannot run the Docker tier at all, which is further reason the hosted
+run is the governing gate for box 6 rather than a preference.
