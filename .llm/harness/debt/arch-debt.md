@@ -2338,7 +2338,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
   but `Aspire.Hosting.Browsers` has no stable 13.5.x package. The accepted OF-2a fallback is
-  `13.5.3-preview.1.26425.3`, preserving a single 13.5 train without holding back the stable surface.
+  `13.5.3-preview.1.26425.3`, preserving a single 13.5 train without holding back the stable
+  surface.
 - **Owner:** CLI Aspire scaffold maintainers.
 - **Target:** Replace the preview pin as soon as a stable 13.5.x `Aspire.Hosting.Browsers` package
   is available.
@@ -2346,8 +2347,34 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/`.
 - **Created:** 2026-08-29.
 - **Status:** open, DEBT_ACCEPTED for #1713 under research decision D-1 / OF-2a.
-- **Gate:** Drop when a stable 13.5.x Browsers package exists. E-12
-  (`check:scaffold-versions`) scans `SCAFFOLD_VERSIONS` only and never sees
-  `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; until then, `check:aspire-version-parity` (exact-pin
-  allow-list), `generate-aspire-config_test.ts`, and both CI-owned `scaffold.runtime` tiers must
-  retain the exact accepted preview pin and remain green.
+- **Gate:** Drop when a stable 13.5.x Browsers package exists. E-12 (`check:scaffold-versions`)
+  scans `SCAFFOLD_VERSIONS` only and never sees `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; until then,
+  `check:aspire-version-parity` (exact-pin allow-list), `generate-aspire-config_test.ts`, and both
+  CI-owned `scaffold.runtime` tiers must retain the exact accepted preview pin and remain green.
+
+## packages/cli — resource-command composition IO extraction (`cli-resource-composition-io-1354`)
+
+- **ID:** `cli-resource-composition-io-1354`
+- **Title:** Resource-command staging and procedure discovery remain in the public composition root.
+- **Context:** Slice F for issue #1354 / PR #1956 absorbed Slice E's deferred dependency-composition
+  item in `public/features/root/public-command-dependencies.ts`. Its resource stager directly uses
+  temporary-directory and filesystem operations, while its procedure resolver launches `deno eval`
+  and parses the selected service name. IMPL-EVAL M-2 found that these are adapter-grade effects,
+  not declarative wiring under R-COMP-DECL/AP-25. The same path and the resource use case also
+  retain Slice E LOW-2: non-reconciler pre-apply failures surface as plain `Error` instead of
+  `CliExitError`.
+- **Why deferred:** PR #1956 is a post-evaluation closeout with product-code changes explicitly
+  prohibited. The command behavior and production composition are integration-tested; moving the
+  effects and normalizing errors require a separately reviewed adapter/error-boundary slice.
+- **Owner:** CLI resource-generation maintainers / issue #1354 follow-up.
+- **Target:** Slice G or the next dedicated `generate resource` architecture follow-up, before
+  another resource-command dependency is added to the public composition root.
+- **Linked plan:** `.llm/runs/feat-cli-resource-slice-activate--1354-f/plan.md`; issue #1354; PR
+  #1956; `.llm/runs/feat-cli-resource-slice-activate--1354-f/evaluate.md` (M-2, L-4).
+- **Created:** 2026-09-03.
+- **Status:** open, DEBT_ACCEPTED for PR #1956 closeout only.
+- **Gate:** Move staging and procedure discovery behind role-named `kernel/adapters/`
+  implementations of the existing filesystem/process seams, add focused adapter tests (including
+  service-name extraction), and normalize every non-reconciler pre-apply failure to `CliExitError`;
+  focused resource-command tests, the full CLI unit suite, structured CLI check, `arch:check`,
+  `quality:gate`, and CLI publish dry-run must all remain green.
