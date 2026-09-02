@@ -35,7 +35,7 @@
 
 | # | Slice | Gate | Files |
 | - | --- | --- | --- |
-| F | Converge init, retire complete old authority, compose and register command, regenerate carriers/corpus | focused tests + complete Slice F gate set | locked 32-file enumeration; generated carriers exempt |
+| F | Converge init, retire complete old authority, compose and register command, regenerate carriers/corpus | focused tests + complete Slice F gate set | amended 33-file enumeration; generated carriers exempt |
 
 ### Extension Axes and Composition
 
@@ -68,6 +68,9 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | 2026-09-02 | F | Rescope | Owner amended plan item 33 and ceiling 33; refreshed `origin/feat/cli-resource-slice-plan` and resumed within the amended scope. |
 | 2026-09-02 | F | Implementation | Retired the complete old authority, converged init on the formatted planner preset, Fresh-derived routes after emission, composed and registered the command fourth, and repaired item 33. |
 | 2026-09-02 | F | Supervisor review | Found and fixed missing `appRoutes.<resource>` binding and post-marker init formatting drift; strengthened the command-level exact-preset rerun proof. |
+| 2026-09-03 | F | Product commit | Committed the reviewed implementation as `8c27ffe16` and pushed the exact required refspec. |
+| 2026-09-03 | F | Clean-tree carriers | MCP corpus regeneration was deterministic with no diff; all four carrier/publish/sample checks passed on the committed tree. |
+| 2026-09-03 | F | PR evidence | Updated PR #1956's body and posted the structured implementation PASS comment. |
 
 ## Decisions
 
@@ -97,17 +100,19 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | touched CLI format | 0 | 12 files, 0 findings |
 | `check:publish-assets` | 0 | freshness pass |
 | `check:emitted-samples` | 0 | 48 samples / 38 paths |
+| `gen:mcp-export-corpus` | 0 | clean committed tree; hash `cc64442f`; no diff |
+| `check:mcp-export-corpus` | 0 | 35 packages / 273 subpaths / 7846 symbols |
+| `check:assets-barrel` | 0 | regeneration plus `git diff --exit-code` pass |
 | CLI JSR audit | 0 | 977 files / 128705 LOC / 21 warnings |
 | CLI `publish:dry-run` | 0 | success; existing publish warnings only |
-| `arch:check` | 0 | every package `FAIL=0`; baseline warnings remain |
+| `arch:check` | 0 | every package `FAIL=0`; CLI `WARN=63`; baseline warnings remain |
 | `quality:gate` | 0 | no scanner findings; 7 existing allowances |
 | `docs:readme-fences` | 0 | 7 expected type errors, no unattributed failure |
 | `docs:jsdoc-examples` | 0 | 359 checked, `unboundName=116`, 0 failures |
 | `deps:prod-install` | 0 | production install OK |
 | asset no-orphan scan | 0 | 98 disk / 98 declared / 0 orphan / 0 missing |
 
-Clean-tree `check:assets-barrel`, MCP corpus regeneration/freshness, and post-commit verification remain.
-
 ## Handoff Notes
 
+- Product implementation is pushed at `8c27ffe16`; the next step is the formal opposite-family IMPL-EVAL.
 - Evaluator should first inspect retire-set completeness, planner equivalence, Fresh derivation order, and composed command dependencies.
