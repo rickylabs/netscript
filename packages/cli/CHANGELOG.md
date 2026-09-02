@@ -73,7 +73,9 @@
   the partial-navigation lifecycle through the SSR-safe `@netscript/fresh/navigation` surface
   (superseded responses are drained, native `key` partial boundaries render), invokes the captured
   navigation fetch with the browser receiver, and rejects undeclared keys on pattern-inferred route
-  params at the property-access site.
+  params at the property-access site. `@netscript/fresh/vite` now publishes route-manifest
+  derivation (`discoverNetScriptRoutes`, `resolveNetScriptRouteManifestOptions`,
+  `writeNetScriptRouteManifestSync`) so the CLI can write and compare Fresh-owned manifest output.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
