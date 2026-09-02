@@ -5168,35 +5168,35 @@
     }
   ],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-02T12:00:00.000Z",
+    "capturedAt": "2026-09-02T12:15:00.000Z",
     "source": "GitHub milestone 27 open issues; exactly one orchestrator:* label per issue",
-    "openIssueCount": 33,
+    "openIssueCount": 34,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
       "features": 9,
-      "fixes": 13,
+      "fixes": 14,
       "internals": 3,
       "docs": 1,
       "aspire": 7
     },
     "queueRule": "Each supervisor queries its orchestrator:<lane> label as the authoritative queue; serialisation applies within that orchestrator only, and a parked leaf never blocks another lane.",
     "deliveryPathAudit": {
-      "openPrPaths": 21,
+      "openPrPaths": 18,
       "activeOrDependencyPathsWithoutPr": [1349, 863, 1881, 1844],
-      "queueCorrectionsDispatched": [1920, 1880, 1455, 1544, 1601, 1557, 1249, 1481],
-      "capturedAt": "2026-09-02T11:52:00.000Z"
+      "queueCorrectionsDispatched": [1926, 1920, 1880, 1455, 1544, 1601, 1557, 1249, 1481],
+      "capturedAt": "2026-09-02T12:15:00.000Z"
     }
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-02T12:00:00.000Z",
-    "milestoneOpenPrCount": 19,
+    "capturedAt": "2026-09-02T12:15:00.000Z",
+    "milestoneOpenPrCount": 18,
     "milestoneUnassigned": 0,
     "milestoneMultiplyAssigned": 0,
     "counts": {
       "features": 7,
       "fixes": 5,
-      "internals": 3,
+      "internals": 2,
       "docs": 1,
       "aspire": 3
     },

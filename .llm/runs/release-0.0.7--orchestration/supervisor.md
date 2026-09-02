@@ -1683,3 +1683,15 @@ GPT-5.6-SOL/high PLAN-EVAL; no GitHub epic/subissue publication precedes PASS.
   canary barrier.
 - Aspire: actively finish S9, retry/repair S10 cleanup, then converge S13; start #1880 static work
   in parallel and reserve its runtime proof before #1881. Runtime leases remain globally serial.
+
+## 2026-09-02T12:15:00Z — active steering after #1917/#1915 merge
+
+- Internals completed #1905's post-merge proof and closure, keeps #1920 active, and re-dispatched
+  #1923's exact-head evaluation because a wrapper success with verdict `NONE` is not merge evidence.
+- Features is rebasing PASS_IMPL #1927 onto current main, watches #1895 runtime and #1921/#1922
+  evaluators, and must reconcile merged #1915 back into parent #1352 rather than leave unchecked
+  milestone acceptance disconnected from the shipped slice.
+- Fixes is actively diagnosing #1926's isolated `@orpc/contract` resolution and retains parallel
+  dispatches for #1544 and the #1601+#1557 Fresh bundle. Docs repaired #1925's single unsafe-cast
+  scanner finding. Aspire owns the S9 `aspire otel -n` exact-tier proof, S10 cleanup repair, S13
+  convergence, and parallel #1880 static branch.

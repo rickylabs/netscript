@@ -1886,3 +1886,16 @@ implementation thread.
   current-main attribution/repair was dispatched to prevent duplicate branch-local work.
 - Local runtime inventory is clean (Aspire 0, containers 0, custom networks 0). Docker reports three
   unconsumed volumes versus the prior ledger's one; none is deleted without positive run ownership.
+
+## 2026-09-02 — wrapper success is not an evaluator verdict; client-side trace limits cannot widen CLI output
+
+- #1923's OpenHands workflow completed successfully but produced `OPENHANDS_VERDICT: NONE` with an
+  unavailable artifact. The PR stays unmerged and a replacement exact-head evaluation is running;
+  transport success must never be promoted as implementation approval.
+- S9's final TC-14 red was a retrieval-contract defect, not absent stream telemetry: `aspire otel`
+  returned its default bounded tail before the adapter applied `limit: 500` in memory. The bounded
+  correction passes the limit to the CLI as `-n`, preserves the authenticated CLI source, and pins
+  argv behavior with a regression test.
+- Milestone issue/PR totals can grow while throughput is positive because supervisors file proven
+  defects and delivery leaves. Track consumed exact-green packets and explicit delivery paths, not
+  raw queue size alone; #1917/#1915 merged while #1926/#1927 were admitted and assigned.

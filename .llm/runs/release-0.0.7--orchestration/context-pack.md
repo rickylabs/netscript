@@ -2577,3 +2577,22 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Subsequent to the ownership snapshot, Docs converted #1924 into active PR #1925 at `0be2fba52`,
   bringing the live totals to 33 issues and 19 PRs. Its exact-head IMPL-EVAL is dispatched; the leaf
   remains independent of Canary 6.
+
+## Resume delta — 2026-09-02T12:15:00Z
+
+- Coordinator squash-merged exact-green #1917 as `97eace32d` and #1915 as `37452f11f`; current
+  main is `37452f11f5045f0f5a98e07d802bcc2a2e94333b`. Internals then completed #1917's required
+  post-merge manifest-trigger proof and closed #1905. #1923 remains unmerged until its replacement
+  evaluator produces a real verdict rather than `OPENHANDS_VERDICT: NONE`.
+- Canary 6 remains bounded, not forgotten. S9 #1759 repaired the final 92/93 hosted-Postgres red at
+  `09f8eae30`: the trace reader now passes the caller's limit to `aspire otel -n`, so the older real
+  `stream.subscribe` consumer span is not discarded by the CLI default tail before client-side
+  slicing. Exact-head dual-tier proof is running. S10 #1760 is independently proving/repairing its
+  teardown survivor; S13 #1779 is statically clean and armed to converge after S9/S10.
+- The shared isolated desktop resolution failure is now explicit Fixes issue #1926 and is under
+  active diagnosis once on main. Docs repaired #1925's unsafe-cast quality finding at new head
+  `eefe776e8`. Features is resolving #1927's main conflict, watching exact evaluators for
+  #1921/#1922, and keeping #1895's final runtime pair moving.
+- Live milestone inventory is 34 open issues and 18 open PRs, with exactly one orchestrator owner
+  on every item. New intake explains the issue total (#1926), while the PR total fell despite new
+  #1927 because two merge-ready packets were consumed. No owner-only decision is pending.

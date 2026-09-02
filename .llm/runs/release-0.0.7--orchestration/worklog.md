@@ -3956,3 +3956,18 @@
 - Docs immediately converted newly filed #1924 into PR #1925 (`0be2fba52`) and dispatched its
   exact-head IMPL-EVAL, so current dynamic inventory is 33 open issues / 19 open PRs with one Docs
   issue and one Docs PR; both remain exactly owned and non-blocking for the canary.
+
+## 2026-09-02T12:15:00Z — two more merges, post-merge closure, and final S9 defect repaired
+
+- Revalidated exact current checks and squash-merged #1917 (`97eace32d`) and #1915 (`37452f11f`).
+  Both PRs were normalized to `status:shipped`. Internals executed the armed post-merge manifest
+  trigger proof and closed #1905; it re-dispatched #1923 after the first evaluator returned no
+  verdict artifact despite a successful wrapper job.
+- S9's previous Postgres artifact was 92 PASS / 1 FAIL. The missing TC-14 stream-consumer span was
+  caused by requesting no row count from `aspire otel` and attempting to widen the already-truncated
+  response in memory. Head `09f8eae30` passes `-n <limit>` to the CLI, adds an argv regression test,
+  retains the honest CLI source, and is running both exact hosted tiers.
+- Fixes took new #1926 as the one shared desktop isolated-package repair. Docs pushed #1925's
+  typed-narrowing repair after the scanner rejected one unsafe cast. Features is rebasing conflicted
+  PASS_IMPL #1927 and watching #1895/#1921/#1922. Live inventory is 34 open issues / 18 open PRs,
+  all singly owned; no owner-only decision is pending.
