@@ -10,13 +10,24 @@ import {
   setAuthProvider,
   showAuthBackend,
 } from './auth-config.ts';
-import { AUTH_SECRET_KINDS, type AuthSecretKind, type AuthSessionHttpPort } from './auth-types.ts';
+import {
+  AUTH_SECRET_KINDS,
+  type AuthSecretKind,
+  type AuthSessionClientContext,
+  type AuthSessionHttpPort,
+  type AuthSessionRequestOptions,
+} from './auth-types.ts';
 
 /** Dependencies for the public `plugin auth` command group. */
 export interface AuthPluginCommandDependencies {
   readonly fs: FileSystemPort;
   readonly resolveProjectRoot: ProjectRootResolver;
   readonly sessions: AuthSessionHttpPort;
+  /** Resolve application-owned credential context for one direct auth-session request. */
+  readonly resolveSessionContext?: () =>
+    | AuthSessionClientContext
+    | undefined
+    | PromiseLike<AuthSessionClientContext | undefined>;
   /** Regenerate Aspire helpers after persisted auth configuration changes. */
   readonly regenerateAspire?: (projectRoot: string) => Promise<void>;
   readonly print?: (message: string) => void;
@@ -119,7 +130,10 @@ export function createAuthPluginCommand(
                 'streams HTTP endpoint, and pass it with `--stream-url`.',
             );
           }
-          const active = (await dependencies.sessions.list(options.streamUrl))
+          const active = (await dependencies.sessions.list(
+            options.streamUrl,
+            await resolveSessionRequestOptions(dependencies),
+          ))
             .filter((item) => item.state === 'active');
           print('Session\tUser\tProvider\tState\tExpires');
           for (const item of active) {
@@ -138,7 +152,11 @@ export function createAuthPluginCommand(
           required: true,
         })
         .action(async (options: { authUrl: string }, id: string) => {
-          print(`Revoked ${await dependencies.sessions.revoke(options.authUrl, id)}.`);
+          print(`Revoked ${await dependencies.sessions.revoke(
+            options.authUrl,
+            id,
+            await resolveSessionRequestOptions(dependencies),
+          )}.`);
         }),
     );
 
@@ -150,4 +168,11 @@ export function createAuthPluginCommand(
     .command('provider', provider)
     .command('secret', secret)
     .command('session', session);
+}
+
+async function resolveSessionRequestOptions(
+  dependencies: AuthPluginCommandDependencies,
+): Promise<AuthSessionRequestOptions | undefined> {
+  const context = await dependencies.resolveSessionContext?.();
+  return context === undefined ? undefined : { context };
 }

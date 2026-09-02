@@ -20,7 +20,11 @@ import {
 } from './auth-config.ts';
 import { createAuthPluginCommand } from './auth-plugin-command.ts';
 import { FetchAuthSessionHttp, parseSessionProjection } from './auth-session-client.ts';
-import type { AuthSessionHttpPort } from './auth-types.ts';
+import type {
+  AuthSessionClientContext,
+  AuthSessionHttpPort,
+  AuthSessionRequestOptions,
+} from './auth-types.ts';
 import { doctorPlugin } from '../doctor/doctor-plugin-use-case.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
 
@@ -187,19 +191,32 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
   const output: string[] = [];
   const regenerated: string[] = [];
   const listedUrls: string[] = [];
+  const requestOptions: Array<AuthSessionRequestOptions | undefined> = [];
+  const context: AuthSessionClientContext = {
+    auth: { getAccessToken: () => 'application-owned-token' },
+  };
+  let contextCalls = 0;
   const sessions: AuthSessionHttpPort = {
-    list: (url) => {
+    list: (url, options) => {
       listedUrls.push(url);
+      requestOptions.push(options);
       return Promise.resolve([
         { id: 'active-1', state: 'active', userId: 'user-1' },
         { id: 'old-1', state: 'revoked', userId: 'user-1' },
       ]);
     },
-    revoke: (_url, id) => Promise.resolve(id),
+    revoke: (_url, id, options) => {
+      requestOptions.push(options);
+      return Promise.resolve(id);
+    },
   };
   const command = createAuthPluginCommand({
     fs,
     sessions,
+    resolveSessionContext: () => {
+      contextCalls++;
+      return context;
+    },
     resolveProjectRoot: (value) => Promise.resolve(value ?? '/workspace'),
     print: (line) => output.push(line),
     regenerateAspire: (projectRoot) => {
@@ -230,6 +247,8 @@ Deno.test('plugin auth parser drives backend and session verbs', async () => {
   ]);
   assertEquals(regenerated, ['/workspace']);
   assertEquals(listedUrls, ['http://streams.test/auth/sessions']);
+  assertEquals(requestOptions, [{ context }, { context }]);
+  assertEquals(contextCalls, 2);
 });
 
 Deno.test('session list fails loudly when the stream URL is omitted', async () => {

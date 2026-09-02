@@ -17,6 +17,10 @@ import type {
   PreparedSdkClientCall,
   SdkClientLogicalCall,
 } from './adapter-ports.ts';
+import {
+  getSdkClientContributionDiagnosticId,
+  parseSdkClientContributionDiagnosticId,
+} from './contribution-diagnostic-id.ts';
 
 const CONTRIBUTION_FIELDS = new Set([
   'protocol',
@@ -41,7 +45,6 @@ const RESERVED_HEADERS = new Set(
     'trailer transfer-encoding upgrade via x-http-method x-http-method-override x-method-override'
   ).split(' '),
 );
-const CONTRIBUTION_ID_PATTERN = /^[a-z0-9@][a-z0-9@._/-]*:[a-z0-9][a-z0-9._-]*$/;
 const HEADER_NAME_PATTERN = /^[!#$%&'*+\-.^_`|~0-9a-z]+$/;
 const PRINTABLE_ASCII_PATTERN = /^[\x20-\x7e]{1,64}$/;
 
@@ -81,6 +84,7 @@ function fail(
   phase: 'construction' | 'partition' | 'preparation',
   fields: {
     readonly contributionId?: SdkClientContributionId;
+    readonly conflictingContributionId?: SdkClientContributionId;
     readonly procedurePath?: string;
     readonly headerName?: string;
   } = {},
@@ -102,22 +106,17 @@ function isForbiddenHeader(name: string): boolean {
 }
 
 function validatedContributionId(value: unknown): SdkClientContributionId {
-  if (
-    typeof value !== 'string' || value.length < 3 || value.length > 128 ||
-    !CONTRIBUTION_ID_PATTERN.test(value) ||
-    value.startsWith('@netscript/internal:')
-  ) {
-    fail('SDK_CONTRIBUTION_INVALID', 'construction');
-  }
-  return value as SdkClientContributionId;
+  const contributionId = parseSdkClientContributionDiagnosticId(value);
+  if (contributionId === undefined) fail('SDK_CONTRIBUTION_INVALID', 'construction');
+  return contributionId;
 }
 
-function validateProtocol(value: unknown): void {
+function validateProtocol(value: unknown, contributionId?: SdkClientContributionId): void {
   if (!isPlainRecord(value) || !hasExactFields(value, PROTOCOL_FIELDS)) {
-    fail('SDK_CONTRIBUTION_INVALID', 'construction');
+    fail('SDK_CONTRIBUTION_INVALID', 'construction', { contributionId });
   }
   if (value.family !== 'netscript.sdk-client' || value.major !== 1) {
-    fail('SDK_CONTRIBUTION_VERSION', 'construction');
+    fail('SDK_CONTRIBUTION_VERSION', 'construction', { contributionId });
   }
 }
 
@@ -167,6 +166,7 @@ function validateHeaderKeys(
     if (seen.has(candidate)) {
       fail('SDK_CONTRIBUTION_CONFLICT', 'construction', {
         contributionId,
+        conflictingContributionId: contributionId,
         headerName: candidate,
       });
     }
@@ -204,10 +204,16 @@ function validateResponseCache(
 }
 
 function validateContribution(value: unknown): ValidatedSdkClientContribution {
-  if (!isPlainRecord(value) || !hasExactFields(value, CONTRIBUTION_FIELDS)) {
+  if (!isPlainRecord(value)) {
     fail('SDK_CONTRIBUTION_INVALID', 'construction');
   }
-  validateProtocol(value.protocol);
+  const diagnosticId = getSdkClientContributionDiagnosticId(value);
+  if (!hasExactFields(value, CONTRIBUTION_FIELDS)) {
+    fail('SDK_CONTRIBUTION_INVALID', 'construction', {
+      contributionId: diagnosticId,
+    });
+  }
+  validateProtocol(value.protocol, diagnosticId);
   const id = validatedContributionId(value.id);
   const context = validateContextDeclaration(value.context, id);
   const headerKeys = validateHeaderKeys(value.headerKeys, id);
@@ -232,7 +238,11 @@ export function validateSdkClientContributions(
   value: unknown,
 ): readonly ValidatedSdkClientContribution[] {
   if (!Array.isArray(value)) fail('SDK_CONTRIBUTION_INVALID', 'construction');
-  if (value.length > 16) fail('SDK_CONTRIBUTION_LIMIT', 'construction');
+  if (value.length > 16) {
+    fail('SDK_CONTRIBUTION_LIMIT', 'construction', {
+      contributionId: getSdkClientContributionDiagnosticId(value[16]),
+    });
+  }
 
   const ids = new Set<string>();
   const contexts = new Map<string, SdkClientContributionId>();
@@ -244,22 +254,27 @@ export function validateSdkClientContributions(
     if (ids.has(contribution.id)) {
       fail('SDK_CONTRIBUTION_CONFLICT', 'construction', {
         contributionId: contribution.id,
+        conflictingContributionId: contribution.id,
       });
     }
     ids.add(contribution.id);
 
     for (const key of Object.keys(contribution.context)) {
-      if (contexts.has(key)) {
+      const ownerId = contexts.get(key);
+      if (ownerId !== undefined) {
         fail('SDK_CONTRIBUTION_CONFLICT', 'construction', {
           contributionId: contribution.id,
+          conflictingContributionId: ownerId,
         });
       }
       contexts.set(key, contribution.id);
     }
     for (const name of contribution.headerKeys) {
-      if (headers.has(name)) {
+      const ownerId = headers.get(name);
+      if (ownerId !== undefined) {
         fail('SDK_CONTRIBUTION_CONFLICT', 'construction', {
           contributionId: contribution.id,
+          conflictingContributionId: ownerId,
           headerName: name,
         });
       }
