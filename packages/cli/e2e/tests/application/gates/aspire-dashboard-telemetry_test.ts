@@ -79,6 +79,8 @@ Deno.test('Aspire telemetry adapter groups documented CLI spans by traceId', asy
       '--nologo',
       '--dashboard-url',
       'https://localhost:18888',
+      '-n',
+      '10',
     ],
     [
       'otel',
@@ -90,6 +92,8 @@ Deno.test('Aspire telemetry adapter groups documented CLI spans by traceId', asy
       '--nologo',
       '--dashboard-url',
       'https://localhost:18888',
+      '-n',
+      '10',
     ],
     [
       'otel',
@@ -203,4 +207,30 @@ Deno.test('Aspire MCP telemetry adapter routes resource and trace-scoped structu
     timeUnixMs: 0,
     body: 'job completed',
   }]);
+});
+
+Deno.test('the caller limit reaches aspire otel as -n, not only the client-side slice', async () => {
+  // TC-14 regression: `queryTraces({ limit: 500 })` previously applied 500 only *after* the CLI
+  // returned its bounded default tail, so a span emitted earlier in the run — a stream consumer's
+  // `stream.subscribe` — never arrived to be sliced, and TC-14's first assertion saw no span at all.
+  const invocations: string[][] = [];
+  const runAspire = (args: readonly string[]): Promise<unknown> => {
+    invocations.push([...args]);
+    return Promise.resolve([]);
+  };
+  const query = createAspireMcpTelemetryQuery(
+    () => Promise.resolve({ text: '# STRUCTURED LOGS DATA\n[]' }),
+    runAspire,
+    'https://dashboard.invalid',
+  );
+
+  await query.queryTraces({ limit: 500 });
+
+  const otel = invocations.filter((args) => args[0] === 'otel');
+  assertEquals(otel.length > 0, true);
+  for (const args of otel) {
+    const n = args.indexOf('-n');
+    assertEquals(n >= 0, true, `aspire otel ${args[1]} was invoked without -n: ${args.join(' ')}`);
+    assertEquals(args[n + 1], '500');
+  }
 });

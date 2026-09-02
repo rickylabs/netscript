@@ -186,6 +186,12 @@ async function readAspireTelemetryItems(
   const resourceName = url.searchParams.get('resource');
   if (resourceName) args.push(resourceName);
   args.push(...ASPIRE_JSON_ARGUMENTS, '--dashboard-url', dashboardUrl);
+  // The caller's `limit` has to reach the CLI, not only `applyLimit` afterwards. `aspire otel`
+  // returns a bounded default tail, so a client-side slice can only ever narrow what the CLI
+  // already truncated — a span emitted earlier in the run (a stream consumer's `stream.subscribe`,
+  // for instance) never arrives to be sliced.
+  const requested = requestedRowLimit(url);
+  if (requested !== undefined) args.push('-n', String(requested));
   if (traceId) args.push('--trace-id', traceId);
   const value = await runAspire(args);
   if (!Array.isArray(value)) throw new Error(`aspire otel ${kind} JSON was not an array`);
@@ -290,6 +296,20 @@ function normalizeMcpLog(value: unknown): unknown {
     body: value.message,
     attributes,
   };
+}
+
+/**
+ * Row count to request from `aspire otel`, so the CLI is asked for at least what the caller wants.
+ *
+ * Returns undefined for an absent or malformed limit, leaving the CLI default in place rather than
+ * inventing a bound.
+ */
+function requestedRowLimit(url: URL): number | undefined {
+  const raw = url.searchParams.get('limit');
+  if (raw === null) return undefined;
+  const limit = Number(raw);
+  if (!Number.isInteger(limit) || limit <= 0) return undefined;
+  return limit;
 }
 
 function applyLimit(items: readonly unknown[], value: string | null): readonly unknown[] {
