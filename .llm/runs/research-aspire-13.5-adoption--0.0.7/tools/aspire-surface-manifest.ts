@@ -88,12 +88,31 @@ const RULES: readonly Rule[] = [
   },
   {
     test: re(
-      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|\.llm\/tools\/agentic\/teardown\/probes_test\.ts)$/,
+      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|packages\/mcp\/tests\/fixtures\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/aspire-13\.5\.3-fixture\.ts|\.llm\/tools\/agentic\/teardown\/probes_test\.ts)$/,
     ),
     cls: 'compat-fixture',
     owner: 'S3',
     disposition:
       'inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
+  },
+  {
+    // The parity checker's own test data and the compat-fixture test both MUST contain old
+    // literals — that is what they assert against. Classifying them by their directory made the
+    // raw sweep flag its own enforcement mechanism.
+    test: re(
+      /^\.llm\/tools\/validation\/(check-aspire-version-parity_test|check-compat-fixtures_test)\.ts$/,
+    ),
+    cls: 'compat-fixture',
+    owner: 'S7/S13',
+    disposition:
+      'validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
+  },
+  {
+    test: re(/^\.llm\/tools\/agentic\/teardown\/__fixtures__\/README\.md$/),
+    cls: 'compat-fixture',
+    owner: 'S7',
+    disposition:
+      'documents why the version-suffixed 13.4.6 teardown fixture is retained and names its 13.5.3 counterpart; parity phase 2 asserts the 13.5.3 case exists',
   },
   {
     test: re(/^notes\.md$/),

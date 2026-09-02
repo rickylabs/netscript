@@ -6,13 +6,19 @@ path	class	owner	disposition
 .agents/generated/consumer-skills/.claude/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/AGENTS.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	authoritative repository skill; align directly
+.agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
 .agents/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
 .agents/skills/netscript-cli/commands.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-cli/maintainer-cli.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-cli/SKILL.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-pr/SKILL.md	skill:internal	archival	exempt — historical branch-name example
 .agents/skills/README.md	skill:internal	S13	wording check; no version literal expected
+.claude/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
+.claude/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
+.claude/skills/netscript-cli/commands.md	skill:internal	S13	wording check; no version literal expected
+.claude/skills/netscript-cli/maintainer-cli.md	skill:internal	S13	wording check; no version literal expected
+.claude/skills/netscript-cli/SKILL.md	skill:internal	S13	wording check; no version literal expected
+.claude/skills/netscript-pr/SKILL.md	skill:internal	archival	exempt — historical branch-name example
 .github/CODEOWNERS	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/ISSUE_TEMPLATE/bug_report.yml	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/ISSUE_TEMPLATE/feature_request.yml	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
@@ -54,20 +60,26 @@ path	class	owner	disposition
 .llm/tools/agentic/runtime/contract.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.4.6.json	archival:version-suffixed-fixture	archival	exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)
 .llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.5.3.json	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
-.llm/tools/agentic/teardown/__fixtures__/README.md	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/__fixtures__/process-tree-13.5.3-orphaned.json	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/__fixtures__/process-tree-13.5.3-phase-b-live.json	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/__fixtures__/README.md	compat-fixture	S7	documents why the version-suffixed 13.4.6 teardown fixture is retained and names its 13.5.3 counterpart; parity phase 2 asserts the 13.5.3 case exists
 .llm/tools/agentic/teardown/forbidden-commands_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/leak-check_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/leak-check.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/ownership_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/ownership.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/phase-b-live-snapshot_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/probes_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 .llm/tools/agentic/teardown/probes.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/teardown_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/teardown.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/wsl/wsl-foundation-lib.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/wsl/wsl-foundation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/CLEANUP-PLAYBOOK.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-tools.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/check-accuracy-and-discoverability_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/check-accuracy-and-discoverability.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-exports-drift.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/scaffold-e2e-test_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -80,9 +92,9 @@ path	class	owner	disposition
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
-.llm/tools/validation/check-aspire-version-parity_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/check-aspire-version-parity_test.ts	compat-fixture	S7/S13	validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 .llm/tools/validation/check-aspire-version-parity.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
-.llm/tools/validation/check-compat-fixtures_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/check-compat-fixtures_test.ts	compat-fixture	S7/S13	validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 .llm/tools/validation/check-scaffold-versions.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .openhands/setup.sh	ci:openhands	S1	OpenHands runner hydrates Aspire CLI from toolchain.env; parity phase 1 enforce
 AGENTS.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)
@@ -170,8 +182,8 @@ docs/site/orchestration-runtime/how-to/author-a-plugin.md	doc:public-page	S11	pr
 docs/site/orchestration-runtime/how-to/deploy-deno-deploy.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/deploy-local-aspire.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
 docs/site/orchestration-runtime/how-to/deploy.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/graceful-shutdown.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/orchestration-runtime/how-to/roll-out-runtime-overrides.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/runtime-config.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/quickstart.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -252,6 +264,7 @@ packages/aspire/src/application/port-allocation.ts	aspire-ports	N/A	SDK-neutral 
 packages/aspire/src/application/resolve-env-vars.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/application/resolve-permissions.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/diagnostics/inspect-aspire.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
+packages/aspire/src/domain/aspire-resource-name.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/domain/aspire-resource.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/domain/contribution-context.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/domain/errors.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
@@ -308,6 +321,7 @@ packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixtur
 packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/service-env/configure-service-env.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -353,6 +367,7 @@ packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts	e2e	S2/S3/S10	ru
 packages/cli/e2e/tests/application/gates/scaffold/behavior-plugins-health-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/scaffold/typed-db-background-restart_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/ui-data-screen-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -375,6 +390,7 @@ packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock_test.ts	cli-ada
 packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/aspire-command-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operation-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operation-runner-helpers.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operation-runner.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/providers/mssql.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
@@ -491,6 +507,7 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
@@ -498,6 +515,8 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-test-support.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/types.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
@@ -637,12 +656,12 @@ packages/mcp/src/publish-assets.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/da
 packages/mcp/tests/aspire-ps-dashboard-reader_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/doctor-families_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/drift-evidence_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
-packages/mcp/tests/fixtures/README.md	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/fixtures/README.md	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/mcp/tests/fixtures/telemetry/aspire-13.4.6-fixture.ts	archival:version-suffixed-fixture	archival	exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)
-packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-fixture.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-fixture.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-resources.json	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-spans.json	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
-packages/mcp/tests/fixtures/telemetry/README.md	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/fixtures/telemetry/README.md	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/mcp/tests/openapi-read-tools_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/service-endpoint-directory_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/service-endpoint-source-fixtures.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
