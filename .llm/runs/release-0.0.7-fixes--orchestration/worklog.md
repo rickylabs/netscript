@@ -7674,3 +7674,12 @@ Root cause remains **undetermined**; no fix is named on purpose.
 - **#1856 at `9d4713d52`**: marked ready; `code-quality`/`quality` SUCCESS, `check-test` running, e2e skipped by classify → `ci:full` added for a runtime verdict; `close-gate` red only because not `status:ready-merge`. All DoD boxes ticked; `Closes #1609`.
 - **#1883**: RED `b9b2e9f0a` `test(e2e): reproduce ANSI dev readiness miss` landed on thread `01a05de2`.
 - **#1930 merge dependency is now explicit**: #1885, #1938 (and any `ci:full` PR) cannot show desktop green until `b3a861918` lands — coordinator should merge #1930 first on its PASS.
+
+## 2026-09-02T18:55Z — three more leaves delivered
+
+- **#1883 (#1868)**: GREEN `72adf62f2` (`fix(e2e): detect colorized Vite readiness` — ANSI-normalised scan + `NO_COLOR=1`), receipt `52785e4b4`, pushed; exact-head e2e-cli `33657045717` running. Desktop FAIL there = #1926, not attributable. Decisive gate = both scaffold-runtime tiers.
+- **#1916 (#1610)**: GREEN `e79c88dca`, receipt `1c59ae57b`, ready, `Closes #1610`, `ci:full`; IMPL-EVAL (glm-5.3-flash) dispatched at `1c59ae57b` → `.llm/tmp/eval1916/`.
+- **#1942 (#1544)**: RED `a3e135c68`, GREEN `2b2ee45fe`, receipt `2a5d01ae1`; non-draft, `Closes #1544`, 0.0.7, `ci:full`; IMPL-EVAL dispatched at `2a5d01ae1` → `.llm/tmp/eval1942/`.
+- **#1940 (#1601+#1557)**: plan `1e54fa598`, RED/GREEN `e912c414d`, receipt `55084d6a4`; `Refs` only (browser gate hosted-only, boxes 3–5 open — truthful); `ci:full`; IMPL-EVAL dispatched at `55084d6a4` → `.llm/tmp/eval1940/`.
+- **#1938 (#1455)**: corpus regenerated `28401b6c3` (`check:mcp-export-corpus` exit 0, 7803 symbols); eval at `6e546515c` still running — delta is generated carrier + worklog only.
+- **#1885**: sqlite/Garnet tier SUCCESS at `dd039a791` (Garnet timeout gone post-#1858); postgres pending; desktop = #1926.
