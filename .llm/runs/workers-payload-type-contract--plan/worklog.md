@@ -53,13 +53,15 @@
 - Why this proves #1455: baseline `build()` erases each handler payload and `enqueueJob` infers its
   independent payload generic from `options`, so the wrong payload is accepted. GREEN must make the
   selected definition the only inference source, consuming this same directive.
+- First implementation / RED commit: `8e7cf697c`.
+- Draft PR: https://github.com/rickylabs/netscript/pull/1938
 
 ## Commit receipts
 
 | Slice | SHA | Evidence |
 | --- | --- | --- |
 | Contract plan | `f655c3405` | `plan.md` committed alone, before source/type edits |
-| RED consumer proof | pending | Must fail only because `@ts-expect-error` is unused |
+| RED consumer proof | `8e7cf697c` | Targeted check fails only because `@ts-expect-error` is unused |
 | GREEN implementation | pending | Same directive must be consumed by the job-id payload mismatch |
 
 ## Gate receipts
