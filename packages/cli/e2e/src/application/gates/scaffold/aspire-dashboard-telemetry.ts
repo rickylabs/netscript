@@ -9,10 +9,9 @@ import { readAspireMcpEntryPoint } from './aspire-mcp/entry-point.ts';
 import { createStdioAspireMcpTransport } from './aspire-mcp/stdio-transport.ts';
 import { ASPIRE_MCP_DASHBOARD_TOOLS } from './aspire-mcp/tools.ts';
 import {
-  createDashboardLinkedSpanReader,
-  enrichAspireCliSpanLinks,
-  type LinkedSpanReader,
-} from './aspire-dashboard-span-links.ts';
+  createDashboardTelemetryApiReader,
+  type DashboardTelemetryApiReader,
+} from './aspire-dashboard-api.ts';
 
 type AspireMcpTelemetryTool = 'list_structured_logs' | 'list_trace_structured_logs';
 
@@ -51,7 +50,7 @@ export async function createLiveAspireTelemetryQuery(
     callTool,
     runAspire,
     dashboardUrl,
-    createDashboardLinkedSpanReader(dashboardUrl),
+    createDashboardTelemetryApiReader(dashboardUrl),
   );
 }
 
@@ -60,51 +59,57 @@ export function createAspireMcpTelemetryQuery(
   callTool: AspireMcpTelemetryToolCaller,
   runAspire: AspireCliTelemetryCommandRunner,
   dashboardUrl: string,
-  readLinkedSpans?: LinkedSpanReader,
+  readDashboardApi?: DashboardTelemetryApiReader,
 ): TelemetryQueryPort {
   return new AspireTelemetryQuery({
     endpoint: MCP_ENDPOINT,
-    fetch: createLiveAspireFetch(callTool, runAspire, dashboardUrl, readLinkedSpans),
+    fetch: createLiveAspireFetch(callTool, runAspire, dashboardUrl, readDashboardApi),
   });
 }
 
 /**
  * Translate package query requests into authenticated Aspire CLI and MCP calls. When
- * `readLinkedSpans` is given, linked span rows borrow their attribute-bearing links from the
- * Dashboard telemetry API, which the CLI's JSON projection drops.
+ * `readDashboardApi` is given, span reads (`traces`, `traces/<id>`, `spans`) go to the Dashboard
+ * telemetry API's full OTLP JSON instead of the CLI's lossy projection (no span events, no link
+ * attributes); the CLI path remains the fallback for hosts without dashboard API access.
  */
 export function createLiveAspireFetch(
   callTool: AspireMcpTelemetryToolCaller,
   runAspire: AspireCliTelemetryCommandRunner,
   dashboardUrl: string,
-  readLinkedSpans?: LinkedSpanReader,
+  readDashboardApi?: DashboardTelemetryApiReader,
 ): typeof fetch {
   return async (input) => {
     try {
       const url = requestUrl(input);
       const path = url.pathname.replace('/api/telemetry/', '');
+      if (
+        readDashboardApi !== undefined && path !== 'traces/export' &&
+        (path === 'traces' || path === 'spans' || path.startsWith('traces/'))
+      ) {
+        return await readDashboardApi(path, url.searchParams);
+      }
       if (path === 'traces') {
         const [summaries, spans] = await Promise.all([
           readAspireTelemetryItems(runAspire, 'traces', dashboardUrl, url),
-          readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url)
-            .then((rows) => enrichAspireCliSpanLinks(rows, readLinkedSpans)),
+          readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url),
         ]);
         return Response.json({ traces: groupAspireCliSpans(summaries, spans, url) });
       }
       if (path.startsWith('traces/') && path !== 'traces/export') {
         const traceId = decodeURIComponent(path.slice('traces/'.length));
-        const spans = await enrichAspireCliSpanLinks(
-          await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url, traceId),
-          readLinkedSpans,
+        const spans = await readAspireTelemetryItems(
+          runAspire,
+          'spans',
+          dashboardUrl,
+          url,
+          traceId,
         );
         const trace = groupAspireCliSpans([{ traceId }], spans, url)[0];
         return Response.json({ data: trace });
       }
       if (path === 'spans') {
-        const spans = await enrichAspireCliSpanLinks(
-          await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url),
-          readLinkedSpans,
-        );
+        const spans = await readAspireTelemetryItems(runAspire, 'spans', dashboardUrl, url);
         return Response.json({ spans: spans.map(normalizeAspireCliSpan) });
       }
       if (path === 'logs') {
