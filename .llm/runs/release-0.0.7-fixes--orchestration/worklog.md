@@ -7750,3 +7750,6 @@ Root cause remains **undetermined**; no fix is named on purpose.
 - **#1481** PLAN-EVAL **PASS_PLAN** at `f8ed75b41` (`.llm/tmp/eval1481/verdict.md`, qwen3.8-flash); artifact committed `5566a89f6`; thread `01a06322` resumed with the implementation steer (`/tmp/impl1481.md`); draft PR #1945.
 - **#1885** plan v2 PLAN-EVAL: trusted trigger posted (comment 5515361868), OpenHands run `33675250751` pending (monitor `bxxjbeak9`).
 - 20:01Z — `codex-resume` for `01a0606e` (#1909) returned exit 124 (client `timeout 300`), worker thread confirmed alive/`working` via `codex-status`; local merge commit `ad36284d9` present, tree clean, stream-based observation retained (no `DEPARTURE_OBSERVE_POLL_MS` loop). `01a06322` (#1481) also `working`. Not relaunching.
+- **#1856** CONFLICTING after #1944 → merged main `7d1faa352` (corpus only), regenerated → **`8ce535d58`** pushed; 5 carrier/parity gates green; PR-owned delta vs main identical (3 files). CI running.
+- **#1942 `ade347516`** close-gate root cause: issue #1544's negative-test box is soft-wrapped; mirror keys on the first line, PR entry carried the full sentence → keyed on the parsed text; close-gate rerun fired. Postgres tier pending.
+- #1481 `codex-resume` client exit 124 as well; thread `01a06322` confirmed `working`.
