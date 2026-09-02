@@ -7927,3 +7927,11 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   TCP-capable fallback + regression test) is in flight.
 - Fixes lane action: none — no duplication, no rescope of #1959/#1249/#1481. If the microfix lands
   on main before #1959 packets, #1959 pulls it mechanically like #1957.
+
+## 2026-09-02T23:35Z — #1885 SHIPPED; #1959 Postgres-tier defect fixed by supervisor
+
+- Coordinator merged #1885 exact head `b17aac20e` as main `9464ab223`. Flipped `status:ready-merge`→`status:shipped` on PR #1885 and issue #1845 (issue auto-closed by `Closes #1845`; stray `status:triage` removed so exactly one `status:` remains).
+- #1959 head `786b9a06c` hosted Postgres tier (e2e-cli run 33693668597, job 100458239402) FAILED at `generated.quality-negative`: scaffold lint `require-await` on generated `aspire/.helpers/register-infrastructure.mts:74` — S2 (`65b80691a`) removed the endpoint awaits from the emitted `postgres_listener` health check but kept `async`. PR-owned defect, not a flake. check-test/quality/static/desktop green; SQLite tier still running at that head.
+- Worker `01a0592e` idle since 01:04 local (27 min); fix is one line, so supervisor applied it in `007-leaf-1844`: merged main `f589d251a` (`45601c30f`, mechanical, no conflicts) then `a6dc38e4d fix(aspire): await endpoint listener readiness in generated health check` (template emits `return await createEndpointListenerReadinessCheck(...)()`, unit expectation updated). Scoped template tests 40/40 pass. Pushed to `fix/listener-readiness-diagnostics`; worker nudged (`/tmp/nudge1844c.md`) to `git pull --ff-only`.
+- Consequence: PR-owned blobs changed → no IMPL-EVAL carry; the OpenHands run at `786b9a06c` was `skipped` anyway (no verdict ever posted). IMPL-EVAL must fire at the final head via label cycle; Postgres "twice consecutively" DoD restarts at `a6dc38e4d`.
+- CI watcher `bjtxvs4c3` on `a6dc38e4d`. #1885 packet closed. Queue unchanged: #1959, #1960 (worker still active — posting PR comment), #1945 (local `21ee63419` unpushed).
