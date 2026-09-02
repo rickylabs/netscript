@@ -6,7 +6,7 @@
 | -------------- | --------------------------------------- |
 | Run ID         | `desktop-orpc-contract-dep--impl`       |
 | Branch         | `fix/desktop-fixture-orpc-contract-dep` |
-| Current phase  | `plan`                                  |
+| Current phase  | `impl-eval` (PASS_IMPL at `b3a861918`) |
 | Archetype      | `6 — CLI / Tooling` (owned harness)     |
 | Scope overlays | none                                    |
 
@@ -50,10 +50,10 @@ implementation and gates".
 
 | Gate family | Current status | Evidence                   |
 | ----------- | -------------- | -------------------------- |
-| Static      | pending        | implementation not started |
-| Fitness     | pending        | implementation not started |
-| Runtime     | pending        | implementation not started |
-| Consumer    | pending        | implementation not started |
+| Static      | green          | scoped check 0 diagnostics; lint/fmt/quality:gate/arch:check exit 0 at `b3a861918` |
+| Fitness     | green          | fixture-contract guard test exit 0; IMPL-EVAL C1/C2 closed, PASS_IMPL at `b3a861918` |
+| Runtime     | green          | e2e run 33653416477 at `b3a861918`: desktop, postgres, sqlite, static all success |
+| Consumer    | n/a            | fixture-only repair; no consumer surface change |
 
 ## Open Questions
 

@@ -111,7 +111,14 @@ dynamic, `export … from`, `export *`, and inline-type forms are all collected;
 
 Gates: scoped check 5 files / 0 diagnostics; fixture-contract test exit 0; lint exit 0; fmt exit 0;
 `quality:gate` exit 0; `arch:check` exit 0; `deno.lock` byte-identical to `origin/main`. Hosted:
-`desktop-native-linux` **success** at `f8df31782`, run 33638728013.
+`desktop-native-linux` **success** at `f8df31782`, run 33638728013; superseded by exact-head run 33653416477 at `b3a861918` (desktop, postgres, sqlite, static all success).
 
 Local limits: the isolated-root dpkg install/update/rollback path cannot run in this environment (no
 dpkg root, X server, or a11y bus), so the packaged-app assertion rests on hosted CI.
+
+## Sign-off (artifact-only)
+
+IMPL-EVAL re-audit (`z-ai/glm-5.3-flash`, separate session) returned **PASS_IMPL at `b3a861918`**;
+C1/C2 closed. Exact-head e2e run 33653416477 green on every tier. The earlier postgres failure on
+`f8df31782` (run 33638728013) was `postgres_listener was never published; readiness deadline 300s`
+with a desktop-only diff — recorded as #1844 evidence, not attributable to this branch.

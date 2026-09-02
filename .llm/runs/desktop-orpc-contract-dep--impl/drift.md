@@ -46,3 +46,9 @@ was never visited.
 Collector now covers `from`, side-effect, and dynamic forms, strips comments first (doc examples in
 `sdk/src/desktop/mod.ts` reference `@my-app/contracts`, which is not a real edge), and strips erased
 `import type` / `export type` statements.
+
+## Out of scope — `^1.14.6` prepared-map pin
+
+The fixture's committed `deno.json` pins `@orpc/contract` at `^1.14.6` while the prepared import map
+resolves a different range. Reconciling that pin is not part of #1926 and is deliberately left
+untouched here.
