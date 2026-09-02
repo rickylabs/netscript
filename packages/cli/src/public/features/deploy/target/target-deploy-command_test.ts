@@ -198,3 +198,24 @@ Deno.test('deploy target routers resolve their default registry targets', () => 
     assertEquals(verbs, ['down', 'plan', 'up']);
   }
 });
+
+Deno.test('router exposes every operation advertised by each default target', () => {
+  const dependencies = {
+    deployTargets: new DeployTargetRegistry(),
+    resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+    loadConfig: () => Promise.resolve({}),
+  } as unknown as PublicCommandDependencies;
+
+  for (const [key, target] of dependencies.deployTargets.entries()) {
+    const verbs = createTargetDeployCommand(key, dependencies)
+      .getCommands()
+      .map((command) => command.getName())
+      .sort();
+
+    assertEquals(
+      verbs,
+      [...target.operations].sort(),
+      `${key} must route every advertised operation`,
+    );
+  }
+});
