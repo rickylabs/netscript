@@ -55,13 +55,16 @@ public role semantics.
 
 ## Progress Log
 
-| Time       | Slice | Step              | Notes                                                                                                                                    |
-| ---------- | ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-02 | 1     | design checkpoint | Audit consumed; public additive field and role semantics locked before source edits.                                                     |
-| 2026-09-02 | 1     | PLAN-EVAL         | `N/A` — owner supplied the completed audit, exact gap, compatibility constraint, acceptance cases, file boundaries, and gates.           |
-| 2026-09-02 | 1     | implementation    | Added claimant/owner diagnostics, meaningful pre-validation ids, and exact six-case tests.                                               |
-| 2026-09-02 | 1     | quality review    | Extracted diagnostic-id policy after the first composite gate exposed a new 514-line F-1 warning; final `prepared-call.ts` is 499 lines. |
-| 2026-09-02 | 1     | reconcile         | Live issue #1349 remains open at milestone 27 (0.0.7); no closing keyword is authorized; sibling boundaries remain unchanged.            |
+| Time       | Slice | Step                  | Notes                                                                                                                                    |
+| ---------- | ----- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-02 | 1     | design checkpoint     | Audit consumed; public additive field and role semantics locked before source edits.                                                     |
+| 2026-09-02 | 1     | PLAN-EVAL             | `N/A` — owner supplied the completed audit, exact gap, compatibility constraint, acceptance cases, file boundaries, and gates.           |
+| 2026-09-02 | 1     | implementation        | Added claimant/owner diagnostics, meaningful pre-validation ids, and exact six-case tests.                                               |
+| 2026-09-02 | 1     | quality review        | Extracted diagnostic-id policy after the first composite gate exposed a new 514-line F-1 warning; final `prepared-call.ts` is 499 lines. |
+| 2026-09-02 | 1     | reconcile             | Live issue #1349 remains open at milestone 27 (0.0.7); no closing keyword is authorized; sibling boundaries remain unchanged.            |
+| 2026-09-02 | 1     | implementation commit | `672b67b61` records the source, tests, harness design, and primary gate evidence.                                                        |
+| 2026-09-02 | 1     | clean-tree publish    | SDK `deno publish --dry-run` passed and listed the intended package, including `contribution-diagnostic-id.ts`.                          |
+| 2026-09-02 | 1     | carrier cascade       | All three generators passed; only the expected MCP export corpus/provenance changed.                                                     |
 
 ## Decisions
 
@@ -69,6 +72,18 @@ public role semantics.
 | ------------------------------------ | ------------------------------------------------------------ | --------------- |
 | Optional `conflictingContributionId` | Additive and preserves all existing readers/semantics.       | `plan.md` D1–D3 |
 | Valid ids only                       | Prevents misleading or unsafe synthetic descriptor identity. | `plan.md` D4    |
+
+## Acceptance Diagnostics
+
+| Case                     | Exact construction diagnostic                                                                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Duplicate id             | `{code:"SDK_CONTRIBUTION_CONFLICT", phase:"construction", contributionId:"test:duplicate", conflictingContributionId:"test:duplicate"}`                          |
+| Header ownership         | `{code:"SDK_CONTRIBUTION_CONFLICT", phase:"construction", contributionId:"test:header-claimant", conflictingContributionId:"test:owner", headerName:"x-tenant"}` |
+| Context ownership        | `{code:"SDK_CONTRIBUTION_CONFLICT", phase:"construction", contributionId:"test:context-claimant", conflictingContributionId:"test:owner"}`                       |
+| Unsupported family/major | `{code:"SDK_CONTRIBUTION_VERSION", phase:"construction", contributionId:"test:unsupported-version"}`                                                             |
+| More than 16             | `{code:"SDK_CONTRIBUTION_LIMIT", phase:"construction", contributionId:"test:limit-16"}`                                                                          |
+| Dependency/order field   | `{code:"SDK_CONTRIBUTION_INVALID", phase:"construction", contributionId:"test:<field>"}` for each rejected field                                                 |
+| Desktop-incompatible     | `{code:"SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED", phase:"construction", contributionId:"test:desktop"}`                                                           |
 
 ## Drift
 
@@ -91,11 +106,11 @@ public role semantics.
 
 ### Fitness Gates
 
-| Gate         | Result                     | Evidence                 | Notes                                                                                     |
-| ------------ | -------------------------- | ------------------------ | ----------------------------------------------------------------------------------------- |
-| Code quality | PASS, exit 0               | `deno task quality:gate` | Repository scanner findings 0; 7 existing allowances; composite architecture gate passed. |
-| Architecture | PASS, exit 0               | `deno task arch:check`   | SDK has no new F-1 warning; remaining SDK F-16/A9 notices pre-exist.                      |
-| JSR audit    | pending clean-tree dry-run | `deno publish --dry-run` | First pre-commit exact invocation correctly exited 1 only because the tree was dirty.     |
+| Gate         | Result       | Evidence                                                | Notes                                                                                                                           |
+| ------------ | ------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Code quality | PASS, exit 0 | `deno task quality:gate`                                | Repository scanner findings 0; 7 existing allowances; composite architecture gate passed.                                       |
+| Architecture | PASS, exit 0 | `deno task arch:check`                                  | SDK has no new F-1 warning; remaining SDK F-16/A9 notices pre-exist.                                                            |
+| JSR audit    | PASS, exit 0 | clean-tree `deno publish --dry-run` from `packages/sdk` | Intended file list; no slow-type or metadata failure. The first pre-commit invocation exited 1 only because the tree was dirty. |
 
 ### Runtime Gates
 
@@ -107,13 +122,16 @@ public role semantics.
 
 ### Consumer Gates
 
-| Consumer                          | Result  | Evidence                              | Notes                                              |
-| --------------------------------- | ------- | ------------------------------------- | -------------------------------------------------- |
-| `@netscript/sdk/client` type/docs | PASS    | check + doc A/B + examples            | Additive optional field; zero new doc diagnostics. |
-| publish dry-run                   | pending | clean-tree exact command after commit | Listing is emitted on stderr.                      |
-| carrier cascade                   | pending | post-commit generation sequence       | Public diagnostic surface moved.                   |
+| Consumer                          | Result       | Evidence                                                             | Notes                                                                                                               |
+| --------------------------------- | ------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/sdk/client` type/docs | PASS         | check + doc A/B + examples                                           | Additive optional field; zero new doc diagnostics.                                                                  |
+| publish dry-run                   | PASS, exit 0 | clean-tree exact command after commit `672b67b61`                    | Listing emitted on stderr and ended `Success Dry run complete`.                                                     |
+| carrier cascade                   | PASS, exit 0 | `gen:assets-barrel` → `gen:publish-assets` → `gen:mcp-export-corpus` | Corpus SHA-256 `2899a7da...a9c9`; 35 packages, 272 subpaths, 7,803 symbols; only expected generated corpus changed. |
+| lock hygiene                      | PASS         | `sha256sum deno.lock`                                                | `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d`; unchanged.                                      |
 
 ## Handoff Notes
 
 - Evaluator should inspect claimant/owner orientation first, then all six measured construction
   diagnostics, exact `toJSON()` shapes, and redaction.
+- Acceptance-evidence block is supportable: audit rows 1–6 and 8–10 remain SHIPPED without edits;
+  this slice closes row 7 with exact structured/JSON assertions and full green package gates.

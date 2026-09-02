@@ -6,16 +6,16 @@
 | -------------- | -------------------------------------------------- |
 | Run ID         | `feat-sdk-contribution-conflict-diagnostics--1349` |
 | Branch         | `feat/sdk-contribution-conflict-diagnostics`       |
-| Current phase  | `gate`                                             |
+| Current phase  | `evaluate`                                         |
 | Archetype      | `2 — Integration`                                  |
 | Scope overlays | `none`                                             |
 
 ## Current State
 
 The diagnostic and exact acceptance tests are implemented. `contributionId` remains the
-claimant/offender; optional `conflictingContributionId` identifies the earlier owner. Primary SDK,
-docs, quality, and architecture gates pass; clean-tree publish/cascade and separate IMPL-EVAL
-remain.
+claimant/offender; optional `conflictingContributionId` identifies the earlier owner. All requested
+generator gates, clean-tree publication, and the post-commit carrier cascade pass. IMPL-EVAL
+remains.
 
 ## Completed
 
@@ -26,16 +26,17 @@ remain.
   failures/findings.
 - `deno doc --lint` A/B has zero new diagnostics; docs examples remain at `unboundName=116`.
 - `quality:gate` and explicit `arch:check` pass after removing the transient new F-1 warning.
+- Clean-tree SDK dry-run passes; carrier cascade updates only the MCP generated export corpus.
 
 ## In Progress
 
-- Clean-tree publication, post-commit carrier cascade, and separate-session evaluation.
+- Final evidence/generated commit and separate-session evaluation.
 
 ## Next Steps
 
-1. Commit the reviewed implementation/gate state.
-2. Run clean-tree dry-run and post-commit carrier cascade; commit any evidence/generated outputs.
-3. Run separate IMPL-EVAL, explicit-refspec push, and open the non-draft PR with exact metadata.
+1. Commit carrier/evidence state and verify the cascade is idempotent after that commit.
+2. Run separate IMPL-EVAL.
+3. Explicit-refspec push and open the non-draft PR with exact metadata/evidence.
 
 ## Key Decisions
 
@@ -46,23 +47,24 @@ remain.
 
 ## Files Changed
 
-| Path                                                                           | Status  | Notes                                                |
-| ------------------------------------------------------------------------------ | ------- | ---------------------------------------------------- |
-| `.llm/runs/feat-sdk-contribution-conflict-diagnostics--1349/*`                 | new     | Harness state and evidence.                          |
-| `packages/sdk/src/client/errors.ts`                                            | changed | Additive diagnostic/error/JSON field.                |
-| `packages/sdk/src/internal/client-contributions/contribution-diagnostic-id.ts` | new     | Redaction-safe id policy.                            |
-| `packages/sdk/src/internal/client-contributions/prepared-call.ts`              | changed | Populate offender/owner ids.                         |
-| `packages/sdk/src/desktop/application/desktop-rpc-client.ts`                   | changed | Name first supplied Desktop-incompatible descriptor. |
-| `packages/sdk/tests/client-contribution-validation_test.ts`                    | changed | Exact structured and JSON acceptance assertions.     |
+| Path                                                                                 | Status    | Notes                                                |
+| ------------------------------------------------------------------------------------ | --------- | ---------------------------------------------------- |
+| `.llm/runs/feat-sdk-contribution-conflict-diagnostics--1349/*`                       | new       | Harness state and evidence.                          |
+| `packages/sdk/src/client/errors.ts`                                                  | changed   | Additive diagnostic/error/JSON field.                |
+| `packages/sdk/src/internal/client-contributions/contribution-diagnostic-id.ts`       | new       | Redaction-safe id policy.                            |
+| `packages/sdk/src/internal/client-contributions/prepared-call.ts`                    | changed   | Populate offender/owner ids.                         |
+| `packages/sdk/src/desktop/application/desktop-rpc-client.ts`                         | changed   | Name first supplied Desktop-incompatible descriptor. |
+| `packages/sdk/tests/client-contribution-validation_test.ts`                          | changed   | Exact structured and JSON acceptance assertions.     |
+| `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | generated | Updated public export corpus and provenance.         |
 
 ## Gates
 
-| Gate family | Current status                          | Evidence                             |
-| ----------- | --------------------------------------- | ------------------------------------ |
-| Static      | PASS                                    | scoped check/lint/fmt; docs examples |
-| Fitness     | PASS except clean-tree dry-run pending  | quality/arch exit 0                  |
-| Runtime     | PASS                                    | 228 passed, 0 failed/ignored         |
-| Consumer    | PASS except post-commit cascade pending | doc A/B delta 0                      |
+| Gate family | Current status | Evidence                             |
+| ----------- | -------------- | ------------------------------------ |
+| Static      | PASS           | scoped check/lint/fmt; docs examples |
+| Fitness     | PASS           | quality/arch and dry-run exit 0      |
+| Runtime     | PASS           | 228 passed, 0 failed/ignored         |
+| Consumer    | PASS           | doc A/B delta 0; carrier exit 0      |
 
 ## Open Questions
 
