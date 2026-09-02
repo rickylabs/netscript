@@ -7604,3 +7604,32 @@ arrives for free with S8.
 **Empirical check available.** S9's in-flight run is the test: its base still lacks #1846, so if a
 tier goes `CANCELLED` again during it, eviction is still live and the sequencing above is confirmed
 from the failure side as well.
+
+## D-296 — eviction confirmed on S9, and the per-branch workaround is closed by token scope
+
+D-295 predicted that S9's tiers would keep being evicted while its base (S8) lacks #1846. Confirmed:
+run `33592084708` ended `cancelled` with `scaffold-static (deno-only)` **success** and **both**
+runtime tiers `cancelled`. A static job succeeding while both runtime jobs die is the runtime-gate
+eviction signature, not a genuine cancellation — precisely the condition #1846's `queue: max`
+replaces with deferral on the same run and head SHA.
+
+Given that proof I reconsidered D-295's option 1 (carry the 11-line workflow hunk in S9 directly).
+It applied cleanly and was committed locally — then the push was refused:
+
+```
+! [remote rejected] refusing to allow a Personal Access Token to create or update
+  workflow `.github/workflows/e2e-cli.yml` without `workflow` scope
+```
+
+So option 1 is not merely less tidy, it is **unavailable to this session**. The local commit was
+dropped and S9 restored to `e72da5161` with a clean tree.
+
+**Consequence: S8's merge is the critical path for the rest of the train, not just the preferred
+ordering.** S9 (#1759) and S10 (#1760) are based on `feat/aspire-13-5-s8-typed-resource-commands`;
+until it merges they inherit an `e2e-cli.yml` without the deferral fix, and their runtime tiers will
+keep being evicted no matter how often they are re-fired. Re-firing them before then burns hosted
+capacity for a result that cannot stick.
+
+This needs no owner decision: S8 is already fully green, packeted, and `status:ready-merge`
+(14 SUCCESS / 0 not-green / MERGEABLE / CLEAN at `ce7e82a76`). Merging it in the normal course both
+ships gate 1 of #863 and retargets S9/S10 onto a main that carries #1846.
