@@ -67,6 +67,7 @@
       "README.md"
     ],
     "exclude": [
+      "tests/",
       "tests/type-fixtures/",
       "**/*_test.ts",
       "**/*_test.tsx",

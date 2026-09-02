@@ -31,6 +31,13 @@ const builtAuthManifest: PluginManifest = definePlugin(
     name: AUTH_API_SERVICE_NAME,
     entrypoint: './services/src/main.ts',
   })
+  .withSdkClients([{
+    protocol: { family: 'netscript.sdk-client', major: 1 },
+    id: '@netscript/plugin-auth:bearer',
+    module: '@netscript/plugin-auth-core/sdk',
+    export: 'createBearerSdkClientContribution',
+    targets: ['browser', 'server'],
+  }])
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: AUTH_PLUGIN_ID }])
   .withMetadata({

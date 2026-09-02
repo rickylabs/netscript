@@ -1,0 +1,3 @@
+# Context Pack
+
+Issue #1897 is complete on branch `build/fresh-publish-tests-exclude` and PR #1918. Option 1 excludes bare `tests/`: dry-run entries are 155 → 136 and `tests/` entries are 19 → 0. All 17 export entrypoints pass `deno doc` and none imports `tests/`. Scoped check passes; Fresh source tests pass 254/254 and the evaluator's whole-package run passes 276/276; assets-barrel and publish-assets pass. The MCP corpus check exits 1 on unrelated baseline staleness: diagnostic regeneration was byte-identical with and without this slice, so its carrier was restored from `HEAD`. Quality and focused JSR gates pass; `deno.lock` is unchanged. Separate-session IMPL-EVAL returned PASS. PR #1918 is non-draft with the requested labels, milestone 0.0.7, and `Closes #1897`.
