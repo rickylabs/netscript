@@ -4238,3 +4238,43 @@ already generalises; `docs:snippets` is simply pointed at one root) and an expli
 That is the second time an audit has been worth more for what it revealed about coverage than for
 what it found in the PR — the #1842 audit surfaced the dynamic-`import()` specifier trap the same
 way.
+
+## 2026-09-02 — #1924 taken: measured baseline first, then the README fence gate (PR #1925)
+
+**Baseline measured and published before writing any gate code**, which the coordinator asked for and
+which is the doctrine #1777 and #1533 both followed. On `ec848e6b0`: 36 READMEs, 166 fences, **71**
+TypeScript-like, 1 syntax-invalid, 70 compilable, **31** type errors across **6** READMEs
+(`TS2304` ×21, `TS2307` ×5, `TS18046` ×5).
+
+The headline is that **30 of 36 READMEs and 64 of 71 fences already compile clean**. This is fencing
+in a surface that is largely right and unguarded, not rescuing a broken one — worth saying plainly,
+because "31 errors" reads alarming out of context.
+
+### A measurement trap that would have produced a false baseline
+
+My first measurement reported **zero** errors. It was wrong: `deno check` aborts the whole program on
+the first parse failure, and `packages/mcp/README.md:277` is prose tagged as a TypeScript fence, so
+the abort masked all 31. Had I trusted that run, the ceiling would have been set at 0 and the gate
+would have gone red on the next unrelated change with no explanation. The checker now excludes
+unparseable blocks iteratively and reports each by path and line, and the trap is recorded in the
+commit message and PR body so the next person re-running it does not repeat it.
+
+### Design — reuse, not a second compiler
+
+`extractFencedBlocks` and `compileSnippetAnalysis` already generalise; `docs:snippets` simply points
+them at `docs/site`. The new module contributes README discovery, the syntax-invalid exclusion loop,
+and the ratchet — nothing else. Floors and ceilings all sit at their exact measured census, so the
+corpus can neither shrink to manufacture a pass nor grow its failing set silently.
+
+Mutation-proved rather than declared green: a dead specifier injected into a clean README fails with
+both `failing readmes 7 > 6` and `type errors 32 > 31`. Five policy tests cover the ceilings, the
+anti-shrink floors, multi-violation reporting, and the census line; the `.llm/tools/gates/` suite is
+27/0; `docs:jsdoc-examples` unchanged at 116/14; zero tasks or gate ids lost against main.
+
+**Deliberately not wired into `ci.yml` in this leaf.** The gate id exists and runs through `run-gate`,
+but wiring it into the `quality` job is a follow-up: the ceiling should be lowered against a stable
+baseline first, and keeping the wiring out keeps this leaf independent of the canary barrier, as
+instructed. Said so in the PR body rather than leaving it to be discovered.
+
+**Opened as PR #1925**, head `0be2fba52`, labelled at open, milestone 0.0.7, `status:impl`.
+Separate-session IMPL-EVAL is next.
