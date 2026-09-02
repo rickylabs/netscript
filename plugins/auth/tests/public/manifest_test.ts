@@ -15,6 +15,13 @@ Deno.test('authPlugin manifest exposes service, contract, and config axes', () =
     ),
   );
   assert(authPlugin.contributions.runtimeConfigTopics?.some((topic) => topic.name === 'auth'));
+  assertEquals(authPlugin.contributions.sdkClients, [{
+    protocol: { family: 'netscript.sdk-client', major: 1 },
+    id: '@netscript/plugin-auth:bearer',
+    module: '@netscript/plugin-auth-core/sdk',
+    export: 'createBearerSdkClientContribution',
+    targets: ['browser', 'server'],
+  }]);
 
   const inspection = inspectPlugin(authPlugin);
   assertEquals(inspection.target, '@netscript/plugin-auth');
@@ -27,4 +34,13 @@ Deno.test('authPlugin manifest exposes service, contract, and config axes', () =
   const verification = verifyAuthPlugin();
   assertEquals(verification.ok, true);
   assertEquals(verification.findings, []);
+});
+
+Deno.test('auth SDK contribution reference carries no credential material', () => {
+  const credential = crypto.randomUUID();
+  const serialized = JSON.stringify(authPlugin.contributions.sdkClients);
+
+  assertEquals(serialized.includes(credential), false);
+  assertEquals(serialized.includes('resolveCredential'), false);
+  assertEquals(serialized.includes('token'), false);
 });
