@@ -97,7 +97,10 @@ export async function verifyListenerFailureRecovery(
     baselineTests.push(await readTestOnlyReport(appHost, expectation, expectations, 'Healthy'));
   }
   const baselineReal = await requireRealBackingHealthy(appHost, expectations);
-  await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+  await commandListenerFaultController(projectRoot, {
+    postgresOpen: true,
+    garnetOpen: true,
+  });
 
   const receipts: ListenerRecoveryReceipt[] = [];
   let primaryFailure: unknown;
@@ -105,7 +108,7 @@ export async function verifyListenerFailureRecovery(
   try {
     for (let index = 0; index < expectations.length; index += 1) {
       const expectation = expectations[index];
-      await commandController(projectRoot, closedState(expectation));
+      await commandListenerFaultController(projectRoot, closedState(expectation));
 
       // Departure has no native wait (see DEPARTURE_OBSERVE_DEADLINE_MS): observe the report until
       // Aspire has actually re-evaluated the closed listener. Only then is the follow-up
@@ -133,7 +136,7 @@ export async function verifyListenerFailureRecovery(
       );
       const afterWait = await requireRealBackingHealthy(appHost, expectations);
 
-      await commandController(projectRoot, reopenedState(expectation));
+      await commandListenerFaultController(projectRoot, reopenedState(expectation));
       await requireResourceHealthy(appHost, expectation.resource, RECOVERY_WAIT_TIMEOUT_SECONDS);
       const recovered = await readTestOnlyReport(appHost, expectation, expectations, 'Healthy');
       const afterRecovery = await requireRealBackingHealthy(appHost, expectations);
@@ -153,7 +156,10 @@ export async function verifyListenerFailureRecovery(
     primaryFailure = error;
   } finally {
     try {
-      await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+      await commandListenerFaultController(projectRoot, {
+        postgresOpen: true,
+        garnetOpen: true,
+      });
     } catch (error) {
       cleanupFailure = error;
     }
@@ -275,7 +281,7 @@ function expectedUnhealthyDescription(expectation: ListenerFaultExpectation): Re
   return new RegExp(
     `^${listener} listener (?:unreachable|unhealthy): (?:${
       EXPECTED_FAILURE_CODES.join('|')
-    })(?!\\w)`,
+    })(?=$|\\s)`,
   );
 }
 
@@ -284,6 +290,9 @@ export function matchesExpectedFailure(
   report: ListenerHealthReport,
   expectation: ListenerFaultExpectation,
 ): boolean {
+  // Status is checked here rather than trusted from the caller: a Healthy report carrying a stale
+  // ECONNREFUSED data bag would otherwise satisfy the assertion on any path that forgot the guard.
+  if (report.status !== 'Unhealthy') return false;
   const found = readFailureCode(report);
   if (found.kind === 'malformed') return false;
   if (found.kind === 'string') {
@@ -420,7 +429,8 @@ function assertRealBackingHealthy(
   });
 }
 
-async function commandController(
+/** Apply one revision to D-101's controller and require its exact acknowledgement. */
+export async function commandListenerFaultController(
   projectRoot: string,
   desired: Pick<ListenerFaultState, 'postgresOpen' | 'garnetOpen'>,
 ): Promise<ListenerFaultState> {

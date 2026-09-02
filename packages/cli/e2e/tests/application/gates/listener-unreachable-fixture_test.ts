@@ -133,6 +133,42 @@ Deno.test('expected-failure matcher accepts only a genuine expected socket failu
     );
   });
 
+  await t.step('a Healthy report is rejected even with an expected structured code', () => {
+    assertEquals(
+      matchesExpectedFailure(
+        report('Healthy', 'RESP listener ready on localhost:18999', { code: 'ECONNREFUSED' }),
+        GARNET_EXPECTATION,
+      ),
+      false,
+    );
+  });
+
+  await t.step('a Healthy report is rejected even with a matching description', () => {
+    assertEquals(
+      matchesExpectedFailure(
+        report('Healthy', 'RESP listener unhealthy: ECONNREFUSED at localhost:18999 after 2 ms'),
+        GARNET_EXPECTATION,
+      ),
+      false,
+    );
+  });
+
+  await t.step('a punctuation-suffixed code is rejected by the fallback', () => {
+    for (
+      const description of [
+        'RESP listener unhealthy: ECONNREFUSED.',
+        'RESP listener unhealthy: ECONNREFUSED: actually EPROTO',
+        'RESP listener unhealthy: ECONNREFUSED-ish',
+        'RESP listener unhealthy: ETIMEDOUT,',
+      ]
+    ) {
+      assertEquals(
+        matchesExpectedFailure(report('Unhealthy', description), GARNET_EXPECTATION),
+        false,
+      );
+    }
+  });
+
   await t.step('an unexpected fallback code is rejected', () => {
     assertEquals(
       matchesExpectedFailure(

@@ -4,6 +4,7 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../../domain/cli-surface.ts';
+import { resolve } from '@std/path';
 import type { GateDefinition } from '../../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../../domain/run-context.ts';
 import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
@@ -139,4 +140,29 @@ export function parseListenerFaultDatabase(value: string): DatabaseEngine {
     default:
       throw new Error(`unsupported listener-fault database: ${value}`);
   }
+}
+
+/** Build the lease-backed S8 receipt gate for the PostgreSQL runtime suite. */
+export function createTypedDbPhaseBGate(): GateDefinition {
+  return commandGate(
+    GATE.RUNTIME_TYPED_DB_PHASE_B,
+    'Verify typed database commands and bounded unhealthy wait',
+    GATE_PHASE.RUNTIME,
+    (context) => [
+      'deno',
+      'run',
+      '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+      '--allow-read',
+      '--allow-write',
+      '--allow-run=aspire,deno',
+      `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts`,
+      context.project.appHost,
+      context.project.projectRoot,
+      context.project.cliEntrypoint.startsWith('jsr:')
+        ? context.project.cliEntrypoint
+        : resolve(context.project.repoRoot, context.project.cliEntrypoint),
+      context.request.options.database,
+    ],
+    (context) => context.project.projectRoot,
+  );
 }

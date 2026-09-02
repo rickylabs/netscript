@@ -33,6 +33,15 @@ name: e2e-cli
 # triggers the workflow immediately. Version tags and manual dispatch run the
 # complete release-grade suite.
 #
+# Queue policy: the docker and sqlite runtime tiers remain separate repo-wide
+# mutexes because they contend for host resources. Each group uses GitHub's
+# bounded `queue: max` admission (one running plus up to 100 pending) rather
+# than the default single pending entry, which replaces and cancels overflow.
+# A deferred job therefore stays visibly pending and resumes on the same run
+# and head SHA without a redispatch or push. Within that documented bound,
+# `cancelled` now means an explicit cancellation, timeout, or the workflow's
+# per-ref supersession—not silent runtime-gate eviction.
+#
 # Selection policy (see `.github/scripts/ci-classify-changes.ts`): an opted-in
 # PR first runs `classify`, which emits the #1152 capability vector
 # (`run_static`, `run_runtime_sqlite`, `run_runtime`, `needs_*`) from the diff
@@ -252,6 +261,7 @@ jobs:
     concurrency:
       group: e2e-scaffold-runtime-global
       cancel-in-progress: false
+      queue: max
     # Applicable only after release/manual/PR opt-in. `ci:skip-e2e` can
     # short-circuit the lane; classifier failure is fail-closed and runs it.
     # This remains additive until it has enough observed-green history.
@@ -338,6 +348,7 @@ jobs:
     concurrency:
       group: e2e-scaffold-runtime-sqlite-global
       cancel-in-progress: false
+      queue: max
     # Applicable only after release/manual/PR opt-in. The sqlite runtime follows
     # the scaffold-impact signal; ci:skip-e2e remains authoritative over both
     # runtime tiers. Classifier failure is fail-closed and runs it.

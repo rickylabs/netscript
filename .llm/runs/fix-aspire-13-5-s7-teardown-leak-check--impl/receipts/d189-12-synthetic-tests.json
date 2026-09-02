@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "d189-synthetic-teardown-tests",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/agentic/teardown"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s7",
+  "gitHead": "be2c7a3b063590cb9250c6f89734f8b30d38c51e",
+  "actualGitHead": "be2c7a3b063590cb9250c6f89734f8b30d38c51e",
+  "timeoutMs": 120000,
+  "runnerIdentity": "codex:01a05841-8da9-75f1-b7cf-4f6b3a1b88a6",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "1ccd7a0a8128aba6b67b5274e5e7700665c0634cc705b4dcfadd5f40f801b4a2",
+  "lifecycleId": "codex:01a05841-8da9-75f1-b7cf-4f6b3a1b88a6:d189-synthetic-teardown-tests:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T15:02:22.162Z",
+  "startedAt": "2026-08-31T15:02:22.164Z",
+  "finishedAt": "2026-08-31T15:02:25.639Z",
+  "durationMs": 3475,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 299,
+    "sha256": "16413e9b9df734da35eac8b01b1a460dac3419dc7ef1fbdfdb9d1eda49424e8c",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/agentic/teardown\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-aspire-s7\",\"exitCode\":0,\"durationMs\":3342,\"summary\":{\"passed\":48,\"failed\":0,\"ignored\":0,\"totalResults\":48,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 131,
+    "sha256": "dda870316bced6323313b363e3e10f0dd7555e676b84a2e08649b3dd47da76cb",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/agentic/teardown'\n",
+    "truncated": false
+  }
+}

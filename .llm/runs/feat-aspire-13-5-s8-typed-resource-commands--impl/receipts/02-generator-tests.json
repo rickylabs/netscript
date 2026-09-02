@@ -1,0 +1,38 @@
+{
+  "gateId": "test",
+  "invocationId": "s8-s2-generator-head",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts",
+    "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s8",
+  "gitHead": "1fa1cb75b3e3776ed1d0bd9dd9da046203264c20",
+  "actualGitHead": "1fa1cb75b3e3776ed1d0bd9dd9da046203264c20",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:381342",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "573287f12de09d1af114adcfaccb9bfc5fbf273f4975562cf456846b2cb3f070",
+  "lifecycleId": "worker:381342:s8-s2-generator-head:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T09:44:39.021Z",
+  "startedAt": "2026-08-30T09:44:39.023Z",
+  "finishedAt": "2026-08-30T09:44:39.286Z",
+  "durationMs": 264,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 445,
+    "sha256": "bdb60a7c5293d8a5545fa38379d18ede187885a7d3fc3c2108f9439ca0bade58",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts\",\"packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-aspire-s8\",\"exitCode\":0,\"durationMs\":139,\"summary\":{\"passed\":34,\"failed\":0,\"ignored\":0,\"totalResults\":34,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 278,
+    "sha256": "2f6ec5e51fba28d590e403cc5a284c4c87dfbbc2fa2fc600fb067f3023b886d7",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts' 'packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts'\n",
+    "truncated": false
+  }
+}

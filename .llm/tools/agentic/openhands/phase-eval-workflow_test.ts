@@ -365,7 +365,7 @@ Deno.test('manual generation lookup retries 5x1s and exhausts to an attributable
   );
 });
 
-Deno.test('generic OpenHands reports wrapped, absent, and unparseable verdict markers distinctly', async () => {
+Deno.test('generic OpenHands reports verdict marker cardinality and shape distinctly', async () => {
   const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
   const functionStart = workflow.indexOf('            function verdictOf(text) {');
   const functionEnd = workflow.indexOf('\n\n            // 1) Summary file', functionStart);
@@ -373,7 +373,7 @@ Deno.test('generic OpenHands reports wrapped, absent, and unparseable verdict ma
   const functionSource = workflow.slice(functionStart, functionEnd).replace(/^ {12}/gm, '');
   const verdictOf = new Function(`"use strict"; ${functionSource}; return verdictOf;`)() as (
     text: string,
-  ) => { verdict: string | null; state: 'parsed' | 'absent' | 'unparseable' };
+  ) => { verdict: string | null; state: 'parsed' | 'absent' | 'unparseable' | 'ambiguous' };
 
   assertEquals(verdictOf('OPENHANDS_VERDICT: PASS'), { verdict: 'PASS', state: 'parsed' });
   assertEquals(verdictOf('## **OPENHANDS_VERDICT: FAIL_FIX**'), {
@@ -385,6 +385,22 @@ Deno.test('generic OpenHands reports wrapped, absent, and unparseable verdict ma
     verdict: null,
     state: 'unparseable',
   });
+  assertEquals(
+    verdictOf('OPENHANDS_VERDICT: PASS\nOPENHANDS_VERDICT: PENDING'),
+    { verdict: null, state: 'ambiguous' },
+  );
+  assertEquals(
+    verdictOf('OPENHANDS_VERDICT: PASS\nOPENHANDS_VERDICT: FAIL_FIX'),
+    { verdict: null, state: 'ambiguous' },
+  );
+  assertEquals(
+    verdictOf('```text\nOPENHANDS_VERDICT: FAIL_FIX\n```\nOPENHANDS_VERDICT: PASS'),
+    { verdict: 'PASS', state: 'parsed' },
+  );
+  assertEquals(
+    verdictOf('OPENHANDS_VERDICT: <PASS|FAIL_FIX>\nOPENHANDS_VERDICT: PASS'),
+    { verdict: 'PASS', state: 'parsed' },
+  );
 
   const shellMatcherLine = workflow.split('\n').find((line) =>
     line.includes("| grep -E '") && line.includes('OPENHANDS_VERDICT')
@@ -401,17 +417,82 @@ Deno.test('generic OpenHands reports wrapped, absent, and unparseable verdict ma
 
   assertStringIncludes(workflow, 'agent_verdict_state="absent"');
   assertStringIncludes(workflow, 'agent_verdict_state="unparseable"');
+  assertStringIncludes(workflow, 'agent_verdict_state="ambiguous"');
   assertStringIncludes(workflow, 'agent_verdict_state="parsed"');
+  assertStringIncludes(workflow, 'marker_count="$(printf');
+  assertStringIncludes(workflow, '[ "$marker_count" -gt 1 ] || [ "$valid_count" -gt 1 ]');
   assertStringIncludes(workflow, 'agent_verdict_state=$agent_verdict_state');
   assertStringIncludes(workflow, '"agent_verdict_state": os.environ.get(');
   assertStringIncludes(workflow, "'summary-unparseable'");
+  assertStringIncludes(workflow, "'summary-ambiguous'");
   assertStringIncludes(workflow, "'pr-comment-unparseable'");
+  assertStringIncludes(workflow, "'pr-comment-ambiguous'");
   assertStringIncludes(workflow, 'Agent emitted no OPENHANDS_VERDICT token.');
   assertStringIncludes(
     workflow,
     'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.',
   );
   assertStringIncludes(workflow, '(?:#{1,6}[ \\t]+)?');
+});
+
+Deno.test('read-only formal evaluator with pr-comment preserves a durable verdict off-head', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
+  assertStringIncludes(
+    workflow,
+    "const outputMode = matchValue('output') || process.env.DISPATCH_OUTPUT_MODE || 'pr-comment';",
+  );
+
+  const commitStart = workflow.indexOf(
+    '      - name: Commit run artifacts to PR branch (allow-listed paths only)',
+  );
+  const preserveStart = workflow.indexOf(
+    '      - name: Preserve formal evaluator verdict on isolated artifact ref',
+  );
+  const createPrStart = workflow.indexOf(
+    '      - name: Create pull request for non-PR triggers',
+  );
+  assert(commitStart >= 0 && preserveStart > commitStart && createPrStart > preserveStart);
+  const commitBlock = workflow.slice(commitStart, preserveStart);
+  const preserveBlock = workflow.slice(preserveStart, createPrStart);
+
+  assertStringIncludes(commitBlock, "steps.request.outputs.eval_phase == ''");
+  assertStringIncludes(preserveBlock, "steps.request.outputs.eval_phase != ''");
+  assertStringIncludes(preserveBlock, 'git commit-tree "$artifact_tree" -p "$EVAL_HEAD"');
+  assertStringIncludes(
+    preserveBlock,
+    'openhands-eval-artifacts/pr-${ISSUE_NUMBER}/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}',
+  );
+  assertStringIncludes(
+    preserveBlock,
+    'git push "$remote" "${record_commit}:refs/heads/${artifact_ref}"',
+  );
+  assert(!preserveBlock.includes('HEAD:${CHECKOUT_REF}'));
+  assertStringIncludes(preserveBlock, '"evaluated_head": os.environ["EVAL_HEAD"]');
+  assertStringIncludes(
+    preserveBlock,
+    '"formal_verdict": os.environ.get("AGENT_VERDICT", "NONE")',
+  );
+  assertStringIncludes(preserveBlock, '"verdict_source": os.environ.get("VERDICT_SOURCE"');
+  assertStringIncludes(preserveBlock, '"verdict_artifact_uri": os.environ["ARTIFACT_URI"]');
+
+  const finalizeStart = workflow.indexOf('      - name: Publish final status comment');
+  const transitionStart = workflow.indexOf(
+    '      - name: Check out trusted status transition helper',
+  );
+  const finalizeBlock = workflow.slice(finalizeStart, transitionStart);
+  assertStringIncludes(finalizeBlock, "env.OUTPUT_MODE === 'summary-only'");
+  assertStringIncludes(finalizeBlock, 'const formalArtifactReady =');
+  assertStringIncludes(
+    finalizeBlock,
+    "summaryInspection.state === 'parsed' && formalArtifactReady",
+  );
+  assertStringIncludes(finalizeBlock, 'verdict_artifact_uri: formalArtifactReady');
+  assertStringIncludes(finalizeBlock, 'evaluated_head: env.EVAL_HEAD || null');
+  assertStringIncludes(finalizeBlock, 'env.TRACE_VERDICT_SOURCE ||');
+  assertStringIncludes(finalizeBlock, 'evaluated head unchanged');
+  assertStringIncludes(finalizeBlock, 'no tracked verdict path is claimed');
+  assertStringIncludes(finalizeBlock, "summaryInspection.state !== 'parsed'");
+  assertStringIncludes(finalizeBlock, 'not repeat an untrusted verdict token');
 });
 
 Deno.test('formal evaluator prompts are trusted read-only harness contracts', async () => {

@@ -135,6 +135,10 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'type AspireResource =');
     assertStringIncludes(output, '& Parameters<');
     assertStringIncludes(output, 'readonly databases: Map<string, AspireResource>');
+    assertStringIncludes(
+      output,
+      'readonly databaseConnectionStrings: Map<string, DatabaseConnectionStringResolver>',
+    );
     assertStringIncludes(output, 'type CacheResource = AspireResource | CacheContainerResource;');
     assertStringIncludes(output, 'readonly caches: Map<string, CacheResource>');
     assertStringIncludes(output, 'readonly cacheEndpoints: Map<string, EndpointReference>');
@@ -167,6 +171,15 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'builder.addPostgres("main", {');
     assertStringIncludes(output, 'ensureDatabasePassword(appHostDir, "main")');
     assertStringIncludes(output, 'databases.set("main",');
+    assert(
+      !output.includes('databaseConnectionStrings.set(\n    "main"'),
+      'Container commands must consume Aspire graph-injected environment instead of a callback resolver',
+    );
+    assert(
+      !output.includes('connectionStringExpression()'),
+      'Container registration must not emit a compile-clean runtime capability call',
+    );
+    assert(!output.includes('.getValue()'));
     assertStringIncludes(output, '(Container)');
   });
 
@@ -176,6 +189,11 @@ describe('generateRegisterInfrastructure', () => {
       caches: {},
     });
     assertStringIncludes(output, 'builder.addConnectionString("ext-db")');
+    assertStringIncludes(
+      output,
+      'await builder.getConfiguration().getConnectionString("ext-db")',
+    );
+    assertStringIncludes(output, 'databaseConnectionStrings.set(\n    "ext-db"');
     assertStringIncludes(output, '(External)');
   });
 

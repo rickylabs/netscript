@@ -1,0 +1,115 @@
+{
+  "sources": [
+    ".llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/receipts/phase-b-02-baseline-process-tree.json",
+    ".llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/receipts/phase-b-03-cli-terminated.json"
+  ],
+  "leasedRun": {
+    "worktreeRoot": "/home/agent/projects/netscript/worktrees/007-aspire-s7",
+    "ownedRoot": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b",
+    "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/apphost.mts"
+  },
+  "foreignControl": {
+    "worktreeRoot": "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval",
+    "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control/aspire/apphost.mts"
+  },
+  "baselineProcesses": [
+    {
+      "role": "foreign-control-cli",
+      "pid": 3208128,
+      "ppid": 1,
+      "startTimeTicks": "29782259",
+      "argv": [
+        "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire",
+        "run",
+        "--non-interactive",
+        "--apphost",
+        "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control/aspire/apphost.mts",
+        "--log-file",
+        "[LOG_PATH_REDACTED]",
+        "--isolated"
+      ]
+    },
+    {
+      "role": "foreign-control-apphost",
+      "pid": 3208145,
+      "ppid": 3208128,
+      "startTimeTicks": "29782274",
+      "argv": [
+        "/home/agent/projects/netscript/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed",
+        "server",
+        "--contentRoot",
+        "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control/aspire/.aspire/integrations/apphosts/c34a1c03400d"
+      ]
+    },
+    {
+      "role": "leased-run-cli",
+      "pid": 3232704,
+      "ppid": 1,
+      "startTimeTicks": "29800295",
+      "argv": [
+        "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire",
+        "run",
+        "--non-interactive",
+        "--apphost",
+        "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/apphost.mts",
+        "--log-file",
+        "[LOG_PATH_REDACTED]",
+        "--isolated"
+      ]
+    },
+    {
+      "role": "leased-run-apphost",
+      "pid": 3232801,
+      "ppid": 3232704,
+      "startTimeTicks": "29800374",
+      "argv": [
+        "/home/agent/projects/netscript/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed",
+        "server",
+        "--contentRoot",
+        "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/.aspire/integrations/apphosts/046152fa9308"
+      ]
+    }
+  ],
+  "afterCliSigkill": [
+    {
+      "role": "leased-run-aspire-managed-server",
+      "pid": 3232801,
+      "ppid": 1,
+      "startTimeTicks": "29800374",
+      "pathEvidence": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/.aspire/integrations/apphosts/046152fa9308"
+    },
+    {
+      "role": "leased-run-apphost-tsx",
+      "pid": 3233563,
+      "ppid": 1,
+      "startTimeTicks": "29800801",
+      "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/apphost.mts"
+    },
+    {
+      "role": "leased-run-dcp-apiserver",
+      "pid": 3233914,
+      "ppid": 1,
+      "startTimeTicks": "29800954",
+      "monitorPid": 3232801
+    },
+    {
+      "role": "leased-run-dcp-controllers",
+      "pid": 3233945,
+      "ppid": 3233914,
+      "startTimeTicks": "29800960"
+    },
+    {
+      "role": "leased-run-aspire-managed-dashboard",
+      "pid": 3234123,
+      "ppid": 3233945,
+      "startTimeTicks": "29801006"
+    }
+  ],
+  "derivedContainmentVectors": {
+    "note": "These vectors exercise the Phase-A argv/cwd/socket/DCP-label contract with the exact authorized roots. They are derived test inputs, not fields claimed to have been present in the Phase-B /proc capture.",
+    "dcpLabelPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/apphost.mts",
+    "socketPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire/.aspire/dcp.sock",
+    "cwdPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b/aspire",
+    "foreignDcpLabelPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7-eval/.llm/tmp/s7-foreign-control/aspire/apphost.mts"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-30T19:31:20.338Z",
+  "command": "/home/agent/.local/bin/mise exec -- deno task agentic:leak-check -- --slice-dir /home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl --worktree /home/agent/projects/netscript/worktrees/007-aspire-s7 --owned-root /home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-attempt",
+  "exitCode": 0,
+  "probes": {
+    "aspire": "ok",
+    "docker": "ok",
+    "process": "ok"
+  },
+  "leasedRun": {
+    "processSurvivors": [],
+    "ownedContainers": [
+      {
+        "id": "184d1e658deeb76771ce2da3a12f5071c77cf816b3c8c3ef22700ef74572edeb",
+        "name": "postgres-79fb6680",
+        "mountSource": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-attempt/.data/postgres",
+        "createdAt": "2026-08-30T19:30:04.316307473Z",
+        "ownership": "owned"
+      }
+    ],
+    "finding": "No re-parented process survived long enough for leak-check to report or classify it. Criterion 1 did not reproduce."
+  },
+  "foreignControl": {
+    "appHostPid": 3461203,
+    "appHostOwnership": "foreign",
+    "cliPid": 3461184,
+    "cliEvidence": "apphost-argv",
+    "managedServerEvidence": "content-root-argv",
+    "postgresId": "6fc08112ecd17e9d9ac7abf03b2a76cdad1cb8feb58084b71fd68cf337f8bf35",
+    "redisId": "b83b9c987eb3c8ed1c3e959e095afa76c9505f0ed0295f1b38d2c6e982bd35b5",
+    "containersOwnership": "foreign",
+    "plannedForMutation": false
+  },
+  "relayPolicy": "Supervisor relay resources were ignored by the reporter and were not counted as leaks.",
+  "criterion1": "FAIL_NOT_REPRODUCED"
+}
