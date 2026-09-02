@@ -7558,3 +7558,49 @@ itself sets (a `compat-fixture` row must carry a `13.5.3` case):
 So S13's box 1 is blocked on S8+S9+S11 merging, not on any S13 defect. I nearly "fixed" the two
 S11 docs inside S11 before checking — they were already correct on S11's branch; only main's copies
 are stale. Checking the owning branch before repairing a cross-slice sweep hit is the rule.
+
+## D-295 — #1846's incorporation point is S8's merge, because S9/S10 are based on S8, not main
+
+Coordinator merged #1846 (`ci(e2e-cli): defer runtime overflow instead of cancelling`) as main
+`6bb9c00f9`. Its product change is 11 lines in `.github/workflows/e2e-cli.yml`: `queue: max` on both
+runtime-tier concurrency groups, so an overflowing job stays **pending and resumes on the same run
+and head SHA** instead of being evicted. It also redefines the signal: `cancelled` now means an
+explicit cancellation, timeout, or per-ref supersession — **not** silent runtime-gate eviction.
+
+That fix explains a large share of this lane's churn. S8, S9, S10 and #1747 have all shown
+`CANCELLED` runtime tiers that I re-fired by hand, and D-291 recorded that a never-started cancelled
+job cannot even be rerun individually.
+
+**Where it must land.** `gh pr view` shows `baseRefName = feat/aspire-13-5-s8-typed-resource-commands`
+for **both** #1759 (S9) and #1760 (S10). Their `pull_request` runs therefore evaluate the merge of
+their head into **S8**, not into main, so they inherit `e2e-cli.yml` from that merge. Two ways to give
+them the deferral behaviour:
+
+1. Carry #1846's workflow hunk in each branch. Works — the merge ref would contain it — but it makes
+   S9 and S10 each carry a CI change that is not their subject, shows up in their PR diff, and
+   becomes a duplicate the moment S8 lands.
+2. Let it arrive with S8's merge. S8 is merge-ready; once it merges into main, S9 and S10 rebase onto
+   a main that carries **both** S8 and #1846 in a single step, with no duplicate commit and no
+   diff pollution.
+
+**Chosen: (2). The next safe slice boundary for this stack is S8's merge.**
+
+**Why nothing is rebased right now.** At decision time every branch that would benefit had a hosted
+tier in flight, and the two that did not must not be touched for a different reason:
+
+| PR | Hosted tier | Why not now |
+| --- | --- | --- |
+| #1754 S8 | running | must not interrupt |
+| #1747 | running | must not interrupt |
+| #1760 S10 | running | must not interrupt |
+| #1759 S9 | running (`e2e-cli` 33592084708) | must not interrupt |
+| #1744 S7 | idle | **merge-ready**; a new head clears `status:ready-merge` (D-292) and voids its close-gate SUCCESS for a fix it never uses — it needs no further runtime run |
+| #1771 S11 | n/a — docs, tiers SKIPPED | same, and #1846 cannot affect a PR whose runtime tiers never schedule |
+| #1779 S13 | idle | blocked on S8+S9+S11 (D-294); converging now guarantees a second convergence later |
+
+So incorporating #1846 anywhere tonight would have cost earned gate state and bought nothing. It
+arrives for free with S8.
+
+**Empirical check available.** S9's in-flight run is the test: its base still lacks #1846, so if a
+tier goes `CANCELLED` again during it, eviction is still live and the sequencing above is confirmed
+from the failure side as well.
