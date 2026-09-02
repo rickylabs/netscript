@@ -12,7 +12,8 @@
 
 ## Current State
 
-The single implementation slice passed supervisor review and all pre-commit gates. The generic
+The single implementation slice passed supervisor review, all pre-commit gates, and all three
+post-commit carrier checks. The generic
 context assembles caller-resolved appsettings/environment once while retaining lazy memoized DB/KV.
 The unchanged CLI template was materialized at its real generated path and booted the real
 workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-EVAL remains N/A.
@@ -26,14 +27,12 @@ workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-
 
 ## In Progress
 
-- Sign-off commit, post-commit carrier checks, and mandatory separate-session IMPL-EVAL.
+- PR bootstrap and mandatory separate-session IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit the reviewed implementation, carrier, and gate evidence.
-2. Verify every carrier `check:*` against the commit.
-3. Push and atomically open the required non-draft PR with labels/milestone.
-4. Run the separate-session IMPL-EVAL and publish its structured PR comment.
+1. Push and atomically open the required non-draft PR with labels/milestone.
+2. Run the separate-session IMPL-EVAL and publish its structured PR comment.
 
 ## Key Decisions
 
@@ -60,7 +59,7 @@ workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | PASS | plugin/auth check, lint, fmt all exit 0; full plugin test 97/97 |
-| Fitness | PASS_WITH_BASELINE | doc lint 15→15; JSR findings 7→7; publish/docs/quality/arch verdict gates pass |
+| Fitness | PASS_WITH_BASELINE | doc lint 15→15; JSR findings 7→7; publish/docs/quality/arch and all post-commit carrier checks pass |
 | Runtime | N/A | owner forbids hosted runtime; focused real-listener consumer proof passed instead |
 | Consumer | FOCUSED_PASS | wrapper exit 0: 3 passed, 0 failed, 0 ignored; three real listeners healthy and stopped |
 
@@ -77,4 +76,4 @@ workers/auth/sagas factories to healthy listeners, then stopped all three. PLAN-
 
 ## Commits
 
-- Sign-off commit pending. The owner requires a non-draft PR after local sign-off.
+- `18ace6ac3` — product, consumer proof, generated corpus, and pre-commit gate evidence.

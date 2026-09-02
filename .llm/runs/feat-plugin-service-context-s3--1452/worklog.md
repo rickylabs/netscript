@@ -113,6 +113,9 @@ them and are the sign-off verdicts.
 | `deno task gen:assets-barrel` | 0 | generated; no carrier delta |
 | `deno task gen:publish-assets` | 0 | generated; no carrier delta |
 | `deno task gen:mcp-export-corpus` | 0 | 35 packages, 273 subpaths, 7816 symbols; corpus SHA `628133…5d7c` |
+| `deno task check:assets-barrel` after commit `18ace6ac3` | 0 | regenerated carriers match committed assets |
+| `deno task check:publish-assets` after commit `18ace6ac3` | 0 | publish carriers match committed assets |
+| `deno task check:mcp-export-corpus` after commit `18ace6ac3` | 0 | committed corpus matches: 35 packages, 273 subpaths, 7816 symbols, SHA `628133…5d7c` |
 
 MCP corpus provenance changed by +143 uncompressed bytes (2,192,016 → 2,192,159) and +67
 compressed bytes (317,993 → 318,060), with symbol count unchanged at 7,816. Decoded A/B evidence
@@ -127,4 +130,4 @@ Protected-file SHA-256 remains unchanged: `packages/plugin/deno.json`
 
 - Inspect the generated-consumer test first: it must start/ready/stop each real service.
 - Verify `packages/plugin/deno.json` and `deno.lock` remain byte-identical.
-- Post-commit carrier checks and the separate IMPL-EVAL remain before PR handoff.
+- All post-commit carrier checks passed; separate IMPL-EVAL remains after PR bootstrap.
