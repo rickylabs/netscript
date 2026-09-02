@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.6",
-  "sourceCommit": "1e6de95e1",
-  "extractionTimestamp": "2026-08-31T18:29:31.930Z",
+  "sourceCommit": "511e1a347",
+  "extractionTimestamp": "2026-09-02T18:44:34.358Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -187,6 +187,6 @@
     "pages/why/index.md"
   ],
   "uncompressedBytes": 4859361,
-  "compressedBytes": 1394099,
-  "sha256": "0f16163de6ca70fac04985041e9c0119432bd96e7286889db86151fc1c9274d7"
+  "compressedBytes": 1394096,
+  "sha256": "ce772551ce8ab90c1c081229252a4fbdaa9e887509f61ffb1b79677b4645e414"
 }
