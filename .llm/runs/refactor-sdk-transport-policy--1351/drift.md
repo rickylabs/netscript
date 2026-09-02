@@ -37,3 +37,32 @@ The incoming delta from main is confined to `.llm/tools/agentic/teardown/*`, `ex
 Gate 10 (`scaffold.runtime` E2E) remains the evaluator-judged **EXTERNAL** Aspire `database.init`
 `404` for the generated Postgres executable — re-establish at merge readiness; not attributable to
 this slice's 26-file footprint, which contains no CLI, Aspire, apphost, scaffold, or workflow source.
+
+## D — integration onto main `9fcdee63e`, and the measured block on boxes 1 and 6
+
+Fourth integration merge, producing head `141bbf579`. Verdict carries unchanged, proven rather than
+assumed:
+
+| Property | Pre-merge | Post-merge | Result |
+| --- | --- | --- | --- |
+| `packages/sdk` tree | `5db60b947` | `5db60b947` | **byte-identical** |
+| `deno.lock` | `23cb256ba` | `23cb256ba` | **byte-identical** |
+
+**Acceptance boxes 1 and 6 remain unsatisfiable at this head, by measurement.** Both require the
+`@orpc/*` family to resolve **once** at stable v1.15.0. That work was split out to #1879 by
+coordinator ruling and is not yet on main (`9fcdee63e` = #1894, preceded by #1850 and #1887).
+Re-measured here with a real captured exit — `DENO_WHY_REAL_EXIT=0`:
+
+```
+@orpc/shared@1.14.6
+@orpc/shared@1.14.7     <- two copies; 1.14.7 pulled by @orpc/otel@1.14.7
+```
+
+The full resolved set is 18 entries, all `1.14.x`. Ticking box 1 or box 6 now would assert something
+this head disproves, so both stay unchecked and the PR stays at `status:impl`. They become tickable
+only after PR #1890 merges and this branch integrates it — which is why the merge order
+**#1890 → #1889** is a constraint rather than a preference.
+
+Box 6 additionally requires the scaffold runtime E2E. The runtime lane is free for the first time
+this cycle (the #1839 three-arrival proof completed and released it), so that gate is being dispatched
+now rather than deferred again.
