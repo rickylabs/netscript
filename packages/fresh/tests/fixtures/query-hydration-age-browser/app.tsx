@@ -42,6 +42,7 @@ function QueryHydrationAgeSnapshot(props: QueryHydrationAgeBrowserProps): object
 
   return (
     <main
+      data-fresh-island='query-hydration-age'
       data-hydrated={String(hydrated)}
       data-interaction-count={String(interactionCount)}
       data-mode={props.mode}

@@ -89,3 +89,12 @@
 - General lesson: hydration diagnostics must follow the framework version's emitted DOM contract.
   A missing legacy wrapper is not evidence of failed hydration when the client effect, context,
   and interaction all execute inside a valid Fresh boundary.
+
+### Follow-up measurement
+
+- CI run `33633076918` showed that Fresh also removes its server boundary comments during boot, so
+  the exact comment is not a post-hydration DOM invariant either.
+- The stable fixture contract now marks the island component's root with `data-fresh-island`, which
+  is the alternate form already understood by the #1845 diagnostic selector. The element-presence
+  check therefore identifies the actual `main` island root, while the separate effect and click
+  checks prove that it is no longer merely SSR markup.

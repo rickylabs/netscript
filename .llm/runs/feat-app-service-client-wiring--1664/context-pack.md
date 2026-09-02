@@ -210,3 +210,7 @@ client effect, and button-driven state change in both modes, but exposed that th
 marker probe assumed a `<fresh-island>` wrapper. The measured fixture response uses Fresh 2's
 comment boundary `frsh:island:app:0:`. The proof now asserts that exact boundary plus the three
 already-true client measurements; a second exact-head CI run is required for the final verdict.
+
+CI run `33633076918` then proved the server comment is removed after boot. The final evidence
+contract uses the #1845 selector's supported `[data-fresh-island]` form on the fixture island root,
+expected as `main`, alongside the already-observed query-client, effect, and click proofs.

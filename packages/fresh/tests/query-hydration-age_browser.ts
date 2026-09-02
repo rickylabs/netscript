@@ -64,13 +64,9 @@ Deno.test({
             );
             const root = page.locator('main[data-hydrated="true"]');
             await root.waitFor();
-            const freshIslandElement = await root.evaluate(element => {
-              const boundary = element.previousSibling;
-              return boundary?.nodeType === Node.COMMENT_NODE &&
-                  boundary.textContent?.startsWith('frsh:island:')
-                ? boundary.textContent
-                : null;
-            });
+            const freshIslandElement = await root.evaluate(element =>
+              element.closest('fresh-island, [data-fresh-island]')?.tagName.toLowerCase() ?? null
+            );
             const queryClientFound =
               await root.getAttribute('data-query-client-found') === 'true';
             const interactionCount = Number(
@@ -182,7 +178,7 @@ interface SnapshotAgeEvidence {
 }
 
 function assertHydrationEvidence(evidence: HydrationEvidence, mode: string): void {
-  assertEquals(evidence.freshIslandElement, 'frsh:island:app:0:', `${mode}: freshIslandElement`);
+  assertEquals(evidence.freshIslandElement, 'main', `${mode}: freshIslandElement`);
   assertEquals(evidence.queryClientFound, true, `${mode}: queryClientFound`);
   assertEquals(evidence.islandHydrated, true, `${mode}: islandHydrated`);
   assertEquals(evidence.islandInteractive, true, `${mode}: islandInteractive`);

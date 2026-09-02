@@ -524,3 +524,15 @@ The exact-head CI browser lane remains the decisive hydration observation. The t
   island root. The remaining three assertions and all snapshot-age assertions are unchanged.
 - Final-byte rerun: check 211 files / 2 batches / 0 diagnostics; package tests 276 / 0 / 0 in
   7,682 ms; lint and fmt each 211 / 211 with 0 findings.
+
+### Second exact-head browser observation
+
+- CI run `33633076918`, job `100257200773`, again observed the three client facts as true in both
+  modes, but `freshIslandElement` remained null: Fresh removes its `frsh:island` server comments
+  during client boot, so the boundary is not a hydrated-DOM invariant.
+- The fixture now explicitly marks the `QueryHydrationAgeBrowser` root with
+  `data-fresh-island="query-hydration-age"`, using the alternate island selector already present in
+  the #1845 diagnostics. The named element check asserts that this root is `main`; client-effect
+  hydration and post-click state change remain independent assertions against SSR-only markup.
+- Final-byte local rerun: check 211 files / 2 batches / 0 diagnostics; package tests 276 / 0 / 0 in
+  7,562 ms; lint and fmt each 211 / 211 with 0 findings.
