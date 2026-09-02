@@ -1,0 +1,400 @@
++16|  as `90f6fa550` and pushed to `fix/aspire-event-observation`.
++17|- This summary file and the PR verdict comment. No repository source 
+changes.
++18|
++19|## Validation (all re-run or verified at the evaluated head)
++20|
++21|- **CI live proof (previously the open blocker):** run 33617534840 at head 
+`d44fb2a6fade`,
++22|  conclusion success; `scaffold-runtime (aspire + docker + postgres)` and
++23|  `scaffold-runtime-sqlite` both PASS; log shows 
+`runtime.health.listener-unreachable` executed
++24|  with `listener-unreachable-receipt.json` uploaded.
++25|- **Focused unit tests re-run by the evaluator:** 10 passed / 0 failed 
+across
++26|  `resource-state-stream_test.ts` + `listener-unreachable-fixture_test.ts`.
++27|- **Scoped static gates re-run (raw exit 0):** scoped `run-deno-check.ts` 
+(141 files, 0 findings),
++28|  scoped `run-deno-fmt.ts` (192 files, 0 findings), `quality:scan` ok with 0
+findings,
++29|  `arch:check` exit 0 (exit-3 warnings are pre-existing main-side WARNs).
++30|- **Matcher truth table:** all six rows of `matchesExpectedFailure` verified
+against source and
++31|  passing tests (null-data token fallback, code precedence + fail-closed on 
+wrong/malformed codes,
++32|  Healthy rejection with or without matching prose, token-boundary 
+rejections, producer wordings).
++33|- **Parser guard verified live:** sibling `{resources:[postgres,…]}` 
+envelope rejected with the
++34|  raw line in the error; single-resource line accepted; 
+`readListenerHealthReport` returns the
++35|  real Healthy report and throws (never undefined) on a missing health key.
++36|- **Non-vacuity:** ceiling test must see a rejection via `assertRejects` and
+asserts child kill;
++37|  snapshot never discovers a transition (baseline health asserted pre-fault;
+evidence re-read
++38|  post-transition with real-backing continuity).
++39|- **No poll constant:** D-101's `REPORT_DEADLINE_MS`/`REPORT_POLL_MS`/
++40|  `HEALTHY_WAIT_TIMEOUT_SECONDS` are gone; remaining constants are commented
+failure ceilings.
++41|- **Close-gate / issue hygiene:** `Refs #1906`, no closing keyword, issue 
+D-101 DoD box still
++42|  open — correct for a partial slice. Review threads: 0 unanswered. Locks: 
+no PR-commit churn
++43|  (deno.lock changes come from main merges). Debt: no new entry required.
++44|- **PR commit isolation:** verified via per-commit `git show --stat`; 
+unrelated main-merge noise
++45|  does not belong to this PR.
++46|
++47|## Responses to review comments / issue comments
++48|
++49|- No open review threads on PR #1909 (agentic:review-threads PASS, 
+threads=0).
++50|- Issue #1906: only the D-101 DoD box is claimed by this slice; the 
+remaining Bucket A/C sites and
++51|  the regression guard intentionally remain open — the PR carries `Refs 
+#1906` without a closing
++52|  keyword, which is the correct partial-completion form.
++53|- Prior opposite-family IMPL-EVAL posted `PASS_IMPL` — that was the run's 
+PASS with IMPL
++54|  notation; this session confirms it with a formal harness verdict and the 
+raw re-run evidence in
++55|  `.llm/runs/fix-aspire-event-observation--impl/evaluate.md`.
++56|
++57|## Remaining risks
++58|
++59|- PR DoD box "CI confirms D-101…" is now evidenced green at this head; tick 
+the box on merge prep.
++60|- #1906's remaining unchecked boxes are follow-up slices under #1906 (not 
+this PR's scope).
++61|- Minor, non-blocking: `assertThrows`-covered grammar 
+(listener-unreachable-fixture_test.ts:3–7)
++62|  is not exercised by any product path today; harness-external, reserved for
+the follow-up
++63|  adopter slice.
++64|
++65|OPENHANDS_VERDICT: PASS
++66|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark evaluator tasks complete
+
+📋 Update Task List (5 tasks)
+
+Tokens: ↑ input 43.97K (total 3.34M) • cache hit 89.08% (total 81.66%) •  
+reasoning 0 (total 20.86K) • ↓ output 302 (total 46.81K) • $ (total 0.1806)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 5 done
+
+✅ 1. IMPL-EVAL-1909: verify matcher truth table
+   Notes: Truth table verified against source + tests; 6/6 rows confirmed.
+✅ 2. IMPL-EVAL-1909: verify parser guard table
+   Notes: Sibling-envelope rejection re-verified through 
+parseResourceUpdateLine.
+✅ 3. IMPL-EVAL-1909: healthStatus-blindness hypothesis check
+   Notes: Probes executed: sibling rejection, snapshot fallback, evidence 
+re-read.
+✅ 4. IMPL-EVAL-1909: run focused unit tests + static gates
+   Notes: 10/10 focused tests pass; scoped check/fmt, quality:scan, arch:check 
+all exit 0; CI 33617534840 green at evaluated head with live D-101 gate 
+evidence; artifacts and PR body verified; review threads 0.
+✅ 5. IMPL-EVAL-1909: write evaluate.md + emit verdict
+   Notes: evaluate.md committed as 90f6fa550 and pushed; summary.md written; PR 
+verdict comment posted with PASS as first line.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Post verdict comment to PR 1909
+
+$ cd /home/runner/work/netscript/netscript && gh pr comment 1909 --repo 
+rickylabs/netscript --body-file 
+/home/runner/work/_temp/openhands/33617541668-1/verdict-comment.md 2>&1 | tail 
+-2 [timeout: 60.0s]
+
+Tokens: ↑ input 44.29K (total 3.39M) • cache hit 93.65% (total 81.82%) •  
+reasoning 0 (total 20.86K) • ↓ output 100 (total 46.91K) • $ (total 0.1823)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+open /home/runner/work/_temp/openhands/33617541668-1/verdict-comment.md: no such
+file or directory
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create verdict comment file
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/33617541668-1/verdict-comment.md"
+  file_text: 
+    OPENHANDS_VERDICT: PASS
+    
+    **IMPL-EVAL — PR #1909 @ `d44fb2a6fade`** (separate-session evaluator; 
+OpenHands lane via OpenRouter `z-ai/glm-5.3-flash`; effort not attested — the 
+OpenHands adapter does not expose it). Generator: Codex `gpt-5.6-sol` (thread 
+`01a0606e-e6da-7bf1-8760-753a71eb715d`). Verdict artifact: 
+`.llm/runs/fix-aspire-event-observation--impl/evaluate.md`, committed as 
+`90f6fa550` on this branch.
+    
+    **Plan-Gate:** `PLAN-EVAL: N/A` justified and recorded pre-implementation 
+(worklog) — #1906 + brief + supervisor addenda locked API, container shapes, 
+sequencing, file scope, verification. Design checkpoint present in worklog and 
+followed by commit `8681daf77`.
+    
+    **Both PR-body blockers resolved at the evaluated head:**
+    
+    - **CI live proof (DoD box 1)** — run 33617534840 ran at head 
+`d44fb2a6fade`, conclusion success; `scaffold-runtime (aspire + docker + 
+postgres)` and `scaffold-runtime-sqlite` PASS; log shows 
+`runtime.health.listener-unreachable` executed with 
+`listener-unreachable-receipt.json` uploaded.
+    - **Separate-session IMPL-EVAL (DoD box 2)** — this pass. Both blockers' 
+boxes may be ticked at merge prep.
+    
+    **Evaluator re-runs at head (raw evidence):**
+    
+    - Focused unit tests: 10 passed / 0 failed (`resource-state-stream_test.ts` 
++ `listener-unreachable-fixture_test.ts`).
+    - Scoped `run-deno-check.ts` (141 files, 0 findings), scoped 
+`run-deno-fmt.ts` (192 files, 0 findings), `quality:scan` ok (0 findings), 
+`arch:check` exit 0 — all raw exit 0.
+    - Matcher truth table: all six rows of `matchesExpectedFailure` verified 
+against source and tests (code precedence with fail-closed on wrong/malformed 
+codes; Healthy rejected with or without matching prose; token-boundary 
+rejections; producer wordings accepted).
+    - Parser guard probed live: sibling `{resources:[postgres,…]}` envelope 
+rejected with the raw line in the error; single-resource line accepted; 
+`readListenerHealthReport` returns the real Healthy report and throws (never 
+silently undefined) on a missing health key.
+    - Non-vacuity: ceiling test requires `assertRejects` and asserts child kill;
+the snapshot path never discovers a transition (baseline health asserted 
+pre-fault, evidence re-read post-transition with real-backing continuity).
+    - No poll constant: `REPORT_DEADLINE_MS` / `REPORT_POLL_MS` / 
+`HEALTHY_WAIT_TIMEOUT_SECONDS` removed from D-101; remaining constants are 
+commented failure ceilings.
+    - Close-gate/issue hygiene: `Refs #1906`, no closing keyword, issue D-101 
+DoD box still open — correct partial-slice form. Review threads: 0 unanswered. 
+Locks: no PR-commit churn (`deno.lock` delta comes from the main-merge commits, 
+not PR commits). Debt: no new entry required.
+    
+    **Findings:** none blocking. One minor non-blocking note: the 
+`assertThrows`-covered grammar (listener-unreachable-fixture_test.ts:3–7) is not
+exercised by any product path today — harness-external, correctly reserved for 
+the follow-up adopter slice under #1906.
+    
+    **Remaining scope:** other Bucket A/C sites and the regression guard stay 
+with open boxes on #1906, per the approved slice boundary.
+    
+    _This comment was generated by an AI agent (OpenHands) on behalf of the 
+repository owner._
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 44.48K (total 3.43M) • cache hit 93.24% (total 81.97%) •  
+reasoning 0 (total 20.86K) • ↓ output 872 (total 47.78K) • $ (total 0.1844)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/33617541668-1/verdict-comment.md edited 
+with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|OPENHANDS_VERDICT: PASS
+ 2|
++3|**IMPL-EVAL — PR #1909 @ `d44fb2a6fade`** (separate-session evaluator; 
+OpenHands lane via OpenRouter `z-ai/glm-5.3-flash`; effort not attested — the 
+OpenHands adapter does not expose it). Generator: Codex `gpt-5.6-sol` (thread 
+`01a0606e-e6da-7bf1-8760-753a71eb715d`). Verdict artifact: 
+`.llm/runs/fix-aspire-event-observation--impl/evaluate.md`, committed as 
+`90f6fa550` on this branch.
++4|
++5|**Plan-Gate:** `PLAN-EVAL: N/A` justified and recorded pre-implementation 
+(worklog) — #1906 + brief + supervisor addenda locked API, container shapes, 
+sequencing, file scope, verification. Design checkpoint present in worklog and 
+followed by commit `8681daf77`.
++6|
++7|**Both PR-body blockers resolved at the evaluated head:**
++8|
++9|- **CI live proof (DoD box 1)** — run 33617534840 ran at head `d44fb2a6fade`,
+conclusion success; `scaffold-runtime (aspire + docker + postgres)` and 
+`scaffold-runtime-sqlite` PASS; log shows `runtime.health.listener-unreachable` 
+executed with `listener-unreachable-receipt.json` uploaded.
++10|- **Separate-session IMPL-EVAL (DoD box 2)** — this pass. Both blockers' 
+boxes may be ticked at merge prep.
++11|
++12|**Evaluator re-runs at head (raw evidence):**
++13|
++14|- Focused unit tests: 10 passed / 0 failed (`resource-state-stream_test.ts` 
++ `listener-unreachable-fixture_test.ts`).
++15|- Scoped `run-deno-check.ts` (141 files, 0 findings), scoped 
+`run-deno-fmt.ts` (192 files, 0 findings), `quality:scan` ok (0 findings), 
+`arch:check` exit 0 — all raw exit 0.
++16|- Matcher truth table: all six rows of `matchesExpectedFailure` verified 
+against source and tests (code precedence with fail-closed on wrong/malformed 
+codes; Healthy rejected with or without matching prose; token-boundary 
+rejections; producer wordings accepted).
++17|- Parser guard probed live: sibling `{resources:[postgres,…]}` envelope 
+rejected with the raw line in the error; single-resource line accepted; 
+`readListenerHealthReport` returns the real Healthy report and throws (never 
+silently undefined) on a missing health key.
++18|- Non-vacuity: ceiling test requires `assertRejects` and asserts child kill;
+the snapshot path never discovers a transition (baseline health asserted 
+pre-fault, evidence re-read post-transition with real-backing continuity).
++19|- No poll constant: `REPORT_DEADLINE_MS` / `REPORT_POLL_MS` / 
+`HEALTHY_WAIT_TIMEOUT_SECONDS` removed from D-101; remaining constants are 
+commented failure ceilings.
++20|- Close-gate/issue hygiene: `Refs #1906`, no closing keyword, issue D-101 
+DoD box still open — correct partial-slice form. Review threads: 0 unanswered. 
+Locks: no PR-commit churn (`deno.lock` delta comes from the main-merge commits, 
+not PR commits). Debt: no new entry required.
++21|
++22|**Findings:** none blocking. One minor non-blocking note: the 
+`assertThrows`-covered grammar (listener-unreachable-fixture_test.ts:3–7) is not
+exercised by any product path today — harness-external, correctly reserved for 
+the follow-up adopter slice under #1906.
++23|
++24|**Remaining scope:** other Bucket A/C sites and the regression guard stay 
+with open boxes on #1906, per the approved slice boundary.
++25|
++26|_This comment was generated by an AI agent (OpenHands) on behalf of the 
+repository owner._
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Post verdict comment to PR 1909
+
+$ cd /home/runner/work/netscript/netscript && gh pr comment 1909 --repo 
+rickylabs/netscript --body-file 
+/home/runner/work/_temp/openhands/33617541668-1/verdict-comment.md 2>&1 | tail 
+-2 [timeout: 60.0s]
+
+Tokens: ↑ input 45.38K (total 3.48M) • cache hit 91.38% (total 82.09%) •  
+reasoning 0 (total 20.86K) • ↓ output 100 (total 47.88K) • $ (total 0.1863)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+https://github.com/rickylabs/netscript/pull/1909#issuecomment-5508464235
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Clean scratch file and verify clean tree
+
+$ cd /home/runner/work/netscript/netscript && rm -f /tmp/impl_ver_test.ts && git
+status --porcelain && echo "tree-clean-check-done"
+
+Tokens: ↑ input 45.58K (total 3.52M) • cache hit 91.00% (total 82.21%) •  
+reasoning 0 (total 20.86K) • ↓ output 67 (total 47.95K) • $ (total 0.1882)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+tree-clean-check-done
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL complete: PASS verdict emitted for PR 1909
+
+Thought:
+The formal IMPL-EVAL session for PR #1909 is complete.
+
+**IMPL-EVAL Summary — PR #1909 @ `d44fb2a6fade`**
+
+All IMPL-EVAL protocol steps executed as a separate evaluator session (generator
+was Codex `gpt-5.6-sol`, thread `01a0606e-…715d`):
+
+- **Plan-Gate**: justified `PLAN-EVAL: N/A` recorded pre-implementation in the 
+worklog; design checkpoint present and followed by commit `8681daf77`.
+- **PR-body blockers resolved at the evaluated head**: CI run 33617534840 
+(success, at head `d44fb2a6fade`) shows `scaffold-runtime (aspire + docker + 
+postgres)` and `scaffold-runtime-sqlite` green with the live 
+`runtime.health.listener-unreachable` gate and receipt artifact; this session 
+supplied the separate-session IMPL-EVAL itself.
+- **Independent re-runs**: 10/10 focused unit tests, scoped check/fmt (0 
+findings), `quality:scan` ok, `arch:check` exit 0; matcher truth table (6/6 
+rows), live parser-guard probes (sibling-envelope rejection with raw line; 
+snapshot fallback Healthy report / throw-on-missing), non-vacuity, 
+no-poll-constant, close-gate/issue hygiene (Refs #1906, no closing keyword, 
+issue box open), lock hygiene (no PR-commit churn), debt (no entry needed), 
+review threads (0 unanswered), PR-commit isolation verified via per-commit `git 
+show --stat`.
+- **Findings**: none blocking; one minor non-blocking note (assertThrows-covered
+grammar not exercised by any product path — harness-external, reserved for the 
+follow-up adopter slice).
+- **Deliverables**: `.llm/runs/fix-aspire-event-observation--impl/evaluate.md` 
+committed as `90f6fa550` and pushed to `fix/aspire-event-observation`; summary 
+written to `/home/runner/work/_temp/openhands/33617541668-1/summary.md`; verdict
+comment posted as first-line-PASS at 
+https://github.com/rickylabs/netscript/pull/1909#issuecomment-5508464235; 
+working tree clean; no source edits, no lock churn.
+
+OPENHANDS_VERDICT: PASS
+
+Finish with message:
+Formal IMPL-EVAL completed for PR #1909 (slice 1 of issue #1906) at head 
+d44fb2a6fade. Verdict: PASS.
+
+Key actions:
+1. Read AGENTS.md first, then the harness IMPL-EVAL protocol 
+(.llm/harness/evaluator/protocol.md, verdict-definitions.md) per the 
+netscript-harness skill, with generator≠evaluator honored (generator: Codex 
+gpt-5.6-sol thread 01a0606e; evaluator: this OpenHands session, effort not 
+attested per adapter limitation).
+2. Verified plan disposition (justified PLAN-EVAL: N/A in worklog), design 
+checkpoint, commit trail (3 PR commits isolated from main-merge noise), PR body,
+labels, milestone, close-gate hygiene (Refs #1906, no closing keyword, issue 
+#1906 D-101 box still open — correct partial-slice form), lock hygiene (no 
+PR-commit deno.lock churn), debt (no entry required), and review threads (0 
+unanswered).
+3. Resolved PR-body blocker #1: CI live proof — run 33617534840 confirmed at the
+evaluated head with scaffold-runtime (aspire + docker + postgres) and 
+scaffold-runtime-sqlite green, executing runtime.health.listener-unreachable and
+uploading listener-unreachable-receipt.json.
+4. Independently re-ran gates at head: 10/10 focused unit tests, scoped 
+run-deno-check (141 files, 0 findings), scoped run-deno-fmt (192 files, 0 
+findings), quality:scan ok (0 findings), arch:check exit 0.
+5. Verified matcher truth table (6/6 rows with tests), live parser-guard probes 
+(sibling envelope rejected with raw line; readListenerHealthReport returns real 
+Healthy report, throws on missing key), non-vacuity (assertRejects ceiling test,
+snapshot never discovers transitions), and no-poll-constant removal for D-101.
+6. Deliverables: evaluate.md committed as 90f6fa550 and pushed to 
+fix/aspire-event-observation; summary.md written to 
+/home/runner/work/_temp/openhands/33617541668-1/summary.md; PASS verdict comment
+posted as the first line at PR #1909 comment 5508464235. Working tree left 
+clean; no source edits, no verdict-comment <!-- openhands- markers, no deno.lock
+changes.
+
+Verdict line: OPENHANDS_VERDICT: PASS
+
+Tokens: ↑ input 45.71K (total 3.57M) • cache hit 90.72% (total 82.31%) •  
+reasoning 0 (total 20.86K) • ↓ output 1.05K (total 49K) • $ (total 0.1906)
+
