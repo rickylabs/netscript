@@ -1,0 +1,400 @@
+Stale recommendation: refresh D-03 in `drift.md` on the next slice to point at 
+the superseding verdict.
+    
+    ## Acceptance & links
+    
+    - `Closes #1642` and `Closes #1723` present in PR body; both issues' 
+acceptance boxes are checked with evidence in the body (how-to page reachable 
+via how-to index + `xref`, confirmed in prose manifest and the prior full read 
+of the page; `doc:lint` root-scoped claim consistent with D-02/D-30; #1000 
+correctly NOT a closing target — shipped by #1748).
+    - Milestone 0.0.7; docs slice with `ci:skip-e2e` — runtime tiers N/A.
+    - Carried minor (non-gating, from the `122e00a83` verdict): the `<db>-cli` /
+`excludeFromMcp` claims in `docs/site/reference/aspire/index.md` still lack a 
+source citation; remains open for the owning wave.
+    
+    ## Remaining risks
+    
+    - The minor reference-page finding above is unresolved (recorded, advisory).
+    - D-03 text in `drift.md` is stale relative to the executed regeneration 
+(cosmetic; record-keeping only).
+    
+    Responses to review comments: no open review threads to answer. The HOLD 
+comment requested precisely this delta evaluation; this session is it.
+    
+    _This evaluation was performed by an AI agent (OpenHands) on behalf of the 
+requesting user._
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 36.51K (total 1.52M) • cache hit 0.00% (total 49.68%) •  
+reasoning 0 (total 31.48K) • ↓ output 1.31K (total 40.68K) • $ (total 0.0866)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/33592691044-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|OPENHANDS_VERDICT: PASS
+ 2|
++3|# IMPL-EVAL — PR #1771 "docs(aspire): public docs + README refresh for Aspire
+13.5 (S11)"
++4|
++5|Single-file delta evaluation of `122e00a83..d77c026f3` at immutable head 
+`d77c026f3dc1c5d5aecd325b22c2c8222b199249`, resolving the P0 from the formal 
+`FAIL_FIX` verdict recorded at `122e00a83` and the coordinator HOLD that 
+withheld the merge packet pending exactly this evaluation. Evaluator session 
+separate from all generator sessions (generator ≠ evaluator honored).
++6|
++7|## Summary
++8|
++9|The delta is exactly the required repair: one commit touching one generated 
+file (`packages/mcp/src/publish-assets.generated.ts`, 4+/4−), regenerating the 
+MCP publish assets after the S11 prose sweep. The prior verdict's single 
+required action ("run `deno task gen:publish-assets` and commit the regenerated 
+file") is executed verbatim. All generated-carrier freshness gates now pass at 
+head; no scope change, no new findings, no gate weakening.
++10|
++11|## Changes (evaluated, not authored)
++12|
++13|- Delta under evaluation: `122e00a83..d77c026f3` = 1 file, 4+/4− (generated 
+only).
++14|- Full PR surface vs merge-base `e938ecd31` (== trusted base `c53233415`, S7
+#1744): 29 files, +1396/−197; docs surface byte-identical to the PASS-carrying 
+head `503a90b9e` (`git diff --stat 503a90b9e..d77c026f3 -- docs/` is empty).
++15|
++16|## Validation (all run in this session at head `d77c026f3`)
++17|
++18|| Gate | Result | Evidence |
++19|| --- | --- | --- |
++20|| `deno task check:publish-assets` (packages/mcp) | PASS exit 0 | The P0 
+gate; stale-asset error at `122e00a83` is gone |
++21|| `deno task check:agent-docs-prose` | PASS exit 0 | 
+`{"fresh":true,"stalePaths":[]}`, `sourceCommit: 503a90b9e`, sha256 `6cd3be45…`,
+includes `pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md` 
+|
++22|| `deno task check:mcp-export-corpus` | PASS exit 0 | `sha256 2779fd30…`, 35
+packages / 272 subpaths |
++23|| `deno task docs:accuracy` | PASS exit 0 | "live Aspire scaffold pins", 200
+published source pages, 91/91 public commands |
++24|| Lock hygiene | clean | `deno.lock` absent from PR surface (`git diff 
+--name-only e938ecd31..HEAD` has no lock hit) |
++25|| Review threads | 0 open | `GET pulls/1771/comments` → 0 review comments |
++26|
++27|Environment note (not a PR defect): on this runner the gates require `env -u
+LD_LIBRARY_PATH`; with the runner's Python-toolchain `LD_LIBRARY_PATH` exported,
+`check:publish-assets` aborts with `NotCapable` spawning `deno fmt`. CI proves 
+the gates green without it; recorded so future local runs don't misread the 
+abort as staleness.
++28|
++29|## Drift disposition (D-137 / D-03)
++30|
++31|The run-artifact statement that generated files "were not regenerated" 
+(drift D-03, 2026-08-31; context-pack) was the conflict-replay ruling for the 
+D-137 un-stack onto corrected S10 — correct in its own frame, and it explicitly 
+named `check:agent-docs-prose` reporting stale as the consequence. The 
+subsequent formal `FAIL_FIX` at `122e00a83` superseded that ruling by ordering 
+regeneration of the publish carrier, and the 2026-09-02 commits (92568c7db → 
+122e00a83 → d77c026f3) execute it. This is superseded-disposition, not 
+unrecorded drift or false-done: the PR comment trail records every step (D-137 
+un-stack, IMPL-EVAL cycles 1–2, FAIL_FIX at `122e00a83`, HOLD, this delta eval).
+Stale recommendation: refresh D-03 in `drift.md` on the next slice to point at 
+the superseding verdict.
++32|
++33|## Acceptance & links
++34|
++35|- `Closes #1642` and `Closes #1723` present in PR body; both issues' 
+acceptance boxes are checked with evidence in the body (how-to page reachable 
+via how-to index + `xref`, confirmed in prose manifest and the prior full read 
+of the page; `doc:lint` root-scoped claim consistent with D-02/D-30; #1000 
+correctly NOT a closing target — shipped by #1748).
++36|- Milestone 0.0.7; docs slice with `ci:skip-e2e` — runtime tiers N/A.
++37|- Carried minor (non-gating, from the `122e00a83` verdict): the `<db>-cli` /
+`excludeFromMcp` claims in `docs/site/reference/aspire/index.md` still lack a 
+source citation; remains open for the owning wave.
++38|
++39|## Remaining risks
++40|
++41|- The minor reference-page finding above is unresolved (recorded, advisory).
++42|- D-03 text in `drift.md` is stale relative to the executed regeneration 
+(cosmetic; record-keeping only).
++43|
++44|Responses to review comments: no open review threads to answer. The HOLD 
+comment requested precisely this delta evaluation; this session is it.
++45|
++46|_This evaluation was performed by an AI agent (OpenHands) on behalf of the 
+requesting user._
++47|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write evaluator artifact evaluate.md in run dir
+
+Reasoning:
+Now write the evaluator artifact evaluate.md in the run directory. Wait — the 
+evaluator protocol says the evaluator writes evaluate.md. But the task says "Do 
+not edit files, create commits, push, or repair findings." Writing a new run 
+artifact file... The trigger says "Do not edit files, create commits, push". 
+Creating evaluate.md in .llm/runs/ is writing a file in the repo. The workflow 
+auto-commits run artifacts under .llm/tmp/run/openhands/ and .llm/runs/ — per 
+the operational contract: "The workflow does NOT push source changes for you; it
+only commits run artifacts under .llm/tmp/run/openhands/ and .llm/runs/."
+
+So the workflow commits .llm/runs/ artifacts automatically. Writing evaluate.md 
+there is the protocol-prescribed evaluator output and will be picked up by the 
+workflow's auto-commit. It's not "editing files" in the source sense — it's the 
+evaluator's own artifact, explicitly sanctioned by the harness protocol 
+("Evaluator writes evaluate.md"). The task instruction "Do not edit files, 
+create commits, push, or repair findings" means don't repair the PR (fix 
+findings), don't create commits manually, don't push. The run artifact is the 
+evaluator's deliverable. I'll write it.
+
+Hmm, but should I? The trigger contract says never defer writing; also the 
+harness says evaluator writes evaluate.md in the run dir. I'll write a concise 
+evaluate.md. If the workflow auto-commits it, fine; if not, it's preserved in 
+the artifact. It's clearly within the evaluator's mandate.
+
+Thought:
+Now the evaluator artifact in the run directory (the workflow auto-commits 
+`.llm/runs/` artifacts):
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: 
+"/home/runner/work/netscript/netscript/.llm/runs/docs-aspire-13-5-s11-public-doc
+s-refresh--impl/evaluate.md"
+  file_text: 
+    # evaluate.md — IMPL-EVAL (separate session, delta scope)
+    
+    - **PR:** rickylabs/netscript#1771 — docs(aspire): public docs + README 
+refresh for Aspire 13.5 (S11)
+    - **Evaluated head:** `d77c026f3dc1c5d5aecd325b22c2c8222b199249` (immutable 
+trigger head; == branch tip)
+    - **Trusted base / merge-base with main:** `e938ecd31` == `c53233415` 
+(#1744, S7)
+    - **Delta scope:** `122e00a83..d77c026f3` — 1 file, 4+/4−, 
+`packages/mcp/src/publish-assets.generated.ts` (generated only)
+    - **Session separation:** generator ≠ evaluator; this session is the fresh 
+supervisor-dispatched evaluator requested by the 2026-09-02 HOLD comment, 
+following the formal `FAIL_FIX` at `122e00a83` and the PASS chain through 
+`503a90b9e` (five delta cycles).
+    - **Verdict: PASS**
+    
+    ## Resolution of the outstanding P0
+    
+    `FAIL_FIX` at `122e00a83` required one action: run `deno task 
+gen:publish-assets` and commit the regenerated carrier. Commit `d77c026f3` is 
+exactly that. Gate evidence at head:
+    
+    - `deno task check:publish-assets` → exit 0 (runner requires `env -u 
+LD_LIBRARY_PATH`; CI green without).
+    - `deno task check:agent-docs-prose` → exit 0, 
+`{"fresh":true,"stalePaths":[]}`, `sourceCommit: '503a90b9e'`, sha256 
+`6cd3be45…0e99d3`; manifest includes the new detached-start page.
+    - `deno task check:mcp-export-corpus` → exit 0.
+    - `deno task docs:accuracy` → exit 0 ("live Aspire scaffold pins").
+    
+    Staleness markers resolved: 
+`packages/mcp/src/publish-assets.generated.ts:78` now pins `sourceCommit: 
+'503a90b9e'`; zero `.NET Aspire` occurrences in the embedded corpus; zero 
+`d38158176` pins remain.
+    
+    ## Carry integrity
+    
+    Docs surface byte-identical to PASS-carrying head `503a90b9e` (`git diff 
+--stat 503a90b9e..d77c026f3 -- docs/` empty). PR surface: 29 files, +1396/−197; 
+`deno.lock` untouched. Zero open review threads.
+    
+    ## Drift ruling (D-137 / D-03)
+    
+    The "generated files were not regenerated" disposition (drift D-03, 
+2026-08-31) was the conflict-replay ruling for the D-137 un-stack onto corrected
+S10, and it explicitly recorded the resulting stale `check:agent-docs-prose` as 
+its known consequence. The later formal `FAIL_FIX` at `122e00a83` superseded 
+that ruling by ordering regeneration; commits `92568c7db` → `122e00a83` → 
+`d77c026f3` execute it and every step is on the PR comment trail. Classified as 
+**superseded-disposition**, not unrecorded drift and not false-done. 
+Housekeeping (non-blocking): refresh D-03 in `drift.md` to reference the 
+superseding verdict on the next slice.
+    
+    ## Acceptance & false-done checks
+    
+    - `Closes #1642`, `Closes #1723` in PR body; #1000 correctly excluded 
+(shipped by #1748).
+    - Both issues' acceptance boxes evidenced in the body; detached-start how-to
+present in the prose manifest and `xref`-linked (per prior full read at 
+`9d6afebfd..503a90b9e`).
+    - No gate weakening: delta contains no checker/test edits. No lock churn. 
+Milestone 0.0.7, docs slice, `ci:skip-e2e` — runtime tiers N/A.
+    
+    ## Findings
+    
+    | Sev | Finding | Action |
+    | --- | --- | --- |
+    | Minor | `<db>-cli` / `excludeFromMcp` claims in 
+`docs/site/reference/aspire/index.md` still lack a source citation (carried from
+`122e00a83` verdict) | Owning wave to cite or correct |
+    | Housekeeping | D-03 text stale vs executed regeneration | Refresh on next 
+slice |
+    
+    ## Verdict
+    
+    PASS — the merge packet's HOLD condition is satisfied by this evaluation; 
+coordinator may restore `status:ready-merge`.
+    
+    _This evaluation was performed by an AI agent (OpenHands) on behalf of the 
+requesting user._
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 37.83K (total 1.56M) • cache hit 89.16% (total 50.63%) •  
+reasoning 329 (total 31.81K) • ↓ output 1.46K (total 42.14K) • $ (total 0.0878)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File 
+/home/runner/work/netscript/netscript/.llm/runs/docs-aspire-13-5-s11-public-docs
+-refresh--impl/evaluate.md edited with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# evaluate.md — IMPL-EVAL (separate session, delta scope)
+ 2|
++3|- **PR:** rickylabs/netscript#1771 — docs(aspire): public docs + README 
+refresh for Aspire 13.5 (S11)
++4|- **Evaluated head:** `d77c026f3dc1c5d5aecd325b22c2c8222b199249` (immutable 
+trigger head; == branch tip)
++5|- **Trusted base / merge-base with main:** `e938ecd31` == `c53233415` (#1744,
+S7)
++6|- **Delta scope:** `122e00a83..d77c026f3` — 1 file, 4+/4−, 
+`packages/mcp/src/publish-assets.generated.ts` (generated only)
++7|- **Session separation:** generator ≠ evaluator; this session is the fresh 
+supervisor-dispatched evaluator requested by the 2026-09-02 HOLD comment, 
+following the formal `FAIL_FIX` at `122e00a83` and the PASS chain through 
+`503a90b9e` (five delta cycles).
++8|- **Verdict: PASS**
++9|
++10|## Resolution of the outstanding P0
++11|
++12|`FAIL_FIX` at `122e00a83` required one action: run `deno task 
+gen:publish-assets` and commit the regenerated carrier. Commit `d77c026f3` is 
+exactly that. Gate evidence at head:
++13|
++14|- `deno task check:publish-assets` → exit 0 (runner requires `env -u 
+LD_LIBRARY_PATH`; CI green without).
++15|- `deno task check:agent-docs-prose` → exit 0, 
+`{"fresh":true,"stalePaths":[]}`, `sourceCommit: '503a90b9e'`, sha256 
+`6cd3be45…0e99d3`; manifest includes the new detached-start page.
++16|- `deno task check:mcp-export-corpus` → exit 0.
++17|- `deno task docs:accuracy` → exit 0 ("live Aspire scaffold pins").
++18|
++19|Staleness markers resolved: 
+`packages/mcp/src/publish-assets.generated.ts:78` now pins `sourceCommit: 
+'503a90b9e'`; zero `.NET Aspire` occurrences in the embedded corpus; zero 
+`d38158176` pins remain.
++20|
++21|## Carry integrity
++22|
++23|Docs surface byte-identical to PASS-carrying head `503a90b9e` (`git diff 
+--stat 503a90b9e..d77c026f3 -- docs/` empty). PR surface: 29 files, +1396/−197; 
+`deno.lock` untouched. Zero open review threads.
++24|
++25|## Drift ruling (D-137 / D-03)
++26|
++27|The "generated files were not regenerated" disposition (drift D-03, 
+2026-08-31) was the conflict-replay ruling for the D-137 un-stack onto corrected
+S10, and it explicitly recorded the resulting stale `check:agent-docs-prose` as 
+its known consequence. The later formal `FAIL_FIX` at `122e00a83` superseded 
+that ruling by ordering regeneration; commits `92568c7db` → `122e00a83` → 
+`d77c026f3` execute it and every step is on the PR comment trail. Classified as 
+**superseded-disposition**, not unrecorded drift and not false-done. 
+Housekeeping (non-blocking): refresh D-03 in `drift.md` to reference the 
+superseding verdict on the next slice.
++28|
++29|## Acceptance & false-done checks
++30|
++31|- `Closes #1642`, `Closes #1723` in PR body; #1000 correctly excluded 
+(shipped by #1748).
++32|- Both issues' acceptance boxes evidenced in the body; detached-start how-to
+present in the prose manifest and `xref`-linked (per prior full read at 
+`9d6afebfd..503a90b9e`).
++33|- No gate weakening: delta contains no checker/test edits. No lock churn. 
+Milestone 0.0.7, docs slice, `ci:skip-e2e` — runtime tiers N/A.
++34|
++35|## Findings
++36|
++37|| Sev | Finding | Action |
++38|| --- | --- | --- |
++39|| Minor | `<db>-cli` / `excludeFromMcp` claims in 
+`docs/site/reference/aspire/index.md` still lack a source citation (carried from
+`122e00a83` verdict) | Owning wave to cite or correct |
++40|| Housekeeping | D-03 text stale vs executed regeneration | Refresh on next 
+slice |
++41|
++42|## Verdict
++43|
++44|PASS — the merge packet's HOLD condition is satisfied by this evaluation; 
+coordinator may restore `status:ready-merge`.
++45|
++46|_This evaluation was performed by an AI agent (OpenHands) on behalf of the 
+requesting user._
++47|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+Both deliverables are written. Emitting the verdict:
+
+**Evaluation complete.** This session was the single-file delta IMPL-EVAL that 
+the coordinator's HOLD explicitly withheld the merge packet for — scoped exactly
+to `122e00a83..d77c026f3` (one commit, one generated file, 4+/4−).
+
+**Key findings:**
+
+1. **The P0 is remediated.** The formal `FAIL_FIX` at `122e00a83` required one 
+action — regenerate `packages/mcp/src/publish-assets.generated.ts`. Commit 
+`d77c026f3` is exactly that, and `deno task check:publish-assets` now exits 0 at
+head. Staleness markers confirmed resolved: `sourceCommit` now pins `503a90b9e`,
+zero `.NET Aspire` in the embedded corpus.
+
+2. **Carry is intact.** The docs surface is byte-identical to the PASS-carrying 
+head `503a90b9e`; all sibling carrier gates green in this session 
+(`check:agent-docs-prose` → `fresh:true`, `check:mcp-export-corpus`, 
+`docs:accuracy`). `deno.lock` untouched; zero open review threads.
+
+3. **The D-137 tension resolves as superseded-disposition, not unrecorded 
+drift.** The "not regenerated" text was the conflict-replay ruling (which itself
+predicted the staleness), and the later FAIL_FIX formally superseded it — with 
+every step on the PR comment trail. No false-done: the generator's worklog 
+explicitly deferred acceptance to this fresh evaluator.
+
+4. **Environment caveat recorded:** this runner needs `env -u LD_LIBRARY_PATH` 
+for the generator-backed gates (`NotCapable` spawning `deno fmt` otherwise); CI 
+proves them green without it.
+
+**Validation:** all four gates run in-session at head, exit 0.
+
+Deliverables written: summary at `OPENHANDS_SUMMARY_PATH` 
+(`/home/runner/work/_temp/openhands/33592691044-1/summary.md`) and the evaluator
+artifact at 
+`.llm/runs/docs-aspire-13-5-s11-public-docs-refresh--impl/evaluate.md` (workflow
+commits run artifacts).
+
+OPENHANDS_VERDICT: PASS
+
+Tokens: ↑ input 39.03K (total 1.6M) • cache hit 85.60% (total 51.49%) •  
+reasoning 1 (total 31.81K) • ↓ output 483 (total 42.62K) • $ (total 0.0888)
+
