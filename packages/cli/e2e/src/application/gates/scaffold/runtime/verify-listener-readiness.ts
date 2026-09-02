@@ -22,6 +22,22 @@ export function readListenerHealthReport(
   return report;
 }
 
+/**
+ * Look up one named report without failing when it is absent.
+ *
+ * A report that has not been published *yet* is not the same as one that will never appear. Wait
+ * loops need the first case to mean "keep waiting"; `readListenerHealthReport` throws for both,
+ * which turned a transient absence into a fatal error inside a loop written to tolerate it.
+ */
+export function findListenerHealthReport(
+  topology: unknown,
+  resourceName: string,
+  healthCheckKey: string,
+): ListenerHealthReport | undefined {
+  return readListenerHealthReports(topology, resourceName)
+    .find((candidate) => candidate.healthCheckKey === healthCheckKey);
+}
+
 /** Read every named report on one described resource, retaining diagnostic payloads. */
 export function readListenerHealthReports(
   topology: unknown,

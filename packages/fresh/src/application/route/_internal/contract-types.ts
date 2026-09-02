@@ -21,7 +21,6 @@ import type {
   SchemaParseResult,
   SearchParamInput,
   SearchParamSchema,
-  Simplify,
   ValidatedRouteHref,
 } from '../../builders/define-page/types.ts';
 import type { SchemaObjectOutput } from '../schema-output.ts';
@@ -77,9 +76,9 @@ type InferRoutePatternSegment<TSegment extends string> = TSegment extends `[[...
   : TSegment extends `[${infer TParam}]` ? { [TKey in TParam]: string }
   : EmptySegment;
 
-type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? EmptyRecord
+type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? EmptySegment
   : TPattern extends `${infer TSegment}/${infer TRest}`
-    ? Simplify<InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest>>
+    ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest> & EmptySegment
   : InferRoutePatternSegment<TPattern>;
 
 export type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
