@@ -12,7 +12,7 @@
 
 ## Current State
 
-S1 RED is reproduced: the package-configured TSX test reports exactly three TS2322 diagnostics for input/select/textarea, all caused by `ControlProps.role`. PLAN-EVAL is justified N/A; mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
+S1 is GREEN: after the three-diagnostic RED proof, `ControlProps.role` derives from Preact's intrinsic HTML role type and the input/select/textarea consumer compiles. All scoped S1 GREEN gates exit 0. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
 
 ## Completed
 
@@ -21,16 +21,16 @@ S1 RED is reproduced: the package-configured TSX test reports exactly three TS23
 - Locked role derivation, Zod mappings, exclusive-bound behavior, slices, gates, and ceiling.
 - Opened draft PR #1960 with requested labels and 0.0.7 milestone.
 - Added and ran the independent S1 RED probe.
+- Implemented and validated S1 GREEN; 82 scoped tests pass.
 
 ## In Progress
 
-- S1 GREEN intrinsic-compatible role type.
+- S2 RED exact locked-family five-field constraint probe.
 
 ## Next Steps
 
-1. Land S1 GREEN and prove the TSX consumer compiles.
-2. Land S2 RED; proceed only if the exact locked family fails as expected, then S2 GREEN.
-3. Run S3/full gates and hand off to the separate evaluator without self-certification.
+1. Land S2 RED; proceed only if the exact locked family fails as expected, then S2 GREEN.
+2. Run S3/full gates and hand off to the separate evaluator without self-certification.
 
 ## Key Decisions
 
@@ -46,15 +46,16 @@ S1 RED is reproduced: the package-configured TSX test reports exactly three TS23
 | --- | --- | --- |
 | `.llm/runs/fix-form-control-props-zod4--0.0.7/*` | new | Harness activation, research, plan, worklog, context, drift. |
 | `packages/fresh/src/application/form/control-props-element-assignability_test.tsx` | new | S1 TSX consumer RED probe. |
+| `packages/fresh/src/application/form/_internal/prop-types.ts` | changed | Intrinsic-derived `role` property type. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Expected RED | Check/test exit 1 on three TS2322 diagnostics; lint/fmt exit 0. |
-| Fitness | PASS at S1 RED | `quality:gate` exit 0; final JSR/doc gates remain planned. |
+| Static | PASS at S1 GREEN | Focused check plus scoped check/test/lint/fmt exit 0; 82 tests. |
+| Fitness | PASS at S1 GREEN | `quality:gate` exit 0; final JSR/doc gates remain planned. |
 | Runtime | N/A | No runtime/browser workflow change. |
-| Consumer | RED reproduced | Input/select/textarea all fail on `role`; GREEN pending. |
+| Consumer | PASS | Input/select/textarea spreads compile without casts after RED proof. |
 
 ## Open Questions
 

@@ -60,6 +60,8 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | 2026-09-02T23:12Z | 0 | Pre-push gates | Scoped check/test/lint/fmt and `quality:gate` all exited 0; 81 tests passed. Existing doctrine warnings were advisory and outside this slice. |
 | 2026-09-02T23:16Z | S1 RED | Probe | Package-configured check exited 1 with exactly three TS2322 diagnostics; all three intrinsic controls fail only on `role`. |
 | 2026-09-02T23:16Z | S1 RED | Pre-push gates | Expected RED: check=1, test=1 (type-check); lint=0, fmt=0, quality=0. Lock unchanged. |
+| 2026-09-02T23:18Z | S1 GREEN | Implementation | `ControlProps.role` now derives from `JSX.HTMLAttributes<HTMLElement>['role']`; focused consumer check exits 0. |
+| 2026-09-02T23:18Z | S1 GREEN | Pre-push gates | check=0, test=0 (82 passed), lint=0, fmt=0, quality=0. Lock unchanged. |
 
 ## Decisions
 
@@ -104,7 +106,7 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Preact intrinsic elements | NOT_RUN | S1 RED/GREEN | Pending. |
+| Preact intrinsic elements | PASS | Focused package-configured check exit 0; scoped check exit 0 | Input/select/textarea spreads compile without casts. |
 
 ### S1 RED raw probe
 

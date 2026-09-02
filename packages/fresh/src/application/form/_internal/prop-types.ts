@@ -1,3 +1,5 @@
+import type { JSX } from 'preact';
+
 /** Props applied to the root form element. */
 export interface FormElementProps {
   /** Additional standard, ARIA, data, or framework attributes for the form element. */
@@ -163,7 +165,7 @@ export interface ControlProps {
   /** Associated datalist id. */
   readonly list?: string;
   /** Optional ARIA role. */
-  readonly role?: string;
+  readonly role?: JSX.HTMLAttributes<HTMLElement>['role'];
   /** Optional tab order. */
   readonly tabIndex?: number;
   /** Field path diagnostic marker. */
