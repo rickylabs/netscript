@@ -1,0 +1,400 @@
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 43.72K (total 3.9M) • cache hit 81.98% (total 78.54%) •  
+reasoning 0 (total 68.69K) • ↓ output 2.25K (total 103.92K) • $ (total 0.2455)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/33636102569-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary — PR #1930 (fix(sdk): guard desktop fixture oRPC contract
+import)
+ 2|
++3|## OPENHANDS_VERDICT: FAIL_FIX
++4|
++5|**Head under evaluation:** 45fbef54e360181d86358d91523e6a5467257ed0 · Trusted
+base:
++6|13bb9415e7f41ba24239940d17b8e7ad1162889c (= merge of #1923, one commit after 
+the run's merge-base
++7|37452f11f5045f0f5a98e07d802bcc2a2e94333b). Branch head f8df31782 ("fix(e2e): 
+make the desktop
++8|fixture import-map guard actually detect the defect") post-dates the trigger 
+head; it was verified
++9|separately in throwaway worktrees and via CI read-back and does not change 
+the verdict.
++10|
++11|## Summary
++12|
++13|IMPL-EVAL for the desktop-fixture @orpc/contract repair (issue #1926), 
+Archetype 6, no overlays.
++14|The implementation is functionally correct, runtime-accepted at both heads, 
+lock-clean, and
++15|doctrine-clean. What blocks PASS is run-artifact bookkeeping: the 
+worklog/context-pack gate tables
++16|still say "pending" at the head that would merge, and the 
+plan-vs-implementation drift (including
++17|the vacuous first guard) is unrecorded. Verdict FAIL_FIX per 
+verdict-definitions.md. Reasoning
++18|effort is NOT attested (OpenHands adapter limitation) — no max claim is 
+made.
++19|
++20|## What this evaluator measured (not accepted from prose)
++21|
++22|**Guard correctness (the heart of the fix)**
++23|
++24|- Positive at evaluated head: `deno task check:desktop-native-fixture` at 
+45fbef54e → exit 0
++25|  ("satisfies 14 reachable SDK modules; 0 unmapped specifiers").
++26|- Non-vacuity at evaluated head: removing '@orpc/contract' from the 
+PREPARED-map synthesis in
++27|  fixture-workspace.ts → exit 1; restored → exit 0. The checked-in map alone
+is discarded by
++28|  prepareDesktopFixture, so only the prepared-map probe is decisive there.
++29|- Non-vacuity at f8df31782: removing '@orpc/contract' from the committed 
+fixture map
++30|  (packages/cli/e2e/fixtures/desktop-native/deno.json) → exit 1, naming
++31|  `@orpc/contract — imported by 
+packages/sdk/src/internal/client-contributions/stable-v1-adapter.ts`;
++32|  restored → exit 0. Novel-specifier probe: `import probe from 
+"@netscript/nonexistent-probe";`
++33|  in packages/sdk/src/desktop/mod.ts → exit 1 naming it; restored → exit 0.
++34|- All probes ran in throwaway worktrees; evaluated tree left pristine
++35|  (git status --porcelain = 0, deno.lock untouched, worktrees removed). A 
+first probe attempt that
++36|  used a side-effect-only import exited 0 and is recorded as a guard-regex 
+calibration limitation
++37|  (LOW), not as a guard pass.
++38|
++39|**Static** — deno check / fmt --check / lint on the changed driver at 
+f8df31782: exit 0 each.
++40|Root `deno.json` `check.dependencies` includes 
+`check:desktop-native-fixture`; the required
++41|check-test lane ran green at f8df31782.
++42|
++43|**Runtime** — desktop-native-linux (deb + signed updater) SUCCESS at exactly
+45fbef54e (run
++44|33636093184, head verified on the run object, not the rollup) and SUCCESS at
+f8df31782 (run
++45|33638728013). This resolves the prior attempt's blocking runtime-evidence 
+finding.
++46|
++47|**Hygiene/scope** — deno.lock diff vs base and vs origin/main: 0 lines. 
+transport-policy.ts
++48|untouched (no #1889 rollback). No plugins surface. No doctrine debt delta 
+(arch-debt.md unchanged).
++49|
++50|**PR-diff correctness** — the three-dot PR diff
++51|(git diff $(git merge-base 13bb9415e 45fbef54e)...45fbef54e --name-only) 
+contains no workflow
++52|files: only the eight run-dir artifacts, deno.json, and the three 
+fixture/guard files. The prior
++53|attempt's "queue: max reversion" finding was a two-dot diff artifact of 
+comparing against #1923's
++54|own merge commit and is WITHDRAWN.
++55|
++56|## Findings (severity-ranked)
++57|
++58|1. HIGH — Run-artifact gate records are stale at the evaluated head and 
+remain stale at f8df31782:
++59|   worklog.md "## Gate Results" says "Pending implementation." (Progress 
+also still lists slice 0 as
++60|   pending), and context-pack.md "## Gates" lists 
+Static/Fitness/Runtime/Consumer all "pending /
++61|   implementation not started". The evidence exists (CI runs above; guard 
+probes) but a resume or
++62|   audit gets none of it from the artifacts, failing the last PASS criterion
+in
++63|   verdict-definitions.md ("docs and run artifacts are updated enough for 
+resume"). Required: one
++64|   commit on the branch backfilling measured evidence into worklog.md Gate 
+Results and
++65|   context-pack.md Gates (guard probe results, static gates, run IDs/SHAs) 
+and correcting the
++66|   Progress line.
++67|2. MEDIUM — Plan-vs-implementation drift is unrecorded: plan.md validation 
+rows specify guard
++68|   semantics the shipped guard contradicts (delete-from-checked-in-map probe
+and `deno check`
++69|   orchestration; the staged map is synthesized from the workspace root and 
+the checked-in map is
++70|   discarded; the shipped guard asserts fixture-map coverage directly). 
+Neither plan.md nor drift.md
++71|   records the design change, and the vacuous first guard attempt (exit 0 
+both sides, per
++72|   45fbef54e's own commit message, fixed by f8df31782) is not recorded 
+anywhere in the run
++73|   artifacts. Required: update the plan rows or add a drift.md entry, 
+including the vacuous-guard
++74|   history.
++75|3. LOW (non-blocking) — Guard regex scans value-import `from` forms only; 
+side-effect-only bare
++76|   imports (`import "x"`) are invisible to it (evaluator probe: exit 0). 
+#1926's defect class is
++77|   covered; candidate hardening slice, not this repair.
++78|4. LOW (non-blocking) — Tier-A slice-review receipt is not recorded in run 
+artifacts;
++79|   supervisor.md records the review mechanism (cloud evaluator automation + 
+ci:full at
++80|   ready-for-review), so this is a recording gap only.
++81|5. INFO — Close-gate run 33638727913 FAIL on #1930 (unticked PR-body DoD 
+boxes) is expected at this
++82|   stage, not a defect. Tick the boxes only after findings 1–2 land and with
+run links; then
++83|   status:ready-merge per netscript-pr. Issue #1926's main-branch-run 
+criterion stays open until
++84|   post-merge by construction.
++85|6. INFO — Base-relatedness: 13bb9415e is a sibling of the head's merge base 
+(37452f11f), not an
++86|   ancestor; the only separating commit (#1923) touches two workflow files, 
+a workflow test, and
++87|   run artifacts — zero overlap with this branch's changed surface, so the 
+trusted base remains
++88|   valid for protocol reading and for evaluating the change.
++89|
++90|## Acceptance criteria (issue #1926)
++91|
++92|4 of 5 evidenced at head (root cause statement, green desktop-native-linux 
+run on a main-facing
++93|branch carrying #1889 at 45fbef54e and re-proven at f8df31782, fix confined 
+to the packaging/import
++94|surface, scheduling recommendation recorded). The main-branch-run criterion 
+cannot exist pre-merge
++95|and is correctly left open; the close-gate FAIL on #1930 reflects exactly 
+that.
++96|
++97|## PLAN-EVAL verdict check
++98|
++99|FAIL_PLAN was considered and rejected: plan.md is complete and sound, 
+PLAN-EVAL: N/A is justified
++100|in D4 and logged in worklog slice 0, and the implementation matches the 
+plan's contract. The defects
++101|found are implementation-of-artifacts (stale gate tables, unrecorded 
+drift), not plan defects, so
++102|the verdict vocabulary maps them to FAIL_FIX, not FAIL_PLAN.
++103|
++104|## Changes
++105|
++106|None — evaluator session (measurement-only). Deliverables: this summary,
++107|.llm/runs/desktop-orpc-contract-dep--impl/evaluate.md (full evaluation), 
+and the PR verdict comment.
++108|No push (evaluators do not push); the generator's bookkeeping commit 
+(findings 1–2) is the required
++109|follow-up.
++110|
++111|## Responses to review comments or issue comments
++112|
++113|- Prior evaluator attempt (same run, FAIL_FIX): its runtime-evidence 
+finding is resolved by run
++114|  33636093184 SUCCESS at exactly 45fbef54e; its "queue: max reversion" 
+finding is withdrawn after
++115|  three-dot diff verification; its plan-eval.md-absent and 
+slice-review-receipt findings are carried
++116|  (the latter as LOW-4).
++117|- Generator packet (2026-09-02T13:55Z): claims re-measured and hold; its 
+open item "exact-head run
++118|  at f8df31782 should be read before merge" is resolved (run 33638728013 
+SUCCESS).
++119|- Close-gate: expected while DoD boxes are unticked; tick only after 
+findings 1–2 land, with run
++120|  links, then status:ready-merge per netscript-pr.
++121|
++122|## Remaining risks
++123|
++124|- Guard regex calibration gap for side-effect-only bare imports (LOW; 
+hardening slice candidate).
++125|- Main-branch desktop-native run remains open until post-merge, per the 
+issue.
++126|- Drift record gaps (findings 1–2) must be closed by the generator before 
+ready-merge; until then a
++127|  resume from run artifacts alone would understate the run's actual gate 
+status.
++128|
++129|## Run metadata
++130|
++131|Evaluator: OpenHands IMPL-EVAL, model openrouter/z-ai/glm-5.3-flash 
+(OpenRouter), 2026-09-02,
++132|run ID desktop-orpc-contract-dep--impl. Full evidence tables in evaluate.md
+(same directory as the
++133|run's plan/worklog/context-pack).
++134|
++135|OPENHANDS_VERDICT: FAIL_FIX
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify verdict lines and pristine tree state
+
+Reasoning:
+Both deliverables written. Final consistency check: verify the two verdict lines
+match (FAIL_FIX in both), exactly one line each, no decoration. Quick grep to 
+confirm verdict lines and their count in each file, plus confirm the verdict 
+appears once per file. Also verify no lingering modifications in the repo tree 
+(evaluate.md is a NEW untracked file in .llm/runs — that's a run-dir 
+deliverable; fine per repo conventions; the workflow commits run artifacts).
+
+One check: `git status --porcelain` will now show the untracked evaluate.md. 
+That's expected (deliverable in .llm/runs, which is tracked context per 
+AGENTS.md rule 7). The workflow commits `.llm/tmp/run/openhands/` and 
+`.llm/runs/` artifacts itself, per the operational contract ("it only commits 
+run artifacts under .llm/tmp/run/openhands/ and .llm/runs/"). So my uncommitted 
+evaluate.md will be picked up by the workflow's artifact commit. Good — and per 
+the operational contract, as an evaluator I don't push source changes; 
+evaluate.md is a run artifact, not source.
+
+Final verification command: grep verdict lines in both files + git status. Then 
+finish with the final response containing the verdict line FIRST, then summary, 
+ending with exactly one verdict line? The instruction: "End with exactly one 
+supported verdict line" — final response should END with the verdict line. My 
+final message must contain the verdict line exactly once (as the last line) — 
+the same token FAIL_FIX. The summary file has it twice (top heading area + 
+bottom). Hmm — instruction says "in BOTH your summary file and your verdict 
+comment — as the FIRST line of the verdict comment". It doesn't forbid 
+repetition within the summary; the earlier example summary also had it twice 
+(line 37 end + presumably). Actually the pre-existing summary had it once at 
+end. Having it twice in summary.md is slightly redundant; the machine-extraction
+may take first or last occurrence. Top says "## OPENHANDS_VERDICT: FAIL_FIX" — a
+markdown heading containing the token; bottom has the bare line. Both are the 
+same token so either extraction gets FAIL_FIX. Keep it — top for human 
+visibility, bottom as the canonical bare line.
+
+For evaluate.md: verdict line appears once at the end. Good.
+
+PR comment: I can't post comments with available tools (no gh write / no github 
+API access). The adapter handles posting. My final response message will carry 
+the verdict line first and last... Instruction: final response should END with 
+exactly one verdict line. And verdict comment first line = verdict. My final 
+assistant message IS the verdict comment source. So: put the verdict as the LAST
+line (per "End with exactly one supported verdict line") — and the adapter will 
+format the comment. To satisfy "first line of the verdict comment" I'd want it 
+first too... The adapter writes the summary's verdict or my message's verdict 
+line. Safer: make my final message START with the verdict line AND end with it? 
+"End with exactly one supported verdict line" — ending with it. But the 
+comment-first-line rule suggests the comment (my message) should have it first. 
+A single line can't be both first and last unless the message is just that line.
+The summary.md has it both top and bottom; my message: start with verdict line, 
+end with verdict line? That risks "exactly one" violation (two occurrences). 
+Hmm.
+
+The instruction for the trigger says: emit exactly one line of that form in BOTH
+your summary file and your verdict comment — as the FIRST line of the verdict 
+comment. So: summary file: one (canonical) line. My final message (the verdict 
+comment): verdict as FIRST line. "End with exactly one supported verdict line" 
+from the base prompt describes the overall reply ending. To satisfy both: 
+verdict as first line of my final message, and I'll also close the message body 
+before a final standalone verdict line... that's two occurrences again.
+
+Resolution: the summary.md holds the canonical "## OPENHANDS_VERDICT: FAIL_FIX" 
+heading + final bare line (the earlier workflow example had exactly that pattern
+— heading near top, bare line at end — and it was accepted as the previous 
+attempt's summary format). For my final message: verdict line FIRST (matching 
+"as the FIRST line of the verdict comment"), and the message otherwise prose. 
+The "end with verdict line" and "first line" rules conflict; the trigger's 
+explicit rule ("as the FIRST line of the verdict comment") wins, and since my 
+whole message is the comment, starting with it satisfies the strongest 
+constraint. The adapter extracts the token, not the position. I'll open with the
+verdict line and not repeat it at the end — wait, "End with exactly one 
+supported verdict line" is quite explicit in the harness skill... but the 
+trigger overrides: "one token from PASS|FAIL_..., alone on its own line ... in 
+BOTH your summary file and your verdict comment — as the FIRST line of the 
+verdict comment". First-line rule is more specific. I'll start the message with 
+the verdict line. If the harness also wants it at the end, the summary file 
+carries the bottom line. Actually to be maximally safe, many of these harnesses 
+regex-search the whole message for ^OPENHANDS_VERDICT: — one occurrence is 
+cleanest for the comment. Start with it. Done.
+
+Quick final check of the two files' verdict lines then finish.
+
+Thought:
+Both deliverables are in place. Final consistency verification:
+
+$ echo "=== evaluate.md verdict ==="; grep -n "OPENHANDS_VERDICT" 
+/home/runner/work/netscript/netscript/.llm/runs/desktop-orpc-contract-dep--impl/
+evaluate.md; echo "=== summary.md verdict ==="; grep -n "OPENHANDS_VERDICT" 
+/home/runner/work/_temp/openhands/33636102569-1/summary.md; echo "=== repo tree 
+state (only run-dir deliverable expected untracked) ==="; git status 
+--porcelain; echo "=== worktrees ==="; git worktree list
+
+Tokens: ↑ input 46.01K (total 3.95M) • cache hit 77.90% (total 78.53%) •  
+reasoning 1.12K (total 69.82K) • ↓ output 1.28K (total 105.2K) • $ (total 
+0.2488)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+=== evaluate.md verdict ===
+121:OPENHANDS_VERDICT: FAIL_FIX
+=== summary.md verdict ===
+3:## OPENHANDS_VERDICT: FAIL_FIX
+135:OPENHANDS_VERDICT: FAIL_FIX
+=== repo tree state (only run-dir deliverable expected untracked) ===
+?? .llm/runs/desktop-orpc-contract-dep--impl/evaluate.md
+=== worktrees ===
+/home/runner/work/netscript/netscript 45fbef54e (detached HEAD)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL FAIL_FIX verdict delivered with evidence
+
+Finish with message:
+## IMPL-EVAL complete — verdict: FAIL_FIX
+
+Formal IMPL-EVAL for PR #1930 (`fix(sdk): guard desktop fixture oRPC contract 
+import`, issue #1926) is complete at the evaluated head `45fbef54e`, trusted 
+base `13bb9415e`.
+
+**Verdict: FAIL_FIX** — the implementation is functionally correct, 
+runtime-accepted at both heads, lock-clean, and doctrine-clean; PASS is blocked 
+by run-artifact bookkeeping (protocol rule 14):
+- HIGH: worklog "Gate Results" says "Pending implementation" and context-pack 
+Gates are all "pending" at the evaluated head **and at branch head `f8df31782`**
+— the measured evidence exists but a resume/audit gets none of it from the 
+artifacts.
+- MEDIUM: plan-vs-implementation drift unrecorded (plan specifies a 
+delete-from-checked-in-map probe + `deno check` orchestration; the shipped guard
+asserts fixture-map coverage directly; the staged map is synthesized from the 
+workspace root), and the vacuous first guard (exit 0 both sides, fixed by 
+`f8df31782`) appears in no run artifact.
+- FAIL_PLAN was considered and rejected: the plan is sound; the defects are 
+implementation-of-artifacts.
+
+**Measured this session** (probes in throwaway worktrees, tree left pristine, 
+`deno.lock` untouched):
+- Guard positive exit 0 at `45fbef54e` ("14 reachable SDK modules; 0 unmapped 
+specifiers"); non-vacuity exit 1 when `@orpc/contract` removed from the 
+prepared-map synthesis (evaluated head) and from the committed fixture map 
+(`f8df31782`, naming `stable-v1-adapter.ts`); novel-specifier probe exit 1 
+naming it.
+- `desktop-native-linux` SUCCESS at exactly `45fbef54e` (run 33636093184, head 
+verified on the run object) and at `f8df31782` (run 33638728013) — resolves the 
+prior attempt's blocking runtime finding.
+- Static gates (check/fmt/lint) on the changed driver exit 0; guard wired into 
+root `check`.
+- Prior attempt's "queue: max reversion" finding WITHDRAWN: the three-dot PR 
+diff contains no workflow files (two-dot diff artifact of comparing against 
+#1923's own merge commit).
+- LOW (non-blocking): guard regex misses side-effect-only bare imports (verified
+probe); hardening-slice candidate.
+
+**Deliverables:** `OPENHANDS_SUMMARY_PATH` summary (FAIL_FIX, first line inside)
+and `.llm/runs/desktop-orpc-contract-dep--impl/evaluate.md` (full evidence 
+tables, same FAIL_FIX line). The evaluate.md file is untracked in the repo tree 
+(evaluator does not push); the generator's bookkeeping commit for findings 1–2 
+is the required follow-up, after which the PR's DoD boxes can be ticked and 
+`status:ready-merge` applied per netscript-pr.
+
+OPENHANDS_VERDICT: FAIL_FIX
+
+Tokens: ↑ input 46.34K (total 4M) • cache hit 87.01% (total 78.63%) •  reasoning
+0 (total 69.82K) • ↓ output 680 (total 105.88K) • $ (total 0.2512)
+
