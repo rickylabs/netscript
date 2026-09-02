@@ -52,3 +52,5 @@ in `packages/mcp/src/` and both collide with `main` on it. Regenerate-after-merg
 - #1916 → `ready-merge`: `quality`/`check-test` green, **`close-gate` red** (label applied after
   the run; mirror never fired). Also 16 behind `main`. Rerun/new-head sequence posted.
 - #1942 → `ready-merge`: same close-gate race; 0 behind `main`. Rerun posted.
+
+- #1938 `quality` **success** on run 33659669247 (`6ae6cc483`). Findings closed on the PR.
