@@ -631,3 +631,17 @@ before starting SQLite.
   check-claude, publish-assets exit 0; `agentic:sync-claude:check` removed by #1911);
   desktop-native red is the #1930 `@orpc/contract` class, not S9-owned.
 - **S10 #1760** `84e4b38f7` unchanged; only desktop-native (#1930, still OPEN) outstanding.
+
+### 2026-09-01 16:53Z checkpoint — S9/S10/S13 (Fable 5.1 medium, deadline 2026-09-02T17:16:34Z)
+
+- S13 #1779 @ `335258304` — MERGEABLE; `quality`/`check-test` pending on `ci` (dispatched
+  immediately after the `gen:publish-assets` repair). Remaining gate: `ci` + close-gate; actor:
+  supervisor (packet on green), ETA ~17:05Z.
+- S9 #1759 @ `4c5e0f191` — Flow-B consumer OTLP export now authenticates with the AppHost
+  `OTEL_EXPORTER_OTLP_HEADERS` key (TC-14 401 root cause). Dispatch confirmed: `ci` 33657229358,
+  `e2e-cli` 33657229220 (ci:full tiers). Stale `e2e-cli` 33655871833 (`c6ec50214`) cancelled to
+  free the runtime concurrency slot. Remaining gate: both runtime tiers → receipts → body finalize →
+  `status:ready-merge` → close-gate; actor: supervisor; ETA ~17:20Z.
+- S10 #1760 @ `84e4b38f7` — green except `desktop-native-linux` (#1930 class, not S10-owned);
+  #1930 still open. Remaining gate: rerun `desktop-native-linux` after #1930 merges; actor:
+  supervisor; ETA bound to #1930.
