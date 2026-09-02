@@ -10414,3 +10414,49 @@ The workflow's `run-name` interpolates `github.event.pull_request.number`, but t
 the un-interpolated `name`** (`"Phase eval PR"`), so a number-qualified match never hits. Match on the
 bare workflow name and disambiguate by timestamp or by following through to the `OpenHands runner ·
 issue_comment · <n>` run instead.
+
+---
+
+## ~15:35Z — #1891 PLAN-EVAL: `PASS_PLAN_WITH_FINDINGS`
+
+The verdict the coordinator authorized, finally delivered — by the **native opposite-family Fable 5
+lane** after three OpenHands attempts died on an upstream rate limit without producing one. Posted
+(`5512089887`).
+
+**Every plan-gate box PASS**, including the two sections whose absence alone forced the earlier
+FAIL_PLANs: Open-decision sweep (21 rows) and Risk register (12 rows). The evaluator independently
+confirmed the narrowing was a **pure subtraction** — Slice C 11→10, every remaining
+journal/lock/backup mention inside a deferred-scope statement.
+
+Four of five cycle-1 blockers concretely answered. The nested/parameterized derivation was settled in
+the strongest available form: the property chain comes from **Fresh's own `routeKeyPath`** and
+Fresh's accessor uses `.join('.')`, so the CLI mirrors Fresh rather than guessing.
+
+### Two HIGH findings, both enumeration defects — and one is a real breakage
+
+**HIGH-1: Slice F's retire-set is incomplete.** It retires 13 templates; **eight outside the set
+depend solely on them**, and three of those (`lab-panel`, both `summary-panel`s) would **break the
+generated app at `GENERATED_DENO_CHECK`**. The other five become orphans the writer keeps rendering.
+The plan's own contingency names the *wrong* type consumers. It also never states a consequence its
+byte-equivalence gate forces: the init page cannot keep `withResource('viewer')`, `withPolicy`,
+`withTelemetry`, the hero/notes layers, or the viewer-gated `mutate`.
+
+**HIGH-2: Slice G cannot reach `scaffold.runtime` with its declared files.** Runtime gates come from
+an explicit `RUNTIME_GATES` id list in `capability-suites.ts`; a gate composed in `scaffold-gates.ts`
+but absent from that list **never runs**, so the hosted proof would silently exclude the resource
+step. That file is also a live #1664 overlap — a missing D9 row.
+
+The generalisable lesson, recorded in the amendment brief: **a retire-set is complete only when every
+consumer of a retired file is either retired with it or has a named surviving consumer.** Slice F's
+list was checked for what it removes, never for what still imports it.
+
+### Disposition
+
+Both HIGHs touch **no D1–D9 decision and no A–E file**, so per the evaluator they are applied as a
+plan amendment before Slice F and Slice G dispatch, under the plan's own touch-set-growth rule, with
+**no re-gate** — unless HIGH-1 is instead resolved by neutral-template extension, which would change
+Slice C/D contracts and must return to PLAN-EVAL before Slice C. The brief tells the lane to
+**stop and report** rather than take that route unilaterally.
+
+Amendment dispatched; it expands no public flag and reinstates no recovery machinery. Implementation
+Slices **A and B** remain gated on #1664's merge/rebase, unchanged by this verdict.
