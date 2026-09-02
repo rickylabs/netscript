@@ -9753,3 +9753,52 @@ pushed head `f570dcde4`, all four exit 0.
 | #1349 | — | row-7 diagnostics gap-fill worker running |
 | #1354 | #1891 | plan revision worker running (third no-delta FAIL_PLAN; escalated to owner) |
 | #1348 | — | epic; no leaf PR by design |
+
+### Coordinator directive pass — ~11:50–12:00Z
+
+Directive honoured: no fourth PLAN-EVAL on #1891; #1917 is Internals and untouched; no foreground
+waiting on evaluator watchers.
+
+**#1922 → all six gates green** after the docs repair (`unboundName` census back to 116, snippets
+exit 0). Label cycled, IMPL-EVAL dispatched at `f570dcde4` (run `33626842233`), with the same
+anti-pager / don't-re-run-repo-wide-gates constraints that the #1915 budget exhaustion made
+necessary.
+
+**#1664 — the help fix worked, and unmasked the next failure.** `Repo-wide test` is now **green** at
+`573d01d35`; `Managed form browser regression` now **fails**. Measured that this is not a regression:
+at `7f076f875` the browser step was **`skipped`**, because the repo-wide test failed first and
+short-circuited it. So the fixture has never been proven in CI — the same shape as #1895, where
+clearing one failure revealed the next.
+
+Cause, to be confirmed by the worker rather than assumed:
+`query-hydration-age_browser.ts:157-175`'s `waitForServer` loops `attempt < 100` racing
+`child.status` against a **50 ms** timer, so with ECONNREFUSED returning immediately the entire
+budget is **≈5 seconds**. A cold Vite root does not start in five seconds on a CI runner. Two
+supporting observations: the error is a *timeout*, not `Vite fixture exited before startup`, so the
+child was alive; and the two `form-navigation_browser.ts` tests that passed first are a **different
+Vite root**, so they do not warm this one. Repair dispatched — wall-clock deadline, keep the
+`child.status` fast-fail race, and **surface the fixture's stdout/stderr in the timeout error**,
+which is why this cost a CI round-trip to diagnose. Explicitly not a sleep and not flake-masking:
+if a realistic budget still times out, that is a fixture defect to report, not to extend.
+
+`tests/form-navigation_browser.ts` is fenced off — #1895 owns it and is in evaluation.
+
+**#1354 — cycle-3 delta applied and summarised for the owner's ruling** (`5509105172`), head
+`b5dcb23e2`. Both previously-absent plan-gate sections now exist (Open-decision sweep 421–448, Risk
+register 450–465); D3 reordered to `option selection → candidate render → conflict check → write`
+with the marker/body-hash contract and the seventh marked-but-hand-edited case defined; D9 now
+carries all nine overlapping files plus the MCP corpus, with an explicit requirement that
+convergence **carries #1664's `initialDataUpdatedAt` fix into the neutral island rather than
+deleting it**. No fourth PLAN-EVAL dispatched.
+
+**#1349 gap leaf** committed `672b67b61` (`feat(sdk): name contribution diagnostic conflicts`) plus
+evidence; worker still running its gate set before pushing.
+
+### Exact blockers — nothing else is waiting on a decision
+
+1. **#1664 cannot reach all-green in this lane.** Two of its reds are foreign and unfixable from
+   here: `scaffold-runtime (postgres)` → **#1845** (`islandHydrated:false`, island never hydrates)
+   and `scaffold-runtime-sqlite` → **#1844/#1880** (garnet health transition). Its own two reds are
+   fixed/being fixed. Merge readiness therefore depends on a coordinator ruling on merging over two
+   known, separately-owned reds — the same class of ruling already open for #1842.
+2. **#1842 and #1918 are `status:ready-merge`** and need only the merge decision.
