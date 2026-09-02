@@ -3903,3 +3903,17 @@
   `d5c5810db23dc0204a5a4cbba002f806e3e63a3e`; Aspire inventory is empty, DinD has zero containers,
   and zombie count is zero. The 139 registered worktrees are preserved pending ownership-aware
   cleanup because active supervisors and leaf evaluators are using the current milestone set.
+
+## 2026-09-02T05:47:24Z — S8 ships and Docs workflow authorization is restored
+
+- The bounded S8 evaluator passed the final worker-refresh delta at `ce7e82a76`. The subsequent
+  `daa4dad4d` merge commit integrated current main with no S8 product-byte change; current CI,
+  close-gate, both hosted runtime tiers, acceptance, and review threads remained green. The
+  coordinator merged #1754 as `0622dc43255c59793a3a7f6cf1c0dbb932e641d8`, closing/shipping #1720.
+- The owner completed GitHub device authorization for the stored CLI credential. Its scopes are now
+  `repo` + `workflow` (verified without exposing the token). The injected `GH_TOKEN` remains
+  repo-only, so Docs was explicitly instructed to use `env -u GH_TOKEN -u GITHUB_TOKEN` for the
+  #1756 workflow push. Docs resumed immediately with current-main integration, real `ci.yml` patch,
+  exact CI, and one bounded delta evaluation.
+- Milestone state is 38 open issues and 19 open PRs, with zero unassigned issues. Aspire and Docker
+  inventories remain zero. Canary 6 now has S7, #1747, and S8 on main; S9/S10, S11, and S13 remain.

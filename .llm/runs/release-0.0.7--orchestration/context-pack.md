@@ -2521,3 +2521,13 @@ continues concurrently because serial ordering is per orchestrator, not global.
 - Environment at checkpoint: `aspire ps --format Json == []`, DinD container count 0, zombies 0.
   Registered worktrees are 139 and must not be bulk-pruned while current milestone ownership is
   active.
+
+## Resume delta — 2026-09-02T05:47:24Z
+
+- Main is `0622dc43255c59793a3a7f6cf1c0dbb932e641d8`: Aspire S8 #1754 passed its bounded final-delta
+  evaluator and both hosted tiers, then merged; #1720 is closed/shipped.
+- GitHub stored CLI auth now includes `workflow`. Because the environment-injected `GH_TOKEN` is
+  still repo-only, workflow-changing operations must run as
+  `env -u GH_TOKEN -u GITHUB_TOKEN <gh-or-git-command>`. Docs #1756 has resumed on that route.
+- Live inventory: 38 milestone issues, 19 open PRs, zero ownerless issues, Aspire applications 0,
+  Docker containers 0. Canary 6 awaits only the remaining S9/S10, S11, and S13 Aspire convergence.
