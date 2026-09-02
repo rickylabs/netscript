@@ -10659,3 +10659,10 @@ the sqlite tier. No Aspire readiness noise this run either; the PR's sole red re
 the ruling says cannot be waived.
 
 Evals live: #1941 (`33656495216`, agent in progress), #1943 (`33658230195`, agent queued).
+
+### ~18:35Z — #1943 lock mirror landed as exactly one line
+
+`2e0699bf3`: `packages/fresh-ui/deno.lock` `+1`, the single line `"jsr:@netscript/fresh@0.0.6"` —
+the mirror and nothing else, as instructed. The IMPL-EVAL agent (`33658230195`) had already started
+at `5f0a857ff` before the push, so it was **not** skipped; a lock-only delta moves no product source,
+so its verdict carries. CI re-running at the new head; waiting on both before packeting.
