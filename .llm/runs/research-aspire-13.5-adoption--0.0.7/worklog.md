@@ -783,3 +783,19 @@ the merge.**
   + three DoD boxes that the staged final body/receipts satisfy once both tiers are green.
   Remaining: tiers → `s9-receipt.sh 33676071441` → receipts commit → body PATCH → `gh run rerun`
   close-gate → packet. Actor: supervisor; ETA ~20:50Z.
+
+### 2026-09-02T20:20Z — S9 dual-green at d2c0a51a0, bounded merge to fcce551be
+
+- e2e-cli run 33676071441 attempt 2 at `d2c0a51a0`: desktop, sqlite tier, postgres tier all SUCCESS
+  (`agent.aspire-mcp-smoke`, `behavior.otel.traces`, `behavior.streams.producer-reconnect` passed on
+  both tiers). Receipts committed on this branch at `487467ce7` (`receipts/aspire-13.5-mcp-smoke.json`
+  captured 20:09:27Z, `.postgres.json` captured 20:09:25Z; BOX1-FIELDS OK for both).
+- PR #1759 body patched with the acceptance-evidence block (boxes 1–6) + DoD ticks; ci 33676002428
+  attempt 2 check-test/quality SUCCESS; close-gate job 100408213645 rerun → SUCCESS; #1721 boxes
+  mirrored 6/6.
+- Main advanced to `3a794be67` (#1943/#1948) → PR CONFLICTING. One bounded merge in the S9 worktree:
+  sole conflict `packages/cli/src/kernel/assets/embedded.generated.ts`, resolved by `gen:assets-barrel`
+  on the merged tree (line-set diff vs main = S9's own agent-doc entry only). Export corpus
+  regenerates as a no-op (sha256 `ea839426…`); manifest fresh; parity ok 907/0; barrel type-check
+  clean. `packages/cli/e2e` unchanged by the merge; product surface still the 10-file S9 set.
+  Pushed `fcce551be`; PR body carries the evidence-carry-forward note. New ci/e2e-cli runs pending.

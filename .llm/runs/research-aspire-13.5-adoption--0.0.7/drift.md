@@ -8451,3 +8451,12 @@ executed on S9 before D-328 (earlier runs stopped at TC-14). Repair `d3cc03766` 
 `resolveOtlpHeadersFromResource` moved to `otlp-headers.ts` and shared; the reconnect gate borrows
 the ingest key from the running `streams` resource process before stopping it and injects it into
 the proxy's upstream requests.
+
+### D-330 — S9 evidence carried across a corpus-only main merge (2026-09-02)
+
+Runtime tiers and IMPL-EVAL are certified at `d2c0a51a0`; head is now `fcce551be` (merge of main
+`3a794be67`). Carry justified by: empty `git diff d2c0a51a0 fcce551be -- packages/cli/e2e`, identical
+product surface vs main, generated carriers regenerated (barrel) or verified no-op (corpus, manifest).
+Coordinator instruction: "carry the already-valid dual runtime/evaluator evidence only if owned
+runtime blobs are unchanged". If the classify job re-dispatches runtime tiers at `fcce551be`, those
+verdicts supersede the carry.
