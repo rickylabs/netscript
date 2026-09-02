@@ -29,7 +29,7 @@
 
 ### Commit slices
 
-One cohesive closeout slice; see `plan.md`.
+One behavior/evidence slice plus one PR-handoff bookkeeping slice; see `plan.md`.
 
 ### Deferred scope
 
@@ -55,6 +55,8 @@ branch, metadata, and close-evidence format. The audit introduced no architectur
 | 2026-09-02 | First narrow regression run | Exit 1: the new disabled call correctly exposed a stale preparation-count assertion (actual 4, expected 3); assertion updated. |
 | 2026-09-02 | Narrow regression rerun | Exit 0: 1 passed, 0 failed, 0 ignored. |
 | 2026-09-02 | Final audit | All fourteen rows are SHIPPED after the narrow residual; both closing keywords are justified. |
+| 2026-09-02 | Slice 1 commit/push | `136ea478ef28c8b6c74c64329bbb3ef7f6a50af2`; explicit refspec push succeeded. |
+| 2026-09-02 | PR open | #1941, non-draft against `main`, milestone `0.0.7`, exact required labels, both closing issues recognized. |
 
 ## Gate results
 
@@ -78,6 +80,23 @@ branch, metadata, and close-evidence format. The audit introduced no architectur
 | `git diff --check` | 0 | No whitespace errors |
 | `deno.lock` diff | 0 | No change; SHA-256 `e52c167e48e78a3c822ee1e63d5874401e1a02d0c49c214e1cd2df189272c46d` |
 
+## Acceptance mirror dry-run
+
+Initial PR head `136ea478ef28c8b6c74c64329bbb3ef7f6a50af2`, exit 0:
+
+```text
+acceptance-mirror DRY-RUN: no changes
+provenance: head=136ea478ef28c8b6c74c64329bbb3ef7f6a50af2 evaluated=2026-09-02T16:37:56.889Z
+snapshot: #1353 updated=2026-08-31T02:25:18Z bodySha256=bc212ab5da8a45e4d80f1cb8419b2d2e50fc61bb4d4adb438c8195fdd57161d7
+snapshot: #1467 updated=2026-08-31T02:25:16Z bodySha256=188436df37080ac82ebb9533bd5964968390908df2478f5d7c5ee143e5870e57
+notice: Closing reference #1353 classified as issue; retained for acceptance mirroring.
+notice: Closing reference #1467 classified as issue; retained for acceptance mirroring.
+notice: Mirror skipped because live PR labels do not include status:ready-merge.
+```
+
+The skip is expected: only the supervisor may apply `status:ready-merge`. A final dry-run is repeated
+after the bookkeeping commit and reported in the handoff.
+
 ## Substantive slice review
 
 - The diff gates only `injectContext()`/final `Headers.set()` on the existing boolean; `withSpan()`,
@@ -95,3 +114,5 @@ branch, metadata, and close-evidence format. The audit introduced no architectur
   keyword. The closeout PR will close only issues whose entire indexed evidence block validates.
 - After slice 1: every row is SHIPPED and fresh gates are green, so `Closes #1353` and
   `Closes #1467` are both justified. `Part of #1348` remains a non-closing epic reference.
+- After PR open: GitHub reports `closingIssue=1353` and `closingIssue=1467`; #1941 remains at the
+  required `status:impl` for separate-session evaluation.

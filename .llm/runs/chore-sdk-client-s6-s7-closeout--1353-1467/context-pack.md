@@ -15,9 +15,9 @@ strengthening the both-order proof with an auth-shaped header. All fourteen rows
 
 ## Next steps
 
-1. Commit and push with the explicit refspec.
-2. Open the non-draft `status:impl` PR with both evidence blocks and all metadata.
-3. Run the mirror dry-run and hand off to the separate-session evaluator/supervisor.
+1. Commit/push this PR-handoff update with the explicit refspec.
+2. Repeat the mirror dry-run at the final head.
+3. Hand #1941 to the separate-session evaluator/supervisor; do not apply `status:ready-merge` here.
 
 ## Key decisions
 
@@ -30,3 +30,10 @@ strengthening the both-order proof with an auth-shaped header. All fourteen rows
 
 - Drift: initial #1353 proof did not satisfy the disabled-propagation clause; fixed in this branch.
 - Debt: none.
+
+## PR handoff
+
+- PR: #1941 — `https://github.com/rickylabs/netscript/pull/1941`
+- Opening head: `136ea478ef28c8b6c74c64329bbb3ef7f6a50af2`
+- Metadata: non-draft, base `main`, milestone `0.0.7`, `status:impl`, both closing issues recognized.
+- Initial mirror dry-run: exit 0; expected skip because `status:ready-merge` is absent.

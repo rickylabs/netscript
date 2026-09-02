@@ -35,11 +35,12 @@ keywords/evidence blocks only for fully satisfied issues.
 | Closing keywords | Resolved after gates | All seven rows for an issue must be shipped. |
 | PLAN-EVAL | N/A | Fixed contract and owner-directed verification slice. |
 
-## Commit slice
+## Commit slices
 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
-| 1 | Reconcile all fourteen rows, make the trace switch govern final injection, prove disabled/both-order auth composition, and record close evidence. | Owner gate set and mirror dry-run | `packages/sdk/src/client/http-client-link.ts`, `packages/sdk/tests/client-contribution-observability_test.ts`, run artifacts |
+| 1 | Reconcile all fourteen rows, make the trace switch govern final injection, prove disabled/both-order auth composition, and record close evidence. | Owner gate set | `packages/sdk/src/client/http-client-link.ts`, `packages/sdk/tests/client-contribution-observability_test.ts`, run artifacts |
+| 2 | Record the opened PR identity, final push, and mirror handoff without changing implementation. | PR metadata inspection and mirror dry-run | Run artifacts only |
 
 ## Risk register
 
