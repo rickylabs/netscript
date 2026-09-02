@@ -64,6 +64,10 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | --- | --- | --- | --- |
 | 2026-09-02 | F | Bootstrap | Clean branch at `be3e3dded`; locked plan read; retire-set census found no additional importer or rendered consumer. |
 | 2026-09-02 | F | Plan gate | `PLAN-EVAL: N/A` — owner supplied a locked, already evaluated plan and explicitly directed N/A for this implementation run. |
+| 2026-09-02 | F | Stop-and-amend | Focused convention resolution found `agent-conventions.ts` referenced five retired paths. Implementation stopped before adapting the unenumerated consumer. |
+| 2026-09-02 | F | Rescope | Owner amended plan item 33 and ceiling 33; refreshed `origin/feat/cli-resource-slice-plan` and resumed within the amended scope. |
+| 2026-09-02 | F | Implementation | Retired the complete old authority, converged init on the formatted planner preset, Fresh-derived routes after emission, composed and registered the command fourth, and repaired item 33. |
+| 2026-09-02 | F | Supervisor review | Found and fixed missing `appRoutes.<resource>` binding and post-marker init formatting drift; strengthened the command-level exact-preset rerun proof. |
 
 ## Decisions
 
@@ -71,6 +75,8 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | --- | --- | --- |
 | Retain only service-query/README/telemetry demo additions in the example writer. | Every canonical role must come from the neutral planner. | locked Slice F / D4 |
 | Treat generated carriers as ceiling-exempt freshness output. | They are mechanical projections, not authored scope. | owner/doctrine contract |
+| Format neutral rendered bodies before ownership markers on both callers. | Init's final project formatter otherwise changed three marker bodies and made an exact command rerun appear `owned-edited`. | locked D3/D4/D8 + supervisor review |
+| Defer Slice E LOW-2. | The required `generate-resource-command.ts` change is outside the amended Slice F 33-path set. | owner conditional scope instruction |
 
 ## Drift
 
@@ -78,12 +84,30 @@ Change a canonical resource leaf under `kernel/assets/resource-slice/` and its p
 | --- | --- | --- |
 | `rtk` binary is unavailable. | minor | yes |
 | Stacked base branch advanced after integration commit. | minor | yes |
+| `agent-conventions.ts` was an additional rendered consumer of five retired paths; item 33 now authorizes its repair. | scope amendment | yes |
 
 ## Gate Results
 
-Pending implementation.
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| focused four-file suite | 0 | 32 passed, 0 failed |
+| full package-owned CLI unit suite | 0 | 1324 passed, 0 failed |
+| structured CLI check | 0 | 977 files, 9 batches, 0 diagnostics |
+| touched CLI lint | 0 | 12 files, 0 findings |
+| touched CLI format | 0 | 12 files, 0 findings |
+| `check:publish-assets` | 0 | freshness pass |
+| `check:emitted-samples` | 0 | 48 samples / 38 paths |
+| CLI JSR audit | 0 | 977 files / 128705 LOC / 21 warnings |
+| CLI `publish:dry-run` | 0 | success; existing publish warnings only |
+| `arch:check` | 0 | every package `FAIL=0`; baseline warnings remain |
+| `quality:gate` | 0 | no scanner findings; 7 existing allowances |
+| `docs:readme-fences` | 0 | 7 expected type errors, no unattributed failure |
+| `docs:jsdoc-examples` | 0 | 359 checked, `unboundName=116`, 0 failures |
+| `deps:prod-install` | 0 | production install OK |
+| asset no-orphan scan | 0 | 98 disk / 98 declared / 0 orphan / 0 missing |
+
+Clean-tree `check:assets-barrel`, MCP corpus regeneration/freshness, and post-commit verification remain.
 
 ## Handoff Notes
 
 - Evaluator should first inspect retire-set completeness, planner equivalence, Fresh derivation order, and composed command dependencies.
-

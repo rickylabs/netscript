@@ -12,23 +12,25 @@
 
 ## Current State
 
-The clean integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at `be3e3dded`. The owner supplied locked Slice F. Retire-set census is complete with no additional consumer found. No implementation file has changed yet.
+The integration branch contains #1664 head `9295eabaa`, Slice A, and Slice E at `be3e3dded`. The owner amended Slice F after the mandated stop found `agent-conventions.ts` as an additional rendered consumer; item 33 and ceiling 33 now govern the run. Implementation and supervisor review are complete pending the clean-tree generated-corpus/assets checks and formal IMPL-EVAL.
 
 ## Completed
 
-- Skills/doctrine/harness contract read.
-- Base, branch, lock, planner, adapter, command, and old asset authority inspected.
-- `PLAN-EVAL: N/A` recorded per owner instruction.
+- Complete 18-template retire-set plus manual route seed removed.
+- Init and command share the planner, neutral assets, and generated-source formatter.
+- Fresh derives manifest/routes after route emission; exact init-preset command rerun is conflict-free and byte-identical.
+- `generate resource` is registered fourth through production-composed dependencies.
+- Focused 32/32 and full CLI 1324/1324 test suites pass; structured check/lint/fmt and precommit fitness gates pass.
 
 ## In Progress
 
-- Bootstrap commit and non-draft stacked PR creation, followed by Slice F implementation.
+- First implementation commit, clean-tree carrier verification, and formal IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push run bootstrap and open the PR with all required metadata.
-2. Implement exactly the 32-file Slice F enumeration.
-3. Run gates, separate-session IMPL-EVAL, update artifacts/PR, commit and push final evidence.
+1. Commit and push the reviewed implementation.
+2. Run clean-tree corpus/assets checks and any final affected gates.
+3. Run the opposite-family IMPL-EVAL, update artifacts/PR, commit and push final evidence.
 
 ## Key Decisions
 
@@ -40,27 +42,26 @@ The clean integration branch contains #1664 head `9295eabaa`, Slice A, and Slice
 
 ## Files Changed
 
-- Harness run artifacts only at bootstrap.
+- 33 product paths: 32 tracked paths plus the new focused writer test; the generated MCP corpus is unchanged.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | — |
-| Fitness | pending | — |
+| Static | pass | CLI check 0 diagnostics; touched lint/fmt 0 findings. |
+| Fitness | pass | JSR audit, publish dry-run, `arch:check`, and `quality:gate` exit 0. |
 | Runtime | N/A | Slice G owns hosted acceptance. |
-| Consumer | pending | focused init/command/assets/emitted tests |
+| Consumer | pass precommit | focused 32/32; full CLI 1324/1324; publish assets/emitted samples/docs gates pass. |
 
 ## Open Questions
 
-- None; additional retire-set consumers are a stop condition.
+- Formal IMPL-EVAL remains.
 
 ## Drift and Debt
 
-- Drift: minor environment/base movement recorded.
-- Debt: none introduced.
+- Drift: RTK absence, stacked-base movement, and the item-33 rescope are recorded.
+- Debt: Slice E LOW-2 remains deferred because its required `generate-resource-command.ts` edit is outside Slice F's amended file set.
 
 ## Commits
 
 - See the PR commit list and per-phase comments.
-
