@@ -10,25 +10,30 @@
  * shrink to manufacture a pass nor grow its failing set silently. Changing one is a one-line,
  * reviewable diff.
  *
- * Re-measured from `ec848e6b0` after `plugins/auth/README.md` gained one `typescript` fence in main:
- * it imports the install-emitted `./auth/sdk-client.ts`, which no repository path resolves, the same
- * tolerated consumer-owned-module class already carried by `packages/sdk`, `packages/service` and
- * `packages/prisma-adapter-mysql`. That single fence moved `tsLike` 71→72, `checked` 70→71,
- * `typeErrors` 31→32 and `failingReadmes` 6→7; no other value changed.
+ * Lowered by #1934, which repaired the debt the gate made visible rather than carrying it:
+ * `typeErrors` 32→7, `failingReadmes` 7→5, `syntaxInvalid` 1→0. Closing the unterminated
+ * four-backtick fence in `packages/mcp/README.md` also un-masked two blocks the aborted parse had
+ * been hiding, so `tsLike` rose 72→73 and `checked` 71→73.
+ *
+ * The 7 that remain are all `TS2307` on modules that correctly have no repository path — imports of
+ * consumer-owned or installer-emitted files (`blocks/contracts/orders.ts`, `blocks/router.ts`,
+ * `.generated/client.server.ts`, `auth/sdk-client.ts`) and the scaffolded app's own `@app/*` alias —
+ * plus one `TS18046` downstream of that alias. Repairing those would mean documenting something
+ * other than what a reader actually writes, so they stay deferred on purpose.
  */
 export const README_FENCE_RATCHET = {
   /** Discovered `packages/*` and `plugins/*` READMEs. */
   minimumReadmes: 36,
   /** `ts`, `tsx` and `typescript` fences across them. */
-  minimumTsLikeFences: 72,
+  minimumTsLikeFences: 73,
   /** Fences actually submitted to the compiler. */
-  minimumChecked: 71,
+  minimumChecked: 73,
   /** Fences tagged TypeScript whose body does not parse; `deno check` aborts the program on these. */
-  maximumSyntaxInvalid: 1,
+  maximumSyntaxInvalid: 0,
   /** READMEs carrying at least one type error. */
-  maximumFailingReadmes: 7,
+  maximumFailingReadmes: 5,
   /** Total type errors across the corpus. */
-  maximumTypeErrors: 32,
+  maximumTypeErrors: 7,
 } as const;
 
 /** One README fence that could not be parsed as TypeScript. */
