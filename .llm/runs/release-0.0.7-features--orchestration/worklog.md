@@ -10460,3 +10460,50 @@ Slice C/D contracts and must return to PLAN-EVAL before Slice C. The brief tells
 
 Amendment dispatched; it expands no public flag and reinstates no recovery machinery. Implementation
 Slices **A and B** remain gated on #1664's merge/rebase, unchanged by this verdict.
+
+---
+
+## ~16:10Z — three merged; dependents reconciled; the S6/S7 closure gap opened next
+
+**#1842, #1931, #1936 merged.** `main` → `850cc7757` (also carrying **#1935**, which repaired the
+README fence debt the compile gate had made visible — the baseline dropped **32 → 7**).
+
+**#1349 and #1352 are CLOSED**, by their closing keywords after the mirror ticked every box. #1452
+correctly stays open — Slice 2 merged, later slices remain.
+
+### All three open leaves reconciled and pushed
+
+| PR | New head | Notes |
+| --- | --- | --- |
+| #1895 | `d0bf0aebf` | clean merge, corpus already current, `docs:readme-fences` 0 |
+| #1664 | `d155db116` | corpus conflict → main's side + regenerate; fences 0 at the **new** baseline of 7 |
+| #1891 | `ae6e09caa` | clean merge |
+
+### #1891's amendment took the route that avoids a re-gate
+
+**HIGH-1 resolved under settled D4, not by template extension** — which was the fork that would have
+forced a return to PLAN-EVAL before Slice C. D4 now requires stock init to equal
+`generate resource --form --partial`, explicitly removing `withResource('viewer')`, `withPolicy`,
+`withTelemetry`, hero/notes and the viewer-gated `mutate`, with no extension point allowed. Slice F
+enumerates the three real import/type consumers — the ones that would have broken
+`GENERATED_DENO_CHECK` — plus five orphans, with manifest/carrier cleanup.
+
+**HIGH-2**: `capability-suites.ts` in both D9 and Slice G, with both resource gate IDs required in
+`RUNTIME_GATES` and static reachability asserted.
+
+**MEDIUM-3 resolved by narrowing rather than by adding machinery**: #1354 now accepts **only static
+absolute routes** and explicitly rejects parameterized/catch-all patterns. That is the cheaper half
+of the fork and keeps the slice inside its declared touch set — the same instinct as the D3 narrowing.
+
+### The closure gap has recurred, and it is now a recognisable pattern
+
+**#1353 and #1467 are still open with 7 unticked boxes each**, exactly as #1349 and #1352 were:
+#1921 and #1922 merged **without closing keywords** (correct at the time), and an evidence block is
+**inert without one**, so nothing ticks and nothing closes.
+
+This is the third and fourth instance today. The general shape: *a partial-scope PR correctly omits
+the keyword; the final PR in the group must carry it, and someone has to notice the group is
+finished.* Dispatched a combined audit-and-closeout for both issues, told to verify all fourteen rows
+against merged `main`, cite **code and tests rather than the merged PRs' verdicts**, and to withhold
+a closing keyword for any issue whose rows it cannot defend — closing one and leaving the other open
+is explicitly allowed.
