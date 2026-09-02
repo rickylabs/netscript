@@ -71,6 +71,8 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | 2026-09-02T17:27:31Z | Plan | Research | Re-baselined #1481/RFC 0005 against `origin/main` `850cc7757`; inspected positioning, generated README/templates, Fresh docs/API, writer/manifest/barrel generator, and closest E2E mutation pattern. |
 | 2026-09-02T17:27:31Z | Plan | Design | Locked developer-only intent and both independent exclusion mechanisms; selected Archetype 6 + frontend overlay. |
 | 2026-09-02T17:27:31Z | Plan | Gate status | PLAN-EVAL selected and pending. No implementation or later-phase gate was run. |
+| 2026-09-02T19:02:00Z | Implement | Plan gate | Resumed only after separate-session `PASS_PLAN` at `5566a89f6` for plan head `f8ed75b41`. |
+| 2026-09-02T19:10:00Z | Implement | RED 1 | Added focused middleware/config/materialization expectations and `scaffold.design-production-exclusion` registration/order expectations. The structured test wrapper failed as required: missing `TEMPLATE_KEYS.appRoutesDesignMiddleware` and missing `GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` (exit 1, five type errors). No implementation exists in this step. |
 
 ## Decisions
 
@@ -88,7 +90,12 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` by explicit Phase-1 instruction. The separate-session PLAN-EVAL is `PENDING` on the plan commit SHA.
+| Gate | Status | Evidence |
+| --- | --- | --- |
+| PLAN-EVAL | PASS | `plan-eval.md`; evaluator commit `5566a89f6`, plan head `f8ed75b41` |
+| RED focused tests | EXPECTED_FAIL | Structured `run-deno-test.ts` over five focused unit/E2E files exited 1 with missing middleware asset key and gate ID; 2026-09-02 |
+| Local GREEN rows 1–7 | NOT_RUN | Awaiting implementation and generated-barrel steps |
+| Hosted rows 8–9 | NOT_RUN | Hosted-only; local runtime E2E prohibited |
 
 ## Handoff Notes
 

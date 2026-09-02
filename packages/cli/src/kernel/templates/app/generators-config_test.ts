@@ -346,13 +346,24 @@ describe('generateAppViteConfig', () => {
       appPort: 50_123,
     });
     assertStringIncludes(output, 'createNetScriptVitePlugin');
-    assertStringIncludes(
-      output,
-      "fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] })",
-    );
+    assertStringIncludes(output, "islandSpecifiers: ['@netscript/fresh/defer/island']");
     assertStringIncludes(output, "resolve(workspaceRoot, 'packages')");
     assertStringIncludes(output, "resolve(workspaceRoot, 'contracts')");
     assertStringIncludes(output, "resolve(workspaceRoot, 'plugins')");
+  });
+
+  it('excludes the design route group outside Vite development mode', () => {
+    const output = generateAppViteConfig({
+      appName: 'dashboard',
+      appPort: 50_123,
+    });
+
+    assertStringIncludes(output, 'const DESIGN_ROUTE_GROUP_PATTERN =');
+    assertStringIncludes(output, String.raw`[\\/]routes[\\/]\(design\)[\\/]`);
+    assertStringIncludes(
+      output,
+      "ignore: mode === 'development' ? [] : [DESIGN_ROUTE_GROUP_PATTERN]",
+    );
   });
 
   it('should include all @app aliases mirrored from the playground', () => {
@@ -384,7 +395,7 @@ describe('generateAppViteConfig', () => {
           output.indexOf("{ find: '@app/routes'"),
     );
     assert(
-      output.indexOf("fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] }),") <
+      output.indexOf('fresh({') <
           output.indexOf('tailwindCSS(),') &&
         output.indexOf('tailwindCSS(),') <
           output.indexOf('createNetScriptVitePlugin({'),

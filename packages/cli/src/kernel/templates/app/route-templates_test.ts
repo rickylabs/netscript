@@ -5,7 +5,8 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertStrictEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateRouteManifestSeed } from '../../application/scaffold/writers/app-route-seeds.ts';
-import { TEMPLATE_MANIFEST } from '../../assets/manifest.ts';
+import { readTemplateAsset } from '../../adapters/templates/template-asset.ts';
+import { TEMPLATE_KEYS, TEMPLATE_MANIFEST } from '../../assets/manifest.ts';
 import {
   appAppTemplate,
   appClientTemplate,
@@ -356,6 +357,24 @@ describe('app route template rendering', () => {
     assertStringIncludes(appDesignTokenClipboardTemplate, '[data-token-copy]');
     assertStringIncludes(appDesignCssTemplate, '.ns-tokens-page');
     assert(!appDesignCssTemplate.includes('repeating-linear-gradient'));
+  });
+
+  it('design route middleware refuses every mode except literal development', async () => {
+    const middleware = await readTemplateAsset(TEMPLATE_KEYS.appRoutesDesignMiddleware);
+
+    assertStringIncludes(middleware, "import { define } from '@app/utils.ts';");
+    assertStringIncludes(
+      middleware,
+      "const mode = Deno.env.get('MODE') ?? Deno.env.get('NODE_ENV');",
+    );
+    assertStringIncludes(middleware, "if (mode !== 'development') {");
+    assertStringIncludes(middleware, "return new Response('Not Found', { status: 404 });");
+    assertStringIncludes(middleware, 'return await ctx.next();');
+    assertEquals(middleware.includes("?? 'development'"), false);
+    assert(
+      middleware.indexOf("mode !== 'development'") < middleware.indexOf('ctx.next()'),
+      'runtime refusal must happen before delegating to the design route',
+    );
   });
 
   it('examples landing route keeps the builder in index.tsx and the cards in a child view', async () => {

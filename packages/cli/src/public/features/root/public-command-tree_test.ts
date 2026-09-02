@@ -72,6 +72,10 @@ Deno.test('public init emits resolvable app conventions with and without the exa
       'users',
     ]);
     const serviceApp = join(parent, 'with-service', 'apps', 'dashboard');
+    const designMiddleware = await Deno.stat(
+      join(serviceApp, 'routes', '(design)', 'design', '_middleware.ts'),
+    );
+    assert(designMiddleware.isFile, 'Expected the design route middleware to be emitted');
     const serviceMarkdown = await assertAppConventionsResolve(serviceApp, {
       appName: 'dashboard',
       dbEngine: 'none',

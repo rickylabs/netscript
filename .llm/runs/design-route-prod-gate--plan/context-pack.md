@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `plan` — ready for separate-session PLAN-EVAL |
+| Current phase | `implement` — RED expectations landed locally |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-Issue #1481 is fully researched and planned against `origin/main` `850cc7757`. The plan rules `/design` a developer-only reference, delivers both RFC 0005 exclusions, and adds a hosted mutation-proved production-build gate. No implementation or implementation gate has run.
+PLAN-EVAL passed for plan head `f8ed75b41`. The first implementation step is RED: focused tests now specify the middleware, Vite ignore, emitted file, and hosted gate registration/order contracts, and the structured wrapper fails on the deliberately missing asset key and gate ID.
 
 ## Completed
 
@@ -23,18 +23,20 @@ Issue #1481 is fully researched and planned against `origin/main` `850cc7757`. T
 - Identified `generated.quality-negative` as the closest non-vacuous gate pattern.
 - Accounted for open debt `scaffold-runtime-a8-f16-1333` by planning no new top-level scaffold-gate child.
 - Wrote research, plan, design checkpoint, supervisor identity, context, and drift artifacts.
+- Received separate-session `PASS_PLAN` at evaluator commit `5566a89f6`.
+- Ran RED step 1 through the structured test wrapper; exit 1 is the expected evidence.
 
 ## In Progress
 
-- Commit/push plan artifacts and open the structured draft PR.
+- Commit RED step 1, then record hosted RED as pending without running local runtime E2E.
 
 ## Next Steps
 
-1. Supervisor dispatches a fresh native opposite-family PLAN-EVAL against the reported plan SHA.
-2. If and only if the verdict is `PASS`, resume this same implementation lane/thread.
-3. Implement the single atomic slice in the plan’s RED/GREEN order.
-4. Run scoped gates; obtain hosted `ci:full` `scaffold.runtime` evidence through the coordinator lease.
-5. Dispatch mandatory separate-session IMPL-EVAL.
+1. Record hosted production RED as `HOSTED_PENDING`; do not run `e2e:cli` locally.
+2. Implement manifest/load/write, middleware, Vite ignore, and hosted mutation probe.
+3. Regenerate `embedded.generated.ts` only through `deno task gen:assets-barrel`.
+4. Run local validation rows 1–7 plus the four-carrier pre-push chain.
+5. Stop on the final implementation head for supervisor-triggered hosted CI and IMPL-EVAL.
 
 ## Key Decisions
 
@@ -61,7 +63,7 @@ Issue #1481 is fully researched and planned against `origin/main` `850cc7757`. T
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan-Gate | PENDING | Must be a separate session on this plan SHA |
+| Plan-Gate | PASS | `plan-eval.md` at `5566a89f6`, evaluated plan head `f8ed75b41` |
 | Static | NOT_RUN | Explicitly deferred to implementation |
 | Fitness | NOT_RUN | Explicitly deferred to implementation |
 | Runtime | NOT_RUN | Hosted only under `ci:full` with coordinator lease |

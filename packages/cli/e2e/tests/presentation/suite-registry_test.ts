@@ -121,6 +121,10 @@ Deno.test('true userland suite runs init, four no-samples plugin installs, asser
 Deno.test('runtime suite includes full scaffold, database, runtime, and behavior gates', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_INIT), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_INIT), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
@@ -156,6 +160,9 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   const generatedCheckIndex = runtime.gates.findIndex((gate) =>
     gate.id === GATE.GENERATED_DENO_CHECK
   );
+  const designProductionExclusionIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION
+  );
   const sixKindInstalls = [
     'scaffold.plugin.worker',
     'scaffold.plugin.saga',
@@ -173,6 +180,16 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(aiInstallIndex < appsettingsIndex, true);
   assertEquals(appsettingsIndex < runtimeSchemasIndex, true);
   assertEquals(runtimeSchemasIndex < generatedCheckIndex, true);
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.SCAFFOLD_INIT) <
+      designProductionExclusionIndex,
+    true,
+  );
+  assertEquals(
+    designProductionExclusionIndex <
+      runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_START),
+    true,
+  );
   const dataScreenIndex = runtime.gates.findIndex((gate) =>
     gate.id === GATE.SCAFFOLD_UI_DATA_SCREEN
   );
