@@ -1,10 +1,13 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import {
   assertExpectedListenerFailure,
   matchesExpectedFailure,
+  observeInducedListenerDeparture,
+  RESOURCE_TRANSITION_FAILURE_CEILING_MS,
 } from '../../../src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts';
+import { createControlledFollower } from './controlled-follower.ts';
 import {
   type ListenerFaultExpectation,
   listenerFaultExpectations,
@@ -179,4 +182,163 @@ Deno.test('expected-failure matcher accepts only a genuine expected socket failu
       );
     }
   });
+});
+
+/**
+ * The private Phase-B deadline that timed out Canary 6 (run 33684157301) on a stale Healthy report.
+ * Retained only as the boundary the shared ceiling and the delayed-transition case must clear.
+ */
+const RETIRED_PHASE_B_POLL_DEADLINE_MS = 30_000;
+/** Scale for the delayed-transition case: one unit stands for one second of the shared ceiling. */
+const DELAY_SCALE = 1_000;
+/** Test-failure ceiling for in-memory departure cases that must return on the event. */
+const UNIT_WAIT_FAILURE_CEILING_MS = 2_000;
+const APP_HOST = '/workspace/app/aspire/apphost.mts';
+
+function postgresUpdate(
+  healthStatus: 'Healthy' | 'Unhealthy',
+  testOnly: Record<string, unknown>,
+  realBacking: Record<string, unknown> = { status: 'Healthy' },
+): string {
+  return JSON.stringify({
+    displayName: POSTGRES_EXPECTATION.resource,
+    state: 'Running',
+    healthStatus,
+    healthReports: {
+      [POSTGRES_EXPECTATION.healthCheckKey]: testOnly,
+      [POSTGRES_EXPECTATION.realHealthCheckKey]: realBacking,
+    },
+  });
+}
+
+const HEALTHY_TEST_ONLY = { status: 'Healthy', description: 'tcp listener ready' };
+const UNHEALTHY_TEST_ONLY = {
+  status: 'Unhealthy',
+  description: 'tcp listener unhealthy: ECONNREFUSED at localhost:18998 after 3 ms',
+  data: { code: 'ECONNREFUSED' },
+};
+
+Deno.test('shared departure ceiling clears the retired Phase-B poll deadline', () => {
+  assertEquals(RESOURCE_TRANSITION_FAILURE_CEILING_MS, 120_000);
+  assertEquals(RESOURCE_TRANSITION_FAILURE_CEILING_MS > RETIRED_PHASE_B_POLL_DEADLINE_MS, true);
+});
+
+Deno.test('induced departure subscribes before the close command and returns on the event', async () => {
+  const controlled = createControlledFollower();
+  const order: string[] = [];
+  let followerStarted = false;
+
+  const evidence = await observeInducedListenerDeparture(
+    APP_HOST,
+    POSTGRES_EXPECTATION,
+    async () => {
+      order.push(followerStarted ? 'close-after-subscribe' : 'close-before-subscribe');
+      await controlled.emit(postgresUpdate('Healthy', HEALTHY_TEST_ONLY));
+      await controlled.emit(postgresUpdate('Unhealthy', UNHEALTHY_TEST_ONLY));
+    },
+    {
+      ceilingMs: UNIT_WAIT_FAILURE_CEILING_MS,
+      startFollower: () => {
+        followerStarted = true;
+        return controlled.follower;
+      },
+    },
+  );
+
+  assertEquals(order, ['close-after-subscribe']);
+  assertEquals(evidence.source, 'follow-event');
+  assertEquals(evidence.testOnly.status, 'Unhealthy');
+  assertEquals(evidence.realBacking.status, 'Healthy');
+  assertEquals(evidence.departureCeilingMs, UNIT_WAIT_FAILURE_CEILING_MS);
+  assertEquals(controlled.wasKilled(), true);
+});
+
+Deno.test('induced departure waits past the retired 30s boundary when Aspire re-evaluates late', async () => {
+  // Scaled 1:1000 so the case stays deterministic: a departure emitted at "45s" (45 ms) must be
+  // accepted under the "120s" (120 ms) ceiling although it lies well beyond the retired "30s".
+  const scaledCeilingMs = RESOURCE_TRANSITION_FAILURE_CEILING_MS / DELAY_SCALE;
+  const scaledDepartureMs = 45_000 / DELAY_SCALE;
+  assertEquals(scaledDepartureMs > RETIRED_PHASE_B_POLL_DEADLINE_MS / DELAY_SCALE, true);
+  assertEquals(scaledDepartureMs < scaledCeilingMs, true);
+
+  const controlled = createControlledFollower();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const evidence = await observeInducedListenerDeparture(
+      APP_HOST,
+      POSTGRES_EXPECTATION,
+      async () => {
+        // Aspire keeps reporting the stale Healthy state for a while after the close is acked.
+        await controlled.emit(postgresUpdate('Healthy', HEALTHY_TEST_ONLY));
+        timer = setTimeout(() => {
+          void controlled.emit(postgresUpdate('Unhealthy', UNHEALTHY_TEST_ONLY));
+        }, scaledDepartureMs);
+      },
+      { ceilingMs: scaledCeilingMs, startFollower: () => controlled.follower },
+    );
+    assertEquals(evidence.testOnly.status, 'Unhealthy');
+    assertEquals(evidence.realBacking.status, 'Healthy');
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+});
+
+Deno.test('induced departure fails non-vacuously when only stale Healthy is ever reported', async () => {
+  const controlled = createControlledFollower();
+  const error = await assertRejects(
+    () =>
+      observeInducedListenerDeparture(
+        APP_HOST,
+        POSTGRES_EXPECTATION,
+        () => controlled.emit(postgresUpdate('Healthy', HEALTHY_TEST_ONLY)),
+        { ceilingMs: 20, startFollower: () => controlled.follower },
+      ),
+    Error,
+    'test-failure ceiling for a hung stream',
+  );
+  assertStringIncludes(error.message, '20ms');
+  assertEquals(controlled.wasKilled(), true);
+});
+
+Deno.test('induced departure rejects when the real backing check leaves Healthy', async () => {
+  const controlled = createControlledFollower();
+  await assertRejects(
+    () =>
+      observeInducedListenerDeparture(
+        APP_HOST,
+        POSTGRES_EXPECTATION,
+        () =>
+          controlled.emit(
+            postgresUpdate('Unhealthy', UNHEALTHY_TEST_ONLY, {
+              status: 'Unhealthy',
+              description: 'real backing changed',
+            }),
+          ),
+        { ceilingMs: UNIT_WAIT_FAILURE_CEILING_MS, startFollower: () => controlled.follower },
+      ),
+    Error,
+    'real backing health postgres_listener changed to Unhealthy',
+  );
+});
+
+Deno.test('induced departure requires the structured socket failure code', async () => {
+  const controlled = createControlledFollower();
+  await assertRejects(
+    () =>
+      observeInducedListenerDeparture(
+        APP_HOST,
+        POSTGRES_EXPECTATION,
+        () =>
+          controlled.emit(
+            postgresUpdate('Unhealthy', {
+              status: 'Unhealthy',
+              description: 'tcp listener unhealthy: EPROTO',
+              data: { code: 'EPROTO' },
+            }),
+          ),
+        { ceilingMs: UNIT_WAIT_FAILURE_CEILING_MS, startFollower: () => controlled.follower },
+      ),
+    Error,
+    'neither its failure code nor its description names ECONNREFUSED or ETIMEDOUT',
+  );
 });
