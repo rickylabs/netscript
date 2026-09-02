@@ -4,6 +4,8 @@ import { createService } from '../../../service/mod.ts';
 import { createServiceClient } from '../../src/client/service-client.ts';
 import { createHttpClientLink } from '../../src/client/http-client-link.ts';
 import { createServerServiceEnvKey } from '../../src/discovery/service-url.ts';
+import { resolveTransportPolicy } from '../../src/internal/transport-policy.ts';
+import type { ContractLike } from '../../src/ports/service-client.ts';
 
 const SERVICE_NAME = 'sdk-live';
 const BAD_SERVICE_NAME = 'sdk-missing';
@@ -38,9 +40,9 @@ function createRuntimeRouter() {
   };
 }
 
-function createLink(contract: Parameters<typeof createHttpClientLink>[0]['contract']) {
+function createLink(contract: ContractLike) {
   return createHttpClientLink({
-    contract,
+    transportPolicy: resolveTransportPolicy(contract),
     getTraceHeaders: () => ({}),
     propagateTraceContext: false,
     protocol: 'http',
@@ -76,6 +78,85 @@ Deno.test('createServiceClient round-trips through live service discovery', asyn
 
     const response = await client.echo({ message: 'hello' });
     assertEquals(response.echoed, 'hello');
+  } finally {
+    if (previous === undefined) {
+      Deno.env.delete(envKey);
+    } else {
+      Deno.env.set(envKey, previous);
+    }
+    await running.stop();
+  }
+});
+
+Deno.test('deprecated port and timeout options remain accepted no-ops', async () => {
+  let dispatches = 0;
+  const router = {
+    echo: os.route({ method: 'POST', path: '/echo' }).handler(
+      ({ input }: { input: unknown }) => {
+        dispatches += 1;
+        const payload = input as EchoInput;
+        return { echoed: payload.message } satisfies EchoOutput;
+      },
+    ),
+    slow: os.route({ method: 'POST', path: '/slow' }).handler(
+      async ({ input }: { input: unknown }) => {
+        dispatches += 1;
+        const payload = input as EchoInput;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        return { echoed: payload.message } satisfies EchoOutput;
+      },
+    ),
+  };
+  const running = await createService(router, { name: SERVICE_NAME })
+    .withRPC({ rpcPath: RPC_PATH })
+    .serve({ port: 0 });
+  const envKey = createServerServiceEnvKey(SERVICE_NAME);
+  const previous = Deno.env.get(envKey);
+  Deno.env.set(envKey, clientOrigin(running.addr.hostname, running.addr.port));
+
+  try {
+    const baseline = createServiceClient({
+      contract: router,
+      serviceName: SERVICE_NAME,
+    });
+    const compatibility = createServiceClient({
+      contract: router,
+      serviceName: SERVICE_NAME,
+      port: running.addr.port + 1,
+      timeout: 1,
+    });
+
+    assertEquals(await baseline.echo({ message: 'same-discovery' }), {
+      echoed: 'same-discovery',
+    });
+    assertEquals(await compatibility.echo({ message: 'same-discovery' }), {
+      echoed: 'same-discovery',
+    });
+    assertEquals(await compatibility.slow({ message: 'no-synthetic-timeout' }), {
+      echoed: 'no-synthetic-timeout',
+    });
+    assertEquals(dispatches, 3);
+
+    const reason = new Error('explicit-cancellation');
+    const baselineController = new AbortController();
+    const compatibilityController = new AbortController();
+    baselineController.abort(reason);
+    compatibilityController.abort(reason);
+    const baselineError = await assertRejects(() =>
+      baseline.echo(
+        { message: 'cancel-baseline' },
+        { context: { signal: baselineController.signal } },
+      )
+    );
+    const compatibilityError = await assertRejects(() =>
+      compatibility.echo(
+        { message: 'cancel-compatibility' },
+        { context: { signal: compatibilityController.signal } },
+      )
+    );
+    assertEquals(baselineError, reason);
+    assertEquals(compatibilityError, reason);
+    assertEquals(dispatches, 3);
   } finally {
     if (previous === undefined) {
       Deno.env.delete(envKey);

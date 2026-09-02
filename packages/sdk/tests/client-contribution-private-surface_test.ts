@@ -11,6 +11,10 @@ const PRIVATE_ADAPTER_NAMES = [
   'ProcedureMetadataPort',
   'ClientTransportPolicyPort',
   'stableV1PreparedCall',
+  'resolveTransportPolicy',
+  'ResolvedTransportPolicy',
+  'ResolvedCallTransportPolicy',
+  'ResolvedTransportCacheGroup',
 ] as const;
 
 const CONTRIBUTION_PUBLIC_SYMBOLS = [
@@ -37,6 +41,7 @@ const REJECTED_PACKED_IMPORTS = [
   '@netscript/sdk/internal/client-contributions',
   '@netscript/sdk/internal/client-contributions/adapter-ports',
   '@netscript/sdk/client-contributions',
+  '@netscript/sdk/internal/transport-policy',
 ] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
