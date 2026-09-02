@@ -1,0 +1,35 @@
+// @netscript/directory-role islands: client hydration only
+import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
+import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';
+import { {{queryFactoryName}} } from '{{clientModuleSpecifier}}';
+import { load{{resourcePascalCase}}Resource } from '../(_shared)/{{resource}}-loaders.ts';
+
+type Props = NonNullable<
+  InferDefinePageLayerLoaderProps<typeof load{{resourcePascalCase}}Resource>
+>;
+
+function {{resourcePascalCase}}Data(props: Props) {
+  const query = useIslandQuery({
+    ...{{queryFactory}}.queryOptions(props.input),
+    queryKey: {{queryFactory}}.clientKey(props.input),
+    initialData: props.initialData,
+    initialDataUpdatedAt: props.cachedAt,
+  });
+
+  if (query.isLoading) return <p role='status'>Loading {{resource}}…</p>;
+  if (query.isError) return <p role='alert'>Unable to load {{resource}}.</p>;
+
+  return (
+    <output class='block overflow-x-auto rounded-xl bg-ns-surface-raised/30 p-4 text-sm'>
+      <pre>{JSON.stringify(query.data, null, 2)}</pre>
+    </output>
+  );
+}
+
+export default function {{resourcePascalCase}}Island(props: Props) {
+  return (
+    <QueryIsland>
+      <{{resourcePascalCase}}Data {...props} />
+    </QueryIsland>
+  );
+}

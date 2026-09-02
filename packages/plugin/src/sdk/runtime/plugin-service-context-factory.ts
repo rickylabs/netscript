@@ -81,14 +81,14 @@ class LazyPluginServiceKv implements PluginServiceKv {
 }
 
 /**
- * Assemble a plugin service context around caller-owned database and KV resolvers.
+ * Assemble a plugin service context around caller-owned host resolvers.
  *
- * Neither resolver runs until its corresponding context surface is first used. Each resolver's
- * promise is then reused for all later and concurrent access.
+ * Database and KV resolution remains lazy and memoized. Environment and optional appsettings are
+ * resolved once while the context is assembled.
  *
  * @param pluginName - Plugin name used to scope the host logger
- * @param resolvers - Project-owned database and KV resolver functions
- * @returns The assembled host context without resolving either adapter
+ * @param resolvers - Project-owned database, KV, environment, and appsettings resolver functions
+ * @returns The assembled host context without resolving either lazy adapter
  *
  * @example
  * ```ts
@@ -106,18 +106,26 @@ class LazyPluginServiceKv implements PluginServiceKv {
  * });
  * ```
  */
-export function createPluginServiceContext(
+export async function createPluginServiceContext(
   pluginName: string,
   resolvers: {
     /** Resolve the project-owned database client. */
     readonly getDatabaseClient: () => Promise<unknown>;
     /** Resolve the host-selected key-value adapter. */
     readonly getKv: () => Promise<unknown>;
+    /** Resolve optional host-owned application settings. */
+    readonly getAppsettings?: () => Promise<unknown>;
+    /** Resolve host environment values instead of capturing `Deno.env`. */
+    readonly getEnvironment?: () => Promise<Readonly<Record<string, string>>>;
   },
 ): Promise<PluginServiceContext> {
   const getDatabaseClient = memoizeAsyncResolver(resolvers.getDatabaseClient);
+  const [appsettings, env] = await Promise.all([
+    resolvers.getAppsettings?.(),
+    resolvers.getEnvironment?.() ?? Promise.resolve(Deno.env.toObject()),
+  ]);
 
-  return Promise.resolve({
+  return {
     db: {
       getClient: getDatabaseClient,
     },
@@ -127,8 +135,9 @@ export function createPluginServiceContext(
     },
     kv: new LazyPluginServiceKv(resolvers.getKv),
     logger: createPluginLogger(pluginName),
-    env: Deno.env.toObject(),
-  });
+    env,
+    appsettings,
+  };
 }
 
 function memoizeAsyncResolver<T>(resolver: AsyncResolver<T>): AsyncResolver<T> {

@@ -1,5 +1,8 @@
 import { createTelemetryQuery, type TelemetryQueryPort } from '@netscript/telemetry/query';
-import type { TelemetryEndpointEnvironment } from '../domain/telemetry-endpoint.ts';
+import type {
+  AspirePsDashboardPort,
+  TelemetryEndpointEnvironment,
+} from '../domain/telemetry-endpoint.ts';
 import { resolveTelemetryEndpoint } from '../domain/telemetry-endpoint.ts';
 
 /** Infrastructure overrides used by tests and non-standard Aspire installations. */
@@ -8,6 +11,8 @@ export interface ResolvedTelemetryQueryOptions {
   readonly fetch?: typeof fetch;
   /** Directory containing trusted ASP.NET development certificate PEM files. */
   readonly aspnetTrustDirectory?: string;
+  /** Injectable `aspire ps` reader used after configured environment inputs. */
+  readonly aspirePs?: AspirePsDashboardPort;
 }
 
 function isLoopbackHttps(endpoint: string): boolean {
@@ -70,7 +75,7 @@ export function createResolvedTelemetryQuery(
   environment: TelemetryEndpointEnvironment,
   options: ResolvedTelemetryQueryOptions = {},
 ): TelemetryQueryPort {
-  const endpoint = resolveTelemetryEndpoint(explicit, environment).endpoint;
+  const endpoint = resolveTelemetryEndpoint(explicit, environment, options.aspirePs).endpoint;
   return createTelemetryQuery({
     endpoint,
     fetch: createAspireDashboardFetch(endpoint, options),

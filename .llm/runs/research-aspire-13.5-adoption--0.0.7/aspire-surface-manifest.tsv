@@ -1,12 +1,69 @@
 path	class	owner	disposition
 .agents/docs/README.md	skill:internal	S13	wording check; no version literal expected
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/aws.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/azure.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/cicd.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/docker-compose.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/github-actions-azure-csharp.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/github-actions-azure-typescript.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/javascript.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/kubernetes.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/preflight.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-deployment/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-init/references/init-workflow.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-init/references/templates.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-init/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/diagnostics-bridge.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/monitoring.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/playwright-handoff.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/agent-workflows.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/app-commands.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/detection.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/resource-management.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/safety-guardrails.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/aspire/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/help.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/netscript-build/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.agents/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/aws.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/azure.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/cicd.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/docker-compose.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/github-actions-azure-csharp.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/github-actions-azure-typescript.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/javascript.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/kubernetes.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/preflight.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-deployment/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-init/references/init-workflow.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-init/references/templates.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-init/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/diagnostics-bridge.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/monitoring.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/playwright-handoff.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/agent-workflows.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/app-commands.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/detection.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/resource-management.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/safety-guardrails.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/aspire/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/help.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript-build/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/consumer-tools.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/e2e/scaffold-e2e-test.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/README.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/run-deno-lint.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.llm/tools/validation/check-aspire-host-ports.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
+.agents/generated/consumer-skills/.mcp.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/AGENTS.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	authoritative repository skill; align directly
+.agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
 .agents/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
 .agents/skills/netscript-cli/commands.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-cli/maintainer-cli.md	skill:internal	S13	wording check; no version literal expected
@@ -26,7 +83,8 @@ path	class	owner	disposition
 .github/workflows/e2e-cli.yml	ci:workflow	S1	single 13.5.3 train, cache key, preflight; parity phase 1 enforce
 .llm/2026-07-31-fix-954-aspire-app-health-probe.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/2026-08-04-openapi-mcp-wave0-proofs.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
-.llm/2026-08-29-aspire-13.5-adoption-research.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
+.llm/2026-08-31-sdk-browser-full-key-normalization.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
+.llm/2026-09-01-workers-registry-compiler-parity.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/assets/agent-docs/provenance.json	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/devtools-rfc-orchestrator-brief.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/harness/archetypes/ARCHETYPE-2-integration.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
@@ -41,73 +99,13 @@ path	class	owner	disposition
 .llm/harness/gates/README.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/harness/gates/release-gates.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/harness/gates/runtime-gates.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
-.llm/runs/research-aspire-13.5-adoption--0.0.7/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/drift.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/epic-draft.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/existing-issue-map.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/plan-eval-cycle-2.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/plan-eval.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/receipts/aspire-13.4.6-mcp-baseline.json	archival:version-suffixed-fixture	archival	exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)
-.llm/runs/research-aspire-13.5-adoption--0.0.7/research.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspire-whats-new-13.5.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-app-host_container-files.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-app-host_typescript-apphost.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-app-host_with-terminal.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-dashboard_ai-coding-agents.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-extensibility_interaction-service.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-fundamentals_custom-resource-commands.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-fundamentals_health-checks.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-get-started_ai-coding-agents.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-get-started_aspire-mcp-server.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-get-started_aspire-skills.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-get-started_resource-mcp-servers.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_api_typescript_aspire.hosting.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-agent-init.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-agent-mcp.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-deploy.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-describe.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-destroy.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-do.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-docs-api-search.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-doctor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-export.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-ls.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-mcp.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-otel-logs.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-otel-traces.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-ps.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-publish.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-resource.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-start.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-stop.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-terminal.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-update.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-reference_cli_commands_aspire-wait.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/aspiredev-whats-new_upgrade-aspire.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/github-release-v13.5.0.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/github-release-v13.5.1.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/github-release-v13.5.2.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/github-release-v13.5.3.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sources/README.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/stale-surface-inventory.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/01-pin-bump-and-parity-gate.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/02-runtime-verification-pass.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/03-fixture-recapture.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/04-generator-revalidation.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/05-literal-ports.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/06-real-health-checks.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/07-teardown-leak-check.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/08-typed-resource-commands.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/09-skills-corpora-mcp-alignment.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/10-e2e-gate-upgrades.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/11-public-docs-refresh.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/12-next-wave-spikes.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/sub-issues/13-stale-surface-cleanup.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/harness/templates/milestone-cluster-state.json	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
+.llm/harness/workflow/milestone-reporting.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/drift.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/tools/agentic/claude/hybrid-opencode-adapter_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/codex/run-codex-slice-lib_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/agentic/dogfood-skills.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/opencode/opencode-boundary-plugin.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/opencode/opencode-preflight_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/opencode/opencode-project-config_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -115,30 +113,47 @@ path	class	owner	disposition
 .llm/tools/agentic/runtime/adapters/local-codex-remote-adapter.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/runtime/contract.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.4.6.json	archival:version-suffixed-fixture	archival	exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)
+.llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.5.3.json	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/__fixtures__/process-tree-13.5.3-orphaned.json	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/__fixtures__/process-tree-13.5.3-phase-b-live.json	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/__fixtures__/README.md	compat-fixture	S7	documents why the version-suffixed 13.4.6 teardown fixture is retained and names its 13.5.3 counterpart; parity phase 2 asserts the 13.5.3 case exists
 .llm/tools/agentic/teardown/forbidden-commands_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/leak-check_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/leak-check.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/ownership_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/ownership.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
+.llm/tools/agentic/teardown/phase-b-live-snapshot_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/probes_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 .llm/tools/agentic/teardown/probes.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/teardown_test.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/teardown/teardown.ts	teardown	S7	orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture
 .llm/tools/agentic/wsl/wsl-foundation-lib.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/wsl/wsl-foundation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/CLEANUP-PLAYBOOK.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-README.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/consumer-tools.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/check-accuracy-and-discoverability_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/docs/check-accuracy-and-discoverability.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-docs-contract-derivation.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/docs/check-exports-drift.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/scaffold-e2e-test_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/e2e/scaffold-e2e-test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/entry.md	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/fitness/check-public-jsdoc-codenames_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/gates/catalog.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/gates/run-aspire-mcp-smoke.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/harness/render-milestone-status_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/harness/render-milestone-status.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/harness/validate-milestone-cluster_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/harness/validate-milestone-cluster.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/baselines/public-surfaces.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-fmt.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/check-aspire-version-parity_test.ts	compat-fixture	S7/S13	validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+.llm/tools/validation/check-aspire-version-parity.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/check-compat-fixtures_test.ts	compat-fixture	S7/S13	validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 .llm/tools/validation/check-scaffold-versions.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .openhands/setup.sh	ci:openhands	S1	OpenHands runner hydrates Aspire CLI from toolchain.env; parity phase 1 enforce
 AGENTS.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)
@@ -226,8 +241,8 @@ docs/site/orchestration-runtime/how-to/author-a-plugin.md	doc:public-page	S11	pr
 docs/site/orchestration-runtime/how-to/deploy-deno-deploy.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/deploy-local-aspire.md	doc:aspire-dedicated	S11	version snippets must equal a fresh netscript init; parity phase 2 enforce
 docs/site/orchestration-runtime/how-to/deploy.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
+docs/site/orchestration-runtime/how-to/detached-start-agents-ci.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/how-to/graceful-shutdown.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
-docs/site/orchestration-runtime/how-to/roll-out-runtime-overrides.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/index.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/orchestration-runtime/runtime-config.md	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
 docs/site/quickstart.vto	doc:public-page	S11	prose sweep + #1000 terminology; doc:lint
@@ -308,6 +323,7 @@ packages/aspire/src/application/port-allocation.ts	aspire-ports	N/A	SDK-neutral 
 packages/aspire/src/application/resolve-env-vars.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/application/resolve-permissions.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/diagnostics/inspect-aspire.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
+packages/aspire/src/domain/aspire-resource-name.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/domain/aspire-resource.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/domain/contribution-context.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/src/domain/errors.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
@@ -334,6 +350,7 @@ packages/aspire/tests/runtime/aspire-ns-plugin-contribution_test.ts	aspire-ports
 packages/aspire/tests/runtime/contribution-registry_test.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/tests/schema_test.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
 packages/aspire/types.ts	aspire-ports	N/A	SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)
+packages/cli/CHANGELOG.md	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/deno.json	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/e2e/fixtures/desktop-native/src/constants.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/mod.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -342,18 +359,47 @@ packages/cli/e2e/src/application/builders/suite/suite-builder.ts	e2e	S2/S3/S10	r
 packages/cli/e2e/src/application/builders/workspace/smoke-project-factory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/quickstart/aspire-walk.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-telemetry.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
-packages/cli/e2e/src/application/gates/scaffold/runtime/capture-db-endpoint-allocation.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp-smoke.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/contract.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/entry-point.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/evaluate.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/receipt.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/stdio-transport.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/aspire-mcp/tools.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/database-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/find-job-execute-identity_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/generated-app-endpoint.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/otel-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/otlp-headers.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
-packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/capture-db-endpoint-allocation.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/dashboard-config.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/doctor.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/resource-command.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/listener-fault-controller.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/prepare-readiness-fixture.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-plugin-resource.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/resource-state-stream.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/runtime-scripts.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/scaffold-capability-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/scaffold-gates.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/service-env/configure-service-env.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -374,7 +420,6 @@ packages/cli/e2e/src/application/gates/scaffold/verify-endpoint-readiness.ts	e2e
 packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
-packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/cli-surface.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/evidence.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/src/domain/extension-axes.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -386,18 +431,35 @@ packages/cli/e2e/tests/adapters/reporting/pretty-reporter_test.ts	e2e	S2/S3/S10	
 packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/builders/runtime-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/builders/suite-builder_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/aspire-dashboard-telemetry_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-mcp-smoke_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/aspire-structured-evidence_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-describe-follow-13.5.3-capture.ndjson	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-doctor-13.5.3.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-post-stop-probe.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/fixtures/aspire-stop-transcript.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/cli/e2e/tests/application/gates/http-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/locate-workers-resource-block_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/prepare-readiness-fixture_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/quickstart-aspire-walk_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/resource-command-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/resource-state-stream_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/behavior-plugins-health-gate_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/generated-app-identity-source-policy_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/plugin-contract-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/scaffold/typed-db-background-restart_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/gates/scaffold/ui-ai-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/scaffold/ui-data-screen-gates_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/runner/gate-runner_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/application/runner/suite-runner_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
+packages/cli/e2e/tests/fixtures/aspire-13.5.3-mcp-recorded.json	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/init-json_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/quickstart-walk-suite_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
 packages/cli/e2e/tests/presentation/suite-registry_test.ts	e2e	S2/S3/S10	runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)
@@ -415,6 +477,7 @@ packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock_test.ts	cli-ada
 packages/cli/src/kernel/adapters/database/apphost-lifecycle-lock.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/aspire-command-executor.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operation-runner_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
+packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operation-runner-helpers.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/operation-runner.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
 packages/cli/src/kernel/adapters/database/providers/mssql.provider.ts	cli-adapter:database	S8	typed resource commands replace ad-hoc AppHost spawn for db ops
@@ -431,6 +494,7 @@ packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts	cli:othe
 packages/cli/src/kernel/adapters/service/workspace-mutator.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/templates/scaffold-template-assets.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/windows/environment/env-file-content.ts	windows-env	S13	ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)
+packages/cli/src/kernel/adapters/windows/environment/env-file-dashboard_test.ts	windows-env	S13	ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)
 packages/cli/src/kernel/adapters/windows/environment/env-file-values.ts	windows-env	S13	ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)
 packages/cli/src/kernel/adapters/windows/manifest/manifest-loader.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/adapters/windows/manifest/manifest-placeholders.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -448,11 +512,13 @@ packages/cli/src/kernel/application/scaffold/plan-init_test.ts	cli:other	S4	grep
 packages/cli/src/kernel/application/scaffold/plan-init.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/application/scaffold/render-init.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/kernel/application/scaffold/s13-stale-surface_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/application/scaffold/support/format-generated-files_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/application/scaffold/support/helpers.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/application/scaffold/validate-init.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/kernel/assets/agent-docs.generated.ts	generated:barrel	derived	deno task gen:assets-barrel; gate check:assets-barrel
 packages/cli/src/kernel/assets/agent-tools.generated.ts	generated:barrel	derived	deno task gen:assets-barrel; gate check:assets-barrel
+packages/cli/src/kernel/assets/agent/guidance.md.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/main.ts.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/routes/_app.tsx.template	template:other	S11	prose/link check only (S11 wording); no version literal
 packages/cli/src/kernel/assets/app/routes/(design)/design/(_components)/components-view.tsx.template	template:other	S11	prose/link check only (S11 wording); no version literal
@@ -523,8 +589,12 @@ packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-serv
 packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/render-http-endpoint.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
+packages/cli/src/kernel/templates/aspire/helpers/tests/aspire-compat-health-checks_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-background_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-infrastructure_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/generate-register-source-safety_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/generated-helpers-compile_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
@@ -532,6 +602,8 @@ packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-test-support.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
 packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/register-http-endpoint_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
+packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/tests/service-environment-runtime_test.ts	generator-test	S1/S4	assert against constants (S1); member table + #1371 test (S4)
 packages/cli/src/kernel/templates/aspire/helpers/types.ts	generator	S4/S5/S6/S8	generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)
@@ -558,6 +630,7 @@ packages/cli/src/maintainer/features/release/eject/producer-root-files.ts	cli:ot
 packages/cli/src/maintainer/features/release/eject/release-eject.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/maintainer/features/root/maintainer-command-dependencies.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/maintainer/features/root/maintainer-services_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer_test.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/agent/deno-aspire-agent-initializer.ts	agent-init	S9	aspire agent init delegation flags
 packages/cli/src/public/adapters/jsr-import-resolver.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/domain/scaffold-plan_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -574,6 +647,7 @@ packages/cli/src/public/features/config/project/resolve-appsettings-path.ts	cli:
 packages/cli/src/public/features/db/add/add-db-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/db/add/add-db.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/db/remove/remove-db-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/deploy/build/build-windows-prebuild_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/build/build-windows-prebuild.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/build/build-windows-strategy.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/deploy/target/desktop/package/package-desktop_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -593,6 +667,7 @@ packages/cli/src/public/features/plugins/doctor/doctor-plugin-command_test.ts	cl
 packages/cli/src/public/features/plugins/doctor/doctor-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/host/plugin-loader_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
+packages/cli/src/public/features/plugins/install/install-plugin-command_test.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin-command.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/install/install-plugin.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
 packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts	cli:other	S4	grep-verified in the S4 member table; no emission change expected
@@ -650,12 +725,15 @@ packages/mcp/cli.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures 
 packages/mcp/deno.json	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/mod.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/README.md	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/application/flows/doctor-flow.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/application/flows/telemetry-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/runner/mcp-server.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/application/service-endpoint-directory.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/doctor-check-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/telemetry-endpoint.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/domain/tool-contracts.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/aspire-doctor-family.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/src/infrastructure/aspire-ps-dashboard-reader.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/appsettings-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-command.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
@@ -663,9 +741,15 @@ packages/mcp/src/infrastructure/service-endpoints/aspire-cli-output.ts	mcp:clien
 packages/mcp/src/infrastructure/telemetry-query-adapter.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/ports/service-endpoint-directory-port.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
 packages/mcp/src/publish-assets.generated.ts	mcp:client	S3/S11/S13	Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated
+packages/mcp/tests/aspire-ps-dashboard-reader_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/doctor-families_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/drift-evidence_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/fixtures/README.md	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/mcp/tests/fixtures/telemetry/aspire-13.4.6-fixture.ts	archival:version-suffixed-fixture	archival	exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)
+packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-fixture.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-resources.json	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-spans.json	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
+packages/mcp/tests/fixtures/telemetry/README.md	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
 packages/mcp/tests/openapi-read-tools_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/service-endpoint-directory_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/service-endpoint-source-fixtures.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
@@ -713,6 +797,7 @@ packages/sdk/src/discovery/mod.ts	package:other	S4	mention only (service discove
 packages/sdk/src/discovery/service-url.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/ports/service-client.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/sdk/src/presets/define-services.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/sdk/tests/discovery/env-ordering_test.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/service/src/diagnostics/database-connectivity.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/telemetry/query.ts	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
 packages/telemetry/README.md	telemetry-bridge	S3	dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff
@@ -729,17 +814,23 @@ plugins/ai/README.md	plugin:other	S5	contribution-seam consumers; verify no lite
 plugins/auth/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/barrel/barrel.stub.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/auth/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/auth/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/sagas/deno.json	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/README.md	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/adapter/resources/resources.test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/sagas/src/aspire/sagas-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
+plugins/sagas/src/cli/adapters/runtime-api-client.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/constants.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/src/e2e/probes/probe-context.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/public/mod.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/src/runtime/saga-publisher.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/aspire/sagas-contribution_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/e2e/sagas-gates_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/tests/public/deprecated-default-port_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/tests/public/manifest_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/tests/runtime/saga-publisher_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
+plugins/sagas/tests/streams/factory-discovery_test.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/sagas/verify-plugin.ts	plugin:sagas	S5	SagaPublisherResult redesign (jsr-audit recorded in research §15)
 plugins/streams/deno.json	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/README.md	plugin:other	S5	contribution-seam consumers; verify no literal port
@@ -748,6 +839,7 @@ plugins/streams/src/adapter/plugin.ts	plugin:other	S5	contribution-seam consumer
 plugins/streams/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/streams/src/aspire/streams-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
+plugins/streams/src/e2e/probes/probe-context.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/tests/aspire/streams-contribution_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/streams/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
@@ -758,10 +850,14 @@ plugins/triggers/services/src/main.ts	plugin:other	S5	contribution-seam consumer
 plugins/triggers/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/triggers/src/aspire/triggers-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
+plugins/triggers/src/cli/http-triggers-service.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/src/runtime/trigger-processor.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/tests/aspire/aspire_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/triggers/tests/e2e/webhooks_helpers.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/triggers/tests/public/deprecated-default-port_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/triggers/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/triggers/verify-plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/bin/runtime.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/deno.json	plugin:other	S5	contribution-seam consumers; verify no literal port
@@ -769,9 +865,14 @@ plugins/workers/README.md	plugin:other	S5	contribution-seam consumers; verify no
 plugins/workers/src/adapter/resources/resources.test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/aspire/mod.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
 plugins/workers/src/aspire/workers-contribution.ts	plugin-contribution	S5/S6	literal ports removed (S5); health registration hook (S6)
+plugins/workers/src/cli/adapters/runtime-api-client.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/src/e2e/probes/probe-context.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/src/public/mod.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/streams/factory.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/test-api.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/aspire/workers-contribution_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/tests/public/manifest_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
+plugins/workers/tests/streams/factory-discovery_test.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 plugins/workers/verify-plugin.ts	plugin:other	S5	contribution-seam consumers; verify no literal port
 README.md	doc:root	S11	prose sweep (AGENTS.md only if skill path changes)
 resources/design/dashboard/CLAUDE-DESIGN-BRIEF.md	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
@@ -796,10 +897,12 @@ resources/design/dashboard/screens/01-stack-map.html	archival:design-corpus	arch
 resources/design/dashboard/screens/02-flow-trace.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
 resources/design/dashboard/screens/03-service-catalog.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
 resources/design/dashboard/screens/04-run-inspector.html	archival:design-corpus	archival	exempt — design evidence; parity gate reports info only
+rfcs/0000-polyglot-task-protocol.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0000-scriptc-task-runtime-adapter.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0002-runtime-versioned-automation.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0004-deterministic-first-hybrid-mcp-doc-retrieval.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 rfcs/0005-devtools-contribution.md	archival:rfc	archival	exempt — RFC body; dated addenda only
+rfcs/0006-database-architecture.md	archival:rfc	archival	exempt — RFC body; dated addenda only
 skills/aspire/SKILL.md	skill:shipped	S9	receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce
 skills/help.md	skill:shipped	S9	receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce
 skills/manifest.json	skill:shipped	S9	receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce

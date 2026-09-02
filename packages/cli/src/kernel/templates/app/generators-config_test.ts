@@ -148,13 +148,14 @@ describe('generateAppDenoJson', () => {
       'update',
     ]);
     assertEquals(config.exclude, ['**/_fresh/*']);
-    assertEquals(Object.keys(config.imports).slice(0, 7), [
+    assertEquals(Object.keys(config.imports).slice(0, 8), [
       '@app/',
       '@my-project/contracts',
       '@netscript/fresh',
       '@netscript/fresh/defer/island',
       '@netscript/fresh-ui',
       '@netscript/sdk',
+      '@netscript/mcp',
       'fresh',
     ]);
     assertEquals(config.imports['@app/'], './');
@@ -224,6 +225,7 @@ describe('generateAppDenoJson', () => {
       '../../packages/fresh-ui/interactive.ts',
     );
     assertEquals(config.imports['@netscript/sdk'], '../../packages/sdk/mod.ts');
+    assertEquals(config.imports['@netscript/mcp'], '../../packages/mcp/mod.ts');
     assertEquals(
       config.imports['@netscript/sdk/client'],
       '../../packages/sdk/src/client/mod.ts',

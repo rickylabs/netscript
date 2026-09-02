@@ -17,4 +17,6 @@ export interface PluginServiceContext {
   readonly logger: unknown;
   /** Environment variables captured by the host. */
   readonly env: Readonly<Record<string, string>>;
+  /** Optional opaque application settings supplied by the host. */
+  readonly appsettings?: unknown;
 }

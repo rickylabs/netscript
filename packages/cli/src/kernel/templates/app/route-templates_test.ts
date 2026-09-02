@@ -55,6 +55,7 @@ import {
   appServiceSummaryCardTemplate,
   appServiceSummaryPanelTemplate,
   appServiceSummaryPartialTemplate,
+  appTelemetryExampleSharedTemplate,
   appUtilsTemplate,
   makeAdapter,
   SAMPLE_APP_VARS,
@@ -88,6 +89,25 @@ function assertUniqueDirectAppRouteTargets(source: string): void {
 }
 
 describe('app route template rendering', () => {
+  it('telemetry example resolves env then running AppHost and renders unavailable guidance', () => {
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      "import { AspirePsDashboardReader, resolveTelemetryEndpoint } from '@netscript/mcp';",
+    );
+    assertStringIncludes(appTelemetryExampleSharedTemplate, 'NETSCRIPT_TELEMETRY_ENDPOINT');
+    assertStringIncludes(appTelemetryExampleSharedTemplate, 'ASPIRE_DASHBOARD_PORT');
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      'resolved.httpsFallback ?? resolved.endpoint',
+    );
+    assertStringIncludes(appTelemetryExampleSharedTemplate, "source === 'default'");
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      'dashboard unavailable — run `aspire ps`',
+    );
+    assert(!appTelemetryExampleSharedTemplate.includes('18888'));
+  });
+
   it('router.ts mirrors the playground route entrypoint and adds the scaffold service ref', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appRouterTemplate, SAMPLE_APP_VARS);

@@ -33,11 +33,16 @@ export function validateFlowB(
   traces: readonly TelemetryTrace[],
   flowBCorrelationId: string,
 ): void {
-  const main = traces.find((trace) =>
+  // More than one Flow-B-shaped trace coexists in the dashboard (`behavior.triggers-webhook`
+  // fires the same generic webhook earlier in the suite), so the trace carrying the recorded
+  // correlation fixture is authoritative; dashboard ordering only breaks ties.
+  const flowBShaped = traces.filter((trace) =>
     hasAny(trace, ['trigger.ingress', 'trigger.detect']) && has(trace, 'queue.enqueue') &&
     has(trace, 'queue.dequeue') &&
     has(trace, 'job.execute')
   );
+  const main = flowBShaped.find((trace) => carriesCorrelation(trace, flowBCorrelationId)) ??
+    flowBShaped[0];
   tcAssert(
     'TC-1/TC-2',
     main !== undefined,
@@ -90,7 +95,10 @@ export function validateFlowB(
   const subscribeSpans = traces.flatMap((trace) => trace.spans).filter((span) =>
     span.name === 'stream.subscribe'
   );
-  const fanIn = subscribeSpans.find((span) => span.links.length > 0) ?? subscribeSpans[0];
+  const fanIn =
+    subscribeSpans.find((span) =>
+      span.links.length > 0 && span.attributes['netscript.correlation.id'] === flowBCorrelationId
+    ) ?? subscribeSpans.find((span) => span.links.length > 0) ?? subscribeSpans[0];
   tcAssert('TC-14', fanIn !== undefined, 'real streams consumer span exists');
   tcAssert(
     'TC-14',
@@ -258,4 +266,8 @@ function hasOutcome(span: TelemetrySpan): boolean {
 function tcAssert(tc: string, condition: boolean, description: string): asserts condition {
   if (!condition) throw new Error(`${tc} FAIL: ${description}`);
   console.info(`${tc} PASS: ${description}`);
+}
+
+function carriesCorrelation(trace: TelemetryTrace, correlationId: string): boolean {
+  return trace.spans.some((span) => span.attributes['netscript.correlation.id'] === correlationId);
 }

@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertThrows } from 'jsr:@std/assert@^1';
 
 import {
   DeployTargetRegistry,
@@ -29,8 +29,9 @@ function fakeTarget(calls: RecordedOp[]): DeployTargetPort {
   return {
     key: 'compose',
     label: 'Docker Compose',
-    operations: ['plan', 'up', 'down', 'status', 'logs'],
+    operations: ['plan', 'emit', 'up', 'down', 'status', 'logs'],
     plan: handler('plan'),
+    emit: handler('emit'),
     up: handler('up'),
     down: handler('down'),
     status: handler('status'),
@@ -54,7 +55,18 @@ Deno.test('router derives verb subcommands from the adapter operations (no busin
   const command = createTargetDeployCommand('compose', fakeDependencies([]));
   const verbs = command.getCommands().map((c) => c.getName()).sort();
 
-  assertEquals(verbs, ['down', 'logs', 'plan', 'status', 'up']);
+  assertEquals(verbs, ['down', 'emit', 'logs', 'plan', 'status', 'up']);
+});
+
+Deno.test('router routes emit straight to the registry-resolved adapter', async () => {
+  const calls: RecordedOp[] = [];
+  const command = createTargetDeployCommand('compose', fakeDependencies(calls));
+
+  await command.parse(['emit', '--output-dir', '.deploy/compose']);
+
+  assertEquals(calls.length, 1);
+  assertEquals(calls[0].operation, 'emit');
+  assertEquals(calls[0].request.outputDir, '.deploy/compose');
 });
 
 Deno.test('router routes a verb straight to the registry-resolved adapter', async () => {
@@ -155,10 +167,14 @@ Deno.test('router exposes secrets set/get/list and forwards the selected operati
   const target = fakeTarget(calls);
   const registry = new DeployTargetRegistry([[
     'compose',
-    { ...target, operations: [...target.operations, 'secrets'], secrets: (request) => {
-      calls.push({ operation: 'secrets', request });
-      return Promise.resolve({ target: 'compose', operation: 'secrets', message: 'secrets ok' });
-    } },
+    {
+      ...target,
+      operations: [...target.operations, 'secrets'],
+      secrets: (request) => {
+        calls.push({ operation: 'secrets', request });
+        return Promise.resolve({ target: 'compose', operation: 'secrets', message: 'secrets ok' });
+      },
+    },
   ]]);
   const dependencies = {
     deployTargets: registry,
@@ -167,7 +183,11 @@ Deno.test('router exposes secrets set/get/list and forwards the selected operati
   } as unknown as PublicCommandDependencies;
   const command = createTargetDeployCommand('compose', dependencies);
   const secrets = command.getCommands().find((entry) => entry.getName() === 'secrets');
-  assertEquals(secrets?.getCommands().map((entry) => entry.getName()).sort(), ['get', 'list', 'set']);
+  assertEquals(secrets?.getCommands().map((entry) => entry.getName()).sort(), [
+    'get',
+    'list',
+    'set',
+  ]);
 
   await command.parse(['secrets', 'set', 'DATABASE_URL', 'secret']);
   assertEquals(calls[0].request.secrets, {
@@ -188,13 +208,50 @@ Deno.test('deploy target routers resolve their default registry targets', () => 
     const command = createTargetDeployCommand(key, dependencies);
     const verbs = command.getCommands().map((c) => c.getName()).sort();
 
-    assertEquals(verbs, ['down', 'logs', 'plan', 'status', 'up']);
+    assertEquals(verbs, ['down', 'emit', 'logs', 'plan', 'status', 'up']);
   }
 
   for (const key of ['kubernetes', 'azure-aca', 'azure-app-service', 'azure-aks', 'cloud-run']) {
     const command = createTargetDeployCommand(key, dependencies);
     const verbs = command.getCommands().map((c) => c.getName()).sort();
 
-    assertEquals(verbs, ['down', 'plan', 'up']);
+    assertEquals(verbs, ['down', 'emit', 'plan', 'up']);
   }
+});
+
+Deno.test('router exposes every operation advertised by each default target', () => {
+  const dependencies = {
+    deployTargets: new DeployTargetRegistry(),
+    resolveProjectRoot: () => Promise.resolve('/resolved-root'),
+    loadConfig: () => Promise.resolve({}),
+  } as unknown as PublicCommandDependencies;
+
+  for (const [key, target] of dependencies.deployTargets.entries()) {
+    const verbs = createTargetDeployCommand(key, dependencies)
+      .getCommands()
+      .map((command) => command.getName())
+      .sort();
+
+    assertEquals(
+      verbs,
+      [...target.operations].sort(),
+      `${key} must route every advertised operation`,
+    );
+  }
+});
+
+Deno.test('router rejects a synthetic advertised operation without a route', () => {
+  const dependencies = fakeDependencies([]);
+  const target = fakeTarget([]);
+  dependencies.deployTargets.register('compose', {
+    ...target,
+    operations: [...target.operations, 'build'],
+    build: target.plan,
+  });
+
+  assertThrows(
+    () => createTargetDeployCommand('compose', dependencies),
+    Error,
+    'advertises unrouted operations: build',
+  );
 });

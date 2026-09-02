@@ -9,6 +9,7 @@ import {
 } from './DeferIsland.tsx';
 import { DeferComponent } from './island.ts';
 import { DeferPage, type DeferPageProps } from './DeferPage.tsx';
+import { decideDeferClientAction, resolveDeferPolicy } from './policy.ts';
 
 interface VNodeLike {
   readonly type: unknown;
@@ -143,6 +144,38 @@ Deno.test('DeferComponent enables f-client-nav for every request and cache combi
       `Expected client navigation for ${JSON.stringify(combination)}`,
     );
   }
+});
+
+Deno.test('defer client policy skips a partial request that already has cached data', () => {
+  const policy = resolveDeferPolicy(undefined, undefined, undefined);
+
+  assertEquals(
+    decideDeferClientAction({
+      isPartialRequest: true,
+      hasCachedData: true,
+      hasFreshnessInfo: true,
+      isFresh: true,
+      staleTimeMs: policy.staleTimeMs,
+      policy,
+    }),
+    { action: 'skip', reason: 'partial-hit' },
+  );
+});
+
+Deno.test('defer client policy submits a partial request when cached data is absent', () => {
+  const policy = resolveDeferPolicy(undefined, undefined, undefined);
+
+  assertEquals(
+    decideDeferClientAction({
+      isPartialRequest: true,
+      hasCachedData: false,
+      hasFreshnessInfo: false,
+      isFresh: false,
+      staleTimeMs: policy.staleTimeMs,
+      policy,
+    }),
+    { action: 'submit', reason: 'partial-miss' },
+  );
 });
 
 Deno.test('DeferPage server tree carries the registered defer island component identity', () => {
