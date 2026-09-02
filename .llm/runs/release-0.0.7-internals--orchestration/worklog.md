@@ -10922,3 +10922,12 @@ After the converge, #1952 touches `listener-readiness-gates_test.ts` (allow-run 
 does #1959 (fixes, #1844; adds deadline-snapshot tests). `git merge-tree` between the two branches
 is clean — no ordering constraint. Noted on both PRs. My earlier overlap check used a file list
 captured before the converge; re-derived from the live heads, which is the only valid source.
+
+### D-268 — microfix #1962 audited read-only at 998f8e031: PASS, no findings; offered as the formal IMPL-EVAL
+
+E2E-only scope (gate, test, one real 13.5.3 describe fixture, TSV), lock churn 0. Resolver: exact
+displayName/name wins regardless of array order; ambiguity throws with candidates; DCP fallback
+requires the same scheme regex as `tcpUrl` (477/499 identical) so the fallback cannot pick what
+`tcpUrl` rejects. Fixture shows the exact failing shape: `postgres-password` (Parameter, urls=[])
+before `postgres-2226b6f5` (Container, displayName `postgres`, `tcp://localhost:10538`). Tests
+14/0, e2e check 0. Posted on #1962; no edits, no relabel, no duplication of the coordinator's agent.
