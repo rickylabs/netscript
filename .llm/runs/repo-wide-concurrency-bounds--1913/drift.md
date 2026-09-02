@@ -55,3 +55,32 @@
 - **Action:** fix
 - **Evidence:** supervisor explicitly resumed this leaf and directed it to commit/push everything;
   push uses the stored workflow-scoped credential without exposing it.
+
+## 2026-09-02 — Stale branch dispatches retain the old Pages queue policy
+
+- **What:** The workflow comment's serial-retention guarantee originally omitted that GitHub uses
+  the arriving run's workflow revision.
+- **Source:** IMPL-EVAL origin-branch sweep at head `47c3b4241`.
+- **Expected:** Merging the bound closes ordinary `push: main` and release traffic exposure.
+- **Actual:** Of 158 origin branches, only this branch carries `queue: max` in `pages.yml`; a
+  workflow dispatch from one of 157 stale copies can still join `pages-deploy` under the default
+  pending policy and displace a pending main run until that branch copy converges.
+- **Severity:** minor residual
+- **Action:** accept and document in the `pages.yml` diagnostic header; the literal key remains the
+  correct mutex for a single global site.
+- **Evidence:** evaluator count: Pages with bound 1, without 157.
+
+## 2026-09-02 — Canary duplicate behavior and hosted-evidence precision
+
+- **What:** The canary header overstated that every redundant request fails closed, and two hosted
+  evidence statements needed temporal/API qualifications.
+- **Source:** IMPL-EVAL findings F2-F4.
+- **Expected:** Republish requests meet existing-version guards; latest-100 traffic and zero-step
+  deployment evidence remain auditable when later API reads differ.
+- **Actual:** Duplicate `target-version` requests mint successive canary numbers serially and each
+  consumes a publish-budget slot. The latest-100 push count is window-dependent (12 initially, 11
+  at evaluation), and zero deploy steps still produced deployment record `6221263357` in
+  `waiting` then `failure` state.
+- **Severity:** minor
+- **Action:** fix comments/evidence only; retain the evaluated concurrency mappings unchanged.
+- **Evidence:** corrected `release-canary.yml` header and `evidence.md` qualifications.

@@ -8,6 +8,8 @@
 - Issue correction measurement: latest 100 Pages runs contained 88 pull requests and 12 main
   pushes. Close main-push pairs occurred at 06:01:58/06:02:25 (27s),
   06:39:22/06:43:33 (4m11s), and 06:43:33/06:49:46 (6m13s) UTC.
+- The latest-100 count is a sliding-window observation, not a stable inventory: the evaluator's
+  later recheck found 11 main pushes while reproducing the same close-gap values above.
 
 ## Required gate exits
 
@@ -22,6 +24,14 @@
 The format wrapper initially returned exit 1 for mechanical wrapping in the new test. The file was
 formatted directly (`TARGETED_FMT_WRITE_REAL_EXIT=0`) and the complete final gate set above was
 rerun; the table records the final-head verdicts.
+
+## Post-IMPL-EVAL findings follow-up
+
+The four evaluator findings required comments and evidence only. After those edits, the focused
+release test passed 6/6 (`REAL_EXIT=0`), the `.llm/tools` check passed across 342 files and three
+batches (`REAL_EXIT=0`), and `git diff --check` passed (`REAL_EXIT=0`). An independent YAML parse
+compared each complete `concurrency` object with evaluated head `47c3b4241`; both serialized values
+were byte-identical (`REAL_EXIT=0`). The evaluated logic therefore did not change.
 
 ## Parsed concurrency sweep
 
@@ -76,7 +86,9 @@ build setup ran and its deploy job had `steps: 0`, so no Pages deployment action
 
 The feature-branch occupant completed before its cancellation request arrived. This stayed safe:
 its environment-protected deploy job failed with `steps: 0`, exactly as the preflight predicted.
-No real deployment occurred in any of the three runs.
+GitHub nevertheless created deployment object `6221263357`, which moved from `waiting` to
+`failure`; that record did not execute a deployment action. No real deployment occurred in any of
+the three runs.
 
 ### Acceptance interpretation
 

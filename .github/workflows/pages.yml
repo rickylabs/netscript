@@ -52,6 +52,9 @@ permissions:
 # leaves only one PENDING slot; a third arrival evicts that pending job, whose
 # `cancelled` conclusion and zero executed steps distinguish queue eviction from
 # mid-execution cancellation. Retain every arrival for serial execution.
+# This guarantee applies only to arrivals carrying this workflow revision:
+# dispatches from stale branches use that ref's older queue policy and can still
+# displace a pending `pages-deploy` entry until those branch copies converge.
 #
 # The deploy job's `github-pages` environment applies deployment protections;
 # GitHub environments and concurrency groups are independent, so it does not
