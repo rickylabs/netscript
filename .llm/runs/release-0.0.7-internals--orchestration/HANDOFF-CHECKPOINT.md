@@ -26,7 +26,10 @@ D-224 through D-226 were shaped by this session's token lacking PAT `workflow` s
 `gist, read:org, repo, workflow`. Both remaining issues are workflow changes and their authors can
 push them. The taxonomy recorded on #1908 stays true as history; it is no longer a constraint.
 
-## Live work
+## Live work — NONE as of 2026-09-02 18:35Z (all owned issues merged and closed; see D-246)
+
+<!-- historical table retained below -->
+## Live work (historical)
 
 | # | Branch | Worktree | Thread | State |
 | --- | --- | --- | --- | --- |

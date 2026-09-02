@@ -10671,3 +10671,18 @@ push. Re-packeted for coordinator merge.
 
 **Rule kept:** before adding an evidence block to a PR that already carries `Closes #N`, check for an
 existing one; a second entry is a conflict to the mirror, not a supplement.
+
+### D-246 — #1937 merged as ef8f3bee7; #1867 CLOSED; internals lane fully drained
+
+Verified live: #1937 `MERGED` 18:35:31Z, merge `ef8f3bee7`; #1867 `CLOSED/COMPLETED` 18:35:32Z via
+its closing keyword; the guard is on `main` (`gen:mcp-export-corpus` carries `--allow-run=deno,git`).
+`origin/main` = `c0b7d841a`.
+
+Allocation reconciled after merge: **0** open internals issues at any milestone, **0** unowned 0.0.7
+issues (27 open, all fixes/features/aspire), only PR is the #1641 umbrella. Final closeout posted to
+#1641. Posture through stable cut: event-driven via the persistent allocation watcher; no polling
+turns; on-request evaluation for other lanes remains offered.
+
+Lane totals this rotation: 4 issues closed (3 × 0.0.7 + 1 × 0.0.8), 4 PRs merged, 5 opposite-family
+IMPL-EVALs dispatched or performed (#1917, #1923, #1929, #1937 authored-leaf; #1933 coordinator leaf),
+1 post-merge proof PR, 0 merges by this supervisor.
