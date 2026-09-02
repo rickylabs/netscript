@@ -1,0 +1,11 @@
+[
+  {
+    "appHostPath": "/home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-lease/s7lease/aspire/apphost.mts",
+    "appHostPid": 1918656,
+    "status": "running",
+    "sdkVersion": "13.5.3",
+    "cliPid": 1918637,
+    "dashboardUrl": "https://localhost:40373",
+    "logFilePath": "/home/agent/projects/netscript/.aspire/logs/cli_20260831T055845881_detach-child_481ac7b108e64c2d9512792024b418a3.log"
+  }
+]

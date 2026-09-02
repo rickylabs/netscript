@@ -74,7 +74,10 @@ export async function verifyListenerFailureRecovery(
     expectations.map((expectation) => pollHealthyReport(appHost, expectation, expectations)),
   );
   const baselineReal = await requireRealBackingHealthy(appHost, expectations);
-  await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+  await commandListenerFaultController(projectRoot, {
+    postgresOpen: true,
+    garnetOpen: true,
+  });
 
   const receipts: ListenerRecoveryReceipt[] = [];
   let primaryFailure: unknown;
@@ -82,7 +85,7 @@ export async function verifyListenerFailureRecovery(
   try {
     for (let index = 0; index < expectations.length; index += 1) {
       const expectation = expectations[index];
-      await commandController(projectRoot, closedState(expectation));
+      await commandListenerFaultController(projectRoot, closedState(expectation));
       const unhealthy = await pollReport(
         appHost,
         expectation,
@@ -113,7 +116,7 @@ export async function verifyListenerFailureRecovery(
       );
       const afterWait = await requireRealBackingHealthy(appHost, expectations);
 
-      await commandController(projectRoot, reopenedState(expectation));
+      await commandListenerFaultController(projectRoot, reopenedState(expectation));
       const recovered = await pollHealthyReport(appHost, expectation, expectations);
       const afterRecovery = await requireRealBackingHealthy(appHost, expectations);
       receipts.push({
@@ -132,7 +135,10 @@ export async function verifyListenerFailureRecovery(
     primaryFailure = error;
   } finally {
     try {
-      await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+      await commandListenerFaultController(projectRoot, {
+        postgresOpen: true,
+        garnetOpen: true,
+      });
     } catch (error) {
       cleanupFailure = error;
     }
@@ -294,7 +300,8 @@ function assertRealBackingHealthy(
   });
 }
 
-async function commandController(
+/** Apply one revision to D-101's controller and require its exact acknowledgement. */
+export async function commandListenerFaultController(
   projectRoot: string,
   desired: Pick<ListenerFaultState, 'postgresOpen' | 'garnetOpen'>,
 ): Promise<ListenerFaultState> {

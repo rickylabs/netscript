@@ -1,0 +1,25 @@
+{
+  "source": {
+    "mode": "command",
+    "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g",
+    "exitCode": 0
+  },
+  "selection": {
+    "filesSelected": 3,
+    "batches": 1,
+    "failedBatches": 0
+  },
+  "coverage": {
+    "filesSelected": 3,
+    "filesProcessed": 3,
+    "droppedFiles": [],
+    "refusals": []
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

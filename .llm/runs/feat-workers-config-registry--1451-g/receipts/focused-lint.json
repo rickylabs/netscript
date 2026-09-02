@@ -1,0 +1,37 @@
+{
+  "source": {
+    "mode": "command",
+    "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-workers-g",
+    "exitCode": 2
+  },
+  "selection": {
+    "filesSelected": 4,
+    "batches": 2,
+    "failedBatches": 1,
+    "excludedBatches": 1
+  },
+  "coverage": {
+    "filesSelected": 4,
+    "filesProcessed": 3,
+    "droppedFiles": [
+      "packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts"
+    ],
+    "refusals": [
+      {
+        "cause": "partial-exclusion",
+        "filesSelected": 4,
+        "filesProcessed": 3,
+        "droppedFiles": [
+          "packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts"
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueRules": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

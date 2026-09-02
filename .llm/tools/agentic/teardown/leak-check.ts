@@ -1,5 +1,11 @@
 import { dirname, isAbsolute, join, relative, resolve } from '@std/path';
-import { classify, type Ownership, type ResourceCandidate } from './ownership.ts';
+import {
+  classify,
+  classifyVolume,
+  type ContainerCandidate,
+  type Ownership,
+  type ResourceCandidate,
+} from './ownership.ts';
 import { probeResourceReport, type ProbeStatus } from './probes.ts';
 import { type CommandPort, type FilePort, systemCommands, systemFiles } from './ports.ts';
 import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
@@ -15,6 +21,12 @@ export interface LeakEntry {
   readonly ageMs: number | null;
   readonly stale: boolean;
   readonly command: string;
+  /**
+   * True for a DCP-managed network this run cannot positively own: stopping the AppHost hands the
+   * network to DCP's abandoned-resource cleanup, which may reap it as collateral even though it
+   * was created by another run. Repo cleanup never removes networks itself.
+   */
+  readonly atRiskFromUpstream: boolean;
   readonly resource: ResourceCandidate;
 }
 
@@ -25,6 +37,9 @@ export interface LeakReport {
   readonly probes: {
     readonly aspire: ProbeStatus;
     readonly docker: ProbeStatus;
+    readonly volumes: ProbeStatus;
+    readonly networks: ProbeStatus;
+    readonly process?: ProbeStatus;
   };
   readonly survivors: readonly LeakEntry[];
 }
@@ -32,6 +47,9 @@ export interface LeakReport {
 const OK_PROBES: LeakReport['probes'] = {
   aspire: { state: 'ok' },
   docker: { state: 'ok' },
+  volumes: { state: 'ok' },
+  networks: { state: 'ok' },
+  process: { state: 'ok' },
 };
 
 function shellQuote(value: string): string {
@@ -40,9 +58,13 @@ function shellQuote(value: string): string {
 
 /** Builds the exact per-resource command shown to a human or terminal blocker. */
 export function stopCommand(resource: ResourceCandidate): string {
-  return resource.kind === 'apphost'
-    ? `aspire stop --apphost ${shellQuote(resource.appHostPath)} --non-interactive --nologo`
-    : `docker rm -f ${shellQuote(resource.id)}`;
+  if (resource.kind === 'apphost') {
+    return `aspire stop --apphost ${shellQuote(resource.appHostPath)} --non-interactive --nologo`;
+  }
+  if (resource.kind === 'volume') return `docker volume rm ${shellQuote(resource.id)}`;
+  if (resource.kind === 'network') return `docker network rm ${shellQuote(resource.id)}`;
+  if (resource.kind === 'process') return `kill -TERM ${shellQuote(String(resource.pid))}`;
+  return `docker rm -f ${shellQuote(resource.id)}`;
 }
 
 /**
@@ -53,7 +75,13 @@ export function stopCommand(resource: ResourceCandidate): string {
  * resource `unknown`.
  */
 function ownerFrom(resource: ResourceCandidate, worktreeRoot: string): string {
-  const path = resource.kind === 'apphost' ? resource.appHostPath : resource.mountSource;
+  const path = resource.kind === 'apphost'
+    ? resource.appHostPath
+    : resource.kind === 'container'
+    ? resource.mountSource
+    : resource.kind === 'process'
+    ? resource.evidence[0]?.path
+    : undefined;
   if (!path || !isAbsolute(path) || !isAbsolute(worktreeRoot)) return 'unknown';
   const siblingRoot = dirname(resolve(worktreeRoot));
   const delta = relative(siblingRoot, resolve(path));
@@ -72,6 +100,7 @@ function registeredStart(
       entry.appHostStartedAt === resource.appHostStartedAt
     )?.startedAt;
   }
+  if (resource.kind === 'process') return undefined;
   return registry.containers.find((entry) =>
     entry.creatorPid === resource.creatorPid &&
     entry.creatorProcessStartTime === resource.creatorProcessStartTime
@@ -93,25 +122,49 @@ export function buildLeakReport(
   staleAfterMs: number = STALE_AFTER_MS,
   probes: LeakReport['probes'] = OK_PROBES,
 ): LeakReport {
+  const containerCandidates = resources.filter(
+    (resource): resource is ContainerCandidate => resource.kind === 'container',
+  );
+  const ownedContainerIds = new Set(
+    containerCandidates
+      .filter((candidate) => classify(candidate, registry, worktreeRoot) === 'owned')
+      .map((candidate) => candidate.id),
+  );
   return {
     schemaVersion: 1,
     generatedAt: new Date(nowMs).toISOString(),
     worktreeRoot,
     probes,
     survivors: resources.map((resource) => {
-      const startedAt = registeredStart(resource, registry) ?? resource.createdAt;
+      const startedAt = registeredStart(resource, registry) ??
+        (resource.kind === 'process' ? undefined : resource.createdAt);
       const parsedStart = parseTimestamp(startedAt);
-      const ageMs = Number.isFinite(parsedStart) ? Math.max(0, nowMs - parsedStart) : null;
+      const ageMs = resource.kind === 'process'
+        ? resource.observedAgeMs ?? null
+        : Number.isFinite(parsedStart)
+        ? Math.max(0, nowMs - parsedStart)
+        : null;
+      // A network is this run's own session network only when its attached containers are all
+      // positively owned by the run. Attachment is relationship evidence, never creation proof:
+      // ownership stays fail-closed for every network regardless of the verdict here.
+      const attachedOnlyByOwned = resource.kind === 'network' &&
+        resource.attachedContainers.length > 0 &&
+        resource.attachedContainers.every((id) => ownedContainerIds.has(id));
       return {
         kind: resource.kind,
         identity: resource.kind === 'apphost'
           ? `${resource.appHostPath} (pid ${resource.appHostPid ?? 'unknown'})`
+          : resource.kind === 'process'
+          ? `${resource.commandLine} (pid ${resource.pid})`
           : `${resource.name ?? resource.id} (${resource.id})`,
-        ownership: classify(resource, registry, worktreeRoot),
+        ownership: resource.kind === 'volume'
+          ? classifyVolume(resource, containerCandidates, registry, worktreeRoot)
+          : classify(resource, registry, worktreeRoot),
         owner: ownerFrom(resource, worktreeRoot),
         ageMs,
         stale: ageMs !== null && ageMs >= staleAfterMs,
         command: stopCommand(resource),
+        atRiskFromUpstream: resource.kind === 'network' && !attachedOnlyByOwned,
         resource,
       };
     }),
@@ -127,6 +180,11 @@ export function renderLeakReport(report: LeakReport): string {
     `Worktree: \`${report.worktreeRoot}\``,
     `Aspire probe: ${renderProbeStatus(report.probes.aspire)}`,
     `Docker probe: ${renderProbeStatus(report.probes.docker)}`,
+    `Volumes probe: ${renderProbeStatus(report.probes.volumes)}`,
+    `Networks probe: ${renderProbeStatus(report.probes.networks)}`,
+    `Process probe: ${
+      renderProbeStatus(report.probes.process ?? { state: 'unavailable', message: 'not recorded' })
+    }`,
     '',
   ];
   if (report.survivors.length === 0) {
@@ -141,6 +199,18 @@ export function renderLeakReport(report: LeakReport): string {
       `- Age: ${entry.ageMs === null ? 'unknown' : `${entry.ageMs} ms`}`,
       `- Stale: ${entry.stale}`,
       `- User command: \`${entry.command}\``,
+      ...(entry.kind === 'network'
+        ? [
+          `- At risk from upstream: ${entry.atRiskFromUpstream ? 'yes' : 'no'}`,
+          ...(entry.atRiskFromUpstream
+            ? [
+              `  Stopping the AppHost hands DCP-managed networks to DCP's abandoned-resource`,
+              `  cleanup, which may remove a network this run did not create. Repo cleanup never`,
+              `  removes networks; decide manually before any removal.`,
+            ]
+            : []),
+        ]
+        : []),
       '',
     );
   }
