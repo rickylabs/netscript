@@ -67,6 +67,9 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | 2026-09-02T23:23Z | S2 GREEN | Implementation | Added Zod 4 regex/inclusive numeric/multiple check decoding; exact map and exclusive-bound regression both pass. |
 | 2026-09-02T23:23Z | S2 GREEN | Reconcile | Preserved the existing direct URL-format behavior; nested format lookup is used only for admitted regex checks. Issue #1249 is now fully implemented pending final gates/eval. |
 | 2026-09-02T23:23Z | S2 GREEN | Pre-push gates | focused=0 (18 passed), check=0, test=0 (84 passed), lint=0, fmt=0, quality=0. Lock unchanged. |
+| 2026-09-02T23:25Z | S3 | Public docs | Preferred JSX derivation failed form doc lint with two private Preact `JSXInternal` references; direct root `AriaRole` import failed with one. Reconciled D1 to the exact inline Preact 10.29.2 role union; form doc lint and surface inspection exit 0. |
+| 2026-09-02T23:26Z | S3 | Baseline comparison | Full Fresh doc aggregate is unchanged from pinned base: both exit 1 with the same 45 out-of-scope diagnostics; the form entrypoint has zero on both. |
+| 2026-09-02T23:26Z | S3 | Final gates | check=0, test=0 (84 passed), lint=0, fmt=0, quality=0, JSR audit=0, publish dry-run=0, form doc lint=0, lock diff=0. |
 
 ## Decisions
 
@@ -80,7 +83,8 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None yet | — | — |
+| Preferred Preact-derived type fails public doc lint; exact role literals used inline | minor | Yes |
+| Full Fresh doc aggregate has 45 identical pinned-base diagnostics outside form | minor | Yes |
 
 ## Gate Results
 
@@ -89,17 +93,19 @@ Start at `schema-adapter/schema-adapter.test.ts` for a full expected map, extend
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Baseline lock | SHA-256 current vs `8c549c061:deno.lock` | PASS | Both `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6`. |
-| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | Exit 0; 213 files, 2 batches, 0 findings. |
-| Scoped tests | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/fresh/tests packages/fresh/src/application/form` | PASS | Exit 0; 81 passed, 0 failed. |
-| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | Exit 0; 213 files, 0 findings. |
-| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | Exit 0; 213 files, 0 findings. |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | Exit 0; 214 files, 2 batches, 0 findings. |
+| Scoped tests | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/fresh/tests packages/fresh/src/application/form` | PASS | Exit 0; 84 passed, 0 failed. |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS | Exit 0; 214 files, 0 findings. |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | Exit 0; 214 files, 0 findings. |
 | Quality gate | `deno task quality:gate` | PASS | Exit 0; quality scan 0 findings/7 registered allowances; doctrine scan has pre-existing advisory warnings only. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Archetype 4 / JSR | NOT_RUN | Planned commands in `plan.md` | Public surface inspected with `deno doc`; final gates pending. |
+| Form public docs | PASS | `deno doc --lint packages/fresh/src/application/form/mod.ts` exit 0 | `ControlProps` surface inspected; no private references. |
+| Full Fresh docs | BASELINE | Branch and exact pinned base each exit 1 with identical 45 diagnostics | All diagnostics are outside the form entrypoint and ceiling. |
+| Archetype 4 / JSR | PASS | Audit exit 0; `deno publish --dry-run --allow-dirty` exit 0 | Two advisory audit warnings are pre-existing; publish simulation succeeds. |
 
 ### Runtime Gates
 

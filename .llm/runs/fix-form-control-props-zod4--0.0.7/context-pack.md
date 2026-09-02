@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-form-control-props-zod4--0.0.7` |
 | Branch | `fix/form-control-props-zod4` |
-| Current phase | `plan` |
+| Current phase | `implementation complete; evaluator handoff` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` (consumer type contract) |
 
 ## Current State
 
-S1 and S2 are GREEN after independent RED proofs. The intrinsic consumer compiles; locked npm Zod 4.4.3 now produces the exact five-field map, and exclusive `.gt()`/`.lt()` bounds remain omitted. All S2 GREEN pre-push gates exit 0. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
+S1 and S2 are GREEN after independent RED proofs. The intrinsic consumer compiles; locked npm Zod 4.4.3 now produces the exact five-field map, and exclusive `.gt()`/`.lt()` bounds remain omitted. Final scoped, quality, JSR, publish, form-doc, and lock gates pass. Mandatory IMPL-EVAL remains assigned to a separate native opposite-family session.
 
 ## Completed
 
@@ -24,21 +24,24 @@ S1 and S2 are GREEN after independent RED proofs. The intrinsic consumer compile
 - Implemented and validated S1 GREEN; 82 scoped tests pass.
 - Added and ran S2 RED; focused result is 16 passed/1 failed and full scoped result is 82 passed/1 failed.
 - Implemented S2 GREEN; focused adapter tests are 18/18 and full scoped tests are 84/84.
+- Reconciled the Preact role representation after doc lint exposed private dependency references; the exact Preact 10.29.2 role literals are inline and the form entrypoint is doc-clean.
+- Proved the package-wide 45 doc diagnostics are identical on pinned base and branch and occur outside the form entrypoint.
+- Completed final gates: check/test/lint/fmt/quality/JSR/publish/form-doc/lock all exit 0.
 
 ## In Progress
 
-- S3 public docs/JSR/final gate evidence.
+- Draft PR update and separate-session IMPL-EVAL handoff.
 
 ## Next Steps
 
-1. Run S3 public surface, JSR, full local gates, and lock evidence.
-2. Update the draft PR to `Closes #1249` with truthful validation and hand off to the separate evaluator without self-certification.
+1. Update the draft PR to `Closes #1249` with final evidence.
+2. Supervisor triggers the separate opposite-family IMPL-EVAL; generator does not self-certify or mark ready.
 
 ## Key Decisions
 
 | Decision | Source | Notes |
 | --- | --- | --- |
-| Intrinsic-derived role type | `plan.md` D1 | No `unknown`, no duplicated role union. |
+| Exact intrinsic-compatible role literals | `plan.md` D1 / `drift.md` | Derivation attempts were doc-private; exact Preact role set is inline, with no `unknown` or upstream re-export. |
 | Inclusive numeric mapping only | `plan.md` D2 | Exclusive bounds omitted from native attributes. |
 | Conditional S2 admission | Issue #1249 / brief | Unexpected green defers Zod half to 0.0.8. |
 
@@ -56,8 +59,8 @@ S1 and S2 are GREEN after independent RED proofs. The intrinsic consumer compile
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS at S2 GREEN | Check/test/lint/fmt exit 0; 84 tests. |
-| Fitness | PASS at S2 GREEN | `quality:gate` exit 0; final JSR/doc gates remain planned. |
+| Static | PASS final | Check/test/lint/fmt exit 0; 84 tests. |
+| Fitness | PASS/BASELINE | Quality, JSR, publish, and form doc lint exit 0; full package docs match pinned-base 45 out-of-scope diagnostics. |
 | Runtime | N/A | No runtime/browser workflow change. |
 | Consumer | PASS | Input/select/textarea spreads compile without casts after RED proof. |
 
@@ -67,7 +70,7 @@ S1 and S2 are GREEN after independent RED proofs. The intrinsic consumer compile
 
 ## Drift and Debt
 
-- Drift: none yet.
+- Drift: preferred derived role type was doc-private; full package doc aggregate has verified pinned-base debt.
 - Debt: none created or deepened.
 
 ## Commits

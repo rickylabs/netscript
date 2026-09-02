@@ -56,7 +56,7 @@ Make `controlProps()` directly assignable to Preact input/select/textarea elemen
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Derive `ControlProps.role` from Preact `JSX.HTMLAttributes<HTMLElement>['role']`. | Matches the intrinsic contract without widening to `unknown` or duplicating `AriaRole`. |
+| D1 | Mirror Preact 10.29.2's exported `AriaRole` literals directly on `ControlProps.role`. | The preferred `JSX.HTMLAttributes<HTMLElement>['role']` and imported `AriaRole` both pass consumer checking but fail `deno doc --lint` as private dependency types; the exact inline union preserves assignability without widening, a new public alias, or an upstream re-export. |
 | D2 | Map `greater_than`/`less_than` only when `inclusive === true`. | HTML `min`/`max` are inclusive; exclusive constraints have no faithful native attribute and must not receive invented off-by-one values. |
 | D3 | Map `multiple_of.value` to `step`. | This is the direct native control constraint represented by the Zod check. |
 | D4 | For `string_format` + `format: 'regex'`, read `_zod.def.pattern` and use `RegExp.source`. | This matches the locked Zod 4 representation while retaining legacy regex handling. |
