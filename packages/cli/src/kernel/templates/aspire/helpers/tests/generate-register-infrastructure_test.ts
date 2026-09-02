@@ -64,7 +64,7 @@ describe('generateRegisterInfrastructure', () => {
       assertStringIncludes(output, 'createEndpointListenerReadinessCheck')
       assertStringIncludes(
         block,
-        `return createEndpointListenerReadinessCheck({\n` +
+        `return await createEndpointListenerReadinessCheck({\n` +
           `      kind: ${JSON.stringify(fixture.kind)},\n` +
           `      endpoint: () => ${server}.getEndpoint('tcp'),\n` +
           `    })();`,

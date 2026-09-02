@@ -210,7 +210,7 @@ export function generateRegisterInfrastructure(
     if (['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine)) {
       const healthCheckKey = `${name}_listener`
       lines.push(`  builder.addHealthCheck(${JSON.stringify(healthCheckKey)}, async () => {`)
-      lines.push(`    return createEndpointListenerReadinessCheck({`)
+      lines.push(`    return await createEndpointListenerReadinessCheck({`)
       lines.push(`      kind: ${JSON.stringify(entry.Engine.toLowerCase())},`)
       lines.push(`      endpoint: () => ${id}_server.getEndpoint('tcp'),`)
       lines.push(`    })();`)
