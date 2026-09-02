@@ -75,17 +75,20 @@ test before changing `classifyPath()`.
 | 2026-09-02 10:07 | 0 | design | Recorded `PLAN-EVAL: N/A`, locked slices, validation, and acceptance boundaries before implementation. |
 | 2026-09-02 10:28 | 1 | test-first | Added only the private-lock classifier expectations; implementation remains unchanged for the committed RED proof. |
 | 2026-09-02 10:29 | 1 | RED | Detached throwaway worktree at `8bdb7f0afdf51e0d63bfbdd021658d5ff81f5a27`: 61 passed, 1 failed; real exit code 1. |
+| 2026-09-02 10:32 | 2 | implementation | Extended the nested-config contribution without narrowing the existing Fresh UI prefix; synchronized both workflow path lists. |
+| 2026-09-02 10:33 | 2 | GREEN | All required local commands and the dedicated YAML parse returned real exit code 0; no lockfile changed. |
 
 ## Gate Results
 
 | Gate | Real exit code | Result | Evidence |
 | --- | ---: | --- | --- |
 | RED classifier test in committed throwaway worktree | 1 | expected FAIL | New test failed on `packages/sdk/deno.json`: actual `freshUi=false`, expected `true`; 61 other tests passed. |
-| classifier unit test | NOT_RUN | pending | Required command |
-| Fresh UI validation test wrapper | NOT_RUN | pending | Required command |
-| scoped `.github` check wrapper | NOT_RUN | pending | Required command |
-| scoped `.github` format wrapper | NOT_RUN | pending | Required command |
-| parsed workflow YAML readback | NOT_RUN | pending | Structural test reads both `paths` arrays |
+| classifier unit test | 0 | PASS | 62 passed, 0 failed. |
+| Fresh UI validation test wrapper | 0 | PASS | Structured runner: 2 passed, 0 failed. |
+| scoped `.github` check wrapper | 0 | PASS | 11 files, 1 batch, 0 failed batches/findings. |
+| scoped `.github` format wrapper | 0 | PASS | 11 files processed, 0 failed batches/findings/refusals. |
+| parsed workflow YAML readback | 0 | PASS | Parsed document: both event arrays equal, all four required inputs present, negations ordered after the positive path. |
+| targeted validation-file format wrapper | 0 | PASS | 1 file processed, 0 findings/refusals. |
 | stale-lock draft PR | NOT_RUN | pending | Run id, failing step, and `::error::` line to be captured |
 
 ## Reconcile Notes
@@ -98,3 +101,6 @@ test before changing `classifyPath()`.
 - Slice 1 (post-RED): the committed test was checked out detached in a disposable worktree. The only
   failure was the intended private-lock classifier gap; the existing root-config behavior remained
   green. No implementation file was present to rescue the test.
+- Slice 2: issue and PR remain at `status:impl`; no new reviewer comments altered scope. The diff
+  remains limited to the authorized classifier, classifier test, workflow, structural test, and
+  leaf run artifacts. Both repository lockfiles remain unchanged.
