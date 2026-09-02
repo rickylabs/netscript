@@ -38,15 +38,13 @@ export type TriggersStreamDBOptions = Readonly<{
  *
  * @example
  * ```ts
- * import { createTriggersStreamDB } from '@plugins/triggers/streams';
- * import { useLiveQuery } from '@tanstack/react-db';
+ * import { createTriggersStreamDB } from '@netscript/plugin-triggers/streams';
+ *
+ * declare const streamsServiceUrl: string;
  *
  * const triggersDb = createTriggersStreamDB({ baseUrl: streamsServiceUrl });
- *
- * const { data: detected } = useLiveQuery((q) =>
- *   q.from({ t: triggersDb.collections.triggerEvent })
- *     .where(({ t }) => t.status === 'detected')
- * );
+ * const events = triggersDb.collections.triggerEvent;
+ * void events;
  * ```
  */
 export function createTriggersStreamDB(

@@ -13,9 +13,15 @@ import type { ComponentChild, KeyedPartialProps } from './types.ts';
  *
  * @example
  * ```tsx
+ * import type { ComponentChild } from '@netscript/fresh/navigation';
+ *
+ * declare const orderId: string;
+ * declare const order: { readonly id: string };
+ * declare function OrderSummary(props: { readonly order: { readonly id: string } }): ComponentChild;
+ *
  * <KeyedPartial name={`order-${orderId}`}>
  *   <OrderSummary order={order} />
- * </KeyedPartial>
+ * </KeyedPartial>;
  * ```
  */
 export function KeyedPartial(props: KeyedPartialProps): ComponentChild {

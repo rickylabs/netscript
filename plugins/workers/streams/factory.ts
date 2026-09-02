@@ -34,16 +34,13 @@ export type WorkersStreamDB = Readonly<{
  *
  * @example
  * ```ts
- * import { createWorkersStreamDB } from '@plugins/workers/streams';
- * import { useLiveQuery } from '@tanstack/react-db';
+ * import { createWorkersStreamDB } from '@netscript/plugin-workers/streams';
+ *
+ * declare const streamsServiceUrl: string;
  *
  * const workersDb = createWorkersStreamDB({ baseUrl: streamsServiceUrl });
- *
- * // In a Preact island:
- * const { data: running } = useLiveQuery((q) =>
- *   q.from({ e: workersDb.collections.execution })
- *     .where(({ e }) => e.status === 'running')
- * );
+ * const executions = workersDb.collections.execution;
+ * void executions;
  * ```
  */
 export function createWorkersStreamDB(

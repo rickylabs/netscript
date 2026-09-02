@@ -33,15 +33,13 @@ export interface SagasStreamDB {
  *
  * @example
  * ```ts
- * import { createSagasStreamDB } from '@plugins/sagas/streams';
- * import { useLiveQuery } from '@tanstack/react-db';
+ * import { createSagasStreamDB } from '@netscript/plugin-sagas/streams';
+ *
+ * declare const streamsServiceUrl: string;
  *
  * const sagasDb = createSagasStreamDB({ baseUrl: streamsServiceUrl });
- *
- * const { data: active } = useLiveQuery((q) =>
- *   q.from({ s: sagasDb.collections.sagaInstance })
- *     .where(({ s }) => s.status === 'active')
- * );
+ * const sagas = sagasDb.collections.sagaInstance;
+ * void sagas;
  * ```
  */
 export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasStreamDB {
