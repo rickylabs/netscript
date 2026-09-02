@@ -125,3 +125,22 @@ workflow change and run artifacts but stopped before committing — the same aut
 three times earlier in this release. The leaf's authored content (the two-literal change and the
 header prose incorporating all four post-dispatch operator facts) is preserved byte-for-byte; the
 supervisor added only the captured-exit evidence above, this note, and the commit/PR.
+
+## Co-author acceptance review
+
+The pre-existing workflow regression test used substring assertions for the two v1 key spellings.
+Because both v2 literals retain those strings as prefixes, the test could pass if the version suffix
+was removed. The acceptance slice tightened both assertions to newline-terminated v2 literals and
+added explicit absence assertions for both newline-terminated v1 literals.
+
+Focused command:
+
+```text
+deno test --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.test.ts
+60 passed | 0 failed
+REAL_EXIT=0
+```
+
+The hosted mixed-generation scheduler exercise and independent IMPL-EVAL remain pending. No local
+`scaffold.runtime` run is added: it would test runtime behavior, not GitHub concurrency admission,
+and would duplicate the real hosted job required by issue acceptance.
