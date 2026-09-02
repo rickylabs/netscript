@@ -244,28 +244,50 @@ export function assertOwnedListenerFaultExpectation(
  */
 const EXPECTED_FAILURE_CODES = ['ECONNREFUSED', 'ETIMEDOUT'] as const;
 
-function unhealthyFailureCode(report: ListenerHealthReport): string | undefined {
+/**
+ * The structured failure code the listener health checks publish in the report's data bag.
+ *
+ * `malformed` is distinguished from `absent` so a present-but-non-string `code` fails closed rather
+ * than silently falling through to the description, which is weaker evidence.
+ */
+type FailureCodeLookup =
+  | { readonly kind: 'string'; readonly code: string }
+  | { readonly kind: 'malformed' }
+  | { readonly kind: 'absent' };
+
+function readFailureCode(report: ListenerHealthReport): FailureCodeLookup {
   const data = report.data;
-  if (typeof data !== 'object' || data === null) return undefined;
+  if (typeof data !== 'object' || data === null || !('code' in data)) return { kind: 'absent' };
   const code = Reflect.get(data, 'code');
-  return typeof code === 'string' ? code : undefined;
+  return typeof code === 'string' ? { kind: 'string', code } : { kind: 'malformed' };
 }
 
+/**
+ * Description fallback for report shapes that carry no data bag.
+ *
+ * Anchored at the start and closed with a non-word lookahead on purpose. The RESP description
+ * embeds arbitrary received bytes (`received="..."`), so an unanchored pattern accepts a genuinely
+ * wrong failure whose diagnostic payload merely quotes an expected code — and without the lookahead
+ * `ECONNREFUSED_BOGUS` matches `ECONNREFUSED`. Both were real holes.
+ */
 function expectedUnhealthyDescription(expectation: ListenerFaultExpectation): RegExp {
   const listener = expectation.controllerListener === 'postgres' ? 'tcp' : 'RESP';
   return new RegExp(
-    `${listener} listener (?:unreachable|unhealthy): (?:${EXPECTED_FAILURE_CODES.join('|')})`,
+    `^${listener} listener (?:unreachable|unhealthy): (?:${
+      EXPECTED_FAILURE_CODES.join('|')
+    })(?!\\w)`,
   );
 }
 
 /** True when the report names one of the expected socket failures, by code or by description. */
-function matchesExpectedFailure(
+export function matchesExpectedFailure(
   report: ListenerHealthReport,
   expectation: ListenerFaultExpectation,
 ): boolean {
-  const code = unhealthyFailureCode(report);
-  if (code !== undefined) {
-    return (EXPECTED_FAILURE_CODES as readonly string[]).includes(code);
+  const found = readFailureCode(report);
+  if (found.kind === 'malformed') return false;
+  if (found.kind === 'string') {
+    return (EXPECTED_FAILURE_CODES as readonly string[]).includes(found.code);
   }
   return report.description !== undefined &&
     expectedUnhealthyDescription(expectation).test(report.description);
