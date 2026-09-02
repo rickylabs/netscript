@@ -1,0 +1,2 @@
+{"name":"prisma-studio-fwytsyfw","displayName":"prisma-studio","resourceType":"Executable","waitingFor":["postgres","app-db"],"source":"deno","healthReports":{},"commands":{"start":{"displayName":"Start","state":"Enabled"}}}
+{"name":"sagas-api-pqrsuvwx","displayName":"sagas-api","resourceType":"Executable","source":"deno","healthReports":{},"commands":{"restart":{"displayName":"Restart","state":"Enabled"}}}
