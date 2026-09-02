@@ -10694,3 +10694,14 @@ umbrella); unowned 0.0.7: 0. Central ledger ~7h stale (11:52Z, `ec848e6b0`, sche
 `reporting`); per-lane counts disagree with GitHub across all five lanes. Delta table posted to
 #1641 for coordinator refresh; file not edited (coordinator-owned; will become a v2 hard gate).
 Watchers current. No transfer.
+
+### D-248 — cross-lane audit at e341c6f71 (no internals leaf): four ready-merge PRs blocked by close-gate mechanics
+
+Classified all 9 red close-gates from job logs. **Actionable, fixable without a new head:** #1759
+(aspire) and #1883 (fixes) — missing evidence entries; #1942 (fixes) — exact box-text mismatch on a
+wrapped line, remedy `box-index`; #1940 (fixes) — mirror skipped (label absent at eval) plus an
+unticked DoD box. **Expected pre-ready reds:** #1949, #1664, #1891, #1885; #1909 also DIRTY.
+**Real red:** #1895 sqlite tier failed with 17 steps — execution failure, not eviction.
+**Cut readiness:** last canary success 08-31 18:19 at a pre-#1917 head; ≥12 merges since, no
+post-fix canary; 15 p0/p1 open incl. #1712 (p0) and #1947 (p1). Posted as an actionable packet to
+#1641 with exact remedies drawn from D-234/D-245. No edits to other lanes' PRs.
