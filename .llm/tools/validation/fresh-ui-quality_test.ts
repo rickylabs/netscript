@@ -19,8 +19,8 @@ function parseYamlScalar(source: string): string {
   return value;
 }
 
-/** Parse the workflow's YAML event mapping into a document used by structural assertions. */
-function parseWorkflowYaml(source: string): ParsedWorkflow {
+/** Read the workflow's indentation-delimited YAML event mapping for structural assertions. */
+function readWorkflowEventPaths(source: string): ParsedWorkflow {
   const document: ParsedWorkflow = { on: {} };
   let inEvents = false;
   let eventName: string | undefined;
@@ -65,15 +65,18 @@ function parseWorkflowYaml(source: string): ParsedWorkflow {
 }
 
 Deno.test('Fresh UI workflow trigger paths cover every private-lock input on both event arms', async () => {
-  const workflow = parseWorkflowYaml(
+  const workflow = readWorkflowEventPaths(
     await Deno.readTextFile('.github/workflows/fresh-ui-quality.yml'),
   );
   const pullRequestPaths = workflow.on.pull_request?.paths;
   const pushPaths = workflow.on.push?.paths;
   const requiredPrivateLockInputs = [
     'packages/*/deno.json',
+    'packages/*/deno.jsonc',
     'packages/cli/e2e/deno.json',
+    'packages/cli/e2e/deno.jsonc',
     'plugins/*/deno.json',
+    'plugins/*/deno.jsonc',
     'deno.lock',
   ];
 

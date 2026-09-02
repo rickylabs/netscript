@@ -221,7 +221,7 @@ export function classifyPath(
       pages: (path === 'deno.lock' || /^(packages|plugins)\/[^/]+\/deno\.jsonc?$/.test(path)) &&
         !isPackageTestOnly(path),
       freshUi: path.startsWith('packages/fresh-ui/') || path === 'deno.lock' ||
-        /^(?:packages\/[^/]+|packages\/cli\/e2e|plugins\/[^/]+)\/deno\.json$/.test(path),
+        /^(?:packages\/[^/]+|packages\/cli\/e2e|plugins\/[^/]+)\/deno\.jsonc?$/.test(path),
       freshBrowser: path === 'deno.lock' || path.startsWith('packages/fresh/'),
     };
   }

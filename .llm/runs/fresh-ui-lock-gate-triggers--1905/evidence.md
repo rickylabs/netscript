@@ -21,8 +21,10 @@ Re-derived at `77ad823dcb1874ccfc8964b4679ad92a3a145e0b` on 2026-09-02.
   `--no-lock`; no task consumes `docs/site/deno.lock` through `--lock=`.
 
 Verdict: `packages/fresh-ui/deno.lock` is the only second lockfile consumed frozen over the root
-workspace graph. The complete current trigger class is therefore `packages/*/deno.json`, the
-explicit nested member `packages/cli/e2e/deno.json`, `plugins/*/deno.json`, and root `deno.lock`.
+workspace graph. The complete manifest-form trigger class is therefore `deno.json` and
+`deno.jsonc` under `packages/*`, the explicit nested member `packages/cli/e2e`, and `plugins/*`,
+plus root `deno.lock`. No current member uses `deno.jsonc`, but covering it closes the latent
+recurrence admitted by `isDenoConfigBase()` rather than covering only today's instances.
 
 ## Acceptance Mapping
 
@@ -63,7 +65,8 @@ Result: `61 passed | 1 failed`. The only failure was
 
 ## GREEN Gates
 
-Every exit code was captured directly from the command substitution before printing output.
+Re-run after Tier-A finding T-1 on 2026-09-02 at 10:50 UTC. Every exit code was captured directly
+from the command substitution before printing output.
 
 | Gate | Real exit code | Result |
 | --- | ---: | --- |
@@ -71,22 +74,31 @@ Every exit code was captured directly from the command substitution before print
 | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/validation/fresh-ui-quality_test.ts` | 0 | 2 passed, 0 failed |
 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts` | 0 | 11 files, 0 failed batches/findings |
 | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts` | 0 | 11 files, 0 findings/refusals |
-| `deno test --allow-read --filter 'Fresh UI workflow trigger paths' .llm/tools/validation/fresh-ui-quality_test.ts` | 0 | YAML trigger document parsed; 1 passed, 1 filtered out |
-| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/validation/fresh-ui-quality_test.ts` | 0 | 1 file, 0 findings/refusals |
+| `deno test --allow-read --filter 'Fresh UI workflow trigger paths' .llm/tools/validation/fresh-ui-quality_test.ts` | 0 | Narrow structural reader returned both event arrays; 1 passed, 1 filtered out |
 
-The structural YAML test reads the arrays from the parsed document at
-`workflow.on.pull_request.paths` and `workflow.on.push.paths`. It proves both arrays are equal and
-contain:
+The structural workflow test intentionally hand-rolls a narrow, line-based reader for the
+indentation-delimited YAML `on` mapping; it does **not** use a YAML library and must not be read as
+a full YAML parser. A library import such as `jsr:@std/yaml` would modify the root dependency/lock
+state and thereby stale the private lock inside the PR that is forbidden from regenerating it.
+
+The reader returns a document-shaped value and the test reads
+`workflow.on.pull_request.paths` and `workflow.on.push.paths` from it. It fails closed: if workflow
+formatting moves either event or `paths` outside the supported indentation shape, the corresponding
+value is `undefined`, and the required `includes` assertions fail. It proves both arrays are equal
+and contain:
 
 ```text
 packages/*/deno.json
+packages/*/deno.jsonc
 packages/cli/e2e/deno.json
+packages/cli/e2e/deno.jsonc
 plugins/*/deno.json
+plugins/*/deno.jsonc
 deno.lock
 ```
 
 It also proves both lists retain `packages/fresh-ui/**` before its Markdown and MDX negations.
-Classifier coverage proves all four paths contribute `needs_fresh_ui=true`, while the existing
+Classifier coverage proves all seven paths contribute `needs_fresh_ui=true`, while the existing
 root `deno.json` toolchain contribution remains true. The pre-existing unknown-path safety test
 also remains green, so the change narrows no existing fail-open escalation.
 

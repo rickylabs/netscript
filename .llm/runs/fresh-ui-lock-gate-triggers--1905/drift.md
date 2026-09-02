@@ -18,6 +18,17 @@
 - **Action:** used focused raw `rg` and git commands. Gate verdicts will use the required unfiltered
   commands with explicitly captured real exit codes.
 
+## 2026-09-02 — General YAML library rejected for the structural workflow test
+
+- **Severity:** minor
+- **Considered:** import `jsr:@std/yaml` and parse the entire workflow with the library.
+- **Rejected because:** adding the import requires root `deno.json`/`deno.lock` dependency state.
+  That root change would itself stale `packages/fresh-ui/deno.lock`, while this PR is explicitly
+  forbidden from regenerating either lock. The generated `@std/yaml` root-lock entries were caught
+  by the clean-status check, removed before commit, and absent from every pushed commit.
+- **Action:** kept a narrow line-based reader inside the authorized structural test file. Its
+  limitations and fail-closed behavior are recorded in `evidence.md`.
+
 ## Scope Drift
 
 None. The two-layer classifier/workflow fix, tests, and evidence remain within the authorized files.

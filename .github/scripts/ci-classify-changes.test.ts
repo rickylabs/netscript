@@ -350,8 +350,11 @@ Deno.test('Fresh UI private-lock inputs contribute to needs_fresh_ui', () => {
   for (
     const path of [
       'packages/sdk/deno.json',
+      'packages/sdk/deno.jsonc',
       'packages/cli/e2e/deno.json',
+      'packages/cli/e2e/deno.jsonc',
       'plugins/ai/deno.json',
+      'plugins/ai/deno.jsonc',
       'deno.lock',
     ]
   ) {

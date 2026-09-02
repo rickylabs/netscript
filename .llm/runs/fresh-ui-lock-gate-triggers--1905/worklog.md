@@ -41,8 +41,8 @@ from a separate planning evaluator. IMPL-EVAL remains the supervisor's separate-
 
 ### Constants
 
-- Required trigger paths: `packages/*/deno.json`, `packages/cli/e2e/deno.json`,
-  `plugins/*/deno.json`, and `deno.lock`.
+- Required trigger paths: `deno.json` and `deno.jsonc` under `packages/*`,
+  `packages/cli/e2e`, and `plugins/*`, plus `deno.lock`.
 
 ### Commit Slices
 
@@ -78,6 +78,8 @@ test before changing `classifyPath()`.
 | 2026-09-02 10:32 | 2 | implementation | Extended the nested-config contribution without narrowing the existing Fresh UI prefix; synchronized both workflow path lists. |
 | 2026-09-02 10:33 | 2 | GREEN | All required local commands and the dedicated YAML parse returned real exit code 0; no lockfile changed. |
 | 2026-09-02 10:39 | 3 | live teeth proof | Disposable PR #1919 produced failing run `33620426788` at `Frozen package type-check`; captured annotation, closed PR unmerged, and deleted branch/worktree. |
+| 2026-09-02 | 4 | Tier-A finding T-1 | Extended the latent manifest-form class to `deno.jsonc` across classifier, both workflow arms, and both tests; recorded the rejected YAML-library option. |
+| 2026-09-02 10:50 | 4 | validation | Re-ran the four required gates plus the filtered structural test; all returned real exit code 0 and changed no lock or manifest. |
 
 ## Gate Results
 
@@ -88,7 +90,7 @@ test before changing `classifyPath()`.
 | Fresh UI validation test wrapper | 0 | PASS | Structured runner: 2 passed, 0 failed. |
 | scoped `.github` check wrapper | 0 | PASS | 11 files, 1 batch, 0 failed batches/findings. |
 | scoped `.github` format wrapper | 0 | PASS | 11 files processed, 0 failed batches/findings/refusals. |
-| parsed workflow YAML readback | 0 | PASS | Parsed document: both event arrays equal, all four required inputs present, negations ordered after the positive path. |
+| parsed workflow YAML readback | 0 | PASS | Narrow line-based reader returned both equal event arrays with all seven inputs; 1 passed, 1 filtered out. |
 | targeted validation-file format wrapper | 0 | PASS | 1 file processed, 0 findings/refusals. |
 | stale-lock live gate | 1 | expected FAIL | Run `33620426788`, job `100216039828`, step `Frozen package type-check`; private-lock stale annotation emitted. |
 
@@ -109,6 +111,8 @@ test before changing `classifyPath()`.
   guard, so the supported `ready_for_review` event started the live run. After the expected failure,
   the PR was closed unmerged and its branch/worktree deleted. This proves teeth only, not isolated
   member-manifest triggering. Main PR #1917 remains draft at `status:impl`.
+- Slice 4: Tier-A finding T-1 was accepted. `deno.jsonc` now follows the same classifier and trigger
+  path as `deno.json`; all five requested gates passed, and the authorized surface remained exact.
 
 ## Handoff
 
