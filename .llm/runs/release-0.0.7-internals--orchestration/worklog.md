@@ -10645,3 +10645,16 @@ independent contribution an empty-queue lane can make toward the stable cut, as 
 #1937: CI run `33654919736` still in progress; close-gate red is the designed mirror-skip without
 `status:ready-merge` at evaluation (phase-eval demoted it). Re-apply label + rerun after the run
 completes; never a push.
+
+### D-244 — allocation re-check against central state: nothing unblocked; ledger has two stale facts
+
+All 17 `lane: internals` leaves in `milestone-cluster-state.json` checked live: 15 MERGED; the 2
+OPEN (#1759, #1760) are `orchestrator:aspire` S9/S10 — a lane-attribution error in central state,
+not internals work. Counts also stale (`internals` issues 2 vs live 1; PRs 3 vs live 2). Reported on
+#1641, not edited: the file is coordinator-owned and `007-primary` is live. Central state
+`updatedAt` 11:52Z predates three internals merges. Lesson kept: a ledger is not a queue — verify
+each entry live before treating it as dispatchable, exactly as D-226 required for the eviction
+offender set.
+
+#1937 watcher is now **event-driven with the action embedded**: on CI completion it applies
+`status:ready-merge` and reruns `--failed`, then watches close-gate to green. No manual polling turn.
