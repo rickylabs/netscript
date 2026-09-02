@@ -9893,3 +9893,73 @@ moment a partition starts deriving from the token; and diagnostics disclose only
 `procedurePath`. The published `plugin-auth-core/sdk` surface is exactly three symbols and #1349's
 privacy boundary holds. `close-gate` now **PASS**; the DoD box was already ticked and the verdict
 makes the claim true.
+
+---
+
+## #1915 merged (`37452f11f`) — dependent rebases and #1352 reconciliation, ~12:10–12:35Z
+
+### The #1354 ruling is fully executed
+
+- **D3 narrowed** (`6b737ab9c`) as a pure subtraction. Verified by token census: `--keep`,
+  `--replace`, `--abort`, `--recover`, `single-writer` → **0 occurrences**. The four residual
+  `journal` / `backup` / `rollback` mentions are all in **deferral text** — the rationale, a Risk
+  row marked `Deferred`, "a later issue must scope those adapters", and an out-of-scope list. That is
+  correct: a deferral must name what is not promised.
+- **Harness sync** (`409630338`), harness-only: `supervisor.md` added; `context-pack.md` synced to
+  the narrowed safety contract, the restricted evaluator focus, and #1664's head (`573d01d35` at
+  the ruling, since advanced to `ec9e7048a`, with an instruction to re-derive overlap against its
+  live head); `research.md`'s ten stale paths corrected. `doctrine/05-testing.md` and
+  `06-quality-gates.md` are recorded as having **no doctrine successor** rather than mapped to a
+  plausible-looking file.
+- **One narrow exact-head PLAN-EVAL dispatched** at `409630338`, scope-restricted to the plan gate
+  and cycle-1 blockers, with the settled decisions named as out of scope and an explicit instruction
+  that findings against them will be discarded. No fourth advisory loop.
+
+### Four leaves went CONFLICTING on the merge; three are back
+
+| PR | Conflicts | Resolution |
+| --- | --- | --- |
+| **#1842** | export corpus only | main's side + regenerate → `d789febfd`. **The anticipated one-line collision with #1915 in `packages/plugin/src/sdk/mod.ts` auto-merged** — both sides add distinct exports. Corpus `dde09764…`, 273/7810. |
+| **#1927** | export corpus only | main's side + regenerate → `e019fb02f`. Now `MERGEABLE`. |
+| **#1922** | 6 files | see below → `af48ec18d`. All four carrier gates **0**, `docs:jsdoc-examples` **0** with census back at **116**. |
+| **#1664** | — | rebase pending behind its browser-fixture CI run. |
+
+**#1922's `sdk.md` was a genuine content conflict, resolved as a union rather than a pick.** Both
+#1915 and this slice added a `contributions` row to the same option table and then a prose section.
+Took **main's** table row (the shipped wording), and kept **both** sections with the right nesting:
+this slice's `## Typed request contributions` (the general seam, auth + locale composed) now contains
+#1915's `### Typed bearer credentials` as its specialisation. They document different things — the
+seam, and credential guidance for one consumer of it — so dropping either would lose real content.
+
+**`status:ready-merge` withdrawn from #1842.** Its packet evidence was pinned to `d1697421c` and the
+head moved; the label asserts readiness that is currently unproven. It returns with a fresh packet
+when this head's gates land. The IMPL-EVAL `PASS` still carries — no product source this branch
+authored moved in the convergence.
+
+### #1352 reconciled — it does not close, and #1915 said so itself
+
+The coordinator asked that the merged implementation not be left disconnected from its milestone
+issue. Audited rather than assumed: **row 2 is genuinely outstanding**, and #1915's own PR body
+deferred exactly it —
+
+> the CLI auth-session revoke/list raw-fetch migration remains out of scope because its explicit
+> auth URLs are not modeled by the public SDK transport
+
+Measured the surface: `packages/cli/src/public/features/plugins/auth/auth-session-client.ts`'s
+`FetchAuthSessionHttp` (47 lines) raw-fetches two **explicit** URLs — `GET <streamUrl>` and
+`POST <authUrl>/signout`. The SDK transport resolves URLs through **discovery** and cannot express
+"call this exact URL". That is a real constraint, not an omission, which is why #1915 deferred rather
+than forced it.
+
+**Hand-ticking the seven boxes would have asserted something the merged PR itself declined to
+claim.** Instead: finding posted to #1352 (`5509377785`), and a residual slice dispatched on
+`feat/cli-auth-session-typed-transport` that audits all seven rows first, implements only what the
+audit proves outstanding, and is explicitly told that "this row cannot close without extending the
+public SDK transport, here is why" is a **complete and valuable** outcome rather than a failure — and
+that extending `packages/sdk`'s public surface unilaterally is not its call. It carries `Closes
+#1352` **only if** all seven rows end satisfied, plus the acceptance-evidence block that ticks them
+through the mirror.
+
+Also fenced in that brief: #1927, #1921 and #1922's concurrent surfaces, and **#1243** — which owns
+the dead-localhost-port defect in the very file this slice edits, so it is referenced rather than
+drive-by fixed.
