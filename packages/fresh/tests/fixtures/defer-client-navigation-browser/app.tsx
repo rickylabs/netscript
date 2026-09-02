@@ -39,7 +39,9 @@ const deferredPage = definePage<unknown>()
 function document(body: ComponentChildren) {
   return (
     <html>
-      <body f-client-nav>{body}</body>
+      <body f-client-nav>
+        <Partial name='defer-navigation-page'>{body}</Partial>
+      </body>
     </html>
   );
 }

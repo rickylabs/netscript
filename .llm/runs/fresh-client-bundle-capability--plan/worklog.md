@@ -72,6 +72,8 @@ requires hydration/client navigation.
 | 2026-09-02T16:48:46Z | 1 | GREEN | Added locked `--frozen --cached-only` workspace Vite helper; targeted bundle/policy wrapper passed 10/10 with a fresh empty npm cache. |
 | 2026-09-02T16:48:46Z | 2 | GREEN | Added direct hit/miss policy pairs and a package Playwright fixture that intercepts the partial request, counts one semantic named-boundary swap, and plants a rejected double-swap control. |
 | 2026-09-02T16:48:46Z | 3 | Local gates | Fresh check/lint/fmt, 278 package tests, and repository `quality:gate` passed; browser execution remains CI-owned because this host has no `playwright-cli`. |
+| 2026-09-02T17:07:49Z | 2 | CI RED | Provisioned browser receipt passed both existing tests but timed out before the new fallback appeared; the source page lacked the matching outer Fresh partial needed for client navigation. |
+| 2026-09-02T17:07:49Z | 2 | CI fix | Wrapped both fixture pages in the same `defer-navigation-page` partial; scoped check/lint/fmt and all 278 Fresh tests remain green. |
 
 ## Decisions
 
@@ -119,6 +121,7 @@ requires hydration/client navigation.
 | Fresh lint | PASS | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` | 213 files, zero findings. |
 | Fresh format | PASS | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | 213 files, zero findings. |
 | Browser navigation | BLOCKED_LOCAL | `deno task --cwd packages/fresh test:browser` | All three modules type-checked, then all three tests failed only because `playwright-cli` is absent. CI provisions the pinned driver and Chromium. |
+| Browser navigation attempt 1 | FAIL_RED | CI run `33657607942`, job `100340132927` | Existing tests passed 2/2; new fixture timed out waiting for fallback because no source partial matched the destination page shell. Matching outer partial added; rerun pending. |
 
 ### Consumer Gates
 
