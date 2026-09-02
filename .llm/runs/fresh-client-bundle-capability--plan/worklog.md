@@ -42,7 +42,7 @@
 | # | Slice | Gate | Files |
 | - | --- | --- | --- |
 | 0 | Lock research/design and open the draft PR. | PLAN-EVAL | run-dir artifacts |
-| 1 | Prove deterministic locked client-bundle build. | Targeted wrapper test/cold npm cache | Vite test helper, bundle test, run artifacts |
+| 1 | Prove exact locked client-bundle build without test-time registry resolution. | Targeted wrapper test after deterministic install | Vite test helper, bundle test, run artifacts |
 | 2 | Prove direct policy pairs plus real request/exactly-one boundary swap. | Package test + CI browser gate | Fresh tests/fixtures/task, run artifacts |
 | 3 | Record final scoped gates and independent verdict. | Full gate set + IMPL-EVAL | run artifacts |
 
@@ -64,12 +64,12 @@ requires hydration/client navigation.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-09-02T12:22:08Z | 0 | Research | Re-baselined both issues and current `origin/main`; #1557's missing-browser premise is superseded. |
-| 2026-09-02T12:22:08Z | 0 | Determinism probe | Locked `--frozen --cached-only` Vite build passed with an empty `NPM_CONFIG_CACHE` in 3.9s. |
+| 2026-09-02T12:22:08Z | 0 | Determinism probe | Locked `--frozen --cached-only` Vite build passed in 3.9s from the Deno cache already prepared by installation; the empty `NPM_CONFIG_CACHE` did not enforce a cold Deno cache. |
 | 2026-09-02T12:22:08Z | 0 | Browser baseline | Existing local browser task is blocked by absent `playwright-cli`; CI already provisions it. |
 | 2026-09-02T12:22:08Z | 0 | Design checkpoint | Package-level real-browser design locked; PLAN-EVAL selected as a hard stop. |
 | 2026-09-02T16:48:46Z | 0 | Supervisor resume | PLAN-EVAL waived for this test-only leaf; committed the plan contract unchanged as `1e54fa598`. |
 | 2026-09-02T16:48:46Z | 1 | RED | Focused `deno check --unstable-kv` failed on the deliberately missing locked Vite/browser fixture modules and incomplete fixture types. |
-| 2026-09-02T16:48:46Z | 1 | GREEN | Added locked `--frozen --cached-only` workspace Vite helper; targeted bundle/policy wrapper passed 10/10 with a fresh empty npm cache. |
+| 2026-09-02T16:48:46Z | 1 | GREEN | Added locked `--frozen --cached-only` workspace Vite helper; targeted bundle/policy wrapper passed 10/10 from the installation-prepared Deno cache without test-time registry resolution. |
 | 2026-09-02T16:48:46Z | 2 | GREEN | Added direct hit/miss policy pairs and a package Playwright fixture that intercepts the partial request, counts one semantic named-boundary swap, and plants a rejected double-swap control. |
 | 2026-09-02T16:48:46Z | 3 | Local gates | Fresh check/lint/fmt, 278 package tests, and repository `quality:gate` passed; browser execution remains CI-owned because this host has no `playwright-cli`. |
 | 2026-09-02T17:07:49Z | 2 | CI RED | Provisioned browser receipt passed both existing tests but timed out before the new fallback appeared; the source page lacked the matching outer Fresh partial needed for client navigation. |
@@ -77,6 +77,7 @@ requires hydration/client navigation.
 | 2026-09-02T17:27:19Z | 2 | CI RED 2 | The rerun still timed out; direct partial probing exposed HTTP 500 from the fixture's underspecified OpenTelemetry stub (`span.setAttribute` absent). |
 | 2026-09-02T17:27:19Z | 2 | CI fix 2 | Reused the established locked catalog resolver for real `@opentelemetry/api`; `/deferred?fresh-partial=true` now returns 200 with both named partials and fallback. Locked client/SSR build and all scoped gates pass. |
 | 2026-09-02T17:40:43Z | 3 | CI GREEN | Provisioned `fresh-browser` receipt passed all 3 tests in 40.115s, including the cache-miss request/exactly-one named-boundary regression in 13s. |
+| 2026-09-02T17:57:48Z | 1 | F1 correction | Removed inert `NPM_CONFIG_CACHE` plumbing. Scoped bundle wrapper passed 1/1 in 3.972s using exact locked Vite under `--frozen --cached-only`; CI `deno install` supplies the cache, and a cold Deno cache fails loudly. Code commit `49c889897279e2079c4abbb47f7c471a4a53abce`. |
 
 ## Decisions
 
@@ -101,7 +102,7 @@ requires hydration/client navigation.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Baseline | `git rev-parse HEAD origin/main` | PASS | Both `37452f11...`; clean except staged run dir. |
-| Locked Vite probe | `deno run --frozen --cached-only -A vite build ...` with empty npm cache | PASS | Vite 7.2.2; 45 client/188 SSR modules. |
+| Locked Vite probe | `deno run --frozen --cached-only -A vite build ...` after deterministic installation | PASS | Exact Vite 7.2.2 from the prewarmed Deno cache; no registry fallback at test time; cold Deno cache fails loudly. |
 | Local browser baseline | `deno task --cwd packages/fresh test:browser` | FAIL (environment) | `playwright-cli` not found; product assertions did not run. |
 
 ### Fitness Gates
@@ -118,6 +119,7 @@ requires hydration/client navigation.
 | --- | --- | --- | --- |
 | Focused RED | PASS | Focused `deno check --unstable-kv` | Failed before helpers existed on the intended missing-module/type boundary. |
 | Targeted GREEN | PASS | `run-deno-test.ts` over bundle + defer policy tests | 10 passed, 0 failed; 4.355s. |
+| F1 scoped bundle rerun | PASS | `run-deno-test.ts -- --allow-all packages/fresh/tests/defer-island-client-bundle_test.ts` | 1 passed, 0 failed; 3.972s after removing inert `NPM_CONFIG_CACHE`. |
 | Fresh package test | PASS | `deno task --cwd packages/fresh test` | 278 passed, 0 failed. |
 | Structured Fresh test | PASS | `run-deno-test.ts -- --allow-all packages/fresh` | 278 passed, 0 failed; 8.107s. |
 | Fresh check | PASS | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | 213 files, 2 batches, `deno check --unstable-kv`, zero findings. |
@@ -142,6 +144,7 @@ requires hydration/client navigation.
 | Implementation | `e912c414d2da72711e36bbb5daa1d933c3c19d8b` | Head SHA after RED/GREEN and all local gates; explicit-refspec push receipt follows in the PR lifecycle record. |
 | CI RED fix | `1e1f374a29d7edd0c9cdcd5e3e3fbb2b631f1aeb` | Head SHA after adding the matching outer navigation partial; explicit-refspec rerun push follows. |
 | CI RED fix 2 | `9148054f8cc33a41c53e69a88d42ad89da8f1b84` | Head SHA after replacing the incomplete telemetry stub; explicit-refspec rerun push follows. |
+| F1 code correction | `49c889897279e2079c4abbb47f7c471a4a53abce` | Removed inert npm-cache override; scoped bundle test passed 1/1 before the artifact correction commit. |
 
 ## Reconcile Notes
 

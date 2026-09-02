@@ -41,8 +41,8 @@ boundary exactly once.
 
 - Replace unlocked, bare npm Vite execution in Fresh tests with the package's exact-pinned `vite`
   import resolved through the root lock under `--frozen --cached-only`.
-- Keep the existing client-bundle content assertion and continuously exercise it with an empty npm
-  cache directory.
+- Keep the existing client-bundle content assertion and continuously exercise it without registry
+  resolution at test time, using dependencies materialized by CI's deterministic `deno install`.
 - Add direct policy assertions for partial hit and partial miss action/reason pairs.
 - Add one `packages/fresh` fixture app built with `definePage().withLayer(...)` and one Playwright
   browser regression under the existing `test:browser` task.
@@ -82,9 +82,10 @@ boundary exactly once.
    external `playwright-cli` is present; the slice will not install or vendor it.
 3. **Deterministic bundle build — workspace alias plus frozen locked cache.** All test fixture Vite
    processes use `deno run --frozen --cached-only -A vite ...`. `vite` resolves from
-   `packages/fresh/deno.json` to exact `npm:vite@7.2.2`, whose graph is in the root lock. The bundle
-   test supplies a new empty `NPM_CONFIG_CACHE` on every run. No `--no-lock` or runtime `npm:vite@...`
-   specifier survives.
+   `packages/fresh/deno.json` to exact `npm:vite@7.2.2`, whose graph is in the root lock. CI's
+   deterministic `deno install` step warms the Deno cache before tests; `--cached-only` then forbids
+   registry fallback at test time, and a genuinely cold Deno cache fails loudly. No `--no-lock` or
+   runtime `npm:vite@...` specifier survives.
 4. **Suite placement — split by cost.** Pure policy tests and the deterministic production bundle
    build stay in the default package suite. Real-browser navigation remains behind the established
    `test:browser` task and `needs_fresh_browser` impact gate because Chromium installation and
@@ -119,7 +120,7 @@ a negative control, and the same exact-one assertion must reject its count of tw
 
 | Risk | Mitigation |
 | --- | --- |
-| `--cached-only` fails because the test runner did not materialize Vite. | Vite is imported by Fresh source/config and locked; prove the exact command before editing and in the targeted bundle test. |
+| `--cached-only` fails because the test runner did not materialize Vite. | CI runs deterministic `deno install` before tests; retain the loud cold-cache failure rather than resolving from the registry at test time. |
 | Browser observer races the automatic island submission. | Intercept and pause the configured endpoint, wait for fallback, install the observer, then release the request. |
 | MutationObserver callback multiplicity inflates a swap count. | Record unique semantic state values, not raw callback/mutation counts. |
 | A double swap would still pass. | Apply the exact-one assertion to the real count and prove rejection with a planted second state. |
@@ -160,7 +161,7 @@ a negative control, and the same exact-one assertion must reject its count of tw
 | # | What it proves | Gate | Files |
 | - | --- | --- | --- |
 | 0 | Current research and design decisions are reviewable before implementation. | Separate-session PLAN-EVAL | run-dir mandatory artifacts |
-| 1 | The wanted client-bundle assertion builds through the exact locked Vite graph with network resolution disabled and an empty npm cache. | Targeted wrapper test plus cold-cache build | `packages/fresh/tests/_fixtures/vite-runtime.ts`, `packages/fresh/tests/defer-island-client-bundle_test.ts`, run artifacts |
+| 1 | The wanted client-bundle assertion builds through exact locked `npm:vite@7.2.2` with registry resolution disabled at test time after deterministic CI installation. | Targeted wrapper test from the CI-prewarmed Deno cache | `packages/fresh/tests/_fixtures/vite-runtime.ts`, `packages/fresh/tests/defer-island-client-bundle_test.ts`, run artifacts |
 | 2 | Partial hit/miss policy pairs are direct, and a real cache-miss client navigation requests the configured endpoint and swaps the named boundary exactly once with a double-swap negative control. | Default package test; `test:browser` in CI | `packages/fresh/src/application/defer/DeferIsland.test.ts`, `packages/fresh/tests/_fixtures/browser-runtime.ts`, `packages/fresh/tests/form-navigation_browser.ts`, `packages/fresh/tests/defer-client-navigation_browser.ts`, `packages/fresh/tests/fixtures/defer-client-navigation-browser/**`, `packages/fresh/deno.json`, run artifacts |
 | 3 | The complete scoped change satisfies static, test, doctrine, dependency, and browser gates. | Full validation plan and separate-session IMPL-EVAL | run artifacts only |
 
@@ -168,7 +169,7 @@ a negative control, and the same exact-one assertion must reject its count of tw
 
 | Order | Gate | Command or check | Expected result |
 | --- | --- | --- | --- |
-| 1 | Targeted deterministic bundle | `run-deno-test.ts -- --allow-all packages/fresh/tests/defer-island-client-bundle_test.ts` with empty npm cache encoded by test | PASS without network resolution |
+| 1 | Targeted deterministic bundle | `run-deno-test.ts -- --allow-all packages/fresh/tests/defer-island-client-bundle_test.ts` after deterministic dependency installation | PASS without test-time registry resolution; cold Deno cache fails loudly |
 | 2 | Fresh check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS |
 | 3 | Fresh package tests | `deno task --cwd packages/fresh test` (task uses Deno test; record structured wrapper result as well) | PASS |
 | 4 | Fresh lint | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` | PASS |

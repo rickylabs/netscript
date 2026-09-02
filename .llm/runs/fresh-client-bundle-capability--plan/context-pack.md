@@ -20,11 +20,12 @@ is non-draft and awaits independent IMPL-EVAL/close-gate reconciliation.
 
 - Read required skills, harness/doctrine references, and both issues including comments.
 - Re-baselined branch exactly to current `origin/main`.
-- Proved the locked/cached-only Vite command with an empty npm cache.
+- Proved the exact locked Vite command runs without registry resolution at test time when CI's
+  deterministic `deno install` step has warmed the Deno cache; a cold Deno cache fails loudly.
 - Recorded design, risks, slices, and validation plan.
 - Committed/pushed the plan contract as `1e54fa598` and opened non-draft PR #1940.
-- Replaced runtime npm Vite resolution with the exact workspace alias under `--frozen
-  --cached-only`; the bundle test supplies a new empty npm cache.
+- Replaced runtime npm Vite resolution with exact `npm:vite@7.2.2` through the workspace alias under
+  `--frozen --cached-only`; CI deterministically warms the Deno cache with `deno install` first.
 - Added direct policy-pair tests and a real-browser cache-miss navigation regression with request,
   exact-one named-boundary swap, and double-swap negative-control evidence.
 - Passed Fresh check/lint/fmt, 278 package tests, and `quality:gate`.
