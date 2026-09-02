@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-31T14:58:25.102Z",
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s7",
+  "command": [
+    "docker",
+    "network",
+    "inspect",
+    "aspire-persistent-network-0e0a2a9f-aspire-managed"
+  ],
+  "exitCode": 0,
+  "stdout": "[\n    {\n        \"Name\": \"aspire-persistent-network-0e0a2a9f-aspire-managed\",\n        \"Id\": \"47849d23d068f58fd01031404633fb940bdcc0f282041d6ca0b22533ad92c67e\",\n        \"Created\": \"2026-08-31T14:52:07.376704997Z\",\n        \"Scope\": \"local\",\n        \"Driver\": \"bridge\",\n        \"EnableIPv4\": true,\n        \"EnableIPv6\": false,\n        \"IPAM\": {\n            \"Driver\": \"default\",\n            \"Options\": {},\n            \"Config\": [\n                {\n                    \"Subnet\": \"172.19.0.0/16\",\n                    \"Gateway\": \"172.19.0.1\"\n                }\n            ]\n        },\n        \"Internal\": false,\n        \"Attachable\": false,\n        \"Ingress\": false,\n        \"ConfigFrom\": {\n            \"Network\": \"\"\n        },\n        \"ConfigOnly\": false,\n        \"Containers\": {},\n        \"Options\": {},\n        \"Labels\": {\n            \"com.microsoft.developer.usvc-dev.creatorProcessId\": \"2456068\",\n            \"com.microsoft.developer.usvc-dev.creatorProcessStartTime\": \"0001-01-05T07:03:18.440Z\",\n            \"com.microsoft.developer.usvc-dev.persistent\": \"true\"\n        }\n    }\n]\n",
+  "stderr": "",
+  "parsed": [
+    {
+      "Name": "aspire-persistent-network-0e0a2a9f-aspire-managed",
+      "Id": "47849d23d068f58fd01031404633fb940bdcc0f282041d6ca0b22533ad92c67e",
+      "Created": "2026-08-31T14:52:07.376704997Z",
+      "Scope": "local",
+      "Driver": "bridge",
+      "EnableIPv4": true,
+      "EnableIPv6": false,
+      "IPAM": {
+        "Driver": "default",
+        "Options": {},
+        "Config": [
+          {
+            "Subnet": "172.19.0.0/16",
+            "Gateway": "172.19.0.1"
+          }
+        ]
+      },
+      "Internal": false,
+      "Attachable": false,
+      "Ingress": false,
+      "ConfigFrom": {
+        "Network": ""
+      },
+      "ConfigOnly": false,
+      "Containers": {},
+      "Options": {},
+      "Labels": {
+        "com.microsoft.developer.usvc-dev.creatorProcessId": "2456068",
+        "com.microsoft.developer.usvc-dev.creatorProcessStartTime": "0001-01-05T07:03:18.440Z",
+        "com.microsoft.developer.usvc-dev.persistent": "true"
+      }
+    }
+  ]
+}

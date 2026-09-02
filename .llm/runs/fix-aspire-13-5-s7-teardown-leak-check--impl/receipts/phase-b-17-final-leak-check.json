@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "phase": "S7 phase B rerun",
+  "generatedAt": "2026-08-30T19:15:44.489Z",
+  "command": "/home/agent/.local/bin/mise exec -- deno task agentic:leak-check -- --slice-dir /home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl --worktree /home/agent/projects/netscript/worktrees/007-aspire-s7 --owned-root /home/agent/projects/netscript/worktrees/007-aspire-s7/.llm/tmp/s7-phase-b-rerun",
+  "exitCode": 0,
+  "probes": {
+    "aspire": "ok",
+    "docker": "ok",
+    "process": "ok"
+  },
+  "ownedSurvivors": [],
+  "observedUnproven": [
+    {
+      "pid": 3396666,
+      "ppid": 3396655,
+      "commandLine": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire ps --format Json",
+      "evidence": [],
+      "disposition": "Reporter probe subprocess; not owned, not mutated, and gone when the command completed."
+    }
+  ],
+  "foreignControlSurvivors": [],
+  "supervisorRelayMutations": []
+}

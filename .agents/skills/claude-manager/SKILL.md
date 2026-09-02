@@ -17,18 +17,18 @@ opinion or native-family quota exhaustion, and OpenHands for explicitly cloud-dr
 ## Workflow
 
 Native Claude sessions authenticated through the Anthropic client are the mobile-visible operator
-surface. Claude sessions launched through `agentic:claude-openrouter-gateway` or another custom gateway are
-separate inference-only provider-runner sessions: they may be forked, supervised, and recorded, but
-must never be described as Remote Control or mobile-visible sessions. Claude Code 2.1.196 and newer
-enforce this boundary by rejecting Remote Control when `ANTHROPIC_BASE_URL` is custom; an
-interactive process staying alive is not attachment proof.
+surface. Claude sessions launched through `agentic:claude-openrouter-gateway` or another custom
+gateway are separate inference-only provider-runner sessions: they may be forked, supervised, and
+recorded, but must never be described as Remote Control or mobile-visible sessions. Claude Code
+2.1.196 and newer enforce this boundary by rejecting Remote Control when `ANTHROPIC_BASE_URL` is
+custom; an interactive process staying alive is not attachment proof.
 
 `agentic:claude-hybrid` keeps that boundary intact. It starts a native, Anthropic-authenticated
 Remote Control supervisor and gives it the local `netscript-hybrid` MCP tool `delegate_openrouter`.
 A tool call delegates one bounded task to OpenCode/OpenRouter; the approved default is
-`z-ai/glm-5.3-flash` at `max`, with `qwen/qwen3.8-flash` also allowed. This is not transparent model substitution: Claude must still
-have enough native quota to take a turn and call the tool. At zero Claude quota, use the
-non-Remote-Control OpenRouter surface or OpenCode directly.
+`z-ai/glm-5.3-flash` at `max`, with `qwen/qwen3.8-flash` also allowed. This is not transparent model
+substitution: Claude must still have enough native quota to take a turn and call the tool. At zero
+Claude quota, use the non-Remote-Control OpenRouter surface or OpenCode directly.
 
 1. Re-baseline the worktree and branch first.
 2. If the user says `use harness`, read `.agents/skills/netscript-harness/SKILL.md`. If a native
@@ -100,7 +100,6 @@ deno task agentic:check-claude
 deno task agentic:smoke-claude-remote -- --pretty
 deno task agentic:claude-openrouter-gateway -- --cwd <path> [--resume <id> --fork-session]
 deno task agentic:claude-hybrid -- --cwd <absolute-path> [--name <label>]
-deno task agentic:sync-claude
 ```
 
 Use `--live --prompt <file>` with `agentic:smoke-claude-remote` only when a real Claude background
@@ -108,8 +107,7 @@ session should be started.
 
 ## Common Pitfalls
 
-- Assuming a repo skill is globally installed. Check `.claude/skills/` or read `.agents/skills/...`
-  directly.
+- Assuming a repo skill is globally installed. Read `.agents/skills/<name>/SKILL.md` directly.
 - Waiting for full session completion when the job is only to steer. Background launches should
   return quickly and provide a status handle.
 - Treating a successful local process as mobile-visible. Require remote-control or daemon evidence.
@@ -122,7 +120,8 @@ session should be started.
 - Retrying a failed delegated task without reading its bounded error category. Check task/context
   size, timeout, OpenCode availability, and the configured OpenRouter env file for
   `invalid_request`, `timed_out`, `result_too_large`, or `worker_failed` respectively.
-- Letting stale `.claude/skills` drift from `.agents/skills`; run `agentic:check-claude`.
+- Copying repository skills into `.claude/skills/`; that directory contains only the discovery
+  bridge, while all skill content belongs in `.agents/skills/`.
 
 ## Checklist
 

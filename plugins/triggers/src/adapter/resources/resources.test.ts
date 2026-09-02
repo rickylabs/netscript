@@ -134,6 +134,13 @@ Deno.test('triggers install emits only userland glue under triggers', () => {
       );
     }
   }
+
+  const controlPlane = artifacts.find((artifact) => artifact.path === 'triggers/plugin.ts');
+  assertStringIncludes(artifactText(controlPlane!), 'NETSCRIPT_CONTRIBUTION_BUILDERS');
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineWebhook', axis: 'triggers' }",
+  );
 });
 
 Deno.test('generated triggers runtime activates the selected Redis adapter', async () => {

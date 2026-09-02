@@ -12,11 +12,6 @@ import {
   DedupeRequestsPlugin,
 } from '@orpc/client/plugins';
 import type { StandardLinkClientInterceptorOptions } from '@orpc/client/standard';
-import {
-  type AnyContractRouter as ORPCAnyContractRouter,
-  inferRPCMethodFromContractRouter,
-  isContractProcedure,
-} from '@orpc/contract';
 import { SpanNames } from '@netscript/telemetry/attributes';
 import { contextWithSpan, injectContext } from '@netscript/telemetry/context';
 import { getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';
@@ -25,13 +20,17 @@ import type { PreparedSdkClientCall } from '../internal/client-contributions/ada
 import { createPreparedOutboundHeadersPort } from '../internal/client-contributions/prepared-call.ts';
 import {
   createStableV1ClientLink,
-  createStableV1ProcedureMetadataPort,
   stableV1PreparedCall,
   type StableV1TransportContext,
 } from '../internal/client-contributions/stable-v1-adapter.ts';
+import type {
+  ResolvedCallTransportPolicy,
+  ResolvedTransportCacheGroup,
+  ResolvedTransportPolicy,
+} from '../internal/transport-policy.ts';
 import type { ClientLinkPort } from '../ports/client-link-factory.ts';
 import type { SdkClientContributionContext } from '../ports/sdk-client-contribution.ts';
-import type { ContractLike, ServiceClientContext } from '../ports/service-client.ts';
+import type { ServiceClientContext } from '../ports/service-client.ts';
 
 type HttpRuntimeClientContext =
   & StableV1TransportContext<object>
@@ -43,28 +42,12 @@ type HttpRuntimeClientOptions = ClientOptions<HttpRuntimeClientContext> & {
 
 const RPC_CLIENT_TRACER = '@netscript/sdk';
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object';
-}
-
-function isOrpcContractRouter(value: unknown): value is ORPCAnyContractRouter {
-  if (isContractProcedure(value)) {
-    return true;
-  }
-  if (!isRecord(value) || Array.isArray(value) || '~orpc' in value) {
-    return false;
-  }
-  const children = Object.values(value);
-  return children.length > 0 && children.every(isOrpcContractRouter);
-}
-
 /** Options for the HTTP service-client link adapter. */
 export interface HttpClientLinkOptions<
-  TContract extends ContractLike,
   TContributions extends readonly object[] = readonly [],
 > {
-  /** Contract definition used for HTTP method inference. */
-  contract: TContract;
+  /** Fully resolved NetScript-owned transport policy. */
+  transportPolicy: ResolvedTransportPolicy;
   /** Service name resolved through NetScript discovery. */
   serviceName: string;
   /** Canonical RPC path for the service router. */
@@ -81,12 +64,51 @@ export interface HttpClientLinkOptions<
   fetch?: typeof globalThis.fetch;
 }
 
+function preparedCallFromOptions(
+  options: Readonly<{
+    readonly context?: HttpRuntimeClientContext;
+    readonly preparedCall?: PreparedSdkClientCall<object>;
+  }>,
+): PreparedSdkClientCall<object> {
+  const prepared = options.preparedCall ?? options.context?.[stableV1PreparedCall];
+  if (prepared === undefined) {
+    throw new TypeError('SDK HTTP transport requires a resolved logical call');
+  }
+  return prepared;
+}
+
+function adaptCacheGroup(
+  group: ResolvedTransportCacheGroup<'force-cache'> | ResolvedTransportCacheGroup<'default'>,
+): Readonly<{
+  readonly condition: (
+    options: StandardLinkClientInterceptorOptions<HttpRuntimeClientContext>,
+  ) => boolean;
+  readonly context: Readonly<{ cache: 'force-cache' }> | Readonly<Record<never, never>>;
+}> {
+  return Object.freeze({
+    condition: (
+      options: StandardLinkClientInterceptorOptions<HttpRuntimeClientContext>,
+    ): boolean => group.condition(preparedCallFromOptions(options).call.transportPolicy),
+    context: group.context,
+  });
+}
+
+function stableV1CodecMethod(
+  policy: ResolvedTransportPolicy,
+  call: ResolvedCallTransportPolicy,
+): 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' {
+  // Stable v1's declaration is narrower than Fetch's method space; the owned policy validates the
+  // actual NetScript method before this adapter invokes the codec callback.
+  const opaquePolicy: object = policy;
+  const method = Reflect.get(opaquePolicy, 'method');
+  return Reflect.apply(method, policy, [call]);
+}
+
 /** Create the default HTTP client link for discovered services. */
 export function createHttpClientLink<
-  TContract extends ContractLike,
   const TContributions extends readonly object[] = readonly [],
 >({
-  contract,
+  transportPolicy,
   serviceName,
   rpcPath,
   protocol,
@@ -94,27 +116,27 @@ export function createHttpClientLink<
   getTraceHeaders,
   contributions,
   fetch: transportFetch = globalThis.fetch,
-}: HttpClientLinkOptions<TContract, TContributions>): ClientLinkPort<
+}: HttpClientLinkOptions<TContributions>): ClientLinkPort<
   ServiceClientContext & SdkClientContributionContext<TContributions>
 > {
-  if (!isOrpcContractRouter(contract)) {
-    throw new TypeError('Service client contracts must contain oRPC contract procedures');
-  }
+  const [forceCacheGroup, defaultCacheGroup] = transportPolicy.cacheGroups;
 
   const link: unknown = new RPCLink<HttpRuntimeClientContext>({
     // Resolve lazily so browser clients can rely on SSR-injected discovery
     // data instead of touching Deno APIs at import time.
     url: (options: HttpRuntimeClientOptions) => {
-      const prepared = options.preparedCall ?? options.context?.[stableV1PreparedCall];
-      if (prepared !== undefined) {
-        return new URL(prepared.call.transport.rpcPath, prepared.call.transport.origin).toString();
-      }
-      const baseUrl = getServiceUrl(serviceName, protocol);
-      return `${baseUrl}${rpcPath}`;
+      const prepared = preparedCallFromOptions(options);
+      return new URL(prepared.call.transport.rpcPath, prepared.call.transport.origin).toString();
     },
-    method: inferRPCMethodFromContractRouter(contract),
+    method: (options: HttpRuntimeClientOptions) =>
+      stableV1CodecMethod(
+        transportPolicy,
+        preparedCallFromOptions(options).call.transportPolicy,
+      ),
+    fallbackMethod: transportPolicy.fallbackMethod,
+    maxUrlLength: transportPolicy.maxUrlLength,
     headers: (options: HttpRuntimeClientOptions) => {
-      const prepared = options.preparedCall ?? options.context?.[stableV1PreparedCall];
+      const prepared = preparedCallFromOptions(options);
       const headers: Record<string, string> = {
         ...prepared?.contributedHeaders.values,
         'Content-Type': 'application/json',
@@ -141,21 +163,13 @@ export function createHttpClientLink<
         },
       }),
       new DedupeRequestsPlugin<HttpRuntimeClientContext>({
-        filter: ({ request }) => request.method === 'GET',
+        filter: (options) =>
+          transportPolicy.dedupePredicate(
+            preparedCallFromOptions(options).call.transportPolicy,
+          ),
         groups: [
-          {
-            condition: ({
-              context,
-            }: StandardLinkClientInterceptorOptions<HttpRuntimeClientContext>) =>
-              context?.cache === 'force-cache',
-            context: {
-              cache: 'force-cache',
-            },
-          },
-          {
-            condition: () => true,
-            context: {},
-          },
+          adaptCacheGroup(forceCacheGroup),
+          adaptCacheGroup(defaultCacheGroup),
         ],
       }),
     ],
@@ -194,15 +208,12 @@ export function createHttpClientLink<
     StableV1TransportContext<object>,
     PreparedSdkClientCall<object>
   >;
-  const preparation = createPreparedOutboundHeadersPort(
-    contributionTuple,
-    createStableV1ProcedureMetadataPort(),
-  );
+  const preparation = createPreparedOutboundHeadersPort(contributionTuple);
 
   return createStableV1ClientLink<SdkClientContributionContext<TContributions>>({
-    contract,
     link: transportLink,
     preparation,
+    transportPolicy,
     resolveTransport: () => {
       const discovered = new URL(getServiceUrl(serviceName, protocol));
       return Object.freeze({

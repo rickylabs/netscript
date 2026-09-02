@@ -140,20 +140,35 @@ real instrumentation from <code>@netscript/telemetry</code>, not the scaffold he
 
 ### Query or export a detached AppHost
 
-Generated workspaces include task routes that do not require you to discover or remember the
-dashboard URL:
+Generated workspaces include task routes that query traces and logs so you never have to discover
+or remember the dashboard URL:
 
 ```bash
+# Query traces or logs for a specific resource
 deno task aspire:otel -- traces <resource>
 deno task aspire:otel -- logs <resource>
+
+# Query with timestamp search filter (ISO format or date)
+deno task aspire:otel -- traces <resource> --search "timestamp:>=2026-08-30"
+
+# Export collected telemetry to a structured zip archive
 deno task aspire:export -- -o telemetry.zip
 ```
 
 Generate traffic before querying traces; a healthy but idle AppHost legitimately returns an empty
-array. The tasks forward all arguments, try Aspire's automatic detached discovery first, and retry
-with the matching `dashboardUrl` from `aspire ps --format Json` if needed. If bare Aspire reports
-`The dashboard is not available`, use these task routes—the collector and dashboard data may still
-be healthy.
+array. The generated task wrappers forward your arguments, try Aspire's automatic discovery first,
+and on failure query `aspire ps --format Json` for the matching AppHost path and retry with its
+active `dashboardUrl`. Bare `aspire otel` exits with code `12` when no dashboard is reachable; the
+task wrappers catch that exit and resolve the running instance automatically.
+
+AI agents and external tools that connect through the NetScript MCP telemetry server
+(`@netscript/mcp`) resolve the endpoint by a fixed precedence — options first, then environment
+variables, then the default:
+
+1. The explicit `--endpoint` option.
+2. The `NETSCRIPT_TELEMETRY_ENDPOINT` environment variable.
+3. The `ASPIRE_DASHBOARD_PORT` environment variable (e.g. `18888`).
+4. The default fallback endpoint, `http://localhost:18888`.
 
 ## Step 3 — Add your own spans in a job handler
 

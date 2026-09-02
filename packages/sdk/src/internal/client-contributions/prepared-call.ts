@@ -15,7 +15,6 @@ import type {
 import type {
   PreparedOutboundHeadersPort,
   PreparedSdkClientCall,
-  ProcedureMetadataPort,
   SdkClientLogicalCall,
 } from './adapter-ports.ts';
 
@@ -351,15 +350,6 @@ function validatePatchHeaders(
   return Object.freeze(headers);
 }
 
-function freezeProcedure(
-  procedure: SdkClientProcedureDescriptor,
-): SdkClientProcedureDescriptor {
-  return Object.freeze({
-    path: Object.freeze([...procedure.path]),
-    meta: Object.freeze({ ...procedure.meta }),
-  });
-}
-
 /** Resolve the contribution tuple's canonical, non-secret cache partitions. */
 export function resolveSdkClientCachePartition(
   contributions: readonly ValidatedSdkClientContribution[],
@@ -432,7 +422,6 @@ export function hasDirectOnlySdkClientContribution(
 /** Create the private preparation port for one validated contribution tuple. */
 export function createPreparedOutboundHeadersPort(
   contributions: unknown,
-  procedureMetadata: ProcedureMetadataPort,
 ): PreparedOutboundHeadersPort {
   const tuple = validateSdkClientContributions(contributions);
 
@@ -442,9 +431,7 @@ export function createPreparedOutboundHeadersPort(
     ): Promise<PreparedSdkClientCall<TContext>> {
       if (call.signal?.aborted) throw abortReason(call.signal);
 
-      const procedure = freezeProcedure(
-        procedureMetadata.describe(call.procedureNode, call.procedurePath),
-      );
+      const procedure = call.procedure;
       const procedurePath = procedure.path.join('.');
       const callContext = call.context as Readonly<Record<string, unknown>>;
       const values: Record<string, string> = {};

@@ -11,7 +11,7 @@
  * @example
  * ```typescript
  * import { PrismaMySql } from "@netscript/prisma-adapter-mysql";
- * import { PrismaClient } from "./schema/.generated/client.server.ts";
+ * import { PrismaClient } from "@database";
  *
  * const adapter = new PrismaMySql({
  *   hostname: "localhost",

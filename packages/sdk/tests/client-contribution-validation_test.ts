@@ -63,10 +63,16 @@ function procedureDescriptor(path: readonly string[] = ['echo']) {
 }
 
 function logicalCall(context: Readonly<Record<string, unknown>>): SdkClientLogicalCall<object> {
+  const procedure = procedureDescriptor();
   return Object.freeze({
     context,
     procedurePath: Object.freeze(['echo']),
-    procedureNode: contract.echo,
+    procedure,
+    transportPolicy: Object.freeze({
+      procedure,
+      method: 'POST' as const,
+      cache: 'default' as const,
+    }),
     transport: Object.freeze({
       kind: 'http' as const,
       origin: new URL('https://example.test'),
@@ -78,9 +84,7 @@ function logicalCall(context: Readonly<Record<string, unknown>>): SdkClientLogic
 }
 
 function preparationPort(contributions: unknown) {
-  return createPreparedOutboundHeadersPort(contributions, {
-    describe: (_node, path) => procedureDescriptor(path),
-  });
+  return createPreparedOutboundHeadersPort(contributions);
 }
 
 Deno.test('unknown construction rejects invalid protocol, ids, shapes, and forbidden extras', () => {
@@ -169,6 +173,48 @@ Deno.test('Desktop construction rejects even an empty contributions field at run
   assert(error instanceof SdkClientContributionError);
   assertEquals(error.code, 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED');
   assertEquals(error.phase, 'construction');
+});
+
+Deno.test('transport policy validation precedes Desktop contribution rejection', () => {
+  const error = assertThrows(() =>
+    Reflect.apply(createDesktopServiceClient, undefined, [{
+      contract,
+      transportPolicy: { method: 'GET' },
+      contributions: [],
+    }])
+  );
+  assert(error instanceof TypeError);
+  assertEquals(error.message, 'SDK transportPolicy.method must be a function');
+});
+
+Deno.test('contribution preparation receives exactly the five public fields', async () => {
+  let observedKeys: readonly string[] = [];
+  const contribution = descriptor({
+    prepare: (options: unknown) => {
+      assert(options !== null && typeof options === 'object');
+      observedKeys = Object.keys(options).sort();
+      for (
+        const forbidden of [
+          'method',
+          'inferredMethod',
+          'fallbackMethod',
+          'maxUrlLength',
+          'dedupePredicate',
+          'retry',
+          'trace',
+          'fetch',
+          'link',
+          'plugins',
+        ]
+      ) {
+        assertFalse(forbidden in options);
+      }
+      return { headers: { 'x-tenant': 'safe' } };
+    },
+  });
+
+  await preparationPort([contribution]).prepare(logicalCall({ tenant: 'tenant' }));
+  assertEquals(observedKeys, ['context', 'input', 'procedure', 'signal', 'transport']);
 });
 
 Deno.test('preparation rejects missing context and every invalid header form', async () => {

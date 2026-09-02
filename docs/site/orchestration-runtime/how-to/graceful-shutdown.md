@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Graceful shutdown
 templateEngine: [vento, md]
-order: 105
+order: 106
 oldUrl: /how-to/graceful-shutdown/
 ---
 
