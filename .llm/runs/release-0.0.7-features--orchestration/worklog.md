@@ -10850,3 +10850,13 @@ the fixed head.
 Worth keeping: **a line-regex on a `;`-terminated member is the wrong primitive for a language whose
 types contain `;`.** The evaluator found it by constructing the counter-example, not by reading the
 tests — which all passed.
+
+### ~22:30Z — #1944 and #1943 exact-green at their re-converged heads
+
+| PR | Head | CI | Mergeable |
+| --- | --- | --- | --- |
+| **#1944** (closes #1452) | `bd3eeac54` | **6/6** | `MERGEABLE` |
+| **#1943** (Slice B) | `3a888f398` | **7/7** incl. `fresh-ui-quality` | `MERGEABLE` |
+
+Both confirmed on the PRs. With #1895, three Features PRs are ready for the coordinator; #1664's sole
+red is #1845; #1946 is in its fix loop.
