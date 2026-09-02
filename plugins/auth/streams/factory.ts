@@ -31,15 +31,13 @@ export interface AuthStreamDB {
  *
  * @example
  * ```ts
- * import { createAuthStreamDB } from '@plugins/auth/streams';
- * import { useLiveQuery } from '@tanstack/react-db';
+ * import { createAuthStreamDB } from '@netscript/plugin-auth/streams';
+ *
+ * declare const streamsServiceUrl: string;
  *
  * const authDb = createAuthStreamDB({ baseUrl: streamsServiceUrl });
- *
- * const { data: active } = useLiveQuery((q) =>
- *   q.from({ s: authDb.collections.authSession })
- *     .where(({ s }) => s.state === 'active')
- * );
+ * const sessions = authDb.collections.authSession;
+ * void sessions;
  * ```
  */
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {

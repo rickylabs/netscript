@@ -6,19 +6,13 @@ path	class	owner	disposition
 .agents/generated/consumer-skills/.claude/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/.claude/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/generated/consumer-skills/AGENTS.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
+.agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	authoritative repository skill; align directly
 .agents/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
 .agents/skills/netscript-cli/commands.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-cli/maintainer-cli.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-cli/SKILL.md	skill:internal	S13	wording check; no version literal expected
 .agents/skills/netscript-pr/SKILL.md	skill:internal	archival	exempt — historical branch-name example
 .agents/skills/README.md	skill:internal	S13	wording check; no version literal expected
-.claude/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
-.claude/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
-.claude/skills/netscript-cli/commands.md	skill:internal	S13	wording check; no version literal expected
-.claude/skills/netscript-cli/maintainer-cli.md	skill:internal	S13	wording check; no version literal expected
-.claude/skills/netscript-cli/SKILL.md	skill:internal	S13	wording check; no version literal expected
-.claude/skills/netscript-pr/SKILL.md	skill:internal	archival	exempt — historical branch-name example
 .github/CODEOWNERS	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/ISSUE_TEMPLATE/bug_report.yml	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env
 .github/ISSUE_TEMPLATE/feature_request.yml	ci:other	S1	toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env

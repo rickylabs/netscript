@@ -19,6 +19,11 @@ export interface WorkspaceSurface {
   catalogConflictCount: number;
 }
 
+/** Workspace export-selection controls for synthetic documentation checks. */
+export interface WorkspaceSurfaceOptions {
+  publishedOnly?: boolean;
+}
+
 function isJsonObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -142,6 +147,7 @@ function resolveCatalogImport(
 export async function resolveWorkspaceSurface(
   repositoryRoot: string,
   supportImports: Record<string, string> = {},
+  options: WorkspaceSurfaceOptions = {},
 ): Promise<WorkspaceSurface> {
   const rootPath = join(repositoryRoot, 'deno.json');
   const rootConfig = await readJsonObject(rootPath);
@@ -155,6 +161,7 @@ export async function resolveWorkspaceSurface(
   const publicWorkspaceSpecifiers = new Set<string>();
 
   for (const member of members) {
+    if (options.publishedOnly === true && member.config.publish === false) continue;
     const name = member.config.name;
     if (typeof name !== 'string' || !name.startsWith('@netscript/')) continue;
     const exportsValue = member.config.exports;
@@ -245,7 +252,9 @@ export async function resolveWorkspaceSurface(
   return {
     imports,
     catalog,
-    memberCount: members.length,
+    memberCount: options.publishedOnly
+      ? members.filter((member) => member.config.publish !== false).length
+      : members.length,
     declaredConflictCount: 0,
     catalogConflictCount: 0,
   };

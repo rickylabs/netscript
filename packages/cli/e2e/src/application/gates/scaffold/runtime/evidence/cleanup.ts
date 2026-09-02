@@ -18,6 +18,8 @@ export interface PostStopProbeEvaluation {
   readonly unprovenContainers: readonly ContainerEvidence[];
   readonly ownedProcesses: readonly ProcessEvidence[];
   readonly foreignProcesses: readonly ProcessEvidence[];
+  /** Matching processes whose AppHost path could not be established either way. */
+  readonly unprovenProcesses: readonly ProcessEvidence[];
 }
 
 /** Returns true only when an absolute candidate path is contained by root on path boundaries. */
@@ -49,6 +51,7 @@ export function evaluatePostStopProbe(
   }
   const ownedProcesses: ProcessEvidence[] = [];
   const foreignProcesses: ProcessEvidence[] = [];
+  const unprovenProcesses: ProcessEvidence[] = [];
   for (const candidate of arrayField(root, 'processes')) {
     const process = record(candidate, 'process');
     const pid = numberField(process, 'pid');
@@ -68,6 +71,9 @@ export function evaluatePostStopProbe(
     const evidence = appHostArgument ?? envAppHost;
     if (evidence && pathContained(evidence, projectRoot)) ownedProcesses.push({ pid });
     else if (evidence && isAbsolute(evidence)) foreignProcesses.push({ pid });
+    // Containers already had this third bucket; processes did not, so a matching process
+    // with no usable path evidence fell through both branches and vanished entirely.
+    else unprovenProcesses.push({ pid });
   }
   return {
     ownedContainers,
@@ -75,6 +81,7 @@ export function evaluatePostStopProbe(
     unprovenContainers,
     ownedProcesses,
     foreignProcesses,
+    unprovenProcesses,
   };
 }
 

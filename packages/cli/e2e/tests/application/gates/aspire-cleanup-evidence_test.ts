@@ -54,3 +54,31 @@ Deno.test('cleanup adds force only after the exact-apphost graceful stop', () =>
     '--nologo',
   ]);
 });
+
+Deno.test('a matching process with no path evidence is reported as unproven, not dropped', async () => {
+  // Containers already have an `unproven` bucket; processes did not. A matching aspire/dcp process
+  // that exposes neither `--apphost` argv nor ASPIRE_DCP_APPHOST_PATH therefore fell through both
+  // branches and vanished from the evaluation entirely — so a survivor could leak past
+  // assertNoOwnedSurvivors while the report showed nothing. Classification must be total.
+  const fixture = JSON.parse(
+    await Deno.readTextFile(new URL('aspire-post-stop-probe.json', FIXTURES)),
+  );
+  const result = evaluatePostStopProbe(fixture, fixture.projectRoot);
+
+  assertEquals(result.unprovenProcesses.map((entry) => entry.pid), [45]);
+
+  // Every matching process lands in exactly one bucket.
+  const classified = [
+    ...result.ownedProcesses,
+    ...result.foreignProcesses,
+    ...result.unprovenProcesses,
+  ].map((entry) => entry.pid).sort((a, b) => a - b);
+  assertEquals(classified, [41, 42, 43, 45]);
+
+  // Unproven is reported, never mutated — same treatment containers already get.
+  assertThrows(
+    () => assertNoOwnedSurvivors(result),
+    Error,
+    'post-stop probe found owned containers',
+  );
+});

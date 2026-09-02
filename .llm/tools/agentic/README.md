@@ -49,7 +49,7 @@ token. It is safe to read any one of them in isolation.
 | `openhands/`   | The OpenHands lane: dispatch an evaluator, read its status, watch for the verdict.                                                                                                                                                  |
 | `github/`      | The GitHub REST lane: leaf-PR lifecycle, background CI/verdict watch, durable token resolution.                                                                                                                                     |
 | `wsl/`         | The WSL foundation: a native doctor and a reversible bootstrap/rollback planner.                                                                                                                                                    |
-| `claude/`      | Claude hooks, Remote Control smoke and bounded OpenRouter delegation, skill-mirror sync, and surface validation.                                                                                                                    |
+| `claude/`      | Claude hooks, Remote Control smoke and bounded OpenRouter delegation, plus surface validation.                                                                                                                                      |
 | `config/`      | **The single source for everything volatile** — model ids, tool versions, endpoints. See [Maintenance map](#maintenance-map-change-one-thing-in-one-place).                                                                         |
 | `lib/`         | Shared pure + impure primitives (all the landmine logic), its unit suite, and real fixtures.                                                                                                                                        |
 
@@ -318,9 +318,9 @@ unreadable, or otherwise unknown evidence fails closed and preserves the lease.
 Apply re-reads the unchanged lease token and repeats every probe. It atomically persists an
 `authorized` receipt containing both timestamped evidence passes, CAS-removes only that exact
 record, then finalizes the receipt as `evicted`. Receipts live under
-`~/.config/netscript-agentic/runtime/evidence/`, record the finite
-`restart_stale_ownership` reason, and redact the lease token. If re-observation changes or any
-evidence becomes unknown, repair aborts without eviction.
+`~/.config/netscript-agentic/runtime/evidence/`, record the finite `restart_stale_ownership` reason,
+and redact the lease token. If re-observation changes or any evidence becomes unknown, repair aborts
+without eviction.
 
 ### `runtime/cli/routing-state.ts` — quota fallback, inspected
 
@@ -353,11 +353,12 @@ OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly em
 gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
 Native Claude Remote Control remains a different surface.
 
-For interactive OpenRouter work, `agentic:claude-openrouter-gateway` starts a loopback-only split gateway.
-Exact `/v1/messages` requests receive the configured OpenRouter credential and forced model; other
-Claude API traffic is passed to the configured Anthropic endpoint without the OpenRouter key. The
-Claude child receives neither provider API key and runs with `bypassPermissions`. The key is read
-from `OPENROUTER_API_KEY` or the same configured user env file as OpenCode and is never printed.
+For interactive OpenRouter work, `agentic:claude-openrouter-gateway` starts a loopback-only split
+gateway. Exact `/v1/messages` requests receive the configured OpenRouter credential and forced
+model; other Claude API traffic is passed to the configured Anthropic endpoint without the
+OpenRouter key. The Claude child receives neither provider API key and runs with
+`bypassPermissions`. The key is read from `OPENROUTER_API_KEY` or the same configured user env file
+as OpenCode and is never printed.
 
 ```bash
 # New inference-only GLM 5.3 Flash session at max effort.
@@ -511,16 +512,17 @@ to `Deno.cwd()` only when the variable is absent.
 The configured process reads exactly `CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, and
 `CLAUDE_SESSION_ID`, writes only below the launch-root hook-log subtree, and needs no runtime read
 permission. `--no-lock` keeps the hook from disturbing `deno.lock`; `--no-prompt` prevents a future
-TTY-attached invocation from prompting. `sync-claude-skills.ts` **generates** `.claude/skills/` from
-`.agents/skills/` — the mirrors are generated, never hand-edited. `validate-claude-surface.ts` (the
-`agentic:check-claude` gate) checks the whole surface in one pass:
+TTY-attached invocation from prompting. Repository skills live only in `.agents/skills/`; the lone
+`.claude/skills/repo-skills/SKILL.md` file points Claude to that source.
+`validate-claude-surface.ts` (the `agentic:check-claude` gate) checks the whole surface in one pass:
 
 ```console
 $ deno task agentic:check-claude --pretty
 OK CLAUDE.md: contains @AGENTS.md
+OK CLAUDE.md: contains .agents/skills/<name>/SKILL.md
 OK .claude/settings.json: valid JSON
 OK .gitignore: ignores .claude/settings.local.json
-OK .claude/skills: agentic:sync-claude OK: 18 skill(s), 22 mirrored file(s)
+OK Claude repository-skill bridge: .claude/skills/repo-skills/SKILL.md is the only Claude skill and points to .agents/skills
 OK claude hook lock check: deno.lock unchanged after 3 hook runs
 ```
 
@@ -671,7 +673,6 @@ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root .llm/tools/agentic --ext ts,tsx
 deno task agentic:check-claude                                                          # Claude surface gate
-deno task agentic:sync-claude:check                                                     # mirrors in sync
 ```
 
 Unit tests use a local throw-based `assert`/`assertEquals` because the repo's import map is empty
