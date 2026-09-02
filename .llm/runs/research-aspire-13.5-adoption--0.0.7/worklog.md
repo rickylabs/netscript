@@ -900,3 +900,27 @@ the merge.**
   exhausted → dispatched the same sanctioned local route (detached `007-eval-1953` @ `c231fbe5e`,
   brief `.llm/tmp/impl-eval-1953-brief.md`, citation-resolution focus) rather than stand by.
 - **#1952:** still `dirty` against post-#1909 main; parked until after the next clean canary.
+
+### 2026-09-02T23:3xZ — #1957 merged (main `ba6f1f49a`); #1952 converged; Canary 7 in flight; #1881 triaged
+
+- Coordinator merged #1957 at exact head; Canary 7 dispatched from `ba6f1f49a` after
+  publish-readiness PASS: run 33693663110 (monitor `bk7jnllap`).
+- **#1952** converged twice (first onto `308d99c78`, then onto `ba6f1f49a`): fixture resolved on
+  the #1909 stream flow with the readiness observation attached to `unhealthyEvidence.testOnly`
+  inside the open subscription; #1957's `observeInducedListenerDeparture` + exported ceiling kept
+  verbatim; `requireHealthyWaitTimeout`/`aspire wait` timeout step stay removed as on main.
+  Carriers regenerated (prose/barrel/publish-assets; corpus gen no-op — the dirty guard refuses
+  mid-merge, so generate after the merge commit). Local: 215/215 gate tests, five carrier/parity
+  gates green. Pushed `f4a4169b6`; `e2e-cli` auto-triggered (33693746353) under `e2e-cli-gate`;
+  body carries a convergence section; monitor `bwylltguy`.
+- **#1953** merges clean onto `ba6f1f49a`; head left at `c231fbe5e` so the running local
+  IMPL-EVAL (monitor `b4iidj1ok`) stays valid. Docs-only; no converge commit warranted.
+- **#1881 (#863 gate 3)** triaged (issue comment 5517708920): `quickstart.walk` on the prod
+  canary is the clean-runner substrate but mirrors `docs/site/quickstart.vto`, not the root
+  README; five README-vs-walk divergences tabled (incl. the undocumented "wait until postgres
+  healthy" manual step and `aspire restore` maxRetries 2 = retry under the gate's own rule).
+  Proposed `readme.quickstart` suite + README drift test + prod-workflow step; WSL Codex lane;
+  recommended `status:plan`. No label change made (coordinator's call after Canary 7).
+- Epic #1712 ledger: S1–S11, S13 `status:shipped`; S12 (#1725) retargeted 0.0.8; #1726 S6b
+  0.0.8; #1742 backlog. Open 0.0.7 Aspire closure: #1880 (via #1952), #863 (gates 1–2 via
+  #1952, gate 3 = #1881), #1881.
