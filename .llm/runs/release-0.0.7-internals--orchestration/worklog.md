@@ -10941,3 +10941,12 @@ failed on **YAML schema**: the author's blocks use `boxes:` where the contract r
 — a key my earlier regex did not check (I read `box-index` lines, not their parent). Fixed block 1
 (#1880) to `entries:`, removed block 2 (#863 is `Part of`, never mutated; its `boxes:` key would have
 failed too), original body saved for restore, dry-run re-run, close-gate rerun fired on success.
+
+### D-270 — #1952 head moved to 29b2b29de by a coordinator main-merge; review green; packet re-bound and held for CI
+
+`478450a3c` was exact-green (docker tier 95/0, CI 16/28) but the coordinator merged `main`
+`f589d251a` (#1885, #1953) into the branch before the packet posted. A packet is head-bound: the
+old numbers are not carried forward. Review at `29b2b29de` fully green; CI `33696044394` and e2e
+`33696044376` queued. Evidence block is now schema-valid (`entries:`) with `status:ready-merge`
+present, so the new run's mirror should write #1880's boxes and close-gate should go green on its
+own. Old close-gate rerun on `33694943768` is moot. Noted on #1952.
