@@ -10742,3 +10742,15 @@ The native route delivered two durable verdicts in ~4 and ~3 minutes of wall tim
 cloud lane spent ~45 minutes apiece reaching PASS and then discarding it for want of an
 `evaluate.md`. `lane-policy.md` names the native session as the local default; the cloud lane is for
 explicitly cloud-driven work. I should have started here.
+
+### ~20:10Z — #1943's cloud retry lost its verdict too (3/3); routed native
+
+Run `33659961810` at the stable head `2e0699bf3`: `verdict: NONE`, `artifact-unavailable` — the same
+missing-`evaluate.md` cause, with no head movement to blame. That is the cloud lane's third
+discarded verdict today. Dispatched the native Fable IMPL-EVAL for Slice B with the plan's Slice B
+section as the contract, the six-file ceiling plus carriers and the private-lock mirror as the
+permitted touch set, and the `PageModuleRouteForm` closure decision named as something to judge
+rather than assume. Its receipt lands in the run dir on the branch.
+
+Standing rule from here: **formal evals go native first**; the cloud lane is used only where the
+work is explicitly cloud-driven, as `lane-policy.md` already says.
