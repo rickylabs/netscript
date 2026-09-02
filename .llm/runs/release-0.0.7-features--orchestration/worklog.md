@@ -9963,3 +9963,68 @@ through the mirror.
 Also fenced in that brief: #1927, #1921 and #1922's concurrent surfaces, and **#1243** — which owns
 the dead-localhost-port defect in the very file this slice edits, so it is referenced rather than
 drive-by fixed.
+
+---
+
+## #1664 under the coordinator ruling — 2026-09-02 ~12:20Z
+
+Proceeding without an owner decision, per the ruling. Response posted (`5509476140`).
+
+### Converged — `1dd976024`
+
+`CONFLICTING` cleared against `main` `37452f11f`. Only the export corpus conflicted; main's side
+taken and regenerated (`67a24cf8…`, 273/7814). Three carrier gates 0, lock byte-identical.
+
+### The `check-test` red had a cause nobody could see, and the previous repair is why we can now
+
+The `waitForServer` fix did two things: a wall-clock deadline **and** surfacing the fixture's stderr
+on timeout. The second half is what mattered:
+
+```
+[vite] Internal server error: Cannot find module '@opentelemetry/api'
+  imported from 'packages/telemetry/src/context/w3c.ts'
+```
+
+The fixture imports `@netscript/fresh/query`, whose graph reaches `w3c.ts` → `@opentelemetry/api`,
+and Vite cannot resolve a bare npm specifier from the workspace catalog. **For three CI cycles this
+presented as a slow server. It was never slow.** A timeout that reports only a URL hides exactly the
+information needed to diagnose it — that is the durable lesson.
+
+`packages/fresh/tests/fixtures/route-binding-browser/vite.config.ts` already solves this with a
+catalog-reading `resolveId`/`load` shim; `query-hydration-age-browser` simply lacks it. Repair
+dispatched against that precedent rather than a hand-rolled variant.
+
+### #1845 — route (a), with the gap in the evidence named rather than glossed
+
+The ruling is right that #1845 cannot be waived by label. Route (a) is reachable because this PR's
+own `query-hydration-age_browser.ts` drives `QueryIsland` + `useQuery` + `useQueryClient` in a real
+browser — a *focused* fixture, independent of the canonical showcase.
+
+But its assertion is *"public query wrapper preserves old and fresh server snapshot ages"*, which
+proves hydration only **incidentally**. Citing it as-is would be citing evidence for a claim it does
+not literally make, so the fixture is being extended to assert `freshIslandElement`,
+`islandHydrated`, `islandInteractive` and `queryClientFound` first-class — **#1845's own diagnostics
+vocabulary**, so the canonical showcase's four `false`s and this fixture's four trues are directly
+comparable. That comparability *is* the evidence.
+
+The lane is told explicitly that if the island does not hydrate here either, reporting it is more
+valuable than a green obtained by lowering the bar — that outcome would mean #1845 is broader than
+the canonical showcase and #1664 must take route (b).
+
+### #1844/#1880 — one half of the exclusion test proven, the other explicitly pending
+
+The ruling permits exclusion **only** when both hold. Reported separately rather than as one claim:
+
+- **Delta does not touch their paths — proven.** The branch's only `aspire/` file is
+  `generate-aspire.ts`, whose diff is dry-run/force/formatter plumbing;
+  `grep -ciE "garnet|health|listener"` over the whole `generate/aspire/` diff returns **0**. No
+  Aspire resource, health probe, or container declaration is touched anywhere.
+- **Same-failure reproduction on current main — pending.** #1842 is re-running both tiers at
+  `d789febfd` on this same `main`, touches no garnet path, and already supplied #1844's second
+  reproduction. It is the control the ruling asks for. **Not claiming the exclusion until it
+  lands** — asserting it now would be exactly the unproven attribution the ruling guards against.
+
+### DoD
+
+Both remaining boxes stay unchecked: `fresh-browser` is not green at this head and the IMPL-EVAL
+`PASS` is pinned to `377811da8`. They tick when true and evidenced, not to clear the gate.
