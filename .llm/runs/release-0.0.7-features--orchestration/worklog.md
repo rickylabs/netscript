@@ -10195,3 +10195,68 @@ milestone issue with open scope.
 | --- | --- | --- |
 | #1842 | `96f777f5a` | corpus only; `status:ready-merge` retained with the reason stated, and I withdraw it the moment anything reds |
 | #1664 | `771548f6d` | corpus only |
+
+---
+
+## ~14:20Z — #1936 exact-green; #1349's mirror applied end to end
+
+**#1936 is 6/6 green at `005c22fd6`, including `close-gate`.** #1349's **ten acceptance boxes are
+ticked, zero unticked**, written by the mirror with provenance. `close-gate` went red → pass on the
+**unchanged head** as a direct consequence. The issue stays `OPEN` until the merge; `Closes #1349`
+closes it, completing the issue across #1834, #1841, #1886, #1927 and this docs closeout.
+
+The chain that made it work, which is worth keeping because two earlier attempts failed on it:
+
+1. `docs/site/reference/sdk/index.md` **0 → 10** contribution references — the exact residual I had
+   measured against README's 14 and `services-sdk/sdk.md`'s 17.
+2. `Closes #1349` on this PR, because **an evidence block is inert without a closing keyword** —
+   #1927's identical block returned `no changes` on dry-run; this one returned `DRY-RUN: #1349`.
+3. `status:ready-merge` applied, then the existing CI run re-read live labels at the unchanged head.
+   Never pushed to re-trigger, never hand-ticked.
+
+### The phase-eval trigger — I had the mechanism wrong, and it cost four #1891 attempts
+
+`.github/workflows/openhands-phase-eval.yml`'s own header states it:
+
+- **PLAN-EVAL:** add `openhands`, then add **`status:plan-eval`**. Rerun by moving away from and back
+  to `status:plan-eval`.
+- **IMPL-EVAL:** make a draft PR ready for review; rerun by cycling **`status:impl-eval`**.
+
+`status:plan` triggers nothing — the job's `if` does not name it. And a hand-posted
+`dispatch-openhands --phase` comment can **never** work: the workflow mints its own trigger under a
+claim key of `{last "labeled" event id, phase, head}` with an embedded marker, and the manual policy
+refuses anything without it. That is the whole explanation for `phase-generation-lookup-exhausted`,
+and for why label swaps on #1895/#1921/#1918 appeared to "auto-retrigger" — the workflow was
+dispatching, not my comment. Applied the correct pair to #1891; its eval is running and `dispatch`
+is green. Memory corrected from the earlier, partly-wrong note.
+
+### #1664 — `quality` red on a gate that did not exist when the branch was written
+
+`main` merged **#1925**, adding a **README fence integrity** step. Measured rather than assumed:
+
+| Revision | census | result |
+| --- | --- | --- |
+| clean `main` `3066a0cc5` | `checked=71 type_errors=32 failing_readmes=7` | **PASS** |
+| #1664 `771548f6d` | `checked=72 type_errors=39 failing_readmes=7` | **FAIL** |
+
+**One added TypeScript fence, seven added errors**, and the only README this branch touches is
+`packages/cli/README.md` — so it is genuinely this branch's. Repair dispatched with two constraints:
+land at **32** by fixing the example rather than widening the tolerance, and **do not touch**
+`packages/fresh`, `service`, `ai` READMEs that appear in the error output — those sit inside main's
+tolerated baseline and belong to other lanes.
+
+Generalisation recorded in the brief: **a converged head must re-run the *current* gate set, not the
+one that existed when the branch was written.** Two gates arrived on `main` mid-flight today —
+`check:mcp-export-corpus` into `quality` (#1929, closing my #1920) and README fences (#1925) — and
+both bit leaves that were green an hour earlier.
+
+### Board
+
+| PR | State |
+| --- | --- |
+| **#1936** | **exact-green, `status:ready-merge`** — closes #1349 |
+| #1895 | ready-merge; only the alternating postgres tier red |
+| #1842 | ready-merge; `quality` green post-corpus, runtime tiers running |
+| #1931 | green but `close-gate` red pending its eval on the `Closes #1352` question |
+| #1891 | PLAN-EVAL running at last |
+| #1664 | fence repair in flight; routed behind #1845 |
