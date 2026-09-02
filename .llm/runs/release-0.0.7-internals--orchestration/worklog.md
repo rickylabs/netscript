@@ -10882,3 +10882,13 @@ Exactly one gate widened to `--allow-run=aspire,docker`; the other two allowlist
 polling reintroduced, four generated `check:` gates 0, lock churn 0, tests 4/0 · 3/0 · 10/0, e2e
 type-check 0. Aspire independently posted the same diagnosis at 23:21 — no disagreement. CI
 `33694703133` and e2e `33694703090` running at the fixed head; packet follows their result.
+
+### D-264 — #1952 head 478450a3c: e2e cancellation at f8b0b4a26 was per-ref supersession by the worker's own follow-up push
+
+The f8b0b4a26 e2e showed both tier jobs `cancelled` with `steps=0`; the D-227 discriminator says
+"look outward", and outward was our own branch: the worker pushed `478450a3c` (argv-derived
+`runtime-gates_test.ts` regression I asked for, plus evidence) three minutes later, and the
+top-level `e2e-cli-${ref}` group cancelled the superseded run — designed, not eviction. Review at
+`478450a3c`: merge clean, readiness 4 / stream 4 / polling 0, four `check:` gates 0, lock churn 0,
+tests 4/0 · 3/0 · 10/0, e2e type-check 0. CI `33694943768` and e2e `33694943994` running; the
+watcher now re-keys by branch head so further pushes cannot strand it.
