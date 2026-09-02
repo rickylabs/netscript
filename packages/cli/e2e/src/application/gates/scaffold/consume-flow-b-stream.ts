@@ -186,14 +186,35 @@ function firstResourceUrl(urls: readonly string[], resourceName: string): string
 
 async function readJobExecuteIdentity(projectRoot: string): Promise<FlowBProducerIdentity> {
   const query = await createLiveAspireTelemetryQuery(projectRoot);
+  const fixtureCorrelationId = await readFlowBCorrelationFixture(projectRoot);
   for (let attempt = 1; attempt <= 20; attempt++) {
     const identity = findJobExecuteIdentity(
       await query.queryTraces({ serviceName: 'workers', limit: 500 }),
+      fixtureCorrelationId,
     );
     if (identity) return identity;
     if (attempt < 20) await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  throw new Error('Flow-B job.execute telemetry did not expose correlation and trace identities');
+  throw new Error(
+    `Flow-B job.execute telemetry did not expose correlation and trace identities${
+      fixtureCorrelationId ? ` for fixture correlation ${fixtureCorrelationId}` : ''
+    }`,
+  );
+}
+
+/**
+ * The `behavior.otel.webhook` gate records the correlation of the Flow-B run under test; earlier
+ * webhook gates leave older `flow-b-callback` executions in the dashboard, so the consumer must
+ * anchor on this fixture rather than on dashboard ordering. Absent fixture → legacy first-match.
+ */
+async function readFlowBCorrelationFixture(projectRoot: string): Promise<string | undefined> {
+  try {
+    const value = (await Deno.readTextFile(`${projectRoot}/.netscript/e2e/flow-b-correlation-id`))
+      .trim();
+    return value || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 interface NamedStreamReceipt {

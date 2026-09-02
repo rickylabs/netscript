@@ -117,9 +117,17 @@ export async function readAspireTraceStructuredLogs(
 }
 
 /** Find the Flow-B callback execution identity in normalized telemetry traces. */
+/**
+ * Finds the Flow-B `job.execute` identity. The runtime suite drives the generic webhook more than
+ * once (`behavior.triggers-webhook` before `behavior.otel.webhook`), so several
+ * `flow-b-callback` executions coexist in the dashboard; when the gate's correlation fixture is
+ * known, the execution carrying it wins over dashboard ordering.
+ */
 export function findJobExecuteIdentity(
   traces: readonly TelemetryTrace[],
+  preferredCorrelationId?: string,
 ): FlowBProducerIdentity | undefined {
+  let fallback: FlowBProducerIdentity | undefined;
   for (const span of traces.flatMap((trace) => trace.spans)) {
     const jobId = span.attributes['netscript.job.id'] ?? span.attributes['job.id'];
     const correlationId = span.attributes['netscript.correlation.id'];
@@ -127,10 +135,11 @@ export function findJobExecuteIdentity(
       span.name === 'job.execute' && jobId === 'flow-b-callback' &&
       typeof correlationId === 'string'
     ) {
-      return { correlationId, traceId: span.traceId };
+      if (correlationId === preferredCorrelationId) return { correlationId, traceId: span.traceId };
+      fallback ??= { correlationId, traceId: span.traceId };
     }
   }
-  return undefined;
+  return preferredCorrelationId === undefined ? fallback : undefined;
 }
 
 function requestUrl(input: RequestInfo | URL): URL {
