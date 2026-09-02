@@ -139,6 +139,7 @@ requires hydration/client navigation.
 | Plan | `1e54fa598b7a58d9a2155d2fb162653c646d25bf` | Explicit refspec pushed to `origin/test/fresh-client-bundle-capability`; PR #1940 opened non-draft. |
 | Implementation | `e912c414d2da72711e36bbb5daa1d933c3c19d8b` | Head SHA after RED/GREEN and all local gates; explicit-refspec push receipt follows in the PR lifecycle record. |
 | CI RED fix | `1e1f374a29d7edd0c9cdcd5e3e3fbb2b631f1aeb` | Head SHA after adding the matching outer navigation partial; explicit-refspec rerun push follows. |
+| CI RED fix 2 | `9148054f8cc33a41c53e69a88d42ad89da8f1b84` | Head SHA after replacing the incomplete telemetry stub; explicit-refspec rerun push follows. |
 
 ## Reconcile Notes
 
