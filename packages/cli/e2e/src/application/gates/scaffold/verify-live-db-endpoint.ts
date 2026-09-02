@@ -218,11 +218,9 @@ async function readReceipt(allocation: 'first' | 'second'): Promise<EndpointRece
       join(projectRoot, '.netscript', 'e2e', `db-allocation-${allocation}.json`),
     ),
   );
-  const postgres = findResource(topology, database);
+  const postgres = resolveDatabaseEndpointResource(topology, database);
   const users = findResource(topology, 'users');
-  if (!postgres || !users) {
-    throw new Error(`${allocation} topology omitted postgres/users resources`);
-  }
+  if (!users) throw new Error(`${allocation} topology omitted users resource`);
   const postgresUrl = tcpUrl(postgres);
   const usersDatabaseUrl = environmentValue(users, 'DATABASE_URL');
   return { allocation, postgresUrl, usersDatabaseUrl };
@@ -242,12 +240,14 @@ export function compareSecondReceiptWithLiveTopology(
   liveTopology: unknown,
   databaseName: string,
 ): LiveSecondEndpointComparison {
-  const postgres = findResource(liveTopology, databaseName);
-  if (!postgres) {
+  let postgres: Record<string, unknown>;
+  try {
+    postgres = resolveDatabaseEndpointResource(liveTopology, databaseName);
+  } catch (error) {
     return {
       ok: false,
       receiptPostgresUrl,
-      error: `live second-start topology omitted Postgres resource ${JSON.stringify(databaseName)}`,
+      error: `live second-start Postgres resource was unavailable: ${errorMessage(error)}`,
     };
   }
 
@@ -416,6 +416,80 @@ function findResource(value: unknown, name: string): Record<string, unknown> | u
     if (found) return found;
   }
   return undefined;
+}
+
+/**
+ * Resolve a database endpoint resource without confusing its parameter siblings for the container.
+ *
+ * Aspire 13.5 emits `postgres-password` and the DCP-named Postgres container in the same resource
+ * array. Exact public identity wins regardless of array order. Older captures that omit the public
+ * display name may fall back only to one DCP-suffixed resource that actually exposes a supported
+ * database endpoint; an arbitrary prefix match is never evidence of the live database.
+ */
+export function resolveDatabaseEndpointResource(
+  topology: unknown,
+  databaseName: string,
+): Record<string, unknown> {
+  const resources = topologyResources(topology);
+  const exact = resources.filter((resource) =>
+    resource.displayName === databaseName || resource.name === databaseName
+  );
+  if (exact.length === 1) return exact[0];
+  if (exact.length > 1) {
+    throw new Error(
+      `database resource ${JSON.stringify(databaseName)} had ambiguous exact matches: ` +
+        describeResourceCandidates(exact),
+    );
+  }
+
+  const fallback = resources.filter((resource) =>
+    isDcpSuffixedName(resource.name, databaseName) && hasDatabaseEndpoint(resource)
+  );
+  if (fallback.length === 1) return fallback[0];
+  if (fallback.length > 1) {
+    throw new Error(
+      `database resource ${JSON.stringify(databaseName)} had ambiguous DCP endpoint matches: ` +
+        describeResourceCandidates(fallback),
+    );
+  }
+
+  throw new Error(
+    `database resource ${JSON.stringify(databaseName)} had no exact identity or unique DCP ` +
+      `endpoint match; available resources: ${describeResourceCandidates(resources)}`,
+  );
+}
+
+function topologyResources(topology: unknown): Record<string, unknown>[] {
+  if (!isRecord(topology) || !Array.isArray(topology.resources)) return [];
+  return topology.resources.filter(isRecord);
+}
+
+function isDcpSuffixedName(value: unknown, databaseName: string): boolean {
+  if (typeof value !== 'string') return false;
+  const prefix = `${databaseName}-`;
+  return value.startsWith(prefix) && /^[a-z0-9]{8}$/i.test(value.slice(prefix.length));
+}
+
+function hasDatabaseEndpoint(resource: Record<string, unknown>): boolean {
+  if (!Array.isArray(resource.urls)) return false;
+  return resource.urls.some((item) => {
+    const value = isRecord(item) ? item.url : item;
+    return typeof value === 'string' && /^(?:tcp|postgres(?:ql)?):\/\//.test(value);
+  });
+}
+
+function describeResourceCandidates(resources: readonly Record<string, unknown>[]): string {
+  if (resources.length === 0) return '(none)';
+  return resources.map((resource) => {
+    const name = typeof resource.name === 'string' ? resource.name : '(unnamed)';
+    const displayName = typeof resource.displayName === 'string'
+      ? resource.displayName
+      : '(no displayName)';
+    const type = typeof resource.resourceType === 'string'
+      ? resource.resourceType
+      : '(unknown type)';
+    return `${name} [displayName=${displayName}, type=${type}]`;
+  }).join(', ');
 }
 
 function tcpUrl(resource: Record<string, unknown>): string {
