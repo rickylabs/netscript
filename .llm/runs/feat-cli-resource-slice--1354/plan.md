@@ -485,6 +485,13 @@ File ceilings count created, modified, moved, and deleted files. If a slice exce
 needs a shared file not listed below, stop and rescope/update the plan before editing. RTK output is
 exploratory only; durable merge evidence uses the repository gate wrappers/receipts.
 
+**Generated carrier outputs are ceiling-exempt.** `*.generated.ts` files under `packages/*/src/`
+and `.llm/assets/agent-docs/*` are regenerated from tooling at every converged head and never
+hand-edited. Regenerating them is a required side effect of moving a public surface (#1929 makes a
+stale corpus a hard `quality` failure), not slice scope. A slice's ceiling counts hand-authored
+files only; every slice that moves a public surface must still run the carrier cascade and verify
+the `check:*` gates after committing.
+
 ### Slice A — share #1664's client selector (Refs #1354; partial)
 
 **Landability:** behavior-preserving extraction that can land immediately after #1664. It does not
