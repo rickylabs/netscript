@@ -145,3 +145,44 @@ PLAN-EVAL: `PASS` in `.llm/runs/fix-fresh-partial-nav--1590/plan-eval.md` before
 Hosted `fresh-browser` was not run in this implementation lane and remains supervisor-owned.
 No unplanned drift was found; `drift.md` only records that the prior blocking harness-context
 failure is repaired locally and still awaits the hosted verdict.
+
+## Repair — hydration-safe dynamic-name remount evidence
+
+- Supervisor-hosted run `33618955184` / job `100211358097` at `31f4ff8a1` confirmed the observer
+  and pre-close drain repairs: the scenario emitted full evidence, both barriers completed once
+  with zero cancellations, overlay/errors/failures were absent, and Vite stderr was empty. The
+  newly reached assertion showed all three live-DOM marker reads were `null`.
+- Resolved `fresh` to JSR `@fresh/core@2.3.3` with `deno info`. Installed `reviver.ts` sets
+  `SHOW_MARKERS = false`, replaces server comment markers with hidden text nodes during `_walkInner`,
+  converts nested partial markers into keyed `PartialComp` VNodes in `domToVNode`, and renders
+  `PartialComp` as children only. Installed `partials.ts` likewise parses response markers into a
+  keyed `PartialComp`. Determination: **(a)** — nested partial markers are parser artifacts consumed
+  by hydration/application, so walking the hydrated live DOM was an invalid observation.
+- Replaced the live-DOM marker walk with bodies from the page's actual initial-A, B-mount, and
+  A-mount responses. The exact marker assertion remains A→B→A and proves the server encoded each
+  native key by dynamic name.
+- Added a live behavior check: a non-attribute expando tags `#region-content` immediately before
+  each name change. Both subsequent nodes must lack that tag. Ordinary reconciliation of the same
+  DOM node preserves an expando; losing it proves that A→B and B→A each replaced/remounted the
+  region node. B is re-tagged after its same-name update so the second comparison isolates B→A.
+- The proven heading observer and pre-close drain code were not changed. The proof remains exactly
+  500 lines; no source, fixture, package-config, timeout, sleep, or lock change was made.
+
+### Local gate evidence for hydration-safe marker repair
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| Resolved Fresh source inspection | 0 | `@fresh/core@2.3.3`; `reviver.ts`/`partials.ts` consumption path measured |
+| Fixture response-marker probe | 0 | 3 responses status 200; markers exactly region-a, region-b, region-a |
+| Scoped Fresh check | 0 | 211 files, 2 batches, 0 diagnostics |
+| Scoped Fresh lint | 0 | 211 files, 2 batches, 0 findings |
+| Scoped Fresh format | 0 | 211 files, 2 batches, 0 findings |
+| Fresh source tests | 0 | 254 passed, 0 failed, 0 ignored |
+| `quality:gate` | 0 | quality scan 0 findings; doctrine check 0 failures (existing warnings only) |
+| Local browser proof | not run | `playwright-cli` unavailable (`command -v` exit 1) |
+| Hosted browser proof | not run here | Supervisor owns the next exact-head run |
+| Diff/file hygiene | 0 | `git diff --check` clean; proof exactly 500 lines |
+| Lock hygiene | 0 | SHA-256 remains `a269308a7cfd304e04377fbd9ef81d51edf629589aa741e18d367652dcdb2bcd` |
+
+Reconcile: Slice 2 remains proof-only and `Refs #1590` until the supervisor's new hosted run proves
+the changed observation at the exact pushed head. No product issue is indicated by this finding.

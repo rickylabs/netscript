@@ -34,3 +34,18 @@ milestone `0.0.7`.
   at SHA-256 `a269308a7cfd304e04377fbd9ef81d51edf629589aa741e18d367652dcdb2bcd`.
 - `playwright-cli` is unavailable locally, so no browser or hosted proof was run. The supervisor
   must run the hosted `fresh-browser` gate at the pushed repair SHA before acceptance.
+
+## 2026-09-02 hydration-safe remount handoff
+
+- Supervisor run `33618955184` / job `100211358097` proved the page-context observer and pre-close
+  drain fixes at `31f4ff8a1`; Vite stderr was empty and execution reached assertions.
+- The remaining marker failure is determination **(a)**. Resolved Fresh 2.3.3 source shows nested
+  comment markers are parsed into keyed `PartialComp` VNodes and are not durable hydrated-DOM nodes.
+- The exact A→B→A marker assertion now reads the page's three relevant fetched HTML bodies. Two
+  page-side expando checks independently require region node replacement across both name changes,
+  with B re-tagged after its same-name update to isolate B→A.
+- Local check/lint/fmt processed 211 files with no findings; source tests passed 254/254;
+  `quality:gate` and the three-response fixture marker probe exited 0. The proof remains 500 lines
+  and the lock SHA-256 remains `a269308a7cfd304e04377fbd9ef81d51edf629589aa741e18d367652dcdb2bcd`.
+- No local or hosted browser proof was run in this lane because `playwright-cli` is unavailable and
+  hosted execution remains supervisor-owned. Run hosted `fresh-browser` at the pushed repair SHA.

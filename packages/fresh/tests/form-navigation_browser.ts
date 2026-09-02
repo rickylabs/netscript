@@ -115,6 +115,7 @@ Deno.test({
           const consoleWarnings = [];
           const requestFailures = [];
           const partialResponses = [];
+          const markerResponseBodies = [];
           const staleNetwork = [];
           let traceStaleNetwork = false;
           let documentRequests = 0;
@@ -133,6 +134,8 @@ Deno.test({
           }));
           page.on('response', response => {
             if (traceStaleNetwork) staleNetwork.push({ kind: 'response', url: response.url() });
+            const responseUrl = response.url();
+            if (response.request().resourceType() === 'document' || responseUrl.includes('phase=mount')) markerResponseBodies.push(response.text());
             if (response.url().includes('fresh-partial=true')) {
               partialResponses.push({ url: response.url(), status: response.status() });
             }
@@ -141,35 +144,31 @@ Deno.test({
             const state = await (await fetch('/control/state')).json();
             return state[barrier].arrived === 1;
           }, name);
-          const partialMarker = name => {
-            const walker = document.createTreeWalker(document, NodeFilter.SHOW_ALL);
-            let node = walker.currentNode;
-            while (node !== null) {
-              const hidden = node._frshMarker;
-              const value = typeof hidden === 'string' ? hidden :
-                node.nodeType === Node.COMMENT_NODE ? node.nodeValue : null;
-              if (typeof value === 'string' && value.startsWith('frsh:partial:' + name + ':')) {
-                return value;
-              }
-              node = walker.nextNode();
-            }
-            return null;
-          };
+          const markRegionMount = name => page.evaluate(marker => {
+            const region = document.querySelector('#region-content');
+            const remounted = region.__keyedPartialProbe === undefined;
+            region.__keyedPartialProbe = marker;
+            return remounted;
+          }, name);
           await page.goto(${JSON.stringify(url)});
           await page.waitForFunction(() => globalThis.__partialNavigation != null);
           await page.evaluate(() => globalThis.__sameDocumentSentinel = 'preserved');
           const colonHtml = await page.evaluate(async () => await (await fetch('/colon-marker')).text());
           const colonMarker = colonHtml.match(/<!--(frsh:partial:colon:probe:0:colon_probe)-->/)?.[1] ?? null;
-          const markerA1 = await page.evaluate(partialMarker, 'region-a');
+          await markRegionMount('region-a');
           await page.getByRole('link', { name: 'Navigate to B' }).click();
           await page.getByRole('heading', { name: 'Page B mount' }).waitFor();
-          const markerB = await page.evaluate(partialMarker, 'region-b');
+          const remountB = await markRegionMount('region-b');
           await page.getByRole('button', { name: 'Update current region' }).click();
           await page.waitForFunction(() => document.querySelector('#region-content')?.textContent === 'b-mount-updated');
           const bRegion = await page.locator('#region-content').textContent();
+          await markRegionMount('region-b-updated');
           await page.getByRole('link', { name: 'Navigate to A' }).click();
           await page.getByRole('heading', { name: 'Page A mount' }).waitFor();
-          const markerA2 = await page.evaluate(partialMarker, 'region-a');
+          const remountA2 = await markRegionMount('region-a');
+          const dynamicMarkers = (await Promise.all(markerResponseBodies)).map(html =>
+            html.match(/<!--(frsh:partial:region-[ab]:0:region-[ab])-->/)?.[1] ?? null
+          );
           await page.getByRole('button', { name: 'Update current region' }).click();
           await page.waitForFunction(() => document.querySelector('#region-content')?.textContent === 'a-mount-updated');
           const aRegion = await page.locator('#region-content').textContent();
@@ -225,7 +224,8 @@ Deno.test({
             title: await page.title(),
             heading: await page.locator('h1').textContent(),
             regionContent: await page.locator('#region-content').textContent(),
-            dynamicMarkers: [markerA1, markerB, markerA2],
+            dynamicMarkers,
+            dynamicRemounts: [remountB, remountA2],
             colonMarker,
             bRegion,
             aRegion,
@@ -289,6 +289,7 @@ Deno.test({
       'frsh:partial:region-b:0:region-b',
       'frsh:partial:region-a:0:region-a',
     ]);
+    assertEquals(evidence.dynamicRemounts, [true, true]);
     assertEquals(evidence.colonMarker, 'frsh:partial:colon:probe:0:colon_probe');
     assertEquals(evidence.bRegion, 'b-mount-updated');
     assertEquals(evidence.aRegion, 'a-mount-updated');
@@ -407,7 +408,6 @@ Deno.test({
     }
   },
 });
-
 async function runPlaywright(
   args: readonly string[],
   cwd: string,

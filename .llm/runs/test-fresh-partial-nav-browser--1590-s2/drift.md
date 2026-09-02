@@ -59,3 +59,19 @@ original settle point. Teardown now releases and drains both barriers, with zero
 before closing the Playwright session, so the unchanged Vite stderr abort check cannot be polluted
 by a live held body at page close. This required no fixture or product-source change and introduced
 no timeout or sleep. The hosted verdict remains pending at the commit produced by this repair.
+
+## 2026-09-02 — live nested-partial markers are consumed by Fresh 2.3.3 (minor)
+
+Determination: **(a)**, not a Slice-1 product defect. `deno info` resolves the fixture to
+`@fresh/core@2.3.3`. Its installed client `reviver.ts` calls `_walkInner` during boot, hides each
+`frsh:*` comment, converts nested `frsh:partial` records into `PartialComp` VNodes carrying the
+serialized key, and renders `PartialComp` as children only. `partials.ts` performs the same
+comment-to-keyed-VNode conversion for fetched partial HTML. The nested region comments are inputs
+to hydration/partial parsing, not a supported durable live-DOM surface. This explains why the raw
+`colonMarker` response probe succeeds while the post-hydration TreeWalker sees no region markers.
+
+The proof now retains the exact marker assertion against the three HTML response bodies actually
+fetched for initial A, B mount, and A mount. It additionally tags the live region node with an
+expando immediately before A→B and B→A; the tag is absent after both transitions, proving node
+replacement/remount rather than same-node reconciliation. No `packages/fresh/src` or fixture
+change is warranted.
