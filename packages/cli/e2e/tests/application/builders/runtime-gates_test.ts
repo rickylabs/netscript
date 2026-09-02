@@ -144,6 +144,13 @@ Deno.test('typed database Phase-B faults the controller-owned listener without s
 
   assertStringIncludes(source, 'commandListenerFaultController');
   assertStringIncludes(source, 'TEST_ONLY_POSTGRES_HEALTH_KEY');
+  // Canary 6 (run 33684157301): the departure wait is the fixture's shared subscription, which is
+  // established before the close command. No private poll deadline may grow back here.
+  assertStringIncludes(source, 'observeInducedListenerDeparture(appHost, expectation, async () =>');
+  assertEquals(source.includes('REPORT_DEADLINE_MS'), false);
+  assertEquals(source.includes('REPORT_POLL_MS'), false);
+  assertEquals(source.includes("'describe',"), false);
+  assertStringIncludes(source, 'const WAIT_TIMEOUT_SECONDS = 10;');
   assertEquals(source.includes("'resource',\n      database,\n      'stop'"), false);
   assertEquals(source.includes("'resource',\n        database,\n        'start'"), false);
 });
