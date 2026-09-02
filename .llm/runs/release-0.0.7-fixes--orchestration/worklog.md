@@ -7808,3 +7808,16 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   `already has an active writer` (turn still open). Retry deliverer `/tmp/deliver1844n.sh`
   (nudge: no issue creation, implement S1/S2, push, draft PR via git+gh) running detached.
 - Watch: #1885 GREEN push; #1481 push → local rows green → ready-for-review; #1844 push + draft PR.
+
+## 2026-09-02T22:25Z — coordinator: #1885 `7ad2d7ca6` NOT merge-ready; steer sent
+
+- Coordinator ruling: check-test FAIL + close-gate FAIL (DoD 0/5, S3/S4 open), `status:impl`. Head is
+  not green and will not be described as such.
+- Exact check-test failure (receipt 33688003508-1): `probe-island-hydration_test.ts:6` TS2307 missing
+  `scaffold/runtime/probe-island-hydration.ts` (untracked in leaf, never committed); `:45` TS7006
+  `receipt` implicit any. Leaf dirty state type-checks clean locally (`deno check` exit 0).
+- Worker `01a058a1` idle mid-turn since 22:01Z. Steer `/tmp/steer1885d.md`: commit+push GREEN
+  incl. the untracked module → read managed-browser CI measurement (DoD 1) → S3/S4 or explicit
+  scope narrowing (`Closes`→`Refs #1845`, tick only evidenced boxes) → keep `status:impl`.
+  Retry deliverer `/tmp/deliver1885d.sh` detached.
+- Next: on push, confirm check-test green; IMPL-EVAL only when DoD is truthfully complete.
