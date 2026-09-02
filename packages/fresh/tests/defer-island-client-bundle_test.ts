@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
+import { createLockedViteCommand } from './_fixtures/vite-runtime.ts';
 
 interface ViteManifestEntry {
   readonly file: string;
@@ -14,14 +15,11 @@ const FIXTURE_ROOT = fromFileUrl(
 
 Deno.test('vite build emits the registered defer island in the client bundle', async () => {
   const outputDir = await Deno.makeTempDir({ prefix: 'netscript-defer-island-' });
+  const npmCacheDir = await Deno.makeTempDir({ prefix: 'netscript-empty-npm-cache-' });
 
   try {
-    const output = await new Deno.Command(Deno.execPath(), {
+    const output = await createLockedViteCommand({
       args: [
-        'run',
-        '--no-lock',
-        '-A',
-        'npm:vite@7.2.2',
         'build',
         '--config',
         'vite.config.ts',
@@ -31,6 +29,7 @@ Deno.test('vite build emits the registered defer island in the client bundle', a
       cwd: FIXTURE_ROOT,
       stdout: 'piped',
       stderr: 'piped',
+      env: { NPM_CONFIG_CACHE: npmCacheDir },
     }).output();
 
     const stderr = new TextDecoder().decode(output.stderr);
@@ -60,5 +59,6 @@ Deno.test('vite build emits the registered defer island in the client bundle', a
     );
   } finally {
     await Deno.remove(outputDir, { recursive: true });
+    await Deno.remove(npmCacheDir, { recursive: true });
   }
 });

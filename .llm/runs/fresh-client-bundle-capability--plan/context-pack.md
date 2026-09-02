@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `fresh-client-bundle-capability--plan` |
 | Branch | `test/fresh-client-bundle-capability` |
-| Current phase | `plan-eval` |
+| Current phase | `impl-eval` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Research and design are locked against current main. #1557 is now in scope because a package-level
-Playwright/Vite gate exists. No implementation has started; separate-session PLAN-EVAL is the hard
-stop.
+The plan contract was committed unchanged after the supervisor waived PLAN-EVAL for this test-only
+leaf. Implementation and all local non-browser gates are green. PR #1940 is non-draft; provisioned
+CI must supply the browser receipt before #1557 can be claimed complete.
 
 ## Completed
 
@@ -22,16 +22,22 @@ stop.
 - Re-baselined branch exactly to current `origin/main`.
 - Proved the locked/cached-only Vite command with an empty npm cache.
 - Recorded design, risks, slices, and validation plan.
+- Committed/pushed the plan contract as `1e54fa598` and opened non-draft PR #1940.
+- Replaced runtime npm Vite resolution with the exact workspace alias under `--frozen
+  --cached-only`; the bundle test supplies a new empty npm cache.
+- Added direct policy-pair tests and a real-browser cache-miss navigation regression with request,
+  exact-one named-boundary swap, and double-swap negative-control evidence.
+- Passed Fresh check/lint/fmt, 278 package tests, and `quality:gate`.
 
 ## In Progress
 
-- Commit plan artifacts, open the draft PR, and run native Claude/Fable PLAN-EVAL.
+- Provisioned CI browser receipt and independent IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push the plan and open the required draft PR with requested labels/milestone.
-2. Obtain `plan-eval.md = PASS` from a separate Fable 5 medium session.
-3. Implement slice 1 only after PASS.
+1. Commit implementation and updated run receipts; explicit-refspec push.
+2. Confirm the provisioned Fresh browser CI receipt.
+3. Obtain a separate-session IMPL-EVAL verdict and reconcile PR #1940.
 
 ## Key Decisions
 
@@ -46,20 +52,21 @@ stop.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fresh-client-bundle-capability--plan/*` | new | Mandatory run artifacts plus owner brief/session receipt. |
+| `.llm/runs/fresh-client-bundle-capability--plan/*` | updated | Plan contract plus implementation/gate receipts. |
+| `packages/fresh/**` | changed | Test-only locked Vite and client-navigation capability. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | research-only PASS | Baseline and locked Vite probe |
-| Fitness | pending | PLAN-EVAL then scoped wrappers/quality gate |
+| Static | PASS | 213 files check/lint/fmt; check used `--unstable-kv` |
+| Fitness | PASS locally | 278 tests plus `quality:gate`; PLAN-EVAL supervisor-waived |
 | Runtime | blocked locally/pending CI | `playwright-cli` absent locally; existing CI provisions it |
 | Consumer | N/A | No public-surface change |
 
 ## Open Questions
 
-- None requiring a design decision before implementation.
+- None. Remaining work is verdict collection, not design.
 
 ## Drift and Debt
 
@@ -68,4 +75,5 @@ stop.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after the plan commit.
+- Plan: `1e54fa598b7a58d9a2155d2fb162653c646d25bf`.
+- Implementation: pending final scoped commit/push receipt.

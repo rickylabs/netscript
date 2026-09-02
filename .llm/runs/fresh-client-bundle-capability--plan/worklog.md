@@ -67,6 +67,11 @@ requires hydration/client navigation.
 | 2026-09-02T12:22:08Z | 0 | Determinism probe | Locked `--frozen --cached-only` Vite build passed with an empty `NPM_CONFIG_CACHE` in 3.9s. |
 | 2026-09-02T12:22:08Z | 0 | Browser baseline | Existing local browser task is blocked by absent `playwright-cli`; CI already provisions it. |
 | 2026-09-02T12:22:08Z | 0 | Design checkpoint | Package-level real-browser design locked; PLAN-EVAL selected as a hard stop. |
+| 2026-09-02T16:48:46Z | 0 | Supervisor resume | PLAN-EVAL waived for this test-only leaf; committed the plan contract unchanged as `1e54fa598`. |
+| 2026-09-02T16:48:46Z | 1 | RED | Focused `deno check --unstable-kv` failed on the deliberately missing locked Vite/browser fixture modules and incomplete fixture types. |
+| 2026-09-02T16:48:46Z | 1 | GREEN | Added locked `--frozen --cached-only` workspace Vite helper; targeted bundle/policy wrapper passed 10/10 with a fresh empty npm cache. |
+| 2026-09-02T16:48:46Z | 2 | GREEN | Added direct hit/miss policy pairs and a package Playwright fixture that intercepts the partial request, counts one semantic named-boundary swap, and plants a rejected double-swap control. |
+| 2026-09-02T16:48:46Z | 3 | Local gates | Fresh check/lint/fmt, 278 package tests, and repository `quality:gate` passed; browser execution remains CI-owned because this host has no `playwright-cli`. |
 
 ## Decisions
 
@@ -99,13 +104,21 @@ requires hydration/client navigation.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Archetype/overlay selection | PASS | doctrine verdict + Archetype 4 + frontend overlay | Test-only slice preserves Keep verdict. |
-| PLAN-EVAL | NOT_RUN | Separate Fable session pending | Hard stop before implementation. |
+| PLAN-EVAL | WAIVED | Supervisor resume directive | Test-only leaf; `plan.md` remains the unchanged contract. |
+| Quality/doctrine | PASS | `deno task quality:gate` | Exit 0; no quality findings or doctrine failures. Existing warnings remain, with no new catalog warning after mirroring the established fixture resolver. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Browser navigation | NOT_RUN | CI driver required | Will run after draft is ready. |
+| Focused RED | PASS | Focused `deno check --unstable-kv` | Failed before helpers existed on the intended missing-module/type boundary. |
+| Targeted GREEN | PASS | `run-deno-test.ts` over bundle + defer policy tests | 10 passed, 0 failed; 4.355s. |
+| Fresh package test | PASS | `deno task --cwd packages/fresh test` | 278 passed, 0 failed. |
+| Structured Fresh test | PASS | `run-deno-test.ts -- --allow-all packages/fresh` | 278 passed, 0 failed; 8.107s. |
+| Fresh check | PASS | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | 213 files, 2 batches, `deno check --unstable-kv`, zero findings. |
+| Fresh lint | PASS | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` | 213 files, zero findings. |
+| Fresh format | PASS | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | 213 files, zero findings. |
+| Browser navigation | BLOCKED_LOCAL | `deno task --cwd packages/fresh test:browser` | All three modules type-checked, then all three tests failed only because `playwright-cli` is absent. CI provisions the pinned driver and Chromium. |
 
 ### Consumer Gates
 
@@ -113,12 +126,21 @@ requires hydration/client navigation.
 | --- | --- | --- | --- |
 | Published Fresh surface | N/A | No export/published-source change | Tests excluded from publish. |
 
+## Commit Receipts
+
+| Slice | Commit | Remote receipt |
+| --- | --- | --- |
+| Plan | `1e54fa598b7a58d9a2155d2fb162653c646d25bf` | Explicit refspec pushed to `origin/test/fresh-client-bundle-capability`; PR #1940 opened non-draft. |
+| Implementation | pending | Record the final head SHA immediately after the scoped commit/push. |
+
 ## Reconcile Notes
 
-- Slice 0: issues #1601/#1557 remain open; draft PR will reference both until evidence establishes
-  which closing keywords are truthful. No status/milestone drift detected (`0.0.7`, p2, Fresh).
+- Slice 0: issues #1601/#1557 remain open; PR #1940 references both until CI browser evidence exists.
+  Supervisor-provided taxonomy superseded the original p2 brief: `priority:p1`, `status:impl-eval`.
+- Slices 1–3: no route-inference, CLI E2E, root lock/config, workflow, dependency, or published-surface
+  changes. Browser behavior cannot be claimed complete until the provisioned CI gate reports.
 
 ## Handoff Notes
 
-- PLAN-EVAL should first challenge whether the proposed observer proves exactly one semantic named
-  boundary transition and whether `--cached-only` is appropriate in the default package suite.
+- Await the provisioned Fresh browser CI receipt and independent IMPL-EVAL. Keep `Refs #1601 #1557`
+  unless every close-gated acceptance item is evidenced.
