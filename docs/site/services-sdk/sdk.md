@@ -161,9 +161,68 @@ touches discovery; `createQueryFactories` is pure wiring over `{ contract, clien
     { name: "routerName", type: "string?", desc: "Router-name segment for URL path construction. Required for plugin API services, omitted for plain services." },
     { name: "protocol", type: "'http' | 'https'?", desc: "Resolved protocol for service discovery." },
     { name: "apiPath / apiVersion", type: "string?", desc: "Base RPC path and API version segment overrides." },
+    { name: "contributions", type: "readonly SdkClientContribution[]?", desc: "Explicit literal tuple of typed request-header contributions. The tuple adds its context to direct and generated clients." },
     { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call." }
   ]
 }) }}
+
+## Typed request contributions
+
+Contributions add typed per-call context and declare ownership of lower-case request headers. Attach
+the literal tuple to each service that needs it; contributions are explicit and are never installed
+automatically.
+
+This example composes an auth-shaped application contribution with the SDK's non-auth locale
+contribution:
+
+```ts
+import {
+  createLocaleSdkClientContribution,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
+import { defineServices } from '@netscript/sdk/presets';
+import { accountsContract } from './contracts/accounts.ts';
+
+const locale = createLocaleSdkClientContribution();
+const bearer = defineSdkClientContribution<{
+  auth: { getAccessToken(): Promise<string>; cachePartition: string };
+}>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:bearer',
+  context: { auth: 'required' },
+  headerKeys: ['authorization'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.auth.cachePartition,
+  },
+  prepare: async ({ context }) => ({
+    headers: { authorization: `Bearer ${await context.auth.getAccessToken()}` },
+  }),
+});
+
+const sdk = defineServices({
+  accounts: {
+    contract: accountsContract,
+    contributions: [bearer, locale] as const,
+  },
+});
+
+const context = {
+  auth: {
+    getAccessToken: () => Promise.resolve('runtime-only-value'),
+    cachePartition: 'account-epoch-7',
+  },
+  locale: 'de-CH',
+};
+await sdk.clients.accounts.profile({}, { context });
+sdk.queryUtils.accounts.profile.queryOptions({ input: {}, context });
+```
+
+The locale factory canonicalizes one optional Unicode BCP 47 locale, owns `accept-language`, and
+uses the canonical locale as its declared cache partition. An absent locale emits no header and uses
+the stable `default` partition. Preference lists and quality weights are rejected. Other
+contributions must declare whether responses are `invariant`, `partitioned`, or `direct-only`;
+partition values must be stable, printable, and non-secret.
 
 The L3 alternative builds all three layers from one map:
 `defineServices({ orders: { contract, serviceName: 'orders' } })` returns

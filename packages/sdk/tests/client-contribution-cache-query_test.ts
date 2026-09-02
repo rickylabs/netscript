@@ -2,6 +2,10 @@ import { assert, assertEquals, assertFalse } from '@std/assert';
 import { os } from '@orpc/server';
 import { CacheQuery } from '../src/cache/cache-query.ts';
 import { resetCacheProvider, setCacheProvider } from '../src/cache/cache-provider.ts';
+import {
+  createLocaleSdkClientContribution,
+  type LocaleSdkClientContext,
+} from '../src/client/locale-contribution.ts';
 import { defineSdkClientContribution } from '../src/client/sdk-client-contribution.ts';
 import { createServiceClient } from '../src/client/service-client.ts';
 import { defineServices } from '../src/presets/define-services.ts';
@@ -9,6 +13,7 @@ import { createQueryFactory } from '../src/query/query-factory.ts';
 import { createKvCachePersister } from '../src/query-client/kv-cache-persister.ts';
 import type { CacheEntry } from '../src/ports/cache-entry.ts';
 import type { CacheProvider } from '../src/cache/cache-provider.ts';
+import type { SdkClientCachePartitionOptions } from '../src/ports/sdk-client-contribution.ts';
 import { MemoryCacheStore } from './test-helpers.ts';
 
 const contract = {
@@ -27,17 +32,7 @@ const tenantContribution = defineSdkClientContribution<{ tenant: string }>()({
   prepare: ({ context }) => ({ headers: { 'x-tenant': context.tenant } }),
 });
 
-const localeContribution = defineSdkClientContribution<{ locale: string }>()({
-  protocol: { family: 'netscript.sdk-client', major: 1 },
-  id: 'test:locale',
-  context: { locale: 'required' },
-  headerKeys: ['accept-language'],
-  responseCache: {
-    mode: 'partitioned',
-    partition: ({ context }) => context.locale,
-  },
-  prepare: ({ context }) => ({ headers: { 'accept-language': context.locale } }),
-});
+const localeContribution = createLocaleSdkClientContribution();
 
 const invariantContribution = defineSdkClientContribution<Record<never, never>>()({
   protocol: { family: 'netscript.sdk-client', major: 1 },
@@ -73,13 +68,66 @@ Deno.test('server and TanStack full keys use sorted contribution partitions', ()
     'echo',
     '{"page":1}',
     '$netscript.sdk-context',
-    '[["test:locale","de-CH"],["test:tenant","principal-7"]]',
+    '[["@netscript/sdk:locale","de-CH"],["test:tenant","principal-7"]]',
   ]);
   assertEquals(queryOptions.queryKey.slice(-3), [
     '$netscript.sdk-context',
-    ['test:locale', 'de-CH'],
+    ['@netscript/sdk:locale', 'de-CH'],
     ['test:tenant', 'principal-7'],
   ]);
+});
+
+Deno.test('locale cache keys are equal for the same locale and distinct for different locales', () => {
+  const client = createServiceClient({
+    contract,
+    serviceName: 'locale-partition-law',
+    contributions: [localeContribution] as const,
+  });
+  const action = createQueryFactory('catalog', contract, client).echo;
+  const input = { page: 1 };
+  const first = action.key(input, { context: { locale: 'en-US' } });
+  const same = action.key(input, { context: { locale: 'en-us' } });
+  const different = action.key(input, { context: { locale: 'fr-FR' } });
+
+  assertEquals(first, same);
+  assertFalse(JSON.stringify(first) === JSON.stringify(different));
+});
+
+Deno.test('locale keys use the declared partition function without preparing or reading headers', () => {
+  let partitions = 0;
+  let preparations = 0;
+  const contribution = {
+    ...localeContribution,
+    id: 'test:locale-partition-source' as const,
+    responseCache: {
+      mode: 'partitioned' as const,
+      partition: (options: SdkClientCachePartitionOptions<LocaleSdkClientContext>) => {
+        partitions += 1;
+        return `partition:${options.context.locale ?? 'default'}`;
+      },
+    },
+    prepare: () => {
+      preparations += 1;
+      return { headers: { 'accept-language': 'constant-header' } };
+    },
+  };
+  const client = createServiceClient({
+    contract,
+    serviceName: 'locale-declared-partition',
+    contributions: [contribution] as const,
+  });
+  const key = createQueryFactory('catalog', contract, client).echo.key(
+    { page: 1 },
+    { context: { locale: 'de-CH' } },
+  );
+
+  assertEquals(key.slice(-2), [
+    '$netscript.sdk-context',
+    '[["test:locale-partition-source","partition:de-CH"]]',
+  ]);
+  assertEquals(partitions, 1);
+  assertEquals(preparations, 0);
+  assertFalse(JSON.stringify(key).includes('constant-header'));
 });
 
 Deno.test('server cache entries cannot cross contribution partitions', async () => {
