@@ -61,3 +61,15 @@ milestone `0.0.7`.
   generation, asset, Aspire parity, README fence, architecture, and quality gates exited 0.
 - Generated outputs and `deno.lock` exactly match `origin/main`. `playwright-cli` remains absent, so
   the supervisor/CI must run the durable `fresh-browser` job at the pushed merge SHA.
+
+## 2026-09-03 second convergence handoff
+
+- Merged `origin/main` at `f589d251a` into the clean IMPL-EVAL-PASS head `a7f6a06a3`. The only
+  conflict was the additive browser-test file shared by Slice 2 and #1885.
+- Both named sessions and both proof families survive. The showcase-island case is byte-identical to
+  main; the partial-navigation test and its drain/capture helpers are unchanged. Main's shared
+  browser-runtime imports remain canonical, and no runtime type adaptation was required.
+- Fresh check passed with 219 files and 0 diagnostics; Fresh units passed 280/280. All requested
+  generated-corpus, asset, Aspire parity, README fence, architecture, and quality gates exited 0.
+- `deno.lock` remains byte-identical at SHA-256 `6c8f90a2...`. No local browser run was possible
+  because `playwright-cli` is absent; CI/supervisor owns the durable `fresh-browser` verdict.

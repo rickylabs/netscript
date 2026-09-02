@@ -16,7 +16,11 @@ import {
   type ListenerHealthReport,
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
-import { type ResourceUpdate, watchResourceUpdates } from './resource-state-stream.ts';
+import {
+  type ResourceUpdate,
+  type StartResourceUpdateFollower,
+  watchResourceUpdates,
+} from './resource-state-stream.ts';
 
 /** Test-failure ceiling for the fixture-owned file-controller acknowledgement protocol. */
 const CONTROLLER_ACK_DEADLINE_MS = 5_000;
@@ -30,8 +34,13 @@ const BASELINE_READY_FAILURE_CEILING_SECONDS = 120;
 /**
  * Test-failure ceiling for a follower that hangs without emitting the induced transition.
  * The stream returns on the event; this value never defines how long Aspire is expected to take.
+ *
+ * Exported so every gate that induces a listener departure shares this one ceiling. Canary 6
+ * (run 33684157301, job 100427490701) failed because a second consumer kept a private 30s poll
+ * deadline and timed out on a stale Healthy report while this fixture, in the same run, had
+ * already observed the identical transition; a second budget must never grow back.
  */
-const RESOURCE_TRANSITION_FAILURE_CEILING_MS = 120_000;
+export const RESOURCE_TRANSITION_FAILURE_CEILING_MS = 120_000;
 
 interface ListenerRecoveryReceipt {
   readonly resource: string;
@@ -166,6 +175,56 @@ export async function verifyListenerFailureRecovery(
   await Deno.writeTextFile(receiptPath, `${JSON.stringify(receipts, null, 2)}\n`);
   console.info(`listener failure/recovery receipt: ${receiptPath}`);
   return receipts;
+}
+
+/** Per-check evidence for one induced departure, attributed from the stream or one snapshot. */
+export interface InducedDepartureEvidence {
+  readonly testOnly: ListenerHealthReport;
+  readonly realBacking: ListenerHealthReport;
+  readonly source: TransitionEvidenceSource;
+  readonly departureCeilingMs: number;
+}
+
+export interface InducedDepartureOptions {
+  /** Test seam; production consumers keep the shared 120s test-failure ceiling. */
+  readonly ceilingMs?: number;
+  /** Test seam for replacing only the long-lived follower process. */
+  readonly startFollower?: StartResourceUpdateFollower;
+}
+
+/**
+ * Subscribe first, induce the departure, then wait for the resource's aggregate Unhealthy event.
+ *
+ * The subscription is established before `induce` runs so the transition cannot land between a
+ * controller command and a later poll; the wait returns on the event itself, however long Aspire
+ * takes to re-evaluate. After the event, one scoped read asserts the test-only report carries a
+ * structured socket failure and the real backing report stayed Healthy. Consumers that also need
+ * recovery (the D-101 fixture) keep their own subscription open across both transitions.
+ */
+export async function observeInducedListenerDeparture(
+  appHost: string,
+  expectation: ListenerFaultExpectation,
+  induce: () => Promise<unknown>,
+  options: InducedDepartureOptions = {},
+): Promise<InducedDepartureEvidence> {
+  assertOwnedListenerFaultExpectation(expectation);
+  const ceilingMs = options.ceilingMs ?? RESOURCE_TRANSITION_FAILURE_CEILING_MS;
+  const subscription = await watchResourceUpdates(
+    appHost,
+    expectation.resource,
+    options.startFollower,
+  );
+  try {
+    await induce();
+    const departure = await subscription.waitFor(
+      (update) => resourceHealthIs(update, 'Unhealthy'),
+      ceilingMs,
+    );
+    const evidence = await reportsAfterTransition(appHost, departure, expectation, 'Unhealthy');
+    return { ...evidence, departureCeilingMs: ceilingMs };
+  } finally {
+    await subscription.close();
+  }
 }
 
 function closedState(

@@ -232,3 +232,42 @@ the changed observation at the exact pushed head. No product issue is indicated 
 
 Reconcile: this is a convergence-only merge after the recorded IMPL-EVAL PASS. No feature scope or
 assertion changed; CI must re-establish the hosted `fresh-browser` verdict at the pushed merge SHA.
+
+## 2026-09-03 — second convergence onto origin/main
+
+- Began clean at `a7f6a06a30fa5b36d3dbc15e87d95982ad3cbb65` and merged fetched
+  `origin/main` at `f589d251ad475cd9cd752791b364da92780aef5c`. The sole conflict was again
+  `packages/fresh/tests/form-navigation_browser.ts`.
+- Resolved the constant hunk by retaining both `PARTIAL_NAVIGATION_SESSION` and
+  `SHOWCASE_ISLAND_SESSION`. Resolved the body hunk as an additive union: Slice 2's
+  `releaseAndDrainPartialBarriers` and piped `spawnVite` helpers remain unchanged, and main's full
+  showcase-island browser case follows unchanged. A direct suffix comparison against
+  `origin/main` confirmed the showcase case is byte-identical.
+- Main's shared `_fixtures/browser-runtime.ts` imports remain the single shared helper source. The
+  browser task already contained main's test entries, while this branch's existing fixture/browser
+  publish excludes remain, yielding the requested union. No runtime type adaptation was needed.
+- Reset the generated Aspire manifest to main before regeneration. The prescribed bare MCP corpus
+  generation again exited 1 because the merge's staged package read set activates its clean-tree
+  guard; the documented `--allow-dirty` rerun exited 0. Aspire manifest regeneration exited 0 with
+  911 rows and no unmatched paths.
+
+### Second-convergence gate evidence
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| Fresh structured check | 0 | 219 files, 2 batches, 0 failed batches, 0 diagnostics |
+| Fresh unit task | 0 | 280 passed, 0 failed |
+| `check:mcp-export-corpus` | 0 | 35 packages, 273 subpaths, 7,841 symbols; hash `284917fc...` |
+| `check:assets-barrel` | 0 | regeneration produced no diff |
+| `check:publish-assets` | 0 | generated publish assets current |
+| `check:aspire-version-parity` | 0 | 910 checked, 0 failed, 0 missing; manifest fresh |
+| `docs:readme-fences` | 0 | 36 READMEs, 168 fences, 73 TS-like checked |
+| `arch:check` | 0 | dependency checks and doctrine scan completed with 0 failures |
+| `quality:scan` | 0 | 0 findings; 7 existing allowances |
+| Browser task | not run | `playwright-cli` unavailable (`command -v` exit 1); hosted `fresh-browser` is durable |
+| Format/conflict hygiene | 0 | resolved browser file formats cleanly; no conflict markers |
+| Lock hygiene | 0 | pre/post/current-main SHA-256 all `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` |
+
+Reconcile: this remains a convergence-only merge after IMPL-EVAL PASS. No Slice 2 assertion,
+timeout, fixture behavior, or feature scope changed; CI must re-establish the hosted browser verdict
+at the pushed merge SHA.
