@@ -273,10 +273,13 @@ Three entrypoints carry the package:
 The projection subpath accepts an already-loaded OpenAPI document. It keeps discovery and I/O at the
 caller's boundary:
 
-````ts
+```ts
 import { indexOpenApiOperations } from '@netscript/mcp/openapi-projection';
 
+declare const openApiDocument: unknown;
+
 const index = indexOpenApiOperations(openApiDocument);
+```
 
 Every tool flow depends on a port interface, so embedders and tests supply their own adapters and
 assert against the published schemas. The always-current symbol list is
@@ -302,7 +305,7 @@ const endpoints = createServiceEndpointDirectory({
 });
 
 const { entries, sources } = await endpoints.list();
-````
+```
 
 The effective per-service precedence is `override > aspire-cli > run-manifest > appsettings`. Every
 source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale

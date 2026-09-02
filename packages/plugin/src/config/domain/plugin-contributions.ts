@@ -4,6 +4,7 @@ import type { DbSchemaContribution } from './db-schema-contribution.ts';
 import type { E2eContribution } from './e2e-contribution.ts';
 import type { MigrationContribution } from './migration-contribution.ts';
 import type { RuntimeConfigTopicContribution } from './runtime-config-topic-contribution.ts';
+import type { SdkClientContributionReference } from './sdk-client-contribution-reference.ts';
 import type { ServiceContribution } from './service-contribution.ts';
 import type { StreamTopicContribution } from './stream-topic-contribution.ts';
 import type { TelemetryContribution } from './telemetry-contribution.ts';
@@ -17,6 +18,8 @@ export interface PluginContributions {
   };
   /** Service contributions registered by the plugin. */
   readonly services?: readonly ServiceContribution[];
+  /** Declarative SDK client-contribution factories made available by the plugin. */
+  readonly sdkClients?: readonly SdkClientContributionReference[];
   /** Background processor contributions registered by the plugin. */
   readonly backgroundProcessors?: readonly BackgroundProcessorContribution[];
   /** Stream topic contributions registered by the plugin. */

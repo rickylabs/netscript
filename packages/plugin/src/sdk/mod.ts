@@ -36,6 +36,7 @@ export { createPluginContext } from './runtime/plugin-context.ts';
 export type { PluginContext, PluginLogger } from '../domain/mod.ts';
 export { createPluginHostBootstrap } from './runtime/plugin-host-bootstrap.ts';
 export type { PluginHostBootstrap } from './runtime/plugin-host-bootstrap.ts';
+export { createPluginServiceContext } from './runtime/plugin-service-context-factory.ts';
 export type {
   BackgroundProcessorContribution,
   ContractVersionContribution,
@@ -50,6 +51,7 @@ export type {
   PluginMetadataValue,
   PluginType,
   RuntimeConfigTopicContribution,
+  SdkClientContributionReference,
   ServiceContribution,
   StreamTopicContribution,
   TelemetryContribution,
