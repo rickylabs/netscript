@@ -7686,3 +7686,41 @@ deferred to owning slices, 5 archival info.
 repo's own parity gate already does it, and better: it attributes every remaining stale literal to
 its owning slice (S9, S11, S3, S1/S4, `derived`, `archival`) rather than counting them against S13.
 Box 1's raw `git grep` sweep is the cruder instrument; the gate is the one that reflects ownership.
+
+## D-299 — a label change on a pre-#1846 branch is a full runtime dispatch
+
+Internals reported that S8 was not dormant as I had claimed: run `33592595321` was executing both
+runtime tiers on the unfixed workflow and evicted their sqlite tier. I traced the trigger against
+#1754's timeline:
+
+    04:54:25Z  unlabeled  status:ready-merge
+    04:54:26Z  labeled    status:impl-eval
+    04:54:28Z  run 33592595321   event=pull_request   head=ce7e82a76
+    04:58:36Z  #1889 sqlite tier cancelled
+    04:58:39Z  S8 sqlite tier starts
+
+Three seconds from label to dispatch. The label churn itself was coordinator-required — the hold on
+#1754 while its delta eval runs — but I had modelled `labeled`/`unlabeled` as metadata rather than as
+a `pull_request` event that re-dispatches the whole workflow. On a stale-workflow branch that costs
+another topic two receipts every time.
+
+**Operational rule for this lane: on a branch that does not yet carry #1846, treat every label change
+as a runtime dispatch.** Withdrawing `status:ready-merge` is not a free, reversible bookkeeping act.
+
+**This also dissolves the tension I had been managing.** I was holding S8's head still to preserve the
+green receipts at `ce7e82a76`, on the theory that a dormant branch evicts nobody. Since any re-label
+re-dispatches regardless, preserving those receipts buys nothing and keeps S8 an active offender.
+Corrected sequence for S8, at the delta-eval boundary:
+
+1. delta verdict returns,
+2. integrate main (head moves, `queue: max` arrives),
+3. let the single resulting run produce fresh receipts **on the fixed workflow**, eviction-free,
+4. only then re-apply `status:ready-merge`, rerun close-gate, publish the packet.
+
+That trades one already-earned receipt set for one clean one, and takes S8 off the offender list.
+No labels are touched on S8 before step 2.
+
+Also settled: S11 is **not** an offender. Internals proved it at job level — `classify changes` is
+skipped, so the tier jobs' `if: needs.classify.result != 'skipped'` is false and they are never
+admitted, so they never claim the concurrency group. "Shows SKIPPED" and "never claimed the mutex"
+are not the same claim, and only the second one exonerates a branch.
