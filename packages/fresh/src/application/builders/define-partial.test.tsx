@@ -312,6 +312,19 @@ function assertPartialRouteMutationInference(): void {
     },
     component: StatsCard,
   });
+
+  const renamedConsumer = createRouteReference('/projects/[workspace]');
+  definePartial({
+    name: 'renamed-consumer',
+    route: renamedConsumer,
+    loader: async (ctx) => {
+      const workspace: string = ctx.path.workspace;
+      // @ts-expect-error The renamed route no longer declares a `project` path param.
+      const project: string = ctx.path.project;
+      return await Promise.resolve({ label: workspace, value: project });
+    },
+    component: StatsCard,
+  });
 }
 
 void assertPartialRouteMutationInference;
