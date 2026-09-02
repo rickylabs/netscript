@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `workers-payload-type-contract--plan` |
 | Branch | `feat/workers-payload-type-contract` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | workers-core/triggers-core: 3; workers plugin: 5 |
 | Scope overlays | none |
 
 ## Current State
 
 The current-surface investigation is complete and the public contract is committed independently at
-`f655c3405`. Draft PR #1938 is open. No TypeScript or test file has changed. Implementation is
-paused for independent PLAN-EVAL.
+`f655c3405`. Draft PR #1938 is open. No TypeScript or test file has changed. The owner explicitly
+accepted the plan and authorized implementation without PLAN-EVAL.
 
 ## Completed
 
@@ -27,17 +27,16 @@ paused for independent PLAN-EVAL.
 
 ## In Progress
 
-- Fresh Anthropic Fable 5 medium PLAN-EVAL of the committed plan and research.
+- Defect-specific consumer-site RED proof for trigger-core `enqueueJob`.
 
 ## Next Steps
 
-1. Apply any mandatory plan-evaluator findings and obtain PASS.
-2. Commit the consumer-site RED fixture and record its failure SHA/evidence.
-3. Implement core type/schema/contract binding until that fixture turns GREEN.
-4. Update both generator paths and schema-backed first-party fixtures without changing #1451
+1. Commit the consumer-site RED fixture and record its failure SHA/evidence.
+2. Implement core type/schema/contract binding until that fixture turns GREEN.
+3. Update both generator paths and schema-backed first-party fixtures without changing #1451
    operational semantics.
-5. Run scoped, workspace, publish, architecture, documentation, and quality gates.
-6. Obtain fresh IMPL-EVAL and only then decide whether every acceptance box supports issue closure.
+4. Run scoped, workspace, publish, architecture, documentation, and quality gates.
+5. Obtain fresh IMPL-EVAL and only then decide whether every acceptance box supports issue closure.
 
 ## Key Decisions
 
@@ -67,7 +66,7 @@ paused for independent PLAN-EVAL.
 
 ## Open Questions
 
-- None before PLAN-EVAL; evaluator findings may reopen a decision.
+- None; the owner accepted plan commit `f655c3405` as authoritative.
 
 ## Drift and Debt
 

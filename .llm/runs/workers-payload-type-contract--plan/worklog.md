@@ -30,7 +30,29 @@
   handoff.
 - Selected the canonical fresh evaluator route: Anthropic Fable 5, medium effort
   (`formal_plan_evaluation`).
-- Next: obtain independent PLAN-EVAL PASS before the RED test commit.
+- Native evaluator launch session `ece26f81-5475-4026-9d25-34b5826028e0` observed model
+  `fable-5` but failed before evaluation with `unrecognized_model`; it produced no artifact or
+  plan work.
+- Before the fallback launched, the owner explicitly accepted plan commit `f655c3405` and directed
+  implementation to proceed without PLAN-EVAL. No evaluator produced a verdict or changed files.
+- Owner-set next step: commit the defect-specific consumer-site RED proof, push it immediately, then
+  implement the smallest complete id-to-payload binding increment within the one-hour SLO.
+
+### 2026-09-02 — RED consumer proof
+
+- Added `packages/plugin-triggers-core/src/builders/enqueue-job-payload-contract_test.ts` with two
+  jobs whose handler parameter types independently establish `EmbedDocumentPayload` and
+  `TranscribeImagePayload` using APIs that compile on the baseline.
+- The positive `embedDocument` enqueue compiles. The negative call selects `transcribeImage` and
+  passes the already-valid `embedPayload` value; its directive is attached only to that payload
+  property.
+- RED command: `deno check --unstable-kv
+  packages/plugin-triggers-core/src/builders/enqueue-job-payload-contract_test.ts`.
+- RED result: exit 1 with exactly `TS2578 Unused '@ts-expect-error' directive` at the wrong-job
+  payload property. There is no arity, import, job-construction, or unrelated type failure.
+- Why this proves #1455: baseline `build()` erases each handler payload and `enqueueJob` infers its
+  independent payload generic from `options`, so the wrong payload is accepted. GREEN must make the
+  selected definition the only inference source, consuming this same directive.
 
 ## Commit receipts
 
@@ -46,4 +68,4 @@ No implementation gates have run yet. The plan artifact passed `git diff --check
 
 ## Blockers
 
-None. Implementation is intentionally held at the PLAN-EVAL gate.
+None. The owner explicitly waived PLAN-EVAL and accepted `f655c3405` as authoritative.

@@ -19,5 +19,12 @@
 | `formal_plan_evaluation` | Anthropic / Fable 5 / medium | Fresh opposite-family PLAN-EVAL |
 | `formal_impl_evaluation` | Anthropic / Fable 5 / medium | Fresh opposite-family IMPL-EVAL |
 
-The run uses the canonical routes in `.llm/harness/workflow/lane-policy.md`; there are no route or
-evaluation overrides.
+## Recorded lane/eval overrides
+
+- The preferred native Fable 5 evaluator session `ece26f81-5475-4026-9d25-34b5826028e0` failed
+  before evaluation because Claude Code reported `unrecognized_model` for observed model
+  `fable-5`. The run therefore uses the canonical native-route-unavailable PLAN-EVAL fallback:
+  OpenRouter Qwen 3.8 Flash, max effort. This fallback is isolated and is not described as native
+  Claude or mobile-visible.
+- Before that fallback launched, the owner accepted plan commit `f655c3405` and explicitly directed
+  the run not to seek PLAN-EVAL. The fallback was therefore cancelled and implementation resumed.
