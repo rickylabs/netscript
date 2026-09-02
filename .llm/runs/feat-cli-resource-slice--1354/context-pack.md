@@ -2,14 +2,19 @@
 
 ## Handoff state
 
-- **Current phase:** PLAN complete, awaiting separate PLAN-EVAL.
+- **Current phase:** PLAN complete. Exactly **one** narrow exact-head PLAN-EVAL is authorized.
 - **Implementation status:** not started; this run intentionally changed no product code.
-- **Baseline:** `38f2ce7358f80e4075c481b450b52e1a01c5984c`.
+- **Planning baseline:** `38f2ce735` at launch. Cycle-3 delta `b5dcb23e2`; coordinator-directed D3
+  narrowing `6b737ab9c`; this harness sync on top.
 - **Primary archetype:** 6 (CLI tooling); bounded Archetype-4 Fresh public seam.
 - **Scope:** frontend generation + CLI composition.
-- **Required next action:** an opposite-family evaluator runs
-  `.llm/harness/evaluator/plan-protocol.md` against `research.md` and `plan.md`. Do not implement
-  until it returns `PASS` or the plan incorporates all blocking findings.
+- **Required next action:** one opposite-family PLAN-EVAL at the exact head, **restricted to the
+  formal plan gate and the cycle-1 blockers**. It is not a fresh architecture review and must not
+  reopen decisions the 2026-09-02 coordinator ruling settled. On `PASS`, the lane waits only for
+  #1664's merge/rebase, then dispatches implementation Slices **A** and **B** in parallel.
+- **Cycles 2 and 3 were orchestration defects, not architecture failures** — both re-evaluated a
+  byte-identical `b210f9092`. A verdict re-issued against an unchanged head is one verdict observed
+  three times, not three findings.
 
 ## Three-file planning packet
 
@@ -36,9 +41,11 @@ this three-file packet are owner-authored context and were not changed by the pl
 5. Fresh already owns sidecar discovery and manifest/routes rendering. Its writer is internal to the
    route manifest module and not exported from `@netscript/fresh/vite`.
 6. The CLI currently has no `@netscript/fresh` dependency.
-7. #1664 is open. Inspected head `377811da85045be055059d836c524c213794a71d` adds the required
-   `--client` behavior: zero fails, one can be used without a flag, multiple without a flag fail
-   closed, and an explicit selector must match exactly one exported service.
+7. #1664 is open. Head at the coordinator ruling was `573d01d35`; it has since advanced to
+   `ec9e7048a` (a browser-fixture startup repair). It adds the required `--client` behavior: zero
+   fails, one can be used without a flag, multiple without a flag fail closed, and an explicit
+   selector must match exactly one exported service. **Because that branch is live, re-derive the
+   overlap set against its head at implementation time rather than trusting any snapshot here.**
 8. #1664 owns `web-scaffold.ts`, `add-ui-command.ts`, the add-ui input, and the service-query
    template. Its live diff also overlaps the public dependency graph, embedded asset carrier,
    example islands, and E2E gate registries used by later slices. #1354 must wait for its merge,
@@ -72,10 +79,22 @@ The operation is fully preflighted before the first write:
 - absent leaf → write;
 - byte-identical leaf → skip;
 - divergent generator-owned leaf → conflict by default, replace only with explicit `--force`;
-- unmarked/foreign leaf → conflict even with force;
+- unmarked/foreign or `owned-edited` leaf → conflict even under `--force`;
 - any conflict or unsupported shared shape → report and write nothing;
 - dry-run → report only;
 - force never replaces `router.ts` or `utils.ts` wholesale.
+
+**Narrowed by the 2026-09-02 coordinator ruling after a touch-set audit.** Removed: the
+`--keep` / `--replace` / `--abort` / `--recover` flags, the crash/recovery journal, the app-scoped
+lock, and the backup-rollback promise — their IO adapters appear in **no declared slice touch set**
+and they exceed #1354's acceptance. **Explicitly deferred:** process-crash / mid-rename cross-file
+atomicity, and concurrent-invocation locking; a crash between renames can leave a partially written
+slice and two concurrent invocations are not serialized, with rerun or manual move/rename as the
+recovery.
+
+The bar that replaces them: **every pre-apply failure proves zero writes** — validation, Fresh
+staging/writer, and shared-source transform failures each occur before the first application write —
+and a default conflict exit plus manual move/rename or owned-only `--force` is sufficient.
 
 The proof that matters is a second unchanged run with exit 0 and zero writes, plus negative tests
 showing that owned edits, foreign files, missing procedures, ambiguous clients, and late router
@@ -102,8 +121,8 @@ request-state needs. Supported State transforms are bounded and fail closed for 
 ## Coordination and slice order
 
 1. Wait for #1664 merge.
-2. Run separate PLAN-EVAL and obtain `PASS` (this can happen while waiting, but implementation still
-   waits for #1664).
+2. Run the single narrow exact-head PLAN-EVAL and obtain `PASS` (this happens while waiting, but
+   implementation still waits for #1664's merge/rebase). No further advisory cycle is authorized.
 3. Slice A: extract/share #1664 selector, serialized over its two web-scaffold files.
 4. Slice B: Fresh manifest public seam and CLI adapter. A/B may run in parallel after merge.
 5. Slice C: resource contracts and reconcilers.
@@ -175,7 +194,17 @@ lanes must not start an app, Aspire, Docker, browser, or `e2e:cli`.
 
 ## Evaluator focus
 
-Challenge the one-template-authority claim, atomicity of late manifest/router failures, optional
-flag upgrades under the force contract, nested/parameterized route property-chain derivation,
-source-safe State/router transforms, and whether Slice F can remove old copies without capturing
-demo-only behavior. A blocking finding updates the plan; it is not deferred into implementation.
+**Restricted scope, per the 2026-09-02 coordinator ruling.** Judge only:
+
+1. the **formal plan gate** (`.llm/harness/gates/plan-gate.md`) — every checklist box, including the
+   Risk register and the Open-decision sweep; and
+2. the **cycle-1 blockers** — the one-template-authority claim, optional flag upgrades under the
+   narrowed force contract, nested/parameterized route property-chain derivation, source-safe
+   State/router transforms, and whether Slice F can remove old copies without losing demo-only
+   behavior.
+
+Out of scope: reopening D1-D9, the removed flags/journal/lock/rollback, or the explicitly deferred
+cross-file atomicity and concurrency. Those are settled. Late manifest/router failure handling is
+judged **only** against the narrowed bar - zero writes on any pre-apply failure - not against
+crash-atomic emission, which #1354 no longer promises. A blocking finding updates the plan; it is
+not deferred into implementation.

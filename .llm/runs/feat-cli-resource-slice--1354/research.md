@@ -29,19 +29,32 @@
 - `.llm/harness/workflow/activation.md`
 - `.llm/harness/workflow/run-loop.md`
 - `.llm/harness/workflow/lane-policy.md`
-- `.llm/harness/workflow/plan-gate.md`
-- `.llm/harness/workflow/archetype-gate-matrix.md`
+- `.llm/harness/gates/plan-gate.md`
+- `.llm/harness/gates/archetype-gate-matrix.md`
 - `.llm/harness/evaluator/plan-protocol.md`
 - `.llm/harness/archetypes/ARCHETYPE-6-cli-tooling.md`
-- `.llm/harness/scopes/SCOPE-frontend.md`
-- `docs/architecture/doctrine/01-core-principles.md`
-- `docs/architecture/doctrine/02-package-archetypes.md`
-- `docs/architecture/doctrine/05-testing.md`
-- `docs/architecture/doctrine/06-quality-gates.md`
-- `docs/architecture/doctrine/07-dependency-graph.md`
-- `docs/architecture/doctrine/09-anti-patterns.md`
-- `docs/architecture/doctrine/10-doctrine-fitness.md`
+- `.llm/harness/archetypes/SCOPE-frontend.md`
+- `docs/architecture/doctrine/01-thesis-and-axioms.md`
+- `docs/architecture/doctrine/06-archetypes.md`
+- `.llm/harness/gates/static-gates.md` (the former `doctrine/05-testing.md` has **no** current
+  doctrine successor; testing gates live here)
+- `.llm/harness/gates/fitness-gates.md`
+- `docs/architecture/doctrine/07-composition-and-extension.md`
+- `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
+- `docs/architecture/doctrine/ref-migration-map.md`
 - `.llm/runs/feat-workers-runtime--1592-1451/plan.md` as the required slice-plan shape reference.
+
+> **Path currency note (harness sync, 2026-09-02).** The source list above was corrected
+> against `origin/main`. Three harness files moved directory — `plan-gate.md` and
+> `archetype-gate-matrix.md` into `.llm/harness/gates/`, `SCOPE-frontend.md` into
+> `.llm/harness/archetypes/` — and the doctrine catalog was renumbered, so
+> `01-core-principles` → `01-thesis-and-axioms`, `02-package-archetypes` → `06-archetypes`,
+> `07-dependency-graph` → `07-composition-and-extension`, and both `09-anti-patterns` and
+> `10-doctrine-fitness` collapse into `09-anti-patterns-and-fitness-functions.md`
+> (with `ref-migration-map.md` carrying the AP/F renumbering). `doctrine/05-testing.md` and
+> `doctrine/06-quality-gates.md` have **no doctrine successor**; their subject now lives in
+> `.llm/harness/gates/static-gates.md` and `fitness-gates.md`. Recorded as a gap rather than
+> mapped to a plausible-looking file — a fabricated citation is worse than an acknowledged one.
 
 ### Requested audit evidence
 
