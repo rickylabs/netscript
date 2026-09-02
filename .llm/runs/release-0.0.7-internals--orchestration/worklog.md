@@ -9904,3 +9904,32 @@ scope. Only the first is fixable by branch hygiene.
 
 **Standing rule adopted:** never report a lane clear from a remembered offender set. Re-derive it from
 the live workflow runs at that moment.
+
+### D-227 — diagnostic method pinned; #1889 sqlite gated behind the Aspire release receipt
+
+**Why the S9 eviction was hard to see, recorded on #1908 for the next person.** Every symptom points
+at the victim: a runtime tier reporting `cancelled` with no executed steps looks exactly like flaky
+infrastructure on the branch that lost it. This investigation passed through four wrong attributions
+before landing — per-ref supersession by a newer push; a defect in the victim's own slice; "flaky
+Aspire" (the default reading of two earlier failures on the same gate); and one lane's slice needing
+another's to merge first. **That last one fit the timing and was still wrong**, which is the trap.
+
+Two discriminators did the work:
+
+- **`steps: 0`** — evicted-while-pending and interrupted-mid-execution are indistinguishable from the
+  `cancelled` conclusion, and the run-level conclusion actively hides the difference. Zero executed
+  steps ⇒ never admitted ⇒ look outward, not at the slice.
+- **Enumerate by job admission time, not run creation time.** S9's run was created `04:46:27Z` but its
+  jobs entered the group at `05:17:03Z`. Any candidate filter keyed on run `created_at` within the
+  incident window would have **excluded the actual culprit**; it was found only by listing *active*
+  runs rather than recent ones.
+
+**Sequencing.** A drain-gated watcher now waits for the sqlite group to clear repo-wide — counting
+`in_progress`, `queued` and `pending` across every active run — before re-firing #1889's cancelled
+sqlite job. The Aspire lane's S9 receipt (`aspire-13.5-mcp-smoke.json`, #1721 box 2, release path)
+therefore goes first without a manual handoff, and their serialized S8/S10 re-dispatches interleave
+with mine by **deferral rather than eviction** now that all three carry `queue: max`.
+
+Error attribution settled with the Aspire lane: their S9-is-harmless read was a reasonable inference
+from `cancel-in-progress: false`; the distinctly-mine failure was asserting a **lane-wide** clear —
+a claim only this session could verify — from a remembered set instead of re-deriving it.
