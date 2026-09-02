@@ -57,6 +57,7 @@ tenant-header example and replaces its context/header/cache declaration with the
 | 2026-09-02 | 1 | slice review | Supervisor compared every public claim with `deno doc`, confirmed the example's cache policy matches its varying tenant header, and inspected the generated-carrier diff. |
 | 2026-09-02 | 1 | commit | Slice committed as `34747ba4c`; the tree was clean before post-commit carrier verification. |
 | 2026-09-02 | 1 | post-commit gate | All four `check:*` carrier tasks exited 0 and left the committed tree clean. |
+| 2026-09-02 | 1 | IMPL-EVAL | Fresh native Claude/Fable 5.1 medium session returned `PASS` at evaluated source head `ca405be8b`; it independently compiled the page's fence with the docs snippet compiler. |
 
 ## Decisions
 
@@ -105,8 +106,8 @@ tenant-header example and replaces its context/header/cache declaration with the
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Copyable docs snippet | PASS | `docs:snippets`, exit 0 | All imports and values are bound; no `any` or `declare`. |
+| Copyable docs snippet | PASS | `evaluate.md` independent scoped compile, exit 0 | The broad `docs:snippets` gate passes but classifies this reference page outside its tier-1 floor; the evaluator invoked the same compiler/config directly on this page and confirmed all imports/values bind with no `any` or `declare`. |
 
 ## Handoff Notes
 
-- Evidence mirror and separate-session IMPL-EVAL remain.
+- Recheck the ten evidence entries against merged `origin/main`, then create the PR and dry-run the mirror.

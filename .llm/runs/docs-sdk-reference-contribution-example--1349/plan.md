@@ -64,7 +64,7 @@ option and descriptor surface and includes one copyable, compiling client-compos
 
 | Risk | Mitigation |
 | --- | --- |
-| Snippet compiles only through a type escape | Bind all imports and values; use no `any` or `declare`; run `docs:snippets`. |
+| Snippet compiles only through a type escape | Bind all imports and values; use no `any` or `declare`; run `docs:snippets` plus a scoped invocation of its compiler because this page is outside the tier-1 floor. |
 | Reference contradicts the live export | Verify signatures and fields with `deno doc` before authoring and in IMPL-EVAL. |
 | Evidence block closes incomplete issue | Recheck every row and PR #1927's merge state immediately before PR creation. |
 | Generator changes protected files | Review the exact diff and reject any change outside the page/run/generated carrier scope. |

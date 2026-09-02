@@ -39,3 +39,23 @@
 - **Severity:** minor.
 - **Action:** fix.
 - **Evidence:** `docs/site/reference/sdk/index.md`; `deno task docs:snippets` exit 0.
+
+## 2026-09-02 — Reference heading differs from guide terminology
+
+- **What:** The final heading is `Client contributions (SdkClientContribution)`, not the plan's shorthand `Typed request contributions`.
+- **Source:** Evaluator comparison of `plan.md` with the reference page and guide page.
+- **Expected:** Reuse the guide section label as a planning locator.
+- **Actual:** The reference uses its symbol-oriented heading convention and avoids duplicating the guide heading.
+- **Severity:** minor.
+- **Action:** accept; the content contract is unchanged.
+- **Evidence:** `docs/site/reference/sdk/index.md`; `evaluate.md` low finding.
+
+## 2026-09-02 — Reference page is outside the snippet gate floor
+
+- **What:** `deno task docs:snippets` passes but does not compile `reference/sdk/index.md` because the page is outside `TIER_1_PAGES`.
+- **Source:** Separate-session evaluator inspection of `.llm/tools/docs/snippet-policy.ts` and gate census.
+- **Expected:** The broad gate's exit 0 would directly prove the new fence compiles.
+- **Actual:** The evaluator ran the same docs snippet compiler/config scoped to this page; it exited 0 with the root lock unchanged.
+- **Severity:** minor.
+- **Action:** accept for this docs-only slice and cite the scoped compile honestly; a tier-floor change is optional follow-up tooling scope.
+- **Evidence:** `evaluate.md`, Static Gates → `Independent snippet compile`.

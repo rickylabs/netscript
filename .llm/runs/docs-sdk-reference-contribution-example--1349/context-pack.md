@@ -6,14 +6,15 @@
 | --- | --- |
 | Run ID | `docs-sdk-reference-contribution-example--1349` |
 | Branch | `docs/sdk-reference-contribution-example` |
-| Current phase | `evaluate` |
+| Current phase | `close` |
 | Archetype | N/A — consumer documentation only |
 | Scope overlays | `docs` |
 
 ## Current State
 
-The reference section and compiling tenant-header example are committed at `34747ba4c`.
-Documentation gates, all four carrier generators, and all four post-commit carrier checks pass.
+The reference section and compiling tenant-header example are committed. Documentation gates, all
+four carrier generators, and all four post-commit carrier checks pass. Fresh separate-session
+IMPL-EVAL returned `PASS` at source head `ca405be8b`.
 
 ## Completed
 
@@ -24,16 +25,17 @@ Documentation gates, all four carrier generators, and all four post-commit carri
 - Passed `docs:snippets` and `docs:jsdoc-examples` with `unboundName=116`.
 - Ran the four carrier generators in order with exit 0.
 - Committed the slice and passed every matching `check:*` task on the clean committed tree.
+- Passed independent native Claude/Fable 5.1 medium IMPL-EVAL, including a scoped compile of this page.
 
 ## In Progress
 
-- Running the mandatory fresh opposite-family IMPL-EVAL.
+- Revalidating closing evidence and opening the owner-specified PR.
 
 ## Next Steps
 
-1. Run separate-session IMPL-EVAL.
-2. Recheck #1927 and the ten evidence entries.
-3. Push and create the owner-specified non-draft PR, then run the mirror dry-run.
+1. Recheck the ten evidence entries against merged `origin/main` (now including #1927).
+2. Push and create the owner-specified non-draft PR.
+3. Run the mirror dry-run and record the expected `status:impl` skip.
 
 ## Key Decisions
 
@@ -54,13 +56,13 @@ Documentation gates, all four carrier generators, and all four post-commit carri
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | PASS | Docs gates, generators, and post-commit checks all exit 0. |
-| Fitness | source aligned; evaluator pending | Six `deno doc` samples plus supervisor slice review. |
+| Fitness | PASS | Six `deno doc` samples, supervisor slice review, and `evaluate.md` PASS. |
 | Runtime | N/A | Docs-only slice. |
 | Consumer | PASS | `docs:snippets`, exit 0. |
 
 ## Open Questions
 
-- PR #1927 must be merged before this PR can honestly close #1349.
+- None. PR #1927 merged as `cfbb7e706`; its row-7 work is now present on `origin/main`.
 
 ## Drift and Debt
 
