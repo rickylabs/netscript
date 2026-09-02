@@ -799,3 +799,16 @@ the merge.**
   regenerates as a no-op (sha256 `ea839426…`); manifest fresh; parity ok 907/0; barrel type-check
   clean. `packages/cli/e2e` unchanged by the merge; product surface still the 10-file S9 set.
   Pushed `fcce551be`; PR body carries the evidence-carry-forward note. New ci/e2e-cli runs pending.
+
+### 2026-09-02T20:40Z — S9 MERGED 88fc6d69d; Canary 6 dispatched; leaf reconciliation
+
+- e2e-cli 33678503194 at exact head `fcce551be`: sqlite + postgres tiers SUCCESS (D-330 carry no longer
+  load-bearing). Packet + exact-head update posted on #1759; coordinator merged → main `88fc6d69d`;
+  #1721 auto-closed. Canary 6 release run 33679983481 dispatched from that SHA (monitored as topic
+  evidence only).
+- Label hygiene with truthful evidence: #1722 (PR #1760 → 58280d6ee), #1724 (PR #1779 → c0b7d841a),
+  #1370/#979 (PR #1740 → 2a1248d33), #1721 (PR #1759 → 88fc6d69d) → `status:shipped`.
+- #863: gate 1 proven by merged #1754 (`0622dc432`) but never mirrored (its evidence block maps #1720
+  only). Recorded on #863 with a reconciliation proposal (next #1880/#1881 PR carries an `issue: 863`
+  box-1 entry). Gates 2/3 = #1880/#1881, both 0.0.7 `status:triage`, unassigned — the only 0.0.7 Aspire
+  items still open. All other epic #1712 children are 0.0.8+ or backlog.
