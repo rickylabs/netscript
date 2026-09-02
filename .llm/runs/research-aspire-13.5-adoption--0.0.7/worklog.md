@@ -864,3 +864,18 @@ the merge.**
   the surface manifest) → TSV-only commit `0d6520b60`. `e2e-cli` had never run: the workflow is
   opt-in via `e2e-cli-gate`; label applied, tiers dispatched at `0d6520b60` (monitor `byxychrzn`).
 - **#1953:** IMPL-EVAL in flight at `c231fbe5e` (monitor `bget0w5o7`); CI green there.
+
+### 2026-09-02T22:1xZ — #1957 redesigned on #1909 stream; force-pushed `e23dc30c2`
+
+- Local hotfix worktree reset to main `308d99c78`; interim `9b5f1713d` superseded (not landed).
+- `listener-unreachable-fixture.ts`: export `RESOURCE_TRANSITION_FAILURE_CEILING_MS`; new
+  `observeInducedListenerDeparture(appHost, expectation, induce, {ceilingMs?, startFollower?})`.
+- `verify-typed-db-phase-b.ts`: private 30s poll removed; close runs inside the induce callback
+  after the subscription is live; 10s `db init` bounded assertion unchanged; receipt carries
+  failure code, real-backing status, evidence source, departure ceiling.
+- Tests: shared `controlled-follower.ts`; six departure cases incl. delayed transition past the
+  retired 30s boundary (scaled 1:1000) and non-vacuous ceiling failure; Phase-B source-shape
+  test forbids `REPORT_DEADLINE_MS`/`REPORT_POLL_MS`/`'describe',`. 208/208 pass; parity fresh.
+- PR #1957 body/DoD rewritten; `e2e-cli` run 33686579366 (postgres + sqlite tiers) triggered at
+  `e23dc30c2`; monitor `bws8u4kkd` replaces `b9vkp2cek`.
+- Open: tiers → `status:impl-eval` → packet. #1952 and #1953 unchanged this checkpoint.

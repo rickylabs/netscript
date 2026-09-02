@@ -8500,3 +8500,11 @@ verdicts supersede the carry.
   postgres tier is the proof. Post-merge proof is the next canary's `e2e-cli-prod` Phase-B PASS.
 - **Lesson:** any gate that closes a synthetic listener must use the shared departure budget; a
   source-shape test now refuses a private `REPORT_DEADLINE_MS` in Phase-B.
+- **D-332 follow-up (2026-09-02T22:1xZ):** the interim 90s polling reuse at `9b5f1713d` was
+  **not landed**. After coordinator merged #1909 (main `308d99c78`) the hotfix was redesigned on
+  the resource-state-stream: `observeInducedListenerDeparture` subscribes to the scoped
+  `describe --follow` stream *before* the controller close, waits for aggregate Unhealthy under
+  the shared 120s `RESOURCE_TRANSITION_FAILURE_CEILING_MS`, then attributes the transition
+  (structured code + real `postgres_listener` Healthy). #1957 force-pushed to `e23dc30c2`.
+  Per the efficiency directive, #1957 stays test-observer only: no `owned-container-log`, no
+  #1952 prose; #1952 continues after the next canary.
