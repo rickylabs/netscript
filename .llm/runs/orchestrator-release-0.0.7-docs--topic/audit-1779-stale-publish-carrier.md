@@ -134,3 +134,22 @@ No open docs finding. No `orchestrator:docs` issue in 0.0.7.
   closing keyword in the body yet — expected at impl stage, owner Features.
 - **#1664** `a30405df1` impl-eval: behind 0, no conflict; corpus + embedded + two READMEs regenerated
   cleanly (three checks exit 0).
+
+## #1949 IMPL-EVAL FAIL_FIX → fixes + fold-ins (head be6a4d471, main 3a794be67)
+
+- IMPL-EVAL (GLM 5.3 Flash · max) on `85ca65cc4`: **FAIL_FIX** — 40/44 claims verified; one false
+  clause (KV template consumes `createLazyKv` — superseded by #1842, template now takes lazy KV from
+  `createPluginServiceContext`), three wording issues (5.102.x read as a pin; "every skill body";
+  internal "D-17" id). Artifact: `1949-impl-eval-85ca65cc4-FAIL_FIX.md`.
+- Applied all four in `be6a4d471`; folded #1944 (`a8e9c8ce6`), #1942 (`f55a0b9c5`), #1943
+  (`5d34f56da`), #1948 (`032031b5c`) as each landed on main. Each fold verified against
+  `origin/main` (factory resolvers, deploy `operations` arrays, `vite.ts` export block,
+  `resource-slice/` tree). `check:publish-assets` exit 0; all lines ≤ 100 cols; no conflict with
+  main. `status:ready-merge` applied before CI on the new head; delta IMPL-EVAL dispatched on
+  `be6a4d471`.
+- Resweeps: #1759 `fcce551be`, #1856 `8ce535d58`, #1943 `7e16727b0`, #1948 `958150d83`, #1664
+  `9e0936440` — all behind 0, no conflict, carriers zero-diff. #1942 close-gate now **pass**
+  (Fixes repaired the #1544 box) and #1942 merged. #1950 (Features, impl) noted for a ready-merge
+  sweep.
+- Trap paid again: `pkill -f openrouter-run.ts` matched the invoking shell (exit 144). Use the
+  `/proc/<pid>/cmdline` filter loop; never `pkill -f` a pattern the shell itself carries.
