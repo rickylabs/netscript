@@ -128,3 +128,10 @@ No pre-existing or introduced failures appeared in this bounded gate set.
 ## Blockers
 
 None. The owner explicitly waived PLAN-EVAL and accepted `f655c3405` as authoritative.
+
+## IMPL-EVAL (separate session) — PASS_IMPL
+
+`z-ai/glm-5.3-flash` (xhigh, OpenRouter) returned **PASS_IMPL at `6e546515c`**, noting the
+post-brief advance to `28401b6c3` is generator output only (corpus regeneration + this worklog).
+Evaluator flagged that `plan-eval.md` was absent from the run dir; the recorded PASS_PLAN verdict for
+`f655c3405` is now committed as `plan-eval.md`. Remaining #1455 slices stay unclaimed (`Refs #1455`).
