@@ -44,11 +44,31 @@ export interface AuthSessionProjection {
   readonly expiresAt?: string;
 }
 
+/** Caller-owned credential context for direct auth-session requests. */
+export interface AuthSessionClientContext {
+  /** Resolve the current bearer credential without exposing ambient storage. */
+  readonly auth?: {
+    readonly getAccessToken: () => string | undefined | PromiseLike<string | undefined>;
+  };
+}
+
+/** Typed options supplied by application code to an auth-session request. */
+export interface AuthSessionRequestOptions {
+  /** Explicit caller context consumed by the canonical bearer contribution. */
+  readonly context?: AuthSessionClientContext;
+}
+
 /** Narrow HTTP seam used by auth session CLI operations. */
 export interface AuthSessionHttpPort {
   /** Read durable auth session projections. */
-  list(streamUrl: string): Promise<readonly AuthSessionProjection[]>;
+  list(
+    streamUrl: string,
+    options?: AuthSessionRequestOptions,
+  ): Promise<readonly AuthSessionProjection[]>;
   /** Revoke a session through the auth signout procedure. */
-  revoke(authUrl: string, sessionId: string): Promise<string>;
+  revoke(
+    authUrl: string,
+    sessionId: string,
+    options?: AuthSessionRequestOptions,
+  ): Promise<string>;
 }
-

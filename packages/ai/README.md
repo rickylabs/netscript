@@ -249,6 +249,10 @@ inspect the synchronous snapshot. Reading `snapshot` performs no network I/O, so
 can select ready servers without waiting on degraded peers.
 
 ```typescript
+import type { McpTransportPool } from '@netscript/ai/mcp';
+
+declare const pool: McpTransportPool;
+
 const startup = AbortSignal.timeout(1_500);
 await pool.connect({ signal: startup });
 
@@ -274,6 +278,10 @@ transport calls accept their own operation-specific signal.
 Retry only the degraded server instead of rebuilding healthy peers:
 
 ```typescript
+import type { McpTransportPool } from '@netscript/ai/mcp';
+
+declare const pool: McpTransportPool;
+
 const degraded = pool.server('search');
 if (degraded) {
   await degraded.reconnect({ signal: AbortSignal.timeout(1_500) });

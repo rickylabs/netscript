@@ -18,6 +18,7 @@ import { generateAppsettings } from '../../templates/aspire/generate-appsettings
 import type { InitPipelineContext } from './context.ts';
 import { createScaffoldPlan } from '../../domain/scaffold/scaffold-plan.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
 
 function generateAppStubDenoJson(name: string, appName: string): string {
   const config = {
@@ -174,10 +175,9 @@ export async function scaffoldRoot(
   ] as const;
   for (const [filename, content] of aspireWorkflowFiles) {
     const workflowPath = join(targetPath, '.github', 'workflows', filename);
-    const renderedContent = content.replaceAll(
-      '{{netscriptCliSpecifier}}',
-      netscriptJsrSpecifier('cli'),
-    );
+    const renderedContent = content
+      .replaceAll('{{netscriptCliSpecifier}}', netscriptJsrSpecifier('cli'))
+      .replaceAll('{{ASPIRE_SDK}}', SCAFFOLD_VERSIONS.ASPIRE_SDK);
     if (
       await context.scaffolder.writeFile(workflowPath, renderedContent, options.force)
     ) {

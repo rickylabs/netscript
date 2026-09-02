@@ -54,11 +54,15 @@ import type { ServiceEndpointDirectoryPort } from './src/ports/service-endpoint-
 import type { ExportSurfaceCorpusPort } from './src/ports/export-surface-corpus-port.ts';
 import { createExportSurfaceFlows } from './src/application/export-surfaces/export-surface-flows.ts';
 import { EmbeddedExportSurfaceCorpus } from './src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
+import { AspirePsDashboardReader } from './src/infrastructure/aspire-ps-dashboard-reader.ts';
+import type { AspirePsDashboardPort } from './src/domain/telemetry-endpoint.ts';
 
 export * from './mod.ts';
 
 /** Optional CLI trigger collaborators and policy supplied by an outer composition. */
 export interface McpCliOptions {
+  /** Override the running-AppHost dashboard reader for embedders and fixtures. */
+  readonly aspirePs?: AspirePsDashboardPort;
   /** Dynamic command catalog, supplied by the NetScript CLI in S7. */ readonly commandCatalog?:
     CommandCatalogPort;
   /** Command execution adapter. */ readonly commandExecutor?: CommandExecutorPort;
@@ -112,11 +116,14 @@ export async function runMcpStdioServer(
 /** Compose the generic MCP server with optional outer CLI adapters. */
 export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const projectRoot = options.projectRoot ?? Deno.cwd();
+  const aspirePs = options.aspirePs ?? new AspirePsDashboardReader({
+    appHostPath: resolve(projectRoot, 'aspire', 'apphost.mts'),
+  });
   const environment = {
     ...readTelemetryEndpointEnvironment(),
     ...(options.endpoint ? { NETSCRIPT_TELEMETRY_ENDPOINT: options.endpoint } : {}),
   };
-  const query = createResolvedTelemetryQuery(undefined, environment);
+  const query = createResolvedTelemetryQuery(undefined, environment, { aspirePs });
   const configuredDocsRoot = options.docsRoot ??
     resolveDocsRoot([], Deno.env.get('NETSCRIPT_DOCS_ROOT'), projectRoot);
   const docsCorpus = configuredDocsRoot
@@ -140,6 +147,7 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   return createMcpServer({
     probe,
     environment,
+    aspirePs,
     flows: {
       ...createDocsFlows(docsCorpus, docsSelection),
       find_export: withReceipt(
@@ -214,13 +222,19 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         warnEvidence,
       ),
       doctor: withReceipt(
-        createDoctorFlow(probe, environment, [
-          new AspireDoctorFamily(),
-          new ProjectWiringDoctorFamily(),
-          new PluginDoctorFamily(
-            options.projectDoctor ?? new UnwiredProjectDoctor(),
-          ),
-        ], projectRoot),
+        createDoctorFlow(
+          probe,
+          environment,
+          [
+            new AspireDoctorFamily(),
+            new ProjectWiringDoctorFamily(),
+            new PluginDoctorFamily(
+              options.projectDoctor ?? new UnwiredProjectDoctor(),
+            ),
+          ],
+          projectRoot,
+          aspirePs,
+        ),
         evidence,
         'mcp doctor',
         warnEvidence,

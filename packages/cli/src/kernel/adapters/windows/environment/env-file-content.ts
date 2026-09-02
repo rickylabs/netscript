@@ -282,7 +282,6 @@ export function generateEnvFileContent(
   }
 
   // Dashboard section
-  const dashboardPort = options.dashboardPort ?? 18888;
   const dashboardOtlpPort = options.dashboardOtlpPort ?? 4318;
   lines.push(
     '',
@@ -290,9 +289,11 @@ export function generateEnvFileContent(
     '# DASHBOARD',
     '# ============================================================================',
     '',
-    `ASPIRE_DASHBOARD_PORT=${dashboardPort}`,
     `ASPIRE_DASHBOARD_OTLP_HTTP_PORT=${dashboardOtlpPort}`,
   );
+  if (options.dashboardPort !== undefined) {
+    lines.push(`ASPIRE_DASHBOARD_PORT=${options.dashboardPort}`);
+  }
 
   // Servy service account (propagated from build environment)
   const envAccount = Deno.env.get('SERVY_SERVICE_ACCOUNT');

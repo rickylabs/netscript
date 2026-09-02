@@ -374,12 +374,32 @@ jobs:
           --id quality-jsdoc-example-compile
           --output .llm/tmp/gate-receipts/quality/jsdoc-example-compile.json
 
+      - name: README fence integrity
+        # Its subject is README markdown, so it must also run for docs-only
+        # diffs: classify gives `packages/*/README.md` needs_docs, not
+        # needs_deno. `RUN` is this job's own `needs_deno || needs_docs` gate —
+        # guarding on RUN_DENO would skip the gate on the very diffs that edit
+        # the files it checks.
+        if: env.RUN == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate readme-fences
+          --id quality-readme-fences
+          --output .llm/tmp/gate-receipts/quality/readme-fences.json
+
       - name: Agent docs corpus freshness
         if: env.RUN == 'true'
         run: >-
           deno run --allow-read --allow-write --allow-run --allow-env
           .llm/tools/gates/run-gate.ts --gate agent-docs-prose --id quality-agent-docs-prose
           --output .llm/tmp/gate-receipts/quality/agent-docs-prose.json
+
+      - name: MCP export corpus freshness
+        if: env.RUN_DENO == 'true'
+        run: >-
+          deno run --allow-read --allow-write --allow-run --allow-env
+          .llm/tools/gates/run-gate.ts --gate mcp-export-corpus --id quality-mcp-export-corpus
+          --output .llm/tmp/gate-receipts/quality/mcp-export-corpus.json
 
       - name: Generated asset freshness
         if: env.RUN_DENO == 'true'

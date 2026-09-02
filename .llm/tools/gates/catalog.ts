@@ -60,6 +60,7 @@ export const GATE_CATALOG = {
   'docs-tagline': ['deno', 'task', 'docs:tagline:check'],
   'docs-accuracy': ['deno', 'task', 'docs:accuracy'],
   'jsdoc-example-compile': ['deno', 'task', 'docs:jsdoc-examples'],
+  'readme-fences': ['deno', 'task', 'docs:readme-fences'],
   'agent-docs-prose': ['deno', 'task', 'check:agent-docs-prose'],
   'assets-barrel': ['deno', 'task', 'check:assets-barrel'],
   'publish-assets': ['deno', 'task', 'check:publish-assets'],
