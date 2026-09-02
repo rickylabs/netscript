@@ -10720,3 +10720,25 @@ again. It writes `evaluate.md` into the run dir itself. If the cloud run later l
 verdict too, both are recorded; nothing is wasted but a session.
 
 Two native evals now live (#1941, #1944); #1943's cloud retrigger still pending.
+
+---
+
+## ~20:00Z — two native PASSes, two packets; the cloud lane's losses were never the plan
+
+**#1941** (#1353/#1467 closeout): native Fable IMPL-EVAL **PASS**, receipt `evaluate.md` committed
+as `4bfded8c8`. Every one of the fourteen rows cited to code and a running test; the
+`propagateTraceContext` guard verified red-first in substance (the disabled-path assertion fails on
+base, where injection was unconditional) with the enabled path's source untouched. Both-order
+composition pinned by `[auth, second]` and `[second, auth]` links each asserting `traceparentCount
+=== 1`. `status:ready-merge` applied; mirror dry-run `DRY-RUN: #1353, #1467`; waiting on CI at the
+receipt head so the fourteen boxes tick.
+
+**#1944** (#1452 S3): native Fable IMPL-EVAL **PASS**, receipt `781fe9bd9`, packet posted.
+`Closes #1452` holds on all four rows; the boot test was run alone by the evaluator and genuinely
+starts three services through `Deno.serve`. `packages/plugin/deno.json` diff 0. This completes
+#1452 across #1820, #1842, #1944.
+
+The native route delivered two durable verdicts in ~4 and ~3 minutes of wall time each, after the
+cloud lane spent ~45 minutes apiece reaching PASS and then discarding it for want of an
+`evaluate.md`. `lane-policy.md` names the native session as the local default; the cloud lane is for
+explicitly cloud-driven work. I should have started here.
