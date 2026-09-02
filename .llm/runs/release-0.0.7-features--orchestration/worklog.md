@@ -10260,3 +10260,34 @@ both bit leaves that were green an hour earlier.
 | #1931 | green but `close-gate` red pending its eval on the `Closes #1352` question |
 | #1891 | PLAN-EVAL running at last |
 | #1664 | fence repair in flight; routed behind #1845 |
+
+### ~14:35Z — two corrections, one of them mine
+
+**#1664: the lane caught a wrong constraint in my brief and stopped rather than working around it.**
+I told it the added README fence was in `packages/cli/README.md` and that `packages/fresh/README.md`
+was main's tolerated baseline. Backwards. Verified its correction:
+
+- commit **`1df8a5274`** (`feat(fresh): preserve generated query cache age`, **this branch**) added
+  the "Preserve server cache age during hydration" section to `packages/fresh/README.md`, a pure
+  `+21` addition against `origin/main`, including the `tsx` fence with unbound `ordersQueries`,
+  `ordersClient`, `input`, `props`;
+- clean `main` has five checked Fresh README fences, the branch has six.
+
+**My touch-set read had been truncated** — `git diff --name-only … | head -30` on a branch with 160+
+changed files never showed that README. Authorized the correct fix with the prohibition narrowed to
+the READMEs that genuinely are main's baseline (`service`, `ai`, …), and kept the "land at 32, do not
+raise the ratchet" constraint.
+
+Worth keeping: **a truncated touch-set read is a real failure mode on a large branch**, and it
+produced a confident wrong attribution that would have blocked the only correct repair. The lane
+refusing a constraint that contradicted its own measurement is exactly the behaviour that caught it.
+
+**#1891: the PLAN-EVAL reached the agent and died on infrastructure.** Run `33640388554` — so the
+label pair fixed the trigger — then `litellm.RateLimitError: 429, qwen/qwen3.8-flash temporarily
+rate-limited upstream (Alibaba shared pool)`, `verdict: NONE`, `verdict_source:
+artifact-unavailable`.
+
+That is **no verdict**, so retrying is the *same* authorized evaluation, not a second one. Cycled
+`status:plan-eval`. Routing around it is not possible: the dispatcher pins PLAN to
+`qwen/qwen3.8-flash` and explicitly rejects `eval:model:glm` for the plan phase
+(`openhands-phase-eval.yml:296-299`). Recorded on the PR.
