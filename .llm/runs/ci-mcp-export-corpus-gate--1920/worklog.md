@@ -36,6 +36,7 @@
 | - | --- | --- | --- |
 | 1 | Bootstrap the evidence-backed harness plan | artifact review | `.llm/runs/ci-mcp-export-corpus-gate--1920/**` |
 | 2 | Prove deterministic corpus generation and wire its existing gate into CI | determinism, YAML parse, classifier reachability, RED/GREEN teeth, structured tooling check | generated corpus, `.github/workflows/ci.yml`, run artifacts |
+| 3 | Integrate final main and re-establish the generated corpus/evidence at that exact SHA | regeneration hash/cardinalities, YAML parse, classifier reachability, RED/GREEN freshness, structured tooling check | integration commit, generated corpus, run artifacts |
 
 ### Deferred Scope
 
@@ -56,6 +57,11 @@ other quality receipts.
 | 2026-09-02 | 1 | Plan gate | `PLAN-EVAL: N/A` — mechanical two-file change with locked implementation, validation, and stop condition. |
 | 2026-09-02 | 1 | Baseline RED | Exact pinned base returned `REAL_EXIT=1` with the expected stale-corpus diagnostic. |
 | 2026-09-02 | 1 | Determinism | Two warm generations and one pristine-`DENO_DIR` generation all returned 0 and produced byte-identical output: file SHA `906827e5…`, payload SHA `749a692a…`, 272 subpaths, 7,803 symbols. |
+| 2026-09-02 | 2 | CI wiring | Added the existing catalog gate to `quality` with `RUN_DENO`, invocation ID `quality-mcp-export-corpus`, and receipt `quality/mcp-export-corpus.json`. |
+| 2026-09-02 | 2 | Trigger proof | Executed nine classifier decisions covering package/plugin source and manifests, root manifest/lock, generator/workflow code, and generated output; all selected `needsDeno`, `quality`, and `RUN_DENO`. |
+| 2026-09-02 | 2 | Teeth | Detached throwaway worktree at stale base returned exit 1; the fresh live tree and exact catalog runner each returned exit 0. |
+| 2026-09-02 | 2 | Static validation | Parsed YAML assertion returned 0; requested structured tools check selected 342 files/3 batches and returned 0. |
+| 2026-09-02 | 2 | Reconcile | Draft PR #1929 is open with exact requested taxonomy/milestone. `origin/main` advanced to `37452f11f`; it changes both the classifier (#1905/#1917) and corpus (#1915), so planned integration slice 3 is required. |
 
 ## Decisions
 
@@ -72,7 +78,25 @@ other quality receipts.
 
 ## Gate Results
 
-Results will be copied from `evidence.md` after implementation.
+### Static Gates
+
+| Gate | Result | Notes |
+| --- | --- | --- |
+| Parsed CI YAML | PASS (`REAL_EXIT=0`) | Read back exact job, name, `if`, gate, ID, and receipt path. |
+| Classifier reachability | PASS (`REAL_EXIT=0`) | Nine input classes all selected Deno-backed quality. |
+| `.llm/tools` structured check | PASS (`REAL_EXIT=0`) | 342 files, 3 batches, 0 failed batches/findings. |
+
+### Fitness / Consumer Gates
+
+| Gate | Result | Notes |
+| --- | --- | --- |
+| Stale corpus RED | PASS (`REAL_EXIT=1`) | Detached throwaway worktree at dispatched stale base; expected diagnostic matched. |
+| Fresh corpus GREEN | PASS (`REAL_EXIT=0`) | Live tree at dispatched surface state. |
+| Catalog-runner invocation | PASS (`REAL_EXIT=0`) | Receipt outcome `PASS`, command `deno task check:mcp-export-corpus`. |
+
+### Runtime Gates
+
+N/A — no runtime behavior changed. `deno task e2e:cli` is explicitly prohibited for this slice.
 
 ## Handoff Notes
 

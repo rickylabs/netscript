@@ -12,9 +12,10 @@
 
 ## Current State
 
-Research and design are locked at the exact dispatched base. Determinism passed across two warm
-generations and one pristine-cache generation. The generated corpus is intentionally present as an
-unstaged implementation change while the harness bootstrap is committed independently.
+Slices 1 and 2 are complete locally: deterministic generation, CI wiring, YAML/classifier proof,
+RED/GREEN teeth, and the requested structured check are green. `origin/main` advanced to
+`37452f11f` with classifier and published-surface changes, so slice 3 must integrate it and
+regenerate before final handoff.
 
 ## Completed
 
@@ -23,16 +24,20 @@ unstaged implementation change while the harness bootstrap is committed independ
   step shape, and classifier architecture.
 - Recorded `PLAN-EVAL: N/A` for this mechanical slice.
 - Captured the expected stale-base exit 1 and three successful, byte-identical generations.
+- Added and parsed the exact CI step; proved all generator input classes select it.
+- Proved stale exit 1 in a throwaway worktree and fresh/catalog-runner exit 0 in the live tree.
+- Opened draft PR #1929 with the requested labels, `status:impl`, and milestone `0.0.7`.
 
 ## In Progress
 
-- Bootstrap artifact commit and draft-PR opening, followed by the workflow edit.
+- Final-main integration and post-integration regeneration/validation.
 
 ## Next Steps
 
-1. Commit bootstrap artifacts and open the draft PR.
-2. Wire the workflow step, prove trigger coverage and RED/GREEN teeth, validate, commit, push, and
-   comment the implementation evidence.
+1. Commit/push slice 2 and post its draft-PR evidence comment.
+2. Integrate `origin/main` at `37452f11f`, regenerate, and repeat load-bearing validations.
+3. Commit/push slice 3, update PR body/comment, and hand off to the supervisor for independent
+   review and IMPL-EVAL.
 
 ## Key Decisions
 
@@ -47,24 +52,25 @@ unstaged implementation change while the harness bootstrap is committed independ
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/ci-mcp-export-corpus-gate--1920/**` | new | Harness context and evidence |
-| `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | changed | Deterministic generator output at pinned base; intentionally excluded from bootstrap commit |
+| `.github/workflows/ci.yml` | changed | One additive existing-gate invocation |
+| `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` | changed | Deterministic generator output at pinned base; must be regenerated after main integration |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | planned | `plan.md` validation table |
-| Fitness | determinism passed; teeth pending | `evidence.md` |
+| Static | PASS at dispatched base | Parsed YAML, classifier assertion, structured check in `evidence.md` |
+| Fitness | PASS at dispatched base | Determinism and RED/GREEN teeth in `evidence.md` |
 | Runtime | N/A | No runtime behavior change |
-| Consumer | planned | RED/GREEN corpus freshness proof |
+| Consumer | PASS at dispatched base | RED/GREEN corpus freshness proof |
 
 ## Open Questions
 
-- None unless a stop condition or concurrent-main collision appears.
+- No design question. The detected main collision is handled by planned slice 3.
 
 ## Drift and Debt
 
-- Drift: local `rtk` tool unavailable; focused raw fallbacks are in use.
+- Drift: local `rtk` tool unavailable; `origin/main` moved and changed the corpus/classifier.
 - Debt: none created or deepened.
 
 ## Commits

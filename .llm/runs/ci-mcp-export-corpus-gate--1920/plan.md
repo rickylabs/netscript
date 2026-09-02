@@ -122,3 +122,11 @@ step in the CI `quality` job for every change that can affect its generated cont
 
 - Pristine-cache divergence, classifier gaps, `origin/main` movement, corpus collision, or any
   required file outside the authorized workflow/generated-asset/run-artifact scope.
+
+## Commit Slices
+
+1. Bootstrap the evidence-backed harness plan.
+2. Wire the existing gate and prove determinism, policy reachability, YAML structure, and RED/GREEN
+   behavior at the dispatched base.
+3. Integrate the final `origin/main`, regenerate the collision-prone corpus, and repeat all
+   load-bearing validations against the exact integrated main SHA.
