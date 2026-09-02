@@ -2,8 +2,10 @@
 
 ## Current state
 
-Implementation is complete on the exact requested Slice C baseline `f2696ea88`. The product tree
-is independently attested `IMPL-EVAL: PASS` at `5fd40ef13`; all required author and evaluator gates
+Implementation is complete. It started on the exact requested Slice C baseline `f2696ea88`; after
+#1946 squash-merged and its head branch was deleted, only Slice D was rebased onto the merged
+contract at `e341c6f71`. The product tree has independent pre- and post-rebase
+`IMPL-EVAL: PASS` attestations (`5fd40ef13` and `4af7c98d5`); all required author and evaluator gates
 are green. The master plan remains locked and this leaf records `PLAN-EVAL: N/A`.
 
 ## Key decisions
@@ -14,14 +16,17 @@ are green. The master plan remains locked and this leaf records `PLAN-EVAL: N/A`
 - Page/view candidates carry canonical prior renderings so D3 additive option reconciliation works.
 - No command consumes the family until Slice E/F.
 
-## Next steps
+## Handoff
 
-1. Commit the evaluation and bookkeeping artifact update.
-2. Push and open the required non-draft PR against `feat/cli-resource-slice-contract`.
-3. Post IMPL/IMPL-EVAL comments and verify exact labels, milestone, base, head, and SHA.
+- PR #1948 is open, non-draft, against `main` because #1946's branch no longer exists.
+- Milestone: `0.0.7`; labels: `orchestrator:features`, `status:impl`, `type:feat`, `area:cli`,
+  `priority:p2`, `wave:v1`.
+- IMPL and IMPL-EVAL phase comments are posted. The remaining work is Slice E/F, not part of this
+  leaf.
 
 ## Drift and debt
 
 - Drift: owner-directed non-draft lifecycle, RTK unavailable, absent frontend overlay reference,
-  and 12 current/final child count versus the future assembled 14-child observation.
+  the expected post-#1946 base transition, and 12 current/final child count versus the future
+  assembled 14-child observation.
 - Debt: none created.

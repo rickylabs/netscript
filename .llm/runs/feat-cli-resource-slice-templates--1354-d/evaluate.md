@@ -201,3 +201,114 @@ results when recording this verdict, keeping the run resumable.
 | Next step | Supervisor records this verdict (ticking the worklog progress boxes and ideally adding the `## SKILL` chapter to `implement.md`), pushes, and opens the owner-mandated non-draft stacked PR (`Refs #1354`, base `feat/cli-resource-slice-contract`, `status:impl`) per drift.md. |
 
 [PHASE: IMPL-EVAL] [VERDICT: PASS]
+
+## Post-#1946 rebase verification
+
+Fresh, independent, read-only-first IMPL-EVAL of the rebased Slice D, performed after #1946
+(`feat/cli-resource-slice-contract`) squash-merged to `main` as `e341c6f71` and its head branch was
+deleted.
+
+### Evaluator identity (requested vs observed)
+
+| Field  | Requested                                                       | Observed                                                                      |
+| ------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Route  | separate formal IMPL-EVAL session, native Claude family           | Claude Code session `session_01WzYLuPFGFShNKrTpGzAWfj`, model `claude-fable-5` |
+| Author | Codex / GPT-5 family implementation session (`supervisor.md`)     | no product byte authored by this session; only this appended section written    |
+| Effort | per `lane-policy.md`                                              | session default; no explicit effort attestation surface in this transport      |
+
+Generator ≠ evaluator holds. This is a different session from the pre-rebase evaluator
+(`session_01RzoTEujrWaZjRysSYzSk8T`); both are native Claude Fable 5, opposite-family to the Codex
+generator. `rtk` remains absent in this environment (drift-recorded); structured wrappers and raw
+`git`/`gh` were used for all verdict evidence.
+
+### Attested head and base
+
+| Field | Value | Evidence |
+| --- | --- | --- |
+| Current head | `4af7c98d5a180eeaf989fcf8f08ab4c4c25f74de` | `git rev-parse HEAD` |
+| Base | `origin/main` = `e341c6f71033658099f694c4d8542a9676e6c68d` (#1946 squash) | `git rev-parse origin/main`; `git merge-base HEAD origin/main` = same SHA |
+| Commit chain | `792b7199b` (product, parent `e341c6f71`) → `4af7c98d5` (harness eval record) | `git log --format='%H %P' origin/main..HEAD` |
+| PR | #1948, base `main`, non-draft, OPEN, head `4af7c98d5` (= local HEAD), milestone `0.0.7`, labels `type:feat`/`area:cli`/`priority:p2`/`wave:v1`/`status:impl`/`orchestrator:features` | `gh pr view 1948 --json headRefOid,baseRefName,…` |
+
+### Caller criteria
+
+1. **Exact 18 product paths, no lockfile/unrelated source — `PASS`.**
+   `git diff --name-status origin/main...HEAD` = 26 paths: the master plan's Slice D enumeration
+   item-for-item (11 `assets/resource-slice/**.template`, `manifest.ts`,
+   `scaffold-template-assets.ts`, `render-resource-slice.ts` + `_test.ts`,
+   `assets/resource-slice/README.md`, `plan-resource-slice_test.ts`, regenerated
+   `embedded.generated.ts`) plus the 8 run-dir artifacts. `git diff origin/main HEAD -- deno.lock`
+   is empty. Nothing else is touched.
+
+2. **Slice C untouched except the named test — `PASS`.**
+   Within `application/resource-slice/`, the diff contains only `plan-resource-slice_test.ts` (M)
+   and the two new render files (A). Contract, planner, and all three reconcilers plus their tests
+   are absent from the diff, i.e. byte-identical to the merged #1946 base.
+
+3. **Rebase fidelity — `PASS`.**
+   `git diff 5fd40ef13 792b7199b` restricted to the 18 product paths differs in exactly one file:
+   `embedded.generated.ts`. All 17 hand-authored product paths are byte-identical to the content
+   that received the pre-rebase independent PASS. The carrier difference is the regeneration on the
+   merged base, as the rebase record claims.
+
+4. **Generated-carrier provenance and freshness on the merged base — `PASS`.**
+   Independently re-run at `4af7c98d5`: `check:assets-barrel` exit 0 (regeneration byte-identical
+   across all seven carriers — `embedded.generated.ts` is a true generator output, not hand-merged),
+   `check:publish-assets` exit 0, `check:mcp-export-corpus` exit 0 with
+   `{packageCount:35, subpathCount:273, symbolCount:7834}` and hash `087da112…` (matching the
+   worklog's post-rebase record; the 7,816→7,834 symbol movement is `main`'s, not this slice's),
+   `check:emitted-samples` exit 0 (48 samples from 38 artifact paths). Freshness quartet:
+   `0 / 0 / 0 / 0`.
+
+5. **D3 strict-prior-canonical renderings — `PASS`.**
+   `render-resource-slice.ts` attaches `previousCanonicalContents` via `strictOptionSubsets` and
+   renders every strict prior subset through the same `renderOwnedLeaf` path; each leaf is marked by
+   the Slice C contract's `markOwnedResourceSliceLeaf` (schema-1 marker) and the test parses every
+   candidate back through `parseOwnedResourceSliceLeaf`. The combined-render test asserts exactly 7
+   strict predecessors for page/view; re-run green (12/12).
+
+6. **D4 neutrality — `PASS`.**
+   Grep over the template family for `viewer`, `withPolicy`, `withTelemetry`, `\bhero\b`,
+   `notes-card`, `JSON.parse`, `fetch(`, `: any`/`as any`, and handwritten `queryKey: [`: zero
+   matches. No `withRouteContract` (Form B sidecar: `defineRouteContract` in the sidecar, page uses
+   `.withRoute(appRoutes.{{routeAlias}})`). No extension point: the renderer's roster is the closed
+   typed map with a throw on unregistered names; the only consumers of the carrier/renderer are
+   `scaffold-template-assets.ts`, `render-resource-slice.ts`, and its test. No file under
+   `src/public/`, no scaffold writer, and no init template is in the diff — no command, no init
+   activation. `service-query` is not copied (no such key/file in the family).
+
+7. **Tests, checks, child count on the merged base (authoritative) — `PASS`.**
+   Focused tests: 12 passed / 0 failed / 0 ignored (exit 0). Structured CLI check: 935 files, 8
+   batches, 0 diagnostics. `arch:check` exit 0 with **zero** `resource-slice` findings and all
+   packages `FAIL=0`; `application/resource-slice/` has exactly 12 direct children (at the F-16 cap
+   of 12, no WARN — `main` does not yet contain Slice A's selector pair, so the plan's assembled
+   14-child WARN remains future, consistent with the drift record). `quality:scan` exit 0,
+   `findings: []`, allowance census unchanged at 7 pre-existing #1276 entries. No server, browser,
+   Aspire, Docker, or `e2e:cli` was started (D11).
+
+8. **Validity of the existing PASS — upheld.**
+   The pre-rebase PASS at `5fd40ef13` evaluated content whose 17 hand-authored paths are
+   byte-identical to `792b7199b`; the sole divergent file is machine-regenerated and its provenance
+   is re-proven by regeneration on the merged base. Every gate class the prior verdict relied on was
+   independently re-run green at the new head. Nothing in the rebase invalidates that verdict; this
+   section extends it to the merged base. The prior LOW-1 (`implement.md` missing `## SKILL`) was
+   addressed — the chapter now exists at line 3.
+
+### Findings (severity-ranked)
+
+- **LOW-R1 — post-rebase run bookkeeping is uncommitted.** The working tree carries unstaged
+  `worklog.md`/`drift.md` edits recording the rebase evidence and PR #1948; PR head `4af7c98d5`
+  therefore does not yet contain that bookkeeping. Non-blocking: the content is accurate (its corpus
+  hash/counts match this session's independent runs) and the supervisor commits it together with
+  this appended evaluation. No product byte is affected.
+
+No other findings. No new debt; `debt/arch-debt.md` untouched.
+
+### Verdict
+
+The rebase replayed exactly the two Slice D commits onto the #1946 squash with byte-identical
+hand-authored content, a machine-regenerated carrier, an unchanged `deno.lock`, untouched Slice C
+production sources, and every re-run gate green on the merged base. The existing PASS remains valid
+and is re-attested at head `4af7c98d5` on base `e341c6f71`.
+
+[PHASE: IMPL-EVAL] [VERDICT: PASS]

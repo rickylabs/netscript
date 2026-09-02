@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-cli-resource-slice-templates--1354-d` |
 | Branch | `feat/cli-resource-slice-templates` |
-| Baseline | `f2696ea88700b7f8e9db3a77a307719e802bc7f9` |
+| Baseline | started at `f2696ea88700b7f8e9db3a77a307719e802bc7f9`; rebased onto merged #1946 squash `e341c6f71033658099f694c4d8542a9676e6c68d` |
 | PLAN-EVAL | N/A — master plan already passed; this leaf implements locked Slice D |
 
 ## Design
@@ -40,7 +40,8 @@
 - [x] Carrier cascade committed and four post-commit freshness checks green.
 - [x] Full package gates green.
 - [x] Separate-session IMPL-EVAL complete.
-- [ ] Non-draft stacked PR opened with required metadata.
+- [x] Non-draft PR #1948 opened with required metadata; #1946 merged and its deleted branch made
+  `main` the contingency base.
 
 ## Implementation evidence
 
@@ -83,6 +84,25 @@
 The post-commit freshness quartet exits, in required reporting order, is `0 / 0 / 0 / 0` for
 assets barrel, publish assets, MCP export corpus, and emitted samples.
 
+## Post-#1946 rebase evidence
+
+- #1946 squash-merged as `e341c6f71` while this run was preparing its PR, and GitHub deleted
+  `feat/cli-resource-slice-contract`; the agentic PR endpoint therefore rejected that base as
+  invalid (HTTP 422).
+- Rebased only the two Slice D commits with
+  `git rebase --onto origin/main f2696ea88700b7f8e9db3a77a307719e802bc7f9`.
+- The sole conflict was the ceiling-exempt `embedded.generated.ts` carrier and was resolved by
+  `gen:assets-barrel`, never by hand. The full three-stage carrier cascade then produced a clean
+  worktree on the merged base (35 packages, 273 subpaths, 7,834 symbols; hash `087da112…`).
+- Rebased product commit: `792b7199b`; post-rebase freshness quartet: `0 / 0 / 0 / 0`; focused
+  tests: 12 passed / 0 failed / 0 ignored.
+- PR #1948: <https://github.com/rickylabs/netscript/pull/1948>, base `main`, non-draft, milestone
+  `0.0.7`, labels `orchestrator:features`, `status:impl`, `type:feat`, `area:cli`, `priority:p2`,
+  `wave:v1`.
+- IMPL phase receipt: <https://github.com/rickylabs/netscript/pull/1948#issuecomment-5515429255>.
+- IMPL-EVAL phase receipt:
+  <https://github.com/rickylabs/netscript/pull/1948#issuecomment-5515502617>.
+
 ## Formal evaluation
 
 - Native opposite-family Claude Fable 5 launched with explicit medium effort.
@@ -93,3 +113,10 @@ assets barrel, publish assets, MCP export corpus, and emitted samples.
 - Verdict: `PASS` at product/implementation head `5fd40ef1368bce264ec2aa5f8ab66bd301f8e340`.
 - `evaluate.md` independently reproduces the touch-set, D3/D4, carrier, focused test, consumer,
   check, lint/fmt, architecture, quality, publish, and docs evidence.
+- Post-merge evaluator handle `8e239bc9`, Claude Code session
+  `session_01WzYLuPFGFShNKrTpGzAWfj`, independently re-attested `PASS` at rebased head
+  `4af7c98d5a180eeaf989fcf8f08ab4c4c25f74de` on #1946 squash base `e341c6f71`.
+- Rebase evaluation observed 18 planned product paths + 8 run artifacts, 17/17 hand-authored
+  product files byte-identical to the prior PASS, generated carrier fresh, focused tests 12/12,
+  structured check 935 files / 8 batches / 0 diagnostics, freshness `0 / 0 / 0 / 0`, 12 direct
+  children, and no `resource-slice` architecture finding.

@@ -33,3 +33,15 @@
 - **Severity:** minor documentation availability drift.
 - **Action:** use the installed `deno-fresh` skill and checked-in Fresh 2.x source/tests.
 
+## 2026-09-02 — stacked base merged before PR creation
+
+- **What:** PR #1946 squash-merged and GitHub deleted `feat/cli-resource-slice-contract` before
+  this slice's PR was created.
+- **Expected:** Open Slice D with that live branch as its stacked base; the supervisor rebases onto
+  `main` after #1946 merges.
+- **Actual:** The repository-native create endpoint rejected the deleted base with HTTP 422. The
+  post-merge contingency was immediately active.
+- **Severity:** expected lifecycle transition, no scope expansion.
+- **Action:** rebase only D's two commits onto the #1946 squash (`e341c6f71`), regenerate the
+  ceiling-exempt embedded carrier, verify the exact 18-file product diff and all freshness checks,
+  then open PR #1948 against `main`.
