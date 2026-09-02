@@ -1,0 +1,23 @@
+// @netscript/directory-role shared: loaders and shared route types only
+import { dehydrateQueryClient } from '@netscript/fresh/query';
+import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
+import { {{queryFactoryName}} } from '{{clientModuleSpecifier}}';
+
+export const {{resourceCamelCase}}Input = {};
+
+export async function load{{resourcePascalCase}}Resource() {
+  const queryClient = createNetScriptQueryClient();
+  const queryOptions = {{queryFactory}}.queryOptions({{resourceCamelCase}}Input);
+  const cachedAt = Date.now();
+  const initialData = await queryClient.fetchQuery({
+    ...queryOptions,
+    queryKey: {{queryFactory}}.clientKey({{resourceCamelCase}}Input),
+  });
+
+  return {
+    input: {{resourceCamelCase}}Input,
+    initialData,
+    cachedAt,
+    dehydratedState: dehydrateQueryClient(queryClient),
+  };
+}

@@ -81,6 +81,20 @@ const ASPIRE_HELPER_TEMPLATE_URLS: TemplateUrlMap = {
   runToolTemplate: TEMPLATE_KEYS.aspireHelpersRunTool,
 } as const;
 
+const RESOURCE_SLICE_TEMPLATE_URLS: TemplateUrlMap = {
+  routeContractTemplate: TEMPLATE_KEYS.resourceSliceIndexRoute,
+  pageTemplate: TEMPLATE_KEYS.resourceSliceIndex,
+  layoutTemplate: TEMPLATE_KEYS.resourceSliceIndexLayout,
+  viewTemplate: TEMPLATE_KEYS.resourceSliceComponentsResourceView,
+  islandTemplate: TEMPLATE_KEYS.resourceSliceIslandsResourceIsland,
+  loadersTemplate: TEMPLATE_KEYS.resourceSliceSharedResourceLoaders,
+  formComponentTemplate: TEMPLATE_KEYS.resourceSliceComponentsResourceForm,
+  formContractTemplate: TEMPLATE_KEYS.resourceSliceLibResourceForm,
+  summaryComponentTemplate: TEMPLATE_KEYS.resourceSliceComponentsResourceSummary,
+  partialRouteTemplate: TEMPLATE_KEYS.resourceSlicePartialsSummary,
+  streamIslandTemplate: TEMPLATE_KEYS.resourceSliceIslandsResourceStream,
+} as const;
+
 type TemplateMap<T extends Record<string, TemplateKey>> = {
   readonly [Key in keyof T]: string;
 };
@@ -92,6 +106,9 @@ export type ExampleServiceAppTemplateAssets = TemplateMap<
 export type RootScaffoldTemplateAssets = TemplateMap<typeof ROOT_TEMPLATE_URLS>;
 export type AspireHelperTemplateAssets = TemplateMap<
   typeof ASPIRE_HELPER_TEMPLATE_URLS
+>;
+export type ResourceSliceTemplateAssets = TemplateMap<
+  typeof RESOURCE_SLICE_TEMPLATE_URLS
 >;
 
 async function loadTemplateMap<T extends Record<string, TemplateKey>>(
@@ -127,4 +144,10 @@ export async function loadAspireHelperTemplateAssets(): Promise<
   AspireHelperTemplateAssets
 > {
   return await loadTemplateMap(ASPIRE_HELPER_TEMPLATE_URLS);
+}
+
+export async function loadResourceSliceTemplateAssets(): Promise<
+  ResourceSliceTemplateAssets
+> {
+  return await loadTemplateMap(RESOURCE_SLICE_TEMPLATE_URLS);
 }

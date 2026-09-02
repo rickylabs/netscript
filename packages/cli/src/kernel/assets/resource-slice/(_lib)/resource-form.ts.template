@@ -1,0 +1,20 @@
+// @netscript/directory-role lib: route-local pure contracts and helpers only
+import { z } from 'zod';
+
+export const {{resourceCamelCase}}FormSchema = z.object({
+  note: z.string().trim().min(3, 'Note must be at least 3 characters').max(160),
+});
+
+export type {{resourcePascalCase}}FormValues = z.infer<
+  typeof {{resourceCamelCase}}FormSchema
+>;
+
+export const {{resourceCamelCase}}FormInitialValues: {{resourcePascalCase}}FormValues = {
+  note: '',
+};
+
+export function copy{{resourcePascalCase}}FormValues(
+  values: {{resourcePascalCase}}FormValues,
+): {{resourcePascalCase}}FormValues {
+  return { ...values };
+}
