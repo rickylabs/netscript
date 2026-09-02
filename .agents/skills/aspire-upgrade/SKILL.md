@@ -84,9 +84,13 @@ compat branch is deleted.
 ### The generated-carrier chain (four gates)
 
 Any prose or template change ripples: `skills/` + `.agents/skills/` prose -> `gen:mcp-export-corpus`
--> `gen:assets-barrel` (`embedded.generated.ts`, `skills.generated.ts`) -> `check:publish-assets`.
-Regenerate in that order on a **clean tree** (the corpus generator refuses a dirty read set) and run
-`deno task agentic:dogfood-skills` for the consumer bundle. Never hand-edit a `*.generated.ts`.
+-> `gen:assets-barrel` (`embedded.generated.ts`, `skills.generated.ts`) -> `check:publish-assets`. A
+`docs/site/**` page edit starts one hop earlier: `gen:agent-docs-prose` (site build ->
+`prose.json.gz` + `provenance.json`) -> barrel (`agent-docs.generated.ts`) -> `gen:publish-assets`
+(`packages/mcp/src/publish-assets.generated.ts`); run `check:agent-docs-prose` locally before
+pushing (D-331 cost one CI cycle). Regenerate in that order on a **clean tree** (the corpus
+generator refuses a dirty read set) and run `deno task agentic:dogfood-skills` for the consumer
+bundle. Never hand-edit a `*.generated.ts`.
 
 ### Runtime evidence is leased and serialized
 
