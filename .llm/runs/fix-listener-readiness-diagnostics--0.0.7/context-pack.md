@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-listener-readiness-diagnostics--0.0.7` |
 | Branch | `fix/listener-readiness-diagnostics` |
-| Current phase | `gate` |
+| Current phase | `evaluate` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service` |
 
@@ -27,13 +27,12 @@ The E2E deadline discards the resource lifecycle and sibling health evidence nee
 
 ## In Progress
 
-- Record final evidence, push the explicit refspec, and open the draft PR.
+- Draft PR #1959 is open; final run-artifact receipt commit remains to push.
 
 ## Next Steps
 
-1. Commit final evidence and push the explicit refspec.
-2. Open the draft PR with the brief's labels/milestone.
-3. Leave separate-session IMPL-EVAL and hosted consecutive runs to the supervisor.
+1. Push the final run-artifact receipt commit.
+2. Leave separate-session IMPL-EVAL and hosted consecutive runs to the supervisor.
 
 ## Key Decisions
 

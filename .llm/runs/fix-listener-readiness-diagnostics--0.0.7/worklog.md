@@ -97,6 +97,7 @@ loop or a literal timeout at the gate call site.
 | 2026-09-03T00:22Z | 2G | Full-suite correction | Complete helper directory found one stale old-helper import assertion (276 passed / 2 failed); updated the assertion before rerunning the directory. |
 | 2026-09-03T01:05Z | 2G | Full-suite GREEN | Complete helper directory passed 278/278; E2E gate directory passed 183/183. Both source checks passed with zero diagnostics. |
 | 2026-09-03T01:07Z | 3 | Quality gates | E2E lint and focused E2E format passed. Root configuration excludes `packages/cli` template sources, so template lint/fmt wrappers refused with `all-excluded`; emitted helper format is independently green in the 278-test helper suite. Version parity, quality scan, and doctrine check passed. |
+| 2026-09-03T01:12Z | 3 | Draft PR | Pushed explicit refspec at `8d7a6178a` and opened draft PR #1959 with `Refs #1844`, requested labels, milestone `0.0.7`, and hosted/IMPL-EVAL boxes left open. |
 
 ## Decisions
 
@@ -156,3 +157,4 @@ loop or a literal timeout at the gate call site.
 
 - Evaluator should inspect the final deadline classification and confirm the endpoint timeout reports reachability semantics without forcing state.
 - IMPL-EVAL is mandatory and supervisor-dispatched in a separate session.
+- Draft PR: #1959. Hosted proof has not been claimed or dispatched by this lane.
