@@ -10987,3 +10987,11 @@ Microfix merged with ci green and docker-tier e2e success at `998f8e031` — the
 source. Next canary's pinned prod E2E is the receipt; a dedicated watcher reports per-step and the
 `behavior.live-db-endpoint` gate outcome. #1952 still awaits Aspire's re-dispatched verdict after my
 incident (D-272); no internals action on it.
+
+### D-274 — Aspire's re-dispatched GLM xhigh evaluator: VERDICT PASS at 478450a3c; #1952 handed off, no duplicate packet
+
+Aspire re-ran the authoritative evaluator after my incident and posted `VERDICT: PASS` plus their own
+exact-head merge packet. Internals completed only the mechanics it owned: DoD box 24 ticked against
+that verdict, box 23 against e2e `33694943994`, close-gate rerun fired with `ready-merge` present.
+Posted a hand-off note instead of a second packet — one packet per PR. The #1880/#1952 transfer is
+complete from Internals' side; merge is the coordinator's.
