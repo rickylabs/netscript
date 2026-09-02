@@ -942,3 +942,15 @@ the merge.**
   worktree fast-forwarded. Tiers at `f8b0b4a26` were cancelled by the superseding push; `ci` +
   `e2e-cli` now running at `478450a3c`. Next: on green → `status:impl-eval` + separate-session
   IMPL-EVAL.
+
+## 2026-09-02 23:4xZ — #1953 shipped; #1952 tiers at 478450a3c; #1961 noted
+
+- **#1953 merged** by the coordinator at exact head `07c4a0b93` after cycle-2 PASS + green
+  close-gate; main → `f589d251a`. Relabelled `status:ready-merge` → `status:shipped`; eval worktrees
+  `007-eval-1953`, `007-eval-1957` and slice worktree `007-aspire-upgrade-skill` removed.
+- Canary 7 `behavior.live-db-endpoint` microfix is **#1961**, coordinator-owned and in flight; the
+  Aspire lane does not touch it.
+- **#1952** stays at `478450a3c` (base `ba6f1f49a`); main `f589d251a` differs only by #1953's
+  `.agents/skills/**` files, disjoint from this PR — no re-merge pushed so the running tiers are not
+  cancelled again. IMPL-EVAL brief pre-staged at `slices/leaf-1880/impl-eval-brief.md` (hosted
+  evidence placeholders filled on tier completion).
