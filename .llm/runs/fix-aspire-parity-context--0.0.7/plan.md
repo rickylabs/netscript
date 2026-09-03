@@ -19,10 +19,14 @@ because those working copies are now wholly outside the scan domain.
 3. Tests prove excluded rows are never read, live manifest contains no run/transient rows, and the
 same violations in framework/docs still fail. Preserve shipped generated source and compat cases.
 4. Make one stale resource-name JSDoc version-neutral; do not change grammar/runtime.
-5. Regenerate the manifest from its canonical generator. No consumer bundle edits or manual TSV.
+5. Regenerate the manifest from its canonical generator. No manual TSV edits.
 6. Record the durable scan-versus-retention rule in AGENTS.md; extend the existing tests only.
 7. Keep the shipped host-port checker import-closed: declare its scope helper as a consumer-tools
 support module and regenerate its canonical embedded carrier. Existing bundle closure tests prove it.
+8. Preserve functional generated-project acceptance under scratch: the existing scaffold E2E
+caller explicitly selects `--generated-project`; only transient paths inside that project are
+ignored. Repository sweeps still exclude the entire scratch parent. Regressions prove a real
+generated appsettings host-port defect remains red and internal run artifacts remain excluded.
 
 Gates: baseline red, focused tests/check/lint/fmt, phases 1 and 2 including manifest freshness,
 source-quality/architecture review, CI, independent substantive review and formal IMPL-EVAL.

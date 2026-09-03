@@ -15,3 +15,9 @@ This changes scan inputs only, not tracked-file retention or functional release 
 host-port checker is also a shipped consumer tool, so its new shared scope module must be declared
 in consumer-tools.json and regenerated into agent-tools.generated.ts. Added this necessary import
 closure and canonical carrier regeneration to the same owner-requested fix; no new entrypoint.
+
+2026-09-03 D-4: tracing the shipped checker found an existing functional caller deliberately
+validates a scaffold under .llm/tmp. Blindly applying repository exclusions there would hide a
+real generated-project defect. Added an explicit one-root --generated-project mode, wired the
+existing E2E caller, and proved both the bad generated app and its excluded internal run history.
+This preserves acceptance; it does not put incidental scratch back into repository static scans.

@@ -60,3 +60,19 @@ No extra executable tool or external dependency. The focused suite including the
 relative-import closure test passes58/58. Regeneration changes only agent-tools.generated.ts.
 No lock movement. Consume the original c487e9273 evaluation then review this bounded dependency/
 carrier correction on the same independent evaluator session; no unrelated source changes.
+
+## Generated-project safeguard — 2026-09-03 09:19Z
+
+Kept repository scans blind to run/scratch artifacts, but preserved the existing release fixture's
+deliberate validation of a scaffold created under scratch. The host-port checker accepts one
+explicit --generated-project root; the E2E caller selects it. Its internal .llm/runs remains
+excluded. Regenerated the embedded carrier after this change. No application/runtime output change.
+
+- Structured focused suite: 64 passed, 0 failed/ignored, including both boundary regressions and
+  the existing shipped-import-closure tests.
+- Structured check and format: all 12 selected files processed, no failures or diagnostics.
+- Structured lint: initial invocation used an unsupported wrapper flag and exited before lint;
+  corrected to the documented --config option with the existing no-exclusion lint config.
+- Phase 2: 867 maintained paths, 0 failures/missing, manifestFresh true. Host ports: 966 files, PASS.
+- Independent evaluation is still running on c487e9273; this later delta needs its own receipt
+  in that same independent session before approval. CI quality on 3b6dac6dd is now green.

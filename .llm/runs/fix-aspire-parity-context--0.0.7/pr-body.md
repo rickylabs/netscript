@@ -9,6 +9,8 @@ maintained docs; correct negative-guard/compatibility classification and one sta
 - Area: tooling validation; package change is comment-only.
 - Part of #1712. Remaining epic gates include published canary and clean-machine receipts.
 - Shared exclusion policy covers parity, host-port and polling checks. Run files remain committed.
+- Explicit generated-project acceptance still checks its scaffold under scratch; internal run
+  artifacts stay excluded. The shipped checker/helper bundle is regenerated and import-closed.
 - No workflow, dependency, scaffold-output or runtime behavior change.
 
 ## Slices
@@ -19,9 +21,9 @@ maintained docs; correct negative-guard/compatibility classification and one sta
 
 ## Validation
 
-Baseline full phase 2 failed five paths. Now: 58 focused tests PASS (including shipped import closure); full phase 2 PASS (867 checked,
+Baseline full phase 2 failed five paths. Now: 64 focused tests PASS (including shipped import closure and generated-project boundaries); full phase 2 PASS (867 checked,
 0 failures, 0 missing, fresh manifest); host-port scan PASS (966 files); selected source
-check/lint/fmt PASS (10/10 processed). Independent IMPL-EVAL and current CI pending.
+check/lint/fmt PASS (12/12 processed). Independent IMPL-EVAL and current CI pending.
 No runtime/scaffold-output changes; this leaf does not replace the parent release gates.
 
 ## Harness
