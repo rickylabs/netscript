@@ -28,3 +28,23 @@ Future entries are append-only. In particular, implementation must record drift 
   surface, mechanism, or runtime change.
 - **Evidence:** CI run `33715250151`, job `100523026122`, uploaded `test.report.json`: 5235 passed /
   1 failed, exact diff `21` vs `22` at the named order test.
+
+## D-3 — Canonical app-reference probe retained the retired showcase contract
+
+- **Severity:** minor
+- **Observed:** After merging `origin/main` `e14322c511` (#1956), exact-head SQLite/Garnet runtime
+  job `100572750365` passed `scaffold.design-production-exclusion` and then failed only
+  `behavior.app-reference`. The browser probe still requested seven legacy `?preview=` states and
+  asserted showcase `data-state` markers, while #1956 intentionally retired that complete asset
+  family and made the generated Form-B resource slice canonical at `/examples/users`.
+- **Ruling:** Keep the root and `/design/composition` browser expectations, and replace only the
+  retired preview-state expectations with stable generated-resource markers at `/examples/users`.
+  Do not restore deleted showcase product assets or weaken the design-route assertions.
+- **Scope effect:** One existing E2E probe and its focused test under authorized
+  `packages/cli/e2e/**`; no scaffold product source, runtime implementation, or public surface
+  change.
+- **Evidence:** Run `33731627085`, SQLite/Garnet report: 83 passed / 1 failed;
+  `scaffold.design-production-exclusion` returned clean/mutation/restored `true/true/true`, then
+  `behavior.app-reference` failed on `/examples/users?preview=loading` missing
+  `data-state="loading"`. Test-first RED reproduced 1 passed / 2 failed; the bounded probe/test
+  repair passes 54/54 with the service/runtime order and suite-registry contracts.

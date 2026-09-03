@@ -15,24 +15,9 @@ const EXPECTED_VIEWPORTS = [
 const EXPECTED_STATES = [
   { path: '/', markers: ['href="/design"', 'href="/design/composition"'] },
   { path: '/design/composition', markers: ['Composition', 'L0'] },
-  { path: '/examples/users?preview=loading', markers: ['data-state="loading"'] },
   {
-    path: '/examples/users?preview=error',
-    markers: ['data-state="error"', 'Resource list unavailable'],
-  },
-  { path: '/examples/users?preview=empty', markers: ['data-state="empty"', 'No resources yet'] },
-  { path: '/examples/users?preview=success', markers: ['data-state="success"'] },
-  {
-    path: '/examples/users?preview=optimistic',
-    markers: ['data-state="optimistic"', 'Optimistic update is visible'],
-  },
-  {
-    path: '/examples/users?preview=rollback',
-    markers: ['data-state="rollback"', 'saved cache snapshot was restored'],
-  },
-  {
-    path: '/examples/users?preview=confirmed',
-    markers: ['data-state="confirmed"', 'service confirmed the mutation'],
+    path: '/examples/users',
+    markers: ['Cache-first query', 'server cache hydration.'],
   },
 ] as const;
 
@@ -56,11 +41,11 @@ Deno.test('reference probe renders every named state at desktop and mobile viewp
   assertEquals(observed.some((entry) => entry.startsWith('mobile:')), true);
 });
 
-Deno.test('reference probe rejects the old route with no rendered state marker', () => {
+Deno.test('reference probe rejects a resource route with no generated-slice marker', () => {
   const expectation = REFERENCE_EXPECTATIONS.find((candidate) =>
-    candidate.path === '/examples/users?preview=rollback'
+    candidate.path === '/examples/users'
   );
-  if (!expectation) throw new Error('rollback expectation missing');
+  if (!expectation) throw new Error('resource expectation missing');
 
   assertThrows(
     () =>
@@ -70,7 +55,7 @@ Deno.test('reference probe rejects the old route with no rendered state marker',
         REFERENCE_VIEWPORTS[0],
       ),
     Error,
-    'did not render data-state="rollback"',
+    'did not render Cache-first query',
   );
 });
 
