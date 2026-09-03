@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-09-03T12:38:53.118Z",
+  "capturedAt": "2026-09-03T12:45:23.633Z",
   "pullRequests": [
     {
       "number": 1696,
@@ -623,6 +623,15 @@
       "baseBranch": "main",
       "headSha": "0475c32134166b9ba60ce1ea1a53c6abcc5af695",
       "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1983,
+      "issueNumbers": [],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "832e53720baf7a8d11e132d93582c48879a4628e",
+      "state": "open",
       "role": "leaf"
     }
   ]

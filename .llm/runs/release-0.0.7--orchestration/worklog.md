@@ -1,5 +1,33 @@
 # Worklog — release 0.0.7
 
+## 2026-09-03 owner wrap-up: cache objection and clean resume
+
+Owner requests wrap-up because usage is low and challenges treating cached Docker images as bad.
+Ordinary CI benefits from image caching. The new strict baseline came specifically from issue1881's
+explicit no-warm-images cold-machine acceptance, not a product failure or general cache policy.
+Hosted rehearsal33756743492 at1983/832e53720 failed BEFORE README with appHosts0,containers0,
+images6,volumes0,networks0. Image identities were not captured, so relevance is unproven.
+Do not represent this as a broken NetScript runtime or as a passing quickstart.
+
+The proposed isolated Docker-daemon setup was NOT implemented or run. Its only uncommitted
+exploratory RED regression (8 pass/1 fail) was removed with an exact owned patch; source worktree
+is restored to the reviewed/pushed832e53720. No image/cache/resource deletion or daemon mutation.
+Do not revive that overcomplicated setup automatically. On resume reconcile the cold-test acceptance
+with owner's cache objection, inspect whether cached images are relevant, and choose the narrow
+evidenced correction; retain README-first order and genuine fresh application state.
+
+Authorization IS FIXED: explicit GH_CONFIG_DIR=/home/agent/.config/netscript-release-gh verified
+rickylabs and gist/read:org/repo/workflow through status plus API. Keep credentials outside Git.
+PR1983 exists, ready for review, same independent PASS source832e53720. Core check/quality still
+running at wrap-up; close-gate fails its honest unchecked hosted-rehearsal DoD. No waived gate.
+No new version minted. Main075ea8ed7 includes merged1945;1481/1971 closed/shipped. Only issue1881,
+863 and1712 remain. Native product readiness at075ea8ed7 PASS all9 checks/35members; preserve
+receipts/final-product-readiness-075ea8ed7.ndjson. This does not substitute for published E2E.
+
+No new author/evaluator sessions. Existing supervisor identities/routes preserved. Last NAS audit
+12:44:29Z: Aspire0,containers0,custom networks0. Primary deno.lock and .vite remain unrelated and
+untouched. Owner instruction is to wrap up now, not to cut or silently waive cold acceptance.
+
 ## 2026-09-03 12:35Z final product merge and auth non-retention
 
 Merged #1945 at075ea8ed7a027c8485db3c2ac183d0af5e1b2d35, immutable PR head

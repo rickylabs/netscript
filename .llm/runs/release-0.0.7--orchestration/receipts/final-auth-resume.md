@@ -1,5 +1,10 @@
 # Final permission boundary and immediate resume
 
+AUTH SOLVED: use GH_CONFIG_DIR=/home/agent/.config/netscript-release-gh; scopes include workflow.
+Owner now requests wrap-up and questions the strict cached-image check. Latest context-pack is
+authoritative:1983 pushed, rehearsal33756743492 failed only on6 preloaded images before README.
+Do not request another login, mint a canary, or start the abandoned second-daemon approach.
+
 Current update12:35Z:1945 merged as075ea8ed7;1481/1971 closed. Three acceptance issues remain.
 The renewed device flow completed but the selected credential still has repo only. Isolated
 GH_CONFIG_DIR=/home/agent/.config/netscript-release-gh login is pending in exec59710.

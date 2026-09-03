@@ -4617,6 +4617,22 @@
       "implementationEvaluationVerdict": "PASS",
       "implementationEvaluatedProductHeadSha": "bdb5de2bd14173b36276f59048a444f8873985bc",
       "implementationEvaluationArtifact": "receipts/pr-1981-openrouter-eval-33715860434.md"
+    },
+    {
+      "id": "readme-cold-release-proof",
+      "lane": "internals",
+      "phase": "gating",
+      "baseBranch": "main",
+      "headSha": "832e53720baf7a8d11e132d93582c48879a4628e",
+      "currentPrHeadSha": "832e53720baf7a8d11e132d93582c48879a4628e",
+      "issueNumbers": [],
+      "branch": "fix/readme-cold-release-proof",
+      "prNumber": 1983,
+      "worktree": "/home/agent/projects/netscript/worktrees/007-readme-cold-release-proof",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "832e53720baf7a8d11e132d93582c48879a4628e",
+      "nextGate": "Owner wrap-up: rehearsal33756743492 failed images6 only; core CI pending, narrow cold-policy reconciliation on resume.",
+      "reconciledAt": "2026-09-03T12:45:23.633Z"
     }
   ],
   "evaluatorLeases": [
@@ -5769,12 +5785,17 @@
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-03T12:38:53.118Z",
+    "capturedAt": "2026-09-03T12:45:23.633Z",
     "prs": [
+      {
+        "number": 1983,
+        "topic": "coordinator",
+        "role": "release-proof"
+      },
       {
         "number": 1641,
         "topic": "coordinator",
-        "role": "harness-only, never product release barrier"
+        "role": "coordinator-artifact"
       }
     ]
   },
@@ -5955,7 +5976,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T12:38:53.118Z",
+  "updatedAt": "2026-09-03T12:49:51.131Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6040,25 +6061,25 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T12:38:53.118Z",
-    "nextReportDueAt": "2026-09-03T13:38:53.118Z",
+    "lastReportAt": "2026-09-03T12:49:51.131Z",
+    "nextReportDueAt": "2026-09-03T13:44:51.131Z",
     "lastReportRef": "receipts/final-auth-resume.md",
-    "headline": "Final product PR1945 merged;1481/1971 closed. Three release-acceptance issues remain. Device approval completed but available GH credential still has repo only; isolated release login required.",
+    "headline": "Owner-requested wrap-up. Product PRs merged and readiness PASS;1983 rehearsal stopped before README on6 cached runner images, not a product failure. Authorization solved.",
     "currentMainSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
       "state": "qualifying",
       "eta": {
-        "window": "Conditional on workflow authorization, cold-proof rehearsal, final CI and native canary production pair; no trustworthy clock ETA yet.",
+        "window": "Held for owner-requested wrap-up and narrow cold-test/cache reconciliation; no new canary minted.",
         "confidence": "low",
-        "basis": "All product PRs merged; hosted cold-proof rehearsal against existingcanary9 must precede minting."
+        "basis": "Strict baseline0/0/6/0/0 rejected a fresh hosted runner before application execution; actual image relevance unknown."
       },
       "criticalPath": [
         {
           "id": "cold-proof",
           "state": "gating",
           "impact": "1881/863/1712 need truly cold hosted README acceptance.",
-          "nextAction": "Isolated workflow-scoped login; push832e53720, CI and existingcanary9 rehearsal before minting."
+          "nextAction": "Reconcile owner cache objection with1881 cold acceptance; inspect cache relevance, retain fresh-app requirements; do not restart abandoned daemon-isolation approach."
         },
         {
           "id": "canary-pair",
@@ -6085,16 +6106,24 @@
         1971
       ],
       "newIssues": [],
-      "queueDeltaExplanation": "Final product PR merged. Only coordinator tracking1641 open; reviewed cold-workflow832e53720 remains local pending workflow credential."
+      "queueDeltaExplanation": "Only primary tracking1641 and cold-proof1983 open; all product PRs merged. Three published-acceptance issues remain owned."
     },
     "scope": {
       "openIssueCount": 3,
       "ownedIssueCount": 3,
       "scheduledIssueCount": 3,
-      "openPullRequestCount": 1,
+      "openPullRequestCount": 2,
       "unscheduledIssueNumbers": []
     },
-    "mergeQueue": [],
+    "mergeQueue": [
+      {
+        "prNumber": 1983,
+        "lane": "internals",
+        "state": "repairing",
+        "nextGate": "33756743492 failed strict baseline on6 cached images; no README command ran. Core CI running; close-gate reports unchecked hosted proof.",
+        "nextAction": "Owner wrap-up now. On resume make the narrow evidence-based cold-test correction; no broad cache deletion or canary before gates."
+      }
+    ],
     "orchestratorMatrix": [
       {
         "lane": "features",
@@ -6114,11 +6143,13 @@
       },
       {
         "lane": "internals",
-        "state": "complete",
-        "activeItems": [],
-        "lastConcreteProgressAt": "2026-09-03T07:59:00Z",
-        "blocker": "Native Fable monthly cap. Specialized Aspire ownership is recorded separately; not an internal implementation queue.",
-        "nextAction": "No new internal feature scope; coordinator continues independent Aspire published acceptance."
+        "state": "blocked",
+        "activeItems": [
+          1983
+        ],
+        "lastConcreteProgressAt": "2026-09-03T12:49:51.131Z",
+        "blocker": "Owner-requested wrap-up; cold baseline needs narrow cache-policy reconciliation, not more implementation fanout.",
+        "nextAction": "Resume1983 from clean832e53720; inspect baseline and cache relevance, no automatic daemon setup."
       },
       {
         "lane": "docs",
@@ -6197,43 +6228,32 @@
         "ownerDecisionRequired": false
       },
       {
-        "id": "github-workflow-auth",
-        "category": "infrastructure",
-        "summary": "Device flow reported success; gh auth status and API independently still report only repo scope, no user-keyed credential. Cause of non-retention unproven.",
-        "impact": "Blocks workflow push and final canary admission; product merges complete.",
-        "owner": "owner",
-        "nextAction": "Authorize an isolated release login and verify actual scopes before push.",
-        "ownerDecisionRequired": true
+        "id": "cold-cache-baseline",
+        "category": "test-harness",
+        "summary": "New strict1881 baseline rejects6 preloaded images; apps/containers/volumes/custom networks all0.",
+        "impact": "Rehearsal stopped before README; not evidence of a framework defect. Cold proof remains unverified.",
+        "owner": "coordinator",
+        "nextAction": "Reconcile owner cache objection on resume; abandoned daemon-isolation experiment removed, not implemented.",
+        "ownerDecisionRequired": false
       }
     ],
     "environment": {
-      "checkedAt": "2026-09-03T10:30:00Z",
+      "checkedAt": "2026-09-03T12:44:29Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
     },
-    "ownerDecisions": [
-      {
-        "id": "github-workflow-auth",
-        "question": "Approve isolated release GitHub login so workflow permission is retained.",
-        "whyOwnerOnly": "GitHub rejects the new e2e-cli-prod.yml workflow commit because the stored credential only has repo scope; only the account owner can grant the permission.",
-        "blockedItems": [
-          1881,
-          863,
-          1712
-        ]
-      }
-    ]
+    "ownerDecisions": []
   },
   "releasePreflight": {
-    "gitHead": "94fe507af47171cd4f295e8f532b281d7147b334",
+    "gitHead": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
     "worktree": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
     "command": "mise exec -- deno task publish:readiness",
     "rawExitCode": 0,
     "ok": true,
     "version": "0.0.6",
     "publishableMembers": 35,
-    "scope": "Read-only readiness rehearsal on pre-bump main. No tag/version/publish; must repeat at final candidate. Not a green canary pair.",
-    "observedAt": "2026-09-03T08:21:00Z"
+    "scope": "Read-only composed readiness,9 checks PASS; native NDJSON in receipts/final-product-readiness-075ea8ed7.ndjson. Repeat after release-proof merge. No canary minted.",
+    "observedAt": "2026-09-03T12:45:23.633Z"
   }
 }
