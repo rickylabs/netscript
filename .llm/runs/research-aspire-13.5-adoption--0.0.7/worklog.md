@@ -1118,3 +1118,9 @@ the merge.**
   `slices/leaf-1881-fix/impl-eval-brief.md`, verdict → `impl-eval-verdict.md`. Watcher armed on
   verdict + PR checks. Exact-head CI: code-quality pass; quality/check-test pending; close-gate red
   only on the open IMPL-EVAL box.
+- 02:3xZ #1975: quality red = "Aspire version parity (phase 1)" manifest freshness (branch-caused:
+  six new Aspire-mentioning harness/test files). Same worker regenerated the manifest → head
+  `8e54ccfa1` (product diff identical to `0650f6f7b`; only `.llm/` changed). IMPL-EVAL **PASS**
+  (GLM 5.3 Flash xhigh; `impl-eval-verdict.md`; F1–F4 informational) posted as
+  issuecomment-5519404999; DoD IMPL-EVAL box ticked. Exact-head CI: quality pass, code-quality
+  pass, close-gate pass, check-test pending; zero review threads.
