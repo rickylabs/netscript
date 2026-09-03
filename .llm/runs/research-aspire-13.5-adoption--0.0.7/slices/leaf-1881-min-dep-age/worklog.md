@@ -46,7 +46,30 @@ text, scope, assertions, gates, and prohibited alternatives.
 | Date | Slice | State | Evidence |
 | --- | --- | --- | --- |
 | 2026-09-03 | 0 | complete | Clean exact baseline verified; required skills, doctrine, archetype, docs overlay, and gate references read. |
+| 2026-09-03 | 1 | RED | Commit `a3f929c23` changes only expected-command/test contracts. Focused wrapper exited 1: 7 passed, 3 failed. Both drift tests showed actual old command versus expected flagged command; application test threw `README Quickstart command 1 diverged` with the same expected/received text. |
+| 2026-09-03 | 2 | GREEN | Commit `86c71bc97` changes only the root README, docs Quickstart/callout, and package README. The same focused wrapper exited 0: 10 passed, 0 failed. |
+| 2026-09-03 | 3 | carriers | `check:agent-docs-prose` first named two stale outputs; `gen:agent-docs-prose`, `gen:assets-barrel`, and `gen:publish-assets` produced four derived files committed in `e6dbee80d`. All four carrier checks then exited 0. |
+| 2026-09-03 | 3 | manifest | Initial parity reported manifest freshness only; generator completed with `rows=943 unmatched=0`; parity then exited 0 with `manifestFresh:true` and no failures. |
 
 ## Gate results
 
-Pending.
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| Focused RED | 1 expected | 7 passed, 3 failed; actual unflagged commands differed from expected flagged contracts. |
+| Focused GREEN | 0 | 10 passed, 0 failed; exact source-command and argv provenance covered. |
+| `check:agent-docs-prose` | 0 | final check fresh after matching generator; initial stale check exited 1 and named only its two outputs. |
+| `check:assets-barrel` | 0 | final clean generated diff after carrier commit. |
+| `check:publish-assets` | 0 | generated publish asset matches source carrier. |
+| `check:mcp-export-corpus` | 0 | 35 packages, 273 subpaths, 7,841 symbols. |
+| Scoped E2E check | 0 | 236 files, 2 batches, 0 findings. |
+| Full nested E2E tests | 0 | 334 passed, 0 failed. |
+| Scoped E2E format | 0 | 236 processed, 0 findings/refusals. |
+| Changed handwritten TS lint | 0 | 3 processed, 0 findings/refusals. Generated files were generator-checked; an exploratory all-changed run exited 2 on the wrapper's expected generated-file exclusion with zero lint findings. |
+| README Quickstart gate listing | 0 | 11 ordered commands; command 1 displays the exact minimum-age flag. |
+| Docs accuracy | 0 | 200 published source pages and 91/91 root/direct public commands checked. |
+| Docs links | 0 | 105 docs; 0 broken links/anchors/orphans. |
+| README standard | 1 baseline | Only `packages/bench/README.md` lacks an Install section at baseline `3149d18e1`; untouched. |
+| Quality/doctrine gate | 0 | quality scan clean; doctrine reports no failures, only pre-existing warnings. |
+| Aspire version parity | 0 | `counts.fail:0`, `manifestFresh:true`; initial freshness-only red regenerated as required. |
+
+No runtime suite, Aspire process, Docker command, install, publish, or workflow command ran.
