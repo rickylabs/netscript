@@ -12,9 +12,10 @@
 
 ## Current State
 
-The fresh branch is based on `79adb103b`. The accepted parent contract and the owner-provided
-remainder brief are authoritative. No production types have been edited; the next action is the
-defect-specific RED test commit.
+PR #1970 is in implementation repair after a supervisor audit of head `feb55c046`. The
+schema-backed contract and literal registry are implemented; the repair migrates all named
+first-party consumers, fixes the standalone validation example, and aligns workers doctor with the
+literal registry format.
 
 ## Completed
 
@@ -24,14 +25,13 @@ defect-specific RED test commit.
 
 ## In Progress
 
-- RED runtime and compile-time consumer proofs.
+- Commit and push the repair plus RED→GREEN gate receipts for evaluator handoff.
 
 ## Next Steps
 
-1. Commit and push RED tests with defect-specific failure receipts.
-2. Implement core schema carrier/validation.
-3. Implement literal generation and typed `triggerJob`.
-4. Run gates and open the required ready PR.
+1. Commit and push the repair.
+2. Update PR #1970 with the repair receipt.
+3. Hand off to the separate evaluator session.
 
 ## Key Decisions
 

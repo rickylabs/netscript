@@ -7,10 +7,6 @@ import type {
 } from '@netscript/plugin-triggers-core/domain';
 import type { JobDefinition } from '@netscript/plugin-workers-core';
 
-type HealthCheckPayload = Readonly<{
-  verbose: boolean;
-}>;
-
 type GenericInboundWebhookDefinition = WebhookDefinition<
   'generic-inbound-webhook',
   TriggerEvent<'webhook', WebhookTriggerPayload<unknown>>,
@@ -27,7 +23,7 @@ const workersPluginHealthCheckJob = {
 export const genericInboundWebhook: GenericInboundWebhookDefinition = defineWebhook(
   () =>
     Promise.resolve([
-      enqueueJob<'workers-plugin-health-check', HealthCheckPayload>(workersPluginHealthCheckJob, {
+      enqueueJob(workersPluginHealthCheckJob, {
         payload: { verbose: false },
         priority: 50,
       }),

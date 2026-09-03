@@ -27,3 +27,17 @@ Drift is append-only.
 - **Action:** accept; do not introduce v2.
 - **Evidence:** contract soundness test and unchanged `JobTriggerInputZodSchema` runtime value.
 
+## 2026-09-03 — supervisor-expanded first-party repair ceiling
+
+- **What:** The hosted workspace check exposed schema-less first-party consumers in
+  `plugins/triggers` and one `plugins/sagas` runtime test, outside the original implementation
+  ceiling.
+- **Source:** Supervisor repair steer for PR #1970 at `feb55c046`.
+- **Expected:** The remainder brief limited implementation to workers-core, workers, one CLI
+  fixture, tests, and the run directory.
+- **Actual:** The owner explicitly required either an unsafe compatibility overload or migration of
+  every named first-party consumer; the same steer authorized those consumer files.
+- **Severity:** significant
+- **Action:** migrate the named consumers to schema-backed handlers, retain the schema-required
+  public contract, and make no trigger-core or unrelated plugin changes.
+- **Evidence:** repo-wide `deno task check` and focused trigger/saga test receipts in `worklog.md`.

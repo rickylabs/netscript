@@ -42,6 +42,11 @@ export class JobPayloadValidationError extends TypeError {
  *
  * @example
  * ```ts
+ * import { validateJobPayload } from '@netscript/plugin-workers-core/runtime';
+ * import { z } from 'zod';
+ *
+ * const schema = z.object({ documentId: z.string() });
+ * const input: unknown = { documentId: 'doc-123' };
  * const payload = await validateJobPayload(schema, input, 'embed-document');
  * ```
  *
