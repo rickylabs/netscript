@@ -307,6 +307,19 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
 
     await client.send('Page.navigate', { url });
     await client.waitFor('Page.loadEventFired');
+    try {
+      const finalUrl = await evaluate<string>(client, 'document.location.href');
+      assertExpectedAppPage(url, finalUrl);
+    } catch (error) {
+      const diagnostics = await captureOptimisticRenderDiagnostics(
+        client,
+        undefined,
+        undefined,
+        false,
+        pageDiagnostics.snapshot(),
+      );
+      throw diagnosticsError('browser target origin assertion failed', diagnostics, error);
+    }
     const instrumentation = await evaluate<BrowserInstrumentationInstall>(
       client,
       installOptimisticInstrumentationExpression(),
@@ -899,23 +912,56 @@ function isRpcPath(url: string | undefined, path: string): boolean {
   }
 }
 
-interface DebugTarget {
+export interface DebugTarget {
+  readonly type?: string;
+  readonly url?: string;
+  readonly webSocketDebuggerUrl?: string;
+}
+
+export interface PageDebugTarget extends DebugTarget {
+  readonly type: 'page';
   readonly webSocketDebuggerUrl: string;
 }
 
-async function waitForDebugTarget(port: number): Promise<DebugTarget> {
-  let target: DebugTarget | undefined;
+/** Select only a page target, matching the generated-island hydration probe. */
+export function selectPageDebugTarget(
+  targets: readonly DebugTarget[],
+): PageDebugTarget | undefined {
+  return targets.find((target): target is PageDebugTarget =>
+    target.type === 'page' && typeof target.webSocketDebuggerUrl === 'string'
+  );
+}
+
+/** Refuse to probe a non-web target or a page outside the generated app origin. */
+export function assertExpectedAppPage(expectedUrl: string, finalUrl: string | undefined): void {
+  const expected = new URL(expectedUrl);
+  let actual: URL | undefined;
+  try {
+    actual = finalUrl === undefined ? undefined : new URL(finalUrl);
+  } catch {
+    // The shared error below retains the exact malformed target URL.
+  }
+  const isWebPage = actual?.protocol === 'http:' || actual?.protocol === 'https:';
+  if (isWebPage && actual?.origin === expected.origin) return;
+  throw new Error(
+    `attached CDP target ended at ${JSON.stringify(finalUrl ?? null)}; ` +
+      `expected an http(s) page on ${expected.origin}`,
+  );
+}
+
+async function waitForDebugTarget(port: number): Promise<PageDebugTarget> {
+  let target: PageDebugTarget | undefined;
   await waitUntil(async () => {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/json/list`);
       const targets = await response.json() as DebugTarget[];
-      target = targets.find((entry) => typeof entry.webSocketDebuggerUrl === 'string');
+      target = selectPageDebugTarget(targets);
       return target !== undefined;
     } catch {
       return false;
     }
-  }, 'Chrome DevTools target');
-  return target as DebugTarget;
+  }, 'Chrome DevTools page target');
+  return target as PageDebugTarget;
 }
 
 function reservePort(): number {

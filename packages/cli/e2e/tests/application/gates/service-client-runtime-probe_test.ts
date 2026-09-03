@@ -11,12 +11,14 @@ import { z } from 'zod';
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
 import { createBrowserPageDiagnosticsCollector } from '../../../src/application/gates/scaffold/service-client-browser-diagnostics.ts';
 import {
+  assertExpectedAppPage,
   awaitBrowserStartup,
   BROWSER_EXECUTABLE_ENV,
   captureBoundedText,
   CdpClient,
   probeBrowserVersion,
   selectBrowserExecutable,
+  selectPageDebugTarget,
   terminateBrowserProcess,
   waitForCompletedStableBaseline,
 } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
@@ -925,6 +927,47 @@ Deno.test('browser page diagnostics retain document status, client failures, and
       errorText: null,
     }],
   });
+});
+
+Deno.test('browser target selection ignores extension backgrounds and chooses the page', () => {
+  const extensionTarget = {
+    type: 'background_page',
+    url: 'chrome-extension://nkeimhogjdpnpccoofpliimaahmaaome/background.html',
+    webSocketDebuggerUrl: 'ws://localhost/devtools/page/extension',
+  };
+  const pageTarget = {
+    type: 'page',
+    url: 'about:blank',
+    webSocketDebuggerUrl: 'ws://localhost/devtools/page/app',
+  };
+
+  assertStrictEquals(selectPageDebugTarget([extensionTarget, pageTarget]), pageTarget);
+  assertEquals(selectPageDebugTarget([extensionTarget]), undefined);
+});
+
+Deno.test('browser target origin guard accepts only the generated app web origin', () => {
+  assertExpectedAppPage(
+    'http://127.0.0.1:5173/examples/users',
+    'http://127.0.0.1:5173/examples/users?mode=success',
+  );
+  assertThrows(
+    () =>
+      assertExpectedAppPage(
+        'http://127.0.0.1:5173/examples/users',
+        'chrome-extension://nkeimhogjdpnpccoofpliimaahmaaome/background.html',
+      ),
+    Error,
+    'chrome-extension://nkeimhogjdpnpccoofpliimaahmaaome/background.html',
+  );
+  assertThrows(
+    () =>
+      assertExpectedAppPage(
+        'http://127.0.0.1:5173/examples/users',
+        'http://127.0.0.1:4173/examples/users',
+      ),
+    Error,
+    'expected an http(s) page on http://127.0.0.1:5173',
+  );
 });
 
 Deno.test('live service refetch targets the same canonical page as island hydration', async () => {
