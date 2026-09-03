@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `public-query-client observer correction locally green; hosted proof pending` |
+| Current phase | `merge-readiness evidence complete; acceptance synchronized; final evidence push pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
@@ -26,9 +26,12 @@ then falsified its private Preact traversal in both tiers (SQLite 86/1, PostgreS
 passed). The current correction imports the existing public `@netscript/fresh/query` browser module,
 requires the generated `users.list` entry in its singleton, and invalidates that same client. Fresh
 proportional exact-head local evidence is green (focused 120/120, full CLI 1,795/1,795, check 0
-diagnostics, lint/fmt clean, architecture and quality green). Isolated hosted acceptance and
-IMPL-EVAL are pending, so PR #1958
-stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
+diagnostics, lint/fmt clean, architecture and quality green). Changed-head hosted run `33736497671`
+is also green: PostgreSQL 103/103 and SQLite 98/98, with resource first-run/rerun stdout, generated
+check/lint/fmt, complete browser tail, and cleanup all passing. Fresh separate-session IMPL-EVAL
+cycle 4 returned `PASS_IMPL_WITH_FINDINGS`; both findings are informational and non-blocking. Final
+GitHub acceptance/lifecycle synchronization is now authorized; the PR remains open and must not be
+merged by this lane.
 
 ## Completed
 
@@ -43,13 +46,13 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## In Progress
 
-- Isolated hosted acceptance and fresh separate-session IMPL-EVAL for the eighteen-file amended product head.
+- Commit and push the final tracked receipt, prevent an unchanged-product runtime rerun, verify the
+  close-gate and review-thread state, and deliver the merge packet without merging.
 
 ## Next Steps
 
-1. Commit and push the public-singleton local evidence.
-2. Run both isolated hosted runtime tiers; do not use a host runtime lease.
-3. Obtain a fresh separate-session IMPL-EVAL, then update #1354/#1958 only from green evidence.
+1. Commit/push tracked receipts, cancel any evidence-only synchronize runtime before it executes,
+   and deliver the verified merge packet without merging.
 
 ## Key Decisions
 
@@ -70,18 +73,19 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | PASS | Focused 119/119; full CLI 1,794/1,794; check 1,004 files/0 diagnostics; lint/fmt 18 files/0 findings. |
+| Static | PASS | Focused 120/120; full CLI 1,795/1,795; check 1,004 files/0 diagnostics; lint/fmt 18 files/0 findings. |
 | Fitness | PASS | `arch:check` and `quality:gate` exit 0; `FAIL=0`; scanner findings 0. |
-| Runtime | #1354 path advanced / corrected head pending | Run `33731170586`: `behavior.app-reference` passed; PostgreSQL 90/1 and SQLite 85/1 then failed only at stale `behavior.island-served-surface`; cleanup passed. Run `33732473476` was canceled before runtime after proactive inspection found the next stale hydration/refetch assertions. |
+| Runtime | PASS | Run `33736497671`: PostgreSQL 103/103 and SQLite 98/98; resource first run/rerun, generated check/lint/fmt, app reference, served surface, hydration, refetch, and cleanup all exited 0. |
 | Consumer | PASS | Guidance, first-write, identical zero-write rerun, UI ordering, and generated-project quality/type-check all executed successfully. |
+| Fresh IMPL-EVAL | PASS_WITH_FINDINGS | Cycle 4: `PASS_IMPL_WITH_FINDINGS`; two informational, non-blocking findings; exact-head independent focused 68/68 + 35/35, full CLI 1,795/1,795, check 0 diagnostics, lint/fmt clean, fitness green, hosted artifacts independently hash-matched. |
 
 ## Open Questions
 
-- Whether both isolated database tiers complete the corrected `PeopleIsland` served, hydration, and one-refetch tail.
+- None in product/runtime scope; only final lifecycle synchronization remains.
 
 ## Drift and Debt
 
-- Drift: captured-stdout reachability required item 8; PR #1891 authorized it. Later hosted runs and a proactive tail trace exposed stale preview-state, island-showcase, hydration, and Rename-refetch probes inherited from the pre-Slice-F scaffold. They are now aligned to the neutral generated resource inside the owner-accepted eighteen-file boundary; hosted proof remains pending.
+- Drift: captured-stdout reachability required item 8; PR #1891 authorized it. Later hosted runs and a proactive tail trace exposed stale preview-state, island-showcase, hydration, and Rename-refetch probes inherited from the pre-Slice-F scaffold. They are aligned to the neutral generated resource inside the owner-accepted eighteen-file boundary and proven by both hosted tiers.
 - Debt: none.
 
 ## Commits
@@ -92,4 +96,9 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 - Current-main merge: `964d3cdd344828126fd90227bd7618c2bd41845e` merged `origin/main`
   `94fe507af47171cd4f295e8f532b281d7147b334` without rebasing; exact-head evidence after the final
   doctrine cleanup is pending.
-- PR: #1958, head `feat/cli-resource-slice-acceptance`, base `main`, status `status:impl-eval`.
+- Public-client product head: `9cba13fec997ed4839e95940a4ddc5f0d01ab3ae`; pushed evidence head:
+  `0e1717dab754a84229b02eee8143138cd4f60fa9`; hosted run `33736497671` is green in both tiers.
+- Fresh IMPL-EVAL cycle 4: `PASS_IMPL_WITH_FINDINGS` via the lane-policy fallback evaluator
+  `z-ai/glm-5.3-flash`; both findings are informational and non-blocking.
+- PR: #1958, head `feat/cli-resource-slice-acceptance`, base `main`; lifecycle synchronization to
+  `status:ready-merge` is authorized, but this lane does not merge.

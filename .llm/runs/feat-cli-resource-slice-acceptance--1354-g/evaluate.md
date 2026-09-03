@@ -311,3 +311,112 @@ Per the brief, the expensive Aspire/browser suite was **not** rerun here. The re
 | ----- | ----- |
 | Verdict | **PASS_IMPL** (evaluation cycle 3 of 3; harness class: `PASS`) |
 | Rationale | All approved-scope product work at the pushed live-main head is complete and independently verified: exactly the eight authorized product files over `origin/main`, `deno.lock` byte- and hash-unchanged, final Slice F preserved through a true merge, executed `RUNTIME_GATES` order `database.codegen → generated.service-client-contract → scaffold.resource-generate → scaffold.resource-rerun → scaffold.ui-data-screen → generated quality/type-check` mirrored in composition and pinned by direct + resolved-suite tests, exact command and rerun-captured summary, minimal item-8 fake, shared-sentence guidance in both convention documents with exact referenced paths. Independent fresh runs at this session reproduce the author's Tier-A evidence (focused 46/46, full CLI 1788/1788, check 1004 files/0 diagnostics, lint/fmt 8/8 clean, `arch:check` and `quality:gate` exit 0 with FAIL=0). No unrecorded doctrine violation; no new or deepened debt; run artifacts are resume-complete. This PASS explicitly does **not** assert a green runtime suite: the isolated hosted `scaffold.runtime` receipt was still in flight at evaluation time, the close-gate is red on the pending issue-acceptance boxes, and both PR DoD boxes for those facts remain honestly unchecked. Lifecycle may advance only after the independent hosted receipt lands and the acceptance evidence is mirrored. |
+
+---
+
+# Evaluation cycle 4: amended eighteen-file acceptance boundary at the decisive hosted head
+
+**Verdict: PASS_IMPL_WITH_FINDINGS** (two informational, non-blocking findings; harness class `PASS` — this PASS authorizes #1354/#1958 acceptance synchronization and ready-for-merge status, not the merge)
+
+## Evaluator identity and route
+
+| Field | Value |
+| ----- | ----- |
+| Requested evaluator | Native Anthropic Claude, Fable 5 family, medium effort (`supervisor.md` route table) — primary native launch previously failed before an evaluation turn with `unrecognized_model`/HTTP 404 (session `885a699a-4550-4d38-a533-b16d91a763d1`, recorded in cycle 3) |
+| Observed evaluator (this session) | **Claude Code transport, OpenRouter provider, `z-ai/glm-5.3-flash`** — the lane-policy-approved fresh fallback evaluator route (preset `claude-evaluator-glm-5-3-flash`, `lane-policy.md` fallback for `formal_impl_evaluation`); `supervisor.md` binds this preset to effort `max` |
+| Effort attestation | The model/transport above is observed from the running session; the `max` binding is the run's recorded lane-policy fallback value, which I cannot re-verify from inside the session. The protocol capability table confirms this model returns a real reasoning trace and a verified agentic turn, so all gate runs below are genuine executions. No OpenHands run is involved and no OpenHands effort is claimed |
+| Fresh-session statement | This is a brand-new evaluator session: separate from the Codex/GPT-5 author session (`supervisor.md`), separate from the cycle-1/2/3 evaluator sessions, and separate from the interrupted pre-fix session `b0a5a6db-10f5-43cc-9ee2-d69f1d92319c`. It ran no implementation: no product code modified, no commit, no push, no merge, no GitHub mutation. All GitHub access was read-only `gh api`. The only tracked mutation is this appended cycle-4 receipt; all evaluator scratch lives in gitignored `.llm/tmp/` |
+| Inputs read | `/home/agent/AGENTS.md`, repo `AGENTS.md`, `CLAUDE.md`, complete `netscript-harness`, `netscript-cli`, `netscript-tools`, `netscript-doctrine`, `netscript-pr`, `deno-fresh` SKILL instructions, `.llm/harness/evaluator/protocol.md` + `verdict-definitions.md`, all nine run artifacts, and the full 18-file product diff |
+
+## Exact state (all verified live, not assumed)
+
+| Field | Required | Observed | Result |
+| ----- | -------- | -------- | ------ |
+| Branch | `feat/cli-resource-slice-acceptance` | same | PASS |
+| PR #1958 | open vs `main` | open, non-draft, base `main`, head_sha `0e1717dab754a84229b02eee8143138cd4f60fa9`, unmerged; exactly one `status:` (`status:impl-eval`), milestone `0.0.7` | PASS |
+| Evidence HEAD | `0e1717dab754a84229b02eee8143138cd4f60fa9` | same (`git rev-parse HEAD`) | PASS |
+| Product HEAD | `9cba13fec997ed4839e95940a4ddc5f0d01ab3ae` | same (evidence commit's sole product parent; `0e1717dab` touches only run artifacts) | PASS |
+| Merged baseline | `origin/main` `94fe507af47171cd4f295e8f532b281d7147b334` | same, and `git rev-parse origin/main` equals it | PASS |
+| True merge | `964d3cdd344828126fd90227bd7618c2bd41845e` | parents `2c759c874` (branch) + `94fe507af` (`origin/main`); merge without rebase | PASS |
+| Slice F (#1956) preserved | byte-preserved | `git diff 94fe507af..HEAD -- packages/ plugins/` contains **only** the 18 authorized paths; zero other product paths differ from `origin/main` | PASS |
+| Product scope | exactly 18 existing `packages/cli` paths | `git diff --name-status 94fe507af..HEAD -- packages/ plugins/` = 18 files (12 M, 6 A… counted below), 716 insertions / 169 deletions; nothing outside `packages/cli`; `plugins/` empty | PASS |
+| `deno.lock` | unchanged | `git diff 94fe507af..HEAD -- deno.lock` = 0 lines | PASS |
+| Debt registry | no new/deepened entries | `.llm/harness/debt/arch-debt.md` diff vs baseline = 0 lines | PASS |
+| Working tree | only expected mutation | three author-owned run artifacts (`context-pack.md`, `drift.md`, `worklog.md`) modified, uncommitted; no untracked files | PASS |
+
+## Hosted receipt audit (cross-checked, not inferred)
+
+| Check | Observed | Result |
+| ----- | -------- | ------ |
+| Run `33736497671` | event `pull_request`, head_sha `0e1717dab754a84229b02eee8143138cd4f60fa9`, status `completed`, conclusion **success** | PASS |
+| PostgreSQL job `100588348258` | conclusion **success**; raw suite log line `Summary: passed=103 failed=0 skipped=0` | PASS |
+| SQLite/Garnet job `100588348306` | conclusion **success**; raw suite log line `Summary: passed=98 failed=0 skipped=0` | PASS |
+| Artifact authenticity | re-downloaded artifacts `e2e-cli-scaffold-runtime-report` (id 9886263754) and `…-sqlite-report` (id 9886192569) from run `33736497671`; both `head_sha=0e1717dab…`; SHA-256 of downloaded `e2e-report-scaffold-runtime.json` = `9bc9b01e701248eb82634dff789f4ebf196ee7ee2459880f7e70dbcd7d2439b6` and of `e2e-report-scaffold-runtime-sqlite.json` = `733714b78faf3d39965ff679e13b04b6bc61dd5fdd91be9eba5680b6b81998d9` — **byte-identical** to the local `.llm/tmp/run-33736497671-{postgres,sqlite}/` copies | PASS |
+| Report summary fields | postgres `ok:true, suiteId:scaffold.runtime, summary {103,0,0}`; sqlite `ok:true, suiteId:scaffold.runtime.sqlite, summary {98,0,0}`; project roots `/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260903-0901{53,58}` | PASS |
+| First-run gate (both tiers) | executed argv exactly `… netscript-dev.ts generate resource people --client users --procedure list --partial --app plugin-smoke-20260903-0901{53,58}-web`, `code:0`, 11 `WRITE` lines, final line `Resource slice applied: 11 written, 0 skipped, 0 conflicts.` | PASS |
+| Rerun gate (both tiers) | identical argv, `code:0`, 11 `SKIP` lines / 0 `WRITE`, final line exactly `Resource slice applied: 0 written, 11 skipped, 0 conflicts.` | PASS |
+| Executed order (both reports' step lists) | `database.codegen` → `generated.service-client-contract` → `scaffold.resource-generate` → `scaffold.resource-rerun` → `scaffold.ui-data-screen` → … → `generated.quality-negative`/`generated.deno-check`/`generated.deno-lint`/`generated.deno-fmt-check` → `behavior.app-reference` → `behavior.island-served-surface` → `behavior.island-hydration` → `behavior.service-client-refetch` → `cleanup.aspire-stop` | PASS |
+| App reference | `probe-app-reference.ts` exit 0 both tiers, stdout `generated app reference rendered 4 routes at desktop` / `… at mobile` (the two resource routes + `/` + `/design/composition`) | PASS |
+| Served surface / hydration / refetch | all three exit 0, `timedOut:false`, both tiers (observations persist to structured receipts; stdout empty by design) | PASS |
+| Cleanup | `cleanup.aspire-stop` exit 0 both tiers (plus `cleanup.docker-created-containers` on the SQLite tier) | PASS |
+
+## Falsification targets (all independently checked against source + tests + hosted receipt)
+
+| # | Target | Result | Evidence |
+| - | ------ | ------ | -------- |
+| 1 | Stable ids `scaffold.resource-generate` / `scaffold.resource-rerun` | PASS | `GATE` constants at `packages/cli/e2e/src/domain/cli-surface.ts:77-78` (diff-only +2 lines); both flow into `RUNTIME_GATES` and the hosted step ids |
+| 2 | Exact argv + 11-write/11-skip captured stdout | PASS | `resource-slice-gates.ts:7-11,45-59`: `people`, `--client users --procedure list --partial --app generatedAppName(context)`, `cwd: project.projectRoot`, `outputMode:'capture'` on both; rerun `stdoutIncludes: ['Resource slice applied: 0 written, 11 skipped, 0 conflicts.']`; `resource-slice-gates_test.ts:12-49` pins the full argv array, cwd, capture mode, and rerun stdout while asserting the first run has none; hosted reports prove both summaries verbatim (table above) |
+| 3 | Executed `RUNTIME_GATES` + `createScaffoldGates()` ordering | PASS | `capability-suites.ts:82-86` (codegen → contract → pair → UI data-screen) with `generated.quality-negative`/`generated.deno-check` at :100-101 and browser tail later; composition `scaffold-gates.ts:135` places `...createResourceSliceGates()` directly after the `GENERATED_SERVICE_CLIENT_CONTRACT` gate; tests pin `firstRun == serviceClientContract + 1` (composition) and the full executed adjacency on both the raw list and `resolveSuite(SCAFFOLD.RUNTIME)` |
+| 4 | Direct + resolved-suite reachability incl. suite-runner nominal fake | PASS | `RUNTIME_GATES` exported (`capability-suites.ts:62`) and materialized as the suite's gates (`:229`; SQLite tier is the pre-existing `RUNTIME_SQLITE_GATES` filter — no split command, no new suite); test asserts duplicate-free membership and adjacency on both surfaces; `suite-runner_test.ts` diff is exactly +2 lines — the nominal fake's `generate`+`resource` stdout branch emitting the 11-skip summary |
+| 5 | Rendered AGENTS/WEB-LAYER guidance + referenced paths | PASS | one shared `RESOURCE_GENERATION_GUIDANCE` constant rendered in `buildAppAgentsMarkdown` ("## Default architecture") and `buildWebLayerMarkdown` ("## One-screen path"), each before the numbered manual steps; new `agent-conventions_test.ts` pins presence+ordering in both renders and exact referenced-path lists with and without the example service; path existence is additionally covered by the pre-existing full-suite stat checks (1,795 green) |
+| 6 | Unresolved app-root fails loudly with zero writes | PASS | guard `generate-resource.ts:119` `if (!appRoot) throw new Error('Could not resolve a Fresh application root.')`; new `generate-resource-command_test.ts` case injects `resolveAppRoot: () => Promise.resolve(undefined)`, asserts the rejection message, `fixture.fs.getFiles()` byte-identical before/after, and `writes() === 0` |
+| 7 | Owner-authorized neutral-resource browser tail | PASS | `probe-app-reference.ts` now asserts neutral `/examples/users` (`Users`, `Cache-first query`, `Managed form`, `Deferred summary`) and generated `/people`, with all seven `?preview=` states removed and a test asserting none remain; `probe-island-served-surface.ts` now `PeopleIsland`/`/people` with its test pinning marker, `fresh:client-entry` module request, island module fetch, bundle hit, persisted failure receipt, fail-closed behavior, and `assertFalse(requested.some(url => url.includes('ServiceShowcaseLab')))`; hydration navigates `/people`, imports the public Vite module id `/@id/@netscript/fresh/query`, calls exported `getIslandQueryClient()` (verified exported at `packages/fresh/src/application/query/mod.ts:27`), requires the active `users.list` cache entry, and forbids private traversal (`assertFalse(source.includes('new WeakSet'))`; full file read — no Preact-internals walk remains); refetch invalidates that exact key on the same singleton and requires `finalListRequestCount === baseline + 1`, fails if the count exceeds expected, and requires 2xx; no Rename/preview contract remains in any executed probe; retired identities survive only as fixture strings in a pre-existing diagnostics unit test (Finding 2) |
+| 8 | No generator / Fresh runtime / template / suite / split-runtime change | PASS | diff touches no `generate-resource.ts`/`service-query`/Fresh runtime source; the only `src/kernel/templates/app` change is the guidance constant in `agent-conventions.ts` (+7 lines); `capability-suites.ts` diff is the export + gate reorder only; `scaffold.runtime` suite definition unchanged; zero added `deno-lint-ignore` / `as unknown as` / `as any` / `quality-allow` lines in the whole diff |
+| 9 | Doctrine/size, debt, topology, scope, lock | PASS | largest touched file `probe-island-hydration.ts` = 479 lines (< 500 cap); colocated `*_test.ts` is the established `e2e/src` and `templates/app` pattern; `arch-debt.md` unchanged; merge topology and 18-file scope as above; lock unchanged; `arch:check` CLI baseline `WARN=62 INFO=1` unchanged from recorded evidence |
+
+## Independent author-lane gate runs (this session, exact head `0e1717dab`, `mise exec --` pinned Deno 2.9.5, `TMPDIR=/var/tmp`)
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Focused touched regressions | `run-deno-test.ts --cwd packages/cli -- --allow-all` over the 8 touched test files | **PASS** exit 0; 68 passed / 0 failed / 0 ignored (1.47 s) |
+| Registry/runner regressions | same wrapper over `suite-registry_test.ts`, `suite-runner_test.ts`, `suite-lease_test.ts`, `gate-runner_test.ts`, `resource-slice-gates_test.ts` | **PASS** exit 0; 35 passed / 0 failed |
+| Full `packages/cli` unit suite | `run-deno-test.ts -- --allow-all packages/cli` (repo-root cwd, the author's invocation) | **PASS** exit 0; 1,795 passed / 0 failed / 0 ignored (73.8 s) |
+| Structured CLI check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | **PASS** exit 0; 1,004 files, 9 batches, 0 failed batches, 0 diagnostics |
+| Scoped lint (18 files) | `run-deno-lint.ts --config <no-exclusion scratch config> --file …` ×18 | **PASS** exit 0; 18 selected / 18 processed / 0 findings / 0 refusals |
+| Scoped format (18 files) | `run-deno-fmt.ts --config <same> --file …` ×18 | **PASS** exit 0; 18/18, 0 findings |
+| `arch:check` | `deno task arch:check` | **PASS** exit 0; every reported root `FAIL=0`; CLI `FAIL=0 WARN=62 INFO=1` (recorded baseline) |
+| `quality:gate` / `quality:scan` | `deno task quality:gate` (+ scan detail) | **PASS** exit 0; scanner `findings: []`, 7 pre-existing allowances (all issue #1276, none in touched files), 37/37 workspace members, 35 publishable |
+| Review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1958 --pretty` | **PASS** exit 0; `threads=0 unanswered=0` |
+
+Invocation note (disclosed for honesty, not a finding): a first full-suite invocation with `--cwd packages/cli` failed 1 of 1,795 — `render-resource-slice_test.ts` (a Slice-F-owned file, untouched here) resolves its type-check fixture parent from `Deno.cwd()`, so it requires the repo-root invocation. Re-running from the repo root reproduced the author's 1,795/0 exactly. Wrapper cwd sensitivity is an environment artifact of this evaluator, not a product defect.
+
+Carrier/docs/JSR/publish evidence is taken from the recorded author receipts (`worklog.md` Gate Results, PR body "Exact-head local validation") without rerun, per the brief: no discrepancy was found in any value I independently re-derived (file counts, diagnostic counts, arch baselines, scanner allowances, hosted totals all match exactly), and the diff touches no asset-barrel, carrier, or publish-surface source.
+
+## Findings
+
+| # | Severity | Finding | Required action |
+| - | -------- | ------- | --------------- |
+| 1 | informational (non-blocking) | The retired Rename browser machinery survives as **dead library code**: `collectBrowserRefetchEvidence` in `packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts` (pre-existing, outside the 18-file ceiling, untouched) now has zero callers — the slice removed its only import from `service-client-runtime-probe.ts` — and its module retains the Rename/`data-state` expressions plus a ServiceShowcaseLab URL fixture inside a pre-existing diagnostics unit test (`service-client-runtime-probe_test.ts:962-986`, not the touched test). The executed acceptance tail no longer references any of it; retention was forced by the owner's file ceiling. | None required for merge. Owner may schedule dead-probe removal as a later cleanup slice; do not expand this PR to remove it. |
+| 2 | informational (non-blocking) | The PR body (lines 97–100) still describes run `33736497671` as "executing / result pending" — accurate when written, stale now that both tiers are green. The two unchecked DoD boxes (hosted receipt; fresh IMPL-EVAL) remain honestly unchecked, so no false claim exists in the body. | Author, during the already-planned lifecycle sync: update that paragraph and check both DoD boxes with linked evidence when advancing to `status:ready-merge`. |
+
+## Anti-Pattern Check and Arch-Debt Delta
+
+| Item | Result |
+| ----- | ------ |
+| AP-18 (semantic over snapshot) | CLEAR — tests assert command arrays, ordering indices, membership, and exact required strings, never whole-document snapshots |
+| AP-23/AP-25 (suite/side effects) | CLEAR — composition stays declarative in `resource-slice-gates.ts`; static definitions and pure template tests introduce no side effects |
+| New/deepened/unrecorded debt | 0 / 0 / 0 (`arch-debt.md` unchanged vs baseline; `arch:check` FAIL=0 everywhere; no new suppressions or casts in the diff) |
+
+## Close-gate and lifecycle state
+
+- PR #1958: open, non-draft, unmerged, base `main`, head `0e1717dab`; labels carry exactly one `status:` (`status:impl-eval`); body uses `Refs #1354` **without** a closing keyword — correct while #1354 acceptance boxes are unchecked.
+- Issue #1354: open, 10 of 12 close-gated boxes checked; the 2 unchecked are the generator app-root negative test (now satisfied by the zero-write command regression) and the `gate: deno task e2e:cli run scaffold.runtime --cleanup` box (now satisfied by run `33736497671`). Both are exactly the boxes the owner's post-verdict lifecycle sync must check with linked evidence.
+- The close-gate is red today because of those unchecked boxes — the correct pre-sync state. Nothing in this cycle requires re-implementation.
+
+## Verdict
+
+| Field | Value |
+| ----- | ----- |
+| Verdict | **PASS_IMPL_WITH_FINDINGS** (evaluation cycle 4 of 4; harness class: `PASS`, two informational findings, neither blocking) |
+| Rationale | The complete amended Slice G acceptance boundary is verified at exact head `0e1717dab`/`9cba13fec`: exactly 18 authorized `packages/cli` product paths over `origin/main` `94fe507af`, final Slice F byte-preserved through a true merge, `deno.lock` and `arch-debt.md` unchanged. Both stable gate ids execute after `database.codegen` and `generated.service-client-contract`, before `scaffold.ui-data-screen` and generated quality/type-check, mirrored in composition and pinned by direct + resolved-suite tests; the exact `people --client users --procedure list --partial --app <app>` argv, captured 11-skip rerun stdout, item-8 fake, shared guidance sentence, unresolved-app-root zero-write regression, and the neutral `/examples/users` + `/people` browser tail through the public `@netscript/fresh/query#getIslandQueryClient` singleton with exactly one 2xx refetch are all proven in source, tests, and the decisive hosted receipt. Independent fresh gate runs reproduce the author's Tier-A evidence (focused 68/68 + 35/35, full CLI 1,795/0, check 1,004 files/0 diagnostics, 18-file lint/fmt clean, `arch:check` and `quality:gate` exit 0 with FAIL=0, review threads 0/0). The hosted receipt audit is cross-checked end-to-end: run `33736497671` success at the evidence head, PostgreSQL 103/0/0 and SQLite 98/0/0 with raw suite exit 0, and locally downloaded reports proven byte-identical (SHA-256) to freshly downloaded CI artifacts. No generator, Fresh runtime, template, parallel-suite, or split-runtime behavior change; no new or deepened debt. The two informational findings (retired dead probe code retained under the ceiling; stale pending-language in the PR body) require no product change. |
+| Lifecycle conclusion | This PASS authorizes the author/coordinator to (1) synchronize issue #1354's two remaining acceptance/gate boxes with linked evidence (the zero-write app-root regression and hosted run `33736497671`), (2) update PR #1958's body and check its two remaining DoD boxes, and (3) advance the PR to `status:ready-merge`. It does **not** authorize merging: humans merge by default, and the merge must follow the close-gate (`netscript-pr`) with the evidence mirror and a current close-gate run at the unchanged head `0e1717dab754a84229b02eee8143138cd4f60fa9`. |

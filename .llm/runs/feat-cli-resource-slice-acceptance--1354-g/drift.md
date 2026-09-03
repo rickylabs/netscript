@@ -200,3 +200,19 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
   no-`WeakSet` contract in the focused test.
 - **Boundary:** No Fresh or generator code changes. This is a correction inside the already accepted
   hydration/refetch probe and test paths; the eighteen-file product ceiling does not move.
+
+## 2026-09-03 — Public query-client seam closes the hosted tail
+
+- **What:** Changed-head GitHub Actions run `33736497671` completed both full, unsplit runtime tiers
+  after replacing private Preact-object traversal with the public
+  `@netscript/fresh/query#getIslandQueryClient` seam.
+- **Evidence:** PostgreSQL job `100588348258` exited 0 with 103 passed / 0 failed / 0 skipped;
+  SQLite/Garnet job `100588348306` exited 0 with 98 passed / 0 failed / 0 skipped. Both uploaded
+  reports show the resource command's `11 written` first run and `0 written, 11 skipped` rerun,
+  generated check/lint/fmt, app reference, `PeopleIsland` served surface, hydration, exactly one
+  successful resource-list refetch, and cleanup all passing with exit code 0.
+- **Resolution:** The earlier failures were acceptance-observer drift caused by carrying
+  pre-Slice-F showcase assumptions through a neutral resource replacement; they were not failures
+  of the shipped Slice F generator. The public query-client export is the stable observation seam.
+- **Boundary:** The final accepted product ceiling remains eighteen existing files. No generator,
+  Fresh runtime, template, lockfile, parallel suite, or split runtime command was added.

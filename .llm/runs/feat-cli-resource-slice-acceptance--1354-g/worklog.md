@@ -99,6 +99,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | doctrine cleanup | The first refetch implementation made `probe-island-hydration.ts` 560 lines and added an A8 size warning. Consolidated the duplicate browser lifecycle and query expressions inside the same accepted file and brought it within the 500-line doctrine cap; focused hydration/service-client tests pass 37/37. No debt exception was added. |
 | 2026-09-03 | G | complete-tail hosted diagnosis | Run `33735122923` passed static and `behavior.island-served-surface`, then both tiers failed only at the new hydration observer: SQLite 86/1, PostgreSQL 91/1, cleanup passed. Private Preact graph traversal could not find the QueryClient. Replaced it with the public browser module contract `@netscript/fresh/query#getIslandQueryClient`, required the generated `users.list` cache entry, and kept the refetch on that singleton. No generator/Fresh product code changed. |
 | 2026-09-03 | G | public-singleton exact-head gates | At product head `9cba13fec`, focused tests passed 120/120, full CLI passed 1,795/1,795, structured check covered 1,004 files with zero diagnostics, 18-file lint/fmt were clean, `arch:check` returned `FAIL=0` with CLI baseline `WARN=62`, and `quality:gate` returned 0 scanner findings / 7 allowances / 37 workspace members. |
+| 2026-09-03 | G | decisive hosted acceptance | Changed-head run `33736497671` completed successfully at evidence head `0e1717dab`: PostgreSQL job `100588348258` passed 103/103 and SQLite job `100588348306` passed 98/98, with zero failures/skips. In both reports the resource first run exited 0 with 11 writes, the identical rerun exited 0 with 11 skips, generated check/lint/fmt passed, the full app-reference/served-surface/hydration/refetch tail passed, and `cleanup.aspire-stop` exited 0. |
 
 ## Decisions
 
@@ -124,12 +125,13 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Runtime prerequisites were not traced at design time: codegen output and router-alias ownership both blocked the original gate. | high, resolved | yes |
 | Existing service-client order regression requires its contract probe immediately after codegen; the resource pair follows that probe within the same ceiling. | significant, resolved | yes |
 | Live-main UI data-screen mutation had to move after the resource pair; runtime prerequisites include prior shared-file mutations. | high, resolved | yes |
-| Shared-host Aspire/DCP advertised proxy ports diverged from healthy Docker mappings in two exact-head retries. | infrastructure, hosted proof pending | yes |
-| Isolated hosted runtime reaches the browser tail but `behavior.app-reference` still asserts retired Slice F preview-state DOM; its owning file is outside the Slice G ceiling. | high, unresolved | yes |
-| Owner-authorized hosted amendment reassigns stale browser/runtime probes to Slice G and expands the final ceiling to thirteen existing files. | significant, implemented; hosted proof pending | yes |
-| Final matrix found no generator-specific unresolved-app-root negative test in the merged suite. | acceptance, resolved by command-level zero-write regression; full-suite proof pending | yes |
-| Changed-head hosted run passed the corrected app-reference probe, then exposed the next pre-Slice-F `ServiceShowcaseLab` served-surface assertion. | significant, corrected; hosted proof pending | yes |
-| The next hydration/refetch gates also encoded `ServiceShowcaseLab` Rename/data-state behavior removed by Slice F. | significant, corrected within resource acceptance; hosted proof pending | yes |
+| Shared-host Aspire/DCP advertised proxy ports diverged from healthy Docker mappings in two exact-head retries. | infrastructure, superseded by green isolated hosted proof | yes |
+| Isolated hosted runtime reached a stale `behavior.app-reference` assertion for retired Slice F preview-state DOM. | high, resolved and hosted | yes |
+| Owner-authorized hosted amendment reassigned stale browser/runtime probes to Slice G and expanded the final ceiling to eighteen existing files. | significant, resolved and hosted | yes |
+| Final matrix found no generator-specific unresolved-app-root negative test in the merged suite. | acceptance, resolved by command-level zero-write regression and full-suite proof | yes |
+| Changed-head hosted run exposed the next pre-Slice-F `ServiceShowcaseLab` served-surface assertion. | significant, resolved and hosted | yes |
+| The hydration/refetch gates also encoded `ServiceShowcaseLab` Rename/data-state behavior removed by Slice F. | significant, resolved and hosted | yes |
+| Private Preact-object traversal was not a stable QueryClient observation seam. | significant, resolved through the public query-client export and hosted in both tiers | yes |
 
 ## Gate Results
 
@@ -211,17 +213,45 @@ and 35 publishable members.
 | superseded pending hosted run | CANCELED before runtime | Run `33732473476` | Proactive source trace found deterministic stale hydration/refetch assertions; no unchanged failing-head runtime rerun was consumed. |
 | first complete-tail hosted run (SQLite) | FAIL, exit 1 | 86 passed, 1 failed (`behavior.island-hydration`), cleanup passed | Run `33735122923`, job `100583852710`; served surface passed, private QueryClient traversal timed out. |
 | first complete-tail hosted run (PostgreSQL) | FAIL, exit 1 | 91 passed, 1 failed (`behavior.island-hydration`), cleanup passed | Run `33735122923`, job `100583852866`; same acceptance-observer failure. |
+| decisive hosted `scaffold.runtime` (PostgreSQL) | PASS, exit 0 | 103 passed, 0 failed, 0 skipped; cleanup exit 0 | Run `33736497671`, job `100588348258`; 11-write first run, identical 11-skip rerun, generated check/lint/fmt, app reference, served island, hydration, and one-refetch tail all passed. |
+| decisive hosted `scaffold.runtime.sqlite` | PASS, exit 0 | 98 passed, 0 failed, 0 skipped; cleanup exit 0 | Run `33736497671`, job `100588348306`; same complete resource/generated/browser proof on SQLite/Garnet. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| generated guidance/resource acceptance | PASS | focused structured tests: 68/68 plus exact-head runtime prefix | Runtime proved first write, zero-write rerun, UI ordering, and generated project check/lint/fmt before the later Aspire infrastructure timeout. |
+| generated guidance/resource acceptance | PASS | focused structured tests: 120/120 plus green two-tier hosted run `33736497671` | Runtime proved first write, zero-write rerun, UI ordering, generated project check/lint/fmt, browser hydration/refetch, and cleanup. |
 | stock-init resource command | PASS, exit 0 | sqlite init + service generation + database codegen + exact `generate resource people --client users --procedure list --partial --app cycle2-proof-web` twice | First stdout: `Resource slice applied: 11 written, 0 skipped, 0 conflicts.` Rerun stdout: `Resource slice applied: 0 written, 11 skipped, 0 conflicts.` |
+
+### Fresh IMPL-EVAL cycle 4
+
+The fresh separate-session evaluator completed at evidence head
+`0e1717dab754a84229b02eee8143138cd4f60fa9` and product head
+`9cba13fec997ed4839e95940a4ddc5f0d01ab3ae` with **`PASS_IMPL_WITH_FINDINGS`** (harness class
+`PASS`). The observed route was Claude Code transport through OpenRouter using
+`z-ai/glm-5.3-flash`; the run's lane-policy binding records `max` effort, which the evaluator could
+not independently attest from inside the session. Its independent gates all exited 0: focused
+68/68 plus 35/35, full CLI 1,795/1,795, structured check 1,004 files / 0 diagnostics, lint/fmt
+18/18 clean, `arch:check` every `FAIL=0`, `quality:gate` green, and review threads 0/0. It
+re-downloaded both hosted artifacts and SHA-256 matched them to the local receipts. Its two findings
+are informational and non-blocking: a retired pre-existing browser helper remains dead code outside
+the accepted ceiling, and the PR body still had the expected pre-verdict pending language. The
+verdict authorizes acceptance/body synchronization and `status:ready-merge`, not merging.
+
+### Acceptance synchronization
+
+Issue #1354 now has all 12 acceptance boxes checked and an evidence section naming the unresolved
+app-root zero-write regression, hosted run `33736497671`, both raw job totals, exact first-run/rerun
+stdout, and fresh cycle-4 evaluator verdict. The issue remains open. Issue #1354 and PR #1958 were
+advanced from `status:impl-eval` to `status:ready-merge`; PR #1958 remains open, non-draft, based on
+`main`, and uses `Refs #1354`. The final evidence-only push must not consume another unchanged-product
+runtime run.
 
 ## Handoff Notes
 
 - Inspect the two stable IDs, the `people` command arrays, direct `RUNTIME_GATES` selection, codegen/contract/resource materialized order, and identical guidance sentence first.
 - PR #1891 supplied the minimal plan amendment; the authorized item-8 fix is green in both focused and full-suite coverage.
-- PR #1958 targets `main`; lifecycle remains `status:impl-eval` because the corrected eighteen-file head still needs exact-head Tier A, a fresh IMPL-EVAL, and a green isolated hosted receipt.
-- Do not merge or add a closing keyword until both hosted tiers exit 0 and the last #1354 acceptance mappings are updated from exact evidence.
+- PR #1958 targets `main`; the corrected eighteen-file head has green exact-head Tier A, green
+  two-tier hosted acceptance, and a fresh cycle-4 evaluator PASS. Acceptance/lifecycle metadata is
+  synchronized; the final receipt push and close-gate verification remain.
+- Do not merge; human merge remains the next lifecycle action after the final close-gate.
