@@ -11131,3 +11131,10 @@ re-installs without `-f`. Deterministic fixture collision; #1967's min-dep-age f
 working (scaffold-runtime 97/97 green). `cleanup.aspire-stop` is downstream. Surfaced on #1641 with
 repair owner Aspire (#1965): isolate install root or uninstall before the walk; never edit README.
 No internals gate involved.
+
+### D-287 — reconcile at main 45e57377f: owned queue umbrella-only; Aspire's #1975 owns the Canary 9 quickstart repair
+
+Main `45e57377f`, ci green; releases through `v0.0.7-canary.9`, no stable tag. No open issue is
+internals-labelled or un-laned (0.0.7 or any milestone) besides #1641. Aspire opened #1975
+("isolate DENO_INSTALL_ROOT for the verbatim README walk", `status:impl`) — the exact repair
+surfaced in D-286; not duplicated. Harness branch merged to main. Nothing to dispatch.
