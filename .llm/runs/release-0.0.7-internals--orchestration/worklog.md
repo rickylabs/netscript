@@ -11106,3 +11106,11 @@ main authoritative). #1967 (`2fa5f60eb`) shows `mergeable_state=unstable`: `clos
 expected pre-`ready-merge` state, and its two `scaffold-runtime*` jobs on run `33700628150` are
 `cancelled` by per-ref supersession with the rerun `33701233530` pending. No repair-requiring
 failure; not surfaced.
+
+### D-284 — reset resume at main b6b9df966: owned queue is #1641 only; #1967 ready-merge; harness branch integrated
+
+Live: no open 0.0.7 issue is `orchestrator:internals` or un-laned besides umbrella #1641. #1965
+merged (main `b6b9df966`, ci green); #1967 promoted to `status:ready-merge` by Fixes — coordinator
+merge → Canary 9. Latest canary is still Canary 8 (`33697398852` failure). Harness branch merged to
+main again (`966278d18`, 0 behind). No internals-owned packet exists to hand off; nothing to
+dispatch or steer.
