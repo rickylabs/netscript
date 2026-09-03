@@ -1,5 +1,20 @@
 # Worklog — release 0.0.7
 
+## 2026-09-03: canary.10 pair GREEN; final cleanup inventory verification
+
+Published run33762898477 and exact production33763460542 both SUCCESS. Actual reports:
+README12+cleanup13/0; scaffold runtime104/0; quickstart7+cleanup/integrity9/0; no retries.
+Canary release notes exist, generated from21mergedPRs; Latest remains stable0.0.6.
+Receipt: receipts/canary10-green-pair.json. Source main stays a2d5b8b75, immutable tag170e33782.
+Final inspection found cleanup report proves containers only; it does not independently capture
+post-run AppHost/volume/network counts and injects an empty process list. Do not overclaim it.
+Verification-only branch test/readme-canary10-cleanup-proof@e677ac3c8 dispatch33765493143
+reruns only README against the SAME published canary.10 with four read-only post-run counts.
+No new version or product change; no NAS runtime lease. On complete green evidence close
+1881,863,1712, claim sole stable captain, native release:cut then release:publish with prepared
+release-0.0.7-intro.md. Stable publication plus artifact-pinned stable E2E remain mandatory.
+
+
 ## 2026-09-03 14:03Z — published canary and exact-main qualification
 
 Canary.10 is published; producer33762898477 now awaits pinned production run33763460542 at
