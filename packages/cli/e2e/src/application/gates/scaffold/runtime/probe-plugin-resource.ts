@@ -8,7 +8,9 @@ type ProbeAction =
   | 'trigger-webhook'
   | 'trigger-events';
 
+/** Application-effect retry cap; this probes HTTP results, not Aspire resource health. */
 const ATTEMPTS = 30;
+/** Application-effect retry delay; it is not an Aspire observation cadence. */
 const RETRY_DELAY_MS = 1_000;
 
 /** Probe a plugin resource through URLs allocated by the running Aspire AppHost. */

@@ -27,6 +27,7 @@ interface ProducerReconnectProbeResult {
 const PROBE_TIMEOUT_MS = 90_000;
 /** Test-failure ceiling for a hung resource follower; it is not a transition-time assumption. */
 const RESOURCE_EVENT_FAILURE_CEILING_MS = 120_000;
+/** Telemetry-export retry cap and delay; neither discovers Aspire resource state. */
 const TELEMETRY_ATTEMPTS = 30;
 const TELEMETRY_DELAY_MS = 500;
 const SERVICE_NAME = 'streams-producer-reconnect-probe';

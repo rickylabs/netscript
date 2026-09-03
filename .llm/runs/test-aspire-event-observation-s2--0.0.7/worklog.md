@@ -119,6 +119,35 @@ pinned base, and changing either is outside this slice. Running the same wrapper
 batches (`--exclude` for 218 root files, then the seven fixture files with `--config deno.json`)
 proves complete 225-file lint coverage with zero findings.
 
+## S3 — blocking-cap audit
+
+No cap was shortened. The Aspire skill records real 13.5.3 S2-host observations of 38.62s for a
+cold start, 24.80s for a second start, and 13.065s for isolated restore; its receipt pointer is
+`origin/test/aspire-13-5-s2-runtime-verification:.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/03-v9-aspire-restore.time.txt`.
+Three additional hosted scaffold-runtime receipts in this checkout provide the following observed
+distribution:
+
+| Hosted receipt | Restore | Start | Per-resource settled waits | Service-env | DB endpoint captures |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `fix-saga-span-emission-and-correlation--0.0.7/receipts/flow-b-scaffold-runtime-5b526e4bc-attempt2.json` | 3.562s | 9.133s | 0.258–6.101s | 0.616s | 0.336–0.359s |
+| `fix-saga-span-emission-and-correlation--0.0.7/receipts/scaffold-runtime-fresh-9d8bbb4e9.json` | 4.386s | 9.144s | 0.257–6.274s | 0.612s | 0.374–0.447s |
+| `fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/scaffold-runtime.json` | 9.298s | 23.003s | 0.323–40.456s | 1.039s | 0.425–0.825s |
+
+| Remaining cap | Classification and evidence |
+| --- | --- |
+| `READINESS_EVENT_FAILURE_CEILING_MS = 120_000` | Hung-stream failure ceiling. The hosted per-resource settled-wait distribution is 0.257–40.456s; 120s remains headroom, not correctness timing. |
+| `ENDPOINT_EVENT_FAILURE_CEILING_MS = 120_000` | Hung endpoint-follower failure ceiling. Hosted database endpoint captures settled in 0.336–0.825s, while the overall resource distribution reached 40.456s. |
+| `RESOURCE_EVENT_FAILURE_CEILING_MS = 120_000` | Hung induced-transition follower ceiling. The one hosted producer-reconnect gate completed its entire stop/recovery behavior in 12.168s; the broader resource distribution above remains the conservative evidence. |
+| `HEALTHY_TIMEOUT_SECONDS = 180` | Native first-readiness failure ceiling. Three hosted service-env gates completed in 0.612–1.039s; cold-start evidence reaches 38.62s. |
+| `ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000` | Infrastructure failure ceiling. Hosted restore distribution is 3.562–13.065s. Retries remain infrastructure-only. |
+| Quickstart `timeoutMs` = 180s at its suite caller | Command failure ceiling shared by restore/start/initial `aspire wait`. Observed restore/start distribution is 3.562–38.62s; no induced transition is involved. |
+| `PROBE_TIMEOUT_MS = 90_000` | Child-process output-marker ceiling, not a resource-health wait. The hosted full producer-reconnect gate completed in 12.168s. |
+| `TELEMETRY_ATTEMPTS` × `TELEMETRY_DELAY_MS` = 15s | Telemetry export/eventual-query bound after recovery, not a resource-state assertion; covered within the same 12.168s hosted gate. |
+| `probe-plugin-resource` 30 × 1s | Application HTTP-effect retry bound. Hosted app-home behavior took 0.383–0.553s; worker/event actions intentionally remain application-level probes. |
+
+Every source comment now names whether a retained value is a test-failure ceiling or a non-resource
+application retry. The polling guard's final allowlist is exactly the six concurrency-fenced files.
+
 ## Reconcile
 
 - S1 inventory reconciles with issue #1906: one direct non-fenced `aspire describe` poll remains at

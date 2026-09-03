@@ -28,7 +28,10 @@ export type AspireCommandRunner = (
   timeoutMs: number,
 ) => Promise<AspireCommandResult>;
 
-/** Execute restore, start, and database readiness as one independently reported Quickstart step. */
+/**
+ * Execute restore, start, and initial database readiness as one independently reported step.
+ * `timeoutMs` is a test-failure ceiling for hung commands, not an expected Aspire duration.
+ */
 export async function runBoundedAspireWalk(
   appHost: string,
   projectRoot: string,
