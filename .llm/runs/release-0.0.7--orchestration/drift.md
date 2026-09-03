@@ -13,7 +13,10 @@ on fix/cli-prepublish-test-fixture in 007-stable-fixture-repair, based on the un
 One publish-excluded test file changed: keep/assert public exact pin, then use checkout imports
 for real generate-resource calls. Focused full file 5/0, check/lint/fmt all PASS. No product file,
 manifest, generated output, or production behavior changed. Independent existing GLM session
-0039d1ad-72eb-4047-964c-8b326ff65902 is reviewing only that delta in 007-eval-readme-cold.
+0039d1ad-72eb-4047-964c-8b326ff65902 completed PASS on that delta at 14:54Z and fully exited:
+independent focused tests 5/0, check/lint/fmt green, exclusion and real subprocesses confirmed.
+Verdict and raw report: receipts/eval-readme-cold/evaluate-stable-fixture.md and
+stable-fixture-test-report.json. No live worker remains.
 
 Owner-only ruling requested asynchronously: may this test-only correction retain canary.10's
 proven product evidence? Native inheritance currently permits only a version-only immediate
