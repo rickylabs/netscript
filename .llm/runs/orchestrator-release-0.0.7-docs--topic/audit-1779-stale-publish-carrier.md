@@ -218,3 +218,11 @@ heading and exclude the `|` form.
   probes) + `packages/fresh/tests/**` browser fixtures only. No published package source, no
   scaffold template. The 0.0.7 changelog records shipped surface only → no bullet; the title's
   "hydrate" refers to proving hydration in the E2E suite. Not on the #1961 canary path.
+
+## #1968 follow-up fold (#1952) — exact-green packet
+
+- #1952 merged `2b8867d32` (closed #1880): Aspire reference "Readiness contract" section. Folded
+  into the Aspire bullet of `packages/cli/CHANGELOG.md` on a branch cut from `origin/main`
+  `2b8867d32`: PR **#1968**, head `21d195c45`, `Refs #1952` (no closing keyword).
+- CI run 33700967113 at the exact head: success; `mergeable=true state=clean`; behind 0.
+- Docs-only one-bullet change — no separate IMPL-EVAL cycle (same disposition as #1955).
