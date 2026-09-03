@@ -69,6 +69,7 @@ Define one schema next to a job, pass it to `defineJobHandler(schema, handler)` 
 | 2026-09-03 | 4 | bounded gates | Scoped check/lint/fmt passed; workers-core/workers suites passed 108/108; generator and CLI integration suites passed 30/30; `quality:gate`, `publish:dry-run`, and `arch:check` exited 0. |
 | 2026-09-03 | 4 | documentation lint | New public symbols carry JSDoc and add no diagnostics. The bounded core command reports the accepted four pre-existing private-type references around the existing workers contract implementation; the workers package reports its pre-existing `workersPlugin`→`PluginManifest` private reference. |
 | 2026-09-03 | 4 | fenced CI blocker | Extra `deno task check:mcp-export-corpus` fails because `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is stale. The canonical fix is `deno task gen:mcp-export-corpus`, but `packages/mcp/**` is outside this brief's ceiling, so it was not run and no fenced file was touched. |
+| 2026-09-03 | PR | opened | Non-draft PR #1970 opened with the exact requested labels and milestone `0.0.7`; body uses `Refs #1455` and names the fenced generated-corpus remainder. Pushed receipt head before this final log update: `e18f2abe6`. |
 
 ## Decisions
 
@@ -117,3 +118,6 @@ reported only the unused directive.
 
 - Evaluator should inspect the RED failure receipts first, then schema identity at both runtime
   boundaries, then emitted literal type preservation before Map projection.
+- PR: #1970 (`https://github.com/rickylabs/netscript/pull/1970`).
+- Final implementation commit: `c194a4145`; the final branch head is the harness receipt commit that
+  contains this line and is reported after its explicit-refspec push.
