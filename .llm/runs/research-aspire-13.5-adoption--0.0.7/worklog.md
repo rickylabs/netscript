@@ -1011,3 +1011,33 @@ the merge.**
 ## 2026-09-03 00:5xZ — #1952 exact-head packet at 1a759ea34
 
 - `quality`, `code-quality`, `check-test`, `scaffold-static`, `close-gate`, postgres tier, sqlite tier all SUCCESS at `1a759ea34`; packet posted (supersedes `478450a3c`). `status:ready-merge` stands; coordinator merges.
+
+## 2026-09-03 00:5xZ — #1952 shipped (gate 2 complete); #1965 converged, non-draft, IMPL-EVAL dispatched
+
+- **#1952 MERGED** by the coordinator at exact head `1a759ea34` → main `2b8867d32`; #1880 CLOSED.
+  Labelled `status:shipped`; worktrees `007-leaf-1880` and `007-aspire-eval-1952` removed.
+  **Aspire 13.5 readiness gate 2 (#863 gate 2 / #1880) is complete.** Coordinator states canary
+  fix #1967 is the only remaining fix-forward release blocker.
+- **#1965 (#1881, #863 gate 3):** Codex thread `01a06491…` idle at `6adc9b412` (S0–S3). Pushed the
+  workflow commit with the workflow-scoped credential (`env -u GH_TOKEN -u GITHUB_TOKEN`), then
+  mechanically merged main `2b8867d32` (`e0b901a17`, clean); `check:aspire-version-parity` went
+  red (surface manifest stale after README change) → regenerated via
+  `.llm/runs/…/tools/aspire-surface-manifest.ts` → `9cff705f5` (parity PASS; agent-docs-prose,
+  assets-barrel, publish-assets, mcp-export-corpus all PASS, no carrier delta). Scoped gates at
+  `9cff705f5`: e2e check 233 files 0 errors; e2e tests 322/322; fmt 233/0; `e2e:cli gates
+  readme.quickstart` lists 11 README gates + cleanup. Pushed; PR marked ready (non-draft);
+  `status:impl` → `status:impl-eval`; `e2e-cli-gate` added so both runtime tiers run at the exact
+  head. S3 box ticked in the PR body.
+- **Close-gate reconciliation (coordinator directive):** hosted-transcript line rewritten as a
+  labelled post-merge canary-admission note, not a DoD checkbox. Close-gate then still read red
+  against #1881's four acceptance boxes — box 1 literally requires "the transcript is attached",
+  which no honest structured evidence can satisfy before the next canary prod run. Switched the PR
+  from a closing keyword to `Part of #1881` with remaining scope stated (issue closes when the
+  coordinator attaches the canary transcript). Local `check-close-gate` → PASS (no closing refs).
+  Coordinator may overrule by supplying structured evidence + ready-merge; recorded as D-335.
+- **IMPL-EVAL #1965:** the thread recorded a Codex-spawned Claude Fable 5.1 opposite-family PASS
+  (+ recheck) on the pre-commit state (`thread-evaluate.md`). Supervisor-dispatched independent
+  evaluator at the exact converged head `9cff705f5`: local route `agentic:claude-openrouter`
+  z-ai/glm-5.3-flash xhigh, detached worktree `007-aspire-eval-1965`, brief
+  `slices/leaf-1881/impl-eval-brief.md`, output `evaluate-supervisor.md`.
+- Thread records copied as `slices/leaf-1881/thread-*.md`.

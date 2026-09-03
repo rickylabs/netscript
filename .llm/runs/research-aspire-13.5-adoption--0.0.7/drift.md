@@ -8541,3 +8541,15 @@ verdicts supersede the carry.
   `a27d7dd5-88ac-4654-9e65-477f6e21c3d3`, same brief and head. Rule for this lane going forward:
   eval worktrees are named `007-aspire-eval-<n>`; the wait loop also exits if the worktree
   disappears so the loss is detected at once instead of reading as a hang.
+
+### D-335 — #1965 carries `Part of #1881`, not a closing keyword (2026-09-03)
+
+- **Observed:** #1881 acceptance box 1 requires the hosted README transcript to be *attached*; the
+  coordinator ruled that transcript is post-merge canary-admission evidence. Close-gate mirrors
+  issue boxes from structured PR evidence, and evidence for box 1 would have to assert a not-yet-run
+  hosted execution.
+- **Decision:** no closing keyword on #1965; the issue stays open until the next fix-forward canary
+  prod run produces the `readme.quickstart` transcript, which the coordinator attaches before
+  closing #1881. Close-gate has no referenced issue and passes on its own merits.
+- **Reversal path:** coordinator adds a fenced `acceptance-evidence` block + closing keyword +
+  `status:ready-merge` if they judge the wired workflow step sufficient for box 1.
