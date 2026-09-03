@@ -34,8 +34,8 @@ const ISLAND_SERVED_SURFACE_FAILURE_HINT =
   'JavaScript entry. Inspect the structured served-surface receipt.';
 
 const ISLAND_HYDRATION_FAILURE_HINT =
-  'The generated service example did not hydrate into an interactive island. Inspect the ' +
-  'structured hydration receipt and the headless-browser failure.';
+  'The generated resource island did not expose its QueryClient from the hydrated Preact tree. ' +
+  'Inspect the structured hydration receipt and the headless-browser failure.';
 
 const AI_CHAT_ROUTE_FAILURE_HINT =
   'The generated AI chat route or composition could not be imported, or the self-wired ' +
@@ -339,7 +339,7 @@ export function createRuntimeBehaviorGates(
     ),
     commandGate(
       GATE.BEHAVIOR_ISLAND_HYDRATION,
-      'Hydrate the generated route-local island and complete Rename',
+      'Hydrate the generated route-local resource QueryIsland',
       GATE_PHASE.BEHAVIOR,
       (context) => [
         'deno',
@@ -360,7 +360,7 @@ export function createRuntimeBehaviorGates(
     ),
     commandGate(
       GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
-      'Prove settled users update invalidates and refetches its list once',
+      'Invalidate the generated resource query and refetch its list once',
       GATE_PHASE.BEHAVIOR,
       (context) => [
         'deno',

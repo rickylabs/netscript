@@ -4,8 +4,8 @@ import { dirname } from '@std/path';
 import type { IslandScriptReceipt, IslandServedSurfaceReceipt } from './island-receipts.ts';
 import { resolveProjectAppUrls } from './probe-app-reference.ts';
 
-const ISLAND_NAME = 'ServiceShowcaseLab';
-const ISLAND_PATH = '/examples/users';
+const ISLAND_NAME = 'PeopleIsland';
+const ISLAND_PATH = '/people';
 
 export interface ProbeIslandServedSurfaceOptions {
   readonly resolveLiveUrls?: (appHost: string, appName: string) => Promise<string[]>;

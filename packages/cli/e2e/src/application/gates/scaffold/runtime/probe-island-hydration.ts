@@ -4,43 +4,56 @@ import { dirname } from '@std/path';
 import type { IslandHydrationReceipt } from './island-receipts.ts';
 import { findBrowserExecutable, resolveProjectAppUrls } from './probe-app-reference.ts';
 
-const ISLAND_PATH = '/examples/users';
+const ISLAND_PATH = '/people';
+const LIST_PATH = '/api/rpc/v1/users/list';
+const QUERY_MODULE_PATH = '/@id/@netscript/fresh/query';
 const TIMEOUT_MS = 20_000;
-
-export interface IslandInteractionObservation {
-  readonly initialRow: string | null;
-  readonly rowAfterRename: string | null;
-  readonly dataState: string | null;
+const BASELINE_CONFIRMATION_MS = 500;
+export interface IslandHydrationObservation {
+  readonly queryClientFound: boolean;
+  readonly listQueryFound: boolean;
   readonly freshIslandElement: string | null;
+}
+
+export interface ResourceQueryRefetchObservation {
+  readonly queryClientFound: boolean;
+  readonly listQueryFound: boolean;
+  readonly baselineListRequestCount: number;
+  readonly finalListRequestCount: number;
+  readonly refetchStatus: number | null;
 }
 
 export interface ProbeIslandHydrationOptions {
   readonly resolveLiveUrls?: (appHost: string, appName: string) => Promise<string[]>;
-  readonly interact?: (url: string) => Promise<IslandInteractionObservation>;
+  readonly interact?: (url: string) => Promise<IslandHydrationObservation>;
   readonly persist?: (receipt: IslandHydrationReceipt) => Promise<void>;
   readonly receiptPath?: string;
 }
 
+export interface ProbeResourceQueryRefetchOptions {
+  readonly resolveLiveUrls?: (appHost: string, appName: string) => Promise<string[]>;
+  readonly interact?: (url: string) => Promise<ResourceQueryRefetchObservation>;
+}
+
 /** Convert browser observations into the strict hydration receipt. */
 export function receiptFromIslandInteraction(
-  observation: IslandInteractionObservation,
+  observation: IslandHydrationObservation,
 ): IslandHydrationReceipt {
-  if (!observation.dataState || !observation.freshIslandElement) {
-    throw new Error('generated island data-state element was not rendered');
+  if (!observation.freshIslandElement) {
+    throw new Error('generated resource island surface was not rendered');
   }
-  if (!observation.initialRow) throw new Error('generated island rendered no Rename row');
-  const expected = `${observation.initialRow}*`;
-  if (observation.rowAfterRename !== expected) {
+  if (!observation.queryClientFound) {
     throw new Error(
-      `Rename click did not change ${JSON.stringify(observation.initialRow)} to ${
-        JSON.stringify(expected)
-      }; observed ${JSON.stringify(observation.rowAfterRename)}`,
+      'generated resource QueryClient was not reachable from the hydrated Preact tree',
     );
+  }
+  if (!observation.listQueryFound) {
+    throw new Error('generated users.list query was not present after island hydration');
   }
   return { islandHydrated: true, freshIslandElement: observation.freshIslandElement };
 }
 
-/** Resolve the live generated app and prove its scaffold data island is interactive. */
+/** Resolve the live generated app and prove its resource QueryIsland hydrated. */
 export async function probeIslandHydration(
   projectRoot: string,
   appName: string,
@@ -71,10 +84,114 @@ export async function probeIslandHydration(
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
-async function interactWithHeadlessChrome(url: string): Promise<IslandInteractionObservation> {
+/** Resolve the live generated app and prove its active resource query refetches exactly once. */
+export async function probeResourceQueryRefetch(
+  projectRoot: string,
+  appName: string,
+  appHost: string | undefined,
+  options: ProbeResourceQueryRefetchOptions = {},
+): Promise<ResourceQueryRefetchObservation> {
+  const baseUrls = options.resolveLiveUrls
+    ? appHost === undefined ? [] : await options.resolveLiveUrls(appHost, appName)
+    : await resolveProjectAppUrls(projectRoot, appName, appHost);
+  if (baseUrls.length === 0) throw new Error(`No live URL resolved for generated app ${appName}.`);
+  const interact = options.interact ?? interactWithHeadlessChromeForRefetch;
+  let lastError: unknown;
+  for (const baseUrl of baseUrls) {
+    try {
+      const observation = await interact(new URL(ISLAND_PATH, baseUrl).toString());
+      requireResourceQueryRefetch(observation);
+      return observation;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
+function requireResourceQueryRefetch(observation: ResourceQueryRefetchObservation): void {
+  if (!observation.queryClientFound) throw new Error('resource QueryClient was not reachable');
+  if (!observation.listQueryFound) throw new Error('users.list query was not present');
+  const expected = observation.baselineListRequestCount + 1;
+  if (observation.finalListRequestCount !== expected) {
+    throw new Error(
+      `users.list request count was ${observation.finalListRequestCount}; expected ${expected}`,
+    );
+  }
+  const status = observation.refetchStatus;
+  if (status === null || status < 200 || status >= 300) {
+    throw new Error(`users.list refetch returned ${status ?? 'no HTTP response'}`);
+  }
+}
+
+async function interactWithHeadlessChrome(url: string): Promise<IslandHydrationObservation> {
+  return await withHeadlessChrome('island-hydration', async (client) => {
+    await client.send('Page.navigate', { url });
+    await client.waitFor('Page.loadEventFired');
+    return await waitForEvaluation<IslandHydrationObservation>(
+      client,
+      islandHydrationObservationExpression(),
+      (value) =>
+        value?.freshIslandElement !== null && value?.queryClientFound === true &&
+        value.listQueryFound === true,
+    );
+  });
+}
+
+async function interactWithHeadlessChromeForRefetch(
+  url: string,
+): Promise<ResourceQueryRefetchObservation> {
+  return await withHeadlessChrome('resource-refetch', async (client) => {
+    await client.send('Network.enable');
+    const requestIds = new Set<string>();
+    const completedIds = new Set<string>();
+    const responseStatuses = new Map<string, number>();
+    client.observe(({ method, params }) => {
+      const requestId = typeof params.requestId === 'string' ? params.requestId : undefined;
+      if (
+        method === 'Network.requestWillBeSent' && requestId &&
+        isUsersListUrl((params.request as { url?: unknown } | undefined)?.url)
+      ) requestIds.add(requestId);
+      else if (method === 'Network.responseReceived' && requestId && requestIds.has(requestId)) {
+        const status = (params.response as { status?: unknown } | undefined)?.status;
+        if (typeof status === 'number') responseStatuses.set(requestId, status);
+      } else if (method === 'Network.loadingFinished' && requestId && requestIds.has(requestId)) {
+        completedIds.add(requestId);
+      }
+    });
+    await client.send('Page.navigate', { url });
+    await client.waitFor('Page.loadEventFired');
+    const discovery = await waitForEvaluation<QueryClientDiscoveryObservation>(
+      client,
+      resourceQueryExpression(false),
+      (value) => value?.queryClientFound === true && value?.listQueryFound === true,
+    );
+    const counts = () => ({ requestCount: requestIds.size, completedCount: completedIds.size });
+    const baseline = await waitForStableRequestCount(counts);
+    const invalidation = await client.evaluate<QueryClientDiscoveryObservation>(
+      resourceQueryExpression(true),
+    );
+    if (!invalidation?.queryClientFound || !invalidation.listQueryFound) {
+      throw new Error('generated users.list query disappeared before invalidation');
+    }
+    await waitForRequestCount(counts, baseline + 1);
+    const refetchId = [...requestIds].at(-1);
+    return {
+      ...discovery,
+      baselineListRequestCount: baseline,
+      finalListRequestCount: requestIds.size,
+      refetchStatus: refetchId ? responseStatuses.get(refetchId) ?? null : null,
+    };
+  });
+}
+
+async function withHeadlessChrome<T>(
+  profileName: string,
+  interact: (client: CdpClient) => Promise<T>,
+): Promise<T> {
   const executable = await findBrowserExecutable();
   const port = reservePort();
-  const profile = await Deno.makeTempDir({ prefix: 'netscript-island-hydration-' });
+  const profile = await Deno.makeTempDir({ prefix: `netscript-${profileName}-` });
   const child = new Deno.Command(executable, {
     args: [
       '--headless=new',
@@ -94,21 +211,7 @@ async function interactWithHeadlessChrome(url: string): Promise<IslandInteractio
     client = await CdpClient.connect(await waitForPageTarget(port));
     await client.send('Page.enable');
     await client.send('Runtime.enable');
-    await client.send('Page.navigate', { url });
-    await client.waitFor('Page.loadEventFired');
-
-    const initial = await waitForEvaluation<IslandInteractionObservation>(
-      client,
-      islandObservationExpression(),
-      (value) => value?.initialRow !== null && value?.freshIslandElement !== null,
-    );
-    await client.evaluate(clickRenameExpression());
-    const renamed = await waitForEvaluation<IslandInteractionObservation>(
-      client,
-      islandObservationExpression(),
-      (value) => value?.rowAfterRename === `${initial.initialRow}*`,
-    );
-    return { ...renamed, initialRow: initial.initialRow };
+    return await interact(client);
   } finally {
     client?.close();
     try {
@@ -128,6 +231,9 @@ class CdpClient {
     reject: (error: Error) => void;
   }>();
   readonly #events: Array<{ method: string; params: Record<string, unknown> }> = [];
+  readonly #observers: Array<
+    (event: { method: string; params: Record<string, unknown> }) => void
+  > = [];
   #nextId = 1;
 
   private constructor(socket: WebSocket) {
@@ -155,6 +261,10 @@ class CdpClient {
     const id = this.#nextId++;
     this.#socket.send(JSON.stringify({ id, method, params }));
     return new Promise((resolve, reject) => this.#pending.set(id, { resolve, reject }));
+  }
+
+  observe(observer: (event: { method: string; params: Record<string, unknown> }) => void): void {
+    this.#observers.push(observer);
   }
 
   async evaluate<T>(expression: string): Promise<T | undefined> {
@@ -209,7 +319,11 @@ class CdpClient {
       else pending.resolve(message.result);
       return;
     }
-    if (message.method) this.#events.push({ method: message.method, params: message.params ?? {} });
+    if (message.method) {
+      const event = { method: message.method, params: message.params ?? {} };
+      this.#events.push(event);
+      for (const observer of this.#observers) observer(event);
+    }
   }
 }
 
@@ -243,41 +357,101 @@ async function waitForEvaluation<T>(
   predicate: (value: T | undefined) => boolean,
 ): Promise<T> {
   const started = Date.now();
+  let lastValue: T | undefined;
   while (Date.now() - started < TIMEOUT_MS) {
-    const value = await client.evaluate<T>(expression);
-    if (predicate(value)) return value as T;
+    lastValue = await client.evaluate<T>(expression);
+    if (predicate(lastValue)) return lastValue as T;
     await delay(50);
   }
-  throw new Error('timed out waiting for generated island DOM state');
+  throw new Error(
+    `timed out waiting for generated island DOM state; last observation ${
+      JSON.stringify(lastValue)
+    }`,
+  );
 }
 
-function islandObservationExpression(): string {
-  return `(() => {
-    const button = [...document.querySelectorAll('button')]
-      .find((entry) => entry.textContent?.trim() === 'Rename');
-    const row = button?.closest('li') ?? null;
-    const surface = row?.closest('ul[data-state]') ?? null;
-    const dataState = surface?.getAttribute('data-state') ?? null;
-    const name = row?.querySelector('p')?.textContent?.trim() ?? null;
+function islandHydrationObservationExpression(): string {
+  return `(async () => {
+    const surface = document.querySelector('main output');
+    const { getIslandQueryClient } = await import(${JSON.stringify(QUERY_MODULE_PATH)});
+    const queryClient = getIslandQueryClient();
+    const queries = queryClient.getQueryCache().getAll();
+    const listQuery = queries.find((query) =>
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
+    );
     return {
-      initialRow: name,
-      rowAfterRename: name,
-      dataState,
-      freshIslandElement: surface && dataState
-        ? surface.tagName.toLowerCase() + '[data-state="' + dataState + '"]'
-        : null,
+      queryClientFound: queryClient !== null,
+      listQueryFound: listQuery !== undefined,
+      freshIslandElement: surface?.tagName.toLowerCase() ?? null,
     };
   })()`;
 }
 
-function clickRenameExpression(): string {
-  return `(() => {
-    const button = [...document.querySelectorAll('button')]
-      .find((entry) => entry.textContent?.trim() === 'Rename');
-    if (!button) throw new Error('Rename control was not rendered');
-    button.click();
-    return true;
+interface QueryClientDiscoveryObservation {
+  readonly queryClientFound: boolean;
+  readonly listQueryFound: boolean;
+}
+
+type RequestCounts = Readonly<{ requestCount: number; completedCount: number }>;
+
+function resourceQueryExpression(invalidate: boolean): string {
+  return `(async () => {
+    const { getIslandQueryClient } = await import(${JSON.stringify(QUERY_MODULE_PATH)});
+    const queryClient = getIslandQueryClient();
+    const queries = queryClient.getQueryCache().getAll();
+    const listQuery = queries.find((query) =>
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
+    );
+    if (${JSON.stringify(invalidate)} && listQuery) {
+      await queryClient.invalidateQueries({ queryKey: listQuery.queryKey, exact: true });
+    }
+    return {
+      queryClientFound: queryClient !== null,
+      listQueryFound: listQuery !== undefined,
+    };
   })()`;
+}
+
+async function waitForStableRequestCount(observe: () => RequestCounts): Promise<number> {
+  const started = Date.now();
+  let candidate: number | undefined;
+  let stableSince: number | undefined;
+  while (Date.now() - started < TIMEOUT_MS) {
+    const counts = observe();
+    if (counts.requestCount !== counts.completedCount) {
+      candidate = undefined;
+      stableSince = undefined;
+    } else if (candidate !== counts.requestCount) {
+      candidate = counts.requestCount;
+      stableSince = Date.now();
+    } else if (stableSince !== undefined && Date.now() - stableSince >= BASELINE_CONFIRMATION_MS) {
+      return counts.requestCount;
+    }
+    await delay(50);
+  }
+  throw new Error('timed out waiting for a stable users.list request baseline');
+}
+
+async function waitForRequestCount(observe: () => RequestCounts, expected: number): Promise<void> {
+  const started = Date.now();
+  while (Date.now() - started < TIMEOUT_MS) {
+    const counts = observe();
+    if (counts.requestCount === expected && counts.completedCount === expected) return;
+    if (counts.requestCount > expected) {
+      throw new Error(`users.list request count exceeded ${expected}`);
+    }
+    await delay(50);
+  }
+  throw new Error(`timed out waiting for users.list request count ${expected}`);
+}
+
+function isUsersListUrl(value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  try {
+    return new URL(value).pathname === LIST_PATH;
+  } catch {
+    return false;
+  }
 }
 
 function reservePort(): number {

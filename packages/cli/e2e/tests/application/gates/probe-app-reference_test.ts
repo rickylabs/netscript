@@ -12,33 +12,26 @@ const EXPECTED_VIEWPORTS = [
   { name: 'mobile', width: 390, height: 844 },
 ] as const;
 
-const EXPECTED_STATES = [
+const EXPECTED_REFERENCES = [
   { path: '/', markers: ['href="/design"', 'href="/design/composition"'] },
   { path: '/design/composition', markers: ['Composition', 'L0'] },
-  { path: '/examples/users?preview=loading', markers: ['data-state="loading"'] },
   {
-    path: '/examples/users?preview=error',
-    markers: ['data-state="error"', 'Resource list unavailable'],
-  },
-  { path: '/examples/users?preview=empty', markers: ['data-state="empty"', 'No resources yet'] },
-  { path: '/examples/users?preview=success', markers: ['data-state="success"'] },
-  {
-    path: '/examples/users?preview=optimistic',
-    markers: ['data-state="optimistic"', 'Optimistic update is visible'],
+    path: '/examples/users',
+    markers: ['Users', 'Cache-first query', 'Managed form', 'Deferred summary'],
   },
   {
-    path: '/examples/users?preview=rollback',
-    markers: ['data-state="rollback"', 'saved cache snapshot was restored'],
-  },
-  {
-    path: '/examples/users?preview=confirmed',
-    markers: ['data-state="confirmed"', 'service confirmed the mutation'],
+    path: '/people',
+    markers: ['People', 'Cache-first query', 'Deferred summary'],
   },
 ] as const;
 
-Deno.test('reference probe renders every named state at desktop and mobile viewports', async () => {
+Deno.test('reference probe renders init and generated resources at desktop and mobile viewports', async () => {
   assertEquals(REFERENCE_VIEWPORTS, EXPECTED_VIEWPORTS);
-  assertEquals(REFERENCE_EXPECTATIONS, EXPECTED_STATES);
+  assertEquals(REFERENCE_EXPECTATIONS, EXPECTED_REFERENCES);
+  assertEquals(
+    REFERENCE_EXPECTATIONS.some((candidate) => candidate.path.includes('?preview=')),
+    false,
+  );
   const observed: string[] = [];
   await probeAppReference('/workspace/project', 'inventory-web', '/workspace/apphost.mts', {
     resolveLiveUrls: () => Promise.resolve(['http://localhost:41234/']),
@@ -56,11 +49,9 @@ Deno.test('reference probe renders every named state at desktop and mobile viewp
   assertEquals(observed.some((entry) => entry.startsWith('mobile:')), true);
 });
 
-Deno.test('reference probe rejects the old route with no rendered state marker', () => {
-  const expectation = REFERENCE_EXPECTATIONS.find((candidate) =>
-    candidate.path === '/examples/users?preview=rollback'
-  );
-  if (!expectation) throw new Error('rollback expectation missing');
+Deno.test('reference probe rejects a generated resource without its semantic markers', () => {
+  const expectation = REFERENCE_EXPECTATIONS.find((candidate) => candidate.path === '/people');
+  if (!expectation) throw new Error('generated people expectation missing');
 
   assertThrows(
     () =>
@@ -70,7 +61,7 @@ Deno.test('reference probe rejects the old route with no rendered state marker',
         REFERENCE_VIEWPORTS[0],
       ),
     Error,
-    'did not render data-state="rollback"',
+    'did not render People',
   );
 });
 
