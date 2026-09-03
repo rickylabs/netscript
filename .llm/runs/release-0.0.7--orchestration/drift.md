@@ -1,5 +1,21 @@
 # Drift — release 0.0.7
 
+## 2026-09-03 10:08Z verified merges and evaluation handoff
+
+Coordinator merged #1958 at 2f43fa7f37f97a287c6722b004598e7cb7e04dd9 after required CI,
+independent cycle-4 PASS, exact product-equivalent two-tier receipts, empty review threads and a
+fresh live close-gate PASS with Closes #1354. Issue1354 closed; both terminal labels are shipped.
+Original #1970/#1945 authors resumed in their existing threads against merged main; no new model
+or duplicate source owner. #1844's owner-approved disposition remains closed, no owner pause.
+
+Independent #1982 session7ffea6b7-4401-4fec-b826-7d5e7657d88f completed PASS_IMPL at exact
+0475c32134166b9ba60ce1ea1a53c6abcc5af695. Cycle1 and final delta artifacts plus completed raw
+transports are preserved in receipts/eval-1982/; secret-pattern scan found no suspected provider
+keys. Source CI check-test/quality and independent64 tests PASS; only stale DoD close-gate awaits
+live body reconciliation. The primary preserves the review evidence here without pushing a
+receipt-only change to the evaluated source branch or needlessly invalidating its green CI.
+No release gate waived, no new runtime lease, no historical run cleanup.
+
 ## 2026-09-03 09:52Z owner-approved #1844 closeout
 
 Owner answered “Yes close” to the explicit proposal “mitigated; original cause unproven.”

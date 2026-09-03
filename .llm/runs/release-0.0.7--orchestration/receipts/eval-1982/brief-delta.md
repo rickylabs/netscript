@@ -1,5 +1,12 @@
 use harness
 
+## SKILL
+
+Retain the initial brief's netscript-harness, netscript-tools, netscript-pr and evaluator-protocol
+instructions. This is a continuation of that independent review, not a new implementation lane.
+
+## Bounded delta
+
 Continue the SAME independent evaluator session 7ffea6b7-4401-4fec-b826-7d5e7657d88f.
 Preserve the original c487e9273 verdict verbatim in evaluate-cycle-1.md. Evaluate the bounded
 delta to exact 0475c32134166b9ba60ce1ea1a53c6abcc5af695 (PR #1982), in the same isolated
