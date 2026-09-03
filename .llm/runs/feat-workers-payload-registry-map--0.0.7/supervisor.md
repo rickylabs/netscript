@@ -17,3 +17,10 @@
 | --- | --- | --- |
 | `complex_implementation` | Codex · OpenAI · GPT-5.6 Sol · high | RED, implementation, focused gates, and PR handoff |
 | `complex_evaluation` | Separate opposite-family session | Post-implementation evaluation; never self-evaluated here |
+
+## Evaluator attempt
+
+Native session `28790605-53ad-4062-bfc3-cf6ad0426963` requested Fable 5 at medium effort and
+observed Fable 5.1 at medium effort. Anthropic rejected the turn at the monthly spend limit before
+evaluation began. No verdict or `evaluate.md` was produced, and the owner-frozen route was not
+changed or duplicated.

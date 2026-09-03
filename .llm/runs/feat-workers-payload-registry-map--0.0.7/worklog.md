@@ -728,3 +728,56 @@ another run directory already present on `origin/main`; this branch adds no new 
 two pre-existing run-document findings in its earlier contract commits. No local runtime lease was
 taken: the coordinator's hosted runtime-zero proof at 07:50Z remains the runtime evidence while this
 continuation is static/hosted-only.
+
+Integration commit: `303c4e87a5e55d01273146deac8f0e3fe7b52a13` (parents
+`d3df14baee7f0e0aa4ed30f654738772a3f87bf3` and
+`e14322c511bbf26018c617c12f639474b6092c32`; pushed by explicit refspec).
+
+## Exact-head hosted receipts and external blocker
+
+Actions run `33731861232` evaluated synthetic merge
+`3c70fabe5183a9def6aa2028670c58ce3390677d` for product head `303c4e87a`. The complete rollup was
+15 successful, 4 policy-skipped, 1 failed, and 1 cancelled:
+
+- `check-test`: PASS in 14m17s.
+- `quality`: PASS in 3m41s.
+- `code-quality`, `surface-diff`, `scaffold-static`, `desktop-native-linux`, docs build, and both CI
+  visibility jobs: PASS.
+- SQLite `scaffold.runtime`: report raw result 82 passed / 1 failed / 0 skipped; cleanup PASS.
+- PostgreSQL `scaffold.runtime`: GitHub classified the matrix job cancelled after the SQLite
+  fail-fast, but its uploaded report completed 87 passed / 1 failed / 0 skipped and cleanup PASS.
+
+Both database reports have the same sole failure:
+
+```text
+behavior.app-reference
+desktop reference probe /examples/users?preview=loading did not render data-state="loading"
+packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts:74
+```
+
+The #1455 path is independently green inside both reports: generated worker registries loaded two
+jobs; `behavior.workers-health`, `behavior.workers-jobs`,
+`behavior.workers-trigger-health-job`, and `behavior.workers-executions` passed. The runtime red is
+owned by current main `e14322c511` (`feat(cli): converge init and activate resource generation
+(#1956)`), which deleted the retired preview-state showcase templates while the browser probe still
+asserts those states. Open PR #1958 is the dedicated owner and already carries the verified neutral
+resource-route and island-probe correction. Duplicating/cherry-picking that CLI acceptance change
+here would violate #1455 scope and collide with its active owner.
+
+## Separate evaluator receipt
+
+Exactly one native opposite-family IMPL-EVAL session was launched after the integrated local gates:
+
+```text
+session: 28790605-53ad-4062-bfc3-cf6ad0426963
+requested: Claude / Fable 5 / medium
+observed: Fable 5.1 / medium / native Claude Max
+result: blocked before evaluation — monthly spend limit
+```
+
+The evaluator made no repository change, posted no PR comment, and emitted no verdict;
+`evaluate.md` therefore remains absent. The owner prohibited provider/model changes, so no fallback
+or duplicate evaluator was dispatched. The two remaining merge-readiness conditions are concrete:
+land PR #1958 (or its owning correction) into main and reconcile/rerun #1970 hosted runtime, then run
+one fresh native Fable/medium IMPL-EVAL when the Anthropic allowance permits. PR #1970 remains
+unmerged with `Refs #1455` and `status:impl`.

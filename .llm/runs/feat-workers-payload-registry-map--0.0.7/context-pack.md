@@ -17,6 +17,9 @@ import failed because `Object.freeze(handler)` rejected first-party `Object.assi
 GREEN keeps only `payloadSchema` immutable while preserving the callable metadata-extension seam.
 Current main `e14322c511` is integrated without rebasing, its four generated-carrier conflicts are
 canonically regenerated, and the generated add-job stub still exports its typed handler as default.
+All exact-head static/quality checks pass. Both hosted runtime reports pass the #1455 worker path but
+stop at current-main's stale retired-showcase browser probe, already owned by PR #1958. The one
+native Fable evaluator launch was quota-blocked before producing a verdict.
 
 ## Completed
 
@@ -26,15 +29,16 @@ canonically regenerated, and the generated add-job stub still exports its typed 
 
 ## In Progress
 
-- Commit/push the current-main reconciliation, obtain exact-head hosted CI and one separate-session
-  implementation evaluation, then hand off the immutable merge packet without merging.
+- Persist and push the exact-head CI/evaluator receipts, then hand off the immutable blocked packet
+  without merging or duplicating PR #1958's CLI correction.
 
 ## Next Steps
 
-1. Commit and explicitly push the current-main reconciliation plus fresh static/quality receipts.
-2. Confirm exact-head hosted CI without taking a local runtime lease.
-3. Obtain exactly one separate-session IMPL-EVAL through the persisted route and hand off without
-   merging the PR.
+1. Land PR #1958's owning browser/island acceptance correction into main, then reconcile it here and
+   rerun hosted runtime without taking a local lease.
+2. Run one fresh native Fable/medium IMPL-EVAL when Anthropic allowance is available; do not dispatch
+   a model fallback or duplicate evaluator.
+3. Hand off a green/evaluated merge packet without merging the PR.
 
 ## Key Decisions
 
@@ -50,12 +54,12 @@ canonically regenerated, and the generated add-job stub still exports its typed 
 | --- | --- | --- |
 | Static | passed locally | focused check/test/lint/fmt, root check, and emitted samples pass |
 | Fitness | passed locally | quality, architecture, docs examples, publish dry-run, and carriers pass |
-| Runtime | hosted pass at `43734544f`; no new local lease | PostgreSQL and SQLite jobs passed; static/hosted work only for this continuation |
+| Runtime | #1455 path passes; overall blocked externally | both DB reports stop only at stale current-main browser probe owned by PR #1958 |
 | Consumer | passed | prior compile-time and generated-registry receipts in worklog |
 
 ## Open Questions
 
-- None.
+- None; blockers have explicit owners and reproduction evidence.
 
 ## Drift and Debt
 
