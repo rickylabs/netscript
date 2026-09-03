@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness` |
 | Branch | `fix/canary-readme-service-readiness` |
-| Current phase | `gate — implementation complete, IMPL-EVAL pending` |
+| Current phase | `gate — independent PASS recorded; inventory repair awaiting exact hosted CI` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | docs |
 
@@ -24,11 +24,13 @@ Canary 9 production run `33712927776` passed README commands 1–10, then hung 9
 
 ## In Progress
 
-- Hand the pushed immutable implementation head to a separate-session evaluator.
+- Coordinator repaired the sole hosted quality failure (`manifest:freshness`) after
+  the OS restart; local phase-1 parity passes. Await exact pushed-head CI.
 
 ## Next Steps
 
-1. Run separate-session IMPL-EVAL at the immutable head.
+1. Verify hosted CI after the inventory-only repair; independent product PASS is
+   recorded in PR comment `5520440630` (product `8704b0571`, evidence `bdb5de2bd`).
 2. Keep #1881/#863/#1712 open until a fresh hosted published-version run passes.
 
 ## Key Decisions
@@ -61,7 +63,7 @@ Canary 9 production run `33712927776` passed README commands 1–10, then hung 9
 
 ## Open Questions
 
-- Separate-session IMPL-EVAL and hosted published-version acceptance remain.
+- Exact-head hosted CI and fresh published-version acceptance remain.
 
 ## Drift and Debt
 

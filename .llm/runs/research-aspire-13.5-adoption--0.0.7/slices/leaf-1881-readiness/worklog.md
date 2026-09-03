@@ -108,3 +108,17 @@ Edit the marked root README command block and its single expected-command tuple 
 ## Handoff Notes
 
 - Inspect that users readiness is printed and executed exactly, port capture moved to that line, curl is bounded in argv, and both cleanup receipt files are uploaded.
+
+## 2026-09-03 07:56Z — post-restart exact CI reconciliation
+
+- Hosted run `33715843167` passed `check-test` and `close-gate`. Its sole quality
+  failure is phase-1 `manifest:freshness`, not a product or service-health failure.
+- Coordinator regenerated the checked-in Aspire surface manifest using its existing
+  generator. The diff adds six missing inventory rows; no product, gate predicate,
+  dependency lock, or historical receipt changed. Phase-1 parity now reports
+  `ok=true`, `fail=0`, `manifestFresh=true`, 960 inventory rows and zero unmatched paths.
+- Independent implementation review PASS remains recorded in PR comment
+  `5520440630` for product head `8704b0571` / evidence head `bdb5de2bd`.
+  This inventory-only repair does not replace that review or claim published runtime proof.
+- Re-run hosted CI at the pushed recovery head before merge. #1881/#863/#1712 stay
+  open until the version-coherent published README/scaffold acceptance succeeds.
