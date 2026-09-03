@@ -2,9 +2,9 @@ import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from 
 
 import {
   parseResourceUpdateLine,
-  type ResourceUpdateFollower,
   watchResourceUpdates,
 } from '../../../src/application/gates/scaffold/runtime/resource-state-stream.ts';
+import { createControlledFollower } from './controlled-follower.ts';
 
 /** Test-failure ceiling for deterministic in-memory subscription tests. */
 const UNIT_WAIT_FAILURE_CEILING_MS = 1_000;
@@ -151,47 +151,6 @@ Deno.test('resource subscription terminates its child when line parsing throws',
     await subscription.close();
   }
 });
-
-interface ControlledFollower {
-  readonly follower: ResourceUpdateFollower;
-  emit(rawLine: string): Promise<void>;
-  wasKilled(): boolean;
-}
-
-function createControlledFollower(): ControlledFollower {
-  const stream = new TransformStream<Uint8Array, Uint8Array>();
-  const writer = stream.writable.getWriter();
-  const status = Promise.withResolvers<{ success: boolean; code: number }>();
-  let killed = false;
-  let writerClosed = false;
-  const closeWriter = () => {
-    if (writerClosed) return;
-    writerClosed = true;
-    void writer.close().catch(() => undefined);
-  };
-  const follower: ResourceUpdateFollower = {
-    stdout: stream.readable,
-    stderr: new ReadableStream<Uint8Array>({
-      start(controller) {
-        controller.close();
-      },
-    }),
-    status: status.promise,
-    kill() {
-      killed = true;
-      closeWriter();
-      status.resolve({ success: false, code: 143 });
-    },
-  };
-  return {
-    follower,
-    async emit(rawLine) {
-      await writer.write(new TextEncoder().encode(`${rawLine}\n`));
-      await Promise.resolve();
-    },
-    wasKilled: () => killed,
-  };
-}
 
 async function childStatusWithin(
   child: Deno.ChildProcess,

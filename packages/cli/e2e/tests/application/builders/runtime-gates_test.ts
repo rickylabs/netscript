@@ -144,6 +144,13 @@ Deno.test('typed database Phase-B faults the controller-owned listener without s
 
   assertStringIncludes(source, 'commandListenerFaultController');
   assertStringIncludes(source, 'TEST_ONLY_POSTGRES_HEALTH_KEY');
+  // Canary 6 (run 33684157301): the departure wait is the fixture's shared subscription, which is
+  // established before the close command. No private poll deadline may grow back here.
+  assertStringIncludes(source, 'observeInducedListenerDeparture(appHost, expectation, async () =>');
+  assertEquals(source.includes('REPORT_DEADLINE_MS'), false);
+  assertEquals(source.includes('REPORT_POLL_MS'), false);
+  assertEquals(source.includes("'describe',"), false);
+  assertStringIncludes(source, 'const WAIT_TIMEOUT_SECONDS = 10;');
   assertEquals(source.includes("'resource',\n      database,\n      'stop'"), false);
   assertEquals(source.includes("'resource',\n        database,\n        'start'"), false);
 });
@@ -340,6 +347,71 @@ Deno.test('app reference gate runs the real browser probe for the project-derive
     'inventory-console-web',
     '/workspace/app/aspire/apphost.mts',
   ]);
+});
+
+Deno.test('island served-surface gate runs against the live generated app and writes a receipt', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected island served-surface command gate.');
+  const command = gate.command({
+    request: {
+      suiteId: 'scaffold.runtime.sqlite',
+      options: { projectName: 'inventory-console' },
+    },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-served-surface.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+    '/repo/.llm/tmp/gate-receipts/scaffold.runtime.sqlite/behavior.island-served-surface.json',
+  ]);
+});
+
+Deno.test('island hydration gate runs the fail-closed headless browser probe', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_ISLAND_HYDRATION
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected island hydration command gate.');
+  const command = gate.command({
+    request: {
+      suiteId: 'scaffold.runtime.sqlite',
+      options: { projectName: 'inventory-console' },
+    },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+    '/repo/.llm/tmp/gate-receipts/scaffold.runtime.sqlite/behavior.island-hydration.json',
+  ]);
+  assertEquals(gate.skip, undefined);
 });
 
 Deno.test('runtime gates wait for postgres resource by default', () => {

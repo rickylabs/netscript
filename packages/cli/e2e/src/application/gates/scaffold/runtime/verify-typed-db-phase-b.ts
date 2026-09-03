@@ -1,11 +1,18 @@
-import { readListenerHealthReport } from './verify-listener-readiness.ts';
+import type { DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import { TEST_ONLY_POSTGRES_HEALTH_KEY } from './listener-fault-controller.ts';
-import { commandListenerFaultController } from './listener-unreachable-fixture.ts';
+import {
+  type ListenerFaultExpectation,
+  listenerFaultExpectations,
+  parseListenerFaultDatabase,
+} from './listener-readiness-gates.ts';
+import {
+  commandListenerFaultController,
+  type InducedDepartureEvidence,
+  observeInducedListenerDeparture,
+} from './listener-unreachable-fixture.ts';
 
+/** Bound on the NetScript CLI's own database wait; the Unhealthy departure is not on this clock. */
 const WAIT_TIMEOUT_SECONDS = 10;
-const REPORT_DEADLINE_MS = 30_000;
-const REPORT_POLL_MS = 1_000;
-const UNHEALTHY_DESCRIPTION = /listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
 
 interface CommandResult {
   readonly code: number;
@@ -20,9 +27,10 @@ export async function verifyTypedDbPhaseB(
   appHost: string,
   projectRoot: string,
   cliEntrypoint: string,
-  database: string,
+  database: DatabaseEngine,
 ): Promise<void> {
   if (database === 'sqlite') throw new Error('S8 Phase-B requires a listener-backed database');
+  const expectation = ownedPostgresExpectation(database);
   const resource = `${database}-cli`;
   const before = await countMatchingAppHosts(appHost);
   if (before !== 1) {
@@ -93,19 +101,20 @@ export async function verifyTypedDbPhaseB(
   );
 
   let listenerFaulted = false;
-  let unhealthyStatus = '';
+  let departure: InducedDepartureEvidence | undefined;
   let boundedFailure: CommandResult | undefined;
   try {
-    await commandListenerFaultController(projectRoot, {
-      postgresOpen: false,
-      garnetOpen: true,
+    // Subscribe to the scoped resource stream before commanding the close, then wait for the
+    // aggregate Unhealthy event under the fixture's shared test-failure ceiling. Canary 6 (run
+    // 33684157301) timed out here on a private 30s poll while the listener-unreachable gate had
+    // observed the same departure moments earlier: Aspire's re-evaluation cadence is not ours.
+    departure = await observeInducedListenerDeparture(appHost, expectation, async () => {
+      await commandListenerFaultController(projectRoot, {
+        postgresOpen: false,
+        garnetOpen: true,
+      });
+      listenerFaulted = true;
     });
-    listenerFaulted = true;
-    unhealthyStatus = await waitForListenerUnhealthy(
-      appHost,
-      database,
-      TEST_ONLY_POSTGRES_HEALTH_KEY,
-    );
     // #1720 A4 / #863 name `netscript db init` as the exact command that must exit bounded
     // against an Unhealthy-but-Running Postgres. `db migrate` exercised a different code path
     // and did not prove the acceptance box.
@@ -147,7 +156,9 @@ export async function verifyTypedDbPhaseB(
     }
   }
 
-  if (!boundedFailure) throw new Error('bounded unhealthy database evidence was not captured');
+  if (!departure || !boundedFailure) {
+    throw new Error('bounded unhealthy database evidence was not captured');
+  }
   const after = await countMatchingAppHosts(appHost);
   if (after !== before) {
     throw new Error(`resident AppHost count changed from ${before} to ${after}`);
@@ -166,7 +177,17 @@ export async function verifyTypedDbPhaseB(
       stdout: resetWithoutConfirm.stdout,
       stderr: resetWithoutConfirm.stderr,
     },
-    unhealthy: { status: unhealthyStatus, timeoutSeconds: WAIT_TIMEOUT_SECONDS },
+    unhealthy: {
+      status: `${departure.testOnly.status}: ${
+        departure.testOnly.description ?? '(no description)'
+      }`,
+      healthCheckKey: expectation.healthCheckKey,
+      failureCode: readFailureCode(departure.testOnly.data),
+      realBacking: { key: expectation.realHealthCheckKey, status: departure.realBacking.status },
+      transitionEvidence: departure.source,
+      departureCeilingMs: departure.departureCeilingMs,
+      timeoutSeconds: WAIT_TIMEOUT_SECONDS,
+    },
     boundedFailure,
     appHostCount: { before, after },
   };
@@ -177,40 +198,22 @@ export async function verifyTypedDbPhaseB(
   console.info(`typed database Phase-B receipt: ${receiptPath}`);
 }
 
-async function waitForListenerUnhealthy(
-  appHost: string,
-  database: string,
-  healthCheckKey: string,
-): Promise<string> {
-  const deadline = Date.now() + REPORT_DEADLINE_MS;
-  let last = 'report absent';
-  while (Date.now() < deadline) {
-    try {
-      const describe = await requireAspireSuccess([
-        'describe',
-        '--apphost',
-        appHost,
-        '--format',
-        'Json',
-        '--non-interactive',
-        '--nologo',
-      ]);
-      const report = readListenerHealthReport(
-        JSON.parse(describe.stdout),
-        database,
-        healthCheckKey,
-      );
-      last = `${report.status}: ${report.description ?? '(no description)'}`;
-      if (
-        report.status === 'Unhealthy' && report.description !== undefined &&
-        UNHEALTHY_DESCRIPTION.test(report.description)
-      ) return last;
-    } catch (error) {
-      last = error instanceof Error ? error.message : String(error);
-    }
-    await new Promise((resolve) => setTimeout(resolve, REPORT_POLL_MS));
+/** Phase-B only faults the controller-owned Postgres listener; refuse anything else. */
+function ownedPostgresExpectation(database: DatabaseEngine): ListenerFaultExpectation {
+  const expectation = listenerFaultExpectations(database).find((candidate) =>
+    candidate.controllerListener === 'postgres' &&
+    candidate.healthCheckKey === TEST_ONLY_POSTGRES_HEALTH_KEY
+  );
+  if (!expectation) {
+    throw new Error(`S8 Phase-B has no controller-owned Postgres listener for ${database}`);
   }
-  throw new Error(`${database} did not become listener-Unhealthy; last=${last}`);
+  return expectation;
+}
+
+function readFailureCode(data: unknown): string | undefined {
+  if (typeof data !== 'object' || data === null) return undefined;
+  const code = Reflect.get(data, 'code');
+  return typeof code === 'string' ? code : undefined;
 }
 
 async function countMatchingAppHosts(appHost: string): Promise<number> {
@@ -297,5 +300,10 @@ if (import.meta.main) {
   if (!appHost || !projectRoot || !cliEntrypoint || !database) {
     throw new Error('expected apphost, project root, CLI entrypoint, and database arguments');
   }
-  await verifyTypedDbPhaseB(appHost, projectRoot, cliEntrypoint, database);
+  await verifyTypedDbPhaseB(
+    appHost,
+    projectRoot,
+    cliEntrypoint,
+    parseListenerFaultDatabase(database),
+  );
 }
