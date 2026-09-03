@@ -72,6 +72,10 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | 2026-09-03T03:17:00Z | S2 | slice review | Tightened the removal predicate from substring matching to an exact trimmed-line suffix for the current id; verified all other failures retain the original throw shape. Receipt change is additive and aggregates ids across probes. |
 | 2026-09-03T03:17:00Z | S2 | reconcile | No new issue/PR comments or acceptance changes. Scope remains the two evidence files plus run artifacts; hosted tiers remain deferred to CI. |
 | 2026-09-03T03:18:31Z | S2 | exact-head evidence | Durable focused test receipt passed 9/9 at `fdeeee1a06bd6698c6654bf95e0e0130991acafa`; `gitHead == actualGitHead`. |
+| 2026-09-03T03:19:00Z | S3 | scoped static gates | Structured check/lint/fmt each selected and processed both touched files; zero failed batches, diagnostics, dropped files, or findings. |
+| 2026-09-03T03:20:08Z | S3 | durable gates | At exact head `63282ffcc`: focused test 9/9 PASS, Aspire parity PASS (946 checked, 0 fail), and `quality:gate` PASS. |
+| 2026-09-03T03:21:00Z | S3 | prohibited-delta guard | Product delta contains only `cleanup.ts` and `cleanup_test.ts`; no `deno.lock`, `.llm/tmp/pwcli/`, timeout, deadline, wait-array, `setTimeout`, or budget delta. |
+| 2026-09-03T03:21:00Z | S3 | re-baseline/reconcile | Refreshed `origin/main` to `3903feea6`; its three new commits do not overlap the target surface. Issue/PR remain `status:impl`; no scope change. |
 
 ## Decisions
 
@@ -86,6 +90,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Owner-selected high generator effort exceeds the normal small-fix route. | minor | yes |
+| `origin/main` advanced by three unrelated commits during S3. | minor | yes |
 
 ## Gate Results
 
@@ -93,17 +98,24 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| scoped check/lint/fmt | structured wrappers | NOT_RUN | S3 |
 | S1 RED | `run-gate.ts --gate test -- .../evidence/cleanup_test.ts` | FAIL_EXPECTED | Receipt exit 1, 0/1 pass/fail. |
 | S2 focused GREEN | `run-gate.ts --gate test` over `cleanup_test.ts` and `aspire-cleanup-evidence_test.ts` | PASS | `receipts/s2-green.json`; 9 passed, 0 failed at `fdeeee1a0`. |
+| scoped check | `run-deno-check.ts --file cleanup.ts --file cleanup_test.ts --ext ts` | PASS | 2 selected; 1 batch; 0 failed batches; 0 diagnostics. |
+| scoped lint | `run-deno-lint.ts --file cleanup.ts --file cleanup_test.ts --ext ts` | PASS | 2 processed; no drops/refusals/findings. |
+| scoped fmt | `run-deno-fmt.ts --file cleanup.ts --file cleanup_test.ts --ext ts` | PASS | 2 processed; no drops/refusals/findings. |
+| S3 exact-head test | `run-gate.ts --gate test` over both cleanup test files | PASS | `receipts/s3-test.json`; 9/9 at `63282ffcc`. |
+| Aspire version parity | `run-gate.ts --gate aspire-version-parity` | PASS | `receipts/s3-aspire-version-parity.json`; 946 checked, 0 failed. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-10/F-19 | NOT_RUN | focused tests and wrappers planned | S1–S3 |
+| F-10 | PASS | `cleanup_test.ts`; `aspire-cleanup-evidence_test.ts`; `receipts/s3-test.json` | Small semantic tests; 9/9 pass. |
 | A14 RED regression | PASS | `receipts/s1-red.json` | Receipt SHA-256 `f8e2d160...`; pre-fix file hashes `cleanup.ts` `b861a185...`, `cleanup_test.ts` `4f8ec1aa...`. Receipt correctly records the bootstrap HEAD and does not claim worktree cleanliness. |
 | Archetype 6 structure | PASS | manual pre-change review | No public/composition/generated-output change planned. |
+| `quality:gate` | PASS | `receipts/s3-quality-gate.json` | Quality scan + doctrine check exit 0 at `63282ffcc`; reported warnings are pre-existing and outside this two-file delta. |
+| F-CLI-1…31 | PENDING_SCRIPT | manual post-change diff review + `quality:gate` | Archetype profile has no dedicated F-CLI scripts; no public surface, composition, registry, binary, generated output, or folder-over-cap change. |
+| F-19 | PASS | scoped check/lint/fmt reports above | Exact two-file selection, no exclusions or drops. |
 
 ### Runtime Gates
 
@@ -118,7 +130,17 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | --- | --- | --- | --- |
 | public CLI/scaffold output | N/A | scope review | No consumer-visible or generated-output change. |
 
+### Prohibited-Delta Guard
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Product paths | PASS | Baseline name-status shows only `cleanup.ts` and new `cleanup_test.ts`. |
+| Timing/budgets | PASS | Zero added/removed lines matching timeout, deadline, wait-array, `setTimeout`, or budget tokens. |
+| Lock/pwcli | PASS | Baseline diff contains no `deno.lock` or `.llm/tmp/pwcli/` path. |
+
 ## Handoff Notes
 
 - Evaluator should inspect the same-id error predicate, vanished-id aggregation, negative failure
   regression, prohibited-delta guard, and hosted tier evidence first.
+- Local S1–S3 are complete. Hosted tier checks and the fresh native Fable IMPL-EVAL remain before
+  close-gate completion.

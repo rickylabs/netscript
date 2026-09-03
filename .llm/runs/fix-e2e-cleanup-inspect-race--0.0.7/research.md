@@ -6,6 +6,9 @@
 - Re-derived against `origin/main` at `4afbd82a78f9f825b46b1dfdb6034ca3d45c514d` on 2026-09-03.
 - What changed vs the carried-in version: nothing. The remote baseline and branch match the brief;
   the local `main` ref is stale and is not used as the baseline.
+- Follow-up re-baseline: `origin/main` advanced to `3903feea63f0f4c421dd90f221132c08dbb3650e`
+  during S3. Its three commits do not touch cleanup evidence or its tests, so the locked design and
+  product diff remain current without rebasing the branch.
 
 ## Findings
 
