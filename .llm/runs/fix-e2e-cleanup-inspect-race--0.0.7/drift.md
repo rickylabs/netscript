@@ -22,3 +22,17 @@
 - **Action:** accept; no merge/rebase is needed because the PR merge ref supplies current main and
   the target surface has no overlap.
 - **Evidence:** `git diff 4afbd82a7..origin/main -- packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts` is empty.
+
+## 2026-09-03 — ready transition owns IMPL-EVAL dispatch
+
+- **What:** The planned native Fable evaluator is replaced by the PR lifecycle's single automatic
+  opposite-family IMPL-EVAL dispatch.
+- **Source:** Owner instruction to mark the draft ready after S1–S3; `netscript-pr` Draft ↔ ready
+  rule; `agent-handoff.md` formal-phase trigger contract.
+- **Expected:** Initial supervisor table selected native Fable for a local Codex-authored run.
+- **Actual:** Draft→ready is explicitly required and automatically dispatches IMPL-EVAL; launching
+  native Fable as well would duplicate the formal evaluator for the same head.
+- **Severity:** minor.
+- **Action:** accept; record requested and observed workflow identity, and do not claim reasoning
+  effort because OpenHands does not expose it.
+- **Evidence:** `supervisor.md`; PR #1979 ready transition and resulting workflow/comment.

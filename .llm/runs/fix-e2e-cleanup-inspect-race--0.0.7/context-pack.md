@@ -33,8 +33,8 @@ Aspire parity 946/0 failures, and quality/doctrine exit 0. Scoped check/lint/fmt
 ## Next Steps
 
 1. Commit/push the S3 evidence record.
-2. Verify both hosted runtime tiers at the fix head.
-3. Run the separate native Fable IMPL-EVAL and apply any findings.
+2. Mark the draft ready, which triggers the single automated opposite-family IMPL-EVAL.
+3. Verify both hosted runtime tiers at the fix head and apply any evaluator findings.
 4. Complete close-gate evidence and mark the PR ready only when permitted by the lifecycle.
 
 ## Key Decisions
@@ -71,7 +71,8 @@ Aspire parity 946/0 failures, and quality/doctrine exit 0. Scoped check/lint/fmt
 
 ## Drift and Debt
 
-- Drift: owner-selected generator effort and unrelated `main` advance recorded; no scope drift.
+- Drift: owner-selected generator effort, unrelated `main` advance, and lifecycle-owned evaluator
+  transport recorded; no scope drift.
 - Debt: no new or deepened debt.
 
 ## Commits
