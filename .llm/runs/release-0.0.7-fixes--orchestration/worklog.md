@@ -7997,3 +7997,11 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   label cycle; the cycle re-triggered e2e-cli 33702319275 at the same head → counts as run 2/2.
 - #1906: worker opened PR **#1969** (`Refs #1906` partial, cce7b34d2, non-draft, labels/milestone
   correct). Will packet on green + IMPL-EVAL.
+- 01:12Z #1945 IMPL-EVAL @d2a5e167f → **FAIL_FIX** (run 33696765169). F-1 high: new
+  `scaffold.design-production-exclusion` gate ran before `DATABASE_CODEGEN`, so its prod Vite build
+  could not import generated zod CRUD → both runtime suites abort. F-2: stale manifest (branch lacked
+  #1962). F-3: no closing keyword yet. Supervisor repair (bounded, plan-consistent): moved the gate
+  directly after `GATE.DATABASE_CODEGEN` in `RUNTIME_GATES` (sqlite derives), tightened
+  `suite-registry_test.ts` (de4d31b69); merged main 262aa8fbe (parity manifestFresh:true) → head
+  **9630583c8** pushed. F-3 keyword + acceptance boxes only after green head. Second FAIL_FIX on F-1
+  would escalate per harness rules.
