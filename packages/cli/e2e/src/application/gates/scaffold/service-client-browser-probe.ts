@@ -294,9 +294,8 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
       client,
       installOptimisticInstrumentationExpression(),
     );
-    let originalName: string;
     try {
-      originalName = await waitForExpression<string>(client, rowNameExpression());
+      await waitForExpression<string>(client, rowNameExpression());
     } catch (error) {
       const diagnostics = await captureOptimisticRenderDiagnostics(
         client,
@@ -311,6 +310,18 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
       requestCount: listRequestIds.size,
       completedCount: completedListIds.size,
     }));
+    let originalName: string;
+    try {
+      originalName = await waitForExpression<string>(client, rowNameExpression());
+    } catch (error) {
+      const diagnostics = await captureOptimisticRenderDiagnostics(
+        client,
+        undefined,
+        instrumentation,
+        false,
+      );
+      throw diagnosticsError('refreshed Rename row assertion failed', diagnostics, error);
+    }
     const renamedName = `${originalName}*`;
 
     await evaluate(client, clickRenameExpression());
@@ -340,6 +351,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
     }
     const mutationStatus = paused.responseStatusCode;
     await client.send('Fetch.continueResponse', { requestId: paused.requestId });
+    await client.send('Fetch.disable');
     if (typeof paused.networkId === 'string') {
       await client.waitFor(
         'Network.loadingFinished',
@@ -700,9 +712,11 @@ function optimisticDiagnosticsExpression(
     });
     const mutationMessage = document.querySelector('[data-mutation-state]');
     const list = row?.closest('ul[data-state]') ?? null;
-    const freshIsland = button?.closest('fresh-island, [data-fresh-island]') ?? null;
-    const islandHydrated = discovery.client !== null;
     const interactionObserved = ${JSON.stringify(interactionObserved)};
+    const freshIslandElement = list
+      ? list.tagName.toLowerCase() + '[data-state="' + (list.getAttribute('data-state') ?? '') + '"]'
+      : null;
+    const islandHydrated = interactionObserved;
     return {
       renderedRowText: row?.querySelector('p')?.textContent?.trim() ?? null,
       mutationState: mutationMessage?.getAttribute('data-mutation-state') ?? null,
@@ -714,7 +728,7 @@ function optimisticDiagnosticsExpression(
         : islandHydrated
         ? 'Browser QueryClient was reachable from the hydrated Preact tree, but Rename was not rendered'
         : 'No browser QueryClient or interactive Rename control was discoverable after Page.loadEventFired',
-      freshIslandElement: freshIsland?.tagName?.toLowerCase() ?? null,
+      freshIslandElement,
       queryClientFound: discovery.client !== null,
       queryClientPath: discovery.path,
       listQueryKey: listQuery?.queryKey ?? null,

@@ -146,3 +146,45 @@
   only `embedded.generated.ts`, and it passed after that generated combined-head carrier was staged.
 - General lesson: merge convergence can require an explicitly recorded dirty-read override for a
   generator, but the final clean/check mode remains the verdict and must pass before delivery.
+
+## 2026-09-03 — pre-refresh row made the optimistic assertion self-inconsistent
+
+- Severity: browser-probe correctness; no product-template change.
+- The service-refetch probe read the row name before deliberately refreshing the list, then derived
+  its expected optimistic rename from that stale value. Running #1885's hydration interaction first
+  made the divergence deterministic: SSR showed the app server cache's prior value while Refresh
+  loaded the newly persisted value, so the correct optimistic row had one more `*` than the probe
+  expected.
+- Resolution: retain the initial row-presence gate, but derive the mutation expectation from a
+  second row read after the completed, stable Refresh baseline. The response-paused optimistic and
+  exactly-one-refetch assertions remain unchanged.
+- General lesson: a probe that mutates its own baseline must derive later expectations after that
+  mutation, especially when earlier gates intentionally modify the same persisted fixture.
+
+## 2026-09-03 — QueryClient introspection was not hydration evidence
+
+- Severity: browser-evidence contract correction; no Fresh runtime change.
+- The generated island produced a paused update request and updated its DOM, while the bounded
+  Preact-object crawl still returned no QueryClient. The old diagnostic therefore emitted the
+  contradictory pair `islandInteractive=true` and `islandHydrated=false`.
+- Resolution: hydration/interactivity follow the #1885 observable interaction contract and the
+  concrete `ul[data-state]` surface; QueryClient discovery remains supplemental cache diagnostics.
+
+## 2026-09-03 — response interception required an explicit release
+
+- Severity: CDP transport correctness; no product behavior change.
+- In cached Chrome 151, `Fetch.continueResponse` alone acknowledged the command but left the held
+  cross-origin mutation pending. Both the branch probe and a direct CDP reproduction observed no
+  settled invalidation until interception was disabled.
+- Resolution: after continuing the single held response, call `Fetch.disable`; the unchanged gate
+  then measures mutation success and exactly one completed list refetch.
+
+## 2026-09-03 — sqlite maintainer DB commands started Aspire unexpectedly
+
+- Severity: constraint violation / tooling surprise.
+- The generated project's `netscript-dev db init/generate/seed` path announced and launched an
+  isolated project AppHost even though the intended operation was local sqlite codegen. The lane
+  stopped invoking that wrapper, terminated the exact run-owned Aspire/DCP process tree, and
+  verified it was gone before continuing with standalone Vite and Deno service processes.
+- General lesson: a database CLI wrapper may use Aspire as its command transport even for sqlite;
+  no-Aspire investigations must invoke the underlying generated database tasks directly.

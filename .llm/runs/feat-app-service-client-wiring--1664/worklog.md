@@ -664,3 +664,114 @@ branch carrier and passed after that generated result was staged.
   `88fc6d69d`.
 - No unmerged entries remain. No Aspire, Docker, browser, hosted-runtime, or `e2e:cli` command was
   run.
+
+## 2026-09-03 generated service-refetch discriminating measurement
+
+### Design and bounded experiment
+
+- Archetype: 6 — CLI / Tooling. The product surface under measurement is generated Fresh UI, but
+  this slice is limited to scaffold templates and their browser evidence probes; `packages/fresh/src`
+  is not a permitted implementation seam.
+- Baseline: branch `4e86a311397c7bf38adf68e2139201c331673bf2`, compared with the coordinator-pinned
+  clean-main ref `9464ab223`. The later remote `main` tip is deliberately not merged into this
+  bounded slice.
+- PLAN-EVAL: N/A — the coordinator supplied an ordered three-outcome experiment, exact comparison
+  ref, bounded edit ceiling, and fixed validation set. No architecture or public-contract choice is
+  being delegated to this implementation session.
+- Red-first source measurement: both `ServiceShowcaseLab` templates retain clean main's default
+  export, `QueryIsland` boundary, row structure, and interaction label. Their only branch delta is
+  `initialDataUpdatedAt: props.cachedAt`. The service-query template changes the query-factory
+  resource name and list invalidation derivation, not island registration or provider placement.
+- Next discriminators: emit identical stock `users` sqlite workspaces from both refs under
+  `/home/agent/tmp`, compare the three generated files byte-for-byte, serve the branch artifact
+  without Aspire, and run both #1885's hydration receipt and the service-refetch browser evidence
+  against that same URL.
+
+### Emitted-artifact comparison
+
+- Public CLI scaffolds from both refs completed with exit 0: 210 files / 47 directories each,
+  project `service-refetch-fixture`, sqlite database, and service name `users`.
+- A recursive comparison found exactly two differing emitted files. The generated island differs
+  only by the branch's `initialDataUpdatedAt: props.cachedAt`; its route-local `(_islands)` path,
+  default export, `QueryIsland`, `Rename` control, `ul[data-state]`, and Fresh boot registration are
+  byte-identical. The generated service-query module removes `bridgeInvalidation`, changes the
+  factory member from `service` to `users`, and derives the invalidation prefix from
+  `usersQueries.list.clientKey()`.
+- The standalone route returned HTTP 200 and the server HTML contained
+  `frsh:island:ServiceShowcaseLab:1:`, `Seed User`, `Rename`, and `data-state="success"`.
+
+### Browser discriminators and measured cause
+
+- Browser support was recovered without a system install: the cached Playwright Chromium was run
+  with Debian browser libraries extracted under `/home/agent/tmp`; every Deno eval used
+  `--no-lock`. A capability-check import briefly changed `deno.lock`; that diagnostic-only change
+  was immediately restored to HEAD before further work.
+- Red-first #1885 receipt output (exit 0):
+  `ISLAND_HYDRATION_OBSERVATION={"initialRow":"Seed User","rowAfterRename":"Seed User*","dataState":"success","freshIslandElement":"ul[data-state=\"success\"]"}` and
+  `ISLAND_HYDRATION_PROBE_RESULT={"islandHydrated":true,"freshIslandElement":"ul[data-state=\"success\"]"}`.
+- Red-first service probe output (exit 1):
+  `SERVICE_CLIENT_BROWSER_PROBE_ERROR=optimistic row assertion failed` with diagnostics
+  `renderedRowText="Seed User**"`, `islandInteractive=true`, and `queryClientFound=false`.
+  The exact doubled suffix is discriminating: #1885 had already persisted `Seed User*`; the app's
+  server cache still SSR-rendered `Seed User`, then the service probe's own Refresh loaded
+  `Seed User*`, but the probe continued expecting a rename derived from its pre-refresh snapshot.
+- Removing only `initialDataUpdatedAt` in the temporary artifact reproduced the same false
+  optimistic failure. Substituting both clean-main emitted files allowed the optimistic assertion
+  but then timed out at refetch because main's `service` query key and `users` invalidation prefix
+  do not match. The branch templates are therefore not the hydration failure.
+- A direct response-paused browser timeline on the unchanged branch artifact observed the true
+  optimistic state while held: row `Seed User*****`, disabled Rename control, and notice
+  `Optimistically renamed record #1.`. An ordinary unpaused interaction observed one update and
+  exactly one following list request.
+- After the probe re-read the row after its baseline Refresh, the optimistic phase passed and
+  exposed a second CDP-only fault: `Fetch.continueResponse` left the browser mutation promise
+  pending. Sending `Fetch.disable` immediately after continuing the sole held response releases
+  interception; the mutation settles and invalidation produces the required single refetch.
+- The timeout diagnostics now classify hydration from the #1885-compatible observable interaction
+  contract and report the concrete `ul[data-state="..."]` surface. QueryClient discovery remains a
+  separate diagnostic field and no longer turns an executed Rename handler into a false
+  non-hydration claim.
+
+### Fixed exact-head browser evidence
+
+- Re-running the probes in the requested order against the same standalone Vite/service pair:
+  `ISLAND_HYDRATION_OBSERVATION={"initialRow":"Seed User******","rowAfterRename":"Seed User*******","dataState":"success","freshIslandElement":"ul[data-state=\"success\"]"}`
+  and `ISLAND_HYDRATION_PROBE_RESULT={"islandHydrated":true,"freshIslandElement":"ul[data-state=\"success\"]"}` (exit 0).
+- Fixed service probe output (exit 0):
+  `SERVICE_CLIENT_BROWSER_PROBE_RESULT={"baselineListRequestCount":1,"finalListRequestCount":2,"mutationSucceeded":true,"optimisticRowContainedRenamedName":true,"finalRowContainedRenamedName":true,"renamedName":"Seed User********"}`.
+- No template or Fresh runtime source changed. The code touch is the branch-owned CDP probe plus its
+  existing unit test; validation receipts follow below.
+
+### Constraint drift and cleanup
+
+- The generated `netscript-dev db` wrapper unexpectedly launched an isolated AppHost while running
+  sqlite init/generate/seed. This contradicted the no-Aspire constraint; it was not an intentional
+  runtime gate. The process was interrupted at disclosure, its exact run-owned process tree was
+  terminated, and a read-only process check confirmed no process rooted in this fixture remained.
+  Subsequent runtime work used only standalone Vite and the generated Deno service; Docker and
+  `e2e:cli` were never invoked.
+
+### Final validation
+
+| Gate | Exit | Counts / evidence |
+| --- | ---: | --- |
+| Exact touched probe test with `TMPDIR=/home/agent/tmp` | 0 | 25 passed / 0 failed / 0 ignored |
+| Structured CLI check | 0 | 984 selected / 9 batches / 0 failed / 0 diagnostics |
+| Structured Fresh check | 0 | 219 selected / 2 batches / 0 failed / 0 diagnostics |
+| Full `packages/cli/e2e/tests/` unit directory | 0 | 325 passed / 0 failed / 0 ignored |
+| `check:assets-barrel` | 0 | Generated asset barrel current |
+| `check:publish-assets` | 0 | Published asset set current |
+| `check:emitted-samples` | 0 | 48 emitted TypeScript samples from 38 artifact paths checked |
+| `check:mcp-export-corpus` | 0 | 35 packages / 273 subpaths / 7,846 symbols; corpus current |
+| `check:aspire-version-parity` | 0 | Expected 13.5.3 / 916 checked / 0 failed / manifest fresh |
+| `arch:check` | 0 | Dependency and doctrine checks completed with 0 failures |
+| `quality:gate` | 0 | Root coverage complete; 0 quality findings / 7 existing allowances; doctrine 0 failures |
+| `docs:readme-fences` | 0 | 169 fences / 74 TS-like / 74 checked / 7 tolerated type errors / no unattributed failure |
+| `docs:jsdoc-examples` | 0 | 359 checked / 0 failures; deferred `unboundName=116`, `typeError=14` |
+| Source formatting and diff hygiene | 0 | 2 touched TypeScript files formatted; `git diff --check` clean |
+| Lock integrity | 0 | Byte-identical to the slice baseline; SHA-256 `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` |
+
+The touched-test wrapper was also run once without the required home-directory `TMPDIR`; that
+environment reported 23 passed / 2 failed because `/ephemeral/tmp` forbids execution of the two
+test-created browser stubs. Re-running on the slice's prescribed executable temp root passed all
+25 tests. No generated carrier, template, Fresh source, SDK source, or lock-file byte changed.

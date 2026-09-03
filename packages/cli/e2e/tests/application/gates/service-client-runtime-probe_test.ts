@@ -1,4 +1,5 @@
 import {
+  assert,
   assertEquals,
   assertRejects,
   assertStrictEquals,
@@ -813,7 +814,7 @@ Deno.test('browser termination propagates unrelated kill and drain errors unchan
   assertStrictEquals(actual, drainError);
 });
 
-Deno.test('browser refetch probe keeps the stable baseline and response-stage resume', async () => {
+Deno.test('browser refetch probe refreshes its row baseline and fully releases response interception', async () => {
   const sourceUrl = new URL(
     '../../../src/application/gates/scaffold/service-client-browser-probe.ts',
     import.meta.url,
@@ -823,7 +824,21 @@ Deno.test('browser refetch probe keeps the stable baseline and response-stage re
   assertStringIncludes(source, 'await waitForCompletedStableBaseline(() => ({');
   assertEquals(source.includes('await delay(750)'), false);
   assertStringIncludes(source, "client.send('Fetch.continueResponse'");
+  assertStringIncludes(source, "client.send('Fetch.disable')");
   assertEquals(source.includes("client.send('Fetch.continueRequest'"), false);
+  const stableBaseline = source.indexOf('await waitForCompletedStableBaseline(() => ({');
+  const refreshedRow = source.indexOf(
+    'originalName = await waitForExpression<string>(client, rowNameExpression())',
+    stableBaseline,
+  );
+  const renameClick = source.indexOf(
+    'await evaluate(client, clickRenameExpression())',
+    refreshedRow,
+  );
+  assert(stableBaseline >= 0 && refreshedRow > stableBaseline && renameClick > refreshedRow);
+  const continueResponse = source.indexOf("client.send('Fetch.continueResponse'");
+  const disableFetch = source.indexOf("client.send('Fetch.disable')", continueResponse);
+  assert(continueResponse >= 0 && disableFetch > continueResponse);
   assertStringIncludes(source, 'const stderr = captureBoundedText(child.stderr);');
   assertStringIncludes(source, 'const childStatus = child.status;');
   assertStringIncludes(source, 'const target = await awaitBrowserStartup(');
