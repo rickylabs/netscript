@@ -6034,18 +6034,17 @@
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
       "head": "b5d23b051fdd56453914f19b3f88c88e7b4a2806",
       "action": "PR merged; issue1455 closed. Only persist final receipts, no new implementation or runtime dispatch.",
-      "state": "merged-closeout",
-      "lastProgressAt": "2026-09-03T10:48:00Z",
-      "pid": 223146
+      "state": "completed",
+      "lastProgressAt": "2026-09-03T10:48:00Z"
     },
     {
       "pr": 1945,
       "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
-      "head": "456abefbdfa4a06de15c1a64b3e5f4a68751e769",
-      "action": "Bounded existing ordering-test repair only; final required CI then merge. Both runtime tiers and scoped independent PASS already verified.",
+      "head": "d6ffcb5ea73c9b06f3106b8dfff64b3d0d6584b3",
+      "action": "Bounded test repair pushed; watch core CI33746758886, complete truthful merge packet. Product runtime and independent PASS preserved.",
       "state": "active",
-      "lastProgressAt": "2026-09-03T10:48:00Z",
+      "lastProgressAt": "2026-09-03T10:54:16Z",
       "pid": 223518
     }
   ],
