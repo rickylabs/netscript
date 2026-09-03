@@ -81,6 +81,13 @@ Deno.test('sagas install emits only userland glue under sagas', () => {
       );
     }
   }
+
+  const controlPlane = artifacts.find((artifact) => artifact.path === 'sagas/plugin.ts');
+  assertStringIncludes(artifactText(controlPlane!), 'NETSCRIPT_CONTRIBUTION_BUILDERS');
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineSaga', axis: 'sagas' }",
+  );
 });
 
 Deno.test('sagas install runtime glue registers Redis before starting the runner', () => {

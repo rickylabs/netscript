@@ -9,24 +9,31 @@ Fresh runtime extensions, builders, forms, defer primitives, and route contracts
 page is written against the public surface reported by `deno doc`. For the full index
 of packages and plugins return to the [reference overview](/reference/).
 
+## Exports
+
 The root entrypoint (`@netscript/fresh`) exposes only the cross-cutting page-loader cache helpers.
 Every other capability lives on an explicit sub-path export. The sub-paths and their reference
 sections are:
 
-| Export                         | Entrypoint                          | Purpose                                       |
-| ------------------------------ | ----------------------------------- | --------------------------------------------- |
-| `@netscript/fresh`             | `./mod.ts`                          | Page-loader cache helpers (documented below). |
-| `@netscript/fresh/server`      | `./src/runtime/server/mod.ts`       | Fresh app factory and streaming SSR.          |
-| `@netscript/fresh/builders`    | `./src/application/builders/mod.ts` | Fluent page and partial builders.             |
-| `@netscript/fresh/route`       | `./src/application/route/mod.ts`    | Typed route contracts and navigation.         |
-| `@netscript/fresh/defer`       | `./src/application/defer/mod.ts`    | Deferred rendering primitives.                |
-| `@netscript/fresh/form`        | `./src/application/form/mod.ts`     | Managed forms and validation.                 |
-| `@netscript/fresh/error`       | `./src/diagnostics/error/mod.ts`    | Error normalization and display.              |
-| `@netscript/fresh/streams`     | `./src/runtime/streams/mod.ts`      | Durable streams client SDK.                   |
-| `@netscript/fresh/query`       | `./src/application/query/mod.ts`    | Island TanStack Query hooks.                  |
-| `@netscript/fresh/interactive` | `./src/runtime/interactive/mod.ts`  | Suspense promise helpers.                     |
-| `@netscript/fresh/vite`        | `./src/application/vite/vite.ts`    | NetScript Fresh Vite plugin.                  |
-| `@netscript/fresh/testing`     | `./src/testing/mod.ts`              | Test fixtures.                                |
+| Export                         | Path                                      | Purpose                                                          |
+| ------------------------------ | ----------------------------------------- | ---------------------------------------------------------------- |
+| `@netscript/fresh`             | `./mod.ts`                                | Page-loader cache helpers (documented below).                    |
+| `@netscript/fresh/server`      | `./src/runtime/server/mod.ts`             | Fresh app factory and streaming SSR.                             |
+| `@netscript/fresh/desktop`     | `./src/runtime/desktop/mod.ts`            | Desktop-gated oRPC window binding and lifecycle contracts.       |
+| `@netscript/fresh/builders`    | `./src/application/builders/mod.ts`       | Fluent page and partial builders.                                |
+| `@netscript/fresh/route`       | `./src/application/route/mod.ts`          | Typed route contracts and navigation.                            |
+| `@netscript/fresh/navigation`  | `./src/runtime/navigation/mod.ts`         | Last-intent partial-navigation coordinator and keyed boundaries. |
+| `@netscript/fresh/defer`       | `./src/application/defer/mod.ts`          | Deferred rendering primitives.                                   |
+| `@netscript/fresh/defer/island` | `./src/application/defer/island.ts`      | Client deferred-refresh coordinator and policy contracts.        |
+| `@netscript/fresh/form`        | `./src/application/form/mod.ts`           | Managed forms and validation.                                    |
+| `@netscript/fresh/error`       | `./src/diagnostics/error/mod.ts`          | Error normalization and display.                                 |
+| `@netscript/fresh/streams`     | `./src/runtime/streams/mod.ts`            | Durable streams client SDK.                                      |
+| `@netscript/fresh/ai`          | `./src/runtime/ai/mod.ts`                 | Durable-chat connections, projections, responses, and proxies.   |
+| `@netscript/fresh/ai/sandbox`  | `./src/runtime/ai/sandbox.ts`             | Fresh-compatible MCP sandbox and widget-call route handlers.     |
+| `@netscript/fresh/query`       | `./src/application/query/mod.ts`          | Island TanStack Query hooks.                                     |
+| `@netscript/fresh/interactive` | `./src/runtime/interactive/mod.ts`        | Suspense promise helpers.                                        |
+| `@netscript/fresh/vite`        | `./src/application/vite/vite.ts`          | NetScript Fresh Vite plugin.                                     |
+| `@netscript/fresh/testing`     | `./src/testing/mod.ts`                    | Test fixtures.                                                   |
 
 ## Root entrypoint
 
@@ -261,6 +268,34 @@ helpers.
 | `StripLeadingSlash`             | typeAlias | Strip a leading slash from a Fresh route pattern.                               |
 | `ValidatedRouteHref`            | typeAlias | Stable href string returned by validated route navigation helpers.              |
 
+## `@netscript/fresh/navigation`
+
+Client-side partial-navigation ordering. The coordinator makes the latest navigation intent win:
+newer page generations invalidate older page *and* region application, region requests inherit their
+rendered page generation, and a stale `replaceState` is suppressed inside the coordinator rather than
+by the application. Superseded responses are **drained to EOF, never aborted** — physically aborting
+a stale partial surfaces as an unhandled `AbortSignal` overlay under Vite dev.
+
+`KeyedPartial` keys the native Fresh `<Partial>` boundary by name so a remount is identity-safe.
+Applications do not patch `fetch`, `history`, or server HTML markers.
+
+### Functions and components
+
+| Symbol                               | Signature                                                        | Description                                                                       |
+| ------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `installPartialNavigationCoordinator` | `installPartialNavigationCoordinator(): PartialNavigationCoordinator` | Install the coordinator for the current document and return its handle.       |
+| `KeyedPartial`                       | `KeyedPartial(props: KeyedPartialProps): ComponentChild`         | Render a native Fresh partial boundary keyed by name for remount safety.          |
+
+### Types
+
+| Symbol                         | Description                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------- |
+| `PartialNavigationCoordinator` | Coordinator handle: applies route changes and disposes, awaiting in-flight EOF.  |
+| `RouteChange`                  | An accepted history mutation: `kind` (push/replace/pop), `url`, and `state`.      |
+| `KeyedPartialProps`            | Props for `KeyedPartial`: partial `name` and `mode`.                             |
+| `ComponentChild`               | Structural child type, avoiding a hard Preact type dependency.                   |
+| `ComponentChildren`            | One or many `ComponentChild` values.                                             |
+
 ## `@netscript/fresh/defer`
 
 Deferred rendering primitives: server and island defer wrappers, policy resolution, and telemetry
@@ -376,7 +411,7 @@ Managed forms: CSRF, intents, progressive enhancement, pagination, and Standard 
 | `FieldConstraints`             | interface | HTML constraint attributes derived from a schema field.                    |
 | `FieldDescriptor`              | interface | Descriptor for one form field and its generated props.                     |
 | `FieldDescriptorMap`           | typeAlias | Field descriptors keyed by form value path.                                |
-| `FormCollectionStrategy`       | interface | Client/server ownership policy for a collection field.                     |
+| `FormCollectionStrategy`       | typeAlias | Client/server ownership policy for a collection field.                     |
 | `FormCollectionStrategyMode`   | typeAlias | Progressive enhancement strategy for collection fields.                    |
 | `FormContent`                  | typeAlias | Renderable content accepted by form helper components.                     |
 | `FormCsrfInputProps`           | interface | Props for the hidden CSRF token input.                                     |

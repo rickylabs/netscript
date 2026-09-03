@@ -8,9 +8,12 @@
  *
  * Use the root when an app wants the L3 composition preset:
  * `defineServices()`. That preset creates service clients, server-side query
- * factories, and TanStack Query utilities from one contract map. Its returned
- * values are the same L2 values exposed by the focused factories, so dropping
- * down a layer does not require replacing wiring.
+ * factories, and TanStack Query utilities from one contract map. Explicit client
+ * contribution tuples add typed per-call context and declared HTTP headers;
+ * cache-safe tuples partition full keys, while direct-only tuples remain absent
+ * from generated query surfaces. Its returned values are the same L2 values
+ * exposed by the focused factories, so dropping down a layer does not require
+ * replacing wiring.
  *
  * Use `@netscript/sdk/presets` when browser or shared code only needs
  * `defineServices()` and its package-owned type closure. That focused entry
@@ -65,6 +68,7 @@ export * from './src/query/mod.ts';
 export * from './src/query-client/mod.ts';
 export * from './src/telemetry/mod.ts';
 export type {
+  ActionQueryKey,
   CachedEntry,
   CacheEntry,
   CacheInvalidationReport,
@@ -80,7 +84,9 @@ export type {
   CacheWriteReport,
   CacheWriteTopologyReport,
   QueryClientPort,
+  SdkClientServerKeySuffix,
   ServiceClientContract,
   ServiceClientShape,
   ServiceQueryUtils,
+  ServiceRequestRest,
 } from './src/ports/mod.ts';

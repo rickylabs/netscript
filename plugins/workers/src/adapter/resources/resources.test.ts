@@ -56,6 +56,13 @@ Deno.test('workers install emits only userland glue under workers', () => {
       );
     }
   }
+
+  const controlPlane = artifacts.find((artifact) => artifact.path === 'workers/plugin.ts');
+  assertStringIncludes(artifactText(controlPlane!), 'NETSCRIPT_CONTRIBUTION_BUILDERS');
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineJob', axis: 'jobs' }",
+  );
 });
 
 Deno.test('workers task scaffolder preserves multi-runtime task emission', () => {

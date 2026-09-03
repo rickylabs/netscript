@@ -1,10 +1,20 @@
 /** Inline scripts used by scaffold runtime lifecycle gates. */
 
+import { KV_BACKGROUND_RUNTIME_RESOURCES } from '../../../../domain/cli-surface.ts';
+
 export const ASPIRE_START_SCRIPT = [
   'const appHost = Deno.args[0];',
   'const projectRoot = Deno.args[1];',
+  'const configPath = Deno.args[2];',
   'if (!appHost) throw new Error("apphost argument is required");',
   'if (!projectRoot) throw new Error("project root argument is required");',
+  'if (!configPath) throw new Error("aspire config argument is required");',
+  'const config = JSON.parse(await Deno.readTextFile(configPath));',
+  'const environmentVariables = config.profiles?.https?.environmentVariables;',
+  'if (!environmentVariables) throw new Error("aspire.config.json omitted profiles.https.environmentVariables");',
+  'const dashboardAnonymousKey = "ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS";',
+  'environmentVariables[dashboardAnonymousKey] = "false";',
+  'await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);',
   'const command = new Deno.Command("aspire", {',
   '  args: [',
   '    "start",',
@@ -49,6 +59,57 @@ export const ASPIRE_RESTART_SCRIPT = [
   '}).spawn().status;',
   'if (!stop.success) throw new Error(`aspire stop failed with code ${stop.code}`);',
   ASPIRE_START_SCRIPT,
+].join('\n');
+
+/**
+ * Prefer the S8 typed migration command; retain the full restart for older/failing surfaces.
+ *
+ * A successful migrate must leave the AppHost resident, but the KV-backed background runtimes
+ * it does not restart would keep processing against the pre-migration database — #1720's
+ * "health-check execution has not completed yet". So the success path restarts only those
+ * resources (`aspire resource <name> restart`), and the full AppHost restart stays strictly as
+ * the fallback for surfaces that can run neither the typed command nor a targeted restart.
+ */
+export const ASPIRE_TYPED_DB_COMMAND_OR_RESTART_SCRIPT = [
+  'const database = Deno.args[3];',
+  'if (!database) throw new Error("database argument is required");',
+  'const typed = await new Deno.Command("aspire", {',
+  '  args: [',
+  '    "resource", `${database}-cli`, "migrate", "--timeout", "60",',
+  '    "--apphost", Deno.args[0], "--non-interactive", "--nologo",',
+  '  ],',
+  '  stdout: "inherit",',
+  '  stderr: "inherit",',
+  '}).spawn().status;',
+  'if (typed.success) {',
+  '  console.info(`typed ${database}-cli migrate completed; resident AppHost preserved`);',
+  '  await restartBackgroundRuntimes();',
+  '} else {',
+  '  console.warn(`typed database command exited ${typed.code}; using restart fallback`);',
+  ASPIRE_RESTART_SCRIPT,
+  '}',
+  '',
+  'async function restartBackgroundRuntimes() {',
+  `  const runtimes = ${JSON.stringify([...KV_BACKGROUND_RUNTIME_RESOURCES])};`,
+  '  for (const resource of runtimes) {',
+  '    const restart = await new Deno.Command("aspire", {',
+  '      args: [',
+  '        "resource", resource, "restart",',
+  '        "--apphost", Deno.args[0], "--non-interactive", "--nologo",',
+  '      ],',
+  '      stdout: "inherit",',
+  '      stderr: "inherit",',
+  '    }).spawn().status;',
+  '    if (!restart.success) {',
+  '      console.warn(',
+  '        `aspire resource ${resource} restart exited ${restart.code}; using restart fallback`,',
+  '      );',
+  ASPIRE_RESTART_SCRIPT,
+  '      return;',
+  '    }',
+  '    console.info(`restarted ${resource}; background processors now observe the migrated database`);',
+  '  }',
+  '}',
 ].join('\n');
 
 export const AUTH_SMOKE_ENV_SCRIPT = [

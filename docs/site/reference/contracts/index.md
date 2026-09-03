@@ -33,6 +33,45 @@ sub-path exports add higher-level builders:
 | `NetScriptAuthenticationRequirement` | type alias | `type NetScriptAuthenticationRequirement = "none" \| "optional" \| "required"` | NetScript-owned authentication vocabulary used by procedure metadata. Existing literals remain stable; metadata capabilities evolve through additive optional readonly fields. |
 | `NetScriptProcedureMeta` | interface | `interface NetScriptProcedureMeta` | NetScript-owned semantic procedure metadata, independent of the upstream contract-library representation. Consumers treat absent fields as unspecified; compatibility evolves through additive optional readonly fields. |
 
+### Procedure access metadata
+
+`NetScriptProcedureMeta.access` is the single access-policy vocabulary. Attach it to the procedure
+with `.meta()`; do not create a second policy object keyed by a router name or URL.
+
+```ts
+import { baseContract } from '@netscript/contracts';
+import { z } from 'zod';
+
+export const readOrder = baseContract
+  .route({ method: 'GET', path: '/orders/{id}' })
+  .meta({
+    access: {
+      authentication: 'required',
+      authorization: {
+        scopes: ['orders:read'],
+        roles: ['operator'],
+      },
+    },
+  })
+  .input(z.object({ id: z.string() }))
+  .output(z.object({ id: z.string() }));
+```
+
+| Field | Meaning |
+| --- | --- |
+| `access.authentication` | Optional `'none' \| 'optional' \| 'required'` declaration. An absent access field is unspecified. |
+| `access.authorization.scopes` | Optional readonly scope requirements. |
+| `access.authorization.roles` | Optional readonly role requirements. |
+
+The metadata is contract-local, so it follows the procedure when the router key is renamed. The
+renamed SDK method retains the metadata, while a reference to the old SDK key fails to type-check.
+This is rename continuity; it does not require a second key-indexed policy map.
+
+Runtime enforcement is separately opt-in through `@netscript/service`. The vocabulary declares
+`'optional'` for future support, but `createContractAuthorizer()` currently rejects it during
+construction with the stable
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` error.
+
 ## Schema helper factories
 
 | Symbol | Signature | Description |

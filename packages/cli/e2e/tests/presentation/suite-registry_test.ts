@@ -230,6 +230,18 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
+  const resourceCommandIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_RESOURCE_COMMAND
+  );
+  assertEquals(
+    resourceCommandIndex >
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES),
+    true,
+  );
+  assertEquals(
+    resourceCommandIndex < runtime.gates.findIndex((gate) => gate.id === GATE.CLEANUP_ASPIRE_STOP),
+    true,
+  );
 });
 
 Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () => {
@@ -278,11 +290,38 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_APP), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
+    true,
+  );
+  assertEquals(
+    resolveSuite(SCAFFOLD.RUNTIME_SQLITE).gates.some((gate) =>
+      gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+    ),
+    true,
+  );
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    assertEquals(
+      resolveSuite(suiteId).gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_HYDRATION),
+      true,
+      suiteId,
+    );
+  }
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
+  const dynamicRouteIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE
+  );
+  const referenceIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE);
   assertEquals(waitIndex < homeIndex, true);
+  assertEquals(
+    [homeIndex, dynamicRouteIndex, referenceIndex],
+    [homeIndex, homeIndex + 1, homeIndex + 2],
+    'catalog order must be app-home, dynamic-route, app-reference',
+  );
 });
 
 Deno.test('listener failure/recovery gate runs after topology capture and before behavior', () => {
@@ -310,8 +349,13 @@ Deno.test('runtime DB mutations run only after the resident AppHost starts', () 
   }
   const seedIndex = gates.findIndex((gate) => gate.id === GATE.DATABASE_SEED);
   const restartIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB);
+  const secondAllocationIndex = gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND
+  );
+  const refreshIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_DESCRIBE);
   const waitIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES);
-  assertEquals(seedIndex < restartIndex && restartIndex < waitIndex, true);
+  assertEquals(seedIndex < restartIndex && restartIndex < secondAllocationIndex, true);
+  assertEquals(secondAllocationIndex < refreshIndex && refreshIndex < waitIndex, true);
 });
 
 Deno.test('runtime suite omits database resource wait for sqlite', () => {
@@ -390,6 +434,7 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
     GATE.DATABASE_MIGRATION_ARTIFACTS,
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
     GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+    GATE.RUNTIME_TYPED_DB_PHASE_B,
     GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
   ]);
   const databaseWaits = new Set<GateId>([
@@ -424,6 +469,7 @@ Deno.test('runtime database overrides preserve service health and the Postgres g
         GATE.DATABASE_MIGRATION_ARTIFACTS,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
         GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+        GATE.RUNTIME_TYPED_DB_PHASE_B,
         GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
       ])).has(gate)
     ),
@@ -464,6 +510,18 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
 
   const runtimeGateIds = cases[0][0].gates.map((gate) => gate.id);
+  for (const [suite] of cases) {
+    const gateIds = suite.gates.map((gate) => gate.id);
+    const smokeIndex = gateIds.indexOf(GATE.AGENT_ASPIRE_MCP_SMOKE);
+    assertEquals(
+      gateIds.indexOf(GATE.SCAFFOLD_AGENT_INIT) > gateIds.indexOf(GATE.SCAFFOLD_INIT),
+      true,
+      suite.id,
+    );
+    assertEquals(smokeIndex > gateIds.indexOf(GATE.RUNTIME_WAIT_APP), true, suite.id);
+    assertEquals(smokeIndex > gateIds.indexOf(GATE.RUNTIME_ASPIRE_DESCRIBE), true, suite.id);
+    assertEquals(smokeIndex < gateIds.indexOf(GATE.CLEANUP_ASPIRE_STOP), true, suite.id);
+  }
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
@@ -471,11 +529,13 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST), true);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND), true);
   assertEquals(runtimeGateIds.includes(GATE.BEHAVIOR_LIVE_DB_ENDPOINT), true);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_TYPED_DB_PHASE_B), true);
 
   assertEquals(sqliteGateIds.includes(GATE.DATABASE_MIGRATION_ARTIFACTS), false);
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST), false);
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND), false);
   assertEquals(sqliteGateIds.includes(GATE.BEHAVIOR_LIVE_DB_ENDPOINT), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_TYPED_DB_PHASE_B), false);
 });
 
 Deno.test('runtime suite selects mssql database resource wait for mssql', () => {

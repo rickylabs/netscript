@@ -61,11 +61,15 @@ export const GATE_PHASE = {
   CLEANUP: 'cleanup',
 } as const;
 
+/** Stable receipt gate id for the generated Aspire MCP server. */
+export const AGENT_ASPIRE_MCP_SMOKE = 'agent.aspire-mcp-smoke';
+
 /** Static gate ids used by the scaffold plugin suite. */
 export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
   SCAFFOLD_INIT: 'scaffold.init',
+  SCAFFOLD_AGENT_INIT: 'scaffold.agent-init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
   CONTRACT_LIST: 'contract.list',
@@ -109,6 +113,7 @@ export const GATE = {
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
   RUNTIME_CAPTURE_DB_ALLOCATION_FIRST: 'runtime.capture-db-allocation-first',
   RUNTIME_ASPIRE_RESTART_AFTER_DB: 'runtime.aspire-restart-after-db',
+  RUNTIME_TYPED_DB_PHASE_B: 'runtime.typed-db-phase-b',
   RUNTIME_CAPTURE_DB_ALLOCATION_SECOND: 'runtime.capture-db-allocation-second',
   RUNTIME_WAIT_DATABASE: 'runtime.wait.database',
   RUNTIME_WAIT_POSTGRES: 'runtime.wait.postgres',
@@ -125,9 +130,14 @@ export const GATE = {
   RUNTIME_WAIT_STREAMS: 'runtime.wait.streams',
   RUNTIME_WAIT_APP: 'runtime.wait.app',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
+  RUNTIME_RESOURCE_COMMAND: 'runtime.resource-command',
+  AGENT_ASPIRE_MCP_SMOKE,
   RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
+  BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
+  BEHAVIOR_ISLAND_SERVED_SURFACE: 'behavior.island-served-surface',
+  BEHAVIOR_ISLAND_HYDRATION: 'behavior.island-hydration',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',

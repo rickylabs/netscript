@@ -122,7 +122,8 @@ Deno.test('command union covers the complete schema 1.0 command vocabulary', () 
     { kind: 'restore', commandId: '08', mode: 'plan', session, currentRoute: route },
     { kind: 'status', commandId: '09', mode: 'inspect', agent: 'codex' },
     { kind: 'repair-codex-remote', commandId: '10', mode: 'plan', worktree: route.worktree },
-    { kind: 'rollback', commandId: '11', mode: 'plan', checkpointId: 'checkpoint-1' },
+    { kind: 'repair-sender-lease', commandId: '11', mode: 'plan', worktree: route.worktree },
+    { kind: 'rollback', commandId: '12', mode: 'plan', checkpointId: 'checkpoint-1' },
   ] as const satisfies readonly RuntimeCommand[];
 
   assertEquals(commands.map((command) => command.kind), [...RUNTIME_COMMANDS]);

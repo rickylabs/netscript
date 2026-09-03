@@ -27,7 +27,7 @@ export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{
   readonly correlationId?: string;
   readonly traceparent?: string;
   readonly tracestate?: string;
-  readonly reportProgress?: (percent: number, message?: string) => void;
+  readonly reportProgress?: (percent: number, message?: string) => void | Promise<void>;
 }>;
 
 /** Function that executes a runtime job. */
@@ -142,6 +142,10 @@ export type ExecutionRecord = Readonly<
     readonly error: string | null;
     readonly result: Record<string, unknown> | null;
     readonly workerId: string | null;
+    /** Latest execution progress percentage. */
+    readonly progressPercent: number | null;
+    /** Latest execution progress message. */
+    readonly progressMessage: string | null;
     readonly attempt: number;
     readonly maxAttempts: number;
     readonly payload?: Record<string, unknown>;

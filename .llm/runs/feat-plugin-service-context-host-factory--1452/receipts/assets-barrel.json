@@ -1,0 +1,36 @@
+{
+  "gateId": "assets-barrel",
+  "invocationId": "1452-seam-barrel",
+  "argv": [
+    "deno",
+    "task",
+    "check:assets-barrel"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1452",
+  "gitHead": "8ab11ddeefa75cd0993c1d2cfa52c21ac2463a9c",
+  "actualGitHead": "8ab11ddeefa75cd0993c1d2cfa52c21ac2463a9c",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:1632473",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "04e62d989da0150dfc07c370d0029c4e6ccc52c10e2f633db6570f19093ad55b",
+  "lifecycleId": "worker:1632473:1452-seam-barrel:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T04:42:37.625Z",
+  "startedAt": "2026-08-31T04:42:37.627Z",
+  "finishedAt": "2026-08-31T04:42:38.254Z",
+  "durationMs": 627,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 622,
+    "sha256": "112b4f675ae42f50781a08b52dda9b08317c29d3b1a3b19e39caf9a80aec8cc9",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:assets-barrel\u001b[0m deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/cli/src/kernel/assets/agent-tools.generated.ts packages/cli/src/kernel/assets/agent-docs.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mgen:assets-barrel\u001b[0m deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts\n",
+    "truncated": false
+  }
+}

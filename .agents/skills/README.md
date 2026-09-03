@@ -17,11 +17,13 @@ operate this codebase end-to-end without re-deriving the API from documentation 
 | `jsr-audit`          | **CORE** — Audit packages for JSR readiness. Required Plan-Gate input for package/plugin waves.                   | active |
 | `deno-fresh`         | Frontend development with Fresh 2.x, Preact, and Tailwind CSS in Deno.                                            | active |
 | `aspire`             | Aspire/.NET integration, AppHost shape, and Deno hosting package expectations.                                    | active |
+| `aspire-upgrade`     | Aspire version bumps: pin map, fixture re-record, carrier chain, runtime proof, canary class.                     | active |
 | `rtk`                | Token-saving CLI proxy. Prefix read-heavy git/gh/grep/ls/docker commands with `rtk`; `rtk proxy` for `deno task`. | active |
 | `claude-manager`     | Operate Claude Code and WSL Codex sessions: discover, steer, monitor, MCP-bridge, and poll daemon status.         | active |
 
-Claude Code consumes a generated mirror at `.claude/skills/`. Keep `.agents/skills/` as the source
-of truth and run `deno task agentic:sync-claude` after skill changes.
+`.agents/skills/` is the single repository-skill source for every agent. Claude Code discovers that
+source through the lone `.claude/skills/repo-skills/SKILL.md` bridge and reads the matching skill
+here directly; repository skills are never copied into `.claude/skills/`.
 
 ---
 
@@ -34,6 +36,7 @@ If a prompt is vague, route it to the narrowest skill that fits:
 - JSR readiness or publish audit → `jsr-audit`
 - Fresh/Deno frontend → `deno-fresh`
 - Aspire/.NET scaffold or AppHost work → `aspire`
+- Taking a new Aspire release (patch/minor/major pin bump) → `aspire-upgrade`
 - Read-heavy git/gh/grep/ls/docker output, or tracking `deno task` runs → `rtk`
 - Claude Code, Zed ACP, or WSL Codex session steering/status → `claude-manager`
 - Anything else → ask for clarification rather than guess

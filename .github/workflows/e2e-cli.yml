@@ -33,6 +33,54 @@ name: e2e-cli
 # triggers the workflow immediately. Version tags and manual dispatch run the
 # complete release-grade suite.
 #
+# Queue policy: the docker and sqlite runtime tiers remain separate repo-wide
+# mutexes because they contend for host resources. Each group uses GitHub's
+# bounded `queue: max` admission (one running plus up to 100 pending) rather
+# than the default single pending entry, which replaces and cancels overflow.
+# A deferred job therefore stays visibly pending and resumes on the same run
+# and head SHA without a redispatch or push. Within that documented bound,
+# `cancelled` now means an explicit cancellation, timeout, or the workflow's
+# per-ref supersession—not silent runtime-gate eviction.
+# The tier group keys are versioned: fixed branches use v2 so a pre-#1846
+# branch cannot share their mutex.
+# The mechanism this prevents is *pending displacement*, not cancellation of a
+# running job. Both generations set `cancel-in-progress: false` on the tier
+# groups, so a running job is never interrupted. What #1846 added was
+# `queue: max`; a branch without it falls back to GitHub's default admission of
+# one running plus *one* pending, and each new arrival cancels the previously
+# pending entry. A pre-#1846 arrival therefore destroys other topics' *queued*
+# tier jobs while leaving running ones alone — which is why an evicted job shows
+# `steps: 0` and why the symptom looks like flaky infrastructure on the victim.
+# During the transition, the at-most-one-running-per-tier promise holds within
+# a key generation: one v1 plus one v2 job may run on isolated hosted VMs. The
+# repo-wide promise returns once every live branch carries v2 — and "live"
+# includes dormant-but-unmerged branches, which keep the doubling alive until
+# they are integrated or deleted. A `cancelled` runtime job on a v1 (unfixed)
+# branch means an unfixed branch is still live, not that the fixed queue policy
+# is defective.
+# Operationally, a label edit on a pre-#1846 branch is a full runtime dispatch
+# (`on:` includes `labeled`); batch it with the head move instead of spending it
+# separately. Cancelling a stale-branch runtime run to free the mutex is
+# net-negative *within the v1 generation*: its forced redispatch is another v1
+# arrival that can displace the pending job it was meant to save. Post-v2 a v1
+# redispatch cannot reach a v2 job, so the advice survives but the reason is
+# narrower than it looks.
+# A `ci:skip-e2e` branch skips at *policy* level, not by staying out of the
+# group: on a PR that is not opted in, `classify` is skipped and the tier `if`
+# is false, so no job is admitted; but on an opted-in PR the classifier runs and
+# succeeds (fail-closed), the tier jobs ARE admitted, and the skip happens at
+# step level via `env.RUN` — seconds-long no-ops that still enter the group.
+# Harmless under v2 + `queue: max`, but they are not absent from the mutex.
+# To pick up this fix on a stale topic, merge `main` **through a GitHub
+# server-side merge** (the Update-branch or merge button, or the API): a push
+# from the git command line that touches `.github/workflows/**` is refused
+# whenever the credential lacks PAT `workflow` scope, and that refusal applies
+# even to a merge republishing an already-remote tree. That asymmetry rescues
+# only branches adopting
+# an already-merged fix: authoring any change to this file still requires a
+# credential carrying `workflow` scope, so the wall is real for whoever writes
+# the next one.
+#
 # Selection policy (see `.github/scripts/ci-classify-changes.ts`): an opted-in
 # PR first runs `classify`, which emits the #1152 capability vector
 # (`run_static`, `run_runtime_sqlite`, `run_runtime`, `needs_*`) from the diff
@@ -250,8 +298,9 @@ jobs:
     name: scaffold-runtime (aspire + docker + postgres)
     needs: classify
     concurrency:
-      group: e2e-scaffold-runtime-global
+      group: e2e-scaffold-runtime-global-v2
       cancel-in-progress: false
+      queue: max
     # Applicable only after release/manual/PR opt-in. `ci:skip-e2e` can
     # short-circuit the lane; classifier failure is fail-closed and runs it.
     # This remains additive until it has enough observed-green history.
@@ -329,15 +378,18 @@ jobs:
             .llm/tmp/e2e-report-scaffold-runtime*.json
             .llm/tmp/e2e-report-scaffold-runtime*.ndjson
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
+            .llm/tmp/gate-receipts/scaffold-runtime/agent.aspire-mcp-smoke*
           include-hidden-files: true
           if-no-files-found: ignore
+          retention-days: 30
 
   scaffold-runtime-sqlite:
     name: scaffold-runtime-sqlite (aspire + sqlite + garnet)
     needs: classify
     concurrency:
-      group: e2e-scaffold-runtime-sqlite-global
+      group: e2e-scaffold-runtime-sqlite-global-v2
       cancel-in-progress: false
+      queue: max
     # Applicable only after release/manual/PR opt-in. The sqlite runtime follows
     # the scaffold-impact signal; ci:skip-e2e remains authoritative over both
     # runtime tiers. Classifier failure is fail-closed and runs it.
@@ -415,8 +467,10 @@ jobs:
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.json
             .llm/tmp/e2e-report-scaffold-runtime-sqlite*.ndjson
             .llm/tmp/cli-e2e/*/.netscript/e2e/listener-unreachable-receipt.json
+            .llm/tmp/gate-receipts/scaffold-runtime-sqlite/agent.aspire-mcp-smoke*
           include-hidden-files: true
           if-no-files-found: ignore
+          retention-days: 30
 
   desktop-native-linux:
     name: desktop-native-linux (deb + signed updater)

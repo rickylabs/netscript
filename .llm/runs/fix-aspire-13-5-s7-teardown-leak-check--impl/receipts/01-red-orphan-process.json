@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "s7-red-orphan-process",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/agentic/teardown/leak-check_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-aspire-13-5-s7",
+  "gitHead": "fe4f496bdcc605eceb9b3e5748ad55a7811bbed9",
+  "actualGitHead": "fe4f496bdcc605eceb9b3e5748ad55a7811bbed9",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:1342254",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "39b34bf6fb32b2d42c3d6f966fd8c93e0a204a40d91b31293bff36c162bcdb51",
+  "lifecycleId": "worker:1342254:s7-red-orphan-process:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-30T03:07:54.500Z",
+  "startedAt": "2026-08-30T03:07:54.505Z",
+  "finishedAt": "2026-08-30T03:07:56.029Z",
+  "durationMs": 1524,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 799,
+    "sha256": "a6a26969cab0481841180356296458b0ff3b8fa5559299047df604967bc3027d",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/agentic/teardown/leak-check_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-aspire-13-5-s7\",\"exitCode\":1,\"durationMs\":1379,\"summary\":{\"passed\":7,\"failed\":1,\"ignored\":0,\"totalResults\":8,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n+   [\\n+     \\\"process\\\",\\n+     \\\"process\\\",\\n+     \\\"process\\\",\\n+   ]\\n-   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/agentic/teardown/leak-check_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"13.5.3 orphaned PPID-1 Aspire descendants are reported\",\"file\":\"./.llm/tools/agentic/teardown/leak-check_test.ts\",\"line\":141}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 150,
+    "sha256": "db68f641a734b889f38e63e7ea7042e73a1f0ab32f198c54377fa0a78214c2b3",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/agentic/teardown/leak-check_test.ts'\n",
+    "truncated": false
+  }
+}

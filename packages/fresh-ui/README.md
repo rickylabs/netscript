@@ -108,7 +108,15 @@ Controlled collection actions are opt-in; omitting these props preserves the leg
 
 ```tsx
 import { DataGrid } from '@netscript/fresh-ui';
+import type { DataGridColumn, DataGridRow } from '@netscript/fresh-ui';
 import { ActionMenu } from '@netscript/fresh-ui/interactive';
+
+type Session = { name: string; tokens: number; status: string };
+
+declare const columns: readonly DataGridColumn<Session>[];
+declare const rows: readonly DataGridRow<Session>[];
+declare const selectedIds: ReadonlySet<string>;
+declare const setSelectedIds: (next: ReadonlySet<string>) => void;
 
 <DataGrid<Session>
   columns={columns}

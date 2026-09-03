@@ -12,6 +12,7 @@ import {
   HYBRID_MCP_ENVIRONMENT_NAMES,
   HYBRID_PROCESS_GROUP_BINARIES,
 } from './hybrid-opencode-adapter.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 const STRIPPED_CLAUDE_ENV = new Set([
   'ANTHROPIC_API_KEY',
@@ -70,6 +71,7 @@ export interface HybridLauncherDependencies {
 
 /** Parses the deliberately small launcher argument surface. */
 export function parseHybridLaunchOptions(args: readonly string[]): HybridLaunchOptions {
+  args = normalizeTaskArguments(args);
   let cwd: string | undefined;
   let name: string | undefined;
   for (let index = 0; index < args.length; index++) {

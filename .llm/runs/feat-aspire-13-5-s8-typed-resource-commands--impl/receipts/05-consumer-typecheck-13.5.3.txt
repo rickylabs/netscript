@@ -1,0 +1,78 @@
+Gate: S8 consumer AppHost type-check against restored Aspire SDK 13.5.3
+Date: 2026-08-30
+Result: PASS (compiler exit 2 with exactly two allowed zod TS2307 baseline errors and zero S8 errors)
+
+Generator source:
+  worktree: /home/agent/projects/netscript/worktrees/007-aspire-s8
+  phase-A HEAD before the slice-5 fix commit: 1efd1a175d75cb5bb167b0998e0ce559f037255f
+  command: deno run -A packages/cli/bin/netscript.ts init s8tsc --path .llm/tmp/s8tsc --db postgres --cache --cache-backend redis --service --no-git --ci --yes
+  generated project: <worktree>/.llm/tmp/s8tsc/s8tsc
+  generated AppHost: <worktree>/.llm/tmp/s8tsc/s8tsc/aspire
+
+Scratch-only manifest adjustment:
+  sdk.version: 13.5.3
+  Aspire.Hosting.PostgreSQL: 13.5.3
+  Aspire.Hosting.Redis: 13.5.3
+  Aspire.Hosting.Browsers: 13.5.3-preview.1.26425.3
+  aspire.config.json sha256: 77d8d5e2d670d635e322c10e0f627e51823a2e722094bf76e5b1cdc3965878eb
+  No product manifest was changed.
+
+Static host invariants:
+  pre-restore `/home/agent/.local/bin/mise exec -- aspire ps --format Json --nologo --non-interactive`: []
+  pre-restore `DOCKER_HOST=tcp://netscript-dind:2375 docker ps -a`: <empty>
+  post-restore `/home/agent/.local/bin/mise exec -- aspire ps --format Json --nologo --non-interactive`: []
+  post-restore `DOCKER_HOST=tcp://netscript-dind:2375 docker ps -a`: <empty>
+
+Restore (single attempt; no retry):
+  command: /home/agent/.local/bin/mise exec -- aspire restore --apphost <generated-apphost> --non-interactive --nologo
+  output:
+    Finding AppHosts...
+    .llm/tmp/s8tsc/s8tsc/aspire/apphost.mts
+
+    Restoring SDK code...
+    SDK code restored successfully for apphost.mts.
+  exit code: 0
+  D-39 host state: max_user_instances=1024; no historical inotify waiver applies
+
+Restored modules:
+  .aspire/modules/aspire.mts sha256: 7cd4cf8319360b4ddbe8fb8f5481e3e5907610883c40179840fa249a86600487
+  .aspire/modules/base.mts sha256: e2ce97fa0ceaf103fd604174473dfcb6e586db9f548d1759e291618514ec656e
+  .aspire/modules/transport.mts sha256: 2fd6593b7390e43e322f26e884f5b56fbad25f7f7dd0695671982bd72e455c17
+  These match the S6 expected hashes exactly.
+
+Restored signature evidence:
+  aspire.mts:802-814 — CommandOptions.arguments?: InteractionInput[]
+  aspire.mts:824-832 — visibility?: ResourceCommandVisibility
+  aspire.mts:734-740 — ResourceCommandVisibility is emitted as string values None/UI/Api
+  aspire.mts:1695-1697 — WithCommandOptions.commandOptions?: CommandOptions
+  aspire.mts:5842-5850 — ExecuteCommandContext.arguments(): InteractionInputCollectionPromise
+  base.mts:476-486 — InteractionInputCollectionPromise.value()/requiredValue()
+  aspire.mts:10035-10040 — Configuration.getConnectionString(name): Promise<string>
+  aspire.mts:10463-10466 — DistributedApplicationBuilder.getConfiguration(): ConfigurationPromise
+  aspire.mts:27160-27169 — ExecutableResource.withCommand(..., options?: WithCommandOptions)
+  aspire.mts:27323-27327 — ExecutableResource.excludeFromMcp()
+
+D-19 correction cycle:
+  First compiler exit: 2.
+  First output included only the two allowed zod TS2307 misses plus three real generator defects:
+    - ServiceProvider has no getConnectionString member (TS2339)
+    - the string-valued visibility enum cannot be bitwise-combined (TS2322/TS2362/TS2363)
+  Correction:
+    - non-SQLite callbacks now use builder.getConfiguration().getConnectionString(...)
+    - explicit visibility is omitted so Aspire supplies its documented UI+API default; no cast
+  Generated helper hashes after correction:
+    .helpers/db-cli-mode.mts sha256: a933cd743d127358f6bcd17c312143f9c65bede4b513298387700cf9083bb36e
+    .helpers/run-tool.mts sha256: 5373ccf7fed07c05b430a30eba77d165a5393b5279b05faa956efb5424e73ff6
+
+Compiler:
+  TypeScript 5.9.3 from the restored AppHost node_modules
+  command (from generated aspire directory): ./node_modules/.bin/tsc --noEmit -p tsconfig.apphost.json
+  final observed output:
+    .helpers/_aspire-compat.mts(10,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+    .helpers/config-schema.mts(4,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
+  final exit code: 2
+  baseline diagnostics: exactly the two allowed zod TS2307 errors above
+  S8 diagnostics: 0
+
+No Aspire start, run, wait, resource command, AppHost process, or container operation was used.
+The scratch workspace was removed after evidence capture.

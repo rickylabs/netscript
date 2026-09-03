@@ -15,7 +15,7 @@ The userland saga DSL (`defineSaga`, the cascaded-message constructors) is autho
 [`@netscript/plugin-sagas-core`](/reference/plugin-sagas-core/) and re-exported through the runtime
 entrypoint. That separately published package has its own canonical reference page.
 
-## Entrypoints
+## Exports
 
 The plugin publishes the following entrypoints. Each is documented against its own `deno doc`
 surface.
@@ -23,14 +23,16 @@ surface.
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/plugin-sagas` | `./mod.ts` | Plugin manifest, identifiers, and inspection helper (documented below). |
+| `@netscript/plugin-sagas/adapter-cli` | `./cli.ts` | Executable plugin-adapter CLI entrypoint and its shared CLI protocol types. |
 | `@netscript/plugin-sagas/public` | `./src/public/mod.ts` | Curated public manifest surface for host integration. |
 | `@netscript/plugin-sagas/plugin` | `./src/public/mod.ts` | Plugin manifest and contribution types (alias of the public surface). |
 | `@netscript/plugin-sagas/runtime` | `./src/runtime/mod.ts` | Executable saga runtime, engine, scheduler, publisher, and supervisor. |
 | `@netscript/plugin-sagas/contracts` | `./contracts/v1/mod.ts` | Versioned API contract (`sagasContract`) and router types. |
 | `@netscript/plugin-sagas/streams` | `./streams/mod.ts` | Browser-safe saga stream schema and collection. |
 | `@netscript/plugin-sagas/cli` | `./src/cli/mod.ts` | Plugin CLI commands (inspect, codemod, generate registry). |
-| `@netscript/plugin-sagas/scaffolding` | `./src/scaffolding/mod.ts` | Saga item scaffolders and runtime scaffold manifest. |
+| `@netscript/plugin-sagas/scaffold` | `./scaffold.ts` | Executable plugin scaffolder entrypoint and its shared scaffolding protocol types. |
 | `@netscript/plugin-sagas/aspire` | `./src/aspire/mod.ts` | Aspire contribution for the sagas API service. |
+| `@netscript/plugin-sagas/doctor` | `./doctor.ts` | Static sagas adapter used by plugin doctor. |
 | `@netscript/plugin-sagas/services` | `./services/src/main.ts` | Saga API service entrypoint. |
 | `@netscript/plugin-sagas/e2e` | `./src/e2e/mod.ts` | End-to-end test contributions. |
 | `@netscript/plugin-sagas/streams/server` | `./streams/server.ts` | Server-side stream wiring. |
@@ -46,7 +48,7 @@ is provided by `inspectPlugin` from `@netscript/plugin`.
 | `SAGAS_PLUGIN_ID` | variable | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
 | `SAGAS_PLUGIN_VERSION` | variable | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
 | `SAGAS_API_SERVICE_NAME` | variable | `"sagas-api"` | Service contribution name for the sagas API process. |
-| `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Default HTTP fallback port for the sagas API process (note: your scaffold's port will differ as the scaffolder allocates randomized high-range ports at init/install time). |
+| `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Deprecated compatibility metadata; endpoint resolution does not use this value as an HTTP fallback. |
 
 
 ## Runtime (`@netscript/plugin-sagas/runtime`)
@@ -66,6 +68,7 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 | `SagaScheduler` | class | - | Durable timer scheduler for `schedule()` cascaded messages. |
 | `SagaCompensator` | class | - | Runtime primitive for `sagaFail()` and `sagaCompensate()` cascades. |
 | `createSagaPublisher` | function | `createSagaPublisher(options: HttpSagaPublisherOptions): SagaPublisherPort` | Create a plugin-layer HTTP publisher for sagas API publish endpoints. |
+| `publishSagaOrThrow` | function | `publishSagaOrThrow(publisher, message, options?): Promise<SagaPublisherReceipt>` | Publish one message and throw a structured `SagasError` when the non-throwing port rejects it. |
 | `HttpSagaPublisher` | class | - | HTTP implementation of the saga publisher port. |
 | `loadSagaRegistryModule` | function | `loadSagaRegistryModule(specifier, importer): Promise` | Load saga definitions from the generated static registry module. |
 | `SagaIdempotencyDedupTable` | class | - | In-memory idempotency table for local development and tests; use a durable port in production. |
@@ -78,7 +81,7 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 | `SagaRuntimeAdapter` | type alias | Adapter selected by the saga runtime composition root. |
 | `SagaBusPort` | interface | Replaceable bus contract implemented by the native saga adapter. |
 | `SagaStorePort` | interface | Persistent boundary for saga state, transitions, and correlation indexes. |
-| `SagaPublisherPort` | interface | Explicit publisher boundary implemented by plugin-layer HTTP clients. |
+| `SagaPublisherPort` | interface | Non-throwing publisher boundary; callers must discriminate every receipt or use `publishSagaOrThrow` for one message. |
 | `SagaIdempotencyPort` | interface | Durable idempotency boundary for saga publish and cascade deduplication. |
 | `CreateSagaRuntimeOptions` | type alias | Options accepted by `createSagaRuntime()`. |
 | `SagaEngineOptions` | type alias | Options for the native saga engine. |

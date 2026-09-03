@@ -4,6 +4,8 @@ export interface ListenerHealthReport {
   readonly healthCheckKey: string;
   readonly status: string;
   readonly description?: string;
+  readonly data?: unknown;
+  readonly exception?: unknown;
 }
 
 /** Read a resource's named object-valued 13.5 health report without accepting array drift. */
@@ -12,65 +14,134 @@ export function readListenerHealthReport(
   resourceName: string,
   healthCheckKey: string,
 ): ListenerHealthReport {
+  const reports = readListenerHealthReports(topology, resourceName);
+  const report = reports.find((candidate) => candidate.healthCheckKey === healthCheckKey);
+  if (!report) {
+    throw new Error(`resource ${resourceName} health key ${healthCheckKey} was never published`);
+  }
+  return report;
+}
+
+/**
+ * Look up one named report without failing when it is absent.
+ *
+ * A report that has not been published *yet* is not the same as one that will never appear. Wait
+ * loops need the first case to mean "keep waiting"; `readListenerHealthReport` throws for both,
+ * which turned a transient absence into a fatal error inside a loop written to tolerate it.
+ */
+export function findListenerHealthReport(
+  topology: unknown,
+  resourceName: string,
+  healthCheckKey: string,
+): ListenerHealthReport | undefined {
+  return readListenerHealthReports(topology, resourceName)
+    .find((candidate) => candidate.healthCheckKey === healthCheckKey);
+}
+
+/** Read every named report on one described resource, retaining diagnostic payloads. */
+export function readListenerHealthReports(
+  topology: unknown,
+  resourceName: string,
+): readonly ListenerHealthReport[] {
   const resources = isRecord(topology) && Array.isArray(topology.resources)
     ? topology.resources
     : [];
   for (const candidate of resources) {
     if (!isRecord(candidate) || !resourceMatches(candidate, resourceName)) continue;
     const reports = candidate.healthReports;
-    if (!isRecord(reports) || !(healthCheckKey in reports)) continue;
-    const report = reports[healthCheckKey];
-    if (!isRecord(report) || typeof report.status !== 'string') {
-      throw new Error(`${resourceName} healthReports.${healthCheckKey} has no string status`);
+    if (!isRecord(reports)) return [];
+    const parsed: ListenerHealthReport[] = [];
+    for (const [healthCheckKey, report] of Object.entries(reports)) {
+      if (!isRecord(report) || typeof report.status !== 'string') {
+        throw new Error(`${resourceName} healthReports.${healthCheckKey} has no string status`);
+      }
+      parsed.push({
+        resourceName,
+        healthCheckKey,
+        status: report.status,
+        ...(typeof report.description === 'string' ? { description: report.description } : {}),
+        ...('data' in report ? { data: report.data } : {}),
+        ...('exception' in report ? { exception: report.exception } : {}),
+      });
     }
-    return {
-      resourceName,
-      healthCheckKey,
-      status: report.status,
-      ...(typeof report.description === 'string' ? { description: report.description } : {}),
-    };
+    return parsed;
   }
-  throw new Error(`${resourceName} omitted healthReports.${healthCheckKey}`);
+  throw new Error(`resource ${resourceName} was never published`);
 }
 
-/** Wait for Aspire health, then require the expected custom report to be Healthy. */
+/** Format the published-but-unhealthy state without discarding report diagnostics. */
+export function listenerReadinessFailure(report: ListenerHealthReport): string {
+  const details = [
+    `status=${report.status}`,
+    ...(report.description === undefined
+      ? []
+      : [`description=${renderDiagnostic(report.description)}`]),
+    ...(report.data === undefined ? [] : [`data=${renderDiagnostic(report.data)}`]),
+    ...(report.exception === undefined ? [] : [`exception=${renderDiagnostic(report.exception)}`]),
+  ];
+  return `${report.resourceName} health key ${report.healthCheckKey} exists but is unhealthy: ${
+    details.join(' ')
+  }`;
+}
+
+/** Poll named Aspire health so unpublished and unhealthy states remain distinguishable. */
 export async function verifyListenerReadiness(
   appHost: string,
   resourceName: string,
   healthCheckKey: string,
   timeoutSeconds: number,
 ): Promise<ListenerHealthReport> {
-  await runAspire([
-    'wait',
-    resourceName,
-    '--status',
-    'healthy',
-    '--timeout',
-    String(timeoutSeconds),
-    '--apphost',
-    appHost,
-    '--non-interactive',
-    '--nologo',
-  ]);
-  const topology = JSON.parse(
-    await runAspire([
-      'describe',
-      '--apphost',
-      appHost,
-      '--format',
-      'Json',
-      '--non-interactive',
-      '--nologo',
-    ]),
-  );
-  const report = readListenerHealthReport(topology, resourceName, healthCheckKey);
-  if (report.status !== 'Healthy') {
-    throw new Error(
-      `${resourceName} healthReports.${healthCheckKey} is ${report.status}, expected Healthy`,
-    );
+  const deadline = performance.now() + timeoutSeconds * 1_000;
+  let lastFailure = `resource ${resourceName} health key ${healthCheckKey} was never published`;
+
+  while (true) {
+    try {
+      const topology = JSON.parse(
+        await runAspire([
+          'describe',
+          '--apphost',
+          appHost,
+          '--format',
+          'Json',
+          '--non-interactive',
+          '--nologo',
+        ]),
+      );
+      const reports = readListenerHealthReports(topology, resourceName);
+      const expected = reports.find((report) => report.healthCheckKey === healthCheckKey);
+      if (!expected) {
+        lastFailure = `resource ${resourceName} health key ${healthCheckKey} was never published`;
+      } else {
+        const blocker = expected.status === 'Healthy'
+          ? reports.find((report) => report.status !== 'Healthy')
+          : expected;
+        if (!blocker) {
+          console.info(`${resourceName} ${healthCheckKey} listener health is Healthy`);
+          return expected;
+        }
+        lastFailure = listenerReadinessFailure(blocker);
+        if (isTerminalListenerFailure(blocker)) throw new Error(lastFailure);
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('exists but is unhealthy')) throw error;
+      lastFailure = error instanceof Error ? error.message : String(error);
+    }
+
+    const remainingMs = deadline - performance.now();
+    if (remainingMs <= 0) {
+      throw new Error(`${lastFailure}; readiness deadline ${timeoutSeconds}s elapsed`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, Math.min(1_000, remainingMs)));
   }
-  console.info(`${resourceName} ${healthCheckKey} listener health is Healthy`);
-  return report;
+}
+
+function isTerminalListenerFailure(report: ListenerHealthReport): boolean {
+  if (!isRecord(report.data)) return false;
+  return report.data.code === 'NOAUTH' || report.data.code === 'EPROTO';
+}
+
+function renderDiagnostic(value: unknown): string {
+  return JSON.stringify(value) ?? String(value);
 }
 
 async function runAspire(args: readonly string[]): Promise<string> {

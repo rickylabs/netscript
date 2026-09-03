@@ -1,6 +1,7 @@
 /** Launches OpenCode's native browser UI with safe remote-exposure defaults. */
 
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { openCodeChildEnvironment, resolveOpenCodeBinary } from './opencode-run.ts';
 
 export interface OpenCodeWebOptions {
@@ -64,6 +65,7 @@ function requiredValue(args: readonly string[], index: number, flag: string): st
 }
 
 function parse(args: readonly string[]): OpenCodeWebOptions {
+  args = normalizeTaskArguments(args);
   let hostname: string = OPENCODE_TOOL.webDefaultHostname;
   let port: number = OPENCODE_TOOL.webDefaultPort;
   let mdns = false;

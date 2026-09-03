@@ -204,7 +204,17 @@ function renderSandboxDocument(input: {
  *
  * @example
  * ```ts
- * import { createMcpSandboxHandler } from '@netscript/fresh/ai';
+ * import {
+ *   createMcpSandboxHandler,
+ *   type McpSandboxHandlerOptions,
+ * } from '@netscript/fresh/ai/sandbox';
+ *
+ * declare const registry: {
+ *   lookup(
+ *     uri: string,
+ *     options: { signal: AbortSignal },
+ *   ): ReturnType<McpSandboxHandlerOptions['resolveResource']>;
+ * };
  *
  * export const handler = {
  *   GET: createMcpSandboxHandler({

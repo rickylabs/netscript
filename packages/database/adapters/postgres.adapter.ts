@@ -42,8 +42,8 @@ export interface PostgresDriverAdapter {
  *
  * @example
  * ```typescript
- * import { PostgresAdapter } from '@netscript/database/adapters';
- * import { PrismaClient } from './generated/client';
+ * import { PostgresAdapter } from '@netscript/database/adapters/postgres';
+ * import { PrismaClient } from '@database';
  *
  * const adapter = new PostgresAdapter({
  *   connectionString: 'postgresql://user:pass@localhost:5432/mydb',

@@ -11,6 +11,7 @@ interface ConventionReference {
     | 'dashboard-view'
     | 'ui-barrel'
     | 'composition-route'
+    | 'dynamic-order-route'
     | 'service-route-contract'
     | 'service-lib'
     | 'service-page'
@@ -25,6 +26,11 @@ interface ConventionReference {
 }
 
 const COMMON_REFERENCES: readonly ConventionReference[] = [
+  {
+    id: 'dynamic-order-route',
+    path: 'routes/examples/orders/[id].tsx',
+    purpose: 'typed dynamic path binding and bound-reference href generation',
+  },
   {
     id: 'dashboard-view',
     path: 'routes/(_components)/dashboard-view.tsx',

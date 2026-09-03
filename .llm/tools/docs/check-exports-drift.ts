@@ -26,6 +26,11 @@ export interface PackageMapping {
   symbolCoverage: SymbolCoverage;
 }
 
+export interface ExcludedReferencePage {
+  docPath: string;
+  reason: string;
+}
+
 export interface DenoConditionalExportTarget {
   readonly default?: string;
 }
@@ -34,7 +39,123 @@ export type DenoExportTarget = string | DenoConditionalExportTarget;
 
 export type DenoExports = string | Readonly<Record<string, DenoExportTarget>>;
 
+export const EXCLUDED_REFERENCE_PAGES: readonly ExcludedReferencePage[] = [
+  {
+    docPath: 'docs/site/reference/auth/index.md',
+    reason:
+      'Multi-package auth hub indexing @netscript/plugin-auth, @netscript/plugin-auth-core, @netscript/auth-kv-oauth, @netscript/auth-workos, and @netscript/auth-better-auth; it is not the reference page for a single package.',
+  },
+];
+
 export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
+  {
+    name: 'fresh',
+    packagePath: 'packages/fresh',
+    docPath: 'docs/site/reference/fresh/index.md',
+    packageName: '@netscript/fresh',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all seventeen entrypoints, but four have no per-symbol tables and the server, builders, route, form, streams, query, and Vite sections omit query-cache invalidation, routed-partial and schema, form-navigation, SSE protocol, and Vite hook contracts.',
+    },
+  },
+  {
+    name: 'plugin-workers-core',
+    packagePath: 'packages/plugin-workers-core',
+    docPath: 'docs/site/reference/plugin-workers-core/index.md',
+    packageName: '@netscript/plugin-workers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all seventeen entrypoints and inventories all 32 root exports, but omits subpath-only APIs including JobBuilderState, WorkersRuntime, PublicDefinitionSchema, WorkersContractV1, WorkersConfig, WorkerInstrumentation, and TestWorkersRuntime.',
+    },
+  },
+  {
+    name: 'plugin-sagas-core',
+    packagePath: 'packages/plugin-sagas-core',
+    docPath: 'docs/site/reference/plugin-sagas-core/index.md',
+    packageName: '@netscript/plugin-sagas-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page documents every entrypoint and the complete root and agent surfaces, but omits substantial subpath contracts such as transport codecs, store adapters, telemetry contracts, and config schemas.',
+    },
+  },
+  {
+    name: 'plugin-sagas',
+    packagePath: 'plugins/sagas',
+    docPath: 'docs/site/reference/sagas/index.md',
+    packageName: '@netscript/plugin-sagas',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All fourteen entrypoints were checked with deno doc; the page documents 56 of 236 exported symbols and omits broad CLI command/backend contracts, runtime delivery/projection/scheduler/publisher details, contract schemas, E2E and scaffold protocols, and server-side stream wiring.',
+    },
+  },
+  {
+    name: 'plugin-triggers',
+    packagePath: 'plugins/triggers',
+    docPath: 'docs/site/reference/triggers/index.md',
+    packageName: '@netscript/plugin-triggers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eleven entrypoints were checked with deno doc; the page documents 17 of 150 exported symbols and omits broad trigger CLI command/backend contracts, runtime definitions and action/durability/port contracts, scaffold protocols, service helpers, and stream database/server wiring.',
+    },
+  },
+  {
+    name: 'plugin-workers',
+    packagePath: 'plugins/workers',
+    docPath: 'docs/site/reference/workers/index.md',
+    packageName: '@netscript/plugin-workers',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All thirteen entrypoints were checked with deno doc; the page documents 125 of 175 exported symbols and omits CLI job/task/workflow commands and runtime API clients, adapter and doctor contracts, health-check job contracts, generated-registry/runtime helpers, scaffold protocols, and project-file utilities.',
+    },
+  },
+  {
+    name: 'ai',
+    packagePath: 'packages/ai',
+    docPath: 'docs/site/reference/ai/index.md',
+    packageName: '@netscript/ai',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all thirteen entrypoints but does not yet inventory every symbol: /skills has no dedicated symbol section; the root prompt APIs, OpenAI-compatible vision exports, Ollama HttpReachabilityConfig, MCP pool/resource APIs, AgentLoop, newer contract/reasoning symbols, vector-memory and provider-factory ports, and retrieval testing helpers remain incomplete.',
+    },
+  },
+  {
+    name: 'auth-kv-oauth',
+    packagePath: 'packages/auth-kv-oauth',
+    docPath: 'docs/site/reference/auth-kv-oauth/index.md',
+    packageName: '@netscript/auth-kv-oauth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All eight entrypoints were checked with deno doc; the page omits AUTH_SESSION_STATES, AtomicCheck, AtomicMutation, AtomicResult, AuthBackendPort, AuthPrincipalMapperPort, AuthProviderCapability, AuthProviderDescriptor, AuthProviderRegistryPort, AuthSession, AuthSessionCreateInput, AuthSessionCryptoPort, AuthSessionLookup, AuthSessionPrincipalMapping, AuthSessionState, AuthSessionStorePort, AuthenticatorPort, AuthnRequest, AuthnResult, ClientAuthMethod, InteractiveCallbackResult, InteractiveFlowPort, KvEntry, KvKey, KvListOptions, KvOAuthCookieOptions, KvOAuthEncryptedTokens, KvOAuthErrorCode, KvOAuthFetch, KvOAuthJsonValidator, KvOAuthKeyMaterial, KvOAuthPrincipal, KvOAuthRefreshMode, KvOAuthSessionRecord, KvOAuthStoreOptions, KvOAuthTxn, KvSetOptions, KvStore, NormalizePrincipalContext, OAuthCustomFetch, OAuthEndpointProviderConfig, OAuthIssuerProviderConfig, OAuthProviderBaseConfig, OAuthProviderClientAuthConfig, OAuthTokenCustomFetch, Principal, TenantOAuthProviderOptions, WatchEvent, WatchOptions, WatchPrefixOptions, WatchableKv, clientAuth, describeProvider, discoveryRequestOptions, hashToken, and requestOptions.',
+    },
+  },
+  {
+    name: 'plugin-triggers-core',
+    packagePath: 'packages/plugin-triggers-core',
+    docPath: 'docs/site/reference/plugin-triggers-core/index.md',
+    packageName: '@netscript/plugin-triggers-core',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'The page guarantees all twelve entrypoints and completely inventories the root/public/builders surface, while omitting substantial domain defaults/errors, port defer/clock contracts, adapter/store implementations, config and v1 contract schemas, telemetry types, and testing doubles reported by deno doc.',
+    },
+  },
   {
     name: 'plugin-auth-core',
     packagePath: 'packages/plugin-auth-core',
@@ -45,6 +166,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'All nine entrypoints were checked with deno doc; the page omits AUTH_PRESET_KINDS, Account, AccountState, AttributeValue, Attributes, AuthAttributeName, AuthAttributes, AuthAttributesMap, AuthBackendPreset, AuthCapabilities, AuthConfigInput, AuthContract, AuthContractDefinition, AuthContractV1, AuthErrorCode, AuthErrorCodeMap, AuthErrorCodeValue, AuthOperationInput, AuthOperationRecorder, AuthOutcome, AuthOutcomeMap, AuthOutcomeValue, AuthPresetDefinition, AuthPresetKind, AuthPresetRegistry, AuthProviderConfig, AuthProviderPreset, AuthRouter, AuthSchema, AuthSchemaResult, AuthSessionPolicy, AuthSessionPrincipalMapping, AuthSessionResponse, AuthSessionResponseSchema, AuthSpanEventName, AuthSpanEvents, AuthSpanEventsMap, AuthSpanName, AuthSpanNames, AuthSpanNamesMap, AuthStreamDefinition, AuthStreamEventSchema, AuthStreamEventType, AuthStreamSessionSchema, AuthTelemetry, AuthTelemetryAttributeValue, AuthTelemetryAttributes, AuthTelemetryOperation, AuthTelemetryOptions, AuthUserResponse, AuthUserResponseSchema, AuthenticatorPort, AuthnRequest, AuthnResult, BuildAuthSessionOptions, BuildAuthUserOptions, CallbackInput, CallbackInputSchema, CallbackResponse, CallbackResponseSchema, CollectionDefinition, CollectionEventHelpers, Context, Exception, InteractiveCallbackResult, Link, MeResponse, MeResponseSchema, Principal, RedactedAuthPrincipal, SerializedTraceContext, SessionInput, SessionInputSchema, SessionResponse, SessionResponseSchema, SigninInput, SigninInputSchema, SigninResponse, SigninResponseSchema, SignoutInput, SignoutInputSchema, SignoutResponse, SignoutResponseSchema, Span, SpanContext, SpanKind, SpanOptions, SpanStatus, SpanStatusCode, StateSchema, StreamStateDefinition, TimeInput, TraceState, Tracer, ValidationErrorData, buildAuthSession, and buildAuthUser.',
+    },
+  },
+  {
+    name: 'plugin-auth',
+    packagePath: 'plugins/auth',
+    docPath: 'docs/site/reference/plugin-auth/index.md',
+    packageName: '@netscript/plugin-auth',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All nine entrypoints were checked with deno doc; the page documents 5 of 84 exported symbols and omits versioned auth contracts, schemas, router and session/user inputs and responses, service runtime types, stream event/schema/producer/database helpers, and scaffold and adapter CLI protocols.',
     },
   },
   {
@@ -69,6 +202,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'The root table inventories all 51 exports, but the SSE table omits BindStreamEventSourceOptionsV1, Operation, the shared schema contracts, and 16 StreamSse* contract types; telemetry and testing are prose-only and therefore omit all 33 telemetry exports plus MemoryStreamEvent, MemoryStreamProducer, StreamTopicFixtureSchema, and createStreamTopicFixture from symbol tables.',
+    },
+  },
+  {
+    name: 'plugin-streams',
+    packagePath: 'plugins/streams',
+    docPath: 'docs/site/reference/streams/index.md',
+    packageName: '@netscript/plugin-streams',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All seven entrypoints were checked with deno doc; the page documents 33 of 55 exported symbols and omits adapter CLI and scaffold protocol types, shared CLI and E2E contracts, the unsupportedStreamOperation helper, and Aspire contribution contracts.',
     },
   },
   {
@@ -249,6 +394,18 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
       mode: 'entrypoints-only',
       reason:
         'The page inventories every root export and both entrypoints, but its contracts/v1 tables omit AiContractSchema, AiContractSchemaResult, JsonSchema, ReasoningChunk, and ToolParameters.',
+    },
+  },
+  {
+    name: 'plugin-ai',
+    packagePath: 'plugins/ai',
+    docPath: 'docs/site/reference/plugin-ai/index.md',
+    packageName: '@netscript/plugin-ai',
+    excludedExports: [],
+    symbolCoverage: {
+      mode: 'entrypoints-only',
+      reason:
+        'All seven entrypoints were checked with deno doc; the page documents 24 of 88 exported symbols and omits adapter CLI and scaffold protocol types, adapter contracts, and much of the versioned AI contract vocabulary including message/content/chunk, model, tool, usage, and schema types.',
     },
   },
   {
@@ -646,6 +803,47 @@ export function checkSymbolsDrift(
   return errors;
 }
 
+export function validateReferencePageCoverage(
+  referenceDocPaths: readonly string[],
+  mappings: readonly { readonly docPath: string }[],
+  exclusions: readonly ExcludedReferencePage[],
+): string[] {
+  const mappedPaths = new Set(mappings.map((mapping) => mapping.docPath));
+  const excludedPaths = new Set(exclusions.map((exclusion) => exclusion.docPath));
+  const errors: string[] = [];
+
+  for (const docPath of [...referenceDocPaths].sort()) {
+    const mapped = mappedPaths.has(docPath);
+    const excluded = excludedPaths.has(docPath);
+    if (!mapped && !excluded) {
+      errors.push(
+        `Reference Page Coverage Error: ${docPath} is in neither AUTHORITATIVE_MAPPING nor EXCLUDED_REFERENCE_PAGES`,
+      );
+    } else if (mapped && excluded) {
+      errors.push(
+        `Reference Page Coverage Error: ${docPath} is in both AUTHORITATIVE_MAPPING and EXCLUDED_REFERENCE_PAGES`,
+      );
+    }
+  }
+
+  return errors;
+}
+
+export async function discoverReferencePagePaths(root: string = Deno.cwd()): Promise<string[]> {
+  const referenceRoot = join(root, 'docs/site/reference');
+  const paths: string[] = [];
+  for await (const entry of Deno.readDir(referenceRoot)) {
+    if (!entry.isDirectory) continue;
+    const relativePath = join('docs/site/reference', entry.name, 'index.md');
+    try {
+      if ((await Deno.stat(join(root, relativePath))).isFile) paths.push(relativePath);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+  }
+  return paths.sort();
+}
+
 interface ValidatedMapping {
   mappings: PackageMapping[];
   errors: string[];
@@ -1002,5 +1200,18 @@ export async function checkDrift(mapping: unknown): Promise<number> {
 }
 
 if (import.meta.main) {
+  const referenceDocPaths = await discoverReferencePagePaths();
+  const coverageErrors = validateReferencePageCoverage(
+    referenceDocPaths,
+    AUTHORITATIVE_MAPPING,
+    EXCLUDED_REFERENCE_PAGES,
+  );
+  for (const error of coverageErrors) console.error(error);
+  if (coverageErrors.length > 0) Deno.exit(1);
+
+  console.log(
+    `Reference page coverage: PASS (${referenceDocPaths.length}/${referenceDocPaths.length}; ` +
+      `mapped=${AUTHORITATIVE_MAPPING.length}; excluded=${EXCLUDED_REFERENCE_PAGES.length})`,
+  );
   Deno.exit(await checkDrift(AUTHORITATIVE_MAPPING));
 }

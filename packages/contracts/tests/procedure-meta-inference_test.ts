@@ -11,7 +11,9 @@ type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B 
   : false;
 type Assert<T extends true> = T;
 
-const inferredBaseContract = oc.$meta<NetScriptProcedureMeta>({}).errors(commonErrorMap);
+const inferredBaseContract = oc.$meta<NetScriptProcedureMeta>({
+  policy: { cache: 'force-cache' },
+}).errors(commonErrorMap);
 
 type InferredBaseMeta = typeof inferredBaseContract['~orpc']['meta'];
 type InferredBaseErrors = typeof inferredBaseContract['~orpc']['errorMap'];

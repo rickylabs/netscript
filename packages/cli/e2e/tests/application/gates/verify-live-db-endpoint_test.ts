@@ -5,6 +5,7 @@ import {
   correlateUsersTelemetry,
   matchesDatabaseHealthContract,
   pollUsersTelemetryCorrelation,
+  resolveDatabaseEndpointResource,
   verifyGeneratedCrudAcceptance,
 } from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
 
@@ -19,6 +20,67 @@ const aspire1353Describe = JSON.parse(
     new URL('./fixtures/aspire-13.5.3-describe-postgres.json', import.meta.url),
   ),
 );
+const passwordFirstDescribe = JSON.parse(
+  await Deno.readTextFile(
+    new URL(
+      './fixtures/aspire-13.5.3-describe-postgres-password-first.json',
+      import.meta.url,
+    ),
+  ),
+);
+
+Deno.test('database endpoint resolver ignores password parameter before exact Postgres container', () => {
+  assertEquals(resolveDatabaseEndpointResource(passwordFirstDescribe, 'postgres'), {
+    name: 'postgres-2226b6f5',
+    displayName: 'postgres',
+    resourceType: 'Container',
+    state: 'Running',
+    urls: [{ name: 'tcp', url: 'tcp://localhost:10538' }],
+  });
+});
+
+Deno.test('database endpoint resolver uses only one endpoint-bearing DCP fallback', () => {
+  const topology = structuredClone(passwordFirstDescribe);
+  delete topology.resources[1].displayName;
+  assertEquals(
+    resolveDatabaseEndpointResource(topology, 'postgres').name,
+    'postgres-2226b6f5',
+  );
+});
+
+Deno.test('database endpoint resolver reports ambiguous candidate names and types', () => {
+  const topology = {
+    resources: [
+      {
+        name: 'postgres-11111111',
+        resourceType: 'Container',
+        urls: ['tcp://localhost:15432'],
+      },
+      {
+        name: 'postgres-22222222',
+        resourceType: 'ContainerReplica',
+        urls: [{ url: 'postgres://localhost:25432' }],
+      },
+      {
+        name: 'postgres-password',
+        resourceType: 'Parameter',
+        urls: [],
+      },
+    ],
+  };
+
+  let message = '';
+  try {
+    resolveDatabaseEndpointResource(topology, 'postgres');
+  } catch (error) {
+    message = error instanceof Error ? error.message : String(error);
+  }
+  assertStringIncludes(message, 'ambiguous DCP endpoint matches');
+  assertStringIncludes(message, 'postgres-11111111');
+  assertStringIncludes(message, 'type=Container');
+  assertStringIncludes(message, 'postgres-22222222');
+  assertStringIncludes(message, 'type=ContainerReplica');
+});
 
 Deno.test('second receipt accepts the live Aspire 13.5 persistent allocation', () => {
   assertEquals(

@@ -150,13 +150,13 @@ routing here — defer to that file. The items below are the parts of the contra
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
   **local-machine run**, PLAN-EVAL and IMPL-EVAL normally use a fresh native opposite-family
   session: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work.
-  Use the phase-bound Qwen 3.8 Flash/GLM 5.3 Flash OpenRouter preset only for a genuine third opinion or when
-  the native opposite-family route is quota-blocked. If OpenRouter is then limited, use a fresh AGY
-  Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
-  cloud-driven work. For cloud PRs, repository automation owns the phase trigger: `openhands` plus
-  `status:plan-eval` for PLAN-EVAL, and draft→ready for IMPL-EVAL. Supervisors select labels and do
-  not duplicate the automatic dispatch with a manual evaluator. Record every blocked route,
-  escalation, and requested/observed identity.
+  Use the phase-bound Qwen 3.8 Flash/GLM 5.3 Flash OpenRouter preset only for a genuine third
+  opinion or when the native opposite-family route is quota-blocked. If OpenRouter is then limited,
+  use a fresh AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved
+  for explicitly cloud-driven work. For cloud PRs, repository automation owns the phase trigger:
+  `openhands` plus `status:plan-eval` for PLAN-EVAL, and draft→ready for IMPL-EVAL. Supervisors
+  select labels and do not duplicate the automatic dispatch with a manual evaluator. Record every
+  blocked route, escalation, and requested/observed identity.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
@@ -186,6 +186,13 @@ routing here — defer to that file. The items below are the parts of the contra
 
 Run artifacts live under `.llm/runs/<run-id>/` and use templates from `.llm/harness/templates/`.
 
+They are intentionally committed cross-agent context, including the identity, worktree-path,
+receipt, and resumable-state records needed to continue or audit a run. Do not strip, untrack,
+redact, or block a PR merely because its scoped run directory contains those records. Secrets and
+tokens are forbidden in run artifacts. Retention is owner-controlled: after a stable release the
+owner may select run directories for cleanup and may preserve selected runs across milestones; no
+agent may perform that cleanup pre-release or infer a deletion set without the owner's instruction.
+
 `<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
 
 | File                | Purpose                                                                                           |
@@ -209,7 +216,9 @@ agent with `templates/agent-briefing.md`.
 Milestone clusters additionally keep `milestone-intake.json`, `milestone-inventory.json`,
 `milestone-dependency-dag.json`, `milestone-cluster-state.json`, generated `milestone-status.md`,
 `cut-trace.md`, and `receipts/`. Run `harness:milestone:render` after every state transition and
-`harness:milestone:validate` before dispatch or release-captain activation.
+`harness:milestone:validate` before dispatch or release-captain activation. New milestone clusters
+use schema-v2 `reporting` and the hourly/event-driven owner-facing contract in
+`workflow/milestone-reporting.md`; its generated report is also the pace/intervention surface.
 
 ## `.llm/runs` Path Caveat
 
@@ -288,7 +297,7 @@ Record rescope evidence in `drift.md` with severity `significant` or `architectu
 | Generic run mechanics                         | `.llm/harness/workflow/`             |
 | Archetype-specific gates or false-done states | `.llm/harness/archetypes/`           |
 | Stable repeated cross-run lessons             | `.llm/harness/lessons/`              |
-| Package/plugin doctrine navigation            | `.claude/skills/netscript-doctrine/` |
+| Package/plugin doctrine navigation            | `.agents/skills/netscript-doctrine/` |
 | Deep domain expertise                         | a focused skill                      |
 | Deferred doctrine violations                  | `.llm/harness/debt/arch-debt.md`     |
 
@@ -329,6 +338,7 @@ User says "use harness"
 | `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs                                                                   |
 | `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing)                |
 | `.llm/harness/workflow/milestone-run.md`        | Release milestone clusters from Step 0 through stable cut                                     |
+| `.llm/harness/workflow/milestone-reporting.md`  | Required coordinator status shape, cadence, ETA, scope, and orchestrator matrix               |
 | `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist                                                                           |
 | `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions                                                                        |
 | `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions                                                                        |

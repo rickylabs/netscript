@@ -11095,3 +11095,14 @@ main at `262aa8fbe`; `check-test` in progress; close-gate n/a on push. Internals
 0. The canary blocker is #1966 (Fixes, `status:impl`) with fix PR #1967 (`status:impl-eval`,
 head `2fa5f60eb`, fixture-only `minimumDependencyAge` opt-out, 1 fixture file) — not internals;
 watched only for merge → Canary 9. Nothing to surface as an internal gate.
+
+### D-283 — integration prep: harness branch merged to main 2b8867d32; #1967 "unstable" is close-gate + superseded e2e, not red evidence
+
+Reset resumed 2026-09-03. Live: internals allocation 0, no un-laned 0.0.7 issue, every open 0.0.7
+PR belongs to fixes/aspire/features/docs. Merged `origin/main` (98 commits, harness-only branch)
+into `orchestrator/release-0.0.7-internals`; sole conflict was an add/add on a foreign lane's
+`refactor-sdk-transport-policy--1351/leak-report.md` — took main's copy (owner-only artifacts;
+main authoritative). #1967 (`2fa5f60eb`) shows `mergeable_state=unstable`: `close-gate` red is the
+expected pre-`ready-merge` state, and its two `scaffold-runtime*` jobs on run `33700628150` are
+`cancelled` by per-ref supersession with the rerun `33701233530` pending. No repair-requiring
+failure; not surfaced.

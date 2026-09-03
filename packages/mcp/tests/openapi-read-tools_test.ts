@@ -4,6 +4,7 @@ import {
   createGetOperationSchemaFlow,
   createListApiServicesFlow,
   createListServiceOperationsFlow,
+  OPENAPI_CURL_AUTH_NOTE,
   SERVICE_OPERATION_RESULT_LIMIT,
 } from '../mod.ts';
 import type { ServiceEndpointDirectoryPort, ServiceEndpointDirectoryResult } from '../mod.ts';
@@ -49,6 +50,31 @@ function spec(count: number): Record<string, unknown> {
         },
       },
     ])),
+  };
+}
+
+function accessSpec(): Record<string, unknown> {
+  return {
+    openapi: '3.1.0',
+    paths: {
+      '/undeclared': { get: { operationId: 'access.undeclared', responses: {} } },
+      '/public': { get: { operationId: 'access.public', security: [], responses: {} } },
+      '/optional': {
+        get: {
+          operationId: 'access.optional',
+          security: [{}, { bearerAuth: [] }],
+          responses: {},
+        },
+      },
+      '/required': {
+        get: {
+          operationId: 'access.required',
+          security: [{ bearerAuth: ['catalog:read'] }],
+          'x-netscript-roles': ['reader'],
+          responses: {},
+        },
+      },
+    },
   };
 }
 
@@ -153,6 +179,80 @@ Deno.test('get_operation_schema composes S4 views and an unauthenticated curl te
     true,
   );
   assert((result.value as { authNote: string }).authNote.includes('Unauthenticated'));
+});
+
+Deno.test('OpenAPI read tools project all four access states and distinct curl guidance', async () => {
+  const flowDirectory = directory({
+    sources,
+    entries: [{
+      name: 'catalog',
+      status: 'running',
+      source: 'aspire-cli',
+      conflicts: [],
+      baseUrl: 'http://127.0.0.1:4200',
+      spec: accessSpec(),
+    }],
+  });
+
+  const listResult = await createListServiceOperationsFlow(flowDirectory)({ service: 'catalog' });
+  assert(listResult.ok);
+  const rows = (listResult.value as { operations: Array<Record<string, unknown>> }).operations;
+  assertEquals(Object.hasOwn(rows[0]!, 'access'), false);
+  assertEquals(rows.slice(1).map((row) => row.access), [
+    { authentication: 'none', securitySchemes: [], scopes: [], roles: [] },
+    {
+      authentication: 'optional',
+      securitySchemes: ['bearerAuth'],
+      scopes: [],
+      roles: [],
+    },
+    {
+      authentication: 'required',
+      securitySchemes: ['bearerAuth'],
+      scopes: ['catalog:read'],
+      roles: ['reader'],
+    },
+  ]);
+
+  const detailFlow = createGetOperationSchemaFlow(flowDirectory);
+  const details: Array<Record<string, unknown>> = [];
+  for (
+    const operation of [
+      'access.undeclared',
+      'access.public',
+      'access.optional',
+      'access.required',
+    ]
+  ) {
+    const result = await detailFlow({ service: 'catalog', operation, view: 'all' });
+    assert(result.ok);
+    details.push(result.value as Record<string, unknown>);
+  }
+
+  assertEquals(Object.hasOwn(details[0]!, 'access'), false);
+  assertEquals(details.map((detail) => detail.access), [
+    undefined,
+    { authentication: 'none', securitySchemes: [], scopes: [], roles: [] },
+    {
+      authentication: 'optional',
+      securitySchemes: ['bearerAuth'],
+      scopes: [],
+      roles: [],
+    },
+    {
+      authentication: 'required',
+      securitySchemes: ['bearerAuth'],
+      scopes: ['catalog:read'],
+      roles: ['reader'],
+    },
+  ]);
+  assertEquals(details[0]!.authNote, OPENAPI_CURL_AUTH_NOTE);
+  assertEquals(new Set(details.map((detail) => detail.curlExample)).size, 4);
+  assertEquals(new Set(details.map((detail) => detail.authNote)).size, 4);
+  assertEquals(
+    details.some((detail) => String(detail.curlExample).includes('Bearer <credential>')),
+    true,
+  );
 });
 
 Deno.test('CLI settles a successful S6 receipt through the S8 lifecycle', async () => {

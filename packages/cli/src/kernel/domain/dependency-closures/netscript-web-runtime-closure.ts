@@ -21,6 +21,7 @@ export const NETSCRIPT_WEB_RUNTIME_EXPORTS = {
     './ai/sandbox',
     './query',
     './interactive',
+    './navigation',
     './vite',
     './testing',
   ],

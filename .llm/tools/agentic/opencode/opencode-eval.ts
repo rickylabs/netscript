@@ -3,6 +3,7 @@
 import { OPENCODE_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import { runOpenCode } from './opencode-run.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 
 interface EvalOptions {
   readonly prompt: string;
@@ -17,6 +18,7 @@ function requiredValue(args: readonly string[], index: number, flag: string): st
 }
 
 function parse(args: readonly string[]): EvalOptions {
+  args = normalizeTaskArguments(args);
   let prompt: string | undefined;
   let variant: string = OPENCODE_TOOL.defaultVariant;
   const files: string[] = [];

@@ -57,10 +57,10 @@ export const TEMPLATE_KEYS = {
     'app/routes/examples/(_shared)/service-showcase.ts.template',
   appRoutesExamplesSharedServiceShowcaseMemory:
     'app/routes/examples/(_shared)/service-showcase.memory.ts.template',
-  appRoutesExamplesSharedAuthorization:
-    'app/routes/examples/(_shared)/authorization.ts.template',
+  appRoutesExamplesSharedAuthorization: 'app/routes/examples/(_shared)/authorization.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
   appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
+  appRoutesExamplesOrdersId: 'app/routes/examples/orders/[id].tsx.template',
   appRoutesExamplesServiceIndexLayout: 'app/routes/examples/service/index.layout.tsx.template',
   appRoutesExamplesServiceIndex: 'app/routes/examples/service/index.tsx.template',
   appRoutesExamplesTelemetryComponentsTelemetryView:
@@ -115,6 +115,18 @@ export const TEMPLATE_KEYS = {
   generatedPluginsGeneratePluginService2: 'generated/plugins/generate-plugin-service-2.ts.template',
   generatedPluginsGeneratePluginService3: 'generated/plugins/generate-plugin-service-3.ts.template',
   generatedWorkspaceNetscriptConfig1: 'generated/workspace/netscript-config-1.ts.template',
+  resourceSliceIndexRoute: 'resource-slice/index.route.ts.template',
+  resourceSliceIndex: 'resource-slice/index.tsx.template',
+  resourceSliceIndexLayout: 'resource-slice/index.layout.tsx.template',
+  resourceSliceComponentsResourceView: 'resource-slice/(_components)/resource-view.tsx.template',
+  resourceSliceIslandsResourceIsland: 'resource-slice/(_islands)/ResourceIsland.tsx.template',
+  resourceSliceSharedResourceLoaders: 'resource-slice/(_shared)/resource-loaders.ts.template',
+  resourceSliceComponentsResourceForm: 'resource-slice/(_components)/resource-form.tsx.template',
+  resourceSliceLibResourceForm: 'resource-slice/(_lib)/resource-form.ts.template',
+  resourceSliceComponentsResourceSummary:
+    'resource-slice/(_components)/resource-summary.tsx.template',
+  resourceSlicePartialsSummary: 'resource-slice/partials/summary.tsx.template',
+  resourceSliceIslandsResourceStream: 'resource-slice/(_islands)/ResourceStream.tsx.template',
   pluginsServiceContext: 'plugins/service-context.ts.template',
   serviceContract: 'service/contract.ts.template',
   serviceContractMemory: 'service/contract.memory.ts.template',

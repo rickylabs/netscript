@@ -17,8 +17,12 @@
  *
  * @example Basic Usage with Adapters
  * ```typescript
- * import { createPostgresAdapter, createMssqlAdapter } from '@netscript/database/adapters';
- * import { PrismaClient } from './generated/client';
+ * import { createPostgresAdapter } from '@netscript/database/adapters/postgres';
+ * import { createMssqlAdapter } from '@netscript/database/adapters/mssql';
+ * import { PrismaClient } from '@database';
+ *
+ * declare const pgUrl: string;
+ * declare const mssqlUrl: string;
  *
  * // PostgreSQL
  * const pgAdapter = createPostgresAdapter({ connectionString: pgUrl });

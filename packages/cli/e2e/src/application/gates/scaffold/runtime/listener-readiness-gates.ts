@@ -4,6 +4,7 @@ import {
   GATE,
   GATE_PHASE,
 } from '../../../../domain/cli-surface.ts';
+import { resolve } from '@std/path';
 import type { GateDefinition } from '../../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../../domain/run-context.ts';
 import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
@@ -14,6 +15,7 @@ import {
 } from './listener-fault-controller.ts';
 
 const DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS = 300;
+const GARNET_LISTENER_WAIT_TIMEOUT_SECONDS = 30;
 const MSSQL_LISTENER_WAIT_TIMEOUT_SECONDS = 600;
 
 /** Describe-derived listener health contract for one backing service resource. */
@@ -51,7 +53,7 @@ export function listenerReadinessExpectation(
       return {
         resource,
         healthCheckKey: `${resource}_resp`,
-        timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+        timeoutSeconds: GARNET_LISTENER_WAIT_TIMEOUT_SECONDS,
       };
     default:
       return undefined;
@@ -89,7 +91,8 @@ export function createListenerReadinessGates(
         'run',
         '--allow-read',
         '--allow-write',
-        '--allow-run=aspire',
+        // `docker` is for the owned-container log quoted by the readiness receipt (#863 gate 2).
+        '--allow-run=aspire,docker',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts`,
         context.project.appHost,
         context.project.projectRoot,
@@ -138,4 +141,29 @@ export function parseListenerFaultDatabase(value: string): DatabaseEngine {
     default:
       throw new Error(`unsupported listener-fault database: ${value}`);
   }
+}
+
+/** Build the lease-backed S8 receipt gate for the PostgreSQL runtime suite. */
+export function createTypedDbPhaseBGate(): GateDefinition {
+  return commandGate(
+    GATE.RUNTIME_TYPED_DB_PHASE_B,
+    'Verify typed database commands and bounded unhealthy wait',
+    GATE_PHASE.RUNTIME,
+    (context) => [
+      'deno',
+      'run',
+      '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+      '--allow-read',
+      '--allow-write',
+      '--allow-run=aspire,deno',
+      `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts`,
+      context.project.appHost,
+      context.project.projectRoot,
+      context.project.cliEntrypoint.startsWith('jsr:')
+        ? context.project.cliEntrypoint
+        : resolve(context.project.repoRoot, context.project.cliEntrypoint),
+      context.request.options.database,
+    ],
+    (context) => context.project.projectRoot,
+  );
 }

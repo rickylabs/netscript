@@ -10,6 +10,7 @@ import type { PluginType } from '../../domain/mod.ts';
 import type { PluginManifest } from '../domain/plugin-manifest.ts';
 import type { PluginMetadata } from '../domain/plugin-metadata.ts';
 import type { RuntimeConfigTopicContribution } from '../domain/runtime-config-topic-contribution.ts';
+import type { SdkClientContributionReference } from '../domain/sdk-client-contribution-reference.ts';
 import type { ServiceContribution } from '../domain/service-contribution.ts';
 import type { StreamTopicContribution } from '../domain/stream-topic-contribution.ts';
 import type { TelemetryContribution } from '../domain/telemetry-contribution.ts';
@@ -161,6 +162,18 @@ export class PluginBuilder<
     TDependencies
   > {
     return this.#withArrayContribution('services', service);
+  }
+
+  /** Add declarative SDK client-contribution factory references. */
+  withSdkClients(
+    references: ContributionInput<readonly SdkClientContributionReference[], TDependencies>,
+  ): PluginBuilder<
+    TName,
+    TVersion,
+    TContributions & { readonly sdkClients: readonly SdkClientContributionReference[] },
+    TDependencies
+  > {
+    return this.#withArrayContributions('sdkClients', references);
   }
 
   /** Add a background processor contribution. */

@@ -1,5 +1,3 @@
-import { stripAnsiCode } from '@std/fmt/colors';
-
 import type { DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import {
   LISTENER_FAULT_ACK_FILE,
@@ -18,13 +16,37 @@ import {
   type ListenerHealthReport,
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
+import { type OwnedContainerSelection, readOwnedContainerLog } from './owned-container-log.ts';
+import {
+  assertReadinessDisagreement,
+  observeReadiness,
+  type ReadinessObservation,
+} from './readiness-disagreement.ts';
+import {
+  type ResourceUpdate,
+  type StartResourceUpdateFollower,
+  watchResourceUpdates,
+} from './resource-state-stream.ts';
 
-const REPORT_DEADLINE_MS = 30_000;
-const REPORT_POLL_MS = 1_000;
+/** Test-failure ceiling for the fixture-owned file-controller acknowledgement protocol. */
 const CONTROLLER_ACK_DEADLINE_MS = 5_000;
+/** Sampling interval for the fixture-owned acknowledgement file, not Aspire resource state. */
 const CONTROLLER_ACK_POLL_MS = 50;
-const HEALTHY_WAIT_TIMEOUT_SECONDS = 10;
-export const HEALTHY_WAIT_TIMEOUT_EXIT_CODE = 17;
+/**
+ * Test-failure ceiling for coarse initial readiness before D-101 subscribes and induces a change.
+ * It bounds a hung setup; it is not an assumed Aspire readiness schedule.
+ */
+const BASELINE_READY_FAILURE_CEILING_SECONDS = 120;
+/**
+ * Test-failure ceiling for a follower that hangs without emitting the induced transition.
+ * The stream returns on the event; this value never defines how long Aspire is expected to take.
+ *
+ * Exported so every gate that induces a listener departure shares this one ceiling. Canary 6
+ * (run 33684157301, job 100427490701) failed because a second consumer kept a private 30s poll
+ * deadline and timed out on a stale Healthy report while this fixture, in the same run, had
+ * already observed the identical transition; a second budget must never grow back.
+ */
+export const RESOURCE_TRANSITION_FAILURE_CEILING_MS = 120_000;
 
 interface ListenerRecoveryReceipt {
   readonly resource: string;
@@ -35,28 +57,38 @@ interface ListenerRecoveryReceipt {
     readonly realBacking: readonly ListenerHealthReport[];
   };
   readonly unhealthy: ListenerHealthReport;
-  readonly healthyWaitTimeoutExitCode: number;
-  readonly healthyWaitTimeoutDiagnostic: string;
   readonly recovered: ListenerHealthReport;
+  readonly transitionEvidence: {
+    readonly departure: TransitionEvidenceSource;
+    readonly recovery: TransitionEvidenceSource;
+  };
   readonly realKeyContinuity: {
     readonly duringFailure: readonly ListenerHealthReport[];
-    readonly afterWait: readonly ListenerHealthReport[];
     readonly afterRecovery: readonly ListenerHealthReport[];
+  };
+  /**
+   * #863 gate 2 (#1880): the container log and the unhealthy report captured at the same moment,
+   * classified. Present for the Postgres expectation only; the fault is on the test-only listener
+   * key, so the real engine keeps running and its log keeps saying ready while the report says
+   * Unhealthy — the false negative, reproduced on demand instead of recalled.
+   */
+  readonly readiness?: ReadinessObservation & {
+    readonly container: OwnedContainerSelection;
+    readonly logTail: string;
   };
 }
 
-export interface AspireWaitResult {
+type TransitionEvidenceSource = 'follow-event' | 'post-transition-snapshot';
+
+interface AspireResult {
   readonly code: number;
+  readonly success: boolean;
   readonly stdout: string;
   readonly stderr: string;
 }
 
-interface AspireResult extends AspireWaitResult {
-  readonly success: boolean;
-}
-
 /**
- * Exercise D-101's harness-owned close → Unhealthy/wait-timeout → reopen → Healthy flow.
+ * Exercise D-101's harness-owned close → Unhealthy → reopen → Healthy transition flow.
  *
  * The backing Postgres/Garnet resources never stop or pause. An Aspire-managed E2E task owns two
  * synthetic listeners and applies revisioned file commands, so the fixture exercises the exact
@@ -70,11 +102,16 @@ export async function verifyListenerFailureRecovery(
   const expectations = listenerFaultExpectations(database);
   for (const expectation of expectations) assertOwnedListenerFaultExpectation(expectation);
 
-  const baselineTests = await Promise.all(
-    expectations.map((expectation) => pollHealthyReport(appHost, expectation, expectations)),
-  );
-  const baselineReal = await requireRealBackingHealthy(appHost, expectations);
-  await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+  const baselines: ListenerReportPair[] = [];
+  for (const expectation of expectations) {
+    await requireResourceHealthy(
+      appHost,
+      expectation.resource,
+      BASELINE_READY_FAILURE_CEILING_SECONDS,
+    );
+    baselines.push(await baselineReports(appHost, expectation));
+  }
+  await commandListenerFaultController(projectRoot, { postgresOpen: true, garnetOpen: true });
 
   const receipts: ListenerRecoveryReceipt[] = [];
   let primaryFailure: unknown;
@@ -82,57 +119,64 @@ export async function verifyListenerFailureRecovery(
   try {
     for (let index = 0; index < expectations.length; index += 1) {
       const expectation = expectations[index];
-      await commandController(projectRoot, closedState(expectation));
-      const unhealthy = await pollReport(
-        appHost,
-        expectation,
-        expectations,
-        (report) =>
-          report.status === 'Unhealthy' &&
-          report.description !== undefined &&
-          expectedUnhealthyDescription(expectation).test(report.description),
-      );
-      const duringFailure = await requireRealBackingHealthy(appHost, expectations);
+      const subscription = await watchResourceUpdates(appHost, expectation.resource);
+      try {
+        await commandListenerFaultController(projectRoot, closedState(expectation));
+        const departure = await subscription.waitFor(
+          (update) => resourceHealthIs(update, 'Unhealthy'),
+          RESOURCE_TRANSITION_FAILURE_CEILING_MS,
+        );
+        const unhealthyEvidence = await reportsAfterTransition(
+          appHost,
+          departure,
+          expectation,
+          'Unhealthy',
+        );
 
-      const wait = await runAspire([
-        'wait',
-        expectation.resource,
-        '--status',
-        'healthy',
-        '--timeout',
-        String(HEALTHY_WAIT_TIMEOUT_SECONDS),
-        '--apphost',
-        appHost,
-        '--non-interactive',
-        '--nologo',
-      ]);
-      const healthyWaitTimeoutDiagnostic = requireHealthyWaitTimeout(
-        expectation.resource,
-        HEALTHY_WAIT_TIMEOUT_SECONDS,
-        wait,
-      );
-      const afterWait = await requireRealBackingHealthy(appHost, expectations);
+        const readiness = expectation.controllerListener === 'postgres'
+          ? await observeReadinessDisagreement(projectRoot, unhealthyEvidence.testOnly)
+          : undefined;
 
-      await commandController(projectRoot, reopenedState(expectation));
-      const recovered = await pollHealthyReport(appHost, expectation, expectations);
-      const afterRecovery = await requireRealBackingHealthy(appHost, expectations);
-      receipts.push({
-        resource: expectation.resource,
-        healthCheckKey: expectation.healthCheckKey,
-        realHealthCheckKey: expectation.realHealthCheckKey,
-        baseline: { testOnly: baselineTests[index], realBacking: baselineReal },
-        unhealthy,
-        healthyWaitTimeoutExitCode: wait.code,
-        healthyWaitTimeoutDiagnostic,
-        recovered,
-        realKeyContinuity: { duringFailure, afterWait, afterRecovery },
-      });
+        await commandListenerFaultController(projectRoot, reopenedState(expectation));
+        const recovery = await subscription.waitFor(
+          (update) => resourceHealthIs(update, 'Healthy'),
+          RESOURCE_TRANSITION_FAILURE_CEILING_MS,
+        );
+        const recoveredEvidence = await reportsAfterTransition(
+          appHost,
+          recovery,
+          expectation,
+          'Healthy',
+        );
+        receipts.push({
+          resource: expectation.resource,
+          healthCheckKey: expectation.healthCheckKey,
+          realHealthCheckKey: expectation.realHealthCheckKey,
+          baseline: {
+            testOnly: baselines[index].testOnly,
+            realBacking: [baselines[index].realBacking],
+          },
+          unhealthy: unhealthyEvidence.testOnly,
+          recovered: recoveredEvidence.testOnly,
+          transitionEvidence: {
+            departure: unhealthyEvidence.source,
+            recovery: recoveredEvidence.source,
+          },
+          realKeyContinuity: {
+            duringFailure: [unhealthyEvidence.realBacking],
+            afterRecovery: [recoveredEvidence.realBacking],
+          },
+          ...(readiness ? { readiness } : {}),
+        });
+      } finally {
+        await subscription.close();
+      }
     }
   } catch (error) {
     primaryFailure = error;
   } finally {
     try {
-      await commandController(projectRoot, { postgresOpen: true, garnetOpen: true });
+      await commandListenerFaultController(projectRoot, { postgresOpen: true, garnetOpen: true });
     } catch (error) {
       cleanupFailure = error;
     }
@@ -154,30 +198,70 @@ export async function verifyListenerFailureRecovery(
   return receipts;
 }
 
-/** Require Aspire's documented timeout result for a running resource that remains unhealthy. */
-export function requireHealthyWaitTimeout(
-  resource: string,
-  timeoutSeconds: number,
-  wait: AspireWaitResult,
-): string {
-  const expectedDiagnostic =
-    `Timed out waiting for resource '${resource}' to be healthy after ${timeoutSeconds}s.`;
-  const output = [wait.stderr, wait.stdout].filter((value) => value.length > 0).join('\n');
-  const hasExactDiagnostic = [wait.stderr, wait.stdout].some((stream) =>
-    stream.split(/\r?\n/u).some((line) =>
-      stripAnsiCode(line).trim().replace(/^❌\s*/u, '') === expectedDiagnostic
-    )
+/**
+ * Quote the owned Postgres container's log next to the Unhealthy report and require the two to
+ * disagree in the gate-2 direction (log ready, listener unhealthy). An unhealthy report without a
+ * ready log is rejected by `assertReadinessDisagreement`: that would prove a failing probe, not the
+ * false negative this gate exists to reproduce.
+ */
+async function observeReadinessDisagreement(
+  projectRoot: string,
+  unhealthy: ListenerHealthReport,
+): Promise<NonNullable<ListenerRecoveryReceipt['readiness']>> {
+  const { container, log } = await readOwnedContainerLog(projectRoot, 'postgres');
+  const observation = observeReadiness(unhealthy, log);
+  assertReadinessDisagreement(observation);
+  return { ...observation, container, logTail: log.split(/\r?\n/).slice(-20).join('\n') };
+}
+
+/** Per-check evidence for one induced departure, attributed from the stream or one snapshot. */
+export interface InducedDepartureEvidence {
+  readonly testOnly: ListenerHealthReport;
+  readonly realBacking: ListenerHealthReport;
+  readonly source: TransitionEvidenceSource;
+  readonly departureCeilingMs: number;
+}
+
+export interface InducedDepartureOptions {
+  /** Test seam; production consumers keep the shared 120s test-failure ceiling. */
+  readonly ceilingMs?: number;
+  /** Test seam for replacing only the long-lived follower process. */
+  readonly startFollower?: StartResourceUpdateFollower;
+}
+
+/**
+ * Subscribe first, induce the departure, then wait for the resource's aggregate Unhealthy event.
+ *
+ * The subscription is established before `induce` runs so the transition cannot land between a
+ * controller command and a later poll; the wait returns on the event itself, however long Aspire
+ * takes to re-evaluate. After the event, one scoped read asserts the test-only report carries a
+ * structured socket failure and the real backing report stayed Healthy. Consumers that also need
+ * recovery (the D-101 fixture) keep their own subscription open across both transitions.
+ */
+export async function observeInducedListenerDeparture(
+  appHost: string,
+  expectation: ListenerFaultExpectation,
+  induce: () => Promise<unknown>,
+  options: InducedDepartureOptions = {},
+): Promise<InducedDepartureEvidence> {
+  assertOwnedListenerFaultExpectation(expectation);
+  const ceilingMs = options.ceilingMs ?? RESOURCE_TRANSITION_FAILURE_CEILING_MS;
+  const subscription = await watchResourceUpdates(
+    appHost,
+    expectation.resource,
+    options.startFollower,
   );
-  if (
-    wait.code !== HEALTHY_WAIT_TIMEOUT_EXIT_CODE ||
-    !hasExactDiagnostic
-  ) {
-    throw new Error(
-      `aspire wait ${resource} exited ${wait.code}, expected exit ${HEALTHY_WAIT_TIMEOUT_EXIT_CODE} ` +
-        `with diagnostic "${expectedDiagnostic}": ${output || '(no output)'}`,
+  try {
+    await induce();
+    const departure = await subscription.waitFor(
+      (update) => resourceHealthIs(update, 'Unhealthy'),
+      ceilingMs,
     );
+    const evidence = await reportsAfterTransition(appHost, departure, expectation, 'Unhealthy');
+    return { ...evidence, departureCeilingMs: ceilingMs };
+  } finally {
+    await subscription.close();
   }
-  return expectedDiagnostic;
 }
 
 function closedState(
@@ -213,88 +297,218 @@ export function assertOwnedListenerFaultExpectation(
   }
 }
 
+/**
+ * The listener health checks carry a structured failure code in the report's data bag alongside a
+ * human-readable description. Assert on the code whenever it is present: the description is
+ * diagnostic prose and has already been reworded once (`unreachable` -> `unhealthy`, gaining
+ * host/port/elapsed detail), which broke this gate while the behaviour under test was correct.
+ * The description stays a fallback for report shapes that carry no data bag, and now tolerates
+ * both wordings.
+ */
+const EXPECTED_FAILURE_CODES = ['ECONNREFUSED', 'ETIMEDOUT'] as const;
+
+/**
+ * The structured failure code the listener health checks publish in the report's data bag.
+ *
+ * `malformed` is distinguished from `absent` so a present-but-non-string `code` fails closed rather
+ * than silently falling through to the description, which is weaker evidence.
+ */
+type FailureCodeLookup =
+  | { readonly kind: 'string'; readonly code: string }
+  | { readonly kind: 'malformed' }
+  | { readonly kind: 'absent' };
+
+function readFailureCode(report: ListenerHealthReport): FailureCodeLookup {
+  const data = report.data;
+  if (typeof data !== 'object' || data === null || !('code' in data)) return { kind: 'absent' };
+  const code = Reflect.get(data, 'code');
+  return typeof code === 'string' ? { kind: 'string', code } : { kind: 'malformed' };
+}
+
+/**
+ * Description fallback for report shapes that carry no data bag.
+ *
+ * Anchored at the start and closed with a non-word lookahead on purpose. The RESP description
+ * embeds arbitrary received bytes (`received="..."`), so an unanchored pattern accepts a genuinely
+ * wrong failure whose diagnostic payload merely quotes an expected code — and without the lookahead
+ * `ECONNREFUSED_BOGUS` matches `ECONNREFUSED`. Both were real holes.
+ */
 function expectedUnhealthyDescription(expectation: ListenerFaultExpectation): RegExp {
-  return expectation.controllerListener === 'postgres'
-    ? /tcp listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/
-    : /RESP listener unreachable: (?:ECONNREFUSED|ETIMEDOUT)/;
-}
-
-async function pollHealthyReport(
-  appHost: string,
-  expectation: ListenerFaultExpectation,
-  continuity: readonly ListenerFaultExpectation[],
-): Promise<ListenerHealthReport> {
-  return await pollReport(
-    appHost,
-    expectation,
-    continuity,
-    (report) => report.status === 'Healthy',
+  const listener = expectation.controllerListener === 'postgres' ? 'tcp' : 'RESP';
+  return new RegExp(
+    `^${listener} listener (?:unreachable|unhealthy): (?:${
+      EXPECTED_FAILURE_CODES.join('|')
+    })(?=$|\\s)`,
   );
 }
 
-async function pollReport(
-  appHost: string,
+/** True when the report names one of the expected socket failures, by code or by description. */
+export function matchesExpectedFailure(
+  report: ListenerHealthReport,
   expectation: ListenerFaultExpectation,
-  continuity: readonly ListenerFaultExpectation[],
-  accepts: (report: ListenerHealthReport) => boolean,
-): Promise<ListenerHealthReport> {
-  const deadline = Date.now() + REPORT_DEADLINE_MS;
-  let last = 'report absent';
-  while (Date.now() < deadline) {
-    let topology: unknown;
-    try {
-      topology = JSON.parse(await describe(appHost));
-    } catch (error) {
-      last = error instanceof Error ? error.message : String(error);
-      await delay(REPORT_POLL_MS);
-      continue;
-    }
-    assertRealBackingHealthy(topology, continuity);
-    try {
-      const report = readListenerHealthReport(
-        topology,
-        expectation.resource,
-        expectation.healthCheckKey,
-      );
-      last = `${report.status}: ${report.description ?? '(no description)'}`;
-      if (accepts(report)) return report;
-    } catch (error) {
-      last = error instanceof Error ? error.message : String(error);
-    }
-    await delay(REPORT_POLL_MS);
+): boolean {
+  // Status is checked here rather than trusted from the caller: a Healthy report carrying a stale
+  // ECONNREFUSED data bag would otherwise satisfy the assertion on any path that forgot the guard.
+  if (report.status !== 'Unhealthy') return false;
+  const found = readFailureCode(report);
+  if (found.kind === 'malformed') return false;
+  if (found.kind === 'string') {
+    return (EXPECTED_FAILURE_CODES as readonly string[]).includes(found.code);
   }
+  return report.description !== undefined &&
+    expectedUnhealthyDescription(expectation).test(report.description);
+}
+
+/** Require D-101's structured socket-failure code, with prose only as a legacy fallback. */
+export function assertExpectedListenerFailure(
+  report: ListenerHealthReport,
+  expectation: ListenerFaultExpectation,
+): void {
+  if (matchesExpectedFailure(report, expectation)) return;
   throw new Error(
-    `${expectation.resource} healthReports.${expectation.healthCheckKey} missed its 30s transition; last=${last}`,
+    `${expectation.resource} healthReports.${expectation.healthCheckKey} went Unhealthy but ` +
+      `neither its failure code nor its description names ` +
+      `${EXPECTED_FAILURE_CODES.join(' or ')}: ${report.description ?? '(no description)'}`,
   );
 }
 
-async function requireRealBackingHealthy(
+/** Block on Aspire's own wait until it observes the resource healthy; fail loudly if it does not. */
+async function requireResourceHealthy(
   appHost: string,
-  expectations: readonly ListenerFaultExpectation[],
-): Promise<readonly ListenerHealthReport[]> {
-  return assertRealBackingHealthy(JSON.parse(await describe(appHost)), expectations);
+  resource: string,
+  timeoutSeconds: number,
+): Promise<void> {
+  const result = await runAspire([
+    'wait',
+    resource,
+    '--status',
+    'healthy',
+    '--timeout',
+    String(timeoutSeconds),
+    '--apphost',
+    appHost,
+    '--non-interactive',
+    '--nologo',
+  ]);
+  if (result.code === 0) return;
+  throw new Error(
+    `aspire wait ${resource} --status healthy did not observe healthy within ${timeoutSeconds}s ` +
+      `(exit ${result.code}); this is Aspire's own observation, not a polling deadline: ` +
+      `${result.stderr.trim() || result.stdout.trim()}`,
+  );
 }
 
-function assertRealBackingHealthy(
-  topology: unknown,
-  expectations: readonly ListenerFaultExpectation[],
-): readonly ListenerHealthReport[] {
-  return expectations.map((expectation) => {
-    const report = readListenerHealthReport(
-      topology,
-      expectation.resource,
-      expectation.realHealthCheckKey,
+interface ListenerReportPair {
+  readonly testOnly: ListenerHealthReport;
+  readonly realBacking: ListenerHealthReport;
+}
+
+interface TransitionReports extends ListenerReportPair {
+  readonly source: TransitionEvidenceSource;
+}
+
+function resourceHealthIs(update: ResourceUpdate, expected: 'Healthy' | 'Unhealthy'): boolean {
+  const healthStatus = update.resource.healthStatus;
+  if (typeof healthStatus !== 'string') {
+    throw new Error(
+      `Aspire follow update for the scoped resource has no string healthStatus; raw line: ` +
+        update.rawLine,
     );
-    if (report.status !== 'Healthy') {
-      throw new Error(
-        `${expectation.resource} real backing health ${expectation.realHealthCheckKey} changed to ${report.status}`,
-      );
-    }
-    return report;
-  });
+  }
+  return healthStatus.toLowerCase() === expected.toLowerCase();
 }
 
-async function commandController(
+/**
+ * Attribute a transition from its rich event when possible, otherwise from one settled snapshot.
+ *
+ * The snapshot fallback never discovers the transition: the follower already emitted the expected
+ * aggregate health state. Reading once here only obtains the undocumented per-check report needed
+ * for the structured failure-code and real-backing assertions; it must never become a poll loop.
+ */
+async function reportsAfterTransition(
+  appHost: string,
+  update: ResourceUpdate,
+  expectation: ListenerFaultExpectation,
+  expected: 'Healthy' | 'Unhealthy',
+): Promise<TransitionReports> {
+  const eventHasReports = carriesReports(update, [
+    expectation.healthCheckKey,
+    expectation.realHealthCheckKey,
+  ]);
+  const source: TransitionEvidenceSource = eventHasReports
+    ? 'follow-event'
+    : 'post-transition-snapshot';
+  const topology = eventHasReports
+    ? { resources: [update.resource] }
+    : JSON.parse(await describeResource(appHost, expectation.resource));
+  const testOnly = readListenerHealthReport(
+    topology,
+    expectation.resource,
+    expectation.healthCheckKey,
+  );
+  if (testOnly.status !== expected) {
+    throw new Error(
+      `${expectation.resource} healthReports.${expectation.healthCheckKey} is ${testOnly.status}, ` +
+        `expected ${expected} after the follow stream emitted aggregate ${expected}: ` +
+        `${testOnly.description ?? '(no description)'}`,
+    );
+  }
+  if (expected === 'Unhealthy') assertExpectedListenerFailure(testOnly, expectation);
+
+  const realBacking = readListenerHealthReport(
+    topology,
+    expectation.resource,
+    expectation.realHealthCheckKey,
+  );
+  if (realBacking.status !== 'Healthy') {
+    throw new Error(
+      `${expectation.resource} real backing health ${expectation.realHealthCheckKey} changed to ` +
+        realBacking.status,
+    );
+  }
+  console.info(
+    `${expectation.resource} ${expected} transition attributed from ${source}`,
+  );
+  return { testOnly, realBacking, source };
+}
+
+function carriesReports(update: ResourceUpdate, keys: readonly string[]): boolean {
+  const reports = update.resource.healthReports;
+  return isRecord(reports) && keys.every((key) => Object.hasOwn(reports, key));
+}
+
+/** Read the initial per-check baseline once after coarse readiness has settled. */
+async function baselineReports(
+  appHost: string,
+  expectation: ListenerFaultExpectation,
+): Promise<ListenerReportPair> {
+  const topology = JSON.parse(await describeResource(appHost, expectation.resource));
+  const testOnly = readListenerHealthReport(
+    topology,
+    expectation.resource,
+    expectation.healthCheckKey,
+  );
+  if (testOnly.status !== 'Healthy') {
+    throw new Error(
+      `${expectation.resource} healthReports.${expectation.healthCheckKey} is ${testOnly.status}, ` +
+        `expected Healthy after Aspire settled: ${testOnly.description ?? '(no description)'}`,
+    );
+  }
+  const realBacking = readListenerHealthReport(
+    topology,
+    expectation.resource,
+    expectation.realHealthCheckKey,
+  );
+  if (realBacking.status !== 'Healthy') {
+    throw new Error(
+      `${expectation.resource} real backing health ${expectation.realHealthCheckKey} changed to ` +
+        realBacking.status,
+    );
+  }
+  return { testOnly, realBacking };
+}
+
+export async function commandListenerFaultController(
   projectRoot: string,
   desired: Pick<ListenerFaultState, 'postgresOpen' | 'garnetOpen'>,
 ): Promise<ListenerFaultState> {
@@ -325,7 +539,10 @@ async function commandController(
     }
     await delay(CONTROLLER_ACK_POLL_MS);
   }
-  throw new Error(`listener controller did not acknowledge revision ${next.revision} within 5s`);
+  throw new Error(
+    `listener controller did not acknowledge revision ${next.revision} within ` +
+      `${CONTROLLER_ACK_DEADLINE_MS}ms`,
+  );
 }
 
 async function writeJsonAtomically(path: string, value: unknown): Promise<void> {
@@ -334,9 +551,10 @@ async function writeJsonAtomically(path: string, value: unknown): Promise<void> 
   await Deno.rename(temporary, path);
 }
 
-async function describe(appHost: string): Promise<string> {
+async function describeResource(appHost: string, resource: string): Promise<string> {
   return (await requireAspireSuccess([
     'describe',
+    resource,
     '--apphost',
     appHost,
     '--format',
@@ -372,6 +590,10 @@ async function runAspire(args: readonly string[]): Promise<AspireResult> {
 
 function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 if (import.meta.main) {

@@ -497,7 +497,9 @@ function createExtensionConfig(options: SqlJsonExtensionOptions): PrismaExtensio
  *
  * @example
  * ```typescript
- * import { PrismaClient, Prisma } from './schema/.generated/client.server.ts';
+ * import { PrismaMssql } from '@prisma/adapter-mssql';
+ * import { PrismaClient, Prisma } from '@database';
+ * import { getMssqlConfig } from '@netscript/database/adapters/mssql';
  * import { sqlJsonExtension, type JsonFieldConfig } from '@netscript/database/extensions';
  *
  * // Define your project's JSON fields configuration
@@ -507,7 +509,7 @@ function createExtensionConfig(options: SqlJsonExtensionOptions): PrismaExtensio
  *   JobDefinition: ['config', 'permissions', 'metadata'],
  * };
  *
- * const adapter = new PrismaMssql(config);
+ * const adapter = new PrismaMssql(getMssqlConfig());
  * const baseClient = new PrismaClient({ adapter });
  *
  * // Apply extension with your JSON fields configuration

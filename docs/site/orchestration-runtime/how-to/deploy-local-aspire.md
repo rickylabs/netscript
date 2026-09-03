@@ -54,9 +54,17 @@ on disk before going further:
 ls aspire/apphost.mts aspire/aspire.config.json
 ```
 
-`aspire.config.json` pins `language: "typescript/nodejs"`, `appHost.path: "apphost.mts"`, and the
-Aspire SDK version `13.4.6`. The graph inside the AppHost is **derived from your installed
-plugins** at boot via `composeAppHost` (from `@netscript/aspire/application`) — add a plugin and
+`aspire.config.json` pins `language: "typescript/nodejs"` and `appHost.path: "apphost.mts"`.
+The default scaffold pins the Aspire SDK to <code>13.5.3</code>, PostgreSQL and Redis hosting
+integrations to <code>13.5.3</code>, and the Browsers integration to
+<code>13.5.3-preview.1.26425.3</code>. The Aspire CLI and the AppHost SDK must be on the same release
+train — never mix CLI and SDK trains. If you installed the Aspire CLI through npm
+(`npm install -g @microsoft/aspire-cli`),
+`aspire update --self` is aware of the installation method and directs you to run
+`npm install -g @microsoft/aspire-cli@latest`.
+
+The graph inside the AppHost is **derived from your installed plugins** at boot via
+`composeAppHost` (from `@netscript/aspire/application`) — add a plugin and
 its API plus background processor appear in the graph; remove it and they vanish, no edit to
 `apphost.mts` required. The mechanics are in [Orchestration with Aspire](/explanation/aspire/).
 
@@ -202,5 +210,8 @@ a Deno workspace problem.</li>
   {{ comp.xref({ key: "howto:database-migration", text: "Database & migration" }) }}.
 - **Exact symbols + full port map:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }}
   and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
+- **Non-interactive and CI execution:**
+  {{ comp.xref({ key: "howto:detached-start-agents-ci", text: "Detached start for agents and CI" }) }}
+  — structured JSON output, timeout budgets, and `--isolated` parallel mode.
 
-{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" } }) }}

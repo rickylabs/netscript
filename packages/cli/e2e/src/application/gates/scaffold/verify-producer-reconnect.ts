@@ -2,6 +2,7 @@ import { StreamProducerMetricNames } from '@netscript/plugin-streams-core/teleme
 import type { TelemetryTrace } from '@netscript/telemetry/query';
 import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
+import { resolveOtlpHeadersFromResource } from './otlp-headers.ts';
 
 // This coordinator is copied into service-only smoke workspaces where the streams plugin source is
 // intentionally absent. Keep the probe's wire markers structural so static scaffold checks do not
@@ -113,10 +114,18 @@ async function main(): Promise<void> {
   let otlpCapture: OtlpCapture | undefined;
 
   try {
+    // The dashboard runs with anonymous access disabled, so its OTLP receiver rejects exports
+    // without `x-otlp-api-key`. The probe is not an Aspire resource; borrow the ingest key from
+    // the `streams` resource process while it is still running, before this gate stops it.
+    const otlpHeaders = await resolveOtlpHeadersFromResource(
+      projectRoot,
+      'streams',
+      'producer-reconnect-probe',
+    );
     await runAspireResource(appHost, 'stop');
     streamsStarted = false;
     await waitForStreamsOffline(baseUrl);
-    otlpCapture = startOtlpCapture(otlpEndpoint);
+    otlpCapture = startOtlpCapture(otlpEndpoint, otlpHeaders);
 
     child = new Deno.Command('deno', {
       args: [
@@ -204,7 +213,10 @@ interface OtlpCapture {
   shutdown(): Promise<void>;
 }
 
-function startOtlpCapture(upstreamEndpoint: string): OtlpCapture {
+function startOtlpCapture(
+  upstreamEndpoint: string,
+  upstreamHeaders: Readonly<Record<string, string>> = {},
+): OtlpCapture {
   const metricPayloads: unknown[] = [];
   const abort = new AbortController();
   const server = Deno.serve({
@@ -222,6 +234,7 @@ function startOtlpCapture(upstreamEndpoint: string): OtlpCapture {
     const headers = new Headers(request.headers);
     headers.delete('host');
     headers.delete('content-length');
+    for (const [key, value] of Object.entries(upstreamHeaders)) headers.set(key, value);
     return await fetch(`${upstreamEndpoint.replace(/\/$/, '')}${url.pathname}`, {
       method: request.method,
       headers,
@@ -274,7 +287,7 @@ async function waitForOutputMarker(
   timeoutMs: number,
 ): Promise<boolean> {
   const reader = stream.getReader();
-  let timeoutId: number | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_resolve, reject) => {
     timeoutId = setTimeout(
       () => reject(new Error(`Timed out waiting for ${marker}`)),

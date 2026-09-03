@@ -34,7 +34,8 @@ not.
   every service, so each request gets a server span with W3C propagation and the service name
   recorded, with no per-service wiring.
 - **Opt-in auth** — `./auth` ships authentication and authorization ports plus static-credential,
-  trusted-header, and scope-authorizer factories, kept off the import graph until used.
+  trusted-header, contract-policy, and scope-authorizer factories, kept off the import graph until
+  used.
 
 ## Architecture
 
@@ -81,6 +82,12 @@ Compose every in-process runtime behind one bounded shutdown handle without repl
 ```ts
 import { createRuntimeHost } from '@netscript/service';
 
+// Your own components — the host only needs something to call.
+declare const service: { stop(): Promise<void> };
+declare const workers: { stop(reason: string): Promise<void> };
+declare const queue: { stop(): Promise<void> };
+declare const database: { disconnect(): Promise<void> };
+
 const host = createRuntimeHost({
   timeoutMs: 15_000,
   drains: [
@@ -99,15 +106,18 @@ phase. Rejected drains are reported and do not prevent later phases. If the one 
 expires, the active outcome is `timed-out`, remaining drains are `skipped`, and `shutdown()` returns
 without waiting indefinitely for the slow resource.
 
-Reach for `createService()` when a service needs explicit, stage-by-stage composition — and pull in
-`./auth` to guard it:
+Reach for `createService()` when a service needs explicit, stage-by-stage composition. The primary
+authorization pattern declares access on the contract procedure and opts the application into
+enforcement with `createContractAuthorizer()`:
 
 ```ts
 import { createService } from '@netscript/service';
 import {
-  createScopeAuthorizer,
+  createContractAuthorizer,
   createStaticCredentialAuthenticator,
 } from '@netscript/service/auth';
+import { OrdersContractV1 } from '@example/contracts';
+import { router } from './router.ts';
 
 const authenticator = createStaticCredentialAuthenticator({
   credentials: {
@@ -115,29 +125,73 @@ const authenticator = createStaticCredentialAuthenticator({
   },
 });
 
-const authorizer = createScopeAuthorizer({
-  rules: [{
-    match: (request) => request.path.startsWith('/api/orders'),
-    requireScopes: ['orders:read'],
-  }],
-});
+// OrdersContractV1 declares procedure-local metadata such as:
+// .meta({ access: {
+//   authentication: 'required',
+//   authorization: { scopes: ['orders:read'], roles: ['service'] },
+// } })
+const authorizer = createContractAuthorizer(OrdersContractV1);
 
 const running = await createService(router, { name: 'orders', version: '1.0.0' })
+  .withRPC()
   .withAuthn({ authenticator })
   .withAuthz({ authorizer })
-  .withRPC()
   .withHealth()
   .serve({ port: 3001 });
 
 await running.stop();
 ```
 
-The `defineService()` preset accepts the same ports through its `auth` option, so generated
-entrypoints opt in without leaving the one-call surface:
+This migration is opt-in. Existing unguarded services, generated scaffolds, and services that use
+`createScopeAuthorizer()` by itself keep their current behavior. Fail-closed contract enforcement
+begins only when the application supplies the result of
+`createContractAuthorizer(contract, { fallback? })` to `.withAuthz()`.
+
+Contract metadata is authoritative. For a request that matches a contract procedure, a
+match-aware fallback is consulted only when that procedure has no access metadata. If neither the
+metadata nor a fallback rule matches, the request is denied even when the fallback's standalone
+`denyByDefault` setting would otherwise allow it. A fallback can neither make a declared public
+procedure private nor weaken declared scopes or roles. The builder binds one resolver to its actual
+REST path, RPC path, RPC aliases, and deprecated RPC route aliases, then shares that resolver with
+both authentication and authorization middleware.
+
+`createScopeAuthorizer()` remains supported and is not deprecated. Use it standalone for a legacy
+path-prefix policy, or pass it as the match-aware migration fallback for procedures that do not yet
+declare metadata:
 
 ```ts
-import { defineService } from '@netscript/service';
+import { createContractAuthorizer, createScopeAuthorizer } from '@netscript/service/auth';
+import type { ContractPolicyContract } from '@netscript/service/auth';
+
+declare const OrdersContractV1: ContractPolicyContract;
+
+const legacyFallback = createScopeAuthorizer({
+  rules: [{
+    match: (request) => request.path.startsWith('/api/legacy-orders'),
+    requireScopes: ['orders:read'],
+  }],
+  denyByDefault: false,
+});
+
+const authorizer = createContractAuthorizer(OrdersContractV1, {
+  fallback: legacyFallback,
+});
+```
+
+`authentication: 'optional'` is declared for future support, currently rejected. Construction of
+`createContractAuthorizer()` throws
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>`; the
+error is raised while the contract is traversed, not on the first request.
+
+The `defineService()` preset accepts the same ports through its `auth` option. The following legacy
+path-prefix form remains valid and behavior-compatible; new services should prefer contract
+metadata plus `createContractAuthorizer()` as shown above:
+
+```ts
+import { defineService, type ServiceRouter } from '@netscript/service';
 import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+
+declare const router: ServiceRouter;
 
 const running = await defineService(router, {
   name: 'orders',
@@ -163,12 +217,38 @@ const running = await defineService(router, {
 await running.stop();
 ```
 
+## Principal and handler context
+
+`@netscript/service` owns both `Principal` and `ServiceHandlerContext<TCustom>`. A principal carries
+the authenticated `subject`, readonly `scopes` and `roles`, the authentication `scheme`, and a
+readonly verified `claims` bag. `ServiceHandlerContext<TCustom>` combines a custom context factory's
+readonly fields with optional framework-owned `db`, `traceHeaders`, and `principal` fields.
+
+`principal` is intentionally optional because auth is configured at runtime. A handler that needs
+identity narrows it before use; contract policy guarantees the runtime gate, not per-procedure
+TypeScript auth typestate.
+
+## OpenAPI access projection
+
+`createOpenAPISpec()` projects declared contract access without rewriting other operation fields:
+
+| Contract declaration | OpenAPI operation |
+| --- | --- |
+| `authentication: 'none'` | `security: []` |
+| `authentication: 'required'` | `security: [{ bearerAuth: scopes }]` |
+| Required `authorization.roles` | `x-netscript-roles: roles` |
+| `authentication: 'optional'` | `security: [{}, { bearerAuth: [] }]` |
+| No authentication declaration | No generated operation-level `security` field |
+
+The generated `bearerAuth` component is `{ type: 'http', scheme: 'bearer' }`. Optional remains
+visible in documentation even though the first runtime adapter rejects it at construction.
+
 ## API at a glance
 
 | Entry    | What it gives you                                                                                                                                     |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.`      | `defineService`, `createService`, `createRuntimeHost`, `healthChecks`, `HEALTH_STATUS`, handler factories (`createRPCHandler`, `createOpenAPISpec`, `createScalarDocs`, …) |
-| `./auth` | `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, and the authn/authz port types                    |
+| `.`      | `defineService`, `createService`, `createRuntimeHost`, `Principal`, `ServiceHandlerContext`, `healthChecks`, `HEALTH_STATUS`, and handler factories (`createRPCHandler`, `createOpenAPISpec`, `createScalarDocs`, …) |
+| `./auth` | `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createContractAuthorizer`, `createScopeAuthorizer`, and the authn/authz and contract-policy types |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/service@<version>`](https://jsr.io/@netscript/service/doc).

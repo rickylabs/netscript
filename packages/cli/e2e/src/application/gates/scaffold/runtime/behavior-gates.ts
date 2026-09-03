@@ -21,9 +21,21 @@ const APP_HOME_FAILURE_HINT =
   'here means the app itself is not rendering — check the app resource logs in the Aspire ' +
   'dashboard.';
 
+const APP_DYNAMIC_ROUTE_FAILURE_HINT =
+  'The generated app did not bind its dynamic order path through definePage().withRoute(...). ' +
+  'Inspect the plain/partial request mode and the missing status, data-order-id, or href marker.';
+
 const APP_REFERENCE_FAILURE_HINT =
   'The generated app did not render its canonical resource and design states in a real headless ' +
   'browser at desktop and mobile viewports. Inspect the named path, viewport, and missing semantic marker.';
+
+const ISLAND_SERVED_SURFACE_FAILURE_HINT =
+  'The generated service example did not emit its Fresh island marker or serve every referenced ' +
+  'JavaScript entry. Inspect the structured served-surface receipt.';
+
+const ISLAND_HYDRATION_FAILURE_HINT =
+  'The generated service example did not hydrate into an interactive island. Inspect the ' +
+  'structured hydration receipt and the headless-browser failure.';
 
 const AI_CHAT_ROUTE_FAILURE_HINT =
   'The generated AI chat route or composition could not be imported, or the self-wired ' +
@@ -268,6 +280,25 @@ export function createRuntimeBehaviorGates(
       APP_HOME_FAILURE_HINT,
     ),
     commandGate(
+      GATE.BEHAVIOR_APP_DYNAMIC_ROUTE,
+      'Generated app binds a dynamic route in plain and partial requests',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1,localhost',
+        '--allow-read',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-dynamic-route.ts`,
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+      ],
+      undefined,
+      'capture',
+      APP_DYNAMIC_ROUTE_FAILURE_HINT,
+    ),
+    commandGate(
       GATE.BEHAVIOR_APP_REFERENCE,
       'Render canonical app reference states in desktop and mobile browsers',
       GATE_PHASE.BEHAVIOR,
@@ -284,6 +315,48 @@ export function createRuntimeBehaviorGates(
       undefined,
       'capture',
       APP_REFERENCE_FAILURE_HINT,
+    ),
+    commandGate(
+      GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
+      'Serve the generated route-local island marker and client modules',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1,localhost',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-served-surface.ts`,
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/behavior.island-served-surface.json`,
+      ],
+      undefined,
+      'capture',
+      ISLAND_SERVED_SURFACE_FAILURE_HINT,
+    ),
+    commandGate(
+      GATE.BEHAVIOR_ISLAND_HYDRATION,
+      'Hydrate the generated route-local island and complete Rename',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1,localhost',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts`,
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/behavior.island-hydration.json`,
+      ],
+      undefined,
+      'capture',
+      ISLAND_HYDRATION_FAILURE_HINT,
     ),
     commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
