@@ -1,5 +1,33 @@
 # Drift — release 0.0.7
 
+## 2026-09-03 10:30Z final candidate freeze and complete issue closure
+
+Owner requires all remaining issues genuinely closed and the next green canary to lead directly
+to stable, without unrelated source drift or speculative extra canaries. Six open issues are
+mapped in receipts/final-issue-closure-matrix.md. Live GitHub child/closing-PR audit reconciled
+Aspire #1712 checkboxes (all S1–S11/S13 delivered; S12 is NOT_PLANNED in 0.0.8, not shipped),
+#863 gates1/2 and #1971 ownership. #1844 remains closed under its explicit owner disposition.
+
+New real #1881 acceptance gap: e2e-cli-prod ran README after two runtime suites and restored the
+Aspire NuGet cache. Coordinator bounded fix832e53720 in007-readme-cold-release-proof puts the
+unchanged README suite first, removes the app cache and captures fail-closed cold counts. Eight
+focused tests plus selected check/lint/fmt and YAML parsing PASS. Independent GLM session
+0039d1ad-72eb-4047-964c-8b326ff65902 runs in007-eval-readme-cold, no local runtime. New workflow
+push is rejected by GitHub because the current PAT lacks workflow scope; owner was sent the
+GitHub device-authorization link. No permission bypass or credential exposure; other lanes continue.
+
+#1970 b5d23b051 hosted33743065396 PASSED both tiers; core CI33743065545 attempt1 failed only
+publish-workspace_test.ts fixture cleanup (Directory not empty), 5263 other PASS. Same author has
+one failed-job-only rerun active; do not hide the original red. #1945 integrated main as5243a19f9;
+its same independent evaluator completed PASS and is correcting provider/intersection metadata
+before final packet. Main remains0247471c8. No new canary dispatched. Preserve exact-head final
+checks; merge verified packets, then composed publish readiness at frozen content and one native
+OIDC canary. Its cold README and production pair close #1881/#863/#1712 before stable.
+
+NAS rules reaffirmed: /home/agent/projects paths, mise pins, sandbox Docker only, no host/GPU
+mutation, no global tool install, no secret output and owner-controlled tracked-run retention.
+10:30Z read-only Aspire and DinD audits: zero apps, zero containers, zero custom networks.
+
 ## 2026-09-03 10:12Z two PRs merged; final product integration active
 
 Main0247471c89e381dd16e680bf0c10b6559caf36ee now includes both #1958 and #1982. #1354 closed,

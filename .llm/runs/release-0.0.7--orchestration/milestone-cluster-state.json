@@ -5978,7 +5978,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T10:12:00Z",
+  "updatedAt": "2026-09-03T10:31:00Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6065,10 +6065,10 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T10:12:00Z",
-    "nextReportDueAt": "2026-09-03T11:12:00Z",
-    "lastReportRef": "worklog.md#2026-09-03-1012z-two-prs-merged-final-product-integration-active",
-    "headline": "#1958 and #1982 merged; #1354 closed. Two product PRs remain before the next canary; same authors actively integrating main.",
+    "lastReportAt": "2026-09-03T10:31:00Z",
+    "nextReportDueAt": "2026-09-03T11:01:00Z",
+    "lastReportRef": "receipts/final-issue-closure-matrix.md",
+    "headline": "Two PRs merged; six issues fully owned. Final fix integrations active; cold README proof repaired locally, workflow permission requested before the single intended final canary.",
     "currentMainSha": "0247471c89e381dd16e680bf0c10b6559caf36ee",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
@@ -6091,7 +6091,8 @@
           "impact": "Stable cannot publish without same-content canary publish and pinned production E2E.",
           "nextAction": "Dispatch one release-canary workflow after candidate convergence; watch to terminal."
         }
-      ]
+      ],
+      "finalCandidatePolicy": "Owner: one intended final canary from frozen verified source, then stable after exact publish/production/cold-start acceptance. No unrelated source drift or speculative canary."
     },
     "progress": {
       "mergedPullRequests": [
@@ -6235,15 +6236,35 @@
         "owner": "coordinator",
         "nextAction": "Do not spin retries or silently change model/spend settings; route approved evaluations and keep existing authors moving.",
         "ownerDecisionRequired": false
+      },
+      {
+        "id": "github-workflow-auth",
+        "category": "infrastructure",
+        "summary": "New cold README proof workflow commit832e53720 is local; GitHub rejected its push for missing workflow scope.",
+        "impact": "Blocks cold-proof PR publication and final canary admission, not #1970/#1945 verification or merges.",
+        "owner": "owner",
+        "nextAction": "Finish pending device authorization; coordinator verifies scopes and pushes using newly authorized credential.",
+        "ownerDecisionRequired": true
       }
     ],
     "environment": {
-      "checkedAt": "2026-09-03T09:25:00Z",
+      "checkedAt": "2026-09-03T10:30:00Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
     },
-    "ownerDecisions": []
+    "ownerDecisions": [
+      {
+        "id": "github-workflow-auth",
+        "question": "Approve GitHub device authorization for workflow-scoped pushes (link sent in coordinator thread).",
+        "whyOwnerOnly": "GitHub rejects the new e2e-cli-prod.yml workflow commit because the stored credential only has repo scope; only the account owner can grant the permission.",
+        "blockedItems": [
+          1881,
+          863,
+          1712
+        ]
+      }
+    ]
   },
   "releasePreflight": {
     "gitHead": "94fe507af47171cd4f295e8f532b281d7147b334",
