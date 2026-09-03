@@ -8066,3 +8066,9 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - **Hosted CI at head:** `ci` 33700447539 success after close-gate rerun (quality, check-test, close-gate ✅); e2e-cli 33700447581 + 33702319275 ✅ (Postgres twice, sqlite, static, desktop-native).
 - **IMPL-EVAL:** PASS at `f5100c44a` via sanctioned local GLM 5.3 Flash max-effort evaluator (issuecomment-5519025742) after hosted stall.
 - **Lock hygiene:** `deno.lock` unchanged vs merge-base. Coordinator merges; Fixes flips `status:shipped` on the PR afterwards (#1844 stays open for remaining scope).
+
+## 2026-09-03 — #1959 merged by coordinator at `69b3ab5f4`; #1971 filed by #1481 worker
+
+- PR #1959 → `status:shipped` (#1844 remains open, partial). Main is now `69b3ab5f4`.
+- #1481 worker filed **#1971** (`type:bug priority:p0 area:cli area:fresh gate:e2e status:triage orchestrator:fixes`, milestone 0.0.7): raw evidence shows `deno task build` exits 1 **immediately after `init`** (211 files) and again after `db:generate` — Vite cannot resolve the `"zod": "catalog:"` import-map entry. Consumer-facing P0 on main. Worker's docs head `1a777a0b3` (harness-only, product diff 0) is local; thread still mid-turn, will push.
+- Reconcile policy: #1969 runtime tiers in progress at `f9406dec6` (MERGEABLE); main merge deferred until the runtime receipts land to avoid discarding them. #1970 and #1481 leaves have live worker turns; reconciliation goes through their threads.
