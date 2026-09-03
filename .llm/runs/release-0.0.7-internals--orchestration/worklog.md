@@ -11059,3 +11059,19 @@ compile-registry` in the same project REAL_EXIT=1 (`error: Could not find versio
 compiler works from a checkout at both heads (D-278), so the published artifact is what is broken.
 Owner features. Corrects D-278's window framing: the regression is in what got *published*, which is
 why no source bisect could find it — the prod-install class of gate is the right instrument.
+
+### D-280 — Canary 8 doctor red: final cause = Deno minimum-dependency-age blocking the minutes-old canary.8 plugin-workers in the generator child; owned by Fixes (#1966); internals stops
+
+Direct reproduction in the fixture project: `jsr:@netscript/plugin-workers@0.0.7-canary.8/cli
+compile-registry` → `Could not find version … newer than the specified minimum dependency date`
+(default 24 h policy). The published package is intact; the source compiler is intact; the
+`generate plugins` child spawned for a package-backed plugin does not carry `--minimum-dependency-age=0`
+the way the CLI install and the scaffold's jsr-mode `deno.json` (`minimumDependencyAge`) do. The
+matrix result (fails iff plugin-workers=canary.8) was real but its *reading* as a publish defect
+was wrong: the distinguishing variable was package **age**, not package content. Coordinator: proven
+and owned by Fixes in #1966; fix is fixture-only (`minimumDependencyAge: 0`), production generator
+unchanged. Three attributions on #1641 superseded in one closing note.
+
+Lesson kept: when a matrix isolates a *version*, ask what else differs between versions besides
+content — publish time is a variable, and Deno 2.9 makes it a gate. Also: read the child's exact
+error before naming an owner; I posted twice from inference and once from evidence.
