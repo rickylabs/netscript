@@ -243,3 +243,10 @@ heading and exclude the `|` form.
   `packages/cli/e2e/src/domain/readme-quickstart.ts`; root README is not a publish carrier.
 - Disposition: no carrier regeneration, no changelog bullet (E2E gate; the `aspire wait` command
   already matches `.agents/skills/aspire` and the CLI database runner).
+
+## #1970 triage — 2026-09-03
+
+- #1970 `fix(workers): publish literal job payload registry map` (Fixes-owned, p1, `status:impl`).
+  Real public surface in `plugin-workers-core` (`mod.ts`, contracts v1, builders) and self-declared
+  source-breaking. Added to the fold set; bullet staged in scratch `foldin-draft.md`. Ownership
+  unchanged. Fold only on `merged=true` + commit on `origin/main`.
