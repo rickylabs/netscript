@@ -11075,3 +11075,10 @@ unchanged. Three attributions on #1641 superseded in one closing note.
 Lesson kept: when a matrix isolates a *version*, ask what else differs between versions besides
 content — publish time is a variable, and Deno 2.9 makes it a gate. Also: read the child's exact
 error before naming an owner; I posted twice from inference and once from evidence.
+
+### D-281 — #1952 exact-green at 1a759ea34: all required checks success, mergeable clean; Internals transfer closed
+
+Aspire's converge head passed everything: check-test, quality (parity green in-branch), close-gate,
+sqlite + docker runtime tiers. Exact-head confirmation posted; merge is the coordinator's. The
+#1880/#1952 cross-concern leaf is complete from Internals' side (converge, docker allow-run fix,
+merge-ref parity isolation, DoD mechanics); evaluator and packet are Aspire's.
