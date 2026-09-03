@@ -12,10 +12,10 @@
 
 ## Current State
 
-PR #1970 is in implementation repair after a supervisor audit of head `feb55c046`. The
-schema-backed contract and literal registry are implemented; the repair migrates all named
-first-party consumers, fixes the standalone validation example, and aligns workers doctor with the
-literal registry format.
+PR #1970 is in a bounded hosted-runtime repair at head `14bdf2f98`. The schema-backed contract,
+literal registry, downstream migrations, documentation carriers, and generated-format repair are
+implemented. Both current hosted runtime tiers reach the Flow-B fixture and then time out starting
+Aspire because its legacy handler rewrite does not recognize #1455's schema-first generated job.
 
 ## Completed
 
@@ -25,13 +25,13 @@ literal registry format.
 
 ## In Progress
 
-- Commit and push the repair plus RED→GREEN gate receipts for evaluator handoff.
+- Validate and push the schema-first Flow-B fixture repair, then hand back an immutable merge packet.
 
 ## Next Steps
 
-1. Commit and push the repair.
-2. Update PR #1970 with the repair receipt.
-3. Hand off to the separate evaluator session.
+1. Prove the generated callback is async after fixture rewriting.
+2. Run exact PostgreSQL and SQLite runtime suites with cleanup.
+3. Record Tier-A/CI receipts, push the immutable head, and update PR #1970.
 
 ## Key Decisions
 
@@ -45,10 +45,10 @@ literal registry format.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | RED first |
-| Fitness | pending | doctrine/archetypes selected |
-| Runtime | pending | invalid payload must currently reach handler |
-| Consumer | pending | widened generated/trigger payload must leave `@ts-expect-error` unused |
+| Static | passed at `14bdf2f98` | hosted core/quality/static-scaffold checks green |
+| Fitness | passed at `14bdf2f98` | hosted code-quality green; prior local receipts in worklog |
+| Runtime | repair in progress | both hosted suites share the schema-first fixture mismatch |
+| Consumer | passed | prior compile-time and generated-registry receipts in worklog |
 
 ## Open Questions
 

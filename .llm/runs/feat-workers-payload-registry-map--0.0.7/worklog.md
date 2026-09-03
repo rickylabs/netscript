@@ -424,3 +424,65 @@ remains under `.llm/tmp/` and is not committed.
 `deno.lock` is unchanged. PR #1970 remains non-draft and its body retains `Refs #1455` for the
 supervisor's packet-time close disposition. The final pushed head is the receipt-only commit
 containing this section and is reported in the PR comment and implementation-lane handoff.
+
+## Repair 4 — schema-first Flow-B runtime fixture compatibility
+
+The owner resumed this lane at exact head `14bdf2f98a302eb698e51048affaf670c7920a9d` while the
+opposite-family supervisor was quota-blocked. `origin/main` was fetched and verified at
+`3903feea63f0f4c421dd90f221132c08dbb3650e`; it was not merged or rebased into this branch.
+
+PLAN-EVAL remains N/A: this is a mechanical compatibility repair under the accepted #1455 contract,
+with the two hosted failures and a direct generator probe fixing the shape and scope. It introduces
+no public or runtime-contract decision.
+
+### Hosted RED receipts
+
+GitHub Actions run `33710942351` failed only its two runtime jobs after all generated check/lint/fmt
+gates passed:
+
+```text
+scaffold-runtime (job 100510190939): runtime.aspire-start failed after 312842ms
+  aspire describe --follow did not converge: timed out after 300s
+scaffold-runtime-sqlite (job 100510191077): runtime.aspire-start failed after 312861ms
+  aspire describe --follow did not converge: timed out after 300s
+```
+
+The PostgreSQL cleanup failure (`docker inspect ... No such object`) followed its start failure;
+SQLite cleanup passed. It is secondary evidence, not a second product defect.
+
+Both suites pass `runtime.flow-b-fixture` immediately before startup. That fixture still replaced
+the legacy one-argument `defineJobHandler((context) => {` spelling, while #1455 now emits the
+schema-first multiline form whose callback begins `  (context) => {`. A direct probe against
+`jobScaffolder.emit({ id: 'flow-b-callback' })` produced:
+
+```text
+legacyAsyncReplacementApplied=false
+completionMarkerFound=true
+defineJobHandler(
+  PayloadSchema,
+  (context) => {
+    await Promise.resolve();
+```
+
+The injected `await` therefore remained inside a synchronous handler. The generated static check
+ran before fixture injection, so it could not catch the post-check invalid source; workers then
+failed to start and Aspire could not converge.
+
+### Narrow repair
+
+`prepare-flow-b-fixture.ts` now targets the schema-first callback marker and fails immediately with
+a named error if that generator seam drifts again. Payload schema, handler behavior, generated
+registries, and #1455's public surface are unchanged.
+
+Focused GREEN receipts:
+
+```text
+$ direct jobScaffolder schema-first rewrite probe
+schemaFirstHandlerFound=true; asyncReplacementApplied=true; hasSchemaFirstAsyncHandler=true
+$ run-deno-check.ts --file packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts --ext ts,tsx
+exit 0; filesSelected=1; failedBatches=0; totalOccurrences=0; --unstable-kv enabled
+$ run-deno-lint.ts --root packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts --ext ts,tsx
+exit 0; filesSelected=1; failedBatches=0; totalOccurrences=0
+$ run-deno-fmt.ts --root packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts --ext ts,tsx
+exit 0; filesSelected=1; failedBatches=0; findings=0
+```

@@ -41,3 +41,19 @@ Drift is append-only.
 - **Action:** migrate the named consumers to schema-backed handlers, retain the schema-required
   public contract, and make no trigger-core or unrelated plugin changes.
 - **Evidence:** repo-wide `deno task check` and focused trigger/saga test receipts in `worklog.md`.
+
+## 2026-09-03 — owner-expanded Flow-B fixture repair ceiling
+
+- **What:** The schema-first generated workers job made the CLI runtime fixture's legacy async
+  callback rewrite stale, preventing both hosted Aspire graphs from converging.
+- **Source:** Owner resume steer for PR #1970 at `14bdf2f98` plus Actions run `33710942351`.
+- **Expected:** The original ceiling named only the canonical CLI registry fixture and generated
+  counterparts.
+- **Actual:** The owner explicitly requested the narrow repair for both hosted runtime reds; the
+  required compatibility seam is
+  `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts`.
+- **Severity:** minor.
+- **Action:** update only the schema-first callback marker and add fail-fast drift detection; do not
+  change application runtime semantics or absorb unrelated CLI work.
+- **Evidence:** hosted RED logs, direct generator probe, and exact runtime-suite receipts recorded in
+  `worklog.md`.
