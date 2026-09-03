@@ -26,3 +26,12 @@
 
 - Does the exact Canary 8 command ignore `--project-root` when `cwd` differs, or does published-manifest/generator resolution omit package-backed registry generation?
 - Does local CLI source at baseline `79adb103b` reproduce the same behavior against the same package-backed root?
+
+## Resolved cause and supervisor correction
+
+The exact replay resolved both questions before product code changed. Repo-cwd and project-cwd runs
+both reach the published workers generator with the explicit fixture root. That nested Deno process
+uses the fixture project's `deno.json`, but the config did not carry the outer command's
+`--minimum-dependency-age=0` policy. Deno's default 24-hour policy therefore rejects the freshly
+published `@netscript/config@0.0.7-canary.8`, and no registry is written. The supervisor correction
+binds the repair to the package-backed E2E fixture; product generator and doctor code are excluded.
