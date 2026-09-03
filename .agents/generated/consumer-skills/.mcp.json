@@ -9,7 +9,7 @@
         "--config",
         "deno.json",
         "-A",
-        "jsr:@netscript/cli@0.0.6",
+        "jsr:@netscript/cli@0.0.7-canary.9",
         "agent",
         "mcp",
         "--project-root",
