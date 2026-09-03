@@ -11052,3 +11052,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 01:57Z — #1664 `257963e0c` sqlite red discriminated: probe attached to `chrome-extension://…/background.html` (extension target on hosted Chrome); #1885 island gates pass first. Branch-owned probe defect → narrow repair dispatched (target selection). Postgres tier in progress; labels untouched.
 - 01:58Z — #1664 postgres tier at `257963e0c`: same extension-target signature (75/76). Single cause; repair running.
 - 02:02Z — #1664 target-selection repair → `3b4e2b92b` (probe + unit test only; lock ok). Waits armed; bounded delta eval dispatched. ready-merge to be applied only after both tiers conclude (labeled re-dispatch trap).
+- 02:05Z — #1664 target-delta native eval **PASS_IMPL** (predicate identical to #1885's); receipt parked. Packet awaits tiers at `3b4e2b92b`.
