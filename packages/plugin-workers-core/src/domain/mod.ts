@@ -47,7 +47,13 @@ export type { CronExpression, DayOfWeek } from './cron.ts';
 export { createFailureResult, createSuccessResult } from './job-result.ts';
 export type { JobFailure, JobResult, JobSuccess } from './job-result.ts';
 export type { JobContext } from './job-context.ts';
-export type { JobHandler, JobHandlerSpec } from './job-handler.ts';
+export {
+  createJobHandlerDefinition,
+  isJobHandlerDefinition,
+  JobPayloadValidationError,
+  validateJobPayload,
+} from './job-handler.ts';
+export type { JobHandler, JobHandlerDefinition, JobHandlerSpec } from './job-handler.ts';
 export {
   ExecutionRecordSchema,
   JobDefinitionSchema,
@@ -94,6 +100,7 @@ export {
   PublicTaskDefinitionSchema,
   PublicWorkflowDefinitionSchema,
 } from './public-schema.ts';
+export type { JobPayloadSchema, PublicStandardSchema } from './public-schema.ts';
 export {
   DotNetTaskConfigSchema,
   ExtendedTaskDefinitionSchema,

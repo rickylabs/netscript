@@ -33,7 +33,7 @@ Deno.test('workers add job emits the same shape at the user-named path', () => {
   assertStringIncludes(source, 'welcomeEmailJob');
   assertStringIncludes(source, "jobId: 'welcome-email'");
   assertStringIncludes(source, 'const PayloadSchema = z.object({}).passthrough().default({})');
-  assertStringIncludes(source, 'PayloadSchema.parse(context.payload)');
+  assertStringIncludes(source, 'defineJobHandler(\n  PayloadSchema,');
 });
 
 Deno.test('workers install emits only userland glue under workers', () => {

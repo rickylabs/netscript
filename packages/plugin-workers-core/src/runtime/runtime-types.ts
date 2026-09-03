@@ -1,5 +1,5 @@
 import type { ExecutionStatus, TriggerType } from '../domain/constants.ts';
-import type { JobResult as DomainJobResult } from '../domain/mod.ts';
+import type { JobPayloadSchema, JobResult as DomainJobResult } from '../domain/mod.ts';
 import type { TaskExecutor } from '../abstracts/task-executor.ts';
 import type { MultiRuntimeTaskExecutorOptions } from '../executor/mod.ts';
 import type { RegistryJobStoragePort } from '../registry/mod.ts';
@@ -79,6 +79,7 @@ export type JobDefinition<
     readonly pluginId?: string;
     readonly permissions?: RuntimePermissions;
     readonly handler?: JobHandler<TPayload, TResult>;
+    readonly payloadSchema?: JobPayloadSchema<TPayload>;
   }
 >;
 
@@ -186,7 +187,12 @@ export type TaskMessage = Readonly<
 >;
 
 /** Input for registering a job definition. */
-export type RegisterJobInput = Readonly<Record<string, unknown> & { readonly id?: string }>;
+export type RegisterJobInput = Readonly<
+  Record<string, unknown> & {
+    readonly id?: string;
+    readonly payloadSchema?: JobPayloadSchema<unknown>;
+  }
+>;
 
 /** Input for registering a task definition. */
 export type RegisterTaskInput = Readonly<Record<string, unknown> & { readonly id?: string }>;
@@ -198,7 +204,7 @@ export type TaskExecutionOptions = Readonly<Record<string, unknown>>;
 export type TaskResult = Readonly<Record<string, unknown> & { readonly success: boolean }>;
 
 /** Registry of statically imported runtime job handlers. */
-export type StaticJobRegistry = ReadonlyMap<string, JobHandler>;
+export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never, unknown>>;
 
 /** Dynamic runtime module importer. */
 export type JobModuleImporter = (specifier: string) => Promise<Readonly<Record<string, unknown>>>;

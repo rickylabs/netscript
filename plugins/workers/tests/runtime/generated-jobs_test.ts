@@ -85,6 +85,25 @@ Deno.test('an absent generated registry is reported, not silently empty', async 
   assertEquals(loaded.definitions, undefined);
 });
 
+Deno.test('literal generated definitions take precedence so payload schemas reach registration', async () => {
+  const url = await writeRegistry([
+    'const payloadSchema = {',
+    '  "~standard": { version: 1, vendor: "test", validate: (value) => ({ value }) },',
+    '};',
+    'export const jobDefinitionsById = {',
+    '  "typed-job": { id: "typed-job", payloadSchema },',
+    '};',
+    'export const jobDefinitions = new Map([["fallback-job", { id: "fallback-job" }]]);',
+  ].join('\n'));
+
+  const loaded = await loadGeneratedJobRegistry(url);
+
+  assertEquals(loaded.status, 'loaded');
+  assertEquals(loaded.definitions?.has('typed-job'), true);
+  assertEquals(loaded.definitions?.has('fallback-job'), false);
+  assertEquals(loaded.definitions?.get('typed-job')?.payloadSchema?.['~standard'].vendor, 'test');
+});
+
 Deno.test('a generated registry without job definitions fails at startup', async () => {
   const url = await writeRegistry('export const registry = new Map();');
 

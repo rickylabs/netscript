@@ -277,7 +277,14 @@ Deno.test('configured plugin policy rejects an intrinsic handler id mismatch', a
     await writeWorkersManifest(projectRoot, true);
     await write(
       join(projectRoot, 'plugins/workers/jobs/intrinsic.ts'),
-      `export default Object.assign(async () => undefined, { id: 'actual-plugin-id' as const });\n`,
+      `const payloadSchema = {
+  '~standard': { version: 1 as const, vendor: 'test', validate: (value: unknown) => ({ value }) },
+};
+export default Object.assign(async () => undefined, {
+  id: 'actual-plugin-id' as const,
+  payloadSchema,
+});
+`,
     );
     const workers = WorkersConfigSchema.parse({
       jobsDir: './workers/jobs',
@@ -312,7 +319,25 @@ Deno.test('generated registry preserves literal job payload types at the consume
 export type JobHandler<TPayload = unknown> = (
   context: JobContext<TPayload>,
 ) => unknown | Promise<unknown>;
+export type JobPayloadSchema<TPayload> = Readonly<{
+  '~standard': Readonly<{
+    version: 1;
+    vendor: string;
+    validate(value: unknown): { value: TPayload };
+    types?: Readonly<{ input: unknown; output: TPayload }>;
+  }>;
+}>;
+export type JobHandlerDefinition<TPayload = unknown, _TResult = unknown> =
+  & JobHandler<TPayload>
+  & Readonly<{ payloadSchema: JobPayloadSchema<TPayload> }>;
+export type JobPayloadOf<TDefinition> = TDefinition extends {
+  readonly payloadSchema: JobPayloadSchema<infer TPayload>;
+} ? TPayload : never;
+export type JobPayloadMap<TRegistry extends Readonly<Record<string, unknown>>> = Readonly<{
+  [TId in keyof TRegistry]: JobPayloadOf<TRegistry[TId]>;
+}>;
 export type RegisterJobInput = Readonly<Record<string, unknown> & { id?: string }>;
+export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
 `,
     );
     await writeTypedJob(
@@ -542,9 +567,21 @@ async function writeTypedJob(
 ): Promise<void> {
   await write(
     join(projectRoot, 'workers/jobs', file),
-    `import type { JobHandler } from '../../registry-types.ts';
+    `import type { JobHandlerDefinition, JobPayloadSchema } from '../../registry-types.ts';
 
-const handler: JobHandler<${payloadType}> = async () => ({ success: true });
+type Payload = ${payloadType};
+const payloadSchema: JobPayloadSchema<Payload> = {
+  '~standard': {
+    version: 1,
+    vendor: 'test',
+    validate: (value) => ({ value: value as Payload }),
+  },
+};
+
+const handler: JobHandlerDefinition<Payload> = Object.assign(
+  async () => ({ success: true }),
+  { payloadSchema },
+);
 export default handler;
 `,
   );
@@ -553,7 +590,12 @@ export default handler;
 async function writeJob(projectRoot: string, file: string): Promise<void> {
   await write(
     join(projectRoot, 'workers/jobs', file),
-    'export default async function job(): Promise<void> {}\n',
+    `const payloadSchema = {
+  '~standard': { version: 1 as const, vendor: 'test', validate: (value: unknown) => ({ value }) },
+};
+const handler = Object.assign(async function job(): Promise<void> {}, { payloadSchema });
+export default handler;
+`,
   );
 }
 

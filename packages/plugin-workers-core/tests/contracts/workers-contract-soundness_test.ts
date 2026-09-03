@@ -1,10 +1,11 @@
 import { assertEquals } from '@std/assert';
+import type { InferContractRouterInputs } from '@orpc/contract';
 import type {
   ExecutionRecordResponse,
   JobTriggerInput,
   JobTriggerOutput,
 } from '../../src/contracts/v1/mod.ts';
-import { workersContractV1 } from '../../src/contracts/v1/mod.ts';
+import { createWorkersContract, workersContractV1 } from '../../src/contracts/v1/mod.ts';
 import type { ExecutionRecord } from '../../src/state/mod.ts';
 import type { TriggerType } from '../../src/domain/constants.ts';
 
@@ -41,13 +42,25 @@ type ApplicationJobPayloads = Readonly<{
 // Negative: the embed-document payload must not compile for transcribe-image.
 // RED receipt: on the broad baseline this directive is unused, because
 // JobTriggerInput does not yet bind id to payload.
-// @ts-expect-error - payload belongs to embed-document, not transcribe-image
-const _mismatchedJobPayload: JobTriggerInput = {
+const _mismatchedJobPayload: JobTriggerInput<ApplicationJobPayloads> = {
   id: 'transcribe-image',
+  // @ts-expect-error - payload belongs to embed-document, not transcribe-image
   payload: { documentId: 'doc-1', text: 'content' },
 };
 
-type _ApplicationJobPayloads = ApplicationJobPayloads;
+const _typedWorkersContract = createWorkersContract<ApplicationJobPayloads>();
+type ApplicationWorkerInputs = InferContractRouterInputs<typeof _typedWorkersContract>;
+
+const _validTypedClientInput: ApplicationWorkerInputs['triggerJob'] = {
+  id: 'embed-document',
+  payload: { documentId: 'doc-1', text: 'content' },
+};
+
+const _mismatchedTypedClientInput: ApplicationWorkerInputs['triggerJob'] = {
+  id: 'transcribe-image',
+  // @ts-expect-error - the typed triggerJob contract binds payload to the selected job id
+  payload: { documentId: 'doc-1', text: 'content' },
+};
 
 // --- triggerJob output keeps `triggered: boolean` -----------------------------
 
@@ -84,6 +97,8 @@ Deno.test('workers contract exposes a precise, non-loosened type surface', () =>
   assertEquals(_validTrigger.id, 'job-1');
   assertEquals(_badTriggerId.id as unknown, 123);
   assertEquals(_mismatchedJobPayload.id, 'transcribe-image');
+  assertEquals(_validTypedClientInput.id, 'embed-document');
+  assertEquals(_mismatchedTypedClientInput.id, 'transcribe-image');
   assertEquals(_badTriggerOut.triggered as unknown, 'yes');
   assertEquals(_badExecResponse.executionId, undefined);
   assertEquals(_validTriggeredBy, 'manual');

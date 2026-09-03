@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { JobDefinition } from './job-definition.ts';
 import { JobDefinitionSchema } from './job-definition.ts';
+import type { JobPayloadSchema } from './public-schema.ts';
 import { DEFAULT_TOPIC, TriggerTypeZodSchema } from './constants.ts';
 
 /** Public job specification consumed by registries and runtime adapters. */
@@ -159,7 +160,9 @@ export const RegisterJobInputSchema: z.ZodObject<typeof RegisterJobInputShape> =
 );
 
 /** Input for registering a job. */
-export type RegisterJobInput = z.input<typeof RegisterJobInputSchema>;
+export type RegisterJobInput<TPayload = unknown> =
+  & z.input<typeof RegisterJobInputSchema>
+  & Readonly<{ payloadSchema?: JobPayloadSchema<TPayload> }>;
 
 /** Plugin contribution containing jobs to register. */
 type PluginJobContributionShape = {

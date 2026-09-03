@@ -10,8 +10,7 @@ export const jobStub: StubSource<'JOB_ID' | 'JOB_EXPORT'> = defineStub({
   source: `import {
   createSuccessResult,
   defineJobHandler,
-  type JobHandlerContext,
-  type JobResult,
+  type JobHandlerDefinition,
 } from '@netscript/plugin-workers-core';
 import { z } from 'zod';
 
@@ -21,16 +20,15 @@ type Payload = z.infer<typeof PayloadSchema>;
 /**
  * Starter workers job handler for %%JOB_ID%%.
  */
-export const %%JOB_EXPORT%%: (
-  context: JobHandlerContext<Payload>,
-) => JobResult | Promise<JobResult> = defineJobHandler((context) => {
-  const payload = PayloadSchema.parse(context.payload);
-
+export const %%JOB_EXPORT%%: JobHandlerDefinition<Payload> = defineJobHandler(
+  PayloadSchema,
+  (context) => {
   return createSuccessResult({
     jobId: '%%JOB_ID%%',
-    payload,
+    payload: context.payload,
   });
-});
+  },
+);
 `,
   tokens: ['JOB_ID', 'JOB_EXPORT'] as const,
 });

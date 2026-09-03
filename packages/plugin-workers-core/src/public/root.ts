@@ -7,7 +7,9 @@ import {
   createSuccessResult as createSuccessResultImpl,
 } from '../domain/job-result.ts';
 import { permissions as permissionsImpl } from '../domain/permissions.ts';
+import { createJobHandlerDefinition as createJobHandlerDefinitionImpl } from '../domain/job-handler.ts';
 import type { PublicStandardSchema } from '../domain/public-schema.ts';
+export type { PublicStandardSchema } from '../domain/public-schema.ts';
 import { startWorkers as startWorkersImpl } from '../presets/mod.ts';
 import {
   createWorkersRuntime as createWorkersRuntimeImpl,
@@ -141,6 +143,16 @@ export type JobHandlerContext<TPayload = unknown> = Readonly<{
 /** Standard Schema-compatible validator carried by a worker job definition. */
 export type JobPayloadSchema<TPayload = unknown> = PublicStandardSchema<TPayload>;
 
+/** Function that executes a root-surface worker job. */
+export type JobHandler<TPayload = unknown, TResult = unknown> = (
+  context: JobHandlerContext<TPayload>,
+) => JobResult<TResult> | Promise<JobResult<TResult>>;
+
+/** Callable root-surface job handler carrying its payload validator. */
+export type JobHandlerDefinition<TPayload = unknown, TResult = unknown> =
+  & JobHandler<TPayload, TResult>
+  & Readonly<{ payloadSchema: JobPayloadSchema<TPayload> }>;
+
 /** Root-surface job definition derived from the thin public schema. */
 export type JobDefinition<
   TId extends string = string,
@@ -152,7 +164,22 @@ export type JobDefinition<
   name?: string;
   topic?: string;
   payloadSchema?: JobPayloadSchema<TPayload>;
+  handler?: JobHandler<TPayload, TResult>;
 }>;
+
+/** Infer the payload carried by a job definition or schema-backed handler. */
+export type JobPayloadOf<TDefinition> = TDefinition extends {
+  readonly payloadSchema: JobPayloadSchema<infer TPayload>;
+} ? TPayload
+  : TDefinition extends JobDefinition<string, infer TPayload, unknown> ? TPayload
+  : never;
+
+/** Derive a literal job-id-to-payload map from a definition or handler registry. */
+export type JobPayloadMap<TRegistry extends Readonly<Record<string, unknown>>> = Readonly<
+  {
+    [TId in keyof TRegistry]: JobPayloadOf<TRegistry[TId]>;
+  }
+>;
 
 /** Root-surface task definition derived from the thin public schema. */
 export type TaskDefinition<TId extends string = string> = Readonly<{
@@ -172,12 +199,25 @@ export type WorkflowDefinition<TId extends string = string> = Readonly<{
 /** Root-surface job builder typestate API. */
 export interface JobBuilder<
   TId extends string,
-  TConfigured extends 'initial' | 'entrypoint-set' | 'handler-set',
+  TConfigured extends
+    | 'initial'
+    | 'entrypoint-set'
+    | 'payload-set'
+    | 'payload-entrypoint-set'
+    | 'handler-set',
   TPayload,
   TResult,
 > {
   /** Set the module entrypoint that executes the job. */
-  entrypoint(path: string): JobBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+  entrypoint(
+    path: string,
+  ): JobBuilder<
+    TId,
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'entrypoint-set',
+    TPayload,
+    TResult
+  >;
   /** Set the display name for this job. */
   name(value: string): this;
   /** Set the job description. */
@@ -185,14 +225,30 @@ export interface JobBuilder<
   /** Set an in-process handler that executes the job. */
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: (
-      context: Readonly<{ id: string; payload: TNextPayload }>,
+      context: Readonly<{
+        id: string;
+        payload: TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload
+          : TNextPayload;
+      }>,
     ) => JobResult<TNextResult> | Promise<JobResult<TNextResult>>,
-  ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+  ): JobBuilder<
+    TId,
+    'handler-set',
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload,
+    TNextResult
+  >;
   /** Narrow the payload type carried by this job definition. */
   payload<TNextPayload>(
     this: TConfigured extends 'handler-set' ? never
       : JobBuilder<TId, TConfigured, TPayload, TResult>,
-  ): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
+    schema: JobPayloadSchema<TNextPayload>,
+  ): JobBuilder<
+    TId,
+    TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'payload-set',
+    TNextPayload,
+    TResult
+  >;
   /** Set the cron schedule expression for this job.
    * @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`.
    */
@@ -219,7 +275,7 @@ export interface JobBuilder<
   queueTrigger(name: string): this;
   /** Build the job definition after an entrypoint or handler has been configured. */
   build(
-    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+    this: TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' | 'handler-set'
       ? JobBuilder<TId, TConfigured, TPayload, TResult>
       : never,
   ): JobDefinition<TId, TPayload, TResult>;
@@ -355,13 +411,29 @@ export const cron: CronHelpers = cronImpl;
 /** Permission presets for worker jobs and tasks. */
 export const permissions: PermissionPresets = permissionsImpl;
 
-/** Define a worker job handler. */
-export function defineJobHandler<TPayload = unknown>(
-  handler: (
-    context: JobHandlerContext<TPayload>,
-  ) => JobResult<unknown> | Promise<JobResult<unknown>>,
-): (context: JobHandlerContext<TPayload>) => JobResult<unknown> | Promise<JobResult<unknown>> {
-  return handler;
+/**
+ * Define a worker job handler whose payload schema is used at the application boundary.
+ *
+ * @example
+ * ```ts
+ * import { defineJobHandler } from '@netscript/plugin-workers-core';
+ * import { z } from 'zod';
+ *
+ * const handler = defineJobHandler(
+ *   z.object({ documentId: z.string() }),
+ *   ({ payload }) => ({ success: true, data: payload.documentId }),
+ * );
+ * ```
+ *
+ * @param payloadSchema - Standard Schema validator and payload type authority.
+ * @param handler - Application callback invoked with the validated schema output.
+ * @returns A callable handler carrying the same payload schema for generation and dispatch.
+ */
+export function defineJobHandler<TPayload, TResult = unknown>(
+  payloadSchema: JobPayloadSchema<TPayload>,
+  handler: JobHandler<TPayload, TResult>,
+): JobHandlerDefinition<TPayload, TResult> {
+  return createJobHandlerDefinitionImpl(payloadSchema, handler);
 }
 
 /** Create a fresh workers runtime from explicit dependencies. */

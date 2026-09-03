@@ -2,6 +2,7 @@ import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { createPluginService } from '@netscript/plugin/service';
 import { router } from './router.ts';
 import type { WorkersServiceRuntime } from './routers/router-context.ts';
+import { z } from 'zod';
 
 // Gap 2 regression (issue #279): `triggerJob` / `triggerTask` must take the
 // target id from the `{id}` path segment, not a required body field. Previously
@@ -15,12 +16,16 @@ import type { WorkersServiceRuntime } from './routers/router-context.ts';
 // Minimal stand-in runtime: only the relevant registry `get` is reached before
 // the handler returns NOT_FOUND, so the rest of the runtime is intentionally
 // absent. Test-only cast; the real runtime is wired by the host.
-function buildApp(registryKey: 'jobRegistry' | 'taskRegistry', lookedUp: string[]) {
+function buildApp(
+  registryKey: 'jobRegistry' | 'taskRegistry',
+  lookedUp: string[],
+  jobDefinition?: Readonly<Record<string, unknown>>,
+) {
   const stubRuntime = {
     [registryKey]: {
-      get(id: string): Promise<undefined> {
+      get(id: string): Promise<Readonly<Record<string, unknown>> | undefined> {
         lookedUp.push(id);
-        return Promise.resolve(undefined);
+        return Promise.resolve(jobDefinition);
       },
     },
   } as unknown as WorkersServiceRuntime;
@@ -76,4 +81,22 @@ Deno.test('triggerTask resolves the target task id from the {id} path, not the b
   });
 
   assertPathIdResolved(lookedUp, 'task-from-path', response.status);
+});
+
+Deno.test('triggerJob validates the selected definition before enqueue', async () => {
+  const lookedUp: string[] = [];
+  const app = buildApp('jobRegistry', lookedUp, {
+    id: 'embed-document',
+    topic: 'default',
+    payloadSchema: z.object({ documentId: z.string(), text: z.string() }),
+  });
+
+  const response = await app.request('/api/v1/workers/jobs/embed-document/trigger', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ payload: { imageUrl: 'https://example.test/image.png' } }),
+  });
+
+  assertEquals(lookedUp, ['embed-document']);
+  assertEquals(response.status, 422);
 });

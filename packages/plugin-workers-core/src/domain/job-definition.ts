@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { JobHandler } from './job-handler.ts';
+import type { JobPayloadSchema } from './public-schema.ts';
 import {
   DEFAULT_TOPIC,
   ExecutionStatusSchema,
@@ -159,6 +160,7 @@ export type JobDefinition<
     id: JobId<TId>;
     entrypoint?: string;
     handler?: JobHandler<TPayload, TResult>;
+    payloadSchema?: JobPayloadSchema<TPayload>;
   }
 >;
 

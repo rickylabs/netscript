@@ -36,6 +36,9 @@ export interface PublicStandardSchema<TOutput> {
   };
 }
 
+/** Standard Schema-compatible validator carried by a worker job definition. */
+export type JobPayloadSchema<TPayload = unknown> = PublicStandardSchema<TPayload>;
+
 /** Structural validator accepted as a public definition field. */
 export interface PublicDefinitionFieldSchema<TOutput = unknown> {
   /** Parse an unknown field value. */

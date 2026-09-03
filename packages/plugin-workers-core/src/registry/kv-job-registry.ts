@@ -30,6 +30,10 @@ export class KvJobRegistry extends Registry<string, JobDefinition>
   readonly id: string;
   readonly #topic?: string;
   readonly #kv: RegistryKvStore;
+  readonly #payloadSchemas = new Map<
+    string,
+    NonNullable<JobDefinition['payloadSchema']>
+  >();
 
   /** Create a KV-backed job registry. */
   constructor(options: RegistryOptions & { kv: RegistryKvStore }) {
@@ -41,7 +45,10 @@ export class KvJobRegistry extends Registry<string, JobDefinition>
 
   /** Register or replace a job definition by key. */
   async register(key: string, value: JobDefinition): Promise<void> {
-    await this.#kv.set([...JOB_PREFIX, key], value);
+    const { payloadSchema, ...stored } = value;
+    if (payloadSchema) this.#payloadSchemas.set(key, payloadSchema);
+    else this.#payloadSchemas.delete(key);
+    await this.#kv.set([...JOB_PREFIX, key], stored);
   }
 
   /** Normalize and register a new job definition. */
@@ -58,14 +65,22 @@ export class KvJobRegistry extends Registry<string, JobDefinition>
   /** Get a job definition by key. */
   async get(key: string): Promise<JobDefinition | undefined> {
     const entry = await this.#kv.get<JobDefinition>([...JOB_PREFIX, key]);
-    return entry?.value ?? undefined;
+    if (!entry?.value) return undefined;
+    const payloadSchema = this.#payloadSchemas.get(key);
+    return payloadSchema ? { ...entry.value, payloadSchema } : entry.value;
   }
 
   /** List raw registry entries. */
   async entries(): Promise<readonly (readonly [string, JobDefinition])[]> {
     const result: (readonly [string, JobDefinition])[] = [];
     for await (const entry of this.#kv.list<JobDefinition>({ prefix: JOB_PREFIX })) {
-      if (entry.value) result.push([String(entry.key.at(-1)), entry.value] as const);
+      if (entry.value) {
+        const key = String(entry.key.at(-1));
+        const payloadSchema = this.#payloadSchemas.get(key);
+        result.push(
+          [key, payloadSchema ? { ...entry.value, payloadSchema } : entry.value] as const,
+        );
+      }
     }
     return result;
   }
@@ -133,6 +148,7 @@ export class KvJobRegistry extends Registry<string, JobDefinition>
     const existing = await this.get(jobId);
     if (!existing) return false;
     await this.#kv.delete([...JOB_PREFIX, jobId]);
+    this.#payloadSchemas.delete(jobId);
     return true;
   }
 
@@ -167,7 +183,7 @@ export class KvJobRegistry extends Registry<string, JobDefinition>
 }
 
 function normalizeJobDefinition(input: RegisterJobInput): JobDefinition {
-  return JobDefinitionSchema.parse({
+  const job = JobDefinitionSchema.parse({
     ...input,
     id: input.id ?? crypto.randomUUID(),
     topic: input.topic ?? DEFAULT_TOPIC,
@@ -183,4 +199,5 @@ function normalizeJobDefinition(input: RegisterJobInput): JobDefinition {
     persist: input.persist ?? true,
     tags: input.tags ?? [],
   }) as JobDefinition;
+  return input.payloadSchema ? { ...job, payloadSchema: input.payloadSchema } : job;
 }

@@ -14,11 +14,11 @@ import type {
   ContractSchema,
   ExecutionRecordResponse,
   JobDefinitionResponse,
-  JobTriggerInput,
   SSEEvent,
   TaskDefinitionResponse,
   TaskTriggerInput,
 } from './workers.contract-types.ts';
+import type { JobTriggerInput } from './job-trigger-contract.ts';
 
 export const nonNegativeInt = (description: string): z.ZodNumber =>
   z.number().int().nonnegative().describe(description);
