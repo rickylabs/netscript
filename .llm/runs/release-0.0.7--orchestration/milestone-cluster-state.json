@@ -1309,12 +1309,14 @@
     },
     {
       "number": 1844,
-      "state": "open",
+      "state": "closed",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1844"
+        "https://github.com/rickylabs/netscript/issues/1844",
+        "https://github.com/rickylabs/netscript/issues/1844#issuecomment-5523886825"
       ],
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1844",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T09:52:13Z",
+      "disposition": "Owner approved: mitigated; original cause unproven"
     }
   ],
   "leaves": [
@@ -5713,14 +5715,14 @@
   ],
   "expensiveGates": [],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-03T08:15:00.000Z",
+    "capturedAt": "2026-09-03T09:52:13Z",
     "source": "Live GitHub milestone 27 export; actual remaining issues, not historical frozen inventory.",
-    "openIssueCount": 8,
+    "openIssueCount": 7,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
       "features": 1,
-      "fixes": 4,
+      "fixes": 3,
       "internals": 0,
       "docs": 0,
       "aspire": 3
@@ -5739,13 +5741,6 @@
         "state": "OPEN",
         "title": "test(aspire): clean-machine quickstart canary runs the root README sequence without manual recovery (#863 gate 3)",
         "url": "https://github.com/rickylabs/netscript/issues/1881"
-      },
-      {
-        "number": 1844,
-        "owner": "orchestrator:fixes",
-        "state": "OPEN",
-        "title": "ci(e2e-cli): runtime.wait.garnet times out at 300s on the Postgres scaffold-runtime tier",
-        "url": "https://github.com/rickylabs/netscript/issues/1844"
       },
       {
         "number": 1712,
@@ -5989,7 +5984,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T09:23:00Z",
+  "updatedAt": "2026-09-03T09:52:13Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6084,10 +6079,10 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T09:23:00Z",
-    "nextReportDueAt": "2026-09-03T10:23:00Z",
-    "lastReportRef": "worklog.md#2026-09-03-0923z-browser-runtime-green-and-owner-scan-fix-pushed",
-    "headline": "#1958 both database runtime suites and core CI green; independent evaluation active. Owner Aspire scan fix pushed to #1982 at 0475c3213.",
+    "lastReportAt": "2026-09-03T09:52:13Z",
+    "nextReportDueAt": "2026-09-03T10:52:13Z",
+    "lastReportRef": "worklog.md#2026-09-03-0952z-owner-approved-1844-closeout",
+    "headline": "#1844 closed by explicit owner acceptance: mitigated; original cause unproven. Seven milestone issues remain; release gates unchanged.",
     "currentMainSha": "94fe507af47171cd4f295e8f532b281d7147b334",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
@@ -6122,14 +6117,16 @@
       "mergedPullRequests": [
         1981
       ],
-      "closedIssues": [],
+      "closedIssues": [
+        1844
+      ],
       "newIssues": [],
-      "queueDeltaExplanation": "One bounded owner-directed Aspire scan repair PR (#1982) added; no new milestone issues. #1981 merged this turn; eight existing issues remain assigned."
+      "queueDeltaExplanation": "Owner-approved #1844 historical-evidence disposition recorded and issue closed; open milestone issue count 8→7. No code, evaluation or release gate waived."
     },
     "scope": {
-      "openIssueCount": 8,
-      "ownedIssueCount": 8,
-      "scheduledIssueCount": 8,
+      "openIssueCount": 7,
+      "ownedIssueCount": 7,
+      "scheduledIssueCount": 7,
       "openPullRequestCount": 5,
       "unscheduledIssueNumbers": []
     },
@@ -6181,14 +6178,13 @@
         "activeItems": [
           1455,
           1481,
-          1844,
           1971,
           1970,
           1945
         ],
         "lastConcreteProgressAt": "2026-09-03T08:09:42Z",
         "blocker": "Native Fable monthly cap; original implementation threads at clean dependency checkpoints, not active workers.",
-        "nextAction": "Resume same #1970/#1945 threads immediately after #1958 merge. Audit historical Garnet independently."
+        "nextAction": "Finish independent product reviews and exact-head integration/CI for #1970/#1945; #1844 historical disposition is owner-approved and closed."
       },
       {
         "lane": "internals",
@@ -6273,15 +6269,6 @@
         "owner": "coordinator",
         "nextAction": "Do not spin retries or silently change model/spend settings; route approved evaluations and keep existing authors moving.",
         "ownerDecisionRequired": false
-      },
-      {
-        "id": "historical-garnet-cause",
-        "category": "infrastructure",
-        "summary": "Original run 33404321608 report preserves 300-second timeout but not referenced AppHost logs; current diagnoses/soak must not be called historical root-cause proof.",
-        "impact": "#1844 remains open for honest acceptance disposition; no current Garnet regression proven.",
-        "owner": "coordinator / fixes",
-        "nextAction": "Owner question surfaced; audit at receipts/issue-1844-recovery-audit.md and issuecomment-5522800739. Continue candidate without this historical-proof barrier.",
-        "ownerDecisionRequired": true
       }
     ],
     "environment": {
@@ -6290,16 +6277,7 @@
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
     },
-    "ownerDecisions": [
-      {
-        "id": "garnet-historical-closeout",
-        "question": "Accept #1844 closure as mitigated, original cause unproven, with later full PostgreSQL passes and missing original logs explicitly documented?",
-        "whyOwnerOnly": "Original acceptance explicitly demands a historical root cause and AppHost/DCP log excerpt that the retained artifact cannot supply. Relaxing that criterion must not be silently self-certified.",
-        "blockedItems": [
-          1844
-        ]
-      }
-    ]
+    "ownerDecisions": []
   },
   "releasePreflight": {
     "gitHead": "94fe507af47171cd4f295e8f532b281d7147b334",

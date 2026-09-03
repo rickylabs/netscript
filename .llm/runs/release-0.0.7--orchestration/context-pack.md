@@ -1,5 +1,17 @@
 # Context pack — release 0.0.7
 
+## 2026-09-03 09:52Z owner-approved #1844 closeout
+
+Owner answered “Yes close” to the explicit proposal “mitigated; original cause unproven.”
+Closed issue1844 at09:52:13Z, completed/status:shipped, preserving the original incident checklist
+and explicitly recording the historical-root-cause/log-evidence exception; no fake diagnosis.
+Evidence: https://github.com/rickylabs/netscript/issues/1844#issuecomment-5523886825 and
+receipts/issue-1844-owner-closeout.md. Mitigation PR1959 is merged; linked full PostgreSQL recovery
+runs pass. Active owner-decision queue cleared; seven milestone issues remain. Final-candidate CI,
+canary production E2E and clean-machine quickstart requirements are unchanged.
+NAS continuity unchanged: canonical /home/agent/projects/netscript paths, mise toolchains,
+DinD sandbox only, no host-runtime mutation or run cleanup. This action is issue/ledger-only.
+
 ## 2026-09-03 09:23Z browser runtime green and owner scan fix pushed
 
 #1958 @0e1717dab: hosted33736497671 PASS (Postgres103/0, SQLite98/0, cleanup0), core CI green.
