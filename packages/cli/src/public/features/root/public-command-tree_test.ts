@@ -1,7 +1,8 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { dirname, extname, isAbsolute, join, relative } from 'jsr:@std/path@^1';
+import { dirname, extname, fromFileUrl, isAbsolute, join, relative } from 'jsr:@std/path@^1';
 
 import cliMeta from '../../../../deno.json' with { type: 'json' };
+import { useLocalWorkspaceImports } from '../../../../tests/support/local-workspace-imports.ts';
 import {
   type AppConventionsInput,
   appConventionsReferencedPaths,
@@ -201,6 +202,13 @@ Deno.test('public init emits resolvable app conventions with and without the exa
     const beforeDryRun = await Promise.all(
       sharedPaths.map((path) => Deno.readTextFile(join(serviceApp, path))),
     );
+    const serviceConfig = JSON.parse(await Deno.readTextFile(join(serviceApp, 'deno.json')));
+    assertEquals(serviceConfig.imports['@netscript/sdk'], `jsr:@netscript/sdk@${cliMeta.version}`);
+    // Keep the public pin assertion above, then resolve the checkout under test:
+    // release-cut versions intentionally do not exist on JSR before publication.
+    const repositoryRoot = fromFileUrl(new URL('../../../../../../', import.meta.url));
+    await useLocalWorkspaceImports(join(parent, 'with-service'), repositoryRoot);
+    await useLocalWorkspaceImports(serviceApp, repositoryRoot);
     const generate = createPublicCommandTree({
       cwd: () => serviceApp,
       resolvePath: (path) => path ?? serviceApp,
