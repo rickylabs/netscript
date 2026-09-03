@@ -9,6 +9,36 @@ import { join } from 'jsr:@std/path@^1';
 import { scanContent, scanHostPorts } from './check-aspire-host-ports.ts';
 
 const APPHOST = 'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts';
+
+Deno.test('host-port checks ignore retained run and transient files but not framework source', () => {
+  const source = 'withHttpEndpoint({ port: 3000 })';
+  for (
+    const path of ['.llm/runs/old/apphost.ts', '.llm/tmp/apphost.ts', '.agents/generated/copy.ts']
+  ) {
+    assertEquals(scanContent(path, source).findings, []);
+  }
+  assertEquals(scanContent(APPHOST, source).findings.length, 1);
+});
+
+Deno.test('explicit generated-project validation still catches pins under a scratch parent', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const project = join(root, '.llm', 'tmp', 'generated-project');
+    await Deno.mkdir(join(project, 'aspire'), { recursive: true });
+    await Deno.writeTextFile(join(project, 'aspire', 'appsettings.json'), '{"HostPort":3000}');
+    await Deno.mkdir(join(project, '.llm', 'runs', 'history'), { recursive: true });
+    await Deno.writeTextFile(
+      join(project, '.llm', 'runs', 'history', 'apphost.ts'),
+      'withHttpEndpoint({ port: 3000 })',
+    );
+    assertEquals((await scanHostPorts([project])).scannedFiles, 0);
+    const result = await scanHostPorts([project], true);
+    assertEquals(result.scannedFiles, 1);
+    assertEquals(result.findings.length, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
 const APPSETTINGS = 'packages/cli/src/kernel/templates/aspire/generate-appsettings.ts';
 const GENERATOR =
   'packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-services.ts';

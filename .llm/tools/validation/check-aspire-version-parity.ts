@@ -7,6 +7,7 @@
  */
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
 import { buildAspireSurfaceManifest } from '../../runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts';
+import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
 export const ASPIRE_SURFACE_MANIFEST_PATH =
   '.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv';
@@ -85,9 +86,24 @@ const PHASE_ONE_EXACT_VERSIONS: Readonly<Record<string, readonly string[]>> = {
   '.github/workflows/e2e-cli-prod-local.yml': ['13.5.3', '13.5.3-v1'],
 };
 
-function staleMatches(source: string): string[] {
+/** Remove only syntax explicitly permitted by the manifest-owned context. */
+function pinSource(source: string, className: string): string {
+  if (className === 'negative-version-guard') {
+    // Deliberately not a TS parser: recognize only a standalone, direct three-argument
+    // guard statement with an identifier input and literal/identifier location.
+    // Unfamiliar syntax remains fail-closed.
+    return source.replace(
+      /^(\s*forbidText\(\s*[A-Za-z_$][\w$]*\s*,\s*)(['"])(13\.[0-4]\.[0-9]+)\2(?=\s*,\s*(?:[A-Za-z_$][\w$]*|'[^'\r\n]*'|"[^"\r\n]*")\s*,?\s*\)\s*;\s*$)/gm,
+      '$1$2<forbidden version>$2',
+    );
+  }
+  return source;
+}
+
+function staleMatches(source: string, className: string): string[] {
+  const pins = pinSource(source, className);
   return [
-    ...new Set(STALE_PATTERNS.flatMap((pattern) => [...source.matchAll(pattern)].map((m) => m[0]))),
+    ...new Set(STALE_PATTERNS.flatMap((pattern) => [...pins.matchAll(pattern)].map((m) => m[0]))),
   ];
 }
 
@@ -176,7 +192,7 @@ export async function evaluateAspireVersionParity(
   }
 
   for (const row of options.rows) {
-    if (row.class === 'lockfile') {
+    if (row.class === 'lockfile' || isTransientAspireScanPath(row.path)) {
       skipped.push(row.path);
       continue;
     }
@@ -195,7 +211,7 @@ export async function evaluateAspireVersionParity(
       continue;
     }
     const exactMismatches = options.phase === 1 ? unexpectedPhaseOneVersions(row.path, source) : [];
-    const matches = [...new Set([...staleMatches(source), ...exactMismatches])];
+    const matches = [...new Set([...staleMatches(source, row.class), ...exactMismatches])];
 
     if (row.owner === 'archival' || row.class.startsWith('archival:')) {
       if (matches.length > 0) {

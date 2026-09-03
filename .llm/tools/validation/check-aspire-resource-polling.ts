@@ -1,4 +1,5 @@
 import { relative, resolve } from '@std/path';
+import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
 /** A source file that appears to poll an Aspire describe snapshot on its own clock. */
 export interface AspireResourcePollingFinding {
@@ -26,7 +27,7 @@ export async function findAspireResourcePolling(
   repositoryRoot: string = Deno.cwd(),
 ): Promise<readonly AspireResourcePollingFinding[]> {
   const findings: AspireResourcePollingFinding[] = [];
-  for (const path of await typescriptFiles(sourceRoot)) {
+  for (const path of await typescriptFiles(sourceRoot, repositoryRoot)) {
     const source = await Deno.readTextFile(path);
     const loops = loopRanges(source);
     for (const match of source.matchAll(DESCRIBE_COMMAND)) {
@@ -34,7 +35,9 @@ export async function findAspireResourcePolling(
       const loop = loops.find((candidate) => candidate.start < index && index < candidate.end);
       if (!loop) continue;
       const body = source.slice(loop.start, loop.end);
-      if (FOLLOW_FLAG.test(body) || !COMMAND_SIGNAL.test(body) || !TIMING_SIGNAL.test(body)) continue;
+      if (FOLLOW_FLAG.test(body) || !COMMAND_SIGNAL.test(body) || !TIMING_SIGNAL.test(body)) {
+        continue;
+      }
       findings.push({
         path: normalize(relative(repositoryRoot, path)),
         describeLine: source.slice(0, index).split(/\r?\n/u).length,
@@ -69,17 +72,21 @@ export function unexpectedAspireResourcePolling(
   return findings.filter((finding) => !ASPIRE_RESOURCE_POLL_ALLOWLIST.has(finding.path));
 }
 
-async function typescriptFiles(root: string): Promise<string[]> {
+async function typescriptFiles(root: string, repositoryRoot: string): Promise<string[]> {
   const files: string[] = [];
-  await visit(resolve(root), files);
+  await visit(resolve(root), files, repositoryRoot);
   return files.sort((left, right) => left.localeCompare(right));
 }
 
-async function visit(path: string, files: string[]): Promise<void> {
+async function visit(path: string, files: string[], repositoryRoot: string): Promise<void> {
+  if (isTransientAspireScanPath(relative(repositoryRoot, path))) return;
   for await (const entry of Deno.readDir(path)) {
     const child = resolve(path, entry.name);
-    if (entry.isDirectory) await visit(child, files);
-    else if (entry.isFile && entry.name.endsWith('.ts')) files.push(child);
+    if (entry.isDirectory) await visit(child, files, repositoryRoot);
+    else if (
+      entry.isFile && entry.name.endsWith('.ts') &&
+      !isTransientAspireScanPath(relative(repositoryRoot, child))
+    ) files.push(child);
   }
 }
 

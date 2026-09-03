@@ -1,5 +1,5 @@
 /**
- * Aspire 13.4.6 default resource-name grammar.
+ * Default Aspire resource-name grammar.
  *
  * Names contain 1–64 ASCII characters, start with a letter, use only letters,
  * digits, or hyphens, and contain neither consecutive nor trailing hyphens.

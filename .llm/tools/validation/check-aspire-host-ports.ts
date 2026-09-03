@@ -20,6 +20,7 @@
  */
 import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
+import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
 const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'] as const;
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template', '.json']);
@@ -137,10 +138,12 @@ function sourceLineAt(content: string, index: number): string {
 export function scanContent(
   path: string,
   content: string,
+  scopePath: string = path,
 ): { findings: HostPortFinding[]; allowances: HostPortAllowance[] } {
   const findings: HostPortFinding[] = [];
   const allowances: HostPortAllowance[] = [];
   const normalizedPath = normalized(path);
+  if (isTransientAspireScanPath(scopePath)) return { findings, allowances };
   const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalizedPath);
   const checksGeneratedJson = normalizedPath.endsWith('/aspire/appsettings.json');
   const checksContribution = PLUGIN_CONTRIBUTION.test(normalizedPath);
@@ -231,6 +234,7 @@ export function scanContent(
  */
 export async function scanHostPorts(
   roots: readonly string[] = DEFAULT_ROOTS,
+  generatedProject: boolean = false,
 ): Promise<HostPortScanResult> {
   const findings: HostPortFinding[] = [];
   const allowances: HostPortAllowance[] = [];
@@ -244,11 +248,15 @@ export async function scanHostPorts(
       })
     ) {
       const path = normalized(relative('.', entry.path));
+      // An explicitly selected generated project is the subject of a functional gate,
+      // even when its parent is scratch. Only state INSIDE that project is excluded.
+      const scopePath = generatedProject ? normalized(relative(root, entry.path)) : path;
+      if (isTransientAspireScanPath(scopePath)) continue;
       if (![...SOURCE_EXTENSIONS].some((suffix) => path.endsWith(suffix))) continue;
       if (path.includes('/node_modules/') || isTestPath(path) || isGeneratedSource(path)) continue;
 
       scannedFiles += 1;
-      const result = scanContent(path, await Deno.readTextFile(entry.path));
+      const result = scanContent(path, await Deno.readTextFile(entry.path), scopePath);
       findings.push(...result.findings);
       allowances.push(...result.allowances);
     }
@@ -261,16 +269,21 @@ if (import.meta.main) {
   if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
     console.log([
       'Usage:',
-      '  deno run --allow-read check-aspire-host-ports.ts [root ...] [--pretty]',
+      '  deno run --allow-read check-aspire-host-ports.ts [root ...] [--pretty] [--generated-project]',
       '',
       'Roots default to packages/cli/src and plugins. Pass a generated project root to validate the scaffold',
       'that consumers actually received.',
+      '--generated-project checks an explicitly selected scaffold, including one created under scratch; internal transient state is still excluded.',
     ].join('\n'));
     Deno.exit(0);
   }
   const pretty = Deno.args.includes('--pretty');
   const roots = Deno.args.filter((arg) => !arg.startsWith('-'));
-  const result = await scanHostPorts(roots.length > 0 ? roots : DEFAULT_ROOTS);
+  const generatedProject = Deno.args.includes('--generated-project');
+  if (generatedProject && roots.length !== 1) {
+    throw new Error('--generated-project requires one root');
+  }
+  const result = await scanHostPorts(roots.length > 0 ? roots : DEFAULT_ROOTS, generatedProject);
 
   if (pretty) {
     console.log(`Scanned ${result.scannedFiles} files.`);
