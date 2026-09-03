@@ -46,8 +46,8 @@
 | # | Slice | Gate | Files |
 | - | --- | --- | --- |
 | 0 | Activate run record and draft review surface | artifact review | run dir |
-| 1 | Reproduce published/local behavior and lock deterministic RED | focused structured test wrapper (expected failure) | CLI test + run dir |
-| 2 | Repair the proven contract and establish GREEN | focused structured test wrapper + scoped local gates | CLI source/test + run dir |
+| 1 | Reproduce published behavior and lock deterministic RED | executable `--mode red` assertion + raw receipt | run dir |
+| 2 | Prove the fixture-only repair and complete doctor behavior | executable `--mode green` + complete fixture | CLI e2e fixture + run dir |
 | 3 | Exact-head gate/evaluator/hosted convergence | receipt sufficiency, CI, separate evaluation | run dir + PR metadata |
 
 ### Deferred Scope
@@ -66,23 +66,37 @@ For another package-backed registry, declare its generator and targets in the pl
 | --- | --- | --- | --- |
 | 2026-09-03 | 0 | bootstrap | Read issue #1966, requested skills, harness/doctrine/gates, current code path, and debt; selected PLAN-EVAL N/A. |
 | 2026-09-03 | 0 | pre-push gates | At committed head `2d137cfa9`, scoped check and `quality:gate` passed. The exact scoped lint/fmt commands failed closed on baseline config exclusions; see drift. No product TypeScript changed in this slice. |
+| 2026-09-03 01:08Z | 1 | executable RED | At `2fa5f60eb359ffdc5484728ef9845d8594e734b8`, `deno run -A .llm/runs/fix-package-backed-plugin-generate--0.0.7/reproduce-canary8.ts --mode red` exercised the exact published Canary-8 CLI from repo and project cwd. Both nested commands exited 1 on the minimum-dependency-date rejection and wrote no generated tree. Raw receipt: `receipts/red-canary8.txt`. |
+| 2026-09-03 01:08Z | 2 | executable GREEN | At the same product head, `deno run -A .llm/runs/fix-package-backed-plugin-generate--0.0.7/reproduce-canary8.ts --mode green` exercised both cwd values. Both commands exited 0; each tree contains `.netscript/generated/plugin-workers/job-registry.ts`, whose raw contents include `package-backed-job`. Raw receipt: `receipts/green-canary8.txt`. |
+| 2026-09-03 01:08Z | 2 | complete fixture | The exact published `package-backed-plugin-doctor-fixture.ts` command exited 0 with `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS`; raw command/output/tree/semantic matches are in `receipts/doctor-fixture-canary8.txt`. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
 | PLAN-EVAL N/A | Canonical issue and brief already bind the small repair's contract, ceiling, RED, and gates. | `run-loop.md` §4; issue #1966 |
-| Keep workers consumer-only initially | Host owns package-backed manifest dispatch; plugin edit requires direct causal proof. | Archetypes 5/6 and ceiling |
+| Keep workers and CLI product code unchanged | Executable RED/GREEN proves the dedicated fixture config is the only repair boundary. | Supervisor correction; receipts |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Baseline root config excludes `packages/cli/`, so the exact scoped lint/fmt wrappers refuse incomplete coverage. | significant | yes |
+| Initial product-defect hypothesis was replaced by the proven fixture dependency-age cause. | significant | yes |
 
 ## Reproduction Evidence
 
-Pending exact published Canary 8 runs from both invoking cwd values and the baseline local-source comparison.
+All commands below ran at product head `2fa5f60eb359ffdc5484728ef9845d8594e734b8`.
+
+| Mode | Exact harness command | Repo cwd result | Project cwd result | Durable raw receipt |
+| --- | --- | --- | --- | --- |
+| RED | `deno run -A .llm/runs/fix-package-backed-plugin-generate--0.0.7/reproduce-canary8.ts --mode red` | Published nested command exit 1; minimum-dependency-date rejection; `.netscript/generated` missing. | Published nested command exit 1; same rejection; `.netscript/generated` missing. | `receipts/red-canary8.txt` |
+| GREEN | `deno run -A .llm/runs/fix-package-backed-plugin-generate--0.0.7/reproduce-canary8.ts --mode green` | Exit 0; workers registry written with `package-backed-job`. | Exit 0; workers registry written with `package-backed-job`. | `receipts/green-canary8.txt` |
+| Complete fixture | `deno run -A packages/cli/e2e/src/application/gates/scaffold/package-backed-plugin-doctor-fixture.ts --project-root /tmp/netscript-1966-doctor-receipt-2fa5f60e/project --repo-root /home/agent/projects/netscript/worktrees/007-leaf-1966 --cli-entrypoint jsr:@netscript/cli@0.0.7-canary.8 --package-version 0.0.7-canary.8` | Exit 0; `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS`. | Fixture intentionally invokes the CLI from repo cwd, matching CI. | `receipts/doctor-fixture-canary8.txt` |
+
+Each mode records the exact nested `deno run -A --minimum-dependency-age=0
+jsr:@netscript/cli@0.0.7-canary.8 generate plugins --project-root <root>` command, invoking cwd,
+timestamp, git head, exit code, full stdout/stderr, generated tree, and registry contents when present.
 
 ## Gate Results
 
@@ -106,14 +120,17 @@ Pending exact published Canary 8 runs from both invoking cwd values and the base
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Published two-cwd reproduction | NOT_RUN | pending | Run before RED. |
+| Published two-cwd RED/GREEN reproduction | PASS | `receipts/red-canary8.txt`; `receipts/green-canary8.txt` | Executable mode assertions cover both repo and project cwd at `2fa5f60eb359ffdc5484728ef9845d8594e734b8`. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Package-backed workers registry | NOT_RUN | pending | Exact published and focused temp-root test. |
+| Package-backed workers registry | PASS | `receipts/green-canary8.txt` | Both cwd variants write the declared registry and its raw contents include `package-backed-job`. |
+| Complete package-backed doctor fixture | PASS | `receipts/doctor-fixture-canary8.txt` | Exact Canary-8 fixture exits 0 with `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS`. |
 
 ## Handoff Notes
 
-- Evaluator should inspect the two-cwd reproduction, causal distinction between root resolution and remote generator dispatch, and whether the regression truly excludes local-source fallback.
+- Implementation and executable evidence are complete; the run is awaiting merge coordination.
+- Review the immutable receipt trio for the two-cwd RED/GREEN boundary and complete fixture proof.
+- Product code, plugin code, root config, and `deno.lock` are unchanged by this harness repair.

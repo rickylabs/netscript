@@ -6,29 +6,36 @@
 | --- | --- |
 | Run ID | `fix-package-backed-plugin-generate--0.0.7` |
 | Branch | `fix/package-backed-plugin-generate` |
-| Current phase | `research` |
+| Current phase | `implementation complete / awaiting merge` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Issue #1966 is re-baselined at dispatch base `79adb103b`. Harness research/plan/design are activated; PLAN-EVAL is N/A because the canonical brief already fixes the bounded repair decisions. The bootstrap slice is committed at `2d137cfa9`; check and quality pass, while the exact lint/fmt wrapper commands expose a pre-existing root-config exclusion that prevents complete CLI coverage.
+Issue #1966's fixture-only repair is implemented at product commit `11cffaabb` and proven at head
+`2fa5f60eb359ffdc5484728ef9845d8594e734b8`. Executable RED and GREEN modes cover the exact
+published Canary-8 CLI from repository and project cwd. Immutable receipts contain the full raw
+process output, generated trees, and registry contents. The complete package-backed doctor fixture
+passes. Product CLI/worker/doctor code and dependency files are unchanged by the evidence repair.
 
 ## Completed
 
 - Read issue acceptance/evidence, all requested skills, harness workflow/gates/routes, applicable Archetype 5/6 doctrine, current verdicts, and relevant debt.
-- Traced the command into the installed-runtime generator far enough to identify the two causal candidates.
+- Proved explicit `--project-root` selection reaches the same package-backed nested generator from both cwd values.
+- Recorded executable RED: both published commands exit 1 on Deno's minimum-dependency-date policy and write no generated tree.
+- Recorded executable GREEN: both published commands exit 0 and write a workers registry containing `package-backed-job`.
+- Recorded the complete fixture exit 0 and `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS` result.
 - Ran bootstrap pre-push gates: scoped check and `quality:gate` passed; scoped lint/fmt failed closed on the baseline `packages/cli/` exclusion and are recorded as drift.
 
-## In Progress
+## Awaiting Merge
 
-- Exact published Canary 8 reproduction from repository and project cwd.
+- No implementation or evidence work remains in this run.
+- Release coordination may merge after its hosted-policy requirements converge.
 
 ## Next Steps
 
-1. Create identical dedicated roots and record published two-cwd output/tree.
-2. Run baseline local CLI against the same shape.
-3. Commit deterministic RED, then repair and gate GREEN.
+1. Review the committed receipt trio and final PR state.
+2. Merge through the release coordinator when authorized.
 
 ## Key Decisions
 
@@ -36,13 +43,15 @@ Issue #1966 is re-baselined at dispatch base `79adb103b`. Harness research/plan/
 | --- | --- | --- |
 | Explicit project root is authoritative | CLI contract / issue #1966 | Regression must distinguish cwd. |
 | PLAN-EVAL N/A | harness run loop | Mechanical bounded fix. |
-| Fable 5 medium final evaluator | lane policy | Fresh native opposite-family session. |
+| Fixture-only correction | Supervisor steer / executable receipts | No product generator or doctor change is warranted. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-package-backed-plugin-generate--0.0.7/*` | new | Harness activation and carried implement brief. |
+| `.llm/runs/fix-package-backed-plugin-generate--0.0.7/reproduce-canary8.ts` | modified | Explicit asserted `--mode red` and `--mode green` paths. |
+| `.llm/runs/fix-package-backed-plugin-generate--0.0.7/receipts/*.txt` | new | Immutable raw Canary-8 RED, GREEN, and complete fixture receipts. |
+| `.llm/runs/fix-package-backed-plugin-generate--0.0.7/{worklog,context-pack}.md` | modified | Truthful completion state and exact evidence links. |
 
 ## Gates
 
@@ -50,13 +59,12 @@ Issue #1966 is re-baselined at dispatch base `79adb103b`. Harness research/plan/
 | --- | --- | --- |
 | Static | partial/baseline blocker | Check PASS; lint/fmt exact commands refuse root-excluded CLI coverage. |
 | Fitness | PASS at bootstrap | `deno task quality:gate` exit 0 at `2d137cfa9`. |
-| Runtime | pending | Published two-cwd reproduction. |
-| Consumer | pending | Package-backed regression and hosted suite. |
+| Runtime | PASS | `receipts/red-canary8.txt` and `receipts/green-canary8.txt` at `2fa5f60eb`. |
+| Consumer | PASS | `receipts/green-canary8.txt` plus `receipts/doctor-fixture-canary8.txt`. |
 
 ## Open Questions
 
-- Root/cwd bug or package-backed manifest/generator bug?
-- Does baseline local CLI reproduce it?
+- None. The two-cwd receipts resolve the causal question to the fixture's missing dependency-age policy.
 
 ## Drift and Debt
 
@@ -65,4 +73,5 @@ Issue #1966 is re-baselined at dispatch base `79adb103b`. Harness research/plan/
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `11cffaabb` — fixture writes `minimumDependencyAge: 0` and preserves hard generation assertions.
+- `2fa5f60eb` — initial harness evidence record; executable receipt correction follows as one harness-only commit.

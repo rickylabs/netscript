@@ -2,62 +2,83 @@ import { dirname, fromFileUrl, join, relative } from '@std/path';
 
 const PACKAGE_VERSION = '0.0.7-canary.8';
 const PUBLISHED_CLI = `jsr:@netscript/cli@${PACKAGE_VERSION}`;
+const REGISTRY_PATH = '.netscript/generated/plugin-workers/job-registry.ts';
 
-interface Scenario {
-  readonly cli: 'published' | 'local';
-  readonly cwd: 'repo' | 'project';
-}
+type Mode = 'green' | 'red';
+type InvokingCwd = 'project' | 'repo';
 
+const mode = parseMode(Deno.args);
 const repoRoot = fromFileUrl(new URL('../../..', import.meta.url));
-const localCli = join(repoRoot, 'packages/cli/bin/netscript.ts');
-const scenarios: readonly Scenario[] = [
-  { cli: 'published', cwd: 'repo' },
-  { cli: 'published', cwd: 'project' },
-  { cli: 'local', cwd: 'repo' },
-  { cli: 'local', cwd: 'project' },
-];
+const gitHead = await readGitHead(repoRoot);
+const failures: string[] = [];
 
-for (const scenario of scenarios) {
+console.log(`mode=${mode}`);
+console.log(`gitHead=${gitHead}`);
+console.log(`startedAt=${new Date().toISOString()}`);
+
+for (const invokingCwd of ['repo', 'project'] as const) {
   const projectRoot = await Deno.makeTempDir({
-    prefix: `netscript-1966-${scenario.cli}-${scenario.cwd}-`,
+    prefix: `netscript-1966-${mode}-${invokingCwd}-`,
   });
   try {
-    await buildFixtureRoot(projectRoot);
-    const entrypoint = scenario.cli === 'published' ? PUBLISHED_CLI : localCli;
-    const denoArgs = ['run', '-A'];
-    if (scenario.cli === 'published') denoArgs.push('--minimum-dependency-age=0');
-    denoArgs.push(
-      entrypoint,
+    await buildFixtureRoot(projectRoot, mode);
+    const cwd = invokingCwd === 'repo' ? repoRoot : projectRoot;
+    const denoArgs = [
+      'run',
+      '-A',
+      '--minimum-dependency-age=0',
+      PUBLISHED_CLI,
       'generate',
       'plugins',
       '--project-root',
       projectRoot,
-      '--verbose',
-    );
+    ];
     const result = await new Deno.Command(Deno.execPath(), {
       args: denoArgs,
-      cwd: scenario.cwd === 'repo' ? repoRoot : projectRoot,
+      cwd,
       stdout: 'piped',
       stderr: 'piped',
     }).output();
+    const tree = await generatedTree(projectRoot);
+    const registry = await readOptional(join(projectRoot, REGISTRY_PATH));
 
-    console.log(`=== ${scenario.cli} CLI; cwd=${scenario.cwd} ===`);
-    console.log(`entrypoint=${entrypoint}`);
+    console.log(`=== published CLI; mode=${mode}; cwd=${invokingCwd} ===`);
+    console.log(`timestamp=${new Date().toISOString()}`);
+    console.log(`gitHead=${gitHead}`);
+    console.log(`cwd=${cwd}`);
     console.log(`projectRoot=${projectRoot}`);
-    console.log(`invokingCwd=${scenario.cwd === 'repo' ? repoRoot : projectRoot}`);
+    console.log(`command=${formatCommand('deno', denoArgs)}`);
     console.log(`exitCode=${result.code}`);
     console.log('stdout:');
-    console.log(decode(result.stdout) || '(empty)');
+    printRaw(result.stdout);
     console.log('stderr:');
-    console.log(decode(result.stderr) || '(empty)');
+    printRaw(result.stderr);
     console.log('generatedTree:');
-    for (const path of await generatedTree(projectRoot)) console.log(path);
+    tree.forEach((path) => console.log(path));
+    console.log('registryContents:');
+    console.log(registry ?? `(missing ${REGISTRY_PATH})`);
+
+    assertScenario(mode, invokingCwd, result, tree, registry, failures);
   } finally {
     await Deno.remove(projectRoot, { recursive: true });
   }
 }
 
-async function buildFixtureRoot(projectRoot: string): Promise<void> {
+if (failures.length > 0) {
+  failures.forEach((failure) => console.error(`ASSERTION_FAILURE: ${failure}`));
+  Deno.exit(1);
+}
+
+console.log(`REPRODUCTION_${mode.toUpperCase()}_PASS`);
+
+function parseMode(args: readonly string[]): Mode {
+  if (args.length !== 2 || args[0] !== '--mode' || !['red', 'green'].includes(args[1])) {
+    throw new Error('Usage: reproduce-canary8.ts --mode <red|green>');
+  }
+  return args[1] as Mode;
+}
+
+async function buildFixtureRoot(projectRoot: string, selectedMode: Mode): Promise<void> {
   await Deno.mkdir(join(projectRoot, 'workers/jobs'), { recursive: true });
   await Deno.mkdir(join(projectRoot, 'aspire'), { recursive: true });
   await Deno.mkdir(join(projectRoot, 'dotnet/AppHost'), { recursive: true });
@@ -65,7 +86,7 @@ async function buildFixtureRoot(projectRoot: string): Promise<void> {
   const workersSpecifier = `jsr:@netscript/plugin-workers@${PACKAGE_VERSION}`;
   const streamsSpecifier = `jsr:@netscript/plugin-streams@${PACKAGE_VERSION}`;
   await writeJson(join(projectRoot, 'deno.json'), {
-    minimumDependencyAge: 0,
+    ...(selectedMode === 'green' ? { minimumDependencyAge: 0 } : {}),
     imports: {
       '@netscript/config': `jsr:@netscript/config@${PACKAGE_VERSION}`,
       '@netscript/plugin-workers': workersSpecifier,
@@ -124,6 +145,44 @@ export { config as default };
   await writeJson(join(projectRoot, 'dotnet/AppHost/appsettings.json'), appsettings);
 }
 
+function assertScenario(
+  selectedMode: Mode,
+  cwd: InvokingCwd,
+  result: Deno.CommandOutput,
+  tree: readonly string[],
+  registry: string | undefined,
+  output: string[],
+): void {
+  const stderr = new TextDecoder().decode(result.stderr);
+  if (selectedMode === 'red') {
+    if (result.code !== 1) output.push(`red/${cwd}: expected exit 1, got ${result.code}`);
+    if (!/minimum dependency (?:age|date)/i.test(stderr)) {
+      output.push(`red/${cwd}: missing minimum-dependency rejection`);
+    }
+    if (!tree.includes('(missing .netscript/generated)')) {
+      output.push(`red/${cwd}: generated tree unexpectedly exists`);
+    }
+    return;
+  }
+
+  if (result.code !== 0) output.push(`green/${cwd}: expected exit 0, got ${result.code}`);
+  if (!tree.includes(REGISTRY_PATH)) output.push(`green/${cwd}: registry absent from tree`);
+  if (!registry?.includes('package-backed-job')) {
+    output.push(`green/${cwd}: registry omits package-backed-job`);
+  }
+}
+
+async function readGitHead(cwd: string): Promise<string> {
+  const result = await new Deno.Command('git', {
+    args: ['rev-parse', 'HEAD'],
+    cwd,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!result.success) throw new Error(new TextDecoder().decode(result.stderr));
+  return new TextDecoder().decode(result.stdout).trim();
+}
+
 async function generatedTree(projectRoot: string): Promise<readonly string[]> {
   const root = join(projectRoot, '.netscript/generated');
   const output: string[] = [];
@@ -150,11 +209,32 @@ async function exists(path: string): Promise<boolean> {
   });
 }
 
+async function readOptional(path: string): Promise<string | undefined> {
+  try {
+    return await Deno.readTextFile(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return undefined;
+    throw error;
+  }
+}
+
 async function writeJson(path: string, value: unknown): Promise<void> {
   await Deno.mkdir(dirname(path), { recursive: true });
   await Deno.writeTextFile(path, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function decode(value: Uint8Array): string {
-  return new TextDecoder().decode(value).trim();
+function printRaw(value: Uint8Array): void {
+  if (value.length === 0) {
+    console.log('(empty)');
+    return;
+  }
+  const decoded = new TextDecoder().decode(value);
+  console.log(decoded.endsWith('\n') ? decoded.slice(0, -1) : decoded);
+}
+
+function formatCommand(command: string, args: readonly string[]): string {
+  return [command, ...args].map((arg) =>
+    /^[A-Za-z0-9_./:@=-]+$/.test(arg) ? arg : JSON.stringify(arg)
+  )
+    .join(' ');
 }
