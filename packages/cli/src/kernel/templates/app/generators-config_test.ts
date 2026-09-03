@@ -112,7 +112,10 @@ describe('generateAppDenoJson', () => {
     assert(config.imports['@fresh/plugin-vite']);
     assert(config.imports['@tailwindcss/vite']);
     assert(config.imports['vite']);
-    assertEquals(config.imports.zod, 'catalog:');
+    assertEquals(
+      config.imports.zod,
+      `npm:zod@${SCAFFOLD_WORKSPACE_CATALOG.zod}`,
+    );
     assertEquals(config.imports['@netscript/fresh/route'], undefined);
     assertEquals(config.imports['@netscript/fresh-ui/interactive'], undefined);
     assertEquals(config.imports['@netscript/sdk/client'], undefined);

@@ -67,6 +67,10 @@ entrypoints through `DatabaseScaffolder` only when generated consumers already i
 | 2026-09-03 | 0 | Contract | Native Deno resolves installed Zod; `@deno/loader` 0.4.0 returns literal `catalog:`. |
 | 2026-09-03 | 0 | Plan gate | `PLAN-EVAL: N/A` — exact reproduction fully determines contract, scope, alternatives, and gates. |
 | 2026-09-03 | 1 | RED | Added parsed-manifest regression; structured wrapper exited 1 with literal `[["zod", "catalog:"]]`. |
+| 2026-09-03 | 1 | Commit | Pushed RED as `0fa3f6e564747a737cd0683071af7124d642e010`. |
+| 2026-09-03 | 2 | GREEN | Materialized app Zod target from the workspace catalog and seeded the pre-codegen Zod contract. |
+| 2026-09-03 | 2 | Drift repair | Extended exact-file seed cleanup after Prisma rejected the first non-empty generated directory. |
+| 2026-09-03 | 2 | Consumer proof | Exact clean init/build/codegen/build sequence exited `0/0/0/0`. |
 
 ## Raw Reproduction Evidence
 
@@ -128,7 +132,8 @@ for reachability.
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None from the locked plan | N/A | N/A |
+| Prisma rejects a non-empty seeded output directory | minor | Yes; resolved in GREEN implementation. |
+| Root policy excludes CLI from requested lint/fmt wrappers | baseline | Yes; supplemental changed-file evidence recorded. |
 
 ## Gate Results
 
@@ -138,6 +143,13 @@ for reachability.
 | --- | --- | --- | --- |
 | Baseline focused tests | structured test wrapper on existing catalog/config tests | PASS (exit 0; 21/21) | Confirms a new RED assertion is needed. |
 | RED app manifest regression | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/src/kernel/templates/app/generators-config_test.ts` | EXPECTED FAIL (exit 1; 18 passed, 2 failure records) | `unresolvedCatalogImports` actual value is `[["zod", "catalog:"]]`, expected `[]`. |
+| GREEN focused tests | structured wrapper on app config/catalog and database scaffolder/generator tests | PASS (exit 0; 35/35) | Covers explicit npm materialization, seed content, and exact cleanup contract. |
+| Scoped check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS (exit 0) | 979 files, 9 batches, zero diagnostics. |
+| Scoped lint (exact requested) | `run-deno-lint.ts --root packages/cli --ext ts,tsx` | BASELINE REFUSAL (exit 2) | Root config excludes `packages/cli/`; 979 selected, 233 processed, remainder dropped. |
+| Changed-file lint supplement | `deno lint --no-config ... <six changed TS files>` | PASS (exit 0) | Checked all six changed files with recommended + JSR and root-added rules. |
+| Scoped fmt (exact requested) | `run-deno-fmt.ts --root packages/cli --ext ts,tsx` | BASELINE REFUSAL (exit 2) | Root config excludes `packages/cli/`; zero parsed findings. |
+| Changed-file fmt supplement | `deno fmt --check --no-config ... <six changed TS files>` | BASELINE FINDINGS (exit 1) | Only two pre-existing deltas outside changed lines, in catalog and DB-config files. |
+| Repository check | `deno task check` | PASS (exit 0) | Desktop fixture: 15 reachable modules, 0 unmapped; 3,107 files checked in 26 batches. |
 
 Raw RED wrapper output:
 
@@ -149,7 +161,8 @@ Raw RED wrapper output:
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Archetype 6 / `quality:gate` | NOT_RUN | Pending GREEN | Required before final push. |
+| Archetype 6 / `quality:gate` | PASS (exit 0) | Local command output | Quality census, catalog compliance, and doctrine gate completed. Existing warnings remain non-blocking. |
+| Asset barrel | N/A | No asset/template carrier changed | Source writers/constants only. |
 
 ### Runtime Gates
 
@@ -161,10 +174,52 @@ Raw RED wrapper output:
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Fresh production build before codegen | FAIL (exit 1) | Raw output above | Expected RED reproduction. |
-| Fresh production build after codegen | FAIL (exit 1) | Raw output above | Expected RED reproduction. |
+| Fresh production build before codegen | PASS (exit 0) | Exact clean GREEN scaffold below | Seeded Zod contract is reachable. |
+| SQLite codegen | PASS (exit 0) | Exact clean GREEN scaffold below | Seed cleanup leaves Prisma output valid. |
+| Fresh production build after codegen | PASS (exit 0) | Exact clean GREEN scaffold below | Real generated Zod barrel replaces the seed. |
+
+Raw GREEN consumer output from the exact clean scratch path:
+
+```text
+$ deno run -A packages/cli/bin/netscript-dev.ts init catalog-build-probe ...
+✅ Project scaffolded successfully in 0.1s
+Created: 211 files, 48 directories
+exit 0
+
+$ (cd apps/catalog-build-probe-web && deno task build)
+vite v7.2.2 building client environment for production...
+✓ 526 modules transformed.
+vite v7.2.2 building ssr environment for production...
+✓ 964 modules transformed.
+✓ built in 8.66s
+exit 0
+
+$ (cd database/sqlite && DATABASE_URL='file:./sqlite.db' SQLITE_URI='file:./sqlite.db' deno task db:generate)
+Task db:clear-seeded-client deno run --allow-write=schema/.generated scripts/clear-seeded-client.ts
+✔ Generated Prisma Client (7.10.0)
+✔ Generated Prisma Zod Generator to ./schema/.generated/zod
+exit 0
+
+$ (cd apps/catalog-build-probe-web && deno task build)
+vite v7.2.2 building client environment for production...
+✓ 533 modules transformed.
+vite v7.2.2 building ssr environment for production...
+✓ 971 modules transformed.
+✓ built in 8.86s
+exit 0
+```
+
+Generated contract after codegen:
+
+```json
+{"appZod":"npm:zod@^4.4.3","rootZod":"^4.4.3","catalogAppImports":[]}
+```
+
+The post-codegen `crud.ts` is the real `@generated` re-export barrel, proving the disposable seed
+was replaced rather than retained.
 
 ## Handoff Notes
 
-- Evaluator should inspect the explicit app target derivation, disposable Zod seed, exact two-build
-  proof, immutable-head receipts, and hosted `scaffold.runtime` status first.
+- Evaluator should inspect the explicit app target derivation, exact-file seed cleanup, exact
+  two-build proof, immutable-head receipts, baseline lint/fmt exclusion, and hosted
+  `scaffold.runtime` status first.
