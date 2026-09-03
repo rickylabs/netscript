@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repo": "rickylabs/netscript",
   "milestone": "0.0.7",
-  "capturedAt": "2026-09-03T08:15:00.000Z",
+  "capturedAt": "2026-09-03T09:06:00.000Z",
   "pullRequests": [
     {
       "number": 1696,
@@ -569,7 +569,7 @@
       ],
       "lane": "fixes",
       "baseBranch": "main",
-      "headSha": "303c4e87a5e55d01273146deac8f0e3fe7b52a13",
+      "headSha": "a526c625ad0555230e9a9b464b1b1c7e50144621",
       "state": "open",
       "role": "leaf"
     },
@@ -581,7 +581,7 @@
       ],
       "lane": "fixes",
       "baseBranch": "main",
-      "headSha": "d813df7ca1e4f265943d5874fd959a0da1a42746",
+      "headSha": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
       "state": "open",
       "role": "leaf"
     },
@@ -592,7 +592,7 @@
       ],
       "lane": "features",
       "baseBranch": "main",
-      "headSha": "8341c07431cd333a9e109c5732c2958704334ab6",
+      "headSha": "68812c9d11b0e5947e703fb4ce88e1f9c2c411ce",
       "state": "open",
       "role": "leaf"
     },
@@ -612,9 +612,18 @@
       "issueNumbers": [],
       "lane": null,
       "baseBranch": "main",
-      "headSha": "0f486e2a8654b37eb3d9ef256af1a5ece94fbb81",
+      "headSha": "25a663d9964db7dadba5383805e7a6bf178fdbb7",
       "state": "open",
       "role": "coordinator-artifact"
+    },
+    {
+      "number": 1982,
+      "issueNumbers": [],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "c487e927367e6b6eee281c7ca19f384c89a1fae7",
+      "state": "open",
+      "role": "leaf"
     }
   ]
 }

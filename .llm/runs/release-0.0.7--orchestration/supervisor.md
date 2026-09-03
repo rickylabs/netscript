@@ -1,5 +1,38 @@
 # Supervisor identity — release 0.0.7
 
+## 2026-09-03 09:06Z owner scan-scope amendment
+
+Owner explicitly directed Aspire checks to ignore every LLM run file and transient state and fold
+that into existing PR #1982. Coordinator implemented it directly at c487e927367e6b6eee281c7ca19f384c89a1fae7
+on fix/aspire-parity-context, worktree /home/agent/projects/netscript/worktrees/007-aspire-parity-context.
+Shared scope policy now covers parity/host-port/polling; framework/docs/shipped generated source
+remain enforced. All .llm/runs and transient agent copies excluded, none deleted/untracked.
+55 focused tests PASS; phases 1/2 PASS (867 checked); host ports 966/PASS; 10-file check/lint/fmt PASS.
+PR #1982 is ready for CI, not ready-merge; independent review session 7ffea6b7-4401-4fec-b826-7d5e7657d88f
+runs GLM 5.3 Flash/max via checked-in agentic:claude-openrouter, evaluator WT 007-eval-1982.
+Its transport output is evidence, not a native supervisor replacement. impl-eval:skip suppresses
+only duplicate cloud automation; mandatory local evaluation remains. CI 33736337155 pending.
+
+The attempted extra Codex helper 01a06670-a816-7eb2-bf7c-abf3b935cc0d failed/not-attached before a
+verified implementation turn (Remote Control disabled; missing receipt directory). No duplicate
+launch, no false active-worker claim. Coordinator co-authored under the existing owner mandate,
+with independent substantive review required before sign-off. Five native Fable supervisors retain
+accepted identities/efforts and are still monthly capped; no model/spend override.
+
+#1958 68812c9d1 passes served-island surface but hosted 33735122923 fails hydration (SQLite86/1,
+cleanup PASS); no unchanged retry. Same author committed 9cba13fec replacing guessed private Preact
+traversal with public QueryClient and diagnostic observations, now running author gates before
+fresh exact-head runtime. Steering comment5523198664 requests predicate/console/network evidence.
+#1970 and #1945 retain their own verified product repairs and event-wait the shared #1958 merge,
+then integrate canonical main; no parallel writer on browser probes.
+
+Main remains94fe507af; #1981 is the one merge this recovery turn. Eight open issues remain owned,
+five PRs now include this new bounded owner-directed repair and coordinator #1641. Next canary is
+not yet dispatchable; native publish plus exact pinned production E2E still required before stable.
+#1844 historical-cause disposition is the sole parked owner question, not a canary barrier.
+No host runtime lease; last verified Aspire/DinD/custom-network inventory zero at08:18Z.
+
+
 ## 2026-09-03 restart delivery
 
 Evaluator routing clarification (08:32Z): the owner freezes the five native topic supervisors on Fable 5.1; this does NOT revoke their explicit GLM 5.3 Flash/highest-effort implementation-evaluator authorization. Native #1970 evaluator session 28790605-53ad-4062-bfc3-cf6ad0426963 ended before evaluation due monthly cap, with no verdict. Per native-first formal lane policy, the primary coordinator may dispatch one fresh separate-session `agentic:claude-openrouter` GLM 5.3 Flash/max IMPL-EVAL after exact candidate gates; no new owner routing decision, no duplicate native probe, no supervisor model substitution. Corrections posted to #1970/#1945/#1958 as comments 5522904980/5522905171/5522905440. Do not perpetuate the leaf's earlier erroneous claim that all evaluator provider changes were forbidden.
