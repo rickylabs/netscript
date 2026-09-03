@@ -61,6 +61,40 @@ Deno.test('docker cleaner still throws when removing a created container fails',
   );
 });
 
+Deno.test('docker cleaner accepts a container the daemon is already removing', async () => {
+  const commands: string[][] = [];
+  const cleaner = new DockerCliResourceCleaner((args) => {
+    commands.push([...args]);
+    if (args[0] === 'ps') return Promise.resolve(commandOutput(0, 'existing-a\ncreated-b\n'));
+    return Promise.resolve(
+      commandOutput(
+        1,
+        '',
+        'Error response from daemon: removal of container created-b is already in progress',
+      ),
+    );
+  });
+
+  const removed = await cleaner.pruneCreatedResources({ containerIds: ['existing-a'] });
+
+  assertEquals(removed, ['created-b']);
+  assertEquals(commands[1], ['rm', '-f', 'created-b']);
+});
+
+Deno.test('docker cleaner accepts a container that is already gone', async () => {
+  const cleaner = new DockerCliResourceCleaner((args) => {
+    if (args[0] === 'ps') return Promise.resolve(commandOutput(0, 'existing-a\ncreated-b\n'));
+    return Promise.resolve(
+      commandOutput(1, '', 'Error response from daemon: No such container: created-b'),
+    );
+  });
+
+  assertEquals(
+    await cleaner.pruneCreatedResources({ containerIds: ['existing-a'] }),
+    ['created-b'],
+  );
+});
+
 function commandOutput(code: number, stdout = '', stderr = '') {
   return {
     code,
