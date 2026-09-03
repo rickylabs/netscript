@@ -5,7 +5,7 @@ import { PACKAGE_SOURCE } from '../../src/domain/extension-axes.ts';
 
 const EXACT_CLI = 'jsr:@netscript/cli@0.0.7-canary.1';
 
-Deno.test('README Quickstart suite exposes eleven ordered no-retry command receipts', () => {
+Deno.test('README Quickstart suite exposes twelve ordered no-retry command receipts', () => {
   const suite = createReadmeQuickstartSuite({
     repoRoot: '/repo',
     packageSource: PACKAGE_SOURCE.JSR,
@@ -26,6 +26,7 @@ Deno.test('README Quickstart suite exposes eleven ordered no-retry command recei
     GATE.README_QUICKSTART_DB_INIT,
     GATE.README_QUICKSTART_DB_GENERATE,
     GATE.README_QUICKSTART_DB_SEED,
+    GATE.README_QUICKSTART_ASPIRE_WAIT_USERS,
     GATE.README_QUICKSTART_CURL_HEALTH,
     GATE.CLEANUP_ASPIRE_STOP,
   ]);
@@ -52,17 +53,17 @@ Deno.test('README Quickstart gates dispatch one indexed runtime-edge command eac
     },
   } as const;
 
-  const commands = suite.gates.slice(0, 11).map((gate) => {
+  const commands = suite.gates.slice(0, 12).map((gate) => {
     if (gate.kind !== 'command') throw new Error(`${gate.id} is not a command gate`);
     return gate.command(context);
   });
-  assertEquals(commands.map((command) => command.at(-7)), Array(11).fill('/repo'));
-  assertEquals(commands.map((command) => command.at(-6)), Array(11).fill('/repo'));
+  assertEquals(commands.map((command) => command.at(-7)), Array(12).fill('/repo'));
+  assertEquals(commands.map((command) => command.at(-6)), Array(12).fill('/repo'));
   assertEquals(
     commands.map((command) => command.at(-5)),
-    Array(11).fill('/repo/my-app/aspire/apphost.mts'),
+    Array(12).fill('/repo/my-app/aspire/apphost.mts'),
   );
-  assertEquals(commands.map((command) => command.at(-4)), [...Array(11).keys()].map(String));
+  assertEquals(commands.map((command) => command.at(-4)), [...Array(12).keys()].map(String));
   assertEquals(commands.every((command) => command.includes('--allow-run')), true);
   assertEquals(commands.every((command) => command.includes('--allow-env=PATH')), true);
 });
@@ -70,9 +71,12 @@ Deno.test('README Quickstart gates dispatch one indexed runtime-edge command eac
 Deno.test('README Quickstart command, gate-id, and phase tuples stay aligned', () => {
   const suite = createReadmeQuickstartSuite({ repoRoot: '/repo' });
   const commandGates = suite.gates.slice(0, -1);
-  assertEquals(commandGates.length, 11);
+  assertEquals(commandGates.length, 12);
   assertEquals(commandGates.every((gate) => gate.id.startsWith('readme.quickstart.')), true);
   assertEquals(commandGates.every((gate) => gate.phase !== undefined), true);
+  const curl = commandGates.at(-1);
+  if (!curl || curl.kind !== 'command') throw new Error('README curl gate is not a command gate');
+  assertEquals(curl.timeoutMs, 25_000);
 });
 
 Deno.test('README Quickstart rejects a local CLI before command execution', () => {

@@ -47,7 +47,7 @@ Turn Canary 9's 15-minute false wait into an explicit service-readiness boundary
 | --- | --- | --- |
 | D1 | Print `aspire wait users --status healthy --timeout 60 --apphost aspire/apphost.mts`. | It works from the workspace root after DB operations and proves the actual resource before curl. |
 | D2 | Print `curl --fail-with-body --show-error --max-time 15 ...`. | HTTP errors retain bodies, transport failures are visible, and users never wait 15 minutes. |
-| D3 | Give curl a 20-second outer gate bound. | The printed 15-second bound remains authoritative; 5 seconds allow process/report overhead. |
+| D3 | Give the curl child a 20-second bound and its wrapper a 25-second bound. | The printed 15-second bound remains authoritative; each outer layer gets 5 seconds for process/report overhead. |
 | D4 | Capture the port only after the printed users wait. | Endpoint allocation alone is not readiness. |
 | D5 | Upload both cleanup JSON paths explicitly. | The report already proves cleanup PASS; the missing files prevent independent receipt audit. |
 
@@ -81,4 +81,3 @@ Turn Canary 9's 15-minute false wait into an explicit service-readiness boundary
 ## Plan-Gate
 
 `PLAN-EVAL: N/A` — this is a bounded incident repair with exact failing evidence, owner-locked scope, no architecture choice, and no package/API change.
-

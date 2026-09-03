@@ -205,7 +205,8 @@ export const GATE = {
   README_QUICKSTART_DB_INIT: 'readme.quickstart.08-db-init',
   README_QUICKSTART_DB_GENERATE: 'readme.quickstart.09-db-generate',
   README_QUICKSTART_DB_SEED: 'readme.quickstart.10-db-seed',
-  README_QUICKSTART_CURL_HEALTH: 'readme.quickstart.11-curl-health',
+  README_QUICKSTART_ASPIRE_WAIT_USERS: 'readme.quickstart.11-aspire-wait-users',
+  README_QUICKSTART_CURL_HEALTH: 'readme.quickstart.12-curl-health',
 } as const;
 
 /** Generated Aspire resource ids waited on by the scaffold plugin suite. */

@@ -53,6 +53,10 @@ Edit the marked root README command block and its single expected-command tuple 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-09-03T04:20Z | 0 | bootstrap | Reconciled exact main and run `33712927776`; recorded PLAN-EVAL N/A before implementation. |
+| 2026-09-03T04:30Z | 1 | implement | Printed a literal users-health wait after DB setup, moved endpoint capture to that command, and bounded the printed curl at 15 seconds with HTTP/body diagnostics. |
+| 2026-09-03T04:33Z | 1 | tests | Focused structured tests PASS 22/22; exact parser/argv test and full fake-runner sequence prove no hidden readiness command and one post-readiness port capture. |
+| 2026-09-03T04:35Z | 2 | implement | Added both `readme.quickstart` cleanup wrapper/child receipts to the production artifact upload and pinned them in the release workflow test. |
+| 2026-09-03T04:38Z | 2 | reconcile | #1881, #863, and epic #1712 remain open because a new hosted published-version run is still required; PR #1981 references rather than closes them. |
 
 ## Decisions
 
@@ -73,13 +77,19 @@ Edit the marked root README command block and its single expected-command tuple 
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| focused check/test/lint/fmt | pending | NOT_RUN | implementation not started |
+| focused tests | structured test wrapper | PASS | 22 passed, 0 failed. |
+| focused check | structured check wrapper | PASS | 8 files, 0 diagnostics. |
+| focused lint | structured lint wrapper | PASS | 7 E2E files processed, 0 findings; root policy intentionally excludes `.llm/**`, so the release workflow test is test/check/fmt-covered but not a lint verdict target. |
+| focused fmt | structured fmt wrapper | PASS | 7 E2E files, 0 findings; release test raw format check also passed. Root README retains unrelated pre-existing formatting drift and was not mass-formatted. |
+| full nested E2E tests | structured test wrapper | FAIL (environment baseline) | 366 passed, 2 browser-fixture tests failed because executable fixtures under `/ephemeral/tmp` are noexec; neither file/path is touched by this slice. |
+| workflow YAML | `@std/yaml` parse | PASS | `YAML_PARSE_OK`. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| quality/doctrine | NOT_RUN | pending | no package public surface planned |
+| quality/doctrine | PASS | `deno task quality:gate` | Repository scan and doctrine report `ok: true` / `FAIL=0`; existing WARN rows unchanged. |
+| Aspire parity phase 2 | FAIL (parallel S9/S13 baseline) | 6 existing findings | Manifest freshness, skill bundle, docs checker, and legacy literal work is owned by the active Aspire convergence lane; no finding names a changed file in this slice. |
 
 ### Runtime Gates
 
@@ -91,9 +101,9 @@ Edit the marked root README command block and its single expected-command tuple 
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| README command parser/suite | NOT_RUN | pending | exact command list + gates |
+| README command parser/suite | PASS | `e2e:cli suites` + `gates readme.quickstart` | 12 exact printed commands plus ownership-aware cleanup; users wait is command 11, bounded curl command 12. |
+| docs carrier | PASS | `deno task check:agent-docs-prose` | Generated agent docs bundle fresh. |
 
 ## Handoff Notes
 
 - Inspect that users readiness is printed and executed exactly, port capture moved to that line, curl is bounded in argv, and both cleanup receipt files are uploaded.
-

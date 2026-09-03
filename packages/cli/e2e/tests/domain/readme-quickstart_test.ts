@@ -80,16 +80,16 @@ Deno.test('README Quickstart substitution permits only version and receipt-backe
   );
   assertEquals(
     substituteReadmeQuickstartCommand(
-      'curl http://localhost:<port>/health',
+      'curl --fail-with-body --show-error --max-time 15 http://localhost:<port>/health',
       { version: '0.0.7', port: 43210 },
       72,
     ),
-    'curl http://localhost:43210/health',
+    'curl --fail-with-body --show-error --max-time 15 http://localhost:43210/health',
   );
   assertThrows(
     () =>
       substituteReadmeQuickstartCommand(
-        'curl http://localhost:<port>/health',
+        'curl --fail-with-body --show-error --max-time 15 http://localhost:<port>/health',
         { version: '0.0.7' },
         72,
       ),
@@ -112,6 +112,40 @@ Deno.test('README Quickstart argv rejects shell quoting instead of rewriting it'
     'healthy',
   ]);
   assertThrows(() => readmeQuickstartArgv('tool "rewritten value"', 18), Error, 'README line 18');
+});
+
+Deno.test('README Quickstart exposes service readiness and curl bounds in literal argv', () => {
+  assertEquals(
+    readmeQuickstartArgv(
+      'aspire wait users --status healthy --timeout 60 --apphost aspire/apphost.mts',
+      1,
+    ),
+    [
+      'aspire',
+      'wait',
+      'users',
+      '--status',
+      'healthy',
+      '--timeout',
+      '60',
+      '--apphost',
+      'aspire/apphost.mts',
+    ],
+  );
+  assertEquals(
+    readmeQuickstartArgv(
+      'curl --fail-with-body --show-error --max-time 15 http://localhost:43210/health',
+      2,
+    ),
+    [
+      'curl',
+      '--fail-with-body',
+      '--show-error',
+      '--max-time',
+      '15',
+      'http://localhost:43210/health',
+    ],
+  );
 });
 
 Deno.test('README Quickstart port selection requires an explicit Aspire receipt port', () => {
