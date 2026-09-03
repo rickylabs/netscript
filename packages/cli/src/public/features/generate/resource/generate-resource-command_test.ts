@@ -185,6 +185,25 @@ Deno.test('conflict output is emitted before a typed nonzero exit error', async 
   assert(fixture.output.some((line) => line.startsWith('CONFLICT routes/orders/index.tsx')));
 });
 
+Deno.test('unresolved app root fails loudly before any out-of-app write', async () => {
+  const fixture = await commandFixture();
+  const before = new Map(fixture.fs.getFiles());
+  fixture.resetWrites();
+
+  const error = await assertRejects(
+    () =>
+      fixture.args({ resolveAppRoot: () => Promise.resolve(undefined) }).then((command) =>
+        command.parse(['orders', '--procedure', 'list', '--app', 'missing'])
+      ),
+    Error,
+    'Could not resolve a Fresh application root.',
+  );
+
+  assertStringIncludes(error.message, 'Could not resolve a Fresh application root.');
+  assertEquals(fixture.fs.getFiles(), before);
+  assertEquals(fixture.writes(), 0);
+});
+
 Deno.test('invalid input, client, procedure, Fresh staging, and shared transform never mutate the app', async () => {
   const cases: readonly Readonly<{
     name: string;

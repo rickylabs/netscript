@@ -485,3 +485,15 @@ Deno.test('production E2E waits for JSR propagation for explicit canary dispatch
   assertStringIncludes(waitStep, 'sleep 120');
   assertEquals(waitStep.includes('if:'), false);
 });
+
+Deno.test('production README E2E uploads both durable cleanup receipts', async () => {
+  const source = await Deno.readTextFile(new URL('.github/workflows/e2e-cli-prod.yml', root));
+  assertStringIncludes(
+    source,
+    '.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json',
+  );
+  assertStringIncludes(
+    source,
+    '.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json',
+  );
+});

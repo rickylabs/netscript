@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertFalse, assertRejects } from '@std/assert';
 
 import {
   collectIslandServedSurface,
@@ -9,21 +9,21 @@ const PAGE = `<!doctype html>
 <html><head>
   <link rel="modulepreload" href="/@id/fresh:client-entry">
 </head><body>
-  <!--frsh:island:ServiceShowcaseLab:1:--><div>Seed User</div><!--/frsh:island-->
+  <!--frsh:island:PeopleIsland:1:--><div>People</div><!--/frsh:island-->
   <script type="module">
     import { boot } from "/@id/fresh:client-entry";
-    import ServiceShowcaseLab from "/@id/fresh-island::ServiceShowcaseLab";
-    boot({ ServiceShowcaseLab });
+    import PeopleIsland from "/@id/fresh-island::PeopleIsland";
+    boot({ PeopleIsland });
   </script>
 </body></html>`;
 
 Deno.test('served-surface receipt proves marker and every referenced Fresh module', async () => {
   const requested: string[] = [];
-  const receipt = await collectIslandServedSurface('http://localhost:41234/examples/users', {
+  const receipt = await collectIslandServedSurface('http://localhost:41234/people', {
     fetch: (input) => {
       const url = String(input);
       requested.push(url);
-      if (url.endsWith('/examples/users')) {
+      if (url.endsWith('/people')) {
         return Promise.resolve(
           new Response(PAGE, {
             status: 200,
@@ -31,8 +31,8 @@ Deno.test('served-surface receipt proves marker and every referenced Fresh modul
           }),
         );
       }
-      const body = url.includes('ServiceShowcaseLab')
-        ? 'export default function ServiceShowcaseLab() {}'
+      const body = url.includes('PeopleIsland')
+        ? 'export default function PeopleIsland() {}'
         : 'export function boot() {}';
       return Promise.resolve(
         new Response(body, {
@@ -43,16 +43,17 @@ Deno.test('served-surface receipt proves marker and every referenced Fresh modul
     },
   });
 
-  assertEquals(receipt.markers, ['frsh:island:ServiceShowcaseLab:1:']);
+  assertEquals(receipt.markers, ['frsh:island:PeopleIsland:1:']);
   assertEquals(receipt.scripts.length, 2);
   assertEquals(receipt.scripts.every((script) => script.status === 200), true);
   assertEquals(receipt.scripts.every((script) => script.contentType?.includes('javascript')), true);
   assertEquals(receipt.bundleHit, true);
   assertEquals(requested, [
-    'http://localhost:41234/examples/users',
+    'http://localhost:41234/people',
     'http://localhost:41234/@id/fresh:client-entry',
-    'http://localhost:41234/@id/fresh-island::ServiceShowcaseLab',
+    'http://localhost:41234/@id/fresh-island::PeopleIsland',
   ]);
+  assertFalse(requested.some((url) => url.includes('ServiceShowcaseLab')));
 });
 
 Deno.test('served-surface probe persists its receipt before rejecting a missing island export', async () => {
@@ -64,7 +65,7 @@ Deno.test('served-surface probe persists its receipt before rejecting a missing 
         fetch: (input) => {
           const url = String(input);
           return Promise.resolve(
-            url.endsWith('/examples/users')
+            url.endsWith('/people')
               ? new Response(PAGE, { status: 200, headers: { 'content-type': 'text/html' } })
               : new Response('export const unrelated = true;', {
                 status: 200,
@@ -78,7 +79,7 @@ Deno.test('served-surface probe persists its receipt before rejecting a missing 
         },
       }),
     Error,
-    'did not contain ServiceShowcaseLab',
+    'did not contain PeopleIsland',
   );
   assertEquals(persisted.length, 1);
 });

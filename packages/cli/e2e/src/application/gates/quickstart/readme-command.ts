@@ -11,8 +11,11 @@ import { type AspireCommandRunner, runAspireCommand } from './aspire-walk.ts';
 
 const JSR_CLI_PREFIX = 'jsr:@netscript/cli@';
 const SERVICE_RESOURCE = 'users';
+const SERVICE_READINESS_PREFIX = `aspire wait ${SERVICE_RESOURCE} `;
 const RECEIPT_TAIL_LENGTH = 4_000;
 const DENO_INSTALL_DIRECTORY = '.deno-install';
+
+type ServiceUrlResolver = (appHost: string, resourceName: string) => Promise<string[]>;
 
 interface ReadmeWalkState {
   readonly cwd: string;
@@ -58,6 +61,7 @@ export async function executeReadmeQuickstartCommand(
   statePath: string,
   timeoutMs: number,
   spawn: AspireCommandRunner = runAspireCommand,
+  resolveServiceUrls: ServiceUrlResolver = resolveResourceUrlsFromAppHost,
 ): Promise<number> {
   const readme = await Deno.readTextFile(resolve(repoRoot, 'README.md'));
   const commands = parseReadmeQuickstartCommands(readme);
@@ -102,8 +106,8 @@ export async function executeReadmeQuickstartCommand(
       cwd: argv[0] === 'cd' ? resolve(state.cwd, argv[1]) : state.cwd,
       nextIndex: index + 1,
     };
-    if (entry.command.startsWith('aspire wait ')) {
-      nextState = await captureServicePort(nextState, appHost);
+    if (entry.command.startsWith(SERVICE_READINESS_PREFIX)) {
+      nextState = await captureServicePort(nextState, appHost, resolveServiceUrls);
     }
     await writeState(statePath, nextState);
   }
@@ -127,7 +131,7 @@ export async function executeReadmeQuickstartCommand(
         ? { port: state.servicePort }
         : {}),
     }),
-    ...(entry.command.startsWith('aspire wait ') &&
+    ...(entry.command.startsWith(SERVICE_READINESS_PREFIX) &&
         (nextState.servicePort !== undefined || nextState.servicePortError !== undefined)
       ? {
         evidence: {
@@ -264,9 +268,10 @@ async function changeDirectory(
 async function captureServicePort(
   state: ReadmeWalkState,
   appHost: string,
+  resolveServiceUrls: ServiceUrlResolver,
 ): Promise<ReadmeWalkState> {
   try {
-    const urls = await resolveResourceUrlsFromAppHost(appHost, SERVICE_RESOURCE);
+    const urls = await resolveServiceUrls(appHost, SERVICE_RESOURCE);
     const port = explicitServicePort(urls);
     return Object.freeze({
       ...state,

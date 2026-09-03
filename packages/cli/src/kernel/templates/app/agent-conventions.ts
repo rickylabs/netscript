@@ -49,6 +49,9 @@ const COMMON_REFERENCES: readonly ConventionReference[] = [
   },
 ];
 
+const RESOURCE_GENERATION_GUIDANCE =
+  'Before manually constructing this path, run `netscript generate resource <resource> --procedure <query> --client <service> --partial --app <app>`.';
+
 function serviceReferences(
   input: AppConventionsInput,
 ): readonly ConventionReference[] {
@@ -144,6 +147,8 @@ ${localExamples}
 
 ## Default architecture
 
+${RESOURCE_GENERATION_GUIDANCE}
+
 Before hand-writing a service request or probing it with curl, follow the MCP path: \`list_api_services\` to discover the live service name, \`list_service_operations\` to select an operation, then \`get_operation_schema\` for its request and response contract.
 
 1. Start from the service contract and derive the client **and query factories** in the resource-local \`(_lib)\` module.
@@ -179,6 +184,8 @@ export function buildWebLayerMarkdown(input: AppConventionsInput): string {
   return `# ${input.appName} web layer
 
 ## One-screen path
+
+${RESOURCE_GENERATION_GUIDANCE}
 
 \`contract → createQueryFactories → definePage layers → QueryIsland/useMutation → live stream\`
 
