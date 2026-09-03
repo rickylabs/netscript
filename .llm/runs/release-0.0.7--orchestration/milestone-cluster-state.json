@@ -4540,17 +4540,17 @@
       "issueNumbers": [
         1354
       ],
-      "phase": "implementing",
+      "phase": "evaluating",
       "thread": "01a06424-38fe-7893-ba59-6064b0dd616e",
       "wt": "007-leaf-1354-g",
-      "nextGate": "Public QueryClient hydration correction (local 9cba13fec), exact two-tier CI and independent IMPL-EVAL",
+      "nextGate": "Core CI and hosted33736497671 two-tier runtime PASS; independent GLM evaluation then lifecycle/review gate",
       "baseBranch": "main",
-      "headSha": "68812c9d11b0e5947e703fb4ce88e1f9c2c411ce",
-      "currentPrHeadSha": "68812c9d11b0e5947e703fb4ce88e1f9c2c411ce",
+      "headSha": "0e1717dab754a84229b02eee8143138cd4f60fa9",
+      "currentPrHeadSha": "0e1717dab754a84229b02eee8143138cd4f60fa9",
       "branch": "feat/cli-resource-slice-acceptance",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
       "implementerAgentId": "01a06424-38fe-7893-ba59-6064b0dd616e",
-      "reconciledAt": "2026-09-03T09:06:00.000Z"
+      "reconciledAt": "2026-09-03T09:23:00Z"
     },
     {
       "id": "aspire-static-scan-scope",
@@ -4564,14 +4564,15 @@
       "ownerDirectedPostFreeze": true,
       "phase": "evaluating",
       "baseBranch": "main",
-      "headSha": "c487e927367e6b6eee281c7ca19f384c89a1fae7",
+      "headSha": "0475c32134166b9ba60ce1ea1a53c6abcc5af695",
       "branch": "fix/aspire-parity-context",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-parity-context",
       "implementerAgentId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
       "evaluatorAgentId": "7ffea6b7-4401-4fec-b826-7d5e7657d88f",
       "evaluationWorktree": "/home/agent/projects/netscript/worktrees/007-eval-1982",
-      "nextGate": "Independent review/IMPL-EVAL and current core CI, then coordinator sign-off/merge",
-      "receiptRefs": []
+      "nextGate": "Author64 focused tests and structured gates PASS; consume original evaluator then same-session final-head delta, current CI",
+      "receiptRefs": [],
+      "reconciledAt": "2026-09-03T09:23:00Z"
     },
     {
       "id": "readme-service-readiness",
@@ -5785,7 +5786,7 @@
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-03T09:06:00.000Z",
+    "capturedAt": "2026-09-03T09:23:00Z",
     "prs": [
       {
         "number": 1970,
@@ -5988,7 +5989,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T09:06:00.000Z",
+  "updatedAt": "2026-09-03T09:23:00Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6051,31 +6052,29 @@
       "pr": 1970,
       "threadId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
-      "pid": 5580,
       "head": "a526c625ad0555230e9a9b464b1b1c7e50144621",
-      "action": "Event-wait canonical #1958 merge; integrate main and regenerate exact-head gates. Approved GLM evaluator fallback is not an owner decision.",
-      "state": "active",
-      "lastProgressAt": "2026-09-03T09:06:00.000Z"
+      "action": "Original author turn exited at clean pushed checkpoint awaiting #1958 merge. Primary will explicitly resume this same thread at merge; no duplicate browser writer.",
+      "state": "waiting-dependency",
+      "lastProgressAt": "2026-09-03T09:23:00Z"
     },
     {
       "pr": 1945,
       "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
-      "pid": 6035,
       "head": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
-      "action": "Event-wait canonical #1958 merge; integrate main and regenerate exact-head gates. Approved GLM evaluator fallback is not an owner decision.",
-      "state": "active",
-      "lastProgressAt": "2026-09-03T09:06:00.000Z"
+      "action": "Original author turn exited at clean pushed checkpoint awaiting #1958 merge. Primary will explicitly resume this same thread at merge; no duplicate browser writer.",
+      "state": "waiting-dependency",
+      "lastProgressAt": "2026-09-03T09:23:00Z"
     },
     {
       "pr": 1958,
       "threadId": "01a06424-38fe-7893-ba59-6064b0dd616e",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
       "pid": 6158,
-      "head": "68812c9d11b0e5947e703fb4ce88e1f9c2c411ce",
-      "action": "Shared browser acceptance: 68812c9 hosted hydration failed; local correction 9cba13fec uses public QueryClient. Same author gates before next push.",
+      "head": "0e1717dab754a84229b02eee8143138cd4f60fa9",
+      "action": "Both hosted runtime tiers PASS in 33736497671 (Postgres103/0, SQLite98/0), core CI green. Original author dispatches independent GLM evaluation and synchronizes acceptance.",
       "state": "active",
-      "lastProgressAt": "2026-09-03T09:06:00.000Z"
+      "lastProgressAt": "2026-09-03T09:23:00Z"
     }
   ],
   "reconciliation": {
@@ -6085,10 +6084,10 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T09:06:00.000Z",
-    "nextReportDueAt": "2026-09-03T10:06:00.000Z",
-    "lastReportRef": "worklog.md#2026-09-03-0906z-owner-scan-scope-amendment",
-    "headline": "#1981 merged; #1982 owner-directed scan exclusions in independent review/CI. Resource browser repair remains candidate critical path.",
+    "lastReportAt": "2026-09-03T09:23:00Z",
+    "nextReportDueAt": "2026-09-03T10:23:00Z",
+    "lastReportRef": "worklog.md#2026-09-03-0923z-browser-runtime-green-and-owner-scan-fix-pushed",
+    "headline": "#1958 both database runtime suites and core CI green; independent evaluation active. Owner Aspire scan fix pushed to #1982 at 0475c3213.",
     "currentMainSha": "94fe507af47171cd4f295e8f532b281d7147b334",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
@@ -6096,14 +6095,14 @@
       "eta": {
         "window": "45–90 minutes after the three verified merge packets; conditional, not a publication promise",
         "confidence": "low",
-        "basis": "Resource browser correction remains unverified; then integration heads/evaluations and publish+production pair. No credible clock-time release promise before runtime gates clear."
+        "basis": "Shared resource/browser runtime blocker is now green. Remaining product evaluations/integration heads precede native publish and pinned production pair."
       },
       "criticalPath": [
         {
           "id": "resource-acceptance",
-          "state": "repairing",
-          "impact": "Current main retired the showcase island; old acceptance probe blocks a coherent candidate.",
-          "nextAction": "Verify public QueryClient hydration/refetch correction in #1958, then exact PostgreSQL/SQLite receipts."
+          "state": "gating",
+          "impact": "Shared resource/browser runtime acceptance passed on exact 0e1717dab; review/IMPL-EVAL remain.",
+          "nextAction": "Consume independent #1958 verdict, verify acceptance/review threads, merge and resume both dependent original fix authors."
         },
         {
           "id": "merge-packets",
@@ -6140,27 +6139,27 @@
         "lane": "fixes",
         "state": "gating",
         "nextGate": "Exact CI/two hosted runtime tiers, then separate-session bounded delta IMPL-EVAL; coordinator merge.",
-        "nextAction": "Existing same author continues; primary coordinator verifies and merges."
+        "nextAction": "Primary explicitly resumes original idle author at #1958 merge; integrate canonical probes then exact-head runtime and independent delta review."
       },
       {
         "prNumber": 1945,
         "lane": "fixes",
         "state": "gating",
         "nextGate": "Exact runtime proof after merged codegen/Zod fixes; acceptance mirror, independent delta evaluation, coordinator merge.",
-        "nextAction": "Existing same author continues; primary coordinator verifies and merges."
+        "nextAction": "Primary explicitly resumes original idle author at #1958 merge; integrate canonical probes then exact-head runtime and independent delta review."
       },
       {
         "prNumber": 1958,
         "lane": "features",
-        "state": "implementing",
-        "nextGate": "68812c9 runtime passes served-surface, fails hydration; source fix 9cba13fec needs both tiers and independent delta evaluation.",
+        "state": "gating",
+        "nextGate": "Hosted 33736497671: PostgreSQL103/0 and SQLite98/0, clean cleanup; core CI green. Independent evaluation and lifecycle sign-off remain.",
         "nextAction": "Existing same author continues; primary coordinator verifies and merges."
       },
       {
         "prNumber": 1982,
         "lane": "internals",
         "state": "gating",
-        "nextGate": "Independent GLM IMPL-EVAL and core CI on c487e9273; specialized owner remains Aspire.",
+        "nextGate": "64 focused tests, both parity phases, 12-file check/lint/fmt and asset freshness PASS at 0475c3213. Consume original evaluator verdict then same-session carrier/generated-mode delta; final CI.",
         "nextAction": "Coordinator co-authored owner amendment; preserve source/doc enforcement, no run deletion."
       }
     ],
@@ -6172,9 +6171,9 @@
           1354,
           1958
         ],
-        "lastConcreteProgressAt": "2026-09-03T09:06:00.000Z",
+        "lastConcreteProgressAt": "2026-09-03T09:23:00Z",
         "blocker": "Native Fable monthly cap; existing Codex author remains productive.",
-        "nextAction": "Verify #1958 public-client correction, no unchanged-head runtime loops."
+        "nextAction": "Independent #1958 evaluation underway after full runtime PASS; deliver merge packet."
       },
       {
         "lane": "fixes",
@@ -6188,8 +6187,8 @@
           1945
         ],
         "lastConcreteProgressAt": "2026-09-03T08:09:42Z",
-        "blocker": "Native Fable monthly cap; original two Codex authors are active.",
-        "nextAction": "Consume CI/evaluation packets; independently audit historical Garnet proof without claiming inferred root cause."
+        "blocker": "Native Fable monthly cap; original implementation threads at clean dependency checkpoints, not active workers.",
+        "nextAction": "Resume same #1970/#1945 threads immediately after #1958 merge. Audit historical Garnet independently."
       },
       {
         "lane": "internals",
@@ -6266,15 +6265,6 @@
       }
     ],
     "blockers": [
-      {
-        "id": "stale-island-probe",
-        "category": "test-harness",
-        "summary": "Generated resource served-surface passes; hydration probe failed to discover QueryClient through private Preact graph.",
-        "impact": "Blocks the resource PR and pre-canary full acceptance, not independent worker repairs.",
-        "owner": "features / existing #1958 author",
-        "nextAction": "Same author committed public QueryClient correction 9cba13fec; validate before another hosted run.",
-        "ownerDecisionRequired": false
-      },
       {
         "id": "native-fable-quota",
         "category": "evaluator-transport",

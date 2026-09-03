@@ -1,5 +1,19 @@
 # Context pack — release 0.0.7
 
+## 2026-09-03 09:23Z browser runtime green and owner scan fix pushed
+
+#1958 @0e1717dab: hosted33736497671 PASS (Postgres103/0, SQLite98/0, cleanup0), core CI green.
+Original author is performing independent GLM evaluation. On its verified packet, coordinator
+merges and explicitly resumes original #1970/#1945 threads from their clean pushed checkpoints;
+those two turns have exited waiting for this dependency, not three perpetually active authors.
+#1982 @0475c3213 pushed: owner run/transient exclusions, shipped helper closure, explicit generated-
+project safeguard. 64 tests, 12-file check/lint/fmt, both parity phases, asset freshness all PASS.
+Independent session7ffea6b7-4401-4fec-b826-7d5e7657d88f still evaluates c487e9273; same-session
+bounded delta brief is receipts/eval-1982/brief-delta.md. Final CI/review mandatory before merge.
+No host lease or run deletion. Main94fe507af, eight open issues, five PRs; no canary tag minted.
+Native Fable quota remains; accepted supervisor models unchanged. Historical #1844 question is
+parked separately; a second retained runtime artifact is being audited, not a canary barrier.
+
 ## 2026-09-03 09:06Z owner scan-scope amendment
 
 Owner explicitly directed Aspire checks to ignore every LLM run file and transient state and fold
