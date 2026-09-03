@@ -5,7 +5,7 @@
 | Thing | Value |
 | --- | --- |
 | Route | **Claude · `claude-fable-5-1` · low** · Remote Control attached · supervise-only · **never merges** (primary coordinator merges) |
-| `origin/main` | **`a867ab9cb`** (#1954) — moves fast, always re-fetch; every convergence regenerates the corpus |
+| `origin/main` | **`262aa8fbe`** (#1895) — moves fast, always re-fetch; every convergence regenerates the corpus |
 | Topic branch | `orchestrator/release-0.0.7-features`, worktree `007-features` |
 | Eval routes | **Native Fable 5 subagent first** for both PLAN and IMPL — it writes `evaluate.md` itself (commit it as the receipt). The OpenHands lane lost 3/3 parsed PASSes today (`Expected exactly one changed evaluate.md; found 0`, reported on #1894); use it only for explicitly cloud-driven work |
 
@@ -16,7 +16,7 @@
 | #1349, #1352 | **CLOSED** via #1936 / #1931 (mirror ticked all boxes) |
 | #1897 | **CLOSED** via #1918 |
 | #1353, #1467 | **CLOSED** via #1941 (merged; mirror 14/14) |
-| #1590 | PR **#1895** `b142783c9` — **packet posted**, `status:ready-merge` (required + close-gate green; Aspire pending) |
+| #1590 | **CLOSED** via #1895 (merged `262aa8fbe`) |
 | #1355 / #1360 | PR **#1664** `dbb577826` — refetch red was probe-side (fixed, 2 e2e files); generated island hydrates; probe-delta native eval running; CI at this head → on required-green: ready-merge + ci rerun (mirror, evidence block fixed; parser bug #1964) → packet when runtime tiers green — every branch-owned gate green; **sole red is #1845** in both tiers; routed (b) |
 | #1354 | plan PR **#1891** `61d7708f8` — `PASS_PLAN_WITH_FINDINGS`, amendment + carrier-exempt rule applied. **Slice B = #1943 MERGED** `3c8b0fd18` — **native PASS, `status:ready-merge`** (partial, `Refs`). **Slice C = #1946 MERGED** `e341c6f71`. **Slice D = #1948 MERGED** `3a794be67`, base main — **native PASS, `status:ready-merge`**. **Slice E dispatched** (`007-leaf-1354-e`, base `0faae3fde` = main+B+D; hard fence: no `public-command-dependencies.ts`). **Slice A = PR #1950** `d55afbef5` PASS_IMPL (stacked on #1664). **Slice E = #1954 MERGED** `a867ab9cb` (F absorbs LOW-1/LOW-2). **Slice F = PR #1956** `47476897c` PASS_IMPL_WITH_FINDINGS (stacked on #1664). **Slice G = PR #1958** `e2887ca1b` PASS_IMPL (stacked on F). Slice A gated on #1664 (`web-scaffold.ts`); C–G follow the plan order |
 | #1452 | **CLOSED** via #1944 (merged `7d1faa352`) |
