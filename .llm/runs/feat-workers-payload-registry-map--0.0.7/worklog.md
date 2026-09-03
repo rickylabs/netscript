@@ -237,3 +237,53 @@ reported only the unused directive.
 - Repair implementation commit: `4cf0795b8`; exact RED→GREEN and static-lane receipts are above.
 - The final branch head is the log-only receipt commit containing this handoff; its exact SHA is
   reported in the PR repair comment and the implementation lane's final message.
+
+## Repair 2 — trigger action variance and canonical saga sample
+
+The supervisor pinned this repair to `c72f853bdf05a09d67759a6114611a7250160363`. The assigned
+worktree contained a large unrelated supervisor-owned staged set, so the repair and its exact-head
+gates ran in a clean local clone of that commit. The original index was not reset, unstaged, or
+included.
+
+### RED receipts
+
+```text
+$ deno task check:emitted-samples
+exit 1
+TS2322 at generated triggers/generic-inbound-webhook.ts:29:5
+JobHandler<Readonly<{ verbose: boolean }>, unknown> is not assignable to
+JobHandler<unknown, unknown> through TriggerActionResult.job.handler.
+```
+
+```text
+$ deno test --allow-all .llm/tools/docs/official-saga-publisher-sample-sync_test.ts
+exit 1; 0 passed / 1 failed
+The only diff is the stale canonical two-line handler form: one-argument defineJobHandler plus
+manual schema parsing versus the source generator's schema-first handler plus ctx.payload.
+```
+
+The new trigger-core compile-time control was also checked against the old `job:
+JobDefinition<TJobId, TPayload>` carrier. It failed with exactly one `TS2322` at the concrete
+schema-backed enqueue action assignment to `TriggerActionResult`; the diagnostic names the
+contravariant `job.handler` payload parameter. This proves the control fails for this defect rather
+than an arity, import, or unrelated mismatch.
+
+### GREEN implementation and pre-commit receipts
+
+- `EnqueueJobAction.job` now omits only `handler` from its public result shape. `enqueueJob` still
+  accepts the full typed `JobDefinition` and returns the same object at runtime; job id, payload,
+  payload schema, and dispatch metadata remain typed and runtime semantics are unchanged.
+- The canonical saga sample is updated by
+  `.llm/tools/docs/sync-official-saga-publisher-sample.ts`, factored from the existing derivation
+  test. No generated Markdown or compressed/embedded carrier was hand-edited.
+- `deno task check:emitted-samples`: exit 0, 48 emitted TypeScript samples checked.
+- Focused trigger contract test: exit 0, 1 passed / 0 failed.
+- Focused saga sample sync test: exit 0, 1 passed / 0 failed.
+- Trigger-core structured check: exit 0, 81 files, 0 diagnostics.
+- Trigger-core suite: exit 0, 42 passed / 0 failed.
+- Trigger-core lint/fmt: exit 0, 81 files, 0 findings.
+- `deno task gen:mcp-export-corpus --allow-dirty`: exit 0; canonical generator reports corpus
+  `481c569e...2764`. It produced no file delta for this property-type-only change.
+- `deno task check:mcp-export-corpus`: exit 0.
+- `deno task check:agent-docs-prose` correctly reported the canonical saga page carriers stale;
+  `gen:agent-docs-prose` and `gen:assets-barrel` then refreshed only their attributed outputs.
