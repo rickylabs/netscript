@@ -11019,3 +11019,13 @@ progress.
 #1952: Aspire took remedy 1 — `1a759ea34` = merge main `79adb103b` into the branch. Review at the
 new head fully green and `check:aspire-version-parity` **ok (0 fail)** on the branch itself; CI
 running. Merge-ref class closed at source.
+
+### D-277 — Canary 8 doctor red pinned: the gate was masked, not new; registry compiled at gate 23 by the local CLI, absent at gate 90 in the package-backed doctor fixture
+
+Prod suite has 93 gates; canary.6 died at ~59, canary.7 at 71 (`live-db-endpoint`), so gate 90
+`behavior.package-backed-plugin-doctor` had never executed on a canary before. Not new — masked.
+Evidence from the report artifact: `generated.workers-registry` (gate 23) ran the **local repo's**
+`plugins/workers/src/cli/composition/main.ts compile-registry` in the smoke project, code 0; gate 90
+runs `package-backed-plugin-doctor-fixture.ts --project-root …` and the doctor reports
+`.netscript/generated/plugin-workers/job-registry.ts` **missing** ("doctor did not execute healthy
+workers check"). Owner: fixes (doctor #1574/#1603 lineage; fixture). Exact contract being read.
