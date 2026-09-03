@@ -90,3 +90,15 @@ Write `evaluate.md` with evidence, findings by severity, explicit requirement co
 one Harness verdict token from the evaluator protocol (`PASS`, `FAIL_TESTS`, `FAIL_IMPL`,
 `FAIL_SCOPE`, `BLOCKED_ENV`, or another protocol-defined token if applicable). A PASS requires no
 unresolved blocking findings.
+
+## Focused re-evaluation after `FAIL_FIX`
+
+The implementation session accepted F-1 without changing product, gate, README, or workflow code.
+Evaluate repaired head `a074ba2a9f7da3c92432788a40631b3a9f7ba186`. The evaluator prompt,
+initial verdict, worklog, context pack, and supervisor record were staged before the manifest was
+regenerated. The generator then reported `rows=946 unmatched=0`; the subsequent parity command
+exited 0 with `ok:true`, `manifestFresh:true`, and counts
+`checked:945, fail:0, deferred:16, info:5, skipped:1, missing:0`. Confirm that result independently,
+confirm the repair commit is evidence-only, and update the existing `evaluate.md` to preserve the
+initial finding and add a focused re-evaluation section with the final protocol verdict. Do not
+modify any other file or run runtime/Aspire/Docker commands.

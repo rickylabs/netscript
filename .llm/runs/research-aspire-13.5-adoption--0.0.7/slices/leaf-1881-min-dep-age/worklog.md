@@ -52,6 +52,7 @@ text, scope, assertions, gates, and prohibited alternatives.
 | 2026-09-03 | 3 | manifest | Initial parity reported manifest freshness only; generator completed with `rows=943 unmatched=0`; parity then exited 0 with `manifestFresh:true` and no failures. |
 | 2026-09-03 | 4 | IMPL-EVAL `FAIL_FIX` | Independent Claude Fable 5.1 session `b67d4969-52f8-4250-a60d-12f95d855ad9` confirmed the owner contract and all implementation evidence, but found the committed manifest omitted this worklog after its final Aspire-mentioning evidence update. Repair is evidence-only: track evaluator artifacts, regenerate the manifest last, rerun parity, and request a focused re-verdict. |
 | 2026-09-03 | 4 | evaluator repair | Staged the evaluator prompt/verdict and updated run artifacts before regenerating the surface manifest (`rows=946 unmatched=0`). The authoritative parity rerun exited 0 with `ok:true`, `manifestFresh:true`, and `counts: { checked:945, fail:0, deferred:16, info:5, skipped:1, missing:0 }`. |
+| 2026-09-03 | 4 | IMPL-EVAL `PASS` | The same independent evaluator rechecked repair head `a074ba2a9`, confirmed the commit changed only run evidence, matched all tracked slice paths selected by the manifest generator, independently reran parity at exit 0, and superseded the historical `FAIL_FIX` with final `PASS`. |
 
 ## Gate results
 

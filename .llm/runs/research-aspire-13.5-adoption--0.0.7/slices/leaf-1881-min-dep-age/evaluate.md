@@ -132,9 +132,31 @@ The recorded GREEN count (10 passed) exceeds the 3 tests in these three files; t
 | ------ | ------- | ---------- | ---------- |
 | Regenerate the Aspire surface manifest as the last step of the evidence commit | Any run artifact edited after manifest generation that mentions "aspire" (worklog gate tables do) re-stales the manifest; generate, then `git grep`-verify, then commit together | runs under `research-aspire-13.5-adoption--0.0.7` | high |
 
+## Initial verdict (cycle 1, head `957cff9ff`, superseded below)
+
+| Field     | Value |
+| --------- | ----- |
+| Verdict   | `FAIL_FIX` (historical; see Focused re-evaluation) |
+| Rationale | The owner contract is fully met: exact command spelling and flag position on all five surfaces, root README `# 1.` retained plus one-line explanation, docs callout rewritten with `-f` retained, harness parses and passes the flag verbatim with no injection, once-only assertions on argv and `sourceCommand`, carriers regenerated and fresh, no workflow/lockfile/runtime change, focused tests and docs accuracy independently green. The single blocking defect is process evidence: the required `check:aspire-version-parity` gate (in the plan gate set and in CI) is red at head because the final commit's worklog edit post-dated manifest generation, and the worklog records a green result that is not true at head. The fix is one manifest regeneration and a corrected evidence row; no implementation change is required. Re-evaluation can be limited to confirming parity exit 0 at the new head. |
+
+## Focused re-evaluation (cycle 2, repaired head `a074ba2a9f7da3c92432788a40631b3a9f7ba186`)
+
+Evaluator: same Claude Fable 5.1 opposite-family session, 2026-09-03, read-only except this file.
+
+| Check | Result | Evidence |
+| ----- | ------ | -------- |
+| Repair commit is evidence-only | `PASS` | `git show --stat a074ba2a9`: parent `957cff9ff`; 6 files, all under `.llm/runs/research-aspire-13.5-adoption--0.0.7/` (manifest `+3` rows, `context-pack.md`, `evaluate.md`, `impl-eval-prompt.md`, `supervisor.md`, `worklog.md`). `git diff --name-only 957cff9ff..a074ba2a9` excluding `.llm/runs/` is empty: no product, test, README, docs, carrier, workflow, or lockfile change |
+| Manifest covers every tracked Aspire-mentioning slice artifact | `PASS` | `diff` of `git grep -il aspire a074ba2a9 -- <slice dir>` against manifest rows for the slice: identical set (`context-pack.md`, `evaluate.md`, `impl-eval-prompt.md`, `plan.md`, `supervisor.md`, `worklog.md`) |
+| `check:aspire-version-parity` at repaired head | `PASS` | independent rerun exit 0: `ok:true`, `manifestFresh:true`, counts `checked:945, fail:0, deferred:16, info:5, skipped:1, missing:0`, matching the recorded values |
+| Worklog evidence corrected (F-1 required action) | `PASS` | `a074ba2a9` rewrites the Aspire parity gate row to cite the final green run and adds two Progress rows recording the `FAIL_FIX` and the repair ordering (artifacts tracked, then `rows=946 unmatched=0` regeneration) |
+| Implementation evidence from cycle 1 still valid | `PASS` | no non-run-artifact file changed between `957cff9ff` and `a074ba2a9`, so every cycle-1 requirement, static, carrier, and test result carries over unchanged |
+| Working tree | note | one uncommitted delta: `impl-eval-prompt.md` (+12 lines, the focused re-evaluation brief). The path is already a manifest row, so its content does not affect parity; commit it with this file |
+
+F-1 is resolved. F-2 and F-3 remain informational and non-blocking.
+
 ## Verdict
 
 | Field     | Value |
 | --------- | ----- |
-| Verdict   | `FAIL_FIX` |
-| Rationale | The owner contract is fully met: exact command spelling and flag position on all five surfaces, root README `# 1.` retained plus one-line explanation, docs callout rewritten with `-f` retained, harness parses and passes the flag verbatim with no injection, once-only assertions on argv and `sourceCommand`, carriers regenerated and fresh, no workflow/lockfile/runtime change, focused tests and docs accuracy independently green. The single blocking defect is process evidence: the required `check:aspire-version-parity` gate (in the plan gate set and in CI) is red at head because the final commit's worklog edit post-dated manifest generation, and the worklog records a green result that is not true at head. The fix is one manifest regeneration and a corrected evidence row; no implementation change is required. Re-evaluation can be limited to confirming parity exit 0 at the new head. |
+| Verdict   | `PASS` |
+| Rationale | The owner contract was fully met at `957cff9ff` and is untouched by the repair. The only blocking finding, stale Aspire surface manifest evidence, is fixed by an evidence-only commit whose parity gate now independently exits 0 with a fresh manifest and zero failures, and whose worklog row cites that final run. No unresolved blocking findings remain. Runtime proof of the same-day install is deliberately deferred to the post-push `e2e-cli-prod` run per the owner contract. |
