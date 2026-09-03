@@ -8,6 +8,58 @@ import { executeReadmeQuickstartCommand } from '../../src/application/gates/quic
 import { README_QUICKSTART_EXPECTED_COMMANDS } from '../../src/domain/readme-quickstart.ts';
 
 const EXACT_CLI = 'jsr:@netscript/cli@0.0.7-canary.9';
+
+for (const diagnosticCode of [0, 1]) {
+  Deno.test(`README failed readiness retains its exit and bounded logs (diagnostic ${diagnosticCode})`, async () => {
+    const root = await Deno.makeTempDir({ prefix: 'netscript-readme-failure-' });
+    try {
+      const statePath = resolve(root, 'state.json');
+      const appHost = resolve(root, 'aspire/apphost.mts');
+      await Deno.writeTextFile(
+        statePath,
+        JSON.stringify({
+          cwd: root,
+          denoInstallRoot: resolve(root, '.deno-install'),
+          nextIndex: 10,
+        }),
+      );
+      const calls: Array<{ argv: readonly string[]; timeoutMs: number }> = [];
+      const spawn: AspireCommandRunner = (argv, _cwd, timeoutMs) => {
+        calls.push({ argv, timeoutMs });
+        return Promise.resolve(
+          argv[1] === 'logs'
+            ? { code: diagnosticCode, stdout: 'service diagnostic', stderr: '', timedOut: false }
+            : { code: 18, stdout: '', stderr: 'FailedToStart', timedOut: false },
+        );
+      };
+      assertEquals(
+        await executeReadmeQuickstartCommand(
+          resolve(import.meta.dirname!, '../../../../..'),
+          root,
+          appHost,
+          10,
+          EXACT_CLI,
+          statePath,
+          65_000,
+          spawn,
+        ),
+        18,
+      );
+      assertEquals(calls.length, 2);
+      assertEquals(calls[1], {
+        argv: ['aspire', 'logs', 'users', '--tail', '40', '--format', 'Json', '--apphost', appHost],
+        timeoutMs: 2_000,
+      });
+      const receipt = JSON.parse(await Deno.readTextFile(resolve(root, 'receipts/11.json')));
+      assertEquals(receipt.exitCode, 18);
+      assertEquals(receipt.failureDiagnostics.exitCode, diagnosticCode);
+      assertEquals(receipt.failureDiagnostics.stdoutTail, 'service diagnostic');
+      assertEquals(JSON.parse(await Deno.readTextFile(statePath)).nextIndex, 10);
+    } finally {
+      await Deno.remove(root, { recursive: true });
+    }
+  });
+}
 const EXPECTED_INSTALL_ARGV = [
   'deno',
   'install',

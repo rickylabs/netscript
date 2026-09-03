@@ -49,6 +49,13 @@ interface ReadmeCommandReceipt {
     readonly source?: string;
   };
   readonly timedOut: boolean;
+  readonly failureDiagnostics?: {
+    readonly argv: readonly string[];
+    readonly exitCode: number;
+    readonly stdoutTail: string;
+    readonly stderrTail: string;
+    readonly timedOut: boolean;
+  };
 }
 
 /** Execute one indexed root README Quickstart command and emit its child receipt. */
@@ -112,6 +119,32 @@ export async function executeReadmeQuickstartCommand(
     await writeState(statePath, nextState);
   }
 
+  // Observe the failing resource before owned cleanup removes its console evidence.
+  // This read-only probe fits within the wrapper grace and never changes the command verdict.
+  let failureDiagnostics: ReadmeCommandReceipt['failureDiagnostics'];
+  if (
+    entry.command.startsWith(SERVICE_READINESS_PREFIX) && (result.code !== 0 || result.timedOut)
+  ) {
+    const logArgv = [
+      'aspire',
+      'logs',
+      SERVICE_RESOURCE,
+      '--tail',
+      '40',
+      '--format',
+      'Json',
+      '--apphost',
+      appHost,
+    ];
+    const logs = await runCommand(logArgv, state.cwd, 2_000, environment.env, spawn);
+    failureDiagnostics = {
+      argv: logArgv,
+      exitCode: logs.code,
+      stdoutTail: tail(logs.stdout),
+      stderrTail: tail(logs.stderr),
+      timedOut: logs.timedOut,
+    };
+  }
   const receipt: ReadmeCommandReceipt = Object.freeze({
     argv,
     cwd: state.cwd,
@@ -146,6 +179,7 @@ export async function executeReadmeQuickstartCommand(
       }
       : {}),
     timedOut: result.timedOut,
+    ...(failureDiagnostics === undefined ? {} : { failureDiagnostics }),
   });
   await writeReceipt(statePath, index, receipt);
   console.info(JSON.stringify(receipt));

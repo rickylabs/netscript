@@ -29,6 +29,13 @@ with the existing ordered command transcript and both durable owned-cleanup rece
 
 ## Gates and close boundary
 
+2026-09-03 measured diagnostic amendment: rehearsal33760126265 passed baseline and printed
+commands1–10 but users readiness failed with exit18. CLI/AppHost logs do not contain the resource
+console failure. Add one read-only, two-second, 40-line users-log snapshot to its FAILED child
+receipt before cleanup; preserve the exact primary exit code, no retry/restart or hidden recovery.
+Test both successful and failed diagnostic capture. This extends scope only to the private README
+command runner and its existing regression file. No published framework/template change.
+
 RED: the added workflow regression must reject the old warm order. GREEN: focused release workflow
 tests, selected TypeScript check/lint/fmt, YAML parsing, independent bounded review and required CI.
 The exact published-version runtime remains the final canary gate, not a local static claim.

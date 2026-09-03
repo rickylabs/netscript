@@ -1,5 +1,15 @@
 # Worklog: cold README published-release proof
 
+## Bounded failure evidence, 2026-09-03
+
+Hosted rehearsal33760126265 at4092014cf against existingcanary9: baselinePASS with normal caches;
+READMEcommands1–10PASS; users readiness exit18 FailedToStart; cleanupPASS. It did not capture the
+resource console failure before cleanup. Root cause is not yet proven. Do not claim cache damage.
+Add a single read-only users-log snapshot (40lines,2seconds,4kBtail) on readiness failure only;
+the original command exit/state remains unchanged even if diagnostics fail. No hidden recovery.
+RegressionRED2pass/2fail; GREEN15/0 including all release-policy and README-command tests.
+Selected check/lint/fmt2files/0findings; diff-checkPASS. Same existing PR, no framework source edits.
+
 ## Final CI integration correction — 2026-09-03
 
 CI33757937139 reports5266 pass/2 fail. These are exact policy intersections, not product defects:
