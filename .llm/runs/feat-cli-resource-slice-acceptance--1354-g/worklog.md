@@ -133,6 +133,27 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 ### Static Gates
 
+Final local evidence below is from product head
+`2f0807f254d57a45c690a7b372efd73fd75be008`, after the no-rebase merge of current main. Historical
+rows remain below it to preserve earlier receipts.
+
+| Gate | Command or check | Result | Notes |
+| ---- | ---------------- | ------ | ----- |
+| final focused regressions | structured wrapper over resource, browser-tail, suite reachability/registry/runner, guidance, and app-root tests | PASS, exit 0 | 119 passed, 0 failed, 0 ignored. |
+| final full CLI unit suite | structured test wrapper with `TMPDIR=/var/tmp` | PASS, exit 0 | 1,794 passed, 0 failed, 0 ignored. |
+| final CLI check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 1,004 files, 9 batches, 0 failed batches, 0 diagnostics. |
+| final authorized-file lint | structured lint wrapper with no-exclusion config | PASS, exit 0 | 18 selected/processed, 0 findings/refusals. |
+| final authorized-file format | structured fmt wrapper with no-exclusion config | PASS, exit 0 | 18 selected/processed, 0 findings/refusals. |
+| final `check:assets-barrel` | repository task | PASS, exit 0 | Regeneration left no carrier diff. |
+| final `check:publish-assets` | repository task | PASS, exit 0 | Publish-asset freshness passed. |
+| final `check:emitted-samples` | repository task | PASS, exit 0 | 48 TypeScript samples from 38 artifact paths. |
+| final `check:mcp-export-corpus` | repository task | PASS, exit 0 | 35 packages / 273 subpaths / 7,846 symbols; SHA-256 `ddbc949e…`. |
+| final CLI JSR audit | `audit-jsr-package.ts --root packages/cli --text` | PASS, exit 0 | 1,004 files / 134,492 LOC / 280 test files; dry-run OK; 21 existing WARN findings, 0 FAIL. |
+| final CLI doc lint | structured full-export-map doc lint | PASS, exit 0 | 3 entrypoints, 0 diagnostics. |
+| final CLI publish dry-run | `deno task --cwd packages/cli publish:dry-run` | PASS, exit 0 | Existing dynamic-resolution warnings only; `Success Dry run complete`. |
+| final `docs:readme-fences` | repository task | PASS, exit 0 | 36 READMEs, 169 fences, 74 checked; 7 expected type errors, no unattributed failure. |
+| final `docs:jsdoc-examples` | repository task | PASS, exit 0 | 35 members, 2,060 files, 359 checked, 0 failures; `unboundName=116`, `typeError=14`. |
+
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
 | focused regressions | structured test wrapper over resource/guidance, runtime capability, service-client order, UI order, registry, and runner tests | PASS, exit 0 | 68 passed, 0 failed, 0 ignored. |
@@ -157,6 +178,11 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 ### Fitness Gates
 
+At product head `2f0807f254d57a45c690a7b372efd73fd75be008`, `arch:check` passed with
+`FAIL=0` for every root and CLI `WARN=62 INFO=1` (the new probe-size warning was eliminated).
+`quality:gate` passed with 0 scanner findings, 7 allowances, 37/37 workspace members in boundary,
+and 35 publishable members.
+
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | `arch:check` | PASS, exit 0 | Every reported package/plugin root has `FAIL=0`; CLI baseline `WARN=62 INFO=1`. | Dependency checks passed with warning-only catalog census. |
@@ -175,6 +201,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | isolated hosted failed-jobs retry (SQLite) | FAIL, exit 1 | 84 passed, 1 failed (`behavior.app-reference`), cleanup passed | Job `100532599296`; same exact failure after 25.59 s in the browser probe. |
 | changed-head hosted `scaffold.runtime` (PostgreSQL) | FAIL, exit 1 | 90 passed, 1 failed (`behavior.island-served-surface`), cleanup passed | Run `33731170586`, job `100571302293`; `behavior.app-reference` passed, then the served-surface probe required retired `ServiceShowcaseLab`. |
 | changed-head hosted `scaffold.runtime.sqlite` | FAIL, exit 1 | 85 passed, 1 failed (`behavior.island-served-surface`), cleanup passed | Run `33731170586`, job `100571302333`; same decisive error; all preceding resource/generated/runtime/browser gates passed. |
+| superseded pending hosted run | CANCELED before runtime | Run `33732473476` | Proactive source trace found deterministic stale hydration/refetch assertions; no unchanged failing-head runtime rerun was consumed. |
 
 ### Consumer Gates
 

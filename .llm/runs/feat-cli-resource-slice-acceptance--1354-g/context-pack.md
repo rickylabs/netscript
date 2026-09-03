@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `complete hosted-tail correction implemented; exact-head gates pending` |
+| Current phase | `local exact-head gates green; isolated hosted acceptance pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
@@ -21,8 +21,10 @@ gate; the command test proves unresolved app-root selection fails loudly with ze
 served-surface probe now proves `/people` emits and serves `PeopleIsland` and its Fresh module graph.
 Hydration requires a browser-reachable QueryClient; the refetch gate invalidates its active
 `users.list` query and requires exactly one completed 2xx request instead of driving the retired
-Rename showcase. Current correction-focused tests pass 97/97. Exact-head Tier A, isolated hosted
-acceptance, and fresh IMPL-EVAL remain pending, so PR #1958
+Rename showcase. At product head `2f0807f25`, focused tests pass 119/119, the full CLI suite passes
+1,794/1,794, structured check covers 1,004 files with zero diagnostics, all scoped quality/carrier/
+docs/publish gates pass, and doctrine reports `FAIL=0` with no new warning. Isolated hosted
+acceptance and fresh IMPL-EVAL remain pending, so PR #1958
 stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Completed
@@ -38,12 +40,12 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## In Progress
 
-- Exact-head validation, isolated hosted acceptance, and fresh separate-session IMPL-EVAL for the eighteen-file amended product head.
+- Isolated hosted acceptance and fresh separate-session IMPL-EVAL for the eighteen-file amended product head.
 
 ## Next Steps
 
-1. Commit and push the eighteen-file product head with the tracked Harness amendment.
-2. Run exact-head Tier A and both isolated hosted runtime tiers; do not use a host runtime lease.
+1. Commit and push the final local evidence receipt.
+2. Run both isolated hosted runtime tiers; do not use a host runtime lease.
 3. Obtain a fresh separate-session IMPL-EVAL, then update #1354/#1958 only from green evidence.
 
 ## Key Decisions
@@ -65,7 +67,7 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | PASS | Focused 68/68; full CLI 1788/1788; check 1004 files/0 diagnostics; lint/fmt 8 files/0 findings. |
+| Static | PASS | Focused 119/119; full CLI 1,794/1,794; check 1,004 files/0 diagnostics; lint/fmt 18 files/0 findings. |
 | Fitness | PASS | `arch:check` and `quality:gate` exit 0; `FAIL=0`; scanner findings 0. |
 | Runtime | #1354 path advanced / corrected head pending | Run `33731170586`: `behavior.app-reference` passed; PostgreSQL 90/1 and SQLite 85/1 then failed only at stale `behavior.island-served-surface`; cleanup passed. Run `33732473476` was canceled before runtime after proactive inspection found the next stale hydration/refetch assertions. |
 | Consumer | PASS | Guidance, first-write, identical zero-write rerun, UI ordering, and generated-project quality/type-check all executed successfully. |
