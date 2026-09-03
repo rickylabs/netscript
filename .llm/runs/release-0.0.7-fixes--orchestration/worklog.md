@@ -7950,3 +7950,19 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - **#1966 (P0)**: Canary 8 (`v0.0.7-canary.8`, head `21b952fe7`, run 33697779870) 90/1 — sole red `behavior.package-backed-plugin-doctor`. Leaf `007-leaf-1966`, branch `fix/package-backed-plugin-generate` off main `79adb103b`, brief `954126717` (run dir `.llm/runs/fix-package-backed-plugin-generate--0.0.7/`). Worker Codex gpt-5.6-sol · high, thread `01a064a4-de33-75c3-96b8-81f693ad79df` (first launch refused: upstream set → `branch --unset-upstream`, relaunched). Coordinator repro delivered as steer `/tmp/steer1966a.md`: nested `runGenerator` child reads fixture `deno.json` lacking `minimumDependencyAge`, Deno's 24h default blocks fresh `@netscript/config@0.0.7-canary.8`, nested exit 1 swallowed by outer `generate plugins` exit 0. Bounded fix: fixture-only `minimumDependencyAge: 0`, hard-assert nested exit 0 + registry, propagate nested failure if masked; never weaken doctor.
 - #1959 `e9937231a` CI watcher `bn43wrm2e`; #1945 `d2a5e167f` eval run 33696765169 (watcher `bzmmmd6rb`).
 - 00:30Z #1966 coordinator correction: fixture-only fix (`minimumDependencyAge: 0` in fixture `deno.json` + hard assertions on nested exit 0 and registry presence); **no product `runGenerator` change**, doctor untouched. My first steer's item 2 (propagate masked nested exit in `packages/cli`) is withdrawn: that deliverer was killed before delivery; corrective steer `/tmp/steer1966b.md` queued (worker holds the writer lock on its first turn). Leaf watcher `bbt0ncu73`. Packet target: exact head with hosted `scaffold-runtime` tiers + check-test/quality/close-gate green and IMPL-EVAL PASS (or attributed test-only skip per #1966 acceptance).
+
+## 2026-09-03 00:40Z — #1966 fix landed by supervisor; #1906/#1455 dispatched via thread resume
+
+- #1966: worker (thread 01a064a4) opened draft PR #1967 at 5f7f4e911 but spent ~7M tokens reproducing
+  without landing the fix. Fix is fully specified by coordinator (fixture-only `minimumDependencyAge: 0`),
+  so supervisor committed it on `fix/package-backed-plugin-generate` as **11cffaabb** (fixture deno.json
+  + nested-exit-0 assertion; product code untouched; worker's stray deno.lock churn discarded). PR #1967
+  marked ready, labels `type:fix area:cli area:plugins priority:p0 gate:e2e orchestrator:fixes status:impl
+  ci:full`, milestone 0.0.7. Steer B rewritten to: reset to origin, RED@5f7f4e911 / GREEN@11cffaabb on
+  exact canary.8, evidence.md, PR body `Closes #1966`. Deliverer `/tmp/deliver1966b.sh` still retrying on
+  writer lock.
+- #1906 / #1455: `launch-codex-slice` refused both leaves with `duplicate_sender_risk` (sender records
+  point at idle prior threads 01a0606e… / 01a06201…; no process has either worktree as cwd; rollouts
+  hours stale). Per recovery order, resumed the slice's own prior threads instead of releasing:
+  `/tmp/resume1906.sh`, `/tmp/resume1455.sh` (codex-resume with new-slice brief pointers), detached.
+  Briefs: 9059e2042 (`test/aspire-event-observation-s2`), a64e4fcd0 (`feat/workers-payload-registry-map`).
