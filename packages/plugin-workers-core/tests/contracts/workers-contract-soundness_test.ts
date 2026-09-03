@@ -33,6 +33,22 @@ const _badTriggerId: JobTriggerInput = {
   id: 123,
 };
 
+type ApplicationJobPayloads = Readonly<{
+  'embed-document': Readonly<{ documentId: string; text: string }>;
+  'transcribe-image': Readonly<{ imageUrl: string; language?: string }>;
+}>;
+
+// Negative: the embed-document payload must not compile for transcribe-image.
+// RED receipt: on the broad baseline this directive is unused, because
+// JobTriggerInput does not yet bind id to payload.
+// @ts-expect-error - payload belongs to embed-document, not transcribe-image
+const _mismatchedJobPayload: JobTriggerInput = {
+  id: 'transcribe-image',
+  payload: { documentId: 'doc-1', text: 'content' },
+};
+
+type _ApplicationJobPayloads = ApplicationJobPayloads;
+
 // --- triggerJob output keeps `triggered: boolean` -----------------------------
 
 // Negative: `triggered` is a boolean; a string must not satisfy the output.
@@ -67,6 +83,7 @@ Deno.test('workers contract exposes a precise, non-loosened type surface', () =>
   assertEquals(typeof workersContractV1.triggerJob, 'object');
   assertEquals(_validTrigger.id, 'job-1');
   assertEquals(_badTriggerId.id as unknown, 123);
+  assertEquals(_mismatchedJobPayload.id, 'transcribe-image');
   assertEquals(_badTriggerOut.triggered as unknown, 'yes');
   assertEquals(_badExecResponse.executionId, undefined);
   assertEquals(_validTriggeredBy, 'manual');

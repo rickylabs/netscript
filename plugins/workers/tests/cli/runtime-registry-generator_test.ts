@@ -298,6 +298,80 @@ Deno.test('configured plugin policy rejects an intrinsic handler id mismatch', a
   });
 });
 
+Deno.test('generated registry preserves literal job payload types at the consumer boundary', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeProjectDenoConfig(projectRoot);
+    await writeWorkersManifest(projectRoot, false, true);
+    await write(
+      join(projectRoot, 'registry-types.ts'),
+      `export type JobContext<TPayload> = Readonly<{
+  id: string;
+  job: Readonly<{ id: string }>;
+  payload: TPayload;
+}>;
+export type JobHandler<TPayload = unknown> = (
+  context: JobContext<TPayload>,
+) => unknown | Promise<unknown>;
+export type RegisterJobInput = Readonly<Record<string, unknown> & { id?: string }>;
+`,
+    );
+    await writeTypedJob(
+      projectRoot,
+      'embed-document.ts',
+      'Readonly<{ documentId: string; text: string }>',
+    );
+    await writeTypedJob(
+      projectRoot,
+      'transcribe-image.ts',
+      'Readonly<{ imageUrl: string; language?: string }>',
+    );
+
+    await generateRuntimeRegistries(generatorOptions(projectRoot));
+    const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
+    const hasLiteralRegistry = registrySource.includes('export const jobHandlersById');
+    const importedRegistry = hasLiteralRegistry ? 'jobHandlersById' : 'registry';
+    const transcribeHandler = hasLiteralRegistry
+      ? 'jobHandlersById["transcribe-image"]'
+      : 'registry.get("transcribe-image")!';
+    await write(
+      join(projectRoot, 'payload-consumer.ts'),
+      `import { ${importedRegistry} } from './${REGISTRY_PATH}';
+
+const transcribeImage = ${transcribeHandler};
+const job = { id: 'transcribe-image' };
+
+await transcribeImage({
+  id: 'execution-valid',
+  job,
+  payload: { imageUrl: 'https://example.test/image.png' },
+});
+
+await transcribeImage({
+  id: 'execution-invalid',
+  job,
+  // @ts-expect-error - embed-document payload must not compile for transcribe-image
+  payload: { documentId: 'doc-1', text: 'content' },
+});
+`,
+    );
+
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'check',
+        '--no-lock',
+        '--config',
+        join(projectRoot, 'deno.json'),
+        join(projectRoot, 'payload-consumer.ts'),
+      ],
+      cwd: projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const stderr = new TextDecoder().decode(output.stderr);
+    assertEquals(output.code, 0, stderr);
+  });
+});
+
 function jobPolicy(id: string, entrypoint: string): Readonly<Record<string, unknown>> {
   return { id, name: id, entrypoint, source: 'local' };
 }
@@ -380,6 +454,7 @@ async function importRegistry(
 async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
   const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
     catalog?: Readonly<Record<string, string>>;
+    imports?: Readonly<Record<string, string>>;
   };
   const configPackage = JSON.parse(
     await Deno.readTextFile(join(REPOSITORY_ROOT, 'packages/config/deno.json')),
@@ -387,14 +462,19 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
   const workersCore = JSON.parse(
     await Deno.readTextFile(join(REPOSITORY_ROOT, 'packages/plugin-workers-core/deno.json')),
   ) as { imports?: Readonly<Record<string, string>> };
+  const telemetry = JSON.parse(
+    await Deno.readTextFile(join(REPOSITORY_ROOT, 'packages/telemetry/deno.json')),
+  ) as { imports?: Readonly<Record<string, string>> };
   await write(
     join(projectRoot, 'deno.json'),
     `${
       JSON.stringify({
         catalog: rootConfig.catalog,
         imports: {
+          ...rootConfig.imports,
           ...configPackage.imports,
           ...workersCore.imports,
+          ...telemetry.imports,
           '@netscript/config': toFileUrl(join(REPOSITORY_ROOT, 'packages/config/mod.ts')).href,
           '@netscript/plugin-workers-core/config': toFileUrl(
             join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/config/mod.ts'),
@@ -411,6 +491,7 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
 async function writeWorkersManifest(
   projectRoot: string,
   includePluginDir = false,
+  widenHandlersToAny = false,
 ): Promise<void> {
   await write(
     join(projectRoot, 'scaffold.runtime.json'),
@@ -426,8 +507,16 @@ async function writeWorkersManifest(
           varPrefix: 'job',
           typeImport: {
             name: 'JobHandler',
-            from: '@netscript/plugin-workers-core/runtime',
+            from: widenHandlersToAny
+              ? '../../../registry-types.ts'
+              : '@netscript/plugin-workers-core/runtime',
           },
+          ...(widenHandlersToAny
+            ? {
+              mapValueType: 'JobHandler<any>',
+              preamble: ['// deno-lint-ignore-file no-explicit-any'],
+            }
+            : {}),
           ...(includePluginDir
             ? {
               pluginDirs: [{
@@ -443,6 +532,21 @@ async function writeWorkersManifest(
         }],
       })
     }\n`,
+  );
+}
+
+async function writeTypedJob(
+  projectRoot: string,
+  file: string,
+  payloadType: string,
+): Promise<void> {
+  await write(
+    join(projectRoot, 'workers/jobs', file),
+    `import type { JobHandler } from '../../registry-types.ts';
+
+const handler: JobHandler<${payloadType}> = async () => ({ success: true });
+export default handler;
+`,
   );
 }
 
