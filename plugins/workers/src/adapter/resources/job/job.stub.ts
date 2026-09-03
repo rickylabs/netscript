@@ -29,6 +29,8 @@ export const %%JOB_EXPORT%%: JobHandlerDefinition<Payload> = defineJobHandler(
     });
   },
 );
+
+export default %%JOB_EXPORT%%;
 `,
   tokens: ['JOB_ID', 'JOB_EXPORT'] as const,
 });

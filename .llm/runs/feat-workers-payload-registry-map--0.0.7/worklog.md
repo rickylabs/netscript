@@ -580,3 +580,29 @@ must expose their schema-backed handler as `default` or `handler`. The generic a
 updated when the registry began enforcing that contract. The RED assertion requires the existing
 typed named handler to also be the module's default export; it does not fail on arity, imports, or an
 unrelated type mismatch.
+
+RED commit: `93125a3a8`. Focused RED receipt:
+
+```text
+$ deno test --allow-all --unstable-kv plugins/workers/src/adapter/resources/resources.test.ts
+exit 1; 6 passed / 1 failed
+failure: emitted welcome-email module did not contain `export default welcomeEmailJob;`
+```
+
+GREEN adds that default export to the canonical typed job stub while retaining the existing named
+export. This changes neither handler construction nor enqueue/runtime semantics; it makes every
+generic add-job artifact satisfy the registry boundary already specified by #1455.
+
+```text
+$ deno test --allow-all --unstable-kv plugins/workers/src/adapter/resources/resources.test.ts
+exit 0; 7 passed / 0 failed
+$ run-deno-check.ts --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=103; failedBatches=0; totalOccurrences=0; --unstable-kv enabled
+$ run-deno-lint.ts --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=103; failedBatches=0; totalOccurrences=0
+$ run-deno-fmt.ts --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=103; failedBatches=0; findings=0
+```
+
+The GREEN commit is pushed immediately after this receipt is recorded; its exact SHA is reported in
+the PR implementation comment and handoff packet.

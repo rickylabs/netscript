@@ -13,9 +13,10 @@
 ## Current State
 
 PR #1970 has the bounded schema-first Flow-B fixture repair at `c182fead3` and current-main
-integration at `6e654b1bd`. Integrated workspace check, emitted-sample check, quality, architecture,
-JSDoc-example, workers resource, and generated-carrier gates all pass. A final receipt commit will
-be pushed and left immutable for the hosted dual-provider runtime verdict.
+integration at `6e654b1bd`. The first hosted rerun exposed the remaining application-boundary gap:
+generic add-job modules had only a named export although the generated registry requires `default`
+or `handler`. RED `93125a3a8` locks that exact mismatch; GREEN emits the existing typed handler as
+default and focused workers gates pass.
 
 ## Completed
 
@@ -25,7 +26,7 @@ be pushed and left immutable for the hosted dual-provider runtime verdict.
 
 ## In Progress
 
-- Push the receipt-only immutable head and collect current hosted runtime receipts.
+- Push the GREEN head and collect current hosted runtime receipts.
 
 ## Next Steps
 
