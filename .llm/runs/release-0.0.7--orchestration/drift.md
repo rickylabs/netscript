@@ -1,5 +1,22 @@
 # Drift — release 0.0.7
 
+## Owner ruling applied: normal caches and configuration-specific Docker
+
+2026-09-03: owner rejected blanket no-image-cache requirement and confirmed NetScript/Aspire
+can run without Docker for non-container configurations. Issue1881 acceptance rewritten IN PLACE:
+fresh application state, normal caches allowed, documented prerequisites, unchanged no-recovery and
+owned-cleanup requirements. This supersedes the preceding cache-policy question; no owner decision
+remains. Do not restore an empty-image requirement or launch the abandoned daemon design.
+
+PR1983 amendment4092014cf is explicitly pushed: image count diagnostic-only, strict four application
+state fields remain, root README prerequisites distinguish its containerized walkthrough from
+framework-wide requirements. Printed command sequence unchanged. RED7/1 then GREEN8/0; selected
+check1/1/0 and format1/1/0 pass. No cache/resource deletion or local runtime; no canary minted.
+Existing independent PASS remains exact to832e53720; next step is proportional independent review
+of this small policy/prose delta, required CI, and refreshed existingcanary9 rehearsal. Then merge,
+final readiness, one intended final canary and stable when the actual published pair is green.
+Owner requested low-usage wrap-up; do not launch new workers merely to write a checkpoint.
+
 ## 2026-09-03 owner wrap-up: cache objection and clean resume
 
 Owner requests wrap-up because usage is low and challenges treating cached Docker images as bad.
