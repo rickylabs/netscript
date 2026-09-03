@@ -486,3 +486,47 @@ exit 0; filesSelected=1; failedBatches=0; totalOccurrences=0
 $ run-deno-fmt.ts --root packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts --ext ts,tsx
 exit 0; filesSelected=1; failedBatches=0; findings=0
 ```
+
+Implementation repair commit: `c182fead36324830a2420464e4727ab17c0b9e53` (pushed by explicit
+refspec).
+
+### Runtime diagnostic and current-main integration
+
+The exact local PostgreSQL `scaffold.runtime` suite reached the repaired Flow-B fixture and then
+failed `runtime.aspire-start` after 309761ms because this host's DCP proxy listeners for PostgreSQL
+and Garnet did not become reachable. Aspire's resource view showed the backing containers running;
+cleanup passed. This is recorded separately from the branch-owned hosted RED and is not treated as
+a GREEN product receipt. A SQLite rerun on the same host would exercise the same unhealthy proxy
+layer, so the authoritative dual-provider verdict is the hosted synthetic-merge CI requested below.
+
+While this repair ran, `origin/main` advanced from the owner-pinned `3903feea63` to
+`632528888ad033f0e23dfd4f6718d089bfe3eeab`, leaving PR #1970 conflicting and unable to schedule
+its normal PR checks. Main was integrated once without rebasing. The only conflicts were four
+derived documentation/publish carriers; each was seeded from main and then regenerated with the
+canonical tasks. No generated carrier was hand-edited and `deno.lock` remains unchanged.
+
+Canonical carrier receipts on the integrated tree:
+
+```text
+$ deno task gen:agent-docs-prose
+exit 0; sha256=8c219d169eb852c481aef9f0745748444b05d7e3fc5e869a9c914c7e81c40e1e
+$ deno task gen:assets-barrel
+exit 0
+$ deno task gen:publish-assets
+exit 0
+$ deno task gen:mcp-export-corpus --allow-dirty
+exit 0; sha256=209fe9ff690a706286526833314ca1fac1d09436139c1a12ab94fd109abc7a1c;
+packageCount=35; subpathCount=273; symbolCount=7869
+$ deno task check:agent-docs-prose
+exit 0; fresh=true; stalePaths=[]
+$ deno task check:assets-barrel
+exit 0
+$ deno task check:publish-assets
+exit 0
+$ deno task check:mcp-export-corpus
+exit 0; same corpus hash and census
+```
+
+The final integrated head and exact Tier-A/hosted receipts follow in the receipt slice. PR #1970
+must remain unmerged and its body must retain `Refs #1455` for the supervisor's packet-time close
+disposition.

@@ -20,13 +20,13 @@ the local orchestrator; your application code remains Deno and TypeScript. See
 <!-- quickstart-walk:start -->
 
 ```bash
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 ```
 
 The same command works in Bash and PowerShell; Deno prints the executable directory to add to `PATH` if `netscript` is not found.
 
 {{ comp callout { type: "note", title: "Installing on a release day or a canary" } }}
-Deno refuses dependencies published in the last ~24 hours, so on the day a version ships the command above fails. Add <code>--minimum-dependency-age=0</code> to override the policy, and <code>-f</code> to replace an existing global executable:
+Deno refuses dependencies published in the last ~24 hours by default; the command above already overrides that policy. Add <code>-f</code> only to replace an existing global executable:
 <code>deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}</code>
 {{ /comp }}
 

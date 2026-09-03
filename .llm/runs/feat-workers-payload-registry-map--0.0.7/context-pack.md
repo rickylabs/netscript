@@ -12,10 +12,10 @@
 
 ## Current State
 
-PR #1970 is in a bounded hosted-runtime repair at head `14bdf2f98`. The schema-backed contract,
-literal registry, downstream migrations, documentation carriers, and generated-format repair are
-implemented. Both current hosted runtime tiers reach the Flow-B fixture and then time out starting
-Aspire because its legacy handler rewrite does not recognize #1455's schema-first generated job.
+PR #1970 has the bounded schema-first Flow-B fixture repair committed at `c182fead3`. The branch is
+integrating current `origin/main` once so GitHub can schedule a fresh synthetic-merge run; only
+generated documentation carriers conflicted, and they were resolved through their canonical
+generators.
 
 ## Completed
 
@@ -25,13 +25,14 @@ Aspire because its legacy handler rewrite does not recognize #1455's schema-firs
 
 ## In Progress
 
-- Validate and push the schema-first Flow-B fixture repair, then hand back an immutable merge packet.
+- Finish the integration receipt slice, push the immutable head, and collect current hosted runtime
+  receipts.
 
 ## Next Steps
 
-1. Prove the generated callback is async after fixture rewriting.
-2. Run exact PostgreSQL and SQLite runtime suites with cleanup.
-3. Record Tier-A/CI receipts, push the immutable head, and update PR #1970.
+1. Run final static, quality, architecture, and carrier gates on the integrated tree.
+2. Push the receipt head and collect exact PostgreSQL and SQLite hosted runtime verdicts.
+3. Update PR #1970 with the immutable merge packet without merging it.
 
 ## Key Decisions
 
@@ -45,9 +46,9 @@ Aspire because its legacy handler rewrite does not recognize #1455's schema-firs
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | passed at `14bdf2f98` | hosted core/quality/static-scaffold checks green |
-| Fitness | passed at `14bdf2f98` | hosted code-quality green; prior local receipts in worklog |
-| Runtime | repair in progress | both hosted suites share the schema-first fixture mismatch |
+| Static | final integrated rerun pending | focused repair checks pass; carrier checks pass |
+| Fitness | final integrated rerun pending | prior hosted code-quality green |
+| Runtime | hosted rerun pending | local host proxy failure is separated in worklog |
 | Consumer | passed | prior compile-time and generated-registry receipts in worklog |
 
 ## Open Questions

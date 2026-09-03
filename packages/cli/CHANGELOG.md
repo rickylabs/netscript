@@ -83,6 +83,9 @@
   The form descriptor's `controlProps()` bag is directly assignable to Preact `input`, `select`,
   and `textarea` elements, and derives `pattern` plus inclusive numeric `min`/`max`/`step` native
   constraints from the Zod 4 schema.
+  `useQuery` from `@netscript/fresh/query` seeds `initialDataUpdatedAt` alongside `initialData`,
+  so `staleTime` is measured from the server load rather than browser hydration, and the scaffolded
+  showcase island passes the loader's `cachedAt` through instead of discarding it.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
@@ -97,6 +100,11 @@
   Fresh 2.x resource-slice template family (`packages/cli/src/kernel/assets/resource-slice/`),
   rendered through the pure slice planner with exact core/form/partial/stream option deltas; no
   command wires it yet.
+  `netscript service generate` reconciles every manifest service into a generator-owned
+  `apps/<app>/lib/<service>.ts` client module with service-scoped query-factory keys and
+  collision-safe naming, validates each `contracts/versions/v1/<service>.contract.ts` export before
+  writing, and regenerates Aspire helpers in the same pass; identical modules are skipped and
+  `--force` rewrites them.
 - Aspire moves to the atomic 13.5.3 train with a version-parity gate, re-validates every emitted
   AppHost SDK member and the deploy CLI argv contract against the 13.5 TypeScript API, removes
   runtime literal ports so Aspire owns endpoint allocation (the auth, sagas, and triggers

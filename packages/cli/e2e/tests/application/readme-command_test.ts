@@ -14,6 +14,7 @@ const EXPECTED_INSTALL_ARGV = [
   '--allow-all',
   '--name',
   'netscript',
+  '--minimum-dependency-age=0',
   EXACT_CLI,
 ] as const;
 
@@ -74,11 +75,19 @@ Deno.test('README commands share a run-owned Deno install environment without ch
 
     assertEquals(spawns[0].argv, EXPECTED_INSTALL_ARGV);
     assertEquals(spawns[0].argv.includes('-f'), false);
+    assertEquals(
+      spawns[0].argv.filter((token) => token === '--minimum-dependency-age=0').length,
+      1,
+    );
     assertEquals(spawns[0].env?.DENO_INSTALL_ROOT, denoInstallRoot);
     assertEquals(spawns[0].env?.PATH?.startsWith(`${pathPrepend}${DELIMITER}`), true);
     assertEquals(spawns[1].env, spawns[0].env);
     const receipt = JSON.parse(
       await Deno.readTextFile(resolve(temporaryRoot, 'receipts', '01.json')),
+    );
+    assertEquals(
+      receipt.sourceCommand.split('--minimum-dependency-age=0').length - 1,
+      1,
     );
     assertEquals(receipt.environment, { denoInstallRoot, pathPrepend });
   } finally {
