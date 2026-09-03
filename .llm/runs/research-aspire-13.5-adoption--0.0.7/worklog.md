@@ -1145,3 +1145,11 @@ the merge.**
   `readme-quickstart.ts` expected contract, `readme-command_test.ts`, `quickstart.vto` +
   `QUICKSTART_DOCUMENTED_COMMANDS`, `packages/cli/README.md`, callout reword; RED→GREEN via the
   drift tests; carrier-chain + parity gates; no harness flag hiding, no republish, no workflow edit.
+- 15:3xZ (post-outage resume) Aspire epic reconciled: #1881/#863/#1712 all CLOSED; canary.10 pair
+  GREEN on main `a2d5b8b75`. Release PR #1984 @ `6884b7548` driven to all-green: reran the
+  Cloudflare/Docker-Hub outage `check-test` (502 on redis:7-alpine) → pass unchanged; verified the
+  owner-approved test-only exception independently (single path, `**/*_test.ts` publish-excluded);
+  ticked the two DoD boxes with the agreement audit; close-gate PASS; promoted `status:ready-merge`;
+  mergeStateStatus CLEAN. Ran the real `release:verify-canary-pair` — fails closed at this head, so
+  the inherited canary.10 evidence status MUST be written on the stable merge SHA before publish.
+  Packet: `1984-merge-packet.md`.
