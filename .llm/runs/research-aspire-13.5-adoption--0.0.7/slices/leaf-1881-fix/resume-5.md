@@ -1,0 +1,25 @@
+New bounded slice in THIS worktree (already on branch `fix/aspire-1881-readme-min-dep-age` = origin/main `3149d18e1`, clean). Same harness rules as before (`use harness`, netscript-harness + netscript-doctrine + netscript-pr skills; run artifacts under `.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/`).
+
+## Exact red (production, after the #1975 isolation fix)
+`e2e-cli-prod` run 33708533076 (main `3149d18e1`, published-version=0.0.7-canary.9): `readme.quickstart.01-install-cli` exit 1. Isolation worked (run-owned `DENO_INSTALL_ROOT` in the receipt, no collision). stderr:
+`error: Could not find version of '@netscript/cli' that matches specified version constraint '0.0.7-canary.9'` / `A newer matching version was found, but it was not used because it was newer than the specified minimum dependency date …` — Deno 2.9's default 24h minimum-dependency-age, applied even with no config. `deno install --global` ignores a cwd `deno.json` (verified locally), and no env var exists. Coordinator ruling: this is a **real public install defect** in the printed command, not a harness wait — the printed README command must carry the flag. Do NOT hide the flag in the harness (no env, no shim, no `-f`), do NOT republish, do NOT touch `.github/workflows/**`.
+
+## Change set (exact)
+Replace the printed global install command everywhere it is the user-facing contract, with this exact text (flag directly before the specifier it governs):
+`deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>`
+1. `README.md` line 38 (inside the `readme-quickstart` markers). Keep the `# 1.` comment; do not touch other README lines.
+2. `packages/cli/e2e/src/domain/readme-quickstart.ts` `README_QUICKSTART_EXPECTED_COMMANDS[0]`.
+3. `packages/cli/e2e/tests/application/readme-command_test.ts` `EXPECTED_INSTALL_ARGV` (add the `'--minimum-dependency-age=0'` token in the matching position) and any fixture README text in that test / `packages/cli/e2e/tests/domain/readme-quickstart_test.ts`.
+4. `docs/site/quickstart.vto` line 23 (`jsr:@netscript/cli{{ releaseSpecifier }}` form, same flag position) and `packages/cli/e2e/suites/quickstart/quickstart-walk-suite.ts` `QUICKSTART_DOCUMENTED_COMMANDS[0]` (displayed contract; `quickstart-command-drift_test.ts` enforces alignment). Reword the "Installing on a release day or a canary" callout in quickstart.vto so it no longer tells the reader to *add* `--minimum-dependency-age=0` (the command now carries it) — keep the `-f` guidance for replacing an existing global executable. Also update `packages/cli/README.md` line 55 (same printed command) so the JSR package README does not contradict the root README.
+5. Add one sentence after the README command block (root README) explaining the flag briefly: Deno 2.9 refuses packages published in the last 24h by default; the flag lets a same-day release install. Keep it to one line.
+
+## RED → GREEN (focused, committed separately)
+- RED commit: update only the expected-command contracts/tests (items 2, 3, `QUICKSTART_DOCUMENTED_COMMANDS`) and show `packages/cli/e2e/tests/domain/readme-quickstart_test.ts` + the README drift test (`readme-quickstart-drift_test.ts` or equivalent) + `quickstart-command-drift_test.ts` + `readme-command_test.ts` FAIL against the unchanged README/quickstart.vto (paste exact failing assertion).
+- GREEN commit: README.md, quickstart.vto, packages/cli/README.md, callout reword → the same tests pass. Add an explicit assertion in `readme-command_test.ts` that `spawns[0].argv` contains `'--minimum-dependency-age=0'` exactly once and that the token comes from the README text (not injected by the harness — i.e. it is present in the parsed `sourceCommand`).
+
+## Gates (before pushing)
+- Carrier chain: run `deno task check:agent-docs-prose`, `check:assets-barrel`, `check:publish-assets`, `check:mcp-export-corpus` (and the matching `gen:*` + commit output if any is derived from README/quickstart). Run `deno task check:aspire-version-parity` and regenerate the surface manifest (`deno run --allow-read --allow-write --allow-run=git .llm/runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts`) if it reports stale.
+- Scoped `run-deno-check.ts`/`run-deno-test.ts`/`run-deno-fmt.ts --ext ts,tsx` on `packages/cli/e2e`; lint changed files; `deno task e2e:cli gates readme.quickstart`; `docs:check`/accuracy check if the repo has one for `docs/site` (`deno task` list). No runtime suite.
+
+## PR
+Push `fix/aspire-1881-readme-min-dep-age`; open NON-draft PR to main, title `fix(readme): carry --minimum-dependency-age=0 in the printed global install command (#863 gate 3)`, body with exact red, RED/GREEN evidence, gate outputs, `Part of #1881`, `Part of #863`, mention #818 as the tracked product-policy issue (no closing keyword on any), labels `type:fix area:docs area:cli gate:e2e priority:p0 orchestrator:aspire status:impl`, milestone 0.0.7. Do not apply ready-merge. Report head SHA, PR number, gate exit codes.

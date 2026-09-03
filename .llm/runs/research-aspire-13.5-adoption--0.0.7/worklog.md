@@ -1137,3 +1137,11 @@ the merge.**
   canary.9 published 01:41:38Z. No argv-verbatim suite seam exists (env var: none; cwd deno.json:
   ignored by `deno install --global`, reproduced locally). Exact green requires re-dispatch after
   2026-09-04T01:41:39Z. Full diagnosis + immutable receipts: `slices/leaf-1881-fix/prod-33708533076/`.
+- 03:0xZ Coordinator ruling on run 33708533076: the 24h minimum-dependency-age failure is a **real
+  public install defect** in the printed command, not an age wait. Dispatched the final bounded
+  repair to the same worker `01a064ff…` (`resume-5.md`) on branch
+  `fix/aspire-1881-readme-min-dep-age` off main `3149d18e1`: root README command carries
+  `--minimum-dependency-age=0` (flag before the specifier), aligned in
+  `readme-quickstart.ts` expected contract, `readme-command_test.ts`, `quickstart.vto` +
+  `QUICKSTART_DOCUMENTED_COMMANDS`, `packages/cli/README.md`, callout reword; RED→GREEN via the
+  drift tests; carrier-chain + parity gates; no harness flag hiding, no republish, no workflow edit.
