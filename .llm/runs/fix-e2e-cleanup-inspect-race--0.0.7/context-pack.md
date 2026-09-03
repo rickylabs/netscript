@@ -14,7 +14,8 @@
 
 S1 RED and S2 GREEN behavior are complete. Same-id `No such object` now produces a vanished id,
 generic inspect failures still throw, and `stopAndProbe` aggregates vanished ids across observations
-into additive `docker.vanishedContainerIds` receipt evidence. Focused cleanup tests pass 9/9.
+into additive `docker.vanishedContainerIds` receipt evidence. The exact-head focused receipt passes
+9/9 at `fdeeee1a0`.
 
 ## Completed
 
@@ -25,12 +26,11 @@ into additive `docker.vanishedContainerIds` receipt evidence. Focused cleanup te
 
 ## In Progress
 
-- S2 commit/push and exact-head GREEN receipt, followed by S3 gates.
+- S3 scoped/static/parity/quality evidence.
 
 ## Next Steps
 
-1. Commit/push S2 and capture an exact-head GREEN receipt.
-2. Run S3 gates and hand off to the separate native Fable evaluator.
+1. Run S3 gates and hand off to the separate native Fable evaluator.
 
 ## Key Decisions
 
@@ -48,12 +48,13 @@ into additive `docker.vanishedContainerIds` receipt evidence. Focused cleanup te
 | `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts` | changed | Runner seam, vanished classification, aggregation, additive receipt field. |
 | `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup_test.ts` | new | Vanished-container and generic-failure regressions. |
 | `.llm/runs/fix-e2e-cleanup-inspect-race--0.0.7/receipts/s1-red.json` | new | Expected failing gate receipt. |
+| `.llm/runs/fix-e2e-cleanup-inspect-race--0.0.7/receipts/s2-green.json` | new | Exact-head focused GREEN receipt. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | focused GREEN; full S3 pending | 9/9 cleanup tests |
+| Static | focused GREEN; full S3 pending | `receipts/s2-green.json`, 9/9 |
 | Fitness | design-reviewed; automated pending | S3 |
 | Runtime | pending hosted CI | No local Aspire runtime |
 | Consumer | N/A | No public/generated change |

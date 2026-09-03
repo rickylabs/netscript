@@ -71,6 +71,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | 2026-09-03T03:17:00Z | S2 | GREEN | Structured focused wrapper passed 9/9 across the new colocated regression and existing Aspire cleanup-evidence tests. |
 | 2026-09-03T03:17:00Z | S2 | slice review | Tightened the removal predicate from substring matching to an exact trimmed-line suffix for the current id; verified all other failures retain the original throw shape. Receipt change is additive and aggregates ids across probes. |
 | 2026-09-03T03:17:00Z | S2 | reconcile | No new issue/PR comments or acceptance changes. Scope remains the two evidence files plus run artifacts; hosted tiers remain deferred to CI. |
+| 2026-09-03T03:18:31Z | S2 | exact-head evidence | Durable focused test receipt passed 9/9 at `fdeeee1a06bd6698c6654bf95e0e0130991acafa`; `gitHead == actualGitHead`. |
 
 ## Decisions
 
@@ -94,7 +95,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | --- | --- | --- | --- |
 | scoped check/lint/fmt | structured wrappers | NOT_RUN | S3 |
 | S1 RED | `run-gate.ts --gate test -- .../evidence/cleanup_test.ts` | FAIL_EXPECTED | Receipt exit 1, 0/1 pass/fail. |
-| S2 focused GREEN | structured test wrapper over `cleanup_test.ts` and `aspire-cleanup-evidence_test.ts` | PASS | 9 passed, 0 failed, 638 ms. Exact-head durable receipt follows after commit. |
+| S2 focused GREEN | `run-gate.ts --gate test` over `cleanup_test.ts` and `aspire-cleanup-evidence_test.ts` | PASS | `receipts/s2-green.json`; 9 passed, 0 failed at `fdeeee1a0`. |
 
 ### Fitness Gates
 
