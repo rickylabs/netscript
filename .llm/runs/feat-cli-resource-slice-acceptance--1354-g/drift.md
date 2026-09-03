@@ -103,3 +103,26 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** acceptance blocker outside Slice G ceiling
 - **Action:** Leave the corresponding issue checkbox unchecked and keep `Refs #1354`; do not claim the leaf closes #1354 or advance to `status:ready-merge`.
 - **Evidence:** `rg` found the guard at `packages/cli/src/public/features/generate/resource/generate-resource.ts:119` and no matching resource-generator test; `ui-app-root-command_test.ts` covers the shared resolver but not this verb's negative path.
+
+## 2026-09-03 — OS-restart resume: hosted tail belongs to Slice G acceptance
+
+- **What:** Final exact-head hosted run `33719217078` failed both database tiers at
+  `behavior.app-reference`; PostgreSQL reported 89 pass / 1 fail and SQLite 84 pass / 1 fail. Both
+  decisive errors were `desktop reference probe /examples/users?preview=loading did not render
+  data-state="loading"` at `probe-app-reference.ts:74`.
+- **Source:** Complete GitHub Actions job logs for PostgreSQL job `100534800206` and SQLite job
+  `100534800209`, plus the `e14322c511^..e14322c511` Slice F diff.
+- **Expected:** Hosted acceptance would execute the generated resource pair and complete the
+  canonical browser tail.
+- **Actual:** The browser probe predates Slice F (`9464ab223`) and still asserts seven preview
+  states. Slice F `e14322c511` removed the showcase templates that emitted those states and replaced
+  `/examples/users` with the neutral planner resource, while explicitly deferring hosted acceptance
+  to Slice G. #1958 also generates `/people`, but the probe did not exercise it.
+- **Severity:** significant
+- **Action:** owner-authorized post-hosted amendment: expand the final product ceiling from eight to
+  eleven existing files; probe `/examples/users` and `/people`, pin resource-rerun before the browser
+  gate, and add the missing unresolved-app-root zero-write command regression. Do not recreate the
+  retired showcase and do not run a new PLAN-EVAL.
+- **Boundary:** The stale assertion is pre-existing; the incompatible rendered surface was
+  introduced by merged Slice F; the correction belongs to Slice G because PR #1956 explicitly
+  assigned hosted acceptance and #1354 closure to PR #1958.

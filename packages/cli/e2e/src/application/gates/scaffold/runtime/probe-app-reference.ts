@@ -34,32 +34,12 @@ export const REFERENCE_EXPECTATIONS: readonly ReferenceExpectation[] = [
     markers: ['Composition', 'L0'],
   },
   {
-    path: '/examples/users?preview=loading',
-    markers: ['data-state="loading"'],
+    path: '/examples/users',
+    markers: ['Users', 'Cache-first query', 'Managed form', 'Deferred summary'],
   },
   {
-    path: '/examples/users?preview=error',
-    markers: ['data-state="error"', 'Resource list unavailable'],
-  },
-  {
-    path: '/examples/users?preview=empty',
-    markers: ['data-state="empty"', 'No resources yet'],
-  },
-  {
-    path: '/examples/users?preview=success',
-    markers: ['data-state="success"'],
-  },
-  {
-    path: '/examples/users?preview=optimistic',
-    markers: ['data-state="optimistic"', 'Optimistic update is visible'],
-  },
-  {
-    path: '/examples/users?preview=rollback',
-    markers: ['data-state="rollback"', 'saved cache snapshot was restored'],
-  },
-  {
-    path: '/examples/users?preview=confirmed',
-    markers: ['data-state="confirmed"', 'service confirmed the mutation'],
+    path: '/people',
+    markers: ['People', 'Cache-first query', 'Deferred summary'],
   },
 ];
 
@@ -78,7 +58,7 @@ export function assertReferenceDom(
   }
 }
 
-/** Render every canonical state in a real headless browser at desktop and mobile viewports. */
+/** Render the canonical scaffold and generated resource references in a real headless browser. */
 export async function probeAppReference(
   projectRoot: string,
   appName: string,
@@ -104,7 +84,7 @@ export async function probeAppReference(
           assertReferenceDom(dom, expectation, viewport);
         }
         log(
-          `generated app reference rendered ${REFERENCE_EXPECTATIONS.length} states at ${viewport.name}`,
+          `generated app reference rendered ${REFERENCE_EXPECTATIONS.length} routes at ${viewport.name}`,
         );
       }
       return;

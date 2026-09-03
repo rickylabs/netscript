@@ -41,7 +41,25 @@ Add two resource-generation gates to the existing `scaffold.runtime` route and t
 - Reword both rendered one-screen guides.
 - Teach the existing runtime-suite success fake to emit the rerun gate's expected captured output.
 
-The amended eight-file ceiling applies to product files. Required `.llm/runs/feat-cli-resource-slice-acceptance--1354-g/` harness artifacts are tracked run context and are outside that product touch set.
+The amended eight-file ceiling applied to the original Slice G author lane. After the first isolated
+hosted run exposed Slice F's retired preview surface still being asserted by Slice G's acceptance
+tail, the owner authorized a post-hosted acceptance amendment: three existing product test/harness
+files may be added, for an eleven-file final ceiling. Required
+`.llm/runs/feat-cli-resource-slice-acceptance--1354-g/` harness artifacts are tracked run context and
+are outside that product touch set.
+
+### Owner-authorized post-hosted amendment (2026-09-03)
+
+9. `packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts` — replace the
+   retired preview-state assertions with the neutral init resource and generated `people` resource.
+10. `packages/cli/e2e/tests/application/gates/probe-app-reference_test.ts` — pin the two resource
+    routes, semantic markers, both viewports, and rejection behavior.
+11. `packages/cli/src/public/features/generate/resource/generate-resource-command_test.ts` — prove
+    unresolved app-root selection fails loudly with zero writes anywhere.
+
+The existing resource gate test also pins resource rerun before the browser reference gate. This
+amendment resolves hosted and issue-acceptance gaps without changing generator behavior or reviving
+the retired showcase. Per owner direction, it requires no new PLAN-EVAL.
 
 ## Non-Scope
 
@@ -72,7 +90,7 @@ The amended eight-file ceiling applies to product files. Required `.llm/runs/fea
 
 | Decision | Status | Notes |
 | -------- | ------ | ----- |
-| Product touch set | resolved now | Exactly the eight amended locked files. |
+| Product touch set | resolved now | Eight original files plus three owner-authorized hosted-acceptance files; eleven total. |
 | Runtime proof | safe to defer | Hosted `scaffold.runtime` CI only, per owner direction. |
 | IMPL-EVAL | safe to defer | Separate evaluator/automation owns it; this is the author lane. |
 
@@ -84,7 +102,7 @@ The amended eight-file ceiling applies to product files. Required `.llm/runs/fea
 | Resource command runs before clients exist or selects ambiguously. | Order after service discovery and explicit `--client users`; exact command-array test. |
 | Rerun succeeds while rewriting files. | Captured exact zero-write/zero-conflict/11-skip summary requirement. |
 | Guidance mentions nonexistent files. | Exact referenced-path tests with and without the example service. |
-| Scope expands beyond eight product files. | Stop instead of changing runner infrastructure, registry tests, or parallel suites. |
+| Hosted correction expands beyond eleven product files. | Stop instead of changing templates, runner infrastructure, registry tests, or parallel suites. |
 
 ## Anti-Patterns to Resolve or Avoid
 
@@ -120,7 +138,7 @@ The amended eight-file ceiling applies to product files. Required `.llm/runs/fea
 | 3 | Static | structured CLI check/lint/fmt wrappers | exit 0; zero diagnostics/findings/unformatted files |
 | 4 | Assets/publish/docs | plan-named tasks and CLI JSR audit | exit 0; report counts |
 | 5 | Fitness | `deno task arch:check`; `deno task quality:gate` | exit 0; FAIL=0 |
-| 6 | Git hygiene | raw diff/status and `deno.lock` comparison | only eight product files plus required run artifacts; no lock change |
+| 6 | Git hygiene | raw diff/status and `deno.lock` comparison | only eleven authorized product files plus required run artifacts; no lock change |
 
 ## Risks
 
@@ -133,6 +151,6 @@ The amended eight-file ceiling applies to product files. Required `.llm/runs/fea
 
 ## Drift Watch
 
-- Any need to edit outside the amended eight product files.
+- Any need to edit outside the eleven owner-authorized product files.
 - Any change to the expected 11-candidate rerun summary.
 - Any movement of the Slice F base or `deno.lock`.

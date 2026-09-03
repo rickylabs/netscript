@@ -6,13 +6,20 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `live-main evidence complete — PASS_IMPL; hosted/browser and issue-acceptance blockers recorded` |
+| Current phase | `owner-authorized hosted acceptance correction implemented; exact-head gates pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
-Exactly the eight amended product files remain in scope after merging `origin/main` `e14322c511bbf26018c617c12f639474b6092c32` without rebasing. Product head `a2366577fd8232c8e08e078b03d1e3cc84793b92` generates `people` and orders `database.codegen` → `generated.service-client-contract` → resource first run → resource rerun → UI data-screen → generated quality/type-check. Exact-head focused tests are 68/68 and the full CLI suite is 1788/1788; all Tier-A gates are green. Fresh cycle-3 IMPL-EVAL passed at evidence head `0cc736365`. Isolated hosted run `33717890456` and its retry proved the full #1354 resource/generated-quality path and cleanup on both PostgreSQL and SQLite, but each raw suite exited 1 at the later `behavior.app-reference` assertion against preview DOM deliberately retired by final Slice F. That probe is a ninth product file. The final acceptance audit also found no generator-specific unresolved-app-root negative test. PR #1958 is open against `main` and must not advance beyond `status:impl-eval`.
+The owner resumed the run after the exact-head hosted failure and authorized a narrow correction
+within #1354's accepted resource scope. The final product ceiling is eleven existing files: the
+original eight plus the browser probe, its exact semantic test, and the resource command test.
+The probe now covers final Slice F's neutral `/examples/users` resource and Slice G's generated
+`/people` resource at both viewports; the resource gate test proves generation precedes the browser
+gate; the command test proves unresolved app-root selection fails loudly with zero writes. Initial
+focused tests pass 48/48. Exact-head Tier A, isolated hosted acceptance, and fresh IMPL-EVAL remain
+pending, so PR #1958 stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Completed
 
@@ -27,13 +34,13 @@ Exactly the eight amended product files remain in scope after merging `origin/ma
 
 ## In Progress
 
-- Owner/coordinator resolution of the two out-of-ceiling acceptance blockers.
+- Exact-head validation, isolated hosted acceptance, and fresh separate-session IMPL-EVAL for the amended product head.
 
 ## Next Steps
 
-1. Preserve the eight-file Slice G implementation and the cycle-3 `PASS_IMPL` receipt.
-2. Reconcile the stale `behavior.app-reference` preview expectations with final Slice F in its owning scope, then obtain a complete green hosted `scaffold.runtime` receipt.
-3. Add or identify the generator-specific unresolved-app-root negative test and only then finish #1354's acceptance checklist/close gate.
+1. Commit and push the eleven-file product head with the tracked Harness amendment.
+2. Run exact-head Tier A and both isolated hosted runtime tiers; do not use a host runtime lease.
+3. Obtain a fresh separate-session IMPL-EVAL, then update #1354/#1958 only from green evidence.
 
 ## Key Decisions
 
@@ -47,7 +54,7 @@ Exactly the eight amended product files remain in scope after merging `origin/ma
 
 | Path | Status | Notes |
 | ---- | ------ | ----- |
-| eight amended Slice G product paths | modified/new | Implementation complete, including authorized item 8. |
+| eleven owner-authorized Slice G product paths | modified/new | Original eight plus hosted probe/test and generator app-root negative regression. |
 | `.llm/runs/feat-cli-resource-slice-acceptance--1354-g/*` | new | Required harness context and blocker evidence. |
 
 ## Gates
@@ -61,7 +68,7 @@ Exactly the eight amended product files remain in scope after merging `origin/ma
 
 ## Open Questions
 
-- Which owning slice/rescope will update the ninth-file browser probe and add/locate the generator-specific unresolved-app-root negative test.
+- Whether both isolated database tiers render the two neutral resource routes with the pinned markers.
 
 ## Drift and Debt
 

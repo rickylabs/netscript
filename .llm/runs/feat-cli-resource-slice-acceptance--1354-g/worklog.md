@@ -53,6 +53,7 @@
 | # | Slice | Gate | Files |
 | - | ----- | ---- | ----- |
 | 1 | Add resource acceptance gates, runtime selection, generated guidance, and the reachable-suite stdout fixture | focused/static unit tests; structured CLI gates; asset/publish/fitness gates | exactly the eight amended product files plus this run directory |
+| 2 | Align the hosted browser tail with the neutral init resource and generated `people` route; close the missing app-root negative case | focused resource/probe/command tests; both hosted runtime tiers; fresh IMPL-EVAL | three owner-authorized existing product files, one existing Slice G test, and this run directory |
 
 ### Deferred Scope
 
@@ -87,6 +88,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | fresh IMPL-EVAL cycle 3 | The requested native Fable 5 medium route failed before a turn (`unrecognized_model`/HTTP 404); a fresh lane-policy fallback session used Claude transport/OpenRouter `z-ai/glm-5.3-flash` at max effort and returned `PASS_IMPL` for evidence head `0cc736365`. Exact route facts are recorded in `evaluate.md`. |
 | 2026-09-03 | G | isolated hosted acceptance | GitHub Actions run `33717890456` and its failed-jobs retry passed both resource gates, generated check/lint/fmt, runtime startup, and cleanup on PostgreSQL and SQLite. Both tiers exited 1 only at the later stale `behavior.app-reference` users-preview assertion: retry totals PostgreSQL 89/1, SQLite 84/1. The owning probe is outside the eight-file ceiling, so lifecycle remains blocked. |
 | 2026-09-03 | G | final issue acceptance audit | Ten implementation checkboxes have direct test/hosted evidence. The generator-specific missing-app-root negative test and the complete exit-0 hosted gate remain unproved, so #1354 stays open and PR #1958 keeps `Refs #1354` / `status:impl-eval`. |
+| 2026-09-03 | G | OS-restart hosted diagnosis | Retrieved complete run `33719217078` logs: PostgreSQL job `100534800206` was 89/1 and SQLite job `100534800209` was 84/1; both failed only at the same retired `/examples/users?preview=loading` marker. Git history proves the probe predates Slice F while Slice F removed its showcase renderer and explicitly assigned hosted acceptance to Slice G. |
+| 2026-09-03 | G | owner-authorized acceptance amendment | Expanded the final ceiling to eleven existing product files: probe neutral `/examples/users` and generated `/people`, pin resource rerun before the browser gate, and add the generator-specific unresolved-app-root zero-write regression. Initial focused wrapper passes 48/48; lint passes 11/11 and format passes after one mechanical formatting correction. No host runtime was started. |
 
 ## Decisions
 
@@ -97,6 +100,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Execute after database codegen and its service-client contract probe | Procedure resolution imports generated Zod CRUD output; the existing probe must remain immediately adjacent to codegen, so the resource pair follows it and precedes generated quality/type-check gates. | evaluator finding + full-suite invariant |
 | Run the full hosted acceptance after the prerequisite merge | The coordinator explicitly superseded the earlier author-lane prohibition and requested exact-head hosted acceptance. | owner resume instruction |
 | Resource generation precedes UI data-screen generation | `ui:add data-screen` writes a quoted router key that the intentionally fail-closed resource reconciler will not rewrite. | first live-main hosted run |
+| Probe neutral init and generated command resources, not retired preview states | Slice F replaced the init showcase with planner output; `/people` is the resource created by Slice G and must exist before the browser gate. | hosted run `33719217078` + owner resume instruction |
+| Add the unresolved-app-root regression in the existing command test | The guard already fails before client/procedure/staging; the command-level fixture can prove the entire in-memory filesystem remains byte-identical with zero writes. | #1354 acceptance audit + owner resume instruction |
 
 ## Drift
 
@@ -109,7 +114,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Live-main UI data-screen mutation had to move after the resource pair; runtime prerequisites include prior shared-file mutations. | high, resolved | yes |
 | Shared-host Aspire/DCP advertised proxy ports diverged from healthy Docker mappings in two exact-head retries. | infrastructure, hosted proof pending | yes |
 | Isolated hosted runtime reaches the browser tail but `behavior.app-reference` still asserts retired Slice F preview-state DOM; its owning file is outside the Slice G ceiling. | high, unresolved | yes |
-| Final matrix found no generator-specific unresolved-app-root negative test in the merged suite. | acceptance, unresolved | yes |
+| Owner-authorized hosted amendment reassigns the stale browser tail to Slice G and expands the final ceiling to eleven existing files. | significant, implemented; hosted proof pending | yes |
+| Final matrix found no generator-specific unresolved-app-root negative test in the merged suite. | acceptance, resolved by command-level zero-write regression; full-suite proof pending | yes |
 
 ## Gate Results
 
