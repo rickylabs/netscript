@@ -109,6 +109,10 @@
   The Aspire reference documents the backing-resource readiness contract: `healthStatus` reports
   reachability at the published endpoint, so a container log line is not the readiness authority
   and `Unhealthy` means "not reachable where you will connect", not "not started".
+  Scaffolded Aspire helpers gain `createEndpointListenerReadinessCheck`: the postgres listener
+  readiness check bounds endpoint allocation with the same deadline as the socket probe and
+  reports `ENDPOINT_ALLOCATION_TIMEOUT` instead of waiting indefinitely when the endpoint is never
+  allocated.
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.
 
 ## 0.0.6
