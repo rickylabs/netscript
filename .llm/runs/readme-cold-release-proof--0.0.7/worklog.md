@@ -1,5 +1,21 @@
 # Worklog: cold README published-release proof
 
+## Final CI integration correction — 2026-09-03
+
+CI33757937139 reports5266 pass/2 fail. These are exact policy intersections, not product defects:
+aspire-nuget-cache-policy requires the pinned SDK download cache; forbidden-commands flags the
+read-only container shorthand as a shared-host bulk teardown phrase. Restore the existing SDK
+package cache (not generated AppHost state) consistently with the owner's normal-cache ruling;
+use explicit read-only docker container ls --all --quiet. No guard disabled or resource mutation.
+Update the original workflow regression to require the SDK cache and reject generated AppHost
+state caching. Focused RED and GREEN include both previously failing policy tests.
+
+Actual RED8pass/3fail includes both unchanged policy tests and the revised workflow expectation;
+GREEN11pass/0fail after correction. Selected check1/1/0diagnostics; format corrected one line
+wrap then PASS1/1/0; selected lint uses the existing explicit repository-rule config. No baseline
+guard removed. Hosted33760126265 already passed the cache-permitting baseline at4092014cf and
+is executing the unchanged README; not yet a completed runtime verdict.
+
 ## Owner-ratified cache correction — 2026-09-03
 
 The first hosted rehearsal33756743492 stopped before README on6 preloaded images; all four

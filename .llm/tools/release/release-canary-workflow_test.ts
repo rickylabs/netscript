@@ -503,7 +503,13 @@ Deno.test('production README starts with fresh application state and permits ima
   const readme = source.indexOf('- name: Root README Quickstart E2E');
   assert(readme > 0);
   const before = source.slice(0, readme);
-  assertEquals(before.includes('actions/cache@'), false, 'README must not inherit an Aspire cache');
+  assertStringIncludes(before, 'path: ~/.nuget/packages');
+  assertStringIncludes(before, 'key: nuget-aspire-${{ runner.os }}-13.5.3-v1');
+  assertEquals(
+    before.includes('path: ~/.aspire'),
+    false,
+    'generated AppHost state must stay fresh',
+  );
   assertEquals(
     before.includes('deno task e2e:cli run'),
     false,

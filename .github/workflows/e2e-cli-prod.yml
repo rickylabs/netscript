@@ -39,6 +39,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Restore pinned Aspire NuGet package cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
+
       - name: Install Aspire CLI
         run: |
           dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
@@ -89,13 +95,13 @@ jobs:
         run: deno install
 
       # The README owns the first application/runtime on this fresh hosted VM.
-      # Do not restore an AppHost cache or run another scaffold before this gate.
+      # Downloaded SDK packages and images are allowed; no prior application runs or state.
       - name: Verify cold README baseline
         run: |
           set -euo pipefail
           mkdir -p .llm/tmp
           readme_apphosts="$(aspire ps --format Json | jq 'length')"
-          readme_containers="$(docker ps -aq | wc -l)"
+          readme_containers="$(docker container ls --all --quiet | wc -l)"
           readme_images="$(docker image ls -q | wc -l)"
           readme_volumes="$(docker volume ls -q | wc -l)"
           readme_networks="$(docker network ls --filter type=custom -q | wc -l)"
