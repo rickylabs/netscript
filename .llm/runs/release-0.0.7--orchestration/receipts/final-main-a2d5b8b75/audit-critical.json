@@ -1,0 +1,36 @@
+{
+  "gateId": "audit-critical",
+  "invocationId": "quality-audit-critical",
+  "argv": [
+    "deno",
+    "task",
+    "audit:critical"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "c69befd1a73d5e4a1799782dd8a16d4b088b08d9e643ae6315a8d84cdee7453b",
+  "lifecycleId": "quality:quality-audit-critical:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:48:46.699Z",
+  "startedAt": "2026-09-03T13:48:46.701Z",
+  "finishedAt": "2026-09-03T13:48:46.950Z",
+  "durationMs": 249,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 190,
+    "sha256": "5be59599b06b5b8d37c55840b9d47194c827f7897958d0151aec455c29f21709",
+    "tail": "Found \u001b[0m\u001b[31m23\u001b[0m vulnerabilities\nSeverity: \u001b[0m\u001b[1m2\u001b[0m \u001b[0m\u001b[1mlow\u001b[0m, \u001b[0m\u001b[33m10\u001b[0m \u001b[0m\u001b[33mmoderate\u001b[0m, \u001b[0m\u001b[31m11\u001b[0m \u001b[0m\u001b[31mhigh\u001b[0m, \u001b[0m\u001b[31m0\u001b[0m \u001b[0m\u001b[31mcritical\u001b[0m\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 74,
+    "sha256": "a46abaf49f7c75c6c991b14f4028b5d71095c0b3f696aca72a96d524fa6f4ff8",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36maudit:critical\u001b[0m deno audit --level critical\n",
+    "truncated": false
+  }
+}

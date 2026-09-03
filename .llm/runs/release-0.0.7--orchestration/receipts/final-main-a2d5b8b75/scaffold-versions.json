@@ -1,0 +1,36 @@
+{
+  "gateId": "scaffold-versions",
+  "invocationId": "quality-scaffold-versions",
+  "argv": [
+    "deno",
+    "task",
+    "check:scaffold-versions"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "1e033911b081e2e09adce92c703b2c6c45916544e88c8536ed72d7d800324f43",
+  "lifecycleId": "quality:quality-scaffold-versions:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:47:57.032Z",
+  "startedAt": "2026-09-03T13:47:57.034Z",
+  "finishedAt": "2026-09-03T13:47:57.138Z",
+  "durationMs": 103,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 66,
+    "sha256": "44e0f7fc5305307310501236b845352f09a084aea2df0e716871c79a794570da",
+    "tail": "E-12 OK — 11 scaffold pin(s) are stable (no prerelease suffix).\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 122,
+    "sha256": "8cb2237934fdf734425e6aa918b6c403421214d047509ece6db34733feb736e9",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:scaffold-versions\u001b[0m deno run .llm/tools/validation/check-scaffold-versions.ts --pretty\n",
+    "truncated": false
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "gateId": "readme-fences",
+  "invocationId": "quality-readme-fences",
+  "argv": [
+    "deno",
+    "task",
+    "docs:readme-fences"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "09dcfe2e482558b824975abfefacc5ba068c71915bd73f4b8594b8d3aa970a38",
+  "lifecycleId": "quality:quality-readme-fences:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:47:14.883Z",
+  "startedAt": "2026-09-03T13:47:14.885Z",
+  "finishedAt": "2026-09-03T13:47:25.234Z",
+  "durationMs": 10349,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 149,
+    "sha256": "fd5d17916c789f454b21a5782da50c25e28d47a942d6038bf7e137c12e90820d",
+    "tail": "readme fences: PASS readmes=36 fences=169 ts_like=74 exempt=0 checked=74 syntax_invalid=0 type_errors=7 failing_readmes=5 unattributed_failure=false\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 137,
+    "sha256": "743033839f278a66c5ff56034321323b6cff30a5ba3227fb41f21616aac81b41",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdocs:readme-fences\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-readme-fences.ts\n",
+    "truncated": false
+  }
+}

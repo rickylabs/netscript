@@ -1,5 +1,22 @@
 # Context pack — release 0.0.7
 
+## 2026-09-03 14:03Z: canary published, production tests active
+
+Canary.10 publication passed in run33762898477. The immutable tag resolves to commit
+170e33782acf2dfb4bccc3f4e461ae8f5a149f85 (the annotated tag object is75ae9500).
+Its exact pinned production run33763460542 has passed the first-application README sequence,
+owned cleanup and public init smoke; the full scaffold runtime suite is executing, then the
+final quickstart walk remains. Do not call the whole pair green or close issues before its reports.
+
+Final source main remains a2d5b8b75. Main CI33762836732 is SUCCESS:5270pass/0fail/14ignored,
+browser regression and quality pass. The extra native quality:gate receipt is PASS at that same
+head. All21 raw receipts are retained in receipts/final-main-a2d5b8b75; the evidence evaluator
+recomputes SUFFICIENT with zero reasons. Historical circular post-publication prerequisite IDs
+were corrected in the ledger only, documented in drift.md; all real publication gates remain.
+No new source changes, model dispatches or runtime leases. Continue the live published tests,
+close1881/863/1712 from complete evidence, claim the single stable writer and use native
+release:cut/release:publish. Both stable publication and its pinned production E2E must pass.
+
 ## Canary10 dispatched — keep following run33762898477
 
 Latest:1983MERGED ata2d5b8b75083769b946c03ab772e08f2634e2b35 (13:44:33Z). CI5270/0,

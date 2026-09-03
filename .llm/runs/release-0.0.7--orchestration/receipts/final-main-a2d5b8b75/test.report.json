@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all"],"cwd":"/home/runner/work/netscript/netscript","exitCode":0,"durationMs":538506,"summary":{"passed":5270,"failed":0,"ignored":14,"totalResults":5284,"uniqueFailures":0},"failures":[]}

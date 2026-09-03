@@ -5942,22 +5942,765 @@
     }
   ],
   "exactMainEvidence": {
-    "gitHead": "ec848e6b0334ec8fcd2bc66ba009305d35367b01",
+    "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
     "surface": "repository",
     "expectedGateIds": [
-      "arch-check",
-      "canary-e2e-cli-prod",
-      "canary-oidc-publish",
+      "agent-docs-prose",
+      "aspire-version-parity",
+      "assets-barrel",
+      "audit-critical",
       "check",
+      "docs-accuracy",
+      "docs-source-format",
+      "docs-source-format-test",
+      "docs-tagline",
+      "emitted-samples",
+      "fmt-check",
+      "jsdoc-example-compile",
+      "lint",
+      "mcp-export-corpus",
+      "netscript-jsr-specifiers",
+      "publish-assets",
       "publish-dry-run",
-      "publish-readiness",
-      "quality-job",
-      "scaffold.runtime",
-      "stable-e2e-cli-prod",
-      "stable-oidc-publish",
+      "quality-gate",
+      "readme-fences",
+      "scaffold-versions",
       "test"
     ],
-    "receipts": []
+    "receipts": [
+      {
+        "gateId": "agent-docs-prose",
+        "invocationId": "quality-agent-docs-prose",
+        "argv": [
+          "deno",
+          "task",
+          "check:agent-docs-prose"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "7527ce70dc52246cfaeb38050d44a558c91e94d4e4b5d15409a1ca93440201c1",
+        "lifecycleId": "quality:quality-agent-docs-prose:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:25.336Z",
+        "startedAt": "2026-09-03T13:47:25.339Z",
+        "finishedAt": "2026-09-03T13:47:37.257Z",
+        "durationMs": 11918,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/agent-docs-prose.json",
+        "stdoutEvidence": {
+          "bytes": 54767,
+          "sha256": "ba50c8425e16928710e5fec0a4239ea85e719282c4794540065436018616ebca"
+        },
+        "stderrEvidence": {
+          "bytes": 11042,
+          "sha256": "57afc5640ecf948dd126bcf981fb35b7c19ba730c5ae7e153703162e08946be3"
+        }
+      },
+      {
+        "gateId": "aspire-version-parity",
+        "invocationId": "quality-aspire-version-parity",
+        "argv": [
+          "deno",
+          "task",
+          "check:aspire-version-parity"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "17570719f82d4d20b096bdcd6de0784ffa4282d7369c6b0faff5c8bdfb057e1f",
+        "lifecycleId": "quality:quality-aspire-version-parity:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:57.239Z",
+        "startedAt": "2026-09-03T13:47:57.241Z",
+        "finishedAt": "2026-09-03T13:47:57.508Z",
+        "durationMs": 267,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/aspire-version-parity.json",
+        "stdoutEvidence": {
+          "bytes": 4116,
+          "sha256": "79b454dd0caed8a464e1bf645533aee16e8dbf6f5ba10bddc496e5530479b6c9"
+        },
+        "stderrEvidence": {
+          "bytes": 150,
+          "sha256": "e60a250e3908f9a1b58c71dd2bc13ef05e25431bb14fe9bb60cd5917162f99ee"
+        }
+      },
+      {
+        "gateId": "assets-barrel",
+        "invocationId": "quality-assets-barrel",
+        "argv": [
+          "deno",
+          "task",
+          "check:assets-barrel"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "0b8a8770fc49412627f93eaca876468754677b98661c759bbe6aac7ef13ff61e",
+        "lifecycleId": "quality:quality-assets-barrel:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:45.750Z",
+        "startedAt": "2026-09-03T13:47:45.753Z",
+        "finishedAt": "2026-09-03T13:47:46.765Z",
+        "durationMs": 1013,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/assets-barrel.json",
+        "stdoutEvidence": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderrEvidence": {
+          "bytes": 622,
+          "sha256": "112b4f675ae42f50781a08b52dda9b08317c29d3b1a3b19e39caf9a80aec8cc9"
+        }
+      },
+      {
+        "gateId": "audit-critical",
+        "invocationId": "quality-audit-critical",
+        "argv": [
+          "deno",
+          "task",
+          "audit:critical"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "c69befd1a73d5e4a1799782dd8a16d4b088b08d9e643ae6315a8d84cdee7453b",
+        "lifecycleId": "quality:quality-audit-critical:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:48:46.699Z",
+        "startedAt": "2026-09-03T13:48:46.701Z",
+        "finishedAt": "2026-09-03T13:48:46.950Z",
+        "durationMs": 249,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/audit-critical.json",
+        "stdoutEvidence": {
+          "bytes": 190,
+          "sha256": "5be59599b06b5b8d37c55840b9d47194c827f7897958d0151aec455c29f21709"
+        },
+        "stderrEvidence": {
+          "bytes": 74,
+          "sha256": "a46abaf49f7c75c6c991b14f4028b5d71095c0b3f696aca72a96d524fa6f4ff8"
+        }
+      },
+      {
+        "gateId": "check",
+        "invocationId": "check-test-check",
+        "argv": [
+          "deno",
+          "task",
+          "check",
+          "--output",
+          ".llm/tmp/gate-receipts/check-test/check.report.json"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "check-test",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "f21c95dc8b4e4f9b80effdd6f2bdb2063c1cc95c0951eff559c65e0801ff2bf7",
+        "lifecycleId": "check-test:check-test-check:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:31.840Z",
+        "childReport": ".llm/tmp/gate-receipts/check-test/check.report.json",
+        "startedAt": "2026-09-03T13:45:31.842Z",
+        "finishedAt": "2026-09-03T13:48:34.145Z",
+        "durationMs": 182302,
+        "exitCode": 0,
+        "childReportEvidence": {
+          "path": ".llm/tmp/gate-receipts/check-test/check.report.json",
+          "bytes": 288,
+          "sha256": "eac6b6c9291a9d2ab0fc004e243db41d682c9dfbf1ff07d400528ac059fc0685",
+          "modifiedAt": "2026-09-03T13:48:34.135Z"
+        },
+        "receiptPath": "receipts/final-main-a2d5b8b75/check.receipt.json",
+        "stdoutEvidence": {
+          "bytes": 238,
+          "sha256": "edd46571942f546a8457418c02ab203103780c68bf0ce09f318428d32ea3dd81"
+        },
+        "stderrEvidence": {
+          "bytes": 463,
+          "sha256": "55c0340ee39e51f123e5209b11e2504e304a842c5faa56ee5ba4f5cdc69d2409"
+        }
+      },
+      {
+        "gateId": "docs-accuracy",
+        "invocationId": "quality-docs-accuracy",
+        "argv": [
+          "deno",
+          "task",
+          "docs:accuracy"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "0ce04ca455f5614623d46de93a7e691c76540a3217ac34fb78ffbeed71b72cd1",
+        "lifecycleId": "quality:quality-docs-accuracy:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:41.189Z",
+        "startedAt": "2026-09-03T13:45:41.192Z",
+        "finishedAt": "2026-09-03T13:45:54.147Z",
+        "durationMs": 12955,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/docs-accuracy.json",
+        "stdoutEvidence": {
+          "bytes": 304,
+          "sha256": "a0e6dd7add7cc5ad856b2c5ca3b82b1a0a1157070881cbc4daac171c23f3eadc"
+        },
+        "stderrEvidence": {
+          "bytes": 36469,
+          "sha256": "1029d88ea9e64cbfd14eb0b2809644ee14ce4a98beccedc1299d82122e6cbe8c"
+        }
+      },
+      {
+        "gateId": "docs-source-format",
+        "invocationId": "quality-docs-format",
+        "argv": [
+          "deno",
+          "task",
+          "check:source-format"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript/docs/site",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "2ee11eec288f8182670b7220d3426b854aad381182d1f173ddce87ccf3399f8e",
+        "lifecycleId": "quality:quality-docs-format:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:20.391Z",
+        "startedAt": "2026-09-03T13:45:20.394Z",
+        "finishedAt": "2026-09-03T13:45:21.352Z",
+        "durationMs": 958,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/docs-format.json",
+        "stdoutEvidence": {
+          "bytes": 23,
+          "sha256": "a91dbfc7ba015ebd64902c27740032f3798207dc0ebae57d2526342b219899c5"
+        },
+        "stderrEvidence": {
+          "bytes": 2398,
+          "sha256": "bbb8b5ccc33800f066d8491074aa8db4f55a42e0d5aa6ebc0e22f6cf8f0000a7"
+        }
+      },
+      {
+        "gateId": "docs-source-format-test",
+        "invocationId": "quality-docs-format-test",
+        "argv": [
+          "deno",
+          "task",
+          "test:source-format"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript/docs/site",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "680ca02feba869af233f0a4161c55b28730db4594e1fdb8869fe74e5bed12af3",
+        "lifecycleId": "quality:quality-docs-format-test:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:21.462Z",
+        "startedAt": "2026-09-03T13:45:21.464Z",
+        "finishedAt": "2026-09-03T13:45:24.846Z",
+        "durationMs": 3381,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/docs-format-test.json",
+        "stdoutEvidence": {
+          "bytes": 808,
+          "sha256": "693f87f0c4c6478f23b3fce719263b07534ae396f175a34ac12bf43008438c95"
+        },
+        "stderrEvidence": {
+          "bytes": 25749,
+          "sha256": "444084886c02310a391d2b38bba8ddb422a11d2207ea8d43ec101bce4ac5a076"
+        }
+      },
+      {
+        "gateId": "docs-tagline",
+        "invocationId": "quality-docs-tagline",
+        "argv": [
+          "deno",
+          "task",
+          "docs:tagline:check"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "7bd51e0356398967c93c5d771e5b022648845d6820b0431e8d6afd61c78f72c4",
+        "lifecycleId": "quality:quality-docs-tagline:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:40.745Z",
+        "startedAt": "2026-09-03T13:45:40.747Z",
+        "finishedAt": "2026-09-03T13:45:41.072Z",
+        "durationMs": 326,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/docs-tagline.json",
+        "stdoutEvidence": {
+          "bytes": 105,
+          "sha256": "a1d59212ae3a7b1d83d1120f6c2db1508896116ba56e5803fbb2be04f3a35f09"
+        },
+        "stderrEvidence": {
+          "bytes": 5276,
+          "sha256": "8eaac43d359d0d1f3614972f109c41a8f4b04b503f144faacf5a0216afa203b2"
+        }
+      },
+      {
+        "gateId": "emitted-samples",
+        "invocationId": "quality-emitted-samples",
+        "argv": [
+          "deno",
+          "task",
+          "check:emitted-samples"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "fdd836658085c364d129a6b1359554befd663bfb5c3652aa8ccd8ee87526bbc2",
+        "lifecycleId": "quality:quality-emitted-samples:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:47.434Z",
+        "startedAt": "2026-09-03T13:47:47.436Z",
+        "finishedAt": "2026-09-03T13:47:55.602Z",
+        "durationMs": 8166,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/emitted-samples.json",
+        "stdoutEvidence": {
+          "bytes": 62,
+          "sha256": "d3004ac9a69e35d543eb9fb16481313b5894aac26b6d581382f65d1945e305e4"
+        },
+        "stderrEvidence": {
+          "bytes": 21684,
+          "sha256": "709ff4b682f06bc6db9d351fbe91d9ee67e6d29687f9d036bca2db625c899348"
+        }
+      },
+      {
+        "gateId": "fmt-check",
+        "invocationId": "quality-fmt",
+        "argv": [
+          "deno",
+          "task",
+          "fmt:check",
+          "--output",
+          ".llm/tmp/gate-receipts/quality/fmt.report.json"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "1fe4b0df5b4a0fb0cdf55597622ce36af6d45df31bee06fb0f8279332258a815",
+        "lifecycleId": "quality:quality-fmt:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:37.112Z",
+        "childReport": ".llm/tmp/gate-receipts/quality/fmt.report.json",
+        "startedAt": "2026-09-03T13:45:37.114Z",
+        "finishedAt": "2026-09-03T13:45:40.636Z",
+        "durationMs": 3522,
+        "exitCode": 0,
+        "childReportEvidence": {
+          "path": ".llm/tmp/gate-receipts/quality/fmt.report.json",
+          "bytes": 291,
+          "sha256": "33f44be0b1c66108c007a54d57b6a198b52ff41b60561d287f94ddfbe18c6195",
+          "modifiedAt": "2026-09-03T13:45:40.625Z"
+        },
+        "receiptPath": "receipts/final-main-a2d5b8b75/fmt.receipt.json",
+        "stdoutEvidence": {
+          "bytes": 157,
+          "sha256": "6511de2970824ff6663e94da4728a9239e5326f05eb54a39ea0617b2c306e561"
+        },
+        "stderrEvidence": {
+          "bytes": 317,
+          "sha256": "cd41ebd56f89aab8ae8b786b34cc40c5e40f435df6bf550a7270252162d46da7"
+        }
+      },
+      {
+        "gateId": "jsdoc-example-compile",
+        "invocationId": "quality-jsdoc-example-compile",
+        "argv": [
+          "deno",
+          "task",
+          "docs:jsdoc-examples"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "f5aee1056d49fd9ac12608d16ef53cccc64400ab6801bafdb76872e61f01058e",
+        "lifecycleId": "quality:quality-jsdoc-example-compile:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:54.260Z",
+        "startedAt": "2026-09-03T13:45:54.262Z",
+        "finishedAt": "2026-09-03T13:47:14.777Z",
+        "durationMs": 80515,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/jsdoc-example-compile.json",
+        "stdoutEvidence": {
+          "bytes": 253,
+          "sha256": "f7e75a1f3c8f8528a6e16b80c46351b5a235656656b945036f85b11c1c54b281"
+        },
+        "stderrEvidence": {
+          "bytes": 139,
+          "sha256": "467e8f3d6edc6ea20f2fd93a3b78f78904c578f395d3991f9ce01d45cac3838b"
+        }
+      },
+      {
+        "gateId": "lint",
+        "invocationId": "quality-lint",
+        "argv": [
+          "deno",
+          "task",
+          "lint",
+          "--output",
+          ".llm/tmp/gate-receipts/quality/lint.report.json"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "8b8190218b79bcba92ef305b21fc10b66814be1d8ab48619721f8625c26cf276",
+        "lifecycleId": "quality:quality-lint:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:45:27.771Z",
+        "childReport": ".llm/tmp/gate-receipts/quality/lint.report.json",
+        "startedAt": "2026-09-03T13:45:27.773Z",
+        "finishedAt": "2026-09-03T13:45:36.998Z",
+        "durationMs": 9224,
+        "exitCode": 0,
+        "childReportEvidence": {
+          "path": ".llm/tmp/gate-receipts/quality/lint.report.json",
+          "bytes": 342,
+          "sha256": "9cad19198214b237c4808b75c57aa5cf3396bfcdb7a771b9bed3e0eed0873cab",
+          "modifiedAt": "2026-09-03T13:45:36.987Z"
+        },
+        "receiptPath": "receipts/final-main-a2d5b8b75/lint.receipt.json",
+        "stdoutEvidence": {
+          "bytes": 148,
+          "sha256": "8cf6da463901fac48b8950ee00702fd217dd81f5920eccee66a19cbdf77213bf"
+        },
+        "stderrEvidence": {
+          "bytes": 292,
+          "sha256": "3f93f850c199689d811167e31ae25573d1521a3261dfc3618a7cb647c5e68d0b"
+        }
+      },
+      {
+        "gateId": "mcp-export-corpus",
+        "invocationId": "quality-mcp-export-corpus",
+        "argv": [
+          "deno",
+          "task",
+          "check:mcp-export-corpus"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "65fffa1de29d3e5a5d32efc9967e24924c1211dc170c9cbbe57e2fb86a939147",
+        "lifecycleId": "quality:quality-mcp-export-corpus:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:37.381Z",
+        "startedAt": "2026-09-03T13:47:37.383Z",
+        "finishedAt": "2026-09-03T13:47:45.649Z",
+        "durationMs": 8265,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/mcp-export-corpus.json",
+        "stdoutEvidence": {
+          "bytes": 232,
+          "sha256": "d90ef20cd84da82edb8bd00e04b2289f11ba5a2f4cc39c069991c6271d2a56bb"
+        },
+        "stderrEvidence": {
+          "bytes": 174,
+          "sha256": "5b0296405ffc7469c51761c77c0d5007b5e29e78d70198cc4275e08998f9cf86"
+        }
+      },
+      {
+        "gateId": "netscript-jsr-specifiers",
+        "invocationId": "quality-jsr-specifiers",
+        "argv": [
+          "deno",
+          "task",
+          "check:netscript-jsr-specifiers"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "2c3a3fe6929c96ff159c31d360d883a4f4e35b266e19bbecada4d9f691c79330",
+        "lifecycleId": "quality:quality-jsr-specifiers:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:55.716Z",
+        "startedAt": "2026-09-03T13:47:55.718Z",
+        "finishedAt": "2026-09-03T13:47:56.930Z",
+        "durationMs": 1212,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/jsr-specifiers.json",
+        "stdoutEvidence": {
+          "bytes": 238,
+          "sha256": "661d3d70b0efd8f7ce910e0cb94f7612f7789730848c44b9352d363fa225bf5a"
+        },
+        "stderrEvidence": {
+          "bytes": 149,
+          "sha256": "fcf936879ef9bd2b9559ab15f26bee24f95e68544b414c4d4a01c39da618746a"
+        }
+      },
+      {
+        "gateId": "publish-assets",
+        "invocationId": "quality-publish-assets",
+        "argv": [
+          "deno",
+          "task",
+          "check:publish-assets"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "4c5aad6cec94ec79bd2fc16266b6f1b7edac407be4b63265c884750fce68363b",
+        "lifecycleId": "quality:quality-publish-assets:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:46.873Z",
+        "startedAt": "2026-09-03T13:47:46.875Z",
+        "finishedAt": "2026-09-03T13:47:47.329Z",
+        "durationMs": 454,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/publish-assets.json",
+        "stdoutEvidence": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderrEvidence": {
+          "bytes": 250,
+          "sha256": "552a20ca8810fd5e5a7ef115222b1ccba8f8637d0a5fa2ad69270738c9c46b40"
+        }
+      },
+      {
+        "gateId": "publish-dry-run",
+        "invocationId": "quality-publish-dry-run",
+        "argv": [
+          "deno",
+          "task",
+          "publish:dry-run"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "11175a4039533a762995baa2c8269461c35b7cc3d15ae429cc773000a3b5e72a",
+        "lifecycleId": "quality:quality-publish-dry-run:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:57.612Z",
+        "startedAt": "2026-09-03T13:47:57.614Z",
+        "finishedAt": "2026-09-03T13:48:46.584Z",
+        "durationMs": 48970,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/publish-dry-run.json",
+        "stdoutEvidence": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderrEvidence": {
+          "bytes": 335157,
+          "sha256": "34dbebde3d05fcc205ba7e9c519a7d87743aeb7bca3001429dd4e6ebcf97ca20"
+        }
+      },
+      {
+        "gateId": "quality-gate",
+        "invocationId": "stable-precut:quality-gate:a2d5b8b75",
+        "argv": [
+          "deno",
+          "task",
+          "quality:gate"
+        ],
+        "cwd": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "worker:360330",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "fa58e0dda25d4e303aab32fc7dc26cc4235e52374961c3c59f1a629f1d4d95c3",
+        "lifecycleId": "worker:360330:stable-precut:quality-gate:a2d5b8b75:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:50:38.700Z",
+        "startedAt": "2026-09-03T13:50:38.703Z",
+        "finishedAt": "2026-09-03T13:50:46.275Z",
+        "durationMs": 7572,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/quality-gate.receipt.json",
+        "stdoutEvidence": {
+          "bytes": 46705,
+          "sha256": "3abf97724dc597c7dc089e447e1c1abf074a53d77fbdd7f5f798ae8dde9ebac5"
+        },
+        "stderrEvidence": {
+          "bytes": 820,
+          "sha256": "8a8e390f39c878090a6ca47a125557d3ff837cb8f95bfdb83bb388a4fa82f7cf"
+        }
+      },
+      {
+        "gateId": "readme-fences",
+        "invocationId": "quality-readme-fences",
+        "argv": [
+          "deno",
+          "task",
+          "docs:readme-fences"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "09dcfe2e482558b824975abfefacc5ba068c71915bd73f4b8594b8d3aa970a38",
+        "lifecycleId": "quality:quality-readme-fences:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:14.883Z",
+        "startedAt": "2026-09-03T13:47:14.885Z",
+        "finishedAt": "2026-09-03T13:47:25.234Z",
+        "durationMs": 10349,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/readme-fences.json",
+        "stdoutEvidence": {
+          "bytes": 149,
+          "sha256": "fd5d17916c789f454b21a5782da50c25e28d47a942d6038bf7e137c12e90820d"
+        },
+        "stderrEvidence": {
+          "bytes": 137,
+          "sha256": "743033839f278a66c5ff56034321323b6cff30a5ba3227fb41f21616aac81b41"
+        }
+      },
+      {
+        "gateId": "scaffold-versions",
+        "invocationId": "quality-scaffold-versions",
+        "argv": [
+          "deno",
+          "task",
+          "check:scaffold-versions"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "quality",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "1e033911b081e2e09adce92c703b2c6c45916544e88c8536ed72d7d800324f43",
+        "lifecycleId": "quality:quality-scaffold-versions:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:47:57.032Z",
+        "startedAt": "2026-09-03T13:47:57.034Z",
+        "finishedAt": "2026-09-03T13:47:57.138Z",
+        "durationMs": 103,
+        "exitCode": 0,
+        "receiptPath": "receipts/final-main-a2d5b8b75/scaffold-versions.json",
+        "stdoutEvidence": {
+          "bytes": 66,
+          "sha256": "44e0f7fc5305307310501236b845352f09a084aea2df0e716871c79a794570da"
+        },
+        "stderrEvidence": {
+          "bytes": 122,
+          "sha256": "8cb2237934fdf734425e6aa918b6c403421214d047509ece6db34733feb736e9"
+        }
+      },
+      {
+        "gateId": "test",
+        "invocationId": "check-test-test",
+        "argv": [
+          "deno",
+          "task",
+          "test",
+          "--report-output",
+          ".llm/tmp/gate-receipts/check-test/test.report.json"
+        ],
+        "cwd": "/home/runner/work/netscript/netscript",
+        "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+        "timeoutMs": 1800000,
+        "runnerIdentity": "check-test",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "c48f9da839c7e7dfb3da0b794908651f518256393db0a4700f17e42d911a3958",
+        "lifecycleId": "check-test:check-test-test:1",
+        "outcome": "PASS",
+        "claimedAt": "2026-09-03T13:48:34.247Z",
+        "childReport": ".llm/tmp/gate-receipts/check-test/test.report.json",
+        "startedAt": "2026-09-03T13:48:34.250Z",
+        "finishedAt": "2026-09-03T13:57:32.907Z",
+        "durationMs": 538657,
+        "exitCode": 0,
+        "childReportEvidence": {
+          "path": ".llm/tmp/gate-receipts/check-test/test.report.json",
+          "bytes": 259,
+          "sha256": "7b2ff624c753d7144ef9d9747610954c20556202814bc012dee2604b0571d009",
+          "modifiedAt": "2026-09-03T13:57:32.879Z"
+        },
+        "receiptPath": "receipts/final-main-a2d5b8b75/test.receipt.json",
+        "stdoutEvidence": {
+          "bytes": 153,
+          "sha256": "110f0ffe794667d6bc5c9e4b9c0939c5c5c4ea559182950e124573564058b974"
+        },
+        "stderrEvidence": {
+          "bytes": 198,
+          "sha256": "16860496c602244aff843cea181b87beb1f666de19220be801ad3fbf30aa170a"
+        }
+      }
+    ],
+    "scope": "Exact-main pre-cut command receipts: full native files are retained at receiptPath; state embeds unchanged identity/outcome plus output hashes. Published canary and stable workflow gates are separately mandatory, not impossible pre-cut command IDs.",
+    "publishReadinessRef": "receipts/final-readiness-a2d5b8b75.ndjson",
+    "ciWorkflowRunId": 33762836732
   },
   "existingReleaseLease": true,
   "releaseWriters": [],

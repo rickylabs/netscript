@@ -1,5 +1,14 @@
 # Worklog — release 0.0.7
 
+## 2026-09-03 14:03Z — published canary and exact-main qualification
+
+Canary.10 is published; producer33762898477 now awaits pinned production run33763460542 at
+170e33782acf2dfb4bccc3f4e461ae8f5a149f85. README first-run sequence, cleanup and public init
+passed; full scaffold/runtime is active and final quickstart remains. No final acceptance claim.
+Main CI33762836732 at a2d5b8b75 passed5270tests,0failures,14ignored plus browser and quality.
+Native quality:gate also passed.21 exact-head native receipts retained and recomputedSUFFICIENT;
+milestone validatorPASS. No owner decisions or additional source/evaluator work is pending.
+
 ## 2026-09-03 active release wrap-up — latest owner mandate
 
 The latest owner explicitly resumes continuous autonomous execution toward stable0.0.7. Earlier

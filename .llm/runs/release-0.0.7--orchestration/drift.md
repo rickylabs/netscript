@@ -1,5 +1,23 @@
 # Drift — release 0.0.7
 
+## Reconcile pre-cut evidence with the documented release sequence
+
+The historical exactMainEvidence entry targeted ec848e6b and listed stable publication and stable
+production E2E as prerequisites for claiming the release captain. Those post-publication actions
+cannot exist before the cut, and several listed names were not command-catalog gate IDs.
+
+Replaced that stale entry with the actual 21 native pre-cut receipts at a2d5b8b75: current-main
+CI 33762836732 (5,270 tests, zero failures, browser regression and quality green), plus the native
+quality:gate receipt including doctrine/dependency checks. Full, unmodified receipts are retained
+under receipts/final-main-a2d5b8b75; the ledger embeds their identity/outcome fields and output
+hashes with receiptPath pointers. The validator still recomputes sufficiency; no fabricated PASS.
+
+This does not waive publication gates. The canary workflow 33762898477 and exact pinned runtime
+33763460542 remain mandatory before the three acceptance issues close and stable can begin.
+Stable publication and its own artifact-pinned production E2E remain mandatory for completion,
+as required by release-gates.md and netscript-release. They are downstream evidence, not a
+circular pre-cut command requirement. No source or toolchain policy was changed.
+
 ## Active mandate supersedes low-usage pause
 
 Latest owner explicitly resumes continuous stable wrap-up. Earlier pauses are historical.

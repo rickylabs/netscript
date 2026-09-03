@@ -1,0 +1,45 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "quality-fmt",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--output",
+    ".llm/tmp/gate-receipts/quality/fmt.report.json"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "1fe4b0df5b4a0fb0cdf55597622ce36af6d45df31bee06fb0f8279332258a815",
+  "lifecycleId": "quality:quality-fmt:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:45:37.112Z",
+  "childReport": ".llm/tmp/gate-receipts/quality/fmt.report.json",
+  "startedAt": "2026-09-03T13:45:37.114Z",
+  "finishedAt": "2026-09-03T13:45:40.636Z",
+  "durationMs": 3522,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 157,
+    "sha256": "6511de2970824ff6663e94da4728a9239e5326f05eb54a39ea0617b2c306e561",
+    "tail": "{\"report\":\".llm/tmp/gate-receipts/quality/fmt.report.json\",\"summary\":{\"filesSelected\":2135,\"batches\":37,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 317,
+    "sha256": "cd41ebd56f89aab8ae8b786b34cc40c5e40f435df6bf550a7270252162d46da7",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--output' '.llm/tmp/gate-receipts/quality/fmt.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/gate-receipts/quality/fmt.report.json",
+    "bytes": 291,
+    "sha256": "33f44be0b1c66108c007a54d57b6a198b52ff41b60561d287f94ddfbe18c6195",
+    "modifiedAt": "2026-09-03T13:45:40.625Z"
+  }
+}
