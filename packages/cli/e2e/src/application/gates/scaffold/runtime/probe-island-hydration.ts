@@ -8,7 +8,6 @@ const ISLAND_PATH = '/people';
 const LIST_PATH = '/api/rpc/v1/users/list';
 const TIMEOUT_MS = 20_000;
 const BASELINE_CONFIRMATION_MS = 500;
-
 export interface IslandHydrationObservation {
   readonly queryClientFound: boolean;
   readonly freshIslandElement: string | null;
