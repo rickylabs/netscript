@@ -26,6 +26,7 @@ export type AspireCommandRunner = (
   command: readonly string[],
   cwd: string,
   timeoutMs: number,
+  env?: Record<string, string>,
 ) => Promise<AspireCommandResult>;
 
 /** Execute restore, start, and database readiness as one independently reported Quickstart step. */

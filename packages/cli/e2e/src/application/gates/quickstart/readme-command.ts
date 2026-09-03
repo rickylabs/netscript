@@ -7,7 +7,7 @@ import {
   substituteReadmeQuickstartCommand,
 } from '../../../domain/readme-quickstart.ts';
 import { resolveResourceUrlsFromAppHost } from '../scaffold/generated-app-endpoint.ts';
-import { runAspireCommand } from './aspire-walk.ts';
+import { type AspireCommandRunner, runAspireCommand } from './aspire-walk.ts';
 
 const JSR_CLI_PREFIX = 'jsr:@netscript/cli@';
 const SERVICE_RESOURCE = 'users';
@@ -51,6 +51,7 @@ export async function executeReadmeQuickstartCommand(
   cliSpecifier: string,
   statePath: string,
   timeoutMs: number,
+  spawn: AspireCommandRunner = runAspireCommand,
 ): Promise<number> {
   const readme = await Deno.readTextFile(resolve(repoRoot, 'README.md'));
   const commands = parseReadmeQuickstartCommands(readme);
@@ -85,7 +86,7 @@ export async function executeReadmeQuickstartCommand(
   const started = performance.now();
   const result = argv[0] === 'cd'
     ? await changeDirectory(argv, state.cwd, entry.line)
-    : await runCommand(argv, state.cwd, timeoutMs);
+    : await runCommand(argv, state.cwd, timeoutMs, spawn);
   const durationMs = Math.round(performance.now() - started);
   let nextState: ReadmeWalkState = state;
   if (result.code === 0 && !result.timedOut) {
@@ -145,9 +146,10 @@ async function runCommand(
   argv: readonly string[],
   cwd: string,
   timeoutMs: number,
+  spawn: AspireCommandRunner,
 ): Promise<{ code: number; stdout: string; stderr: string; timedOut: boolean }> {
   try {
-    return await runAspireCommand(argv, cwd, timeoutMs);
+    return await spawn(argv, cwd, timeoutMs);
   } catch (error) {
     return {
       code: 1,
