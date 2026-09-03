@@ -16,7 +16,7 @@ import {
 } from './runtime/runtime-scripts.ts';
 import { listenerReadinessExpectation } from './runtime/listener-readiness-gates.ts';
 
-/** A feed stall gets three short chances instead of consuming two suite-wide 15-minute budgets. */
+/** Infrastructure test-failure ceiling per restore attempt; not an expected restore duration. */
 export const ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000;
 export const ASPIRE_RESTORE_MAX_RETRIES = 2;
 
@@ -56,6 +56,7 @@ function runtimeAppWaitGate(): GateDefinition {
   );
 }
 
+/** Failure ceiling supplied to the event follower, never an Aspire polling cadence. */
 function runtimeConvergenceTimeoutSeconds(database: DatabaseEngine): number {
   const timeoutSeconds = runtimeResources(database).reduce((maximum, resource) => {
     const expectation = listenerReadinessExpectation(resource);
@@ -183,6 +184,7 @@ export function createRuntimeGates(
         context.project.appHost,
         context.project.projectRoot,
         'first',
+        databaseAllocationResource(database),
       ],
     ),
     commandGate(
@@ -213,6 +215,7 @@ export function createRuntimeGates(
         context.project.appHost,
         context.project.projectRoot,
         'second',
+        databaseAllocationResource(database),
       ],
     ),
     commandGate(
@@ -263,6 +266,12 @@ function databaseRuntimeResources(
     case DATABASE.SQLITE:
       return [];
   }
+}
+
+function databaseAllocationResource(database: DatabaseEngine): AspireResource {
+  const resource = databaseRuntimeResources(database)[0];
+  if (!resource) throw new Error(`database endpoint allocation is not applicable to ${database}`);
+  return resource;
 }
 
 /** Create cleanup gates that stop generated runtime resources. */
