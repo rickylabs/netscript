@@ -1,6 +1,6 @@
 import { dirname, relative, resolve } from '@std/path';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
-const PREREQUISITE = 'netscript service add --name <service> --with-client';
+import { type ClientBinding, selectClientBinding } from '../resource-slice/client-selector.ts';
 export type UiGeneratedFileRole = 'page' | 'query-loader' | 'island' | 'route-registration';
 export type UiGeneratedFile = Readonly<{
   path: string;
@@ -22,8 +22,6 @@ export interface UiIslandScaffoldInput extends WriteOptions {
   readonly query?: boolean;
   readonly client?: string;
 }
-type Binding = Readonly<{ path: string; queries: string; input: string }>;
-type BindingCandidate = Readonly<{ path: string; source: string; service: string | undefined }>;
 export async function scaffoldUiPage(
   input: UiPageScaffoldInput,
   fs: FileSystemPort,
@@ -32,7 +30,9 @@ export async function scaffoldUiPage(
   const routeId = cleanRouteId(input.route ?? segment.replaceAll('/', '.'));
   const dir = resolve(input.projectRoot, 'routes', segment);
   const name = pascalCase(segment.split('/').at(-1) ?? 'Page');
-  const binding = input.island ? await findBinding(input.projectRoot, fs, input.client) : undefined;
+  const binding = input.island
+    ? await selectClientBinding(input.projectRoot, fs, input.client)
+    : undefined;
   const files: UiGeneratedFile[] = [{
     path: resolve(dir, 'index.tsx'),
     content: pageTemplate(name, routeId, Boolean(binding)),
@@ -59,7 +59,9 @@ export async function scaffoldUiIsland(
   fs: FileSystemPort,
 ): Promise<UiScaffoldResult> {
   const name = pascalCase(input.name);
-  const binding = input.query ? await findBinding(input.projectRoot, fs, input.client) : undefined;
+  const binding = input.query
+    ? await selectClientBinding(input.projectRoot, fs, input.client)
+    : undefined;
   const path = resolve(input.projectRoot, 'routes', '(_islands)', `${name}.tsx`);
   const content = binding ? queryIslandTemplate(binding, path, name) : signalTemplate(name);
   const files: UiGeneratedFile[] = [{ path, content, role: 'island' }];
@@ -83,108 +85,6 @@ async function applyPlan(
     await fs.createDir(dirname(file.path));
     await fs.writeFile(file.path, file.content);
   }
-}
-async function findBinding(root: string, fs: FileSystemPort, client?: string): Promise<Binding> {
-  const candidates: string[] = [];
-  const lib = resolve(root, 'lib');
-  if (await fs.exists(lib)) {
-    for (const entry of await fs.readDir(lib)) {
-      const path = resolve(lib, entry.name);
-      if (
-        entry.isFile && entry.name.endsWith('.ts') &&
-        (await fs.readFile(path)).includes('createQueryFactories(')
-      ) candidates.push(path);
-    }
-  }
-  const examples = resolve(root, 'routes', 'examples');
-  if (!candidates.length && await fs.exists(examples)) {
-    for (const entry of await fs.readDir(examples)) {
-      if (!entry.isDirectory) continue;
-      const fallback = resolve(examples, entry.name, '(_lib)', 'service-query.ts');
-      if (await fs.exists(fallback)) candidates.push(fallback);
-    }
-  }
-  let path: string;
-  let source: string;
-  if (client !== undefined) {
-    const identified = await identifyCandidates(candidates, fs);
-    const matches = identified.filter((candidate) => candidate.service === client);
-    if (!matches.length) {
-      bindingError(
-        `selected client '${client}' matches no query client`,
-        candidates,
-        selectionRemedy(identified),
-      );
-    }
-    if (matches.length > 1) {
-      bindingError(
-        `selected client '${client}' matches more than one query client`,
-        matches.map((candidate) => candidate.path),
-        ` More than one candidate declares service '${client}'.`,
-      );
-    }
-    path = matches[0].path;
-    source = matches[0].source;
-  } else if (candidates.length !== 1) {
-    const remedy = candidates.length > 1
-      ? selectionRemedy(await identifyCandidates(candidates, fs))
-      : '';
-    bindingError(
-      candidates.length ? 'multiple query clients are ambiguous' : 'no query client found',
-      candidates,
-      remedy,
-    );
-  } else {
-    path = candidates[0];
-    source = await fs.readFile(path);
-  }
-  const service = serviceIdentity(source);
-  const queries = source.match(
-    /export const (\w+Queries)\s*=\s*createQueryFactories\(/,
-  )?.[1];
-  if (!service || !queries) {
-    bindingError('unsupported query client', candidates);
-  }
-  const contracts = resolve(root, '..', '..', 'contracts', 'versions', 'v1');
-  const contractPath = resolve(contracts, `${service}.contract.ts`);
-  if (!await fs.exists(contractPath)) {
-    bindingError(`missing contract ${contractPath}`, candidates);
-  }
-  const contract = await fs.readFile(contractPath);
-  const input = contract.includes('createCrudContract(')
-    ? `{ limit: 20, page: 1, sortBy: 'id', sortOrder: 'asc' } as const`
-    : /ListInputSchemaV1[\s\S]*offset\s*:/.test(contract)
-    ? `{ limit: 20, offset: 0 } as const`
-    : undefined;
-  if (!input) {
-    bindingError(`unsupported list contract ${contractPath}`, candidates);
-  }
-  return { path, queries, input };
-}
-async function identifyCandidates(
-  paths: readonly string[],
-  fs: FileSystemPort,
-): Promise<readonly BindingCandidate[]> {
-  return await Promise.all(paths.map(async (path) => {
-    const source = await fs.readFile(path);
-    return { path, source, service: serviceIdentity(source) };
-  }));
-}
-function serviceIdentity(source: string): string | undefined {
-  return source.match(/export const \w+Name\s*=\s*['"]([^'"]+)['"]/i)?.[1];
-}
-function selectionRemedy(candidates: readonly BindingCandidate[]): string {
-  const services = [
-    ...new Set(candidates.flatMap((candidate) => candidate.service ? [candidate.service] : [])),
-  ].sort();
-  const available = services.length ? services.join(', ') : '(none recognized)';
-  return ` Available services: ${available}. Use --client <service> to select one.`;
-}
-function bindingError(reason: string, candidates: readonly string[], remedy = ''): never {
-  const detail = candidates.length ? ` Candidates: ${candidates.join(', ')}.` : '';
-  throw new Error(
-    `Cannot scaffold a data-bound island: ${reason}.${detail}${remedy} Exactly one conventional generated client is required. Prerequisite: ${PREREQUISITE}.`,
-  );
 }
 async function routeRegistration(
   root: string,
@@ -236,7 +136,7 @@ function pageTemplate(
     : `.withLayer('${camel}', () => <main><h1>${name}</h1></main>, () => ({}))`;
   return `import { appRoutes } from '@app/router.ts';\nimport { definePage } from '@app/utils.ts';\n${imports}\nexport const ${camel}Page = definePage()\n  .withRoute(appRoutes['${routeId}'])\n  .withMeta(() => ({ title: '${name}' }))\n  ${layer}\n  .withLayout((slots) => slots.${camel}())\n  .build();\n\nexport const { default: page } = ${camel}Page;\nexport { page as default };\n`;
 }
-function loaderTemplate(binding: Binding, path: string, name: string): string {
+function loaderTemplate(binding: ClientBinding, path: string, name: string): string {
   const query = binding.queries;
   const input = `${camelCase(name)}ListInput`;
   return `import { createNetScriptQueryClient } from '@netscript/sdk/query-client';\nimport { ${query} } from '${
@@ -244,7 +144,7 @@ function loaderTemplate(binding: Binding, path: string, name: string): string {
   }';\n\nexport const ${input} = ${binding.input};\n\nexport async function load${name}Data() {\n  const input = ${input};\n  const queryClient = createNetScriptQueryClient();\n  const queryOptions = ${query}.list.queryOptions(input);\n  const cachedAt = Date.now();\n  const initialData = await queryClient.fetchQuery({\n    queryKey: queryOptions.queryKey,\n    queryFn: queryOptions.queryFn,\n  });\n  return { input, initialData, cachedAt };\n}\n`;
 }
 function dataIslandTemplate(
-  binding: Binding,
+  binding: ClientBinding,
   dir: string,
   name: string,
 ): string {
@@ -256,7 +156,7 @@ function dataIslandTemplate(
   return `import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${module}';\nimport { load${name}Data } from '../(_shared)/query-loaders.ts';\n\ntype Props = NonNullable<InferDefinePageLayerLoaderProps<typeof load${name}Data>>;\n\nfunction ${name}Data(props: Props) {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(props.input),\n    queryKey: ${query}.list.clientKey(props.input),\n    initialData: props.initialData,\n    initialDataUpdatedAt: props.cachedAt,\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}Island(props: Props) {\n  return (\n    <QueryIsland>\n      <${name}Data {...props} />\n    </QueryIsland>\n  );\n}\n`;
 }
 function queryIslandTemplate(
-  binding: Binding,
+  binding: ClientBinding,
   path: string,
   name: string,
 ): string {
