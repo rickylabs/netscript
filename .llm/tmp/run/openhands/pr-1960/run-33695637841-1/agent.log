@@ -1,0 +1,400 @@
+repository owner._
++44|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Post verdict PR comment
+
+$ gh pr comment 1960 --repo rickylabs/netscript --body-file 
+/tmp/verdict-comment.md
+
+Tokens: ↑ input 34.29K (total 5.55M) • cache hit 96.50% (total 93.51%) •  
+reasoning 0 (total 51.99K) • ↓ output 44 (total 83.63K) • $ (total 0.1258)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+https://github.com/rickylabs/netscript/pull/1960#issuecomment-5518347345
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "str_replace", "new_str": "OPENHANDS_VERDICT: 
+FAIL_FIX\n\n**IMPL-EVAL \u2014 PR #1960 \u00b7 head 
+`1edd0062a5986551031db2405383fe60ecd3a9c6` \u00b7 trusted base `f589d251a` (true
+merge-base `8c549c061`)**\n\nSeparate evaluator session", "old_str": 
+"**IMPL-EVAL \u2014 PR #1960 \u00b7 head 
+`1edd0062a5986551031db2405383fe60ecd3a9c6` \u00b7 trusted base `f589d251a` (true
+merge-base `8c549c061`)**\n\nSeparate evaluator session", "path": 
+"/tmp/verdict-comment.md"}
+
+Reasoning:
+Verdict comment posted: 
+https://github.com/rickylabs/netscript/pull/1960#issuecomment-5518347345
+
+Final checks:
+1. Verify the comment's first line — first line is "**IMPL-EVAL — PR #1960 · 
+head …**", then "OPENHANDS_VERDICT: FAIL_FIX" as the second line. Wait — the 
+trigger said: "emit exactly one line of the form OPENHANDS_VERDICT: ... as the 
+FIRST line of the verdict comment". I put a title line first, verdict second! 
+Let me re-read the trigger:
+
+"emit exactly one line of the form OPENHANDS_VERDICT: PASS (one token from 
+PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN, alone on its own line, outside 
+code fences, with NO bold/backtick/prefix decoration) in BOTH your summary file 
+and your verdict comment — as the FIRST line of the verdict comment."
+
+"as the FIRST line of the verdict comment" — hmm. My comment has a bold title 
+line first and the verdict on line 3 (after a blank line). This may fail a 
+strict parser that checks line 1 == "OPENHANDS_VERDICT: FAIL_FIX".
+
+But hmm — the harness in user_context said "emit exactly ONE stable verdict as a
+PR comment" and "Verdict emission is the FINAL step — emit NOTHING after". The 
+strict "FIRST line" requirement: a machine parser might read the first line 
+only, or might scan for the regex. The task trigger explicitly says FIRST line. 
+I should fix this — edit the comment so the very first line is 
+`OPENHANDS_VERDICT: FAIL_FIX`.
+
+Also: "with NO bold/backtick/prefix decoration" — the verdict line itself is 
+plain, good.
+
+But there's tension with harness rule 7: "Do NOT imitate the workflow's own 
+status comment" — fine.
+
+The GitHub API allows updating a comment: `gh api -X PATCH 
+repos/rickylabs/netscript/issues/comments/<id> -f body=...`. The comment ID is 
+5518347345. But careful: if the parser has ALREADY read the comment (the 
+workflow might poll for it), editing could race. The workflow presumably waits 
+for the run to end and then reads the latest verdict comment from the agent. 
+Editing within the same run should be fine and is safer than leaving a 
+non-conforming first line.
+
+Actually, wait. Let me think about what "verdict comment" means to the parser. 
+The output_mode=pr-comment workflow typically collects the agent's LAST comment 
+(or all comments by the agent actor) and extracts OPENHANDS_VERDICT via regex. 
+If it takes the last comment and regex-scans, my current comment passes (token 
+present, alone on its own line, no decoration). The "FIRST line" clause is 
+likely aimed at: don't bury the verdict at the bottom after prose, and don't put
+it inside fences. My placement on line 3 top-of-body is close but not literally 
+first.
+
+To be safe and literally compliant, edit the comment to put `OPENHANDS_VERDICT: 
+FAIL_FIX` as line 1. The title line then becomes line 2+. That satisfies both 
+readings (first line literal + regex scan).
+
+Risk of edit: minimal. The comment is mine; updating body doesn't change comment
+ID or timestamp ordering (updated_at changes).
+
+Let me edit /tmp/verdict-comment.md — move the verdict line to the very top — 
+and PATCH the comment.
+
+Also check: no '## OpenHands Agent —' heading — correct, mine says '## Plan / 
+process' etc. No '<!-- openhands-' marker — correct.
+
+One more trigger clause: "as the FIRST line of the verdict comment" — also 
+applies to summary? "in BOTH your summary file and your verdict comment — as the
+FIRST line of the verdict comment". Grammar: "as the FIRST line" attaches to the
+verdict comment. My summary has it at the end — acceptable per grammar. But hmm,
+to be extra safe, should the summary also start with it? The summary file clause
+reads "...in BOTH your summary file and your verdict comment" with the placement
+qualifier only for the comment. The workflow's summary extraction likely 
+regex-scans the file. Leave summary as-is (verdict at end is conventional for 
+summaries). Actually — risk assessment: if the supervisor's parser checks 
+summary.md's first line... the trigger text would have said "as the first line 
+of both". It says "as the FIRST line of the verdict comment". Keep summary 
+as-is.
+
+Now PATCH the PR comment.
+
+Thought:
+Verdict comment posted. One compliance detail: the trigger requires the verdict 
+token as the **first line** of the verdict comment — mine currently has a title 
+line above it. Fixing by editing the comment to lead with the bare token:
+
+Action: FileEditorAction
+
+Arguments:
+  command: "str_replace"
+  path: "/tmp/verdict-comment.md"
+  old_str: 
+    **IMPL-EVAL — PR #1960 · head `1edd0062a5986551031db2405383fe60ecd3a9c6` · 
+trusted base `f589d251a` (true merge-base `8c549c061`)**
+    
+    Separate evaluator session
+
+  new_str: 
+    OPENHANDS_VERDICT: FAIL_FIX
+    
+    **IMPL-EVAL — PR #1960 · head `1edd0062a5986551031db2405383fe60ecd3a9c6` · 
+trusted base `f589d251a` (true merge-base `8c549c061`)**
+    
+    Separate evaluator session
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 34.42K (total 5.58M) • cache hit 99.47% (total 93.55%) •  
+reasoning 959 (total 52.95K) • ↓ output 1.19K (total 84.83K) • $ (total 0.1266)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+❌ [An error occurred during execution.]
+[An error occurred during execution.]
+No replacement was performed, old_str `**IMPL-EVAL — PR #1960 · head 
+`1edd0062a5986551031db2405383fe60ecd3a9c6` · trusted base `f589d251a` (true 
+merge-base `8c549c061`)**
+
+Separate evaluator session` did not appear verbatim in /tmp/verdict-comment.md.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Inspect exact file bytes of first lines
+
+$ head -5 /tmp/verdict-comment.md; echo ---; awk 'BEGIN{ORS="\\n"} {print}' 
+/tmp/verdict-comment.md | head -c 400
+
+Tokens: ↑ input 34.76K (total 5.62M) • cache hit 98.87% (total 93.58%) •  
+reasoning 0 (total 52.95K) • ↓ output 61 (total 84.89K) • $ (total 0.1271)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+**IMPL-EVAL — PR #1960 · head `1edd0062a5986551031db2405383fe60ecd3a9c6` · 
+trusted base `f589d251a` (true merge-base `8c549c061`)**
+
+Separate evaluator session (OpenHands, open model 
+`openrouter/z-ai/glm-5.3-flash`; the generator is Codex Sol and did not 
+self-certify). OpenHands does not expose reasoning-effort attestation, so none 
+is claimed. Protocol and verdict vocabulary read at base (`netscript-harness`, 
+`.llm/harness/evaluator/{protocol,verdict-definitions}.md`); evaluation 
+performed at the immutable head. Full record: 
+`.llm/runs/fix-form-control-props-zod4--0.0.7/evaluate.md` (pushed to this 
+branch as `1a0ae8f28`).
+
+OPENHANDS_VERDICT: FAIL_FIX
+---
+**IMPL-EVAL — PR #1960 · head `1edd0062a5986551031db2405383fe60ecd3a9c6` · 
+trusted base `f589d251a` (true merge-base `8c549c061`)**\n\nSeparate evaluator 
+session (OpenHands, open model `openrouter/z-ai/glm-5.3-flash`; the generator is
+Codex Sol and did not self-certify). OpenHands does not expose reasoning-effort 
+attestation, so none is claimed. Protocol and verdict vocabulary read at base 
+(`n
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Move verdict token to first line
+
+$ cd /tmp && python3 - <<'EOF'
+lines = open('verdict-comment.md').read().split('\n')
+token = 'OPENHANDS_VERDICT: FAIL_FIX'
+idx = lines.index(token)
+lines.insert(0, lines.pop(idx))
+open('verdict-comment.md', 'w').write('\n'.join(lines))
+EOF
+head -3 /tmp/verdict-comment.md
+
+Tokens: ↑ input 35.23K (total 5.65M) • cache hit 98.64% (total 93.61%) •  
+reasoning 0 (total 52.95K) • ↓ output 104 (total 84.99K) • $ (total 0.1277)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+❌ [An error occurred during execution.]
+Cannot execute multiple commands at once.
+Please run each command separately OR chain them into a single command via && or
+;
+Provided commands:
+(1) cd /tmp && python3 - <<'EOF'
+lines = open('verdict-comment.md').read().split('\n')
+token = 'OPENHANDS_VERDICT: FAIL_FIX'
+idx = lines.index(token)
+lines.insert(0, lines.pop(idx))
+open('verdict-comment.md', 'w').write('\n'.join(lines))
+EOF
+(2) head -3 /tmp/verdict-comment.md
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Move verdict token to first line
+
+$ python3 -c "
+lines = open('/tmp/verdict-comment.md').read().split('\n')
+idx = lines.index('OPENHANDS_VERDICT: FAIL_FIX')
+lines.insert(0, lines.pop(idx))
+open('/tmp/verdict-comment.md', 'w').write('\n'.join(lines))
+" && head -2 /tmp/verdict-comment.md
+
+Tokens: ↑ input 35.46K (total 5.69M) • cache hit 99.26% (total 93.65%) •  
+reasoning 0 (total 52.95K) • ↓ output 98 (total 85.09K) • $ (total 0.1283)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+OPENHANDS_VERDICT: FAIL_FIX
+**IMPL-EVAL — PR #1960 · head `1edd0062a5986551031db2405383fe60ecd3a9c6` · 
+trusted base `f589d251a` (true merge-base `8c549c061`)**
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Update comment so verdict is first line
+
+$ COMMENT_ID=5518347345; gh api -X PATCH 
+repos/rickylabs/netscript/issues/comments/$COMMENT_ID -F body="$(cat 
+/tmp/verdict-comment.md)" --jq '.id' && sed -n '1,12p' /tmp/verdict-comment.md
+
+Tokens: ↑ input 35.7K (total 5.73M) • cache hit 99.32% (total 93.68%) •  
+reasoning 0 (total 52.95K) • ↓ output 86 (total 85.18K) • $ (total 0.1289)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+5518347345
+OPENHANDS_VERDICT: FAIL_FIX
+**IMPL-EVAL — PR #1960 · head `1edd0062a5986551031db2405383fe60ecd3a9c6` · 
+trusted base `f589d251a` (true merge-base `8c549c061`)**
+
+Separate evaluator session (OpenHands, open model 
+`openrouter/z-ai/glm-5.3-flash`; the generator is Codex Sol and did not 
+self-certify). OpenHands does not expose reasoning-effort attestation, so none 
+is claimed. Protocol and verdict vocabulary read at base (`netscript-harness`, 
+`.llm/harness/evaluator/{protocol,verdict-definitions}.md`); evaluation 
+performed at the immutable head. Full record: 
+`.llm/runs/fix-form-control-props-zod4--0.0.7/evaluate.md` (pushed to this 
+branch as `1a0ae8f28`).
+
+
+## Plan / process
+
+- Approved plan present and followed: 
+`.llm/runs/fix-form-control-props-zod4--0.0.7/plan.md` — locked decisions D1–D5 
+and the validation plan are implemented as written; 7 commits 
+`93c5fa5a5…1edd0062a` match slices 0–3 including both RED→GREEN probe pairs.
+- `PLAN-EVAL: N/A` recorded (worklog line 59) with justification — issue #1249 +
+implement brief fully specified the contract; no unresolved architecture 
+decision. Valid under protocol.
+- Design checkpoint present (worklog `## Design`); implement brief carries its 
+`## SKILL` chapter; drift log populated (3 minor, accepted/deferred entries).
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final compliance check of summary and worktree
+
+$ head -2 /home/runner/work/_temp/openhands/33695637841-1/summary.md; tail -1 
+/home/runner/work/_temp/openhands/33695637841-1/summary.md; git status 
+--porcelain; rm -f /tmp/verdict-comment.md
+
+Tokens: ↑ input 36.23K (total 5.76M) • cache hit 98.39% (total 93.71%) •  
+reasoning 0 (total 52.95K) • ↓ output 91 (total 85.27K) • $ (total 0.1295)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# IMPL-EVAL Summary — PR #1960 (fix/form-control-props-zod4)
+
+OPENHANDS_VERDICT: FAIL_FIX
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "plan", "task_list": [{"title": 
+"IMPL-EVAL-1960: investigation/verification", "status": "done", "notes": "Scope,
+diff-vs-plan, corpus attribution (base PASS / main PASS / tip FAIL), close-gate 
+root cause, protocol + verdict definitions, evaluator-run gates (S1/S2/form 
+suite/doc lint/lock/debt) all verified."}, {"title": "IMPL-EVAL-1960: emit 
+single verdict PR comment", "status": "done", "notes": "Comment 5518347345 
+posted and edited so 'OPENHANDS_VERDICT: FAIL_FIX' is the first line. 
+evaluate.md committed (1a0ae8f28) and fast-forward pushed to 
+fix/form-control-props-zod4. Summary written to OPENHANDS_SUMMARY_PATH with 
+verdict as last line."}]}
+
+📋 Update Task List (2 tasks)
+
+Tokens: ↑ input 36.42K (total 5.8M) • cache hit 99.47% (total 93.75%) •  
+reasoning 0 (total 52.95K) • ↓ output 194 (total 85.46K) • $ (total 0.1301)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 2 done
+
+✅ 1. IMPL-EVAL-1960: investigation/verification
+   Notes: Scope, diff-vs-plan, corpus attribution (base PASS / main PASS / tip 
+FAIL), close-gate root cause, protocol + verdict definitions, evaluator-run 
+gates (S1/S2/form suite/doc lint/lock/debt) all verified.
+✅ 2. IMPL-EVAL-1960: emit single verdict PR comment
+   Notes: Comment 5518347345 posted and edited so 'OPENHANDS_VERDICT: FAIL_FIX' 
+is the first line. evaluate.md committed (1a0ae8f28) and fast-forward pushed to 
+fix/form-control-props-zod4. Summary written to OPENHANDS_SUMMARY_PATH with 
+verdict as last line.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL complete: FAIL_FIX verdict posted and pushed
+
+Finish with message:
+Formal IMPL-EVAL session for PR #1960 (fix/form-control-props-zod4, head 
+1edd0062a, trusted base f589d251a / true merge-base 8c549c061) is complete. 
+Evaluation was read-only on source; no files were edited, no findings repaired.
+
+**Verdict: OPENHANDS_VERDICT: FAIL_FIX** — the approved plan 
+(`.llm/runs/fix-form-control-props-zod4--0.0.7/plan.md`, locked decisions D1–D5)
+is valid and fully implemented with `PLAN-EVAL: N/A` properly justified, but the
+required CI gate `mcp-export-corpus` fails at the evaluated head.
+
+Key evidence (all evaluator-run at head):
+- S1 consumer TSX probe exit 0; S2 schema-adapter 18/18 (five-field Zod 4 map + 
+exclusive-bound omission); full form suite 62/62; form doc lint exit 0; 
+deno.lock byte-identical to base; arch-debt delta none.
+- Decisive attribution matrix: corpus gate PASSES at merge-base 8c549c061 and at
+main-side ba6f1f49a, FAILS only at PR tip — staleness is PR-attributable. The PR
+widens the packages/fresh public doc surface (ControlProps.role → 138-literal 
+ARIA union; new getConstraints() behavior), changing deno doc signatures the 
+pinned corpus embeds (426332 B committed vs 426336 B regenerated). Required 
+action: `deno task gen:mcp-export-corpus`, commit the regenerated file, re-run 
+CI, then tick the final PR-body DoD box (the sole close-gate failure) citing the
+evaluation.
+
+Deliverables:
+- Verdict PR comment: 
+https://github.com/rickylabs/netscript/pull/1960#issuecomment-5518347345 — 
+`OPENHANDS_VERDICT: FAIL_FIX` as the first line, AI-disclosure footer included.
+- Evaluator record `.llm/runs/fix-form-control-props-zod4--0.0.7/evaluate.md` 
+committed (1a0ae8f28) and fast-forward pushed to `fix/form-control-props-zod4` 
+(remote tip was exactly the evaluated head; no force push, no source churn).
+- Run summary written to 
+/home/runner/work/_temp/openhands/33695637841-1/summary.md with 
+Summary/Changes/Validation/Responses/Remaining risks and the verdict line; 
+scratch probe deleted; worktree clean; deno.lock untouched.
+
+Tokens: ↑ input 36.63K (total 5.83M) • cache hit 99.42% (total 93.78%) •  
+reasoning 0 (total 52.95K) • ↓ output 593 (total 86.05K) • $ (total 0.1308)
+
