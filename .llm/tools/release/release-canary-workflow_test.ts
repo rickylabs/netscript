@@ -497,3 +497,25 @@ Deno.test('production README E2E uploads both durable cleanup receipts', async (
     '.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json',
   );
 });
+
+Deno.test('production README is the first runtime on a cold, uncached runner', async () => {
+  const source = await Deno.readTextFile(new URL('.github/workflows/e2e-cli-prod.yml', root));
+  const readme = source.indexOf('- name: Root README Quickstart E2E');
+  assert(readme > 0);
+  const before = source.slice(0, readme);
+  assertEquals(before.includes('actions/cache@'), false, 'README must not inherit an Aspire cache');
+  assertEquals(
+    before.includes('deno task e2e:cli run'),
+    false,
+    'no runtime suite may warm the runner',
+  );
+  assertEquals(before.includes('- name: Install published CLI from JSR'), false);
+  assertEquals(before.includes('- name: Public init smoke from JSR CLI'), false);
+  assertStringIncludes(before, '- name: Verify cold README baseline');
+  assertStringIncludes(before, 'all(.[]; . == 0)');
+  for (const field of ['appHosts', 'containers', 'images', 'volumes', 'networks']) {
+    assertStringIncludes(before, `--argjson ${field} `);
+  }
+  const upload = source.slice(source.indexOf('- name: Upload production E2E artifacts'));
+  assertStringIncludes(upload, '.llm/tmp/readme-cold-baseline.json');
+});

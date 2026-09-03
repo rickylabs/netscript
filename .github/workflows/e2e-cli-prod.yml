@@ -39,12 +39,6 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Restore pinned Aspire NuGet package cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
-
       - name: Install Aspire CLI
         run: |
           dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
@@ -90,16 +84,47 @@ jobs:
           echo "sleeping 120s so just-published @netscript/cli@${{ steps.version.outputs.version }} and deps become resolvable on JSR before install."
           sleep 120
 
+      - name: Install workspace dependencies
+        id: install_workspace_dependencies
+        run: deno install
+
+      # The README owns the first application/runtime on this fresh hosted VM.
+      # Do not restore an AppHost cache or run another scaffold before this gate.
+      - name: Verify cold README baseline
+        run: |
+          set -euo pipefail
+          mkdir -p .llm/tmp
+          readme_apphosts="$(aspire ps --format Json | jq 'length')"
+          readme_containers="$(docker ps -aq | wc -l)"
+          readme_images="$(docker image ls -q | wc -l)"
+          readme_volumes="$(docker volume ls -q | wc -l)"
+          readme_networks="$(docker network ls --filter type=custom -q | wc -l)"
+          jq -n \
+            --argjson appHosts "$readme_apphosts" \
+            --argjson containers "$readme_containers" \
+            --argjson images "$readme_images" \
+            --argjson volumes "$readme_volumes" \
+            --argjson networks "$readme_networks" \
+            '{appHosts: $appHosts, containers: $containers, images: $images, volumes: $volumes, networks: $networks}' \
+            > .llm/tmp/readme-cold-baseline.json
+          jq -e 'all(.[]; . == 0)' .llm/tmp/readme-cold-baseline.json
+          test ! -e .llm/tmp/cli-e2e/my-app
+
+      - name: Root README Quickstart E2E (published CLI, verbatim)
+        run: |
+          deno task e2e:cli run readme.quickstart \
+            --source jsr \
+            --cli "jsr:@netscript/cli@${{ steps.version.outputs.version }}" \
+            --cleanup \
+            --report .llm/tmp/readme-quickstart-prod-report.json \
+            --log-file .llm/tmp/readme-quickstart-prod.ndjson
+
       - name: Install published CLI from JSR
         id: install_published_cli
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
           deno install -g -A --minimum-dependency-age=0 -n netscript "jsr:@netscript/cli@${{ steps.version.outputs.version }}"
           netscript --help
-
-      - name: Install workspace dependencies
-        id: install_workspace_dependencies
-        run: deno install
 
       - name: Public init smoke from JSR CLI
         run: |
@@ -134,16 +159,6 @@ jobs:
             --report .llm/tmp/quickstart-walk-prod-report.json \
             --log-file .llm/tmp/quickstart-walk-prod.ndjson
 
-      - name: Root README Quickstart E2E (published CLI, verbatim)
-        if: ${{ always() && steps.install_published_cli.outcome == 'success' && steps.install_workspace_dependencies.outcome == 'success' }}
-        run: |
-          deno task e2e:cli run readme.quickstart \
-            --source jsr \
-            --cli "jsr:@netscript/cli@${{ steps.version.outputs.version }}" \
-            --cleanup \
-            --report .llm/tmp/readme-quickstart-prod-report.json \
-            --log-file .llm/tmp/readme-quickstart-prod.ndjson
-
       - name: Report production E2E failure
         if: failure()
         run: |
@@ -173,6 +188,7 @@ jobs:
             .llm/tmp/quickstart-walk-prod.ndjson
             .llm/tmp/readme-quickstart-prod-report.json
             .llm/tmp/readme-quickstart-prod.ndjson
+            .llm/tmp/readme-cold-baseline.json
             .llm/tmp/readme-quickstart/state.json
             .llm/tmp/readme-quickstart/receipts/*.json
             .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json
