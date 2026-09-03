@@ -65,6 +65,9 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-09-03T03:12:00Z | bootstrap | research/design | Re-baselined live issue #1977 and branch against exact `origin/main` `4afbd82a7`; locked plan. |
+| 2026-09-03T03:15:35Z | S1 | RED | Durable `test` receipt failed as expected: 0 passed, 1 failed; the sole failure is `docker inspect 7ab8913455fa failed (1): Error: No such object: 7ab8913455fa`. |
+| 2026-09-03T03:16:00Z | S1 | slice review | Diff is limited to the internal runner seam and desired semantic regression. No classification, receipt, wait, timeout, or budget behavior is changed in S1. |
+| 2026-09-03T03:16:00Z | S1 | reconcile | Issue #1977 and draft PR #1979 are open at `status:impl`, milestone `0.0.7`, with the requested taxonomy. No new comments or scope readjustments. |
 
 ## Decisions
 
@@ -87,12 +90,14 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | scoped check/lint/fmt | structured wrappers | NOT_RUN | S3 |
+| S1 RED | `run-gate.ts --gate test -- .../evidence/cleanup_test.ts` | FAIL_EXPECTED | Receipt exit 1, 0/1 pass/fail. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-10/F-19 | NOT_RUN | focused tests and wrappers planned | S1–S3 |
+| A14 RED regression | PASS | `receipts/s1-red.json` | Receipt SHA-256 `f8e2d160...`; pre-fix file hashes `cleanup.ts` `b861a185...`, `cleanup_test.ts` `4f8ec1aa...`. Receipt correctly records the bootstrap HEAD and does not claim worktree cleanliness. |
 | Archetype 6 structure | PASS | manual pre-change review | No public/composition/generated-output change planned. |
 
 ### Runtime Gates

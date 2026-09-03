@@ -230,12 +230,14 @@ export async function stopAndProbe(
 }
 
 /** Inspect every container currently known to Docker, so each probe sees the present state. */
-async function inspectAllContainers(): Promise<unknown[]> {
-  const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
+export async function inspectAllContainers(
+  run: typeof capture = capture,
+): Promise<unknown[]> {
+  const idsOutput = await requireSuccess('docker', ['ps', '-aq'], run);
   const ids = idsOutput.stdout.split(/\s+/).filter(Boolean);
   const containers: unknown[] = [];
   for (const id of ids) {
-    const inspection = await requireSuccess('docker', ['inspect', id]);
+    const inspection = await requireSuccess('docker', ['inspect', id], run);
     const parsed: unknown = JSON.parse(inspection.stdout);
     if (!Array.isArray(parsed)) throw new Error(`docker inspect ${id} did not return an array`);
     containers.push(...parsed);
@@ -272,8 +274,12 @@ async function capture(
   return result;
 }
 
-async function requireSuccess(command: string, args: readonly string[]) {
-  const result = await capture(command, args);
+async function requireSuccess(
+  command: string,
+  args: readonly string[],
+  run: typeof capture = capture,
+) {
+  const result = await run(command, args);
   if (result.code !== 0) {
     throw new Error(
       `${command} ${args.join(' ')} failed (${result.code}): ${result.stderr || result.stdout}`,

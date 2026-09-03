@@ -12,25 +12,24 @@
 
 ## Current State
 
-The live issue, exact remote baseline, cleanup code, test conventions, Aspire teardown semantics,
-and doctrine gates are researched. The design is locked and `PLAN-EVAL: N/A` is justified. No
-implementation change has started.
+S1 RED is complete: the cleanup probe accepts an injected command runner, and the new colocated
+regression fails only because the listed id returns same-id `No such object` during inspect. The
+durable receipt is retained. The classification fix has not started.
 
 ## Completed
 
 - Harness activation, research, doctrine/archetype selection, and design checkpoint.
 - Exact decisions for error matching, receipt compatibility, and aggregation.
+- S1 deterministic regression and expected-failure receipt.
 
 ## In Progress
 
-- Draft PR bootstrap, followed by S1 RED.
+- S2 GREEN classification and receipt evidence.
 
 ## Next Steps
 
-1. Commit/push bootstrap artifacts and open the draft PR with requested metadata.
-2. Add the runner seam and failing regression; capture RED.
-3. Implement classification and additive receipt evidence; capture GREEN.
-4. Run S3 gates and hand off to the separate native Fable evaluator.
+1. Implement classification and additive receipt evidence; capture GREEN.
+2. Run S3 gates and hand off to the separate native Fable evaluator.
 
 ## Key Decisions
 
@@ -45,12 +44,15 @@ implementation change has started.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-e2e-cleanup-inspect-race--0.0.7/*` | new | Harness bootstrap artifacts. |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts` | changed | Injectable runner seam only in S1. |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup_test.ts` | new | RED listed-then-removed regression. |
+| `.llm/runs/fix-e2e-cleanup-inspect-race--0.0.7/receipts/s1-red.json` | new | Expected failing gate receipt. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending | S3 |
+| Static | RED as planned | `receipts/s1-red.json` |
 | Fitness | design-reviewed; automated pending | S3 |
 | Runtime | pending hosted CI | No local Aspire runtime |
 | Consumer | N/A | No public/generated change |
