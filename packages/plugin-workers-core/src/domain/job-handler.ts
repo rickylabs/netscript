@@ -83,7 +83,15 @@ export function createJobHandlerDefinition<TPayload, TResult = unknown>(
     },
     { payloadSchema },
   );
-  return Object.freeze(definition);
+  // Contribution modules extend the callable with registry metadata such as `id`.
+  // Keep the schema immutable without closing that documented extension seam.
+  Object.defineProperty(definition, 'payloadSchema', {
+    configurable: false,
+    enumerable: true,
+    value: payloadSchema,
+    writable: false,
+  });
+  return definition;
 }
 
 /** Return whether a runtime value is a callable schema-backed job handler. */

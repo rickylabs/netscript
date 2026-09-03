@@ -12,11 +12,12 @@
 
 ## Current State
 
-PR #1970 has the bounded schema-first Flow-B fixture repair at `c182fead3` and current-main
-integration at `6e654b1bd`. The first hosted rerun exposed the remaining application-boundary gap:
-generic add-job modules had only a named export although the generated registry requires `default`
-or `handler`. RED `93125a3a8` locks that exact mismatch; GREEN emits the existing typed handler as
-default and focused workers gates pass.
+PR #1970 is resuming from authoritative remote head `43734544f`, whose hosted PostgreSQL and SQLite
+runtime lanes passed. The coordinator-prepared handler-freeze repair is staged and independently
+proved: the RED health-check import fails because `Object.freeze(handler)` rejects first-party
+`Object.assign(..., { id })`; GREEN keeps only `payloadSchema` immutable while preserving the
+callable metadata-extension seam. The generated add-job stub still exports its typed handler as
+default.
 
 ## Completed
 
@@ -26,13 +27,14 @@ default and focused workers gates pass.
 
 ## In Progress
 
-- Push the GREEN head and collect current hosted runtime receipts.
+- Commit and push the bounded handler-freeze repair, then reconcile `origin/main` at `e14322c511`.
 
 ## Next Steps
 
-1. Push the receipt head and collect exact PostgreSQL and SQLite hosted runtime verdicts.
-2. Run the review-thread gate and update PR #1970 with the immutable merge packet.
-3. Hand off without merging the PR.
+1. Commit/push the handler-freeze RED→GREEN slice with its run-artifact receipts.
+2. Merge current main without wholesale shared-file replacement and regenerate canonical carriers.
+3. Run exact static/quality/CI gates, obtain one separate-session IMPL-EVAL, and hand off without
+   merging the PR.
 
 ## Key Decisions
 
@@ -48,7 +50,7 @@ default and focused workers gates pass.
 | --- | --- | --- |
 | Static | passed locally | root check and emitted samples pass on integrated tree |
 | Fitness | passed locally | quality, architecture, docs examples, carriers pass |
-| Runtime | hosted rerun pending | local host proxy failure is separated in worklog |
+| Runtime | hosted pass at `43734544f`; no new local lease | PostgreSQL and SQLite jobs passed; static/hosted work only for this continuation |
 | Consumer | passed | prior compile-time and generated-registry receipts in worklog |
 
 ## Open Questions

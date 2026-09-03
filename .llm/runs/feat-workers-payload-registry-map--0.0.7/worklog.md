@@ -606,3 +606,44 @@ exit 0; filesSelected=103; failedBatches=0; findings=0
 
 The GREEN commit is pushed immediately after this receipt is recorded; its exact SHA is reported in
 the PR implementation comment and handoff packet.
+
+## Repair 6 — preserve first-party handler metadata extension
+
+The NAS restart left this worktree's index and files at committed tree `c72f853bd` while the shared
+branch ref had advanced in the prior writer worktree. Before changing source, the stale state was
+proven byte-identical to `c72f853bd` with zero unstaged or untracked paths, then the index/worktree
+was realigned to authoritative remote head
+`43734544fa865d830acd82cab7dfb3c3ce6cf872`. No unique or foreign work was discarded.
+
+Coordinator-prepared commit `ad5a74e764c6ed85d7b7d165ce62c9bed7d70d32` contains exactly two
+bounded paths: the handler-definition freeze repair and a real built-in health-check regression
+test. Its test was applied alone against `43734544f` to establish the defect-specific RED:
+
+```text
+$ deno test --allow-all --unstable-kv plugins/workers/jobs/health-check_test.ts
+exit 1; 0 passed / 1 failed
+TypeError: Cannot add property id, object is not extensible
+at Object.assign(handler, { id: 'workers-plugin-health-check' })
+```
+
+GREEN replaces whole-callable freezing with a non-configurable, non-writable own
+`payloadSchema` property. The function remains extensible for documented contribution metadata;
+schema identity and handler-boundary validation remain unchanged. The generated generic job stub's
+`export default %%JOB_EXPORT%%;` is retained.
+
+```text
+$ run-deno-test.ts -- --allow-all --unstable-kv \
+    packages/plugin-workers-core/tests/runtime/job-payload-contract_test.ts \
+    plugins/workers/jobs/health-check_test.ts
+exit 0; 2 passed / 0 failed
+$ run-deno-check.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=219; failedBatches=0; totalOccurrences=0; wrapper used --unstable-kv
+$ run-deno-lint.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=219; failedBatches=0; totalOccurrences=0
+$ run-deno-fmt.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=219; failedBatches=0; findings=0
+```
+
+The first check-wrapper invocation incorrectly supplied an unsupported explicit `--unstable-kv`
+wrapper argument and exited 1 before selecting files; the corrected invocation exited 0 and its
+structured command confirms `deno check --unstable-kv <files>`. No runtime lease was taken.
