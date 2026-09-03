@@ -9,12 +9,8 @@ export const TEMPLATE_KEYS = {
     'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
   appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',
   appRoutesDesignSharedTokens: 'app/routes/(design)/design/(_shared)/tokens.ts.template',
-  appRoutesExamplesServiceLibRouteContract:
-    'app/routes/examples/service/(_lib)/route-contract.ts.template',
   appRoutesExamplesServiceLibServiceQuery:
     'app/routes/examples/service/(_lib)/service-query.ts.template',
-  appRoutesExamplesServiceLibOptimisticListMutation:
-    'app/routes/examples/service/(_lib)/optimistic-list-mutation.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',
   appRoutesComponentsHealthView: 'app/routes/(_components)/health-view.tsx.template',
@@ -37,33 +33,9 @@ export const TEMPLATE_KEYS = {
   appRoutesExamplesComponentsExamplesView:
     'app/routes/examples/(_components)/examples-view.tsx.template',
   appRoutesExamplesComponentsCrudView: 'app/routes/examples/(_components)/crud-view.tsx.template',
-  appRoutesExamplesComponentsHero: 'app/routes/examples/(_components)/hero.tsx.template',
-  appRoutesExamplesComponentsLabPanel: 'app/routes/examples/(_components)/lab-panel.tsx.template',
-  appRoutesExamplesComponentsManagedForm:
-    'app/routes/examples/(_components)/managed-form.tsx.template',
-  appRoutesExamplesComponentsNotesCard: 'app/routes/examples/(_components)/notes-card.tsx.template',
-  appRoutesExamplesComponentsPageLayout:
-    'app/routes/examples/(_components)/page-layout.tsx.template',
-  appRoutesExamplesComponentsSummaryCard:
-    'app/routes/examples/(_components)/summary-card.tsx.template',
-  appRoutesExamplesComponentsSummaryPanel:
-    'app/routes/examples/(_components)/summary-panel.tsx.template',
-  appRoutesExamplesComponentsSummaryPanelMemory:
-    'app/routes/examples/(_components)/summary-panel.memory.tsx.template',
-  appRoutesExamplesIslandsServiceshowcaselab:
-    'app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template',
-  appRoutesExamplesIslandsServiceshowcaselabMemory:
-    'app/routes/examples/(_islands)/ServiceShowcaseLab.memory.tsx.template',
-  appRoutesExamplesSharedServiceShowcase:
-    'app/routes/examples/(_shared)/service-showcase.ts.template',
-  appRoutesExamplesSharedServiceShowcaseMemory:
-    'app/routes/examples/(_shared)/service-showcase.memory.ts.template',
-  appRoutesExamplesSharedAuthorization: 'app/routes/examples/(_shared)/authorization.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
   appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
   appRoutesExamplesOrdersId: 'app/routes/examples/orders/[id].tsx.template',
-  appRoutesExamplesServiceIndexLayout: 'app/routes/examples/service/index.layout.tsx.template',
-  appRoutesExamplesServiceIndex: 'app/routes/examples/service/index.tsx.template',
   appRoutesExamplesTelemetryComponentsTelemetryView:
     'app/routes/examples/telemetry/(_components)/telemetry-view.tsx.template',
   appRoutesExamplesTelemetrySharedTelemetryTrace:
@@ -72,8 +44,6 @@ export const TEMPLATE_KEYS = {
   appRoutesHealth: 'app/routes/health.tsx.template',
   appRoutesIndex: 'app/routes/index.tsx.template',
   appRoutesDashboard: 'app/routes/dashboard.tsx.template',
-  appRoutesPartialsExamplesServiceSummary:
-    'app/routes/partials/examples/service-summary.tsx.template',
   appUtils: 'app/utils.ts.template',
   appViteConfig: 'app/vite.config.ts.template',
   aspireHelpersAspireCompat: 'aspire/helpers/_aspire-compat.ts.template',

@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `implement repair` — #1481 code complete; hosted gate blocked by #1971 |
+| Current phase | `delta repair` — #1481/#1971 runtime green; current-main exact-head gates pending |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. Supervisor repair `de4d31b69` correctly places the design-production gate after `DATABASE_CODEGEN`, and branch head `9630583c8` includes current `main`. Both hosted runtime tiers now fail only at `scaffold.design-production-exclusion` because generated Fresh apps map `zod` to bare `catalog:`, which Vite cannot load after database codegen makes that route import reachable. Product remediation is deliberately split to release blocker #1971; stack #1971 → #1945.
+PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. #1971 landed through main and hosted run `33715250068` at exact head `98699f4bd` proves both runtime tiers green: PostgreSQL 102/102 and SQLite/Garnet 97/97, including `scaffold.design-production-exclusion` and `behavior.app-reference`. The remaining red was one stale core order assertion (5235 passed / 1 failed) that assumed no gate could sit between database codegen and the generated service-client contract. Current main `e14322c511` (#1956) is integrated with both product features preserved; D-2 records the bounded assertion repair.
 
 ## Completed
 
@@ -36,13 +36,13 @@ PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. Su
 
 ## In Progress
 
-- #1971's product fix is now present through main commit `953b0849c`; fresh hosted PostgreSQL and SQLite/Garnet runtime tiers and a separate-session IMPL-EVAL remain required at the immutable final head.
+- Run fresh static/Tier-A receipts at the current-main merge head, push, obtain current-head hosted CI, then dispatch one separate-session delta IMPL-EVAL.
 
 ## Next Steps
 
-1. Push the immutable merge-readiness head and run PostgreSQL + SQLite/Garnet hosted runtime tiers.
-2. Confirm `scaffold.design-production-exclusion` and `behavior.app-reference` pass in both tiers.
-3. Dispatch a fresh separate-session IMPL-EVAL at that exact head, then map #1481/#1971 acceptance evidence honestly.
+1. Commit and run current-main exact-head scoped/Tier-A gates; push the immutable packet.
+2. Confirm fresh core CI and both hosted runtime tiers at that head.
+3. Dispatch a fresh separate-session delta IMPL-EVAL; on PASS, map #1481/#1971 acceptance and PR DoD with exact receipts.
 
 ## Key Decisions
 
@@ -72,16 +72,16 @@ PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. Su
 | Plan-Gate | PASS | `plan-eval.md` at `5566a89f6`, evaluated plan head `f8ed75b41` |
 | Static | PASS | Final local implementation set: check 733 files; focused tests 88/88; scoped lint/fmt 12/12 files; supervisor reorder adds an explicit after-`DATABASE_CODEGEN` order assertion |
 | Fitness | PASS | `quality:gate`, explicit `arch:check`, asset freshness, and four-carrier checks exited 0 before hosted evaluation |
-| Runtime | FAIL_BLOCKED | Head `9630583c8`: PostgreSQL job `100484648723` and SQLite job `100484648739` each report 20 passed / 1 failed only at `scaffold.design-production-exclusion`; blocker #1971 |
-| Consumer | BLOCKED | The post-codegen Fresh production build cannot complete until #1971 resolves Vite loading `catalog:` |
+| Runtime | PASS_OLD_HEAD | Head `98699f4bd`: PostgreSQL job `100523051743` passed 102/102; SQLite/Garnet job `100523052025` passed 97/97; both include design exclusion and development reference behavior |
+| Consumer | PASS_OLD_HEAD | Post-codegen production build and downstream browser reference gates pass in both hosted tiers; fresh current-main evidence pending |
 
 ## Open Questions
 
-- None inside #1481. The Vite/catalog product fix is explicitly owned by #1971.
+- None inside #1481/#1971. Fresh current-head validation/evaluation is procedural, not an open design decision.
 
 ## Drift and Debt
 
-- Drift: D-1 adds the existing `packages/cli/e2e/suites/scaffold/capability-suites.ts` selector omitted from the plan file list; this is required for runtime-suite inclusion and remains inside authorized `packages/cli/**` scope.
+- Drift: D-1 adds the existing suite selector required for runtime inclusion. D-2 adds the existing service-client order test whose stale adjacency assertion conflicts with the intentional design gate. Both remain inside authorized `packages/cli/**` scope.
 - Debt: existing `scaffold-runtime-a8-f16-1333` remains open and is not deepened.
 
 ## Commits

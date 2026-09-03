@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { toCamelCase } from '@std/text';
 import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
 import type { ValidatedInitOptions } from '../../../domain/scaffold/scaffold-options.ts';
@@ -8,12 +9,12 @@ import { generateAppViteConfig } from '../../../adapters/templates/app/generate-
 import {
   loadAppScaffoldTemplateAssets,
   loadExampleServiceAppTemplateAssets,
+  loadResourceSliceTemplateAssets,
 } from '../../../adapters/templates/scaffold-template-assets.ts';
 import { DEFAULT_UI_INIT_ITEMS, installUiRegistryItems } from '../../ui/registry.ts';
 import type { InitPipelineContext } from '../context.ts';
 import { adjustLocalBase } from '../support/helpers.ts';
 import { createScaffoldPlan } from '../../../domain/scaffold/scaffold-plan.ts';
-import { generateRouteManifestSeed, generateRoutesSeed } from './app-route-seeds.ts';
 import { writeExampleServiceAppFiles } from './write-example-service-app-files.ts';
 import {
   buildAppAgentsMarkdown,
@@ -30,7 +31,10 @@ export async function writeNormalizedAppFiles(
   filesSkipped: string[],
   directoriesCreated: string[],
 ): Promise<void> {
-  const appPort = allocateScaffoldDefaultPort(options.name, `app:${options.appName}`);
+  const appPort = allocateScaffoldDefaultPort(
+    options.name,
+    `app:${options.appName}`,
+  );
   const plan = createScaffoldPlan(options, {
     useWorkspacePackages: context.packagesAsWorkspaceMembers(options),
   });
@@ -40,6 +44,14 @@ export async function writeNormalizedAppFiles(
     appPort: String(appPort),
     serviceName: plan.service?.name ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
     modelName: options.modelName,
+    serviceResourceRouteAlias: options.includeExampleService && options.serviceName
+      ? `${toCamelCase(options.serviceName)}: generatedRoutes.examples.${
+        toCamelCase(options.serviceName)
+      }.$route,\n  `
+      : '',
+    serviceExampleRouteReference: options.includeExampleService && options.serviceName
+      ? `routes.examples.${toCamelCase(options.serviceName)}.$route`
+      : 'routes.examples.$route',
   };
   const {
     appAppTemplate,
@@ -124,7 +136,10 @@ export async function writeNormalizedAppFiles(
     ? join(partialsExamplesDir, options.serviceName)
     : undefined;
   const telemetryExampleDir = join(examplesRoutesDir, 'telemetry');
-  const telemetryExampleComponentsDir = join(telemetryExampleDir, '(_components)');
+  const telemetryExampleComponentsDir = join(
+    telemetryExampleDir,
+    '(_components)',
+  );
   const telemetryExampleSharedDir = join(telemetryExampleDir, '(_shared)');
   const conventionsInput = {
     appName: options.appName,
@@ -150,8 +165,10 @@ export async function writeNormalizedAppFiles(
   await createDir(assetsDir);
   if (options.includeExampleService) {
     if (
-      serviceExampleDir && serviceExampleComponentsDir && serviceExampleIslandsDir &&
-      serviceExampleLibDir && serviceExampleSharedDir && serviceExamplePartialDir
+      serviceExampleDir && serviceExampleComponentsDir &&
+      serviceExampleIslandsDir &&
+      serviceExampleLibDir && serviceExampleSharedDir &&
+      serviceExamplePartialDir
     ) {
       await createDir(partialsDir);
       await createDir(partialsExamplesDir);
@@ -177,8 +194,14 @@ export async function writeNormalizedAppFiles(
     jsrResolver: context.jsrResolver,
   });
   await write(appDenoJsonPath, appDenoJson);
-  await write(join(appDir, 'AGENTS.md'), buildAppAgentsMarkdown(conventionsInput));
-  await write(join(appDir, 'WEB-LAYER.md'), buildWebLayerMarkdown(conventionsInput));
+  await write(
+    join(appDir, 'AGENTS.md'),
+    buildAppAgentsMarkdown(conventionsInput),
+  );
+  await write(
+    join(appDir, 'WEB-LAYER.md'),
+    buildWebLayerMarkdown(conventionsInput),
+  );
   await write(
     join(appDir, SCAFFOLD_FILES.TSCONFIG_APP),
     generateAppTsConfig(),
@@ -191,7 +214,9 @@ export async function writeNormalizedAppFiles(
   for (const copiedFile of uiInstall.copiedFiles) {
     if (!filesCreated.includes(copiedFile)) filesCreated.push(copiedFile);
   }
-  if (!filesCreated.includes(uiInstall.stylesPath)) filesCreated.push(uiInstall.stylesPath);
+  if (!filesCreated.includes(uiInstall.stylesPath)) {
+    filesCreated.push(uiInstall.stylesPath);
+  }
   await write(join(assetsDir, 'design.css'), appDesignCssTemplate);
   await write(
     join(appDir, 'client.ts'),
@@ -209,8 +234,6 @@ export async function writeNormalizedAppFiles(
     join(appDir, 'router.ts'),
     await context.templateAdapter.render(appRouterTemplate, appTemplateVars),
   );
-  await write(join(generatedDir, 'manifest.ts'), generateRouteManifestSeed());
-  await write(join(generatedDir, 'routes.ts'), generateRoutesSeed());
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
   await write(join(designSharedDir, 'registry.ts'), appDesignRegistryTemplate);
   await write(join(designSharedDir, 'tokens.ts'), appDesignTokensLibTemplate);
@@ -218,14 +241,20 @@ export async function writeNormalizedAppFiles(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
     appDesignFloatingSurfaceDemoTemplate,
   );
-  await write(join(designIslandsDir, 'TokenClipboard.tsx'), appDesignTokenClipboardTemplate);
+  await write(
+    join(designIslandsDir, 'TokenClipboard.tsx'),
+    appDesignTokenClipboardTemplate,
+  );
   await write(
     join(routesDir, '_app.tsx'),
     await context.templateAdapter.render(appAppTemplate, appTemplateVars),
   );
   await write(
     join(routesDir, 'index.tsx'),
-    await context.templateAdapter.render(appIndexRouteTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appIndexRouteTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(routeComponentsDir, 'home-view.tsx'),
@@ -233,11 +262,17 @@ export async function writeNormalizedAppFiles(
   );
   await write(
     join(routesDir, 'dashboard.tsx'),
-    await context.templateAdapter.render(appDashboardRouteTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appDashboardRouteTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(routeComponentsDir, 'dashboard-view.tsx'),
-    await context.templateAdapter.render(appDashboardViewTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appDashboardViewTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(routesDir, '_layout.tsx'),
@@ -245,50 +280,92 @@ export async function writeNormalizedAppFiles(
   );
   await write(
     join(routesDir, 'health.tsx'),
-    await context.templateAdapter.render(appHealthRouteTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appHealthRouteTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(routeComponentsDir, 'health-view.tsx'),
-    await context.templateAdapter.render(appHealthViewTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appHealthViewTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(routeSharedDir, 'health.ts'),
-    await context.templateAdapter.render(appHealthSharedTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appHealthSharedTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(designRoutesDir, '_layout.tsx'),
-    await context.templateAdapter.render(appDesignLayoutTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appDesignLayoutTemplate,
+      appTemplateVars,
+    ),
   );
   await write(join(designRoutesDir, '_middleware.ts'), appDesignMiddlewareTemplate);
   await write(join(designRoutesDir, 'index.tsx'), appDesignIndexRouteTemplate);
-  await write(join(designRoutesDir, 'tokens.tsx'), appDesignTokensRouteTemplate);
-  await write(join(designComponentsDir, 'tokens-view.tsx'), appDesignTokensViewTemplate);
-  await write(join(designRoutesDir, 'components.tsx'), appDesignComponentsRouteTemplate);
-  await write(join(designComponentsDir, 'components-view.tsx'), appDesignComponentsViewTemplate);
-  await write(join(designRoutesDir, 'composition.tsx'), appDesignCompositionRouteTemplate);
+  await write(
+    join(designRoutesDir, 'tokens.tsx'),
+    appDesignTokensRouteTemplate,
+  );
+  await write(
+    join(designComponentsDir, 'tokens-view.tsx'),
+    appDesignTokensViewTemplate,
+  );
+  await write(
+    join(designRoutesDir, 'components.tsx'),
+    appDesignComponentsRouteTemplate,
+  );
+  await write(
+    join(designComponentsDir, 'components-view.tsx'),
+    appDesignComponentsViewTemplate,
+  );
+  await write(
+    join(designRoutesDir, 'composition.tsx'),
+    appDesignCompositionRouteTemplate,
+  );
   await write(
     join(designComponentsDir, 'composition-view.tsx'),
     appDesignCompositionViewTemplate,
   );
   await write(
     join(examplesRoutesDir, 'index.tsx'),
-    await context.templateAdapter.render(appExamplesIndexRouteTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appExamplesIndexRouteTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(examplesComponentsDir, 'examples-view.tsx'),
-    await context.templateAdapter.render(appExamplesViewTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appExamplesViewTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(examplesRoutesDir, 'crud.tsx'),
-    await context.templateAdapter.render(appCrudExampleRouteTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appCrudExampleRouteTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(orderRoutesDir, '[id].tsx'),
-    await context.templateAdapter.render(appOrderExampleRouteTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appOrderExampleRouteTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(examplesComponentsDir, 'crud-view.tsx'),
-    await context.templateAdapter.render(appCrudExampleViewTemplate, appTemplateVars),
+    await context.templateAdapter.render(
+      appCrudExampleViewTemplate,
+      appTemplateVars,
+    ),
   );
   if (
     options.includeExampleService && serviceExampleDir &&
@@ -299,23 +376,47 @@ export async function writeNormalizedAppFiles(
       context,
       appTemplateVars,
       templates: await loadExampleServiceAppTemplateAssets(),
+      resourceTemplates: await loadResourceSliceTemplateAssets(),
       write,
-      hasDatabase: options.dbEngine !== 'none',
+      appDir,
       serviceExampleDir,
-      serviceExampleComponentsDir,
-      serviceExampleIslandsDir,
       serviceExampleLibDir,
-      serviceExampleSharedDir,
-      serviceExamplePartialDir,
       telemetryExampleDir,
       telemetryExampleComponentsDir,
       telemetryExampleSharedDir,
     });
   }
+  if (!options.dryRun) {
+    const { writeFreshRouteManifestSync } = await import(
+      '../../../adapters/scaffold/fresh-route-manifest.ts'
+    );
+    const derived = writeFreshRouteManifestSync(appDir);
+    trackDerivedRouteFile(
+      derived.result.manifestOutputPath,
+      derived.result.manifestChanged,
+      filesCreated,
+      filesSkipped,
+    );
+    trackDerivedRouteFile(
+      derived.result.routesOutputPath,
+      derived.result.routesChanged,
+      filesCreated,
+      filesSkipped,
+    );
+  }
   await write(
     join(appDir, 'vite.config.ts'),
     generateAppViteConfig({ appName: options.appName, appPort }),
   );
+}
+
+function trackDerivedRouteFile(
+  path: string,
+  changed: boolean,
+  filesCreated: string[],
+  filesSkipped: string[],
+): void {
+  (changed ? filesCreated : filesSkipped).push(path);
 }
 
 /** Carry infrastructure choices made by init into the runtime that consumes them. */

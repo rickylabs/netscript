@@ -1,3 +1,5 @@
+import { toPascalCase } from '@std/text';
+
 /** Inputs that determine which scaffolded web-layer examples exist. */
 export interface AppConventionsInput {
   readonly appName: string;
@@ -18,7 +20,6 @@ interface ConventionReference {
     | 'service-island'
     | 'service-shared'
     | 'service-form'
-    | 'service-authorization'
     | 'service-partial'
     | 'telemetry-route';
   readonly path: string;
@@ -58,7 +59,7 @@ function serviceReferences(
   return [
     {
       id: 'service-route-contract',
-      path: `${root}/(_lib)/route-contract.ts`,
+      path: `${root}/index.route.ts`,
       purpose: 'typed path, search, and managed-form schemas',
     },
     {
@@ -73,23 +74,18 @@ function serviceReferences(
     },
     {
       id: 'service-island',
-      path: `${root}/(_islands)/ServiceShowcaseLab.tsx`,
+      path: `${root}/(_islands)/${toPascalCase(input.serviceName)}Island.tsx`,
       purpose: 'QueryIsland and typed query/mutation options',
     },
     {
       id: 'service-shared',
-      path: `${root}/(_shared)/service-showcase.ts`,
+      path: `${root}/(_shared)/${input.serviceName}-loaders.ts`,
       purpose: 'canonical query keys and shared query loaders',
     },
     {
       id: 'service-form',
-      path: `${root}/(_components)/managed-form.tsx`,
+      path: `${root}/(_components)/${input.serviceName}-form.tsx`,
       purpose: 'withForm invalid and successful submission states',
-    },
-    {
-      id: 'service-authorization',
-      path: `${root}/(_shared)/authorization.ts`,
-      purpose: 'provider-neutral viewer and mutation policy boundary',
     },
     {
       id: 'service-partial',

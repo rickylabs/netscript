@@ -11,3 +11,20 @@ Future entries are append-only. In particular, implementation must record drift 
 - **Ruling:** Add the new gate ID to the existing `RUNTIME_GATES` list immediately after `scaffold.init`, as required by the approved gate ordering. Do not create a new gate file or directory child.
 - **Scope effect:** One additional existing file under authorized `packages/cli/**`; no architecture, mechanism, or acceptance change.
 - **Evidence:** `createScaffoldCapabilityGates()` registers `createGeneratedQualityGates()`, while `createScaffoldCapabilitySuite()` selects only IDs listed by `capability-suites.ts`.
+
+## D-2 — Cross-feature service-client order assertion omitted from plan file list
+
+- **Severity:** minor
+- **Observed:** Hosted core CI at head `98699f4bd` passed both runtime tiers but failed one
+  `service-client-runtime-probe_test.ts` assertion. The service-client test required
+  `DATABASE_CODEGEN` and `GENERATED_SERVICE_CLIENT_CONTRACT` to be adjacent in both the service and
+  runtime suites; #1481 intentionally inserts `SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` between those
+  gates in the runtime suite.
+- **Ruling:** Update the existing order assertion to preserve service-suite adjacency while
+  explicitly requiring runtime order `DATABASE_CODEGEN` → `SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` →
+  `GENERATED_SERVICE_CLIENT_CONTRACT`. Do not change runtime behavior, skip a test, or weaken either
+  product contract.
+- **Scope effect:** One additional existing test under authorized `packages/cli/e2e/**`; no public
+  surface, mechanism, or runtime change.
+- **Evidence:** CI run `33715250151`, job `100523026122`, uploaded `test.report.json`: 5235 passed /
+  1 failed, exact diff `21` vs `22` at the named order test.
