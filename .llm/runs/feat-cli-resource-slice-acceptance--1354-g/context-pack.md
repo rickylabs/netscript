@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `public-query-client observer correction implemented; exact-head gates pending` |
+| Current phase | `public-query-client observer correction locally green; hosted proof pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
@@ -25,7 +25,9 @@ Rename showcase. Product head `2f0807f25` passed every local gate, but hosted ru
 then falsified its private Preact traversal in both tiers (SQLite 86/1, PostgreSQL 91/1; cleanup
 passed). The current correction imports the existing public `@netscript/fresh/query` browser module,
 requires the generated `users.list` entry in its singleton, and invalidates that same client. Fresh
-exact-head local evidence, isolated hosted acceptance, and IMPL-EVAL are pending, so PR #1958
+proportional exact-head local evidence is green (focused 120/120, full CLI 1,795/1,795, check 0
+diagnostics, lint/fmt clean, architecture and quality green). Isolated hosted acceptance and
+IMPL-EVAL are pending, so PR #1958
 stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Completed
@@ -45,8 +47,8 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Next Steps
 
-1. Commit the public-singleton observer correction and rerun proportional exact-head local gates.
-2. Push and run both isolated hosted runtime tiers; do not use a host runtime lease.
+1. Commit and push the public-singleton local evidence.
+2. Run both isolated hosted runtime tiers; do not use a host runtime lease.
 3. Obtain a fresh separate-session IMPL-EVAL, then update #1354/#1958 only from green evidence.
 
 ## Key Decisions

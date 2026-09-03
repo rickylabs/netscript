@@ -98,6 +98,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | current-main convergence | `origin/main` advanced from `e14322c511` to `94fe507af` while the run was active. Committed the acceptance correction, fetched, and merged current main without rebasing in `964d3cdd3`; the merge was clean and the main-relative product delta remained exactly eighteen files with no lock movement. |
 | 2026-09-03 | G | doctrine cleanup | The first refetch implementation made `probe-island-hydration.ts` 560 lines and added an A8 size warning. Consolidated the duplicate browser lifecycle and query expressions inside the same accepted file and brought it within the 500-line doctrine cap; focused hydration/service-client tests pass 37/37. No debt exception was added. |
 | 2026-09-03 | G | complete-tail hosted diagnosis | Run `33735122923` passed static and `behavior.island-served-surface`, then both tiers failed only at the new hydration observer: SQLite 86/1, PostgreSQL 91/1, cleanup passed. Private Preact graph traversal could not find the QueryClient. Replaced it with the public browser module contract `@netscript/fresh/query#getIslandQueryClient`, required the generated `users.list` cache entry, and kept the refetch on that singleton. No generator/Fresh product code changed. |
+| 2026-09-03 | G | public-singleton exact-head gates | At product head `9cba13fec`, focused tests passed 120/120, full CLI passed 1,795/1,795, structured check covered 1,004 files with zero diagnostics, 18-file lint/fmt were clean, `arch:check` returned `FAIL=0` with CLI baseline `WARN=62`, and `quality:gate` returned 0 scanner findings / 7 allowances / 37 workspace members. |
 
 ## Decisions
 
@@ -137,6 +138,11 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 Final local evidence below is from product head
 `2f0807f254d57a45c690a7b372efd73fd75be008`, after the no-rebase merge of current main. Historical
 rows remain below it to preserve earlier receipts.
+
+The later public-singleton observer correction at product head `9cba13fec` was re-proven
+proportionally: focused 120/120, full CLI 1,795/1,795, check 1,004 files / 0 diagnostics, lint/fmt
+18/18 clean, `arch:check` exit 0 (`FAIL=0`, CLI `WARN=62 INFO=1`), and `quality:gate` exit 0
+(0 findings, 7 allowances, 37/37 members, 35 publishable).
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
