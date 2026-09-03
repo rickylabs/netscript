@@ -2,7 +2,8 @@
  * @module infra/database/scaffolder_test
  */
 
-import { assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { join } from 'jsr:@std/path@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
 import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
@@ -48,6 +49,9 @@ describe('DatabaseScaffolder', () => {
       '/project/database/mysql/schema/zod-generator.config.json',
     );
     const schema = await fs.readFile('/project/database/mysql/schema/schema.prisma');
+    const seededCrudZod = await fs.readFile(
+      '/project/database/mysql/schema/.generated/zod/crud.ts',
+    );
     const seed = await fs.readFile('/project/database/mysql/scripts/seed.ts');
 
     assertStringIncludes(
@@ -85,6 +89,34 @@ describe('DatabaseScaffolder', () => {
       clearSeededClient,
       "new URL('../schema/.generated/client.server.ts', import.meta.url)",
     );
+    assertStringIncludes(
+      clearSeededClient,
+      "new URL('../schema/.generated/zod/crud.ts', import.meta.url)",
+    );
+    assertStringIncludes(
+      clearSeededClient,
+      "await Deno.remove(new URL('../schema/.generated/zod', import.meta.url), { recursive: true });",
+    );
+
+    const emittedScriptRoot = await Deno.makeTempDir({
+      prefix: 'netscript-clear-seeded-artifacts-',
+    });
+    try {
+      const emittedScriptPath = join(emittedScriptRoot, 'clear-seeded-client.ts');
+      await Deno.writeTextFile(emittedScriptPath, clearSeededClient);
+      const checked = await new Deno.Command(Deno.execPath(), {
+        args: ['check', '--no-config', '--no-lock', emittedScriptPath],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(
+        checked.code,
+        0,
+        new TextDecoder().decode(checked.stderr),
+      );
+    } finally {
+      await Deno.remove(emittedScriptRoot, { recursive: true });
+    }
 
     assertStringIncludes(
       patchPrismaClient,
@@ -99,6 +131,16 @@ describe('DatabaseScaffolder', () => {
     assertStringIncludes(schemaZodConfig, '"emit": {');
     assertStringIncludes(schema, 'model Product {');
     assertStringIncludes(schema, 'id        Int      @id @default(autoincrement())');
+    assertStringIncludes(
+      seededCrudZod,
+      'This file is seeded by netscript init and replaced by database code generation.',
+    );
+    assertStringIncludes(seededCrudZod, 'export const ProductSchema = z.object({');
+    assertStringIncludes(seededCrudZod, 'export const ProductCreateInput = z.object({');
+    assertStringIncludes(
+      seededCrudZod,
+      'export const ProductUpdateInput = ProductCreateInput.partial();',
+    );
     assertStringIncludes(seed, 'const existing = await client.product.findFirst(');
     assertStringIncludes(seed, 'await client.product.create({');
   });

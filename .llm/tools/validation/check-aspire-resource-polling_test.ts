@@ -1,9 +1,14 @@
 import { assertEquals } from '@std/assert';
 
 import {
+  ASPIRE_RESOURCE_POLL_ALLOWLIST,
   findAspireResourcePolling,
   unexpectedAspireResourcePolling,
 } from './check-aspire-resource-polling.ts';
+
+Deno.test('Aspire resource polling allowlist is pinned to the exact approved set', () => {
+  assertEquals([...ASPIRE_RESOURCE_POLL_ALLOWLIST].sort(), []);
+});
 
 async function withSource(source: string, run: (root: string) => Promise<void>): Promise<void> {
   const root = await Deno.makeTempDir();
@@ -79,4 +84,3 @@ Deno.test('CLI E2E source has no non-fenced Aspire describe polling', async () =
     }`,
   );
 });
-

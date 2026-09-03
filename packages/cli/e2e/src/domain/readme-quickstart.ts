@@ -18,7 +18,7 @@ export interface ReadmeQuickstartSubstitutions {
 
 /** Ordered command contract expected by the `readme.quickstart` suite. */
 export const README_QUICKSTART_EXPECTED_COMMANDS = [
-  'deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>',
+  'deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>',
   'netscript init my-app --db postgres --service --yes',
   'cd my-app/aspire',
   'aspire restore',

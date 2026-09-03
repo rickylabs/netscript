@@ -24,6 +24,10 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 - The owner supplied a locked, already evaluated plan and explicitly required `PLAN-EVAL: N/A` for this implementation run.
 - The owner requires the PR to open non-draft with `status:impl`; this overrides the harness default of a draft PR on the bootstrap commit.
+- On the final merged-stack convergence, the owner reported the Fable supervisor temporarily
+  quota-blocked and directed this implementation child not to wait. The existing independent
+  evaluator receipt remains authoritative for Slice F; the bounded quality correction receives
+  exact final-head gate and hosted-CI receipts without claiming a new self-evaluation.
 
 ## Evaluator receipt
 

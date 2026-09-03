@@ -14,11 +14,14 @@ import {
   TEST_ONLY_POSTGRES_HEALTH_KEY,
 } from './listener-fault-controller.ts';
 
-const DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS = 300;
-const GARNET_LISTENER_WAIT_TIMEOUT_SECONDS = 30;
-const MSSQL_LISTENER_WAIT_TIMEOUT_SECONDS = 600;
+/** Hung-stream failure ceiling; preserves the former 300s cap without timing Aspire correctness. */
+const DEFAULT_LISTENER_FAILURE_CEILING_SECONDS = 300;
+/** Hung-stream failure ceiling; preserves the former 30s Garnet cap without shortening it. */
+const GARNET_LISTENER_FAILURE_CEILING_SECONDS = 30;
+/** Hung-stream failure ceiling; preserves the former 600s MSSQL cap without shortening it. */
+const MSSQL_LISTENER_FAILURE_CEILING_SECONDS = 600;
 
-/** Describe-derived listener health contract for one backing service resource. */
+/** Event-observed listener health contract for one backing service resource. */
 export interface ListenerReadinessExpectation {
   readonly resource: string;
   readonly healthCheckKey: string;
@@ -41,26 +44,26 @@ export function listenerReadinessExpectation(
       return {
         resource,
         healthCheckKey: `${resource}_listener`,
-        timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+        timeoutSeconds: DEFAULT_LISTENER_FAILURE_CEILING_SECONDS,
       };
     case ASPIRE_RESOURCE.MSSQL:
       return {
         resource,
         healthCheckKey: `${resource}_listener`,
-        timeoutSeconds: MSSQL_LISTENER_WAIT_TIMEOUT_SECONDS,
+        timeoutSeconds: MSSQL_LISTENER_FAILURE_CEILING_SECONDS,
       };
     case ASPIRE_RESOURCE.GARNET:
       return {
         resource,
         healthCheckKey: `${resource}_resp`,
-        timeoutSeconds: GARNET_LISTENER_WAIT_TIMEOUT_SECONDS,
+        timeoutSeconds: GARNET_LISTENER_FAILURE_CEILING_SECONDS,
       };
     default:
       return undefined;
   }
 }
 
-/** Build the wait command that also verifies the 13.5 `healthReports` contract. */
+/** Build the follower command that also verifies the 13.5 `healthReports` contract. */
 export function listenerReadinessWaitCommand(
   context: RunContext,
   expectation: ListenerReadinessExpectation,
@@ -73,7 +76,7 @@ export function listenerReadinessWaitCommand(
     context.project.appHost,
     expectation.resource,
     expectation.healthCheckKey,
-    String(expectation.timeoutSeconds),
+    String(expectation.timeoutSeconds * 1_000),
   ];
 }
 
@@ -112,7 +115,7 @@ export function listenerFaultExpectations(
     healthCheckKey: TEST_ONLY_GARNET_HEALTH_KEY,
     realHealthCheckKey: 'garnet_resp',
     controllerListener: 'garnet',
-    timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+    timeoutSeconds: DEFAULT_LISTENER_FAILURE_CEILING_SECONDS,
   };
   switch (database) {
     case DATABASE.POSTGRES:
@@ -121,7 +124,7 @@ export function listenerFaultExpectations(
         healthCheckKey: TEST_ONLY_POSTGRES_HEALTH_KEY,
         realHealthCheckKey: 'postgres_listener',
         controllerListener: 'postgres',
-        timeoutSeconds: DEFAULT_LISTENER_WAIT_TIMEOUT_SECONDS,
+        timeoutSeconds: DEFAULT_LISTENER_FAILURE_CEILING_SECONDS,
       }, garnet];
     case DATABASE.MYSQL:
     case DATABASE.MSSQL:

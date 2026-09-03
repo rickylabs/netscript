@@ -86,6 +86,11 @@ the existing resource feature, not the init writer.
 | 2026-09-03 | F     | Base convergence              | Merged #1664 head `31d59a656` as `a042c6e57`. The only non-generated conflict was Slice E's evaluation receipt; both historical and superseding receipts were retained.                                                                                        |
 | 2026-09-03 | F     | Projection refresh            | Took the base side for generated projections, ran the assets-barrel and Aspire-manifest generators, then ran the MCP corpus generator on the clean merge commit after its dirty-read guard refused the in-progress merge. MCP regeneration was byte-identical. |
 | 2026-09-03 | F     | Closeout gates                | Every required post-merge gate passed; `deno.lock` retained hash `202d4c9bfb5841f1d3cee766351fdf63efc53a3b`.                                                                                                                                                   |
+| 2026-09-03 | F     | Merged-stack rebase           | Rebased the F-only commits from `275a878ab` onto merged #1664/#1891/#1950 main `3903feea63`; duplicated Slice A ancestry dropped and no conflict occurred.                                                                                                      |
+| 2026-09-03 | F     | Failed-quality diagnosis      | Reproduced CI's eager Rollup/FFI load, deferred both Fresh manifest imports to their execution paths, then ratified the newly visible `generate resource` command in the reference/census. Slice G's eight-file set remains untouched.                          |
+| 2026-09-03 | F     | Focused convergence gate      | `docs:accuracy` exit 0 (92/92 direct commands, 157 recursive); focused wrapper suite exit 0 (21 passed, 0 failed).                                                                                                                                              |
+| 2026-09-03 | F     | Live-main convergence         | Replayed the 11 Slice F commits onto live `main` `632528888` after its README/docs-carrier follow-up landed. Only generated agent-docs/publish carriers conflicted; the base side was retained and regenerated. No non-generated conflict occurred.             |
+| 2026-09-03 | F     | Immutable local receipts      | Re-ran the complete Slice F verdict set on the live-base lineage. Every required gate exited 0; the final harness-only commit records the exact counts below.                                                                                                  |
 
 ## Decisions
 
@@ -95,6 +100,8 @@ the existing resource feature, not the init writer.
 | Treat generated carriers as ceiling-exempt freshness output.                     | They are mechanical projections, not authored scope.                                                                        | owner/doctrine contract                    |
 | Format neutral rendered bodies before ownership markers on both callers.         | Init's final project formatter otherwise changed three marker bodies and made an exact command rerun appear `owned-edited`. | locked D3/D4/D8 + supervisor review        |
 | Defer Slice E LOW-2.                                                             | This no-product-change closeout records it with adapter extraction in debt `cli-resource-composition-io-1354`.              | owner closeout instruction / IMPL-EVAL L-4 |
+| Defer Fresh/Vite adapter module evaluation until a write/stage executes.          | Public command/help census must construct init/resource commands without requiring native Rollup FFI; the actual derivation calls and outputs are unchanged. | failed CI quality receipt / Slice F activation |
+| Add only the exact command-reference row required by the 92-command ratchet.      | Public activation must satisfy the existing docs-accuracy policy, while Slice G retains all eight planned guidance/runtime files. | failed CI quality receipt / serial slice boundary |
 
 ## Drift
 
@@ -166,3 +173,39 @@ Non-generated package convergence evidence:
 `19 files changed, 1548 insertions(+), 415 deletions(-)`. Those 19 paths are the current #1664
 base's changes after excluding the five Slice E files already present in `8c27ffe16`; no
 closeout-authored product file is present.
+
+## Final live-main receipts
+
+The tested source/carrier commit is `c4d00b9eadaecf612bb0f1696a3ab7553efe02d3` on base
+`632528888ad033f0e23dfd4f6718d089bfe3eeab`. The only subsequent commit is this harness receipt.
+
+| Gate | Exit | Exact receipt |
+| --- | ---: | --- |
+| focused init/writer/command/docs tests | 0 | 21 passed, 0 failed, 0 ignored |
+| full `packages/cli` unit suite | 0 | 1,777 passed, 0 failed, 0 ignored; 78,839 ms; `TMPDIR=/home/agent/tmp` |
+| structured CLI check | 0 | 1,000 files, 9 batches, 0 failed batches, 0 diagnostics |
+| touched structured lint | 0 | 3 files processed, 0 dropped, 0 findings |
+| touched structured format | 0 | 3 files processed, 0 dropped, 0 findings |
+| `docs:accuracy` | 0 | 92/92 root/direct commands from 157 recursive paths; 200 published pages; 182 shipped corpus files; 6 valid Fresh imports |
+| `gen:assets-barrel` | 0 | regenerated on live main |
+| `gen:mcp-export-corpus` | 0 | 35 packages / 273 subpaths / 7,846 symbols; SHA `ddbc949e`; byte-identical |
+| Aspire manifest generator | 0 | 954 rows, 0 unmatched; byte-identical after live-main replay |
+| `check:assets-barrel` | 0 | freshness pass |
+| `check:publish-assets` | 0 | freshness pass |
+| `check:emitted-samples` | 0 | 48 samples / 38 artifact paths |
+| `check:mcp-export-corpus` | 0 | 35 packages / 273 subpaths / 7,846 symbols; SHA `ddbc949e` |
+| `check:agent-docs-prose` | 0 | fresh; 182 files; SHA `f95a2a08`; source commit `863589b55` |
+| `check:aspire-version-parity` | 0 | 953 checked, 0 fail, 16 deferred, 5 info, 1 skipped, 0 missing; manifest fresh |
+| `arch:check` | 0 | every doctrine root `FAIL=0` |
+| `quality:gate` | 0 | 37 workspace members / 35 publishable; 0 findings; 7 accepted allowances; doctrine `FAIL=0` |
+| `docs:readme-fences` | 0 | 36 READMEs, 169 fences, 74 checked, 0 syntax-invalid, 7 expected type errors |
+| `docs:jsdoc-examples` | 0 | 359 checked, 0 failures; `unboundName=116`, `typeError=14` |
+| workspace `publish:dry-run` | 0 | `Success Dry run complete` |
+| CLI JSR audit | 0 | 1,000 files / 133,551 LOC / 277 tests / 21 existing warnings; dry-run OK |
+| `check:netscript-jsr-specifiers` | 0 | 2,453 scanned, 1 allowance, 0 ranges, 0 failures |
+| `check:scaffold-versions` | 0 | 11 stable pins |
+| `docs:tagline:check` | 0 | 36 checked, 0 over cap |
+
+Final branch-vs-base package census before the harness-only receipt: 35 package paths including
+three generated carriers; excluding generated files, 32 paths with 1,008 insertions and 1,986
+deletions. `deno.lock` is byte-identical to live main at blob `202d4c9b`.

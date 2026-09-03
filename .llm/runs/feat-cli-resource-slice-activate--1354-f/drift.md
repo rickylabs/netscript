@@ -106,3 +106,59 @@
   non-generated package changes after `8c27ffe16`.
 - **Evidence:** conflict-marker scan, generator outputs, merge commit `a042c6e57`, and the 19-file
   non-generated package diff census in `worklog.md`.
+
+## 2026-09-03 — merged-stack rebase and quality-gate ratification
+
+- **What:** After #1664, Slice A (#1950), and the plan (#1891) merged, PR #1956 still carried the
+  pre-merge Slice A ancestry and its `quality` job failed before completing docs accuracy.
+- **Source:** Owner closeout instruction at head `275a878ab`; CI run `33711047392`, job
+  `100510555451`.
+- **Expected:** Converge narrowly on current `main` `3903feea63`, preserve Slice F behavior and the
+  serial Slice G boundary, and return a new immutable receipt-bound head.
+- **Actual:** Rebase `--onto origin/main 76e7ce2d8` removed the duplicated Slice A ancestry without
+  conflicts. The quality failure had two sequential causes: eager evaluation of the Fresh/Vite
+  manifest adapter required Rollup FFI during help-only command census, then the now-reachable
+  command raised the ratified direct-command count from 91 to 92. The two existing Slice F
+  composition paths now import the Fresh adapter only when derivation/staging executes; the command
+  reference gained one exact `generate resource` row and the census ratchet moved to 92. No Slice G
+  enumerated file changed.
+- **Severity:** post-evaluation integration correction
+- **Action:** Treat the two reference-policy paths as quality-gate receipts required by public
+  activation, not as Slice G guidance/hosted-acceptance work. Re-run the full Slice F gate set and
+  bind the merge packet to the final pushed SHA.
+- **Evidence:** `deno task docs:accuracy` changed from Rollup/FFI failure, to an explicit 91→92
+  census failure, to exit 0 with 92/92 documented direct commands and 157 recursive paths; focused
+  wrapper suite passes 21/21.
+
+## 2026-09-03 — final evaluator route temporarily unavailable
+
+- **What:** The owner reported the Fable supervisor temporarily quota-blocked and explicitly
+  directed this implementation child not to wait.
+- **Source:** Owner closeout instruction for PR #1956.
+- **Expected:** Do not self-certify a replacement IMPL-EVAL and do not block the narrow convergence
+  on the unavailable route.
+- **Actual:** The committed independent `PASS_IMPL_WITH_FINDINGS` receipt remains the Slice F
+  implementation evaluation. This closeout records the bounded post-evaluation delta and relies on
+  exact local/hosted gate receipts at the new immutable head; no new evaluator verdict is claimed.
+- **Severity:** lane availability
+- **Action:** Return the immutable packet to the coordinator without merging and without waiting on
+  Fable.
+- **Evidence:** owner instruction, existing `evaluate.md`, and the final-head gate/CI receipts.
+
+## 2026-09-03 — live main advanced during receipt generation
+
+- **What:** `main` advanced from the owner-specified `3903feea63` to its direct descendant
+  `632528888` while final local receipts were running.
+- **Source:** refreshed `origin/main`; the new commit is #1980's README/quickstart correction and
+  its generated projections.
+- **Expected:** An immutable merge packet must be based on the live PR base without absorbing
+  unrelated feature scope.
+- **Actual:** The 11 Slice F commits were replayed onto `632528888`. Only generated agent-docs and
+  publish carriers conflicted; main's side was retained, then regenerated from the converged source.
+  No non-generated conflict occurred. MCP export corpus and Aspire manifest regeneration were
+  byte-identical.
+- **Severity:** expected base movement
+- **Action:** Bind the final local and hosted receipts to the new head/base pair and use an exact
+  force-with-lease against remote Slice F head `275a878ab`.
+- **Evidence:** `git merge-base`, conflict log, generator output, and final gate table in
+  `worklog.md`.

@@ -123,6 +123,7 @@ helper layer.
 | `netscript generate aspire` | Regenerate Aspire AppHost helpers from `appsettings.json`. Flag: `--project-root <path>`. |
 | `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
 | `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. The workers generator discovers project-authored top-level `workers/jobs/*.ts` modules independently of official samples, excluding declared helper files such as `job-tools.ts`. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
+| `netscript generate resource <resource>` | Generate a typed Fresh resource slice from a named query procedure. Required flag: `--procedure <path>`. Selection flags: `--client <service>`, `--app <name>`, `--project-root <path>`, `--route <path>`. Optional layers: `--form`, `--partial`, `--stream`. Application flags: `--dry-run`, `--force`, `--json`. |
 
 Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
 `netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official
