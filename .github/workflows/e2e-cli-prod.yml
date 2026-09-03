@@ -127,7 +127,26 @@ jobs:
             --report .llm/tmp/readme-quickstart-prod-report.json \
             --log-file .llm/tmp/readme-quickstart-prod.ndjson
 
+      # Verification-only branch: no product/package changes and no new publication.
+      - name: Record four-part README post-cleanup baseline
+        if: ${{ always() && steps.install_workspace_dependencies.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          readme_apphosts="$(aspire ps --format Json | jq 'length')"
+          readme_containers="$(docker container ls --all --quiet | wc -l)"
+          readme_volumes="$(docker volume ls -q | wc -l)"
+          readme_networks="$(docker network ls --filter type=custom -q | wc -l)"
+          jq -n \
+            --argjson appHosts "$readme_apphosts" \
+            --argjson containers "$readme_containers" \
+            --argjson volumes "$readme_volumes" \
+            --argjson networks "$readme_networks" \
+            '{appHosts: $appHosts, containers: $containers, volumes: $volumes, networks: $networks}' \
+            > .llm/tmp/readme-post-cleanup-baseline.json
+          jq -e '[.appHosts, .containers, .volumes, .networks] | all(. == 0)' .llm/tmp/readme-post-cleanup-baseline.json
+
       - name: Install published CLI from JSR
+        if: ${{ github.ref_name != 'test/readme-canary10-cleanup-proof' }}
         id: install_published_cli
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
@@ -135,6 +154,7 @@ jobs:
           netscript --help
 
       - name: Public init smoke from JSR CLI
+        if: ${{ github.ref_name != 'test/readme-canary10-cleanup-proof' }}
         run: |
           rm -rf .llm/tmp/cli-prod-init-smoke
           netscript init cli-prod-init-smoke \
@@ -147,6 +167,7 @@ jobs:
           test -f .llm/tmp/cli-prod-init-smoke/deno.json
 
       - name: Full scaffold runtime E2E (published CLI, one pass)
+        if: ${{ github.ref_name != 'test/readme-canary10-cleanup-proof' }}
         run: |
           deno task e2e:cli run scaffold.runtime \
             --source jsr \
@@ -197,6 +218,7 @@ jobs:
             .llm/tmp/readme-quickstart-prod-report.json
             .llm/tmp/readme-quickstart-prod.ndjson
             .llm/tmp/readme-cold-baseline.json
+            .llm/tmp/readme-post-cleanup-baseline.json
             .llm/tmp/readme-quickstart/state.json
             .llm/tmp/readme-quickstart/receipts/*.json
             .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json
