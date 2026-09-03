@@ -1075,3 +1075,22 @@ the merge.**
   bounded, not a canary blocker; proposed to the coordinator in the closure packet.
 - Waiting on Canary 9 `e2e-cli-prod` (monitor armed) for the gate-3 transcript; `#1881` closure
   comment drafted (scratchpad `1881-close.md`).
+
+## 2026-09-03 02:1xZ — Canary 9 exact red on README command 1; bounded repair dispatched
+
+- Canary 9 (`v0.0.7-canary.9`, parent 33704380711 from main `061c70fab`, child `e2e-cli-prod`
+  33704697088): scaffold.runtime PASS, quickstart.walk PASS, **`readme.quickstart.01-install-cli`
+  FAIL** exit 1 — verbatim `deno install --global --allow-all --name netscript
+  jsr:@netscript/cli@0.0.7-canary.9` → `Existing installation found. Aborting (Use -f to
+  overwrite).` The workflow's "Install published CLI from JSR" step already owns the ambient
+  global; `readme-command.ts` spawns with inherited env. `cleanup.aspire-stop` red is downstream.
+  Artifacts pulled (report + receipt 01.json) — receipt proves argv verbatim and no retry.
+- Repair (coordinator: no owner decision; README stays verbatim): isolate `DENO_INSTALL_ROOT` to a
+  run-owned `<runRoot>/.deno-install` and prepend its `bin` to PATH for every README command;
+  optional `env` on `runAspireCommand` (quickstart.walk unchanged); receipt gains `environment`.
+  RED/GREEN focused test required. Dispatched via `agentic:launch-codex-slice` → thread
+  `01a064ff-4d6c-79b2-85c5-50a7c13e28e0` (Sol medium) in `007-aspire-leaf-1881-fix`, branch
+  `fix/aspire-1881-readme-install-isolation` off main `45e57377f`; brief
+  `slices/leaf-1881-fix/brief.md`. First launch attempt failed (brief==dest path truncated the
+  brief; relaunched with the run-dir brief).
+- #1881 stays open; Canary 9 republish mode after merge (coordinator).
