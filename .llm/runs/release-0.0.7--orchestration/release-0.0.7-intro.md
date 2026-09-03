@@ -19,6 +19,12 @@ Breaking API details and migration notes are recorded in the package changelog a
 notably, SDK safe failures use undefined data and lazy server cache setup is explicit outside
 defineFreshApp. The Prisma-next database architecture remains an RFC, not a shipped database rewrite.
 
+Outside this release: [#1453](https://github.com/rickylabs/netscript/issues/1453) needs re-scoping
+because its referenced migration tool is absent from this repository. Aspire exploration
+[#1725](https://github.com/rickylabs/netscript/issues/1725) was closed as not planned under 0.0.8,
+and deeper protocol/credential readiness remains tracked in
+[#1726](https://github.com/rickylabs/netscript/issues/1726). None is claimed as shipped here.
+
 Use the root README's configuration-specific prerequisites. Its PostgreSQL/cache walkthrough uses
 containers, but NetScript and Aspire do not require Docker for every configuration. Normal image
 and dependency caches are supported; users do not need to clear them before installation.

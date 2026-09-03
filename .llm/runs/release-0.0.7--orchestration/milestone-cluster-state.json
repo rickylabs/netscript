@@ -655,9 +655,14 @@
   "committedIssues": [
     {
       "number": 863,
-      "state": "open",
+      "state": "closed",
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/863",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T14:21:14.837Z",
+      "closedAt": "2026-09-03T14:19:19Z",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/actions/runs/33763460542",
+        "https://github.com/rickylabs/netscript/actions/runs/33765493143"
+      ]
     },
     {
       "number": 1000,
@@ -1151,9 +1156,14 @@
     },
     {
       "number": 1712,
-      "state": "open",
+      "state": "closed",
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1712",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T14:21:14.837Z",
+      "closedAt": "2026-09-03T14:19:19Z",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/actions/runs/33763460542",
+        "https://github.com/rickylabs/netscript/actions/runs/33765493143"
+      ]
     },
     {
       "number": 1713,
@@ -1300,12 +1310,14 @@
     },
     {
       "number": 1881,
-      "state": "open",
+      "state": "closed",
       "evidence": [
-        "https://github.com/rickylabs/netscript/issues/1881"
+        "https://github.com/rickylabs/netscript/actions/runs/33763460542",
+        "https://github.com/rickylabs/netscript/actions/runs/33765493143"
       ],
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1881",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T14:21:14.837Z",
+      "closedAt": "2026-09-03T14:19:19Z"
     },
     {
       "number": 1844,
@@ -5751,9 +5763,9 @@
   ],
   "expensiveGates": [],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-03T12:38:53.118Z",
+    "capturedAt": "2026-09-03T14:21:14.837Z",
     "source": "Live GitHub milestone 27 export; actual remaining issues, not historical frozen inventory.",
-    "openIssueCount": 3,
+    "openIssueCount": 0,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
@@ -5761,31 +5773,9 @@
       "fixes": 0,
       "internals": 0,
       "docs": 0,
-      "aspire": 3
+      "aspire": 0
     },
-    "issues": [
-      {
-        "number": 1881,
-        "owner": "orchestrator:aspire",
-        "state": "OPEN",
-        "title": "test(aspire): clean-machine quickstart canary runs the root README sequence without manual recovery (#863 gate 3)",
-        "url": "https://github.com/rickylabs/netscript/issues/1881"
-      },
-      {
-        "number": 1712,
-        "owner": "orchestrator:aspire",
-        "state": "OPEN",
-        "title": "Epic: Aspire 13.5 adoption and orchestration stabilization",
-        "url": "https://github.com/rickylabs/netscript/issues/1712"
-      },
-      {
-        "number": 863,
-        "owner": "orchestrator:aspire",
-        "state": "OPEN",
-        "title": "scaffold: `netscript db init` can block indefinitely on an Unhealthy-but-Running Postgres resource (clean-machine quickstart flake)",
-        "url": "https://github.com/rickylabs/netscript/issues/863"
-      }
-    ],
+    "issues": [],
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
@@ -5932,13 +5922,20 @@
     {
       "id": "checkpoint-feature-complete",
       "rationale": "Publish the exact feature-complete main candidate before stable release qualification.",
-      "state": "publishing",
+      "state": "complete",
       "contentSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
       "workflowRunId": 33762898477,
       "receiptRefs": [
-        "receipts/canary10-dispatch.md",
-        "receipts/final-readiness-a2d5b8b75.ndjson"
-      ]
+        "receipts/canary10-green-pair.json",
+        "https://github.com/rickylabs/netscript/actions/runs/33765493143",
+        "https://github.com/rickylabs/netscript/releases/tag/v0.0.7-canary.10"
+      ],
+      "version": "0.0.7-canary.10",
+      "tag": "v0.0.7-canary.10",
+      "releaseCommitSha": "170e33782acf2dfb4bccc3f4e461ae8f5a149f85",
+      "publicationWorkflowRunId": 33762898477,
+      "productionE2eWorkflowRunId": 33763460542,
+      "completedAt": "2026-09-03T14:06:45Z"
     }
   ],
   "exactMainEvidence": {
@@ -6702,10 +6699,19 @@
     "publishReadinessRef": "receipts/final-readiness-a2d5b8b75.ndjson",
     "ciWorkflowRunId": 33762836732
   },
-  "existingReleaseLease": true,
-  "releaseWriters": [],
+  "existingReleaseLease": false,
+  "releaseWriters": [
+    "codex-root-0.0.7"
+  ],
   "releaseCaptain": {
-    "state": "inactive"
+    "state": "claimed",
+    "agentId": "codex-root-0.0.7",
+    "leaseId": "stable-0.0.7-final-a2d5b8b75",
+    "contentSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+    "claimedAt": "2026-09-03T14:21:14.837Z",
+    "worktree": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
+    "notesFile": "release-0.0.7-intro.md",
+    "previousReleaseTag": "v0.0.6"
   },
   "environmentState": {
     "dockerContainers": 0,
@@ -6724,7 +6730,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T13:47:24.723Z",
+  "updatedAt": "2026-09-03T14:21:14.837Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6809,27 +6815,20 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T13:47:24.723Z",
-    "nextReportDueAt": "2026-09-03T14:42:24.723Z",
-    "lastReportRef": "receipts/canary10-dispatch.md",
-    "headline": "1983 merged; all product PRs delivered. Exactmainreadiness9/9 PASS. Native finalcanary33762898477 dispatched once froma2d5b8b75; publishing then pinned productionE2E.",
+    "lastReportAt": "2026-09-03T14:21:14.837Z",
+    "nextReportDueAt": "2026-09-03T15:16:14.837Z",
+    "lastReportRef": "receipts/canary10-green-pair.json",
+    "headline": "Canary.10 publication and production GREEN; final README cleanup proof GREEN; all milestone issues closed. Primary claims sole stable writer.",
     "currentMainSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
     "canary": {
-      "target": "0.0.7-canary.10 (next available immutable number)",
-      "state": "publishing",
+      "target": "0.0.7-canary.10",
+      "state": "complete",
       "eta": {
-        "window": "Native publish followed by pinned production E2E, then stable cut if green.",
-        "confidence": "medium",
-        "basis": "JSR quota precheck passed; native canary preparation running. No owner decisions or source blockers."
+        "window": "Published and fully verified",
+        "confidence": "high",
+        "basis": "Native pair SUCCESS; same-version cleanup counts all zero."
       },
-      "criticalPath": [
-        {
-          "id": "canary-pair",
-          "state": "publishing",
-          "impact": "Published acceptance closes1881/863/1712 and admitsstable.",
-          "nextAction": "Follow33762898477 and its pinned production run; no duplicate dispatch."
-        }
-      ],
+      "criticalPath": [],
       "finalCandidatePolicy": "Owner: one intended final canary from frozen verified source, then stable after exact publish/production/cold-start acceptance. No unrelated source drift or speculative canary."
     },
     "progress": {
@@ -6846,15 +6845,18 @@
         1354,
         1455,
         1481,
-        1971
+        1971,
+        1881,
+        863,
+        1712
       ],
       "newIssues": [],
-      "queueDeltaExplanation": "Only coordinator tracking1641 remains open; three final acceptance issues remain owned."
+      "queueDeltaExplanation": "All issue acceptance complete. Stable cut and coordinator tracking closeout remain."
     },
     "scope": {
-      "openIssueCount": 3,
-      "ownedIssueCount": 3,
-      "scheduledIssueCount": 3,
+      "openIssueCount": 0,
+      "ownedIssueCount": 0,
+      "scheduledIssueCount": 0,
       "openPullRequestCount": 1,
       "unscheduledIssueNumbers": []
     },
@@ -6865,32 +6867,32 @@
         "state": "complete",
         "activeItems": [],
         "lastConcreteProgressAt": "2026-09-03T10:12:00Z",
-        "blocker": "None: #1354 closed by merged #1958.",
-        "nextAction": "No pending feature issues; retain receipts for release closeout."
+        "blocker": "None; scope delivered.",
+        "nextAction": "Preserve evidence; primary owns publication."
       },
       {
         "lane": "fixes",
         "state": "complete",
         "activeItems": [],
         "lastConcreteProgressAt": "2026-09-03T12:38:53.118Z",
-        "blocker": "None: final product PR1945 and its issues are closed.",
-        "nextAction": "Preserve merged evidence; no product restart."
+        "blocker": "None; scope delivered.",
+        "nextAction": "Preserve evidence; primary owns publication."
       },
       {
         "lane": "internals",
         "state": "complete",
         "activeItems": [],
         "lastConcreteProgressAt": "2026-09-03T13:47:24.723Z",
-        "blocker": "None;1983merged.",
-        "nextAction": "No newproduct work; primary owns release acceptance."
+        "blocker": "None; scope delivered.",
+        "nextAction": "Preserve evidence; primary owns publication."
       },
       {
         "lane": "docs",
         "state": "complete",
         "activeItems": [],
         "lastConcreteProgressAt": "2026-09-03T08:11:43Z",
-        "blocker": "Native Fable monthly cap.",
-        "nextAction": "Release-note top-up after final merges; no docs barrier to product work."
+        "blocker": "None; scope delivered.",
+        "nextAction": "Preserve evidence; primary owns publication."
       }
     ],
     "topicSupervisors": [
@@ -6950,17 +6952,7 @@
         "verifiedAt": "2026-09-03T07:59:00Z"
       }
     ],
-    "blockers": [
-      {
-        "id": "native-fable-quota",
-        "category": "evaluator-transport",
-        "summary": "All five restored native Fable supervisors report monthly spend cap; visibility does not mean executing.",
-        "impact": "Native supervisory turns unavailable; same Codex authors and sanctioned OpenRouter evaluators continue.",
-        "owner": "coordinator",
-        "nextAction": "Do not spin retries or silently change model/spend settings; route approved evaluations and keep existing authors moving.",
-        "ownerDecisionRequired": false
-      }
-    ],
+    "blockers": [],
     "environment": {
       "checkedAt": "2026-09-03T12:44:29Z",
       "aspireApplications": 0,
