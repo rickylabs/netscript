@@ -12,6 +12,7 @@ import { createCleanupGates } from '../../src/application/gates/scaffold/runtime
 const DEFAULT_COMMAND_TIMEOUT_MS = 900_000;
 const ASPIRE_COMMAND_TIMEOUT_MS = 180_000;
 const ASPIRE_WAIT_TIMEOUT_MS = 65_000;
+const CURL_COMMAND_TIMEOUT_MS = 20_000;
 const WRAPPER_GRACE_MS = 5_000;
 
 const README_GATE_IDS = [
@@ -25,6 +26,7 @@ const README_GATE_IDS = [
   GATE.README_QUICKSTART_DB_INIT,
   GATE.README_QUICKSTART_DB_GENERATE,
   GATE.README_QUICKSTART_DB_SEED,
+  GATE.README_QUICKSTART_ASPIRE_WAIT_USERS,
   GATE.README_QUICKSTART_CURL_HEALTH,
 ] as const;
 
@@ -39,6 +41,7 @@ const README_GATE_PHASES = [
   GATE_PHASE.DATABASE,
   GATE_PHASE.DATABASE,
   GATE_PHASE.DATABASE,
+  GATE_PHASE.RUNTIME,
   GATE_PHASE.BEHAVIOR,
 ] as const;
 
@@ -132,5 +135,6 @@ function requirePublishedCli(context: RunContext): void {
 function commandTimeout(command: string): number {
   if (command.startsWith('aspire wait ')) return ASPIRE_WAIT_TIMEOUT_MS;
   if (command.startsWith('aspire ')) return ASPIRE_COMMAND_TIMEOUT_MS;
+  if (command.startsWith('curl ')) return CURL_COMMAND_TIMEOUT_MS;
   return DEFAULT_COMMAND_TIMEOUT_MS;
 }

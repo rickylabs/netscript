@@ -28,7 +28,8 @@ export const README_QUICKSTART_EXPECTED_COMMANDS = [
   'netscript db init --name init',
   'netscript db generate',
   'netscript db seed',
-  'curl http://localhost:<port>/health',
+  'aspire wait users --status healthy --timeout 60 --apphost aspire/apphost.mts',
+  'curl --fail-with-body --show-error --max-time 15 http://localhost:<port>/health',
 ] as const;
 
 /** Extract ordered executable lines from marked bash fences in README Markdown. */
