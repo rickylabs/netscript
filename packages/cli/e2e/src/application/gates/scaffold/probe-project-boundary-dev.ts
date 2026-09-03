@@ -1,9 +1,10 @@
-/** Host-tolerant budget for dependency preflight and Vite startup. */
+/** Direct child-process preflight/startup ceiling; no Aspire resource exists in this probe. */
 export const DEV_STARTUP_BUDGET_MS = 180_000;
 
-/** HTTP readiness budget reserved until after Vite reports its local address. */
+/** Direct Fresh-child HTTP ceiling after Vite reports its address; no Aspire state is sampled. */
 export const FRESH_HTTP_READINESS_BUDGET_MS = 60_000;
 
+/** Direct Fresh-child HTTP retry interval; it never observes an Aspire resource. */
 const HTTP_POLL_INTERVAL_MS = 250;
 const VITE_READY_MARKER = 'Local:';
 const ANSI_ESCAPE_PATTERN = new RegExp(

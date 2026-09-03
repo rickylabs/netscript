@@ -567,7 +567,7 @@ export function correlateUsersTelemetry(
   };
 }
 
-/** Poll eventually-consistent dashboard logs and traces until their trace IDs correlate. */
+/** Poll eventual telemetry export after HTTP success; this does not infer Aspire resource state. */
 export async function pollUsersTelemetryCorrelation(
   reader: UsersTelemetryReader,
   options: { readonly maxAttempts?: number; readonly delayMs?: number } = {},

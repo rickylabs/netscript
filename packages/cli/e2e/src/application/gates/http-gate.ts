@@ -2,7 +2,9 @@ import type { GateResult, HttpGateDefinition } from '../../domain/gate-definitio
 import type { RunContext } from '../../domain/run-context.ts';
 import type { HttpClient, HttpResult } from '../../ports/http-client.ts';
 
+/** Per-request HTTP transport cap; this probes application responses, not Aspire resource state. */
 const HTTP_ATTEMPT_TIMEOUT_MS = 5_000;
+/** Delay between application HTTP attempts; it is not an Aspire readiness interval. */
 const HTTP_RETRY_DELAY_MS = 250;
 
 /** Gate that succeeds when an HTTP endpoint returns a 2xx response. */

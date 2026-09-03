@@ -42,6 +42,7 @@ function extractNativeExample(markdown: string): string {
 }
 
 const PROOF_SUFFIX = `
+/** Application SSE-data ceiling for the documented client; it does not observe Aspire state. */
 const documentedExampleDeadline = Date.now() + 15_000;
 let documentedExampleReceipt = 0;
 try {

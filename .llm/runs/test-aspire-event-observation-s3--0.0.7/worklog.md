@@ -83,9 +83,27 @@ test fails non-vacuously on the remaining timed `aspire describe` loop.
 | Focused fenced tests + polling policy | PASS — 58 passed, 0 failed |
 | Focused runtime check wrapper | PASS — 3 files, 0 findings |
 
+### S3 — Bucket C disposition
+
+All eight sites are retained as legitimately timing-based; none is an Aspire resource-state wait.
+The full per-site rationale is in `bucket-c-disposition.md`.
+
+| Boundary | Sites |
+| --- | --- |
+| Application HTTP/render | `http-gate.ts`, `probe-app-home.ts` |
+| Application SSE/domain state | `consume-flow-b-stream.ts`, `select-flow-b-stream-change.ts`, `durable-cli-parity.ts`, `run-documented-stream-example.ts` |
+| Direct child process | `probe-project-boundary-dev.ts` |
+| In-process MCP fixture | `ui-ai-gates.ts` |
+
+Resource endpoints used by the application probes are already resolved through the shared follower.
+Comments beside the remaining bounds now state the actual effect they cap. Focused Bucket-C and
+policy tests pass 91/91.
+
 ## Reconcile
 
 - S1: issue #1906 remains open and this partial slice uses `Refs #1906`; the six-file fence is clear
   and the pinned-base RED agrees with the current issue inventory after #1969.
 - S2: the polling allowlist is empty and every formerly fenced file now has an explicit disposition.
   No issue/PR comment changed the brief or scope.
+- S3: Bucket C contains no newly discovered resource-readiness surrogate. The disposition closes
+  the issue's eight-row judgement inventory without expanding into application-effect rewrites.
