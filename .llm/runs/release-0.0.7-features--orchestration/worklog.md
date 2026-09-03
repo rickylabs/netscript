@@ -11035,3 +11035,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 00:33Z — #1895 merged at `b142783c9` → main `262aa8fbe`; #1590 CLOSED. #1664/#1950/#1956/#1958 all MERGEABLE, no drift. #1664 `dbb577826`: check-test in progress, runtime tiers pending; probe-delta eval in flight.
 - 00:37Z — #1664 `dbb577826` required-green → `status:ready-merge` applied; full ci run 33699263324 rerun for the mirror (evidence block per-issue, 17/17 parse-verified). Runtime tiers pending. Packet on close-gate + runtime green.
 - 00:37Z — #1664 mirror rerun: close-gate SUCCESS at `dbb577826`. Runtime tiers of the prior e2e run were cancelled by a re-dispatch (concurrency group); new e2e run 33700272827 pending at the same head.
+- 00:41Z — #1664 probe-delta native eval **PASS_IMPL_WITH_FINDINGS** (LOW/INFO only); receipt parked at `/home/agent/observability/eval-1664-probe-delta.md` to keep `dbb577826` immutable; commit with post-merge harness sync.
