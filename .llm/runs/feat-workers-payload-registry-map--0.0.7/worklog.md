@@ -71,6 +71,7 @@ Define one schema next to a job, pass it to `defineJobHandler(schema, handler)` 
 | 2026-09-03 | 4         | fenced CI blocker      | Extra `deno task check:mcp-export-corpus` fails because `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is stale. The canonical fix is `deno task gen:mcp-export-corpus`, but `packages/mcp/**` is outside this brief's ceiling, so it was not run and no fenced file was touched.                       |
 | 2026-09-03 | PR        | opened                 | Non-draft PR #1970 opened with the exact requested labels and milestone `0.0.7`; body uses `Refs #1455` and names the fenced generated-corpus remainder. Pushed receipt head before this final log update: `e18f2abe6`.                                                                                                                       |
 | 2026-09-03 | repair    | supervisor steer       | Hosted audit found first-party source compatibility and JSDoc example regressions at `feb55c046`. The steer explicitly expands the implementation ceiling to the named `plugins/triggers/**` consumers and `plugins/sagas/tests/runtime/storefront-checkout-flow_test.ts`; no trigger-core contract or generated metadata change is included. |
+| 2026-09-03 | repair    | GREEN implementation   | `4cf0795b8` migrates every named first-party consumer, fixes the standalone JSDoc example, and aligns workers doctor with the emitted literal definition registry. Explicit refspec push succeeded. |
 
 ### Repair RED — exact branch head `feb55c046fe396bb7d9283678ecceaaea7098606`
 
@@ -233,3 +234,6 @@ reported only the unused directive.
 - PR: #1970 (`https://github.com/rickylabs/netscript/pull/1970`).
 - Final implementation commit: `c194a4145`; the final branch head is the harness receipt commit that
   contains this line and is reported after its explicit-refspec push.
+- Repair implementation commit: `4cf0795b8`; exact RED→GREEN and static-lane receipts are above.
+- The final branch head is the log-only receipt commit containing this handoff; its exact SHA is
+  reported in the PR repair comment and the implementation lane's final message.
