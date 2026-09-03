@@ -992,3 +992,18 @@ the merge.**
   `runtime-gates_test.ts`, no conflicts); `gen:*` carrier chain re-run → no delta; five carrier /
   manifest checks green; `run-deno-check`/`lint`/`fmt` on `packages/cli/e2e` clean; e2e tests
   300/300. On Canary 8 completion: push, exact-head CI + tiers, new packet.
+
+## 2026-09-03 00:2xZ — Canary 8 result; #1952 convergence pushed; #1881 PR #1965 open
+
+- **Canary 8** (release 33697398852 from `79adb103b`, `v0.0.7-canary.8`): packages published;
+  pinned prod E2E 33697779870 → every Aspire gate PASSED (`runtime.health.listener-unreachable`,
+  `runtime.typed-db-phase-b`, `behavior.live-db-endpoint` — the #1962 target). Sole red:
+  `behavior.package-backed-plugin-doctor` (published CLI `generate plugins` exits 0 without writing
+  the workers registry in the package-backed fixture root). Coordinator: fixes lane owns the P0
+  fix-forward; **not** Aspire scope.
+- **#1952** convergence `1a759ea34` pushed after Canary 8 completed; comment 5518374126; tiers +
+  CI re-running at the exact head. Packet at `478450a3c` withdrawn; new packet on green.
+- **#1881** Codex thread `01a06491…` opened PR **#1965** (`test/aspire-1881-readme-quickstart`,
+  design commit `75c41ee15`, labels/milestone/`Closes #1881` correct; S1–S3 pending). Thread drift
+  noted: parent `research.md` absent at leaf baseline (verified `aspire wait` locally); scoped lint
+  wrapper refuses the desktop fixture (pre-existing, deferred).
