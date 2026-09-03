@@ -250,7 +250,9 @@ export async function probeLiveServiceRefetch(
   for (const baseUrl of baseUrls) {
     try {
       const url = new URL(SERVICE_SHOWCASE_PATH, baseUrl).toString();
-      assertSettledRefetch(await collectBrowserRefetchEvidence(url));
+      await collectBrowserRefetchEvidence(url, {
+        assertSettled: assertSettledRefetch,
+      });
       return;
     } catch (error) {
       lastError = error;

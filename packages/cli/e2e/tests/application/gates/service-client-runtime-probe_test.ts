@@ -17,10 +17,12 @@ import {
   captureBoundedText,
   CdpClient,
   probeBrowserVersion,
+  restoreMutationPostData,
   selectBrowserExecutable,
   selectPageDebugTarget,
   terminateBrowserProcess,
   waitForCompletedStableBaseline,
+  withMutationRestore,
 } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { generatedAppName } from '../../../src/application/gates/scaffold/runtime/generated-app-name.ts';
@@ -324,6 +326,59 @@ Deno.test('settled refetch proof requires mutation, optimistic row, exactly +1, 
     Error,
     'persisted row did not contain Ada*',
   );
+});
+
+Deno.test('fixture restoration rewrites the generated Rename request to the captured name', () => {
+  const postData = JSON.stringify({
+    json: {
+      id: 1,
+      data: { name: 'Seed User**' },
+    },
+  });
+  const restored = JSON.parse(
+    restoreMutationPostData(postData, 'Seed User**', 'Seed User*'),
+  );
+  assertEquals(restored, {
+    json: {
+      id: 1,
+      data: { name: 'Seed User*' },
+    },
+  });
+});
+
+Deno.test('fixture restoration runs after the settled verdict and after a post-mutation failure', async () => {
+  const successCalls: string[] = [];
+  const evidence = await withMutationRestore(
+    () => {
+      successCalls.push('settled assertion');
+      return Promise.resolve('evidence');
+    },
+    () => true,
+    () => {
+      successCalls.push('restore captured original name');
+      return Promise.resolve();
+    },
+  );
+  assertEquals(evidence, 'evidence');
+  assertEquals(successCalls, ['settled assertion', 'restore captured original name']);
+
+  const failureCalls: string[] = [];
+  const probeFailure = new Error('proof failed after onMutate');
+  const observedFailure = await assertRejects(() =>
+    withMutationRestore(
+      () => {
+        failureCalls.push('onMutate ran');
+        return Promise.reject(probeFailure);
+      },
+      () => true,
+      () => {
+        failureCalls.push('restore captured original name');
+        return Promise.resolve();
+      },
+    )
+  );
+  assertStrictEquals(observedFailure, probeFailure);
+  assertEquals(failureCalls, ['onMutate ran', 'restore captured original name']);
 });
 
 Deno.test('quiet baseline rejects a late initial request before accepting the completed count', async () => {
@@ -818,7 +873,7 @@ Deno.test('browser termination propagates unrelated kill and drain errors unchan
   assertStrictEquals(actual, drainError);
 });
 
-Deno.test('browser refetch probe refreshes its row baseline and fully releases response interception', async () => {
+Deno.test('browser refetch probe proves refetch before restoring its captured row name', async () => {
   const sourceUrl = new URL(
     '../../../src/application/gates/scaffold/service-client-browser-probe.ts',
     import.meta.url,
@@ -827,21 +882,28 @@ Deno.test('browser refetch probe refreshes its row baseline and fully releases r
   const testSource = await Deno.readTextFile(new URL(import.meta.url));
   assertStringIncludes(source, 'await waitForCompletedStableBaseline(() => ({');
   assertEquals(source.includes('await delay(750)'), false);
-  assertStringIncludes(source, "client.send('Fetch.continueResponse'");
-  assertStringIncludes(source, "client.send('Fetch.disable')");
-  assertEquals(source.includes("client.send('Fetch.continueRequest'"), false);
+  assertStringIncludes(source, "client!.send('Fetch.continueResponse'");
+  assertStringIncludes(source, "client!.send('Fetch.disable')");
+  assertStringIncludes(source, "client.send('Fetch.continueRequest'");
   const stableBaseline = source.indexOf('await waitForCompletedStableBaseline(() => ({');
   const refreshedRow = source.indexOf(
     'originalName = await waitForExpression<string>(client, rowNameExpression())',
     stableBaseline,
   );
   const renameClick = source.indexOf(
-    'await evaluate(client, clickRenameExpression())',
+    'await evaluate(client!, clickRenameExpression())',
     refreshedRow,
   );
   assert(stableBaseline >= 0 && refreshedRow > stableBaseline && renameClick > refreshedRow);
-  const continueResponse = source.indexOf("client.send('Fetch.continueResponse'");
-  const disableFetch = source.indexOf("client.send('Fetch.disable')", continueResponse);
+  const settledVerdict = source.indexOf('options.assertSettled?.(evidence);', renameClick);
+  const restoreCall = source.indexOf('await restoreRenamedRow(', settledVerdict);
+  assert(settledVerdict > renameClick && restoreCall > settledVerdict);
+  assertStringIncludes(
+    source.slice(restoreCall, source.indexOf(');', restoreCall) + 2),
+    'originalName',
+  );
+  const continueResponse = source.indexOf("client!.send('Fetch.continueResponse'");
+  const disableFetch = source.indexOf("client!.send('Fetch.disable')", continueResponse);
   assert(continueResponse >= 0 && disableFetch > continueResponse);
   assertStringIncludes(source, 'const stderr = captureBoundedText(child.stderr);');
   assertStringIncludes(source, 'const childStatus = child.status;');
@@ -979,6 +1041,7 @@ Deno.test('live service refetch targets the same canonical page as island hydrat
   );
   assertStringIncludes(source, "const SERVICE_SHOWCASE_PATH = '/examples/users';");
   assertEquals(source.includes('/examples/users?preview=success'), false);
+  assertStringIncludes(source, 'assertSettled: assertSettledRefetch');
 });
 
 Deno.test('generated consumer imports usersQueries and paymentsQueries together without aliases', () => {

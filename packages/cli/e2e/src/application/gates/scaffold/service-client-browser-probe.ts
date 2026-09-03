@@ -49,6 +49,11 @@ export interface SettledRefetchEvidence {
   readonly renamedName: string;
 }
 
+export interface BrowserRefetchProbeOptions {
+  /** Run the unchanged settled-refetch verdict before fixture restoration. */
+  readonly assertSettled?: (evidence: SettledRefetchEvidence) => void;
+}
+
 export interface RequestCompletionCounts {
   readonly requestCount: number;
   readonly completedCount: number;
@@ -242,7 +247,10 @@ export class CdpClient {
 }
 
 /** Collect the mutation/refetch evidence from one live generated app URL. */
-export async function collectBrowserRefetchEvidence(url: string): Promise<SettledRefetchEvidence> {
+export async function collectBrowserRefetchEvidence(
+  url: string,
+  options: BrowserRefetchProbeOptions = {},
+): Promise<SettledRefetchEvidence> {
   const selection = await selectBrowserExecutable();
   const port = reservePort();
   const profile = await Deno.makeTempDir({ prefix: 'netscript-service-client-cdp-' });
@@ -355,62 +363,90 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
       throw diagnosticsError('refreshed Rename row assertion failed', diagnostics, error);
     }
     const renamedName = `${originalName}*`;
+    let paused: Record<string, unknown> | undefined;
+    let responseReleased = false;
+    let onMutateRan = false;
 
-    await evaluate(client, clickRenameExpression());
-    const paused = await client.waitFor(
-      'Fetch.requestPaused',
-      (params) => {
-        const request = params.request as { url?: string } | undefined;
-        return isRpcPath(request?.url, UPDATE_PATH) &&
-          typeof params.responseStatusCode === 'number';
+    const releaseMutationResponse = async () => {
+      if (responseReleased) return;
+      if (paused) {
+        await client!.send('Fetch.continueResponse', { requestId: paused.requestId });
+      }
+      await client!.send('Fetch.disable');
+      responseReleased = true;
+      if (paused && typeof paused.networkId === 'string') {
+        await client!.waitFor(
+          'Network.loadingFinished',
+          (params) => params.requestId === paused!.networkId,
+        );
+      }
+    };
+
+    return await withMutationRestore(
+      async () => {
+        await evaluate(client!, clickRenameExpression());
+        paused = await client!.waitFor(
+          'Fetch.requestPaused',
+          (params) => {
+            const request = params.request as { url?: string } | undefined;
+            return isRpcPath(request?.url, UPDATE_PATH) &&
+              typeof params.responseStatusCode === 'number';
+          },
+        );
+        onMutateRan = true;
+        let optimistic: boolean;
+        try {
+          optimistic = await waitForExpression<boolean>(
+            client!,
+            rowContainsExpression(renamedName),
+            (value) => value,
+          );
+        } catch (error) {
+          const diagnostics = await captureOptimisticRenderDiagnostics(
+            client!,
+            renamedName,
+            instrumentation,
+            true,
+            pageDiagnostics.snapshot(),
+          );
+          throw diagnosticsError('optimistic row assertion failed', diagnostics, error);
+        }
+        const mutationStatus = paused.responseStatusCode;
+        await releaseMutationResponse();
+
+        await waitUntil(
+          () => listRequestIds.size === baseline + 1 && completedListIds.size >= baseline + 1,
+          'one settled users.list refetch',
+        );
+        const finalRow = await waitForExpression<boolean>(
+          client!,
+          rowContainsExpression(renamedName),
+          (value) => value,
+        );
+        await delay(500);
+        const evidence = {
+          baselineListRequestCount: baseline,
+          finalListRequestCount: listRequestIds.size,
+          mutationSucceeded: typeof mutationStatus === 'number' && mutationStatus >= 200 &&
+            mutationStatus < 300,
+          optimisticRowContainedRenamedName: optimistic,
+          finalRowContainedRenamedName: finalRow,
+          renamedName,
+        };
+        options.assertSettled?.(evidence);
+        return evidence;
+      },
+      () => onMutateRan,
+      async () => {
+        await releaseMutationResponse();
+        await restoreRenamedRow(
+          client!,
+          originalName,
+          listRequestIds,
+          completedListIds,
+        );
       },
     );
-    let optimistic: boolean;
-    try {
-      optimistic = await waitForExpression<boolean>(
-        client,
-        rowContainsExpression(renamedName),
-        (value) => value,
-      );
-    } catch (error) {
-      const diagnostics = await captureOptimisticRenderDiagnostics(
-        client,
-        renamedName,
-        instrumentation,
-        true,
-        pageDiagnostics.snapshot(),
-      );
-      throw diagnosticsError('optimistic row assertion failed', diagnostics, error);
-    }
-    const mutationStatus = paused.responseStatusCode;
-    await client.send('Fetch.continueResponse', { requestId: paused.requestId });
-    await client.send('Fetch.disable');
-    if (typeof paused.networkId === 'string') {
-      await client.waitFor(
-        'Network.loadingFinished',
-        (params) => params.requestId === paused.networkId,
-      );
-    }
-
-    await waitUntil(
-      () => listRequestIds.size === baseline + 1 && completedListIds.size >= baseline + 1,
-      'one settled users.list refetch',
-    );
-    const finalRow = await waitForExpression<boolean>(
-      client,
-      rowContainsExpression(renamedName),
-      (value) => value,
-    );
-    await delay(500);
-    return {
-      baselineListRequestCount: baseline,
-      finalListRequestCount: listRequestIds.size,
-      mutationSucceeded: typeof mutationStatus === 'number' && mutationStatus >= 200 &&
-        mutationStatus < 300,
-      optimisticRowContainedRenamedName: optimistic,
-      finalRowContainedRenamedName: finalRow,
-      renamedName,
-    };
   } finally {
     client?.close();
     try {
@@ -647,6 +683,77 @@ export async function waitForCompletedStableBaseline(
   );
 }
 
+/** Preserve a probe's primary verdict while restoring shared fixture state after a mutation. */
+export async function withMutationRestore<T>(
+  operation: () => Promise<T>,
+  shouldRestore: () => boolean,
+  restore: () => Promise<void>,
+): Promise<T> {
+  let operationCompleted = false;
+  let operationError: unknown;
+  try {
+    const operationResult = await operation();
+    operationCompleted = true;
+    return operationResult;
+  } catch (error) {
+    operationError = error;
+    throw error;
+  } finally {
+    if (shouldRestore()) {
+      try {
+        await restore();
+      } catch (restoreError) {
+        if (!operationCompleted) {
+          throw new AggregateError(
+            [operationError, restoreError],
+            'service-client refetch proof and fixture restoration both failed',
+          );
+        }
+        throw restoreError;
+      }
+    }
+  }
+}
+
+/** Rewrite only the generated Rename payload's requested name for fixture restoration. */
+export function restoreMutationPostData(
+  postData: string | undefined,
+  requestedName: string,
+  originalName: string,
+): string {
+  if (postData === undefined) throw new Error('users.update restore request had no POST data');
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(postData);
+  } catch (error) {
+    throw new Error('users.update restore request POST data was not JSON', { cause: error });
+  }
+
+  let replacements = 0;
+  const replaceRequestedName = (value: unknown): unknown => {
+    if (value === requestedName) {
+      replacements += 1;
+      return originalName;
+    }
+    if (Array.isArray(value)) return value.map(replaceRequestedName);
+    if (value !== null && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, entry]) => [key, replaceRequestedName(entry)]),
+      );
+    }
+    return value;
+  };
+  const restored = replaceRequestedName(parsed);
+  if (replacements === 0) {
+    throw new Error(
+      `users.update restore request did not contain requested name ${
+        JSON.stringify(requestedName)
+      }`,
+    );
+  }
+  return JSON.stringify(restored);
+}
+
 function rowNameExpression(): string {
   return `(() => {
     const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim() === 'Rename');
@@ -864,6 +971,88 @@ function clickRefreshExpression(): string {
     button.click();
     return true;
   })()`;
+}
+
+function readyRenameRowNameExpression(): string {
+  return `(() => {
+    const button = [...document.querySelectorAll('button')].find((entry) => entry.textContent?.trim() === 'Rename');
+    if (!(button instanceof HTMLButtonElement) || button.disabled) return undefined;
+    return button.closest('li')?.querySelector('p')?.textContent?.trim();
+  })()`;
+}
+
+async function restoreRenamedRow(
+  client: CdpClient,
+  originalName: string,
+  listRequestIds: Set<string>,
+  completedListIds: Set<string>,
+): Promise<void> {
+  const currentName = await waitForExpression<string>(client, readyRenameRowNameExpression());
+  if (currentName === originalName) return;
+
+  const requestedName = `${currentName}*`;
+  const restoreBaseline = await waitForCompletedStableBaseline(() => ({
+    requestCount: listRequestIds.size,
+    completedCount: completedListIds.size,
+  }));
+  let interceptionEnabled = false;
+  let restoreRequestReleased = false;
+  let paused: Record<string, unknown> | undefined;
+  try {
+    await client.send('Fetch.enable', {
+      patterns: [{ urlPattern: `*${UPDATE_PATH}*`, requestStage: 'Request' }],
+    });
+    interceptionEnabled = true;
+    await evaluate(client, clickRenameExpression());
+    paused = await client.waitFor(
+      'Fetch.requestPaused',
+      (params) => {
+        const request = params.request as { url?: string } | undefined;
+        return isRpcPath(request?.url, UPDATE_PATH) &&
+          typeof params.responseStatusCode !== 'number';
+      },
+    );
+    const request = paused.request as { postData?: string } | undefined;
+    const postData = restoreMutationPostData(request?.postData, requestedName, originalName);
+    await client.send('Fetch.continueRequest', {
+      requestId: paused.requestId,
+      postData: new TextEncoder().encode(postData).toBase64(),
+    });
+    restoreRequestReleased = true;
+    await client.send('Fetch.disable');
+    interceptionEnabled = false;
+    if (typeof paused.networkId === 'string') {
+      await client.waitFor(
+        'Network.loadingFinished',
+        (params) => params.requestId === paused!.networkId,
+      );
+    }
+    await waitUntil(
+      () =>
+        listRequestIds.size === restoreBaseline + 1 &&
+        completedListIds.size >= restoreBaseline + 1,
+      'one fixture-restoration users.list refetch',
+    );
+    await waitForExpression<boolean>(
+      client,
+      rowContainsExpression(originalName),
+      (value) => value,
+    );
+    await delay(500);
+    if (listRequestIds.size !== restoreBaseline + 1) {
+      throw new Error(
+        `fixture restoration users.list request count was ${listRequestIds.size}; ` +
+          `expected ${restoreBaseline + 1}`,
+      );
+    }
+  } finally {
+    if (interceptionEnabled) {
+      if (paused && !restoreRequestReleased) {
+        await client.send('Fetch.continueRequest', { requestId: paused.requestId });
+      }
+      await client.send('Fetch.disable');
+    }
+  }
 }
 
 async function evaluate<T>(client: CdpClient, expression: string): Promise<T | undefined> {
