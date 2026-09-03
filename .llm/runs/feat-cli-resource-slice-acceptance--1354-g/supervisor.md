@@ -8,7 +8,7 @@
 | Checkout | `/home/agent/projects/netscript/worktrees/007-leaf-1354-g` |
 | Worktree | `/home/agent/projects/netscript/worktrees/007-leaf-1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Baseline | `origin/main` `e14322c511bbf26018c617c12f639474b6092c32`, merged without rebase in `008d3264c5352abf6d1e3798d580550ec98e7e7c` |
+| Baseline | Current `origin/main` `94fe507af47171cd4f295e8f532b281d7147b334`, merged without rebase in `964d3cdd344828126fd90227bd7618c2bd41845e` (the required Slice F baseline was first merged in `008d3264c5352abf6d1e3798d580550ec98e7e7c`) |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 
 ## Routes in force

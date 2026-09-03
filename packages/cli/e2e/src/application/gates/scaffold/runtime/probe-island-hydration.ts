@@ -49,34 +49,6 @@ export function receiptFromIslandInteraction(
   return { islandHydrated: true, freshIslandElement: observation.freshIslandElement };
 }
 
-/** Require one successful active-query refetch from the generated resource island. */
-export function assertResourceQueryRefetch(
-  observation: ResourceQueryRefetchObservation,
-): void {
-  if (!observation.queryClientFound) {
-    throw new Error(
-      'generated resource QueryClient was not reachable from the hydrated Preact tree',
-    );
-  }
-  if (!observation.listQueryFound) {
-    throw new Error('generated users.list query was not present in the resource QueryClient');
-  }
-  const expected = observation.baselineListRequestCount + 1;
-  if (observation.finalListRequestCount !== expected) {
-    throw new Error(
-      `users.list request count was ${observation.finalListRequestCount}; expected ${expected}`,
-    );
-  }
-  if (
-    observation.refetchStatus === null || observation.refetchStatus < 200 ||
-    observation.refetchStatus >= 300
-  ) {
-    throw new Error(
-      `users.list refetch returned ${observation.refetchStatus ?? 'no HTTP response'}`,
-    );
-  }
-}
-
 /** Resolve the live generated app and prove its resource QueryIsland hydrated. */
 export async function probeIslandHydration(
   projectRoot: string,
@@ -124,7 +96,7 @@ export async function probeResourceQueryRefetch(
   for (const baseUrl of baseUrls) {
     try {
       const observation = await interact(new URL(ISLAND_PATH, baseUrl).toString());
-      assertResourceQueryRefetch(observation);
+      requireResourceQueryRefetch(observation);
       return observation;
     } catch (error) {
       lastError = error;
@@ -133,76 +105,38 @@ export async function probeResourceQueryRefetch(
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
+function requireResourceQueryRefetch(observation: ResourceQueryRefetchObservation): void {
+  if (!observation.queryClientFound) throw new Error('resource QueryClient was not reachable');
+  if (!observation.listQueryFound) throw new Error('users.list query was not present');
+  const expected = observation.baselineListRequestCount + 1;
+  if (observation.finalListRequestCount !== expected) {
+    throw new Error(
+      `users.list request count was ${observation.finalListRequestCount}; expected ${expected}`,
+    );
+  }
+  const status = observation.refetchStatus;
+  if (status === null || status < 200 || status >= 300) {
+    throw new Error(`users.list refetch returned ${status ?? 'no HTTP response'}`);
+  }
+}
+
 async function interactWithHeadlessChrome(url: string): Promise<IslandHydrationObservation> {
-  const executable = await findBrowserExecutable();
-  const port = reservePort();
-  const profile = await Deno.makeTempDir({ prefix: 'netscript-island-hydration-' });
-  const child = new Deno.Command(executable, {
-    args: [
-      '--headless=new',
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-background-networking',
-      '--no-sandbox',
-      `--remote-debugging-port=${port}`,
-      `--user-data-dir=${profile}`,
-      'about:blank',
-    ],
-    stdout: 'null',
-    stderr: 'null',
-  }).spawn();
-  let client: CdpClient | undefined;
-  try {
-    client = await CdpClient.connect(await waitForPageTarget(port));
-    await client.send('Page.enable');
-    await client.send('Runtime.enable');
+  return await withHeadlessChrome('island-hydration', async (client) => {
     await client.send('Page.navigate', { url });
     await client.waitFor('Page.loadEventFired');
-
     return await waitForEvaluation<IslandHydrationObservation>(
       client,
       islandHydrationObservationExpression(),
       (value) => value?.freshIslandElement !== null && value?.queryClientFound === true,
     );
-  } finally {
-    client?.close();
-    try {
-      child.kill('SIGTERM');
-    } catch {
-      // The browser already terminated; its status below still completes cleanup.
-    }
-    await child.status;
-    await Deno.remove(profile, { recursive: true }).catch(() => undefined);
-  }
+  });
 }
 
 async function interactWithHeadlessChromeForRefetch(
   url: string,
 ): Promise<ResourceQueryRefetchObservation> {
-  const executable = await findBrowserExecutable();
-  const port = reservePort();
-  const profile = await Deno.makeTempDir({ prefix: 'netscript-resource-refetch-' });
-  const child = new Deno.Command(executable, {
-    args: [
-      '--headless=new',
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-background-networking',
-      '--no-sandbox',
-      `--remote-debugging-port=${port}`,
-      `--user-data-dir=${profile}`,
-      'about:blank',
-    ],
-    stdout: 'null',
-    stderr: 'null',
-  }).spawn();
-  let client: CdpClient | undefined;
-  try {
-    client = await CdpClient.connect(await waitForPageTarget(port));
-    await client.send('Page.enable');
-    await client.send('Runtime.enable');
+  return await withHeadlessChrome('resource-refetch', async (client) => {
     await client.send('Network.enable');
-
     const requestIds = new Set<string>();
     const completedIds = new Set<string>();
     const responseStatuses = new Map<string, number>();
@@ -211,36 +145,30 @@ async function interactWithHeadlessChromeForRefetch(
       if (
         method === 'Network.requestWillBeSent' && requestId &&
         isUsersListUrl((params.request as { url?: unknown } | undefined)?.url)
-      ) {
-        requestIds.add(requestId);
-      } else if (method === 'Network.responseReceived' && requestId && requestIds.has(requestId)) {
+      ) requestIds.add(requestId);
+      else if (method === 'Network.responseReceived' && requestId && requestIds.has(requestId)) {
         const status = (params.response as { status?: unknown } | undefined)?.status;
         if (typeof status === 'number') responseStatuses.set(requestId, status);
       } else if (method === 'Network.loadingFinished' && requestId && requestIds.has(requestId)) {
         completedIds.add(requestId);
       }
     });
-
     await client.send('Page.navigate', { url });
     await client.waitFor('Page.loadEventFired');
     const discovery = await waitForEvaluation<QueryClientDiscoveryObservation>(
       client,
-      queryClientDiscoveryExpression(),
+      resourceQueryExpression(false),
       (value) => value?.queryClientFound === true && value?.listQueryFound === true,
     );
-    const baseline = await waitForStableRequestCount(
-      () => ({ requestCount: requestIds.size, completedCount: completedIds.size }),
-    );
+    const counts = () => ({ requestCount: requestIds.size, completedCount: completedIds.size });
+    const baseline = await waitForStableRequestCount(counts);
     const invalidation = await client.evaluate<QueryClientDiscoveryObservation>(
-      invalidateResourceQueryExpression(),
+      resourceQueryExpression(true),
     );
     if (!invalidation?.queryClientFound || !invalidation.listQueryFound) {
       throw new Error('generated users.list query disappeared before invalidation');
     }
-    await waitForRequestCount(
-      () => ({ requestCount: requestIds.size, completedCount: completedIds.size }),
-      baseline + 1,
-    );
+    await waitForRequestCount(counts, baseline + 1);
     const refetchId = [...requestIds].at(-1);
     return {
       ...discovery,
@@ -248,6 +176,36 @@ async function interactWithHeadlessChromeForRefetch(
       finalListRequestCount: requestIds.size,
       refetchStatus: refetchId ? responseStatuses.get(refetchId) ?? null : null,
     };
+  });
+}
+
+async function withHeadlessChrome<T>(
+  profileName: string,
+  interact: (client: CdpClient) => Promise<T>,
+): Promise<T> {
+  const executable = await findBrowserExecutable();
+  const port = reservePort();
+  const profile = await Deno.makeTempDir({ prefix: `netscript-${profileName}-` });
+  const child = new Deno.Command(executable, {
+    args: [
+      '--headless=new',
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+      '--disable-background-networking',
+      '--no-sandbox',
+      `--remote-debugging-port=${port}`,
+      `--user-data-dir=${profile}`,
+      'about:blank',
+    ],
+    stdout: 'null',
+    stderr: 'null',
+  }).spawn();
+  let client: CdpClient | undefined;
+  try {
+    client = await CdpClient.connect(await waitForPageTarget(port));
+    await client.send('Page.enable');
+    await client.send('Runtime.enable');
+    return await interact(client);
   } finally {
     client?.close();
     try {
@@ -418,10 +376,7 @@ interface QueryClientDiscoveryObservation {
   readonly listQueryFound: boolean;
 }
 
-interface RequestCounts {
-  readonly requestCount: number;
-  readonly completedCount: number;
-}
+type RequestCounts = Readonly<{ requestCount: number; completedCount: number }>;
 
 const QUERY_CLIENT_DISCOVERY_SOURCE = `
   const findQueryClient = () => {
@@ -460,22 +415,7 @@ const QUERY_CLIENT_DISCOVERY_SOURCE = `
   };
 `;
 
-function queryClientDiscoveryExpression(): string {
-  return `(() => {
-    ${QUERY_CLIENT_DISCOVERY_SOURCE}
-    const discovery = findQueryClient();
-    const queries = discovery.client?.getQueryCache().getAll() ?? [];
-    const listQuery = queries.find((query) =>
-      Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
-    );
-    return {
-      queryClientFound: discovery.client !== null,
-      listQueryFound: listQuery !== undefined,
-    };
-  })()`;
-}
-
-function invalidateResourceQueryExpression(): string {
+function resourceQueryExpression(invalidate: boolean): string {
   return `(async () => {
     ${QUERY_CLIENT_DISCOVERY_SOURCE}
     const discovery = findQueryClient();
@@ -483,7 +423,7 @@ function invalidateResourceQueryExpression(): string {
     const listQuery = queries.find((query) =>
       Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
     );
-    if (discovery.client && listQuery) {
+    if (${JSON.stringify(invalidate)} && discovery.client && listQuery) {
       await discovery.client.invalidateQueries({ queryKey: listQuery.queryKey, exact: true });
     }
     return {

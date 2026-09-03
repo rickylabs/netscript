@@ -84,4 +84,7 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 - Main merge: `008d3264c5352abf6d1e3798d580550ec98e7e7c`.
 - Live-main ordering fix / product head: `a2366577fd8232c8e08e078b03d1e3cc84793b92`.
 - Pushed served-island head: `73d3a3a96c4862ab453366abdbbb33d65b4ce82b`; the next product head will add the hydration/refetch correction and tracked evidence.
+- Current-main merge: `964d3cdd344828126fd90227bd7618c2bd41845e` merged `origin/main`
+  `94fe507af47171cd4f295e8f532b281d7147b334` without rebasing; exact-head evidence after the final
+  doctrine cleanup is pending.
 - PR: #1958, head `feat/cli-resource-slice-acceptance`, base `main`, status `status:impl-eval`.

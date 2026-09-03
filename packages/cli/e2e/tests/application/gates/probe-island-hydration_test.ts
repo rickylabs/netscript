@@ -1,10 +1,10 @@
 import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 
 import {
-  assertResourceQueryRefetch,
   probeIslandHydration,
   probeResourceQueryRefetch,
   receiptFromIslandInteraction,
+  type ResourceQueryRefetchObservation,
 } from '../../../src/application/gates/scaffold/runtime/probe-island-hydration.ts';
 
 Deno.test('hydration receipt requires the generated resource surface and QueryClient', () => {
@@ -51,32 +51,37 @@ Deno.test('hydration probe targets the generated people resource', async () => {
   assertEquals(receipt, { islandHydrated: true, freshIslandElement: 'output' });
 });
 
-Deno.test('resource query refetch requires the hydrated list query, one request, and success', () => {
-  const evidence = {
+Deno.test('resource query refetch requires the hydrated list query, one request, and success', async () => {
+  const evidence: ResourceQueryRefetchObservation = {
     queryClientFound: true,
     listQueryFound: true,
     baselineListRequestCount: 0,
     finalListRequestCount: 1,
     refetchStatus: 200,
-  } as const;
-  assertResourceQueryRefetch(evidence);
-  assertThrows(
-    () => assertResourceQueryRefetch({ ...evidence, queryClientFound: false }),
+  };
+  const probe = (observed: ResourceQueryRefetchObservation) =>
+    probeResourceQueryRefetch('/workspace/project', 'inventory-web', '/workspace/apphost.mts', {
+      resolveLiveUrls: () => Promise.resolve(['http://localhost:41234/']),
+      interact: () => Promise.resolve(observed),
+    });
+  await probe(evidence);
+  await assertRejects(
+    () => probe({ ...evidence, queryClientFound: false }),
     Error,
     'QueryClient was not reachable',
   );
-  assertThrows(
-    () => assertResourceQueryRefetch({ ...evidence, listQueryFound: false }),
+  await assertRejects(
+    () => probe({ ...evidence, listQueryFound: false }),
     Error,
     'users.list query was not present',
   );
-  assertThrows(
-    () => assertResourceQueryRefetch({ ...evidence, finalListRequestCount: 2 }),
+  await assertRejects(
+    () => probe({ ...evidence, finalListRequestCount: 2 }),
     Error,
     'expected 1',
   );
-  assertThrows(
-    () => assertResourceQueryRefetch({ ...evidence, refetchStatus: 500 }),
+  await assertRejects(
+    () => probe({ ...evidence, refetchStatus: 500 }),
     Error,
     'returned 500',
   );
