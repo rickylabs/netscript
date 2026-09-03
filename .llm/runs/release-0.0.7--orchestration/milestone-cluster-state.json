@@ -6254,16 +6254,36 @@
         "summary": "Original run 33404321608 report preserves 300-second timeout but not referenced AppHost logs; current diagnoses/soak must not be called historical root-cause proof.",
         "impact": "#1844 remains open for honest acceptance disposition; no current Garnet regression proven.",
         "owner": "coordinator / fixes",
-        "nextAction": "Audit available original artifacts and current readiness receipts; surface exact acceptance decision if evidence cannot satisfy original criterion.",
-        "ownerDecisionRequired": false
+        "nextAction": "Owner question surfaced; audit at receipts/issue-1844-recovery-audit.md and issuecomment-5522800739. Continue candidate without this historical-proof barrier.",
+        "ownerDecisionRequired": true
       }
     ],
     "environment": {
-      "checkedAt": "2026-09-03T07:50:00Z",
+      "checkedAt": "2026-09-03T08:18:00Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
-      "dockerCustomNetworks": null
+      "dockerCustomNetworks": 0
     },
-    "ownerDecisions": []
+    "ownerDecisions": [
+      {
+        "id": "garnet-historical-closeout",
+        "question": "Accept #1844 closure as mitigated, original cause unproven, with later full PostgreSQL passes and missing original logs explicitly documented?",
+        "whyOwnerOnly": "Original acceptance explicitly demands a historical root cause and AppHost/DCP log excerpt that the retained artifact cannot supply. Relaxing that criterion must not be silently self-certified.",
+        "blockedItems": [
+          1844
+        ]
+      }
+    ]
+  },
+  "releasePreflight": {
+    "gitHead": "94fe507af47171cd4f295e8f532b281d7147b334",
+    "worktree": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
+    "command": "mise exec -- deno task publish:readiness",
+    "rawExitCode": 0,
+    "ok": true,
+    "version": "0.0.6",
+    "publishableMembers": 35,
+    "scope": "Read-only readiness rehearsal on pre-bump main. No tag/version/publish; must repeat at final candidate. Not a green canary pair.",
+    "observedAt": "2026-09-03T08:21:00Z"
   }
 }
