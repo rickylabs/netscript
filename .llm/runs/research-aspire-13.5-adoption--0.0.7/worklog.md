@@ -1103,3 +1103,18 @@ the merge.**
   and hand the coordinator the dispatch packet; #1881 proof comes from that run.
 - Thread `01a064ff…` still in its skill-read turn; auto-resume watcher armed to resume the same
   thread the instant it idles (no idle checkpoint allowed).
+- 02:1xZ leaf-1881-fix: live-diff audit (coordinator + me) confirmed two gaps in the first GREEN
+  attempt — no `--allow-env=PATH` on `readmeWalkerCommand` while `readme-command.ts` reads PATH;
+  `.deno-install` only mkdir'd (addendum unimplemented). Thread `01a064ff…` had died at RED
+  `b1aafaaa6`; resumed the SAME thread with `resume-3.md`. Worker shipped GREEN `0650f6f7b`, PR
+  **#1975** (non-draft, base main, milestone 0.0.7, labels as briefed). Tier-A verified by me on the
+  diff: fail-closed `Deno.remove` (NotFound-tolerated) then mkdir at index 0; env on every spawn;
+  argv verbatim / no `-f`; receipt `environment`; `--allow-env=PATH` + suite test; README/workflow/
+  cleanup untouched; focused tests 5/0 and `gates readme.quickstart` listing re-run locally.
+- Body/DoD updated via REST (GREEN ticked with SHA; IMPL-EVAL box honestly open; hosted proof is a
+  labeled post-merge note — "closes #1881" prose had re-armed close-gate as a body keyword, reworded).
+- IMPL-EVAL dispatched: GLM 5.3 Flash xhigh via `agentic:claude-openrouter` (no `--user` flag on
+  this task) in detached eval worktree `007-aspire-leaf-1881-fix-eval` @ `0650f6f7b`; brief
+  `slices/leaf-1881-fix/impl-eval-brief.md`, verdict → `impl-eval-verdict.md`. Watcher armed on
+  verdict + PR checks. Exact-head CI: code-quality pass; quality/check-test pending; close-gate red
+  only on the open IMPL-EVAL box.
