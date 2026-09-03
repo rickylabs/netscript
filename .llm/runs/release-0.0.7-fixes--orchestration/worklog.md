@@ -8029,3 +8029,22 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 ## 2026-09-03 — #1967 rebased by coordinator to `7e4372bc7`
 
 - `git diff --stat 335df7207 7e4372bc7` empty (tree-identical; 3 clean commits `db44701fc`, `5ce16eca3`, `7e4372bc7`); product diff vs `packages plugins deno.json deno.lock` = 0. IMPL-EVAL PASS carry and merge packet stand at the new head. Merge remains coordinator-owned; `status:shipped` flips only after merge.
+
+## 2026-09-03 — coordinator merged #1967 at `061c70fab`; #1966 moves to post-publish admission
+
+- PR #1967 + issue #1966 → `status:shipped` (ready-merge removed). Canary 9 parent run 33704380711 (`release-canary`, head `061c70fab`) is live; watcher `/tmp/waitcanary9.sh`. On package-backed doctor green: attach immutable proof to #1966 and close; on red: dispatch exact repair.
+
+## 2026-09-03 — #1960 IMPL-EVAL PASS (sanctioned local route), promoted
+
+- Hosted OpenHands run 33701141326 exceeded stall threshold (>45 min, no terminal verdict). Local GLM 5.3 Flash max-effort evaluator on immutable `e57de8e0c`: 6/6 gates pass, corpus blocker closed by `40e103d00`, no blocking findings → verdict comment issuecomment-5518970343. DoD box 58 ticked (REST PATCH — `gh pr edit` scope error), `status:impl-eval`→`status:ready-merge`, `gh run rerun 33699033976 --failed` (close-gate). Label edit re-triggered e2e-cli 33704226923 (prior 33701125189 already green).
+
+## 2026-09-03 — #1970 (#1455) RED at `feb55c046` — worker repair steer sent
+
+- Base `79adb103b`/main `b6b9df966` green; reds are the branch's own. `deno task check`: 9 errors (TS2554/TS7006/TS2322) in `plugins/triggers/jobs/{file-import,file-relay,staged-cleanup}.ts`, `plugins/triggers/generic-webhook.ts`, `plugins/sagas/tests/runtime/storefront-checkout-flow_test.ts` — job-definition API arity/typing break for first-party consumers. `docs:jsdoc-examples` FAIL: new `validateJobPayload` example uses unbound names. Steer `/tmp/steer1455b.md` → thread `01a06201-d0b9-7cb1-afe6-8b071ca28012` (detached resume, no timeout).
+
+## 2026-09-03 — #1945 at `9630583c8`: gate now catches a real product defect
+
+- Runtime tiers red only on `scaffold.design-production-exclusion`: `[vite:load-fallback] Could not load catalog: (imported by routes/examples/users/(_lib)/route-contract.ts)`. Scaffold maps `zod: 'catalog:'` (`scaffold-app-catalog.ts:58`); the users slice from DB codegen imports it; Vite prod build cannot resolve `catalog:`. Pre-reorder the probe ran before codegen and thus never saw it. Steer `/tmp/steer1481c.md` → thread `01a06322-7bb5-7d80-badf-3068fb4942eb`: causal discrimination with raw evidence, file separate P0 bug, keep gate after DATABASE_CODEGEN, docs-only head; #1945 stacks behind the new fix.
+- **Exact blocker surfaced to coordinator:** scaffolded-app production `deno task build` fails after `db codegen` on current main (consumer-facing).
+
+## 2026-09-03 — #1959 at `f5100c44a`: Postgres 2/2 green; evaluator run 33702340371 still in progress (started 01:07Z)
