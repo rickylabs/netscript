@@ -12,14 +12,7 @@ export interface AspireResourcePollingFinding {
  * This list may only shrink as their owning PRs land. It must not acquire an in-scope file merely
  * to make the guard green.
  */
-export const ASPIRE_RESOURCE_POLL_ALLOWLIST: ReadonlySet<string> = new Set([
-  'packages/cli/e2e/src/application/gates/scaffold/runtime/listener-readiness-gates.ts',
-  'packages/cli/e2e/src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts',
-  'packages/cli/e2e/src/application/gates/scaffold/runtime/readiness-disagreement.ts',
-  'packages/cli/e2e/src/application/gates/scaffold/runtime/owned-container-log.ts',
-  'packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts',
-  'packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts',
-]);
+export const ASPIRE_RESOURCE_POLL_ALLOWLIST: ReadonlySet<string> = new Set([]);
 
 const DESCRIBE_COMMAND = /['"`]describe['"`]/gu;
 const FOLLOW_FLAG = /['"`]--follow['"`]/u;
