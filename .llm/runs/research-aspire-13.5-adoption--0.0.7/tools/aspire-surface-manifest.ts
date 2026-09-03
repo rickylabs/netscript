@@ -12,7 +12,8 @@
  * evidence: plan/research/drafts/sources/receipts/verdicts) so the parity gate can report it as info.
  * Parity semantics per class: owner `archival` → info only; class `compat-fixture` → phase 2 checks
  * that a 13.5.3 case exists beside the kept 13.4.6 case; class `lockfile` → excluded from literal
- * sweeps; every other row → phase 2 fail on a stale literal.
+ * sweeps; version-floor/negative-version-guard → ignore only their narrowly recognized context,
+ * then fail on every remaining stale literal; every other row → phase 2 fail on a stale literal.
  *
  * Run from the repository root:
  *   deno run --allow-run=git --allow-write=.llm/runs/research-aspire-13.5-adoption--0.0.7 \
@@ -119,6 +120,29 @@ const RULES: readonly Rule[] = [
     cls: 'archival:root-notes',
     owner: 'archival',
     disposition: 'exempt — historical scratch notes',
+  },
+  {
+    test: re(/^\.agents\/skills\/aspire-upgrade\/SKILL\.md$/),
+    cls: 'compat-fixture',
+    owner: 'S13',
+    disposition:
+      'migration worked example and retained old/new fixtures; phase 2 requires the exact 13.5.3 counterpart',
+  },
+  {
+    test: re(
+      /^\.agents\/generated\/consumer-skills\/\.(agents|claude)\/skills\/aspire-orchestration\/references\/detection\.md$/,
+    ),
+    cls: 'version-floor',
+    owner: 'S9',
+    disposition:
+      'upstream minimum-version detection guidance; preserve plus-suffixed Aspire floors, enforce every other version reference',
+  },
+  {
+    test: re(/^\.llm\/tools\/docs\/check-accuracy-and-discoverability\.ts$/),
+    cls: 'negative-version-guard',
+    owner: 'S7/S13',
+    disposition:
+      'negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references',
   },
   {
     test: starts('.llm/harness/', '.llm/2026-', '.llm/README', '.llm/assets/', '.llm/devtools-'),
