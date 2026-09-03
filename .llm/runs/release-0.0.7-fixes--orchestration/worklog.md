@@ -8006,3 +8006,11 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   **9630583c8** pushed. F-3 keyword + acceptance boxes only after green head. Second FAIL_FIX on F-1
   would escalate per harness rules.
 - 01:15Z steer C resume was killed by my own `timeout 300` wrapper (codex-resume runs the whole turn in the foreground; never wrap it in timeout). Worker had already produced mode support + receipts/red-canary8.txt uncommitted. Re-resumed with continuation steer D (/tmp/deliver1966d.sh, no timeout).
+
+### MERGE PACKET — PR #1967 (Closes #1966, P0 Canary-8 fix-forward) — 01:20Z
+- Exact head: **335df720754b5c1e507c29026cb455cd2ad9c99d** (product head 11cffaabb; 2fa5f60eb/335df7207 verified harness-only, 0 product files)
+- IMPL-EVAL: PASS (local sanctioned GLM 5.3 Flash · max, issuecomment-5518730960); carry audit posted
+- Core CI @335df7207: quality ✅ check-test ⏳(re-queued after label push) close-gate ❌(ran 01:14Z pre body-fix: PR DoD boxes now ticked truthfully; #1966 acceptance boxes are mirror-owned and need the coordinator's `gh run rerun` with ready-merge live)
+- Labels: status:ready-merge applied; runtime tiers intentionally not required (owner decision)
+- Canary 9 hosted package-backed gate = post-merge admission, tracked on #1966
+- Coordinator owns close-gate repair + merge (per 01:18Z directive)
