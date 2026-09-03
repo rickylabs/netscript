@@ -37,13 +37,13 @@
 
 - `GATE.SCAFFOLD_RESOURCE_GENERATE` — `scaffold.resource-generate`.
 - `GATE.SCAFFOLD_RESOURCE_RERUN` — `scaffold.resource-rerun`.
-- Resource/client/procedure/variant — `users`, `users`, `list`, `--partial`.
+- Resource/client/procedure/variant — `people`, `users`, `list`, `--partial`.
 - Rerun summary — `Resource slice applied: 0 written, 11 skipped, 0 conflicts.`.
 
 ### Command, composition, and generated-output contract
 
-- Command surface: `generate resource users --client users --procedure list --partial --app <generated-app>`.
-- Composition owner: `createScaffoldGates()` declaratively places both definitions after `service.list`; `RUNTIME_GATES` selects them before generated quality/type-check gates.
+- Command surface: `generate resource people --client users --procedure list --partial --app <generated-app>`.
+- Composition owner: `createScaffoldGates()` and `RUNTIME_GATES` both place the pair after `database.codegen` and its adjacent `generated.service-client-contract` probe, before `scaffold.ui-data-screen` and generated quality/type-check gates.
 - Generated outputs: eight owned core/partial leaves plus three shared generated/router files.
 - Permissions: no new permissions; execution uses the existing CLI command gate.
 - Semantic tests: exact argv/cwd, gate order, captured stdout requirement, direct membership, materialized suite reachability, rendered guidance, and exact declared references.
@@ -79,6 +79,11 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | cycle-2 correction | Changed the resource name to `people`; selected the pair after `database.codegen` and its immediately adjacent service-client contract probe; mirrored definition order and strengthened direct/materialized order assertions. |
 | 2026-09-03 | G | stock-init proof | Isolated local-source sqlite init, service generation, codegen, and the exact resource command twice all exited 0; first run wrote 11 and rerun skipped 11 with zero conflicts. No `e2e:cli` runtime suite was run. |
 | 2026-09-03 | G | cycle-2 author gates | Focused 88/88 and full CLI 1716/1716 plus final check/lint/fmt, assets, publish, docs, doctrine, and quality gates all passed; `deno.lock` remains unchanged. |
+| 2026-09-03 | G | live-main merge | Fetched coordinator-confirmed `origin/main` `e14322c511bbf26018c617c12f639474b6092c32` and merged it without rebasing. Conflict resolution retained main's final Slice F implementation and all eight Slice G product files. Merge commit: `008d3264c5352abf6d1e3798d580550ec98e7e7c`. |
+| 2026-09-03 | G | carrier regeneration check | Asset barrel, publish assets, emitted samples, and MCP export corpus all passed with no generated diff. |
+| 2026-09-03 | G | first live-main runtime | The unsplit `scaffold.runtime` run exposed that `scaffold.ui-data-screen` had already added a quoted route entry rejected by the resource reconciler. Moved that existing gate after the resource rerun within the eight-file ceiling and committed `a2366577fd8232c8e08e078b03d1e3cc84793b92`. |
+| 2026-09-03 | G | exact-head runtime retries | Two unsplit runs at `a2366577` passed resource generation, identical rerun, UI generation, and every generated-project quality/type-check gate. Both later timed out only in `runtime.aspire-start`; each reported 42 passed/1 failed and cleanup passed. Live diagnostics showed healthy Postgres/Garnet/Redis containers but Aspire-advertised proxy ports diverged from Docker mappings on the shared host. |
+| 2026-09-03 | G | exact-head Tier A | Focused 68/68, full CLI 1788/1788, check 1004 files/0 diagnostics, scoped lint/fmt 8/8, carriers, docs, JSR, dependency, architecture, quality, and publish gates completed at `a2366577`. |
 
 ## Decisions
 
@@ -87,7 +92,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | `PLAN-EVAL: N/A` | Owner states the plan is locked and evaluated; this author lane implements only its mechanical Slice G. | user brief |
 | Resource `people`; client `users`; procedure `list` | Keeps explicit client/procedure selection while avoiding init's existing `appRoutes.users` alias. | IMPL-EVAL cycle 1 stock-init reproduction |
 | Execute after database codegen and its service-client contract probe | Procedure resolution imports generated Zod CRUD output; the existing probe must remain immediately adjacent to codegen, so the resource pair follows it and precedes generated quality/type-check gates. | evaluator finding + full-suite invariant |
-| Do not run hosted/runtime commands | Author-lane prohibition is explicit. | user brief |
+| Run the full hosted acceptance after the prerequisite merge | The coordinator explicitly superseded the earlier author-lane prohibition and requested exact-head hosted acceptance. | owner resume instruction |
+| Resource generation precedes UI data-screen generation | `ui:add data-screen` writes a quoted router key that the intentionally fail-closed resource reconciler will not rewrite. | first live-main hosted run |
 
 ## Drift
 
@@ -97,6 +103,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Slice F's remote branch advanced by three harness-evidence commits after the dispatched baseline; product files are disjoint and the PR still targets that branch. | minor | yes |
 | Runtime prerequisites were not traced at design time: codegen output and router-alias ownership both blocked the original gate. | high, resolved | yes |
 | Existing service-client order regression requires its contract probe immediately after codegen; the resource pair follows that probe within the same ceiling. | significant, resolved | yes |
+| Live-main UI data-screen mutation had to move after the resource pair; runtime prerequisites include prior shared-file mutations. | high, resolved | yes |
+| Shared-host Aspire/DCP advertised proxy ports diverged from healthy Docker mappings in two exact-head retries. | infrastructure, hosted proof pending | yes |
 
 ## Gate Results
 
@@ -104,17 +112,23 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| focused regressions | structured test wrapper over resource/guidance, runtime capability, service-client order, registry, and runner tests | PASS, exit 0 | 88 passed, 0 failed, 0 ignored. |
-| CLI check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 980 files, 9 batches, 0 failed batches, 0 diagnostics. |
+| focused regressions | structured test wrapper over resource/guidance, runtime capability, service-client order, UI order, registry, and runner tests | PASS, exit 0 | 68 passed, 0 failed, 0 ignored. |
+| CLI check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 1004 files, 9 batches, 0 failed batches, 0 diagnostics. |
 | authorized-file lint | structured lint wrapper with no-exclusion temporary config | PASS, exit 0 | 8 selected/processed, 0 findings/refusals. |
 | authorized-file format | structured fmt wrapper with no-exclusion temporary config | PASS, exit 0 | 8 selected/processed, 0 findings/refusals. |
-| E2E definition lint | structured lint wrapper under `packages/cli/e2e/deno.json` | PASS, exit 0 | 212 selected/processed, 0 findings/refusals. |
-| E2E definition format | structured fmt wrapper under `packages/cli/e2e/deno.json` | PASS, exit 0 | 212 selected/processed, 0 findings/refusals. |
-| full CLI unit suite | structured test wrapper, executable out-of-workspace temp root | PASS, exit 0 | 1716 passed, 0 failed, 0 ignored. |
+| full CLI unit suite | structured test wrapper, executable `/var/tmp` | PASS, exit 0 | 1788 passed, 0 failed, 0 ignored. |
 | `check:assets-barrel` | canonical regeneration plus generated-file diff | PASS, exit 0 | No generated asset-barrel diff. |
 | `check:publish-assets` | canonical publish-asset check | PASS, exit 0 | Freshness check passed. |
-| CLI JSR audit | `audit-jsr-package.ts --root packages/cli --text` | PASS, exit 0 | 980 files / 128,965 LOC / 267 test files; dry-run OK; 21 existing WARN findings, 0 FAIL. |
+| `check:emitted-samples` | canonical emitted-sample validation | PASS, exit 0 | 48 TypeScript samples from 38 artifact paths. |
+| `check:mcp-export-corpus` | canonical corpus freshness check | PASS, exit 0 | 35 packages / 273 subpaths / 7,846 symbols; SHA-256 `ddbc949e…`. |
+| CLI JSR audit | `audit-jsr-package.ts --root packages/cli --text` | PASS, exit 0 | 1004 files / 134,124 LOC / 280 test files; dry-run OK; 21 existing WARN findings, 0 FAIL. |
+| Fresh JSR audit | `audit-jsr-package.ts --root packages/fresh --text` | PASS, exit 0 | 182 files / 26,465 LOC / 39 test files; dry-run OK; 2 existing WARN findings, 0 FAIL. |
 | CLI publish dry-run | `deno task --cwd packages/cli publish:dry-run` | PASS, exit 0 | Three exports checked; existing dynamic-resolution warnings only; `Success Dry run complete`. |
+| workspace publish dry-run | `deno task publish:dry-run` | PASS, exit 0 | Workspace simulation completed with `Success Dry run complete`. |
+| CLI doc lint | structured full-export-map doc lint | PASS, exit 0 | 3 entrypoints, 0 diagnostics. |
+| Fresh doc lint delta | structured full-export-map doc lint plus raw diff | BASELINE, raw exit 1 | 45 existing mainline diagnostics (28 private-type references, 17 missing JSDoc); zero `packages/fresh` delta from `origin/main`. |
+| dependency usage | `deno task deps:why @netscript/fresh` | PASS, exit 0 | sourceUsed=true, sourceHitCount=107, likelyDeadImport=false, fullyRemovable=false. |
+| production install | `deno task deps:prod-install` | PASS, exit 0 | OK in 277 ms. |
 | `docs:readme-fences` | repository task | PASS, exit 0 | 36 READMEs, 169 fences, 74 checked; 7 expected type errors, 0 syntax-invalid/unattributed failures. |
 | `docs:jsdoc-examples` | repository task | PASS, exit 0 | 35 members, 2,060 files, 359 checked candidates, 0 failures; `unboundName=116`, `typeError=14`. |
 
@@ -122,25 +136,27 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| `arch:check` | PASS, exit 0 | Every reported package/plugin root has `FAIL=0`; CLI baseline `WARN=63 INFO=1`. | Dependency checks passed with warning-only catalog census. |
+| `arch:check` | PASS, exit 0 | Every reported package/plugin root has `FAIL=0`; CLI baseline `WARN=62 INFO=1`. | Dependency checks passed with warning-only catalog census. |
 | `quality:gate` | PASS, exit 0 | Scanner findings 0; allowances 7; coverage 37/37 workspace members and 35 publishable members. | Includes a second green `arch:check`. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| `scaffold.runtime` | NOT_RUN | hosted lane pending | Local execution prohibited. |
+| `scaffold.runtime` merge-head run | FAIL, exit 1 | 23 gates passed, resource gate failed, cleanup passed | Exposed the UI data-screen ordering prerequisite; fixed in `a2366577`. |
+| `scaffold.runtime` exact-head run | INFRA FAIL, exit 1 | 42 passed, 1 failed (`runtime.aspire-start`), cleanup passed | All #1354/resource/generated-project gates passed; Aspire convergence timed out after 300 s. |
+| `scaffold.runtime` exact-head retry | INFRA FAIL, exit 1 | 42 passed, 1 failed (`runtime.aspire-start`), cleanup passed | Same shared-host DCP proxy mismatch; healthy backing containers, divergent advertised/mapped ports. Isolated hosted receipt pending. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| generated guidance/resource acceptance | PASS | focused structured tests: 88/88 | Static author-lane plus the permitted stock-init CLI proof; hosted runtime remains pending. |
+| generated guidance/resource acceptance | PASS | focused structured tests: 68/68 plus exact-head runtime prefix | Runtime proved first write, zero-write rerun, UI ordering, and generated project check/lint/fmt before the later Aspire infrastructure timeout. |
 | stock-init resource command | PASS, exit 0 | sqlite init + service generation + database codegen + exact `generate resource people --client users --procedure list --partial --app cycle2-proof-web` twice | First stdout: `Resource slice applied: 11 written, 0 skipped, 0 conflicts.` Rerun stdout: `Resource slice applied: 0 written, 11 skipped, 0 conflicts.` |
 
 ## Handoff Notes
 
 - Inspect the two stable IDs, the `people` command arrays, direct `RUNTIME_GATES` selection, codegen/contract/resource materialized order, and identical guidance sentence first.
 - PR #1891 supplied the minimal plan amendment; the authorized item-8 fix is green in both focused and full-suite coverage.
-- Hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` remains required in CI and was not run by this author lane.
-- Non-draft PR #1958 targets `feat/cli-resource-slice-activate` with `orchestrator:features`, `status:impl`, `type:feat`, `area:cli`, `priority:p2`, and `wave:v1`; milestone is 0.0.7.
+- An isolated hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` PASS remains required because both exact-head shared-host runs reached all #1354 gates but timed out later at Aspire startup.
+- PR #1958 must be retargeted from the now-merged Slice F branch to `main`; lifecycle remains implementation/evaluation until isolated hosted proof and fresh IMPL-EVAL pass.

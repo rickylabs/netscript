@@ -73,3 +73,13 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Action:** Keep the fail-closed reconciler unchanged and within the locked eight-file ceiling. Move `scaffold.ui-data-screen` in `RUNTIME_GATES` to immediately after `scaffold.resource-rerun`, preserving `database.codegen` → `generated.service-client-contract` → resource first run → resource rerun → UI data screen, all before generated quality/type-check gates. Encode the ordering in `resource-slice-gates_test.ts`.
 - **Evidence:** The correction changes only two already-enumerated Slice G files; focused resource/UI/suite reachability tests pass 68/68 before the full rerun.
 - **Lesson:** Runtime prerequisites include mutations made by earlier acceptance gates, not only generated files imported by the command. Gate-order design must trace every prior mutation of reconciled shared files.
+
+## 2026-09-03 — Shared-host Aspire proxy mismatch blocks the final runtime tail
+
+- **What:** Two unsplit `scaffold.runtime` runs at exact product head `a2366577fd8232c8e08e078b03d1e3cc84793b92` passed 42 gates, including both resource gates and all generated-project check/lint/fmt gates, then timed out only in `runtime.aspire-start`; cleanup passed both times.
+- **Source:** Raw suite receipts plus live `aspire ps`, `aspire logs`, and Docker mapping inspection during the second retry.
+- **Expected:** Aspire's advertised TCP endpoints converge with the Docker-published host ports and the remaining runtime/browser gates execute.
+- **Actual:** Postgres, Garnet, and Redis containers were healthy and listening internally, but Aspire-advertised proxy ports were refused. Garnet and Redis advertised ports differed from their Docker-published ports on the shared host. The identical 300-second convergence timeout repeated without a product change.
+- **Severity:** infrastructure
+- **Action:** Preserve both raw failures and cleanup evidence; do not change #1354 product code around the DCP host fault. Obtain the required green one-pass receipt from the PR's isolated hosted lane before advancing lifecycle.
+- **Evidence:** Each exact-head run reported `passed=42 failed=1 skipped=0`; the sole failing gate was `runtime.aspire-start` with `aspire describe --follow did not converge: timed out after 300s`.
