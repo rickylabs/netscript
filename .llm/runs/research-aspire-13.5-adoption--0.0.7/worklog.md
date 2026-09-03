@@ -1128,3 +1128,7 @@ the merge.**
   tiers skipping), close-gate rerun PASS at head, mergeStateStatus CLEAN, 0 threads. Merge packet
   `slices/leaf-1881-fix/merge-packet.md` handed to coordinator; post-merge dispatch packet is
   `e2e-cli-prod.yml --ref main -f published-version=0.0.7-canary.9`.
+- 02:41Z #1975 MERGED by coordinator → main `3149d18e1`. Coordinator dispatched `e2e-cli-prod`
+  run **33708533076** from main @ `3149d18e1` (repaired harness vs published `0.0.7-canary.9`, no
+  Canary 10). Watching the Root README Quickstart step; #1881/#863/#1712 closure packet is gated
+  on that transcript.
