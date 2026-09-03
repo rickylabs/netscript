@@ -1124,3 +1124,7 @@ the merge.**
   (GLM 5.3 Flash xhigh; `impl-eval-verdict.md`; F1–F4 informational) posted as
   issuecomment-5519404999; DoD IMPL-EVAL box ticked. Exact-head CI: quality pass, code-quality
   pass, close-gate pass, check-test pending; zero review threads.
+- 02:40Z #1975 exact head `8e54ccfa1`: check-test pass → promoted `status:ready-merge` (runtime
+  tiers skipping), close-gate rerun PASS at head, mergeStateStatus CLEAN, 0 threads. Merge packet
+  `slices/leaf-1881-fix/merge-packet.md` handed to coordinator; post-merge dispatch packet is
+  `e2e-cli-prod.yml --ref main -f published-version=0.0.7-canary.9`.
