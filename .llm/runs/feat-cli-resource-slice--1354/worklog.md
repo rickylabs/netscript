@@ -100,3 +100,57 @@
 | D3 proof list                            | PASS; 7 cases including positive owned-only force |
 | Slice references / closing keyword       | PASS; 7 partial references / no closing keyword   |
 | Product/runtime gates                    | NOT RUN — plan-only and explicitly prohibited     |
+
+## 2026-09-03 — harness-only closeout after implementation dispatch
+
+- Converged on `origin/main` `4afbd82a78f9f825b46b1dfdb6034ca3d45c514d` with merge commit
+  `04504ae2c8d8f5621b3f0e2a584c2d5f60ab990e`. The merge was conflict-free. Main's generated
+  carriers were retained, and `deno task gen:mcp-export-corpus` exited 0 with no resulting diff.
+- The plan's separate native opposite-family receipt is `plan-eval-cycle3.md`
+  (`PASS_PLAN_WITH_FINDINGS`). A separate native amendment-delta evaluation owns the final verdict
+  at the amended head — see `plan-eval-final.md`; this closeout does not author it.
+- **IMPL-EVAL: not applicable — plan-only PR; supervisor (Features lane) decision, no product diff.**
+
+### Stop-and-amend record
+
+| Commit | Clause invoked | Change before implementation resumed |
+| --- | --- | --- |
+| `36492718a` | Slice F's complete-retire-set importer/rendered-consumer stop | Added item 33 `agent-conventions.ts`; ceiling 32 → 33 |
+| `8896b3b76` | Slice G's captured-stdout/runtime-reachability stop | Added item 8 `suite-runner_test.ts`; ceiling 7 → 8 |
+
+### Slice implementation ledger
+
+| Slice | PR | State | Evaluator receipt |
+| --- | --- | --- | --- |
+| A | #1950 | open at `d55afbef5e80ec607f127bc43bf6fb93ae716733` | `PASS_IMPL` |
+| B | #1943 | merged `3c8b0fd18f6e62f7ba81b264c5a4609b8799a592` | `PASS` |
+| C | #1946 | merged `e341c6f71033658099f694c4d8542a9676e6c68d` | `PASS` |
+| D | #1948 | merged `3a794be67b684145b0ad03a984479c55302ec84f` | `PASS` |
+| E | #1954 | merged `a867ab9cba61571ba53b68430a6e8bb909b2676d` | `PASS_IMPL_WITH_FINDINGS` |
+| F | #1956 | open at `0c95978c6353f721c112d129d861dfda29e6b236` | `PASS_IMPL_WITH_FINDINGS`; M-1/M-2 recorded |
+| G | #1958 | open at `bc116bb5df7e7f6cd422e6bbaa41111a69e1885e` | `PASS_IMPL` cycle 2 |
+
+### Implementation drift disposition
+
+- F absorbed Slice E's deferred `public-command-dependencies.ts` composition path (33 enumerated +
+  one absorbed path), and the `agent-conventions.ts` surviving consumer triggered amendment
+  `36492718a`. M-2 is recorded as debt `cli-resource-composition-io-1354`.
+- G's first evaluator cycle proved that runtime execution had to follow `database.codegen` and its
+  adjacent service-client contract probe; it also found the init `users` route alias collision.
+  Cycle 2 moved the pair and renamed the generated resource to `people`. The nominal suite-runner
+  fake stdout path was authorized by amendment `8896b3b76`.
+- E LOW-1 was absorbed by F's positive ready-plan dry-run proof. E LOW-2 remains deferred under
+  `cli-resource-composition-io-1354`.
+
+### Closeout gates
+
+| Gate | Exit | Result |
+| --- | ---: | --- |
+| `deno task docs:readme-fences` | 0 | PASS — 36 READMEs, 169 fences, 74 checked, 7 expected type errors |
+| `deno task check:mcp-export-corpus` | 0 | PASS — 35 packages, 273 subpaths, 7,846 symbols |
+| `deno task check:publish-assets` | 0 | PASS |
+| `deno task arch:check` | 0 | PASS — every doctrine root `FAIL=0`; warnings remain baseline observations |
+| `deno task quality:gate` | 0 | PASS — 37/37 workspace members covered, 0 findings, 7 accepted allowances |
+
+`deno.lock` remained byte-identical throughout regeneration and gates at SHA-256
+`6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6`.

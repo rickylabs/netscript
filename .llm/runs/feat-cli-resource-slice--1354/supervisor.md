@@ -53,3 +53,34 @@ Recorded verbatim in `worklog.md`. Three points bind this run:
 Scope is **restricted to the formal plan gate and the cycle-1 blockers**. It is not a fresh
 architecture review, and it must not reopen decisions this ruling settled. On `PASS`, the lane waits
 only for `#1664`'s merge/rebase and then dispatches implementation Slices A and B.
+
+## 2026-09-03 harness-only closeout reconciliation
+
+This appended ledger supersedes the earlier phase/next-step fields while retaining them as the
+historical launch state. The plan PR still contains no product diff. #1664 merged to `main` as
+`4afbd82a7`; all A–G slices were dispatched, and B–E have merged.
+
+### Amendment authority
+
+| Commit | Clause | Disposition |
+| --- | --- | --- |
+| `36492718a` | Slice F complete-retire-set consumer stop | Added `agent-conventions.ts` as item 33 and raised the ceiling to 33 before F resumed |
+| `8896b3b76` | Slice G captured-stdout/runtime-reachability stop | Added the suite-runner nominal fake as item 8 and raised the ceiling to 8 before G resumed |
+
+### Slice status and evaluator provenance
+
+| Slice | PR | Merge SHA or open head | Verdict |
+| --- | --- | --- | --- |
+| A | #1950 | open `d55afbef5e80ec607f127bc43bf6fb93ae716733` | `PASS_IMPL` |
+| B | #1943 | merged `3c8b0fd18f6e62f7ba81b264c5a4609b8799a592` | `PASS` |
+| C | #1946 | merged `e341c6f71033658099f694c4d8542a9676e6c68d` | `PASS` |
+| D | #1948 | merged `3a794be67b684145b0ad03a984479c55302ec84f` | `PASS` |
+| E | #1954 | merged `a867ab9cba61571ba53b68430a6e8bb909b2676d` | `PASS_IMPL_WITH_FINDINGS` |
+| F | #1956 | open `0c95978c6353f721c112d129d861dfda29e6b236` | `PASS_IMPL_WITH_FINDINGS` (M-1/M-2 recorded; debt `cli-resource-composition-io-1354`) |
+| G | #1958 | open `bc116bb5df7e7f6cd422e6bbaa41111a69e1885e` | `PASS_IMPL` cycle 2 |
+
+The original opposite-family plan receipt is `plan-eval-cycle3.md`: final verdict at the amended
+head — see `plan-eval-final.md`. It is written only by the separately running native PLAN-EVAL
+session; this supervisor closeout does not manufacture or predict that verdict.
+
+**IMPL-EVAL: not applicable — plan-only PR; supervisor (Features lane) decision, no product diff.**

@@ -208,3 +208,45 @@ cross-file atomicity and concurrency. Those are settled. Late manifest/router fa
 judged **only** against the narrowed bar - zero writes on any pre-apply failure - not against
 crash-atomic emission, which #1354 no longer promises. A blocking finding updates the plan; it is
 not deferred into implementation.
+
+## 2026-09-03 closeout reconciliation
+
+This section supersedes the pre-implementation handoff state above without rewriting that history.
+The plan remains plan-only, but all seven implementation slices have now been dispatched and have
+independent evaluator receipts. Slices B–E are merged; A, F, and G remain open behind the now-merged
+#1664 stack.
+
+### Post-PASS amendments
+
+| Amendment | Stop-and-amend clause invoked | Result |
+| --- | --- | --- |
+| `36492718a` | Slice F's complete-retire-set clause: any additional importer or rendered consumer requires an enumeration amendment before implementation | Added item 33, `agent-conventions.ts`, because `serviceReferences()` consumed retired canonical paths; ceiling 32 → 33 |
+| `8896b3b76` | Slice G's captured-stdout/runtime-reachability clause: any required file beyond the declared set requires an amendment | Added item 8, `suite-runner_test.ts`, so the nominal fake emits the rerun skip-only stdout; ceiling 7 → 8 |
+
+### Slice ledger
+
+| Slice | PR | Current status | Receipt |
+| --- | --- | --- | --- |
+| A | #1950 | open at `d55afbef5e80ec607f127bc43bf6fb93ae716733` | `PASS_IMPL` — `.llm/runs/feat-cli-resource-slice-client-selector--1354-a/evaluate.md` |
+| B | #1943 | merged as `3c8b0fd18f6e62f7ba81b264c5a4609b8799a592` | `PASS` — `.llm/runs/feat-cli-fresh-manifest-seam--1354-b/evaluate.md` |
+| C | #1946 | merged as `e341c6f71033658099f694c4d8542a9676e6c68d` | `PASS` — `.llm/runs/feat-cli-resource-slice-contract--1354-c/evaluate.md` |
+| D | #1948 | merged as `3a794be67b684145b0ad03a984479c55302ec84f` | `PASS` — `.llm/runs/feat-cli-resource-slice-templates--1354-d/evaluate.md` |
+| E | #1954 | merged as `a867ab9cba61571ba53b68430a6e8bb909b2676d` | `PASS_IMPL_WITH_FINDINGS` — `.llm/runs/feat-cli-resource-slice-command--1354-e/evaluate.md` |
+| F | #1956 | open at `0c95978c6353f721c112d129d861dfda29e6b236` | `PASS_IMPL_WITH_FINDINGS` — `.llm/runs/feat-cli-resource-slice-activate--1354-f/evaluate.md` |
+| G | #1958 | open at `bc116bb5df7e7f6cd422e6bbaa41111a69e1885e` | `PASS_IMPL` cycle 2 — `.llm/runs/feat-cli-resource-slice-acceptance--1354-g/evaluate.md` |
+
+### Implementation drift carried forward
+
+- Slice F absorbed Slice E's deferred `public-command-dependencies.ts` composition path, so its
+  accounting is 33 enumerated paths plus one absorbed path. Its `agent-conventions.ts` consumer was
+  authorized by amendment `36492718a`. Evaluator findings M-1/M-2 are recorded; M-2 is owned by debt
+  `cli-resource-composition-io-1354` on Slice F.
+- Slice G moved the runtime pair after `database.codegen` and its adjacent service-client contract
+  probe, renamed the generated resource from colliding alias `users` to `people`, and used the
+  amendment-authorized suite-runner fake stdout path.
+- Slice E LOW-1 (positive ready-plan `--dry-run`) was absorbed by Slice F. LOW-2 (normalizing
+  non-reconciler pre-apply failures) is deferred to `cli-resource-composition-io-1354`.
+
+The planning receipt remains `plan-eval-cycle3.md`. The final verdict at the amended head is owned
+by a separate native PLAN-EVAL session — see `plan-eval-final.md`. No evaluator verdict is authored
+by this closeout session.
