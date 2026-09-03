@@ -14,11 +14,13 @@ export const SCAFFOLD = {
 /** Documentation-walk suites. */
 export const QUICKSTART = {
   WALK: 'quickstart.walk',
+  README: 'readme.quickstart',
 } as const;
 
 /** Stable titles for documentation-walk suites. */
 export const QUICKSTART_TITLE = {
   WALK: 'Published CLI Quickstart walk',
+  README: 'Root README Quickstart walk',
 } as const;
 
 /** Suite ids that require exclusive access to the expensive runtime path. */
@@ -26,6 +28,7 @@ export const EXPENSIVE_RUNTIME_SUITE_IDS = [
   SCAFFOLD.RUNTIME,
   SCAFFOLD.RUNTIME_SQLITE,
   QUICKSTART.WALK,
+  QUICKSTART.README,
 ] as const;
 
 /** Stable titles for built-in suites. */
@@ -137,6 +140,8 @@ export const GATE = {
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
+  BEHAVIOR_ISLAND_SERVED_SURFACE: 'behavior.island-served-surface',
+  BEHAVIOR_ISLAND_HYDRATION: 'behavior.island-hydration',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
@@ -187,6 +192,17 @@ export const GATE = {
   QUICKSTART_DATABASE_INTEGRITY: 'quickstart.pgdata-integrity-after-teardown',
   QUICKSTART_CHECK: 'quickstart.6-project-check',
   QUICKSTART_SERVICE_RESPONSE: 'quickstart.7-service-response',
+  README_QUICKSTART_INSTALL: 'readme.quickstart.01-install-cli',
+  README_QUICKSTART_INIT: 'readme.quickstart.02-init-workspace',
+  README_QUICKSTART_CD_ASPIRE: 'readme.quickstart.03-cd-aspire',
+  README_QUICKSTART_ASPIRE_RESTORE: 'readme.quickstart.04-aspire-restore',
+  README_QUICKSTART_ASPIRE_START: 'readme.quickstart.05-aspire-start',
+  README_QUICKSTART_ASPIRE_WAIT: 'readme.quickstart.06-aspire-wait-postgres',
+  README_QUICKSTART_CD_ROOT: 'readme.quickstart.07-cd-root',
+  README_QUICKSTART_DB_INIT: 'readme.quickstart.08-db-init',
+  README_QUICKSTART_DB_GENERATE: 'readme.quickstart.09-db-generate',
+  README_QUICKSTART_DB_SEED: 'readme.quickstart.10-db-seed',
+  README_QUICKSTART_CURL_HEALTH: 'readme.quickstart.11-curl-health',
 } as const;
 
 /** Generated Aspire resource ids waited on by the scaffold plugin suite. */

@@ -15,7 +15,10 @@ import {
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
-import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
+import {
+  createListenerReadinessGates,
+  createTypedDbPhaseBGate,
+} from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 import { formatCommandFailure } from '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts';
 
@@ -119,6 +122,23 @@ Deno.test('typed database Phase-B gate stays outside the base runtime gate list'
     ),
     false,
   );
+});
+
+Deno.test('listener-unreachable gate grants every subprocess executable it invokes', () => {
+  const gate = createListenerReadinessGates(DATABASE.POSTGRES).find((entry) =>
+    entry.id === GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected listener-unreachable gate to be a command gate.');
+  }
+
+  const command = gate.command(s8RuntimeContext());
+  const allowRun = command.find((argument) => argument.startsWith('--allow-run='));
+  const allowedExecutables = new Set(allowRun?.slice('--allow-run='.length).split(',') ?? []);
+
+  for (const executable of ['aspire', 'docker']) {
+    assertEquals(allowedExecutables.has(executable), true);
+  }
 });
 
 Deno.test('typed database Phase-B failures surface both captured streams', () => {
@@ -347,6 +367,71 @@ Deno.test('app reference gate runs the real browser probe for the project-derive
     'inventory-console-web',
     '/workspace/app/aspire/apphost.mts',
   ]);
+});
+
+Deno.test('island served-surface gate runs against the live generated app and writes a receipt', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected island served-surface command gate.');
+  const command = gate.command({
+    request: {
+      suiteId: 'scaffold.runtime.sqlite',
+      options: { projectName: 'inventory-console' },
+    },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-served-surface.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+    '/repo/.llm/tmp/gate-receipts/scaffold.runtime.sqlite/behavior.island-served-surface.json',
+  ]);
+});
+
+Deno.test('island hydration gate runs the fail-closed headless browser probe', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_ISLAND_HYDRATION
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected island hydration command gate.');
+  const command = gate.command({
+    request: {
+      suiteId: 'scaffold.runtime.sqlite',
+      options: { projectName: 'inventory-console' },
+    },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+    '/repo/.llm/tmp/gate-receipts/scaffold.runtime.sqlite/behavior.island-hydration.json',
+  ]);
+  assertEquals(gate.skip, undefined);
 });
 
 Deno.test('runtime gates wait for postgres resource by default', () => {

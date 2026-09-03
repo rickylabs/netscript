@@ -36,6 +36,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     DEPLOY.TARGETS,
     DEPLOY.DESKTOP_NATIVE,
     QUICKSTART.WALK,
+    QUICKSTART.README,
   ]);
 });
 
@@ -289,6 +290,7 @@ Deno.test('every registered suite pins its exact deferred-gate set and owning is
     [DEPLOY.TARGETS]: [],
     [DEPLOY.DESKTOP_NATIVE]: [],
     [QUICKSTART.WALK]: [],
+    [QUICKSTART.README]: [],
   } satisfies Record<SuiteId, readonly DeferredGate[]>;
 
   assertEquals(
@@ -314,6 +316,23 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
+    true,
+  );
+  assertEquals(
+    resolveSuite(SCAFFOLD.RUNTIME_SQLITE).gates.some((gate) =>
+      gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+    ),
+    true,
+  );
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    assertEquals(
+      resolveSuite(suiteId).gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_HYDRATION),
+      true,
+      suiteId,
+    );
+  }
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
@@ -641,6 +660,7 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
       samples: false,
     }],
     [QUICKSTART.WALK, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
+    [QUICKSTART.README, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
   ]);
 
   for (const suite of builtInSuites) {

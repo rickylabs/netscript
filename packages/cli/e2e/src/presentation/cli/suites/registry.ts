@@ -10,6 +10,7 @@ import { createDeployTargetsSuite } from '../../../../suites/deploy/deploy-targe
 import { createDesktopNativeDeploySuite } from '../../../../suites/deploy/desktop-native-suite.ts';
 import { createTrueUserlandInstallSuite } from '../../../../suites/scaffold/true-userland-install-suite.ts';
 import { createQuickstartWalkSuite } from '../../../../suites/quickstart/quickstart-walk-suite.ts';
+import { createReadmeQuickstartSuite } from '../../../../suites/quickstart/readme-quickstart-suite.ts';
 import { QUICKSTART, QUICKSTART_TITLE } from '../../../domain/cli-surface.ts';
 
 /** Built-in suite descriptor. */
@@ -49,6 +50,11 @@ export const builtInSuites: readonly BuiltInSuite[] = [
     id: QUICKSTART.WALK,
     title: QUICKSTART_TITLE.WALK,
     create: createQuickstartWalkSuite,
+  },
+  {
+    id: QUICKSTART.README,
+    title: QUICKSTART_TITLE.README,
+    create: createReadmeQuickstartSuite,
   },
 ];
 
