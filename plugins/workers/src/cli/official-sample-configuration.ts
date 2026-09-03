@@ -391,8 +391,8 @@ const CreateUserSettingsPayloadSchema = z.object({
 
 const sagaPublisher = createSagaPublisher<UserRegistrationMessage>();
 
-const handler = defineJobHandler(async (ctx) => {
-  const { userId } = CreateUserSettingsPayloadSchema.parse(ctx.payload ?? {});
+const handler = defineJobHandler(CreateUserSettingsPayloadSchema, async (ctx) => {
+  const { userId } = ctx.payload;
   console.info('Creating scaffold sample settings', { userId });
 
   const publishResult = await sagaPublisher.publish({

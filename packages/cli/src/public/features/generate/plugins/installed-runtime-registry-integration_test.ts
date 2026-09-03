@@ -119,7 +119,14 @@ Deno.test('generated workers registry loads a custom-only job and excludes job t
   await withTempProject(async (projectRoot) => {
     await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
       'workers/jobs/custom-claim-job.ts': `
-export const customClaimJob = async () => undefined;
+const payloadSchema = {
+  '~standard': {
+    version: 1,
+    vendor: 'test',
+    validate: (value: unknown) => ({ value }),
+  },
+} as const;
+export default Object.assign(async () => undefined, { payloadSchema });
 `,
       'workers/jobs/job-tools.ts': `
 const handler = Object.assign(async () => undefined, { id: 'excluded-job-tools' });
@@ -146,7 +153,14 @@ Deno.test('installed workers registry carries project policy through runtime sta
   await withTempProject(async (projectRoot) => {
     await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
       'workers/jobs/project-policy.ts': `
-export const projectPolicy = async () => undefined;
+const payloadSchema = {
+  '~standard': {
+    version: 1,
+    vendor: 'test',
+    validate: (value: unknown) => ({ value }),
+  },
+} as const;
+export default Object.assign(async () => undefined, { payloadSchema });
 `,
       'netscript.config.ts': `
 export default {

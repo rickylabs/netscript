@@ -31,6 +31,8 @@ import {
   TaskFiltersZodSchema,
   TaskTriggerInputZodSchema,
 } from './workers.contract-schemas.ts';
+import type { JobPayloadRegistry, JobTriggerInput } from './job-trigger-contract.ts';
+import type { WorkersContract } from './workers.contract-types.ts';
 
 // Converge onto the shared plugin error vocabulary: NOT_FOUND, VALIDATION_ERROR,
 // and INTERNAL are reported with identical status codes, messages, and payload
@@ -380,7 +382,22 @@ type SubscribeRoute = ContractProcedureBuilderWithInputOutput<
  * because each member derives from a named, annotated schema via `typeof`, the
  * contract type can never silently drift from the schemas.
  */
-interface WorkersContractDefinition extends BasePluginContract {
+type JobTriggerSchema<TPayloads extends JobPayloadRegistry> =
+  & Omit<typeof JobTriggerInputZodSchema, '~standard'>
+  & Readonly<{
+    '~standard':
+      & Omit<(typeof JobTriggerInputZodSchema)['~standard'], 'types'>
+      & Readonly<{
+        types?: Readonly<{
+          input: JobTriggerInput<TPayloads>;
+          output: JobTriggerInput<TPayloads>;
+        }>;
+      }>;
+  }>;
+
+interface WorkersContractDefinition<
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+> extends BasePluginContract {
   readonly describe: BasePluginDescribeRoute;
   readonly listJobs: Route<typeof listJobsInput, typeof listJobsOutput>;
   readonly getJob: Route<typeof getJobInput, typeof JobDefinitionResponseZodSchema>;
@@ -390,7 +407,7 @@ interface WorkersContractDefinition extends BasePluginContract {
     typeof JobDefinitionResponseZodSchema
   >;
   readonly deleteJob: Route<typeof deleteJobInput, typeof deleteJobOutput>;
-  readonly triggerJob: Route<typeof JobTriggerInputZodSchema, typeof triggerJobOutput>;
+  readonly triggerJob: Route<JobTriggerSchema<TPayloads>, typeof triggerJobOutput>;
   readonly listExecutions: Route<typeof listExecutionsInput, typeof listExecutionsOutput>;
   readonly getExecution: Route<typeof getExecutionInput, typeof ExecutionRecordResponseZodSchema>;
   readonly batchQueryExecutions: Route<
@@ -560,6 +577,26 @@ export type { WorkersContractDefinition };
  * Carries the real, precise oRPC contract router type — no erasure cast.
  */
 export const workersContract: WorkersContractDefinition = workersContractDefinition;
+
+/**
+ * Return the v1 workers contract narrowed to an application's literal job payload registry.
+ *
+ * The returned value is the same wire contract as {@link workersContract}; only its TypeScript
+ * `triggerJob` input is narrowed for client generation.
+ *
+ * @example
+ * ```ts
+ * type Payloads = { 'embed-document': { documentId: string } };
+ * const contract = createWorkersContract<Payloads>();
+ * ```
+ *
+ * @returns The v1 workers contract with literal job-id payload binding.
+ */
+export function createWorkersContract<
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+>(): WorkersContract<TPayloads> {
+  return workersContractDefinition as WorkersContractDefinition<TPayloads>;
+}
 
 /**
  * The implemented (context-bindable) workers v1 contract.

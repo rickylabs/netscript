@@ -2,6 +2,13 @@ import type {
   WorkersContractDefinition,
   workersContractV1,
 } from './workers.contract-definition.ts';
+import type { JobPayloadRegistry } from './job-trigger-contract.ts';
+
+export type {
+  JobPayloadRecord,
+  JobPayloadRegistry,
+  JobTriggerInput,
+} from './job-trigger-contract.ts';
 
 /** Result returned by contract schema validation. */
 export type ContractSchemaResult<TOutput> =
@@ -28,18 +35,6 @@ export type TaskDefinitionResponse = Readonly<Record<string, unknown>>;
 /** Server-sent event payload emitted by the workers service. */
 export type SSEEvent = Readonly<Record<string, unknown>>;
 
-/** Input accepted by the trigger-job procedure. */
-export type JobTriggerInput = Readonly<{
-  /** Job id, resolved from the `{id}` path segment; optional in the body. */
-  id?: string;
-  payload?: Record<string, unknown>;
-  priority?: number;
-  delay?: number;
-  correlationId?: string;
-  traceparent?: string;
-  tracestate?: string;
-}>;
-
 /** Output returned by the trigger-job procedure. */
 export type JobTriggerOutput = Readonly<{ jobId: string; triggered: boolean }>;
 
@@ -65,7 +60,9 @@ export type TaskTriggerOutput = Readonly<{ taskId: string; triggered: boolean }>
  * per-route input/output/error types, so client generation and
  * `implement(...)` stay sound and can never drift from the Zod schemas.
  */
-export type WorkersContract = WorkersContractDefinition;
+export type WorkersContract<
+  TPayloads extends JobPayloadRegistry = JobPayloadRegistry,
+> = WorkersContractDefinition<TPayloads>;
 
 /**
  * Context-binding implementer for the v1 worker contract.

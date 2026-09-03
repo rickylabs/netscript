@@ -17,7 +17,10 @@ try {
   // optional
 }
 const imports = [];
-const entries = [];
+const handlerEntries = [];
+const handlerTypes = [];
+const definitionEntries = [];
+const registryEntries = [];
 for (const file of files) {
   try {
     await Deno.stat(join(jobsDir, file));
@@ -27,18 +30,94 @@ for (const file of files) {
   const id = file.replace(/\\.ts$/, '');
   const name = id.replace(/-/g, '');
   imports.push(\`import \${name} from '../../../workers/jobs/\${file}';\`);
-  entries.push(\`  [\${name}.id, \${name}],\`);
+  handlerEntries.push(\`  [\${name}.id]: \${name},\`);
+  handlerTypes.push(\`  & Readonly<Record<typeof \${name}.id, typeof \${name}>>\`);
+  registryEntries.push(\`  [\${name}.id, \${name}],\`);
+  definitionEntries.push(
+    \`  [\${name}.id]: createLocalJobDefinition(\${name}.id, './\${file}', \${name}),\`,
+  );
 }
 await Deno.mkdir(join(projectRoot, '.netscript', 'generated', 'plugin-workers'), { recursive: true });
 await Deno.writeTextFile(join(projectRoot, '.netscript', 'generated', 'plugin-workers', 'job-registry.ts'), [
-  "import type { JobHandler, RegisterJobInput } from '@netscript/plugin-workers-core/runtime';",
+  "import type { JobPayloadMap, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
   ...imports,
   '',
-  'export const registry = new Map<string, JobHandler<any>>([',
-  ...entries,
+  'type SchemaBackedJobHandler =',
+  '  & ((...args: never[]) => unknown)',
+  '  & Readonly<{ id: string; payloadSchema: unknown }>;',
+  '',
+  'export type GeneratedJobHandlerRegistry =',
+  ...handlerTypes,
+  ';',
+  '',
+  'export const jobHandlersById: GeneratedJobHandlerRegistry = Object.freeze({',
+  ...handlerEntries,
+  '});',
+  '',
+  'type StaticJobHandler = StaticJobRegistry extends ReadonlyMap<string, infer THandler>',
+  '  ? THandler',
+  '  : never;',
+  '',
+  'export const registry: StaticJobRegistry = new Map<string, StaticJobHandler>([',
+  ...registryEntries,
   ']);',
-  'export const jobDefinitions = new Map<string, RegisterJobInput>();',
-  'function createLocalJobDefinition() {}',
+  '',
+  'type GeneratedJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler> =',
+  '  Readonly<RegisterJobInput & {',
+  '    readonly id: TId;',
+  '    readonly handler: THandler;',
+  '    readonly payloadSchema: THandler["payloadSchema"];',
+  '  }>;',
+  '',
+  'export type GeneratedJobDefinitionRegistry = Readonly<{',
+  '  [TId in keyof GeneratedJobHandlerRegistry]: GeneratedJobDefinition<',
+  '    TId & string,',
+  '    GeneratedJobHandlerRegistry[TId]',
+  '  >;',
+  '}>;',
+  '',
+  'export type GeneratedJobPayloadMap = JobPayloadMap<GeneratedJobDefinitionRegistry>;',
+  '',
+  'export const jobDefinitionsById: GeneratedJobDefinitionRegistry = Object.freeze({',
+  ...definitionEntries,
+  '});',
+  '',
+  'const jobDefinitionEntries: readonly [string, RegisterJobInput][] =',
+  '  Object.entries(jobDefinitionsById).map(([id, definition]) => [id, toRegisterJobInput(definition)]);',
+  '',
+  'export const jobDefinitions: ReadonlyMap<string, RegisterJobInput> = new Map(jobDefinitionEntries);',
+  'export const definitions: ReadonlyMap<string, RegisterJobInput> = jobDefinitions;',
+  '',
+  'function createLocalJobDefinition<TId extends string, THandler extends SchemaBackedJobHandler>(',
+  '  id: TId,',
+  '  entrypoint: string,',
+  '  handler: THandler,',
+  '): GeneratedJobDefinition<TId, THandler> {',
+  '  return {',
+  '    id,',
+  '    name: id.split("-").map((part) => part.slice(0, 1).toUpperCase() + part.slice(1)).join(" "),',
+  '    entrypoint,',
+  '    topic: "default",',
+  '    source: "local",',
+  '    executionType: "deno",',
+  '    timezone: "UTC",',
+  '    timeout: 300000,',
+  '    maxRetries: 3,',
+  '    retryDelay: 1000,',
+  '    maxConcurrency: 1,',
+  '    priority: 50,',
+  '    enabled: true,',
+  '    persist: true,',
+  '    tags: [],',
+  '    handler,',
+  '    payloadSchema: handler.payloadSchema,',
+  '  };',
+  '}',
+  '',
+  'function toRegisterJobInput(definition: RegisterJobInput): RegisterJobInput {',
+  '  const { handler: _handler, payloadSchema: _payloadSchema, ...registration } = definition;',
+  '  return registration;',
+  '}',
   '',
 ].join('\\n'));
 const officialSamplesArg = Deno.args[Deno.args.indexOf('--official-samples') + 1];
