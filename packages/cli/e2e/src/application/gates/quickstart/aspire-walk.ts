@@ -98,7 +98,7 @@ async function requireAspireSuccess(
   if (result.stdout) console.info(result.stdout);
 }
 
-async function runAspireCommand(
+export async function runAspireCommand(
   command: readonly string[],
   cwd: string,
   timeoutMs: number,
