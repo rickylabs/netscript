@@ -357,3 +357,28 @@ The repository-configured formatter's only diff is lines 18-21: the return state
 payload, and closing call each need one additional indentation level. No quote-style or unrelated
 diagnostic remains after supplying the root formatter configuration explicitly.
 ```
+
+RED commit: `3d7e190a5e77751d366d75dd55fba6c44ed16ab8` (pushed by explicit refspec).
+
+### GREEN focused receipt
+
+The canonical `plugins/workers/src/adapter/resources/job/job.stub.ts` now emits the return statement
+at handler-body depth and the object properties/call close one level beneath it. No runtime or
+registry behavior changed.
+
+```text
+$ deno test --allow-all --unstable-kv plugins/workers/src/adapter/resources/resources.test.ts
+exit 0; 7 passed / 0 failed
+The installed health-check artifact passes its nested deno fmt --check assertion.
+```
+
+Scoped plugin receipts on the same implementation tree:
+
+```text
+$ run-deno-check.ts --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=103; failedBatches=0; totalOccurrences=0; --unstable-kv enabled
+$ run-deno-lint.ts --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=103; failedBatches=0; totalOccurrences=0
+$ run-deno-fmt.ts --root plugins/workers --ext ts,tsx
+exit 0; filesSelected=103; failedBatches=0; findings=0
+```

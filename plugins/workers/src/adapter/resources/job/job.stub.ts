@@ -23,10 +23,10 @@ type Payload = z.infer<typeof PayloadSchema>;
 export const %%JOB_EXPORT%%: JobHandlerDefinition<Payload> = defineJobHandler(
   PayloadSchema,
   (context) => {
-  return createSuccessResult({
-    jobId: '%%JOB_ID%%',
-    payload: context.payload,
-  });
+    return createSuccessResult({
+      jobId: '%%JOB_ID%%',
+      payload: context.payload,
+    });
   },
 );
 `,
