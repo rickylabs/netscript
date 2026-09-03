@@ -897,6 +897,7 @@ class SmokeRunner {
         '--allow-read',
         join(this.#options.repo, '.llm', 'tools', 'validation', 'check-aspire-host-ports.ts'),
         this.projectRoot,
+        '--generated-project',
         '--pretty',
       ],
     });

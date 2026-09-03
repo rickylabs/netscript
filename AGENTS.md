@@ -167,6 +167,15 @@ writing.
 
 ## Validation
 
+Aspire static checks target maintained framework source, shipped resources, and documentation.
+Exclude `.llm/runs/**` (including the checker-owning run), `.llm/tmp/**`, generated agent working
+copies under `.agents/generated/**`, and transient cache/dependency/runtime state through the shared
+Aspire scan-scope policy. These exclusions do not remove or untrack the retained harness evidence.
+Do not exempt shipped generated framework source or replace functional release/runtime gates with
+a repository text sweep.
+An explicit generated-project acceptance scan uses `check-aspire-host-ports --generated-project`
+so its scaffold is still tested even when created under scratch; internal run/temp files stay excluded.
+
 Run the smallest validation that proves the change. For targeted `deno check` commands that touch
 workspace code, include `--unstable-kv`.
 

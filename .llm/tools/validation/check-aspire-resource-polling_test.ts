@@ -10,6 +10,23 @@ Deno.test('Aspire resource polling allowlist is pinned to the exact approved set
   assertEquals([...ASPIRE_RESOURCE_POLL_ALLOWLIST].sort(), []);
 });
 
+Deno.test('polling guard ignores run/transient copies and retains the same defect in framework source', async () => {
+  const source = `while (Date.now() < deadline) {
+  await new Deno.Command('aspire', { args: ['describe'] }).output();
+  await new Promise((resolve) => setTimeout(resolve, 1));
+}`;
+  await withSource(source, async (root) => {
+    for (const directory of ['.llm/runs/old', '.llm/tmp', '.agents/generated/copy']) {
+      await Deno.mkdir(`${root}/${directory}`, { recursive: true });
+      await Deno.writeTextFile(`${root}/${directory}/probe.ts`, source);
+    }
+    assertEquals(await findAspireResourcePolling(root, root), [{
+      path: 'packages/cli/e2e/src/probe.ts',
+      describeLine: 2,
+    }]);
+  });
+});
+
 async function withSource(source: string, run: (root: string) => Promise<void>): Promise<void> {
   const root = await Deno.makeTempDir();
   try {

@@ -119,6 +119,7 @@ Deno.test('generated host-port validation is critical and inspects the final pre
     const validator = report.steps[validatorIndex];
     assertEquals(validator.critical, true);
     assertStringIncludes(JSON.stringify(validator.details), 'check-aspire-host-ports.ts');
+    assertStringIncludes(JSON.stringify(validator.details), '--generated-project');
     const init = report.steps.find((step) => step.id === 'init-project');
     assertEquals(JSON.stringify(init?.details).includes('service-port'), false);
     const offlineCodegen = report.steps[offlineCodegenIndex];

@@ -32,6 +32,132 @@ const files = new Map<string, string>([
 
 const readText = (path: string): Promise<string | null> => Promise.resolve(files.get(path) ?? null);
 
+Deno.test('both Aspire parity phases skip all run and transient rows without reading them', async () => {
+  const skipped = [
+    '.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md',
+    '.llm/runs/future/receipt.json',
+    '.llm/tmp/apphost.ts',
+    '.agents/generated/consumer-skills/AGENTS.md',
+    'packages/cli/node_modules/aspire.ts',
+  ];
+  for (const phase of [1, 2] as const) {
+    const reads: string[] = [];
+    const report = await evaluateAspireVersionParity({
+      rows: [...skipped, 'packages/cli/src/current-pin.ts', 'docs/site/reference/aspire.md'].map((
+        path,
+      ) => ({
+        path,
+        class: 'scaffold-constants',
+        owner: 'S13',
+        disposition: 'enforce',
+      })),
+      phase,
+      expectedVersion: '13.5.3',
+      readText: (path) => {
+        reads.push(path);
+        return Promise.resolve('13.4.6');
+      },
+    });
+    assertEquals(report.skipped, skipped);
+    assertEquals(reads, ['packages/cli/src/current-pin.ts', 'docs/site/reference/aspire.md']);
+    assertEquals(report.counts.checked, 2);
+    assertEquals(report.counts.fail, 2);
+  }
+});
+
+for (
+  const { name, className, source, ok } of [
+    {
+      name: 'literal guard location with trailing comma',
+      className: 'negative-version-guard',
+      source: "forbidText(\n page,\n '13.4.6',\n 'docs/page.md',\n);",
+      ok: true,
+    },
+    {
+      name: 'stale third guard argument',
+      className: 'negative-version-guard',
+      source: "forbidText(page, '13.4.6', '13.4.6');",
+      ok: false,
+    },
+    {
+      name: 'quoted guard is not an executable guard',
+      className: 'negative-version-guard',
+      source: 'const example = "forbidText(page, \'13.4.6\', path);";',
+      ok: false,
+    },
+    {
+      name: 'unowned floor',
+      className: 'doc:public-page',
+      source: 'Aspire 13.2+ uses rooted config.',
+      ok: false,
+    },
+    {
+      name: 'current pin beside a floor',
+      className: 'doc:public-page',
+      source: 'Aspire 13.2+ uses rooted config. Install 13.4.6.',
+      ok: false,
+    },
+    {
+      name: 'non-floor guidance',
+      className: 'doc:public-page',
+      source: 'Install Aspire 13.2.',
+      ok: false,
+    },
+    {
+      name: 'negative guard literal',
+      className: 'negative-version-guard',
+      source: "forbidText(page, '13.4.6', sourcePath);",
+      ok: true,
+    },
+    {
+      name: 'double-quoted multiline negative guard',
+      className: 'negative-version-guard',
+      source: 'forbidText(\n page,\n "13.4.6",\n sourcePath);',
+      ok: true,
+    },
+    {
+      name: 'positive guard',
+      className: 'negative-version-guard',
+      source: "requireText(page, '13.4.6', sourcePath);",
+      ok: false,
+    },
+    {
+      name: 'wrong guard argument',
+      className: 'negative-version-guard',
+      source: "forbidText('13.4.6', 'other', sourcePath);",
+      ok: false,
+    },
+    {
+      name: 'stale pin beside a negative guard',
+      className: 'negative-version-guard',
+      source: "forbidText(page, '13.4.6', sourcePath); const version = '13.4.6';",
+      ok: false,
+    },
+    {
+      name: 'unowned negative guard',
+      className: 'tooling-doc',
+      source: "forbidText(page, '13.4.6', sourcePath);",
+      ok: false,
+    },
+  ]
+) {
+  Deno.test(`phase 2 context policy: ${name}`, async () => {
+    const report = await evaluateAspireVersionParity({
+      rows: [{
+        path: 'owned-surface',
+        class: className,
+        owner: 'S13',
+        disposition: 'enforce remaining pins',
+      }],
+      phase: 2,
+      expectedVersion: '13.5.3',
+      readText: () => Promise.resolve(source),
+    });
+    assertEquals(report.ok, ok);
+    assertEquals(report.counts.fail, ok ? 0 : 1);
+  });
+}
+
 Deno.test('manifest parser skips the TSV header and preserves owner/disposition fields', () => {
   assertEquals(parseManifest(manifest)[0], {
     path: 'scaffold.ts',
