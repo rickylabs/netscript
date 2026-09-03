@@ -14,3 +14,17 @@
 - **Action:** fix
 - **Evidence:** Add a launcher assertion, stale-binary RED/GREEN coverage, and exercise
   `deno task e2e:cli gates readme.quickstart` before the GREEN commit.
+
+## 2026-09-03 — Evaluator route alias
+
+- **What:** The first formal IMPL-EVAL launch used the lane-policy model id `fable-5`, which the
+  installed native Claude CLI 2.1.258 rejected as an unrecognized model before evaluation began.
+- **Source:** Native evaluator launcher exit 1, session
+  `500f9d7b-9c3d-4a92-9f54-43331555404b`.
+- **Expected:** The configured routing id would be accepted directly by the installed CLI.
+- **Actual:** The CLI accepts the native alias `fable`, which resolved to `claude-fable-5-1`.
+- **Severity:** minor tooling drift
+- **Action:** retry the same formal lane with native alias `fable`; no implementation or gate
+  scope changed.
+- **Evidence:** Successful separate session `c74d687f-4c79-4f44-a79b-d844085dc27a`, medium effort,
+  completed with PASS and wrote `evaluate.md` only.

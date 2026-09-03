@@ -75,6 +75,7 @@ cause, contract, test assertions, scope, gates, and prohibited alternatives were
 | 2026-09-03 | 2 | GREEN | Corrected focused test exited 0 (1 passed, 0 failed) under `--allow-env=PATH`; all scoped gates passed, and a safe real child walker invocation at index 2 exited 0 under the exact narrow permissions. |
 | 2026-09-03 | 2 | slice review | Separate read-only re-review: PASS, no blockers. Reviewer independently ran focused application + presentation tests with only `--allow-env=PATH`: 5 passed, 0 failed; `git diff --check` passed. |
 | 2026-09-03 | 2 | reconcile | PR #1975 remains non-draft with `Part of #1881` and `Part of #863`, no closing keyword, milestone 0.0.7, the seven requested labels, and exactly one `status:impl`; hosted issue closure remains deferred. |
+| 2026-09-03 | 3 | IMPL-EVAL | Separate opposite-family native evaluator (Claude Fable 5.1, medium, session `c74d687f-4c79-4f44-a79b-d844085dc27a`) returned PASS at `0650f6f7b`: no high/medium findings, no new/deepened doctrine debt, and all owner acceptance points independently verified. |
 
 ## Gate Results
 
@@ -104,5 +105,6 @@ install, NetScript command, Aspire command, network probe, or cleanup ran.
 
 ## Handoff Notes
 
-Evaluator should inspect argv preservation, cross-index state persistence, optional-env default
-behavior, receipt evidence, and the prohibition on runtime execution.
+Formal IMPL-EVAL is recorded in `evaluate.md` as PASS. The hosted `e2e-cli-prod` rerun from `main`
+remains deferred release-owner evidence for closing #1881. Keep PR #1975 at `status:impl`; do not
+mark it ready-merge in this slice.

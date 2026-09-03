@@ -16,8 +16,10 @@
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `light_implementation` | OpenAI / Codex GPT-5 family / session default | Focused RED/GREEN gate-code slice |
-| `formal_impl_evaluation` | Separate session / available reviewer identity recorded in `evaluate.md` | Mandatory final evaluation |
+| `formal_impl_evaluation` | Anthropic / Claude Fable 5.1 / medium | Mandatory final evaluation — PASS |
 
 The owner supplied the complete contract, exact immutable red, scope, gates, branch, and PR
 metadata. `PLAN-EVAL` is therefore `N/A` under the small/mechanical exception. No lane override is
-in force. The separate evaluator identity will be recorded when launched.
+in force. The separate opposite-family evaluator ran as native session
+`c74d687f-4c79-4f44-a79b-d844085dc27a` against GREEN head `0650f6f7b` and recorded `PASS` in
+`evaluate.md`.

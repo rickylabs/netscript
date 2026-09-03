@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix` |
 | Branch | `fix/aspire-1881-readme-install-isolation` |
-| Current phase | `gate` |
+| Current phase | `impl-eval complete` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-RED commit `b1aafaaa6` is pushed and PR #1975 is open non-draft. The corrected GREEN is implemented
-and all owner-scoped gates pass, including a safe real child invocation under the walker's exact
-narrow permissions. Separate substantive slice review returned PASS with no blockers. The GREEN is
-ready to commit. No runtime suite has run.
+RED commit `b1aafaaa6` and corrected GREEN commit `0650f6f7b` are pushed; PR #1975 is open
+non-draft. All owner-scoped gates pass, including a safe real child invocation under the walker's
+exact narrow permissions. Separate substantive slice review and formal opposite-family IMPL-EVAL
+both returned PASS with no blockers. No runtime suite has run.
 
 ## Completed
 
@@ -27,16 +27,18 @@ ready to commit. No runtime suite has run.
 - Corrected GREEN focused test: exit 0, 1 passed / 0 failed.
 - Scoped check/fmt/lint and full nested tests pass; full nested tests: 327 passed / 0 failed.
 - Gate listing and real subprocess permission proof both exit 0.
+- GREEN committed and pushed as `0650f6f7b` after RED `b1aafaaa6`.
+- Formal IMPL-EVAL recorded in `evaluate.md`: PASS, no high/medium findings and no debt delta.
 
 ## In Progress
 
-- Slice 2: commit and push the reviewed GREEN.
+- PR evidence reconciliation and release-owner handoff only.
 
 ## Next Steps
 
-1. Complete the corrected slice review.
-2. Commit and push GREEN; post its phase comment.
-3. Run separate IMPL-EVAL and update PR evidence without changing `status:impl` or marking ready-merge.
+1. Preserve `status:impl` and do not mark PR #1975 ready-merge.
+2. After merge, the release owner dispatches the hosted canary proof from `main`; that transcript,
+   not this implementation slice, is the #1881 closure evidence.
 
 ## Key Decisions
 
@@ -58,4 +60,5 @@ See `plan.md`; all material decisions are owner-locked.
 
 ## Commits
 
-- See the PR commit list and per-slice comments once opened.
+- `b1aafaaa6` — RED recording-spawn contract.
+- `0650f6f7b` — GREEN install-root isolation and stale-root reset.
