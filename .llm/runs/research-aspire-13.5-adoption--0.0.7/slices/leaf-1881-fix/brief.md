@@ -66,3 +66,12 @@ Body: exact red above with run id and stderr line; RED/GREEN outputs; `Part of #
 `type:fix area:cli area:aspire gate:e2e priority:p0 orchestrator:aspire status:impl`, milestone
 0.0.7. Open non-draft. Record worklog/drift under
 `.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/`. Do not mark ready-merge.
+
+## Addendum (coordinator, required)
+
+- `initializeState` at index 0 MUST remove any pre-existing `<runRoot>/.deno-install` (recursive,
+  NotFound tolerated) before recreating it — `mkdir recursive` alone leaves a prior `netscript` and
+  reproduces the collision on rerun. Later indexes inherit the persisted root/PATH from state.
+- The RED/GREEN test must seed a fake `<runRoot>/.deno-install/bin/netscript` before index 0 and
+  prove it is gone after `initializeState`, while argv stays verbatim and index ≥1 carries the
+  same env. Keep scope bounded; nothing else changes.

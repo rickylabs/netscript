@@ -1094,3 +1094,12 @@ the merge.**
   `slices/leaf-1881-fix/brief.md`. First launch attempt failed (brief==dest path truncated the
   brief; relaunched with the run-dir brief).
 - #1881 stays open; Canary 9 republish mode after merge (coordinator).
+- Coordinator corrections (02:0xZ): (1) design accepted — Deno 2.9.5 honours `DENO_INSTALL_ROOT`
+  then PATH; (2) `initializeState` index 0 must fail-closed remove a pre-existing
+  `<runRoot>/.deno-install` before recreating; RED/GREEN must seed a fake bin and prove removal
+  (brief addendum + `resume-1/2.md`); (3) **no Canary 10, no release-canary republish** — after the
+  isolation PR merges, dispatch `e2e-cli-prod.yml` from ref `main` with input
+  `published-version=0.0.7-canary.9` (repaired harness against the exact published Canary 9 payload)
+  and hand the coordinator the dispatch packet; #1881 proof comes from that run.
+- Thread `01a064ff…` still in its skill-read turn; auto-resume watcher armed to resume the same
+  thread the instant it idles (no idle checkpoint allowed).
