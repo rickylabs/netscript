@@ -35,8 +35,6 @@
         "name": "JobHandler",
         "from": "@netscript/plugin-workers-core/runtime"
       },
-      "mapValueType": "JobHandler<any>",
-      "preamble": ["// deno-lint-ignore-file no-explicit-any"],
       "pluginDirs": [
         {
           "dir": "plugins/workers/jobs",

@@ -6,6 +6,7 @@
 
 export {};
 export {
+  createWorkersContract,
   ExecutionFiltersSchema,
   ExecutionRecordResponseSchema,
   JobCreateInputSchema,
@@ -25,6 +26,8 @@ export type {
   ContractSchemaResult,
   ExecutionRecordResponse,
   JobDefinitionResponse,
+  JobPayloadRecord,
+  JobPayloadRegistry,
   JobTriggerInput,
   JobTriggerOutput,
   SSEEvent,

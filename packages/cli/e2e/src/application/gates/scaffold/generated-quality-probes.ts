@@ -1,3 +1,5 @@
+import { join, relative } from '@std/path';
+
 interface QualityReport {
   readonly ok: boolean;
   readonly selection?: {
@@ -36,6 +38,14 @@ const PROBE_SOURCE = 'const __qualityProbe: string = 1;\nexport { __qualityProbe
 // Assemble the forbidden type token so source scanning does not confuse fixture data with syntax.
 const EXPLICIT_ANY_TYPE = String.fromCharCode(97, 110, 121);
 export const ANY_PROBE_SOURCE = `export const __qualityAny: ${EXPLICIT_ANY_TYPE} = 1;\n`;
+
+const DESIGN_PRODUCTION_EXCLUSION_MODE = '--design-production-exclusion';
+const DESIGN_IGNORE_RULE = "ignore: mode === 'development' ? [] : [DESIGN_ROUTE_GROUP_PATTERN],";
+const DESIGN_IGNORE_MUTATION = 'ignore: [], // e2e mutation: plant design routes';
+const DESIGN_ROUTE_SOURCE_PATH = 'routes/(design)/';
+const DESIGN_ROUTE_MARKER = 'Composition rules — NetScript design system';
+
+class DesignRouteOutputError extends Error {}
 
 async function runQualityTask(
   projectRoot: string,
@@ -134,6 +144,121 @@ async function probeExplicitAny(projectRoot: string): Promise<void> {
   }
 }
 
+async function removeBuildOutput(appRoot: string): Promise<void> {
+  await Deno.remove(join(appRoot, '_fresh'), { recursive: true }).catch((error: unknown) => {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  });
+}
+
+async function runProductionBuild(appRoot: string): Promise<void> {
+  const output = await new Deno.Command('deno', {
+    args: ['task', 'build'],
+    cwd: appRoot,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (output.code === 0) return;
+
+  const decoder = new TextDecoder();
+  throw new Error(
+    `generated app production build failed (exit ${output.code})\n` +
+      `stdout:\n${decoder.decode(output.stdout)}\n` +
+      `stderr:\n${decoder.decode(output.stderr)}`,
+  );
+}
+
+async function* walkFiles(root: string): AsyncGenerator<string> {
+  for await (const entry of Deno.readDir(root)) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory) {
+      yield* walkFiles(path);
+    } else if (entry.isFile) {
+      yield path;
+    }
+  }
+}
+
+async function findDesignRouteEvidence(appRoot: string): Promise<string | undefined> {
+  const buildRoot = join(appRoot, '_fresh');
+  const decoder = new TextDecoder();
+  for await (const path of walkFiles(buildRoot)) {
+    const relativePath = relative(buildRoot, path).replaceAll('\\', '/');
+    if (relativePath.includes(DESIGN_ROUTE_SOURCE_PATH)) {
+      return `path:${relativePath}`;
+    }
+
+    const source = decoder.decode(await Deno.readFile(path));
+    if (source.includes(DESIGN_ROUTE_SOURCE_PATH)) {
+      return `source-path:${relativePath}`;
+    }
+    if (source.includes(DESIGN_ROUTE_MARKER)) {
+      return `route-marker:${relativePath}`;
+    }
+  }
+  return undefined;
+}
+
+async function assertDesignRoutesExcluded(appRoot: string): Promise<void> {
+  const evidence = await findDesignRouteEvidence(appRoot);
+  if (evidence !== undefined) {
+    throw new DesignRouteOutputError(
+      `production build contains developer design route output (${evidence})`,
+    );
+  }
+}
+
+function plantDesignRoutes(viteConfig: string): string {
+  const matches = viteConfig.split(DESIGN_IGNORE_RULE).length - 1;
+  if (matches !== 1) {
+    throw new Error(`expected exactly one generated design ignore rule, found ${matches}`);
+  }
+  return viteConfig.replace(DESIGN_IGNORE_RULE, DESIGN_IGNORE_MUTATION);
+}
+
+/** Prove clean exclusion, mutation sensitivity, restoration, and a final clean build. */
+export async function runDesignProductionExclusionProbe(appRoot: string): Promise<void> {
+  const viteConfigPath = join(appRoot, 'vite.config.ts');
+  const originalViteConfig = await Deno.readTextFile(viteConfigPath);
+
+  await removeBuildOutput(appRoot);
+  await runProductionBuild(appRoot);
+  await assertDesignRoutesExcluded(appRoot);
+
+  let mutationError: unknown;
+  let mutationRejected = false;
+  try {
+    await Deno.writeTextFile(viteConfigPath, plantDesignRoutes(originalViteConfig));
+    await removeBuildOutput(appRoot);
+    await runProductionBuild(appRoot);
+    try {
+      await assertDesignRoutesExcluded(appRoot);
+    } catch (error) {
+      if (!(error instanceof DesignRouteOutputError)) throw error;
+      mutationRejected = true;
+    }
+  } catch (error) {
+    mutationError = error;
+  } finally {
+    await Deno.writeTextFile(viteConfigPath, originalViteConfig);
+    await removeBuildOutput(appRoot);
+    await runProductionBuild(appRoot);
+    await assertDesignRoutesExcluded(appRoot);
+  }
+
+  if (mutationError !== undefined) throw mutationError;
+  if (!mutationRejected) {
+    throw new Error('design exclusion detector accepted the planted design route output');
+  }
+
+  console.log(JSON.stringify({
+    ok: true,
+    appRoot,
+    cleanProductionBuild: true,
+    plantedRouteRejected: true,
+    restoredProductionBuild: true,
+  }));
+}
+
 /** Run the serial negative matrix and prove cleanup with a final green task. */
 export async function runQualityProbes(projectRoot: string): Promise<void> {
   for (const path of QUALITY_PROBE_PATHS) await probePath(projectRoot, path);
@@ -161,7 +286,11 @@ export async function runQualityProbes(projectRoot: string): Promise<void> {
 }
 
 if (import.meta.main) {
-  const projectRoot = Deno.args[0];
-  if (!projectRoot) throw new Error('generated project root is required');
-  await runQualityProbes(projectRoot);
+  const root = Deno.args[0];
+  if (!root) throw new Error('generated project or app root is required');
+  if (Deno.args[1] === DESIGN_PRODUCTION_EXCLUSION_MODE) {
+    await runDesignProductionExclusionProbe(root);
+  } else {
+    await runQualityProbes(root);
+  }
 }

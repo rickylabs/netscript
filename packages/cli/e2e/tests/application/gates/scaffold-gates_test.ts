@@ -188,12 +188,35 @@ Deno.test('generated quality probes cover TS, TSX, plugin, background, and AppHo
   assertEquals(
     createGeneratedQualityGates().map((gate) => gate.id),
     [
+      GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION,
       GATE.GENERATED_QUALITY_NEGATIVE,
       GATE.GENERATED_DENO_CHECK,
       GATE.GENERATED_DENO_LINT,
       GATE.GENERATED_DENO_FMT_CHECK,
     ],
   );
+});
+
+Deno.test('design production exclusion gate targets the generated Fresh app', () => {
+  const gate = createGeneratedQualityGates().find((entry) =>
+    entry.id === GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION
+  );
+  if (!gate || gate.kind !== 'command') {
+    throw new Error('Expected design production exclusion gate to be a command gate.');
+  }
+
+  const context = createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL);
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=deno',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts',
+    '/repo/.llm/tmp/cli-e2e/prod-local-test/apps/prod-local-test-web',
+    '--design-production-exclusion',
+  ]);
+  assertEquals(gate.cwd?.(context), '/repo');
 });
 
 Deno.test('scaffold contract add gate targets the generated workspace', () => {

@@ -1,4 +1,9 @@
-import { DEFAULT_TOPIC, type JobMessage } from '@netscript/plugin-workers-core/runtime';
+import {
+  DEFAULT_TOPIC,
+  type JobMessage,
+  JobPayloadValidationError,
+  validateJobPayload,
+} from '@netscript/plugin-workers-core/runtime';
 import { notFound, validationFailed } from '@netscript/contracts';
 import { getJobQueue, getWorkersRuntime, router, type WorkersHandlers } from './router-context.ts';
 
@@ -103,6 +108,19 @@ export const jobHandlers: WorkersHandlers<
 
     if (!job) {
       notFound({ errors, path, resourceId: jobId });
+    }
+
+    if (job.payloadSchema) {
+      try {
+        await validateJobPayload(job.payloadSchema, input.payload, jobId);
+      } catch (error) {
+        if (!(error instanceof JobPayloadValidationError)) throw error;
+        validationFailed({
+          errors,
+          message: error.message,
+          fieldErrors: { payload: error.issues.map((issue) => issue.message) },
+        });
+      }
     }
 
     const traceHeaders =

@@ -1112,11 +1112,19 @@ Deno.test('service and runtime suites preserve executable service-client gate or
         ids.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE),
       true,
     );
-    assertEquals(
-      ids.indexOf(GATE.DATABASE_CODEGEN) + 1,
-      ids.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT),
-    );
   }
+  assertEquals(
+    serviceIds.indexOf(GATE.DATABASE_CODEGEN) + 1,
+    serviceIds.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT),
+  );
+  assertEquals(
+    runtimeIds.indexOf(GATE.DATABASE_CODEGEN) + 1,
+    runtimeIds.indexOf(GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION),
+  );
+  assertEquals(
+    runtimeIds.indexOf(GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION) + 1,
+    runtimeIds.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT),
+  );
   assertEquals(serviceIds.includes(GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH), false);
   const trio = [
     GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,

@@ -15,8 +15,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
-  type JobHandlerContext,
-  type JobResult,
+  type JobHandlerDefinition,
+  type JobPayloadSchema,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { createQueue } from '@netscript/queue';
@@ -40,7 +40,28 @@ const QueueTargetSchema = z.object({
   messageType: z.string(),
 });
 
-const FileRelayPayloadSchema = z.object({
+type HttpTarget = Readonly<{
+  type: 'http';
+  url: string;
+  method: 'POST' | 'PUT';
+  headers: Record<string, string>;
+  sendContent: boolean;
+}>;
+
+type QueueTarget = Readonly<{
+  type: 'queue';
+  queueName: string;
+  messageType: string;
+}>;
+
+type FileRelayPayload = Readonly<{
+  filePath: string;
+  fileName: string;
+  contentHash: string | null;
+  target: HttpTarget | QueueTarget;
+}>;
+
+const FileRelayPayloadSchema: JobPayloadSchema<FileRelayPayload> = z.object({
   filePath: z.string().min(1),
   fileName: z.string().min(1),
   contentHash: z.string().nullable(),
@@ -51,115 +72,116 @@ const FileRelayPayloadSchema = z.object({
 // JOB HANDLER
 // ============================================================================
 
-type FileRelayJobHandler = (
-  context: JobHandlerContext,
-) => JobResult<unknown> | Promise<JobResult<unknown>>;
+type FileRelayJobHandler = JobHandlerDefinition<FileRelayPayload>;
 
-const handler: FileRelayJobHandler = defineJobHandler(async (ctx) => {
-  const payload = FileRelayPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace } = createJobTools(ctx);
-  const { filePath, fileName, contentHash, target } = payload;
+const handler: FileRelayJobHandler = defineJobHandler<FileRelayPayload, unknown>(
+  FileRelayPayloadSchema,
+  async (ctx) => {
+    const payload = ctx.payload;
+    const { log, progress, trace } = createJobTools(ctx);
+    const { filePath, fileName, contentHash, target } = payload;
 
-  log.info('Starting file relay', { filePath, fileName, targetType: target.type });
-  trace.addEvent('file-relay.started', { file_path: filePath, target_type: target.type });
+    log.info('Starting file relay', { filePath, fileName, targetType: target.type });
+    trace.addEvent('file-relay.started', { file_path: filePath, target_type: target.type });
 
-  // Step 1: Read file
-  progress(10, 'Reading file');
-  let rawContent: string;
-  try {
-    rawContent = await Deno.readTextFile(filePath);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    log.error('Failed to read file', { filePath, error: msg });
-    return createFailureResult(`Failed to read file: ${msg}`);
-  }
-
-  // Step 2: Clean up staged file
-  try {
-    await Deno.remove(filePath);
-    log.info('Cleaned up staged file', { filePath });
-  } catch {
-    // Non-fatal
-  }
-
-  // Step 3: Forward to target
-  progress(50, `Relaying to ${target.type}`);
-
-  if (target.type === 'http') {
+    // Step 1: Read file
+    progress(10, 'Reading file');
+    let rawContent: string;
     try {
-      const body = target.sendContent
-        ? rawContent
-        : JSON.stringify({ fileName, contentHash, size: rawContent.length });
-
-      const headers: Record<string, string> = {
-        ...target.headers,
-        'X-File-Name': fileName,
-        'X-Content-Hash': contentHash ?? '',
-      };
-      if (!target.sendContent) {
-        headers['Content-Type'] = 'application/json';
-      }
-
-      const response = await fetch(target.url, {
-        method: target.method,
-        headers,
-        body,
-        signal: AbortSignal.timeout(30_000),
-      });
-
-      if (!response.ok) {
-        const text = await response.text().catch(() => '');
-        return createFailureResult(`HTTP ${response.status}: ${text}`);
-      }
-
-      log.info('File relayed via HTTP', {
-        url: target.url,
-        status: response.status,
-      });
-
-      progress(100, 'Complete');
-      return createSuccessResult({
-        fileName,
-        targetType: 'http',
-        url: target.url,
-        status: response.status,
-        completedAt: new Date().toISOString(),
-      });
+      rawContent = await Deno.readTextFile(filePath);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      return createFailureResult(`HTTP relay failed: ${msg}`);
+      log.error('Failed to read file', { filePath, error: msg });
+      return createFailureResult(`Failed to read file: ${msg}`);
     }
-  } else {
-    // Queue target
+
+    // Step 2: Clean up staged file
     try {
-      const queue = createQueue(target.queueName);
-      await queue.enqueue({
-        type: target.messageType,
-        fileName,
-        contentHash,
-        content: rawContent,
-        relayedAt: new Date().toISOString(),
-      });
-
-      log.info('File relayed via queue', {
-        queueName: target.queueName,
-        messageType: target.messageType,
-      });
-
-      progress(100, 'Complete');
-      return createSuccessResult({
-        fileName,
-        targetType: 'queue',
-        queueName: target.queueName,
-        messageType: target.messageType,
-        completedAt: new Date().toISOString(),
-      });
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : String(error);
-      return createFailureResult(`Queue relay failed: ${msg}`);
+      await Deno.remove(filePath);
+      log.info('Cleaned up staged file', { filePath });
+    } catch {
+      // Non-fatal
     }
-  }
-});
+
+    // Step 3: Forward to target
+    progress(50, `Relaying to ${target.type}`);
+
+    if (target.type === 'http') {
+      try {
+        const body = target.sendContent
+          ? rawContent
+          : JSON.stringify({ fileName, contentHash, size: rawContent.length });
+
+        const headers: Record<string, string> = {
+          ...target.headers,
+          'X-File-Name': fileName,
+          'X-Content-Hash': contentHash ?? '',
+        };
+        if (!target.sendContent) {
+          headers['Content-Type'] = 'application/json';
+        }
+
+        const response = await fetch(target.url, {
+          method: target.method,
+          headers,
+          body,
+          signal: AbortSignal.timeout(30_000),
+        });
+
+        if (!response.ok) {
+          const text = await response.text().catch(() => '');
+          return createFailureResult(`HTTP ${response.status}: ${text}`);
+        }
+
+        log.info('File relayed via HTTP', {
+          url: target.url,
+          status: response.status,
+        });
+
+        progress(100, 'Complete');
+        return createSuccessResult({
+          fileName,
+          targetType: 'http',
+          url: target.url,
+          status: response.status,
+          completedAt: new Date().toISOString(),
+        });
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        return createFailureResult(`HTTP relay failed: ${msg}`);
+      }
+    } else {
+      // Queue target
+      try {
+        const queue = createQueue(target.queueName);
+        await queue.enqueue({
+          type: target.messageType,
+          fileName,
+          contentHash,
+          content: rawContent,
+          relayedAt: new Date().toISOString(),
+        });
+
+        log.info('File relayed via queue', {
+          queueName: target.queueName,
+          messageType: target.messageType,
+        });
+
+        progress(100, 'Complete');
+        return createSuccessResult({
+          fileName,
+          targetType: 'queue',
+          queueName: target.queueName,
+          messageType: target.messageType,
+          completedAt: new Date().toISOString(),
+        });
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error);
+        return createFailureResult(`Queue relay failed: ${msg}`);
+      }
+    }
+  },
+);
 
 const fileRelayJob: FileRelayJobHandler & Readonly<{ id: 'triggers-plugin-file-relay' }> = Object
   .assign(handler, { id: 'triggers-plugin-file-relay' as const });

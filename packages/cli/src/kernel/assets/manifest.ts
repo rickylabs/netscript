@@ -27,6 +27,7 @@ export const TEMPLATE_KEYS = {
     'app/routes/(design)/design/(_components)/composition-view.tsx.template',
   appRoutesDesignIndex: 'app/routes/(design)/design/index.tsx.template',
   appRoutesDesignLayout: 'app/routes/(design)/design/_layout.tsx.template',
+  appRoutesDesignMiddleware: 'app/routes/(design)/design/_middleware.ts.template',
   appRoutesDesignTokens: 'app/routes/(design)/design/tokens.tsx.template',
   appRoutesDesignTokensView: 'app/routes/(design)/design/(_components)/tokens-view.tsx.template',
   appRoutesExamplesComponentsExamplesView:

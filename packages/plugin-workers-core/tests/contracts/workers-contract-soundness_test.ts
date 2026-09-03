@@ -1,10 +1,11 @@
 import { assertEquals } from '@std/assert';
+import type { InferContractRouterInputs } from '@orpc/contract';
 import type {
   ExecutionRecordResponse,
   JobTriggerInput,
   JobTriggerOutput,
 } from '../../src/contracts/v1/mod.ts';
-import { workersContractV1 } from '../../src/contracts/v1/mod.ts';
+import { createWorkersContract, workersContractV1 } from '../../src/contracts/v1/mod.ts';
 import type { ExecutionRecord } from '../../src/state/mod.ts';
 import type { TriggerType } from '../../src/domain/constants.ts';
 
@@ -31,6 +32,34 @@ const _validTrigger = {
 const _badTriggerId: JobTriggerInput = {
   // @ts-expect-error - `id` must be a string
   id: 123,
+};
+
+type ApplicationJobPayloads = Readonly<{
+  'embed-document': Readonly<{ documentId: string; text: string }>;
+  'transcribe-image': Readonly<{ imageUrl: string; language?: string }>;
+}>;
+
+// Negative: the embed-document payload must not compile for transcribe-image.
+// RED receipt: on the broad baseline this directive is unused, because
+// JobTriggerInput does not yet bind id to payload.
+const _mismatchedJobPayload: JobTriggerInput<ApplicationJobPayloads> = {
+  id: 'transcribe-image',
+  // @ts-expect-error - payload belongs to embed-document, not transcribe-image
+  payload: { documentId: 'doc-1', text: 'content' },
+};
+
+const _typedWorkersContract = createWorkersContract<ApplicationJobPayloads>();
+type ApplicationWorkerInputs = InferContractRouterInputs<typeof _typedWorkersContract>;
+
+const _validTypedClientInput: ApplicationWorkerInputs['triggerJob'] = {
+  id: 'embed-document',
+  payload: { documentId: 'doc-1', text: 'content' },
+};
+
+const _mismatchedTypedClientInput: ApplicationWorkerInputs['triggerJob'] = {
+  id: 'transcribe-image',
+  // @ts-expect-error - the typed triggerJob contract binds payload to the selected job id
+  payload: { documentId: 'doc-1', text: 'content' },
 };
 
 // --- triggerJob output keeps `triggered: boolean` -----------------------------
@@ -67,6 +96,9 @@ Deno.test('workers contract exposes a precise, non-loosened type surface', () =>
   assertEquals(typeof workersContractV1.triggerJob, 'object');
   assertEquals(_validTrigger.id, 'job-1');
   assertEquals(_badTriggerId.id as unknown, 123);
+  assertEquals(_mismatchedJobPayload.id, 'transcribe-image');
+  assertEquals(_validTypedClientInput.id, 'embed-document');
+  assertEquals(_mismatchedTypedClientInput.id, 'transcribe-image');
   assertEquals(_badTriggerOut.triggered as unknown, 'yes');
   assertEquals(_badExecResponse.executionId, undefined);
   assertEquals(_validTriggeredBy, 'manual');

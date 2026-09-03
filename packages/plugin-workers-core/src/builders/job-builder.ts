@@ -1,15 +1,33 @@
 import { DEFAULT_TOPIC } from '../domain/constants.ts';
 import type { CronExpression } from '../domain/cron.ts';
-import type {
-  JobDefinition as DomainJobDefinition,
-  JobHandler as DomainJobHandler,
-  JobId as DomainJobId,
-  TaskPermissionsInput,
+import {
+  createJobHandlerDefinition,
+  type JobDefinition as DomainJobDefinition,
+  type JobHandler as DomainJobHandler,
+  type JobId as DomainJobId,
+  type JobPayloadSchema,
+  type TaskPermissionsInput,
 } from '../domain/mod.ts';
 import type { BuilderPermissions, JobDefinition, JobHandler } from './builder-types.ts';
 
 /** Job builder state used to gate `build()`. */
-export type JobBuilderState = 'initial' | 'entrypoint-set' | 'handler-set';
+export type JobBuilderState =
+  | 'initial'
+  | 'entrypoint-set'
+  | 'payload-set'
+  | 'payload-entrypoint-set'
+  | 'handler-set';
+
+type AfterEntrypoint<TConfigured extends JobBuilderState> = TConfigured extends
+  'payload-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+  : 'entrypoint-set';
+
+type AfterPayload<TConfigured extends JobBuilderState> = TConfigured extends
+  'entrypoint-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+  : 'payload-set';
+
+type HandlerPayload<TConfigured extends JobBuilderState, TPayload, TNextPayload> =
+  TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload;
 
 /** Retry configuration options for job definitions. */
 export type RetryOptions = Readonly<{
@@ -38,16 +56,39 @@ export interface JobBuilder<
   /** Set the job description. */
   description(value: string): this;
   /** Set the module entrypoint that executes the job. */
-  entrypoint(path: string): JobBuilder<TId, 'entrypoint-set', TPayload, TResult>;
+  entrypoint(
+    path: string,
+  ): JobBuilder<
+    TId,
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'entrypoint-set',
+    TPayload,
+    TResult
+  >;
   /** Set an in-process handler that executes the job. */
   handler<TNextPayload = TPayload, TNextResult = TResult>(
-    fn: JobHandler<TNextPayload, TNextResult>,
-  ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
+    fn: JobHandler<
+      TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload,
+      TNextResult
+    >,
+  ): JobBuilder<
+    TId,
+    'handler-set',
+    TConfigured extends 'payload-set' | 'payload-entrypoint-set' ? TPayload : TNextPayload,
+    TNextResult
+  >;
   /** Narrow the payload type carried by this job definition. */
   payload<TNextPayload>(
     this: TConfigured extends 'handler-set' ? never
       : JobBuilder<TId, TConfigured, TPayload, TResult>,
-  ): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
+    schema: JobPayloadSchema<TNextPayload>,
+  ): JobBuilder<
+    TId,
+    TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' ? 'payload-entrypoint-set'
+      : 'payload-set',
+    TNextPayload,
+    TResult
+  >;
   /** Set the cron schedule expression for this job.
    * @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`.
    */
@@ -74,7 +115,7 @@ export interface JobBuilder<
   queueTrigger(name: string): this;
   /** Build the job definition after an entrypoint or handler has been configured. */
   build(
-    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+    this: TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' | 'handler-set'
       ? JobBuilder<TId, TConfigured, TPayload, TResult>
       : never,
   ): JobDefinition<TId, TPayload, TResult>;
@@ -108,6 +149,7 @@ type JobBuilderData<TId extends string, TPayload, TResult> = Readonly<{
   description?: string;
   entrypoint?: string;
   handler?: DomainJobHandler<TPayload, TResult>;
+  payloadSchema?: JobPayloadSchema<TPayload>;
   schedule?: string;
   timezone: string;
   timeout: number;
@@ -141,29 +183,44 @@ class JobBuilderImpl<
     return new JobBuilderImpl({ ...this.#data, description: value });
   }
 
-  entrypoint(path: string): JobBuilder<TId, 'entrypoint-set', TPayload, TResult> {
-    return new JobBuilderImpl<TId, 'entrypoint-set', TPayload, TResult>({
+  entrypoint(
+    path: string,
+  ): JobBuilder<TId, AfterEntrypoint<TConfigured>, TPayload, TResult> {
+    return new JobBuilderImpl<TId, AfterEntrypoint<TConfigured>, TPayload, TResult>({
       ...this.#data,
       entrypoint: path,
     });
   }
 
   handler<TNextPayload = TPayload, TNextResult = TResult>(
-    fn: JobHandler<TNextPayload, TNextResult>,
-  ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
+    fn: JobHandler<HandlerPayload<TConfigured, TPayload, TNextPayload>, TNextResult>,
+  ): JobBuilder<
+    TId,
+    'handler-set',
+    HandlerPayload<TConfigured, TPayload, TNextPayload>,
+    TNextResult
+  > {
     const { handler: _previousHandler, ...data } = this.#data;
-    return new JobBuilderImpl<TId, 'handler-set', TNextPayload, TNextResult>({
+    type THandlerPayload = HandlerPayload<TConfigured, TPayload, TNextPayload>;
+    const payloadSchema = this.#data.payloadSchema as JobPayloadSchema<THandlerPayload> | undefined;
+    const handler = payloadSchema ? createJobHandlerDefinition(payloadSchema, fn) : fn;
+    return new JobBuilderImpl<TId, 'handler-set', THandlerPayload, TNextResult>({
       ...data,
-      handler: fn,
+      handler,
+      payloadSchema,
     });
   }
 
   payload<TNextPayload>(
     this: TConfigured extends 'handler-set' ? never
       : JobBuilderImpl<TId, TConfigured, TPayload, TResult>,
-  ): JobBuilder<TId, TConfigured, TNextPayload, TResult> {
+    schema: JobPayloadSchema<TNextPayload>,
+  ): JobBuilder<TId, AfterPayload<TConfigured>, TNextPayload, TResult> {
     const { handler: _handler, ...data } = this.#data;
-    return new JobBuilderImpl<TId, TConfigured, TNextPayload, TResult>(data);
+    return new JobBuilderImpl<TId, AfterPayload<TConfigured>, TNextPayload, TResult>({
+      ...data,
+      payloadSchema: schema,
+    });
   }
 
   /** @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`. */
@@ -235,7 +292,7 @@ class JobBuilderImpl<
   }
 
   build(
-    this: TConfigured extends 'entrypoint-set' | 'handler-set'
+    this: TConfigured extends 'entrypoint-set' | 'payload-entrypoint-set' | 'handler-set'
       ? JobBuilderImpl<TId, TConfigured, TPayload, TResult>
       : never,
   ): JobDefinition<TId, TPayload, TResult> {
@@ -268,6 +325,7 @@ class JobBuilderImpl<
       permissions: toDomainPermissions(this.#data.permissions),
       retention: this.#data.retention,
       handler: this.#data.handler,
+      payloadSchema: this.#data.payloadSchema,
     });
 
     return definition;
