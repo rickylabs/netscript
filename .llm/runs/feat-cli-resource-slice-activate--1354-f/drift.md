@@ -144,3 +144,21 @@
 - **Action:** Return the immutable packet to the coordinator without merging and without waiting on
   Fable.
 - **Evidence:** owner instruction, existing `evaluate.md`, and the final-head gate/CI receipts.
+
+## 2026-09-03 — live main advanced during receipt generation
+
+- **What:** `main` advanced from the owner-specified `3903feea63` to its direct descendant
+  `632528888` while final local receipts were running.
+- **Source:** refreshed `origin/main`; the new commit is #1980's README/quickstart correction and
+  its generated projections.
+- **Expected:** An immutable merge packet must be based on the live PR base without absorbing
+  unrelated feature scope.
+- **Actual:** The 11 Slice F commits were replayed onto `632528888`. Only generated agent-docs and
+  publish carriers conflicted; main's side was retained, then regenerated from the converged source.
+  No non-generated conflict occurred. MCP export corpus and Aspire manifest regeneration were
+  byte-identical.
+- **Severity:** expected base movement
+- **Action:** Bind the final local and hosted receipts to the new head/base pair and use an exact
+  force-with-lease against remote Slice F head `275a878ab`.
+- **Evidence:** `git merge-base`, conflict log, generator output, and final gate table in
+  `worklog.md`.

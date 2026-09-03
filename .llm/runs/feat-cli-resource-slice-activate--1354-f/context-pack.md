@@ -12,13 +12,14 @@
 
 ## Current State
 
-The integration branch contains #1664, Slice A, and Slice E. The owner amended Slice F after the
+Main contains #1664, the Slice A selector, and the amended plan. The owner amended Slice F after the
 mandated stop found `agent-conventions.ts` as an additional rendered consumer; item 33 and ceiling
 33 govern the run. Implementation and the separate-session Fable evaluation are complete. The
 committed verdict is `PASS_IMPL_WITH_FINDINGS`; closeout resolved M-1 through corrected **33
 enumerated + 1 absorbed** accounting and M-2 through the canonical doctrine debt registry. The
-branch is converged on #1664 head `31d59a656`, all required post-merge gates pass, and no product
-feature code changed during closeout.
+branch was narrowly replayed onto live `main` `632528888`, all required post-rebase gates pass, and
+the only post-evaluation product adjustment defers Fresh/Vite loading until execution so command
+help/docs census can run without Rollup FFI.
 
 ## Completed
 
@@ -27,22 +28,23 @@ feature code changed during closeout.
 - Fresh derives manifest/routes after route emission; exact init-preset command rerun is
   conflict-free and byte-identical.
 - `generate resource` is registered fourth through production-composed dependencies.
-- Focused 32/32 and full CLI 1324/1324 test suites pass; structured check/lint/fmt and precommit
+- Focused 21/21 and full CLI 1,777/1,777 test suites pass; structured check/lint/fmt and precommit
   fitness gates pass.
 - Clean-tree MCP regeneration produced no diff; all four carrier/publish/sample checks pass.
 - PR #1956 body and implementation-phase PASS comment carry the amended contract and evidence.
-- Fresh native Claude/Fable 5 medium evaluator session `bb222ada` independently reproduced the
-  load-bearing gates and returned PASS.
+- The committed independent evaluator receipt remains authoritative. The owner explicitly directed
+  this closeout not to wait for the temporarily quota-blocked Fable route; no replacement self-eval
+  is claimed.
 
 ## In Progress
 
-- Final harness evidence commit, push, and PR #1956 body/status update.
+- Push the immutable final head and attach its hosted-check packet to PR #1956.
 
 ## Next Steps
 
-1. Push the converged head to `feat/cli-resource-slice-activate`.
-2. Update PR #1956 with corrected accounting, debt ownership, and convergence evidence.
-3. Hand off Slice G guidance/hosted acceptance.
+1. Force-push the narrowly rebased head with an exact lease.
+2. Update PR #1956 with the live-base and failed-quality correction receipts.
+3. Leave Slice G serial and unstarted until Slice F lands.
 
 ## Key Decisions
 
@@ -60,9 +62,11 @@ feature code changed during closeout.
 - The absorbed path is `public-command-dependencies.ts`, Slice E's deferred item-6 production
   composition seam. It makes the pre-convergence product diff 33 files but is not part of Slice F's
   enumeration.
-- Post-product package changes are base-derived only: excluding `*.generated.ts`,
-  `8c27ffe16..a042c6e57` is 19 files, 1,548 insertions, and 415 deletions, exactly the 19
-  non-Slice-E paths supplied by #1664's current base.
+- Relative to live main, the final package diff has 35 paths including three generated carriers;
+  excluding generated files, it has 32 paths, 1,008 insertions, and 1,986 deletions.
+- The bounded failed-quality correction reuses two Slice F paths and adds only the command-census
+  policy and exact CLI-reference row outside `packages/`; none of Slice G's eight enumerated paths
+  changed.
 
 ## Gates
 
@@ -73,7 +77,7 @@ feature code changed during closeout.
 | Runtime     | N/A            | Slice G owns hosted acceptance.                                                                                                                                                                                               |
 | Consumer    | pass           | focused 32/32; full CLI 1324/1324; all carrier/publish/sample/docs gates pass.                                                                                                                                                |
 
-Post-convergence rerun: CLI check 980 files / 9 batches / 0 diagnostics; full CLI unit suite 1,720
+Final live-main rerun: CLI check 1,000 files / 9 batches / 0 diagnostics; full CLI unit suite 1,777
 passed / 0 failed / 0 ignored; all asset/corpus/Aspire checks exit 0; `arch:check` and
 `quality:gate` exit 0; README fences retain 7 expected type errors; JSDoc examples retain
 `unboundName=116`; workspace publish dry-run exits 0.
@@ -99,3 +103,6 @@ passed / 0 failed / 0 ignored; all asset/corpus/Aspire checks exit 0; `arch:chec
 - `e78b9a25a` — IMPL-EVAL finding bookkeeping and canonical doctrine debt.
 - `a042c6e57` — merge current #1664 base `31d59a656`, including generated refresh and dual-receipt
   conflict resolution.
+- `863589b55` — live-main-replayed failed-quality correction: execution-time Fresh imports plus
+  exact 92-command documentation ratification.
+- `c4d00b9ea` — regenerated agent-docs and publish carriers on live main `632528888`.
