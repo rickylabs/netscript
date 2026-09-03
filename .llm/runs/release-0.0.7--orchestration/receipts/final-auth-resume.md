@@ -1,5 +1,11 @@
 # Final permission boundary and immediate resume
 
+Current update12:35Z:1945 merged as075ea8ed7;1481/1971 closed. Three acceptance issues remain.
+The renewed device flow completed but the selected credential still has repo only. Isolated
+GH_CONFIG_DIR=/home/agent/.config/netscript-release-gh login is pending in exec59710.
+After approval verify actual scopes using this explicit config before push. Earlier author/CI
+and device-session details below are historical; use the latest context-pack for the live state.
+
 2026-09-03 10:56Z. Owner requires one intended final canary, then stable immediately after its
 true green pair and issue acceptance; no unrelated content drift, no premature version minting.
 

@@ -1,5 +1,9 @@
 # Cut trace — release 0.0.7
 
+2026-09-03T12:35:06Z: coordinator mergedPR1945,075ea8ed7a027c8485db3c2ac183d0af5e1b2d35,
+closing1481/1971. Source d6ffcb5ea, core33746758886 PASS, product runtime33744551964
+104/0 PG and99/0 SQLite, independent scoped PASS and final live closure/thread gates PASS.
+
 Canary publication is active. This trace records canary membership from actual first-parent history,
 the exact canary-pinned production E2E, and will later record stable publication and exact
 artifact-pinned production E2E.

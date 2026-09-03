@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "d2af6e8b40777720b242aaea639b0e538299cdc8",
+  "currentMainSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "osUpdateRecoverySnapshot": "receipts/recovery-2026-09-03.json",
@@ -855,9 +855,9 @@
     },
     {
       "number": 1481,
-      "state": "open",
+      "state": "closed",
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1481",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T12:38:53.118Z"
     },
     {
       "number": 1502,
@@ -1291,12 +1291,12 @@
     },
     {
       "number": 1971,
-      "state": "open",
+      "state": "closed",
       "evidence": [
         "https://github.com/rickylabs/netscript/issues/1971"
       ],
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1971",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T12:38:53.118Z"
     },
     {
       "number": 1881,
@@ -4525,17 +4525,21 @@
         1481,
         1971
       ],
-      "phase": "gating",
+      "phase": "merged",
       "thread": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "wt": "007-leaf-1481",
-      "nextGate": "Both runtime tiers PASS33744551964 (104/0 PG,99/0 SQLite). Core fails only resource-slice-gates_test positional assertion21 vs20. Same author granted exact codegen→design→client ordering repair in comment5524505478; retain valid runtime/evaluator, renew selected + core gates.",
+      "nextGate": "Merged after final CI, scoped independent PASS and fresh close-gate/review-threads PASS;1481/1971 closed.",
       "baseBranch": "main",
-      "headSha": "456abefbdfa4a06de15c1a64b3e5f4a68751e769",
-      "currentPrHeadSha": "456abefbdfa4a06de15c1a64b3e5f4a68751e769",
+      "headSha": "d6ffcb5ea73c9b06f3106b8dfff64b3d0d6584b3",
+      "currentPrHeadSha": "d6ffcb5ea73c9b06f3106b8dfff64b3d0d6584b3",
       "branch": "fix/design-route-prod-gate",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
       "implementerAgentId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
-      "reconciledAt": "2026-09-03T10:48:00Z"
+      "reconciledAt": "2026-09-03T12:38:53.118Z",
+      "mergeCommitSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
+      "mergedAt": "2026-09-03T12:35:06Z",
+      "ciState": "success",
+      "ciWorkflowRunId": 33746758886
     },
     {
       "id": "resource-slice-final-acceptance",
@@ -5727,26 +5731,19 @@
   ],
   "expensiveGates": [],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-03T10:48:00Z",
+    "capturedAt": "2026-09-03T12:38:53.118Z",
     "source": "Live GitHub milestone 27 export; actual remaining issues, not historical frozen inventory.",
-    "openIssueCount": 5,
+    "openIssueCount": 3,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
       "features": 0,
-      "fixes": 2,
+      "fixes": 0,
       "internals": 0,
       "docs": 0,
       "aspire": 3
     },
     "issues": [
-      {
-        "number": 1971,
-        "owner": "orchestrator:fixes",
-        "state": "OPEN",
-        "title": "scaffold: production deno task build fails on catalog: zod specifier after db codegen",
-        "url": "https://github.com/rickylabs/netscript/issues/1971"
-      },
       {
         "number": 1881,
         "owner": "orchestrator:aspire",
@@ -5762,13 +5759,6 @@
         "url": "https://github.com/rickylabs/netscript/issues/1712"
       },
       {
-        "number": 1481,
-        "owner": "orchestrator:fixes",
-        "state": "OPEN",
-        "title": "fix(fresh-ui): /design ships ungated — the defect class RFC 0005 guards against",
-        "url": "https://github.com/rickylabs/netscript/issues/1481"
-      },
-      {
         "number": 863,
         "owner": "orchestrator:aspire",
         "state": "OPEN",
@@ -5779,12 +5769,8 @@
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-03T10:48:00Z",
+    "capturedAt": "2026-09-03T12:38:53.118Z",
     "prs": [
-      {
-        "number": 1945,
-        "topic": "fixes"
-      },
       {
         "number": 1641,
         "topic": "coordinator",
@@ -5969,7 +5955,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T10:48:00Z",
+  "updatedAt": "2026-09-03T12:38:53.118Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6042,10 +6028,9 @@
       "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
       "head": "d6ffcb5ea73c9b06f3106b8dfff64b3d0d6584b3",
-      "action": "Bounded test repair pushed; watch core CI33746758886, complete truthful merge packet. Product runtime and independent PASS preserved.",
-      "state": "active",
-      "lastProgressAt": "2026-09-03T10:54:16Z",
-      "pid": 223518
+      "action": "Final packet consumed: PR1945 merged and1481/1971 closed. Original author exited; no further dispatch.",
+      "state": "completed",
+      "lastProgressAt": "2026-09-03T12:38:53.118Z"
     }
   ],
   "reconciliation": {
@@ -6055,31 +6040,31 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T10:48:00Z",
-    "nextReportDueAt": "2026-09-03T11:18:00Z",
-    "lastReportRef": "receipts/final-issue-closure-matrix.md",
-    "headline": "#1970 merged and #1455 closed. Five issues remain; #1945 needs one integration-test assertion corrected. Final cold README workflow proof awaits requested GitHub authorization; no canary minted.",
-    "currentMainSha": "d2af6e8b40777720b242aaea639b0e538299cdc8",
+    "lastReportAt": "2026-09-03T12:38:53.118Z",
+    "nextReportDueAt": "2026-09-03T13:38:53.118Z",
+    "lastReportRef": "receipts/final-auth-resume.md",
+    "headline": "Final product PR1945 merged;1481/1971 closed. Three release-acceptance issues remain. Device approval completed but available GH credential still has repo only; isolated release login required.",
+    "currentMainSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
       "state": "qualifying",
       "eta": {
-        "window": "45–90 minutes after the three verified merge packets; conditional, not a publication promise",
+        "window": "Conditional on workflow authorization, cold-proof rehearsal, final CI and native canary production pair; no trustworthy clock ETA yet.",
         "confidence": "low",
-        "basis": "Shared resource/browser repair and owner Aspire static-scan repair are merged. Two remaining product integration/evaluation packets precede native publish and pinned production pair."
+        "basis": "All product PRs merged; hosted cold-proof rehearsal against existingcanary9 must precede minting."
       },
       "criticalPath": [
         {
-          "id": "merge-packets",
+          "id": "cold-proof",
           "state": "gating",
-          "impact": "Worker payload typing and /design exclusion are user-facing payload for the same candidate.",
-          "nextAction": "Consume #1970/#1945 after exact CI and delta review, independently of docs/internals."
+          "impact": "1881/863/1712 need truly cold hosted README acceptance.",
+          "nextAction": "Isolated workflow-scoped login; push832e53720, CI and existingcanary9 rehearsal before minting."
         },
         {
           "id": "canary-pair",
           "state": "queued",
-          "impact": "Stable cannot publish without same-content canary publish and pinned production E2E.",
-          "nextAction": "Dispatch one release-canary workflow after candidate convergence; watch to terminal."
+          "impact": "Stable requires same-content published canary and production E2E.",
+          "nextAction": "Verified cold-proof merge then final readiness, one native canary and stable."
         }
       ],
       "finalCandidatePolicy": "Owner: one intended final canary from frozen verified source, then stable after exact publish/production/cold-start acceptance. No unrelated source drift or speculative canary."
@@ -6089,32 +6074,27 @@
         1981,
         1958,
         1982,
-        1970
+        1970,
+        1945
       ],
       "closedIssues": [
         1844,
         1354,
-        1455
+        1455,
+        1481,
+        1971
       ],
       "newIssues": [],
-      "queueDeltaExplanation": "Three PRs1958/1982/1970 merged this turn. Five issues, one product PR1945 plus coordinator tracking PR1641 remain; cold-proof commit local pending workflow permission."
+      "queueDeltaExplanation": "Final product PR merged. Only coordinator tracking1641 open; reviewed cold-workflow832e53720 remains local pending workflow credential."
     },
     "scope": {
-      "openIssueCount": 5,
-      "ownedIssueCount": 5,
-      "scheduledIssueCount": 5,
-      "openPullRequestCount": 2,
+      "openIssueCount": 3,
+      "ownedIssueCount": 3,
+      "scheduledIssueCount": 3,
+      "openPullRequestCount": 1,
       "unscheduledIssueNumbers": []
     },
-    "mergeQueue": [
-      {
-        "prNumber": 1945,
-        "lane": "fixes",
-        "state": "repairing",
-        "nextGate": "Both runtime tiers PASS33744551964 (104/0 PG,99/0 SQLite). Core fails only resource-slice-gates_test positional assertion21 vs20. Same author granted exact codegen→design→client ordering repair in comment5524505478; retain valid runtime/evaluator, renew selected + core gates.",
-        "nextAction": "Same author repairs existing order assertion, scoped proof then required CI; no broad new evaluation or repeated unchanged-product runtime."
-      }
-    ],
+    "mergeQueue": [],
     "orchestratorMatrix": [
       {
         "lane": "features",
@@ -6126,15 +6106,11 @@
       },
       {
         "lane": "fixes",
-        "state": "active",
-        "activeItems": [
-          1481,
-          1971,
-          1945
-        ],
-        "lastConcreteProgressAt": "2026-09-03T10:48:00Z",
-        "blocker": "Native Fable quota remains, but original Codex authors are active; no owner-only decision.",
-        "nextAction": "Same author repairs existing order assertion, scoped proof then required CI; no broad new evaluation or repeated unchanged-product runtime."
+        "state": "complete",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-09-03T12:38:53.118Z",
+        "blocker": "None: final product PR1945 and its issues are closed.",
+        "nextAction": "Preserve merged evidence; no product restart."
       },
       {
         "lane": "internals",
@@ -6223,10 +6199,10 @@
       {
         "id": "github-workflow-auth",
         "category": "infrastructure",
-        "summary": "New cold README proof workflow commit832e53720 is local; GitHub rejected its push for missing workflow scope.",
-        "impact": "Blocks cold-proof PR publication and final canary admission, not #1970/#1945 verification or merges.",
+        "summary": "Device flow reported success; gh auth status and API independently still report only repo scope, no user-keyed credential. Cause of non-retention unproven.",
+        "impact": "Blocks workflow push and final canary admission; product merges complete.",
         "owner": "owner",
-        "nextAction": "Finish pending device authorization; coordinator verifies scopes and pushes using newly authorized credential.",
+        "nextAction": "Authorize an isolated release login and verify actual scopes before push.",
         "ownerDecisionRequired": true
       }
     ],
@@ -6239,7 +6215,7 @@
     "ownerDecisions": [
       {
         "id": "github-workflow-auth",
-        "question": "Approve GitHub device authorization for workflow-scoped pushes (link sent in coordinator thread).",
+        "question": "Approve isolated release GitHub login so workflow permission is retained.",
         "whyOwnerOnly": "GitHub rejects the new e2e-cli-prod.yml workflow commit because the stored credential only has repo scope; only the account owner can grant the permission.",
         "blockedItems": [
           1881,

@@ -1,5 +1,28 @@
 # Drift — release 0.0.7
 
+## 2026-09-03 12:35Z final product merge and auth non-retention
+
+Merged #1945 at075ea8ed7a027c8485db3c2ac183d0af5e1b2d35, immutable PR head
+d6ffcb5ea73c9b06f3106b8dfff64b3d0d6584b3. CI33746758886 SUCCESS (5267/0),
+hosted product runtime33744551964 PASS (104/0 PG,99/0 SQLite), scoped separate GLM PASS
+and explicit test-only integration diff checked. Fresh close-gate12:34:48Z PASS;
+review threads0/unanswered0. #1481/#1971 auto-closed at12:35:07Z/08Z; all terminal
+labels shipped. Original author PID223518 is gone after its final packet, not a stalled writer.
+Only1881/863/1712 remain: published cold README and final release acceptance.
+No new author or evaluator, no model change, no canary minted.
+
+Owner device approval completed, but both gh auth status and live API scopes still report
+repo only. GH_TOKEN/GITHUB_TOKEN unset; no user-keyed rickylabs credential found.
+Reason for credential non-retention is not proven; do not claim owner refused permissions.
+Isolated release login now pending in exec59710, GH_CONFIG_DIR=
+/home/agent/.config/netscript-release-gh. This is outside Git, mode700; no credential copied
+or printed. After owner approval verify scopes through that explicit config. Do not bypass
+the rejected workflow push using an alternative endpoint.
+Continue832e53720 cold-proof push/PR, existingcanary9 hosted rehearsal without minting,
+verified merge + final readiness, one intended final canary then stable exact green pairs.
+All five existing supervisor identities/models preserved. NAS rules unchanged: mise,
+sandbox-only Docker, no host/GPU mutation and owner-controlled tracked harness retention.
+
 ## 2026-09-03 10:54Z workers shipped; final proof review PASS
 
 Coordinator merged #1970 at d2af6e8b40777720b242aaea639b0e538299cdc8 (10:43:28Z);
