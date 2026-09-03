@@ -11007,3 +11007,15 @@ old merge ref; ci.yml has no touch-free trigger. Two remedies posted on #1952: A
 + regenerates the manifest in-branch (durable), or the coordinator reopens for a fresh merge ref.
 Lesson: "same head, one run green, one run red" on a pull_request run means compare **merge refs**,
 not heads — the receipt's `gitHead` is the merge commit, and it named the difference.
+
+### D-276 — Canary 8: publish green, `behavior.live-db-endpoint` now passes, prove red on a NEW gate `behavior.package-backed-plugin-doctor`; #1952 remedied by Aspire at 1a759ea34
+
+Canary 8 `33697398852` @ `79adb103b`: `v0.0.7-canary.8` published; pinned prod E2E `33697779870`
+(22 steps) **90 passed / 1 failed** — `behavior.live-db-endpoint` passed (the #1962 fix holds on
+the real cut path); the red is `behavior.package-backed-plugin-doctor`: `Plugin doctor failed:
+workspace, @netscript/plugin-workers` (streams resolved healthy at `0.0.7-canary.8`). The prod
+suite grew again (71 → 90 gates). Owner lane: fixes (plugin doctor / workers); diagnosis in
+progress.
+#1952: Aspire took remedy 1 — `1a759ea34` = merge main `79adb103b` into the branch. Review at the
+new head fully green and `check:aspire-version-parity` **ok (0 fail)** on the branch itself; CI
+running. Merge-ref class closed at source.
