@@ -7966,3 +7966,8 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   hours stale). Per recovery order, resumed the slice's own prior threads instead of releasing:
   `/tmp/resume1906.sh`, `/tmp/resume1455.sh` (codex-resume with new-slice brief pointers), detached.
   Briefs: 9059e2042 (`test/aspire-event-observation-s2`), a64e4fcd0 (`feat/workers-payload-registry-map`).
+- #1959 @e9937231a CI: Postgres tier RED (aspire-start, AppHost TS2552 `createListenerReadinessCheck` not
+  found). Cause: `prepare-readiness-fixture.ts` injects a test-only postgres health check calling the
+  old helper name, but #1959's generator now imports only `createEndpointListenerReadinessCheck`. Fixed
+  in the fixture (+ its unit test) to use the endpoint-based API; merged main 262aa8fbe; head
+  **f5100c44a** pushed. Postgres "twice consecutively" count restarts at f5100c44a.
