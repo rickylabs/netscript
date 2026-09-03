@@ -268,3 +268,11 @@ heading and exclude the `|` form.
 - Attributed `impl-eval:skip` applied with a `[PHASE: IMPL-EVAL] [VERDICT: SKIP]` comment (same
   path as #1968). CI run 33704983331: check-test, quality, close-gate, core lane visibility all
   success. `mergeable=true state=clean`. Handed to coordinator for merge.
+
+## Reconcile at main 45e57377f — 2026-09-03
+
+- #1972 merged `4529ddba4`, #1973 (fold #1960, head `a2fa39271`, impl-eval:skip attributed) merged
+  `45e57377f`. Both bullets verified on `origin/main`. Scratch worktrees and fold branches removed.
+- #1974 `fix(scaffold): materialize Zod for Fresh production builds` (Fixes-owned p0, tracks
+  #1971) added to the fold set; draft bullet staged. Remaining fold set: #1664, #1956, #1945,
+  #1970, #1974. Open docs-owned milestone PRs: none.
