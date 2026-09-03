@@ -11055,3 +11055,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 02:05Z — #1664 target-delta native eval **PASS_IMPL** (predicate identical to #1885's); receipt parked. Packet awaits tiers at `3b4e2b92b`.
 - 02:17Z — **#1664 sqlite tier SUCCESS at `3b4e2b92b`** (refetch gate green on hosted runner; run 33706056406). Required green, close-gate green. Postgres tier in progress since 02:10Z; label untouched until it concludes → then ready-merge + packet.
 - 02:20Z — #1664 `3b4e2b92b` run 33706056406: sqlite GREEN; postgres 77/78 — refetch passes; `behavior.live-db-endpoint` fails because the refetch probe left the seed row renamed (`Seed User**`). Repair dispatched: restore original name after settled assertion.
+- 02:21Z — Refined: main runs live-db-endpoint before the island pair; branch reorder put #1885's unrestored rename ahead of it. Fix = move the island+refetch trio back after app-reference (order tests pinned). Worker steered mid-run.
