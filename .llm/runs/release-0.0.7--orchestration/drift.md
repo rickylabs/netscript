@@ -1,5 +1,17 @@
 # Drift — release 0.0.7
 
+## 2026-09-03 15:02Z — owner exception APPROVED; final CI executing
+
+Owner explicitly answered yes to retaining green canary.10 evidence for the single publish-excluded
+test correction, then reaffirmed continuing. No owner boundary remains. Receipt:
+receipts/owner-approved-stable-fixture-exception.md; PR comment5527706987. No general gate change.
+Release PR1984 was fast-forwarded and pushed to the exact independently reviewed6884b7548.
+Current full CI33770214410 is executing. No CI check is waived. After full CI passes, reconcile
+DoD/close/thread gates, merge, prove merged tree equals6884b7548, and attach the explicitly
+owner-approved inherited canary evidence to that actual merge SHA. Then native release:publish
+with handwritten intro, --prev-tag v0.0.6 and complete paginated release notes. Follow stable
+publish plus artifact-pinned production E2E through completion. No new canary or evaluator needed.
+
 ## 2026-09-03 14:48Z — stable-cut test fixture circularity proven
 
 Stable PR #1984 remains at b8fb15bc136feb98ef81c21d010f43b1ee282798 and is NOT merged.

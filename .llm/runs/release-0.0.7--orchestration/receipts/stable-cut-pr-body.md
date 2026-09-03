@@ -5,9 +5,11 @@ workspace versions and regenerates the release-owned assets; no new feature or r
 
 ## Scope
 
-- Release engineering: 64 version/generated-output paths, 320 additions and 320 removals.
+- Release engineering: 64 version/generated-output paths, plus one publish-excluded test correction.
 - Parent content: `a2d5b8b75083769b946c03ab772e08f2634e2b35`.
-- Release head: `b8fb15bc136feb98ef81c21d010f43b1ee282798`.
+- Release head: `6884b7548a0fdc53a17c52ef343c6025a7527d93`.
+- The test asserts the emitted public version pin, then resolves local checkout code before
+  invoking the real resource generator. No published file changes beyond the native version cut.
 - All milestone issue acceptance is closed, including #1881, #863 and #1712. No new closing keyword.
 - Coordinator tracking: #1641; primary coordinator is the sole authorized merger/release writer.
 
@@ -20,8 +22,9 @@ workspace versions and regenerates the release-owned assets; no new feature or r
   — README 13/0, scaffold runtime 104/0, quickstart plus integrity/cleanup 9/0; no retries.
 - [Supplementary same-version cleanup proof](https://github.com/rickylabs/netscript/actions/runs/33765493143)
   — README 13/0, post-run AppHosts/containers/volumes/custom networks all zero; caches retained.
-- Exact release-head CI and separate-session mechanical-delta review are running. No skipped check
-  is claimed as executed; production canary results are the named runtime evidence.
+- Independent mechanical-delta review and fixture-correction review both PASS in the named
+  separate session. Focused fixture file5/0; check/lint/fmt green. Full exact-head CI is running.
+  No skipped check is claimed as executed; production canary results are the named runtime evidence.
 
 ## Harness
 
@@ -35,6 +38,12 @@ Primary SOL/high; independent review GLM 5.3 Flash in existing evaluator session
 Stable release notes use the full `v0.0.6` range and a handwritten introduction. The native note
 collector's 100-issue page limit will be reconciled with the complete paginated list through its
 existing formatter before release handoff. No product change or new canary is needed for notes.
+
+Owner explicitly approved one-time reuse of canary.10 evidence for the publish-excluded test-only
+correction after CI revealed an attempt to import stable0.0.7 before it was published. The
+original canary workflows remain the provenance; this does not claim a new canary ran or waive CI.
+Receipt: `.llm/runs/release-0.0.7--orchestration/receipts/owner-approved-stable-fixture-exception.md`
+on coordinator PR #1641. No general inheritance-policy change.
 
 ## Definition of Done
 
