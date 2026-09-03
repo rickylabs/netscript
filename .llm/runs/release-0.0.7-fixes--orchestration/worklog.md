@@ -7978,3 +7978,6 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   verdict. Labels re-cycled impl→impl-eval at 00:50Z for a fresh generation.
 - #1906 resume live: 48c32cc6c RED guard (`check-aspire-resource-polling.ts` + test). #1455 resume live,
   no commit yet.
+- 00:52Z #1967: prior impl-eval label flip (00:35Z) predates final head 2fa5f60eb and its generation
+  was phase=impl; re-cycled impl→impl-eval to mint the IMPL-EVAL generation at 2fa5f60eb. Core CI
+  (check-test, both runtime tiers) pending; close-gate red is the expected pre-merge state.
