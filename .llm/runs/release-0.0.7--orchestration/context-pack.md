@@ -1,5 +1,14 @@
 # Context pack — release 0.0.7
 
+## Canary10 dispatched — keep following run33762898477
+
+Latest:1983MERGED ata2d5b8b75083769b946c03ab772e08f2634e2b35 (13:44:33Z). CI5270/0,
+independentreviewPASS, close/thread gatesPASS. Exactcleanmainreadiness9/9PASS. Dispatchednative
+release-canary.yml ONCE,target0.0.7,run33762898477. QuotaPASS, preparationrunning. Followits
+actualversion and pinnedprodE2E; no duplicatecanary. Close1881→863→1712 only onactualgreenpair,
+then native stablecut/publish andstablepinnedE2E. OnlytrackingPR1641stillopen. See
+receipts/canary10-dispatch.md. Olderpending1983/oldcanarydiagnosisbelowaresuperseded.
+
 ## Final cause proven; advance to merge/canary, no more old-version rehearsals
 
 Read receipts/readme-final-disposition.md first. Diagnostic33761336744 proves existingcanary9

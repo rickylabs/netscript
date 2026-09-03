@@ -34,7 +34,7 @@ owned cleanup so a failed readiness check explains its actual cause.
 - That scaffold correction already merged in #1974 (`953b0849c`), after canary.9; current main seeds
   the required CRUD Zod file before startup. Old canary failure remains recorded, not relabeled green.
   Final canary10 must exercise the newly published source and pass the complete production suite.
-- Current CI33761323539; primary review-thread gate PASS (0 unanswered).
+- CI33761323539 check-test and quality SUCCESS; primary review-thread gate PASS (0 unanswered).
 
 ## Harness
 
@@ -49,7 +49,7 @@ duplicate cloud evaluation, not the independent evaluation recorded above. Track
 - [x] Existing published runtime suites and owned-cleanup evidence remain intact.
 - [x] Existing-version rehearsal inspected; exact old-package failure and current-main correction identified.
 - [x] Final diagnostic delta independent review passes.
-- [ ] Required CI passes at the immutable current head before merge.
+- [x] Required check-test and quality CI pass at the immutable current head before merge.
 
 Remaining issue acceptance is intentionally outside this PR's closing keywords: final published
 README/canary pair, then #1881/#863/#1712 closure and stable publication with its own green pair.

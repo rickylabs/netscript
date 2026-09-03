@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
+  "currentMainSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "osUpdateRecoverySnapshot": "receipts/recovery-2026-09-03.json",
@@ -4621,7 +4621,7 @@
     {
       "id": "readme-cold-release-proof",
       "lane": "internals",
-      "phase": "gating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "2743cd0df771ec902799c5d281e6e1111600b331",
       "currentPrHeadSha": "2743cd0df771ec902799c5d281e6e1111600b331",
@@ -4631,8 +4631,12 @@
       "worktree": "/home/agent/projects/netscript/worktrees/007-readme-cold-release-proof",
       "implementationEvaluationVerdict": "PASS_IMPL",
       "implementationEvaluatedProductHeadSha": "2743cd0df771ec902799c5d281e6e1111600b331",
-      "nextGate": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS.",
-      "reconciledAt": "2026-09-03T13:31:35.605Z"
+      "nextGate": "Merged; canary33762898477 now proving exact published content.",
+      "reconciledAt": "2026-09-03T13:47:24.723Z",
+      "mergeCommitSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+      "mergedAt": "2026-09-03T13:44:33Z",
+      "ciState": "success",
+      "ciWorkflowRunId": 33761323539
     }
   ],
   "evaluatorLeases": [
@@ -5785,13 +5789,8 @@
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-03T12:45:23.633Z",
+    "capturedAt": "2026-09-03T13:47:24.723Z",
     "prs": [
-      {
-        "number": 1983,
-        "topic": "coordinator",
-        "role": "release-proof"
-      },
       {
         "number": 1641,
         "topic": "coordinator",
@@ -5933,7 +5932,13 @@
     {
       "id": "checkpoint-feature-complete",
       "rationale": "Publish the exact feature-complete main candidate before stable release qualification.",
-      "state": "planned"
+      "state": "publishing",
+      "contentSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+      "workflowRunId": 33762898477,
+      "receiptRefs": [
+        "receipts/canary10-dispatch.md",
+        "receipts/final-readiness-a2d5b8b75.ndjson"
+      ]
     }
   ],
   "exactMainEvidence": {
@@ -5954,7 +5959,7 @@
     ],
     "receipts": []
   },
-  "existingReleaseLease": false,
+  "existingReleaseLease": true,
   "releaseWriters": [],
   "releaseCaptain": {
     "state": "inactive"
@@ -5976,7 +5981,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T13:31:35.605Z",
+  "updatedAt": "2026-09-03T13:47:24.723Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6061,31 +6066,25 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T13:31:35.605Z",
-    "nextReportDueAt": "2026-09-03T14:26:35.605Z",
-    "lastReportRef": "receipts/active-release-resume.md",
-    "headline": "All product PRs merged.1983/2743cd0df independentPASS and15focusedPASS; final CI running. Rehearsal proves canary9 missingCRUDmodule, already fixed by merged1974. Proceed final canary after merge.",
-    "currentMainSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
+    "lastReportAt": "2026-09-03T13:47:24.723Z",
+    "nextReportDueAt": "2026-09-03T14:42:24.723Z",
+    "lastReportRef": "receipts/canary10-dispatch.md",
+    "headline": "1983 merged; all product PRs delivered. Exactmainreadiness9/9 PASS. Native finalcanary33762898477 dispatched once froma2d5b8b75; publishing then pinned productionE2E.",
+    "currentMainSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
-      "state": "qualifying",
+      "state": "publishing",
       "eta": {
-        "window": "After current CI/closegate, verified1983merge and finalmain readiness; then native publish plus production runtime duration.",
-        "confidence": "low",
-        "basis": "Missing initialCRUDmodule proven, alreadyfixed953b0849c; finalreviewPASS. Publishednewversion still requires its real fullgate."
+        "window": "Native publish followed by pinned production E2E, then stable cut if green.",
+        "confidence": "medium",
+        "basis": "JSR quota precheck passed; native canary preparation running. No owner decisions or source blockers."
       },
       "criticalPath": [
         {
-          "id": "cold-proof",
-          "state": "gating",
-          "impact": "1881/863/1712 need truly cold hosted README acceptance.",
-          "nextAction": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS."
-        },
-        {
           "id": "canary-pair",
-          "state": "queued",
-          "impact": "Stable requires same-content published canary and production E2E.",
-          "nextAction": "Verified cold-proof merge then final readiness, one native canary and stable."
+          "state": "publishing",
+          "impact": "Published acceptance closes1881/863/1712 and admitsstable.",
+          "nextAction": "Follow33762898477 and its pinned production run; no duplicate dispatch."
         }
       ],
       "finalCandidatePolicy": "Owner: one intended final canary from frozen verified source, then stable after exact publish/production/cold-start acceptance. No unrelated source drift or speculative canary."
@@ -6096,7 +6095,8 @@
         1958,
         1982,
         1970,
-        1945
+        1945,
+        1983
       ],
       "closedIssues": [
         1844,
@@ -6106,24 +6106,16 @@
         1971
       ],
       "newIssues": [],
-      "queueDeltaExplanation": "Only primary tracking1641 and cold-proof1983 open; all product PRs merged. Three published-acceptance issues remain owned."
+      "queueDeltaExplanation": "Only coordinator tracking1641 remains open; three final acceptance issues remain owned."
     },
     "scope": {
       "openIssueCount": 3,
       "ownedIssueCount": 3,
       "scheduledIssueCount": 3,
-      "openPullRequestCount": 2,
+      "openPullRequestCount": 1,
       "unscheduledIssueNumbers": []
     },
-    "mergeQueue": [
-      {
-        "prNumber": 1983,
-        "lane": "internals",
-        "state": "repairing",
-        "nextGate": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS.",
-        "nextAction": "Verify actual cause/currenthead, merge1983, native final canary then stable. No owner pause."
-      }
-    ],
+    "mergeQueue": [],
     "orchestratorMatrix": [
       {
         "lane": "features",
@@ -6143,13 +6135,11 @@
       },
       {
         "lane": "internals",
-        "state": "active",
-        "activeItems": [
-          1983
-        ],
-        "lastConcreteProgressAt": "2026-09-03T13:31:35.605Z",
-        "blocker": "Current CI/review and concrete service diagnostic; no owner decision.",
-        "nextAction": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS."
+        "state": "complete",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-09-03T13:47:24.723Z",
+        "blocker": "None;1983merged.",
+        "nextAction": "No newproduct work; primary owns release acceptance."
       },
       {
         "lane": "docs",
@@ -6237,14 +6227,14 @@
     "ownerDecisions": []
   },
   "releasePreflight": {
-    "gitHead": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
+    "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
     "worktree": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
     "command": "mise exec -- deno task publish:readiness",
     "rawExitCode": 0,
     "ok": true,
     "version": "0.0.6",
     "publishableMembers": 35,
-    "scope": "Read-only composed readiness,9 checks PASS; native NDJSON in receipts/final-product-readiness-075ea8ed7.ndjson. Repeat after release-proof merge. No canary minted.",
-    "observedAt": "2026-09-03T12:45:23.633Z"
+    "scope": "Exact merged main readiness:9PASS,35members; receipts/final-readiness-a2d5b8b75.ndjson; source clean.",
+    "observedAt": "2026-09-03T13:47:24.723Z"
   }
 }
