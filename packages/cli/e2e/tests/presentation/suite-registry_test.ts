@@ -186,6 +186,11 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
     true,
   );
   assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.DATABASE_CODEGEN) <
+      designProductionExclusionIndex,
+    true,
+  );
+  assertEquals(
     designProductionExclusionIndex <
       runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_START),
     true,
