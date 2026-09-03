@@ -8018,3 +8018,10 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   slice adds 4 Aspire-surface files. Merged main (ce8422e20), regenerated manifest (+4 rows) →
   **f9406dec6** pushed. Worker thread 01a0606e idle after PR open; will steer only if CI needs it.
 - #1455: worker at e18f2abe6 (receipts recorded), no PR yet.
+
+## 2026-09-03 — #1455 → PR #1970 opened by resumed worker (feat/workers-payload-registry-map)
+
+- Head `feb55c046` (impl `c194a4145`), non-draft, milestone 0.0.7, labels `type:fix status:impl ci:full priority:p1 area:workers area:contracts orchestrator:fixes`.
+- Worker reports S1–S4 landed; body carries `Refs #1455` — upgrade to `Closes #1455` only after exact-head green + IMPL-EVAL PASS confirms full scope.
+- `.llm/tmp/` scratch is untracked on the branch (verified `git ls-files`); deno.lock hygiene checked vs `79adb103b`.
+- Watcher `/tmp/waitpk1970.sh` armed on CI at `feb55c046`.
