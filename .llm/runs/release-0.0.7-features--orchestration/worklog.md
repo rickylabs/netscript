@@ -11043,3 +11043,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 01:18Z — #1664 CI-red delta native eval **PASS_IMPL_WITH_FINDINGS** (1 LOW); receipt parked at `/home/agent/observability/eval-1664-ci-red-delta.md`. Awaiting hosted tiers at `4ac77ac36`.
 - 01:22Z — Post-reset reconciliation: main `b6b9df966`; #1664 `4ac77ac36` check-test in progress, runtime pending (waits alive); #1959/#1960 are Fixes-lane (read-only watch armed); stack A/F/G MERGEABLE on #1664. Features-owned open issues: only #1355 (#1664) and #1354 (stack) — no unvehicled issue to dispatch.
 - 01:26Z — #1664 `4ac77ac36` required-green → ready-merge applied; full ci run 33702736445 rerun for the mirror. Runtime tiers pending.
+- 01:27Z — Mirror rerun re-dispatched e2e-cli (cancel-in-progress killed the live tiers at `4ac77ac36`); new e2e run 33703632552 in progress. Lesson recorded in memory: sequence mirror rerun before tiers start or after they conclude.
