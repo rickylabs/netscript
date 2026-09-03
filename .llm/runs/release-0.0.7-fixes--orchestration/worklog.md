@@ -8059,3 +8059,10 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 ## 2026-09-03 — #1959 IMPL-EVAL PASS (sanctioned local route), promoted
 
 - Hosted OpenHands run 33702340371 stalled (>30 min). Local GLM 5.3 Flash max-effort evaluator at immutable `f5100c44a`: 6/6 gates pass (15/15 + 40/40 tests, check 0, lock clean, assets-barrel in sync, D1–D5 honoured), no blocking findings → issuecomment-5519025742. DoD boxes ticked with evidence: Postgres twice = e2e-cli 33700447581 + 33702319275; IMPL-EVAL PASS. `status:impl-eval`→`status:ready-merge`; `gh run rerun 33700447539 --failed` (close-gate). Packet follows on close-gate green.
+
+## MERGE PACKET — PR #1959 (Refs #1844, partial; do not auto-close #1844) — 2026-09-03
+
+- **Exact head:** `f5100c44a` (`fix/listener-readiness-diagnostics`), milestone 0.0.7, `status:ready-merge`, MERGEABLE.
+- **Hosted CI at head:** `ci` 33700447539 success after close-gate rerun (quality, check-test, close-gate ✅); e2e-cli 33700447581 + 33702319275 ✅ (Postgres twice, sqlite, static, desktop-native).
+- **IMPL-EVAL:** PASS at `f5100c44a` via sanctioned local GLM 5.3 Flash max-effort evaluator (issuecomment-5519025742) after hosted stall.
+- **Lock hygiene:** `deno.lock` unchanged vs merge-base. Coordinator merges; Fixes flips `status:shipped` on the PR afterwards (#1844 stays open for remaining scope).
