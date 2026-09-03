@@ -1,6 +1,6 @@
 {
   "name": "@netscript/contracts",
-  "version": "0.0.6",
+  "version": "0.0.7-canary.10",
   "description": "NetScript contract primitives, common schemas, CRUD generators, query helpers, and transform helpers.",
   "license": "Apache-2.0",
   "exports": {

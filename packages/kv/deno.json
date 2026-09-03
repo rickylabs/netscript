@@ -1,6 +1,6 @@
 {
   "name": "@netscript/kv",
-  "version": "0.0.6",
+  "version": "0.0.7-canary.10",
   "description": "Reactive key-value abstraction for Redis, Deno KV, and in-memory backends.",
   "license": "Apache-2.0",
   "exports": {
