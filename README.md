@@ -35,11 +35,13 @@ You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/
 
 ```bash
 # 1. Install the NetScript CLI on your PATH
-deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>
 
 # 2. Scaffold a workspace: contracts + a typed example service + Postgres + Aspire orchestration
 netscript init my-app --db postgres --service --yes
 ```
+
+Deno 2.9 refuses packages published in the last 24 hours by default; `--minimum-dependency-age=0` lets a same-day release install.
 
 Replace `<version>` with the current release — the
 [latest tag](https://github.com/rickylabs/netscript/releases/latest), or the version shown on

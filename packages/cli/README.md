@@ -52,7 +52,7 @@ flowchart LR
 ## Install
 
 ```bash
-deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>
 ```
 
 Or as a library, for the embeddable command tree:
