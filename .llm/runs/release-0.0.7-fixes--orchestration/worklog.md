@@ -8072,3 +8072,10 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - PR #1959 → `status:shipped` (#1844 remains open, partial). Main is now `69b3ab5f4`.
 - #1481 worker filed **#1971** (`type:bug priority:p0 area:cli area:fresh gate:e2e status:triage orchestrator:fixes`, milestone 0.0.7): raw evidence shows `deno task build` exits 1 **immediately after `init`** (211 files) and again after `db:generate` — Vite cannot resolve the `"zod": "catalog:"` import-map entry. Consumer-facing P0 on main. Worker's docs head `1a777a0b3` (harness-only, product diff 0) is local; thread still mid-turn, will push.
 - Reconcile policy: #1969 runtime tiers in progress at `f9406dec6` (MERGEABLE); main merge deferred until the runtime receipts land to avoid discarding them. #1970 and #1481 leaves have live worker turns; reconciliation goes through their threads.
+
+## 2026-09-03 — #1960 merged at `574e9ce57` (#1249 closed); #1971 owner dispatched; #1945 reconcile queued
+
+- PR #1960 + issue #1249 → `status:shipped`. Main `574e9ce57`.
+- Conflict survey vs `574e9ce57`: #1969, #1970 clean; #1945 conflicts only in generated carrier `packages/cli/src/kernel/assets/embedded.generated.ts`. #1481 worker finished its evidence turn at pushed head `1a777a0b3` (harness-only; PR body/worklog now say FAIL_BLOCKED on #1971, gate order kept). Steer `/tmp/steer1481d.md` (merge main, regenerate carrier via assets-barrel, scoped gates) delivered by `/tmp/deliver1481d.sh` on turn exit.
+- **#1971 dispatched** under the parallel mandate (P0, no owner, blocks #1945): worktree `007-leaf-1971`, branch `fix/scaffold-build-catalog-zod` from `574e9ce57`, run dir `.llm/runs/fix-scaffold-build-catalog-zod--0.0.7/` (brief committed `12c566672`), route Codex GPT-5.6 Sol · high via `launch-codex-slice` (first attempt EXIT 4 push-safety: upstream set → `git branch --unset-upstream`, relaunched). Ceiling `packages/cli/**`; consumer proof = issue's shell block with `deno task build` exit 0 pre- and post-codegen.
+- #1969 runtime tiers still in progress at `f9406dec6`; main reconcile after receipts (clean merge expected).
