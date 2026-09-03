@@ -382,3 +382,45 @@ exit 0; filesSelected=103; failedBatches=0; totalOccurrences=0
 $ run-deno-fmt.ts --root plugins/workers --ext ts,tsx
 exit 0; filesSelected=103; failedBatches=0; findings=0
 ```
+
+GREEN implementation commit: `57be230494a679f4e638c489428432dcf0c2d030` (pushed by explicit
+refspec).
+
+### Generated carrier chain — exact order
+
+```text
+$ deno task gen:mcp-export-corpus
+exit 0; sha256=209fe9ff690a706286526833314ca1fac1d09436139c1a12ab94fd109abc7a1c;
+packageCount=35; subpathCount=273; symbolCount=7869
+$ deno task check:mcp-export-corpus
+exit 0; same corpus hash and census
+$ deno task check:agent-docs-prose
+exit 0; fresh=true; stalePaths=[]
+$ deno task check:assets-barrel
+exit 0
+$ deno task gen:publish-assets
+exit 0
+$ deno task check:publish-assets
+exit 0
+```
+
+The canonical generators produced no tracked delta, including no
+`packages/mcp/src/publish-assets.generated.ts` delta: the supervisor-provided carriers at the repair
+base were already current. No generated carrier was hand-edited.
+
+Additional installed-scaffold receipt:
+
+```text
+$ deno task e2e:cli run scaffold.plugins --format pretty --report \
+    .llm/tmp/e2e-report-scaffold-plugins-health-check-fmt.json
+exit 0; passed=17; failed=0; skipped=0
+```
+
+The focused resource test above is the direct formatter proof: it invokes repository-configured
+`deno fmt --check` on the emitted health-check file. The broader scaffold receipt proves the same
+workers install resource composes successfully with the official plugin set. The ignored report
+remains under `.llm/tmp/` and is not committed.
+
+`deno.lock` is unchanged. PR #1970 remains non-draft and its body retains `Refs #1455` for the
+supervisor's packet-time close disposition. The final pushed head is the receipt-only commit
+containing this section and is reported in the PR comment and implementation-lane handoff.
