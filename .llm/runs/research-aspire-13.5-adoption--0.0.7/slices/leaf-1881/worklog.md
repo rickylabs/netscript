@@ -83,6 +83,10 @@ There is no material architecture or scope decision left for adversarial plannin
 | 2026-09-03 | 2 | A1 review | Fresh Claude Fable 5.1 low session `d1b8dd03-8be6-477f-a80e-8a342077b81f` returned `CHANGES_REQUIRED`; accepted the smoke-root/AppHost, pure-rule coverage, explicit-port, receipt, stale-receipt, and tuple-alignment findings. Recheck pending. |
 | 2026-09-03 | 2 | A1 recheck | Same independent reviewer returned `PASS`; after two low evidence improvements, its narrow final recheck also returned `PASS` with no blocking findings. |
 | 2026-09-03 | 2 | pre-push gates | Check 229 files PASS; tests 314/314 PASS; fmt 229 files PASS; suites/gates, carrier freshness, and quality gate PASS. Exact lint wrapper repeats the documented baseline refusal with zero findings. |
+| 2026-09-03 | 3 | implement | Added the hosted `readme.quickstart` step immediately after `quickstart.walk`, its failure-summary report input, and report/log/state/child-receipt artifacts. |
+| 2026-09-03 | 3 | pre-push gates | YAML parse PASS; repeated check 229, tests 314/314, fmt 229, and suites/gates PASS; lint repeats only the documented baseline coverage refusal. |
+| 2026-09-03 | 3 | A1 review | Fresh Claude Fable 5.1 low session `33acaeee-4ed1-4cca-a6c6-8fb1dd382c4c` returned `PASS`; no blocking findings. Omitted optional `--format pretty` to preserve the coordinator's exact command. |
+| 2026-09-03 | 3 | IMPL-EVAL | Fresh native Claude Fable 5.1 medium session `a3e6affc-fea3-4f66-8754-976873d16775` wrote `evaluate.md` with formal `PASS`; recheck after prompt metadata repair preserved PASS. Hosted admission remains pending and the PR must stay draft/status:impl. |
 
 ## Decisions
 
@@ -90,6 +94,7 @@ There is no material architecture or scope decision left for adversarial plannin
 | --- | --- | --- |
 | Use executable `aspire wait postgres --status healthy --timeout 60`. | Exact CLI 13.5.3 help supports it. | Aspire help + coordinator item 4 |
 | Preserve cleanup unchanged. | Foreign/unknown ownership behavior is already centralized. | `createCleanupGates()` + #1855 doctrine |
+| Keep the workflow invocation without `--format pretty`. | The coordinator supplied the exact command; JSON report, NDJSON log, and child receipts remain durable. | Coordinator item 5 + S3 A1 review |
 
 ## Drift
 
@@ -116,6 +121,7 @@ There is no material architecture or scope decision left for adversarial plannin
 | `e2e:cli gates readme.quickstart` | PASS | Prints 11 exact README gates plus unchanged cleanup without starting runtime resources. |
 | `check:agent-docs-prose` | PASS | Root README edit does not move a generated carrier; no generated file changed. |
 | `quality:gate` | PASS | Repository quality and architecture gates report zero failures. |
+| Workflow YAML parse | PASS | Pinned `jsr:@std/yaml@1` under `--no-lock` returned `YAML_PARSE_OK`. |
 
 ### Runtime Gates
 
@@ -127,3 +133,5 @@ There is no material architecture or scope decision left for adversarial plannin
 
 - Review parser fail-closed behavior, one-command/one-attempt evidence, prior-evidence port
   extraction, process lifecycle, and unchanged cleanup first.
+- Hosted `readme.quickstart` transcript remains the explicit next-canary admission gate; do not mark
+  the draft PR ready or merge before that evidence is attached.

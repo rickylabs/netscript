@@ -20,3 +20,11 @@
 | `formal_impl_evaluation` | Claude · Anthropic · Fable 5 · medium | Separate-session final evaluation |
 
 No lane overrides are authorized or in force.
+
+## Observed independent sessions
+
+| Lane | Requested identity | Observed identity | Session | Verdict |
+| --- | --- | --- | --- | --- |
+| `review_codex` S1/S2 | Claude Fable 5 low | `claude-fable-5-1` | `d1b8dd03-8be6-477f-a80e-8a342077b81f` | `PASS` after fixes |
+| `review_codex` S3 | Claude Fable 5 low | `claude-fable-5-1` | `33acaeee-4ed1-4cca-a6c6-8fb1dd382c4c` | `PASS` |
+| `formal_impl_evaluation` | Claude Fable 5 medium | `claude-fable-5-1` | `a3e6affc-fea3-4f66-8754-976873d16775` | `PASS` |

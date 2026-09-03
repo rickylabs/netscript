@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `research-aspire-13.5-adoption--0.0.7/slices/leaf-1881` |
 | Branch | `test/aspire-1881-readme-quickstart` |
-| Current phase | `implement` |
+| Current phase | `evaluated — pending final commit/push` |
 | Archetype | `6 - CLI / Tooling` |
 | Scope overlays | docs |
 
@@ -29,13 +29,13 @@ one pre-existing lint-wrapper coverage refusal is recorded.
 
 ## In Progress
 
-- S1/S2 independent reviewer recheck.
+- Isolated S3 workflow commit and push.
 
 ## Next Steps
 
-1. Re-run the exact pre-push gates, obtain reviewer PASS, commit, push, and comment on S1/S2.
-2. Implement and review the isolated workflow slice.
-3. Obtain separate-session final IMPL-EVAL without running local runtime gates.
+1. Commit and push the isolated S3 workflow/evaluation slice.
+2. Update the PR slice/DoD evidence and post the evaluation summary.
+3. Leave the hosted transcript unticked and the PR draft/status:impl for next-canary admission.
 
 ## Key Decisions
 
@@ -59,6 +59,8 @@ one pre-existing lint-wrapper coverage refusal is recorded.
 | `packages/cli/e2e/src/domain/cli-surface.ts` | changed | Stable suite/gate identifiers. |
 | `packages/cli/e2e/src/presentation/cli/suites/registry.ts` | changed | Built-in suite registration. |
 | `packages/cli/e2e/README.md` | changed | Suite table. |
+| `.github/workflows/e2e-cli-prod.yml` | changed | Hosted suite, summary, and artifact wiring. |
+| `evaluate.md` | new | Separate-session formal IMPL-EVAL PASS, not merge authorization. |
 
 ## Gates
 
@@ -68,10 +70,11 @@ one pre-existing lint-wrapper coverage refusal is recorded.
 | Fitness | PASS | `quality:gate` reports zero failures. |
 | Runtime | NOT_RUN | Hosted next canary; no local lease. |
 | Consumer | PASS | Suite listing includes `readme.quickstart`; gate listing prints 11 commands plus cleanup without starting resources. |
+| Workflow | PASS | YAML parses; independent S3 review PASS; exact hosted command/report/artifact wiring present. |
 
 ## Open Questions
 
-- None.
+- Hosted canary transcript is intentionally pending outside this implementation slice's local lease.
 
 ## Drift and Debt
 

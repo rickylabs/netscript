@@ -1,3 +1,10 @@
+use harness
+
+## SKILL
+
+- netscript-harness — continuation of the same independent A1 review; inspect fixes without editing.
+- netscript-doctrine — recheck pure-domain and runtime-edge boundaries.
+
 Recheck the S1/S2 work after your `CHANGES_REQUIRED` verdict. Do not edit, commit, push, comment on
 GitHub, or run a runtime suite.
 
