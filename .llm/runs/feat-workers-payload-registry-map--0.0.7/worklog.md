@@ -530,3 +530,28 @@ exit 0; same corpus hash and census
 The final integrated head and exact Tier-A/hosted receipts follow in the receipt slice. PR #1970
 must remain unmerged and its body must retain `Refs #1455` for the supervisor's packet-time close
 disposition.
+
+Integration commit: `6e654b1bd` (main parent
+`632528888ad033f0e23dfd4f6718d089bfe3eeab`; pushed by explicit refspec).
+
+### Integrated Tier-A receipts
+
+```text
+$ deno task check
+exit 0; filesSelected=3135; batches=27; failedBatches=0; totalOccurrences=0
+$ deno task check:emitted-samples
+exit 0; checked 48 TypeScript samples from 38 artifact paths
+$ deno task quality:gate
+exit 0; doctrine output contains existing WARN/INFO census only, FAIL=0
+$ deno task arch:check
+exit 0; doctrine output contains existing WARN/INFO census only, FAIL=0
+$ deno task docs:jsdoc-examples
+exit 0; PASS; members=35; files=2062; checked=362; failures=0
+$ deno test --allow-all --unstable-kv plugins/workers/src/adapter/resources/resources.test.ts
+exit 0; 7 passed / 0 failed
+```
+
+These gates ran on the integrated tree after the canonical carrier checks. The receipt commit that
+contains this section is the intended immutable PR head; GitHub's current `check-test`, `quality`,
+`scaffold-static`, PostgreSQL runtime, and SQLite runtime jobs are the authoritative synthetic-merge
+receipts for that exact pushed commit.

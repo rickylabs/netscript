@@ -12,10 +12,10 @@
 
 ## Current State
 
-PR #1970 has the bounded schema-first Flow-B fixture repair committed at `c182fead3`. The branch is
-integrating current `origin/main` once so GitHub can schedule a fresh synthetic-merge run; only
-generated documentation carriers conflicted, and they were resolved through their canonical
-generators.
+PR #1970 has the bounded schema-first Flow-B fixture repair at `c182fead3` and current-main
+integration at `6e654b1bd`. Integrated workspace check, emitted-sample check, quality, architecture,
+JSDoc-example, workers resource, and generated-carrier gates all pass. A final receipt commit will
+be pushed and left immutable for the hosted dual-provider runtime verdict.
 
 ## Completed
 
@@ -25,14 +25,13 @@ generators.
 
 ## In Progress
 
-- Finish the integration receipt slice, push the immutable head, and collect current hosted runtime
-  receipts.
+- Push the receipt-only immutable head and collect current hosted runtime receipts.
 
 ## Next Steps
 
-1. Run final static, quality, architecture, and carrier gates on the integrated tree.
-2. Push the receipt head and collect exact PostgreSQL and SQLite hosted runtime verdicts.
-3. Update PR #1970 with the immutable merge packet without merging it.
+1. Push the receipt head and collect exact PostgreSQL and SQLite hosted runtime verdicts.
+2. Run the review-thread gate and update PR #1970 with the immutable merge packet.
+3. Hand off without merging the PR.
 
 ## Key Decisions
 
@@ -46,8 +45,8 @@ generators.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | final integrated rerun pending | focused repair checks pass; carrier checks pass |
-| Fitness | final integrated rerun pending | prior hosted code-quality green |
+| Static | passed locally | root check and emitted samples pass on integrated tree |
+| Fitness | passed locally | quality, architecture, docs examples, carriers pass |
 | Runtime | hosted rerun pending | local host proxy failure is separated in worklog |
 | Consumer | passed | prior compile-time and generated-registry receipts in worklog |
 
