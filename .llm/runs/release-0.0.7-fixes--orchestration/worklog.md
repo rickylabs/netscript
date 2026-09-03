@@ -8083,3 +8083,7 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 ## 2026-09-03 — #1969 exact-green at `f9406dec6`; IMPL-EVAL minted
 
 - All tiers success (check-test, quality, close-gate, scaffold-runtime pg + sqlite, static, desktop). GitHub reports MERGEABLE/CLEAN vs main `574e9ce57` and `git merge-tree` is conflict-free, so main is reconciled at merge time rather than by a branch merge that would discard the runtime receipts. `status:impl`→`status:impl-eval` (hosted evaluator); watcher `/tmp/wait1969ev.sh`. Stall threshold 20 min → sanctioned local route.
+
+## 2026-09-03 — #1970 repaired by worker at `8ef044d10`; supervisor regenerated MCP corpus → `6fe200630`
+
+- Worker commits `4cf0795b8` (consumer/doctor repair, RED→GREEN receipts) + `8ef044d10` (worklog). Worker reported `check:mcp-export-corpus` FAIL as out-of-ceiling (`packages/mcp/**`). Supervisor ran `deno task gen:mcp-export-corpus` on the leaf (generated asset only, 1 file) and pushed `6fe200630`; `check:mcp-export-corpus` exit 0 locally. deno.lock unchanged vs `79adb103b`. Watcher `/tmp/waitpk1970b.sh` on CI at `6fe200630`.
