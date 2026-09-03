@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "version": "0.0.6",
-  "sourceCommit": "6f9620c0c",
-  "extractionTimestamp": "2026-08-13T03:10:55.562Z",
+  "version": "0.0.7",
+  "sourceCommit": "a2d5b8b75",
+  "extractionTimestamp": "2026-09-03T14:21:55.717Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -25,6 +25,9 @@
     "pages/background-processing/polyglot-tasks/index.md",
     "pages/background-processing/workers/index.md",
     "pages/cli-reference/index.md",
+    "pages/comparisons/backend/index.md",
+    "pages/comparisons/frontend/index.md",
+    "pages/comparisons/index.md",
     "pages/concepts/index.md",
     "pages/data-persistence/database/index.md",
     "pages/data-persistence/how-to/choose-a-queue-provider/index.md",
@@ -70,6 +73,7 @@
     "pages/orchestration-runtime/how-to/deploy-deno-deploy/index.md",
     "pages/orchestration-runtime/how-to/deploy-local-aspire/index.md",
     "pages/orchestration-runtime/how-to/deploy/index.md",
+    "pages/orchestration-runtime/how-to/detached-start-agents-ci/index.md",
     "pages/orchestration-runtime/how-to/graceful-shutdown/index.md",
     "pages/orchestration-runtime/how-to/index.md",
     "pages/orchestration-runtime/how-to/roll-out-runtime-overrides/index.md",
@@ -183,7 +187,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 4720171,
-  "compressedBytes": 1352808,
-  "sha256": "c13c8e8365146c141e516e5a6cf0d39c781a2e03ad2f8e1e01299d3d9a184362"
+  "uncompressedBytes": 4915623,
+  "compressedBytes": 1413097,
+  "sha256": "b0b8a897c801c992ff1e60d0b67b675a1a6687858093312892605f4856bfba71"
 }

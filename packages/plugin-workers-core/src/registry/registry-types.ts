@@ -1,3 +1,5 @@
+import type { JobPayloadSchema, TaskPermissionsInput } from '../domain/mod.ts';
+
 /** Job source value accepted by registry filters. */
 export type JobSource = 'database' | 'local' | 'plugin' | 'remote';
 
@@ -58,6 +60,7 @@ export type JobDefinition = Readonly<
     readonly executionType: string;
     readonly pluginId?: string;
     readonly permissions?: TaskPermissionsInput;
+    readonly payloadSchema?: JobPayloadSchema<unknown>;
   }
 >;
 
@@ -110,7 +113,13 @@ export type RuntimePermissionValue = boolean | string[];
 export type RuntimePermissions = TaskPermissionsInput;
 
 /** Input accepted when registering a job. */
-export type RegisterJobInput = Readonly<Omit<JobDefinition, 'id'> & { readonly id?: string }>;
+export type RegisterJobInput = Readonly<
+  & Omit<JobDefinition, 'id' | 'payloadSchema'>
+  & {
+    readonly id?: string;
+    readonly payloadSchema?: JobPayloadSchema<unknown>;
+  }
+>;
 
 /** Input accepted when registering a task. */
 export type RegisterTaskInput = Readonly<Omit<TaskDefinition, 'id'> & { readonly id?: string }>;
@@ -132,6 +141,10 @@ export type ExecutionRecord = Readonly<
     readonly error: string | null;
     readonly result: Record<string, unknown> | null;
     readonly workerId: string | null;
+    /** Latest execution progress percentage. */
+    readonly progressPercent: number | null;
+    /** Latest execution progress message. */
+    readonly progressMessage: string | null;
     readonly attempt: number;
     readonly maxAttempts: number;
     readonly payload?: Record<string, unknown>;
@@ -148,4 +161,3 @@ export type RegistryJobStoragePort = Readonly<{
   saveExecution(record: ExecutionRecord): Promise<void>;
   findExecution(executionId: string): Promise<ExecutionRecord | undefined>;
 }>;
-import type { TaskPermissionsInput } from '../domain/mod.ts';

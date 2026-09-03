@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-source-format-test",
+  "invocationId": "quality-root-coverage-s3-docs-source-format-test",
+  "argv": [
+    "deno",
+    "task",
+    "test:source-format"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage/docs/site",
+  "gitHead": "4ae309d5774676d710ba24f56119b028bc2c095c",
+  "actualGitHead": "4ae309d5774676d710ba24f56119b028bc2c095c",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "d2ed1987aaa297e1baa71892e72384842f28ffa9538b8a547fe53cf324a4a64c",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s3-docs-source-format-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T06:33:59.791Z",
+  "startedAt": "2026-08-15T06:33:59.794Z",
+  "finishedAt": "2026-08-15T06:34:01.194Z",
+  "durationMs": 1400,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 806,
+    "sha256": "e51eb12edc1837c366ba2eef1be22a43905681f9c6b7ea856e64b7112daf3ed9",
+    "tail": "\u001b[0m\u001b[38;5;245mrunning 6 tests from ./_plugins/check-source-format_test.ts\u001b[0m\nrejects raw newlines inside quoted Vento component arguments ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(4ms)\u001b[0m\nrejects Markdown headings in Vento pages without Markdown rendering ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(10ms)\u001b[0m\naccepts multiline component objects whose individual strings stay valid ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(1ms)\u001b[0m\nrejects literal Vento placeholders in any rendered page ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(1ms)\u001b[0m\nallows only the bounded CLI string-template documentation tokens ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(933µs)\u001b[0m\nrejects CLI documentation tokens beyond the bounded allowance ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(914µs)\u001b[0m\n\n\u001b[0m\u001b[32mok\u001b[0m | 6 passed | 0 failed \u001b[0m\u001b[38;5;245m(26ms)\u001b[0m\n\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 668,
+    "sha256": "6aeb42f8cd9aab849bb3d10f7beab0405e80060cb410b6f1603284fd375b9785",
+    "tail": "Warning: config file file:///home/codex/repos/netscript-007-quality-root-coverage/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-quality-root-coverage/. Ignoring the parent workspace config.\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest:source-format\u001b[0m deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts\nWarning: config file file:///home/codex/repos/netscript-007-quality-root-coverage/docs/site/deno.json is not a member of the workspace at file:///home/codex/repos/netscript-007-quality-root-coverage/. Ignoring the parent workspace config.\n\u001b[0m\u001b[32mCheck\u001b[0m _plugins/check-source-format_test.ts\n",
+    "truncated": false
+  }
+}

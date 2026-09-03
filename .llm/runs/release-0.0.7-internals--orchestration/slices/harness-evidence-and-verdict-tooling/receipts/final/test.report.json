@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all"],"cwd":"/home/codex/repos/netscript-007-harness-evidence","exitCode":0,"durationMs":223778,"summary":{"passed":4109,"failed":0,"ignored":19,"totalResults":4128,"uniqueFailures":0},"failures":[]}

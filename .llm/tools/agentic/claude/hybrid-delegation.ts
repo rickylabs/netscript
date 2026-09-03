@@ -117,7 +117,7 @@ export function validateHybridDelegationRequest(
       'model is not approved for hybrid delegation',
     );
   }
-  const effort = request.effort ?? 'high';
+  const effort = request.effort ?? 'max';
   if (!EFFORTS.includes(effort as Effort)) {
     throw new HybridDelegationError('invalid_request', 'effort is not supported');
   }

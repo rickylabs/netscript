@@ -1,10 +1,27 @@
-import { Command } from "@cliffy/command";
+import { Command } from '@cliffy/command';
 
-import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
-import { installUiRegistryItems, type UiInstallDependencies } from "../registry.ts";
-import { type UiAppRootResolver, requireUiAppRoot } from "../../../presentation/support.ts";
-import type { UiAddCommandInput } from "./add-ui-input.ts";
-import { scaffoldUiIsland, scaffoldUiPage } from '../../../../kernel/application/ui/web-scaffold.ts';
+import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
+import { installUiRegistryItems, type UiInstallDependencies } from '../registry.ts';
+import { requireUiAppRoot, type UiAppRootResolver } from '../../../presentation/support.ts';
+import type { UiAddCommandInput } from './add-ui-input.ts';
+import {
+  scaffoldUiIsland,
+  scaffoldUiPage,
+  type UiGeneratedFileRole,
+  type UiScaffoldResult,
+} from '../../../../kernel/application/ui/web-scaffold.ts';
+
+/** Semantic roles emitted by the public data-screen scaffold. */
+export const UI_DATA_SCREEN_FILE_ROLES = [
+  'page',
+  'query-loader',
+  'island',
+  'route-registration',
+] as const satisfies readonly UiGeneratedFileRole[];
+
+const DATA_SCREEN_HELP = `Data-screen roles: ${
+  UI_DATA_SCREEN_FILE_ROLES.join(', ')
+}. New island output uses routes/**/(_islands)/; existing top-level islands remain compatible.`;
 
 /** Dependencies for the public `ui:add` command handler. */
 export interface UiAddCommandDependencies {
@@ -22,34 +39,43 @@ export function createUiAddCommand(
 ) {
   const print = dependencies.print ?? outputText;
   return new Command()
-    .name("ui:add")
+    .name('ui:add')
     .description(
-      "Scaffold the Fresh page + island + query-loader triad for a data screen, or copy an app-owned UI registry item",
+      `Scaffold a Fresh data screen or copy an app-owned UI registry item. ${DATA_SCREEN_HELP}`,
     )
     .example(
-      "Data-screen triad",
-      "netscript ui:add page incidents --island\nCreates one data-screen unit: typed page route + colocated hydrating island + query loader. Use it when a route will load data and hydrate an interactive region.",
+      'Data-screen triad',
+      'netscript ui:add page incidents --island\nCreates one data-screen unit: typed page route + colocated hydrating island + query loader. Use it when a route will load data and hydrate an interactive region.',
     )
     .example(
-      "Registry item",
-      "netscript ui:add data-table\nUse a registry item when the route already exists and you only need an app-owned component and its styles.",
+      'Registry item',
+      'netscript ui:add data-table\nUse a registry item when the route already exists and you only need an app-owned component and its styles.',
     )
-    .arguments("<kind:string> [name:string]")
-    .option("--project-root <path:string>", "Project root directory")
-    .option("--app <name:string>", "Fresh app workspace name")
-    .option("--registry-root <path:string>", "Fresh UI package root override")
-    .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
-    .option("--force", "Overwrite existing copied UI files", { default: false })
-    .option("--route <id:string>", "Override the generated page's typed route id")
+    .arguments('<kind:string> [name:string]')
+    .option('--project-root <path:string>', 'Project root directory')
+    .option('--app <name:string>', 'Fresh app workspace name')
+    .option('--registry-root <path:string>', 'Fresh UI package root override')
+    .option('--theme <name:string>', 'Theme registry item (defaults to the official theme)')
+    .option('--force', 'Overwrite existing copied UI or scaffold files', { default: false })
     .option(
-      "--island",
-      "For page scaffolds, add the colocated hydrating island and query-loader parts of the triad",
+      '--dry-run',
+      'For page and island scaffolds, report the complete file plan without writing it',
+      { default: false },
+    )
+    .option('--route <id:string>', "Override the generated page's typed route id")
+    .option(
+      '--island',
+      'For page scaffolds, add the colocated hydrating island and query-loader parts of the triad',
       { default: false },
     )
     .option(
-      "--query",
-      "For island scaffolds, generate a QueryIsland-based surface for contract-derived queries",
+      '--query',
+      'For island scaffolds, generate a QueryIsland-based surface for contract-derived queries',
       { default: false },
+    )
+    .option(
+      '--client <service:string>',
+      'Select the generated service query client for a data-bound page or island',
     )
     .action(async (options: UiAddCommandInput, kind: string, name?: string): Promise<void> => {
       const projectRoot = await requireUiAppRoot(
@@ -58,15 +84,33 @@ export function createUiAddCommand(
       );
       if (kind === 'page') {
         if (!name) throw new Error('ui:add page requires <path>.');
-        const result = await scaffoldUiPage({ projectRoot, path: name, route: options.route, island: options.island }, dependencies.installDependencies.fs);
-        print(`Generated ${result.files.length} Fresh page files.`);
+        const result = await scaffoldUiPage({
+          projectRoot,
+          path: name,
+          route: options.route,
+          island: options.island,
+          client: options.client,
+          force: options.force,
+          dryRun: options.dryRun,
+        }, dependencies.installDependencies.fs);
+        reportScaffold(result, options.dryRun ?? false, print);
         return;
       }
       if (kind === 'island') {
         if (!name) throw new Error('ui:add island requires <Name>.');
-        const result = await scaffoldUiIsland({ projectRoot, name, query: options.query }, dependencies.installDependencies.fs);
-        print(`Generated ${result.files.length} Fresh island file.`);
+        const result = await scaffoldUiIsland({
+          projectRoot,
+          name,
+          query: options.query,
+          client: options.client,
+          force: options.force,
+          dryRun: options.dryRun,
+        }, dependencies.installDependencies.fs);
+        reportScaffold(result, options.dryRun ?? false, print);
         return;
+      }
+      if (options.dryRun) {
+        throw new Error('--dry-run is supported only for page and island scaffolds.');
       }
       const result = await installUiRegistryItems({
         projectRoot,
@@ -81,4 +125,13 @@ export function createUiAddCommand(
       print(`Wrote ${result.stylesPath}.`);
       print(`Merged ${result.dependenciesMerged.length} deno.json imports.`);
     });
+}
+
+function reportScaffold(
+  result: UiScaffoldResult,
+  dryRun: boolean,
+  print: (message: string) => void,
+): void {
+  const verb = dryRun ? 'Planned' : 'Generated';
+  for (const file of result.files) print(`${verb} ${file.role}: ${file.path}`);
 }

@@ -39,10 +39,10 @@ export interface Options {
   progressIntervalMs: number;
   commandTimeoutMs: number;
   httpTimeoutMs: number;
-  workersUrl: string;
-  sagasUrl: string;
-  triggersUrl: string;
-  authUrl: string;
+  workersUrl?: string;
+  sagasUrl?: string;
+  triggersUrl?: string;
+  authUrl?: string;
   aspireCommand: string;
 }
 
@@ -227,10 +227,6 @@ export function defaultOptions(): Options {
     progressIntervalMs: 15_000,
     commandTimeoutMs: 900_000,
     httpTimeoutMs: 30_000,
-    workersUrl: 'http://localhost:8091',
-    sagasUrl: 'http://localhost:8092',
-    triggersUrl: 'http://localhost:8093',
-    authUrl: 'http://localhost:8094',
     aspireCommand: Deno.env.get('NETSCRIPT_ASPIRE_COMMAND') ?? 'aspire',
   };
 }
@@ -242,7 +238,7 @@ function authSmokeEnv(): Record<string, string> {
     NETSCRIPT_AUTH_CLIENT_SECRET: 'scaffold_runtime_smoke_secret',
     NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/oauth/authorize',
     NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
-    NETSCRIPT_AUTH_REDIRECT_URI: 'http://localhost:8094/api/v1/auth/callback',
+    NETSCRIPT_AUTH_REDIRECT_URI: 'http://localhost/api/v1/auth/callback',
     NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
     NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
   };
@@ -297,10 +293,10 @@ export function normalizeCommandOptions(raw: CommandOptionValues): Options {
       raw.httpTimeoutMs ?? defaults.httpTimeoutMs,
       '--http-timeout-ms',
     ),
-    workersUrl: (raw.workersUrl ?? defaults.workersUrl).replace(/\/+$/, ''),
-    sagasUrl: (raw.sagasUrl ?? defaults.sagasUrl).replace(/\/+$/, ''),
-    triggersUrl: (raw.triggersUrl ?? defaults.triggersUrl).replace(/\/+$/, ''),
-    authUrl: (raw.authUrl ?? defaults.authUrl).replace(/\/+$/, ''),
+    workersUrl: raw.workersUrl?.replace(/\/+$/, ''),
+    sagasUrl: raw.sagasUrl?.replace(/\/+$/, ''),
+    triggersUrl: raw.triggersUrl?.replace(/\/+$/, ''),
+    authUrl: raw.authUrl?.replace(/\/+$/, ''),
     aspireCommand: raw.aspireCommand ?? defaults.aspireCommand,
   };
 }
@@ -369,18 +365,10 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
       default: 30_000,
     })
     .option('--aspire-command <path:string>', 'Aspire executable. Defaults to aspire.')
-    .option('--workers-url <url:string>', 'Workers API base URL.', {
-      default: 'http://localhost:8091',
-    })
-    .option('--sagas-url <url:string>', 'Sagas API base URL.', {
-      default: 'http://localhost:8092',
-    })
-    .option('--triggers-url <url:string>', 'Triggers API base URL.', {
-      default: 'http://localhost:8093',
-    })
-    .option('--auth-url <url:string>', 'Auth API base URL.', {
-      default: 'http://localhost:8094',
-    })
+    .option('--workers-url <url:string>', 'Optional Workers API base URL override.')
+    .option('--sagas-url <url:string>', 'Optional Sagas API base URL override.')
+    .option('--triggers-url <url:string>', 'Optional Triggers API base URL override.')
+    .option('--auth-url <url:string>', 'Optional Auth API base URL override.')
     .example(
       'Default NDJSON run',
       'deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts',
@@ -406,6 +394,37 @@ function tail(text: string, maxLength = 8_000): string {
 
 function unknownToMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Resolves the first declared HTTP URL for a top-level Aspire resource. */
+export function resourceUrlFromDescribeOutput(output: string, resourceName: string): string {
+  const trimmed = output.trim();
+  const indexes = [trimmed.indexOf('{'), trimmed.indexOf('[')].filter((index) => index >= 0);
+  if (indexes.length === 0) throw new Error('aspire describe did not emit JSON');
+  const parsed: unknown = JSON.parse(trimmed.slice(Math.min(...indexes)));
+  if (!isRecord(parsed) || !Array.isArray(parsed['resources'])) {
+    throw new Error('aspire describe output did not contain resources[]');
+  }
+  const expected = resourceName.toLowerCase();
+  const resource = parsed['resources'].filter(isRecord).find((candidate) => {
+    const name = candidate['name'];
+    const displayName = candidate['displayName'];
+    return typeof displayName === 'string' && displayName.toLowerCase() === expected ||
+      typeof name === 'string' &&
+        (name.toLowerCase() === expected || name.toLowerCase().startsWith(`${expected}-`));
+  });
+  if (!resource || !Array.isArray(resource['urls'])) {
+    throw new Error(`resource ${resourceName} did not declare urls[]`);
+  }
+  for (const entry of resource['urls']) {
+    const url = isRecord(entry) ? entry['url'] : entry;
+    if (typeof url === 'string' && /^https?:\/\//i.test(url)) return url.replace(/\/+$/, '');
+  }
+  throw new Error(`resource ${resourceName} did not declare an HTTP URL`);
 }
 
 function summarizeJson(value: unknown): unknown {
@@ -878,6 +897,7 @@ class SmokeRunner {
         '--allow-read',
         join(this.#options.repo, '.llm', 'tools', 'validation', 'check-aspire-host-ports.ts'),
         this.projectRoot,
+        '--generated-project',
         '--pretty',
       ],
     });
@@ -1235,89 +1255,120 @@ class SmokeRunner {
     });
   }
 
+  async #resolveApiUrl(resourceName: string, override?: string): Promise<string> {
+    if (override) return override;
+    if (this.#options.dryRun) return `http://${resourceName}`;
+    const output = await new Deno.Command(this.#options.aspireCommand, {
+      args: [
+        'describe',
+        '--apphost',
+        this.appHost,
+        '--format',
+        'Json',
+        '--non-interactive',
+        '--nologo',
+      ],
+      cwd: this.projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const stdout = decoder.decode(output.stdout);
+    const stderr = decoder.decode(output.stderr);
+    if (!output.success) {
+      throw new Error(`aspire describe failed with code ${output.code}: ${stderr || stdout}`);
+    }
+    return resourceUrlFromDescribeOutput(stdout, resourceName);
+  }
+
   async #exerciseApis(): Promise<void> {
+    const [workersUrl, sagasUrl, triggersUrl, authUrl] = await Promise.all([
+      this.#resolveApiUrl('workers-api', this.#options.workersUrl),
+      this.#resolveApiUrl('sagas-api', this.#options.sagasUrl),
+      this.#resolveApiUrl('triggers-api', this.#options.triggersUrl),
+      this.#resolveApiUrl('auth', this.#options.authUrl),
+    ]);
     await this.#httpGet(
       'http-workers-health',
       'Workers API health',
-      `${this.#options.workersUrl}/health`,
+      `${workersUrl}/health`,
     );
     await this.#httpGet(
       'http-sagas-live',
       'Sagas API liveness',
-      `${this.#options.sagasUrl}/health/live`,
+      `${sagasUrl}/health/live`,
     );
     await this.#httpGet(
       'http-sagas-ready',
       'Sagas API readiness',
-      `${this.#options.sagasUrl}/health/ready`,
+      `${sagasUrl}/health/ready`,
     );
     await this.#httpGet(
       'http-triggers-health',
       'Triggers API health',
-      `${this.#options.triggersUrl}/health`,
+      `${triggersUrl}/health`,
     );
     await this.#httpGet(
       'http-auth-live',
       'Auth API liveness',
-      `${this.#options.authUrl}/health/live`,
+      `${authUrl}/health/live`,
     );
     await this.#httpGet(
       'http-auth-ready',
       'Auth API readiness',
-      `${this.#options.authUrl}/health/ready`,
+      `${authUrl}/health/ready`,
     );
     await this.#httpGet(
       'http-auth-session',
       'Resolve unauthenticated auth session',
-      `${this.#options.authUrl}/api/v1/auth/session`,
+      `${authUrl}/api/v1/auth/session`,
     );
 
     await this.#httpGet(
       'http-workers-jobs',
       'List worker jobs',
-      `${this.#options.workersUrl}/api/v1/workers/jobs`,
+      `${workersUrl}/api/v1/workers/jobs`,
     );
     await this.#httpGet(
       'http-workers-tasks',
       'List worker tasks',
-      `${this.#options.workersUrl}/api/v1/workers/tasks`,
+      `${workersUrl}/api/v1/workers/tasks`,
     );
     await this.#httpPost(
       'http-workers-seed',
       'Seed worker demo data through API',
-      `${this.#options.workersUrl}/api/v1/workers/seed`,
+      `${workersUrl}/api/v1/workers/seed`,
     );
     await this.#httpPost(
       'http-workers-trigger-health-job',
       'Trigger workers-plugin-health-check job',
-      `${this.#options.workersUrl}/api/v1/workers/jobs/workers-plugin-health-check/trigger`,
+      `${workersUrl}/api/v1/workers/jobs/workers-plugin-health-check/trigger`,
     );
     await this.#sleep('wait-worker-execution', 'Wait for worker execution to complete', 8_000);
     await this.#httpGet(
       'http-workers-executions',
       'List recent worker executions',
-      `${this.#options.workersUrl}/api/v1/workers/executions?limit=10`,
+      `${workersUrl}/api/v1/workers/executions?limit=10`,
     );
 
     await this.#httpGet(
       'http-sagas-list',
       'List saga definitions',
-      `${this.#options.sagasUrl}/api/v1/sagas/sagas`,
+      `${sagasUrl}/api/v1/sagas/sagas`,
     );
     await this.#httpGet(
       'http-sagas-instances',
       'List saga instances',
-      `${this.#options.sagasUrl}/api/v1/sagas/instances`,
+      `${sagasUrl}/api/v1/sagas/instances`,
     );
     await this.#httpGet(
       'http-triggers-list',
       'List trigger definitions',
-      `${this.#options.triggersUrl}/api/v1/triggers/triggers`,
+      `${triggersUrl}/api/v1/triggers/triggers`,
     );
     await this.#httpGet(
       'http-triggers-events',
       'List trigger events',
-      `${this.#options.triggersUrl}/api/v1/triggers/events`,
+      `${triggersUrl}/api/v1/triggers/events`,
     );
   }
 

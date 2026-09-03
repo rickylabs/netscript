@@ -1,0 +1,40 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "quality-root-coverage-s1-final-fmt-fired",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--root",
+    ".llm/tools/quality/check-root-coverage_test.ts",
+    "--root",
+    ".llm/tools/quality/check-root-coverage.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-root-coverage",
+  "gitHead": "a2f33ca4f0d437b765cc21ab2a9c92688cf40cd4",
+  "actualGitHead": "a2f33ca4f0d437b765cc21ab2a9c92688cf40cd4",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "263012c012ed7505e00ba0a6c20c6c55ded3dee2edb98ec9a35c7fe2b05b61b1",
+  "lifecycleId": "codex:01a003d2-61ee-7ec0-8c74-075b3d631168:quality-root-coverage-s1-final-fmt-fired:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T06:02:57.590Z",
+  "startedAt": "2026-08-15T06:02:57.598Z",
+  "finishedAt": "2026-08-15T06:02:59.270Z",
+  "durationMs": 1672,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 219,
+    "sha256": "186834220a0475e4cc26d0b8f36b0a10ca1713745854c5cc7bb21683efaa7184",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/codex/repos/netscript-007-quality-root-coverage\",\"mode\":\"check\",\"summary\":{\"filesSelected\":2036,\"batches\":11,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"findings\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 404,
+    "sha256": "79f36e4897677613a806daa26674db7f0adc5a37c085881726e062bffca037f4",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mfmt:check\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--root' '.llm/tools/quality/check-root-coverage_test.ts' '--root' '.llm/tools/quality/check-root-coverage.ts'\n",
+    "truncated": false
+  }
+}

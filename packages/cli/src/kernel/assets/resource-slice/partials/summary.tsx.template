@@ -1,0 +1,13 @@
+import { definePartial } from '@netscript/fresh/builders';
+import { {{resourcePascalCase}}Summary } from '@app/{{routeDirectory}}/(_components)/{{resource}}-summary.tsx';
+import { load{{resourcePascalCase}}Resource } from '@app/{{routeDirectory}}/(_shared)/{{resource}}-loaders.ts';
+
+const route = definePartial({
+  name: '{{partialName}}',
+  loader: load{{resourcePascalCase}}Resource,
+  component: {{resourcePascalCase}}Summary,
+});
+
+export const config = route.config;
+
+export default route.page;

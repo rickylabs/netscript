@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "immutableHead": "9cc8c4c5f84acef262bca2cec9169ebbaa410eb5",
+  "surface": "#1387 Slice 4 contract-policy service ports (type contract only)",
+  "expectedGateIds": [
+    "check",
+    "doc-lint",
+    "exports-drift",
+    "fmt-check",
+    "lint",
+    "mcp-export-corpus",
+    "publish-dry-run",
+    "quality-gate",
+    "test"
+  ],
+  "receiptIds": [
+    "1387-s4-check",
+    "1387-s4-doc-lint",
+    "1387-s4-exports-drift",
+    "1387-s4-fmt-check",
+    "1387-s4-lint",
+    "1387-s4-mcp-export-corpus",
+    "1387-s4-publish-dry-run",
+    "1387-s4-quality-gate",
+    "1387-s4-test"
+  ],
+  "sufficiency": "SUFFICIENT",
+  "reasons": []
+}

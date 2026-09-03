@@ -121,6 +121,8 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
             'deno run -A jsr:@netscript/plugin-workers@',
             'deno run -A jsr:@netscript/plugin-sagas@',
           ].join('\n')
+          : request.command.includes('generate') && request.command.includes('resource')
+          ? 'Resource slice applied: 0 written, 11 skipped, 0 conflicts.'
           : '',
         stderr: '',
         timedOut: false,
@@ -219,7 +221,8 @@ Deno.test('suite runner cleans up after a targeted non-cleanup gate when cleanup
 
   assertEquals(cleaner.snapshots, 1);
   assertEquals(commands.some((request) => request.command.includes('init')), true);
-  assertEquals(commands.some((request) => request.command.includes('stop')), true);
+  const cleanup = commands.find((request) => request.command.includes('cli-e2e-aspire-cleanup'));
+  assertEquals(cleanup?.command.includes('true'), true);
 });
 
 Deno.test('suite runner can target cleanup gate without suite cleanup enabled', async () => {
@@ -258,7 +261,8 @@ Deno.test('suite runner can target cleanup gate without suite cleanup enabled', 
 
   assertEquals(cleaner.snapshots, 0);
   assertEquals(commands.length, 1);
-  assertEquals(commands[0].command.includes('stop'), true);
+  assertEquals(commands[0].command.includes('cli-e2e-aspire-cleanup'), true);
+  assertEquals(commands[0].command.includes('false'), true);
 });
 
 Deno.test('suite runner releases the expensive-suite lease when suite execution throws', async () => {

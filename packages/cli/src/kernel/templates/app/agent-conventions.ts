@@ -1,3 +1,5 @@
+import { toPascalCase } from '@std/text';
+
 /** Inputs that determine which scaffolded web-layer examples exist. */
 export interface AppConventionsInput {
   readonly appName: string;
@@ -11,13 +13,13 @@ interface ConventionReference {
     | 'dashboard-view'
     | 'ui-barrel'
     | 'composition-route'
+    | 'dynamic-order-route'
     | 'service-route-contract'
     | 'service-lib'
     | 'service-page'
     | 'service-island'
     | 'service-shared'
     | 'service-form'
-    | 'service-authorization'
     | 'service-partial'
     | 'telemetry-route';
   readonly path: string;
@@ -25,6 +27,11 @@ interface ConventionReference {
 }
 
 const COMMON_REFERENCES: readonly ConventionReference[] = [
+  {
+    id: 'dynamic-order-route',
+    path: 'routes/examples/orders/[id].tsx',
+    purpose: 'typed dynamic path binding and bound-reference href generation',
+  },
   {
     id: 'dashboard-view',
     path: 'routes/(_components)/dashboard-view.tsx',
@@ -42,6 +49,9 @@ const COMMON_REFERENCES: readonly ConventionReference[] = [
   },
 ];
 
+const RESOURCE_GENERATION_GUIDANCE =
+  'Before manually constructing this path, run `netscript generate resource <resource> --procedure <query> --client <service> --partial --app <app>`.';
+
 function serviceReferences(
   input: AppConventionsInput,
 ): readonly ConventionReference[] {
@@ -52,7 +62,7 @@ function serviceReferences(
   return [
     {
       id: 'service-route-contract',
-      path: `${root}/(_lib)/route-contract.ts`,
+      path: `${root}/index.route.ts`,
       purpose: 'typed path, search, and managed-form schemas',
     },
     {
@@ -67,23 +77,18 @@ function serviceReferences(
     },
     {
       id: 'service-island',
-      path: `${root}/(_islands)/ServiceShowcaseLab.tsx`,
+      path: `${root}/(_islands)/${toPascalCase(input.serviceName)}Island.tsx`,
       purpose: 'QueryIsland and typed query/mutation options',
     },
     {
       id: 'service-shared',
-      path: `${root}/(_shared)/service-showcase.ts`,
+      path: `${root}/(_shared)/${input.serviceName}-loaders.ts`,
       purpose: 'canonical query keys and shared query loaders',
     },
     {
       id: 'service-form',
-      path: `${root}/(_components)/managed-form.tsx`,
+      path: `${root}/(_components)/${input.serviceName}-form.tsx`,
       purpose: 'withForm invalid and successful submission states',
-    },
-    {
-      id: 'service-authorization',
-      path: `${root}/(_shared)/authorization.ts`,
-      purpose: 'provider-neutral viewer and mutation policy boundary',
     },
     {
       id: 'service-partial',
@@ -142,6 +147,8 @@ ${localExamples}
 
 ## Default architecture
 
+${RESOURCE_GENERATION_GUIDANCE}
+
 Before hand-writing a service request or probing it with curl, follow the MCP path: \`list_api_services\` to discover the live service name, \`list_service_operations\` to select an operation, then \`get_operation_schema\` for its request and response contract.
 
 1. Start from the service contract and derive the client **and query factories** in the resource-local \`(_lib)\` module.
@@ -177,6 +184,8 @@ export function buildWebLayerMarkdown(input: AppConventionsInput): string {
   return `# ${input.appName} web layer
 
 ## One-screen path
+
+${RESOURCE_GENERATION_GUIDANCE}
 
 \`contract → createQueryFactories → definePage layers → QueryIsland/useMutation → live stream\`
 

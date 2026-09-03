@@ -68,33 +68,33 @@ referencing those ids; change a model/version/endpoint only there. See the suite
 read-only gate exposes silent review findings before merge: a reply or reasoned decline counts as
 answered, UI resolution is irrelevant, and outdated threads are listed but do not block.
 
-| Task                             | Tool                                      | Use                                                                                                |
-| -------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `agentic:launch-codex-slice`     | `launch-codex-slice.ts`                   | stage + safety-check + launch a WSL Codex slice; records the thread id                             |
-| `agentic:codex-resume`           | `codex-resume.ts`                         | steer an existing Codex thread (never a rival second send)                                         |
-| `agentic:codex-follow`           | `codex-follow.ts`                         | readable live rollout stream by thread id; exits on completion/failure                             |
-| `agentic:codex-status`           | `codex-status.ts`                         | per-session working/idle/stalled/dead/refused state plus activity and artifact evidence            |
-| `agentic:codex-watch`            | `codex-watch.ts`                          | event-driven wake on a slice's git progress or turn completion (run inside WSL)                    |
-| `agentic:dispatch-openhands`     | `dispatch-openhands.ts`                   | validate + post an `@openhands-agent` trigger (enforces the handoff contract)                      |
-| `agentic:openhands-status`       | `openhands-status.ts`                     | read an OpenHands run's verdict (local trace or remote comment)                                    |
-| `agentic:gh-pr`                  | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
-| `agentic:gh-watch`               | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
-| `agentic:gh-token`               | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
-| `agentic:review-threads`         | `review-threads.ts`                       | list all PR review threads and fail while a current thread has no reply                            |
-| `agentic:claude-hook-log`        | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
-| `agentic:sync-claude` / `:check` | `sync-claude-skills.ts`                   | regenerate / verify the `.claude/skills/` mirror from `.agents/skills/`                            |
-| `agentic:check-claude`           | `validate-claude-surface.ts`              | validate the Claude configuration/skills/hooks surface                                             |
-| `agentic:smoke-claude-remote`    | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
-| `agentic:opencode`               | `opencode-run.ts`                         | run a general native OpenCode turn; message-first argv protects repeated `-f` inputs               |
-| `agentic:opencode-eval`          | `opencode-eval.ts`                        | capture canonical Kimi vision evidence from one or more native WSL image paths                     |
-| `agentic:opencode-web`           | `opencode-web.ts`                         | host OpenCode's browser UI; loopback default, password required for LAN/mDNS exposure              |
-| `agentic:runtime`                | `runtime/cli/agentic-runtime.ts`          | desired-state controller: `doctor` / `status` / `repair codex-remote` (inspect-first; `--dry-run`) |
-| `agentic:routing-state`          | `runtime/cli/routing-state.ts`            | read-only view of persisted quota-fallback routing state                                           |
-| `agentic:antigravity-evidence`   | `runtime/cli/antigravity-evidence-cli.ts` | run/aggregate bounded Antigravity evidence-lane probes                                             |
-| `agentic:provider-canary`        | `runtime/cli/provider-canary.ts`          | statically validate every OpenRouter preset; `--live` opts into one bounded provider turn          |
-| `agentic:claude-openrouter`      | `claude/remote-model-launcher.ts`         | launch an inference-only Claude OpenRouter session/fork; explicitly not Remote Control             |
-| `agentic:rollout-canary`         | `runtime/cli/rollout-canary-cli.ts`       | rollout canary + report for route promotion (#582)                                                 |
-| `agentic:wsl-foundation`         | `wsl/wsl-foundation.ts`                   | WSL foundation doctor + reversible bootstrap/rollback planner                                      |
+| Task                                | Tool                                      | Use                                                                                                |
+| ----------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `agentic:launch-codex-slice`        | `launch-codex-slice.ts`                   | stage + safety-check + launch a WSL Codex slice; records the thread id                             |
+| `agentic:codex-resume`              | `codex-resume.ts`                         | steer an existing Codex thread (never a rival second send)                                         |
+| `agentic:codex-follow`              | `codex-follow.ts`                         | readable live rollout stream by thread id; exits on completion/failure                             |
+| `agentic:codex-status`              | `codex-status.ts`                         | per-session working/idle/stalled/dead/refused state plus activity and artifact evidence            |
+| `agentic:codex-watch`               | `codex-watch.ts`                          | event-driven wake on a slice's git progress or turn completion (run inside WSL)                    |
+| `agentic:dispatch-openhands`        | `dispatch-openhands.ts`                   | validate + post an `@openhands-agent` trigger (enforces the handoff contract)                      |
+| `agentic:openhands-status`          | `openhands-status.ts`                     | read an OpenHands run's verdict (local trace or remote comment)                                    |
+| `agentic:gh-pr`                     | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
+| `agentic:gh-watch`                  | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
+| `agentic:gh-token`                  | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
+| `agentic:review-threads`            | `review-threads.ts`                       | list all PR review threads and fail while a current thread has no reply                            |
+| `agentic:claude-hook-log`           | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
+| `agentic:check-claude`              | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
+| `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
+| `agentic:opencode`                  | `opencode-run.ts`                         | run a general native OpenCode turn; message-first argv protects repeated `-f` inputs               |
+| `agentic:opencode-eval`             | `opencode-eval.ts`                        | capture canonical Kimi vision evidence from one or more native WSL image paths                     |
+| `agentic:opencode-web`              | `opencode-web.ts`                         | host OpenCode's browser UI; loopback default, password required for LAN/mDNS exposure              |
+| `agentic:runtime`                   | `runtime/cli/agentic-runtime.ts`          | desired-state controller: `doctor` / `status` / `repair codex-remote` (inspect-first; `--dry-run`) |
+| `agentic:routing-state`             | `runtime/cli/routing-state.ts`            | read-only view of persisted quota-fallback routing state                                           |
+| `agentic:antigravity-evidence`      | `runtime/cli/antigravity-evidence-cli.ts` | run/aggregate bounded Antigravity evidence-lane probes                                             |
+| `agentic:provider-canary`           | `runtime/cli/provider-canary.ts`          | statically validate every OpenRouter preset; `--live` opts into one bounded provider turn          |
+| `agentic:claude-openrouter`         | `claude/openrouter-run.ts`                | run the formal bounded Claude/OpenRouter print-turn transport                                      |
+| `agentic:claude-openrouter-gateway` | `claude/remote-model-launcher.ts`         | launch an interactive loopback-gateway Claude OpenRouter session/fork; not Remote Control          |
+| `agentic:rollout-canary`            | `runtime/cli/rollout-canary-cli.ts`       | rollout canary + report for route promotion (#582)                                                 |
+| `agentic:wsl-foundation`            | `wsl/wsl-foundation.ts`                   | WSL foundation doctor + reversible bootstrap/rollback planner                                      |
 
 `gh-watch.ts` and `gh-token.ts` are the two durable GitHub infra utilities — see **netscript-tools**
 § Supervisor Automation for their exit codes and token-handling rules.

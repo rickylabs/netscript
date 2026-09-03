@@ -8,6 +8,7 @@ import type {
   JobResult,
   StaticJobRegistry,
 } from './runtime-types.ts';
+import { isJobHandlerDefinition, validateJobPayload } from '../domain/mod.ts';
 
 export type {
   JobDispatcherOptions,
@@ -72,6 +73,14 @@ export class InProcessJobDispatcher {
     context: JobContext<TPayload, TResult>,
   ): Promise<JobResult<TResult>> {
     const resolution = await this.resolve(job);
+    if (
+      job.payloadSchema &&
+      (!isJobHandlerDefinition(resolution.handler) ||
+        resolution.handler.payloadSchema !== job.payloadSchema)
+    ) {
+      const payload = await validateJobPayload(job.payloadSchema, context.payload, job.id);
+      return resolution.handler({ ...context, payload });
+    }
     return resolution.handler(context);
   }
 }

@@ -18,16 +18,19 @@ This page is the <strong>loader API</strong> — the code you call to discover a
 disclose <code>SKILL.md</code> documents at runtime. It is distinct from the
 <strong>public skill bundle</strong> that <code>netscript agent init</code> installs
 for a coding agent (the next section). The library loads skills; the bundle is a set
-of three ready-made skills that teach an agent the NetScript vocabulary.
+of five ready-made skills that teach an agent the NetScript vocabulary.
 {{ /comp }}
 
 ## Installed NetScript skills
 
-`netscript agent init` installs five first-party skills and a symptom playbook on the **Claude Code host path**
-(under `.claude/skills/`, alongside `.mcp.json` and the marked `AGENTS.md` section); the
-VS Code editor path writes `.vscode/mcp.json`; Zed writes native `context_servers` into
-`.zed/settings.json`. Select with `netscript agent init --editor none|zed|vscode`, including on a
-cloned existing project. They share one vocabulary with the
+`netscript agent init` installs five first-party skills and a symptom playbook in the canonical
+`.agents/skills/` tree and adds a marked NetScript section to `AGENTS.md` for every host. The
+Claude Code host integration is the fallback default when no host is selected or detected. It
+writes `.mcp.json` and derives a mirror under
+`.claude/skills/`; the VS Code editor writes `.vscode/mcp.json`; Zed writes native
+`context_servers` into `.zed/settings.json`. Select an editor with
+`netscript agent init --editor none|zed|vscode`, including on a cloned existing project. They share
+one vocabulary with the
 `netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#what-the-server-exposes),
 so an agent routes to a workflow and then reaches for the matching CLI verb or MCP tool.
 
@@ -40,10 +43,22 @@ so an agent routes to a workflow and then reaches for the matching CLI verb or M
 | `deno` | Diagnose runtime and toolchain problems with focused checks, module-resolution inspection, permissions, test sanitizers, cache evidence, and API docs. |
 
 These are the skills named in the bundle manifest and installed as an atomic set. The companion
-`.claude/skills/help.md` playbook starts from symptoms—including broken plugin wiring—and routes to
-the first diagnostic command;
+`.agents/skills/help.md` playbook starts from symptoms—including broken plugin wiring—and routes to
+the first diagnostic command; Claude Code receives the same playbook in the derived mirror;
 re-running `netscript agent init` is idempotent. See
 [Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP combo.
+
+The upstream Aspire workflow skills (`aspire-init`, `aspire-orchestration`, `aspire-monitoring`,
+`aspire-deployment`) can be installed beside NetScript's `aspire` diagnostic skill by explicit
+name; they never overwrite `aspire/SKILL.md`.
+
+Agents connect to the Aspire MCP server with `aspire agent mcp`, or with the dashboard-only form
+`aspire agent mcp --dashboard-url <url>` (plus an optional `--api-key`). Aspire 13.5.3 exposes a
+**14-tool MCP baseline**: `list_resources`, `list_console_logs`, `list_structured_logs`,
+`list_traces`, `list_trace_structured_logs`, `execute_resource_command`, `list_apphosts`,
+`select_apphost`, `list_integrations`, `list_docs`, `search_docs`, `get_doc`, `doctor`, and
+`refresh_tools`. (`get_integration_docs` is documented upstream on aspire.dev but was not observed
+at 13.5.3.)
 
 ```ts
 import {

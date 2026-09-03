@@ -49,15 +49,15 @@ package's public surface reported by `deno doc`.
 
 ## Sub-path exports
 
-| Export | Purpose |
-| --- | --- |
-| `@netscript/auth-kv-oauth` | Root KV OAuth backend surface. |
-| `@netscript/auth-kv-oauth/providers` | Provider presets and `defineOAuthProvider`. |
-| `@netscript/auth-kv-oauth/store` | KV OAuth store implementation. |
-| `@netscript/auth-kv-oauth/crypto` | KV OAuth crypto helpers. |
-| `@netscript/auth-kv-oauth/cookies` | Cookie parsing and header helpers. |
-| `@netscript/auth-kv-oauth/flow` | OAuth sign-in and callback flow. |
-| `@netscript/auth-kv-oauth/backend` | Backend adapter factory. |
-| `@netscript/auth-kv-oauth/errors` | KV OAuth error class and codes. |
+| Export | Path | Purpose |
+| --- | --- | --- |
+| `@netscript/auth-kv-oauth` | `./mod.ts` | Root KV OAuth backend surface. |
+| `@netscript/auth-kv-oauth/providers` | `./src/providers.ts` | Provider presets and the defineOAuthProvider helper. |
+| `@netscript/auth-kv-oauth/store` | `./src/store.ts` | KV OAuth store implementation. |
+| `@netscript/auth-kv-oauth/crypto` | `./src/crypto.ts` | KV OAuth crypto helpers. |
+| `@netscript/auth-kv-oauth/cookies` | `./src/cookies.ts` | Cookie parsing and header helpers. |
+| `@netscript/auth-kv-oauth/flow` | `./src/flow.ts` | OAuth sign-in and callback flow. |
+| `@netscript/auth-kv-oauth/backend` | `./src/backend.ts` | Backend adapter factory. |
+| `@netscript/auth-kv-oauth/errors` | `./src/errors.ts` | KV OAuth error class and codes. |
 
 Back to the [auth reference hub](/reference/auth/).

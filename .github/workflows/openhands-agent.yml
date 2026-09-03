@@ -1,8 +1,9 @@
 # OpenHands Agent (v2) — cloud agent runner for NetScript.
 #
 # Public manual-comment trigger contract:
-#   - The command token is the first token of the first line, followed only by recognized
-#     `name=value` arguments, in a PR/issue comment from OWNER/MEMBER/COLLABORATOR.
+#   - Any comment containing the literal command token reaches the trusted default-branch policy.
+#     Only a first-line command with recognized `name=value` arguments from an
+#     OWNER/MEMBER/COLLABORATOR may dispatch; every reportable denial gets one controlled reply.
 #   - Any prompt starts on the following line. Quoted commands and prose mentions do not dispatch.
 #   - workflow_dispatch with explicit inputs.
 #   - `fix-me` / `agent:<profile>` labels on issues/PRs; `openhands` directly on issues.
@@ -24,7 +25,9 @@
 #       for .llm/tools/agentic/openhands/openhands-status.ts compatibility)
 #   <!-- openhands-run: {"run_id":..,"attempt":..,"conclusion":..,
 #        "state":..,"verdict":..,"verdict_source":..,"phase":..,
-#        "evaluated_head":..} -->                              (machine marker, v2)
+#        "evaluated_head":..,"verdict_artifact_path":..,
+#        "verdict_artifact_commit":..,"verdict_artifact_uri":..} -->
+#                                                               (machine marker, v2)
 #   ## OpenHands Agent — <Completed|Completed — no agent summary|Agent failed|
 #        Bootstrap failed|Did not run>                     (heading vocabulary
 #       is frozen; agentic-lib.ts parseOpenHandsStatusComment maps it)
@@ -53,7 +56,9 @@
 # the agent leaves uncommitted outside the allow-list is skipped, counted in
 # the final comment, and preserved as uncommitted.txt/uncommitted.patch in the
 # Actions artifact — never pushed. Lock-file churn on PR branches is designed
-# out, not cleaned up after.
+# out, not cleaned up after. Formal evaluators never push the evaluated branch:
+# their one exact verdict and compact trace are committed to a unique
+# openhands-eval-artifacts/pr-*/run-* evidence ref rooted at the immutable head.
 #
 # Concurrency: group = openhands-<event>-<pr/issue number|ref>, with
 # cancel-in-progress: false. GitHub semantics for this configuration: at most
@@ -86,12 +91,11 @@ on:
       model_profile:
         description: Model profile to use when model is empty.
         required: false
-        default: qwen
+        default: glm
         type: choice
         options:
+          - glm
           - qwen
-          - minimax
-          - deepseek
       target_pr:
         description: Optional PR number to inspect/comment on.
         required: false
@@ -139,8 +143,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && contains(github.event.head_commit.message, '[openhands')) ||
       (github.event_name == 'issue_comment' &&
-        startsWith(github.event.comment.body, '@openhands-agent') &&
-        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+        contains(github.event.comment.body, '@openhands-agent')) ||
       ((github.event_name == 'issues' || github.event_name == 'pull_request') &&
         (github.event.label.name == 'fix-me' ||
          (github.event.label.name == 'openhands' && github.event_name == 'issues') ||
@@ -148,6 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      issues: write # one source-comment-keyed refusal via GITHUB_TOKEN
     outputs:
       dispatch: ${{ steps.non_comment.outputs.dispatch || steps.policy.outputs.dispatch }}
       trigger_line: ${{ steps.policy.outputs.trigger_line }}
@@ -179,73 +183,135 @@ jobs:
               process.env.GITHUB_WORKSPACE,
               '.trigger-policy-trusted/.github/scripts/openhands-comment-trigger.mjs',
             );
-            const { authorizeOpenHandsCommentTrigger } = await import(
+            const {
+              authorizeOpenHandsCommentTrigger,
+              buildOpenHandsRefusalReply,
+              isReportableOpenHandsDenial,
+            } = await import(
               pathToFileURL(policyPath).href
             );
-            const decision = await authorizeOpenHandsCommentTrigger(
-              {
-                body: context.payload.comment?.body,
-                authorAssociation: context.payload.comment?.author_association,
-              },
-              async ({ phase, head }) => {
-                if (!context.payload.issue?.pull_request) {
-                  throw new Error('Formal evaluator comment commands require a pull request.');
-                }
-                const owner = context.repo.owner;
-                const repo = context.repo.repo;
-                const issue_number = context.payload.issue.number;
-                const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
-                const events = await github.paginate(github.rest.issues.listEvents, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                const generationEvent = events
+
+            async function findPhaseGeneration(loadEvents, expectedStatus, sleep) {
+              let generationEvent;
+              for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1) {
+                const events = await loadEvents();
+                generationEvent = events
                   .filter((event) => event.event === 'labeled' && event.label?.name === expectedStatus)
                   .at(-1);
-                if (!generationEvent) {
-                  throw new Error(`No labeled-event generation found for ${expectedStatus}.`);
-                }
-                const comments = await github.paginate(github.rest.issues.listComments, {
-                  owner,
-                  repo,
-                  issue_number,
-                  per_page: 100,
-                });
-                const currentCommentId = Number(context.payload.comment?.id);
-                // Re-read the live PR and phase immediately before returning claim operations.
-                // A queued stale command is denied by the trusted policy before any provider job.
-                const { data: livePr } = await github.rest.pulls.get({
-                  owner,
-                  repo,
-                  pull_number: issue_number,
-                });
-                const liveLabelData = await github.paginate(
-                  github.rest.issues.listLabelsOnIssue,
-                  { owner, repo, issue_number, per_page: 100 },
-                );
-                return {
-                  generation: generationEvent.id,
-                  operations: {
-                    createRef: async ({ ref, sha }) => {
-                      await github.rest.git.createRef({ owner, repo, ref, sha });
+                if (!generationEvent) await sleep(1000);
+              }
+              return generationEvent;
+            }
+
+            function buildGenerationLookupRefusal({ sourceCommentId, expectedStatus }) {
+              const id = String(sourceCommentId ?? '');
+              if (!/^[1-9][0-9]*$/.test(id)) {
+                throw new Error('sourceCommentId must be a positive integer');
+              }
+              const marker = `<!-- openhands-command-refusal:${id} -->`;
+              const body = [
+                marker,
+                `OpenHands did not start for source comment ${id}.`,
+                `Reason: the labeled-event generation for \`${expectedStatus}\` was not observable after five attempts.`,
+                'Recovery: cycle away from and back to that phase status, then submit a new formal command.',
+              ].join('\n');
+              return { marker, body };
+            }
+
+            let decision;
+            let refusal;
+            try {
+              decision = await authorizeOpenHandsCommentTrigger(
+                {
+                  body: context.payload.comment?.body,
+                  authorAssociation: context.payload.comment?.author_association,
+                },
+                async ({ phase, head }) => {
+                  if (!context.payload.issue?.pull_request) {
+                    throw new Error('Formal evaluator comment commands require a pull request.');
+                  }
+                  const owner = context.repo.owner;
+                  const repo = context.repo.repo;
+                  const issue_number = context.payload.issue.number;
+                  const expectedStatus = phase === 'plan' ? 'status:plan-eval' : 'status:impl-eval';
+                  const generationEvent = await findPhaseGeneration(
+                    () => github.paginate(github.rest.issues.listEvents, {
+                      owner,
+                      repo,
+                      issue_number,
+                      per_page: 100,
+                    }),
+                    expectedStatus,
+                    (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+                  );
+                  if (!generationEvent) {
+                    const error = new Error(
+                      `Labeled-event generation lookup exhausted for ${expectedStatus}.`,
+                    );
+                    error.code = 'phase-generation-lookup-exhausted';
+                    error.expectedStatus = expectedStatus;
+                    throw error;
+                  }
+                  const comments = await github.paginate(github.rest.issues.listComments, {
+                    owner,
+                    repo,
+                    issue_number,
+                    per_page: 100,
+                  });
+                  const currentCommentId = Number(context.payload.comment?.id);
+                  // Re-read the live PR and phase immediately before returning claim operations.
+                  // A queued stale command is denied by the trusted policy before any provider job.
+                  const { data: livePr } = await github.rest.pulls.get({
+                    owner,
+                    repo,
+                    pull_number: issue_number,
+                  });
+                  const liveLabelData = await github.paginate(
+                    github.rest.issues.listLabelsOnIssue,
+                    { owner, repo, issue_number, per_page: 100 },
+                  );
+                  return {
+                    generation: generationEvent.id,
+                    operations: {
+                      createRef: async ({ ref, sha }) => {
+                        await github.rest.git.createRef({ owner, repo, ref, sha });
+                      },
+                      getRef: async ({ ref }) => {
+                        const existing = await github.rest.git.getRef({ owner, repo, ref });
+                        return { sha: existing.data.object.sha };
+                      },
                     },
-                    getRef: async ({ ref }) => {
-                      const existing = await github.rest.git.getRef({ owner, repo, ref });
-                      return { sha: existing.data.object.sha };
-                    },
-                  },
-                  priorCommentBodies: comments
-                    .filter((comment) => Number(comment.id) !== currentCommentId)
-                    .map((comment) => String(comment.body ?? '')),
-                  currentHead: livePr.head.sha,
-                  liveLabels: liveLabelData.map(({ name }) => name),
-                };
-              },
-            );
+                    priorCommentBodies: comments
+                      .filter((comment) => Number(comment.id) !== currentCommentId)
+                      .map((comment) => String(comment.body ?? '')),
+                    currentHead: livePr.head.sha,
+                    liveLabels: liveLabelData.map(({ name }) => name),
+                  };
+                },
+              );
+            } catch (error) {
+              if (error?.code !== 'phase-generation-lookup-exhausted') throw error;
+              decision = {
+                dispatch: false,
+                triggerLine: '',
+                reason: error.code,
+              };
+              refusal = buildGenerationLookupRefusal({
+                sourceCommentId: context.payload.comment?.id,
+                expectedStatus: error.expectedStatus,
+              });
+            }
+            if (!refusal && isReportableOpenHandsDenial(decision.reason)) {
+              refusal = buildOpenHandsRefusalReply({
+                sourceCommentId: context.payload.comment?.id,
+                authorLogin: context.payload.comment?.user?.login,
+                reason: decision.reason,
+              });
+            }
             core.setOutput('dispatch', String(decision.dispatch));
             core.setOutput('trigger_line', decision.triggerLine);
+            core.setOutput('refusal_marker', refusal?.marker ?? '');
+            core.setOutput('refusal_body', refusal?.body ?? '');
             core.notice(`Manual comment policy: ${decision.reason}`);
             if (['stale-phase-head', 'phase-not-current'].includes(decision.reason)) {
               const recovery = 'Cycle away from and back to the phase status label to create a new deliberate generation.';
@@ -257,6 +323,41 @@ jobs:
                 .write();
             }
 
+      - name: Report denied manual command
+        if: github.event_name == 'issue_comment' && steps.policy.outputs.refusal_marker != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          REFUSAL_MARKER: ${{ steps.policy.outputs.refusal_marker }}
+          REFUSAL_BODY: ${{ steps.policy.outputs.refusal_body }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            async function reportRefusalOnce({ listComments, createComment, marker, body }) {
+              const comments = await listComments();
+              if (comments.some((comment) => String(comment.body ?? '').includes(marker))) {
+                return false;
+              }
+              await createComment(body);
+              return true;
+            }
+
+            await reportRefusalOnce({
+              listComments: () => github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                per_page: 100,
+              }),
+              createComment: (body) => github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                body,
+              }),
+              marker: process.env.REFUSAL_MARKER,
+              body: process.env.REFUSAL_BODY,
+            });
+
   agent:
     needs: authorize
     if: needs.authorize.outputs.dispatch == 'true'
@@ -267,7 +368,7 @@ jobs:
       issues: write # acknowledge + final status comments
       pull-requests: write # draft PR for non-PR triggers, review-thread replies
     env:
-      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/qwen/qwen3.8-max' }}
+      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'openrouter/z-ai/glm-5.3-flash' }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
@@ -292,9 +393,8 @@ jobs:
             const eventName = context.eventName;
 
             const modelProfiles = new Map([
-              ['qwen', 'openrouter/qwen/qwen3.8-max'],
-              ['minimax', 'openrouter/minimax/minimax-m3'],
-              ['deepseek', 'openrouter/deepseek/deepseek-v4-flash-0731'],
+              ['glm', 'openrouter/z-ai/glm-5.3-flash'],
+              ['qwen', 'openrouter/qwen/qwen3.8-flash'],
             ]);
 
             const labels = new Set();
@@ -416,9 +516,8 @@ jobs:
 
             const selectedModel = pickModel();
             const allowedModels = new Set([
-              'openrouter/minimax/minimax-m3',
-              'openrouter/deepseek/deepseek-v4-flash-0731',
-              'openrouter/qwen/qwen3.8-max',
+              'openrouter/z-ai/glm-5.3-flash',
+              'openrouter/qwen/qwen3.8-flash',
             ]);
             if (!allowedModels.has(selectedModel)) {
               throw new Error(`OpenHands model is not in the approved open-evaluator allowlist: ${selectedModel}`);
@@ -525,6 +624,7 @@ jobs:
               '',
               `Model: \`${process.env.MODEL}\``,
               `Provider: \`${process.env.PROVIDER}\``,
+              'Reasoning effort: not attested (OpenHands adapter limitation)',
               `Output mode: \`${process.env.OUTPUT_MODE}\``,
               '',
               `Run: ${process.env.RUN_URL}`,
@@ -831,6 +931,8 @@ jobs:
           ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
           CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
           CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          EVAL_PHASE: ${{ steps.request.outputs.eval_phase }}
+          EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
         run: |
           set -euo pipefail
           if [ -z "${OPENHANDS_RUN_DIR:-}" ]; then
@@ -855,36 +957,50 @@ jobs:
             verdict="summary-missing"
           fi
 
-          # Layered agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
-          # "Publish final status comment" step. Tier 1 (strict): literal
-          # OPENHANDS_VERDICT: line, one exact token, alone on its own line, outside
-          # code fences. Template text (e.g. "OPENHANDS_VERDICT: <PASS|FAIL_FIX|...>")
-          # cannot match. Tier 2 (decorated): the same marker line after stripping
-          # markdown decoration and an optional "Verdict:" prefix — models bold the
-          # marker in practice (observed: "**Verdict: OPENHANDS_VERDICT: PASS**",
-          # PR #475); lines containing '<' (placeholders) never match.
+          # Agent-verdict extraction. KEEP IN SYNC with verdictOf() in the
+          # "Publish final status comment" step. Accept one exact token on its own
+          # line outside code fences, optionally wrapped by a blockquote, markdown
+          # heading/emphasis, or "Verdict:" prefix. Template text containing '<'
+          # cannot match. Preserve whether an eligible marker was absent or emitted
+          # with an unparseable token/shape, or more than one eligible marker.
           agent_verdict="NONE"
+          agent_verdict_state="absent"
+          agent_verdict_source="none"
           if [ -s "$OPENHANDS_SUMMARY_PATH" ]; then
             unfenced="$(awk '/^[[:space:]]*(```|~~~)/{fence=!fence; next} !fence' "$OPENHANDS_SUMMARY_PATH")"
-            line="$(printf '%s\n' "$unfenced" \
-              | grep -E '^OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
-              | head -n 1 || true)"
-            if [ -z "$line" ]; then
-              line="$(printf '%s\n' "$unfenced" | grep -v '<' | sed -E 's/[*`]+//g' \
-                | grep -E '^[[:space:]]*(Verdict:?[[:space:]]*)?OPENHANDS_VERDICT:[[:space:]]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[[:space:]]*$' \
-                | head -n 1 || true)"
-            fi
-            if [ -n "$line" ]; then
-              agent_verdict="$(printf '%s' "$line" | sed -E 's/^.*OPENHANDS_VERDICT:[[:space:]]*//; s/[[:space:]]*$//')"
+            eligible="$(printf '%s\n' "$unfenced" | grep -v '<' || true)"
+            marker_count="$(printf '%s\n' "$eligible" | grep -Ec 'OPENHANDS_VERDICT[[:space:]]*:' || true)"
+            verdict_lines="$OPENHANDS_RUN_DIR/verdict-lines.txt"
+            printf '%s\n' "$eligible" \
+              | grep -E '^[[:space:]]*(>[[:space:]]*)*(#{1,6}[[:space:]]+)?[*_`]*(Verdict[*_`]*[[:space:]]*:?[[:space:]]*[*_`]*)?OPENHANDS_VERDICT[[:space:]]*:[[:space:]]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[[:space:]]*$' \
+              > "$verdict_lines" || true
+            valid_count="$(grep -c . "$verdict_lines" || true)"
+            if [ "$marker_count" -gt 1 ] || [ "$valid_count" -gt 1 ]; then
+              agent_verdict_state="ambiguous"
+              agent_verdict_source="summary-ambiguous"
+            elif [ "$marker_count" -eq 1 ] && [ "$valid_count" -eq 1 ]; then
+              line="$(head -n 1 "$verdict_lines")"
+              agent_verdict="$(printf '%s' "$line" \
+                | grep -oE 'PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE' \
+                | tail -n 1)"
+              agent_verdict_state="parsed"
+              agent_verdict_source="summary-file"
+            elif [ "$marker_count" -gt 0 ]; then
+              agent_verdict_state="unparseable"
+              agent_verdict_source="summary-unparseable"
             fi
           fi
 
           {
             echo "verdict=$verdict"
             echo "agent_verdict=$agent_verdict"
+            echo "agent_verdict_state=$agent_verdict_state"
+            echo "agent_verdict_source=$agent_verdict_source"
             echo "summary_source=$summary_source"
           } >> "$GITHUB_OUTPUT"
-          export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" SUMMARY_SOURCE="$summary_source"
+          export RUN_VERDICT="$verdict" AGENT_VERDICT="$agent_verdict" \
+            AGENT_VERDICT_STATE="$agent_verdict_state" \
+            AGENT_VERDICT_SOURCE="$agent_verdict_source" SUMMARY_SOURCE="$summary_source"
 
           if [ ! -s "$OPENHANDS_SUMMARY_PATH" ]; then
             {
@@ -939,6 +1055,10 @@ jobs:
               "agent_outcome": os.environ["AGENT_OUTCOME"],
               "verdict": os.environ.get("RUN_VERDICT", "unknown"),
               "agent_verdict": os.environ.get("AGENT_VERDICT", "NONE"),
+              "agent_verdict_state": os.environ.get("AGENT_VERDICT_STATE", "absent"),
+              "verdict_source": os.environ.get("AGENT_VERDICT_SOURCE", "none"),
+              "eval_phase": os.environ.get("EVAL_PHASE") or None,
+              "evaluated_head": os.environ.get("EVAL_HEAD") or None,
               "summary_source": os.environ.get("SUMMARY_SOURCE", "none"),
               "model": os.environ["MODEL"],
               "provider": os.environ["PROVIDER"],
@@ -987,8 +1107,8 @@ jobs:
         id: commit-artifacts
         # always(): trace/run artifacts from a failed or budget-cut run must
         # still land on the branch for the supervisor's local status tooling.
-        # Formal evaluators are immutable read-only runs: their trace stays in the Actions artifact
-        # and final PR comment so the evaluated head can never be changed by evaluation itself.
+        # Formal evaluators are immutable read-only runs: a later step preserves their exact
+        # verdict + trace on an isolated evidence ref, never on the evaluated PR branch.
         # Allow-list: .llm/tmp/run/openhands/** and .llm/runs/** only — never
         # deno.lock, never node_modules, never agent source changes (the agent
         # pushes its own source commits per the request contract). Disallowed
@@ -1060,6 +1180,113 @@ jobs:
             git push "$remote" "HEAD:${CHECKOUT_REF}"
           fi
           echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Preserve formal evaluator verdict on isolated artifact ref
+        id: preserve-eval
+        # Formal evaluators remain read-only with respect to the evaluated PR head. A unique
+        # evidence ref is rooted at that immutable head and contains only the exact verdict plus
+        # compact trace metadata; the checkout branch itself is never pushed by this step.
+        if: >-
+          always() &&
+          steps.request.outputs.eval_phase != '' &&
+          steps.target-ref.outputs.exists == 'true' &&
+          steps.request.outputs.is_pr == 'true' &&
+          steps.artifacts.outputs.trace_dir != ''
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          EVAL_PHASE: ${{ steps.request.outputs.eval_phase }}
+          EVAL_HEAD: ${{ steps.request.outputs.eval_head }}
+          AGENT_VERDICT: ${{ steps.trace.outputs.agent_verdict }}
+          AGENT_VERDICT_STATE: ${{ steps.trace.outputs.agent_verdict_state }}
+          VERDICT_SOURCE: ${{ steps.trace.outputs.agent_verdict_source }}
+          TRACE_DIR: ${{ steps.artifacts.outputs.trace_dir }}
+        run: |
+          set -euo pipefail
+          expected_file="evaluate.md"
+          expected_pattern='evaluate\.md'
+          if [ "$EVAL_PHASE" = "plan" ]; then
+            expected_file="plan-eval.md"
+            expected_pattern='plan-eval\.md'
+          fi
+
+          changed_paths="$RUNNER_TEMP/formal-eval-changed-paths.txt"
+          candidates_file="$RUNNER_TEMP/formal-eval-candidates.txt"
+          {
+            git diff --name-only --diff-filter=ACMRT "$EVAL_HEAD" -- .llm/runs
+            git ls-files --others --exclude-standard -- .llm/runs
+          } | sort -u > "$changed_paths"
+          grep -E "^\.llm/runs/.+/${expected_pattern}$" "$changed_paths" > "$candidates_file" || true
+          mapfile -t candidates < "$candidates_file"
+          if [ "${#candidates[@]}" -ne 1 ]; then
+            echo "Expected exactly one changed ${expected_file}; found ${#candidates[@]}." >&2
+            exit 1
+          fi
+          verdict_path="${candidates[0]}"
+          if [ ! -f "$verdict_path" ]; then
+            echo "Formal verdict candidate is not a file: $verdict_path" >&2
+            exit 1
+          fi
+
+          artifact_ref="openhands-eval-artifacts/pr-${ISSUE_NUMBER}/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          artifact_index="$(mktemp)"
+          rm -f "$artifact_index"
+          export GIT_AUTHOR_NAME="OpenHands Bot" GIT_AUTHOR_EMAIL="openhands@all-hands.dev"
+          export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME" GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+
+          GIT_INDEX_FILE="$artifact_index" git read-tree "$EVAL_HEAD"
+          GIT_INDEX_FILE="$artifact_index" git add -- "$verdict_path"
+          artifact_tree="$(GIT_INDEX_FILE="$artifact_index" git write-tree)"
+          artifact_commit="$(git commit-tree "$artifact_tree" -p "$EVAL_HEAD" \
+            -m "chore(openhands): preserve formal verdict ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}")"
+          artifact_uri="${GITHUB_SERVER_URL}/${CHECKOUT_REPO}/blob/${artifact_commit}/${verdict_path}"
+
+          export VERDICT_PATH="$verdict_path" ARTIFACT_REF="$artifact_ref"
+          export ARTIFACT_COMMIT="$artifact_commit" ARTIFACT_URI="$artifact_uri"
+          python - <<'PY'
+          import json
+          import os
+
+          metadata_path = os.path.join(os.environ["TRACE_DIR"], "metadata.json")
+          with open(metadata_path, encoding="utf-8") as source:
+              metadata = json.load(source)
+          metadata.update({
+              "eval_phase": os.environ["EVAL_PHASE"],
+              "evaluated_head": os.environ["EVAL_HEAD"],
+              "formal_verdict": os.environ.get("AGENT_VERDICT", "NONE"),
+              "verdict_state": os.environ.get("AGENT_VERDICT_STATE", "absent"),
+              "verdict_source": os.environ.get("VERDICT_SOURCE", "none"),
+              "verdict_artifact_path": os.environ["VERDICT_PATH"],
+              "verdict_artifact_ref": os.environ["ARTIFACT_REF"],
+              "verdict_artifact_commit": os.environ["ARTIFACT_COMMIT"],
+              "verdict_artifact_uri": os.environ["ARTIFACT_URI"],
+          })
+          with open(metadata_path, "w", encoding="utf-8") as target:
+              json.dump(metadata, target, indent=2)
+              target.write("\n")
+          PY
+          cp "$TRACE_DIR/metadata.json" "$OPENHANDS_METADATA_PATH"
+
+          record_index="$(mktemp)"
+          rm -f "$record_index"
+          GIT_INDEX_FILE="$record_index" git read-tree "$artifact_commit"
+          GIT_INDEX_FILE="$record_index" git add -f -- "$TRACE_DIR"
+          record_tree="$(GIT_INDEX_FILE="$record_index" git write-tree)"
+          record_commit="$(git commit-tree "$record_tree" -p "$artifact_commit" \
+            -m "chore(openhands): record formal evaluator trace ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}")"
+
+          remote="https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git"
+          git push "$remote" "${record_commit}:refs/heads/${artifact_ref}"
+          {
+            echo "pushed=true"
+            echo "artifact_ref=$artifact_ref"
+            echo "artifact_commit=$artifact_commit"
+            echo "record_commit=$record_commit"
+            echo "verdict_path=$verdict_path"
+            echo "artifact_uri=$artifact_uri"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create pull request for non-PR triggers
         id: create-pr
@@ -1140,6 +1367,7 @@ jobs:
           ACK_OUTCOME: ${{ steps.ack.outcome }}
           TRACE_OUTCOME: ${{ steps.trace.outcome }}
           COMMIT_OUTCOME: ${{ steps.commit-artifacts.outcome }}
+          PRESERVE_EVAL_OUTCOME: ${{ steps.preserve-eval.outcome }}
           REPLIES_OUTCOME: ${{ steps.replies.outcome }}
           CREATE_PR_OUTCOME: ${{ steps.create-pr.outcome }}
           CREATE_PR_URL: ${{ steps.create-pr.outputs.pull-request-url }}
@@ -1150,6 +1378,12 @@ jobs:
           SUMMARY_PATH: ${{ steps.artifacts.outputs.summary }}
           TRACE_DIR: ${{ steps.artifacts.outputs.trace_dir }}
           ARTIFACT_NAME: openhands-agent-${{ github.run_id }}-${{ github.run_attempt }}
+          EVAL_ARTIFACT_PUSHED: ${{ steps.preserve-eval.outputs.pushed }}
+          EVAL_ARTIFACT_REF: ${{ steps.preserve-eval.outputs.artifact_ref }}
+          EVAL_ARTIFACT_COMMIT: ${{ steps.preserve-eval.outputs.artifact_commit }}
+          EVAL_ARTIFACT_PATH: ${{ steps.preserve-eval.outputs.verdict_path }}
+          EVAL_ARTIFACT_URI: ${{ steps.preserve-eval.outputs.artifact_uri }}
+          TRACE_VERDICT_SOURCE: ${{ steps.trace.outputs.agent_verdict_source }}
         with:
           github-token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
@@ -1157,33 +1391,33 @@ jobs:
             const env = process.env;
             const outcome = (v) => v || 'skipped';
 
-            // Layered agent-verdict matcher. KEEP IN SYNC with the awk/grep in
-            // the "Materialize OpenHands trace" step. Tier 1 (strict): literal
-            // line, one exact token, own line, outside code fences. Placeholder/
-            // template text ("OPENHANDS_VERDICT: <PASS|...>", "[VERDICT:
-            // <verdict>]") cannot match, which is the point (observed failure
-            // mode 5). Tier 2 (decorated): same marker line after stripping
-            // markdown decoration and an optional "Verdict:" prefix — models
-            // bold the marker in practice ("**Verdict: OPENHANDS_VERDICT:
-            // PASS**", PR #475); lines containing '<' never match.
+            // Agent-verdict matcher. KEEP IN SYNC with the awk/grep in the
+            // "Materialize OpenHands trace" step. One exact token must occupy its
+            // own line outside code fences; blockquotes, heading/emphasis wrappers,
+            // and an optional "Verdict:" prefix are accepted. Placeholder/template
+            // text containing '<' remains ineligible. The result distinguishes a
+            // genuinely absent marker from an emitted-but-unparseable marker, and
+            // rejects multiple eligible markers as ambiguous.
             function verdictOf(text) {
               let inFence = false;
-              let decorated = null;
+              let markerCount = 0;
+              const matches = [];
               for (const line of String(text ?? '').split(/\r?\n/)) {
                 if (/^\s*(```|~~~)/.test(line)) { inFence = !inFence; continue; }
-                if (inFence) continue;
-                const m = line.match(
-                  /^OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
+                if (inFence || line.includes('<')) continue;
+                if (/OPENHANDS_VERDICT[ \t]*:/.test(line)) markerCount += 1;
+                const match = line.match(
+                  /^[ \t]*(?:>[ \t]*)*(?:#{1,6}[ \t]+)?[*_`]*(?:Verdict[*_`]*[ \t]*:?[ \t]*[*_`]*)?OPENHANDS_VERDICT[ \t]*:[ \t]*[*_`]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN|NONE)[*_`]*[ \t]*$/,
                 );
-                if (m) return m[1];
-                if (!decorated && !line.includes('<')) {
-                  const d = line.replace(/[*`]+/g, '').match(
-                    /^[ \t]*(?:Verdict:?[ \t]*)?OPENHANDS_VERDICT:[ \t]*(PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT|FAIL_PLAN)[ \t]*$/,
-                  );
-                  if (d) decorated = d[1];
-                }
+                if (match) matches.push(match[1]);
               }
-              return decorated;
+              if (markerCount > 1 || matches.length > 1) {
+                return { verdict: null, state: 'ambiguous' };
+              }
+              if (markerCount === 1 && matches.length === 1) {
+                return { verdict: matches[0], state: 'parsed' };
+              }
+              return { verdict: null, state: markerCount ? 'unparseable' : 'absent' };
             }
 
             // 1) Summary file (terminal artifact — authoritative when present).
@@ -1199,13 +1433,15 @@ jobs:
                 'See the workflow logs for the failing setup step.',
               ].join('\n');
             }
-            const summaryVerdict = verdictOf(summary);
+            const summaryInspection = verdictOf(summary);
+            const summaryVerdict = summaryInspection.verdict;
 
             // 2) Agent-posted comments created after run start (the dispatch
             // contract asks evaluators to post their verdict comment early, so
             // a budget-cut run can still deliver a verdict this way).
             let commentVerdict = null;
             let commentVerdictUrl = null;
+            let commentVerdictState = 'absent';
             const issueNumber = Number(env.ISSUE_NUMBER || '');
             if (issueNumber) {
               try {
@@ -1220,17 +1456,62 @@ jobs:
                   const body = c.body ?? '';
                   if (String(c.id) === env.TRIGGER_COMMENT_ID) continue; // the trigger itself
                   if (body.includes('<!-- openhands-')) continue; // workflow-owned comments
-                  const v = verdictOf(body);
-                  if (v) { commentVerdict = v; commentVerdictUrl = c.html_url; }
+                  const inspection = verdictOf(body);
+                  if (inspection.verdict) {
+                    commentVerdict = inspection.verdict;
+                    commentVerdictUrl = c.html_url;
+                    commentVerdictState = 'parsed';
+                  } else if (
+                    (inspection.state === 'unparseable' || inspection.state === 'ambiguous') &&
+                    !commentVerdict
+                  ) {
+                    commentVerdictState = inspection.state;
+                  }
                 }
               } catch (error) {
                 core.warning(`Verdict comment scan failed: ${error.message}`);
               }
             }
 
-            const verdict = summaryVerdict ?? commentVerdict ?? 'NONE';
-            const verdictSource = summaryVerdict ? 'summary-file' : (commentVerdict ? 'pr-comment' : 'none');
+            const isFormalEval = env.EVAL_PHASE === 'plan' || env.EVAL_PHASE === 'impl';
+            const formalArtifactReady = env.EVAL_ARTIFACT_PUSHED === 'true' &&
+              Boolean(env.EVAL_ARTIFACT_URI) && Boolean(env.EVAL_ARTIFACT_PATH) &&
+              Boolean(env.EVAL_ARTIFACT_COMMIT);
+            const verdict = isFormalEval
+              ? summaryInspection.state === 'parsed' && formalArtifactReady
+                ? summaryVerdict
+                : 'NONE'
+              : summaryVerdict ?? commentVerdict ?? 'NONE';
+            const verdictSource = isFormalEval
+              ? !formalArtifactReady
+                ? 'artifact-unavailable'
+                : env.TRACE_VERDICT_SOURCE ||
+                  (summaryInspection.state === 'parsed'
+                    ? 'summary-file'
+                    : `summary-${summaryInspection.state}`)
+              : summaryVerdict
+              ? 'summary-file'
+              : commentVerdict
+              ? 'pr-comment'
+              : summaryInspection.state === 'ambiguous'
+              ? 'summary-ambiguous'
+              : summaryInspection.state === 'unparseable'
+              ? 'summary-unparseable'
+              : commentVerdictState === 'ambiguous'
+              ? 'pr-comment-ambiguous'
+              : commentVerdictState === 'unparseable'
+              ? 'pr-comment-unparseable'
+              : 'none';
             const verdictMismatch = Boolean(summaryVerdict && commentVerdict && summaryVerdict !== commentVerdict);
+            const verdictDiagnostic = verdictSource === 'none'
+              ? 'Agent emitted no OPENHANDS_VERDICT token.'
+              : verdictSource.endsWith('-ambiguous')
+              ? 'Agent emitted more than one eligible OPENHANDS_VERDICT marker.'
+              : verdictSource.endsWith('-unparseable')
+              ? 'Agent emitted an OPENHANDS_VERDICT marker, but its verdict token or line could not be parsed.'
+              : verdictSource === 'artifact-unavailable'
+              ? 'Formal verdict artifact could not be preserved without mutating the evaluated head.'
+              : null;
 
             // Heading vocabulary is FROZEN — agentic-lib.ts
             // parseOpenHandsStatusComment maps these exact strings.
@@ -1267,10 +1548,24 @@ jobs:
               verdict_source: verdictSource,
               phase: env.EVAL_PHASE || null,
               evaluated_head: env.EVAL_HEAD || null,
+              verdict_artifact_path: formalArtifactReady ? env.EVAL_ARTIFACT_PATH : null,
+              verdict_artifact_commit: formalArtifactReady ? env.EVAL_ARTIFACT_COMMIT : null,
+              verdict_artifact_uri: formalArtifactReady ? env.EVAL_ARTIFACT_URI : null,
             });
 
             const MAX_SUMMARY = 55000;
             let summaryOut = summary.trim();
+            if (
+              isFormalEval &&
+              (!formalArtifactReady || summaryInspection.state !== 'parsed')
+            ) {
+              summaryOut = [
+                'Formal evaluator summary withheld because its verdict contract failed closed:',
+                `summary state=${summaryInspection.state}, artifact preserved=${formalArtifactReady}.`,
+                'Inspect the workflow logs and runtime Actions artifact. This status comment does',
+                'not repeat an untrusted verdict token or claim an unpreserved tracked path.',
+              ].join(' ');
+            }
             if (summaryOut.length > MAX_SUMMARY) {
               summaryOut = summaryOut.slice(0, MAX_SUMMARY)
                 + '\n\n_[summary truncated; full text is in the Actions artifact]_';
@@ -1280,6 +1575,7 @@ jobs:
               `ack=${outcome(env.ACK_OUTCOME)}`,
               `trace=${outcome(env.TRACE_OUTCOME)}`,
               `commit-artifacts=${outcome(env.COMMIT_OUTCOME)}`,
+              `preserve-eval=${outcome(env.PRESERVE_EVAL_OUTCOME)}`,
               `replies=${outcome(env.REPLIES_OUTCOME)}`,
               `draft-pr=${outcome(env.CREATE_PR_OUTCOME)}`,
             ].join(' ');
@@ -1293,13 +1589,23 @@ jobs:
               '',
               `Model: \`${env.MODEL || '?'}\``,
               `Provider: \`${env.PROVIDER || '?'}\``,
+              'Reasoning effort: not attested (OpenHands adapter limitation)',
               `Job status: ${env.JOB_STATUS || 'unknown'}`,
               `Verdict source: ${verdictSource}`
                 + (verdictMismatch
                   ? ` (MISMATCH: summary=${summaryVerdict}, comment=${commentVerdict}; summary file wins)`
                   : ''),
+              ...(verdictDiagnostic ? [`Verdict diagnostic: ${verdictDiagnostic}`] : []),
             ];
             if (commentVerdictUrl) lines.push(`Verdict comment: ${commentVerdictUrl}`);
+            if (formalArtifactReady) {
+              lines.push(
+                `Verdict artifact: [\`${env.EVAL_ARTIFACT_PATH}\`](${env.EVAL_ARTIFACT_URI}) `
+                  + `(isolated ref \`${env.EVAL_ARTIFACT_REF}\`; evaluated head unchanged)`,
+              );
+            } else if (isFormalEval) {
+              lines.push('Verdict artifact: unavailable; no tracked verdict path is claimed.');
+            }
             lines.push(`Summary source: ${env.SUMMARY_SOURCE || 'none'}`);
             lines.push(`Housekeeping: ${housekeeping}`);
             const leftovers = Number(env.LEFTOVER_COUNT || 0);

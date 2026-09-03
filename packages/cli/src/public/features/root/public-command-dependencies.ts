@@ -1,8 +1,6 @@
-import {
-  AstExtractor,
-  FilesystemWalker,
-  RegistryEmitter,
-} from '@netscript/plugin/sdk';
+import { AstExtractor, FilesystemWalker, RegistryEmitter } from '@netscript/plugin/sdk';
+import { copy } from '@std/fs';
+import { dirname, join, relative, toFileUrl } from '@std/path';
 
 import {
   findProjectRoot as findDeployProjectRoot,
@@ -21,11 +19,16 @@ import { DatabaseScaffolder } from '../../../kernel/adapters/database/scaffolder
 import { DatabaseWorkspaceMutator } from '../../../kernel/adapters/database/workspace-mutator.ts';
 import { resolveManifest } from '../../../kernel/adapters/deploy/commands/manifest-command.ts';
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
+import { DenoGeneratedSourceFormatter } from '../../../kernel/adapters/runtime/process/deno-generated-source-formatter.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
 import { CliffyPrompt } from '../../../kernel/adapters/runtime/prompt/cliffy-prompt.ts';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../kernel/adapters/scaffold/template-adapter.ts';
+import {
+  createResourceSliceTemplateRenderer,
+  loadResourceSliceTemplateAssetsSync,
+} from '../../../kernel/adapters/templates/scaffold-template-assets.ts';
 import { PluginRegistryScaffolder } from '../../../kernel/adapters/plugin/registry-scaffolder.ts';
 import { PluginScaffolder } from '../../../kernel/adapters/plugin/scaffolder.ts';
 import { PluginWorkspaceMutator } from '../../../kernel/adapters/plugin/workspace-mutator.ts';
@@ -68,6 +71,14 @@ import { AspireAppHostDoctorInspector } from '../../../kernel/adapters/aspire/ap
 import { fetchJsrExportMap } from '../../infra/jsr/fetch-jsr-export-map.ts';
 import { resolveUiAppRoot as resolveUiAppRootFromWorkspace } from '../../../kernel/application/ui/resolve-ui-app-root.ts';
 import type { UiAppRootResolver } from '../../presentation/support.ts';
+import type { GeneratedSourceFormatterPort } from '../../../kernel/ports/generated-source-formatter-port.ts';
+import { selectClientBinding } from '../../../kernel/application/resource-slice/client-selector.ts';
+import type { SelectedResourceClient } from '../../../kernel/application/resource-slice/resource-slice-contract.ts';
+import type { GenerateResourceCommandDependencies } from '../generate/resource/generate-resource-command.ts';
+import type {
+  ResourceSliceStager,
+  ResourceSliceStageResult,
+} from '../generate/resource/generate-resource.ts';
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
@@ -88,7 +99,9 @@ export interface PublicCommandDependencies {
   /** Versioned runtime override store. */
   readonly runtimeConfigStore: RuntimeConfigStorePort;
   /** Resolve a project root from an optional flag. */
-  readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
+  readonly resolveProjectRoot: (
+    projectRoot?: string,
+  ) => Promise<string | undefined>;
   /** Resolve a UI command to one Fresh application root. */
   readonly resolveUiAppRoot: UiAppRootResolver;
   /** Dependencies for public init. */
@@ -96,7 +109,9 @@ export interface PublicCommandDependencies {
     readonly defaultProjectName: () => string;
     readonly prompt: CliffyPrompt;
     readonly initContext: InitPipelineContext;
-    readonly createInitContext: (options: { readonly dryRun: boolean }) => InitPipelineContext;
+    readonly createInitContext: (
+      options: { readonly dryRun: boolean },
+    ) => InitPipelineContext;
   };
   /** Dependencies for Fresh UI registry installation commands. */
   readonly uiInstallDependencies: {
@@ -123,6 +138,7 @@ export interface PublicCommandDependencies {
     readonly contractScaffolder: ReturnType<typeof createContractScaffolder>;
     readonly serviceScaffolder: ServiceScaffolder;
     readonly clientScaffolder: ServiceClientScaffolder;
+    readonly formatter: GeneratedSourceFormatterPort;
   };
   /** Dependencies for plugin install. */
   readonly pluginInstallDependencies: {
@@ -140,7 +156,9 @@ export interface PublicCommandDependencies {
   };
   /** Dependencies for host-side plugin loading. */
   readonly pluginHostDependencies: {
-    readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
+    readonly resolveProjectRoot: (
+      projectRoot?: string,
+    ) => Promise<string | undefined>;
     readonly generate: GeneratePluginRegistriesCommandDependencies['generate'];
   };
   /** Dependencies for plugin CLI dispatch. */
@@ -150,7 +168,10 @@ export interface PublicCommandDependencies {
   /** Dependencies for host-side plugin removal. */
   readonly pluginRemoveDependencies: RemovePluginDependencies;
   /** Dependencies for host-side plugin diagnostics. */
-  readonly pluginDoctorDependencies: Pick<DoctorPluginCommandDependencies, 'doctor'>;
+  readonly pluginDoctorDependencies: Pick<
+    DoctorPluginCommandDependencies,
+    'doctor'
+  >;
   /** HTTP adapter used by auth session projection and revocation commands. */
   readonly authSessionHttp: AuthSessionHttpPort;
   /** Regenerate Aspire helpers after auth configuration changes. */
@@ -161,18 +182,24 @@ export interface PublicCommandDependencies {
   readonly generateRuntimeSchemasCommandDependencies: GenerateRuntimeSchemasCommandDependencies;
   /** Dependencies for plugin registry generation. */
   readonly generatePluginRegistriesCommandDependencies: GeneratePluginRegistriesCommandDependencies;
+  /** Dependencies for canonical Fresh resource generation. */
+  readonly generateResourceCommandDependencies: GenerateResourceCommandDependencies;
   /** Dependencies for deploy build. */
   readonly deployBuildDependencies: {
     readonly loadConfig: typeof loadDeployConfig;
     readonly buildWindowsDeployment?: typeof buildWindowsDeployment;
   };
   /** Optional Deno Deploy target factory override, used by parser-level tests. */
-  readonly denoDeployTargetFactory?: (defaults: DenoDeployTargetDefaults) => DeployTargetPort;
+  readonly denoDeployTargetFactory?: (
+    defaults: DenoDeployTargetDefaults,
+  ) => DeployTargetPort;
   /** Resolve deployment manifests for install/uninstall. */
   readonly manifestPort: {
     readonly resolve: (
       options: { installDir?: string; deployDir?: string },
-    ) => Promise<{ manifest: ServiceManifest; manifestDir: string; installDir: string }>;
+    ) => Promise<
+      { manifest: ServiceManifest; manifestDir: string; installDir: string }
+    >;
   };
   /** OS service adapter for deployment lifecycle commands (servy/systemd). */
   readonly osServices: OsServicePort;
@@ -190,6 +217,7 @@ export function createPublicCommandDependencies(
 ): PublicCommandDependencies {
   const fs = new DenoFileSystem();
   const process = new DenoProcess();
+  const generatedSourceFormatter = new DenoGeneratedSourceFormatter(process);
   const prompt = new CliffyPrompt();
   const templateAdapter = new StringTemplateAdapter(fs);
   const scaffolder = new Scaffolder(templateAdapter, fs);
@@ -212,6 +240,26 @@ export function createPublicCommandDependencies(
     fs,
     process,
   });
+  const resolveResourceClient = async (
+    appRoot: string,
+    selectedService: string | undefined,
+  ): Promise<SelectedResourceClient> => {
+    const binding = await selectClientBinding(appRoot, fs, selectedService);
+    const source = await fs.readFile(binding.path);
+    const serviceName = source.match(
+      /export const \w+Name\s*=\s*['"]([^'"]+)['"]/i,
+    )?.[1];
+    if (!serviceName) {
+      throw new Error(
+        `Selected query client does not declare a service name: ${binding.path}`,
+      );
+    }
+    return {
+      serviceName,
+      moduleSpecifier: `@app/${relative(appRoot, binding.path).replaceAll('\\', '/')}`,
+      queryFactoryName: binding.queries,
+    };
+  };
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -222,11 +270,25 @@ export function createPublicCommandDependencies(
       scaffolder,
       templateAdapter,
       templateRegistry: new DefaultContractTemplateRegistry(),
-      versionRegistry: new ContractVersionRegistry(fs),
+      versionRegistry: new ContractVersionRegistry(
+        fs,
+        generatedSourceFormatter,
+      ),
       workspaceResolver: new ContractWorkspaceResolver(fs),
+      formatter: generatedSourceFormatter,
     }),
-    serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
-    clientScaffolder: new ServiceClientScaffolder(scaffolder, fs),
+    serviceScaffolder: new ServiceScaffolder(
+      scaffolder,
+      fs,
+      templateAdapter,
+      generatedSourceFormatter,
+    ),
+    clientScaffolder: new ServiceClientScaffolder(
+      scaffolder,
+      fs,
+      generatedSourceFormatter,
+    ),
+    formatter: generatedSourceFormatter,
   };
   const createInitContext = (initFs: FileSystemPort): InitPipelineContext => {
     const initTemplateAdapter = new StringTemplateAdapter(initFs);
@@ -275,7 +337,12 @@ export function createPublicCommandDependencies(
     dbAddDependencies: {
       fs,
       registry: dbRegistry,
-      databaseScaffolder: new DatabaseScaffolder(scaffolder, fs, templateAdapter, dbRegistry),
+      databaseScaffolder: new DatabaseScaffolder(
+        scaffolder,
+        fs,
+        templateAdapter,
+        dbRegistry,
+      ),
       workspaceMutator: databaseWorkspaceMutator,
     },
     serviceAddDependencies,
@@ -314,11 +381,16 @@ export function createPublicCommandDependencies(
           process,
           loadJsrExportMap: fetchJsrExportMap,
           inspectAppHost: new AspireAppHostDoctorInspector(process),
+          inspectRuntimeRegistries: generatePluginRegistries,
         }),
     },
     authSessionHttp: new FetchAuthSessionHttp(),
     authRegenerateAspire: async (projectRoot) => {
-      const result = await generateAspire({ projectRoot }, { fs, scaffolder, templateAdapter });
+      const result = await generateAspire({ projectRoot }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+      });
       await formatGeneratedFiles(
         process,
         projectRoot,
@@ -352,6 +424,21 @@ export function createPublicCommandDependencies(
       fs,
       generate: generatePluginRegistries,
     },
+    generateResourceCommandDependencies: {
+      generateResourceDependencies: {
+        fs,
+        templateRenderer: createResourceSliceTemplateRenderer(
+          templateAdapter,
+          generatedSourceFormatter,
+        ),
+        templates: loadResourceSliceTemplateAssetsSync(),
+        resolveAppRoot: resolveUiAppRoot,
+        resolveClient: resolveResourceClient,
+        resolveProcedure: async ({ appRoot, client, procedure }) =>
+          await resolveResourceProcedure(appRoot, client, procedure, process),
+        stage: createResourceSliceStager(),
+      },
+    },
     deployBuildDependencies: {
       loadConfig: (options) => loadDeployConfig({ ...options, loadNetScriptConfig: loadConfig }),
     },
@@ -360,11 +447,99 @@ export function createPublicCommandDependencies(
         const resolved = await resolveManifest(options);
         return {
           ...resolved,
-          manifest: resolved.manifest as unknown as ServiceManifest, // quality-allow: service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port
+          manifest: resolved.manifest as unknown as ServiceManifest, // quality-allow: #1276 — service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port
         };
       },
     },
     osServices: createOsServicePort(detectServiceOs(), { process }),
     deployTargets: new DeployTargetRegistry(),
   };
+}
+
+function createResourceSliceStager(): ResourceSliceStager {
+  return async (
+    { appRoot, leaves, route },
+  ): Promise<ResourceSliceStageResult> => {
+    const stagingRoot = await Deno.makeTempDir({
+      prefix: 'netscript-resource-stage-',
+    });
+    try {
+      await copy(join(appRoot, 'routes'), join(stagingRoot, 'routes'), {
+        overwrite: false,
+      });
+      for (const leaf of leaves) {
+        const target = join(stagingRoot, leaf.path);
+        await Deno.mkdir(dirname(target), { recursive: true });
+        await Deno.writeTextFile(target, leaf.content);
+      }
+      const { writeFreshRouteManifestSync } = await import(
+        '../../../kernel/adapters/scaffold/fresh-route-manifest.ts'
+      );
+      const derived = writeFreshRouteManifestSync(stagingRoot);
+      const matches = derived.discoveredRoutes.filter((candidate) =>
+        candidate.routePattern === route
+      );
+      if (matches.length !== 1) {
+        throw new Error(
+          `Fresh staging resolved ${matches.length} routes for '${route}'; expected exactly one.`,
+        );
+      }
+      const [routeRoot, ...routeRest] = matches[0].routeKeyPath;
+      if (!routeRoot) {
+        throw new Error(`Fresh staging returned an empty route key for '${route}'.`);
+      }
+      return {
+        routeKeyPath: [routeRoot, ...routeRest],
+        shared: [
+          {
+            path: '.generated/manifest.ts',
+            content: derived.manifestSource,
+            role: 'fresh-derived',
+          },
+          {
+            path: '.generated/routes.ts',
+            content: derived.routesSource,
+            role: 'fresh-derived',
+          },
+        ],
+      };
+    } finally {
+      await Deno.remove(stagingRoot, { recursive: true });
+    }
+  };
+}
+
+async function resolveResourceProcedure(
+  appRoot: string,
+  client: SelectedResourceClient,
+  procedure: string,
+  process: ProcessPort,
+) {
+  const path = procedure.split('.').filter(Boolean);
+  if (
+    path.length === 0 ||
+    path.some((segment) => !/^[A-Za-z_$][\w$]*$/.test(segment)) ||
+    path.join('.') !== procedure
+  ) {
+    throw new Error(`Invalid query procedure '${procedure}'.`);
+  }
+  const moduleUrl = toFileUrl(
+    join(appRoot, client.moduleSpecifier.replace(/^@app\//, '')),
+  ).href;
+  const script = `const module = await import(${JSON.stringify(moduleUrl)});
+let node = module[${JSON.stringify(client.queryFactoryName)}];
+for (const segment of ${JSON.stringify(path)}) node = Reflect.get(node, segment);
+if (typeof node !== 'function' || typeof node.queryOptions !== 'function' || typeof node.clientKey !== 'function') throw new Error('Selected procedure is not a query factory.');
+`;
+  const result = await process.exec(
+    Deno.execPath(),
+    ['eval', `--config=${join(appRoot, 'deno.json')}`, script],
+    { cwd: appRoot, timeoutMs: 30_000 },
+  );
+  if (result.code !== 0) {
+    throw new Error(
+      `Query procedure '${procedure}' does not exist on client '${client.serviceName}'.`,
+    );
+  }
+  return { path: path as [string, ...string[]], kind: 'query' as const };
 }

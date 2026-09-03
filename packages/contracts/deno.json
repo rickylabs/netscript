@@ -1,6 +1,6 @@
 {
   "name": "@netscript/contracts",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "NetScript contract primitives, common schemas, CRUD generators, query helpers, and transform helpers.",
   "license": "Apache-2.0",
   "exports": {
@@ -10,7 +10,7 @@
     "./transform": "./transform.ts"
   },
   "imports": {
-    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
+    "@orpc/contract": "npm:@orpc/contract@^1.15.0",
     "zod": "catalog:"
   },
   "tasks": {

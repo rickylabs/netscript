@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-streams",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "displayName": "Durable Streams",
   "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.6"
+    "@netscript/plugin": "0.0.7"
   },
   "capabilities": {
     "hasDatabaseMigrations": false,
@@ -51,8 +51,6 @@
     "pluginDir": "streams",
     "serviceEntrypoint": "services/src/main.ts",
     "serviceConfigKey": "streams",
-    "servicePort": 4437,
-    "backgroundPort": 4437,
     "requiresDb": false,
     "requiresKv": false,
     "permissions": [

@@ -26,8 +26,9 @@
  *
  * @example Define a generated service entrypoint.
  * ```typescript
- * import { defineService } from '@netscript/service';
- * import { router } from './router.ts';
+ * import { defineService, type ServiceRouter } from '@netscript/service';
+ *
+ * declare const router: ServiceRouter;
  *
  * const service = await defineService(router, {
  *   name: 'users',
@@ -77,14 +78,28 @@ export {
   type HealthStatus,
 } from './src/primitives/health.ts';
 
-export type { AuthnOptions, AuthzOptions } from './src/auth/options.ts';
+export type { AuthnOptions, AuthzOptions, ContractAuthorizerOptions } from './src/auth/options.ts';
+export type {
+  ContractAuthorizerFactory,
+  ContractPolicyAuthorizerPort,
+  ContractPolicyBindingOptions,
+  ContractPolicyContract,
+  ContractPolicyRpcRouteAlias,
+  ProcedureAccessPolicy,
+  ProcedurePolicyRequest,
+  ProcedurePolicyResolution,
+  ProcedurePolicyResolver,
+} from './src/auth/contract-policy.ts';
+export { createContractAuthorizer } from './src/auth/contract-authorizer.ts';
 export type {
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthorizerMatch,
   AuthorizerPort,
   AuthzDecision,
   AuthzRequest,
+  MatchAwareAuthorizerPort,
   Principal,
 } from './src/auth/types.ts';
 
@@ -126,6 +141,7 @@ export type {
   ServiceContext,
   ServiceErrorHandler,
   ServiceHandler,
+  ServiceHandlerContext,
   ServiceHandlerPlugin,
   ServiceMiddleware,
   ServiceNotFoundHandler,

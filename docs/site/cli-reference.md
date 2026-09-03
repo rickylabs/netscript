@@ -119,13 +119,29 @@ so in the final column; a filesystem-only `--dry-run` would not safely model tho
     { name: "Preview first", type: "netscript init my-app --dry-run", desc: "Print every file and directory the scaffold would create, and write nothing." },
     { name: "Fully specified, no prompts", type: "netscript init my-app --db postgres --service --service-name users --yes", desc: "Postgres database support, an example oRPC <code>users</code> service on its assigned port, defaults for the rest. <code>--yes</code> accepts defaults, <code>--ci</code> is non-interactive; both engage automatically when stdin is not a terminal." },
     { name: "Pick a database engine", type: "netscript init my-app --db postgres", desc: "<code>postgres</code> (recommended), <code>mysql</code>, <code>mssql</code>, <code>sqlite</code>, or <code>none</code> — the default is no database unless you pass <code>--db</code>." },
-    { name: "Skip Aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint; start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code>." },
+    { name: "Skip Aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the Aspire footprint; start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code>." },
     { name: "Tune the rest", type: "--cache-backend garnet · --model-name Product · --path ./apps · --editor zed", desc: "Cache backend (<code>redis</code> default, <code>garnet</code>, or app-level <code>deno-kv</code>; <code>--cache=false</code> for none), the Prisma model name for the scaffolded CRUD surface, the target directory, and editor settings." }
   ]
 }) }}
 
 Every `init` flag — including `--app-name`, `--no-git`, `--force`, `--json`, and
 `--from <preset>` — is spelled out in the [command reference](/reference/cli/commands/).
+
+## Aspire orchestration CLI
+
+Run these commands from inside the `aspire/` folder with the Aspire CLI (13.5.3):
+
+{{ comp.apiTable({
+  caption: "Aspire orchestration commands",
+  rows: [
+    { name: "Restore SDK", type: "aspire restore", desc: "Download and restore the AppHost SDK modules (run once per workspace and after SDK bumps)." },
+    { name: "Start resource graph", type: "aspire start", desc: "Boot the database, cache, services, and dashboard. Flags: <code>--isolated</code> (random ports/secrets), <code>--format Json</code> (structured output)." },
+    { name: "List running AppHosts", type: "aspire ps --format Json", desc: "List running AppHost instances, their dashboard URLs (which may carry an auth token), and their log paths as machine-readable JSON." },
+    { name: "Describe resources", type: "aspire describe (alias: aspire resources)", desc: "Show detailed status, health, and endpoints for all registered AppHost resources." },
+    { name: "Stop AppHost", type: "aspire stop [--force]", desc: "Gracefully shut down the AppHost; pass <code>--force</code> to stop the AppHost and clean up persistent resources." },
+    { name: "Search Aspire docs", type: "aspire docs api search <query> --language typescript", desc: "Query the Aspire documentation CLI for TypeScript and AppHost API references." }
+  ]
+}) }}
 
 ## Run & iterate
 

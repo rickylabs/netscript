@@ -1,0 +1,162 @@
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/sdk",
+    "entrypoints": [
+      "./mod.ts",
+      "./src/auto-update/mod.ts",
+      "./src/cache/mod.ts",
+      "./src/client/mod.ts",
+      "./src/collections/mod.ts",
+      "./src/desktop/mod.ts",
+      "./src/discovery/mod.ts",
+      "./src/ports/mod.ts",
+      "./src/query-client/mod.ts",
+      "./src/query/mod.ts",
+      "./src/streams.ts",
+      "./src/telemetry/mod.ts"
+    ],
+    "exitCode": 1
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 3,
+    "totalPrivateTypeRef": 3,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/sdk",
+      "dir": "packages/sdk",
+      "entrypoints": [
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "./src/auto-update/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/cache/mod.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "./src/client/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/collections/mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./src/desktop/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/discovery/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/ports/mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./src/query-client/mod.ts",
+          "privateTypeRef": 11,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 11
+        },
+        {
+          "path": "./src/query/mod.ts",
+          "privateTypeRef": 34,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 34
+        },
+        {
+          "path": "./src/streams.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./src/telemetry/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        }
+      ],
+      "files": [
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-1731/packages/sdk/src/ports/query-client.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-1731/packages/sdk/src/query-client/query-client-factory.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "/home/agent/projects/netscript/worktrees/007-leaf-1731/packages/plugin-streams-core/src/application/create-durable-stream.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        }
+      ],
+      "combinedTotal": 3,
+      "combinedPrivateTypeRef": 3,
+      "combinedMissingJSDoc": 0,
+      "combinedOther": 0,
+      "combinedExitCode": 1,
+      "entrypointExitCodes": {
+        "./mod.ts": 1,
+        "./src/auto-update/mod.ts": 0,
+        "./src/cache/mod.ts": 1,
+        "./src/client/mod.ts": 0,
+        "./src/collections/mod.ts": 1,
+        "./src/desktop/mod.ts": 0,
+        "./src/discovery/mod.ts": 0,
+        "./src/ports/mod.ts": 1,
+        "./src/query-client/mod.ts": 1,
+        "./src/query/mod.ts": 1,
+        "./src/streams.ts": 1,
+        "./src/telemetry/mod.ts": 0
+      }
+    }
+  ]
+}

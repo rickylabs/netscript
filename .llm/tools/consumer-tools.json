@@ -4,6 +4,10 @@
   "supportFiles": ["consumer-tools.json", "README.md", "release.json"],
   "modules": [
     {
+      "source": ".llm/tools/validation/aspire-scan-scope.ts",
+      "path": "validation/aspire-scan-scope.ts"
+    },
+    {
       "source": ".llm/tools/docs/snippet-extractor.ts",
       "path": "docs/snippet-extractor.ts"
     }
@@ -36,8 +40,8 @@
     {
       "source": ".llm/tools/quality/scan-code-quality.ts",
       "path": "quality/scan-code-quality.ts",
-      "symptom": "Architecture review needs a focused code-quality scan",
-      "permissions": ["read"]
+      "symptom": "Architecture review needs a fail-closed scan that verifies allowance owners in rickylabs/netscript",
+      "permissions": ["read", "env", "net"]
     },
     {
       "source": ".llm/tools/deps/outdated.ts",

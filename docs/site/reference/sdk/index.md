@@ -9,17 +9,19 @@ Service discovery, oRPC clients, and cache-backed query factories for NetScript.
 written against the package's public surface reported by `deno doc`. For the full index of
 packages and plugins return to the [reference overview](/reference/).
 
-The root entrypoint (`@netscript/sdk`) is the high-level composition preset for service-aware
-applications: it re-exports the client, query, query-client, discovery, cache, telemetry, and
-OpenAPI surfaces and adds the `defineServices()` preset. A single `defineServices()` call wires the
-whole typed stack — service clients, cache-aware query factories, and query utils — from one service
-map, so a component imports ready-to-use `queryOptions()` / `mutationOptions()` instead of
-hand-writing fetch wrappers. Focused sub-path exports carry the same values for narrow imports - see
+The root entrypoint (`@netscript/sdk`) is the high-level composition entry for service-aware
+applications: it re-exports the client, query, query-client, discovery, telemetry, and OpenAPI
+surfaces and adds the `defineServices()` preset. It does not export the server cache engine or
+install a cache provider at import time. A single `defineServices()` call wires the whole typed
+stack — service clients, cache-aware query factories, and query utils — from one service map, so a
+component imports ready-to-use `queryOptions()` / `mutationOptions()` instead of hand-writing fetch
+wrappers. Focused sub-path exports carry the same values for narrow imports — see
 [Sub-path exports](#sub-path-exports).
 
 ## Composition preset (`defineServices`)
 
-These symbols are available only from the root export.
+These symbols are available from the root export and the focused, browser-safe
+`@netscript/sdk/presets` entry.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -59,6 +61,65 @@ These symbols are available only from the root export.
 | `SafeSuccess` | type alias | Success branch returned by `safe`. |
 | `SafeFailure` | type alias | Failure branch returned by `safe`. |
 
+### Client contributions (`SdkClientContribution`)
+
+`CreateServiceClientOptions.contributions` accepts an explicit literal tuple of request
+contributions. Tuple type inference projects the combined context declared across all
+contributions onto the per-call client `context`.
+
+Every `SdkClientContribution` descriptor contains six required fields:
+
+- `protocol`: Protocol version discriminator (`{ family: 'netscript.sdk-client', major: 1 }`).
+- `id`: Globally unique contribution identifier (`${string}:${string}`).
+- `context`: Runtime declaration mapping owned context keys to `'required'` or `'optional'`.
+- `headerKeys`: Readonly array of exclusive lower-case HTTP request-header names owned by this
+  contribution.
+- `responseCache`: Response-cache policy declaration (`{ mode: 'invariant' }`,
+  `{ mode: 'partitioned', partition: ... }`, or `{ mode: 'direct-only' }`).
+- `prepare`: Synchronous or async hook returning a header patch (`{ headers?: Record<string, string> }`)
+  for one logical request epoch.
+
+```ts
+import { oc } from '@orpc/contract';
+import {
+  createServiceClient,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
+import { z } from 'zod';
+
+const contract = {
+  echo: oc
+    .route({ method: 'POST', path: '/echo' })
+    .input(z.object({ message: z.string() }))
+    .output(z.object({ echoed: z.string() })),
+};
+
+const tenantHeader = defineSdkClientContribution<{ tenantId: string }>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:tenant-header',
+  context: { tenantId: 'required' },
+  headerKeys: ['x-tenant-id'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.tenantId,
+  },
+  prepare: ({ context }) => ({
+    headers: { 'x-tenant-id': context.tenantId },
+  }),
+});
+
+const client = createServiceClient({
+  contract,
+  serviceName: 'tenant-service',
+  contributions: [tenantHeader] as const,
+});
+
+await client.echo(
+  { message: 'hello' },
+  { context: { tenantId: 'tenant_123' } },
+);
+```
+
 ## Server-side query factories (`@netscript/sdk/query`)
 
 | Symbol | Kind | Signature / Description |
@@ -78,7 +139,9 @@ These symbols are available only from the root export.
 
 ## Cache engine (`@netscript/sdk/cache`)
 
-Server-side only. Importing this subpath auto-registers the shared KV-backed cache provider.
+Server-side only. Importing this subpath is inert. Custom server bootstraps must call
+`setCacheProvider(cacheQuery)` explicitly; `defineFreshApp()` does this for NetScript-managed Fresh
+apps.
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
@@ -253,21 +316,22 @@ Available from the root export.
 
 ## Sub-path exports
 
-The following entrypoints are published alongside the root export. Each carries the same values
-exposed by the root for narrow imports.
+The following entrypoints are published alongside the root export. Focused entries keep
+environment-specific adapters and dependencies out of consumers that do not need them.
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
-| `@netscript/sdk` | `./mod.ts` | High-level composition preset (`defineServices`) plus all surfaces below. |
+| `@netscript/sdk` | `./mod.ts` | Side-effect-free high-level composition entry (`defineServices`) plus common non-cache surfaces. |
 | `@netscript/sdk/auto-update` | `./src/auto-update/mod.ts` | Auto-update client-side primitives. |
 | `@netscript/sdk/desktop` | `./src/desktop/mod.ts` | Native desktop capability helpers and bindings. |
+| `@netscript/sdk/cache` | `./src/cache/mod.ts` | Server-side KV-backed cache engine and explicit provider-registration seam. |
 | `@netscript/sdk/client` | `./src/client/mod.ts` | `createServiceClient` and the contract algebra. |
-| `@netscript/sdk/query` | `./src/query/mod.ts` | Server-side cache-aware query factories. |
-| `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | TanStack Query integration for browser/island code. |
-| `@netscript/sdk/cache` | `./src/cache/mod.ts` | Server-side KV-backed cache engine (auto-registers the provider). |
 | `@netscript/sdk/collections` | `./src/collections/mod.ts` | TanStack DB collection backed by TanStack Query. |
 | `@netscript/sdk/discovery` | `./src/discovery/mod.ts` | Aspire service URL and database/KV connection discovery. |
 | `@netscript/sdk/ports` | `./src/ports/mod.ts` | Package-owned structural ports (upstream-type-free). |
+| `@netscript/sdk/presets` | `./src/presets/mod.ts` | Browser-safe `defineServices` preset and its package-owned type closure. |
+| `@netscript/sdk/query` | `./src/query/mod.ts` | Server-side cache-aware query factories. |
+| `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | TanStack Query integration for browser/island code. |
 | `@netscript/sdk/streams` | `./src/streams.ts` | Durable stream producers and schema helpers. |
 | `@netscript/sdk/telemetry` | `./src/telemetry/mod.ts` | OpenTelemetry middleware for oRPC. |
 

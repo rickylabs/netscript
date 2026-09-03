@@ -2,8 +2,152 @@ import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 
 const root = new URL('../../../', import.meta.url);
 
+type YamlScalar = boolean | null | string;
+
+interface ParsedYamlDocument {
+  mappings: Set<string>;
+  scalars: Map<string, YamlScalar>;
+}
+
+interface ConcurrencyBlock {
+  workflow: string;
+  scope: string;
+  group: string;
+  classification: string;
+  cancelInProgress: boolean;
+  queue?: string;
+}
+
+/** Parses the mapping/scalar subset used by GitHub workflow concurrency declarations. */
+function parseWorkflowYaml(source: string, label: string): ParsedYamlDocument {
+  const mappings = new Set<string>();
+  const scalars = new Map<string, YamlScalar>();
+  const parents: Array<{ indent: number; key: string }> = [];
+  let blockScalarIndent: number | undefined;
+
+  for (const [index, raw] of source.split('\n').entries()) {
+    if (raw.includes('\t')) {
+      throw new Error(`${label}:${index + 1}: tabs are not valid indentation`);
+    }
+    const text = raw.trim();
+    if (text === '' || text.startsWith('#')) continue;
+    const indent = raw.length - raw.trimStart().length;
+
+    if (blockScalarIndent !== undefined) {
+      if (indent > blockScalarIndent) continue;
+      blockScalarIndent = undefined;
+    }
+
+    const entry = text.match(/^([A-Za-z0-9_-]+):(?:\s*(.*))?$/);
+    if (!entry) continue;
+    while (parents.at(-1)?.indent !== undefined && parents.at(-1)!.indent >= indent) {
+      parents.pop();
+    }
+
+    const key = entry[1];
+    const rawValue = entry[2] ?? '';
+    const path = [...parents.map((parent) => parent.key), key].join('.');
+    if (rawValue === '') {
+      mappings.add(path);
+      parents.push({ indent, key });
+      continue;
+    }
+    if (/^[>|][+-]?$/.test(rawValue)) {
+      blockScalarIndent = indent;
+      continue;
+    }
+
+    let value: YamlScalar = rawValue;
+    if (rawValue === 'true') value = true;
+    else if (rawValue === 'false') value = false;
+    else if (rawValue === 'null' || rawValue === '~') value = null;
+    else if (
+      (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+      (rawValue.startsWith("'") && rawValue.endsWith("'"))
+    ) value = rawValue.slice(1, -1);
+    scalars.set(path, value);
+  }
+
+  return { mappings, scalars };
+}
+
+function classifyConcurrencyGroup(group: string): string {
+  if (group === "pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}") {
+    return 'ref-templated / repo-wide literal';
+  }
+  if (
+    group === 'e2e-scaffold-runtime-global-v2' ||
+    group === 'e2e-scaffold-runtime-sqlite-global-v2'
+  ) {
+    return 'repo-wide literal';
+  }
+  if (group.startsWith('openhands-${{') && group.includes('github.ref')) {
+    return 'entity-keyed / ref fallback';
+  }
+  if (
+    group.includes('inputs.republish-version') ||
+    group.includes('github.event.pull_request.number')
+  ) {
+    return 'entity-keyed';
+  }
+  if (group.includes('github.ref')) return 'ref-templated';
+  throw new Error(`unclassified concurrency group: ${group}`);
+}
+
+function readConcurrencyBlocks(
+  workflow: string,
+  document: ParsedYamlDocument,
+): ConcurrencyBlock[] {
+  const scalarConcurrency = [...document.scalars.keys()].filter((path) =>
+    path === 'concurrency' || path.endsWith('.concurrency')
+  );
+  assertEquals(
+    scalarConcurrency,
+    [],
+    `${workflow}: scalar concurrency declarations must be added to the parsed contract`,
+  );
+
+  return [...document.mappings]
+    .filter((path) => path === 'concurrency' || path.endsWith('.concurrency'))
+    .map((path) => {
+      const group = document.scalars.get(`${path}.group`);
+      const cancelInProgress = document.scalars.get(`${path}.cancel-in-progress`);
+      const queue = document.scalars.get(`${path}.queue`);
+      assert(typeof group === 'string', `${workflow}:${path} must declare a scalar group`);
+      assert(
+        typeof cancelInProgress === 'boolean',
+        `${workflow}:${path} must declare boolean cancel-in-progress`,
+      );
+      assert(
+        queue === undefined || typeof queue === 'string',
+        `${workflow}:${path} queue must be a scalar string`,
+      );
+      const block: ConcurrencyBlock = {
+        workflow,
+        scope: path === 'concurrency' ? 'workflow' : path.slice(0, -'.concurrency'.length),
+        group,
+        classification: classifyConcurrencyGroup(group),
+        cancelInProgress,
+      };
+      if (queue !== undefined) block.queue = queue;
+      return block;
+    });
+}
+
 Deno.test('canary workflow reuses the publisher and records only an awaited green pair', async () => {
   const source = await Deno.readTextFile(new URL('.github/workflows/release-canary.yml', root));
+  const concurrency = readConcurrencyBlocks(
+    'release-canary.yml',
+    parseWorkflowYaml(source, 'release-canary.yml'),
+  );
+  assertEquals(concurrency, [{
+    workflow: 'release-canary.yml',
+    scope: 'workflow',
+    group: 'release-canary-${{ inputs.republish-version || inputs.target-version }}',
+    classification: 'entity-keyed',
+    cancelInProgress: false,
+    queue: 'max',
+  }]);
   const ordered = [
     'check-jsr-publish-budget.ts',
     'deno task release:canary -- "$TARGET_VERSION"',
@@ -78,6 +222,127 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   );
   assertEquals(source.includes('make_latest'), false);
   assertEquals(source.includes('gh release'), false);
+});
+
+Deno.test('all workflow concurrency mappings are classified and repo-wide literals are bounded', async () => {
+  const workflowDirectory = new URL('.github/workflows/', root);
+  const workflowNames: string[] = [];
+  for await (const entry of Deno.readDir(workflowDirectory)) {
+    if (entry.isFile && entry.name.endsWith('.yml')) workflowNames.push(entry.name);
+  }
+  workflowNames.sort();
+  assertEquals(workflowNames, [
+    'ci.yml',
+    'code-quality.yml',
+    'e2e-cli-prod-local.yml',
+    'e2e-cli-prod.yml',
+    'e2e-cli.yml',
+    'fresh-ui-quality.yml',
+    'jsr-settings.yml',
+    'openhands-agent.yml',
+    'openhands-phase-eval.yml',
+    'pages.yml',
+    'publish.yml',
+    'release-canary.yml',
+    'surface-diff.yml',
+  ]);
+
+  const blocks: ConcurrencyBlock[] = [];
+  for (const workflow of workflowNames) {
+    const source = await Deno.readTextFile(new URL(workflow, workflowDirectory));
+    blocks.push(...readConcurrencyBlocks(workflow, parseWorkflowYaml(source, workflow)));
+  }
+  blocks.sort((left, right) =>
+    `${left.workflow}:${left.scope}`.localeCompare(`${right.workflow}:${right.scope}`)
+  );
+
+  assertEquals(blocks, [
+    {
+      workflow: 'ci.yml',
+      scope: 'workflow',
+      group: 'ci-${{ github.workflow }}-${{ github.ref }}',
+      classification: 'ref-templated',
+      cancelInProgress: true,
+    },
+    {
+      workflow: 'e2e-cli-prod-local.yml',
+      scope: 'workflow',
+      group: 'e2e-cli-prod-local-${{ github.workflow }}-${{ github.ref }}',
+      classification: 'ref-templated',
+      cancelInProgress: false,
+    },
+    {
+      workflow: 'e2e-cli-prod.yml',
+      scope: 'workflow',
+      group: 'e2e-cli-prod-${{ github.workflow }}-${{ github.ref }}',
+      classification: 'ref-templated',
+      cancelInProgress: false,
+    },
+    {
+      workflow: 'e2e-cli.yml',
+      scope: 'jobs.scaffold-runtime',
+      group: 'e2e-scaffold-runtime-global-v2',
+      classification: 'repo-wide literal',
+      cancelInProgress: false,
+      queue: 'max',
+    },
+    {
+      workflow: 'e2e-cli.yml',
+      scope: 'jobs.scaffold-runtime-sqlite',
+      group: 'e2e-scaffold-runtime-sqlite-global-v2',
+      classification: 'repo-wide literal',
+      cancelInProgress: false,
+      queue: 'max',
+    },
+    {
+      workflow: 'e2e-cli.yml',
+      scope: 'workflow',
+      group: 'e2e-cli-${{ github.workflow }}-${{ github.ref }}',
+      classification: 'ref-templated',
+      cancelInProgress: true,
+    },
+    {
+      workflow: 'openhands-agent.yml',
+      scope: 'workflow',
+      group:
+        'openhands-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number || github.ref }}',
+      classification: 'entity-keyed / ref fallback',
+      cancelInProgress: false,
+    },
+    {
+      workflow: 'openhands-phase-eval.yml',
+      scope: 'workflow',
+      group: 'openhands-phase-eval-${{ github.event.pull_request.number }}',
+      classification: 'entity-keyed',
+      cancelInProgress: false,
+    },
+    {
+      workflow: 'pages.yml',
+      scope: 'workflow',
+      group: "pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}",
+      classification: 'ref-templated / repo-wide literal',
+      cancelInProgress: false,
+      queue: 'max',
+    },
+    {
+      workflow: 'release-canary.yml',
+      scope: 'workflow',
+      group: 'release-canary-${{ inputs.republish-version || inputs.target-version }}',
+      classification: 'entity-keyed',
+      cancelInProgress: false,
+      queue: 'max',
+    },
+  ]);
+
+  for (const block of blocks) {
+    if (block.classification.includes('repo-wide literal')) {
+      assertEquals(
+        block.queue,
+        'max',
+        `${block.workflow}:${block.scope} leaves a repo-wide literal group unbounded`,
+      );
+    }
+  }
 });
 
 Deno.test('stable publisher uses composed readiness before provisioning and real publish', async () => {
@@ -219,4 +484,49 @@ Deno.test('production E2E waits for JSR propagation for explicit canary dispatch
   );
   assertStringIncludes(waitStep, 'sleep 120');
   assertEquals(waitStep.includes('if:'), false);
+});
+
+Deno.test('production README E2E uploads both durable cleanup receipts', async () => {
+  const source = await Deno.readTextFile(new URL('.github/workflows/e2e-cli-prod.yml', root));
+  assertStringIncludes(
+    source,
+    '.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json',
+  );
+  assertStringIncludes(
+    source,
+    '.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json',
+  );
+});
+
+Deno.test('production README starts with fresh application state and permits image caches', async () => {
+  const source = await Deno.readTextFile(new URL('.github/workflows/e2e-cli-prod.yml', root));
+  const readme = source.indexOf('- name: Root README Quickstart E2E');
+  assert(readme > 0);
+  const before = source.slice(0, readme);
+  assertStringIncludes(before, 'path: ~/.nuget/packages');
+  assertStringIncludes(before, 'key: nuget-aspire-${{ runner.os }}-13.5.3-v1');
+  assertEquals(
+    before.includes('path: ~/.aspire'),
+    false,
+    'generated AppHost state must stay fresh',
+  );
+  assertEquals(
+    before.includes('deno task e2e:cli run'),
+    false,
+    'no runtime suite may warm the runner',
+  );
+  assertEquals(before.includes('- name: Install published CLI from JSR'), false);
+  assertEquals(before.includes('- name: Public init smoke from JSR CLI'), false);
+  assertStringIncludes(before, '- name: Verify cold README baseline');
+  assertStringIncludes(before, '[.appHosts, .containers, .volumes, .networks] | all(. == 0)');
+  assertEquals(
+    before.includes("jq -e 'all(.[]; . == 0)'"),
+    false,
+    'cached images must not gate readiness',
+  );
+  for (const field of ['appHosts', 'containers', 'images', 'volumes', 'networks']) {
+    assertStringIncludes(before, `--argjson ${field} `);
+  }
+  const upload = source.slice(source.indexOf('- name: Upload production E2E artifacts'));
+  assertStringIncludes(upload, '.llm/tmp/readme-cold-baseline.json');
 });

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-read",
+    "--allow-env",
+    ".llm/tools/agentic/lib/agentic-lib_test.ts",
+    ".llm/tools/agentic/openhands/phase-eval-workflow_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+  "exitCode": 1,
+  "durationMs": 999,
+  "summary": {
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 0,
+    "uniqueFailures": 0
+  },
+  "failures": [],
+  "processFailure": {
+    "reason": "deno test exited non-zero without a parseable TAP test failure",
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": "",
+      "truncated": false
+    },
+    "stderr": {
+      "bytes": 1177,
+      "sha256": "d0cb2273630d536ea9ffb19fe79ed1c2eb4dcbd35ca1dee6d4d6cad408021877",
+      "tail": "TS2724 [ERROR]: '\"file:///home/codex/repos/netscript-007-harness-evidence/.llm/tools/agentic/lib/agentic-lib.ts\"' has no exported member named 'extractVerdictResult'. Did you mean 'extractVerdict'?\n  extractVerdictResult,\n  ~~~~~~~~~~~~~~~~~~~~\n    at file:///home/codex/repos/netscript-007-harness-evidence/.llm/tools/agentic/lib/agentic-lib_test.ts:25:3\n\n    'extractVerdict' is declared here.\n    export function extractVerdict(comments: VerdictSourceComment[]): ExtractedVerdict | null {\n                    ~~~~~~~~~~~~~~\n        at file:///home/codex/repos/netscript-007-harness-evidence/.llm/tools/agentic/lib/agentic-lib.ts:967:17\n\nTS2305 [ERROR]: Module '\"file:///home/codex/repos/netscript-007-harness-evidence/.llm/tools/agentic/lib/agentic-lib.ts\"' has no exported member 'inspectMachineVerdict'.\n  inspectMachineVerdict,\n  ~~~~~~~~~~~~~~~~~~~~~\n    at file:///home/codex/repos/netscript-007-harness-evidence/.llm/tools/agentic/lib/agentic-lib_test.ts:30:3\n\nFound 2 errors.\n\nerror: Type checking failed.\n\n  \u001b[33minfo:\u001b[39m The program failed type-checking, but it still might work correctly.\n  \u001b[36mhint:\u001b[39m Re-run with \u001b[4m--no-check\u001b[24m to skip type-checking.\n",
+      "truncated": false
+    }
+  }
+}

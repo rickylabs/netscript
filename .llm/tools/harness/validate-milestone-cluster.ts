@@ -31,6 +31,24 @@ const LEAF_PHASES = [
   'closed',
 ] as const;
 const TERMINAL_LEAF_PHASES = new Set(['merged', 'moved', 'closed']);
+const REPORT_LANE_STATES = ['active', 'queued', 'blocked', 'stalled', 'complete'] as const;
+const CANARY_REPORT_STATES = [
+  'not-planned',
+  'planned',
+  'qualifying',
+  'blocked',
+  'ready',
+  'publishing',
+  'complete',
+] as const;
+const REPORT_CONFIDENCE = ['low', 'medium', 'high'] as const;
+const BLOCKER_CATEGORIES = [
+  'product',
+  'test-harness',
+  'infrastructure',
+  'lifecycle-metadata',
+  'evaluator-transport',
+] as const;
 
 type JsonRecord = Record<string, unknown>;
 
@@ -45,6 +63,36 @@ export interface MilestoneClusterArtifacts {
 export interface ValidationResult {
   readonly ok: boolean;
   readonly errors: readonly string[];
+  readonly findings: readonly ReconciliationFinding[];
+}
+
+export type TopicLane = (typeof TOPIC_LANES)[number];
+export type LiveMilestonePrState = 'open' | 'merged' | 'closed';
+export type LiveMilestonePrRole = 'leaf' | 'coordinator-artifact';
+
+export interface LiveMilestonePr {
+  readonly number: number;
+  readonly issueNumbers: readonly number[];
+  readonly lane: TopicLane | null;
+  readonly baseBranch: string;
+  readonly headSha: string;
+  readonly state: LiveMilestonePrState;
+  readonly role: LiveMilestonePrRole;
+}
+
+export interface MilestonePrSource {
+  listOpenMilestonePrs(repo: string, milestone: string): Promise<readonly LiveMilestonePr[]>;
+  readPrHead(repo: string, prNumber: number): Promise<LiveMilestonePr>;
+}
+
+export interface ReconciliationFinding {
+  readonly kind: 'stale-head' | 'missing-leaf' | 'source-unavailable';
+  readonly issueNumber: number | null;
+  readonly prNumber: number | null;
+  readonly lane: TopicLane | null;
+  readonly recordedHead: string | null;
+  readonly liveHead: string | null;
+  readonly detail?: string;
 }
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -79,6 +127,24 @@ function issueNumber(value: unknown): value is number {
   return Number.isInteger(value) && (value as number) > 0;
 }
 
+function nonNegativeInteger(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 0;
+}
+
+function knownResourceCountOrUnknown(value: unknown): value is number | null {
+  return value === null || nonNegativeInteger(value);
+}
+
+function timestamp(value: unknown): number | null {
+  if (!nonEmpty(value)) return null;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function topicLane(value: unknown): value is TopicLane {
+  return oneOf(value, TOPIC_LANES);
+}
+
 function duplicateValues<T>(values: readonly T[]): T[] {
   const seen = new Set<T>();
   const duplicates = new Set<T>();
@@ -87,6 +153,197 @@ function duplicateValues<T>(values: readonly T[]): T[] {
     seen.add(value);
   }
   return [...duplicates];
+}
+
+function validateReporting(
+  errors: string[],
+  state: JsonRecord,
+  lanes: JsonRecord[],
+): void {
+  const reporting = isRecord(state.reporting) ? state.reporting : null;
+  if (!reporting) {
+    errors.push('state.reporting is required for schemaVersion 2');
+    return;
+  }
+
+  const cadence = reporting.cadenceMinutes;
+  if (!Number.isInteger(cadence) || (cadence as number) < 15 || (cadence as number) > 60) {
+    errors.push('state.reporting.cadenceMinutes must be an integer from 15 through 60');
+  }
+  const lastReportAt = timestamp(reporting.lastReportAt);
+  const nextReportDueAt = timestamp(reporting.nextReportDueAt);
+  const updatedAt = timestamp(state.updatedAt);
+  if (lastReportAt === null) errors.push('state.reporting.lastReportAt must be an ISO timestamp');
+  if (nextReportDueAt === null) {
+    errors.push('state.reporting.nextReportDueAt must be an ISO timestamp');
+  }
+  if (updatedAt === null) errors.push('state.updatedAt must be an ISO timestamp');
+  if (
+    lastReportAt !== null && nextReportDueAt !== null && Number.isInteger(cadence) &&
+    (nextReportDueAt <= lastReportAt ||
+      nextReportDueAt - lastReportAt > (cadence as number) * 60_000)
+  ) {
+    errors.push('state.reporting.nextReportDueAt must be after the report and within cadence');
+  }
+  if (
+    lastReportAt !== null && updatedAt !== null && Number.isInteger(cadence) &&
+    (lastReportAt > updatedAt || updatedAt - lastReportAt > (cadence as number) * 60_000)
+  ) {
+    errors.push('state.reporting is stale relative to state.updatedAt');
+  }
+  if (!nonEmpty(reporting.lastReportRef)) {
+    errors.push('state.reporting.lastReportRef is required');
+  }
+  if (!nonEmpty(reporting.headline)) errors.push('state.reporting.headline is required');
+  if (reporting.currentMainSha !== state.currentMainSha) {
+    errors.push('state.reporting.currentMainSha must equal state.currentMainSha');
+  }
+
+  const canary = isRecord(reporting.canary) ? reporting.canary : {};
+  const eta = isRecord(canary.eta) ? canary.eta : {};
+  const criticalPath = records(canary.criticalPath);
+  if (!nonEmpty(canary.target)) errors.push('state.reporting.canary.target is required');
+  if (!oneOf(canary.state, CANARY_REPORT_STATES)) {
+    errors.push('state.reporting.canary.state is invalid');
+  }
+  if (!nonEmpty(eta.window) || !oneOf(eta.confidence, REPORT_CONFIDENCE) || !nonEmpty(eta.basis)) {
+    errors.push('state.reporting.canary.eta needs window, confidence, and basis');
+  }
+  if (canary.state !== 'not-planned' && canary.state !== 'complete' && criticalPath.length === 0) {
+    errors.push('an active canary report needs a non-empty critical path');
+  }
+  for (const item of criticalPath) {
+    if (
+      !nonEmpty(item.id) || !nonEmpty(item.state) || !nonEmpty(item.impact) ||
+      !nonEmpty(item.nextAction)
+    ) {
+      errors.push('every canary critical-path item needs id, state, impact, and nextAction');
+    }
+  }
+
+  const progress = isRecord(reporting.progress) ? reporting.progress : {};
+  for (const key of ['mergedPullRequests', 'closedIssues', 'newIssues']) {
+    if (!Array.isArray(progress[key]) || integers(progress[key]).length !== progress[key].length) {
+      errors.push(`state.reporting.progress.${key} must contain positive issue/PR numbers only`);
+    }
+  }
+  if (!nonEmpty(progress.queueDeltaExplanation)) {
+    errors.push('state.reporting.progress.queueDeltaExplanation is required');
+  }
+
+  const scope = isRecord(reporting.scope) ? reporting.scope : {};
+  for (
+    const key of [
+      'openIssueCount',
+      'ownedIssueCount',
+      'scheduledIssueCount',
+      'openPullRequestCount',
+    ]
+  ) {
+    if (!nonNegativeInteger(scope[key])) {
+      errors.push(`state.reporting.scope.${key} must be a non-negative integer`);
+    }
+  }
+  const unscheduled = integers(scope.unscheduledIssueNumbers);
+  if (
+    !Array.isArray(scope.unscheduledIssueNumbers) ||
+    unscheduled.length !== scope.unscheduledIssueNumbers.length
+  ) {
+    errors.push('state.reporting.scope.unscheduledIssueNumbers must contain issue numbers only');
+  }
+  if (unscheduled.length > 0) {
+    errors.push('state.reporting.scope has unscheduled milestone issues');
+  }
+  if (
+    nonNegativeInteger(scope.openIssueCount) && nonNegativeInteger(scope.ownedIssueCount) &&
+    nonNegativeInteger(scope.scheduledIssueCount) &&
+    (scope.openIssueCount !== scope.ownedIssueCount ||
+      scope.openIssueCount !== scope.scheduledIssueCount)
+  ) {
+    errors.push('state.reporting.scope open, owned, and scheduled issue counts must agree');
+  }
+
+  const mergeQueue = records(reporting.mergeQueue);
+  if (!Array.isArray(reporting.mergeQueue) || mergeQueue.length !== reporting.mergeQueue.length) {
+    errors.push('state.reporting.mergeQueue must contain objects only');
+  }
+  for (const candidate of mergeQueue) {
+    if (
+      !issueNumber(candidate.prNumber) || !topicLane(candidate.lane) ||
+      !nonEmpty(candidate.state) ||
+      !nonEmpty(candidate.nextGate) || !nonEmpty(candidate.nextAction)
+    ) {
+      errors.push('every merge-queue row needs PR, lane, state, nextGate, and nextAction');
+    }
+  }
+
+  const matrix = records(reporting.orchestratorMatrix);
+  const matrixLanes = matrix.map((row) => row.lane).filter(topicLane);
+  if (
+    !Array.isArray(reporting.orchestratorMatrix) || matrix.length !== TOPIC_LANES.length ||
+    TOPIC_LANES.some((lane) => matrixLanes.filter((candidate) => candidate === lane).length !== 1)
+  ) {
+    errors.push('state.reporting.orchestratorMatrix must cover every topic lane exactly once');
+  }
+  for (const row of matrix) {
+    if (
+      !topicLane(row.lane) || !oneOf(row.state, REPORT_LANE_STATES) ||
+      !Array.isArray(row.activeItems) || timestamp(row.lastConcreteProgressAt) === null ||
+      !(row.blocker === null || nonEmpty(row.blocker)) || !nonEmpty(row.nextAction)
+    ) {
+      errors.push(
+        `orchestrator report row ${
+          String(row.lane ?? '?')
+        } needs state, activeItems, progress, blocker, and nextAction`,
+      );
+    }
+  }
+  const stateLaneIds = lanes.map((lane) => lane.id).filter(topicLane).sort();
+  if (JSON.stringify([...matrixLanes].sort()) !== JSON.stringify(stateLaneIds)) {
+    errors.push('state.reporting.orchestratorMatrix disagrees with cluster lanes');
+  }
+
+  const blockers = records(reporting.blockers);
+  if (!Array.isArray(reporting.blockers) || blockers.length !== reporting.blockers.length) {
+    errors.push('state.reporting.blockers must contain objects only');
+  }
+  for (const blocker of blockers) {
+    if (
+      !nonEmpty(blocker.id) || !oneOf(blocker.category, BLOCKER_CATEGORIES) ||
+      !nonEmpty(blocker.summary) || !nonEmpty(blocker.impact) || !nonEmpty(blocker.owner) ||
+      !nonEmpty(blocker.nextAction) || typeof blocker.ownerDecisionRequired !== 'boolean'
+    ) {
+      errors.push('every blocker needs a class, plain-English impact, owner, and next action');
+    }
+  }
+
+  const environment = isRecord(reporting.environment) ? reporting.environment : {};
+  if (
+    timestamp(environment.checkedAt) === null ||
+    !knownResourceCountOrUnknown(environment.aspireApplications) ||
+    !knownResourceCountOrUnknown(environment.dockerContainers) ||
+    !knownResourceCountOrUnknown(environment.dockerCustomNetworks)
+  ) {
+    errors.push(
+      'state.reporting.environment needs a timestamp and non-negative owned-resource counts or null when unknown',
+    );
+  }
+
+  const ownerDecisions = records(reporting.ownerDecisions);
+  if (
+    !Array.isArray(reporting.ownerDecisions) ||
+    ownerDecisions.length !== reporting.ownerDecisions.length
+  ) {
+    errors.push('state.reporting.ownerDecisions must contain objects only');
+  }
+  for (const decision of ownerDecisions) {
+    if (
+      !nonEmpty(decision.id) || !nonEmpty(decision.question) ||
+      !nonEmpty(decision.whyOwnerOnly) || !Array.isArray(decision.blockedItems)
+    ) {
+      errors.push('every owner decision needs id, question, whyOwnerOnly, and blockedItems');
+    }
+  }
 }
 
 function stringArray(value: unknown): string[] | null {
@@ -372,7 +629,9 @@ function validateState(
   state: JsonRecord,
   activeIssues: JsonRecord[],
 ): void {
-  if (state.schemaVersion !== 1) errors.push('state.schemaVersion must be 1');
+  if (state.schemaVersion !== 1 && state.schemaVersion !== 2) {
+    errors.push('state.schemaVersion must be 1 or 2');
+  }
   const coordinator = isRecord(state.coordinator) ? state.coordinator : {};
   if (!nonEmpty(coordinator.agentId)) errors.push('state.coordinator.agentId is required');
   if (!nonEmpty(state.currentMainSha)) errors.push('state.currentMainSha is required');
@@ -426,6 +685,8 @@ function validateState(
     }
   }
 
+  if (state.schemaVersion === 2) validateReporting(errors, state, lanes);
+
   for (const watcher of records(state.watchers)) {
     if (!nonEmpty(watcher.agentId) || watcher.mutationAuthority !== false) {
       errors.push('watchers need an identity and mutationAuthority:false');
@@ -452,6 +713,7 @@ function validateState(
     if (!oneOf(leaf.lane, TOPIC_LANES)) errors.push(`leaf ${id} has an invalid lane`);
     if (!oneOf(leaf.phase, LEAF_PHASES)) errors.push(`leaf ${id} has an invalid phase`);
     if (leaf.baseBranch !== 'main') errors.push(`leaf ${id} must target main directly`);
+    if (!issueNumber(leaf.prNumber)) errors.push(`leaf ${id} needs a positive prNumber`);
     if (!nonEmpty(leaf.headSha)) errors.push(`leaf ${id} needs an immutable headSha`);
     if (
       nonEmpty(leaf.implementerAgentId) && nonEmpty(leaf.evaluatorAgentId) &&
@@ -581,15 +843,189 @@ function validateState(
   }
 }
 
+function unavailableMilestonePrSource(detail: string): MilestonePrSource {
+  const unavailable = () => Promise.reject<never>(new Error(detail));
+  return {
+    listOpenMilestonePrs: unavailable,
+    readPrHead: unavailable,
+  };
+}
+
+/** Build the read-only reconciliation port from a freshly captured PR export. */
+export function milestonePrSourceFromExport(value: unknown): MilestonePrSource {
+  if (!isRecord(value) || value.schemaVersion !== 1) {
+    throw new Error('GitHub PR export must be an object with schemaVersion 1');
+  }
+  if (!nonEmpty(value.repo) || !nonEmpty(value.milestone) || !nonEmpty(value.capturedAt)) {
+    throw new Error('GitHub PR export requires repo, milestone, and capturedAt');
+  }
+  const entries = records(value.pullRequests);
+  if (!Array.isArray(value.pullRequests) || entries.length !== value.pullRequests.length) {
+    throw new Error('GitHub PR export pullRequests must contain objects only');
+  }
+  const pullRequests: LiveMilestonePr[] = [];
+  for (const entry of entries) {
+    const issueNumbers = integers(entry.issueNumbers);
+    if (
+      !issueNumber(entry.number) ||
+      !Array.isArray(entry.issueNumbers) || issueNumbers.length !== entry.issueNumbers.length ||
+      !(entry.lane === null || topicLane(entry.lane)) ||
+      !nonEmpty(entry.baseBranch) || !nonEmpty(entry.headSha) ||
+      !oneOf(entry.state, ['open', 'merged', 'closed'] as const) ||
+      !oneOf(entry.role, ['leaf', 'coordinator-artifact'] as const)
+    ) {
+      throw new Error(`GitHub PR export entry #${String(entry.number ?? '?')} is malformed`);
+    }
+    pullRequests.push({
+      number: entry.number,
+      issueNumbers,
+      lane: entry.lane,
+      baseBranch: entry.baseBranch,
+      headSha: entry.headSha,
+      state: entry.state,
+      role: entry.role,
+    });
+  }
+  for (const duplicate of duplicateValues(pullRequests.map((pullRequest) => pullRequest.number))) {
+    throw new Error(`GitHub PR export PR #${duplicate} is duplicated`);
+  }
+
+  const exportRepo = value.repo;
+  const exportMilestone = value.milestone;
+  function requireIdentity(repo: string, milestone?: string): void {
+    if (repo !== exportRepo || (milestone !== undefined && milestone !== exportMilestone)) {
+      throw new Error(
+        `GitHub PR export identity ${exportRepo}/${exportMilestone} does not match ${repo}/${milestone}`,
+      );
+    }
+  }
+  return {
+    listOpenMilestonePrs: (repo, milestone) => {
+      requireIdentity(repo, milestone);
+      return Promise.resolve(
+        pullRequests.filter((pullRequest) => pullRequest.state === 'open'),
+      );
+    },
+    readPrHead: (repo, prNumber) => {
+      requireIdentity(repo);
+      const pullRequest = pullRequests.find((candidate) => candidate.number === prNumber);
+      return pullRequest
+        ? Promise.resolve(pullRequest)
+        : Promise.reject(new Error(`GitHub PR export has no PR #${prNumber}`));
+    },
+  };
+}
+
+function firstIssueNumber(value: unknown): number | null {
+  return integers(value)[0] ?? null;
+}
+
+async function reconcileMilestonePrs(
+  state: JsonRecord,
+  repo: string,
+  milestone: string,
+  source: MilestonePrSource,
+): Promise<ReconciliationFinding[]> {
+  let openPullRequests: readonly LiveMilestonePr[];
+  try {
+    openPullRequests = await source.listOpenMilestonePrs(repo, milestone);
+  } catch (error) {
+    return [{
+      kind: 'source-unavailable',
+      issueNumber: null,
+      prNumber: null,
+      lane: null,
+      recordedHead: null,
+      liveHead: null,
+      detail: error instanceof Error ? error.message : String(error),
+    }];
+  }
+
+  const findings: ReconciliationFinding[] = [];
+  const leaves = records(state.leaves);
+  const leafByPrNumber = new Map<number, JsonRecord>();
+  for (const leaf of leaves) {
+    if (issueNumber(leaf.prNumber)) leafByPrNumber.set(leaf.prNumber, leaf);
+  }
+
+  for (const leaf of leaves) {
+    if (
+      TERMINAL_LEAF_PHASES.has(String(leaf.phase)) || leaf.baseBranch !== 'main' ||
+      !issueNumber(leaf.prNumber)
+    ) {
+      continue;
+    }
+    let livePullRequest: LiveMilestonePr;
+    try {
+      livePullRequest = await source.readPrHead(repo, leaf.prNumber);
+    } catch (error) {
+      findings.push({
+        kind: 'source-unavailable',
+        issueNumber: firstIssueNumber(leaf.issueNumbers),
+        prNumber: leaf.prNumber,
+        lane: topicLane(leaf.lane) ? leaf.lane : null,
+        recordedHead: nonEmpty(leaf.headSha) ? leaf.headSha : null,
+        liveHead: null,
+        detail: error instanceof Error ? error.message : String(error),
+      });
+      continue;
+    }
+    if (
+      livePullRequest.state === 'open' && nonEmpty(leaf.headSha) &&
+      livePullRequest.headSha !== leaf.headSha
+    ) {
+      findings.push({
+        kind: 'stale-head',
+        issueNumber: firstIssueNumber(leaf.issueNumbers),
+        prNumber: leaf.prNumber,
+        lane: topicLane(leaf.lane) ? leaf.lane : null,
+        recordedHead: leaf.headSha,
+        liveHead: livePullRequest.headSha,
+      });
+    }
+  }
+
+  const laneByIssue = new Map<number, TopicLane>();
+  for (const lane of records(state.lanes)) {
+    if (!topicLane(lane.id)) continue;
+    for (const number of integers(lane.issueNumbers)) laneByIssue.set(number, lane.id);
+  }
+  const seenOpenPrNumbers = new Set<number>();
+  for (const pullRequest of openPullRequests) {
+    if (
+      seenOpenPrNumbers.has(pullRequest.number) || pullRequest.state !== 'open' ||
+      pullRequest.baseBranch !== 'main' || pullRequest.role === 'coordinator-artifact'
+    ) {
+      continue;
+    }
+    seenOpenPrNumbers.add(pullRequest.number);
+    if (leafByPrNumber.has(pullRequest.number)) continue;
+    const issue = pullRequest.issueNumbers[0] ?? null;
+    findings.push({
+      kind: 'missing-leaf',
+      issueNumber: issue,
+      prNumber: pullRequest.number,
+      lane: pullRequest.lane ?? (issue === null ? null : laneByIssue.get(issue) ?? null),
+      recordedHead: null,
+      liveHead: pullRequest.headSha,
+    });
+  }
+  return findings;
+}
+
 export async function validateMilestoneCluster(
   artifacts: MilestoneClusterArtifacts,
+  source: MilestonePrSource = unavailableMilestonePrSource(
+    'GitHub PR reconciliation source was not provided',
+  ),
 ): Promise<ValidationResult> {
   const errors: string[] = [];
+  const findings: ReconciliationFinding[] = [];
   if (!isRecord(artifacts.intake)) errors.push('milestone-intake.json must be an object');
   if (!isRecord(artifacts.inventory)) errors.push('milestone-inventory.json must be an object');
   if (!isRecord(artifacts.dag)) errors.push('milestone-dependency-dag.json must be an object');
   if (!isRecord(artifacts.state)) errors.push('milestone-cluster-state.json must be an object');
-  if (errors.length > 0) return { ok: false, errors };
+  if (errors.length > 0) return { ok: false, errors, findings };
 
   const intake = artifacts.intake as JsonRecord;
   const inventory = artifacts.inventory as JsonRecord;
@@ -603,11 +1039,25 @@ export async function validateMilestoneCluster(
   validateDag(errors, dag, activeIssues);
   validateState(errors, state, activeIssues);
 
+  if (nonEmpty(intake.repo) && nonEmpty(state.milestone)) {
+    findings.push(...await reconcileMilestonePrs(state, intake.repo, state.milestone, source));
+  } else {
+    findings.push({
+      kind: 'source-unavailable',
+      issueNumber: null,
+      prNumber: null,
+      lane: null,
+      recordedHead: null,
+      liveHead: null,
+      detail: 'cluster artifacts do not provide a repository and milestone for reconciliation',
+    });
+  }
+
   const rendered = await renderMilestoneStatus(state);
   if (artifacts.status !== rendered) {
     errors.push('milestone-status.md is stale; regenerate it from milestone-cluster-state.json');
   }
-  return { ok: errors.length === 0, errors };
+  return { ok: errors.length === 0 && findings.length === 0, errors, findings };
 }
 
 async function readJson(path: string): Promise<unknown> {
@@ -616,42 +1066,65 @@ async function readJson(path: string): Promise<unknown> {
 
 export interface ValidateCliArgs {
   readonly runDir?: string;
+  readonly githubPrsPath?: string;
   readonly error?: string;
 }
 
 /** Parse both direct invocation and `deno task ... -- <run-dir>` arguments. */
 export function parseValidateCliArgs(args: readonly string[]): ValidateCliArgs {
-  const positional = args.filter((arg) => arg !== '--');
-  if (positional.some((arg) => arg.startsWith('-'))) {
-    return { error: `unknown option: ${positional.find((arg) => arg.startsWith('-'))}` };
+  let runDir: string | undefined;
+  let githubPrsPath: string | undefined;
+  const values = args.filter((arg) => arg !== '--');
+  for (let index = 0; index < values.length; index++) {
+    const value = values[index];
+    if (value === '--github-prs') {
+      const path = values[++index];
+      if (!path || path.startsWith('-')) return { error: '--github-prs requires a path' };
+      githubPrsPath = path;
+      continue;
+    }
+    if (value.startsWith('-')) return { error: `unknown option: ${value}` };
+    if (runDir !== undefined) return { error: 'expected exactly one run directory' };
+    runDir = value;
   }
-  if (positional.length !== 1) {
-    return {
-      error: positional.length === 0
-        ? 'missing run directory'
-        : 'expected exactly one run directory',
-    };
-  }
-  return { runDir: positional[0] };
+  return runDir === undefined
+    ? { error: 'missing run directory' }
+    : githubPrsPath === undefined
+    ? { runDir }
+    : { runDir, githubPrsPath };
 }
 
 async function main(): Promise<void> {
   const parsed = parseValidateCliArgs(Deno.args);
   if (!parsed.runDir || parsed.error) {
     if (parsed.error) console.error(`error: ${parsed.error}`);
-    console.error('usage: validate-milestone-cluster.ts <run-dir>');
+    console.error('usage: validate-milestone-cluster.ts <run-dir> [--github-prs <export.json>]');
     Deno.exit(2);
   }
   let result: ValidationResult;
   try {
     const runDir = parsed.runDir;
+    let source = unavailableMilestonePrSource(
+      'GitHub PR reconciliation input is unavailable; pass --github-prs <export.json>',
+    );
+    if (parsed.githubPrsPath) {
+      try {
+        source = milestonePrSourceFromExport(await readJson(parsed.githubPrsPath));
+      } catch (error) {
+        source = unavailableMilestonePrSource(
+          `GitHub PR reconciliation input is unavailable: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
     result = await validateMilestoneCluster({
       intake: await readJson(join(runDir, 'milestone-intake.json')),
       inventory: await readJson(join(runDir, 'milestone-inventory.json')),
       dag: await readJson(join(runDir, 'milestone-dependency-dag.json')),
       state: await readJson(join(runDir, 'milestone-cluster-state.json')),
       status: await Deno.readTextFile(join(runDir, 'milestone-status.md')),
-    });
+    }, source);
   } catch (error) {
     console.error(
       `error: unable to validate milestone cluster: ${

@@ -8,7 +8,7 @@
 NetScript. It turns plain config data into validated resource graphs without leaking any Aspire SDK
 type into your signatures.**
 
-Orchestrating a polyglot workspace with .NET Aspire usually means writing against the Aspire SDK
+Orchestrating a polyglot workspace with Aspire usually means writing against the Aspire SDK
 directly — and then every plugin, test, and diagnostic tool inherits that dependency. This package
 inverts the relationship: every function takes plain data and returns plain data. Config is parsed
 and validated with Zod schemas, resource graphs are composed through a builder port, and the Aspire

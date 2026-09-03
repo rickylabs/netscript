@@ -3,6 +3,8 @@
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../..');
+const ALLOW_DIRTY_ARGUMENT = '--allow-dirty';
+const GENERATOR_READ_SET = ['packages', 'plugins'] as const;
 /** Repository-relative generated corpus staged by release preparation. */
 export const EXPORT_SURFACE_CORPUS_OUTPUT =
   'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts';
@@ -199,6 +201,8 @@ export async function buildExportSurfaceCorpus(
     const command = new Deno.Command(Deno.execPath(), {
       args: ['doc', '--json', ...packageSources.map((source) => source.entrypoint)],
       cwd: root,
+      env: colorInvariantChildEnv(),
+      clearEnv: true,
       stdout: 'piped',
       stderr: 'piped',
     });
@@ -446,10 +450,71 @@ function hex(buffer: ArrayBuffer): string {
   return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Canonical child environment for nested `deno` invocations.
+ *
+ * `deno doc --json` embeds ANSI escape sequences in its emitted strings when colour is
+ * enabled, so the corpus content would otherwise depend on the *caller's* terminal
+ * environment: `NO_COLOR=1` and `FORCE_COLOR=1` produced two different committed blobs.
+ * `FORCE_COLOR` takes precedence over `NO_COLOR`, and even `FORCE_COLOR=0` forces colour,
+ * so it must be **removed** from the child environment rather than overridden.
+ */
+export function colorInvariantChildEnv(): Record<string, string> {
+  const env = Deno.env.toObject();
+  delete env.FORCE_COLOR;
+  delete env.CLICOLOR_FORCE;
+  env.NO_COLOR = '1';
+  return env;
+}
+
+async function guardGeneratorWrite(root: string, allowDirty: boolean): Promise<void> {
+  let output: Deno.CommandOutput;
+  try {
+    output = await new Deno.Command('git', {
+      args: ['status', '--porcelain', '--', ...GENERATOR_READ_SET],
+      cwd: root,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+  } catch (error) {
+    console.warn(
+      `WARNING: Git is unavailable; continuing MCP export-corpus generation without ` +
+        `clean-tree verification (${error instanceof Error ? error.message : String(error)}).`,
+    );
+    return;
+  }
+
+  if (!output.success) {
+    const detail = new TextDecoder().decode(output.stderr).trim() || `exit ${output.code}`;
+    console.warn(
+      `WARNING: Git status is unavailable; continuing MCP export-corpus generation without ` +
+        `clean-tree verification (${detail}).`,
+    );
+    return;
+  }
+
+  const dirty = new TextDecoder().decode(output.stdout).trimEnd();
+  if (!dirty) return;
+
+  const summary = `MCP export-corpus generator read set is dirty:\n${dirty}`;
+  if (allowDirty) {
+    console.warn(
+      `WARNING: ${summary}\nProceeding because ${ALLOW_DIRTY_ARGUMENT} was explicitly supplied.`,
+    );
+    return;
+  }
+  throw new Error(
+    `${summary}\nRefusing to generate from uncommitted package/plugin sources. ` +
+      `Commit or stash them, or deliberately rerun with ${ALLOW_DIRTY_ARGUMENT}.`,
+  );
+}
+
 async function formatTypeScript(source: string): Promise<string> {
   const child = new Deno.Command(Deno.execPath(), {
     args: ['fmt', '--ext', 'ts', '-'],
     cwd: REPO_ROOT,
+    env: colorInvariantChildEnv(),
+    clearEnv: true,
     stdin: 'piped',
     stdout: 'piped',
     stderr: 'piped',
@@ -466,8 +531,15 @@ async function formatTypeScript(source: string): Promise<string> {
 
 if (import.meta.main) {
   const check = Deno.args.includes('--check');
-  const unknown = Deno.args.filter((argument) => argument !== '--check');
+  const allowDirty = Deno.args.includes(ALLOW_DIRTY_ARGUMENT);
+  const unknown = Deno.args.filter((argument) =>
+    argument !== '--check' && argument !== ALLOW_DIRTY_ARGUMENT
+  );
   if (unknown.length > 0) throw new Error(`unknown argument: ${unknown[0]}`);
+  if (check && allowDirty) {
+    throw new Error(`${ALLOW_DIRTY_ARGUMENT} is only valid when writing the generated corpus`);
+  }
+  if (!check) await guardGeneratorWrite(REPO_ROOT, allowDirty);
   const asset = await createGeneratedAsset(await buildExportSurfaceCorpus());
   if (check) {
     const current = await Deno.readTextFile(OUTPUT_PATH).catch(() => '');

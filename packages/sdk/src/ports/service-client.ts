@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { ValidateSdkClientContributions } from './sdk-client-contribution.ts';
+
 /**
  * Minimal structural representation of a standard-schema-compatible type.
  */
@@ -124,6 +126,14 @@ export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike
   : never;
 
 /**
+ * Procedure metadata carried by a contract procedure node.
+ */
+export type ProcedureMetaFromNode<TNode> = TNode extends {
+  readonly '~orpc': { readonly meta: infer TMeta };
+} ? TMeta
+  : Record<never, never>;
+
+/**
  * Per-call service client context.
  */
 export interface ServiceClientContext {
@@ -154,21 +164,67 @@ export interface ServiceClientContext {
   } | null;
 }
 
+/** HTTP methods selectable by the NetScript SDK transport policy. */
+export type SdkClientHttpMethod =
+  | 'GET'
+  | 'POST'
+  | 'PUT'
+  | 'PATCH'
+  | 'DELETE'
+  | 'OPTIONS'
+  | 'TRACE'
+  | 'CONNECT';
+
+/** Immutable inputs supplied to a service-client HTTP method override. */
+export interface SdkClientTransportPolicyMethodOptions {
+  /** NetScript-owned procedure path and metadata. */
+  readonly procedure: import('./sdk-client-contribution.ts').SdkClientProcedureDescriptor;
+  /** Borrowed procedure input for this logical call. */
+  readonly input: unknown;
+  /** Method inferred from the contract before an override is applied. */
+  readonly inferredMethod: SdkClientHttpMethod;
+}
+
+/** Narrow, upstream-neutral override for SDK-owned transport policy. */
+export interface SdkClientTransportPolicy {
+  /** Override the contract-derived HTTP method for one logical call. */
+  readonly method?: (
+    options: Readonly<SdkClientTransportPolicyMethodOptions>,
+  ) => SdkClientHttpMethod;
+}
+
 /**
  * Optional second argument passed to service-client methods.
  */
-export interface ServiceRequestOptions {
+export interface ServiceRequestOptions<
+  TContext extends object = ServiceClientContext,
+> {
   /** Per-request service client context. */
-  context?: ServiceClientContext;
+  readonly context?: TContext;
 }
+
+/** @internal Required keys used to select the request-options tuple shape. */
+export type RequiredKeys<TContext extends object> = {
+  [K in keyof TContext]-?: Record<never, never> extends Pick<TContext, K> ? never : K;
+}[keyof TContext];
+
+/** Optional or required request-options tuple based on the client context. */
+export type ServiceRequestRest<TContext extends object = ServiceClientContext> =
+  RequiredKeys<TContext> extends never ? [options?: ServiceRequestOptions<TContext>]
+    : [options: { readonly context: TContext }];
 
 /**
  * Typed service-client method derived from a contract procedure.
  */
-export type ServiceClientMethod<TInput, TOutput> = (
+export type ServiceClientMethod<
+  TInput,
+  TOutput,
+  TError = Error,
+  TContext extends object = ServiceClientContext,
+> = (
   input: TInput,
-  options?: ServiceRequestOptions,
-) => Promise<TOutput>;
+  ...request: ServiceRequestRest<TContext>
+) => Promise<TOutput> & { __error?: { type: TError } };
 
 /**
  * Compile-time marker that preserves the source contract for inference.
@@ -181,18 +237,49 @@ export interface ServiceClientContract<TContract extends ContractLike> {
 /**
  * Recursive callable/router shape for a typed service client.
  */
-export type ServiceClientShape<TContract extends ContractLike> = TContract extends
-  ContractProcedureLike
-  ? ServiceClientMethod<ProcedureInputFromNode<TContract>, ProcedureOutputFromNode<TContract>>
+export type ServiceClientShape<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+> = TContract extends ContractProcedureLike ? ServiceClientMethod<
+    ProcedureInputFromNode<TContract>,
+    ProcedureOutputFromNode<TContract>,
+    TContract extends {
+      readonly '~orpc': {
+        readonly errorMap: infer TErrorMap extends Record<
+          string,
+          { readonly data?: unknown } | undefined
+        >;
+      };
+    } ?
+        | {
+          [K in keyof TErrorMap]: K extends string
+            ? TErrorMap[K] extends { readonly data?: infer TDataSchema } ? Error & {
+                readonly defined: true;
+                readonly code: K;
+                readonly status: number;
+                readonly data: ContractSchemaOutput<TDataSchema>;
+              }
+            : never
+            : never;
+        }[keyof TErrorMap]
+        | Error
+      : Error,
+    TContext
+  >
   : {
-    [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceClient<TContract[K]> : never;
+    [K in keyof TContract]: TContract[K] extends ContractLike
+      ? ServiceClient<TContract[K], TContext>
+      : never;
   };
 
 /**
  * Typed service client derived from a contract router.
  */
-export type ServiceClient<TContract extends ContractLike> =
-  & ServiceClientShape<TContract>
+export type ServiceClient<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+> =
+  & ServiceClientShape<TContract, TContext>
   & ServiceClientContract<TContract>;
 
 /**
@@ -200,7 +287,10 @@ export type ServiceClient<TContract extends ContractLike> =
  *
  * @typeParam TContract - Contract used by the service.
  */
-export interface CreateServiceClientOptions<TContract extends ContractLike> {
+export interface CreateServiceClientOptions<
+  TContract extends ContractLike,
+  TContributions extends readonly object[] = readonly [],
+> {
   /** Contract definition used for client typing and HTTP method inference. */
   contract: TContract;
   /** Service name registered in Aspire / NetScript config. */
@@ -213,10 +303,26 @@ export interface CreateServiceClientOptions<TContract extends ContractLike> {
   apiPath?: string;
   /** API version segment. */
   apiVersion?: string;
-  /** Reserved override for explicit port selection. */
+  /**
+   * Compatibility-only explicit port selection. The value is accepted but ignored.
+   *
+   * @deprecated Configure explicit service addresses through discovery instead. This option is a
+   * no-op and will be removed in a future major version.
+   */
   port?: number;
-  /** Reserved request timeout in milliseconds. */
+  /**
+   * Compatibility-only request timeout in milliseconds. The value is accepted but ignored.
+   *
+   * @deprecated Pass a per-call `AbortSignal` for cancellation instead. This option is a no-op and
+   * will be removed in a future major version.
+   */
   timeout?: number;
+  /** Optional HTTP method adaptation resolved before client contributions compose. */
+  transportPolicy?: SdkClientTransportPolicy;
   /** Whether to propagate trace context headers automatically. */
   propagateTraceContext?: boolean;
+  /** Explicit literal tuple of typed SDK client contributions. */
+  contributions?:
+    & TContributions
+    & ValidateSdkClientContributions<TContributions>;
 }

@@ -1,6 +1,7 @@
 /** Human rollout report renderer for a validated canary outcome. */
 
 import type { RolloutOutcome } from './rollout-canary.ts';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 function escapeCell(value: string): string {
   return value.replaceAll('|', '\\|').replaceAll('\n', ' ');
@@ -30,6 +31,8 @@ export function renderRolloutReport(outcome: RolloutOutcome): string {
     '# Agentic runtime rollout outcome',
     '',
     `Generated from schema \`${outcome.schemaVersion}\` at ${outcome.generatedAt}. Baseline: \`${outcome.baseline}\`.`,
+    '',
+    `Current open-evaluator routing uses PLAN \`${OPENROUTER_MODEL_IDS.planEvaluator}\` and IMPL/default \`${OPENROUTER_MODEL_IDS.implEvaluator}\`. Model references in the July canary evidence below are retained as historical observations, not current selectors.`,
     '',
     '## Executive outcome',
     '',

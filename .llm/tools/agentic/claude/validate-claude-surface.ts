@@ -8,9 +8,10 @@ const pretty = Deno.args.includes('--pretty');
 const results: CheckResult[] = [];
 
 results.push(await checkFileContains('CLAUDE.md', '@AGENTS.md'));
+results.push(await checkFileContains('CLAUDE.md', '.agents/skills/<name>/SKILL.md'));
 results.push(await checkJson('.claude/settings.json'));
 results.push(await checkGitignore('.claude/settings.local.json'));
-results.push(await runSyncCheck());
+results.push(await checkClaudeSkillBridge());
 results.push(await runHookLockCheck());
 
 const ok = results.every((result) => result.ok);
@@ -57,41 +58,54 @@ async function checkGitignore(entry: string): Promise<CheckResult> {
   }
 }
 
-async function runSyncCheck(): Promise<CheckResult> {
-  const command = new Deno.Command(Deno.execPath(), {
-    args: [
-      'run',
-      '--no-lock',
-      '--allow-read',
-      '.llm/tools/agentic/claude/sync-claude-skills.ts',
-      '--check',
-      '--pretty',
-    ],
-    stdout: 'piped',
-    stderr: 'piped',
-  });
-  const result = await command.output();
-  const decoder = new TextDecoder();
-  const output = `${decoder.decode(result.stdout)}${decoder.decode(result.stderr)}`.trim();
-  return {
-    name: '.claude/skills',
-    ok: result.code === 0,
-    detail: output || `sync check exited ${result.code}`,
-  };
+async function checkClaudeSkillBridge(): Promise<CheckResult> {
+  const bridgePath = '.claude/skills/repo-skills/SKILL.md';
+  try {
+    const entries: string[] = [];
+    for await (const entry of walkFiles('.claude/skills')) entries.push(entry);
+    entries.sort();
+    const bridge = await Deno.readTextFile(bridgePath);
+    const onlyBridge = entries.length === 1 && entries[0] === bridgePath;
+    const pointsToSource = bridge.includes('.agents/skills/<name>/SKILL.md');
+    const ok = onlyBridge && pointsToSource;
+    return {
+      name: 'Claude repository-skill bridge',
+      ok,
+      detail: ok
+        ? `${bridgePath} is the only Claude skill and points to .agents/skills`
+        : `expected only ${bridgePath} pointing to .agents/skills; found ${entries.join(', ')}`,
+    };
+  } catch (error) {
+    return { name: 'Claude repository-skill bridge', ok: false, detail: String(error) };
+  }
+}
+
+async function* walkFiles(root: string): AsyncGenerator<string> {
+  for await (const entry of Deno.readDir(root)) {
+    const path = `${root}/${entry.name}`;
+    if (entry.isDirectory) yield* walkFiles(path);
+    else if (entry.isFile) yield path;
+  }
 }
 
 async function runHookLockCheck(): Promise<CheckResult> {
+  const projectRoot = Deno.cwd();
   const lockBefore = await readOptional('deno.lock');
   for (let i = 0; i < 3; i += 1) {
     const command = new Deno.Command(Deno.execPath(), {
       args: [
         'run',
         '--no-lock',
-        '--allow-env',
-        '--allow-read',
-        '--allow-write',
-        '.llm/tools/agentic/claude/claude-hook-log.ts',
+        '--no-prompt',
+        '--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID',
+        `--allow-write=${projectRoot}/.llm/tmp/claude/hooks`,
+        `${projectRoot}/.llm/tools/agentic/claude/claude-hook-log.ts`,
       ],
+      env: {
+        CLAUDE_PROJECT_DIR: projectRoot,
+        NETSCRIPT_RUN_ID: 'agentic-check-claude',
+        CLAUDE_SESSION_ID: 'agentic-check-claude',
+      },
       stdin: 'piped',
       stdout: 'piped',
       stderr: 'piped',

@@ -20,7 +20,12 @@ import {
   SimpleSpanProcessor,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { CacheQuery } from '../../src/cache/cache-query.ts';
-import { type CacheProvider, createProviderBoundary } from '../../src/cache/cache-provider.ts';
+import {
+  type CacheProvider,
+  createProviderBoundary,
+  resetCacheProvider,
+  setCacheProvider,
+} from '../../src/cache/cache-provider.ts';
 import {
   CACHE_NAMESPACE_MAX_LENGTH,
   CacheEvents,
@@ -28,10 +33,16 @@ import {
   type CacheTelemetry,
   type CacheTelemetrySpan,
   normalizeCacheNamespace,
+  resetCacheNamespaceRegistry,
 } from '../../src/cache/cache-telemetry.ts';
+import { createCompositeQuery } from '../../src/query/composite-query.ts';
 import type { CacheEntry } from '../../src/ports/cache-entry.ts';
 import type { CacheKey, CacheStoreEntry } from '../../src/ports/cache-store.ts';
-import type { CacheProviderDescriptor } from '../../src/ports/cache-topology.ts';
+import type {
+  CacheInvalidationTopologyReport,
+  CacheProviderDescriptor,
+  CacheWriteTopologyReport,
+} from '../../src/ports/cache-topology.ts';
 import { MemoryCacheStore, nextTurn } from '../test-helpers.ts';
 
 type RecordedEvent = {
@@ -96,6 +107,15 @@ function findEvent(span: RecordedCacheSpan, name: string): RecordedEvent {
   const event = span.events.find((candidate) => candidate.name === name);
   assert(event, `expected ${name} event`);
   return event;
+}
+
+async function fillNamespaceBudget(cache: CacheQuery): Promise<void> {
+  for (let index = 0; index < 256; index += 1) {
+    assertEquals(
+      await cache.getCachedData(['namespace-budget', index], `namespace.${index}`),
+      null,
+    );
+  }
 }
 
 Deno.test('cache telemetry distinguishes a cold miss and measured backend write', async () => {
@@ -234,7 +254,7 @@ Deno.test('cache telemetry measures backend entry when the loader throws', async
   assertEquals(span.exceptions.length, 1);
 });
 
-Deno.test('cache telemetry rejects incomplete or unbounded provider evidence', async () => {
+Deno.test('cache telemetry degrades malformed lookup evidence without losing data', async () => {
   class UnboundedStore extends MemoryCacheStore {
     override get<T>(_key: CacheKey): Promise<CacheStoreEntry<T>> {
       return Promise.resolve({
@@ -253,21 +273,106 @@ Deno.test('cache telemetry rejects incomplete or unbounded provider evidence', a
     }
   }
   const { cache, telemetry } = makeCache(new UnboundedStore());
+  let loaderCalls = 0;
 
-  await assertRejects(
-    () =>
-      cache.query(['orders'], {
-        operationId: 'orders.list',
-        queryFn: () => Promise.resolve('unexpected'),
-      }),
-    TypeError,
-    'missing or invalid topology evidence',
+  assertEquals(
+    await cache.query(['orders'], {
+      operationId: 'orders.list',
+      queryFn: () => {
+        loaderCalls += 1;
+        return Promise.resolve('loaded');
+      },
+    }),
+    'loaded',
   );
 
   const span = telemetry.spans[0];
   assertEquals(span.attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
   assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
-  assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], false);
+  assertEquals(span.attributes[CacheAttributes.BACKEND_EXECUTED], true);
+  assertEquals(loaderCalls, 1);
+  assertEquals(span.status, 'unset');
+});
+
+Deno.test('cache telemetry degrades malformed write evidence without losing data', async () => {
+  class MalformedWriteStore extends MemoryCacheStore {
+    override set(): Promise<CacheWriteTopologyReport> {
+      return Promise.resolve({
+        writes: [
+          { system: 'memory', tier: 'l1', writeThrough: false },
+          { system: 'redis', tier: 'l2', writeThrough: true },
+          { system: 'INVALID', tier: 'durable', writeThrough: true },
+        ],
+        promotions: [],
+        topologyComplete: true,
+      });
+    }
+  }
+  const { cache, telemetry } = makeCache(new MalformedWriteStore());
+
+  assertEquals(
+    await cache.query(['orders'], {
+      operationId: 'orders.write',
+      queryFn: () => Promise.resolve('loaded'),
+    }),
+    'loaded',
+  );
+
+  const span = telemetry.spans[0];
+  assertEquals(span.attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
+  assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+  const writes = span.events.filter((event) => event.name === CacheEvents.WRITE);
+  assertEquals(writes.length, 1);
+  assertEquals(writes[0].attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+});
+
+Deno.test('cache telemetry rolls back a report that fails on its third invalidation', async () => {
+  class PartwayInvalidationStore extends MemoryCacheStore {
+    private deleteCalls = 0;
+
+    override async *list(): AsyncIterable<{ key: CacheKey }> {
+      yield { key: ['malformed'] };
+      yield { key: ['valid'] };
+    }
+
+    override delete(): Promise<CacheInvalidationTopologyReport> {
+      this.deleteCalls += 1;
+      if (this.deleteCalls === 1) {
+        return Promise.resolve({
+          invalidations: [
+            { system: 'memory', tier: 'l1' },
+            { system: 'redis', tier: 'l2' },
+            { system: 'INVALID', tier: 'durable' },
+          ],
+          topologyComplete: true,
+        });
+      }
+      return Promise.resolve({
+        invalidations: [{ system: 'deno-kv', tier: 'durable' }],
+        topologyComplete: true,
+      });
+    }
+  }
+  const { cache, telemetry } = makeCache(new PartwayInvalidationStore());
+
+  await cache.invalidateQueries(['orders'], 'orders.invalidate');
+
+  const span = telemetry.spans[0];
+  assertEquals(span.attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
+  assertEquals(span.attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+  const invalidations = span.events.filter((event) => event.name === CacheEvents.INVALIDATE);
+  assertEquals(invalidations.length, 2);
+  const emittedTiers = invalidations
+    .filter((event) => event.attributes[CacheAttributes.TOPOLOGY_COMPLETE] === true)
+    .map((event) => event.attributes[CacheAttributes.TIER]);
+  assertEquals(emittedTiers, ['durable']);
+  assert(
+    !invalidations.some((event) =>
+      event.attributes[CacheAttributes.TOPOLOGY_COMPLETE] === true &&
+      (event.attributes[CacheAttributes.TIER] === 'l1' ||
+        event.attributes[CacheAttributes.TIER] === 'l2')
+    ),
+  );
 });
 
 Deno.test('cache telemetry distinguishes a tier promotion and write-through', async () => {
@@ -367,6 +472,103 @@ Deno.test('cache namespaces are bounded normalized operation identities', () => 
   assert(/^[a-z0-9.]+$/.test(bounded));
   assertEquals(normalizeCacheNamespace(undefined), 'direct');
   assertEquals(normalizeCacheNamespace(undefined, ' Composite View '), 'composite.view');
+});
+
+Deno.test('cache namespace overflow is request-local and descriptor validation stays in-span', async () => {
+  const originalWarn = console.warn;
+  let warnCalls = 0;
+  console.warn = () => {
+    warnCalls += 1;
+  };
+  resetCacheNamespaceRegistry();
+  try {
+    const filler = new CacheQuery(
+      new MemoryCacheStore(),
+      new Map(),
+      new RecordingCacheTelemetry(),
+    );
+    await fillNamespaceBudget(filler);
+
+    class InvalidDescriptorStore extends MemoryCacheStore {
+      override readonly descriptor: CacheProviderDescriptor = {
+        system: 'INVALID provider',
+        tier: 'l1',
+      };
+    }
+    const firstTelemetry = new RecordingCacheTelemetry();
+    const first = new CacheQuery(new InvalidDescriptorStore(), new Map(), firstTelemetry);
+    assertEquals(
+      await first.query(['overflow', 'first'], {
+        operationId: ' Overflow :: FIRST ',
+        queryFn: () => Promise.resolve('loaded'),
+      }),
+      'loaded',
+    );
+
+    const firstSpan = firstTelemetry.spans[0];
+    assertEquals(firstSpan.attributes[CacheAttributes.NAMESPACE], 'overflow');
+    assertEquals(firstSpan.events[0].name, 'cache.namespace.overflow');
+    assertEquals(firstSpan.events[0].attributes['cache.namespace.offending_id'], 'overflow.first');
+    assertEquals(firstSpan.events[1].name, CacheEvents.LOOKUP);
+    assertEquals(firstSpan.events[1].attributes[CacheAttributes.OUTCOME], CacheOutcomes.ERROR);
+    assertEquals(firstSpan.events[1].attributes[CacheAttributes.TOPOLOGY_COMPLETE], false);
+
+    const laterTelemetry = new RecordingCacheTelemetry();
+    const later = new CacheQuery(new MemoryCacheStore(), new Map(), laterTelemetry);
+    assertEquals(
+      await later.getCachedData(['overflow', 'second'], ' Overflow :: SECOND '),
+      null,
+    );
+    const laterSpan = laterTelemetry.spans[0];
+    assertEquals(laterSpan.attributes[CacheAttributes.NAMESPACE], 'overflow');
+    assertEquals(
+      laterSpan.events.filter((event) => event.name === 'cache.namespace.overflow').length,
+      0,
+    );
+    assert(!JSON.stringify(laterSpan).includes('overflow.second'));
+    assertEquals(warnCalls, 0);
+  } finally {
+    resetCacheNamespaceRegistry();
+    console.warn = originalWarn;
+  }
+});
+
+Deno.test('composite construction defers namespace admission until a real operation', async () => {
+  resetCacheNamespaceRegistry();
+  resetCacheProvider();
+  try {
+    const telemetry = new RecordingCacheTelemetry();
+    const cache = new CacheQuery(new MemoryCacheStore(), new Map(), telemetry);
+    const composite = createCompositeQuery<{ id: string }, string>({
+      key: ['composite-test'],
+      queryFn: ({ id }) => Promise.resolve(`loaded:${id}`),
+      defaultOptions: { operationId: ' Composite :: Pending ' },
+    });
+    assertEquals(telemetry.spans.length, 0);
+
+    await fillNamespaceBudget(cache);
+    assertEquals(
+      telemetry.spans.flatMap((span) => span.events).filter((event) =>
+        event.name === 'cache.namespace.overflow'
+      ).length,
+      0,
+    );
+
+    setCacheProvider(cache);
+    telemetry.spans.length = 0;
+    assertEquals(await composite({ id: 'one' }), 'loaded:one');
+    assertEquals(telemetry.spans.length, 1);
+    const span = telemetry.spans[0];
+    assertEquals(span.attributes[CacheAttributes.NAMESPACE], 'overflow');
+    assertEquals(span.events[0].name, 'cache.namespace.overflow');
+    assertEquals(
+      span.events[0].attributes['cache.namespace.offending_id'],
+      'composite.pending',
+    );
+  } finally {
+    resetCacheProvider();
+    resetCacheNamespaceRegistry();
+  }
 });
 
 Deno.test('successful unowned providers report unknown topology without an error outcome', async () => {

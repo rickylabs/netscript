@@ -1,13 +1,15 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { dirname, extname, isAbsolute, join, relative } from 'jsr:@std/path@^1';
+import { dirname, extname, fromFileUrl, isAbsolute, join, relative } from 'jsr:@std/path@^1';
 
 import cliMeta from '../../../../deno.json' with { type: 'json' };
+import { useLocalWorkspaceImports } from '../../../../tests/support/local-workspace-imports.ts';
 import {
+  type AppConventionsInput,
   appConventionsReferencedPaths,
   buildAppAgentsMarkdown,
-  type AppConventionsInput,
 } from '../../../kernel/templates/app/agent-conventions.ts';
-import { createPublicCommandTree } from './public-command-tree.ts';
+import { createPublicCommandRegistry, createPublicCommandTree } from './public-command-tree.ts';
+import { createPublicCommandDependencies } from './public-command-dependencies.ts';
 
 Deno.test('public root command reports the package version', () => {
   const command = createPublicCommandTree({
@@ -17,6 +19,55 @@ Deno.test('public root command reports the package version', () => {
 
   assertEquals(command.getVersion(), cliMeta.version);
   assertEquals(command.getVersion() === '1.0.0', false);
+});
+
+Deno.test('public generate group exposes resource fourth with composed dependencies and exact help', () => {
+  const host = {
+    cwd: () => Deno.cwd(),
+    resolvePath: (path?: string) => path ?? Deno.cwd(),
+  };
+  const dependencies = createPublicCommandDependencies(host);
+  const root = createPublicCommandRegistry().program({
+    name: 'netscript',
+    version: 'test',
+    description: 'NetScript public command tree test',
+    context: { host, dependencies },
+  });
+  root.getHelp({ colors: false, width: 160 });
+  const generate = root.getCommands().find((entry) => entry.getName() === 'generate');
+  assert(generate);
+  assertEquals(generate.getCommands().map((entry) => entry.getName()), [
+    'aspire',
+    'runtime-schemas',
+    'plugins',
+    'resource',
+  ]);
+  const resource = generate.getCommands().at(3);
+  const help = resource?.getHelp({ colors: false, width: 160 }) ?? '';
+  assertStringIncludes(
+    help,
+    'Generate a typed Fresh resource slice from a query procedure',
+  );
+  for (
+    const option of [
+      '--procedure',
+      '--client',
+      '--app',
+      '--form',
+      '--partial',
+      '--stream',
+    ]
+  ) {
+    assertStringIncludes(help, option);
+  }
+  assert(
+    dependencies.generateResourceCommandDependencies
+      .generateResourceDependencies.resolveClient,
+  );
+  assert(
+    dependencies.generateResourceCommandDependencies
+      .generateResourceDependencies.stage,
+  );
 });
 
 Deno.test('public init --dry-run leaves the target directory absent', async () => {
@@ -72,6 +123,10 @@ Deno.test('public init emits resolvable app conventions with and without the exa
       'users',
     ]);
     const serviceApp = join(parent, 'with-service', 'apps', 'dashboard');
+    const designMiddleware = await Deno.stat(
+      join(serviceApp, 'routes', '(design)', 'design', '_middleware.ts'),
+    );
+    assert(designMiddleware.isFile, 'Expected the design route middleware to be emitted');
     const serviceMarkdown = await assertAppConventionsResolve(serviceApp, {
       appName: 'dashboard',
       dbEngine: 'none',
@@ -99,21 +154,124 @@ Deno.test('public init emits resolvable app conventions with and without the exa
     assertStringIncludes(exampleReadme, 'Copy the architecture');
     assertStringIncludes(exampleReadme, 'Delete or replace the sample data');
     await assertPathAbsent(join(serviceApp, 'lib', 'example-service.ts'));
-    for (const localDirectory of ['(_components)', '(_islands)', '(_shared)', '(_lib)']) {
+    for (
+      const localDirectory of [
+        '(_components)',
+        '(_islands)',
+        '(_shared)',
+        '(_lib)',
+      ]
+    ) {
       const stat = await Deno.stat(
         join(serviceApp, 'routes', 'examples', 'users', localDirectory),
       );
-      assert(stat.isDirectory, `Expected resource-local directory: ${localDirectory}`);
+      assert(
+        stat.isDirectory,
+        `Expected resource-local directory: ${localDirectory}`,
+      );
     }
     await Deno.stat(
-      join(serviceApp, 'routes', 'examples', 'users', '(_components)', 'managed-form.tsx'),
+      join(
+        serviceApp,
+        'routes',
+        'examples',
+        'users',
+        '(_components)',
+        'users-form.tsx',
+      ),
     );
-    await Deno.stat(
-      join(serviceApp, 'routes', 'examples', 'users', '(_shared)', 'authorization.ts'),
+    const page = await Deno.readTextFile(
+      join(serviceApp, 'routes', 'examples', 'users', 'index.tsx'),
+    );
+    assertStringIncludes(page, '"options":["core","form","partial"]');
+    assertStringIncludes(page, '.withRoute(appRoutes.users)');
+    const generatedRoutes = await Deno.readTextFile(
+      join(serviceApp, '.generated', 'routes.ts'),
+    );
+    assertStringIncludes(generatedRoutes, 'bindRoutePattern(');
+    assertStringIncludes(
+      generatedRoutes,
+      'routePatterns.examples.users.$route',
+    );
+    const sharedPaths = [
+      'router.ts',
+      join('.generated', 'manifest.ts'),
+      join('.generated', 'routes.ts'),
+      join('routes', 'examples', 'users', 'index.tsx'),
+    ];
+    const beforeDryRun = await Promise.all(
+      sharedPaths.map((path) => Deno.readTextFile(join(serviceApp, path))),
+    );
+    const serviceConfig = JSON.parse(await Deno.readTextFile(join(serviceApp, 'deno.json')));
+    assertEquals(serviceConfig.imports['@netscript/sdk'], `jsr:@netscript/sdk@${cliMeta.version}`);
+    // Keep the public pin assertion above, then resolve the checkout under test:
+    // release-cut versions intentionally do not exist on JSR before publication.
+    const repositoryRoot = fromFileUrl(new URL('../../../../../../', import.meta.url));
+    await useLocalWorkspaceImports(join(parent, 'with-service'), repositoryRoot);
+    await useLocalWorkspaceImports(serviceApp, repositoryRoot);
+    const generate = createPublicCommandTree({
+      cwd: () => serviceApp,
+      resolvePath: (path) => path ?? serviceApp,
+    });
+    await generate.parse([
+      'generate',
+      'resource',
+      'audits',
+      '--procedure',
+      'list',
+      '--client',
+      'users',
+      '--project-root',
+      serviceApp,
+      '--dry-run',
+    ]);
+    await assertPathAbsent(join(serviceApp, 'routes', 'audits'));
+    assertEquals(
+      await Promise.all(
+        sharedPaths.map((path) => Deno.readTextFile(join(serviceApp, path))),
+      ),
+      beforeDryRun,
+    );
+    const rerun = createPublicCommandTree({
+      cwd: () => serviceApp,
+      resolvePath: (path) => path ?? serviceApp,
+    });
+    await rerun.parse([
+      'generate',
+      'resource',
+      'users',
+      '--procedure',
+      'list',
+      '--client',
+      'users',
+      '--project-root',
+      serviceApp,
+      '--route',
+      '/examples/users',
+      '--form',
+      '--partial',
+      '--dry-run',
+    ]);
+    assertEquals(
+      await Promise.all(
+        sharedPaths.map((path) => Deno.readTextFile(join(serviceApp, path))),
+      ),
+      beforeDryRun,
+    );
+    await assertPathAbsent(
+      join(
+        serviceApp,
+        'routes',
+        'examples',
+        'users',
+        '(_shared)',
+        'authorization.ts',
+      ),
     );
     for (
       const retainedRoute of [
         join('routes', 'examples', 'crud.tsx'),
+        join('routes', 'examples', 'orders', '[id].tsx'),
         join('routes', 'examples', 'telemetry', 'index.tsx'),
         join('routes', 'examples', 'users', 'index.tsx'),
       ]
@@ -130,7 +288,14 @@ Deno.test('public init emits resolvable app conventions with and without the exa
     ], 'postgres');
     const dbServiceApp = join(parent, 'with-db-service', 'apps', 'dashboard');
     await Deno.stat(
-      join(dbServiceApp, 'routes', 'examples', 'users', '(_islands)', 'ServiceShowcaseLab.tsx'),
+      join(
+        dbServiceApp,
+        'routes',
+        'examples',
+        'users',
+        '(_islands)',
+        'UsersIsland.tsx',
+      ),
     );
     await assertExampleImportsResolve(dbServiceApp);
 
@@ -185,12 +350,13 @@ async function scaffoldFixture(
   ]);
 }
 
-const IMPORT_SPECIFIER_PATTERN =
-  /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"]([^'"]+)['"]/g;
+const IMPORT_SPECIFIER_PATTERN = /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"]([^'"]+)['"]/g;
 const EXTERNAL_SPECIFIER_PATTERN = /^[a-z][a-z\d+.-]*:/i;
 
 async function assertExampleImportsResolve(appDir: string): Promise<void> {
-  const config = JSON.parse(await Deno.readTextFile(join(appDir, 'deno.json'))) as {
+  const config = JSON.parse(
+    await Deno.readTextFile(join(appDir, 'deno.json')),
+  ) as {
     readonly imports?: Readonly<Record<string, string>>;
   };
   const imports = config.imports ?? {};
@@ -199,7 +365,12 @@ async function assertExampleImportsResolve(appDir: string): Promise<void> {
     const source = await Deno.readTextFile(sourcePath);
     for (const match of source.matchAll(IMPORT_SPECIFIER_PATTERN)) {
       const specifier = match[1];
-      const targetPath = resolveEmittedTreeImport(appDir, sourcePath, specifier, imports);
+      const targetPath = resolveEmittedTreeImport(
+        appDir,
+        sourcePath,
+        specifier,
+        imports,
+      );
       if (targetPath === undefined) continue;
       let target: Deno.FileInfo;
       try {
@@ -213,7 +384,9 @@ async function assertExampleImportsResolve(appDir: string): Promise<void> {
       }
       assert(
         target.isFile,
-        `Expected emitted import to resolve to a file: ${relative(appDir, sourcePath)} -> ${specifier}`,
+        `Expected emitted import to resolve to a file: ${
+          relative(appDir, sourcePath)
+        } -> ${specifier}`,
       );
     }
   }
@@ -239,7 +412,9 @@ function resolveEmittedTreeImport(
     .sort((left, right) => right.length - left.length)[0];
   if (matchingKey === undefined) {
     throw new Error(
-      `Unresolved emitted import-map specifier: ${relative(appDir, sourcePath)} imports ${specifier}`,
+      `Unresolved emitted import-map specifier: ${
+        relative(appDir, sourcePath)
+      } imports ${specifier}`,
     );
   }
 
@@ -285,7 +460,8 @@ async function assertAppConventionsResolve(
       (!token.includes(' ') && (token.includes('/') || token.includes('.')))
     );
   const parsedPaths = [...new Set(references)].sort();
-  const declaredPaths = [...new Set(appConventionsReferencedPaths(input))].sort();
+  const declaredPaths = [...new Set(appConventionsReferencedPaths(input))]
+    .sort();
   assertEquals(parsedPaths, declaredPaths);
 
   for (const reference of parsedPaths) {
@@ -316,3 +492,15 @@ async function readEntryNames(path: string): Promise<string[]> {
   }
   return names.sort();
 }
+Deno.test('app conventions declare the scaffold dynamic route as a canonical reference', () => {
+  const paths = appConventionsReferencedPaths({
+    appName: 'dashboard',
+    dbEngine: 'none',
+    includeExampleService: false,
+  });
+
+  assert(
+    paths.includes('routes/examples/orders/[id].tsx'),
+    'dynamic order route must be part of the canonical scaffold references',
+  );
+});

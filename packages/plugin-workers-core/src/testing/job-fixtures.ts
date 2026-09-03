@@ -13,6 +13,7 @@ import {
   type WorkersRuntime,
   type WorkersRuntimeOptions,
 } from '../runtime/mod.ts';
+import { z } from 'zod';
 import { MemoryJobStorage } from './memory-job-storage.ts';
 import { MemoryWorker } from './memory-worker.ts';
 
@@ -42,7 +43,13 @@ export type JobFixtureDefinition<
   & Omit<BuilderJobDefinition<TId, TPayload, TResult>, 'handler'>;
 
 /** Partial execution record fields used to override fixture defaults. */
-export type ExecutionRecordFixtureOptions = Partial<ExecutionRecord>;
+export type ExecutionRecordFixtureOptions = Readonly<
+  & Omit<Partial<ExecutionRecord>, 'progressPercent' | 'progressMessage'>
+  & {
+    progressPercent?: number | null;
+    progressMessage?: string | null;
+  }
+>;
 
 /** Options for creating a memory-backed workers runtime fixture. */
 export type TestWorkersRuntimeOptions = Omit<WorkersRuntimeOptions, 'jobRegistry' | 'worker'> & {
@@ -79,6 +86,7 @@ export function createJobFixture<
   const handler: BuilderJobHandler<TPayload, TResult> = options.handler ??
     (() => createSuccessResult<TResult>());
   const definition: BuilderJobDefinition<TId, TPayload, TResult> = defineJob(id)
+    .payload(z.custom<TPayload>(() => true))
     .handler(handler)
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])
@@ -94,6 +102,7 @@ export function createExecutionRecordFixture(
   options: ExecutionRecordFixtureOptions = {},
 ): ExecutionRecord {
   const now = new Date(0).toISOString();
+  const { progressPercent, progressMessage, ...overrides } = options;
   return Object.freeze({
     id: '00000000-0000-4000-8000-000000000001',
     concept: 'job',
@@ -109,9 +118,11 @@ export function createExecutionRecordFixture(
     error: null,
     result: {},
     workerId: 'memory-worker',
+    progressPercent: progressPercent ?? null,
+    progressMessage: progressMessage ?? null,
     attempt: 0,
     maxAttempts: 3,
-    ...options,
+    ...overrides,
   });
 }
 

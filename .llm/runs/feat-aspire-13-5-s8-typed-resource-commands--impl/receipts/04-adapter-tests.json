@@ -1,0 +1,40 @@
+{
+  "gateId": "test",
+  "invocationId": "s8-s4-adapters-head",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/src/kernel/adapters/database/operation-runner_test.ts",
+    "packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts",
+    "packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts",
+    "packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-aspire-s8",
+  "gitHead": "1efd1a175d75cb5bb167b0998e0ce559f037255f",
+  "actualGitHead": "1efd1a175d75cb5bb167b0998e0ce559f037255f",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:420044",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "ef377f79ca163ca8992c9232456b6e5661752fc34ab508010341e283664e08ce",
+  "lifecycleId": "worker:420044:s8-s4-adapters-head:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-30T09:57:36.655Z",
+  "startedAt": "2026-08-30T09:57:36.657Z",
+  "finishedAt": "2026-08-30T09:57:37.001Z",
+  "durationMs": 344,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 591,
+    "sha256": "78d95fcc3e6f43aa9d0651d3fdeafebe5f558efa3b56876cae7f1387ddf0ab22",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/cli/src/kernel/adapters/database/operation-runner_test.ts\",\"packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts\",\"packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts\",\"packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-aspire-s8\",\"exitCode\":0,\"durationMs\":226,\"summary\":{\"passed\":49,\"failed\":0,\"ignored\":0,\"totalResults\":49,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 424,
+    "sha256": "753bec1cdd47a3513a8fd3d234f861018b77bea4d3df9179f2ddbe0e62a4c735",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/src/kernel/adapters/database/operation-runner_test.ts' 'packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts' 'packages/cli/src/kernel/templates/aspire/helpers/tests/generate-db-cli-mode_test.ts' 'packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts'\n",
+    "truncated": false
+  }
+}

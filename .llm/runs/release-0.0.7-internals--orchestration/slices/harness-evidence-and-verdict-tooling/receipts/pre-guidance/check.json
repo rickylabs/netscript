@@ -1,0 +1,36 @@
+{
+  "gateId": "check",
+  "invocationId": "harness-evidence-final-check-b21424c44",
+  "argv": [
+    "deno",
+    "task",
+    "check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+  "gitHead": "b21424c44bf43077b4caf5702ef58b3e1d0c00b1",
+  "actualGitHead": "b21424c44bf43077b4caf5702ef58b3e1d0c00b1",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "leaf:harness-evidence-and-verdict-tooling",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "861ca8607474e49dadd8e18774c42872b3b04d390eef6eef5ab6ddb8e53f44c6",
+  "lifecycleId": "leaf:harness-evidence-and-verdict-tooling:harness-evidence-final-check-b21424c44:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-13T21:06:08.220Z",
+  "startedAt": "2026-08-13T21:06:08.223Z",
+  "finishedAt": "2026-08-13T21:09:51.227Z",
+  "durationMs": 210413,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 299,
+    "sha256": "9b3b39c443e835a23336e104164893ebedc1a50c59100ad103dbb7ba833358dc",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-harness-evidence\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2919,\"batches\":25,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 192,
+    "sha256": "8e7cb67a36cfafde9a120b0109ba1f06cbe2c185d7d3fac8967000ed6e61dfec",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\n",
+    "truncated": false
+  }
+}

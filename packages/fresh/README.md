@@ -38,6 +38,8 @@ never imports the streaming runtime.
   SSR, and `DeferPage`/`Deferred` defer page regions under a resolvable freshness policy.
 - **Desktop RPC** — `bindDesktopRpcWindow` on `./desktop` binds an existing oRPC router to one Deno
   Desktop window while remaining inert in browser and Aspire processes.
+- **Ordered partial navigation** — `installPartialNavigationCoordinator` drains superseded Fresh
+  responses without applying them, while `KeyedPartial` remounts name-changing partial regions.
 
 ## Architecture
 
@@ -120,7 +122,10 @@ that cannot parse or fall back to contract defaults throws 400.
 
 ```tsx
 import { definePartial } from '@netscript/fresh/builders';
+// `@app/*` is the scaffolded application's own alias, so it resolves in your app, not here.
 import { routes } from '@app/router.ts';
+
+declare function loadOrder(id: string): Promise<{ total: number }>;
 
 export const orderSummaryPartial = definePartial({
   name: 'order-summary',
@@ -142,6 +147,10 @@ Aspire processes return an explicit disabled lifecycle without registering a bin
 
 ```typescript
 import { bindDesktopRpcWindow } from '@netscript/fresh/desktop';
+import type { DesktopBindableWindow, DesktopRpcRouter } from '@netscript/fresh/desktop';
+
+declare const desktopWindow: DesktopBindableWindow;
+declare const ordersRouter: DesktopRpcRouter;
 
 const desktopRpc = bindDesktopRpcWindow({
   window: desktopWindow,
@@ -156,6 +165,47 @@ await desktopRpc.close();
 Each call owns isolated per-window transport state and unbinds exactly once during cleanup. Pair it
 with `createDesktopServiceClient({ contract })` from `@netscript/sdk/desktop` in the webview; both
 sides reuse the same oRPC contract instead of a hand-maintained bindings declaration file.
+
+### Ordered partial navigation
+
+Install the browser lifecycle explicitly from client code. Repeated installs in one document share
+the same coordinator; every caller owns a handle and the final `dispose()` restores only wrappers
+that are still package-owned.
+
+```tsx
+import { installPartialNavigationCoordinator, KeyedPartial } from '@netscript/fresh/navigation';
+import type { Signal } from '@preact/signals';
+import type { ComponentChild } from 'preact';
+
+declare const routeEvents: Signal<readonly string[]>;
+declare function OrderSummary(props: { orderId: string }): ComponentChild;
+
+const navigation = installPartialNavigationCoordinator();
+const unsubscribe = navigation.subscribe(({ kind, url }) => {
+  routeEvents.value = [...routeEvents.value, `${kind}:${url.pathname}`];
+});
+
+navigation.navigate('/orders');
+
+export function OrderRegion({ orderId }: { orderId: string }) {
+  return (
+    <KeyedPartial name={`order-${orderId}`}>
+      <OrderSummary orderId={orderId} />
+    </KeyedPartial>
+  );
+}
+
+// Client cleanup waits for every superseded finite HTML body to reach EOF.
+unsubscribe();
+await navigation.dispose();
+```
+
+This compatibility adapter targets Fresh 2.3.3's current partial-fetch and history sequence. It
+never aborts or cancels a superseded transport: stale bodies are read to EOF and discarded so Vite
+development servers do not surface transport aborts as overlays. Draining can briefly retain an
+HTTP/1.1 development-server connection slot, bounded by the finite response body's time to EOF.
+Fresh normalizes colons to underscores when serializing a VNode key into its marker; the wrapper
+uses the unmodified region name as the native Preact key and does not rewrite server HTML markers.
 
 ## Subpaths at a glance
 
@@ -172,12 +222,51 @@ sides reuse the same oRPC contract instead of a hand-maintained bindings declara
 | `./streams`     | `createNetScriptStreamDB`, `useLiveQuery`, `useLiveSuspenseQuery`                     |
 | `./ai`          | Chat connection and stream-proxy helpers for AI-backed pages                          |
 | `./interactive` | `usePromise` and promise helpers for interactive islands                              |
+| `./navigation`  | Ordered partial navigation lifecycle, route events, and keyed Fresh boundaries        |
 | `./vite`        | `createNetScriptVitePlugin` — codegen for routes and bindings                         |
 | `./error`       | `ErrorDisplay`, `errorHandler`, typed error classification and extraction             |
 | `./testing`     | Mock route contexts and defer policies for page tests                                 |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/fresh@<version>`](https://jsr.io/@netscript/fresh/doc).
+
+### Preserve server cache age during hydration
+
+When a loader supplies `initialData` to an island query, also pass the timestamp at which that
+snapshot was loaded as `initialDataUpdatedAt`. The public `useQuery` wrapper seeds both the value and
+that timestamp into the shared client, so `staleTime` is measured from the server load instead of
+from browser hydration:
+
+```tsx
+import { useQuery } from '@netscript/fresh/query';
+
+useQuery({
+  queryKey: ordersQueries.list.clientKey(input),
+  queryFn: () => ordersClient.list(input),
+  initialData: props.initialOrders,
+  initialDataUpdatedAt: props.cachedAt,
+  staleTime: 15_000,
+});
+
+type Order = { readonly id: number; readonly name: string };
+type OrdersInput = { readonly limit: number; readonly page: number };
+
+declare const ordersQueries: {
+  readonly list: { clientKey(input: OrdersInput): readonly unknown[] };
+};
+declare const ordersClient: {
+  list(input: OrdersInput): Promise<readonly Order[]>;
+};
+declare const input: OrdersInput;
+declare const props: {
+  readonly initialOrders: readonly Order[];
+  readonly cachedAt: number;
+};
+```
+
+An older server snapshot can therefore refetch immediately on hydration, while a snapshot still
+inside `staleTime` remains fresh. Omitting `initialDataUpdatedAt` makes TanStack Query treat the
+snapshot as newly loaded in the browser and discards its real cache age.
 
 ## Docs
 

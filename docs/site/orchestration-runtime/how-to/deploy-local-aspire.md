@@ -8,7 +8,7 @@ oldUrl: /how-to/deploy-local-aspire/
 
 # Deploy locally with Aspire
 
-**Goal:** run your whole NetScript workspace on one machine under .NET Aspire — scaffold the
+**Goal:** run your whole NetScript workspace on one machine under Aspire — scaffold the
 AppHost, bring up the resource graph (Postgres, Redis, every service and background processor),
 and watch it from the Aspire dashboard. This is the **local** orchestration companion to the
 [Deploy](/orchestration-runtime/how-to/deploy/) recipe (which covers shipping to a remote target); for *why* the
@@ -30,7 +30,7 @@ with no Aspire up and it fails — there is no Postgres for it to reach. See
   rows: [
     { name: "A scaffolded workspace", type: "netscript init", desc: "Created WITHOUT --no-aspire, so the aspire/ AppHost folder exists. See the CLI reference for init flags." },
     { name: "Docker daemon running", type: "container engine", desc: "Aspire provisions Postgres and Redis as local Docker containers. No daemon = the default workflow does not start." },
-    { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external .NET Aspire CLI, run from inside aspire/ — not netscript subcommands." },
+    { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external Aspire CLI, run from inside aspire/ — not netscript subcommands." },
     { name: "A reachable port range", type: "ports", desc: "Dashboard :18888 (HTTPS) / :18889 (HTTP), OTLP :4318, and randomized high-range ports (49152–65535) allocated per project at scaffold time for services, plugin APIs, and frontend apps." }
   ]
 }) }}
@@ -54,9 +54,17 @@ on disk before going further:
 ls aspire/apphost.mts aspire/aspire.config.json
 ```
 
-`aspire.config.json` pins `language: "typescript/nodejs"`, `appHost.path: "apphost.mts"`, and the
-Aspire SDK version `13.4.6`. The graph inside the AppHost is **derived from your installed
-plugins** at boot via `composeAppHost` (from `@netscript/aspire/application`) — add a plugin and
+`aspire.config.json` pins `language: "typescript/nodejs"` and `appHost.path: "apphost.mts"`.
+The default scaffold pins the Aspire SDK to <code>13.5.3</code>, PostgreSQL and Redis hosting
+integrations to <code>13.5.3</code>, and the Browsers integration to
+<code>13.5.3-preview.1.26425.3</code>. The Aspire CLI and the AppHost SDK must be on the same release
+train — never mix CLI and SDK trains. If you installed the Aspire CLI through npm
+(`npm install -g @microsoft/aspire-cli`),
+`aspire update --self` is aware of the installation method and directs you to run
+`npm install -g @microsoft/aspire-cli@latest`.
+
+The graph inside the AppHost is **derived from your installed plugins** at boot via
+`composeAppHost` (from `@netscript/aspire/application`) — add a plugin and
 its API plus background processor appear in the graph; remove it and they vanish, no edit to
 `apphost.mts` required. The mechanics are in [Orchestration with Aspire](/explanation/aspire/).
 
@@ -172,6 +180,17 @@ from inside <code>aspire/</code>. <code>netscript db</code> commands run from th
 <li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code>
 command needs a live Postgres. Run it with no Aspire up and it fails fast — bring the graph up
 first.</li>
+<li><strong>A declared background reference cannot resolve.</strong> For each background processor
+that is not explicitly disabled, the generated AppHost preflights every declared service and plugin
+reference before registration. Each such declaration is required configuration, so it fails fast
+when the resource is missing or when the resource exists but has no <code>http</code> endpoint; this
+is a startup configuration error, not a processor failing under load. Service references use the
+message template
+<code>Background processor configuration error: '&lt;processor&gt;' could not resolve service
+reference '&lt;ref&gt;' HTTP endpoint.</code> Plugin references use the distinct template
+<code>Background processor configuration error: '&lt;processor&gt;' could not resolve plugin
+reference '&lt;ref&gt;' HTTP endpoint.</code> The generated code substitutes the configured processor
+and reference names for <code>&lt;processor&gt;</code> and <code>&lt;ref&gt;</code>.</li>
 <li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and
 OTLP <code>:4318</code>; services and plugin APIs claim their assigned high-range ports (49152–65535) allocated at scaffold time. A stale prior run holding a port blocks boot — check the dashboard
 resource list (or your process table) and free it.</li>
@@ -191,5 +210,8 @@ a Deno workspace problem.</li>
   {{ comp.xref({ key: "howto:database-migration", text: "Database & migration" }) }}.
 - **Exact symbols + full port map:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }}
   and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
+- **Non-interactive and CI execution:**
+  {{ comp.xref({ key: "howto:detached-start-agents-ci", text: "Detached start for agents and CI" }) }}
+  — structured JSON output, timeout budgets, and `--isolated` parallel mode.
 
-{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "Detached start for agents and CI", href: "/orchestration-runtime/how-to/detached-start-agents-ci/" } }) }}

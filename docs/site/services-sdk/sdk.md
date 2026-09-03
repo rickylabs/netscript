@@ -17,7 +17,9 @@ The `@netscript/sdk` is the **typed client and data layer** for NetScript: it tu
 wraps each contract action in a **cache-first query factory** (KV-backed SWR), and bridges
 those into [TanStack Query](https://tanstack.com/query) for islands. The contract object is
 the single source of truth — the *same* object the [service](/services-sdk/services/)
-implements is the one the client imports, so caller and server **cannot drift**.
+implements is the one the client imports, so its input, output, and declared-error types cannot
+drift between caller and server. Transport failures and arbitrary thrown values are not declared
+contract errors; `safe()` keeps those failures on its non-defined branch.
 {{ comp.badge({ status: "pre-1.0" }) }}
 
 {{ comp.diagram({
@@ -30,7 +32,8 @@ implements is the one the client imports, so caller and server **cannot drift**.
 
 The SDK is layered. **L1** is the typed client: `createServiceClient<Contract>()` resolves a
 service URL from [Aspire service discovery](/explanation/aspire/) and returns a callable
-object whose method signatures are inferred from the contract. **L2** wraps each contract
+object whose method input, output, and declared-error union are inferred from the contract.
+**L2** wraps each contract
 action in a query factory (`createQueryFactories`) that runs through a shared KV-backed cache
 provider and exposes `queryOptions`/`mutationOptions`/`clientKey`/`key`/`getCachedEntry` per
 action. **L3** is the `defineServices()` preset that builds clients, server query factories,
@@ -62,8 +65,10 @@ lives: not inside server code, but in a standalone, versioned contract package t
 the client, **and** the OpenAPI/Scalar surface all import. And the derivation goes further than
 method types — from one contract action the factory derives the server KV cache key (`key()`),
 the client TanStack key (`clientKey()`), the `queryOptions`/`mutationOptions` helpers, and the
-SWR cache reads. One edit to the contract updates the client, the docs surface, and the query
-layer together — there is no separate turn to keep them in sync.
+SWR cache reads. For routes built from `baseContract`, the same derivation carries the declared
+error schemas through the client promise and `safe()`. One edit to those contract-owned types
+updates the client, the docs surface, and the query layer together; transport and arbitrary thrown
+failures remain runtime, non-defined failures rather than being promoted into that contract.
 
 This is how a production chat application built on NetScript wires its dashboard:
 the typed client is built straight off the contract type, so a route added to the contract shows
@@ -110,7 +115,8 @@ export const ordersQueries = createQueryFactories({
   orders: { contract: ordersContract, client: ordersClient },
 }).orders;
 
-// Direct typed call: `.list()` is fully inferred from the contract.
+// Direct call: input, output, and declared errors are inferred from the contract.
+// Calls still reject on failure; use safe() as shown below when you want a result value.
 const recent = await ordersClient.list({ limit: 10 });
 ```
 
@@ -155,13 +161,143 @@ touches discovery; `createQueryFactories` is pure wiring over `{ contract, clien
     { name: "routerName", type: "string?", desc: "Router-name segment for URL path construction. Required for plugin API services, omitted for plain services." },
     { name: "protocol", type: "'http' | 'https'?", desc: "Resolved protocol for service discovery." },
     { name: "apiPath / apiVersion", type: "string?", desc: "Base RPC path and API version segment overrides." },
-    { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call." }
+    { name: "propagateTraceContext", type: "boolean?", desc: "Auto-propagate W3C traceparent/tracestate headers on each call." },
+    { name: "contributions", type: "readonly SdkClientContribution[]?", desc: "Explicit literal tuple of typed request contributions. The tuple infers required per-call context and reserves its declared headers." }
   ]
 }) }}
 
+## Typed request contributions
+
+Contributions add typed per-call context and declare ownership of lower-case request headers. Attach
+the literal tuple to each service that needs it; contributions are explicit and are never installed
+automatically.
+
+This example composes an auth-shaped application contribution with the SDK's non-auth locale
+contribution:
+
+```ts
+import {
+  createLocaleSdkClientContribution,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
+import { defineServices } from '@netscript/sdk/presets';
+import { oc } from '@orpc/contract';
+import { z } from 'zod';
+
+const accountsContract = {
+  profile: oc.route({ method: 'GET' })
+    .input(z.object({}))
+    .output(z.object({ id: z.string(), displayName: z.string() })),
+};
+
+const locale = createLocaleSdkClientContribution();
+const bearer = defineSdkClientContribution<{
+  auth: { getAccessToken(): Promise<string>; cachePartition: string };
+}>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:bearer',
+  context: { auth: 'required' },
+  headerKeys: ['authorization'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.auth.cachePartition,
+  },
+  prepare: async ({ context }) => ({
+    headers: { authorization: `Bearer ${await context.auth.getAccessToken()}` },
+  }),
+});
+
+const sdk = defineServices({
+  accounts: {
+    contract: accountsContract,
+    contributions: [bearer, locale] as const,
+  },
+});
+
+const context = {
+  auth: {
+    getAccessToken: () => Promise.resolve('runtime-only-value'),
+    cachePartition: 'account-epoch-7',
+  },
+  locale: 'de-CH',
+};
+await sdk.clients.accounts.profile({}, { context });
+sdk.queryUtils.accounts.profile.queryOptions({ input: {}, context });
+```
+
+The locale factory canonicalizes one optional Unicode BCP 47 locale, owns `accept-language`, and
+uses the canonical locale as its declared cache partition. An absent locale emits no header and uses
+the stable `default` partition. Preference lists and quality weights are rejected. Other
+contributions must declare whether responses are `invariant`, `partitioned`, or `direct-only`;
+partition values must be stable, printable, and non-secret.
+
+### Typed bearer credentials
+
+Credential fields do not belong on `CreateServiceClientOptions`. Instead, attach the canonical
+auth contribution through the versioned client-contribution seam. Its resolver receives only the
+context fields it declares, runs once per logical retry epoch, and owns only the lower-case
+`authorization` header:
+
+```ts
+import { createServiceClient } from '@netscript/sdk/client';
+import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
+import { createBearerSdkClientContribution } from '@netscript/plugin-auth-core/sdk';
+
+declare const applicationSession: { accessToken: string; accountId: string };
+
+const bearer = createBearerSdkClientContribution<{
+  auth: { getAccessToken(): string | undefined | PromiseLike<string | undefined> };
+  accountPartition: string;
+}>({
+  context: { auth: 'required', accountPartition: 'required' },
+  resolveCredential: ({ context }) => context.auth.getAccessToken(),
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.accountPartition,
+  },
+});
+
+const authClient = createServiceClient({
+  contract: authContract,
+  serviceName: 'auth-api',
+  routerName: 'auth',
+  contributions: [bearer] as const,
+});
+
+await authClient.me(undefined, {
+  context: {
+    auth: { getAccessToken: () => applicationSession.accessToken },
+    accountPartition: applicationSession.accountId,
+  },
+});
+```
+
+Procedure metadata controls resolution: `none` skips the resolver, `optional` omits the header when
+no credential is available, and `required` fails preparation when it is missing. Unmarked routes
+default to `none`. Bearer credentials require HTTPS except on localhost, `.localhost`, IPv4
+`127/8`, and IPv6 `::1`; other cleartext origins require an explicit opt-in.
+
+Choose `responseCache: { mode: 'direct-only' }` if authenticated responses must bypass generated
+query helpers. A `partitioned` cache must use a stable, non-secret tenant/account partition. Never
+derive a partition from a credential, session id, email address, or another reversible identity.
+Contribution factories do not read ambient environment variables, cookies, or browser storage.
+Plugin manifest references only make factories discoverable—they do not activate them.
+
 The L3 alternative builds all three layers from one map:
 `defineServices({ orders: { contract, serviceName: 'orders' } })` returns
-`{ clients, queryFactories, queryUtils }` — the same L2 values, just composed in one call.
+`{ clients, queries, queryUtils }` — the same L2 values, just composed in one call. Import it from
+`@netscript/sdk/presets` in browser/shared modules so the graph contains only the preset and its
+package-owned type closure. The root also exports `defineServices`, but neither entry installs a
+server cache provider.
+
+NetScript-managed Fresh apps register the shared provider when `defineFreshApp()` is called. A
+custom server composition root must do so explicitly:
+
+```ts
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
+
+setCacheProvider(cacheQuery);
+```
 
 ## Service discovery & query client
 
@@ -177,7 +313,7 @@ The L3 alternative builds all three layers from one map:
     { name: "createNetScriptQueryClient(options)", type: "@netscript/sdk/query-client", desc: "A TanStack QueryClient with server-first defaults: staleTime 30s, gcTime 300s, refetchOnWindowFocus false, retry 1." },
     { name: "bridgeInvalidation(resource, action?)", type: "@netscript/sdk/query-client", desc: "Build a client-side invalidation filter ({ queryKey }) for queryClient.invalidateQueries()." },
     { name: "toClientKeyPrefix(resource, action?)", type: "@netscript/sdk/query-client", desc: "Map a server resource/action to a prefix-matchable client query key, e.g. ['orders','list']." },
-    { name: "cacheQuery.setCachedData(key, data, ttl)", type: "@netscript/sdk/cache", desc: "Server-only: fire-and-forget pre-warm of an entity into the KV cache. Importing /cache auto-registers the shared provider." }
+    { name: "cacheQuery.setCachedData(key, data, ttl)", type: "@netscript/sdk/cache", desc: "Server-only: fire-and-forget pre-warm of an entity into the KV cache. Register cacheQuery explicitly at a custom server composition root." }
   ]
 }) }}
 
@@ -185,19 +321,96 @@ The L3 alternative builds all three layers from one map:
   {
     label: "Server loader (definePage layer)",
     lang: "ts",
-    code: "// routes/(dashboard)/orders/(_loaders)/orders-list.ts\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// Cache-first: read the KV entry (with cachedAt) for SWR; fall back to a fetch.\nexport const loadOrders = async () => {\n  const entry = await ordersQueries.list.getCachedEntry({ limit: 20 });\n  if (entry) return entry; // serve cached; SDK reloads stale in the background\n  return { data: await ordersQueries.list.queryOptions({ limit: 20 }).queryFn(), cachedAt: Date.now() };\n};"
+    code: "// routes/(dashboard)/orders/(_loaders)/orders-list.ts\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// The callable action owns cache policy; block on stale so metadata is current.\nexport const loadOrders = async () => {\n  const input = { limit: 20 };\n  const data = await ordersQueries.list(input, { preferFreshOnStale: true });\n  // getCachedEntry is a KV-only metadata read; it never fetches or revalidates.\n  const entry = await ordersQueries.list.getCachedEntry(input);\n  return entry ?? { data, cachedAt: Date.now() }; // fail safe if persistence did not land\n};"
   },
   {
     label: "Island (TanStack hydration)",
     lang: "tsx",
     code: "// orders/(_islands)/OrdersQueryIsland.tsx\nimport { useQuery, useQueryClient } from '@netscript/fresh/query';\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// Same contract action → same query key as the server loader, so the island\n// hydrates from server state instead of refetching on mount.\nconst OrdersList = () => {\n  const qc = useQueryClient();\n  const orders = useQuery(ordersQueries.list.queryOptions({ limit: 20 }));\n  // invalidate by prefix after a write:\n  const refresh = () => qc.invalidateQueries({ queryKey: ordersQueries.list.clientKey() });\n  return null; // render orders.data\n};"
-  },
-  {
-    label: "Safe error narrowing",
-    lang: "ts",
-    code: "// services/orders/src/routers/v1.ts — service-to-service call\nimport { safe, isDefinedError } from '@netscript/sdk/client';\nimport { usersClient } from '@app/lib/users.ts';\n\nconst [error, user, isDefined] = await safe(usersClient.getById({ id }));\nif (error) {\n  // narrow to a typed, contract-declared error\n  if (isDefinedError(error)) return { code: error.code, status: error.status };\n  throw error;\n}"
   }
 ] }) }}
+
+## Safe error narrowing
+
+For a route built from `baseContract`, the defined channel is exactly `NOT_FOUND`,
+`VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`.
+`safe()` returns a `SafeResult`: test `isSuccess` first, then test `isDefined` on the failure.
+That second test prevents a transport failure or arbitrary thrown value from falling through as a
+successful result. On the defined branch, `data` is inferred from the schema registered for the
+selected `code`; it is neither an open property bag nor `any`.
+
+```ts
+import { baseContract } from '@netscript/contracts';
+import { createServiceClient, safe } from '@netscript/sdk/client';
+import { z } from 'zod';
+
+const usersContract = {
+  getById: baseContract
+    .route({ method: 'GET', path: '/users/{id}' })
+    .input(z.object({ id: z.string() }))
+    .output(z.object({ id: z.string(), name: z.string() })),
+};
+const usersClient = createServiceClient({ contract: usersContract, serviceName: 'users' });
+
+type StandardErrorCode =
+  | 'NOT_FOUND'
+  | 'VALIDATION_ERROR'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'RATE_LIMITED'
+  | 'SERVICE_UNAVAILABLE';
+
+export async function loadUser(id: string) {
+  const result = await safe(usersClient.getById({ id }));
+  if (result.isSuccess) return result.data;
+  if (!result.isDefined) throw result.error;
+
+  const code: StandardErrorCode = result.error.code;
+  if (result.error.code === 'NOT_FOUND') {
+    // NOT_FOUND selects its schema: { resourceType, resourceId }.
+    console.error(result.error.data.resourceType, result.error.data.resourceId);
+  }
+  throw new Error(`users.getById failed: ${code}`, { cause: result.error });
+}
+```
+
+`isDefinedError(failure.error)` is the predicate form when you already have a typed failure union.
+It preserves the defined members present in that input type; it does not turn an arbitrary
+`unknown` value into one of the contract's declared errors.
+
+### Bare promises and the defined-error arm
+
+When a promise carries no contract error type, `TError` falls back to `Error`. In that case the
+`isDefined: true` arm of `SafeFailure<Error>` types `error` as `never`, while its
+`isDefined: false` arm carries the `Error`. The defined arm is therefore unreachable in the type
+system, but it can still be reached at runtime when a `DefinedError` rejects that bare promise and
+`safe()` returns a failure whose `isDefined` value is `true`.
+
+This is a deliberate characteristic of the API. To make the defined-error arm available to the
+type checker, pass `safe()` a promise carrying contract error typing, such as the promise returned
+by a service-client method, rather than a bare `Promise`. For an existing typed error union,
+`isDefinedError()` narrows to the `DefinedError` members already present in that union.
+
+### Migrating to 0.0.7
+
+The typed-error channel in **0.0.7 is an intentional pre-1.0 breaking change and is not
+patch-compatible**. Existing SDK consumers should account for all of these signature changes:
+
+| Surface | Before 0.0.7 | 0.0.7 and later |
+| --- | --- | --- |
+| `SafeFailure` / `SafeResult` failure payload | The second tuple slot and object `data` property were `null`. | Both are `undefined`: `[error, undefined, isDefined, false]` and `{ error, data: undefined, ... }`. |
+| `SafeFailure` arms | `SafeFailure<TError = unknown>` was one failure arm with `isDefined: boolean`. | It is two literal-discriminated arms, `isDefined: false` and `isDefined: true`. Code that typed the property as a general `boolean` or treated failure as one undifferentiated arm must branch on the literal. |
+| Default error type | `SafeFailure` and `SafeResult` defaulted `TError` to `unknown`; `safe<TOutput>` had no `TError` parameter and returned `SafeResult<TOutput>`, inheriting that default. | `SafeFailure`, `SafeResult`, and `safe` now default `TError` to `Error`. |
+| `ServiceClientMethod` | `ServiceClientMethod<TInput, TOutput>` returned `Promise<TOutput>`. | `ServiceClientMethod<TInput, TOutput, TError = Error>` returns `Promise<TOutput> & { __error?: { type: TError } }`; the optional phantom marker lets `safe()` recover `TError`. |
+| `safe(promise)` input | Accepted `PromiseLike<TOutput>`. | Requires `Promise<TOutput> & { __error?: { type: TError } }`. A non-`Promise` thenable now fails with `TS2345`; pass `Promise.resolve(thenable)` instead. |
+| `baseContract` error codes | The error-map key space was open, so undeclared codes remained type-valid even though comparisons against them were silently false at runtime. | The key space is exactly `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, or `SERVICE_UNAVAILABLE`. Comparing `error.code` with any other code is now a type error: intentional typo/undeclared-code protection and a breaking tightening. |
+| Result handling | Tuple destructuring such as `const [error, result] = await safe(...)` was the common idiom. | Branch on `result.isSuccess` first, then `result.isDefined`, as in the example above. |
+
+The tuple form has **not** been removed: every success and failure arm remains a tuple-and-object
+intersection, so destructuring still works. The discriminated form is the documented path because
+it keeps non-defined failures distinct from success and narrows contract-defined errors. For the
+payload migration, change a check such as `if (failure.data === null)` to
+`if (failure.data === undefined)`.
 
 ## Production notes
 

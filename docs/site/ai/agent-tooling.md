@@ -49,8 +49,8 @@ in, client out. The server's full per-tool contracts live in the
 netscript agent init
 ```
 
-Host detection installs the matching files. Use `--host claude`, `--host vscode`, or `--host all`
-to select an agent host explicitly. Editor configuration is a separate, shared target:
+Host detection selects which host integrations are added. Use `--host claude`, `--host vscode`, or
+`--host all` to select an agent host explicitly. Editor configuration is a separate, shared target:
 `--editor none|zed|vscode` applies the same Deno editor setup available during `netscript init` to
 an existing project and adds native MCP wiring. When omitted, one existing `.zed` or `.vscode`
 directory is honoured; if both exist, select explicitly. Unsupported editor names fail with the
@@ -63,11 +63,14 @@ project. Version disagreement or a failed documentation command aborts before th
 is written; without the flag, no offline corpus is installed. When the bundle is installed, every
 generated host command receives the same absolute `--docs-root <project>/.netscript/docs` pair.
 
-| Host        | Files written                                                                                        |
-| ----------- | ---------------------------------------------------------------------------------------------------- |
-| Claude Code | `.mcp.json`, NetScript skills under `.claude/skills/`, and a marked NetScript section in `AGENTS.md` |
-| VS Code     | `.vscode/mcp.json`                                                                                   |
-| Zed         | `.zed/settings.json` with `context_servers` (plus Deno settings, tasks, and debug configuration)     |
+Every host receives the canonical NetScript skill bundle under `.agents/skills/` and a marked
+NetScript section in `AGENTS.md`. Host and editor targets add only their own integration files:
+
+| Host or editor target | Additional files written |
+| --- | --- |
+| Claude Code host | `.mcp.json`, a derived mirror of the canonical bundle under `.claude/skills/`, and the conditional `playwright-cli` skill when that skill is absent and Aspire is available (best-effort; failures and timeouts are reported and skipped) |
+| VS Code editor | `.vscode/mcp.json`, `.netscript/schema/config-file.v1.json`, `.vscode/settings.json`, `.vscode/extensions.json`, `.vscode/launch.json`, `.vscode/tasks.json` |
+| Zed editor | `.zed/settings.json` with `context_servers`, `.zed/debug.json`, `.zed/tasks.json`, `.netscript/schema/config-file.v1.json` |
 
 The generated MCP configuration runs `netscript agent mcp` for the current
 project. Re-running `agent init` is idempotent: unchanged files are left alone,

@@ -43,30 +43,20 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.5.3-v1
 
       - name: Install Aspire CLI
-        env:
-          # 13.4.6 can orphan stopped NuGet prefetch helpers that deadlock later
-          # restores (microsoft/aspire#18948). This is the first daily build we
-          # verified contains the merged lifecycle fix (microsoft/aspire#18958).
-          ASPIRE_CLI_VERSION: '13.5.0-preview.1.26404.10'
         run: |
-          curl -fsSL https://aspire.dev/install.sh | bash -s -- \
-            --version "$ASPIRE_CLI_VERSION" \
-            --install-path "$HOME/.aspire/bin" \
-            --skip-path
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version 13.5.3
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Aspire CLI preflight
-        env:
-          ASPIRE_CLI_VERSION: '13.5.0-preview.1.26404.10'
         run: |
           aspire_version="$(aspire --version)"
           echo "$aspire_version"
           case "$aspire_version" in
-            "$ASPIRE_CLI_VERSION"|"$ASPIRE_CLI_VERSION"+*) ;;
-            *) echo "Expected Aspire CLI $ASPIRE_CLI_VERSION, got $aspire_version" >&2; exit 1 ;;
+            13.5.*) ;;
+            *) echo "Expected Aspire CLI 13.5.x, got $aspire_version" >&2; exit 1 ;;
           esac
           aspire doctor --non-interactive --nologo
 
@@ -100,16 +90,49 @@ jobs:
           echo "sleeping 120s so just-published @netscript/cli@${{ steps.version.outputs.version }} and deps become resolvable on JSR before install."
           sleep 120
 
+      - name: Install workspace dependencies
+        id: install_workspace_dependencies
+        run: deno install
+
+      # The README owns the first application/runtime on this fresh hosted VM.
+      # Downloaded SDK packages and images are allowed; no prior application runs or state.
+      - name: Verify cold README baseline
+        run: |
+          set -euo pipefail
+          mkdir -p .llm/tmp
+          readme_apphosts="$(aspire ps --format Json | jq 'length')"
+          readme_containers="$(docker container ls --all --quiet | wc -l)"
+          readme_images="$(docker image ls -q | wc -l)"
+          readme_volumes="$(docker volume ls -q | wc -l)"
+          readme_networks="$(docker network ls --filter type=custom -q | wc -l)"
+          jq -n \
+            --argjson appHosts "$readme_apphosts" \
+            --argjson containers "$readme_containers" \
+            --argjson images "$readme_images" \
+            --argjson volumes "$readme_volumes" \
+            --argjson networks "$readme_networks" \
+            '{appHosts: $appHosts, containers: $containers, images: $images, volumes: $volumes, networks: $networks}' \
+            > .llm/tmp/readme-cold-baseline.json
+          # This hosted PostgreSQL scenario needs fresh application state, not empty image caches.
+          # Image count is diagnostic only; Docker is not a universal framework prerequisite.
+          jq -e '[.appHosts, .containers, .volumes, .networks] | all(. == 0)' .llm/tmp/readme-cold-baseline.json
+          test ! -e .llm/tmp/cli-e2e/my-app
+
+      - name: Root README Quickstart E2E (published CLI, verbatim)
+        run: |
+          deno task e2e:cli run readme.quickstart \
+            --source jsr \
+            --cli "jsr:@netscript/cli@${{ steps.version.outputs.version }}" \
+            --cleanup \
+            --report .llm/tmp/readme-quickstart-prod-report.json \
+            --log-file .llm/tmp/readme-quickstart-prod.ndjson
+
       - name: Install published CLI from JSR
         id: install_published_cli
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
           deno install -g -A --minimum-dependency-age=0 -n netscript "jsr:@netscript/cli@${{ steps.version.outputs.version }}"
           netscript --help
-
-      - name: Install workspace dependencies
-        id: install_workspace_dependencies
-        run: deno install
 
       - name: Public init smoke from JSR CLI
         run: |
@@ -148,7 +171,7 @@ jobs:
         if: failure()
         run: |
           found=false
-          for report in .llm/tmp/cli-e2e-prod-report.json .llm/tmp/quickstart-walk-prod-report.json; do
+          for report in .llm/tmp/cli-e2e-prod-report.json .llm/tmp/quickstart-walk-prod-report.json .llm/tmp/readme-quickstart-prod-report.json; do
             if [ -f "$report" ]; then
               found=true
               deno run --allow-read --allow-env=GITHUB_STEP_SUMMARY --allow-write="$GITHUB_STEP_SUMMARY" \
@@ -171,5 +194,12 @@ jobs:
             .llm/tmp/cli-e2e-prod.ndjson
             .llm/tmp/quickstart-walk-prod-report.json
             .llm/tmp/quickstart-walk-prod.ndjson
+            .llm/tmp/readme-quickstart-prod-report.json
+            .llm/tmp/readme-quickstart-prod.ndjson
+            .llm/tmp/readme-cold-baseline.json
+            .llm/tmp/readme-quickstart/state.json
+            .llm/tmp/readme-quickstart/receipts/*.json
+            .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json
+            .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json
             ~/.aspire/logs/cli_*.log
           if-no-files-found: ignore

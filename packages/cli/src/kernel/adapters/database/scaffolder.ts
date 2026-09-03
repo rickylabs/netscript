@@ -20,6 +20,7 @@ import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import {
   generateDatabaseDenoJson,
   generateDatabaseFacadeMod,
+  generateDatabaseSeed,
   generateEngineMod,
   generatePrismaConfig,
 } from '../../templates/database/database-generators.ts';
@@ -44,15 +45,50 @@ export default PrismaClient;
 `;
 }
 
-function generateClearSeededPrismaClient(): string {
+function generatePlaceholderCrudZod(modelName: string): string {
+  return `// This file is seeded by netscript init and replaced by database code generation.
+
+import { z } from 'zod';
+
+export const ${modelName}Schema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const ${modelName}CreateInput = z.object({
+  name: z.string(),
+});
+
+export const ${modelName}UpdateInput = ${modelName}CreateInput.partial();
+`;
+}
+
+function generateClearSeededArtifacts(): string {
   return `/**
- * Remove the seeded Prisma client placeholder before real Prisma generation.
+ * Remove scaffold placeholders before real Prisma and Zod generation.
  *
  * @module
  */
 
+const seededFiles = [
+  new URL('../schema/.generated/client.server.ts', import.meta.url),
+  new URL('../schema/.generated/zod/crud.ts', import.meta.url),
+];
+
+for (const file of seededFiles) {
+  try {
+    await Deno.remove(file);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) {
+      throw error;
+    }
+  }
+}
+
 try {
-  await Deno.remove(new URL('../schema/.generated/client.server.ts', import.meta.url));
+  await Deno.remove(new URL('../schema/.generated/zod', import.meta.url), { recursive: true });
 } catch (error) {
   if (!(error instanceof Deno.errors.NotFound)) {
     throw error;
@@ -95,6 +131,7 @@ export class DatabaseScaffolder {
     const workspaceDir = join(databaseRoot, provider.dirName);
     const schemaDir = join(workspaceDir, 'schema');
     const generatedDir = join(schemaDir, '.generated');
+    const generatedZodDir = join(generatedDir, 'zod');
     const migrationsDir = join(workspaceDir, 'migrations');
     const scriptsDir = join(workspaceDir, 'scripts');
 
@@ -104,7 +141,15 @@ export class DatabaseScaffolder {
     const overwrite = options.overwrite ?? false;
 
     for (
-      const dir of [databaseRoot, workspaceDir, schemaDir, generatedDir, migrationsDir, scriptsDir]
+      const dir of [
+        databaseRoot,
+        workspaceDir,
+        schemaDir,
+        generatedDir,
+        ...(provider.capabilities.hasZodGeneration ? [generatedZodDir] : []),
+        migrationsDir,
+        scriptsDir,
+      ]
     ) {
       await this.fs.createDir(dir);
       directoriesCreated.push(dir);
@@ -146,7 +191,10 @@ export class DatabaseScaffolder {
       }),
     );
     await write(join(databaseRoot, SCAFFOLD_FILES.MOD), generateDatabaseFacadeMod(provider));
-    await write(join(workspaceDir, SCAFFOLD_FILES.MOD), generateEngineMod(provider, { configKey }));
+    await write(
+      join(workspaceDir, SCAFFOLD_FILES.MOD),
+      generateEngineMod(provider, { configKey, databaseName }),
+    );
     await write(
       join(schemaDir, 'schema.prisma'),
       renderTemplateAssetSync(TEMPLATE_KEYS.databaseSchema, templateVars),
@@ -155,9 +203,15 @@ export class DatabaseScaffolder {
       join(generatedDir, provider.capabilities.clientEntrypoint),
       generatePlaceholderPrismaClient(),
     );
+    if (provider.capabilities.hasZodGeneration) {
+      await write(
+        join(generatedZodDir, 'crud.ts'),
+        generatePlaceholderCrudZod(templateVars.modelName),
+      );
+    }
     await write(
       join(scriptsDir, 'seed.ts'),
-      renderTemplateAssetSync(TEMPLATE_KEYS.databaseSeed, templateVars),
+      generateDatabaseSeed({ modelName: templateVars.modelName }),
     );
     await write(
       join(scriptsDir, 'fix-zod-imports.ts'),
@@ -167,7 +221,7 @@ export class DatabaseScaffolder {
       join(scriptsDir, 'migrate.ts'),
       renderTemplateAssetSync(TEMPLATE_KEYS.databaseScriptsMigrate, templateVars),
     );
-    await write(join(scriptsDir, 'clear-seeded-client.ts'), generateClearSeededPrismaClient());
+    await write(join(scriptsDir, 'clear-seeded-client.ts'), generateClearSeededArtifacts());
 
     if (provider.capabilities.hasZodGeneration) {
       const zodGeneratorConfig = renderTemplateAssetSync(

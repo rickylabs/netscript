@@ -25,9 +25,52 @@ sub-path exports add higher-level builders:
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `baseContract` | const | `const baseContract: BaseContract` | Common oRPC contract primitive with NetScript's standard error map applied. |
-| `BaseContract` | type alias | `type BaseContract = ReturnType<typeof oc.errors>` | Common oRPC contract primitive with NetScript's standard error map applied. |
+| `BaseContract` | type alias | `type BaseContract = typeof baseContract` | Common oRPC contract primitive with NetScript's standard error map applied. |
+| `BaseContractErrors` | type alias | `type BaseContractErrors = MergedErrorMap<Record<never, never>, CommonErrorMap>` | NetScript-owned name for the exact standard error map carried by every base route. Its error codes, HTTP statuses, message literals, and data schemas are the stable compatibility contract. |
+| `BaseContractMeta` | type alias | `type BaseContractMeta = NetScriptProcedureMeta & Record<never, never>` | NetScript-owned exact metadata slot carried by the base builder. Compatibility evolves through additive optional readonly fields on `NetScriptProcedureMeta`. |
 | `BaseContractRoute` | type alias | `type BaseContractRoute<TIn, TOut> = ContractProcedureBuilderWithInputOutput<...>` | Sound type of a route built via baseContract.route(...).input(TIn).output(TOut). |
 | `BaseContractOutputRoute` | type alias | `type BaseContractOutputRoute<TOut> = ContractProcedureBuilderWithOutput<...>` | Sound type of an output-only route built via baseContract.route(...).output(TOut) (no .input(...)). |
+| `NetScriptAuthenticationRequirement` | type alias | `type NetScriptAuthenticationRequirement = "none" \| "optional" \| "required"` | NetScript-owned authentication vocabulary used by procedure metadata. Existing literals remain stable; metadata capabilities evolve through additive optional readonly fields. |
+| `NetScriptProcedureMeta` | interface | `interface NetScriptProcedureMeta` | NetScript-owned semantic procedure metadata, independent of the upstream contract-library representation. Consumers treat absent fields as unspecified; compatibility evolves through additive optional readonly fields. |
+
+### Procedure access metadata
+
+`NetScriptProcedureMeta.access` is the single access-policy vocabulary. Attach it to the procedure
+with `.meta()`; do not create a second policy object keyed by a router name or URL.
+
+```ts
+import { baseContract } from '@netscript/contracts';
+import { z } from 'zod';
+
+export const readOrder = baseContract
+  .route({ method: 'GET', path: '/orders/{id}' })
+  .meta({
+    access: {
+      authentication: 'required',
+      authorization: {
+        scopes: ['orders:read'],
+        roles: ['operator'],
+      },
+    },
+  })
+  .input(z.object({ id: z.string() }))
+  .output(z.object({ id: z.string() }));
+```
+
+| Field | Meaning |
+| --- | --- |
+| `access.authentication` | Optional `'none' \| 'optional' \| 'required'` declaration. An absent access field is unspecified. |
+| `access.authorization.scopes` | Optional readonly scope requirements. |
+| `access.authorization.roles` | Optional readonly role requirements. |
+
+The metadata is contract-local, so it follows the procedure when the router key is renamed. The
+renamed SDK method retains the metadata, while a reference to the old SDK key fails to type-check.
+This is rename continuity; it does not require a second key-indexed policy map.
+
+Runtime enforcement is separately opt-in through `@netscript/service`. The vocabulary declares
+`'optional'` for future support, but `createContractAuthorizer()` currently rejects it during
+construction with the stable
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` error.
 
 ## Schema helper factories
 
@@ -51,6 +94,7 @@ sub-path exports add higher-level builders:
 | `validationFailed` | function | `function validationFailed(options: ValidationFailedOptions): never` | Throws the contract `VALIDATION_ERROR` oRPC error. |
 | `getResourceType` | function | `function getResourceType(options: { path?: readonly string[]; }): string` | Resolves a singular resource name from an oRPC handler path. |
 | `COMMON_ERROR_CODES` | const | `const COMMON_ERROR_CODES: Readonly<{ notFound; validationError; unauthorized; forbidden; rateLimited; serviceUnavailable; }>` | Common oRPC error codes shared by NetScript service contracts. |
+| `CommonErrorMap` | type alias | `type CommonErrorMap = Readonly<{ ... }>` | The standard NetScript error map carried by every base route. Its error codes, HTTP statuses, message literals, and data schemas are stable compatibility commitments. |
 | `NotFoundErrorSchema` | const | `const NotFoundErrorSchema: ContractSchema<NotFoundError>` | Common not-found error schema. |
 | `ValidationErrorSchema` | const | `const ValidationErrorSchema: ContractSchema<ValidationError>` | Common validation error schema. |
 | `UnauthorizedErrorSchema` | const | `const UnauthorizedErrorSchema: ContractSchema<UnauthorizedError>` | Common unauthorized error schema. |

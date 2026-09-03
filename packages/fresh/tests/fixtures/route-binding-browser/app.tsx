@@ -1,9 +1,30 @@
 import { App } from 'fresh';
 import { Partial } from 'fresh/runtime';
+import { QueryClient } from '@tanstack/query-core';
 import { definePage } from '../../../src/application/builders/mod.ts';
+import { dehydrateQueryClient } from '../../../src/application/query/mod.ts';
 import { routes } from './routes.ts';
+import ServiceShowcaseLab from './routes/examples/(_islands)/ServiceShowcaseLab.tsx';
+import { ServiceExampleLabPanel } from './routes/examples/service/(_components)/lab-panel.tsx';
 
 type FixtureState = Record<string, never>;
+
+const serviceListQueryKey = ['route-binding-browser', 'service-list'] as const;
+
+function serviceShowcaseProps() {
+  const initialRow = { id: 1, name: 'Server row' };
+  const initialDataUpdatedAt = Date.now();
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(serviceListQueryKey, initialRow, {
+    updatedAt: initialDataUpdatedAt,
+  });
+
+  return {
+    dehydratedState: dehydrateQueryClient(queryClient),
+    initialRow,
+    initialDataUpdatedAt,
+  };
+}
 
 const generatedOrderRoute = routes.orders.$id.$route;
 
@@ -30,6 +51,24 @@ const orderPage = definePage<FixtureState>()
   })
   .build();
 
+function ServiceExampleRouteLayout(): object {
+  const slots = serviceShowcasePage.hooks.useSlots();
+
+  return (
+    <html>
+      <body>
+        <main id='service-showcase-layout'>{slots.lab()}</main>
+      </body>
+    </html>
+  );
+}
+
+const serviceShowcasePage = definePage<FixtureState>()
+  .withRouteContract({ $route: '/examples/service' })
+  .withLayer('lab', ServiceExampleLabPanel, serviceShowcaseProps)
+  .withLayout(() => <ServiceExampleRouteLayout />)
+  .build();
+
 function indexPage() {
   const orderLink = generatedOrderRoute.getLinkProps({
     path: { id: 'order-42' },
@@ -49,12 +88,30 @@ function indexPage() {
   );
 }
 
+function directServiceShowcasePage() {
+  return (
+    <html>
+      <body>
+        <main id='service-showcase-direct'>
+          <ServiceShowcaseLab {...serviceShowcaseProps()} />
+        </main>
+      </body>
+    </html>
+  );
+}
+
 /** Create the real Fresh app used by the generated route binding browser test. */
 export function createRouteBindingBrowserApp(): App<FixtureState> {
   const app = new App<FixtureState>();
 
+  app.get('/favicon.ico', () => new Response(null, { status: 204 }));
   app.get('/', (ctx) => ctx.render(indexPage()));
+  app.get('/examples/service-direct', (ctx) => ctx.render(directServiceShowcasePage()));
   app.get('/orders/:id', async (ctx) => ctx.render(await orderPage.page(ctx)));
+  app.get(
+    '/examples/service',
+    async (ctx) => ctx.render(await serviceShowcasePage.page(ctx)),
+  );
 
   return app;
 }

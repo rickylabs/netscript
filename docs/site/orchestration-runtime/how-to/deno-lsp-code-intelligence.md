@@ -2,7 +2,7 @@
 layout: layouts/base.vto
 title: Deno LSP code intelligence in Claude Code
 templateEngine: [vento, md]
-order: 108
+order: 109
 oldUrl: /how-to/deno-lsp-code-intelligence/
 ---
 

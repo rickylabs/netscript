@@ -1,6 +1,13 @@
 import { StreamProducerMetricNames } from '@netscript/plugin-streams-core/telemetry';
 import type { TelemetryTrace } from '@netscript/telemetry/query';
 import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
+import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
+import { resolveOtlpHeadersFromResource } from './otlp-headers.ts';
+import {
+  type ResourceUpdate,
+  type ResourceUpdateSubscription,
+  watchResourceUpdates,
+} from './runtime/resource-state-stream.ts';
 
 // This coordinator is copied into service-only smoke workspaces where the streams plugin source is
 // intentionally absent. Keep the probe's wire markers structural so static scaffold checks do not
@@ -16,7 +23,11 @@ interface ProducerReconnectProbeResult {
   readonly sinceUnixMs: number;
 }
 
+/** Test-failure ceiling for the child probe's backoff marker, not Aspire resource state. */
 const PROBE_TIMEOUT_MS = 90_000;
+/** Test-failure ceiling for a hung resource follower; it is not a transition-time assumption. */
+const RESOURCE_EVENT_FAILURE_CEILING_MS = 120_000;
+/** Telemetry-export retry cap and delay; neither discovers Aspire resource state. */
 const TELEMETRY_ATTEMPTS = 30;
 const TELEMETRY_DELAY_MS = 500;
 const SERVICE_NAME = 'streams-producer-reconnect-probe';
@@ -97,21 +108,34 @@ export function assertProducerReconnectMetrics(
 }
 
 async function main(): Promise<void> {
-  const [projectRoot, appHost, repoRoot, baseUrl] = Deno.args;
-  if (!projectRoot || !appHost || !repoRoot || !baseUrl) {
-    throw new Error('project root, AppHost, repository root, and streams base URL are required');
+  const [projectRoot, appHost, repoRoot] = Deno.args;
+  if (!projectRoot || !appHost || !repoRoot) {
+    throw new Error('project root, AppHost, and repository root are required');
   }
+  const baseUrl = firstResourceUrl(
+    await resolveResourceUrlsFromAppHost(appHost, 'streams'),
+    'streams',
+  );
   const metadata = await readStartMetadata(projectRoot);
   const otlpEndpoint = await readOtlpEndpoint(metadata.logFile);
   let streamsStarted = true;
   let child: Deno.ChildProcess | undefined;
   let otlpCapture: OtlpCapture | undefined;
+  const resourceUpdates = await watchResourceUpdates(appHost, 'streams');
 
   try {
+    // The dashboard runs with anonymous access disabled, so its OTLP receiver rejects exports
+    // without `x-otlp-api-key`. The probe is not an Aspire resource; borrow the ingest key from
+    // the `streams` resource process while it is still running, before this gate stops it.
+    const otlpHeaders = await resolveOtlpHeadersFromResource(
+      projectRoot,
+      'streams',
+      'producer-reconnect-probe',
+    );
     await runAspireResource(appHost, 'stop');
     streamsStarted = false;
-    await waitForStreamsOffline(baseUrl);
-    otlpCapture = startOtlpCapture(otlpEndpoint);
+    await requireStreamsObservation(resourceUpdates, 'Finished');
+    otlpCapture = startOtlpCapture(otlpEndpoint, otlpHeaders);
 
     child = new Deno.Command('deno', {
       args: [
@@ -152,7 +176,7 @@ async function main(): Promise<void> {
 
     await runAspireResource(appHost, 'start');
     streamsStarted = true;
-    await waitForStreamsHealthy(appHost);
+    await requireStreamsObservation(resourceUpdates, 'Running', 'Healthy');
 
     const status = await child.status;
     const [stdoutText, stderrText] = await Promise.all([stdout.completed, stderr.completed]);
@@ -170,21 +194,32 @@ async function main(): Promise<void> {
       } and preserved trace ${result.traceId} with retry/recovery/delivery metrics.`,
     );
   } finally {
-    if (!streamsStarted) {
-      await runAspireResource(appHost, 'start').catch((error) =>
-        console.error(`Failed to restore streams resource after reconnect gate: ${String(error)}`)
-      );
-    }
-    if (child) {
-      try {
-        child.kill('SIGTERM');
-      } catch {
-        // The probe already exited; its verdict was handled above.
+    try {
+      if (!streamsStarted) {
+        await runAspireResource(appHost, 'start').catch((error) =>
+          console.error(`Failed to restore streams resource after reconnect gate: ${String(error)}`)
+        );
       }
-      await child.status.catch(() => undefined);
+      if (child) {
+        try {
+          child.kill('SIGTERM');
+        } catch {
+          // The probe already exited; its verdict was handled above.
+        }
+        await child.status.catch(() => undefined);
+      }
+      await otlpCapture?.shutdown();
+    } finally {
+      // The long-lived Aspire follower must close even if probe or OTLP cleanup itself throws.
+      await resourceUpdates.close();
     }
-    await otlpCapture?.shutdown();
   }
+}
+
+function firstResourceUrl(urls: readonly string[], resourceName: string): string {
+  const url = urls[0];
+  if (!url) throw new Error(`Aspire resource ${resourceName} declared no URL.`);
+  return url;
 }
 
 interface OtlpCapture {
@@ -193,7 +228,10 @@ interface OtlpCapture {
   shutdown(): Promise<void>;
 }
 
-function startOtlpCapture(upstreamEndpoint: string): OtlpCapture {
+function startOtlpCapture(
+  upstreamEndpoint: string,
+  upstreamHeaders: Readonly<Record<string, string>> = {},
+): OtlpCapture {
   const metricPayloads: unknown[] = [];
   const abort = new AbortController();
   const server = Deno.serve({
@@ -211,6 +249,7 @@ function startOtlpCapture(upstreamEndpoint: string): OtlpCapture {
     const headers = new Headers(request.headers);
     headers.delete('host');
     headers.delete('content-length');
+    for (const [key, value] of Object.entries(upstreamHeaders)) headers.set(key, value);
     return await fetch(`${upstreamEndpoint.replace(/\/$/, '')}${url.pathname}`, {
       method: request.method,
       headers,
@@ -263,7 +302,7 @@ async function waitForOutputMarker(
   timeoutMs: number,
 ): Promise<boolean> {
   const reader = stream.getReader();
-  let timeoutId: number | undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_resolve, reject) => {
     timeoutId = setTimeout(
       () => reject(new Error(`Timed out waiting for ${marker}`)),
@@ -388,43 +427,41 @@ async function runAspireResource(appHost: string, command: 'start' | 'stop'): Pr
   }
 }
 
-async function waitForStreamsHealthy(appHost: string): Promise<void> {
-  const output = await new Deno.Command('aspire', {
-    args: [
-      'wait',
-      'streams',
-      '--status',
-      'healthy',
-      '--timeout',
-      '120',
-      '--apphost',
-      appHost,
-      '--non-interactive',
-      '--nologo',
-    ],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  if (!output.success) {
-    throw new Error(
-      `aspire wait streams failed with code ${output.code}: ${
-        decode(output.stderr) || decode(output.stdout)
-      }`,
+/** Await one streams lifecycle event and reject an observed-but-wrong aggregate health value. */
+export async function requireStreamsObservation(
+  subscription: ResourceUpdateSubscription,
+  expectedState: 'Finished' | 'Running',
+  expectedHealth?: 'Healthy',
+): Promise<ResourceUpdate> {
+  let update: ResourceUpdate;
+  let lastExpectedState: ResourceUpdate | undefined;
+  try {
+    update = await subscription.waitFor(
+      (candidate) => {
+        const state = candidate.resource.state;
+        if (typeof state !== 'string' || state.toLowerCase() !== expectedState.toLowerCase()) {
+          return false;
+        }
+        lastExpectedState = candidate;
+        const health = candidate.resource.healthStatus;
+        return expectedHealth === undefined ||
+          (typeof health === 'string' && health.toLowerCase() === expectedHealth.toLowerCase());
+      },
+      RESOURCE_EVENT_FAILURE_CEILING_MS,
     );
-  }
-}
-
-async function waitForStreamsOffline(baseUrl: string): Promise<void> {
-  const deadline = Date.now() + 30_000;
-  while (Date.now() < deadline) {
-    try {
-      await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(500) });
-    } catch {
-      return;
+  } catch (cause) {
+    if (expectedHealth !== undefined && lastExpectedState) {
+      const health = lastExpectedState.resource.healthStatus;
+      throw new Error(
+        `Aspire observed streams enter ${expectedState}, but healthStatus was ${
+          typeof health === 'string' ? health : 'missing'
+        }; raw line: ${lastExpectedState.rawLine}`,
+        { cause },
+      );
     }
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    throw new Error(`Aspire did not observe streams enter ${expectedState}`, { cause });
   }
-  throw new Error('streams resource remained reachable after Aspire stop');
+  return update;
 }
 
 async function readStartMetadata(

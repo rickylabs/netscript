@@ -42,8 +42,8 @@ carries an in-plan token-limit fallback where declared.
 | Vision-capable adversarial design evidence (`adversarial_design_eval`)                                                                                                                     | OpenCode · OpenRouter · Kimi K3 vision · high (`--variant`). Complements — does not replace — the required GLM 5.2 design pass. | —                                    |
 | Claude Code workflows (`claude_workflow`)                                                                                                                                                  | Claude · Anthropic · Opus 5 · low                                                                                               | —                                    |
 | Massive external research / extraction (`research_extraction`)                                                                                                                             | Antigravity CLI · Google · Gemini 3.6 Flash · low                                                                                 | —                                    |
-| **Local PLAN-EVAL** (`formal_plan_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex plans; Sol · high for Claude plans                                            | Minimax M3 · high for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
-| **Local IMPL-EVAL** (`formal_impl_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex work; Sol · xhigh for Claude work                                             | DeepSeek V4 Flash 0731 · max for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
+| **Local PLAN-EVAL** (`formal_plan_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex plans; Sol · high for Claude plans                                            | Qwen 3.8 Flash · max for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
+| **Local IMPL-EVAL** (`formal_impl_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex work; Sol · xhigh for Claude work                                             | GLM 5.3 Flash · max for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
 | Automated cloud evaluator                                                                                                                                                                  | OpenHands · approved open model only · branch smoke verified in Actions run `31574668989` (2026-08-12)                          | Local agentic evaluator when cloud is unavailable |
 
 The `major_ui_ux_*` GLM 5.2 lanes and the OpenCode vision-evidence lane are **dormant** while the
@@ -170,20 +170,25 @@ evaluates Codex-authored work; Codex GPT-5.6 Sol high (PLAN) or xhigh (IMPL) eva
 Claude-authored work. The generator session never evaluates itself.
 
 The phase-bound OpenRouter presets remain available only for a genuine third opinion or when the
-native opposite-family route is quota-blocked: Minimax M3 high for PLAN-EVAL, DeepSeek V4 Flash
-0731 max for small/simple IMPL-EVAL, and Qwen 3.8 Max for broader or complex IMPL-EVAL. If that
+native opposite-family route is quota-blocked: Qwen 3.8 Flash max for PLAN-EVAL and GLM 5.3 Flash
+max for IMPL-EVAL. IMPL-EVAL no longer splits its open route by slice complexity. If that
 escalation hits an OpenRouter limit, the final fallback is a fresh
 AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
 cloud-driven work.
 
 For cloud-driven PRs, the phase workflow dispatches from `openhands` + `status:plan-eval` or from
 draft→ready. An orchestrator may select one `eval:model:*` override before the transition but never
-duplicates the automatic trigger.
+duplicates the automatic trigger. OpenHands currently cannot attest reasoning effort because its
+adapter does not expose that identity; its comments and summaries must report that limitation and
+must not claim `max`.
 
 **Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`.
 `resolveCanonicalFormalEvaluatorRoute()` **throws** unless the requested native family or explicit
 fallback reason matches the phase-bound route. Approved OpenRouter model identities remain
 centralized in `config/models.ts`.
+
+<!-- canonical-open-evaluator-route lane=formal_plan_evaluation preset=claude-evaluator-qwen-3-8-flash model=qwen/qwen3.8-flash effort=max condition=open_model_route -->
+<!-- canonical-open-evaluator-route lane=formal_impl_evaluation preset=claude-evaluator-glm-5-3-flash model=z-ai/glm-5.3-flash effort=max condition=open_model_route -->
 
 ### OpenRouter through Claude Code
 
@@ -199,8 +204,8 @@ general-evaluation model.
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn | Lane              |
 | --------------------------------- | --------------- | ------------ | ----------------- |
-| `minimax/minimax-m3`              | yes             | supported    | PLAN-EVAL; workflow fanout uses a distinct preset |
-| `deepseek/deepseek-v4-flash-0731` | yes             | supported    | IMPL-EVAL |
+| `qwen/qwen3.8-flash`              | yes             | supported    | PLAN-EVAL |
+| `z-ai/glm-5.3-flash`              | yes             | supported    | IMPL-EVAL and hybrid/gateway default |
 | `z-ai/glm-5.2`                    | **none**        | —            | design/UI-UX; sole other use: `docs_polish` last-resort fallback |
 
 The **evaluator lane is fully capable**: real reasoning trace, verified agentic turn (real tool
@@ -238,9 +243,10 @@ supersede the GLM 5.2 requirement for major UI/UX work.
    significant frontend UX are either led through the `claude-design-glm-5-2` route or receive its
    adversarial design pass before merge.
 6. **Relay evaluator lanes run OPEN models only.** OpenRouter escalation uses
-   `minimax/minimax-m3` or `deepseek/deepseek-v4-flash-0731`; cloud OpenHands remains governed by
-   its approved open-model set. Closed models are prohibited on those relay surfaces because they
-   burn paid OpenRouter credit. Native Claude/Codex evaluation is not a relay route.
+   `qwen/qwen3.8-flash` for PLAN-EVAL or `z-ai/glm-5.3-flash` for IMPL-EVAL; cloud OpenHands remains
+   governed by the same approved open-model set, but cannot attest reasoning effort. Closed models
+   are prohibited on those relay surfaces because they burn paid OpenRouter credit. Native
+   Claude/Codex evaluation is not a relay route.
 
 ## Selection and handoff rules
 

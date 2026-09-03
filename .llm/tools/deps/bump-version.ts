@@ -30,6 +30,12 @@ interface Semver {
 const semverPattern =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
 
+/** Checked-in dogfood surfaces whose exact CLI pins follow the coordinated release version. */
+export const GENERATED_CONSUMER_VERSION_FILES: readonly string[] = [
+  '.agents/generated/consumer-skills/.llm/tools/release.json',
+  '.agents/generated/consumer-skills/.mcp.json',
+];
+
 /** Apply an exact release version to root, every declared workspace member, scaffolds, and lock. */
 export async function coordinateVersionBump(
   root: string,
@@ -164,10 +170,14 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
   const trackedFiles = await listTrackedFiles(root);
   const rootLock = normalize(join(root, 'deno.lock'));
   const files = new Set<string>([rootDenoJson, ...memberManifests]);
-  if (await includesLock(rootLock, trackedFiles)) files.add(rootLock);
+  if (await includesTrackedOrExistingFile(rootLock, trackedFiles)) files.add(rootLock);
+  for (const relativePath of GENERATED_CONSUMER_VERSION_FILES) {
+    const path = normalize(join(root, relativePath));
+    if (await includesTrackedOrExistingFile(path, trackedFiles)) files.add(path);
+  }
   for (const manifest of memberManifests) {
     const memberLock = normalize(join(dirname(manifest), 'deno.lock'));
-    if (await includesLock(memberLock, trackedFiles)) files.add(memberLock);
+    if (await includesTrackedOrExistingFile(memberLock, trackedFiles)) files.add(memberLock);
     for await (
       const entry of walk(dirname(manifest), {
         includeDirs: false,
@@ -216,7 +226,7 @@ async function listTrackedFiles(root: string): Promise<ReadonlySet<string> | und
   return new Set(paths.map((path) => normalize(join(root, path))));
 }
 
-async function includesLock(
+async function includesTrackedOrExistingFile(
   path: string,
   trackedFiles: ReadonlySet<string> | undefined,
 ): Promise<boolean> {

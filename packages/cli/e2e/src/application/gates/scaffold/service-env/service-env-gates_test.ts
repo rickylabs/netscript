@@ -19,7 +19,7 @@
  */
 
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
-import { fromFileUrl } from '@std/path';
+import { fromFileUrl, resolve } from '@std/path';
 import { GATE } from '../../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../../domain/gate-definition.ts';
 import type { GateId } from '../../../../domain/cli-surface.ts';
@@ -97,7 +97,7 @@ Deno.test('service env gates: every gate command names a script that exists', as
   for (const gate of createServiceEnvironmentGates()) {
     const script = commandOf(gate).find((argument) => argument.endsWith('.ts'));
     assert(script, `${gate.id} builds a command with no script argument`);
-    const stat = await Deno.stat(script);
+    const stat = await Deno.stat(resolve(REPO_ROOT, script));
     assert(stat.isFile, `${gate.id} points at ${script}, which is not a file`);
   }
 });

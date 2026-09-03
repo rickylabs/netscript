@@ -1,0 +1,25 @@
+Slice 3 supplemental: public-doc-lint finding-set identity
+Date: 2026-08-30
+Content head: 9ab779ce96f0ae282afe96ad3efaa5146a2bf428
+Receipt: receipts/public-doc-lint-final.json
+Outcome: FAIL (expected baseline-red), exit code 1
+Count: 12
+Comparison: exactR1Set=true; delta 0 from the settled R-1 set
+
+Sorted public symbol -> private referenced symbol pairs:
+1. BaseContractErrors -> MergedErrorMap
+2. BaseContractOutputRoute -> AnySchema
+3. BaseContractOutputRoute -> ContractProcedureBuilderWithOutput
+4. BaseContractOutputRoute -> Schema
+5. BaseContractRoute -> AnySchema
+6. BaseContractRoute -> ContractProcedureBuilderWithInputOutput
+7. CrudRoute -> AnySchema
+8. DurableStreamProducerOptions["instrumentation"] -> StreamsInstrumentation
+9. QueryClientPort -> QueryClient
+10. baseContract -> ContractBuilder
+11. baseContract -> Schema
+12. createNetScriptQueryClient -> QueryClient
+
+The structured per-member reports contain 9 contracts findings and 3 SDK findings, all
+private-type-ref, with 0 missing-jsdoc and 0 other findings. No `commonErrorMap` link, new public
+symbol, or upstream oRPC type export was introduced to alter this baseline.

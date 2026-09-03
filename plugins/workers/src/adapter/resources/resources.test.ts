@@ -1,4 +1,5 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { fromFileUrl } from 'jsr:@std/path@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { workersAdapterPlugin } from '../plugin.ts';
 import { DEFAULT_JOB_INPUT, jobScaffolder, taskScaffolder, workflowScaffolder } from './mod.ts';
@@ -25,6 +26,35 @@ Deno.test('workers install starter job is byte-identical to add job default emis
   assertEquals(installJob ? artifactText(installJob) : undefined, artifactText(addJob));
 });
 
+Deno.test('workers install starter job is deno fmt clean', async () => {
+  const installJob = collectInstallArtifacts(workersAdapterPlugin).find((artifact) =>
+    artifact.path === 'workers/jobs/health-check.ts'
+  );
+  const temporaryDirectory = await Deno.makeTempDir({ prefix: 'netscript-workers-job-' });
+  const generatedJobPath = `${temporaryDirectory}/health-check.ts`;
+
+  try {
+    await Deno.writeTextFile(generatedJobPath, artifactText(installJob!));
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'fmt',
+        '--check',
+        '--config',
+        fromFileUrl(new URL('../../../../../deno.json', import.meta.url)),
+        generatedJobPath,
+      ],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const decoder = new TextDecoder();
+    const diagnostics = `${decoder.decode(output.stdout)}${decoder.decode(output.stderr)}`;
+
+    assertEquals(output.code, 0, diagnostics);
+  } finally {
+    await Deno.remove(temporaryDirectory, { recursive: true });
+  }
+});
+
 Deno.test('workers add job emits the same shape at the user-named path', () => {
   const [artifact] = jobScaffolder.emit({ id: 'welcome-email' });
 
@@ -33,7 +63,8 @@ Deno.test('workers add job emits the same shape at the user-named path', () => {
   assertStringIncludes(source, 'welcomeEmailJob');
   assertStringIncludes(source, "jobId: 'welcome-email'");
   assertStringIncludes(source, 'const PayloadSchema = z.object({}).passthrough().default({})');
-  assertStringIncludes(source, 'PayloadSchema.parse(context.payload)');
+  assertStringIncludes(source, 'defineJobHandler(\n  PayloadSchema,');
+  assertStringIncludes(source, 'export default welcomeEmailJob;');
 });
 
 Deno.test('workers install emits only userland glue under workers', () => {
@@ -56,6 +87,13 @@ Deno.test('workers install emits only userland glue under workers', () => {
       );
     }
   }
+
+  const controlPlane = artifacts.find((artifact) => artifact.path === 'workers/plugin.ts');
+  assertStringIncludes(artifactText(controlPlane!), 'NETSCRIPT_CONTRIBUTION_BUILDERS');
+  assertStringIncludes(
+    artifactText(controlPlane!),
+    "{ callee: 'defineJob', axis: 'jobs' }",
+  );
 });
 
 Deno.test('workers task scaffolder preserves multi-runtime task emission', () => {

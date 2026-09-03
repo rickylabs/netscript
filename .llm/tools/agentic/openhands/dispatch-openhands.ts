@@ -10,8 +10,9 @@
  * Token handling (classifier-enforced): the PAT is read from an env var the
  * supervisor sets in-process (`--token-env`, default GH_TOKEN -> GITHUB_TOKEN
  * fallback) and used ONLY as the Authorization header. It is never written to a
- * file, passed on argv, or echoed. `--dry-run` needs no token and makes no
- * network call.
+ * file, passed on argv, or echoed. A non-formal `--dry-run` needs no token and
+ * makes no network call. Formal `--phase` mode always resolves a token and the
+ * live PR head, including for dry-run output.
  *
  * OpenHands concurrency note: many `@openhands-agent` comments on one PR cancel
  * all-but-one pending run. Dispatch one trigger per intended run. A PR-comment
@@ -28,7 +29,7 @@
  * Modes:
  *   (default)    Validate prompt -> build comment -> POST it.
  *   --dry-run    Validate + print the target, trigger line, and full comment body
- *                without posting and without needing a token.
+ *                without posting. Formal mode still reads the live PR head.
  *
  * Usage:
  *   deno run --allow-read --allow-env --allow-net \
@@ -36,6 +37,7 @@
  *     --repo rickylabs/netscript --pr 86 \
  *     --prompt-file <win-path> --model <open-model-id> \
  *     --output pr-comment --iterations 800 [--provider openrouter] \
+ *     [--phase plan|impl] \
  *     [--token-env GH_TOKEN] [--dry-run] [--pretty]
  *
  * Exit codes: 0 = ok / dry-run clean · 1 = post failed · 2 = usage error ·
@@ -47,11 +49,15 @@ import {
   buildOpenHandsComment,
   githubField,
   githubRequest,
+  type GitHubResponse,
+  type OpenHandsDispatchPhase,
   parseRepoSlug,
   requireValue,
+  type ResolvedGithubToken,
   resolveGithubToken,
   validateHandoffContract,
 } from '../lib/agentic-lib.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { requestedLaunchIdentity } from '../runtime/launch-route-identity.ts';
 import { OPEN_EVALUATOR_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
@@ -65,10 +71,27 @@ interface Options {
   iterations?: string;
   provider?: string;
   effort?: string;
+  phase?: OpenHandsDispatchPhase;
   tokenEnv: string;
   verdictContract: boolean;
   dryRun: boolean;
   pretty: boolean;
+}
+
+export interface DispatchOpenHandsDependencies {
+  readTextFile(path: string): Promise<string>;
+  resolveGithubToken(options: { preferEnv: string }): Promise<ResolvedGithubToken>;
+  githubRequest(
+    method: string,
+    path: string,
+    token: string,
+    body?: unknown,
+  ): Promise<GitHubResponse>;
+}
+
+export interface DispatchOpenHandsOutput {
+  log(value: string): void;
+  error(value: string): void;
 }
 
 function printHelp(): void {
@@ -83,21 +106,23 @@ function printHelp(): void {
     '  --pr <n>              Target PR number (checks out PR branch).',
     '  --issue <n>           Target issue number (checks out default branch).',
     '  --prompt-file <path>  Windows path to the dispatch prompt (validated for contract). Required.',
-    `  --model <id>          Literal LiteLLM model id (e.g. openrouter/${OPENROUTER_MODEL_IDS.qwen}).`,
+    `  --model <id>          Literal LiteLLM model id (e.g. openrouter/${OPENROUTER_MODEL_IDS.planEvaluator}).`,
     '  --output <mode>       pr-comment | respond-comments | thread-replies | summary-only.',
     '  --iterations <n>      Max agent iterations (50-3000).',
     '  --provider <name>     Provider gateway override (e.g. openrouter).',
     '  --effort <level>      Required low|medium|high|xhigh|max effort identity.',
+    '  --phase <phase>       Formal evaluator phase: plan | impl. PR-only; resolves live head.',
     '  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.',
     '  --no-verdict-contract Skip the verdict output-contract epilogue (for non-eval',
     '                        dispatches, e.g. implementation asks). Default: appended.',
-    '  --dry-run             Validate + print comment without posting (no token needed).',
+    '  --dry-run             Validate + print without posting; formal mode still reads live head.',
     '  --pretty              Human-readable output instead of JSON.',
     '  --help                Show this help.',
   ].join('\n'));
 }
 
 function parseArgs(args: string[]): Options | null {
+  args = normalizeTaskArguments(args);
   const o: Options = {
     repo: 'rickylabs/netscript',
     tokenEnv: 'GH_TOKEN',
@@ -144,6 +169,13 @@ function parseArgs(args: string[]): Options | null {
         o.effort = requireValue(args, i, a);
         i++;
         break;
+      case '--phase': {
+        const phase = requireValue(args, i, a);
+        if (phase !== 'plan' && phase !== 'impl') throw new Error('--phase must be plan or impl');
+        o.phase = phase;
+        i++;
+        break;
+      }
       case '--token-env':
         o.tokenEnv = requireValue(args, i, a);
         i++;
@@ -167,92 +199,137 @@ function parseArgs(args: string[]): Options | null {
   return o;
 }
 
-async function main(): Promise<void> {
+/** Execute one dispatch CLI request through injected file, token, and GitHub ports. */
+export async function runDispatchOpenHands(
+  args: string[],
+  dependencies: DispatchOpenHandsDependencies,
+  output: DispatchOpenHandsOutput,
+): Promise<number> {
   let o: Options | null;
   try {
-    o = parseArgs(Deno.args);
+    o = parseArgs(args);
   } catch (e) {
-    console.error(e instanceof Error ? e.message : String(e));
-    Deno.exit(2);
-    return;
+    output.error(e instanceof Error ? e.message : String(e));
+    return 2;
   }
-  if (!o) return;
+  if (!o) return 0;
 
   if (!o.promptFile) {
-    console.error('--prompt-file is required. See --help.');
-    Deno.exit(2);
+    output.error('--prompt-file is required. See --help.');
+    return 2;
   }
   let requested;
   try {
     requested = requestedLaunchIdentity(o);
   } catch (error) {
-    console.error(error instanceof Error ? error.message : String(error));
-    Deno.exit(2);
-    return;
+    output.error(error instanceof Error ? error.message : String(error));
+    return 2;
   }
   const openRouterModel = requested.model.replace(/^openrouter\//, '');
   if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === openRouterModel)) {
-    console.error(
+    output.error(
       `OpenHands evaluator model must be one of: ${
         OPEN_EVALUATOR_MODEL_IDS.map((model) => `openrouter/${model}`).join(', ')
       }`,
     );
-    Deno.exit(2);
+    return 2;
   }
   const number = o.pr ?? o.issue;
   if (!number || !Number.isFinite(number)) {
-    console.error('one of --pr or --issue (a number) is required. See --help.');
-    Deno.exit(2);
+    output.error('one of --pr or --issue (a number) is required. See --help.');
+    return 2;
+  }
+  if (o.phase && !o.pr) {
+    output.error('Formal OpenHands dispatch requires --pr; issue targets are non-formal only.');
+    return 2;
+  }
+  if (o.phase && !o.verdictContract) {
+    output.error('Formal OpenHands dispatch requires the verdict output contract.');
+    return 2;
   }
   let slug;
   try {
     slug = parseRepoSlug(o.repo);
   } catch (e) {
-    console.error(e instanceof Error ? e.message : String(e));
-    Deno.exit(2);
-    return;
+    output.error(e instanceof Error ? e.message : String(e));
+    return 2;
   }
 
   // 1) Validate the dispatch-prompt contract.
-  const content = await Deno.readTextFile(o.promptFile);
+  const content = await dependencies.readTextFile(o.promptFile);
   const check = validateHandoffContract(content);
   if (!check.ok) {
-    console.log(
+    output.log(
       o.pretty
         ? `FAIL prompt contract: ${check.problems.join('; ')}`
         : JSON.stringify({ stage: 'validate', ok: false, problems: check.problems }),
     );
-    Deno.exit(3);
+    return 3;
   }
 
-  // 2) Build the trigger comment (verdict output contract appended by default).
+  // 2) Prepare everything that cannot affect formal head currency.
   const prompt = o.verdictContract ? appendVerdictContractEpilogue(content) : content;
+  const endpoint = `/repos/${slug.owner}/${slug.repo}/issues/${number}/comments`;
+  let token: string | undefined;
+  let head: string | undefined;
+
+  // 3) Formal mode resolves the live PR head as the final external operation before emission.
+  if (o.phase) {
+    try {
+      const resolved = await dependencies.resolveGithubToken({ preferEnv: o.tokenEnv });
+      output.error(`[dispatch-openhands] token source: ${resolved.source}`);
+      token = resolved.token;
+    } catch (e) {
+      output.error((e as Error).message);
+      return 4;
+    }
+    const livePr = await dependencies.githubRequest(
+      'GET',
+      `/repos/${slug.owner}/${slug.repo}/pulls/${o.pr}`,
+      token,
+    );
+    if (!livePr.ok) {
+      output.log(JSON.stringify({
+        ok: false,
+        status: livePr.status,
+        error: githubField(livePr.body, 'message') ?? livePr.body,
+      }));
+      return 1;
+    }
+    const liveHead = githubField(githubField(livePr.body, 'head'), 'sha');
+    head = typeof liveHead === 'string' ? liveHead : '';
+  }
+
+  // 4) Emit the trigger only after the formal head read has completed.
   const triggerComment = buildOpenHandsComment({
     model: o.model,
     outputMode: o.output,
     iterations: o.iterations,
     provider: o.provider,
     effort: o.effort,
+    phase: o.phase,
+    head,
     prompt,
   });
   const comment =
     `${triggerComment}\n\n<!-- route-identity requested provider=${requested.provider} model=${requested.model} effort=${requested.effort}; observed provider=pending model=pending effort=pending -->`;
   const triggerLine = comment.split('\n')[0];
-  const endpoint = `/repos/${slug.owner}/${slug.repo}/issues/${number}/comments`;
 
-  // 3a) Dry-run: print without posting; no token required.
+  // 5a) Dry-run: non-formal mode needs no token; formal mode used one for the live PR read.
   if (o.dryRun) {
     if (o.pretty) {
-      console.log('DRY-RUN ok');
-      console.log(`  target   : ${slug.owner}/${slug.repo} #${number} (${o.pr ? 'pr' : 'issue'})`);
-      console.log(`  trigger  : ${triggerLine}`);
-      console.log(`  endpoint : POST ${endpoint}`);
-      console.log(`  contract : verdict epilogue ${o.verdictContract ? 'appended' : 'skipped'}`);
-      console.log(`  bytes    : ${new TextEncoder().encode(comment).length}`);
-      console.log('  --- comment body ---');
-      console.log(comment);
+      output.log('DRY-RUN ok');
+      output.log(
+        `  target   : ${slug.owner}/${slug.repo} #${number} (${o.pr ? 'pr' : 'issue'})`,
+      );
+      output.log(`  trigger  : ${triggerLine}`);
+      output.log(`  endpoint : POST ${endpoint}`);
+      output.log(`  contract : verdict epilogue ${o.verdictContract ? 'appended' : 'skipped'}`);
+      output.log(`  bytes    : ${new TextEncoder().encode(comment).length}`);
+      output.log('  --- comment body ---');
+      output.log(comment);
     } else {
-      console.log(JSON.stringify({
+      output.log(JSON.stringify({
         mode: 'dry-run',
         ok: true,
         repo: o.repo,
@@ -265,39 +342,50 @@ async function main(): Promise<void> {
         comment,
       }));
     }
-    Deno.exit(0);
+    return 0;
   }
 
-  // 3b) Real post: resolve a validated token from any healthy source; never logged.
-  let token: string;
-  try {
-    const resolved = await resolveGithubToken({ preferEnv: o.tokenEnv });
-    console.error(`[dispatch-openhands] token source: ${resolved.source}`);
-    token = resolved.token;
-  } catch (e) {
-    console.error((e as Error).message);
-    Deno.exit(4);
-    return;
+  // 5b) Non-formal posts resolve a token only after building their tuple-free comment.
+  if (!token) {
+    try {
+      const resolved = await dependencies.resolveGithubToken({ preferEnv: o.tokenEnv });
+      output.error(`[dispatch-openhands] token source: ${resolved.source}`);
+      token = resolved.token;
+    } catch (e) {
+      output.error((e as Error).message);
+      return 4;
+    }
   }
-  const res = await githubRequest('POST', endpoint, token, { body: comment });
+  const res = await dependencies.githubRequest('POST', endpoint, token, { body: comment });
   if (!res.ok) {
-    console.log(
+    output.log(
       JSON.stringify({
         ok: false,
         status: res.status,
         error: githubField(res.body, 'message') ?? res.body,
       }),
     );
-    Deno.exit(1);
+    return 1;
   }
   const htmlUrl = githubField(res.body, 'html_url');
   const url = typeof htmlUrl === 'string' ? htmlUrl : null;
-  console.log(
+  output.log(
     o.pretty
       ? `POSTED ${triggerLine} -> ${url}`
       : JSON.stringify({ ok: true, status: res.status, commentUrl: url, triggerLine }),
   );
-  Deno.exit(0);
+  return 0;
 }
 
-if (import.meta.main) await main();
+if (import.meta.main) {
+  const code = await runDispatchOpenHands(
+    Deno.args,
+    {
+      readTextFile: (path) => Deno.readTextFile(path),
+      resolveGithubToken,
+      githubRequest,
+    },
+    { log: console.log, error: console.error },
+  );
+  Deno.exit(code);
+}

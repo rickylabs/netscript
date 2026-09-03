@@ -1,35 +1,35 @@
-import { join } from "@std/path";
+import { join } from '@std/path';
 import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
-} from "../../../../kernel/assets/skills.generated.ts";
+} from '../../../../kernel/assets/skills.generated.ts';
+import { EMBEDDED_TEMPLATE_CONTENT } from '../../../../kernel/assets/embedded.generated.ts';
+import { TEMPLATE_KEYS } from '../../../../kernel/assets/manifest.ts';
 import {
   EMBEDDED_AGENT_TOOL_BUNDLE_HASH,
   EMBEDDED_AGENT_TOOL_FILES,
   EMBEDDED_AGENT_TOOL_PATHS,
-} from "../../../../kernel/assets/agent-tools.generated.ts";
-import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
+} from '../../../../kernel/assets/agent-tools.generated.ts';
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { generateEditorConfigFiles } from '../../../../kernel/adapters/scaffold/editor-config.ts';
 import type { EditorChoice } from '../../../../kernel/domain/scaffold/workspace-config.ts';
-import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
-import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
-import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
-import {
-  type AgentHost,
-  type InitAgentInput,
-  type InitAgentResult,
-} from "./init-agent-input.ts";
+import type { AgentDocsGenerator } from './agent-docs-generator.ts';
+import type { AgentInitFileSystem } from './agent-init-file-system.ts';
+import { ASPIRE_WORKFLOW_SKILLS, type AspireAgentInitializer } from './aspire-agent-initializer.ts';
+import type { AgentHost, InitAgentInput, InitAgentResult } from './init-agent-input.ts';
 
-const START_MARKER = "<!-- netscript-agent:start -->";
-const END_MARKER = "<!-- netscript-agent:end -->";
+const START_MARKER = '<!-- netscript-agent:start -->';
+const END_MARKER = '<!-- netscript-agent:end -->';
 function agentsSection(withDocs: boolean): string {
   const docs = withDocs
-    ? " Offline framework and exact-version API docs are installed; start at `.netscript/docs/llms.txt`."
-    : " Need offline framework or API guidance? Run `netscript agent init --with-docs`.";
-  return `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nBefore implementing an unfamiliar NetScript API or architecture, call MCP \`find_guidance\` with the task. Use MCP \`search_docs\` for literal lookup and \`get_doc\` for exact retrieval.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.${docs}\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
+    ? ' Offline framework and exact-version API docs are installed; start at `.netscript/docs/llms.txt`.'
+    : ' Need offline framework or API guidance? Run `netscript agent init --with-docs`.';
+  return EMBEDDED_TEMPLATE_CONTENT[TEMPLATE_KEYS.agentGuidance].replace(
+    '{{OFFLINE_DOCS_GUIDANCE}}',
+    docs,
+  ).trimEnd();
 }
 const ASPIRE_INIT_TIMEOUT_MS = 60_000;
-const PLAYWRIGHT_SKILL_PATH = ".claude/skills/playwright-cli/SKILL.md";
 
 /** Embedded skill bundle accepted by the installer and its integrity test seam. */
 export interface AgentSkillBundle {
@@ -54,7 +54,7 @@ export interface InitAgentDependencies {
   readonly cliSpecifier?: string;
 }
 
-/** Install MCP host configuration and agent skills without rewriting unchanged files. */
+/** Install MCP host configuration and canonical agent skills without rewriting unchanged files. */
 export async function initAgent(
   input: InitAgentInput,
   dependencies: InitAgentDependencies,
@@ -63,25 +63,23 @@ export async function initAgent(
     files: EMBEDDED_SKILL_FILES,
     hash: EMBEDDED_SKILL_BUNDLE_HASH,
   };
-  const skillManifest = JSON.parse(bundle.files["manifest.json"] ?? "{}") as {
+  const skillManifest = JSON.parse(bundle.files['manifest.json'] ?? '{}') as {
     readonly files?: readonly string[];
   };
-  await verifyBundle(bundle, skillManifest.files ?? [], "Skill");
+  await verifyBundle(bundle, skillManifest.files ?? [], 'Skill');
   const toolBundle = dependencies.toolBundle ?? {
     files: EMBEDDED_AGENT_TOOL_FILES,
     paths: EMBEDDED_AGENT_TOOL_PATHS,
     hash: EMBEDDED_AGENT_TOOL_BUNDLE_HASH,
   };
-  await verifyBundle(toolBundle, toolBundle.paths, "Agent tool");
+  await verifyBundle(toolBundle, toolBundle.paths, 'Agent tool');
   const docs = input.withDocs
     ? await dependencies.docsGenerator?.generate(input.projectRoot)
     : undefined;
   if (input.withDocs && !docs) {
-    throw new Error("Offline documentation generation is not configured");
+    throw new Error('Offline documentation generation is not configured');
   }
-  const installedDocsRoot = docs
-    ? join(input.projectRoot, ".netscript", "docs")
-    : undefined;
+  const installedDocsRoot = docs ? join(input.projectRoot, '.netscript', 'docs') : undefined;
   const editor = await resolveEditor(input, dependencies.fs);
   const hosts = await resolveHosts(input, dependencies.fs, editor);
   const changedFiles: string[] = [];
@@ -89,18 +87,18 @@ export async function initAgent(
   for (const path of toolBundle.paths) {
     await writeChanged(
       dependencies.fs,
-      join(input.projectRoot, ".llm", "tools", path),
-      toolBundle.files[path] ?? "",
+      join(input.projectRoot, '.llm', 'tools', path),
+      toolBundle.files[path] ?? '',
       changedFiles,
     );
   }
   for (const [path, content] of Object.entries(docs?.files ?? {})) {
-    if (path.startsWith("/") || path.split("/").includes("..")) {
+    if (path.startsWith('/') || path.split('/').includes('..')) {
       throw new Error(`Offline documentation bundle contains unsafe path: ${path}`);
     }
     await writeChanged(
       dependencies.fs,
-      join(input.projectRoot, ".netscript", "docs", path),
+      join(input.projectRoot, '.netscript', 'docs', path),
       content,
       changedFiles,
     );
@@ -114,39 +112,54 @@ export async function initAgent(
       changedFiles,
     );
   }
-  if (hosts.includes("claude")) {
+  const skillFiles = Object.entries(bundle.files).filter(
+    ([path]) => path !== 'manifest.json',
+  );
+  for (const [path, content] of skillFiles) {
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, '.agents', 'skills', path),
+      content,
+      changedFiles,
+    );
+  }
+  const agentsPath = join(input.projectRoot, 'AGENTS.md');
+  const currentAgents = await dependencies.fs.readText(agentsPath) ?? '';
+  await writeChanged(
+    dependencies.fs,
+    agentsPath,
+    upsertMarkedSection(currentAgents, input.withDocs === true),
+    changedFiles,
+  );
+  if (hosts.includes('claude')) {
     await writeHostConfig(
       dependencies.fs,
-      join(input.projectRoot, ".mcp.json"),
-      "mcpServers",
+      join(input.projectRoot, '.mcp.json'),
+      'mcpServers',
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
       installedDocsRoot,
     );
-    for (const [path, content] of Object.entries(bundle.files)) {
-      if (path === "manifest.json") continue;
+    for (const [path] of skillFiles) {
+      const canonicalPath = join(input.projectRoot, '.agents', 'skills', path);
+      const content = await dependencies.fs.readText(canonicalPath);
+      if (content == null) {
+        throw new Error(`Canonical skill was not installed: ${canonicalPath}`);
+      }
       await writeChanged(
         dependencies.fs,
-        join(input.projectRoot, ".claude", "skills", path),
+        join(input.projectRoot, '.claude', 'skills', path),
         content,
         changedFiles,
       );
     }
-    const agentsPath = join(input.projectRoot, "AGENTS.md");
-    const current = await dependencies.fs.readText(agentsPath) ?? "";
-    await writeChanged(
-      dependencies.fs,
-      agentsPath,
-      upsertMarkedSection(current, input.withDocs === true),
-      changedFiles,
-    );
   }
   if (editor === 'vscode') {
     await writeHostConfig(
       dependencies.fs,
-      join(input.projectRoot, ".vscode", "mcp.json"),
-      "servers",
+      join(input.projectRoot, '.vscode', 'mcp.json'),
+      'servers',
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
@@ -163,10 +176,8 @@ export async function initAgent(
     );
   }
   if (
-    hosts.includes("claude") &&
-    !await dependencies.fs.exists(
-      join(input.projectRoot, PLAYWRIGHT_SKILL_PATH),
-    )
+    hosts.includes('claude') &&
+    !await hasAspireWorkflowSkills(input.projectRoot, dependencies.fs)
   ) {
     const signal = AbortSignal.timeout(
       dependencies.aspireTimeoutMs ?? ASPIRE_INIT_TIMEOUT_MS,
@@ -179,7 +190,7 @@ export async function initAgent(
       if (!result.ok) messages.push(aspireSkipped(result.reason));
     } catch (error) {
       const reason = signal.aborted
-        ? "aspire agent init timed out"
+        ? 'aspire agent init timed out'
         : error instanceof Error
         ? error.message
         : String(error);
@@ -192,6 +203,17 @@ export async function initAgent(
     );
   }
   return { hosts, changedFiles, messages };
+}
+
+async function hasAspireWorkflowSkills(
+  projectRoot: string,
+  fs: AgentInitFileSystem,
+): Promise<boolean> {
+  for (const skill of ASPIRE_WORKFLOW_SKILLS) {
+    if (!await fs.exists(join(projectRoot, '.agents', 'skills', skill, 'SKILL.md'))) return false;
+    if (!await fs.exists(join(projectRoot, '.claude', 'skills', skill, 'SKILL.md'))) return false;
+  }
+  return true;
 }
 
 async function resolveEditor(
@@ -217,32 +239,30 @@ async function resolveHosts(
   fs: AgentInitFileSystem,
   editor: EditorChoice,
 ): Promise<readonly AgentHost[]> {
-  if (input.host === "all") return ["claude", "vscode"];
+  if (input.host === 'all') return ['claude', 'vscode'];
   if (input.host) return [input.host];
   const detected: AgentHost[] = [];
-  if (await fs.exists(join(input.projectRoot, ".claude"))) {
-    detected.push("claude");
+  if (await fs.exists(join(input.projectRoot, '.claude'))) {
+    detected.push('claude');
   }
   if (editor === 'vscode') {
-    detected.push("vscode");
+    detected.push('vscode');
   }
-  return detected.length > 0 ? detected : ["claude"];
+  return detected.length > 0 ? detected : ['claude'];
 }
 
 async function writeHostConfig(
   fs: AgentInitFileSystem,
   path: string,
-  key: "mcpServers" | "servers",
+  key: 'mcpServers' | 'servers',
   projectRoot: string,
   changed: string[],
-  cliSpecifier = netscriptJsrSpecifier("cli"),
+  cliSpecifier = netscriptJsrSpecifier('cli'),
   docsRoot?: string,
 ): Promise<void> {
   const currentText = await fs.readText(path);
-  const current = currentText
-    ? JSON.parse(currentText) as Record<string, unknown>
-    : {};
-  const existing = current[key] && typeof current[key] === "object"
+  const current = currentText ? JSON.parse(currentText) as Record<string, unknown> : {};
+  const existing = current[key] && typeof current[key] === 'object'
     ? current[key] as Record<string, unknown>
     : {};
   const content = `${
@@ -252,12 +272,12 @@ async function writeHostConfig(
         [key]: {
           ...existing,
           netscript: {
-            command: "deno",
+            command: 'deno',
             args: netscriptMcpArgs(projectRoot, cliSpecifier, docsRoot),
           },
           aspire: {
-            command: "aspire",
-            args: ["agent", "mcp"],
+            command: 'aspire',
+            args: ['agent', 'mcp'],
           },
         },
       },
@@ -292,15 +312,21 @@ async function writeZedConfig(
         args: netscriptMcpArgs(projectRoot, cliSpecifier, docsRoot),
       }
       : { command: 'aspire', args: ['agent', 'mcp'] };
-  const content = `${JSON.stringify({
-    ...generated,
-    ...current,
-    context_servers: {
-      ...contextServers,
-      netscript: command('netscript'),
-      aspire: command('aspire'),
-    },
-  }, null, 2)}\n`;
+  const content = `${
+    JSON.stringify(
+      {
+        ...generated,
+        ...current,
+        context_servers: {
+          ...contextServers,
+          netscript: command('netscript'),
+          aspire: command('aspire'),
+        },
+      },
+      null,
+      2,
+    )
+  }\n`;
   await writeChanged(fs, path, content, changed);
 }
 
@@ -326,7 +352,7 @@ function netscriptMcpArgs(
 }
 
 function aspireSkipped(reason: string): string {
-  return `Aspire agent wiring was skipped: ${reason.replace(/[.]+$/, "")}.`;
+  return `Aspire agent wiring was skipped: ${reason.replace(/[.]+$/, '')}.`;
 }
 
 async function writeChanged(
@@ -345,12 +371,10 @@ function upsertMarkedSection(content: string, withDocs = false): string {
   const start = content.indexOf(START_MARKER);
   const end = content.indexOf(END_MARKER);
   if (start >= 0 && end >= start) {
-    return `${content.slice(0, start)}${section}${
-      content.slice(end + END_MARKER.length)
-    }`;
+    return `${content.slice(0, start)}${section}${content.slice(end + END_MARKER.length)}`;
   }
   const prefix = content.trimEnd();
-  return `${prefix}${prefix ? "\n\n" : ""}${section}\n`;
+  return `${prefix}${prefix ? '\n\n' : ''}${section}\n`;
 }
 
 async function verifyBundle(
@@ -359,16 +383,14 @@ async function verifyBundle(
   label: string,
 ): Promise<void> {
   if (paths.length === 0) throw new Error(`${label} bundle manifest is missing or empty.`);
-  const canonical = paths.map((path) =>
-    `${path}\0${bundle.files[path] ?? ""}`
-  ).join("\0");
+  const canonical = paths.map((path) => `${path}\0${bundle.files[path] ?? ''}`).join('\0');
   const digest = await crypto.subtle.digest(
-    "SHA-256",
+    'SHA-256',
     new TextEncoder().encode(canonical),
   );
-  const actual = [...new Uint8Array(digest)].map((byte) =>
-    byte.toString(16).padStart(2, "0")
-  ).join("");
+  const actual = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(
+    '',
+  );
   if (actual !== bundle.hash) {
     throw new Error(
       `${label} bundle hash mismatch: expected ${bundle.hash}, received ${actual}.`,

@@ -1,0 +1,39 @@
+{
+  "gateId": "doc-lint",
+  "invocationId": "quality-rail-s3-cli-doc-lint",
+  "argv": [
+    "deno",
+    "task",
+    "doc:lint",
+    "--root",
+    "packages/cli",
+    "--pretty"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "f9acdb426d5438935ae75bee7dda987dbfe3d4cb",
+  "actualGitHead": "f9acdb426d5438935ae75bee7dda987dbfe3d4cb",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "7365b43b778442d6657f074fe73d93871df8f952f30fd283ed40e1ebe8a29d17",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s3-cli-doc-lint:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:25:38.274Z",
+  "startedAt": "2026-08-15T00:25:38.278Z",
+  "finishedAt": "2026-08-15T00:25:38.644Z",
+  "durationMs": 366,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 1211,
+    "sha256": "d8db58a24bb4e7c840a5df4fe69c2f9f4bc65216d8048c2c86ecfe3943fe6522",
+    "tail": "{\n  \"source\": {\n    \"mode\": \"auto\",\n    \"root\": \"packages/cli\",\n    \"entrypoints\": [\n      \"./mod.ts\",\n      \"./scaffolding.ts\",\n      \"./testing.ts\"\n    ],\n    \"exitCode\": 0\n  },\n  \"summary\": {\n    \"totalPackages\": 1,\n    \"totalErrors\": 0,\n    \"totalPrivateTypeRef\": 0,\n    \"totalMissingJSDoc\": 0,\n    \"totalOther\": 0\n  },\n  \"packages\": [\n    {\n      \"name\": \"@netscript/cli\",\n      \"dir\": \"packages/cli\",\n      \"entrypoints\": [\n        {\n          \"path\": \"./mod.ts\",\n          \"privateTypeRef\": 0,\n          \"missingJSDoc\": 0,\n          \"other\": 0,\n          \"total\": 0\n        },\n        {\n          \"path\": \"./scaffolding.ts\",\n          \"privateTypeRef\": 0,\n          \"missingJSDoc\": 0,\n          \"other\": 0,\n          \"total\": 0\n        },\n        {\n          \"path\": \"./testing.ts\",\n          \"privateTypeRef\": 0,\n          \"missingJSDoc\": 0,\n          \"other\": 0,\n          \"total\": 0\n        }\n      ],\n      \"files\": [],\n      \"combinedTotal\": 0,\n      \"combinedPrivateTypeRef\": 0,\n      \"combinedMissingJSDoc\": 0,\n      \"combinedOther\": 0,\n      \"combinedExitCode\": 0,\n      \"entrypointExitCodes\": {\n        \"./mod.ts\": 0,\n        \"./scaffolding.ts\": 0,\n        \"./testing.ts\": 0\n      }\n    }\n  ]\n}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 155,
+    "sha256": "e221fe956356de2cc9981500d41a760e3bbad0b0378daa7e59017fbe2edc9e4d",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdoc:lint\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/cli' '--pretty'\n",
+    "truncated": false
+  }
+}

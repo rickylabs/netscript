@@ -103,6 +103,8 @@ export type BasePluginDescribeRoute = ContractProcedureBuilderWithOutput<
  *
  * @example
  * ```ts
+ * import { BASE_PLUGIN_CONTRACT_ROUTES, type BasePluginContract } from '@netscript/plugin/contract-base';
+ *
  * const contract = { ...BASE_PLUGIN_CONTRACT_ROUTES } satisfies BasePluginContract;
  * ```
  */

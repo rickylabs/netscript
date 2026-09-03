@@ -1,12 +1,13 @@
 /** Launches an inference-only Claude session behind the credential-isolated model gateway. */
 
-import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { type CurrentOpenRouterModelId, OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { type Effort, EFFORTS } from '../runtime/contract.ts';
 import { resolveOpenRouterApiKey } from '../lib/openrouter-credential.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { startRemoteModelGateway } from './remote-model-gateway.ts';
 
 export interface RemoteModelLaunchOptions {
-  readonly model: typeof OPENROUTER_MODEL_IDS[keyof typeof OPENROUTER_MODEL_IDS];
+  readonly model: CurrentOpenRouterModelId;
   readonly cwd: string;
   readonly effort: Effort;
   readonly name?: string;
@@ -45,7 +46,11 @@ function requiredValue(args: readonly string[], index: number, flag: string): st
 }
 
 function safeText(value: string, flag: string): string {
-  if (value.length > 256 || /[\u0000-\u001f\u007f]/.test(value)) {
+  const hasControlCharacter = [...value].some((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 0x1f || code === 0x7f;
+  });
+  if (value.length > 256 || hasControlCharacter) {
     throw new Error(`${flag} contains unsupported characters`);
   }
   return value;
@@ -53,15 +58,15 @@ function safeText(value: string, flag: string): string {
 
 /** Parses and validates the finite launcher CLI contract. */
 export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteModelLaunchOptions {
-  let model: string = OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
+  args = normalizeTaskArguments(args);
+  let model: string = OPENROUTER_MODEL_IDS.implEvaluator;
   let cwd = Deno.cwd();
-  let effort: Effort = 'xhigh';
+  let effort: Effort = 'max';
   let name: string | undefined;
   let resume: string | undefined;
   let forkSession = false;
   for (let index = 0; index < args.length; index++) {
     const argument = args[index];
-    if (argument === '--') continue;
     if (argument === '--model') model = requiredValue(args, index++, argument);
     else if (argument === '--cwd') cwd = requiredValue(args, index++, argument);
     else if (argument === '--effort') effort = requiredValue(args, index++, argument) as Effort;
@@ -83,7 +88,7 @@ export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteMo
   if (!EFFORTS.includes(effort)) throw new Error('--effort is invalid');
   if (forkSession && !resume) throw new Error('--fork-session requires --resume');
   return {
-    model: model as RemoteModelLaunchOptions['model'],
+    model: model as CurrentOpenRouterModelId,
     cwd,
     effort,
     ...(name ? { name } : {}),

@@ -3,7 +3,7 @@
  *
  * @example
  * ```typescript
- * import { paginatedQuery } from '@netscript/contracts';
+ * import { paginatedQuery } from '@netscript/contracts/query';
  *
  * const result = await paginatedQuery(db.user, {
  *   page: 1,

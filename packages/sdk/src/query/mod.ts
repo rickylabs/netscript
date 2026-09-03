@@ -25,6 +25,7 @@ export type {
   CompositeQuery,
   FactoryConfig,
   ProcedureInput,
+  ProcedureMeta,
   ProcedureOutput,
   QueryFactory,
 } from '../ports/query-factory.ts';

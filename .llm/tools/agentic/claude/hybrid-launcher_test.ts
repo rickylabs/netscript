@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import {
   type HybridClaudeProcess,
@@ -16,8 +16,18 @@ Deno.test('hybrid launcher parses only absolute cwd and bounded name', () => {
     cwd: '/repo',
     name: 'loopback',
   });
-  assertRejects(async () => parseHybridLaunchOptions(['--cwd', 'relative']), Error, 'absolute');
-  assertRejects(async () => parseHybridLaunchOptions(['--model', 'other']), Error, 'unknown');
+  assertEquals(parseHybridLaunchOptions(['--', '--cwd', '/repo', '--name', 'loopback']), {
+    cwd: '/repo',
+    name: 'loopback',
+  });
+  assertThrows(() => parseHybridLaunchOptions(['--cwd', 'relative']), Error, 'absolute');
+  assertThrows(() => parseHybridLaunchOptions(['--model', 'other']), Error, 'unknown');
+  assertThrows(() => parseHybridLaunchOptions(['--cwd', '/repo', '--']), Error, 'Unknown argument');
+  assertThrows(
+    () => parseHybridLaunchOptions(['--', '--', '--cwd', '/repo']),
+    Error,
+    'Unknown argument',
+  );
 });
 
 Deno.test('native Claude environment strips every provider credential override', () => {

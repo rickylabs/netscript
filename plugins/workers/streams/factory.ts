@@ -2,8 +2,8 @@
  * Client-side StreamDB factory for the Workers plugin.
  *
  * Returns a TanStack DB-backed `StreamDB` with typed `.collections` for
- * worker executions and jobs.  Connect it to the durable streams server
- * (the `plugins/streams` plugin on port 4437) via `@durable-streams/state`.
+ * worker executions and jobs. Connect it to the Aspire-discovered durable streams
+ * service via `@durable-streams/state`.
  *
  * @module
  */
@@ -34,26 +34,21 @@ export type WorkersStreamDB = Readonly<{
  *
  * @example
  * ```ts
- * import { createWorkersStreamDB } from '@plugins/workers/streams';
- * import { useLiveQuery } from '@tanstack/react-db';
+ * import { createWorkersStreamDB } from '@netscript/plugin-workers/streams';
  *
- * const workersDb = createWorkersStreamDB({ baseUrl: 'http://localhost:4437' });
+ * declare const streamsServiceUrl: string;
  *
- * // In a Preact island:
- * const { data: running } = useLiveQuery((q) =>
- *   q.from({ e: workersDb.collections.execution })
- *     .where(({ e }) => e.status === 'running')
- * );
+ * const workersDb = createWorkersStreamDB({ baseUrl: streamsServiceUrl });
+ * const executions = workersDb.collections.execution;
+ * void executions;
  * ```
  */
 export function createWorkersStreamDB(
   options: { baseUrl?: string } = {},
 ): WorkersStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
-
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/workers/executions', baseUrl),
+      url: buildStreamUrl('/workers/executions', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },

@@ -21,6 +21,10 @@
 
 import { join } from '@std/path';
 import { SCAFFOLD_FILES } from '../../../../../src/kernel/constants/scaffold/scaffold-files.ts';
+import { watchResourceUpdates } from './runtime/resource-state-stream.ts';
+
+/** Test-failure ceiling for missing endpoint events; it is not an allocation-time assumption. */
+const ENDPOINT_EVENT_FAILURE_CEILING_MS = 120_000;
 
 /** The single field of `appsettings.json` this module reads. */
 interface AppSettingsAppsShape {
@@ -169,17 +173,24 @@ function findResource(value: unknown, name: string): Record<string, unknown> | u
  * the entire assertion `probe-app-home.ts` makes. `urls[]` is the resource's own contract.
  */
 export function declaredHttpUrls(resource: Record<string, unknown>): string[] {
-  const declared = resource['urls'];
-  if (!Array.isArray(declared)) return [];
+  const declared = declaredResourceUrls(resource);
   const http: string[] = [];
   const https: string[] = [];
-  for (const entry of declared) {
-    const url = isRecord(entry) ? entry['url'] : entry;
-    if (typeof url !== 'string') continue;
+  for (const url of declared) {
     if (/^http:\/\//i.test(url)) http.push(url);
     else if (/^https:\/\//i.test(url)) https.push(url);
   }
   return [...http, ...https];
+}
+
+/** Every endpoint URL explicitly declared by a resource, independent of transport. */
+export function declaredResourceUrls(resource: Record<string, unknown>): string[] {
+  const declared = resource['urls'];
+  if (!Array.isArray(declared)) return [];
+  return declared.flatMap((entry) => {
+    const url = isRecord(entry) ? entry['url'] : entry;
+    return typeof url === 'string' ? [url] : [];
+  });
 }
 
 /**
@@ -198,54 +209,91 @@ export function declaredHttpUrls(resource: Record<string, unknown>): string[] {
  * @throws {@link AppEndpointPendingError} if the resource is absent or exposes no HTTP endpoint.
  * Other parse errors are terminal and are reported unchanged.
  */
-export function appUrlsFromDescribeOutput(describeOutput: string, appName: string): string[] {
-  const resource = findResource(JSON.parse(extractJson(describeOutput)), appName);
+export function resourceUrlsFromDescribeOutput(
+  describeOutput: string,
+  resourceName: string,
+): string[] {
+  const resource = findResource(JSON.parse(extractJson(describeOutput)), resourceName);
   if (!resource) {
     throw new AppEndpointPendingError(
-      `resource ${appName} was not present in aspire describe output`,
+      `resource ${resourceName} was not present in aspire describe output`,
     );
   }
   const urls = declaredHttpUrls(resource);
   if (urls.length === 0) {
     throw new AppEndpointPendingError(
-      `resource ${appName} still declared no HTTP endpoint in its aspire describe urls[]`,
+      `resource ${resourceName} still declared no HTTP endpoint in its aspire describe urls[]`,
     );
   }
   return urls;
 }
 
+/** Backward-compatible app-specific spelling for the generic resource URL parser. */
+export function appUrlsFromDescribeOutput(describeOutput: string, appName: string): string[] {
+  return resourceUrlsFromDescribeOutput(describeOutput, appName);
+}
+
 /**
- * Asks the running AppHost which host port(s) it allocated for `appName`.
+ * Observes the running AppHost until the resource publishes one or more endpoint URLs.
  *
  * @param appHost - Path to the generated AppHost, as passed to `aspire --apphost`.
- * @param appName - Aspire resource name of the app.
- * An AppHost that has not started yet and an endpoint that has not been registered are transient;
- * both throw {@link AppEndpointPendingError}. Other command and parse failures are terminal.
+ * @param resourceName - Aspire resource name.
+ * Malformed follow lines are terminal. A stream that exits or reaches its failure ceiling before
+ * allocation is reported as a missing observation rather than an observed-but-wrong value.
  */
+export async function resolveDeclaredResourceUrlsFromAppHost(
+  appHost: string,
+  resourceName: string,
+  watch: typeof watchResourceUpdates = watchResourceUpdates,
+): Promise<string[]> {
+  const subscription = await watch(appHost, resourceName);
+  try {
+    const update = await subscription.waitFor(
+      (candidate) => declaredResourceUrls(candidate.resource).length > 0,
+      ENDPOINT_EVENT_FAILURE_CEILING_MS,
+    );
+    return declaredResourceUrls(update.resource);
+  } catch (cause) {
+    if (
+      cause instanceof Error &&
+      cause.message.startsWith('Unrecognized Aspire resource update line; raw line:')
+    ) {
+      throw cause;
+    }
+    throw new Error(
+      `Aspire did not observe endpoint allocation for ${resourceName}: ${
+        cause instanceof Error ? cause.message : String(cause)
+      }`,
+      { cause },
+    );
+  } finally {
+    await subscription.close();
+  }
+}
+
+/** Observe a resource endpoint allocation and return only its HTTP candidates. */
+export async function resolveResourceUrlsFromAppHost(
+  appHost: string,
+  resourceName: string,
+  watch: typeof watchResourceUpdates = watchResourceUpdates,
+): Promise<string[]> {
+  const declared = await resolveDeclaredResourceUrlsFromAppHost(appHost, resourceName, watch);
+  const urls = declared.filter((url) => /^https?:\/\//i.test(url));
+  if (urls.length === 0) {
+    throw new Error(
+      `Aspire observed endpoint allocation for ${resourceName}, but the update declared no HTTP URL: ` +
+        JSON.stringify(declared),
+    );
+  }
+  return urls;
+}
+
+/** Backward-compatible app-specific spelling for generic live resource URL resolution. */
 export async function resolveAppUrlsFromAppHost(
   appHost: string,
   appName: string,
 ): Promise<string[]> {
-  const output = await new Deno.Command('aspire', {
-    args: ['describe', '--apphost', appHost, '--format', 'Json', '--non-interactive', '--nologo'],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  const stdout = new TextDecoder().decode(output.stdout);
-  const stderr = new TextDecoder().decode(output.stderr);
-  if (!output.success) {
-    const detail = stderr || stdout;
-    if (
-      /apphost[^\n]*(?:not running|not found)|no (?:running )?apphosts?|no apphost[^\n]*found/i
-        .test(detail)
-    ) {
-      throw new AppEndpointPendingError(
-        `running AppHost was not available to describe: ${detail.trim()}`,
-      );
-    }
-    throw new Error(`aspire describe failed with code ${output.code}: ${stderr || stdout}`);
-  }
-  return appUrlsFromDescribeOutput(stdout, appName);
+  return await resolveResourceUrlsFromAppHost(appHost, appName);
 }
 
 /**

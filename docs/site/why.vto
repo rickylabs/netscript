@@ -65,7 +65,7 @@ No row is a universal winner. Choose the system whose primary constraint matches
     {
       name: "Encore-style stack",
       type: "Integrated infrastructure workflow is the center",
-      desc: "NetScript keeps a Deno/JSR workspace in the application and uses .NET Aspire for local orchestration through an adapter. It provides less managed infrastructure, so deployment and operations remain your responsibility."
+      desc: "NetScript keeps a Deno/JSR workspace in the application and uses Aspire for local orchestration through an adapter. It provides less managed infrastructure, so deployment and operations remain your responsibility."
     },
     {
       name: "Temporal",
@@ -88,7 +88,7 @@ ahead today — see [how NetScript's path compares](/explanation/compared/).
 
 - **The package family is pre-1.0.** APIs move, so scaffolded imports use exact
   `{{ releaseSpecifier }}` pins. If you need a frozen surface today, NetScript is not ready for you.
-- **The .NET Aspire CLI is the default orchestration path.** Scaffold with `--no-aspire` to opt out;
+- **The Aspire CLI is the default orchestration path.** Scaffold with `--no-aspire` to opt out;
   resource wiring and local telemetry then belong to you. [See the Aspire boundary](/quickstart/aspire/).
 - **The web layer is Fresh and Preact.** That is a deliberate fit, not compatibility with the
   React/Next ecosystem. [See the web layer](/web-layer/).

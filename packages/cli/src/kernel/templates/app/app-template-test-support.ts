@@ -5,6 +5,7 @@ import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import {
   loadAppScaffoldTemplateAssets,
   loadExampleServiceAppTemplateAssets,
+  loadResourceSliceTemplateAssets,
 } from '../../adapters/templates/scaffold-template-assets.ts';
 
 export const SAMPLE_APP_VARS = {
@@ -13,6 +14,8 @@ export const SAMPLE_APP_VARS = {
   appPort: '8010',
   serviceName: 'team-members',
   modelName: 'TeamMember',
+  serviceResourceRouteAlias: 'teamMembers: generatedRoutes.examples.teamMembers.$route,\n  ',
+  serviceExampleRouteReference: 'routes.examples.teamMembers.$route',
 } as const;
 
 export function makeAdapter(): StringTemplateAdapter {
@@ -43,6 +46,7 @@ export const {
   appDesignTokensViewTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
+  appOrderExampleRouteTemplate,
   appHealthRouteTemplate,
   appHealthSharedTemplate,
   appHealthViewTemplate,
@@ -56,32 +60,13 @@ export const {
 const exampleTemplates = await loadExampleServiceAppTemplateAssets();
 
 export const appExampleServiceQueryTemplate = exampleTemplates.appExampleServiceQueryTemplate;
-export const appExampleServiceOptimisticListMutationTemplate =
-  exampleTemplates.appExampleServiceOptimisticListMutationTemplate;
-export const appExampleServiceRouteContractTemplate =
-  exampleTemplates.appExampleServiceRouteContractTemplate;
-export const appServiceExampleHeroTemplate = exampleTemplates.appExampleServiceHeroTemplate;
-export const appServiceExampleLabPanelTemplate = exampleTemplates.appExampleServiceLabPanelTemplate;
-export const appServiceManagedFormTemplate = exampleTemplates.appExampleServiceManagedFormTemplate;
-export const appServiceAuthorizationTemplate =
-  exampleTemplates.appExampleServiceAuthorizationTemplate;
-export const appServiceExampleNotesCardTemplate =
-  exampleTemplates.appExampleServiceNotesCardTemplate;
-export const appServiceExamplePageLayoutTemplate =
-  exampleTemplates.appExampleServicePageLayoutTemplate;
-export const appServiceShowcaseIslandTemplate = exampleTemplates.appExampleServiceShowcaseTemplate;
-export const appServiceShowcaseMemoryIslandTemplate =
-  exampleTemplates.appExampleServiceShowcaseMemoryTemplate;
-export const appServiceShowcaseSharedTemplate =
-  exampleTemplates.appExampleServiceShowcaseSharedTemplate;
-export const appServiceShowcaseMemorySharedTemplate =
-  exampleTemplates.appExampleServiceShowcaseSharedMemoryTemplate;
-export const appServiceSummaryCardTemplate = exampleTemplates.appExampleServiceSummaryCardTemplate;
-export const appServiceSummaryPanelTemplate =
-  exampleTemplates.appExampleServiceSummaryPanelTemplate;
-export const appServiceExampleIndexTemplate = exampleTemplates.appServiceExampleIndexTemplate;
-export const appServiceExampleLayoutTemplate = exampleTemplates.appServiceExampleLayoutTemplate;
-export const appServiceSummaryPartialTemplate = exampleTemplates.appServiceSummaryPartialTemplate;
+export const appTelemetryExampleSharedTemplate = exampleTemplates.appTelemetryExampleSharedTemplate;
 
-export const serviceContractTemplate = await readTemplateAsset(TEMPLATE_KEYS.serviceContract);
-export const serviceV1RouterTemplate = await readTemplateAsset(TEMPLATE_KEYS.serviceRoutersV1);
+export const resourceSliceTemplates = await loadResourceSliceTemplateAssets();
+
+export const serviceContractTemplate = await readTemplateAsset(
+  TEMPLATE_KEYS.serviceContract,
+);
+export const serviceV1RouterTemplate = await readTemplateAsset(
+  TEMPLATE_KEYS.serviceRoutersV1,
+);

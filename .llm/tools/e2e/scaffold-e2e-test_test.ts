@@ -1,10 +1,27 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { defaultOptions, normalizeCommandOptions, runSmoke } from './scaffold-e2e-test.ts';
+import {
+  defaultOptions,
+  normalizeCommandOptions,
+  resourceUrlFromDescribeOutput,
+  runSmoke,
+} from './scaffold-e2e-test.ts';
 
 Deno.test('scaffold diagnostic cleans up by default with explicit opt-out', () => {
   assertEquals(defaultOptions().cleanup, true);
   assertEquals(normalizeCommandOptions({}).cleanup, true);
   assertEquals(normalizeCommandOptions({ noCleanup: true }).cleanup, false);
+});
+
+Deno.test('plugin endpoint defaults come from Aspire describe resources', () => {
+  assertEquals(defaultOptions().workersUrl, undefined);
+  assertEquals(normalizeCommandOptions({}).sagasUrl, undefined);
+  assertEquals(
+    resourceUrlFromDescribeOutput(
+      `banner\n{"resources":[{"name":"workers-api-instance","displayName":"workers-api","urls":[{"url":"http://127.0.0.1:49152"}]}]}`,
+      'workers-api',
+    ),
+    'http://127.0.0.1:49152',
+  );
 });
 
 Deno.test('missing Aspire binary becomes a structured failed step', async () => {
@@ -102,6 +119,7 @@ Deno.test('generated host-port validation is critical and inspects the final pre
     const validator = report.steps[validatorIndex];
     assertEquals(validator.critical, true);
     assertStringIncludes(JSON.stringify(validator.details), 'check-aspire-host-ports.ts');
+    assertStringIncludes(JSON.stringify(validator.details), '--generated-project');
     const init = report.steps.find((step) => step.id === 'init-project');
     assertEquals(JSON.stringify(init?.details).includes('service-port'), false);
     const offlineCodegen = report.steps[offlineCodegenIndex];

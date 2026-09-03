@@ -1,0 +1,19 @@
+{
+  "source": {
+    "mode": "selection",
+    "cwd": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep"
+  },
+  "command": "deno check --unstable-kv <files>",
+  "selection": {
+    "filesSelected": 2,
+    "batches": 1,
+    "failedBatches": 0
+  },
+  "summary": {
+    "totalOccurrences": 0,
+    "uniqueOccurrences": 0,
+    "uniqueCodes": 0,
+    "uniquePaths": 0
+  },
+  "groups": []
+}

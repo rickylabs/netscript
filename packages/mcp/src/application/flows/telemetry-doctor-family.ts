@@ -2,6 +2,7 @@ import type { DoctorCheck } from '../../domain/tool-contracts.ts';
 import type { DoctorCheckContext, DoctorCheckFamily } from '../../domain/doctor-check-family.ts';
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
 import {
+  type AspirePsDashboardPort,
   resolveTelemetryEndpoint,
   type TelemetryEndpointEnvironment,
 } from '../../domain/telemetry-endpoint.ts';
@@ -17,8 +18,9 @@ export function createTelemetryDoctorFamily(
   probe: TelemetryProbePort,
   explicitEndpoint: string | undefined,
   environment: TelemetryEndpointEnvironment = {},
+  aspirePs?: AspirePsDashboardPort,
 ): TelemetryDoctorFamily {
-  const resolved = resolveTelemetryEndpoint(explicitEndpoint, environment);
+  const resolved = resolveTelemetryEndpoint(explicitEndpoint, environment, aspirePs);
   let endpoint = resolved.endpoint;
   return {
     name: 'telemetry',

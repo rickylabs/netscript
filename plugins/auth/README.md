@@ -21,7 +21,7 @@ them to a NetScript host.
 
 ## Why teams use it
 
-- **One auth API, swappable backends** — the `auth-api` service (default port `8094`) exposes
+- **One auth API, swappable backends** — the `auth-api` service uses an Aspire-allocated endpoint and exposes
   `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract, backed by a
   single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive OAuth/OIDC),
   `workos`, or `better-auth`.
@@ -33,13 +33,15 @@ them to a NetScript host.
   projection for the `authSession` entity, with server-side emit helpers on `./streams/server`.
 - **Provisioning recorded up front** — auth requires Postgres (schema) and Deno KV (sessions); the
   install records both from the manifest so `netscript db` and Aspire provision them for you.
+- **Typed bearer client opt-in** — the manifest advertises a browser/server-safe bearer factory,
+  and install emits `auth/sdk-client.ts` for explicit placement on the `auth-api` client only.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
     M["authPlugin manifest"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["auth-api :8094<br/>signin · callback · session · me · signout"]
+    H --> A["auth-api<br/>Aspire-allocated endpoint<br/>signin · callback · session · me · signout"]
     A --> B["Active backend<br/>(NETSCRIPT_AUTH_BACKEND)"]
     B --> K["kv-oauth"]
     B --> W["workos"]
@@ -75,7 +77,7 @@ Install the plugin:
 
 ```bash
 $ netscript plugin install auth --name auth
-Installed auth plugin "auth" on port 8094.
+Installed auth plugin "auth" on port <allocated-port>.
 Created 1 plugin files.
 Regenerated 12 Aspire helper files.
 ```
@@ -100,12 +102,42 @@ console.log(
 );
 ```
 
+The manifest reference makes the bearer factory discoverable; it does not activate credentials.
+The install-owned `auth/sdk-client.ts` exports `authSdkClientContribution`. Add it explicitly to the
+named auth service and supply its required context on authenticated calls:
+
+```typescript
+import { createServiceClient } from '@netscript/sdk/client';
+import { authContract } from '@netscript/plugin-auth-core/contracts/v1';
+import { authSdkClientContribution } from './auth/sdk-client.ts';
+
+declare const applicationSession: { accessToken: string; accountId: string };
+
+const auth = createServiceClient({
+  contract: authContract,
+  serviceName: 'auth-api',
+  routerName: 'auth',
+  contributions: [authSdkClientContribution] as const,
+});
+
+await auth.session(undefined, {
+  context: {
+    auth: { getAccessToken: () => applicationSession.accessToken },
+    // Stable and non-secret; never put a token, session id, or email in a cache key.
+    authCachePartition: applicationSession.accountId,
+  },
+});
+```
+
+The generated module reads no environment variable, cookie, or browser storage. Credential lookup
+remains application-owned and per call; bearer headers default to HTTPS plus local loopback origins.
+
 ## Public surface
 
 | Entry              | What it gives you                                                    |
 | ------------------ | -------------------------------------------------------------------- |
 | `.`                | `authPlugin` plus the `AUTH_*` identity and service constants        |
-| `./services`       | The auth API service composition (`auth-api`, port `8094`)           |
+| `./services`       | The auth API service composition (`auth-api`, Aspire-allocated port) |
 | `./streams`        | Browser-safe durable-stream projection for the `authSession` entity  |
 | `./streams/server` | Server-side session-stream emit helpers                              |
 | `./contracts`      | The versioned auth API contract generated registries bind against    |
@@ -129,8 +161,9 @@ The always-current symbol list is
 ## Compatibility
 
 The auth API service requires Deno 2.9+ and needs Postgres for the auth schema and Deno KV for
-sessions (both provisioned through `netscript db` and Aspire). The manifest and the browser-safe
-`./streams` subpath are importable in any TypeScript environment.
+sessions (both provisioned through `netscript db` and Aspire). The manifest, typed SDK contribution
+reference, generated bearer starter, and browser-safe `./streams` subpath are importable in any
+TypeScript environment.
 
 ## License
 

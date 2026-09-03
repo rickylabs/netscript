@@ -4,14 +4,23 @@
       "command": "deno",
       "args": [
         "run",
+        "--no-lock",
+        "--minimum-dependency-age=0",
         "--config",
-        "/home/codex/repos/fix-1046/.agents/generated/consumer-skills/deno.json",
+        "deno.json",
         "-A",
-        "jsr:@netscript/cli@0.0.2",
+        "jsr:@netscript/cli@0.0.7",
         "agent",
         "mcp",
         "--project-root",
-        "/home/codex/repos/fix-1046/.agents/generated/consumer-skills"
+        "."
+      ]
+    },
+    "aspire": {
+      "command": "aspire",
+      "args": [
+        "agent",
+        "mcp"
       ]
     }
   }

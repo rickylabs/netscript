@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-sagas",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "displayName": "Saga Orchestrator",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.6"
+    "@netscript/plugin": "0.0.7"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,
@@ -47,8 +47,6 @@
     "backgroundEntrypoint": "sagas/runtime.ts",
     "doctorEntrypoint": "./doctor.ts",
     "serviceConfigKey": "sagas-api",
-    "servicePort": 8092,
-    "backgroundPort": 8092,
     "dependencies": ["streams"],
     "requiresDb": true,
     "requiresKv": true,

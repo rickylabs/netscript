@@ -1,0 +1,40 @@
+{
+  "gateId": "allowance-budget",
+  "invocationId": "quality-rail-s1-allowance-budget-landed-head",
+  "argv": [
+    "deno",
+    "run",
+    "--allow-run",
+    ".llm/tools/quality/check-allowance-budget-diff.ts",
+    "01e0960494c95ce56eb35892c211a095eb13e6ed",
+    "586b5513500caa1fd5ce07878f4ba96606064555",
+    "--pretty"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "586b5513500caa1fd5ce07878f4ba96606064555",
+  "actualGitHead": "586b5513500caa1fd5ce07878f4ba96606064555",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "794121ed9f46b0d76df84bce953273a5199fd89278268321c9071cbb43e0f125",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s1-allowance-budget-landed-head:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-14T23:50:11.387Z",
+  "startedAt": "2026-08-14T23:50:11.391Z",
+  "finishedAt": "2026-08-14T23:50:11.455Z",
+  "durationMs": 64,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 59,
+    "sha256": "2122337d00abfac09fd1b973e7232a395887791899c7435500934d0114210347",
+    "tail": "{\n  \"ok\": true,\n  \"increases\": [],\n  \"issueLinked\": true\n}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tail": "",
+    "truncated": false
+  }
+}

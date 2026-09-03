@@ -3,7 +3,7 @@
  *
  * @example
  * ```typescript
- * import { createTransformer } from '@netscript/contracts';
+ * import { createTransformer } from '@netscript/contracts/transform';
  *
  * const userTransformer = createTransformer((dbUser) => ({
  *   id: dbUser.id,

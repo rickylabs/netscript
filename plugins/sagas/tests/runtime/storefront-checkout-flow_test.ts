@@ -85,8 +85,8 @@ Deno.test('storefront documented trigger-worker-saga flow reaches paid as writte
     })
     .build();
 
-  const handler = defineJobHandler(async (context) => {
-    const payload = PaymentPayloadSchema.parse(context.payload);
+  const handler = defineJobHandler(PaymentPayloadSchema, async (context) => {
+    const payload = context.payload;
     await runtime.publish({
       type: 'PaymentCompleted',
       payload: {

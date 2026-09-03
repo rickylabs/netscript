@@ -9,12 +9,16 @@ async function main(): Promise<void> {
   if (!appHost || !projectRoot) throw new Error('apphost and project root arguments are required');
 
   const query = await createLiveAspireTelemetryQuery(projectRoot);
+  const flowBCorrelationId = (await Deno.readTextFile(
+    `${projectRoot}/.netscript/e2e/flow-b-correlation-id`,
+  )).trim();
+  if (!flowBCorrelationId) throw new Error('Flow-B correlation fixture was empty');
 
   let lastSummary = 'no traces returned';
   for (let attempt = 1; attempt <= 30; attempt++) {
     const traces = await query.queryTraces({ limit: 500 });
     try {
-      validateFlowB(traces);
+      validateFlowB(traces, flowBCorrelationId);
       console.info(`Flow-B grouped trace passed after ${attempt} attempt(s)`);
       return;
     } catch (error) {
@@ -25,12 +29,20 @@ async function main(): Promise<void> {
   throw new Error(`Flow-B trace assertions did not converge: ${lastSummary}`);
 }
 
-export function validateFlowB(traces: readonly TelemetryTrace[]): void {
-  const main = traces.find((trace) =>
+export function validateFlowB(
+  traces: readonly TelemetryTrace[],
+  flowBCorrelationId: string,
+): void {
+  // More than one Flow-B-shaped trace coexists in the dashboard (`behavior.triggers-webhook`
+  // fires the same generic webhook earlier in the suite), so the trace carrying the recorded
+  // correlation fixture is authoritative; dashboard ordering only breaks ties.
+  const flowBShaped = traces.filter((trace) =>
     hasAny(trace, ['trigger.ingress', 'trigger.detect']) && has(trace, 'queue.enqueue') &&
     has(trace, 'queue.dequeue') &&
     has(trace, 'job.execute')
   );
+  const main = flowBShaped.find((trace) => carriesCorrelation(trace, flowBCorrelationId)) ??
+    flowBShaped[0];
   tcAssert(
     'TC-1/TC-2',
     main !== undefined,
@@ -48,6 +60,7 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
   const execute = named(main, 'job.execute');
   const callback = main.spans.find((span) => span.name === 'rpc.client');
   const callbackBoundary = named(main, 'flow-b.callback');
+  const saga = assertSagaCompensationCorrelation(traces, flowBCorrelationId);
   tcAssert(
     'TC-1/TC-9',
     callback !== undefined,
@@ -82,7 +95,10 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
   const subscribeSpans = traces.flatMap((trace) => trace.spans).filter((span) =>
     span.name === 'stream.subscribe'
   );
-  const fanIn = subscribeSpans.find((span) => span.links.length > 0) ?? subscribeSpans[0];
+  const fanIn =
+    subscribeSpans.find((span) =>
+      span.links.length > 0 && span.attributes['netscript.correlation.id'] === flowBCorrelationId
+    ) ?? subscribeSpans.find((span) => span.links.length > 0) ?? subscribeSpans[0];
   tcAssert('TC-14', fanIn !== undefined, 'real streams consumer span exists');
   tcAssert(
     'TC-14',
@@ -101,7 +117,17 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
     'fan-in link preserves per-message attributes through the SDK provider',
   );
 
-  const correlatedSpans = [ingress, process, enqueue, dequeue, execute, callbackBoundary, fanIn];
+  const correlatedSpans = [
+    ingress,
+    process,
+    enqueue,
+    dequeue,
+    execute,
+    callbackBoundary,
+    fanIn,
+    saga.handle,
+    saga.compensate,
+  ];
   for (const span of correlatedSpans) {
     tcAssert(
       'TC-6/TC-7',
@@ -114,6 +140,11 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
     new Set(correlatedSpans.map((span) => span.attributes['netscript.correlation.id'])).size === 1,
     'Flow-B product and boundary spans carry the same correlation id',
   );
+  tcAssert(
+    'TC-6/TC-7',
+    callbackBoundary.attributes['netscript.correlation.id'] === flowBCorrelationId,
+    'callback correlation equals the generated saga payload/publish correlation fixture',
+  );
 
   for (const span of correlatedSpans) {
     tcAssert(
@@ -122,6 +153,53 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
       `${span.name} carries a netscript.* outcome`,
     );
   }
+}
+
+/** Assert the real generated saga compensation span is correlated and directly parented. */
+export function assertSagaCompensationCorrelation(
+  traces: readonly TelemetryTrace[],
+  flowBCorrelationId: string,
+): Readonly<{ handle: TelemetrySpan; compensate: TelemetrySpan }> {
+  const spans = traces.flatMap((trace) => trace.spans);
+  const handles = spans.filter((span) =>
+    span.name === 'saga.handle' &&
+    span.attributes['netscript.saga.id'] === 'flow-b-compensation'
+  );
+  const compensations = spans.filter((span) =>
+    span.name === 'saga.cascade.compensate' &&
+    span.attributes['netscript.saga.id'] === 'flow-b-compensation'
+  );
+  const handle =
+    handles.find((span) => span.attributes['netscript.correlation.id'] === flowBCorrelationId) ??
+      handles[0];
+  const compensate =
+    compensations.find((span) =>
+      span.attributes['netscript.correlation.id'] === flowBCorrelationId
+    ) ?? compensations[0];
+  tcAssert('TC-1', handle !== undefined, 'generated Flow-B saga.handle exists');
+  tcAssert(
+    'TC-1',
+    compensate !== undefined,
+    'generated Flow-B saga.cascade.compensate exists',
+  );
+  for (const span of [handle, compensate]) {
+    tcAssert(
+      'TC-6/TC-7',
+      span.attributes['netscript.correlation.id'] === flowBCorrelationId,
+      `${span.name} correlation equals callback fixture ${flowBCorrelationId}`,
+    );
+    tcAssert(
+      'TC-6/TC-7',
+      span.attributes['netscript.saga.correlation_key'] === flowBCorrelationId,
+      `${span.name} saga correlation key equals generated payload correlation`,
+    );
+  }
+  tcAssert(
+    'TC-9',
+    compensate.traceId === handle.traceId && compensate.parentSpanId === handle.spanId,
+    'saga.handle -> saga.cascade.compensate is a direct parent edge',
+  );
+  return Object.freeze({ handle, compensate });
 }
 
 /** Assert the SSE consumer has a W3C link into the selected Flow-B producer trace. */
@@ -188,4 +266,8 @@ function hasOutcome(span: TelemetrySpan): boolean {
 function tcAssert(tc: string, condition: boolean, description: string): asserts condition {
   if (!condition) throw new Error(`${tc} FAIL: ${description}`);
   console.info(`${tc} PASS: ${description}`);
+}
+
+function carriesCorrelation(trace: TelemetryTrace, correlationId: string): boolean {
+  return trace.spans.some((span) => span.attributes['netscript.correlation.id'] === correlationId);
 }

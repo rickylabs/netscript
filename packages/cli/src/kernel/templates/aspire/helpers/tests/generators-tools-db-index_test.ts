@@ -10,10 +10,24 @@ import { generateDbCliMode } from '../generate-db-cli-mode.ts';
 import { generateIndex } from '../generate-index.ts';
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+import { TEMPLATE_KEYS, type TemplateKey } from '../../../../assets/manifest.ts';
 
-// These generators read templates synchronously, which requires a previously-
-// awaited registry hydration. The tests exercise them directly (outside the CLI
-// dispatch path), so hydrate at module load.
+// Generator tests exercise source assets before the embedded snapshot is
+// regenerated in its own slice.
+async function registerSourceTemplate(key: TemplateKey, path: string): Promise<void> {
+  DEFAULT_TEMPLATE_REGISTRY.register(key, {
+    path: key,
+    content: await Deno.readTextFile(new URL(path, import.meta.url)),
+  });
+}
+await registerSourceTemplate(
+  TEMPLATE_KEYS.generatedAspireHelpersGenerateDbCliMode1,
+  '../../../../assets/generated/aspire/helpers/generate-db-cli-mode-1.ts.template',
+);
+await registerSourceTemplate(
+  TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterTools1,
+  '../../../../assets/generated/aspire/helpers/generate-register-tools-1.ts.template',
+);
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateRegisterTools', () => {
@@ -50,18 +64,18 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio'])",
+      "builder.addExecutable(\"prisma-studio\", 'deno', tool_0_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, tool_0_errorFile, \"studio\"])",
     );
     assertStringIncludes(
       output,
-      "prisma_studio = maybeWithProcessCommand(prisma_studio, 'prisma-studio', 'studio');",
+      'const tool_0_errorFile = resolveToolErrorFile(tool_0_workdir, "prisma-studio");',
     );
-    assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
-    assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
-    assertStringIncludes(output, "const prisma_studio_errorFile = resolveToolErrorFile(prisma_studio_workdir, 'prisma-studio');");
-    assertStringIncludes(output, "['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio']");
-    assertStringIncludes(output, "aspire/.helpers/run-tool.mts");
-    assertStringIncludes(output, 'monitorToolFailure(builder, prisma_studio, prisma_studio_errorFile);');
+    assertStringIncludes(
+      output,
+      "['run', '--allow-run', '--allow-write', toolRunnerPath, tool_0_errorFile, \"studio\"]",
+    );
+    assertStringIncludes(output, 'aspire/.helpers/run-tool.mts');
+    assertStringIncludes(output, 'monitorToolFailure(builder, tool_0, tool_0_errorFile);');
     assertStringIncludes(output, "targetState: 'Finished'");
     assertStringIncludes(output, 'publishResourceUpdate(resource, {');
     assertStringIncludes(output, 'catch(() => undefined)');
@@ -73,15 +87,15 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { migrate: toolNoTaskName },
     });
-    assertStringIncludes(output, "migrate_errorFile, 'migrate']");
+    assertStringIncludes(output, 'tool_0_errorFile, "migrate"]');
   });
 
-  it('should convert hyphenated names to safe identifiers', () => {
+  it('should use ordinal identifiers independent of resource names', () => {
     const output = generateRegisterTools({
       tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
     });
-    assertStringIncludes(output, 'prisma_studio_workdir');
-    assertStringIncludes(output, 'let prisma_studio = await builder.addExecutable');
+    assertStringIncludes(output, 'tool_0_workdir');
+    assertStringIncludes(output, 'let tool_0 = await builder.addExecutable');
   });
 
   it('should include enabled gate for each tool', () => {
@@ -90,7 +104,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "config.Tools['prisma-studio']?.Enabled !== false",
+      'config.Tools["prisma-studio"]?.Enabled !== false',
     );
   });
 
@@ -98,14 +112,14 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { 'prisma-studio': fixtures.MINIMAL_TOOL },
     });
-    assertStringIncludes(output, '// Named database dependency: main');
+    assertStringIncludes(output, '// Named database dependency');
     assertStringIncludes(
       output,
-      "prisma_studio = await attachToolDatabase(prisma_studio, config, infrastructure, 'main');",
+      'tool_0 = await attachToolDatabase(tool_0, config, infrastructure, "main");',
     );
     assertStringIncludes(
       output,
-      "const prisma_studio_workdir = resolvePrismaStudioWorkdir(appHostDir, config, 'main');",
+      'const tool_0_workdir = resolvePrismaStudioWorkdir(appHostDir, config, "main");',
     );
   });
 
@@ -117,7 +131,7 @@ describe('generateRegisterTools', () => {
     assertStringIncludes(output, '// Primary database dependency (fallback)');
     assertStringIncludes(
       output,
-      'lint = await attachToolDatabase(lint, config, infrastructure);',
+      'tool_0 = await attachToolDatabase(tool_0, config, infrastructure);',
     );
   });
 
@@ -200,13 +214,15 @@ describe('generateDbCliMode', () => {
     assert(!output.includes('--minimum-dependency-age=0'));
   });
 
-  it('registers explicit DB resources without short-circuiting the resident graph', () => {
+  it('registers typed DB CLI resources without short-circuiting the resident graph', () => {
     const output = generateDbCliMode({ databases: {} });
 
     assertStringIncludes(output, 'export async function tryHandleDbCliMode(');
-    assertStringIncludes(output, '`netscript-db-${target.configKey}`');
+    assertStringIncludes(output, '`${target.configKey}-cli`');
     assertStringIncludes(output, 'await resource.withExplicitStart();');
-    assertStringIncludes(output, 'request.NETSCRIPT_PRISMA_OPERATION');
+    assertStringIncludes(output, 'await resource.withCommand(');
+    assert(!output.includes('DB_OPERATION_RUNNER'));
+    assertStringIncludes(output, 'await resource.excludeFromMcp();');
     assertStringIncludes(output, 'return false;');
   });
 });

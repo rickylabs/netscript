@@ -44,36 +44,53 @@ export const NATIVE_CANARY_MODEL_ARGS = {
 } as const;
 
 /**
- * Validated OpenRouter preset model ids (verified against provider docs
- * 2026-07-10). Presets are suggestions, not global defaults or fallback policy.
+ * Current OpenRouter model ids approved for new route and preset selection.
+ * Re-verified against the live OpenRouter catalog on 2026-08-30.
  */
 export const OPENROUTER_MODEL_IDS = {
-  minimax: 'minimax/minimax-m3',
-  qwen: 'qwen/qwen3.8-max',
-  glm: 'z-ai/glm-5.2',
+  /** Conditional formal PLAN-EVAL route. */
+  planEvaluator: 'qwen/qwen3.8-flash',
+  /** Formal IMPL-EVAL and hybrid/gateway default route. */
+  implEvaluator: 'z-ai/glm-5.3-flash',
+  /** Creative-design route retained independently of evaluator routing. */
+  designGlm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
+} as const;
+
+/**
+ * Retired OpenRouter model ids accepted only while deserializing historical
+ * run state. They are deliberately absent from every active selector.
+ */
+export const LEGACY_OPENROUTER_MODEL_IDS = {
+  minimaxM3: 'minimax/minimax-m3',
   deepseekV4Flash0731: 'deepseek/deepseek-v4-flash-0731',
+  qwen38Max: 'qwen/qwen3.8-max',
 } as const;
 
 /** OpenRouter models approved for explicit Claude hybrid delegation. */
-export type HybridDelegationModelId = typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
+export type CurrentOpenRouterModelId =
+  typeof OPENROUTER_MODEL_IDS[keyof typeof OPENROUTER_MODEL_IDS];
+export type LegacyOpenRouterModelId =
+  typeof LEGACY_OPENROUTER_MODEL_IDS[keyof typeof LEGACY_OPENROUTER_MODEL_IDS];
+export type HybridDelegationModelId =
+  | typeof OPENROUTER_MODEL_IDS.implEvaluator
+  | typeof OPENROUTER_MODEL_IDS.planEvaluator;
 export const HYBRID_DELEGATION_MODEL_IDS: readonly HybridDelegationModelId[] = [
-  OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+  OPENROUTER_MODEL_IDS.implEvaluator,
+  OPENROUTER_MODEL_IDS.planEvaluator,
 ] as const;
 
 /** Default OpenRouter worker for Claude hybrid delegation. */
 export const HYBRID_DELEGATION_DEFAULT_MODEL: HybridDelegationModelId =
-  OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
+  OPENROUTER_MODEL_IDS.implEvaluator;
 
 /** Open models approved for formal evaluation without paid closed-model routing. */
 export const OPEN_EVALUATOR_MODEL_IDS: readonly [
-  typeof OPENROUTER_MODEL_IDS.minimax,
-  typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
-  typeof OPENROUTER_MODEL_IDS.qwen,
+  typeof OPENROUTER_MODEL_IDS.planEvaluator,
+  typeof OPENROUTER_MODEL_IDS.implEvaluator,
 ] = [
-  OPENROUTER_MODEL_IDS.minimax,
-  OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
-  OPENROUTER_MODEL_IDS.qwen,
+  OPENROUTER_MODEL_IDS.planEvaluator,
+  OPENROUTER_MODEL_IDS.implEvaluator,
 ] as const;
 export type OpenEvaluatorModelId = typeof OPEN_EVALUATOR_MODEL_IDS[number];
 

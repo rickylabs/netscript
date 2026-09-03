@@ -19,7 +19,7 @@
  */
 
 import type { RegisterPluginsOptions } from '../types.ts';
-import { extractSagaStoreBackend, fileHeader, safeIdentifier } from '../_utils.ts';
+import { extractSagaStoreBackend, fileHeader } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
@@ -47,7 +47,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   // --- Pass 1 blocks: create all plugin resources ---
   const pass1Blocks: string[] = [];
 
-  for (const [name, entry] of entries) {
+  for (const [pluginIndex, [name, entry]] of entries.entries()) {
     const workdir = entry.Workdir ?? '.';
     if (entry.Entrypoint === undefined) {
       throw new Error(`Plugin appsettings entry "${name}" is missing Entrypoint.`);
@@ -61,7 +61,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       : withDatabasePermissions(denoDefaults.Permissions, databaseEngine);
 
     const lines: string[] = [];
-    lines.push(`  // --- ${name} ---`);
+    lines.push(`  // --- plugin ${pluginIndex} ---`);
     lines.push(`  {`);
 
     // Resolve permissions — plugins use --watch-hmr
@@ -77,14 +77,20 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(`    );`);
 
     // Resolve working directory
-    lines.push(`    const workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
+    lines.push(
+      `    const workdir = resolveWorkspacePath(appHostDir, ${JSON.stringify(workdir)});`,
+    );
     lines.push(
       `    const bootstrapModule = new URL('../../services/_shared/plugin-service-context.ts', import.meta.url).href;`,
     );
 
     // Register via addExecutable with HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addExecutable(${
+        JSON.stringify(name)
+      }, 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, ${
+        JSON.stringify(entrypoint)
+      }])`,
     );
     lines.push(`      .${renderHttpEndpointCall(entry)};`);
 
@@ -93,7 +99,9 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(``);
       lines.push(`    // HTTP health probe — a listening socket alone is not "healthy".`);
       lines.push(
-        `    await resource.withHttpHealthCheck({ path: '${healthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+        `    await resource.withHttpHealthCheck({ path: ${
+          JSON.stringify(healthCheckPath)
+        }, endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
       );
     }
 
@@ -125,7 +133,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(``);
     lines.push(`    // OTEL telemetry (full executable env set)`);
     lines.push(
-      `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable');`,
+      `    const otel = buildOtelEnvVars(${JSON.stringify(name)}, config.Version, 'executable');`,
     );
     lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
     lines.push(`      await resource.withEnvironment(key, value);`);
@@ -181,15 +189,19 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(
         `    // Service references (wired via endpoint env vars — services already exist)`,
       );
-      for (const ref of serviceRefs) {
-        const refId = safeIdentifier(ref);
+      for (const [refIndex, ref] of serviceRefs.entries()) {
+        const refId = `plugin_service_${pluginIndex}_${refIndex}`;
         lines.push(`    {`);
         lines.push(
-          `      const ${refId}Endpoint = await _services.get('${ref}')?.getEndpoint('http');`,
+          `      const ${refId}Endpoint = await _services.get(${
+            JSON.stringify(ref)
+          })?.getEndpoint('http');`,
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(
-          `        await resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+          `        await resource.withEnvironment(${
+            JSON.stringify(`services__${ref}__http__0`)
+          }, ${refId}Endpoint);`,
         );
         lines.push(`      }`);
         lines.push(`    }`);
@@ -197,7 +209,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     }
 
     lines.push(``);
-    lines.push(`    plugins.set('${name}', resource);`);
+    lines.push(`    plugins.set(${JSON.stringify(name)}, resource);`);
     lines.push(`  }`);
 
     pass1Blocks.push(lines.join('\n'));
@@ -206,25 +218,29 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   // --- Pass 2 blocks: wire plugin→plugin cross-references ---
   const pass2Blocks: string[] = [];
 
-  for (const [name, entry] of entries) {
+  for (const [pluginIndex, [name, entry]] of entries.entries()) {
     const pluginRefs = entry.PluginReferences ?? [];
     if (pluginRefs.length === 0) continue;
 
     const lines: string[] = [];
-    lines.push(`  // --- ${name}: wire PluginReferences via endpoint env vars ---`);
+    lines.push(`  // --- plugin ${pluginIndex}: wire PluginReferences via endpoint env vars ---`);
     lines.push(`  {`);
-    lines.push(`    const resource = plugins.get('${name}');`);
+    lines.push(`    const resource = plugins.get(${JSON.stringify(name)});`);
     lines.push(`    if (resource) {`);
 
-    for (const ref of pluginRefs) {
-      const refId = safeIdentifier(ref);
+    for (const [refIndex, ref] of pluginRefs.entries()) {
+      const refId = `plugin_plugin_${pluginIndex}_${refIndex}`;
       lines.push(`      {`);
       lines.push(
-        `        const ${refId}Endpoint = await plugins.get('${ref}')?.getEndpoint('http');`,
+        `        const ${refId}Endpoint = await plugins.get(${
+          JSON.stringify(ref)
+        })?.getEndpoint('http');`,
       );
       lines.push(`        if (${refId}Endpoint) {`);
       lines.push(
-        `          await resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+        `          await resource.withEnvironment(${
+          JSON.stringify(`services__${ref}__http__0`)
+        }, ${refId}Endpoint);`,
       );
       lines.push(`        }`);
       lines.push(`      }`);

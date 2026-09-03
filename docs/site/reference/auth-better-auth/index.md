@@ -8,6 +8,12 @@ title: "@netscript/auth-better-auth"
 Better Auth integration, authenticator, and backend adapter for NetScript auth. This page is
 written against the package's public surface reported by `deno doc`.
 
+## Exports
+
+| Export | Path |
+| --- | --- |
+| `@netscript/auth-better-auth` | `./mod.ts` |
+
 ## Factories
 
 | Symbol | Kind | Description |

@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The contract-first vocabulary for NetScript boundaries: an oRPC base contract with the standard
-error map, Zod-backed pagination and error schemas, and CRUD/query/transform builders that keep
-service handlers and typed clients in sync.**
+**Contract-first vocabulary for NetScript boundaries: an oRPC base contract with the standard error
+map, NetScript-owned procedure metadata, Zod pagination and error schemas, and CRUD/query/transform
+builders that keep services and clients in sync.**
 
 In NetScript the contract comes first: services implement it, the SDK generates typed clients from
 it, and both sides stay in sync because they share one definition. This package is that shared
@@ -20,6 +20,9 @@ projections from a single entity schema.
 - **Base contract** — `baseContract` carries NetScript's common oRPC error map (`NOT_FOUND`,
   `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `RATE_LIMITED`, `SERVICE_UNAVAILABLE`), so every
   service starts from one shared error vocabulary.
+- **Procedure metadata** — `NetScriptProcedureMeta.access` declares authentication/authorization,
+  while `policy.cache` supplies advisory SDK cache intent, without exposing oRPC's metadata types
+  or maintaining a second route-policy map.
 - **Pagination schemas** — offset and cursor query/input/meta schemas
   (`OffsetPaginationQuerySchema`, `CursorPaginationMetaSchema`, and friends) with shared
   limit/offset defaults and string-to-number coercion for query parameters.
@@ -56,6 +59,16 @@ import { z } from 'jsr:@zod/zod@4';
 // error map (NOT_FOUND, VALIDATION_ERROR, UNAUTHORIZED, ...) is already applied.
 export const listItems = baseContract
   .route({ method: 'GET', path: '/items' })
+  .meta({
+    access: {
+      authentication: 'required',
+      authorization: {
+        scopes: ['items:read'],
+        roles: ['operator'],
+      },
+    },
+    policy: { cache: 'force-cache' },
+  })
   .input(OffsetPaginationQuerySchema)
   .output(
     z.object({
@@ -69,11 +82,36 @@ const query = OffsetPaginationQuerySchema.parse({ limit: '25' });
 console.log(query); // { limit: 25, offset: 0 }
 ```
 
+## Procedure access metadata
+
+Declare access beside the procedure it governs with `.meta({ access: ... })`. Do not maintain a
+second policy map keyed by a router key or URL: contract-local metadata follows the procedure when
+that procedure is renamed, while a stale SDK reference to the old procedure key fails to
+type-check.
+
+| Field | Declaration |
+| --- | --- |
+| `authentication` | `'none' \| 'optional' \| 'required'` |
+| `authorization.scopes` | Optional readonly list of required scopes |
+| `authorization.roles` | Optional readonly list of required roles |
+
+An absent `access` field is unspecified, not public. The service runtime leaves existing consumers
+unchanged until an application explicitly opts into contract enforcement with
+`createContractAuthorizer(contract, { fallback? })` and passes it to `.withAuthz()`.
+
+`policy.cache` accepts `'no-store'`, `'default'`, or `'force-cache'`. It is advisory input to the
+SDK's central transport policy; it does not create a second cache or server-handler mechanism.
+
+`'optional'` is declared for future support, currently rejected. The OpenAPI projection can
+represent the declaration, but `createContractAuthorizer()` throws the stable
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` error
+during construction, before the first request.
+
 ## Public surface
 
 | Entry         | What it gives you                                                                     |
 | ------------- | ------------------------------------------------------------------------------------- |
-| `.`           | `baseContract`, error + pagination schemas, schema factories, `inspectContracts`      |
+| `.`           | `baseContract`, procedure metadata, error + pagination schemas, schema factories      |
 | `./crud`      | `createCrudContract`, `createReadOnlyContract`, `createListOnlyContract`              |
 | `./query`     | Filter/search schemas, `buildPrismaWhere`, `createPaginatedOutput`, cursor pagination |
 | `./transform` | `createTransformer`, `composeTransformers`, pick/omit transformer factories           |
@@ -97,6 +135,14 @@ The always-current symbol list is
 Runs on Deno, Node.js, and Bun — the package is pure schema and contract definitions with no runtime
 APIs and no permissions. Contracts are built on [oRPC](https://orpc.unnoq.com/) (`@orpc/contract`)
 and [Zod](https://zod.dev/) 4; any oRPC server/client stack can implement and consume them.
+
+`NetScriptProcedureMeta` is owned and versioned by NetScript, independently of oRPC's public
+metadata vocabulary. Its compatibility rule is additive-only optional readonly fields: existing
+field names and meanings do not change within the current major line, and there is deliberately no
+required version discriminant because unannotated procedures carry `{}`. Consumers should ignore
+unknown fields and treat absent known fields as unspecified. That means runtime code cannot
+distinguish “metadata absent” from a notional v1 marker; an incompatible semantic change requires a
+new field name with deprecation guidance or a semver-major release.
 
 ## License
 

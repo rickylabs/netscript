@@ -3,14 +3,21 @@
  *
  * The root export is the high-level SDK entrypoint for service-aware
  * applications. It gathers the most common client, query, discovery,
- * telemetry, OpenAPI, and cache surfaces while preserving focused subpaths for
- * narrow imports.
+ * telemetry, and OpenAPI surfaces while preserving focused subpaths for narrow
+ * imports. Importing this module does not install a server cache provider.
  *
  * Use the root when an app wants the L3 composition preset:
  * `defineServices()`. That preset creates service clients, server-side query
- * factories, and TanStack Query utilities from one contract map. Its returned
- * values are the same L2 values exposed by the focused factories, so dropping
- * down a layer does not require replacing wiring.
+ * factories, and TanStack Query utilities from one contract map. Explicit client
+ * contribution tuples add typed per-call context and declared HTTP headers;
+ * cache-safe tuples partition full keys, while direct-only tuples remain absent
+ * from generated query surfaces. Its returned values are the same L2 values
+ * exposed by the focused factories, so dropping down a layer does not require
+ * replacing wiring.
+ *
+ * Use `@netscript/sdk/presets` when browser or shared code only needs
+ * `defineServices()` and its package-owned type closure. That focused entry
+ * avoids pulling unrelated root exports into the module graph.
  *
  * Use `@netscript/sdk/client` when a service or frontend only needs
  * `createServiceClient()` and the package-owned contract algebra.
@@ -21,8 +28,10 @@
  * Use `@netscript/sdk/query-client` when browser or island code needs
  * TanStack Query integration, client key helpers, or the KV cache persister.
  *
- * Use `@netscript/sdk/cache` only from server-side code. Importing it
- * auto-registers the shared KV-backed cache provider for query factories.
+ * Use `@netscript/sdk/cache` only from server-side code. Importing it is inert;
+ * a custom server bootstrap must explicitly call
+ * `setCacheProvider(cacheQuery)`. `defineFreshApp()` performs that registration
+ * for NetScript-managed Fresh apps.
  *
  * Use `@netscript/sdk/discovery` for Aspire service URLs and database/KV
  * connection discovery. That subpath keeps Deno env access isolated from the
@@ -43,7 +52,6 @@
  * @module
  */
 
-export * from './src/cache/mod.ts';
 export * from './src/client/mod.ts';
 export * from './src/discovery/mod.ts';
 export {
@@ -60,6 +68,9 @@ export * from './src/query/mod.ts';
 export * from './src/query-client/mod.ts';
 export * from './src/telemetry/mod.ts';
 export type {
+  ActionQueryKey,
+  CachedEntry,
+  CacheEntry,
   CacheInvalidationReport,
   CacheInvalidationTopologyReport,
   CacheKey,
@@ -73,7 +84,9 @@ export type {
   CacheWriteReport,
   CacheWriteTopologyReport,
   QueryClientPort,
+  SdkClientServerKeySuffix,
   ServiceClientContract,
   ServiceClientShape,
   ServiceQueryUtils,
+  ServiceRequestRest,
 } from './src/ports/mod.ts';

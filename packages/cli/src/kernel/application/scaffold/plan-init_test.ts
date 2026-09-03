@@ -17,6 +17,7 @@ import type { PublicCommandDependencies } from '../../../public/features/root/pu
 import { createDeployCommand } from '../../../public/features/deploy/deploy-group.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
+import { SCAFFOLD_VERSIONS } from '../../constants/scaffold/scaffold-versions.ts';
 import type { InitPipelineContext } from './context.ts';
 import { scaffoldRoot } from './plan-init.ts';
 
@@ -51,12 +52,14 @@ function context(scaffolder: InMemoryScaffolder): InitPipelineContext {
 }
 
 function fakeDeployTarget(key: string): DeployTargetPort {
-  const handler = (operation: DeployTargetOperation) => (_request: DeployTargetRequest): Promise<DeployTargetResult> =>
-    Promise.resolve({
-      target: key,
-      operation,
-      message: `${key} ${operation} ok`,
-    });
+  const handler =
+    (operation: DeployTargetOperation) =>
+    (_request: DeployTargetRequest): Promise<DeployTargetResult> =>
+      Promise.resolve({
+        target: key,
+        operation,
+        message: `${key} ${operation} ok`,
+      });
   return {
     key,
     label: key,
@@ -95,7 +98,8 @@ function fakeDeployDependencies(): PublicCommandDependencies {
       ['compose', fakeDeployTarget('compose')],
       ['docker', fakeDeployTarget('docker')],
     ]),
-    denoDeployTargetFactory: (_defaults: DenoDeployTargetDefaults) => fakeDeployTarget('deno-deploy'),
+    denoDeployTargetFactory: (_defaults: DenoDeployTargetDefaults) =>
+      fakeDeployTarget('deno-deploy'),
   } as unknown as PublicCommandDependencies;
 }
 
@@ -179,6 +183,14 @@ Deno.test('scaffoldRoot emits CI/CD workflow templates for shipped deploy target
 
   assertStringIncludes(compose ?? '', 'deploy compose plan');
   assertStringIncludes(compose ?? '', netscriptJsrSpecifier('cli'));
+  assertStringIncludes(
+    compose ?? '',
+    `dotnet tool install Aspire.Cli --version ${SCAFFOLD_VERSIONS.ASPIRE_SDK}`,
+  );
+  assert(
+    (compose ?? '').indexOf('dotnet tool install Aspire.Cli') <
+      (compose ?? '').indexOf('aspire restore'),
+  );
   assertStringIncludes(compose ?? '', '--clear-cache');
   assertStringIncludes(compose ?? '', 'ghcr.io');
   assert(!compose?.includes('~/.aspire/deployments'));

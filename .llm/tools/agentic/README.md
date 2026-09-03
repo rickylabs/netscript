@@ -49,7 +49,7 @@ token. It is safe to read any one of them in isolation.
 | `openhands/`   | The OpenHands lane: dispatch an evaluator, read its status, watch for the verdict.                                                                                                                                                  |
 | `github/`      | The GitHub REST lane: leaf-PR lifecycle, background CI/verdict watch, durable token resolution.                                                                                                                                     |
 | `wsl/`         | The WSL foundation: a native doctor and a reversible bootstrap/rollback planner.                                                                                                                                                    |
-| `claude/`      | Claude hooks, Remote Control smoke and bounded OpenRouter delegation, skill-mirror sync, and surface validation.                                                                                                                    |
+| `claude/`      | Claude hooks, Remote Control smoke and bounded OpenRouter delegation, plus surface validation.                                                                                                                                      |
 | `config/`      | **The single source for everything volatile** — model ids, tool versions, endpoints. See [Maintenance map](#maintenance-map-change-one-thing-in-one-place).                                                                         |
 | `lib/`         | Shared pure + impure primitives (all the landmine logic), its unit suite, and real fixtures.                                                                                                                                        |
 
@@ -145,8 +145,11 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts \
   --thread-id <uuid> --message "<follow-up>" [--worktree <wsl-path>] [--dry-run]
 ```
 
-`--dry-run` prints the exact command and sends nothing. Exit: `0` ok/dry-run · `1` resume failed ·
-`2` usage error.
+`--dry-run` prints the exact command and sends nothing. A real resume exits `0` only when the child
+result is accepted. A recognized rejection — including
+`thread-store conflict: already has an active writer` — remains visible on the same child
+stdout/stderr stream but forces exit `1` even when the child process itself exited `0`. Other child
+failures also exit `1`; usage errors exit `2`.
 
 ### 5. Check live state anytime — `codex/codex-status.ts`
 
@@ -187,14 +190,14 @@ same phase/head.
 
 **When:** an authorized manual rerun or non-phase cloud task genuinely needs a direct trigger. The
 tool validates the dispatch-prompt contract (it must begin with `use harness` and carry a `## SKILL`
-chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status transitions
-instead. Dispatch exactly one trigger per intended run.
+chapter), builds the trigger, and POSTs it. Normal PLAN/IMPL phase runs use labels/status
+transitions instead. Dispatch exactly one trigger per intended run.
 
 ```bash
 # Dry-run (no token, no network) — see the exact comment that would post:
 deno run --allow-read .llm/tools/agentic/openhands/dispatch-openhands.ts \
-  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.8-max \
-  --output pr-comment --provider openrouter --effort xhigh --dry-run --pretty
+  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.8-flash \
+  --output pr-comment --provider openrouter --effort high --dry-run --pretty
 ```
 
 Set `GH_TOKEN` in-process and drop `--dry-run` to post for real. By default every prompt gets a
@@ -202,6 +205,10 @@ verdict output-contract epilogue so the evaluator posts the machine-readable `OP
 line early (iteration budgets exhaust and late verdicts get lost); pass `--no-verdict-contract` for
 non-eval implementation asks. Exit: `0` ok/dry-run · `1` post failed · `2` usage · `3` prompt
 contract violation · `4` missing token.
+
+OpenHands currently cannot attest reasoning effort because its adapter does not expose that
+identity. The dispatch argument records requested metadata only; workflow comments and summaries
+state the limitation and never claim a `max` effort observation.
 
 ### Read the verdict — `openhands/openhands-status.ts` and `watch-openhands-verdict.ts`
 
@@ -269,13 +276,14 @@ threads never block. The command is read-only and is also enforced in CI's `clos
 
 ### `runtime/cli/agentic-runtime.ts` — the canonical surface
 
-This is the front door to the desired-state controller: inspection, planning, and one guarded
-recovery command.
+This is the front door to the desired-state controller: inspection, planning, and guarded recovery
+commands.
 
 ```bash
 deno task agentic:runtime doctor --json      # inspect-only health
 deno task agentic:runtime status --json      # inspect-only observed state
 deno task agentic:runtime repair codex-remote --worktree <wsl-path> --dry-run --json
+deno task agentic:runtime repair sender-lease --worktree <wsl-path> --dry-run --json
 ```
 
 `doctor` and `status` never write. Controller state and checkpoints are value-free JSON under
@@ -287,6 +295,32 @@ app-server` may receive `SIGTERM`; only the one known
 control socket may be removed; no broad `pkill` or shell-evaluated kill patterns exist. Always
 `--dry-run` first — it inspects and plans without terminating a PID, removing a socket, or writing
 evidence.
+
+`repair sender-lease` is the only eviction path for a durable sender owner; launch itself is
+preserve-only and never removes an existing record. A launch blocked by `duplicate_sender_risk` or
+`ownership_conflict` must be handled by resuming the recorded thread or by running this explicit
+repair against one canonical worktree. There is no sender-directory scan, force flag, or
+elapsed-time shortcut.
+
+Always preview the exact worktree first, then omit `--dry-run` only when the plan reports stale:
+
+```bash
+deno task agentic:runtime repair sender-lease --worktree <wsl-path> --dry-run --json
+deno task agentic:runtime repair sender-lease --worktree <wsl-path> --json
+```
+
+A lease is stale only when all three provenance-bound signals agree: two debounced PID probes show
+the owner dead, the exact rollout is terminal or proven absent, and the thread is non-active or
+proven absent. Absence counts only when the inspected rollout inventory and thread daemon are bound
+to the record's own session provenance. Alive, working, stalled, active, foreign, mismatched,
+unreadable, or otherwise unknown evidence fails closed and preserves the lease.
+
+Apply re-reads the unchanged lease token and repeats every probe. It atomically persists an
+`authorized` receipt containing both timestamped evidence passes, CAS-removes only that exact
+record, then finalizes the receipt as `evicted`. Receipts live under
+`~/.config/netscript-agentic/runtime/evidence/`, record the finite `restart_stale_ownership` reason,
+and redact the lease token. If re-observation changes or any evidence becomes unknown, repair aborts
+without eviction.
 
 ### `runtime/cli/routing-state.ts` — quota fallback, inspected
 
@@ -319,19 +353,20 @@ OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly em
 gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
 Native Claude Remote Control remains a different surface.
 
-For interactive OpenRouter work, `agentic:claude-openrouter` starts a loopback-only split gateway.
-Exact `/v1/messages` requests receive the configured OpenRouter credential and forced model; other
-Claude API traffic is passed to the configured Anthropic endpoint without the OpenRouter key. The
-Claude child receives neither provider API key and runs with `bypassPermissions`. The key is read
-from `OPENROUTER_API_KEY` or the same configured user env file as OpenCode and is never printed.
+For interactive OpenRouter work, `agentic:claude-openrouter-gateway` starts a loopback-only split
+gateway. Exact `/v1/messages` requests receive the configured OpenRouter credential and forced
+model; other Claude API traffic is passed to the configured Anthropic endpoint without the
+OpenRouter key. The Claude child receives neither provider API key and runs with
+`bypassPermissions`. The key is read from `OPENROUTER_API_KEY` or the same configured user env file
+as OpenCode and is never printed.
 
 ```bash
-# New inference-only DeepSeek session.
-deno task agentic:claude-openrouter -- --cwd /home/me/repo
+# New inference-only GLM 5.3 Flash session at max effort.
+deno task agentic:claude-openrouter-gateway -- --cwd /home/me/repo
 
 # Fork an existing conversation without changing the original.
-deno task agentic:claude-openrouter -- \
-  --cwd /home/me/repo --resume <conversation-id> --fork-session --effort xhigh
+deno task agentic:claude-openrouter-gateway -- \
+  --cwd /home/me/repo --resume <conversation-id> --fork-session --effort max
 ```
 
 This surface is deliberately **not Remote Control/mobile-visible**. Claude Code 2.1.196 and newer
@@ -374,7 +409,7 @@ derive a different registry name.
 > **Quota limitation.** Claude must still have enough native allowance to take a turn and choose to
 > call `delegate_openrouter`. The OpenRouter worker can do the delegated reasoning, but this bridge
 > cannot make a zero-Claude-quota Remote Control session progress. For work that needs no Claude
-> turn, use the non-Remote-Control `agentic:claude-openrouter` surface or OpenCode directly.
+> turn, use the non-Remote-Control `agentic:claude-openrouter-gateway` surface or OpenCode directly.
 
 If launch fails, diagnose the boundary reported by the error: confirm `--cwd` is an existing
 absolute directory, `HOME` is set, native `claude --remote-control` works with the current login,
@@ -404,7 +439,7 @@ the child keeps only `ANTHROPIC_AUTH_TOKEN`, has every rival provider/route key 
 under an isolated `CLAUDE_CONFIG_DIR` — a cached native Claude login cannot override the gateway.
 
 ```bash
-deno task agentic:claude-openrouter --model <openrouter-id> --effort xhigh \
+deno task agentic:claude-openrouter --model <openrouter-id> --effort max \
   --prompt .llm/runs/<run-id>/evaluate-prompt.md [--resume <session>] [--output result.json]
 ```
 
@@ -467,18 +502,27 @@ failure.
 
 ## The Claude surface — `claude/`
 
-`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks; it appends Claude Code
-events to `.llm/tmp/claude/hooks/<run-id>/events.jsonl` and is careful never to disturb `deno.lock`.
-`sync-claude-skills.ts` **generates** `.claude/skills/` from `.agents/skills/` — the mirrors are
-generated, never hand-edited. `validate-claude-surface.ts` (the `agentic:check-claude` gate) checks
-the whole surface in one pass:
+`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks. Both `PreToolUse` and
+`Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a nested turn cwd cannot change
+which checked-in logger runs. Claude defines that variable as the session launch root; it does not
+follow `EnterWorktree`, and this hook deliberately writes the event log back to that launch root at
+`.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude script/task invocation falls back
+to `Deno.cwd()` only when the variable is absent.
+
+The configured process reads exactly `CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, and
+`CLAUDE_SESSION_ID`, writes only below the launch-root hook-log subtree, and needs no runtime read
+permission. `--no-lock` keeps the hook from disturbing `deno.lock`; `--no-prompt` prevents a future
+TTY-attached invocation from prompting. Repository skills live only in `.agents/skills/`; the lone
+`.claude/skills/repo-skills/SKILL.md` file points Claude to that source.
+`validate-claude-surface.ts` (the `agentic:check-claude` gate) checks the whole surface in one pass:
 
 ```console
 $ deno task agentic:check-claude --pretty
 OK CLAUDE.md: contains @AGENTS.md
+OK CLAUDE.md: contains .agents/skills/<name>/SKILL.md
 OK .claude/settings.json: valid JSON
 OK .gitignore: ignores .claude/settings.local.json
-OK .claude/skills: agentic:sync-claude OK: 17 skill(s), 21 mirrored file(s)
+OK Claude repository-skill bridge: .claude/skills/repo-skills/SKILL.md is the only Claude skill and points to .agents/skills
 OK claude hook lock check: deno.lock unchanged after 3 hook runs
 ```
 
@@ -567,8 +611,12 @@ The invariants worth internalizing:
 - **Push safety.** A worktree branched off an umbrella inherits its upstream, so a bare `git push`
   lands on the umbrella. Launch fails (exit 4) unless `@{u}` is `NONE`; pushes use an explicit
   `HEAD:refs/heads/<branch>` refspec.
-- **One sender per worktree.** A Codex launch has one durable owner per canonical worktree; a live
-  owner refuses a rival with `duplicate_sender_risk`. Elapsed time alone never makes an owner stale.
+- **One sender per worktree.** A Codex launch has one durable owner per canonical worktree and never
+  auto-evicts it; a rival is refused with `duplicate_sender_risk` or `ownership_conflict`. Elapsed
+  time alone never makes an owner stale.
+- **Sender eviction is explicit and auditable.** Only `agentic:runtime repair sender-lease` can
+  remove a provenance-bound stale record, after repeat PID + rollout + thread evidence and a durable
+  redacted authorization receipt. Foreign, mismatched, live, or unknown ownership stays fail-closed.
 - **Fail-closed, anchored repair.** Destructive recovery only ever touches a `codex
   app-server`
   PID below `$HOME/.codex/` and the one known control socket — never a broad `pkill`.
@@ -625,7 +673,6 @@ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root .llm/tools/agentic --ext ts,tsx
 deno task agentic:check-claude                                                          # Claude surface gate
-deno task agentic:sync-claude:check                                                     # mirrors in sync
 ```
 
 Unit tests use a local throw-based `assert`/`assertEquals` because the repo's import map is empty

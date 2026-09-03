@@ -1,10 +1,10 @@
 /**
  * Server ↔ client query key bridging utilities.
  *
- * The SDK server keys (`['cache_query', resource, action, serializedInput]`)
- * and oRPC TanStack keys (`[...path, procedure, { type, input }]`) live in
- * separate cache tiers and are intentionally **not merged**. These helpers
- * map between the two for cross-tier invalidation.
+ * The SDK server keys (`[resource, action, serializedInput]`) and query-factory
+ * TanStack keys (`[resource, action, { input }]`) live in separate cache tiers
+ * and are intentionally **not merged**. These helpers map their shared prefix
+ * for cross-tier invalidation.
  *
  * @module
  */
@@ -26,6 +26,11 @@ export function toClientKeyPrefix(
 /**
  * Build a client-side invalidation filter from a resource and optional action.
  *
+ * Query-factory consumers should derive factory-consistent prefixes from
+ * `factory.<action>.clientKey()` instead of repeating the resource and action.
+ *
+ * @param resource - Resource segment at the start of the client query key.
+ * @param action - Optional action segment following the resource.
  * @returns An object with a `queryKey` property suitable for
  *          `queryClient.invalidateQueries()`.
  */

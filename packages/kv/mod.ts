@@ -10,6 +10,7 @@
 
 export {
   closeKv,
+  createLazyKv,
   getActiveProvider,
   getKv,
   getKvPath,

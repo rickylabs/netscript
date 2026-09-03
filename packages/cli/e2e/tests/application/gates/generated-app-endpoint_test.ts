@@ -5,7 +5,13 @@ import {
   appUrlsFromDescribeOutput,
   generatedAppHomeUrls,
   readPinnedAppPort,
+  resolveResourceUrlsFromAppHost,
+  resourceUrlsFromDescribeOutput,
 } from '../../../src/application/gates/scaffold/generated-app-endpoint.ts';
+import type {
+  ResourceUpdate,
+  ResourceUpdateSubscription,
+} from '../../../src/application/gates/scaffold/runtime/resource-state-stream.ts';
 import {
   diagnosticBody,
   probeAppHome,
@@ -166,6 +172,34 @@ Deno.test("the app endpoint comes from the resource's declared urls[]", () => {
   ]);
 });
 
+// S2 captured 13.5.3 describe JSON with `--nologo`; this independent, bannerless case is a
+// redacted projection of `02-v5-aspire-describe-final.json`, selecting its `users` resource.
+const ASPIRE_13_5_3_DESCRIBE_FIXTURE = JSON.stringify({
+  resources: [
+    {
+      name: 'users-yvbcumea',
+      displayName: 'users',
+      resourceType: 'Executable',
+      state: 'Running',
+      healthStatus: 'Healthy',
+      dashboardUrl: 'https://localhost:42501/?resource=users-yvbcumea',
+      relationships: [{ type: 'Reference', resourceName: 'aspire-13-5-postgres-db' }],
+      urls: [{ name: 'http', url: 'http://localhost:3001' }],
+      environment: {
+        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:42043',
+        OTEL_SERVICE_NAME: 'users',
+        PORT: '43515',
+      },
+    },
+  ],
+});
+
+Deno.test("13.5.3: the app endpoint comes from the captured resource's declared urls[]", () => {
+  assertEquals(appUrlsFromDescribeOutput(ASPIRE_13_5_3_DESCRIBE_FIXTURE, 'users'), [
+    'http://localhost:3001',
+  ]);
+});
+
 // This is the sharp edge. A recursive scrape of the resource node also picks up the Aspire
 // dashboard deep-link and every sibling URL in `environment`. Probing one of those would not
 // just be wrong — a sibling app's page is `text/html` containing `<html` too, which is the
@@ -180,6 +214,75 @@ Deno.test('resolution never returns the dashboard link or a sibling service URL'
 // DCP suffixes the instance id; gates pass the AppHost-given name.
 Deno.test('a resource resolves by displayName even though name is suffixed', () => {
   assertEquals(appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'users'), ['http://localhost:34100']);
+});
+
+Deno.test('generic resource endpoint resolution supports plugin resources', () => {
+  const describe = JSON.stringify({
+    resources: [{
+      name: 'workers-api-random',
+      displayName: 'workers-api',
+      urls: [{ name: 'http', url: 'http://localhost:35123' }],
+    }],
+  });
+  assertEquals(resourceUrlsFromDescribeOutput(describe, 'workers-api'), [
+    'http://localhost:35123',
+  ]);
+});
+
+Deno.test('live endpoint resolution consumes one scoped endpoint-bearing event and closes it', async () => {
+  const stats = { closes: 0 };
+  const subscription = endpointSubscription([
+    resourceUpdate({
+      displayName: 'workers-api',
+      urls: [{ name: 'http', url: 'http://localhost:35123' }],
+    }),
+  ], stats);
+
+  assertEquals(
+    await resolveResourceUrlsFromAppHost(
+      '/workspace/aspire/apphost.mts',
+      'workers-api',
+      () => Promise.resolve(subscription),
+    ),
+    ['http://localhost:35123'],
+  );
+  assertEquals(stats.closes, 1);
+});
+
+Deno.test('live endpoint resolution distinguishes observed non-HTTP endpoints from no event', async () => {
+  const subscription = endpointSubscription([
+    resourceUpdate({
+      displayName: 'postgres',
+      urls: [{ name: 'tcp', url: 'tcp://localhost:5432' }],
+    }),
+  ]);
+  await assertRejects(
+    () =>
+      resolveResourceUrlsFromAppHost(
+        '/workspace/aspire/apphost.mts',
+        'postgres',
+        () => Promise.resolve(subscription),
+      ),
+    Error,
+    'observed endpoint allocation for postgres, but the update declared no HTTP URL',
+  );
+});
+
+Deno.test('live endpoint resolution keeps malformed follow lines terminal and closes', async () => {
+  const stats = { closes: 0 };
+  const malformed = new Error('Unrecognized Aspire resource update line; raw line: not-json');
+  const subscription = endpointSubscription([], stats, malformed);
+  const failure = await assertRejects(() =>
+    resolveResourceUrlsFromAppHost(
+      '/workspace/aspire/apphost.mts',
+      'dashboard',
+      () => Promise.resolve(subscription),
+    )
+  );
+
+  assertEquals(failure, malformed);
+  assertEquals(failure instanceof AppEndpointPendingError, false);
+  assertEquals(stats.closes, 1);
 });
 
 // `relationships[]` entries carry a matching `resourceName` but no endpoint. Matching one
@@ -311,6 +414,27 @@ Deno.test('app-home diagnostics extract the Fresh overlay error and stack', () =
       'at fetchModule (vite.js:42)\nat render (app.tsx:7)',
   );
 });
+
+function endpointSubscription(
+  updates: readonly ResourceUpdate[],
+  stats = { closes: 0 },
+  terminal: Error = new Error('synthetic stream had no matching update'),
+): ResourceUpdateSubscription {
+  return {
+    waitFor(predicate) {
+      const match = updates.find(predicate);
+      return match ? Promise.resolve(match) : Promise.reject(terminal);
+    },
+    close() {
+      stats.closes += 1;
+      return Promise.resolve();
+    },
+  };
+}
+
+function resourceUpdate(resource: Record<string, unknown>): ResourceUpdate {
+  return { resource, rawLine: JSON.stringify(resource) };
+}
 
 Deno.test('app-home diagnostics retain a useful bounded fallback for unknown responses', () => {
   const body = `upstream failure: ${'x'.repeat(30_000)}`;

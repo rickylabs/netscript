@@ -35,6 +35,7 @@ package's public surface reported by `deno doc`.
 | `redactAuthPrincipal` | function | Return a redacted principal snapshot for logging and diagnostics. |
 | `authErrorCodeForReason` | function | Map an auth failure reason to an auth error code. |
 | `authOutcomeForReason` | function | Map an auth failure reason to an operation outcome. |
+| `createBearerSdkClientContribution` | function | Create the canonical typed bearer contribution for explicit service-client tuples. |
 
 ## Contracts, schemas, and constants
 
@@ -70,19 +71,22 @@ package's public surface reported by `deno doc`.
 | `AuthUser` | type alias | Auth user payload. |
 | `AuthOperationOutcome` | type alias | Auth operation outcome value. |
 | `AuthStreamEvent` | type alias | Auth stream event payload. |
+| `CreateBearerSdkClientContributionOptions` | interface | Context resolver, cache policy, unmarked-route policy, and cleartext opt-in for the bearer contribution. |
+| `NetScriptAuthenticationRequirement` | type alias | Authentication metadata vocabulary: `none`, `optional`, or `required`. |
 
 ## Sub-path exports
 
-| Export | Purpose |
-| --- | --- |
-| `@netscript/plugin-auth-core` | Root contract, port, schema, stream, and telemetry surface. |
-| `@netscript/plugin-auth-core/domain` | Domain types and schemas. |
-| `@netscript/plugin-auth-core/ports` | Backend, provider, session, and interactive-flow ports. |
-| `@netscript/plugin-auth-core/contracts/v1` | Versioned auth contract. |
-| `@netscript/plugin-auth-core/telemetry` | Auth telemetry attributes and helpers. |
-| `@netscript/plugin-auth-core/streams` | Auth stream schema and event types. |
-| `@netscript/plugin-auth-core/config` | Runtime config schemas and backend resolution helpers. |
-| `@netscript/plugin-auth-core/presets` | Backend preset registry helpers. |
-| `@netscript/plugin-auth-core/testing` | Testing primitives for auth adapters and plugins. |
+| Export | Path | Purpose |
+| --- | --- | --- |
+| `@netscript/plugin-auth-core` | `./mod.ts` | Root contract, port, schema, stream, and telemetry surface. |
+| `@netscript/plugin-auth-core/sdk` | `./src/sdk/mod.ts` | Universal typed bearer contribution factory and option types. |
+| `@netscript/plugin-auth-core/domain` | `./src/domain/mod.ts` | Domain types and schemas. |
+| `@netscript/plugin-auth-core/ports` | `./src/ports/mod.ts` | Backend, provider, session, and interactive-flow ports. |
+| `@netscript/plugin-auth-core/contracts/v1` | `./src/contracts/v1/mod.ts` | Versioned auth contract. |
+| `@netscript/plugin-auth-core/telemetry` | `./src/telemetry/mod.ts` | Auth telemetry attributes and helpers. |
+| `@netscript/plugin-auth-core/streams` | `./src/streams/mod.ts` | Auth stream schema and event types. |
+| `@netscript/plugin-auth-core/config` | `./src/config/mod.ts` | Runtime config schemas and backend resolution helpers. |
+| `@netscript/plugin-auth-core/presets` | `./src/presets/mod.ts` | Backend preset registry helpers. |
+| `@netscript/plugin-auth-core/testing` | `./src/testing/mod.ts` | Testing primitives for auth adapters and plugins. |
 
 Back to the [auth reference hub](/reference/auth/).

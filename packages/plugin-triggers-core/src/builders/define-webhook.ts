@@ -77,8 +77,8 @@ export function defineWebhook<TId extends string, TPayload = unknown>(
  * @returns Frozen enqueue-job action for the trigger processor.
  */
 export function enqueueJob<TJobId extends string, TPayload = unknown>(
-  job: JobDefinition<TJobId>,
-  options: EnqueueJobOptions<TPayload> = {},
+  job: JobDefinition<TJobId, TPayload>,
+  options: EnqueueJobOptions<NoInfer<TPayload>> = {},
 ): EnqueueJobAction<TJobId, TPayload> {
   return Object.freeze({
     kind: 'enqueue-job',

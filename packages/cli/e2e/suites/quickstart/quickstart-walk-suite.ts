@@ -1,7 +1,7 @@
 import { resolve } from '@std/path';
 import { commandGate } from '../../src/application/gates/scaffold/gate-factory.ts';
 import { createCleanupGates } from '../../src/application/gates/scaffold/runtime-gates.ts';
-import { PROBE_SERVICE_HEALTH_SCRIPT } from '../../src/application/gates/scaffold/runtime-gates.ts';
+import { PROBE_SERVICE_HEALTH_SCRIPT } from '../../src/application/gates/scaffold/runtime/behavior-scripts.ts';
 import { GATE, GATE_PHASE, QUICKSTART, QUICKSTART_TITLE } from '../../src/domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../src/domain/extension-axes.ts';
 import type { GateDefinition } from '../../src/domain/gate-definition.ts';
@@ -18,7 +18,7 @@ const ASPIRE_RESTORE_MAX_RETRIES = 2;
 
 /** Ordered executable commands mirrored by the Quickstart page. */
 export const QUICKSTART_DOCUMENTED_COMMANDS = [
-  'deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>',
+  'deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>',
   'netscript init my-app --db postgres --yes',
   'cd my-app',
   'netscript service add --name users --with-client',

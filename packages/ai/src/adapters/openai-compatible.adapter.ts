@@ -51,6 +51,30 @@ export function openAiCompatibleGenerationModelOptions(
 }
 
 /**
+ * Map per-turn {@linkcode GenerationOptions} to the OpenAI Responses
+ * request-body keys: a reasoning tier maps to the nested `reasoning.effort`
+ * field, and `maxOutputTokens` maps to `max_output_tokens`. `'off'` is treated
+ * as "no explicit reasoning request" (the OpenAI wire has no disable value, so
+ * `reasoning` is simply omitted and the model default applies). Returns
+ * `undefined` when the options carry nothing OpenAI models. Pure and
+ * unit-testable; the caller's `providerOptions` escape hatch is merged
+ * separately by the bridge.
+ */
+export function openAiResponsesGenerationModelOptions(
+  options: GenerationOptions,
+): Readonly<Record<string, unknown>> | undefined {
+  const modelOptions: Record<string, unknown> = {};
+  const effort = options.reasoningEffort;
+  if (effort !== undefined && effort !== 'off') {
+    modelOptions.reasoning = { effort };
+  }
+  if (options.maxOutputTokens !== undefined) {
+    modelOptions.max_output_tokens = options.maxOutputTokens;
+  }
+  return Object.keys(modelOptions).length > 0 ? modelOptions : undefined;
+}
+
+/**
  * Which underlying OpenAI API surface the endpoint speaks.
  */
 export type OpenAiCompatibleApi = 'chat-completions' | 'responses';
@@ -195,7 +219,9 @@ export class OpenAiCompatibleModelProvider implements ModelProviderPort {
     }, {
       name: name ?? OPENAI_COMPATIBLE_PROVIDER_ID,
       kind: 'text',
-      mapModelOptions: openAiCompatibleGenerationModelOptions,
+      mapModelOptions: api === 'responses'
+        ? openAiResponsesGenerationModelOptions
+        : openAiCompatibleGenerationModelOptions,
     });
   }
 

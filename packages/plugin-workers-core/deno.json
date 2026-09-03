@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers-core",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins.",
   "license": "Apache-2.0",
   "exports": {
@@ -28,11 +28,12 @@
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "zod": "catalog:",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.6",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.6",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.6",
-    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
-    "@orpc/server": "npm:@orpc/server@^1.14.6"
+    "@netscript/kv": "jsr:@netscript/kv@0.0.7",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.7",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.7",
+    "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+    "@orpc/server": "npm:@orpc/server@^1.15.0"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/contracts/v1/mod.ts src/registry/mod.ts src/state/mod.ts src/executor/mod.ts src/workflow/mod.ts src/streams/mod.ts src/stores/mod.ts src/presets/mod.ts src/shutdown/mod.ts src/domain/public-schema.ts src/telemetry/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/config/mod.ts src/runtime/mod.ts",

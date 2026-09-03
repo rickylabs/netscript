@@ -43,7 +43,7 @@ Deno.test('generatePluginService opts KV-backed plugin services into Redis adapt
   const output = generatePluginService(kvBackedProvider, {
     pluginName: 'background',
     kind: 'background',
-    servicePort: 8091,
+    servicePort: 9181,
   });
 
   assertStringIncludes(output, "import '@netscript/kv/redis';");
@@ -54,7 +54,7 @@ Deno.test('generatePluginService does not add Redis adapter import for API-only 
   const output = generatePluginService(apiKindProvider, {
     pluginName: 'api-sample',
     kind: 'api',
-    servicePort: 8094,
+    servicePort: 9184,
   });
 
   assert(output.length > 0);
@@ -65,7 +65,7 @@ Deno.test('generatePluginProcessorEntrypoint carries the selected KV adapter', (
   const output = generatePluginProcessorEntrypoint(kvBackedProvider, {
     pluginName: 'background',
     kind: 'background',
-    servicePort: 8091,
+    servicePort: 9181,
   });
 
   assertStringIncludes(output, "import '@netscript/kv/redis';");
@@ -74,12 +74,20 @@ Deno.test('generatePluginProcessorEntrypoint carries the selected KV adapter', (
 Deno.test('generatePluginServiceContext emits package-resident safe imports', () => {
   const output = generatePluginServiceContext();
 
-  assertStringIncludes(output, "from '@netscript/plugin/loader'");
+  assertStringIncludes(output, "from '@netscript/plugin/sdk'");
   assertStringIncludes(output, "from '@netscript/kv'");
-  assertStringIncludes(output, "from '@netscript/contracts'");
+  assertStringIncludes(
+    output,
+    'createPluginServiceContext as createHostPluginServiceContext',
+  );
   assertFalse(output.includes(netscriptJsrSpecifier('plugin', '/loader')));
   assertFalse(output.includes('../../contracts/versions/v1/mod.ts'));
   assertStringIncludes(output, 'export function createPluginServiceContext(');
-  assertStringIncludes(output, 'return Promise.resolve({');
+  assertStringIncludes(output, 'return createHostPluginServiceContext(pluginName, {');
+  assertStringIncludes(output, 'getDatabaseClient,');
+  assertStringIncludes(output, 'getKv,');
+  assertFalse(output.includes("from '@netscript/plugin/loader'"));
+  assertFalse(output.includes("from '@netscript/contracts'"));
+  assertFalse(output.includes('return Promise.resolve({'));
   assertFalse(output.includes('export async function createPluginServiceContext('));
 });

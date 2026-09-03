@@ -1,0 +1,34 @@
+[
+  {
+    "pid": 77301,
+    "ppid": 1,
+    "elapsedSeconds": 42,
+    "startedAt": "884201",
+    "commandLine": "aspire-managed nuget search --format json",
+    "cwd": "/home/codex/repos/fix-1046/.llm/tmp/cli-e2e/plugin-smoke",
+    "environment": "ASPIRE_DCP_APPHOST_PATH=/home/codex/repos/fix-1046/.llm/tmp/cli-e2e/plugin-smoke/aspire/apphost.mts",
+    "socketPaths": []
+  },
+  {
+    "pid": 77302,
+    "ppid": 1,
+    "elapsedSeconds": 41,
+    "startedAt": "884202",
+    "commandLine": "dotnet dcp --apphost /home/codex/repos/fix-1046/.llm/tmp/cli-e2e/plugin-smoke/aspire/apphost.mts",
+    "cwd": "/home/codex/repos/fix-1046/.llm/tmp/cli-e2e/plugin-smoke/aspire",
+    "environment": "",
+    "socketPaths": []
+  },
+  {
+    "pid": 77303,
+    "ppid": 1,
+    "elapsedSeconds": 40,
+    "startedAt": "884203",
+    "commandLine": "aspire-managed dcp backchannel",
+    "cwd": "/tmp",
+    "environment": "",
+    "socketPaths": [
+      "/home/codex/repos/fix-1046/.llm/tmp/cli-e2e/plugin-smoke/.aspire/backchannel.sock"
+    ]
+  }
+]

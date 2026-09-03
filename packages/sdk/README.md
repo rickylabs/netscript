@@ -25,6 +25,11 @@ and deployed endpoints without a registry or a config file.
   the map key.
 - **Typed service clients** — `createServiceClient` builds a fully inferred oRPC client from a
   shared contract router; input and output types come from the contract, never from you.
+- **Typed request contributions** — explicit versioned tuples add required per-call context and
+  declared HTTP headers without exposing transport links, retries, fetch, or upstream types.
+- **Declaration-safe procedure metadata** — `ProcedureMetaFromNode` on `./ports` and `ProcedureMeta`
+  on `./ports` and `./query` recover the exact NetScript-owned metadata carried by direct clients,
+  `defineServices`, and query actions without exposing upstream oRPC types.
 - **Aspire service discovery** — `./discovery` resolves service URLs and database/KV connections
   from orchestrator-injected environment variables, lazily at call time.
 - **Cache-aware query factories** — `createQueryFactories` is the golden path: one call over a
@@ -73,7 +78,7 @@ the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in 
 ## Quick example
 
 ```ts
-import { defineServices } from '@netscript/sdk';
+import { defineServices } from '@netscript/sdk/presets';
 import { ordersContract } from './contracts/orders.ts';
 
 // One contract map wires clients, server query factories, and frontend query utils.
@@ -92,8 +97,117 @@ const ordersQuery = queries.orders;
 const ordersQueryUtils = queryUtils.orders;
 ```
 
-Drop to a focused subpath when an app only needs part of the surface — `./client`, `./query`, and
-`./query-client` carry the three pieces individually.
+Use the side-effect-free `./presets` subpath for `defineServices` in browser/shared modules. Drop to
+`./client`, `./query`, and `./query-client` when an app only needs one of the three pieces.
+
+### Typed request contributions
+
+Use the SDK-owned locale factory or define an application contribution, then attach the literal
+tuple only to the services that should use it. The tuple owns its context and lower-case header
+names; construction rejects malformed descriptors, duplicates, reserved names, and unsupported
+protocol versions. Preparation failures use `SdkClientContributionError` with stable codes and
+framework-authored, redacted messages.
+
+```ts
+import {
+  createLocaleSdkClientContribution,
+  defineSdkClientContribution,
+} from '@netscript/sdk/client';
+import { defineServices } from '@netscript/sdk/presets';
+import { ordersContract } from './contracts/orders.ts';
+
+// Non-auth: the SDK canonicalizes one optional Unicode locale, owns
+// accept-language, and partitions response caches by that locale.
+const locale = createLocaleSdkClientContribution();
+
+// Auth-shaped application example: credential resolution is explicit, and
+// cache partitioning uses a stable non-secret epoch rather than the credential.
+const bearer = defineSdkClientContribution<{
+  auth: {
+    getAccessToken(): Promise<string>;
+    cachePartition: string;
+  };
+}>()({
+  protocol: { family: 'netscript.sdk-client', major: 1 },
+  id: 'app:bearer',
+  context: { auth: 'required' },
+  headerKeys: ['authorization'],
+  responseCache: {
+    mode: 'partitioned',
+    partition: ({ context }) => context.auth.cachePartition,
+  },
+  prepare: async ({ context }) => ({
+    headers: { authorization: `Bearer ${await context.auth.getAccessToken()}` },
+  }),
+});
+
+const services = defineServices({
+  orders: {
+    contract: ordersContract,
+    contributions: [bearer, locale] as const,
+  },
+});
+
+const context = {
+  auth: {
+    getAccessToken: () => Promise.resolve('runtime-only-test-value'),
+    cachePartition: 'account-epoch-7',
+  },
+  locale: 'de-CH',
+};
+const order = await services.clients.orders.get({ id: 'ord_123' }, { context });
+const query = services.queries.orders.list({ limit: 20, offset: 0 }, { context });
+const queryOptions = services.queryUtils.orders.list.queryOptions({
+  input: { limit: 20, offset: 0 },
+  context,
+});
+```
+
+`createLocaleSdkClientContribution()` accepts one optional Unicode BCP 47 locale. A present value is
+canonicalized (for example, `en-us` becomes `en-US`) before it is sent and partitioned; an absent
+value emits no `accept-language` header and uses the stable `default` cache partition. Preference
+lists and quality weights such as `en-US, fr;q=0.8` are deliberately rejected by this single-locale
+factory.
+
+Every contribution declares one response-cache mode:
+
+- `invariant` leaves existing server and TanStack key shapes unchanged.
+- `partitioned` appends sorted `[contributionId, value]` pairs to full keys. Partition values are
+  intentionally visible in caches and developer tools, so they must be stable, printable, non-secret
+  identifiers—not credentials, session ids, personal data, or reversible encodings.
+- `direct-only` keeps `services.clients.<name>` but omits that service from both `queries` and
+  `queryUtils`, at type level and runtime.
+
+Prefixes used for invalidation stay unsuffixed. Persisted TanStack keys retain the full partition,
+and generated collection wiring must take `queryKey` and `queryFn` from the same generated options
+result. Contributions prepare once per logical call epoch; ordinary retries reuse that immutable
+result, while a stream reconnect begins a fresh epoch.
+
+Version 1 is HTTP-only. `createDesktopServiceClient()` uses a MessagePort transport with no HTTP
+header channel, so its options do not accept `contributions`; JavaScript or widened input carrying
+the field throws `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED` instead of silently ignoring it. Create a
+separate HTTP service client in the native host when the host needs contributed request headers.
+
+### Server cache registration
+
+Calling provider-backed query methods requires one explicit registration at the server composition
+root. NetScript-managed Fresh apps do this inside `defineFreshApp()`; custom servers do it directly:
+
+```typescript
+import { cacheQuery, setCacheProvider } from '@netscript/sdk/cache';
+
+setCacheProvider(cacheQuery);
+```
+
+Importing either `@netscript/sdk` or `@netscript/sdk/cache` is load-time pure and does not register
+the provider.
+
+#### Migration from implicit registration
+
+Existing custom server bootstraps that relied on importing the SDK root or `./cache` for its side
+effect must add the explicit call above. Existing Fresh bootstraps that call `defineFreshApp()` keep
+the default provider without another change. Cache engine symbols such as `KvCacheStore` and
+`cacheQuery` now come from `@netscript/sdk/cache`, not the root.
 
 ### Two query dialects — pick one per data layer
 
@@ -138,6 +252,20 @@ static `operationId` from `defaultOptions`, or the fixed `composite` fallback; d
 calls accept a static `operationId`, or use a fixed direct-method fallback. Operation ids are
 lowercase, separator-normalized, and capped at 80 characters. They are contract metadata: never
 construct one from query props, tenant/user ids, cache keys, values, or URLs.
+
+Cache telemetry admits at most 256 distinct normalized operation namespaces per process. The first
+new namespace beyond that budget is collapsed to the fixed `overflow` namespace and named once in
+a `cache.namespace.overflow` span event; later over-budget namespaces also collapse to `overflow`
+without retaining or emitting their original ids. Composite construction only normalizes its
+static default. Admission happens when a real cache operation opens a span, so construction alone
+does not consume the process budget.
+
+Topology evidence validation is fail-safe. Missing, unbounded, or malformed provider evidence marks
+the active cache span with `outcome=error` and `topology_complete=false`, but it does not turn an
+otherwise successful loader, write, or invalidation into an application exception. Invalid reports
+are not partially emitted: an invalidation report is staged and merged only after the complete
+report validates. Provider descriptors are likewise validated inside the active span so malformed
+observability data remains visible without preventing the application operation.
 
 `backend_executed` is measured only when the `queryFn` closure is entered. It is `false` for a fresh
 hit, cache-only read, provider failure before the loader, and the losing trace in an in-flight join
@@ -210,20 +338,36 @@ and Linux apply on relaunch.
 
 | Entry            | What it gives you                                                                 |
 | ---------------- | --------------------------------------------------------------------------------- |
-| `.`              | `defineServices` plus re-exports of the full surface below                        |
-| `./client`       | `createServiceClient`, `isDefinedError`                                           |
+| `.`              | Side-effect-free `defineServices` plus common non-cache surfaces                  |
+| `./presets`      | Browser-safe `defineServices` and its package-owned type closure                  |
+| `./client`       | service clients, contribution definitions, redacted errors                        |
 | `./discovery`    | `getServiceUrl`, `getServiceInfo`, `getPostgresConnection`, `getKvConnection`, …  |
 | `./query`        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`              |
 | `./query-client` | `createNetScriptQueryClient`, `createServiceQueryUtils`, `createKvCachePersister` |
-| `./cache`        | `KvCacheStore`, `cacheQuery`, cache-provider wiring                               |
+| `./cache`        | `KvCacheStore`, `cacheQuery`, explicit cache-provider wiring                      |
 | `./collections`  | `createQueryCollection` — live client-side collections                            |
 | `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
 | `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
 | `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
+| `./ports`        | structural client/query and contribution contracts, upstream-type-free            |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).
+
+## Transport policy
+
+Service clients derive the HTTP method, GET deduplication, and cache group from the contract and
+its NetScript procedure metadata through one SDK-owned policy decision. Use the optional
+`transportPolicy.method` callback only when adapting that final method—for example, a future
+POST-only transport. Request contributions receive procedure path, metadata, input, their context
+projection, signal, and the resolved destination; they never receive the HTTP method or control
+retry, deduplication, tracing, fetch, or link plugins.
+
+The deprecated client-level `port` and `timeout` options remain accepted for source compatibility
+but are intentional no-ops. Configure explicit addresses through service discovery instead of
+`port`, and pass a per-call `AbortSignal` instead of `timeout`. Neither option changes discovery,
+dispatch, or cancellation behavior.
 
 ## Docs
 
@@ -239,7 +383,8 @@ The always-current symbol list is
 
 Runs on Deno 2.x on the server and in the browser: the client, query-client, and collections
 surfaces run in islands, while discovery and KV-backed caching read `Deno.env` / `Deno.openKv` and
-belong on the server (use `--unstable-kv` where KV types are checked).
+belong on the server (use `--unstable-kv` where KV types are checked). Importing the root no longer
+exports or registers the cache engine; use `./cache` plus explicit registration in custom servers.
 
 ## License
 

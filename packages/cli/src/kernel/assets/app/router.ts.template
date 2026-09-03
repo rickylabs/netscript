@@ -14,10 +14,6 @@ export const routes = {
   ...generatedRoutes,
   examples: {
     ...generatedRoutes.examples,
-    serviceExample: createRouteReference('/examples/{{serviceName}}', {
-      id: 'examples.{{serviceName | camelCase}}',
-      kind: 'page',
-    }),
     telemetry: createRouteReference('/examples/telemetry', {
       id: 'examples.telemetry',
       kind: 'page',
@@ -30,8 +26,9 @@ export const appRoutes = {
   dashboard: routes.dashboard.$route,
   health: routes.health.$route,
   examples: routes.examples.$route,
-  serviceExample: routes.examples.serviceExample,
+  {{serviceResourceRouteAlias}}serviceExample: {{serviceExampleRouteReference}},
   crudExample: routes.examples.crud.$route,
+  order: generatedRoutes.examples.orders.$id.$route,
   telemetryExample: routes.examples.telemetry,
   design: routes.design.$route,
   designTokens: createRouteReference('/design/tokens', {

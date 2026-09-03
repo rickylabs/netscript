@@ -1,4 +1,7 @@
-/** Default port used by the development streams service. */
+/**
+ * @deprecated Not a runtime fallback; removed in 0.0.8 — see
+ * "chore(plugins): remove deprecated default-port compatibility exports in 0.0.8".
+ */
 export const DEFAULT_STREAMS_PORT = 4437;
 
 /** Aspire resource name used for the streams service. */

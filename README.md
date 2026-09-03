@@ -13,7 +13,7 @@ where today you assemble a stack.
 
 Define your API once as an oRPC contract. The typed Hono service and the typed SDK clients both
 derive from it — server and callers cannot drift apart. Background jobs, sagas, triggers, event
-streams, auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings
+streams, auth, and AI install as first-party plugins behind the same unified API. Aspire brings
 the whole graph up locally with one command. And it ships: from a single compiled binary to a
 multi-cloud distributed infrastructure, with observability on by default — one toolchain shared by
 you and the coding agent you work with.
@@ -28,16 +28,23 @@ all the generated code.
 ## 🚀 Quickstart
 
 You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/) and the
-[.NET Aspire CLI](https://learn.microsoft.com/dotnet/aspire/) (or skip orchestration with
-`--no-aspire`). Docker provisions Postgres and the cache.
+[Aspire CLI](https://aspire.dev) (or skip orchestration with
+`--no-aspire`). This walkthrough uses Docker for its containerized Postgres and cache resources;
+have a Docker-compatible container runtime available for this configuration. Docker is not a
+universal requirement for NetScript or Aspire: configurations using non-container resources can
+run without it. Existing Docker image caches are supported and do not need to be cleared.
+
+<!-- readme-quickstart:start -->
 
 ```bash
 # 1. Install the NetScript CLI on your PATH
-deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>
 
 # 2. Scaffold a workspace: contracts + a typed example service + Postgres + Aspire orchestration
 netscript init my-app --db postgres --service --yes
 ```
+
+Deno 2.9 refuses packages published in the last 24 hours by default; `--minimum-dependency-age=0` lets a same-day release install.
 
 Replace `<version>` with the current release — the
 [latest tag](https://github.com/rickylabs/netscript/releases/latest), or the version shown on
@@ -53,10 +60,10 @@ your numbered next steps. Follow them:
 cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
 aspire start     # starts everything and prints the dashboard URL
+aspire wait postgres --status healthy --timeout 60
 ```
 
-Open the dashboard, wait until the `postgres` resource reports healthy, then initialize the
-database:
+Open the dashboard, then initialize the database:
 
 ```bash
 # 4. Initialize the database (from the workspace root)
@@ -71,9 +78,12 @@ service answers on its health probe (replace `<port>` with the port assigned to 
 scaffold console output or Aspire dashboard):
 
 ```bash
-curl http://localhost:<port>/health
+aspire wait users --status healthy --timeout 60 --apphost aspire/apphost.mts
+curl --fail-with-body --show-error --max-time 15 http://localhost:<port>/health
 # {"status":"healthy","timestamp":"…","checks":[{"name":"database","healthy":true,"latency":2}],…}
 ```
+
+<!-- readme-quickstart:end -->
 
 Want to check the blast radius before anything touches disk? `netscript init my-app --dry-run`
 reports the file and directory counts it would create and writes nothing. Run `netscript --help` or
@@ -314,7 +324,7 @@ reasoning.
 [Glossary](https://rickylabs.github.io/netscript/glossary/)
 
 **Five tutorial tracks** — each builds one complete application from a fresh `netscript init` and
-ends by running it locally under .NET Aspire:
+ends by running it locally under Aspire:
 
 - [Live dashboard](https://rickylabs.github.io/netscript/tutorials/live-dashboard/)
 - [AI chat](https://rickylabs.github.io/netscript/tutorials/chat/)

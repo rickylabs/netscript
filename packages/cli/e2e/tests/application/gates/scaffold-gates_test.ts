@@ -8,7 +8,10 @@ import {
   QUALITY_ANY_PROBE_PATH,
   QUALITY_PROBE_PATHS,
 } from '../../../src/application/gates/scaffold/generated-quality-probes.ts';
-import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
+import {
+  createPreflightGates,
+  createScaffoldGates,
+} from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import {
   DATABASE,
@@ -20,6 +23,17 @@ import type { CommandGateDefinition } from '../../../src/domain/gate-definition.
 import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 
 const PUBLISHED_TEST_VERSION = ['0', '0', '2'].join('.');
+
+Deno.test('Aspire preflight runs structured doctor through the durable receipt path', () => {
+  const gate = createPreflightGates().find((entry) => entry.id === GATE.PREFLIGHT_ASPIRE);
+  if (gate?.kind !== 'command') throw new Error('Expected Aspire preflight command gate.');
+  const command = gate.command(
+    createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL),
+  );
+  assertEquals(command.includes('cli-e2e-aspire-doctor'), true);
+  assertEquals(command.includes('--child-report'), true);
+  assertEquals(command.some((entry) => entry.endsWith('/preflight.aspire.json')), true);
+});
 
 Deno.test('generated explicit-any probe source remains byte-identical', () => {
   assertEquals(ANY_PROBE_SOURCE.length, 36);
@@ -174,12 +188,35 @@ Deno.test('generated quality probes cover TS, TSX, plugin, background, and AppHo
   assertEquals(
     createGeneratedQualityGates().map((gate) => gate.id),
     [
+      GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION,
       GATE.GENERATED_QUALITY_NEGATIVE,
       GATE.GENERATED_DENO_CHECK,
       GATE.GENERATED_DENO_LINT,
       GATE.GENERATED_DENO_FMT_CHECK,
     ],
   );
+});
+
+Deno.test('design production exclusion gate targets the generated Fresh app', () => {
+  const gate = createGeneratedQualityGates().find((entry) =>
+    entry.id === GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION
+  );
+  if (!gate || gate.kind !== 'command') {
+    throw new Error('Expected design production exclusion gate to be a command gate.');
+  }
+
+  const context = createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL);
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=deno',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/generated-quality-probes.ts',
+    '/repo/.llm/tmp/cli-e2e/prod-local-test/apps/prod-local-test-web',
+    '--design-production-exclusion',
+  ]);
+  assertEquals(gate.cwd?.(context), '/repo');
 });
 
 Deno.test('scaffold contract add gate targets the generated workspace', () => {

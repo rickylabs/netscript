@@ -9,7 +9,13 @@ import {
   type UserConfig,
   type ViteDevServer,
 } from 'vite';
-import { createNetScriptVitePlugin } from './vite.ts';
+import {
+  createNetScriptVitePlugin,
+  discoverNetScriptRoutes,
+  resolveNetScriptRouteManifestOptions,
+  type WriteNetScriptRouteManifestResult,
+  writeNetScriptRouteManifestSync,
+} from './vite.ts';
 
 const assignablePlugin = createNetScriptVitePlugin();
 const pluginContract: Plugin = assignablePlugin;
@@ -62,6 +68,51 @@ function asResolveIdHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
       | undefined
     >;
 }
+
+Deno.test('public Vite entrypoint discovers sidecars and writes route manifests', () => {
+  const appRoot = Deno.makeTempDirSync({ prefix: 'netscript-fresh-vite-public-' });
+  const routesDir = resolve(appRoot, 'staged-routes');
+  const outputPath = resolve(appRoot, 'staged-output/routes.ts');
+  const pagePath = resolve(routesDir, 'orders/history/index.tsx');
+
+  try {
+    Deno.mkdirSync(resolve(routesDir, 'orders/history'), { recursive: true });
+    Deno.writeTextFileSync(pagePath, 'export default function Page() { return null; }\n');
+    Deno.writeTextFileSync(
+      resolve(routesDir, 'orders/history/index.route.ts'),
+      'export default {};\n',
+    );
+
+    const options = resolveNetScriptRouteManifestOptions(appRoot, { routesDir, outputPath });
+    const routes = discoverNetScriptRoutes(options);
+    const result: WriteNetScriptRouteManifestResult = writeNetScriptRouteManifestSync(options);
+
+    assert(routes.length === 1, `Expected one public-entrypoint route, received ${routes.length}`);
+    assert(
+      JSON.stringify(routes[0].routeKeyPath) ===
+        JSON.stringify(['orders', 'history', '$route']),
+      `Unexpected Fresh route key: ${JSON.stringify(routes[0].routeKeyPath)}`,
+    );
+    assert(routes[0].pageModuleForm === 'sidecar', 'Expected the sidecar authoring form');
+    assert(result.changed, 'Expected the first public-entrypoint write to change generated files');
+    assert(result.routeCount === 1, `Expected one written route, received ${result.routeCount}`);
+    assert(result.boundRouteCount === 1, 'Expected the sidecar contract to be bound');
+    assert(
+      Deno.readTextFileSync(result.manifestOutputPath).includes(
+        'routePatterns.orders.history.$route',
+      ) === false,
+      'Expected the generated manifest to use a nested property tree',
+    );
+    assert(
+      Deno.readTextFileSync(result.routesOutputPath).includes(
+        'routePatterns.orders.history.$route',
+      ),
+      'Expected generated routes to consume the Fresh-owned property chain',
+    );
+  } finally {
+    Deno.removeSync(appRoot, { recursive: true });
+  }
+});
 
 Deno.test('createNetScriptVitePlugin returns config through official plugin hooks', () => {
   const plugin = createNetScriptVitePlugin({

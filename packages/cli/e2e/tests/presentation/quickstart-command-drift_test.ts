@@ -1,8 +1,13 @@
 import { assertEquals } from '@std/assert';
+import { fromFileUrl } from '@std/path';
 import { QUICKSTART_DOCUMENTED_COMMANDS } from '../../suites/quickstart/quickstart-walk-suite.ts';
 
+const QUICKSTART_PATH = fromFileUrl(
+  new URL('../../../../../docs/site/quickstart.vto', import.meta.url),
+);
+
 Deno.test('Quickstart executable commands stay aligned with quickstart.walk', async () => {
-  const page = await Deno.readTextFile('docs/site/quickstart.vto');
+  const page = await Deno.readTextFile(QUICKSTART_PATH);
   const marked = page.match(/<!-- quickstart-walk:start -->([\s\S]*?)<!-- quickstart-walk:end -->/);
   if (!marked) throw new Error('Quickstart walk command markers are missing.');
   const commands = [...marked[1].matchAll(/```bash\n([\s\S]*?)```/g)]

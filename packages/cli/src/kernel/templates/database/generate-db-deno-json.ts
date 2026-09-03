@@ -45,7 +45,7 @@ export function generateDatabaseDenoJson(
     [`db:generate:${provider.engine}`]: 'deno task db:generate',
     'db:generate:all': 'deno task db:generate',
     'db:clear-seeded-client':
-      'deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts',
+      'deno run --allow-write=schema/.generated scripts/clear-seeded-client.ts',
     'db:init': `${DENO_SCRIPT_RUN} scripts/migrate.ts --name=init`,
     [`db:init:${provider.engine}`]: 'deno task db:init',
     'db:init:all': 'deno task db:init',

@@ -70,6 +70,8 @@ Deno.test('PluginScaffolder includes sample jobs and tasks by default', async ()
 
   const files = createdFiles(result);
 
+  assertEquals(result.hostPort, undefined);
+
   assert(files.includes('/project/plugins/billing-worker/jobs/health-check.ts'));
   assert(files.includes('/project/plugins/billing-worker/tasks/validate-payload.ts'));
 
@@ -88,6 +90,22 @@ Deno.test('PluginScaffolder includes sample jobs and tasks by default', async ()
   assertEquals(denoJson.imports['@netscript/plugin-sagas-core'], undefined);
   assertStringIncludes(denoJson.tasks.check, 'jobs/**/*.ts');
   assertStringIncludes(denoJson.tasks.check, 'tasks/**/*.ts');
+});
+
+Deno.test('PluginScaffolder pins a host port only when --port is explicit', async () => {
+  const { scaffolder } = await createPluginScaffolder();
+
+  const result = await scaffolder.scaffold({
+    projectName: 'sample-app',
+    targetPath: '/project',
+    kind: 'background',
+    pluginName: 'pinned-worker',
+    importMode: 'jsr',
+    port: 55_123,
+    force: false,
+  });
+
+  assertEquals(result.hostPort, 55_123);
 });
 
 Deno.test('PluginScaffolder skips sample files and manifest contributions when disabled', async () => {

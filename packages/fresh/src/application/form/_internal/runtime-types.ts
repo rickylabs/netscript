@@ -86,17 +86,30 @@ export interface FormNavigationStrategy {
 }
 
 /** Client/server ownership policy for a collection field. */
-export interface FormCollectionStrategy extends Partial<FormNavigationStrategy> {
-  /** Strategy mode. */
-  readonly mode: FormCollectionStrategyMode;
-  /** Partial route used for collection updates. */
-  readonly partial?: string;
-  /** Whether client navigation is enabled for collection updates.
-   *
-   * @deprecated Use `navigation` so the policy describes caller intent.
-   */
-  readonly clientNav?: boolean;
-}
+export type FormCollectionStrategy =
+  & {
+    /** Partial route used for collection updates. */
+    readonly partial?: string;
+    /** Whether client navigation is enabled for collection updates.
+     *
+     * @deprecated Use `navigation` so the policy describes caller intent.
+     */
+    readonly clientNav?: boolean;
+  }
+  & (
+    | {
+      /** Client-owned collection updates do not submit. */
+      readonly mode: 'client';
+      /** Navigation is unavailable because this mode does not submit. */
+      readonly navigation?: never;
+    }
+    | {
+      /** Collection updates submitted through the managed form. */
+      readonly mode: 'server' | 'hybrid';
+      /** Use Fresh client revival or a browser document navigation. */
+      readonly navigation?: FormNavigationMode;
+    }
+  );
 
 /** Options used to progressively enhance a rendered form. */
 export interface FormEnhancementOptions<TValues extends FormValues> {

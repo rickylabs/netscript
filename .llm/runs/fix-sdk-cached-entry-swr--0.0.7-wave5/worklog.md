@@ -1,0 +1,202 @@
+# Worklog: sdk cached-entry stale policy
+
+## Run Metadata
+
+| Field          | Value                                                                         |
+| -------------- | ----------------------------------------------------------------------------- |
+| Run ID         | `fix-sdk-cached-entry-swr--0.0.7-wave5`                                       |
+| Branch         | `fix/sdk-cached-entry-swr`                                                    |
+| Archetype      | `3 — Runtime/Behavior` slice; package-wide SDK assignment remains Archetype 2 |
+| Scope overlays | `docs`                                                                        |
+
+## Design
+
+### Public Surface
+
+- **No new or changed export.** Preserve callable `ActionMethod(props, options?)` as the only
+  cache-policy execution surface and `getCachedEntry(props)` as a pure metadata read.
+- Preserve all 12 `packages/sdk/deno.json` entrypoints.
+
+### Domain Vocabulary
+
+- **Fresh entry** — cached age is below `staleTime`; return cached data, zero upstream calls.
+- **Stale SWR entry** — cached data remains usable; every overlapping reader returns it while one
+  background refresh owns fetch plus persistence.
+- **Blocking stale entry** — `preferFreshOnStale` requires the reader to join/start the one refresh
+  and wait until its persistence attempt completes.
+- **Missing/expired entry** — no usable cache value; reader joins/starts the one foreground refresh.
+- **In-flight operation** — one promise per canonical query key covering upstream execution and the
+  cache-write attempt, not only the upstream promise.
+
+### State, Identity, Lifecycle, and Concurrency
+
+- State: existing `CacheEntry<TData>` (`data`, `timestamp`) plus the existing per-engine
+  `inflightRequests` map.
+- Identity: existing JSON-serialized `QueryKey`; no new identifier.
+- Lifecycle: `absent → fetching → persistence-attempted → settled`, or
+  `stale → background-refreshing → persistence-attempted → settled`.
+- Concurrency: per-key single-flight. SWR readers do not join in a blocking sense; they share
+  ownership by observing/starting one registered background operation and returning stale data.
+- Failure: preserve PR #1665. If fetch succeeds and persistence fails, the registered operation
+  resolves to fetched data for every owner and joiner; a background owner records the provider
+  error under captured telemetry context and remains detached. Only fetch failure rejects. Map
+  cleanup runs after the persistence attempt or its fail-safe handling completes.
+- Clock: preserve existing `Date.now()` timestamp seam; do not add or deepen runtime clock usage in
+  this focused change. Tests control seed timestamps and synchronization without sleeps.
+- Cancellation: no new long-running handle or cancellable public operation is introduced.
+
+### Ports
+
+- Existing `CacheStore` — one shared in-memory implementation in concurrency tests.
+- Existing `CacheTelemetry` — captured-parent background span and execution/write evidence remain.
+- Existing typed service client through `ActionMethod` — upstream call counter in loader regression.
+- No new port.
+
+### Constants
+
+- Existing `CACHE_PREFIX`, default stale/cache times, telemetry operations/events/outcomes only.
+- No new finite-value constant group is required.
+
+### Commit Slices
+
+| # | Slice                                                                                                                               | Gate                                                                             | Files                                                                                                                                                                                             |
+| - | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | Policy-aware, persistence-complete single-flight plus overlapping SWR regression                                                    | Focused structured cache tests; targeted wrappers; `quality:gate`                | `packages/sdk/src/cache/cache-query.ts`, `packages/sdk/tests/cache/cache-query_test.ts`, run artifacts                                                                                            |
+| 2 | Truthful blocking loader example, baseline fresh-hit predicate correction, page-level tutorial action/read distinction, executable factory regression, and ordered four-file asset cascade | Focused factory test; docs format/accuracy; three cascade checks; JSR/root gates | `packages/sdk/src/cache/cache-query.ts` (exact S2-A predicate only), `packages/sdk/tests/query/query-factory_test.ts`, `docs/site/services-sdk/sdk.md`, `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`, four declared generated files, run artifacts |
+
+### Deferred Scope
+
+- `queryEntry()` or another published convenience — no missing acceptance capability justifies it.
+- Any third docs source — the coordinator authorized exactly two site pages, and the executed sweep
+  found no third false `getCachedEntry()`/revalidation claim.
+- Known SDK doc-lint/cardinality debt and known repo-red gates.
+
+### Contributor Path
+
+To change cache policy, start at `packages/sdk/src/ports/query-options.ts`, follow the callable
+action in `src/query/query-factory.ts` into `src/cache/cache-query.ts`, and add behavior to
+`tests/cache/cache-query_test.ts`. Loader-level contract regressions belong in
+`tests/query/query-factory_test.ts`; user guidance belongs in the source page, never `_site/`.
+
+## Progress Log
+
+| Time       | Slice          | Step                     | Notes                                                                                                                                                                              |
+| ---------- | -------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-15 | Plan           | Research and design      | Re-baselined at `3e8e146a4`; no product code changed. Hard stop pending topic-orchestrator PLAN-EVAL PASS.                                                                         |
+| 2026-08-15 | Plan amendment | Coordinator scope ruling | Added exactly the live-dashboard chapter-3 source; swept surrounding docs; executed the ordered generation chain with no undeclared tracked path; no product/docs content changed. |
+| 2026-08-15 | Plan repair    | Tier-A T-1               | Reconciled tutorial scope with S2 using explicit dispositions for every same-class line; re-ran the exact-two-page and site-wide sweeps; no product/docs content changed.          |
+| 2026-08-15 | Plan eval      | Terminal PASS             | PLAN-EVAL passed at plan head `23db20f30` (`plan-eval.md` artifact head `d555cc971`); implementation authorization received for S1 only.                                      |
+| 2026-08-15 | S1             | Single-flight runtime     | Made in-flight ownership policy-aware and persistence-complete without changing exports or PR #1665 fail-safe/telemetry behavior.                                            |
+| 2026-08-15 | S1             | Deterministic regressions | Added overlapping stale SWR and background-write-failure/blocking-joiner tests; both use manually controlled promises and no timing sleeps.                                  |
+| 2026-08-15 | S1             | Pre-review correction     | Coordinator rejected the initial comment/spacing deletion as F-1 metric gaming. Restored all useful documentation and structure, then reduced real duplication; honest file is 497 lines. |
+| 2026-08-15 | S1             | Tier-A PASS               | Fresh Tier-A accepted S1 at `e100ea205`, including A2/A3 semantics and the honest 497-line/no-F-1 structural reduction. |
+| 2026-08-15 | S2             | Baseline defect exposed   | The authorized factory regression's fresh phase failed: `preferFreshOnStale: true` fetched despite a fresh non-expired entry. Base `main@3e8e146a4:170` contains the same predicate, so this is not an S1 regression. |
+| 2026-08-15 | S2-A           | Plan-only scope amendment | Coordinator authorized exactly `cache-query.ts` for the predicate correction. Preserved the three authored S2 files uncommitted; no source/docs/test mutation belongs to this amendment commit. |
+| 2026-08-15 | S2-A           | Tier-A PASS               | Fresh fixes Tier-A passed the exact five-artifact amendment at `ef3e43f06`; implementation resumed without widening the authorized surface. |
+| 2026-08-15 | S2             | Fresh-hit correction      | Changed only the predicate to `isExpired || (!isFresh && preferFreshOnStale)`; `cache-query.ts` remains 497 lines and every accepted S1 A2/A3 behavior and documentation block is untouched. |
+| 2026-08-15 | S2             | Loader regression         | Factory test proves fresh+flag makes 0 calls, expired with the flag false fetches once, and two overlapping stale+flag readers block on exactly one refresh and receive one persisted timestamp. |
+| 2026-08-15 | S2             | Published guidance        | Applied every disposition across exactly the two authorized pages. A4 explicitly contrasts default non-blocking SWR with the example's blocking flag; no prose implies that the factory lacks SWR. |
+| 2026-08-15 | S2             | Generated cascade         | Ran prose → barrel → publish-assets in order. Executed `git status --short`/`git diff --name-only` found exactly the four declared generated mirrors and no fifth tracked path. |
+| 2026-08-15 | S2             | Merge-readiness gates     | Scoped/root/runtime/docs/quality/publish gates completed. All three freshness gates then passed sequentially on unchanged committed content head `eba0b092416831f5fada679a1c21247d065ca521`. |
+
+## Decisions
+
+| Decision                   | Reason                                                                                                    | Source                                                  |
+| -------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Remedy 1; no new export    | Existing action owns all stale policy and can block before metadata read.                                 | `research.md`, doctrine A1/A2, issue #1461              |
+| Policy-aware map semantics | SWR readers must not become blocking readers merely because refresh is registered.                        | `cache-query.ts`, acceptance concurrency/policy bullets |
+| Full lifecycle promise     | Joined blocking loader must observe the persisted refreshed timestamp immediately after query completion. | `research.md` finding 9                                 |
+| Synchronous registration   | The scheduling SWR reader registers the shared operation before any fetch/write await, so later readers deterministically observe it. | PLAN-EVAL A3; overlapping-reader regression |
+| Non-fatal write join       | Fetch success plus write failure resolves fetched data for foreground/background owners and joiners; only fetch failure rejects. | PLAN-EVAL A2; write-failure regression |
+| Honest F-1 closure         | Preserve documentation and normal layout; reduce responsibility/branch duplication rather than squeezing physical lines. | Coordinator pre-review; doctrine A8/AP-1/F-1 |
+| Stale-only blocking option | Use `isExpired || (!isFresh && preferFreshOnStale)`: expired precedence remains, stale may block, and fresh falls through to its hit return. | Baseline `main@3e8e146a4:170`; S2-A ruling |
+
+## PLAN-EVAL Advisories Carried Forward
+
+- **A1 — implemented as manual evidence:** the page-level acceptance sentence is not asserted by
+  `.llm/tools/docs/check-accuracy-and-discoverability.ts`. In S2 it must be proved manually by the
+  Tier-A slice review and IMPL-EVAL reading the disposition table against the rendered page. A
+  `docs-accuracy` receipt may support its own checks but must not be cited as proof of that sentence;
+  no `.llm/tools/**` change was made. The manual sentence presented to those reviewers is: taken as
+  a whole, chapter 3 identifies the callable action as the SWR policy path, identifies
+  `getCachedEntry()` as a KV-only metadata read, and demonstrates action-then-metadata composition,
+  so the page no longer implies that the demonstrated metadata reader revalidates.
+- **A4 — implemented:** the corrected loader says the default callable action without
+  `preferFreshOnStale` is the non-blocking SWR path and this example sets the flag so `cachedAt`
+  reflects the refreshed value (`03-sdk-cache-first-query.md:117-118`).
+- **A2 — implemented in S1:** the map-registered fetch-and-persist operation returns fetched data
+  after a handled write failure for any owner/joiner. Background telemetry records the provider
+  error and detached ownership remains intact; fetch failure is the only rejection path.
+- **A3 — implemented in S1:** `startInflight` installs the shared promise synchronously and defers
+  its callback to the next microtask. The overlapping-reader test fully awaits reader 1, starts
+  reader 2, then releases a manually blocked fetcher; it is sleep-free and pins calls to exactly 1.
+
+## Drift
+
+| Drift                                                                                                    | Severity    | Logged in drift.md |
+| -------------------------------------------------------------------------------------------------------- | ----------- | ------------------ |
+| Two frozen contract paths do not exist; `_site` target is generated                                      | significant | yes                |
+| Brief's six-diagnostic wording was the sum of two expected-red three-diagnostic invocations              | significant | yes                |
+| Adjacent false tutorial prose was outside frozen surface; coordinator authorized exactly that one source | significant | yes                |
+| Tier-A found line-100-only scope inconsistent with the page-level S2 acceptance commitment               | significant | yes                |
+| S2 exposed the baseline `preferFreshOnStale` predicate fetching fresh entries                             | significant | yes                |
+
+## Gate Results
+
+### Research Baselines
+
+| Gate                      | Command or check                                                                                | Result                        | Notes                                                                                                                                              |
+| ------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Public API inspection     | `deno doc --filter CacheQuery packages/sdk/mod.ts`                                              | PASS (inspection)             | Confirms callable query policy and pure cached-entry read; done before source reads.                                                               |
+| Package publish dry-run   | `deno publish --dry-run --allow-dirty` in `packages/sdk`                                        | PASS (exit 0)                 | No actual slow-type diagnostic; source-only intended file list.                                                                                    |
+| JSR audit                 | `audit-jsr-package.ts --root packages/sdk --text`                                               | PASS with 2 warnings (exit 0) | Known F-DOCT-5 13-child warning; F-JSR-7 banner parser warning, raw dry-run authoritative.                                                         |
+| Combined SDK doc lint     | explicit 12-entrypoint `deno doc --lint`                                                        | EXPECTED RED (exit 1)         | Exactly three named diagnostics; zero new allowed; never reported green.                                                                           |
+| Cache-entrypoint doc lint | `deno doc --lint ./src/cache/mod.ts` from `packages/sdk`                                        | EXPECTED RED (exit 1)         | Exactly three named `KvCacheStore` diagnostics; zero new allowed; never reported green.                                                            |
+| Docs claim sweep          | exact two authorized pages, surrounding tutorial story, and site-wide source `rg`                  | PASS (inspection)             | All same-class authorized-page results have per-line dispositions; chapter 4 line 231 is checked-and-cleared `withPolicy` prose, out of scope.     |
+| Generated mirror coverage | `gen:agent-docs-prose` → `gen:assets-barrel` → `gen:publish-assets`; provenance `rg`; Git delta | PASS (exit 0 each)            | Both authorized pages are provenance inputs; clean synchronized content produced zero tracked deltas and no path beyond the four declared mirrors. |
+
+### Static / Fitness / Runtime / Consumer Gates
+
+| Gate | Structured verdict | Evidence |
+| ---- | ------------------ | -------- |
+| Focused cache tests | **PASS** (exit 0) | `run-deno-test.ts -- --allow-all packages/sdk/tests/cache/cache-query_test.ts`: passed 5, failed 0, ignored 0, total 5, unique failures 0. |
+| SDK tests | **PASS** (exit 0) | `run-deno-test.ts -- --allow-all packages/sdk/`: passed 68, failed 0, ignored 0, total 68, unique failures 0. |
+| SDK check | **PASS** (exit 0) | `run-deno-check.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 failed batches, 0 occurrences; wrapper used `--unstable-kv`. |
+| SDK lint | **PASS** (exit 0) | `run-deno-lint.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 occurrences and 0 rules. |
+| SDK format | **PASS** (exit 0) | `run-deno-fmt.ts --root packages/sdk --ext ts,tsx`: 84 files, 1 batch, 0 failed batches, 0 findings. |
+| Repository quality | **PASS** (exit 0) | Re-run on the restored 497-line source with `rtk proxy deno task quality:gate`: repository scan `ok: true`, 0 findings; SDK doctrine `FAIL=0`, `WARN=1`, `INFO=1`; no F-1 finding. The one SDK warning is the known F-16 13-child finding. |
+| S2 factory regression discovery | **RED** (exit 1) | Focused query-factory wrapper: passed 5, failed 1; fresh phase expected `seeded-fresh`, got `fetched`. Full SDK wrapper: passed 68, failed 1 with the same failure. This is the expected evidence exposing the pre-existing predicate defect, not an S1 regression. |
+| Focused factory test | **PASS** (exit 0) | Structured wrapper: passed 6, failed 0, ignored 0, total 6, unique failures 0. Fresh+flag calls `0`; expired with flag false calls `1`; overlapping stale+flag refresh calls exactly `1`. |
+| Full SDK tests | **PASS** (exit 0) | Structured wrapper: passed 69, failed 0, ignored 0, total 69, unique failures 0. |
+| Root check | **PASS** (exit 0) | Structured wrapper selected 2,925 files in 25 batches; 0 failed batches and 0 occurrences. It executed on changed inputs rather than returning a cache line. |
+| Root tests | **PASS** (exit 0) | Structured wrapper: passed 4,206, failed 0, ignored 19, total 4,225, unique failures 0. Queue flake #1667 did not occur; run was not repeated. |
+| Docs source format | **PASS** receipt (exit 0) | `Docs source format: OK`. |
+| Docs accuracy | **PASS** receipt (exit 0) | Script's own checks passed. Per A1, this receipt is not evidence for the chapter-3 page-level sentence. |
+| Agent-docs prose freshness | **PASS** receipt (exit 0) | Fresh with `stalePaths: []` on the generated content state. |
+| Assets-barrel freshness, pre-commit | **RED** receipt (exit 1) | Expected sequencing result: task regenerated the authorized dirty mirror then `git diff --exit-code` compared it with pre-S2 `HEAD`. Retained honestly; rerun is required only after committing this changed content state. |
+| Agent-docs prose freshness, committed head | **PASS** receipt (exit 0) | `sdk-cache-s2-head-agent-docs-prose`; receipt and actual Git head both `eba0b092416831f5fada679a1c21247d065ca521`; duration 13,278 ms. |
+| Assets-barrel freshness, committed head | **PASS** receipt (exit 0) | `sdk-cache-s2-head-assets-barrel`; receipt and actual Git head both `eba0b092416831f5fada679a1c21247d065ca521`; duration 767 ms. This supersedes the retained pre-commit sequencing red after the content-state change. |
+| Publish-assets freshness, committed head | **PASS** receipt (exit 0) | `sdk-cache-s2-head-publish-assets`; receipt and actual Git head both `eba0b092416831f5fada679a1c21247d065ca521`; duration 437 ms. |
+| Quality gate | **PASS** receipt (exit 0) | Repository scan 0 findings. SDK `FAIL=0 WARN=1 INFO=1`; the one warning is known F-16. `cache-query.ts` remains 497 lines with no F-1. |
+| Architecture check | **PASS** receipt (exit 0) | Dependency checks and all-roots doctrine scan exit 0; SDK known F-16 remains unchanged. |
+| Root publish dry-run | **PASS** receipt (exit 0) | Full workspace simulation completed successfully. |
+| Package raw publish dry-run | **PASS** (exit 0) | All 12 SDK entrypoints checked; no actual slow-type diagnostic; intended 58-file source-only list; `Success Dry run complete`. |
+| SDK JSR audit | **PASS with known warnings** (exit 0) | `files=84`, `loc=9922`, 12 exports; known F-DOCT-5 13-child warning and banner-parser F-JSR-7 only. Raw dry-run adjudicates the latter. |
+| NetScript JSR specifiers | **PASS** receipt (exit 0) | Scanned 2,361, allowances 1, ranges 0, failures 0. |
+| Combined SDK doc lint | **EXPECTED RED** (exit 1) | Exactly 3 pinned `private-type-ref` diagnostics: `QueryClientPort`/`QueryClient` at `src/ports/query-client.ts:41:1`; `createNetScriptQueryClient`/`QueryClient` at `src/query-client/query-client-factory.ts:44:1`; external `DurableStreamProducerOptions["instrumentation"]`/`StreamsInstrumentation` at `packages/plugin-streams-core/src/application/create-durable-stream.ts:41:3`. Zero new; never a pass. |
+| Cache-entrypoint doc lint | **EXPECTED RED** (exit 1) | Exactly 3 pinned `private-type-ref` diagnostics in `src/cache/kv-cache-store.ts`: `KvCacheStore`/`CacheStore` at `48:1`; `get`/`CacheKey` and `get`/`CacheStoreEntry` at `97:3`. Zero new; never a pass. |
+| Surface diff | **KNOWN BASELINE RED** (exit 1) | `verdict: major`, 524 undeclared majors from stale `public-surfaces.json`; no published export was added or changed by this leaf. Out of repair scope. |
+
+All three post-commit cascade checks passed sequentially against unchanged content head
+`eba0b092416831f5fada679a1c21247d065ca521`; the working tree remained clean after each check.
+Aspire, Docker, and `e2e:cli` were not run and no runtime lease was acquired.
+
+## Handoff Notes
+
+- S2 implementation and its committed-head validation are complete on exactly the authorized
+  runtime predicate, factory test, two docs pages, four generated mirrors, and run artifacts.
+  `cache-query_test.ts` was not touched in S2.
+- A1 remains manual reviewer evidence: fresh Tier-A and later IMPL-EVAL must read the disposition
+  table against the rendered page. The docs-accuracy PASS is explicitly not cited for that claim.
+- Stop after push and the S2 PR receipt for fresh Tier-A. Do not launch IMPL-EVAL or change the draft
+  or sole `status:plan` state.

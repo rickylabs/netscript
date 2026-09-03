@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-workers",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "displayName": "Background Worker",
   "description": "NetScript plugin for background job scheduling, task execution, and worker API endpoints.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.6"
+    "@netscript/plugin": "0.0.7"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,
@@ -54,8 +54,6 @@
     "backgroundEntrypoint": "workers/runtime.ts",
     "doctorEntrypoint": "./doctor.ts",
     "serviceConfigKey": "workers-api",
-    "servicePort": 8091,
-    "backgroundPort": 8091,
     "dependencies": ["streams"],
     "requiresDb": true,
     "requiresKv": true,

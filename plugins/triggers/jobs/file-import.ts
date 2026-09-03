@@ -14,8 +14,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
-  type JobHandlerContext,
-  type JobResult,
+  type JobHandlerDefinition,
+  type JobPayloadSchema,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { z } from 'zod';
@@ -24,7 +24,16 @@ import { z } from 'zod';
 // PAYLOAD SCHEMA
 // ============================================================================
 
-const FileImportPayloadSchema = z.object({
+type FileImportPayload = Readonly<{
+  filePath: string;
+  fileName: string;
+  contentHash: string | null;
+  format: 'csv' | 'json' | 'text' | 'auto';
+  sagaMessageType?: string;
+  csvDelimiter: string;
+}>;
+
+const FileImportPayloadSchema: JobPayloadSchema<FileImportPayload> = z.object({
   filePath: z.string().min(1),
   fileName: z.string().min(1),
   contentHash: z.string().nullable(),
@@ -68,108 +77,109 @@ function parseCsv(
 // JOB HANDLER
 // ============================================================================
 
-type FileImportJobHandler = (
-  context: JobHandlerContext,
-) => JobResult<unknown> | Promise<JobResult<unknown>>;
+type FileImportJobHandler = JobHandlerDefinition<FileImportPayload>;
 
-const handler: FileImportJobHandler = defineJobHandler(async (ctx) => {
-  const payload = FileImportPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace } = createJobTools(ctx);
-  const { filePath, fileName, contentHash, format, sagaMessageType, csvDelimiter } = payload;
+const handler: FileImportJobHandler = defineJobHandler<FileImportPayload, unknown>(
+  FileImportPayloadSchema,
+  async (ctx) => {
+    const payload = ctx.payload;
+    const { log, progress, trace } = createJobTools(ctx);
+    const { filePath, fileName, contentHash, format, sagaMessageType, csvDelimiter } = payload;
 
-  log.info('Starting file import', { filePath, fileName, format });
-  trace.addEvent('file-import.started', { file_path: filePath, format });
+    log.info('Starting file import', { filePath, fileName, format });
+    trace.addEvent('file-import.started', { file_path: filePath, format });
 
-  // Step 1: Read file
-  progress(10, 'Reading file');
-  let rawContent: string;
-  try {
-    rawContent = await Deno.readTextFile(filePath);
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    log.error('Failed to read file', { filePath, error: msg });
-    return createFailureResult(`Failed to read file: ${msg}`);
-  }
-
-  // Step 2: Clean up staged file — content is in memory
-  try {
-    await Deno.remove(filePath);
-    log.info('Cleaned up staged file', { filePath });
-  } catch {
-    // Non-fatal — file may already be gone
-  }
-
-  // Step 3: Parse based on format
-  progress(40, 'Parsing content');
-  const resolvedFormat = format === 'auto' ? detectFormat(fileName) : format;
-
-  let parsed: {
-    format: string;
-    headers?: string[];
-    rows?: Record<string, string>[];
-    data?: unknown;
-    content?: string;
-    rowCount: number;
-  };
-
-  switch (resolvedFormat) {
-    case 'csv': {
-      const csv = parseCsv(rawContent, csvDelimiter);
-      parsed = { format: 'csv', ...csv };
-      break;
+    // Step 1: Read file
+    progress(10, 'Reading file');
+    let rawContent: string;
+    try {
+      rawContent = await Deno.readTextFile(filePath);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      log.error('Failed to read file', { filePath, error: msg });
+      return createFailureResult(`Failed to read file: ${msg}`);
     }
-    case 'json': {
-      try {
-        const data = JSON.parse(rawContent);
-        const rowCount = Array.isArray(data) ? data.length : 1;
-        parsed = { format: 'json', data, rowCount };
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        return createFailureResult(`JSON parse error: ${msg}`);
+
+    // Step 2: Clean up staged file — content is in memory
+    try {
+      await Deno.remove(filePath);
+      log.info('Cleaned up staged file', { filePath });
+    } catch {
+      // Non-fatal — file may already be gone
+    }
+
+    // Step 3: Parse based on format
+    progress(40, 'Parsing content');
+    const resolvedFormat = format === 'auto' ? detectFormat(fileName) : format;
+
+    let parsed: {
+      format: string;
+      headers?: string[];
+      rows?: Record<string, string>[];
+      data?: unknown;
+      content?: string;
+      rowCount: number;
+    };
+
+    switch (resolvedFormat) {
+      case 'csv': {
+        const csv = parseCsv(rawContent, csvDelimiter);
+        parsed = { format: 'csv', ...csv };
+        break;
       }
-      break;
-    }
-    default: {
-      const lines = rawContent.trim().split('\n');
-      parsed = { format: 'text', content: rawContent, rowCount: lines.length };
-      break;
-    }
-  }
-
-  log.info('File parsed', { format: resolvedFormat, rowCount: parsed.rowCount });
-  trace.addEvent('file-import.parsed', {
-    format: resolvedFormat,
-    row_count: parsed.rowCount,
-  });
-
-  progress(100, 'Complete');
-  trace.addEvent('file-import.completed', {
-    format: resolvedFormat,
-    row_count: parsed.rowCount,
-  });
-
-  return createSuccessResult({
-    fileName,
-    contentHash,
-    format: resolvedFormat,
-    rowCount: parsed.rowCount,
-    headers: parsed.headers,
-    sagaMessage: sagaMessageType
-      ? {
-        type: sagaMessageType,
-        payload: {
-          filePath,
-          fileName,
-          contentHash: contentHash ?? crypto.randomUUID(),
-          rowCount: parsed.rowCount,
-          headers: parsed.headers ?? [],
-          rows: parsed.rows ?? parsed.data ?? parsed.content,
-        },
+      case 'json': {
+        try {
+          const data = JSON.parse(rawContent);
+          const rowCount = Array.isArray(data) ? data.length : 1;
+          parsed = { format: 'json', data, rowCount };
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          return createFailureResult(`JSON parse error: ${msg}`);
+        }
+        break;
       }
-      : undefined,
-    completedAt: new Date().toISOString(),
-  });
-});
+      default: {
+        const lines = rawContent.trim().split('\n');
+        parsed = { format: 'text', content: rawContent, rowCount: lines.length };
+        break;
+      }
+    }
+
+    log.info('File parsed', { format: resolvedFormat, rowCount: parsed.rowCount });
+    trace.addEvent('file-import.parsed', {
+      format: resolvedFormat,
+      row_count: parsed.rowCount,
+    });
+
+    progress(100, 'Complete');
+    trace.addEvent('file-import.completed', {
+      format: resolvedFormat,
+      row_count: parsed.rowCount,
+    });
+
+    return createSuccessResult({
+      fileName,
+      contentHash,
+      format: resolvedFormat,
+      rowCount: parsed.rowCount,
+      headers: parsed.headers,
+      sagaMessage: sagaMessageType
+        ? {
+          type: sagaMessageType,
+          payload: {
+            filePath,
+            fileName,
+            contentHash: contentHash ?? crypto.randomUUID(),
+            rowCount: parsed.rowCount,
+            headers: parsed.headers ?? [],
+            rows: parsed.rows ?? parsed.data ?? parsed.content,
+          },
+        }
+        : undefined,
+      completedAt: new Date().toISOString(),
+    });
+  },
+);
 
 const fileImportJob: FileImportJobHandler & Readonly<{ id: 'triggers-plugin-file-import' }> = Object
   .assign(handler, { id: 'triggers-plugin-file-import' as const });

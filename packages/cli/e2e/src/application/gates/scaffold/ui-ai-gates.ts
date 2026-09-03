@@ -5,7 +5,7 @@ import type { RunContext } from '../../../domain/run-context.ts';
 import { join } from '@std/path';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
 import { localSourceFixtureScript } from './local-source-fixture.ts';
-import { generatedAppName } from './generated-app-name.ts';
+import { generatedAppName } from './runtime/generated-app-name.ts';
 
 const AI_LOCAL_SOURCE_PACKAGES = [
   { specifier: '@netscript/ai', entrypoint: 'ai/mod.ts' },
@@ -195,6 +195,7 @@ function mcpWidgetRoundtripScript(mcpModuleSpecifier: string): string {
     '  else return Response.json({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: "method not found" } });',
     '  return Response.json({ jsonrpc: "2.0", id: message.id, result }, { headers: { "mcp-session-id": sessionId } });',
     '});',
+    '/** In-process MCP HTTP round-trip ceiling; this fixture is not an orchestrated resource. */',
     'const timeout = setTimeout(() => { console.error("MCP widget round trip timed out"); Deno.exit(1); }, 60_000);',
     'const pool = createMcpTransportPool({ servers: [{',
     '  kind: "streamable-http",',

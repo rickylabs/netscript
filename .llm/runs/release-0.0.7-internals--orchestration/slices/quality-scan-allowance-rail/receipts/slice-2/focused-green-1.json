@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "quality-rail-s2-focused-green-1",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/quality/scan-code-quality_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-quality-rail",
+  "gitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "actualGitHead": "3c398528996a715da8daebe04969e6aba90263e9",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "59105fcc3671a65c7af3280feebc4d42c6df87e024a1d053c3005fc508c756ac",
+  "lifecycleId": "codex:019ffcc9-97d6-7602-bb7d-582ecc92b069:quality-rail-s2-focused-green-1:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T00:02:43.140Z",
+  "startedAt": "2026-08-15T00:02:43.142Z",
+  "finishedAt": "2026-08-15T00:02:44.695Z",
+  "durationMs": 1554,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 1406,
+    "sha256": "7b416adbeefef42c825694a6ccf4ed58b4fd58d304b900f9ace2e78663a5a9b3",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/quality/scan-code-quality_test.ts\"],\"cwd\":\"/home/codex/repos/netscript-007-quality-rail\",\"exitCode\":1,\"durationMs\":1475,\"summary\":{\"passed\":23,\"failed\":1,\"ignored\":0,\"totalResults\":24,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n-   [\\n-     {\\n-       file: \\\"packages/plugin-auth-core/src/domain/mod.ts\\\",\\n-       line: 22,\\n-       rule: \\\"public-export-unresolved\\\",\\n-       text: \\\"export type { AuthenticatorPort, AuthnRequest, AuthnResult, Principal };\\\",\\n-     },\\n-     {\\n-       file: \\\"packages/plugin-auth-core/src/streams/mod.ts\\\",\\n-       line: 19,\\n-       rule: \\\"public-export-unresolved\\\",\\n-       text: \\\"export type { StateSchema, StreamStateDefinition };\\\",\\n-     },\\n-     {\\n-       file: \\\"packages/plugin-sagas-core/src/streams/schema.ts\\\",\\n-       line: 97,\\n-       rule: \\\"public-export-unresolved\\\",\\n-       text: \\\"export type {\\\",\\n-     },\\n-   ]\\n+   []\\n\\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\\n    at file://<cwd>/.llm/tools/quality/scan-code-quality_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"all six repository soundness fixtures retain their explicit scanner exemption\",\"file\":\"./.llm/tools/quality/scan-code-quality_test.ts\",\"line\":252}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 174,
+    "sha256": "3ec86fd6d24c0008a491bfa3577d6f7562beabf0510c4d0648ff2985162f9253",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/quality/scan-code-quality_test.ts'\n",
+    "truncated": false
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "gateId": "check",
+  "invocationId": "app-service-client-wiring-f6-check",
+  "argv": [
+    "deno",
+    "task",
+    "check"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1355",
+  "gitHead": "7fa29ad3ed10ad903b9cbbd518111e6bf2754761",
+  "actualGitHead": "7fa29ad3ed10ad903b9cbbd518111e6bf2754761",
+  "timeoutMs": 3600000,
+  "runnerIdentity": "worker:645285",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6050d6ed0ab0a5db31745a6e3f14b9fb729e37b5b4bbc44ddad2f8014204d93e",
+  "lifecycleId": "worker:645285:app-service-client-wiring-f6-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T19:10:20.709Z",
+  "startedAt": "2026-08-15T19:10:20.713Z",
+  "finishedAt": "2026-08-15T19:10:32.352Z",
+  "durationMs": 9713,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 296,
+    "sha256": "f9439f45e08642664d393458c8e288f4186cb1bfb47b7524ab5b1be012f779f8",
+    "tail": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"/home/codex/repos/netscript-007-features-1355\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2944,\"batches\":25,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 192,
+    "sha256": "8e7cb67a36cfafde9a120b0109ba1f06cbe2c185d7d3fac8967000ed6e61dfec",
+    "tail": "Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"\n",
+    "truncated": false
+  }
+}

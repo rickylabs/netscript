@@ -40,6 +40,8 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
   catalog the agent sees comes from the release it runs.
 - **Intent-aware guidance** — `find_guidance` accepts the task in the caller's words and returns a
   bounded, ordered set of section citations and cited code excerpts.
+- **Credential-free operation access** — service-operation list and schema results include a
+  bounded access summary derived from OpenAPI, never a principal, token, cookie, or credential.
 - **Zero npm MCP SDK** — a minimal newline-delimited JSON-RPC transport keeps the dependency graph
   lean and the lockfile stable.
 
@@ -181,13 +183,45 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 | `execute_command`             | `command`; `resource` optional | Executor identity, status, exit code, duration, and bounded output tail |
 | `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
 | `list_api_services`           | —                 | Discovered services, live spec status, source outcomes, and operation counts  |
-| `list_service_operations`     | `service`         | Bounded OpenAPI operation rows with honest truncation metadata                |
-| `get_operation_schema`        | `service`, `operation` | Request, response, and error views plus an unauthenticated curl template   |
+| `list_service_operations`     | `service`         | Bounded OpenAPI operation rows, optional `access`, and honest truncation metadata |
+| `get_operation_schema`        | `service`, `operation` | Request, response, and error views, optional `access`, and access-aware curl guidance |
 
 A top-level input/result field overview for every tool is on the
 [MCP reference](https://rickylabs.github.io/netscript/reference/mcp/); the complete Standard Schema
 contracts are published as `TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS` and returned by the live
 `tools/list`.
+
+### Operation access summaries
+
+Both `list_service_operations` rows and `get_operation_schema` results use the same optional access
+shape:
+
+```json
+{
+  "authentication": "required",
+  "securitySchemes": ["bearerAuth"],
+  "scopes": ["catalog:read"],
+  "roles": ["reader"]
+}
+```
+
+`authentication` is `none`, `optional`, or `required`. Each string list is bounded to 50 items and
+each value to 2,000 characters by the published output schema. The summary is deliberately
+credential-free: it reports only declared scheme names, scopes, and roles and never solicits or
+echoes a credential.
+
+The projection preserves four distinct states:
+
+| OpenAPI operation | MCP result |
+| --- | --- |
+| No own `security` field | `access` is absent |
+| `security: []` | `authentication: 'none'`, with empty schemes and scopes |
+| `security: [{}, { bearerAuth: [] }]` | `authentication: 'optional'` |
+| `security: [{ bearerAuth: ['catalog:read'] }]` plus `x-netscript-roles` | `authentication: 'required'` with the declared scheme, scopes, and roles |
+
+`get_operation_schema` also emits distinct curl guidance for all four states. Required operations
+show an explicit `Authorization: Bearer <credential>` placeholder; undeclared operations retain the
+generic unauthenticated caveat. The tool never places a real credential into its result.
 
 ## Record drift
 
@@ -239,10 +273,13 @@ Three entrypoints carry the package:
 The projection subpath accepts an already-loaded OpenAPI document. It keeps discovery and I/O at the
 caller's boundary:
 
-````ts
+```ts
 import { indexOpenApiOperations } from '@netscript/mcp/openapi-projection';
 
+declare const openApiDocument: unknown;
+
 const index = indexOpenApiOperations(openApiDocument);
+```
 
 Every tool flow depends on a port interface, so embedders and tests supply their own adapters and
 assert against the published schemas. The always-current symbol list is
@@ -268,7 +305,7 @@ const endpoints = createServiceEndpointDirectory({
 });
 
 const { entries, sources } = await endpoints.list();
-````
+```
 
 The effective per-service precedence is `override > aspire-cli > run-manifest > appsettings`. Every
 source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale
@@ -315,7 +352,8 @@ requests. Tests and custom hosts can replace every source and the probe through
 ## Configuration at a glance
 
 - **Telemetry endpoint discovery** (tools and `doctor`): explicit `--endpoint`, then
-  `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`.
+  `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then the running AppHost reported by
+  `aspire ps --format Json`, then `http://localhost:18888`.
 - **Docs corpus**: explicit `--docs-root <path>`, then `NETSCRIPT_DOCS_ROOT`, then an indexable
   `<projectRoot>/.netscript/docs`, then the bounded generated release fallback. `agent init
   --with-docs` writes the installed root into every generated host command. `list_docs.corpus`
@@ -333,7 +371,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 21-tool field overview, policy, and exports**:
+- **MCP reference — the 22-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)

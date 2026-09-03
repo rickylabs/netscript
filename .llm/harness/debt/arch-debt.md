@@ -143,20 +143,22 @@ finding into a debt entry.
 
 ## packages/cli — CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred
 
-- **Reason:** The scaffold still uses `_aspire-compat.mjs` plus generated
-  `builder.addExecutable(...)` registrations for Deno resources. Current Aspire 13.4 docs state
-  `CommunityToolkit.Aspire.Hosting.Deno` does not expose `addDenoApp` or `addDenoTask` APIs in the
-  TypeScript SDK, and SQLite hosting is C#-only for AppHost APIs with TypeScript directed to
-  `builder.addConnectionString(...)`.
-- **Owner:** Aspire scaffold follow-up.
-- **Target:** Dedicated CommunityToolkit Deno/SQLite TypeScript AppHost integration slice.
-- **Linked plan:** `.llm/tmp/run/chore-align-aspire-13.4.6--impl/plan.md`
+- **Reason:** The scaffold still uses `_aspire-compat.mts` plus generated
+  `builder.addExecutable(...)` registrations for Deno resources. Aspire 13.5.3 restore evidence
+  proves `CommunityToolkit.Aspire.Hosting.Deno` projects `addDenoApp` and `addDenoTask` into the
+  TypeScript SDK, but 0.0.7 retains the proven executable path until its dedicated adoption slice.
+  First-party Deno hosting is scheduled upstream for Aspire 13.6 (aspire#18627, aspire#18628, and
+  aspire#16218). SQLite remains modeled through `builder.addConnectionString(...)`.
+- **Owner:** Aspire 13.5 S12 adoption slice.
+- **Target:** Adopt the restored CommunityToolkit Deno projection in S12/0.0.8; reassess SQLite in
+  the same dedicated integration slice without coupling it to S4 emission re-validation.
+- **Linked plan:** `.llm/runs/chore-aspire-13-5-s4-generator-revalidation--impl/plan.md` (D-4)
 - **Created:** 2026-06-27
 - **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when Aspire/CommunityToolkit exposes the required TypeScript SDK APIs or a
-  redesigned scaffold uses documented TypeScript connection-string modeling, and
-  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the workaround
-  removed.
+- **Gate:** Close after S12 replaces the Deno executable registration and compatibility path with
+  the restored CommunityToolkit projection, preserves documented SQLite connection-string modeling,
+  and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` passes with the superseded
+  workaround removed.
 
 ## packages/cli — ISSUE-167-PLUGIN-REMOVE-UNINSTALL
 
@@ -713,8 +715,8 @@ finding into a debt entry.
 ## packages/plugin-streams-core — AP-13 console.warn runtime reporting
 
 - **Reason:** `DurableStreamProducer` previously used `console.warn` for connection, pending-event,
-  serialization, and primary-key visibility in published runtime code. The warning debt was
-  accepted for alpha operator visibility until structured producer telemetry was available.
+  serialization, and primary-key visibility in published runtime code. The warning debt was accepted
+  for alpha operator visibility until structured producer telemetry was available.
 - **Owner:** `@netscript/plugin-streams-core` maintainers.
 - **Target:** Completed by the #1326 reconnect supervisor telemetry integration.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
@@ -974,6 +976,11 @@ finding into a debt entry.
 - **Status:** open. Slice 5 records `PASS_WITH_CLI_DEBT` evidence in
   `.llm/tmp/run/feat-cli-aspire-otel-parity/baseline-csharp-trace.md`; slice 6 may compare trace
   shape through the Dashboard API, but final PR must not claim the `aspire otel` CLI path passed.
+- **Aspire 13.5.3 re-verification (2026-08-30, #1714):** The generated-project runtime pass
+  reproduced the same discovery boundary: bare `aspire otel logs --format Json -n 10` exited 12 in
+  0.34 s with `dashboard unavailable`, while the same probe with the exact `--dashboard-url` exited
+  0 in 0.62 s. The debt remains open and the generated telemetry fallback remains required.
+  Evidence: `.llm/runs/test-aspire-13-5-s2-runtime-verification--impl/receipts/02-v4-*`.
 - **Gate:** runtime - C# baseline, runtime - telemetry
 
 ## packages/cli — legacy C# scaffold plugin-add incompatibility (`legacy-csharp-scaffold-plugin-add`)
@@ -2134,8 +2141,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when a compiled/public CLI installs a JSR plugin, resolves its doctor adapter,
   executes a contributed check, and reports import failures as structured doctor errors.
 - **Closure evidence:** `behavior.package-backed-plugin-doctor` was demonstrated red before the
-  product fix, red again after deliberately dropping bounded-probe permission metadata, and green
-  in both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
+  product fix, red again after deliberately dropping bounded-probe permission metadata, and green in
+  both the focused `scaffold.plugins` run and the serialized `scaffold.runtime` run. The latter
   executed 88 printed named gates with 0 failures and 0 skips, including the published workers
   doctor adapter. Its summary counts an unprinted 89th passed step because `suite-runner.ts` adds
   the Docker prune step without emitting a reporter event; see the W2-H `evidence.md`.
@@ -2219,10 +2226,10 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/mcp — guidance contracts deepen over-cap tool-contract table (`mcp-tool-contracts-a8-1102`)
 
-- **Reason:** PR #1404 adds the public `find_guidance` schemas to
-  `src/domain/tool-contracts.ts`, deepening the evaluator-counted file from 301 to 367 lines against
-  the 300-line A8/AP-1/F-1 cap. The same doctrine warning already exists on `origin/main`, so the
-  package-root verdict adds no new finding, but growth inside an over-cap file is still debt.
+- **Reason:** PR #1404 adds the public `find_guidance` schemas to `src/domain/tool-contracts.ts`,
+  deepening the evaluator-counted file from 301 to 367 lines against the 300-line A8/AP-1/F-1 cap.
+  The same doctrine warning already exists on `origin/main`, so the package-root verdict adds no new
+  finding, but growth inside an over-cap file is still debt.
 - **Owner:** MCP contract-surface follow-up.
 - **Target:** Before the next MCP public-tool expansion.
 - **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/plan.md`; issue #1102;
@@ -2235,16 +2242,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
 
-- **Reason:** PR #1427 deepens
-  `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906 lines against the 500-line
-  A8/AP-1/F-1 cap while adding the named-app and browser-reference gates. The same slice grows the
-  scaffold gate directory from 41 to 43 direct children against F-16. Both were already over their
-  doctrine limits; splitting the established runtime registry during the release-blocking scaffold
-  feature would mix an architecture migration into behavioral acceptance.
+- **Reason:** PR #1427 deepens `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906
+  lines against the 500-line A8/AP-1/F-1 cap while adding the named-app and browser-reference gates.
+  The same slice grows the scaffold gate directory from 41 to 43 direct children against F-16. Both
+  were already over their doctrine limits; splitting the established runtime registry during the
+  release-blocking scaffold feature would mix an architecture migration into behavioral acceptance.
 - **Owner:** CLI E2E scaffold-runtime maintainers.
 - **Target:** Before the next scaffold runtime gate or probe is added.
-- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue #1333;
-  PR #1427.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue
+  #1333; PR #1427.
 - **Created:** 2026-08-09
 - **Status:** open, DEBT_ACCEPTED for #1427; registry entry added after IMPL-EVAL cycle 1. **Not
   deepened by PR #1449** (2026-08-11) — see the stop-condition note below.
@@ -2261,9 +2267,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   baseline 43 plus the one bounded `service-env/` subdirectory, whose own **12** files sit **exactly
   at** the 12-child cap — not comfortably inside it. IMPL-EVAL recorded 10 here; the remediation
   slices then added `gate-permission-probe.ts` and `service-env-gates_test.ts`, and the count was
-  not re-measured, so the record was a false-done. Corrected by measurement at head.
-  **Stop condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a
-  sibling directory, requires the owed `runtime-gates.ts` split first rather than another bounded
+  not re-measured, so the record was a false-done. Corrected by measurement at head. **Stop
+  condition:** `service-env/` is full. A thirteenth file in it, or a further gate needing a sibling
+  directory, requires the owed `runtime-gates.ts` split first rather than another bounded
   subdirectory. IMPL-EVAL cycle 1 had measured 943 lines and 48 children before this correction. The
   entry stays **open**: the pre-existing 906-line registry and 43 over-cap children are untouched,
   so the full split is still owed, and the next gate faces the same condition.
@@ -2303,3 +2309,72 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Group the established attribute domains behind role-named bounded subdirectories while
   preserving the `@netscript/telemetry/attributes` export map and symbol names; telemetry package
   tests, scoped gates, full-export doc lint, publish dry-run, and `quality:gate` must remain green.
+
+## plugins/workers — published export private-type references (`workers-private-type-ref-1655`)
+
+- **Reason:** Full-export `deno doc --lint` over all 13 `@netscript/plugin-workers` export targets
+  reports exactly 20 pre-existing `private-type-ref` diagnostics. The same audit reports zero
+  `missing-jsdoc` and zero other diagnostics. Removing these references is a package API repair
+  outside the quality-scanner leaf; hiding them or claiming this audit green would make the
+  publication evidence untruthful.
+- **Owner:** `@netscript/plugin-workers` public-surface maintainers; issue #1655 in milestone 0.0.8.
+- **Target:** Resolve in #1655 without increasing or adding a diagnostic class before that repair.
+- **Linked plan:**
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/plan.md`;
+  issues #1378, #1545, and #1655; PR #1653.
+- **Created:** 2026-08-15.
+- **Status:** open, DEBT_ACCEPTED for PR #1653 only at the strict baseline of 20 `private-type-ref`
+  diagnostics across 13 export targets. This is a no-increase allowance, not a full-export lint
+  pass.
+- **Gate:** Until #1655 closes, the 13-target full-export audit may report at most the recorded 20
+  `private-type-ref` diagnostics and must report zero `missing-jsdoc` and zero other diagnostics.
+  Any increase or new diagnostic class is `FAIL_DEBT`. Closure requires that audit to exit 0 with
+  zero diagnostics while the scoped Workers publish dry-run and `quality:gate` remain green.
+- **Evidence:**
+  `.llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-3/workers-doc-lint.json`
+  records the exact baseline at signed Slice 2 head `f9acdb426d5438935ae75bee7dda987dbfe3d4cb`.
+
+## Aspire.Hosting.Browsers preview pin (13.5 train) (`aspire-browsers-preview-1713`)
+
+- **Reason:** Aspire SDK, CLI, and official hosting integrations move atomically to stable 13.5.3,
+  but `Aspire.Hosting.Browsers` has no stable 13.5.x package. The accepted OF-2a fallback is
+  `13.5.3-preview.1.26425.3`, preserving a single 13.5 train without holding back the stable
+  surface.
+- **Owner:** CLI Aspire scaffold maintainers.
+- **Target:** Replace the preview pin as soon as a stable 13.5.x `Aspire.Hosting.Browsers` package
+  is available.
+- **Linked plan:** Issue #1713; epic #1712; PR #1727;
+  `.llm/runs/chore-aspire-13-5-s1-pin-bump--impl/`.
+- **Created:** 2026-08-29.
+- **Status:** open, DEBT_ACCEPTED for #1713 under research decision D-1 / OF-2a.
+- **Gate:** Drop when a stable 13.5.x Browsers package exists. E-12 (`check:scaffold-versions`)
+  scans `SCAFFOLD_VERSIONS` only and never sees `SCAFFOLD_ASPIRE_INTEGRATIONS.BROWSERS`; until then,
+  `check:aspire-version-parity` (exact-pin allow-list), `generate-aspire-config_test.ts`, and both
+  CI-owned `scaffold.runtime` tiers must retain the exact accepted preview pin and remain green.
+
+## packages/cli — resource-command composition IO extraction (`cli-resource-composition-io-1354`)
+
+- **ID:** `cli-resource-composition-io-1354`
+- **Title:** Resource-command staging and procedure discovery remain in the public composition root.
+- **Context:** Slice F for issue #1354 / PR #1956 absorbed Slice E's deferred dependency-composition
+  item in `public/features/root/public-command-dependencies.ts`. Its resource stager directly uses
+  temporary-directory and filesystem operations, while its procedure resolver launches `deno eval`
+  and parses the selected service name. IMPL-EVAL M-2 found that these are adapter-grade effects,
+  not declarative wiring under R-COMP-DECL/AP-25. The same path and the resource use case also
+  retain Slice E LOW-2: non-reconciler pre-apply failures surface as plain `Error` instead of
+  `CliExitError`.
+- **Why deferred:** PR #1956 is a post-evaluation closeout with product-code changes explicitly
+  prohibited. The command behavior and production composition are integration-tested; moving the
+  effects and normalizing errors require a separately reviewed adapter/error-boundary slice.
+- **Owner:** CLI resource-generation maintainers / issue #1354 follow-up.
+- **Target:** Slice G or the next dedicated `generate resource` architecture follow-up, before
+  another resource-command dependency is added to the public composition root.
+- **Linked plan:** `.llm/runs/feat-cli-resource-slice-activate--1354-f/plan.md`; issue #1354; PR
+  #1956; `.llm/runs/feat-cli-resource-slice-activate--1354-f/evaluate.md` (M-2, L-4).
+- **Created:** 2026-09-03.
+- **Status:** open, DEBT_ACCEPTED for PR #1956 closeout only.
+- **Gate:** Move staging and procedure discovery behind role-named `kernel/adapters/`
+  implementations of the existing filesystem/process seams, add focused adapter tests (including
+  service-name extraction), and normalize every non-reconciler pre-apply failure to `CliExitError`;
+  focused resource-command tests, the full CLI unit suite, structured CLI check, `arch:check`,
+  `quality:gate`, and CLI publish dry-run must all remain green.

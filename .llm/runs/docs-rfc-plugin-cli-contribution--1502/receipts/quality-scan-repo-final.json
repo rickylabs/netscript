@@ -1,0 +1,36 @@
+{
+  "gateId": "quality-scan-repo",
+  "invocationId": "ns1502-s4-final-quality-scan-repo",
+  "argv": [
+    "deno",
+    "task",
+    "quality:scan:repo"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1502",
+  "gitHead": "120859d5c762706702cd45a3f2be19664e335e22",
+  "actualGitHead": "120859d5c762706702cd45a3f2be19664e335e22",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2681704",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "2a36815a11de2ca596c8cdb15a5ebbc7d148add8695693f667a41a55f2c4061d",
+  "lifecycleId": "worker:2681704:ns1502-s4-final-quality-scan-repo:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-15T00:55:54.421Z",
+  "startedAt": "2026-08-15T00:55:54.424Z",
+  "finishedAt": "2026-08-15T00:55:55.061Z",
+  "durationMs": 637,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 1471,
+    "sha256": "34d986abc429908ad0288737a07f44dd499ac26aa677c58045ddae585f8ea284",
+    "tail": "{\"ok\":true,\"mode\":\"repository\",\"scanned\":[\"packages\",\"plugins\",\".llm/tools/fitness\",\".llm/tools/quality\",\"docs/site\"],\"findings\":[],\"allowCount\":7,\"allowances\":[{\"file\":\"packages/cli/src/public/features/root/public-command-dependencies.ts\",\"line\":363,\"reason\":\"service manifest loader resolves a runtime module whose structural service contract is wider than the public loader port\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":135,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":136,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":158,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":275,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"packages/cli/src/public/public-api.ts\",\"line\":276,\"reason\":\"public facade bridges duplicated internal and exported plugin port identities pending package-boundary unification\"},{\"file\":\"plugins/workers/streams/producer.ts\",\"line\":52,\"reason\":\"durable-stream mutation hook upstream type omits the worker execution extension fields\"}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 225,
+    "sha256": "5b4bdd473998624d31af75cdc624871c107984c8738d921149391a4fc0a6599f",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mquality:scan:repo\u001b[0m deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages --root plugins --root .llm/tools/fitness --root .llm/tools/quality --root docs/site --max-allow 8\n",
+    "truncated": false
+  }
+}

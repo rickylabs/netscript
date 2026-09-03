@@ -15,18 +15,18 @@ Deno.test('new inference session uses the configured model and mandatory bypass 
     '--cwd',
     '/repo',
     '--name',
-    'deepseek fork',
+    'glm fork',
   ]);
-  assertEquals(options.model, OPENROUTER_MODEL_IDS.deepseekV4Flash0731);
+  assertEquals(options.model, OPENROUTER_MODEL_IDS.implEvaluator);
   assertEquals(remoteModelClaudeArguments(options), [
     '--model',
-    OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+    OPENROUTER_MODEL_IDS.implEvaluator,
     '--effort',
-    'xhigh',
+    'max',
     '--permission-mode',
     'bypassPermissions',
     '--name',
-    'deepseek fork',
+    'glm fork',
   ]);
 });
 
@@ -45,7 +45,7 @@ Deno.test('conversation fork uses inference-only resume with model and effort', 
     'conversation-id',
     '--fork-session',
     '--model',
-    OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+    OPENROUTER_MODEL_IDS.implEvaluator,
     '--effort',
     'high',
     '--permission-mode',
@@ -66,6 +66,16 @@ Deno.test('launcher rejects unsafe or contradictory session combinations', () =>
     () => parseRemoteModelLaunchOptions(['--name', 'line\nbreak']),
     Error,
     'unsupported characters',
+  );
+  assertThrows(
+    () => parseRemoteModelLaunchOptions(['--cwd', '/repo', '--']),
+    Error,
+    'Unknown argument: --',
+  );
+  assertThrows(
+    () => parseRemoteModelLaunchOptions(['--', '--', '--cwd', '/repo']),
+    Error,
+    'Unknown argument: --',
   );
 });
 

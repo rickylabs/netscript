@@ -30,7 +30,7 @@ import type {
 } from './state.ts';
 import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
 import { assert, assertEquals } from '@std/assert';
-import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { LEGACY_OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 function assertUnique(values: readonly unknown[], label: string): void {
   assert(new Set(values).size === values.length, `${label} contains duplicates`);
@@ -122,7 +122,8 @@ Deno.test('command union covers the complete schema 1.0 command vocabulary', () 
     { kind: 'restore', commandId: '08', mode: 'plan', session, currentRoute: route },
     { kind: 'status', commandId: '09', mode: 'inspect', agent: 'codex' },
     { kind: 'repair-codex-remote', commandId: '10', mode: 'plan', worktree: route.worktree },
-    { kind: 'rollback', commandId: '11', mode: 'plan', checkpointId: 'checkpoint-1' },
+    { kind: 'repair-sender-lease', commandId: '11', mode: 'plan', worktree: route.worktree },
+    { kind: 'rollback', commandId: '12', mode: 'plan', checkpointId: 'checkpoint-1' },
   ] as const satisfies readonly RuntimeCommand[];
 
   assertEquals(commands.map((command) => command.kind), [...RUNTIME_COMMANDS]);
@@ -162,21 +163,33 @@ Deno.test('desired-state source loads a value-free state from a content referenc
   assert(!('desiredState' in loaded), 'source reference leaked into desired state');
 });
 
-Deno.test('desired-state routes preserve validated OpenRouter preset identity', () => {
-  const value = structuredClone(desired) as unknown as Record<string, unknown>;
-  const agents = value.agents as Record<string, Record<string, unknown>>;
-  agents.codex.route = {
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: 'claude-openrouter',
-    presetId: 'claude-evaluator-minimax-m3',
-    model: OPENROUTER_MODEL_IDS.minimax,
-    effort: 'high',
-    worktree: route.worktree,
-    mobileRequired: false,
-  };
-  const parsed = parseDesiredRuntimeState(value);
-  assertEquals(parsed.agents.codex?.route?.presetId, 'claude-evaluator-minimax-m3');
+Deno.test('desired-state routes preserve every retired OpenRouter preset identity', () => {
+  const historical = [
+    ['claude-fanout-minimax-m3', LEGACY_OPENROUTER_MODEL_IDS.minimaxM3, 'high'],
+    ['claude-evaluator-minimax-m3', LEGACY_OPENROUTER_MODEL_IDS.minimaxM3, 'high'],
+    [
+      'claude-evaluator-deepseek-v4-flash-0731',
+      LEGACY_OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+      'max',
+    ],
+    ['claude-evaluator-qwen-3-8-max', LEGACY_OPENROUTER_MODEL_IDS.qwen38Max, 'max'],
+  ] as const;
+  for (const [presetId, model, effort] of historical) {
+    const value = structuredClone(desired) as unknown as Record<string, unknown>;
+    const agents = value.agents as Record<string, Record<string, unknown>>;
+    agents.codex.route = {
+      agent: 'claude',
+      provider: 'openrouter',
+      profileId: 'claude-openrouter',
+      presetId,
+      model,
+      effort,
+      worktree: route.worktree,
+      mobileRequired: false,
+    };
+    const parsed = parseDesiredRuntimeState(value);
+    assertEquals(parsed.agents.codex?.route?.presetId, presetId);
+  }
 });
 
 Deno.test('persisted and result contracts expose identifiers and fingerprints only', () => {

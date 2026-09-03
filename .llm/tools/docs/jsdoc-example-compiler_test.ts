@@ -1,0 +1,489 @@
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { dirname, fromFileUrl } from '@std/path';
+import type {
+  JsdocExampleAnalysis,
+  JsdocExampleBlock,
+  JsdocExampleOwner,
+} from './jsdoc-example-contract.ts';
+import {
+  classifyDenoCheckDiagnostics,
+  compileJsdocExamples,
+  exampleSymbolImport,
+  unattributedDiagnostics,
+} from './jsdoc-example-compiler.ts';
+import { JSDOC_SCAFFOLD_ALIAS_RULES } from './snippet-supports.ts';
+import { resolveWorkspaceSurface } from './snippet-workspace.ts';
+
+const repositoryRoot = dirname(dirname(dirname(dirname(fromFileUrl(import.meta.url)))));
+
+function owner(
+  symbol: string,
+  declarationKind: 'value' | 'type' | 'class',
+  publicSpecifier: string,
+): JsdocExampleOwner {
+  return {
+    memberName: publicSpecifier.split('/').slice(0, 2).join('/'),
+    memberRoot: 'packages/test',
+    sourcePath: 'packages/test/mod.ts',
+    kind: 'symbol',
+    symbol,
+    declarationKind,
+    publicSpecifier,
+  };
+}
+
+function block(
+  blockOwner: JsdocExampleOwner,
+  body: string,
+  fenceOrdinal = 1,
+  exemptionReason?: string,
+): JsdocExampleBlock {
+  return {
+    owner: blockOwner,
+    exampleOrdinal: 1,
+    fenceOrdinal,
+    openingLine: 1,
+    codeStartLine: 2,
+    language: 'ts',
+    checkedLanguage: 'ts',
+    compilationExtension: 'ts',
+    exemptionReason,
+    body,
+  };
+}
+
+function analysis(blocks: JsdocExampleBlock[]): JsdocExampleAnalysis {
+  const exempt = blocks.filter((candidate) => candidate.exemptionReason !== undefined);
+  return {
+    blocks,
+    exemptions: exempt,
+    findings: blocks.map((candidate) => ({
+      disposition: candidate.exemptionReason ? 'exempt' : 'checked',
+      owner: candidate.owner,
+      exampleOrdinal: candidate.exampleOrdinal,
+      fenceOrdinal: candidate.fenceOrdinal,
+      reason: candidate.exemptionReason,
+    })),
+    census: {
+      members: blocks.length > 0 ? 1 : 0,
+      files: blocks.length > 0 ? 1 : 0,
+      examples: blocks.length,
+      candidates: blocks.length,
+      checked: blocks.length - exempt.length,
+      exempt: exempt.length,
+      nonTypeScript: 0,
+      unfenced: 0,
+      malformed: 0,
+      failures: 0,
+    },
+  };
+}
+
+Deno.test('published-only workspace resolver excludes publish:false members', async () => {
+  const surface = await resolveWorkspaceSurface(repositoryRoot, {}, { publishedOnly: true });
+  assertEquals(surface.memberCount, 35);
+  assertEquals(surface.imports['@netscript/cli-e2e'], undefined);
+  assertEquals(surface.imports['@netscript/bench'], undefined);
+});
+Deno.test('zero candidates and zero checked modules refuse before spawning Deno', async () => {
+  const zeroCandidates = await compileJsdocExamples(analysis([]), repositoryRoot);
+  assertEquals(zeroCandidates.code, 1);
+  assertEquals(zeroCandidates.denoCheckSpawned, false);
+  assertStringIncludes(zeroCandidates.diagnostics, 'zero candidates');
+
+  const exempt = block(
+    owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+    'PaginationInputSchema.parse({ page: 1, limit: 20 });',
+    1,
+    'illustrative fragment',
+  );
+  const zeroChecked = await compileJsdocExamples(analysis([exempt]), repositoryRoot);
+  assertEquals(zeroChecked.code, 1);
+  assertEquals(zeroChecked.denoCheckSpawned, false);
+  assertStringIncludes(zeroChecked.diagnostics, 'zero checked modules');
+});
+
+Deno.test('relative and undeclared NetScript subpath controls fail without execution', async () => {
+  const moduleOwner: JsdocExampleOwner = {
+    memberName: '@netscript/sdk',
+    memberRoot: 'packages/sdk',
+    sourcePath: 'packages/sdk/mod.ts',
+    kind: 'module',
+  };
+  const result = await compileJsdocExamples(
+    analysis([
+      block(moduleOwner, 'import "../src/dead.ts";'),
+      block(moduleOwner, 'import { nope } from "@netscript/sdk/not-shipped";\nvoid nope;', 2),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 1);
+  assertEquals(result.denoCheckSpawned, false);
+  assertEquals(result.failureCensus.badSpecifier, 2);
+  assertStringIncludes(result.diagnostics, 'relative/absolute import');
+  assertStringIncludes(result.diagnostics, 'undeclared NetScript subpath');
+});
+
+Deno.test('scaffold aliases align to app and service generators per documented owner', async () => {
+  const generatorProbe = await new Deno.Command(Deno.execPath(), {
+    cwd: repositoryRoot,
+    args: [
+      'eval',
+      '--config',
+      'packages/cli/deno.json',
+      `import { generateAppDenoJson } from "./packages/cli/src/kernel/adapters/templates/app/generate-app-deno-json.ts";
+import { generateServiceDenoJson } from "./packages/cli/src/kernel/templates/service/generate-service-deno-json.ts";
+const app = JSON.parse(generateAppDenoJson({ projectName: "my-app", appName: "dashboard", importMode: "jsr" }));
+const service = JSON.parse(generateServiceDenoJson({ projectName: "my-app", serviceName: "users", importMode: "jsr", hasDatabase: true }));
+console.log(JSON.stringify({ app, service }));`,
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(generatorProbe.code, 0, new TextDecoder().decode(generatorProbe.stderr));
+  const { app: appConfig, service: serviceConfig } = JSON.parse(
+    new TextDecoder().decode(generatorProbe.stdout),
+  );
+  assertEquals(appConfig.imports['@app/'], './');
+  assertEquals(serviceConfig.imports['@app/'], undefined);
+  assertEquals(typeof serviceConfig.imports['@database'], 'string');
+  assertEquals(
+    JSDOC_SCAFFOLD_ALIAS_RULES.map(({ prefix, scaffoldKind }) => ({ prefix, scaffoldKind })),
+    [
+      { prefix: '@app/', scaffoldKind: 'app' },
+      { prefix: '@database', scaffoldKind: 'service' },
+    ],
+  );
+
+  const serviceOwner = owner('defineService', 'value', '@netscript/service');
+  const rejected = await compileJsdocExamples(
+    analysis([
+      block(
+        serviceOwner,
+        'import { definePage } from "@app/utils.ts";\nvoid definePage;',
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(rejected.code, 1);
+  assertEquals(rejected.failureCensus.badSpecifier, 1);
+  assertStringIncludes(rejected.diagnostics, 'app-generated alias');
+
+  const appOwner: JsdocExampleOwner = {
+    memberName: '@netscript/fresh',
+    memberRoot: 'packages/fresh',
+    sourcePath: 'packages/fresh/mod.ts',
+    kind: 'module',
+  };
+  const accepted = await compileJsdocExamples(
+    analysis([
+      block(
+        appOwner,
+        'import { definePage } from "@app/utils.ts";\nvoid definePage;',
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(accepted.code, 0, accepted.diagnostics);
+  assertEquals(accepted.failureCensus.badSpecifier, 0);
+});
+
+Deno.test('ambient documented-symbol injection covers const, type, and class shapes', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        'PaginationInputSchema.parse({ page: 1, limit: 20 });',
+      ),
+      block(
+        owner('PaginationInput', 'type', '@netscript/contracts/query'),
+        'const input: PaginationInput = { page: 1, limit: 20, sortOrder: "asc" };\nvoid input;',
+        2,
+      ),
+      block(
+        owner('MemoryKvAdapter', 'class', '@netscript/kv'),
+        'const Adapter: typeof MemoryKvAdapter = MemoryKvAdapter;\nlet instance: MemoryKvAdapter | undefined;\nvoid Adapter;\nvoid instance;',
+        3,
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 0, result.diagnostics);
+  assert(result.denoCheckSpawned);
+  assert(result.rootLockUnchanged);
+});
+
+Deno.test('an explicit documented-symbol import may shadow the ambient convention', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        'import { PaginationInputSchema } from "@netscript/contracts/query";\nPaginationInputSchema.parse({ page: 1, limit: 20 });',
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 0, result.diagnostics);
+});
+
+Deno.test('body diagnostics are classified and deferred without weakening the import gate', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        'PaginationInputSchema.parse(missingInput);',
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 0, result.diagnostics);
+  assertEquals(result.enforcedFailureCount, 0);
+  assertEquals(result.failureCensus.unboundName, 1);
+  assertEquals(
+    result.deferredExamples.map((example) => ({
+      failureClass: example.failureClass,
+      exampleOrdinal: example.exampleOrdinal,
+      fenceOrdinal: example.fenceOrdinal,
+      tsCodes: example.tsCodes,
+    })),
+    [{
+      failureClass: 'unboundName',
+      exampleOrdinal: 1,
+      fenceOrdinal: 1,
+      tsCodes: [2304],
+    }],
+  );
+});
+
+Deno.test('an unclassified compiler abort fails closed even when deferred syntax findings exist', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        'const illustrative = { value: ... };',
+      ),
+      block(
+        owner('PaginationInput', 'type', '@netscript/contracts/query'),
+        'const rendered = <App />;\nvoid rendered;',
+        2,
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 1);
+  assertEquals(result.failureCensus.typeError, 1);
+  assertStringIncludes(result.diagnostics, 'SyntaxError');
+});
+
+Deno.test('placeholder preclassification ignores comments and leaves diagnostics to Deno', async () => {
+  const result = await compileJsdocExamples(
+    analysis([
+      block(
+        owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+        '// ... { illustrative input }\nPaginationInputSchema.parse({ page: 1, limit: 20 });',
+      ),
+      block(
+        owner('PaginationInput', 'type', '@netscript/contracts/query'),
+        'const repeated = 1;\n// ... { repeated: 2 }\nconst repeated = 2;\nvoid repeated;',
+        2,
+      ),
+    ]),
+    repositoryRoot,
+  );
+  assertEquals(result.code, 0, result.diagnostics);
+  assert(result.denoCheckSpawned);
+  assertEquals(result.failureCensus.typeError, 1);
+  assertEquals(
+    result.deferredExamples.map(({ fenceOrdinal, tsCodes }) => ({ fenceOrdinal, tsCodes })),
+    [{ fenceOrdinal: 2, tsCodes: [2451] }],
+  );
+});
+
+Deno.test('an exempt bad specifier remains a policy failure', async () => {
+  const bad = block(
+    owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+    'import "./missing.ts";\nPaginationInputSchema.parse({ page: 1, limit: 20 });',
+    1,
+    'illustrative fragment',
+  );
+  const good = block(
+    owner('PaginationInputSchema', 'value', '@netscript/contracts/query'),
+    'PaginationInputSchema.parse({ page: 1, limit: 20 });',
+    2,
+  );
+  const result = await compileJsdocExamples(analysis([bad, good]), repositoryRoot);
+  assertEquals(result.code, 1);
+  assertEquals(result.failureCensus.badSpecifier, 1);
+  assertStringIncludes(result.diagnostics, 'relative/absolute import');
+});
+
+Deno.test('diagnostic classification is identical with compiler color on and off', () => {
+  const moduleOwner: JsdocExampleOwner = {
+    memberName: '@netscript/test',
+    memberRoot: 'packages/test',
+    sourcePath: 'packages/test/mod.ts',
+    kind: 'module',
+  };
+  const modules = [
+    {
+      path: '/tmp/jsdoc-examples/bad-import.ts',
+      block: block(moduleOwner, 'import "missing";', 1),
+    },
+    {
+      path: '/tmp/jsdoc-examples/unbound-name.ts',
+      block: block(moduleOwner, 'void missing;', 2),
+    },
+    {
+      path: '/tmp/jsdoc-examples/type-error.ts',
+      block: block(moduleOwner, 'const value: string = 1;', 3),
+    },
+  ];
+  const plain = [
+    'TS2307 [ERROR]: Cannot find module.',
+    '    at file:///tmp/jsdoc-examples/bad-import.ts:3:1',
+    'TS2304 [ERROR]: Cannot find name.',
+    '    at file:///tmp/jsdoc-examples/unbound-name.ts:3:1',
+    'TS2345 [ERROR]: Argument is not assignable.',
+    '    at file:///tmp/jsdoc-examples/type-error.ts:3:1',
+  ].join('\n');
+  const colored = plain
+    .replaceAll(/TS(\d+)/g, '\u001b[31mTS$1\u001b[0m')
+    .replaceAll(
+      /file:\/\/\/tmp\/jsdoc-examples\/[^:]+:\d+:\d+/g,
+      '\u001b[36m$&\u001b[0m',
+    );
+
+  const withoutColor = classifyDenoCheckDiagnostics(plain, modules);
+  const withColor = classifyDenoCheckDiagnostics(colored, modules);
+  assertEquals(withColor, withoutColor);
+  assertEquals(withColor.census, { badSpecifier: 1, typeError: 1, unboundName: 1 });
+  assertEquals(
+    withColor.deferredExamples.map((example) => ({
+      failureClass: example.failureClass,
+      fenceOrdinal: example.fenceOrdinal,
+      tsCodes: example.tsCodes,
+    })),
+    [
+      { failureClass: 'unboundName', fenceOrdinal: 2, tsCodes: [2304] },
+      { failureClass: 'typeError', fenceOrdinal: 3, tsCodes: [2345] },
+    ],
+  );
+});
+
+Deno.test('a diagnostic no example owns is reported even when siblings are classified', () => {
+  const owned = '/tmp/x/examples/1/example.ts';
+  const raw = [
+    "TS2304 [ERROR]: Cannot find name 'nope'.",
+    'const a = nope;',
+    `    at ${owned}:3:11`,
+    '',
+    "TS2451 [ERROR]: Cannot redeclare block-scoped variable 'dup'.",
+    'declare const dup: number;',
+    '    at /tmp/x/examples/1/preamble.ts:3:9',
+  ].join('\n');
+
+  // The owned diagnostic classifies, which is exactly the condition that used to suppress the
+  // unowned one: `unclassifiedCompilerFailure` only fires when nothing at all classified.
+  const unowned = unattributedDiagnostics(raw, [{ path: owned }]);
+  assertEquals(unowned.length, 1);
+  assert(unowned[0]?.startsWith('TS2451 at /tmp/x/examples/1/preamble.ts'));
+});
+
+Deno.test('every diagnostic an example owns is attributed, none reported as unowned', () => {
+  const owned = '/tmp/x/examples/7/example.ts';
+  const raw = [
+    "TS2322 [ERROR]: Type 'number' is not assignable to type 'string'.",
+    'const a: string = 1;',
+    `    at file://${owned}:4:7`,
+    '',
+    "TS2304 [ERROR]: Cannot find name 'missing'.",
+    'missing();',
+    `    at ${owned}:5:1`,
+  ].join('\n');
+  assertEquals(unattributedDiagnostics(raw, [{ path: owned }]), []);
+});
+
+Deno.test('a documented value binds module-scoped, so it cannot leak into sibling examples', () => {
+  const owner: JsdocExampleOwner = {
+    memberName: '@netscript/plugin',
+    memberRoot: 'packages/plugin',
+    sourcePath: 'packages/plugin/src/adapter/item/substitute.ts',
+    kind: 'symbol',
+    symbol: 'substituteTokens',
+    publicSpecifier: '@netscript/plugin/adapter',
+    declarationKind: 'value',
+  };
+  const block = {
+    owner,
+    body: 'const source = substituteTokens(stub, { NAME: 1 });\n',
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+
+  const binding = exampleSymbolImport(block);
+  // A real import is scoped to the one example module. A `declare global` const would be visible to
+  // every other example in the same `deno check` program, which is how examples used to resolve
+  // symbols they never imported.
+  assertEquals(binding, 'import { substituteTokens } from "@netscript/plugin/adapter";');
+  assert(!binding?.includes('declare global'));
+});
+
+Deno.test('an example that already binds the symbol gets no second binding', () => {
+  const owner: JsdocExampleOwner = {
+    memberName: '@netscript/plugin',
+    memberRoot: 'packages/plugin',
+    sourcePath: 'packages/plugin/src/adapter/item/substitute.ts',
+    kind: 'symbol',
+    symbol: 'substituteTokens',
+    publicSpecifier: '@netscript/plugin/adapter',
+    declarationKind: 'value',
+  };
+  const imported = {
+    owner,
+    body: "import { substituteTokens } from '@netscript/plugin/adapter';\nsubstituteTokens();\n",
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+  assertEquals(exampleSymbolImport(imported), undefined);
+
+  const declared = {
+    owner,
+    body: 'const substituteTokens = () => 1;\n',
+    exampleOrdinal: 1,
+    fenceOrdinal: 1,
+    compilationExtension: 'ts',
+  } as unknown as JsdocExampleBlock;
+  assertEquals(exampleSymbolImport(declared), undefined);
+});
+
+Deno.test('an example using a value documented elsewhere, without importing it, is not resolved by that other example', async () => {
+  // The property, exercised through the real materialize + `deno check` path rather than through the
+  // generated binding string: under the previous `declare global` preamble the second block below
+  // compiled, because the first block's ambient const was visible program-wide. Asserting only the
+  // binding string would pass even if the import stopped being injected into the example module.
+  const documented = block(
+    owner('substituteTokens', 'value', '@netscript/plugin/adapter'),
+    "const stub = defineStub({ source: '%%N%%', tokens: ['N'] as const });\nvoid substituteTokens(stub, { N: 'x' });\n",
+  );
+  const borrower = block(
+    owner('defineStub', 'value', '@netscript/plugin/adapter'),
+    // References `substituteTokens` — documented by the block above — without importing it.
+    "const stub = defineStub({ source: '%%N%%', tokens: ['N'] as const });\nvoid substituteTokens(stub, { N: 'x' });\n",
+  );
+
+  const result = await compileJsdocExamples(analysis([documented, borrower]), repositoryRoot);
+  const borrowed = result.deferredExamples.filter((entry) =>
+    entry.owner.symbol === 'defineStub' && entry.failureClass === 'unboundName'
+  );
+  assertEquals(
+    borrowed.length,
+    1,
+    'the borrowing example must be classified, not silently resolved',
+  );
+  assert(
+    borrowed[0]?.tsCodes.includes(2304),
+    'the borrowed symbol must be reported as an unbound name',
+  );
+});

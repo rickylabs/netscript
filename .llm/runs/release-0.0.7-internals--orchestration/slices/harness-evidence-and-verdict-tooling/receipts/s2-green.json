@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-read",
+    "--allow-env",
+    ".llm/tools/agentic/lib/agentic-lib_test.ts",
+    ".llm/tools/agentic/openhands/phase-eval-workflow_test.ts"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-harness-evidence",
+  "exitCode": 0,
+  "durationMs": 1222,
+  "summary": {
+    "passed": 81,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 81,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

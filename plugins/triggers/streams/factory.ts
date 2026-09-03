@@ -38,21 +38,18 @@ export type TriggersStreamDBOptions = Readonly<{
  *
  * @example
  * ```ts
- * import { createTriggersStreamDB } from '@plugins/triggers/streams';
- * import { useLiveQuery } from '@tanstack/react-db';
+ * import { createTriggersStreamDB } from '@netscript/plugin-triggers/streams';
  *
- * const triggersDb = createTriggersStreamDB({ baseUrl: 'http://localhost:4437' });
+ * declare const streamsServiceUrl: string;
  *
- * const { data: detected } = useLiveQuery((q) =>
- *   q.from({ t: triggersDb.collections.triggerEvent })
- *     .where(({ t }) => t.status === 'detected')
- * );
+ * const triggersDb = createTriggersStreamDB({ baseUrl: streamsServiceUrl });
+ * const events = triggersDb.collections.triggerEvent;
+ * void events;
  * ```
  */
 export function createTriggersStreamDB(
   options: TriggersStreamDBOptions = {},
 ): TriggersStreamDB {
-  const baseUrl = options.baseUrl ?? 'http://localhost:4437';
   const state = createStateSchema<TriggersStreamDefinition>({
     triggerEvent: {
       schema: TriggerStreamEntitySchema,
@@ -63,7 +60,7 @@ export function createTriggersStreamDB(
 
   return createStreamDB({
     streamOptions: {
-      url: buildStreamUrl('/triggers/events', baseUrl),
+      url: buildStreamUrl('/triggers/events', options.baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },

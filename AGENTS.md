@@ -167,6 +167,15 @@ writing.
 
 ## Validation
 
+Aspire static checks target maintained framework source, shipped resources, and documentation.
+Exclude `.llm/runs/**` (including the checker-owning run), `.llm/tmp/**`, generated agent working
+copies under `.agents/generated/**`, and transient cache/dependency/runtime state through the shared
+Aspire scan-scope policy. These exclusions do not remove or untrack the retained harness evidence.
+Do not exempt shipped generated framework source or replace functional release/runtime gates with
+a repository text sweep.
+An explicit generated-project acceptance scan uses `check-aspire-host-ports --generated-project`
+so its scaffold is still tested even when created under scratch; internal run/temp files stay excluded.
+
 Run the smallest validation that proves the change. For targeted `deno check` commands that touch
 workspace code, include `--unstable-kv`.
 
@@ -234,7 +243,7 @@ doctor.
 OpenHands PR trigger template for this gate:
 
 ```text
-@openhands-agent model=openrouter/qwen/qwen3.8-max output=pr-comment
+@openhands-agent model=openrouter/qwen/qwen3.8-flash output=pr-comment
 run the full scaffold runtime E2E smoke for this PR.
 
 Use this single one-pass command from the repository root:
@@ -243,6 +252,9 @@ deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 
 Do not split this into individual gate commands. Report the raw exit code and summarize failing suite/test names if any. Preserve lock hygiene: do not commit deno.lock or source churn unless the run explicitly requires a reviewed fix.
 ```
+
+OpenHands does not currently expose reasoning-effort attestation. Its workflow comments and
+summaries must state that limitation; do not claim `max` effort for an OpenHands run.
 
 This gate is expensive. Do not run it for every intermediate implementation loop; run it during the
 evaluator/merge-readiness pass or when explicitly requested.

@@ -1,0 +1,495 @@
+/**
+ * aspire-surface-manifest.ts — reproducible, sorted disposition manifest for every tracked path
+ * that mentions Aspire (case-insensitive) outside the excluded trees.
+ *
+ * Inclusion rule (exact commands reproduced by this script):
+ *   git grep -il --extended-regexp 'aspire' -- ':!node_modules' ':!deno.lock' ':!.llm/runs' ':!.llm/tmp'
+ * Every matching tracked path is then assigned exactly one owner/disposition by the FIRST matching
+ * rule below (rules are ordered; a path never gets two rows). `.llm/runs/**` and `.llm/tmp/**` are
+ * excluded entirely, including this run's own evidence. Transient working copies are also excluded
+ * by the shared Aspire scan scope. The committed files are retained; exclusion is not deletion.
+ * Parity semantics per class: owner `archival` → info only; class `compat-fixture` → phase 2 checks
+ * that a 13.5.3 case exists beside the kept 13.4.6 case; class `lockfile` → excluded from literal
+ * sweeps; negative-version-guard → ignore only its narrowly recognized context,
+ * then fail on every remaining stale literal; every other row → phase 2 fail on a stale literal.
+ *
+ * Run from the repository root:
+ *   deno run --allow-run=git --allow-write=.llm/runs/research-aspire-13.5-adoption--0.0.7 \
+ *     .llm/runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts
+ * Output: aspire-surface-manifest.tsv (sorted by path; columns: path, class, owner, disposition).
+ */
+
+import { isTransientAspireScanPath } from '../../../tools/validation/aspire-scan-scope.ts';
+
+const RUN_DIR = '.llm/runs/research-aspire-13.5-adoption--0.0.7';
+
+type Rule = {
+  readonly test: (p: string) => boolean;
+  readonly cls: string;
+  readonly owner: string;
+  readonly disposition: string;
+};
+
+const starts = (...prefixes: string[]) => (p: string) => prefixes.some((x) => p.startsWith(x));
+const re = (r: RegExp) => (p: string) => r.test(p);
+
+/** Ordered rules — first match wins. */
+const RULES: readonly Rule[] = [
+  // ---- archival exemptions (never rewritten by the epic) ----
+  {
+    test: re(/(^|\/)deno\.lock$/),
+    cls: 'lockfile',
+    owner: 'N/A',
+    disposition:
+      'dependency lock; any version literal belongs to an unrelated package; excluded from literal sweeps in both parity phases (lock hygiene per AGENTS.md)',
+  },
+  {
+    test: starts('resources/design/'),
+    cls: 'archival:design-corpus',
+    owner: 'archival',
+    disposition: 'exempt — design evidence; parity gate reports info only',
+  },
+  {
+    test: starts('docs/site/_plan/'),
+    cls: 'archival:docs-plan',
+    owner: 'archival',
+    disposition: 'exempt — documentation planning corpus',
+  },
+  {
+    test: starts('rfcs/'),
+    cls: 'archival:rfc',
+    owner: 'archival',
+    disposition: 'exempt — RFC body; dated addenda only',
+  },
+  {
+    test: re(/(^|\/)[^/]*13\.4\.6[^/]*$/),
+    cls: 'archival:version-suffixed-fixture',
+    owner: 'archival',
+    disposition: 'exempt — 13.4.6 compat fixture kept beside the 13.5.3 capture (S3)',
+  },
+  {
+    test: re(/agent\/init\/fixtures\/prior-release\.mcp\.json$/),
+    cls: 'archival:migration-fixture',
+    owner: 'archival',
+    disposition: 'exempt — tests migration from a release without the aspire MCP entry',
+  },
+  {
+    test: starts('.llm/harness/debt/'),
+    cls: 'archival:debt-registry',
+    owner: 'archival',
+    disposition:
+      'exempt — dated debt entries are historical evidence; S1/S2/S4 append/update their own entries (Browsers preview, CommunityToolkit Deno, otel discovery) without rewriting older ones',
+  },
+  {
+    test: re(
+      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|packages\/mcp\/tests\/fixtures\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/aspire-13\.5\.3-fixture\.ts|\.llm\/tools\/agentic\/teardown\/probes_test\.ts)$/,
+    ),
+    cls: 'compat-fixture',
+    owner: 'S3',
+    disposition:
+      'inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
+  },
+  {
+    // The parity checker's own test data and the compat-fixture test both MUST contain old
+    // literals — that is what they assert against. Classifying them by their directory made the
+    // raw sweep flag its own enforcement mechanism.
+    test: re(
+      /^\.llm\/tools\/validation\/(check-aspire-version-parity_test|check-compat-fixtures_test)\.ts$/,
+    ),
+    cls: 'compat-fixture',
+    owner: 'S7/S13',
+    disposition:
+      'validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
+  },
+  {
+    test: re(/^\.llm\/tools\/agentic\/teardown\/__fixtures__\/README\.md$/),
+    cls: 'compat-fixture',
+    owner: 'S7',
+    disposition:
+      'documents why the version-suffixed 13.4.6 teardown fixture is retained and names its 13.5.3 counterpart; parity phase 2 asserts the 13.5.3 case exists',
+  },
+  {
+    test: re(/^notes\.md$/),
+    cls: 'archival:root-notes',
+    owner: 'archival',
+    disposition: 'exempt — historical scratch notes',
+  },
+  {
+    test: re(/^\.agents\/skills\/aspire-upgrade\/SKILL\.md$/),
+    cls: 'compat-fixture',
+    owner: 'S13',
+    disposition:
+      'migration worked example and retained old/new fixtures; phase 2 requires the exact 13.5.3 counterpart',
+  },
+  {
+    test: re(/^\.llm\/tools\/docs\/check-accuracy-and-discoverability\.ts$/),
+    cls: 'negative-version-guard',
+    owner: 'S7/S13',
+    disposition:
+      'negative docs enforcement: retain only direct forbidText second-argument version literals, enforce all other references',
+  },
+  {
+    test: starts('.llm/harness/', '.llm/2026-', '.llm/README', '.llm/assets/', '.llm/devtools-'),
+    cls: 'harness-doc',
+    owner: 'archival',
+    disposition:
+      'exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)',
+  },
+  // ---- product source of truth ----
+  {
+    test: starts('packages/cli/src/kernel/constants/scaffold/'),
+    cls: 'scaffold-constants',
+    owner: 'S1',
+    disposition: 'atomic 13.5.3 pin bump (A-SCAFFOLD); parity phase 1 enforce',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/templates\/aspire\/.*_test\.ts$/),
+    cls: 'generator-test',
+    owner: 'S1/S4',
+    disposition: 'assert against constants (S1); member table + #1371 test (S4)',
+  },
+  {
+    test: starts('packages/cli/src/kernel/templates/aspire/'),
+    cls: 'generator',
+    owner: 'S4/S5/S6/S8',
+    disposition:
+      'generator re-validation (S4); ports (S5); health checks (S6); typed commands + excludeFromMcp (S8)',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/assets\/aspire\/helpers\//),
+    cls: 'template:apphost-helpers',
+    owner: 'S4/S6',
+    disposition:
+      'stale upstream anchors (S4); readiness helper (S6); regenerated into embedded.generated.ts',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/assets\/generated\/aspire\//),
+    cls: 'template:generator-snapshot',
+    owner: 'derived',
+    disposition:
+      'snapshot of generator output; regenerated by whichever generator slice lands (S4/S5/S6/S8) + gen:assets-barrel',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/assets\/.*\.generated\.ts$/),
+    cls: 'generated:barrel',
+    owner: 'derived',
+    disposition: 'deno task gen:assets-barrel; gate check:assets-barrel',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/assets\/workspace\/github\//),
+    cls: 'template:consumer-ci',
+    owner: 'S13',
+    disposition: 'pin Aspire CLI install to SCAFFOLD_VERSIONS.ASPIRE_SDK before aspire restore',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/assets\/app\/routes\/examples\/telemetry\//),
+    cls: 'template:example',
+    owner: 'S13',
+    disposition: 'dashboard-port assumption (ASPIRE_DASHBOARD_PORT ?? 18888) decision',
+  },
+  {
+    test: starts('packages/cli/src/kernel/assets/'),
+    cls: 'template:other',
+    owner: 'S11',
+    disposition: 'prose/link check only (S11 wording); no version literal',
+  },
+  {
+    test: starts('packages/cli/src/kernel/templates/workspace/'),
+    cls: 'generator:workspace',
+    owner: 'S11/S13',
+    disposition:
+      'deno.json aspire:* tasks + aspire-cli wrapper keep (S2 re-measures timeout); README generator prose (S11)',
+  },
+  {
+    test: starts('packages/cli/src/kernel/adapters/windows/environment/'),
+    cls: 'windows-env',
+    owner: 'S13',
+    disposition: 'ASPIRE_DASHBOARD_PORT default decision (same as telemetry example)',
+  },
+  {
+    test: re(/^packages\/cli\/src\/kernel\/adapters\/aspire\/aspire-(cloud|compose)-deploy-target/),
+    cls: 'cli-adapter:deploy',
+    owner: 'S4',
+    disposition:
+      'verify the 13.5 aspire publish|deploy|destroy argv contract (--apphost, --output-path, --environment, --non-interactive; docs also list --yes, --clear-cache, --pipeline-log-level, --include-exception-details) against sources; adapter tests updated; S2 V12 --help receipts (D-15)',
+  },
+  {
+    test: starts('packages/cli/src/kernel/adapters/aspire/'),
+    cls: 'cli-adapter:doctor',
+    owner: 'S4',
+    disposition:
+      'aspire ps --format Json parsing unchanged in 13.5 (BC-3 removed only ps --resources); grep-verified in the S4 member table',
+  },
+  {
+    test: starts('packages/cli/src/kernel/adapters/database/'),
+    cls: 'cli-adapter:database',
+    owner: 'S8',
+    disposition: 'typed resource commands replace ad-hoc AppHost spawn for db ops',
+  },
+  {
+    test: starts('packages/cli/src/public/features/agent/'),
+    cls: 'agent-init',
+    owner: 'S9',
+    disposition:
+      'explicit upstream --skills list; hash test; AGENTS block; .mcp.json entry proven by agent.aspire-mcp-smoke',
+  },
+  {
+    test: starts('packages/cli/src/public/adapters/agent/'),
+    cls: 'agent-init',
+    owner: 'S9',
+    disposition: 'aspire agent init delegation flags',
+  },
+  {
+    test: starts('packages/cli/e2e/'),
+    cls: 'e2e',
+    owner: 'S2/S3/S10',
+    disposition:
+      'runtime verification (S2); 13.5.3 fixtures (S3); gate upgrades + agent.aspire-mcp-smoke (S10/S9)',
+  },
+  {
+    test: starts('packages/cli/'),
+    cls: 'cli:other',
+    owner: 'S4',
+    disposition: 'grep-verified in the S4 member table; no emission change expected',
+  },
+  {
+    test: starts('packages/config/'),
+    cls: 'config-schema',
+    owner: 'S4',
+    disposition: 'AspireConfigSchema default → ./aspire/apphost.mts',
+  },
+  {
+    test: starts('packages/mcp/tests/'),
+    cls: 'mcp:fixtures',
+    owner: 'S3',
+    disposition: 'add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat',
+  },
+  {
+    test: starts('packages/mcp/'),
+    cls: 'mcp:client',
+    owner: 'S3/S11/S13',
+    disposition:
+      'Aspire CLI/dashboard client; fixtures decide adapter changes (S3); endpoint precedence docs (S11); 18888 decision (S13); publish-assets regenerated',
+  },
+  {
+    test: starts('packages/telemetry/'),
+    cls: 'telemetry-bridge',
+    owner: 'S3',
+    disposition: 'dashboard /api/telemetry adapter; untouched unless 13.5.3 fixture diff',
+  },
+  {
+    test: starts('packages/aspire/'),
+    cls: 'aspire-ports',
+    owner: 'N/A',
+    disposition:
+      'SDK-neutral ports; no public-surface change planned (jsr-audit N/A unless S6 adds a field)',
+  },
+  {
+    test: re(/^plugins\/[^/]+\/src\/aspire\//),
+    cls: 'plugin-contribution',
+    owner: 'S5/S6',
+    disposition: 'literal ports removed (S5); health registration hook (S6)',
+  },
+  {
+    test: starts('plugins/sagas/'),
+    cls: 'plugin:sagas',
+    owner: 'S5',
+    disposition: 'SagaPublisherResult redesign (jsr-audit recorded in research §15)',
+  },
+  {
+    test: starts('plugins/'),
+    cls: 'plugin:other',
+    owner: 'S5',
+    disposition: 'contribution-seam consumers; verify no literal port',
+  },
+  {
+    test: starts('packages/'),
+    cls: 'package:other',
+    owner: 'S4',
+    disposition: 'mention only (service discovery/env helpers); grep-verified, no change expected',
+  },
+  // ---- skills, corpora, prompts ----
+  {
+    test: starts('skills/'),
+    cls: 'skill:shipped',
+    owner: 'S9',
+    disposition:
+      'receipt-cited 13.5.3 text; embedded via gen:assets-barrel; parity phase 2 enforce',
+  },
+  {
+    test: starts('.agents/generated/'),
+    cls: 'skill:dogfood-bundle',
+    owner: 'S9',
+    disposition: 'regenerate via agentic:dogfood-skills',
+  },
+  {
+    test: re(/^\.(agents|claude)\/skills\/aspire\//),
+    cls: 'skill:internal-aspire',
+    owner: 'S9',
+    disposition: 'derived from skills/aspire (OF-1a) + agentic:sync-claude',
+  },
+  {
+    test: re(/^\.(agents|claude)\/skills\/codex-wsl-remote\//),
+    cls: 'skill:internal',
+    owner: 'S13',
+    disposition: 'replace 13.3.0 toolchain snapshot with toolchain.env reference',
+  },
+  {
+    test: re(/^\.(agents|claude)\/skills\/netscript-pr\//),
+    cls: 'skill:internal',
+    owner: 'archival',
+    disposition: 'exempt — historical branch-name example',
+  },
+  {
+    test: starts('.agents/', '.claude/'),
+    cls: 'skill:internal',
+    owner: 'S13',
+    disposition: 'wording check; no version literal expected',
+  },
+  // ---- CI ----
+  {
+    test: starts('.openhands/'),
+    cls: 'ci:openhands',
+    owner: 'S1',
+    disposition: 'OpenHands runner hydrates Aspire CLI from toolchain.env; parity phase 1 enforce',
+  },
+  {
+    test: starts('.github/workflows/'),
+    cls: 'ci:workflow',
+    owner: 'S1',
+    disposition: 'single 13.5.3 train, cache key, preflight; parity phase 1 enforce',
+  },
+  {
+    test: starts('.github/scripts/'),
+    cls: 'ci:policy-test',
+    owner: 'S1',
+    disposition: 'single-train assertions; parity phase 1 enforce',
+  },
+  {
+    test: starts('.github/'),
+    cls: 'ci:other',
+    owner: 'S1',
+    disposition: 'toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env',
+  },
+  // ---- agentic tooling ----
+  {
+    test: starts('.llm/tools/agentic/teardown/'),
+    cls: 'teardown',
+    owner: 'S7',
+    disposition: 'orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture',
+  },
+  {
+    test: starts('.llm/tools/'),
+    cls: 'tooling-doc',
+    owner: 'S7/S13',
+    disposition: 'CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus',
+  },
+  // ---- docs ----
+  {
+    test: re(
+      /^docs\/site\/(explanation\/aspire|quickstart\/aspire|reference\/aspire\/|orchestration-runtime\/how-to\/deploy-local-aspire)/,
+    ),
+    cls: 'doc:aspire-dedicated',
+    owner: 'S11',
+    disposition: 'version snippets must equal a fresh netscript init; parity phase 2 enforce',
+  },
+  {
+    test: starts('docs/site/_diagrams/'),
+    cls: 'doc:diagram-source',
+    owner: 'S11',
+    disposition: 'diagrams:render if S6/S8 add nodes',
+  },
+  {
+    test: starts('docs/site/assets/'),
+    cls: 'doc:generated-asset',
+    owner: 'derived',
+    disposition: 'diagrams:render output; gate diagrams:check',
+  },
+  {
+    test: starts(
+      'docs/site/_data/',
+      'docs/site/_plugins/',
+      'docs/site/_includes/',
+      'docs/site/_components/',
+    ),
+    cls: 'doc:site-infra',
+    owner: 'S11',
+    disposition: 'xref/plugin wiring; wording check only',
+  },
+  {
+    test: starts('docs/site/'),
+    cls: 'doc:public-page',
+    owner: 'S11',
+    disposition: 'prose sweep + #1000 terminology; doc:lint',
+  },
+  {
+    test: starts('docs/architecture/'),
+    cls: 'doc:doctrine',
+    owner: 'archival',
+    disposition: 'exempt — doctrine changes need their own run',
+  },
+  {
+    test: re(/^(README|CONTRIBUTING|AGENTS)\.md$/),
+    cls: 'doc:root',
+    owner: 'S11',
+    disposition: 'prose sweep (AGENTS.md only if skill path changes)',
+  },
+  {
+    test: re(/^deno\.jsonc?$/),
+    cls: 'root-config',
+    owner: 'S1/S13',
+    disposition: 'task wiring for check:aspire-version-parity (S1) and phase-2 flip (S13)',
+  },
+];
+
+async function gitGrep(pathspecs: string[]): Promise<string[]> {
+  const out = await new Deno.Command('git', {
+    args: ['grep', '-il', '--extended-regexp', 'aspire', '--', ...pathspecs],
+    stdout: 'piped',
+  }).output();
+  return new TextDecoder().decode(out.stdout).split('\n').filter(Boolean);
+}
+
+/** Reproducible manifest content plus paths missing an ownership rule. */
+export interface AspireSurfaceManifestBuild {
+  readonly body: string;
+  readonly rows: readonly string[];
+  readonly unmatched: readonly string[];
+}
+
+/** Build the current tracked Aspire surface manifest without writing it. */
+export async function buildAspireSurfaceManifest(): Promise<AspireSurfaceManifestBuild> {
+  const paths = (await gitGrep([':!node_modules', ':!deno.lock', ':!.llm/runs', ':!.llm/tmp']))
+    .filter((path) => !isTransientAspireScanPath(path));
+  const rows: string[] = [];
+  const unmatched: string[] = [];
+  for (const path of paths) {
+    const rule = RULES.find((candidate) => candidate.test(path));
+    if (!rule) {
+      unmatched.push(path);
+      continue;
+    }
+    rows.push([path, rule.cls, rule.owner, rule.disposition].join('\t'));
+  }
+  rows.sort((left, right) => left.localeCompare(right, 'en'));
+  const header = 'path\tclass\towner\tdisposition';
+  return { body: [header, ...rows].join('\n') + '\n', rows, unmatched };
+}
+
+if (import.meta.main) {
+  const manifest = await buildAspireSurfaceManifest();
+  await Deno.writeTextFile(`${RUN_DIR}/aspire-surface-manifest.tsv`, manifest.body);
+  const byClass = new Map<string, number>();
+  for (const row of manifest.rows) {
+    const className = row.split('\t')[1];
+    byClass.set(className, (byClass.get(className) ?? 0) + 1);
+  }
+  console.log(`rows=${manifest.rows.length} unmatched=${manifest.unmatched.length}`);
+  for (const [className, count] of [...byClass.entries()].sort()) {
+    console.log(`${count}\t${className}`);
+  }
+  if (manifest.unmatched.length) {
+    console.error('UNMATCHED:\n' + manifest.unmatched.join('\n'));
+    Deno.exit(1);
+  }
+}

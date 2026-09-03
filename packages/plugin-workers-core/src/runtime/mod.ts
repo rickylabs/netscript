@@ -13,6 +13,13 @@ import {
 import type { RuntimeJobKvKeyFactories } from './runtime-types.ts';
 
 export { DEFAULT_TOPIC, SSEEventTypes };
+export { JobPayloadValidationError, validateJobPayload } from '../domain/mod.ts';
+export type {
+  JobHandlerDefinition,
+  JobPayloadSchema,
+  PublicStandardSchema,
+} from '../domain/mod.ts';
+export type { JobPayloadMap, JobPayloadOf } from '../public/root.ts';
 // Canonical execution status / trigger enums. Re-exported from the runtime
 // entrypoint so consumer ports (e.g. the worker `WorkerExecutionState`) can
 // type `status` / `triggeredBy` with the same enums the runtime records carry,

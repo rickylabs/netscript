@@ -1,0 +1,20 @@
+S8 Phase-B Aspire process/count evidence
+
+Lease preflight at 2026-08-30T18:42:56Z:
+  aspire ps --format Json --nologo --non-interactive
+  []
+  exact AppHost count: 0
+
+Post-suite at 2026-08-30T18:49:18Z:
+  aspire ps --format Json --nologo --non-interactive
+  []
+  exact AppHost count: 0
+
+Final at 2026-08-30T18:51:35Z:
+  aspire ps --format Json --nologo --non-interactive
+  []
+  exact AppHost count: 0
+
+The suite failed at generated.quality-negative before runtime.typed-db-phase-b, so its intended
+resident-AppHost before/after count assertion did not execute. This receipt does not substitute the
+missing live gate evidence; it records the exact external zero observations bracketing the one pass.

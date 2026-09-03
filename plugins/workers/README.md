@@ -28,9 +28,9 @@ binds them to a NetScript host.
 - **A real operations surface** — the plugin CLI covers the job lifecycle end to end: `add-job`,
   `add-task`, `add-workflow`, `run`, `run-task`, `list-jobs`, `executions`, `logs`, `trigger`,
   `enable`/`disable`, and `compile-registry`.
-- **Workers API included** — the `workers-api` service (default port `8091`) exposes job and
-  execution introspection over a versioned contract, so dashboards and agents query state instead of
-  scraping logs.
+- **Workers API included** — the `workers-api` service uses an Aspire-allocated endpoint and exposes
+  job and execution introspection over a versioned contract, so dashboards and agents query state
+  instead of scraping logs.
 - **Durable by default** — `./streams` publishes execution and job entities to durable stream
   topics, and worker metrics flow through the shared NetScript telemetry conventions.
 - **Aspire-native** — `./aspire` contributes the worker resources to the AppHost, so local
@@ -41,7 +41,7 @@ binds them to a NetScript host.
 ```mermaid
 flowchart LR
     M["workersPlugin<br/>(manifest: services, schema,<br/>topics, Aspire resources)"] --> H["NetScript host<br/>(plugin install + sync)"]
-    H --> A["workers-api<br/>:8091"]
+    H --> A["workers-api<br/>Aspire-allocated endpoint"]
     H --> W["Worker + Scheduler<br/>processes"]
     W --> R["Runtimes<br/>Deno · PowerShell · Python · shell"]
     W --> S["Durable streams<br/>executions · jobs"]
@@ -76,13 +76,50 @@ deno x -A jsr:@netscript/plugin-workers@<version>/cli list-jobs
 Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line.
 
+## Generated job policy
+
+`netscript generate plugins` discovers worker modules from the installed plugin's
+`scaffold.runtime.json`, then reads project policy from `netscript.config.ts`. The manifest owns
+discovery metadata only; it is never a second policy store. Validation and defaults remain owned by
+`@netscript/plugin-workers-core/config`, and the registry generator consumes that normalized result.
+
+Policy binds to a discovered module by its normalized project-relative entrypoint. The configured
+source must agree with discovery, and a plugin-owned handler's exported id must agree with its
+configured id; unmatched or conflicting paths, ids, and sources stop generation with a diagnostic.
+Discovered jobs with no config entry retain the generic registry defaults for compatibility.
+
+Grouped jobs are canonical. When `workers.groups[].jobs[]` and legacy `workers.jobs[]` declare the
+same id and entrypoint, the grouped definition wholly shadows the flat definition, including its
+group topic and every policy field. A partial collision—same id at another path or the same path
+with another id—is an error rather than an order-dependent merge.
+
+```typescript
+export default {
+  name: 'orders',
+  databases: { config: [] },
+  workers: {
+    jobsDir: './workers/jobs',
+    groups: [{
+      topic: 'billing',
+      jobs: [{
+        id: 'reconcile-invoices',
+        name: 'Reconcile invoices',
+        entrypoint: './reconcile-invoices.ts',
+        priority: 80,
+        maxConcurrency: 2,
+      }],
+    }],
+  },
+};
+```
+
 ## Quick example
 
 Install the plugin, then list the jobs it manages:
 
 ```bash
 $ netscript plugin install worker --name workers
-Installed worker plugin "workers" on port 8091.
+Installed worker plugin "workers" on port <allocated-port>.
 Created 4 plugin files.
 Regenerated 12 Aspire helper files.
 
@@ -100,10 +137,10 @@ import { workersPlugin } from '@netscript/plugin-workers';
 
 console.log(workersPlugin.name); // "@netscript/plugin-workers"
 
-// Declared service contributions (the Workers API runs on port 8091).
+// Declared service contributions (the Workers API port is allocated by Aspire).
 const service = workersPlugin.contributions.services?.[0];
 console.log(service?.name); // "workers-api"
-console.log(service?.port); // 8091
+console.log(service?.port); // undefined unless explicitly pinned
 ```
 
 ## Public surface
@@ -113,7 +150,7 @@ console.log(service?.port); // 8091
 | `.`           | `workersPlugin` — the typed `PluginManifest` with every contribution axis  |
 | `./cli`       | The workers command group (`add-job`, `run`, `list-jobs`, `executions`, …) |
 | `./worker`    | The `Worker` consumer and cron `Scheduler` runtime classes                 |
-| `./services`  | The Workers API service composition (`workers-api`, port `8091`)           |
+| `./services`  | The Workers API service composition (`workers-api`, Aspire-allocated port) |
 | `./streams`   | Durable-stream factory for execution and job entities                      |
 | `./aspire`    | The workers Aspire contribution for the AppHost                            |
 | `./contracts` | The versioned workers API contract generated registries bind against       |

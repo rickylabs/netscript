@@ -40,6 +40,11 @@ await Deno.mkdir(join(options.projectRoot, 'dotnet/AppHost'), { recursive: true 
 const workersSpecifier = `jsr:@netscript/plugin-workers@${options.packageVersion}`;
 const streamsSpecifier = `jsr:@netscript/plugin-streams@${options.packageVersion}`;
 await writeJson(join(options.projectRoot, 'deno.json'), {
+  // Test-harness only: the nested registry generator reads this project deno.json, and Deno's
+  // default 24h minimum dependency age rejects a just-published canary (#1966). The outer CLI
+  // receives --minimum-dependency-age=0 on its own command line, but that flag does not reach the
+  // nested generator process. Product supply-chain policy is untouched.
+  minimumDependencyAge: 0,
   imports: {
     '@netscript/config': `jsr:@netscript/config@${options.packageVersion}`,
     '@netscript/plugin-workers': workersSpecifier,
@@ -79,13 +84,11 @@ const appsettings = {
         Enabled: true,
         Entrypoint: `${workersSpecifier}/services`,
         Workdir: '.',
-        Port: 8091,
       },
       streams: {
         Enabled: true,
         Entrypoint: `${streamsSpecifier}/services`,
         Workdir: '.',
-        Port: 4437,
       },
     },
     BackgroundProcessors: {
@@ -115,6 +118,11 @@ const generate = await runCli(options, [
 ]);
 if (generate.code !== 0) {
   failures.push(`generate plugins exited ${generate.code}: ${generate.output}`);
+}
+if (
+  /exited (?:with )?(?:code )?[1-9]|minimum dependency age|dependency age/i.test(generate.output)
+) {
+  failures.push(`nested registry generation did not exit 0: ${generate.output}`);
 }
 const registryPath = join(options.projectRoot, REGISTRY_PATH);
 const registry = await readOptional(registryPath);

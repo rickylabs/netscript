@@ -1,0 +1,117 @@
+{
+  "checks": [
+    {
+      "category": "aspire",
+      "name": "cli-version",
+      "status": "pass",
+      "message": "Aspire CLI version 13.5.3 (channel: stable)",
+      "metadata": {
+        "currentVersion": "13.5.3",
+        "identityChannel": "stable"
+      }
+    },
+    {
+      "category": "environment",
+      "name": "operating-system",
+      "status": "pass",
+      "message": "Operating system: Linux Ubuntu 24.04",
+      "metadata": {
+        "osType": "Linux",
+        "displayName": "Linux Ubuntu",
+        "version": "24.04",
+        "description": "Ubuntu 24.04.1 LTS"
+      }
+    },
+    {
+      "category": "environment",
+      "name": "wsl",
+      "status": "pass",
+      "message": "WSL2 environment detected",
+      "details": "If you experience container connectivity issues, ensure Docker Desktop WSL integration is enabled."
+    },
+    {
+      "category": "sdk",
+      "name": "dotnet-sdk",
+      "status": "pass",
+      "message": ".NET 10.0.111 installed (x64)"
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs",
+      "status": "warning",
+      "message": "HTTPS development certificate is only partially trusted",
+      "fix": "Set SSL_CERT_DIR in your shell profile: export SSL_CERT_DIR=\"$SSL_CERT_DIR:/usr/lib/ssl/certs:/home/codex/.aspnet/dev-certs/trust\"",
+      "link": "https://aka.ms/aspire-prerequisites#dev-certs",
+      "details": "The certificate is in the trusted store, but SSL_CERT_DIR is not configured to include '/home/codex/.aspnet/dev-certs/trust'. Some applications may not trust the certificate. 'aspire run' will configure this automatically.",
+      "metadata": {
+        "certificates": [
+          {
+            "thumbprint": "92FDB71F7F9FDC3466206A51C6D899E4B06FC9CD",
+            "version": 6,
+            "trustLevel": "partial",
+            "notBefore": "2026-06-13T19:05:41.0000000+02:00",
+            "notAfter": "2027-06-13T19:05:41.0000000+02:00"
+          }
+        ]
+      }
+    },
+    {
+      "category": "environment",
+      "name": "dev-certs-certutil",
+      "status": "warning",
+      "message": "certutil is not available; browser certificate trust may be incomplete",
+      "fix": "Install certutil from your distribution's NSS tools package (for example, libnss3-tools).",
+      "link": "https://aka.ms/aspire-prerequisites#dev-certs",
+      "details": "Aspire uses certutil to query and update NSS certificate databases used by Firefox and Chromium browsers on Linux."
+    },
+    {
+      "category": "container",
+      "name": "docker",
+      "status": "pass",
+      "message": "Docker v29.1.3: running (auto-detected (default)) ← active"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-ephemeral-certificate",
+      "status": "pass",
+      "message": "Developer Control Plane (DCP) connection using an ephemeral DCP-managed certificate succeeded"
+    },
+    {
+      "category": "aspire",
+      "name": "dcp-developer-certificate",
+      "status": "warning",
+      "message": "No trusted developer certificate was available for the Developer Control Plane (DCP) developer certificate connection check",
+      "fix": "Run `aspire certs trust` to create and trust a developer certificate.",
+      "details": "No fully trusted exportable developer certificate with a private key was found."
+    },
+    {
+      "category": "devtools",
+      "name": "vscode-extension",
+      "status": "warning",
+      "message": "VS Code is installed, but the Aspire extension is not installed",
+      "fix": "Install the Aspire extension from the VS Code Marketplace for an integrated Aspire experience.",
+      "link": "https://aka.ms/aspire/vscode-extension",
+      "metadata": {
+        "vsCodeInstalled": true,
+        "extensionInstalled": false,
+        "extensionId": "microsoft-aspire.aspire-vscode"
+      }
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "warnings": 4,
+    "failed": 0
+  },
+  "installations": [
+    {
+      "path": "/home/codex/.dotnet/tools/.store/aspire.cli/13.5.3/aspire.cli.linux-x64/13.5.3/tools/net10.0/linux-x64/aspire",
+      "canonicalPath": "/home/codex/.dotnet/tools/.store/aspire.cli/13.5.3/aspire.cli.linux-x64/13.5.3/tools/net10.0/linux-x64/aspire",
+      "version": "13.5.3+b5f143315ffb6968ea939a9978797a5b20e4c688",
+      "channel": "stable",
+      "route": "dotnet-tool",
+      "pathStatus": "active",
+      "status": "ok"
+    }
+  ]
+}

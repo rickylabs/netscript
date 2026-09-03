@@ -12,8 +12,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
-  type JobHandlerContext,
-  type JobResult,
+  type JobHandlerDefinition,
+  type JobPayloadSchema,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { z } from 'zod';
@@ -22,7 +22,12 @@ import { z } from 'zod';
 // PAYLOAD SCHEMA
 // ============================================================================
 
-const StagedCleanupPayloadSchema = z.object({
+type StagedCleanupPayload = Readonly<{
+  filePath: string;
+  fileName: string;
+}>;
+
+const StagedCleanupPayloadSchema: JobPayloadSchema<StagedCleanupPayload> = z.object({
   filePath: z.string().min(1),
   fileName: z.string().min(1),
 });
@@ -31,37 +36,38 @@ const StagedCleanupPayloadSchema = z.object({
 // JOB HANDLER
 // ============================================================================
 
-type StagedCleanupJobHandler = (
-  context: JobHandlerContext,
-) => JobResult<unknown> | Promise<JobResult<unknown>>;
+type StagedCleanupJobHandler = JobHandlerDefinition<StagedCleanupPayload>;
 
-const handler: StagedCleanupJobHandler = defineJobHandler(async (ctx) => {
-  const payload = StagedCleanupPayloadSchema.parse(ctx.payload ?? {});
-  const { log } = createJobTools(ctx);
-  const { filePath, fileName } = payload;
+const handler: StagedCleanupJobHandler = defineJobHandler<StagedCleanupPayload, unknown>(
+  StagedCleanupPayloadSchema,
+  async (ctx) => {
+    const payload = ctx.payload;
+    const { log } = createJobTools(ctx);
+    const { filePath, fileName } = payload;
 
-  log.info('Starting staged file cleanup', { filePath, fileName });
+    log.info('Starting staged file cleanup', { filePath, fileName });
 
-  try {
-    const stat = await Deno.stat(filePath);
-    await Deno.remove(filePath);
-    log.info('Staged file removed', { filePath, size: stat.size });
+    try {
+      const stat = await Deno.stat(filePath);
+      await Deno.remove(filePath);
+      log.info('Staged file removed', { filePath, size: stat.size });
 
-    return createSuccessResult({
-      fileName,
-      filePath,
-      size: stat.size,
-      removedAt: new Date().toISOString(),
-    });
-  } catch (error: unknown) {
-    if (error instanceof Deno.errors.NotFound) {
-      log.info('Staged file already gone', { filePath });
-      return createSuccessResult({ fileName, filePath, alreadyGone: true });
+      return createSuccessResult({
+        fileName,
+        filePath,
+        size: stat.size,
+        removedAt: new Date().toISOString(),
+      });
+    } catch (error: unknown) {
+      if (error instanceof Deno.errors.NotFound) {
+        log.info('Staged file already gone', { filePath });
+        return createSuccessResult({ fileName, filePath, alreadyGone: true });
+      }
+      const msg = error instanceof Error ? error.message : String(error);
+      return createFailureResult(`Failed to clean up staged file: ${msg}`);
     }
-    const msg = error instanceof Error ? error.message : String(error);
-    return createFailureResult(`Failed to clean up staged file: ${msg}`);
-  }
-});
+  },
+);
 
 const stagedCleanupJob:
   & StagedCleanupJobHandler

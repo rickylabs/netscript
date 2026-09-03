@@ -7,8 +7,10 @@
  * @example Define a worker job
  * ```ts
  * import { defineJob } from "@netscript/plugin-workers-core";
+ * import { z } from "zod";
  *
  * const job = defineJob("send-email")
+ *   .payload(z.object({ to: z.string().email() }))
  *   .entrypoint("./workers/jobs/send-email.ts")
  *   .build();
  * ```
@@ -36,8 +38,14 @@ export type { JobTools, JobToolSpan } from './src/telemetry/job-tools.ts';
 export type {
   JobBuilder,
   JobDefinition,
+  JobHandler,
   JobHandlerContext,
+  JobHandlerDefinition,
+  JobPayloadMap,
+  JobPayloadOf,
+  JobPayloadSchema,
   JobResult,
+  PublicStandardSchema,
   TaskBuilder,
   TaskDefinition,
   WorkflowBuilder,
