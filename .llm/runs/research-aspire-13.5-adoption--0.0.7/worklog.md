@@ -981,3 +981,14 @@ the merge.**
   `readme.quickstart` suite (verbatim, once, no retries), drift test, executable readiness line
   (`aspire wait`), `e2e-cli-prod.yml` step as a separate last commit (workflow-scoped push by the
   supervisor), cleanup doctrine inherited. No local runtime; no Canary 8 mutation. Issue → `status:impl`.
+
+## 2026-09-03 00:1xZ — #1952 packet withdrawn pending convergence (coordinator ruling)
+
+- Coordinator: do not merge #1952 at `478450a3c` — its latest `quality` is red for lack of the
+  #1953/#1962 manifest convergence. The IMPL-EVAL PASS stays as content evidence.
+- Prepared locally in `007-leaf-1880`, **not pushed** until Canary 8 (release run 33697398852 from
+  `79adb103b`, pinned prod E2E 33697779870 for `v0.0.7-canary.8`) completes: merge commit
+  `1a759ea34` of main `79adb103b` (auto-merged `aspire-surface-manifest.tsv` and
+  `runtime-gates_test.ts`, no conflicts); `gen:*` carrier chain re-run → no delta; five carrier /
+  manifest checks green; `run-deno-check`/`lint`/`fmt` on `packages/cli/e2e` clean; e2e tests
+  300/300. On Canary 8 completion: push, exact-head CI + tiers, new packet.
