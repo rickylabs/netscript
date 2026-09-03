@@ -16,6 +16,12 @@ import {
   type ListenerHealthReport,
   readListenerHealthReport,
 } from './verify-listener-readiness.ts';
+import { type OwnedContainerSelection, readOwnedContainerLog } from './owned-container-log.ts';
+import {
+  assertReadinessDisagreement,
+  observeReadiness,
+  type ReadinessObservation,
+} from './readiness-disagreement.ts';
 import {
   type ResourceUpdate,
   type StartResourceUpdateFollower,
@@ -59,6 +65,16 @@ interface ListenerRecoveryReceipt {
   readonly realKeyContinuity: {
     readonly duringFailure: readonly ListenerHealthReport[];
     readonly afterRecovery: readonly ListenerHealthReport[];
+  };
+  /**
+   * #863 gate 2 (#1880): the container log and the unhealthy report captured at the same moment,
+   * classified. Present for the Postgres expectation only; the fault is on the test-only listener
+   * key, so the real engine keeps running and its log keeps saying ready while the report says
+   * Unhealthy — the false negative, reproduced on demand instead of recalled.
+   */
+  readonly readiness?: ReadinessObservation & {
+    readonly container: OwnedContainerSelection;
+    readonly logTail: string;
   };
 }
 
@@ -117,6 +133,10 @@ export async function verifyListenerFailureRecovery(
           'Unhealthy',
         );
 
+        const readiness = expectation.controllerListener === 'postgres'
+          ? await observeReadinessDisagreement(projectRoot, unhealthyEvidence.testOnly)
+          : undefined;
+
         await commandListenerFaultController(projectRoot, reopenedState(expectation));
         const recovery = await subscription.waitFor(
           (update) => resourceHealthIs(update, 'Healthy'),
@@ -146,6 +166,7 @@ export async function verifyListenerFailureRecovery(
             duringFailure: [unhealthyEvidence.realBacking],
             afterRecovery: [recoveredEvidence.realBacking],
           },
+          ...(readiness ? { readiness } : {}),
         });
       } finally {
         await subscription.close();
@@ -175,6 +196,22 @@ export async function verifyListenerFailureRecovery(
   await Deno.writeTextFile(receiptPath, `${JSON.stringify(receipts, null, 2)}\n`);
   console.info(`listener failure/recovery receipt: ${receiptPath}`);
   return receipts;
+}
+
+/**
+ * Quote the owned Postgres container's log next to the Unhealthy report and require the two to
+ * disagree in the gate-2 direction (log ready, listener unhealthy). An unhealthy report without a
+ * ready log is rejected by `assertReadinessDisagreement`: that would prove a failing probe, not the
+ * false negative this gate exists to reproduce.
+ */
+async function observeReadinessDisagreement(
+  projectRoot: string,
+  unhealthy: ListenerHealthReport,
+): Promise<NonNullable<ListenerRecoveryReceipt['readiness']>> {
+  const { container, log } = await readOwnedContainerLog(projectRoot, 'postgres');
+  const observation = observeReadiness(unhealthy, log);
+  assertReadinessDisagreement(observation);
+  return { ...observation, container, logTail: log.split(/\r?\n/).slice(-20).join('\n') };
 }
 
 /** Per-check evidence for one induced departure, attributed from the stream or one snapshot. */
