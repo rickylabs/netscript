@@ -8014,3 +8014,7 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - Labels: status:ready-merge applied; runtime tiers intentionally not required (owner decision)
 - Canary 9 hosted package-backed gate = post-merge admission, tracked on #1966
 - Coordinator owns close-gate repair + merge (per 01:18Z directive)
+- 01:25Z #1969 (#1906 partial) quality RED @49a5d70ac: aspire-version-parity manifestFresh:false — the
+  slice adds 4 Aspire-surface files. Merged main (ce8422e20), regenerated manifest (+4 rows) →
+  **f9406dec6** pushed. Worker thread 01a0606e idle after PR open; will steer only if CI needs it.
+- #1455: worker at e18f2abe6 (receipts recorded), no PR yet.
