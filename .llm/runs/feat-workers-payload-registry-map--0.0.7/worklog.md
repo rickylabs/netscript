@@ -65,6 +65,10 @@ Define one schema next to a job, pass it to `defineJobHandler(schema, handler)` 
 | 2026-09-03 | 1 | RED runtime | `job-payload-contract_test.ts` compiled, ran, and failed only with `Expected function to reject`; malformed wire payload reached the application handler. |
 | 2026-09-03 | 1 | RED trigger consumer | `deno check --unstable-kv workers-contract-soundness_test.ts` failed only with TS2578 on the mismatched ID/payload directive. The call shape, imports, and other controls compile. |
 | 2026-09-03 | 1 | RED generated consumer | Focused generator test emitted the current widened map; nested `deno check` failed only with TS2578 on the wrong-job payload directive. A self-contained type module excludes unrelated workspace/import failures. |
+| 2026-09-03 | 2–3 | GREEN | `c194a4145` carries schema-backed handler/enqueue validation, the literal generated definition/payload maps, and the generic workers client contract. The RED runtime test now rejects before application code, and both consumer directives are consumed by the intended ID→payload mismatch. |
+| 2026-09-03 | 4 | bounded gates | Scoped check/lint/fmt passed; workers-core/workers suites passed 108/108; generator and CLI integration suites passed 30/30; `quality:gate`, `publish:dry-run`, and `arch:check` exited 0. |
+| 2026-09-03 | 4 | documentation lint | New public symbols carry JSDoc and add no diagnostics. The bounded core command reports the accepted four pre-existing private-type references around the existing workers contract implementation; the workers package reports its pre-existing `workersPlugin`→`PluginManifest` private reference. |
+| 2026-09-03 | 4 | fenced CI blocker | Extra `deno task check:mcp-export-corpus` fails because `packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts` is stale. The canonical fix is `deno task gen:mcp-export-corpus`, but `packages/mcp/**` is outside this brief's ceiling, so it was not run and no fenced file was touched. |
 
 ## Decisions
 
@@ -93,6 +97,21 @@ Define one schema next to a job, pass it to `defineJobHandler(schema, handler)` 
 The directives are not compensating for arity, missing imports, malformed definitions, or unrelated
 type errors: the positive call sites and surrounding fixtures compile, and each nested compiler
 reported only the unused directive.
+
+### GREEN and merge-readiness receipts
+
+| Gate | Result |
+| --- | --- |
+| GREEN implementation commit | `c194a4145` |
+| `run-deno-check.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx` | PASS, 218 files, built-in `--unstable-kv` |
+| `run-deno-test.ts -- --allow-all packages/plugin-workers-core plugins/workers` | PASS, 108/108 |
+| runtime/golden + installed CLI registry-generator tests | PASS, 30/30 |
+| `run-deno-lint.ts` / `run-deno-fmt.ts`, both touched roots | PASS, 218 files |
+| `deno task quality:gate` | PASS |
+| `deno task publish:dry-run` | PASS (`Success Dry run complete`) |
+| `deno task arch:check` | PASS; warnings are the existing repository doctrine/dependency baseline |
+| `deno doc --lint` on touched package entrypoints | Expected baseline diagnostics only; no new public-symbol JSDoc diagnostics |
+| `deno task check:mcp-export-corpus` | FAIL, introduced derived-corpus staleness at the fenced `packages/mcp/**` target |
 
 ## Handoff Notes
 
