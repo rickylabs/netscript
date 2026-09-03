@@ -31,13 +31,15 @@ Archetype 6 governs because the defect is in the user-run `generate plugins` com
 
 ## Goal
 
-Make the published `generate plugins --project-root <root>` path generate every registry declared by package-backed runtime manifests regardless of invoking cwd, without weakening doctor.
+Make the release-day package-backed doctor fixture propagate its minimum-dependency-age policy to
+the nested generator through the fixture project's `deno.json`, without changing product generation
+or weakening doctor.
 
 ## Scope
 
 - Exact Canary 8 two-cwd reproduction and baseline local-source comparison.
-- A failing CLI regression against a package-backed manifest with `cwd != projectRoot`.
-- The smallest product or fixture fix supported by reproduction.
+- The existing package-backed fixture as the deterministic RED with `cwd != projectRoot`.
+- A fixture-only `minimumDependencyAge: 0` repair with hard generation and registry assertions.
 - Scoped, receipt-backed local gates and hosted/evaluator handoff.
 
 ## Non-Scope
@@ -55,16 +57,16 @@ Make the published `generate plugins --project-root <root>` path generate every 
 | ID | Decision | Rationale |
 | --- | --- | --- |
 | D1 | Treat explicit `--project-root` as authoritative; test with a distinct cwd. | This is the documented CLI contract and issue acceptance. |
-| D2 | Drive RED through the installed-runtime generator/command seam with a package-backed manifest, not through doctor. | Isolates the generator defect and preserves truthful diagnostics. |
-| D3 | Repair `packages/cli` unless direct workers-generator reproduction proves otherwise. | The ceiling and thin-plugin doctrine keep host orchestration in CLI. |
+| D2 | Drive RED through the existing package-backed doctor fixture and exact published CLI. | Exercises the release-day nested process boundary and preserves truthful diagnostics. |
+| D3 | Repair only the fixture `deno.json`; product generator and doctor code are excluded. | Exact replay proves the explicit root is honored and the nested Deno dependency-age policy is the cause. |
 | D4 | PLAN-EVAL is N/A. | This is a bounded P0 repair with canonical acceptance, ceiling, RED shape, and gate list; no architectural decision remains open. |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Product root resolver vs package-backed generator cause | must resolve now | Two-cwd published and local-source reproduction resolves it before RED is authored. |
-| Exact repair location | must resolve now | Determined from the causal trace; no speculative cross-package edit. |
+| Product root resolver vs package-backed generator cause | resolved | Both cwd values reach the package generator; nested dependency-age policy is causal. |
+| Exact repair location | resolved | Dedicated E2E fixture `deno.json` only. |
 | Hosted scaffold-runtime outcome | safe to defer | Cannot be run locally under the runtime lease rule; PR CI supplies it. |
 
 ## Risk Register
@@ -104,8 +106,8 @@ Make the published `generate plugins --project-root <root>` path generate every 
 
 | Order | Gate | Command or check | Expected result |
 | --- | --- | --- | --- |
-| 1 | RED | changed focused test through structured test wrapper | Fails for missing package-backed registry behavior before repair. |
-| 2 | GREEN | same focused test | Passes and verifies cwd independence plus generated semantic entry. |
+| 1 | RED | exact published CLI through the package-backed fixture before repair | Nested generator exits 1 on the 24-hour dependency-age policy and writes no registry. |
+| 2 | GREEN | same published CLI through the repaired fixture | Exits 0 and verifies the registry exists and contains `package-backed-job`. |
 | 3 | Static | scoped check/test/lint/fmt wrappers | Exit 0. |
 | 4 | Fitness | `deno task quality:gate` | Exit 0. |
 | 5 | JSR | focused CLI publishability/doc-surface audit appropriate to unchanged exports | No new/deepened finding. |
