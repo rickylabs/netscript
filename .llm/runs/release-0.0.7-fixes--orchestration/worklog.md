@@ -7971,3 +7971,10 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   old helper name, but #1959's generator now imports only `createEndpointListenerReadinessCheck`. Fixed
   in the fixture (+ its unit test) to use the endpoint-based API; merged main 262aa8fbe; head
   **f5100c44a** pushed. Postgres "twice consecutively" count restarts at f5100c44a.
+- #1967: OpenHands impl phase (label-triggered) pushed harness-docs-only **2fa5f60eb** on top of 11cffaabb
+  with exact-canary.8 RED (nested gen exit 1, no `.netscript/generated`) / GREEN (registry present,
+  `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS`) proof; product untouched. Hosted tiers running.
+- #1960: eval run 33699067014 failed closed (summary ambiguous, verdict artifact unpreserved) — not a
+  verdict. Labels re-cycled impl→impl-eval at 00:50Z for a fresh generation.
+- #1906 resume live: 48c32cc6c RED guard (`check-aspire-resource-polling.ts` + test). #1455 resume live,
+  no commit yet.
