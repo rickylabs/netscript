@@ -75,6 +75,8 @@ export const GATE = {
   SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION: 'scaffold.design-production-exclusion',
   SCAFFOLD_SERVICE_CLIENT_ADD: 'scaffold.service-client-add',
   SCAFFOLD_SERVICE_CLIENT_GENERATE: 'scaffold.service-client-generate',
+  SCAFFOLD_RESOURCE_GENERATE: 'scaffold.resource-generate',
+  SCAFFOLD_RESOURCE_RERUN: 'scaffold.resource-rerun',
   SCAFFOLD_AGENT_INIT: 'scaffold.agent-init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
@@ -206,7 +208,8 @@ export const GATE = {
   README_QUICKSTART_DB_INIT: 'readme.quickstart.08-db-init',
   README_QUICKSTART_DB_GENERATE: 'readme.quickstart.09-db-generate',
   README_QUICKSTART_DB_SEED: 'readme.quickstart.10-db-seed',
-  README_QUICKSTART_CURL_HEALTH: 'readme.quickstart.11-curl-health',
+  README_QUICKSTART_ASPIRE_WAIT_USERS: 'readme.quickstart.11-aspire-wait-users',
+  README_QUICKSTART_CURL_HEALTH: 'readme.quickstart.12-curl-health',
 } as const;
 
 /** Generated Aspire resource ids waited on by the scaffold plugin suite. */

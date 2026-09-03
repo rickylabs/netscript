@@ -75,7 +75,8 @@ service answers on its health probe (replace `<port>` with the port assigned to 
 scaffold console output or Aspire dashboard):
 
 ```bash
-curl http://localhost:<port>/health
+aspire wait users --status healthy --timeout 60 --apphost aspire/apphost.mts
+curl --fail-with-body --show-error --max-time 15 http://localhost:<port>/health
 # {"status":"healthy","timestamp":"…","checks":[{"name":"database","healthy":true,"latency":2}],…}
 ```
 

@@ -1039,9 +1039,8 @@ Deno.test('live service refetch targets the same canonical page as island hydrat
       import.meta.url,
     ),
   );
-  assertStringIncludes(source, "const SERVICE_SHOWCASE_PATH = '/examples/users';");
-  assertEquals(source.includes('/examples/users?preview=success'), false);
-  assertStringIncludes(source, 'assertSettled: assertSettledRefetch');
+  assertEquals(source.includes("SERVICE_SHOWCASE_PATH = '/examples/users'"), false);
+  assertStringIncludes(source, 'probeResourceQueryRefetch(projectRoot, appName, appHost');
 });
 
 Deno.test('generated consumer imports usersQueries and paymentsQueries together without aliases', () => {

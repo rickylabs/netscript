@@ -175,5 +175,7 @@ jobs:
             .llm/tmp/readme-quickstart-prod.ndjson
             .llm/tmp/readme-quickstart/state.json
             .llm/tmp/readme-quickstart/receipts/*.json
+            .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json
+            .llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json
             ~/.aspire/logs/cli_*.log
           if-no-files-found: ignore

@@ -6,6 +6,7 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { generatedAppName } from './runtime/generated-app-name.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
+import { createResourceSliceGates } from './resource-slice-gates.ts';
 
 const DISABLE_CACHE_ARGUMENT = '--cache=false';
 
@@ -131,6 +132,7 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
         JSON.stringify(cli(context)),
       ],
     ),
+    ...createResourceSliceGates(),
     commandGate(
       GATE.SCAFFOLD_AGENT_INIT,
       'Install generated Claude agent integration',
