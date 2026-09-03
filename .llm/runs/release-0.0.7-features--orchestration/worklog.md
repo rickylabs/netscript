@@ -11054,3 +11054,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 02:02Z — #1664 target-selection repair → `3b4e2b92b` (probe + unit test only; lock ok). Waits armed; bounded delta eval dispatched. ready-merge to be applied only after both tiers conclude (labeled re-dispatch trap).
 - 02:05Z — #1664 target-delta native eval **PASS_IMPL** (predicate identical to #1885's); receipt parked. Packet awaits tiers at `3b4e2b92b`.
 - 02:17Z — **#1664 sqlite tier SUCCESS at `3b4e2b92b`** (refetch gate green on hosted runner; run 33706056406). Required green, close-gate green. Postgres tier in progress since 02:10Z; label untouched until it concludes → then ready-merge + packet.
+- 02:20Z — #1664 `3b4e2b92b` run 33706056406: sqlite GREEN; postgres 77/78 — refetch passes; `behavior.live-db-endpoint` fails because the refetch probe left the seed row renamed (`Seed User**`). Repair dispatched: restore original name after settled assertion.
