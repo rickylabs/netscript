@@ -250,3 +250,10 @@ heading and exclude the `|` form.
   Real public surface in `plugin-workers-core` (`mod.ts`, contracts v1, builders) and self-declared
   source-breaking. Added to the fold set; bullet staged in scratch `foldin-draft.md`. Ownership
   unchanged. Fold only on `merged=true` + commit on `origin/main`.
+
+## #1959 triage — 2026-09-03
+
+- #1959 `fix(e2e,aspire): diagnose and bound postgres listener readiness` (Aspire-owned,
+  `ready-merge` at `f5100c44a`, closes #1844). User-visible surface: scaffolded
+  `_aspire-compat.ts.template` gains `createEndpointListenerReadinessCheck` with an
+  `ENDPOINT_ALLOCATION_TIMEOUT` outcome. Added to the fold set; bullet staged. Ownership unchanged.
