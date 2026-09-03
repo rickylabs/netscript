@@ -1,0 +1,41 @@
+{
+  "gateId": "test",
+  "invocationId": "1906-s2-s2-focused-green",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/e2e/tests/application/gates/verify-endpoint-readiness_test.ts",
+    "packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts",
+    "packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect_test.ts",
+    "packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts",
+    "packages/cli/e2e/tests/application/builders/runtime-gates_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1906",
+  "gitHead": "9e20929a9d26f0d4eabe5358364ba423e76ac009",
+  "actualGitHead": "9e20929a9d26f0d4eabe5358364ba423e76ac009",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:3266155",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "17e1578fb19f0625abcf3bb57470293db248a0c24bea033cf440a554610848e9",
+  "lifecycleId": "worker:3266155:1906-s2-s2-focused-green:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T00:54:38.176Z",
+  "startedAt": "2026-09-03T00:54:38.178Z",
+  "finishedAt": "2026-09-03T00:54:39.325Z",
+  "durationMs": 1148,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 654,
+    "sha256": "6dd14eebf3702442068423f67b4593c76bea48734764aab8bfc721526019937b",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/cli/e2e/tests/application/gates/verify-endpoint-readiness_test.ts\",\"packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts\",\"packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect_test.ts\",\"packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts\",\"packages/cli/e2e/tests/application/builders/runtime-gates_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1906\",\"exitCode\":0,\"durationMs\":1028,\"summary\":{\"passed\":63,\"failed\":0,\"ignored\":0,\"totalResults\":63,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 486,
+    "sha256": "0d299d480f8af37a890aa91eabb7289749cc67e59d5fa8d645e62aa082996e2b",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/e2e/tests/application/gates/verify-endpoint-readiness_test.ts' 'packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts' 'packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect_test.ts' 'packages/cli/e2e/tests/application/gates/capture-db-endpoint-allocation_test.ts' 'packages/cli/e2e/tests/application/builders/runtime-gates_test.ts'\n",
+    "truncated": false
+  }
+}

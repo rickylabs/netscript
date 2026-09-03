@@ -16,6 +16,13 @@
 import { runNetscriptCli } from './bin/netscript.ts';
 
 export * from './src/public/public-api.ts';
+export {
+  generateServiceClients,
+  type GenerateServiceClientsDependencies,
+  type GenerateServiceClientsRequest,
+  type GenerateServiceClientsResult,
+  type PlannedServiceClientFile,
+} from './src/public/features/services/generate/generate-service-clients.ts';
 
 if (import.meta.main) {
   await runNetscriptCli();

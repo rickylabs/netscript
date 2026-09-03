@@ -1,0 +1,14 @@
+{
+  "scannedFiles": 739,
+  "findings": [],
+  "allowances": [
+    {
+      "path": "packages/cli/src/kernel/constants/scaffold/scaffold-packages.ts",
+      "line": 29,
+      "reason": "import-map alias key maps to an exact release target."
+    }
+  ],
+  "staleVersions": [],
+  "unknownExports": [],
+  "ranges": []
+}

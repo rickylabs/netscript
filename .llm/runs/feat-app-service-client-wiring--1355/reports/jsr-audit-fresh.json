@@ -1,0 +1,379 @@
+{
+  "pkg": {
+    "name": "@netscript/fresh",
+    "version": "0.0.6",
+    "description": "Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript.",
+    "root": "packages/fresh"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./server": "./src/runtime/server/mod.ts",
+    "./desktop": "./src/runtime/desktop/mod.ts",
+    "./builders": "./src/application/builders/mod.ts",
+    "./route": "./src/application/route/mod.ts",
+    "./defer": "./src/application/defer/mod.ts",
+    "./defer/island": "./src/application/defer/island.ts",
+    "./form": "./src/application/form/mod.ts",
+    "./error": "./src/diagnostics/error/mod.ts",
+    "./streams": "./src/runtime/streams/mod.ts",
+    "./ai": "./src/runtime/ai/mod.ts",
+    "./ai/sandbox": "./src/runtime/ai/sandbox.ts",
+    "./query": "./src/application/query/mod.ts",
+    "./interactive": "./src/runtime/interactive/mod.ts",
+    "./vite": "./src/application/vite/vite.ts",
+    "./testing": "./src/testing/mod.ts"
+  },
+  "files": {
+    "total": 167,
+    "loc": 23413,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 1714
+      },
+      {
+        "path": "src/runtime/server/mod.ts",
+        "bytes": 994
+      },
+      {
+        "path": "src/runtime/desktop/mod.ts",
+        "bytes": 711
+      },
+      {
+        "path": "src/application/builders/mod.ts",
+        "bytes": 1239
+      },
+      {
+        "path": "src/application/route/mod.ts",
+        "bytes": 6275
+      },
+      {
+        "path": "src/application/defer/mod.ts",
+        "bytes": 366
+      },
+      {
+        "path": "src/application/defer/island.ts",
+        "bytes": 255
+      },
+      {
+        "path": "src/application/form/mod.ts",
+        "bytes": 2884
+      },
+      {
+        "path": "src/diagnostics/error/mod.ts",
+        "bytes": 614
+      },
+      {
+        "path": "src/runtime/streams/mod.ts",
+        "bytes": 3243
+      },
+      {
+        "path": "src/runtime/ai/mod.ts",
+        "bytes": 5574
+      },
+      {
+        "path": "src/runtime/ai/sandbox.ts",
+        "bytes": 834
+      },
+      {
+        "path": "src/application/query/mod.ts",
+        "bytes": 2585
+      },
+      {
+        "path": "src/runtime/interactive/mod.ts",
+        "bytes": 348
+      },
+      {
+        "path": "src/application/vite/vite.ts",
+        "bytes": 15034
+      },
+      {
+        "path": "src/testing/mod.ts",
+        "bytes": 4798
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 223,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./server": true,
+      "./desktop": true,
+      "./builders": true,
+      "./route": true,
+      "./defer": true,
+      "./defer/island": true,
+      "./form": true,
+      "./error": true,
+      "./streams": true,
+      "./ai": true,
+      "./ai/sandbox": true,
+      "./query": true,
+      "./interactive": true,
+      "./vite": true,
+      "./testing": true
+    },
+    "descriptionLen": 95
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "hasAllCacheEntries",
+        "minCachedAt",
+        "projectCachedItemFromList"
+      ],
+      "rawCount": 3
+    },
+    "./server": {
+      "exported": [
+        "StreamErrorBoundary",
+        "createStreamingResponse",
+        "defineFreshApp",
+        "renderToStream"
+      ],
+      "rawCount": 4
+    },
+    "./desktop": {
+      "exported": [
+        "DESKTOP_RPC_BINDING_STATUSES",
+        "DESKTOP_RPC_DISABLED_REASONS",
+        "bindDesktopRpcWindow"
+      ],
+      "rawCount": 3
+    },
+    "./builders": {
+      "exported": [
+        "definePage",
+        "definePartial",
+        "defineStatsPartial"
+      ],
+      "rawCount": 3
+    },
+    "./route": {
+      "exported": [
+        "bindRoutePattern",
+        "createRouteReference",
+        "defineEnumPathParam",
+        "defineRouteContract",
+        "enumPathParamSchema",
+        "fallback",
+        "paginationSearchSchema"
+      ],
+      "rawCount": 7
+    },
+    "./defer": {
+      "exported": [],
+      "rawCount": 5
+    },
+    "./defer/island": {
+      "exported": [
+        "DeferComponent"
+      ],
+      "rawCount": 1
+    },
+    "./form": {
+      "exported": [
+        "CSRF_COOKIE_NAME",
+        "CSRF_FIELD_NAME",
+        "Form",
+        "FormRegion",
+        "INTENT_FIELD_NAME",
+        "SUBMISSION_ID_FIELD_NAME",
+        "applyCollectionStrategy",
+        "applyIntentOperation",
+        "buildPaginationState",
+        "collectionIntent",
+        "createEmptyFormErrors",
+        "createFormEnhancementSnapshot",
+        "createStandardSchemaAdapter",
+        "firstFieldError",
+        "formDataToRawValues",
+        "generateCsrfToken",
+        "generateSubmissionId",
+        "getSubmissionHiddenInputProps",
+        "normalizeFormValues",
+        "parseFormIntent",
+        "readCsrfToken",
+        "resolveFormState",
+        "resolvePagination",
+        "setCsrfCookie",
+        "submitIntent",
+        "toFormErrors",
+        "useFormEnhancement",
+        "verifyCsrfToken"
+      ],
+      "rawCount": 28
+    },
+    "./error": {
+      "exported": [
+        "ErrorDisplay",
+        "InlineError",
+        "classifyErrorType",
+        "errorHandler",
+        "extractData",
+        "extractDataWithFallback",
+        "extractErrorData",
+        "extractErrorWithFallback",
+        "getDefaultMessage",
+        "hasError",
+        "isRetryable",
+        "safeParseData",
+        "safeParseDataWithFallback"
+      ],
+      "rawCount": 13
+    },
+    "./streams": {
+      "exported": [
+        "NetScriptLiveQueryFactory",
+        "NetScriptLiveQueryResult",
+        "createNetScriptStreamDB",
+        "createNetScriptStreamEventSourceV1",
+        "useLiveQuery",
+        "useLiveSuspenseQuery"
+      ],
+      "rawCount": 7
+    },
+    "./ai": {
+      "exported": [
+        "createNetScriptChatConnection",
+        "createNetScriptChatStreamProxy",
+        "projectChatSnapshot",
+        "resolveChatSnapshot",
+        "toNetScriptChatResponse"
+      ],
+      "rawCount": 5
+    },
+    "./ai/sandbox": {
+      "exported": [
+        "createMcpAppCallHandler",
+        "createMcpSandboxHandler"
+      ],
+      "rawCount": 2
+    },
+    "./query": {
+      "exported": [
+        "DEFAULT_QUERY_CACHE_INVALIDATION_PATH",
+        "DEFAULT_QUERY_HYDRATION_SCRIPT_ID",
+        "HydrationBoundary",
+        "QueryHydrationScript",
+        "QueryIsland",
+        "dehydrateQueryClient",
+        "getIslandQueryClient",
+        "hydrateFromDehydrated",
+        "invalidateServerQueryCache",
+        "resetIslandQueryClient",
+        "useInfiniteQuery",
+        "useIsFetching",
+        "useIsMutating",
+        "useIslandInfiniteQuery",
+        "useIslandMutation",
+        "useIslandQuery",
+        "useIslandSuspenseInfiniteQuery",
+        "useIslandSuspenseQuery",
+        "useLiveQuery",
+        "useLiveSuspenseQuery",
+        "useMutation",
+        "useQuery",
+        "useQueryClient",
+        "useSuspenseInfiniteQuery",
+        "useSuspenseQuery"
+      ],
+      "rawCount": 25
+    },
+    "./interactive": {
+      "exported": [
+        "resolvedPromise",
+        "usePromise"
+      ],
+      "rawCount": 2
+    },
+    "./vite": {
+      "exported": [
+        "NetScriptViteAlias",
+        "NetScriptViteBuildStartHook",
+        "NetScriptViteConfigHook",
+        "NetScriptViteConfigureServerHook",
+        "NetScriptViteEnvMapping",
+        "NetScriptVitePlugin",
+        "NetScriptVitePluginOptions",
+        "NetScriptViteResolveIdHook",
+        "createNetScriptVitePlugin"
+      ],
+      "rawCount": 9
+    },
+    "./testing": {
+      "exported": [
+        "MockDeferPolicyInput",
+        "MockDeferPolicyProfile",
+        "MockRouteContext",
+        "MockRouteContextOptions",
+        "createMockDeferPolicy",
+        "createMockRouteContext"
+      ],
+      "rawCount": 6
+    }
+  },
+  "tests": {
+    "fileCount": 36,
+    "files": [
+      "src/internal/package-telemetry/telemetry_test.ts",
+      "src/diagnostics/error/extract_test.ts",
+      "src/diagnostics/error/classify_test.ts",
+      "src/runtime/streams/create-stream-event-source_test.ts",
+      "src/runtime/streams/create-stream-db_test.ts",
+      "src/runtime/desktop/bind-desktop-rpc-window_test.ts",
+      "src/runtime/server/query-cache-invalidation.test.ts",
+      "src/runtime/server/define-fresh-app.test.ts",
+      "src/runtime/server/stream_test.ts",
+      "src/runtime/server/sse_test.ts",
+      "src/runtime/ai/sandbox_exports_test.ts",
+      "src/runtime/ai/create-chat-connection_integration_test.ts",
+      "src/runtime/ai/create-chat-connection_test.ts",
+      "src/runtime/ai/mcp-sandbox-handler_test.ts",
+      "src/runtime/ai/mcp-app-call-handler_test.ts",
+      "src/runtime/ai/stream-proxy_test.ts",
+      "src/application/vite/vite.test.ts",
+      "src/application/query/query-options.test.ts",
+      "src/application/query/mutation-lifecycle.test.ts",
+      "src/application/query/cache-invalidation/mod.test.ts",
+      "src/application/form/schema-adapter/schema-adapter-standard.test.ts",
+      "src/application/form/schema-adapter/schema-adapter.test.ts",
+      "src/application/form/validation/csrf.test.ts",
+      "src/application/form/validation/error-normalization.test.ts",
+      "src/application/form/runtime/tests/reply.test.ts",
+      "src/application/form/runtime/tests/intent.test.ts",
+      "src/application/form/runtime/tests/runtime-state.test.ts",
+      "src/application/form/runtime/tests/collection.test.ts",
+      "src/application/route/contract.test.ts",
+      "src/application/route/manifest.test.ts",
+      "src/application/route/manifest-page-module.test.ts",
+      "src/application/builders/define-page/tests/surface.test.ts",
+      "src/application/defer/DeferIsland.test.ts",
+      "tests/_fixtures/docs-examples_test.ts",
+      "tests/package-manifest_test.ts",
+      "tests/defer-island-client-bundle_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 13 immediate children; doctrine cap is 12",
+      "path": "src/runtime/ai"
+    },
+    {
+      "gate": "F-JSR-7 slow-types",
+      "level": "WARN",
+      "message": "Checking for slow types in the public API..."
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [
+      "Checking for slow types in the public API..."
+    ],
+    "rawTail": "   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/src/runtime/server/stream.ts (7.6KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/src/runtime/streams/create-stream-db.ts (5.42KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/src/runtime/streams/create-stream-event-source.ts (2.71KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/src/runtime/streams/mod.ts (3.2KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/src/testing/mod.ts (4.69KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/builders/form-page.tsx (1.28KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/builders/layer-page.tsx (1.06KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/builders/partial-page.tsx (884B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/builders/routed-page/[id].tsx (1.17KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/builders/search-page.tsx (1.09KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/builders/static-page.tsx (793B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/defer-island-client/client.ts (11B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/defer-island-client/main.ts (112B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/defer-island-client/otel-api.ts (1.25KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/defer-island-client/vite.config.ts (425B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/form-navigation-browser/app.tsx (3.02KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/form-navigation-browser/main.ts (33B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/form-navigation-browser/vite.config.ts (213B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/query-hydration-age-browser/app.tsx (2.21KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/query-hydration-age-browser/main.ts (623B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/query-hydration-age-browser/vite.config.ts (248B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/route-binding-browser/app.tsx (1.93KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/route-binding-browser/main.ts (33B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/route-binding-browser/routes.ts (568B)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/fixtures/route-binding-browser/vite.config.ts (1.12KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/form-navigation_browser.ts (8.47KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/query-hydration-age_browser.ts (5.24KB)\n   file:///home/codex/repos/netscript-007-features-1355/packages/fresh/tests/runtime-catalog-dependencies.ts (245B)\nSuccess Dry run complete\n"
+  }
+}

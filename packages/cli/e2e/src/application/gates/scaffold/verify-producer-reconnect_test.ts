@@ -1,11 +1,16 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import type { TelemetryTrace } from '@netscript/telemetry/query';
 import { StreamProducerMetricNames } from '@netscript/plugin-streams-core/telemetry';
 import {
   assertProducerReconnectMetrics,
   assertProducerReconnectTrace,
   parseProducerReconnectResult,
+  requireStreamsObservation,
 } from './verify-producer-reconnect.ts';
+import type {
+  ResourceUpdate,
+  ResourceUpdateSubscription,
+} from './runtime/resource-state-stream.ts';
 
 const result = {
   traceId: '0123456789abcdef0123456789abcdef',
@@ -52,6 +57,37 @@ Deno.test('assertProducerReconnectMetrics requires retry recovery and delivered 
     () => assertProducerReconnectMetrics(metrics.slice(1), result),
     Error,
     StreamProducerMetricNames.RETRIES,
+  );
+});
+
+Deno.test('streams recovery waits through intermediate health before accepting Healthy', async () => {
+  const subscription = streamSubscription([
+    resourceUpdate({ displayName: 'streams', state: 'Running', healthStatus: 'Unhealthy' }),
+    resourceUpdate({ displayName: 'streams', state: 'Running', healthStatus: 'Healthy' }),
+  ]);
+
+  const observed = await requireStreamsObservation(subscription, 'Running', 'Healthy');
+  assertEquals(observed.resource.healthStatus, 'Healthy');
+});
+
+Deno.test('streams observation distinguishes missing state from observed wrong health', async () => {
+  await assertRejects(
+    () => requireStreamsObservation(streamSubscription([]), 'Finished'),
+    Error,
+    'did not observe streams enter Finished',
+  );
+
+  await assertRejects(
+    () =>
+      requireStreamsObservation(
+        streamSubscription([
+          resourceUpdate({ displayName: 'streams', state: 'Running', healthStatus: 'Unhealthy' }),
+        ]),
+        'Running',
+        'Healthy',
+      ),
+    Error,
+    'observed streams enter Running, but healthStatus was Unhealthy',
   );
 });
 
@@ -105,4 +141,20 @@ function metricPayload(name: string, value: number): unknown {
       }],
     }],
   };
+}
+
+function streamSubscription(updates: readonly ResourceUpdate[]): ResourceUpdateSubscription {
+  return {
+    waitFor(predicate) {
+      for (const update of updates) {
+        if (predicate(update)) return Promise.resolve(update);
+      }
+      return Promise.reject(new Error('synthetic stream ended'));
+    },
+    close: () => Promise.resolve(),
+  };
+}
+
+function resourceUpdate(resource: Record<string, unknown>): ResourceUpdate {
+  return { resource, rawLine: JSON.stringify(resource) };
 }
