@@ -20,7 +20,7 @@ Refs #1906
 - plugin-resource retries assert application HTTP effects, not Aspire resource state, so they remain
   intentionally bounded HTTP probes.
 - Concurrency-fenced Bucket A files, Bucket B, and Bucket C remain follow-up scope; this PR is a
-  partial slice and intentionally does not close #1906.
+  partial slice and intentionally does not complete the umbrella issue.
 
 ## Verification
 
