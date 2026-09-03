@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import {
   DEPLOY,
   GATE,
@@ -325,6 +325,7 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
     const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
     const servedSurfaceIndex = ids.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
+    const appReferenceIndex = ids.indexOf(GATE.BEHAVIOR_APP_REFERENCE);
     assertEquals(
       ids.slice(servedSurfaceIndex, servedSurfaceIndex + 3),
       [
@@ -334,7 +335,16 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
       ],
       `${suiteId} must discriminate served surface and hydration before refetch`,
     );
+    assertEquals(
+      servedSurfaceIndex,
+      appReferenceIndex + 1,
+      `${suiteId} must run the island/refetch trio immediately after app reference`,
+    );
   }
+  assert(
+    runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT) <
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
+  );
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);

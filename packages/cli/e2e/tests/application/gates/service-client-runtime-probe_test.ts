@@ -1119,16 +1119,32 @@ Deno.test('service and runtime suites preserve executable service-client gate or
     );
   }
   assertEquals(serviceIds.includes(GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH), false);
-  const servedSurfaceIndex = runtimeIds.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
-  assertEquals(
-    runtimeIds.slice(servedSurfaceIndex, servedSurfaceIndex + 3),
-    [
-      GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
-      GATE.BEHAVIOR_ISLAND_HYDRATION,
-      GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
-    ],
+  const trio = [
+    GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
+    GATE.BEHAVIOR_ISLAND_HYDRATION,
+    GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
+  ];
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const servedSurfaceIndex = ids.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
+    assertEquals(ids.slice(servedSurfaceIndex, servedSurfaceIndex + trio.length), trio);
+    assertEquals(servedSurfaceIndex, ids.indexOf(GATE.BEHAVIOR_APP_REFERENCE) + 1);
+    assertEquals(ids.indexOf(GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH), servedSurfaceIndex + 2);
+  }
+  assert(
+    runtimeIds.indexOf(GATE.BEHAVIOR_LIVE_DB_ENDPOINT) <
+      runtimeIds.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
   );
-  assert(runtimeIds.indexOf(GATE.BEHAVIOR_SERVICE_HEALTH) < servedSurfaceIndex);
+
+  const behaviorIds = createRuntimeBehaviorGates().map((gate) => gate.id);
+  const behaviorServedSurfaceIndex = behaviorIds.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
+  assert(
+    behaviorIds.indexOf(GATE.BEHAVIOR_LIVE_DB_ENDPOINT) < behaviorServedSurfaceIndex,
+  );
+  assertEquals(
+    behaviorIds.slice(behaviorServedSurfaceIndex, behaviorServedSurfaceIndex + trio.length),
+    trio,
+  );
 });
 
 function commandGate(id: string): CommandGateDefinition {
