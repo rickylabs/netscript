@@ -69,6 +69,9 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
     [GATE.SCAFFOLD_RESOURCE_GENERATE, GATE.SCAFFOLD_RESOURCE_RERUN],
   );
   const selectedDatabaseCodegen = RUNTIME_GATES.indexOf(GATE.DATABASE_CODEGEN);
+  const selectedDesignProductionExclusion = RUNTIME_GATES.indexOf(
+    GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION,
+  );
   const selectedServiceClientContract = RUNTIME_GATES.indexOf(
     GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
   );
@@ -77,7 +80,8 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
   const selectedDataScreen = RUNTIME_GATES.indexOf(GATE.SCAFFOLD_UI_DATA_SCREEN);
   const selectedAppReference = RUNTIME_GATES.indexOf(GATE.BEHAVIOR_APP_REFERENCE);
   assert(selectedDatabaseCodegen < selectedFirstRun);
-  assertEquals(selectedServiceClientContract, selectedDatabaseCodegen + 1);
+  assertEquals(selectedDesignProductionExclusion, selectedDatabaseCodegen + 1);
+  assertEquals(selectedServiceClientContract, selectedDesignProductionExclusion + 1);
   assertEquals(selectedFirstRun, selectedServiceClientContract + 1);
   assertEquals(selectedRerun, selectedFirstRun + 1);
   assertEquals(selectedDataScreen, selectedRerun + 1);
@@ -86,6 +90,9 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
   const runtimeIds = resolveSuite(SCAFFOLD.RUNTIME).gates.map((gate) => gate.id);
   const serviceClientGenerate = runtimeIds.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE);
   const databaseCodegen = runtimeIds.indexOf(GATE.DATABASE_CODEGEN);
+  const designProductionExclusion = runtimeIds.indexOf(
+    GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION,
+  );
   const firstRun = runtimeIds.indexOf(GATE.SCAFFOLD_RESOURCE_GENERATE);
   const rerun = runtimeIds.indexOf(GATE.SCAFFOLD_RESOURCE_RERUN);
   const serviceClientContract = runtimeIds.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT);
@@ -96,7 +103,8 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
 
   assert(serviceClientGenerate < databaseCodegen);
   assert(databaseCodegen < firstRun);
-  assertEquals(serviceClientContract, databaseCodegen + 1);
+  assertEquals(designProductionExclusion, databaseCodegen + 1);
+  assertEquals(serviceClientContract, designProductionExclusion + 1);
   assertEquals(firstRun, serviceClientContract + 1);
   assertEquals(rerun, firstRun + 1);
   assertEquals(dataScreen, rerun + 1);

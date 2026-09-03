@@ -66,3 +66,22 @@ Future entries are append-only. In particular, implementation must record drift 
 - **Evidence:** Primary-coordinator comment on PR #1945,
   <https://github.com/rickylabs/netscript/pull/1945#issuecomment-5522782123>; #1958 head
   `73d3a3a96` has exact-head Tier-A check/test green and owns the pending hosted/evaluator closure.
+
+## D-5 — Canonical resource-order assertion retained the pre-#1481 adjacency
+
+- **Severity:** minor integration correction
+- **Observed:** Exact-head core CI at `456abefbd` passed repository check and 5,260 tests, but
+  failed `resource-slice-gates_test.ts` once. The assertion added by merged #1958 still required
+  `GENERATED_SERVICE_CLIENT_CONTRACT` immediately after `DATABASE_CODEGEN`; #1481 intentionally
+  places `SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` between those gates so its production build runs
+  against the generated database slice.
+- **Ruling:** Update only the new #1958 order test to assert the complete intended sequence:
+  `DATABASE_CODEGEN` → `SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION` →
+  `GENERATED_SERVICE_CLIENT_CONTRACT` → `SCAFFOLD_RESOURCE_GENERATE`. Do not alter a gate,
+  product source, runtime behavior, skip, or xfail.
+- **Scope effect:** One existing test under authorized `packages/cli/e2e/**`; this is a
+  proportional integration assertion repair, not a new evaluator cycle or runtime product delta.
+- **Evidence:** Core CI run `33744526413` at `456abefbd`; repository check passed with 3,137 files
+  and 0 diagnostics, while repository test reported 5,260 passed / 1 failed / 14 ignored at
+  `packages/cli/e2e/src/application/gates/scaffold/resource-slice-gates_test.ts:64`, with actual
+  position `21` versus expected `20`.
