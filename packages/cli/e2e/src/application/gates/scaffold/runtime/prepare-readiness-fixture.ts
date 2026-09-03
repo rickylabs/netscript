@@ -81,7 +81,7 @@ export function injectListenerFaultHealthChecks(
       source,
       postgresAttachments,
       (attachment, indentation) =>
-        `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: ${POSTGRES_TEST_LISTENER_PORT} }));
+        `${indentation}builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createEndpointListenerReadinessCheck({ kind: 'tcp', endpoint: () => Promise.resolve({ host: () => Promise.resolve('localhost'), port: () => Promise.resolve(${POSTGRES_TEST_LISTENER_PORT}) }) }));
 ${indentation}await ${attachment.resourceBinding}.withHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}');`,
     );
   }
