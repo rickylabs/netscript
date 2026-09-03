@@ -18,7 +18,7 @@ const ASPIRE_RESTORE_MAX_RETRIES = 2;
 
 /** Ordered executable commands mirrored by the Quickstart page. */
 export const QUICKSTART_DOCUMENTED_COMMANDS = [
-  'deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>',
+  'deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>',
   'netscript init my-app --db postgres --yes',
   'cd my-app',
   'netscript service add --name users --with-client',
