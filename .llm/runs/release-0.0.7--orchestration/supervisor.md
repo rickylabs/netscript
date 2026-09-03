@@ -1,5 +1,20 @@
 # Supervisor identity — release 0.0.7
 
+## 2026-09-03 10:12Z two PRs merged; final product integration active
+
+Main0247471c89e381dd16e680bf0c10b6559caf36ee now includes both #1958 and #1982. #1354 closed,
+#1844 remains owner-approved closed. Six open milestone issues; only #1970/#1945 product PRs and
+coordinator tracking PR1641 remain. Features, docs and internals have no open milestone issues.
+#1982 final CI33738115735 PASS after only its stale close-gate reran; source0475c3213 stayed fixed.
+The cycle1 verbatim review is also saved separately alongside the final review and raw transports.
+
+Same-thread implementation resumes: #1970 thread01a06201-d0b9-7cb1-afe6-8b071ca28012 (pid223146)
+and #1945 thread01a06322-7bb5-7d80-badf-3068fb4942eb (pid223518). Both use their existing NAS
+worktrees and routing. #1945 has already integrated main locally as09425aa6b; #1970 carries scoped
+GLM PASS. Next: exact-head final product/runtime/evaluation packets, coordinator merges, then native
+canary publication and pinned production proof. Neither docs nor internals is a canary barrier.
+No new owner decision, host lease, resource mutation, model switch, or duplicated browser author.
+
 ## 2026-09-03 10:08Z verified merges and evaluation handoff
 
 Coordinator merged #1958 at 2f43fa7f37f97a287c6722b004598e7cb7e04dd9 after required CI,

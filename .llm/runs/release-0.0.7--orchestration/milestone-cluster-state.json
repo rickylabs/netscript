@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "94fe507af47171cd4f295e8f532b281d7147b334",
+  "currentMainSha": "0247471c89e381dd16e680bf0c10b6559caf36ee",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "osUpdateRecoverySnapshot": "receipts/recovery-2026-09-03.json",
@@ -757,9 +757,9 @@
     },
     {
       "number": 1354,
-      "state": "open",
+      "state": "closed",
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1354",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T10:06:48Z"
     },
     {
       "number": 1355,
@@ -4506,10 +4506,10 @@
       "phase": "gating",
       "thread": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
       "wt": "007-leaf-1970",
-      "nextGate": "Canonical #1958 merge then integrated main, exact tiers and approved GLM delta IMPL-EVAL",
+      "nextGate": "#1958 merged. Existing independent GLM PASS; integrate canonical main, exact hosted tiers and proportional delta review.",
       "baseBranch": "main",
-      "headSha": "a526c625ad0555230e9a9b464b1b1c7e50144621",
-      "currentPrHeadSha": "a526c625ad0555230e9a9b464b1b1c7e50144621",
+      "headSha": "01e408d1690f4ec9cde1dd8725a01186125febac",
+      "currentPrHeadSha": "01e408d1690f4ec9cde1dd8725a01186125febac",
       "branch": "feat/workers-payload-registry-map",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
       "implementerAgentId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
@@ -4526,7 +4526,7 @@
       "phase": "gating",
       "thread": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "wt": "007-leaf-1481",
-      "nextGate": "Canonical #1958 merge then integrated main, exact tiers and approved GLM delta IMPL-EVAL",
+      "nextGate": "#1958 merged. Same author integrates main (local09425aa6b), obtains exact hosted tiers and independent evaluation.",
       "baseBranch": "main",
       "headSha": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
       "currentPrHeadSha": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
@@ -4542,17 +4542,22 @@
       "issueNumbers": [
         1354
       ],
-      "phase": "evaluating",
+      "phase": "merged",
       "thread": "01a06424-38fe-7893-ba59-6064b0dd616e",
       "wt": "007-leaf-1354-g",
-      "nextGate": "Core CI and hosted33736497671 two-tier runtime PASS; independent GLM evaluation then lifecycle/review gate",
+      "nextGate": "Merged; parent published-candidate acceptance remains.",
       "baseBranch": "main",
-      "headSha": "0e1717dab754a84229b02eee8143138cd4f60fa9",
-      "currentPrHeadSha": "0e1717dab754a84229b02eee8143138cd4f60fa9",
+      "headSha": "47275c0022eb3e78aed0b47242b8428d35daeab6",
+      "currentPrHeadSha": "47275c0022eb3e78aed0b47242b8428d35daeab6",
       "branch": "feat/cli-resource-slice-acceptance",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
       "implementerAgentId": "01a06424-38fe-7893-ba59-6064b0dd616e",
-      "reconciledAt": "2026-09-03T09:23:00Z"
+      "reconciledAt": "2026-09-03T10:12:00Z",
+      "mergeCommitSha": "2f43fa7f37f97a287c6722b004598e7cb7e04dd9",
+      "mergedAt": "2026-09-03T10:06:46Z",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "9cba13fec997ed4839e95940a4ddc5f0d01ab3ae",
+      "implementationEvaluationArtifact": ".llm/runs/feat-cli-resource-slice-acceptance--1354-g/evaluate.md"
     },
     {
       "id": "aspire-static-scan-scope",
@@ -4564,7 +4569,7 @@
         1712
       ],
       "ownerDirectedPostFreeze": true,
-      "phase": "evaluating",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "0475c32134166b9ba60ce1ea1a53c6abcc5af695",
       "branch": "fix/aspire-parity-context",
@@ -4572,9 +4577,14 @@
       "implementerAgentId": "019ffaa3-32ae-7b02-92a5-d7ae146d8cbd",
       "evaluatorAgentId": "7ffea6b7-4401-4fec-b826-7d5e7657d88f",
       "evaluationWorktree": "/home/agent/projects/netscript/worktrees/007-eval-1982",
-      "nextGate": "Author64 focused tests and structured gates PASS; consume original evaluator then same-session final-head delta, current CI",
+      "nextGate": "Merged; parent published-candidate acceptance remains.",
       "receiptRefs": [],
-      "reconciledAt": "2026-09-03T09:23:00Z"
+      "reconciledAt": "2026-09-03T10:12:00Z",
+      "mergeCommitSha": "0247471c89e381dd16e680bf0c10b6559caf36ee",
+      "mergedAt": "2026-09-03T10:09:56Z",
+      "implementationEvaluationVerdict": "PASS_IMPL",
+      "implementationEvaluatedProductHeadSha": "0475c32134166b9ba60ce1ea1a53c6abcc5af695",
+      "implementationEvaluationArtifact": "receipts/eval-1982/evaluate.md"
     },
     {
       "id": "readme-service-readiness",
@@ -5715,13 +5725,13 @@
   ],
   "expensiveGates": [],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-03T09:52:13Z",
+    "capturedAt": "2026-09-03T10:12:00Z",
     "source": "Live GitHub milestone 27 export; actual remaining issues, not historical frozen inventory.",
-    "openIssueCount": 7,
+    "openIssueCount": 6,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
-      "features": 1,
+      "features": 0,
       "fixes": 3,
       "internals": 0,
       "docs": 0,
@@ -5764,13 +5774,6 @@
         "url": "https://github.com/rickylabs/netscript/issues/1455"
       },
       {
-        "number": 1354,
-        "owner": "orchestrator:features",
-        "state": "OPEN",
-        "title": "feat(cli): no verb generates a resource route slice — the typed contract, cache-first loader and withResource page must be hand-copied from init",
-        "url": "https://github.com/rickylabs/netscript/issues/1354"
-      },
-      {
         "number": 863,
         "owner": "orchestrator:aspire",
         "state": "OPEN",
@@ -5781,7 +5784,7 @@
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-03T09:23:00Z",
+    "capturedAt": "2026-09-03T10:12:00Z",
     "prs": [
       {
         "number": 1970,
@@ -5792,18 +5795,9 @@
         "topic": "fixes"
       },
       {
-        "number": 1958,
-        "topic": "features"
-      },
-      {
         "number": 1641,
         "topic": "coordinator",
         "role": "harness-only, never product release barrier"
-      },
-      {
-        "number": 1982,
-        "topic": "aspire",
-        "role": "owner-directed static scan scope; coordinator co-author, independent evaluation"
       }
     ]
   },
@@ -5984,7 +5978,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T09:52:13Z",
+  "updatedAt": "2026-09-03T10:12:00Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6047,29 +6041,21 @@
       "pr": 1970,
       "threadId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
-      "head": "a526c625ad0555230e9a9b464b1b1c7e50144621",
-      "action": "Original author turn exited at clean pushed checkpoint awaiting #1958 merge. Primary will explicitly resume this same thread at merge; no duplicate browser writer.",
-      "state": "waiting-dependency",
-      "lastProgressAt": "2026-09-03T09:23:00Z"
+      "head": "01e408d1690f4ec9cde1dd8725a01186125febac",
+      "action": "Original author resumed after #1958 merge; integrate canonical main, exact-head focused/carrier and both hosted runtime gates, finish independent product/integration review then coordinator merge.",
+      "state": "active",
+      "lastProgressAt": "2026-09-03T10:12:00Z",
+      "pid": 223146
     },
     {
       "pr": 1945,
       "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
       "head": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
-      "action": "Original author turn exited at clean pushed checkpoint awaiting #1958 merge. Primary will explicitly resume this same thread at merge; no duplicate browser writer.",
-      "state": "waiting-dependency",
-      "lastProgressAt": "2026-09-03T09:23:00Z"
-    },
-    {
-      "pr": 1958,
-      "threadId": "01a06424-38fe-7893-ba59-6064b0dd616e",
-      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
-      "pid": 6158,
-      "head": "0e1717dab754a84229b02eee8143138cd4f60fa9",
-      "action": "Both hosted runtime tiers PASS in 33736497671 (Postgres103/0, SQLite98/0), core CI green. Original author dispatches independent GLM evaluation and synchronizes acceptance.",
+      "action": "Original author resumed after #1958 merge; integrate canonical main, exact-head focused/carrier and both hosted runtime gates, finish independent product/integration review then coordinator merge.",
       "state": "active",
-      "lastProgressAt": "2026-09-03T09:23:00Z"
+      "lastProgressAt": "2026-09-03T10:12:00Z",
+      "pid": 223518
     }
   ],
   "reconciliation": {
@@ -6079,26 +6065,20 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T09:52:13Z",
-    "nextReportDueAt": "2026-09-03T10:52:13Z",
-    "lastReportRef": "worklog.md#2026-09-03-0952z-owner-approved-1844-closeout",
-    "headline": "#1844 closed by explicit owner acceptance: mitigated; original cause unproven. Seven milestone issues remain; release gates unchanged.",
-    "currentMainSha": "94fe507af47171cd4f295e8f532b281d7147b334",
+    "lastReportAt": "2026-09-03T10:12:00Z",
+    "nextReportDueAt": "2026-09-03T11:12:00Z",
+    "lastReportRef": "worklog.md#2026-09-03-1012z-two-prs-merged-final-product-integration-active",
+    "headline": "#1958 and #1982 merged; #1354 closed. Two product PRs remain before the next canary; same authors actively integrating main.",
+    "currentMainSha": "0247471c89e381dd16e680bf0c10b6559caf36ee",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
       "state": "qualifying",
       "eta": {
         "window": "45–90 minutes after the three verified merge packets; conditional, not a publication promise",
         "confidence": "low",
-        "basis": "Shared resource/browser runtime blocker is now green. Remaining product evaluations/integration heads precede native publish and pinned production pair."
+        "basis": "Shared resource/browser repair and owner Aspire static-scan repair are merged. Two remaining product integration/evaluation packets precede native publish and pinned production pair."
       },
       "criticalPath": [
-        {
-          "id": "resource-acceptance",
-          "state": "gating",
-          "impact": "Shared resource/browser runtime acceptance passed on exact 0e1717dab; review/IMPL-EVAL remain.",
-          "nextAction": "Consume independent #1958 verdict, verify acceptance/review threads, merge and resume both dependent original fix authors."
-        },
         {
           "id": "merge-packets",
           "state": "gating",
@@ -6115,19 +6095,22 @@
     },
     "progress": {
       "mergedPullRequests": [
-        1981
+        1981,
+        1958,
+        1982
       ],
       "closedIssues": [
-        1844
+        1844,
+        1354
       ],
       "newIssues": [],
-      "queueDeltaExplanation": "Owner-approved #1844 historical-evidence disposition recorded and issue closed; open milestone issue count 8→7. No code, evaluation or release gate waived."
+      "queueDeltaExplanation": "#1958 and #1982 merged this turn; #1354 auto-closed after verified closing-keyword repair. Six open milestone issues, two product PRs plus coordinator tracking PR. #1844 already owner-approved closed."
     },
     "scope": {
-      "openIssueCount": 7,
-      "ownedIssueCount": 7,
-      "scheduledIssueCount": 7,
-      "openPullRequestCount": 5,
+      "openIssueCount": 6,
+      "ownedIssueCount": 6,
+      "scheduledIssueCount": 6,
+      "openPullRequestCount": 3,
       "unscheduledIssueNumbers": []
     },
     "mergeQueue": [
@@ -6135,42 +6118,25 @@
         "prNumber": 1970,
         "lane": "fixes",
         "state": "gating",
-        "nextGate": "Exact CI/two hosted runtime tiers, then separate-session bounded delta IMPL-EVAL; coordinator merge.",
-        "nextAction": "Primary explicitly resumes original idle author at #1958 merge; integrate canonical probes then exact-head runtime and independent delta review."
+        "nextGate": "Independent scoped GLM PASS recorded; integrate main, both hosted runtime tiers and proportional integration delta review.",
+        "nextAction": "Existing author resumed now against merged #1958; produce exact-head final hosted gates and verified merge packet."
       },
       {
         "prNumber": 1945,
         "lane": "fixes",
         "state": "gating",
-        "nextGate": "Exact runtime proof after merged codegen/Zod fixes; acceptance mirror, independent delta evaluation, coordinator merge.",
-        "nextAction": "Primary explicitly resumes original idle author at #1958 merge; integrate canonical probes then exact-head runtime and independent delta review."
-      },
-      {
-        "prNumber": 1958,
-        "lane": "features",
-        "state": "gating",
-        "nextGate": "Hosted 33736497671: PostgreSQL103/0 and SQLite98/0, clean cleanup; core CI green. Independent evaluation and lifecycle sign-off remain.",
-        "nextAction": "Existing same author continues; primary coordinator verifies and merges."
-      },
-      {
-        "prNumber": 1982,
-        "lane": "internals",
-        "state": "gating",
-        "nextGate": "64 focused tests, both parity phases, 12-file check/lint/fmt and asset freshness PASS at 0475c3213. Consume original evaluator verdict then same-session carrier/generated-mode delta; final CI.",
-        "nextAction": "Coordinator co-authored owner amendment; preserve source/doc enforcement, no run deletion."
+        "nextGate": "Integrate main, both hosted runtime tiers, independent evaluation, truthful acceptance/body close-gate.",
+        "nextAction": "Existing author resumed now against merged #1958; produce exact-head final hosted gates and verified merge packet."
       }
     ],
     "orchestratorMatrix": [
       {
         "lane": "features",
-        "state": "active",
-        "activeItems": [
-          1354,
-          1958
-        ],
-        "lastConcreteProgressAt": "2026-09-03T09:23:00Z",
-        "blocker": "Native Fable monthly cap; existing Codex author remains productive.",
-        "nextAction": "Independent #1958 evaluation underway after full runtime PASS; deliver merge packet."
+        "state": "complete",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-09-03T10:12:00Z",
+        "blocker": "None: #1354 closed by merged #1958.",
+        "nextAction": "No pending feature issues; retain receipts for release closeout."
       },
       {
         "lane": "fixes",
@@ -6182,9 +6148,9 @@
           1970,
           1945
         ],
-        "lastConcreteProgressAt": "2026-09-03T08:09:42Z",
-        "blocker": "Native Fable monthly cap; original implementation threads at clean dependency checkpoints, not active workers.",
-        "nextAction": "Finish independent product reviews and exact-head integration/CI for #1970/#1945; #1844 historical disposition is owner-approved and closed."
+        "lastConcreteProgressAt": "2026-09-03T10:12:00Z",
+        "blocker": "Native Fable quota remains, but original Codex authors are active; no owner-only decision.",
+        "nextAction": "Finish #1970/#1945 integration and exact-head gates, then coordinator merges."
       },
       {
         "lane": "internals",
@@ -6272,7 +6238,7 @@
       }
     ],
     "environment": {
-      "checkedAt": "2026-09-03T08:18:00Z",
+      "checkedAt": "2026-09-03T09:25:00Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0

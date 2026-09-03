@@ -569,7 +569,7 @@
       ],
       "lane": "fixes",
       "baseBranch": "main",
-      "headSha": "a526c625ad0555230e9a9b464b1b1c7e50144621",
+      "headSha": "01e408d1690f4ec9cde1dd8725a01186125febac",
       "state": "open",
       "role": "leaf"
     },
@@ -592,8 +592,8 @@
       ],
       "lane": "features",
       "baseBranch": "main",
-      "headSha": "0e1717dab754a84229b02eee8143138cd4f60fa9",
-      "state": "open",
+      "headSha": "47275c0022eb3e78aed0b47242b8428d35daeab6",
+      "state": "merged",
       "role": "leaf"
     },
     {
@@ -622,7 +622,7 @@
       "lane": "internals",
       "baseBranch": "main",
       "headSha": "0475c32134166b9ba60ce1ea1a53c6abcc5af695",
-      "state": "open",
+      "state": "merged",
       "role": "leaf"
     }
   ]
