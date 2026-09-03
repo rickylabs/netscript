@@ -48,3 +48,21 @@ Future entries are append-only. In particular, implementation must record drift 
   `behavior.app-reference` failed on `/examples/users?preview=loading` missing
   `data-state="loading"`. Test-first RED reproduced 1 passed / 2 failed; the bounded probe/test
   repair passes 54/54 with the service/runtime order and suite-registry contracts.
+
+## D-4 — Shared probe repair reassigned to #1958
+
+- **Severity:** coordination correction; supersedes D-3's local ownership ruling
+- **Observed:** After D-3's bounded repair was pushed, the primary coordinator identified PR #1958
+  as the sole writer for the shared app-reference and served-island probe migration. #1958's
+  canonical contract covers both the init-generated `/examples/users` resource and its generated
+  `/people` resource, then proves the `PeopleIsland` marker/module/bundle surface. The narrower D-3
+  patch would duplicate only part of that cross-feature repair.
+- **Ruling:** Revert this branch's two shared probe/test hunks while retaining the raw diagnosis in
+  the run record. Do not implement `PeopleIsland` here or rerun an unchanged failing runtime head.
+  Wait for #1958 to pass its owner gates and merge, then integrate current main mechanically and
+  preserve #1481's design-exclusion gate alongside the canonical resource probes.
+- **Scope effect:** No shared probe product delta remains from D-3. This branch is explicitly
+  blocked on the #1958 owner merge; its own design-route and suite-order changes remain intact.
+- **Evidence:** Primary-coordinator comment on PR #1945,
+  <https://github.com/rickylabs/netscript/pull/1945#issuecomment-5522782123>; #1958 head
+  `73d3a3a96` has exact-head Tier-A check/test green and owns the pending hosted/evaluator closure.
