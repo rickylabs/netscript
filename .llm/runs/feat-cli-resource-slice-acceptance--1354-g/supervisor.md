@@ -17,7 +17,7 @@
 | --- | --- | --- |
 | author implementation | OpenAI Codex, current GPT-5 session | Implement and validate the locked light Slice G scope. |
 | evaluator requested | Native Anthropic Claude, Fable 5 family, medium effort | Primary fresh launch failed before an evaluation turn with `unrecognized_model` / HTTP 404 (session `885a699a-4550-4d38-a533-b16d91a763d1`). |
-| evaluator observed | Claude transport, OpenRouter `z-ai/glm-5.3-flash`, max effort | Lane-policy fallback session `bd3b06fa-8d48-48c7-826f-b55322e3d832`; cycle 3 returned `PASS_IMPL` at pushed evidence head `0cc736365`. Native Fable identity is not claimed. |
+| evaluator observed | Claude transport, OpenRouter `z-ai/glm-5.3-flash`, max effort | Lane-policy fallback session `bd3b06fa-8d48-48c7-826f-b55322e3d832`; cycle 3 returned `PASS_IMPL` at pushed evidence head `0cc736365`. Fresh pre-fix session `b0a5a6db-10f5-43cc-9ee2-d69f1d92319c` was interrupted after hosted run `33731170586` exposed another product-evidence change; it wrote no receipt. A new fresh evaluation is required after the correction. Native Fable identity is not claimed. |
 
 Reference `.llm/harness/workflow/lane-policy.md`; this owner-directed session is the author lane and does not self-evaluate.
 
@@ -27,4 +27,4 @@ Reference `.llm/harness/workflow/lane-policy.md`; this owner-directed session is
 - Owner explicitly requires a non-draft PR despite the generic harness draft-on-start default.
 - The coordinator's resume instruction supersedes the earlier local-runtime prohibition and explicitly requires full hosted acceptance after merging main.
 - Shared-host exact-head runs may be used as diagnostic evidence, but lifecycle advancement requires an isolated green hosted receipt.
-- Isolated hosted run `33717890456` and its retry passed the #1354 resource/generated-quality gates but failed the later stale `behavior.app-reference` users-preview assertion on both PostgreSQL and SQLite. Its owning source is outside the locked eight-file ceiling, so the run stops without a workaround and lifecycle stays `status:impl-eval`.
+- Isolated hosted runs pass the #1354 resource/generated-quality prefix. Owner direction assigns the stale post-Slice-F browser/runtime probe corrections to Slice G's accepted resource scope; lifecycle stays `status:impl-eval` until the corrected thirteen-file head passes both tiers and a fresh separate-session IMPL-EVAL.

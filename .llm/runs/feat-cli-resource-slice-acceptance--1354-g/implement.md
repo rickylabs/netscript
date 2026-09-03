@@ -16,7 +16,7 @@ The filled `## Design` section in `worklog.md` is the implementation contract.
 
 ## Operating Rules
 
-- Touch exactly the eight amended product files; harness artifacts do not count toward that ceiling.
+- Touch only the final thirteen owner-authorized product files; harness artifacts do not count toward that ceiling.
 - Do not run Aspire, Docker, browser, or `deno task e2e:cli` locally.
 - Do not edit `main`, `deno.lock`, #1664-owned service-query/add-ui surfaces, or Slice F's command-tree test.
 - Stop if captured stdout or runtime reachability needs another product file.
@@ -37,3 +37,13 @@ The full CLI unit suite materializes the new rerun gate in the existing runner s
 ## Rescope Resolution — 2026-09-03
 
 PR #1891 amended the ceiling to 8 and enumerated the runner test as item 8. The owner authorized resumption: update only the nominal-success fake's stdout for `generate resource`, retain the existing suite, and finish the author-lane gates and PR handoff.
+
+## Hosted Acceptance Amendments — 2026-09-03
+
+After Slice F merged, isolated hosted evidence exposed two acceptance probes that still asserted its
+retired preview/showcase surface. The owner resumed Slice G with authority to fix the actual
+introduced/baseline boundary within the accepted resource scope and explicitly prohibited a new
+PLAN-EVAL. The final ceiling is thirteen existing product files: the original eight, the neutral
+resource browser probe/test, the unresolved-app-root command regression, and the served-island
+probe/test. Assert `/examples/users` plus `/people`, and `PeopleIsland` at `/people`; never recreate
+the retired preview states or `ServiceShowcaseLab`. Only hosted CI may run the unsplit runtime suite.

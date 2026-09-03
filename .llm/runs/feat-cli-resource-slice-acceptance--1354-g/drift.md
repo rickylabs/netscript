@@ -126,3 +126,28 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Boundary:** The stale assertion is pre-existing; the incompatible rendered surface was
   introduced by merged Slice F; the correction belongs to Slice G because PR #1956 explicitly
   assigned hosted acceptance and #1354 closure to PR #1958.
+
+## 2026-09-03 — Changed-head hosted run exposes the retired island-showcase probe
+
+- **What:** After the `/examples/users` and `/people` browser-reference correction, changed-head
+  hosted run `33731170586` passed `behavior.app-reference` in both database tiers and then failed at
+  the next gate, `behavior.island-served-surface`.
+- **Source:** Complete GitHub Actions logs for PostgreSQL job `100571302293` and SQLite job
+  `100571302333` at product head `8341c07431cd333a9e109c5732c2958704334ab6`.
+- **Expected:** The served-surface gate proves the island emitted by Slice G's generated `/people`
+  resource and all Fresh module references return JavaScript successfully.
+- **Actual:** The probe still fetched `/examples/users` and required the pre-Slice-F
+  `ServiceShowcaseLab` marker/bundle. PostgreSQL reported 90 pass / 1 fail; SQLite reported 85 pass /
+  1 fail; both raw commands exited 1 with `served HTML did not contain the Fresh ServiceShowcaseLab
+  island marker`; cleanup passed. The resource first run/rerun, generated quality/type-check, app
+  reference, runtime startup, and all preceding behavior gates passed.
+- **Severity:** significant
+- **Action:** Extend the owner-authorized hosted acceptance correction to thirteen existing product
+  files. Point the existing served-surface probe to `/people` and `PeopleIsland`; update its existing
+  semantic test to pin the Fresh marker, module URL, bundle hit, persisted failure receipt, and
+  absence of the retired showcase identity. Do not recreate `ServiceShowcaseLab`, add a suite, split
+  the runtime command, or run a new PLAN-EVAL.
+- **Boundary:** The probe predates and was not modified by Slice F. The incompatible generated
+  surface came from Slice F's intentional replacement of the showcase with the neutral planner
+  resource. Slice G's public `generate resource people` output supplies the correct island for this
+  hosted acceptance gate, so the correction remains in the accepted resource scope.

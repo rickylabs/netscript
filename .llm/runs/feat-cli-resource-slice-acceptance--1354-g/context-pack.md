@@ -6,20 +6,22 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `owner-authorized hosted acceptance correction implemented; exact-head gates pending` |
+| Current phase | `second hosted-tail correction implemented; exact-head gates pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
 ## Current State
 
 The owner resumed the run after the exact-head hosted failure and authorized a narrow correction
-within #1354's accepted resource scope. The final product ceiling is eleven existing files: the
-original eight plus the browser probe, its exact semantic test, and the resource command test.
+within #1354's accepted resource scope. The final product ceiling is thirteen existing files: the
+original eight plus both browser/runtime probes, their exact semantic tests, and the resource command test.
 The probe now covers final Slice F's neutral `/examples/users` resource and Slice G's generated
 `/people` resource at both viewports; the resource gate test proves generation precedes the browser
-gate; the command test proves unresolved app-root selection fails loudly with zero writes. Initial
-focused tests pass 48/48. Exact-head Tier A, isolated hosted acceptance, and fresh IMPL-EVAL remain
-pending, so PR #1958 stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
+gate; the command test proves unresolved app-root selection fails loudly with zero writes. The
+served-surface probe now proves `/people` emits and serves `PeopleIsland` and its Fresh module graph,
+instead of demanding Slice F's retired `ServiceShowcaseLab`. Initial correction-focused tests pass
+8/8. Exact-head Tier A, isolated hosted acceptance, and fresh IMPL-EVAL remain pending, so PR #1958
+stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Completed
 
@@ -34,11 +36,11 @@ pending, so PR #1958 stays `status:impl-eval` and #1354 acceptance remains uncha
 
 ## In Progress
 
-- Exact-head validation, isolated hosted acceptance, and fresh separate-session IMPL-EVAL for the amended product head.
+- Exact-head validation, isolated hosted acceptance, and fresh separate-session IMPL-EVAL for the thirteen-file amended product head.
 
 ## Next Steps
 
-1. Commit and push the eleven-file product head with the tracked Harness amendment.
+1. Commit and push the thirteen-file product head with the tracked Harness amendment.
 2. Run exact-head Tier A and both isolated hosted runtime tiers; do not use a host runtime lease.
 3. Obtain a fresh separate-session IMPL-EVAL, then update #1354/#1958 only from green evidence.
 
@@ -54,7 +56,7 @@ pending, so PR #1958 stays `status:impl-eval` and #1354 acceptance remains uncha
 
 | Path | Status | Notes |
 | ---- | ------ | ----- |
-| eleven owner-authorized Slice G product paths | modified/new | Original eight plus hosted probe/test and generator app-root negative regression. |
+| thirteen owner-authorized Slice G product paths | modified/new | Original eight plus two hosted probes/tests and generator app-root negative regression. |
 | `.llm/runs/feat-cli-resource-slice-acceptance--1354-g/*` | new | Required harness context and blocker evidence. |
 
 ## Gates
@@ -63,21 +65,21 @@ pending, so PR #1958 stays `status:impl-eval` and #1354 acceptance remains uncha
 | ----------- | -------------- | -------- |
 | Static | PASS | Focused 68/68; full CLI 1788/1788; check 1004 files/0 diagnostics; lint/fmt 8 files/0 findings. |
 | Fitness | PASS | `arch:check` and `quality:gate` exit 0; `FAIL=0`; scanner findings 0. |
-| Runtime | #1354 path PASS / full suite FAIL | Hosted retry: PostgreSQL 89/1 and SQLite 84/1; only `behavior.app-reference` failed, cleanup passed. |
+| Runtime | #1354 path advanced / full suite FAIL | Run `33731170586`: `behavior.app-reference` passed; PostgreSQL 90/1 and SQLite 85/1 then failed only at stale `behavior.island-served-surface`; cleanup passed. |
 | Consumer | PASS | Guidance, first-write, identical zero-write rerun, UI ordering, and generated-project quality/type-check all executed successfully. |
 
 ## Open Questions
 
-- Whether both isolated database tiers render the two neutral resource routes with the pinned markers.
+- Whether both isolated database tiers serve `PeopleIsland` and then complete the remaining runtime tail.
 
 ## Drift and Debt
 
-- Drift: captured-stdout reachability required item 8; PR #1891 authorized and resolved it. Cycle 1 exposed untraced codegen and route-alias prerequisites. The first live-main run exposed a further UI router-mutation prerequisite. All Slice G product drift is resolved inside the ceiling. The isolated hosted browser tail and the final missing-app-root negative-test mapping require files outside the ceiling and remain explicit blockers.
+- Drift: captured-stdout reachability required item 8; PR #1891 authorized it. Later hosted runs exposed stale preview-state and island-showcase probes inherited from the pre-Slice-F scaffold. Both are now aligned to the neutral resources inside the owner-accepted thirteen-file boundary; hosted proof remains pending.
 - Debt: none.
 
 ## Commits
 
 - Main merge: `008d3264c5352abf6d1e3798d580550ec98e7e7c`.
 - Live-main ordering fix / product head: `a2366577fd8232c8e08e078b03d1e3cc84793b92`.
-- Pushed evidence head: `0cc736365c1a3886129920e8599d9e61895a40f0` (cycle-3 evaluator receipt is the only current tracked modification).
+- Pushed correction head: `8341c07431cd333a9e109c5732c2958704334ab6`; the next product head will add the served-island correction and tracked evidence.
 - PR: #1958, head `feat/cli-resource-slice-acceptance`, base `main`, status `status:impl-eval`.
