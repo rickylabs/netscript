@@ -8109,3 +8109,7 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - #1970 c72f853bd RED (exact): (a) generated `triggers/generic-inbound-webhook.ts:29` TS2322 — typed `JobHandler<Readonly<{verbose}>>` not assignable to `TriggerActionResult`'s `JobHandler<unknown>` (contravariance) → fails emitted-samples + both runtime tiers; (b) `official-saga-publisher-sample-sync_test.ts` — canonical saga carrier not re-derived from the schema-first workers sample. Steer `/tmp/steer1455c.md` delivered to thread 01a06201 (leaf 007-leaf-1455); worker turn live.
 - #1974 f383c3280 RED (exact, worker-introduced): emitted `clear-seeded-client.ts:27` references non-existent `Deno.errors.DirectoryNotEmpty` → TS2339 in scaffold-static + both runtime tiers (run 33706833254). Steer `/tmp/steer1971b.md` delivered to thread 01a064f3 (leaf 007-leaf-1971); worker turn live.
 - Supervisor traps this turn: a `pkill -f` self-match killed the shell (exit 144); a duplicate deliverer was killed by pid. `rtk` absent on host.
+
+## 2026-09-03 02:55Z — #1969 local IMPL-EVAL PASS; PR was already merged by coordinator
+- Local GLM 5.3 Flash (max) evaluator: PASS with one MINOR (allowlist not pinned by a test → #1906 follow-up). Verdict issuecomment-5519522118; packet issuecomment-5519525143.
+- Coordinator had merged #1969 at 02:39Z as 02c9cf648 and applied `status:shipped` before the packet landed; my `status:ready-merge` write was stale → removed, single status restored, annotation posted. Lesson: re-read PR state immediately before any label write.
