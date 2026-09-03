@@ -336,3 +336,24 @@ run-deno-fmt plugin-triggers-core: exit 0; 81 files; 0 findings
 
 `deno.lock` remains unchanged. No runtime lease was taken; hosted scaffold tiers remain responsible
 for runtime execution after push, as directed.
+
+## Repair 3 — generated workers health-check formatting and carrier freshness
+
+The supervisor pinned this repair to exact branch head
+`b4159bb6d3fda18bb85448fb14a8369074a82733`; the worktree and remote branch already matched that
+commit with a clean index, so no merge, rebase, or destructive reset was performed.
+
+The RED control writes the actual `workers/jobs/health-check.ts` install artifact to a temporary
+directory and runs `deno fmt --check` on it. This exercises the canonical `jobStub` emission rather
+than a copied expectation, so its failure is specific to the under-indented generated handler body
+reported by `generated.deno-fmt-check`.
+
+### RED receipt
+
+```text
+$ deno test --allow-all --unstable-kv plugins/workers/src/adapter/resources/resources.test.ts
+exit 1; 6 passed / 1 failed
+The repository-configured formatter's only diff is lines 18-21: the return statement, jobId,
+payload, and closing call each need one additional indentation level. No quote-style or unrelated
+diagnostic remains after supplying the root formatter configuration explicitly.
+```
