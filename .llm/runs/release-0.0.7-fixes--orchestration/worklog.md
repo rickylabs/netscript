@@ -8094,3 +8094,8 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - Proof: parent run 33704380711 (head 061c70fab = merge of #1967) → child 33704697088 (af365a734), job 100491230604 step 14 success 01:44:42Z–01:56:05Z; artifact `e2e-cli-prod-0.0.7-canary.9` (9875134332), report sha256 f03cd05a…3919, ok:true 97/97, CLI `jsr:@netscript/cli@0.0.7-canary.9`; `behavior.package-backed-plugin-doctor` passed (exit 0, `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS`, registry emitted).
 - Actions: proof + acceptance-evidence fence posted (issuecomment-5519182281); six acceptance boxes ticked manually (PR merged with mirror label-gated → mirror cannot run; recorded as supervisor completion with per-box evidence); `gh issue close 1966 --reason completed`. State: CLOSED, `status:shipped` retained.
 - Still armed: #1969 verdict watcher, #1970 CI watcher (6fe200630), #1971 Sol worker; #1945 blocked on #1971.
+
+## 2026-09-03 ~02:3xZ — #1970 reconciled (was DIRTY → no CI at 6fe200630); #1974 opened for #1971
+- #1970: CONFLICTING/DIRTY vs main after #1959/#1960 merges → merged origin/main in 007-leaf-1970; sole conflict = generated MCP corpus. First push a53448b6b carried main's corpus (`rtk` absent on host masked a skipped regen); corrected by real `gen:mcp-export-corpus` + `check` PASS → c72f853bd. CI watcher re-armed at c72f853bd.
+- #1971: Sol worker opened draft PR #1974 (fix/scaffold-build-catalog-zod, 0fa3f6e56), labels/milestone correct, S0 done, S1/S2 pending; closing keyword deliberately deferred until evidence current. Leave to worker.
+- Lessons: `rtk` is not installed on this host — never chain `rtk proxy … | tail` (pipe masks the missing binary); `pkill -f` self-matched and killed the supervisor shell (exit 144) — kill only by /proc identity.
