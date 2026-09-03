@@ -107,7 +107,9 @@ jobs:
             --argjson networks "$readme_networks" \
             '{appHosts: $appHosts, containers: $containers, images: $images, volumes: $volumes, networks: $networks}' \
             > .llm/tmp/readme-cold-baseline.json
-          jq -e 'all(.[]; . == 0)' .llm/tmp/readme-cold-baseline.json
+          # This hosted PostgreSQL scenario needs fresh application state, not empty image caches.
+          # Image count is diagnostic only; Docker is not a universal framework prerequisite.
+          jq -e '[.appHosts, .containers, .volumes, .networks] | all(. == 0)' .llm/tmp/readme-cold-baseline.json
           test ! -e .llm/tmp/cli-e2e/my-app
 
       - name: Root README Quickstart E2E (published CLI, verbatim)

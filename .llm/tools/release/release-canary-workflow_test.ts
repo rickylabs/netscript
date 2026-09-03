@@ -498,7 +498,7 @@ Deno.test('production README E2E uploads both durable cleanup receipts', async (
   );
 });
 
-Deno.test('production README is the first runtime on a cold, uncached runner', async () => {
+Deno.test('production README starts with fresh application state and permits image caches', async () => {
   const source = await Deno.readTextFile(new URL('.github/workflows/e2e-cli-prod.yml', root));
   const readme = source.indexOf('- name: Root README Quickstart E2E');
   assert(readme > 0);
@@ -512,7 +512,12 @@ Deno.test('production README is the first runtime on a cold, uncached runner', a
   assertEquals(before.includes('- name: Install published CLI from JSR'), false);
   assertEquals(before.includes('- name: Public init smoke from JSR CLI'), false);
   assertStringIncludes(before, '- name: Verify cold README baseline');
-  assertStringIncludes(before, 'all(.[]; . == 0)');
+  assertStringIncludes(before, '[.appHosts, .containers, .volumes, .networks] | all(. == 0)');
+  assertEquals(
+    before.includes("jq -e 'all(.[]; . == 0)'"),
+    false,
+    'cached images must not gate readiness',
+  );
   for (const field of ['appHosts', 'containers', 'images', 'volumes', 'networks']) {
     assertStringIncludes(before, `--argjson ${field} `);
   }

@@ -1,5 +1,25 @@
 # Worklog: cold README published-release proof
 
+## Owner-ratified cache correction — 2026-09-03
+
+The first hosted rehearsal33756743492 stopped before README on6 preloaded images; all four
+application-state counts were zero. Owner rejected the blanket cache restriction and clarified
+Docker is configuration-specific, not universally required by NetScript or Aspire.
+
+Design: retain first-application README ordering and all application/cleanup checks; record images
+as diagnostic-only. Amend root README prerequisite prose, not its commands. No daemon replacement,
+image pruning, new infrastructure, version change or broader test suppression. Update1881 in place.
+PLAN-EVAL remains N/A for this bounded owner-directed correction.
+
+Regression RED7/1 proves the previous all-fields-zero predicate is rejected. Final scoped GREEN
+and CI follow this amendment. Existing independent PASS applies to832e53720; the small policy/prose
+delta still requires proportional independent review before merge. Do not carry the old PASS as
+an exact-new-head evaluation. Owner requested a durable wrap-up, not another evaluator launch now.
+
+Final amendment gates: structured tests8/0, selected check1file/1batch/0diagnostics, selected
+format1/1/0findings. Issue1881 acceptance rewritten in place; unproven acceptance remains unchecked.
+PR1983 body now distinguishes the old exact-head PASS from pending bounded delta review.
+
 2026-09-03 10:24Z: primary coordinator found and repaired a real acceptance gap while auditing
 the six remaining 0.0.7 issues. #1881 explicitly forbids a warm-machine quickstart proof. Original
 workflow was warm by construction; no completed cold verdict is claimed.

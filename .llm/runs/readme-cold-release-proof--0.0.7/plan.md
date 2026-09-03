@@ -11,14 +11,19 @@ The root README published quickstart must be the first application/runtime on a 
 The prior workflow restored the Aspire NuGet cache and ran scaffold.runtime and quickstart.walk
 before readme.quickstart; that cannot establish #1881's cold-machine acceptance.
 
-Only .github/workflows/e2e-cli-prod.yml and the existing release-canary-workflow_test.ts change.
+Only .github/workflows/e2e-cli-prod.yml, the existing release-canary-workflow_test.ts, and the
+root README prerequisite prose change. Owner explicitly ratified this narrow correction on
+2026-09-03: normal image caches are supported; Docker requirements are configuration-specific.
 Run artifacts remain committed by owner policy. No framework, template, README command, release
 version, credential, lock, runtime assertion, cleanup implementation or canary admission is changed.
 
 Remove the warm AppHost cache restore; install the maintainer Deno graph, assert a read-only zero
-Aspire/container/image/volume/custom-network baseline, then execute the unchanged README suite
+Aspire/container/volume/custom-network baseline for this dedicated hosted scenario, then execute the unchanged README suite
 before globally installing the CLI or running any other scaffold. Each baseline command fails
-closed before JSON construction; nonzero counts fail without deleting anything. Upload its JSON
+closed before JSON construction; nonzero application-state counts fail without deleting anything.
+Record the image count only as diagnostic evidence; cached images are not a failure. Docker is
+required by this PostgreSQL/container-cache scenario, not universally by NetScript or Aspire.
+Upload its JSON
 with the existing ordered command transcript and both durable owned-cleanup receipts.
 
 ## Gates and close boundary
