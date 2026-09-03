@@ -11060,3 +11060,4 @@ self-evaluating is a drift to watch for — it looks like diligence and is not t
 - 02:31Z — #1664 pushed restore approach `8470808c7` (probe +297; order unchanged: island pair still before live-db-endpoint). Worker idle → ordering steer delivered (trio back after app-reference; pin live-db-endpoint < island-served-surface).
 - 02:36Z — #1664 → `9e53cce17`: restore-fixture commit `8470808c7` + order restored to main's (live-db-endpoint → app-reference → island pair → refetch); e2e-only; lock ok. Waits armed; bounded eval of both commits dispatched.
 - 02:39Z — #1664 restore+order delta native eval **PASS_IMPL_WITH_FINDINGS** (2 LOW); receipt parked. Awaiting tiers at `9e53cce17`.
+- 02:40Z — main `02c9cf648` (#1969 Aspire transitions, #1975 quickstart DENO_INSTALL_ROOT): #1664 CONFLICTING (e2e runtime files). Tiers at `9e53cce17` IN_PROGRESS → let them finish to bank the repair evidence, then converge (dry-merge classifying conflicts now).
