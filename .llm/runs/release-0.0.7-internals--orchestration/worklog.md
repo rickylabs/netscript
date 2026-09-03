@@ -11085,3 +11085,13 @@ merge-ref parity isolation, DoD mechanics); evaluator and packet are Aspire's.
 
 **D-281 addendum:** #1952 was merged by the coordinator while the confirmation posted (docker tier
 97/0 at `1a759ea34`); #1880 closes via its keyword. Watcher retired. Internals owned queue: 0.
+
+### D-282 — post-reset reconciliation at 2b8867d32: no release-blocking internal gate; cut blocker is Fixes' #1966 → PR #1967
+
+`origin/main` = `2b8867d32` (#1952 merge). Latest main `ci` run `33700886662`: `quality` 28 steps
+success with every internals-owned gate green — Agent docs corpus, **MCP export corpus** (#1929),
+Generated asset, Publish asset, **Aspire version parity**; `fresh-ui-quality` (#1917) success on
+main at `262aa8fbe`; `check-test` in progress; close-gate n/a on push. Internals owned open issues:
+0. The canary blocker is #1966 (Fixes, `status:impl`) with fix PR #1967 (`status:impl-eval`,
+head `2fa5f60eb`, fixture-only `minimumDependencyAge` opt-out, 1 fixture file) — not internals;
+watched only for merge → Canary 9. Nothing to surface as an internal gate.
