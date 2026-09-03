@@ -1,3 +1,13 @@
+use harness
+
+## SKILL
+
+- `netscript-harness` — run dir, worklog/drift, RED→GREEN discipline, separate-session eval.
+- `aspire` — Aspire resource lifecycle, `watchResourceUpdates` event semantics, fault-injection patterns.
+- `netscript-tools` — scoped validation wrappers; `.llm/tools/validation/check-aspire-resource-polling.ts` guard; durable receipts via `.llm/tools/gates/run-gate.ts`.
+- `netscript-doctrine` — `packages/cli` archetype gates before touching e2e application code.
+- `netscript-pr` — PR body/labels/milestone; `Refs #1906` (partial; supervisor closes the epic).
+
 # Implement brief — #1906 slice 3: fenced Bucket-A conversions, Bucket-C disposition, allowlist pinned
 
 Branch `test/aspire-event-observation-s3` (from `main` `3149d18e1`), worktree `007-leaf-1906`.
