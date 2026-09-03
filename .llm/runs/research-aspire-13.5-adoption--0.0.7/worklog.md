@@ -968,3 +968,16 @@ the merge.**
   (`agentic:claude-openrouter`, z-ai/glm-5.3-flash, xhigh) in detached worktree `007-eval-1952` @
   `478450a3c`, session `16762a5f-40e0-41a1-96b4-57d02472f738`; brief
   `slices/leaf-1880/impl-eval-brief.md`. Verdict lands on the PR as a comment; no head change.
+
+## 2026-09-03 00:0xZ — #1952 PASS + packet; #1881 slice dispatched
+
+- **#1952** IMPL-EVAL attempt 2 → **PASS** (session `a27d7dd5…`, 30 turns, USD 1.33); PR comment
+  5518186482; DoD 2/2; coordinator's `status:ready-merge` stands; exact-head packet 5518186781 at
+  `478450a3c`. Records `slices/leaf-1880/`. Three low findings deferred as follow-up candidates.
+- **#1881** coordinator-authorized `status:plan` → dispatched WSL-Codex-equivalent slice via
+  `agentic:launch-codex-slice` (thread `01a06491-c069-7610-999b-e4f3efa4096f`, Sol medium, route
+  matched) in `worktrees/007-aspire-leaf-1881`, branch `test/aspire-1881-readme-quickstart` off
+  main `79adb103b` (post-#1962). Brief `slices/leaf-1881/brief.md`: README markers + pure parser,
+  `readme.quickstart` suite (verbatim, once, no retries), drift test, executable readiness line
+  (`aspire wait`), `e2e-cli-prod.yml` step as a separate last commit (workflow-scoped push by the
+  supervisor), cleanup doctrine inherited. No local runtime; no Canary 8 mutation. Issue → `status:impl`.
