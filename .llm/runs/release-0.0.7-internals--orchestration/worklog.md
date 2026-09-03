@@ -11041,3 +11041,11 @@ The fixture builds a minimal package-backed project with one declared job and ex
 CLI's doctor to find a compiled registry containing it; on canary.8 the registry is never produced.
 Local bisect of `compile-registry` on the fixture's project shape at both heads recorded above.
 Owner: **features** (workers CLI regression), surfaced through a fixes-owned gate.
+
+**D-278 correction:** the local bisect shows `compile-registry` produces the registry at BOTH heads
+(`8f1fcb2bc` and `79adb103b`, REAL_EXIT=0, job present). The compiler did not regress; the
+fixture never runs compile-registry, so the published flow must have auto-produced the registry
+at canary.5 and no longer does. Attribution to #1872/#1882 withdrawn on #1641; window re-scoped to
+published `cli`/`plugin-core`/`plugin-workers` doctor-side behaviour (#1850 discovery, #1842/#1944).
+Lesson: post the bisect result *before* naming candidates — I named them from the diff list while
+the bisect was still running in the same script.
