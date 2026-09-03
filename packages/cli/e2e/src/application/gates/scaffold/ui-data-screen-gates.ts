@@ -24,6 +24,8 @@ function dataScreenCommand(context: RunContext): readonly string[] {
     'page',
     'data-screen',
     '--island',
+    '--client',
+    'users',
     '--app',
     generatedAppName(context),
   );

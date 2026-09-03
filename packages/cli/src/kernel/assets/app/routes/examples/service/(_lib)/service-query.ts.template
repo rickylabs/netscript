@@ -1,6 +1,5 @@
 import { createServiceClient } from '@netscript/sdk/client';
 import { createQueryFactories } from '@netscript/sdk/query';
-import { bridgeInvalidation } from '@netscript/sdk/query-client';
 import {
   {{serviceName | pascalCase}}ContractV1,
 } from '@{{name}}/contracts';
@@ -8,10 +7,6 @@ import {
 export const {{serviceName | camelCase}}Name = '{{serviceName}}';
 export const {{serviceName | camelCase}}RouterName = '{{serviceName | camelCase}}';
 export const {{serviceName | camelCase}}Contract = {{serviceName | pascalCase}}ContractV1;
-export const {{serviceName | camelCase}}ListInvalidation = bridgeInvalidation(
-  {{serviceName | camelCase}}RouterName,
-  'list',
-);
 
 export const {{serviceName | camelCase}}Client = createServiceClient<typeof {{serviceName | camelCase}}Contract>({
   contract: {{serviceName | camelCase}}Contract,
@@ -20,8 +15,10 @@ export const {{serviceName | camelCase}}Client = createServiceClient<typeof {{se
 });
 
 export const {{serviceName | camelCase}}Queries = createQueryFactories({
-  service: {
+  {{serviceName | camelCase}}: {
     contract: {{serviceName | camelCase}}Contract,
     client: {{serviceName | camelCase}}Client,
   },
-}).service;
+}).{{serviceName | camelCase}};
+
+export const {{serviceName | camelCase}}ListInvalidation = { queryKey: {{serviceName | camelCase}}Queries.list.clientKey() } as const;

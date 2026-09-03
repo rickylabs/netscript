@@ -1,9 +1,4 @@
-import {
-  assert,
-  assertEquals,
-  assertStringIncludes,
-  assertThrows,
-} from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import {
@@ -14,6 +9,7 @@ import { createUiAddCommand } from './add-ui-command.ts';
 
 const APP_ROOT = '/workspace/shop/apps/dashboard';
 const ROUTER_PATH = `${APP_ROOT}/router.ts`;
+const HELP_TEST_WIDTH = 80;
 const ROUTER_SOURCE = `import { createRouteReference } from '@netscript/fresh/route';
 
 export const appRoutes = {
@@ -26,16 +22,23 @@ Deno.test('ui:add help explains the page island query-loader triad', () => {
     installDependencies: { fs: new DenoFileSystem() },
     resolveUiAppRoot: () => Promise.resolve('/workspace'),
   });
-  const help = command.getHelp().replace(/\s+/g, ' ');
+  const help = command.getHelp({ colors: false, width: HELP_TEST_WIDTH });
 
-  assertStringIncludes(
+  assertHelpIncludes(
     help,
     'Creates one data-screen unit: typed page route + colocated hydrating island + query loader.',
   );
-  assertStringIncludes(help, 'Use it when a route will load data and hydrate an interactive region.');
-  assertStringIncludes(
+  assertHelpIncludes(
+    help,
+    'Use it when a route will load data and hydrate an interactive region.',
+  );
+  assertHelpIncludes(
     help,
     'Use a registry item when the route already exists and you only need an app-owned component',
+  );
+  assertHelpIncludes(
+    help,
+    '--client <service> - Select the generated service query client for a data-bound page or island',
   );
 });
 
@@ -46,10 +49,10 @@ Deno.test('ui:add real help advertises exactly the independently planned data-sc
     { projectRoot: APP_ROOT, path: 'incidents', island: true, dryRun: true },
     fs,
   );
-  const help = testCommand(fs).getHelp().replace(/\s+/g, ' ');
+  const help = testCommand(fs).getHelp({ colors: false, width: HELP_TEST_WIDTH });
 
   assertHelpMatchesPlan(help, planned.files);
-  assertStringIncludes(help, 'routes/**/(_islands)/');
+  assertHelpIncludes(help, 'routes/**/(_islands)/');
 });
 
 Deno.test('ui:add help-role seam rejects the stale three-part advertisement', async () => {
@@ -85,12 +88,14 @@ Deno.test('ui:add page --island --dry-run reports the exact plan and writes noth
 
   assertEquals(fs.getFiles(), before);
   assertReportedRoles(output, 'Planned');
-  for (const path of [
-    `${APP_ROOT}/routes/admin/status/index.tsx`,
-    `${APP_ROOT}/routes/admin/status/(_shared)/query-loaders.ts`,
-    `${APP_ROOT}/routes/admin/status/(_islands)/StatusIsland.tsx`,
-    ROUTER_PATH,
-  ]) {
+  for (
+    const path of [
+      `${APP_ROOT}/routes/admin/status/index.tsx`,
+      `${APP_ROOT}/routes/admin/status/(_shared)/query-loaders.ts`,
+      `${APP_ROOT}/routes/admin/status/(_islands)/StatusIsland.tsx`,
+      ROUTER_PATH,
+    ]
+  ) {
     assert(output.some((line) => line.includes(path)), `Missing planned path: ${path}`);
   }
 });
@@ -105,14 +110,57 @@ Deno.test('ui:add page --island reports each generated role and path', async () 
   assertReportedRoles(output, 'Generated');
 });
 
+Deno.test('ui:add --client forwards service selection to page and island scaffolds', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await seedBindableApp(fs);
+  await fs.writeFile(
+    `${APP_ROOT}/lib/client-module.ts`,
+    `export const paymentsName = 'payments';
+export const paymentsQueries = createQueryFactories({
+  service: { contract: paymentsContract, client: paymentsClient },
+}).service;
+`,
+  );
+  await fs.writeFile(
+    '/workspace/shop/contracts/versions/v1/payments.contract.ts',
+    "export const PaymentsCrudContractV1 = createCrudContract({ resource: 'payments' });\n",
+  );
+
+  await testCommand(fs).parse([
+    'page',
+    'payments',
+    '--island',
+    '--client',
+    'payments',
+  ]);
+  await testCommand(fs).parse([
+    'island',
+    'payments-panel',
+    '--query',
+    '--client',
+    'payments',
+  ]);
+
+  const pageLoader = await fs.readFile(
+    `${APP_ROOT}/routes/payments/(_shared)/query-loaders.ts`,
+  );
+  const island = await fs.readFile(
+    `${APP_ROOT}/routes/(_islands)/PaymentsPanel.tsx`,
+  );
+  assertStringIncludes(pageLoader, 'paymentsQueries');
+  assertStringIncludes(island, 'paymentsQueries');
+});
+
 Deno.test('ui:add --force reaches page scaffold replacement', async () => {
   const fs = new MemoryFileSystemAdapter();
   await seedBindableApp(fs);
-  for (const path of [
-    `${APP_ROOT}/routes/orders/index.tsx`,
-    `${APP_ROOT}/routes/orders/(_shared)/query-loaders.ts`,
-    `${APP_ROOT}/routes/orders/(_islands)/OrdersIsland.tsx`,
-  ]) {
+  for (
+    const path of [
+      `${APP_ROOT}/routes/orders/index.tsx`,
+      `${APP_ROOT}/routes/orders/(_shared)/query-loaders.ts`,
+      `${APP_ROOT}/routes/orders/(_islands)/OrdersIsland.tsx`,
+    ]
+  ) {
     await fs.writeFile(path, '// stale\n');
   }
 
@@ -149,12 +197,20 @@ export const ordersQueries = createQueryFactories({
 }
 
 function assertHelpMatchesPlan(help: string, files: readonly UiGeneratedFile[]): void {
-  const advertised = /Data-screen roles: ([^.]+)\./.exec(help)?.[1]
+  const advertised = /Data-screen roles: ([^.]+)\./.exec(normalizeHelpText(help))?.[1]
     .split(',')
     .map((role) => role.trim())
     .sort();
   assert(advertised, 'Real command help must expose the data-screen role list.');
   assertEquals(advertised, [...new Set(files.map((file) => file.role))].sort());
+}
+
+function assertHelpIncludes(help: string, expected: string): void {
+  assertStringIncludes(normalizeHelpText(help), normalizeHelpText(expected));
+}
+
+function normalizeHelpText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
 }
 
 function assertReportedRoles(output: readonly string[], verb: 'Planned' | 'Generated'): void {

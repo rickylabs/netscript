@@ -26,9 +26,21 @@ export const SCAFFOLD_RUNTIME_DEFERRED_GATES: readonly DeferredGate[] = [];
 const SERVICE_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.SCAFFOLD_INIT,
+  GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+  GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
   GATE.SERVICE_LIST,
   GATE.DATABASE_CODEGEN,
+  GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
   GATE.GENERATED_SERVICE_CHECK,
+  // GATE.GENERATED_DENO_LINT is deliberately NOT wired into the service suite.
+  // It already runs in the runtime suite, where the scaffold registers plugins.
+  // This suite's fixture registers none, so the Aspire helper template's
+  // `{{__slot4__}}`/`{{__slot5__}}` render empty and its `builder`,
+  // `infrastructure`, `appHostDir`, `databaseEnvKey`, and `databaseProviderEnv`
+  // symbols become unused -- 23 `no-unused-vars` in generated output this branch
+  // does not author. That is pre-existing template debt, tracked separately; it
+  // is not a reason to hold this slice, and suppressing it here would weaken a
+  // gate that is genuinely useful where the slots are populated.
 ] as const;
 
 const CONTRACT_GATES = [
@@ -51,6 +63,8 @@ const RUNTIME_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
   GATE.SCAFFOLD_INIT,
+  GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+  GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
   GATE.SCAFFOLD_AGENT_INIT,
   GATE.SCAFFOLD_UI_DATA_SCREEN,
   'scaffold.plugin.worker',
@@ -67,6 +81,7 @@ const RUNTIME_GATES = [
   GATE.SCAFFOLD_UI_LOCAL_SOURCE,
   GATE.GENERATED_RUNTIME_SCHEMAS,
   GATE.DATABASE_CODEGEN,
+  GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
   GATE.BEHAVIOR_PROJECT_BOUNDARY_DEV,
   GATE.BEHAVIOR_PLUGINS_UNHEALTHY,
   GATE.GENERATED_PLUGINS_CHECK,
@@ -136,6 +151,7 @@ const RUNTIME_GATES = [
   GATE.BEHAVIOR_APP_REFERENCE,
   GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
   GATE.BEHAVIOR_ISLAND_HYDRATION,
+  GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
   GATE.BEHAVIOR_UI_RENDER,
   GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP,
   GATE.BEHAVIOR_PLUGINS_HEALTH,

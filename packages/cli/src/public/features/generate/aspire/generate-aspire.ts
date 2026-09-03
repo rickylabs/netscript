@@ -2,11 +2,16 @@ import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/wor
 import { UseCase } from '../../../../kernel/application/abstracts/use-case.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../../../kernel/ports/template-port.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 
 /** Request for regenerating Aspire helper files. */
 export interface GenerateAspireRequest {
   /** Absolute project root. */
   readonly projectRoot: string;
+  /** Report helper changes without writing them. */
+  readonly dryRun?: boolean;
+  /** Rewrite identical helper files. */
+  readonly force?: boolean;
 }
 
 /** Dependencies for Aspire helper generation. */
@@ -20,12 +25,20 @@ export interface GenerateAspireDependencies {
   /** Template renderer. */
   readonly templateAdapter: TemplatePort;
 
+  /** Optional pre-write canonicalizer for service-generation flows. */
+  readonly formatter?: GeneratedSourceFormatterPort;
+
   /** Optional helper regeneration override for tests. */
   readonly regenerateHelpers?: (
     projectRoot: string,
     fs: FileSystemPort,
     scaffolder: ScaffolderPort,
     templateAdapter: TemplatePort,
+    options?: {
+      readonly dryRun?: boolean;
+      readonly force?: boolean;
+      readonly formatter?: GeneratedSourceFormatterPort;
+    },
   ) => Promise<readonly string[]>;
 }
 
@@ -66,6 +79,11 @@ async function executeGenerateAspire(
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    {
+      dryRun: request.dryRun,
+      force: request.force,
+      formatter: dependencies.formatter,
+    },
   );
   return { helperFiles };
 }

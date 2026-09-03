@@ -1,0 +1,59 @@
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/cli",
+    "entrypoints": [
+      "./mod.ts",
+      "./scaffolding.ts",
+      "./testing.ts"
+    ],
+    "exitCode": 0
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 0,
+    "totalPrivateTypeRef": 0,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/cli",
+      "dir": "packages/cli",
+      "entrypoints": [
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./scaffolding.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./testing.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        }
+      ],
+      "files": [],
+      "combinedTotal": 0,
+      "combinedPrivateTypeRef": 0,
+      "combinedMissingJSDoc": 0,
+      "combinedOther": 0,
+      "combinedExitCode": 0,
+      "entrypointExitCodes": {
+        "./mod.ts": 0,
+        "./scaffolding.ts": 0,
+        "./testing.ts": 0
+      }
+    }
+  ]
+}

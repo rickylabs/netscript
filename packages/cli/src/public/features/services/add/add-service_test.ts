@@ -1,5 +1,5 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
@@ -14,6 +14,9 @@ import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/wo
 import { addService } from './add-service.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
+import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 
 // This flow renders root project metadata via sync template generators, which
 // require a previously-awaited registry hydration. The test drives the flow
@@ -46,6 +49,8 @@ describe('public add service flow', () => {
     await writeProjectFiles(fs);
     const templateAdapter = new StringTemplateAdapter(fs);
     const scaffolder = new Scaffolder(templateAdapter, fs);
+    const formatter = identityFormatter();
+    const helperOptions: unknown[] = [];
 
     const result = await addService({
       serviceName: 'billing',
@@ -53,6 +58,7 @@ describe('public add service flow', () => {
       serviceReferences: ['users'],
       projectRoot: '/workspace/alpha',
       overwrite: false,
+      withClient: true,
     }, {
       fs,
       scaffolder,
@@ -63,11 +69,17 @@ describe('public add service flow', () => {
         scaffolder,
         templateAdapter,
         templateRegistry: new DefaultContractTemplateRegistry(),
-        versionRegistry: new ContractVersionRegistry(fs),
+        versionRegistry: new ContractVersionRegistry(fs, formatter),
         workspaceResolver: new ContractWorkspaceResolver(fs),
+        formatter,
       }),
-      serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+      serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter, formatter),
+      clientScaffolder: new ServiceClientScaffolder(scaffolder, fs, formatter),
+      formatter,
+      regenerateHelpers: (_root, _fs, _scaffolder, _template, options) => {
+        helperOptions.push(options);
+        return Promise.resolve(['/workspace/alpha/aspire/apphost.mts']);
+      },
     });
 
     const serviceDenoJson = JSON.parse(
@@ -85,17 +97,99 @@ describe('public add service flow', () => {
     assertEquals(rootDenoJson.workspace.includes('./services/billing'), true);
     assertStringIncludes(contractMod, './billing.contract.ts');
     assertEquals(result.helperFiles.length, 1);
+    assertEquals(helperOptions, [{ formatter }]);
+    assertEquals(result.clientPath, '/workspace/alpha/apps/web/lib/billing.ts');
+    if (!result.clientPath) throw new Error('Expected generated client path.');
+    assertStringIncludes(
+      await fs.readFile(result.clientPath),
+      '{ queryKey: billingQueries.list.clientKey() } as const',
+    );
+  });
+
+  it('rejects an unrelated missing contract before any add-path write', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs, {
+      users: { Port: 3001 },
+      orders: { Port: 3002 },
+    });
+    await fs.writeFile(
+      '/workspace/alpha/contracts/versions/v1/users.contract.ts',
+      'export const UsersContractV1 = { list: {} };\n',
+    );
+    const originalAppsettings = await fs.readFile('/workspace/alpha/appsettings.json');
+    const originalWorkspace = await fs.readFile('/workspace/alpha/deno.json');
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const formatter = identityFormatter();
+
+    const error = await assertRejects(
+      () =>
+        addService({
+          serviceName: 'payments',
+          port: 3003,
+          serviceReferences: [],
+          projectRoot: '/workspace/alpha',
+          overwrite: false,
+          withClient: true,
+        }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          portAllocator: new PortAllocator(fs),
+          serviceResolver: new ServiceWorkspaceResolver(fs),
+          contractScaffolder: createContractScaffolder({
+            scaffolder,
+            templateAdapter,
+            templateRegistry: new DefaultContractTemplateRegistry(),
+            versionRegistry: new ContractVersionRegistry(fs, formatter),
+            workspaceResolver: new ContractWorkspaceResolver(fs),
+            formatter,
+          }),
+          serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter, formatter),
+          clientScaffolder: new ServiceClientScaffolder(scaffolder, fs, formatter),
+          formatter,
+          regenerateHelpers: async () => {
+            await fs.writeFile('/workspace/alpha/aspire/apphost.mts', '// unexpected write\n');
+            return ['/workspace/alpha/aspire/apphost.mts'];
+          },
+        }),
+      ScaffoldValidationError,
+    );
+
+    assertStringIncludes(error.message, 'orders');
+    assertStringIncludes(
+      error.message,
+      '/workspace/alpha/contracts/versions/v1/orders.contract.ts',
+    );
+    assertEquals(await fs.readFile('/workspace/alpha/appsettings.json'), originalAppsettings);
+    assertEquals(await fs.readFile('/workspace/alpha/deno.json'), originalWorkspace);
+    assertEquals(await fs.exists('/workspace/alpha/aspire/apphost.mts'), false);
+    assertEquals(await fs.exists('/workspace/alpha/services/payments/deno.json'), false);
+    assertEquals(
+      await fs.exists('/workspace/alpha/contracts/versions/v1/payments.contract.ts'),
+      false,
+    );
   });
 });
 
-async function writeProjectFiles(fs: MemoryFileSystemAdapter): Promise<void> {
+function identityFormatter(): GeneratedSourceFormatterPort {
+  return {
+    formatContent: (_path, content) => Promise.resolve(content),
+    formatFiles: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
+}
+
+async function writeProjectFiles(
+  fs: MemoryFileSystemAdapter,
+  services: Readonly<Record<string, unknown>> = {},
+): Promise<void> {
   await fs.writeFile(
     '/workspace/alpha/appsettings.json',
     JSON.stringify(
       {
         NetScript: {
           Name: 'alpha-app',
-          Services: {},
+          Services: services,
         },
       },
       null,

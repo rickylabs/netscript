@@ -23,6 +23,7 @@ import {
 } from './templates/contract-template-registry.ts';
 import { ContractVersionRegistry } from './version-registry.ts';
 import { ContractWorkspaceResolver } from './workspace-resolver.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 /** Dependencies required to scaffold and extend contract workspaces. */
 export interface ContractScaffoldDependencies {
@@ -36,6 +37,8 @@ export interface ContractScaffoldDependencies {
   readonly versionRegistry?: ContractVersionRegistry;
   /** Optional workspace membership resolver. */
   readonly workspaceResolver?: ContractWorkspaceResolver;
+  /** Optional pre-write canonicalizer for post-init service flows. */
+  readonly formatter?: GeneratedSourceFormatterPort;
 }
 
 /** Contract workspace operations used by public application flows. */
@@ -60,6 +63,7 @@ export function createContractScaffolder(
     templateRegistry,
     versionRegistry,
     workspaceResolver,
+    formatter,
   } = dependencies;
 
   async function writeTracked(
@@ -69,7 +73,8 @@ export function createContractScaffolder(
     filesCreated: string[],
     filesSkipped: string[],
   ): Promise<void> {
-    if (await scaffolder.writeFile(path, content, force ?? false)) {
+    const canonicalContent = formatter ? await formatter.formatContent(path, content) : content;
+    if (await scaffolder.writeFile(path, canonicalContent, force ?? false)) {
       filesCreated.push(path);
     } else {
       filesSkipped.push(path);

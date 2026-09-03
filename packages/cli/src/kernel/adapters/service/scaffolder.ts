@@ -14,6 +14,7 @@ import { generateServiceDenoJson } from '../../templates/service/generate-servic
 import type { ServiceScaffoldOptions, ServiceScaffoldResult } from '../../domain/service-shape.ts';
 import { TEMPLATE_KEYS, type TemplateKey } from '../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../templates/template-asset.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 /** Creates a complete service workspace under `services/<name>/`. */
 export class ServiceScaffolder {
@@ -22,6 +23,7 @@ export class ServiceScaffolder {
     private readonly scaffolder: ScaffolderPort,
     private readonly _fs: FileSystemPort,
     private readonly _templateAdapter: TemplatePort,
+    private readonly formatter?: GeneratedSourceFormatterPort,
   ) {}
 
   /**
@@ -150,7 +152,10 @@ export class ServiceScaffolder {
     filesCreated: string[],
     filesSkipped: string[],
   ): Promise<void> {
-    if (await this.scaffolder.writeFile(path, content, force)) {
+    const canonicalContent = this.formatter
+      ? await this.formatter.formatContent(path, content)
+      : content;
+    if (await this.scaffolder.writeFile(path, canonicalContent, force)) {
       filesCreated.push(path);
     } else {
       filesSkipped.push(path);

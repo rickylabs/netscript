@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "app-service-client-wiring-f8-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1355",
+  "gitHead": "3299992e4e1cfc329c808b9034e91598bf758522",
+  "actualGitHead": "3299992e4e1cfc329c808b9034e91598bf758522",
+  "timeoutMs": 3000000,
+  "runnerIdentity": "worker:588674",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "d17a20ce9137d2555e9b503deb849f69039a5e7b8e7aad9619731ba4a9b36206",
+  "lifecycleId": "worker:588674:app-service-client-wiring-f8-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-23T07:24:43.866Z",
+  "startedAt": "2026-08-23T07:24:43.870Z",
+  "finishedAt": "2026-08-23T07:30:53.019Z",
+  "durationMs": 344550,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 267,
+    "sha256": "34c0f07adbaa0ac3d375792c66c6f1b68b70bcde04e063a77b869c3911d0a0b5",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-features-1355\",\"exitCode\":0,\"durationMs\":344407,\"summary\":{\"passed\":4240,\"failed\":0,\"ignored\":19,\"totalResults\":4259,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 127,
+    "sha256": "d8c71713aba1eb302702bcf55c321886c40fa2beba1801afb19ff811dd358567",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}
