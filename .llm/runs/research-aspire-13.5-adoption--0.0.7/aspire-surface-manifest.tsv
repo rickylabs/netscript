@@ -116,6 +116,11 @@ path	class	owner	disposition
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/research.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
+.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/drift.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/evaluate.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
@@ -172,6 +177,7 @@ path	class	owner	disposition
 .llm/tools/harness/validate-milestone-cluster_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/harness/validate-milestone-cluster.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/release/baselines/public-surfaces.json	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/release/release-canary-workflow_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-fmt.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus

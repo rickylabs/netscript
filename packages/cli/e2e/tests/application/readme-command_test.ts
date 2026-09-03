@@ -5,6 +5,7 @@ import type {
   AspireCommandRunner,
 } from '../../src/application/gates/quickstart/aspire-walk.ts';
 import { executeReadmeQuickstartCommand } from '../../src/application/gates/quickstart/readme-command.ts';
+import { README_QUICKSTART_EXPECTED_COMMANDS } from '../../src/domain/readme-quickstart.ts';
 
 const EXACT_CLI = 'jsr:@netscript/cli@0.0.7-canary.9';
 const EXPECTED_INSTALL_ARGV = [
@@ -90,6 +91,70 @@ Deno.test('README commands share a run-owned Deno install environment without ch
       1,
     );
     assertEquals(receipt.environment, { denoInstallRoot, pathPrepend });
+  } finally {
+    await Deno.remove(temporaryRoot, { recursive: true });
+  }
+});
+
+Deno.test('README walker captures the users port only after the printed readiness command', async () => {
+  const temporaryRoot = await Deno.makeTempDir({ prefix: 'netscript-readme-readiness-' });
+  try {
+    const repoRoot = resolve(import.meta.dirname!, '../../../../..');
+    const runRoot = resolve(temporaryRoot, 'run');
+    const appHost = resolve(runRoot, 'my-app/aspire/apphost.mts');
+    const statePath = resolve(temporaryRoot, 'state.json');
+    await Deno.mkdir(resolve(runRoot, 'my-app/aspire'), { recursive: true });
+    const spawns: string[][] = [];
+    const spawn: AspireCommandRunner = (command) => {
+      spawns.push([...command]);
+      return Promise.resolve({ code: 0, stdout: '', stderr: '', timedOut: false });
+    };
+    const resolverCalls: Array<{ appHost: string; resourceName: string }> = [];
+    const resolveServiceUrls = (candidateAppHost: string, resourceName: string) => {
+      resolverCalls.push({ appHost: candidateAppHost, resourceName });
+      return Promise.resolve(['http://localhost:43210']);
+    };
+
+    for (let index = 0; index < README_QUICKSTART_EXPECTED_COMMANDS.length; index++) {
+      assertEquals(
+        await executeReadmeQuickstartCommand(
+          repoRoot,
+          runRoot,
+          appHost,
+          index,
+          EXACT_CLI,
+          statePath,
+          1_000,
+          spawn,
+          resolveServiceUrls,
+        ),
+        0,
+      );
+    }
+
+    assertEquals(resolverCalls, [{ appHost, resourceName: 'users' }]);
+    assertEquals(
+      spawns.find((argv) => argv[0] === 'aspire' && argv[1] === 'wait' && argv[2] === 'users'),
+      [
+        'aspire',
+        'wait',
+        'users',
+        '--status',
+        'healthy',
+        '--timeout',
+        '60',
+        '--apphost',
+        'aspire/apphost.mts',
+      ],
+    );
+    assertEquals(spawns.find((argv) => argv[0] === 'curl'), [
+      'curl',
+      '--fail-with-body',
+      '--show-error',
+      '--max-time',
+      '15',
+      'http://localhost:43210/health',
+    ]);
   } finally {
     await Deno.remove(temporaryRoot, { recursive: true });
   }
