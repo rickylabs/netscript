@@ -31,11 +31,17 @@ for (
       'compile-registry',
       `
 import * as job0 from './welcome.ts';
-const entries = [["welcome", resolveJobHandler(job0, "workers/jobs/welcome.ts")]];
+export const jobHandlersById = Object.freeze({
+  ["welcome"]: resolveJobHandler(job0, "workers/jobs/welcome.ts"),
+});
+const entries = [["welcome", jobHandlersById["welcome"]]];
 export const registry = new Map(entries);
-const jobDefinitionEntries = [["welcome", createLocalJobDefinition("welcome", "./welcome.ts")]];
+export const jobDefinitionsById = Object.freeze({
+  ["welcome"]: createLocalJobDefinition("welcome", "./welcome.ts"),
+});
+const jobDefinitionEntries = Object.entries(jobDefinitionsById);
 export const jobDefinitions = new Map(jobDefinitionEntries);
-function createLocalJobDefinition() {}
+function createLocalJobDefinition<TId extends string>(id: TId) { return { id }; }
 `,
     ],
     [

@@ -19,9 +19,46 @@ import { z } from 'zod';
 // PAYLOAD SCHEMA
 // ============================================================================
 
-const HealthCheckPayloadSchema = z.object({
+/** Validated payload consumed by the built-in workers health-check job. */
+export type HealthCheckJobPayload = Readonly<{ verbose: boolean }>;
+
+/** Standard Schema surface carried by the built-in workers health-check job. */
+export interface HealthCheckJobPayloadSchema {
+  /** Standard Schema validation metadata and hook. */
+  readonly '~standard': {
+    readonly version: 1;
+    readonly vendor: string;
+    readonly validate: (
+      value: unknown,
+      options?: { readonly libraryOptions?: Record<string, unknown> | undefined },
+    ) =>
+      | { readonly value: HealthCheckJobPayload; readonly issues?: undefined }
+      | {
+        readonly issues: ReadonlyArray<{
+          readonly message: string;
+          readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined;
+        }>;
+      }
+      | Promise<
+        | { readonly value: HealthCheckJobPayload; readonly issues?: undefined }
+        | {
+          readonly issues: ReadonlyArray<{
+            readonly message: string;
+            readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined;
+          }>;
+        }
+      >;
+    readonly types?: {
+      readonly input: unknown;
+      readonly output: HealthCheckJobPayload;
+    } | undefined;
+  };
+}
+
+/** Payload schema for the built-in workers health-check job. */
+export const HealthCheckPayloadSchema: HealthCheckJobPayloadSchema = z.object({
   verbose: z.boolean().default(false),
-});
+}).default({ verbose: false });
 
 // ============================================================================
 // RESULT TYPES
@@ -42,7 +79,7 @@ interface HealthCheck {
 export type HealthCheckJobContext = Readonly<{
   id: string;
   job?: Readonly<{ id: string }>;
-  payload: unknown;
+  payload: HealthCheckJobPayload;
   correlationId?: string;
   traceparent?: string;
   tracestate?: string;
@@ -55,14 +92,13 @@ export type HealthCheckJobResult =
   | Readonly<{ success: false; error: string; data?: unknown }>;
 
 /** Handler signature for the built-in workers plugin health check job. */
-export type HealthCheckJobHandler = (
-  context: HealthCheckJobContext,
-) => HealthCheckJobResult | Promise<HealthCheckJobResult>;
+export type HealthCheckJobHandler =
+  & ((context: HealthCheckJobContext) => HealthCheckJobResult | Promise<HealthCheckJobResult>)
+  & Readonly<{ payloadSchema: typeof HealthCheckPayloadSchema }>;
 
-const handler: HealthCheckJobHandler = defineJobHandler(async (ctx) => {
-  const payload = HealthCheckPayloadSchema.parse(ctx.payload ?? {});
+const handler = defineJobHandler(HealthCheckPayloadSchema, async (ctx) => {
   const { log, progress, trace } = createJobTools(ctx);
-  const { verbose } = payload;
+  const { verbose } = ctx.payload;
   const checks: HealthCheck[] = [];
   const startTime = performance.now();
 

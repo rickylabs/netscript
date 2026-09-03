@@ -77,11 +77,15 @@ export async function loadGeneratedJobRegistry(
   }
 
   const module = await importRegistryModule(registryUrl);
-  const definitions = isStaticJobDefinitionRegistry(module.jobDefinitions)
-    ? module.jobDefinitions
-    : isStaticJobDefinitionRegistry(module.definitions)
-    ? module.definitions
+  const literalDefinitions = isStaticJobDefinitionRecord(module.jobDefinitionsById)
+    ? new Map(Object.entries(module.jobDefinitionsById))
     : undefined;
+  const definitions = literalDefinitions ??
+    (isStaticJobDefinitionRegistry(module.jobDefinitions)
+      ? module.jobDefinitions
+      : isStaticJobDefinitionRegistry(module.definitions)
+      ? module.definitions
+      : undefined);
   const registry = isStaticJobRegistry(module.registry) ? module.registry : undefined;
 
   if (!definitions) {
@@ -203,6 +207,15 @@ async function findUnregistered(
 
 function isStaticJobDefinitionRegistry(value: unknown): value is StaticJobDefinitionRegistry {
   return value instanceof Map;
+}
+
+function isStaticJobDefinitionRecord(
+  value: unknown,
+): value is Readonly<Record<string, RegisterJobInput>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) &&
+    Object.values(value).every((definition) =>
+      typeof definition === 'object' && definition !== null
+    );
 }
 
 function isStaticJobRegistry(value: unknown): value is StaticJobRegistry {

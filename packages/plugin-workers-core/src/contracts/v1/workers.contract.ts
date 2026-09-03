@@ -8,7 +8,11 @@
  */
 
 export { SSEEventTypes } from '../../domain/mod.ts';
-export { workersContract, workersContractV1 } from './workers.contract-definition.ts';
+export {
+  createWorkersContract,
+  workersContract,
+  workersContractV1,
+} from './workers.contract-definition.ts';
 export {
   ExecutionFiltersSchema,
   ExecutionRecordResponseSchema,
@@ -27,6 +31,8 @@ export type {
   ContractSchemaResult,
   ExecutionRecordResponse,
   JobDefinitionResponse,
+  JobPayloadRecord,
+  JobPayloadRegistry,
   JobTriggerInput,
   JobTriggerOutput,
   SSEEvent,

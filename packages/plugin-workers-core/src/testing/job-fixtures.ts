@@ -13,6 +13,7 @@ import {
   type WorkersRuntime,
   type WorkersRuntimeOptions,
 } from '../runtime/mod.ts';
+import { z } from 'zod';
 import { MemoryJobStorage } from './memory-job-storage.ts';
 import { MemoryWorker } from './memory-worker.ts';
 
@@ -85,6 +86,7 @@ export function createJobFixture<
   const handler: BuilderJobHandler<TPayload, TResult> = options.handler ??
     (() => createSuccessResult<TResult>());
   const definition: BuilderJobDefinition<TId, TPayload, TResult> = defineJob(id)
+    .payload(z.custom<TPayload>(() => true))
     .handler(handler)
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])

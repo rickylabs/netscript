@@ -1,4 +1,7 @@
 import { assertEquals } from '@std/assert';
+import { defineJob } from '@netscript/plugin-workers-core';
+import { z } from 'zod';
+import { enqueueJob } from '../../src/builders/define-webhook.ts';
 import type {
   TriggerDefinitionResponse,
   TriggerEventResponse,
@@ -7,6 +10,7 @@ import type {
 } from '../../src/contracts/v1/mod.ts';
 import { triggersContractV1 } from '../../src/contracts/v1/mod.ts';
 import type { TriggerDurabilityTier, TriggerEventStatus } from '../../src/domain/constants.ts';
+import type { TriggerActionResult } from '../../src/domain/trigger-action.ts';
 
 // ============================================================================
 // Type-level soundness assertions for the precise triggers contract.
@@ -80,6 +84,18 @@ const _badTier: TriggerDefinitionResponse['durabilityTier'] = 't9';
 // @ts-expect-error - 'cron' is not a TriggerContractKind
 const _badKind: TriggerDefinitionResponse['kind'] = 'cron';
 
+// A concrete schema-backed worker action must remain assignable to the broad
+// trigger-handler result union. The public action carrier intentionally omits
+// the handler because its payload parameter is contravariant; the dispatcher
+// needs only the job reference metadata and payload schema.
+const _typedJob = defineJob('typed-trigger-job')
+  .payload(z.object({ verbose: z.boolean() }))
+  .handler(({ payload }) => ({ success: true, data: payload.verbose }))
+  .build();
+const _typedEnqueueAction: TriggerActionResult = enqueueJob(_typedJob, {
+  payload: { verbose: true },
+});
+
 Deno.test('triggers contract exposes a precise, non-loosened type surface', () => {
   // Reference the type-level bindings at runtime so they are not unused, and
   // confirm the implementer value (precise oRPC contract) is present.
@@ -93,4 +109,5 @@ Deno.test('triggers contract exposes a precise, non-loosened type surface', () =
   assertEquals(_validTier, 't1');
   assertEquals(_badTier as unknown, 't9');
   assertEquals(_badKind as unknown, 'cron');
+  assertEquals(_typedEnqueueAction.kind, 'enqueue-job');
 });
