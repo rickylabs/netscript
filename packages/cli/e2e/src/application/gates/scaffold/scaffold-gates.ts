@@ -171,21 +171,5 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       GATE_PHASE.SCAFFOLD,
       (context) => cli(context, 'plugin', 'list', '--project-root', context.project.projectRoot),
     ),
-    commandGate(
-      GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
-      'Prove settled users update invalidates and refetches its list once',
-      GATE_PHASE.BEHAVIOR,
-      (context) => [
-        'deno',
-        'run',
-        '-A',
-        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`,
-        'browser',
-        context.project.projectRoot,
-        generatedAppName(context),
-        context.project.appHost,
-      ],
-      (context) => context.project.projectRoot,
-    ),
   ];
 }

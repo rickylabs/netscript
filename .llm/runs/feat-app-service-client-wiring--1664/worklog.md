@@ -775,3 +775,70 @@ The touched-test wrapper was also run once without the required home-directory `
 environment reported 23 passed / 2 failed because `/ephemeral/tmp` forbids execution of the two
 test-created browser stubs. Re-running on the slice's prescribed executable temp root passed all
 25 tests. No generated carrier, template, Fresh source, SDK source, or lock-file byte changed.
+
+## 2026-09-03 hosted no-island follow-up at `dbb577826`
+
+### Design
+
+- Archetype: 6 — CLI / Tooling. This is a bounded E2E ordering and failure-evidence correction; it
+  changes no public CLI vocabulary, scaffold template, generated application, or Fresh runtime.
+- Public surface: unchanged. The internal runtime suite will run the served-surface and hydration
+  discriminators immediately before the service-client refetch proof.
+- Domain vocabulary: a bounded page-failure snapshot consisting of final URL, main-document HTTP
+  status, title, first 600 body-HTML characters, console/runtime errors, and failed HTTP/network
+  requests.
+- Ports and effects: the existing CDP client remains the only browser edge. `Network`, `Runtime`,
+  and `Log` events supply diagnostics already available during the probe; no new process or network
+  abstraction is introduced.
+- Constants: retain the existing gate IDs and add only a fixed 600-character document snippet cap.
+- Commit slice: reorder the three behavior gates, colocate their gate definitions in runtime
+  behavior composition, add bounded failure capture, align refetch with the same canonical URL as
+  the #1885 probes if static and standalone evidence show `preview=success` adds no behavior needed
+  by the assertion, update order/diagnostic tests, then run the coordinator-specified gates.
+- Deferred scope: no template/runtime repair without evidence; no Aspire, Docker, hosted runtime,
+  or local `e2e:cli` execution.
+- Contributor path: `capability-suites.ts` declares verdict order; `behavior-gates.ts` composes the
+  live-app command gates; `service-client-browser-probe.ts` owns CDP evidence.
+- PLAN-EVAL: N/A — the coordinator supplied the exact order, bounded diagnostic fields, decision
+  rule for the query string, touch ceiling, and gate set. No material architecture decision remains.
+
+### Measurement and implementation
+
+- Static route inspection found that `preview=success` is parsed into `previewState` only. Both the
+  database and memory loaders still fetch the service records, the lab panel always renders the
+  default-exported `ServiceShowcaseLab`, and the island always installs its `QueryClientProvider`.
+- The exact-branch generated fixture at
+  `/home/agent/tmp/ns1664-local-out.IOeTzR/service-refetch-fixture` was served with its standalone
+  Deno service and Vite, without Aspire or Docker. Direct requests measured:
+  - `/examples/users`: HTTP 200, 135,557 bytes, one `frsh:island:ServiceShowcaseLab:1:` marker, one
+    `>Rename<` control, and one `data-state="success"` marker.
+  - `/examples/users?preview=success`: HTTP 200, 135,635 bytes, with the same three marker counts.
+  - The 78-byte response delta is serialized preview state; the query does not suppress the island,
+    its bundle, or the control in this standalone generated app.
+- The refetch gate now targets the same canonical `/examples/users` document as the two #1885
+  discriminators. The query was removed to eliminate an unnecessary hosted-environment difference,
+  not because local evidence showed it caused the missing DOM.
+- Runtime order is now `behavior.island-served-surface` → `behavior.island-hydration` →
+  `behavior.service-client-refetch`, with the refetch command moved from scaffold composition into
+  runtime behavior composition immediately after hydration.
+- Refetch failures now carry bounded structured evidence for final URL, document HTTP status,
+  document title, the first 600 body-HTML characters, console/runtime/log errors, and failed HTTP or
+  network requests. HTTP failures include method/status/URL, so missing client bundles survive into
+  the gate artifact. Existing mutation, optimistic-row, and exactly-one-refetch success assertions
+  are unchanged.
+
+### Validation
+
+| Gate | Exit | Counts / evidence |
+| --- | ---: | --- |
+| Structured CLI check | 0 | 985 selected / 9 batches / 0 failed batches / 0 diagnostics |
+| Touched E2E unit tests | 0 | 47 passed / 0 failed / 0 ignored |
+| Full `packages/cli/e2e/tests/` unit directory | 0 | 327 passed / 0 failed / 0 ignored |
+| `arch:check` | 0 | Dependency and doctrine scans completed with 0 failures |
+| `quality:gate` | 0 | Root coverage complete; 0 findings / 7 existing allowances; doctrine 0 failures |
+| Source formatting and diff hygiene | 0 | 8 touched TypeScript files formatted; `git diff --check` clean |
+| Lock integrity | 0 | Byte-identical to `dbb577826`; SHA-256 `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6` |
+
+No Aspire, Docker, hosted tier, browser-runtime suite, or `e2e:cli` gate was run locally. The next
+hosted sqlite run will either pass on the canonical path or report which earlier island discriminator
+failed plus the served document/network evidence from the refetch probe.

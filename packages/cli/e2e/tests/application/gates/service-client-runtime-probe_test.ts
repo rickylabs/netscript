@@ -9,6 +9,7 @@ import {
 import { z } from 'zod';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
+import { createBrowserPageDiagnosticsCollector } from '../../../src/application/gates/scaffold/service-client-browser-diagnostics.ts';
 import {
   awaitBrowserStartup,
   BROWSER_EXECUTABLE_ENV,
@@ -19,6 +20,7 @@ import {
   terminateBrowserProcess,
   waitForCompletedStableBaseline,
 } from '../../../src/application/gates/scaffold/service-client-browser-probe.ts';
+import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
 import { generatedAppName } from '../../../src/application/gates/scaffold/runtime/generated-app-name.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { deriveProcedureInput } from '../../../src/application/gates/scaffold/service-client-input-probe.ts';
@@ -842,6 +844,19 @@ Deno.test('browser refetch probe refreshes its row baseline and fully releases r
   assertStringIncludes(source, 'const stderr = captureBoundedText(child.stderr);');
   assertStringIncludes(source, 'const childStatus = child.status;');
   assertStringIncludes(source, 'const target = await awaitBrowserStartup(');
+  assertStringIncludes(source, "client.send('Log.enable')");
+  for (
+    const field of [
+      'finalUrl',
+      'documentHttpStatus',
+      'documentTitle',
+      'bodyHtmlSnippet',
+      'consoleErrors',
+      'failedNetworkRequests',
+    ]
+  ) {
+    assertStringIncludes(source, field);
+  }
   assertEquals(source.includes('new WritableStream({ write: () => undefined })'), false);
   assertEquals(source.includes('findBrowserExecutable'), false);
   const cleanupStart = source.indexOf('  } finally {', source.indexOf('let client:'));
@@ -857,6 +872,70 @@ Deno.test('browser refetch probe refreshes its row baseline and fully releases r
     assertEquals(source.includes(directory), false);
     assertEquals(testSource.includes(directory), false);
   }
+});
+
+Deno.test('browser page diagnostics retain document status, client failures, and console errors', () => {
+  const diagnostics = createBrowserPageDiagnosticsCollector();
+  diagnostics.observe({
+    method: 'Network.requestWillBeSent',
+    params: {
+      requestId: 'document',
+      request: { url: 'http://localhost/examples/users', method: 'GET' },
+    },
+  });
+  diagnostics.observe({
+    method: 'Network.responseReceived',
+    params: {
+      requestId: 'document',
+      type: 'Document',
+      response: { url: 'http://localhost/examples/users', status: 200 },
+    },
+  });
+  diagnostics.observe({
+    method: 'Network.requestWillBeSent',
+    params: {
+      requestId: 'island',
+      request: { url: 'http://localhost/@id/fresh-island::ServiceShowcaseLab', method: 'GET' },
+    },
+  });
+  diagnostics.observe({
+    method: 'Network.responseReceived',
+    params: {
+      requestId: 'island',
+      type: 'Script',
+      response: {
+        url: 'http://localhost/@id/fresh-island::ServiceShowcaseLab',
+        status: 404,
+      },
+    },
+  });
+  diagnostics.observe({
+    method: 'Runtime.consoleAPICalled',
+    params: { type: 'error', args: [{ value: 'island import failed' }] },
+  });
+
+  assertEquals(diagnostics.snapshot(), {
+    documentHttpStatus: 200,
+    documentUrl: 'http://localhost/examples/users',
+    consoleErrors: ['island import failed'],
+    failedNetworkRequests: [{
+      url: 'http://localhost/@id/fresh-island::ServiceShowcaseLab',
+      method: 'GET',
+      status: 404,
+      errorText: null,
+    }],
+  });
+});
+
+Deno.test('live service refetch targets the same canonical page as island hydration', async () => {
+  const source = await Deno.readTextFile(
+    new URL(
+      '../../../src/application/gates/scaffold/service-client-runtime-probe.ts',
+      import.meta.url,
+    ),
+  );
+  assertStringIncludes(source, "const SERVICE_SHOWCASE_PATH = '/examples/users';");
+  assertEquals(source.includes('/examples/users?preview=success'), false);
 });
 
 Deno.test('generated consumer imports usersQueries and paymentsQueries together without aliases', () => {
@@ -934,17 +1013,23 @@ Deno.test('service and runtime suites preserve executable service-client gate or
     );
   }
   assertEquals(serviceIds.includes(GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH), false);
+  const servedSurfaceIndex = runtimeIds.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
   assertEquals(
-    runtimeIds.indexOf(GATE.BEHAVIOR_SERVICE_HEALTH) <
-      runtimeIds.indexOf(GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH),
-    true,
+    runtimeIds.slice(servedSurfaceIndex, servedSurfaceIndex + 3),
+    [
+      GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
+      GATE.BEHAVIOR_ISLAND_HYDRATION,
+      GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
+    ],
   );
+  assert(runtimeIds.indexOf(GATE.BEHAVIOR_SERVICE_HEALTH) < servedSurfaceIndex);
 });
 
 function commandGate(id: string): CommandGateDefinition {
-  const gate = createScaffoldGates({ plugins: [], samples: false }).find((entry) =>
-    entry.id === id
-  );
+  const gate = [
+    ...createScaffoldGates({ plugins: [], samples: false }),
+    ...createRuntimeBehaviorGates(),
+  ].find((entry) => entry.id === id);
   if (!gate || gate.kind !== 'command') throw new Error(`${id} command gate missing`);
   return gate;
 }

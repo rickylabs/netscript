@@ -10,6 +10,7 @@ import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from './generated-
 
 const EVIDENCE_MARKER = '__NETSCRIPT_SERVICE_CLIENT_EVIDENCE__';
 const PROBE_FILE = '__service_client_e2e_probe.ts';
+const SERVICE_SHOWCASE_PATH = '/examples/users';
 const GENERATED_ZOD_CRUD_SUFFIX = '/schema/.generated/zod/crud.ts';
 const INPUT_DERIVATION_MODULE_URL =
   new URL('./service-client-input-probe.ts', import.meta.url).href;
@@ -248,7 +249,7 @@ export async function probeLiveServiceRefetch(
   let lastError: unknown;
   for (const baseUrl of baseUrls) {
     try {
-      const url = new URL('/examples/users?preview=success', baseUrl).toString();
+      const url = new URL(SERVICE_SHOWCASE_PATH, baseUrl).toString();
       assertSettledRefetch(await collectBrowserRefetchEvidence(url));
       return;
     } catch (error) {

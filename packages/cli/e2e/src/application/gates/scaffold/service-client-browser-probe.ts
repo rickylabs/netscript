@@ -1,5 +1,11 @@
 /** Chrome DevTools transport for the live generated service-client probe. */
 
+import {
+  type BrowserPageEventEvidence,
+  createBrowserPageDiagnosticsCollector,
+  type FailedNetworkRequestEvidence,
+} from './service-client-browser-diagnostics.ts';
+
 const LIST_PATH = '/api/rpc/v1/users/list';
 const UPDATE_PATH = '/api/rpc/v1/users/update';
 const TIMEOUT_MS = 20_000;
@@ -7,6 +13,7 @@ const BROWSER_VERSION_TIMEOUT_MS = 5_000;
 const BROWSER_OUTPUT_LIMIT_BYTES = 32 * 1024;
 const BASELINE_CONFIRMATION_MS = 500;
 const BASELINE_POLL_MS = 50;
+const PAGE_BODY_HTML_LIMIT = 600;
 const OPTIMISTIC_DIAGNOSTICS_MARKER = '__NETSCRIPT_OPTIMISTIC_RENDER_DIAGNOSTICS__';
 const ALREADY_TERMINATED_CHILD_MESSAGE = 'Child process has already terminated';
 const BUILT_IN_BROWSER_SOURCE = 'built-in allowlist';
@@ -67,6 +74,12 @@ interface OptimisticRenderDiagnostics {
   readonly listDataUpdatedAt: number | null;
   readonly cacheEvents: readonly unknown[];
   readonly onMutateRan: boolean;
+  readonly finalUrl: string | null;
+  readonly documentHttpStatus: number | null;
+  readonly documentTitle: string | null;
+  readonly bodyHtmlSnippet: string | null;
+  readonly consoleErrors: readonly string[];
+  readonly failedNetworkRequests: readonly FailedNetworkRequestEvidence[];
   readonly captureError?: string;
 }
 
@@ -270,13 +283,17 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
     await client.send('Page.enable');
     await client.send('Runtime.enable');
     await client.send('Network.enable');
+    await client.send('Log.enable');
     await client.send('Fetch.enable', {
       patterns: [{ urlPattern: `*${UPDATE_PATH}*`, requestStage: 'Response' }],
     });
 
     const listRequestIds = new Set<string>();
     const completedListIds = new Set<string>();
-    client.observe(({ method, params }) => {
+    const pageDiagnostics = createBrowserPageDiagnosticsCollector();
+    client.observe((event) => {
+      pageDiagnostics.observe(event);
+      const { method, params } = event;
       if (method === 'Network.requestWillBeSent') {
         const request = params.request as { url?: string } | undefined;
         const requestId = params.requestId;
@@ -302,6 +319,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
         undefined,
         instrumentation,
         false,
+        pageDiagnostics.snapshot(),
       );
       throw diagnosticsError('initial Rename row assertion failed', diagnostics, error);
     }
@@ -319,6 +337,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
         undefined,
         instrumentation,
         false,
+        pageDiagnostics.snapshot(),
       );
       throw diagnosticsError('refreshed Rename row assertion failed', diagnostics, error);
     }
@@ -346,6 +365,7 @@ export async function collectBrowserRefetchEvidence(url: string): Promise<Settle
         renamedName,
         instrumentation,
         true,
+        pageDiagnostics.snapshot(),
       );
       throw diagnosticsError('optimistic row assertion failed', diagnostics, error);
     }
@@ -711,12 +731,12 @@ function optimisticDiagnosticsExpression(
       return Array.isArray(records) && records.some((record) => record?.name === renamedName);
     });
     const mutationMessage = document.querySelector('[data-mutation-state]');
-    const list = row?.closest('ul[data-state]') ?? null;
+    const list = row?.closest('ul[data-state]') ?? document.querySelector('ul[data-state]');
     const interactionObserved = ${JSON.stringify(interactionObserved)};
     const freshIslandElement = list
       ? list.tagName.toLowerCase() + '[data-state="' + (list.getAttribute('data-state') ?? '') + '"]'
       : null;
-    const islandHydrated = interactionObserved;
+    const islandHydrated = interactionObserved || discovery.client !== null;
     return {
       renderedRowText: row?.querySelector('p')?.textContent?.trim() ?? null,
       mutationState: mutationMessage?.getAttribute('data-mutation-state') ?? null,
@@ -725,8 +745,10 @@ function optimisticDiagnosticsExpression(
       islandInteractive: interactionObserved,
       hydrationEvidence: interactionObserved
         ? 'Rename click produced a paused users.update response in CDP'
-        : islandHydrated
+        : discovery.client !== null
         ? 'Browser QueryClient was reachable from the hydrated Preact tree, but Rename was not rendered'
+        : list !== null
+        ? 'Fresh island list markup rendered, but no QueryClient or interactive Rename control was discoverable'
         : 'No browser QueryClient or interactive Rename control was discoverable after Page.loadEventFired',
       freshIslandElement,
       queryClientFound: discovery.client !== null,
@@ -736,6 +758,9 @@ function optimisticDiagnosticsExpression(
       listDataUpdatedAt: listQuery?.state?.dataUpdatedAt ?? null,
       cacheEvents,
       onMutateRan,
+      finalUrl: document.location.href,
+      documentTitle: document.title,
+      bodyHtmlSnippet: document.body?.innerHTML.slice(0, ${PAGE_BODY_HTML_LIMIT}) ?? null,
     };
   })()`;
 }
@@ -745,13 +770,21 @@ async function captureOptimisticRenderDiagnostics(
   renamedName: string | undefined,
   instrumentation: BrowserInstrumentationInstall | undefined,
   interactionObserved: boolean,
+  pageEvents: BrowserPageEventEvidence,
 ): Promise<OptimisticRenderDiagnostics> {
   try {
     const diagnostics = await evaluate<OptimisticRenderDiagnostics>(
       client,
       optimisticDiagnosticsExpression(renamedName, interactionObserved),
     );
-    if (diagnostics) return diagnostics;
+    if (diagnostics) {
+      return {
+        ...diagnostics,
+        documentHttpStatus: pageEvents.documentHttpStatus,
+        consoleErrors: pageEvents.consoleErrors,
+        failedNetworkRequests: pageEvents.failedNetworkRequests,
+      };
+    }
     throw new Error('browser diagnostics returned no value');
   } catch (error) {
     return {
@@ -771,6 +804,12 @@ async function captureOptimisticRenderDiagnostics(
       listDataUpdatedAt: null,
       cacheEvents: [],
       onMutateRan: false,
+      finalUrl: pageEvents.documentUrl,
+      documentHttpStatus: pageEvents.documentHttpStatus,
+      documentTitle: null,
+      bodyHtmlSnippet: null,
+      consoleErrors: pageEvents.consoleErrors,
+      failedNetworkRequests: pageEvents.failedNetworkRequests,
       captureError: errorMessage(error),
     };
   }

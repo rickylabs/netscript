@@ -188,3 +188,17 @@
   verified it was gone before continuing with standalone Vite and Deno service processes.
 - General lesson: a database CLI wrapper may use Aspire as its command transport even for sqlite;
   no-Aspire investigations must invoke the underlying generated database tasks directly.
+
+## 2026-09-03 — preview query did not explain the hosted missing DOM
+
+- Severity: rejected environment hypothesis; hosted discriminator improved.
+- Static route semantics and byte/count measurements from the exact-branch generated app showed
+  that `/examples/users` and `/examples/users?preview=success` both return HTTP 200 with the same
+  Fresh island boundary, Rename control, and success-state list. The preview query only adds
+  serialized preview state in the standalone Vite path.
+- The refetch probe nevertheless moved to the canonical no-query path so it consumes the same
+  document the immediately preceding served-surface and hydration gates certify. A future hosted
+  failure will now distinguish absent/incorrect server markup, hydration failure, and a refetch-only
+  failure instead of short-circuiting before the independent evidence runs.
+- General lesson: when a composite suite short-circuits, order discriminating prerequisites before
+  the narrow behavior gate, and retain HTTP/DOM/browser-network evidence at the failure boundary.

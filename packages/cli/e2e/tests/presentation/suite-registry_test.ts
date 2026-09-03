@@ -321,10 +321,16 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
     true,
   );
   for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const servedSurfaceIndex = ids.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
     assertEquals(
-      resolveSuite(suiteId).gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_HYDRATION),
-      true,
-      suiteId,
+      ids.slice(servedSurfaceIndex, servedSurfaceIndex + 3),
+      [
+        GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
+        GATE.BEHAVIOR_ISLAND_HYDRATION,
+        GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
+      ],
+      `${suiteId} must discriminate served surface and hydration before refetch`,
     );
   }
 

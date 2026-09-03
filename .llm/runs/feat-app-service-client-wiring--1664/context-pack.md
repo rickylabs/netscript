@@ -257,3 +257,18 @@ two already-known no-exec temp-fixture failures. All requested carrier, parity, 
 checks pass. The lock is unchanged at
 `6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6`. No runtime infrastructure
 was invoked.
+
+## 2026-09-03 hosted missing-DOM discriminator handoff
+
+At baseline `dbb577826`, hosted sqlite still reached the refetch gate before the #1885 island
+discriminators and reported no island or Rename DOM. This slice orders served-surface and hydration
+immediately before refetch, moves the refetch definition into runtime behavior composition, and
+adds bounded document/status/title/body/console/network diagnostics to its failure artifact.
+
+Static route inspection plus exact generated-app HTTP measurements disprove `preview=success` as a
+standalone island-suppression branch: both queried and canonical URLs returned 200 with one Fresh
+ServiceShowcaseLab boundary and one Rename control. Refetch now uses canonical `/examples/users` to
+match the preceding probes exactly. CLI check is 985 files/0 diagnostics, touched tests are 47/47,
+all E2E unit tests are 327/327, and both architecture and quality gates exit 0. Lock SHA-256 remains
+`6c8f90a26375dcc0cec969f01e5bfb9e474216adb10f1cfbf68df5edab6b94d6`. No Aspire, Docker,
+hosted-runtime, or `e2e:cli` gate was run locally.
