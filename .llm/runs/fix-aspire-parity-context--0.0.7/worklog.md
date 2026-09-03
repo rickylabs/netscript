@@ -50,3 +50,13 @@ maintained docs, shipped generated sources, and tooling remain checked. Retained
   format required the existing polling scanner's source formatting and is rechecked before push.
 - Scope now 11 source/manifest files plus AGENTS.md and scoped run artifacts. No runtime behavior,
   dependency, generated consumer bundle, or workflow change; no host runtime lease.
+
+## Shipped helper closure — 2026-09-03 09:11Z
+
+CI quality33736337155 / job100587782925 failed Generated asset freshness. The modified host-port
+checker is shipped by agent init, so its new shared scope helper also needs a consumer-tools
+support-module entry and canonical embedded tool carrier regeneration. Corrected both in this PR.
+No extra executable tool or external dependency. The focused suite including the existing real-bundle
+relative-import closure test passes58/58. Regeneration changes only agent-tools.generated.ts.
+No lock movement. Consume the original c487e9273 evaluation then review this bounded dependency/
+carrier correction on the same independent evaluator session; no unrelated source changes.

@@ -10,3 +10,8 @@ evaluation uses already-approved native-quota fallback, not a new owner decision
 static checks. Expanded the bounded leaf to a shared scan-scope helper/tests plus the two existing
 host-port/polling scanner pairs and AGENTS.md. Removed the superseded version-floor special case.
 This changes scan inputs only, not tracked-file retention or functional release acceptance.
+
+2026-09-03 D-3: hosted quality correctly caught the stale embedded agent-tool carrier. The
+host-port checker is also a shipped consumer tool, so its new shared scope module must be declared
+in consumer-tools.json and regenerated into agent-tools.generated.ts. Added this necessary import
+closure and canonical carrier regeneration to the same owner-requested fix; no new entrypoint.

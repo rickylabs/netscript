@@ -19,7 +19,7 @@ maintained docs; correct negative-guard/compatibility classification and one sta
 
 ## Validation
 
-Baseline full phase 2 failed five paths. Now: 55 focused tests PASS; full phase 2 PASS (867 checked,
+Baseline full phase 2 failed five paths. Now: 58 focused tests PASS (including shipped import closure); full phase 2 PASS (867 checked,
 0 failures, 0 missing, fresh manifest); host-port scan PASS (966 files); selected source
 check/lint/fmt PASS (10/10 processed). Independent IMPL-EVAL and current CI pending.
 No runtime/scaffold-output changes; this leaf does not replace the parent release gates.
@@ -36,5 +36,5 @@ Failed helper attachment recorded; coordinator co-authoring, separate evaluator,
 ## Definition of Done
 
 - [x] Focused regression and negative-control tests pass.
-- [ ] Both parity phases pass with fresh generated manifest at the amended head.
+- [x] Both parity phases pass with fresh generated manifest at the amended head.
 - [ ] Independent review/IMPL-EVAL pass; current CI and review threads clear.

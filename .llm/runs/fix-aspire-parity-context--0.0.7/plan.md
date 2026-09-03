@@ -21,6 +21,8 @@ same violations in framework/docs still fail. Preserve shipped generated source 
 4. Make one stale resource-name JSDoc version-neutral; do not change grammar/runtime.
 5. Regenerate the manifest from its canonical generator. No consumer bundle edits or manual TSV.
 6. Record the durable scan-versus-retention rule in AGENTS.md; extend the existing tests only.
+7. Keep the shipped host-port checker import-closed: declare its scope helper as a consumer-tools
+support module and regenerate its canonical embedded carrier. Existing bundle closure tests prove it.
 
 Gates: baseline red, focused tests/check/lint/fmt, phases 1 and 2 including manifest freshness,
 source-quality/architecture review, CI, independent substantive review and formal IMPL-EVAL.
