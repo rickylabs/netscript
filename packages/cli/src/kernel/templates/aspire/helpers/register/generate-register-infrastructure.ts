@@ -84,7 +84,7 @@ export function generateRegisterInfrastructure(
   ]
   const compatImports = [
     'type CacheWiring',
-    ...(usesDatabaseListenerReadiness ? ['createListenerReadinessCheck'] : []),
+    ...(usesDatabaseListenerReadiness ? ['createEndpointListenerReadinessCheck'] : []),
     ...(usesRespReadiness ? ['createRespPingCheck'] : []),
     ...(dbEntries.some(([, entry]) =>
         ['Postgres', 'Mysql'].includes(entry.Engine) &&
@@ -210,14 +210,10 @@ export function generateRegisterInfrastructure(
     if (['Postgres', 'Mysql', 'Mssql'].includes(entry.Engine)) {
       const healthCheckKey = `${name}_listener`
       lines.push(`  builder.addHealthCheck(${JSON.stringify(healthCheckKey)}, async () => {`)
-      lines.push(`    const endpoint = await ${id}_server.getEndpoint('tcp');`)
-      lines.push(`    const host = await endpoint.host();`)
-      lines.push(`    const port = await endpoint.port();`)
-      lines.push(
-        `    return createListenerReadinessCheck({ kind: ${
-          JSON.stringify(entry.Engine.toLowerCase())
-        }, host, port })();`,
-      )
+      lines.push(`    return await createEndpointListenerReadinessCheck({`)
+      lines.push(`      kind: ${JSON.stringify(entry.Engine.toLowerCase())},`)
+      lines.push(`      endpoint: () => ${id}_server.getEndpoint('tcp'),`)
+      lines.push(`    })();`)
       lines.push(`  });`)
       lines.push(`  await ${id}_server.withHealthCheck(${JSON.stringify(healthCheckKey)});`)
     }

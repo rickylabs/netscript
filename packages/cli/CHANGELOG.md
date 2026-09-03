@@ -106,6 +106,9 @@
   and `help.md` are re-verified against Aspire CLI 13.5.3 (`aspire agent mcp`, the
   `aspire resources` alias, `healthReports` as an object) with receipt keys linking each
   re-verified command to its smoke evidence.
+  The Aspire reference documents the backing-resource readiness contract: `healthStatus` reports
+  reachability at the published endpoint, so a container log line is not the readiness authority
+  and `Unhealthy` means "not reachable where you will connect", not "not started".
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.
 
 ## 0.0.6

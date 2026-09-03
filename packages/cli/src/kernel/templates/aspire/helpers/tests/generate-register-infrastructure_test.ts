@@ -61,16 +61,16 @@ describe('generateRegisterInfrastructure', () => {
       const block = emittedHealthCheckBlock(output, key, server)
 
       assert(!output.includes('EndpointProperty'))
-      assertStringIncludes(output, 'createListenerReadinessCheck')
-      assertStringIncludes(block, `const endpoint = await ${server}.getEndpoint('tcp');`)
-      assertStringIncludes(block, 'const host = await endpoint.host();')
-      assertStringIncludes(block, 'const port = await endpoint.port();')
+      assertStringIncludes(output, 'createEndpointListenerReadinessCheck')
       assertStringIncludes(
         block,
-        `return createListenerReadinessCheck({ kind: ${
-          JSON.stringify(fixture.kind)
-        }, host, port })();`,
+        `return await createEndpointListenerReadinessCheck({\n` +
+          `      kind: ${JSON.stringify(fixture.kind)},\n` +
+          `      endpoint: () => ${server}.getEndpoint('tcp'),\n` +
+          `    })();`,
       )
+      assert(!block.includes('await endpoint.host()'))
+      assert(!block.includes('await endpoint.port()'))
       assert(!block.toLowerCase().includes('password'))
       assert(!block.toLowerCase().includes('username'))
       assert(!block.includes('db_0_password'))
