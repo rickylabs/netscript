@@ -226,3 +226,12 @@ heading and exclude the `|` form.
   `2b8867d32`: PR **#1968**, head `21d195c45`, `Refs #1952` (no closing keyword).
 - CI run 33700967113 at the exact head: success; `mergeable=true state=clean`; behind 0.
 - Docs-only one-bullet change — no separate IMPL-EVAL cycle (same disposition as #1955).
+
+## #1968 merged — 2026-09-03
+
+- #1968 merged as `1dcc6e0ec` (impl-eval:skip attributed by coordinator: three changelog lines, full
+  CI, independent diff/thread audit). Changelog bullet confirmed on `origin/main`.
+- Docs carrier gates on exact main `1dcc6e0ec`: publish-assets, mcp-export-corpus, assets-barrel,
+  agent-docs-prose — all PASS.
+- Scratch worktree `main-audit` removed; local branch `docs/changelog-0-0-7-fold-1952` deleted.
+- Open docs-owned milestone PRs: none. Fold triggers still unmerged: #1664, #1956, #1960, #1945.
