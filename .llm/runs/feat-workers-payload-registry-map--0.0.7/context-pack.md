@@ -84,3 +84,17 @@ native Fable evaluator launch was quota-blocked before producing a verdict.
   review only if that integration changes product source.
 - Do not launch a second evaluator, take a local runtime lease, patch shared browser probes, or
   merge PR #1970.
+
+## 2026-09-03 post-#1958 integration
+
+- Prerequisite #1958 merged as main commit
+  `2f43fa7f37f97a287c6722b004598e7cb7e04dd9`.
+- Conflict-free integration commit: `b4d8b37940f78106f325c151a2a1f923b6996f85`; canonical main probes
+  won without manual resolution.
+- Carrier regeneration is diff-clean; all focused checks, 29 focused tests, quality, publish
+  dry-run, emitted samples, and JSDoc examples pass at the integrated tree.
+- No #1455 product-source delta was introduced by integration; preserve the existing independent
+  GLM `PASS` and do not launch another evaluator.
+- Next decisive gate: push one final source head, let the native workflow run once, and collect both
+  PostgreSQL and SQLite hosted runtime receipts. Only then update the PR body to the closing issue
+  disposition and hand off the immutable merge packet. No local runtime lease and no merge authority.

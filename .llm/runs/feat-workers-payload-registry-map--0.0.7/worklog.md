@@ -839,3 +839,49 @@ unanswered. Local `HEAD`, the remote branch ref, and PR head all resolved to
 worktree was removed with its uncommitted `deno.lock` probe churn after the evaluator-authored
 artifact checksum was verified against the imported file. Receipt-only CI run `33741559824` was
 pending at the time of this entry; no hosted runtime suite was dispatched.
+
+## PR #1958 integration — 2026-09-03T10:06Z
+
+The coordinator merged the sole shared browser/resource-probe owner as main commit
+`2f43fa7f37f97a287c6722b004598e7cb7e04dd9`. From clean pushed checkpoint
+`01e408d1690f4ec9cde1dd8725a01186125febac`, current `origin/main` was fetched and merged without
+rebasing. The merge was conflict-free; main's canonical resource/browser probes were retained
+unchanged. Integration commit: `b4d8b37940f78106f325c151a2a1f923b6996f85`.
+
+Before main landed, pushing the evaluation receipts automatically started E2E run `33741628249`.
+Because both runtime matrices were pre-prerequisite and explicitly prohibited, the run was cancelled
+as soon as it was observed. Its runtime jobs are cancellation noise, not verdict evidence and not a
+substitute for the required post-merge pair. Its static scaffold and desktop jobs had already passed.
+
+Canonical carrier regeneration and freshness, in order:
+
+```text
+gen:mcp-export-corpus: exit 0; sha256 209fe9ff690a706286526833314ca1fac1d09436139c1a12ab94fd109abc7a1c
+gen:agent-docs-prose: exit 0
+gen:assets-barrel: exit 0
+gen:publish-assets: exit 0
+check:mcp-export-corpus: exit 0
+check:agent-docs-prose: exit 0
+check:assets-barrel: exit 0
+check:publish-assets: exit 0
+tracked generated delta: none
+```
+
+Exact integrated-head focused and proportional receipts:
+
+```text
+focused workers/trigger/generator/doctor/saga tests: exit 0; 29 passed / 0 failed
+run-deno-check, five affected package/plugin roots: exit 0; 463 files; 0 diagnostics
+run-deno-lint, same roots: exit 0; 463 files; 0 findings
+run-deno-fmt, same roots: exit 0; 463 files; 0 findings
+deno task check:emitted-samples: exit 0; 48 samples / 38 artifact paths
+deno task quality:gate: exit 0; doctrine FAIL=0; existing warnings only
+deno task publish:dry-run: exit 0; Success Dry run complete
+deno task docs:jsdoc-examples: exit 0; checked=362; failures=0
+```
+
+The merge contains only already-reviewed main changes and no #1455 product-source edit or conflict
+resolution, so the independent GLM `PASS` remains applicable and no delta evaluator was launched.
+The writer worktree and `deno.lock` remained clean after regeneration and gates. One final-source
+push will dispatch the native CI workflow once; both post-merge hosted database receipts remain the
+decisive gate.
