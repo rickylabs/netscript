@@ -80,6 +80,9 @@
   and compare Fresh-owned manifest output.
   `FormCollectionStrategy` rejects `navigation: 'document'` together with `mode: 'client'` at the
   type level instead of silently dropping the navigation choice.
+  The form descriptor's `controlProps()` bag is directly assignable to Preact `input`, `select`,
+  and `textarea` elements, and derives `pattern` plus inclusive numeric `min`/`max`/`step` native
+  constraints from the Zod 4 schema.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
