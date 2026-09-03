@@ -1007,3 +1007,7 @@ the merge.**
   design commit `75c41ee15`, labels/milestone/`Closes #1881` correct; S1–S3 pending). Thread drift
   noted: parent `research.md` absent at leaf baseline (verified `aspire wait` locally); scoped lint
   wrapper refuses the desktop fixture (pre-existing, deferred).
+
+## 2026-09-03 00:5xZ — #1952 exact-head packet at 1a759ea34
+
+- `quality`, `code-quality`, `check-test`, `scaffold-static`, `close-gate`, postgres tier, sqlite tier all SUCCESS at `1a759ea34`; packet posted (supersedes `478450a3c`). `status:ready-merge` stands; coordinator merges.
