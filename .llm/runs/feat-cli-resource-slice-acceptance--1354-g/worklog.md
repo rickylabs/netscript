@@ -93,6 +93,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | changed-head Tier A | At `8341c0743`, focused tests passed 79/79, full CLI passed 1789/1789, structured check covered 1004 files with 0 diagnostics, lint/fmt passed 11/11, all carrier/docs gates passed, `arch:check` reported `FAIL=0`, and `quality:gate` exited 0 with 0 scanner findings. |
 | 2026-09-03 | G | changed-head hosted diagnosis | Run `33731170586` proved the prior correction: `behavior.app-reference` passed in both tiers. PostgreSQL then reported 90/1 and SQLite 85/1; only `behavior.island-served-surface` failed because its pre-Slice-F probe still required `ServiceShowcaseLab` at `/examples/users`. Cleanup passed in both jobs. |
 | 2026-09-03 | G | served-island correction | Extended the accepted resource-scope correction to thirteen existing product files. The served-surface gate now probes `/people` and `PeopleIsland`, with semantic tests pinning the marker/module/bundle/receipt contract and excluding the retired showcase identity. Initial correction-focused wrapper passes 8/8. No host runtime was started and the interrupted pre-fix evaluator turn wrote no receipt. |
+| 2026-09-03 | G | proactive hosted-tail audit | Canceled pending run `33732473476` before its runtime jobs after source inspection proved the next two gates still depended on the removed Rename showcase. This was not an unchanged runtime rerun: no new runtime result was consumed, and the next dispatch requires a corrected product head. |
+| 2026-09-03 | G | hydration/refetch correction | Extended the accepted resource-scope correction to eighteen existing product files. Hydration now requires the `/people` output plus a browser-reachable QueryClient. The existing refetch gate invalidates the active generated `users.list` query and requires exactly one completed 2xx refetch, without changing generator output or reviving the deferred mutation showcase. Focused browser-tail/resource/suite regressions pass 97/97; no host runtime was started. |
 
 ## Decisions
 
@@ -106,6 +108,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Probe neutral init and generated command resources, not retired preview states | Slice F replaced the init showcase with planner output; `/people` is the resource created by Slice G and must exist before the browser gate. | hosted run `33719217078` + owner resume instruction |
 | Add the unresolved-app-root regression in the existing command test | The guard already fails before client/procedure/staging; the command-level fixture can prove the entire in-memory filesystem remains byte-identical with zero writes. | #1354 acceptance audit + owner resume instruction |
 | Probe the Slice G `PeopleIsland` served surface | Slice F retired `ServiceShowcaseLab`; the public resource verb creates `/people` and its route-local island before the served-surface gate executes. | hosted run `33731170586` + generated resource plan |
+| Prove hydration through the generated resource QueryClient | The neutral planner resource has no Rename control or `data-state` list; its browser-only semantic is a hydrated `QueryIsland` with a reachable QueryClient. | Slice F diff + generated resource template |
+| Preserve one-refetch behavior on the generated resource | Explicitly invalidating the active generated `users.list` query retains a meaningful cache/refetch assertion without restoring the deferred mutation showcase. | proactive runtime-tail trace + generated `PeopleIsland` query key |
 
 ## Drift
 
@@ -121,6 +125,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Owner-authorized hosted amendment reassigns stale browser/runtime probes to Slice G and expands the final ceiling to thirteen existing files. | significant, implemented; hosted proof pending | yes |
 | Final matrix found no generator-specific unresolved-app-root negative test in the merged suite. | acceptance, resolved by command-level zero-write regression; full-suite proof pending | yes |
 | Changed-head hosted run passed the corrected app-reference probe, then exposed the next pre-Slice-F `ServiceShowcaseLab` served-surface assertion. | significant, corrected; hosted proof pending | yes |
+| The next hydration/refetch gates also encoded `ServiceShowcaseLab` Rename/data-state behavior removed by Slice F. | significant, corrected within resource acceptance; hosted proof pending | yes |
 
 ## Gate Results
 
@@ -180,5 +185,5 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 - Inspect the two stable IDs, the `people` command arrays, direct `RUNTIME_GATES` selection, codegen/contract/resource materialized order, and identical guidance sentence first.
 - PR #1891 supplied the minimal plan amendment; the authorized item-8 fix is green in both focused and full-suite coverage.
-- PR #1958 targets `main`; lifecycle remains `status:impl-eval` because the corrected thirteen-file head still needs exact-head Tier A, a fresh IMPL-EVAL, and a green isolated hosted receipt.
+- PR #1958 targets `main`; lifecycle remains `status:impl-eval` because the corrected eighteen-file head still needs exact-head Tier A, a fresh IMPL-EVAL, and a green isolated hosted receipt.
 - Do not merge or add a closing keyword until both hosted tiers exit 0 and the last #1354 acceptance mappings are updated from exact evidence.

@@ -27,4 +27,4 @@ Reference `.llm/harness/workflow/lane-policy.md`; this owner-directed session is
 - Owner explicitly requires a non-draft PR despite the generic harness draft-on-start default.
 - The coordinator's resume instruction supersedes the earlier local-runtime prohibition and explicitly requires full hosted acceptance after merging main.
 - Shared-host exact-head runs may be used as diagnostic evidence, but lifecycle advancement requires an isolated green hosted receipt.
-- Isolated hosted runs pass the #1354 resource/generated-quality prefix. Owner direction assigns the stale post-Slice-F browser/runtime probe corrections to Slice G's accepted resource scope; lifecycle stays `status:impl-eval` until the corrected thirteen-file head passes both tiers and a fresh separate-session IMPL-EVAL.
+- Isolated hosted runs pass the #1354 resource/generated-quality prefix. Owner direction assigns the stale post-Slice-F browser/runtime probe corrections to Slice G's accepted resource scope; lifecycle stays `status:impl-eval` until the corrected eighteen-file head passes both tiers and a fresh separate-session IMPL-EVAL.

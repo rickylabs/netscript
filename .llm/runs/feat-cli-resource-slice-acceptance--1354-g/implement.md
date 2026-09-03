@@ -16,7 +16,7 @@ The filled `## Design` section in `worklog.md` is the implementation contract.
 
 ## Operating Rules
 
-- Touch only the final thirteen owner-authorized product files; harness artifacts do not count toward that ceiling.
+- Touch only the final eighteen owner-authorized product files; harness artifacts do not count toward that ceiling.
 - Do not run Aspire, Docker, browser, or `deno task e2e:cli` locally.
 - Do not edit `main`, `deno.lock`, #1664-owned service-query/add-ui surfaces, or Slice F's command-tree test.
 - Stop if captured stdout or runtime reachability needs another product file.
@@ -43,7 +43,9 @@ PR #1891 amended the ceiling to 8 and enumerated the runner test as item 8. The 
 After Slice F merged, isolated hosted evidence exposed two acceptance probes that still asserted its
 retired preview/showcase surface. The owner resumed Slice G with authority to fix the actual
 introduced/baseline boundary within the accepted resource scope and explicitly prohibited a new
-PLAN-EVAL. The final ceiling is thirteen existing product files: the original eight, the neutral
-resource browser probe/test, the unresolved-app-root command regression, and the served-island
-probe/test. Assert `/examples/users` plus `/people`, and `PeopleIsland` at `/people`; never recreate
-the retired preview states or `ServiceShowcaseLab`. Only hosted CI may run the unsplit runtime suite.
+PLAN-EVAL. The final ceiling is eighteen existing product files: the original eight, the neutral
+resource browser probe/test, the unresolved-app-root command regression, served-island probe/test,
+and the hydration/refetch acceptance tail. Assert `/examples/users` plus `/people`, `PeopleIsland`
+at `/people`, a hydrated QueryClient, and exactly one successful active `users.list` refetch; never
+recreate the retired preview states, `ServiceShowcaseLab`, or Rename mutation. Only hosted CI may
+run the unsplit runtime suite.

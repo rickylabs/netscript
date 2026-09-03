@@ -2,15 +2,12 @@
 
 import { join, relative } from '@std/path';
 import { partialMatchKey } from 'npm:@tanstack/query-core@^5.101.0';
-import {
-  collectBrowserRefetchEvidence,
-  type SettledRefetchEvidence,
-} from './service-client-browser-probe.ts';
+import type { SettledRefetchEvidence } from './service-client-browser-probe.ts';
 import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from './generated-app-endpoint.ts';
+import { probeResourceQueryRefetch } from './runtime/probe-island-hydration.ts';
 
 const EVIDENCE_MARKER = '__NETSCRIPT_SERVICE_CLIENT_EVIDENCE__';
 const PROBE_FILE = '__service_client_e2e_probe.ts';
-const SERVICE_SHOWCASE_PATH = '/examples/users';
 const GENERATED_ZOD_CRUD_SUFFIX = '/schema/.generated/zod/crud.ts';
 const INPUT_DERIVATION_MODULE_URL =
   new URL('./service-client-input-probe.ts', import.meta.url).href;
@@ -236,29 +233,20 @@ export async function assertGeneratedServiceSchemaReady(projectRoot: string): Pr
   );
 }
 
-/** Exercise the generated Rename control and observe the settled network/DOM contract. */
+/** Exercise the generated resource QueryIsland and observe one settled list refetch. */
 export async function probeLiveServiceRefetch(
   projectRoot: string,
   appName: string,
   appHost: string,
 ): Promise<void> {
-  const pinned = readPinnedAppPort(projectRoot, appName);
-  const baseUrls = pinned === undefined
-    ? await generatedAppHomeUrlsFromAppHost(appHost, appName)
-    : [`http://127.0.0.1:${pinned}/`];
-  let lastError: unknown;
-  for (const baseUrl of baseUrls) {
-    try {
-      const url = new URL(SERVICE_SHOWCASE_PATH, baseUrl).toString();
-      await collectBrowserRefetchEvidence(url, {
-        assertSettled: assertSettledRefetch,
-      });
-      return;
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  throw lastError instanceof Error ? lastError : new Error('no generated app URL was probeable');
+  await probeResourceQueryRefetch(projectRoot, appName, appHost, {
+    resolveLiveUrls: async (host, name) => {
+      const pinned = readPinnedAppPort(projectRoot, name);
+      return pinned === undefined
+        ? await generatedAppHomeUrlsFromAppHost(host, name)
+        : [`http://127.0.0.1:${pinned}/`];
+    },
+  });
 }
 
 async function snapshotOwnedOutput(projectRoot: string, appName: string): Promise<FileSnapshot> {

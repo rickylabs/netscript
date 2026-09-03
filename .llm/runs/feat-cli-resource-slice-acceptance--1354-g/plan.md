@@ -41,11 +41,11 @@ Add two resource-generation gates to the existing `scaffold.runtime` route and t
 - Reword both rendered one-screen guides.
 - Teach the existing runtime-suite success fake to emit the rerun gate's expected captured output.
 
-The amended eight-file ceiling applied to the original Slice G author lane. After the first isolated
+The amended eight-file ceiling applied to the original Slice G author lane. After the isolated
 hosted runs exposed Slice F's retired preview and island-showcase surfaces still being asserted by
 Slice G's acceptance tail, the owner authorized post-hosted acceptance corrections within the
-accepted resource scope: five existing product test/harness files may be added, for a thirteen-file
-final ceiling. Required
+accepted resource scope. The complete traced browser tail requires ten existing product
+test/harness files beyond the original eight, for an eighteen-file final ceiling. Required
 `.llm/runs/feat-cli-resource-slice-acceptance--1354-g/` harness artifacts are tracked run context and
 are outside that product touch set.
 
@@ -62,10 +62,24 @@ are outside that product touch set.
 13. `packages/cli/e2e/tests/application/gates/probe-island-served-surface_test.ts` — pin the served
     route, Fresh island marker, module request, bundle hit, receipt persistence, and fail-closed
     behavior without the retired showcase name.
+14. `packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts` — prove the
+    generated `/people` QueryIsland hydrates and exposes its QueryClient; provide the resource-local
+    one-refetch browser observation used by the following gate.
+15. `packages/cli/e2e/tests/application/gates/probe-island-hydration_test.ts` — pin `/people`, the
+    hydrated QueryClient requirement, exact `baseline + 1` list request count, and 2xx response.
+16. `packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts` — describe the
+    neutral resource hydration and refetch contracts instead of the retired Rename showcase.
+17. `packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts` — retain its
+    static generated-client checks and route the browser mode to the generated resource refetch
+    observation.
+18. `packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts` — pin browser
+    delegation to the generated resource and exclude the retired showcase path.
 
 The existing resource gate test also pins resource rerun before the browser reference gate. This
 amendment resolves hosted and issue-acceptance gaps without changing generator behavior or reviving
-the retired showcase. Per owner direction, it requires no new PLAN-EVAL.
+the retired showcase. The existing `behavior.service-client-refetch` gate remains reachable and
+meaningful: it invalidates the active generated `users.list` query and requires exactly one
+successful browser refetch. Per owner direction, it requires no new PLAN-EVAL.
 
 ## Non-Scope
 
@@ -96,7 +110,7 @@ the retired showcase. Per owner direction, it requires no new PLAN-EVAL.
 
 | Decision | Status | Notes |
 | -------- | ------ | ----- |
-| Product touch set | resolved now | Eight original files plus five owner-authorized hosted-acceptance files; thirteen total. |
+| Product touch set | resolved now | Eight original files plus ten owner-authorized hosted-acceptance files; eighteen total. |
 | Runtime proof | safe to defer | Hosted `scaffold.runtime` CI only, per owner direction. |
 | IMPL-EVAL | safe to defer | Separate evaluator/automation owns it; this is the author lane. |
 
@@ -108,7 +122,7 @@ the retired showcase. Per owner direction, it requires no new PLAN-EVAL.
 | Resource command runs before clients exist or selects ambiguously. | Order after service discovery and explicit `--client users`; exact command-array test. |
 | Rerun succeeds while rewriting files. | Captured exact zero-write/zero-conflict/11-skip summary requirement. |
 | Guidance mentions nonexistent files. | Exact referenced-path tests with and without the example service. |
-| Hosted correction expands beyond thirteen product files. | Stop instead of changing templates, runner infrastructure, registry tests, or parallel suites. |
+| Hosted correction expands beyond eighteen product files. | Stop instead of changing templates, runner infrastructure, registry tests, or parallel suites. |
 
 ## Anti-Patterns to Resolve or Avoid
 
@@ -144,7 +158,7 @@ the retired showcase. Per owner direction, it requires no new PLAN-EVAL.
 | 3 | Static | structured CLI check/lint/fmt wrappers | exit 0; zero diagnostics/findings/unformatted files |
 | 4 | Assets/publish/docs | plan-named tasks and CLI JSR audit | exit 0; report counts |
 | 5 | Fitness | `deno task arch:check`; `deno task quality:gate` | exit 0; FAIL=0 |
-| 6 | Git hygiene | raw diff/status and `deno.lock` comparison | only thirteen authorized product files plus required run artifacts; no lock change |
+| 6 | Git hygiene | raw diff/status and `deno.lock` comparison | only eighteen authorized product files plus required run artifacts; no lock change |
 
 ## Risks
 
@@ -157,6 +171,6 @@ the retired showcase. Per owner direction, it requires no new PLAN-EVAL.
 
 ## Drift Watch
 
-- Any need to edit outside the thirteen owner-authorized product files.
+- Any need to edit outside the eighteen owner-authorized product files.
 - Any change to the expected 11-candidate rerun summary.
 - Any movement of the Slice F base or `deno.lock`.
