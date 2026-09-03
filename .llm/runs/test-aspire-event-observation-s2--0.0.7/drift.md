@@ -8,3 +8,10 @@ already blocking-wait + settled-snapshot/coarse-arrival paths. The implementatio
 landed results and limits edits to remaining defects. No scope expansion or fenced-file edit is
 required.
 
+## 2026-09-03 — scoped lint wrapper config boundary (pre-existing tooling)
+
+The mandated all-e2e lint command selects 225 files but its nearest-config batch for the seven
+`fixtures/desktop-native` files exits before linting: Deno 2.9.5 ignores the parent workspace and
+reports `Package 'zod' not found in catalog`. Neither the fixture config nor the lint wrapper differs
+from pinned base `79adb103b`, and both are outside the allowed S2 changes. An equivalent two-batch
+run covers 218 + 7 = all 225 files with zero lint findings. No source or config drift was introduced.

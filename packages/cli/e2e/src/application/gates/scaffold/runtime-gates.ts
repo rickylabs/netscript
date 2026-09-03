@@ -183,6 +183,7 @@ export function createRuntimeGates(
         context.project.appHost,
         context.project.projectRoot,
         'first',
+        databaseAllocationResource(database),
       ],
     ),
     commandGate(
@@ -213,6 +214,7 @@ export function createRuntimeGates(
         context.project.appHost,
         context.project.projectRoot,
         'second',
+        databaseAllocationResource(database),
       ],
     ),
     commandGate(
@@ -263,6 +265,12 @@ function databaseRuntimeResources(
     case DATABASE.SQLITE:
       return [];
   }
+}
+
+function databaseAllocationResource(database: DatabaseEngine): AspireResource {
+  const resource = databaseRuntimeResources(database)[0];
+  if (!resource) throw new Error(`database endpoint allocation is not applicable to ${database}`);
+  return resource;
 }
 
 /** Create cleanup gates that stop generated runtime resources. */
