@@ -12,6 +12,11 @@ import type { AddServiceInput } from './add-service-input.ts';
 import { planServiceAdd } from './plan-service-add.ts';
 import { renderService, type RenderServiceDependencies } from './render-service.ts';
 import { ServiceClientScaffolder } from '../../../../kernel/adapters/service/client-scaffolder.ts';
+import {
+  generateServiceClients,
+  validateServiceClientContracts,
+} from '../generate/generate-service-clients.ts';
+import type { GeneratedSourceFormatterPort } from '../../../../kernel/ports/generated-source-formatter-port.ts';
 
 /** Dependencies used by the public add-service flow. */
 export interface AddServiceDependencies extends RenderServiceDependencies {
@@ -33,12 +38,16 @@ export interface AddServiceDependencies extends RenderServiceDependencies {
   /** Typed client/query module scaffolder. */
   readonly clientScaffolder?: ServiceClientScaffolder;
 
+  /** Pre-write canonicalizer for post-init generated source. */
+  readonly formatter: GeneratedSourceFormatterPort;
+
   /** Helper regeneration override for tests. */
   readonly regenerateHelpers?: (
     projectRoot: string,
     fs: FileSystemPort,
     scaffolder: ScaffolderPort,
     templateAdapter: TemplatePort,
+    options?: { readonly formatter?: GeneratedSourceFormatterPort },
   ) => Promise<readonly string[]>;
 }
 
@@ -48,6 +57,24 @@ export async function addService(
   dependencies: AddServiceDependencies,
 ): Promise<AddServiceResult> {
   const plan = await planServiceAdd(request, dependencies);
+
+  if (plan.withClient && !dependencies.clientScaffolder) {
+    throw new Error('Typed client scaffolding dependency is required for --with-client.');
+  }
+  const clientDependencies = plan.withClient
+    ? {
+      readProjectName: () => Promise.resolve(plan.projectName),
+      serviceResolver: dependencies.serviceResolver,
+      clientScaffolder: dependencies.clientScaffolder!,
+    }
+    : undefined;
+
+  // Abort before renderService or any other write when an existing manifest
+  // service cannot participate in the all-service client generation contract.
+  if (clientDependencies) {
+    await validateServiceClientContracts(plan.projectRoot, clientDependencies);
+  }
+
   const rendered = await renderService(plan, dependencies);
 
   await upsertServiceAppsettingsEntry(
@@ -58,25 +85,24 @@ export async function addService(
   );
   await addServiceWorkspaceMember(plan.projectRoot, plan.serviceName, dependencies.fs);
 
+  const clientResult = clientDependencies
+    ? await generateServiceClients({
+      projectRoot: plan.projectRoot,
+      dryRun: false,
+      force: plan.overwrite,
+    }, clientDependencies)
+    : undefined;
+  const clientPath = clientResult?.planned.find((file) => file.serviceName === plan.serviceName)
+    ?.path;
+
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
   const helperFiles = await regenerateHelpers(
     plan.projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
+    { formatter: dependencies.formatter },
   );
-
-  if (plan.withClient && !dependencies.clientScaffolder) {
-    throw new Error('Typed client scaffolding dependency is required for --with-client.');
-  }
-  const clientPath = plan.withClient
-    ? await dependencies.clientScaffolder!.scaffold(
-      plan.projectRoot,
-      plan.projectName,
-      plan.serviceName,
-      plan.overwrite,
-    )
-    : undefined;
 
   return {
     ...rendered,

@@ -52,7 +52,7 @@ flowchart LR
 ## Install
 
 ```bash
-deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@<version>
 ```
 
 Or as a library, for the embeddable command tree:
@@ -109,6 +109,34 @@ $ netscript init my-app --db postgres --service --yes --dry-run
 
 `netscript <group> --help` prints the live tree for any group; it is generated from the same
 command definitions this package exports, so it never drifts from the binary you installed.
+
+### Regenerate service clients
+
+`netscript service generate` reconciles every manifest service into the generator-owned module
+`apps/<app>/lib/<service>.ts` and regenerates Aspire helpers in the same command. Client modules use
+the query-factory L1/L2 dialect: factory keys are service-scoped and the generated list
+invalidation filter comes from `<service>Queries.list.clientKey()`.
+
+The command validates every manifest entry before writing anything. Each service must have
+`contracts/versions/v1/<service>.contract.ts` exporting `<PascalService>ContractV1`; otherwise the
+error names the service and expected path/export, and neither client modules nor Aspire helpers are
+written. Disabled entries (`Enabled: false`) still receive owned client modules so generation is a
+deterministic projection of the whole manifest.
+
+Generated modules are reconciled rather than treated as user-owned: missing or differing content
+is written without `--force`, identical content is skipped, and `--force` rewrites even identical
+outputs. `--dry-run` reports the complete client-and-Aspire plan without writes. Both flags govern
+the whole command, including Aspire helpers.
+
+If a project was scaffolded before this per-service wiring, run `netscript service generate` after
+updating the CLI. Regeneration replaces the fixed example names with service-derived symbols:
+`exampleServiceName`, `exampleServiceRouterName`, `exampleServiceContract`,
+`exampleServiceListInvalidation`, `exampleServiceClient`, and `exampleServiceQueries` become
+`<service>Name`, `<service>RouterName`, `<service>Contract`, `<service>ListInvalidation`,
+`<service>Client`, and `<service>Queries`. It also changes the query-key namespace from the literal
+`service` resource to the service's camel-case identity. Update imports of the six old symbols;
+persisted cache entries under the old namespace are orphaned and may be cleared. Projects that do
+not regenerate keep their existing generated code unchanged.
 
 ### Plugin source truth
 

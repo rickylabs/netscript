@@ -22,7 +22,9 @@ import {
   readPinnedAppPort,
 } from './generated-app-endpoint.ts';
 
+/** Application-render attempts after endpoint allocation; they do not infer Aspire health. */
 const ATTEMPTS = 60;
+/** Delay between application HTML probes, not an Aspire resource-state polling interval. */
 const RETRY_DELAY_MS = 1_000;
 const MAX_DIAGNOSTIC_CHARS = 24_000;
 const MAX_DIAGNOSTIC_LINES = 300;

@@ -1,0 +1,42 @@
+{
+  "gateId": "test",
+  "invocationId": "1906-s3-s2-fenced-green",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts",
+    "packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts",
+    "packages/cli/e2e/tests/application/gates/readiness-disagreement_test.ts",
+    "packages/cli/e2e/tests/application/gates/owned-container-log_test.ts",
+    "packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts",
+    ".llm/tools/validation/check-aspire-resource-polling_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1906",
+  "gitHead": "ee5b46a43d90f4e68c4a5d1771874d6c5f0e50d2",
+  "actualGitHead": "ee5b46a43d90f4e68c4a5d1771874d6c5f0e50d2",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:4092477",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6ee8dfdd010561d50f43748d7316ba2f03f0b1461481b2694c58b93f630d5120",
+  "lifecycleId": "worker:4092477:1906-s3-s2-fenced-green:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T03:06:00.651Z",
+  "startedAt": "2026-09-03T03:06:00.653Z",
+  "finishedAt": "2026-09-03T03:06:01.212Z",
+  "durationMs": 559,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 706,
+    "sha256": "19e8434b0208e211ee7d016a455ce56aa6d2fd8305cc79f7bfcb4175de10567d",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts\",\"packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts\",\"packages/cli/e2e/tests/application/gates/readiness-disagreement_test.ts\",\"packages/cli/e2e/tests/application/gates/owned-container-log_test.ts\",\"packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts\",\".llm/tools/validation/check-aspire-resource-polling_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1906\",\"exitCode\":0,\"durationMs\":445,\"summary\":{\"passed\":58,\"failed\":0,\"ignored\":0,\"totalResults\":58,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 539,
+    "sha256": "5fbef8d6732b6a6f20ca0cebc98e338933b35b78d35a41db3eac3576e25de32e",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/e2e/tests/application/gates/listener-readiness-gates_test.ts' 'packages/cli/e2e/tests/application/gates/listener-unreachable-fixture_test.ts' 'packages/cli/e2e/tests/application/gates/readiness-disagreement_test.ts' 'packages/cli/e2e/tests/application/gates/owned-container-log_test.ts' 'packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts' '.llm/tools/validation/check-aspire-resource-polling_test.ts'\n",
+    "truncated": false
+  }
+}

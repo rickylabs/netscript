@@ -22,9 +22,9 @@ export interface FlowBStreamBatch {
 export interface FlowBSelectionOptions {
   /** Maximum number of control-delimited batches to inspect. */
   readonly maxBatches: number;
-  /** Maximum total wall-clock time allowed for selection. */
+  /** Application SSE-record selection ceiling; it does not observe managed resource state. */
   readonly timeoutMs: number;
-  /** Delay between unmatched batches so immediate heartbeats do not exhaust the batch bound. */
+  /** Application SSE-batch delay; it is not a resource-readiness interval. */
   readonly retryDelayMs?: number;
   /** Read one batch, bounded by the remaining total time. */
   readonly readBatch: (

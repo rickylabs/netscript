@@ -90,6 +90,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 async function poll(label: string, check: () => Promise<boolean>): Promise<void> {
+  // This bounds application-domain worker/saga query convergence after their HTTP endpoints exist.
   for (let attempt = 1; attempt <= 30; attempt++) {
     if (await check()) return;
     await new Promise((resolve) => setTimeout(resolve, 1_000));

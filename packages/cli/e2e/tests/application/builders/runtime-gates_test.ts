@@ -235,6 +235,22 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command.at(-1), '300');
 });
 
+Deno.test('database allocation gates pass the scoped database resource to event observation', () => {
+  const gates = createRuntimeGates(DATABASE.POSTGRES);
+  for (
+    const [gateId, label] of [
+      [GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST, 'first'],
+      [GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND, 'second'],
+    ] as const
+  ) {
+    const gate = gates.find((entry) => entry.id === gateId);
+    if (gate?.kind !== 'command') throw new Error(`Expected ${gateId} command gate.`);
+    const command = gate.command(s8RuntimeContext());
+    assertEquals(command.at(-2), label);
+    assertEquals(command.at(-1), ASPIRE_RESOURCE.POSTGRES);
+  }
+});
+
 Deno.test('Aspire restart fallback binds aspire.config.json to the AppHost workspace', () => {
   const context = s8RuntimeContext();
 

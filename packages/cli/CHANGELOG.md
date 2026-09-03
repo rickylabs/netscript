@@ -80,6 +80,12 @@
   and compare Fresh-owned manifest output.
   `FormCollectionStrategy` rejects `navigation: 'document'` together with `mode: 'client'` at the
   type level instead of silently dropping the navigation choice.
+  The form descriptor's `controlProps()` bag is directly assignable to Preact `input`, `select`,
+  and `textarea` elements, and derives `pattern` plus inclusive numeric `min`/`max`/`step` native
+  constraints from the Zod 4 schema.
+  `useQuery` from `@netscript/fresh/query` seeds `initialDataUpdatedAt` alongside `initialData`,
+  so `staleTime` is measured from the server load rather than browser hydration, and the scaffolded
+  showcase island passes the loader's `cachedAt` through instead of discarding it.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
@@ -94,6 +100,11 @@
   Fresh 2.x resource-slice template family (`packages/cli/src/kernel/assets/resource-slice/`),
   rendered through the pure slice planner with exact core/form/partial/stream option deltas; no
   command wires it yet.
+  `netscript service generate` reconciles every manifest service into a generator-owned
+  `apps/<app>/lib/<service>.ts` client module with service-scoped query-factory keys and
+  collision-safe naming, validates each `contracts/versions/v1/<service>.contract.ts` export before
+  writing, and regenerates Aspire helpers in the same pass; identical modules are skipped and
+  `--force` rewrites them.
 - Aspire moves to the atomic 13.5.3 train with a version-parity gate, re-validates every emitted
   AppHost SDK member and the deploy CLI argv contract against the 13.5 TypeScript API, removes
   runtime literal ports so Aspire owns endpoint allocation (the auth, sagas, and triggers
@@ -109,6 +120,10 @@
   The Aspire reference documents the backing-resource readiness contract: `healthStatus` reports
   reachability at the published endpoint, so a container log line is not the readiness authority
   and `Unhealthy` means "not reachable where you will connect", not "not started".
+  Scaffolded Aspire helpers gain `createEndpointListenerReadinessCheck`: the postgres listener
+  readiness check bounds endpoint allocation with the same deadline as the socket probe and
+  reports `ENDPOINT_ALLOCATION_TIMEOUT` instead of waiting indefinitely when the endpoint is never
+  allocated.
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.
 
 ## 0.0.6
