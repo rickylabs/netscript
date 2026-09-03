@@ -99,6 +99,30 @@ Resource endpoints used by the application probes are already resolved through t
 Comments beside the remaining bounds now state the actual effect they cap. Focused Bucket-C and
 policy tests pass 91/91.
 
+### S4 — final evidence
+
+Evidence source head: `95ae2dfad33fffa94239a6c871a42da741009b06`. PR: #1978.
+
+| Gate | Result | Receipt |
+| --- | --- | --- |
+| Focused converted/helper tests | PASS — 131 passed, 0 failed | `receipts/s4-focused-tests.json` |
+| Empty-allowlist policy | PASS — 5 passed, 0 failed | `receipts/s4-polling-policy.json` |
+| `deno task quality:gate` | PASS — exit 0 | `receipts/s4-quality-gate.json` |
+| E2E check wrapper | PASS — 236 files, 2 batches, 0 findings | `receipts/s4-e2e-check.json` |
+| E2E format wrapper | PASS — 236/236 files, 0 findings | `receipts/s4-e2e-fmt.json` |
+| E2E lint coverage | PASS via complete split — 229 + 7 files, 0 findings | `receipts/s4-e2e-lint-main.json`, `receipts/s4-e2e-lint-desktop-native.json` |
+| `deno task e2e:cli suites` | PASS — all 11 suite IDs listed | worklog evidence |
+
+The exact single-root lint command was also run and is retained as
+`receipts/s4-e2e-lint-root.json`. It exits 2 before linting the seven standalone desktop-native
+fixture files because Deno ignores their non-member config and then cannot resolve `catalog:zod`.
+This is the same unchanged config-boundary defect documented by slice 2. The two wrapper invocations
+above process all 236 selected files under resolvable configs with no lint findings; no fixture or
+root config change was taken into this slice.
+
+No Aspire, Docker, full `scaffold.runtime`, or other local runtime lease was started. `ci:full` is
+the live transition proof surface.
+
 ## Reconcile
 
 - S1: issue #1906 remains open and this partial slice uses `Refs #1906`; the six-file fence is clear
@@ -107,3 +131,5 @@ policy tests pass 91/91.
   No issue/PR comment changed the brief or scope.
 - S3: Bucket C contains no newly discovered resource-readiness surrogate. The disposition closes
   the issue's eight-row judgement inventory without expanding into application-effect rewrites.
+- S4: issue #1906 and PR #1978 metadata still match the brief. Every current #1906 DoD item is met
+  by #1909, #1969, and this head; the supervisor retains the umbrella issue-linkage decision.

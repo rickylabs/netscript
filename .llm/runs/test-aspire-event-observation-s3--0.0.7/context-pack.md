@@ -3,7 +3,7 @@
 - Branch: `test/aspire-event-observation-s3`
 - Base: `3149d18e1`; brief head: `ea2c912b4`
 - Run dir: `.llm/runs/test-aspire-event-observation-s3--0.0.7/`
-- Current phase: S3 GREEN; next is S4 final evidence and PR
+- Current phase: implementation complete; PR #1978 open for hosted CI and separate-session eval
 - Contract: complete the cleared six-file fence, dispose Bucket C, empty the guard allowlist, and
   avoid all local Aspire runtime execution.
 - Evaluator: separate opposite-family session after implementation.
@@ -13,3 +13,6 @@
   tests and the empty-allowlist guard pass 58/58.
 - S3: all eight Bucket-C sites are legitimate effect-level waits; `bucket-c-disposition.md` records
   each reason and focused tests pass 91/91.
+- S4 source/evidence head: `95ae2dfad33fffa94239a6c871a42da741009b06`. Focused tests,
+  policy, quality, check, format, complete split lint coverage, and suite discovery pass. The known
+  single-root lint config refusal is preserved in its own receipt.
