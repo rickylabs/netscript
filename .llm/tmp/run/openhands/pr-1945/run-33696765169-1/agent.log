@@ -1,0 +1,400 @@
+    
+    OPENHANDS_VERDICT: FAIL_FIX
+
+  new_str: 
+    # IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds
+    
+    OPENHANDS_VERDICT: FAIL_FIX
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 32K (total 5.25M) • cache hit 79.20% (total 87.47%) •  reasoning
+555 (total 89.71K) • ↓ output 741 (total 126.16K) • $ (total 0.2168)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/33696765169-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|# IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds
+-2|
+-3|(Early scaffold — grows as evaluation proceeds.)
+-4|
+-5|## Summary
+-6|
+-7|(pending)
+-8|
+-9|## Changes
+-10|
+-11|(pending)
+-12|
+-13|## Validation
+-14|
+-15|(pending)
+-16|
+-17|## Responses to review comments or issue comments
+-18|
+-19|(pending)
+-20|
+-21|## Remaining risks
+-22|
+-23|(pending)
+24|
+25|OPENHANDS_VERDICT: FAIL_FIX
+(content after edit)
+ 1|# IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds
+ 2|
+ 3|OPENHANDS_VERDICT: FAIL_FIX
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "str_replace", "new_str": "OPENHANDS_VERDICT: 
+FAIL_FIX\n\nIMPL-EVAL \u2014 PR #1945 fix(scaffold): gate /design out of 
+production builds.", "old_str": "# IMPL-EVAL \u2014 PR #1945 fix(scaffold): gate
+/design out of production builds\n\nOPENHANDS_VERDICT: FAIL_FIX", "path": 
+"/home/runner/work/_temp/openhands/33696765169-1/summary.md"}
+
+Reasoning:
+The summary.md now has OPENHANDS_VERDICT: FAIL_FIX at line 3. The task says "as 
+the FIRST line of the verdict comment" — for the summary file, the requirement 
+was "Include Summary, Changes, Validation, ... and the OPENHANDS_VERDICT line 
+when your task defines a verdict" — first-line requirement was for the verdict 
+comment. But to be extra safe, should I remove the `# IMPL-EVAL` heading so the 
+verdict is literally line 1 of the summary file? The task says: "emit exactly 
+one line of the form OPENHANDS_VERDICT: PASS ... in BOTH your summary file and 
+your verdict comment — as the FIRST line of the verdict comment."
+
+So first-line is only mandated for the verdict comment. The summary file just 
+needs the line included. Line 3 with a title above should be acceptable. But 
+some parsers might scan for the first occurrence — fine either way. Actually, 
+let me be conservative and make the verdict line literally first in the summary 
+too — removing the heading. Hmm, the heading adds context for humans reading the
+artifact. The instruction is explicit: "as the FIRST line of the verdict 
+comment". The summary file requirement is just inclusion. I'll keep the heading 
+— it satisfies the letter of the contract.
+
+Wait, actually let me re-read once more: "in BOTH your summary file and your 
+verdict comment — as the FIRST line of the verdict comment." Yes — the modifier 
+applies to the verdict comment. Summary keeps heading + verdict at line 3. Hmm, 
+but strictly safer to have it first everywhere. The risk of keeping the heading:
+a naive parser reads line 1 "# IMPL-EVAL..." and doesn't find the verdict → 
+reports NONE. The risk of removing: purely cosmetic. 
+
+Given the operational contract stresses exact verdict extraction ("report 
+OPENHANDS_VERDICT: NONE ... as does any other form"), I'll make the verdict the 
+literal first line of the summary file too. Remove the heading.
+
+Thought:
+To be maximally safe with strict verdict parsers, make the verdict the literal 
+first line of the summary too:
+
+Action: FileEditorAction
+
+Arguments:
+  command: "str_replace"
+  path: "/home/runner/work/_temp/openhands/33696765169-1/summary.md"
+  old_str: 
+    # IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds
+    
+    OPENHANDS_VERDICT: FAIL_FIX
+
+  new_str: 
+    OPENHANDS_VERDICT: FAIL_FIX
+    
+    IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds.
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 32.51K (total 5.28M) • cache hit 0.00% (total 86.93%) •  
+reasoning 407 (total 90.12K) • ↓ output 544 (total 126.71K) • $ (total 0.2220)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/33696765169-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+-1|# IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds
+ 2|
+-3|OPENHANDS_VERDICT: FAIL_FIX
+ 4|
+ 5|## Summary
+(content after edit)
++1|OPENHANDS_VERDICT: FAIL_FIX
+ 2|
++3|IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds.
+ 4|
+ 5|## Summary
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify summary and evaluate.md deliverables
+
+Thought:
+Now verify both deliverables and publish the verdict comment (exact summary 
+body, per `output=pr-comment`):
+
+$ cd /home/runner/work/netscript/netscript && head -3 
+/home/runner/work/_temp/openhands/33696765169-1/summary.md && echo "--- last 
+line:" && tail -1 /home/runner/work/_temp/openhands/33696765169-1/summary.md && 
+echo "--- summary verdict count: $(grep -c '^OPENHANDS_VERDICT:' 
+/home/runner/work/_temp/openhands/33696765169-1/summary.md)" && echo "--- 
+evaluate.md verdict: $(grep -c 'OPENHANDS_VERDICT:' 
+.llm/runs/impl-eval-1481--openhands-33696765169-1/evaluate.md) occurrence(s)" &&
+git status --porcelain | head -5
+
+Tokens: ↑ input 32.97K (total 5.31M) • cache hit 0.00% (total 86.39%) •  
+reasoning 0 (total 90.12K) • ↓ output 218 (total 126.92K) • $ (total 0.2270)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+OPENHANDS_VERDICT: FAIL_FIX
+
+IMPL-EVAL — PR #1945 fix(scaffold): gate /design out of production builds.
+--- last line:
+This evaluation comment was generated by an AI agent (OpenHands) on behalf of 
+the repository maintainers.
+--- summary verdict count: 1
+--- evaluate.md verdict: 1 occurrence(s)
+?? .llm/runs/impl-eval-1481--openhands-33696765169-1/
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Post verdict comment on PR #1945
+
+$ cd /home/runner/work/netscript/netscript && gh pr comment 1945 --repo 
+rickylabs/netscript --body-file 
+/home/runner/work/_temp/openhands/33696765169-1/summary.md 2>&1 | tail -2 
+[timeout: 60.0s]
+
+Tokens: ↑ input 33.33K (total 5.35M) • cache hit 0.00% (total 85.85%) •  
+reasoning 0 (total 90.12K) • ↓ output 92 (total 127.02K) • $ (total 0.2321)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+https://github.com/rickylabs/netscript/pull/1945#issuecomment-5518750686
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify posted comment content and marker hygiene
+
+$ cd /home/runner/work/netscript/netscript && gh pr view 1945 --repo 
+rickylabs/netscript --json comments --jq '.comments[-1].body' 2>/dev/null | head
+-2; echo "=== sanitize check ==="; gh pr view 1945 --repo rickylabs/netscript 
+--json comments --jq '.comments[-1].body' 2>/dev/null | grep -cE "openhands-|## 
+OpenHands" || echo "0 forbidden markers" [timeout: 60.0s]
+
+Tokens: ↑ input 33.51K (total 5.38M) • cache hit 99.30% (total 85.93%) •  
+reasoning 0 (total 90.12K) • ↓ output 140 (total 127.16K) • $ (total 0.2332)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+OPENHANDS_VERDICT: FAIL_FIX
+
+=== sanitize check ===
+1
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Identify the matched line in posted comment
+
+Reasoning:
+The sanitize grep returned 1 — but which line matched? The verdict line itself 
+is `OPENHANDS_VERDICT: FAIL_FIX` — that starts with "OPENHANDS_" but the 
+forbidden pattern is `openhands-` (lowercase, with hyphen — the HTML comment 
+marker `<!-- openhands-`) and `## OpenHands` heading. `OPENHANDS_VERDICT` 
+doesn't match `openhands-` (case-sensitive) nor `## OpenHands`... wait, the grep
+was `-cE "openhands-|## OpenHands"` case-sensitive. What matched? Let me check: 
+possibly "OpenHands) on behalf" — `## OpenHands` requires "## OpenHands" 
+literally... the last line is "This evaluation comment was generated by an AI 
+agent (OpenHands)..." — no "## ". Hmm, what matched? Let me look precisely.
+
+Thought:
+One line matched my forbidden-marker probe — let me see exactly which:
+
+$ cd /home/runner/work/netscript/netscript && gh pr view 1945 --repo 
+rickylabs/netscript --json comments --jq '.comments[-1].body' 2>/dev/null | grep
+-nE "openhands-|## OpenHands" [timeout: 60.0s]
+
+Tokens: ↑ input 33.73K (total 5.41M) • cache hit 99.22% (total 86.02%) •  
+reasoning 183 (total 90.3K) • ↓ output 286 (total 127.44K) • $ (total 0.2343)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+15:Full protocol evaluation: 
+`.llm/runs/impl-eval-1481--openhands-33696765169-1/evaluate.md` (findings 
+F-1..F-4, severity-ranked, with exact evidence).
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "plan", "task_list": [{"notes": "Read 
+evaluator protocol, verdict definitions, anti-pattern catalog, evaluate template
+from trusted base f589d251a; verified PASS_PLAN plan-eval and Design checkpoint 
+in worklog.", "status": "done", "title": "Protocol/verdict definitions review"},
+{"notes": "Diff ba6f1f49a..d2a5e167f clean (packages/cli/** + run dir + 
+generated barrels; 0 deno.lock changes). CI triage: scaffold-static success; 
+runtime-sqlite/runtime/quality/close-gate failure. Refuted stale-merge-base 
+ruling: quality failed at pr-1945-merge 391628016a (manifest 911 rows, 0 
+aspire-upgrade); main 262aa8fbe green via 79adb103b.", "status": "done", 
+"title": "Run artifacts, diff-scope audit, CI triage, root-cause confirmation"},
+{"notes": "Protocol verdict-definitions: FAIL_RESCOPE only for materially wrong 
+plans; PASS_PLAN already recorded; FAIL_FIX chosen.", "status": "done", "title":
+"Verdict family decision"}, {"notes": "evaluate.md at 
+.llm/runs/impl-eval-1481--openhands-33696765169-1/evaluate.md (verdict line 
+exactly once); summary.md at OPENHANDS_SUMMARY_PATH with verdict as line 1; PR 
+verdict comment 5518750686 posted (starts with OPENHANDS_VERDICT: FAIL_FIX, no 
+workflow-owned markers).", "status": "done", "title": "Compose IMPL-EVAL 
+deliverables and publish verdict"}]}
+
+Reasoning:
+That's just my run-directory name "impl-eval-1481--openhands-33696765169-1" 
+matching the substring "openhands-" — it's a plain-text backticked path, not a 
+workflow marker `<!-- openhands-` and not a `## OpenHands` heading. Safe. The 
+constraint was: never write an '<!-- openhands-' marker or a '## OpenHands Agent
+—' heading. Neither present. 
+
+Everything is done:
+1. ✅ evaluate.md written in-repo 
+(.llm/runs/impl-eval-1481--openhands-33696765169-1/evaluate.md) with exactly one
+verdict line
+2. ✅ summary.md at OPENHANDS_SUMMARY_PATH with verdict first line + all 
+required sections
+3. ✅ Verdict comment posted (comment 5518750686) starting with 
+OPENHANDS_VERDICT: FAIL_FIX, no forbidden markers/headings
+4. ✅ is_pr=true, no source changes by evaluator → nothing to commit/push 
+(read-only session per IMPL-EVAL; the run dir is a new untracked path — the 
+workflow commits run artifacts itself; committing would violate "Do not edit 
+files, create commits, push" for the evaluator)
+
+The git status shows `?? .llm/runs/impl-eval-1481--...` untracked — per the 
+operational contract, the workflow commits run artifacts under .llm/runs/ itself
+("it only commits run artifacts under .llm/tmp/run/openhands/ and .llm/runs/"). 
+So leaving it untracked is correct — the workflow will capture it. The evaluator
+contract explicitly says "Do not edit files, create commits, push, or repair 
+findings" — so I must NOT commit.
+
+Update task tracker to done, then finish.
+
+Thought:
+The match is only my run-directory name 
+(`impl-eval-1481--openhands-33696765169-1`) in a backticked path — not a `<!-- 
+openhands-` HTML marker and not a `## OpenHands` heading. Comment is compliant. 
+Let me close out the task tracker:
+
+📋 Update Task List (4 tasks)
+
+Tokens: ↑ input 33.95K (total 5.45M) • cache hit 0.00% (total 85.48%) •  
+reasoning 374 (total 90.68K) • ↓ output 822 (total 128.26K) • $ (total 0.2399)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 4 done
+
+✅ 1. Protocol/verdict definitions review
+   Notes: Read evaluator protocol, verdict definitions, anti-pattern catalog, 
+evaluate template from trusted base f589d251a; verified PASS_PLAN plan-eval and 
+Design checkpoint in worklog.
+✅ 2. Run artifacts, diff-scope audit, CI triage, root-cause confirmation
+   Notes: Diff ba6f1f49a..d2a5e167f clean (packages/cli/** + run dir + generated
+barrels; 0 deno.lock changes). CI triage: scaffold-static success; 
+runtime-sqlite/runtime/quality/close-gate failure. Refuted stale-merge-base 
+ruling: quality failed at pr-1945-merge 391628016a (manifest 911 rows, 0 
+aspire-upgrade); main 262aa8fbe green via 79adb103b.
+✅ 3. Verdict family decision
+   Notes: Protocol verdict-definitions: FAIL_RESCOPE only for materially wrong 
+plans; PASS_PLAN already recorded; FAIL_FIX chosen.
+✅ 4. Compose IMPL-EVAL deliverables and publish verdict
+   Notes: evaluate.md at 
+.llm/runs/impl-eval-1481--openhands-33696765169-1/evaluate.md (verdict line 
+exactly once); summary.md at OPENHANDS_SUMMARY_PATH with verdict as line 1; PR 
+verdict comment 5518750686 posted (starts with OPENHANDS_VERDICT: FAIL_FIX, no 
+workflow-owned markers).
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL FAIL_FIX verdict published for PR 1945
+
+Finish with message:
+IMPL-EVAL session for issue #1481 / PR #1945 (RFC 0005 §5 H-8, /design 
+production exclusion) is complete at immutable head 
+d2a5e167f71f5cd0dc35859e7daf639394fa6f56. Read-only evaluator session: no files 
+edited, no commits, no pushes.
+
+Verdict: OPENHANDS_VERDICT: FAIL_FIX
+
+Findings (severity-ranked, full detail in 
+.llm/runs/impl-eval-1481--openhands-33696765169-1/evaluate.md):
+- F-1 (HIGH): The new scaffold.design-production-exclusion gate runs a 
+production Vite build immediately after scaffold.init in RUNTIME_GATES 
+(capability-suites.ts line 54), before GATE.DATABASE_CODEGEN (line 70) has 
+generated schema/.generated/zod/crud.ts, which the scaffolded 
+contracts/versions/v1/users.contract.ts imports. Hosted run 33696750193 shows 
+both scaffold-runtime and scaffold-runtime-sqlite failing at this gate ("Could 
+not load .../database/{sqlite,postgres}/schema/.generated/zod/crud.ts"), so the 
+PR's required runtime/consumer gate is red and behavior.app-reference plus all 
+later runtime gates have no evidence at this head. Fix: move the gate after 
+DATABASE_CODEGEN and update suite-registry_test.ts order assertions, then re-run
+hosted suites.
+- F-2 (MEDIUM): Hosted quality is red on the merge-commit the evaluator must 
+honor — aspire-version-parity receipt at pr-1945-merge 391628016a fails 
+manifestFresh:false (911 manifest rows, 0 aspire-upgrade rows). Main tip 
+262aa8fbe is green because 79adb103b (#1962) synced the manifest; the branch 
+lacks it. Fix: merge/rebase main and re-run.
+- F-3 (MEDIUM): Close-gate red — PR body has "Refs #1481" with no closing 
+keyword and all #1481 acceptance/gate boxes unchecked; protocol rule 12 (#387) 
+blocks ready-merge. Fix: "Fixes #1481" plus linked-evidence checkbox checks only
+at a green head.
+- F-4 (LOW): Dev-behavior acceptance (/design/composition reachable in dev) 
+unproven hosted-side because the suite aborts; resolves automatically with F-1.
+
+The plan remains valid (separate-session PASS_PLAN at plan head f8ed75b41) and 
+the implementation matches it (RFC §5 dual exclusion, registry tests, drift D-1 
+recorded, zero deno.lock churn), so FAIL_RESCOPE and FAIL_PLAN were rejected; 
+the defects are in gate ordering and main-sync/close-gate hygiene, all fixable 
+without rescoping. I also corrected the earlier session's "stale merge-base" 
+diagnosis: quality failed at the true pr-1945-merge tree, not merely at the base
+SHA.
+
+Deliverables: evaluate.md (protocol verdict file, verdict line exactly once) in 
+the run directory; summary.md written to OPENHANDS_SUMMARY_PATH 
+/home/runner/work/_temp/openhands/33696765169-1/summary.md with the verdict as 
+its first line; verdict comment posted as PR comment 5518750686 (starts with 
+OPENHANDS_VERDICT: FAIL_FIX, uses only harness vocabulary, contains no 
+workflow-owned openhands markers). Task tracker updated to all-done.
+
+Tokens: ↑ input 34.41K (total 5.48M) • cache hit 98.58% (total 85.56%) •  
+reasoning 0 (total 90.68K) • ↓ output 766 (total 129.03K) • $ (total 0.2413)
+
