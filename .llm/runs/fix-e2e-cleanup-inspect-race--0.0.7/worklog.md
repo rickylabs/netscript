@@ -68,6 +68,9 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | 2026-09-03T03:15:35Z | S1 | RED | Durable `test` receipt failed as expected: 0 passed, 1 failed; the sole failure is `docker inspect 7ab8913455fa failed (1): Error: No such object: 7ab8913455fa`. |
 | 2026-09-03T03:16:00Z | S1 | slice review | Diff is limited to the internal runner seam and desired semantic regression. No classification, receipt, wait, timeout, or budget behavior is changed in S1. |
 | 2026-09-03T03:16:00Z | S1 | reconcile | Issue #1977 and draft PR #1979 are open at `status:impl`, milestone `0.0.7`, with the requested taxonomy. No new comments or scope readjustments. |
+| 2026-09-03T03:17:00Z | S2 | GREEN | Structured focused wrapper passed 9/9 across the new colocated regression and existing Aspire cleanup-evidence tests. |
+| 2026-09-03T03:17:00Z | S2 | slice review | Tightened the removal predicate from substring matching to an exact trimmed-line suffix for the current id; verified all other failures retain the original throw shape. Receipt change is additive and aggregates ids across probes. |
+| 2026-09-03T03:17:00Z | S2 | reconcile | No new issue/PR comments or acceptance changes. Scope remains the two evidence files plus run artifacts; hosted tiers remain deferred to CI. |
 
 ## Decisions
 
@@ -91,6 +94,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | --- | --- | --- | --- |
 | scoped check/lint/fmt | structured wrappers | NOT_RUN | S3 |
 | S1 RED | `run-gate.ts --gate test -- .../evidence/cleanup_test.ts` | FAIL_EXPECTED | Receipt exit 1, 0/1 pass/fail. |
+| S2 focused GREEN | structured test wrapper over `cleanup_test.ts` and `aspire-cleanup-evidence_test.ts` | PASS | 9 passed, 0 failed, 638 ms. Exact-head durable receipt follows after commit. |
 
 ### Fitness Gates
 
@@ -105,6 +109,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | hosted scaffold runtime tiers | NOT_RUN | CI after push | Local Aspire runtime prohibited. |
+| cleanup unit behavior | PASS | focused structured wrapper | Vanished and non-vanished failure paths covered. |
 
 ### Consumer Gates
 
