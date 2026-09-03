@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "0247471c89e381dd16e680bf0c10b6559caf36ee",
+  "currentMainSha": "d2af6e8b40777720b242aaea639b0e538299cdc8",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "osUpdateRecoverySnapshot": "receipts/recovery-2026-09-03.json",
@@ -817,9 +817,9 @@
     },
     {
       "number": 1455,
-      "state": "open",
+      "state": "closed",
       "githubEvidence": "https://github.com/rickylabs/netscript/issues/1455",
-      "reconciledAt": "2026-09-03T08:15:00.000Z"
+      "reconciledAt": "2026-09-03T10:49:00Z"
     },
     {
       "number": 1458,
@@ -4503,17 +4503,19 @@
       "issueNumbers": [
         1455
       ],
-      "phase": "gating",
+      "phase": "merged",
       "thread": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
       "wt": "007-leaf-1970",
-      "nextGate": "#1958 merged. Existing independent GLM PASS; integrate canonical main, exact hosted tiers and proportional delta review.",
+      "nextGate": "Done: #1455 auto-closed; final canary publication will supply consumer version. Scoped independent PASS, core33743065545 attempt2 and runtime33743065396 PASS.",
       "baseBranch": "main",
-      "headSha": "01e408d1690f4ec9cde1dd8725a01186125febac",
-      "currentPrHeadSha": "01e408d1690f4ec9cde1dd8725a01186125febac",
+      "headSha": "b5d23b051fdd56453914f19b3f88c88e7b4a2806",
+      "currentPrHeadSha": "b5d23b051fdd56453914f19b3f88c88e7b4a2806",
       "branch": "feat/workers-payload-registry-map",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
       "implementerAgentId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
-      "reconciledAt": "2026-09-03T09:06:00.000Z"
+      "reconciledAt": "2026-09-03T10:48:00Z",
+      "mergeSha": "d2af6e8b40777720b242aaea639b0e538299cdc8",
+      "mergedAt": "2026-09-03T10:43:28Z"
     },
     {
       "id": "design-production-exclusion",
@@ -4526,14 +4528,14 @@
       "phase": "gating",
       "thread": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "wt": "007-leaf-1481",
-      "nextGate": "#1958 merged. Same author integrates main (local09425aa6b), obtains exact hosted tiers and independent evaluation.",
+      "nextGate": "Both runtime tiers PASS33744551964 (104/0 PG,99/0 SQLite). Core fails only resource-slice-gates_test positional assertion21 vs20. Same author granted exact codegen→design→client ordering repair in comment5524505478; retain valid runtime/evaluator, renew selected + core gates.",
       "baseBranch": "main",
-      "headSha": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
-      "currentPrHeadSha": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
+      "headSha": "456abefbdfa4a06de15c1a64b3e5f4a68751e769",
+      "currentPrHeadSha": "456abefbdfa4a06de15c1a64b3e5f4a68751e769",
       "branch": "fix/design-route-prod-gate",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
       "implementerAgentId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
-      "reconciledAt": "2026-09-03T09:06:00.000Z"
+      "reconciledAt": "2026-09-03T10:48:00Z"
     },
     {
       "id": "resource-slice-final-acceptance",
@@ -5725,14 +5727,14 @@
   ],
   "expensiveGates": [],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-03T10:12:00Z",
+    "capturedAt": "2026-09-03T10:48:00Z",
     "source": "Live GitHub milestone 27 export; actual remaining issues, not historical frozen inventory.",
-    "openIssueCount": 6,
+    "openIssueCount": 5,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
       "features": 0,
-      "fixes": 3,
+      "fixes": 2,
       "internals": 0,
       "docs": 0,
       "aspire": 3
@@ -5767,13 +5769,6 @@
         "url": "https://github.com/rickylabs/netscript/issues/1481"
       },
       {
-        "number": 1455,
-        "owner": "orchestrator:fixes",
-        "state": "OPEN",
-        "title": "workers: preserve job payload type through definition, registry, and enqueue",
-        "url": "https://github.com/rickylabs/netscript/issues/1455"
-      },
-      {
         "number": 863,
         "owner": "orchestrator:aspire",
         "state": "OPEN",
@@ -5784,12 +5779,8 @@
     "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
   },
   "openPrOwnership": {
-    "capturedAt": "2026-09-03T10:12:00Z",
+    "capturedAt": "2026-09-03T10:48:00Z",
     "prs": [
-      {
-        "number": 1970,
-        "topic": "fixes"
-      },
       {
         "number": 1945,
         "topic": "fixes"
@@ -5978,7 +5969,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T10:31:00Z",
+  "updatedAt": "2026-09-03T10:48:00Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6041,20 +6032,20 @@
       "pr": 1970,
       "threadId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
-      "head": "01e408d1690f4ec9cde1dd8725a01186125febac",
-      "action": "Original author resumed after #1958 merge; integrate canonical main, exact-head focused/carrier and both hosted runtime gates, finish independent product/integration review then coordinator merge.",
-      "state": "active",
-      "lastProgressAt": "2026-09-03T10:12:00Z",
+      "head": "b5d23b051fdd56453914f19b3f88c88e7b4a2806",
+      "action": "PR merged; issue1455 closed. Only persist final receipts, no new implementation or runtime dispatch.",
+      "state": "merged-closeout",
+      "lastProgressAt": "2026-09-03T10:48:00Z",
       "pid": 223146
     },
     {
       "pr": 1945,
       "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
-      "head": "91a1ee89746d48422e73e41e5b9b677b8e0a439e",
-      "action": "Original author resumed after #1958 merge; integrate canonical main, exact-head focused/carrier and both hosted runtime gates, finish independent product/integration review then coordinator merge.",
+      "head": "456abefbdfa4a06de15c1a64b3e5f4a68751e769",
+      "action": "Bounded existing ordering-test repair only; final required CI then merge. Both runtime tiers and scoped independent PASS already verified.",
       "state": "active",
-      "lastProgressAt": "2026-09-03T10:12:00Z",
+      "lastProgressAt": "2026-09-03T10:48:00Z",
       "pid": 223518
     }
   ],
@@ -6065,11 +6056,11 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T10:31:00Z",
-    "nextReportDueAt": "2026-09-03T11:01:00Z",
+    "lastReportAt": "2026-09-03T10:48:00Z",
+    "nextReportDueAt": "2026-09-03T11:18:00Z",
     "lastReportRef": "receipts/final-issue-closure-matrix.md",
-    "headline": "Two PRs merged; six issues fully owned. Final fix integrations active; cold README proof repaired locally, workflow permission requested before the single intended final canary.",
-    "currentMainSha": "0247471c89e381dd16e680bf0c10b6559caf36ee",
+    "headline": "#1970 merged and #1455 closed. Five issues remain; #1945 needs one integration-test assertion corrected. Final cold README workflow proof awaits requested GitHub authorization; no canary minted.",
+    "currentMainSha": "d2af6e8b40777720b242aaea639b0e538299cdc8",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
       "state": "qualifying",
@@ -6098,36 +6089,31 @@
       "mergedPullRequests": [
         1981,
         1958,
-        1982
+        1982,
+        1970
       ],
       "closedIssues": [
         1844,
-        1354
+        1354,
+        1455
       ],
       "newIssues": [],
-      "queueDeltaExplanation": "#1958 and #1982 merged this turn; #1354 auto-closed after verified closing-keyword repair. Six open milestone issues, two product PRs plus coordinator tracking PR. #1844 already owner-approved closed."
+      "queueDeltaExplanation": "Three PRs1958/1982/1970 merged this turn. Five issues, one product PR1945 plus coordinator tracking PR1641 remain; cold-proof commit local pending workflow permission."
     },
     "scope": {
-      "openIssueCount": 6,
-      "ownedIssueCount": 6,
-      "scheduledIssueCount": 6,
-      "openPullRequestCount": 3,
+      "openIssueCount": 5,
+      "ownedIssueCount": 5,
+      "scheduledIssueCount": 5,
+      "openPullRequestCount": 2,
       "unscheduledIssueNumbers": []
     },
     "mergeQueue": [
       {
-        "prNumber": 1970,
-        "lane": "fixes",
-        "state": "gating",
-        "nextGate": "Independent scoped GLM PASS recorded; integrate main, both hosted runtime tiers and proportional integration delta review.",
-        "nextAction": "Existing author resumed now against merged #1958; produce exact-head final hosted gates and verified merge packet."
-      },
-      {
         "prNumber": 1945,
         "lane": "fixes",
-        "state": "gating",
-        "nextGate": "Integrate main, both hosted runtime tiers, independent evaluation, truthful acceptance/body close-gate.",
-        "nextAction": "Existing author resumed now against merged #1958; produce exact-head final hosted gates and verified merge packet."
+        "state": "repairing",
+        "nextGate": "Both runtime tiers PASS33744551964 (104/0 PG,99/0 SQLite). Core fails only resource-slice-gates_test positional assertion21 vs20. Same author granted exact codegen→design→client ordering repair in comment5524505478; retain valid runtime/evaluator, renew selected + core gates.",
+        "nextAction": "Same author repairs existing order assertion, scoped proof then required CI; no broad new evaluation or repeated unchanged-product runtime."
       }
     ],
     "orchestratorMatrix": [
@@ -6143,15 +6129,13 @@
         "lane": "fixes",
         "state": "active",
         "activeItems": [
-          1455,
           1481,
           1971,
-          1970,
           1945
         ],
-        "lastConcreteProgressAt": "2026-09-03T10:12:00Z",
+        "lastConcreteProgressAt": "2026-09-03T10:48:00Z",
         "blocker": "Native Fable quota remains, but original Codex authors are active; no owner-only decision.",
-        "nextAction": "Finish #1970/#1945 integration and exact-head gates, then coordinator merges."
+        "nextAction": "Same author repairs existing order assertion, scoped proof then required CI; no broad new evaluation or repeated unchanged-product runtime."
       },
       {
         "lane": "internals",

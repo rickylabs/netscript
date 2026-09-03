@@ -1,5 +1,13 @@
 # Final 0.0.7 issue closure matrix
 
+Latest: 2026-09-03 10:54Z. #1455 is CLOSED by merged #1970 at d2af6e8b4 (10:43:28Z).
+Five open issues remain. The original six-row accounting below is retained as the audit trail;
+its #1455 row is now satisfied, not waiting. #1945 has both runtime tiers PASS and only a bounded
+ordering-test/core-CI delta left. Cold-proof independent PASS is receipts/eval-readme-cold/.
+Coordinator tracking #1641 contains historical maintainer-policy/skill edits as well as runs;
+reconcile those against current main (never restore retired Claude mirrors) before closing it.
+It is not a product implementation or a canary barrier; preserve all its accepted run context.
+
 GitHub audit: 2026-09-03 10:30Z. Six open issues, zero unassigned. PRs are counted separately;
 the GitHub milestone API's nine open items includes the three open PRs at this checkpoint.
 

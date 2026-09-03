@@ -1,5 +1,26 @@
 # Supervisor identity — release 0.0.7
 
+## 2026-09-03 10:54Z workers shipped; final proof review PASS
+
+Coordinator merged #1970 at d2af6e8b40777720b242aaea639b0e538299cdc8 (10:43:28Z);
+#1455 closed and terminal labels are shipped. Native author01a06201 exited after its verified
+packet; no decisive gate remains there. Five issues remain, not six. Current closure matrix
+counts and GitHub snapshots are reconciled and validate without findings.
+
+#1945: scoped independent PASS and hosted33744551964 PASS (PG104/0, SQLite99/0; non-vacuous
+production mutation/restoration). Core33744526413 exposed one stale resource-order assertion21
+vs20. Same author applied the bounded explicit codegen→design→client fix85bd9b65d, then merged
+main as33fde3777, conflict-free. Focused115/115, 1004-file check, selected lint/fmt, quality and
+carriers PASS; final core CI remains next. No new full evaluation or blind runtime retry is needed.
+
+Cold README proof832e53720 independent session0039d1ad-72eb-4047-964c-8b326ff65902 returned
+PASS_IMPL. Verbatim verdict, completed transport and coordinator disposition are in
+receipts/eval-readme-cold/. It completed normally; no worker was killed. Source push still lacks
+GitHub workflow permission. Initial device code expired; second authorization was requested via
+owner prompt. Before minting a next canary, use the corrected workflow against existingcanary.9
+to measure cold baseline/README and avoid spending a version on unmeasured runner assumptions.
+Then final frozen source→readiness→native canary pair→remaining issue closures→stable pair.
+
 ## 2026-09-03 10:30Z final candidate freeze and complete issue closure
 
 Owner requires all remaining issues genuinely closed and the next green canary to lead directly
