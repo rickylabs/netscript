@@ -561,3 +561,22 @@ scheduled no product CI. A final scoped commit adds only an explanatory comment 
 package fixture seam (no behavior or type change), ensuring the required synthetic-merge workflows
 run against the immutable packet head. The successful integrated local receipts above remain valid
 because the executable source is unchanged.
+
+## Repair 5 — generated add-job module registration boundary
+
+Exact-head Actions run `33714069941` reproduced the same `runtime.aspire-start` timeout in both
+PostgreSQL (job `100519618399`) and SQLite (job `100519618312`) after every generated static gate
+and `runtime.flow-b-fixture` passed. Both cleanup steps passed. Inspection of the actual Flow-B
+artifact emitted by `jobScaffolder` found the remaining branch-owned mismatch:
+
+```text
+job module exports: flowBCallbackJob (named only)
+generated registry resolver: module.default ?? module.handler
+runtime result: resolver throws while workers-api loads the generated registry
+```
+
+This follows directly from #1455's deliberate application-boundary contract: generated job modules
+must expose their schema-backed handler as `default` or `handler`. The generic add-job stub was not
+updated when the registry began enforcing that contract. The RED assertion requires the existing
+typed named handler to also be the module's default export; it does not fail on arity, imports, or an
+unrelated type mismatch.
