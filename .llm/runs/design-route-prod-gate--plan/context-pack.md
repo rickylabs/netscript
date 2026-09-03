@@ -32,16 +32,17 @@ PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. Su
 - Verified the corrected post-codegen gate order at `9630583c8` and reproduced the hosted product blocker locally with a fresh SQLite scaffold.
 - Filed #1971 with raw before/after-codegen evidence, P0/milestone ownership, and the #1945 dependency.
 - Merged exact `origin/main` `574e9ce57` as `9c1f8765e`; regenerated the sole conflicted carrier (`embedded.generated.ts`) and passed the exact post-sync CLI check (979 files) plus suite-registry test (20/20).
+- Merged exact `origin/main` `5778d70bb` (including the #1971 fix in #1974 and cleanup-race fix #1979) as `bcb83330b`; retained both design-exclusion and service-client surfaces, regenerated the embedded carrier, and passed the fresh Tier-A preflight.
 
 ## In Progress
 
-- #1945 is merge-blocked on #1971; no source workaround belongs on this branch.
+- #1971's product fix is now present through main commit `953b0849c`; fresh hosted PostgreSQL and SQLite/Garnet runtime tiers and a separate-session IMPL-EVAL remain required at the immutable final head.
 
 ## Next Steps
 
-1. Land #1971 without changing #1945's correct post-codegen gate order.
-2. Sync the #1971 fix into #1945 and rerun PostgreSQL + SQLite hosted runtime tiers.
-3. Only after both tiers and `behavior.app-reference` pass, dispatch a fresh separate-session IMPL-EVAL.
+1. Push the immutable merge-readiness head and run PostgreSQL + SQLite/Garnet hosted runtime tiers.
+2. Confirm `scaffold.design-production-exclusion` and `behavior.app-reference` pass in both tiers.
+3. Dispatch a fresh separate-session IMPL-EVAL at that exact head, then map #1481/#1971 acceptance evidence honestly.
 
 ## Key Decisions
 
