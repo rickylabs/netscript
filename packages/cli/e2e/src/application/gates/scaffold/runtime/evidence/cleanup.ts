@@ -119,6 +119,11 @@ export interface OwnedSurvivorResolution {
   readonly attempts: readonly StopProbeAttempt[];
 }
 
+interface ContainerInspection {
+  readonly containers: unknown[];
+  readonly vanishedContainerIds: string[];
+}
+
 /**
  * Re-probe for owned survivors, forcing one exact-AppHost stop between attempts.
  *
@@ -187,14 +192,18 @@ export async function stopAndProbe(
     transcripts.push(await capture(command[0] ?? 'aspire', command.slice(1)));
   }
   const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
-  const containers = await inspectAllContainers();
+  const vanishedContainerIds = new Set<string>();
+  const initialInspection = await inspectAllContainers();
+  initialInspection.vanishedContainerIds.forEach((id) => vanishedContainerIds.add(id));
   // Container teardown is asynchronous to `aspire stop`, so a first probe can observe a container
   // that is already on its way out. Re-probe with one forced exact-AppHost stop between attempts,
   // bounded, retaining every observation as evidence.
-  let observedContainers = containers;
+  let observedContainers = initialInspection.containers;
   const { evaluation, attempts } = await resolveOwnedSurvivors(
     async () => {
-      observedContainers = await inspectAllContainers();
+      const inspection = await inspectAllContainers();
+      observedContainers = inspection.containers;
+      inspection.vanishedContainerIds.forEach((id) => vanishedContainerIds.add(id));
       return evaluatePostStopProbe(
         { appHost, projectRoot, containers: observedContainers, processes: [] },
         projectRoot,
@@ -212,7 +221,11 @@ export async function stopAndProbe(
     cleanup,
     commands,
     transcripts,
-    docker: { ids: idsOutput, containers: observedContainers },
+    docker: {
+      ids: idsOutput,
+      containers: observedContainers,
+      vanishedContainerIds: [...vanishedContainerIds],
+    },
     survivorAttempts: attempts,
     evaluation,
   };
@@ -230,17 +243,31 @@ export async function stopAndProbe(
 }
 
 /** Inspect every container currently known to Docker, so each probe sees the present state. */
-async function inspectAllContainers(): Promise<unknown[]> {
-  const idsOutput = await requireSuccess('docker', ['ps', '-aq']);
+export async function inspectAllContainers(
+  run: typeof capture = capture,
+): Promise<ContainerInspection> {
+  const idsOutput = await requireSuccess('docker', ['ps', '-aq'], run);
   const ids = idsOutput.stdout.split(/\s+/).filter(Boolean);
   const containers: unknown[] = [];
+  const vanishedContainerIds: string[] = [];
   for (const id of ids) {
-    const inspection = await requireSuccess('docker', ['inspect', id]);
+    const inspection = await run('docker', ['inspect', id]);
+    if (inspection.code !== 0) {
+      const failure = inspection.stderr || inspection.stdout;
+      const wasRemoved = failure.split(/\r?\n/).some((line) =>
+        line.trim().endsWith(`No such object: ${id}`)
+      );
+      if (wasRemoved) {
+        vanishedContainerIds.push(id);
+        continue;
+      }
+      throw new Error(`docker inspect ${id} failed (${inspection.code}): ${failure}`);
+    }
     const parsed: unknown = JSON.parse(inspection.stdout);
     if (!Array.isArray(parsed)) throw new Error(`docker inspect ${id} did not return an array`);
     containers.push(...parsed);
   }
-  return containers;
+  return { containers, vanishedContainerIds };
 }
 
 export function stopCommand(appHost: string, force: boolean): readonly string[] {
@@ -272,8 +299,12 @@ async function capture(
   return result;
 }
 
-async function requireSuccess(command: string, args: readonly string[]) {
-  const result = await capture(command, args);
+async function requireSuccess(
+  command: string,
+  args: readonly string[],
+  run: typeof capture = capture,
+) {
+  const result = await run(command, args);
   if (result.code !== 0) {
     throw new Error(
       `${command} ${args.join(' ')} failed (${result.code}): ${result.stderr || result.stdout}`,
