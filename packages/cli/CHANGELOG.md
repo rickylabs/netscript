@@ -80,6 +80,9 @@
   and compare Fresh-owned manifest output.
   `FormCollectionStrategy` rejects `navigation: 'document'` together with `mode: 'client'` at the
   type level instead of silently dropping the navigation choice.
+  The form descriptor's `controlProps()` bag is directly assignable to Preact `input`, `select`,
+  and `textarea` elements, and derives `pattern` plus inclusive numeric `min`/`max`/`step` native
+  constraints from the Zod 4 schema.
 - Saga publish receipts are non-discardable, and saga cascade spans are emitted and correlated
   across planes.
 - AI maps typed generation options for OpenAI Responses when a provider is configured with
@@ -106,6 +109,13 @@
   and `help.md` are re-verified against Aspire CLI 13.5.3 (`aspire agent mcp`, the
   `aspire resources` alias, `healthReports` as an object) with receipt keys linking each
   re-verified command to its smoke evidence.
+  The Aspire reference documents the backing-resource readiness contract: `healthStatus` reports
+  reachability at the published endpoint, so a container log line is not the readiness authority
+  and `Unhealthy` means "not reachable where you will connect", not "not started".
+  Scaffolded Aspire helpers gain `createEndpointListenerReadinessCheck`: the postgres listener
+  readiness check bounds endpoint allocation with the same deadline as the socket probe and
+  reports `ENDPOINT_ALLOCATION_TIMEOUT` instead of waiting indefinitely when the endpoint is never
+  allocated.
 - The oRPC dependency family moves to 1.15.0 with one resolved copy of each `@orpc/*` package.
 
 ## 0.0.6

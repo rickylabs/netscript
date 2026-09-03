@@ -36,6 +36,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     DEPLOY.TARGETS,
     DEPLOY.DESKTOP_NATIVE,
     QUICKSTART.WALK,
+    QUICKSTART.README,
   ]);
 });
 
@@ -267,6 +268,7 @@ Deno.test('every registered suite pins its exact deferred-gate set and owning is
     [DEPLOY.TARGETS]: [],
     [DEPLOY.DESKTOP_NATIVE]: [],
     [QUICKSTART.WALK]: [],
+    [QUICKSTART.README]: [],
   } satisfies Record<SuiteId, readonly DeferredGate[]>;
 
   assertEquals(
@@ -636,6 +638,7 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
       samples: false,
     }],
     [QUICKSTART.WALK, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
+    [QUICKSTART.README, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
   ]);
 
   for (const suite of builtInSuites) {
