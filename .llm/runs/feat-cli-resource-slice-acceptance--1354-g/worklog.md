@@ -84,6 +84,9 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | first live-main runtime | The unsplit `scaffold.runtime` run exposed that `scaffold.ui-data-screen` had already added a quoted route entry rejected by the resource reconciler. Moved that existing gate after the resource rerun within the eight-file ceiling and committed `a2366577fd8232c8e08e078b03d1e3cc84793b92`. |
 | 2026-09-03 | G | exact-head runtime retries | Two unsplit runs at `a2366577` passed resource generation, identical rerun, UI generation, and every generated-project quality/type-check gate. Both later timed out only in `runtime.aspire-start`; each reported 42 passed/1 failed and cleanup passed. Live diagnostics showed healthy Postgres/Garnet/Redis containers but Aspire-advertised proxy ports diverged from Docker mappings on the shared host. |
 | 2026-09-03 | G | exact-head Tier A | Focused 68/68, full CLI 1788/1788, check 1004 files/0 diagnostics, scoped lint/fmt 8/8, carriers, docs, JSR, dependency, architecture, quality, and publish gates completed at `a2366577`. |
+| 2026-09-03 | G | fresh IMPL-EVAL cycle 3 | The requested native Fable 5 medium route failed before a turn (`unrecognized_model`/HTTP 404); a fresh lane-policy fallback session used Claude transport/OpenRouter `z-ai/glm-5.3-flash` at max effort and returned `PASS_IMPL` for evidence head `0cc736365`. Exact route facts are recorded in `evaluate.md`. |
+| 2026-09-03 | G | isolated hosted acceptance | GitHub Actions run `33717890456` and its failed-jobs retry passed both resource gates, generated check/lint/fmt, runtime startup, and cleanup on PostgreSQL and SQLite. Both tiers exited 1 only at the later stale `behavior.app-reference` users-preview assertion: retry totals PostgreSQL 89/1, SQLite 84/1. The owning probe is outside the eight-file ceiling, so lifecycle remains blocked. |
+| 2026-09-03 | G | final issue acceptance audit | Ten implementation checkboxes have direct test/hosted evidence. The generator-specific missing-app-root negative test and the complete exit-0 hosted gate remain unproved, so #1354 stays open and PR #1958 keeps `Refs #1354` / `status:impl-eval`. |
 
 ## Decisions
 
@@ -105,6 +108,8 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | Existing service-client order regression requires its contract probe immediately after codegen; the resource pair follows that probe within the same ceiling. | significant, resolved | yes |
 | Live-main UI data-screen mutation had to move after the resource pair; runtime prerequisites include prior shared-file mutations. | high, resolved | yes |
 | Shared-host Aspire/DCP advertised proxy ports diverged from healthy Docker mappings in two exact-head retries. | infrastructure, hosted proof pending | yes |
+| Isolated hosted runtime reaches the browser tail but `behavior.app-reference` still asserts retired Slice F preview-state DOM; its owning file is outside the Slice G ceiling. | high, unresolved | yes |
+| Final matrix found no generator-specific unresolved-app-root negative test in the merged suite. | acceptance, unresolved | yes |
 
 ## Gate Results
 
@@ -146,6 +151,10 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | `scaffold.runtime` merge-head run | FAIL, exit 1 | 23 gates passed, resource gate failed, cleanup passed | Exposed the UI data-screen ordering prerequisite; fixed in `a2366577`. |
 | `scaffold.runtime` exact-head run | INFRA FAIL, exit 1 | 42 passed, 1 failed (`runtime.aspire-start`), cleanup passed | All #1354/resource/generated-project gates passed; Aspire convergence timed out after 300 s. |
 | `scaffold.runtime` exact-head retry | INFRA FAIL, exit 1 | 42 passed, 1 failed (`runtime.aspire-start`), cleanup passed | Same shared-host DCP proxy mismatch; healthy backing containers, divergent advertised/mapped ports. Isolated hosted receipt pending. |
+| isolated hosted `scaffold.runtime` (PostgreSQL), original | FAIL, exit 1 | 89 passed, 1 failed (`behavior.app-reference`), cleanup passed | Resource first run/rerun and generated check/lint/fmt passed; browser probe expected retired users-preview `data-state="loading"`. |
+| isolated hosted `scaffold.runtime.sqlite`, original | FAIL, exit 1 | 84 passed, 1 failed (`behavior.app-reference`), cleanup passed | Same deterministic browser assertion; resource and generated quality gates passed. |
+| isolated hosted failed-jobs retry (PostgreSQL) | FAIL, exit 1 | 89 passed, 1 failed (`behavior.app-reference`), cleanup passed | Job `100532599146`; same exact failure after 24.17 s in the browser probe. |
+| isolated hosted failed-jobs retry (SQLite) | FAIL, exit 1 | 84 passed, 1 failed (`behavior.app-reference`), cleanup passed | Job `100532599296`; same exact failure after 25.59 s in the browser probe. |
 
 ### Consumer Gates
 
@@ -158,5 +167,5 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 
 - Inspect the two stable IDs, the `people` command arrays, direct `RUNTIME_GATES` selection, codegen/contract/resource materialized order, and identical guidance sentence first.
 - PR #1891 supplied the minimal plan amendment; the authorized item-8 fix is green in both focused and full-suite coverage.
-- An isolated hosted `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` PASS remains required because both exact-head shared-host runs reached all #1354 gates but timed out later at Aspire startup.
-- PR #1958 must be retargeted from the now-merged Slice F branch to `main`; lifecycle remains implementation/evaluation until isolated hosted proof and fresh IMPL-EVAL pass.
+- PR #1958 is retargeted to `main`; fresh cycle-3 IMPL-EVAL passed, but lifecycle remains `status:impl-eval` because the isolated hosted suite is red outside the Slice G ceiling and the generator-specific missing-app-root negative test remains unmapped.
+- Do not merge or add a closing keyword. The owning follow-up must update the stale browser reference acceptance after final Slice F and add/locate the missing generator app-root negative before checking the last two #1354 boxes.

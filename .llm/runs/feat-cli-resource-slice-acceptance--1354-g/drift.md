@@ -83,3 +83,23 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** infrastructure
 - **Action:** Preserve both raw failures and cleanup evidence; do not change #1354 product code around the DCP host fault. Obtain the required green one-pass receipt from the PR's isolated hosted lane before advancing lifecycle.
 - **Evidence:** Each exact-head run reported `passed=42 failed=1 skipped=0`; the sole failing gate was `runtime.aspire-start` with `aspire describe --follow did not converge: timed out after 300s`.
+
+## 2026-09-03 — Isolated hosted browser probe still targets retired Slice F showcase states
+
+- **What:** The isolated GitHub Actions run and its failed-jobs retry both completed the resource first run, zero-write rerun, generated-project check/lint/fmt, runtime startup, and cleanup, but both PostgreSQL and SQLite tiers failed later at `behavior.app-reference`.
+- **Source:** E2E CLI workflow run `33717890456`, original jobs `100530896255` / `100530896105` and retry jobs `100532599146` / `100532599296` at pushed evidence head `0cc736365c1a3886129920e8599d9e61895a40f0`.
+- **Expected:** The one-pass hosted suite exits 0 after proving the generated resource and its browser/runtime surface.
+- **Actual:** PostgreSQL reported `passed=89 failed=1 skipped=0`; SQLite reported `passed=84 failed=1 skipped=0`; both raw commands exited 1 only because `/examples/users?preview=loading` did not render `data-state="loading"`. Cleanup passed. Merged Slice F deliberately retired the init-only viewer/showcase assets that supplied the preview-state DOM, while `probe-app-reference.ts` still asserts them.
+- **Severity:** high, merge-readiness blocker outside Slice G ceiling
+- **Action:** Stop at the locked eight-product-file boundary. Do not remove the unrelated behavior gate or recreate retired showcase output. The owning follow-up must reconcile `packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts` with final Slice F before the hosted `scaffold.runtime` gate and #1354 close gate can be green.
+- **Evidence:** `git diff e14322c511^ e14322c511 -- packages/cli/src/kernel/assets/app` shows the preview/showcase assets removed by Slice F; `probe-app-reference.ts` is a ninth, unenumerated product path. The identical failure reproduced across two database tiers and a full failed-jobs retry.
+
+## 2026-09-03 — Final #1354 matrix found no generator-specific missing-app-root negative test
+
+- **What:** The final issue-acceptance audit mapped each #1354 checkbox to merged tests or hosted receipts.
+- **Source:** Repository-wide search across `packages/cli/**/*_test.ts` plus the full 1788-test receipt.
+- **Expected:** A negative generator test removes/fails app-root resolution and proves the command does not write outside `apps/<app>/`.
+- **Actual:** The implementation has an explicit `if (!appRoot)` failure in `generate-resource.ts`, and shared UI app-root tests prove the resolver boundary, but no generator-specific negative test exercises an unresolved app root. This test would belong beside the generator command/use-case tests, outside Slice G's eight-file set.
+- **Severity:** acceptance blocker outside Slice G ceiling
+- **Action:** Leave the corresponding issue checkbox unchecked and keep `Refs #1354`; do not claim the leaf closes #1354 or advance to `status:ready-merge`.
+- **Evidence:** `rg` found the guard at `packages/cli/src/public/features/generate/resource/generate-resource.ts:119` and no matching resource-generator test; `ui-app-root-command_test.ts` covers the shared resolver but not this verb's negative path.
