@@ -1,17 +1,36 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { join, toFileUrl } from 'jsr:@std/path@^1';
-import {
-  discoverNetScriptRoutes,
-  renderNetScriptRouteManifest,
-  renderNetScriptRoutesModule,
-  resolveNetScriptRouteManifestOptions,
-} from '../../../../../../fresh/src/application/route/manifest.ts';
 import { generateAppTsConfig } from '../../../adapters/templates/app/generate-app-tsconfig.ts';
-import { generateRouteManifestSeed, generateRoutesSeed } from './app-route-seeds.ts';
+import { MemoryFileSystemAdapter } from '../../../adapters/scaffold/memory-fs.ts';
+import { DenoProcess } from '../../../adapters/runtime/process/deno-process.ts';
+import { StringTemplateAdapter } from '../../../adapters/scaffold/template-adapter.ts';
+import {
+  createResourceSliceTemplateRenderer,
+  loadResourceSliceTemplateAssets,
+} from '../../../adapters/templates/scaffold-template-assets.ts';
+import { DenoGeneratedSourceFormatter } from '../../../adapters/runtime/process/deno-generated-source-formatter.ts';
+import { planResourceSlice } from '../../resource-slice/plan-resource-slice.ts';
+import { renderResourceSlice } from '../../resource-slice/render-resource-slice.ts';
+import { normalizeResourceSliceInput } from '../../resource-slice/resource-slice-contract.ts';
+import {
+  planExampleServiceResourceSlice,
+  renderExampleServiceResourceSlice,
+} from './write-example-service-app-files.ts';
 import { emitSelectedBackendImports } from './write-app-files.ts';
 
+const APP_VARS = {
+  name: 'test-project',
+  appName: 'dashboard',
+  appPort: '8010',
+  serviceName: 'team-members',
+  modelName: 'TeamMember',
+  serviceResourceRouteAlias: 'teamMembers: generatedRoutes.examples.teamMembers.$route,\n  ',
+  serviceExampleRouteReference: 'routes.examples.teamMembers.$route',
+} as const;
+
 Deno.test('selected cache backend is carried into the generated app runtime', () => {
-  const emitted = emitSelectedBackendImports('export const app = {};\n', { cache: true });
+  const emitted = emitSelectedBackendImports('export const app = {};\n', {
+    cache: true,
+  });
 
   assertStringIncludes(emitted, "import '@netscript/sdk/cache';");
   assertEquals(emitSelectedBackendImports(emitted, { cache: true }), emitted);
@@ -38,119 +57,56 @@ Deno.test('app tsconfig is self-contained and Vite/Fresh compatible', () => {
   });
 });
 
-Deno.test('initial route references match the canonical generated leaf shape', () => {
-  const routes = generateRoutesSeed();
-
-  assertStringIncludes(
-    routes,
-    'crud: {\n      $route: createRouteReference(routePatterns.examples.crud.$route, {',
+Deno.test('init preset and command-shaped planner render byte-identical canonical roles', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const renderer = new StringTemplateAdapter(fs);
+  const process = new DenoProcess();
+  const canonicalRenderer = createResourceSliceTemplateRenderer(
+    renderer,
+    new DenoGeneratedSourceFormatter(process),
   );
-  assertStringIncludes(
-    routes,
-    'tokens: {\n      $route: createRouteReference(routePatterns.design.tokens.$route, {',
+  const templates = await loadResourceSliceTemplateAssets();
+  const initPlan = planExampleServiceResourceSlice(APP_VARS);
+  const commandPlan = planResourceSlice(normalizeResourceSliceInput({
+    resource: 'team-members',
+    app: 'dashboard',
+    route: '/examples/team-members',
+    variants: ['form', 'partial'],
+    client: {
+      serviceName: 'team-members',
+      moduleSpecifier: '@app/routes/examples/team-members/(_lib)/service-query.ts',
+      queryFactoryName: 'teamMembersQueries',
+    },
+    procedure: { path: ['list'], kind: 'query' },
+  }));
+  const [initLeaves, commandLeaves] = await Promise.all([
+    renderExampleServiceResourceSlice(
+      { templateAdapter: renderer, process },
+      APP_VARS,
+      templates,
+    ),
+    renderResourceSlice(commandPlan, templates, canonicalRenderer),
+  ]);
+
+  assertEquals(initPlan.input.variants, ['core', 'form', 'partial']);
+  assertEquals(
+    Object.fromEntries(initLeaves.map((leaf) => [leaf.role, leaf.content])),
+    Object.fromEntries(commandLeaves.map((leaf) => [leaf.role, leaf.content])),
   );
 });
 
-Deno.test('initial route seeds include the generated dynamic order route shape', () => {
-  const manifest = generateRouteManifestSeed();
-  const routes = generateRoutesSeed();
-
-  assertStringIncludes(
-    manifest,
-    "orders: {\n      $id: {\n        $route: '/examples/orders/[id]'",
+Deno.test('Fresh derivation follows route emission and no manual seed remains', async () => {
+  const source = await Deno.readTextFile(
+    new URL('./write-app-files.ts', import.meta.url),
   );
-  assertStringIncludes(
-    routes,
-    'orders: {\n      $id: {\n        $route: createRouteReference(routePatterns.examples.orders.$id.$route, {',
+  const routeEmission = source.indexOf('await writeExampleServiceAppFiles({');
+  const freshDerivation = source.indexOf('writeFreshRouteManifestSync(appDir)');
+
+  assert(routeEmission >= 0, 'expected service route emission');
+  assert(
+    freshDerivation > routeEmission,
+    'Fresh derivation must follow every example route',
   );
-  assertStringIncludes(routes, "id: 'examples.orders.$id'");
-});
-
-interface DynamicRouteModuleShape {
-  readonly routePatterns: {
-    readonly examples: { readonly orders: { readonly $id: { readonly $route: string } } };
-  };
-}
-
-interface DynamicRoutesModuleShape {
-  readonly routes: {
-    readonly examples: {
-      readonly orders: {
-        readonly $id: {
-          readonly $route: {
-            readonly routePattern: string;
-            readonly $id?: string;
-            readonly $kind?: string;
-            href(input: { readonly path: { readonly id: string } }): string;
-          };
-        };
-      };
-    };
-  };
-}
-
-async function importDynamicRouteShape(
-  root: string,
-  manifestSource: string,
-  routesSource: string,
-) {
-  await Deno.mkdir(root, { recursive: true });
-  const manifestPath = join(root, 'manifest.ts');
-  const routesPath = join(root, 'routes.ts');
-  await Deno.writeTextFile(manifestPath, manifestSource);
-  await Deno.writeTextFile(routesPath, routesSource);
-
-  const manifest = await import(
-    `${toFileUrl(manifestPath).href}?scope=${crypto.randomUUID()}`
-  ) as DynamicRouteModuleShape;
-  const routes = await import(
-    `${toFileUrl(routesPath).href}?scope=${crypto.randomUUID()}`
-  ) as DynamicRoutesModuleShape;
-  const reference = routes.routes.examples.orders.$id.$route;
-
-  return {
-    pattern: manifest.routePatterns.examples.orders.$id.$route,
-    routePattern: reference.routePattern,
-    id: reference.$id,
-    kind: reference.$kind,
-    href: reference.href({ path: { id: 'parity-nonce' } }),
-  };
-}
-
-Deno.test('dynamic route seed equals the current manifest generator output', async () => {
-  const appRoot = await Deno.makeTempDir({ prefix: 'netscript-dynamic-route-seed-' });
-  try {
-    const routeDir = join(appRoot, 'routes', 'examples', 'orders');
-    await Deno.mkdir(routeDir, { recursive: true });
-    await Deno.writeTextFile(
-      join(routeDir, '[id].tsx'),
-      'export default function OrderPage() { return null; }\n',
-    );
-
-    const discovered = discoverNetScriptRoutes(resolveNetScriptRouteManifestOptions(appRoot, {}));
-    assertEquals(discovered.length, 1);
-    assertEquals(discovered[0].relativeRouteFilePath, 'examples/orders/[id].tsx');
-
-    const generatedShape = await importDynamicRouteShape(
-      join(appRoot, 'generator-output'),
-      renderNetScriptRouteManifest(discovered),
-      renderNetScriptRoutesModule(discovered),
-    );
-    const seedShape = await importDynamicRouteShape(
-      join(appRoot, 'seed-output'),
-      generateRouteManifestSeed(),
-      generateRoutesSeed(),
-    );
-
-    assertEquals(seedShape, generatedShape);
-    assertEquals(generatedShape, {
-      pattern: '/examples/orders/[id]',
-      routePattern: '/examples/orders/[id]',
-      id: 'examples.orders.$id',
-      kind: 'page',
-      href: '/examples/orders/parity-nonce',
-    });
-  } finally {
-    await Deno.remove(appRoot, { recursive: true });
-  }
+  assertEquals(source.includes('generateRouteManifestSeed'), false);
+  assertEquals(source.includes('generateRoutesSeed'), false);
 });

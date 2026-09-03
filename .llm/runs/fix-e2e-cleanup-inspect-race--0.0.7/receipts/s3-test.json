@@ -1,0 +1,38 @@
+{
+  "gateId": "test",
+  "invocationId": "cleanup-inspect-race-s3-test",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup_test.ts",
+    "packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1977",
+  "gitHead": "63282ffcc2125aeaea379605b7f0ea9a6c521972",
+  "actualGitHead": "63282ffcc2125aeaea379605b7f0ea9a6c521972",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:22685",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "772f5842a1fed8676eb0b2ee99b7f39e028c16b905d34da9b295d47bb7a4e24c",
+  "lifecycleId": "worker:22685:cleanup-inspect-race-s3-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T03:19:55.316Z",
+  "startedAt": "2026-09-03T03:19:55.318Z",
+  "finishedAt": "2026-09-03T03:19:55.620Z",
+  "durationMs": 301,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 424,
+    "sha256": "e5836c83c08e7913c7b63f80bc941fba99e8eb0bfae7c044b2c4c78a031045fd",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup_test.ts\",\"packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1977\",\"exitCode\":0,\"durationMs\":186,\"summary\":{\"passed\":9,\"failed\":0,\"ignored\":0,\"totalResults\":9,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 259,
+    "sha256": "91ad799616da54a8aeb1b43e7e9fc2653bfb9a6dd87f8373d44a9e5d50d72ddf",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all 'packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup_test.ts' 'packages/cli/e2e/tests/application/gates/aspire-cleanup-evidence_test.ts'\n",
+    "truncated": false
+  }
+}

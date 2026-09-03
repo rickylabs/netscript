@@ -36,7 +36,7 @@ describe('database template generators', () => {
     assertStringIncludes(config.tasks['db:generate'], 'deno task db:clear-seeded-client');
     assertEquals(
       config.tasks['db:clear-seeded-client'],
-      'deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts',
+      'deno run --allow-write=schema/.generated scripts/clear-seeded-client.ts',
     );
     assertStringIncludes(config.tasks['db:generate'], 'npm:prisma@^7.4.2 generate');
     assertEquals(

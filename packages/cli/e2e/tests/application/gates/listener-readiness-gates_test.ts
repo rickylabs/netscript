@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { ASPIRE_RESOURCE, GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../src/domain/extension-axes.ts';
@@ -16,7 +16,12 @@ import {
   readAspireLogLines,
   readListenerHealthReport,
   readListenerReadinessSnapshot,
+  verifyListenerReadiness,
 } from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
+import type {
+  ResourceUpdate,
+  ResourceUpdateSubscription,
+} from '../../../src/application/gates/scaffold/runtime/resource-state-stream.ts';
 
 Deno.test('listener readiness maps database and RESP resources to stable report keys', () => {
   assertEquals(listenerReadinessExpectation(ASPIRE_RESOURCE.POSTGRES), {
@@ -195,7 +200,7 @@ Deno.test('Aspire JSON and NDJSON log output retain the final content lines', ()
   );
 });
 
-Deno.test('listener wait command verifies the named report after Aspire wait', () => {
+Deno.test('listener observation command verifies the named report after Aspire follow', () => {
   const expectation = listenerReadinessExpectation(ASPIRE_RESOURCE.POSTGRES);
   if (!expectation) throw new Error('Postgres listener readiness expectation is missing.');
   assertEquals(listenerReadinessWaitCommand(runContext(), expectation), [
@@ -206,8 +211,92 @@ Deno.test('listener wait command verifies the named report after Aspire wait', (
     '/workspace/app/aspire/apphost.mts',
     'postgres',
     'postgres_listener',
-    '300',
+    '300000',
   ]);
+});
+
+Deno.test('listener readiness observes aggregate Healthy then reads one detailed snapshot', async () => {
+  const calls: string[] = [];
+  const observedCeilings: number[] = [];
+  const fake = fakeSubscription(
+    [
+      resourceUpdate({ displayName: 'postgres', state: 'Running', healthStatus: 'Healthy' }),
+    ],
+    calls,
+    observedCeilings,
+  );
+
+  const report = await verifyListenerReadiness(
+    '/workspace/app/aspire/apphost.mts',
+    'postgres',
+    'postgres_listener',
+    300_000,
+    () => {
+      calls.push('watch');
+      return Promise.resolve(fake.subscription);
+    },
+    () => {
+      calls.push('snapshot');
+      return Promise.resolve(JSON.stringify({
+        resources: [{
+          displayName: 'postgres',
+          state: 'Running',
+          healthStatus: 'Healthy',
+          healthReports: {
+            postgres_listener: { status: 'Healthy', description: 'listener ready' },
+            container_lifecycle: { status: 'Healthy' },
+          },
+        }],
+      }));
+    },
+  );
+
+  assertEquals(report.status, 'Healthy');
+  assertEquals(calls, ['watch', 'wait', 'snapshot', 'close']);
+  assertEquals(observedCeilings, [300_000]);
+  assertEquals(fake.closeCount(), 1);
+});
+
+Deno.test('listener readiness distinguishes an absent event from wrong post-event detail', async () => {
+  const absent = fakeSubscription([], [], [], new Error('synthetic stream ended'));
+  await assertRejects(
+    () =>
+      verifyListenerReadiness(
+        '/workspace/app/aspire/apphost.mts',
+        'postgres',
+        'postgres_listener',
+        20,
+        () => Promise.resolve(absent.subscription),
+        () => Promise.reject(new Error('snapshot must not run before an event')),
+      ),
+    Error,
+    'did not observe postgres transition to aggregate Healthy',
+  );
+  assertEquals(absent.closeCount(), 1);
+
+  const wrong = fakeSubscription([
+    resourceUpdate({ displayName: 'postgres', state: 'Running', healthStatus: 'Healthy' }),
+  ]);
+  await assertRejects(
+    () =>
+      verifyListenerReadiness(
+        '/workspace/app/aspire/apphost.mts',
+        'postgres',
+        'postgres_listener',
+        20,
+        () => Promise.resolve(wrong.subscription),
+        () =>
+          Promise.resolve(JSON.stringify({
+            resources: [{
+              displayName: 'postgres',
+              healthReports: { postgres_listener: { status: 'Unhealthy' } },
+            }],
+          })),
+      ),
+    Error,
+    'observed postgres aggregate Healthy, but healthReports.postgres_listener had the wrong value',
+  );
+  assertEquals(wrong.closeCount(), 1);
 });
 
 Deno.test('failure/recovery gate owns exactly the synthetic Postgres and Garnet checks', () => {
@@ -325,3 +414,32 @@ Deno.test('an unpublished health report is absent, not an error', async () => {
     'Unhealthy',
   );
 });
+
+function fakeSubscription(
+  updates: readonly ResourceUpdate[],
+  calls: string[] = [],
+  ceilings: number[] = [],
+  terminal: Error = new Error('synthetic stream had no matching update'),
+): { subscription: ResourceUpdateSubscription; closeCount: () => number } {
+  let closes = 0;
+  return {
+    subscription: {
+      waitFor(predicate, ceilingMs) {
+        calls.push('wait');
+        ceilings.push(ceilingMs);
+        const match = updates.find(predicate);
+        return match ? Promise.resolve(match) : Promise.reject(terminal);
+      },
+      close() {
+        calls.push('close');
+        closes += 1;
+        return Promise.resolve();
+      },
+    },
+    closeCount: () => closes,
+  };
+}
+
+function resourceUpdate(resource: Record<string, unknown>): ResourceUpdate {
+  return { resource, rawLine: JSON.stringify(resource) };
+}

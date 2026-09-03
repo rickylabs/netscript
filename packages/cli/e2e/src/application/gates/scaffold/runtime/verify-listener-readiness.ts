@@ -1,3 +1,5 @@
+import { type ResourceUpdate, watchResourceUpdates } from './resource-state-stream.ts';
+
 /** One custom listener health report selected from `aspire describe --format Json`. */
 export interface ListenerHealthReport {
   readonly resourceName: string;
@@ -170,128 +172,73 @@ export function listenerReadinessFailure(report: ListenerHealthReport): string {
   }`;
 }
 
-/** Poll named Aspire health so unpublished and unhealthy states remain distinguishable. */
+/** Observe aggregate readiness, then validate named reports from one settled snapshot. */
 export async function verifyListenerReadiness(
   appHost: string,
   resourceName: string,
   healthCheckKey: string,
-  timeoutSeconds: number,
+  failureCeilingMs: number,
+  watch: typeof watchResourceUpdates = watchResourceUpdates,
+  readSnapshot: (appHost: string, resourceName: string) => Promise<string> = describeResource,
 ): Promise<ListenerHealthReport> {
-  const deadline = performance.now() + timeoutSeconds * 1_000;
-  let lastFailure = `resource ${resourceName} health key ${healthCheckKey} was never published`;
-
-  while (true) {
+  const subscription = await watch(appHost, resourceName);
+  try {
+    let update: ResourceUpdate;
     try {
-      const topology = JSON.parse(
-        await runAspire([
-          'describe',
-          '--apphost',
-          appHost,
-          '--format',
-          'Json',
-          '--non-interactive',
-          '--nologo',
-        ]),
+      update = await subscription.waitFor(
+        (candidate) => resourceHealthIs(candidate, 'Healthy'),
+        failureCeilingMs,
       );
-      const reports = readListenerHealthReports(topology, resourceName);
-      const expected = reports.find((report) => report.healthCheckKey === healthCheckKey);
-      if (!expected) {
-        lastFailure = `resource ${resourceName} health key ${healthCheckKey} was never published`;
-      } else {
-        const blocker = expected.status === 'Healthy'
-          ? reports.find((report) => report.status !== 'Healthy')
-          : expected;
-        if (!blocker) {
-          console.info(`${resourceName} ${healthCheckKey} listener health is Healthy`);
-          return expected;
-        }
-        lastFailure = listenerReadinessFailure(blocker);
-        if (isTerminalListenerFailure(blocker)) throw new Error(lastFailure);
-      }
     } catch (error) {
-      if (error instanceof Error && error.message.includes('exists but is unhealthy')) throw error;
-      lastFailure = error instanceof Error ? error.message : String(error);
-    }
-
-    const remainingMs = deadline - performance.now();
-    if (remainingMs <= 0) {
       throw new Error(
-        await captureListenerReadinessDeadline(
-          appHost,
-          resourceName,
-          healthCheckKey,
-          timeoutSeconds,
-          lastFailure,
-        ),
+        `Aspire did not observe ${resourceName} transition to aggregate Healthy before the ` +
+          `${failureCeilingMs}ms test-failure ceiling`,
+        { cause: error },
       );
     }
-    await new Promise((resolve) => setTimeout(resolve, Math.min(1_000, remainingMs)));
-  }
-}
 
-async function captureListenerReadinessDeadline(
-  appHost: string,
-  resourceName: string,
-  healthCheckKey: string,
-  timeoutSeconds: number,
-  lastFailure: string,
-): Promise<string> {
-  let snapshot: ListenerReadinessSnapshot;
-  try {
-    const topology = JSON.parse(
-      await runAspire([
-        'describe',
-        '--apphost',
-        appHost,
-        '--format',
-        'Json',
-        '--non-interactive',
-        '--nologo',
-      ]),
-    );
-    snapshot = readListenerReadinessSnapshot(topology, resourceName);
-  } catch (error) {
-    snapshot = {
-      resourceName,
-      match: 'unknown',
-      healthReports: [],
-      describeError: `${lastFailure}; final describe failed: ${renderError(error)}`,
-    };
-  }
-
-  let logLines: readonly string[];
-  try {
-    logLines = readAspireLogLines(
-      await runAspire([
-        'logs',
+    // Follow output establishes the transition but does not promise per-check healthReports. This
+    // single snapshot is attribution after an observed event, never a sample used to discover it.
+    const rawSnapshot = await readSnapshot(appHost, resourceName);
+    const reports = readListenerHealthReports(JSON.parse(rawSnapshot), resourceName);
+    const expected = reports.find((report) => report.healthCheckKey === healthCheckKey);
+    if (!expected) {
+      throw observedWrongValue(
         resourceName,
-        '--apphost',
-        appHost,
-        '--tail',
-        String(LISTENER_LOG_TAIL_LINES),
-        '--format',
-        'Json',
-        '--non-interactive',
-        '--nologo',
-      ]),
-    );
-  } catch (error) {
-    logLines = [`<unavailable: ${renderError(error)}>`];
+        healthCheckKey,
+        `the named report was not published; raw event: ${update.rawLine}`,
+      );
+    }
+    const blocker = expected.status === 'Healthy'
+      ? reports.find((report) => report.status !== 'Healthy')
+      : expected;
+    if (blocker) {
+      throw observedWrongValue(
+        resourceName,
+        healthCheckKey,
+        listenerReadinessFailure(blocker),
+      );
+    }
+    console.info(`${resourceName} ${healthCheckKey} listener health is Healthy`);
+    return expected;
+  } finally {
+    await subscription.close();
   }
-  return formatListenerReadinessDeadline(snapshot, healthCheckKey, timeoutSeconds, logLines);
-}
-
-function isTerminalListenerFailure(report: ListenerHealthReport): boolean {
-  if (!isRecord(report.data)) return false;
-  return report.data.code === 'NOAUTH' || report.data.code === 'EPROTO';
 }
 
 function renderDiagnostic(value: unknown): string {
   return JSON.stringify(value) ?? String(value);
 }
 
-function renderError(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+function observedWrongValue(
+  resourceName: string,
+  healthCheckKey: string,
+  detail: string,
+): Error {
+  return new Error(
+    `Aspire observed ${resourceName} aggregate Healthy, but healthReports.${healthCheckKey} ` +
+      `had the wrong value: ${detail}`,
+  );
 }
 
 function findListenerResource(
@@ -357,6 +304,30 @@ async function runAspire(args: readonly string[]): Promise<string> {
   return stdout;
 }
 
+async function describeResource(appHost: string, resourceName: string): Promise<string> {
+  return await runAspire([
+    'describe',
+    resourceName,
+    '--apphost',
+    appHost,
+    '--format',
+    'Json',
+    '--non-interactive',
+    '--nologo',
+  ]);
+}
+
+function resourceHealthIs(update: ResourceUpdate, expected: 'Healthy'): boolean {
+  const healthStatus = update.resource.healthStatus;
+  if (typeof healthStatus !== 'string') {
+    throw new Error(
+      `Aspire follow update for the scoped resource has no string healthStatus; raw line: ` +
+        update.rawLine,
+    );
+  }
+  return healthStatus.toLowerCase() === expected.toLowerCase();
+}
+
 /** Match a resource's `displayName`/`name`/`resourceName` against a base or ID-suffixed name. */
 export function resourceMatches(
   resource: Readonly<Record<string, unknown>>,
@@ -383,12 +354,12 @@ if (import.meta.main) {
   const appHost = Deno.args[0];
   const resourceName = Deno.args[1];
   const healthCheckKey = Deno.args[2];
-  const timeoutSeconds = Number.parseInt(Deno.args[3] ?? '', 10);
+  const failureCeilingMs = Number.parseInt(Deno.args[3] ?? '', 10);
   if (!appHost) throw new Error('AppHost path argument is required');
   if (!resourceName) throw new Error('resource name argument is required');
   if (!healthCheckKey) throw new Error('health-check key argument is required');
-  if (!Number.isSafeInteger(timeoutSeconds) || timeoutSeconds <= 0) {
-    throw new Error('positive timeout-seconds argument is required');
+  if (!Number.isSafeInteger(failureCeilingMs) || failureCeilingMs <= 0) {
+    throw new Error('positive failure-ceiling-ms argument is required');
   }
-  await verifyListenerReadiness(appHost, resourceName, healthCheckKey, timeoutSeconds);
+  await verifyListenerReadiness(appHost, resourceName, healthCheckKey, failureCeilingMs);
 }

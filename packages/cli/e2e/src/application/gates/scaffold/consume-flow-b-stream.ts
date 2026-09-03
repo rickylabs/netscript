@@ -28,8 +28,11 @@ import {
 import { resolveResourceUrlsFromAppHost } from './generated-app-endpoint.ts';
 import { resolveOtlpHeadersFromResource } from './otlp-headers.ts';
 
+/** Application SSE batches inspected for the correlated Flow-B record, not resource readiness. */
 const FLOW_B_SELECTION_MAX_BATCHES = 40;
+/** Application SSE selection ceiling; Aspire endpoint allocation is observed separately. */
 const FLOW_B_SELECTION_TIMEOUT_MS = 20_000;
+/** Delay between unmatched application SSE batches, not an Aspire polling interval. */
 const FLOW_B_SELECTION_RETRY_DELAY_MS = 500;
 
 const projectRoot = Deno.args[0];
@@ -189,6 +192,7 @@ function firstResourceUrl(urls: readonly string[], resourceName: string): string
 async function readJobExecuteIdentity(projectRoot: string): Promise<FlowBProducerIdentity> {
   const query = await createLiveAspireTelemetryQuery(projectRoot);
   const fixtureCorrelationId = await readFlowBCorrelationFixture(projectRoot);
+  // This retry observes eventual telemetry export for a completed job, never resource readiness.
   for (let attempt = 1; attempt <= 20; attempt++) {
     const identity = findJobExecuteIdentity(
       await query.queryTraces({ serviceName: 'workers', limit: 500 }),

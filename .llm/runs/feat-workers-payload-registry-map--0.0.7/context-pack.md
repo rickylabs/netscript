@@ -12,12 +12,11 @@
 
 ## Current State
 
-PR #1970 is resuming from authoritative remote head `43734544f`, whose hosted PostgreSQL and SQLite
-runtime lanes passed. The coordinator-prepared handler-freeze repair is staged and independently
-proved: the RED health-check import fails because `Object.freeze(handler)` rejects first-party
-`Object.assign(..., { id })`; GREEN keeps only `payloadSchema` immutable while preserving the
-callable metadata-extension seam. The generated add-job stub still exports its typed handler as
-default.
+PR #1970 now carries the pushed bounded handler-freeze repair at `d3df14bae`: the RED health-check
+import failed because `Object.freeze(handler)` rejected first-party `Object.assign(..., { id })`;
+GREEN keeps only `payloadSchema` immutable while preserving the callable metadata-extension seam.
+Current main `e14322c511` is integrated without rebasing, its four generated-carrier conflicts are
+canonically regenerated, and the generated add-job stub still exports its typed handler as default.
 
 ## Completed
 
@@ -27,13 +26,14 @@ default.
 
 ## In Progress
 
-- Commit and push the bounded handler-freeze repair, then reconcile `origin/main` at `e14322c511`.
+- Commit/push the current-main reconciliation, obtain exact-head hosted CI and one separate-session
+  implementation evaluation, then hand off the immutable merge packet without merging.
 
 ## Next Steps
 
-1. Commit/push the handler-freeze RED→GREEN slice with its run-artifact receipts.
-2. Merge current main without wholesale shared-file replacement and regenerate canonical carriers.
-3. Run exact static/quality/CI gates, obtain one separate-session IMPL-EVAL, and hand off without
+1. Commit and explicitly push the current-main reconciliation plus fresh static/quality receipts.
+2. Confirm exact-head hosted CI without taking a local runtime lease.
+3. Obtain exactly one separate-session IMPL-EVAL through the persisted route and hand off without
    merging the PR.
 
 ## Key Decisions
@@ -48,8 +48,8 @@ default.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | passed locally | root check and emitted samples pass on integrated tree |
-| Fitness | passed locally | quality, architecture, docs examples, carriers pass |
+| Static | passed locally | focused check/test/lint/fmt, root check, and emitted samples pass |
+| Fitness | passed locally | quality, architecture, docs examples, publish dry-run, and carriers pass |
 | Runtime | hosted pass at `43734544f`; no new local lease | PostgreSQL and SQLite jobs passed; static/hosted work only for this continuation |
 | Consumer | passed | prior compile-time and generated-registry receipts in worklog |
 

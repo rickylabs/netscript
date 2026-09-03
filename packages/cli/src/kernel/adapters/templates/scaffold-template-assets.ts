@@ -1,5 +1,7 @@
 import { TEMPLATE_KEYS, type TemplateKey } from '../../assets/manifest.ts';
-import { readTemplateAsset } from '../templates/template-asset.ts';
+import { readTemplateAsset, readTemplateAssetSync } from '../templates/template-asset.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
+import type { TemplatePort } from '../../ports/template-port.ts';
 
 type TemplateUrlMap = Readonly<Record<string, TemplateKey>>;
 
@@ -39,29 +41,7 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
 } as const;
 
 const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
-  appExampleServiceHeroTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsHero,
-  appExampleServiceLabPanelTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsLabPanel,
-  appExampleServiceManagedFormTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsManagedForm,
-  appExampleServiceNotesCardTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsNotesCard,
-  appExampleServicePageLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsPageLayout,
-  appExampleServiceShowcaseSharedTemplate: TEMPLATE_KEYS.appRoutesExamplesSharedServiceShowcase,
-  appExampleServiceShowcaseSharedMemoryTemplate:
-    TEMPLATE_KEYS.appRoutesExamplesSharedServiceShowcaseMemory,
-  appExampleServiceAuthorizationTemplate: TEMPLATE_KEYS.appRoutesExamplesSharedAuthorization,
-  appExampleServiceShowcaseTemplate: TEMPLATE_KEYS.appRoutesExamplesIslandsServiceshowcaselab,
-  appExampleServiceShowcaseMemoryTemplate:
-    TEMPLATE_KEYS.appRoutesExamplesIslandsServiceshowcaselabMemory,
-  appExampleServiceSummaryCardTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryCard,
-  appExampleServiceSummaryPanelTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanel,
-  appExampleServiceSummaryPanelMemoryTemplate:
-    TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanelMemory,
   appExampleServiceQueryTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceLibServiceQuery,
-  appExampleServiceOptimisticListMutationTemplate:
-    TEMPLATE_KEYS.appRoutesExamplesServiceLibOptimisticListMutation,
-  appExampleServiceRouteContractTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceLibRouteContract,
-  appServiceExampleIndexTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndex,
-  appServiceExampleLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndexLayout,
-  appServiceSummaryPartialTemplate: TEMPLATE_KEYS.appRoutesPartialsExamplesServiceSummary,
   appTelemetryExampleIndexTemplate: TEMPLATE_KEYS.appRoutesExamplesTelemetryIndex,
   appTelemetryExampleViewTemplate: TEMPLATE_KEYS.appRoutesExamplesTelemetryComponentsTelemetryView,
   appTelemetryExampleSharedTemplate: TEMPLATE_KEYS.appRoutesExamplesTelemetrySharedTelemetryTrace,
@@ -150,4 +130,32 @@ export async function loadResourceSliceTemplateAssets(): Promise<
   ResourceSliceTemplateAssets
 > {
   return await loadTemplateMap(RESOURCE_SLICE_TEMPLATE_URLS);
+}
+
+/** Load the canonical resource-slice family for synchronous command composition. */
+export function loadResourceSliceTemplateAssetsSync(): ResourceSliceTemplateAssets {
+  return Object.fromEntries(
+    Object.entries(RESOURCE_SLICE_TEMPLATE_URLS).map(([name, url]) => [
+      name,
+      readTemplateAssetSync(url),
+    ]),
+  ) as ResourceSliceTemplateAssets;
+}
+
+/** Format rendered resource leaves before ownership markers hash their bodies. */
+export function createResourceSliceTemplateRenderer(
+  delegate: TemplatePort,
+  formatter: GeneratedSourceFormatterPort,
+): TemplatePort {
+  return {
+    engine: `${delegate.engine}+generated-format`,
+    async render(template, context) {
+      const rendered = await delegate.render(template, context);
+      return await formatter.formatContent('resource-slice.tsx', rendered);
+    },
+    async renderFile(templatePath, context) {
+      const rendered = await delegate.renderFile(templatePath, context);
+      return await formatter.formatContent(templatePath, rendered);
+    },
+  };
 }
