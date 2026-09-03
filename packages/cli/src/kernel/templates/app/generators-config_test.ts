@@ -4,7 +4,10 @@
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
-import { SCAFFOLD_APP_IMPORTS } from '../../constants/scaffold/scaffold-app-catalog.ts';
+import {
+  SCAFFOLD_APP_IMPORTS,
+  SCAFFOLD_WORKSPACE_CATALOG,
+} from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { generateAppDenoJson } from '../../adapters/templates/app/generate-app-deno-json.ts';
 import { generateAppViteConfig } from '../../adapters/templates/app/generate-vite-config.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
@@ -109,12 +112,33 @@ describe('generateAppDenoJson', () => {
     assert(config.imports['@fresh/plugin-vite']);
     assert(config.imports['@tailwindcss/vite']);
     assert(config.imports['vite']);
-    assertEquals(config.imports.zod, 'catalog:');
+    assertEquals(
+      config.imports.zod,
+      `npm:zod@${SCAFFOLD_WORKSPACE_CATALOG.zod}`,
+    );
     assertEquals(config.imports['@netscript/fresh/route'], undefined);
     assertEquals(config.imports['@netscript/fresh-ui/interactive'], undefined);
     assertEquals(config.imports['@netscript/sdk/client'], undefined);
     assertEquals(config.imports['preact/hooks'], undefined);
     assertEquals(config.imports['vite/client'], undefined);
+  });
+
+  it('materializes production route dependencies instead of emitting catalog targets', () => {
+    const config = JSON.parse(generateAppDenoJson({
+      projectName: 'test',
+      appName: 'dashboard',
+      importMode: 'local',
+      localBase: '../..',
+    }));
+
+    const unresolvedCatalogImports = Object.entries(config.imports)
+      .filter(([, target]) => String(target).startsWith('catalog:'));
+
+    assertEquals(unresolvedCatalogImports, []);
+    assertEquals(
+      config.imports.zod,
+      `npm:zod@${SCAFFOLD_WORKSPACE_CATALOG.zod}`,
+    );
   });
 
   it('should end with trailing newline', () => {
