@@ -29,7 +29,10 @@ all the generated code.
 
 You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/) and the
 [Aspire CLI](https://aspire.dev) (or skip orchestration with
-`--no-aspire`). Docker provisions Postgres and the cache.
+`--no-aspire`). This walkthrough uses Docker for its containerized Postgres and cache resources;
+have a Docker-compatible container runtime available for this configuration. Docker is not a
+universal requirement for NetScript or Aspire: configurations using non-container resources can
+run without it. Existing Docker image caches are supported and do not need to be cleared.
 
 <!-- readme-quickstart:start -->
 
