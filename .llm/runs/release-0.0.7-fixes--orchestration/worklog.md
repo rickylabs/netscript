@@ -8048,3 +8048,10 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - **Exact blocker surfaced to coordinator:** scaffolded-app production `deno task build` fails after `db codegen` on current main (consumer-facing).
 
 ## 2026-09-03 — #1959 at `f5100c44a`: Postgres 2/2 green; evaluator run 33702340371 still in progress (started 01:07Z)
+
+## MERGE PACKET — PR #1960 (Closes #1249) — 2026-09-03
+
+- **Exact head:** `e57de8e0c42b62b8ae0af28600d47abeaf9185a2` (`fix/form-control-props-zod4`), milestone 0.0.7, `status:ready-merge`, MERGEABLE.
+- **Hosted CI at head:** `ci` 33699033976 success after close-gate rerun (quality, check-test, close-gate all ✅); e2e-cli 33701125189 ✅ (postgres + sqlite runtime, static, desktop-native); public-surface-diff ✅. Label-triggered e2e-cli 33704226923 in flight (duplicate of an already-green tier; mergeStateStatus reads UNSTABLE only until it finishes).
+- **IMPL-EVAL:** PASS at `e57de8e0c` via sanctioned local GLM 5.3 Flash max-effort evaluator (issuecomment-5518970343) after hosted OpenHands stall; prior FAIL_FIX blocker (corpus) closed by `40e103d00`.
+- **Lock hygiene:** `deno.lock` unchanged across PR delta. Coordinator merges; Fixes flips `status:shipped` after.
