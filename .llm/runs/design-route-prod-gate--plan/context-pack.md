@@ -31,6 +31,7 @@ PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. Su
 - Passed the final local gate set at `21ee63419`: check 733 files; focused tests 88/88; lint/fmt 12 files each; freshness, quality, architecture, and four carrier checks all exit 0.
 - Verified the corrected post-codegen gate order at `9630583c8` and reproduced the hosted product blocker locally with a fresh SQLite scaffold.
 - Filed #1971 with raw before/after-codegen evidence, P0/milestone ownership, and the #1945 dependency.
+- Merged exact `origin/main` `574e9ce57` as `9c1f8765e`; regenerated the sole conflicted carrier (`embedded.generated.ts`) and passed the exact post-sync CLI check (979 files) plus suite-registry test (20/20).
 
 ## In Progress
 

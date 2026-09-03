@@ -81,6 +81,8 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | 2026-09-03T01:42:46Z | Evaluate repair | Gate ordering | Supervisor commit `de4d31b69` correctly moved `scaffold.design-production-exclusion` after `DATABASE_CODEGEN`; merge head `9630583c8` contains that order and current `main`. Both hosted runtime tiers now reach the production probe and expose the same product defect: 20 passed, 1 failed. |
 | 2026-09-03T01:42:46Z | Evaluate repair | Causal discrimination | Fresh SQLite scaffold at exact head `9630583c8`: init exit 0; immediate production build exit 1 on the not-yet-generated database Zod barrel; standalone `db:generate` exit 0; post-codegen production build exit 1 on Vite loading bare `catalog:` from the materialized service-example route contract. Raw evidence is below. |
 | 2026-09-03T01:42:46Z | Evaluate repair | Scope ruling | Filed release-blocking product bug #1971 with `type:bug`, `area:cli`, `area:fresh`, `priority:p0`, `wave:v1`, `gate:e2e`, `status:triage`, `orchestrator:fixes`, and milestone `0.0.7`. #1945 stays code-complete but merge-blocked; dependency stack is #1971 → #1945. No #1971 product fix, skip, or xfail is added here. |
+| 2026-09-03T01:49:39Z | Main sync | Conflict resolution | Verified docs head `1a777a0b3` was already on `origin/fix/design-route-prod-gate`, then merged exact `origin/main` `574e9ce57` as `9c1f8765e`. The sole conflict was the generated carrier `packages/cli/src/kernel/assets/embedded.generated.ts`; it was resolved by `deno task gen:assets-barrel`, never by hand. `check:assets-barrel` and `check:aspire-version-parity` exited 0. No suite-file conflict occurred, and the runtime suite still places `scaffold.design-production-exclusion` immediately after `DATABASE_CODEGEN`. |
+| 2026-09-03T01:49:39Z | Main sync | Focused validation | On merge tree `9c1f8765e`, the exact requested structured CLI check exited 0 (979 files, 9 batches, 0 failed batches), and `deno test --allow-all packages/cli/e2e/tests/presentation/suite-registry_test.ts` exited 0 (20 passed, 0 failed). Branch-versus-`origin/main` lock diff exited 0; no `deno.lock` churn. No local hosted E2E, Aspire runtime, Docker, product workaround, skip, or xfail was run or added. |
 
 ## Causal Discrimination at `9630583c8`
 
@@ -173,6 +175,11 @@ Vite-loadable module ID. Product remediation is owned by #1971.
 | Publish assets carrier | PASS | `deno task check:publish-assets`; exit 0 |
 | MCP export corpus carrier | PASS | `deno task check:mcp-export-corpus`; exit 0 |
 | Agent docs prose carrier | PASS | `deno task check:agent-docs-prose`; exit 0 |
+| Main `574e9ce57` sync | PASS | Merge `9c1f8765e`; only conflict was `packages/cli/src/kernel/assets/embedded.generated.ts`, regenerated with `deno task gen:assets-barrel` |
+| Post-sync CLI check | PASS | Exact requested `run-deno-check.ts --root packages/cli --ext ts,tsx --exclude '^(.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)'`; exit 0, 979 files, 9/9 batches |
+| Post-sync suite registry test | PASS | Exact requested `deno test --allow-all packages/cli/e2e/tests/presentation/suite-registry_test.ts`; exit 0, 20 passed / 0 failed |
+| Post-sync Aspire parity | PASS | `deno task check:aspire-version-parity`; exit 0, manifest fresh, 927 checked / 0 failed |
+| Post-sync lock hygiene | PASS | `git diff --exit-code origin/main...HEAD -- deno.lock packages/cli/deno.lock packages/cli/e2e/deno.lock`; exit 0 |
 | Hosted development behavior | BLOCKED | `behavior.app-reference` remains downstream of the failing production-build gate and has no current-head verdict |
 | Hosted production exclusion — PostgreSQL | FAIL_BLOCKED | Head `9630583c8`; [job 100484648723](https://github.com/rickylabs/netscript/actions/runs/33702468373/job/100484648723); 20 passed / 1 failed only at `scaffold.design-production-exclusion`; product blocker #1971 |
 | Hosted production exclusion — SQLite | FAIL_BLOCKED | Head `9630583c8`; [job 100484648739](https://github.com/rickylabs/netscript/actions/runs/33702468373/job/100484648739); 20 passed / 1 failed only at `scaffold.design-production-exclusion`; product blocker #1971 |
