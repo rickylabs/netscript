@@ -8087,3 +8087,10 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 ## 2026-09-03 — #1970 repaired by worker at `8ef044d10`; supervisor regenerated MCP corpus → `6fe200630`
 
 - Worker commits `4cf0795b8` (consumer/doctor repair, RED→GREEN receipts) + `8ef044d10` (worklog). Worker reported `check:mcp-export-corpus` FAIL as out-of-ceiling (`packages/mcp/**`). Supervisor ran `deno task gen:mcp-export-corpus` on the leaf (generated asset only, 1 file) and pushed `6fe200630`; `check:mcp-export-corpus` exit 0 locally. deno.lock unchanged vs `79adb103b`. Watcher `/tmp/waitpk1970b.sh` on CI at `6fe200630`.
+
+## 2026-09-03 ~02:2xZ — #1966 CLOSED (post-publish admission proven at 0.0.7-canary.9)
+
+- Directive: Canary 9 child 33704697088 step 14 (published-CLI scaffold.runtime) SUCCESS → attach immutable proof, complete acceptance, close now; README isolation red is unrelated.
+- Proof: parent run 33704380711 (head 061c70fab = merge of #1967) → child 33704697088 (af365a734), job 100491230604 step 14 success 01:44:42Z–01:56:05Z; artifact `e2e-cli-prod-0.0.7-canary.9` (9875134332), report sha256 f03cd05a…3919, ok:true 97/97, CLI `jsr:@netscript/cli@0.0.7-canary.9`; `behavior.package-backed-plugin-doctor` passed (exit 0, `PACKAGE_BACKED_PLUGIN_DOCTOR_PASS`, registry emitted).
+- Actions: proof + acceptance-evidence fence posted (issuecomment-5519182281); six acceptance boxes ticked manually (PR merged with mirror label-gated → mirror cannot run; recorded as supervisor completion with per-box evidence); `gh issue close 1966 --reason completed`. State: CLOSED, `status:shipped` retained.
+- Still armed: #1969 verdict watcher, #1970 CI watcher (6fe200630), #1971 Sol worker; #1945 blocked on #1971.
