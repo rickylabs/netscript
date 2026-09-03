@@ -11114,3 +11114,9 @@ merged (main `b6b9df966`, ci green); #1967 promoted to `status:ready-merge` by F
 merge → Canary 9. Latest canary is still Canary 8 (`33697398852` failure). Harness branch merged to
 main again (`966278d18`, 0 behind). No internals-owned packet exists to hand off; nothing to
 dispatch or steer.
+
+### D-285 — #1967 merged; main 061c70fab integrated into harness branch; awaiting Canary 9
+
+Fixes' #1967 (fixture-only `minimumDependencyAge` opt-out) merged → main `061c70fab`. Harness
+branch merged to it. Canary 9 dispatch is the coordinator's; the canary watcher reports per-step
+results, and the main-CI watcher extracts any red internals-owned gate step.
