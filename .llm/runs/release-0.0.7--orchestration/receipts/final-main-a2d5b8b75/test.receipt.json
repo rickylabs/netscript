@@ -1,0 +1,45 @@
+{
+  "gateId": "test",
+  "invocationId": "check-test-test",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    "--report-output",
+    ".llm/tmp/gate-receipts/check-test/test.report.json"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "check-test",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "c48f9da839c7e7dfb3da0b794908651f518256393db0a4700f17e42d911a3958",
+  "lifecycleId": "check-test:check-test-test:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:48:34.247Z",
+  "childReport": ".llm/tmp/gate-receipts/check-test/test.report.json",
+  "startedAt": "2026-09-03T13:48:34.250Z",
+  "finishedAt": "2026-09-03T13:57:32.907Z",
+  "durationMs": 538657,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 153,
+    "sha256": "110f0ffe794667d6bc5c9e4b9c0939c5c5c4ea559182950e124573564058b974",
+    "tail": "{\"report\":\".llm/tmp/gate-receipts/check-test/test.report.json\",\"summary\":{\"passed\":5270,\"failed\":0,\"ignored\":14,\"totalResults\":5284,\"uniqueFailures\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 198,
+    "sha256": "16860496c602244aff843cea181b87beb1f666de19220be801ad3fbf30aa170a",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mtest\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '--report-output' '.llm/tmp/gate-receipts/check-test/test.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/gate-receipts/check-test/test.report.json",
+    "bytes": 259,
+    "sha256": "7b2ff624c753d7144ef9d9747610954c20556202814bc012dee2604b0571d009",
+    "modifiedAt": "2026-09-03T13:57:32.879Z"
+  }
+}

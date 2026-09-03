@@ -58,15 +58,25 @@ it spends OpenRouter credit where a subscription already exists. This remains a 
 only; it does not change the formal evaluator lane, its approved open-model set, or the prohibition
 on Gemini over evaluator transports.
 
-**Owner decision (2026-08-08).** PLAN-EVAL is conditional: use it before implementation only for
-genuinely complex/decision-heavy work, multi-PR/wave planning, or when adversarial planning advice
-is useful. Small/mechanical issues with complete contract/scope/acceptance/gates record
-`PLAN-EVAL: N/A`. IMPL-EVAL remains mandatory unless the owner explicitly waives it. Both use a
-fresh native opposite-family Claude ⇄ Codex session by default. Use the phase-bound OpenRouter open
-model only for a genuine third opinion or native-family quota limit. If OpenRouter is then limited,
-fall back to a fresh Antigravity CLI (`agy`) Gemini 3.6 Flash high session on the Google
-subscription. OpenHands is not a normal local evaluator and is reserved for explicitly
-cloud-driven work. Record every escalation and requested/observed identity.
+**Owner decisions (2026-08-08, narrowed 2026-08-28).** PLAN-EVAL is risk-selected, not a standard
+phase tax. Select it before implementation only when the topic is genuinely critical or complex:
+material architecture/public-contract decisions, multi-package or multi-PR sequencing, destructive
+or release/runtime risk, or an unresolved trade-off whose wrong answer would force meaningful
+rework. Routine docs corrections, mechanical fixes, generated refreshes, and bounded test/gate
+repairs with complete contract/scope/acceptance/gates record `PLAN-EVAL: N/A` plus the concrete
+selection reason and still receive the independent Tier-A slice review. "Adversarial advice might be
+useful" by itself is not enough to launch a formal evaluator.
+
+IMPL-EVAL remains mandatory unless the owner explicitly waives it. After **two consecutive terminal
+IMPL-EVAL failures on the same leaf**, stop the evaluator loop, release its lease, leave the
+canonical author available rather than frozen, and surface the exact decision/evidence boundary to
+the owner in the primary coordinator task. No third evaluator/fix loop is inferred from silence;
+unrelated lanes continue. Formal evaluations use a fresh native opposite-family Claude ⇄ Codex
+session by default. Use the phase-bound OpenRouter open model only for a genuine third opinion or
+native-family quota limit. If OpenRouter is then limited, fall back to a fresh Antigravity CLI
+(`agy`) Gemini 3.6 Flash high session on the Google subscription. OpenHands is not a normal local
+evaluator and is reserved for explicitly cloud-driven work. Record every escalation and
+requested/observed identity.
 
 **Forward rule (not a lane).** Any future **max-effort OpenAI implementation** route pairs with a
 **Claude · Fable 5 · high** adversarial review. This extends the effort-paired ladder above; when

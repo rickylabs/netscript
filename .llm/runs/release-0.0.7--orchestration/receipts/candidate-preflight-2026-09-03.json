@@ -1,0 +1,16 @@
+{
+  "kind": "coordinator-command-observation",
+  "observedAt": "2026-09-03T08:21:00Z",
+  "gitHead": "94fe507af47171cd4f295e8f532b281d7147b334",
+  "worktree": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
+  "command": "mise exec -- deno task publish:readiness",
+  "rawExitCode": 0,
+  "report": {
+    "gate": "publish-readiness",
+    "ok": true,
+    "version": "0.0.6",
+    "publishableMembers": 35,
+    "passedChecks": ["publish-set", "docs-reference", "markdown-pins", "lockstep-residue", "versionless-specifiers", "new-packages", "first-publish", "provisioning-dry-check", "import-attribute-preflight"]
+  },
+  "scope": "Read-only pre-bump rehearsal. No new version/tag, no publication, no exact canary pair. Repeat after final candidate merges."
+}

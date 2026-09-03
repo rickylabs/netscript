@@ -122,7 +122,10 @@ routing here — defer to that file. The items below are the parts of the contra
   step placement.
 - **Evaluator route binding.** Select the evaluator route from `workflow/lane-policy.md` — the
   open-model evaluator lane for a formal PLAN-EVAL/IMPL-EVAL, or the opposite-family route for
-  ordinary review — and record it in the run. The two-failure eval loop is unchanged.
+  ordinary review — and record it in the run. PLAN-EVAL is risk-selected only for critical or
+  complex topics. After two consecutive terminal IMPL-EVAL failures, release the evaluator and
+  escalate the exact decision to the owner in the primary coordinator task; do not freeze the
+  canonical author or infer a third loop.
 - **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
   skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
   the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the
@@ -266,7 +269,9 @@ OpenHands is reserved for explicitly cloud-driven work. No lane may self-certify
   draft-PR commit list + per-slice PR comments (the commit trail), selected archetype, overlays, and
   gate docs.
 - Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
-- Eval loop limit is two failures before escalation.
+- Eval loop limit is two consecutive failures. The second failure releases the evaluator lease and
+  triggers an owner-facing decision in the primary coordinator task; it does not freeze the author
+  or authorize a third loop.
 
 ## Commit Trail
 

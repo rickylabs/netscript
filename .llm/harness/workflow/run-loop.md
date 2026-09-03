@@ -81,14 +81,17 @@ mandatory final evaluator pass are complete (unless the owner explicitly waives 
 
 ## 4. Conditional Plan-Gate (PLAN-EVAL)
 
-PLAN-EVAL is required when material architecture, sequencing, scope, risk, or trade-off decisions
-remain; for multi-PR/wave plans; and whenever the supervisor genuinely needs adversarial planning
-advice. When selected, it is a **hard stop**: no implementation slice may be committed until its
-verdict is `PASS`.
+PLAN-EVAL is required only for genuinely critical or complex topics: material architecture or
+public-contract decisions, multi-package/multi-PR sequencing, destructive or release/runtime risk,
+or an unresolved trade-off whose wrong answer would force meaningful rework. Wanting generic
+adversarial advice is not sufficient. When selected, it is a **hard stop**: no implementation slice
+may be committed until its verdict is `PASS`.
 
-Skip PLAN-EVAL for a small/mechanical issue whose issue body and current evidence already provide
-the contract, scope, acceptance criteria, and gates. Record `PLAN-EVAL: N/A` plus the concrete
-reason in `worklog.md`/`phase-registry.md`; do not create a ceremonial evaluator session.
+Skip PLAN-EVAL for routine documentation corrections, mechanical fixes, generated refreshes, and
+bounded test/gate repairs whose issue body and current evidence already provide the contract, scope,
+acceptance criteria, and gates. Record `PLAN-EVAL: N/A` plus the concrete risk-selection reason in
+`worklog.md`/`phase-registry.md`; do not create a ceremonial evaluator session. Tier-A slice review
+and IMPL-EVAL still apply.
 
 PLAN-EVAL is a **separate session**. The plan evaluator:
 
@@ -197,7 +200,10 @@ session. Operating instructions live in `evaluator/protocol.md`.
 7. Fill `evaluate.md` from `templates/evaluate.md`.
 8. Emit `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
 
-Two `FAIL_FIX` cycles are allowed. After the second, escalate to the user.
+Two consecutive terminal IMPL-EVAL failures are allowed on one leaf. After the second, stop the
+evaluator loop, release the evaluator lease, keep the canonical implementation author available
+rather than frozen, and surface the exact unresolved decision plus both verdicts to the user in the
+primary coordinator task. Do not infer a third evaluator/fix loop; continue every independent lane.
 
 ## 8. Release (release-cutting runs only)
 

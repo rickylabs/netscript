@@ -1,0 +1,45 @@
+{
+  "gateId": "check",
+  "invocationId": "check-test-check",
+  "argv": [
+    "deno",
+    "task",
+    "check",
+    "--output",
+    ".llm/tmp/gate-receipts/check-test/check.report.json"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "check-test",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "f21c95dc8b4e4f9b80effdd6f2bdb2063c1cc95c0951eff559c65e0801ff2bf7",
+  "lifecycleId": "check-test:check-test-check:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:45:31.840Z",
+  "childReport": ".llm/tmp/gate-receipts/check-test/check.report.json",
+  "startedAt": "2026-09-03T13:45:31.842Z",
+  "finishedAt": "2026-09-03T13:48:34.145Z",
+  "durationMs": 182302,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 238,
+    "sha256": "edd46571942f546a8457418c02ab203103780c68bf0ce09f318428d32ea3dd81",
+    "tail": "desktop fixture import map satisfies 15 reachable SDK modules; 0 unmapped specifiers.\n{\"report\":\".llm/tmp/gate-receipts/check-test/check.report.json\",\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 463,
+    "sha256": "55c0340ee39e51f123e5209b11e2504e304a842c5faa56ee5ba4f5cdc69d2409",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:desktop-native-fixture\u001b[0m deno run --allow-all packages/cli/e2e/src/adapters/native-desktop/fixture-contract-driver.ts --repo-root . --check-only\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--output' '.llm/tmp/gate-receipts/check-test/check.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/gate-receipts/check-test/check.report.json",
+    "bytes": 288,
+    "sha256": "eac6b6c9291a9d2ab0fc004e243db41d682c9dfbf1ff07d400528ac059fc0685",
+    "modifiedAt": "2026-09-03T13:48:34.135Z"
+  }
+}

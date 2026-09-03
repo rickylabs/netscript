@@ -1,0 +1,36 @@
+{
+  "gateId": "aspire-version-parity",
+  "invocationId": "quality-aspire-version-parity",
+  "argv": [
+    "deno",
+    "task",
+    "check:aspire-version-parity"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "17570719f82d4d20b096bdcd6de0784ffa4282d7369c6b0faff5c8bdfb057e1f",
+  "lifecycleId": "quality:quality-aspire-version-parity:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:47:57.239Z",
+  "startedAt": "2026-09-03T13:47:57.241Z",
+  "finishedAt": "2026-09-03T13:47:57.508Z",
+  "durationMs": 267,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 4116,
+    "sha256": "79b454dd0caed8a464e1bf645533aee16e8dbf6f5ba10bddc496e5530479b6c9",
+    "tail": "{\"gate\":\"check:aspire-version-parity\",\"phase\":1,\"expectedVersion\":\"13.5.3\",\"manifest\":\".llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv\",\"ok\":true,\"counts\":{\"checked\":867,\"fail\":0,\"deferred\":12,\"info\":5,\"skipped\":1,\"missing\":0},\"findings\":[{\"path\":\".agents/skills/aspire-upgrade/SKILL.md\",\"class\":\"compat-fixture\",\"owner\":\"S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S13\"},{\"path\":\".llm/2026-07-31-fix-954-aspire-app-health-probe.md\",\"class\":\"harness-doc\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\".llm/tools/agentic/teardown/__fixtures__/aspire-ps-13.4.6.json\",\"class\":\"archival:version-suffixed-fixture\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\".llm/tools/agentic/teardown/__fixtures__/README.md\",\"class\":\"compat-fixture\",\"owner\":\"S7\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7\"},{\"path\":\".llm/tools/agentic/teardown/probes_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\".llm/tools/validation/check-aspire-version-parity_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S7/S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"13.3.9\",\"13.2.1\",\"13.0.0\",\"Aspire 13.4\",\"Aspire 13.1\",\"Aspire 13.2\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7/S13\"},{\"path\":\".llm/tools/validation/check-compat-fixtures_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S7/S13\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S7/S13\"},{\"path\":\"packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-evidence_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/cli/e2e/tests/application/gates/generated-app-endpoint_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"Aspire 13.4\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/fixtures/README.md\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/fixtures/telemetry/aspire-13.4.6-fixture.ts\",\"class\":\"archival:version-suffixed-fixture\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\"packages/mcp/tests/fixtures/telemetry/aspire-13.5.3-fixture.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/fixtures/telemetry/README.md\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/service-endpoint-source-fixtures.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"Aspire 13.4\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"packages/mcp/tests/telemetry-live-fixture_test.ts\",\"class\":\"compat-fixture\",\"owner\":\"S3\",\"status\":\"deferred\",\"matches\":[\"13.4.6\",\"Aspire 13.4\"],\"reason\":\"stale Aspire literal is deferred to manifest owner S3\"},{\"path\":\"resources/design/dashboard/reference/dashboard-design--orchestrator/screen-catalog.md\",\"class\":\"archival:design-corpus\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\"],\"reason\":\"archival owner is informational only\"},{\"path\":\"resources/design/dashboard/reference/plan-roadmap-expansion--seed/design/A-dashboard/proposal.md\",\"class\":\"archival:design-corpus\",\"owner\":\"archival\",\"status\":\"info\",\"matches\":[\"13.4.6\",\"Aspire 13.2\"],\"reason\":\"archival owner is informational only\"}],\"skipped\":[\"packages/fresh-ui/deno.lock\"],\"missing\":[],\"manifestFresh\":true}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 150,
+    "sha256": "e60a250e3908f9a1b58c71dd2bc13ef05e25431bb14fe9bb60cd5917162f99ee",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:aspire-version-parity\u001b[0m deno run --allow-read --allow-run=git .llm/tools/validation/check-aspire-version-parity.ts\n",
+    "truncated": false
+  }
+}
