@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "aspire",
+    "wait",
+    "users",
+    "--status",
+    "healthy",
+    "--timeout",
+    "60",
+    "--apphost",
+    "aspire/apphost.mts"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app",
+  "durationMs": 289,
+  "environment": {
+    "denoInstallRoot": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/.deno-install",
+    "pathPrepend": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/.deno-install/bin"
+  },
+  "exitCode": 18,
+  "readmeLine": 81,
+  "sourceCommand": "aspire wait users --status healthy --timeout 60 --apphost aspire/apphost.mts",
+  "stderrTail": "❌ \u001b[1mResource 'users' entered a failed state: Stopped waiting for resource 'users' to become healthy because it failed to start.\u001b[0m\n📄 See logs at /home/runner/.aspire/logs/cli_20260903T133204_e369defd.log\n🔍 See AppHost logs at /home/runner/.aspire/logs/cli_20260903T133118588_detach-child_d1cc7ae2a44e4031a9ef67b374a0fc8e.log\n",
+  "stdoutTail": "\u001b[2mWaiting for resource 'users' to be healthy...\u001b[0m\n\n",
+  "substitutions": {},
+  "timedOut": false,
+  "failureDiagnostics": {
+    "argv": [
+      "aspire",
+      "logs",
+      "users",
+      "--tail",
+      "40",
+      "--format",
+      "Json",
+      "--apphost",
+      "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app/aspire/apphost.mts"
+    ],
+    "exitCode": 0,
+    "stdoutTail": "{\n  \"logs\": [\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Waiting for resource 'postgres' to enter the 'Running' state.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Waiting for resource 'my-app-db' to enter the 'Running' state.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Waiting for resource 'postgres' to become healthy.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Waiting for resource 'my-app-db' to become healthy.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Waiting for resource ready to execute for 'postgres'.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Finished waiting for resource 'postgres'.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Waiting for resource ready to execute for 'my-app-db'.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"Finished waiting for resource 'my-app-db'.\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"[sys] Starting process...: Cmd = /opt/hostedtoolcache/deno/2.9.5/x64/deno, Args = [\\\"run\\\", \\\"--minimum-dependency-age=0\\\", \\\"--node-modules-dir=none\\\", \\\"--allow-net\\\", \\\"--allow-env\\\", \\\"--allow-read\\\", \\\"--allow-sys\\\", \\\"src/main.ts\\\"]\",\n      \"isError\": false\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m╭\\u001B[0m \\u001B[0m\\u001B[1m\\u001B[33mWarning\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m  Ignored build scripts for packages:\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m  \\u001B[0m\\u001B[3mnpm:prisma@7.10.0\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m  \\u001B[0m\\u001B[3mnpm:@prisma/engines@7.10.0\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m  Lifecycle scripts are only supported when using a `node_modules` directory.\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m  Enable it in your deno config file:\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m│\\u001B[0m  \\u001B[0m\\u001B[1m\\\"nodeModulesDir\\\": \\\"auto\\\"\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[33m╰─\\u001B[0m\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"\\u001B[0m\\u001B[1m\\u001B[31merror\\u001B[0m: Module not found \\\"file:///home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app/database/postgres/schema/.generated/zod/crud.ts\\\".\",\n      \"isError\": true\n    },\n    {\n      \"resourceName\": \"users\",\n      \"content\": \"    at \\u001B[0m\\u001B[36mfile:///home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app/contracts/versions/v1/users.contract.ts\\u001B[0m:\\u001B[0m\\u001B[33m11\\u001B[0m:\\u001B[0m\\u001B[33m62\\u001B[0m\",\n      \"isError\": true\n    }\n  ]\n}\n",
+    "stderrTail": "\u001b[2mGetting logs...\u001b[0m\n",
+    "timedOut": false
+  }
+}

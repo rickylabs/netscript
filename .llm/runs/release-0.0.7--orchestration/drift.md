@@ -1,5 +1,13 @@
 # Drift — release 0.0.7
 
+## Active mandate supersedes low-usage pause
+
+Latest owner explicitly resumes continuous stable wrap-up. Earlier pauses are historical.
+SDK NuGet packages are downloaded prerequisites, not generated AppHost state; caches retained.
+1983/2743cd0df adds bounded read-only failure diagnostics after33760126265 users FailedToStart
+without console evidence. No invented Docker cause, hidden recovery or acceptance waiver.
+CI and scoped independent review run alongside diagnosticrehearsal33761336744 on existingcanary9.
+
 ## Owner ruling applied: normal caches and configuration-specific Docker
 
 2026-09-03: owner rejected blanket no-image-cache requirement and confirmed NetScript/Aspire

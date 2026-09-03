@@ -4623,16 +4623,16 @@
       "lane": "internals",
       "phase": "gating",
       "baseBranch": "main",
-      "headSha": "4092014cfbf02f208dd16e320b35734d7b6b92f6",
-      "currentPrHeadSha": "4092014cfbf02f208dd16e320b35734d7b6b92f6",
+      "headSha": "2743cd0df771ec902799c5d281e6e1111600b331",
+      "currentPrHeadSha": "2743cd0df771ec902799c5d281e6e1111600b331",
       "issueNumbers": [],
       "branch": "fix/readme-cold-release-proof",
       "prNumber": 1983,
       "worktree": "/home/agent/projects/netscript/worktrees/007-readme-cold-release-proof",
       "implementationEvaluationVerdict": "PASS_IMPL",
-      "implementationEvaluatedProductHeadSha": "832e53720baf7a8d11e132d93582c48879a4628e",
-      "nextGate": "Owner cache ruling applied; bounded4092014cf delta review, fresh CI and existingcanary9 rehearsal remain.",
-      "reconciledAt": "2026-09-03T12:55:15.666Z"
+      "implementationEvaluatedProductHeadSha": "2743cd0df771ec902799c5d281e6e1111600b331",
+      "nextGate": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS.",
+      "reconciledAt": "2026-09-03T13:31:35.605Z"
     }
   ],
   "evaluatorLeases": [
@@ -5976,7 +5976,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T12:55:15.666Z",
+  "updatedAt": "2026-09-03T13:31:35.605Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6061,25 +6061,25 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T12:55:15.666Z",
-    "nextReportDueAt": "2026-09-03T13:50:15.666Z",
-    "lastReportRef": "receipts/final-auth-resume.md",
-    "headline": "Owner cache ruling applied:1983/4092014cf allows image caches, README Docker prerequisites are configuration-specific,1881 acceptance rewritten. Scoped8/0 green; wrap-up with delta review and CI pending.",
+    "lastReportAt": "2026-09-03T13:31:35.605Z",
+    "nextReportDueAt": "2026-09-03T14:26:35.605Z",
+    "lastReportRef": "receipts/active-release-resume.md",
+    "headline": "All product PRs merged.1983/2743cd0df independentPASS and15focusedPASS; final CI running. Rehearsal proves canary9 missingCRUDmodule, already fixed by merged1974. Proceed final canary after merge.",
     "currentMainSha": "075ea8ed7a027c8485db3c2ac183d0af5e1b2d35",
     "canary": {
       "target": "0.0.7-canary.10 (next available immutable number)",
       "state": "qualifying",
       "eta": {
-        "window": "Held at owner-requested low-usage checkpoint; resume bounded review/CI/rehearsal before final canary.",
+        "window": "After current CI/closegate, verified1983merge and finalmain readiness; then native publish plus production runtime duration.",
         "confidence": "low",
-        "basis": "Strict baseline0/0/6/0/0 rejected a fresh hosted runner before application execution; actual image relevance unknown."
+        "basis": "Missing initialCRUDmodule proven, alreadyfixed953b0849c; finalreviewPASS. Publishednewversion still requires its real fullgate."
       },
       "criticalPath": [
         {
           "id": "cold-proof",
           "state": "gating",
           "impact": "1881/863/1712 need truly cold hosted README acceptance.",
-          "nextAction": "Proportional independent review of4092014cf, fresh CI and existingcanary9 rehearsal; cache-policy decision is resolved."
+          "nextAction": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS."
         },
         {
           "id": "canary-pair",
@@ -6120,8 +6120,8 @@
         "prNumber": 1983,
         "lane": "internals",
         "state": "repairing",
-        "nextGate": "4092014cf owner-directed cache/prose correction passes8/0 plus check/fmt; proportional independent review and CI/rehearsal remain.",
-        "nextAction": "Resume same PR1983; normal caches allowed, no daemon-isolation design."
+        "nextGate": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS.",
+        "nextAction": "Verify actual cause/currenthead, merge1983, native final canary then stable. No owner pause."
       }
     ],
     "orchestratorMatrix": [
@@ -6143,13 +6143,13 @@
       },
       {
         "lane": "internals",
-        "state": "blocked",
+        "state": "active",
         "activeItems": [
           1983
         ],
-        "lastConcreteProgressAt": "2026-09-03T12:55:15.666Z",
-        "blocker": "Owner-requested wrap-up; exact amendment review and hosted gates pending.",
-        "nextAction": "Resume1983 at4092014cf, no remaining cache-policy question."
+        "lastConcreteProgressAt": "2026-09-03T13:31:35.605Z",
+        "blocker": "Current CI/review and concrete service diagnostic; no owner decision.",
+        "nextAction": "Diagnostic delta review, CI33761323539, hosted diagnostic33761336744; prior rehearsal users readiness exit18 after commands1–10, cleanupPASS."
       },
       {
         "lane": "docs",

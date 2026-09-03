@@ -1,5 +1,24 @@
 # Supervisor identity — release 0.0.7
 
+## 2026-09-03 active release wrap-up — latest owner mandate
+
+The latest owner explicitly resumes continuous autonomous execution toward stable0.0.7. Earlier
+low-usage wrap-up/pause wording below is historical and SUPERSEDED, not an active stop condition.
+Primary remains SOL high, existing topic identities preserved; no product leaves are unassigned.
+NAS orientation reread: /home/agent/projects paths, mise pins, sandbox-only Docker, no host/GPU
+operations, secret-free committed harness context and owner-controlled post-stable cleanup.
+
+PR1983 current source6e9bb276cdb7039ff62b01fb540c0f7afbc4e42c is committed and explicitly pushed.
+Normal image AND NuGet SDK caches are supported; SDK packages are not generated AppHost state.
+Two exact CI regressions repaired (NuGet policy and lexical read-only inventory): focused11/0,
+selected check/fmt/lint0findings. Core33760500123 running; qualitygreen, closegate awaits honest DoD.
+Independent delta4092014cf PASS; same evaluator0039d1ad resumes tiny final cache-policy delta6e9.
+Hosted existingcanary9 rehearsal33760126265 baselinePASS, READMEcommands1–10PASS, users health
+command11FAIL(exit18 FailedToStart), ownedcleanupPASS. No new canary minted. Diagnose actual
+resource failure against publishedcanary9 and currentmain; do not infer Docker/cache cause or waive.
+Only issues1881/863/1712 and release-proofPR1983 remain before exact canary/stable acceptance.
+Continue diagnosis, verified merge, final readiness and native publication without routine pause.
+
 ## Owner ruling applied: normal caches and configuration-specific Docker
 
 2026-09-03: owner rejected blanket no-image-cache requirement and confirmed NetScript/Aspire
