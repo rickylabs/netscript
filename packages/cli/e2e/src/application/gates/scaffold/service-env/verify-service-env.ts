@@ -42,7 +42,7 @@ import {
 } from './service-env-evidence.ts';
 import { requireResourceProcesses, scanResourceProcesses } from './process-evidence.ts';
 
-/** How long the AppHost gets to report the resource healthy before the gate fails. */
+/** Failure ceiling for a hung first-readiness wait; not an assumed time-to-healthy. */
 const HEALTHY_TIMEOUT_SECONDS = 180;
 
 const [projectRoot, appHost] = Deno.args;

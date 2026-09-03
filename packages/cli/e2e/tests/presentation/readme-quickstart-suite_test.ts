@@ -64,6 +64,7 @@ Deno.test('README Quickstart gates dispatch one indexed runtime-edge command eac
   );
   assertEquals(commands.map((command) => command.at(-4)), [...Array(11).keys()].map(String));
   assertEquals(commands.every((command) => command.includes('--allow-run')), true);
+  assertEquals(commands.every((command) => command.includes('--allow-env=PATH')), true);
 });
 
 Deno.test('README Quickstart command, gate-id, and phase tuples stay aligned', () => {

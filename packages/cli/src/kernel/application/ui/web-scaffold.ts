@@ -1,7 +1,7 @@
-import { dirname, relative, resolve } from "@std/path";
-import type { FileSystemPort } from "../../ports/file-system-port.ts";
-const PREREQUISITE = "netscript service add --name <service> --with-client";
-export type UiGeneratedFileRole = "page" | "query-loader" | "island" | "route-registration";
+import { dirname, relative, resolve } from '@std/path';
+import type { FileSystemPort } from '../../ports/file-system-port.ts';
+const PREREQUISITE = 'netscript service add --name <service> --with-client';
+export type UiGeneratedFileRole = 'page' | 'query-loader' | 'island' | 'route-registration';
 export type UiGeneratedFile = Readonly<{
   path: string;
   content: string;
@@ -14,33 +14,40 @@ export interface UiPageScaffoldInput extends WriteOptions {
   readonly path: string;
   readonly route?: string;
   readonly island?: boolean;
+  readonly client?: string;
 }
 export interface UiIslandScaffoldInput extends WriteOptions {
   readonly projectRoot: string;
   readonly name: string;
   readonly query?: boolean;
+  readonly client?: string;
 }
 type Binding = Readonly<{ path: string; queries: string; input: string }>;
+type BindingCandidate = Readonly<{ path: string; source: string; service: string | undefined }>;
 export async function scaffoldUiPage(
   input: UiPageScaffoldInput,
   fs: FileSystemPort,
 ): Promise<UiScaffoldResult> {
   const segment = cleanPath(input.path);
-  const routeId = cleanRouteId(input.route ?? segment.replaceAll("/", "."));
-  const dir = resolve(input.projectRoot, "routes", segment);
-  const name = pascalCase(segment.split("/").at(-1) ?? "Page");
-  const binding = input.island ? await findBinding(input.projectRoot, fs) : undefined;
+  const routeId = cleanRouteId(input.route ?? segment.replaceAll('/', '.'));
+  const dir = resolve(input.projectRoot, 'routes', segment);
+  const name = pascalCase(segment.split('/').at(-1) ?? 'Page');
+  const binding = input.island ? await findBinding(input.projectRoot, fs, input.client) : undefined;
   const files: UiGeneratedFile[] = [{
-    path: resolve(dir, "index.tsx"),
+    path: resolve(dir, 'index.tsx'),
     content: pageTemplate(name, routeId, Boolean(binding)),
-    role: "page",
+    role: 'page',
   }];
   if (binding) {
-    const loader = resolve(dir, "(_shared)", "query-loaders.ts");
-    files.push({ path: loader, content: loaderTemplate(binding, loader, name), role: "query-loader" }, {
-      path: resolve(dir, "(_islands)", `${name}Island.tsx`),
+    const loader = resolve(dir, '(_shared)', 'query-loaders.ts');
+    files.push({
+      path: loader,
+      content: loaderTemplate(binding, loader, name),
+      role: 'query-loader',
+    }, {
+      path: resolve(dir, '(_islands)', `${name}Island.tsx`),
       content: dataIslandTemplate(binding, dir, name),
-      role: "island",
+      role: 'island',
     });
   }
   files.push(await routeRegistration(input.projectRoot, segment, routeId, fs));
@@ -52,15 +59,10 @@ export async function scaffoldUiIsland(
   fs: FileSystemPort,
 ): Promise<UiScaffoldResult> {
   const name = pascalCase(input.name);
-  const binding = input.query ? await findBinding(input.projectRoot, fs) : undefined;
-  const path = resolve(
-    input.projectRoot,
-    "routes",
-    "(_islands)",
-    `${name}.tsx`,
-  );
+  const binding = input.query ? await findBinding(input.projectRoot, fs, input.client) : undefined;
+  const path = resolve(input.projectRoot, 'routes', '(_islands)', `${name}.tsx`);
   const content = binding ? queryIslandTemplate(binding, path, name) : signalTemplate(name);
-  const files: UiGeneratedFile[] = [{ path, content, role: "island" }];
+  const files: UiGeneratedFile[] = [{ path, content, role: 'island' }];
   await applyPlan(files, input, fs);
   return { files };
 }
@@ -71,7 +73,7 @@ async function applyPlan(
 ): Promise<void> {
   if (!options.force) {
     for (const file of files) {
-      if (file.role !== "route-registration" && await fs.exists(file.path)) {
+      if (file.role !== 'route-registration' && await fs.exists(file.path)) {
         throw new Error(`Refusing to overwrite existing file: ${file.path}`);
       }
     }
@@ -82,65 +84,106 @@ async function applyPlan(
     await fs.writeFile(file.path, file.content);
   }
 }
-async function findBinding(root: string, fs: FileSystemPort): Promise<Binding> {
+async function findBinding(root: string, fs: FileSystemPort, client?: string): Promise<Binding> {
   const candidates: string[] = [];
-  const lib = resolve(root, "lib");
+  const lib = resolve(root, 'lib');
   if (await fs.exists(lib)) {
     for (const entry of await fs.readDir(lib)) {
       const path = resolve(lib, entry.name);
       if (
-        entry.isFile && entry.name.endsWith(".ts") &&
-        (await fs.readFile(path)).includes("createQueryFactories(")
+        entry.isFile && entry.name.endsWith('.ts') &&
+        (await fs.readFile(path)).includes('createQueryFactories(')
       ) candidates.push(path);
     }
   }
-  const examples = resolve(root, "routes", "examples");
+  const examples = resolve(root, 'routes', 'examples');
   if (!candidates.length && await fs.exists(examples)) {
     for (const entry of await fs.readDir(examples)) {
       if (!entry.isDirectory) continue;
-      const fallback = resolve(examples, entry.name, "(_lib)", "service-query.ts");
+      const fallback = resolve(examples, entry.name, '(_lib)', 'service-query.ts');
       if (await fs.exists(fallback)) candidates.push(fallback);
     }
   }
-  if (candidates.length !== 1) {
+  let path: string;
+  let source: string;
+  if (client !== undefined) {
+    const identified = await identifyCandidates(candidates, fs);
+    const matches = identified.filter((candidate) => candidate.service === client);
+    if (!matches.length) {
+      bindingError(
+        `selected client '${client}' matches no query client`,
+        candidates,
+        selectionRemedy(identified),
+      );
+    }
+    if (matches.length > 1) {
+      bindingError(
+        `selected client '${client}' matches more than one query client`,
+        matches.map((candidate) => candidate.path),
+        ` More than one candidate declares service '${client}'.`,
+      );
+    }
+    path = matches[0].path;
+    source = matches[0].source;
+  } else if (candidates.length !== 1) {
+    const remedy = candidates.length > 1
+      ? selectionRemedy(await identifyCandidates(candidates, fs))
+      : '';
     bindingError(
-      candidates.length ? "multiple query clients are ambiguous" : "no query client found",
+      candidates.length ? 'multiple query clients are ambiguous' : 'no query client found',
       candidates,
+      remedy,
     );
+  } else {
+    path = candidates[0];
+    source = await fs.readFile(path);
   }
-  const path = candidates[0];
-  const source = await fs.readFile(path);
-  const service = source.match(/export const \w+Name\s*=\s*['"]([^'"]+)['"]/i)
-    ?.[1];
+  const service = serviceIdentity(source);
   const queries = source.match(
     /export const (\w+Queries)\s*=\s*createQueryFactories\(/,
   )?.[1];
   if (!service || !queries) {
-    bindingError("unsupported query client", candidates);
+    bindingError('unsupported query client', candidates);
   }
-  const contractPath = resolve(
-    root,
-    "..",
-    "..",
-    "contracts",
-    "versions",
-    "v1",
-    `${service}.contract.ts`,
-  );
+  const contracts = resolve(root, '..', '..', 'contracts', 'versions', 'v1');
+  const contractPath = resolve(contracts, `${service}.contract.ts`);
   if (!await fs.exists(contractPath)) {
     bindingError(`missing contract ${contractPath}`, candidates);
   }
   const contract = await fs.readFile(contractPath);
-  const input = contract.includes("createCrudContract(") ? `{ limit: 20, page: 1, sortBy: 'id', sortOrder: 'asc' } as const` : /ListInputSchemaV1[\s\S]*offset\s*:/.test(contract) ? `{ limit: 20, offset: 0 } as const` : undefined;
+  const input = contract.includes('createCrudContract(')
+    ? `{ limit: 20, page: 1, sortBy: 'id', sortOrder: 'asc' } as const`
+    : /ListInputSchemaV1[\s\S]*offset\s*:/.test(contract)
+    ? `{ limit: 20, offset: 0 } as const`
+    : undefined;
   if (!input) {
     bindingError(`unsupported list contract ${contractPath}`, candidates);
   }
   return { path, queries, input };
 }
-function bindingError(reason: string, candidates: readonly string[]): never {
-  const detail = candidates.length ? ` Candidates: ${candidates.join(", ")}.` : "";
+async function identifyCandidates(
+  paths: readonly string[],
+  fs: FileSystemPort,
+): Promise<readonly BindingCandidate[]> {
+  return await Promise.all(paths.map(async (path) => {
+    const source = await fs.readFile(path);
+    return { path, source, service: serviceIdentity(source) };
+  }));
+}
+function serviceIdentity(source: string): string | undefined {
+  return source.match(/export const \w+Name\s*=\s*['"]([^'"]+)['"]/i)?.[1];
+}
+function selectionRemedy(candidates: readonly BindingCandidate[]): string {
+  const services = [
+    ...new Set(candidates.flatMap((candidate) => candidate.service ? [candidate.service] : [])),
+  ].sort();
+  const available = services.length ? services.join(', ') : '(none recognized)';
+  return ` Available services: ${available}. Use --client <service> to select one.`;
+}
+function bindingError(reason: string, candidates: readonly string[], remedy = ''): never {
+  const detail = candidates.length ? ` Candidates: ${candidates.join(', ')}.` : '';
   throw new Error(
-    `Cannot scaffold a data-bound island: ${reason}.${detail} Exactly one conventional generated client is required. Prerequisite: ${PREREQUISITE}.`,
+    `Cannot scaffold a data-bound island: ${reason}.${detail}${remedy} Exactly one conventional generated client is required. Prerequisite: ${PREREQUISITE}.`,
   );
 }
 async function routeRegistration(
@@ -149,14 +192,14 @@ async function routeRegistration(
   routeId: string,
   fs: FileSystemPort,
 ): Promise<UiGeneratedFile> {
-  const path = resolve(root, "router.ts");
+  const path = resolve(root, 'router.ts');
   if (!await fs.exists(path)) {
     throw new Error(`Cannot register page route: missing ${path}`);
   }
   const source = await fs.readFile(path);
-  const start = source.indexOf("export const appRoutes = {");
-  const end = source.indexOf("\n} as const;", start);
-  if (start < 0 || end < 0 || !source.includes("createRouteReference")) {
+  const start = source.indexOf('export const appRoutes = {');
+  const end = source.indexOf('\n} as const;', start);
+  if (start < 0 || end < 0 || !source.includes('createRouteReference')) {
     throw new Error(
       `Cannot register page route in ${path}: unsupported appRoutes declaration`,
     );
@@ -174,9 +217,10 @@ async function routeRegistration(
       `Cannot register '${routeId}' in ${path}: route id or path already exists`,
     );
   }
-  const entry = `  '${routeId}': createRouteReference('/${segment}', { id: '${routeId}', kind: 'page' }),\n`;
-  const content = exact ? source : source.slice(0, end) + "\n" + entry + source.slice(end + 1);
-  return { path, content, role: "route-registration" };
+  const entry =
+    `  '${routeId}': createRouteReference('/${segment}', { id: '${routeId}', kind: 'page' }),\n`;
+  const content = exact ? source : source.slice(0, end) + '\n' + entry + source.slice(end + 1);
+  return { path, content, role: 'route-registration' };
 }
 function pageTemplate(
   name: string,
@@ -184,8 +228,12 @@ function pageTemplate(
   dataBound: boolean,
 ): string {
   const camel = camelCase(name);
-  const imports = dataBound ? `import ${name}Island from './(_islands)/${name}Island.tsx';\nimport { load${name}Data } from './(_shared)/query-loaders.ts';\n` : "";
-  const layer = dataBound ? `.withLayer('${camel}', ${name}Island, { loader: load${name}Data })` : `.withLayer('${camel}', () => <main><h1>${name}</h1></main>, () => ({}))`;
+  const imports = dataBound
+    ? `import ${name}Island from './(_islands)/${name}Island.tsx';\nimport { load${name}Data } from './(_shared)/query-loaders.ts';\n`
+    : '';
+  const layer = dataBound
+    ? `.withLayer('${camel}', ${name}Island, { loader: load${name}Data })`
+    : `.withLayer('${camel}', () => <main><h1>${name}</h1></main>, () => ({}))`;
   return `import { appRoutes } from '@app/router.ts';\nimport { definePage } from '@app/utils.ts';\n${imports}\nexport const ${camel}Page = definePage()\n  .withRoute(appRoutes['${routeId}'])\n  .withMeta(() => ({ title: '${name}' }))\n  ${layer}\n  .withLayout((slots) => slots.${camel}())\n  .build();\n\nexport const { default: page } = ${camel}Page;\nexport { page as default };\n`;
 }
 function loaderTemplate(binding: Binding, path: string, name: string): string {
@@ -202,7 +250,7 @@ function dataIslandTemplate(
 ): string {
   const query = binding.queries;
   const module = specifier(
-    resolve(dir, "(_islands)", `${name}Island.tsx`),
+    resolve(dir, '(_islands)', `${name}Island.tsx`),
     binding.path,
   );
   return `import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';\nimport { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${module}';\nimport { load${name}Data } from '../(_shared)/query-loaders.ts';\n\ntype Props = NonNullable<InferDefinePageLayerLoaderProps<typeof load${name}Data>>;\n\nfunction ${name}Data(props: Props) {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(props.input),\n    queryKey: ${query}.list.clientKey(props.input),\n    initialData: props.initialData,\n    initialDataUpdatedAt: props.cachedAt,\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}Island(props: Props) {\n  return (\n    <QueryIsland>\n      <${name}Data {...props} />\n    </QueryIsland>\n  );\n}\n`;
@@ -213,18 +261,20 @@ function queryIslandTemplate(
   name: string,
 ): string {
   const query = binding.queries;
-  return `import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${specifier(path, binding.path)}';\n\nconst input = ${binding.input};\n\nfunction ${name}Data() {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(input),\n    queryKey: ${query}.list.clientKey(input),\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}() {\n  return (\n    <QueryIsland>\n      <${name}Data />\n    </QueryIsland>\n  );\n}\n`;
+  return `import { QueryIsland, useIslandQuery } from '@netscript/fresh/query';\nimport { ${query} } from '${
+    specifier(path, binding.path)
+  }';\n\nconst input = ${binding.input};\n\nfunction ${name}Data() {\n  const query = useIslandQuery({\n    ...${query}.list.queryOptions(input),\n    queryKey: ${query}.list.clientKey(input),\n  });\n  return <pre>{JSON.stringify(query.data, null, 2)}</pre>;\n}\n\nexport default function ${name}() {\n  return (\n    <QueryIsland>\n      <${name}Data />\n    </QueryIsland>\n  );\n}\n`;
 }
 function signalTemplate(name: string): string {
   return `import { useSignal } from '@preact/signals';\n\nexport default function ${name}() {\n  const count = useSignal(0);\n  return <button type="button" onClick={() => count.value++}>{count}</button>;\n}\n`;
 }
 function specifier(from: string, target: string): string {
-  const path = relative(dirname(from), target).replaceAll("\\", "/");
-  return path.startsWith(".") ? path : `./${path}`;
+  const path = relative(dirname(from), target).replaceAll('\\', '/');
+  return path.startsWith('.') ? path : `./${path}`;
 }
 function cleanPath(path: string): string {
-  const value = path.replace(/^\/+|\/+$/g, "");
-  if (!value || value.split("/").some((part) => !/^[\w][\w-]*$/.test(part))) {
+  const value = path.replace(/^\/+|\/+$/g, '');
+  if (!value || value.split('/').some((part) => !/^[\w][\w-]*$/.test(part))) {
     throw new Error(`Invalid page path: ${path}`);
   }
   return value;
@@ -238,7 +288,7 @@ function pascalCase(value: string): string {
     /(^|[-_\s/]+)([\w])/g,
     (_m, _s, c: string) => c.toUpperCase(),
   )
-    .replace(/[^a-zA-Z0-9]/g, "");
+    .replace(/[^a-zA-Z0-9]/g, '');
   if (!result) throw new Error(`Invalid generated name: ${value}`);
   return /^\d/.test(result) ? `Ui${result}` : result;
 }

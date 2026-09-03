@@ -1,4 +1,4 @@
-import { dirname, resolve } from '@std/path';
+import { DELIMITER, dirname, resolve } from '@std/path';
 import {
   explicitServicePort,
   parseReadmeQuickstartCommands,
@@ -7,14 +7,16 @@ import {
   substituteReadmeQuickstartCommand,
 } from '../../../domain/readme-quickstart.ts';
 import { resolveResourceUrlsFromAppHost } from '../scaffold/generated-app-endpoint.ts';
-import { runAspireCommand } from './aspire-walk.ts';
+import { type AspireCommandRunner, runAspireCommand } from './aspire-walk.ts';
 
 const JSR_CLI_PREFIX = 'jsr:@netscript/cli@';
 const SERVICE_RESOURCE = 'users';
 const RECEIPT_TAIL_LENGTH = 4_000;
+const DENO_INSTALL_DIRECTORY = '.deno-install';
 
 interface ReadmeWalkState {
   readonly cwd: string;
+  readonly denoInstallRoot: string;
   readonly nextIndex: number;
   readonly servicePort?: number;
   readonly servicePortSource?: string;
@@ -25,6 +27,10 @@ interface ReadmeCommandReceipt {
   readonly argv: readonly string[];
   readonly cwd: string;
   readonly durationMs: number;
+  readonly environment: {
+    readonly denoInstallRoot: string;
+    readonly pathPrepend: string;
+  };
   readonly exitCode: number;
   readonly readmeLine: number;
   readonly sourceCommand: string;
@@ -51,6 +57,7 @@ export async function executeReadmeQuickstartCommand(
   cliSpecifier: string,
   statePath: string,
   timeoutMs: number,
+  spawn: AspireCommandRunner = runAspireCommand,
 ): Promise<number> {
   const readme = await Deno.readTextFile(resolve(repoRoot, 'README.md'));
   const commands = parseReadmeQuickstartCommands(readme);
@@ -82,10 +89,11 @@ export async function executeReadmeQuickstartCommand(
     entry.line,
   );
   const argv = readmeQuickstartArgv(substituted, entry.line);
+  const environment = readmeCommandEnvironment(state.denoInstallRoot);
   const started = performance.now();
   const result = argv[0] === 'cd'
     ? await changeDirectory(argv, state.cwd, entry.line)
-    : await runCommand(argv, state.cwd, timeoutMs);
+    : await runCommand(argv, state.cwd, timeoutMs, environment.env, spawn);
   const durationMs = Math.round(performance.now() - started);
   let nextState: ReadmeWalkState = state;
   if (result.code === 0 && !result.timedOut) {
@@ -104,6 +112,10 @@ export async function executeReadmeQuickstartCommand(
     argv,
     cwd: state.cwd,
     durationMs,
+    environment: Object.freeze({
+      denoInstallRoot: state.denoInstallRoot,
+      pathPrepend: environment.pathPrepend,
+    }),
     exitCode: result.code,
     readmeLine: entry.line,
     sourceCommand: entry.command,
@@ -145,9 +157,11 @@ async function runCommand(
   argv: readonly string[],
   cwd: string,
   timeoutMs: number,
+  env: Record<string, string>,
+  spawn: AspireCommandRunner,
 ): Promise<{ code: number; stdout: string; stderr: string; timedOut: boolean }> {
   try {
-    return await runAspireCommand(argv, cwd, timeoutMs);
+    return await spawn(argv, cwd, timeoutMs, env);
   } catch (error) {
     return {
       code: 1,
@@ -160,12 +174,32 @@ async function runCommand(
 
 async function initializeState(runRoot: string, statePath: string): Promise<ReadmeWalkState> {
   await Deno.mkdir(runRoot, { recursive: true });
+  const denoInstallRoot = resolve(runRoot, DENO_INSTALL_DIRECTORY);
+  try {
+    await Deno.remove(denoInstallRoot, { recursive: true });
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+  await Deno.mkdir(denoInstallRoot, { recursive: true });
   try {
     await Deno.remove(resolve(dirname(statePath), 'receipts'), { recursive: true });
   } catch (error) {
     if (!(error instanceof Deno.errors.NotFound)) throw error;
   }
-  return Object.freeze({ cwd: runRoot, nextIndex: 0 });
+  return Object.freeze({ cwd: runRoot, denoInstallRoot, nextIndex: 0 });
+}
+
+function readmeCommandEnvironment(
+  denoInstallRoot: string,
+): { env: Record<string, string>; pathPrepend: string } {
+  const pathPrepend = resolve(denoInstallRoot, 'bin');
+  return {
+    env: {
+      DENO_INSTALL_ROOT: denoInstallRoot,
+      PATH: `${pathPrepend}${DELIMITER}${Deno.env.get('PATH') ?? ''}`,
+    },
+    pathPrepend,
+  };
 }
 
 function assertExpectedCommands(actual: readonly string[]): void {
@@ -256,6 +290,7 @@ async function readState(path: string, line: number): Promise<ReadmeWalkState> {
   }
   if (
     !isRecord(parsed) || typeof parsed.cwd !== 'string' ||
+    typeof parsed.denoInstallRoot !== 'string' ||
     typeof parsed.nextIndex !== 'number'
   ) {
     throw new Error(`README line ${line} found a malformed prior run receipt.`);
@@ -274,6 +309,7 @@ async function readState(path: string, line: number): Promise<ReadmeWalkState> {
   }
   return Object.freeze({
     cwd: parsed.cwd,
+    denoInstallRoot: parsed.denoInstallRoot,
     nextIndex: parsed.nextIndex,
     ...(servicePort === undefined ? {} : { servicePort }),
     ...(servicePortSource === undefined ? {} : { servicePortSource }),

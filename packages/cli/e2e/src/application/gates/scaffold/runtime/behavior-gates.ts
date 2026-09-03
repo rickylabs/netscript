@@ -359,6 +359,22 @@ export function createRuntimeBehaviorGates(
       ISLAND_HYDRATION_FAILURE_HINT,
     ),
     commandGate(
+      GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
+      'Prove settled users update invalidates and refetches its list once',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '-A',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`,
+        'browser',
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+      ],
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,

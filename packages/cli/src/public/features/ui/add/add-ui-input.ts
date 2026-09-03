@@ -9,4 +9,5 @@ export interface UiAddCommandInput {
   readonly route?: string;
   readonly island?: boolean;
   readonly query?: boolean;
+  readonly client?: string;
 }

@@ -55,6 +55,7 @@ function ServiceShowcaseLabInner(props: Props) {
     queryKey: listOptions.queryKey,
     queryFn: listOptions.queryFn,
     initialData: props.initialList,
+    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 
