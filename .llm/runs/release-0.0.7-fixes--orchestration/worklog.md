@@ -8099,3 +8099,7 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - #1970: CONFLICTING/DIRTY vs main after #1959/#1960 merges → merged origin/main in 007-leaf-1970; sole conflict = generated MCP corpus. First push a53448b6b carried main's corpus (`rtk` absent on host masked a skipped regen); corrected by real `gen:mcp-export-corpus` + `check` PASS → c72f853bd. CI watcher re-armed at c72f853bd.
 - #1971: Sol worker opened draft PR #1974 (fix/scaffold-build-catalog-zod, 0fa3f6e56), labels/milestone correct, S0 done, S1/S2 pending; closing keyword deliberately deferred until evidence current. Leave to worker.
 - Lessons: `rtk` is not installed on this host — never chain `rtk proxy … | tail` (pipe masks the missing binary); `pkill -f` self-matched and killed the supervisor shell (exit 144) — kill only by /proc identity.
+
+## 2026-09-03 02:14Z — #1974 (Closes #1971) ready for review at f383c3280
+- Worker finished S1/S2: fix in scaffold-app-catalog.ts + database scaffolder/generate-db-deno-json (materialized Zod entrypoint, no literal `catalog:` in production build); consumer sequence init/build/codegen/build 0/0/0/0; check/quality receipts at exact head; lint/fmt wrapper refusal recorded in drift.md (root deno.json excludes packages/cli). Diff within ceiling. CI + e2e-cli running at f383c3280.
+- Next: on green mint IMPL-EVAL (`status:impl`→`status:impl-eval`); on PASS packet; then sync #1945 (rebase onto fix) and rerun its runtime tiers.
