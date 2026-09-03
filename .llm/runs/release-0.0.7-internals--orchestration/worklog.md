@@ -11029,3 +11029,15 @@ Evidence from the report artifact: `generated.workers-registry` (gate 23) ran th
 runs `package-backed-plugin-doctor-fixture.ts --project-root …` and the doctor reports
 `.netscript/generated/plugin-workers/job-registry.ts` **missing** ("doctor did not execute healthy
 workers check"). Owner: fixes (doctor #1574/#1603 lineage; fixture). Exact contract being read.
+
+### D-278 — Canary 8 doctor red is a REGRESSION, not latent: gate 90 passed on canary.5 (08-31, 91/0); workers registry compiler changed in five features merges since
+
+`behavior.package-backed-plugin-doctor` ran and passed on canary.5's prod run `33424988471`
+(head `8f1fcb2bc`). Between `8f1fcb2bc` and canary.8's `79adb103b` the only doctor/workers-relevant
+merges touch `plugins/workers/src/cli/registry-compiler.ts` / `generate-runtime-registries.ts` and
+`packages/plugin-workers-core`: #1861, #1864, #1872 (config-aware installed job registries), #1882
+(registry compiler ↔ JobConfig parity), #1938 (job payload type contracts) — all features lane.
+The fixture builds a minimal package-backed project with one declared job and expects the published
+CLI's doctor to find a compiled registry containing it; on canary.8 the registry is never produced.
+Local bisect of `compile-registry` on the fixture's project shape at both heads recorded above.
+Owner: **features** (workers CLI regression), surfaced through a fixes-owned gate.
