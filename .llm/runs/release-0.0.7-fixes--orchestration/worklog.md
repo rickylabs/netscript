@@ -8005,3 +8005,4 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
   `suite-registry_test.ts` (de4d31b69); merged main 262aa8fbe (parity manifestFresh:true) → head
   **9630583c8** pushed. F-3 keyword + acceptance boxes only after green head. Second FAIL_FIX on F-1
   would escalate per harness rules.
+- 01:15Z steer C resume was killed by my own `timeout 300` wrapper (codex-resume runs the whole turn in the foreground; never wrap it in timeout). Worker had already produced mode support + receipts/red-canary8.txt uncommitted. Re-resumed with continuation steer D (/tmp/deliver1966d.sh, no timeout).
