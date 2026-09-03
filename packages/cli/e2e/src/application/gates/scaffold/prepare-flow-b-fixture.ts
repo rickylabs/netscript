@@ -286,6 +286,7 @@ if (missingCallbackImports.length > 0) {
   updatedFlowBJob = `${missingCallbackImports.join('\n')}\n${updatedFlowBJob}`;
 }
 if (!updatedFlowBJob.includes("'flow-b.callback'")) {
+  // Generated workers jobs are schema-first, so target the callback line rather than the helper.
   const handlerMarker = '  (context) => {';
   if (!updatedFlowBJob.includes(handlerMarker)) {
     throw new Error('generated Flow-B callback job handler marker was not found');

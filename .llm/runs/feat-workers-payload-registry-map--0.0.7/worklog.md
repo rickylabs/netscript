@@ -555,3 +555,9 @@ These gates ran on the integrated tree after the canonical carrier checks. The r
 contains this section is the intended immutable PR head; GitHub's current `check-test`, `quality`,
 `scaffold-static`, PostgreSQL runtime, and SQLite runtime jobs are the authoritative synthetic-merge
 receipts for that exact pushed commit.
+
+The receipt-only push `0e0a850da` matched the workflow's documentation-only path filter and
+scheduled no product CI. A final scoped commit adds only an explanatory comment at the repaired
+package fixture seam (no behavior or type change), ensuring the required synthetic-merge workflows
+run against the immutable packet head. The successful integrated local receipts above remain valid
+because the executable source is unchanged.
