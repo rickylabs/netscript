@@ -42,6 +42,32 @@ config, schema, type, adapter, and testing APIs live on typed sub-path exports:
 - [`@netscript/aspire/testing`](#sub-path-exports) — in-memory builder, contribution base class, and test fixtures.
 - [`@netscript/aspire/public`](#sub-path-exports) — production aggregate re-exporting all public surfaces.
 
+## Readiness contract
+
+`healthStatus` for backing infrastructure answers one question: **is this resource reachable at the
+endpoint its consumers will use?** The listener-readiness probe is a bounded TCP connect (or a RESP
+`PING`) to the resource's *published* endpoint, so `Healthy` means "something accepted a connection
+there", and `Unhealthy` means "nothing did, within the timeout".
+
+**A container log is not the readiness authority.** A database announcing
+`database system is ready to accept connections` is reporting that its own process finished starting,
+observed *inside* the container's network namespace. That is a different question, and the two can
+disagree legitimately: a published port that is not yet mapped, or that resolves somewhere nothing is
+listening, makes the log true while the probe is false. Aspire's DCP binds published ports to the
+Docker host's loopback rather than `0.0.0.0`, so a database that is ready in-container can be
+unreachable from another namespace while its log says otherwise.
+
+So, stated as the inverse of the rule that `Healthy` is not proof of a working resource:
+
+> **`Unhealthy` is not disproof that the database is up — it is proof it is not reachable where you
+> will connect.**
+
+**What consumers must wait on.** Wait on the health check, not on log text: `aspire wait <resource>`
+blocks on the evaluated health state, and `aspire describe --format Json` exposes `healthReports` per
+resource. Scraping a container log for a readiness phrase will report success before the endpoint is
+usable, which is the failure this contract exists to prevent. Treat `healthReports: {}` — no check
+registered — as *unknown* rather than healthy.
+
 ## Diagnostics (root export)
 
 The root `@netscript/aspire` entrypoint exposes the diagnostic contract.

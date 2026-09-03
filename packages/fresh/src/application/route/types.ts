@@ -129,7 +129,7 @@ export type InferRoutePatternSegment<TSegment extends string> = TSegment extends
 
 /** Infer typed path params from the stripped Fresh route pattern. */
 export type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends ''
-  ? EmptyRecord
+  ? EmptySegment
   : TPattern extends `${infer TSegment}/${infer TRest}`
     ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest> & EmptySegment
   : InferRoutePatternSegment<TPattern>;

@@ -146,7 +146,7 @@ identifiers as your local-profile placeholders, not fixed values.
 - Native WSL worktree root: `<REPO_WSL>`
 - Deno toolchain: `2.8.x` (PR #44 upgrade). Other tool versions below are a captured snapshot —
   re-verify per branch with the toolchain command in [Verification Commands](#verification-commands).
-- Snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
+- Snapshot toolchain: use the pinned versions in `.github/toolchain.env`.
 
 Model, provider, and effort are required launch identity. Select them from
 `.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table. Pinned

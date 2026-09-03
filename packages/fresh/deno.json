@@ -24,7 +24,7 @@
   },
   "tasks": {
     "test": "deno test --allow-all ./src ./tests",
-    "test:browser": "deno test --allow-all ./tests/form-navigation_browser.ts",
+    "test:browser": "deno test --allow-all ./tests/form-navigation_browser.ts ./tests/defer-client-navigation_browser.ts ./tests/query-hydration-age_browser.ts",
     "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/runtime/navigation/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts ./tests/type-fixtures/desktop-consumer_type.ts ./tests/type-fixtures/navigation-consumer_type.ts && deno task check:streams-types",
     "check:streams-types": "deno check --no-lock --config ./tests/type-fixtures/streamdb-consumer-deno.json --unstable-kv ./tests/type-fixtures/streamdb-wrapper_type.ts",
     "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/runtime/navigation/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
@@ -72,7 +72,10 @@
       "**/*_test.ts",
       "**/*_test.tsx",
       "**/*.test.ts",
-      "**/*.test.tsx"
+      "**/*.test.tsx",
+      "tests/fixtures/",
+      "**/*_browser.ts",
+      "**/*_browser.tsx"
     ]
   },
   "compilerOptions": {

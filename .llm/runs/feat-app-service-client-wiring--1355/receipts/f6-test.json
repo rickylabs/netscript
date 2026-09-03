@@ -1,0 +1,36 @@
+{
+  "gateId": "test",
+  "invocationId": "app-service-client-wiring-f6-test",
+  "argv": [
+    "deno",
+    "task",
+    "test"
+  ],
+  "cwd": "/home/codex/repos/netscript-007-features-1355",
+  "gitHead": "7fa29ad3ed10ad903b9cbbd518111e6bf2754761",
+  "actualGitHead": "7fa29ad3ed10ad903b9cbbd518111e6bf2754761",
+  "timeoutMs": 3600000,
+  "runnerIdentity": "worker:646605",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "c1cb62b69521163c289e1cac8f546a1b591c8b3a6dc251903d4892bb27a21c2c",
+  "lifecycleId": "worker:646605:app-service-client-wiring-f6-test:1",
+  "outcome": "FAIL",
+  "claimedAt": "2026-08-15T19:10:38.428Z",
+  "startedAt": "2026-08-15T19:10:38.433Z",
+  "finishedAt": "2026-08-15T19:17:38.636Z",
+  "durationMs": 396759,
+  "exitCode": 1,
+  "stdout": {
+    "bytes": 1548,
+    "sha256": "d64ba4306e91a9c9e3b40614849ba356ca28b405800548de62a1b77a8f913d16",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\"],\"cwd\":\"/home/codex/repos/netscript-007-features-1355\",\"exitCode\":1,\"durationMs\":396601,\"summary\":{\"passed\":4228,\"failed\":1,\"ignored\":19,\"totalResults\":4248,\"uniqueFailures\":1},\"failures\":[{\"message\":\"PermissionDenied: Permission denied (os error 13): readdir '<cwd>//.llm/tmp/cli-e2e/plugin-smoke-20260815-203755/.data/postgres/18/docker'\\n    at async getRid (ext:deno_fs/30_fs.js:<line>:<column>)\\n    at async Object.next (ext:deno_fs/30_fs.js:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\\n    at async walk (file://<cwd>/.llm/tools/agentic/teardown/forbidden-commands_test.ts:<line>:<column>)\",\"count\":1,\"tests\":[{\"name\":\"repository contains no shared-host bulk teardown command\",\"file\":\"./.llm/tools/agentic/teardown/forbidden-commands_test.ts\",\"line\":14}]}]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 101,
+    "sha256": "5ae7e9d1dade1dc447e471529cd4f870e6b8391091eb2b26d56244ed895c3917",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all\n",
+    "truncated": false
+  }
+}

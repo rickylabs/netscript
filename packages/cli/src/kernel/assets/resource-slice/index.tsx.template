@@ -1,0 +1,25 @@
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+import { {{resourcePascalCase}}Layout } from './index.layout.tsx';
+import { {{resourcePascalCase}}View } from './(_components)/{{resource}}-view.tsx';
+import { load{{resourcePascalCase}}Resource } from './(_shared)/{{resource}}-loaders.ts';
+{{pageOptionImports}}
+export const {{resourceCamelCase}}Page = definePage()
+  .withRoute(appRoutes.{{routeAlias}})
+  .withResource('{{resourceCamelCase}}', () => load{{resourcePascalCase}}Resource())
+  .withMeta(() => ({
+    title: '{{resourcePascalCase}} resource',
+    description: 'Cache-first {{resource}} resource generated from {{queryFactory}}.',
+  }))
+  .withLayer('{{resourceCamelCase}}', {{resourcePascalCase}}View, {
+    loader: ({ resources }) => resources.{{resourceCamelCase}},
+  })
+{{pageOptionLayers}}  .withLayout((slots) => (
+    <{{resourcePascalCase}}Layout
+      resource={slots.{{resourceCamelCase}}()}
+{{pageLayoutProps}}    />
+  ))
+  .build();
+
+export const { default: page } = {{resourceCamelCase}}Page;
+export { page as default };

@@ -1,0 +1,37 @@
+{
+  "gateId": "test",
+  "invocationId": "1906-s2-s3-policy-green",
+  "argv": [
+    "deno",
+    "task",
+    "test",
+    ".llm/tools/validation/check-aspire-resource-polling_test.ts"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1906",
+  "gitHead": "0f4588e15467a277ffc41ea01a3127560a88d54c",
+  "actualGitHead": "0f4588e15467a277ffc41ea01a3127560a88d54c",
+  "timeoutMs": 120000,
+  "runnerIdentity": "worker:3288522",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "06f539855087646d35bcfcb7aac1db95cc3229db0dfb6f1597c5d5653eff614c",
+  "lifecycleId": "worker:3288522:1906-s2-s3-policy-green:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T00:57:49.466Z",
+  "startedAt": "2026-09-03T00:57:49.467Z",
+  "finishedAt": "2026-09-03T00:57:49.719Z",
+  "durationMs": 251,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 328,
+    "sha256": "89bee36d1a1f4959bb4fd18421b7adbc43d968638267fc92c784525a70d4dc48",
+    "tail": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\".llm/tools/validation/check-aspire-resource-polling_test.ts\"],\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1906\",\"exitCode\":0,\"durationMs\":133,\"summary\":{\"passed\":4,\"failed\":0,\"ignored\":0,\"totalResults\":4,\"uniqueFailures\":0},\"failures\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 163,
+    "sha256": "f98a550f9a1bd6c8b09f398cea86d97f54ef1171afc1007e278a4caa1d3553fb",
+    "tail": "Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all '.llm/tools/validation/check-aspire-resource-polling_test.ts'\n",
+    "truncated": false
+  }
+}

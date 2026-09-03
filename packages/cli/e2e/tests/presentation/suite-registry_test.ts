@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import {
   DEPLOY,
   GATE,
@@ -36,6 +36,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     DEPLOY.TARGETS,
     DEPLOY.DESKTOP_NATIVE,
     QUICKSTART.WALK,
+    QUICKSTART.README,
   ]);
 });
 
@@ -56,8 +57,11 @@ Deno.test('capability suites select only their scoped gates', () => {
   assertEquals(service.gates.map((gate) => gate.id), [
     GATE.PREFLIGHT_DENO,
     GATE.SCAFFOLD_INIT,
+    GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+    GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
     GATE.SERVICE_LIST,
     GATE.DATABASE_CODEGEN,
+    GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
     GATE.GENERATED_SERVICE_CHECK,
   ]);
 });
@@ -121,6 +125,16 @@ Deno.test('true userland suite runs init, four no-samples plugin installs, asser
 Deno.test('runtime suite includes full scaffold, database, runtime, and behavior gates', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_INIT), true);
+  const serviceClientOrder = [
+    GATE.SCAFFOLD_INIT,
+    GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+    GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
+    GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
+  ].map((id) => runtime.gates.findIndex((gate) => gate.id === id));
+  assertEquals(
+    serviceClientOrder,
+    [...serviceClientOrder].sort((left, right) => left - right),
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_INIT), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
@@ -216,6 +230,11 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_READY), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_SESSION), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AI_CHAT_ROUTE), true);
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH) <
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_UI_RENDER), true);
   assertEquals(
     runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP),
@@ -230,6 +249,18 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
+  const resourceCommandIndex = runtime.gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_RESOURCE_COMMAND
+  );
+  assertEquals(
+    resourceCommandIndex >
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES),
+    true,
+  );
+  assertEquals(
+    resourceCommandIndex < runtime.gates.findIndex((gate) => gate.id === GATE.CLEANUP_ASPIRE_STOP),
+    true,
+  );
 });
 
 Deno.test('runtime suites execute the formerly deferred #1398 OTEL gates', () => {
@@ -255,6 +286,7 @@ Deno.test('every registered suite pins its exact deferred-gate set and owning is
     [DEPLOY.TARGETS]: [],
     [DEPLOY.DESKTOP_NATIVE]: [],
     [QUICKSTART.WALK]: [],
+    [QUICKSTART.README]: [],
   } satisfies Record<SuiteId, readonly DeferredGate[]>;
 
   assertEquals(
@@ -280,6 +312,39 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_DYNAMIC_ROUTE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
+    true,
+  );
+  assertEquals(
+    resolveSuite(SCAFFOLD.RUNTIME_SQLITE).gates.some((gate) =>
+      gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+    ),
+    true,
+  );
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const ids = resolveSuite(suiteId).gates.map((gate) => gate.id);
+    const servedSurfaceIndex = ids.indexOf(GATE.BEHAVIOR_ISLAND_SERVED_SURFACE);
+    const appReferenceIndex = ids.indexOf(GATE.BEHAVIOR_APP_REFERENCE);
+    assertEquals(
+      ids.slice(servedSurfaceIndex, servedSurfaceIndex + 3),
+      [
+        GATE.BEHAVIOR_ISLAND_SERVED_SURFACE,
+        GATE.BEHAVIOR_ISLAND_HYDRATION,
+        GATE.BEHAVIOR_SERVICE_CLIENT_REFETCH,
+      ],
+      `${suiteId} must discriminate served surface and hydration before refetch`,
+    );
+    assertEquals(
+      servedSurfaceIndex,
+      appReferenceIndex + 1,
+      `${suiteId} must run the island/refetch trio immediately after app reference`,
+    );
+  }
+  assert(
+    runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT) <
+      runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE),
+  );
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
@@ -320,8 +385,13 @@ Deno.test('runtime DB mutations run only after the resident AppHost starts', () 
   }
   const seedIndex = gates.findIndex((gate) => gate.id === GATE.DATABASE_SEED);
   const restartIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB);
+  const secondAllocationIndex = gates.findIndex((gate) =>
+    gate.id === GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND
+  );
+  const refreshIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_DESCRIBE);
   const waitIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES);
-  assertEquals(seedIndex < restartIndex && restartIndex < waitIndex, true);
+  assertEquals(seedIndex < restartIndex && restartIndex < secondAllocationIndex, true);
+  assertEquals(secondAllocationIndex < refreshIndex && refreshIndex < waitIndex, true);
 });
 
 Deno.test('runtime suite omits database resource wait for sqlite', () => {
@@ -476,6 +546,18 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
   assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
 
   const runtimeGateIds = cases[0][0].gates.map((gate) => gate.id);
+  for (const [suite] of cases) {
+    const gateIds = suite.gates.map((gate) => gate.id);
+    const smokeIndex = gateIds.indexOf(GATE.AGENT_ASPIRE_MCP_SMOKE);
+    assertEquals(
+      gateIds.indexOf(GATE.SCAFFOLD_AGENT_INIT) > gateIds.indexOf(GATE.SCAFFOLD_INIT),
+      true,
+      suite.id,
+    );
+    assertEquals(smokeIndex > gateIds.indexOf(GATE.RUNTIME_WAIT_APP), true, suite.id);
+    assertEquals(smokeIndex > gateIds.indexOf(GATE.RUNTIME_ASPIRE_DESCRIBE), true, suite.id);
+    assertEquals(smokeIndex < gateIds.indexOf(GATE.CLEANUP_ASPIRE_STOP), true, suite.id);
+  }
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
@@ -590,6 +672,7 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
       samples: false,
     }],
     [QUICKSTART.WALK, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
+    [QUICKSTART.README, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
   ]);
 
   for (const suite of builtInSuites) {

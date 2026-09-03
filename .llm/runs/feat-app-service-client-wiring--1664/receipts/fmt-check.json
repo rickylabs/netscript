@@ -1,0 +1,42 @@
+{
+  "gateId": "fmt-check",
+  "invocationId": "1664-stale-expectations-fmt-final-2",
+  "argv": [
+    "deno",
+    "task",
+    "fmt:check",
+    "--include",
+    "^packages/cli/(src/public/features/ui/add/add-ui-command_test\\.ts|e2e/tests/presentation/suite-registry_test\\.ts)$",
+    "--exclude",
+    "^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)",
+    "--config",
+    ".llm/tmp/1664-lint-deno.json"
+  ],
+  "cwd": "/home/agent/projects/netscript/worktrees/007-leaf-1664",
+  "gitHead": "b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9",
+  "actualGitHead": "b37b023fbf8f54937c7cbeea778a4e59bd9fa8e9",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2489523",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "6e6b5c97e8069dd983df93b00424b7b8bf938301d3067c75dd95583c061cd9c1",
+  "lifecycleId": "worker:2489523:1664-stale-expectations-fmt-final-2:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-08-31T14:57:45.887Z",
+  "startedAt": "2026-08-31T14:57:45.889Z",
+  "finishedAt": "2026-08-31T14:57:46.428Z",
+  "durationMs": 539,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 298,
+    "sha256": "f11b3bd2b66f1858d0db7966bda9f5947985a5ca62c64c0d8ce9396f25a502bb",
+    "tail": "{\"command\":\"deno fmt --check\",\"cwd\":\"/home/agent/projects/netscript/worktrees/007-leaf-1664\",\"mode\":\"check\",\"summary\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":0,\"findings\":0,\"ignoredFindings\":0},\"coverage\":{\"filesSelected\":2,\"filesProcessed\":2,\"droppedFiles\":[],\"refusals\":[]},\"findings\":[]}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 464,
+    "sha256": "4f108d7676c9e81503779b297cf99fbbbd02969d2e316539856ea86cad38218d",
+    "tail": "Task fmt:check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings '--include' '^packages/cli/(src/public/features/ui/add/add-ui-command_test\\.ts|e2e/tests/presentation/suite-registry_test\\.ts)$' '--exclude' '^(.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)' '--config' '.llm/tmp/1664-lint-deno.json'\n",
+    "truncated": false
+  }
+}

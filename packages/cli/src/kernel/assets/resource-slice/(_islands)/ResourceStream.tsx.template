@@ -1,0 +1,26 @@
+import { useSignal } from '@preact/signals';
+import { useEffect } from 'preact/hooks';
+import { createNetScriptStreamEventSourceV1 } from '@netscript/fresh/streams';
+
+export default function {{resourcePascalCase}}Stream() {
+  const status = useSignal('Connecting to {{resource}}…');
+
+  useEffect(() => {
+    const stream = createNetScriptStreamEventSourceV1({
+      streamPath: '{{route}}',
+      offset: '-1',
+      onEvent: (event) => {
+        status.value = `{{resourcePascalCase}} stream: ${event.event}`;
+      },
+    });
+    return () => stream.dispose();
+  }, []);
+
+  return (
+    <section id='{{resource}}-stream'>
+      <output class='block rounded-xl border border-ns-border px-4 py-3 text-sm'>
+        {status.value}
+      </output>
+    </section>
+  );
+}

@@ -1,4 +1,5 @@
 import type { ProcessPort } from '../../../ports/process-port.ts';
+import { DenoGeneratedSourceFormatter } from '../../../adapters/runtime/process/deno-generated-source-formatter.ts';
 
 /** Format an exact set of generated TypeScript files as part of their owning mutation. */
 export async function formatGeneratedFiles(
@@ -12,10 +13,10 @@ export async function formatGeneratedFiles(
     if (await exists(file)) existingFiles.push(file);
   }
   if (existingFiles.length === 0) return;
-  const result = await process.exec(
-    'deno',
-    ['fmt', '--no-config', '--line-width', '100', '--single-quote', ...existingFiles],
-    { cwd: projectRoot },
+  const result = await new DenoGeneratedSourceFormatter(process).formatFiles(
+    projectRoot,
+    existingFiles,
+    'generated',
   );
   if (result.code !== 0) {
     const detail = result.stderr.trim() || result.stdout.trim() || `exit ${result.code}`;

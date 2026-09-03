@@ -3,6 +3,7 @@ import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
+import { generatedAppName } from './runtime/generated-app-name.ts';
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
 
@@ -17,10 +18,32 @@ export function createPreflightGates(): readonly GateDefinition[] {
       GATE_PHASE.PREFLIGHT,
       () => ['deno', '--version'],
     ),
-    commandGate(GATE.PREFLIGHT_ASPIRE, 'Aspire CLI is available', GATE_PHASE.PREFLIGHT, () => [
-      'aspire',
-      '--version',
-    ]),
+    commandGate(
+      GATE.PREFLIGHT_ASPIRE,
+      'Aspire CLI doctor is healthy',
+      GATE_PHASE.PREFLIGHT,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '--allow-run=git,deno',
+        `${context.project.repoRoot}/.llm/tools/gates/run-gate.ts`,
+        '--gate',
+        'cli-e2e-aspire-doctor',
+        '--id',
+        `${context.request.suiteId}:preflight.aspire`,
+        '--output',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/preflight.aspire.receipt.json`,
+        '--cwd',
+        context.project.repoRoot,
+        '--child-report',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/preflight.aspire.json`,
+        '--',
+        `${context.project.repoRoot}/.llm/tmp/gate-receipts/${context.request.suiteId}/preflight.aspire.json`,
+      ],
+    ),
   ];
 }
 
@@ -69,6 +92,51 @@ export function createScaffoldGates(state: PluginSuiteState): readonly GateDefin
       'Scaffold generated project',
       GATE_PHASE.SCAFFOLD,
       scaffoldInitCommand,
+    ),
+    commandGate(
+      GATE.SCAFFOLD_SERVICE_CLIENT_ADD,
+      'Add a second service with typed client helpers',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        cli(
+          context,
+          'service',
+          'add',
+          '--name',
+          'payments',
+          '--with-client',
+          '--project-root',
+          context.project.projectRoot,
+        ),
+    ),
+    commandGate(
+      GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE,
+      'Reconcile service client and Aspire output',
+      GATE_PHASE.SCAFFOLD,
+      (context) =>
+        cli(context, 'service', 'generate', '--project-root', context.project.projectRoot),
+    ),
+    commandGate(
+      GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
+      'Prove idempotent two-service client and cache-key output',
+      GATE_PHASE.SCAFFOLD,
+      (context) => [
+        'deno',
+        'run',
+        '-A',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts`,
+        'static',
+        context.project.projectRoot,
+        generatedAppName(context),
+        JSON.stringify(cli(context)),
+      ],
+    ),
+    commandGate(
+      GATE.SCAFFOLD_AGENT_INIT,
+      'Install generated Claude agent integration',
+      GATE_PHASE.SCAFFOLD,
+      (context) => cli(context, 'agent', 'init', '--host', 'claude'),
+      (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.SERVICE_LIST,

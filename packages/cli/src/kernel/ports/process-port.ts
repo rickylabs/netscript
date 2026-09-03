@@ -30,6 +30,8 @@ export interface ProcessPort {
       readonly clearEnv?: boolean;
       /** Maximum runtime before the adapter kills and awaits the child. */
       readonly timeoutMs?: number;
+      /** Text written completely to the child's standard input before it is closed. */
+      readonly stdin?: string;
     },
   ): Promise<ProcessResult>;
 }

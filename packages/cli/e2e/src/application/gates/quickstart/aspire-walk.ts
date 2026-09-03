@@ -26,9 +26,13 @@ export type AspireCommandRunner = (
   command: readonly string[],
   cwd: string,
   timeoutMs: number,
+  env?: Record<string, string>,
 ) => Promise<AspireCommandResult>;
 
-/** Execute restore, start, and database readiness as one independently reported Quickstart step. */
+/**
+ * Execute restore, start, and initial database readiness as one independently reported step.
+ * `timeoutMs` is a test-failure ceiling for hung commands, not an expected Aspire duration.
+ */
 export async function runBoundedAspireWalk(
   appHost: string,
   projectRoot: string,
@@ -95,10 +99,11 @@ async function requireAspireSuccess(
   if (result.stdout) console.info(result.stdout);
 }
 
-async function runAspireCommand(
+export async function runAspireCommand(
   command: readonly string[],
   cwd: string,
   timeoutMs: number,
+  env?: Record<string, string>,
 ): Promise<AspireCommandResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -107,6 +112,7 @@ async function runAspireCommand(
     const output = await new Deno.Command(executable, {
       args,
       cwd,
+      env,
       stdout: 'piped',
       stderr: 'piped',
       signal: controller.signal,

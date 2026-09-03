@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertEquals, assertStringIncludes, assertThrows } from '@std/assert';
 
 import { ASPIRE_RESOURCE, GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import { DATABASE, PACKAGE_SOURCE, REPORT_FORMAT } from '../../../src/domain/extension-axes.ts';
@@ -11,8 +11,11 @@ import {
 } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { assertOwnedListenerFaultExpectation } from '../../../src/application/gates/scaffold/runtime/listener-unreachable-fixture.ts';
 import {
+  formatListenerReadinessDeadline,
   listenerReadinessFailure,
+  readAspireLogLines,
   readListenerHealthReport,
+  readListenerReadinessSnapshot,
 } from '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts';
 
 Deno.test('listener readiness maps database and RESP resources to stable report keys', () => {
@@ -102,6 +105,96 @@ Deno.test('published unhealthy listener report retains actionable diagnostic det
   );
 });
 
+Deno.test('deadline snapshot distinguishes an unmatched resource', () => {
+  const snapshot = readListenerReadinessSnapshot({ resources: [] }, 'postgres');
+
+  assertEquals(snapshot, {
+    resourceName: 'postgres',
+    match: 'not-found',
+    healthReports: [],
+  });
+  const message = formatListenerReadinessDeadline(
+    snapshot,
+    'postgres_listener',
+    300,
+    [],
+  );
+  assertStringIncludes(message, 'resource postgres was not matched');
+  assertStringIncludes(message, 'matched=false');
+  assertStringIncludes(message, 'published health reports=none');
+});
+
+Deno.test('deadline snapshot names a non-Running resource and every published health status', () => {
+  const snapshot = readListenerReadinessSnapshot({
+    resources: [{
+      name: 'postgres-a1b2c3',
+      displayName: 'postgres',
+      state: 'Starting',
+      healthStatus: 'Unhealthy',
+      healthReports: {
+        postgres_listener: { status: 'Unhealthy' },
+        container_lifecycle: { status: 'Healthy' },
+      },
+    }],
+  }, 'postgres');
+
+  const message = formatListenerReadinessDeadline(
+    snapshot,
+    'postgres_listener',
+    300,
+    ['waiting for dependency'],
+  );
+  assertStringIncludes(message, 'resource postgres not Running (state=Starting)');
+  assertStringIncludes(message, 'matched=true');
+  assertStringIncludes(message, 'healthStatus=Unhealthy');
+  assertStringIncludes(
+    message,
+    'published health reports=container_lifecycle=Healthy, postgres_listener=Unhealthy',
+  );
+  assertStringIncludes(message, 'aspire logs (last 20 lines):\nwaiting for dependency');
+});
+
+Deno.test('deadline snapshot names a Running resource whose key was never published', () => {
+  const snapshot = readListenerReadinessSnapshot({
+    resources: [{
+      displayName: 'postgres',
+      state: 'Running',
+      healthStatus: 'Healthy',
+      healthReports: { container_lifecycle: { status: 'Healthy' } },
+    }],
+  }, 'postgres');
+
+  const message = formatListenerReadinessDeadline(
+    snapshot,
+    'postgres_listener',
+    300,
+    ['postgres started', 'accepting connections'],
+  );
+  assertStringIncludes(
+    message,
+    'resource postgres Running but health key postgres_listener was never published',
+  );
+  assertStringIncludes(message, 'published health reports=container_lifecycle=Healthy');
+  assertStringIncludes(message, 'readiness deadline 300s elapsed');
+});
+
+Deno.test('Aspire JSON and NDJSON log output retain the final content lines', () => {
+  assertEquals(
+    readAspireLogLines(JSON.stringify([
+      { resourceName: 'postgres', content: 'line one\nline two', isError: false },
+      { resourceName: 'postgres', content: 'failure', isError: true },
+    ])),
+    ['line one', 'line two', '[stderr] failure'],
+  );
+  assertEquals(
+    readAspireLogLines(
+      '{"resourceName":"postgres","content":"ready","isError":false}\n' +
+        '{"resourceName":"postgres","content":"warn","isError":true}',
+    ),
+    ['ready', '[stderr] warn'],
+  );
+});
+
 Deno.test('listener wait command verifies the named report after Aspire wait', () => {
   const expectation = listenerReadinessExpectation(ASPIRE_RESOURCE.POSTGRES);
   if (!expectation) throw new Error('Postgres listener readiness expectation is missing.');
@@ -162,7 +255,7 @@ Deno.test('failure/recovery gate owns exactly the synthetic Postgres and Garnet 
     'run',
     '--allow-read',
     '--allow-write',
-    '--allow-run=aspire',
+    '--allow-run=aspire,docker',
   ]);
   assertEquals(
     command.at(-4),
@@ -203,3 +296,32 @@ function runContext(): RunContext {
     },
   };
 }
+
+Deno.test('an unpublished health report is absent, not an error', async () => {
+  // Hosted regression: run 33629394228 failed at `runtime.health.listener-unreachable` with
+  // "resource postgres health key postgres_listener was never published" after only 56 gates.
+  // The wait loop used the throwing reader, so a report that had not appeared *yet* was fatal on
+  // the first poll — inside a loop written to wait for that very report to change.
+  const { findListenerHealthReport, readListenerHealthReport } = await import(
+    '../../../src/application/gates/scaffold/runtime/verify-listener-readiness.ts'
+  );
+  const topology = { resources: [{ name: 'postgres', healthReports: {} }] };
+
+  assertEquals(findListenerHealthReport(topology, 'postgres', 'postgres_listener'), undefined);
+  assertThrows(
+    () => readListenerHealthReport(topology, 'postgres', 'postgres_listener'),
+    Error,
+    'was never published',
+  );
+
+  const published = {
+    resources: [{
+      name: 'postgres',
+      healthReports: { postgres_listener: { status: 'Unhealthy', description: 'ECONNREFUSED' } },
+    }],
+  };
+  assertEquals(
+    findListenerHealthReport(published, 'postgres', 'postgres_listener')?.status,
+    'Unhealthy',
+  );
+});

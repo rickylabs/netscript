@@ -14,11 +14,13 @@ export const SCAFFOLD = {
 /** Documentation-walk suites. */
 export const QUICKSTART = {
   WALK: 'quickstart.walk',
+  README: 'readme.quickstart',
 } as const;
 
 /** Stable titles for documentation-walk suites. */
 export const QUICKSTART_TITLE = {
   WALK: 'Published CLI Quickstart walk',
+  README: 'Root README Quickstart walk',
 } as const;
 
 /** Suite ids that require exclusive access to the expensive runtime path. */
@@ -26,6 +28,7 @@ export const EXPENSIVE_RUNTIME_SUITE_IDS = [
   SCAFFOLD.RUNTIME,
   SCAFFOLD.RUNTIME_SQLITE,
   QUICKSTART.WALK,
+  QUICKSTART.README,
 ] as const;
 
 /** Stable titles for built-in suites. */
@@ -61,11 +64,17 @@ export const GATE_PHASE = {
   CLEANUP: 'cleanup',
 } as const;
 
+/** Stable receipt gate id for the generated Aspire MCP server. */
+export const AGENT_ASPIRE_MCP_SMOKE = 'agent.aspire-mcp-smoke';
+
 /** Static gate ids used by the scaffold plugin suite. */
 export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
   SCAFFOLD_INIT: 'scaffold.init',
+  SCAFFOLD_SERVICE_CLIENT_ADD: 'scaffold.service-client-add',
+  SCAFFOLD_SERVICE_CLIENT_GENERATE: 'scaffold.service-client-generate',
+  SCAFFOLD_AGENT_INIT: 'scaffold.agent-init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
   CONTRACT_LIST: 'contract.list',
@@ -85,6 +94,7 @@ export const GATE = {
   DATABASE_GENERATE: 'database.generate',
   DATABASE_SEED: 'database.seed',
   GENERATED_SERVICE_CHECK: 'generated.service-check',
+  GENERATED_SERVICE_CLIENT_CONTRACT: 'generated.service-client-contract',
   GENERATED_CONTRACTS_CHECK: 'generated.contracts-check',
   GENERATED_INFRASTRUCTURE_CHECK: 'generated.infrastructure-check',
   GENERATED_RUNTIME_SCHEMAS: 'generated.runtime-schemas',
@@ -126,10 +136,14 @@ export const GATE = {
   RUNTIME_WAIT_STREAMS: 'runtime.wait.streams',
   RUNTIME_WAIT_APP: 'runtime.wait.app',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
+  RUNTIME_RESOURCE_COMMAND: 'runtime.resource-command',
+  AGENT_ASPIRE_MCP_SMOKE,
   RUNTIME_HEALTH_LISTENER_UNREACHABLE: 'runtime.health.listener-unreachable',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
   BEHAVIOR_APP_DYNAMIC_ROUTE: 'behavior.app-dynamic-route',
   BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
+  BEHAVIOR_ISLAND_SERVED_SURFACE: 'behavior.island-served-surface',
+  BEHAVIOR_ISLAND_HYDRATION: 'behavior.island-hydration',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
@@ -138,6 +152,7 @@ export const GATE = {
   BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB: 'behavior.workers-trigger-health-job',
   BEHAVIOR_WORKERS_EXECUTIONS: 'behavior.workers-executions',
   BEHAVIOR_SERVICE_HEALTH: 'behavior.service-health',
+  BEHAVIOR_SERVICE_CLIENT_REFETCH: 'behavior.service-client-refetch',
   BEHAVIOR_SERVICE_ENV: 'behavior.service-env',
   BEHAVIOR_LIVE_DB_ENDPOINT: 'behavior.live-db-endpoint',
   BEHAVIOR_MCP_ENDPOINT_DIRECTORY: 'behavior.mcp-endpoint-directory',
@@ -180,6 +195,17 @@ export const GATE = {
   QUICKSTART_DATABASE_INTEGRITY: 'quickstart.pgdata-integrity-after-teardown',
   QUICKSTART_CHECK: 'quickstart.6-project-check',
   QUICKSTART_SERVICE_RESPONSE: 'quickstart.7-service-response',
+  README_QUICKSTART_INSTALL: 'readme.quickstart.01-install-cli',
+  README_QUICKSTART_INIT: 'readme.quickstart.02-init-workspace',
+  README_QUICKSTART_CD_ASPIRE: 'readme.quickstart.03-cd-aspire',
+  README_QUICKSTART_ASPIRE_RESTORE: 'readme.quickstart.04-aspire-restore',
+  README_QUICKSTART_ASPIRE_START: 'readme.quickstart.05-aspire-start',
+  README_QUICKSTART_ASPIRE_WAIT: 'readme.quickstart.06-aspire-wait-postgres',
+  README_QUICKSTART_CD_ROOT: 'readme.quickstart.07-cd-root',
+  README_QUICKSTART_DB_INIT: 'readme.quickstart.08-db-init',
+  README_QUICKSTART_DB_GENERATE: 'readme.quickstart.09-db-generate',
+  README_QUICKSTART_DB_SEED: 'readme.quickstart.10-db-seed',
+  README_QUICKSTART_CURL_HEALTH: 'readme.quickstart.11-curl-health',
 } as const;
 
 /** Generated Aspire resource ids waited on by the scaffold plugin suite. */

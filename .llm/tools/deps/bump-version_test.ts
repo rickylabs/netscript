@@ -125,6 +125,60 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
   }
 });
 
+Deno.test('coordinated bump discovers and rewrites only the two tracked dogfood version surfaces', async () => {
+  const temp = await Deno.makeTempDir({ prefix: 'netscript-dogfood-version-bump-' });
+  try {
+    await Deno.mkdir(`${temp}/packages/example`, { recursive: true });
+    await Deno.mkdir(`${temp}/.agents/generated/consumer-skills/.llm/tools`, { recursive: true });
+    await Deno.writeTextFile(
+      `${temp}/deno.json`,
+      JSON.stringify({ version: '1.2.3', workspace: ['packages/*'], publish: false }) + '\n',
+    );
+    await Deno.writeTextFile(
+      `${temp}/packages/example/deno.json`,
+      JSON.stringify({ name: '@netscript/example', version: '1.2.3' }) + '\n',
+    );
+    const generatedFiles = [
+      '.agents/generated/consumer-skills/.llm/tools/release.json',
+      '.agents/generated/consumer-skills/.mcp.json',
+    ];
+    for (const relativePath of generatedFiles) {
+      await Deno.writeTextFile(
+        `${temp}/${relativePath}`,
+        JSON.stringify({ cli: 'jsr:@netscript/cli@1.2.3' }) + '\n',
+      );
+    }
+    const unrelated = '.agents/generated/consumer-skills/unrelated.json';
+    await Deno.writeTextFile(
+      `${temp}/${unrelated}`,
+      JSON.stringify({ cli: 'jsr:@netscript/cli@1.2.3' }) + '\n',
+    );
+    assertEquals((await run('git', ['init'], temp)).code, 0);
+    assertEquals((await run('git', ['add', ...generatedFiles, unrelated], temp)).code, 0);
+
+    const {
+      coordinateVersionBump,
+      discoverVersionFiles,
+      GENERATED_CONSUMER_VERSION_FILES,
+    } = await import('./bump-version.ts');
+    assertEquals(GENERATED_CONSUMER_VERSION_FILES, generatedFiles);
+    const discovered = await discoverVersionFiles(temp);
+    for (const relativePath of generatedFiles) {
+      assertEquals(discovered.includes(`${temp}/${relativePath}`), true);
+    }
+    assertEquals(discovered.includes(`${temp}/${unrelated}`), false);
+
+    const bump = await coordinateVersionBump(temp, '1.3.0');
+    for (const relativePath of generatedFiles) {
+      assertEquals(bump.files.includes(`${temp}/${relativePath}`), true);
+      assertStringIncludes(await Deno.readTextFile(`${temp}/${relativePath}`), '@1.3.0');
+    }
+    assertStringIncludes(await Deno.readTextFile(`${temp}/${unrelated}`), '@1.2.3');
+  } finally {
+    await Deno.remove(temp, { recursive: true });
+  }
+});
+
 for (
   const [name, newVersion] of [
     ['stable', '1.3.0'],

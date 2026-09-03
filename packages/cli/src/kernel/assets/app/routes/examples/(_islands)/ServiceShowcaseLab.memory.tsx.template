@@ -58,6 +58,7 @@ function ServiceShowcaseLabInner(props: Props) {
   } = useQuery({
     ...{{serviceName | camelCase}}Queries.list.queryOptions(props.input),
     initialData: props.initialList,
+    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 

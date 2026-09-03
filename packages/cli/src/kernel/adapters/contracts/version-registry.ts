@@ -10,6 +10,7 @@ import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ContractVersion } from './types.ts';
 import { generateVersionMod } from './templates/contract-template-registry.ts';
+import type { GeneratedSourceFormatterPort } from '../../ports/generated-source-formatter-port.ts';
 
 /** Generate a version aggregate from explicit service names. */
 export function generateVersionAggregate(
@@ -22,7 +23,10 @@ export function generateVersionAggregate(
 /** Manage version aggregate modules under `contracts/versions/`. */
 export class ContractVersionRegistry {
   /** Create a new registry. */
-  constructor(private readonly fs: FileSystemPort) {}
+  constructor(
+    private readonly fs: FileSystemPort,
+    private readonly formatter?: GeneratedSourceFormatterPort,
+  ) {}
 
   /**
    * Discover service contract names in a version directory.
@@ -53,7 +57,10 @@ export class ContractVersionRegistry {
     const serviceNames = await this.discoverServiceNames(versionDir);
     const content = generateVersionAggregate(version, serviceNames);
     const modPath = join(versionDir, SCAFFOLD_FILES.MOD);
-    await this.fs.writeFile(modPath, content);
+    const canonicalContent = this.formatter
+      ? await this.formatter.formatContent(modPath, content)
+      : content;
+    await this.fs.writeFile(modPath, canonicalContent);
     return modPath;
   }
 
@@ -69,7 +76,11 @@ export class ContractVersionRegistry {
       .map((version) => `export * from './versions/${version}/mod.ts';`)
       .join('\n');
     const modPath = join(contractsRoot, SCAFFOLD_FILES.MOD);
-    await this.fs.writeFile(modPath, `${content}\n`);
+    const rendered = `${content}\n`;
+    const canonicalContent = this.formatter
+      ? await this.formatter.formatContent(modPath, rendered)
+      : rendered;
+    await this.fs.writeFile(modPath, canonicalContent);
     return modPath;
   }
 }

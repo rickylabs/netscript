@@ -50,7 +50,7 @@ Deno.test('listener fault splice attaches test-only checks at generator-derived 
     const injected = injectListenerFaultHealthChecks(source);
     assertStringIncludes(
       injected,
-      `builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createListenerReadinessCheck({ kind: 'tcp', host: 'localhost', port: 18998 }));`,
+      `builder.addHealthCheck('${TEST_ONLY_POSTGRES_HEALTH_KEY}', createEndpointListenerReadinessCheck({ kind: 'tcp', endpoint: () => Promise.resolve({ host: () => Promise.resolve('localhost'), port: () => Promise.resolve(18998) }) }));`,
     );
     assertStringIncludes(
       injected,

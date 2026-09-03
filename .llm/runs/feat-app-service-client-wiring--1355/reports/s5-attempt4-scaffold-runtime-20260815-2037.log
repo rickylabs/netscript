@@ -1,0 +1,156 @@
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.runtime' '--cleanup' '--format' 'pretty'
+Running scaffold.runtime
+> preflight.deno: Deno CLI is available
+  PASSED 8ms
+> preflight.aspire: Aspire CLI is available
+  PASSED 73ms
+> scaffold.init: Scaffold generated project
+  PASSED 2087ms
+> scaffold.service-client-add: Add a second service with typed client helpers
+  PASSED 1564ms
+> scaffold.service-client-generate: Reconcile service client and Aspire output
+  PASSED 1555ms
+> scaffold.plugin.worker: Install official worker plugin
+  PASSED 1544ms
+> scaffold.plugin.saga: Install official saga plugin
+  PASSED 1190ms
+> scaffold.plugin.trigger: Install official trigger plugin
+  PASSED 1205ms
+> scaffold.plugin.stream: Install official stream plugin
+  PASSED 1085ms
+> scaffold.plugin.auth: Install official auth plugin
+  PASSED 1117ms
+> scaffold.plugin.ai: Install official ai plugin
+  PASSED 1168ms
+> scaffold.plugin.ai.mcp: Install official AI plugin with MCP skill tool
+  PASSED 1168ms
+> scaffold.plugin.ai.lifecycle: Add and self-wire an AI tool through the plugin CLI
+  PASSED 102ms
+> scaffold.plugin-list: List configured plugins
+  PASSED 2342ms
+> scaffold.plugin.ai.appsettings: Reject synthesized service configuration for the AI plugin
+  PASSED 502ms
+> scaffold.ui-add-ai: Install the Fresh UI AI collection
+  PASSED 482ms
+> scaffold.ui-local-source: Map the unpublished AI dependency to the local workspace member
+  PASSED 546ms
+> generated.runtime-schemas: Generate runtime schemas from all configured plugin modules
+  PASSED 1666ms
+> database.codegen: Generate database clients (standalone, no Aspire)
+  PASSED 6098ms
+> generated.service-client-contract: Prove idempotent two-service client and cache-key output
+  PASSED 5142ms
+> behavior.project-boundary-dev: Start the generated Fresh dev server below a hostile parent tsconfig
+  PASSED 31730ms
+> behavior.plugins-unhealthy: Reject missing workers and sagas registries
+  PASSED 2026ms
+> generated.plugins-check: Generate plugin registries from discovered manifests
+  PASSED 1744ms
+> generated.workers-registry: Compile workers registry through plugin CLI
+  PASSED 295ms
+> generated.sagas-registry: Generate sagas registry through plugin CLI
+  PASSED 123ms
+> behavior.plugin-doctor-missing-module: Reject a configured plugin whose module has been removed
+  PASSED 4085ms
+> runtime.aspire-restore: Restore Aspire TypeScript SDK
+  PASSED 11011ms
+> runtime.service-env-fixture: Declare service environment and regenerate on the consumer path
+  PASSED 2851ms
+> generated.quality-negative: Prove every generated quality surface with deliberate failures
+  PASSED 121318ms
+> generated.deno-check: Run the generated workspace type-check task
+  PASSED 5722ms
+> generated.deno-lint: Run the generated workspace lint task
+  PASSED 255ms
+> generated.deno-fmt-check: Run the generated workspace format-check task
+  PASSED 343ms
+> generated.ui-ai-check: Type-check copied Fresh UI AI files
+  PASSED 1569ms
+> generated.ai-namespace-check: Type-check the complete generated AI namespace
+  PASSED 5828ms
+> runtime.auth-smoke-env: Wire auth smoke environment
+  PASSED 3201ms
+> runtime.flow-b-fixture: Wire real Flow-B callback fixture
+  PASSED 2681ms
+> runtime.readiness-fixture: Wire dead-port readiness fixture
+  PASSED 119ms
+> runtime.aspire-start: Start generated Aspire AppHost
+  PASSED 25896ms
+> database.init: Initialize generated database
+  PASSED 27212ms
+> database.migration-artifacts: Create and verify headless and TTY migration artifacts
+  PASSED 47097ms
+> database.generate: Generate database clients
+  PASSED 13377ms
+> database.seed: Seed generated database
+  PASSED 6464ms
+> runtime.capture-db-allocation-first: Capture first live database allocation
+  PASSED 531ms
+> runtime.aspire-restart-after-db: Restart resident AppHost after database preparation
+  PASSED 38885ms
+> runtime.capture-db-allocation-second: Capture second live database allocation
+  PASSED 922ms
+> runtime.wait.postgres: Wait for postgres
+  PASSED 709ms
+> runtime.wait.garnet: Wait for garnet
+  PASSED 7901ms
+> runtime.wait.workers-api: Wait for workers-api
+  PASSED 7978ms
+> runtime.wait.workers: Wait for workers
+  PASSED 1258ms
+> runtime.wait.sagas-api: Wait for sagas-api
+  PASSED 686ms
+> runtime.wait.sagas: Wait for sagas
+  PASSED 605ms
+> runtime.wait.triggers-api: Wait for triggers-api
+  PASSED 592ms
+> runtime.wait.triggers: Wait for triggers
+  PASSED 622ms
+> runtime.wait.auth: Wait for auth
+  PASSED 751ms
+> runtime.wait.streams: Wait for streams
+  PASSED 653ms
+> runtime.wait.app: Wait for the project-derived Fresh app
+  PASSED 70243ms
+> runtime.aspire-describe: Describe generated topology
+  PASSED 470ms
+> behavior.db-status-preserves-apphost: DB status preserves resident AppHost identity
+  PASSED 18024ms
+> behavior.endpoint-readiness: Endpoint-bearing process requires readiness evidence
+  PASSED 1163ms
+> behavior.workers-health: Workers API health
+  PASSED 82ms
+> behavior.workers-jobs: List worker jobs
+  PASSED 127ms
+> behavior.workers-tasks: List worker tasks
+  PASSED 52ms
+> behavior.workers-seed: Seed worker demo data through API
+  PASSED 40ms
+> behavior.workers-trigger-health-job: Trigger workers plugin health job
+  PASSED 510ms
+> behavior.workers-executions: List recent worker executions
+  PASSED 341ms
+> behavior.mcp-endpoint-directory: Follow the documented MCP OpenAPI discovery path
+  PASSED 11834ms
+> behavior.service-health: Users service health
+  PASSED 31391ms
+> behavior.service-client-refetch: Prove settled users update invalidates and refetches its list once
+  FAILED 40602ms
+    Command exited 1; expected 0.
+    error: Uncaught (in promise) TypeError: Child process has already terminated
+        child.kill('SIGTERM');
+              ^
+        at ChildProcess.kill (ext:deno_process/40_process.js:1:7392)
+        at collectBrowserRefetchEvidence (file:///home/codex/repos/netscript-007-features-1355/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:211:11)
+        at async probeLiveServiceRefetch (file:///home/codex/repos/netscript-007-features-1355/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts:252:28)
+        at async file:///home/codex/repos/netscript-007-features-1355/packages/cli/e2e/src/application/gates/scaffold/service-client-runtime-probe.ts:347:5
+> cleanup.aspire-stop: Stop generated Aspire AppHost
+  PASSED 1946ms
+Summary: passed=69 failed=1 skipped=0
+error: Uncaught (in promise) RemoteError: CLI E2E suite failed
+      if (!report.ok) throw new RemoteError(1, 'CLI E2E suite failed');
+                            ^
+    at Command.<anonymous> (file:///home/codex/repos/netscript-007-features-1355/packages/cli/e2e/src/presentation/cli/commands/run-command.ts:37:29)
+    at async Command.execute (https://jsr.io/@cliffy/command/1.2.1/command.ts:2431:5)
+    at async Command.parseCommand (https://jsr.io/@cliffy/command/1.2.1/command.ts:2246:14)
+    at async file:///home/codex/repos/netscript-007-features-1355/packages/cli/e2e/cli.ts:12:3

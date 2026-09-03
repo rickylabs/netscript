@@ -54,6 +54,7 @@ import {
   appServiceSummaryCardTemplate,
   appServiceSummaryPanelTemplate,
   appServiceSummaryPartialTemplate,
+  appTelemetryExampleSharedTemplate,
   appUtilsTemplate,
   makeAdapter,
   SAMPLE_APP_VARS,
@@ -87,6 +88,25 @@ function assertUniqueDirectAppRouteTargets(source: string): void {
 }
 
 describe('app route template rendering', () => {
+  it('telemetry example resolves env then running AppHost and renders unavailable guidance', () => {
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      "import { AspirePsDashboardReader, resolveTelemetryEndpoint } from '@netscript/mcp';",
+    );
+    assertStringIncludes(appTelemetryExampleSharedTemplate, 'NETSCRIPT_TELEMETRY_ENDPOINT');
+    assertStringIncludes(appTelemetryExampleSharedTemplate, 'ASPIRE_DASHBOARD_PORT');
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      'resolved.httpsFallback ?? resolved.endpoint',
+    );
+    assertStringIncludes(appTelemetryExampleSharedTemplate, "source === 'default'");
+    assertStringIncludes(
+      appTelemetryExampleSharedTemplate,
+      'dashboard unavailable — run `aspire ps`',
+    );
+    assert(!appTelemetryExampleSharedTemplate.includes('18888'));
+  });
+
   it('router.ts mirrors the playground route entrypoint and adds the scaffold service ref', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appRouterTemplate, SAMPLE_APP_VARS);
@@ -418,23 +438,28 @@ describe('app route template rendering', () => {
     const output = await adapter.render(appExampleServiceQueryTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { createServiceClient } from '@netscript/sdk/client';");
     assertStringIncludes(output, "import { createQueryFactories } from '@netscript/sdk/query';");
-    assertStringIncludes(
-      output,
-      "import { bridgeInvalidation } from '@netscript/sdk/query-client';",
-    );
+    assert(!output.includes('bridgeInvalidation'));
+    const sdkImportSpecifiers = [...new Set(
+      [...output.matchAll(/from '(@netscript\/sdk\/[^']+)'/g)].map((match) => match[1]),
+    )].sort();
+    assertEquals(sdkImportSpecifiers, [
+      '@netscript/sdk/client',
+      '@netscript/sdk/query',
+    ]);
     assertStringIncludes(output, 'TeamMembersContractV1,');
     assertStringIncludes(output, "export const teamMembersName = 'team-members';");
     assertStringIncludes(output, "export const teamMembersRouterName = 'teamMembers';");
     assertStringIncludes(
       output,
-      'export const teamMembersListInvalidation = bridgeInvalidation(',
-    );
-    assertStringIncludes(
-      output,
       'export const teamMembersClient = createServiceClient<typeof teamMembersContract>({',
     );
     assertStringIncludes(output, 'routerName: teamMembersRouterName,');
-    assertStringIncludes(output, 'export const teamMembersQueries = createQueryFactories({');
+    const queries = 'export const teamMembersQueries = createQueryFactories({';
+    const invalidation =
+      'export const teamMembersListInvalidation = { queryKey: teamMembersQueries.list.clientKey() } as const;';
+    assertStringIncludes(output, queries);
+    assertStringIncludes(output, invalidation);
+    assert(output.indexOf(invalidation) > output.indexOf(queries));
   });
 
   it('resource-local route contract owns typed path and search state', async () => {
@@ -623,6 +648,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'teamMembersQueries.update.mutationOptions()');
     assertStringIncludes(output, 'teamMembersQueries.delete.mutationOptions()');
     assertStringIncludes(output, 'useQuery<ServiceListData>');
+    assertStringIncludes(output, 'initialDataUpdatedAt: props.cachedAt,');
     assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
     assertStringIncludes(output, 'createOptimisticListMutationCallbacks<ServiceListData');
     assertStringIncludes(output, 'the cached list rolled back');
@@ -639,6 +665,7 @@ describe('app route template rendering', () => {
     const island = await adapter.render(appServiceShowcaseMemoryIslandTemplate, SAMPLE_APP_VARS);
     const shared = await adapter.render(appServiceShowcaseMemorySharedTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(island, 'createOptimisticListMutationCallbacks<ServiceListData');
+    assertStringIncludes(island, 'initialDataUpdatedAt: props.cachedAt,');
     assertStringIncludes(island, 'the cached list rolled back');
     assertStringIncludes(island, "data-state='loading'");
     assertStringIncludes(island, "data-state='error'");

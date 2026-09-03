@@ -345,6 +345,27 @@ export function checkMutationMapColumns(cliReference: string): void {
   }
 }
 
+/**
+ * #863 gate 2 (#1880): the readiness contract must stay stated, not drift back to prose that
+ * implies a container log is evidence of reachability.
+ */
+export async function checkAspireReadinessContract(): Promise<void> {
+  const page = 'docs/site/reference/aspire/index.md';
+  const text = await read(page);
+  for (
+    const needle of [
+      '## Readiness contract',
+      'is this resource reachable at the',
+      'A container log is not the readiness authority',
+      'not disproof',
+      'aspire wait',
+      'healthReports',
+    ]
+  ) {
+    requireText(text, needle, page);
+  }
+}
+
 export async function runAccuracyCheck(): Promise<void> {
   const sagaPagePaths = [
     'docs/site/durable-workflows/sagas.md',
@@ -354,6 +375,7 @@ export async function runAccuracyCheck(): Promise<void> {
   ];
   const publicDocs = await Promise.all(sagaPagePaths.map((p) => read(p)));
   checkSagaVocabulary(publicDocs, sagaPagePaths);
+  await checkAspireReadinessContract();
 
   const [aspireExplanation, deployLocalAspire] = await Promise.all([
     read('docs/site/explanation/aspire.md'),

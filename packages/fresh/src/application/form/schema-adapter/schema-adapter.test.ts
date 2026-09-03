@@ -262,6 +262,8 @@ Deno.test('createZodAdapter getConstraints returns a conservative supported meta
 
   assertDeepEquals(age, {
     required: true,
+    min: 18,
+    max: 120,
   });
 
   assertDeepEquals(website, {
@@ -311,6 +313,63 @@ Deno.test('createZodAdapter getConstraints exposes array collection bounds', () 
     required: true,
     minItems: 1,
     maxItems: 3,
+  });
+});
+
+Deno.test('createZodAdapter getConstraints derives the complete Zod 4 control map', () => {
+  const adapter = createZodAdapter(
+    z.object({
+      email: z.string().min(3).max(120),
+      slug: z.string().regex(/^[a-z-]+$/),
+      homepage: z.string().url().optional(),
+      quantity: z.number().min(1).max(99).multipleOf(5),
+      tags: z.array(z.string().min(2)).min(1).max(4),
+    }),
+  );
+
+  assertDeepEquals(adapter.getConstraints(), {
+    email: {
+      required: true,
+      minLength: 3,
+      maxLength: 120,
+    },
+    slug: {
+      required: true,
+      pattern: '^[a-z-]+$',
+    },
+    homepage: {
+      required: false,
+      pattern: /^https?:\/\/[^\s/$.?#].[^\s]*$/i.source,
+    },
+    quantity: {
+      required: true,
+      min: 1,
+      max: 99,
+      step: 5,
+    },
+    tags: {
+      required: true,
+      minItems: 1,
+      maxItems: 4,
+    },
+    'tags[0]': {
+      required: true,
+      minLength: 2,
+    },
+  });
+});
+
+Deno.test('createZodAdapter omits exclusive number bounds from native constraints', () => {
+  const adapter = createZodAdapter(
+    z.object({
+      quantity: z.number().gt(1).lt(99),
+    }),
+  );
+
+  assertDeepEquals(adapter.getConstraints(), {
+    quantity: {
+      required: true,
+    },
   });
 });
 

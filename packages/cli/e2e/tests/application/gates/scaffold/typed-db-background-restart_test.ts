@@ -139,6 +139,14 @@ async function runRestartGate(
     await Deno.chmod(fakeAspire, 0o755);
     const logPath = join(root, 'aspire-invocations.log');
     const appHost = join(root, 'aspire', 'apphost.mts');
+    // The restart fallback runs ASPIRE_START_SCRIPT, which reads aspire.config.json beside the
+    // AppHost to force ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=false. Without this fixture the
+    // fallback dies on a missing file and both fallback cases fail for the wrong reason.
+    await Deno.mkdir(join(root, 'aspire'), { recursive: true });
+    await Deno.writeTextFile(
+      join(root, 'aspire', 'aspire.config.json'),
+      `${JSON.stringify({ profiles: { https: { environmentVariables: {} } } }, null, 2)}\n`,
+    );
 
     const gate = createRuntimeGates(options.database ?? DATABASE.POSTGRES).find((entry) =>
       entry.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB

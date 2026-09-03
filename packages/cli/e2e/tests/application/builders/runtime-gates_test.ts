@@ -15,7 +15,10 @@ import {
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
 import { createRuntimeBehaviorGates } from '../../../src/application/gates/scaffold/runtime/behavior-gates.ts';
-import { createTypedDbPhaseBGate } from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
+import {
+  createListenerReadinessGates,
+  createTypedDbPhaseBGate,
+} from '../../../src/application/gates/scaffold/runtime/listener-readiness-gates.ts';
 import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 import { formatCommandFailure } from '../../../src/application/gates/scaffold/runtime/verify-typed-db-phase-b.ts';
 
@@ -121,6 +124,23 @@ Deno.test('typed database Phase-B gate stays outside the base runtime gate list'
   );
 });
 
+Deno.test('listener-unreachable gate grants every subprocess executable it invokes', () => {
+  const gate = createListenerReadinessGates(DATABASE.POSTGRES).find((entry) =>
+    entry.id === GATE.RUNTIME_HEALTH_LISTENER_UNREACHABLE
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected listener-unreachable gate to be a command gate.');
+  }
+
+  const command = gate.command(s8RuntimeContext());
+  const allowRun = command.find((argument) => argument.startsWith('--allow-run='));
+  const allowedExecutables = new Set(allowRun?.slice('--allow-run='.length).split(',') ?? []);
+
+  for (const executable of ['aspire', 'docker']) {
+    assertEquals(allowedExecutables.has(executable), true);
+  }
+});
+
 Deno.test('typed database Phase-B failures surface both captured streams', () => {
   const failure = formatCommandFailure('aspire', ['resource', 'postgres-cli', 'migrate'], {
     code: 16,
@@ -144,6 +164,13 @@ Deno.test('typed database Phase-B faults the controller-owned listener without s
 
   assertStringIncludes(source, 'commandListenerFaultController');
   assertStringIncludes(source, 'TEST_ONLY_POSTGRES_HEALTH_KEY');
+  // Canary 6 (run 33684157301): the departure wait is the fixture's shared subscription, which is
+  // established before the close command. No private poll deadline may grow back here.
+  assertStringIncludes(source, 'observeInducedListenerDeparture(appHost, expectation, async () =>');
+  assertEquals(source.includes('REPORT_DEADLINE_MS'), false);
+  assertEquals(source.includes('REPORT_POLL_MS'), false);
+  assertEquals(source.includes("'describe',"), false);
+  assertStringIncludes(source, 'const WAIT_TIMEOUT_SECONDS = 10;');
   assertEquals(source.includes("'resource',\n      database,\n      'stop'"), false);
   assertEquals(source.includes("'resource',\n        database,\n        'start'"), false);
 });
@@ -198,11 +225,46 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   } as RunContext);
 
   assertEquals(command[0], 'deno');
-  assertEquals(command[1], 'eval');
-  assertEquals(command.at(-2), '/workspace/app/aspire/apphost.mts');
-  assertEquals(command.at(-1), '/workspace/app');
-  assertEquals(command[2].includes('"--format"'), true);
-  assertEquals(command[2].includes('aspire-start.json'), true);
+  assertEquals(command[1], 'run');
+  assertEquals(command.some((entry) => entry.endsWith('/.llm/tools/gates/run-gate.ts')), true);
+  assertEquals(command.includes('cli-e2e-aspire-start'), true);
+  assertEquals(command.includes('capture'), true);
+  assertEquals(command.includes('/workspace/app/aspire/apphost.mts'), true);
+  assertEquals(command.includes('/workspace/app'), true);
+  assertEquals(command.at(-2)?.includes('postgres'), true);
+  assertEquals(command.at(-1), '300');
+});
+
+Deno.test('database allocation gates pass the scoped database resource to event observation', () => {
+  const gates = createRuntimeGates(DATABASE.POSTGRES);
+  for (
+    const [gateId, label] of [
+      [GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST, 'first'],
+      [GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND, 'second'],
+    ] as const
+  ) {
+    const gate = gates.find((entry) => entry.id === gateId);
+    if (gate?.kind !== 'command') throw new Error(`Expected ${gateId} command gate.`);
+    const command = gate.command(s8RuntimeContext());
+    assertEquals(command.at(-2), label);
+    assertEquals(command.at(-1), ASPIRE_RESOURCE.POSTGRES);
+  }
+});
+
+Deno.test('Aspire restart fallback binds aspire.config.json to the AppHost workspace', () => {
+  const context = s8RuntimeContext();
+
+  for (const gateId of [GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB]) {
+    const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) => entry.id === gateId);
+    if (gate?.kind !== 'command') {
+      throw new Error(`Expected ${gateId} to be a command gate.`);
+    }
+
+    const command = gate.command(context);
+    assertEquals(command[3], '/workspace/app/aspire/apphost.mts');
+    assertEquals(command[4], '/workspace/app');
+    assertEquals(command[5], '/workspace/app/aspire/aspire.config.json');
+  }
 });
 
 Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
@@ -323,6 +385,71 @@ Deno.test('app reference gate runs the real browser probe for the project-derive
   ]);
 });
 
+Deno.test('island served-surface gate runs against the live generated app and writes a receipt', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_ISLAND_SERVED_SURFACE
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected island served-surface command gate.');
+  const command = gate.command({
+    request: {
+      suiteId: 'scaffold.runtime.sqlite',
+      options: { projectName: 'inventory-console' },
+    },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-served-surface.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+    '/repo/.llm/tmp/gate-receipts/scaffold.runtime.sqlite/behavior.island-served-surface.json',
+  ]);
+});
+
+Deno.test('island hydration gate runs the fail-closed headless browser probe', () => {
+  const gate = createRuntimeBehaviorGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_ISLAND_HYDRATION
+  );
+  if (gate?.kind !== 'command') throw new Error('Expected island hydration command gate.');
+  const command = gate.command({
+    request: {
+      suiteId: 'scaffold.runtime.sqlite',
+      options: { projectName: 'inventory-console' },
+    },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-net=127.0.0.1,localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+    '/repo/.llm/tmp/gate-receipts/scaffold.runtime.sqlite/behavior.island-hydration.json',
+  ]);
+  assertEquals(gate.skip, undefined);
+});
+
 Deno.test('runtime gates wait for postgres resource by default', () => {
   const gateIds = createRuntimeGates().map((entry) => entry.id);
 
@@ -336,9 +463,13 @@ Deno.test('runtime app wait derives the resource name from the scaffold project'
 
   const command = gate.command({
     request: { options: { projectName: 'inventory-console' } },
-    project: { appHost: '/workspace/app/aspire/apphost.mts' },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
   } as RunContext);
-  assertEquals(command[2], 'inventory-console-web');
+  assertEquals(command.at(-1), 'inventory-console-web');
   assertEquals(command.includes('dashboard'), false);
 });
 
@@ -467,15 +598,18 @@ Deno.test('workers wait gate requires runtime startup evidence before behavior g
     gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext),
     [
       'deno',
       'run',
-      '--allow-run=aspire',
-      '/repo/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts',
-      '/workspace/app/aspire/apphost.mts',
+      '--allow-read',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+      'assert',
+      '/workspace/app/.netscript/e2e/aspire-describe.ndjson',
+      'workers',
     ],
   );
 });
@@ -505,13 +639,12 @@ Deno.test('runtime gates enumerate every KV-backed first-party background runtim
     const command = gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext);
-    if (resource !== ASPIRE_RESOURCE.WORKERS) {
-      assertEquals(command.includes('--status'), true);
-      assertEquals(command.includes('healthy'), true);
-    }
+    assertEquals(command.includes('assert'), true);
+    assertEquals(command.includes(resource), true);
   }
 });
 
@@ -595,18 +728,70 @@ Deno.test('runtime gates wait for mssql resource with extended timeout when mssq
     gate.command({
       project: {
         repoRoot: '/repo',
+        projectRoot: '/workspace/app',
         appHost: '/workspace/app/aspire/apphost.mts',
       },
     } as RunContext),
     [
       'deno',
       'run',
-      '--allow-run=aspire',
-      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/verify-listener-readiness.ts',
-      '/workspace/app/aspire/apphost.mts',
+      '--allow-read',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+      'assert',
+      '/workspace/app/.netscript/e2e/aspire-describe.ndjson',
       'mssql',
       'mssql_listener',
-      '600',
     ],
   );
+
+  const startGate = createRuntimeGates(DATABASE.MSSQL).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_START
+  );
+  if (startGate?.kind !== 'command') {
+    throw new Error('Expected mssql Aspire start gate to be a command gate.');
+  }
+  assertEquals(
+    startGate.command({
+      request: { suiteId: 'scaffold.runtime', options: { projectName: 'generated' } },
+      project: {
+        repoRoot: '/repo',
+        projectRoot: '/workspace/app',
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext).at(-1),
+    '600',
+  );
+});
+
+Deno.test('runtime describe refreshes convergence evidence after database restart fallback', () => {
+  const gate = createRuntimeGates(DATABASE.MSSQL).find((entry) =>
+    entry.id === GATE.RUNTIME_ASPIRE_DESCRIBE
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected runtime describe gate to be a command gate.');
+  }
+
+  const command = gate.command({
+    request: { options: { projectName: 'generated' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command.slice(0, 8), [
+    'deno',
+    'run',
+    '--allow-env=ASPIRE_CLI_START_TIMEOUT',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts',
+    'refresh',
+  ]);
+  assertEquals(command.at(-4), '/workspace/app/aspire/apphost.mts');
+  assertEquals(command.at(-3), '/workspace/app/.netscript/e2e/aspire-describe.ndjson');
+  assertEquals(command.at(-2)?.includes('mssql'), true);
+  assertEquals(command.at(-1), '600');
 });
