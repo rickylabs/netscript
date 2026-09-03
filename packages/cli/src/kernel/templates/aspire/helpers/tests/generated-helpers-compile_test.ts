@@ -85,6 +85,15 @@ export function createListenerReadinessCheck(
 ): () => Promise<{ status: string }> {
   return () => Promise.resolve({ status: 'Healthy' });
 }
+
+export function createEndpointListenerReadinessCheck(
+  _options: {
+    kind: string;
+    endpoint: () => PromiseLike<{ host(): Promise<string>; port(): Promise<number> }>;
+  },
+): () => Promise<{ status: string }> {
+  return () => Promise.resolve({ status: 'Healthy' });
+}
 `;
 
 Deno.test('emitted AppHost helpers compile against the restored Aspire SDK contract', async () => {
