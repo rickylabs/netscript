@@ -71,6 +71,10 @@ cause, contract, test assertions, scope, gates, and prohibited alternatives were
 | --- | --- | --- | --- |
 | 2026-09-03 | bootstrap | complete | Clean requested branch at exact base; required skills/doctrine/harness files read. |
 | 2026-09-03 | 1 | RED | Recording runner drove README indexes 0 and 1 without real subprocesses. Focused structured test exited 1: expected `DENO_INSTALL_ROOT=<temp>/run/.deno-install`, actual `undefined`; 0 passed, 1 failed. Exact install argv and absence of `-f` passed before the environment assertion. |
+| 2026-09-03 | 2 | review correction | Initial focused pass was invalidated: separate review reproduced `NotCapable` under the real walker permissions and identified the missing stale-root reset required by the owner addendum. No GREEN commit was made. |
+| 2026-09-03 | 2 | GREEN | Corrected focused test exited 0 (1 passed, 0 failed) under `--allow-env=PATH`; all scoped gates passed, and a safe real child walker invocation at index 2 exited 0 under the exact narrow permissions. |
+| 2026-09-03 | 2 | slice review | Separate read-only re-review: PASS, no blockers. Reviewer independently ran focused application + presentation tests with only `--allow-env=PATH`: 5 passed, 0 failed; `git diff --check` passed. |
+| 2026-09-03 | 2 | reconcile | PR #1975 remains non-draft with `Part of #1881` and `Part of #863`, no closing keyword, milestone 0.0.7, the seven requested labels, and exactly one `status:impl`; hosted issue closure remains deferred. |
 
 ## Gate Results
 
@@ -79,6 +83,24 @@ cause, contract, test assertions, scope, gates, and prohibited alternatives were
 | Gate | Command | Result | Evidence |
 | --- | --- | --- | --- |
 | Focused recording-spawn test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read --allow-write --allow-env packages/cli/e2e/tests/application/readme-command_test.ts` | EXPECTED FAIL (exit 1) | Structured summary: 0 passed, 1 failed; `DENO_INSTALL_ROOT` actual `undefined`, expected `<runRoot>/.deno-install`. |
+
+### GREEN
+
+| Gate | Command | Result | Evidence |
+| --- | --- | --- | --- |
+| Focused recording-spawn test | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-read --allow-write --allow-env=PATH packages/cli/e2e/tests/application/readme-command_test.ts` | PASS (exit 0) | 1 passed, 0 failed; stale binary removed, exact argv/no `-f`, persisted state reused at index 1, receipt environment matched. |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS (exit 0) | 234 files, 2 batches, 0 failed batches/findings. |
+| Nested tests | `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/cli/e2e/tests` | PASS (exit 0) | 327 passed, 0 failed. |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx` | PASS (exit 0) | 234 files processed, 0 findings/refusals. |
+| Changed-file lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file <five changed TS files> --ext ts,tsx` | PASS (exit 0) | 5 files processed, 0 findings. An earlier lint attempt found one type-only import and was corrected before these final gates. |
+| Gate registry/listing | `deno task e2e:cli gates readme.quickstart` | PASS (exit 0) | Eleven ordered README gates plus cleanup listed; install argv remains verbatim. This is listing-only. |
+| Real walker permission proof | equivalent index-2 child invocation of `readme-command.ts` with `--allow-read --allow-write --allow-run --allow-env=PATH` | PASS (exit 0) | Child executed the real PATH read and `cd my-app/aspire`, emitted receipt environment, and did not install/start any tool. |
+
+### Prohibited runtime gates
+
+`readme.quickstart`, `quickstart.walk`, `scaffold.runtime`, Aspire, and Docker were NOT_RUN by owner
+instruction. The index-2 permission proof was process-only and selected a `cd` command, so no README
+install, NetScript command, Aspire command, network probe, or cleanup ran.
 
 ## Handoff Notes
 

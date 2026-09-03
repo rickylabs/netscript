@@ -6,15 +6,16 @@
 | --- | --- |
 | Run ID | `research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix` |
 | Branch | `fix/aspire-1881-readme-install-isolation` |
-| Current phase | `implement` |
+| Current phase | `gate` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
 ## Current State
 
-Research, plan, Design checkpoint, and justified `PLAN-EVAL: N/A` are recorded. The focused RED
-test and minimal recording-spawn seam are present; the test fails exactly because no environment is
-passed. No runtime command has run.
+RED commit `b1aafaaa6` is pushed and PR #1975 is open non-draft. The corrected GREEN is implemented
+and all owner-scoped gates pass, including a safe real child invocation under the walker's exact
+narrow permissions. Separate substantive slice review returned PASS with no blockers. The GREEN is
+ready to commit. No runtime suite has run.
 
 ## Completed
 
@@ -23,17 +24,19 @@ passed. No runtime command has run.
 - RED/GREEN slices and forbidden runtime boundaries locked.
 - RED captured through the structured test wrapper: exit 1, 0 passed / 1 failed, missing
   `DENO_INSTALL_ROOT`; exact argv/no-`-f` assertions passed first.
+- Corrected GREEN focused test: exit 0, 1 passed / 0 failed.
+- Scoped check/fmt/lint and full nested tests pass; full nested tests: 327 passed / 0 failed.
+- Gate listing and real subprocess permission proof both exit 0.
 
 ## In Progress
 
-- Slice 2: implement stateful install-root propagation and receipt evidence.
+- Slice 2: commit and push the reviewed GREEN.
 
 ## Next Steps
 
-1. Commit the captured RED slice.
-2. Implement the isolated environment, run focused green, and commit GREEN.
-3. Run scoped gates and separate IMPL-EVAL.
-4. Open/update the non-draft PR as directed, without ready-merge status.
+1. Complete the corrected slice review.
+2. Commit and push GREEN; post its phase comment.
+3. Run separate IMPL-EVAL and update PR evidence without changing `status:impl` or marking ready-merge.
 
 ## Key Decisions
 
@@ -43,14 +46,14 @@ See `plan.md`; all material decisions are owner-locked.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | implementation not started |
-| Fitness | NOT_RUN | implementation not started |
+| Static | PASS | check/fmt/lint all exit 0 |
+| Fitness | PASS (scoped semantic) | full tests 327/327; focused stale-root/env test 1/1 |
 | Runtime | N/A | explicitly forbidden by owner |
-| Consumer | NOT_RUN | focused semantic command test planned |
+| Consumer | PASS (non-runtime) | gate listing and exact-permission index-2 child both exit 0 |
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: permission and stale-root gaps found before GREEN commit and corrected; see `drift.md`.
 - Debt: none expected.
 
 ## Commits

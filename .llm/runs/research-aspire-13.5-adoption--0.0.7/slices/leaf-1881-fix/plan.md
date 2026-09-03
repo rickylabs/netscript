@@ -30,6 +30,8 @@ binary, while preserving argv byte-for-byte except the existing placeholder subs
 - Add the smallest injectable README spawn seam and a focused failing test.
 - Persist `.deno-install` under `runRoot` in `ReadmeWalkState` from index 0.
 - Pass the same environment to every spawned README command.
+- Grant the walker only `--allow-env=PATH`, matching its ambient PATH read.
+- Remove and recreate the run-owned install root at index 0 so reruns cannot reuse a stale binary.
 - Extend `runAspireCommand` with an optional inherited-environment overlay.
 - Add receipt environment evidence.
 
@@ -49,6 +51,7 @@ binary, while preserving argv byte-for-byte except the existing placeholder subs
 | D3 | Every spawned README command receives the same environment. | Later `netscript` calls must resolve the installed binary. |
 | D4 | Extend `runAspireCommand(..., env?)`; do not pass env from `quickstart.walk`. | Preserves existing walk behavior. |
 | D5 | Receipt records `{ denoInstallRoot, pathPrepend }`; argv remains verbatim. | Hosted evidence proves isolation without changing the public command. |
+| D6 | Index 0 removes the owned install root, tolerating only `NotFound`, then recreates it. | A same-runner rerun must not reproduce the existing-install collision. |
 
 ## Open-Decision Sweep
 
@@ -57,6 +60,7 @@ binary, while preserving argv byte-for-byte except the existing placeholder subs
 | Path delimiter | resolved now | Use `DELIMITER` from `@std/path`. |
 | Missing ambient PATH | resolved now | Preserve the explicit prepend; append the ambient value when present. |
 | Spawn seam shape | resolved now | Optional function parameter defaulting to `runAspireCommand`; no test branch. |
+| PATH read permission | resolved now | Add only `--allow-env=PATH` to the README walker launcher. |
 
 ## Commit Slices
 

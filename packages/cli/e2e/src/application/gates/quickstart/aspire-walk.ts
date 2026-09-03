@@ -100,6 +100,7 @@ export async function runAspireCommand(
   command: readonly string[],
   cwd: string,
   timeoutMs: number,
+  env?: Record<string, string>,
 ): Promise<AspireCommandResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -108,6 +109,7 @@ export async function runAspireCommand(
     const output = await new Deno.Command(executable, {
       args,
       cwd,
+      env,
       stdout: 'piped',
       stderr: 'piped',
       signal: controller.signal,

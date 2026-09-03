@@ -103,6 +103,7 @@ function readmeWalkerCommand(
     '--allow-read',
     '--allow-write',
     '--allow-run',
+    '--allow-env=PATH',
     resolve(
       context.project.repoRoot,
       'packages/cli/e2e/src/application/gates/quickstart/readme-command.ts',
