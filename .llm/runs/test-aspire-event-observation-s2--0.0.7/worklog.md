@@ -148,6 +148,25 @@ distribution:
 Every source comment now names whether a retained value is a test-failure ceiling or a non-resource
 application retry. The polling guard's final allowlist is exactly the six concurrency-fenced files.
 
+## Final implementation receipts and handoff
+
+Implementation head: `0f4588e15467a277ffc41ea01a3127560a88d54c`.
+PR: #1969 (`test/aspire-event-observation-s2`, non-draft).
+
+| Receipt | Head | Result |
+| --- | --- | --- |
+| `receipts/s1-red-polling-guard.json` | `48c32cc6cc354d03e12830e69d3f3b9837415f24` | EXPECTED FAIL — 3 passed / 1 failed; only the readiness poll was reported |
+| `receipts/s2-focused-green.json` | `9e20929a9d26f0d4eabe5358364ba423e76ac009` | PASS — 63/63 focused converted-helper tests |
+| `receipts/s3-policy-green.json` | `0f4588e15467a277ffc41ea01a3127560a88d54c` | PASS — 4/4, fenced-only allowlist |
+| `receipts/s3-e2e-tests.json` | `0f4588e15467a277ffc41ea01a3127560a88d54c` | PASS — 309/309 e2e unit tests |
+| `receipts/s3-quality-gate.json` | `0f4588e15467a277ffc41ea01a3127560a88d54c` | PASS — quality scan + architecture check |
+
+Final non-durable wrapper rerun at the same implementation head also passed check (225 files),
+format (225 files), suites registry, and complete split lint coverage (218 + 7 files). The exact
+single-invocation lint config-boundary failure remains documented above. No local Aspire/Docker
+runtime was started. Hosted CI is the live transition/schema proof surface, and IMPL-EVAL belongs to
+the required fresh opposite-family evaluator session.
+
 ## Reconcile
 
 - S1 inventory reconciles with issue #1906: one direct non-fenced `aspire describe` poll remains at

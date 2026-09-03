@@ -26,6 +26,8 @@ Refs #1906
 
 - RED receipt: guard reported only `verify-endpoint-readiness.ts` on the pinned baseline
 - GREEN receipt: 63 focused converted-helper tests passed at `9e20929a9`
+- final policy receipt: 4/4 passed at implementation head `0f4588e15467a277ffc41ea01a3127560a88d54c`
+- final e2e receipt: 309/309 passed at the same implementation head
 - e2e check: 225 files, zero findings
 - e2e tests: 309 passed, zero failed
 - e2e format: 225 files, zero findings
