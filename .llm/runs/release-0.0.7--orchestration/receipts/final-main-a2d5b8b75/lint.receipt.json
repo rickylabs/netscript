@@ -1,0 +1,45 @@
+{
+  "gateId": "lint",
+  "invocationId": "quality-lint",
+  "argv": [
+    "deno",
+    "task",
+    "lint",
+    "--output",
+    ".llm/tmp/gate-receipts/quality/lint.report.json"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "8b8190218b79bcba92ef305b21fc10b66814be1d8ab48619721f8625c26cf276",
+  "lifecycleId": "quality:quality-lint:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:45:27.771Z",
+  "childReport": ".llm/tmp/gate-receipts/quality/lint.report.json",
+  "startedAt": "2026-09-03T13:45:27.773Z",
+  "finishedAt": "2026-09-03T13:45:36.998Z",
+  "durationMs": 9224,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 148,
+    "sha256": "8cf6da463901fac48b8950ee00702fd217dd81f5920eccee66a19cbdf77213bf",
+    "tail": "{\"report\":\".llm/tmp/gate-receipts/quality/lint.report.json\",\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueRules\":0,\"uniquePaths\":0}}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 292,
+    "sha256": "3f93f850c199689d811167e31ae25573d1521a3261dfc3618a7cb647c5e68d0b",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mlint\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" '--output' '.llm/tmp/gate-receipts/quality/lint.report.json'\n",
+    "truncated": false
+  },
+  "childReportEvidence": {
+    "path": ".llm/tmp/gate-receipts/quality/lint.report.json",
+    "bytes": 342,
+    "sha256": "9cad19198214b237c4808b75c57aa5cf3396bfcdb7a771b9bed3e0eed0873cab",
+    "modifiedAt": "2026-09-03T13:45:36.987Z"
+  }
+}

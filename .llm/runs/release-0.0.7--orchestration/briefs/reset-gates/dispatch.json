@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "milestone": "0.0.7",
+  "launchAfter": "2026-08-15T00:00:00+02:00",
+  "timezone": "Europe/Zurich",
+  "concurrency": 4,
+  "concurrencyScope": "per-topic-orchestrator",
+  "perOrchestratorConcurrency": 1,
+  "ownerOverride": {
+    "recordedAt": "2026-08-14T22:41:15.000Z",
+    "coordinator": "codex-root-0.0.7",
+    "topicOrchestrators": "native Claude Opus 5 / high with Remote Control",
+    "implementationLeaves": "daemon-attached WSL Codex GPT-5.6-SOL with effort matched to documented complexity",
+    "evaluationDefault": "native Claude Opus 5 / low through high; low only for genuinely easy bounded review",
+    "planEvalPolicy": "open only for an existing formal hold, unresolved architectural decision, or demonstrated complexity",
+    "fablePolicy": "reserve Fable 5 for recorded genuinely architectural PLAN questions or exceptional complex implementation review",
+    "costPolicy": "right-size effort, deduplicate shared review inputs, preserve every required independent evidence contract",
+    "queuePolicy": "serialize within each topic orchestrator; docs, internals, fixes, and features may each run one evaluator concurrently",
+    "supersedes": "the 2026-08-14T22:13:00.000Z Sonnet route matrix and the pre-reset blanket Fable matrix"
+  },
+  "routePolicy": {
+    "provider": "native-claude",
+    "remoteControlRequired": true,
+    "freshSessionPerGate": true,
+    "oppositeFamilyRequired": true,
+    "substitutesAllowed": false,
+    "fablePolicy": "not pre-dispatched; coordinator amendment must record genuine architectural or exceptional implementation-review necessity",
+    "forbiddenProviders": ["openrouter", "opencode", "antigravity"]
+  },
+  "entries": [
+    {
+      "order": 1,
+      "leafId": "harness-evidence-and-verdict-tooling",
+      "phase": "impl-eval",
+      "pr": 1644,
+      "branch": "fix/harness-evidence-and-verdict-tooling",
+      "worktree": "/home/codex/repos/netscript-007-harness-evidence",
+      "sourceHead": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
+      "implementationParent": "634b257ea1afcedb2d7f1da486d8c9e9432a2a86",
+      "runDir": ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling",
+      "brief": "harness-evidence-and-verdict-tooling.md",
+      "output": "evaluate.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
+        "effort": "medium",
+        "rationale": "substantive cross-tooling implementation review; Opus medium matches its documented complexity"
+      }
+    },
+    {
+      "order": 2,
+      "leafId": "legacy-port-pin-sweep",
+      "phase": "impl-eval",
+      "pr": 1643,
+      "branch": "fix/legacy-port-pin-sweep",
+      "worktree": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
+      "sourceHead": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
+      "runDir": ".llm/runs/fix-legacy-port-pin-sweep--0.0.7-wave0",
+      "brief": "legacy-port-pin-sweep.md",
+      "output": "evaluate.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
+        "effort": "low",
+        "rationale": "genuinely easy bounded implementation review with complete Tier-A and gate evidence; Opus low is sufficient"
+      }
+    },
+    {
+      "order": 3,
+      "leafId": "rfc-plugin-cli-contribution",
+      "phase": "plan-eval",
+      "cycle": 2,
+      "pr": 1651,
+      "branch": "docs/rfc-plugin-cli-contribution",
+      "worktree": "/home/codex/repos/netscript-007-features-1502",
+      "sourceHead": "12276e6d86403ed1340ef79a963e87d401d643e9",
+      "runDir": ".llm/runs/docs-rfc-plugin-cli-contribution--1502",
+      "brief": "rfc-plugin-cli-contribution.md",
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
+        "effort": "medium",
+        "rationale": "existing formal architectural hold requires substantive independent reasoning; Opus medium is sufficient for this evidence contract"
+      }
+    },
+    {
+      "order": 4,
+      "leafId": "quality-scan-allowance-rail",
+      "phase": "plan-eval",
+      "cycle": 2,
+      "pr": 1653,
+      "branch": "chore/quality-scan-allowance-rail",
+      "worktree": "/home/codex/repos/netscript-007-quality-rail",
+      "sourceHead": "09dfb092dccf7f843b9270295047d674a8187362",
+      "runDir": ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail",
+      "brief": "quality-scan-allowance-rail.md",
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
+        "effort": "medium",
+        "rationale": "substantive coupled ownership and fail-closed quality-policy PLAN-EVAL"
+      }
+    },
+    {
+      "order": 5,
+      "leafId": "scaffold-generated-output-correctness",
+      "phase": "plan-eval",
+      "cycle": 2,
+      "pr": 1654,
+      "branch": "fix/scaffold-generated-output-correctness",
+      "worktree": "/home/codex/repos/netscript-007-leaf-scaffold-generated-output-correctness",
+      "sourceHead": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
+      "runDir": ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0",
+      "brief": "scaffold-generated-output-correctness.md",
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
+        "effort": "medium",
+        "rationale": "substantive grouped generator/runtime boundary PLAN-EVAL without running the expensive gate"
+      }
+    },
+    {
+      "order": 6,
+      "leafId": "comparison-docs-programme",
+      "phase": "plan-eval",
+      "cycle": 1,
+      "pr": 1652,
+      "branch": "docs/comparison-docs-programme",
+      "worktree": "/home/codex/repos/netscript-007-docs-comparison",
+      "sourceHead": "d35cbca30872d1f55118d63437638e93270c2ac3",
+      "runDir": ".llm/runs/docs-comparison-docs-programme--1551",
+      "brief": "comparison-docs-programme.md",
+      "output": "plan-eval.md",
+      "route": {
+        "provider": "native-claude",
+        "model": "Claude Opus 5",
+        "cliModel": "claude-opus-5",
+        "effort": "low",
+        "rationale": "genuinely easy bounded docs-only PLAN-EVAL with immutable evidence and no product implementation; Opus low is sufficient"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2196 @@
+# Drift — release 0.0.7
+
+## 2026-09-03 15:02Z — owner exception APPROVED; final CI executing
+
+Owner explicitly answered yes to retaining green canary.10 evidence for the single publish-excluded
+test correction, then reaffirmed continuing. No owner boundary remains. Receipt:
+receipts/owner-approved-stable-fixture-exception.md; PR comment5527706987. No general gate change.
+Release PR1984 was fast-forwarded and pushed to the exact independently reviewed6884b7548.
+Current full CI33770214410 is executing. No CI check is waived. After full CI passes, reconcile
+DoD/close/thread gates, merge, prove merged tree equals6884b7548, and attach the explicitly
+owner-approved inherited canary evidence to that actual merge SHA. Then native release:publish
+with handwritten intro, --prev-tag v0.0.6 and complete paginated release notes. Follow stable
+publish plus artifact-pinned production E2E through completion. No new canary or evaluator needed.
+
+## 2026-09-03 14:48Z — stable-cut test fixture circularity proven
+
+Stable PR #1984 remains at b8fb15bc136feb98ef81c21d010f43b1ee282798 and is NOT merged.
+CI33766502843 failed one test (5269 pass / 1 fail / 14 ignored); check and quality passed.
+The exact generated-app subprocess fails because @netscript/sdk@0.0.7 is not yet published,
+not because users.list is missing. The production resolver masks the child import error.
+The existing local-workspace-imports fixture helper proves the actual 0.0.7 query factory works.
+
+Prepared and explicitly pushed fixture-only correction 6884b7548a0fdc53a17c52ef343c6025a7527d93
+on fix/cli-prepublish-test-fixture in 007-stable-fixture-repair, based on the unchanged stable cut.
+One publish-excluded test file changed: keep/assert public exact pin, then use checkout imports
+for real generate-resource calls. Focused full file 5/0, check/lint/fmt all PASS. No product file,
+manifest, generated output, or production behavior changed. Independent existing GLM session
+0039d1ad-72eb-4047-964c-8b326ff65902 completed PASS on that delta at 14:54Z and fully exited:
+independent focused tests 5/0, check/lint/fmt green, exclusion and real subprocesses confirmed.
+Verdict and raw report: receipts/eval-readme-cold/evaluate-stable-fixture.md and
+stable-fixture-test-report.json. No live worker remains.
+
+Owner-only ruling requested asynchronously: may this test-only correction retain canary.10's
+proven product evidence? Native inheritance currently permits only a version-only immediate
+parent, so it will refuse this test delta. No exception has been applied, no status fabricated,
+no policy changed, and no new canary minted. Current canary pair and all issue closures remain
+valid. All independent product lanes are complete; primary owns this final release boundary.
+See receipts/stable-cut-fixture-diagnosis.md. Stable publication and pinned stable E2E remain.
+
+## Reconcile pre-cut evidence with the documented release sequence
+
+The historical exactMainEvidence entry targeted ec848e6b and listed stable publication and stable
+production E2E as prerequisites for claiming the release captain. Those post-publication actions
+cannot exist before the cut, and several listed names were not command-catalog gate IDs.
+
+Replaced that stale entry with the actual 21 native pre-cut receipts at a2d5b8b75: current-main
+CI 33762836732 (5,270 tests, zero failures, browser regression and quality green), plus the native
+quality:gate receipt including doctrine/dependency checks. Full, unmodified receipts are retained
+under receipts/final-main-a2d5b8b75; the ledger embeds their identity/outcome fields and output
+hashes with receiptPath pointers. The validator still recomputes sufficiency; no fabricated PASS.
+
+This does not waive publication gates. The canary workflow 33762898477 and exact pinned runtime
+33763460542 remain mandatory before the three acceptance issues close and stable can begin.
+Stable publication and its own artifact-pinned production E2E remain mandatory for completion,
+as required by release-gates.md and netscript-release. They are downstream evidence, not a
+circular pre-cut command requirement. No source or toolchain policy was changed.
+
+## Active mandate supersedes low-usage pause
+
+Latest owner explicitly resumes continuous stable wrap-up. Earlier pauses are historical.
+SDK NuGet packages are downloaded prerequisites, not generated AppHost state; caches retained.
+1983/2743cd0df adds bounded read-only failure diagnostics after33760126265 users FailedToStart
+without console evidence. No invented Docker cause, hidden recovery or acceptance waiver.
+CI and scoped independent review run alongside diagnosticrehearsal33761336744 on existingcanary9.
+
+## Owner ruling applied: normal caches and configuration-specific Docker
+
+2026-09-03: owner rejected blanket no-image-cache requirement and confirmed NetScript/Aspire
+can run without Docker for non-container configurations. Issue1881 acceptance rewritten IN PLACE:
+fresh application state, normal caches allowed, documented prerequisites, unchanged no-recovery and
+owned-cleanup requirements. This supersedes the preceding cache-policy question; no owner decision
+remains. Do not restore an empty-image requirement or launch the abandoned daemon design.
+
+PR1983 amendment4092014cf is explicitly pushed: image count diagnostic-only, strict four application
+state fields remain, root README prerequisites distinguish its containerized walkthrough from
+framework-wide requirements. Printed command sequence unchanged. RED7/1 then GREEN8/0; selected
+check1/1/0 and format1/1/0 pass. No cache/resource deletion or local runtime; no canary minted.
+Existing independent PASS remains exact to832e53720; next step is proportional independent review
+of this small policy/prose delta, required CI, and refreshed existingcanary9 rehearsal. Then merge,
+final readiness, one intended final canary and stable when the actual published pair is green.
+Owner requested low-usage wrap-up; do not launch new workers merely to write a checkpoint.
+
+## 2026-09-03 owner wrap-up: cache objection and clean resume
+
+Owner requests wrap-up because usage is low and challenges treating cached Docker images as bad.
+Ordinary CI benefits from image caching. The new strict baseline came specifically from issue1881's
+explicit no-warm-images cold-machine acceptance, not a product failure or general cache policy.
+Hosted rehearsal33756743492 at1983/832e53720 failed BEFORE README with appHosts0,containers0,
+images6,volumes0,networks0. Image identities were not captured, so relevance is unproven.
+Do not represent this as a broken NetScript runtime or as a passing quickstart.
+
+The proposed isolated Docker-daemon setup was NOT implemented or run. Its only uncommitted
+exploratory RED regression (8 pass/1 fail) was removed with an exact owned patch; source worktree
+is restored to the reviewed/pushed832e53720. No image/cache/resource deletion or daemon mutation.
+Do not revive that overcomplicated setup automatically. On resume reconcile the cold-test acceptance
+with owner's cache objection, inspect whether cached images are relevant, and choose the narrow
+evidenced correction; retain README-first order and genuine fresh application state.
+
+Authorization IS FIXED: explicit GH_CONFIG_DIR=/home/agent/.config/netscript-release-gh verified
+rickylabs and gist/read:org/repo/workflow through status plus API. Keep credentials outside Git.
+PR1983 exists, ready for review, same independent PASS source832e53720. Core check/quality still
+running at wrap-up; close-gate fails its honest unchecked hosted-rehearsal DoD. No waived gate.
+No new version minted. Main075ea8ed7 includes merged1945;1481/1971 closed/shipped. Only issue1881,
+863 and1712 remain. Native product readiness at075ea8ed7 PASS all9 checks/35members; preserve
+receipts/final-product-readiness-075ea8ed7.ndjson. This does not substitute for published E2E.
+
+No new author/evaluator sessions. Existing supervisor identities/routes preserved. Last NAS audit
+12:44:29Z: Aspire0,containers0,custom networks0. Primary deno.lock and .vite remain unrelated and
+untouched. Owner instruction is to wrap up now, not to cut or silently waive cold acceptance.
+
+## 2026-09-03 12:35Z final product merge and auth non-retention
+
+Merged #1945 at075ea8ed7a027c8485db3c2ac183d0af5e1b2d35, immutable PR head
+d6ffcb5ea73c9b06f3106b8dfff64b3d0d6584b3. CI33746758886 SUCCESS (5267/0),
+hosted product runtime33744551964 PASS (104/0 PG,99/0 SQLite), scoped separate GLM PASS
+and explicit test-only integration diff checked. Fresh close-gate12:34:48Z PASS;
+review threads0/unanswered0. #1481/#1971 auto-closed at12:35:07Z/08Z; all terminal
+labels shipped. Original author PID223518 is gone after its final packet, not a stalled writer.
+Only1881/863/1712 remain: published cold README and final release acceptance.
+No new author or evaluator, no model change, no canary minted.
+
+Owner device approval completed, but both gh auth status and live API scopes still report
+repo only. GH_TOKEN/GITHUB_TOKEN unset; no user-keyed rickylabs credential found.
+Reason for credential non-retention is not proven; do not claim owner refused permissions.
+Isolated release login now pending in exec59710, GH_CONFIG_DIR=
+/home/agent/.config/netscript-release-gh. This is outside Git, mode700; no credential copied
+or printed. After owner approval verify scopes through that explicit config. Do not bypass
+the rejected workflow push using an alternative endpoint.
+Continue832e53720 cold-proof push/PR, existingcanary9 hosted rehearsal without minting,
+verified merge + final readiness, one intended final canary then stable exact green pairs.
+All five existing supervisor identities/models preserved. NAS rules unchanged: mise,
+sandbox-only Docker, no host/GPU mutation and owner-controlled tracked harness retention.
+
+## 2026-09-03 10:54Z workers shipped; final proof review PASS
+
+Coordinator merged #1970 at d2af6e8b40777720b242aaea639b0e538299cdc8 (10:43:28Z);
+#1455 closed and terminal labels are shipped. Native author01a06201 exited after its verified
+packet; no decisive gate remains there. Five issues remain, not six. Current closure matrix
+counts and GitHub snapshots are reconciled and validate without findings.
+
+#1945: scoped independent PASS and hosted33744551964 PASS (PG104/0, SQLite99/0; non-vacuous
+production mutation/restoration). Core33744526413 exposed one stale resource-order assertion21
+vs20. Same author applied the bounded explicit codegen→design→client fix85bd9b65d, then merged
+main as33fde3777, conflict-free. Focused115/115, 1004-file check, selected lint/fmt, quality and
+carriers PASS; final core CI remains next. No new full evaluation or blind runtime retry is needed.
+
+Cold README proof832e53720 independent session0039d1ad-72eb-4047-964c-8b326ff65902 returned
+PASS_IMPL. Verbatim verdict, completed transport and coordinator disposition are in
+receipts/eval-readme-cold/. It completed normally; no worker was killed. Source push still lacks
+GitHub workflow permission. Initial device code expired; second authorization was requested via
+owner prompt. Before minting a next canary, use the corrected workflow against existingcanary.9
+to measure cold baseline/README and avoid spending a version on unmeasured runner assumptions.
+Then final frozen source→readiness→native canary pair→remaining issue closures→stable pair.
+
+## 2026-09-03 10:30Z final candidate freeze and complete issue closure
+
+Owner requires all remaining issues genuinely closed and the next green canary to lead directly
+to stable, without unrelated source drift or speculative extra canaries. Six open issues are
+mapped in receipts/final-issue-closure-matrix.md. Live GitHub child/closing-PR audit reconciled
+Aspire #1712 checkboxes (all S1–S11/S13 delivered; S12 is NOT_PLANNED in 0.0.8, not shipped),
+#863 gates1/2 and #1971 ownership. #1844 remains closed under its explicit owner disposition.
+
+New real #1881 acceptance gap: e2e-cli-prod ran README after two runtime suites and restored the
+Aspire NuGet cache. Coordinator bounded fix832e53720 in007-readme-cold-release-proof puts the
+unchanged README suite first, removes the app cache and captures fail-closed cold counts. Eight
+focused tests plus selected check/lint/fmt and YAML parsing PASS. Independent GLM session
+0039d1ad-72eb-4047-964c-8b326ff65902 runs in007-eval-readme-cold, no local runtime. New workflow
+push is rejected by GitHub because the current PAT lacks workflow scope; owner was sent the
+GitHub device-authorization link. No permission bypass or credential exposure; other lanes continue.
+
+#1970 b5d23b051 hosted33743065396 PASSED both tiers; core CI33743065545 attempt1 failed only
+publish-workspace_test.ts fixture cleanup (Directory not empty), 5263 other PASS. Same author has
+one failed-job-only rerun active; do not hide the original red. #1945 integrated main as5243a19f9;
+its same independent evaluator completed PASS and is correcting provider/intersection metadata
+before final packet. Main remains0247471c8. No new canary dispatched. Preserve exact-head final
+checks; merge verified packets, then composed publish readiness at frozen content and one native
+OIDC canary. Its cold README and production pair close #1881/#863/#1712 before stable.
+
+NAS rules reaffirmed: /home/agent/projects paths, mise pins, sandbox Docker only, no host/GPU
+mutation, no global tool install, no secret output and owner-controlled tracked-run retention.
+10:30Z read-only Aspire and DinD audits: zero apps, zero containers, zero custom networks.
+
+## 2026-09-03 10:12Z two PRs merged; final product integration active
+
+Main0247471c89e381dd16e680bf0c10b6559caf36ee now includes both #1958 and #1982. #1354 closed,
+#1844 remains owner-approved closed. Six open milestone issues; only #1970/#1945 product PRs and
+coordinator tracking PR1641 remain. Features, docs and internals have no open milestone issues.
+#1982 final CI33738115735 PASS after only its stale close-gate reran; source0475c3213 stayed fixed.
+The cycle1 verbatim review is also saved separately alongside the final review and raw transports.
+
+Same-thread implementation resumes: #1970 thread01a06201-d0b9-7cb1-afe6-8b071ca28012 (pid223146)
+and #1945 thread01a06322-7bb5-7d80-badf-3068fb4942eb (pid223518). Both use their existing NAS
+worktrees and routing. #1945 has already integrated main locally as09425aa6b; #1970 carries scoped
+GLM PASS. Next: exact-head final product/runtime/evaluation packets, coordinator merges, then native
+canary publication and pinned production proof. Neither docs nor internals is a canary barrier.
+No new owner decision, host lease, resource mutation, model switch, or duplicated browser author.
+
+## 2026-09-03 10:08Z verified merges and evaluation handoff
+
+Coordinator merged #1958 at 2f43fa7f37f97a287c6722b004598e7cb7e04dd9 after required CI,
+independent cycle-4 PASS, exact product-equivalent two-tier receipts, empty review threads and a
+fresh live close-gate PASS with Closes #1354. Issue1354 closed; both terminal labels are shipped.
+Original #1970/#1945 authors resumed in their existing threads against merged main; no new model
+or duplicate source owner. #1844's owner-approved disposition remains closed, no owner pause.
+
+Independent #1982 session7ffea6b7-4401-4fec-b826-7d5e7657d88f completed PASS_IMPL at exact
+0475c32134166b9ba60ce1ea1a53c6abcc5af695. Cycle1 and final delta artifacts plus completed raw
+transports are preserved in receipts/eval-1982/; secret-pattern scan found no suspected provider
+keys. Source CI check-test/quality and independent64 tests PASS; only stale DoD close-gate awaits
+live body reconciliation. The primary preserves the review evidence here without pushing a
+receipt-only change to the evaluated source branch or needlessly invalidating its green CI.
+No release gate waived, no new runtime lease, no historical run cleanup.
+
+## 2026-09-03 09:52Z owner-approved #1844 closeout
+
+Owner answered “Yes close” to the explicit proposal “mitigated; original cause unproven.”
+Closed issue1844 at09:52:13Z, completed/status:shipped, preserving the original incident checklist
+and explicitly recording the historical-root-cause/log-evidence exception; no fake diagnosis.
+Evidence: https://github.com/rickylabs/netscript/issues/1844#issuecomment-5523886825 and
+receipts/issue-1844-owner-closeout.md. Mitigation PR1959 is merged; linked full PostgreSQL recovery
+runs pass. Active owner-decision queue cleared; seven milestone issues remain. Final-candidate CI,
+canary production E2E and clean-machine quickstart requirements are unchanged.
+NAS continuity unchanged: canonical /home/agent/projects/netscript paths, mise toolchains,
+DinD sandbox only, no host-runtime mutation or run cleanup. This action is issue/ledger-only.
+
+## 2026-09-03 09:23Z browser runtime green and owner scan fix pushed
+
+#1958 @0e1717dab: hosted33736497671 PASS (Postgres103/0, SQLite98/0, cleanup0), core CI green.
+Original author is performing independent GLM evaluation. On its verified packet, coordinator
+merges and explicitly resumes original #1970/#1945 threads from their clean pushed checkpoints;
+those two turns have exited waiting for this dependency, not three perpetually active authors.
+#1982 @0475c3213 pushed: owner run/transient exclusions, shipped helper closure, explicit generated-
+project safeguard. 64 tests, 12-file check/lint/fmt, both parity phases, asset freshness all PASS.
+Independent session7ffea6b7-4401-4fec-b826-7d5e7657d88f still evaluates c487e9273; same-session
+bounded delta brief is receipts/eval-1982/brief-delta.md. Final CI/review mandatory before merge.
+No host lease or run deletion. Main94fe507af, eight open issues, five PRs; no canary tag minted.
+Native Fable quota remains; accepted supervisor models unchanged. Historical #1844 question is
+parked separately; a second retained runtime artifact is being audited, not a canary barrier.
+
+## 2026-09-03 09:06Z owner scan-scope amendment
+
+Owner explicitly directed Aspire checks to ignore every LLM run file and transient state and fold
+that into existing PR #1982. Coordinator implemented it directly at c487e927367e6b6eee281c7ca19f384c89a1fae7
+on fix/aspire-parity-context, worktree /home/agent/projects/netscript/worktrees/007-aspire-parity-context.
+Shared scope policy now covers parity/host-port/polling; framework/docs/shipped generated source
+remain enforced. All .llm/runs and transient agent copies excluded, none deleted/untracked.
+55 focused tests PASS; phases 1/2 PASS (867 checked); host ports 966/PASS; 10-file check/lint/fmt PASS.
+PR #1982 is ready for CI, not ready-merge; independent review session 7ffea6b7-4401-4fec-b826-7d5e7657d88f
+runs GLM 5.3 Flash/max via checked-in agentic:claude-openrouter, evaluator WT 007-eval-1982.
+Its transport output is evidence, not a native supervisor replacement. impl-eval:skip suppresses
+only duplicate cloud automation; mandatory local evaluation remains. CI 33736337155 pending.
+
+The attempted extra Codex helper 01a06670-a816-7eb2-bf7c-abf3b935cc0d failed/not-attached before a
+verified implementation turn (Remote Control disabled; missing receipt directory). No duplicate
+launch, no false active-worker claim. Coordinator co-authored under the existing owner mandate,
+with independent substantive review required before sign-off. Five native Fable supervisors retain
+accepted identities/efforts and are still monthly capped; no model/spend override.
+
+#1958 68812c9d1 passes served-island surface but hosted 33735122923 fails hydration (SQLite86/1,
+cleanup PASS); no unchanged retry. Same author committed 9cba13fec replacing guessed private Preact
+traversal with public QueryClient and diagnostic observations, now running author gates before
+fresh exact-head runtime. Steering comment5523198664 requests predicate/console/network evidence.
+#1970 and #1945 retain their own verified product repairs and event-wait the shared #1958 merge,
+then integrate canonical main; no parallel writer on browser probes.
+
+Main remains94fe507af; #1981 is the one merge this recovery turn. Eight open issues remain owned,
+five PRs now include this new bounded owner-directed repair and coordinator #1641. Next canary is
+not yet dispatchable; native publish plus exact pinned production E2E still required before stable.
+#1844 historical-cause disposition is the sole parked owner question, not a canary barrier.
+No host runtime lease; last verified Aspire/DinD/custom-network inventory zero at08:18Z.
+
+
+## 2026-09-03 restart delivery
+
+Evaluator routing clarification (08:32Z): the owner freezes the five native topic supervisors on Fable 5.1; this does NOT revoke their explicit GLM 5.3 Flash/highest-effort implementation-evaluator authorization. Native #1970 evaluator session 28790605-53ad-4062-bfc3-cf6ad0426963 ended before evaluation due monthly cap, with no verdict. Per native-first formal lane policy, the primary coordinator may dispatch one fresh separate-session `agentic:claude-openrouter` GLM 5.3 Flash/max IMPL-EVAL after exact candidate gates; no new owner routing decision, no duplicate native probe, no supervisor model substitution. Corrections posted to #1970/#1945/#1958 as comments 5522904980/5522905171/5522905440. Do not perpetuate the leaf's earlier erroneous claim that all evaluator provider changes were forbidden.
+
+Main advanced to `94fe507af47171cd4f295e8f532b281d7147b334`: coordinator merged #1981 at 08:11:43Z after exact `650844452` check-test/quality/close-gate PASS and an empty unanswered-review-thread gate. Its original independent PASS stands; the OpenRouter PASS report was recovered from Actions artifact `openhands-agent-33715860434-1` and preserved in `receipts/pr-1981-openrouter-eval-33715860434.md`. This is not a new evaluation or a hidden override. Post-publication #1881/#863/#1712 acceptance remains open.
+
+The central inventory/DAG/state are reconciled, schema-v2 reporting is populated, and the generated status plus fresh PR export pass `harness:milestone:validate` with zero errors and findings. Five missing historical PR identities are repaired; old merged leaves no longer masquerade as waiting work. Three already-scheduled incident issues (#1844/#1881/#1971) are added to the ledger without inventing new scope. Eight live issues are owned and scheduled; four PRs remain (three product leaves plus coordinator #1641). Aspire remains its accepted fifth topic supervisor; the validator's historical four-lane schema grouping does not transfer its ownership to Internals.
+
+All five original native Fable 5.1 Remote Control supervisors are restored but provider-spend-capped, including Internals (now verified). Do not retry capped turns or substitute a model. Existing same-thread Codex authors for #1970/#1945/#1958 are actively shipping. #1958 corrected the retired preview-page probe; hosted run 33731170586 passed those pages then exposed the next stale `ServiceShowcaseLab` served-island expectation. Its same author is repairing that against the actual generated `PeopleIsland`, preserving real hydration/module evidence. #1970 and #1945 continue independently, then consume the shared acceptance repair if their exact runs show the same baseline failure.
+
+Next: consume exact-green merge packets; one meaningful next canary after candidate convergence, native workflow only, then require its exact published-version E2E pair before stable. No host runtime lease; last mise-scoped Aspire and DinD counts were zero at 07:50Z, custom networks not yet recounted. Preserve unrelated dirty `deno.lock` and all tracked run context. Continue delivery after this checkpoint.
+
+
+## OS-update recovery — 2026-09-03 07:58Z
+
+See `receipts/recovery-2026-09-03.json` for exact live identities, heads and issue ownership.
+Main is `e14322c511`; Canary 9 published; 29 PRs merged since Canary 6; eight issues and five PRs remain.
+All five native Claude Remote Control sessions were restored on owner-selected Fable 5.1
+(low; Aspire medium). Monthly spend limits still block Fable execution; no model/spend
+override was made. Three original Codex implementation threads are working on #1970,
+#1945 and #1958. #1981 inventory-only repair `650844452` is pushed, local parity PASS,
+awaiting exact hosted CI. Aspire/Docker inventories are zero via `mise exec`; no host
+lease granted. Preserve dirty primary `deno.lock` and tracked runs. Older status below
+is historical; complete inventory/DAG reconciliation before any new wave or cut.
+
+| Time (UTC)           | Drift                                                                                                                                                                                                  | Disposition                                                                                                                                                                                                                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-13T21:12:00Z | #1453 cited a repository surface that never existed.                                                                                                                                                   | Moved to Backlog / Triage with public evidence.                                                                                                                                                                                                                                                                                |
+| 2026-08-13T21:12:00Z | #1249 and #1637 were outside the initial milestone snapshot.                                                                                                                                           | Owner-ratified under `high-value-coherent`; #1249 has an explicit reproduction fallback.                                                                                                                                                                                                                                       |
+| 2026-08-13T21:27:00Z | #1306 and #1606 were stale-open observations.                                                                                                                                                          | Closed completed; #1377 post-merge checkbox synchronized.                                                                                                                                                                                                                                                                      |
+| 2026-08-13T22:42:00Z | #1564's provisional scope incorrectly treated safe three-dot consumers as unfixed.                                                                                                                     | Re-audited seven constructs; closed completed; removed barrier/leaf; 60 active, 43 leaves, nine waves.                                                                                                                                                                                                                         |
+| 2026-08-13T22:42:00Z | #1360 was inventoried in fixes while its grouped leaf was in features.                                                                                                                                 | Moved to features in inventory/state/contract.                                                                                                                                                                                                                                                                                 |
+| 2026-08-13T22:42:00Z | First PLAN-EVAL used Claude Opus/high instead of Fable/medium.                                                                                                                                         | Valid opposite-family verdict retained; route deviation recorded; same conversation gets the sole bounded re-review.                                                                                                                                                                                                           |
+| 2026-08-13T22:42:00Z | Evaluator write hook created a temporary worktree despite read-only intent.                                                                                                                            | Artifact captured; session stopped; worktree and temporary branch removed; no product mutation retained.                                                                                                                                                                                                                       |
+| 2026-08-13T23:03:00Z | Fable reached the monthly spend limit after completing cycle-2 evidence collection but before verdict emission.                                                                                        | Same conversation, same cycle, and same evidence used the recorded Opus fallback for final synthesis; verdict `APPROVED`.                                                                                                                                                                                                      |
+| 2026-08-13T23:10:00Z | Canonical topic-orchestrator route is Claude Opus/high, but native Claude quota is nearly exhausted and Fable already hit the spend limit.                                                             | Use the documented same-role Codex Sol/high fallback for the four control sessions; implementations remain Codex-routed and opposite-family evaluation evidence is still mandatory per leaf.                                                                                                                                   |
+| 2026-08-13T23:32:00Z | #1561's structured non-zero validation report requires the mirror CLI and directly coupled tests omitted from the pre-dispatch file surface.                                                           | Coordinator authorized only the mirror CLI plus five named test peers; `netscript-pr` remains read-only skill guidance, and no unrelated product surface was admitted.                                                                                                                                                         |
+| 2026-08-13T23:34:00Z | #1243 assumed the streams manifest/copy fields were ignored dead pins, but structured validation proved they remain required compatibility fields.                                                     | Preserve/classify those values; authorize only `auth-plugin-command_test.ts` beyond the original contract and finish the core stale silent-default fix with explicit URL/fail-loud guidance.                                                                                                                                   |
+| 2026-08-13T23:44:00Z | Native Claude showed 96% weekly use while the milestone control and #1651 PLAN-EVAL Remote Control sessions were active.                                                                               | Owner stopped both sessions. Continue Codex work; defer any gate that genuinely requires fresh Claude-family capacity until the 2026-08-15 00:00 Europe/Zurich reset rather than substitute silently.                                                                                                                          |
+| 2026-08-13T23:47:00Z | The grouped scaffold leaf proved #1263's OpenAPI-404 sub-symptom is already fixed and that #1262/#1588 require generator-level seams absent from the frozen surface.                                   | Preserve the existing OpenAPI projection with regression coverage; authorize only the named Prisma-config, seed-generator, scaffolder, export, and focused test peers. PLAN-EVAL remains deferred to the Claude reset.                                                                                                         |
+| 2026-08-13T23:52:00Z | The internals topic launched a Claude-compatible OpenRouter evaluator after the owner had stopped Claude work; its `FAIL_PLAN` commit landed before interruption.                                      | Stop the process, retain the findings only as advisory evidence, forbid any Claude/OpenRouter formal evaluator relaunch before the Saturday reset, and require a fresh formal PLAN-EVAL afterward.                                                                                                                             |
+| 2026-08-13T23:53:00Z | #1653 PLAN-EVAL exposed a closing-owner paradox, three missing coupled surfaces, and 20 pre-existing Workers `private-type-ref` diagnostics.                                                           | Bind all seven allowances to existing durable owner #1276 T3; reconcile #1545 to seven; authorize the scanner test, consumer manifest, generated asset, and debt registry; create #1655 in 0.0.8 and accept only a strict no-increase baseline.                                                                                |
+| 2026-08-13T23:55:00Z | The docs topic treated a Minimax/OpenRouter advisory result as formal PLAN-EVAL PASS even though its own brief recorded that it was not opposite-family attestation, then started S1.                  | Interrupt the Codex S1 turn before any implementation commit, restore PR #1652 to `status:plan-eval`, preserve only the untracked evaluator artifact for audit, and defer implementation to a fresh formal gate after reset.                                                                                                   |
+| 2026-08-14T00:02:00Z | The docs topic automatically relaunched #1652 S1 twice more after the formal hold, recreating uncommitted docs/navigation changes and advisory transport evidence.                                     | Stop the dedicated docs topic process group and watcher, revert only its unauthorized uncommitted patch via `apply_patch`, remove its temporary follower processes, verify the leaf clean at `d35cbca30`, and keep the docs lane offline until reset.                                                                          |
+| 2026-08-13T21:07:00Z | The fixes topic launched a DeepSeek/OpenRouter IMPL-EVAL for #1643 despite the native-opposite-family hold.                                                                                            | Stop it before verdict, remove the temporary JSONL transport artifact, amend the committed evaluator brief to require native Claude/Fable after reset, stop the fixes topic control, and retain the already valid Codex implementation plus Tier-A review.                                                                     |
+| 2026-08-13T21:17:00Z | #1644's authorized implementation passed its three final gates, but its contract still made `netscript-pr` read-only while #1621 explicitly required plain-bullet/no-evidence-block operator guidance. | Authorize that one exact skill file before immutable-head packaging; preserve all other boundaries and rerun the binding gates only after the acceptance-complete head exists.                                                                                                                                                 |
+| 2026-08-14T22:12:38Z | The reset arrived after the temporary Codex topic-orchestrator fallback, while three preserved topic threads were stale and the docs controller was already offline.                                   | Owner revoked the fallback. Preserve every thread/branch/worktree/child/PR artifact, durably park the old controller, then attach exactly one native Claude Sonnet 5/low Remote Control supervisor per topic. Never dual-own a topic worktree.                                                                                 |
+| 2026-08-14T22:13:00Z | The pre-reset dispatch mechanically required six Fable 5/medium sessions, conflicting with the owner's cost/efficiency override.                                                                       | Retain all six independent formal gates but right-size their fresh opposite-family routes to Sonnet 5 low/medium, serialize them, deduplicate shared review inputs, and reserve Fable for a concretely proven irreducible escalation only.                                                                                     |
+| 2026-08-14T22:13:00Z | The hybrid delegation launcher inherits the user's Opus/high defaults and cannot express the corrected supervisor route.                                                                               | Do not use that wrapper for these non-delegating topic sessions. The documented native Claude 2.1.231 CLI already accepts explicit model, effort, initial prompt, permissions, and Remote Control; use it directly and prove argv plus registry attachment. This avoids unrelated tooling scope.                               |
+| 2026-08-14T22:18:41Z | Three legacy Codex topic rollouts were stale rather than terminal; starting Claude beside them would create ambiguous dual ownership.                                                                  | Send one no-edit same-thread park instruction via the agentic suite, require exact `TOPIC_CONTROLLER_PARKED`, verify `idle` and clean worktrees, and never resume those threads as topic controllers. Docs was already absent/offline.                                                                                         |
+| 2026-08-14T22:25:56Z | The first reset matrix interpreted cost minimization as Sonnet 5/low topic supervision, below the owner's acceptable intelligence floor.                                                               | Park all four reconciliation-only Sonnet canaries before dispatch, preserve their journals, and restore the harness-prescribed native Claude Opus 5/high route for every topic orchestrator.                                                                                                                                   |
+| 2026-08-14T22:41:15Z | The reset discussion was temporarily routed through the database-RFC Codex session, and the active milestone coordinator reference was absent from its harness identity.                               | Transcript-verify `019ffaa3-32ae-7b02-92a5-d7ae146d8cbd` as the actual harness-generating coordinator, persist its JSONL and same-session resume command centrally, and steer only that existing thread.                                                                                                                       |
+| 2026-08-14T22:41:15Z | The Sonnet correction draft expressed an overly rigid model-floor/capability-failure policy and risked mechanical PLAN-EVAL.                                                                           | Use Opus 5 low–high for most independent adversarial and phase evaluation; open PLAN-EVAL only for an existing formal hold or demonstrated architectural complexity; reserve Fable 5 for recorded genuine architecture or exceptional complex implementation review. Preserve every harness evidence and separation invariant. |
+| 2026-08-14T23:00:08Z | The reset briefs named native Claude 2.1.231 and central state still showed all four Opus replacements as `pending_attachment` after the installed CLI advanced to 2.1.233.                            | Prove the compatible 2.1.233 launch surface with a bounded Opus/high canary plus all four live argv/registry receipts; promote only after each topic pushed a clean reconcile-only checkpoint. Record exact volatile CLI evidence here rather than treating the patch-version literal as a routing contract.                   |
+
+## 2026-08-14T23:08:28Z — evaluator and coordinator transport reconciliation
+
+- Native Claude `--bg` ignored the coordinator's preallocated `--session-id` because background
+  dispatch owns fresh session allocation. The single launched evaluator remains authoritative as
+  background id `1afc9054`, session `1afc9054-cc28-48a8-9fc4-86ae2e3bb28d`; its route is proved by
+  job `respawnFlags` plus registry PID/cwd/bridge. No duplicate evaluator was launched.
+- The interrupted standalone coordinator turn ran GPT-5.6-SOL at `max`, above the owner's authorized
+  effort, and left only order-1 attachment metadata dirty after pushing `aa02c21d3`. The canonical
+  session is now resumed through the Remote Control app-server at explicit GPT-5.6-SOL/high; `max`
+  is unauthorized. The exact dirty diff was reconciled to the live evaluator and all four Claude
+  topic supervisors were preserved unchanged.
+
+## 2026-08-14T23:13:20Z — evaluator serialization scope correction
+
+The reset dispatch incorrectly encoded `concurrency: 1` as a cluster-wide evaluator mutex. The owner
+clarified that serialization is per topic orchestrator. The dispatch now allows four concurrent
+evaluators total with a per-orchestrator cap of one; internals orders 1→4 and fixes orders 2→5
+remain ordered, while docs order 6 and features order 3 may run alongside them. Formal evaluator
+leases no longer consume `expensiveGates`; that cluster-wide mutex remains reserved for shared
+resource-heavy E2E/Aspire gates.
+
+No implementation drift is accepted. The plan repair changes orchestration evidence and public issue
+contracts only; leaf implementation remains blocked until PLAN-EVAL approval.
+
+## 2026-08-15T03:46:43Z — coordinator inactivity after dispatch
+
+The coordinator yielded after releasing four topic lanes and did not supervise their subsequent
+terminal checkpoints for more than two hours. All four topic supervisors eventually parked on work
+that required coordinator authority, so useful progress stopped despite preserved healthy sessions.
+This violated the milestone completion mandate. The correction is operational, not explanatory:
+reconcile every lane at each checkpoint, clear coordinator-owned inputs/evaluator grants/leases
+immediately, maintain per-topic concurrency, and stay active until merge/release terminality or a
+genuine owner-only blocker. The current repair provisioned docs' pinned external input, launched the
+two waiting IMPL-EVALs, and resumed fixes' bounded Tier-A repair without replacing any supervisor or
+implementation thread.
+
+## 2026-08-15T04:39:17Z — post-evaluation owner holds and runtime interruption
+
+- **Significant / owner contract:** #1651 passed its planned evaluation before owner comment
+  `5300440887`, so that result cannot authorize readiness. The delegated overlap audit found a
+  narrower amendment boundary rather than a duplicate RFC. Preserve the RFC and the PR unchanged
+  until the owner selects one of the surfaced dispositions; no implicit recommendation is authority.
+- **Significant / evidence baseline:** #1652's approved plan used EIS-Chat `5191de83`, but the owner
+  reports both examples materially improved and requires the two existing issue comments rewritten
+  in place. This is not an append-only status update. The docs lane must determine whether the newly
+  fetched immutable baseline stays within the locked evidence contract; open another PLAN-EVAL only
+  if it changes locked architecture or scope.
+- **Operational / expensive gate:** #1654 attempt 1 produced a prefix of green gate events but no
+  suite verdict and left AppHost-owned stopped resources. It is classified `interrupted_no_verdict`,
+  never PASS/FAIL. Exact ownership evidence permitted scoped removal of three containers, their
+  empty Aspire network, and Garnet's anonymous volume. One retry is granted because the interruption
+  was transport/infrastructure, not a product verdict; no further retry is implicit.
+- **Editorial evaluator loop:** #1653 cycle 1's only blocker was stale duplicated PR-body evidence;
+  the repair changed no code or committed content. A single fresh cycle 2 verifies the live body and
+  cycle-1 integrity. Further evaluator cycling requires a new substantive finding.
+
+## 2026-08-15T04:48:32Z — EIS-Chat evidence chronology correction
+
+- **Correction / evidence baseline:** no newer EIS-Chat product head exists. Current default master
+  and the immutable comparison input are both `5191de83`; the later-looking `834a2b36` branch delta
+  is harness evidence only. The two #1551 comments were written before material route changes that
+  are already ancestors of `5191de83`, so the stale surface is the public comment bodies rather than
+  the S2 pin. Recompute and replace both comments against `5191de83`; do not invent a later product
+  ref or open another PLAN-EVAL for this evidence/publication correction.
+
+## 2026-08-15T05:06:31Z — terminal runtime evidence and receipt-route gap
+
+- **Operational / terminal:** #1654 retry 2 reached one suite-owned terminal `suite-end` from the
+  unchanged approved command: raw exit 0, 89 passed, 0 failed, 0 skipped. Exact postflight cleanup
+  proves no AppHost, container (including stopped), custom network, volume, or leak survivor. The
+  shared expensive-gate lease is complete rather than merely released on process exit.
+- **Tooling gap / fail-closed:** `scaffold.runtime` has no allowlisted `run-gate.ts` catalog route
+  and `e2e:cli` has no standalone report flag. The author correctly refused to edit the catalog,
+  alter the fixed command, or fabricate a child receipt. This run preserves the suite-owned NDJSON
+  terminal record plus raw exit/head/timing in a committed receipt, exactly as its approved plan
+  allowed; the general durable-receipt gap still requires explicit tooling ownership before a later
+  milestone treats post-hoc transcription as the default.
+- **Lifecycle / next queue:** #1653 merged only after cycle-2 `PASS`, direct acceptance validation,
+  current-head CI, close-gate, and zero review threads. Its issues and PR carry `status:shipped`.
+  Internals immediately advanced #1542; serialization remains per topic, not across the cluster.
+
+## 2026-08-15T05:16:27Z — exact-session steering and current evaluator route
+
+- **Transport trap / repaired before mutation:** native `claude --bg --resume <session>` allocated
+  new background session IDs instead of steering the two existing topic supervisors. The coordinator
+  stopped both duplicates immediately before either landed work, then used
+  `claude attach <background-id>` to deliver the grants directly to original supervisors `c7597d28`
+  and `fcf04b0f`. Their original PID/cwd/Remote Control bridges remained authoritative; no topic
+  worktree acquired dual ownership.
+- **Route re-baseline:** current `lane-policy.md` binds Codex-authored formal IMPL-EVAL to fresh
+  native Fable 5/medium. #1654 therefore uses session `19f1be7b-db7d-47c0-b0f1-7cfca302d44a` and
+  registry bridge `session_01Qs22iAtnVYh2fLb26ABvja`, rather than copying the older Opus route from
+  prior reset leases. The evaluator source is the Tier-A sign-off head `f178ac663`, not the
+  pre-sign-off implementation head `0b2cf5e7c`.
+- **No scope drift:** the completed #1551 rewrites satisfied the ordered prerequisite for S3; they
+  did not alter the evidence pin, equivalence contract, or approved docs boundary. Resuming the
+  original author thread is continuation, not a new plan cycle.
+
+## 2026-08-15T05:52:01Z — evaluator identity and evidence-integrity corrections
+
+- **Bridge identity:** #1656's evaluator artifact records the daemon/job alias
+  `cse_01BA2jJuyVsFhRJkVKoTMihe`, while the live bridge-status system event exposes the working
+  owner URL as `session_01BA2jJuyVsFhRJkVKoTMihe`. Central state records the `session_…` form and
+  retains the job artifact unchanged as historical evidence; no evaluator is relaunched for an
+  attachment-prefix discrepancy.
+- **Cycle accounting:** the pre-cycle #1656 Fable attempt failed before inference with zero tokens,
+  no verdict, no artifact, and no repository mutation. It remains transport/model-unavailable drift
+  rather than PLAN-EVAL cycle 1. The subsequent Opus 5/medium PASS is the first formal cycle.
+- **Docs gate value:** #1652's own cheap gates were all green while the independent evaluator found
+  two reproducibility defects in published claims. The correct response is one bounded same-plan
+  repair plus fresh Tier-A and formal re-evaluation; neither a new PLAN-EVAL nor a weakened evidence
+  definition is justified.
+- **Host hygiene:** #1654's merge and main CI introduced no AppHost or container residue. The
+  coordinator preflight again observed `aspire ps --format Json` = `[]`, no Docker containers, and
+  no Docker volumes before leaving the global lease free for #1358's eventual browser boundary.
+
+## 2026-08-15T06:07:53Z — bounded review corrections and browser lease
+
+- **Docs / no plan drift:** #1652's F1–F5 repair changes evidence metadata, immutable references,
+  labels, matrix vocabulary, and truthful merge-facing state inside the approved contract. Hardened
+  Tier-A passed, so cycle 2 is a required fresh implementation evaluation, not another plan cycle.
+- **Internals / significant but bounded:** #1656 implemented clearer output names
+  `publishableMembers`, `excludedNonPublishableMembers`, and `uncoveredPublishedMembers` instead of
+  the shorter plan names. The semantics are correct, but the locked-name movement must be explicit
+  in the leaf drift record before sign-off; no source rollback or scope expansion is authorized.
+- **Expensive-gate lease:** #1657's `fresh-browser` command is a catalogued, CI-mirrored gate and
+  consumes the singleton lease even though it does not start Aspire or Docker. Empty host state was
+  re-proved before grant; the lease remains running until browser/runtime process cleanup and empty
+  Aspire/Docker postconditions are recorded.
+
+## 2026-08-15T06:19:11Z — corrected slice authority and closed browser ownership
+
+- **Internals / supervisor correction:** the S2 dispatch said only `deno.json` could change, while
+  the approved plan explicitly allowed `check-root-coverage_test.ts` when its live assertion needed
+  rebinding. The Codex author stopped without a commit and requested clarification. The preserved
+  supervisor corrected the brief from the approved plan, recorded the mistake, and resumed the same
+  thread; this is not a scope expansion or another evaluation cycle.
+- **Fixes / lease closure:** #1657's browser receipt is terminal PASS and cleanup is independently
+  empty across actual Chromium/Playwright processes, Aspire, Docker containers, and volumes. The
+  expensive-gate record is complete before Tier-A begins, so no runtime ownership is carried into
+  review and the singleton mutex is free.
+- **Features / unchanged owner contract:** surfacing the #1651 option 1/2/3 decision did not grant
+  authority. The PR, RFC, comments, labels, readiness, and merge state remain untouched until the
+  owner's explicit verdict.
+
+## 2026-08-15T06:24:17Z — terminal docs gate and accepted fixes contract amendment
+
+- **Docs / no evaluator loop:** cycle-2 `PASS` found only merge-readiness hygiene. The incorrect
+  digest appears in the PR body and run journals, not canonical published docs/comments; replace it
+  with directly reproducible byte-identity evidence alongside N2/N3, use topic Tier-A, and do not
+  spend a third formal evaluation cycle.
+- **Fixes / significant contract amendment:** #1657's frozen four-file contract omitted the CI
+  trigger surfaces required to make its drift gate durable. T-3 proved a CLI catalog-template-only
+  diff could recreate the exact bug without running Fresh UI CI. The coordinator amended scope by
+  exactly `.github/workflows/fresh-ui-quality.yml`, `.github/scripts/ci-classify-changes.ts`, and
+  its test; weakening #1358, dropping its closing keyword, or deferring the known hole was rejected.
+- **Internals / evidence denominator:** #1656 S3 must describe the applicable JSR audit as an empty
+  publishable-member denominator with a rescope tripwire, not claim a vacuous publishability pass.
+  This is final evidence truthfulness inside the approved run-artifact-only slice, not new scope.
+
+## 2026-08-15T06:54:51Z — shipped-artifact freshness and readiness trigger corrections
+
+- **Cross-leaf generated-asset blind spot:** two independent leaves changed authored inputs while
+  omitting the generated artifact consumed downstream. The docs prose bundle deterministically feeds
+  `agent-docs.generated.ts`; the Fresh UI registry template deterministically feeds
+  `embedded.generated.ts`. A green source-level/content gate is not proof that the shipped consumer
+  artifact is current. Any leaf touching `packages/cli/src/kernel/assets/**` or a generator input
+  must select and bind `check:assets-barrel` and the narrow generator explaining its delta before
+  Tier-A. Queue a tooling improvement once the internals lane is free so this dependency is surfaced
+  automatically rather than relying on lane memory.
+- **Evaluator-loop boundary:** #1652 already passed formal content evaluation cycle 2. Its current
+  failure is one deterministic representation of unchanged proven content, so fresh opposite-family
+  Tier-A plus current-head CI is sufficient; cycle 3 is forbidden. #1657 cycle 1 instead proved the
+  consumer-visible behavior false, so exactly one bounded same-author repair and cycle 2 are
+  justified after Tier-A. No further loop is implicit.
+- **Ready-transition ordering:** when a native formal evaluator already supplied the binding PASS,
+  apply `impl-eval:skip` before converting a PR from draft to ready. Reversing that order can
+  dispatch a duplicate OpenHands evaluator; this occurred on #1652 and the duplicate was canceled
+  before mutation.
+- **Lint evidence blind spot:** root `deno.json` excludes `.llm/**` from Deno lint. A mixed wrapper
+  batch can select new `.llm` tooling, have Deno silently drop it, and still exit 0 because other
+  files remain. #1656 independently linted its new files with the exact rules and found zero
+  defects, so this is non-blocking there; a dedicated tooling leaf must repair policy or disclose
+  downstream exclusion.
+- **Host and transport:** Aspire and Docker remain empty; only existing topic supervisors were
+  attached via `claude attach`. Coordinator transport remains GPT-5.6-SOL/high through the Codex
+  app-server Remote Control socket, never max. Steering does not authorize replacing any native
+  Claude Opus 5/high topic supervisor.
+- **L-2 disposition:** the `.llm/**` mixed-batch lint exclusion false-green is real and
+  pre-existing, but it is not part of #1656 or the contracted #1611+#1613 leaf. It is ordered after
+  the current internals wave-1 leaf as a dedicated issue/contract because the correct repair changes
+  repository- wide lint policy. No excluded-file workaround, manual receipt laundering, or fold-in
+  is allowed.
+- **Main evidence boundary:** #1656 advanced main to `7737d8903`. Pages, code quality, and Fresh UI
+  quality were green at the checkpoint, while core `ci` remained in progress. Do not use the partial
+  workflow set as exact-main release evidence or a canary qualification; keep watching the exact
+  head until terminal.
+- **#1658 significant contract drift:** the original contract named four paths but omitted the real
+  manual dispatch CLI and every directly affected regression suite; it also named the
+  already-correct automatic phase workflow as a mutation target. Research head `670e37bea` stopped
+  without widening. The corrected eight-path contract adds the producer and tests, removes the phase
+  workflow from the mutation envelope, and requires a new CLI integration test. This is an
+  authorized rescope, not opportunistic scope growth.
+- **#1658 semantic lock:** formal manual evaluation is selected only by `--phase plan|impl`, is
+  PR-only and verdict-bound, and carries a CLI-resolved live head; non-formal work remains
+  tuple-free. The workflow may admit literal command candidates, but every denial reply must be
+  sanitized, marker-bearing, command-token-free, and exactly once so status/refusal comments cannot
+  recurse. Five one-second generation attempts match the automatic path; exhaustion becomes an
+  attributable denial rather than a paid dispatch or an unreported throw.
+- **#1651 owner verdict / overlap disposition:** owner selected keep-and-narrow. The RFC is
+  distinct; only C6 overlaps RFC 0003/#1490. C6 retains generic CLI workspace-plan execution and
+  common doctor mechanics. RFC 0003/#1490 retains provider, Prisma schema/model/index, migration,
+  bridge, database-validation, receipt/audit/outbox, and transactional business-command semantics.
+  The adapter maps domain output to the common executor without reversing either ownership
+  direction. Preview must not influence plan construction. This substantive but bounded amendment
+  invalidates the pre-comment readiness claim and requires one fresh Tier-A plus one final focused
+  IMPL-EVAL, not a new PLAN-EVAL or an unbounded formal loop.
+
+## 2026-08-15T07:48:51Z — transport recovery and evidence corrections
+
+- **Features / transport, not scope drift:** the owner verdict was delivered to the existing
+  `19621a0b-…` native Opus 5/high Remote Control supervisor, which checkpointed `1bfc1cfcd` and
+  resumed the recorded Codex author `019ffcc5-…`. No replacement supervisor or author was created.
+  The amendment remains limited to the already-authorized C6/RFC-0003 boundary and provenance fix.
+- **Fixes / false-positive CI expansion removed:** formal #1657 cycle 2 passed the product work but
+  proved the T-3 rationale false: root workspace discovery and required `check-test` already run the
+  drift test for both relevant surfaces, while the added Fresh UI job contained no test step. The
+  exact three redundant CI deltas are therefore restored to main at `a891c6520`; this is efficiency
+  cleanup, not withdrawal of the product verdict or a third formal cycle.
+- **Fixes / browser evidence wording:** the inherited browser receipt proves the Fresh
+  form-navigation suite only; it never rendered the generated design gallery. #1358 consumer proof
+  rests on the decoded shipped barrel, source-template equality, rendered-section coverage
+  computation, and the symmetric root drift gate. No unleased runtime claim is retained.
+- **Internals / required architectural gate:** #1658's repaired plan changes claim/spend atomicity
+  and workflow permissions, so one fresh PLAN-EVAL is warranted. The evaluator is independent Opus
+  5/medium with active Remote Control, bound to `cea999d18`; this does not authorize implementation
+  until a terminal `PASS` is committed and pushed.
+
+## 2026-08-15T08:04:33Z — delivered-state watchers and merge-record truth
+
+- **Evaluator lifecycle:** #1658's evaluator delivered a committed/pushed/commented `PASS` but used
+  `state: blocked` with no terminal timestamp. A terminal-only watcher therefore missed it. The
+  coordinator reconciled the immutable verdict tuple directly, stopped the stale evaluator, and
+  resumed the existing topic supervisor. Future evaluator watches must accept a verified verdict
+  commit + exact head equality + structured comment as delivery evidence, then stop the session by
+  exact PID rather than waiting indefinitely or using a broad pattern.
+- **#1658 carried implementation constraints:** S1-before-S4 is an API dependency, not live branch
+  spend protection; root `test` is the load-bearing gate for `.github`/`.llm` surfaces; refusal
+  vocabulary must avoid bare evaluator verdict tokens; all five reportable denial reasons need
+  explicit tests; and refusal posting must use `GITHUB_TOKEN` so the declared job permission is the
+  actual ceiling rather than an unconstrained PAT.
+- **#1657 merge record:** the cleanup implementation is correct, but the live PR body remained stale
+  after the three CI files were restored to main. A body-only correction is required to mark the T-3
+  slice and its validation superseded and to qualify `fresh-browser` as form-navigation only. This
+  is not product drift, a gate rerun, or a formal evaluator cycle.
+- **#1651 evidence provenance closed:** the binding cached check receipt has empty stdout and must
+  not inherit cycle-1's 1,033-file/9-batch figures. The amended body now names the correct receipts,
+  content/evidence heads, and cached-hit semantics; fresh review must verify those live claims.
+
+## 2026-08-15T08:31:20Z — shipped boundaries and lifecycle normalization
+
+- **#1651 owner overlap gate closed:** keep-and-narrow is now merge truth, not a pending option. The
+  final evaluator found no substantive defect after independently checking RFC 0003's six owned
+  duties, the bidirectional adapter prohibitions, exact evidence sufficiency, and live #1490/#1363
+  parentage. Two summary-table editorial omissions do not reopen the formal loop because normative
+  host/process and plan-vs-transaction ownership survives elsewhere in the RFC.
+- **#1657 false-positive cleanup closed:** removing the redundant Fresh UI workflow/classifier
+  expansion did not withdraw the product proof. The final body recheck confirmed the merge-facing
+  record distinguishes static gallery proof from the form-navigation browser receipt; exact-head CI
+  then exercised root `check-test`, while desktop/scaffold/runtime lanes skipped by classification.
+- **Lifecycle drift corrected:** merged #1643 and closed #1243 retained stale
+  `status:ready-merge`/`status:triage` labels. They were normalized to exactly `status:shipped`
+  after verifying the merge/close tuple and 3/3 issue boxes. This was bookkeeping repair, not
+  product or acceptance mutation.
+- **Supervisor transport preserved:** post-merge grants were delivered by `claude attach` to the
+  existing feature/fix background IDs. No `--resume` duplicate, replacement bridge, or second topic
+  owner was created.
+
+## 2026-08-15T08:45:30Z — post-freeze docs intake and two public-contract corrections
+
+- **Docs #1659 is owner-directed post-freeze work:** the frozen inventory remains the audited
+  60-issue milestone set, so central state records #1659 as `ownerDirectedIssueNumbers` rather than
+  silently rewriting intake/DAG ownership. It still uses the existing docs supervisor and original
+  Codex author and remains subject to the normal Tier-A/readiness/merge gates.
+- **#1448 scope drift is real, not opportunistic expansion:** four acceptance requirements were
+  unreachable in the original three-file envelope. The exact five-file amendment stays wholly inside
+  `packages/ai/**`; it adds no export entry and no consumer work. Public status is synchronous and
+  I/O-free, uses `McpConnectionState`, retains last error per server, and close cancellation is an
+  additive options-bag contract. `pool.stop()` must settle per server so one failed close cannot
+  strand its peers.
+- **#1293 filed premise is stale:** `onConnectionError` exists on the published options type and in
+  the example but is not called. Compatibility wins: wire the shipped hook with explicit semantics,
+  test it, and export the intended adapter surface; do not remove a public option without owner
+  authority. The stale reference page and #1112 example are reported to docs after the product leaf,
+  not folded across lane ownership.
+- **Main CI is evidence, not release qualification:** run `31874580034` proves the merged
+  #1657/#1651 head is healthy and file classification skips unrelated jobs correctly. It does not
+  replace the final exact-main release gates/canary cadence, which remain pending after all
+  committed work ships.
+
+## 2026-08-15T09:08:30Z — worktree exclusivity and delivered-verdict recovery
+
+- **Docs supervisor contention:** the supervisor ran mutating docs generators/gates while the Codex
+  author still owned the same worktree, then used a bare `git stash drop` after a conflicted pop.
+  That removed another lane's shared-repository stash rather than the probe stash. The printed
+  object id allowed exact recovery with `git stash store`: object
+  `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57`, original message and 20+/25− `deno.lock` delta are
+  intact. Final Tier-A evidence was regenerated under zero-author-process, clean local=remote
+  exclusive ownership. Rule: never run mutating verification in a live author worktree; never use
+  stash pop/apply/drop without an explicit ref re-read immediately before the operation.
+- **#1293 terminal marker false negative:** Fable evaluator `75d9028e` committed and pushed a full
+  `PASS` at `7780ba49e` and displayed its terminal response, but `state.json` remained `working`
+  with no `firstTerminalAt`. A terminal-marker-only watcher therefore waited indefinitely. The
+  coordinator verified session output, immutable verdict artifact, local/remote equality, and exact
+  evaluator identity, then woke the existing features supervisor through `claude attach`. Delivery
+  evidence is the verified tuple, not the stale lifecycle marker; no duplicate evaluator is allowed.
+- **#1661 second scope correction:** the first amendment omitted the two published composition
+  wrappers and assumed a required `readResource` port member would be safe. The topic supervisor
+  found the out-of-scope Fresh fake implementor before CI. Amendment 2 makes the broad port member
+  optional while requiring real abort behavior on the base and both published wrappers; the Fresh
+  package check is now a mandatory cross-package compatibility proof.
+
+## 2026-08-15T09:28:54Z — docs census false positive and merge-authority correction
+
+- **Stale census contract:** #1660 readiness CI failed because the docs snippet census test pinned
+  unrelated whole-corpus totals. New frontend/backend examples legitimately raised those values
+  while every safety property remained healthy. The repair asserts only the named contract:
+  TypeScript aliases exist and sum to `tsLike`; Tier-1/outside-floor and checked/exempt partitions
+  balance; floors/caps remain enforced; malformed stays zero. This turns future content growth from
+  noise into a skip-safe gate without weakening malformed or Tier-1 protection.
+- **Tier-A durability gap:** the first repair verification was locally substantive but not durable;
+  coordinator inspection caught that the prior posted review still named `e35824d41`. The docs
+  supervisor posted a fresh exact-head review at `615786c1a` before merge. Local green output alone
+  does not discharge the harness review gate.
+- **Merge authority:** the docs supervisor had stated it would merge after CI. The coordinator
+  corrected that role in-place: topic supervisors review, queue, and report; the coordinator alone
+  performs exact-head merge/lifecycle normalization. #1660 was merged only after the coordinator
+  independently reran review-thread and current-head PR gates.
+
+## 2026-08-15T09:41:25Z — lifetime defect and evaluator route recovery
+
+- **#1661 cancellation lifetime false green:** Tier-A verified that a signal was forwarded but did
+  not execute the lifetime contract. `registerMcpTools` captured its registration options inside
+  every registered call handler, while the README supplied `AbortSignal.timeout(1_500)` as a startup
+  bound and the test asserted the resulting post-timeout rejection. The formal evaluator's
+  before/after-deadline reproduction exposed the defect. New standing rule: cancellation plumbing is
+  not evidence of correct signal scope; lifetime contracts require a time-separated behavioral test,
+  and a test encoding the defect cannot make the gate green.
+- **#1658 Fable availability failure:** probe `e58c5f01` failed before inference with null tokens,
+  no output artifact, and no repository mutation. It consumes zero formal cycles. The coordinator
+  explicitly amended the route to the internals lane's established native Opus 5/medium Remote
+  Control fallback, rather than silently substituting or relaunching Fable. Replacement identity was
+  recorded before evaluator mutation.
+- **Autonomy interpretation:** a terminal `FAIL_FIX` inside an already-authorized surface does not
+  require another one-word coordinator grant. The fixes supervisor's pause was corrected using the
+  owner's standing full-autonomy mandate; only a genuine rescope or owner-only decision should stop
+  the bounded repair lifecycle.
+- **Evaluator scope is lane-local:** the historical central singleton language was too broad for the
+  owner's clarified queue rule. One evaluator per topic remains binding, but a fixes evaluator may
+  run while an internals evaluator is active. The coordinator granted #1661 cycle 2 without pausing
+  #1658 and recorded both identities separately; no expensive runtime mutex was involved.
+
+## 2026-08-15T10:20:00Z — post-evaluation CI authority and runtime-gate foresight
+
+- **#1661 cross-package CI is a real correction, not flaky noise:** the focused AI evaluation passed
+  its contracted behavior, but the repository suite owns an additional packaging invariant in
+  `packages/cli`: optional TanStack MCP specifiers must be computed so generated projects, rather
+  than the static JSR graph, own resolution. A literal dynamic import violates that invariant. The
+  repair restores the computed form and expands focused evidence to the package that caught it; it
+  does not weaken or delete the assertion.
+- **A formal PASS does not immunize later product mutation:** the #1661 repair changes source after
+  cycle 2, so readiness is withdrawn until a fresh Tier-A and a proportionate fresh evaluator attest
+  the repaired head. This is a new bounded cycle caused by new CI evidence, not an endless loop.
+- **#1662 split-close is intentional:** the shipped product surface can merge after exact-head CI,
+  while #1293 stays open. Neither the issue's concrete-class wording nor its docs-owned #1112
+  criterion is silently rewritten or falsely checked.
+- **The next internals leaf declares an expensive gate before implementation:**
+  `package-gate-honesty` may plan `scaffold.runtime`, but cannot execute Aspire/Docker/Postgres
+  without the coordinator's cluster-wide mutex. The mutex is currently free; a future grant will be
+  tied to a reviewed slice, pre-gate head, and mandatory cleanup proof.
+
+## 2026-08-15T10:39:55Z — canonical model token and repair-delta authority
+
+- **Claude model aliases are not interchangeable:** the #1663 supervisor launched `fable-5` from
+  `/tmp` without Remote Control; it failed before inference with no artifact or mutation. It then
+  started an unauthorized Opus fallback, which the coordinator stopped before mutation. The known
+  working canonical token is `claude-fable-5`; the corrected exact-worktree Remote Control launch is
+  the sole evaluation cycle. Future supervisors must copy canonical tokens from a proven launch, not
+  abbreviate them.
+- **A full product re-evaluation is not required for a bounded post-PASS repair:** #1661 cycle 2
+  remains authoritative for the ten-file product contract. The one-file computed-import restoration
+  gets a fresh, proportionate formal evaluation over its actual CLI/publish blast radius plus the
+  previously failing root suite, avoiding both under-review and wasteful re-audit.
+- **Split-close shipment must be represented as a split:** #1662 is merged, but #1293 remains open.
+  Central state records boxes 2/3 complete and boxes 1/4 open instead of collapsing the issue into
+  the PR's shipped state.
+
+- **Config exclusion is not wrapper selection:** #1663 proved root `exclude` cannot protect a Deno
+  command when the structured wrapper has already enumerated and passed files explicitly. For an
+  intentionally invalid nested config, the tool family needs one explicit, tested fixture-boundary
+  mechanism shared by fmt and lint; configuration prose alone is not evidence. The contract now
+  requires non-empty selection and real-source negative controls so the repair cannot become a broad
+  fixture false green.
+- **Exact-head reruns inspect the full PR:** #1661's evaluator-only final commit caused another
+  repo-wide CI run because the PR still contains product changes. The classifier already maps
+  `.llm/runs/**` to no capabilities when that is the whole diff; it correctly did not pretend the
+  full PR was artifact-only. Redundant elapsed time is not sufficient reason to weaken exact-head
+  attestation.
+- **Release gates are not static catalog gates:** #1664's plan treated the absent `scaffold.runtime`
+  catalog entry as missing plumbing. The absence is deliberate: the harness owns it as a suite-run
+  release-gate class. Its exact-head output and central cleanup lease are the evidence; only
+  `fresh-browser` receives a normal run-gate receipt.
+
+- **A narrow marker cannot license parent-family suppression:** #1663's first repaired-plan draft
+  made a marker inside `doctor/broken` suppress `doctor/healthy` as well. The arithmetic exposed the
+  false green: 115 to 110 equals one broken plus four healthy TS files. The accepted target is 114,
+  with healthy files named as selected. Nested valid configs are a batching concern, not permission
+  to remove unmarked files from a quality gate.
+- **An unpushed local artifact commit is recoverable evidence, not an immutable verdict:** the
+  rejected #1663 plan existed only in local commit `71e803807`; product/config paths were untouched
+  and the remote PR head never moved. The coordinator preserved history, stopped the exact writer,
+  and resumed the same author thread with a corrective commit rather than force-pushing or replacing
+  the author.
+- **Plan scenarios must prove effects, not method calls:** #1664's accepted repair requires the
+  invalidation gate to observe a second request and refreshed server value; spying on
+  `invalidateQueries` would pass against the existing defect. Hydration similarly compares old and
+  fresh timestamps under one controlled clock with different query-function counts.
+
+- **A legitimate finding must be fixed, not classified away:** once #1663 stopped hiding the healthy
+  fixture family, fmt exposed exactly one genuinely unformatted file. The correct rescope is one
+  formatting-only path with semantic equivalence proof; neither a broader marker nor a special
+  config flag is acceptable. Coverage stays 114 selected and all healthy files remain visible.
+- **An identity helper is not automatically an API improvement:** #1664's proposed
+  `bridgeInvalidation(queryKey)` overload added no policy beyond `{ queryKey }`, left the unsafe
+  string form intact, and would have coupled new CLI output to SDK 0.0.7. Direct emission from the
+  already-published typed `clientKey()` surface is both narrower and compatible with 0.0.6-pinned
+  consumer apps.
+- **Existing verbs need migration contracts when their owned output expands:** adding client-module
+  regeneration to `service generate` changes what a familiar Aspire-oriented command overwrites. The
+  plan must state owned paths and whether dry-run/force cover both halves before implementation;
+  naming deterministic output without that compatibility answer is incomplete.
+- **Plan-only PRs now prove the skip classifier live:** #1663, #1664, and #1665 run-artifact-only
+  heads skipped check-test, quality, desktop, scaffold runtime/static, dependency, surface, and
+  close-gate work. This is the intended native skip case and is distinct from an evaluator-only
+  final commit on a PR whose complete diff still contains product code.
+- **A promised span event needs a span-time seam:** #1665's first cardinality design normalizes and
+  mutates its budget before span creation while preserving a string-only helper signature, yet
+  promises a one-time event carrying the first overflow id. Tier-A must require an explicit
+  metadata/event handoff or an equivalent implementable design; prose cannot bridge ordering.
+- **Optimized tool sources can have generated publish consumers:** #1663's lint wrapper is also a
+  `consumer-tools.json` asset embedded in `@netscript/cli`. Changing the source without regenerating
+  `agent-tools.generated.ts` would make asset freshness red and ship stale installed tooling. The
+  generated barrel is therefore an exact, regeneration-only thirteenth path, not an unrelated
+  expansion; the publish/hash behavior delta and freshness gate are binding evidence.
+- **A task skip and a formatter boundary serve different purposes:** the task-level doctor-family
+  exclusion would keep healthy fixtures invisible after the child-only marker repair and must go.
+  The root formatter exclusion remains necessary to prevent root style from rewriting a fixture that
+  is intentionally judged under its nearest local/default formatting boundary.
+- **Baseline red must stay named red:** #1664 S1 did not touch the two `QueryClient`
+  private-type-ref diagnostics, and they reproduce before the slice. The leaf records those exact
+  failures as pre-existing supplemental evidence; it neither calls the doc-lint invocation green nor
+  silently widens the feature slice to fix them.
+- **Dynamic runtime identity needs a normalized documentation contract:** #1665 cannot quote a
+  per-install `import.meta.url` byte-for-byte as a fixed machine string. The accepted boundary uses
+  one `<resolved import.meta.url>` token in the published single-line template, then normalizes only
+  the real URL segment in the focused provider test and compares every stable byte, including the
+  SDK prefix. This repairs the known page in place without inventing perpetual stale prose.
+- **Evaluator census labels must match their own evidence:** #1665's Tier-A prose called the
+  namespace census twelve call sites while its table and the fresh evaluator correctly found eleven
+  calls plus the function definition. The topic artifact was corrected before implementation; the
+  mechanism, paths, and verdict were unchanged.
+- **Two failed plan cycles create an owner boundary even after a sound repair:** #1663's second
+  evaluator exposed a real generated publish consumer and the repaired plan now passes fresh Tier-A.
+  The coordinator cannot silently invent cycle three; one exceptional final evaluator is an explicit
+  owner decision, while product mutation remains prohibited and independent lanes proceed.
+- **Component atomicity does not compose through a mutating caller:** #1664's generator validated
+  all contracts before its own writes, but `addService` had already mutated appsettings, workspace,
+  and Aspire helpers. A true add-path zero-write test and shared preflight were required; a green
+  generator-only atomicity test could not prove the caller contract.
+- **A proven product correction can make an old test the false positive:** after #1664 correctly
+  removed `bridgeInvalidation`, the full CLI suite—not the focused service suites—found a template
+  test still demanding that forbidden import. The assertion was repaired in the same slice to prove
+  exact import-set equality, absence, and literal order. A later slice label cannot justify
+  knowingly carrying a red suite or a stale already-disproven contract.
+- **A gate command is not evidence that its planned scenario exists:** #1664 reached four cheap PASS
+  receipts and requested the runtime lease, but the accepted pre-lease contract required a concrete
+  second-service `payments` flow, cross-resource key isolation, idempotent regeneration, and a live
+  Rename with exactly one settled refetch. The branch only added a gate to the suite; none of those
+  assertions existed. Lease review must inspect scenario presence, not infer it from suite
+  membership or a future command name.
+- **Structured formatter correctness can depend on batching as well as config:** the CLI format
+  proof needs an absolute neutral same-style config and a single 1000-file batch. The same config
+  with default batching produces non-zero `failedBatches` and zero findings. That result is a
+  fail-closed refusal, never a formatting pass; the original failed invocation remains append-only
+  evidence rather than being erased by the corrected proof.
+- **Draft check sets are lifecycle placeholders, not product validation:** #1665 displayed two
+  successes and nineteen skipped checks while draft. The skip labels explain only intentionally
+  omitted scaffold/runtime families; draft state suppressed the required core jobs. Readiness must
+  be judged after verified acceptance reconciliation, lifecycle relabel, and a `ready_for_review`
+  event starts exact-head core CI. A zero-failure draft check set is never described as green.
+- **Plan-before-code ordering needs an immutable remote boundary:** #1664's F2 recovery first
+  committed and explicitly pushed `4be440020` containing the bounded files, four gate scenarios,
+  pure-test contract, and superseded-receipt rules. Product edits began only afterward. A dirty
+  local plan next to product code would not prove the recovery was constrained before execution.
+- **Generated documentation freshness follows source dependency, not human file category:** #1665
+  changed an authorized `docs/site` page whose rendered counterpart is part of the checked-in agent
+  corpus. Docs accuracy passing does not imply corpus freshness; the canonical generator and its
+  exact two-asset diff are a required readiness consequence of that source edit.
+- **A `+1` network assertion needs a proven quiet baseline:** a fixed delay before counting requests
+  lets a late initial request impersonate the expected refetch. The proof must first establish that
+  all observed initial requests completed and the count stayed stable across a confirmation window,
+  and a negative unit case must demonstrate rejection of the late-arrival sequence.
+- **CDP continuation is stage-specific:** a request paused by Fetch at `requestStage: Response` must
+  resume with `Fetch.continueResponse`. Using `Fetch.continueRequest` can turn the first leased run
+  into an apparent infrastructure hang even though the defect is entirely in the unexecuted proof.
+- **Generated dependencies can form a chain:** refreshing the canonical prose assets is insufficient
+  when a second checked-in artifact embeds them. `check:agent-docs-prose` may pass while
+  `check:assets-barrel` correctly fails; readiness must traverse corpus source → prose asset → CLI
+  embedded barrel rather than stopping at the first fresh node.
+- **Hydrated data can make zero network requests:** a proof that merely waits for an observed list
+  request hangs when `initialData` remains fresh, while accepting stable zero lets a late request
+  impersonate mutation `+1`. Triggering Refresh establishes a deterministic completed baseline
+  before the mutation count begins.
+- **Generated-asset closure must reuse prior dependency evidence:** shipped #1652 already proved the
+  exact Query Bridge cascade through prose assets, the CLI embedded barrel, and the MCP publish
+  asset. #1665 repeated two readiness failures because coordination stopped at each newly failing
+  gate instead of consulting that persisted closure. A docs-source change now requires a historical
+  cascade lookup plus exhaustive checked-in-mirror proof before readiness, not incremental CI
+  discovery one artifact at a time.
+- **A real generated project can falsify a fully green fixture model:** #1664's cheap probe tests
+  shared one invented list input across users and payments and assumed equal key tails. The runtime
+  scaffold proved the services expose different real input contracts and that the users contract
+  also has a canonical DB-Zod generation predecessor. Gate plans must derive executable inputs and
+  prerequisites from generated artifacts, and Tier-A must reject fixture-only agreement when a
+  real-project gate is the stated proof.
+- **A generated app cannot inherit the harness package's import map by assumption:** #1664's first
+  F3 draft imported the parent orchestration probe to reuse input derivation. Cheap replay against
+  the preserved generated project showed that this also imports monorepo-only dependencies the app
+  cannot resolve. Shared executable proof primitives used inside generated consumers must be
+  dependency-free (or live in an app-resolvable package), and that boundary must be exercised before
+  the expensive scaffold gate. The author pushed `c4a900adc` to name the isolated internal module
+  before creating it.
+- **An unchanged diagnostic can still be made red by shared-batch type pollution:** #1664 F3's first
+  exact-head root-check receipt failed an old explicit `number` timer assignment only after the
+  proof code changed from `@std/path` to `node:path`. Node imports can introduce a different timer
+  return type into a Deno check batch; file ownership alone cannot establish non-causality. Preserve
+  the original failed receipt, prove the import/batch effect with an isolated before/after, and
+  require amendment-before-repair plus a distinct replacement receipt if the leaf caused it.
+- **Lease records must follow terminal truth, not session attachment metadata:** #1663 cycle 2 had
+  already committed `FAIL_PLAN`, but central `evaluatorLeases` still said `active`. That stale bit
+  could falsely consume the lane evaluator limit or invite an unsafe resume. The record is now
+  terminal with the exact verdict commit/comment and the exceptional-third-cycle owner boundary.
+- **Runtime retry authority belongs to the evidence head:** #1664's second runtime attempt is leased
+  at artifact head `8940e9266`, not merely product head `193e665ba`, so the preserved first FAIL,
+  replacement receipts, and Tier-A provenance are immutable inputs to the gate. The runtime probe
+  executes product content, but coordinator authorization binds the complete reviewed evidence tree.
+- **Fail-closed gate semantics need durable negative tests:** #1666's tenth path is justified
+  because one-off terminal probes cannot fail a future CI run. Empty/malformed reasons, unknown
+  coverage modes, invented symbols, and omitted symbols must remain persistent assertions even
+  though that adds one test-only file to the originally frozen surface.
+- **A corrected example must close its duplicate prose claims:** #1461's exact stale-loader snippet
+  lives in `services-sdk/sdk.md`, but the live-dashboard tutorial separately says a pure
+  `getCachedEntry` read refreshes stale data in the background. Regenerating the same four mirrors
+  while knowingly leaving that second false claim would preserve user-facing drift. The exact
+  tutorial source is a justified plan amendment, not a later cleanup.
+- **Idempotency must hold inputs constant:** #1664's S5 gate ran `service generate` once before
+  installing plugins and again after plugin configuration had changed the Aspire model. Three helper
+  rewrites on the latter invocation are reconciliation, not evidence of non-idempotency. A valid
+  assertion permits that convergence run and requires zero writes only on the immediately following
+  identical invocation. Calling temporally separated, different-input runs “first” and “second”
+  creates an expensive false-positive gate.
+- **Search breadth can invert CI truth:** #1666 research grepped only root tasks and workflow text
+  for the checker name, then concluded the drift check was unwired. The actual fail-closed path is
+  `ci.yml` docs-accuracy gate → catalog task → accuracy script → child drift checker. The missing
+  contract is discoverable naming/runbook visibility, not enforcement. Wiring audits must follow the
+  executable call graph before claiming absence.
+- **Issue-wide example sweeps belong before scope freeze:** one known wrong Contracts import led the
+  #1666 plan to mark acceptance row 1 otherwise satisfied, but an exhaustive shipped-source sweep
+  found three more identical defects. When acceptance is phrased for a package family, planning must
+  enumerate the whole publish set, not stop at the issue's cited exemplar.
+- **A corrected line must repair the surrounding teaching contract:** #1461's second authorized page
+  has one explicitly false `getCachedEntry` clause at line 100, but five earlier SWR statements make
+  the same demonstrated loader story misleading without being individually false. A docs plan must
+  give every nearby mechanism claim an explicit retain/correct disposition and explain the composed
+  narrative; fixing the quoted sentence alone is not sufficient acceptance.
+- **Lease readiness is an immutable evidence state, not an intent:** #1664 attempt 3 was granted
+  only after all F4 receipts, the author report, and independent Tier-A were committed and pushed at
+  `6f813b0db`. No preflight artifact may be appended between this grant and execution. This makes
+  the exact authorized tree reproducible and prevents the attempt-2 grant/run head mismatch.
+- **One baseline witness cannot classify a multi-file gate red:** #1664 attempt 3 found twelve
+  unformatted generated paths. Proving one unchanged Aspire helper fails at the pre-implementation
+  template does not classify leaf-owned users/payments client and payments service/contract outputs.
+  Attribution must enumerate every failing path against both source ownership and baseline before a
+  coordinator can authorize a repair or call the gate pre-existing.
+- **Transport interruption before a verdict does not consume an evaluator cycle:** #1666 cycle 2
+  finished re-derivation but received an interruption before writing an artifact. Resuming the same
+  evaluator history under a new Remote Control attachment preserves independence and cycle identity;
+  launching a new evaluator or counting a third cycle would misstate what happened.
+- **A line-count gate must improve structure, not erase explanation:** #1669 briefly suppressed F-1
+  by deleting useful private-method JSDoc and blank-line structure. The accepted correction restores
+  those explanations and removes real duplicated cache-entry lookup/span logic instead. Threshold
+  compliance is evidence only when the code becomes simpler to own, not when prose is sacrificed to
+  make `wc` smaller.
+- **A named CI edge can be discoverability without duplicate enforcement:** #1666 already failed
+  closed through the aggregate docs-accuracy chain. Its S2 task and Pages label make that existing
+  policy independently runnable and visible; they must not cause the checker to execute twice in one
+  aggregate path or be described as enforcement that did not previously exist.
+- **A named stale-only option needs a fresh-entry negative control:** #1669's docs regression found
+  that `preferFreshOnStale` was evaluated before the fresh-hit return, so the option forced network
+  work even for a fresh non-expired entry. Stale concurrency tests alone could not expose that
+  contract inversion. Policy-option acceptance must include the unaffected state as a zero-effect
+  control while preserving independent expired-entry precedence.
+- **An allowlist should be checked against the pinned executable, not memory:** #1664's formatter
+  names 26 dialect tokens, including uncommon `xml`, `sql`, `vto`, and `njk`. A complete probe
+  against the pinned Deno accepted all 26 and rejected a non-member. That executable result closes
+  the contract question more reliably than assuming the help surface from recollection.
+- **A retry lease must bind the reviewed evidence tree, not merely repaired source:** #1664 attempt
+  4 is authorized only at evidence `1263f655b`, whose parent content is `fda78ee43` and whose four
+  binding receipts plus final Tier-A are already pushed. The clean-host preflight precedes the
+  grant, so any subsequent head movement invalidates the lease before runtime execution.
+- **Nonzero is not proof of the named refusal:** #1666's committed policy tests initially asserted
+  only exit 1. A missing fixture could produce that exit after the reason/mode branch was removed,
+  and OMITS could preserve it after INVENTS was removed. Durable negative tests must assert the
+  specific cause and mutation-prove that removing only that branch makes the named test red.
+- **A cleanup exception cannot stand in for the behavior verdict:** #1664's live refetch probe
+  reached a browser child that had already terminated, then failed while sending SIGTERM. The gate
+  stays red, but attribution must distinguish successful child completion, early failure, and
+  idempotent cleanup before treating this as evidence for or against the settled-refetch contract.
+- **`aspire ps []` is not a complete host-cleanliness proof:** attempt 4 left four stopped
+  `aspire-managed nuget search` utility children whose AppHost/resource inventory was empty. The
+  coordinator must pair Aspire and Docker state with an explicit process/listener audit, remove only
+  exact attributable PIDs, then re-audit while preserving foreign `aspire mcp start` helpers.
+- **A failed receipt can remain truthful beside its replacement:** #1666's first root-test receipt
+  at the repaired head failed because a temporary mutation archive itself contained forbidden
+  command strings. Removing the scratch input and writing a distinct `test-attempt2` PASS preserves
+  both the environmental failure and the clean-tree verdict; overwriting the first receipt would
+  launder the trail.
+- **Termination idempotence must still fail precisely:** #1664 F6 does not permit a broad catch
+  around child teardown. The plan tolerates only Deno's exact already-terminated `TypeError`, still
+  awaits status and stderr drain, and requires unrelated kill and drain failures to propagate.
+- **Brief templating must replace short and full immutable SHAs:** #1666's cycle-2 brief correctly
+  bound content `423867017` and evidence `010da98a2` in its table and repair section, but two copied
+  cycle-1 sentences still named short `47ca22abe` for receipt sufficiency because only the full SHA
+  was replaced. The evaluator independently used the repaired head throughout, so verdict impact is
+  none; future brief assembly must assert there is no contradictory stale source-head token before
+  dispatch.
+- **A passing evaluator does not excuse a later generated-freshness red:** #1666's evaluator
+  correctly judged the declared source/evidence head, but ready CI then proved that the changed
+  Fresh UI reference page had not propagated into the tracked agent-docs corpus. Readiness was
+  revoked; generated closure must be verified and explicitly included before the next content head,
+  followed by fresh Tier-A and delta IMPL-EVAL.
+- **Close-gate races and product reds require different recovery:** #1666's mirror saw the old label
+  and safely mutated nothing, so that same workflow may be rerun after readiness is restored. The
+  simultaneous corpus-freshness red is owned and cannot be retried away. Keep both classifications
+  explicit rather than treating an entire CI run as one failure class.
+- **Ignored runtime debris can still poison repo-wide scanners:** #1664's root test traversed a
+  root-owned Postgres data directory under an ignored e2e temp tree and raised `PermissionDenied`.
+  Preserve the red receipt, recoverably quarantine only the proven unowned tree after Docker/process
+  audits, and use a distinct unchanged-head receipt for the environmental retry.
+- **Apply readiness labels before the ready event and prove live visibility:** #1669 applied both
+  `status:ready-merge` and the attributed `impl-eval:skip` while still draft, fetched them back from
+  GitHub, and passed a live acceptance-mirror dry-run before `ready_for_review`. This ordering
+  avoids the label race observed on #1666 and keeps automatic phase evaluation from duplicating a
+  completed native evaluator.
+- **Lifecycle probes may briefly create their own helper:** the #1664 attempt-5 preflight observed
+  `aspire ps []`, then caught the query's transient `aspire-managed nuget search` child in the same
+  instant. Lease decisions require a separate post-query process audit; that audit was empty. Do not
+  kill a healthy transient helper or mistake the command's own child for pre-existing runtime debt.
+- **An open umbrella can contain a satisfied prerequisite:** #1348 explicitly remains open until its
+  implementation children ship, while its body simultaneously ratifies RFC 0001 Stage 0 and names
+  #1350 as the first child. Treating every open prerequisite node as blocked would deadlock the very
+  implementation sequence it defines; inspect the acceptance semantics, preserve the umbrella, and
+  release #1350 without falsely closing #1348.
+- **Non-blocking does not mean forgotten:** #1669's evaluator found cross-page loader-shape
+  inconsistency and a warm-stale persistence-failure caveat without finding a false revalidation
+  claim or acceptance failure. Preserve PASS, avoid post-evaluation scope creep, and file one
+  explicitly non-blocking follow-up with both exact contracts rather than silently losing the debt.
+- **A generated output can change only in provenance and still be a publish delta:** #1666's MCP
+  bounded prose selection excludes Fresh UI, so its prose bytes stay fixed, but the canonical
+  publish asset advances the corpus `sourceCommit`. The path is still an owned generated/published
+  change and belongs in scope, idempotence proof, JSR reasoning, and delta evaluation.
+- **A red generator is not automatically part of the current cascade:** isolated #1666 controls
+  proved `gen:mcp-export-corpus` produces the same rewritten bytes at base and leaf while its check
+  is already red at base. Preserve and report that red; do not regenerate it merely because another
+  MCP generated asset legitimately changes.
+- **Fixing cleanup can reveal the first real behavior verdict:** #1664 attempt 4 ended in teardown
+  before the refetch probe could report. F6 removed only that mask; attempt 5 then honestly failed
+  on DevTools target discovery. Treat this as new measured causality, not as failure of the teardown
+  fix or permission to retry unchanged.
+- **Terminal leaf and evaluator-lease state must agree:** #1669's leaf, evaluator artifact, verdict
+  comment, CI, merge, and issue lifecycle were all terminal while its separate evaluator-lease entry
+  remained `active`. Reconcile the lease from those independent facts and distinguish a native
+  Claude background spare from a live evaluator before considering process cleanup.
+- **Searching an allowlist is not searching the host:** #1664's probe found no Linux path in its six
+  candidates and fell through to Windows Chrome, but two managed Linux Chromium 151 binaries existed
+  and executed. Selection must validate runnability, provide a strict portable override, and retain
+  early status/stderr; an allowlist miss cannot be promoted into an environment-capability claim.
+- **Supervisor prose can become scanner input:** #1666's ignored unscoped hook transcript captured a
+  supervisor explanation containing a prohibited command literal, so the repository scanner
+  correctly failed unchanged generated content. Preserve the red, quarantine the exact transcript
+  recoverably without weakening the scanner, hash before/after, and allow only one unchanged-head
+  retry.
+- **A checked umbrella item may conflict with its normative ownership header:** the first #1350
+  brief copied a checked metadata sentence from #1348 but missed that the accepted amendment, target
+  owner comment, and live #1466 assign metadata vocabulary elsewhere. Formal planning must reconcile
+  all live authority surfaces before converting a checkbox into leaf ownership.
+
+- **A passed delta evaluator cannot resolve a later generated merge conflict by choosing a side:**
+  #1666 and main both legitimately advanced the same four publication outputs from different source
+  contributions. Preserve the PASS, integrate main, rerun the canonical cascade to include both
+  contributions, prove convergence, and re-evaluate only the integration delta.
+- **Process/container cleanliness is not filesystem cleanliness:** #1664 attempt 5 left a foreign-
+  owned unreadable Postgres directory after its process and container audit passed. Every database-
+  starting run now needs an unreadable/foreign-owned residue sweep; quarantine run-owned residue
+  recoverably and preserve the scanner red rather than weakening traversal.
+- **Compile suppression is transitional evidence, not a green acceptance proof:** #1671 S1 used two
+  `@ts-expect-error` markers to pin the S2 defect after recording the base RED. S2 must remove them
+  and replace them with positive exact-union and code-specific-data assertions before claiming the
+  error channel is preserved.
+
+- **A clean runtime preflight includes readable stale workspaces too:** unreadable residue is the
+  scanner hazard, but readable plugin-smoke trees still make lease ownership ambiguous. Move each
+  exact run-owned tree to recoverable quarantine before a new attempt; do not delete or use broad
+  cleanup.
+- **A retry receipt can validate environmental causality without erasing the red:** #1664's two test
+  receipts have the same 4,256 total results; only the scanner failure flipped, from 4236/1/19 to
+  4237/0/19 after quarantine. Preserve both, exclude the red only in the declared passing evidence
+  set, and require exact-head equality without a mismatch waiver.
+- **A new evaluator must not stack on a stale terminal lease:** before registering #1666's
+  integration-delta evaluator, reconcile the earlier evaluator against its pushed artifact and live
+  verdict comment. Lane-local serialization is measured from live work plus terminal evidence, not
+  from an unreconciled `active` string in the control plane.
+- **A broad quality PASS cannot overrule a narrower changed-source red:** #1666's core `quality` job
+  passed while the dedicated scanner correctly found an explicit `any` and unsafe cast in the leaf's
+  changed checker. Treat the narrower evidence as owned and blocking, revoke readiness, and repair
+  the code rather than rerunning or weakening the scanner.
+- **Acceptance mirroring may precede a later independent CI red:** #1666's close-gate truthfully
+  checked all five #1296 boxes before the separate code-quality workflow failed. Preserve those
+  evidence-backed boxes and the open issue, return the PR to draft, and let `Closes #1296` close the
+  issue only after a fully green repaired head merges.
+- **Valid browser selection does not prove browser behavior completion:** #1664 attempt 6 proved the
+  strict managed Chrome override and still hung until the suite's 900-second child boundary with no
+  refetch evidence. Preserve the red as an unattributed browser-probe timeout; do not regress to the
+  superseded target-discovery diagnosis or claim an application-refetch failure without evidence.
+- **A green suite leak report does not replace the independent host audit:** Aspire and Docker were
+  already green when #1664's separate scan found three stopped run-owned helpers plus unreadable
+  database residue. Exact cleanup and recoverable quarantine were required before releasing the
+  runtime lease.
+- **A scanner's green verdict is invalid when its mode omits the repaired path:** #1666 Tier-A first
+  saw `ok:true` in repository mode while the payload listed only package/plugin roots. Reading mode
+  and selected paths exposed the false green; only the corrected non-empty `changed-files` selection
+  over both `.llm/tools` files counts as repair evidence.
+- **Pinned baseline-red counts still require base/head identity attribution:** #1671 correctly kept
+  raw doc-lint red, then proved its counts changed from Contracts 9→11 and SDK 3→13. A known-red
+  gate is not permission to absorb new leaf-owned findings; stop the matrix, preserve later gates as
+  NOT_RUN, and repair only after a bounded amendment and fresh review.
+- **Supervisor verification must not write into an author-owned leaf:** the #1664 features Tier-A
+  audit regenerated the leaf leak report after the author commit. Its host result remains valid in
+  central state, but the bytes are supervisor-caused contamination and must be restored from the
+  author head before F8; future supervisor audits use supervisor-owned paths.
+- **A thread-local quota probe cannot establish account scope:** both affected leaves used one fresh
+  detached Codex session after preserving the original sender. Threads `01a00766-…` and `01a00767-…`
+  failed before inference with `usageLimitExceeded`, `hasCredits:false`, and zero balance, proving
+  the boundary is account-wide until `2026-08-20 05:31`. Stop retries once that evidence exists;
+  distinguish executable canonical plan-artifact chores from product implementation that truly has
+  no in-plan fallback.
+- **Quota fallback still preserves generator/evaluator separation:** #1664's provenance restoration
+  uses a fresh Claude Opus 5/medium `chore_code` generator and #1671's run-artifact-only amendment
+  uses a fresh Claude Sonnet 5/high `documentation_review` generator. Neither supervisor authors.
+  Each plan is then judged by a fresh Minimax M3/high PLAN-EVAL through the documented native-quota
+  fallback; no lane self-certifies and no outside-plan product implementation is inferred.
+- **Readiness re-entry repeats all live preflights after any repair:** cycle-5 PASS did not inherit
+  the earlier readiness snapshot. #1666 refreshed the final body, review threads, acceptance mirror,
+  close-gate, status ordering, and exact-head CI at `92988da30`; the earlier broad green cannot
+  stand in for the new changed-source quality run.
+- **A persisted controller is not a live supervisor:** all four topic checkpoints remained clean,
+  but their recorded PIDs and Remote Control transports had disappeared. Recovery must mark the
+  stale attachments explicitly, relaunch at the same ownership boundary, and record new transport
+  IDs before dispatching more work.
+- **Elapsed quota boundaries must be re-probed, not inherited:** the Codex capacity proof expired on
+  2026-08-20. It remains historical evidence for the earlier stop, but cannot block work resumed on
+  2026-08-23 without a fresh probe.
+- **Post-checkpoint main advances are drift, not implicit milestone intake:** #1666 belongs to the
+  frozen cut and is reconciled as merged; the four later RFC merges are captured for rebase and
+  compatibility review but do not acquire lane ownership merely by appearing on main.
+- **Cleanup requires two kinds of proof:** stopped five-day-old run helpers with no Aspire resources
+  are disposable; a dirty old worktree containing unique harness history is not. Archive its unique
+  content to a recoverable branch before removing the registration.
+- **A public export is not a safe fix for a private-signature lint finding by default:** #1671's
+  executed probe doubled the contracts diagnostics and made `docs:exports-drift` correctly reject
+  three newly claimed symbols. Prefer a bounded public-signature spelling that preserves the type
+  contract without transferring ownership of a dependency's builder algebra; prove lint-baseline,
+  exact-union, and export-surface parity before authorizing product mutation.
+- **Repository-wide receipts do not certify paths their tasks exclude:** #1664's structured check,
+  test, publish, and architecture receipts were green while direct scoped lint/format review found a
+  changed CLI source defect. Exact-head evidence must include path-selection proof for the changed
+  subtree; regenerate receipts after the correction rather than carrying forward green JSON from an
+  earlier content head.
+- **Runtime residue ownership is broader than the active leaf:** attempt-7 preflight found three
+  unreadable Postgres directories in old unregistered plugin-smoke trees outside #1664. Docker and
+  owning processes were absent, so the exact enclosing runs were quarantined recoverably before the
+  lease. An empty active leaf alone is insufficient when repository scanners can traverse sibling
+  workspaces.
+- **Suite cleanup plus the standard leak-check can both miss reparented Aspire children:** attempt 7
+  reported both green while three `aspire-managed` processes remained under the WSL init relay.
+  Worktree-cwd containment provided exact ownership; targeted cleanup and a second independent sweep
+  are required before a runtime lease is released.
+- **A generated-corpus red is not automatically leaf-owned:** #1671's one-file regeneration was
+  deterministic, but the nine additions reproduced on main and belonged to existing AI/MySQL export
+  changes. Carrying them inside #1671 would hide cross-package debt. Repair the corpus in a
+  standalone single-generated-file prerequisite, merge it, then rebase and evaluate the typed-error
+  leaf.
+- **Literal issue-closing prose can mutate PR state:** #1671 was closed without merge when a
+  prerequisite description used a literal closing keyword. Continue preserved work in a replacement
+  PR, repair the public record in place, and keep closing syntax only where the intended issue is
+  the merge target.
+- **A docs-source edit owns its deterministic generated cascade:** #1692's human docs correction
+  made the agent-docs prose corpus stale. Regenerate the four canonical derived files, prove a
+  second run byte-identical, and move all exact-head acceptance evidence to the regenerated head.
+- **Exact-head acceptance evidence expires after even deterministic repair:** the S8 receipts were
+  valid for `587ade9f3`, but S9 changed the head. The close gate, mirror dry-run, thread audit, full
+  CI, and public acceptance map were therefore rerun at `686bae07b` before merge.
+- **Verify remote merge before treating local cleanup errors as merge failure:** #1692's squash
+  merge succeeded even though automatic deletion of the locally checked-out branch failed. Query PR
+  and main state first, then remove the proven-terminal worktree and branches explicitly.
+- **Cleanup terminal evaluators by exact ownership, not supervisor-wide process names:** the formal
+  evaluator left helpers whose cwd pointed into a removed evaluator tree. Those exact PIDs were
+  stopped after containment proof while all four topic supervisors and their Remote Control bridges
+  were preserved.
+- **A terminal central checkpoint can become stale while an explicitly authorized recovery
+  proceeds:** #1663's PR and leaf advanced from final PLAN-EVAL failure to verified S1-S5 and two
+  passing implementation evaluations under a documented owner grant, while the central JSON still
+  claimed no product mutation. Reconcile live PR commits, comments, branch identity, and evaluator
+  artifacts before treating a persisted terminal label as current truth.
+- **Supervisor attachment metadata is per-process evidence, not durable identity:** all four
+  recorded Claude processes had expired even though their clean topic checkpoints and ownership
+  remained valid. Restore one-for-one from the exact worktrees, verify native `/remote-control`, and
+  update only transport metadata; never infer permission to relaunch work, change ownership, or
+  retry a terminal gate from transport repair alone.
+- **Issue acceptance sweeps must be explicit even when the focused fix is complete:** #1618's
+  request to scan sibling package configs was absent from the evidence trail. The closeout audit
+  performed the cheap sweep, separated auto-discovered configs from custom-named non-candidates, and
+  found no additional blind spot before the PR acceptance map is rewritten.
+- **A dependency-download refusal is not generated-content drift:** #1663 ready CI initially failed
+  `agent-docs-prose`, but its structured JSON receipt attributed the nonzero exit to deno.land
+  rejecting a `deno_dom` HTTP/2 stream for excessive load. The exact failed job passed on retry with
+  no head movement. Diagnose from the receipt before widening a frozen generated-asset surface.
+- **Patch-equivalent rebases can preserve formal verdicts when identity is measured:** #1663's 17
+  commits range-diff one-for-one, twelve product blobs are byte-identical, and the only
+  configuration delta is an audited semantic union. Binding the two evaluator heads to their rebased
+  counterparts avoided a redundant formal cycle while retaining independent fresh Tier-A at the
+  final head.
+- **Coordinator transport remains a distinct ownership axis:** this checkpoint was directed by the
+  existing Codex Desktop Remote Control coordinator on GPT-5.6-SOL/high; `max` remains unauthorized.
+  The fresh Claude Opus 5/high Remote Control Tier-A turn reviewed the internals topic only and did
+  not inherit coordinator merge authority or change any other Claude supervisor's ownership.
+- **A partial tool exclusion is different from an all-excluded invocation:** L-2 reproduced the same
+  selected files returning green in one batch but red when split to batch size one. The existing
+  guard only catches the all-excluded case, so #1709 must compare selected and actually processed
+  files and fail closed when any selected input disappears. Removing a broad, now-unnecessary root
+  exclusion before enabling the guard avoids turning known configuration debt into a surprise red.
+- **Published embedded tools extend the change boundary:** `run-deno-lint.ts` is generated into the
+  CLI agent-tool asset. A wrapper repair therefore owns canonical regeneration and CLI JSR/publish
+  verification even when no package export changes. The formatting wrapper remains audit-only until
+  evidence justifies an explicit rescope.
+- **Acceptance wording must not reverse an intentional API boundary:** #1293's unchecked first row
+  asks for a concrete driver-bound class that formal review deliberately kept out of the root export
+  map. Treat this as an owner wording decision, not a product regression. The independently observed
+  stale MySQL documentation still belongs to the already-frozen fixes #1112 leaf; finding it from
+  features does not silently transfer ownership to features or docs.
+- **Closed-unmerged is not shipped:** stale lifecycle labels were removed from #1671 without adding
+  `status:shipped`; only verified merged PRs and completed issues were normalized to shipped. This
+  preserves truthful lifecycle reporting while eliminating false active-work signals.
+- **A mandatory symmetry audit may justify one coherent rescope:** #1709 proved fmt has the same
+  batch-size-dependent partial-exclusion false green as lint, but its finding completion signal is
+  different. Expand the leaf to six paths, share the coverage wire contract, and retain separate
+  parser adapters rather than assuming identical command output.
+- **Acceptance wording does not authorize a silent breaking runtime fix:** #1112 row 4 exposed that
+  `verify_identity` is misleading, but changing it to enforced TLS/hostname verification would break
+  plaintext and mismatched-certificate deployments. The bounded 0.0.7 disposition is truthful
+  deprecation plus exact legacy mapping tests; any semantic replacement is a separately scoped
+  breaking change.
+- **Read-only dependency probes can dirty the lockfile:** `deno info npm:mysql2@3.22.5` added one
+  exact-pin resolution beside the existing range. The author-owned no-lock-churn gate caught it,
+  restored the base blob before commit, and recorded the transient so a future plan run does not
+  mistake it for product scope.
+- **High WSL load is not evidence of hidden containers:** direct Docker and Aspire inventories were
+  empty. One unused network and nine unlinked zero-byte volumes were safe to prune, while the eight
+  Aspire MCP helpers belonged to live agent tool transports and had to remain. Process ownership and
+  pressure metrics, not process-name matching, distinguish useful control-plane helpers from leaks.
+- **Post-merge follow-ups are not implicit milestone intake:** #1690 and #1693 are open backlog
+  records discovered after #1692. Record them for continuity without adding them to the 0.0.7 DAG or
+  dispatching a topic. Likewise, #1696's surface-diff skip follows current release/label policy and
+  should not create duplicate debt while #309 remains open.
+- **Mandatory run artifacts belong in the initial allowlist:** #1112's repaired seven-product-path
+  plan passed its substantive review but omitted `supervisor.md`, which the harness requires for the
+  run. The correct response was a one-file control-plane amendment with preserved omission history,
+  not a waiver or an eighth product path.
+- **Text-search counts are discovery evidence, not semantic verdicts:** plan audits can count a
+  historical or explicitly negated phrase as if it were a live promise. Read the surrounding record
+  before returning scope; preserve real history rather than rewriting it to satisfy a raw grep.
+- **Exact batch-size-1 coverage is intentionally expensive and scratch-bound:** #1709's formal
+  evaluator enumerated thousands of one-file invocations to prove no selected file disappears. Run
+  that proof only in evaluator scratch, retain structured summaries, and never interpret its
+  sustained CPU use as an orphan while its owning job and progress records remain live.
+- **Formal evaluation had drifted toward ceremony:** the owner reasserted on 2026-08-28 that
+  PLAN-EVAL is only for genuinely critical/complex work. Generic desire for adversarial advice is
+  not selection evidence; routine docs/mechanical/generated/bounded-gate leaves record N/A plus
+  Tier-A. #1709 and #1112 remain selected because their current public-contract and architecture
+  decisions are actually complex, not because every leaf receives a formal plan phase.
+- **Two IMPL-EVAL failures are an owner-facing terminal boundary:** after the second consecutive
+  failure on one leaf, release the evaluator, preserve both verdicts, leave the canonical author
+  available, and surface the exact decision in the primary coordinator task. Parking a live author
+  indefinitely or silently launching a third loop violates the owner ruling; unrelated lanes keep
+  moving.
+- **Terminal evaluator state must beat stale central prose:** #1709's job stopped only after its
+  committed/public `FAIL_PLAN`, and #1112's daemon reported "awaiting generator revision" only after
+  it had committed and posted `FAIL_PLAN`. The immutable artifacts and public comments are
+  authoritative; the central `active`/`ready` fields were reconciliation lag, not live gates.
+
+## 2026-08-28 15:35Z — repaired lint plan and Prisma clean-checkout boundary
+
+- **Observed:** #1709 same-author repair `3e934e2de` closed every cycle-1 finding and passed fresh
+  Tier-A at `bf3635eb5`; the central ledger still described repair as pending.
+- **Action:** reconciled the immutable head and granted only the justified delta-focused final
+  PLAN-EVAL cycle 2, active through fresh Fable 5/medium Remote Control session `14cfb576-...` and
+  pushed topic checkpoint `fe9e23c03`.
+- **Observed:** #1112 scratch generation can resolve `./.generated/client.ts` and exposes a real
+  adapter type mismatch, but this alone does not prove an ordinary clean-checkout root check after
+  generated output is removed.
+- **Action:** bound fixes Tier-A to reproduce the post-cleanup clean-checkout gate; no silent eighth
+  path and no downgrade of the executable example claim.
+
+## 2026-08-28 — final plan-evaluation allowance and clean-checkout correction
+
+- **#1709:** Cycle 2 found a real fmt write-mode signal omitted by both the repaired plan and
+  Tier-A. The ordinary allowance is exhausted, so no cycle 3 is inferred. The owner is asked only
+  whether to accept the evaluator's bounded recommended F4 form; evaluator release and author
+  availability prevent a frozen lane.
+- **#1112:** A scratch-only generated client made a gate locally green but left a permanent
+  clean-checkout `TS2307`. The supervisor's exact archive proof corrected that false positive.
+  Excluding the example is disallowed; the same author is testing a dynamic prerequisite import with
+  separate real-client semantic evidence before any rescope.
+- **Policy:** Formal PLAN-EVAL is not a routine ceremony. It stays limited to critical/complex
+  topics, while Tier-A and mandatory IMPL-EVAL remain. A leaf returns to the owner after two
+  consecutive terminal IMPL-EVAL failures rather than consuming a third loop.
+
+## 2026-08-28 — dynamic-import proof and proportionate evaluation selection
+
+- **Observed:** The #1112 canonical author replaced the clean-checkout-breaking literal generated
+  import with a non-literal runtime import and compensated for lost static evidence with a real
+  Prisma-generated structural wrapper plus guarded import smoke. Fresh Tier-A reproduced both the
+  current TS2322 RED and prospective D17 GREEN, then proved the clean ordinary root gate before and
+  after scratch cleanup.
+- **Action:** Kept the seven-path ceiling, rejected exclusion/stub/suppression shortcuts, reconciled
+  plan head `da769cd7c` and Tier-A topic `d0205087a`, and opened exactly one final delta-focused
+  PLAN-EVAL because consumer-facing generated-client compatibility is genuinely complex.
+- **Guardrail:** The active evaluator `18b66c8f-…` is distinct, bidirectional Remote Control, and
+  artifact-only. A PASS returns for implementation grant; a FAIL_PLAN consumes the second ordinary
+  cycle and releases the evaluator with no third loop. The same two-failure release/escalation rule
+  applies later to IMPL-EVAL, where the owner receives the exact blocking decision.
+
+- **Owner boundary resolved:** “approved proceed” accepted #1709's recommended F4 rather than
+  authorizing another evaluator. The same author resumed from exact `f2b3fc8b3` under pushed topic
+  checkpoint `f9a9af9b3`; only the third write-mode completion form and 1/2/200 crash/drop controls
+  may change in plan artifacts. Fresh Tier-A substitutes for any third PLAN-EVAL.
+
+## 2026-08-29 — canary cadence, live intake, and Aspire 13.5 opportunity
+
+- **Stale assumption:** the prior ledger treated the feature-complete checkpoint as the next
+  publication boundary. **Correction:** owner restored the milestone profile's canary-first train;
+  foundations publishes from exact `cf648f1ff` before remaining issue waves.
+- **Scope drift:** twelve live 0.0.7 issues were absent from the frozen inventory. **Action:** read
+  their current contracts, admitted each to exactly one topic, added dependency-valid waves, and
+  admitted #979 from 0.0.8 because #1370 explicitly cannot land first.
+- **Verify-first constraint:** #1371 is not a presumed defect. It runs only against a published
+  current canary and either closes as refuted with evidence or names the real failing mechanism.
+- **Research opportunity:** Aspire 13.5 may widen 0.0.7 after the first canary. The owner explicitly
+  selected Fable 5 medium as a standalone research orchestrator (an intentional override from the
+  default Opus planning route) and expanded scope to MCP plus every canonical/derived static
+  resource and doc. Product implementation waits for coordinator ratification of its issue graph.
+
+## 2026-08-29 — foundations publication and whole-ecosystem Aspire acceptance
+
+- **Publication is evidence, not a tag alone:** `v0.0.7-canary.1` is accepted only because OIDC
+  publish run `33248726023`, exact-version production E2E `33248961170`, and the
+  `release/canary-pair` commit status are all green at immutable content SHA `cf648f1ff...`.
+- **Merge ordering preserved:** #1710 merged as `3b32d1628` only after the green-pair status was
+  recorded, so the foundations canary membership remains attributable and cannot include the held
+  leaf accidentally.
+- **Aspire MCP alignment requires behavior:** the research correction at `d8caa507e` adds an
+  exact-13.5 structured MCP tool-surface smoke and a path-level stale-surface inventory. Static and
+  documentation parity excludes enumerated historical/RFC/design evidence rather than rewriting it
+  and falsifying provenance.
+
+## 2026-08-29 — final Aspire ratification and exact-head evaluator protection
+
+- **Generator drift caught before implementation:** three newly captured official deploy/destroy/
+  publish Markdown sources were absent from the checked-in surface manifest. A fresh coordinator run
+  regenerated 813 rows with zero unmatched paths; the same Fable session committed the three
+  archival rows at `e4898e6eb`. Filing and S1 dispatch began only after a second run was
+  byte-stable.
+- **No third PLAN-EVAL:** cycle 2's remaining findings were bounded consistency defects. Coordinator
+  ratified D-17 and the repaired 13-slice/three-canary program directly, preserving the owner's
+  reduced PLAN-EVAL policy while retaining independent executable checks.
+- **Verify-first produced a narrower defect:** #1371 did not reproduce missing endpoint injection or
+  background-key normalization drift. It did reproduce silent success for a declared nonexistent
+  dependency. The admitted correction fails at the emitted wiring boundary, where the fully
+  assembled resource maps and endpoint availability are knowable; it does not broaden into #1365 or
+  all resource types.
+- **A PASS receipt is head-bound:** #1711's `PASS_IMPL` at `cd69eb7cb` did not authorize merging
+  later amendment `bbaf70d64`. Fixes dispatched fresh exact-head IMPL-EVAL and kept close-gate red
+  until acceptance evidence catches up.
+
+## 2026-08-29 — generated docs freshness is part of the authored branch contract
+
+- #1711's changed docs reference source made the checked-in agent-docs prose corpus stale. The CI
+  quality failure reproduces locally through the structured gate and names `prose.json.gz` plus
+  `provenance.json`; it is not safe to dismiss as unrelated infrastructure noise.
+- Derived generated outputs may extend the seven authored-source envelope only as an explicitly
+  recorded generator-owned cascade. They require their own exact-head Tier-A/CI evidence and a new
+  amendment evaluation; the earlier `cd69eb7cb` PASS cannot be reused.
+- A CI gate failure and a formal IMPL-EVAL verdict are distinct control-plane events. Only terminal
+  evaluator failures advance the owner's two-consecutive-failure escalation threshold.
+
+## 2026-08-29 — advancing a PR head races and invalidates an active evaluator
+
+- #1711 advanced from evaluator target `bbaf70d64` to corpus repair `a727c7565` while OpenHands run
+  `33275424854` was still active. Even a mechanical generated-only amendment changes the immutable
+  evaluation target; the in-flight verdict is stale and cannot be reused.
+- Coordinator containment is reversible and explicit: PR returned to draft, `status:impl` restored,
+  merge verified absent, and fresh exact-head evaluation required. CI green alone cannot replace the
+  missing independent amendment verdict.
+- App-server process death after a completed agent turn is transport drift, not lost work. #1371's
+  RED artifacts and thread identity survived and were resumed; recovery must check both rollout and
+  filesystem evidence before relaunching a duplicate author.
+
+- **Generated freshness is a transitive envelope, not a first-hop gate.** #1711's docs/reference and
+  public-surface edits made the source agent-docs corpus, the embedded CLI bundle, the MCP export
+  corpus, and the final publish-assets mirror stale in sequence. A pristine base/head control proved
+  the remaining checked-in derivative set is exactly three generated TypeScript files. Future
+  in-corpus docs or export-surface leaves must run all four freshness checks before evaluation.
+- **A stale evaluator should be cancelled once head drift is proven.** Run `33275424854` could not
+  authorize #1711 after `bbaf70d64` advanced to `a727c7565`; cancelling it avoided further spend and
+  is a control-plane containment action, not a terminal IMPL-EVAL failure.
+
+## 2026-08-29 — S1 parity fail-closed review and unrelated e2e baseline drift
+
+- A summary counter is not a gate verdict: S1 counted missing manifest paths separately but derived
+  `ok` only from `fail === 0`. Every required missing row must participate in failure semantics and
+  have a negative test.
+- A stale-version regex limited to older minors cannot prove an exact current patch train. Each
+  phase-1 fail-class pin needs an exhaustive exact-value assertion or equivalent companion policy
+  gate; otherwise a wrong 13.5.x patch can be present yet unselected.
+- Exact-head workflow dispatch runs all e2e lanes when no diff is classified. Run `33276629736`
+  therefore consumed the desktop and scaffold tiers; desktop passed, while all scaffold failures
+  converged on an unrelated generated Fresh/TanStack hydration type mismatch. Keep baseline drift
+  separate from branch-owned S1 acceptance and retain the owner's release-cut/explicit-label policy
+  for expensive non-critical lanes.
+
+## 2026-08-29 — public-canary trigger and lane-coupling correction
+
+- **Orchestrator seriality is local, not global.** A docs, internals, or Aspire gate cannot idle the
+  feature or fix queue. Each orchestrator preserves its own serial ownership while independent
+  orchestrators and their available evaluator slots advance concurrently.
+- **A public canary needs consumer payload.** Docs, harness, CI, research, and internals-only work
+  stays continuously integrated on main but does not independently justify a public version. The
+  already-running canary.2 was allowed to complete; future cuts require at least one merged
+  user-facing package/runtime feature or fix and a coherent checkpoint.
+- **Generated corpora are a merge resource.** Two independently green PRs can conflict when both
+  regenerate shared agent-doc/publish assets. Merge the first verified leaf, then refresh and
+  regenerate the second from the authoritative generator; use a cheap exact-head delta review when
+  the product semantics are unchanged instead of repeating broad plan evaluation.
+
+## 2026-08-29 — an idle prompt is a coordinator interrupt
+
+- A topic supervisor finishing a checkpoint does not satisfy the coordinator mandate. Before the
+  supervisor can remain at a prompt, the coordinator must either supply the next gate/leaf, record a
+  real exclusive-resource queue position while non-resource work continues, or prove that the frozen
+  allocation is exhausted.
+- This rule re-armed fixes (#1729 then #1673), features (#1731 then #1387/#1730), and internals
+  (#1734 then #1732) immediately after #1711/#1728 merged. Aspire S2 received the bounded runtime
+  lease instead of remaining at its request. Docs alone stays parked because its only frozen issue
+  is shipped and Aspire S11 is explicitly epic-owned.
+- Runtime serialization blocks only the exact runtime probe. It must not block research, RED tests,
+  implementation, cheap gates, PR preparation, or review in another orchestrator.
+
+## 2026-08-30 — NAS transport and authority drift
+
+- The coordinator and topic sessions moved from historical WSL paths to the N5 NAS. Old worktree,
+  PID, session, and transcript paths are recovery metadata only; remapped NAS worktrees and Git
+  heads are authoritative.
+- The NAS uses mise-pinned Deno 2.9.5 and Aspire 13.5.3 plus a disposable DinD endpoint. Previous
+  WSL memory/load and host-container assumptions no longer apply. Host Docker and unrelated service
+  containers are outside agent authority.
+- The current parent operating contract reserves PR merges for humans. The coordinator therefore
+  advances leaves through acceptance, review, CI, and ready/CLEAN handoff without performing the
+  merge mutation itself.
+- Fresh Claude supervisors were created rather than reviving the migrated registry. Their transport
+  and process evidence is kept locally because NAS handoff/harness operational evidence must not be
+  committed or published.
+
+## 2026-08-30 — NAS watcher and child Remote Control evidence gap
+
+- `agentic:codex-follow` currently fails at `Deno.watchFs` with `EMFILE` on the NAS. Visible
+  container inotify usage is far below the kernel per-user ceiling, so the likely pressure is shared
+  host-wide outside this container. Do not multiply watchers; supervise through the compact status
+  reporter, append-only launch logs, tmux, and exact Git heads until the platform ceiling is
+  repaired.
+- Fresh Codex threads are created correctly by the checked-in launcher and are discoverable by the
+  managed daemon, but their one-turn stdio app-server emits `remoteControl/status=disabled`.
+  Therefore daemon health is not sufficient proof of per-thread phone attachment. The ledger keeps
+  this red/unknown honestly; future launcher work should establish a supported daemon-proxy or
+  equivalent per-thread attachment proof rather than relabeling discovery as attachment.
+
+## 2026-08-30 — migrated Aspire home ownership
+
+- The migrated default `/home/agent/.aspire` was created as `root:root`, so a node-owned Aspire CLI
+  invocation aborted while creating its diagnostic log and could not prove the runtime baseline.
+- Aspire's own `AspireHomeDirectory` contract supports `ASPIRE_HOME`. The untracked parent mise
+  environment now points it at `/home/agent/projects/netscript/.aspire`, shared by the canonical
+  clone and worktrees and owned by the agent user. With that authority loaded,
+  `aspire ps --format
+  Json` returns `[]`; DinD independently reports zero containers.
+- The root-owned legacy directory was not deleted or mutated because it is outside the agent user's
+  ownership. It contains only two log files plus NuGet-search cache and no live backchannel.
+
+## 2026-08-30 — NAS PID 1 does not reap child processes
+
+- A process-table audit found 7,730 zombies, all adopted by PID 1, including thousands of defunct
+  `sshd` children plus the worker descendants exercised by `hybrid-launcher_test.ts`. A zombie
+  cannot be killed; only its parent can reap it, or the container must be restarted with a proper
+  init/reaper.
+- This platform state explains the repeatable non-product root-test failures now seen by #1731,
+  #1734, and Aspire S5: `Deno.watchFs` reaches `EMFILE`, and the cancellation assertion sees a
+  PID-1-owned defunct descendant as still present. Repeating the same root gate consumes capacity
+  without changing the verdict.
+- The coordinator did not restart the agent container because doing so would terminate five live
+  Remote Control supervisors and active evaluator sessions. Product lanes retain focused gates and
+  honest baseline-red receipts; a human-controlled container restart/init repair remains outside the
+  agent's authority. Docker and Aspire application counts remain exactly zero.
+
+## 2026-08-30 — post-freeze issues existed outside the dispatch gate
+
+- The Aspire checkpoint recorded epic #1712 and its children, and supervisors were actively
+  executing them, but the frozen inventory/DAG omitted #1712–#1724 plus five later issues and six
+  closed milestone records. The validator was internally consistent yet could not detect live GitHub
+  omissions.
+- Re-intake now records all 102 GitHub milestone issues plus retained moved #1453, maps every active
+  issue into one canonical topic lane, and carries the Aspire dependency chain through waves 9–18.
+  Future issue filing/milestone moves must update intake, inventory, DAG, and cluster state in the
+  same atomic checkpoint instead of relying on a topic context pack alone.
+
+## 2026-08-30 — second consecutive #1734 implementation-evaluation failure
+
+- Cycle 1 found that the guard rejected the package's own JSON transport. Cycle 2 confirms that
+  repair, then finds a distinct supported TanStack error-domain hole: JSON-preserved primitive,
+  array, and structured rejection values are rejected or collapsed by the new normalization.
+- Per owner policy, the coordinator did not silently authorize cycle 3. #1734 is parked at artifact
+  head `eb7656292` for the explicit bounded-repair-versus-park choice while #1732 and every other
+  independent lane continue.
+
+## 2026-08-30 — maintenance restart closes the PID-1 false-red
+
+- The platform restarted with `tini` as PID 1. The zombie count fell from 7,730 to 0 without any
+  repository or lane workaround. The exact focused regressions that previously failed now pass:
+  `codex-follow_test.ts` plus `hybrid-launcher_test.ts` report 13 passed / 0 failed, including the
+  stubborn worker-group cancellation check. This supersedes the active operational consequence of
+  the earlier PID-1 and watcher drift while preserving it as cause history.
+- All pre-restart supervisor PIDs and bridges are historical. Five fresh native Remote Control
+  sessions were launched from the exact NAS topic worktrees, with features/fixes/internals/docs on
+  Opus 5/high and the accepted Aspire research supervisor on Fable 5/medium. Recreating the old
+  blocked Claude registry remains prohibited and did not occur.
+
+## 2026-08-30 — hybrid task example and parser disagree on the separator
+
+- `.llm/tools/agentic/README.md` shows `deno task agentic:claude-hybrid -- --cwd ...`, but Deno
+  2.9.5 forwards that separator to `hybrid-launcher.ts`, whose finite parser rejects it as
+  `unknown argument: --`. The failure occurs before the Claude child is spawned, so the five failed
+  recovery attempts left no session or orphan.
+- The working checked-in invocation is `deno task agentic:claude-hybrid --cwd ... --name ...`.
+  Supervisor recovery used that form. The docs/parser mismatch is a bounded tooling follow-up and
+  does not weaken attachment proof: each successful launch emitted matching PID, cwd, session ID,
+  and non-empty bridge ID, and the UI showed `/remote-control is active`.
+
+## 2026-08-30 — NAS project foundation omitted Aspire runtime prerequisites
+
+- The NAS orientation pinned Deno and Aspire but omitted .NET; `aspire doctor` failed on the absent
+  SDK. The container also inherited Node 26 even though current Aspire TypeScript prerequisites
+  support Node 20.19, 22.13, or 24. Project-local mise now pins .NET 10.0.400 and Node 24.20.0;
+  neither was installed globally and no repository file changed.
+- Doctor is now 0 failures. The DinD sandbox remains Docker 27.5.1, reported by Aspire as a warning
+  below its 28.0.0 minimum. Agents cannot upgrade or reset the human-owned sandbox. One authorized
+  S5 gate attempt may characterize compatibility; a version-specific failure is an infrastructure
+  receipt and human boundary, never permission to mutate host Docker or retry repeatedly.
+
+## 2026-08-30 — shared NAS inotify quota blocks token-free run watchers
+
+- The prescribed `.llm/tools/harness/watch-run.ts` helper was attempted against four existing topic
+  run directories after the tini restart. Every `Deno.watchFs` call failed immediately with
+  `Too many open files`; the run directories contain only 3–18 directories, the invoking soft file
+  limit is 1024, and this process namespace exposes only 17 inotify descriptors. This points to a
+  shared kernel/user quota outside the visible project process set rather than topic-run size or the
+  repaired zombie condition.
+- The coordinator did not raise a host sysctl or kill foreign sessions. Until infrastructure frees
+  or raises the quota, supervision uses sparse explicit checkpoints and existing Remote Control
+  liveness while preserving all active lanes. This is operational drift, not a product/evaluator
+  failure and not permission to waive exact-head gates.
+
+### Resolution — 2026-08-30T09:27:09Z
+
+- Infrastructure raised and persisted `fs.inotify.max_user_instances` from 128 to 1024. A fresh
+  `watch-run.ts` invocation allocated successfully and reached its normal heartbeat timeout, while
+  the combined Codex-follow/hybrid-launcher lifecycle suite passed 13/13. Sparse polling is no
+  longer a quota workaround; supervisors must restore the prescribed event-driven watcher.
+- The DinD sandbox was independently upgraded to Docker client/server 28.5.2 and reset while empty.
+  Project mise resolves the same `tcp://netscript-dind:2375` authority at `10.4.12.19`; D-37 is
+  closed as infrastructure drift. This resolution authorizes Docker/Aspire-dependent dispatch but
+  does not relax serialized runtime leases or exact owned zero-state cleanup.
+
+## 2026-08-30 — central validator passed despite stale live leaf reconciliation
+
+- `harness:milestone:validate` was green while #1731/#1736/#1743/#1747 heads were stale and live
+  leaves #1739/#1746/#1748 were absent. The rendered status consequently showed false zero active
+  work in features, fixes, and docs even though GitHub and supervisors were active.
+- The coordinator repaired the current ledger atomically. A tooling follow-up should teach the
+  validator to compare allocated/open milestone PRs against GitHub or a fresh exported snapshot;
+  schema consistency alone cannot prove live completeness.
+
+## 2026-08-30 — remote DinD supports containers but not AppHost-local endpoint assumptions
+
+- S3's first authorized Phase-B attempt proved that worktree-local `withDataBindMount` paths are
+  invisible to the remote DinD daemon. The separately granted second attempt removed DataPath only
+  from the scratch AppHost, allowing the container to start, but Aspire then published PostgreSQL as
+  `localhost:17858`; from the AppHost container namespace that address refused the connection.
+- This is a host-topology boundary, not fixture evidence and not product permission. Both attempts
+  preserved the absence of resources/spans envelopes, stopped without workaround, and returned the
+  host to exact zero. No third attempt is authorized. S3 remains
+  `BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY` at artifact head `9525f1ae`.
+
+## 2026-08-30 — active milestone truth advanced beyond the last rendered checkpoint
+
+- Live GitHub closed fourteen already-committed issues while the cluster ledger still called them
+  open; #1669/#1729 were merged at newer PR heads; #1731/#1739/#1747 had advanced; and #863/#1749
+  were admitted after the prior 107-record render. The same stale-snapshot class also mislabeled
+  #1738/#1740 as handoffs despite `status:ci-fail`.
+- The atomic reconciliation updates inventory, intake, DAG, lane ownership, leaves, counts, and
+  narrative checkpoints together. #1733 stays a duplicate exclusion, and no terminal inventory
+  cleanup item is promoted into committed active scope merely to make counts match.
+
+## 2026-08-30 — #1761 exact-head evaluator report required post-merge preservation
+
+- The final separate-session Fable 5 evaluator assessed exact PR head `c1700128...` and produced a
+  terminal `PASS`. Its report remained untracked in the leaf worktree before merge because adding an
+  evaluator-only commit would have moved the exact head already certified by the seven-row gate.
+- This was not treated as permission to lose the verdict. After coordinator merge, the byte-exact
+  report was copied into the leaf's canonical run path on the central orchestration branch and
+  pinned by SHA-256 `eb4a487bfbb66fb0cb4c9033c202ace2aa2269206bb7fe3ec3fc64ace3abee6f`. The
+  evaluated product head remains `c1700128...`; the preservation commit is harness evidence, not a
+  new product or PR-head verdict.
+
+## 2026-08-30 — #1731 coordinator inert-main ruling preserves evidence without ritual recut
+
+- After Fable 5 session `2f492178` certified #1731's content/evidence against `a5520e70`, main moved
+  once to `a5f506dd` through #1761. Raw changed-file verification found only the CLI changelog and
+  #1757 run artifacts: no contracts/SDK code or tests, lock, gate catalog, docs tooling, workflows,
+  reference docs, or generated carrier moved.
+- The coordinator ruled this delta inert for #1466 and did not force a rebase or regenerate receipts
+  that would attest the same product bytes. This applies the run's already-evaluated carry-forward
+  rule rather than inventing a waiver: content `d5f3bf4c...`, evidence `dbd3eafa...`, evaluator
+  carrier `ce73a038...`, and current `e325b7fe...` remain distinct and auditable. The ruling is
+  https://github.com/rickylabs/netscript/pull/1731#issuecomment-5469026813.
+
+## 2026-08-30 — #1293 filed acceptance contradicted the accepted public boundary
+
+- The original first acceptance row demanded a root-exported concrete `PrismaMySqlAdapter`, but
+  formal PLAN-EVAL R2.1–R2.4 deliberately rejected that surface. The class depends on private
+  `MysqlPoolClient` / `MySqlQueryable` construction seams; exporting it from the root would enlarge
+  the contract or force an unapproved construction redesign. The accepted solution exports the
+  factory and connected/transaction contracts, with only a module-scoped concrete export for fake
+  client tests and a surface test forbidding the root symbol.
+- Keeping the stale box unchecked after both #1662 and #1711 shipped made completed architecture
+  look unfinished. The coordinator corrected the issue text rather than reversing the reviewed
+  boundary, then closed from exact historical evidence. This is acceptance-record repair, not
+  retroactive product scope, a new merge, or permission to rewrite gate history.
+
+## 2026-08-30 — owner cleared the exceptional #1734 cycle while preserving the evaluation policy
+
+- The milestone policy normally stops a leaf after two consecutive terminal IMPL-EVAL failures and
+  surfaces an owner decision. #1734 reached that exact boundary after cycle 2 and remained parked;
+  dependent PRs reproduced its unchanged-main failure but did not waive or retry around it.
+- At `2026-08-30T14:21:34Z` the owner explicitly authorized a third and final exceptional cycle.
+  This is a leaf-specific authorization, not a global relaxation: the preserved author keeps the
+  accepted hydration-only repair ceiling, and fresh exact-head gates plus an independent evaluator
+  remain required. Future leaves still stop after two terminal failures unless separately decided.
+- The same verdict ratified Aspire S13's endpoint precedence and accepted the Phase-B topology
+  diagnosis. Static S13 work may advance; local Phase-B runtime remains prohibited until identical
+  bind paths and reachable published ports are proven.
+
+## 2026-08-30 — live GitHub leaves outran the persisted cluster ledger
+
+- The resumed supervisors advanced or opened ten leaves while the central cluster file retained
+  older heads and omitted the new PRs. A partial head-only edit would still have left intake,
+  inventory, DAG membership, generated status, and ownership internally contradictory, so the
+  coordinator repaired the complete validator-controlled set atomically.
+- Reconciliation corrected two semantic drifts, not just timestamps: #1740 does not close #1365, and
+  #1616 remains a fixes-owned issue even though internals created the clean plan checkpoint. The
+  latter must cross lanes as an explicit handoff; no topic ownership was silently rewritten.
+- Current candidate truth also changed after independent review: #1763's bounded repair is sound but
+  lacks renewed Tier-A/evaluation, while #1764 still contains a reproduced product regression and
+  cannot advance on paperwork-only corrections. These are recorded as gates, not waived as stale
+  supervisor prose.
+
+## 2026-08-30 — S11's final docs-audit finding was receipt arithmetic, not content drift
+
+- Cycle 3 closed every substantive S11 finding and left M3 only: the checked manifest proved eight
+  edited and 113 clean rows, while the worklog retained `10/111` and the PR body omitted the exact
+  row-level proof. Treating this as another formal content-audit cycle would have spent evaluation
+  budget without exercising a new product or documentation claim.
+- The coordinator therefore authorized one audit-free metadata repair, accepted H5's truthful
+  current/target version framing and M5's host-only diagram limitation, and released S13 in
+  parallel. S11 remains stacked and cannot merge until its parent convergence and CI diagram-parity
+  receipt are satisfied; the ruling does not waive those release gates.
+
+## 2026-08-30 — exhausted evaluator ceilings were explicitly extended, not silently reset
+
+- #1734 had already consumed its exceptional third cycle and #1764 had consumed its ordinary two
+  cycles. Their newly authorized runs are owner-specific, bounded exceptions: one final focused
+  cycle 4 for the total private reviver and one delta-scoped cycle 3 for the named-span assertion.
+- This does not raise the milestone-wide evaluator ceiling or permit recursive retries. #1734 must
+  park/rescope after another failure; #1764 still requires Flow-B and cannot become ready on the
+  assertion/evaluator result alone.
+- Central state incorrectly carried #1734 as `merged` while GitHub PR #1736 remained open. The same
+  atomic authorization checkpoint restores the Git-authoritative `implementing` phase.
+
+## 2026-08-30 — Docker 28.5.2 did not itself resolve the remote-DinD topology boundary
+
+- The version mismatch and inotify blockers are fixed, but they were independent of D-42/D-43. A
+  fresh identical-path bind probe still produced an empty/invisible worktree inside the daemon, and
+  a fresh DinD-published Redis loopback port still refused connection from ai-agents.
+- Therefore another local Phase-B lease would deterministically repeat the failure. The accepted
+  paths remain a NAS compose correction (identical bind plus shared/reachable namespace) or existing
+  CI/off-host runtime gates. All static and retarget preparation continues in parallel.
+
+## 2026-08-30 — host topology repair supersedes the D-42/D-43 local-runtime prohibition
+
+- The prior D-55 evidence was valid for the old container topology, but the host operator has now
+  recreated DinD with an identical `/home/agent` bind and proved cross-container service access via
+  `netscript-dind:<published-port>`. The stale rule "local Phase B deterministically fails" is no
+  longer true; local Phase B is preferred again under the single serialized runtime lease.
+- `127.0.0.1` remains the wrong address from `ai-agents` for a DinD-published service. All probes
+  and generated acceptance harnesses must distinguish the Docker API endpoint
+  `tcp://netscript-dind:2375` from application endpoints at `netscript-dind:<published-port>`.
+- The first combined hosted run did not invalidate the topology fix: it passed 36 gates per runtime
+  suite and failed in NetScript's S10 parser before convergence because Aspire 13.5 follow-mode
+  emits direct `ResourceJson` NDJSON lines. Treat that as a bounded adapter/evidence repair, not an
+  infra regression and not a reason to return to unconditional CI fallback.
+
+## 2026-08-30 — direct DinD reachability is not identical to DCP loopback reachability
+
+- The host acceptance probe used a port published on a reachable DinD interface. Aspire DCP uses a
+  stricter contract: its remote-Docker ports are bound to the DinD host's `127.0.0.1`, and DCP in
+  `ai-agents` also resolves the resulting endpoint as its own `127.0.0.1`. Treating the successful
+  `netscript-dind:<port>` probe as complete DCP proof was therefore too broad.
+- Real 13.5 `describe` evidence showed a healthy container with PostgreSQL health failing only at
+  `127.0.0.1:<published-port>`. The bounded correction is an operational two-hop relay scoped to a
+  single runtime lease, not a NetScript product rewrite and not a waiver back to CI-only testing.
+- Lease cleanup must never be issued by a non-owner. The first #1736 local run was externally
+  stopped by its supervisor during `database.init`; the 87 ms stop-to-JSON-RPC-loss sequence proves
+  causation. Hosted exact-product-head green evidence supersedes that invalid local receipt.
+
+## 2026-08-30 — the relay converted the Phase-B blocker into product evidence
+
+- The owner-scoped two-hop relay proved the complete DCP contract, not merely a synthetic Docker
+  probe: PostgreSQL and workers became healthy, `aspire wait` passed, and real 13.5.3 resources and
+  spans were captured. S3's first successful local Phase B therefore supersedes the CI-fallback
+  posture for S3/S7/S8 while keeping the single host lease and exact owned cleanup mandatory.
+- Two scaffold observations (missing generated Zod CRUD during an otherwise unrelated web start, and
+  a minimal workers fixture without `streams`) did not invalidate S3's approved worker-trigger and
+  telemetry-envelope acceptance. They are recorded as observations and must not silently widen S3;
+  any repair requires its own owned slice.
+- The shared #1734 baseline blocker is gone from main at `52a881c58842`. Any S1/S4/S5 or fix leaf
+  that still reports #1734 as its blocker is stale and must integrate current main before spending
+  another runtime lease.
+
+## 2026-08-30 — S3 convergence supersedes its historical blocked state
+
+- S3 is no longer blocked, draft, or awaiting acceptance mirroring. PR #1741 merged as `9710a2898`
+  after real local Phase B, independent cycle-4 `PASS`, exact-head full hosted CI, checked issue
+  acceptance, zero review threads, and a green close-gate. Any ledger or supervisor text describing
+  #1715/#1741 as `status:triage`, `status:impl`, or remote-DinD-blocked is stale.
+- The corrected DinD topology does not make ai-agents loopback interchangeable with the Docker host:
+  direct published application endpoints are `netscript-dind:<port>`. Aspire DCP's explicit loopback
+  publications still use the already-proven owner-scoped relay. New Phase-B work must record which
+  of those two paths it uses rather than collapsing them into one address claim.
+- S1's only authoritative head is `e0d70e40407458bebcf02cc408bea6b49107f42b`. The transient
+  `e0d70e404979` expansion exists only in historical hook telemetry and is not evidence. S10's next
+  boundary is dashboard/MCP availability after 53 passing runtime gates, not the already-repaired
+  NDJSON parser and not another infrastructure fallback.
+
+## 2026-08-30 — S4 and the S7 bootstrap failure have distinct dispositions
+
+- S4 is terminal merged at main `74e3d451e`; stale `status:ci-fail` or baseline-blocked prose for
+  #1716/#1738 is invalid. Its prior exact-head runtime receipts remained current because the S3
+  advance had zero changed-path intersection and refreshed merge-ref CI passed.
+- S7 did not reach Aspire or Docker in its first post-S3 attempt. `deno install` encountered a local
+  generated-module ordering dependency before AppHost start. This is neither D-42 nor D-43; preserve
+  the red receipt, correct only canonical bootstrap ordering, and start a new attempt from exact
+  zero.
+
+## 2026-08-30 — Phase-B address contract is fixed; setup-invalid captures remain invalid
+
+- The authoritative sandbox topology is now stable: identical `/home/agent` bind in DinD, Docker API
+  at `tcp://netscript-dind:2375`, and published application endpoints at `netscript-dind:<port>`
+  from `ai-agents`. Do not revive D-42/D-43 or select CI fallback merely because historical receipts
+  predate this topology.
+- This infrastructure correction does not validate a malformed acceptance setup. S5's first
+  two-start capture reused one AppHost identity and resolved the wrong 13.4.6 toolchain. It is red
+  as evidence construction, not a product failure or a reason to waive the acceptance row. The
+  successor must use two isolated roots, prove 13.5.3 in both, assert exit codes, and clean exactly.
+- Fable 5 monthly-spend exhaustion is a transport/provider boundary, not an evaluator FAIL. The
+  Aspire supervisor's same Remote Control session moved to Sonnet 5 without resetting accepted
+  scope. Evaluator HTTP 429s likewise do not increment the two-terminal-content-failure ceiling; use
+  an approved opposite-family fallback and keep independent slices moving.
+
+## 2026-08-30 — topology proof is necessary but does not waive fixture semantics
+
+- Two isolated AppHosts and healthy database/cache containers do not prove a plugin acceptance row
+  when the generated `netscript.config.ts` says `plugins: []`. Keep the S5 row unchecked and its
+  lifecycle metadata at `status:impl` until both roots contain the named first-party plugin graph
+  and every required plugin resource is healthy concurrently. Repeated infrastructure success is not
+  a substitute for the claimed fixture.
+- Direct `netscript-dind:<port>` reachability applies to probes from ai-agents. DCP and generated
+  clients still consume their localhost publication contract and require the proven owner-scoped
+  two-hop relay. #1764's first Flow-B lease omitted that relay and is infrastructure-red, not a
+  sagas product defect. Any retry must start the relay before AppHost creation and clean by exact
+  owner token rather than broad process/container filters.
+- A validation-only head advance may carry a prior expensive runtime matrix only after an explicit
+  changed-path identity audit. S1 satisfies that rule at `32e418c58`: no product/runtime path
+  changed from `c4cbda254`, while the exact validator gates and fresh delta verdict remain required.
+- Fable quota exhaustion affected docs, Aspire, features, and internals concurrently. Each Opus 5
+  substitute is a one-topic recorded exception preserving Codex-generator/Claude-evaluator and
+  fresh-session invariants; it is not a content failure and does not silently amend the default
+  routing policy.
+
+## 2026-08-30 — OpenRouter fallback and runtime ownership correction
+
+- Fable's spend limit no longer implies that the opposite-family fallback route is exhausted. A
+  host-provisioned mode-600 OpenRouter environment file now supports the checked-in DeepSeek preset.
+  Existing terminal verdicts remain historical evidence, but #1774 specifically requires a fresh
+  sanctioned DeepSeek verdict before merge. Never expose the key in transcripts or repository data.
+- A supervisor calling a near-full scaffold suite "targeted" does not satisfy a bounded runtime
+  authorization. The #1764 expanded runner was interrupted before runtime and contributes no gate
+  result. With exact cleanup back to zero, lease ownership transferred to S5 rather than allowing a
+  static tooling search to idle the runtime train.
+- The authoritative main is now `bc33c2aa319c057dda6525d91cb8adcae56b3d77`, containing shipped S1
+  and docs #1785. Any lane still using `74e3d451e` or describing S1 as pending is stale.
+
+## 2026-08-30 — same project semantics, fixture health, and evaluator output are distinct gates
+
+- Aspire 13.5.3 keys a live CLI instance by exact AppHost path. `--isolated` randomizes ports and
+  secrets but does not permit two live instances at one path. S5's concurrency acceptance therefore
+  uses byte-identical copies at distinct absolute paths; sequential replacement is never equivalent.
+- A plugin-present fixture is not necessarily a runnable plugin fixture. S5 attempt 7 correctly
+  stayed red because `--no-samples` omitted the generated saga registry. The official
+  `netscript generate plugins` path with default samples produced it, and attempt 8 then proved the
+  literal-port fix with every required resource healthy. Hand-created registry files are invalid
+  evidence.
+- A successful evaluator process with `result: ""` is not a verdict, even after extensive correct
+  reasoning. #1774's two claude-wrapper runs are transport receipts only. Reusing the same
+  sanctioned model through a different checked-in OpenRouter transport does not create a third
+  content cycle.
+- Main is now `2a1248d33d55a9529d1e4822d9c850bc6caa4c16`. Runtime evidence captured by S8 before
+  integrating this merge is stale regardless of whether its narrow probe happened to finish green.
+
+## 2026-08-30 — S6 debt gate and evaluator route are separate authority layers
+
+- The first post-S5 S6 brief incorrectly treated a listener-only insertion as narrower. The open
+  `scaffold-runtime-a8-f16-1333` entry makes the complete runtime module split a stop condition
+  before the next gate, so omitting that split is architectural regression, not scope restraint.
+  Reconstruction remains bounded because every b4-touched current-main path differs from its stacked
+  S5 base in only the exact S1 live-DB title and its test assertion. Preserve those two deltas plus
+  S5 dynamic endpoints; discard broad generator formatting churn and regenerate assets.
+- `/home/agent/AGENTS.md` now names GLM 5.3 Flash as the host-wide default open model, but this
+  branch's checked-in hybrid allowlist and formal #1774 evaluator policy still ratify DeepSeek V4
+  Flash 0731 at `max`. Host guidance does not authorize an unreviewed product-routing mutation in
+  the #1774 leaf. The completed DeepSeek/high result is therefore supplemental; the same allowed
+  model at max remains the exact qualifying rerun.
+- A lifecycle label is not merge evidence. #1790's `status:ready-merge` was held when its current
+  report contradicted itself about prior-report reuse, covered only 5/14 entrypoints freshly, cited
+  superseded heads, and left issue Scope boxes unchecked, even though its product diff and
+  mergeability were clean. Exact-head evidence and checklists must agree before coordinator merge.
+
+## 2026-08-30 — prospective model-policy migration does not invalidate terminal evidence
+
+- The owner promoted #1774's substantive DeepSeek/high verdict and then explicitly ruled all
+  existing DeepSeek evaluations valid without rerun. The new GLM/Qwen defaults apply only to newly
+  dispatched evaluations after #1791 lands; retroactive regeneration would burn time without
+  changing product evidence and is forbidden.
+- OpenRouter's live catalog names the requested plan model `qwen/qwen3.8-flash`, not a separate
+  `Qwen3.8-Flash-Next` slug. Tooling must use the canonical id, preserve old ids only for persisted
+  record compatibility, and avoid claiming OpenHands `max` effort until that adapter can attest it.
+- #1739 demonstrates why green core CI is not sufficient: a later review can add real unanswered
+  threads and correctly make close-gate red. Those bounded findings require code/tests and thread
+  resolution, but not a wholesale rerun of an owner-accepted evaluator receipt.
+
+## 2026-08-30 — a transport relay can hide an intentionally stopped listener
+
+- S6 Phase B proved that the NAS two-hop relay keeps its local/DinD listeners open after Aspire
+  removes the backing container publication. A connect-only application health check therefore sees
+  the relay accept TCP and remains Healthy even though its upstream service is gone. This is neither
+  product health semantics nor a reason to weaken the listener gate.
+- The bounded infrastructure correction is for the owner-scoped relay watcher to tear down both
+  forwarding hops when an owned publication disappears and recreate them when it returns. Preserve
+  the 56 unchanged green runtime results, require the listener Unhealthy/exit-18/recovery receipt,
+  and reprove exact zero. Do not grant another runtime lane until this owned lease finishes cleanup.
+
+## 2026-08-30 — health transitions require the checked endpoint to become unreachable
+
+- Supersede the prior assumption that relay watcher teardown alone fixes S6. A persistent Aspire
+  resource stopped through `aspire resource stop` no longer supplies a live transition suitable for
+  this assertion, while pausing its upstream container leaves an independent relay socket open.
+  Both red outcomes are fixture semantics, not product-listener failures.
+- The portable fault injection point is the container publishing the exact endpoint port consumed
+  by the AppHost. Pausing that publisher removes TCP reachability while the Aspire resource and its
+  health evaluator remain live; unpausing permits the same resource to recover. Select it from
+  Docker metadata rather than assuming a NAS relay or a direct service container by name.
+- Historical DeepSeek verdicts are immutable accepted evidence. A prospective default-model change
+  must preserve their deserialization and provenance, never reinterpret them as stale or request a
+  rerun.
+
+## 2026-08-30 — container pause is not a portable TCP listener fault
+
+- Closing NAS relay hop B when a source container is paused is correct relay hygiene, but it changes
+  only this host topology. Direct Docker may continue completing TCP handshakes through the paused
+  container network namespace, so the connect-only shipped listener helper can remain Healthy.
+- Do not use Docker lifecycle or network mutation as the final cross-topology receipt. The runtime
+  gate must control its own dynamic scratch endpoints, attach separate E2E health keys through the
+  exact shipped helpers, and leave the real service checks intact. That proves health scheduling and
+  helper semantics without relying on a relay, firewall, network alias, or DCP lifecycle behavior.
+- D-97/D-100 remain infrastructure receipts. Neither may be represented as S6 product acceptance.
+
+## 2026-08-31 — model defaults are prospective, not evidence expiry
+
+- Preserve every qualifying DeepSeek verdict already recorded at an immutable exact head. No lane
+  may turn the GLM/Qwen routing migration into a retroactive reevaluation campaign.
+- Newly dispatched default and IMPL evaluations use `z-ai/glm-5.3-flash` at max effort. Only newly
+  dispatched genuinely critical or complex PLAN-EVAL uses `qwen/qwen3.8-flash` at max effort.
+  While #1792 is not on main, park that new evaluator gate and continue the lane's next independent
+  implementation; never fall back to a redundant DeepSeek run.
+- A green runtime gate plus accepted evaluator evidence still requires honest metadata promotion,
+  but metadata must not manufacture an evaluator rerun. S6 and #1764 are the current examples:
+  exact-head receipts carry, and only acceptance/label/draft/close-gate reconciliation remains.
+
+## 2026-08-31 — runtime lease applies to research baselines too
+
+- A slice author may not invoke full scaffold, browser, Aspire, or Docker gates while gathering S1
+  baselines unless the primary coordinator has granted the sole serialized host lease. Research
+  intent does not make runtime side effects read-only.
+- If an unleased attempt starts, interrupt it, stop only its exact AppHost, remove only its owned
+  resources, prove Aspire/containers/volumes/non-default networks zero, and classify the result as
+  non-evidence. Preserve the author thread and steer it back to static/package gates.
+- Evidence-only path repairs may carry accepted evaluator and product-runtime receipts only when
+  the new diff is proved product-byte-identical. S6 D-114 qualifies: exactly two manifest path
+  substitutions, direct parity `fail=0`, and no product or runtime gate code changed.
+
+## 2026-08-31 — coordinator-only merge exception and supervisor route repair
+
+- The hybrid launcher accepted no model/effort arguments, so five recovered supervisors inherited
+  the account default Sonnet 5 despite the harness route contract. Corrected in place and verified
+  from each live JSONL: `claude-opus-5`; features/fixes `xhigh`, the other three `high`. Future
+  supervisor launches must pass or immediately assert both values and prove the first assistant
+  response metadata.
+- Owner's standing merge authority applies only to the active primary milestone coordinator. It is
+  never delegated. Every merge still requires immutable head, current required CI, acceptance
+  evidence, answered review threads, clean mergeability, and correct lifecycle labels.
+
+## 2026-08-31 — topic serialization was interpreted too broadly
+
+- Serial ordering is required only where leaves share a source seam, contract, derived corpus,
+  integration base, or runtime lease. It does not prohibit parallel independent leaves inside one
+  topic orchestrator. The coordinator now requires an explicit collision audit and separate
+  worktrees before granting that concurrency.
+- Shared-seam merge fronts remain ordered and the host runtime mutex remains global. This preserves
+  evidence integrity while removing avoidable idle time from feature, fix, docs, internals, and
+  Aspire queues.
+
+## 2026-08-31 — an orthogonal salvage merge still invalidates merge-base receipts
+
+- #1822 touched only two historical Markdown files, but merging it while #1798 and #1762 CI ran
+  advanced main and made those merge-base receipts non-final. Orthogonality preserves accepted
+  product/evaluator evidence; it does not make a stale merge snapshot current.
+- Recovery order is explicit: converge and merge #1798 first, then integrate #1762 once across the
+  complete docs delta. Future ready-queue merges are serialized at the shared main boundary even
+  while implementation/evaluation remains parallel behind it.
+
+## 2026-08-31 — routine cascade conflicts are coordinator decisions, not owner pauses
+
+- Aspire S9's additive gate union and S10's preservation of current-main listener readiness were
+  bounded integration choices with an evidence-preserving answer. Parking either as an owner ruling
+  unnecessarily stalled four downstream slices.
+- Topic supervisors must recommend and surface such conflicts immediately; the milestone coordinator
+  resolves them and keeps independent work moving. Only a genuinely product-defining, irreversible,
+  or safety-sensitive choice crosses the owner boundary.
+
+## 2026-08-31 — a dependency diagnostic can hide the initiating config root
+
+- #1762's check report named `service/health.ts`, suggesting an unstable-KV flag or batch defect.
+  Exact batch inspection showed every command already carried `--unstable-kv`; the initiating CLI
+  E2E root had explicitly replaced its compiler libraries without `deno.unstable`.
+- Diagnose the full dependency path before patching the reported file or the structured wrapper.
+  When a member explicitly declares `compilerOptions.lib`, command flags do not necessarily restore
+  an omitted library. Keep member configs aligned with their production parent and test that parity.
+
+## 2026-08-31 — remote Docker startup is not remote Docker endpoint reachability
+
+- Same-path bind visibility and a responsive `DOCKER_HOST=tcp://netscript-dind:2375` are necessary
+  but insufficient for Aspire Phase B when the daemon runs in another network namespace. Docker
+  publishes the selected port on the daemon host; Aspire 13.5.3 currently records and health-checks
+  it as agent-local `localhost`, which is a different host in this topology.
+- The #1747 attempt-2 receipt separates these layers: the PostgreSQL/Garnet/Redis containers were
+  running, while Aspire's PostgreSQL health reported connection refused at `127.0.0.1:19685`.
+  Treat this as endpoint-host/topology infrastructure drift, not a product failure or timeout. Do
+  not repeat the lease until a supported host override or shared network namespace is proven.
+- Official confirmation: microsoft/aspire#14878 documents this exact remote-`DOCKER_HOST`/localhost
+  failure and is a duplicate of #1650, whose maintainer disposition rejects custom Docker-host
+  support. DCP 0.25.13 intentionally binds unqualified publications to `127.0.0.1` on the daemon
+  host. `AppHost__ContainerHostname` and `ASPIRE_ENABLE_CONTAINER_TUNNEL` do not rewrite this
+  host-facing endpoint. The valid NAS correction is `ai-agents` sharing `netscript-dind`'s network
+  namespace while retaining the identical `/home/agent` mount, or a local daemon in `ai-agents`.
+- Cleanup may still leave an explicitly reported persistent volume after `aspire stop --force`.
+  Remove only that exact proven volume, then re-prove all four runtime inventories are zero.
+
+## 2026-08-31 — configured green checks can still omit a contract-required lane
+
+- #1820 was mergeable with core CI green, but its scaffold-template delta had never opted into the
+  repository's additive `e2e-cli` workflow; all scaffold-static/runtime jobs were policy-skipped.
+  A green configured-check summary is therefore insufficient when the slice contract explicitly
+  requires a generated-project runtime receipt. Correct the harness truth, opt into the hosted gate,
+  and require exact-head success before merge.
+- A workflow-file correction can be locally complete yet unpublishable when the active classic token
+  lacks GitHub's `workflow` scope. Preserve the atomic local commit, surface the exact credential
+  boundary, and continue independent work; never split the change into a knowingly-red partial just
+  to bypass the permission.
+- Owner-authorized intra-topic parallelism is now an explicit standing rule for cross-concern leaves.
+  It does not relax collision audits, shared-carrier ordering, immutable merge gates, or the global
+  runtime mutex.
+
+## 2026-08-31 — negative closing language is executable GitHub metadata
+
+- A sentence such as "must not close #1452" still contains a GitHub closing keyword and can populate
+  `closingIssuesReferences`, despite expressing the opposite human intent. Partial-slice PR bodies
+  must use non-closing language such as "merging leaves #1452 open" and the coordinator must verify
+  the GraphQL closing-reference set is empty before merge.
+- Workflow success is also not evidence that the substantive job ran. #1820's desktop-native job
+  concluded success while all product steps were skipped by policy; it was removed from the runtime
+  evidence list. Evidence summaries must distinguish terminal workflow success from executed gate
+  success.
+
+## 2026-08-31 — a carried verdict cannot survive changed safety semantics
+
+- #1747's later fixture/generator rewrite changed four of seven evaluator-owned product blobs and
+  reintroduced reserved-word bindings plus unsafe string emission. A historical PASS and an
+  `impl-eval:skip` label cannot cover those semantics, even when core CI stays green and the body
+  still claims the older ordinal-binding design.
+- Reserved/collision-name acceptance must be proven at the direct generated-source boundary, not
+  only at a config parser. Hosted scaffold runtime is mandatory when local remote-Docker topology
+  prevents the AppHost from reaching daemon-published localhost ports; a policy-skipped workflow is
+  not a substitute.
+
+## 2026-08-31 — “awaiting coordinator decision” is not a terminal lane state
+
+- A topic supervisor must surface the exact bounded choice and keep independent fronts moving; the
+  primary coordinator must rule immediately when the choice is scope, ownership, convergence, or
+  evidence currency. Only a genuinely owner-only product decision may remain parked.
+- A clean merge tree does not preserve runtime or generated-corpus evidence. #1773 had no direct
+  path intersection with newer main but its runtime consumes #1762's service/auth product changes;
+  #1816 had four derived-carrier overlaps including a binary artifact. Both require exact-main
+  convergence and regenerated evidence rather than either a stale merge or an indefinite wait.
+
+## 2026-08-31 — evaluator transport latency is not a product verdict
+
+- #1841's first hosted evaluator was cancelled without a verdict and its replacement remained in
+  the model step beyond the bounded 45-minute recovery window. Neither outcome was evidence against
+  the implementation. After preserving the immutable head and exact hosted gates, the coordinator
+  used a fresh detached worktree and sanctioned OpenRouter GLM route to obtain an independent PASS.
+- A stalled evaluator must be released at its declared recovery boundary, while a separate-session
+  fallback reruns the evidence it needs and records a structured verdict. Do not keep a complete,
+  exact-green user feature or the release train parked behind a no-verdict transport indefinitely.
+- A canary tag is not a completed canary. Completion requires registry upload, exact-version install,
+  published-CLI scaffold runtime, the seven-verdict quickstart walk, ephemeral-branch cleanup, and a
+  green `release/canary-pair` status on the exact source SHA.
+
+## 2026-09-01 — NAS handoff secrecy and repository harness retention are separate policies
+
+- The coordinator incorrectly generalized the NAS rule for untracked migration handoffs to tracked
+  `.llm/runs/**` and stripped run artifacts from merge candidates without owner authorization. The
+  owner clarified that committed harness runs are intentional cross-agent continuity and that this
+  cleanup decision was contrary to their established release lifecycle.
+- Correct boundary: migration handoffs and secrets never publish; repository harness runs normally
+  do. Session/thread identities, worktree paths, receipts, and resumable state are expected harness
+  context, not automatic leakage. No agent may strip or untrack a scoped run merely because it is
+  operational or host-specific.
+- Cleanup is a post-stable-release owner decision, never an automatic release step. The owner selects
+  deletions and may preserve runs into later milestones. Merge audits must treat an unexpected
+  deletion—not the presence of the run—as the retention defect unless the owner authorized it.
+- Recovery is additive and history-preserving: revert in-flight strip commits, restore already
+  merged context in a bounded preservation PR, close false issue #1847, and do not rewrite shared
+  history.
+
+## 2026-09-01 — readiness labels do not replace immutable evidence
+
+- #1862 briefly carried `status:ready-merge` after its repaired head was pushed even though the only
+  durable evaluator artifact still described the superseded, disproven color-dependent corpus.
+  The coordinator demoted it to `status:impl-eval` while fresh exact-head CI and evaluation run.
+- Binding rule: supervisors may stage readiness, but the coordinator verifies the immutable head,
+  current required checks, truthful PR/issue acceptance mapping, independent verdict, and review
+  threads before merging. Transport progress or lifecycle taxonomy alone never satisfies a gate.
+
+## 2026-09-01 — tmux loss is a transport failure, not a state rollback
+
+- Three mobile-visible topic sessions disappeared because their tmux/Claude processes no longer
+  existed. Their Git branches, PR heads, and tracked harness runs remained authoritative and intact.
+- Recovery creates fresh Remote Control sessions from those durable artifacts and records new
+  identities; it never recreates obsolete job registries or changes accepted topic ownership.
+- Liveness requires all three proofs: live tmux pane, matching Claude session-registry bridge, and
+  concrete turn activity. A mobile card or an old bridge URL alone is not an active orchestrator.
+
+## 2026-09-01 — visible steering text is not submitted steering
+
+- The coordinator staged instructions in all five Remote Control panes and initially treated the
+  visible text as delivered. The text remained in Claude's multiline composer, so supervisors kept
+  their prior completed/standing-by turns despite apparently fresh instructions.
+- Binding recovery check: after tmux steering, inspect the pane again. A submitted task has an empty
+  composer plus active generation/tool output (or a new concrete completion); text still shown after
+  `❯` requires another carriage return. Session existence, `/rc`, background pollers, and queued text
+  are insufficient productivity proofs.
+- Dependency watching is background-only. Every topic supervisor must advance independent static,
+  metadata, evaluation, or next-slice work while a dependency gate runs; repeated "standing by"
+  polling is a coordinator intervention trigger.
+
+## 2026-09-01 — a late hosted failure can validate earlier gates and reveal the next baseline leaf
+
+- #1865's full hosted run was red overall, but exact receipts proved its scoped Flow-B/readiness and
+  Postgres/Garnet repairs in both tiers before the run reached a later workers-startup timeout. The
+  red conclusion must not erase those earlier exact gate receipts, nor permit merging while the full
+  required runtime remains red.
+- The workers timeout was a stale consumer contract: the gate required scheduler evidence plus an
+  obsolete Web Worker marker even though the supported in-process runner emitted a different marker.
+  The bounded correction is scheduler plus either supported runner-mode marker, with positive tests
+  for both modes and fail-closed tests for missing scheduler or runner evidence.
+- Baseline blockers discovered by a product PR are isolated and landed first, then integrated into
+  the original immutable product branch for one complete rerun. Aspire and other dependent lanes
+  consume only the exact merged baseline SHA; they continue independent static work meanwhile.
+
+## 2026-09-01 — repeated no-change polling is a supervisor failure, not progress
+
+- A detached dependency monitor may preserve responsiveness, but repeated `No change` turns and
+  `Standing by` while independent issue work exists violate the milestone supervisor mandate.
+- Recovery requires an explicit productive task, a submitted Remote Control turn, and observed tool
+  or generation activity. The coordinator must also free scarce hosted/runtime lanes from known-red
+  pre-baseline jobs so the release-critical exact-head proof can start.
+- Dependency sequencing is narrow: #1865 blocks Aspire Phase B, not #1855 implementation, issue
+  evidence closure, static convergence, body repair, review, or preparation of post-merge packets.
+
+## 2026-09-01 — OpenHands comment output can falsely claim a tracked evaluator artifact
+
+- Formal run `33533773165` wrote `.llm/runs/fix-workers-runtime-ready-markers--1877/evaluate.md` in
+  its runner checkout and returned PASS, but `pr-comment` mode skipped the allow-listed commit-back
+  step. Its final comment claimed the tracked path existed; Git proved it did not. The uploaded
+  summary also retained both PASS and a trailing PENDING token while metadata parsed PASS.
+- Binding recovery: preserve the immutable Actions artifact, verify its checkout head/model/exits
+  and machine-parsed verdict, require the evaluator's judged blobs to carry byte-identically, and
+  require independent exact runtime/CI proof. Never cite the persistent PR comment alone as the
+  verdict source. P1 #1888 owns the workflow/parser repair.
+- This is evaluator-handoff drift, not a product failure. The product merge had a terminal separate-
+  session PASS, seven byte-identical judged blobs, zero threads, current close-gate, and complete
+  exact Postgres plus SQLite/Garnet runtime proof before the coordinator merged it.
+
+## 2026-09-01 — ordinary DinD port reachability does not prove Aspire DCP reachability
+
+- The NAS handover proved an ordinary Docker container published on all interfaces is reachable as
+  `netscript-dind:<port>`, but Aspire DCP created the S8 PostgreSQL and Redis bindings on DinD's
+  `127.0.0.1` only. The service answered inside DinD while both the DinD hostname and direct
+  container address were unreachable from the agent container.
+- Binding the identical project path into DinD solved volume visibility only. It did not solve the
+  separate-network-namespace loopback boundary. A local Phase-B receipt is green only when the
+  generated AppHost can complete its real resource command from the agent container, not when the
+  backing service merely listens inside DinD.
+- Aspire 13.5.3's container tunnel flag cannot repair this direction of traffic. Bundled DCP
+  0.25.13 deliberately maps an all-interface endpoint back to `127.0.0.1` for its own dial target;
+  upstream Aspire #14878/#1650 and maintainer discussion #9899 confirm that a remote Docker daemon
+  in a different network namespace is unsupported. Shared localhost is a host invariant, not an
+  application slice or a reason to invent generated-code endpoint hacks.
+- Runtime leases remain bounded and owned cleanup remains mandatory even when topology makes the
+  product assertion unreachable. The proven recovery returned both Aspire and Docker inventories to
+  zero before static implementation resumed.
+
+## 2026-09-01 — preserved orchestration can expose a real post-command consumer regression
+
+- S8's typed migrate command itself passed in hosted CI while both full tiers later failed worker
+  execution. Because the current-main baseline passes the byte-identical worker probe, this is not a
+  license to extend the timeout or waive the full gate.
+- The correction must preserve the intended no-restart architecture and restore the resident
+  AppHost's ability to process the triggered job. Slice-local success is necessary but cannot replace
+  the complete integration contract at the same immutable head.
+
+## D-190 — completed supervisor turns were mistaken for active delivery
+
+- Detected 2026-09-02: Features, Internals, and Docs had completed substantive turns, but their next
+  steering instructions remained in the Remote Control composers rather than being submitted.
+- Impact: no merge was produced overnight despite ready packets #1846/#1890/#1744; the milestone
+  appeared active while three topic queues were not advancing.
+- Correction: re-arm completed supervisors immediately, audit ready packets independently, and make
+  the coordinator merge in the same turn. This produced #1846, #1890, #1744, and #1747 on main.
+  A visible tmux session or background watcher is not delivery evidence; the next concrete commit,
+  immutable packet, evaluator, or hosted receipt must be running.
+
+## D-191 — `status:ready-merge` did not prove evaluator currency
+
+- #1754 and #1771 were both exact-head CI/acceptance green but their last formal evaluator evidence
+  predated the final material repair. The coordinator rejected both labels and requested only the
+  bounded product delta evaluation rather than a full repeat.
+- Rule: before merge, compare the last independently evaluated product head with the immutable PR
+  head. Artifact-only carry is acceptable when proven; a material post-verdict product commit needs
+  a separate delta verdict even if hosted CI is green.
+
+## D-192 — pre-fix PR branches still share the old runtime concurrency contract
+
+- #1846 repaired the runtime queue on main, but reruns from pre-#1846 branches can still cancel one
+  another through the workflow concurrency group. This was captured as milestone issue #1908 and
+  assigned to Internals.
+- Until that bounded repair lands, Aspire S9/S10 must not churn identical hosted reruns. Static and
+  evaluator work continues independently; this is not a global lane pause.
+
+## D-193 — live milestone scope and supervisor transport drift after #1910/#1911
+
+- The persisted 38-issue/19-PR checkpoint no longer matched GitHub: live milestone 27 is 49 open / 244
+  closed with 16 open PRs. #1913 was missing a topic label; it is now Internals-owned. Future status
+  reports must query the live milestone rather than decrementing persisted counts.
+- Features and Internals tmux transports were absent even though their durable runs remained. Fresh
+  Opus 5 xhigh/high Remote Control supervisors were launched from the canonical worktrees with exact
+  PID/cwd/session/bridge proof. No historical blocked Claude job was resumed.
+- Docs, Fixes, and Aspire had completed turns with steering text staged in the composer. A staged
+  prompt is not a dispatched turn; the coordinator resubmitted explicit commands and verified active
+  generation. This extends D-190's liveness rule to Remote Control composer state.
+## 2026-09-02T11:52:00Z — live GitHub control-plane drift corrected
+
+- The central ledger had remained at main `0622dc432` with 55 open issues while live GitHub was at
+  `ec848e6b0` with 32. The coordinator reconciled the SHA, issue/PR counts, per-lane ownership, and
+  the concrete no-PR delivery paths. GitHub remains authoritative between atomic harness commits.
+- The apparently common Aspire desktop red is not yet attributed to S9/S10: both branches reproduce
+  isolated dpkg resolution failure for `@orpc/contract` from SDK transport policy. One Fixes-owned
+  current-main attribution/repair was dispatched to prevent duplicate branch-local work.
+- Local runtime inventory is clean (Aspire 0, containers 0, custom networks 0). Docker reports three
+  unconsumed volumes versus the prior ledger's one; none is deleted without positive run ownership.
+
+## 2026-09-02 — wrapper success is not an evaluator verdict; client-side trace limits cannot widen CLI output
+
+- #1923's OpenHands workflow completed successfully but produced `OPENHANDS_VERDICT: NONE` with an
+  unavailable artifact. The PR stays unmerged and a replacement exact-head evaluation is running;
+  transport success must never be promoted as implementation approval.
+- S9's final TC-14 red was a retrieval-contract defect, not absent stream telemetry: `aspire otel`
+  returned its default bounded tail before the adapter applied `limit: 500` in memory. The bounded
+  correction passes the limit to the CLI as `-n`, preserves the authenticated CLI source, and pins
+  argv behavior with a regression test.
+- Milestone issue/PR totals can grow while throughput is positive because supervisors file proven
+  defects and delivery leaves. Track consumed exact-green packets and explicit delivery paths, not
+  raw queue size alone; #1917/#1915 merged while #1926/#1927 were admitted and assigned.

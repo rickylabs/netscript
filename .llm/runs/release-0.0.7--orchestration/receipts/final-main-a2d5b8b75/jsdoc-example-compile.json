@@ -1,0 +1,36 @@
+{
+  "gateId": "jsdoc-example-compile",
+  "invocationId": "quality-jsdoc-example-compile",
+  "argv": [
+    "deno",
+    "task",
+    "docs:jsdoc-examples"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "f5aee1056d49fd9ac12608d16ef53cccc64400ab6801bafdb76872e61f01058e",
+  "lifecycleId": "quality:quality-jsdoc-example-compile:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:45:54.260Z",
+  "startedAt": "2026-09-03T13:45:54.262Z",
+  "finishedAt": "2026-09-03T13:47:14.777Z",
+  "durationMs": 80515,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 253,
+    "sha256": "f7e75a1f3c8f8528a6e16b80c46351b5a235656656b945036f85b11c1c54b281",
+    "tail": "jsdoc examples: PASS members=35 files=2061 examples=363 candidates=362 checked=362 exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0\nenforcedFailureCensus={\"badSpecifier\":0,\"unfenced\":0,\"malformed\":0}\ndeferredCensus={\"unboundName\":116,\"typeError\":14}\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 139,
+    "sha256": "467e8f3d6edc6ea20f2fd93a3b78f78904c578f395d3991f9ce01d45cac3838b",
+    "tail": "\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mdocs:jsdoc-examples\u001b[0m deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts\n",
+    "truncated": false
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "verifiedAt": "2026-09-03T14:14:09.140Z",
+  "version": "0.0.7-canary.10",
+  "contentSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "tagCommit": "170e33782acf2dfb4bccc3f4e461ae8f5a149f85",
+  "publication": {
+    "id": 33762898477,
+    "conclusion": "success"
+  },
+  "production": {
+    "id": 33763460542,
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 9897055429,
+    "url": "https://github.com/rickylabs/netscript/actions/runs/33763460542/artifacts/9897055429"
+  },
+  "releaseNotes": {
+    "url": "https://github.com/rickylabs/netscript/releases/tag/v0.0.7-canary.10",
+    "publishedAt": "2026-09-03T13:51:14Z",
+    "includedPullRequests": 21,
+    "prerelease": true,
+    "isLatest": false
+  },
+  "records": [
+    {
+      "path": "readme-cold-baseline.json",
+      "bytes": 87,
+      "sha256": "49a5da9b068fe8884435b0ca7888c299da17f0f30a9032f49b9a9510868dd7e3",
+      "baseline": {
+        "appHosts": 0,
+        "containers": 0,
+        "images": 6,
+        "volumes": 0,
+        "networks": 0
+      }
+    },
+    {
+      "path": "readme-quickstart-prod-report.json",
+      "bytes": 43693,
+      "sha256": "9f0bfb9044bd4f0857701f81808fee4bdf3c4a39a07e31258979441bfbc2fac4",
+      "ok": true,
+      "suiteId": "readme.quickstart",
+      "summary": {
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 84313,
+      "nonPassed": [],
+      "retried": []
+    },
+    {
+      "path": "cli-e2e-prod-report.json",
+      "bytes": 223950,
+      "sha256": "8de000d4f77d84b2139bcc2ddbc117d792486a0436d7eb9770bd7965c35c6edb",
+      "ok": true,
+      "suiteId": "scaffold.runtime",
+      "summary": {
+        "passed": 104,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 582089,
+      "nonPassed": [],
+      "retried": []
+    },
+    {
+      "path": "quickstart-walk-prod-report.json",
+      "bytes": 43418,
+      "sha256": "c2f43a6bcf8c19773cb9fc410b482a932e0c7fd2ef23dcaa98c47e897eff06ce",
+      "ok": true,
+      "suiteId": "quickstart.walk",
+      "summary": {
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 83119,
+      "nonPassed": [],
+      "retried": []
+    },
+    {
+      "path": "gate-receipts/readme.quickstart/cleanup.aspire-stop.json",
+      "bytes": 2582,
+      "sha256": "5a5e45c24a1a9a7ce4b7f248b00f3d29f27992f7b0229077726a037721695720",
+      "ownedContainers": [],
+      "foreignContainers": [],
+      "unprovenContainers": [],
+      "limitations": "No independent post-run AppHost, volume, network inventory; processes field is injected empty by existing cleanup script and must not be represented as a live process probe."
+    }
+  ],
+  "followup": {
+    "runId": 33765493143,
+    "head": "e677ac3c8",
+    "purpose": "Read-only post-README four-part cleanup inventory from existing canary.10; no new canary or product source change",
+    "status": "running"
+  }
+}

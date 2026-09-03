@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"/home/agent/projects/netscript/worktrees/007-stable-fixture-repair","mode":"check","summary":{"filesSelected":1,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":1,"filesProcessed":1,"droppedFiles":[],"refusals":[]},"findings":[]}

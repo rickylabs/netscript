@@ -1,0 +1,36 @@
+{
+  "gateId": "docs-source-format",
+  "invocationId": "quality-docs-format",
+  "argv": [
+    "deno",
+    "task",
+    "check:source-format"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript/docs/site",
+  "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "actualGitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "quality",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "2ee11eec288f8182670b7220d3426b854aad381182d1f173ddce87ccf3399f8e",
+  "lifecycleId": "quality:quality-docs-format:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-09-03T13:45:20.391Z",
+  "startedAt": "2026-09-03T13:45:20.394Z",
+  "finishedAt": "2026-09-03T13:45:21.352Z",
+  "durationMs": 958,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 23,
+    "sha256": "a91dbfc7ba015ebd64902c27740032f3798207dc0ebae57d2526342b219899c5",
+    "tail": "Docs source format: OK\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 2398,
+    "sha256": "bbb8b5ccc33800f066d8491074aa8db4f55a42e0d5aa6ebc0e22f6cf8f0000a7",
+    "tail": "Warning: config file file:///home/runner/work/netscript/netscript/docs/site/deno.json is not a member of the workspace at file:///home/runner/work/netscript/netscript/. Ignoring the parent workspace config.\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/@types/estree/-/estree-1.0.6.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/markdown-it-attrs/-/markdown-it-attrs-4.3.1.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/meriyah/-/meriyah-6.0.5.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/markdown-it-deflist/-/markdown-it-deflist-3.0.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/@js-temporal/polyfill/-/polyfill-0.4.4.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/markdown-it/-/markdown-it-14.1.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/pagefind/-/pagefind-1.3.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/estree-walker/-/estree-walker-3.0.3.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/markdown-it-anchor/-/markdown-it-anchor-9.2.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/jsbi/-/jsbi-4.3.2.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/entities/-/entities-4.5.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/linkify-it/-/linkify-it-5.0.1.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/punycode.js/-/punycode.js-2.3.1.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/uc.micro/-/uc.micro-2.1.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/mdurl/-/mdurl-2.0.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/@pagefind/linux-x64/-/linux-x64-1.3.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/@types/markdown-it/-/markdown-it-14.1.2.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/@types/linkify-it/-/linkify-it-5.0.0.tgz\n\u001b[0m\u001b[32mDownload\u001b[0m https://registry.npmjs.org/@types/mdurl/-/mdurl-2.0.0.tgz\n\u001b[0m\u001b[32mTask\u001b[0m \u001b[0m\u001b[36mcheck:source-format\u001b[0m deno run --no-lock --allow-read _plugins/check-source-format.ts .\nWarning: config file file:///home/runner/work/netscript/netscript/docs/site/deno.json is not a member of the workspace at file:///home/runner/work/netscript/netscript/. Ignoring the parent workspace config.\n",
+    "truncated": false
+  }
+}

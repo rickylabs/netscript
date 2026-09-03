@@ -1,0 +1,127 @@
+{
+  "observedAt": "2026-09-03T07:58:00Z",
+  "mainSha": "e14322c511bbf26018c617c12f639474b6092c32",
+  "latestRelease": "0.0.7-canary.9",
+  "mergedPrsSinceCanary6": 29,
+  "openIssuesByOwner": {
+    "features": [
+      1354
+    ],
+    "fixes": [
+      1455,
+      1481,
+      1844,
+      1971
+    ],
+    "aspire": [
+      863,
+      1712,
+      1881
+    ],
+    "docs": [],
+    "internals": []
+  },
+  "openPrs": [
+    1641,
+    1945,
+    1958,
+    1970,
+    1981
+  ],
+  "runtime": {
+    "aspireApplications": 0,
+    "dockerContainers": 0,
+    "dockerHost": "tcp://netscript-dind:2375",
+    "leaseGranted": false,
+    "toolchain": "mise exec required; uninitialized non-login shell missing tools is not a host defect"
+  },
+  "supervisors": [
+    {
+      "topic": "features",
+      "sessionId": "8a722f0a-74b2-4f82-b822-88be00fc9eae",
+      "pid": 8729,
+      "bridgeSessionId": "session_01VyeBXMJmj5uPaQFngpkdgn",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-features",
+      "state": "native Remote Control restored; provider monthly spend cap (internals recheck pending)"
+    },
+    {
+      "topic": "fixes",
+      "sessionId": "6b1bf71b-f57e-4f03-9b05-34cc62cadd3c",
+      "pid": 8792,
+      "bridgeSessionId": "session_018SSWZkA5iXGaM4M62ek9Hq",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-fixes",
+      "state": "native Remote Control restored; provider monthly spend cap (internals recheck pending)"
+    },
+    {
+      "topic": "internals",
+      "sessionId": "98833bca-9714-4f63-8230-2e3929f6b103",
+      "pid": 8855,
+      "bridgeSessionId": "session_01CUWDTC8s7BS9tUWU8nrKge",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-internals",
+      "state": "native Remote Control restored; provider monthly spend cap (internals recheck pending)"
+    },
+    {
+      "topic": "docs",
+      "sessionId": "1e88fa17-749f-4294-9ee8-07ab1fa5555e",
+      "pid": 8918,
+      "bridgeSessionId": "session_01T3Wa3rFPDedjCNtaLqwHpF",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
+      "state": "native Remote Control restored; provider monthly spend cap (internals recheck pending)"
+    },
+    {
+      "topic": "aspire",
+      "sessionId": "baff9670-5104-412c-9041-01307926d4cc",
+      "pid": 8981,
+      "bridgeSessionId": "session_01V4CCixt6nEXmFbYJN3pTy2",
+      "effort": "medium",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-aspire",
+      "state": "native Remote Control restored; provider monthly spend cap (internals recheck pending)"
+    }
+  ],
+  "implementationResumes": [
+    {
+      "pr": 1970,
+      "threadId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
+      "pid": 5580,
+      "head": "43734544f",
+      "action": "integrate prepared handler-freeze repair ad5a74e764c6ed85d7b7d165ce62c9bed7d70d32 + main, exact gates"
+    },
+    {
+      "pr": 1945,
+      "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
+      "pid": 6035,
+      "head": "98699f4bd",
+      "action": "integrate main including #1956, diagnose terminal runtime result, exact gates"
+    },
+    {
+      "pr": 1958,
+      "threadId": "01a06424-38fe-7893-ba59-6064b0dd616e",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
+      "pid": 6158,
+      "head": "5c7c105b8",
+      "action": "repair behavior.app-reference loading-state failure from run 33719217078"
+    }
+  ],
+  "followUpCommand": "mise exec -- deno run --no-config --no-lock --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts --user node --thread-id <recorded-thread> --worktree <recorded-worktree> --message <bounded-follow-up>",
+  "transportCaveat": "Claude bridges proven in live registry and terminal. Codex managed daemon and working child processes proven, per-child phone attachment not independently attested.",
+  "coordinatorRepair": {
+    "pr": 1981,
+    "commit": "650844452",
+    "pushed": true,
+    "scope": "six generated Aspire inventory rows + worklog/context, no product changes",
+    "localParity": "PASS",
+    "hostedCi": "pending"
+  },
+  "historicalLedgerCaveat": "Old inventory/DAG/leaf lifecycle fields are historical. This live snapshot supersedes operational status; complete machine reconciliation/validation before new wave or cut. Existing authorized leaves only resumed. Dirty deno.lock preserved."
+}

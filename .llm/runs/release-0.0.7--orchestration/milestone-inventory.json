@@ -1,0 +1,1357 @@
+{
+  "schemaVersion": 1,
+  "repo": "rickylabs/netscript",
+  "milestone": "0.0.7",
+  "capturedAt": "2026-08-30T13:51:57.000Z",
+  "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
+  "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
+  "targetIssueCount": 116,
+  "issues": [
+    {
+      "number": 1093,
+      "title": "[sdk-client S8] fix(plugin-core): let third-party plugin factories participate in discovery",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/plugin/src/sdk/discovery/ast-extractor.ts:4-8 — CONTRIBUTION_BUILDERS still hardcodes { defineJob: jobs }, { defineSaga: sagas }, { defineWebhook: triggers } in the core",
+        "packages/plugin/src/config/domain/plugin-contributions.ts:12-41 — no seam through which a plugin declares its own factory axis; :14-16 doctorChecks is a closed 'auth-backend' literal union",
+        "rfcs/0001-sdk-client-contributions.md:1156-1160 — '#1093 must collect these references without official-plugin switches, reject duplicate ids or mismatched imported descriptors, and expose them to generators' (new obligation added by the merged RFC)",
+        "rfcs/0001-sdk-client-contributions.md:1281 Stage 7 assigns generic discovery to #1093",
+        "Timeline: no merged PR references #1093; the nearest merged neighbour PR #1316 (fix(plugins): declare linking through shared core seam) closed a different issue (#1189) and left ast-extractor.ts:4-8 intact"
+      ]
+    },
+    {
+      "number": 1112,
+      "title": "docs(database): make the MySQL Prisma adapter example honest and executable",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/prisma-adapter-mysql/README.md:7,13,20 still claims 'Deno's native MySQL client' / 'Deno-native driver' — this file is the JSR landing page (jsr-package-settings.json defaults readmeSource: 'readme')",
+        "packages/prisma-adapter-mysql/src/mod.ts:6-8 module JSDoc repeats the same false 'Deno's native mysql driver' claim above the @example",
+        "packages/prisma-adapter-mysql/src/adapter.ts:26 imports type { Pool, PoolConnection, PoolOptions } from 'mysql2/promise' — the real dependency",
+        "packages/prisma-adapter-mysql/src/types.ts:39 declares onConnectionError; grep across the package finds it referenced only in examples/basic-usage.ts:39 and never in src/adapter.ts — a live accepted-but-unused option (acceptance row 4)",
+        "docs/site/reference/prisma-adapter-mysql/index.md:8,14,16-17 IS already honest about mysql2, pooling ownership and timeout — that half was repaired by PR #1292, so only the package-local prose plus source rows remain"
+      ]
+    },
+    {
+      "number": 1243,
+      "title": "auth: session list --stream-url default pins localhost:4437 which no longer exists post-#1211",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/public/features/plugins/auth/auth-plugin-command.ts:87 still sets `default: 'http://localhost:4437/auth/sessions'` on --stream-url",
+        "plugins/streams/scaffold.plugin.json:54-55 still carries servicePort 4437 / backgroundPort 4437 — the dead manifest values the issue asks to sweep",
+        "packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-test-support.ts:108-109 also hardcodes 4437 for both ports",
+        "#1211 (randomize default listener ports) is MERGED in 0.0.5, so the premise that 4437 is no longer bound by new scaffolds holds",
+        "The 4437 squatting failure class is documented in the repo's own aspire skill text (packages/cli/src/kernel/assets/skills.generated.ts), which describes a foreign process answering on 4437 healthily"
+      ]
+    },
+    {
+      "number": 1249,
+      "title": "fix(fresh/form): controlProps() is not element-assignable, and Zod 4 constraint derivation misses numbers and regex",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1249",
+        "https://github.com/rickylabs/netscript/issues/1249#issuecomment-5285236885",
+        "packages/fresh/src/application/form/_internal/prop-types.ts:166",
+        "packages/fresh/src/application/form/schema-adapter/zod-constraints.ts:163-198"
+      ]
+    },
+    {
+      "number": 1262,
+      "title": "scaffold: db seed is a placebo — SELECT 1 plus a success banner, no rows seeded",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/kernel/assets/database/seed.ts.template:13-14 is verbatim `await client.$queryRaw\\`SELECT 1\\`;` followed by `console.log('✅ Database seed completed.')` — unchanged on baseline",
+        "It is the only seed asset in the tree (`find packages/cli/src/kernel/assets -iname '*seed*'` returns exactly this one file), so every engine gets the placebo",
+        "No test references the seed script's row-writing behaviour (no seed assertions found under packages/cli/e2e)",
+        "Timeline shows only #1250/#1256 (the Zod-4 coercion fix) cross-referencing it — nothing that touched the seed"
+      ]
+    },
+    {
+      "number": 1263,
+      "title": "service: generated by-id handler returns 500 {defined:false} for a missing row instead of a defined 404",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/kernel/assets/service/routers/v1.ts.template:59 still throws a bare `new Error(\\`{{modelName}} ${input.id} not found\\`)` in the getById handler — not a defined oRPC error",
+        "Same defect in the memory variant: packages/cli/src/kernel/assets/service/routers/v1.memory.ts.template:56",
+        "Repo-wide grep for `.errors(`, `NOT_FOUND`, or `ORPCError` across packages/cli/src/kernel/assets (excluding generated) returns ZERO hits — no scaffolded contract defines a 404, so the OpenAPI projection cannot document one",
+        "update/delete handlers rely on Prisma's own throw (v1.ts.template update/delete use where:{id} with no not-found branch), so they share the class",
+        "Timeline shows only #1250/#1256 and later related issues; no merged PR addressed the defined-error gap"
+      ]
+    },
+    {
+      "number": 1293,
+      "title": "prisma-adapter-mysql: adapter class is unexported and has no connection-error hook",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "PLAN-EVAL R2.1–R2.4 selected the public factory/connected/transaction contract and deliberately kept concrete PrismaMySqlAdapter out of the package root: tests may reach a module-scoped export, while src/mod.ts and surface:diff must not expose the private construction seam.",
+        "PR #1662 evaluated head f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf merged as 3fc0f2f9221a8246f0d26a26189bafb2647be08a on 2026-08-15T10:27:29Z; its surface test proves PrismaMySqlConnectedAdapter, PrismaMySqlTransactionAdapter, and PrismaMySqlTransactionOptions are root-nameable while the concrete class is absent.",
+        "#1662's fresh native Fable 5 IMPL-EVAL returned PASS; the classifier/notifier suite passed 46/46, exact receipts recomputed SUFFICIENT, deno doc --lint exited 0, and the eight-file publish dry-run exited 0.",
+        "PR #1711 evaluated head 07e12efacf3cd23672395507cbf77ecf620cd454 merged as 3561bb64820602e065bf6df0afeed82b39062e42 on 2026-08-29T22:28:24Z; the real generated Prisma 7.8 client check, dynamic-import smoke, focused 38/38, package 51/51, and #1112 5/5 acceptance completed the example obligation.",
+        "At 2026-08-30T13:51:56Z the coordinator rewrote stale acceptance row 1 in place to the formally accepted R2.1–R2.4 boundary, checked all four rows against exact evidence, posted https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369, labeled status:shipped, and closed the issue COMPLETED without a new PR merge or main movement."
+      ]
+    },
+    {
+      "number": 1296,
+      "title": "fix(docs/exports): repair contracts and Fresh UI reference drift, then wire the regeneration gate",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "The cited file is a false lead: packages/contracts/src/application/contract-primitives.ts:72,112,144 import baseContract/BaseContractRoute/BaseContractOutputRoute from '@netscript/contracts', and all three ARE root exports (packages/contracts/src/public/mod.ts:2-6) — those examples are correct",
+        "Real instances of the same defect: packages/contracts/src/application/paginated-query.ts:6 imports paginatedQuery, schemas/pagination.ts:6 imports PaginationInputSchema/createPaginatedOutput, schemas/filters.ts:6 imports FilterConditionSchema/buildPrismaWhere, and src/application/transform-helpers.ts:6 imports createTransformer — all from the root, while none of those symbols appear in src/public/mod.ts (they live on ./query and ./transform)",
+        ".llm/tools/docs/check-exports-drift.ts:13-21 lists fresh-ui with `checkSymbols: false` and `excludedSymbols: []` — symbol-level drift for docs/site/reference/fresh-ui/index.md is not checked and there is no machine-readable intentional-omission mechanism in use",
+        "Wiring is partly done: .llm/tools/docs/check-accuracy-and-discoverability.ts:293 spawns check-exports-drift.ts, and deno.json:85,90 expose it via docs:accuracy/docs:maintenance — but no .github/workflows job runs those tasks (only pages.yml:145 runs docs:snippets)",
+        "#1108 (the parent of the fresh-ui rows) was closed NOT_PLANNED on 2026-08-11, so those rows genuinely have no other owner"
+      ]
+    },
+    {
+      "number": 1306,
+      "title": "fix(aspire): 'the dashboard is the authority' is unusable for an agent — aspire start detaches in a non-TTY and prints no login token",
+      "disposition": "close-fixed",
+      "lane": null,
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1306",
+        "aspire ps --help: --format Json and --non-interactive",
+        "aspire describe --help: resource state via --format Json",
+        ".agents/skills/aspire/SKILL.md:30-41",
+        "packages/cli/src/kernel/assets/skills.generated.ts"
+      ],
+      "reason": "Aspire CLI 13.4.6 now exposes machine-readable AppHost/resource inventory and NetScript already teaches the exact agent path in both repository and generated skills."
+    },
+    {
+      "number": 1348,
+      "title": "Epic: Typed SDK client contributions — credentials, transport policy, metadata, and cache-safe extensions",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "rfcs/0001-sdk-client-contributions.md:1 exists on baseline — RFC text published, so acceptance box 1 is satisfied",
+        "PR #1390 'RFC: Typed SDK client contributions' MERGED 2026-08-11T20:15:51Z; its body states 'RFC tracking issue: #1348 (reference only; this draft does not close it)'",
+        "rfcs/0001-sdk-client-contributions.md:1555-1599 — 11 unresolved questions still open (incl. Q6 metadata ownership), so ratification acceptance is incomplete",
+        "rfcs/0001-sdk-client-contributions.md:1273 Stage 0 row assigns #1348 'align #1349–#1353 bodies before implementation' — not yet done (bodies still contradict the RFC)",
+        "gh issue list --label epic:sdk-client-contrib: all 8 children (#1349-#1353,#1466,#1467,#1093) still OPEN"
+      ]
+    },
+    {
+      "number": 1349,
+      "title": "[sdk-client S3] feat(sdk): expose the typed oRPC client-contribution seam",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/sdk/src/ports/service-client.ts:203-222 — CreateServiceClientOptions is still the closed nine-field record; no headers/fetch/interceptors/plugins/link/context parameter",
+        "packages/sdk/src/ports/service-client.ts:129-155 — ServiceClientContext is still a concrete interface; ServiceClientMethod<TInput, TOutput> at :167 carries no context or error generic",
+        "packages/sdk/src/client/http-client-link.ts:82,83-101,102-126 — method, headers and plugins are still inline literals inside the link",
+        "packages/sdk/src/ports/mod.ts:7 still advertises 'the transport seam' while ClientLinkPort/ClientLinkCallOptions (packages/sdk/src/ports/client-link-factory.ts:8-26, doc'd 'Internal … seam') are absent from its export list",
+        "packages/service/src/builder/service-rpc.ts:57 still calls createRPCHandler(router, { serviceName, debug }) while packages/service/src/primitives/handlers.ts:44 declares `plugins`; packages/service/src/types.ts:221 still `init?(options: unknown, router: unknown)`"
+      ]
+    },
+    {
+      "number": 1350,
+      "title": "[sdk-client S1] fix(sdk): preserve contract errors through safe() and isDefinedError",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/client/errors.ts:75-77 — `isDefinedError<T>(error: T): error is Extract<T, DefinedError>` still lacks the upstream error generic",
+        "packages/sdk/src/client/errors.ts:86-92 — `safe<TOutput>(promise: PromiseLike<TOutput>)`, no TError; SafeResult<TOutput, TError = unknown> at :49",
+        "packages/contracts/src/application/contract-primitives.ts:81 — `export const baseContract: ReturnType<typeof oc.errors> = oc.errors(commonErrorMap);` still erases the six literal codes",
+        "packages/sdk/tests/readme-doctest_test.ts:36-37 — still `declare function safe<T>(...)` / `declare function isDefinedError(...)` instead of importing the real exports",
+        "docs/site/services-sdk/sdk.md:198 and docs/site/services-sdk/how-to/discover-services.md:147,224 still ship the `isDefinedError(error) -> error.code` pattern"
+      ]
+    },
+    {
+      "number": 1351,
+      "title": "[sdk-client S4] refactor(sdk): centralize HTTP method and GET-cache policy",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/client/http-client-link.ts:82 — `method: inferRPCMethodFromContractRouter(contract)` still applied inline; no owned policy function exists (grep inferRPCMethodFromContractRouter/StrictGetMethodPlugin/fallbackMethod returns only this file)",
+        "packages/sdk/src/client/http-client-link.ts:109 — `filter: ({ request }) => request.method === 'GET'` still re-derives the method decision from the wire",
+        "packages/sdk/src/client/http-client-link.ts:110-125 — the 'force-cache' group condition is still an independent literal keyed off context?.cache",
+        "packages/sdk/src/client/http-client-link.ts:103-108 — ClientRetryPlugin default still frozen at retry: 0",
+        "rfcs/0001-sdk-client-contributions.md:1277 Stage 3 assigns this issue the v1-family version decision, one fetch/retry/dedupe/trace path, header-safe dedupe, and deprecating the no-op options"
+      ]
+    },
+    {
+      "number": 1352,
+      "title": "[sdk-client S5] feat(sdk/auth): prove typed credential contributions end to end",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/service/src/auth/static-credential-authenticator.ts reads Authorization/x-api-key while grep 'Authorization' packages/sdk/src returns no match — the client still cannot send a credential",
+        "packages/sdk/src/client/http-client-link.ts:83-101 — client header authorship is still only Content-Type + optional traceparent/tracestate",
+        "grep -rn 'authClient' packages plugins → no such symbol on baseline (only oauthClient in packages/auth-kv-oauth/src/flow.ts:169)",
+        "packages/plugin/src/config/domain/plugin-contributions.ts:12-41 — still no client/sdkClients contribution group; :14-16 `doctorChecks?: readonly 'auth-backend'[]` is the closed-literal precedent the issue warns against",
+        "rfcs/0001-sdk-client-contributions.md:1278 Stage 4 keeps this issue as the auth dogfood (auth-core bearer factory, access metadata, redaction, cache partition/direct-only, manifest reference, docs, scaffold choice)"
+      ]
+    },
+    {
+      "number": 1353,
+      "title": "[sdk-client S6] feat(sdk): express trace propagation as a general contribution",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/client/http-client-link.ts:87-98 — trace-header authorship is still hard-coded in the link behind the propagateTraceContext boolean",
+        "packages/sdk/src/ports/service-client.ts:149-155 — ServiceClientContext.traceHeaders is still the per-call override; grep traceContextContribution → no such symbol on baseline",
+        "rfcs/0001-sdk-client-contributions.md:1476-1481 §'Rejected: trace propagation as the non-auth contribution' — the merged RFC REJECTS this issue's headline deliverable",
+        "rfcs/0001-sdk-client-contributions.md:1279 Stage 5 — 'Re-scope from “trace contribution” to prove the transport retains the only final trace injection and rejects contributor ownership of trace headers'",
+        "rfcs/0001-sdk-client-contributions.md:870-871,886-887 — traceparent/tracestate are reserved SDK-owned headers unavailable to contributions"
+      ]
+    },
+    {
+      "number": 1354,
+      "title": "feat(cli): no verb generates a resource route slice — the typed contract, cache-first loader and withResource page must be hand-copied from init",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:15-45 is still the entire page generator: three files, no withResource, no loader, no contract sidecar",
+        "packages/cli/src/public/features/generate/generate-group.ts:19-27 registers only `aspire`, `runtime-schemas`, `plugins` — no slice/route generator exists",
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:60-62 writeGeneratedFiles hard-refuses on any existing file; no --force/--dry-run reaches it from add-ui-command.ts:61-67",
+        "Reference slice still exists only as init assets: packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template and (_islands)/ServiceShowcaseLab.tsx.template",
+        "Timeline shows no merged PR touching this issue; only open peers #1355/#1357/#1360 cross-reference it"
+      ]
+    },
+    {
+      "number": 1355,
+      "title": "feat(cli): app-side client/query wiring is a one-shot template with hardcoded names, colliding 'service' cache keys and a no-op invalidation",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/cli/src/kernel/assets/app/routes/examples/service/(_lib)/service-query.ts.template:22-27 still literally does `createQueryFactories({ service: { … } }).service` — resource key is the literal 'service' for every service",
+        "Same template :11-14 builds bridgeInvalidation({{serviceName|camelCase}}RouterName, 'list') → keys ['users','list'], while packages/sdk/src/query/query-factory.ts:218 passes the OBJECT KEY ('service') as resource → the invalidation is a no-op",
+        "packages/sdk/src/query-client/key-bridge.ts:32-37 confirms bridgeInvalidation returns { queryKey: [resource, action] } with no factory linkage",
+        "Dead call sites confirmed: assets/app/routes/examples/(_islands)/ServiceShowcaseLab.memory.tsx.template:93 (onSettled) and :135 ('Invalidate list cache' button)",
+        "packages/cli/src/kernel/adapters/service/client-scaffolder.ts:38-49 is still a single renderTemplateAssetSync — one template, one shot, no per-service naming"
+      ]
+    },
+    {
+      "number": 1357,
+      "title": "fix(cli): ui:add page --island emits a useSignal counter and an empty queryLoaders object instead of the advertised data-screen triad",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:37 still emits `export const queryLoaders = {} as const;` and :35 emits signalIslandTemplate (useSignal counter, :66-68)",
+        "web-scaffold.ts:51-54 — `ui:add island --query` still emits `<QueryIsland><div>Name</div></QueryIsland>`: no useQuery, no key, no factory",
+        "web-scaffold.ts:20+:30 — route id is still a hand-derived dotted string with an inline createRouteReference, not router.ts/appRoutes",
+        "Contradicted description still live at packages/cli/src/public/features/ui/add/add-ui-command.ts:26-28 ('Scaffold the Fresh page + island + query-loader triad for a data screen')",
+        "add-ui-command.ts:61-67 never forwards `--force` to scaffoldUiPage/scaffoldUiIsland, and there is no --dry-run flag at all"
+      ]
+    },
+    {
+      "number": 1358,
+      "title": "fix(scaffold): the generated /design/components gallery lists 50 of 66 registry items — the whole AI collection is invisible and no gate compares them",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/kernel/assets/app/routes/(design)/design/(_shared)/registry.ts.template:28 still declares `total: 50` and :1-4 self-describes as a hand-copied snapshot",
+        "Live manifest item count is 66: `grep -c '^      kind: ' packages/fresh-ui/registry.manifest.ts` → 66",
+        "AI/chart items absent from the snapshot but present in the manifest: grep for model-selector|prompt-input|donut|dropzone|citation-chip|mcp-ui-widget returns 0 hits in the template, and hits at packages/fresh-ui/registry.manifest.ts:451,495,561,583",
+        "The only drift test remains packages/fresh-ui/tests/registry-doc-drift.test.ts:4-19, which compares registry.ts JSDoc COLLECTION NAMES only and never reads the CLI snapshot",
+        "packages/cli/src/kernel/application/ui/registry.ts imports freshUiRegistryManifest — the CLI resolves against the live manifest, so ui:add can install items the gallery denies"
+      ]
+    },
+    {
+      "number": 1360,
+      "title": "fix(scaffold): the canonical island never passes initialDataUpdatedAt, so the loader's cachedAt is computed, displayed and discarded",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "Repo-wide grep for `initialDataUpdatedAt` under packages/cli/src returns ZERO hits; all hits are in packages/fresh (query-types.ts:136, hooks.ts:128,138-140, and two tests)",
+        "packages/cli/src/kernel/assets/app/routes/examples/(_islands)/ServiceShowcaseLab.tsx.template:54-57 passes queryKey + initialData: props.initialList with no initialDataUpdatedAt; :148 uses props.cachedAt only as a display stat",
+        "Memory variant identical: ServiceShowcaseLab.memory.tsx.template:60 initialData, :119 cachedAt as a label only",
+        "The seam is live and tested in the framework — packages/fresh/src/application/query/hooks.ts:138-140 maps the option to `{ updatedAt }` and initial-data.test.tsx:15 exercises it — so only the scaffold is unwired",
+        "Timeline shows no merged PR; only open peers #1354/#1357 cross-reference it"
+      ]
+    },
+    {
+      "number": 1378,
+      "title": "chore(quality): `quality:scan` cannot see an `any` in an exported type, an unbudgeted allowance, or a docs snippet",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Still regex-only, export-blind: `.llm/tools/quality/scan-code-quality.ts:69` `if (!commentOnly && /(?:<|:\\s*)any.../.test(line)) return 'explicit-any'` — no notion of `export`.",
+        "Allowances still unlinked: `scan-code-quality.ts:207` matches `/\\/\\/\\s*quality-allow:\\s*(.+)$/` and accepts any non-empty free text; no `#<n>` requirement anywhere in the file.",
+        "Already landed (boxes 3,4,5,7): `scan-code-quality.ts:119` scans `docs/site/**` `.md` fences; `:124` keeps `-soundness_test.ts` in scope; `deno.json:50-51` wires `--root docs/site --max-allow 7` and `--max-allow 8`.",
+        "PR #1596 (merged 2026-08-12) body: \"Export reachability and live issue-state verification remain explicitly deferred to #1378 for 0.0.7\"; it referenced #1378 without closing it.",
+        "`docs/site/reference/triggers/index.md` (205 lines) contains no `any[]` at baseline — acceptance box 7 is discharged."
+      ]
+    },
+    {
+      "number": 1429,
+      "title": "fix(agentic): leak-check cannot see orphaned Aspire process descendants, so it reports clean through a real leak",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "`.llm/tools/agentic/teardown/leak-check.ts` has zero matches for `ppid|PPID|pgrep|/proc|process` — it has no process-descendant observation at all.",
+        "Its resource model is containers + AppHosts only: `leak-check.ts:42`, `:68`, `:74`, `:106` all branch on `resource.kind === 'apphost'` or `registry.containers`.",
+        "Timeline cross-references for #1429 are only issues #1227 and #1169 (both closed), no merged PR touching leak-check.",
+        "`.llm/tools/agentic/teardown/` contains ownership.ts, ports.ts, probes.ts, run-resources.ts — no process enumerator module."
+      ]
+    },
+    {
+      "number": 1448,
+      "title": "fix(ai/mcp): make pool startup failure-isolated and propagate cancellation",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/ai/src/mcp/application/pool.ts:154-173 — #collectTools iterates transports in a `for...of` with `await list(transport)`, so one never-settling or rejecting server blocks/aborts the whole pool; connect/reconnect/listTools (:107, :115, :122) all route through it",
+        "packages/ai/src/mcp/adapters/tanstack-connector.ts:80 and :89 — listTools/callTool only call options.signal?.throwIfAborted() before awaiting client.tools()/client.callTool(name, args); no signal is passed into the pending TanStack work",
+        "packages/ai/src/mcp/application/register-tools.ts:14-17 — registerMcpTools(registry, transport) accepts no caller signal, and :36 hardcodes `{ signal: undefined }` on every tool call",
+        "packages/ai/src/mcp/application/pool.ts:88 — the pool exposes only an aggregate `state`; there is no per-server status/degraded-lifecycle read",
+        "gh api issues/1448/timeline — the only cross-reference is rickylabs/eis-chat#159 (consumer adapter), not a netscript fix"
+      ]
+    },
+    {
+      "number": 1451,
+      "title": "feat(plugin-workers): generated registry cannot consume project job policy metadata",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "plugins/workers/src/cli/runtime-registry-generator.ts:325-340 — createJobDefinition still hardcodes topic 'default', timeout 300000, maxRetries 3, retryDelay 1000, maxConcurrency 1, priority 50, persist true and a fixed tags expression",
+        "plugins/workers/src/cli/registry-compiler.ts:78 — the compiler path emits the same `timeout: 300000` literal",
+        "plugins/workers/tests/cli/registry-compiler-golden_test.ts:68 and plugins/workers/services/src/generated-jobs_test.ts:22 — golden tests pin the generic 300000ms timeout, so no project-metadata seam is exercised",
+        "packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts:66 — the executor default is likewise `options.defaults?.timeout ?? 300000`",
+        "gh api issues/1451/timeline — the only cross-reference is issue #1455 (open), no fix PR"
+      ]
+    },
+    {
+      "number": 1452,
+      "title": "feat(plugin): publish reusable PluginServiceContext host factory",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/cli/src/kernel/assets/embedded.generated.ts:177 — the scaffold still embeds a full ~100-line LazyPluginKv class plus db/contracts/logger/env composition in the generated createPluginServiceContext",
+        "packages/cli/src/kernel/templates/plugins/generate-plugin-service_test.ts:82 — the test asserts the generator emits `export function createPluginServiceContext(` into consumer code, pinning the duplicate-per-consumer shape",
+        "plugins/workers/services/src/main.ts:88-89, plugins/sagas/services/src/main.ts:139-140 and plugins/auth/services/src/main.ts:124-127 all load the host factory via NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE, so no published factory exists to import",
+        "packages/plugin/src/sdk/ contains only discovery/walker/registry-emitter modules — no host-context factory",
+        "gh api issues/1452/timeline — no cross-references at all"
+      ]
+    },
+    {
+      "number": 1453,
+      "title": "fix(agentic): migration LOC worktree snapshot crashes on unstaged deletions",
+      "disposition": "move",
+      "lane": null,
+      "evidence": [
+        "`tools/migration-loc/` does not exist at baseline: `find . -iname '*migration-loc*'` returns nothing outside `.llm/tmp` hook logs and the 0.0.7 inventory JSONs.",
+        "`git log --all -- tools/migration-loc` is empty — the path has never existed in this repository's history.",
+        "`grep -rn readTrackedFile --include=*.ts .` returns no match; the cited `tools/migration-loc/git.ts:78` frame has no counterpart here.",
+        "The only `-S'migration-loc'` history hits (05e5fbac2, 9f1d0244a) are false positives on the string `migration-lock` in `rfcs/0000-database-architecture.md`.",
+        "No scaffold template emits it: `packages/cli/src/kernel/assets/**` has no migration-loc generator.",
+        "https://github.com/rickylabs/netscript/issues/1453#issuecomment-5285235764"
+      ],
+      "reason": "The entire cited surface is absent from the repo and its full history, so the acceptance is unsatisfiable in a 0.0.7 slice against this codebase; needs re-scoping or relocation to the owning repo first."
+    },
+    {
+      "number": 1455,
+      "title": "workers: preserve job payload type through definition, registry, and enqueue",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/plugin-triggers-core/src/builders/define-webhook.ts:79-81 — `enqueueJob<TJobId extends string, TPayload = unknown>(job: JobDefinition<TJobId>, ...)` still infers the payload independently of the job definition",
+        "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts:32-36 — JobTriggerInput still exposes `payload?: Record<string, unknown>`",
+        "packages/cli/src/kernel/assets/registry-generator-fixture.ts:37 — generated registries still emit `new Map<string, JobHandler<any>>([`",
+        "Partially superseded upstream: packages/plugin-workers-core/src/domain/job-definition.ts:153-163 and builders/job-builder.ts:241 already return JobDefinition<TId, TPayload, TResult>, so the builder-side erasure the issue describes is already gone",
+        "gh api issues/1455/timeline — only cross-reference is rickylabs/eis-chat#168 (consumer repo), no netscript fix PR"
+      ],
+      "priorLane": "features",
+      "ownershipEvidence": "Current orchestrator:fixes label and existing PR #1970 author; no topic relaunch."
+    },
+    {
+      "number": 1458,
+      "title": "feat(fresh/ai): expose awaited durable chat response completion",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts:234-264 — NetScriptChatResponseOptions exposes target/streamPath/source/newMessages/request/authorize/toResponse and no mode or waitUntil",
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts:255-263 — `toResponse` is documented as a test/adapter seam defaulting to toDurableChatSessionResponse, which is exactly the escape hatch consumers are forced to use",
+        "packages/fresh/src/runtime/ai/create-chat-connection.ts:461 — `const toResponse = options.toResponse ?? defaultToResponse;` with no completion-mode forwarding",
+        "gh timeline for #1458: only a 0.0.7 milestone event; no PR has referenced it"
+      ]
+    },
+    {
+      "number": 1461,
+      "title": "docs/sdk: getCachedEntry cache-first loader example never revalidates stale entries",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/cache/cache-query.ts:385-410 — getCachedEntry() reads this.store.get(), records telemetry and returns toCachedEntry(); it never reads staleTime, calls queryFn, or schedules a refresh",
+        "docs/site/services-sdk/sdk.md:188 — the published example still carries `if (entry) return entry; // serve cached; SDK reloads stale in the background`",
+        "docs/site/services-sdk/sdk.md:138 — getCachedEntry is still described as 'the SWR primitive a layer loader uses to decide stale-reload'",
+        "packages/sdk/src/cache/cache-query.ts:256-300 — revalidateInBackground never touches this.inflightRequests, confirming the issue's concurrent-duplicate-refresh note (dedupe exists only in fetchAndCacheOnce at :210-217)",
+        "docs/site/_site/capabilities/sdk/index.md:143 — the same false comment is in the built site output"
+      ]
+    },
+    {
+      "number": 1462,
+      "title": "bug(sdk): importing defineServices in a browser auto-registers the server KV cache provider",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/mod.ts:46 — `export * from './src/cache/mod.ts'` still re-exports the cache module from the SDK root alongside defineServices (mod.ts:55)",
+        "packages/sdk/src/cache/mod.ts:22 — top-level `setCacheProvider(cacheQuery)` executes on any import of that module; the module JSDoc (:11-12) only warns browsers to avoid it",
+        "packages/sdk/deno.json:6-19 exports map has no ./presets or other browser-safe defineServices subpath — exactly the published-surface gap the issue reports",
+        "packages/sdk/mod.ts:24-25 documents the auto-registration as intended behaviour, so the fix must also update the root module contract",
+        "gh timeline for #1462: only a 0.0.7 milestone event — no PR has touched it"
+      ]
+    },
+    {
+      "number": 1466,
+      "title": "[sdk-client S2] feat(sdk): define NetScriptProcedureMeta without erasing contract errors",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "grep -rnE '\\$meta<|\\.meta\\(|NetScriptProcedureMeta' packages plugins --include=*.ts → only Zod `.meta({` in packages/aspire/config.ts; no oRPC procedure metadata and no NetScriptProcedureMeta symbol exists on baseline",
+        "rfcs/0001-sdk-client-contributions.md:1275 Stage 1b — 'Initialize/export NetScriptProcedureMeta without re-erasing Stage 1a types … an explicit dependent child owns this before auth dogfood'",
+        "rfcs/0001-sdk-client-contributions.md:410-413 — `SdkClientProcedureDescriptor.meta: Readonly<NetScriptProcedureMeta>` is a field of the normative public contribution contract",
+        "Issue body 'Part of #1348. Implements RFC 0001 stage 1b.' — filed after PR #1390 merged, so it IS the Stage-0-selected 1b owner",
+        "rfcs/0001-sdk-client-contributions.md:1347 §'Procedure metadata' defines the shape this issue must export",
+        "PR #1731 exact head e325b7fe212f7cf7e0985c634af19e2bd4d5ea22 passed the live-main seven-row coordinator gate, close-gate job 99264739058, and fresh native Fable 5 currency evaluation session 2f492178; it merged as 3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c at 2026-08-30T13:41:17Z and closed #1466 at 13:41:18Z; both are status:shipped.",
+        "Certified head roles remain distinct: content d5f3bf4c159d59bcb468e1abe325f40e267196b9, evidence dbd3eafa6670d90148f52e2f7beec75155267ab6, evaluator carrier ce73a0381485576e63c75fdcae3e163b5b788b4a, and current PR head e325b7fe212f7cf7e0985c634af19e2bd4d5ea22; every commit above content was proven product-inert."
+      ]
+    },
+    {
+      "number": 1467,
+      "title": "[sdk-client S7] feat(sdk): ship locale as the non-auth contribution proof",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "grep -rn 'SdkClientContribution' packages plugins → no match on baseline; no locale contribution exists",
+        "rfcs/0001-sdk-client-contributions.md:1280 Stage 6 'Non-auth proof — new child after RFC acceptance. Ship/test locale contribution, partitioned keys, header conflicts, and generated use.' — #1467 is that child (body: 'Implements RFC 0001 stage 6')",
+        "rfcs/0001-sdk-client-contributions.md:1480-1481 — 'Locale proves generality without duplicating credential semantics or violating trace ownership' (locale, not trace, is the ratified non-auth proof)",
+        "rfcs/0001-sdk-client-contributions.md:879 — `accept-language` is explicitly permitted for contributions",
+        "rfcs/0001-sdk-client-contributions.md:441-452 — SdkClientResponseCache partition/direct-only law this issue must exercise"
+      ]
+    },
+    {
+      "number": 1481,
+      "title": "fix(fresh-ui): /design ships ungated — the defect class RFC 0005 guards against",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/kernel/assets/app/routes/(design)/design/ ships _layout, index, tokens, components, composition templates plus (_components)/(_islands)/(_shared) — grep for MODE|development|import.meta.env across that directory returns zero matches, so no mode gate exists",
+        "packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts:95-99 and :139-143 create the (design) group unconditionally; :257-263 write the route templates with no opt-in flag",
+        "gh timeline for #1481: milestoned to Backlog/Triage then 0.0.7; cross-referenced from merged PRs #1450/#1523 and open #1522 (DevTools RFC artifacts) — none touched the gate",
+        "RFC authority rfcs/0005-devtools-contribution.md is merged on main, so the dual-exclusion posture the acceptance must match is already ratified"
+      ]
+    },
+    {
+      "number": 1502,
+      "title": "RFC: Plugin CLI command contribution architecture — one typed mount and generation seam",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "No such RFC exists: rfcs/ contains only 0000-template, 0001-sdk-client-contributions, 0002-runtime-versioned-automation, 0003-command-composition-kit, 0004-deterministic-first-hybrid-mcp-doc-retrieval, 0005-devtools-contribution",
+        "rfcs/0003-command-composition-kit.md:1-20 is 'Production command composition kit' (transactional business commands, single store) — confirms it does not cover CLI extension, as the issue states",
+        "rfcs/0005-devtools-contribution.md:1-8 is Accepted with tracking issue #1465, so the DevTools consumer named in the sequencing section exists and would consume this seam",
+        "The consumer children are filed and parked downstream: #904, #905, #906, #907, #908 are all OPEN in milestone 0.0.11 ('Host: CLI mount-children contribution contract', async bootstrap, doctor-checks-as-data, manifest triad, plugin CLI children)",
+        "Labelled priority:p0 + status:research + epic:cli-contrib and self-declared '0.0.7 foundation' — nothing in-repo supersedes it"
+      ]
+    },
+    {
+      "number": 1533,
+      "title": "test(docs): nothing compiles JSDoc `@example` blocks",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "No JSDoc example gate exists: .llm/tools/docs/check-snippets.ts:42-43 resolves its root to docs/site (or a fixture's docs/site) only — packages/** and plugins/** JSDoc are outside its scope",
+        "The tool inventory under .llm/tools/docs/ (snippet-extractor.ts, snippet-compiler.ts, snippet-policy.ts, check-snippets.ts) contains no @example/JSDoc extractor",
+        "Negative-test fixture #1 is currently clean: grep for 'api-clients' across packages/sdk/**/*.ts returns nothing (file is packages/sdk/src/query-client/create-service-query-utils.ts), so the gate must reintroduce it deliberately",
+        "Negative-test fixture #2 is also clean: packages/sdk/src/desktop/mod.ts:11-12 now imports '@my-app/contracts', not a relative app path",
+        "Prerequisite #1374 is CLOSED (milestone 0.0.6) and its snippet machinery is checked in, so the sequencing constraint is already satisfied"
+      ]
+    },
+    {
+      "number": 1542,
+      "title": "fix(tooling): quality:gate roots omit published packages, so a green gate is not proof they were scanned",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "`deno.json:52` `quality:gate` = `quality:scan && arch:check`, and `deno.json:50` `quality:scan` roots are still `packages/cli/src`, `plugins`, `docs/site` — `packages/plugin-streams-core`, `packages/plugin-workers-core`, and `packages/cli/e2e` are outside them.",
+        "The `arch:check` half is now fixed: `deno.json:163` uses `--all-roots`, and `.llm/tools/fitness/check-doctrine.ts:27-43` `discoverDoctrineRoots()` enumerates every `packages/*` and `plugins/*` carrying a named `deno.json`.",
+        "That arch half landed in `e391f3aec` \"fix(quality): make quality gate coverage informative (#1570)\", merged 2026-08-12T14:31 — after #1542 was filed (2026-08-12T09:11) but closing #1403, not #1542.",
+        "Acceptance box 3 is arguably already met: the scanner emits `scanned` in its JSON result (`scan-code-quality.ts` main block, `result.scanned`).",
+        "No test pins root coverage: no reference to `discoverDoctrineRoots` from any file under `.llm/tools/quality`."
+      ]
+    },
+    {
+      "number": 1543,
+      "title": "chore(deps): plugin-workers-core and plugins/triggers import plugin-streams-core without declaring it",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "grep for '@netscript/plugin-streams-core' across the three manifests returns only plugins/workers/deno.json:26 — packages/plugin-workers-core/deno.json and plugins/triggers/deno.json still do not declare it",
+        "packages/plugin-workers-core/src/streams/producer.ts:1 imports { createDurableStream } from '@netscript/plugin-streams-core'",
+        "plugins/triggers/streams/producer.ts:7 imports { createDurableStream } from '@netscript/plugin-streams-core'",
+        "plugins/workers/deno.json:26 pins it as jsr:@netscript/plugin-streams-core@0.0.6, establishing the declaration pattern the other two diverge from"
+      ]
+    },
+    {
+      "number": 1544,
+      "title": "fix(cli): `emit` is advertised by three deploy adapters but never routed",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/public/features/deploy/target/target-deploy-command.ts:15-23 ROUTED_OPERATIONS = ['plan','up','down','status','logs','rollback','secrets'] — 'emit' absent",
+        "Same file:26-35 OPERATION_DESCRIPTIONS still carries `emit: 'Emit deployment artifacts'`, and :58-59 generates subcommands only from ROUTED_OPERATIONS ∩ adapter.operations, so emit can never become a command",
+        "packages/cli/src/kernel/adapters/aspire/aspire-compose-deploy-target.ts:66 advertises 'emit' and :97 implements it (`return this.#publish('emit', request)`)",
+        "packages/cli/src/kernel/adapters/aspire/aspire-cloud-deploy-target.ts:125 advertises ['plan','emit','up','down']; packages/cli/src/kernel/domain/deploy/service-deploy-target.ts:24,107 advertise and implement it too",
+        "Existing tests lock the advertised sets (deploy-target-port_test.ts:198-199,210) but none asserts routability — the invariant the issue asks for is genuinely missing"
+      ]
+    },
+    {
+      "number": 1545,
+      "title": "chore(quality): register the pre-existing quality-allow population so #1378's linked-issue rule can land without a day-one red gate",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "No allowance carries an issue id at baseline: all 7 live sites read `// quality-allow: <free text>` — `packages/cli/src/public/public-api.ts:135,136,158,275,276`, `packages/cli/src/public/features/root/public-command-dependencies.ts:363`, `plugins/workers/streams/producer.ts:52`.",
+        "The population is 7, not the 8 the issue tabulates: `grep -rn 'quality-allow' packages/fresh/src` returns nothing, so table row 7 (`route-support.ts:96`) no longer exists at baseline.",
+        "`--max-allow` is already wired: `deno.json:50` `--max-allow 7`, `deno.json:51` `--max-allow 8` — so acceptance box 2 as written (8 for both) is stale relative to the tree.",
+        "The scanner still has no registration concept: `scan-code-quality.ts:207` accepts any non-empty reason, so box 1's 'reports them as registered rather than as findings' has no mechanism.",
+        "PR #1596 referenced #1545 without closing it and deferred live issue-state verification to 0.0.7."
+      ]
+    },
+    {
+      "number": 1551,
+      "title": "docs(positioning): establish \"NetScript vs …\" and \"Migrate from …\" comparison framework",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "No comparison surface exists yet: docs/site has no comparisons/ directory and docs/site/reference/ contains only per-package pages",
+        "The named case-study artifact is not in this repository — there is no apps/ directory, so `apps/dashboard/routes/project/[project]/channel/[channel]/session/[session]/index.tsx` cannot be read or reproduced from this worktree",
+        "#1550 (framework-owned request-aware cache-seed primitive, referenced by the case study) is CLOSED, so the 'label the current helper as application-owned' caveat may already be stale",
+        "Issue body itself scopes 17 deliverable checkboxes including LSP cold/warm p50/p95 benchmarks, paired human/agent navigation studies, and runtime measurement — none of which is a documentation authoring task"
+      ]
+    },
+    {
+      "number": 1557,
+      "title": "test(fresh): no capability to assert the deferred coordinator reaches the client bundle",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "packages/fresh/tests/form-navigation_browser.ts:212 drives `playwright-cli` and .github/workflows/ci.yml:252-265 installs @playwright/cli and runs the fresh-browser gate — the issue's premise 'no browser driver in repo test infrastructure' is STALE as of 1ed78f508 (#1602)",
+        "packages/fresh/tests/defer-island-client-bundle_test.ts:38-60 already builds a client bundle and asserts the defer island entry plus the 'partial-miss' policy string — criterion 1 is largely met for a FIXTURE, not for a scaffolded app",
+        "Criteria 2 and 3 remain unmet: nothing asserts a request to a configured /partials/** endpoint from a client navigation, and nothing asserts a named boundary swaps exactly once (grep of packages/fresh/tests shows only form-navigation_browser.ts and the bundle test)",
+        "gh timeline for #1557: cross-referenced from closed #1459 and merged PRs #1555/#1558 (the runtime fix), never from a test-capability PR"
+      ]
+    },
+    {
+      "number": 1561,
+      "title": "fix(tooling): acceptance-evidence mirror throws on an empty entry list instead of reporting it",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Defect present verbatim: `.llm/tools/validation/acceptance-evidence.ts:255` `if (!field) throw new Error(\\`Invalid acceptance-evidence YAML line: ${line}\\`);`.",
+        "The skip guard only tolerates the bare key: `acceptance-evidence.ts:251` `if (!line || line === 'entries:') continue;` — the literal `entries: []` is neither empty nor equal to `'entries:'`.",
+        "The field regex `^-?\\s*(issue|box|box-index|evidence):\\s*(.*)$` (`:254`) cannot match `entries: []`, so the throw is guaranteed, not conditional."
+      ]
+    },
+    {
+      "number": 1563,
+      "title": "fix(agentic): verdict extractor records NONE when the token is a markdown heading",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Shell tier 2 cannot match a heading: `.github/workflows/openhands-agent.yml:874` `grep -E '^[[:space:]]*(Verdict:?[[:space:]]*)?OPENHANDS_VERDICT:...'` after `sed -E 's/[*`]+//g'` — the strip removes `*` and backtick only, never `#`.",
+        "Shell tier 1 is strictly anchored: `openhands-agent.yml:870` `grep -E '^OPENHANDS_VERDICT:...'`.",
+        "The JS twin has the same hole: `openhands-agent.yml:~1176-1182` `verdictOf()` matches `/^OPENHANDS_VERDICT:.../` then `line.replace(/[*`]+/g,'').match(/^[ \\t]*(?:Verdict:?[ \\t]*)?OPENHANDS_VERDICT:.../)`.",
+        "The library extractor is equally blind: `.llm/tools/agentic/lib/agentic-lib.ts:892` prefix class is `[\\s>*`_]*` — `#` is not a member.",
+        "No test covers the heading form: `agentic-lib_test.ts:655,739` cover the bare line and the `**Verdict: OPENHANDS_VERDICT: PASS**` bold form only."
+      ]
+    },
+    {
+      "number": 1564,
+      "title": "fix(ci): pull_request.base.sha is stale on long-lived PRs, so every gate that computes a range from it silently inspects the wrong changeset",
+      "disposition": "close-fixed",
+      "lane": null,
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1564",
+        "Fresh seven-construct workflow audit at 01e0960: every changed-file consumer uses three-dot merge-base semantics.",
+        "The remaining git show BASE_SHA:deno.json calls are conservative tasks-only applicability comparisons, not changed-file ranges.",
+        "The only affected two-dot code-quality construct and its red-first stale/foreign fixture were completed by #1403.",
+        "Closed COMPLETED during PLAN-EVAL remediation on 2026-08-13."
+      ],
+      "reason": "The only unsafe two-dot changed-file consumer was already fixed by #1403; all remaining changed-file ranges use merge-base semantics and base-manifest reads deliberately fail toward running."
+    },
+    {
+      "number": 1588,
+      "title": "fix(scaffold): omit unreachable provider URL parsers from SQLite workspaces",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/cli/src/kernel/assets/generated/database/generate-prisma-config-1.ts.template:35-51 emits normalizeDatabaseUrl with postgres/mysql/mssql branches while :27 types the provider as the literal '{{__slot4__}}' (= 'sqlite') and :36-38 short-circuits sqlite first — the branches are statically unreachable",
+        "Same template :53-134 carries normalizePostgresUrl, normalizeMysqlUrl, normalizeMssqlUrl, parseSqlServerEndpoint and parseConnectionParts for every engine",
+        "packages/cli/src/kernel/templates/database/generate-engine-mod.ts:34 + :140-142 inline the full connection-helpers asset unconditionally (buildConnectionHelpers() takes no provider argument), so database/<engine>/mod.ts gets all three normalizers too",
+        "packages/cli/src/kernel/assets/database/connection-helpers.ts.template:12-21 is the shared switch that duplicates the prisma-config one",
+        "The only cross-reference is rickylabs/eis-chat#194 (closed, downstream consumer cleanup) — no netscript PR has touched this"
+      ]
+    },
+    {
+      "number": 1590,
+      "title": "Fresh partial navigation needs last-intent ordering and remount-safe region identity",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/fresh/src/application/builders/define-page/navigation/ contains only context.ts/hooks.ts/link.tsx/mod.ts — href/link typing, no generation counter, no supersede/abort logic (grep for generation|supersede|inflight|abort in hooks.ts returns nothing)",
+        "packages/fresh/deno.json:7-22 export map has no client-navigation subpath; nearest client runtime is ./defer/island (packages/fresh/src/application/defer/island.ts)",
+        "grep -rln 'clientNav|replaceState' packages/fresh/src only hits form transport attributes (packages/fresh/src/application/form/components/enhancement.tsx:55) and route types, never a navigation coordinator",
+        "gh timeline for #1590: only a 0.0.7 milestone event, no cross-referenced PR — nothing has attempted this"
+      ]
+    },
+    {
+      "number": 1591,
+      "title": "AI provider adapter needs a typed OpenAI Responses mapper",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/ai/src/adapters/openai-compatible.adapter.ts:39-51 — openAiCompatibleGenerationModelOptions only emits Chat Completions keys (flat `reasoning_effort`, `max_tokens`); no Responses variant exists",
+        "packages/ai/src/adapters/openai-compatible.adapter.ts:56 — OpenAiCompatibleApi already accepts 'responses', and packages/ai/openai-compatible.ts:49 passes it through, so the config surface admits a wire shape the mapper cannot produce",
+        "grep for max_output_tokens across packages/ai returns no hits — the Responses output-token key is absent from the repo",
+        "gh api issues/1591/timeline — no cross-references"
+      ]
+    },
+    {
+      "number": 1592,
+      "title": "Workers durable execution stream should publish typed progress",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "packages/plugin-workers-core/src/domain/job-definition.ts:201-245 — ExecutionRecordShape has no progress or progressMessage field (id, concept, jobId, topic, status, triggeredBy, timestamps, exitCode, duration, error, result, workerId, attempt, maxAttempts, payload, correlationId, traceparent, tracestate only)",
+        "packages/plugin-workers-core/src/domain/job-context.ts:11 — reportProgress?: (percent, message?) => void | Promise<void> exists on the context",
+        "plugins/workers/worker/job-runner-pool.ts:61 — the runtime wires reportProgress and does not persist it into an execution record",
+        "packages/plugin-workers-core/src/telemetry/job-tools.ts:46 — the only consumer just forwards to ctx.reportProgress?.()",
+        "gh api issues/1592/timeline — no cross-references"
+      ]
+    },
+    {
+      "number": 1598,
+      "title": "SDK cache-provider throw should name its module identity when two SDK instances are loaded",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/cache/cache-provider.ts:203-212 — getCacheProvider() throw text still has no import.meta.url and no two-instances hint",
+        "packages/sdk/src/cache/cache-provider.ts:55 — `let _provider: CacheProvider | null = null` is still module-local, as the issue requires it stay",
+        "gh issue 1589 is CLOSED on milestone 0.0.6 — the build-time gate landed, leaving this runtime throw as the only signal for already-generated consumers",
+        "No cross-referenced PR on issue 1598 timeline (gh api issues/1598/timeline returned no cross-references)"
+      ]
+    },
+    {
+      "number": 1601,
+      "title": "test(fresh): defer-island client-bundle test resolves npm:vite over the network, making the package verdict environment-dependent",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "packages/fresh/tests/defer-island-client-bundle_test.ts:19-28 — still `args: ['run','--no-lock','-A','npm:vite@7.2.2','build',...]`, verbatim the cited defect",
+        "packages/fresh/tests/fixtures/defer-island-client/ contains only client.ts, main.ts, otel-api.ts, vite.config.ts — no locked vite resolution for the fixture",
+        "git log on that test shows only 5705aeb19 (#1558); no determinism follow-up landed",
+        "gh timeline for #1601: cross-referenced only from open issue #1604 (packages/cli test suite always red) — same 'prescribed package test task is not a trustworthy verdict' family"
+      ]
+    },
+    {
+      "number": 1604,
+      "title": "test(cli): the prescribed `deno task --cwd packages/cli test` is always red",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "packages/cli/e2e/tests/presentation/quickstart-command-drift_test.ts:5 calls `Deno.readTextFile('docs/site/quickstart.vto')` — a bare repo-root-relative path, resolved against process cwd",
+        "packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example.ts:3,7 define DOC_PATH = 'docs/site/durable-workflows/streams.md' and read it with Deno.readTextFile — same cwd dependence",
+        "packages/cli/e2e/src/application/gates/scaffold/service-env/service-env-gates_test.ts:96-100 stats the script argument produced by service-env-gates.ts:59 (`${GATE_DIR}/configure-service-env.ts`), which is repo-root-relative",
+        "All three are reachable from the packages/cli test task, so the failure is in the base, not any branch — matching the issue's cbf6d5c27 observation",
+        "Same class as #1601 (OPEN, 0.0.7: environment-dependent package verdict), different mechanism"
+      ]
+    },
+    {
+      "number": 1606,
+      "title": "verify(sdk): confirm the published @netscript/sdk JSR landing page shows the canonical query dialect",
+      "disposition": "close-fixed",
+      "lane": null,
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1606",
+        "https://jsr.io/@netscript/sdk",
+        "https://jsr.io/@netscript/sdk/meta.json"
+      ],
+      "reason": "The observational acceptance is satisfied: JSR reports 0.0.6 latest and the live SDK landing page renders the canonical query-dialect content."
+    },
+    {
+      "number": 1609,
+      "title": "fix(fresh): managed form silently drops navigation:'document' when mode:'client'",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/fresh/src/application/form/components/enhancement.tsx:49 — `if (!strategy || strategy.mode === 'client') { return props; }` still early-returns before resolveFormNavigationProps is consulted (function is now applyCollectionStrategy at :42, issue cited the older name resolveFormEnhancementProps)",
+        "packages/fresh/src/application/form/_internal/runtime-types.ts:89 — `FormCollectionStrategy extends Partial<FormNavigationStrategy>` still makes `{ mode: 'client', navigation: 'document' }` expressible",
+        "packages/fresh/src/application/form/components/form.tsx:62 — `...resolveFormNavigationProps(strategy)` is still spread after `...props`, the C3 precedence",
+        "packages/fresh/src/application/form/README.md:77-94 documents client/document strategies but states no precedence over caller-supplied raw f-client-nav props",
+        "git log -- packages/fresh/src/application/form/ shows 6aee2b414 (#1600) as the last change; no follow-up commit touched enhancement.tsx"
+      ]
+    },
+    {
+      "number": 1610,
+      "title": "fix(fresh): route-pattern path inference makes unknown params never instead of a compile error",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/fresh/src/application/route/types.ts:14 — `export type EmptyRecord = Record<string, never>` still exists and is the empty-pattern branch at types.ts:131-132 (`TPattern extends '' ? EmptyRecord`)",
+        "packages/fresh/src/application/route/_internal/contract-types.ts:80 — the internal copy has the same `'' ? EmptyRecord` branch; contract-types.ts:170 also defaults `RouteReference<TPath extends object = EmptyRecord>`, so an unbound reference's unknown key is `never`",
+        "packages/fresh/src/application/builders/define-partial.test.tsx:272-274 — `OriginalPath['channel']` is asserted `IsNever` for pattern '/projects/[project]', i.e. the carrier admits an undeclared key rather than erroring",
+        "packages/fresh/src/application/route/mod.ts:54 — createRouteReference returns RouteReference<InferRoutePatternPath<TRoutePattern>>, so parsePath (contract-types.ts:185) inherits that shape",
+        "gh timeline for #1610: only cross-referenced from PR #1602 (the eval that raised it); no fix PR, and git log on route/types.ts shows no commit after the beta.5 baseline"
+      ]
+    },
+    {
+      "number": 1611,
+      "title": "agentic: formal evaluator dispatch helper must emit phase/head and acquire the existing claim",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Producer confirmed silent on phase/head: `.llm/tools/agentic/lib/agentic-lib.ts:528-539` `buildOpenHandsComment` pushes only `model`, `provider`, `effort`, `output`, `iterations`.",
+        "Authorizer short-circuit confirmed: `.github/scripts/openhands-comment-trigger.mjs:61-63` reads `params.get('phase')`/`params.get('head')` then `if (!phase && !head) return decision;` — returns authorized without consulting the claim.",
+        "The claim path that is bypassed exists immediately below: `openhands-comment-trigger.mjs:64-67` `denied('incomplete-phase-claim')` / `denied('phase-claim-context-required')`.",
+        "No `phase=`/`head=` token appears anywhere in `agentic-lib.ts`'s DispatchOptions surface (`:515-521`)."
+      ]
+    },
+    {
+      "number": 1613,
+      "title": "agentic: report refused OpenHands commands to their author and align generation retry across dispatch paths",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "N2 confirmed: `.github/workflows/openhands-agent.yml:249` `core.notice(\\`Manual comment policy: ${decision.reason}\\`)` and `:252` for the stale-evaluator case — no `createComment` on the denial path.",
+        "N3 confirmed: `.github/workflows/openhands-agent.yml:208` `throw new Error(\\`No labeled-event generation found for ${expectedStatus}.\\`)` with no surrounding retry.",
+        "The asymmetry is real: `.github/workflows/openhands-phase-eval.yml:302-315` wraps the identical lookup in `for (let attempt = 0; attempt < 5 && !generationEvent; attempt += 1)` with a 1s sleep at `:313`."
+      ]
+    },
+    {
+      "number": 1616,
+      "title": "test(cli): the scaffold emits no dynamic route, so no gate exercises dynamic route binding end to end",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "grep -rnE \"createRouteReference\\('/[^']*\\[\" packages/cli/src returns nothing on baseline — no dynamic reference is emitted anywhere",
+        "packages/cli/src/kernel/application/ui/web-scaffold.ts:29 emits `createRouteReference('/${segment}', ...)`; packages/cli/src/kernel/application/scaffold/writers/app-route-seeds.ts:45-60 seeds only $route/dashboard/health static references",
+        "packages/fresh/src/application/route/manifest.ts:154-156 maps a `[id]` segment to `$id` and :269 emits `createRouteReference(<pattern>, <metadata>)` — Reading B is achievable with no framework change, as the issue claims",
+        "packages/fresh/tests/fixtures/route-binding-browser/routes.ts exists as a hand-authored fixture (added by 1ed78f508, #1602), confirming the provenance gap the issue describes",
+        "gh timeline for #1616: cross-referenced only from merged PR #1602; no fix attempt"
+      ]
+    },
+    {
+      "number": 1618,
+      "title": "tooling: deno fmt cannot verify packages/mcp — a deliberately malformed test fixture aborts config parsing",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Hazard present: `packages/mcp/tests/fixtures/doctor/broken/deno.json` is exactly `{ \"workspace\": \"packages/*\" }` — a string where a WorkspaceConfig is required.",
+        "The root `fmt` config does not exclude it: `deno.json:206-210` excludes only `packages/cli/`, `**/.generated/`, `**/node_modules/`.",
+        "Only the whole-repo task compensates: `deno.json:140` `fmt:check` passes `--exclude \"^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|...)\"`, so a scoped `--root packages/mcp` run (the issue's repro) carries no such exclusion.",
+        "That compensating exclusion is pre-existing, not a fix for this issue: it entered in `10162bfda` (#715), long before the issue was filed.",
+        "`.llm/tools/run-deno-fmt.ts` has no fixture-marker skip of its own — the exclusion is caller-supplied only."
+      ]
+    },
+    {
+      "number": 1619,
+      "title": "fix(sdk): cache telemetry evidence validation throws into the data path",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/cache/cache-telemetry.ts:164-180 — recordIncompleteTopology is still typed `never` and ends in `throw new TypeError('Cache provider returned missing or invalid topology evidence')`",
+        "packages/sdk/src/cache/cache-telemetry.ts:149 validateDescriptor + :120 createCacheSpanAttributes — validation still runs inside the attribute builder",
+        "packages/sdk/src/cache/cache-query.ts:88 — createCacheSpanAttributes(...) is still evaluated as an argument to withSpan, so a bad descriptor throws before any span opens (same at :267, :308, :364, :392, :421)",
+        "packages/sdk/src/cache/cache-telemetry.ts:72 SYSTEM_PATTERN /^[a-z0-9][a-z0-9._-]*$/ still bounds the id, confirming the issue's 'no shipped path triggers it' framing"
+      ]
+    },
+    {
+      "number": 1620,
+      "title": "fix(sdk): cache namespace cardinality is unbounded because operationId is caller-supplied free text",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/cache/cache-telemetry.ts:78-89 — normalizeCacheNamespace still only trims/lowercases/collapses/slices to CACHE_NAMESPACE_MAX_LENGTH; no distinct-value bound, no overflow collapse, no warning",
+        "packages/sdk/src/cache/cache-query.ts:86 and :389 — namespace derives directly from the caller-supplied options.operationId on every read path",
+        "Shares its edit surface with #1619 (both mutate packages/sdk/src/cache/cache-telemetry.ts and both need a README contract paragraph) — grouped into one leaf"
+      ]
+    },
+    {
+      "number": 1621,
+      "title": "tooling: acceptance-evidence blocks fail opaquely when the target issue has no checkbox boxes",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Error text present unchanged: `.llm/tools/validation/acceptance-evidence.ts:132` `Issue #${issue}: no acceptance box matched ${compared}; add an entry for box ... using exact trimmed text or its current box-index.`",
+        "No zero-box special case: `validateEvidenceMapping` (`acceptance-evidence.ts:116-140`) computes `actionable = checkboxes.filter(...)` and iterates evidence entries, emitting one per-index error each; it never tests `actionable.length === 0`.",
+        "Only the exact-text variant is pinned by a test: `acceptance-evidence_test.ts:55` asserts the `exact box text \"changed\"` message; there is no zero-box test."
+      ]
+    },
+    {
+      "number": 1622,
+      "title": "mcp: the guidance closeScoreGap constant is pinned by no test — a 10x change passes green",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "Constant present and unpinned: `packages/mcp/src/domain/docs/guidance-index.ts:42` `closeScoreGap: 0.5`, declared at `:29`, consumed at `:201` `leader.score - ranked[end]!.score <= GUIDANCE_RANKING_POLICY.closeScoreGap`.",
+        "The misleading fixture is unchanged: `packages/mcp/tests/guidance-retrieval_test.ts:76` is the close-score test, `:81` seeds `rankedSection('pages/gamma','outside-leader-band',9.8)` and `:92` asserts `'pages/gamma#outside-leader-band'` last — gamma sorts last by slug either way.",
+        "No slug-early/score-outside case exists in that test file (no `zulu`/`alpha` boundary pair), so band membership never changes the observable order."
+      ]
+    },
+    {
+      "number": 1623,
+      "title": "docs(sdk): CacheStore.get JSDoc documents a return shape that no longer type-checks",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "packages/sdk/src/ports/cache-store.ts:63 — `@returns Entry with the value or `{ value: null }` on cache miss` is still present",
+        "packages/sdk/src/ports/cache-store.ts:38-43 — CacheStoreEntry<T> still declares a required `report: CacheReadTopologyReport`, so `{ value: null }` cannot satisfy it",
+        "packages/sdk/src/ports/cache-store.ts:66-79 — set() JSDoc documents only key/value/options and never mentions the CacheWriteTopologyReport it returns"
+      ]
+    },
+    {
+      "number": 1637,
+      "title": "fix(sdk): cache write limits must not fail successful query results",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1637",
+        "https://github.com/rickylabs/netscript/issues/1637#issuecomment-5285236378",
+        "packages/sdk/src/cache/cache-query.ts:234-248"
+      ]
+    },
+    {
+      "number": 1709,
+      "title": "fix(tooling): lint wrapper reports green when Deno drops part of a selected batch",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1709",
+        "Exact-main two-file reproduction: one root-config-excluded .llm lint defect plus one included .github/scripts peer exits 0 in one batch, while the identical selection with batch-size 1 exits 2.",
+        "Internals research checkpoint d682db680b28f224fdc2761390b1d37f537d15be records the wrapper/config/CI/published-consumer boundary and the coordinator-selected fail-closed repair."
+      ]
+    },
+    {
+      "number": 979,
+      "title": "fix(aspire): plugin API resources still pin host ports 8091–8094",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/979",
+        "Dependency-required by #1370's explicit Boundaries section; moved from 0.0.8 to 0.0.7 on 2026-08-29 before dispatch."
+      ]
+    },
+    {
+      "number": 1365,
+      "title": "fix(sagas): publish receipts are discardable and the publisher silently falls back to 127.0.0.1:8092 — jobs report success while the saga never starts",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1365",
+        "P0 runtime correctness contract independently re-intaken from current milestone membership; sequence after #1371 discovery-key evidence."
+      ]
+    },
+    {
+      "number": 1368,
+      "title": "fix(sagas): 5 of 6 saga span factories have zero callers — compensation emits no span and deleting the saga telemetry surface keeps CI green",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1368",
+        "Requires a globally leased Flow-B runtime proof and follows the #1365 correlation contract."
+      ]
+    },
+    {
+      "number": 1370,
+      "title": "fix(plugins): sagas/triggers/streams contributions and the generated browser consumer stub still publish pre-randomization ports",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1370",
+        "Issue Boundaries explicitly require #979 first; no dispatch before the prerequisite leaf is green."
+      ]
+    },
+    {
+      "number": 1371,
+      "title": "verify(aspire): re-test the wave-6 claim that BackgroundProcessors.*.ServiceReferences is parsed but never injected",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1371",
+        "Verify-first acceptance requires a current published canary; implementation is forbidden until the observation is reproduced."
+      ]
+    },
+    {
+      "number": 1387,
+      "title": "feat(service): handlers receive principal as an untyped bag entry and no procedure can declare a policy",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1387",
+        "Complex public contract slice requiring #884 compatibility review and RFC-0001 metadata/contribution ordering."
+      ]
+    },
+    {
+      "number": 1672,
+      "title": "feat(cli/agent-init): generated guidance must teach the Deno toolchain — 55 deno calls, 0 were deno doc/info/eval",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1672",
+        "Shares the generated root guidance and behavioral smoke with #1674/#1675."
+      ]
+    },
+    {
+      "number": 1673,
+      "title": "fix(cli): plugin doctor validates the registry against itself, so registry drift reports healthy while the durable layer never loads",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1673",
+        "Focused source-versus-generated registry truth leaf with mandatory stale-registry red-first proof."
+      ]
+    },
+    {
+      "number": 1674,
+      "title": "fix(cli/agent-init): root AGENTS.md is the only guaranteed-read file and teaches diagnostics but not how to build — and never links the app-level guide",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1674",
+        "P0 generated-guidance gap grouped with #1672/#1675 while retaining distinct acceptance evidence."
+      ]
+    },
+    {
+      "number": 1675,
+      "title": "fix(cli/agent-init): skills install only to .claude/skills with no .agents/skills canonical mirror — non-Claude agents get nothing, and usage measures ~zero",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1675",
+        "Canonical .agents/skills plus host-specific mirrors belongs in the shared agent-init leaf."
+      ]
+    },
+    {
+      "number": 1677,
+      "title": "ai: tanstack-bridge drops promptTokensDetails/cost from TokenUsage — cache and cost accounting are structurally impossible",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1677",
+        "Jointly research with #1695 against the latest TanStack-owned usage shape before implementing a local mapper."
+      ]
+    },
+    {
+      "number": 1694,
+      "title": "ai: no per-request app-context seam — TanStack's context/middleware/metadata is never forwarded by the bridge",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1694",
+        "Open PR #1696 at 414a52ba is a candidate implementation and must pass the normal harness adoption, evaluation, and close gate."
+      ]
+    },
+    {
+      "number": 1695,
+      "title": "deps(ai): @tanstack/ai pinned at ^0.39.0 while 0.48.0 ships — the 0.x caret cannot drift forward",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1695",
+        "Compatibility exercise grouped with #1677; repo-native dependency wrappers decide the current target version."
+      ]
+    },
+    {
+      "number": 1745,
+      "title": "docs(agentic): document canonical cross-host skill installation",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1745",
+        "Current-main audit after #1729 proves three public pages still teach the superseded Claude-only installation contract.",
+        "PR #1746 head 84a5fd1164b2ee9cb564d10fb3854ee015a7ab17 merged as f8b4f804cc5fe77054d4f220974eae66becf090c at 2026-08-30T12:30:25Z, closed #1745, and normalized both items to status:shipped."
+      ]
+    },
+    {
+      "number": 1108,
+      "title": "docs(tooling): verify generated package references against live export maps",
+      "disposition": "close-superseded",
+      "lane": null,
+      "reason": "#1296 became the narrower owner of the remaining source inventory, omission, and regeneration-path work.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1108",
+        "https://github.com/rickylabs/netscript/issues/1108#issuecomment-5258777802"
+      ]
+    },
+    {
+      "number": 1201,
+      "title": "mcp: serve the generated export surfaces, not just prose docs — the most-used doc surface has no MCP path",
+      "disposition": "close-fixed",
+      "lane": null,
+      "reason": "#1218/#1258 delivered the version-pinned export corpus, bounded retrieval, mirror-free proof, freshness, and real scaffold stdio coverage.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1201",
+        "https://github.com/rickylabs/netscript/issues/1201#issuecomment-5258778289"
+      ]
+    },
+    {
+      "number": 1260,
+      "title": "mcp: include SDK guidance in the shipped search_docs corpus",
+      "disposition": "close-fixed",
+      "lane": null,
+      "reason": "The release-pinned embedded corpus includes SDK cache/hydration/mutation guidance and #1258/#1401 prove real CLI composition.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1260",
+        "https://github.com/rickylabs/netscript/issues/1260#issuecomment-5258778683"
+      ]
+    },
+    {
+      "number": 1280,
+      "title": "aspire: backing services report no real health check — blocked on TypeScript AppHost custom health-check support",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1280",
+        "Aspire 13.5 supplies the TypeScript addHealthCheck/withHealthCheck prerequisite; #1718 owns this acceptance in the S6 leaf."
+      ]
+    },
+    {
+      "number": 1550,
+      "title": "feat(fresh): add request-aware cache seed helper for deferred page layers",
+      "disposition": "close-superseded",
+      "lane": null,
+      "reason": "Production integration disproved the proposed cache-suppression primitive; correct warm-partial behavior already exists and the remaining observability gap is #1562.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1550",
+        "https://github.com/rickylabs/netscript/issues/1550#issuecomment-5268246752"
+      ]
+    },
+    {
+      "number": 1659,
+      "title": "docs(comparison): replace the measurement protocol with two entertaining NetScript-vs pages",
+      "disposition": "close-fixed",
+      "lane": null,
+      "reason": "The comparison rewrite shipped with every acceptance row independently verified at the exact head.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1659",
+        "https://github.com/rickylabs/netscript/issues/1659#issuecomment-5301504877"
+      ]
+    },
+    {
+      "number": 1712,
+      "title": "Epic: Aspire 13.5 adoption and orchestration stabilization",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1712",
+        "Owner-ratified umbrella; the Aspire execution sub-orchestrator maps each child into one canonical central topic lane."
+      ]
+    },
+    {
+      "number": 1713,
+      "title": "[aspire-13-5 S1] Atomic Aspire 13.5.3 pin bump + check:aspire-version-parity gate",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1713",
+        "https://github.com/rickylabs/netscript/pull/1727"
+      ]
+    },
+    {
+      "number": 1714,
+      "title": "[aspire-13-5 S2] 13.5 runtime verification pass with receipts",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1714",
+        "https://github.com/rickylabs/netscript/pull/1735",
+        "PR #1735 head fffbb0c473dec14aedd858127b9a3ce4afee74a2 merged as 625447f1b521e7fb0208fcfcc4ad3ea86cf52e21 at 2026-08-30T12:27:43Z, closed #1714, and normalized both items to status:shipped; the post-merge row-7 body correction is issuecomment-5468694739."
+      ]
+    },
+    {
+      "number": 1715,
+      "title": "[aspire-13-5 S3] Re-capture 13.5 fixtures: dashboard telemetry, aspire describe, aspire ps",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1715",
+        "https://github.com/rickylabs/netscript/pull/1741"
+      ]
+    },
+    {
+      "number": 1716,
+      "title": "[aspire-13-5 S4] Generator re-validation against the 13.5 TypeScript API",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1716",
+        "https://github.com/rickylabs/netscript/pull/1738"
+      ]
+    },
+    {
+      "number": 1717,
+      "title": "[aspire-13-5 S5] Remove every literal pre-randomization port from plugin contributions and E2E probes",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1717",
+        "https://github.com/rickylabs/netscript/pull/1740",
+        "One accepted S5 leaf also owns #1365/#1370/#979."
+      ]
+    },
+    {
+      "number": 1718,
+      "title": "[aspire-13-5 S6] Listener-readiness health checks for backing services via TS addHealthCheck/withHealthCheck",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1718",
+        "https://github.com/rickylabs/netscript/pull/1743",
+        "S6 shares its leaf with #1280."
+      ]
+    },
+    {
+      "number": 1719,
+      "title": "[aspire-13-5 S7] Teardown/leak-check on 13.5: orphan cleanup, stop --force, descendant tracking",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1719",
+        "https://github.com/rickylabs/netscript/pull/1744",
+        "S7 shares its leaf with existing issue #1429."
+      ]
+    },
+    {
+      "number": 1720,
+      "title": "[aspire-13-5 S8] Typed resource commands for db-cli-mode resources + excludeFromMcp() ownership",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1720"
+      ]
+    },
+    {
+      "number": 1721,
+      "title": "[aspire-13-5 S9] Skills, corpora, and Aspire MCP alignment — with an exact-13.5.3 MCP smoke receipt",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1721"
+      ]
+    },
+    {
+      "number": 1722,
+      "title": "[aspire-13-5 S10] E2E gate upgrades: doctor receipt, describe --follow evidence, stop --force cleanup, resource-command gate class",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1722"
+      ]
+    },
+    {
+      "number": 1723,
+      "title": "[aspire-13-5 S11] Public docs + README refresh for Aspire 13.5",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1723",
+        "PR #1746 only cross-references this issue and explicitly excludes the Aspire S11 scope."
+      ]
+    },
+    {
+      "number": 1724,
+      "title": "[aspire-13-5 S13] Stale version-bound surface cleanup + parity phase 2 (complete enforcement)",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1724"
+      ]
+    },
+    {
+      "number": 1730,
+      "title": "test(ai): the provider-invisibility invariant has no executable guard above the adapter",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1730",
+        "Regression-net follow-up to shipped issue #1694; features queue already records it after #1387."
+      ]
+    },
+    {
+      "number": 1732,
+      "title": "fix(cli): validate background reference names before emitting AppHost source",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1732",
+        "Independently reproduced source-safety residual from #1728; internals queue records it after #1734."
+      ]
+    },
+    {
+      "number": 1733,
+      "title": "fix(cli/aspire): resource and reference names containing quotes or backslashes emit unparseable AppHost source",
+      "disposition": "close-duplicate",
+      "lane": null,
+      "reason": "Concurrent duplicate; #1732 is the accepted owner and retains the processor-name/env-key details.",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1733",
+        "https://github.com/rickylabs/netscript/issues/1733#issuecomment-5465240364"
+      ]
+    },
+    {
+      "number": 1734,
+      "title": "fix(fresh): readonly DehydratedState breaks TanStack hydrate() on query-core 5.102.x, failing generated-project check",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1734",
+        "https://github.com/rickylabs/netscript/pull/1736"
+      ]
+    },
+    {
+      "number": 1737,
+      "title": "fix(cli/skills): two shipped skill bodies point at .claude/skills/help.md, contradicting the canonical .agents/skills tree",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1737",
+        "PR #1746 explicitly excludes this shipped-skill source/barrel correction; it needs its own leaf."
+      ]
+    },
+    {
+      "number": 863,
+      "title": "scaffold: `netscript db init` can block indefinitely on an Unhealthy-but-Running Postgres resource (clean-machine quickstart flake)",
+      "disposition": "active",
+      "lane": "features",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/863",
+        "https://github.com/rickylabs/netscript/pull/1754",
+        "Aspire S8 shares one bounded typed-resource-command leaf with #1720."
+      ]
+    },
+    {
+      "number": 1749,
+      "title": "docs(quickstart): show the canonical .agents/skills/ bundle in the scaffold tree",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1749",
+        "https://github.com/rickylabs/netscript/pull/1755",
+        "PR #1755 exact head 91bf721c6f6f6a20c55077a6aaa72e5316734abb passed the seven-row coordinator gate and native Fable 5 IMPL-EVAL, merged as a5520e70b43fa792c36451270742240e0f2aa889 at 2026-08-30T13:08:59Z, and closed #1749 at 13:09:01Z; both items are status:shipped."
+      ]
+    },
+    {
+      "number": 1750,
+      "title": "fix(agentic): accept the documented task separator in the Claude hybrid launcher",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1750",
+        "Maintenance recovery reproduced unknown argument before Claude child creation; no orphan was left."
+      ]
+    },
+    {
+      "number": 1751,
+      "title": "fix(agentic): recover stale sender leases and propagate resume rejection",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1751",
+        "Features and fixes both reproduced stale ownership or exit-zero rejected delivery after restart."
+      ]
+    },
+    {
+      "number": 1753,
+      "title": "fix(harness): detect live milestone PR leaves missing or stale in cluster state",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1753",
+        "Central validation was green while #1739/#1746/#1748 were absent and five recorded PR heads were stale."
+      ]
+    },
+    {
+      "number": 1000,
+      "title": "docs: normalize .NET Aspire terminology across public surfaces",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1000",
+        "PR #1748 exact head 9b79d90ef729519e4007010d10851304661a4d61 passed the complete coordinator seven-row gate plus native Fable 5 IMPL-EVAL, merged as 952cc106aafea61570d24247695ac23f5d810026 at 2026-08-30T12:55:05Z, and closed #1000 at 2026-08-30T12:55:06Z; both items are status:shipped.",
+        "Redundant OpenHands run 33311911918 was cancelled with verdict NONE and was explicitly non-gating."
+      ]
+    },
+    {
+      "number": 1757,
+      "title": "docs(cli): the changelog stops at 0.0.6 and no gate enforces it",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1757",
+        "https://github.com/rickylabs/netscript/pull/1761",
+        "PR #1761 exact head c1700128e38dd923cd57298c171b5976ec690a83 passed the complete seven-row coordinator gate and a fresh separate-session native Fable 5 IMPL-EVAL, merged as a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81 at 2026-08-30T13:36:41Z, and closed #1757 at 13:36:42Z; both items are status:shipped.",
+        "The live v0.0.6..a5520e70 triage reconciles all 37 commits as 17 Include / 20 Exclude, and the repaired scanner wording distinguishes declared env/net permissions from optional env access and conditional network use."
+      ]
+    },
+    {
+      "number": 1642,
+      "title": "docs(aspire): expose detached non-TTY start state and dashboard-token discovery",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1642",
+        "Owner explicitly admitted #1642 to 0.0.7 as part of Aspire S11 / PR #1771."
+      ]
+    },
+    {
+      "number": 1770,
+      "title": "docs(aspire): the fatal background-reference preflight error is undocumented",
+      "disposition": "active",
+      "lane": "docs",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1770",
+        "Direct-to-main PR #1772 is the bounded documentation and generated-asset leaf."
+      ]
+    },
+    {
+      "number": 1774,
+      "title": "fix(agentic): make Claude hook logging independent of turn cwd",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1774",
+        "The false Module-not-found hook reproduced in multiple active 0.0.7 supervisor/evaluator sessions and wastes every nested-cwd tool/stop event."
+      ]
+    },
+    {
+      "number": 1971,
+      "title": "scaffold: production deno task build fails on catalog: zod specifier after db codegen",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1971",
+        "Owner continuing mandate: every remaining milestone-27 issue stays owned and scheduled; late intake reconciliation, not newly invented scope."
+      ]
+    },
+    {
+      "number": 1881,
+      "title": "test(aspire): clean-machine quickstart canary runs the root README sequence without manual recovery (#863 gate 3)",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1881",
+        "Owner continuing mandate: every remaining milestone-27 issue stays owned and scheduled; late intake reconciliation, not newly invented scope."
+      ]
+    },
+    {
+      "number": 1844,
+      "title": "ci(e2e-cli): runtime.wait.garnet times out at 300s on the Postgres scaffold-runtime tier",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1844",
+        "Owner continuing mandate: every remaining milestone-27 issue stays owned and scheduled; late intake reconciliation, not newly invented scope."
+      ]
+    }
+  ],
+  "reconciledAt": "2026-09-03T08:15:00.000Z",
+  "reconciliationNote": "Preserve original frozen scope and historical intake timestamps; add three already-owner-scheduled open incident issues and refresh current state. Active inventory means committed scope, not GitHub-open state."
+}
