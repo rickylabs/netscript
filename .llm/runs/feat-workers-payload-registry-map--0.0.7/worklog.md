@@ -287,3 +287,52 @@ than an arity, import, or unrelated mismatch.
 - `deno task check:mcp-export-corpus`: exit 0.
 - `deno task check:agent-docs-prose` correctly reported the canonical saga page carriers stale;
   `gen:agent-docs-prose` and `gen:assets-barrel` then refreshed only their attributed outputs.
+
+### Exact implementation commit receipts — `5843e8b32f2256962d3f5eb8350b897aa00333dd`
+
+```text
+$ deno task check:emitted-samples
+exit 0
+Checked 48 emitted TypeScript samples from 38 artifact paths.
+
+$ deno test --allow-all packages/plugin-triggers-core/tests/contracts/triggers-contract-soundness_test.ts .llm/tools/docs/official-saga-publisher-sample-sync_test.ts
+exit 0
+ok | 2 passed | 0 failed
+
+$ deno task check
+exit 0
+filesSelected=3109; batches=26; failedBatches=0; totalOccurrences=0
+
+$ deno task gen:mcp-export-corpus
+exit 0
+sha256=481c569e29bbcd1fcbd3d6812fe3a4b595db51ce4500c9b0a718dda68caa2764;
+packageCount=35; subpathCount=273; symbolCount=7864
+
+$ deno task check:mcp-export-corpus
+exit 0; same corpus hash and census
+
+$ deno task check:agent-docs-prose
+exit 0; fresh=true; stalePaths=[]
+
+$ deno task check:assets-barrel
+exit 0
+
+$ deno task docs:snippets:test
+exit 0
+ok | 12 passed | 0 failed
+
+$ deno task quality:gate
+exit 0; quality findings=[]; doctrine FAIL=0 with existing warning baseline
+```
+
+Focused package receipts on the same commit:
+
+```text
+run-deno-check plugin-triggers-core: exit 0; 81 files; 0 diagnostics
+run-deno-test plugin-triggers-core: exit 0; 42 passed; 0 failed
+run-deno-lint plugin-triggers-core: exit 0; 81 files; 0 findings
+run-deno-fmt plugin-triggers-core: exit 0; 81 files; 0 findings
+```
+
+`deno.lock` remains unchanged. No runtime lease was taken; hosted scaffold tiers remain responsible
+for runtime execution after push, as directed.
