@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "deno",
+    "install",
+    "--global",
+    "--allow-all",
+    "--name",
+    "netscript",
+    "jsr:@netscript/cli@0.0.7-canary.9"
+  ],
+  "cwd": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e",
+  "durationMs": 296,
+  "environment": {
+    "denoInstallRoot": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/.deno-install",
+    "pathPrepend": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/.deno-install/bin"
+  },
+  "exitCode": 1,
+  "readmeLine": 38,
+  "sourceCommand": "deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>",
+  "stderrTail": "\u001b[0m\u001b[33mWarning\u001b[0m discovered config file will be ignored in the installed command. Use the --config flag if you wish to include it.\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/meta.json\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/meta.json\n\u001b[0m\u001b[32mDownload\u001b[0m https://jsr.io/@netscript/cli/meta.json\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Could not find version of '@netscript/cli' that matches specified version constraint '0.0.7-canary.9'\n\nA newer matching version was found, but it was not used because it was newer than the specified minimum dependency date of 2026-09-02 02:55:58.909510034 UTC\n\n\u001b[0m\u001b[33mhint:\u001b[0m This version is blocked by the minimum dependency age policy, which avoids installing recently published versions to reduce supply chain risk (the default is 24 hours). To use this version now, pass the \u001b[0m\u001b[1m--minimum-dependency-age\u001b[0m (or \u001b[0m\u001b[1m--min-dep-age\u001b[0m) flag (for example \u001b[0m\u001b[1m0\u001b[0m to disable it, or a shorter duration like \u001b[0m\u001b[1m60\u001b[0m minutes) or set \u001b[0m\u001b[1m\"minimumDependencyAge\"\u001b[0m in your deno.json, or wait until the version is old enough.\n\u001b[0m\u001b[33mdocs:\u001b[0m \u001b[0m\u001b[36mhttps://docs.deno.com/go/minimum-dependency-age\u001b[0m\n",
+  "stdoutTail": "",
+  "substitutions": {
+    "version": "0.0.7-canary.9"
+  },
+  "timedOut": false
+}

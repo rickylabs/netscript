@@ -1,0 +1,116 @@
+{
+  "ok": false,
+  "suiteId": "readme.quickstart",
+  "projectRoot": "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app",
+  "startedAt": "2026-09-03T02:55:58.604Z",
+  "durationMs": 1194,
+  "steps": [
+    {
+      "id": "readme.quickstart.01-install-cli",
+      "title": "README command 1/11: deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>",
+      "critical": true,
+      "verdict": "failed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "readme.quickstart.01-install-cli attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-read",
+              "--allow-write",
+              "--allow-run",
+              "--allow-env=PATH",
+              "/home/runner/work/netscript/netscript/packages/cli/e2e/src/application/gates/quickstart/readme-command.ts",
+              "/home/runner/work/netscript/netscript",
+              "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e",
+              "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app/aspire/apphost.mts",
+              "0",
+              "jsr:@netscript/cli@0.0.7-canary.9",
+              "/home/runner/work/netscript/netscript/.llm/tmp/readme-quickstart/state.json",
+              "900000"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "{\"argv\":[\"deno\",\"install\",\"--global\",\"--allow-all\",\"--name\",\"netscript\",\"jsr:@netscript/cli@0.0.7-canary.9\"],\"cwd\":\"/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e\",\"durationMs\":296,\"environment\":{\"denoInstallRoot\":\"/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/.deno-install\",\"pathPrepend\":\"/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/.deno-install/bin\"},\"exitCode\":1,\"readmeLine\":38,\"sourceCommand\":\"deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>\",\"stderrTail\":\"\\u001b[0m\\u001b[33mWarning\\u001b[0m discovered config file will be ignored in the installed command. Use the --config flag if you wish to include it.\\n\\u001b[0m\\u001b[32mDownload\\u001b[0m https://jsr.io/@netscript/cli/meta.json\\n\\u001b[0m\\u001b[32mDownload\\u001b[0m https://jsr.io/@netscript/cli/meta.json\\n\\u001b[0m\\u001b[32mDownload\\u001b[0m https://jsr.io/@netscript/cli/meta.json\\n\\u001b[0m\\u001b[1m\\u001b[31merror\\u001b[0m: Could not find version of '@netscript/cli' that matches specified version constraint '0.0.7-canary.9'\\n\\nA newer matching version was found, but it was not used because it was newer than the specified minimum dependency date of 2026-09-02 02:55:58.909510034 UTC\\n\\n\\u001b[0m\\u001b[33mhint:\\u001b[0m This version is blocked by the minimum dependency age policy, which avoids installing recently published versions to reduce supply chain risk (the default is 24 hours). To use this version now, pass the \\u001b[0m\\u001b[1m--minimum-dependency-age\\u001b[0m (or \\u001b[0m\\u001b[1m--min-dep-age\\u001b[0m) flag (for example \\u001b[0m\\u001b[1m0\\u001b[0m to disable it, or a shorter duration like \\u001b[0m\\u001b[1m60\\u001b[0m minutes) or set \\u001b[0m\\u001b[1m\\\"minimumDependencyAge\\\"\\u001b[0m in your deno.json, or wait until the version is old enough.\\n\\u001b[0m\\u001b[33mdocs:\\u001b[0m \\u001b[0m\\u001b[36mhttps://docs.deno.com/go/minimum-dependency-age\\u001b[0m\\n\",\"stdoutTail\":\"\",\"substitutions\":{\"version\":\"0.0.7-canary.9\"},\"timedOut\":false}\n",
+            "stderrTail": "README line 38 failed exactly as printed: deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "failed",
+          "durationMs": 388,
+          "failureClass": "assertion",
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "error": "Command exited 1; expected 0.",
+      "durationMs": 388
+    },
+    {
+      "id": "cleanup.aspire-stop",
+      "title": "Stop generated Aspire AppHost",
+      "critical": true,
+      "verdict": "failed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "cleanup.aspire-stop attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "--allow-env",
+              "--allow-read",
+              "--allow-write",
+              "--allow-run=git,deno",
+              "/home/runner/work/netscript/netscript/.llm/tools/gates/run-gate.ts",
+              "--gate",
+              "cli-e2e-aspire-cleanup",
+              "--id",
+              "readme.quickstart:cleanup.aspire-stop",
+              "--output",
+              "/home/runner/work/netscript/netscript/.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.receipt.json",
+              "--cwd",
+              "/home/runner/work/netscript/netscript",
+              "--child-report",
+              "/home/runner/work/netscript/netscript/.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json",
+              "--",
+              "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app/aspire/apphost.mts",
+              "/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app",
+              "true",
+              "/home/runner/work/netscript/netscript/.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json"
+            ],
+            "cwd": "/home/runner/work/netscript/netscript",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "{\"gateId\":\"cli-e2e-aspire-cleanup\",\"invocationId\":\"readme.quickstart:cleanup.aspire-stop\",\"argv\":[\"deno\",\"run\",\"--allow-read\",\"--allow-write\",\"--allow-run=aspire,docker\",\"packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts\",\"/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app/aspire/apphost.mts\",\"/home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/my-app\",\"true\",\"/home/runner/work/netscript/netscript/.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json\"],\"cwd\":\"/home/runner/work/netscript/netscript\",\"gitHead\":\"3149d18e18fdd7cfbd0fac5a06f48f781d3a391a\",\"actualGitHead\":\"3149d18e18fdd7cfbd0fac5a06f48f781d3a391a\",\"timeoutMs\":1800000,\"runnerIdentity\":\"scaffold-runtime-jsr\",\"attempt\":1,\"schemaVersion\":1,\"requestHash\":\"7122858d63e2768fabe0c20832206a5781ec6175f2593bc6b5b8e822708870f6\",\"lifecycleId\":\"scaffold-runtime-jsr:readme.quickstart:cleanup.aspire-stop:1\",\"outcome\":\"FAIL\",\"claimedAt\":\"2026-09-03T02:55:59.100Z\",\"childReport\":\"/home/runner/work/netscript/netscript/.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json\",\"startedAt\":\"2026-09-03T02:55:59.103Z\",\"finishedAt\":\"2026-09-03T02:55:59.780Z\",\"durationMs\":678,\"exitCode\":1,\"stdout\":{\"bytes\":0,\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"tail\":\"\",\"truncated\":false},\"stderr\":{\"bytes\":710,\"sha256\":\"e8d03203f3cd85be8359469e49bc049f7582497ca8bf75fe3a0fbe193246cb3f\",\"tail\":\"\\u001b[0m\\u001b[1m\\u001b[31merror\\u001b[0m: Uncaught (in promise) Error: Aspire stop did not complete: ❌ \\u001b[1mThe --apphost option specified a project that does not exist.\\u001b[0m\\n📄 See logs at /home/runner/.aspire/logs/cli_20260903T025559_9b647a33.log\\n\\n    throw new Error(\\n\\u001b[0m\\u001b[31m          ^\\u001b[0m\\n    at \\u001b[0m\\u001b[1m\\u001b[3mstopAndProbe\\u001b[0m (\\u001b[0m\\u001b[2m\\u001b[38;5;245mfile:///home/runner/work/netscript/netscript/\\u001b[0m\\u001b[0m\\u001b[36mpackages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts\\u001b[0m:\\u001b[0m\\u001b[33m224\\u001b[0m:\\u001b[0m\\u001b[33m11\\u001b[0m)\\n    at async \\u001b[0m\\u001b[2m\\u001b[38;5;245mfile:///home/runner/work/netscript/netscript/\\u001b[0m\\u001b[0m\\u001b[36mpackages/cli/e2e/src/application/gates/scaffold/runtime/evidence/cleanup.ts\\u001b[0m:\\u001b[0m\\u001b[33m352\\u001b[0m:\\u001b[0m\\u001b[33m3\\u001b[0m\\n\",\"truncated\":false},\"childReportEvidence\":{\"path\":\"/home/runner/work/netscript/netscript/.llm/tmp/gate-receipts/readme.quickstart/cleanup.aspire-stop.json\",\"bytes\":1486,\"sha256\":\"64e8a48cbd5bfa0aee252664b026c177a027d25bf4bf24d72cd949094f80bffd\",\"modifiedAt\":\"2026-09-03T02:55:59.772Z\"}}\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "failed",
+          "durationMs": 776,
+          "failureClass": "assertion",
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "error": "Command exited 1; expected 0.",
+      "durationMs": 776
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "skipped": 0
+  }
+}

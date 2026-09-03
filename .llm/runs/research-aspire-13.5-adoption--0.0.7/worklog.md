@@ -1132,3 +1132,8 @@ the merge.**
   run **33708533076** from main @ `3149d18e1` (repaired harness vs published `0.0.7-canary.9`, no
   Canary 10). Watching the Root README Quickstart step; #1881/#863/#1712 closure packet is gated
   on that transcript.
+- 02:5xZ prod run 33708533076 RED at `readme.quickstart.01-install-cli` — isolation fix PROVEN
+  (run-owned root in receipt, no collision); new cause is Deno's 24h minimum-dependency-age vs
+  canary.9 published 01:41:38Z. No argv-verbatim suite seam exists (env var: none; cwd deno.json:
+  ignored by `deno install --global`, reproduced locally). Exact green requires re-dispatch after
+  2026-09-04T01:41:39Z. Full diagnosis + immutable receipts: `slices/leaf-1881-fix/prod-33708533076/`.
