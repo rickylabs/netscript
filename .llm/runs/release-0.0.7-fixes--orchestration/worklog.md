@@ -8103,3 +8103,9 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 ## 2026-09-03 02:14Z — #1974 (Closes #1971) ready for review at f383c3280
 - Worker finished S1/S2: fix in scaffold-app-catalog.ts + database scaffolder/generate-db-deno-json (materialized Zod entrypoint, no literal `catalog:` in production build); consumer sequence init/build/codegen/build 0/0/0/0; check/quality receipts at exact head; lint/fmt wrapper refusal recorded in drift.md (root deno.json excludes packages/cli). Diff within ceiling. CI + e2e-cli running at f383c3280.
 - Next: on green mint IMPL-EVAL (`status:impl`→`status:impl-eval`); on PASS packet; then sync #1945 (rebase onto fix) and rerun its runtime tiers.
+
+## 2026-09-03 02:45Z — reds triaged on #1970 and #1974; #1969 local IMPL-EVAL started
+- #1969 f9406dec6: all hosted tiers green; hosted OpenHands IMPL-EVAL run 33705335380 stalled >40 min with no verdict → sanctioned local evaluator (GLM 5.3 Flash, max) dispatched on the product diff + #1906 rule.
+- #1970 c72f853bd RED (exact): (a) generated `triggers/generic-inbound-webhook.ts:29` TS2322 — typed `JobHandler<Readonly<{verbose}>>` not assignable to `TriggerActionResult`'s `JobHandler<unknown>` (contravariance) → fails emitted-samples + both runtime tiers; (b) `official-saga-publisher-sample-sync_test.ts` — canonical saga carrier not re-derived from the schema-first workers sample. Steer `/tmp/steer1455c.md` delivered to thread 01a06201 (leaf 007-leaf-1455); worker turn live.
+- #1974 f383c3280 RED (exact, worker-introduced): emitted `clear-seeded-client.ts:27` references non-existent `Deno.errors.DirectoryNotEmpty` → TS2339 in scaffold-static + both runtime tiers (run 33706833254). Steer `/tmp/steer1971b.md` delivered to thread 01a064f3 (leaf 007-leaf-1971); worker turn live.
+- Supervisor traps this turn: a `pkill -f` self-match killed the shell (exit 144); a duplicate deliverer was killed by pid. `rtk` absent on host.
