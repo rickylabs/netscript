@@ -5,6 +5,15 @@
   "capturedAt": "2026-09-03T12:45:23.633Z",
   "pullRequests": [
     {
+      "number": 1984,
+      "issueNumbers": [],
+      "baseBranch": "main",
+      "headSha": "b8fb15bc136feb98ef81c21d010f43b1ee282798",
+      "state": "open",
+      "role": "coordinator-artifact",
+      "purpose": "Singleton release-captain version-only cut; not a topic implementation leaf."
+    },
+    {
       "number": 1696,
       "issueNumbers": [
         1694

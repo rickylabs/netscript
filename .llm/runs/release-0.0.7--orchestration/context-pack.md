@@ -1,5 +1,30 @@
 # Context pack — release 0.0.7
 
+## Stable cut is open: PR #1984
+
+Final cleanup verification run 33765493143 PASS: README 13/0, post-run AppHosts/containers/
+volumes/custom networks all zero; normal caches retained. #1881, #863 and #1712 were closed
+at 14:19Z with actual evidence. No open milestone issues remain.
+
+Sole primary release captain claimed after harness validation passed. Native release:cut completed
+at b8fb15bc136feb98ef81c21d010f43b1ee282798, branch release/cut-0.0.7, PR #1984.
+All 64 changed paths are coordinated versions/generated outputs; preparation/readiness/dry-run/
+production install PASS. CI 33766502843 is running. Existing independent GLM session
+0039d1ad-72eb-4047-964c-8b326ff65902 reviews only this mechanical delta in evaluator worktree
+007-eval-readme-cold; transport-stable-cut.jsonl and brief-stable-cut.md are retained.
+Primary remains SOL/high. No owner decision and no new canary.
+
+After review and exact-head CI, reconcile the PR checklist, native close/thread gates, ready-merge
+and merge #1984. Use native release:publish with prepared release-0.0.7-intro.md AND
+--prev-tag v0.0.6. Native generated Closed Issues currently stops at100: live pre-closure count
+was173, now176. Reconcile full paginated list using the existing exported formatClosedIssues
+renderer, without adding another canary or changing frozen product content. Native release
+creation is still mandatory; notes can be reconciled immediately on the created release before
+the publish workflow appends JSR links. Both stable workflows must pass before completion.
+
+Tracking #1641 remains for post-stable harness integration. Preserve primary's unrelated dirty
+deno.lock/.vite and all retained runs. Do not restore deprecated Claude skill mirrors.
+
 ## 2026-09-03: canary.10 pair GREEN; final cleanup inventory verification
 
 Published run33762898477 and exact production33763460542 both SUCCESS. Actual reports:
