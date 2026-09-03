@@ -1,4 +1,10 @@
-import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+import {
+  assertEquals,
+  assertFalse,
+  assertRejects,
+  assertStringIncludes,
+  assertThrows,
+} from '@std/assert';
 
 import {
   probeIslandHydration,
@@ -11,6 +17,7 @@ Deno.test('hydration receipt requires the generated resource surface and QueryCl
   assertEquals(
     receiptFromIslandInteraction({
       queryClientFound: true,
+      listQueryFound: true,
       freshIslandElement: 'output',
     }),
     {
@@ -25,10 +32,21 @@ Deno.test('hydration receipt rejects a server-rendered resource without a browse
     () =>
       receiptFromIslandInteraction({
         queryClientFound: false,
+        listQueryFound: false,
         freshIslandElement: 'output',
       }),
     Error,
     'QueryClient was not reachable',
+  );
+  assertThrows(
+    () =>
+      receiptFromIslandInteraction({
+        queryClientFound: true,
+        listQueryFound: false,
+        freshIslandElement: 'output',
+      }),
+    Error,
+    'users.list query was not present',
   );
 });
 
@@ -42,7 +60,11 @@ Deno.test('hydration probe targets the generated people resource', async () => {
       resolveLiveUrls: () => Promise.resolve(['http://localhost:41234/']),
       interact: (url) => {
         requested.push(url);
-        return Promise.resolve({ queryClientFound: true, freshIslandElement: 'output' });
+        return Promise.resolve({
+          queryClientFound: true,
+          listQueryFound: true,
+          freshIslandElement: 'output',
+        });
       },
     },
   );
@@ -110,6 +132,19 @@ Deno.test('resource query refetch probe targets the generated people resource', 
 
   assertEquals(requested, ['http://localhost:41234/people']);
   assertEquals(evidence.finalListRequestCount, 3);
+});
+
+Deno.test('browser hydration and refetch use the public shared query singleton', async () => {
+  const source = await Deno.readTextFile(
+    new URL(
+      '../../../src/application/gates/scaffold/runtime/probe-island-hydration.ts',
+      import.meta.url,
+    ),
+  );
+  assertStringIncludes(source, "const QUERY_MODULE_PATH = '/@id/@netscript/fresh/query';");
+  assertStringIncludes(source, 'const { getIslandQueryClient } = await import(');
+  assertStringIncludes(source, 'queryClient.invalidateQueries');
+  assertFalse(source.includes('new WeakSet'));
 });
 
 Deno.test('hydration probe fails closed and persists negative evidence when Chromium is unavailable', async () => {

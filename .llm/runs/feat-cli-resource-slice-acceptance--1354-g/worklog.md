@@ -97,6 +97,7 @@ Add future scaffold steps by defining focused gate data beside `resource-slice-g
 | 2026-09-03 | G | hydration/refetch correction | Extended the accepted resource-scope correction to eighteen existing product files. Hydration now requires the `/people` output plus a browser-reachable QueryClient. The existing refetch gate invalidates the active generated `users.list` query and requires exactly one completed 2xx refetch, without changing generator output or reviving the deferred mutation showcase. Focused browser-tail/resource/suite regressions pass 97/97; no host runtime was started. |
 | 2026-09-03 | G | current-main convergence | `origin/main` advanced from `e14322c511` to `94fe507af` while the run was active. Committed the acceptance correction, fetched, and merged current main without rebasing in `964d3cdd3`; the merge was clean and the main-relative product delta remained exactly eighteen files with no lock movement. |
 | 2026-09-03 | G | doctrine cleanup | The first refetch implementation made `probe-island-hydration.ts` 560 lines and added an A8 size warning. Consolidated the duplicate browser lifecycle and query expressions inside the same accepted file and brought it within the 500-line doctrine cap; focused hydration/service-client tests pass 37/37. No debt exception was added. |
+| 2026-09-03 | G | complete-tail hosted diagnosis | Run `33735122923` passed static and `behavior.island-served-surface`, then both tiers failed only at the new hydration observer: SQLite 86/1, PostgreSQL 91/1, cleanup passed. Private Preact graph traversal could not find the QueryClient. Replaced it with the public browser module contract `@netscript/fresh/query#getIslandQueryClient`, required the generated `users.list` cache entry, and kept the refetch on that singleton. No generator/Fresh product code changed. |
 
 ## Decisions
 
@@ -202,6 +203,8 @@ and 35 publishable members.
 | changed-head hosted `scaffold.runtime` (PostgreSQL) | FAIL, exit 1 | 90 passed, 1 failed (`behavior.island-served-surface`), cleanup passed | Run `33731170586`, job `100571302293`; `behavior.app-reference` passed, then the served-surface probe required retired `ServiceShowcaseLab`. |
 | changed-head hosted `scaffold.runtime.sqlite` | FAIL, exit 1 | 85 passed, 1 failed (`behavior.island-served-surface`), cleanup passed | Run `33731170586`, job `100571302333`; same decisive error; all preceding resource/generated/runtime/browser gates passed. |
 | superseded pending hosted run | CANCELED before runtime | Run `33732473476` | Proactive source trace found deterministic stale hydration/refetch assertions; no unchanged failing-head runtime rerun was consumed. |
+| first complete-tail hosted run (SQLite) | FAIL, exit 1 | 86 passed, 1 failed (`behavior.island-hydration`), cleanup passed | Run `33735122923`, job `100583852710`; served surface passed, private QueryClient traversal timed out. |
+| first complete-tail hosted run (PostgreSQL) | FAIL, exit 1 | 91 passed, 1 failed (`behavior.island-hydration`), cleanup passed | Run `33735122923`, job `100583852866`; same acceptance-observer failure. |
 
 ### Consumer Gates
 

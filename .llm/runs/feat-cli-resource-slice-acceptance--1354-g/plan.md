@@ -63,8 +63,9 @@ are outside that product touch set.
     route, Fresh island marker, module request, bundle hit, receipt persistence, and fail-closed
     behavior without the retired showcase name.
 14. `packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts` — prove the
-    generated `/people` QueryIsland hydrates and exposes its QueryClient; provide the resource-local
-    one-refetch browser observation used by the following gate.
+    generated `/people` QueryIsland hydrates and registers `users.list` in the public shared
+    QueryClient; provide the resource-local one-refetch browser observation used by the following
+    gate without traversing private Preact state.
 15. `packages/cli/e2e/tests/application/gates/probe-island-hydration_test.ts` — pin `/people`, the
     hydrated QueryClient requirement, exact `baseline + 1` list request count, and 2xx response.
 16. `packages/cli/e2e/src/application/gates/scaffold/runtime/behavior-gates.ts` — describe the

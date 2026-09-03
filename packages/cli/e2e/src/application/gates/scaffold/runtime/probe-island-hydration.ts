@@ -6,10 +6,12 @@ import { findBrowserExecutable, resolveProjectAppUrls } from './probe-app-refere
 
 const ISLAND_PATH = '/people';
 const LIST_PATH = '/api/rpc/v1/users/list';
+const QUERY_MODULE_PATH = '/@id/@netscript/fresh/query';
 const TIMEOUT_MS = 20_000;
 const BASELINE_CONFIRMATION_MS = 500;
 export interface IslandHydrationObservation {
   readonly queryClientFound: boolean;
+  readonly listQueryFound: boolean;
   readonly freshIslandElement: string | null;
 }
 
@@ -44,6 +46,9 @@ export function receiptFromIslandInteraction(
     throw new Error(
       'generated resource QueryClient was not reachable from the hydrated Preact tree',
     );
+  }
+  if (!observation.listQueryFound) {
+    throw new Error('generated users.list query was not present after island hydration');
   }
   return { islandHydrated: true, freshIslandElement: observation.freshIslandElement };
 }
@@ -126,7 +131,9 @@ async function interactWithHeadlessChrome(url: string): Promise<IslandHydrationO
     return await waitForEvaluation<IslandHydrationObservation>(
       client,
       islandHydrationObservationExpression(),
-      (value) => value?.freshIslandElement !== null && value?.queryClientFound === true,
+      (value) =>
+        value?.freshIslandElement !== null && value?.queryClientFound === true &&
+        value.listQueryFound === true,
     );
   });
 }
@@ -350,21 +357,31 @@ async function waitForEvaluation<T>(
   predicate: (value: T | undefined) => boolean,
 ): Promise<T> {
   const started = Date.now();
+  let lastValue: T | undefined;
   while (Date.now() - started < TIMEOUT_MS) {
-    const value = await client.evaluate<T>(expression);
-    if (predicate(value)) return value as T;
+    lastValue = await client.evaluate<T>(expression);
+    if (predicate(lastValue)) return lastValue as T;
     await delay(50);
   }
-  throw new Error('timed out waiting for generated island DOM state');
+  throw new Error(
+    `timed out waiting for generated island DOM state; last observation ${
+      JSON.stringify(lastValue)
+    }`,
+  );
 }
 
 function islandHydrationObservationExpression(): string {
-  return `(() => {
+  return `(async () => {
     const surface = document.querySelector('main output');
-    ${QUERY_CLIENT_DISCOVERY_SOURCE}
-    const queryClientFound = findQueryClient().client !== null;
+    const { getIslandQueryClient } = await import(${JSON.stringify(QUERY_MODULE_PATH)});
+    const queryClient = getIslandQueryClient();
+    const queries = queryClient.getQueryCache().getAll();
+    const listQuery = queries.find((query) =>
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
+    );
     return {
-      queryClientFound,
+      queryClientFound: queryClient !== null,
+      listQueryFound: listQuery !== undefined,
       freshIslandElement: surface?.tagName.toLowerCase() ?? null,
     };
   })()`;
@@ -377,56 +394,19 @@ interface QueryClientDiscoveryObservation {
 
 type RequestCounts = Readonly<{ requestCount: number; completedCount: number }>;
 
-const QUERY_CLIENT_DISCOVERY_SOURCE = `
-  const findQueryClient = () => {
-    const seen = new WeakSet();
-    const queue = [];
-    for (const element of document.querySelectorAll('*')) {
-      for (const key of Object.getOwnPropertyNames(element)) {
-        if (!key.startsWith('__') && !key.toLowerCase().includes('preact')) continue;
-        let value;
-        try { value = element[key]; } catch { continue; }
-        queue.push({ value, depth: 0 });
-      }
-    }
-    let visited = 0;
-    while (queue.length > 0 && visited < 5000) {
-      const entry = queue.shift();
-      const value = entry.value;
-      if ((typeof value !== 'object' && typeof value !== 'function') || value === null) continue;
-      if (seen.has(value)) continue;
-      seen.add(value);
-      visited += 1;
-      if (
-        typeof value.getQueryCache === 'function' &&
-        typeof value.getQueryData === 'function' &&
-        typeof value.getQueryState === 'function'
-      ) return { client: value };
-      if (entry.depth >= 12 || value instanceof Node) continue;
-      let descriptors;
-      try { descriptors = Object.getOwnPropertyDescriptors(value); } catch { continue; }
-      for (const descriptor of Object.values(descriptors).slice(0, 80)) {
-        if (!('value' in descriptor)) continue;
-        queue.push({ value: descriptor.value, depth: entry.depth + 1 });
-      }
-    }
-    return { client: null };
-  };
-`;
-
 function resourceQueryExpression(invalidate: boolean): string {
   return `(async () => {
-    ${QUERY_CLIENT_DISCOVERY_SOURCE}
-    const discovery = findQueryClient();
-    const queries = discovery.client?.getQueryCache().getAll() ?? [];
+    const { getIslandQueryClient } = await import(${JSON.stringify(QUERY_MODULE_PATH)});
+    const queryClient = getIslandQueryClient();
+    const queries = queryClient.getQueryCache().getAll();
     const listQuery = queries.find((query) =>
       Array.isArray(query.queryKey) && query.queryKey[0] === 'users' && query.queryKey[1] === 'list'
     );
-    if (${JSON.stringify(invalidate)} && discovery.client && listQuery) {
-      await discovery.client.invalidateQueries({ queryKey: listQuery.queryKey, exact: true });
+    if (${JSON.stringify(invalidate)} && listQuery) {
+      await queryClient.invalidateQueries({ queryKey: listQuery.queryKey, exact: true });
     }
     return {
-      queryClientFound: discovery.client !== null,
+      queryClientFound: queryClient !== null,
       listQueryFound: listQuery !== undefined,
     };
   })()`;

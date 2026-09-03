@@ -177,3 +177,26 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Lesson:** Runtime prerequisites and dependents were not traced end-to-end at design time. A
   generated-surface replacement must audit every later behavioral gate, not stop at the first
   failure exposed by serial execution.
+
+## 2026-09-03 — Private Preact traversal is not a stable hydration seam
+
+- **What:** First complete-tail hosted run `33735122923` passed the static lane and the corrected
+  served-surface gate, but both database tiers timed out in `behavior.island-hydration` before the
+  refetch gate.
+- **Source:** SQLite job `100583852710` and PostgreSQL job `100583852866`, including their complete
+  logs and uploaded reports.
+- **Expected:** Finding a QueryClient by recursively walking private Preact-owned DOM objects would
+  prove the generated `PeopleIsland` hydrated.
+- **Actual:** The `<output>` and Fresh island/module surface were served successfully, but the
+  private-object traversal never found the client. SQLite reported 86 pass / 1 fail / 0 skipped;
+  PostgreSQL reported 91 pass / 1 fail / 0 skipped; both cleanup gates passed. The same timeout in
+  both isolated tiers makes this an acceptance-observer defect, not a database-specific product
+  failure.
+- **Severity:** significant
+- **Action:** Use the existing public `@netscript/fresh/query` contract instead. Browser evaluation
+  imports its Vite module id, calls exported `getIslandQueryClient()`, requires the generated
+  `users.list` entry, and uses that exact singleton for invalidation. Remove all private Preact graph
+  traversal. Persist the last browser observation in timeout diagnostics and pin the public-module/
+  no-`WeakSet` contract in the focused test.
+- **Boundary:** No Fresh or generator code changes. This is a correction inside the already accepted
+  hydration/refetch probe and test paths; the eighteen-file product ceiling does not move.

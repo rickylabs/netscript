@@ -6,7 +6,7 @@
 | ----- | ----- |
 | Run ID | `feat-cli-resource-slice-acceptance--1354-g` |
 | Branch | `feat/cli-resource-slice-acceptance` |
-| Current phase | `local exact-head gates green; isolated hosted acceptance pending` |
+| Current phase | `public-query-client observer correction implemented; exact-head gates pending` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `none` |
 
@@ -21,10 +21,11 @@ gate; the command test proves unresolved app-root selection fails loudly with ze
 served-surface probe now proves `/people` emits and serves `PeopleIsland` and its Fresh module graph.
 Hydration requires a browser-reachable QueryClient; the refetch gate invalidates its active
 `users.list` query and requires exactly one completed 2xx request instead of driving the retired
-Rename showcase. At product head `2f0807f25`, focused tests pass 119/119, the full CLI suite passes
-1,794/1,794, structured check covers 1,004 files with zero diagnostics, all scoped quality/carrier/
-docs/publish gates pass, and doctrine reports `FAIL=0` with no new warning. Isolated hosted
-acceptance and fresh IMPL-EVAL remain pending, so PR #1958
+Rename showcase. Product head `2f0807f25` passed every local gate, but hosted run `33735122923`
+then falsified its private Preact traversal in both tiers (SQLite 86/1, PostgreSQL 91/1; cleanup
+passed). The current correction imports the existing public `@netscript/fresh/query` browser module,
+requires the generated `users.list` entry in its singleton, and invalidates that same client. Fresh
+exact-head local evidence, isolated hosted acceptance, and IMPL-EVAL are pending, so PR #1958
 stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Completed
@@ -44,8 +45,8 @@ stays `status:impl-eval` and #1354 acceptance remains unchanged for now.
 
 ## Next Steps
 
-1. Commit and push the final local evidence receipt.
-2. Run both isolated hosted runtime tiers; do not use a host runtime lease.
+1. Commit the public-singleton observer correction and rerun proportional exact-head local gates.
+2. Push and run both isolated hosted runtime tiers; do not use a host runtime lease.
 3. Obtain a fresh separate-session IMPL-EVAL, then update #1354/#1958 only from green evidence.
 
 ## Key Decisions
