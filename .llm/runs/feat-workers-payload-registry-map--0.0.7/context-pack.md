@@ -69,3 +69,18 @@ native Fable evaluator launch was quota-blocked before producing a verdict.
 ## Commits
 
 - Per-slice SHAs will be added to `worklog.md` and the PR.
+
+## 2026-09-03 evaluator handoff
+
+- Independent IMPL-EVAL is complete at receipt head
+  `a526c625ad0555230e9a9b464b1b1c7e50144621`.
+- Evaluator session `2a38b460-44df-4fe1-b339-ca24e0a50b83`, observed
+  `z-ai/glm-5.3-flash` at max effort, issued **PASS** in `evaluate.md`.
+- The PASS certifies the bounded workers product delta; it does not claim exact-head runtime or
+  merge readiness.
+- PR #1958 was still open at 2026-09-03T09:53:04Z. Next action remains: after its merge, integrate
+  current `origin/main` with canonical probes winning, regenerate carriers, run exact-head focused
+  static gates, and obtain fresh PostgreSQL plus SQLite hosted runtime receipts. Run bounded delta
+  review only if that integration changes product source.
+- Do not launch a second evaluator, take a local runtime lease, patch shared browser probes, or
+  merge PR #1970.

@@ -57,3 +57,19 @@ Drift is append-only.
   change application runtime semantics or absorb unrelated CLI work.
 - **Evidence:** hosted RED logs, direct generator probe, and exact runtime-suite receipts recorded in
   `worklog.md`.
+
+## 2026-09-03 — owner-authorized evaluator fallback
+
+- **What:** Formal IMPL-EVAL ran through the checked-in Claude/OpenRouter fallback using GLM 5.3
+  Flash at max effort after the native Fable route was quota-blocked before evaluation.
+- **Source:** Coordinator steer at 2026-09-03T09:26Z; lane-policy
+  `formal_impl_evaluation` fallback.
+- **Expected:** Native opposite-family Fable 5 at medium effort.
+- **Actual:** The one native session could not begin because of the Anthropic spend limit. One
+  sanctioned fallback session, `2a38b460-44df-4fe1-b339-ca24e0a50b83`, completed the independent
+  review and emitted a scoped `PASS`. Its initial transport timeout was recovered by resuming the
+  same session, not by starting another evaluator.
+- **Severity:** minor operational drift; no evaluation-scope or product-contract drift.
+- **Action:** preserve `evaluate.md`, record requested and observed identity, and do not dispatch a
+  duplicate evaluator. Discard evaluator-only `deno.lock` drift with the isolated worktree.
+- **Evidence:** `evaluate.md` plus the evaluator command/session and gate receipts in `worklog.md`.

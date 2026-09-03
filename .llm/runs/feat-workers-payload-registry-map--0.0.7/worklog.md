@@ -781,3 +781,46 @@ or duplicate evaluator was dispatched. The two remaining merge-readiness conditi
 land PR #1958 (or its owning correction) into main and reconcile/rerun #1970 hosted runtime, then run
 one fresh native Fable/medium IMPL-EVAL when the Anthropic allowance permits. PR #1970 remains
 unmerged with `Refs #1455` and `status:impl`.
+
+## Sanctioned fallback IMPL-EVAL — 2026-09-03T09:52Z
+
+The coordinator clarified that the Fable-only owner rule applied to topic supervisors, not this
+approved evaluator route, and authorized the checked-in `formal_impl_evaluation` fallback after the
+native Fable quota block. Exactly one isolated evaluator worktree and one evaluator session were
+used:
+
+```text
+worktree: /home/agent/projects/netscript/worktrees/007-eval-1970-glm
+evaluated head: a526c625ad0555230e9a9b464b1b1c7e50144621
+session: 2a38b460-44df-4fe1-b339-ca24e0a50b83
+requested/observed: z-ai/glm-5.3-flash / max / Claude Code + OpenRouter
+verdict: PASS
+artifact: .llm/runs/feat-workers-payload-registry-map--0.0.7/evaluate.md
+```
+
+The first transport invocation reached the verdict-writing step after completing the review, then
+ended with `API Error: Upstream idle timeout exceeded`. The same session was resumed with
+`--resume 2a38b460-44df-4fe1-b339-ca24e0a50b83`; it wrote the verdict and exited 0. This was one
+continuous evaluator session, not a duplicate evaluation cycle.
+
+Independent evaluator receipts on the evaluated head:
+
+```text
+focused workers payload/runtime tests: exit 0; 12 passed / 0 failed
+workers generator/doctor suites: exit 0; 19 passed / 0 failed
+run-deno-check, workers-core + workers: exit 0; 219 files; 0 diagnostics
+deno task quality:gate: exit 0
+deno doc --lint packages/plugin-workers-core/mod.ts: exit 0; Checked 1 file
+deno task check:emitted-samples: exit 0; 48 samples / 38 artifact paths
+```
+
+The evaluator certified the bounded product delta while classifying PR #1958 integration and a
+fresh exact-integrated-head dual hosted-runtime pair as a separate remaining lifecycle condition.
+It made no merge-readiness claim. An optional evaluator probe caused local `deno.lock` drift only
+inside the disposable isolated worktree; that drift is excluded and will be discarded with the
+worktree. The imported `evaluate.md` is byte-identical to the evaluator-authored artifact.
+
+At 2026-09-03T09:53:04Z, PR #1958 remained open (remote head
+`47275c0022eb3e78aed0b47242b8428d35daeab6`) and `origin/main` remained
+`94fe507af47171cd4f295e8f532b281d7147b334`. Therefore no source integration, carrier regeneration,
+or hosted runtime dispatch was performed in this slice.
