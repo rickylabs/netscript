@@ -832,3 +832,10 @@ advanced from `status:impl` to `status:impl-eval`; `Refs #1455`, milestone `0.0.
 type/area/priority/orchestrator labels were preserved. The normal `gh pr edit` label mutation was
 blocked by missing token `read:org`/`read:discussion` scopes, so the same repository issue-label
 mutation was completed through GitHub's REST endpoint and verified from the returned label set.
+
+Post-publication lifecycle receipt: `agentic:review-threads` exited 0 with 0 threads and 0
+unanswered. Local `HEAD`, the remote branch ref, and PR head all resolved to
+`99036343665636ca7bcadd1557431903cdd887ad`; the writer worktree was clean. The disposable evaluator
+worktree was removed with its uncommitted `deno.lock` probe churn after the evaluator-authored
+artifact checksum was verified against the imported file. Receipt-only CI run `33741559824` was
+pending at the time of this entry; no hosted runtime suite was dispatched.
