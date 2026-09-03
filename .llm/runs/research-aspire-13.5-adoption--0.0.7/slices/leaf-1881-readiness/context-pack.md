@@ -24,13 +24,12 @@ Canary 9 production run `33712927776` passed README commands 1–10, then hung 9
 
 ## In Progress
 
-- Commit/push implementation and hand the exact head to a separate-session evaluator.
+- Hand the pushed immutable implementation head to a separate-session evaluator.
 
 ## Next Steps
 
-1. Commit and push the completed implementation/gate evidence.
-2. Run separate-session IMPL-EVAL at the immutable head.
-3. Keep #1881/#863/#1712 open until a fresh hosted published-version run passes.
+1. Run separate-session IMPL-EVAL at the immutable head.
+2. Keep #1881/#863/#1712 open until a fresh hosted published-version run passes.
 
 ## Key Decisions
 
@@ -71,4 +70,5 @@ Canary 9 production run `33712927776` passed README commands 1–10, then hung 9
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `09d9d2edf` — exact incident re-baseline and bounded plan.
+- `8704b0571` — implementation plus focused gate receipts.

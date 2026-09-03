@@ -57,6 +57,7 @@ Edit the marked root README command block and its single expected-command tuple 
 | 2026-09-03T04:33Z | 1 | tests | Focused structured tests PASS 22/22; exact parser/argv test and full fake-runner sequence prove no hidden readiness command and one post-readiness port capture. |
 | 2026-09-03T04:35Z | 2 | implement | Added both `readme.quickstart` cleanup wrapper/child receipts to the production artifact upload and pinned them in the release workflow test. |
 | 2026-09-03T04:38Z | 2 | reconcile | #1881, #863, and epic #1712 remain open because a new hosted published-version run is still required; PR #1981 references rather than closes them. |
+| 2026-09-03T04:45Z | 2 | push | Implementation and focused evidence pushed at `8704b0571`; separate-session IMPL-EVAL remains the only pre-merge harness gate. |
 
 ## Decisions
 
