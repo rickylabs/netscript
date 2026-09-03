@@ -77,6 +77,12 @@ There is no material architecture or scope decision left for adversarial plannin
 | --- | --- | --- | --- |
 | 2026-09-03 | 0 | bootstrap | Verified HEAD and remote `main` at `79adb103b`; read harness/doctrine/tooling contracts and Aspire 13.5.3 wait help. |
 | 2026-09-03 | 0 | pre-push gates | Check 223 files PASS; tests 302/302 PASS; fmt 223 files PASS; suites/gates listings PASS; lint wrapper refused seven unchanged desktop fixture files with zero findings. |
+| 2026-09-03 | 0 | reconcile | Draft PR #1965 opened against exact base with requested labels, milestone 0.0.7, `Closes #1881`, and `Part of #863`; issue remains `status:impl`. |
+| 2026-09-03 | 1 | implement | Added markers, executable 13.5.3 readiness, pure parser, unit tests, and README drift test. |
+| 2026-09-03 | 2 | implement | Added eleven no-retry command gates, isolated smoke-root cwd state, context-derived AppHost port evidence, bounded child receipts, and unchanged ownership-aware cleanup. |
+| 2026-09-03 | 2 | A1 review | Fresh Claude Fable 5.1 low session `d1b8dd03-8be6-477f-a80e-8a342077b81f` returned `CHANGES_REQUIRED`; accepted the smoke-root/AppHost, pure-rule coverage, explicit-port, receipt, stale-receipt, and tuple-alignment findings. Recheck pending. |
+| 2026-09-03 | 2 | A1 recheck | Same independent reviewer returned `PASS`; after two low evidence improvements, its narrow final recheck also returned `PASS` with no blocking findings. |
+| 2026-09-03 | 2 | pre-push gates | Check 229 files PASS; tests 314/314 PASS; fmt 229 files PASS; suites/gates, carrier freshness, and quality gate PASS. Exact lint wrapper repeats the documented baseline refusal with zero findings. |
 
 ## Decisions
 
@@ -97,17 +103,19 @@ There is no material architecture or scope decision left for adversarial plannin
 
 | Gate | Result | Notes |
 | --- | --- | --- |
-| Scoped check | PASS | 223 files, 2 batches, 0 diagnostics. |
-| Full CLI E2E unit tests | PASS | 302 passed, 0 failed. |
+| Scoped check | PASS | 229 files, 2 batches, 0 diagnostics. |
+| Full CLI E2E unit tests | PASS | 314 passed, 0 failed. |
 | Scoped lint | FAIL (baseline tooling refusal) | 0 lint findings; existing standalone desktop fixture cannot resolve root `catalog:` entry. Logged in `drift.md`. |
-| Scoped format | PASS | 223/223 files processed, 0 findings. |
+| Scoped format | PASS | 229/229 files processed, 0 findings. |
 
 ### Consumer Gates
 
 | Gate | Result | Notes |
 | --- | --- | --- |
-| `e2e:cli suites` | PASS | Existing suite registry prints successfully. |
-| `e2e:cli gates quickstart.walk` | PASS | Existing gate registry prints without starting runtime resources. |
+| `e2e:cli suites` | PASS | Registry includes `readme.quickstart`. |
+| `e2e:cli gates readme.quickstart` | PASS | Prints 11 exact README gates plus unchanged cleanup without starting runtime resources. |
+| `check:agent-docs-prose` | PASS | Root README edit does not move a generated carrier; no generated file changed. |
+| `quality:gate` | PASS | Repository quality and architecture gates report zero failures. |
 
 ### Runtime Gates
 

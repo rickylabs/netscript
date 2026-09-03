@@ -126,6 +126,8 @@ and requested PR checks should use
 | `scaffold.plugins`        | init, official plugins, registry generation, plugin doctor |
 | `scaffold.runtime`        | full scaffold runtime behavior path                        |
 | `scaffold.runtime.sqlite` | reduced-container sqlite runtime tier                      |
+| `quickstart.walk`         | docs-site Quickstart flow against the published CLI        |
+| `readme.quickstart`       | root README commands verbatim, once each, with receipts    |
 
 ### Structured Aspire evidence gates
 

@@ -26,3 +26,25 @@
 - **Action:** defer
 - **Evidence:** Baseline run selected 223 files; check, 302 tests, and format passed. The lint
   failure is isolated to the seven pre-existing desktop fixture files and predates this slice.
+
+## 2026-09-03 — README fidelity deliberately exposes fresh-publication and non-TTY behavior
+
+- **What:** The printed README install omits the `--minimum-dependency-age=0` accommodation used by
+  `quickstart.walk`, and its Aspire commands omit the walk's non-interactive flags.
+- **Source:** Root README marker block compared with `quickstart-walk-suite.ts`.
+- **Expected:** `readme.quickstart` executes those printed commands without adding hidden flags.
+- **Actual:** A just-published canary may fail Deno's dependency-recency policy, and the hosted run
+  remains the authority for whether printed Aspire commands are non-TTY safe.
+- **Severity:** significant
+- **Action:** accept as admission evidence; never retry or add hidden recovery.
+- **Evidence:** The drift test fixes the exact printed argv; the hosted clean runner will expose a
+  failure at the named README line.
+
+## 2026-09-03 — Prescribed RTK proxy unavailable
+
+- **What:** `rtk` is not installed in this worktree environment.
+- **Source:** `command -v rtk` / attempted `rtk git status`.
+- **Expected:** Prefix read-heavy Git commands and validation tasks with the token-saving proxy.
+- **Actual:** Native non-interactive Git and exact coordinator gate commands were used.
+- **Severity:** minor
+- **Action:** accept; no command semantics changed.
