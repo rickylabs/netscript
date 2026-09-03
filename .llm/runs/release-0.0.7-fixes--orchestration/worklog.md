@@ -7981,3 +7981,15 @@ Coordinator: Canary6 packages published; pinned prod E2E failed one stale assump
 - 00:52Z #1967: prior impl-eval label flip (00:35Z) predates final head 2fa5f60eb and its generation
   was phase=impl; re-cycled impl→impl-eval to mint the IMPL-EVAL generation at 2fa5f60eb. Core CI
   (check-test, both runtime tiers) pending; close-gate red is the expected pre-merge state.
+- 01:00Z #1967 IMPL-EVAL: hosted evaluator stalled past the 00:56Z deadline → sanctioned local
+  OpenRouter `z-ai/glm-5.3-flash` · max dispatched (first attempt rejected `result_too_large`;
+  re-run with output budget). **PASS** posted (issuecomment-5518730960); medium non-blocking
+  finding: output-regex alternation not proven against canonical `(exit 1)` / `minimum dependency
+  date` strings — recorded as test-only follow-up, registry/doctor assertions remain primary.
+  Carry 11cffaabb→2fa5f60eb verified harness-only (0 product files).
+- 01:05Z Coordinator safety audit: durable evidence at 2fa5f60eb false-done (worklog rows still
+  NOT_RUN/pending; context-pack phase stale; reproduce-canary8.ts GREEN-only, no RED mode/raw
+  receipt). Verified locally. Promotion HELD. Steer C (explicit --mode red/green, immutable raw
+  receipts under receipts/, worklog/context-pack truth-up, harness-only) queued to exact thread
+  01a064a4 via /tmp/deliver1966c.sh; worker process had exited so resume binds immediately.
+- #1965 merged at b6b9df966 (coordinator). Canary 9 waits only on #1967.
