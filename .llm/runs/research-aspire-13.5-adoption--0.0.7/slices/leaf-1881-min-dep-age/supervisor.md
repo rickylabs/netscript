@@ -16,7 +16,7 @@
 | Task lane | Provider / model / effort | Role |
 | --- | --- | --- |
 | `light_implementation` | OpenAI / Codex GPT-5 family / session default | Contract-first RED/GREEN docs slice |
-| `formal_impl_evaluation` | Fresh native opposite-family session per lane policy | Mandatory final evaluation |
+| `formal_impl_evaluation` | Anthropic / Claude Fable 5.1 / medium; session `b67d4969-52f8-4250-a60d-12f95d855ad9` | Mandatory final evaluation; initial `FAIL_FIX` identified stale manifest evidence |
 
 The owner supplied the exact red, command text, file set, ordering, assertions, gates, and PR
 metadata. `PLAN-EVAL` is `N/A` under the small/mechanical exception; no lane override is in force.

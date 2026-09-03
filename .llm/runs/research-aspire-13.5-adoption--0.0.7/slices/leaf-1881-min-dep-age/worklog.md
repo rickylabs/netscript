@@ -50,6 +50,8 @@ text, scope, assertions, gates, and prohibited alternatives.
 | 2026-09-03 | 2 | GREEN | Commit `86c71bc97` changes only the root README, docs Quickstart/callout, and package README. The same focused wrapper exited 0: 10 passed, 0 failed. |
 | 2026-09-03 | 3 | carriers | `check:agent-docs-prose` first named two stale outputs; `gen:agent-docs-prose`, `gen:assets-barrel`, and `gen:publish-assets` produced four derived files committed in `e6dbee80d`. All four carrier checks then exited 0. |
 | 2026-09-03 | 3 | manifest | Initial parity reported manifest freshness only; generator completed with `rows=943 unmatched=0`; parity then exited 0 with `manifestFresh:true` and no failures. |
+| 2026-09-03 | 4 | IMPL-EVAL `FAIL_FIX` | Independent Claude Fable 5.1 session `b67d4969-52f8-4250-a60d-12f95d855ad9` confirmed the owner contract and all implementation evidence, but found the committed manifest omitted this worklog after its final Aspire-mentioning evidence update. Repair is evidence-only: track evaluator artifacts, regenerate the manifest last, rerun parity, and request a focused re-verdict. |
+| 2026-09-03 | 4 | evaluator repair | Staged the evaluator prompt/verdict and updated run artifacts before regenerating the surface manifest (`rows=946 unmatched=0`). The authoritative parity rerun exited 0 with `ok:true`, `manifestFresh:true`, and `counts: { checked:945, fail:0, deferred:16, info:5, skipped:1, missing:0 }`. |
 
 ## Gate results
 
@@ -70,6 +72,6 @@ text, scope, assertions, gates, and prohibited alternatives.
 | Docs links | 0 | 105 docs; 0 broken links/anchors/orphans. |
 | README standard | 1 baseline | Only `packages/bench/README.md` lacks an Install section at baseline `3149d18e1`; untouched. |
 | Quality/doctrine gate | 0 | quality scan clean; doctrine reports no failures, only pre-existing warnings. |
-| Aspire version parity | 0 | `counts.fail:0`, `manifestFresh:true`; initial freshness-only red regenerated as required. |
+| Aspire version parity | 0 | Final repair verdict: `ok:true`, `manifestFresh:true`, counts `checked:945`, `fail:0`, `deferred:16`, `info:5`, `skipped:1`, `missing:0`; evaluator artifacts and this worklog were tracked before the `rows=946 unmatched=0` regeneration. |
 
 No runtime suite, Aspire process, Docker command, install, publish, or workflow command ran.
