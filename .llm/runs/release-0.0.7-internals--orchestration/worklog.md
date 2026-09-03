@@ -10996,3 +10996,14 @@ was already ticked by Aspire against their own verdict (my update found no unche
 changed nothing — credited to Aspire on the PR), close-gate rerun fired with `ready-merge` present.
 Posted a hand-off note instead of a second packet — one packet per PR. The #1880/#1952 transfer is
 complete from Internals' side; merge is the coordinator's.
+
+### D-275 — #1952 `quality` red isolated to manifest freshness on the PR merge ref; cured on current main; needs a new merge ref, not a rerun
+
+close-gate PASS on attempt 2. `quality` step 22 (Aspire version parity) fails only on the merge ref
+`f257a3dd7` = merge(main@f589d251a, 478450a3c): one finding, `aspire-surface-manifest.tsv`
+`manifest:freshness`. Branch alone passes; merge with current main `79adb103b` (post-#1962, which
+regenerated the TSV) passes. Offline gate, deterministic per merge ref. `gh run rerun` re-uses the
+old merge ref; ci.yml has no touch-free trigger. Two remedies posted on #1952: Aspire merges main
++ regenerates the manifest in-branch (durable), or the coordinator reopens for a fresh merge ref.
+Lesson: "same head, one run green, one run red" on a pull_request run means compare **merge refs**,
+not heads — the receipt's `gitHead` is the merge commit, and it named the difference.
