@@ -235,3 +235,11 @@ heading and exclude the `|` form.
   agent-docs-prose — all PASS.
 - Scratch worktree `main-audit` removed; local branch `docs/changelog-0-0-7-fold-1952` deleted.
 - Open docs-owned milestone PRs: none. Fold triggers still unmerged: #1664, #1956, #1960, #1945.
+
+## #1965 merged — 2026-09-03
+
+- #1965 merged as `b6b9df966` (closes #1881). Surface: root `README.md` quickstart + `aspire wait`
+  step, `.github/workflows/e2e-cli-prod.yml`. README markers consumed only by
+  `packages/cli/e2e/src/domain/readme-quickstart.ts`; root README is not a publish carrier.
+- Disposition: no carrier regeneration, no changelog bullet (E2E gate; the `aspire wait` command
+  already matches `.agents/skills/aspire` and the CLI database runner).
