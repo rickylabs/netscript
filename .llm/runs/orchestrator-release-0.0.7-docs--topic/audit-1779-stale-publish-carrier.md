@@ -257,3 +257,14 @@ heading and exclude the `|` form.
   `ready-merge` at `f5100c44a`, closes #1844). User-visible surface: scaffolded
   `_aspire-compat.ts.template` gains `createEndpointListenerReadinessCheck` with an
   `ENDPOINT_ALLOCATION_TIMEOUT` outcome. Added to the fold set; bullet staged. Ownership unchanged.
+
+## #1972 packet — fold #1959 — 2026-09-03
+
+- #1959 merged as `69b3ab5f4`. Fold PR **#1972** (`docs/changelog-0-0-7-fold-1959`, head
+  `19c783aca`, cut from exact main `69b3ab5f4`): four changelog lines.
+- First close-gate FAIL was self-inflicted: the body said "closed #1844", which the gate parsed as a
+  closing keyword and mirrored #1844's unchecked boxes. Body rewritten to `Refs #1844`; close-gate
+  rerun → success. (Confirms the prose-keyword trap; never write "closed #N" in a fold body.)
+- Attributed `impl-eval:skip` applied with a `[PHASE: IMPL-EVAL] [VERDICT: SKIP]` comment (same
+  path as #1968). CI run 33704983331: check-test, quality, close-gate, core lane visibility all
+  success. `mergeable=true state=clean`. Handed to coordinator for merge.
