@@ -1,5 +1,27 @@
 # Context pack — release 0.0.7
 
+## 2026-09-03 14:48Z — stable-cut test fixture circularity proven
+
+Stable PR #1984 remains at b8fb15bc136feb98ef81c21d010f43b1ee282798 and is NOT merged.
+CI33766502843 failed one test (5269 pass / 1 fail / 14 ignored); check and quality passed.
+The exact generated-app subprocess fails because @netscript/sdk@0.0.7 is not yet published,
+not because users.list is missing. The production resolver masks the child import error.
+The existing local-workspace-imports fixture helper proves the actual 0.0.7 query factory works.
+
+Prepared and explicitly pushed fixture-only correction 6884b7548a0fdc53a17c52ef343c6025a7527d93
+on fix/cli-prepublish-test-fixture in 007-stable-fixture-repair, based on the unchanged stable cut.
+One publish-excluded test file changed: keep/assert public exact pin, then use checkout imports
+for real generate-resource calls. Focused full file 5/0, check/lint/fmt all PASS. No product file,
+manifest, generated output, or production behavior changed. Independent existing GLM session
+0039d1ad-72eb-4047-964c-8b326ff65902 is reviewing only that delta in 007-eval-readme-cold.
+
+Owner-only ruling requested asynchronously: may this test-only correction retain canary.10's
+proven product evidence? Native inheritance currently permits only a version-only immediate
+parent, so it will refuse this test delta. No exception has been applied, no status fabricated,
+no policy changed, and no new canary minted. Current canary pair and all issue closures remain
+valid. All independent product lanes are complete; primary owns this final release boundary.
+See receipts/stable-cut-fixture-diagnosis.md. Stable publication and pinned stable E2E remain.
+
 ## Stable cut is open: PR #1984
 
 Final cleanup verification run 33765493143 PASS: README 13/0, post-run AppHosts/containers/

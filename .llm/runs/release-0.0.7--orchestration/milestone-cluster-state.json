@@ -6716,7 +6716,21 @@
     "claimedAt": "2026-09-03T14:21:14.837Z",
     "worktree": "/home/agent/projects/netscript/worktrees/007-canary10-preflight",
     "notesFile": "release-0.0.7-intro.md",
-    "previousReleaseTag": "v0.0.6"
+    "previousReleaseTag": "v0.0.6",
+    "ciConclusion": "FAILURE",
+    "ciFailure": "One pre-publish fixture imports unpublished @netscript/sdk@0.0.7; actual local query factory succeeds.",
+    "fixtureRepairCandidate": {
+      "headSha": "6884b7548a0fdc53a17c52ef343c6025a7527d93",
+      "branch": "fix/cli-prepublish-test-fixture",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-stable-fixture-repair",
+      "changedPublishedFiles": 0,
+      "focusedTests": {
+        "passed": 5,
+        "failed": 0
+      },
+      "independentReviewSession": "0039d1ad-72eb-4047-964c-8b326ff65902",
+      "state": "independent-review-running; owner canary-evidence exception pending"
+    }
   },
   "environmentState": {
     "dockerContainers": 0,
@@ -6735,7 +6749,7 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-03T14:21:14.837Z",
+  "updatedAt": "2026-09-03T14:52:00Z",
   "recoveredTopicSupervisors": [
     {
       "topic": "features",
@@ -6820,10 +6834,10 @@
   },
   "reporting": {
     "cadenceMinutes": 60,
-    "lastReportAt": "2026-09-03T14:21:14.837Z",
-    "nextReportDueAt": "2026-09-03T15:16:14.837Z",
-    "lastReportRef": "receipts/canary10-green-pair.json",
-    "headline": "Canary.10 publication and production GREEN; final README cleanup proof GREEN; all milestone issues closed. Primary claims sole stable writer.",
+    "lastReportAt": "2026-09-03T14:48:00Z",
+    "nextReportDueAt": "2026-09-03T15:43:00Z",
+    "lastReportRef": "receipts/stable-cut-fixture-diagnosis.md",
+    "headline": "All milestone issues closed; canary.10 GREEN. Stable PR1984 held on one proven pre-publication test-fixture error; excluded-test repair 5/0 and independent review running.",
     "currentMainSha": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
     "canary": {
       "target": "0.0.7-canary.10",
@@ -6862,7 +6876,7 @@
       "openIssueCount": 0,
       "ownedIssueCount": 0,
       "scheduledIssueCount": 0,
-      "openPullRequestCount": 1,
+      "openPullRequestCount": 2,
       "unscheduledIssueNumbers": []
     },
     "mergeQueue": [],
@@ -6957,14 +6971,33 @@
         "verifiedAt": "2026-09-03T07:59:00Z"
       }
     ],
-    "blockers": [],
+    "blockers": [
+      {
+        "id": "stable-prepublish-fixture",
+        "category": "test-harness",
+        "summary": "Stable-cut test imports 0.0.7 before it is published; resolver masks registry error as missing query.",
+        "impact": "PR1984 cannot merge green until the fixture correction lands; native canary inheritance currently rejects any test-only delta.",
+        "owner": "primary coordinator",
+        "nextAction": "Finish independent review of 6884b7548 and obtain explicit narrow product-evidence exception before changing the stable candidate.",
+        "ownerDecisionRequired": true
+      }
+    ],
     "environment": {
       "checkedAt": "2026-09-03T12:44:29Z",
       "aspireApplications": 0,
       "dockerContainers": 0,
       "dockerCustomNetworks": 0
     },
-    "ownerDecisions": []
+    "ownerDecisions": [
+      {
+        "id": "stable-fixture-canary-inheritance",
+        "question": "Authorize retaining canary.10 evidence after the publish-excluded test-only correction, with unchanged shipped files and independent review?",
+        "whyOwnerOnly": "Explicit current release doctrine allows only version-only immediate-parent inheritance; primary may not silently waive that boundary.",
+        "blockedItems": [
+          1984
+        ]
+      }
+    ]
   },
   "releasePreflight": {
     "gitHead": "a2d5b8b75083769b946c03ab772e08f2634e2b35",
