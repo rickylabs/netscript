@@ -11138,3 +11138,10 @@ Main `45e57377f`, ci green; releases through `v0.0.7-canary.9`, no stable tag. N
 internals-labelled or un-laned (0.0.7 or any milestone) besides #1641. Aspire opened #1975
 ("isolate DENO_INSTALL_ROOT for the verbatim README walk", `status:impl`) — the exact repair
 surfaced in D-286; not duplicated. Harness branch merged to main. Nothing to dispatch.
+
+### D-288 — reconcile at main 4afbd82a7: no owned or un-laned issue; #1975 (quickstart install-root isolation) merged; no new canary yet
+
+Main `4afbd82a7`, ci in progress. Owned internals issues 0; no un-laned 0.0.7 issue. #1975 and
+#1969 no longer open → merged; #1664 folded into changelog PR #1976 (docs, ready-merge). Latest
+canary still 9 (`33704380711`); next canary awaits coordinator dispatch. Harness branch merged to
+main. Nothing to dispatch; watchers cover main-CI reds, allocations, canary, stable tag.
