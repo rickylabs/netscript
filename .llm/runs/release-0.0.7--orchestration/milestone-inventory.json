@@ -5,7 +5,7 @@
   "capturedAt": "2026-08-30T13:51:57.000Z",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
   "ownerRatifiedAt": "2026-08-29T10:20:00.000Z",
-  "targetIssueCount": 113,
+  "targetIssueCount": 116,
   "issues": [
     {
       "number": 1093,
@@ -349,14 +349,16 @@
       "number": 1455,
       "title": "workers: preserve job payload type through definition, registry, and enqueue",
       "disposition": "active",
-      "lane": "features",
+      "lane": "fixes",
       "evidence": [
         "packages/plugin-triggers-core/src/builders/define-webhook.ts:79-81 — `enqueueJob<TJobId extends string, TPayload = unknown>(job: JobDefinition<TJobId>, ...)` still infers the payload independently of the job definition",
         "packages/plugin-workers-core/src/contracts/v1/workers.contract-types.ts:32-36 — JobTriggerInput still exposes `payload?: Record<string, unknown>`",
         "packages/cli/src/kernel/assets/registry-generator-fixture.ts:37 — generated registries still emit `new Map<string, JobHandler<any>>([`",
         "Partially superseded upstream: packages/plugin-workers-core/src/domain/job-definition.ts:153-163 and builders/job-builder.ts:241 already return JobDefinition<TId, TPayload, TResult>, so the builder-side erasure the issue describes is already gone",
         "gh api issues/1455/timeline — only cross-reference is rickylabs/eis-chat#168 (consumer repo), no netscript fix PR"
-      ]
+      ],
+      "priorLane": "features",
+      "ownershipEvidence": "Current orchestrator:fixes label and existing PR #1970 author; no topic relaunch."
     },
     {
       "number": 1458,
@@ -1122,21 +1124,27 @@
       "title": "[aspire-13-5 S8] Typed resource commands for db-cli-mode resources + excludeFromMcp() ownership",
       "disposition": "active",
       "lane": "features",
-      "evidence": ["https://github.com/rickylabs/netscript/issues/1720"]
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1720"
+      ]
     },
     {
       "number": 1721,
       "title": "[aspire-13-5 S9] Skills, corpora, and Aspire MCP alignment — with an exact-13.5.3 MCP smoke receipt",
       "disposition": "active",
       "lane": "internals",
-      "evidence": ["https://github.com/rickylabs/netscript/issues/1721"]
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1721"
+      ]
     },
     {
       "number": 1722,
       "title": "[aspire-13-5 S10] E2E gate upgrades: doctor receipt, describe --follow evidence, stop --force cleanup, resource-command gate class",
       "disposition": "active",
       "lane": "internals",
-      "evidence": ["https://github.com/rickylabs/netscript/issues/1722"]
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1722"
+      ]
     },
     {
       "number": 1723,
@@ -1153,7 +1161,9 @@
       "title": "[aspire-13-5 S13] Stale version-bound surface cleanup + parity phase 2 (complete enforcement)",
       "disposition": "active",
       "lane": "internals",
-      "evidence": ["https://github.com/rickylabs/netscript/issues/1724"]
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1724"
+      ]
     },
     {
       "number": 1730,
@@ -1310,6 +1320,38 @@
         "https://github.com/rickylabs/netscript/issues/1774",
         "The false Module-not-found hook reproduced in multiple active 0.0.7 supervisor/evaluator sessions and wastes every nested-cwd tool/stop event."
       ]
+    },
+    {
+      "number": 1971,
+      "title": "scaffold: production deno task build fails on catalog: zod specifier after db codegen",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1971",
+        "Owner continuing mandate: every remaining milestone-27 issue stays owned and scheduled; late intake reconciliation, not newly invented scope."
+      ]
+    },
+    {
+      "number": 1881,
+      "title": "test(aspire): clean-machine quickstart canary runs the root README sequence without manual recovery (#863 gate 3)",
+      "disposition": "active",
+      "lane": "internals",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1881",
+        "Owner continuing mandate: every remaining milestone-27 issue stays owned and scheduled; late intake reconciliation, not newly invented scope."
+      ]
+    },
+    {
+      "number": 1844,
+      "title": "ci(e2e-cli): runtime.wait.garnet times out at 300s on the Postgres scaffold-runtime tier",
+      "disposition": "active",
+      "lane": "fixes",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1844",
+        "Owner continuing mandate: every remaining milestone-27 issue stays owned and scheduled; late intake reconciliation, not newly invented scope."
+      ]
     }
-  ]
+  ],
+  "reconciledAt": "2026-09-03T08:15:00.000Z",
+  "reconciliationNote": "Preserve original frozen scope and historical intake timestamps; add three already-owner-scheduled open incident issues and refresh current state. Active inventory means committed scope, not GitHub-open state."
 }

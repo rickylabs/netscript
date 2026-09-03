@@ -175,7 +175,7 @@
       "id": "issue:1455",
       "kind": "issue",
       "issueNumber": 1455,
-      "lane": "features",
+      "lane": "fixes",
       "title": "workers: preserve job payload type through definition, registry, and enqueue"
     },
     {
@@ -723,6 +723,27 @@
       "issueNumber": 1774,
       "lane": "internals",
       "title": "fix(agentic): make Claude hook logging independent of turn cwd"
+    },
+    {
+      "id": "issue:1971",
+      "kind": "issue",
+      "issueNumber": 1971,
+      "lane": "fixes",
+      "title": "scaffold: production deno task build fails on catalog: zod specifier after db codegen"
+    },
+    {
+      "id": "issue:1881",
+      "kind": "issue",
+      "issueNumber": 1881,
+      "lane": "internals",
+      "title": "test(aspire): clean-machine quickstart canary runs the root README sequence without manual recovery (#863 gate 3)"
+    },
+    {
+      "id": "issue:1844",
+      "kind": "issue",
+      "issueNumber": 1844,
+      "lane": "fixes",
+      "title": "ci(e2e-cli): runtime.wait.garnet times out at 300s on the Postgres scaffold-runtime tier"
     }
   ],
   "edges": [
@@ -967,193 +988,257 @@
       "from": "issue:1745",
       "to": "issue:1749",
       "kind": "requires",
-      "evidence": ["#1749 was the bounded quickstart tree follow-up discovered while verifying #1745; PR #1755 merged as a5520e70b43fa792c36451270742240e0f2aa889 and closed it, satisfying this dependency."]
+      "evidence": [
+        "#1749 was the bounded quickstart tree follow-up discovered while verifying #1745; PR #1755 merged as a5520e70b43fa792c36451270742240e0f2aa889 and closed it, satisfying this dependency."
+      ]
     },
     {
       "from": "issue:1749",
       "to": "issue:1757",
       "kind": "requires",
-      "evidence": ["#1757's live 37-row changelog triage explicitly includes and classifies #1755's a5520e70 merge, so the final docs-asset predecessor had to land before PR #1761 could freeze its exact live range."]
+      "evidence": [
+        "#1757's live 37-row changelog triage explicitly includes and classifies #1755's a5520e70 merge, so the final docs-asset predecessor had to land before PR #1761 could freeze its exact live range."
+      ]
     },
     {
       "from": "issue:1713",
       "to": "issue:1714",
       "kind": "requires",
-      "evidence": ["S2 executes against the atomic exact-13.5.3 train established by S1."]
+      "evidence": [
+        "S2 executes against the atomic exact-13.5.3 train established by S1."
+      ]
     },
     {
       "from": "issue:1714",
       "to": "issue:1715",
       "kind": "requires",
-      "evidence": ["S3 captures fixtures from S2's observed 13.5.3 runtime shapes."]
+      "evidence": [
+        "S3 captures fixtures from S2's observed 13.5.3 runtime shapes."
+      ]
     },
     {
       "from": "issue:1713",
       "to": "issue:1716",
       "kind": "requires",
-      "evidence": ["S4 validates emission against the exact hosting train selected by S1."]
+      "evidence": [
+        "S4 validates emission against the exact hosting train selected by S1."
+      ]
     },
     {
       "from": "issue:1714",
       "to": "issue:1716",
       "kind": "requires",
-      "evidence": ["S4 consumes S2 V1 and deploy-command runtime observations."]
+      "evidence": [
+        "S4 consumes S2 V1 and deploy-command runtime observations."
+      ]
     },
     {
       "from": "issue:1716",
       "to": "issue:1717",
       "kind": "requires",
-      "evidence": ["The literal-port graph correction follows the 13.5 generator/API re-validation."]
+      "evidence": [
+        "The literal-port graph correction follows the 13.5 generator/API re-validation."
+      ]
     },
     {
       "from": "issue:1716",
       "to": "issue:1365",
       "kind": "cross-epic-order",
-      "evidence": ["#1365 is resolved inside S5 after S4 settles the generated discovery contract."]
+      "evidence": [
+        "#1365 is resolved inside S5 after S4 settles the generated discovery contract."
+      ]
     },
     {
       "from": "issue:1716",
       "to": "issue:1370",
       "kind": "cross-epic-order",
-      "evidence": ["#1370 is resolved inside S5 after S4 settles the generated contribution contract."]
+      "evidence": [
+        "#1370 is resolved inside S5 after S4 settles the generated contribution contract."
+      ]
     },
     {
       "from": "issue:1716",
       "to": "issue:979",
       "kind": "cross-epic-order",
-      "evidence": ["#979 is resolved inside the same S5 leaf after S4 re-validation."]
+      "evidence": [
+        "#979 is resolved inside the same S5 leaf after S4 re-validation."
+      ]
     },
     {
       "from": "issue:1717",
       "to": "issue:1718",
       "kind": "requires",
-      "evidence": ["S6 health checks bind to the randomized endpoint graph corrected by S5."]
+      "evidence": [
+        "S6 health checks bind to the randomized endpoint graph corrected by S5."
+      ]
     },
     {
       "from": "issue:1717",
       "to": "issue:1280",
       "kind": "requires",
-      "evidence": ["#1280 shares the S6 leaf and consumes S5's settled endpoint graph."]
+      "evidence": [
+        "#1280 shares the S6 leaf and consumes S5's settled endpoint graph."
+      ]
     },
     {
       "from": "issue:1714",
       "to": "issue:1719",
       "kind": "requires",
-      "evidence": ["S7 consumes S2 V6/V7 lifecycle observations."]
+      "evidence": [
+        "S7 consumes S2 V6/V7 lifecycle observations."
+      ]
     },
     {
       "from": "issue:1715",
       "to": "issue:1719",
       "kind": "requires",
-      "evidence": ["S7 runs teardown probes against the newly captured 13.5 ps fixtures."]
+      "evidence": [
+        "S7 runs teardown probes against the newly captured 13.5 ps fixtures."
+      ]
     },
     {
       "from": "issue:1718",
       "to": "issue:1720",
       "kind": "requires",
-      "evidence": ["S8 resource commands follow the settled S6 backing-resource readiness model."]
+      "evidence": [
+        "S8 resource commands follow the settled S6 backing-resource readiness model."
+      ]
     },
     {
       "from": "issue:1718",
       "to": "issue:863",
       "kind": "requires",
-      "evidence": ["#863 shares S8's bounded-wait and standalone database-operation leaf after S6 settles listener readiness."]
+      "evidence": [
+        "#863 shares S8's bounded-wait and standalone database-operation leaf after S6 settles listener readiness."
+      ]
     },
     {
       "from": "issue:1713",
       "to": "issue:1721",
       "kind": "requires",
-      "evidence": ["S9 regenerates shipped guidance against S1's exact version train."]
+      "evidence": [
+        "S9 regenerates shipped guidance against S1's exact version train."
+      ]
     },
     {
       "from": "issue:1714",
       "to": "issue:1721",
       "kind": "requires",
-      "evidence": ["S9 consumes S2's exact Aspire MCP/runtime behavior receipts."]
+      "evidence": [
+        "S9 consumes S2's exact Aspire MCP/runtime behavior receipts."
+      ]
     },
     {
       "from": "issue:1720",
       "to": "issue:1721",
       "kind": "requires",
-      "evidence": ["S9's MCP hidden-set proof consumes S8 excludeFromMcp ownership."]
+      "evidence": [
+        "S9's MCP hidden-set proof consumes S8 excludeFromMcp ownership."
+      ]
     },
     {
       "from": "issue:1675",
       "to": "issue:1721",
       "kind": "requires",
-      "evidence": ["S9 installs regenerated Aspire skills through #1675's canonical cross-host tree."]
+      "evidence": [
+        "S9 installs regenerated Aspire skills through #1675's canonical cross-host tree."
+      ]
     },
     {
       "from": "issue:1719",
       "to": "issue:1722",
       "kind": "requires",
-      "evidence": ["S10 embeds the stop/cleanup guarantees proven by S7."]
+      "evidence": [
+        "S10 embeds the stop/cleanup guarantees proven by S7."
+      ]
     },
     {
       "from": "issue:1720",
       "to": "issue:1722",
       "kind": "requires",
-      "evidence": ["S10's resource-command gate class consumes S8's typed commands."]
+      "evidence": [
+        "S10's resource-command gate class consumes S8's typed commands."
+      ]
     },
     {
       "from": "issue:1721",
       "to": "issue:1723",
       "kind": "requires",
-      "evidence": ["S11 public prose follows the finalized skill/MCP/static-resource surface."]
+      "evidence": [
+        "S11 public prose follows the finalized skill/MCP/static-resource surface."
+      ]
     },
     {
       "from": "issue:1722",
       "to": "issue:1723",
       "kind": "requires",
-      "evidence": ["S11 documents behavior only after the final E2E evidence contract is settled."]
+      "evidence": [
+        "S11 documents behavior only after the final E2E evidence contract is settled."
+      ]
     },
     {
       "from": "issue:1722",
       "to": "issue:1642",
       "kind": "requires",
-      "evidence": ["S11 documents detached-start and dashboard-token behavior after S10 settles the final E2E evidence contract."]
+      "evidence": [
+        "S11 documents detached-start and dashboard-token behavior after S10 settles the final E2E evidence contract."
+      ]
     },
     {
       "from": "issue:1713",
       "to": "issue:1724",
       "kind": "requires",
-      "evidence": ["S13 turns S1's phase-1 parity inventory into complete enforcement."]
+      "evidence": [
+        "S13 turns S1's phase-1 parity inventory into complete enforcement."
+      ]
     },
     {
       "from": "issue:1721",
       "to": "issue:1724",
       "kind": "requires",
-      "evidence": ["S13 closes all remaining agent/MCP/static-resource manifest rows after S9."]
+      "evidence": [
+        "S13 closes all remaining agent/MCP/static-resource manifest rows after S9."
+      ]
     },
     {
       "from": "issue:1723",
       "to": "issue:1724",
       "kind": "requires",
-      "evidence": ["S13 enforces complete parity only after public docs are refreshed."]
+      "evidence": [
+        "S13 enforces complete parity only after public docs are refreshed."
+      ]
     },
     {
       "from": "issue:1724",
       "to": "issue:1712",
       "kind": "requires",
-      "evidence": ["The Aspire umbrella closes by hand only after terminal S13 acceptance."]
+      "evidence": [
+        "The Aspire umbrella closes by hand only after terminal S13 acceptance."
+      ]
     },
     {
       "from": "issue:1694",
       "to": "issue:1730",
       "kind": "cross-epic-order",
-      "evidence": ["#1730 is the regression-net follow-up for #1694's shipped request-context contract."]
+      "evidence": [
+        "#1730 is the regression-net follow-up for #1694's shipped request-context contract."
+      ]
     },
     {
       "from": "issue:1371",
       "to": "issue:1732",
       "kind": "cross-epic-order",
-      "evidence": ["#1732 is the independently routed source-safety residual from #1371/#1728 evaluation."]
+      "evidence": [
+        "#1732 is the independently routed source-safety residual from #1371/#1728 evaluation."
+      ]
     },
     {
       "from": "issue:1675",
       "to": "issue:1737",
       "kind": "cross-epic-order",
-      "evidence": ["#1737 corrects two shipped skill-body paths against #1675's canonical tree."]
+      "evidence": [
+        "#1737 corrects two shipped skill-body paths against #1675's canonical tree."
+      ]
     }
   ],
   "waves": [
@@ -1340,11 +1425,15 @@
     },
     {
       "index": 17,
-      "nodeIds": ["issue:1724"]
+      "nodeIds": [
+        "issue:1724"
+      ]
     },
     {
       "index": 18,
-      "nodeIds": ["issue:1712"]
+      "nodeIds": [
+        "issue:1712"
+      ]
     },
     {
       "index": 19,
@@ -1359,6 +1448,24 @@
       "nodeIds": [
         "issue:1770",
         "issue:1774"
+      ]
+    },
+    {
+      "index": 21,
+      "nodeIds": [
+        "issue:1971"
+      ]
+    },
+    {
+      "index": 22,
+      "nodeIds": [
+        "issue:1881"
+      ]
+    },
+    {
+      "index": 23,
+      "nodeIds": [
+        "issue:1844"
       ]
     }
   ]

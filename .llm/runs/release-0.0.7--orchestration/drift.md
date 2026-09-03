@@ -1,5 +1,16 @@
 # Drift — release 0.0.7
 
+## 2026-09-03 restart delivery
+
+Main advanced to `94fe507af47171cd4f295e8f532b281d7147b334`: coordinator merged #1981 at 08:11:43Z after exact `650844452` check-test/quality/close-gate PASS and an empty unanswered-review-thread gate. Its original independent PASS stands; the OpenRouter PASS report was recovered from Actions artifact `openhands-agent-33715860434-1` and preserved in `receipts/pr-1981-openrouter-eval-33715860434.md`. This is not a new evaluation or a hidden override. Post-publication #1881/#863/#1712 acceptance remains open.
+
+The central inventory/DAG/state are reconciled, schema-v2 reporting is populated, and the generated status plus fresh PR export pass `harness:milestone:validate` with zero errors and findings. Five missing historical PR identities are repaired; old merged leaves no longer masquerade as waiting work. Three already-scheduled incident issues (#1844/#1881/#1971) are added to the ledger without inventing new scope. Eight live issues are owned and scheduled; four PRs remain (three product leaves plus coordinator #1641). Aspire remains its accepted fifth topic supervisor; the validator's historical four-lane schema grouping does not transfer its ownership to Internals.
+
+All five original native Fable 5.1 Remote Control supervisors are restored but provider-spend-capped, including Internals (now verified). Do not retry capped turns or substitute a model. Existing same-thread Codex authors for #1970/#1945/#1958 are actively shipping. #1958 corrected the retired preview-page probe; hosted run 33731170586 passed those pages then exposed the next stale `ServiceShowcaseLab` served-island expectation. Its same author is repairing that against the actual generated `PeopleIsland`, preserving real hydration/module evidence. #1970 and #1945 continue independently, then consume the shared acceptance repair if their exact runs show the same baseline failure.
+
+Next: consume exact-green merge packets; one meaningful next canary after candidate convergence, native workflow only, then require its exact published-version E2E pair before stable. No host runtime lease; last mise-scoped Aspire and DinD counts were zero at 07:50Z, custom networks not yet recounted. Preserve unrelated dirty `deno.lock` and all tracked run context. Continue delivery after this checkpoint.
+
+
 ## OS-update recovery — 2026-09-03 07:58Z
 
 See `receipts/recovery-2026-09-03.json` for exact live identities, heads and issue ownership.

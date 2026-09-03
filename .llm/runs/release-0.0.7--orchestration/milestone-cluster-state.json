@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "milestone": "0.0.7",
   "baselineMainSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-  "currentMainSha": "e14322c511bbf26018c617c12f639474b6092c32",
+  "currentMainSha": "94fe507af47171cd4f295e8f532b281d7147b334",
   "coordinator": {
     "agentId": "codex-root-0.0.7",
     "osUpdateRecoverySnapshot": "receipts/recovery-2026-09-03.json",
@@ -24,7 +24,9 @@
       "predecessorPr": 1755,
       "predecessorMergeSha": "a5520e70b43fa792c36451270742240e0f2aa889",
       "state": "docs_sequence_complete_final_base_successors_released_for_current_main_regeneration",
-      "releasedSuccessorPrs": [1758],
+      "releasedSuccessorPrs": [
+        1758
+      ],
       "rule": "each successor rebases onto current main, regenerates the corpus mechanically, and recuts exact-head evidence/evaluation when its head moves"
     },
     "verifiedAt": "2026-08-30T06:16:47.000Z",
@@ -210,7 +212,8 @@
       "pr1696": "merged_as_21d516224_after_fresh_fable5_impl_eval_pass_and_exact_head_ci_green_issue1694_closed",
       "canary2": "v0.0.7-canary.2_published_from_5bb112dd3_release_commit_2481b57d1_with_oidc_and_pinned_production_e2e_green",
       "parallelLaneRule": "feature_and_fix_queues_ship_independently; docs_internals_aspire_never_hold_them"
-    }
+    },
+    "queueAfterRestart": "Consume exact-green #1970/#1945/#1958 independently; #1981 merged. Fix resource stale probes before one next candidate; green publish + pinned production run before stable."
   },
   "limits": {
     "activeImplementationSlicesPerLane": 2,
@@ -223,6 +226,34 @@
       "id": "docs",
       "orchestratorAgentId": "topic-docs-0.0.7",
       "controller": {
+        "runtime": "claude",
+        "state": "provider-spend-capped",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
+        "branch": "orchestrator/release-0.0.7-docs",
+        "requestedModel": "claude-fable-5-1",
+        "observedModel": "claude-fable-5-1",
+        "requestedEffort": "low",
+        "observedEffort": "low",
+        "sessionId": "1e88fa17-749f-4294-9ee8-07ab1fa5555e",
+        "pid": 8918,
+        "bridgeSessionId": "session_01T3Wa3rFPDedjCNtaLqwHpF",
+        "remoteControlRequired": true,
+        "remoteControlUrl": "https://claude.ai/code/session_01T3Wa3rFPDedjCNtaLqwHpF",
+        "tmuxSession": "netscript-007-docs",
+        "attachmentVerifiedAt": "2026-09-03T07:50:00.000Z",
+        "recoveryFinding": "Same accepted native Fable session restored; all five monthly-spend-cap terminals independently observed. No quota/model override. Existing Codex authors continue under primary coordinator."
+      },
+      "issueNumbers": [
+        1551,
+        1745,
+        1723,
+        1749,
+        1000,
+        1757,
+        1642,
+        1770
+      ],
+      "controllerPriorRecovery": {
         "runtime": "claude",
         "state": "pr1746_pr1748_pr1755_pr1761_merged_shipped_docs_changelog_current_1723_source_blocked",
         "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
@@ -245,22 +276,65 @@
         "legacyState": "parked_offline",
         "recoveryDetectedAt": "2026-08-28T08:58:00.000Z",
         "recoveryFinding": "replacement Claude Opus 5/high supervisor is live at the exact clean topic checkpoint with bidirectional Remote Control active"
-      },
-      "issueNumbers": [
-        1000,
-        1551,
-        1642,
-        1723,
-        1745,
-        1749,
-        1757,
-        1770
-      ]
+      }
     },
     {
       "id": "internals",
       "orchestratorAgentId": "topic-internals-0.0.7",
       "controller": {
+        "runtime": "claude",
+        "state": "provider-spend-capped",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-internals",
+        "branch": "orchestrator/release-0.0.7-internals",
+        "requestedModel": "claude-fable-5-1",
+        "observedModel": "claude-fable-5-1",
+        "requestedEffort": "low",
+        "observedEffort": "low",
+        "sessionId": "98833bca-9714-4f63-8230-2e3929f6b103",
+        "pid": 8855,
+        "bridgeSessionId": "session_01CUWDTC8s7BS9tUWU8nrKge",
+        "remoteControlRequired": true,
+        "remoteControlUrl": "https://claude.ai/code/session_01CUWDTC8s7BS9tUWU8nrKge",
+        "tmuxSession": "netscript-007-internals",
+        "attachmentVerifiedAt": "2026-09-03T07:50:00.000Z",
+        "recoveryFinding": "Same accepted native Fable session restored; all five monthly-spend-cap terminals independently observed. No quota/model override. Existing Codex authors continue under primary coordinator."
+      },
+      "issueNumbers": [
+        1296,
+        1378,
+        1429,
+        1533,
+        1542,
+        1545,
+        1557,
+        1561,
+        1563,
+        1601,
+        1604,
+        1611,
+        1613,
+        1618,
+        1621,
+        1622,
+        1709,
+        1371,
+        1712,
+        1713,
+        1714,
+        1715,
+        1719,
+        1721,
+        1722,
+        1724,
+        1732,
+        1734,
+        1750,
+        1751,
+        1753,
+        1774,
+        1881
+      ],
+      "controllerPriorRecovery": {
         "runtime": "claude",
         "state": "r3_adopted_1828_p0_eval_active_1823_held_after_1820_1802_root_failure_diagnosis_required",
         "worktree": "/home/agent/projects/netscript/worktrees/007-internals",
@@ -348,46 +422,74 @@
           "scope": "admit fmt write-mode Failed to format M of N checked files completion, use the second integer as processed count, and add crash-only plus crash-and-drop controls at batch sizes 1/2/200 while preserving refusal >= crash >= ordinary finding and all accepted F1-F3/A1-A3 boundaries",
           "next": "same author pushes a clean plan-only amendment; fresh internals Tier-A is the final plan gate before coordinator implementation grant; no third PLAN-EVAL"
         }
-      },
-      "issueNumbers": [
-        1296,
-        1371,
-        1378,
-        1429,
-        1533,
-        1542,
-        1545,
-        1557,
-        1561,
-        1563,
-        1601,
-        1604,
-        1611,
-        1613,
-        1618,
-        1621,
-        1622,
-        1709,
-        1712,
-        1713,
-        1714,
-        1715,
-        1719,
-        1721,
-        1722,
-        1724,
-        1732,
-        1734,
-        1750,
-        1751,
-        1753,
-        1774
-      ]
+      }
     },
     {
       "id": "fixes",
       "orchestratorAgentId": "topic-fixes-0.0.7",
       "controller": {
+        "runtime": "claude",
+        "state": "provider-spend-capped",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-fixes",
+        "branch": "orchestrator/release-0.0.7-fixes",
+        "requestedModel": "claude-fable-5-1",
+        "observedModel": "claude-fable-5-1",
+        "requestedEffort": "low",
+        "observedEffort": "low",
+        "sessionId": "6b1bf71b-f57e-4f03-9b05-34cc62cadd3c",
+        "pid": 8792,
+        "bridgeSessionId": "session_018SSWZkA5iXGaM4M62ek9Hq",
+        "remoteControlRequired": true,
+        "remoteControlUrl": "https://claude.ai/code/session_018SSWZkA5iXGaM4M62ek9Hq",
+        "tmuxSession": "netscript-007-fixes",
+        "attachmentVerifiedAt": "2026-09-03T07:50:00.000Z",
+        "recoveryFinding": "Same accepted native Fable session restored; all five monthly-spend-cap terminals independently observed. No quota/model override. Existing Codex authors continue under primary coordinator."
+      },
+      "issueNumbers": [
+        1093,
+        1112,
+        1243,
+        1249,
+        1262,
+        1263,
+        1350,
+        1351,
+        1353,
+        1357,
+        1358,
+        1448,
+        1455,
+        1461,
+        1462,
+        1481,
+        1543,
+        1544,
+        1588,
+        1598,
+        1609,
+        1610,
+        1616,
+        1619,
+        1620,
+        1623,
+        1637,
+        979,
+        1365,
+        1368,
+        1370,
+        1672,
+        1673,
+        1674,
+        1675,
+        1677,
+        1695,
+        1716,
+        1717,
+        1737,
+        1971,
+        1844
+      ],
+      "controllerPriorRecovery": {
         "runtime": "claude",
         "state": "pr1739_cycle_1_fail_fix_bounded_inspection_protocol_plan_active",
         "worktree": "/home/agent/projects/netscript/worktrees/007-fixes",
@@ -455,53 +557,55 @@
           "evaluationFocus": "repaired F1 dynamic-import architecture and five fresh Tier-A claims only; accepted cycle-1 scope is not reopened",
           "next": "PASS returns for coordinator implementation grant; FAIL_PLAN exhausts the ordinary allowance, releases the evaluator, keeps the author available, and permits no cycle 3"
         }
-      },
-      "issueNumbers": [
-        979,
-        1093,
-        1112,
-        1243,
-        1249,
-        1262,
-        1263,
-        1350,
-        1351,
-        1353,
-        1357,
-        1358,
-        1365,
-        1368,
-        1370,
-        1448,
-        1461,
-        1462,
-        1481,
-        1543,
-        1544,
-        1588,
-        1598,
-        1609,
-        1610,
-        1616,
-        1619,
-        1620,
-        1623,
-        1637,
-        1672,
-        1673,
-        1674,
-        1675,
-        1677,
-        1695,
-        1716,
-        1717,
-        1737
-      ]
+      }
     },
     {
       "id": "features",
       "orchestratorAgentId": "topic-features-0.0.7",
       "controller": {
+        "runtime": "claude",
+        "state": "provider-spend-capped",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-features",
+        "branch": "orchestrator/release-0.0.7-features",
+        "requestedModel": "claude-fable-5-1",
+        "observedModel": "claude-fable-5-1",
+        "requestedEffort": "low",
+        "observedEffort": "low",
+        "sessionId": "8a722f0a-74b2-4f82-b822-88be00fc9eae",
+        "pid": 8729,
+        "bridgeSessionId": "session_01VyeBXMJmj5uPaQFngpkdgn",
+        "remoteControlRequired": true,
+        "remoteControlUrl": "https://claude.ai/code/session_01VyeBXMJmj5uPaQFngpkdgn",
+        "tmuxSession": "netscript-007-features",
+        "attachmentVerifiedAt": "2026-09-03T07:50:00.000Z",
+        "recoveryFinding": "Same accepted native Fable session restored; all five monthly-spend-cap terminals independently observed. No quota/model override. Existing Codex authors continue under primary coordinator."
+      },
+      "issueNumbers": [
+        1293,
+        1348,
+        1349,
+        1352,
+        1354,
+        1355,
+        1360,
+        1451,
+        1452,
+        1458,
+        1466,
+        1467,
+        1502,
+        1590,
+        1591,
+        1592,
+        1387,
+        1694,
+        1280,
+        1718,
+        1720,
+        1730,
+        863
+      ],
+      "controllerPriorRecovery": {
         "runtime": "claude",
         "state": "r3_rotated_from_atomic_checkpoint_9ef409dde_pr1762_pr1805_active",
         "worktree": "/home/agent/projects/netscript/worktrees/007-features",
@@ -535,33 +639,7 @@
           "resolution": "coordinator rewrote row 1 to PLAN-EVAL R2.1–R2.4, verified all four rows from #1662/#1711, and closed #1293 status:shipped at 2026-08-30T13:51:56Z",
           "resolutionCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369"
         }
-      },
-      "issueNumbers": [
-        863,
-        1293,
-        1348,
-        1349,
-        1352,
-        1354,
-        1355,
-        1360,
-        1387,
-        1451,
-        1452,
-        1455,
-        1458,
-        1466,
-        1467,
-        1502,
-        1590,
-        1591,
-        1592,
-        1694,
-        1280,
-        1718,
-        1720,
-        1730
-      ]
+      }
     }
   ],
   "watchers": [
@@ -577,37 +655,53 @@
   "committedIssues": [
     {
       "number": 863,
-      "state": "open"
+      "state": "open",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/863",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1000,
       "state": "closed",
       "closedAt": "2026-08-30T12:55:06.000Z",
-      "mergeCommitSha": "952cc106aafea61570d24247695ac23f5d810026"
+      "mergeCommitSha": "952cc106aafea61570d24247695ac23f5d810026",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1000",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1093,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1093",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1112,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1112",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1243,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1243",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1249,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1249",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1262,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1262",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1263,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1263",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1293,
@@ -615,395 +709,612 @@
       "closedAt": "2026-08-30T13:51:56.000Z",
       "closeReason": "completed",
       "acceptanceCorrection": "row 1 rewritten to formally accepted PLAN-EVAL R2.1–R2.4 public connected/transaction contract; all four rows checked from exact #1662/#1711 evidence",
-      "evidenceCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369"
+      "evidenceCommentUrl": "https://github.com/rickylabs/netscript/issues/1293#issuecomment-5469083369",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1293",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1296,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1296",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1348,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1348",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1349,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1349",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1350,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1350",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1351,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1351",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1352,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1352",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1353,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1353",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1354,
-      "state": "open"
+      "state": "open",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1354",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1355,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1355",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1357,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1357",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1358,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1358",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1360,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1360",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1378,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1378",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1429,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1429",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1448,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1448",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1451,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1451",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1452,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1452",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1455,
-      "state": "open"
+      "state": "open",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1455",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1458,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1458",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1461,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1461",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1462,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1462",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1466,
       "state": "closed",
       "closedAt": "2026-08-30T13:41:18.000Z",
-      "mergeCommitSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c"
+      "mergeCommitSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1466",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1467,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1467",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1481,
-      "state": "open"
+      "state": "open",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1481",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1502,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1502",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1533,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1533",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1542,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1542",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1543,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1543",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1544,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1544",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1545,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1545",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1551,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1551",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1557,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1557",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1561,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1561",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1563,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1563",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1588,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1588",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1590,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1590",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1591,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1591",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1592,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1592",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1598,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1598",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1601,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1601",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1604,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1604",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1609,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1609",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1610,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1610",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1611,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1611",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1613,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1613",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1616,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1616",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1618,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1618",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1619,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1619",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1620,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1620",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1621,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1621",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1622,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1622",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1623,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1623",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1637,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1637",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1709,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1709",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 979,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/979",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1365,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1365",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1368,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1368",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1370,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1370",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1371,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1371",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1387,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1387",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1672,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1672",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1673,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1673",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1674,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1674",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1675,
-      "state": "closed"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1675",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1677,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1677",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1694,
       "state": "closed",
       "closedAt": "2026-08-29T22:11:11.000Z",
-      "mergeCommitSha": "21d516224fe35e92957f0998ee848bbf2024eda0"
+      "mergeCommitSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1694",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1695,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1695",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1745,
       "state": "closed",
       "closedAt": "2026-08-30T12:30:25.000Z",
-      "mergeCommitSha": "f8b4f804cc5fe77054d4f220974eae66becf090c"
+      "mergeCommitSha": "f8b4f804cc5fe77054d4f220974eae66becf090c",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1745",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1749,
       "state": "closed",
       "closedAt": "2026-08-30T13:09:01.000Z",
-      "mergeCommitSha": "a5520e70b43fa792c36451270742240e0f2aa889"
+      "mergeCommitSha": "a5520e70b43fa792c36451270742240e0f2aa889",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1749",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1757,
       "state": "closed",
       "closedAt": "2026-08-30T13:36:42.000Z",
-      "mergeCommitSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81"
+      "mergeCommitSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1757",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1280,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1280",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1712,
-      "state": "open"
+      "state": "open",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1712",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1713,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1713",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1714,
       "state": "closed",
       "closedAt": "2026-08-30T12:27:43.000Z",
-      "mergeCommitSha": "625447f1b521e7fb0208fcfcc4ad3ea86cf52e21"
+      "mergeCommitSha": "625447f1b521e7fb0208fcfcc4ad3ea86cf52e21",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1714",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1715,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1715",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1716,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1716",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1717,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1717",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1718,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1718",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1719,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1719",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1720,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1720",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1721,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1721",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1722,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1722",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1723,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1723",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1724,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1724",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1730,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1730",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1732,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1732",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1734,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1734",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1737,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1737",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1750,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1750",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1751,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1751",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1753,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1753",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1642,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1642",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1770,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1770",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "number": 1774,
-      "state": "open"
+      "state": "closed",
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1774",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
+    },
+    {
+      "number": 1971,
+      "state": "open",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1971"
+      ],
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1971",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
+    },
+    {
+      "number": 1881,
+      "state": "open",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1881"
+      ],
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1881",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
+    },
+    {
+      "number": 1844,
+      "state": "open",
+      "evidence": [
+        "https://github.com/rickylabs/netscript/issues/1844"
+      ],
+      "githubEvidence": "https://github.com/rickylabs/netscript/issues/1844",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     }
   ],
   "leaves": [
@@ -1014,7 +1325,9 @@
       "baseBranch": "main",
       "headSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
       "currentPrHeadSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
-      "issueNumbers": [1694],
+      "issueNumbers": [
+        1694
+      ],
       "branch": "feat/ai-request-context",
       "prNumber": 1696,
       "implementationEvaluationState": "complete_cycle_1",
@@ -1027,8 +1340,15 @@
       "ciWorkflowRunId": 33277553650,
       "ciState": "success",
       "mergeCommitSha": "21d516224fe35e92957f0998ee848bbf2024eda0",
-      "mergedAt": "2026-08-29T22:11:10.000Z",
-      "nextGate": "terminal; issue #1694 closed by merged PR #1696"
+      "mergedAt": "2026-08-29T22:11:10Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
+        "nextGate": "terminal; issue #1694 closed by merged PR #1696"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "lint-partial-exclusion-fail-closed",
@@ -1037,7 +1357,9 @@
       "baseBranch": "main",
       "headSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
       "currentPrHeadSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
-      "issueNumbers": [1709],
+      "issueNumbers": [
+        1709
+      ],
       "implementerAgentId": "01a047f0-f17e-7692-b6f0-83a6d22888c9",
       "branch": "fix/lint-partial-exclusion-fail-closed",
       "worktree": "/home/codex/repos/netscript-007-lint-fail-closed",
@@ -1095,14 +1417,21 @@
       "implementationEvaluatedHeadSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
       "implementationEvaluationTopicCheckpointSha": "767479fbc78bfe87112b2021f01c51889e557559",
       "mergeCommitSha": "3b32d1628584749af4dd6e97fd331c24e84f0b9e",
-      "mergedAt": "2026-08-29T11:09:02.000Z",
-      "nextGate": "terminal; issue #1709 closed by merged PR #1710 after the foundations canary green-pair receipt",
+      "mergedAt": "2026-08-29T11:09:02Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1709",
         "https://github.com/rickylabs/netscript/pull/1710",
         "https://github.com/rickylabs/netscript/actions/runs/33248726023",
         "https://github.com/rickylabs/netscript/actions/runs/33248961170"
-      ]
+      ],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
+        "nextGate": "terminal; issue #1709 closed by merged PR #1710 after the foundations canary green-pair receipt"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "prisma-mysql-honest-example",
@@ -1111,7 +1440,9 @@
       "baseBranch": "main",
       "headSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
       "currentPrHeadSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
-      "issueNumbers": [1112],
+      "issueNumbers": [
+        1112
+      ],
       "implementerAgentId": "01a047f1-56bf-7060-b9c4-dbc5dc4ad2a8",
       "branch": "fix/prisma-mysql-honest-example",
       "worktree": "/home/codex/repos/netscript-007-leaf-prisma-mysql",
@@ -1225,8 +1556,8 @@
       },
       "expensiveGateContract": "Aspire, Docker, browser, scaffold.runtime, and e2e are n/a; no runtime lease may be requested",
       "mergeCommitSha": "3561bb64820602e065bf6df0afeed82b39062e42",
-      "mergedAt": "2026-08-29T22:28:24.000Z",
-      "nextGate": "terminal; issue #1112 closed by merged PR #1711",
+      "mergedAt": "2026-08-29T22:28:24Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
       "dependentIssueClosure": {
         "issueNumber": 1293,
         "state": "closed_completed",
@@ -1237,14 +1568,21 @@
       "receiptRefs": [
         "https://github.com/rickylabs/netscript/issues/1112",
         "https://github.com/rickylabs/netscript/pull/1711"
-      ]
+      ],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
+        "nextGate": "terminal; issue #1112 closed by merged PR #1711"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "comparison-docs-programme",
       "lane": "docs",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3",
+      "headSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
       "currentPrHeadSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
       "prNumber": 1652,
       "evaluatorCommitSha": "a790e91e26a4fb84636b4f3c57bd6444196b4ca9",
@@ -1255,7 +1593,9 @@
       "implementationEvaluatorAgentId": "c6950ed9-7405-4f28-9464-1e1977f2979c",
       "implementationEvaluatorCommitSha": "e95f4838038a27a0f209d2ce37c9f53bd4ed4299",
       "implementationEvaluationVerdict": "FAIL_FIX",
-      "issueNumbers": [1551],
+      "issueNumbers": [
+        1551
+      ],
       "implementerAgentId": "019ffcc9-16c2-7573-b7f6-d627172408e8",
       "evaluatorAgentId": "40a06314-b69a-4ca0-a4a0-1224c5e377ca",
       "branch": "docs/comparison-docs-programme",
@@ -1263,7 +1603,10 @@
       "receiptRefs": [],
       "ownerPriorityRewrite": {
         "requestCommentId": 5300459514,
-        "targetCommentIds": [5265826161, 5265971722],
+        "targetCommentIds": [
+          5265826161,
+          5265971722
+        ],
         "oldEvidenceHead": "5191de83f3da97559f21d8891c6c8afdf1cf473a",
         "authoritativeEvidenceHead": "5191de83f3da97559f21d8891c6c8afdf1cf473a",
         "newerProductHeadExists": false,
@@ -1312,20 +1655,27 @@
       "derivedAssetRepairFormalCycle3": "not_authorized",
       "readinessState": "complete",
       "mergeCommitSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
-      "mergedAt": "2026-08-15T07:21:13.000Z",
+      "mergedAt": "2026-08-15T07:21:13Z",
       "issueCompletionState": "closed_completed",
       "mergeReadinessCleanupFindings": [
         "replace the non-reproducible normalized digest claim with directly reproducible byte-identical evidence",
         "update the stale plan status",
         "correct the methodology section citation and already-proven Tier-A checkbox"
-      ]
+      ],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "d35cbca30872d1f55118d63437638e93270c2ac3"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "quality-scan-allowance-rail",
       "lane": "internals",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "09dfb092dccf7f843b9270295047d674a8187362",
+      "headSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8",
       "currentPrHeadSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8",
       "evaluatorCommitSha": "c694cfb311d378f4796280649042c8c275c828ed",
       "evaluationVerdict": "PASS",
@@ -1334,8 +1684,11 @@
       "implementationEvaluatorAgentId": "31c4cfa9-6610-4813-a4d2-482080fc562e",
       "implementationEvaluatorCommitSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8",
       "mergeCommitSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
-      "mergedAt": "2026-08-15T05:04:49.000Z",
-      "issueNumbers": [1378, 1545],
+      "mergedAt": "2026-08-15T05:04:49Z",
+      "issueNumbers": [
+        1378,
+        1545
+      ],
       "implementerAgentId": "019ffcc9-97d6-7602-bb7d-582ecc92b069",
       "evaluatorAgentId": "b6c48f02-cb56-4dae-abfd-e46bdec05bd5",
       "branch": "chore/quality-scan-allowance-rail",
@@ -1344,20 +1697,32 @@
         ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-4/check-binding.json",
         ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-4/test-binding.json",
         ".llm/runs/release-0.0.7-internals--orchestration/slices/quality-scan-allowance-rail/receipts/slice-4/quality-job.json"
-      ]
+      ],
+      "prNumber": 1653,
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "09dfb092dccf7f843b9270295047d674a8187362"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "harness-evidence-and-verdict-tooling",
       "lane": "internals",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f",
+      "headSha": "d6e6a6788cd38127f822d192f37557106dad4ebc",
       "currentPrHeadSha": "d6e6a6788cd38127f822d192f37557106dad4ebc",
       "evaluatorCommitSha": "d6e6a6788cd38127f822d192f37557106dad4ebc",
       "evaluationVerdict": "PASS",
       "mergeCommitSha": "dd472102d05ea13ab7ac7654aeedb177fbae2eb8",
-      "mergedAt": "2026-08-14T23:27:02.000Z",
-      "issueNumbers": [1561, 1563, 1621],
+      "mergedAt": "2026-08-14T23:27:02Z",
+      "issueNumbers": [
+        1561,
+        1563,
+        1621
+      ],
       "implementerAgentId": "019ffcc9-97ba-7770-a890-a1ebd80ec793",
       "evaluatorAgentId": "1afc9054-cc28-48a8-9fc4-86ae2e3bb28d",
       "branch": "fix/harness-evidence-and-verdict-tooling",
@@ -1366,32 +1731,50 @@
         ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/check.receipt.json",
         ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/test.receipt.json",
         ".llm/runs/release-0.0.7-internals--orchestration/slices/harness-evidence-and-verdict-tooling/receipts/final/quality-job.receipt.json"
-      ]
+      ],
+      "prNumber": 1644,
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "4d9fb196765cbf1a6bc7eaa7c18ec82b237ab89f"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "legacy-port-pin-sweep",
       "lane": "fixes",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "e6ba15ec6414c0a42b1f9870791131162ea71c36",
+      "headSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
       "currentPrHeadSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
       "evaluatorCommitSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
       "evaluationVerdict": "PASS",
       "mergeCommitSha": "0b3ed5d5a6aea451318f120988c25dfa3993a2ab",
-      "mergedAt": "2026-08-14T23:39:37.000Z",
-      "issueNumbers": [1243],
+      "mergedAt": "2026-08-14T23:39:37Z",
+      "issueNumbers": [
+        1243
+      ],
       "implementerAgentId": "019ffcca-8bdc-7fb3-98c5-df90e2ae3b1f",
       "evaluatorAgentId": "8c47751a-6a30-4dab-b25c-dbafe9873455",
       "branch": "fix/legacy-port-pin-sweep",
       "worktree": "/home/codex/repos/netscript-007-leaf-legacy-port-pin-sweep",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "prNumber": 1643,
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "e6ba15ec6414c0a42b1f9870791131162ea71c36"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "scaffold-generated-output-correctness",
       "lane": "fixes",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5",
+      "headSha": "7cfaf70cc5a42e74af4ae8b7be76d5a5cbf4fcc5",
       "currentPrHeadSha": "7cfaf70cc5a42e74af4ae8b7be76d5a5cbf4fcc5",
       "evaluatorCommitSha": "b8fc5eb53a530d337602f7dc377239651a57d428",
       "evaluationCycle": 2,
@@ -1410,7 +1793,7 @@
       "implementationEvaluatorCommitSha": "70843d169d4e7f4c8f810d663a142cc66b7969ff",
       "implementationEvaluationVerdict": "PASS",
       "mergeCommitSha": "da574111af05a5cded74250128b196fcab870274",
-      "mergedAt": "2026-08-15T05:36:48.000Z",
+      "mergedAt": "2026-08-15T05:36:48Z",
       "postMergeCi": {
         "state": "success",
         "ciRunId": 31867377599,
@@ -1420,7 +1803,11 @@
         "qualityDuration": "1m48s",
         "warning": "actions/upload-artifact@v5 forced to Node.js 24 because Node.js 20 is deprecated"
       },
-      "issueNumbers": [1262, 1263, 1588],
+      "issueNumbers": [
+        1262,
+        1263,
+        1588
+      ],
       "implementerAgentId": "019ffcca-8be0-74c2-bb0e-c82cf5ce3c85",
       "evaluatorAgentId": "06451c1e-a9b8-47d2-8934-be2247ef5347",
       "branch": "fix/scaffold-generated-output-correctness",
@@ -1451,16 +1838,26 @@
           "aspirePostcondition": "empty",
           "dockerPostcondition": "empty"
         }
-      }
+      },
+      "prNumber": 1654,
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "5b3c6fcf21b0b4947a770d8e67ea5cc8082724d5"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "design-registry-catalog-drift-gate",
       "lane": "fixes",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "da574111af05a5cded74250128b196fcab870274",
+      "headSha": "b71c1ee723813dd384a6490f342360f9a434a89e",
       "currentPrHeadSha": "b71c1ee723813dd384a6490f342360f9a434a89e",
-      "issueNumbers": [1358],
+      "issueNumbers": [
+        1358
+      ],
       "implementerAgentId": "01a003f0-7821-7a10-a555-e619a9280479",
       "branch": "fix/design-registry-catalog-drift-gate",
       "worktree": "/home/codex/repos/netscript-007-leaf-design-registry-drift",
@@ -1524,20 +1921,29 @@
       "postEvaluationBodyRecheckCommentUrl": "https://github.com/rickylabs/netscript/pull/1657#issuecomment-5301330685",
       "readinessState": "complete",
       "mergeCommitSha": "6917c656eebdfda1ac65d509f6a5f55c93f38774",
-      "mergedAt": "2026-08-15T08:27:20.000Z",
+      "mergedAt": "2026-08-15T08:27:20Z",
       "issueCompletionState": "closed_completed",
       "receiptRefs": [
         ".llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json"
-      ]
+      ],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "da574111af05a5cded74250128b196fcab870274"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "quality-scan-root-coverage",
       "lane": "internals",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687",
+      "headSha": "b80794470cd175ad89d27c06a764ab1d032d3d9f",
       "currentPrHeadSha": "b80794470cd175ad89d27c06a764ab1d032d3d9f",
-      "issueNumbers": [1542],
+      "issueNumbers": [
+        1542
+      ],
       "implementerAgentId": "01a003d2-61ee-7ec0-8c74-075b3d631168",
       "branch": "fix/quality-scan-root-coverage",
       "worktree": "/home/codex/repos/netscript-007-quality-root-coverage",
@@ -1580,18 +1986,28 @@
       "readinessState": "complete",
       "readinessFollowUp": "pre-existing .llm lint exclusion can silently omit tooling files from mixed lint batches",
       "mergeCommitSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
-      "mergedAt": "2026-08-15T07:09:12.000Z",
+      "mergedAt": "2026-08-15T07:09:12Z",
       "issueCompletionState": "closed_completed",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "473e8d75b5281c93dc4729d99f3358a34f2bd687"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "openhands-dispatch-claim-and-refusal",
       "lane": "internals",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4",
+      "headSha": "bf07062987088809133ccacd380be6b016b511ed",
       "currentPrHeadSha": "bf07062987088809133ccacd380be6b016b511ed",
-      "issueNumbers": [1611, 1613],
+      "issueNumbers": [
+        1611,
+        1613
+      ],
       "implementerAgentId": "01a00443-abab-7261-8905-74ed71467929",
       "branch": "fix/openhands-dispatch-claim-and-refusal",
       "worktree": "/home/codex/repos/netscript-007-openhands-dispatch",
@@ -1666,7 +2082,7 @@
       "readinessState": "complete",
       "readinessChecks": "21 terminal: 7 success, 14 policy skips, 0 failed, 0 active; 0 review threads; mergeState CLEAN",
       "mergeCommitSha": "05fc3132b6800a85eb6152691a961b658962571b",
-      "mergedAt": "2026-08-15T10:13:45.000Z",
+      "mergedAt": "2026-08-15T10:13:45Z",
       "issueCompletionState": "1611 and 1613 closed; PR and both issues have sole status:shipped",
       "fableAvailabilityProbe": {
         "state": "failed_pre_inference_zero_cycle",
@@ -1695,16 +2111,27 @@
         ],
         "formalPlanEvaluationRequired": true
       },
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "7737d8903bb2925c3fcefbda362168fe297eebd4"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "package-gate-honesty",
       "lane": "internals",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "05fc3132b6800a85eb6152691a961b658962571b",
+      "headSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
       "currentPrHeadSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
-      "issueNumbers": [1604, 1618, 1622],
+      "issueNumbers": [
+        1604,
+        1618,
+        1622
+      ],
       "implementerAgentId": "01a004ec-86a6-7c21-8886-81c09de099f5",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/package-gate-honesty",
@@ -1801,15 +2228,27 @@
         "canonicalCorrection": "relaunched once with canonical token claude-fable-5, medium, Remote Control, and exact worktree"
       },
       "implementationSlices": {
-        "s1": { "state": "complete", "headSha": "4b988a381" },
-        "s2": { "state": "complete", "headSha": "22dc3906e" },
-        "s3": { "state": "complete", "headSha": "fd508978c" },
+        "s1": {
+          "state": "complete",
+          "headSha": "4b988a381"
+        },
+        "s2": {
+          "state": "complete",
+          "headSha": "22dc3906e"
+        },
+        "s3": {
+          "state": "complete",
+          "headSha": "fd508978c"
+        },
         "s4": {
           "state": "complete",
           "evidenceHeadSha": "cf31de902",
           "commentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5387191370"
         },
-        "s5": { "state": "complete_after_focused_fix", "headSha": "cfa055bb8" }
+        "s5": {
+          "state": "complete_after_focused_fix",
+          "headSha": "cfa055bb8"
+        }
       },
       "implementationEvaluation": {
         "state": "complete_pass",
@@ -1846,7 +2285,7 @@
         "firstAttemptFinding": "infrastructure-only deno.land HTTP/2 excessive-load refusal while downloading deno_dom; failed-job-only retry passed without a head move"
       },
       "mergeCommitSha": "cf648f1ff973d74c213bb125a6f5f5b9328e693b",
-      "mergedAt": "2026-08-28T10:08:41.000Z",
+      "mergedAt": "2026-08-28T10:08:41Z",
       "mergeCommentUrl": "https://github.com/rickylabs/netscript/pull/1663#issuecomment-5451251321",
       "issueCompletionState": "1604_1618_1622_closed_completed_status_shipped",
       "siblingPackageBlindSpotSweep": {
@@ -1860,18 +2299,28 @@
         "scope": "pre-existing MCP export-map private-type-ref diagnostics kept outside the frozen 0.0.7 leaf"
       },
       "closeoutState": "shipped_terminal_worktree_and_topic_branch_removed",
-      "nextGate": "none_leaf_terminal",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
       "nextSerialLeaf": "L-2 mixed lint-batch exclusion scope audit",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "05fc3132b6800a85eb6152691a961b658962571b",
+        "nextGate": "none_leaf_terminal",
+        "blocker": null
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "reference-export-drift-gate",
       "lane": "internals",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
+      "headSha": "92988da30a4468f5ea77ea4e5a3e243469f92e52",
       "currentPrHeadSha": "92988da30a4468f5ea77ea4e5a3e243469f92e52",
-      "issueNumbers": [1296],
+      "issueNumbers": [
+        1296
+      ],
       "implementerAgentId": "01a005d2-7c9d-7dd1-b6fc-531b72dc14e4",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/reference-export-drift-gate",
@@ -2087,16 +2536,23 @@
       "sa4NextGate": "complete; PR merged at exact evaluated head and issue #1296 closed",
       "expensiveGateContract": "no runtime lease; scaffold.runtime and fresh-browser are matrix n/a for this checker/docs/JSDoc/task/workflow-only leaf",
       "mergeCommitSha": "2dd1a75ef55637816b80e04462cc26fa89631b12",
-      "mergedAt": "2026-08-15T22:30:51.000Z",
+      "mergedAt": "2026-08-15T22:30:51Z",
       "issueCompletionState": "#1296 closed at 2026-08-15T22:30:52Z; shipped-label reconciliation pending recovery",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "comparison-vs-pages",
       "lane": "docs",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8",
+      "headSha": "615786c1a93c39e7f6b9a1b40b5cee39b163ff8a",
       "currentPrHeadSha": "615786c1a93c39e7f6b9a1b40b5cee39b163ff8a",
       "issueNumbers": [],
       "ownerDirectedIssueNumbers": [
@@ -2120,7 +2576,7 @@
       "readinessState": "merged",
       "formalImplementationEvaluation": "owner-authorized skip; independent Tier-A is the only review",
       "mergeCommitSha": "729386c567bfbd0b8c7f86a4ed09348f0a8a4ad8",
-      "mergedAt": "2026-08-15T09:25:56.000Z",
+      "mergedAt": "2026-08-15T09:25:56Z",
       "issueCompletionState": "closed_8_of_8_status_shipped",
       "pagesDeploymentRunId": 31876977060,
       "pagesDeploymentState": "PASS",
@@ -2140,14 +2596,21 @@
         "verify the public baseContract chain with deno doc",
         "type-check both central NetScript snippets with uncommitted scratch fixtures"
       ],
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "e090f894ff3682405a36e4f896ffd2cc16f9a1f8"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "ai-mcp-pool-isolation",
       "lane": "fixes",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
+      "headSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
       "currentPrHeadSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
       "issueNumbers": [
         1448
@@ -2216,7 +2679,7 @@
       "readinessState": "complete",
       "readinessChecks": "21 terminal current-head checks: success or policy skip, zero failures/active; zero review threads; corrected PR body; MERGEABLE/CLEAN",
       "mergeCommitSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
-      "mergedAt": "2026-08-15T10:54:05.000Z",
+      "mergedAt": "2026-08-15T10:54:05Z",
       "issueCompletionState": "#1448 closed; PR #1661 and issue #1448 both have sole status:shipped",
       "ciFailure": {
         "state": "resolved_repair_under_formal_evaluation",
@@ -2229,16 +2692,29 @@
         "repairOwner": "preserved Codex author 01a0048d-61b0-76a2-8117-5f8ce0466495",
         "repairBoundary": "restore both computed @tanstack specifiers in tanstack-connector.ts; keep the CLI assertion intact; fresh Tier-A and proportionate IMPL-EVAL required after push"
       },
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "284dda90a17a13a7e5e8e9834e5411b58887131b"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "sdk-cache-surface-and-telemetry",
       "lane": "fixes",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184",
+      "headSha": "ac274a46489b9ab746e5be22ca71300ed94eaadb",
       "currentPrHeadSha": "ac274a46489b9ab746e5be22ca71300ed94eaadb",
-      "issueNumbers": [1637, 1619, 1620, 1598, 1623],
+      "issueNumbers": [
+        1637,
+        1619,
+        1620,
+        1598,
+        1623
+      ],
       "implementerAgentId": "01a00516-2033-7ed3-936a-a616cee47447",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cache-surface-and-telemetry",
@@ -2325,7 +2801,7 @@
       "readinessState": "complete",
       "readinessDisposition": "exact-head checks terminal green or intentionally skipped, review threads empty, sole lifecycle status advanced to ready-merge, and coordinator squash merge complete",
       "mergeCommitSha": "3e8e146a4aedf8ee0afec15c83ddaefc171c71f9",
-      "mergedAt": "2026-08-15T16:29:46.000Z",
+      "mergedAt": "2026-08-15T16:29:46Z",
       "issueCompletionState": "PR #1665 shipped; issues #1598, #1619, #1620, #1623, and #1637 closed automatically from verified closing keywords",
       "readinessRunId": 31892668157,
       "readinessFailureJobId": 95031217843,
@@ -2386,7 +2862,14 @@
       "ciSkipSmoke": "plan/run-artifact-only PR #1665 skipped check-test, quality, desktop-native-linux, both scaffold runtimes, scaffold-static, deps-report, surface-diff, close-gate, and lane visibility checks as classified",
       "crossPackageGateContract": "repo-root test or every asserting package gate must be named; package-local green is insufficient for SDK source/public-surface changes",
       "expensiveGateContract": "no Aspire, Docker, or e2e:cli gate is currently load-bearing or authorized",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "baf1cdf67a4e931af17b4772ddf6101f36152184"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "sdk-cached-entry-swr",
@@ -2395,7 +2878,9 @@
       "baseBranch": "main",
       "headSha": "313cc08d572ea7db1764abf2efdcc11f7a63abde",
       "currentPrHeadSha": "313cc08d572ea7db1764abf2efdcc11f7a63abde",
-      "issueNumbers": [1461],
+      "issueNumbers": [
+        1461
+      ],
       "implementerAgentId": "01a00646-82a9-7ec2-88e7-16dea98a58fa",
       "implementerRoute": "openai / gpt-5.6-sol / medium / approval never / dangerFullAccess",
       "branch": "fix/sdk-cached-entry-swr",
@@ -2403,7 +2888,7 @@
       "prNumber": 1669,
       "implementationState": "merged_and_issue_shipped",
       "mergeCommitSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
-      "mergedAt": "2026-08-15T19:39:50.000Z",
+      "mergedAt": "2026-08-15T19:39:50Z",
       "planHeadSha": "23db20f301d06ed1e4a9a65cbbf64349f89cb8c0",
       "dispatchTopicHeadSha": "f9bb928cedeaf91174db4e70f877143028481232",
       "planGate": "research and contract decisions only; resolve the stale docs paths, choose the supported API boundary, open one draft PR, and stop before implementation; PLAN-EVAL is required",
@@ -2478,8 +2963,6 @@
       "closeGateCiRunId": 31904125478,
       "closeGateCiRunUrl": "https://github.com/rickylabs/netscript/actions/runs/31904125478",
       "closeGateCiResult": "PASS: mirror checked all six #1461 boxes; close-gate, quality, check-test, and core CI lane visibility terminal success",
-      "mergeCommitSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
-      "mergedAt": "2026-08-15T19:39:50.000Z",
       "issueCompletionState": "#1461 closed at 2026-08-15T19:39:51Z with six of six boxes checked and exactly status:shipped; PR #1669 exactly status:shipped",
       "advisoryDisposition": "non-blocking cross-page consistency and warm-stale persistence-failure docs caveat remain outside the evaluated scope; filed as Backlog/Triage issue #1670 from reviewed draft 70307f47c",
       "advisoryFollowUpIssueUrl": "https://github.com/rickylabs/netscript/issues/1670",
@@ -2493,16 +2976,25 @@
         "implementerRoute": "openai / gpt-5.6-sol / medium / plan-only"
       },
       "expensiveGateContract": "no runtime lease during research or planning",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "313cc08d572ea7db1764abf2efdcc11f7a63abde"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "sdk-typed-error-channel",
       "lane": "fixes",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
+      "headSha": "686bae07b2bc66353b2eec9dd56baa0779a63a20",
       "currentPrHeadSha": "686bae07b2bc66353b2eec9dd56baa0779a63a20",
-      "issueNumbers": [1350],
+      "issueNumbers": [
+        1350
+      ],
       "implementerAgentId": "01a006f3-ae2d-7941-bd17-2ac71dd3d0f0",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess / Remote Control",
       "branch": "fix/sdk-typed-error-channel",
@@ -2622,12 +3114,19 @@
       "publicRecordState": "PR body exact-head current with 9/9 DoD, strict seven-entry acceptance-evidence YAML, #1350 mirrored 7/7, stale comments rewritten in place, and follow-up issue 1693 filed",
       "readinessState": "complete",
       "mergeCommitSha": "c73d361eea14a7f40702638638e492f2ca961a59",
-      "mergedAt": "2026-08-23T09:58:53.000Z",
+      "mergedAt": "2026-08-23T09:58:53Z",
       "issueCompletionState": "1350 closed COMPLETED and PR/issue labeled status:shipped",
       "terminalCleanup": "leaf and evaluator processes stopped; both worktrees and local/remote topic branch removed after merge",
-      "nextGate": "terminal_merged",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
       "expensiveGateContract": "no runtime lease; no Aspire, Docker, e2e:cli, browser, or runtime gate during plan evaluation",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "0ef48c2ec661a7e6d55ec2faf5def6ae7dd2e6eb",
+        "nextGate": "terminal_merged"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "prisma-mysql-adapter-surface",
@@ -2683,7 +3182,7 @@
       "readinessState": "complete",
       "readinessDisposition": "exact-head checks terminal green with zero review threads; coordinator merge complete",
       "mergeCommitSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "mergedAt": "2026-08-15T10:27:29.000Z",
+      "mergedAt": "2026-08-15T10:27:29Z",
       "issueCompletionState": "PR #1662 shipped the accepted R2.1–R2.4 product contract; after #1711 shipped the executable example, coordinator corrected stale row 1, verified all four rows, and closed #1293 COMPLETED/status:shipped at 2026-08-30T13:51:56Z",
       "planEvaluatorTerminalMetadata": "stale working state; terminal response and exact pushed verdict commit independently verified by coordinator",
       "splitCloseContract": "historical contract satisfied: product PR used Part of #1293 and merged on product gates while #1293 remained open; #1711 later rewrote and verified the docs example before row 4 and issue closure",
@@ -2710,23 +3209,33 @@
         ".llm/runs/feat-prisma-mysql-adapter-surface--1293/evaluate.md",
         ".llm/runs/feat-prisma-mysql-adapter-surface--1293/acceptance-evidence.md",
         "https://github.com/rickylabs/netscript/pull/1711"
-      ]
+      ],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "app-service-client-wiring",
       "lane": "features",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
-      "currentPrHeadSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
+      "headSha": "67d3fd3128a93412b6ed87402bd2e31fbd59fdbf",
+      "currentPrHeadSha": "67d3fd3128a93412b6ed87402bd2e31fbd59fdbf",
       "lastProductHeadSha": "3fc0f2f9221a8246f0d26a26189bafb2647be08a",
-      "issueNumbers": [1355, 1360],
+      "issueNumbers": [
+        1355,
+        1360
+      ],
       "implementerAgentId": "01a004f9-f033-7592-a0bc-63927753fb43",
       "implementerRoute": "openai / gpt-5.6-sol / high / approval never / dangerFullAccess",
       "branch": "feat/app-service-client-wiring",
       "worktree": "/home/codex/repos/netscript-007-features-1355 (removed after terminal attempt 7)",
       "prNumber": 1664,
-      "blocker": "attempt 7 terminal behavior red at 68/1/0; fresh-browser, retry, IMPL-EVAL, and merge withheld",
+      "blocker": null,
       "implementationState": "attempt7_terminal_behavior_red_lease_released_no_retry_fresh_browser_and_impl_eval_withheld",
       "dispatchTopicHeadSha": "0d0ba1b7a404c847acba2daed40c69d282906f69",
       "planGate": "author must open a draft PR at the first slice, produce research and plan, and stop before implementation",
@@ -3011,14 +3520,24 @@
       },
       "planDecisionBoundary": "cycle 1 ruled direct emitted { queryKey: <svc>Queries.list.clientKey() } with no SDK overload; repair must lock generator-owned output paths, existing service generate overwrite/dry-run/force compatibility, package README homes, post-mutation request-count proof, per-slice paths, and qualified citations",
       "expensiveGateContract": "both gates are load-bearing after cheap convergence: scaffold.runtime uses its suite-owned release-gate command/evidence plus central lease (never run-gate catalog); fresh-browser uses the catalog receipt; run serially only after coordinator grant",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "a257807d883ac9cd8d692d441bba1760290d4dab",
+        "blocker": "attempt 7 terminal behavior red at 68/1/0; fresh-browser, retry, IMPL-EVAL, and merge withheld"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "4afbd82a78f9f825b46b1dfdb6034ca3d45c514d",
+      "mergedAt": "2026-09-03T03:02:52Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "rfc-plugin-cli-contribution",
       "lane": "features",
       "phase": "merged",
       "baseBranch": "main",
-      "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9",
+      "headSha": "ec69100c89195adb776c4cef3724c8c3683c553c",
       "currentPrHeadSha": "ec69100c89195adb776c4cef3724c8c3683c553c",
       "evaluatorCommitSha": "3e0c8858b4a2552926d2965b62cbcc97a15c2935",
       "evaluationVerdict": "PASS",
@@ -3054,7 +3573,7 @@
       "ownerDispositionCommentUrl": "https://github.com/rickylabs/netscript/pull/1651#issuecomment-5301349600",
       "readinessState": "complete",
       "mergeCommitSha": "284dda90a17a13a7e5e8e9834e5411b58887131b",
-      "mergedAt": "2026-08-15T08:28:46.000Z",
+      "mergedAt": "2026-08-15T08:28:46Z",
       "issueCompletionState": "closed_completed",
       "ownerMergeHold": {
         "commentId": 5300440887,
@@ -3079,12 +3598,22 @@
           "formalReview": "fresh opposite-family Tier-A followed by one bounded final IMPL-EVAL over the amendment and prior conditional body correction"
         }
       },
-      "issueNumbers": [1502],
+      "issueNumbers": [
+        1502
+      ],
       "implementerAgentId": "019ffcc5-d3e1-7c13-9815-e9956ec43683",
       "evaluatorAgentId": "28cc8106-967b-4fb7-90f3-dd95054ae953",
       "branch": "docs/rfc-plugin-cli-contribution",
       "worktree": "/home/codex/repos/netscript-007-features-1502",
-      "receiptRefs": []
+      "receiptRefs": [],
+      "prNumber": 1651,
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "12276e6d86403ed1340ef79a963e87d401d643e9"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued."
     },
     {
       "id": "aspire-declared-reference-fail-fast",
@@ -3093,7 +3622,9 @@
       "baseBranch": "main",
       "headSha": "1b67b03b4ee7e488c8da266b686bd3b72d479071",
       "currentPrHeadSha": "1b67b03b4ee7e488c8da266b686bd3b72d479071",
-      "issueNumbers": [1371],
+      "issueNumbers": [
+        1371
+      ],
       "branch": "fix/aspire-declared-reference-fail-fast",
       "prNumber": 1728,
       "implementationEvaluationState": "complete_cycle_1",
@@ -3104,8 +3635,15 @@
       "ciWorkflowRunId": 33278449272,
       "ciState": "success",
       "mergeCommitSha": "8b1e42f725919457c64781d5973fd419017fab13",
-      "mergedAt": "2026-08-29T22:30:08.000Z",
-      "nextGate": "terminal; issue #1371 closed by merged PR #1728"
+      "mergedAt": "2026-08-29T22:30:08Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "1b67b03b4ee7e488c8da266b686bd3b72d479071",
+        "nextGate": "terminal; issue #1371 closed by merged PR #1728"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "agent-init-guidance-and-cross-host-skills",
@@ -3114,14 +3652,25 @@
       "baseBranch": "main",
       "headSha": "608f68b076bfb724d111bdaf075fd4111703d937",
       "currentPrHeadSha": "608f68b076bfb724d111bdaf075fd4111703d937",
-      "issueNumbers": [1672, 1674, 1675],
+      "issueNumbers": [
+        1672,
+        1674,
+        1675
+      ],
       "branch": "fix/agent-init-guidance-and-cross-host-skills",
       "worktree": "/home/codex/repos/netscript-007-leaf-agent-init",
       "prNumber": 1729,
       "implementationState": "merged after exact-head Tier-A, IMPL-EVAL, CI, and close gate; issues #1672/#1674/#1675 closed",
       "mergeCommitSha": "13878a80a50c55b9662099fed64555f2310ae4a3",
-      "mergedAt": "2026-08-29T23:17:54.000Z",
-      "nextGate": "terminal"
+      "mergedAt": "2026-08-29T23:17:54Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "608f68b076bfb724d111bdaf075fd4111703d937",
+        "nextGate": "terminal"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "sdk-procedure-meta",
@@ -3134,7 +3683,9 @@
       "contentHeadSha": "d5f3bf4c159d59bcb468e1abe325f40e267196b9",
       "evidenceHeadSha": "dbd3eafa6670d90148f52e2f7beec75155267ab6",
       "evaluatorCarrierHeadSha": "ce73a0381485576e63c75fdcae3e163b5b788b4a",
-      "issueNumbers": [1466],
+      "issueNumbers": [
+        1466
+      ],
       "branch": "feat/sdk-procedure-meta",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1731",
       "prNumber": 1731,
@@ -3170,9 +3721,16 @@
       "ciWorkflowRunId": 33314274931,
       "ciState": "success",
       "mergeCommitSha": "3e5cbabfcd0a8c1aea5383fa7e1c4f111386dc3c",
-      "mergedAt": "2026-08-30T13:41:17.000Z",
+      "mergedAt": "2026-08-30T13:41:17Z",
       "sharedAssetPredecessorState": "final docs sequence PR #1755 merged as a5520e70 and was integrated before exact content/evidence recut",
-      "nextGate": "terminal merged; releases #1349 and #1352 metadata prerequisites while preserving their own gates"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "e325b7fe212f7cf7e0985c634af19e2bd4d5ea22",
+        "nextGate": "terminal merged; releases #1349 and #1352 metadata prerequisites while preserving their own gates"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "fresh-readonly-dehydrated-state",
@@ -3182,7 +3740,9 @@
       "headSha": "be949ebd3359624fe881883e6ac2d78928703a1f",
       "currentPrHeadSha": "be949ebd3359624fe881883e6ac2d78928703a1f",
       "productHeadSha": "d2c7f16c624c5028cd837595d01ab3b516cb1c23",
-      "issueNumbers": [1734],
+      "issueNumbers": [
+        1734
+      ],
       "branch": "fix/fresh-query-hydration-readonly-state",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1736",
       "prNumber": 1736,
@@ -3201,18 +3761,28 @@
       "ciWorkflowRunId": 33328161675,
       "ciState": "success",
       "mergeCommitSha": "52a881c58842f521b7b253b9781a0b56ae897069",
-      "mergedAt": "2026-08-30T18:38:25.000Z",
-      "nextGate": "terminal merged; release Aspire S1/S4/S5 and every runtime leaf that was parked on #1734"
+      "mergedAt": "2026-08-30T18:38:25Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "be949ebd3359624fe881883e6ac2d78928703a1f",
+        "nextGate": "terminal merged; release Aspire S1/S4/S5 and every runtime leaf that was parked on #1734",
+        "blocker": null
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "plugin-doctor-registry-drift",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "5d1cc5a8fca8eb6145d79fa8dfb30de4f4b94e05",
-      "currentPrHeadSha": "5d1cc5a8fca8eb6145d79fa8dfb30de4f4b94e05",
+      "headSha": "05a274e409b42388991da7a88b43105c80d0f9e1",
+      "currentPrHeadSha": "05a274e409b42388991da7a88b43105c80d0f9e1",
       "productHeadSha": "e24e7ce1ef6c731fef00e57378d09bef785e254d",
-      "issueNumbers": [1673],
+      "issueNumbers": [
+        1673
+      ],
       "branch": "fix/plugin-doctor-registry-drift",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1673",
       "prNumber": 1739,
@@ -3222,7 +3792,16 @@
       "implementationEvaluatorBridgeSessionId": "cse_01NKoRnBpTaUJWVJZcGeK3Zc",
       "implementationEvaluationVerdict": "PASS_IMPL",
       "blockingFinding": "shared #1734 baseline failure in scaffold.runtime",
-      "nextGate": "after #1734 lands integrate current main, rerun green scaffold.runtime from exact runtime zero, mirror five issue boxes and complete three PR DoD boxes, then coordinator pre-merge gate"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "5d1cc5a8fca8eb6145d79fa8dfb30de4f4b94e05",
+        "nextGate": "after #1734 lands integrate current main, rerun green scaffold.runtime from exact runtime zero, mirror five issue boxes and complete three PR DoD boxes, then coordinator pre-merge gate"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "73bf2efa9f5fd421691fa0e0a04c4a354c79058d",
+      "mergedAt": "2026-08-30T21:25:41Z"
     },
     {
       "id": "agentic-cross-host-skills-docs",
@@ -3231,14 +3810,23 @@
       "baseBranch": "main",
       "headSha": "84a5fd1164b2ee9cb564d10fb3854ee015a7ab17",
       "currentPrHeadSha": "84a5fd1164b2ee9cb564d10fb3854ee015a7ab17",
-      "issueNumbers": [1745],
+      "issueNumbers": [
+        1745
+      ],
       "branch": "docs/agentic-cross-host-skills",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1745",
       "prNumber": 1746,
       "implementationState": "exact-head IMPL-EVAL PASS, unanswered review threads zero, unchanged-head CI success; coordinator merged at 2026-08-30T12:30:25Z and #1745 closed status:shipped",
       "mergeCommitSha": "f8b4f804cc5fe77054d4f220974eae66becf090c",
-      "mergedAt": "2026-08-30T12:30:25.000Z",
-      "nextGate": "terminal merged; dependency successor #1749 is released but remains third in the shared-asset sequence"
+      "mergedAt": "2026-08-30T12:30:25Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "84a5fd1164b2ee9cb564d10fb3854ee015a7ab17",
+        "nextGate": "terminal merged; dependency successor #1749 is released but remains third in the shared-asset sequence"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "aspire-terminology-sweep",
@@ -3247,8 +3835,12 @@
       "baseBranch": "main",
       "headSha": "9b79d90ef729519e4007010d10851304661a4d61",
       "currentPrHeadSha": "9b79d90ef729519e4007010d10851304661a4d61",
-      "issueNumbers": [1000],
-      "parentIssueNumbers": [1723],
+      "issueNumbers": [
+        1000
+      ],
+      "parentIssueNumbers": [
+        1723
+      ],
       "branch": "docs/aspire-terminology-sweep",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1723a",
       "prNumber": 1748,
@@ -3276,22 +3868,40 @@
         "disposition": "concurrency-cancelled did-not-run; raised and cleared nothing"
       },
       "mergeCommitSha": "952cc106aafea61570d24247695ac23f5d810026",
-      "mergedAt": "2026-08-30T12:55:05.000Z",
-      "nextGate": "terminal merged; parent #1723 remains open for the rest of Aspire S11; shared-asset successors #1755/#1731/#1758 released"
+      "mergedAt": "2026-08-30T12:55:05Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "9b79d90ef729519e4007010d10851304661a4d61",
+        "nextGate": "terminal merged; parent #1723 remains open for the rest of Aspire S11; shared-asset successors #1755/#1731/#1758 released"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "aspire-13-5-s1-pin-parity",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "e0d70e40407458bebcf02cc408bea6b49107f42b",
-      "currentPrHeadSha": "e0d70e40407458bebcf02cc408bea6b49107f42b",
-      "issueNumbers": [1713],
+      "headSha": "32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2",
+      "currentPrHeadSha": "32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2",
+      "issueNumbers": [
+        1713
+      ],
       "branch": "chore/aspire-13-5-s1-pin-bump",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire",
       "prNumber": 1727,
       "implementationState": "exact clean local/remote/PR head; bounded stable-persistent-endpoint correction passed 29/29 and Tier-A; hosted exact-head runtime rerun is queued behind the supervisor's current S4/S5/proof chain",
-      "nextGate": "restart the serialized dispatcher after the current chain, run both hosted runtime tiers at exact head, then separate delta IMPL-EVAL"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "e0d70e40407458bebcf02cc408bea6b49107f42b",
+        "nextGate": "restart the serialized dispatcher after the current chain, run both hosted runtime tiers at exact head, then separate delta IMPL-EVAL"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "798e901afaef65b000cd78a4a2dd9c3aa122220e",
+      "mergedAt": "2026-08-30T20:15:02Z"
     },
     {
       "id": "aspire-13-5-s2-runtime-verification",
@@ -3300,14 +3910,23 @@
       "baseBranch": "main",
       "headSha": "fffbb0c473dec14aedd858127b9a3ce4afee74a2",
       "currentPrHeadSha": "fffbb0c473dec14aedd858127b9a3ce4afee74a2",
-      "issueNumbers": [1714],
+      "issueNumbers": [
+        1714
+      ],
       "branch": "test/aspire-13-5-s2-runtime-verification",
       "prNumber": 1735,
       "implementationState": "terminal runtime PASS; coordinator merged at 2026-08-30T12:27:43Z and #1714 closed status:shipped. Pre-merge row 7 was missed because stale draft/pending-evaluator prose remained; it was rewritten in place immediately post-merge and transparently commented without changing substantive evidence.",
       "mergeCommitSha": "625447f1b521e7fb0208fcfcc4ad3ea86cf52e21",
-      "mergedAt": "2026-08-30T12:27:43.000Z",
+      "mergedAt": "2026-08-30T12:27:43Z",
       "proceduralCorrectionCommentUrl": "https://github.com/rickylabs/netscript/pull/1735#issuecomment-5468694739",
-      "nextGate": "terminal merged; S2 DAG successors released subject to their own gates"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "fffbb0c473dec14aedd858127b9a3ce4afee74a2",
+        "nextGate": "terminal merged; S2 DAG successors released subject to their own gates"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "aspire-13-5-s3-fixture-recapture",
@@ -3316,14 +3935,23 @@
       "baseBranch": "main",
       "headSha": "338922a20db6d5c908ab1ef0efb3e896f3de725a",
       "currentPrHeadSha": "338922a20db6d5c908ab1ef0efb3e896f3de725a",
-      "issueNumbers": [1715],
+      "issueNumbers": [
+        1715
+      ],
       "branch": "test/aspire-13-5-s3-fixture-recapture",
       "prNumber": 1741,
       "implementationState": "real local Phase B captured 13.5.3 resources/spans, cycle-4 IMPL-EVAL passed, exact-head full CI and close-gate passed, and the coordinator merged PR #1741; #1715 is closed with sole status:shipped",
       "runtimeState": "PASS_LOCAL_PHASE_B_AND_HOSTED_EXACT_HEAD",
       "mergeCommitSha": "9710a2898d4f0536752ab303b737e70411a4c399",
-      "mergedAt": "2026-08-30T19:05:59.000Z",
-      "nextGate": "terminal merged; release and rebase S7 plus downstream Aspire stack"
+      "mergedAt": "2026-08-30T19:05:59Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "338922a20db6d5c908ab1ef0efb3e896f3de725a",
+        "nextGate": "terminal merged; release and rebase S7 plus downstream Aspire stack"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "aspire-13-5-s4-generator-revalidation",
@@ -3332,24 +3960,35 @@
       "baseBranch": "main",
       "headSha": "b2a0529fa19b5726c41fdbf6a7678bb67f95347b",
       "currentPrHeadSha": "b2a0529fa19b5726c41fdbf6a7678bb67f95347b",
-      "issueNumbers": [1716],
+      "issueNumbers": [
+        1716
+      ],
       "branch": "chore/aspire-13-5-s4-generator-revalidation",
       "prNumber": 1738,
       "implementationState": "full exact-head E2E and refreshed current-merge-ref CI passed; acceptance 6/6, zero review threads, zero changed-path intersection with the S3 main advance; coordinator merged and normalized #1716/#1738 to status:shipped",
       "ciState": "success",
       "mergeCommitSha": "74e3d451e5dcb9a9cf2fc0a20ca98ee44a9819d9",
-      "mergedAt": "2026-08-30T19:17:52.000Z",
-      "nextGate": "terminal merged; release S5 convergence and review repair"
+      "mergedAt": "2026-08-30T19:17:52Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "b2a0529fa19b5726c41fdbf6a7678bb67f95347b",
+        "nextGate": "terminal merged; release S5 convergence and review repair"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "aspire-reference-name-validation",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "c1e03922ad02416ea31219df94422f062ac33690",
-      "currentPrHeadSha": "c1e03922ad02416ea31219df94422f062ac33690",
+      "headSha": "b189cb872542283bdba111c59f0a459e9f57e710",
+      "currentPrHeadSha": "b189cb872542283bdba111c59f0a459e9f57e710",
       "productHeadSha": "fc3ea1775029502ea0b811137aa2096e40505709",
-      "issueNumbers": [1732],
+      "issueNumbers": [
+        1732
+      ],
       "branch": "fix/aspire-reference-name-validation",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1732",
       "prNumber": 1747,
@@ -3358,71 +3997,128 @@
       "planEvaluationArtifactHeadSha": "e3f227c2151dcde3db0599af6dd37c61cbd76ba9",
       "implementationEvaluationState": "complete_pass",
       "implementationEvaluationVerdict": "PASS_IMPL",
-      "blocker": "mandatory exact-head scaffold.runtime receipt is missing",
-      "nextGate": "run mandatory exact-head scaffold.runtime, then repeat the coordinator seven-row pre-merge verification"
+      "blocker": null,
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "c1e03922ad02416ea31219df94422f062ac33690",
+        "nextGate": "run mandatory exact-head scaffold.runtime, then repeat the coordinator seven-row pre-merge verification",
+        "blocker": "mandatory exact-head scaffold.runtime receipt is missing"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "d5c5810db23dc0204a5a4cbba002f806e3e63a3e",
+      "mergedAt": "2026-09-02T04:56:53Z"
     },
     {
       "id": "aspire-13-5-s5-literal-ports",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "56bf425567df016d47a7e8c4d7139b28d02adc5d",
-      "currentPrHeadSha": "56bf425567df016d47a7e8c4d7139b28d02adc5d",
-      "issueNumbers": [979, 1370, 1717],
+      "headSha": "1c2cf2ef5bd89fa46e736ceb6ea7b556e2a5c049",
+      "currentPrHeadSha": "1c2cf2ef5bd89fa46e736ceb6ea7b556e2a5c049",
+      "issueNumbers": [
+        979,
+        1370,
+        1717
+      ],
       "branch": "fix/aspire-13-5-s5-literal-ports",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s5",
       "prNumber": 1740,
       "implementationState": "live convergence head 56bf4255 is ready except for exact-head scaffold.runtime 26/1 on the known #1734 baseline failure; Tier-A and evaluation pass, runtime returned to zero, and #1365 is not closed by this PR",
       "ciState": "baseline_blocked_status_ci_fail",
-      "blocker": "shared #1734 baseline failure; live status:ci-fail; expensive gate retry prohibited",
-      "nextGate": "wait for the shared #1734 baseline correction; do not rerun the expensive gate and do not hand off for human merge while status:ci-fail"
+      "blocker": null,
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "56bf425567df016d47a7e8c4d7139b28d02adc5d",
+        "nextGate": "wait for the shared #1734 baseline correction; do not rerun the expensive gate and do not hand off for human merge while status:ci-fail",
+        "blocker": "shared #1734 baseline failure; live status:ci-fail; expensive gate retry prohibited"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "2a1248d33d55a9529d1e4822d9c850bc6caa4c16",
+      "mergedAt": "2026-08-30T20:40:21Z"
     },
     {
       "id": "aspire-13-5-s6-health-checks",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "currentPrBaseBranch": "fix/aspire-13-5-s5-literal-ports",
-      "headSha": "01f27d4d494b494e9a38ca222010085088313367",
-      "currentPrHeadSha": "01f27d4d494b494e9a38ca222010085088313367",
-      "issueNumbers": [1280, 1718],
+      "currentPrBaseBranch": "main",
+      "headSha": "b6b0bb87cb7b8ecd1e8f7f4b99076baf13f19e25",
+      "currentPrHeadSha": "b6b0bb87cb7b8ecd1e8f7f4b99076baf13f19e25",
+      "issueNumbers": [
+        1280,
+        1718
+      ],
       "branch": "feat/aspire-13-5-s6-health-checks",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s6",
       "prNumber": 1743,
       "implementationState": "static Phase A is preserved at live convergence head 01f27d4d; stacked behind S5 and still requires topology-backed health receipts plus an exact-live-head evaluator",
       "implementationEvaluationState": "phase_a_pass_cycle_2",
       "implementationEvaluatorSessionId": "988f2cdc-6c86-4b64-ad56-4fdab8d1c989",
-      "nextGate": "after S5 lands retarget direct-to-main, then obtain topology-capable Phase-B health receipts and a fresh exact-live-head evaluation"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "01f27d4d494b494e9a38ca222010085088313367",
+        "nextGate": "after S5 lands retarget direct-to-main, then obtain topology-capable Phase-B health receipts and a fresh exact-live-head evaluation"
+      },
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "e17c96ed80a7698d25baf72ad4131592ce968e0c",
+      "mergedAt": "2026-08-31T02:28:10Z"
     },
     {
       "id": "aspire-13-5-s7-teardown-leak-check",
       "lane": "internals",
-      "phase": "evaluating",
+      "phase": "merged",
       "baseBranch": "main",
-      "currentPrBaseBranch": "test/aspire-13-5-s3-fixture-recapture",
-      "headSha": "6f73dcae778a3086cf7a8032c66b75530e2d4743",
-      "currentPrHeadSha": "6f73dcae778a3086cf7a8032c66b75530e2d4743",
-      "issueNumbers": [1429, 1719],
+      "currentPrBaseBranch": "main",
+      "headSha": "6f4da15b6c67d42fe04b50c063d99554d8ad31b9",
+      "currentPrHeadSha": "6f4da15b6c67d42fe04b50c063d99554d8ad31b9",
+      "issueNumbers": [
+        1429,
+        1719
+      ],
       "branch": "fix/aspire-13-5-s7-teardown-leak-check",
       "prNumber": 1744,
       "implementationState": "bounded explicit contained-cwd/contentRoot provenance repair is Tier-A green and rebased onto S3/main; local Phase-B worker 01a053ef-4c27-7f31-ac43-e78a00dff7c6 is dispatched at exact head",
-      "nextGate": "run the two-AppHost leak/foreign-control Phase B through DinD, clean host to exact zero, then separate-session IMPL-EVAL"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "evaluating",
+        "headSha": "6f73dcae778a3086cf7a8032c66b75530e2d4743",
+        "nextGate": "run the two-AppHost leak/foreign-control Phase B through DinD, clean host to exact zero, then separate-session IMPL-EVAL"
+      },
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "c532334151372d0a06bb9517c7ab271756c3d489",
+      "mergedAt": "2026-09-02T04:49:32Z"
     },
     {
       "id": "aspire-13-5-s8-typed-resource-commands",
       "lane": "features",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
-      "currentPrBaseBranch": "feat/aspire-13-5-s6-health-checks",
-      "headSha": "f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2",
-      "currentPrHeadSha": "f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2",
+      "currentPrBaseBranch": "main",
+      "headSha": "daa4dad4dc9150bb51c2423c768104b749f6d227",
+      "currentPrHeadSha": "daa4dad4dc9150bb51c2423c768104b749f6d227",
       "productHeadSha": "f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2",
-      "issueNumbers": [1720, 863],
+      "issueNumbers": [
+        1720,
+        863
+      ],
       "branch": "feat/aspire-13-5-s8-typed-resource-commands",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s8",
       "prNumber": 1754,
       "implementationState": "static Phase A is complete at live convergence head f2395465; stacked behind S6 and still needs exact database init/resource-command Phase B receipts",
-      "nextGate": "after S6 lands retarget main, capture topology-capable Phase B receipts, then fresh Tier-A and exact-head IMPL-EVAL; #863 remains reference-only"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "implementing",
+        "headSha": "f23954658c1896fe5ed4b8dc76e99cef3cdd3fe2",
+        "nextGate": "after S6 lands retarget main, capture topology-capable Phase B receipts, then fresh Tier-A and exact-head IMPL-EVAL; #863 remains reference-only"
+      },
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "0622dc43255c59793a3a7f6cf1c0dbb932e641d8",
+      "mergedAt": "2026-09-02T05:46:35Z"
     },
     {
       "id": "docs-quickstart-skills-tree",
@@ -3431,7 +4127,9 @@
       "baseBranch": "main",
       "headSha": "91bf721c6f6f6a20c55077a6aaa72e5316734abb",
       "currentPrHeadSha": "91bf721c6f6f6a20c55077a6aaa72e5316734abb",
-      "issueNumbers": [1749],
+      "issueNumbers": [
+        1749
+      ],
       "branch": "docs/quickstart-skills-tree",
       "prNumber": 1755,
       "implementationState": "rebased onto #1748, corrected body sequencing/currency and host-mirror rationale, regenerated four shared carriers once, passed the native exact-head Fable 5 delta evaluation and terminal coordinator seven-row gate, then merged and closed #1749 status:shipped",
@@ -3457,12 +4155,29 @@
         "evaluatedHeadSha": "91bf721c6f6f6a20c55077a6aaa72e5316734abb"
       },
       "redundantOpenHands": [
-        { "runId": 33312864635, "conclusion": "cancelled", "verdict": "NONE", "gating": false },
-        { "runId": 33312881075, "conclusion": "cancelled", "verdict": "NONE", "gating": false }
+        {
+          "runId": 33312864635,
+          "conclusion": "cancelled",
+          "verdict": "NONE",
+          "gating": false
+        },
+        {
+          "runId": 33312881075,
+          "conclusion": "cancelled",
+          "verdict": "NONE",
+          "gating": false
+        }
       ],
       "mergeCommitSha": "a5520e70b43fa792c36451270742240e0f2aa889",
-      "mergedAt": "2026-08-30T13:08:59.000Z",
-      "nextGate": "terminal merged; final shared-asset base releases #1731/#1758"
+      "mergedAt": "2026-08-30T13:08:59Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "91bf721c6f6f6a20c55077a6aaa72e5316734abb",
+        "nextGate": "terminal merged; final shared-asset base releases #1731/#1758"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "docs-cli-provisional-0-0-7-changelog",
@@ -3471,7 +4186,9 @@
       "baseBranch": "main",
       "headSha": "c1700128e38dd923cd57298c171b5976ec690a83",
       "currentPrHeadSha": "c1700128e38dd923cd57298c171b5976ec690a83",
-      "issueNumbers": [1757],
+      "issueNumbers": [
+        1757
+      ],
       "branch": "docs/changelog-0-0-7",
       "prNumber": 1761,
       "implementationState": "Augment found that the first changelog wording miscast widened declared env/net permissions as runtime requirements; the leaf corrected the changelog and contradictory run evidence, reconciled all 37 live commits as 17 Include / 20 Exclude, passed a fresh native exact-head Fable 5 IMPL-EVAL and the complete coordinator seven-row gate, then merged and closed #1757 status:shipped",
@@ -3498,86 +4215,149 @@
       "ciWorkflowRunId": 33314032803,
       "ciState": "success",
       "mergeCommitSha": "a5f506dda0d4eac4c818a85ee7b9966cd1d9fb81",
-      "mergedAt": "2026-08-30T13:36:41.000Z",
-      "nextGate": "terminal merged; provisional changelog requires a release-cut top-up after remaining 0.0.7 payload lands"
+      "mergedAt": "2026-08-30T13:36:41Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "c1700128e38dd923cd57298c171b5976ec690a83",
+        "nextGate": "terminal merged; provisional changelog requires a release-cut top-up after remaining 0.0.7 payload lands"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "jsdoc-example-compile-gate",
       "lane": "internals",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "4cdee82fbb27c222e1a5cbd807b84a079d01cbda",
-      "currentPrHeadSha": "303be12eab5e54ada654d55f60e8cfbf1921ea73",
+      "headSha": "b607bfe260138df616f748973a8f213f5e3f4b7d",
+      "currentPrHeadSha": "b607bfe260138df616f748973a8f213f5e3f4b7d",
       "productHeadSha": "c73fee39c86f08882ba8a1214fd87c07d628672d",
-      "issueNumbers": [1533],
+      "issueNumbers": [
+        1533
+      ],
       "branch": "test/jsdoc-example-compile-gate",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1533",
       "prNumber": 1756,
       "implementationState": "IMPL-EVAL cycle 1 FAIL_FIX identified false service @app alias repairs, a reverse exact-count ratchet, and comment-triggered false deferrals; bounded repair is active on the local evaluated branch",
       "credentialBoundary": "live PR remains at 303be12e because the current PAT lacks workflow scope for the branch's .github/workflows/ci.yml commit",
-      "nextGate": "finish bounded repair, correct the authorized ratcheted-deferred acceptance contract, recut corpus/receipts, obtain workflow-scoped push, then fresh Tier-A/eval/current-head CI"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "implementing",
+        "headSha": "4cdee82fbb27c222e1a5cbd807b84a079d01cbda",
+        "nextGate": "finish bounded repair, correct the authorized ratcheted-deferred acceptance contract, recut corpus/receipts, obtain workflow-scoped push, then fresh Tier-A/eval/current-head CI"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "0f7fefb6ba4208b6f15b1b2164645afd9cedc209",
+      "mergedAt": "2026-09-02T06:39:20Z"
     },
     {
       "id": "sdk-root-cache-provider-leak",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "f4ca7c328f3cbd8b8a80a9f5bc5c700e16011575",
-      "currentPrHeadSha": "f4ca7c328f3cbd8b8a80a9f5bc5c700e16011575",
-      "issueNumbers": [1462],
+      "headSha": "94620577db9532cb281160c0734cfe8fe33e1115",
+      "currentPrHeadSha": "94620577db9532cb281160c0734cfe8fe33e1115",
+      "issueNumbers": [
+        1462
+      ],
       "branch": "fix/sdk-root-cache-provider-leak",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1462",
       "prNumber": 1758,
       "implementationState": "static proof and real production client-chunk proof pass; bare e2e is 26/1 solely on unchanged-main #1734",
-      "blocker": "#1734 must land before a genuinely green bare e2e and final evaluator can exist",
-      "nextGate": "post-#1734 integrate main, rerun green e2e from runtime zero, Tier-A, fresh IMPL-EVAL, mirror/ready, coordinator merge"
+      "blocker": null,
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "f4ca7c328f3cbd8b8a80a9f5bc5c700e16011575",
+        "nextGate": "post-#1734 integrate main, rerun green e2e from runtime zero, Tier-A, fresh IMPL-EVAL, mirror/ready, coordinator merge",
+        "blocker": "#1734 must land before a genuinely green bare e2e and final evaluator can exist"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "b99acc697a7dc99c28645571f75c4501bca4699c",
+      "mergedAt": "2026-08-31T02:29:03Z"
     },
     {
       "id": "aspire-13-5-s9-agent-mcp-activation",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "currentPrBaseBranch": "feat/aspire-13-5-s8-typed-resource-commands",
-      "headSha": "d81a8fe19bc710694a73334a95f141fa04563325",
-      "currentPrHeadSha": "d81a8fe19bc710694a73334a95f141fa04563325",
-      "issueNumbers": [1721],
+      "currentPrBaseBranch": "main",
+      "headSha": "fcce551be154028d9347e03e0a20f3c5c6565fc7",
+      "currentPrHeadSha": "fcce551be154028d9347e03e0a20f3c5c6565fc7",
+      "issueNumbers": [
+        1721
+      ],
       "branch": "fix/aspire-13-5-s9-agent-mcp-activation",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s9",
       "prNumber": 1759,
       "implementationState": "Phase A and prior evaluation pass are preserved at the live convergence head; stacked behind S8 and missing exact 13.5.3 MCP Phase B",
-      "nextGate": "land parent and satisfy topology, capture MCP Phase B, evaluate exact live head, then retarget main"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "d81a8fe19bc710694a73334a95f141fa04563325",
+        "nextGate": "land parent and satisfy topology, capture MCP Phase B, evaluate exact live head, then retarget main"
+      },
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "88fc6d69dd3287c2d5bcb75dbef751c982d596e0",
+      "mergedAt": "2026-09-02T20:32:50Z"
     },
     {
       "id": "aspire-13-5-s10-e2e-gate-upgrades",
       "lane": "internals",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "currentPrBaseBranch": "feat/aspire-13-5-s8-typed-resource-commands",
-      "headSha": "a46ea16d0a6bf250abfe06db2cf50820f5f88dfc",
-      "currentPrHeadSha": "a46ea16d0a6bf250abfe06db2cf50820f5f88dfc",
-      "issueNumbers": [1722],
-      "referenceIssueNumbers": [1372],
+      "currentPrBaseBranch": "main",
+      "headSha": "0b3f13e0c3f7ad23fdd151fc20ef618613af6933",
+      "currentPrHeadSha": "0b3f13e0c3f7ad23fdd151fc20ef618613af6933",
+      "issueNumbers": [
+        1722
+      ],
+      "referenceIssueNumbers": [
+        1372
+      ],
       "branch": "test/aspire-13-5-s10-e2e-gate-upgrades",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s10",
       "prNumber": 1760,
       "implementationState": "direct-ResourceJson NDJSON and nullable-health repairs passed all earlier combined-proof gates at d0023b834; the hosted proof now fails only when Aspire MCP reports that the dashboard is unavailable",
       "runtimeProofHeadSha": "d0023b83450ff597c9868f290466dd383f399916",
       "runtimeProofRunId": 33328972788,
-      "nextGate": "diagnose the S9/S10 dashboard availability and MCP discovery ownership boundary, make a bounded repair with no unchanged retry, then rebuild exact-head combined proof"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "a46ea16d0a6bf250abfe06db2cf50820f5f88dfc",
+        "nextGate": "diagnose the S9/S10 dashboard availability and MCP discovery ownership boundary, make a bounded repair with no unchanged retry, then rebuild exact-head combined proof"
+      },
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "58280d6ee0e6b3156a59ab19a91462b5d677af3f",
+      "mergedAt": "2026-09-02T19:45:39Z"
     },
     {
       "id": "service-principal-adapter-boundary",
       "lane": "features",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
-      "headSha": "a72af9a404373dfde4a5972ded424f544f693274",
-      "currentPrHeadSha": "a72af9a404373dfde4a5972ded424f544f693274",
-      "issueNumbers": [1387],
+      "headSha": "e3852dfb51108a6a49b30fc1f918e164defb90b2",
+      "currentPrHeadSha": "e3852dfb51108a6a49b30fc1f918e164defb90b2",
+      "issueNumbers": [
+        1387
+      ],
       "branch": "feat/service-principal-adapter-boundary",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1387",
       "prNumber": 1762,
       "implementationState": "owner option 1 accepted; distinct plugin CLI architecture is preserved and the RFC 0003 overlap is narrowed to the precise adapter boundary; plan artifact is parked behind #1763",
-      "nextGate": "after #1763 closes, resume the bounded adapter-boundary implementation, Tier-A, and separate-session evaluation"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "a72af9a404373dfde4a5972ded424f544f693274",
+        "nextGate": "after #1763 closes, resume the bounded adapter-boundary implementation, Tier-A, and separate-session evaluation"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "6c195acaf3f7e650c4235fc3fbc51232e210e7a4",
+      "mergedAt": "2026-08-31T16:03:24Z"
     },
     {
       "id": "ai-request-context-provider-guard",
@@ -3587,14 +4367,23 @@
       "headSha": "c80933f7b94804319024b77247f653f073b738ed",
       "currentPrHeadSha": "c80933f7b94804319024b77247f653f073b738ed",
       "productHeadSha": "1c836918abde397b320941f70063d83f25f6c355",
-      "issueNumbers": [1730],
+      "issueNumbers": [
+        1730
+      ],
       "branch": "test/ai-request-context-provider-guard",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1730",
       "prNumber": 1763,
       "implementationState": "product head 1c836918 and evidence carrier c80933f7 passed the final seven-row audit; coordinator merged the exact carrier and normalized PR/issue lifecycle to status:shipped",
       "mergeCommitSha": "24f6642f040617de573c7cef1140eed1ac0efd6d",
-      "mergedAt": "2026-08-30T15:47:10.000Z",
-      "nextGate": "terminal merged and shipped; releases features issue #1387 under accepted option 1"
+      "mergedAt": "2026-08-30T15:47:10Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "c80933f7b94804319024b77247f653f073b738ed",
+        "nextGate": "terminal merged and shipped; releases features issue #1387 under accepted option 1"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "saga-span-emission-and-correlation",
@@ -3603,7 +4392,9 @@
       "baseBranch": "main",
       "headSha": "9f2e6abd2487d8f94c9f71541a29d17e20340469",
       "currentPrHeadSha": "9f2e6abd2487d8f94c9f71541a29d17e20340469",
-      "issueNumbers": [1368],
+      "issueNumbers": [
+        1368
+      ],
       "branch": "fix/saga-span-emission-and-correlation",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1368",
       "prNumber": 1764,
@@ -3612,25 +4403,46 @@
       "ownerAuthorization": "Select the saga.handle span by name rather than positional index and run exactly one delta-scoped IMPL-EVAL cycle 3; carry forward cycle-2 rows and preserve mandatory Flow-B.",
       "ownerAuthorizedAt": "2026-08-30T17:46:16.000Z",
       "mergeCommitSha": "8a925764276b25ef7cef484db273604f44557cef",
-      "mergedAt": "2026-08-31T02:50:31.000Z",
+      "mergedAt": "2026-08-31T02:50:31Z",
       "blocker": null,
-      "nextGate": "terminal merged and shipped; canary.4 remains immutable failed evidence and the repaired main is re-proven at the next coherent feature/fix canary checkpoint"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "9f2e6abd2487d8f94c9f71541a29d17e20340469",
+        "nextGate": "terminal merged and shipped; canary.4 remains immutable failed evidence and the repaired main is re-proven at the next coherent feature/fix canary checkpoint",
+        "blocker": null
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "aspire-13-5-s11-public-docs-refresh",
       "lane": "docs",
-      "phase": "implementing",
+      "phase": "merged",
       "baseBranch": "main",
-      "currentPrBaseBranch": "test/aspire-13-5-s10-e2e-gate-upgrades",
-      "headSha": "44a57a64ee424a0ce691294e6f001e2829c7c39d",
-      "currentPrHeadSha": "44a57a64ee424a0ce691294e6f001e2829c7c39d",
-      "issueNumbers": [1723, 1642],
-      "referenceIssueNumbers": [1000],
+      "currentPrBaseBranch": "main",
+      "headSha": "d77c026f3dc1c5d5aecd325b22c2c8222b199249",
+      "currentPrHeadSha": "d77c026f3dc1c5d5aecd325b22c2c8222b199249",
+      "issueNumbers": [
+        1723,
+        1642
+      ],
+      "referenceIssueNumbers": [
+        1000
+      ],
       "branch": "docs/aspire-13-5-s11-public-docs-refresh",
       "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s11",
       "prNumber": 1771,
       "implementationState": "docs-audit cycle 3 left only M3 acceptance-artifact arithmetic; coordinator accepted the audit-free 8-edited/113-clean correction, M3 was repaired, Fable polish completed, and S13 was released independently",
-      "nextGate": "finish the exact PR/body reconciliation and supervisor slice review; preserve the S10 stack and CI diagram-parity requirement before merge"
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "implementing",
+        "headSha": "44a57a64ee424a0ce691294e6f001e2829c7c39d",
+        "nextGate": "finish the exact PR/body reconciliation and supervisor slice review; preserve the S10 stack and CI diagram-parity requirement before merge"
+      },
+      "reconciledAt": "2026-09-03T08:15:00.000Z",
+      "mergeCommitSha": "1201d621609cfba87791f6d74aa0080bce5ad339",
+      "mergedAt": "2026-09-02T06:02:22Z"
     },
     {
       "id": "background-reference-preflight-docs",
@@ -3639,30 +4451,129 @@
       "baseBranch": "main",
       "headSha": "6d275b2c9350b084ccf4fa62982e2f20432fe9d0",
       "currentPrHeadSha": "6d275b2c9350b084ccf4fa62982e2f20432fe9d0",
-      "issueNumbers": [1770],
+      "issueNumbers": [
+        1770
+      ],
       "branch": "docs/background-reference-preflight",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1770",
       "prNumber": 1772,
       "implementationState": "exact head passed final gates and merged; issue #1770 auto-closed and both PR/issue were normalized to status:shipped",
       "mergeCommitSha": "de57fab0e220203567367b6852f918dc71f296a6",
-      "mergedAt": "2026-08-30T15:32:34.000Z",
-      "nextGate": "terminal merged and shipped"
+      "mergedAt": "2026-08-30T15:32:34Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "merged",
+        "headSha": "6d275b2c9350b084ccf4fa62982e2f20432fe9d0",
+        "nextGate": "terminal merged and shipped"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
     },
     {
       "id": "scaffold-dynamic-route-gate",
       "lane": "fixes",
-      "phase": "blocked",
+      "phase": "merged",
       "baseBranch": "main",
       "headSha": "550bc44e9f0b5622c06f1106bbc68cbb44910d2c",
       "currentPrHeadSha": "550bc44e9f0b5622c06f1106bbc68cbb44910d2c",
-      "issueNumbers": [1616],
+      "issueNumbers": [
+        1616
+      ],
       "branch": "test/scaffold-dynamic-route-gate",
       "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1616",
       "prNumber": 1773,
       "implementationState": "dynamic Fresh route scaffold and critical end-to-end runtime gate shipped with all 25 scoped harness artifacts preserved under the owner retention ruling",
       "mergeCommitSha": "d9e0f1ebbf63de351084f4401d86487c9f373f14",
-      "mergedAt": "2026-09-01T05:38:19.000Z",
-      "nextGate": "terminal merged and shipped; #1616 closed"
+      "mergedAt": "2026-09-01T05:38:19Z",
+      "nextGate": "No implementation dispatch: GitHub confirms this PR merged. Remaining umbrella acceptance, if any, is independently queued.",
+      "recoveryPreviousStatus": {
+        "phase": "blocked",
+        "headSha": "550bc44e9f0b5622c06f1106bbc68cbb44910d2c",
+        "nextGate": "terminal merged and shipped; #1616 closed"
+      },
+      "currentPrBaseBranch": "main",
+      "reconciledAt": "2026-09-03T08:15:00.000Z"
+    },
+    {
+      "id": "workers-payload-registry-map",
+      "lane": "fixes",
+      "prNumber": 1970,
+      "issueNumbers": [
+        1455
+      ],
+      "phase": "gating",
+      "thread": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
+      "wt": "007-leaf-1970",
+      "nextGate": "Exact CI/two hosted runtime tiers, then separate-session bounded delta IMPL-EVAL; coordinator merge.",
+      "baseBranch": "main",
+      "headSha": "303c4e87a5e55d01273146deac8f0e3fe7b52a13",
+      "currentPrHeadSha": "303c4e87a5e55d01273146deac8f0e3fe7b52a13",
+      "branch": "feat/workers-payload-registry-map",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
+      "implementerAgentId": "01a06201-d0b9-7cb1-afe6-8b071ca28012"
+    },
+    {
+      "id": "design-production-exclusion",
+      "lane": "fixes",
+      "prNumber": 1945,
+      "issueNumbers": [
+        1481,
+        1971
+      ],
+      "phase": "gating",
+      "thread": "01a06322-7bb5-7d80-badf-3068fb4942eb",
+      "wt": "007-leaf-1481",
+      "nextGate": "Exact runtime proof after merged codegen/Zod fixes; acceptance mirror, independent delta evaluation, coordinator merge.",
+      "baseBranch": "main",
+      "headSha": "d813df7ca1e4f265943d5874fd959a0da1a42746",
+      "currentPrHeadSha": "d813df7ca1e4f265943d5874fd959a0da1a42746",
+      "branch": "fix/design-route-prod-gate",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
+      "implementerAgentId": "01a06322-7bb5-7d80-badf-3068fb4942eb"
+    },
+    {
+      "id": "resource-slice-final-acceptance",
+      "lane": "features",
+      "prNumber": 1958,
+      "issueNumbers": [
+        1354
+      ],
+      "phase": "implementing",
+      "thread": "01a06424-38fe-7893-ba59-6064b0dd616e",
+      "wt": "007-leaf-1354-g",
+      "nextGate": "Canonical pages browser probe now PASS; repair retired ServiceShowcaseLab served-island expectation, preserve real island proof; exact two-tier run and independent delta evaluation.",
+      "baseBranch": "main",
+      "headSha": "8341c07431cd333a9e109c5732c2958704334ab6",
+      "currentPrHeadSha": "8341c07431cd333a9e109c5732c2958704334ab6",
+      "branch": "feat/cli-resource-slice-acceptance",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
+      "implementerAgentId": "01a06424-38fe-7893-ba59-6064b0dd616e"
+    },
+    {
+      "id": "readme-service-readiness",
+      "lane": "internals",
+      "topic": "aspire",
+      "prNumber": 1981,
+      "issueNumbers": [
+        1881
+      ],
+      "referenceIssueNumbers": [
+        863,
+        1712
+      ],
+      "phase": "merged",
+      "wt": "007-leaf-canary-readme-health",
+      "nextGate": "Canary-pinned clean-runner root README acceptance; linked issues deliberately remain open.",
+      "baseBranch": "main",
+      "headSha": "650844452d3d772975c10aa1bc6646b4115eed23",
+      "currentPrHeadSha": "650844452d3d772975c10aa1bc6646b4115eed23",
+      "branch": "fix/canary-readme-service-readiness",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-canary-readme-health",
+      "mergeCommitSha": "94fe507af47171cd4f295e8f532b281d7147b334",
+      "mergedAt": "2026-09-03T08:11:43Z",
+      "implementationEvaluationVerdict": "PASS",
+      "implementationEvaluatedProductHeadSha": "bdb5de2bd14173b36276f59048a444f8873985bc",
+      "implementationEvaluationArtifact": "receipts/pr-1981-openrouter-eval-33715860434.md"
     }
   ],
   "evaluatorLeases": [
@@ -4775,437 +5686,101 @@
       "transportProof": "daemon backend, bridgeOutboundOnly false, empty providerEnv, and respawn flags include --remote-control, --effort medium, and --model claude-fable-5"
     }
   ],
-  "expensiveGates": [
-    {
-      "id": "scaffold-generated-output-correctness-runtime",
-      "state": "complete",
-      "lane": "fixes",
-      "leafId": "scaffold-generated-output-correctness",
-      "gateId": "scaffold.runtime",
-      "preGateHead": "ebad68c80bc9079ba835901eb2245a1a31ab7b62",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T04:02:33.167Z",
-      "scope": "one isolated scaffold.runtime verdict covering issues 1262, 1263, and 1588; Aspire/Docker cleanup mandatory",
-      "attempt": 2,
-      "retryGrantedAt": "2026-08-15T04:38:12.147Z",
-      "completedAt": "2026-08-15T04:55:26.483Z",
-      "verdict": "PASS",
-      "receiptRefs": [
-        ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/scaffold-runtime.json",
-        ".llm/runs/fix-scaffold-generated-output-correctness--0.0.7-wave0/receipts/leak-check.json"
-      ],
-      "attempt1": {
-        "state": "interrupted_no_verdict",
-        "lastCompletedGate": "database.migration-artifacts",
-        "interruptedAtGate": "database.generate",
-        "cleanup": "complete"
-      }
-    },
-    {
-      "id": "design-registry-catalog-drift-fresh-browser",
-      "state": "complete",
-      "lane": "fixes",
-      "leafId": "design-registry-catalog-drift-gate",
-      "gateId": "fresh-browser",
-      "preGateHead": "4a3c40321ac1e58aa337e02afeaa95fbc553ce7f",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T06:07:21.000Z",
-      "scope": "one contract-approved Playwright/Chromium fresh-browser pass for PR #1657; no Aspire, Docker, or Postgres; stray browser/runtime cleanup and empty-host recheck mandatory",
-      "attempt": 1,
-      "command": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/gates/run-gate.ts --gate fresh-browser --id fresh-browser-1657 --cwd packages/fresh --output .llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json",
-      "completedAt": "2026-08-15T06:13:10.000Z",
-      "verdict": "PASS",
-      "receiptRefs": [
-        ".llm/runs/fix-design-registry-catalog-drift-gate--0.0.7-wave1/receipts/fresh-browser.json"
-      ],
-      "cleanup": {
-        "chromiumPlaywrightSurvivors": 0,
-        "aspirePostcondition": "empty",
-        "dockerPostcondition": "empty",
-        "playwrightInstallNeeded": false,
-        "lockfilesChanged": false
-      }
-    },
-    {
-      "id": "app-service-client-wiring-f3-runtime",
-      "state": "complete",
-      "lane": "features",
-      "leafId": "app-service-client-wiring",
-      "gateId": "scaffold.runtime_then_fresh-browser",
-      "preGateHead": "8940e9266630a3cc5368153722747e45d30aec3b",
-      "contentHead": "193e665ba0592273622253e3e9a1ebfc019b1be9",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T16:43:09.204Z",
-      "attempt": 2,
-      "scope": "run scaffold.runtime first through the suite-owned release command and preserve its receipt; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run fresh-browser serially through the catalog receipt, then browser/runtime cleanup and a final empty-host audit",
-      "runHead": "ab78eaa35c1753f9e8c526dbd234c7073758008b",
-      "evidenceHead": "e1dcb726b983dd10981f4fc8df5ea8c638686e77",
-      "completedAt": "2026-08-15T16:53:06.441Z",
-      "verdict": "FAIL_FIX",
-      "summary": "scaffold.runtime 20 passed / 1 failed / 0 skipped; generated.service-client-contract rejected three post-plugin Aspire-helper writes; fresh-browser NOT_RUN",
-      "receiptRefs": [
-        ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-scaffold-runtime-20260815-184907.log",
-        ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-runtime-failure.md",
-        ".llm/runs/feat-app-service-client-wiring--1355/leak-report.md"
-      ],
-      "cleanup": {
-        "aspirePostcondition": "ok_empty",
-        "dockerPostcondition": "ok_empty",
-        "survivors": 0,
-        "freshBrowser": "NOT_RUN"
-      }
-    },
-    {
-      "id": "app-service-client-wiring-f4-runtime",
-      "state": "complete",
-      "lane": "features",
-      "leafId": "app-service-client-wiring",
-      "gateId": "scaffold.runtime_then_fresh-browser",
-      "preGateHead": "6f813b0db35df38dcd9dc7f1ea333e997399fac0",
-      "contentHead": "7876aa10911c2eeea4aafb217d651b28a90bac2c",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T17:11:14.000Z",
-      "attempt": 3,
-      "scope": "run suite-owned scaffold.runtime first at the immutable final evidence head; preserve the exact raw result; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run catalog-backed fresh-browser serially, then browser/runtime cleanup and a final empty-host audit; no evaluator until both gates and topic reconciliation are terminal",
-      "preflight": {
-        "leafState": "clean_local_remote_pr_equal",
-        "dockerContainers": 0,
-        "aspireApplicationProcesses": 0,
-        "relevantListeningPorts": 0,
-        "otherLeaseOwners": 0,
-        "idleAspireMcpHelpers": "foreign_tooling_preserved"
-      },
-      "completedAt": "2026-08-15T17:19:05.522Z",
-      "verdict": "FAIL_FIX",
-      "summary": "scaffold.runtime passed 32 gates then failed generated.deno-fmt-check; repaired service-client contract passed; fresh-browser NOT_RUN",
-      "cleanup": {
-        "aspirePostcondition": "ok_empty",
-        "dockerPostcondition": "ok_empty",
-        "survivors": 0,
-        "freshBrowser": "NOT_RUN"
-      }
-    },
-    {
-      "id": "app-service-client-wiring-f5-runtime",
-      "state": "complete",
-      "lane": "features",
-      "leafId": "app-service-client-wiring",
-      "gateId": "scaffold.runtime_then_fresh-browser",
-      "preGateHead": "1263f655b37d64a258619403398ca7117ea000d5",
-      "contentHead": "fda78ee438ea40888e5fb3870a78df70cabb8c82",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T18:30:23.000Z",
-      "attempt": 4,
-      "scope": "run suite-owned scaffold.runtime first at immutable evidence head 1263f655b; preserve exact raw result; mandatory Aspire/Docker cleanup and clean inter-gate audit; only on PASS run catalog-backed fresh-browser serially, then browser/runtime cleanup and final empty-host audit; no evaluator until both gates and topic reconciliation are terminal",
-      "preflight": {
-        "leafState": "clean_local_remote_pr_equal",
-        "dockerContainers": 0,
-        "aspireApplicationProcesses": 0,
-        "relevantListeningPorts": 0,
-        "otherLeaseOwners": 0,
-        "idleAspireMcpHelpers": "foreign_tooling_preserved"
-      },
-      "completedAt": "2026-08-15T18:48:52.000Z",
-      "verdict": "FAIL_FIX",
-      "summary": "scaffold.runtime passed 69 gates and failed behavior.service-client-refetch because cleanup killed an already-terminated child; fresh-browser NOT_RUN",
-      "receiptRefs": [
-        ".llm/runs/feat-app-service-client-wiring--1355/reports/s5-attempt4-scaffold-runtime-20260815-2037.log"
-      ],
-      "rawLogSha256": "b476da4ce039d03785e46669d51919b48c41fbae80ca41ca9188bcbb53e97f23",
-      "cleanup": {
-        "aspirePostcondition": "ok_empty",
-        "dockerPostcondition": "ok_empty",
-        "survivors": 0,
-        "freshBrowser": "NOT_RUN"
-      }
-    },
-    {
-      "id": "app-service-client-wiring-f6-runtime",
-      "state": "complete",
-      "lane": "features",
-      "leafId": "app-service-client-wiring",
-      "gateId": "scaffold.runtime_then_fresh-browser",
-      "preGateHead": "a8a160285d4f9bddb95a5dac6cfbde85e1265ebc",
-      "contentHead": "7fa29ad3ed10ad903b9cbbd518111e6bf2754761",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T19:39:00.000Z",
-      "attempt": 5,
-      "scope": "run suite-owned scaffold.runtime once; mandatory cleanup/audit; fresh-browser only on PASS; no retry or evaluator",
-      "completedAt": "2026-08-15T19:47:30.000Z",
-      "verdict": "FAIL_FIX",
-      "summary": "scaffold.runtime passed 69 gates and failed behavior.service-client-refetch on DevTools target timeout; fresh-browser NOT_RUN",
-      "rawLogSha256": "ff349b40f7f70341934e170df7c67d147c0ed983173b41871421755ad55e062b",
-      "cleanup": {
-        "aspirePostcondition": "ok_empty",
-        "dockerPostcondition": "ok_empty",
-        "survivors": 0,
-        "freshBrowser": "NOT_RUN"
-      }
-    },
-    {
-      "id": "app-service-client-wiring-f7-runtime",
-      "state": "complete",
-      "lane": "features",
-      "leafId": "app-service-client-wiring",
-      "gateId": "scaffold.runtime_then_fresh-browser",
-      "preGateHead": "ed3f78e0d87784b1869166bd2574737c62fac0af",
-      "contentHead": "e45144db643f6bde85552a615812c8371e4ce792",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-15T20:55:30.000Z",
-      "attempt": 6,
-      "scope": "run suite-owned scaffold.runtime once with strict managed Chrome override; mandatory cleanup and independent Aspire/Docker/process/port/residue audit; only on PASS and clean audit run catalog fresh-browser once, then final cleanup/audit; no retry or evaluator",
-      "browserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
-      "preflight": {
-        "leafState": "clean_local_remote_pr_equal",
-        "dockerContainers": 0,
-        "aspireApplicationProcesses": 0,
-        "relevantListeningPorts": 0,
-        "unreadableResidue": 0,
-        "otherLeaseOwners": 0,
-        "staleReadableResidue": "three exact run-owned trees moved recoverably to /tmp/netscript-preattempt6-quarantine.9mNpwE"
-      },
-      "completedAt": "2026-08-15T21:30:55.000Z",
-      "verdict": "FAIL_FIX",
-      "summary": "scaffold.runtime passed 69 and failed behavior.service-client-refetch at 900030ms / exit 143 after valid managed-Chrome selection; fresh-browser NOT_RUN",
-      "evidenceHead": "2385cdb72602c149c29cc637870ddca3db09e0cd",
-      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5304325367",
-      "cleanup": {
-        "aspirePostcondition": "ok_empty",
-        "dockerPostcondition": "ok_empty",
-        "processPostcondition": "ok_empty_after_three_exact_run_owned_helpers_exited",
-        "portPostcondition": "ok_empty",
-        "unreadableResiduePostcondition": "ok_empty_after_recoverable_quarantine",
-        "quarantine": "/tmp/netscript-s5-a6-quarantine-20260815-4M9v8k",
-        "freshBrowser": "NOT_RUN"
-      }
-    },
-    {
-      "id": "app-service-client-wiring-f8-runtime",
-      "state": "complete",
-      "lane": "features",
-      "leafId": "app-service-client-wiring",
-      "gateId": "scaffold.runtime_then_fresh-browser",
-      "preGateHead": "388f2b642a0d6e0ece4e346ea60f857928409beb",
-      "contentHead": "4f50b5a026120b5a3b0195fa1b6f495f08e2b46c",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-23T07:51:33.000Z",
-      "attempt": 7,
-      "scope": "run suite-owned scaffold.runtime once with strict managed Chrome override; mandatory cleanup and independent Aspire/Docker/process/port/residue audit; only on PASS and clean audit run catalog fresh-browser once, then final cleanup/audit; no retry; evaluator remains downstream",
-      "browserOverride": "/home/codex/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
-      "preflight": {
-        "leafState": "clean_local_remote_pr_equal",
-        "dockerContainers": 0,
-        "aspireApplicationProcesses": 0,
-        "relevantListeningPorts": 0,
-        "unreadableResidue": 0,
-        "otherLeaseOwners": 0,
-        "staleResidue": "three exact foreign unregistered plugin-smoke trees with no process/container owner moved recoverably to /tmp/netscript-preattempt7-quarantine.rJlScq"
-      },
-      "completedAt": "2026-08-23T08:09:17.000Z",
-      "verdict": "FAIL_FIX",
-      "summary": "scaffold.runtime passed 68 and failed behavior.service-client-refetch at 60134ms / exit 1 after Chrome and CDP succeeded; the optimistic Seed User* DOM state never appeared; fresh-browser NOT_RUN and no retry/evaluator",
-      "evidenceHead": "a257807d883ac9cd8d692d441bba1760290d4dab",
-      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1664#issuecomment-5384987561",
-      "rawLogSha256": "a4ee67d25fa7189fd183cc6478c88e7b6cadf7a8b5bb041a585e1fb29694a042",
-      "ndjsonSha256": "c0b1a450498b0027ad9acce33fad373f05fafbb0eb61c326a53463c6a6a0eff4",
-      "cleanup": {
-        "aspirePostcondition": "ok_empty_after_three_exact_run_owned_orphans_reaped",
-        "dockerPostcondition": "ok_empty",
-        "processPostcondition": "ok_empty",
-        "portPostcondition": "ok_empty",
-        "unreadableResiduePostcondition": "ok_empty_after_recoverable_quarantine",
-        "quarantine": "/tmp/netscript-s5-a7-quarantine.Cy2tNS",
-        "freshBrowser": "NOT_RUN"
-      }
-    },
-    {
-      "id": "aspire-13-5-s2-runtime-verification",
-      "state": "complete",
-      "lane": "aspire-research",
-      "leafId": "aspire-13-5-s2-runtime-verification",
-      "gateId": "aspire_13_5_v1_v12",
-      "preGateHead": "21d516224fe35e92957f0998ee848bbf2024eda0",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-29T22:24:00.000Z",
-      "scope": "one isolated generated AppHost at a time for #1714 V1-V12 receipts on Aspire CLI 13.5.3; exact own-resource stop, leak-check, teardown, and zero Aspire/Docker/process postcondition mandatory",
-      "supervisorRoute": "same Claude Fable 5 medium research supervisor with Remote Control",
-      "implementationRoute": "GPT-5.6-SOL high thread 01a04f9e-e9a1-79a2-8b6b-c98a38e88ed1",
-      "worktree": "historical:/home/codex/repos/netscript-aspire-13-5-s2",
-      "completedAt": "2026-08-30T06:16:47.000Z",
-      "verdict": "PASS",
-      "evidenceHead": "fffbb0c",
-      "prNumber": 1735,
-      "prState": "ready_clean_awaiting_human_merge",
-      "cleanup": {
-        "aspirePostcondition": "empty",
-        "dockerPostcondition": "empty",
-        "survivors": 0
-      }
-    },
-    {
-      "id": "aspire-13-5-s5-exact-head-e2e",
-      "state": "complete",
-      "lane": "aspire-research",
-      "leafId": "aspire-13-5-s5-literal-ports",
-      "gateId": "scaffold.runtime",
-      "preGateHead": "aa822069e10fd90f2bae656b91e28c018bafec0b",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-30T08:34:27.000Z",
-      "scope": "one exact-head deno task e2e:cli verdict for PR #1740, followed by run-owned leak-check or teardown and mandatory Aspire/DinD zero postconditions; no unknown resource mutation",
-      "supervisorRoute": "Claude Fable 5 medium session 4e08fdff-708d-4d6b-8ba9-fded2fc292e3 with Remote Control",
-      "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s5",
-      "preflight": {
-        "pid1": "tini",
-        "zombieCount": 0,
-        "dockerContainers": 0,
-        "aspireApplications": 0,
-        "otherLeaseOwners": 0
-      },
-      "completedAt": "2026-08-30T08:43:35.000Z",
-      "verdict": "BLOCKED_BASELINE",
-      "summary": "26 passed / 1 failed / 0 skipped; generated.quality-negative reproduced the known #1734 Fresh hydration TS2345 before AppHost start; S5 diff and Docker 27 warning were not the cause",
-      "topicCheckpointSha": "f9553ac1",
-      "verdictCommentUrl": "https://github.com/rickylabs/netscript/pull/1740#issuecomment-5467711108",
-      "receiptRefs": [
-        ".llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/receipts/e2e-scaffold-runtime-aa822069-nas.json",
-        ".llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/receipts/e2e-scaffold-runtime-aa822069-nas.log",
-        ".llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/leak-report.md"
-      ],
-      "cleanup": {
-        "aspirePostcondition": "empty",
-        "dockerPostcondition": "empty",
-        "survivors": 0,
-        "runOwnedScratchRemovedBytesApprox": 560000000,
-        "retry": "not_authorized"
-      }
-    },
-    {
-      "id": "aspire-13-5-s3-phase-b-runtime",
-      "state": "complete",
-      "lane": "aspire-research",
-      "leafId": "aspire-13-5-s3-fixture-recapture",
-      "gateId": "s3_phase_b_telemetry_capture",
-      "preGateHead": "fe4f496bdcc605eceb9b3e5748ad55a7811bbed9",
-      "evidenceHead": "9525f1aed82f53aaf24a595f9ee6d63048c83644",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-30T09:27:50.000Z",
-      "scope": "one isolated Aspire 13.5.3 AppHost for the two S3 dashboard telemetry envelopes against Docker 28.5.2 remote DinD; exact owned stop, leak-check, teardown, and zero Aspire/DinD/exact-process postconditions mandatory",
-      "supervisorRoute": "Claude Fable 5 medium session 4e08fdff-708d-4d6b-8ba9-fded2fc292e3 with Remote Control",
-      "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s3",
-      "preflight": {
-        "pid1": "tini",
-        "zombieCount": 0,
-        "dockerContainers": 0,
-        "aspireApplications": 0,
-        "otherLeaseOwners": 0
-      },
-      "cleanupRequired": true,
-      "dispatchedAt": "2026-08-30T09:29:00.000Z",
-      "implementationThread": {
-        "threadId": "01a05200-345d-7ef0-bb18-30c4dacdaf4a",
-        "route": "gpt-5.6-sol/medium",
-        "routeVerdict": "matched",
-        "worktree": "/home/agent/projects/netscript/worktrees/007-aspire-s3",
-        "brief": "/home/agent/aspire-13-5-s3-phase-b-brief.md",
-        "staleEnvironmentCorrection": "same-thread steering queued before first runtime start: Docker 28.5.2 at 10.4.12.19 and inotify 1024 supersede generated brief literals"
-      },
-      "completedAt": "2026-08-30T09:48:00.000Z",
-      "verdict": "BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY",
-      "blocker": "After attempt 2 omitted scratch-only DataPath, Aspire advertised the remote-DinD PostgreSQL endpoint as localhost:17858; AppHost health checks and an independent connect both received 127.0.0.1 connection refused, so dependent resources remained waiting and no telemetry envelope existed.",
-      "attempt1": {
-        "grantedAt": "2026-08-30T09:27:50.000Z",
-        "contentHead": "2b0d33bdf2234a26877a7a972cb13275f3811174",
-        "verdict": "BLOCKED_REMOTE_DIND_BIND_SOURCE_VISIBILITY",
-        "blocker": "Postgres and Redis FailedToStart because worktree-local withDataBindMount sources were not visible to the remote Docker daemon.",
-        "capture": "no telemetry envelope captured, copied, or fabricated",
-        "cleanup": "Aspire []; Docker containers 0; survivors []; teardown preview empty"
-      },
-      "attempt2": {
-        "grantedAt": "2026-08-30T09:41:24.000Z",
-        "contentHead": "9525f1aed82f53aaf24a595f9ee6d63048c83644",
-        "authorizedScratchCorrection": "omit DataPath from the scratch-only AppHost; no product code or configuration changed",
-        "verdict": "BLOCKED_REMOTE_DIND_ENDPOINT_TOPOLOGY",
-        "capture": "no resources or spans envelope captured, copied, or fabricated",
-        "retry": "no third attempt authorized"
-      },
-      "cleanup": {
-        "aspirePostcondition": "empty",
-        "dockerPostcondition": "empty",
-        "dockerVolumePostcondition": "empty",
-        "survivors": 0,
-        "runtimeProcessPostcondition": "empty",
-        "ownedRemoval": "the sole persistent PostgreSQL container and its same-second anonymous volume were positively registered and removed",
-        "state": "complete_exact_zero"
-      }
-    },
-    {
-      "id": "pr1747-background-reference-runtime",
-      "state": "running",
-      "lane": "aspire-research",
-      "leafId": "pr1747-background-reference-validation",
-      "gateId": "scaffold.runtime_and_runtime.flow-b-fixture",
-      "preGateHead": "68c80e7434c151f26f471c232484595fa525fde2",
-      "leaseOwner": "codex-root-0.0.7",
-      "grantedAt": "2026-08-31T03:32:00.000Z",
-      "scope": "one exact-head PostgreSQL scaffold.runtime plus runtime.flow-b-fixture pass through tcp://netscript-dind:2375; published ports reached at netscript-dind:<port>; mandatory Aspire stop and containers/volumes/custom-networks cleanup to exact zero",
-      "preflight": {
-        "aspireApplications": 0,
-        "dockerContainers": 0,
-        "dockerVolumes": 0,
-        "dockerCustomNetworks": 0,
-        "otherLeaseOwners": 0
-      },
-      "attempt": 2,
-      "attempt1": {
-        "state": "interrupted_no_verdict",
-        "lastCompletedGate": "generated.sagas-registry",
-        "interruptedAtGate": "generated.quality-negative",
-        "cause": "Claude shell execution ceiling killed the process before gate-end or final report",
-        "cleanup": "Aspire empty; containers 0; volumes 0; custom networks 0"
-      },
-      "retryGrantedAt": "2026-08-31T03:46:00.000Z",
-      "retryRunner": "dedicated durable tmux runner outside the Claude tool-call timeout",
-      "cleanupRequired": true
-    }
-  ],
+  "expensiveGates": [],
   "openIssueOwnership": {
-    "capturedAt": "2026-09-02T12:22:00.000Z",
-    "source": "GitHub milestone 27 open issues; exactly one orchestrator:* label per issue",
-    "openIssueCount": 33,
+    "capturedAt": "2026-09-03T08:15:00.000Z",
+    "source": "Live GitHub milestone 27 export; actual remaining issues, not historical frozen inventory.",
+    "openIssueCount": 8,
     "unassigned": 0,
     "multiplyAssigned": 0,
     "counts": {
-      "features": 9,
-      "fixes": 14,
-      "internals": 2,
-      "docs": 1,
-      "aspire": 7
-    },
-    "queueRule": "Each supervisor queries its orchestrator:<lane> label as the authoritative queue; serialisation applies within that orchestrator only, and a parked leaf never blocks another lane.",
-    "deliveryPathAudit": {
-      "openPrPaths": 19,
-      "activeOrDependencyPathsWithoutPr": [1349, 863, 1881, 1844],
-      "queueCorrectionsDispatched": [1926, 1920, 1880, 1455, 1544, 1601, 1557, 1249, 1481],
-      "capturedAt": "2026-09-02T12:22:00.000Z"
-    }
-  },
-  "openPrOwnership": {
-    "capturedAt": "2026-09-02T12:22:00.000Z",
-    "milestoneOpenPrCount": 19,
-    "milestoneUnassigned": 0,
-    "milestoneMultiplyAssigned": 0,
-    "counts": {
-      "features": 7,
-      "fixes": 5,
-      "internals": 3,
-      "docs": 1,
+      "features": 1,
+      "fixes": 4,
+      "internals": 0,
+      "docs": 0,
       "aspire": 3
     },
-    "outsideMilestone": {
-      "docsAssigned": [1522, 1640],
-      "auditPendingAtCapture": [780, 822]
-    },
-    "queueRule": "Every open PR has an explicit owner and exact next gate; drafts may be active, converging, or explicitly dispositioned, never silently parked."
+    "issues": [
+      {
+        "number": 1971,
+        "owner": "orchestrator:fixes",
+        "state": "OPEN",
+        "title": "scaffold: production deno task build fails on catalog: zod specifier after db codegen",
+        "url": "https://github.com/rickylabs/netscript/issues/1971"
+      },
+      {
+        "number": 1881,
+        "owner": "orchestrator:aspire",
+        "state": "OPEN",
+        "title": "test(aspire): clean-machine quickstart canary runs the root README sequence without manual recovery (#863 gate 3)",
+        "url": "https://github.com/rickylabs/netscript/issues/1881"
+      },
+      {
+        "number": 1844,
+        "owner": "orchestrator:fixes",
+        "state": "OPEN",
+        "title": "ci(e2e-cli): runtime.wait.garnet times out at 300s on the Postgres scaffold-runtime tier",
+        "url": "https://github.com/rickylabs/netscript/issues/1844"
+      },
+      {
+        "number": 1712,
+        "owner": "orchestrator:aspire",
+        "state": "OPEN",
+        "title": "Epic: Aspire 13.5 adoption and orchestration stabilization",
+        "url": "https://github.com/rickylabs/netscript/issues/1712"
+      },
+      {
+        "number": 1481,
+        "owner": "orchestrator:fixes",
+        "state": "OPEN",
+        "title": "fix(fresh-ui): /design ships ungated — the defect class RFC 0005 guards against",
+        "url": "https://github.com/rickylabs/netscript/issues/1481"
+      },
+      {
+        "number": 1455,
+        "owner": "orchestrator:fixes",
+        "state": "OPEN",
+        "title": "workers: preserve job payload type through definition, registry, and enqueue",
+        "url": "https://github.com/rickylabs/netscript/issues/1455"
+      },
+      {
+        "number": 1354,
+        "owner": "orchestrator:features",
+        "state": "OPEN",
+        "title": "feat(cli): no verb generates a resource route slice — the typed contract, cache-first loader and withResource page must be hand-copied from init",
+        "url": "https://github.com/rickylabs/netscript/issues/1354"
+      },
+      {
+        "number": 863,
+        "owner": "orchestrator:aspire",
+        "state": "OPEN",
+        "title": "scaffold: `netscript db init` can block indefinitely on an Unhealthy-but-Running Postgres resource (clean-machine quickstart flake)",
+        "url": "https://github.com/rickylabs/netscript/issues/863"
+      }
+    ],
+    "queueRule": "Topics remain independent; no capped-supervisor polling loop; primary steers existing authors. Aspire is a preserved specialized supervisor over the schema's historic four-lane grouping."
+  },
+  "openPrOwnership": {
+    "capturedAt": "2026-09-03T08:15:00.000Z",
+    "prs": [
+      {
+        "number": 1970,
+        "topic": "fixes"
+      },
+      {
+        "number": 1945,
+        "topic": "fixes"
+      },
+      {
+        "number": 1958,
+        "topic": "features"
+      },
+      {
+        "number": 1641,
+        "topic": "coordinator",
+        "role": "harness-only, never product release barrier"
+      }
+    ]
   },
   "canaryCheckpoints": [
     {
@@ -5365,11 +5940,7 @@
   "existingReleaseLease": false,
   "releaseWriters": [],
   "releaseCaptain": {
-    "state": "inactive",
-    "agentId": null,
-    "leaseId": null,
-    "contentSha": null,
-    "evidence": []
+    "state": "inactive"
   },
   "environmentState": {
     "dockerContainers": 0,
@@ -5388,5 +5959,311 @@
     "lifecycleSmoke": "13 passed / 0 failed",
     "verifiedAt": "2026-09-02T11:50:00.000Z"
   },
-  "updatedAt": "2026-09-02T11:52:00.000Z"
+  "updatedAt": "2026-09-03T08:15:00.000Z",
+  "recoveredTopicSupervisors": [
+    {
+      "topic": "features",
+      "sessionId": "8a722f0a-74b2-4f82-b822-88be00fc9eae",
+      "pid": 8729,
+      "bridgeSessionId": "session_01VyeBXMJmj5uPaQFngpkdgn",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-features",
+      "state": "provider-spend-capped; Remote Control restored",
+      "verifiedAt": "2026-09-03T07:59:00Z"
+    },
+    {
+      "topic": "fixes",
+      "sessionId": "6b1bf71b-f57e-4f03-9b05-34cc62cadd3c",
+      "pid": 8792,
+      "bridgeSessionId": "session_018SSWZkA5iXGaM4M62ek9Hq",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-fixes",
+      "state": "provider-spend-capped; Remote Control restored",
+      "verifiedAt": "2026-09-03T07:59:00Z"
+    },
+    {
+      "topic": "internals",
+      "sessionId": "98833bca-9714-4f63-8230-2e3929f6b103",
+      "pid": 8855,
+      "bridgeSessionId": "session_01CUWDTC8s7BS9tUWU8nrKge",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-internals",
+      "state": "provider-spend-capped; Remote Control restored",
+      "verifiedAt": "2026-09-03T07:59:00Z"
+    },
+    {
+      "topic": "docs",
+      "sessionId": "1e88fa17-749f-4294-9ee8-07ab1fa5555e",
+      "pid": 8918,
+      "bridgeSessionId": "session_01T3Wa3rFPDedjCNtaLqwHpF",
+      "effort": "low",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
+      "state": "provider-spend-capped; Remote Control restored",
+      "verifiedAt": "2026-09-03T07:59:00Z"
+    },
+    {
+      "topic": "aspire",
+      "sessionId": "baff9670-5104-412c-9041-01307926d4cc",
+      "pid": 8981,
+      "bridgeSessionId": "session_01V4CCixt6nEXmFbYJN3pTy2",
+      "effort": "medium",
+      "model": "claude-fable-5-1",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-aspire",
+      "state": "provider-spend-capped; Remote Control restored",
+      "verifiedAt": "2026-09-03T07:59:00Z"
+    }
+  ],
+  "activeImplementationThreads": [
+    {
+      "pr": 1970,
+      "threadId": "01a06201-d0b9-7cb1-afe6-8b071ca28012",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1970",
+      "pid": 5580,
+      "head": "303c4e87a5e55d01273146deac8f0e3fe7b52a13",
+      "action": "integrate prepared handler-freeze repair ad5a74e764c6ed85d7b7d165ce62c9bed7d70d32 + main, exact gates",
+      "state": "active",
+      "lastProgressAt": "2026-09-03T08:14:17Z"
+    },
+    {
+      "pr": 1945,
+      "threadId": "01a06322-7bb5-7d80-badf-3068fb4942eb",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1481",
+      "pid": 6035,
+      "head": "d813df7ca1e4f265943d5874fd959a0da1a42746",
+      "action": "integrate main including #1956, diagnose terminal runtime result, exact gates",
+      "state": "active",
+      "lastProgressAt": "2026-09-03T08:14:17Z"
+    },
+    {
+      "pr": 1958,
+      "threadId": "01a06424-38fe-7893-ba59-6064b0dd616e",
+      "worktree": "/home/agent/projects/netscript/worktrees/007-leaf-1354-g",
+      "pid": 6158,
+      "head": "8341c07431cd333a9e109c5732c2958704334ab6",
+      "action": "repair behavior.app-reference loading-state failure from run 33719217078",
+      "state": "active",
+      "lastProgressAt": "2026-09-03T08:14:17Z"
+    }
+  ],
+  "reconciliation": {
+    "observedAt": "2026-09-03T08:15:00.000Z",
+    "source": "receipts/github-prs-2026-09-03.json",
+    "scope": "Current known leaves and all open milestone issues; original frozen history retained, ownership labels honored without relaunch. No receipt fabricated or old owner boundary reopened."
+  },
+  "reporting": {
+    "cadenceMinutes": 60,
+    "lastReportAt": "2026-09-03T08:15:00.000Z",
+    "nextReportDueAt": "2026-09-03T09:15:00.000Z",
+    "lastReportRef": "worklog.md#2026-09-03-restart-delivery",
+    "headline": "#1981 merged; three remaining product PRs in exact-head verification. Next canary not yet dispatchable.",
+    "currentMainSha": "94fe507af47171cd4f295e8f532b281d7147b334",
+    "canary": {
+      "target": "0.0.7-canary.10 (next available immutable number)",
+      "state": "qualifying",
+      "eta": {
+        "window": "45–90 minutes after the three verified merge packets; conditional, not a publication promise",
+        "confidence": "low",
+        "basis": "Two hosted runtime tiers take ~7–12 min per head, independent delta reviews still required; resource probe exposed one more stale fixture, so repair duration unresolved."
+      },
+      "criticalPath": [
+        {
+          "id": "resource-acceptance",
+          "state": "repairing",
+          "impact": "Current main retired the showcase island; old acceptance probe blocks a coherent candidate.",
+          "nextAction": "Same #1958 author updates real emitted island proof; regenerate receipts."
+        },
+        {
+          "id": "merge-packets",
+          "state": "gating",
+          "impact": "Worker payload typing and /design exclusion are user-facing payload for the same candidate.",
+          "nextAction": "Consume #1970/#1945 after exact CI and delta review, independently of docs/internals."
+        },
+        {
+          "id": "canary-pair",
+          "state": "queued",
+          "impact": "Stable cannot publish without same-content canary publish and pinned production E2E.",
+          "nextAction": "Dispatch one release-canary workflow after candidate convergence; watch to terminal."
+        }
+      ]
+    },
+    "progress": {
+      "mergedPullRequests": [
+        1981
+      ],
+      "closedIssues": [],
+      "newIssues": [],
+      "queueDeltaExplanation": "Open PRs fell 5→4; eight actual issues remain. Three late incident issues recovered in the central ledger were already in the owner's milestone, not newly introduced scope."
+    },
+    "scope": {
+      "openIssueCount": 8,
+      "ownedIssueCount": 8,
+      "scheduledIssueCount": 8,
+      "openPullRequestCount": 4,
+      "unscheduledIssueNumbers": []
+    },
+    "mergeQueue": [
+      {
+        "prNumber": 1970,
+        "lane": "fixes",
+        "state": "gating",
+        "nextGate": "Exact CI/two hosted runtime tiers, then separate-session bounded delta IMPL-EVAL; coordinator merge.",
+        "nextAction": "Existing same author continues; primary coordinator verifies and merges."
+      },
+      {
+        "prNumber": 1945,
+        "lane": "fixes",
+        "state": "gating",
+        "nextGate": "Exact runtime proof after merged codegen/Zod fixes; acceptance mirror, independent delta evaluation, coordinator merge.",
+        "nextAction": "Existing same author continues; primary coordinator verifies and merges."
+      },
+      {
+        "prNumber": 1958,
+        "lane": "features",
+        "state": "implementing",
+        "nextGate": "Canonical pages browser probe now PASS; repair retired ServiceShowcaseLab served-island expectation, preserve real island proof; exact two-tier run and independent delta evaluation.",
+        "nextAction": "Existing same author continues; primary coordinator verifies and merges."
+      }
+    ],
+    "orchestratorMatrix": [
+      {
+        "lane": "features",
+        "state": "active",
+        "activeItems": [
+          1354,
+          1958
+        ],
+        "lastConcreteProgressAt": "2026-09-03T08:14:14Z",
+        "blocker": "Native Fable monthly cap; existing Codex author remains productive.",
+        "nextAction": "Finish real generated-island acceptance and delta evaluation."
+      },
+      {
+        "lane": "fixes",
+        "state": "active",
+        "activeItems": [
+          1455,
+          1481,
+          1844,
+          1971,
+          1970,
+          1945
+        ],
+        "lastConcreteProgressAt": "2026-09-03T08:09:42Z",
+        "blocker": "Native Fable monthly cap; original two Codex authors are active.",
+        "nextAction": "Consume CI/evaluation packets; independently audit historical Garnet proof without claiming inferred root cause."
+      },
+      {
+        "lane": "internals",
+        "state": "complete",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-09-03T07:59:00Z",
+        "blocker": "Native Fable monthly cap. Specialized Aspire ownership is recorded separately; not an internal implementation queue.",
+        "nextAction": "No new internal feature scope; coordinator continues independent Aspire published acceptance."
+      },
+      {
+        "lane": "docs",
+        "state": "complete",
+        "activeItems": [],
+        "lastConcreteProgressAt": "2026-09-03T08:11:43Z",
+        "blocker": "Native Fable monthly cap.",
+        "nextAction": "Release-note top-up after final merges; no docs barrier to product work."
+      }
+    ],
+    "topicSupervisors": [
+      {
+        "topic": "features",
+        "sessionId": "8a722f0a-74b2-4f82-b822-88be00fc9eae",
+        "pid": 8729,
+        "bridgeSessionId": "session_01VyeBXMJmj5uPaQFngpkdgn",
+        "effort": "low",
+        "model": "claude-fable-5-1",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-features",
+        "state": "provider-spend-capped; Remote Control restored",
+        "verifiedAt": "2026-09-03T07:59:00Z"
+      },
+      {
+        "topic": "fixes",
+        "sessionId": "6b1bf71b-f57e-4f03-9b05-34cc62cadd3c",
+        "pid": 8792,
+        "bridgeSessionId": "session_018SSWZkA5iXGaM4M62ek9Hq",
+        "effort": "low",
+        "model": "claude-fable-5-1",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-fixes",
+        "state": "provider-spend-capped; Remote Control restored",
+        "verifiedAt": "2026-09-03T07:59:00Z"
+      },
+      {
+        "topic": "internals",
+        "sessionId": "98833bca-9714-4f63-8230-2e3929f6b103",
+        "pid": 8855,
+        "bridgeSessionId": "session_01CUWDTC8s7BS9tUWU8nrKge",
+        "effort": "low",
+        "model": "claude-fable-5-1",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-internals",
+        "state": "provider-spend-capped; Remote Control restored",
+        "verifiedAt": "2026-09-03T07:59:00Z"
+      },
+      {
+        "topic": "docs",
+        "sessionId": "1e88fa17-749f-4294-9ee8-07ab1fa5555e",
+        "pid": 8918,
+        "bridgeSessionId": "session_01T3Wa3rFPDedjCNtaLqwHpF",
+        "effort": "low",
+        "model": "claude-fable-5-1",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-docs",
+        "state": "provider-spend-capped; Remote Control restored",
+        "verifiedAt": "2026-09-03T07:59:00Z"
+      },
+      {
+        "topic": "aspire",
+        "sessionId": "baff9670-5104-412c-9041-01307926d4cc",
+        "pid": 8981,
+        "bridgeSessionId": "session_01V4CCixt6nEXmFbYJN3pTy2",
+        "effort": "medium",
+        "model": "claude-fable-5-1",
+        "worktree": "/home/agent/projects/netscript/worktrees/007-aspire",
+        "state": "provider-spend-capped; Remote Control restored",
+        "verifiedAt": "2026-09-03T07:59:00Z"
+      }
+    ],
+    "blockers": [
+      {
+        "id": "stale-island-probe",
+        "category": "test-harness",
+        "summary": "Resource pages now pass in both database tiers; the next probe still names the removed ServiceShowcaseLab instead of generated PeopleIsland.",
+        "impact": "Blocks the resource PR and pre-canary full acceptance, not independent worker repairs.",
+        "owner": "features / existing #1958 author",
+        "nextAction": "Retarget real marker/client-module/bundle evidence with negative controls; no skip.",
+        "ownerDecisionRequired": false
+      },
+      {
+        "id": "native-fable-quota",
+        "category": "evaluator-transport",
+        "summary": "All five restored native Fable supervisors report monthly spend cap; visibility does not mean executing.",
+        "impact": "Native supervisory turns unavailable; same Codex authors and sanctioned OpenRouter evaluators continue.",
+        "owner": "coordinator",
+        "nextAction": "Do not spin retries or silently change model/spend settings; route approved evaluations and keep existing authors moving.",
+        "ownerDecisionRequired": false
+      },
+      {
+        "id": "historical-garnet-cause",
+        "category": "infrastructure",
+        "summary": "Original run 33404321608 report preserves 300-second timeout but not referenced AppHost logs; current diagnoses/soak must not be called historical root-cause proof.",
+        "impact": "#1844 remains open for honest acceptance disposition; no current Garnet regression proven.",
+        "owner": "coordinator / fixes",
+        "nextAction": "Audit available original artifacts and current readiness receipts; surface exact acceptance decision if evidence cannot satisfy original criterion.",
+        "ownerDecisionRequired": false
+      }
+    ],
+    "environment": {
+      "checkedAt": "2026-09-03T07:50:00Z",
+      "aspireApplications": 0,
+      "dockerContainers": 0,
+      "dockerCustomNetworks": null
+    },
+    "ownerDecisions": []
+  }
 }

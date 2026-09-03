@@ -1,0 +1,620 @@
+{
+  "schemaVersion": 1,
+  "repo": "rickylabs/netscript",
+  "milestone": "0.0.7",
+  "capturedAt": "2026-09-03T08:15:00.000Z",
+  "pullRequests": [
+    {
+      "number": 1696,
+      "issueNumbers": [
+        1694
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "2a0a5608629cc2793233507c8449d9316ffeb2ee",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1710,
+      "issueNumbers": [
+        1709
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "30df7b9ff8e3370a7420e5da1c46476253c05b0d",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1711,
+      "issueNumbers": [
+        1112
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "07e12efacf3cd23672395507cbf77ecf620cd454",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1652,
+      "issueNumbers": [
+        1551
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "a465836b4cc1c40262a473de07b5744e70b20ead",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1653,
+      "issueNumbers": [
+        1378,
+        1545
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "70177e80821a916c83ffa72041c6bb24bbb6ccc8",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1644,
+      "issueNumbers": [
+        1561,
+        1563,
+        1621
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "d6e6a6788cd38127f822d192f37557106dad4ebc",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1643,
+      "issueNumbers": [
+        1243
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "a949a6cd1777b0d05b1a3b45143de15951aa6dc2",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1654,
+      "issueNumbers": [
+        1262,
+        1263,
+        1588
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "7cfaf70cc5a42e74af4ae8b7be76d5a5cbf4fcc5",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1657,
+      "issueNumbers": [
+        1358
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "b71c1ee723813dd384a6490f342360f9a434a89e",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1656,
+      "issueNumbers": [
+        1542
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "b80794470cd175ad89d27c06a764ab1d032d3d9f",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1658,
+      "issueNumbers": [
+        1611,
+        1613
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "bf07062987088809133ccacd380be6b016b511ed",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1663,
+      "issueNumbers": [
+        1604,
+        1618,
+        1622
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "a188c7c730be1f71c255057514d5d8d43c10e594",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1666,
+      "issueNumbers": [
+        1296
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "92988da30a4468f5ea77ea4e5a3e243469f92e52",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1660,
+      "issueNumbers": [],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "615786c1a93c39e7f6b9a1b40b5cee39b163ff8a",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1661,
+      "issueNumbers": [
+        1448
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "f74695bc4d0b916ed52ae922d96263f00c5ca6df",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1665,
+      "issueNumbers": [
+        1637,
+        1619,
+        1620,
+        1598,
+        1623
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "ac274a46489b9ab746e5be22ca71300ed94eaadb",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1669,
+      "issueNumbers": [
+        1461
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "313cc08d572ea7db1764abf2efdcc11f7a63abde",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1692,
+      "issueNumbers": [
+        1350
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "686bae07b2bc66353b2eec9dd56baa0779a63a20",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1662,
+      "issueNumbers": [
+        1293
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "f52aa471c0b4e8fe44b7d0e231c69f58b52dc9bf",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1664,
+      "issueNumbers": [
+        1355,
+        1360
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "67d3fd3128a93412b6ed87402bd2e31fbd59fdbf",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1651,
+      "issueNumbers": [
+        1502
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "ec69100c89195adb776c4cef3724c8c3683c553c",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1728,
+      "issueNumbers": [
+        1371
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "1b67b03b4ee7e488c8da266b686bd3b72d479071",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1729,
+      "issueNumbers": [
+        1672,
+        1674,
+        1675
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "608f68b076bfb724d111bdaf075fd4111703d937",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1731,
+      "issueNumbers": [
+        1466
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "e325b7fe212f7cf7e0985c634af19e2bd4d5ea22",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1736,
+      "issueNumbers": [
+        1734
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "be949ebd3359624fe881883e6ac2d78928703a1f",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1739,
+      "issueNumbers": [
+        1673
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "05a274e409b42388991da7a88b43105c80d0f9e1",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1746,
+      "issueNumbers": [
+        1745
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "84a5fd1164b2ee9cb564d10fb3854ee015a7ab17",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1748,
+      "issueNumbers": [
+        1000
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "9b79d90ef729519e4007010d10851304661a4d61",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1727,
+      "issueNumbers": [
+        1713
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "32e418c586e7a4f6d7c6d8312b8787fe7c4f59c2",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1735,
+      "issueNumbers": [
+        1714
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "fffbb0c473dec14aedd858127b9a3ce4afee74a2",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1741,
+      "issueNumbers": [
+        1715
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "338922a20db6d5c908ab1ef0efb3e896f3de725a",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1738,
+      "issueNumbers": [
+        1716
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "b2a0529fa19b5726c41fdbf6a7678bb67f95347b",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1747,
+      "issueNumbers": [
+        1732
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "b189cb872542283bdba111c59f0a459e9f57e710",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1740,
+      "issueNumbers": [
+        979,
+        1370,
+        1717
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "1c2cf2ef5bd89fa46e736ceb6ea7b556e2a5c049",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1743,
+      "issueNumbers": [
+        1280,
+        1718
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "b6b0bb87cb7b8ecd1e8f7f4b99076baf13f19e25",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1744,
+      "issueNumbers": [
+        1429,
+        1719
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "6f4da15b6c67d42fe04b50c063d99554d8ad31b9",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1754,
+      "issueNumbers": [
+        1720,
+        863
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "daa4dad4dc9150bb51c2423c768104b749f6d227",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1755,
+      "issueNumbers": [
+        1749
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "91bf721c6f6f6a20c55077a6aaa72e5316734abb",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1761,
+      "issueNumbers": [
+        1757
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "c1700128e38dd923cd57298c171b5976ec690a83",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1756,
+      "issueNumbers": [
+        1533
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "b607bfe260138df616f748973a8f213f5e3f4b7d",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1758,
+      "issueNumbers": [
+        1462
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "94620577db9532cb281160c0734cfe8fe33e1115",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1759,
+      "issueNumbers": [
+        1721
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "fcce551be154028d9347e03e0a20f3c5c6565fc7",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1760,
+      "issueNumbers": [
+        1722
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "0b3f13e0c3f7ad23fdd151fc20ef618613af6933",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1762,
+      "issueNumbers": [
+        1387
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "e3852dfb51108a6a49b30fc1f918e164defb90b2",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1763,
+      "issueNumbers": [
+        1730
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "c80933f7b94804319024b77247f653f073b738ed",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1764,
+      "issueNumbers": [
+        1368
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "9f2e6abd2487d8f94c9f71541a29d17e20340469",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1771,
+      "issueNumbers": [
+        1723,
+        1642
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "d77c026f3dc1c5d5aecd325b22c2c8222b199249",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1772,
+      "issueNumbers": [
+        1770
+      ],
+      "lane": "docs",
+      "baseBranch": "main",
+      "headSha": "6d275b2c9350b084ccf4fa62982e2f20432fe9d0",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1773,
+      "issueNumbers": [
+        1616
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "550bc44e9f0b5622c06f1106bbc68cbb44910d2c",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1970,
+      "issueNumbers": [
+        1455
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "303c4e87a5e55d01273146deac8f0e3fe7b52a13",
+      "state": "open",
+      "role": "leaf"
+    },
+    {
+      "number": 1945,
+      "issueNumbers": [
+        1481,
+        1971
+      ],
+      "lane": "fixes",
+      "baseBranch": "main",
+      "headSha": "d813df7ca1e4f265943d5874fd959a0da1a42746",
+      "state": "open",
+      "role": "leaf"
+    },
+    {
+      "number": 1958,
+      "issueNumbers": [
+        1354
+      ],
+      "lane": "features",
+      "baseBranch": "main",
+      "headSha": "8341c07431cd333a9e109c5732c2958704334ab6",
+      "state": "open",
+      "role": "leaf"
+    },
+    {
+      "number": 1981,
+      "issueNumbers": [
+        1881
+      ],
+      "lane": "internals",
+      "baseBranch": "main",
+      "headSha": "650844452d3d772975c10aa1bc6646b4115eed23",
+      "state": "merged",
+      "role": "leaf"
+    },
+    {
+      "number": 1641,
+      "issueNumbers": [],
+      "lane": null,
+      "baseBranch": "main",
+      "headSha": "0f486e2a8654b37eb3d9ef256af1a5ece94fbb81",
+      "state": "open",
+      "role": "coordinator-artifact"
+    }
+  ]
+}
