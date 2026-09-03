@@ -4,10 +4,10 @@ import { inspectAllContainers } from './cleanup.ts';
 
 Deno.test('a container removed between docker list and inspect is already removed', async () => {
   const id = '7ab8913455fa';
-  const calls: string[] = [];
+  const calls: string[][] = [];
 
   const inspection = await inspectAllContainers((command, args) => {
-    calls.push([command, ...args].join(' '));
+    calls.push([command, ...args]);
     if (args[0] === 'ps') {
       return Promise.resolve({ code: 0, stdout: `${id}\n`, stderr: '' });
     }
@@ -19,7 +19,7 @@ Deno.test('a container removed between docker list and inspect is already remove
   });
 
   assertEquals(inspection, { containers: [], vanishedContainerIds: [id] });
-  assertEquals(calls, ['docker ps -aq', `docker inspect ${id}`]);
+  assertEquals(calls, [['docker', 'ps', '-aq'], ['docker', 'inspect', id]]);
 });
 
 Deno.test('an inspect failure other than same-id removal still fails cleanup', async () => {

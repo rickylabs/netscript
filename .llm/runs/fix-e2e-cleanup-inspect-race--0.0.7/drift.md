@@ -36,3 +36,16 @@
 - **Action:** accept; record requested and observed workflow identity, and do not claim reasoning
   effort because OpenHands does not expose it.
 - **Evidence:** `supervisor.md`; PR #1979 ready transition and resulting workflow/comment.
+
+## 2026-09-03 — scoped S3 gates missed the teardown source scan
+
+- **What:** The first IMPL-EVAL found that the new test's joined command transcript contained the
+  source phrase rejected by the repository-wide shared-host teardown guard.
+- **Source:** Evaluator comment on PR #1979; `.llm/tools/agentic/teardown/forbidden-commands_test.ts`.
+- **Expected:** S3 scoped tests and quality/doctrine evidence would predict the merge lane.
+- **Actual:** Product behavior and focused tests were green, but `quality:gate` does not include the
+  repository teardown source scan.
+- **Severity:** moderate.
+- **Action:** accept evaluator finding; represent captured calls as argv arrays, run the guard plus
+  focused check/lint/fmt/tests, then require fresh exact-head CI and IMPL-EVAL.
+- **Evidence:** teardown guard 1/1 PASS; cleanup tests 9/9 PASS after the test-only repair.

@@ -16,7 +16,7 @@
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `complex_implementation` | Codex · OpenAI · GPT-5.6 Sol · high | Owner-directed generator for S1–S3 |
-| `formal_impl_evaluation` | Automated cloud evaluator · approved open model · observed identity pending | Separate-session final evaluator triggered once by draft→ready |
+| `formal_impl_evaluation` | OpenHands · OpenRouter · `z-ai/glm-5.3-flash` · effort not attested | Separate-session evaluator triggered by PR lifecycle |
 
 ## Recorded lane/eval overrides
 
@@ -24,5 +24,7 @@
   fit a lighter implementation lane; the requested identity is retained without changing scope.
 - The owner also required the draft→ready transition after S1–S3. Per `netscript-pr`, that
   transition owns the single automatic IMPL-EVAL dispatch, so no duplicate native/manual evaluator
-  is launched. OpenHands cannot attest reasoning effort; the final record will state the observed
-  model and that limitation without claiming an effort level.
+  is launched. OpenHands cannot attest reasoning effort; the record states that limitation without
+  claiming an effort level. The first evaluation passed product behavior at `d425207b0` but found a
+  merge-lane teardown-guard violation in the regression's command-string assertion, requiring one
+  exact-head re-evaluation after the test-only repair.

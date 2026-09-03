@@ -76,6 +76,9 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | 2026-09-03T03:20:08Z | S3 | durable gates | At exact head `63282ffcc`: focused test 9/9 PASS, Aspire parity PASS (946 checked, 0 fail), and `quality:gate` PASS. |
 | 2026-09-03T03:21:00Z | S3 | prohibited-delta guard | Product delta contains only `cleanup.ts` and `cleanup_test.ts`; no `deno.lock`, `.llm/tmp/pwcli/`, timeout, deadline, wait-array, `setTimeout`, or budget delta. |
 | 2026-09-03T03:21:00Z | S3 | re-baseline/reconcile | Refreshed `origin/main` to `3903feea6`; its three new commits do not overlap the target surface. Issue/PR remain `status:impl`; no scope change. |
+| 2026-09-03T03:44:00Z | hosted gates | initial exact-head CI | Both required hosted tiers passed at `d425207b0` in run `33711266536`: SQLite + Aspire + Garnet and Docker + PostgreSQL. |
+| 2026-09-03T03:46:00Z | IMPL-EVAL cycle 1 | PASS with owner action | OpenHands `z-ai/glm-5.3-flash` returned `OPENHANDS_VERDICT: PASS` for product behavior, but found that the test's joined command literal trips `forbidden-commands_test.ts`; exact-head completion therefore remains open. |
+| 2026-09-03T03:47:00Z | evaluator repair | GREEN | Changed the test transcript assertion from joined command strings to argv arrays. The repository teardown guard passes 1/1; focused cleanup tests pass 9/9; scoped check/lint/fmt are clean. No product behavior, receipt schema, or timing changed. |
 
 ## Decisions
 
@@ -91,6 +94,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | --- | --- | --- |
 | Owner-selected high generator effort exceeds the normal small-fix route. | minor | yes |
 | `origin/main` advanced by three unrelated commits during S3. | minor | yes |
+| S3 did not include the repository teardown source-scan guard. | moderate | yes |
 
 ## Gate Results
 
@@ -116,12 +120,13 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | `quality:gate` | PASS | `receipts/s3-quality-gate.json` | Quality scan + doctrine check exit 0 at `63282ffcc`; reported warnings are pre-existing and outside this two-file delta. |
 | F-CLI-1…31 | PENDING_SCRIPT | manual post-change diff review + `quality:gate` | Archetype profile has no dedicated F-CLI scripts; no public surface, composition, registry, binary, generated output, or folder-over-cap change. |
 | F-19 | PASS | scoped check/lint/fmt reports above | Exact two-file selection, no exclusions or drops. |
+| shared-host teardown guard | PASS | `forbidden-commands_test.ts` after evaluator repair | 1/1 passed; regression now asserts argv arrays without embedding the forbidden bulk-teardown phrase. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| hosted scaffold runtime tiers | NOT_RUN | CI after push | Local Aspire runtime prohibited. |
+| hosted scaffold runtime tiers | PASS_ON_PRIOR_HEAD | Actions run `33711266536` | Both required tiers passed at `d425207b0`; final repaired head must rerun in CI. Local Aspire runtime remains prohibited. |
 | cleanup unit behavior | PASS | focused structured wrapper | Vanished and non-vanished failure paths covered. |
 
 ### Consumer Gates
@@ -142,5 +147,5 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 
 - Evaluator should inspect the same-id error predicate, vanished-id aggregation, negative failure
   regression, prohibited-delta guard, and hosted tier evidence first.
-- Local S1–S3 are complete. Hosted tier checks and the fresh native Fable IMPL-EVAL remain before
-  close-gate completion.
+- Local S1–S3 and the evaluator-requested test-only repair are complete. Hosted tiers and the
+  separate OpenHands IMPL-EVAL must rerun at the repaired head before close-gate completion.
