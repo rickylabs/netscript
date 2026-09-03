@@ -134,7 +134,7 @@ export const COMMAND_REFERENCE_PATHS: readonly string[] = [
 ];
 
 /** Ratified root plus direct-child command census for the current public tree. */
-export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 91;
+export const EXPECTED_PUBLIC_DIRECT_COMMAND_COUNT = 92;
 
 export interface GoldenPathDocsResult {
   readonly pageCount: number;

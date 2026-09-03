@@ -24,7 +24,6 @@ import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/den
 import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
 import { CliffyPrompt } from '../../../kernel/adapters/runtime/prompt/cliffy-prompt.ts';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
-import { writeFreshRouteManifestSync } from '../../../kernel/adapters/scaffold/fresh-route-manifest.ts';
 import { StringTemplateAdapter } from '../../../kernel/adapters/scaffold/template-adapter.ts';
 import {
   createResourceSliceTemplateRenderer,
@@ -473,6 +472,9 @@ function createResourceSliceStager(): ResourceSliceStager {
         await Deno.mkdir(dirname(target), { recursive: true });
         await Deno.writeTextFile(target, leaf.content);
       }
+      const { writeFreshRouteManifestSync } = await import(
+        '../../../kernel/adapters/scaffold/fresh-route-manifest.ts'
+      );
       const derived = writeFreshRouteManifestSync(stagingRoot);
       const matches = derived.discoveredRoutes.filter((candidate) =>
         candidate.routePattern === route

@@ -25,4 +25,3 @@
 ## Open questions
 
 - None. Any newly discovered retire-set importer or rendered consumer is a stop/rescope condition, not an implementation choice.
-

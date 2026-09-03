@@ -86,6 +86,9 @@ the existing resource feature, not the init writer.
 | 2026-09-03 | F     | Base convergence              | Merged #1664 head `31d59a656` as `a042c6e57`. The only non-generated conflict was Slice E's evaluation receipt; both historical and superseding receipts were retained.                                                                                        |
 | 2026-09-03 | F     | Projection refresh            | Took the base side for generated projections, ran the assets-barrel and Aspire-manifest generators, then ran the MCP corpus generator on the clean merge commit after its dirty-read guard refused the in-progress merge. MCP regeneration was byte-identical. |
 | 2026-09-03 | F     | Closeout gates                | Every required post-merge gate passed; `deno.lock` retained hash `202d4c9bfb5841f1d3cee766351fdf63efc53a3b`.                                                                                                                                                   |
+| 2026-09-03 | F     | Merged-stack rebase           | Rebased the F-only commits from `275a878ab` onto merged #1664/#1891/#1950 main `3903feea63`; duplicated Slice A ancestry dropped and no conflict occurred.                                                                                                      |
+| 2026-09-03 | F     | Failed-quality diagnosis      | Reproduced CI's eager Rollup/FFI load, deferred both Fresh manifest imports to their execution paths, then ratified the newly visible `generate resource` command in the reference/census. Slice G's eight-file set remains untouched.                          |
+| 2026-09-03 | F     | Focused convergence gate      | `docs:accuracy` exit 0 (92/92 direct commands, 157 recursive); focused wrapper suite exit 0 (21 passed, 0 failed).                                                                                                                                              |
 
 ## Decisions
 
@@ -95,6 +98,8 @@ the existing resource feature, not the init writer.
 | Treat generated carriers as ceiling-exempt freshness output.                     | They are mechanical projections, not authored scope.                                                                        | owner/doctrine contract                    |
 | Format neutral rendered bodies before ownership markers on both callers.         | Init's final project formatter otherwise changed three marker bodies and made an exact command rerun appear `owned-edited`. | locked D3/D4/D8 + supervisor review        |
 | Defer Slice E LOW-2.                                                             | This no-product-change closeout records it with adapter extraction in debt `cli-resource-composition-io-1354`.              | owner closeout instruction / IMPL-EVAL L-4 |
+| Defer Fresh/Vite adapter module evaluation until a write/stage executes.          | Public command/help census must construct init/resource commands without requiring native Rollup FFI; the actual derivation calls and outputs are unchanged. | failed CI quality receipt / Slice F activation |
+| Add only the exact command-reference row required by the 92-command ratchet.      | Public activation must satisfy the existing docs-accuracy policy, while Slice G retains all eight planned guidance/runtime files. | failed CI quality receipt / serial slice boundary |
 
 ## Drift
 

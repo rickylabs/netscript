@@ -15,7 +15,6 @@ import { DEFAULT_UI_INIT_ITEMS, installUiRegistryItems } from '../../ui/registry
 import type { InitPipelineContext } from '../context.ts';
 import { adjustLocalBase } from '../support/helpers.ts';
 import { createScaffoldPlan } from '../../../domain/scaffold/scaffold-plan.ts';
-import { writeFreshRouteManifestSync } from '../../../adapters/scaffold/fresh-route-manifest.ts';
 import { writeExampleServiceAppFiles } from './write-example-service-app-files.ts';
 import {
   buildAppAgentsMarkdown,
@@ -386,6 +385,9 @@ export async function writeNormalizedAppFiles(
     });
   }
   if (!options.dryRun) {
+    const { writeFreshRouteManifestSync } = await import(
+      '../../../adapters/scaffold/fresh-route-manifest.ts'
+    );
     const derived = writeFreshRouteManifestSync(appDir);
     trackDerivedRouteFile(
       derived.result.manifestOutputPath,
