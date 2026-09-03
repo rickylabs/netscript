@@ -62,3 +62,14 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** significant
 - **Action:** preserve the established codegen-to-contract adjacency and put the resource pair immediately after the contract probe. This still guarantees `database.codegen < scaffold.resource-generate`, remains before generated quality/type-check gates, and requires no ninth file.
 - **Evidence:** failing assertion reported indices 21 and 23; the corrected selected order is `database.codegen`, `generated.service-client-contract`, `scaffold.resource-generate`, `scaffold.resource-rerun`.
+
+## 2026-09-03 — Live-main hosted run exposes the UI data-screen ordering prerequisite
+
+- **What:** After merging `origin/main` `e14322c511bbf26018c617c12f639474b6092c32`, the first full `scaffold.runtime` run reached `scaffold.resource-generate` only after `scaffold.ui-data-screen` had added a quoted `'data-screen'` entry to `appRoutes`.
+- **Source:** Exact-head hosted command `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` at merge commit `008d3264c5352abf6d1e3798d580550ec98e7e7c`.
+- **Expected:** Resource generation writes 11 files and its identical rerun reports 11 skips before generated-project quality gates.
+- **Actual:** The suite exited 1 after 23 passes; `scaffold.resource-generate` failed with `The appRoutes object contains an unsupported entry shape.` Cleanup passed. The generated router showed the standard `ui:add` output `'data-screen': createRouteReference(...)`, while the resource reconciler intentionally rejects quoted/computed keys.
+- **Severity:** high
+- **Action:** Keep the fail-closed reconciler unchanged and within the locked eight-file ceiling. Move `scaffold.ui-data-screen` in `RUNTIME_GATES` to immediately after `scaffold.resource-rerun`, preserving `database.codegen` → `generated.service-client-contract` → resource first run → resource rerun → UI data screen, all before generated quality/type-check gates. Encode the ordering in `resource-slice-gates_test.ts`.
+- **Evidence:** The correction changes only two already-enumerated Slice G files; focused resource/UI/suite reachability tests pass 68/68 before the full rerun.
+- **Lesson:** Runtime prerequisites include mutations made by earlier acceptance gates, not only generated files imported by the command. Gate-order design must trace every prior mutation of reconciled shared files.

@@ -73,9 +73,13 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
     GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
   );
   const selectedFirstRun = RUNTIME_GATES.indexOf(GATE.SCAFFOLD_RESOURCE_GENERATE);
+  const selectedRerun = RUNTIME_GATES.indexOf(GATE.SCAFFOLD_RESOURCE_RERUN);
+  const selectedDataScreen = RUNTIME_GATES.indexOf(GATE.SCAFFOLD_UI_DATA_SCREEN);
   assert(selectedDatabaseCodegen < selectedFirstRun);
   assertEquals(selectedServiceClientContract, selectedDatabaseCodegen + 1);
   assertEquals(selectedFirstRun, selectedServiceClientContract + 1);
+  assertEquals(selectedRerun, selectedFirstRun + 1);
+  assertEquals(selectedDataScreen, selectedRerun + 1);
 
   const runtimeIds = resolveSuite(SCAFFOLD.RUNTIME).gates.map((gate) => gate.id);
   const serviceClientGenerate = runtimeIds.indexOf(GATE.SCAFFOLD_SERVICE_CLIENT_GENERATE);
@@ -83,6 +87,7 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
   const firstRun = runtimeIds.indexOf(GATE.SCAFFOLD_RESOURCE_GENERATE);
   const rerun = runtimeIds.indexOf(GATE.SCAFFOLD_RESOURCE_RERUN);
   const serviceClientContract = runtimeIds.indexOf(GATE.GENERATED_SERVICE_CLIENT_CONTRACT);
+  const dataScreen = runtimeIds.indexOf(GATE.SCAFFOLD_UI_DATA_SCREEN);
   const generatedQuality = runtimeIds.indexOf(GATE.GENERATED_QUALITY_NEGATIVE);
   const generatedCheck = runtimeIds.indexOf(GATE.GENERATED_DENO_CHECK);
 
@@ -91,6 +96,7 @@ Deno.test('scaffold.runtime reaches resource gates after codegen and before gene
   assertEquals(serviceClientContract, databaseCodegen + 1);
   assertEquals(firstRun, serviceClientContract + 1);
   assertEquals(rerun, firstRun + 1);
+  assertEquals(dataScreen, rerun + 1);
   assert(rerun < generatedQuality);
   assert(rerun < generatedCheck);
 });
