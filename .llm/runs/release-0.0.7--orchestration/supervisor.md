@@ -1,5 +1,17 @@
 # Supervisor identity — release 0.0.7
 
+## OS-update recovery — 2026-09-03 07:58Z
+
+See `receipts/recovery-2026-09-03.json` for exact live identities, heads and issue ownership.
+Main is `e14322c511`; Canary 9 published; 29 PRs merged since Canary 6; eight issues and five PRs remain.
+All five native Claude Remote Control sessions were restored on owner-selected Fable 5.1
+(low; Aspire medium). Monthly spend limits still block Fable execution; no model/spend
+override was made. Three original Codex implementation threads are working on #1970,
+#1945 and #1958. #1981 inventory-only repair `650844452` is pushed, local parity PASS,
+awaiting exact hosted CI. Aspire/Docker inventories are zero via `mise exec`; no host
+lease granted. Preserve dirty primary `deno.lock` and tracked runs. Older status below
+is historical; complete inventory/DAG reconciliation before any new wave or cut.
+
 | Field                     | Value                                                                                                           |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Profile                   | `milestone-cluster`                                                                                             |
