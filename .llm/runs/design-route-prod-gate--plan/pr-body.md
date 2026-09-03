@@ -18,7 +18,8 @@ and rebuilding successfully.
 - [x] Implement fail-safe middleware, manifest/load/write plumbing, and production Vite exclusion — `0fd04af6d`
 - [x] Regenerate the embedded template barrel with the canonical generator — `0c1778026`
 - [x] Register the post-`DATABASE_CODEGEN` mutation-proved hosted gate and preserve service-client order — `de4d31b69`
-- [x] Integrate #1971/#1958 and current main without replacing shared probes — merge heads through `5243a19f9`
+- [x] Integrate #1971/#1958 and current main without replacing shared probes — merge heads through
+  `33fde3777` (current main `d2af6e8b4`)
 - [x] Complete scoped validation and independent IMPL-EVAL — evidence head `456abefbd`; `IMPL_EVAL_VERDICT: PASS`
 
 ## Acceptance
@@ -43,6 +44,9 @@ and rebuilding successfully.
   - [SQLite/Garnet job 100614048210](https://github.com/rickylabs/netscript/actions/runs/33744551964/job/100614048210): 99 passed / 0 failed; design clean/mutation/restored `true/true/true`; canonical app-reference and island probes passed
 - Independent cycle-2 IMPL-EVAL: `PASS` for the owned delta at `91a1ee897`; the three #1958 shared intersections were then verified proportionally at the integrated head with the exact-head gates above
 - Post-runtime integration assertion: core run `33744526413` exposed one stale #1958 codegen→client adjacency expectation (5,260 passed / 1 failed / 14 ignored); D-5's test-only correction now passes the focused set 115/115 and does not change runtime product source
+- Current-main integration: merge `33fde3777` carries #1970 without conflict; the asset generator
+  produced no delta, focused tests remain 115/115, CLI check remains 1,004 files / 9 batches / 0
+  diagnostics, and quality/doctrine plus all four carriers pass
 - Lock hygiene: no `deno.lock` delta; no local `e2e:cli`, Aspire, Docker, or browser runtime
 
 ```acceptance-evidence
@@ -75,7 +79,9 @@ entries:
 - PLAN-EVAL: `PASS_PLAN` for `f8ed75b41`
 - IMPL-EVAL cycle 1: `FAIL_FIX` on premature gate order, closed by `de4d31b69`
 - IMPL-EVAL cycle 2: `PASS` from isolated GLM 5.3 Flash max via the checked-in OpenRouter transport
-- Final integration review: the three shared #1958 files retain both contracts; the only post-runtime source delta is D-5's proportional resource-order assertion correction, with no product/runtime change
+- Final integration review: the three shared #1958 files retain both contracts; the only owned
+  post-runtime source delta is D-5's proportional resource-order assertion correction, with no
+  product/runtime change; current main is integrated through `d2af6e8b4`
 
 ## Drift / Debt
 

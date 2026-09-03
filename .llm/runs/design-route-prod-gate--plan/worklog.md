@@ -222,6 +222,7 @@ Vite-loadable module ID. Product remediation is owned by #1971.
 | Final core integration RED | FAIL_FIX | Core CI run `33744526413` at `456abefbd`: check passed (3,137 files, 0 diagnostics); tests reported 5,260 passed / 1 failed / 14 ignored because merged #1958's resource-order test retained the pre-#1481 codegen→client adjacency. D-5 records the bounded test-only correction. |
 | D-5 focused GREEN | PASS | Structured seven-file test run with executable worktree `TMPDIR`: 115 passed / 0 failed. The first post-restart attempt reported 113/2 only because `/ephemeral` is mounted `noexec`; both failures were #1958 temporary executable fixtures, not product assertions. No probe source was changed. |
 | D-5 proportional static gates | PASS | Structured CLI check 1,004 files / 9 batches / 0 diagnostics; scoped lint and format 1/1 corrected test file / 0 findings; `quality:gate`, explicit `arch:check`, asset/Aspire freshness, all four carrier checks, and lock hygiene exit 0. |
+| Current-main final integration | PASS | Fetched and mechanically merged main `d2af6e8b4` (#1970) as `33fde3777`; there were no conflicts and `gen:assets-barrel` produced no delta. Exact integration-head structured CLI check passed 1,004 files / 9 batches / 0 diagnostics; seven focused tests passed 115/115 using executable worktree `TMPDIR`; `quality:gate` (including `arch:check`) and all four carrier checks exited 0. #1970's scaffold-fixture/carrier changes do not intersect the owned design-gate behavior. |
 
 ## Handoff Notes
 
