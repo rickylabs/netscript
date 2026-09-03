@@ -123,6 +123,12 @@ root config change was taken into this slice.
 No Aspire, Docker, full `scaffold.runtime`, or other local runtime lease was started. `ci:full` is
 the live transition proof surface.
 
+Hosted CI initially found the generated global Aspire-surface manifest stale because five new
+Bucket-C comments introduced its search literal into previously absent files. The manifest is
+outside this slice's ceiling, so the same classifications were reworded as “resource state” or
+“orchestrated resource.” `deno task check:aspire-version-parity` passes afterward with no manifest,
+config, or lock change.
+
 ## Reconcile
 
 - S1: issue #1906 remains open and this partial slice uses `Refs #1906`; the six-file fence is clear

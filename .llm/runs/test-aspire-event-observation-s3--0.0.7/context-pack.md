@@ -16,3 +16,5 @@
 - S4 source/evidence head: `95ae2dfad33fffa94239a6c871a42da741009b06`. Focused tests,
   policy, quality, check, format, complete split lint coverage, and suite discovery pass. The known
   single-root lint config refusal is preserved in its own receipt.
+- Hosted parity repair: five Bucket-C comments were reworded to avoid expanding the out-of-scope
+  generated global surface manifest; the static parity gate passes with that manifest unchanged.

@@ -22,9 +22,9 @@ export interface FlowBStreamBatch {
 export interface FlowBSelectionOptions {
   /** Maximum number of control-delimited batches to inspect. */
   readonly maxBatches: number;
-  /** Application SSE-record selection ceiling; it does not observe Aspire resource state. */
+  /** Application SSE-record selection ceiling; it does not observe managed resource state. */
   readonly timeoutMs: number;
-  /** Application SSE-batch delay; it is not an Aspire readiness interval. */
+  /** Application SSE-batch delay; it is not a resource-readiness interval. */
   readonly retryDelayMs?: number;
   /** Read one batch, bounded by the remaining total time. */
   readonly readBatch: (

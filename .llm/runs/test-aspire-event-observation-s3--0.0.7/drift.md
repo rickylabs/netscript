@@ -8,3 +8,11 @@ its `catalog:zod` import cannot resolve after Deno ignores the parent config. Th
 slice 2 and outside the observation work. Equivalent structured wrapper runs cover 229 ordinary
 files plus all seven fixture files under the root `deno.json`, with zero findings and complete
 coverage. No config or lock change was made.
+
+## 2026-09-03 — generated Aspire-surface manifest boundary
+
+Hosted parity correctly reported the generated global manifest stale when five Bucket-C comments
+introduced its search literal into previously absent files. Regenerating that manifest is outside
+this slice's ceiling. The comments were reworded to the equally precise “resource state” or
+“orchestrated resource,” preserving the required classification without expanding the global
+manifest. The parity gate then passes with the checked-in manifest unchanged.

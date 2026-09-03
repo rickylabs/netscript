@@ -195,7 +195,7 @@ function mcpWidgetRoundtripScript(mcpModuleSpecifier: string): string {
     '  else return Response.json({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: "method not found" } });',
     '  return Response.json({ jsonrpc: "2.0", id: message.id, result }, { headers: { "mcp-session-id": sessionId } });',
     '});',
-    '/** In-process MCP HTTP round-trip ceiling; this fixture is not an Aspire resource. */',
+    '/** In-process MCP HTTP round-trip ceiling; this fixture is not an orchestrated resource. */',
     'const timeout = setTimeout(() => { console.error("MCP widget round trip timed out"); Deno.exit(1); }, 60_000);',
     'const pool = createMcpTransportPool({ servers: [{',
     '  kind: "streamable-http",',
