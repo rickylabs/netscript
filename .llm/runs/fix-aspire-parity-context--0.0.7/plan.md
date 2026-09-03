@@ -6,14 +6,21 @@ Part of #1712, not closure of the epic. No unresolved architecture decisions or 
 
 ## Locked scope
 
-1. Add narrowly owned version-floor and negative-version-guard classifications to the existing
-manifest generator. Parse only explicit plus-suffixed floor guidance and direct forbidText second
-string-literal arguments. Do not exempt entire active files. Classify the upgrade guide as the
-existing dual-train compat-fixture kind.
-2. Tests prove old pins elsewhere in those files still fail, ordinary positive guards and other
-argument positions fail, unowned floors fail, and compat guidance still requires the current train.
-3. Make one stale resource-name JSDoc version-neutral; do not change grammar/runtime.
-4. Regenerate the manifest from its canonical generator. No consumer bundle edits or manual TSV.
+Owner amendment (2026-09-03): Aspire checks must ignore ALL generated harness run files and transient
+state, not flag these as framework/documentation defects. Fold this directly into existing PR #1982.
+
+1. Shared scan-scope policy excludes every .llm/runs directory, .llm/tmp, .agents/generated working
+copy and transient caches/dependency/runtime state from parity, host-port and polling checks.
+The manifest no longer re-includes its owning research run. Retain committed files; no cleanup.
+2. Keep the narrowly owned negative-version-guard classification; only direct forbidText second
+string-literal arguments are ignored. Classify the maintained upgrade guide as the existing
+dual-train compat-fixture kind. The earlier generated-guide version-floor exception is removed
+because those working copies are now wholly outside the scan domain.
+3. Tests prove excluded rows are never read, live manifest contains no run/transient rows, and the
+same violations in framework/docs still fail. Preserve shipped generated source and compat cases.
+4. Make one stale resource-name JSDoc version-neutral; do not change grammar/runtime.
+5. Regenerate the manifest from its canonical generator. No consumer bundle edits or manual TSV.
+6. Record the durable scan-versus-retention rule in AGENTS.md; extend the existing tests only.
 
 Gates: baseline red, focused tests/check/lint/fmt, phases 1 and 2 including manifest freshness,
 source-quality/architecture review, CI, independent substantive review and formal IMPL-EVAL.
@@ -23,4 +30,3 @@ blanket archival exemptions, or cleanup of historical harness runs.
 
 Risk: broad text matching could hide a pin. Mitigate with narrow owned syntax and negative tests;
 fail closed on unfamiliar syntax instead of inventing a general TypeScript parser.
-

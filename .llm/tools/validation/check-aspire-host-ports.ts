@@ -20,6 +20,7 @@
  */
 import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
+import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
 const DEFAULT_ROOTS = ['packages/cli/src', 'plugins'] as const;
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template', '.json']);
@@ -141,6 +142,7 @@ export function scanContent(
   const findings: HostPortFinding[] = [];
   const allowances: HostPortAllowance[] = [];
   const normalizedPath = normalized(path);
+  if (isTransientAspireScanPath(normalizedPath)) return { findings, allowances };
   const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalizedPath);
   const checksGeneratedJson = normalizedPath.endsWith('/aspire/appsettings.json');
   const checksContribution = PLUGIN_CONTRIBUTION.test(normalizedPath);
@@ -244,6 +246,7 @@ export async function scanHostPorts(
       })
     ) {
       const path = normalized(relative('.', entry.path));
+      if (isTransientAspireScanPath(path)) continue;
       if (![...SOURCE_EXTENSIONS].some((suffix) => path.endsWith(suffix))) continue;
       if (path.includes('/node_modules/') || isTestPath(path) || isGeneratedSource(path)) continue;
 

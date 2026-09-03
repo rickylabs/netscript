@@ -1,68 +1,5 @@
 path	class	owner	disposition
 .agents/docs/README.md	skill:internal	S13	wording check; no version literal expected
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/aws.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/azure.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/cicd.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/docker-compose.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/github-actions-azure-csharp.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/github-actions-azure-typescript.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/javascript.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/kubernetes.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/references/preflight.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-deployment/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-init/references/init-workflow.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-init/references/templates.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-init/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/diagnostics-bridge.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/monitoring.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/references/playwright-handoff.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-monitoring/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/agent-workflows.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/app-commands.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/detection.md	version-floor	S9	upstream minimum-version detection guidance; preserve plus-suffixed Aspire floors, enforce every other version reference
-.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/resource-management.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/references/safety-guardrails.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire-orchestration/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/aspire/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/help.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/netscript-build/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.agents/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/aws.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/azure.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/cicd.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/docker-compose.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/github-actions-azure-csharp.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/github-actions-azure-typescript.yml	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/javascript.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/kubernetes.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/references/preflight.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-deployment/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-init/references/init-workflow.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-init/references/templates.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-init/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/diagnostics-bridge.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/monitoring.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/references/playwright-handoff.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-monitoring/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/agent-workflows.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/app-commands.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/detection.md	version-floor	S9	upstream minimum-version detection guidance; preserve plus-suffixed Aspire floors, enforce every other version reference
-.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/resource-management.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/references/safety-guardrails.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire-orchestration/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/aspire/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/help.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/netscript-build/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/netscript-operate/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.claude/skills/netscript/SKILL.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.llm/tools/consumer-tools.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.llm/tools/e2e/scaffold-e2e-test.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.llm/tools/README.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.llm/tools/run-deno-lint.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.llm/tools/validation/check-aspire-host-ports.ts	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/.mcp.json	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
-.agents/generated/consumer-skills/AGENTS.md	skill:dogfood-bundle	S9	regenerate via agentic:dogfood-skills
 .agents/skills/aspire-upgrade/SKILL.md	compat-fixture	S13	migration worked example and retained old/new fixtures; phase 2 requires the exact 13.5.3 counterpart
 .agents/skills/aspire/SKILL.md	skill:internal-aspire	S9	derived from skills/aspire (OF-1a) + agentic:sync-claude
 .agents/skills/codex-wsl-remote/SKILL.md	skill:internal	S13	replace 13.3.0 toolchain snapshot with toolchain.env reference
@@ -102,37 +39,6 @@ path	class	owner	disposition
 .llm/harness/gates/runtime-gates.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/harness/templates/milestone-cluster-state.json	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
 .llm/harness/workflow/milestone-reporting.md	harness-doc	archival	exempt — harness process/lesson docs or generated corpus input (agent-docs corpus is regenerated by S11)
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/evaluate.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/impl-eval-prompt.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/research.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-fix/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/drift.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/evaluate.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/impl-eval-prompt.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-min-dep-age/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/research.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881-readiness/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/context-pack.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/drift.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/evaluate.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/impl-eval-prompt.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/impl-eval-recheck-prompt.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/plan.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/research.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/review-s1-s2-prompt.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/supervisor.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/leaf-1881/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/drift.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
-.llm/runs/research-aspire-13.5-adoption--0.0.7/slices/s5/repair/worklog.md	archival:this-run	archival	exempt — this research run (plan, research, drafts, verbatim sources, receipts, evaluator verdicts) is protected evidence; parity reports info only
 .llm/tools/agentic/claude/hybrid-opencode-adapter_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/codex/run-codex-slice-lib_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/agentic/dogfood-skills.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
@@ -180,6 +86,8 @@ path	class	owner	disposition
 .llm/tools/release/release-canary-workflow_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-fmt.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/run-deno-lint.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/aspire-scan-scope_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
+.llm/tools/validation/aspire-scan-scope.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-host-ports.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus
 .llm/tools/validation/check-aspire-resource-polling_test.ts	tooling-doc	S7/S13	CLEANUP-PLAYBOOK + gate docs regenerated into agent-tools corpus

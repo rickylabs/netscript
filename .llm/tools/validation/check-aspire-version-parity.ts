@@ -7,6 +7,7 @@
  */
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
 import { buildAspireSurfaceManifest } from '../../runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts';
+import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
 export const ASPIRE_SURFACE_MANIFEST_PATH =
   '.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv';
@@ -87,9 +88,6 @@ const PHASE_ONE_EXACT_VERSIONS: Readonly<Record<string, readonly string[]>> = {
 
 /** Remove only syntax explicitly permitted by the manifest-owned context. */
 function pinSource(source: string, className: string): string {
-  if (className === 'version-floor') {
-    return source.replace(/\bAspire 13\.[0-4](?:\.[0-9]+)?\+(?![\w.+-])/g, '<version floor>');
-  }
   if (className === 'negative-version-guard') {
     // Deliberately not a TS parser: recognize only a standalone, direct three-argument
     // guard statement with an identifier input and literal/identifier location.
@@ -194,7 +192,7 @@ export async function evaluateAspireVersionParity(
   }
 
   for (const row of options.rows) {
-    if (row.class === 'lockfile') {
+    if (row.class === 'lockfile' || isTransientAspireScanPath(row.path)) {
       skipped.push(row.path);
       continue;
     }

@@ -33,3 +33,20 @@ or identifier location. Other strings/argument positions still undergo ordinary 
 
 These are author receipts, not self-certification. Next: independent substantive review and formal
 IMPL-EVAL on committed head; CI and review-thread verification before coordinator sign-off/merge.
+
+## Owner-directed scan-domain amendment — 2026-09-03 09:00Z
+
+Owner explicitly requests all LLM generated run files and transient state be ignored and this
+correction wrapped into existing #1982. Added one shared path policy and regression tests across
+parity/host-port/polling checks; removed the generated-guide floor exception. Framework source,
+maintained docs, shipped generated sources, and tooling remain checked. Retained run files untouched.
+
+- Focused suite: 55 passed, 0 failed; live manifest excludes every run/transient path while
+  retaining core/doc examples. A new polling fixture initially omitted its body timing signal;
+  corrected it to the already-detected deadline/delay shape (no polling detector weakening).
+- Phase 2: PASS, 867 checked, 0 failures, 0 missing, manifestFresh true; manifest 868 rows,
+  0 unmatched. Host-port scan: PASS, 966 source files, no findings.
+- Structured check/lint: all 10 selected source files processed, zero diagnostics/findings;
+  format required the existing polling scanner's source formatting and is rechecked before push.
+- Scope now 11 source/manifest files plus AGENTS.md and scoped run artifacts. No runtime behavior,
+  dependency, generated consumer bundle, or workflow change; no host runtime lease.

@@ -32,6 +32,39 @@ const files = new Map<string, string>([
 
 const readText = (path: string): Promise<string | null> => Promise.resolve(files.get(path) ?? null);
 
+Deno.test('both Aspire parity phases skip all run and transient rows without reading them', async () => {
+  const skipped = [
+    '.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md',
+    '.llm/runs/future/receipt.json',
+    '.llm/tmp/apphost.ts',
+    '.agents/generated/consumer-skills/AGENTS.md',
+    'packages/cli/node_modules/aspire.ts',
+  ];
+  for (const phase of [1, 2] as const) {
+    const reads: string[] = [];
+    const report = await evaluateAspireVersionParity({
+      rows: [...skipped, 'packages/cli/src/current-pin.ts', 'docs/site/reference/aspire.md'].map((
+        path,
+      ) => ({
+        path,
+        class: 'scaffold-constants',
+        owner: 'S13',
+        disposition: 'enforce',
+      })),
+      phase,
+      expectedVersion: '13.5.3',
+      readText: (path) => {
+        reads.push(path);
+        return Promise.resolve('13.4.6');
+      },
+    });
+    assertEquals(report.skipped, skipped);
+    assertEquals(reads, ['packages/cli/src/current-pin.ts', 'docs/site/reference/aspire.md']);
+    assertEquals(report.counts.checked, 2);
+    assertEquals(report.counts.fail, 2);
+  }
+});
+
 for (
   const { name, className, source, ok } of [
     {
@@ -53,18 +86,6 @@ for (
       ok: false,
     },
     {
-      name: 'owned minimum-version guidance',
-      className: 'version-floor',
-      source: 'Aspire 13.2+ uses rooted config.',
-      ok: true,
-    },
-    {
-      name: 'owned patch-version floor',
-      className: 'version-floor',
-      source: 'Aspire 13.2.1+ supports this.',
-      ok: true,
-    },
-    {
       name: 'unowned floor',
       className: 'doc:public-page',
       source: 'Aspire 13.2+ uses rooted config.',
@@ -72,13 +93,13 @@ for (
     },
     {
       name: 'current pin beside a floor',
-      className: 'version-floor',
+      className: 'doc:public-page',
       source: 'Aspire 13.2+ uses rooted config. Install 13.4.6.',
       ok: false,
     },
     {
       name: 'non-floor guidance',
-      className: 'version-floor',
+      className: 'doc:public-page',
       source: 'Install Aspire 13.2.',
       ok: false,
     },

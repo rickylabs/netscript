@@ -1,22 +1,27 @@
 ## Summary
 
-Repair five full-phase Aspire parity findings without rewriting historical guidance or weakening
-current-version enforcement. Preserve legitimate minimum-version/negative-test context and correct
-one stale JSDoc line.
+Exclude all retained harness run artifacts and transient working copies from Aspire static checks,
+as explicitly directed by the owner. Preserve checks on framework source, shipped resources and
+maintained docs; correct negative-guard/compatibility classification and one stale JSDoc line.
 
 ## Scope
 
 - Area: tooling validation; package change is comment-only.
 - Part of #1712. Remaining epic gates include published canary and clean-machine receipts.
+- Shared exclusion policy covers parity, host-port and polling checks. Run files remain committed.
+- No workflow, dependency, scaffold-output or runtime behavior change.
 
 ## Slices
 
 - [x] Bootstrap bounded plan and ownership.
-- [ ] Focused negative tests and implementation.
+- [x] Focused negative tests and implementation.
+- [x] Owner-directed transient/run exclusions and durable AGENTS.md policy.
 
 ## Validation
 
-Baseline full phase 2 fails five paths. Implementation gates and independent IMPL-EVAL pending.
+Baseline full phase 2 failed five paths. Now: 55 focused tests PASS; full phase 2 PASS (867 checked,
+0 failures, 0 missing, fresh manifest); host-port scan PASS (966 files); selected source
+check/lint/fmt PASS (10/10 processed). Independent IMPL-EVAL and current CI pending.
 No runtime/scaffold-output changes; this leaf does not replace the parent release gates.
 
 ## Harness
@@ -30,7 +35,6 @@ Failed helper attachment recorded; coordinator co-authoring, separate evaluator,
 
 ## Definition of Done
 
-- [ ] Focused regression and negative-control tests pass.
-- [ ] Both parity phases pass with fresh generated manifest.
+- [x] Focused regression and negative-control tests pass.
+- [ ] Both parity phases pass with fresh generated manifest at the amended head.
 - [ ] Independent review/IMPL-EVAL pass; current CI and review threads clear.
-
