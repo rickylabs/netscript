@@ -1056,3 +1056,22 @@ the merge.**
 - **Open:** #1881 and epic closure wait on the immutable Canary 9 `e2e-cli-prod` run showing
   `readme.quickstart` green (first hosted execution of the suite). Coordinator states #1967 is the
   only fix-forward blocker before Canary 9.
+
+## 2026-09-03 01:3xZ — Epic #1712 closure pre-flight (main `b6b9df966`)
+
+- Sub-issues: #1713–#1724 all CLOSED `status:shipped` (0.0.7); #1725 (S12) 0.0.8 `status:research`
+  by design; #1880/#1881 gates 2–3 via #1952/#1965. #863 boxes 1–3 still unticked on the issue
+  (feeder PRs used `Part of #863`, so the mirror never ran) — coordinator ticks on closure.
+- MCP smoke receipt: `.llm/runs/…/receipts/aspire-13.5-mcp-smoke.json` (+ `.postgres.json`), CLI
+  13.5.3+b5f1433, 14 expected / 14 observed, `toolsMissing: []`, `toolsExtra: []`,
+  `baselineDiff.added: []`, `documentedUnobserved: ["get_integration_docs"]` → satisfies the DoD
+  content; path differs from the DoD's literal `receipts/…` (residual R2, evidence location only).
+- `check:aspire-version-parity --phase 2` on main: ok=false, 5 fails, all semantically valid
+  literals (aspire-upgrade SKILL "13.4.6 -> 13.5.3" migration prose ×2; `check-accuracy…ts`
+  `forbidText('13.4.6')` negative assertions; `aspire-resource-name.ts` "Aspire 13.4.6 default
+  resource-name grammar" origin comment; generated consumer bundle "Aspire 13.2+" minimum ×2).
+  CI runs phase 1 (default) which is green. Residual R1: either reclassify these five in
+  `tools/aspire-surface-manifest.ts` (info/compat with reason) or reword — harness/docs-only,
+  bounded, not a canary blocker; proposed to the coordinator in the closure packet.
+- Waiting on Canary 9 `e2e-cli-prod` (monitor armed) for the gate-3 transcript; `#1881` closure
+  comment drafted (scratchpad `1881-close.md`).
