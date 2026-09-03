@@ -11049,3 +11049,13 @@ at canary.5 and no longer does. Attribution to #1872/#1882 withdrawn on #1641; w
 published `cli`/`plugin-core`/`plugin-workers` doctor-side behaviour (#1850 discovery, #1842/#1944).
 Lesson: post the bisect result *before* naming candidates — I named them from the diff list while
 the bisect was still running in the same script.
+
+### D-279 — Canary 8 doctor red reproduced decisively: publish-surface defect in `@netscript/plugin-workers@0.0.7-canary.8`
+
+Real fixture, 2×2 over published cli × published plugin-workers (canary.5 vs canary.8): fails iff
+plugin-workers is canary.8, regardless of CLI. `generate plugins` → "Runtime registry generator
+failed for @netscript/plugin-workers (exit 1)"; direct `jsr:@netscript/plugin-workers@0.0.7-canary.8/cli
+compile-registry` in the same project REAL_EXIT=1 (`error: Could not find version of '@netscript/plugin-workers' that matches specified version constraint '0.0.7-canary.8'`); canary.5 package succeeds. Source
+compiler works from a checkout at both heads (D-278), so the published artifact is what is broken.
+Owner features. Corrects D-278's window framing: the regression is in what got *published*, which is
+why no source bisect could find it — the prod-install class of gate is the right instrument.
