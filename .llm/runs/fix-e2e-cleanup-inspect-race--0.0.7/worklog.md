@@ -79,6 +79,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | 2026-09-03T03:44:00Z | hosted gates | initial exact-head CI | Both required hosted tiers passed at `d425207b0` in run `33711266536`: SQLite + Aspire + Garnet and Docker + PostgreSQL. |
 | 2026-09-03T03:46:00Z | IMPL-EVAL cycle 1 | PASS with owner action | OpenHands `z-ai/glm-5.3-flash` returned `OPENHANDS_VERDICT: PASS` for product behavior, but found that the test's joined command literal trips `forbidden-commands_test.ts`; exact-head completion therefore remains open. |
 | 2026-09-03T03:47:00Z | evaluator repair | GREEN | Changed the test transcript assertion from joined command strings to argv arrays. The repository teardown guard passes 1/1; focused cleanup tests pass 9/9; scoped check/lint/fmt are clean. No product behavior, receipt schema, or timing changed. |
+| 2026-09-03T03:51:06Z | evaluator repair | exact-head receipt | Durable `test` receipt passed 10/10 at `f2e8a7bf0`, combining the teardown guard with both cleanup test files; `gitHead == actualGitHead`. |
 
 ## Decisions
 
@@ -120,7 +121,7 @@ This is a small mechanical failure-boundary fix with no unresolved architecture 
 | `quality:gate` | PASS | `receipts/s3-quality-gate.json` | Quality scan + doctrine check exit 0 at `63282ffcc`; reported warnings are pre-existing and outside this two-file delta. |
 | F-CLI-1…31 | PENDING_SCRIPT | manual post-change diff review + `quality:gate` | Archetype profile has no dedicated F-CLI scripts; no public surface, composition, registry, binary, generated output, or folder-over-cap change. |
 | F-19 | PASS | scoped check/lint/fmt reports above | Exact two-file selection, no exclusions or drops. |
-| shared-host teardown guard | PASS | `forbidden-commands_test.ts` after evaluator repair | 1/1 passed; regression now asserts argv arrays without embedding the forbidden bulk-teardown phrase. |
+| shared-host teardown guard | PASS | `receipts/evaluator-repair-test.json` | Combined repair receipt passed 10/10 at `f2e8a7bf0`; regression now asserts argv arrays without embedding the forbidden bulk-teardown phrase. |
 
 ### Runtime Gates
 
