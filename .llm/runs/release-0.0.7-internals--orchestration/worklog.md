@@ -11120,3 +11120,14 @@ dispatch or steer.
 Fixes' #1967 (fixture-only `minimumDependencyAge` opt-out) merged → main `061c70fab`. Harness
 branch merged to it. Canary 9 dispatch is the coordinator's; the canary watcher reports per-step
 results, and the main-CI watcher extracts any red internals-owned gate step.
+
+### D-286 — Canary 9 red isolated: README-quickstart gate collides with the fixture's own prior `deno install -g` ("Existing installation found")
+
+Canary 9 `33704380711` @ `061c70fab` published green; pinned prod E2E `33704697088` (head
+`af365a734`) failed only `readme.quickstart.01-install-cli` — stderr
+`error: Existing installation found. Aborting (Use -f to overwrite).` The job had already installed
+the same global name with `--minimum-dependency-age=0` at 01:44:33Z; the #1965 verbatim walk
+re-installs without `-f`. Deterministic fixture collision; #1967's min-dep-age fix is confirmed
+working (scaffold-runtime 97/97 green). `cleanup.aspire-stop` is downstream. Surfaced on #1641 with
+repair owner Aspire (#1965): isolate install root or uninstall before the walk; never edit README.
+No internals gate involved.
