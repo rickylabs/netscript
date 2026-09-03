@@ -78,6 +78,66 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | 2026-09-03T01:05:00Z | Implement | GREEN 4 | Ran `deno task gen:assets-barrel`; only `packages/cli/src/kernel/assets/embedded.generated.ts` changed and `deno.lock` remained untouched. The freshness task's pre-commit diff check rejected that intended uncommitted delta; its authoritative PASS is run after this generator commit. |
 | 2026-09-02T23:45:00Z | Implement | Upstream sync | Mechanically merged `origin/main` `ba6f1f49a` as `21ee63419`. Concurrent scaffold gate IDs were both retained; the only generated-file conflict was resolved by rerunning `deno task gen:assets-barrel`, never by hand-editing the barrel. This supervisor-requested baseline sync is not plan drift. |
 | 2026-09-02T23:45:00Z | Implement | Local validation | At `21ee63419`, scoped check/test/lint/fmt, embedded freshness, `quality:gate`, explicit `arch:check`, and all four carrier checks exited 0. The current wrappers require repeated `--file`; rejected positional lint/fmt invocations ran no lint/fmt and are excluded from verdict evidence. No local `e2e:cli`, Aspire, or Docker command ran. |
+| 2026-09-03T01:42:46Z | Evaluate repair | Gate ordering | Supervisor commit `de4d31b69` correctly moved `scaffold.design-production-exclusion` after `DATABASE_CODEGEN`; merge head `9630583c8` contains that order and current `main`. Both hosted runtime tiers now reach the production probe and expose the same product defect: 20 passed, 1 failed. |
+| 2026-09-03T01:42:46Z | Evaluate repair | Causal discrimination | Fresh SQLite scaffold at exact head `9630583c8`: init exit 0; immediate production build exit 1 on the not-yet-generated database Zod barrel; standalone `db:generate` exit 0; post-codegen production build exit 1 on Vite loading bare `catalog:` from the materialized service-example route contract. Raw evidence is below. |
+| 2026-09-03T01:42:46Z | Evaluate repair | Scope ruling | Filed release-blocking product bug #1971 with `type:bug`, `area:cli`, `area:fresh`, `priority:p0`, `wave:v1`, `gate:e2e`, `status:triage`, `orchestrator:fixes`, and milestone `0.0.7`. #1945 stays code-complete but merge-blocked; dependency stack is #1971 → #1945. No #1971 product fix, skip, or xfail is added here. |
+
+## Causal Discrimination at `9630583c8`
+
+The reproduction used an isolated local-source SQLite scaffold at
+`.llm/tmp/design-route-prod-gate-causal/catalog-build-probe`. No application, Aspire, or Docker
+runtime was started.
+
+### A. Immediately after init
+
+```text
+deno run -A packages/cli/bin/netscript-dev.ts init catalog-build-probe \
+  --path .llm/tmp/design-route-prod-gate-causal \
+  --db sqlite --cache=false --service --service-name users \
+  --ci --yes --no-git --force
+exit 0 — 211 files, 47 directories
+
+cd apps/catalog-build-probe-web
+deno task build
+exit 1
+[deno] Could not load .../database/sqlite/schema/.generated/zod/crud.ts
+(imported by ../../contracts/versions/v1/users.contract.ts):
+Import 'file:///.../database/sqlite/schema/.generated/zod/crud.ts' failed, not found.
+```
+
+The first build does not pass. It stops on the expected pre-codegen missing generated Zod barrel,
+before the app route's `zod` mapping becomes the active failure.
+
+### B. After the exact standalone database-codegen task
+
+```text
+cd database/sqlite
+DATABASE_URL='file:./sqlite.db' SQLITE_URI='file:./sqlite.db' deno task db:generate
+exit 0
+
+cd ../../apps/catalog-build-probe-web
+deno task build
+exit 1
+vite v7.2.2 building ssr environment for production...
+✓ 434 modules transformed.
+✗ Build failed in 4.84s
+error during build:
+[vite:load-fallback] Could not load catalog: (imported by routes/examples/users/(_lib)/route-contract.ts): ENOENT: no such file or directory, open 'catalog:'
+```
+
+The source `service/(_lib)/route-contract.ts.template` does **not** build. Scaffold substitution
+materializes it as `routes/examples/users/(_lib)/route-contract.ts`; its line-1
+`import { z } from 'zod'` is the exact importer named by Vite. There is no separate generated
+`routes/examples/service` path to compare. The file already exists immediately after init;
+standalone database codegen generates `@database/zod`, allowing the build graph to advance from the
+missing-barrel error to this route-contract resolver error.
+
+The suspected producer is
+`packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts:58`, which maps
+`'zod': 'catalog:'`. The generated workspace root supplies `catalog.zod = "^4.4.3"`, but the Fresh
+app's Vite SSR build receives `catalog:` as a load ID. The repository toolchain contract permits
+catalog indirection only for npm dependency resolution; it does not make bare `catalog:` a
+Vite-loadable module ID. Product remediation is owned by #1971.
 
 ## Decisions
 
@@ -113,10 +173,12 @@ To change a scaffold template, edit its `.template` source, register it in `asse
 | Publish assets carrier | PASS | `deno task check:publish-assets`; exit 0 |
 | MCP export corpus carrier | PASS | `deno task check:mcp-export-corpus`; exit 0 |
 | Agent docs prose carrier | PASS | `deno task check:agent-docs-prose`; exit 0 |
-| Hosted development behavior | HOSTED_PENDING | Existing `behavior.app-reference`; local runtime E2E prohibited |
-| Hosted production exclusion | HOSTED_PENDING | New `scaffold.design-production-exclusion` baseline/mutation/restoration probe under `ci:full` |
+| Hosted development behavior | BLOCKED | `behavior.app-reference` remains downstream of the failing production-build gate and has no current-head verdict |
+| Hosted production exclusion — PostgreSQL | FAIL_BLOCKED | Head `9630583c8`; [job 100484648723](https://github.com/rickylabs/netscript/actions/runs/33702468373/job/100484648723); 20 passed / 1 failed only at `scaffold.design-production-exclusion`; product blocker #1971 |
+| Hosted production exclusion — SQLite | FAIL_BLOCKED | Head `9630583c8`; [job 100484648739](https://github.com/rickylabs/netscript/actions/runs/33702468373/job/100484648739); 20 passed / 1 failed only at `scaffold.design-production-exclusion`; product blocker #1971 |
 
 ## Handoff Notes
 
-- Local implementation rows are complete at `21ee63419`; runtime E2E remains hosted-only under `ci:full` and was not run locally.
-- Supervisor should keep PR #1945 draft until the hosted development/production probes and separate-session IMPL-EVAL pass.
+- The gate order after `DATABASE_CODEGEN` is the correct contract and must not be reverted, skipped, or xfailed.
+- Land #1971 first, merge/sync that product fix into #1945, then rerun both hosted runtime tiers and separate-session IMPL-EVAL.
+- #1945 remains merge-blocked while either hosted production build is red; no full local `e2e:cli`, Aspire, or Docker run was used for this diagnosis.

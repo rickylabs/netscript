@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `design-route-prod-gate--plan` |
 | Branch | `fix/design-route-prod-gate` |
-| Current phase | `implement` — local rows complete; hosted CI and IMPL-EVAL pending |
+| Current phase | `implement repair` — #1481 code complete; hosted gate blocked by #1971 |
 | Archetype | 6 — CLI / Tooling |
 | Scope overlays | Frontend |
 
 ## Current State
 
-PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b4`; GREEN source is `0fd04af6d`; canonical barrel regeneration is `0c1778026`; and the supervisor-requested mechanical merge of `origin/main` `ba6f1f49a` is `21ee63419`. All local scoped, freshness, quality, architecture, and four-carrier checks pass at the merged implementation head. Hosted RED/GREEN behavior remains pending under `ci:full` by constraint.
+PLAN-EVAL passed for plan head `f8ed75b41`; #1481 implementation is complete. Supervisor repair `de4d31b69` correctly places the design-production gate after `DATABASE_CODEGEN`, and branch head `9630583c8` includes current `main`. Both hosted runtime tiers now fail only at `scaffold.design-production-exclusion` because generated Fresh apps map `zod` to bare `catalog:`, which Vite cannot load after database codegen makes that route import reachable. Product remediation is deliberately split to release blocker #1971; stack #1971 → #1945.
 
 ## Completed
 
@@ -29,16 +29,18 @@ PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b
 - Regenerated the embedded asset barrel through its generator; no lockfile changed.
 - Mechanically merged `origin/main` `ba6f1f49a`, retained both concurrent scaffold gate IDs, and regenerated the conflicted barrel from merged sources.
 - Passed the final local gate set at `21ee63419`: check 733 files; focused tests 88/88; lint/fmt 12 files each; freshness, quality, architecture, and four carrier checks all exit 0.
+- Verified the corrected post-codegen gate order at `9630583c8` and reproduced the hosted product blocker locally with a fresh SQLite scaffold.
+- Filed #1971 with raw before/after-codegen evidence, P0/milestone ownership, and the #1945 dependency.
 
 ## In Progress
 
-- Hosted `ci:full` accumulation and supervisor-dispatched separate-session IMPL-EVAL.
+- #1945 is merge-blocked on #1971; no source workaround belongs on this branch.
 
 ## Next Steps
 
-1. Keep draft PR #1945 until hosted `behavior.app-reference` and `scaffold.design-production-exclusion` pass.
-2. Supervisor dispatches separate-session IMPL-EVAL against the final pushed head.
-3. Do not run hosted runtime E2E locally without a coordinator lease.
+1. Land #1971 without changing #1945's correct post-codegen gate order.
+2. Sync the #1971 fix into #1945 and rerun PostgreSQL + SQLite hosted runtime tiers.
+3. Only after both tiers and `behavior.app-reference` pass, dispatch a fresh separate-session IMPL-EVAL.
 
 ## Key Decisions
 
@@ -66,14 +68,14 @@ PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan-Gate | PASS | `plan-eval.md` at `5566a89f6`, evaluated plan head `f8ed75b41` |
-| Static | NOT_RUN | Explicitly deferred to implementation |
-| Fitness | NOT_RUN | Explicitly deferred to implementation |
-| Runtime | HOSTED_PENDING | Hosted only under `ci:full`; no local `e2e:cli`, Aspire, or Docker run |
-| Consumer | NOT_RUN | Explicitly deferred to implementation |
+| Static | PASS | Final local implementation set: check 733 files; focused tests 88/88; scoped lint/fmt 12/12 files; supervisor reorder adds an explicit after-`DATABASE_CODEGEN` order assertion |
+| Fitness | PASS | `quality:gate`, explicit `arch:check`, asset freshness, and four-carrier checks exited 0 before hosted evaluation |
+| Runtime | FAIL_BLOCKED | Head `9630583c8`: PostgreSQL job `100484648723` and SQLite job `100484648739` each report 20 passed / 1 failed only at `scaffold.design-production-exclusion`; blocker #1971 |
+| Consumer | BLOCKED | The post-codegen Fresh production build cannot complete until #1971 resolves Vite loading `catalog:` |
 
 ## Open Questions
 
-- None. PLAN-EVAL should verify the selected route-only build marker and runtime-signal independence.
+- None inside #1481. The Vite/catalog product fix is explicitly owned by #1971.
 
 ## Drift and Debt
 
@@ -82,4 +84,4 @@ PLAN-EVAL passed for plan head `f8ed75b41`. RED step 1 is committed at `2754616b
 
 ## Commits
 
-- See the draft PR commit list and phase comments. The plan SHA will be recorded after commit.
+- See PR #1945's commit list and phase comments; the next docs-only head records this blocked handoff.
