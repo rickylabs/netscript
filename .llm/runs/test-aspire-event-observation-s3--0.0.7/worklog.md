@@ -59,7 +59,33 @@ With the allowlist empty, the sole failure names
 `runtime/verify-listener-readiness.ts:187`. The exact-set allowlist test passes with `[]`; the tree
 test fails non-vacuously on the remaining timed `aspire describe` loop.
 
+### S2 — fenced Bucket A GREEN
+
+- `runtime/verify-listener-readiness.ts` now starts the scoped buffered follower, waits for aggregate
+  Healthy, and reads one snapshot only after that event to validate the named health report and all
+  other reports. An absent event and wrong post-event detail have distinct failure text.
+- `runtime/listener-readiness-gates.ts` retains 300s default, 30s Garnet, and 600s MSSQL durations,
+  but names them as hung-stream failure ceilings and passes milliseconds to the observer. No cap was
+  shortened. Slice 2 recorded hosted settled resource waits of 0.257–40.456s; issue #1906 records
+  Garnet-specific healthy observations of 0.774–1.554s.
+- `runtime/listener-unreachable-fixture.ts` required no observation rewrite: #1909 already leaves one
+  buffered subscription open across D-101's induced Unhealthy and Healthy directions, established
+  before the close command. Its remaining 5s/50ms loop is the fixture-owned file acknowledgement
+  protocol, not Aspire state, and the structured socket failure-code assertion remains intact.
+- `runtime/readiness-disagreement.ts` is a pure report/log classifier with no wait or process.
+- `runtime/owned-container-log.ts` performs one ownership-filtered Docker inventory and one log read;
+  it does not retry or infer Aspire resource state.
+- `scaffold/verify-live-db-endpoint.ts` takes one settled live topology snapshot after the event-based
+  allocation receipts. Its only retry is eventual dashboard telemetry correlation.
+
+| Gate | Result |
+| --- | --- |
+| Focused fenced tests + polling policy | PASS — 58 passed, 0 failed |
+| Focused runtime check wrapper | PASS — 3 files, 0 findings |
+
 ## Reconcile
 
 - S1: issue #1906 remains open and this partial slice uses `Refs #1906`; the six-file fence is clear
   and the pinned-base RED agrees with the current issue inventory after #1969.
+- S2: the polling allowlist is empty and every formerly fenced file now has an explicit disposition.
+  No issue/PR comment changed the brief or scope.
