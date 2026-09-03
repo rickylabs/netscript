@@ -1,0 +1,400 @@
+limitation). Evaluated PR #1959 at immutable head 
+f5100c44a49e6d48864fa8921bbc53ee44c8ce2f against trusted base 
+b6b9df966f54251eb0d08c4c903ce5b440a8cce0, using the evaluator protocol, verdict 
+definitions, Archetype-6 + service overlay, and gate docs read from the base 
+commit. All PASS criteria hold: locked scope complete, gates green with 
+independent re-verification, required runtime evidence present at the exact 
+head, no unrecorded doctrine violation, artifacts resume-ready.
+
+.....
+2
+0000000  \n   #       I   M   P   L   -   E   V   A   L     342 200 224
+0000020       P   R       #   1   9   5   9   :       f   i   x   (   e
+0000040   2   e   ,   a   s   p   i   r   e   )   :       d   i   a   g
+0000060   n   o   s   e       a   n   d       b   o   u   n   d       p
+0000100   o   s   t   g   r   e   s       l   i   s   t   e   n   e   r
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write PR comment body to temp file
+
+Reasoning:
+File content is clean: line 1 = `OPENHANDS_VERDICT: PASS`, proper markdown 
+after, 2 occurrences of the verdict line (first line + final). The echo mangling
+was display-only.
+
+Now: post the PR comment with the verdict as its FIRST line. Build body via 
+python to avoid quoting issues, then gh pr comment. After that: update tracker, 
+final commit? (evaluate.md is in .llm/runs/ — workflow commits run artifacts; 
+but per contract, "The workflow does NOT push source changes for you; it only 
+commits run artifacts under .llm/tmp/run/openhands/ and .llm/runs/" — so 
+.llm/runs/ changes are handled by the workflow. I have no other changes. Nothing
+to commit myself.)
+
+Wait, let me double-check the contract line: "Commit AND push your own 
+source-code changes to the working branch before you finish when is_pr is 
+true... The workflow does NOT push source changes for you; it only commits run 
+artifacts under .llm/tmp/run/openhands/ and .llm/runs/."
+
+So .llm/runs/ changes (my evaluate.md) are workflow-committed. My source changes
+= none. Clean.
+
+Post PR comment now.
+
+Thought:
+File verified clean (line 1 is the verdict; echo noise was display-only). Now 
+posting the PR comment with the verdict as its first line.
+
+$ python3 -c "
+body = '''OPENHANDS_VERDICT: PASS
+
+**IMPL-EVAL — PR #1959 (head f5100c44) — PASS.** Formal separate-session 
+evaluator run per .llm/harness/evaluator/protocol.md; full record in 
+.llm/runs/fix-listener-readiness-diagnostics--0.0.7/evaluate.md.
+
+## What was verified (independent re-verification, not worklog transcription)
+
+- **Scope integrity:** authoritative PR-side diff (merge-base 262aa8fbee → 
+f5100c44) is exactly the locked path ceiling (S1 verifier/fixture, S2 
+template/generator/tests) + 7 run artifacts. The 60-file diff vs trusted base 
+b6b9df9 is main-side churn merged in via #1962 (79adb103be) — readme-quickstart 
+removals, dead-file deletions, CI workflow, docs — not authored on this branch; 
+the author even reverted their own out-of-scope manifest refresh (c27478cf0). 
+Locked-path-ceiling discipline: upheld.
+- **Static gates (re-run at head):** deno check / lint / fmt --check on all 
+changed files clean. Template lint+fmt refusals reproduced (repo configs exclude
+packages/cli) and are recorded as REFUSAL in the worklog — honestly, never a 
+false PASS; emitted-helper format is proven inside the 278-test helper suite. 
+E2E gate tests 192/192 nodes green; helper directory 40 tests / 238 subtests 
+green (= the reported 278 under subtest counting), including 
+never-settling-endpoint → ENDPOINT_UNALLOCATED Unhealthy ~2,000 ms and 
+emitted-workspace compile/format proof.
+- **Fitness gates (re-run at head):** quality:scan ok (37/37 census; only 
+pre-existing F-5/F-6 export-default WARNs); arch:check exit 0; 
+check:assets-barrel exit 0 with a clean tree afterward; added-line hygiene grep 
+found no deno-lint-ignore / as unknown as / as any / @ts-ignore anywhere in the 
+PR-side diff.
+- **Lock hygiene:** deno.lock byte-identical to base (empty git diff); no lock 
+churn committed.
+- **Runtime evidence at the exact head:** CI run 33702319275 (headSha verified 
+f5100c44a49e…) shows scaffold-runtime (aspire + docker + postgres) PASS 8m46s 
+and scaffold-runtime-sqlite PASS 7m15s, plus scaffold-static PASS — the required
+Aspire runtime evidence for an Aspire-helper-generation change, green at the 
+evaluated SHA.
+- **Parity:** check:aspire-version-parity green (13.5.3, 910 checked / 0 fail; 
+needed one sandbox retry after an env quirk — noted, not a product issue).
+- **Process:** PLAN-EVAL: N/A justified (plan D6, brief+addendum lock); design 
+checkpoint present; slice commits match the plan RED→GREEN table with measured 
+gate evidence; implement brief carries the ## SKILL chapter; zero review 
+threads; taxonomy labels + milestone 0.0.7 conform.
+
+## Findings (severity-ranked)
+
+1. **Info:** CI close-gate FAIL is by design, not a defect — it reports 
+closing-issues: none (the PR correctly uses Refs #1844, partial, with no closing
+keyword per the AGENTS.md rule) and flags the two honestly-unchecked DoD boxes. 
+The gate is enforcing the PR own do-not-merge-until contract.
+2. **Info:** CANCELLED check entries are per-PR concurrency cancels of an older 
+head run; every affected check has a PASS entry at head.
+3. **Info:** evaluator reasoning effort is not attested on the OpenHands 
+transport (adapter limitation), reported per protocol.
+
+## Merge preconditions remaining (supervisor-owned, declared in the PR)
+
+- Hosted Postgres tier: two consecutive passes at one head, then tick that DoD 
+box.
+- This IMPL-EVAL PASS satisfies the second box record-wise; ticking is the 
+supervisor call.
+
+Two consecutive same-head hosted passes and final incident disposition for #1844
+remain supervisor-owned and outside this PR scope, exactly as the PR declares.
+
+_This evaluation was performed by an AI agent (OpenHands) on behalf of the 
+repository maintainers._
+'''
+with open('/tmp/pr_comment_body.md', 'w') as f:
+    f.write(body)
+print('BODY_WRITTEN')
+"
+
+Tokens: ↑ input 67.9K (total 3.33M) • cache hit 99.06% (total 87.55%) •  
+reasoning 269 (total 37.44K) • ↓ output 1.27K (total 55.81K) • $ (total 0.1668)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+python3 -c "
+body = '''OPENHANDS_VERDICT: PASS
+**IMPL-EVAL — PR #1959 (head f5100c44) — PASS.** Formal separate-session 
+evaluator run per .llm/harness/evaluator/protocol.md; full record in 
+.llm/runs/fix-listener-readiness-diagnostics--0.0.7/evaluate.md.
+## What was verified (independent re-verification, not worklog transcription)
+- **Scope integrity:** authoritative PR-side diff (merge-base 262aa8fbee → 
+f5100c44) is exactly the locked path ceiling (S1 verifier/fixture, S2 
+template/generator/tests) + 7 run artifacts. The 60-file diff vs trusted base 
+b6b9df9 is main-side churn merged in via #1962 (79adb103be) — readme-quickstart 
+removals, dead-file deletions, CI workflow, docs — not authored on this branch; 
+the author even reverted their own out-of-scope manifest refresh (c27478cf0). 
+Locked-path-ceiling discipline: upheld.
+- **Static gates (re-run at head):** deno check / lint / fmt --check on all 
+changed files clean. Template lint+fmt refusals reproduced (repo configs exclude
+packages/cli) and are recorded as REFUSAL in the worklog — honestly, never a 
+false PASS; emitted-helper format is proven inside the 278-test helper suite. 
+E2E gate tests 192/192 nodes green; helper directory 40 tests / 238 subtests 
+green (= the reported 278 under subtest counting), including 
+never-settling-endpoint → ENDPOINT_UNALLOCATED Unhealthy ~2,000 ms and 
+emitted-workspace compile/format proof.
+- **Fitness gates (re-run at head):** quality:scan ok (37/37 census; only 
+pre-existing F-5/F-6 export-default WARNs); arch:check exit 0; 
+check:assets-barrel exit 0 with a clean tree afterward; added-line hygiene grep 
+found no deno-lint-ignore / as unknown as / as any / @ts-ignore anywhere in the 
+PR-side diff.
+- **Lock hygiene:** deno.lock byte-identical to base (empty git diff); no lock 
+churn committed.
+- **Runtime evidence at the exact head:** CI run 33702319275 (headSha verified 
+f5100c44a49e…) shows scaffold-runtime (aspire + docker + postgres) PASS 8m46s 
+and scaffold-runtime-sqlite PASS 7m15s, plus scaffold-static PASS — the required
+Aspire runtime evidence for an Aspire-helper-generation change, green at the 
+evaluated SHA.
+- **Parity:** check:aspire-version-parity green (13.5.3, 910 checked / 0 fail; 
+needed one sandbox retry after an env quirk — noted, not a product issue).
+- **Process:** PLAN-EVAL: N/A justified (plan D6, brief+addendum lock); design 
+checkpoint present; slice commits match the plan RED→GREEN table with measured 
+gate evidence; implement brief carries the ## SKILL chapter; zero review 
+threads; taxonomy labels + milestone 0.0.7 conform.
+## Findings (severity-ranked)
+1. **Info:** CI close-gate FAIL is by design, not a defect — it reports 
+closing-issues: none (the PR correctly uses Refs #1844, partial, with no closing
+keyword per the AGENTS.md rule) and flags the two honestly-unchecked DoD boxes. 
+The gate is enforcing the PR own do-not-merge-until contract.
+2. **Info:** CANCELLED check entries are per-PR concurrency cancels of an older 
+head run; every affected check has a PASS entry at head.
+3. **Info:** evaluator reasoning effort is not attested on the OpenHands 
+transport (adapter limitation), reported per protocol.
+## Merge preconditions remaining (supervisor-owned, declared in the PR)
+- Hosted Postgres tier: two consecutive passes at one head, then tick that DoD 
+box.
+- This IMPL-EVAL PASS satisfies the second box record-wise; ticking is the 
+supervisor call.
+Two consecutive same-head hosted passes and final incident disposition for #1844
+remain supervisor-owned and outside this PR scope, exactly as the PR declares.
+_This evaluation was performed by an AI agent (OpenHands) on behalf of the 
+repository maintainers._
+'''
+with open('/tmp/pr_comment_body.md', 'w') as f:
+    f.write(body)
+print('BODY_WRITTEN')
+"
+BODY_WRITTEN
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify comment body first line and no forbidden markers
+
+$ head -3 /tmp/pr_comment_body.md; echo ===; grep -c "OPENHANDS_VERDICT: PASS" 
+/tmp/pr_comment_body.md; grep -n "openhands-phase\|## OpenHands Agent" 
+/tmp/pr_comment_body.md; echo MARKERS_CLEAN
+
+Tokens: ↑ input 69.94K (total 3.4M) • cache hit 97.00% (total 87.75%) •  
+reasoning 0 (total 37.44K) • ↓ output 90 (total 55.9K) • $ (total 0.1692)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+OPENHANDS_VERDICT: PASS
+
+**IMPL-EVAL — PR #1959 (head f5100c44) — PASS.** Formal separate-session 
+evaluator run per .llm/harness/evaluator/protocol.md; full record in 
+.llm/runs/fix-listener-readiness-diagnostics--0.0.7/evaluate.md.
+===
+1
+MARKERS_CLEAN
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Condensation ───────────────────────────────────────────────────────────────────
+
+Auto Conversation Condensation Triggered.
+Forgetting 41 events
+
+[Summary of Events Being Forgotten]
+USER_CONTEXT: Acting as IMPL-EVAL evaluator for PR #1959 
+("fix/listener-readiness-diagnostics"). PR makes listener-readiness deadline 
+failures report matched resource state, aggregate health, all published health 
+keys/statuses, and a one-shot Aspire console-log tail; also bounds generated DB 
+endpoint allocation to emit `ENDPOINT_UNALLOCATED` Unhealthy reports. 
+Deliberately not a retroactive diagnosis of incident #1844.
+
+TASK_TRACKING:
+- IMPL-EVAL-1959 (evaluation of PR #1959): IN PROGRESS
+
+COMPLETED:
+- Wrapper refusals resolved: aspire templates are fmt-excluded at root config 
+(earlier "4-file" check actually checked 2); lint wrapper failure was an 
+environment catalog error. Direct fmt/lint on changed files: clean 
+(FMT_DIRECT=0, LINT_DIRECT=0).
+- Diff provenance resolved: full base diff (b6b9df9) = 60 files incl. 
+readme-quickstart removals, e2e-cli-prod.yml workflow change, docs/run-dir churn
+— all arrived from main via merge 8286e943e (2nd parent 79adb103be = merged PR 
+#1962). Authoritative PR-side diff (merge-base 262aa8fbee → head) = exactly 19 
+files: 7 run artifacts + 4 S1 + 8 S2. Author reverted own out-of-scope manifest 
+refresh (c27478cf0, duplicated by #1963) — good scope hygiene.
+- Drift log: 2 minor accepted entries (.claude/ overlay absent; asset-path 
+wording) — properly scoped.
+- Generated-carrier sync gate (check:assets-barrel): EXIT=0, no drift.
+- Worklog cross-check (run ID fix-listener-readiness-diagnostics--0.0.7): gate 
+claims verified — 278/278 helper test nodes (40 tests + 238 subtests) matches 
+independent measurement; E2E gates 192 nodes at head, green.
+- PR surface reviewed: body claims match measurements; honest "Refs #1844 
+(partial)" with no closing keyword (per AGENTS.md rule 1); 2 DoD boxes honestly 
+unchecked (hosted proof, this IMPL-EVAL). Labels: type:fix, area:cli, 
+area:aspire, status:impl-eval, ci:full, gate:e2e, priority:p1, openhands, 
+orchestrator:fixes; milestone 0.0.7; no review threads, reviewDecision empty.
+- CI at head checked: all substantive checks pass EXCEPT `close-gate` (FAIL). 
+Issue #1844 confirmed OPEN.
+
+PENDING:
+- Finish diagnosing close-gate failure root cause (log output truncated 
+mid-read).
+- Produce final IMPL-EVAL verdict/report for PR #1959.
+
+CURRENT_STATE:
+- Working dir: /home/runner/work/netscript/netscript (Python 3.13.15).
+- Head commit: f5100c44a "fix(e2e): readiness fixture injects the endpoint-based
+listener check".
+- close-gate failure: `deno run --allow-env --allow-net 
+.llm/tools/validation/check-close-gate.ts --repo rickylabs/netscript --pr 1959 
+--pretty` → "close-gate FAIL rickylabs/netscript#1959", exit 1 (CI run 
+33700447539/job 100478383390). Likely tied to referenced issue #1844 still 
+OPEN/acceptance unmet — hypothesis not yet confirmed.
+- agent/authorize jobs "skipping" (normal posture).
+
+VERSION_CONTROL_STATUS: Branch fix/listener-readiness-diagnostics at f5100c44a; 
+trusted base b6b9df9; merge-base 262aa8fbee; PR #1959 open, no reviews yet, 
+milestone 0.0.7; CI: close-gate failing at head, all other substantive checks 
+green.
+
+
+Tokens: ↑ input 4.84K (total 3.4M) • cache hit 0.00% (total 87.62%) •  reasoning
+2.27K (total 39.71K) • ↓ output 3.24K (total 59.14K) • $ (total 0.1716)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Post IMPL-EVAL verdict comment on PR 1959
+
+$ gh pr comment 1959 --repo rickylabs/netscript --body-file 
+/tmp/pr_comment_body.md 2>&1
+
+Tokens: ↑ input 40.11K (total 3.44M) • cache hit 0.00% (total 86.60%) •  
+reasoning 0 (total 39.71K) • ↓ output 64 (total 59.2K) • $ (total 0.1776)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+https://github.com/rickylabs/netscript/pull/1959#issuecomment-5519070125
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Remove scratch file and verify clean tree state
+
+Reasoning:
+Comment posted: 
+https://github.com/rickylabs/netscript/pull/1959#issuecomment-5519070125.
+
+Final housekeeping:
+1. Delete /tmp/pr_comment_body.md (scratch).
+2. Verify repo tree state — only evaluate.md new in run dir; git status to 
+confirm nothing else changed.
+3. Update task tracking to done.
+
+Then final message with the verdict line.
+
+Thought:
+Comment posted. Final housekeeping: remove the scratch file and confirm the tree
+state.
+
+$ rm -f /tmp/pr_comment_body.md && git status --porcelain; echo ===; git -C 
+/home/runner/work/netscript/netscript log --oneline -1; echo TREE_VERIFIED
+
+Tokens: ↑ input 40.27K (total 3.48M) • cache hit 0.00% (total 85.60%) •  
+reasoning 87 (total 39.8K) • ↓ output 178 (total 59.38K) • $ (total 0.1837)
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+?? .llm/runs/fix-listener-readiness-diagnostics--0.0.7/evaluate.md
+===
+f5100c44a (HEAD, origin/fix/listener-readiness-diagnostics) fix(e2e): readiness 
+fixture injects the endpoint-based listener check
+TREE_VERIFIED
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.15/x64/bin/python
+✅ Exit code: 0
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+IMPL-EVAL for PR #1959 is complete. All obligations of the evaluator protocol 
+are discharged:
+
+**Deliverables**
+- `evaluate.md` written to 
+`.llm/runs/fix-listener-readiness-diagnostics--0.0.7/` (protocol-required 
+output; workflow-owned `.llm/runs/` artifacts — I made zero commits, and the 
+evaluated head `f5100c44a` is untouched)
+- `summary.md` written to the run-scoped `OPENHANDS_SUMMARY_PATH` with the 
+verdict as its first line
+- Verdict comment posted: [PR #1959 — comment 
+5519070125](https://github.com/rickylabs/netscript/pull/1959#issuecomment-551907
+0125), verdict first line, no workflow-owned markers imitated
+
+**Evaluation outcome (concise)**
+- **Scope integrity:** PR-side diff (merge-base `262aa8fbee` → head) is exactly 
+19 files = the locked path ceiling (S1 verifier/fixture + S2 
+template/generator/tests) + 7 run artifacts. The 60-file base diff was main-side
+churn via merge #1962, and the author reverted their own out-of-scope manifest 
+refresh — exemplary scope hygiene.
+- **Gates independently re-verified at head:** direct deno check/lint/fmt clean 
+on changed files (template lint/fmt refusals are repo-config exclusions, 
+honestly recorded as REFUSAL); E2E 192/192 and helper 40/238 nodes green (278 
+subtest-count), proving the `ENDPOINT_UNALLOCATED` Unhealthy behavior ~2,000 ms;
+`quality:scan`/`arch:check`/`check:assets-barrel` exit 0; `deno.lock` 
+byte-identical; parity 13.5.3 green; no suppression greps in the added lines.
+- **Runtime evidence at the exact evaluated SHA:** CI run 33702319275 (headSha 
+verified) — scaffold-runtime postgres PASS 8m46s, sqlite PASS 7m15s, 
+scaffold-static PASS.
+- **Process:** `PLAN-EVAL: N/A` justified; design checkpoint present; slice 
+commits match the plan's RED→GREEN table; brief carries `## SKILL`; no review 
+threads; labels/milestone conform.
+- **Findings (all Info):** close-gate FAIL is by design (it enforces the PR's 
+own two honestly-unchecked DoD preconditions and the correct partial `Refs 
+#1844` with no closing keyword); CANCELLED check entries are concurrency cancels
+with PASS entries at head; evaluator effort not attested on the OpenHands 
+transport.
+
+Merge preconditions remaining are supervisor-owned (hosted twice-consecutive 
+Postgres proof), exactly as the PR declares — not implementation gaps.
+
+OPENHANDS_VERDICT: PASS
+
+Tokens: ↑ input 40.49K (total 3.52M) • cache hit 99.43% (total 85.76%) •  
+reasoning 344 (total 40.14K) • ↓ output 912 (total 60.29K) • $ (total 0.1854)
+
