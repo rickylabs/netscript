@@ -31,6 +31,8 @@ You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/
 [Aspire CLI](https://aspire.dev) (or skip orchestration with
 `--no-aspire`). Docker provisions Postgres and the cache.
 
+<!-- readme-quickstart:start -->
+
 ```bash
 # 1. Install the NetScript CLI on your PATH
 deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
@@ -53,10 +55,10 @@ your numbered next steps. Follow them:
 cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
 aspire start     # starts everything and prints the dashboard URL
+aspire wait postgres --status healthy --timeout 60
 ```
 
-Open the dashboard, wait until the `postgres` resource reports healthy, then initialize the
-database:
+Open the dashboard, then initialize the database:
 
 ```bash
 # 4. Initialize the database (from the workspace root)
@@ -74,6 +76,8 @@ scaffold console output or Aspire dashboard):
 curl http://localhost:<port>/health
 # {"status":"healthy","timestamp":"…","checks":[{"name":"database","healthy":true,"latency":2}],…}
 ```
+
+<!-- readme-quickstart:end -->
 
 Want to check the blast radius before anything touches disk? `netscript init my-app --dry-run`
 reports the file and directory counts it would create and writes nothing. Run `netscript --help` or
