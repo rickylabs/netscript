@@ -11082,3 +11082,6 @@ Aspire's converge head passed everything: check-test, quality (parity green in-b
 sqlite + docker runtime tiers. Exact-head confirmation posted; merge is the coordinator's. The
 #1880/#1952 cross-concern leaf is complete from Internals' side (converge, docker allow-run fix,
 merge-ref parity isolation, DoD mechanics); evaluator and packet are Aspire's.
+
+**D-281 addendum:** #1952 was merged by the coordinator while the confirmation posted (docker tier
+97/0 at `1a759ea34`); #1880 closes via its keyword. Watcher retired. Internals owned queue: 0.
