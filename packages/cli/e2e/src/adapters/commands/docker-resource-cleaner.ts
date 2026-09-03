@@ -32,7 +32,13 @@ export class DockerCliResourceCleaner implements DockerResourceCleaner {
       const output = await this.runDocker(['rm', '-f', id], 'null');
       if (output.code !== 0) {
         const error = decoder.decode(output.stderr).trim();
-        throw new Error(`docker rm -f ${id} failed${error ? `: ${error}` : '.'}`);
+        // `aspire stop` removes its own containers concurrently with this prune. Both
+        // "already in progress" and "no such container" mean the container is gone or
+        // going, which is exactly the state this cleaner exists to reach, so they are
+        // successful cleanup observations rather than failures.
+        if (!isAlreadyRemovedByAnotherActor(error)) {
+          throw new Error(`docker rm -f ${id} failed${error ? `: ${error}` : '.'}`);
+        }
       }
     }
     return created;
@@ -75,4 +81,11 @@ function runDockerCommand(
 
 function writeDockerWarning(message: string): Promise<number> {
   return Deno.stderr.write(encoder.encode(`${message}\n`));
+}
+
+/** True when the daemon reports the container is already gone or already being removed. */
+function isAlreadyRemovedByAnotherActor(stderr: string): boolean {
+  const normalized = stderr.toLowerCase();
+  return /removal of container .* is already in progress/.test(normalized) ||
+    normalized.includes('no such container');
 }
