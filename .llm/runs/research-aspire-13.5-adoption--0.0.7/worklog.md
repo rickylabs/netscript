@@ -1041,3 +1041,18 @@ the merge.**
   z-ai/glm-5.3-flash xhigh, detached worktree `007-aspire-eval-1965`, brief
   `slices/leaf-1881/impl-eval-brief.md`, output `evaluate-supervisor.md`.
 - Thread records copied as `slices/leaf-1881/thread-*.md`.
+
+## 2026-09-03 01:1xZ — #1965 MERGED (gate 3 code on main); Canary 9 admission watch
+
+- Coordinator posted the exact-head GLM IMPL-EVAL PASS (comment 5518714015, session
+  `aff0fe67…`), promoted `status:ready-merge`, reran close-gate (green) in core run 33701216889;
+  supervisor verified head `9cff705f5`, `review-threads PASS threads=0`, posted merge packet
+  5518725290. **Merged as `b6b9df966`.** Labelled `status:shipped`. Broad runtime tiers
+  (run 33702032229) were not a precondition per coordinator.
+- Evaluator artefacts preserved here: `slices/leaf-1881/evaluate-supervisor.md`,
+  `impl-eval-comment.md`, `impl-eval-comment-posted.md`, `impl-eval-stream.jsonl`,
+  `merge-packet.md`. Worktrees `007-aspire-eval-1965` and `007-aspire-leaf-1881` removed
+  (evaluator exited, thread idle).
+- **Open:** #1881 and epic closure wait on the immutable Canary 9 `e2e-cli-prod` run showing
+  `readme.quickstart` green (first hosted execution of the suite). Coordinator states #1967 is the
+  only fix-forward blocker before Canary 9.
