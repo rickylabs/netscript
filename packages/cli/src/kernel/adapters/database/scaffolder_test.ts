@@ -2,7 +2,8 @@
  * @module infra/database/scaffolder_test
  */
 
-import { assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { join } from 'jsr:@std/path@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
 import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
@@ -94,8 +95,28 @@ describe('DatabaseScaffolder', () => {
     );
     assertStringIncludes(
       clearSeededClient,
-      "new URL('../schema/.generated/zod', import.meta.url)",
+      "await Deno.remove(new URL('../schema/.generated/zod', import.meta.url), { recursive: true });",
     );
+
+    const emittedScriptRoot = await Deno.makeTempDir({
+      prefix: 'netscript-clear-seeded-artifacts-',
+    });
+    try {
+      const emittedScriptPath = join(emittedScriptRoot, 'clear-seeded-client.ts');
+      await Deno.writeTextFile(emittedScriptPath, clearSeededClient);
+      const checked = await new Deno.Command(Deno.execPath(), {
+        args: ['check', '--no-config', '--no-lock', emittedScriptPath],
+        stdout: 'piped',
+        stderr: 'piped',
+      }).output();
+      assertEquals(
+        checked.code,
+        0,
+        new TextDecoder().decode(checked.stderr),
+      );
+    } finally {
+      await Deno.remove(emittedScriptRoot, { recursive: true });
+    }
 
     assertStringIncludes(
       patchPrismaClient,

@@ -71,6 +71,10 @@ entrypoints through `DatabaseScaffolder` only when generated consumers already i
 | 2026-09-03 | 2 | GREEN | Materialized app Zod target from the workspace catalog and seeded the pre-codegen Zod contract. |
 | 2026-09-03 | 2 | Drift repair | Extended exact-file seed cleanup after Prisma rejected the first non-empty generated directory. |
 | 2026-09-03 | 2 | Consumer proof | Exact clean init/build/codegen/build sequence exited `0/0/0/0`. |
+| 2026-09-03 | 3 | Hosted feedback | e2e-cli run 33706833254 failed all tiers on TS2339 for emitted `Deno.errors.DirectoryNotEmpty`. |
+| 2026-09-03 | 3 | Corrective RED | Emitted-script typecheck reproduced the same TS2339; focused wrapper exited 1. |
+| 2026-09-03 | 3 | Corrective GREEN | Recursive Zod-directory removal with only `NotFound` benign; emitted-script test passed. |
+| 2026-09-03 | 3 | Static consumer proof | Exact `scaffold.service` suite exited 0; 5/5 gates passed. |
 
 ## Raw Reproduction Evidence
 
@@ -134,6 +138,7 @@ for reachability.
 | --- | --- | --- |
 | Prisma rejects a non-empty seeded output directory | minor | Yes; resolved in GREEN implementation. |
 | Root policy excludes CLI from requested lint/fmt wrappers | baseline | Yes; supplemental changed-file evidence recorded. |
+| Generated cleanup referenced missing `Deno.errors.DirectoryNotEmpty` | minor | Yes; resolved in corrective slice 3. |
 
 ## Gate Results
 
@@ -150,6 +155,10 @@ for reachability.
 | Scoped fmt (exact requested) | `run-deno-fmt.ts --root packages/cli --ext ts,tsx` | BASELINE REFUSAL (exit 2) | Root config excludes `packages/cli/`; zero parsed findings. |
 | Changed-file fmt supplement | `deno fmt --check --no-config ... <six changed TS files>` | BASELINE FINDINGS (exit 1) | Only two pre-existing deltas outside changed lines, in catalog and DB-config files. |
 | Repository check | `deno task check` | PASS (exit 0) | Desktop fixture: 15 reachable modules, 0 unmapped; 3,107 files checked in 26 batches. |
+| Corrective RED emitted sample | structured wrapper on `scaffolder_test.ts` | EXPECTED FAIL (exit 1) | Exact TS2339: `DirectoryNotEmpty` does not exist on `typeof errors`. |
+| Corrective GREEN focused tests | structured wrapper on app config/catalog and database scaffolder/generator tests | PASS (exit 0; 35/35) | Includes real `deno check --no-config --no-lock` of the emitted cleanup script. |
+| Corrective scoped check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS (exit 0) | 979 files, 9 batches, zero diagnostics. |
+| Corrective changed-file fmt/lint | no-config checks on scaffolder source/test | PASS (exit 0/0) | Both changed TypeScript files checked. |
 
 Raw RED wrapper output:
 
@@ -169,6 +178,25 @@ Raw RED wrapper output:
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Local `scaffold.runtime` | N/A (owner prohibited) | Implement brief ceiling | Hosted evidence remains pending. |
+
+### Corrective Static Scaffold Gate
+
+```text
+$ deno task e2e:cli run scaffold.service --format pretty
+Running scaffold.service
+> preflight.deno: Deno CLI is available
+  PASSED
+> scaffold.init: Scaffold generated project
+  PASSED
+> service.list: List generated services
+  PASSED
+> database.codegen: Generate database clients (standalone, no Aspire)
+  PASSED
+> generated.service-check: Type-check generated service workspace
+  PASSED 14540ms
+Summary: passed=5 failed=0 skipped=0
+exit 0
+```
 
 ### Consumer Gates
 
@@ -220,6 +248,6 @@ was replaced rather than retained.
 
 ## Handoff Notes
 
-- Evaluator should inspect the explicit app target derivation, exact-file seed cleanup, exact
-  two-build proof, immutable-head receipts, baseline lint/fmt exclusion, and hosted
-  `scaffold.runtime` status first.
+- Evaluator should inspect the explicit app target derivation, bounded seed cleanup, exact
+  two-build proof, emitted cleanup typecheck, immutable-head receipts, baseline lint/fmt exclusion,
+  and hosted `scaffold.runtime` status first.

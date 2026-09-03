@@ -27,3 +27,17 @@ issue contract, brief ceiling, or doctrine.
 - **Action:** record — changing root validation policy is outside this issue's ceiling. Supplemental
   `deno lint --no-config` passed all six changed TypeScript files. A no-config format check reported
   only two pre-existing formatter deltas outside this patch's changed lines.
+
+## 2026-09-03 — emitted cleanup referenced a non-existent Deno error class
+
+- **What:** Hosted e2e-cli run 33706833254 failed all three tiers because the generated cleanup
+  script referenced `Deno.errors.DirectoryNotEmpty`, which is absent from Deno 2.9.
+- **Source:** Supervisor steer plus `generated.service-check` in scaffold-static/runtime tiers.
+- **Expected:** The generated cleanup script would type-check and ignore a non-empty Zod directory.
+- **Actual:** TypeScript failed first with TS2339, before the cleanup behavior could run.
+- **Severity:** minor
+- **Action:** fix — remove the generated Zod directory recursively and treat only `NotFound` as
+  benign. Add an emitted-sample `deno check --no-config --no-lock` assertion so future invalid
+  `Deno.errors` members fail the focused scaffolder test.
+- **Evidence:** The new test reproduced TS2339 at the prior head; the exact local
+  `scaffold.service` tier then passed all 5 gates, including `generated.service-check`.

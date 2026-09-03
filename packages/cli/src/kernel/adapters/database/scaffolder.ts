@@ -88,10 +88,9 @@ for (const file of seededFiles) {
 }
 
 try {
-  await Deno.remove(new URL('../schema/.generated/zod', import.meta.url));
+  await Deno.remove(new URL('../schema/.generated/zod', import.meta.url), { recursive: true });
 } catch (error) {
-  if (!(error instanceof Deno.errors.NotFound) &&
-    !(error instanceof Deno.errors.DirectoryNotEmpty)) {
+  if (!(error instanceof Deno.errors.NotFound)) {
     throw error;
   }
 }
