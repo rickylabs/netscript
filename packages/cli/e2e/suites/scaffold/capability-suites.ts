@@ -80,6 +80,9 @@ export const RUNTIME_GATES = [
   GATE.SCAFFOLD_UI_LOCAL_SOURCE,
   GATE.GENERATED_RUNTIME_SCHEMAS,
   GATE.DATABASE_CODEGEN,
+  // The production build imports the generated zod CRUD schemas, so the design
+  // exclusion probe must run after database codegen has produced them.
+  GATE.SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION,
   GATE.GENERATED_SERVICE_CLIENT_CONTRACT,
   GATE.SCAFFOLD_RESOURCE_GENERATE,
   GATE.SCAFFOLD_RESOURCE_RERUN,

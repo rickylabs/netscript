@@ -72,6 +72,7 @@ export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
   SCAFFOLD_INIT: 'scaffold.init',
+  SCAFFOLD_DESIGN_PRODUCTION_EXCLUSION: 'scaffold.design-production-exclusion',
   SCAFFOLD_SERVICE_CLIENT_ADD: 'scaffold.service-client-add',
   SCAFFOLD_SERVICE_CLIENT_GENERATE: 'scaffold.service-client-generate',
   SCAFFOLD_RESOURCE_GENERATE: 'scaffold.resource-generate',

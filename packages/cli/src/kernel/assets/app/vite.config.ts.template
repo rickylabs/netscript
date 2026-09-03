@@ -7,6 +7,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 const appRoot = resolve(import.meta.dirname!, '.');
 const workspaceRoot = resolve(import.meta.dirname!, '../..');
+const DESIGN_ROUTE_GROUP_PATTERN = /[\\/]routes[\\/]\(design\)[\\/]/;
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, appRoot, '');
@@ -37,7 +38,10 @@ export default defineConfig(({ mode }) => {
       host: env.NETSCRIPT_VITE_HOST ?? '0.0.0.0',
     },
     plugins: [
-      fresh({ islandSpecifiers: ['@netscript/fresh/defer/island'] }),
+      fresh({
+        islandSpecifiers: ['@netscript/fresh/defer/island'],
+        ignore: mode === 'development' ? [] : [DESIGN_ROUTE_GROUP_PATTERN],
+      }),
       tailwindCSS(),
       createNetScriptVitePlugin({
         appRoot,
