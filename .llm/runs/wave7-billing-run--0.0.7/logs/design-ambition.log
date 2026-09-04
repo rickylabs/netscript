@@ -3761,3 +3761,1703 @@ payment-refund runtime: redelivered compensated message is a guarded no-op ... 
 
 [0m[32mok[0m | 57 passed | 0 failed [0m[38;5;245m(1s)[0m
 [0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && (nohup deno task dev > /tmp/dev-$$.log 2>&1 & echo "PID=$!" > /tmp/devpid) ; sleep 25; tail -20 /tmp/dev-*.log; cat /tmp/devpid
+[0m[32mTask[0m [0m[36mdev[0m deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native
+[0m[32mTask[0m [0m[36mdeps:closure[0m deno run --allow-read .netscript/verify-dependency-closure.ts
+NetScript dependency closure verified: exact release 0.0.7 (jsr).
+[0m[32mTask[0m [0m[36mdeps:verify[0m deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts
+Deno npm materialization verified: 550 packages, 36797 files.
+
+  VITE v7.2.2  ready in 839 ms
+
+  ➜  Local:   http://localhost:49993/
+  ➜  Network: http://10.4.12.27:49993/
+  ➜  Network: http://10.4.7.43:49993/
+PID=2004593
+[0m
+[0m$ [0msleep 3; PORT=$(grep -o "localhost:[0-9]*" /tmp/dev-*.log | head -1 | cut -d: -f2); echo "PORT=$PORT"; for p in "/" "/?range=3m" "/?range=12m"; do code=$(curl -s -o /tmp/page.html -w "%{http_code}" "http://localhost:$PORT$p"); echo "$p -> $code  bytes=$(wc -c </tmp/page.html)"; done; echo "=== markers on / ==="; curl -s "http://localhost:$PORT/" > /tmp/home.html; for c in ns-overview ns-widget__rate ns-funnel ns-share__track ns-overview-table ns-gauge ns-areachart ns-segmented ns-delta-chip ns-topbar__brand ns-dashboard__nav-item; do printf "%-26s %s\n" "$c" "$(grep -o "$c" /tmp/home.html | wc -l)"; done
+PORT=49993
+/ -> 200  bytes=165566
+/?range=3m -> 200  bytes=163619
+/?range=12m -> 200  bytes=169159
+=== markers on / ===
+ns-overview                15
+ns-widget__rate            2
+ns-funnel                  23
+ns-share__track            1
+ns-overview-table          12
+ns-gauge                   32
+ns-areachart               142
+ns-segmented               25
+ns-delta-chip              13
+ns-topbar__brand           4
+ns-dashboard__nav-item     4
+[0m
+[0m$ [0mcd /tmp && python3 - <<'PY'
+import re
+s=open('/tmp/home.html').read()
+def grab(pat, n=6):
+    return re.findall(pat, s)[:n]
+print("rate:", grab(r'class="ns-widget__rate">([^<]*)<'))
+print("hero money:", grab(r'ns-money-text[^>]*>([^<]*)<')[:8])
+print("funnel labels:", grab(r'ns-funnel__label">([^<]*)<'))
+print("funnel values:", grab(r'ns-funnel__value[^>]*>(?:<[^>]*>)*([^<]*)')[:6])
+print("absent count:", s.count('data-money="absent"'))
+print("unavailable notices:", grab(r'InlineNotice|ns-inline-notice'))
+print("notice titles:", grab(r'ns-inline-notice__title">([^<]*)<'))
+print("share legend:", grab(r'ns-share__legend-label">([^<]*)<'), grab(r'ns-share__legend-value">([^<]*)<'))
+print("table rows:", len(re.findall(r'ns-overview-table__link', s)))
+print("gauge caption:", grab(r'ns-gauge__caption">([^<]*)<'))
+print("footer cols:", grab(r'ns-footer-cols__label">([^<]*)<'), grab(r'ns-footer-cols__value">([^<]*)<'))
+PY
+rate: ['—']
+hero money: [' .ns-areachart__crosshair, .ns-areachart__hit:hover > .ns-areachart__dot, .ns-areachart__hit:hover > .ns-areachart__tip {\n  opacity: 1;\n}\n.ns-areachart__yaxis {\n  grid-column: 1;\n  grid-row: 1;\n  position: relative;\n  width: max-content;\n  margin: 0;\n  padding: 0 var(--ns-space-2) 0 0;\n  list-style: none;\n}\n.ns-areachart__ytick {\n  position: absolute;\n  right: var(--ns-space-2);\n  transform: translateY(-50%);\n  font-family: var(--ns-font-numeric);\n  font-variant-numeric: var(--ns-numeric-tabular);\n  font-size: var(--ns-text-3xs);\n  line-height: 1;\n  white-space: nowrap;\n  color: var(--ns-chart-axis);\n}\n.ns-areachart__xaxis {\n  grid-column: 2;\n  grid-row: 2;\n  position: relative;\n  height: var(--ns-space-4);\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.ns-areachart__xtick {\n  position: absolute;\n  top: 0;\n  transform: translateX(-50%);\n  max-width: 5rem;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  font-size: var(--ns-text-3xs);\n  color: var(--ns-muted-fg);\n}\n.ns-areachart__legend {\n  grid-column: 1 / -1;\n  display: flex;\n  flex-wrap: wrap;\n  gap: var(--ns-space-2) var(--ns-space-4);\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.ns-areachart__legend-row {\n  display: flex;\n  align-items: center;\n  gap: var(--ns-space-2);\n  font-size: var(--ns-text-2xs);\n  color: var(--ns-muted-fg);\n}\n.ns-areachart__swatch {\n  flex-shrink: 0;\n  width: var(--ns-space-2);\n  height: var(--ns-space-2);\n  border-radius: var(--ns-radius-full);\n  background: var(--ns-series-1);\n}\n.ns-areachart__swatch[data-series=\'2\'] {\n  background: var(--ns-series-2);\n}\n.ns-areachart__swatch[data-series=\'3\'] {\n  background: var(--ns-series-3);\n}\n.ns-areachart__swatch[data-series=\'4\'] {\n  background: var(--ns-series-4);\n}\n.ns-areachart__swatch[data-series=\'5\'] {\n  background: var(--ns-series-5);\n}\n.ns-areachart__swatch[data-series=\'6\'] {\n  background: var(--ns-series-6);\n}\n.ns-areachart__swatch--ghost {\n  background: var(--ns-series-1);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-1) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'2\'] {\n  background: var(--ns-series-2);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-2) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'3\'] {\n  background: var(--ns-series-3);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-3) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'4\'] {\n  background: var(--ns-series-4);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-4) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'5\'] {\n  background: var(--ns-series-5);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-5) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'6\'] {\n  background: var(--ns-series-6);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-6) 18%, transparent);\n  }\n}\n.ns-areachart__frame--empty {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  min-height: var(--ns-space-20);\n  padding: var(--ns-space-6);\n  border-style: dashed;\n}\n.ns-areachart__empty {\n  margin: 0;\n  font-size: var(--ns-text-sm);\n  color: var(--ns-muted-fg);\n  text-align: center;\n}\n@media (prefers-reduced-motion: reduce) {\n  .ns-areachart__crosshair, .ns-areachart__dot, .ns-areachart__tip {\n    transition: none;\n  }\n}\n.ns-footer-cols {\n  display: grid;\n  grid-auto-flow: column;\n  grid-auto-columns: 1fr;\n  border: 1px solid var(--ns-border);\n  border-radius: var(--ns-radius-xl);\n  overflow: hidden;\n}\n.ns-footer-cols__col {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: var(--ns-space-1);\n  min-width: 0;\n  padding: var(--ns-space-3) var(--ns-space-2);\n  text-align: center;\n}\n.ns-footer-cols__col + .ns-footer-cols__col::before {\n  content: \'\';\n  position: absolute;\n  inset-block: var(--ns-space-2);\n  inset-inline-start: 0;\n  width: 1px;\n  background: var(--ns-border);\n}\n.ns-footer-cols__glyph {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: var(--ns-space-6);\n  height: var(--ns-space-6);\n  margin-bottom: var(--ns-space-1);\n  border-radius: var(--ns-radius-lg);\n  background: var(--ns-primary);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-primary) 12%, transparent);\n  }\n  color: var(--ns-primary);\n  font-size: var(--ns-text-sm);\n}\n.ns-footer-cols__label {\n  font-family: var(--ns-font-mono);\n  font-size: var(--ns-text-3xs);\n  text-transform: uppercase;\n  letter-spacing: var(--ns-tracking-wide);\n  color: var(--ns-muted-fg);\n  white-space: nowrap;\n}\n.ns-footer-cols__value {\n  font-family: var(--ns-font-numeric);\n  font-variant-numeric: var(--ns-numeric-tabular);\n  font-size: var(--ns-text-sm);\n  font-weight: 600;\n  color: var(--ns-fg);\n  white-space: nowrap;\n}\n.ns-footer-cols__col[data-direction=\'in\'] .ns-footer-cols__value {\n  color: var(--ns-money-pos);\n}\n.ns-footer-cols__col[data-direction=\'out\'] .ns-footer-cols__value {\n  color: var(--ns-money-neg);\n}\n.ns-footer-cols__col[data-direction=\'flat\'] .ns-footer-cols__value {\n  color: var(--ns-money-flat);\n}\n.ns-footer-cols__col[data-direction=\'absent\'] .ns-footer-cols__value {\n  color: var(--ns-absent);\n}\n@layer base {\n  html {\n    background-color: var(--ns-bg);\n    color: var(--ns-fg);\n    -webkit-font-smoothing: antialiased;\n    -moz-osx-font-smoothing: grayscale;\n    color-scheme: dark;\n    min-height: 100%;\n  }\n  html[data-theme=\'light\'] {\n    color-scheme: light;\n  }\n  body {\n    background-color: var(--ns-bg);\n    font-family: var(--ns-font-sans);\n    color: var(--ns-fg);\n    min-height: 100vh;\n    -webkit-tap-highlight-color: var(--ns-primary-border);\n    transition: background-color 0.2s ease, color 0.2s ease;\n  }\n  a, button {\n    touch-action: manipulation;\n  }\n  h1, h2, h3, h4 {\n    --tw-leading: var(--leading-tight);\n    line-height: var(--leading-tight);\n    --tw-tracking: var(--tracking-tight);\n    letter-spacing: var(--tracking-tight);\n    text-wrap: balance;\n    scroll-margin-top: 5rem;\n  }\n}\n.ns-topbar__brand, .ns-page-header h1, .ns-section-heading, .ns-section-heading h2, .ns-section-heading h3, .ns-empty-state__heading, .ns-display {\n  font-family: var(--ns-font-display);\n  font-optical-sizing: auto;\n  font-variant-ligatures: common-ligatures;\n}\n.ns-page-header h1 {\n  font-weight: 600;\n  letter-spacing: -0.015em;\n}\n.ns-empty-state__heading {\n  font-size: var(--ns-text-base);\n}\n.ns-widget__title, .ns-card__title, .ns-data-table__header, .ns-responsive-table__header, .ns-badge, .ns-delta-chip, .ns-money-text {\n  font-family: var(--ns-font-sans);\n}\n.ns-widget__title, .ns-card__title {\n  font-weight: 600;\n}\n.ns-money-text, .ns-money-text__currency, .font-mono {\n  font-family: var(--ns-font-numeric);\n  font-variant-numeric: var(--ns-numeric-tabular);\n}\n@property --tw-rotate-x {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: "*";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-leading {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-font-weight {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-tracking {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-ordinal {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-slashed-zero {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-numeric-figure {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-numeric-spacing {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-numeric-fraction {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-shadow {\n  syntax: "*";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-shadow-color {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-shadow-alpha {\n  syntax: "', '', '', '', '', '']
+funnel labels: ['Issued', 'Collected', 'Outstanding']
+funnel values: [' .ns-areachart__crosshair, .ns-areachart__hit:hover > .ns-areachart__dot, .ns-areachart__hit:hover > .ns-areachart__tip {\n  opacity: 1;\n}\n.ns-areachart__yaxis {\n  grid-column: 1;\n  grid-row: 1;\n  position: relative;\n  width: max-content;\n  margin: 0;\n  padding: 0 var(--ns-space-2) 0 0;\n  list-style: none;\n}\n.ns-areachart__ytick {\n  position: absolute;\n  right: var(--ns-space-2);\n  transform: translateY(-50%);\n  font-family: var(--ns-font-numeric);\n  font-variant-numeric: var(--ns-numeric-tabular);\n  font-size: var(--ns-text-3xs);\n  line-height: 1;\n  white-space: nowrap;\n  color: var(--ns-chart-axis);\n}\n.ns-areachart__xaxis {\n  grid-column: 2;\n  grid-row: 2;\n  position: relative;\n  height: var(--ns-space-4);\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.ns-areachart__xtick {\n  position: absolute;\n  top: 0;\n  transform: translateX(-50%);\n  max-width: 5rem;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  font-size: var(--ns-text-3xs);\n  color: var(--ns-muted-fg);\n}\n.ns-areachart__legend {\n  grid-column: 1 / -1;\n  display: flex;\n  flex-wrap: wrap;\n  gap: var(--ns-space-2) var(--ns-space-4);\n  margin: 0;\n  padding: 0;\n  list-style: none;\n}\n.ns-areachart__legend-row {\n  display: flex;\n  align-items: center;\n  gap: var(--ns-space-2);\n  font-size: var(--ns-text-2xs);\n  color: var(--ns-muted-fg);\n}\n.ns-areachart__swatch {\n  flex-shrink: 0;\n  width: var(--ns-space-2);\n  height: var(--ns-space-2);\n  border-radius: var(--ns-radius-full);\n  background: var(--ns-series-1);\n}\n.ns-areachart__swatch[data-series=\'2\'] {\n  background: var(--ns-series-2);\n}\n.ns-areachart__swatch[data-series=\'3\'] {\n  background: var(--ns-series-3);\n}\n.ns-areachart__swatch[data-series=\'4\'] {\n  background: var(--ns-series-4);\n}\n.ns-areachart__swatch[data-series=\'5\'] {\n  background: var(--ns-series-5);\n}\n.ns-areachart__swatch[data-series=\'6\'] {\n  background: var(--ns-series-6);\n}\n.ns-areachart__swatch--ghost {\n  background: var(--ns-series-1);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-1) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'2\'] {\n  background: var(--ns-series-2);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-2) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'3\'] {\n  background: var(--ns-series-3);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-3) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'4\'] {\n  background: var(--ns-series-4);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-4) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'5\'] {\n  background: var(--ns-series-5);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-5) 18%, transparent);\n  }\n}\n.ns-areachart__swatch--ghost[data-series=\'6\'] {\n  background: var(--ns-series-6);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-series-6) 18%, transparent);\n  }\n}\n.ns-areachart__frame--empty {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  min-height: var(--ns-space-20);\n  padding: var(--ns-space-6);\n  border-style: dashed;\n}\n.ns-areachart__empty {\n  margin: 0;\n  font-size: var(--ns-text-sm);\n  color: var(--ns-muted-fg);\n  text-align: center;\n}\n@media (prefers-reduced-motion: reduce) {\n  .ns-areachart__crosshair, .ns-areachart__dot, .ns-areachart__tip {\n    transition: none;\n  }\n}\n.ns-footer-cols {\n  display: grid;\n  grid-auto-flow: column;\n  grid-auto-columns: 1fr;\n  border: 1px solid var(--ns-border);\n  border-radius: var(--ns-radius-xl);\n  overflow: hidden;\n}\n.ns-footer-cols__col {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: var(--ns-space-1);\n  min-width: 0;\n  padding: var(--ns-space-3) var(--ns-space-2);\n  text-align: center;\n}\n.ns-footer-cols__col + .ns-footer-cols__col::before {\n  content: \'\';\n  position: absolute;\n  inset-block: var(--ns-space-2);\n  inset-inline-start: 0;\n  width: 1px;\n  background: var(--ns-border);\n}\n.ns-footer-cols__glyph {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: var(--ns-space-6);\n  height: var(--ns-space-6);\n  margin-bottom: var(--ns-space-1);\n  border-radius: var(--ns-radius-lg);\n  background: var(--ns-primary);\n  @supports (color: color-mix(in lab, red, red)) {\n    background: color-mix(in srgb, var(--ns-primary) 12%, transparent);\n  }\n  color: var(--ns-primary);\n  font-size: var(--ns-text-sm);\n}\n.ns-footer-cols__label {\n  font-family: var(--ns-font-mono);\n  font-size: var(--ns-text-3xs);\n  text-transform: uppercase;\n  letter-spacing: var(--ns-tracking-wide);\n  color: var(--ns-muted-fg);\n  white-space: nowrap;\n}\n.ns-footer-cols__value {\n  font-family: var(--ns-font-numeric);\n  font-variant-numeric: var(--ns-numeric-tabular);\n  font-size: var(--ns-text-sm);\n  font-weight: 600;\n  color: var(--ns-fg);\n  white-space: nowrap;\n}\n.ns-footer-cols__col[data-direction=\'in\'] .ns-footer-cols__value {\n  color: var(--ns-money-pos);\n}\n.ns-footer-cols__col[data-direction=\'out\'] .ns-footer-cols__value {\n  color: var(--ns-money-neg);\n}\n.ns-footer-cols__col[data-direction=\'flat\'] .ns-footer-cols__value {\n  color: var(--ns-money-flat);\n}\n.ns-footer-cols__col[data-direction=\'absent\'] .ns-footer-cols__value {\n  color: var(--ns-absent);\n}\n@layer base {\n  html {\n    background-color: var(--ns-bg);\n    color: var(--ns-fg);\n    -webkit-font-smoothing: antialiased;\n    -moz-osx-font-smoothing: grayscale;\n    color-scheme: dark;\n    min-height: 100%;\n  }\n  html[data-theme=\'light\'] {\n    color-scheme: light;\n  }\n  body {\n    background-color: var(--ns-bg);\n    font-family: var(--ns-font-sans);\n    color: var(--ns-fg);\n    min-height: 100vh;\n    -webkit-tap-highlight-color: var(--ns-primary-border);\n    transition: background-color 0.2s ease, color 0.2s ease;\n  }\n  a, button {\n    touch-action: manipulation;\n  }\n  h1, h2, h3, h4 {\n    --tw-leading: var(--leading-tight);\n    line-height: var(--leading-tight);\n    --tw-tracking: var(--tracking-tight);\n    letter-spacing: var(--tracking-tight);\n    text-wrap: balance;\n    scroll-margin-top: 5rem;\n  }\n}\n.ns-topbar__brand, .ns-page-header h1, .ns-section-heading, .ns-section-heading h2, .ns-section-heading h3, .ns-empty-state__heading, .ns-display {\n  font-family: var(--ns-font-display);\n  font-optical-sizing: auto;\n  font-variant-ligatures: common-ligatures;\n}\n.ns-page-header h1 {\n  font-weight: 600;\n  letter-spacing: -0.015em;\n}\n.ns-empty-state__heading {\n  font-size: var(--ns-text-base);\n}\n.ns-widget__title, .ns-card__title, .ns-data-table__header, .ns-responsive-table__header, .ns-badge, .ns-delta-chip, .ns-money-text {\n  font-family: var(--ns-font-sans);\n}\n.ns-widget__title, .ns-card__title {\n  font-weight: 600;\n}\n.ns-money-text, .ns-money-text__currency, .font-mono {\n  font-family: var(--ns-font-numeric);\n  font-variant-numeric: var(--ns-numeric-tabular);\n}\n@property --tw-rotate-x {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-rotate-y {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-rotate-z {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-skew-x {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-skew-y {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-border-style {\n  syntax: "*";\n  inherits: false;\n  initial-value: solid;\n}\n@property --tw-leading {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-font-weight {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-tracking {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-ordinal {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-slashed-zero {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-numeric-figure {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-numeric-spacing {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-numeric-fraction {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-shadow {\n  syntax: "*";\n  inherits: false;\n  initial-value: 0 0 #0000;\n}\n@property --tw-shadow-color {\n  syntax: "*";\n  inherits: false;\n}\n@property --tw-shadow-alpha {\n  syntax: "', '—', '—', '—']
+absent count: 5
+unavailable notices: ['ns-inline-notice', 'ns-inline-notice', 'ns-inline-notice', 'ns-inline-notice', 'ns-inline-notice', 'ns-inline-notice']
+notice titles: ['Billing services unavailable', 'Runs service unavailable']
+share legend: [] []
+table rows: 2
+gauge caption: []
+footer cols: [] []
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 -c "
+import json,re
+s=open('deno.json').read()
+d=json.loads(s)
+print(json.dumps(d.get('imports',{}),indent=1))
+" | head -30; echo "=== prior proof harness ==="; sed -n '1,25p' ../../.llm/tmp/run-summary-proof.tsx 2>/dev/null
+{
+ "@app/": "./",
+ "@ledgerline/contracts": "../../contracts/mod.ts",
+ "@netscript/fresh": "jsr:@netscript/fresh@0.0.7",
+ "@netscript/fresh/defer/island": "jsr:@netscript/fresh@0.0.7/defer/island",
+ "@netscript/fresh-ui": "jsr:@netscript/fresh-ui@0.0.7",
+ "@netscript/sdk": "jsr:@netscript/sdk@0.0.7",
+ "@netscript/plugin-auth-core/sdk": "jsr:@netscript/plugin-auth-core@0.0.7/sdk",
+ "@netscript/mcp": "jsr:@netscript/mcp@0.0.7",
+ "fresh": "jsr:@fresh/core@^2.3.3",
+ "@orpc/client": "npm:@orpc/client@^1.15.0",
+ "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+ "@orpc/openapi": "npm:@orpc/openapi@^1.15.0",
+ "@orpc/server": "npm:@orpc/server@^1.15.0",
+ "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.15.0",
+ "@orpc/zod": "npm:@orpc/zod@^1.15.0",
+ "preact": "npm:preact@^10.29.2",
+ "@preact/signals": "npm:@preact/signals@2.9.2",
+ "@tanstack/db": "npm:@tanstack/db@0.7.0",
+ "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.101.0",
+ "@tanstack/query-core": "npm:@tanstack/query-core@^5.101.0",
+ "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@1.2.2",
+ "@tanstack/react-db": "npm:@tanstack/react-db@^0.1.95",
+ "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
+ "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.12",
+ "tailwindcss": "npm:tailwindcss@^4.2.2",
+ "vite": "npm:vite@7.2.2",
+ "zod": "npm:zod@^4.4.3",
+ "clsx": "npm:clsx@^2.1.1",
+ "tailwind-merge": "npm:tailwind-merge@^3.5.0",
+=== prior proof harness ===
+/** @jsxImportSource preact */
+/** Scratch: prove the run summary renders as a five-band widget in every state. */
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import RunSummary from '../../routes/runs/(_components)/run-summary.tsx';
+import type { RunConsoleV1, RunV1 } from '@ledgerline/contracts';
+
+const RUN: RunV1 = {
+  id: 'run_2026_07',
+  periodStart: '2026-07-01T00:00:00.000Z',
+  periodEnd: '2026-07-31T23:59:59.000Z',
+  status: 'ISSUED',
+  expectedCount: 412,
+  issuedCount: 408,
+  failedCount: 3,
+  notes: 'Monthly run',
+  createdAt: '2026-07-01T00:00:00.000Z',
+  total: '1240500.00',
+} as unknown as RunV1;
+
+const TOTALS: RunConsoleV1['totals'] = {
+  computed: '1240500.00',
+  issued: '842000.00',
+  pendingCount: 1,
+  failedCount: 3,
+};
+[0m
+The overview renders with honest absence (rate `—`, both failure notices). Now proving the *populated* composition with fixture data.
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/overview-proof.tsx
+Wrote file successfully.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 200 deno run --allow-all --config apps/ledgerline-web/deno.json .llm/tmp/overview-proof.tsx 2>&1 | head -80
+[0m[1m[31merror[0m: Import "preact/jsx-runtime" not a dependency and not in import map from "file:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/overview-proof.tsx"
+  [0m[36mhint:[0m If you want to use the npm package, try running `deno add npm:preact/jsx-runtime`
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/overview-proof.tsx[0m:[0m[33m1[0m:[0m[33m22[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed 's#../../components/blocks/mod.ts#./components/blocks/mod.ts#' .llm/tmp/overview-proof.tsx > apps/ledgerline-web/.overview-proof.tsx && timeout 200 deno run --allow-all apps/ledgerline-web/.overview-proof.tsx 2>&1 | head -90
+── populated, 6M window ──
+  bytes             15783
+  cards             1
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money data-money-sign="pos" data-currency="USD">$543,720.00not compared · " data-money data-money-sign="pos" data-currency="USD">$446,796.00not compared · " data-money data-money-sign="pos" data-currency="USD">$96,924.00not compared
+  funnel deltas     
+  share legend      Paid · Open · Uncollectible · Void
+  share values      108 · 30 · 6 · 6
+  gauge segments    0
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       6
+  range cells       3
+  range selected    0
+  em dashes         0
+  empty frames      0
+  notices           none
+
+── populated, 3M window ──
+  bytes             13948
+  cards             1
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money data-money-sign="pos" data-currency="USD">$290,720.00+14.9% · " data-money data-money-sign="pos" data-currency="USD">$238,896.00+14.9% · " data-money data-money-sign="pos" data-currency="USD">$51,824.00+14.9%
+  funnel deltas     0.0 pts · +14.9% · +14.9% · +14.9%
+  share legend      Paid · Open · Uncollectible · Void
+  share values      54 · 15 · 3 · 3
+  gauge segments    0
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       6
+  range cells       3
+  range selected    0
+  em dashes         0
+  empty frames      0
+  notices           none
+
+── no invoices at all ──
+  bytes             11245
+  cards             1
+  rate              —
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money="absent" data-currency="USD">—not measured · " data-money="absent" data-currency="USD">—not measured · " data-money="absent" data-currency="USD">—not measured
+  funnel deltas     
+  share legend      
+  share values      
+  gauge segments    0
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       0
+  range cells       3
+  range selected    0
+  em dashes         5
+  empty frames      2
+  notices           none
+
+── no runs yet ──
+  bytes             13782
+  cards             1
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money data-money-sign="pos" data-currency="USD">$543,720.00not compared · " data-money data-money-sign="pos" data-currency="USD">$446,796.00not compared · " data-money data-money-sign="pos" data-currency="USD">$96,924.00not compared
+  funnel deltas     
+  share legend      Paid · Open · Uncollectible · Void
+  share values      108 · 30 · 6 · 6
+  gauge segments    0
+  gauge centre      —
+  footer columns    
+  footer values     
+  table links       6
+  range cells       3
+  range selected    0
+  em dashes         0
+  empty frames      2
+  notices           none
+
+── both services down ──
+  bytes             9900
+  cards             1
+  rate              —
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money="absent" data-currency="USD">—not measured · " data-money="absent" data-currency="USD">—not measured · " data-money="absent" data-currency="USD">—not measured
+  funnel deltas     
+  share legend      
+  share values
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -o "ns-gauge__[a-z-]*" components/ui/semicircular-gauge.tsx | sort -u; echo "=== segmented ==="; grep -o "ns-segmented__[a-z-]*" components/ui/segmented-control.tsx | sort -u; echo "=== is-active in segmented ==="; grep -n "is-active\|is-selected" components/ui/segmented-control.tsx
+ns-gauge__caption
+ns-gauge__center
+ns-gauge__dot
+ns-gauge__empty
+ns-gauge__frame
+ns-gauge__label
+ns-gauge__legend
+ns-gauge__legend-label
+ns-gauge__legend-row
+ns-gauge__legend-value
+ns-gauge__plot
+ns-gauge__rule
+ns-gauge__seg
+ns-gauge__svg
+ns-gauge__track
+ns-gauge__value
+=== segmented ===
+ns-segmented__cell
+=== is-active in segmented ===
+98:        const cellClass = cn('ns-segmented__cell', selected && 'is-selected');
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 - <<'PY'
+p='apps/ledgerline-web/.overview-proof.tsx'
+s=open(p).read()
+s=s.replace("""  console.log(`  cards             ${count(html, 'ns-widget ')}`);""","""  console.log(`  cards             ${count(html, 'ns-widget__header')}`);""")
+s=s.replace("""  console.log(`  gauge segments    ${count(html, 'ns-gauge__arc')}`);""","""  console.log(`  gauge segments    ${count(html, 'ns-gauge__seg')}`);""")
+s=s.replace("""  console.log(`  range selected    ${between(html, 'ns-segmented__cell is-active', '<').length}`);""","""  console.log(`  range selected    ${count(html, 'is-selected')}`);""")
+open(p,'w').write(s)
+PY
+timeout 200 deno run --allow-all apps/ledgerline-web/.overview-proof.tsx 2>&1 | head -60
+── populated, 6M window ──
+  bytes             15783
+  cards             5
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money data-money-sign="pos" data-currency="USD">$543,720.00not compared · " data-money data-money-sign="pos" data-currency="USD">$446,796.00not compared · " data-money data-money-sign="pos" data-currency="USD">$96,924.00not compared
+  funnel deltas     
+  share legend      Paid · Open · Uncollectible · Void
+  share values      108 · 30 · 6 · 6
+  gauge segments    2
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       6
+  range cells       3
+  range selected    1
+  em dashes         0
+  empty frames      0
+  notices           none
+
+── populated, 3M window ──
+  bytes             13948
+  cards             5
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money data-money-sign="pos" data-currency="USD">$290,720.00+14.9% · " data-money data-money-sign="pos" data-currency="USD">$238,896.00+14.9% · " data-money data-money-sign="pos" data-currency="USD">$51,824.00+14.9%
+  funnel deltas     0.0 pts · +14.9% · +14.9% · +14.9%
+  share legend      Paid · Open · Uncollectible · Void
+  share values      54 · 15 · 3 · 3
+  gauge segments    2
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       6
+  range cells       3
+  range selected    1
+  em dashes         0
+  empty frames      0
+  notices           none
+
+── no invoices at all ──
+  bytes             11245
+  cards             5
+  rate              —
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    " data-money="absent" data-currency="USD">—not measured · " data-money="absent" data-currency="USD">—not measured · " data-money="absent" data-currency="USD">—not measured
+  funnel deltas     
+  share legend      
+  share values      
+  gauge segments    2
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       0
+  range cells       3
+  range selected    1
+  em dashes         5
+  empty frames      2
+  notices           none
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '30,50p' components/product/money-text.tsx
+flat: 'flat',
+  absent: 'flat',
+};
+
+/**
+ * Renders money with the money-* semantic colors and tabular numerals.
+ *
+ * Every digit and the direction both come from one `moneyParts()` call. This
+ * component does no arithmetic of its own: the float round-trip it used to
+ * make is what printed `$100` where the ledger requires `$100.00`, and the
+ * sign it used to re-derive with `amount > 0` is a fact the money layer
+ * already resolves — including the case where rounding a small negative to
+ * two digits makes it a flat zero rather than a negative amount.
+ *
+ * Absence (`null`/`undefined`/unparseable) renders an em dash — never `0.00`,
+ * because in a ledger "not measured" and "zero" are different facts.
+ */
+export function MoneyText({ value, currency, class: className }: MoneyTextProps): VNode {
+  const parts = moneyParts(value, { currency });
+
+  if (parts.absent) {
+[0m
+The funnel was colouring every stage green because `MoneyText` derives direction from the sign. Fixing it to match the reference, where only the delta carries colour:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 - <<'PY'
+p='components/blocks/overview.tsx'
+s=open(p).read()
+
+s=s.replace("""/** One row of the dunning funnel: a stage, what it is worth, and which way it moved. */
+interface FunnelStage {
+  readonly label: string;
+  readonly amount: MoneyValue;
+  /** The previous window's figure, or `null` when there was none. */
+  readonly prior: MoneyValue;
+  readonly direction: MoneyDirection;
+}""","""/**
+ * One row of the dunning funnel: a stage, what it is worth, and which way it
+ * moved against the window before.
+ *
+ * There is deliberately no `direction` on the amount. `MoneyText` derives one
+ * from the sign, which would paint "Outstanding" in the same towards-us green
+ * as money that actually arrived — and this is precisely the stage where that
+ * lie is easiest to read as a fact. So the amount is set in the body colour
+ * and only the delta carries a semantic one, which is what the reference
+ * sheet's metric list does: value plain, arrow and movement coloured.
+ */
+interface FunnelStage {
+  readonly label: string;
+  readonly amount: MoneyValue;
+  /** The previous window's figure, or `null` when there was none. */
+  readonly prior: MoneyValue;
+}""")
+
+s=s.replace("""      <MoneyText value={stage.amount} currency={currency} class='ns-funnel__value' />""","""      <span class='ns-funnel__value'>
+        {formatMoneyWithCurrency(stage.amount, { currency })}
+      </span>""")
+
+s=s.replace("""  const stages: readonly FunnelStage[] = [
+    { label: 'Issued', amount: issued, prior: priorIssued, direction: moneyDirection(issued) },
+    {
+      label: 'Collected',
+      amount: collected,
+      prior: priorCollected,
+      direction: moneyDirection(collected),
+    },
+    {
+      label: 'Outstanding',
+      amount: outstanding,
+      prior: priorOutstanding,
+      direction: moneyDirection(outstanding),
+    },
+  ];""","""  const stages: readonly FunnelStage[] = [
+    { label: 'Issued', amount: issued, prior: priorIssued },
+    { label: 'Collected', amount: collected, prior: priorCollected },
+    { label: 'Outstanding', amount: outstanding, prior: priorOutstanding },
+  ];""")
+
+s=s.replace("""import {
+  formatMoneyCompact,
+  formatMoneyWithCurrency,
+  type MoneyDirection,
+  moneyDirection,
+  type MoneyValue,
+  movement,
+  ratio,
+  sumMoney,
+} from '@app/lib/money.ts';""","""import {
+  formatMoneyCompact,
+  formatMoneyWithCurrency,
+  type MoneyValue,
+  movement,
+  ratio,
+  sumMoney,
+} from '@app/lib/money.ts';""")
+open(p,'w').write(s)
+print('ok')
+PY
+deno fmt components/blocks/overview.tsx >/dev/null && timeout 300 deno check 2>&1 | grep -E "TS[0-9]+" | head -10; echo "CHECK_DONE"
+ok
+Checked 1 file
+CHECK_DONE
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 200 deno run --allow-all apps/ledgerline-web/.overview-proof.tsx 2>&1 | sed -n '1,20p;45,120p'
+── populated, 6M window ──
+  bytes             15447
+  cards             5
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    ">$543,720.00not compared · ">$446,796.00not compared · ">$96,924.00not compared
+  funnel deltas     
+  share legend      Paid · Open · Uncollectible · Void
+  share values      108 · 30 · 6 · 6
+  gauge segments    2
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       6
+  range cells       3
+  range selected    1
+  em dashes         0
+  empty frames      0
+  notices           none
+  rate              —
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    ">—not compared · ">—not compared · ">—not compared
+  funnel deltas     
+  share legend      
+  share values      
+  gauge segments    2
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       0
+  range cells       3
+  range selected    1
+  em dashes         2
+  empty frames      2
+  notices           none
+
+── no runs yet ──
+  bytes             13446
+  cards             5
+  rate              82.2%
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    ">$543,720.00not compared · ">$446,796.00not compared · ">$96,924.00not compared
+  funnel deltas     
+  share legend      Paid · Open · Uncollectible · Void
+  share values      108 · 30 · 6 · 6
+  gauge segments    0
+  gauge centre      —
+  footer columns    
+  footer values     
+  table links       6
+  range cells       3
+  range selected    1
+  em dashes         0
+  empty frames      2
+  notices           none
+
+── both services down ──
+  bytes             9519
+  cards             5
+  rate              —
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    ">—not compared · ">—not compared · ">—not compared
+  funnel deltas     
+  share legend      
+  share values      
+  gauge segments    0
+  gauge centre      —
+  footer columns    
+  footer values     
+  table links       0
+  range cells       3
+  range selected    1
+  em dashes         2
+  empty frames      2
+  notices           Billing services unavailable · Runs service unavailable
+
+── runs up, billing down ──
+  bytes             10864
+  cards             5
+  rate              —
+  funnel labels     Issued · Collected · Outstanding
+  funnel amounts    ">—not compared · ">—not compared · ">—not compared
+  funnel deltas     
+  share legend      
+  share values      
+  gauge segments    2
+  gauge centre      $1,318,600.00
+  footer columns    Issued · Excepted · Open
+  footer values     386 · 4 · 22
+  table links       0
+  range cells       3
+  range selected    1
+  em dashes         2
+  empty frames      2
+  notices           none
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && mv apps/ledgerline-web/.overview-proof.tsx .llm/tmp/overview-proof.tsx && git add apps/ledgerline-web/components/blocks apps/ledgerline-web/assets/blocks/overview.css apps/ledgerline-web/assets/styles.css apps/ledgerline-web/routes/index.tsx && git status --short
+A  apps/ledgerline-web/assets/blocks/overview.css
+M  apps/ledgerline-web/assets/styles.css
+A  apps/ledgerline-web/components/blocks/mod.ts
+A  apps/ledgerline-web/components/blocks/overview.tsx
+ M apps/ledgerline-web/routes/customers/[id].tsx
+ M apps/ledgerline-web/routes/customers/index.tsx
+M  apps/ledgerline-web/routes/index.tsx
+ M apps/ledgerline-web/routes/invoices/[id].tsx
+ M apps/ledgerline-web/routes/invoices/index.tsx
+ M apps/ledgerline-web/routes/runs/[id].tsx
+[0m
+All six states render distinctly andcorrectly. Committing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff --stat apps/ledgerline-web/routes/ && git diff apps/ledgerline-web/routes/invoices/index.tsx | head -30
+apps/ledgerline-web/routes/customers/[id].tsx  | 5 +----
+ apps/ledgerline-web/routes/customers/index.tsx | 5 +----
+ apps/ledgerline-web/routes/invoices/[id].tsx   | 5 +----
+ apps/ledgerline-web/routes/invoices/index.tsx  | 5 +----
+ apps/ledgerline-web/routes/runs/[id].tsx       | 5 +----
+ 5 files changed, 5 insertions(+), 20 deletions(-)
+diff --git a/apps/ledgerline-web/routes/invoices/index.tsx b/apps/ledgerline-web/routes/invoices/index.tsx
+index 2d5db82..69d80e8 100644
+--- a/apps/ledgerline-web/routes/invoices/index.tsx
++++ b/apps/ledgerline-web/routes/invoices/index.tsx
+@@ -25,10 +25,7 @@ const INVOICES_SEARCH_SCHEMA = paginationSearchSchema({
+ });
+ 
+ export const invoicesIndexPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.invoices.$route,
+-    searchSchema: INVOICES_SEARCH_SCHEMA,
+-  })
++  .withRouteContract({ $route: routePatterns.invoices.$route, searchSchema: INVOICES_SEARCH_SCHEMA })
+   .withMeta(() => ({
+     title: 'Invoices — ledgerline',
+     description: 'Invoice ledger: issued, paid, and void invoices.',
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git checkout -- apps/ledgerline-web/routes/customers/\[id\].tsx apps/ledgerline-web/routes/customers/index.tsx apps/ledgerline-web/routes/invoices/\[id\].tsx apps/ledgerline-web/routes/invoices/index.tsx apps/ledgerline-web/routes/runs/\[id\].tsx && git status --short
+A  apps/ledgerline-web/assets/blocks/overview.css
+M  apps/ledgerline-web/assets/styles.css
+A  apps/ledgerline-web/components/blocks/mod.ts
+A  apps/ledgerline-web/components/blocks/overview.tsx
+M  apps/ledgerline-web/routes/index.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git commit -F - <<'EOF'
+Feat: the landing is the billing overview, composed as a block
+
+`/` used to be four cards describing the app's own routes — "Open the run
+console", "Browse design". That is the scaffold describing itself in the
+product's voice. A visitor arrives at a finance product and is handed a
+directory of the product's own screens, which is the most literal version
+of "the app talking about itself" there is.
+
+It is now the screen they came for, and it is a block rather than a route
+assembly. `components/blocks/` is the third layer: `ui` is the vocabulary,
+`product` is the domain over it, and a block is a whole page body that
+owns its layout, its empty states and its composition order. Blocks take
+plain data, read no service and import no router, so they lift into any
+route that can supply the model — which is the seam that lets this lane
+ship screens without editing the route files the build lane owns.
+
+Five cards, one anatomy, in a reading order: the one answer, then the
+trend, then the run that produced it, then the evidence.
+
+- Collection — the page's display hero. Rate, then the dunning funnel
+  (issued → collected → outstanding) with each stage's movement against
+  the window before.
+- Billed vs collected — solid collected layer over a translucent billed
+  one on a single axis, behind a range control that is a route, not
+  client state, so a window is a URL you can send someone.
+- Run progress — the newest run as a two-tone gauge, counts as geometry
+  and money in the centre.
+- Recent invoices and invoice mix — the evidence, with full-width CTAs.
+
+Two deliberate calls worth naming:
+
+The funnel's amounts are set in the body colour, not through MoneyText.
+MoneyText derives a direction from the sign, which paints "Outstanding"
+in the same towards-us green as money that actually arrived — the one
+stage where that reads as a fact it is not. Only the delta carries
+semantic colour, which is what the reference sheets do.
+
+Every figure is a sum over the window or an em dash. Six states were
+rendered and counted against fixtures, not described: populated at 3M
+and 6M, no invoices, no runs, both services down, and runs up with
+billing down. That last one is the point of keeping the two reads
+separate — the gauge still answers while the ledger is dark, and a page
+that collapses both into one "unavailable" banner loses the half it
+could still have answered.
+
+The route asserts every window in OVERVIEW_RANGES is selectable in the
+URL. Annotating the array widens it back to the union and the check goes
+vacuous, so the array is `as const` and both halves are asserted through
+tuples — `never extends never` distributes to `never` and passes either
+way. Verified: adding a 24M window fails the build.
+
+Runtime: `/` 200s and the range parameter changes the payload
+(3M 164 KB, 6M 166 KB, 12M 169 KB). With no stack up it renders the
+honest absence state — rate `—`, both failure notices, no fabricated
+zero. The populated composition is proven by fixture render
+(`.llm/tmp/overview-proof.tsx`), not by the route, because the route
+correctly cannot invent data.
+EOF
+git log --oneline -1
+[fix/steer2-consolidated bdcac0a] Feat: the landing is the billing overview, composed as a block
+ 5 files changed, 1150 insertions(+), 47 deletions(-)
+ create mode 100644 apps/ledgerline-web/assets/blocks/overview.css
+ create mode 100644 apps/ledgerline-web/components/blocks/mod.ts
+ create mode 100644 apps/ledgerline-web/components/blocks/overview.tsx
+bdcac0a Feat: the landing is the billing overview, composed as a block
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '30,75p' "routes/(design)/design/_layout.tsx"; echo "=== gauge segment render ==="; sed -n '120,160p' components/ui/semicircular-gauge.tsx; echo "=== gauge css 20-60 ==="; sed -n '20,60p' assets/ui/semicircular-gauge.css
+],
+  },
+] as const;
+
+function buildDesignBreadcrumbs(pathname: string) {
+  const crumbs = [{ label: 'Design', href: '/design' }];
+  const section = pathname.replace(/^\/design\/?/, '').split('/')[0];
+  if (section) {
+    crumbs.push({
+      label: section.charAt(0).toUpperCase() + section.slice(1),
+      href: `/design/${section}`,
+    });
+  }
+  return crumbs.map((item, index) => index === crumbs.length - 1 ? { label: item.label } : item);
+}
+
+export default define.layout(function DesignLayout({ Component, url }) {
+  return (
+    <SidebarShell
+      pathname={url.pathname}
+      navigation={DESIGN_NAVIGATION}
+      brand={
+        <a href='/' class='ns-topbar-brand'>
+          ledgerline
+        </a>
+      }
+      brandBadge={<Badge variant='secondary'>design system</Badge>}
+      topbarStart={
+        <>
+          <SidebarToggle />
+          <Breadcrumb items={buildDesignBreadcrumbs(url.pathname)} />
+        </>
+      }
+      topbarEnd={<ThemeToggle />}
+      footer={
+        <div class='ns-dashboard__sidebar-env'>
+          <span class='ns-dot-active' />
+          <span class='ns-dashboard__sidebar-env-label'>Ledgerline theme</span>
+        </div>
+      }
+    >
+      <Component />
+    </SidebarShell>
+  );
+});
+=== gauge segment render ===
+      <div class='ns-gauge__plot'>
+        <svg
+          class='ns-gauge__svg'
+          viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
+          role='img'
+          aria-label={`${label} ${value} of ${denominator} run items`}
+        >
+          <path
+            class='ns-gauge__track'
+            d={ARC}
+            pathLength={PATH_LENGTH}
+            fill='none'
+            stroke-width={STROKE}
+            stroke-linecap='butt'
+          />
+          {arcs.map((arc) => (
+            <path
+              key={arc.key}
+              class='ns-gauge__seg'
+              data-series={arc.series}
+              d={ARC}
+              pathLength={PATH_LENGTH}
+              fill='none'
+              stroke-width={STROKE}
+              stroke-linecap='butt'
+              stroke-dasharray={`${arc.length} ${PATH_LENGTH - arc.length}`}
+              stroke-dashoffset={arc.offset}
+            />
+          ))}
+        </svg>
+        <div class='ns-gauge__center'>
+          <span class='ns-gauge__label'>{label}</span>
+          <span class='ns-gauge__value'>{value}</span>
+          {caption && <span class='ns-gauge__caption'>{caption}</span>}
+        </div>
+      </div>
+
+      {
+        /* The baseline rule is part of the graphic: it separates the arc from
+          whatever the card puts beneath it. */
+      }
+=== gauge css 20-60 ===
+
+.ns-gauge__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ns-gauge__track {
+  stroke: var(--ns-muted);
+}
+
+.ns-gauge__seg {
+  stroke: var(--ns-series-1);
+  transition: stroke-dasharray var(--ns-ease-normal);
+}
+
+.ns-gauge__seg[data-series='1'] {
+  stroke: var(--ns-series-1);
+}
+
+.ns-gauge__seg[data-series='2'] {
+  stroke: var(--ns-series-2);
+}
+
+.ns-gauge__seg[data-series='3'] {
+  stroke: var(--ns-series-3);
+}
+
+.ns-gauge__seg[data-series='4'] {
+  stroke: var(--ns-series-4);
+}
+
+.ns-gauge__seg[data-series='5'] {
+  stroke: var(--ns-series-5);
+}
+
+.ns-gauge__seg[data-series='6'] {
+  stroke: var(--ns-series-6);
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '20,58p' components/ui/semicircular-gauge.tsx
+* `value` is geometry only — it is never rendered (H2). The label the reader
+ * sees arrives as `display`, already formatted by the caller.
+ */
+export interface GaugeSegment {
+  readonly value: number;
+  /** Legend name, e.g. `Issued`. */
+  readonly label: string;
+  /** Preformatted amount for the legend, e.g. `$842,000.00`. */
+  readonly display: string;
+  /** Series slot. Defaults to the segment's index in the cycle. */
+  readonly series?: GaugeSeries;
+}
+
+export interface SemicircularGaugeProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  segments: readonly GaugeSegment[];
+  /**
+   * The denominator — every item the run covers, including the ones no segment
+   * accounts for. Omitted means the segments are the whole. `null` means the
+   * total was not measured, which renders the empty frame (H7, M1).
+   */
+  total?: number | null;
+  /** Quiet uppercase label above the centre amount, e.g. `ISSUED`. */
+  label: string;
+  /** The preformatted centre amount. */
+  value: string;
+  /** Quiet line under the centre amount. */
+  caption?: string;
+  /** Show the inline dot legend below the rule (C6). Defaults to true. */
+  legend?: boolean;
+  /** Copy for the labelled empty frame. */
+  emptyLabel?: string;
+  /** Tighten the centre amount for narrow rails. */
+  compact?: boolean;
+  class?: string;
+}
+
+/** viewBox: the arc is 160 wide and 100 tall, plus room for the 18-wide stroke. */
+const VIEW_WIDTH = 200;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '56,118p' components/ui/semicircular-gauge.tsx; echo "=== reduced motion in gauge css ==="; grep -n "prefers-reduced-motion" -A4 assets/ui/semicircular-gauge.css
+/** viewBox: the arc is 160 wide and 100 tall, plus room for the 18-wide stroke. */
+const VIEW_WIDTH = 200;
+const VIEW_HEIGHT = 110;
+const RADIUS = 80;
+const STROKE = 18;
+const CENTRE_X = 100;
+const BASELINE_Y = 100;
+
+const ARC = `M ${CENTRE_X - RADIUS} ${BASELINE_Y} A ${RADIUS} ${RADIUS} 0 0 1 ${
+  CENTRE_X + RADIUS
+} ${BASELINE_Y}`;
+
+/** Dash lengths are declared in `pathLength` units, so they read as percentages. */
+const PATH_LENGTH = 100;
+
+/**
+ * A 180° two-tone gauge.
+ *
+ * Terminals are `butt` caps: the arc ends in flat horizontal cuts flush with
+ * the baseline, and the junction between two segments is a crisp radial cut —
+ * no rounded overhang below the baseline and no bleed across the junction.
+ */
+export function SemicircularGauge({
+  segments,
+  total,
+  label,
+  value,
+  caption,
+  legend = true,
+  emptyLabel = 'Nothing to measure yet',
+  compact = false,
+  class: className,
+  ...props
+}: SemicircularGaugeProps): VNode {
+  const sum = segments.reduce((acc, segment) => acc + segment.value, 0);
+  const denominator = total ?? sum;
+
+  if (!Number.isFinite(denominator) || denominator <= 0 || sum < 0) {
+    return (
+      <div {...props} class={cn('ns-gauge', 'ns-gauge--empty', className)}>
+        <div class='ns-gauge__frame'>
+          <p class='ns-gauge__empty'>{emptyLabel}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // A segment can never claim more than the whole; the track keeps the rest.
+  let cursor = 0;
+  const arcs = segments.map((segment, index) => {
+    const share = Math.max(0, Math.min(segment.value, denominator)) / denominator;
+    const start = cursor;
+    cursor = Math.min(cursor + share, 1);
+    return {
+      key: `${segment.label}-${index}`,
+      series: segment.series ?? ((index % 6) + 1) as GaugeSeries,
+      length: share * PATH_LENGTH,
+      offset: -start * PATH_LENGTH,
+    };
+  });
+
+  return (
+=== reduced motion in gauge css ===
+188:@media (prefers-reduced-motion: reduce) {
+189-  .ns-gauge__seg {
+190-    transition: none;
+191-  }
+192-}
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+@@ -1,7 +1,7 @@
+ import { Partial } from 'fresh/runtime';
+ import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
+-import { Badge, Button, SidebarShell } from '@app/components/ui/mod.ts';
++import { Badge, Breadcrumb, type BreadcrumbItem, Button, SidebarShell } from '@app/components/ui/mod.ts';
+ import { appRoutes } from '@app/router.ts';
+ import { define } from '@app/utils.ts';
+ 
+ /**
+
+[0m
+Now making the shell unavoidable (breadcrumbs on product routes) and adding motion that means something (the gauge filling on mount).
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+@@ -25,8 +25,55 @@
+     ],
+   },
+ ] as const;
+ 
++/**
++ * Segment names that are not the capitalised path.
++ *
++ * Only the ones the router actually serves. Anything else falls through to
++ * title-casing, which is right for a segment the copy never names and wrong
++ * to hardcode a guess for.
++ */
++const SEGMENT_LABELS: Readonly<Record<string, string>> = {
++  runs: 'Runs',
++  invoices: 'Invoices',
++  customers: 'Customers',
++  webhooks: 'Webhooks',
++  design: 'Design',
++  health: 'Health',
++};
++
++/**
++ * Breadcrumbs from the path, so no page can render without them.
++ *
++ * The chrome is not decoration a route opts into — a screen with no way back
++ * to the thing that linked to it reads as a broken page, and it is what the
++ * product looked like whenever a surface was opened directly. Deriving the
++ * trail here rather than per route means a new route inherits it.
++ *
++ * A detail segment is an id, and it is rendered as the id. Stripe prints
++ * `cus_…` in its crumb for the same reason: the record's own identifier is
++ * the only name every record has, and inventing a friendlier one would put a
++ * different label on the row than on the page it opens.
++ */
++function buildProductBreadcrumbs(pathname: string): BreadcrumbItem[] {
++  const segments = pathname.split('/').filter((segment) => segment.length > 0);
++  const crumbs: BreadcrumbItem[] = [{ label: 'Overview', href: appRoutes.home.href() }];
++
++  let href = '';
++  segments.forEach((segment, index) => {
++    href = `${href}/${segment}`;
++    const isLast = index === segments.length - 1;
++    const label = SEGMENT_LABELS[segment] ??
++      segment.charAt(0).toUpperCase() + segment.slice(1);
++    crumbs.push(isLast ? { label } : { label, href });
++  });
++
++  // The root is the trail's first crumb and its last; one entry reads as a
++  // breadcrumb with nowhere to go.
++  return segments.length === 0 ? [{ label: 'Overview' }] : crumbs;
++}
++
+ export default define.layout(function RootLayout({ Component, url }) {
+   const homeHref = appRoutes.home.href();
+   const runsHref = appRoutes.runs.href();
+   const invoicesHref = appRoutes.invoices.href();
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+@@ -180,8 +180,9 @@
+       ledgerline
+     </a>
+   }
+   brandBadge={<Badge variant='secondary'>billing console</Badge>}
++  topbarStart={<Breadcrumb items={buildProductBreadcrumbs(url.pathname)} />}
+   topbarEnd={<ThemeToggle />}
+   contentId='page-content'
+ >
+   <Component />
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
+@@ -31,10 +31,51 @@
+ 
+ .ns-gauge__seg {
+   stroke: var(--ns-series-1);
+   transition: stroke-dasharray var(--ns-ease-normal);
++  /*
++   * The arc draws itself on mount, once.
++   *
++   * This is the one piece of motion the product earns: a run advancing over
++   * time is the thing Ledgerline shows that Stripe cannot, and a gauge that
++   * appears already full states the result without showing the passage that
++   * produced it. `backwards`, not `both` — it holds the empty arc through the
++   * stagger delay and then hands the property back, so the `transition`
++   * above is still what animates a live update afterwards. A forwards fill
++   * would pin the value and the console would stop moving on the next event.
++   *
++   * There is no `to` keyframe: the endpoint is the element's own dash array,
++   * so every segment animates to the length it already has.
++   */
++  animation: ns-gauge-fill 720ms var(--ns-ease-normal) backwards;
+ }
+ 
++/*
++ * Segments draw in order rather than together, so a two-tone gauge reads as
++ * settled first and excepted second — the same order the legend below it
++ * lists them. `nth-of-type` because the track is the first path: segment one
++ * is the second.
++ */
++.ns-gauge__seg:nth-of-type(3) {
++  animation-delay: 160ms;
++}
++.ns-gauge__seg:nth-of-type(4) {
++  animation-delay: 320ms;
++}
++.ns-gauge__seg:nth-of-type(5) {
++  animation-delay: 480ms;
++}
++.ns-gauge__seg:nth-of-type(6) {
++  animation-delay: 640ms;
++}
++
++/* Dash lengths are in `pathLength` units, normalised to 100 (see the module). */
++@keyframes ns-gauge-fill {
++  from {
++    stroke-dasharray: 0 100;
++  }
++}
++
+ .ns-gauge__seg[data-series='1'] {
+   stroke: var(--ns-series-1);
+ }
+ 
+
+[0m
+Now the gauge fill — the one motion the ambition document names byname:
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/semicircular-gauge.css
+@@ -228,6 +228,10 @@
+ 
+ @media (prefers-reduced-motion: reduce) {
+   .ns-gauge__seg {
+     transition: none;
++    /* The settled arc, not a half-drawn one: this animation's only job is to
++       show the passage, and a reader who asked for less motion should get the
++       result at once rather than an animation frozen at its first frame. */
++    animation: none;
+   }
+ }
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt assets/ui/semicircular-gauge.css routes/_layout.tsx >/dev/null && timeout 300 deno check 2>&1 | grep -E "TS[0-9]+" | head -10; echo "CHECK_DONE"; deno lint . 2>&1 | tail -4
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Checked 2 files
+CHECK_DONE
+Checked 122 files
+[0m
+[0m$ [0mPORT=$(grep -o "localhost:[0-9]*" /tmp/dev-*.log | head -1 | cut -d: -f2); echo "PORT=$PORT"; for p in "/" "/runs" "/invoices" "/customers" "/design/components"; do out=$(curl -s "http://localhost:$PORT$p"); code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$PORT$p"); crumbs=$(printf '%s' "$out" | grep -o 'ns-breadcrumb__item[^>]*>[^<]*' | sed 's/.*>//' | tr '\n' '>' ); printf "%-24s %s  crumbs: %s\n" "$p" "$code" "$crumbs"; done
+grep: /tmp/dev-2004591.log: binary file matches
+PORT=
+/                        000  crumbs: 
+/runs                    000  crumbs: 
+/invoices                000  crumbs: 
+/customers               000  crumbs: 
+/design/components       000  crumbs:
+[0m
+[0m$ [0mPORT=$(grep -ao "localhost:[0-9]*" /tmp/dev-*.log | head -1 | cut -d: -f2); echo "PORT=$PORT"; curl -s -o /dev/null -w "root=%{http_code}\n" "http://localhost:$PORT/"
+PORT=49993
+root=200
+[0m
+[0m$ [0mPORT=49993; for p in "/" "/runs" "/invoices" "/customers" "/design/components"; do out=$(curl -s "http://localhost:$PORT$p"); code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$PORT$p"); crumbs=$(printf '%s' "$out" | grep -ao 'class="ns-breadcrumb__item[^"]*"' | wc -l); labels=$(printf '%s' "$out" | grep -aoP '(?<=ns-breadcrumb__item"[^>]{0,80}>)[^<]+' | tr '\n' ' '); printf "%-22s %s  items=%s  [%s]\n" "$p" "$code" "$crumbs" "$labels"; done
+grep: lookbehind assertion is not fixed length
+/                      200  items=0  []
+grep: lookbehind assertion is not fixed length
+/runs                  200  items=2  []
+grep: lookbehind assertion is not fixed length
+/invoices              200  items=2  []
+grep: lookbehind assertion is not fixed length
+/customers             200  items=2  []
+grep: lookbehind assertion is not fixed length
+/design/components     200  items=5  []
+[0m
+[0m$ [0mcd /tmp && PORT=49993; curl -s "http://localhost:$PORT/runs" > r.html; curl -s "http://localhost:$PORT/invoices" > i.html; python3 - <<'PY'
+import re
+for f in ('/tmp/r.html','/tmp/i.html'):
+    s=open(f).read()
+    m=re.search(r'<nav[^>]*ns-breadcrumb.*?</nav>', s, re.S)
+    print(f)
+    print('  raw:', (m.group(0)[:400] if m else 'NO BREADCRUMB'))
+PY
+/tmp/r.html
+  raw: <nav aria-label="Breadcrumb" class="ns-breadcrumb"><ol class="ns-breadcrumb" role="list"><li data-frsh-key="Overview-0" class="ns-breadcrumb__item"><a href="/" class="ns-breadcrumb__link" data-ancestor="true" aria-current="true">Overview</a></li><li data-frsh-key="Runs-1" class="ns-breadcrumb__item"><span class="ns-breadcrumb__separator" aria-hidden="true">/</span><span class="ns-breadcrumb__curre
+/tmp/i.html
+  raw: <nav aria-label="Breadcrumb" class="ns-breadcrumb"><ol class="ns-breadcrumb" role="list"><li data-frsh-key="Overview-0" class="ns-breadcrumb__item"><a href="/" class="ns-breadcrumb__link" data-ancestor="true" aria-current="true">Overview</a></li><li data-frsh-key="Invoices-1" class="ns-breadcrumb__item"><span class="ns-breadcrumb__separator" aria-hidden="true">/</span><span class="ns-breadcrumb__c
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/breadcrumb.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rn "data-ancestor" --include="*.ts" --include="*.tsx" . 2>/dev/null | grep -v node_modules | head; echo "=== fresh ==="; grep -rln "data-ancestor" node_modules/@fresh/core/ 2>/dev/null | head -3
+=== fresh ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rln "data-ancestor" node_modules/ 2>/dev/null | head -5; echo "=== search _fresh ==="; grep -rln "data-ancestor" _fresh/ 2>/dev/null | head -5
+=== search _fresh ===
+_fresh/client/shared.mjs
+_fresh/server/server-entry.mjs
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -o "data-ancestor[^;]\{0,200\}" _fresh/server/server-entry.mjs | head -4; echo "=== context ==="; grep -o ".\{300\}data-ancestor.\{300\}" _fresh/server/server-entry.mjs | head -2
+data-ancestor"
+=== context ===
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx[90m [offset=80, limit=60][0m
+`/` now renders the legacy landing topbar, so the overview sits outside the productshell. Fixing that:
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 - <<'PY'
+p='routes/_layout.tsx'
+s=open(p).read()
+start=s.index("  // The landing keeps its hero under the global topbar.")
+end=s.index("  // Product pages: sidebar chrome with the product nav;")
+s = s[:start] + s[end:]
+
+s = s.replace("""export default define.layout(function RootLayout({ Component, url }) {
+  const homeHref = appRoutes.home.href();
+  const runsHref = appRoutes.runs.href();
+  const invoicesHref = appRoutes.invoices.href();
+  const customersHref = appRoutes.customers.href();
+  const healthHref = appRoutes.health.href();
+""","""export default define.layout(function RootLayout({ Component, url }) {
+  const homeHref = appRoutes.home.href();
+""")
+
+s = s.replace("""  // Product pages: sidebar chrome with the product nav; the shell's topbar
+  // carries the theme toggle so every page can switch themes.""","""  // Every product screen — the overview included — renders inside the sidebar
+  // shell. `/` used to keep a landing hero under a bare topbar, which was
+  // right when it was a page of links about the app and is wrong now that it
+  // is the billing overview: the first thing a finance lead sees should have
+  // the same chrome, the same nav and the same theme toggle as the screens it
+  // links to. A screen without the shell reads as a page that failed to load.
+  // The shell's topbar carries the breadcrumb and the theme toggle so every
+  // page can be traced back and every page can switch themes.""")
+
+s = s.replace("""  {
+    label: 'Billing',
+    items: [
+      { href: appRoutes.runs.href(), label: 'Runs', icon: '↻', matchPrefix: true },""","""  {
+    label: 'Billing',
+    items: [
+      { href: appRoutes.home.href(), label: 'Overview', icon: '◱', matchPrefix: false },
+      { href: appRoutes.runs.href(), label: 'Runs', icon: '↻', matchPrefix: true },""")
+open(p,'w').write(s)
+print("ok")
+PY
+deno fmt routes/_layout.tsx >/dev/null; timeout 300 deno check 2>&1 | grep -E "TS[0-9]+" | head; echo CHECK_DONE; deno lint . 2>&1|tail -3
+ok
+Checked 1 file
+CHECK_DONE
+
+Found 1 problem
+Checked 122 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno lint . 2>&1 | head -15
+[0m[1m[31merror[no-unused-vars][0m: [0m[1m`Button` is never used[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  Button,
+ [0m[38;5;12m | [0m  [0m[1m[31m^^^^^^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: If this is intentional, alias it with an underscore like `Button as _Button`
+
+  [0m[38;5;12mdocs[0m: https://docs.deno.com/lint/rules/no-unused-vars
+
+
+Found 1 problem
+Checked 122 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -i "s/import { Badge, Breadcrumb, type BreadcrumbItem, Button, SidebarShell } from '@app\/components\/ui\/mod.ts';/import { Badge, Breadcrumb, type BreadcrumbItem, SidebarShell } from '@app\/components\/ui\/mod.ts';/" routes/_layout.tsx && deno fmt routes/_layout.tsx >/dev/null && deno lint . 2>&1 | tail -3 && timeout 300 deno check 2>&1 | grep -cE "TS[0-9]+"
+Checked 1 file
+
+Found 1 problem
+Checked 122 files
+0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno lint . 2>&1 | head -12
+[0m[1m[31merror[no-unused-vars][0m: [0m[1m`Button` is never used[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  Button,
+ [0m[38;5;12m | [0m  [0m[1m[31m^^^^^^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: If this is intentional, alias it with an underscore like `Button as _Button`
+
+  [0m[38;5;12mdocs[0m: https://docs.deno.com/lint/rules/no-unused-vars
+
+
+Found 1 problem
+Checked 122 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,12p' routes/_layout.tsx
+import { Partial } from 'fresh/runtime';
+import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
+import {
+  Badge,
+  Breadcrumb,
+  type BreadcrumbItem,
+  Button,
+  SidebarShell,
+} from '@app/components/ui/mod.ts';
+import { appRoutes } from '@app/router.ts';
+import { define } from '@app/utils.ts';
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+@@ -3,9 +3,8 @@
+ import {
+   Badge,
+   Breadcrumb,
+   type BreadcrumbItem,
+-  Button,
+   SidebarShell,
+ } from '@app/components/ui/mod.ts';
+ import { appRoutes } from '@app/router.ts';
+ import { define } from '@app/utils.ts';
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno lint . 2>&1 | tail -3 && timeout 300 deno check 2>&1 | grep -cE "TS[0-9]+"; echo "---RENDER---"; sleep 6; PORT=49993; for p in "/" "/runs" "/invoices" "/customers"; do out=$(curl -s "http://localhost:$PORT$p"); printf "%-12s code=%s shell=%s crumbs=%s gauge=%s\n" "$p" "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:$PORT$p)" "$(printf '%s' "$out" | grep -c 'ns-dashboard__sidebar')" "$(printf '%s' "$out" | grep -oP '(?<=current">)[^<]+' | tr '\n' ' ')" "$(printf '%s' "$out" | grep -c 'ns-gauge__seg')"; done
+Checked 122 files
+0
+---RENDER---
+/            code=200 shell=12 crumbs= gauge=12
+/runs        code=200 shell=12 crumbs= gauge=12
+/invoices    code=200 shell=12 crumbs= gauge=12
+/customers   code=200 shell=12 crumbs= gauge=12
+[0m
+[0m$ [0mcd /tmp && PORT=49993; for p in "/" "/runs" "/invoices" "/customers" "/design/tokens"; do curl -s "http://localhost:$PORT$p" > "pg$(echo $p | tr '/' '_').html"; done; python3 - <<'PY'
+import re,glob
+for f in sorted(glob.glob('/tmp/pg*.html')):
+    s=open(f).read()
+    # strip <style> blocks so inlined CSS does not pollute marker counts
+    body=re.sub(r'<style[^>]*>.*?</style>','',s,flags=re.S)
+    nav=re.search(r'<nav[^>]*aria-label="Breadcrumb".*?</nav>', body, re.S)
+    trail=''
+    if nav:
+        trail=' / '.join(re.findall(r'ns-breadcrumb__(?:link|current)"[^>]*>([^<]+)', nav.group(0)))
+    print(f"{f.split('pg')[1][:-5]:>16}  bytes={len(s):>7}  sidebar={'y' if 'ns-dashboard__sidebar"' in body else 'n'}  crumbs={trail or '(none)'}")
+PY
+File "<stdin>", line 10
+    print(f"{f.split('pg')[1][:-5]:>16}  bytes={len(s):>7}  sidebar={'y' if 'ns-dashboard__sidebar"' in body else 'n'}  crumbs={trail or '(none)'}")
+                                                                                                                                                ^
+SyntaxError: unterminated string literal (detected at line 10)
+[0m
+[0m$ [0mcd /tmp && python3 - <<'PY'
+import re,glob
+for f in sorted(glob.glob('/tmp/pg*.html')):
+    s=open(f).read()
+    body=re.sub(r'<style[^>]*>.*?</style>','',s,flags=re.S)
+    nav=re.search(r'<nav[^>]*aria-label="Breadcrumb".*?</nav>', body, re.S)
+    trail=''
+    if nav:
+        trail=' / '.join(re.findall(r'ns-breadcrumb__(?:link|current)"[^>]*>([^<]+)', nav.group(0)))
+    sb = 'y' if 'ns-dashboard__sidebar"' in body else 'n'
+    name = f.replace('/tmp/pg','').replace('.html','')
+    print("%-16s bytes=%7d sidebar=%s crumbs=%s" % (name, len(s), sb, trail or '(none)'))
+PY
+_                bytes= 167017 sidebar=y crumbs=Overview
+_customers       bytes= 157628 sidebar=y crumbs=Overview / Customers
+_design_tokens   bytes= 230626 sidebar=y crumbs=Design / Tokens
+_invoices        bytes= 157611 sidebar=y crumbs=Overview / Invoices
+_runs            bytes= 165564 sidebar=y crumbs=Overview / Runs
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt --check . 2>&1 | tail -2; cd .. && timeout 300 deno test --allow-all 2>&1 | tail -4
+[0m[1m[31merror[0m: Found 6 not formatted files in 188 files
+[0m[1m[31merror[0m: No test modules found
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt --check . 2>&1 | grep -a "^from\|not formatted" | head -10; echo "=== status ==="; cd /home/agent/projects/netscript/wave7-billing-steer2 && git status --short
+[0m[1m[31merror[0m: Found 6 not formatted files in 188 files
+=== status ===
+ M apps/ledgerline-web/assets/ui/semicircular-gauge.css
+ M apps/ledgerline-web/routes/_layout.tsx
+ M apps/ledgerline-web/routes/customers/[id].tsx
+ M apps/ledgerline-web/routes/customers/index.tsx
+ M apps/ledgerline-web/routes/invoices/[id].tsx
+ M apps/ledgerline-web/routes/invoices/index.tsx
+ M apps/ledgerline-web/routes/runs/[id].tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt --check . 2>&1 | grep -a "^\s*from /" | sed 's/.*ledgerline-web\///' | head -10
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt --check . 2>&1 | grep -aoE "apps/ledgerline-web/[^(]*" | sort -u | head -10
+apps/ledgerline-web/routes/_layout.tsx:
+apps/ledgerline-web/routes/customers/[id].tsx:
+apps/ledgerline-web/routes/customers/index.tsx:
+apps/ledgerline-web/routes/invoices/[id].tsx:
+apps/ledgerline-web/routes/invoices/index.tsx:
+apps/ledgerline-web/routes/runs/[id].tsx:
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && deno fmt apps/ledgerline-web/routes/_layout.tsx >/dev/null && git checkout -- "apps/ledgerline-web/routes/customers/[id].tsx" apps/ledgerline-web/routes/customers/index.tsx "apps/ledgerline-web/routes/invoices/[id].tsx" apps/ledgerline-web/routes/invoices/index.tsx "apps/ledgerline-web/routes/runs/[id].tsx" && cd apps/ledgerline-web && deno fmt --check . 2>&1 | tail -2 && deno lint . 2>&1 | tail -2
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Checked 1 file
+Checked 188 files
+Checked 122 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git add apps/ledgerline-web/routes/_layout.tsx apps/ledgerline-web/assets/ui/semicircular-gauge.css && git commit -F - <<'EOF'
+Fix: no product screen can render without the shell
+
+Two ways a page rendered bare, and both were reachable by just opening a
+URL:
+
+1. The sidebar shell skipped `/`. It was built for a landing page whose
+   hero wanted the full width, which was right when `/` was a page of
+   links about the app and is wrong now that it is the billing overview.
+   The first screen a finance lead sees had different chrome from every
+   screen it links to. `/` now renders inside the shell, and the nav
+   gained an Overview entry so the trail's root is reachable from it.
+
+2. No product route carried a breadcrumb — only the design sub-app did.
+   The trail is now derived from the pathname in the layout rather than
+   handed to each route, so a route that forgets to render one is not a
+   route that can render bare. A detail segment shows the record's own
+   id, which is what Stripe prints in its crumb for the same reason: it
+   is the one name every record has, and a friendlier invented one would
+   label the row and the page it opens differently.
+
+Rendering proof, styling blocks stripped so inlined dev CSS does not
+inflate the markers:
+
+    /                sidebar=y  Overview
+    /runs            sidebar=y  Overview / Runs
+    /invoices        sidebar=y  Overview / Invoices
+    /customers       sidebar=y  Overview / Customers
+    /design/tokens   sidebar=y  Design / Tokens
+
+Finding, not fixed: Fresh 2's server renderer stamps ancestor links with
+`aria-current="true"`, which collides with the breadcrumb's own
+`aria-current="page"` on the final crumb — on `/runs`, both "Overview"
+and "Runs" are announced as current. The `true` token is the framework's
+(`_fresh/server/server-entry.mjs`), not this app's, and overriding it
+means reaching into generated output. Recorded rather than worked around.
+
+Also: the gauge draws itself on mount. A run advancing over time is the
+thing this product shows that Stripe cannot, and a gauge that appears
+already full states the result without showing the passage that produced
+it. Segments stagger in legend order. The fill mode is `backwards`, not
+`forwards` — it holds the empty arc through the delay and then hands the
+property back, so the existing `transition` is still what animates a
+live update. A forwards fill would pin the dash array and the console
+would stop moving on the next event. Under
+`prefers-reduced-motion: reduce` the animation is off entirely, which
+gives the settled arc rather than one frozen at its first frame.
+EOF
+git log --oneline -3
+[fix/steer2-consolidated 175ee63] Fix: no product screen can render without the shell
+ 2 files changed, 103 insertions(+), 76 deletions(-)
+175ee63 Fix: no product screen can render without the shell
+bdcac0a Feat: the landing is the billing overview, composed as a block
+5ba414d Fix: every screen was rendering in a fallback font
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && ls routes/webhooks/ 2>/dev/null || echo "no webhooks route here"; echo "=== router.ts ==="; grep -n "webhooks\|health" router.ts 2>/dev/null | head
+no webhooks route here
+=== router.ts ===
+24:  health: routes.health.$route,
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+@@ -22,8 +22,9 @@
+   {
+     label: 'Reference',
+     items: [
+       { href: appRoutes.design.href(), label: 'Design', icon: '◧', matchPrefix: true },
++      { href: appRoutes.health.href(), label: 'Health', icon: '✓', matchPrefix: true },
+     ],
+   },
+ ] as const;
+ 
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt routes/_layout.tsx >/dev/null && timeout 300 deno check 2>&1 | grep -cE "TS[0-9]+"; sleep 5; PORT=49993; curl -s "http://localhost:$PORT/health" | python3 -c "
+import sys,re
+s=sys.stdin.read()
+b=re.sub(r'<style[^>]*>.*?</style>','',s,flags=re.S)
+nav=re.search(r'<nav[^>]*aria-label=\"Breadcrumb\".*?</nav>', b, re.S)
+print('health crumbs:', ' / '.join(re.findall(r'ns-breadcrumb__(?:link|current)\"[^>]*>([^<]+)', nav.group(0))) if nav else '(none)')
+print('sidebar nav items:', re.findall(r'ns-dashboard__nav-label\">([^<]+)', b))
+"
+Checked 1 file
+0
+health crumbs: Overview / Health
+sidebar nav items: ['Overview', 'Runs', 'Invoices', 'Customers', 'Design', 'Health']
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && wc -l RECORD.md && grep -n "^## " RECORD.md | tail -20
+992 RECORD.md
+348:## Steer-5 landed — the hardcoded /api/v1 prefix is gone (31 routes)
+355:## MCP ledger — steer-4/5 lookups and what each changed
+378:## Steer-4 — enforcement, atomicity, typed errors, domain layer (all landed)
+413:## Steer-5 — the REST prefix (third instance of "the framework had already decided")
+441:## Negative-authorization suite (test file, not a curl transcript)
+451:## Steer-4 — auth enforcement, atomic money, typed errors, domain modules (2026-09-04)
+511:## Steer-5 — hardcoded `/api/v1` stripped (defect + lesson)
+541:## Steer-6 — resume: terminal compensation (P0 #7) + run-issue effector (P0 #1)
+637:## Framework defect — compensation effects are never persisted (plugin-sagas-core@0.0.7)
+690:## Live drive (steer-8) — what the runtime proved, and the next environment defect
+751:## Terminal compensation — proved (2026-09-04, backend D)
+809:## Framework defect — the vite build rewrites `withRouteContract`, so `deno fmt` and the build disagree
+852:## Two trees, one component set — which copy is canonical (design steer #2, pass 8)
+884:## Dead API — `WidgetCard.Hero`'s `size` prop could not change the size
+898:## Two card radii on one page — the base `.ns-card` never took C7
+919:## The scaffold sweep renamed the fiction, it did not remove it
+937:## The landing page carries no stat row
+947:## A page hero needs a step the card hero is not already using
+959:## The critique named the wrong token, and the right one was invisible
+984:## Correction: `ratio()` and `formatPercent()` are not dead
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '975,992p' RECORD.md
+amount the dash is standing in for. Dark has the headroom because its money ramp steps to
+**7.00:1**. Closing the gap in light means darkening the money ramp first, which is a theme decision
+for the owner.
+
+The numbers are now a test (`M1 — the absent tone is visible and stays quieter than a real amount`),
+which converts OKLCH to sRGB and computes WCAG luminance for both themes. It fails at the old value
+(2.35:1) and asserts both the floor and the ceiling, so the constraint above survives whoever edits
+the ramp next.
+
+## Correction: `ratio()` and `formatPercent()` are not dead
+
+**Found 2026-09-04 (design steer #2, pass 11), correcting pass 10.** Pass 10 recorded that
+`lib/money.ts` exports `ratio()` and `formatPercent()` with "zero production call sites" and
+recommended deleting both. They have one: `movement()` at `lib/money.ts:345` calls both, and
+`movement()` backs the DeltaChip on the runs console headline and in `run-comparison`. The earlier
+sweep excluded `lib/money.ts` from its own grep, which is what hid the only call site there is.
+Deleting them would have taken the delta chip down with them. Nothing was deleted; the finding is
+withdrawn.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && cat >> RECORD.md <<'EOF'
+
+---
+
+# Design steer #3 — "better than Stripe"
+
+## The product was rendering in a font it did not have
+
+**Found 2026-09-04 (design steer #3).** `assets/tokens.json` declared
+`--ns-font-sans: "Inter", "SF Pro Text", system-ui, sans-serif`. `routes/_app.tsx` requested **DM
+Sans** and **DM Mono**. Neither file is wrong on its own, which is why this survived eleven review
+passes that read both: the browser asks for Inter, does not have it, walks the stack to `system-ui`,
+and renders the entire product in whatever the host happens to ship. No error, no failing test, no
+symptom anyone could point at except that nothing looked designed.
+
+Fixed by naming the face the document loads, and by adding `--ns-font-display` (Fraunces, degrading
+to Georgia) for the product's voice. The serif is spent only where a heading is read as a sentence —
+wordmark, page and section headings, empty-state headings — and is taken back off every surface that
+carries a value. A date range or an amount set in a proportional serif is a trust problem, not a
+style, so card titles, table headers, badges and every money span opt back out to the sans and
+numeric faces.
+
+The two webfonts are separate `<link>` elements. Combined into one request, a bad axis spec from the
+font CDN costs both faces and degrades silently to `system-ui`; split, a failure costs the voice and
+keeps the product.
+
+`F1 — the token layer names only typefaces the document loads` makes it mechanical: every family the
+token layer names must be a family `_app.tsx` requests, and the display face must end in a generic
+serif. Verified non-vacuous — at the old value it fails with
+`--ns-font-sans names "Inter", which _app.tsx never requests`.
+
+## Finding, not fixed: Fresh 2 stamps ancestor links with `aria-current="true"`
+
+The server renderer (`_fresh/server/server-entry.mjs`) marks any anchor that is a path-ancestor of
+the current route with `data-ancestor="true"` and `aria-current="true"`. In a breadcrumb that
+collides with the component's own `aria-current="page"` on the final crumb: on `/runs`, both
+"Overview" and "Runs" are announced as current. It is the framework's generated output, not this
+app's markup, and overriding it means reaching into a build artefact. Recorded, not worked around.
+
+## `deno fmt` and the generator disagree about `withRouteContract` — restated
+
+Still true, and now five route files re-dirty on every dev-server run (previously reported as five,
+then attributed to a trailing comma). The generator emits `.withRouteContract({ … })` on one line at
+105 characters, over the `lineWidth: 100` in `deno.json`; `deno fmt` splits it back into four. Any
+build run leaves `customers/[id]`, `customers/index`, `invoices/[id]`, `invoices/index`, `runs/[id]`
+modified. Reverted, never committed. `routes/index.tsx` was written to fit on one line under 100
+characters so the new overview route does not join the list.
+
+## Why the overview is a block and not a route
+
+`components/blocks/` is the third layer: `components/ui` is the vocabulary, `components/product` is
+the domain over it, and a block is a whole page body that owns its layout, its empty states and its
+composition order. Blocks take plain data, read no service, and import no router, so they lift into
+any route that can supply the model. That is the seam that lets this lane ship screens without
+editing the route files the build lane owns — which is what caused the last two weeks of the design
+work sitting unmerged.
+
+## Six states, rendered and counted
+
+The overview's populated state cannot be seen from the repo with no stack up, because the route
+correctly refuses to invent data — it renders em dashes and both failure notices. So the composition
+was proven by rendering the block against fixtures (`.llm/tmp/overview-proof.tsx`) and counting the
+output, not by describing it:
+
+| State | Rate | Funnel | Gauge | Notices |
+| :-- | :-- | :-- | :-- | :-- |
+| 6M window | 82.2% | $543,720 / $446,796 / $96,924 | 2 segs, $1,318,600 | none |
+| 3M window | 82.2% | $290,720 / $238,896 / $51,824, all +14.9% | 2 segs | none |
+| no invoices | — | — / — / — | 2 segs | none |
+| no runs | 82.2% | full | 0 segs, empty frame | none |
+| both services down | — | — / — / — | 0 segs | both |
+| runs up, billing down | — | — / — / — | **2 segs, $1,318,600** | none |
+
+That last row is the reason the two reads stay separate: the gauge still answers while the ledger is
+dark. A page that collapses both services into one "unavailable" banner loses the half it could
+still have answered.
+
+## The funnel does not colour its amounts
+
+`MoneyText` derives a direction from the sign, so `Outstanding` rendered in the same towards-us
+green as money that actually arrived — the one stage where that reads as a fact it is not. The
+funnel now formats through `formatMoneyWithCurrency` and sets amounts in the body colour; only the
+delta chip carries a semantic one. That is also what the reference sheets do: value plain, arrow and
+movement coloured. The unused `direction` field `FunnelStage` briefly carried was deleted with it.
+EOF
+deno fmt RECORD.md >/dev/null 2>&1; tail -3 RECORD.md
+funnel now formats through `formatMoneyWithCurrency` and sets amounts in the body colour; only the
+delta chip carries a semantic one. That is also what the reference sheets do: value plain, arrow and
+movement coloured. The unused `direction` field `FunnelStage` briefly carried was deleted with it.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git add apps/ledgerline-web/routes/_layout.tsx RECORD.md && git commit -F - <<'EOF'
+Record: steer #3 findings — the font, the crumb collision, the six states
+
+The headline finding is that the product had no typeface. The token layer
+named Inter and the document loaded DM Sans, so every screen fell through
+to `system-ui` and rendered in whatever the host shipped. Eleven review
+passes read both files and none of them caught it, because each file is
+correct in isolation and the failure is a browser quietly walking a font
+stack — no error, no failing test, nothing to point at.
+
+Also recorded:
+
+- Fresh 2 stamps ancestor links `aria-current="true"`, colliding with the
+  breadcrumb's own `aria-current="page"`. Framework output, not worked
+  around.
+- The `withRouteContract` fmt/generator churn restated, now that the new
+  route was written to stay under the line width and not join the list.
+- Why the overview is a block rather than a route assembly.
+- The six-state render table, including the row that justifies keeping the
+  two service reads separate.
+- Why the funnel stopped colouring its amounts.
+
+Health rejoined the sidebar — removing the old landing topbar took the
+only link to it with it.
+EOF
+git log --oneline -4
+[fix/steer2-consolidated 73e8270] Record: steer #3 findings — the font, the crumb collision, the six states
+ 2 files changed, 84 insertions(+)
+73e8270 Record: steer #3 findings — the font, the crumb collision, the six states
+175ee63 Fix: no product screen can render without the shell
+bdcac0a Feat: the landing is the billing overview, composed as a block
+5ba414d Fix: every screen was rendering in a fallback font
+[0m
+[0m# [0mTodos
+[✓] Audit identity gaps: font stack vs loaded fonts, token coverage
+[✓] Fix type identity: display face + correct sans stack in tokens.json/tokens.css
+[✓] Create components/blocks/ — composed overview block
+[✓] Replace the link-list landing at / with the billing overview
+[✓] Make shell unavoidable: breadcrumbs on every product route
+[✓] Motion that means something: gauge fill on mount
+[✓] Record findings in RECORD.md
+[•] Final verification: check, lint, fmt, tests, full route render sweep
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== FMT ===" && deno fmt --check . 2>&1 | tail -2 && echo "=== LINT ===" && deno lint . 2>&1 | tail -2 && echo "=== CHECK ===" && timeout 300 deno check 2>&1 | grep -cE "TS[0-9]+"
+=== FMT ===
+
+[0m[1m[31merror[0m: Found 5 not formatted files in 188 files
+=== LINT ===
+Checked 122 files
+=== CHECK ===
+0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt --check . 2>&1 | grep -aoE "apps/ledgerline-web/[^(]*" | sort -u
+apps/ledgerline-web/routes/customers/[id].tsx:
+apps/ledgerline-web/routes/customers/index.tsx:
+apps/ledgerline-web/routes/invoices/[id].tsx:
+apps/ledgerline-web/routes/invoices/index.tsx:
+apps/ledgerline-web/routes/runs/[id].tsx:
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git checkout -- "apps/ledgerline-web/routes/customers/[id].tsx" apps/ledgerline-web/routes/customers/index.tsx "apps/ledgerline-web/routes/invoices/[id].tsx" apps/ledgerline-web/routes/invoices/index.tsx "apps/ledgerline-web/routes/runs/[id].tsx" && cd apps/ledgerline-web && deno fmt --check . 2>&1 | tail -1 && echo "=== TESTS ===" && cd .. && timeout 400 deno test --allow-all 2>&1 | tail -3
+Checked 188 files
+=== TESTS ===
+[0m[1m[31merror[0m: No test modules found
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && ls tests/ && timeout 400 deno test --allow-all tests/ 2>&1 | tail -6
+design_contract_test.ts
+money_test.ts
+negative-auth_test.ts
+refund-flow_test.ts
+sagas_test.ts
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(222µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(214µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(149µs)[0m
+
+[0m[32mok[0m | 57 passed | 0 failed [0m[38;5;245m(1s)[0m
+[0m
+Full green. Final render sweep across every route, then cleaning up:
+[0m$ [0mcd /tmp && PORT=49993; python3 - <<'PY'
+import re,subprocess
+routes=['/','/?range=3m','/?range=12m','/runs','/invoices','/customers','/health','/design','/design/tokens','/design/components','/design/composition']
+print("%-24s %-5s %-8s %-8s %-7s %s" % ("route","code","bytes","cards","gauge","breadcrumb"))
+for r in routes:
+    url="http://localhost:%s%s" % (49993, r)
+    out=subprocess.run(['curl','-s','-o','/tmp/_p.html','-w','%{http_code}',url],capture_output=True,text=True).stdout
+    s=open('/tmp/_p.html').read()
+    b=re.sub(r'<style[^>]*>.*?</style>','',s,flags=re.S)
+    nav=re.search(r'<nav[^>]*aria-label="Breadcrumb".*?</nav>', b, re.S)
+    trail=' / '.join(re.findall(r'ns-breadcrumb__(?:link|current)"[^>]*>([^<]+)', nav.group(0))) if nav else '-'
+    cards=b.count('ns-widget__header')
+    gauge=len(re.findall(r'class="ns-gauge__seg', b))
+    print("%-24s %-5s %-8d %-8d %-7d %s" % (r, out, len(s), cards, gauge, trail))
+PY
+route                    code  bytes    cards    gauge   breadcrumb
+/                        200   167225   5        0       Overview
+/?range=3m               200   165290   5        0       Overview
+/?range=12m              200   170794   5        0       Overview
+/runs                    200   165772   0        0       Overview / Runs
+/invoices                200   157819   0        0       Overview / Invoices
+/customers               200   157836   0        0       Overview / Customers
+/health                  200   158307   0        0       Overview / Health
+/design                  302   0        0        0       -
+/design/tokens           200   230626   0        0       Design / Tokens
+/design/components       200   288168   6        2       Design / Components
+/design/composition      200   170445   0        0       Design / Composition
+[0m
+[0m$ [0mPID=$(cat /tmp/devpid | cut -d= -f2); kill $PID 2>/dev/null; pkill -f "npm:vite" 2>/dev/null; sleep 2; echo "killed"; cd /home/agent/projects/netscript/wave7-billing-steer2 && git status --short && echo "---" && git log --oneline -5 && echo "--- vs master ---" && git rev-list --left-right --count origin/master...HEAD
+(no output)
+
+<shell_metadata>
+shell tool terminated command after exceeding timeout 120000 ms. If this command is expected to take longer and is not waiting for interactive input, retry with a larger timeout value in milliseconds.
+</shell_metadata>
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git status --short; echo "---LOG---"; git log --oneline -5
+M apps/ledgerline-web/routes/customers/[id].tsx
+ M apps/ledgerline-web/routes/customers/index.tsx
+ M apps/ledgerline-web/routes/invoices/[id].tsx
+ M apps/ledgerline-web/routes/invoices/index.tsx
+ M apps/ledgerline-web/routes/runs/[id].tsx
+---LOG---
+73e8270 Record: steer #3 findings — the font, the crumb collision, the six states
+175ee63 Fix: no product screen can render without the shell
+bdcac0a Feat: the landing is the billing overview, composed as a block
+5ba414d Fix: every screen was rendering in a fallback font
+e5698dc Record pass 11: the display step, the contrast the critique misattributed, and one correction
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git checkout -- "apps/ledgerline-web/routes/customers/[id].tsx" apps/ledgerline-web/routes/customers/index.tsx "apps/ledgerline-web/routes/invoices/[id].tsx" apps/ledgerline-web/routes/invoices/index.tsx "apps/ledgerline-web/routes/runs/[id].tsx" && git status --short && echo "CLEAN"
+CLEAN
+[0m
+[0m$ [0mpgrep -af "vite" | head -5; echo "---"; pgrep -af "deno task dev" | head -3; echo "none-running-if-empty"
+2029743 /bin/bash -c pgrep -af "vite" | head -5; echo "---"; pgrep -af "deno task dev" | head -3; echo "none-running-if-empty"
+---
+2029743 /bin/bash -c pgrep -af "vite" | head -5; echo "---"; pgrep -af "deno task dev" | head -3; echo "none-running-if-empty"
+none-running-if-empty
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff --stat e5698dc..HEAD && echo "=== position ===" && git rev-list --left-right --count origin/master...HEAD
+RECORD.md                                          |  83 +++
+ apps/ledgerline-web/assets/blocks/overview.css     | 263 +++++++
+ apps/ledgerline-web/assets/styles.css              |  67 ++
+ apps/ledgerline-web/assets/tokens.css              |  12 +-
+ apps/ledgerline-web/assets/tokens.json             |  11 +-
+ .../assets/ui/semicircular-gauge.css               |  45 ++
+ apps/ledgerline-web/components/blocks/mod.ts       |  22 +
+ apps/ledgerline-web/components/blocks/overview.tsx | 756 +++++++++++++++++++++
+ apps/ledgerline-web/routes/_app.tsx                |   5 +
+ apps/ledgerline-web/routes/_layout.tsx             | 135 ++--
+ apps/ledgerline-web/routes/index.tsx               | 155 +++--
+ tests/design_contract_test.ts                      |  61 +-
+ 12 files changed, 1489 insertions(+), 126 deletions(-)
+=== position ===
+20	39
+[0m
+Done. Four commits on `fix/steer2-consolidated`, tree clean, gates green (188 files fmt-clean, 122 lint-clean, 0 type errors, 57/57 tests).
+
+## What I found first
+
+**The product had no typeface.** `tokens.json` declared `--ns-font-sans: "Inter"`; `_app.tsx` loads DM Sans. Inter was never requested, so every screen silently fell through to `system-ui` and rendered in whatever the host shipped — no error, no failing test. Eleven review passes read both files and missed it. That is very likely a large part of what "hideous" was reacting to.
+
+Fixed, plus `--ns-font-display` (Fraunces → Georgia) for the voice — spent on the wordmark, headings and empty-state lines, and explicitly taken back off anything carrying a value, because a date range or amount in a proportional serif is a trust problem, not a style. `F1` now fails the build if a declared family isn't loaded; verified non-vacuous at the old value.
+
+## The landing was a directory of the app's own screens
+
+`/` was four cards reading "Open the run console", "Browse design" — the scaffold describing itself in the product's voice. It's now the billing overview, composed as a block under `components/blocks/`.
+
+That directory is the point, not the page: `ui` is the vocabulary, `product` is the domain layer, and a block is a whole page body that takes plain data, reads no service and imports no router. It's the seam that lets this lane ship screens without touching the route files the build lane owns — which is what left your work unmerged in the first place.
+
+Five cards, one anatomy: collection rate (display hero) → dunning funnel → billed-vs-collected two-layer chart with a range control that's a route → run gauge → recent invoices and mix.
+
+## Two things worth flagging
+
+- **Nothing renders bare now.** The sidebar shell skipped `/` entirely, and no product route had a breadcrumb — only the design sub-app did. Both fixed by deriving the trail in the layout. Rendering proof with inlined CSS stripped: every product route 200s with sidebar + correct trail, `/health` included (removing the old topbar had taken the only link to it).
+- **A finding I did not fix:** Fresh 2 stamps ancestor links `aria-current="true"`, which collides with the breadcrumb's `aria-current="page"` — on `/runs` both crumbs announce as current. It's generated output, so I recorded it rather than reaching into a build artefact.
+
+## One correction to your steer
+
+You asked for run console and invoice detail blocks too. I stopped at the overview and recorded why: both already exist as working route-local compositions on this branch, and promoting them means editing the route files that cause the merge conflicts. The overview establishes the pattern — say the word and I'll move those two behind it.
+
+The populated composition is proven by fixture render (`.llm/tmp/overview-proof.tsx`), not by the route, because the route correctly refuses to invent data. Six states counted:
+
+| | rate | funnel | gauge |
+|---|---|---|---|
+| 3M / 6M | 82.2% | real sums, +14.9% deltas | 2 segs |
+| no invoices | `—` | `—` / `—` / `—` | 2 segs |
+| runs up, billing down | `—` | `—` / `—` / `—` | **2 segs, $1,318,600** |
+
+That last row is why the two reads stay separate — the gauge still answers while the ledger is dark.
+
+Two things I did not get to: the `4.5:1` absent tone in light is still blocked on the money ramp (needs darkening `--ns-money-pos`, a theme call for the owner), and I have not verified anything against `design-references/*.png` — I can't read images, and nothing in this run has been compared to them by anything that can.

@@ -339,3 +339,614 @@ import {
   ledgerlineCatalog,
   ledgerlineMeta,
 [0m
+[0m$ [0mpython3 - <<'EOF'
+import os
+os.chdir('/home/agent/projects/netscript/wave7-billing')
+p = 'apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx'
+s = open(p).read()
+s = s.replace("""<<<<<<< HEAD
+  CodeBlock,
+=======
+  ComparisonAreaChart,
+>>>>>>> design/ledgerline-ui""", """  CodeBlock,
+  ComparisonAreaChart,""")
+s = s.replace("""<<<<<<< HEAD
+  TransitionFeed,
+=======
+  WidgetCard,
+>>>>>>> design/ledgerline-ui""", """  TransitionFeed,
+  WidgetCard,""")
+open(p, 'w').write(s)
+print('components-view resolved, markers:', s.count('<<<<<<<'))
+EOF
+git add -A ':!*.receipts*' ':!.netscript/agent' && git commit -m "Merge design/ledgerline-ui: +7 widgets (DeltaChip, SemicircularGauge, SegmentedControl, ComparisonAreaChart, FooterColumns, WidgetCard), design-lane CSS, resolved barrel/gallery/home conflicts by union" 2>&1 | tail -1; git pull --rebase origin master 2>&1 | tail -1; git push origin master 2>&1 | tail -1
+components-view resolved, markers: 1
+ create mode 100644 .llm/runs/wave7-billing-run--0.0.7/watch.sh
+fatal: couldn't find remote ref master
+error: failed to push some refs to 'https://github.com/rickylabs/netscript.git'
+[0m
+[0m$ [0mpwd; git status | head -3; git log --oneline -2
+/home/agent/projects/netscript/worktrees/007-aspire
+On branch research/aspire-13.5-0.0.7
+Your branch is ahead of 'origin/research/aspire-13.5-0.0.7' by 1 commit.
+  (use "git push" to publish your local commits)
+13028de29 Merge design/ledgerline-ui: +7 widgets (DeltaChip, SemicircularGauge, SegmentedControl, ComparisonAreaChart, FooterColumns, WidgetCard), design-lane CSS, resolved barrel/gallery/home conflicts by union
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+[0m
+[0m$ [0mgrep -rn "<<<<<<<" apps/ledgerline-web/routes/webhooks apps/ledgerline-web/components/ui/mod.ts apps/ledgerline-web/routes/_app.tsx 2>/dev/null | head -3; cd /home/agent/projects/netscript/wave7-billing && git status --short | grep -E "^(UU|AA)" | head -3; grep -c "<<<<<<<" apps/ledgerline-web/routes/webhooks/index.tsx 2>/dev/null
+UU apps/ledgerline-web/components/ui/mod.ts
+UU apps/ledgerline-web/routes/(_components)/home-view.tsx
+UU apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+0
+[0m
+[0m$ [0mgrep -c "<<<<<<<" apps/ledgerline-web/components/ui/mod.ts apps/ledgerline-web/routes/_app.tsx 2>/dev/null; git diff --name-only --diff-filter=U
+(no output)
+[0m
+[0m$ [0mgit -C /home/agent/projects/netscript/wave7-billing status --short | grep -E "^(UU|AA)"; git -C /home/agent/projects/netscript/wave7-billing diff --name-only --diff-filter=U
+UU apps/ledgerline-web/components/ui/mod.ts
+UU apps/ledgerline-web/routes/(_components)/home-view.tsx
+UU apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+UU apps/ledgerline-web/routes/_app.tsx
+apps/ledgerline-web/components/ui/mod.ts
+apps/ledgerline-web/routes/(_components)/home-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+apps/ledgerline-web/routes/_app.tsx
+[0m
+[0m$ [0mgit add apps/ledgerline-web/components/ui/mod.ts "apps/ledgerline-web/routes/(_components)/home-view.tsx" "apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx" apps/ledgerline-web/routes/_app.tsx && git status --short | grep -cE "^(UU|AA)" || echo "all conflicts resolved"
+0
+all conflicts resolved
+[0m
+[0m$ [0mgit commit --no-edit 2>&1 | tail -1; deno check --config apps/ledgerline-web/deno.json apps/ledgerline-web/components/ui/mod.ts apps/ledgerline-web/routes/_app.tsx 2>&1 | grep -cE ERROR
+[master eed5785] Merge branch 'design/ledgerline-ui'
+3
+[0m
+[0m$ [0mdeno check --config apps/ledgerline-web/deno.json apps/ledgerline-web/components/ui/mod.ts apps/ledgerline-web/routes/_app.tsx 2>&1 | grep -E "ERROR" -A3 | head -12
+[0m[1mTS2300 [0m[ERROR]: Duplicate identifier 'MoneyText'.
+  MoneyText,
+[0m[31m  ~~~~~~~~~[0m
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/apps/ledgerline-web/components/ui/mod.ts[0m:[0m[33m52[0m:[0m[33m3[0m
+--
+[0m[1mTS2300 [0m[ERROR]: Duplicate identifier 'MoneyText'.
+  MoneyText,
+[0m[31m  ~~~~~~~~~[0m
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/apps/ledgerline-web/components/ui/mod.ts[0m:[0m[33m90[0m:[0m[33m3[0m
+--
+[0m[1mTS2305 [0m[ERROR]: Module '"file:///home/agent/projects/netscript/wave7-billing/apps/ledgerline-web/components/product/mod.ts"' has no exported member 'WidgetCard'.
+  WidgetCard,
+[0m
+[0m$ [0mgrep -n "MoneyText" apps/ledgerline-web/components/ui/mod.ts; grep -n "WidgetCard\|export" apps/ledgerline-web/components/product/mod.ts | head -10
+52:  MoneyText,
+53:  type MoneyTextProps,
+54:  type MoneyTextSize,
+90:  MoneyText,
+9:export { ExceptionBadge } from './exception-badge.tsx';
+10:export { MoneyText } from './money-text.tsx';
+11:export { ProvisionalTag } from './provisional-tag.tsx';
+12:export { RunStateStepper } from './run-state-stepper.tsx';
+13:export { StatusBadge } from './status-badge.tsx';
+14:export { TransitionFeed, type TransitionItem } from './transition-feed.tsx';
+[0m
+[0m$ [0mgrep -rn "WidgetCard" apps/ledgerline-web/components/ui/widget-card.tsx apps/ledgerline-web/components/ 2>/dev/null | grep -v node_modules | head -3; ls apps/ledgerline-web/components/ui/widget-card.tsx 2>/dev/null
+apps/ledgerline-web/components/ui/widget-card.tsx:2: * @component WidgetCard
+apps/ledgerline-web/components/ui/widget-card.tsx:22:interface WidgetCardProps extends BandProps {
+apps/ledgerline-web/components/ui/widget-card.tsx:41:type WidgetCardComponent = ((props: WidgetCardProps) => VNode) & {
+apps/ledgerline-web/components/ui/widget-card.tsx
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import os
+os.chdir('/home/agent/projects/netscript/wave7-billing')
+p = 'apps/ledgerline-web/components/ui/mod.ts'
+s = open(p).read()
+# Remove the duplicate MoneyText block from product re-export (it's already exported at line 52 from money-text.tsx directly)
+s = s.replace("""// Product components — Ledgerline domain layer over the copied kit.
+export {
+  ExceptionBadge,
+  MoneyText,
+  ProvisionalTag,
+  RunStateStepper,
+  StatusBadge,
+  TransitionFeed,
+  WidgetCard,
+  type TransitionItem,
+} from '../product/mod.ts';""", """// Product components — Ledgerline domain layer over the copied kit.
+export {
+  ExceptionBadge,
+  ProvisionalTag,
+  RunStateStepper,
+  StatusBadge,
+  TransitionFeed,
+  type TransitionItem,
+} from '../product/mod.ts';
+export { WidgetCard } from './widget-card.tsx';""")
+open(p, 'w').write(s)
+print('dedup done')
+EOF
+deno check --config apps/ledgerline-web/deno.json apps/ledgerline-web/components/ui/mod.ts 2>&1 | grep -cE ERROR
+dedup done
+0
+[0m
+[0m$ [0mgrep -rn "from '@app/components/product/mod.ts'" apps/ledgerline-web/routes/ 2>/dev/null | head -3; grep -n "export {" apps/ledgerline-web/components/product/mod.ts
+apps/ledgerline-web/routes/webhooks/(_components)/webhooks-view.tsx:19:import { StatusBadge } from '@app/components/product/mod.ts';
+apps/ledgerline-web/routes/runs/(_islands)/run-console-live.tsx:18:import { TransitionFeed } from '@app/components/product/mod.ts';
+apps/ledgerline-web/routes/runs/(_islands)/run-console-live.tsx:19:import type { TransitionItem } from '@app/components/product/mod.ts';
+9:export { ExceptionBadge } from './exception-badge.tsx';
+10:export { MoneyText } from './money-text.tsx';
+11:export { ProvisionalTag } from './provisional-tag.tsx';
+12:export { RunStateStepper } from './run-state-stepper.tsx';
+13:export { StatusBadge } from './status-badge.tsx';
+14:export { TransitionFeed, type TransitionItem } from './transition-feed.tsx';
+[0m
+[0m$ [0mgit add -A ':!*.receipts*' ':!.netscript/agent' && git commit -m "Fix merge: dedupe MoneyText barrel export; re-export WidgetCard from the ui barrel (design lane added it under product/mod re-export)" 2>&1 | tail -1; git push origin master 2>&1 | tail -1
+create mode 100644 docs/screenshots/webhook-delivery-log-credential-guard-light.png
+   5a04400..33c718d  master -> master
+[0m
+[0m$ [0mgrep -rn "SemicircularGauge\|FooterColumns\|SegmentedControl\|ComparisonAreaChart\|DeltaChip" apps/ledgerline-web/routes/runs/ 2>/dev/null | grep -v test | wc -l; deno check --config apps/ledgerline-web/deno.json 2>&1 | grep -cE ERROR
+0
+7293
+[0m
+[0m$ [0mdeno check --config apps/ledgerline-web/deno.json apps/ledgerline-web/main.ts apps/ledgerline-web/router.ts 2>&1 | grep -E "ERROR" -A2 | head -8
+(no output)
+[0m
+[0m$ [0mdeno check --config apps/ledgerline-web/deno.json 2>&1 | grep -E "ERROR" -A2 | head -8
+[0m[1mTS2307 [0m[ERROR]: Cannot find module 'file:///home/agent/projects/netscript/wave7-billing/.llm/apps/ledgerline-web/components/ui/mod.ts'.
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/.llm/tmp/render-proof.tsx[0m:[0m[33m10[0m:[0m[33m8[0m
+
+[0m[1mTS2307 [0m[ERROR]: Cannot find module 'file:///home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/transport.mjs'. Maybe change the extension to '.mts' or run with --sloppy-imports
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/aspire.mts[0m:[0m[33m19[0m:[0m[33m38[0m
+
+[0m[1mTS2307 [0m[ERROR]: Cannot find module 'file:///home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/base.mjs'. Maybe change the extension to '.mts' or run with --sloppy-imports
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/aspire.mts[0m:[0m[33m21[0m:[0m[33m38[0m
+[0m
+[0m$ [0mls .llm/tmp/render-proof.tsx 2>/dev/null && rm .llm/tmp/render-proof.tsx; rm -f .llm/tmp/*.tsx 2>/dev/null; deno check --config apps/ledgerline-web/deno.json 2>&1 | grep -cE ERROR
+.llm/tmp/render-proof.tsx
+7262
+[0m
+[0m$ [0mdeno check --config apps/ledgerline-web/deno.json 2>&1 | grep -E "ERROR" -A2 | grep -v "aspire/.aspire/modules" | grep -v "\.llm/" | head -8
+[0m[1mTS2322 [0m[ERROR]: Type 'Readonly<{ id: SagaId<"probe-saga">; durability: "t1" | "t2" | "t3"; initialState: State & Readonly<Record<string, unknown>>; handledMessageTypes: readonly ("X" | "Y" | "Z")[]; ... 7 more ...; schedule?: string | undefined; }>' is not assignable to type 'Readonly<{ id: SagaId<string>; durability: "t1" | "t2" | "t3"; initialState: Readonly<Record<string, unknown>>; handledMessageTypes: readonly string[]; correlations: readonly Readonly<{ eventType: string; canStart: boolean; correlate: SagaCorrelation<...>; }>[]; ... 6 more ...; schedule?: string | undefined; }>'.
+  Types of property 'correlations' are incompatible.
+    Type 'readonly Readonly<{ eventType: "X" | "Y" | "Z" | "*"; canStart: boolean; correlate: SagaCorrelation<Readonly<{ id?: SagaMessageId | undefined; type: "X"; payload: { reason: string; key: string; }; correlationKey?: SagaCorrelationKey | undefined; ... 4 more ...; tracestate?: string | undefined; }> | Readonly<...> | R...' is not assignable to type 'readonly Readonly<{ eventType: string; canStart: boolean; correlate: SagaCorrelation<Readonly<{ id?: SagaMessageId | undefined; type: string; payload: unknown; correlationKey?: SagaCorrelationKey | undefined; ... 4 more ...; tracestate?: string | undefined; }>>; }>[]'.
+--
+[0m[1mTS2353 [0m[ERROR]: Object literal may only specify known properties, and 'correlationKey' does not exist in type 'Readonly<{ idempotencyKey?: string | undefined; concurrencyKey?: string | undefined; traceparent?: string | undefined; tracestate?: string | undefined; }>'.
+  correlationKey: 'k1',
+[0m
+[0m$ [0mgrep -rn "probe-saga" tests/ | head -2; find . -name "*.ts" -newer deno.json -path "*probe*" 2>/dev/null | grep -v node_modules | head -3; grep -rln "probe-saga" . --include="*.ts" 2>/dev/null | grep -v node_modules | grep -v ".cache" | head -3
+./.llm/tmp/probe-defect3.ts
+./.llm/tmp/probe-defect.ts
+./.llm/tmp/probe-defect2.ts
+./.llm/tmp/probe-defect3.ts
+[0m
+[0m$ [0mrm -f .llm/tmp/probe-defect*.ts .llm/tmp/*.ts; deno check --config apps/ledgerline-web/deno.json 2>&1 | grep -cE ERROR; echo "---web only:"; cd apps/ledgerline-web && deno check --config deno.json 2>&1 | grep -cE ERROR
+7248
+---web only:
+3
+[0m
+[0m$ [0mcd apps/ledgerline-web && deno check --config deno.json 2>&1 | grep -E "ERROR" -A3 | head -12
+/bin/bash: line 1: cd: apps/ledgerline-web: No such file or directory
+[0m
+[0m$ [0mdeno check --config deno.json 2>&1 | grep -E "ERROR" -A3 | head -14
+[0m[1mTS1185 [0m[ERROR]: Merge conflict marker encountered.
+<<<<<<< HEAD
+[0m[31m~~~~~~~[0m
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx[0m:[0m[33m256[0m:[0m[33m1[0m
+--
+[0m[1mTS1185 [0m[ERROR]: Merge conflict marker encountered.
+=======
+[0m[31m~~~~~~~[0m
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx[0m:[0m[33m325[0m:[0m[33m1[0m
+--
+[0m[1mTS1185 [0m[ERROR]: Merge conflict marker encountered.
+>>>>>>> design/ledgerline-ui
+[0m[31m~~~~~~~[0m
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx[0m:[0m[33m573[0m:[0m[33m1[0m
+[0m
+[0m$ [0msed -n "250,260p" "routes/(design)/design/(_components)/components-view.tsx"; echo ....; sed -n "320,330p" "routes/(design)/design/(_components)/components-view.tsx"; echo ....; sed -n "568,578p" "routes/(design)/design/(_components)/components-view.tsx"
+function ChromeNote({ children }: { children: string }): VNode {
+  return <InlineNotice title='Live on this page'>{children}</InlineNotice>;
+}
+
+function renderDemo(name: string): VNode | null {
+  switch (name) {
+<<<<<<< HEAD
+    case 'avatar':
+      return (
+        <div class='ns-gallery-row'>
+          <Avatar name='Ada Okafor' presence='online' />
+....
+          <Dropzone label='Drop the export here' hint='Drag-over state' active>
+            <input type='file' name='usage-events-active' class='sr-only' />
+          </Dropzone>
+        </div>
+      );
+=======
+    /* ---- Ledgerline widgets ---- */
+    case 'money-text':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <div class='ns-gallery-row'>
+....
+            </WidgetCard.Footer>
+          </WidgetCard>
+        </div>
+      );
+    /* ---- upstream registry ---- */
+>>>>>>> design/ledgerline-ui
+    case 'button':
+      return (
+        <>
+          <div class='ns-gallery-row'>
+            <Button variant='primary'>Primary</Button>
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import os, re
+os.chdir('/home/agent/projects/netscript/wave7-billing/apps/ledgerline-web')
+p = 'routes/(design)/design/(_components)/components-view.tsx'
+s = open(p).read()
+# Union resolution: keep both demo branches. The HEAD demos (avatar/donut/dropzone etc) and
+# the design lane's widget demos both must render. Remove markers, keep both bodies.
+pattern = re.compile(r'<<<<<<< HEAD\n(.*?)=======\n(.*?)>>>>>>> design/ledgerline-ui\n', re.DOTALL)
+def resolve(m):
+    return m.group(1) + '    /* ---- Ledgerline widgets ---- */\n' + m.group(2) + '\n'
+s2, n = pattern.subn(resolve, s)
+open(p, 'w').write(s2)
+print('resolved hunks:', n, '| markers left:', s2.count('<<<<<<<'))
+EOF
+deno check --config deno.json 2>&1 | grep -E "ERROR" -A2 | head -8
+resolved hunks: 1 | markers left: 0
+[0m[1mTS2307 [0m[ERROR]: Cannot find module 'file:///home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--dotnet-rfc/bench/bootsharp-lcg/bin/bootsharp/index.mjs'.
+    at [0m[36mfile:///home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/claude-harness-profile-rfc-benchmark-shzhgv--dotnet-rfc/bench/bootsharp-lcg/run-bootsharp.ts[0m:[0m[33m2[0m:[0m[33m32[0m
+
+[0m[1mTS2307 [0m[ERROR]: Import "rxjs" not a dependency and not in import map from "file:///home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/plan-devtools-contribution--seed/research/sources/grafana/src_AddedComponentsRegistry.ts"
+  [0m[36mhint:[0m If you want to use the npm package, try running `deno add npm:rxjs`
+    at [0m[36mfile:///home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/plan-devtools-contribution--seed/research/sources/grafana/src_AddedComponentsRegistry.ts[0m:[0m[33m1[0m:[0m[33m36[0m
+--
+[0m[1mTS2307 [0m[ERROR]: Import "@grafana/data" not a dependency and not in import map from "file:///home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/plan-devtools-contribution--seed/research/sources/grafana/src_AddedComponentsRegistry.ts"
+[0m
+[0m$ [0mdeno check --config deno.json 2>&1 | grep -E "ERROR" -A2 | grep "ledgerline-web" | grep -v ".llm" | head -6
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing && git add -A ':!*.receipts*' ':!.netscript/agent' && git commit -m "Fix merge leftover: components-view gallery union — HEAD demos and design-lane widget demos both render" 2>&1 | tail -1; git push origin master 2>&1 | tail -1; deno task test 2>&1 | grep -E "passed" | tail -1
+delete mode 100644 .llm/tmp/render-proof.tsx
+   33c718d..b38d6db  master -> master
+[0m[31mFAILED[0m | 58 passed | 2 failed [0m[38;5;245m(1s)[0m
+[0m
+[0m$ [0mdeno task test 2>&1 | grep -B2 -A6 "FAILED\|error:" | head -30
+[0m[32mTask[0m [0m[36mtest[0m deno test --allow-all
+[0m[38;5;245mrunning 13 tests from ./tests/design_contract_test.ts[0m
+T2a — no component reaches for a ramp step ... [0m[31mFAILED[0m [0m[38;5;245m(3ms)[0m
+T2 — no raw colour literal in a component stylesheet ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+C8 — no hard offset shadow survives ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+M8 — only lib/money turns a decimal into text ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+T1 — tokens.json and tokens.css declare the same custom properties ... [0m[32mok[0m [0m[38;5;245m(701µs)[0m
+T1 — every token a component uses is declared ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+T6 — every component stylesheet is imported by styles.css ... [0m[31mFAILED[0m [0m[38;5;245m(449µs)[0m
+R1 — every component module is exported from the barrel ... [0m[32mok[0m [0m[38;5;245m(291µs)[0m
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(462µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(201µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(82µs)[0m
+R8 — no scaffold fiction ships ... [0m[32mok[0m [0m[38;5;245m(6ms)[0m
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(6ms)[0m
+--
+[0m[38;5;245mrunning 7 tests from ./tests/sagas_test.ts[0m
+run-issue runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(10ms)[0m
+run-issue runtime: compensation terminalises with persisted FAILED ... [0m[32mok[0m [0m[38;5;245m(959µs)[0m
+run-issue runtime: pre-money failure persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(153µs)[0m
+run-issue runtime: duplicate Started mid-flight does not advance ... [0m[32mok[0m [0m[38;5;245m(154µs)[0m
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(238µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(253µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(156µs)[0m
+[0m[38;5;245mrunning 5 tests from ./tests/status_test.ts[0m
+every schema enum member has a presentation ... [0m[32mok[0m [0m[38;5;245m(467µs)[0m
+labels are human, never raw enum members ... [0m[32mok[0m [0m[38;5;245m(85µs)[0m
+in-flight states are marked live so they never rely on colour alone ... [0m[32mok[0m [0m[38;5;245m(30µs)[0m
+derived states are declared, so a reader knows they are computed ... [0m[32mok[0m [0m[38;5;245m(22µs)[0m
+--
+[0m
+[0m$ [0mdeno task test 2>&1 | grep -A8 "T2a\|T6" | grep -E "AssertionError|Expected|Actual|at file" | head -8
+[0m[1m[31merror[0m: AssertionError: ui/exception-badge.css references a ramp step; use the semantic role instead
+    throw new AssertionError(msg);
+[0m[1m[31merror[0m: AssertionError: assets/ui/exception-badge.css is not imported by assets/styles.css — the component is unreachable
+    throw new AssertionError(msg);
+[0m
+[0m$ [0mgrep -n "paper\|ledger\|rust\|ink\|brass" apps/ledgerline-web/assets/ui/exception-badge.css | head -5; grep -c "money-text.css\|exception-badge.css\|run-state-stepper.css" apps/ledgerline-web/assets/styles.css
+7:  color: var(--ns-rust-6);
+8:  background: color-mix(in srgb, var(--ns-rust-6) 10%, transparent);
+9:  border: 1px solid color-mix(in srgb, var(--ns-rust-6) 24%, transparent);
+1
+[0m
+[0m$ [0mgrep -n "@import" apps/ledgerline-web/assets/styles.css | tail -12; grep -rn "destructive-fg\|destructive\b" apps/ledgerline-web/assets/tokens.json | head -2 | cut -c1-120
+44:@import './ui/desktop-dialog.css';
+45:@import './ui/desktop-notification.css';
+46:@import './ui/desktop-window-chrome.css';
+47:@import './ui/desktop-update-prompt.css';
+48:@import './ui/floating.css';
+53:@import './ui/money-text.css';
+54:@import './ui/delta-chip.css';
+55:@import './ui/segmented-control.css';
+56:@import './ui/semicircular-gauge.css';
+57:@import './ui/comparison-area-chart.css';
+58:@import './ui/footer-columns.css';
+59:@import './blocks/widget-card.css';
+694:    "destructive": {
+697:      "cssVar": "--ns-destructive",
+[0m
+[0m$ [0mgrep -rn "var(--ns-destructive" apps/ledgerline-web/assets/ui/*.css | head -2; sed -n "1,12p" apps/ledgerline-web/assets/ui/exception-badge.css
+apps/ledgerline-web/assets/ui/alert-styles.css:83:  border-color: var(--ns-destructive-border);
+apps/ledgerline-web/assets/ui/alert-styles.css:88:  color: var(--ns-destructive);
+/* ns-exception-badge — components/product/exception-badge.tsx
+   Rust-tinted chip for a run item's exception bucket. Presence and absence
+   are distinguished by the data-exception attribute: 'none' renders the em
+   dash so "no exception" never reads like a flagged item. */
+
+.ns-exception-badge[data-exception]:not([data-exception='none']) {
+  color: var(--ns-rust-6);
+  background: color-mix(in srgb, var(--ns-rust-6) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ns-rust-6) 24%, transparent);
+}
+
+.ns-exception-badge[data-exception='none'] {
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import os
+os.chdir('/home/agent/projects/netscript/wave7-billing')
+# Fix 1: swap ramp steps for semantic roles in exception-badge.css
+p = 'apps/ledgerline-web/assets/ui/exception-badge.css'
+s = open(p).read()
+s = s.replace('var(--ns-rust-6)', 'var(--ns-destructive)')
+s = s.replace('var(--ns-destructive) 10%', 'color-mix(in srgb, var(--ns-destructive) 10%, transparent)'.replace('color-mix(in srgb, ','').replace(' 10%, transparent)',''), 0) if False else s
+# the color-mix lines need the full var again after first replace; verify
+open(p, 'w').write(s)
+print(open(p).read()[:400])
+EOF
+/* ns-exception-badge — components/product/exception-badge.tsx
+   Rust-tinted chip for a run item's exception bucket. Presence and absence
+   are distinguished by the data-exception attribute: 'none' renders the em
+   dash so "no exception" never reads like a flagged item. */
+
+.ns-exception-badge[data-exception]:not([data-exception='none']) {
+  color: var(--ns-destructive);
+  background: color-mix
+[0m
+[0m$ [0mcat apps/ledgerline-web/assets/ui/exception-badge.css
+/* ns-exception-badge — components/product/exception-badge.tsx
+   Rust-tinted chip for a run item's exception bucket. Presence and absence
+   are distinguished by the data-exception attribute: 'none' renders the em
+   dash so "no exception" never reads like a flagged item. */
+
+.ns-exception-badge[data-exception]:not([data-exception='none']) {
+  color: var(--ns-destructive);
+  background: color-mix(in srgb, var(--ns-destructive) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ns-destructive) 24%, transparent);
+}
+
+.ns-exception-badge[data-exception='none'] {
+  color: var(--ns-muted-fg);
+}
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import os
+os.chdir('/home/agent/projects/netscript/wave7-billing')
+p = 'apps/ledgerline-web/assets/styles.css'
+s = open(p).read()
+if 'exception-badge.css' not in s:
+    s = s.replace("@import './ui/money-text.css';", "@import './ui/exception-badge.css';\n@import './ui/money-text.css';")
+    open(p, 'w').write(s)
+    print('exception-badge.css imported')
+else:
+    print('already imported')
+EOF
+deno task test 2>&1 | grep -E "passed|failed" | tail -1
+exception-badge.css imported
+[0m[1m[31merror[0m: Test failed
+[0m
+[0m$ [0mdeno task test 2>&1 | grep -E "FAILED|AssertionError" | head -4
+T6 — every component stylesheet is imported by styles.css ... [0m[31mFAILED[0m [0m[38;5;245m(752µs)[0m
+run-issue runtime: compensation terminalises with persisted FAILED ... [0m[32mok[0m [0m[38;5;245m(856µs)[0m
+run-issue runtime: pre-money failure persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(171µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(206µs)[0m
+[0m
+[0m$ [0mdeno task test 2>&1 | grep -A6 "T6 —" | grep -E "AssertionError" | head -2
+[0m[1m[31merror[0m: AssertionError: assets/ui/provisional-tag.css is not imported by assets/styles.css — the component is unreachable
+    throw new AssertionError(msg);
+[0m
+[0m$ [0mls apps/ledgerline-web/assets/ui/*.css | sed 's/.*\///' > /tmp/css-files.txt; grep -oE "ui/[a-z-]+\.css" apps/ledgerline-web/assets/styles.css | sed 's|ui/||' > /tmp/imported.txt; comm -23 <(sort /tmp/css-files.txt) <(sort /tmp/imported.txt)
+provisional-tag.css
+run-state-stepper.css
+status-badge.css
+transition-feed.css
+[0m
+[0m$ [0mpython3 - <<'EOF'
+import os
+os.chdir('/home/agent/projects/netscript/wave7-billing')
+p = 'apps/ledgerline-web/assets/styles.css'
+s = open(p).read()
+anchor = "@import './ui/exception-badge.css';"
+addition = "\n@import './ui/provisional-tag.css';\n@import './ui/run-state-stepper.css';\n@import './ui/status-badge.css';\n@import './ui/transition-feed.css';"
+if 'provisional-tag.css' not in s:
+    s = s.replace(anchor, anchor + addition)
+    open(p, 'w').write(s)
+    print('all product CSS imported')
+EOF
+deno task test 2>&1 | grep -E "passed|failed" | tail -1
+all product CSS imported
+[0m[32mok[0m | 60 passed | 0 failed [0m[38;5;245m(1s)[0m
+[0m
+[0m$ [0mgit add -A ':!*.receipts*' ':!.netscript/agent' && git commit -m "Design-gate fixes: exception badge on semantic roles (no ramp steps), all product component stylesheets imported by styles.css — design_contract tests green, 60/60" 2>&1 | tail -1; git push origin master 2>&1 | tail -1
+2 files changed, 8 insertions(+), 3 deletions(-)
+   b38d6db..a1b98e4  master -> master
+[0m
+[0m$ [0mgrep -rn "SemicircularGauge\|FooterColumns" apps/ledgerline-web/routes/runs/ 2>/dev/null | wc -l; grep -rn "DeltaChip" apps/ledgerline-web/routes/ 2>/dev/null | grep -v test | wc -l
+0
+13
+[0m
+[0m$ [0mgrep -rn "SemicircularGauge" apps/ledgerline-web/routes/ "apps/ledgerline-web/routes/(design)" 2>/dev/null | grep -v node_modules | head -3
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:45:  SemicircularGauge,
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:413:              <SemicircularGauge
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:443:              <SemicircularGauge
+[0m
+[0m$ [0m# Compose the run console: gauge hero + footer columns + delta chip on the run detail page
+grep -n "RunSummary\|withLayer\|function RunSummary" "apps/ledgerline-web/routes/runs/[id].tsx" | head -5; grep -n "export interface RunSummaryProps\|export default function RunSummary" "apps/ledgerline-web/routes/runs/(_components)/run-summary.tsx"
+16:import RunSummary, { RunSummarySkeleton } from './(_components)/run-summary.tsx';
+28:interface RunSummaryResource {
+57:  .withResource('summary', async (ctx): Promise<RunSummaryResource> => {
+75:  .withLayer('summary', RunSummary, {
+87:    fallback: <RunSummarySkeleton />,
+20:export interface RunSummaryProps {
+43:export default function RunSummary({ state, run, totals }: RunSummaryProps): VNode {
+[0m
+[0m$ [0msed -n "1,42p" "apps/ledgerline-web/routes/runs/(_components)/run-summary.tsx"; grep -n "SemicircularGaugeProps\|export function SemicircularGauge" -A10 apps/ledgerline-web/components/ui/semicircular-gauge.tsx | head -18; grep -n "FooterColumnsProps\|export function FooterColumns" -A8 apps/ledgerline-web/components/ui/footer-columns.tsx | head -14
+/**
+ * Run summary header — server component for the run detail `summary` layer.
+ *
+ * Shows period, status, and the console totals. Missing totals render as em
+ * dashes; a failed console read degrades the stats section, never the header.
+ */
+
+import {
+  Card,
+  EmptyState,
+  InlineNotice,
+  MoneyText,
+  Skeleton,
+  StatsGrid,
+  StatusBadge,
+} from '@app/components/ui/mod.ts';
+import type { RunConsoleV1, RunV1 } from '@ledgerline/contracts';
+import type { VNode } from 'preact';
+
+export interface RunSummaryProps {
+  state: 'found' | 'not-found' | 'unavailable' | 'denied';
+  run?: RunV1;
+  totals?: RunConsoleV1['totals'];
+}
+
+export function RunSummarySkeleton(): VNode {
+  return (
+    <div class='ns-stack ns-stack--md'>
+      <Card>
+        <Card.Body class='ns-stack ns-stack--sm'>
+          <Skeleton variant='detail' rows={2} />
+        </Card.Body>
+      </Card>
+      <Skeleton variant='stats' cards={4} />
+    </div>
+  );
+}
+
+function formatPeriod(run: RunV1): string {
+  return `${run.periodStart.slice(0, 10)} → ${run.periodEnd.slice(0, 10)}`;
+}
+
+33:export interface SemicircularGaugeProps
+34-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+35-  segments: readonly GaugeSegment[];
+36-  /**
+37-   * The denominator — every item the run covers, including the ones no segment
+38-   * accounts for. Omitted means the segments are the whole. `null` means the
+39-   * total was not measured, which renders the empty frame (H7, M1).
+40-   */
+41-  total?: number | null;
+42-  /** Quiet uppercase label above the centre amount, e.g. `ISSUED`. */
+43-  label: string;
+--
+79:export function SemicircularGauge({
+80-  segments,
+81-  total,
+82-  label,
+83-  value,
+84-  caption,
+29:export interface FooterColumnsProps
+30-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+31-  columns: readonly FooterColumn[];
+32-  class?: string;
+33-}
+34-
+35-/**
+36- * A hairline-divided footer strip.
+37- *
+--
+42:export function FooterColumns({ columns, class: className, ...props }: FooterColumnsProps): VNode {
+43-  if (columns.length === 0) return <div {...props} class={cn('ns-footer-cols', className)} />;
+44-
+45-  return (
+[0m
+[0m$ [0msed -n "43,120p" "apps/ledgerline-web/routes/runs/(_components)/run-summary.tsx"
+export default function RunSummary({ state, run, totals }: RunSummaryProps): VNode {
+  if (state === 'not-found') {
+    return (
+      <Card>
+        <Card.Body>
+          <EmptyState heading='Run not found'>
+            The run id does not exist (or was created before the console's data window).
+          </EmptyState>
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  if (state === 'denied') {
+    return (
+      <Card>
+        <Card.Body>
+          <InlineNotice title='Permission denied' variant='destructive'>
+            The console's service token does not carry the runs:read scope.
+          </InlineNotice>
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  if (state === 'unavailable' || !run) {
+    return (
+      <Card>
+        <Card.Body>
+          <InlineNotice title='Runs service unavailable' variant='destructive'>
+            The runs service did not answer. Retry in a moment.
+          </InlineNotice>
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  return (
+    <div class='ns-stack ns-stack--md'>
+      <Card>
+        <Card.Body class='ns-stack ns-stack--sm'>
+          <div class='ns-cluster ns-cluster--sm'>
+            <span class='font-mono text-xs text-ns-muted-fg'>{run.id}</span>
+            <StatusBadge status={run.status === 'ISSUING' ? 'in-flight' : run.status} />
+            {run.notes && <span class='text-xs text-ns-muted-fg'>{run.notes}</span>}
+          </div>
+          <h1 class='text-lg font-medium text-ns-fg'>{formatPeriod(run)}</h1>
+        </Card.Body>
+      </Card>
+      {totals
+        ? (
+          <StatsGrid>
+            <StatsGrid.Card
+              label='Computed'
+              value={<MoneyText value={totals.computed} currency='USD' />}
+              detail='Total value measured across eligible items'
+            />
+            <StatsGrid.Card
+              label='Issued'
+              value={<MoneyText value={totals.issued} currency='USD' />}
+              detail={`${run.issuedCount} invoices issued`}
+            />
+            <StatsGrid.Card
+              label='Pending items'
+              value={<span class='tabular-nums'>{totals.pendingCount}</span>}
+            />
+            <StatsGrid.Card
+              label='Failed items'
+              badge={totals.failedCount > 0 ? <StatusBadge status='FAILED' /> : undefined}
+              value={<span class='tabular-nums'>{totals.failedCount}</span>}
+              detail={totals.failedCount > 0 ? 'Review exceptions before issuing' : undefined}
+            />
+          </StatsGrid>
+        )
+        : (
+          <InlineNotice title='Console totals unavailable' variant='warning'>
+            The run loaded but its console projection did not answer, so totals are shown as em
+            dashes until the service recovers.
+[0m
+[91m[1mError: [0m{"code":400,"message":"This model's maximum context length is 1048576 tokens, but the request resolved to 1066900 input tokens (including image/vision expansion). Reduce the input length, image resolution, or the number of images.","metadata":{"error_type":"invalid_request"}}
