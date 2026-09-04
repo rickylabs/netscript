@@ -60,11 +60,18 @@ Deno.test('child environment late-binds only the selected target and leaves pare
 Deno.test('every profile policy explicitly clears rival credential keys', () => {
   for (const profile of Object.values(PROVIDER_PROFILES)) {
     const policy = childEnvironmentPolicyForProfile(profile);
-    assertEquals(policy.bindings, [{
-      sourceKey: profile.credentialSourceKey,
-      targetKey: profile.credentialTargetKey,
-    }]);
-    assert(!policy.clearKeys.includes(profile.credentialTargetKey));
+    assertEquals(
+      policy.bindings,
+      profile.credentialSourceKey && profile.credentialTargetKey
+        ? [{
+          sourceKey: profile.credentialSourceKey,
+          targetKey: profile.credentialTargetKey,
+        }]
+        : [],
+    );
+    if (profile.credentialTargetKey) {
+      assert(!policy.clearKeys.includes(profile.credentialTargetKey));
+    }
     for (const rival of profile.clearKeys) assert(policy.clearKeys.includes(rival));
   }
 });

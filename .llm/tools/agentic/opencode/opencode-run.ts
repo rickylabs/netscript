@@ -127,6 +127,9 @@ export async function preflightOpenCodeExpense(
 ): Promise<ExpenseDecision | null> {
   const provider = openCodeCredentialProviderForModel(options.model);
   if (!provider) return null;
+  if (provider === 'github_copilot') {
+    throw new Error('Copilot launch requires catalog attestation and credit reservation');
+  }
   if (!options.workloadTier) {
     throw new Error(`paid ${provider} route requires --workload-tier`);
   }

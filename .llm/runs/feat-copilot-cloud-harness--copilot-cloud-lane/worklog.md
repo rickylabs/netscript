@@ -86,6 +86,21 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S3 + S4 — resolver, prose, credential-free profile
+
+- S2 pushed as `38f213c8f`, PR comment `5545720902` posted.
+- Combined with coordinator approval for the exhaustive profile/type compile dependency (drift).
+- Resolver binds Copilot to OpenCode and propagates model family to the deep-research guard.
+- Profile has null credential keys and no child bindings. OpenCode Copilot environment clears rival
+  API keys and GitHub token overrides without reading any credential store.
+- Lane-policy provider order, paid allowance, and deep-research prose updated (PLAN-EVAL note 3).
+- Structured resolver/parity/profile/environment/credential/launcher/config wrapper: PASS 53/53,
+  exit 0 (`.llm/tmp/copilot-s34-test.json`); coordinator independently reran 53/53 and reviewed PASS.
+- Scoped structured check and fmt PASS (4 production files). Lint initially refused all-excluded
+  root config; explicit empty scratch config `.llm/tmp/copilot-lint.json` restored complete
+  selection coverage and passed (4/4 files). No raw output was substituted for a gate.
+- Reconcile: no change to native family defaults, existing OpenHands, or approved live-task boundary.
+
 ### S2 — typed Copilot matrix
 
 - S1 pushed as `f4afe80c0`; PR IMPL comment `5545703862` posted.

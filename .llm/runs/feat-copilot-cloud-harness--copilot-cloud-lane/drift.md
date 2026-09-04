@@ -1,5 +1,15 @@
 # Drift Log: GitHub Copilot cloud lane for the NetScript harness
 
+## 2026-09-04 — S3/S4 compile-atomic consolidation
+
+- Severity: minor; coordinator approved combining S3 and S4 because `RouteIdentity.profileId`
+  references the finite `ProviderProfileId` and `PROVIDER_PROFILES` is exhaustive. Resolver mapping
+  cannot compile independently of the credential-free Copilot profile.
+- Both proving gate sets are retained. Profile credential keys become nullable for connector-owned
+  OAuth, with no bindings for Copilot; the exhaustive child-policy test is updated accordingly.
+- RTK and rg were unavailable on this task shell PATH; focused plain reads and grep are used as
+  the documented fallback. Runtimes remain through `mise exec`.
+
 Drift is append-only. No drift recorded at activation.
 
 ## 2026-09-04T19:07Z — Gemini transport correction

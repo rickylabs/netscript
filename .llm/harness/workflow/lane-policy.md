@@ -17,9 +17,10 @@ order:
 1. Claude subscription through Claude CLI.
 2. Codex subscription through Codex CLI.
 3. Google subscription through `agy`.
-4. OpenCode Go subscription through OpenCode CLI.
-5. Ollama subscription through OpenCode CLI.
-6. OpenRouter through OpenCode CLI as the final fallback.
+4. Catalog-attested GitHub Copilot subscription through OpenCode CLI.
+5. OpenCode Go subscription through OpenCode CLI.
+6. Ollama subscription through OpenCode CLI.
+7. OpenRouter through OpenCode CLI as the final fallback.
 
 Provider precedence chooses a transport capable of serving the selected logical model. It does not
 invent a different model fallback. Model fallbacks are the ordered entries in the workload table.
@@ -52,7 +53,8 @@ Never infer a slug by string concatenation.
 Deep research uses its dedicated matrix column, with Gemini 3.8 Flash at `low`, `medium`, or `high`
 according to the lane's scope and surface coverage. Luna at `max` is the only model fallback.
 Because deep-research sessions can accumulate unusually large context windows and outputs, this role
-may run only on the native Google `agy` transport or the native Codex transport. Claude, OpenCode
+uses native Google `agy` first, catalog-attested GitHub Copilot Gemini second, and native Codex
+Luna last. Copilot is allowed only for the `google` family in this role. Claude, OpenCode
 Go, Ollama, and OpenRouter transports are forbidden for deep research even when they expose a model
 with the same logical identity. The resolver and concrete-model guard both fail closed on that
 boundary.
@@ -117,6 +119,16 @@ re-steers the same evaluator session; do not discard its context by launching a 
    rule may override those explicit limits.
 
 ## Paid-route expense and credentials
+
+GitHub Copilot requires an exact live connector catalog attestation and a positive per-launch
+AI-credit reservation against a local monthly ledger. Missing or malformed state and exhausted
+included allowance block; a valid prior-month ledger rolls over at the UTC reset. Caps reserve
+credits conservatively but are not a provider-enforced token ceiling or authoritative remaining
+balance. Reconcile the ledger against GitHub billing; never assume overage is enabled.
+
+OpenCode owns Copilot device OAuth. Launchers do not read its credential store or inject a Copilot
+key and clear rival provider keys. Native Claude, Codex, and `agy` remain their family defaults;
+attested non-native models prefer Copilot before Go/Ollama/OpenRouter.
 
 OpenCode Go, Ollama, and OpenRouter launches require a positive estimated cost and proven current
 usage before process spawn. Go usage is fetched directly from the authenticated subscription API on

@@ -1,6 +1,7 @@
 import { type RouteIdentity, RUNTIME_SCHEMA_VERSION } from './contract.ts';
 import { planReconciliation } from './planner.ts';
 import {
+  childEnvironmentPolicyForProfile,
   LEGACY_OPENROUTER_PRESET_IDS,
   matchOpenRouterPreset,
   OPENROUTER_PRESET_MODELS,
@@ -14,6 +15,16 @@ import type { ObservedRuntimeState } from './state.ts';
 import { assert, assertEquals } from '@std/assert';
 
 const worktree = '/home/codex/repos/provider-profile-test';
+
+Deno.test('Copilot profile has no credential binding and clears every rival provider', () => {
+  const profile = PROVIDER_PROFILES['opencode-copilot'];
+  assertEquals(profile.provider, 'github_copilot');
+  assertEquals(profile.credentialSourceKey, null);
+  assertEquals(profile.credentialTargetKey, null);
+  const policy = childEnvironmentPolicyForProfile(profile);
+  assertEquals(policy.bindings, []);
+  for (const key of PROVIDER_CREDENTIAL_KEYS) assert(policy.clearKeys.includes(key));
+});
 function route(values: Partial<RouteIdentity> = {}): RouteIdentity {
   return {
     agent: 'codex',

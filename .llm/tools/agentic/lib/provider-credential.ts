@@ -1,8 +1,10 @@
 /** Provider-specific OpenCode credential isolation without value-bearing diagnostics. */
 
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { PROVIDER_CREDENTIAL_KEYS, PROVIDER_ROUTE_KEYS } from '../runtime/provider-profiles.ts';
 
 export const OPENCODE_CREDENTIAL_PROVIDERS = [
+  'github_copilot',
   'opencode_go',
   'ollama',
   'openrouter',
@@ -42,6 +44,7 @@ export type Environment = Readonly<Record<string, string | undefined>>;
 export function openCodeCredentialProviderForModel(
   model: string,
 ): OpenCodeCredentialProvider | null {
+  if (model.startsWith('github-copilot/')) return 'github_copilot';
   return CREDENTIAL_POLICIES.find((entry) => model.startsWith(entry.modelPrefix))?.provider ?? null;
 }
 
@@ -113,6 +116,12 @@ export async function environmentWithOpenCodeCredential(
     Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined),
   );
   const policy = policyForModel(model);
+  if (openCodeCredentialProviderForModel(model) === 'github_copilot') {
+    for (const key of [...PROVIDER_CREDENTIAL_KEYS, ...PROVIDER_ROUTE_KEYS]) delete result[key];
+    // OpenCode alone owns device OAuth. Never inspect or copy its credential store.
+    for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'COPILOT_GITHUB_TOKEN']) delete result[key];
+    return result;
+  }
   if (!policy) return result;
   for (const candidate of CREDENTIAL_POLICIES) delete result[candidate.envKey];
   result[policy.envKey] = await resolveCredential(policy, env, readTextFile, stat);
