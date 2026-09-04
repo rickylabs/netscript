@@ -28,11 +28,11 @@ support: DCP environment label, exact `--apphost` argv, and contained backchanne
 
 ## Phase-B live process tree
 
-`process-tree-13.5.3-phase-b-live.json` copies the relevant process rows from the checked-in
-`phase-b-02-baseline-process-tree.json` and `phase-b-03-cli-terminated.json` receipts. PIDs,
-start-time ticks, AppHost paths, managed-server `--contentRoot` argv, and post-SIGKILL PPIDs are
-preserved exactly; the already-redacted log path remains redacted.
+`process-tree-13.5.3-phase-b-live.json` copies the relevant process rows from receipts archived at
+commit `d8187e5a8656de8f9443f4e33f0a91ece56a7dd2`. PIDs, start-time ticks, AppHost paths,
+managed-server `--contentRoot` argv, and post-SIGKILL PPIDs are preserved exactly; the
+already-redacted log path remains redacted.
 
-The fixture separately labels its DCP-label/socket/cwd entries as `derivedContainmentVectors`.
-Those values exercise the Phase-A evidence contract using the exact leased and foreign roots; they
-are not represented as fields observed by the live `/proc` capture.
+The fixture separately labels its DCP-label/socket/cwd entries as `derivedContainmentVectors`. Those
+values exercise the Phase-A evidence contract using the exact leased and foreign roots; they are not
+represented as fields observed by the live `/proc` capture.

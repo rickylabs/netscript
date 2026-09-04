@@ -1,7 +1,7 @@
 {
   "sources": [
-    ".llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/receipts/phase-b-02-baseline-process-tree.json",
-    ".llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/receipts/phase-b-03-cli-terminated.json"
+    "d8187e5a8656de8f9443f4e33f0a91ece56a7dd2:.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/receipts/phase-b-02-baseline-process-tree.json",
+    "d8187e5a8656de8f9443f4e33f0a91ece56a7dd2:.llm/runs/fix-aspire-13-5-s7-teardown-leak-check--impl/receipts/phase-b-03-cli-terminated.json"
   ],
   "leasedRun": {
     "worktreeRoot": "/home/agent/projects/netscript/worktrees/007-aspire-s7",

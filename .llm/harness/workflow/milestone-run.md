@@ -77,6 +77,13 @@ later milestones. Before that ruling, every agent preserves the tracked run dire
 supervisor, evaluator, cleanup lane, or merge audit may infer retention from age, path shape, host
 metadata, or PR type.
 
+After the owner grants a post-release cleanup scope, preview it with
+`deno task harness:cleanup --all-unretained --pretty`. The command preserves every run belonging to
+the newest two release generations and any RFC-related run identified by its name, an `rfc.md` /
+`RFC-AUTHORITY.md` marker, or an `rfcs/` design directory. It also supports age-bounded `.llm/tmp`
+cleanup. Nothing is removed without `--apply`; `--all-unretained` is the explicit owner-controlled
+full sweep used after a stable cut.
+
 Create the five milestone artifacts from `templates/`, then run:
 
 ```text
