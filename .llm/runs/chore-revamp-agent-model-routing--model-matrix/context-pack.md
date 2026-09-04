@@ -33,7 +33,10 @@ draft. The same native Claude Opus 5 xhigh evaluator session independently execu
 and returned cycle-4 `PASS` at exact implementation head `74c6299b006c8662514e9f1f2a77e970681b0ade`.
 After that PASS, the owner added a final deep-research column: Gemini 3.8 Flash low/medium/high by
 tier, Luna max fallback, native `agy`/Codex transports only. The PR was returned to draft while this
-bounded amendment receives fresh exact-head gates and cycle-5 IMPL-EVAL.
+bounded amendment receives fresh exact-head gates and cycle-5 IMPL-EVAL. Cycle 5 in the same
+separate native Claude Opus 5 xhigh session returned `PASS` for implementation head
+`5f199642f43820ec59b8e1770940a3b61f8cdf43`. The only evaluator condition is refreshing the PR body's
+validation counts and adding the native-only deep-research safety boundary before promotion.
 
 ## Accepted owner decisions
 
@@ -62,9 +65,8 @@ bounded amendment receives fresh exact-head gates and cycle-5 IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit and push the bounded deep-research amendment and its exact-head evaluator brief.
-2. Resume the same separate Opus evaluator for cycle 5, then promote and merge only after exact-head
-   CI and review threads are green.
+1. Commit and push the cycle-5 PASS and refresh the PR body's deep-research summary/validation.
+2. Promote and merge only after exact-head CI and review threads are green.
 
 ## Files Changed
 
@@ -96,7 +98,7 @@ bounded amendment receives fresh exact-head gates and cycle-5 IMPL-EVAL.
 | Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
-| IMPL-EVAL   | PASS C4        | independently executed at implementation head `74c6299b006c866`             |
+| IMPL-EVAL   | PASS C5        | independently executed at implementation head `5f199642f43820e`             |
 | Repair gate | PASS           | deep-research amendment: 25 focused; 187 checked; 585 agentic; format clean |
 
 ## Drift and Debt
