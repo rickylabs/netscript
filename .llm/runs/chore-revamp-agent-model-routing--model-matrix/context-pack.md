@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Current phase  | `cycle-3 bounded repair`                         |
+| Current phase  | `merge-readiness metadata`                       |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
 
@@ -29,7 +29,8 @@ privileged `architecture` row without recorded authority. The critical repair is
 feature-tier IMPL-EVAL cycle 3 then found four DeepSeek cells with invented high/max effort where
 the owner source left effort unstated. Those cells now use `provider_default`, are directly pinned
 by tests, and the compatibility-only Claude/OpenRouter boundary is documented. PR #1989 remains
-draft pending the next exact-head evaluator verdict.
+draft. The same native Claude Opus 5 xhigh evaluator session independently executed the repair gates
+and returned cycle-4 `PASS` at exact implementation head `74c6299b006c8662514e9f1f2a77e970681b0ade`.
 
 ## Accepted owner decisions
 
@@ -56,10 +57,9 @@ draft pending the next exact-head evaluator verdict.
 
 ## Next Steps
 
-1. Commit and push the cycle-3 bounded repair and exact green receipts.
-2. Re-steer the same independent native Claude Opus 5 xhigh feature-tier evaluator at that immutable
-   repair head; correct the obsolete Muse/Meta brief identity and do not widen to a privileged row.
-3. On `PASS`, finalize PR metadata, verify exact-head CI and review threads, and promote the draft.
+1. Commit and push the cycle-4 evaluator verdict and corrected exact SHA.
+2. Rewrite the stale PR body, replace `status:plan-eval` with `status:ready-merge`, and promote the
+   draft only after exact-head CI and review threads are green.
 
 ## Files Changed
 
@@ -91,7 +91,7 @@ draft pending the next exact-head evaluator verdict.
 | Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
-| IMPL-EVAL   | FAIL_FIX C3    | four unstated DeepSeek efforts plus one compatibility-doc gap; repaired     |
+| IMPL-EVAL   | PASS C4        | independently executed at implementation head `74c6299b006c866`             |
 | Repair gate | PASS           | 59 focused tests; 187 checked / 0 diagnostics; 2 TS files format clean      |
 
 ## Drift and Debt

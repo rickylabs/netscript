@@ -37,3 +37,7 @@
   require explicit owner or milestone-coordinator authorization with a recorded rationale. The
   coordinator's unratified `architecture` classification for this bounded harness refactor was an
   error; subsequent work and re-evaluation use the `feature` row.
+- Feature-tier IMPL-EVAL cycles 3 and 4 used the same separate native Claude Opus 5 xhigh session
+  `4f37cff5-ef4e-4c22-b462-007ea368d18a` (Anthropic family). Cycle 3 found the bounded effort/doc
+  defects; cycle 4 independently executed the repair gates and returned `PASS` at implementation
+  head `74c6299b006c8662514e9f1f2a77e970681b0ade`.

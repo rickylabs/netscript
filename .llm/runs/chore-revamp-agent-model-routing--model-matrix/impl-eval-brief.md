@@ -2,7 +2,7 @@ use harness
 
 # IMPL-EVAL: agent model routing and subscription expense policy revamp
 
-Evaluate draft PR #1989 at exact head `74c6299b0bd287ff4773e9564bc6301645777156` against its
+Evaluate draft PR #1989 at exact head `74c6299b006c8662514e9f1f2a77e970681b0ade` against its
 approved plan, the owner's post-evaluation corrections in `drift.md`, and the IMPL-EVAL protocol.
 This is cycle 4 in the same separate evaluator session used for cycle 3. The generator is
 OpenAI-family; you are native Claude Opus 5 xhigh (Anthropic family), the matrix's declared fallback
