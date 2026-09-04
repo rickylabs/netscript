@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "phase": "S7 phase B rerun",
-  "observedAt": "2026-08-30T19:14:30.413Z",
-  "command": "/home/agent/.local/bin/mise exec -- aspire ps --format Json",
-  "exitCode": 0,
-  "stdoutVerbatim": "[]\n",
-  "result": []
-}

@@ -1,5 +1,0 @@
-command: find .llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres/migrations -maxdepth 2 -type f -printf <path|timestamp> | sort
-completed: 2026-08-30T00:55:56+02:00
-exit_code: 0
-.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres/migrations/20260829224230_init/migration.sql|2026-08-30T00:42:30.1366051560+0200
-.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/database/postgres/migrations/migration_lock.toml|2026-08-30T00:42:30.1366051560+0200

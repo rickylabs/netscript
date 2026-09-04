@@ -37,14 +37,14 @@ in this skill restates those contracts, publish mechanics (`netscript-release`),
 
 ## Evidence discipline
 
-Rules below are **[observed]** — recorded during the 0.0.4 execution: in the instrumented trace
-(`.llm/runs/release-0.0.4--orchestration/cut-trace.md`), in the issues that run filed (#1113, #1115,
-…), in the epic's ratified learnings (#1120), or in the ratified design doc's dated observations —
-with the source cited at the claim — or **[asserted]** — plausible and unproven. The distinction is
-load-bearing: 0.0.4 shipped two guards whose predicate could never fire, and they looked correct
-while doing nothing. Treat asserted rules as candidates to attack; when your run falsifies or
-confirms one, record it in the run's `cut-trace.md` so the marker can be upgraded with a citation,
-not by fiat.
+Rules below are **[observed]** — recorded during the 0.0.4 execution: in the
+[archived instrumented trace](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/release-0.0.4--orchestration/cut-trace.md),
+in the issues that run filed (#1113, #1115, …), in the epic's ratified learnings (#1120), or in the
+ratified design doc's dated observations — with the source cited at the claim — or **[asserted]** —
+plausible and unproven. The distinction is load-bearing: 0.0.4 shipped two guards whose predicate
+could never fire, and they looked correct while doing nothing. Treat asserted rules as candidates to
+attack; when your run falsifies or confirms one, record it in the run's `cut-trace.md` so the marker
+can be upgraded with a citation, not by fiat.
 
 ## Step 0 judgement
 
@@ -159,11 +159,11 @@ skill holds no routing. The orchestrator's delegation judgement, beyond routing:
 - **Let phase automation own OpenHands [observed — #1120 learnings].** For PLAN-EVAL, add
   `openhands` and transition the draft PR to `status:plan-eval`. For IMPL-EVAL, choose at most one
   `eval:model:*` override while draft, add `openhands`, then make the PR ready once; automation
-  enters `status:impl-eval` and dispatches exactly once. Never also post `@openhands-agent`
-  manually for that head. Readiness without `openhands` never spends. A deliberate rerun moves away
-  from and back to the relevant eval status while `openhands` remains present. OpenHands is an
-  explicit fallback for cloud lanes or machines without the full local CLI swarm; native evaluator
-  sessions remain the default when the local matrix can run them.
+  enters `status:impl-eval` and dispatches exactly once. Never also post `@openhands-agent` manually
+  for that head. Readiness without `openhands` never spends. A deliberate rerun moves away from and
+  back to the relevant eval status while `openhands` remains present. OpenHands is an explicit
+  fallback for cloud lanes or machines without the full local CLI swarm; native evaluator sessions
+  remain the default when the local matrix can run them.
 
 ## Merge authority
 
@@ -215,15 +215,15 @@ raise them, or follow the run's recorded decision.
 
 ## Reference files
 
-| File                                                  | Load when                                               |
-| ----------------------------------------------------- | ------------------------------------------------------- |
-| `.llm/harness/workflow/milestone-run.md`              | every milestone run — the run shape, gates, DoD         |
-| `.llm/harness/workflow/canary-cadence.md`             | declaring canary points; label/note/drift contract      |
-| `.llm/harness/workflow/milestone-reporting.md`        | hourly/event-driven owner report and pace gate          |
-| `.llm/harness/workflow/lane-policy.md`                | lane and evaluator routing                              |
-| `.llm/harness/workflow/tooling.md`                    | the agentic launch/watch/steer tool surface for stage C |
-| `.llm/harness/workflow/agent-handoff.md`              | handing work to OpenHands or local agents mid-run       |
-| `.agents/skills/netscript-release`                    | any publish, verification, or rollback step             |
-| `.agents/skills/netscript-pr`                         | branch/PR/label/milestone mechanics, close-gate         |
-| `.agents/skills/netscript-harness`                    | general harness operating model                         |
-| `.llm/runs/release-0.0.4--orchestration/cut-trace.md` | the observed evidence base                              |
+| File                                                                                                                                                                 | Load when                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `.llm/harness/workflow/milestone-run.md`                                                                                                                             | every milestone run — the run shape, gates, DoD         |
+| `.llm/harness/workflow/canary-cadence.md`                                                                                                                            | declaring canary points; label/note/drift contract      |
+| `.llm/harness/workflow/milestone-reporting.md`                                                                                                                       | hourly/event-driven owner report and pace gate          |
+| `.llm/harness/workflow/lane-policy.md`                                                                                                                               | lane and evaluator routing                              |
+| `.llm/harness/workflow/tooling.md`                                                                                                                                   | the agentic launch/watch/steer tool surface for stage C |
+| `.llm/harness/workflow/agent-handoff.md`                                                                                                                             | handing work to OpenHands or local agents mid-run       |
+| `.agents/skills/netscript-release`                                                                                                                                   | any publish, verification, or rollback step             |
+| `.agents/skills/netscript-pr`                                                                                                                                        | branch/PR/label/milestone mechanics, close-gate         |
+| `.agents/skills/netscript-harness`                                                                                                                                   | general harness operating model                         |
+| [Archived 0.0.4 cut trace](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/release-0.0.4--orchestration/cut-trace.md) | the observed evidence base                              |

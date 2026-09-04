@@ -1,5 +1,0 @@
-
-command: printenv ASPIRE_PROXYLESS_ENDPOINT_PORT_RANGE
-started: 2026-08-30T00:55:46+02:00
-completed: 2026-08-30T00:55:46+02:00
-exit_code: 1

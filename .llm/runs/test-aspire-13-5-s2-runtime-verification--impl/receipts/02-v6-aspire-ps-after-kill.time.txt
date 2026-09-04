@@ -1,5 +1,0 @@
-command: aspire ps --format Json --non-interactive --nologo
-started: 2026-08-30T00:52:12+02:00
-completed: 2026-08-30T00:52:12+02:00
-elapsed_ms: 385
-exit_code: 0

@@ -1,5 +1,0 @@
-⚙️ Restoring SDK code...
-✅ SDK code restored successfully for apphost.mts.
-
-__ELAPSED_SECONDS=18.13
-__MAX_RSS_KB=215228

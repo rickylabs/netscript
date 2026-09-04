@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 2,
-  "worktreeRoot": "/home/codex/repos/ns005-streamdb",
-  "appHosts": [],
-  "containers": [],
-  "ownedRoots": [
-    "/home/codex/repos/ns005-streamdb/.llm/tmp/1225-protocol"
-  ]
-}

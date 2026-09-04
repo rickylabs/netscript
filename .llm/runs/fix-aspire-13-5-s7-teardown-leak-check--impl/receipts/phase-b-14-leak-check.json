@@ -1,8 +1,0 @@
-{
-  "schemaVersion": 1,
-  "phase": "S7 phase B rerun",
-  "status": "skipped",
-  "criterion1": "not-exercised",
-  "reason": "The required #1429 live process tree was never started; running the classifier against a fabricated or repaired scratch would violate the no-workaround/no-retry instruction.",
-  "mutations": []
-}

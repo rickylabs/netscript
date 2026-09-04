@@ -1,2 +1,0 @@
-{"conversation_id":"27b68d80-f107-4109-a44a-126a2cfaf93a","status":"ERROR","response":"","error":"Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 1h38m5s.","duration_seconds":15.153727665,"num_turns":1,"usage":{"input_tokens":35936,"output_tokens":1271,"thinking_tokens":972,"cache_read_tokens":48822,"total_tokens":37207}}
-agy exited 1

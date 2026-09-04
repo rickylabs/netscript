@@ -1,5 +1,0 @@
-command: aspire stop --apphost /home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres/aspire/apphost.mts --non-interactive --nologo
-started: 2026-08-30T00:52:23+02:00
-completed: 2026-08-30T00:52:23+02:00
-elapsed_ms: 374
-exit_code: 0

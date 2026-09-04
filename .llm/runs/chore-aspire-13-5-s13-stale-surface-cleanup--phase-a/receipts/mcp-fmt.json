@@ -1,1 +1,0 @@
-{"command":"deno fmt --check","cwd":"/home/agent/projects/netscript/worktrees/007-aspire-s13","mode":"check","summary":{"filesSelected":116,"batches":2,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":116,"filesProcessed":116,"droppedFiles":[],"refusals":[]},"findings":[]}
