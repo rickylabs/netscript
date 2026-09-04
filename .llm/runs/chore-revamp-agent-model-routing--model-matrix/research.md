@@ -2,29 +2,116 @@
 
 ## Re-baseline
 
-- Carried-in source: owner-authored `/home/agent/tmp/Harness Agents models matrix.md`.
-- Re-derived against `main` @ `a2d7f5f6f686115b5c31bab085692df6e1582aa7` on 2026-09-04.
-- Current status: source matrix read in full; repository bindings and provider/quota contracts are
-  being re-derived before the plan is locked.
+- Owner input: `/home/agent/tmp/Harness Agents models matrix.md`, read in full before repository
+  inspection as explicitly required.
+- Baseline: `origin/main` @ `a2d7f5f6f686115b5c31bab085692df6e1582aa7` on 2026-09-04.
+- Scope: internal harness and agentic runtime only; no published package/plugin API changes.
+- The owner confirmed `gpt-6-astra` and the two new subscription credentials are target-available.
 
-## Findings
+## Owner-ratified matrix
 
-| # | Finding | How to verify |
-| - | --- | --- |
-| 1 | The owner matrix replaces all prior agent-delegation policy rather than amending it. | Read the matrix preamble and complete table. |
-| 2 | It requires subscription-first routing in this order: Claude, Codex, Google, OpenCode Go, Ollama, then OpenRouter. | Read the matrix `Cli provider priority` section. |
-| 3 | Generator and evaluator must never share a model family, including fallback composition. | Read the matrix final invariant. |
-| 4 | Official OpenAI documentation identifies Astra as `gpt-6-astra`, with `low` through `max` reasoning, and describes account access as a rollout. | `https://developers.openai.com/api/docs/models/gpt-6-astra` |
+| Workload tier                            | Implementer                      | Plan                                 | PLAN-EVAL                           | IMPL-EVAL                           | Vision                                       | Documentation                               |
+| ---------------------------------------- | -------------------------------- | ------------------------------------ | ----------------------------------- | ----------------------------------- | -------------------------------------------- | ------------------------------------------- |
+| simple / cheap                           | Luna max → Qwen 3.8 Flash Next   | N/A                                  | N/A                                 | MiniMax M3 → DeepSeek V4 Flash      | MiniMax M3 → DeepSeek V4 Flash Vision        | Gemini 3.8 Flash medium → Opus 5 low        |
+| straightforward                          | SOL medium → GLM 5.3 Flash       | implementer → GLM 5.3 Flash          | Opus 5 medium → Qwen 3.8 Flash Next | GLM 5.3 Flash → DeepSeek V4 Pro     | DeepSeek V4 Flash Vision → Kimi K3 low       | Gemini 3.8 Flash high → Qwen 3.8 Flash Next |
+| feature / fix                            | Astra low → Muse Spark 1.3 xhigh | Fable 5.1 low → Muse Spark 1.3 xhigh | GLM 5.3 → Fable 5.1 low             | Muse Spark 1.3 xhigh → Opus 5 xhigh | Gemini 3.8 Flash high → Muse Spark 1.3 xhigh | Qwen 3.8 Max → GLM 5.3 Flash                |
+| complex                                  | Astra medium → Fable 5.1 medium  | Fable 5.1 medium → Muse Spark max    | Muse Spark max → Grok 4.6 high      | Muse Spark max → Muse Spark max     | Kimi K3 max → Gemini 3.8 Flash high          | Fable 5.1 medium → Qwen 3.8 Max             |
+| architecture / RFC / explicit escalation | Astra xhigh → Fable 5.1 xhigh    | Fable 5.1 xhigh → Muse Spark max     | Muse Spark max → Grok 4.6 xhigh     | Grok 4.6 xhigh → Muse Spark max     | Kimi K3 max → Fable 5.1 high                 | Fable 5.1 high → Qwen 3.8 Max               |
 
-## jsr-audit surface scan
+The generator/evaluator family invariant applies to both primary routes and every fallback
+composition. Tier-specific evaluation round limits and escalation thresholds are part of the machine
+contract, not operator prose.
 
-- N/A: this run changes internal harness and agentic tooling, not a published package/plugin surface.
+## Coordinator matrix
 
-## Open questions
+| Coordinator role      | Primary      | Fallback                                             |
+| --------------------- | ------------ | ---------------------------------------------------- |
+| small project         | Luna max     | Opus 5 low                                           |
+| non-framework project | SOL medium   | Opus 5 medium                                        |
+| framework project     | Astra low    | Opus 5 xhigh                                         |
+| milestone             | Astra medium | Fable 5.1 medium; Opus 5 xhigh if Fable is exhausted |
 
-- Which exact OpenCode and Ollama model IDs and quota windows are exposed to the subscribed accounts?
-- Which existing lane names remain compatibility aliases, and which should be replaced by explicit
-  role/complexity identities?
-- How should the expense watcher represent subscription windows while preserving existing API-credit
-  accounting and failing closed when provider telemetry is unavailable?
+Provider preference is ordered: Claude subscription → Codex subscription → Google subscription
+(`agy`) → OpenCode Go through OpenCode CLI → Ollama subscription through OpenCode CLI → OpenRouter
+through OpenCode CLI.
 
+## Repository findings
+
+| # | Finding                                                                                                                                                                | Consequence                                                                                                                                   |
+| - | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | `runtime/routing-policy.ts` is a flat legacy lane list whose route conditions mix workload classification, fallback causes, review pairing, and historical exceptions. | Replace it with explicit workload/coordinator matrix records and derived compatibility views; do not append Astra rows to the old policy.     |
+| 2 | Model strings are centralized in `config/models.ts`, but its active catalog is the pre-Astra SOL/Fable-5 matrix.                                                       | Replace the active catalog while retaining a named legacy catalog only for persisted-state input compatibility.                               |
+| 3 | `ProviderKind` has no OpenCode Go or Ollama identity and provider profiles cover native Claude/Codex plus OpenRouter only.                                             | Add distinct `opencode_go` and `ollama` provider identities and profiles so provider cost/limit semantics cannot be confused with OpenRouter. |
+| 4 | `opencode-run.ts` always loads OpenRouter credentials, regardless of the selected model prefix.                                                                        | Select credential policy from the model/provider prefix and clear rival credential variables before launch.                                   |
+| 5 | Existing quota state tracks provider failures and restoration, but there is no subscription expense watcher.                                                           | Add a pure budget evaluator and structured pre-dispatch CLI; integrate paid OpenCode routes so allowance is checked before launch.            |
+| 6 | Existing self-certification guard compares broad agent family only and does not prove all primary/fallback cross-products.                                             | Give every model an explicit family and validate the complete generator/evaluator product at module construction/test time.                   |
+| 7 | Human policy, runtime policy, evaluator protocols, and manager skills repeat old routing rules.                                                                        | Generate/check a stable documentation marker from the typed matrix and replace active prose; historical `.llm/runs/**` remains untouched.     |
+
+## Current provider facts
+
+### OpenAI / Astra
+
+- Canonical model ID: `gpt-6-astra`.
+- Supported reasoning efforts include low, medium, high, xhigh, and max.
+- The owner directed the target toolchain to treat Astra as available.
+- Sources: `https://developers.openai.com/api/docs/models/gpt-6-astra` and
+  `https://developers.openai.com/api/docs/guides/latest-model`.
+
+### OpenCode Go
+
+- Subscription price: $10/month.
+- Monetary allowance windows: $12 per rolling five hours, $30 per week, and $60 per month.
+- Usage can fall through to separately funded Zen balance when enabled; NetScript must fail closed
+  at the Go allowance boundary rather than silently spend Zen balance.
+- Provider model prefix: `opencode-go/`.
+- Relevant live catalog IDs include `grok-4.6`, `gpt-5.6-luna`, `glm-5.3-flash`, `glm-5.3`,
+  `kimi-k3`, `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v4-flash-vision-exp`, `minimax-m3`,
+  `muse-spark-1.3-contributor`, `qwen3.8-max`, and `qwen3.8-flash`.
+- Source: `https://opencode.ai/docs/fr/go` (2026-09-04 re-check).
+
+### Ollama subscription
+
+- Official subscription tiers currently expose monthly included credits and concurrency: Pro
+  ($60 credits, concurrency 3), Max ($300, concurrency 10), Team ($1000 shared, concurrency 10).
+  Credits reset on the subscription anniversary and do not roll over.
+- Local models remain outside cloud credit accounting. Cloud overflow balance is a separate paid
+  surface and must not be consumed implicitly.
+- The watcher will resolve the subscribed tier from provider/account evidence or explicit local
+  configuration; unknown tier/usage fails closed rather than guessing Pro versus Max versus Team.
+- Provider model prefix: `ollama-cloud/`.
+- Sources: `https://ollama.com/pricing` and the OpenCode provider documentation (2026-09-04).
+
+### OpenRouter
+
+- Remains the last fallback only. It is never selected while a higher-priority subscription route is
+  healthy and within allowance.
+- Existing credential handling remains local-only and value-free in receipts.
+
+## Model-ID normalization
+
+- Logical models and provider-specific IDs are distinct. Example: logical `qwen_3_8_flash_next` maps
+  to the locally available `n5air/qwen3.8-flash-next` where supported and to the provider's
+  `qwen3.8-flash` capability where “Next” is not exposed.
+- Route selection is capability-based; it never invents an unsupported provider/model slug.
+- “Fable 5.1” replaces the active Fable 5 identifier. Legacy IDs remain deserialization-only.
+
+## Expense-watcher contract
+
+- Input: provider/tier, usage snapshot timestamp, usage in each applicable window, estimated next
+  charge, and optional concurrent request count.
+- Output: structured JSON with `allowed`, per-window remaining amounts, warning state, reset/renewal
+  metadata, and a stable failure reason. No credential values enter the input or output.
+- OpenCode Go enforces all three monetary windows. Ollama enforces resolved monthly credits and
+  concurrency. OpenRouter remains governed by its reported credit state.
+- Unknown, stale, malformed, or unresolved subscription usage blocks the paid route and advances to
+  the next declared fallback. It never authorizes an unmetered spend.
+
+## Open questions resolved in plan
+
+- Existing lane names are input compatibility aliases only; the new workload/coordinator matrix is
+  authoritative for new selection.
+- Provider usage retrieval is an adapter boundary. The pure watcher consumes normalized snapshots,
+  allowing official provider telemetry or locally accumulated OpenCode receipt data without coupling
+  routing policy to one unstable endpoint.
+- No repository code reads the owner-supplied raw key files directly. The host provisioning step
+  installs mode-600 env files under the existing NetScript agentic config convention.

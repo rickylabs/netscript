@@ -2,71 +2,63 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `chore-revamp-agent-model-routing--model-matrix` |
-| Branch | `chore/revamp-agent-model-routing` |
-| Current phase | `research` |
-| Archetype | `6 - CLI / Tooling` |
-| Scope overlays | docs |
+| Field          | Value                                            |
+| -------------- | ------------------------------------------------ |
+| Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
+| Branch         | `chore/revamp-agent-model-routing`               |
+| Current phase  | `plan-eval`                                      |
+| Archetype      | `6 - CLI / Tooling`                              |
+| Scope overlays | docs                                             |
 
 ## Current State
 
-The owner matrix has been read in full and supersedes prior routing rulings. Official OpenAI
-documentation confirms the `gpt-6-astra` identity and reasoning range. An isolated worktree exists;
-repository/provider/quota research and the design checkpoint remain in progress.
+Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`. The complete owner
+matrix has been normalized into the plan, active code surfaces and official subscription contracts
+have been inventoried, and implementation is stopped at the required separate-session PLAN-EVAL
+gate.
 
-## Completed
+## Accepted owner decisions
 
-- Matrix-first intake.
-- Applicable harness, tooling, PR, and OpenAI model-migration instructions read.
-- Fresh `origin/main` baseline and worktree established.
+- The 2026-09-04 matrix replaces every prior delegation ruling.
+- `gpt-6-astra` is target-available and is active, not provisional.
+- OpenCode Go and Ollama credentials are target-available through secure local provisioning.
+- Provider priority: Claude → Codex → Google → OpenCode Go → Ollama → OpenRouter.
+- Generator/evaluator model families must differ across all primary/fallback combinations.
 
-## In Progress
+## Locked architecture
 
-- Early draft PR bootstrap.
-- Current router, provider adapters, expense watcher, and official quota contract inventory.
+- Typed five-tier workload matrix plus four-tier coordinator matrix.
+- Logical model identity separated from provider-specific capability/slugs.
+- Evaluation round/repair/notification policy encoded in data.
+- Paid OpenCode routes require a fresh structured allowance decision before spawn.
+- Secrets remain in mode-600 local env files and never enter argv, logs, receipts, or git.
+- Active docs/skills derive from/check against the matrix; historical runs stay untouched.
 
 ## Next Steps
 
-1. Open the draft PR.
-2. Complete source-backed provider/quota research and repository surface inventory.
-3. Lock plan/design and obtain a separate cross-family PLAN-EVAL PASS.
-4. Implement, verify, and obtain a separate IMPL-EVAL.
-
-## Key Decisions
-
-| Decision | Source | Notes |
-| --- | --- | --- |
-| Entire legacy matrix is superseded | Owner matrix | Preserve the cross-family invariant across every fallback. |
-| Astra identity is `gpt-6-astra` | Official OpenAI documentation | Route remains capability checked while account access rolls out. |
+1. Commit/push the locked plan and update PR #1989 to `status:plan-eval`.
+2. Run separate Muse Spark 1.3 max PLAN-EVAL and record the exact verdict.
+3. Implement S1–S4 with per-slice checks and pushes.
+4. Run bounded Go/Ollama live smokes, full focused gates, and Grok 4.6 xhigh IMPL-EVAL.
+5. Promote the PR only after exact-head CI and review-thread gate.
 
 ## Files Changed
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/chore-revamp-agent-model-routing--model-matrix/*` | new | Harness bootstrap artifacts only. |
+| Path                                                         | Status       | Notes                                                  |
+| ------------------------------------------------------------ | ------------ | ------------------------------------------------------ |
+| `.llm/runs/chore-revamp-agent-model-routing--model-matrix/*` | modified/new | research, plan, design, continuity, and drift evidence |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Plan | research | PLAN-EVAL required after design lock |
-| Static | NOT_RUN | implementation not started |
-| Fitness | NOT_RUN | implementation not started |
-| Runtime | NOT_RUN | implementation not started |
-| Consumer | NOT_RUN | implementation not started |
-
-## Open Questions
-
-- Exact subscription telemetry and model availability contracts are still being verified.
+| Gate family | Current status | Evidence                            |
+| ----------- | -------------- | ----------------------------------- |
+| Plan        | PENDING        | committed PLAN-EVAL packet next     |
+| Static      | NOT_RUN        | implementation hard stop            |
+| Fitness     | NOT_RUN        | implementation hard stop            |
+| Runtime     | NOT_RUN        | implementation hard stop            |
+| Consumer    | N/A            | no published package/plugin changes |
 
 ## Drift and Debt
 
-- Drift: prior routing policy is superseded by owner instruction; recorded in `drift.md`.
-- Debt: none created.
-
-## Commits
-
-- See the draft PR commit list and later per-slice comments.
-
+- Drift: legacy flat route policy is superseded; tracked in `drift.md`.
+- Debt: no new debt accepted.
