@@ -11,9 +11,40 @@
 
 ## Design
 
-Research is complete. The separate Fable 5.1 plan generator must lock the implementation design and
-populate this section before PLAN-EVAL. No implementation files may be created before PLAN-EVAL
-returns `PASS`.
+Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan generator on the
+`github-copilot/claude-fable-5.1` same-model fallback transport. Full decisions in `plan.md` §2.
+
+- **Surface**: repo-internal agentic suite `.llm/tools/agentic/` (Archetype 6 shape by concern
+  group, not a published package). New concern group `copilot/`; edits to `config/`, `runtime/`,
+  `opencode/`, `lib/`, `github/` consumers only.
+- **Transport model**: one new `ModelTransport` `github_copilot` inserted after `agy` and before
+  `opencode_go` in the global priority; agent `opencode`, provider `github_copilot`, profile
+  `opencode-copilot`. Capabilities added only for attested IDs (Gemini 3.8 Flash, Kimi K3, Grok 4.6,
+  Fable 5.1). Deep research admits `github_copilot` only for the `google` family.
+- **Extension axes touched**: `MODEL_TRANSPORTS`/`MODEL_TRANSPORT_PRIORITY`, `MODEL_CATALOG`
+  capabilities, `ROUTING_MODEL_IDS`, `TRANSPORT_AGENT`/`TRANSPORT_PROVIDER`/`TRANSPORT_PROFILE`,
+  `ProviderKind`, provider profiles, expense guard provider branch, `agentic:*` task list.
+- **Ports/adapters**: OpenCode process launch (existing `opencode-run`), catalog attestation
+  (preflight), GitHub REST (`GITHUB_API_BASE_URL` + `gh-token` resolver), local credit ledger under
+  the user agentic config dir (operational state, never committed).
+- **Constants**: Copilot Pro+ envelope (7000/3900/3100 credits, $0.01/credit, reset UTC day 1),
+  per-tier default caps (40/60/100/150/200), Agent Tasks endpoint path, the eight documented task
+  states, exit codes mirroring `openhands/` tools.
+- **Commands**: `agentic:copilot-preflight` (attestation, read-only) and
+  `agentic:copilot-task
+  dispatch|status|watch` (dispatch dry-run by default; live requires
+  `--live --authorized-by owner
+  --rationale`). No cancel/steer command.
+- **Slice ordering**: config → matrix → resolver+parity → profiles/credentials → attestation →
+  expense → launch receipts → Agent Tasks contract/dispatch → status/watch → wiring/docs → Copilot
+  instructions + canary protocol → run close (12 slices, `plan.md` §4).
+- **Test strategy**: co-located `_test.ts` per touched module; fixtures for connector catalog and
+  Agent Tasks responses; redaction assertions on argv/receipts; guard and parity tests as the
+  single-source gates.
+- **Consumer impact**: none on scaffold/generated output; `lane-policy.md` prose regenerated for
+  provider order and paid-route section.
+- **PLAN-EVAL**: selected (owner). Evaluator `glm_5_3@provider_default`; skip same-family Fable
+  fallback. No implementation before `PASS`.
 
 ## Progress Log
 

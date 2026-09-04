@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `feat-copilot-cloud-harness--copilot-cloud-lane` |
 | Branch         | `feat/copilot-cloud-harness`                     |
-| Current phase  | plan                                             |
+| Current phase  | plan-eval (pending)                              |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs, GitHub workflow                            |
 
@@ -35,19 +35,18 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 
 ## In Progress
 
-- Plan generation. The declared feature-plan chain was exhausted before inference: Fable 5.1 hit its
-  monthly spend limit, OpenCode Go rejected Muse Spark 1.3 while rate-limited, and OpenRouter's
-  account privacy guardrail excluded Muse's paid-training endpoint.
+- PLAN-EVAL. `plan.md` is written (14 locked decisions, 10-item open-decision sweep, 12 slices, risk
+  register, gate set, jsr-audit N/A, deferred scope). `worklog.md` `## Design` is populated.
 
 ## Next Steps
 
-1. Resume plan generation with catalog-attested `github-copilot/claude-fable-5.1` as the same-model
-   fallback after the native Claude subscription limit.
-2. Run separate-session PLAN-EVAL before implementation.
-3. Implement only the ratified slices after `PASS`.
+1. Run separate-session PLAN-EVAL on `glm_5_3@provider_default` (skip same-family Fable fallback);
+   max two cycles, evaluator repairs on cycle two.
+2. Implement only the ratified slices S1–S12 after `PASS`, committing per slice with PR comments.
+3. Live Copilot canary only after static gates and explicit owner authorisation (`plan.md` D9).
 
 ## Drift and Debt
 
-- Drift: declared Fable→Muse plan route is temporarily unavailable; no model/tier substitution was
-  made.
+- Drift: declared Fable→Muse plan route was unavailable; plan generated on the owner-authorised
+  same-model Copilot Fable fallback (see `drift.md` 2026-09-04 plan-generation entry).
 - Debt: none accepted.

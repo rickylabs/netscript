@@ -18,3 +18,17 @@ Drift is append-only. No drift recorded at activation.
   is unavailable.
 - Deep research ordering is `agy` Gemini 3.8 Flash, Copilot Gemini 3.8 Flash, then native Codex
   Luna. Generic OpenCode Go, Ollama, OpenRouter, and Claude remain excluded.
+
+## 2026-09-04 — Plan generation route and evidence head
+
+- Severity: minor. The plan brief named research head `552ca9433`; the checkout head at plan time
+  was `4ffc491c6` (two coordinator commits: Copilot connector catalog attestation and Gemini
+  Copilot-fallback wording). The plan treats the later head as authoritative because both commits
+  restate owner rulings already reflected in `supervisor.md`; no rejected claim was restored.
+- Severity: minor. Plan was generated on `github-copilot/claude-fable-5.1` (same-model fallback
+  authorised in `supervisor.md`) rather than the native Claude transport. Model and effort are
+  unchanged (Fable 5.1, low); transport only.
+- Severity: minor. Symbol-level shapes of `contract.ts`, `provider-profiles.ts`,
+  `subscription-expense.ts`, `opencode-run.ts`, and the `openhands/` and `github/` helpers were not
+  read during planning (survey stopped by the coordinator); paths are verified to exist and the plan
+  instructs implementation to confirm exported names before editing (plan.md §4 note).
