@@ -5,6 +5,7 @@ import {
   COORDINATOR_MATRIX,
   DEEP_RESEARCH_TRANSPORTS,
   DELEGATION_MATRIX,
+  isTransportAllowedForRole,
   MODEL_CATALOG,
   MODEL_TRANSPORT_PRIORITY,
   modelFamily,
@@ -60,7 +61,7 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     { model: 'fable_5_1', effort: 'medium' },
     { model: 'opus_5', effort: 'xhigh' },
   ]);
-  assertEquals(DEEP_RESEARCH_TRANSPORTS, ['agy', 'codex']);
+  assertEquals(DEEP_RESEARCH_TRANSPORTS, ['agy', 'github_copilot', 'codex']);
   assertEquals(DELEGATION_MATRIX.simple.deep_research, [
     { model: 'gemini_3_8_flash', effort: 'low' },
     { model: 'luna', effort: 'max' },
@@ -79,6 +80,7 @@ Deno.test('provider priority puts subscriptions before metered OpenRouter', () =
     'claude',
     'codex',
     'agy',
+    'github_copilot',
     'opencode_go',
     'ollama',
     'openrouter',
@@ -167,12 +169,17 @@ Deno.test('a concrete provider model must belong to the selected matrix cell', (
   );
 });
 
-Deno.test('deep research rejects every non-native, Claude, and OpenRouter capability', () => {
+Deno.test('deep research allows only native and Google Copilot capabilities', () => {
+  assertWorkloadModelAllowed('simple', 'deep_research', ROUTING_MODEL_IDS.gemini38FlashCopilot);
+  assertEquals(isTransportAllowedForRole('deep_research', 'github_copilot', 'google'), true);
+  assertEquals(isTransportAllowedForRole('deep_research', 'github_copilot', 'anthropic'), false);
+  assertEquals(isTransportAllowedForRole('deep_research', 'github_copilot'), false);
   assertWorkloadModelAllowed('simple', 'deep_research', ROUTING_MODEL_IDS.gemini38FlashNative);
   assertWorkloadModelAllowed('simple', 'deep_research', ROUTING_MODEL_IDS.lunaNative);
   for (
     const forbidden of [
       ROUTING_MODEL_IDS.lunaGo,
+      ROUTING_MODEL_IDS.fable51Copilot,
       ROUTING_MODEL_IDS.opus5Native,
       ROUTING_MODEL_IDS.glm53FlashOpenRouter,
     ]
@@ -183,6 +190,21 @@ Deno.test('deep research rejects every non-native, Claude, and OpenRouter capabi
       'is not declared for simple/deep_research',
     );
   }
+});
+
+Deno.test('Copilot catalog contains exactly the four attested capabilities', () => {
+  assertEquals(
+    Object.values(MODEL_CATALOG).flatMap((model) =>
+      model.capabilities.filter((entry) => entry.transport === 'github_copilot')
+        .map((entry) => entry.model)
+    ).sort(),
+    [
+      ROUTING_MODEL_IDS.fable51Copilot,
+      ROUTING_MODEL_IDS.gemini38FlashCopilot,
+      ROUTING_MODEL_IDS.kimiK3Copilot,
+      ROUTING_MODEL_IDS.grok46Copilot,
+    ].sort(),
+  );
 });
 
 Deno.test('evaluation limits preserve exact owner thresholds', () => {

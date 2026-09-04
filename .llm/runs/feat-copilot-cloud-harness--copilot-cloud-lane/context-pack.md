@@ -36,9 +36,10 @@ implementation is authorized.
 
 ## In Progress
 
-- S1 configuration implemented; structured config tests PASS (5/5). Implementation session
-  `/root/copilot_harness_impl` (`gpt-6-astra`, low), starting head `ea31286ab`; coordinator slice
-  review PASS, no findings. S1 is ready for commit/push; S2 is next.
+- S1 pushed as `f4afe80c0`, PR comment posted; config tests PASS (5/5).
+- S2 typed matrix implemented, matrix tests PASS (12/12), coordinator review PASS. S3 resolver
+  bindings and prose parity are next. Implementation session `/root/copilot_harness_impl`
+  (`gpt-6-astra`, low), starting head `ea31286ab`.
 
 - Execute S1-S12 from `plan.md`; incorporate the six bounded notes in `plan-eval.md` without
   widening scope.

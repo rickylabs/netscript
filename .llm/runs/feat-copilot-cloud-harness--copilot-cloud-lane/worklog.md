@@ -86,6 +86,16 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S2 — typed Copilot matrix
+
+- S1 pushed as `f4afe80c0`; PR IMPL comment `5545703862` posted.
+- Added exactly four attested capabilities and priority after native `agy`, before Go.
+- Deep research permits Copilot only for Google; absent family fails closed. Existing matrix
+  routes and evaluator-family rules are unchanged.
+- Structured matrix tests PASS: 12/12, exit 0, `.llm/tmp/copilot-s2-test.json`.
+- Tier-A substantive review PASS, no findings. Reconcile: no scope or owner-routing changes;
+  resolver exhaustive bindings and family propagation remain S3.
+
 ### S1 — centralized Copilot configuration
 
 - Implementation identity: `/root/copilot_harness_impl`, Codex `gpt-6-astra`, effort `low`, exact
