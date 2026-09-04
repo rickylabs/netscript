@@ -24,6 +24,27 @@ export const LOGICAL_MODEL_IDS = [
 ] as const;
 export type LogicalModelId = typeof LOGICAL_MODEL_IDS[number];
 
+/** Stable human labels used by operator-facing matrix renderers. */
+export const LOGICAL_MODEL_LABELS: Readonly<Record<LogicalModelId, string>> = {
+  luna: 'Luna',
+  sol: 'SOL',
+  astra: 'Astra',
+  fable_5_1: 'Fable 5.1',
+  opus_5: 'Opus 5',
+  gemini_3_8_flash: 'Gemini 3.8 Flash',
+  qwen_3_8_flash_next: 'Qwen 3.8 Flash Next',
+  qwen_3_8_max: 'Qwen 3.8 Max',
+  glm_5_3_flash: 'GLM 5.3 Flash',
+  glm_5_3: 'GLM 5.3',
+  muse_spark_1_3: 'Muse Spark 1.3',
+  minimax_m3: 'MiniMax M3',
+  deepseek_v4_flash: 'DeepSeek V4 Flash',
+  deepseek_v4_flash_vision: 'DeepSeek V4 Flash Vision',
+  deepseek_v4_pro: 'DeepSeek V4 Pro',
+  kimi_k3: 'Kimi K3',
+  grok_4_6: 'Grok 4.6',
+} as const;
+
 export const MODEL_VENDOR_FAMILIES = [
   'openai',
   'anthropic',
@@ -221,6 +242,18 @@ export const WORKLOAD_TIERS = [
   'architecture',
 ] as const;
 export type WorkloadTier = typeof WORKLOAD_TIERS[number];
+
+/** Owner-facing row descriptions; routing still comes exclusively from DELEGATION_MATRIX. */
+export const WORKLOAD_TIER_DESCRIPTIONS: Readonly<Record<WorkloadTier, string>> = {
+  simple: 'Automation, simple fixes, and chores; low temperature and low complexity.',
+  straightforward:
+    'Straightforward implementations and features; medium temperature and medium complexity.',
+  feature:
+    'Workhorse for real implementations, features, fixes, and long-running work; low temperature and medium-high complexity.',
+  complex: 'Complex implementations, fixes, and features; medium temperature and high complexity.',
+  architecture:
+    'Architecture-grade groundwork, RFCs, and explicitly escalated work; highest complexity.',
+} as const;
 
 export const PRIVILEGED_WORKLOAD_TIERS = ['complex', 'architecture'] as const;
 export type PrivilegedWorkloadTier = typeof PRIVILEGED_WORKLOAD_TIERS[number];

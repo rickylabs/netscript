@@ -5,6 +5,12 @@ machine authority is `../../tools/agentic/runtime/delegation-matrix.ts`; the act
 `../../tools/agentic/runtime/routing-policy.ts`. Earlier named lanes are persisted-state vocabulary
 only and must not be selected for new work.
 
+Inspect that authority through `deno task agentic:matrix`. Use `--tier <tier>` for one row,
+`--tier <tier> --plan-evaluator|--impl-evaluator` for direct evaluator lookup, `--role
+deep-research` for that dedicated role, `--fallback-of <model>` for every context-sensitive
+fallback, and `--json` for automation. Do not reconstruct the matrix with `sed`/`grep`/`awk`; the
+built-in renderer includes the Deep Research default and fallback columns.
+
 Model strings live only in `../../tools/agentic/config/models.ts`. Subscription limits live only in
 `../../tools/agentic/config/subscriptions.ts`. Change those sources and their tests first; the
 parity gate will identify stale prose here.

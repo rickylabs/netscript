@@ -43,7 +43,9 @@ ad-hoc shell orchestration:
 
 - **Routing is data, not prose.** Select every lane's provider/model/effort from
   `.llm/harness/workflow/lane-policy.md`; its machine bindings live in
-  `.llm/tools/agentic/runtime/routing-policy.ts`. Do not restate or invent model routes.
+  `.llm/tools/agentic/runtime/routing-policy.ts`. Inspect the live matrix with
+  `deno task agentic:matrix` and its row, evaluator, fallback, or JSON filters; do not shell-scrape
+  the TypeScript, restate routes, or invent model fallbacks.
 - **Volatile values have one home.** Model ids, tool versions, and endpoints live only in
   `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`); a guard test fails the
   suite if they are hardcoded elsewhere.

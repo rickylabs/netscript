@@ -95,6 +95,7 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | `agentic:opencode-web`              | `opencode-web.ts`                         | host OpenCode's browser UI; loopback default, password required for LAN/mDNS exposure              |
 | `agentic:runtime`                   | `runtime/cli/agentic-runtime.ts`          | desired-state controller: `doctor` / `status` / `repair codex-remote` (inspect-first; `--dry-run`) |
 | `agentic:routing-state`             | `runtime/cli/routing-state.ts`            | read-only view of persisted quota-fallback routing state                                           |
+| `agentic:matrix`                    | `runtime/cli/delegation-matrix-table.ts`  | render/query the typed model matrix by tier, role, fallback model, or structured JSON              |
 | `agentic:antigravity-evidence`      | `runtime/cli/antigravity-evidence-cli.ts` | run/aggregate bounded Antigravity evidence-lane probes                                             |
 | `agentic:provider-canary`           | `runtime/cli/provider-canary.ts`          | statically validate every OpenRouter preset; `--live` opts into one bounded provider turn          |
 | `agentic:claude-openrouter`         | `claude/openrouter-run.ts`                | run the formal bounded Claude/OpenRouter print-turn transport                                      |

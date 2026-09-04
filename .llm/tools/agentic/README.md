@@ -386,6 +386,24 @@ transitions — no credentials, prompts, or account identity. Fallback and resto
 decisions only_, and only at an idle turn or session boundary; an active/critical slice blocks. This
 command is strictly read-only.
 
+### `runtime/cli/delegation-matrix-table.ts` — routing matrix, readable
+
+Render the typed routing authority without shell-scraping its TypeScript source:
+
+```console
+$ deno task agentic:matrix
+$ deno task agentic:matrix -- --tier standard
+$ deno task agentic:matrix -- --tier feature --plan-evaluator
+$ deno task agentic:matrix -- --tier feature --impl-evaluator
+$ deno task agentic:matrix -- --fallback-of astra
+$ deno task agentic:matrix -- --json
+```
+
+The full view separates default and fallback columns for implementation, planning, PLAN-EVAL,
+IMPL-EVAL, vision, documentation, and Deep Research, followed by evaluation policies, coordinator
+routes, and CLI/provider precedence. Focused queries preserve the same typed source; fallback
+queries list every matching context because a model has no context-free fallback.
+
 ### `runtime/cli/provider-canary.ts` and `rollout-canary-cli.ts` — prove before you fan out
 
 `provider-canary.ts` runs one bounded, read-only probe of a provider/model/effort route and reports
@@ -709,7 +727,7 @@ again outside `config/`.
 | To change a…                                               | Edit                                                          | Notes                                                                                                                                                                                            |
 | ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Model id**                                               | `config/models.ts`                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
-| **Routing binding** (tier + role → logical model + effort) | `runtime/delegation-matrix.ts`                                | The matrix authority rendered by `.llm/harness/workflow/lane-policy.md`; concrete ids remain in `config/models.ts`.                                                                              |
+| **Routing binding** (tier + role → logical model + effort) | `runtime/delegation-matrix.ts`                                | Inspect with `deno task agentic:matrix`; the command renders the authority without parsing source. Concrete ids remain in `config/models.ts`.                                                    |
 | **Tool version**                                           | `config/versions.ts`                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
 | **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
 | **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
