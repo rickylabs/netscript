@@ -1,771 +1,209 @@
-/** Pure policy data and guards for quota fallback route selection. */
+/** Active route resolution derived from the owner-ratified delegation matrix. */
 
-import type { RouteIdentity, SessionIdentity } from './contract.ts';
+import { OPENCODE_TOOL } from '../config/versions.ts';
+import type {
+  AgentKind,
+  Effort,
+  ProviderKind,
+  RouteIdentity,
+  SessionIdentity,
+} from './contract.ts';
 import {
-  MODEL_IDS,
-  OPEN_EVALUATOR_MODEL_IDS,
-  OPENCODE_MODEL_IDS,
-  OPENROUTER_MODEL_IDS,
-} from '../config/models.ts';
-import { type ActiveOpenRouterPresetId, OPENROUTER_PRESETS } from './provider-profiles.ts';
-
-export const MODEL_FAMILIES = ['anthropic', 'openai', 'google', 'open', 'other'] as const;
-export type ModelFamily = typeof MODEL_FAMILIES[number];
-
-export const ROUTING_LANE_PURPOSES = [
-  'orchestration',
-  'implementation',
-  'analysis',
-  'design',
-  'documentation',
-  'claude_workflow',
-  'research_extraction',
-  'evaluation',
-  'docs_audit',
-  'docs_polish',
-] as const;
-export type RoutingLanePurpose = typeof ROUTING_LANE_PURPOSES[number];
-
-export const ROUTING_LANES = [
-  'light_implementation',
-  'normal_implementation',
-  'complex_implementation',
-  'fast_iteration',
-  'deep_analysis',
-  'planning_decisions',
-  'major_ui_ux_design',
-  'major_ui_ux_adversarial_review',
-  'adversarial_design_eval',
-  'documentation_review',
-  'documentation_authoring',
-  'docs_audit',
-  'docs_polish',
-  'chore_code',
-  'claude_workflow',
-  'research_extraction',
-  'formal_plan_evaluation',
-  'formal_impl_evaluation',
-  'review_claude',
-  'review_codex_light',
-  'review_codex',
-  'review_codex_complex',
-  'review_codex_fast',
-] as const;
-export type RoutingLane = typeof ROUTING_LANES[number];
-
-export const SUBSCRIPTION_STATES = ['included', 'outside_plan'] as const;
-export type SubscriptionState = typeof SUBSCRIPTION_STATES[number];
+  COORDINATOR_MATRIX,
+  type CoordinatorTier,
+  DELEGATION_MATRIX,
+  type DelegationRole,
+  type LegacyRoutingLane,
+  type LogicalModelId,
+  MODEL_CATALOG,
+  MODEL_TRANSPORT_PRIORITY,
+  modelFamily,
+  type ModelRoute,
+  type ModelTransport,
+  rejectLegacyLaneForNewSelection,
+  WORKLOAD_TIERS,
+  type WorkloadTier,
+} from './delegation-matrix.ts';
 
 export interface CanonicalRoutePolicy {
-  readonly lane: RoutingLane;
-  readonly purpose: RoutingLanePurpose;
-  readonly agent: RouteIdentity['agent'];
-  readonly provider: RouteIdentity['provider'];
-  readonly model: string;
-  readonly effort: RouteIdentity['effort'];
-  readonly profileId?: RouteIdentity['profileId'];
-  readonly presetId?: ActiveOpenRouterPresetId;
-  readonly condition?: string;
-  readonly effectiveFrom?: string;
-  readonly effectiveThrough?: string;
-  readonly subscriptionState?: SubscriptionState;
-  readonly requiresExplicitApproval?: boolean;
-  readonly evaluatesFamily?: ModelFamily;
-  readonly evaluatorModelPolicy?: 'open_only';
-  /**
-   * Declared, machine-readable effort escalations for this route. Each entry
-   * names the condition under which the launcher may run the SAME route at a
-   * different effort (e.g. docs_audit `large_changeset` → high). Escalation
-   * never changes agent/provider/model — only effort — and any condition not
-   * declared here is rejected by {@link resolveCanonicalRouteEffort}.
-   */
-  readonly effortEscalations?: readonly EffortEscalation[];
-}
-
-export interface EffortEscalation {
-  readonly condition: string;
-  readonly effort: RouteIdentity['effort'];
-}
-
-const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
-const FORMAL_PLAN_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-8-flash'];
-const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-glm-5-3-flash'];
-
-/** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
-export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
-  {
-    lane: 'light_implementation',
-    purpose: 'implementation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'low',
-    condition: 'small_scoped_slices',
-  },
-  {
-    lane: 'normal_implementation',
-    purpose: 'implementation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'medium',
-  },
-  {
-    lane: 'complex_implementation',
-    purpose: 'implementation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'high',
-    condition: 'large_or_cross_cutting_slices',
-  },
-  {
-    lane: 'fast_iteration',
-    purpose: 'implementation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexLuna,
-    effort: 'max',
-  },
-  {
-    lane: 'deep_analysis',
-    purpose: 'analysis',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'medium',
-    subscriptionState: 'included',
-    condition: 'default_complex_decision_subagent',
-  },
-  {
-    lane: 'deep_analysis',
-    purpose: 'analysis',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'high',
-    condition: 'fallback_on_fable_token_limit',
-  },
-  {
-    lane: 'planning_decisions',
-    purpose: 'orchestration',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'high',
-    subscriptionState: 'included',
-    condition: 'default_orchestrator',
-  },
-  {
-    lane: 'planning_decisions',
-    purpose: 'orchestration',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'high',
-    condition: 'fallback_on_opus_token_limit',
-  },
-  {
-    lane: 'major_ui_ux_design',
-    purpose: 'design',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: MAJOR_UI_UX_PRESET.profileId,
-    presetId: MAJOR_UI_UX_PRESET.id,
-    model: MAJOR_UI_UX_PRESET.model,
-    effort: MAJOR_UI_UX_PRESET.effort,
-    condition: 'lead_route_for_major_ui_ux_work',
-  },
-  {
-    lane: 'major_ui_ux_adversarial_review',
-    purpose: 'design',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: MAJOR_UI_UX_PRESET.profileId,
-    presetId: MAJOR_UI_UX_PRESET.id,
-    model: MAJOR_UI_UX_PRESET.model,
-    effort: MAJOR_UI_UX_PRESET.effort,
-    condition: 'required_before_merge_when_glm_not_lead',
-  },
-  {
-    lane: 'adversarial_design_eval',
-    purpose: 'evaluation',
-    agent: 'opencode',
-    provider: 'openrouter',
-    model: OPENCODE_MODEL_IDS.visionEval,
-    effort: 'high',
-    condition: 'vision_evidence_complements_required_glm_design_review',
-  },
-  {
-    lane: 'documentation_review',
-    purpose: 'documentation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.sonnet,
-    effort: 'high',
-    subscriptionState: 'included',
-    condition: 'docs_cleanup_easy_chores',
-  },
-  {
-    lane: 'documentation_review',
-    purpose: 'documentation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexLuna,
-    effort: 'high',
-    condition: 'fallback_on_sonnet_token_limit',
-  },
-  {
-    lane: 'documentation_authoring',
-    purpose: 'documentation',
-    agent: 'antigravity',
-    provider: 'google',
-    model: MODEL_IDS.antigravityDocs,
-    effort: 'low',
-    condition: 'documentation_generation',
-  },
-  // --- Single-pass audit of a Claude-generated docs changeset ---------------------
-  // Owner-revised 2026-07-17. The whole changeset is audited in ONE pass by
-  // Codex · Sol · medium — OPPOSITE-FAMILY to the Claude generators, which
-  // restores family diversity for generated-docs accuracy. Use `high` for large
-  // changesets (auditor discretion, stated in workflow/doc-audit.md). Every accuracy
-  // gate is executed by the auditor (commands run, `deno doc` inspected) — verdicts
-  // from evidence, never from the generator's claims. There is NO cross-family
-  // fallback: the audit is defined by its opposite-family transport, so a fallback
-  // would defeat the lane. Profile: workflow/doc-audit.md.
-  {
-    lane: 'docs_audit',
-    purpose: 'docs_audit',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'medium',
-    condition: 'single_pass_opposite_family_audit_of_generated_docs_changeset',
-    effortEscalations: [{ condition: 'large_changeset', effort: 'high' }],
-  },
-  // --- Final edit-only prose-polish pass, after audit + fixes land -----------------
-  // Owner-revised 2026-07-17. Runs LAST in the docs pipeline: Claude · Fable 5 ·
-  // medium edits prose in place for voice/flow/precision. It must not re-author
-  // documents from scratch or change technical claims — any accuracy doubt returns
-  // to the docs_audit lane. Fallback chain (depth 2): token-limit → Opus 5 ·
-  // xhigh (Claude-family); and only if NO Claude-agent surface is available at all,
-  // GLM 5.2 · xhigh over the `claude-openrouter` transport the design lanes use.
-  // GLM is a polish-fallback-of-last-resort ONLY here — this does not widen GLM
-  // beyond its design scope elsewhere. Profile: workflow/doc-audit.md.
-  {
-    lane: 'docs_polish',
-    purpose: 'docs_polish',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'medium',
-    subscriptionState: 'included',
-    condition: 'edit_only_prose_polish_after_audit',
-  },
-  {
-    lane: 'docs_polish',
-    purpose: 'docs_polish',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'xhigh',
-    condition: 'fallback_on_fable_token_limit',
-  },
-  {
-    lane: 'docs_polish',
-    purpose: 'docs_polish',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: MAJOR_UI_UX_PRESET.profileId,
-    presetId: MAJOR_UI_UX_PRESET.id,
-    model: OPENROUTER_MODEL_IDS.designGlm,
-    effort: 'xhigh',
-    condition: 'fallback_no_claude_surface',
-  },
-  {
-    lane: 'chore_code',
-    purpose: 'implementation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'medium',
-    subscriptionState: 'included',
-    condition: 'delegated_code_chores',
-  },
-  {
-    lane: 'chore_code',
-    purpose: 'implementation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexLuna,
-    effort: 'max',
-    condition: 'fallback_on_opus_token_limit',
-  },
-  {
-    lane: 'claude_workflow',
-    purpose: 'claude_workflow',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'low',
-  },
-  {
-    lane: 'research_extraction',
-    purpose: 'research_extraction',
-    agent: 'antigravity',
-    provider: 'google',
-    model: MODEL_IDS.antigravityDocs,
-    effort: 'low',
-  },
-  {
-    lane: 'formal_plan_evaluation',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'medium',
-    subscriptionState: 'included',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'formal_plan_evaluation',
-    purpose: 'evaluation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'high',
-    evaluatesFamily: 'anthropic',
-  },
-  {
-    lane: 'formal_plan_evaluation',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: FORMAL_PLAN_EVALUATOR_PRESET.profileId,
-    presetId: FORMAL_PLAN_EVALUATOR_PRESET.id,
-    model: FORMAL_PLAN_EVALUATOR_PRESET.model,
-    effort: FORMAL_PLAN_EVALUATOR_PRESET.effort,
-    evaluatorModelPolicy: 'open_only',
-    condition: 'open_model_route',
-  },
-  {
-    lane: 'formal_plan_evaluation',
-    purpose: 'evaluation',
-    agent: 'antigravity',
-    provider: 'google',
-    model: MODEL_IDS.antigravityDocs,
-    effort: 'high',
-    condition: 'fallback_on_openrouter_limit',
-  },
-  {
-    lane: 'formal_impl_evaluation',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'medium',
-    subscriptionState: 'included',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'formal_impl_evaluation',
-    purpose: 'evaluation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'xhigh',
-    evaluatesFamily: 'anthropic',
-  },
-  {
-    lane: 'formal_impl_evaluation',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: FORMAL_IMPL_EVALUATOR_PRESET.profileId,
-    presetId: FORMAL_IMPL_EVALUATOR_PRESET.id,
-    model: FORMAL_IMPL_EVALUATOR_PRESET.model,
-    effort: FORMAL_IMPL_EVALUATOR_PRESET.effort,
-    evaluatorModelPolicy: 'open_only',
-    condition: 'open_model_route',
-  },
-  {
-    lane: 'formal_impl_evaluation',
-    purpose: 'evaluation',
-    agent: 'antigravity',
-    provider: 'google',
-    model: MODEL_IDS.antigravityDocs,
-    effort: 'high',
-    condition: 'fallback_on_openrouter_limit',
-  },
-  {
-    lane: 'review_claude',
-    purpose: 'evaluation',
-    agent: 'codex',
-    provider: 'openai',
-    model: MODEL_IDS.codexSol,
-    effort: 'xhigh',
-    evaluatesFamily: 'anthropic',
-  },
-  // --- Adversarial review of Codex/OpenAI-authored work, effort-paired ------------
-  // Owner-ratified 2026-07-16, on the PR #784 doctrine: Fable 5 is back on the
-  // Anthropic plan, in-plan and auto-selectable — the prior Opus substitution is
-  // retired for these review lanes. Fable is reserved for medium+ pairings; every
-  // fallback stays Claude-family so opposite-family review is never traded away.
-  {
-    lane: 'review_codex_light',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'high',
-    condition: 'pairs_with_light_implementation',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex_light',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.sonnet,
-    effort: 'high',
-    condition: 'token_limit_fallback',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'low',
-    subscriptionState: 'included',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'low',
-    condition: 'token_limit_fallback',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex_complex',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'medium',
-    subscriptionState: 'included',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex_complex',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'medium',
-    condition: 'token_limit_fallback',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex_fast',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.opus,
-    effort: 'medium',
-    condition: 'pairs_with_fast_iteration',
-    evaluatesFamily: 'openai',
-  },
-  {
-    lane: 'review_codex_fast',
-    purpose: 'evaluation',
-    agent: 'claude',
-    provider: 'anthropic',
-    model: MODEL_IDS.sonnet,
-    effort: 'high',
-    condition: 'token_limit_fallback',
-    evaluatesFamily: 'openai',
-  },
-] as const;
-
-export interface EvaluatorAssignment {
-  readonly authorFamily: Exclude<ModelFamily, 'other'>;
-  readonly generatorSession: SessionIdentity;
-  readonly evaluatorSession: SessionIdentity;
-}
-
-export interface FormalEvaluatorAssignment {
-  readonly phase: 'plan' | 'impl';
-  readonly authorFamily: Exclude<ModelFamily, 'open' | 'other'>;
-  readonly generatorSession: SessionIdentity;
-  readonly evaluatorSession: SessionIdentity;
-  readonly route?: CanonicalRoutePolicy;
-  /** @deprecated Retained for input compatibility; open IMPL routing no longer splits by size. */
-  readonly complexity?: 'small' | 'complex';
-  /**
-   * Explicit escalation/fallback. Absent means the native opposite-family route.
-   * OpenRouter is permitted only as a third opinion or when the native opposite
-   * family is quota-blocked; AGY is the final fallback when OpenRouter is limited.
-   */
-  readonly fallbackReason?: 'third_opinion' | 'native_quota_limit' | 'openrouter_limit';
-}
-
-function sessionFamily(session: SessionIdentity): ModelFamily {
-  if (session.agent === 'claude') return 'anthropic';
-  if (session.agent === 'codex') return 'openai';
-  return 'google';
-}
-
-/** Resolves an ordinary opposite-family review while rejecting self-certification. */
-export function resolveCanonicalOrdinaryReviewRoute(
-  assignment: EvaluatorAssignment,
-  at: Date,
-): CanonicalRoutePolicy {
-  if (assignment.generatorSession.sessionId === assignment.evaluatorSession.sessionId) {
-    throw new Error('generator and evaluator sessions must differ');
-  }
-  if (sessionFamily(assignment.generatorSession) !== assignment.authorFamily) {
-    throw new Error('generator session family must match the authored slice');
-  }
-  const evaluatorFamily = sessionFamily(assignment.evaluatorSession);
-  if (evaluatorFamily === assignment.authorFamily) {
-    throw new Error('evaluator must use the opposite model family');
-  }
-  const lane = assignment.authorFamily === 'anthropic'
-    ? 'review_claude'
-    : assignment.authorFamily === 'openai'
-    ? 'review_codex'
-    : undefined;
-  if (!lane) {
-    throw new Error(
-      `no canonical evaluator route for ${assignment.authorFamily} at ${
-        at.toISOString().slice(0, 10)
-      }`,
-    );
-  }
-  const route = resolveCanonicalRoute(lane, at);
-  if (route.agent !== assignment.evaluatorSession.agent) {
-    throw new Error(`canonical evaluator route ${lane} does not match the evaluator session`);
-  }
-  return route;
-}
-
-/** Resolves native opposite-family formal evaluation and its explicit fallbacks. */
-export function resolveCanonicalFormalEvaluatorRoute(
-  assignment: FormalEvaluatorAssignment,
-  _at: Date,
-): CanonicalRoutePolicy {
-  if (assignment.generatorSession.sessionId === assignment.evaluatorSession.sessionId) {
-    throw new Error('generator and evaluator sessions must differ');
-  }
-  if (sessionFamily(assignment.generatorSession) !== assignment.authorFamily) {
-    throw new Error('generator session family must match the authored slice');
-  }
-  const lane = assignment.phase === 'plan' ? 'formal_plan_evaluation' : 'formal_impl_evaluation';
-  const expectedPreset = assignment.phase === 'plan'
-    ? FORMAL_PLAN_EVALUATOR_PRESET
-    : FORMAL_IMPL_EVALUATOR_PRESET;
-  const expectedOpenRouterCondition = 'open_model_route';
-  const openRouterEscalation = assignment.fallbackReason === 'third_opinion' ||
-    assignment.fallbackReason === 'native_quota_limit';
-  const agyFallback = assignment.fallbackReason === 'openrouter_limit';
-  const route = assignment.route ?? CANONICAL_ROUTE_POLICY.find((entry) => {
-    if (entry.lane !== lane) return false;
-    if (agyFallback) return entry.condition === 'fallback_on_openrouter_limit';
-    if (openRouterEscalation) return entry.condition === expectedOpenRouterCondition;
-    return entry.evaluatesFamily === assignment.authorFamily && !entry.condition;
-  });
-  if (!route) throw new Error(`no canonical formal ${assignment.phase} evaluator route`);
-  if (agyFallback) {
-    if (
-      route.lane !== lane || route.purpose !== 'evaluation' ||
-      route.condition !== 'fallback_on_openrouter_limit' || route.agent !== 'antigravity' ||
-      route.provider !== 'google' || route.model !== MODEL_IDS.antigravityDocs ||
-      route.effort !== 'high' || assignment.evaluatorSession.agent !== 'antigravity'
-    ) {
-      throw new Error(`formal ${assignment.phase} evaluator requires the canonical AGY fallback`);
-    }
-    return route;
-  }
-  if (!openRouterEscalation) {
-    if (
-      route.lane !== lane || route.purpose !== 'evaluation' || route.condition !== undefined ||
-      route.evaluatesFamily !== assignment.authorFamily ||
-      route.agent !== assignment.evaluatorSession.agent ||
-      !((route.provider === 'anthropic' && route.agent === 'claude') ||
-        (route.provider === 'openai' && route.agent === 'codex')) ||
-      sessionFamily(assignment.evaluatorSession) === assignment.authorFamily
-    ) {
-      throw new Error(
-        `formal ${assignment.phase} evaluator requires the native opposite-family route`,
-      );
-    }
-    return route;
-  }
-  const preset = route.presetId ? OPENROUTER_PRESETS[route.presetId] : undefined;
-  if (
-    route.purpose !== 'evaluation' || route.agent !== 'claude' ||
-    route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
-    route.evaluatorModelPolicy !== 'open_only' || route.lane !== lane ||
-    route.condition !== expectedOpenRouterCondition ||
-    route.presetId !== expectedPreset.id || route.model !== expectedPreset.model
-  ) {
-    throw new Error(
-      `formal ${assignment.phase} evaluator requires its canonical OpenRouter escalation route`,
-    );
-  }
-  if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model)) {
-    throw new Error('formal evaluator model is not approved for open-only evaluation');
-  }
-  if (
-    !preset || preset.purpose !== 'evaluation' || preset.model !== route.model ||
-    preset.agenticTurn !== 'supported' || preset.reasoningTrace !== 'present'
-  ) {
-    throw new Error(
-      'formal evaluator requires a supported Claude OpenRouter evaluation preset with an approved open model',
-    );
-  }
-  return route;
-}
-
-/** Resolves dated routes without silently retaining an expired temporary override. */
-export function resolveCanonicalRoute(lane: RoutingLane, at: Date): CanonicalRoutePolicy {
-  const day = at.toISOString().slice(0, 10);
-  const matches = CANONICAL_ROUTE_POLICY.filter((route) =>
-    route.lane === lane && (!route.effectiveFrom || day >= route.effectiveFrom) &&
-    (!route.effectiveThrough || day <= route.effectiveThrough)
-  );
-  const primary = matches.find((route) =>
-    !route.condition?.startsWith('fallback') &&
-    route.condition !== 'exceptional_paid_on_demand' &&
-    route.condition !== 'token_limit_fallback'
-  );
-  if (!primary) throw new Error(`no canonical route for ${lane} at ${day}`);
-  return primary;
-}
-
-/**
- * Resolves the effort a launcher may use for a canonical route. With no
- * escalation condition, the route's declared effort is returned. With one, the
- * condition must be declared in the route's `effortEscalations` — undeclared
- * escalations throw, so effort discretion lives in policy data, never in prose.
- */
-export function resolveCanonicalRouteEffort(
-  route: CanonicalRoutePolicy,
-  escalationCondition?: string,
-): RouteIdentity['effort'] {
-  if (!escalationCondition) return route.effort;
-  const escalation = route.effortEscalations?.find((entry) =>
-    entry.condition === escalationCondition
-  );
-  if (!escalation) {
-    throw new Error(
-      `route ${route.lane} declares no effort escalation for ${escalationCondition}`,
-    );
-  }
-  return escalation.effort;
-}
-
-export interface FallbackCandidate {
-  readonly route: RouteIdentity;
-  readonly family: ModelFamily;
-  readonly purpose: RoutingLanePurpose;
-  readonly available: boolean;
-  readonly subscriptionState: SubscriptionState;
-  readonly requiresExplicitApproval: boolean;
-  readonly higherEffortEscalation: boolean;
+  readonly tier: WorkloadTier;
+  readonly role: DelegationRole;
   readonly priority: number;
-  readonly requiresCodexQuotaExhaustion?: boolean;
+  readonly model: LogicalModelId;
+  readonly family: ReturnType<typeof modelFamily>;
+  readonly effort: ModelRoute['effort'];
 }
 
-export interface RoutingPolicyContext {
-  readonly purpose: RoutingLanePurpose;
-  readonly session: SessionIdentity;
-  readonly authorFamily?: ModelFamily;
-  readonly explicitPaidApproval: boolean;
-  readonly explicitEffortEscalation: boolean;
-  readonly fallbackDepth: number;
-  readonly maxFallbackDepth: number;
-  readonly failureCode?: 'quota_exhausted' | 'rate_limited' | 'provider_unavailable';
+/** Human/inspection view; active launch resolution reads the matrix directly. */
+export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = WORKLOAD_TIERS.flatMap(
+  (tier) => {
+    const cell = DELEGATION_MATRIX[tier];
+    return (Object.keys(cell) as (keyof typeof cell)[]).flatMap((role) => {
+      if (!Array.isArray(cell[role])) return [];
+      return (cell[role] as readonly ModelRoute[]).map((candidate, priority) => ({
+        tier,
+        role: role as DelegationRole,
+        priority,
+        model: candidate.model,
+        family: modelFamily(candidate.model),
+        effort: candidate.effort,
+      }));
+    });
+  },
+);
+
+export interface CanonicalCoordinatorPolicy {
+  readonly tier: CoordinatorTier;
+  readonly priority: number;
+  readonly model: LogicalModelId;
+  readonly family: ReturnType<typeof modelFamily>;
+  readonly effort: ModelRoute['effort'];
 }
 
-export type FallbackSelection =
-  | Readonly<{
-    status: 'selected';
-    candidate: FallbackCandidate;
-    notificationRequired: boolean;
-  }>
-  | Readonly<{
-    status: 'blocked';
-    reason:
-      | 'turn_boundary_required'
-      | 'fallback_depth_exceeded'
-      | 'opposite_family_unavailable'
-      | 'approval_required'
-      | 'route_unavailable';
-  }>;
+export const CANONICAL_COORDINATOR_POLICY: readonly CanonicalCoordinatorPolicy[] = Object.entries(
+  COORDINATOR_MATRIX,
+).flatMap(([tier, routes]) =>
+  routes.map((candidate, priority) => ({
+    tier: tier as CoordinatorTier,
+    priority,
+    model: candidate.model,
+    family: modelFamily(candidate.model),
+    effort: candidate.effort,
+  }))
+);
 
-function candidateAllowed(
-  candidate: FallbackCandidate,
-  context: RoutingPolicyContext,
-): boolean {
-  if (!candidate.available || candidate.purpose !== context.purpose) return false;
-  if (candidate.requiresCodexQuotaExhaustion && context.failureCode !== 'quota_exhausted') {
-    return false;
-  }
-  if (context.purpose === 'evaluation' && candidate.family === context.authorFamily) return false;
-  // The docs_audit lane is defined by its opposite-family transport (OpenAI
-  // auditing Claude-generated docs) and has NO cross-family fallback: fail closed
-  // on any candidate outside the OpenAI family rather than trade the invariant.
-  if (context.purpose === 'docs_audit' && candidate.family !== 'openai') return false;
-  if (
-    (candidate.subscriptionState === 'outside_plan' || candidate.requiresExplicitApproval) &&
-    !context.explicitPaidApproval
-  ) return false;
-  if (candidate.higherEffortEscalation && !context.explicitEffortEscalation) return false;
-  return true;
+export interface RouteAvailability {
+  readonly unavailableModels?: readonly LogicalModelId[];
+  readonly unavailableTransports?: readonly ModelTransport[];
 }
 
-/** Selects the first approved fallback without mutating route defaults or process state. */
-export function selectFallbackCandidate(
-  candidates: readonly FallbackCandidate[],
-  context: RoutingPolicyContext,
-): FallbackSelection {
-  if (context.session.boundary === 'active') {
-    return { status: 'blocked', reason: 'turn_boundary_required' };
-  }
-  if (context.fallbackDepth >= context.maxFallbackDepth) {
-    return { status: 'blocked', reason: 'fallback_depth_exceeded' };
-  }
-  const purposeCandidates = candidates.filter((candidate) =>
-    candidate.available && candidate.purpose === context.purpose
-  );
-  if (
-    context.purpose === 'evaluation' &&
-    !purposeCandidates.some((candidate) => candidate.family !== context.authorFamily)
-  ) return { status: 'blocked', reason: 'opposite_family_unavailable' };
+export interface WorkloadRouteRequest extends RouteAvailability {
+  readonly tier: WorkloadTier;
+  readonly role: DelegationRole;
+  readonly generatorModel?: LogicalModelId;
+  readonly worktree: string;
+  readonly mobileRequired?: boolean;
+}
 
-  const selected = purposeCandidates
-    .filter((candidate) => candidateAllowed(candidate, context))
-    .toSorted((left, right) => left.priority - right.priority)[0];
-  if (selected) {
+export interface CoordinatorRouteRequest extends RouteAvailability {
+  readonly tier: CoordinatorTier;
+  readonly worktree: string;
+  readonly mobileRequired?: boolean;
+}
+
+export interface ResolvedDelegationRoute extends RouteIdentity {
+  readonly logicalModel: LogicalModelId;
+  readonly family: ReturnType<typeof modelFamily>;
+  readonly transport: ModelTransport;
+  readonly requestedEffort: ModelRoute['effort'];
+}
+
+const TRANSPORT_AGENT: Readonly<Record<ModelTransport, AgentKind>> = {
+  claude: 'claude',
+  codex: 'codex',
+  agy: 'antigravity',
+  opencode_go: 'opencode',
+  ollama: 'opencode',
+  openrouter: 'opencode',
+};
+
+const TRANSPORT_PROVIDER: Readonly<Record<ModelTransport, ProviderKind>> = {
+  claude: 'anthropic',
+  codex: 'openai',
+  agy: 'google',
+  opencode_go: 'opencode_go',
+  ollama: 'ollama',
+  openrouter: 'openrouter',
+};
+
+function concreteEffort(effort: ModelRoute['effort']): Effort {
+  return effort === 'provider_default' ? OPENCODE_TOOL.defaultVariant : effort;
+}
+
+function resolveRouteChain(
+  candidates: readonly ModelRoute[],
+  request: RouteAvailability & {
+    readonly generatorModel?: LogicalModelId;
+    readonly worktree: string;
+    readonly mobileRequired?: boolean;
+  },
+): ResolvedDelegationRoute {
+  const unavailableModels = new Set(request.unavailableModels ?? []);
+  const unavailableTransports = new Set(request.unavailableTransports ?? []);
+  const generatorFamily = request.generatorModel ? modelFamily(request.generatorModel) : undefined;
+  for (const candidate of candidates) {
+    if (unavailableModels.has(candidate.model)) continue;
+    const definition = MODEL_CATALOG[candidate.model];
+    if (generatorFamily && definition.family === generatorFamily) continue;
+    const capability = definition.capabilities.toSorted((left, right) =>
+      MODEL_TRANSPORT_PRIORITY.indexOf(left.transport) -
+      MODEL_TRANSPORT_PRIORITY.indexOf(right.transport)
+    ).find((entry) => !unavailableTransports.has(entry.transport));
+    if (!capability) continue;
     return {
-      status: 'selected',
-      candidate: selected,
-      notificationRequired: selected.route.mobileRequired !== true,
+      agent: TRANSPORT_AGENT[capability.transport],
+      provider: TRANSPORT_PROVIDER[capability.transport],
+      model: capability.model,
+      effort: concreteEffort(candidate.effort),
+      worktree: request.worktree,
+      mobileRequired: request.mobileRequired ?? false,
+      logicalModel: candidate.model,
+      family: definition.family,
+      transport: capability.transport,
+      requestedEffort: candidate.effort,
     };
   }
-  const approvalBlocked = purposeCandidates.some((candidate) =>
-    candidate.subscriptionState === 'outside_plan' || candidate.requiresExplicitApproval ||
-    candidate.higherEffortEscalation
-  );
-  return {
-    status: 'blocked',
-    reason: approvalBlocked ? 'approval_required' : 'route_unavailable',
-  };
+  const pairing = generatorFamily ? ` opposite ${generatorFamily}` : '';
+  throw new Error(`no available${pairing} route in the declared fallback chain`);
 }
+
+/** Resolves a workload role without consulting the retired flat lane table. */
+export function resolveWorkloadRoute(request: WorkloadRouteRequest): ResolvedDelegationRoute {
+  const cell = DELEGATION_MATRIX[request.tier];
+  const candidates = cell[request.role];
+  if (candidates.length === 0) {
+    throw new Error(`${request.tier}/${request.role} is not applicable`);
+  }
+  const evaluation = request.role === 'plan_evaluation' ||
+    request.role === 'implementation_evaluation';
+  if (evaluation && !request.generatorModel) {
+    throw new Error(`${request.role} requires the selected generator model`);
+  }
+  return resolveRouteChain(candidates, request);
+}
+
+/** Resolves an orchestrator/coordinator route from its dedicated matrix. */
+export function resolveCoordinatorRoute(
+  request: CoordinatorRouteRequest,
+): ResolvedDelegationRoute {
+  return resolveRouteChain(COORDINATOR_MATRIX[request.tier], request);
+}
+
+/** Evaluators must be both a different session and a different vendor family. */
+export function assertEvaluatorIndependence(
+  generator: SessionIdentity & { readonly model: LogicalModelId },
+  evaluator: SessionIdentity & { readonly model: LogicalModelId },
+): void {
+  if (generator.sessionId === evaluator.sessionId) {
+    throw new Error('generator and evaluator sessions must differ');
+  }
+  if (modelFamily(generator.model) === modelFamily(evaluator.model)) {
+    throw new Error('generator and evaluator model families must differ');
+  }
+}
+
+/** Explicit new-selection boundary for persisted pre-revamp lane values. */
+export function resolveLegacyRouteForNewSelection(lane: LegacyRoutingLane): never {
+  return rejectLegacyLaneForNewSelection(lane);
+}
+
+export {
+  type CoordinatorTier,
+  DELEGATION_MATRIX,
+  type DelegationRole,
+  type LegacyRoutingLane,
+  type LogicalModelId,
+  MODEL_CATALOG,
+  type ModelTransport,
+  type WorkloadTier,
+};

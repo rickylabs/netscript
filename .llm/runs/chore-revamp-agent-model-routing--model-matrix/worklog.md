@@ -63,6 +63,7 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T16:24Z    | design    | bounded repair | Locked vendor-level family composition, exact per-tier evaluation limits, and fail-closed legacy-lane behavior.                                                          |
 | 2026-09-04T16:29Z    | PLAN-EVAL | cycle 2        | Same OpenCode session `ses_f9338f842ffeT0E2CjAp7yu3KZ`, Grok 4.6 xhigh, returned `PASS` at repair head `372409ab6`.                                                      |
 | 2026-09-04T16:38Z    | S1        | implemented    | Added volatile model slugs, vendor-family catalog, five workload tiers, four coordinator tiers, exact eval policies, fallback composition, and fail-closed legacy lanes. |
+| 2026-09-04T16:49Z    | S2        | implemented    | Replaced the flat resolver with matrix-derived workload/coordinator resolution, provider precedence, selected-family skipping, and explicit legacy rejection.            |
 
 ## Gate Results
 
@@ -74,3 +75,5 @@ tests and documentation parity gate identify every required downstream update.
 | IMPL-EVAL            | NOT_RUN   | required after implementation                                                    |
 | S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                 |
 | S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                       |
+| S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                          |
+| S2 tests             | PASS      | 28 passed across matrix, resolver, state rendering, and contract                 |

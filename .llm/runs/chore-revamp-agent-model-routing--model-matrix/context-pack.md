@@ -15,8 +15,8 @@
 Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`. The complete owner
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
 have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they were repaired at
-`372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is implemented and
-locally green, pending its atomic commit/push.
+`372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is committed at
+`605ae0e02`; S2's matrix-derived resolver is locally green and pending its atomic commit/push.
 
 ## Accepted owner decisions
 
@@ -51,6 +51,9 @@ locally green, pending its atomic commit/push.
 | `.llm/tools/agentic/config/models.ts`                        | modified     | current provider model slugs only                      |
 | `.llm/tools/agentic/runtime/delegation-matrix.ts`            | new          | authoritative matrix and family composition            |
 | `.llm/tools/agentic/runtime/delegation-matrix_test.ts`       | new          | exact owner-matrix and invariant coverage              |
+| `.llm/tools/agentic/runtime/routing-policy.ts`               | rewritten    | matrix-derived active route resolution                 |
+| `.llm/tools/agentic/runtime/contract.ts`                     | modified     | distinct Go and Ollama provider identities             |
+| `.llm/tools/agentic/runtime/cli/routing-state.ts`            | modified     | new matrix evaluator inspection output                 |
 
 ## Gates
 

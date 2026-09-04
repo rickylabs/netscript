@@ -3,42 +3,31 @@ import {
   renderCanonicalEvaluatorRoutes,
   renderRoutingStateHuman,
 } from './routing-state.ts';
-import { MODEL_IDS, OPENCODE_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../../config/models.ts';
-import { assertEquals as equal } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 
 Deno.test('routing state human edge is finite for an empty machine-local store', async () => {
   const home = await Deno.makeTempDir();
   try {
-    equal(await readRoutingStates(home), []);
-    equal(renderRoutingStateHuman([]), 'No persisted routing transitions.');
+    assertEquals(await readRoutingStates(home), []);
+    assertEquals(renderRoutingStateHuman([]), 'No persisted routing transitions.');
   } finally {
     await Deno.remove(home, { recursive: true });
   }
 });
 
-Deno.test('routing state human edge renders canonical evaluator lanes', () => {
-  equal(
-    renderCanonicalEvaluatorRoutes(),
-    [
-      'Canonical evaluator routes:',
-      `  adversarial_design_eval: condition=vision_evidence_complements_required_glm_design_review route=opencode/openrouter/${OPENCODE_MODEL_IDS.visionEval} effort=high`,
-      `  formal_plan_evaluation: evaluates=openai route=claude/anthropic/${MODEL_IDS.fable} effort=medium`,
-      `  formal_plan_evaluation: evaluates=anthropic route=codex/openai/${MODEL_IDS.codexSol} effort=high`,
-      `  formal_plan_evaluation: policy=open_only route=claude/openrouter/${OPENROUTER_MODEL_IDS.planEvaluator} effort=max`,
-      `  formal_plan_evaluation: condition=fallback_on_openrouter_limit route=antigravity/google/${MODEL_IDS.antigravityDocs} effort=high`,
-      `  formal_impl_evaluation: evaluates=openai route=claude/anthropic/${MODEL_IDS.fable} effort=medium`,
-      `  formal_impl_evaluation: evaluates=anthropic route=codex/openai/${MODEL_IDS.codexSol} effort=xhigh`,
-      `  formal_impl_evaluation: policy=open_only route=claude/openrouter/${OPENROUTER_MODEL_IDS.implEvaluator} effort=max`,
-      `  formal_impl_evaluation: condition=fallback_on_openrouter_limit route=antigravity/google/${MODEL_IDS.antigravityDocs} effort=high`,
-      `  review_claude: evaluates=anthropic route=codex/openai/${MODEL_IDS.codexSol} effort=xhigh`,
-      `  review_codex_light: evaluates=openai route=claude/anthropic/${MODEL_IDS.opus} effort=high`,
-      `  review_codex_light: evaluates=openai route=claude/anthropic/${MODEL_IDS.sonnet} effort=high`,
-      `  review_codex: evaluates=openai route=claude/anthropic/${MODEL_IDS.fable} effort=low`,
-      `  review_codex: evaluates=openai route=claude/anthropic/${MODEL_IDS.opus} effort=low`,
-      `  review_codex_complex: evaluates=openai route=claude/anthropic/${MODEL_IDS.fable} effort=medium`,
-      `  review_codex_complex: evaluates=openai route=claude/anthropic/${MODEL_IDS.opus} effort=medium`,
-      `  review_codex_fast: evaluates=openai route=claude/anthropic/${MODEL_IDS.opus} effort=medium`,
-      `  review_codex_fast: evaluates=openai route=claude/anthropic/${MODEL_IDS.sonnet} effort=high`,
-    ].join('\n'),
+Deno.test('routing state human edge renders evaluator routes derived from the new matrix', () => {
+  const rendered = renderCanonicalEvaluatorRoutes();
+  assertStringIncludes(rendered, 'Canonical evaluator routes:');
+  assertStringIncludes(
+    rendered,
+    'straightforward/implementation_evaluation[0]: family=zhipu logical=glm_5_3_flash effort=provider_default',
+  );
+  assertStringIncludes(
+    rendered,
+    'feature/plan_evaluation[0]: family=zhipu logical=glm_5_3 effort=provider_default',
+  );
+  assertStringIncludes(
+    rendered,
+    'architecture/implementation_evaluation[0]: family=xai logical=grok_4_6 effort=xhigh',
   );
 });
