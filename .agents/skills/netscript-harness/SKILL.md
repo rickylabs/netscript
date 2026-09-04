@@ -13,10 +13,11 @@ This skill coordinates harness-mode runs. The authoritative harness docs live un
 this skill tells you what to load and in what order.
 
 Agent lanes and their model bindings are configuration, not dogma — the single source of truth is
-[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Three rules are hard:
+[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Four rules are hard:
 **generator-session ≠ evaluator-session**, **generator vendor family ≠ evaluator vendor family**,
-and the **slice review gate** (no implementation lane self-certifies). Workload tier, role, route,
-and fallbacks are recorded in the run dir's `supervisor.md`/`drift.md`.
+the **slice review gate** (no implementation lane self-certifies), and **complex/architecture tier
+selection requires explicit owner or milestone-coordinator authority with a recorded rationale**.
+Workload tier, role, route, and fallbacks are recorded in the run dir's `supervisor.md`/`drift.md`.
 
 ## When to Use
 
@@ -40,6 +41,7 @@ and fallbacks are recorded in the run dir's `supervisor.md`/`drift.md`.
 | **PLAN-EVAL**           | Conditional pre-implementation pass for complex/decision-heavy work; hard stop when selected.                                                                                  |
 | **IMPL-EVAL**           | Mandatory final pass after implementation unless the owner explicitly waives it.                                                                                               |
 | **Routing matrix**      | Five workload tiers and four coordinator tiers with role-specific routes; single source `workflow/lane-policy.md`.                                                             |
+| **Privileged tiers**    | `complex` and `architecture` fail closed unless the owner or milestone coordinator explicitly authorizes the row and records why.                                              |
 | **Slice review gate**   | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1).                                                             |
 | **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes).                                                                                  |
 | **Plan-Gate**           | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                                                                                                                      |
@@ -123,6 +125,9 @@ routing here — defer to that file. The items below are the parts of the contra
   `workflow/lane-policy.md`, skip candidates from the selected generator's vendor family, and record
   the complete route in the run. PLAN-EVAL is risk-selected. Re-steer the same evaluator and obey
   the tier-specific round/notification policy; do not substitute a global retry rule.
+- **Privileged-row authority.** `complex` and `architecture` require explicit owner or
+  milestone-coordinator authorization plus a recorded rationale. Never promote a task into either
+  row from complexity inference, file count, or evaluator role alone; cap it at `feature` otherwise.
 - **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
   skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
   the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the

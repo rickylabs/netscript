@@ -8,10 +8,15 @@ import {
   type ExpenseProvider,
   parseExpenseUsageSnapshot,
 } from '../subscription-expense.ts';
+import {
+  fetchOpenCodeGoUsageSnapshot,
+  type OpenCodeGoUsageDependencies,
+} from '../provider-usage.ts';
 
 interface Options {
   readonly provider: ExpenseProvider;
-  readonly snapshotPath: string;
+  readonly model?: string;
+  readonly snapshotPath?: string;
   readonly estimatedCostUsd: number;
   readonly now: string;
   readonly pretty: boolean;
@@ -27,6 +32,7 @@ function parse(args: readonly string[]): Options {
   args = normalizeTaskArguments(args);
   let provider: ExpenseProvider | undefined;
   let snapshotPath: string | undefined;
+  let model: string | undefined;
   let estimatedCostUsd: number | undefined;
   let now = new Date().toISOString();
   let pretty = false;
@@ -40,6 +46,8 @@ function parse(args: readonly string[]): Options {
       provider = candidate as ExpenseProvider;
     } else if (argument === '--snapshot') {
       snapshotPath = value(args, index++, argument);
+    } else if (argument === '--model') {
+      model = value(args, index++, argument);
     } else if (argument === '--estimated-cost-usd') {
       estimatedCostUsd = Number(value(args, index++, argument));
     } else if (argument === '--now') {
@@ -48,24 +56,47 @@ function parse(args: readonly string[]): Options {
       pretty = true;
     } else throw new Error(`unknown argument: ${argument}`);
   }
-  if (!provider || !snapshotPath || !estimatedCostUsd || estimatedCostUsd <= 0) {
+  if (!provider || !estimatedCostUsd || estimatedCostUsd <= 0) {
     throw new Error(
-      'Usage: expense-watch --provider <provider> --snapshot <json> ' +
+      'Usage: expense-watch --provider <provider> --model <model> or --snapshot <json> ' +
         '--estimated-cost-usd <positive-number> [--now <iso>] [--pretty]',
     );
   }
-  return { provider, snapshotPath, estimatedCostUsd, now, pretty };
+  if (provider === 'opencode_go' ? !model : !snapshotPath) {
+    throw new Error(
+      provider === 'opencode_go'
+        ? 'OpenCode Go expense watch requires --model'
+        : `${provider} expense watch requires --snapshot`,
+    );
+  }
+  return {
+    provider,
+    estimatedCostUsd,
+    now,
+    pretty,
+    ...(model ? { model } : {}),
+    ...(snapshotPath ? { snapshotPath } : {}),
+  };
 }
 
-export async function runExpenseWatch(args: readonly string[]): Promise<number> {
+export async function runExpenseWatch(
+  args: readonly string[],
+  dependencies: OpenCodeGoUsageDependencies = {},
+): Promise<number> {
   let options: Options;
   try {
     options = parse(args);
-    const snapshot = parseExpenseUsageSnapshot(
-      await Deno.readTextFile(resolve(options.snapshotPath)),
-    );
+    const snapshot = options.provider === 'opencode_go'
+      ? await fetchOpenCodeGoUsageSnapshot(options.model!, {
+        ...dependencies,
+        now: () => options.now,
+      })
+      : parseExpenseUsageSnapshot(
+        await (dependencies.readTextFile ?? Deno.readTextFile)(resolve(options.snapshotPath!)),
+      );
     const decision = evaluateSubscriptionExpense({
       provider: options.provider,
+      model: options.model,
       snapshot,
       estimatedCostUsd: options.estimatedCostUsd,
       now: options.now,
@@ -73,8 +104,12 @@ export async function runExpenseWatch(args: readonly string[]): Promise<number> 
     console.log(JSON.stringify(decision, null, options.pretty ? 2 : undefined));
     return decision.allowed ? 0 : 4;
   } catch (error) {
-    console.error(error instanceof Error ? error.message : String(error));
-    return 2;
+    console.log(JSON.stringify({
+      allowed: false,
+      reason: 'usage_unproven',
+      error: error instanceof Error ? error.message : String(error),
+    }));
+    return 4;
   }
 }
 

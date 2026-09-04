@@ -9,6 +9,7 @@ import type {
   SessionIdentity,
 } from './contract.ts';
 import {
+  assertPrivilegedTierAuthorization,
   COORDINATOR_MATRIX,
   type CoordinatorTier,
   DELEGATION_MATRIX,
@@ -20,6 +21,7 @@ import {
   modelFamily,
   type ModelRoute,
   type ModelTransport,
+  type PrivilegedTierAuthorization,
   rejectLegacyLaneForNewSelection,
   WORKLOAD_TIERS,
   type WorkloadTier,
@@ -83,6 +85,7 @@ export interface WorkloadRouteRequest extends RouteAvailability {
   readonly generatorModel?: LogicalModelId;
   readonly worktree: string;
   readonly mobileRequired?: boolean;
+  readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
 }
 
 export interface CoordinatorRouteRequest extends RouteAvailability {
@@ -96,6 +99,7 @@ export interface ResolvedDelegationRoute extends RouteIdentity {
   readonly family: ReturnType<typeof modelFamily>;
   readonly transport: ModelTransport;
   readonly requestedEffort: ModelRoute['effort'];
+  readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
 }
 
 const TRANSPORT_AGENT: Readonly<Record<ModelTransport, AgentKind>> = {
@@ -172,6 +176,7 @@ function resolveRouteChain(
 
 /** Resolves a workload role without consulting the retired flat lane table. */
 export function resolveWorkloadRoute(request: WorkloadRouteRequest): ResolvedDelegationRoute {
+  assertPrivilegedTierAuthorization(request.tier, request.privilegedTierAuthorization);
   const cell = DELEGATION_MATRIX[request.tier];
   const candidates = cell[request.role];
   if (candidates.length === 0) {
@@ -182,7 +187,12 @@ export function resolveWorkloadRoute(request: WorkloadRouteRequest): ResolvedDel
   if (evaluation && !request.generatorModel) {
     throw new Error(`${request.role} requires the selected generator model`);
   }
-  return resolveRouteChain(candidates, request);
+  return {
+    ...resolveRouteChain(candidates, request),
+    ...(request.privilegedTierAuthorization
+      ? { privilegedTierAuthorization: request.privilegedTierAuthorization }
+      : {}),
+  };
 }
 
 /** Resolves an orchestrator/coordinator route from its dedicated matrix. */

@@ -1,5 +1,11 @@
 # Evaluation: agent model routing and subscription expense policy revamp
 
+> **Coordinator supersession notice (2026-09-04):** This historical cycle-2 `PASS` applies only to
+> head `8740b16de` and the evaluator's then-approved scope. Subsequent owner dashboard evidence and
+> the authenticated Go usage API disproved the expense-limit and workload-tier assumptions. The PR
+> is not merge-ready; a bounded repair and new independent IMPL-EVAL are required. The historical
+> verdict below is preserved rather than rewritten.
+
 Fill this template during evaluation. Allowed result values: `PASS`, `FAIL`, `N/A`,
 `PENDING_SCRIPT`, `DEBT_ACCEPTED`, `NOT_RUN`. Anti-pattern status values: `CLEAR`,
 `VIOLATION`, `DEBT_ACCEPTED`, `N/A`.

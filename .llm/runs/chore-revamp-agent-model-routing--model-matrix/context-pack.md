@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Current phase  | `review / exact-head CI`                         |
+| Current phase  | `critical post-eval repair`                      |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
 
@@ -22,9 +22,10 @@ Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go tu
 IMPL-EVAL cycle 1 in session `ses_f93062116ffe1eRZWsVs5ukzqK` returned a bounded `FAIL_FIX` at
 `9f8ee61a6`. The repair corrects native Claude and dated Ollama ids, proves an expense denial cannot
 spawn OpenCode, and updates the stale README resolver claim. IMPL-EVAL cycle 2 in the same session
-returned `PASS` at exact head `8740b16de` through the OpenRouter/Grok provider fallback. Both
-OpenCode provider settings are now enabled for subsequent contributor-training and China-hosted
-model routes.
+returned a historical `PASS` at exact head `8740b16de` through the OpenRouter/Grok provider
+fallback. Subsequent owner cost-dashboard evidence and the live Go usage API supersede that PASS for
+merge readiness: the old watcher used flat 12/30/60 USD limits and the coordinator selected the
+privileged `architecture` row without recorded authority. Repair is active; PR #1989 remains draft.
 
 ## Accepted owner decisions
 
@@ -36,21 +37,25 @@ model routes.
 - Provider priority: Claude → Codex → Google → OpenCode Go → Ollama → OpenRouter.
 - The selected generator/evaluator pair must differ by vendor family; fallback composition must
   provide a legal evaluator for every generator candidate.
+- `complex` and `architecture` may be selected only with explicit owner or milestone-coordinator
+  authority and a recorded rationale; otherwise selection is capped at `feature`.
 
 ## Locked architecture
 
 - Typed five-tier workload matrix plus four-tier coordinator matrix.
 - Logical model identity separated from provider-specific capability/slugs.
 - Evaluation round/repair/notification policy encoded in data.
-- Paid OpenCode routes require a fresh structured allowance decision before spawn.
+- Go routes fetch live authenticated usage and apply selected-model effective limits before spawn;
+  other paid OpenCode routes require a fresh structured allowance decision.
 - Secrets remain in mode-600 local env files and never enter argv, logs, receipts, or git.
 - Active docs/skills derive from/check against the matrix; historical runs stay untouched.
 
 ## Next Steps
 
-1. Commit and push the cycle-2 PASS plus final run ledger.
-2. Update the PR body/phase comment to the exact passing head.
-3. Keep the PR available for owner review while exact-head CI and review-thread gates settle.
+1. Finish full agentic and repository gates for the live-usage / privileged-tier repair.
+2. Commit, push, and post the value-free blocked live receipt to draft PR #1989.
+3. Run a new separate-session, different-family feature-tier IMPL-EVAL without OpenCode Go while it
+   is rate-limited; only then return to exact-head CI/review.
 
 ## Files Changed
 
@@ -76,13 +81,13 @@ model routes.
 | ----------- | -------------- | --------------------------------------------------------------------------- |
 | Plan        | PASS cycle 2   | `plan-eval.md`, repair head `372409ab6`                                     |
 | Static      | PASS S1-S3     | per-slice structured checks                                                 |
-| Fitness     | PASS repair    | injected command-spawn denial proof                                          |
+| Fitness     | PASS repair    | injected command-spawn denial proof                                         |
 | Runtime     | PASS repair    | 572 agentic tests plus guarded OpenCode Go live turn                        |
 | Docs parity | PASS S4        | typed table parity plus stale-policy scan                                   |
 | Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
-| IMPL-EVAL   | PASS C2        | `evaluate.md`; all five cycle-1 findings closed at `8740b16de`               |
+| IMPL-EVAL   | SUPERSEDED     | historical C2 PASS at `8740b16de`; new live evidence requires another cycle |
 
 ## Drift and Debt
 

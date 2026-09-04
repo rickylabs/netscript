@@ -33,3 +33,7 @@
   session for cycle 2; do not create a new evaluator identity.
 - Cycle 2 re-steered exact session `ses_f9338f842ffeT0E2CjAp7yu3KZ`; it returned `PASS` for repair
   head `372409ab6`. Implementation is authorized.
+- Owner correction after the first IMPL-EVAL: `complex` and `architecture` are privileged rows and
+  require explicit owner or milestone-coordinator authorization with a recorded rationale. The
+  coordinator's unratified `architecture` classification for this bounded harness refactor was an
+  error; subsequent work and re-evaluation use the `feature` row.

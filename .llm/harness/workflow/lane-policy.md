@@ -47,6 +47,15 @@ phase.
 The typed catalog maps these logical identities to provider-specific slugs and vendor families.
 Never infer a slug by string concatenation.
 
+### Privileged workload rows
+
+`complex` and `architecture` are privileged, subscription-intensive rows. They may be selected only
+when the owner explicitly requests that tier or a milestone coordinator explicitly authorizes it.
+The dispatch record must name the authorizer and preserve a non-empty rationale. File count,
+cross-package scope, a formal evaluator role, or an agent's own complexity inference is not
+authorization. Without that record, selection fails closed at the resolver; ordinary work is capped
+at `feature`.
+
 ## Coordinator matrix
 
 <!-- generated-coordinator-matrix:start -->
@@ -96,13 +105,18 @@ re-steers the same evaluator session; do not discard its context by launching a 
 
 ## Paid-route expense and credentials
 
-OpenCode Go, Ollama, and OpenRouter launches require both a positive estimated cost and a fresh
-normalized usage snapshot before process spawn. The expense guard returns structured JSON and fails
-closed when usage is missing, stale, malformed, exhausted, provider-mismatched, or the Ollama
+OpenCode Go, Ollama, and OpenRouter launches require a positive estimated cost and proven current
+usage before process spawn. Go usage is fetched directly from the authenticated subscription API on
+every dispatch; a caller-provided Go snapshot is never trusted. Ollama and OpenRouter currently
+consume fresh normalized snapshots. The expense guard returns structured JSON and fails closed when
+usage cannot be fetched, is missing, stale, malformed, exhausted, provider-mismatched, or the Ollama
 tier/concurrency is unresolved.
 
-- OpenCode Go enforces rolling five-hour, weekly, and monthly subscription windows. It must never
-  silently consume a separately funded Zen balance.
+- OpenCode Go enforces live rolling five-hour, weekly, and monthly percentages plus the selected
+  model's published effective allowance. The documented 12/30/60 USD windows are the $60 reference
+  allocation; lower-inclusion models scale all three windows (for example, Grok's 15 USD allocation
+  yields 3/7.5/15 USD effective limits). Non-`ok` status, 100% usage, unknown model weighting, or an
+  unavailable usage endpoint blocks before spawn. It must never silently consume funded Zen balance.
 - Ollama resolves Pro, Max, or Team explicitly, then enforces included monthly credits and
   concurrency. It must never guess a tier or silently consume extra balance.
 - OpenRouter requires proven available balance and remains the final fallback.

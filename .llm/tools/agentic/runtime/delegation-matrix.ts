@@ -212,6 +212,26 @@ export const WORKLOAD_TIERS = [
 ] as const;
 export type WorkloadTier = typeof WORKLOAD_TIERS[number];
 
+export const PRIVILEGED_WORKLOAD_TIERS = ['complex', 'architecture'] as const;
+export type PrivilegedWorkloadTier = typeof PRIVILEGED_WORKLOAD_TIERS[number];
+export interface PrivilegedTierAuthorization {
+  readonly authorizer: 'owner' | 'milestone_coordinator';
+  readonly rationale: string;
+}
+
+/** Complex/architecture rows consume scarce subscriptions and require explicit authority. */
+export function assertPrivilegedTierAuthorization(
+  tier: WorkloadTier,
+  authorization?: PrivilegedTierAuthorization,
+): void {
+  if (!PRIVILEGED_WORKLOAD_TIERS.includes(tier as PrivilegedWorkloadTier)) return;
+  if (!authorization?.rationale.trim()) {
+    throw new Error(
+      `${tier} workload tier requires explicit owner or milestone-coordinator authorization`,
+    );
+  }
+}
+
 export const DELEGATION_ROLES = [
   'implementation',
   'plan',
@@ -355,6 +375,21 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
   },
 } as const;
 
+/** Refuses a concrete provider model that is not declared in the selected matrix cell. */
+export function assertWorkloadModelAllowed(
+  tier: WorkloadTier,
+  role: DelegationRole,
+  concreteModel: string,
+): void {
+  const routes = DELEGATION_MATRIX[tier][role];
+  const allowed = routes.some((route) =>
+    MODEL_CATALOG[route.model].capabilities.some((capability) => capability.model === concreteModel)
+  );
+  if (!allowed) {
+    throw new Error(`${concreteModel} is not declared for ${tier}/${role}`);
+  }
+}
+
 export const COORDINATOR_TIERS = [
   'small_project',
   'project',
@@ -410,7 +445,9 @@ export function selectEvaluator(
   tier: WorkloadTier,
   phase: 'plan' | 'implementation',
   generator: LogicalModelId,
+  authorization?: PrivilegedTierAuthorization,
 ): ModelRoute {
+  assertPrivilegedTierAuthorization(tier, authorization);
   const candidates = phase === 'plan'
     ? DELEGATION_MATRIX[tier].plan_evaluation
     : DELEGATION_MATRIX[tier].implementation_evaluation;

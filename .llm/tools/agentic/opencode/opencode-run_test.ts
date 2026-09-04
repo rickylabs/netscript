@@ -120,37 +120,40 @@ Deno.test('paid OpenCode route is blocked before dispatch when expense proof is 
       message: 'do work',
       model: ROUTING_MODEL_IDS.glm53FlashGo,
       variant: 'high',
+      workloadTier: 'straightforward',
+      workloadRole: 'implementation',
     });
   } catch (error) {
     message = error instanceof Error ? error.message : String(error);
   }
   assertEquals(
     message,
-    'paid opencode_go route requires --usage-snapshot and --estimated-cost-usd',
+    'paid opencode_go route requires --estimated-cost-usd',
   );
 });
 
-Deno.test('paid OpenCode route accepts a fresh structured allowance decision', async () => {
+Deno.test('paid OpenCode Go route accepts a fresh live allowance decision', async () => {
   const decision = await preflightOpenCodeExpense(
     {
       message: 'do work',
       model: ROUTING_MODEL_IDS.glm53FlashGo,
       variant: 'high',
-      cwd: '/work',
-      usageSnapshotPath: 'usage.json',
-      estimatedCostUsd: 0.5,
+      workloadTier: 'straightforward',
+      workloadRole: 'implementation',
+      estimatedCostUsd: 0.01,
     },
-    (path) => {
-      assertEquals(path, '/work/usage.json');
-      return Promise.resolve(JSON.stringify({
-        provider: 'opencode_go',
-        capturedAt: '2026-09-04T15:55:00.000Z',
-        rollingFiveHoursUsedUsd: 1,
-        weeklyUsedUsd: 2,
-        monthlyUsedUsd: 3,
-      }));
+    {
+      env: { OPENCODE_API_KEY: 'opaque' },
+      fetch: () =>
+        Promise.resolve(Response.json({
+          usage: {
+            rolling: { percent: 1, status: 'ok' },
+            weekly: { percent: 2, status: 'ok' },
+            monthly: { percent: 3, status: 'ok' },
+          },
+        })),
+      now: () => '2026-09-04T16:00:00.000Z',
     },
-    () => '2026-09-04T16:00:00.000Z',
   );
   assertEquals(decision?.allowed, true);
 });
@@ -165,18 +168,20 @@ Deno.test('denied paid-route expense decision prevents OpenCode process spawn', 
           model: ROUTING_MODEL_IDS.glm53FlashGo,
           variant: 'high',
           cwd: '/work',
-          usageSnapshotPath: 'usage.json',
+          workloadTier: 'feature',
+          workloadRole: 'documentation',
           estimatedCostUsd: 1,
         },
         false,
         {
-          readTextFile: () =>
-            Promise.resolve(JSON.stringify({
-              provider: 'opencode_go',
-              capturedAt: '2026-09-04T15:55:00.000Z',
-              rollingFiveHoursUsedUsd: 12,
-              weeklyUsedUsd: 20,
-              monthlyUsedUsd: 40,
+          env: { OPENCODE_API_KEY: 'opaque' },
+          fetch: () =>
+            Promise.resolve(Response.json({
+              usage: {
+                rolling: { percent: 104.5, status: 'rate-limited' },
+                weekly: { percent: 41.8, status: 'ok' },
+                monthly: { percent: 20.9, status: 'ok' },
+              },
             })),
           now: () => '2026-09-04T16:00:00.000Z',
           spawn: () => {
@@ -186,7 +191,115 @@ Deno.test('denied paid-route expense decision prevents OpenCode process spawn', 
         },
       ),
     Error,
-    'expense guard blocked opencode_go: allowance_exhausted',
+    'expense guard blocked opencode_go: provider_rate_limited',
   );
+  assertEquals(spawnCalls, 0);
+});
+
+Deno.test('unproven live Go usage prevents OpenCode process spawn', async () => {
+  for (
+    const response of [
+      () => Promise.reject(new Error('transport detail must remain private')),
+      () => Promise.resolve(new Response('', { status: 503 })),
+      () => Promise.resolve(Response.json({ usage: {} })),
+    ]
+  ) {
+    let spawnCalls = 0;
+    await assertRejects(
+      () =>
+        runOpenCode(
+          {
+            message: 'do not dispatch',
+            model: ROUTING_MODEL_IDS.grok46Go,
+            variant: 'xhigh',
+            workloadTier: 'architecture',
+            workloadRole: 'implementation_evaluation',
+            privilegedTierAuthorization: {
+              authorizer: 'owner',
+              rationale: 'Test-only authorized architecture expense-denial path.',
+            },
+            estimatedCostUsd: 0.1,
+          },
+          false,
+          {
+            env: { OPENCODE_API_KEY: 'opaque' },
+            fetch: response,
+            spawn: () => {
+              spawnCalls++;
+              throw new Error('spawn must remain unreachable');
+            },
+          },
+        ),
+      Error,
+    );
+    assertEquals(spawnCalls, 0);
+  }
+});
+
+Deno.test('privileged OpenCode workload cannot reach usage fetch or spawn without authority', async () => {
+  let fetchCalls = 0;
+  let spawnCalls = 0;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'misclassified architecture review',
+          model: ROUTING_MODEL_IDS.grok46Go,
+          variant: 'xhigh',
+          workloadTier: 'architecture',
+          workloadRole: 'implementation_evaluation',
+          estimatedCostUsd: 1,
+        },
+        false,
+        {
+          env: { OPENCODE_API_KEY: 'opaque' },
+          fetch: () => {
+            fetchCalls++;
+            return Promise.resolve(Response.json({}));
+          },
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('spawn must remain unreachable');
+          },
+        },
+      ),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+  assertEquals(fetchCalls, 0);
+  assertEquals(spawnCalls, 0);
+});
+
+Deno.test('model outside the selected matrix cell cannot reach usage fetch or spawn', async () => {
+  let fetchCalls = 0;
+  let spawnCalls = 0;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'do not relabel Grok as routine work',
+          model: ROUTING_MODEL_IDS.grok46Go,
+          variant: 'xhigh',
+          workloadTier: 'feature',
+          workloadRole: 'implementation_evaluation',
+          estimatedCostUsd: 1,
+        },
+        false,
+        {
+          env: { OPENCODE_API_KEY: 'opaque' },
+          fetch: () => {
+            fetchCalls++;
+            return Promise.resolve(Response.json({}));
+          },
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('spawn must remain unreachable');
+          },
+        },
+      ),
+    Error,
+    'is not declared for feature/implementation_evaluation',
+  );
+  assertEquals(fetchCalls, 0);
   assertEquals(spawnCalls, 0);
 });

@@ -10,6 +10,10 @@ import {
 } from './routing-policy.ts';
 
 const worktree = '/home/agent/projects/netscript/worktrees/routing-test';
+const privilegedTierAuthorization = {
+  authorizer: 'milestone_coordinator' as const,
+  rationale: 'Recorded cross-package milestone escalation.',
+};
 
 Deno.test('canonical inspection policy is derived from all matrix cells', () => {
   assertEquals(CANONICAL_ROUTE_POLICY.length, 56);
@@ -60,11 +64,30 @@ Deno.test('Astra replaces SOL for feature and higher implementation tiers', () =
     },
   );
   assertEquals(
-    resolveWorkloadRoute({ tier: 'complex', role: 'implementation', worktree }).effort,
+    resolveWorkloadRoute({
+      tier: 'complex',
+      role: 'implementation',
+      worktree,
+      privilegedTierAuthorization,
+    }).effort,
     'medium',
   );
   assertEquals(
-    resolveWorkloadRoute({ tier: 'architecture', role: 'implementation', worktree }).effort,
+    resolveWorkloadRoute({
+      tier: 'complex',
+      role: 'implementation',
+      worktree,
+      privilegedTierAuthorization,
+    }).privilegedTierAuthorization,
+    privilegedTierAuthorization,
+  );
+  assertEquals(
+    resolveWorkloadRoute({
+      tier: 'architecture',
+      role: 'implementation',
+      worktree,
+      privilegedTierAuthorization,
+    }).effort,
     'xhigh',
   );
 });
@@ -108,9 +131,23 @@ Deno.test('same-family evaluator candidates are skipped before provider selectio
     role: 'plan_evaluation',
     generatorModel: 'muse_spark_1_3',
     worktree,
+    privilegedTierAuthorization,
   });
   assertEquals(plan.logicalModel, 'grok_4_6');
   assertEquals(plan.effort, 'high');
+});
+
+Deno.test('complex rows fail closed without recorded privileged-tier authority', () => {
+  assertThrows(
+    () => resolveWorkloadRoute({ tier: 'complex', role: 'implementation', worktree }),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+  assertThrows(
+    () => resolveWorkloadRoute({ tier: 'architecture', role: 'implementation', worktree }),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
 });
 
 Deno.test('provider-default effort resolves through the pinned OpenCode default', () => {

@@ -64,8 +64,8 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
 - **Action:** fixed the four provider spellings in the central model catalog, added an injectable
   OpenCode spawn seam with a zero-call assertion on allowance exhaustion, and replaced the deleted
   resolver name in active tooling documentation.
-- **Continuity:** IMPL-EVAL cycle 2 must resume OpenCode session
-  `ses_f93062116ffe1eRZWsVs5ukzqK`; generator/evaluator vendor and session separation remains intact.
+- **Continuity:** IMPL-EVAL cycle 2 must resume OpenCode session `ses_f93062116ffe1eRZWsVs5ukzqK`;
+  generator/evaluator vendor and session separation remains intact.
 - **Evidence:** `evaluate.md` cycle 1 plus the structured focused check/test/format results in
   `worklog.md`.
 
@@ -87,7 +87,28 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
 - **Action:** treat Go/Grok as a bounded transport failure for this cycle; preserve logical model,
   xAI family, xhigh effort, and evaluator session while moving to the next capable provider. No
   implementation file changed during evaluation.
-- **Resolution:** the owner subsequently enabled both OpenCode provider settings, so training-enabled
-  and China-hosted model routes are now eligible. This is operational state, not committed policy.
+- **Resolution:** the owner subsequently enabled both OpenCode provider settings, so
+  training-enabled and China-hosted model routes are now eligible. This is operational state, not
+  committed policy.
 - **Evidence:** OpenCode session `ses_f93062116ffe1eRZWsVs5ukzqK`, `evaluate.md` cycle 2, and owner
   confirmation with settings screenshot.
+
+## 2026-09-04 — Post-evaluation live usage disproved the expense and tier-selection gates
+
+- **What:** The owner dashboard showed OpenCode Go at 104.5% rolling usage after Grok 4.6 consumed
+  about $3.13. The authenticated usage endpoint independently returned `rate-limited` / 100%.
+- **Root cause 1:** S3 treated the public 12/30/60 USD figures as flat limits. OpenCode applies
+  model-weighted inclusion; Grok's published $15 monthly allocation scales those windows to
+  $3/$7.50/$15.
+- **Root cause 2:** coordinator-authored IMPL-EVAL session `ses_f93062116ffe1eRZWsVs5ukzqK` was
+  explicitly classified as `architecture` and dispatched to Go/Grok xhigh. Its `Vs5ukzqK` session
+  suffix matches the cost history. No owner or milestone coordinator authorization for a privileged
+  row had been recorded; a bounded harness refactor should have remained at `feature`.
+- **Severity:** critical. The cycle-2 evaluator `PASS` remains immutable history for its evaluated
+  head/scope but is superseded for merge readiness by this contradictory live evidence.
+- **Action:** fetch authenticated Go usage before every dispatch; fail closed on unavailable,
+  malformed, non-`ok`, or 100%-plus state; apply model-effective limits; require explicit owner or
+  milestone-coordinator authority plus rationale for `complex` and `architecture`; prove denial
+  occurs before both usage fetch (missing tier authority) and process spawn.
+- **Live receipt:** `agentic:expense-watch` returned exit 4 with `provider_rate_limited`, Grok
+  effective limits $3/$7.50/$15, and no model process was launched.

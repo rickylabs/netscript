@@ -5,11 +5,19 @@ import {
   EXPENSE_WARNING_RATIO,
   OLLAMA_SUBSCRIPTION_LIMITS,
   type OllamaSubscriptionTier,
-  OPENCODE_GO_LIMITS_USD,
+  openCodeGoEffectiveLimits,
 } from '../config/subscriptions.ts';
 
 export const EXPENSE_PROVIDERS = ['opencode_go', 'ollama', 'openrouter'] as const;
 export type ExpenseProvider = typeof EXPENSE_PROVIDERS[number];
+
+export type ExpenseUsageWindowId = 'rolling_five_hours' | 'weekly' | 'monthly';
+
+export interface ExpenseUsageWindowSnapshot {
+  readonly percent: number;
+  readonly status: string;
+  readonly resetsAt?: string;
+}
 
 export interface ExpenseUsageSnapshot {
   readonly provider: ExpenseProvider;
@@ -20,6 +28,9 @@ export interface ExpenseUsageSnapshot {
   readonly monthlyUsedUsd?: number;
   readonly availableBalanceUsd?: number;
   readonly concurrentRequests?: number;
+  readonly percentageWindows?: Readonly<
+    Partial<Record<ExpenseUsageWindowId, ExpenseUsageWindowSnapshot>>
+  >;
   readonly resetsAt?: Readonly<
     Partial<Record<'rolling_five_hours' | 'weekly' | 'monthly', string>>
   >;
@@ -27,6 +38,7 @@ export interface ExpenseUsageSnapshot {
 
 export interface ExpenseRequest {
   readonly provider: ExpenseProvider;
+  readonly model?: string;
   readonly estimatedCostUsd: number;
   readonly snapshot: ExpenseUsageSnapshot;
   readonly now: string;
@@ -38,6 +50,9 @@ export interface ExpenseWindowDecision {
   readonly usedUsd: number;
   readonly remainingAfterUsd: number;
   readonly exhausted: boolean;
+  readonly observedPercent?: number;
+  readonly projectedPercent?: number;
+  readonly status?: string;
   readonly resetsAt?: string;
 }
 
@@ -49,6 +64,7 @@ export type ExpenseDecisionReason =
   | 'usage_unproven'
   | 'subscription_tier_unresolved'
   | 'concurrency_exhausted'
+  | 'provider_rate_limited'
   | 'allowance_exhausted';
 
 export interface ExpenseDecision {
@@ -101,6 +117,27 @@ function windowDecision(
   };
 }
 
+function percentageWindowDecision(
+  id: ExpenseUsageWindowId,
+  limitUsd: number,
+  observed: ExpenseUsageWindowSnapshot,
+  estimatedCostUsd: number,
+): ExpenseWindowDecision {
+  const usedUsd = limitUsd * observed.percent / 100;
+  const projectedPercent = observed.percent + estimatedCostUsd / limitUsd * 100;
+  return {
+    id,
+    limitUsd,
+    usedUsd,
+    remainingAfterUsd: Math.max(0, limitUsd - usedUsd - estimatedCostUsd),
+    exhausted: observed.percent >= 100 || projectedPercent >= 100,
+    observedPercent: observed.percent,
+    projectedPercent,
+    status: observed.status,
+    ...(observed.resetsAt ? { resetsAt: observed.resetsAt } : {}),
+  };
+}
+
 /** Returns a value-free pre-dispatch decision; unknown/stale usage always fails closed. */
 export function evaluateSubscriptionExpense(request: ExpenseRequest): ExpenseDecision {
   if (!finiteNonNegative(request.estimatedCostUsd) || request.estimatedCostUsd === 0) {
@@ -122,34 +159,44 @@ export function evaluateSubscriptionExpense(request: ExpenseRequest): ExpenseDec
   let windows: ExpenseWindowDecision[];
   let concurrency: Readonly<{ current: number; limit: number }> | undefined;
   if (request.provider === 'opencode_go') {
-    const { rollingFiveHoursUsedUsd, weeklyUsedUsd, monthlyUsedUsd } = request.snapshot;
+    const limits = request.model ? openCodeGoEffectiveLimits(request.model) : null;
+    const percentages = request.snapshot.percentageWindows;
+    const rolling = percentages?.rolling_five_hours;
+    const weekly = percentages?.weekly;
+    const monthly = percentages?.monthly;
+    if (!limits || !rolling || !weekly || !monthly) {
+      return blocked(request, 'usage_unproven', snapshotAgeMs);
+    }
+    const observed = [rolling, weekly, monthly];
     if (
-      !finiteNonNegative(rollingFiveHoursUsedUsd) || !finiteNonNegative(weeklyUsedUsd) ||
-      !finiteNonNegative(monthlyUsedUsd)
+      observed.some((entry) =>
+        !finiteNonNegative(entry.percent) || typeof entry.status !== 'string' ||
+        entry.status.trim().length === 0
+      )
     ) return blocked(request, 'usage_unproven', snapshotAgeMs);
     windows = [
-      windowDecision(
+      percentageWindowDecision(
         'rolling_five_hours',
-        OPENCODE_GO_LIMITS_USD.rollingFiveHours,
-        rollingFiveHoursUsedUsd,
+        limits.rollingFiveHours,
+        rolling,
         request.estimatedCostUsd,
-        request.snapshot.resetsAt?.rolling_five_hours,
       ),
-      windowDecision(
+      percentageWindowDecision(
         'weekly',
-        OPENCODE_GO_LIMITS_USD.weekly,
-        weeklyUsedUsd,
+        limits.weekly,
+        weekly,
         request.estimatedCostUsd,
-        request.snapshot.resetsAt?.weekly,
       ),
-      windowDecision(
+      percentageWindowDecision(
         'monthly',
-        OPENCODE_GO_LIMITS_USD.monthly,
-        monthlyUsedUsd,
+        limits.monthly,
+        monthly,
         request.estimatedCostUsd,
-        request.snapshot.resetsAt?.monthly,
       ),
     ];
+    if (observed.some((entry) => entry.status !== 'ok' || entry.percent >= 100)) {
+      return blocked(request, 'provider_rate_limited', snapshotAgeMs, windows);
+    }
   } else if (request.provider === 'ollama') {
     const tier = request.snapshot.tier;
     if (!tier || !(tier in OLLAMA_SUBSCRIPTION_LIMITS)) {
@@ -195,7 +242,10 @@ export function evaluateSubscriptionExpense(request: ExpenseRequest): ExpenseDec
     provider: request.provider,
     reason: 'allowed',
     warning: windows.some((entry) =>
-      entry.limitUsd > 0 && entry.remainingAfterUsd / entry.limitUsd <= 1 - EXPENSE_WARNING_RATIO
+      entry.projectedPercent !== undefined
+        ? entry.projectedPercent >= EXPENSE_WARNING_RATIO * 100
+        : entry.limitUsd > 0 &&
+          entry.remainingAfterUsd / entry.limitUsd <= 1 - EXPENSE_WARNING_RATIO
     ),
     snapshotAgeMs,
     windows,

@@ -15,6 +15,16 @@ import {
   type ExpenseDecision,
   parseExpenseUsageSnapshot,
 } from '../runtime/subscription-expense.ts';
+import { fetchOpenCodeGoUsageSnapshot } from '../runtime/provider-usage.ts';
+import {
+  assertPrivilegedTierAuthorization,
+  assertWorkloadModelAllowed,
+  DELEGATION_ROLES,
+  type DelegationRole,
+  type PrivilegedTierAuthorization,
+  WORKLOAD_TIERS,
+  type WorkloadTier,
+} from '../runtime/delegation-matrix.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';
 
@@ -30,6 +40,9 @@ export interface OpenCodeRunOptions {
   readonly receiptPath?: string;
   readonly usageSnapshotPath?: string;
   readonly estimatedCostUsd?: number;
+  readonly workloadTier?: WorkloadTier;
+  readonly workloadRole?: DelegationRole;
+  readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
 }
 
 export interface OpenCodeRunResult {
@@ -38,8 +51,11 @@ export interface OpenCodeRunResult {
 }
 
 export interface OpenCodeRunDependencies {
+  readonly env?: Readonly<Record<string, string | undefined>>;
+  readonly fetch?: typeof fetch;
   readonly readTextFile?: (path: string) => Promise<string>;
   readonly now?: () => string;
+  readonly stat?: (path: string) => Promise<Pick<Deno.FileInfo, 'mode'>>;
   readonly spawn?: (
     binary: string,
     options: Deno.CommandOptions,
@@ -107,23 +123,51 @@ export async function openCodeChildEnvironment(
 /** Proves allowance before any paid OpenCode process is spawned. */
 export async function preflightOpenCodeExpense(
   options: OpenCodeRunOptions,
-  readTextFile: (path: string) => Promise<string> = Deno.readTextFile,
-  now: () => string = () => new Date().toISOString(),
+  dependencies: OpenCodeRunDependencies = {},
 ): Promise<ExpenseDecision | null> {
   const provider = openCodeCredentialProviderForModel(options.model);
   if (!provider) return null;
-  if (!options.usageSnapshotPath || options.estimatedCostUsd === undefined) {
+  if (!options.workloadTier) {
+    throw new Error(`paid ${provider} route requires --workload-tier`);
+  }
+  if (!options.workloadRole) {
+    throw new Error(`paid ${provider} route requires --workload-role`);
+  }
+  assertPrivilegedTierAuthorization(options.workloadTier, options.privilegedTierAuthorization);
+  assertWorkloadModelAllowed(options.workloadTier, options.workloadRole, options.model);
+  if (options.estimatedCostUsd === undefined) {
     throw new Error(
-      `paid ${provider} route requires --usage-snapshot and --estimated-cost-usd`,
+      `paid ${provider} route requires --estimated-cost-usd`,
     );
   }
-  const cwd = resolve(options.cwd ?? Deno.cwd());
-  const source = await readTextFile(resolve(cwd, options.usageSnapshotPath));
+  let snapshot;
+  if (provider === 'opencode_go') {
+    if (options.usageSnapshotPath) {
+      throw new Error('OpenCode Go does not accept --usage-snapshot; live usage is required');
+    }
+    snapshot = await fetchOpenCodeGoUsageSnapshot(options.model, {
+      env: dependencies.env,
+      fetch: dependencies.fetch,
+      readTextFile: dependencies.readTextFile,
+      stat: dependencies.stat,
+      now: dependencies.now,
+    });
+  } else {
+    if (!options.usageSnapshotPath) {
+      throw new Error(`paid ${provider} route requires --usage-snapshot`);
+    }
+    const cwd = resolve(options.cwd ?? Deno.cwd());
+    const source = await (dependencies.readTextFile ?? Deno.readTextFile)(
+      resolve(cwd, options.usageSnapshotPath),
+    );
+    snapshot = parseExpenseUsageSnapshot(source);
+  }
   const decision = evaluateSubscriptionExpense({
     provider,
+    model: options.model,
     estimatedCostUsd: options.estimatedCostUsd,
-    snapshot: parseExpenseUsageSnapshot(source),
-    now: now(),
+    snapshot,
+    now: (dependencies.now ?? (() => new Date().toISOString()))(),
   });
   if (!decision.allowed) {
     throw new Error(`expense guard blocked ${provider}: ${decision.reason}`);
@@ -137,13 +181,9 @@ export async function runOpenCode(
   capture = false,
   dependencies: OpenCodeRunDependencies = {},
 ): Promise<OpenCodeRunResult> {
-  const processEnv = Deno.env.toObject();
+  const processEnv = dependencies.env ?? Deno.env.toObject();
   const cwd = resolve(options.cwd ?? Deno.cwd());
-  await preflightOpenCodeExpense(
-    options,
-    dependencies.readTextFile ?? Deno.readTextFile,
-    dependencies.now ?? (() => new Date().toISOString()),
-  );
+  await preflightOpenCodeExpense(options, dependencies);
   if (options.receiptPath) {
     await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
   }
@@ -154,6 +194,7 @@ export async function runOpenCode(
       cwd,
       receiptPath: options.receiptPath,
       model: options.model,
+      stat: dependencies.stat,
     },
   );
   if (options.requiredMcp?.length) {
@@ -208,6 +249,10 @@ function parse(args: readonly string[]): CliOptions {
   let receiptPath: string | undefined;
   let usageSnapshotPath: string | undefined;
   let estimatedCostUsd: number | undefined;
+  let workloadTier: WorkloadTier | undefined;
+  let workloadRole: DelegationRole | undefined;
+  let privilegedAuthorizer: PrivilegedTierAuthorization['authorizer'] | undefined;
+  let privilegedRationale: string | undefined;
   const requiredMcp: string[] = [];
 
   for (let index = 0; index < args.length; index++) {
@@ -241,6 +286,28 @@ function parse(args: readonly string[]): CliOptions {
         throw new Error('--estimated-cost-usd must be a positive number');
       }
       estimatedCostUsd = value;
+    } else if (argument === '--workload-tier') {
+      const value = requiredValue(args, index++, argument);
+      if (!WORKLOAD_TIERS.includes(value as WorkloadTier)) {
+        throw new Error(
+          '--workload-tier must be simple, straightforward, feature, complex, or architecture',
+        );
+      }
+      workloadTier = value as WorkloadTier;
+    } else if (argument === '--workload-role') {
+      const value = requiredValue(args, index++, argument);
+      if (!DELEGATION_ROLES.includes(value as DelegationRole)) {
+        throw new Error('--workload-role is not a declared delegation role');
+      }
+      workloadRole = value as DelegationRole;
+    } else if (argument === '--privileged-authorizer') {
+      const value = requiredValue(args, index++, argument);
+      if (value !== 'owner' && value !== 'milestone_coordinator') {
+        throw new Error('--privileged-authorizer must be owner or milestone_coordinator');
+      }
+      privilegedAuthorizer = value;
+    } else if (argument === '--privileged-rationale') {
+      privilegedRationale = requiredValue(args, index++, argument);
     } else if (!argument.startsWith('-') && !message) message = argument;
     else throw new Error(`Unknown or duplicate argument: ${argument}`);
   }
@@ -251,8 +318,16 @@ function parse(args: readonly string[]): CliOptions {
         '[--variant <effort>] [-s <session>] [--cwd <project>] [-f <path> ...] ' +
         '[--require-mcp <server> ...] [--receipt <jsonl>] ' +
         '[--usage-snapshot <json>] [--estimated-cost-usd <amount>] ' +
+        '[--workload-tier <tier> --workload-role <role> ' +
+        '--privileged-authorizer <authority> ' +
+        '--privileged-rationale <text>] ' +
         '[--format default|json] [--capture]',
     );
+  }
+  if (
+    (privilegedAuthorizer && !privilegedRationale) || (!privilegedAuthorizer && privilegedRationale)
+  ) {
+    throw new Error('--privileged-authorizer and --privileged-rationale must be supplied together');
   }
   return {
     message,
@@ -267,6 +342,16 @@ function parse(args: readonly string[]): CliOptions {
     ...(receiptPath ? { receiptPath } : {}),
     ...(usageSnapshotPath ? { usageSnapshotPath } : {}),
     ...(estimatedCostUsd !== undefined ? { estimatedCostUsd } : {}),
+    ...(workloadTier ? { workloadTier } : {}),
+    ...(workloadRole ? { workloadRole } : {}),
+    ...(privilegedAuthorizer && privilegedRationale
+      ? {
+        privilegedTierAuthorization: {
+          authorizer: privilegedAuthorizer,
+          rationale: privilegedRationale,
+        },
+      }
+      : {}),
   };
 }
 

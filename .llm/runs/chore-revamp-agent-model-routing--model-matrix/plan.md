@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Phase          | `plan-eval`                                      |
+| Phase          | `implementation repair`                          |
 | Target         | harness and agentic tooling                      |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
@@ -40,15 +40,22 @@ printing or committing credentials.
    architecture IMPL max 3 and notify after 2. Every iteration re-steers the same evaluator.
    Documentation uses the tier's IMPL policy capped at 2. Simple IMPL is explicitly
    `unspecified_by_owner`, not assigned an invented limit.
-6. **Paid dispatch fails closed.** OpenCode Go, Ollama Cloud, and OpenRouter require a fresh
-   normalized allowance snapshot. Missing/stale/unknown tier or an exceeded window selects the next
-   declared fallback; it never silently consumes Go Zen balance or Ollama extra balance.
+6. **Paid dispatch fails closed.** OpenCode Go obtains live authenticated usage before every spawn
+   and evaluates current/projected percentages against the selected model's published effective
+   5h/weekly/monthly limits. Caller-supplied Go snapshots are not trusted. Ollama Cloud and
+   OpenRouter require fresh normalized allowance snapshots. Missing/unfetchable/stale/unknown
+   tier/model weight, non-`ok` status, or an exceeded window selects the next declared fallback; it
+   never silently consumes Go Zen balance or Ollama extra balance.
 7. **Secrets stay host-local.** Credential loaders parse only the expected assignment from mode-600
    env files in `~/.config/netscript-agentic/`, bind only the selected provider key into the child,
    clear rival keys, and expose key names—not values—in errors/receipts.
 8. **Old routes are migration inputs only.** Persisted legacy IDs/lanes remain readable where
    needed, but no new launch resolves or heuristically maps a legacy lane. A new-selection request
    carrying an old lane fails closed and asks for explicit workload tier and role.
+9. **The last two matrix rows are privileged.** `complex` and `architecture` require explicit owner
+   authorization or a milestone-coordinator authorization with a recorded non-empty rationale.
+   Complexity inference, file count, or evaluator role alone cannot select them; absent authority,
+   dispatch is capped at `feature`.
 
 ## Public surface and vocabulary
 
@@ -85,6 +92,8 @@ No `packages/` or `plugins/` export changes.
 - Make the typed matrix drive the active canonical policy and routing-state human output.
 - Retain only explicit persisted-state compatibility for old lane/model identifiers.
 - Update selection tests for no silent effort/model/provider drift.
+- Reject `complex`/`architecture` selection without a recorded owner or milestone-coordinator
+  authorization and preserve that authorization in the resolved route receipt.
 - **Files:** `runtime/routing-policy.ts`, `runtime/routing-policy_test.ts`,
   `runtime/cli/routing-state.ts`, `runtime/cli/routing-state_test.ts`, and the route contract only
   where the two provider kinds require it.
@@ -94,7 +103,8 @@ No `packages/` or `plugins/` export changes.
 
 - Add `opencode_go`, `ollama`, and generic OpenCode/OpenRouter profiles.
 - Select the credential loader from the chosen provider/model prefix; clear rival keys.
-- Add fixed OpenCode Go limits and dynamic Ollama tier policies.
+- Fetch OpenCode Go's authenticated live usage and combine its window percentages with the selected
+  model's published effective limits; add dynamic Ollama tier policies.
 - Add structured `agentic:expense-watch` preflight with stale/unknown/exceeded fail-closed states.
 - Gate paid OpenCode execution before spawning the child process.
 - **Files:** `config/subscriptions.ts`, `runtime/subscription-expense.ts`,
@@ -147,7 +157,8 @@ No `packages/` or `plugins/` export changes.
 | ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
 | A provider slug differs across Go/Ollama/OpenRouter   | high     | Logical IDs plus explicit capability map; no synthesized slugs; catalog smoke.               |
 | Same-family selected pair accidentally self-certifies | critical | Vendor-family comparison at selection plus coverage proof for every generator candidate.     |
-| Unknown usage silently spends overflow balance        | critical | Fresh snapshot required; fail closed before child spawn.                                     |
+| Unknown usage silently spends overflow balance        | critical | Live Go usage / fresh fallback snapshot required; fail closed before child spawn.            |
+| Routine work selects a scarce privileged matrix row   | critical | Require explicit owner/milestone authority plus rationale in the route and runner contract.  |
 | Credential leaks into receipt/error/argv              | critical | file parser tests, rival-key clearing, value-free diagnostics, no key argv.                  |
 | Legacy callers silently keep old matrix               | high     | active policy derived from new matrix; legacy records accepted only at deserialize boundary. |
 | Human policy drifts from code                         | high     | machine-readable markers and parity test.                                                    |
@@ -167,7 +178,7 @@ No `packages/` or `plugins/` export changes.
 | Static OpenCode smoke | credential/profile/argv tests with opaque fake values                                          | S3           |
 | Live OpenCode smoke   | bounded `agentic:opencode` turns for Go and Ollama with structured receipts                    | S5           |
 | Repo check/test       | `deno task check`, `deno task test` (CI/runtime classifier may natively skip unrelated suites) | before ready |
-| IMPL-EVAL             | separate cross-family Grok 4.6 xhigh; max 3, notify after 2                                    | before ready |
+| IMPL-EVAL             | separate cross-family feature-tier route; privileged rows require explicit authorization       | before ready |
 | PR lifecycle          | exact-head CI, review-thread gate, status/milestone                                            | before merge |
 
 ### Archetype-gate applicability

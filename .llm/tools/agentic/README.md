@@ -80,12 +80,15 @@ Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; the typ
 `runtime/delegation-matrix.ts`, the resolver lives in `runtime/routing-policy.ts`, and concrete ids
 live in `config/models.ts`. Prose in the brief is not launch authority. Drop `--dry-run` for the
 real launch; it fails closed unless the observed provider/model/effort match what you requested. The
-launcher uses the v2 app-server JSONL protocol directly because Codex CLI 0.144.1's
-`debug app-server send-message-v2` helper does not propagate `-c model_reasoning_effort` to the
-child turn. Pass `--allow-route-mismatch` only for an explicit operator-approved exception;
-otherwise a pending or mismatched route exits non-zero with a `BLOCKED:` operator action. Exit: `0`
-ok/dry-run/parse-log · `1` stage failed · `2` watcher heartbeat · `3` brief contract violation · `4`
-git-safety violation (e.g. inherited upstream) · `5` worktree not found.
+`complex` and `architecture` rows additionally require explicit owner or milestone-coordinator
+authorization with a rationale recorded in the run and passed to the route resolver. Inferred
+complexity cannot select them. The launcher uses the v2 app-server JSONL protocol directly because
+Codex CLI 0.144.1's `debug app-server send-message-v2` helper does not propagate
+`-c model_reasoning_effort` to the child turn. Pass `--allow-route-mismatch` only for an explicit
+operator-approved exception; otherwise a pending or mismatched route exits non-zero with a
+`BLOCKED:` operator action. Exit: `0` ok/dry-run/parse-log · `1` stage failed · `2` watcher
+heartbeat · `3` brief contract violation · `4` git-safety violation (e.g. inherited upstream) · `5`
+worktree not found.
 
 ### 2. Watch it — `codex/codex-watch.ts` (runs **inside** WSL)
 
@@ -533,7 +536,9 @@ configured `opencode` binary name on `PATH`; it never uses Windows interop or tr
 
 ```bash
 deno task agentic:opencode --message "Review this implementation" \
-  --model openrouter/moonshotai/kimi-k3 --variant high
+  --model <matrix-selected-provider/model> --variant high --workload-tier feature \
+  --workload-role implementation_evaluation \
+  --usage-snapshot .llm/tmp/usage/openrouter.json --estimated-cost-usd <amount>
 
 deno task agentic:opencode-eval --prompt "Adversarially review this design" \
   -f /home/me/screens/dashboard.png -f /home/me/screens/detail.png
@@ -557,8 +562,9 @@ Measured runs can require real attachment before the product prompt:
 
 ```bash
 deno task agentic:opencode --message "Inspect the project" --model <provider/model> \
-  --variant <effort> --cwd /path/to/project \
-  --usage-snapshot .llm/tmp/usage/<provider>.json --estimated-cost-usd <amount> \
+  --variant <effort> --cwd /path/to/project --workload-tier feature \
+  --workload-role implementation \
+  --estimated-cost-usd <amount> \
   --require-mcp netscript --require-mcp aspire \
   --receipt .netscript/agent/opencode-receipt.jsonl
 ```
@@ -580,19 +586,24 @@ selected key wins; otherwise the launcher reads only that provider's assignment 
 file under `$HOME/.config/netscript-agentic/`. Rival provider keys are cleared from the child. The
 value is never printed, persisted, or added to argv.
 
-Every paid route requires `--usage-snapshot` and `--estimated-cost-usd`. Generate or refresh the
-normalized snapshot outside Git, then inspect the decision before launching:
+Every paid route requires `--estimated-cost-usd`. OpenCode Go fetches authenticated live usage on
+every preflight and rejects caller snapshots; inspect its decision without launching a model:
 
 ```bash
-deno task agentic:expense-watch -- --provider <opencode_go|ollama|openrouter> \
+deno task agentic:expense-watch -- --provider opencode_go --model opencode-go/<model> \
+  --estimated-cost-usd <amount> --pretty
+
+deno task agentic:expense-watch -- --provider <ollama|openrouter> \
   --snapshot .llm/tmp/usage/<provider>.json --estimated-cost-usd <amount> --pretty
 ```
 
 The command exits zero only when the requested spend fits every applicable allowance and concurrency
-boundary. Missing, stale, mismatched, exhausted, or unresolved usage fails closed. Go never silently
-falls into a separately funded Zen balance; Ollama never guesses the subscription tier or consumes
-extra balance implicitly. OpenRouter paid-training eligibility is an owner-approved route property
-and is not filtered out.
+boundary. Go combines live window status/percentages with the selected model's published effective
+limits; its 12/30/60 USD public windows are scaled from the $60 reference allocation. Missing,
+unfetchable, stale, mismatched, exhausted, rate-limited, unknown-weight, or unresolved usage fails
+closed before process spawn. Go never silently falls into a separately funded Zen balance; Ollama
+never guesses the subscription tier or consumes extra balance implicitly. OpenRouter paid-training
+eligibility is an owner-approved route property and is not filtered out.
 
 For browser access, `agentic:opencode-web` wraps the native
 [`opencode web`](https://opencode.ai/docs/web/) server:

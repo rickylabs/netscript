@@ -11,6 +11,10 @@ must skip any candidate from the selected generator's vendor family, then choose
 capable, allowance-proven transport in the canonical provider order. Never infer a model, effort,
 transport, or fallback from historical lane names.
 
+`complex` and `architecture` are privileged rows. Do not select either from inferred complexity: the
+run must contain explicit owner or milestone-coordinator authorization and its rationale. When that
+evidence is absent, evaluation is capped at the `feature` row.
+
 The supervisor triggers the evaluator; a sub-agent never auto-dispatches one. Record the tier,
 phase, fallback reason, requested and observed route identity, session, exact head, and expense
 decision where a paid OpenCode route is selected. OpenRouter paid-training eligibility is allowed by

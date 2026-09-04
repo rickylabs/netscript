@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
   evaluateSubscriptionExpense,
   type ExpenseUsageSnapshot,
@@ -8,37 +9,49 @@ import {
 const now = '2026-09-04T16:00:00.000Z';
 const capturedAt = '2026-09-04T15:55:00.000Z';
 
-function decide(snapshot: ExpenseUsageSnapshot, estimatedCostUsd = 1) {
+function decide(
+  snapshot: ExpenseUsageSnapshot,
+  estimatedCostUsd = 1,
+  model: string | undefined = snapshot.provider === 'opencode_go'
+    ? ROUTING_MODEL_IDS.grok46Go
+    : undefined,
+) {
   return evaluateSubscriptionExpense({
     provider: snapshot.provider,
+    model,
     estimatedCostUsd,
     snapshot,
     now,
   });
 }
 
-Deno.test('OpenCode Go enforces rolling five-hour, weekly, and monthly monetary windows', () => {
-  const decision = decide({
+function goSnapshot(
+  rollingPercent: number,
+  weeklyPercent = 40,
+  monthlyPercent = 20,
+  rollingStatus = 'ok',
+): ExpenseUsageSnapshot {
+  return {
     provider: 'opencode_go',
     capturedAt,
-    rollingFiveHoursUsedUsd: 10,
-    weeklyUsedUsd: 20,
-    monthlyUsedUsd: 40,
-  });
+    percentageWindows: {
+      rolling_five_hours: { percent: rollingPercent, status: rollingStatus },
+      weekly: { percent: weeklyPercent, status: 'ok' },
+      monthly: { percent: monthlyPercent, status: 'ok' },
+    },
+  };
+}
+
+Deno.test('OpenCode Go enforces rolling five-hour, weekly, and monthly monetary windows', () => {
+  const decision = decide(goSnapshot(50), 0.1);
   assertEquals(decision.allowed, true);
   assertEquals(decision.windows.map((entry) => [entry.id, entry.limitUsd]), [
-    ['rolling_five_hours', 12],
-    ['weekly', 30],
-    ['monthly', 60],
+    ['rolling_five_hours', 3],
+    ['weekly', 7.5],
+    ['monthly', 15],
   ]);
   assertEquals(
-    decide({
-      provider: 'opencode_go',
-      capturedAt,
-      rollingFiveHoursUsedUsd: 11.5,
-      weeklyUsedUsd: 20,
-      monthlyUsedUsd: 40,
-    }).reason,
+    decide(goSnapshot(99), 0.1).reason,
     'allowance_exhausted',
   );
 });
@@ -48,11 +61,23 @@ Deno.test('OpenCode Go fails closed when any usage window is absent', () => {
     decide({
       provider: 'opencode_go',
       capturedAt,
-      rollingFiveHoursUsedUsd: 1,
-      weeklyUsedUsd: 2,
+      percentageWindows: {
+        rolling_five_hours: { percent: 1, status: 'ok' },
+        weekly: { percent: 2, status: 'ok' },
+      },
     }).reason,
     'usage_unproven',
   );
+});
+
+Deno.test('OpenCode Go blocks live rate limits and 100-plus-percent usage', () => {
+  assertEquals(decide(goSnapshot(100)).reason, 'provider_rate_limited');
+  assertEquals(decide(goSnapshot(104.5)).reason, 'provider_rate_limited');
+  assertEquals(decide(goSnapshot(99, 40, 20, 'rate-limited')).reason, 'provider_rate_limited');
+});
+
+Deno.test('OpenCode Go refuses models without published weighting metadata', () => {
+  assertEquals(decide(goSnapshot(10), 0.1, 'opencode-go/unknown').reason, 'usage_unproven');
 });
 
 Deno.test('Ollama resolves plan credits and concurrency without guessing a tier', () => {
@@ -127,15 +152,10 @@ Deno.test('stale, future, mismatched, and zero-cost requests fail closed', () =>
 });
 
 Deno.test('warning becomes true at 90 percent consumption without blocking', () => {
-  const decision = decide({
-    provider: 'opencode_go',
-    capturedAt,
-    rollingFiveHoursUsedUsd: 10,
-    weeklyUsedUsd: 20,
-    monthlyUsedUsd: 40,
-  }, 0.9);
+  const decision = decide(goSnapshot(87), 0.1);
   assertEquals(decision.allowed, true);
   assertEquals(decision.warning, true);
+  assertEquals(decision.windows[0]?.projectedPercent! >= 90, true);
 });
 
 Deno.test('snapshot parser accepts structured usage and rejects non-objects', () => {

@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
+  assertWorkloadModelAllowed,
   COORDINATOR_MATRIX,
   DELEGATION_MATRIX,
   MODEL_CATALOG,
@@ -90,14 +91,51 @@ Deno.test('same-family primary evaluator is skipped in favor of the declared fal
     model: 'deepseek_v4_pro',
     effort: 'max',
   });
-  assertEquals(selectEvaluator('complex', 'plan', 'muse_spark_1_3'), {
-    model: 'grok_4_6',
-    effort: 'high',
-  });
+  assertEquals(
+    selectEvaluator('complex', 'plan', 'muse_spark_1_3', {
+      authorizer: 'milestone_coordinator',
+      rationale: 'Cross-package milestone design requires privileged review.',
+    }),
+    {
+      model: 'grok_4_6',
+      effort: 'high',
+    },
+  );
   assertEquals(selectEvaluator('feature', 'plan', 'fable_5_1'), {
     model: 'glm_5_3',
     effort: 'provider_default',
   });
+});
+
+Deno.test('complex and architecture rows require explicit owner or milestone authority', () => {
+  assertThrows(
+    () => selectEvaluator('complex', 'plan', 'muse_spark_1_3'),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+  assertThrows(
+    () => selectEvaluator('architecture', 'implementation', 'astra'),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+});
+
+Deno.test('a concrete provider model must belong to the selected matrix cell', () => {
+  assertWorkloadModelAllowed(
+    'feature',
+    'implementation_evaluation',
+    ROUTING_MODEL_IDS.museSpark13Go,
+  );
+  assertThrows(
+    () =>
+      assertWorkloadModelAllowed(
+        'feature',
+        'implementation_evaluation',
+        ROUTING_MODEL_IDS.grok46Go,
+      ),
+    Error,
+    'is not declared for feature/implementation_evaluation',
+  );
 });
 
 Deno.test('evaluation limits preserve exact owner thresholds', () => {

@@ -11,6 +11,10 @@ supervisor triggers the evaluator. Record tier, requested and observed route ide
 reason, session, and exact head. OpenRouter paid-training eligibility is allowed by owner preference
 and is not a routing blocker.
 
+`complex` and `architecture` are privileged rows. Their use requires explicit owner or
+milestone-coordinator authorization with a rationale in the run; complexity inference alone is not
+authority. Without that record, use at most the `feature` row.
+
 ## Inputs
 
 Read, in order:
