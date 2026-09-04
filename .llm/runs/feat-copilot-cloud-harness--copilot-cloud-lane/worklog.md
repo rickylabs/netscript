@@ -86,6 +86,17 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S5 — exact connector catalog attestation
+
+- S3/S4 pushed `45f553bc1`, PR comment `5545785827` posted.
+- Non-inference `opencode models github-copilot` probe validates exact full IDs, isolates child
+  environment, bounds catalog command lifetime, and retains only model/presence/timestamp.
+- Missing capability feeds `RouteAvailability.unavailableTransports`; test proves Gemini proceeds
+  to native Luna after unavailable agy/Copilot without guessing a model.
+- Structured preflight/config tests PASS 10/10, `.llm/tmp/copilot-s5-test.json`, exit 0.
+- Reconcile: fresh Agent Tasks docs contradict Pro+ create entitlement; coordinator ruling and
+  corrected response shape recorded in drift. OpenCode routing is unaffected. Tier-A review PASS.
+
 ### S3 + S4 — resolver, prose, credential-free profile
 
 - S2 pushed as `38f213c8f`, PR comment `5545720902` posted.

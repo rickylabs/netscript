@@ -1,5 +1,18 @@
 # Drift Log: GitHub Copilot cloud lane for the NetScript harness
 
+## 2026-09-04 — Agent Tasks entitlement and response-shape correction
+
+- Severity: significant factual correction, bounded by coordinator ruling. Fresh primary REST docs
+  state Start a task supports Business/Enterprise only, requires Agent tasks read/write, and rejects
+  installation tokens. Repository assignability does not prove Pro+ API-create entitlement.
+- Source: https://docs.github.com/en/rest/agent-tasks/agent-tasks (accessed 2026-09-04).
+- Coordinator ruling: preserve OpenCode Copilot routing; hard-disable live Agent Tasks creation
+  for this Pro+ environment. Future live creation requires explicit validated Business/Enterprise
+  entitlement evidence; Pro+ and unknown fail closed before network. Keep generic dry-run/status.
+- Cloud model IDs are a separate API catalog, never inferred from connector IDs. Response model,
+  head/base refs, and session IDs are in `sessions[]`; task metadata and artifacts stay task-level.
+  S8-S12 will reflect this correction. No live task was launched.
+
 ## 2026-09-04 — S3/S4 compile-atomic consolidation
 
 - Severity: minor; coordinator approved combining S3 and S4 because `RouteIdentity.profileId`

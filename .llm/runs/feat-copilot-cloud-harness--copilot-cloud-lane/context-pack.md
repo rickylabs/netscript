@@ -36,6 +36,11 @@ implementation is authorized.
 
 ## In Progress
 
+- S5 exact catalog preflight implemented, scoped tests PASS 10/10, Tier-A review PASS.
+- Fresh API entitlement correction: Agent Tasks live create is not available to Pro+ under current
+  docs; coordinator requires Pro+/unknown to fail closed before network. Generic dry-run/status
+  remain in scope; no cloud model support is inferred from OpenCode catalog. See drift.
+
 - S1 pushed as `f4afe80c0`, PR comment posted; config tests PASS (5/5).
 - S2 pushed as `38f213c8f`, matrix tests PASS (12/12), coordinator review PASS.
 - S3/S4 combined with coordinator approval; resolver, profile, credential and parity tests green;

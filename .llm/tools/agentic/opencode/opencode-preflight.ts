@@ -4,6 +4,8 @@ import { appendFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { LOOPBACK_HOST, LOOPBACK_HTTP_PROTOCOL } from '../config/endpoints.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { environmentWithOpenCodeCredential } from '../lib/provider-credential.ts';
+import type { RouteAvailability } from '../runtime/routing-policy.ts';
 import {
   discoverOpenCodeProjectAttachment,
   type Environment,
@@ -33,6 +35,75 @@ export interface OpenCodePreflightOptions {
 
 interface McpStatus {
   readonly status?: unknown;
+}
+
+/** Exact connector catalog evidence, never a credential or inferred model slug. */
+export interface CopilotCatalogAttestation {
+  readonly model: string;
+  readonly present: boolean;
+  readonly capturedAt: string;
+}
+
+/** Matches an explicit model against complete catalog lines without substring acceptance. */
+export function attestCopilotCatalog(
+  model: string,
+  catalog: string,
+  capturedAt: string,
+): CopilotCatalogAttestation {
+  if (!/^github-copilot\/[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(model)) {
+    throw new Error('Copilot catalog requires an explicit connector model');
+  }
+  if (!Number.isFinite(Date.parse(capturedAt))) throw new Error('invalid catalog timestamp');
+  return {
+    model,
+    present: catalog.split(/\r?\n/).some((line) => line.trim() === model),
+    capturedAt,
+  };
+}
+
+/** Feeds absent catalog capability into the existing route fallback mechanism. */
+export function copilotCatalogAvailability(
+  attestation: CopilotCatalogAttestation,
+): RouteAvailability {
+  return { unavailableTransports: attestation.present ? [] : ['github_copilot'] };
+}
+
+/** Reads OpenCode's catalog without starting a model turn or inspecting its OAuth store. */
+export async function preflightCopilotCatalog(
+  model: string,
+  options: {
+    readonly cwd: string;
+    readonly env?: Environment;
+    readonly now?: () => string;
+    readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
+  },
+): Promise<CopilotCatalogAttestation> {
+  const capturedAt = (options.now ?? (() => new Date().toISOString()))();
+  attestCopilotCatalog(model, '', capturedAt);
+  const env = await environmentWithOpenCodeCredential(model, options.env ?? Deno.env.toObject());
+  const binary = resolveBinary(env);
+  const command: Deno.CommandOptions = {
+    args: ['models', 'github-copilot'],
+    cwd: options.cwd,
+    env,
+    clearEnv: true,
+    stdin: 'null',
+    stdout: 'piped',
+    stderr: 'null',
+    signal: AbortSignal.timeout(15_000),
+  };
+  let catalog: string;
+  try {
+    if (options.listModels) catalog = await options.listModels(binary, command);
+    else {
+      const result = await new Deno.Command(binary, command).output();
+      if (!result.success) throw new Error('catalog unavailable');
+      catalog = new TextDecoder().decode(result.stdout);
+    }
+  } catch {
+    throw new Error('Copilot catalog unavailable; mark github_copilot transport unavailable');
+  }
+  return attestCopilotCatalog(model, catalog, capturedAt);
 }
 
 function safeServerName(value: string): boolean {
