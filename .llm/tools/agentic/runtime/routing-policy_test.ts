@@ -15,6 +15,47 @@ const privilegedTierAuthorization = {
   rationale: 'Recorded cross-package milestone escalation.',
 };
 
+Deno.test('Copilot preserves native-family precedence and wins for attested non-native models', () => {
+  const request = { tier: 'feature' as const, role: 'deep_research' as const, worktree };
+  assertEquals(resolveWorkloadRoute(request).transport, 'agy');
+  assertEquals(
+    resolveWorkloadRoute({ ...request, unavailableTransports: ['agy'] }).model,
+    ROUTING_MODEL_IDS.gemini38FlashCopilot,
+  );
+  assertEquals(
+    resolveWorkloadRoute({ ...request, unavailableTransports: ['agy', 'github_copilot'] }).model,
+    ROUTING_MODEL_IDS.lunaNative,
+  );
+  const plan = { tier: 'feature' as const, role: 'plan' as const, worktree };
+  assertEquals(resolveWorkloadRoute(plan).transport, 'claude');
+  assertEquals(
+    resolveWorkloadRoute({ ...plan, unavailableTransports: ['claude'] }).model,
+    ROUTING_MODEL_IDS.fable51Copilot,
+  );
+  const kimi = resolveWorkloadRoute({
+    tier: 'complex',
+    role: 'vision_evaluation',
+    worktree,
+    privilegedTierAuthorization,
+  });
+  assertEquals([kimi.transport, kimi.provider, kimi.profileId, kimi.model], [
+    'github_copilot',
+    'github_copilot',
+    'opencode-copilot',
+    ROUTING_MODEL_IDS.kimiK3Copilot,
+  ]);
+  assertEquals(
+    resolveWorkloadRoute({
+      tier: 'architecture',
+      role: 'implementation_evaluation',
+      generatorModel: 'astra',
+      worktree,
+      privilegedTierAuthorization,
+    }).model,
+    ROUTING_MODEL_IDS.grok46Copilot,
+  );
+});
+
 Deno.test('canonical inspection policy is derived from all matrix cells', () => {
   assertEquals(CANONICAL_ROUTE_POLICY.length, 66);
   assertEquals(

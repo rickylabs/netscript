@@ -1,4 +1,43 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { copilotLedgerPath, reserveCopilotCredits } from './provider-usage.ts';
+
+Deno.test('Copilot ledger path excludes repository-local accounting', () => {
+  assertEquals(
+    copilotLedgerPath({ HOME: '/home/test' }, '/work/repo'),
+    '/home/test/.config/netscript-agentic/copilot-credits.json',
+  );
+  assertThrows(() => copilotLedgerPath({ HOME: '/work/repo/user' }, '/work/repo'));
+  assertThrows(() => copilotLedgerPath({}, '/work/repo'));
+});
+
+Deno.test('Copilot reservations persist caps, roll months, and refuse missing or locked ledgers', async () => {
+  const home = await Deno.makeTempDir();
+  const env = { HOME: home };
+  const path = copilotLedgerPath(env, '/unrelated/repository');
+  const now = '2026-09-04T20:00:00Z';
+  const options = { env, cap: 100, now, worktree: '/unrelated/repository' };
+  try {
+    await Deno.mkdir(`${home}/.config/netscript-agentic`, { recursive: true });
+    assertEquals((await reserveCopilotCredits(options)).reason, 'usage_unproven');
+    await Deno.writeTextFile(
+      path,
+      JSON.stringify({
+        schemaVersion: 1,
+        month: '2026-08',
+        updatedAt: '2026-08-31T23:59:00Z',
+        usedCredits: 7000,
+      }),
+    );
+    assertEquals((await reserveCopilotCredits(options)).allowed, true);
+    assertEquals(JSON.parse(await Deno.readTextFile(path)).usedCredits, 100);
+    assertEquals((await reserveCopilotCredits(options)).allowed, true);
+    assertEquals(JSON.parse(await Deno.readTextFile(path)).usedCredits, 200);
+    await Deno.writeTextFile(`${path}.lock`, '');
+    await assertRejects(() => reserveCopilotCredits(options), Error, 'unavailable or locked');
+  } finally {
+    await Deno.remove(home, { recursive: true });
+  }
+});
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { fetchOpenCodeGoUsageSnapshot, parseOpenCodeGoUsagePayload } from './provider-usage.ts';
 

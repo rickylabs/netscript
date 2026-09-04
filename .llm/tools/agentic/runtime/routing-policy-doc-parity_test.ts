@@ -64,3 +64,9 @@ Deno.test('lane-policy coordinator table exactly matches the typed matrix', asyn
   ];
   assertEquals(tableCells(generatedBlock(source, 'coordinator-matrix')), expected);
 });
+
+Deno.test('lane-policy documents the restricted Copilot deep-research fallback', async () => {
+  const source = await Deno.readTextFile('.llm/harness/workflow/lane-policy.md');
+  assertEquals(source.includes('catalog-attested GitHub Copilot Gemini second'), true);
+  assertEquals(source.includes('Copilot is allowed only for the `google` family'), true);
+});

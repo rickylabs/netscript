@@ -1,6 +1,8 @@
 /** Runs one bounded, non-interactive OpenCode turn. */
 
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { COPILOT_LAUNCH_CREDIT_CAPS } from '../config/subscriptions.ts';
+import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
 export { parseOpenRouterApiKey } from '../lib/openrouter-credential.ts';
 import {
   environmentWithOpenCodeCredential,
@@ -8,14 +10,14 @@ import {
 } from '../lib/provider-credential.ts';
 import { dirname, resolve } from 'node:path';
 import { prepareOpenCodeProjectEnvironment } from './opencode-project-config.ts';
-import { preflightOpenCodeMcp } from './opencode-preflight.ts';
+import { preflightCopilotCatalog, preflightOpenCodeMcp } from './opencode-preflight.ts';
 import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import {
   evaluateSubscriptionExpense,
   type ExpenseDecision,
   parseExpenseUsageSnapshot,
 } from '../runtime/subscription-expense.ts';
-import { fetchOpenCodeGoUsageSnapshot } from '../runtime/provider-usage.ts';
+import { fetchOpenCodeGoUsageSnapshot, reserveCopilotCredits } from '../runtime/provider-usage.ts';
 import {
   assertPrivilegedTierAuthorization,
   assertWorkloadModelAllowed,
@@ -40,6 +42,7 @@ export interface OpenCodeRunOptions {
   readonly receiptPath?: string;
   readonly usageSnapshotPath?: string;
   readonly estimatedCostUsd?: number;
+  readonly maxAiCredits?: number;
   readonly workloadTier?: WorkloadTier;
   readonly workloadRole?: DelegationRole;
   readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
@@ -51,6 +54,9 @@ export interface OpenCodeRunResult {
 }
 
 export interface OpenCodeRunDependencies {
+  readonly repositoryIdentity?: (cwd: string) => Promise<{ branch: string; head: string }>;
+  readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
+  readonly reserveCopilot?: typeof reserveCopilotCredits;
   readonly env?: Readonly<Record<string, string | undefined>>;
   readonly fetch?: typeof fetch;
   readonly readTextFile?: (path: string) => Promise<string>;
@@ -68,19 +74,35 @@ interface CliOptions extends OpenCodeRunOptions {
 
 type Environment = Readonly<Record<string, string | undefined>>;
 
+async function repositoryIdentity(cwd: string): Promise<{ branch: string; head: string }> {
+  const read = async (args: string[]): Promise<string> => {
+    const result = await new Deno.Command('git', { args, cwd, stdout: 'piped', stderr: 'null' })
+      .output();
+    if (!result.success) throw new Error('Copilot launch requires a Git branch and exact head');
+    return new TextDecoder().decode(result.stdout).trim();
+  };
+  return {
+    branch: await read(['symbolic-ref', '--short', 'HEAD']),
+    head: await read(['rev-parse', 'HEAD']),
+  };
+}
+
 /**
  * Builds the OpenCode argv. The message deliberately comes immediately after
  * `run`: OpenCode's `-f` flag accepts an array and otherwise swallows a trailing
  * positional message as another filename.
  */
 export function opencodeRunArguments(options: OpenCodeRunOptions): string[] {
+  const copilot = openCodeCredentialProviderForModel(options.model) === 'github_copilot';
+  if (copilot && options.variant !== 'provider_default') {
+    throw new Error('Copilot variant is unproven; use provider_default');
+  }
   return [
     'run',
     options.message,
     '-m',
     options.model,
-    '--variant',
-    options.variant,
+    ...(!copilot ? ['--variant', options.variant] : []),
     ...(options.session ? ['--session', options.session] : []),
     ...(options.files ?? []).flatMap((file) => ['-f', file]),
     ...(options.format === 'json' ? ['--format', 'json'] : []),
@@ -135,6 +157,19 @@ export async function preflightOpenCodeExpense(
   }
   assertPrivilegedTierAuthorization(options.workloadTier, options.privilegedTierAuthorization);
   assertWorkloadModelAllowed(options.workloadTier, options.workloadRole, options.model);
+  if (provider === 'github_copilot') {
+    if (options.usageSnapshotPath) {
+      throw new Error('Copilot requires its operational ledger, not --usage-snapshot');
+    }
+    const decision = await (dependencies.reserveCopilot ?? reserveCopilotCredits)({
+      cap: options.maxAiCredits ?? COPILOT_LAUNCH_CREDIT_CAPS[options.workloadTier],
+      now: (dependencies.now ?? (() => new Date().toISOString()))(),
+      worktree: resolve(options.cwd ?? Deno.cwd()),
+      env: dependencies.env,
+    });
+    if (!decision.allowed) throw new Error(`expense guard blocked ${provider}: ${decision.reason}`);
+    return decision;
+  }
   if (options.estimatedCostUsd === undefined) {
     throw new Error(
       `paid ${provider} route requires --estimated-cost-usd`,
@@ -183,9 +218,61 @@ export async function runOpenCode(
 ): Promise<OpenCodeRunResult> {
   const processEnv = dependencies.env ?? Deno.env.toObject();
   const cwd = resolve(options.cwd ?? Deno.cwd());
-  await preflightOpenCodeExpense(options, dependencies);
+  const args = opencodeRunArguments(options);
+  const copilot = openCodeCredentialProviderForModel(options.model) === 'github_copilot';
+  if (copilot && !options.receiptPath) throw new Error('Copilot launch requires --receipt');
+  const gitIdentity = copilot
+    ? await (dependencies.repositoryIdentity ?? repositoryIdentity)(cwd)
+    : undefined;
+  if (copilot && options.requiredMcp?.length) {
+    throw new Error(
+      'Copilot inference-based MCP preflight needs a separate authorized reservation',
+    );
+  }
+  const attestation = copilot
+    ? await preflightCopilotCatalog(options.model, {
+      cwd,
+      env: processEnv,
+      now: dependencies.now,
+      listModels: dependencies.listModels,
+    })
+    : undefined;
+  if (attestation && !attestation.present) {
+    throw new Error('Copilot catalog model absent; mark github_copilot transport unavailable');
+  }
+  const expense = await preflightOpenCodeExpense(options, dependencies);
   if (options.receiptPath) {
     await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
+    if (attestation) {
+      const identity = compareLaunchIdentity({
+        provider: 'github_copilot',
+        transport: 'github_copilot',
+        model: options.model,
+        effort: 'provider_default',
+      }, {
+        provider: 'github_copilot',
+        model: null,
+        effort: null,
+        transport: 'github_copilot',
+        catalog: attestation,
+      });
+      await Deno.writeTextFile(
+        resolve(cwd, options.receiptPath),
+        JSON.stringify({
+          kind: 'copilot_launch',
+          identity,
+          expense,
+          observationSource: 'connector_catalog',
+          requestedCreditCap: options.maxAiCredits ??
+            (options.workloadTier ? COPILOT_LAUNCH_CREDIT_CAPS[options.workloadTier] : null),
+          providerEnforcedCap: false,
+          cwd,
+          ...gitIdentity,
+          session: options.session ?? null,
+        }) + '\n',
+        { append: true, mode: 0o600 },
+      );
+    }
   }
   const env = await openCodeChildEnvironment(
     processEnv,
@@ -212,9 +299,10 @@ export async function runOpenCode(
   }
   const binary = resolveOpenCodeBinary(processEnv);
   const commandOptions: Deno.CommandOptions = {
-    args: opencodeRunArguments(options),
+    args,
     cwd,
     env,
+    clearEnv: true,
     stdin: 'null',
     stdout: capture ? 'piped' : 'inherit',
     stderr: 'inherit',
@@ -249,6 +337,7 @@ function parse(args: readonly string[]): CliOptions {
   let receiptPath: string | undefined;
   let usageSnapshotPath: string | undefined;
   let estimatedCostUsd: number | undefined;
+  let maxAiCredits: number | undefined;
   let workloadTier: WorkloadTier | undefined;
   let workloadRole: DelegationRole | undefined;
   let privilegedAuthorizer: PrivilegedTierAuthorization['authorizer'] | undefined;
@@ -280,6 +369,11 @@ function parse(args: readonly string[]): CliOptions {
       receiptPath = requiredValue(args, index++, argument);
     } else if (argument === '--usage-snapshot') {
       usageSnapshotPath = requiredValue(args, index++, argument);
+    } else if (argument === '--max-ai-credits') {
+      maxAiCredits = Number(requiredValue(args, index++, argument));
+      if (!Number.isSafeInteger(maxAiCredits) || maxAiCredits <= 0) {
+        throw new Error('--max-ai-credits must be a positive integer');
+      }
     } else if (argument === '--estimated-cost-usd') {
       const value = Number(requiredValue(args, index++, argument));
       if (!Number.isFinite(value) || value <= 0) {
@@ -342,6 +436,7 @@ function parse(args: readonly string[]): CliOptions {
     ...(receiptPath ? { receiptPath } : {}),
     ...(usageSnapshotPath ? { usageSnapshotPath } : {}),
     ...(estimatedCostUsd !== undefined ? { estimatedCostUsd } : {}),
+    ...(maxAiCredits !== undefined ? { maxAiCredits } : {}),
     ...(workloadTier ? { workloadTier } : {}),
     ...(workloadRole ? { workloadRole } : {}),
     ...(privilegedAuthorizer && privilegedRationale

@@ -173,3 +173,34 @@ Deno.test('snapshot parser accepts structured usage and rejects non-objects', ()
   }
   assertEquals(message, 'usage snapshot requires a supported provider and capturedAt');
 });
+import { evaluateCopilotExpense } from './subscription-expense.ts';
+
+Deno.test('Copilot ledger rejects missing malformed stale cap and envelope anomalies', () => {
+  const now = '2026-09-04T20:00:00Z';
+  const ledger = { schemaVersion: 1, month: '2026-09', updatedAt: now, usedCredits: 6900 };
+  assertEquals(evaluateCopilotExpense(ledger, 100, now).allowed, true);
+  assertEquals(evaluateCopilotExpense(ledger, 101, now).reason, 'allowance_exhausted');
+  for (const cap of [0, -1, 1.5, NaN, Infinity]) {
+    assertEquals(evaluateCopilotExpense(ledger, cap, now).reason, 'invalid_request');
+  }
+  for (
+    const value of [null, {}, { ...ledger, usedCredits: -1 }, { ...ledger, month: 'invalid' }, {
+      ...ledger,
+      updatedAt: '2026-09-05T00:00:00Z',
+    }]
+  ) {
+    assertEquals(evaluateCopilotExpense(value, 100, now).reason, 'usage_unproven');
+  }
+  assertEquals(
+    evaluateCopilotExpense({ ...ledger, updatedAt: '2026-09-04T19:00:00Z' }, 100, now).reason,
+    'usage_stale',
+  );
+  assertEquals(
+    evaluateCopilotExpense(
+      { ...ledger, month: '2026-08', updatedAt: '2026-08-31T23:59:00Z', usedCredits: 7000 },
+      100,
+      now,
+    ).allowed,
+    true,
+  );
+});

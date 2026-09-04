@@ -1,10 +1,36 @@
 import { assertEquals } from '@std/assert';
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
   environmentWithOpenCodeCredential,
   openCodeCredentialProviderForModel,
   parseCredentialAssignment,
 } from './provider-credential.ts';
+
+Deno.test('Copilot OAuth remains connector-owned without credential reads or inherited rival keys', async () => {
+  const env = await environmentWithOpenCodeCredential(
+    ROUTING_MODEL_IDS.kimiK3Copilot,
+    {
+      HOME: '/home/test',
+      OPENCODE_API_KEY: 'go',
+      OLLAMA_API_KEY: 'ollama',
+      OPENROUTER_API_KEY: 'router',
+      OPENAI_API_KEY: 'openai',
+      ANTHROPIC_API_KEY: 'anthropic',
+      ANTHROPIC_AUTH_TOKEN: 'auth',
+      GH_TOKEN: 'github',
+      GITHUB_TOKEN: 'github',
+      COPILOT_GITHUB_TOKEN: 'copilot',
+    },
+    () => Promise.reject(new Error('must not read OAuth store')),
+    undefined,
+  );
+  assertEquals(env, { HOME: '/home/test' });
+  assertEquals(
+    openCodeCredentialProviderForModel(ROUTING_MODEL_IDS.kimiK3Copilot),
+    'github_copilot',
+  );
+});
 
 Deno.test('model prefixes select the exact paid provider', () => {
   assertEquals(openCodeCredentialProviderForModel('opencode-go/model'), 'opencode_go');

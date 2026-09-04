@@ -13,6 +13,7 @@ export const PROVIDER_PROFILE_IDS = [
   'claude-openrouter',
   'codex-openrouter',
   'opencode-go',
+  'opencode-copilot',
   'opencode-ollama',
   'opencode-openrouter',
   'claude-custom',
@@ -42,11 +43,11 @@ export interface ProviderProfile {
   readonly agent: Extract<AgentKind, 'claude' | 'codex' | 'opencode'>;
   readonly provider: Extract<
     ProviderKind,
-    'anthropic' | 'openai' | 'opencode_go' | 'ollama' | 'openrouter' | 'custom'
+    'anthropic' | 'openai' | 'github_copilot' | 'opencode_go' | 'ollama' | 'openrouter' | 'custom'
   >;
   readonly endpointKind: ProviderEndpointKind;
-  readonly credentialSourceKey: ProviderCredentialKey;
-  readonly credentialTargetKey: ProviderCredentialKey;
+  readonly credentialSourceKey: ProviderCredentialKey | null;
+  readonly credentialTargetKey: ProviderCredentialKey | null;
   readonly clearKeys: readonly (ProviderCredentialKey | ProviderRouteKey)[];
 }
 
@@ -71,6 +72,14 @@ function profile(
 
 export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfile>> = Object
   .freeze({
+    'opencode-copilot': profile({
+      id: 'opencode-copilot',
+      agent: 'opencode',
+      provider: 'github_copilot',
+      endpointKind: 'subscription',
+      credentialSourceKey: null,
+      credentialTargetKey: null,
+    }, []),
     'claude-anthropic-native': profile({
       id: 'claude-anthropic-native',
       agent: 'claude',
@@ -296,16 +305,18 @@ export function childEnvironmentPolicyForProfile(
     fixedValues.push({ targetKey: 'CODEX_HOME', value: codexHome });
     fixedValues.push({
       targetKey: 'WSLENV',
-      value: `${profile.credentialTargetKey}:CODEX_HOME/p`,
+      value: [profile.credentialTargetKey, 'CODEX_HOME/p'].filter(Boolean).join(':'),
     });
   }
   return {
     clearKeys: profile.clearKeys,
     ...(emptyKeys.length ? { emptyKeys } : {}),
-    bindings: [{
-      sourceKey: profile.credentialSourceKey,
-      targetKey: profile.credentialTargetKey,
-    }],
+    bindings: profile.credentialSourceKey && profile.credentialTargetKey
+      ? [{
+        sourceKey: profile.credentialSourceKey,
+        targetKey: profile.credentialTargetKey,
+      }]
+      : [],
     ...(fixedValues.length ? { fixedValues } : {}),
   };
 }

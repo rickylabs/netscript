@@ -14,6 +14,15 @@
  * (enforced by `config/no-hardcoded-volatile_test.ts`).
  */
 
+/** Preview Agent Tasks create catalog; never infer these from connector capabilities. */
+export const COPILOT_AGENT_TASK_MODEL_IDS = [
+  'claude-sonnet-4.6',
+  'claude-opus-4.6',
+  'gpt-5.2-codex',
+  'gpt-5.3-codex',
+  'gpt-5.4',
+] as const;
+
 /** First-party (native provider) model ids used by the canonical route policy. */
 export const MODEL_IDS = {
   /** OpenAI/Codex balanced default. */
@@ -41,6 +50,10 @@ export const ROUTING_MODEL_IDS = {
   fable51Native: 'claude-fable-5-1',
   opus5Native: 'claude-opus-5',
   gemini38FlashNative: 'gemini-3.8-flash',
+  gemini38FlashCopilot: 'github-copilot/gemini-3.8-flash',
+  kimiK3Copilot: 'github-copilot/kimi-k3',
+  grok46Copilot: 'github-copilot/grok-4.6',
+  fable51Copilot: 'github-copilot/claude-fable-5.1',
   qwen38FlashNextGo: 'opencode-go/qwen3.8-flash',
   qwen38FlashNextOpenRouter: 'openrouter/qwen/qwen3.8-flash',
   qwen38MaxGo: 'opencode-go/qwen3.8-max',

@@ -107,6 +107,7 @@ const TRANSPORT_AGENT: Readonly<Record<ModelTransport, AgentKind>> = {
   claude: 'claude',
   codex: 'codex',
   agy: 'antigravity',
+  github_copilot: 'opencode',
   opencode_go: 'opencode',
   ollama: 'opencode',
   openrouter: 'opencode',
@@ -116,12 +117,14 @@ const TRANSPORT_PROVIDER: Readonly<Record<ModelTransport, ProviderKind>> = {
   claude: 'anthropic',
   codex: 'openai',
   agy: 'google',
+  github_copilot: 'github_copilot',
   opencode_go: 'opencode_go',
   ollama: 'ollama',
   openrouter: 'openrouter',
 };
 
 const TRANSPORT_PROFILE = {
+  github_copilot: 'opencode-copilot',
   opencode_go: 'opencode-go',
   ollama: 'opencode-ollama',
   openrouter: 'opencode-openrouter',
@@ -152,7 +155,7 @@ function resolveRouteChain(
       MODEL_TRANSPORT_PRIORITY.indexOf(right.transport)
     ).find((entry) =>
       !unavailableTransports.has(entry.transport) &&
-      (!request.role || isTransportAllowedForRole(request.role, entry.transport))
+      (!request.role || isTransportAllowedForRole(request.role, entry.transport, definition.family))
     );
     if (!capability) continue;
     return {

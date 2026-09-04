@@ -1,6 +1,12 @@
 /** Authenticated, value-free subscription usage acquisition for paid providers. */
 
 import { OPENCODE_GO_USAGE_URL } from '../config/endpoints.ts';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import {
+  type CopilotCreditLedger,
+  evaluateCopilotExpense,
+  type ExpenseDecision,
+} from './subscription-expense.ts';
 import { environmentWithOpenCodeCredential } from '../lib/provider-credential.ts';
 import type {
   ExpenseUsageSnapshot,
@@ -9,6 +15,64 @@ import type {
 } from './subscription-expense.ts';
 
 type Environment = Readonly<Record<string, string | undefined>>;
+
+/** Resolves operational accounting outside the selected repository. */
+export function copilotLedgerPath(env: Environment, worktree: string): string {
+  const home = env.HOME?.trim();
+  if (!home || !isAbsolute(home)) throw new Error('Copilot ledger requires an absolute user HOME');
+  const path = resolve(home, '.config/netscript-agentic/copilot-credits.json');
+  const rel = relative(resolve(worktree), path);
+  if (rel === '' || (!rel.startsWith('..' + '/') && !isAbsolute(rel))) {
+    throw new Error('Copilot ledger must be outside the repository');
+  }
+  return path;
+}
+
+/** Reserves the full cap atomically; missing state or concurrent writers fail closed. */
+export async function reserveCopilotCredits(options: {
+  readonly cap: number;
+  readonly now: string;
+  readonly worktree: string;
+  readonly env?: Environment;
+}): Promise<ExpenseDecision> {
+  const path = copilotLedgerPath(options.env ?? Deno.env.toObject(), options.worktree);
+  const lockPath = `${path}.lock`;
+  let lock: Deno.FsFile;
+  try {
+    lock = await Deno.open(lockPath, { write: true, createNew: true, mode: 0o600 });
+  } catch {
+    throw new Error('Copilot ledger unavailable or locked');
+  }
+  let temporary: string | undefined;
+  try {
+    let ledger: unknown;
+    try {
+      ledger = JSON.parse(await Deno.readTextFile(path));
+    } catch {
+      ledger = null;
+    }
+    const decision = evaluateCopilotExpense(ledger, options.cap, options.now);
+    if (!decision.allowed) return decision;
+    const month = new Date(options.now).toISOString().slice(0, 7);
+    const prior = ledger as CopilotCreditLedger;
+    const next: CopilotCreditLedger = {
+      schemaVersion: 1,
+      month,
+      updatedAt: options.now,
+      usedCredits: (prior.month === month ? prior.usedCredits : 0) + options.cap,
+    };
+    temporary = await Deno.makeTempFile({ dir: dirname(path), prefix: 'copilot-credits-' });
+    await Deno.chmod(temporary, 0o600);
+    await Deno.writeTextFile(temporary, JSON.stringify(next) + '\n');
+    await Deno.rename(temporary, path);
+    temporary = undefined;
+    return decision;
+  } finally {
+    if (temporary) await Deno.remove(temporary);
+    lock.close();
+    await Deno.remove(lockPath);
+  }
+}
 
 export interface OpenCodeGoUsageDependencies {
   readonly env?: Environment;

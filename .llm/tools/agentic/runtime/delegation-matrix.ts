@@ -42,6 +42,7 @@ export const MODEL_TRANSPORTS = [
   'claude',
   'codex',
   'agy',
+  'github_copilot',
   'opencode_go',
   'ollama',
   'openrouter',
@@ -86,7 +87,10 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
   fable_5_1: {
     id: 'fable_5_1',
     family: 'anthropic',
-    capabilities: [capability('claude', ROUTING_MODEL_IDS.fable51Native)],
+    capabilities: [
+      capability('claude', ROUTING_MODEL_IDS.fable51Native),
+      capability('github_copilot', ROUTING_MODEL_IDS.fable51Copilot),
+    ],
   },
   opus_5: {
     id: 'opus_5',
@@ -96,7 +100,10 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
   gemini_3_8_flash: {
     id: 'gemini_3_8_flash',
     family: 'google',
-    capabilities: [capability('agy', ROUTING_MODEL_IDS.gemini38FlashNative)],
+    capabilities: [
+      capability('agy', ROUTING_MODEL_IDS.gemini38FlashNative),
+      capability('github_copilot', ROUTING_MODEL_IDS.gemini38FlashCopilot),
+    ],
   },
   qwen_3_8_flash_next: {
     id: 'qwen_3_8_flash_next',
@@ -179,6 +186,7 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     id: 'kimi_k3',
     family: 'moonshot',
     capabilities: [
+      capability('github_copilot', ROUTING_MODEL_IDS.kimiK3Copilot),
       capability('opencode_go', ROUTING_MODEL_IDS.kimiK3Go),
       capability('ollama', ROUTING_MODEL_IDS.kimiK3Ollama),
       capability('openrouter', ROUTING_MODEL_IDS.kimiK3OpenRouter),
@@ -188,6 +196,7 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     id: 'grok_4_6',
     family: 'xai',
     capabilities: [
+      capability('github_copilot', ROUTING_MODEL_IDS.grok46Copilot),
       capability('opencode_go', ROUTING_MODEL_IDS.grok46Go),
       capability('openrouter', ROUTING_MODEL_IDS.grok46OpenRouter),
     ],
@@ -198,6 +207,7 @@ export const MODEL_TRANSPORT_PRIORITY: readonly ModelTransport[] = [
   'claude',
   'codex',
   'agy',
+  'github_copilot',
   'opencode_go',
   'ollama',
   'openrouter',
@@ -243,16 +253,18 @@ export const DELEGATION_ROLES = [
 ] as const;
 export type DelegationRole = typeof DELEGATION_ROLES[number];
 
-/** Deep research stays on native subscriptions; accumulated context makes metered fallback unsafe. */
-export const DEEP_RESEARCH_TRANSPORTS = ['agy', 'codex'] as const;
+/** Deep research permits native subscriptions and catalog-attested Copilot Google fallback only. */
+export const DEEP_RESEARCH_TRANSPORTS = ['agy', 'github_copilot', 'codex'] as const;
 export type DeepResearchTransport = typeof DEEP_RESEARCH_TRANSPORTS[number];
 
 export function isTransportAllowedForRole(
   role: DelegationRole,
   transport: ModelTransport,
+  family?: ModelVendorFamily,
 ): boolean {
   return role !== 'deep_research' ||
-    DEEP_RESEARCH_TRANSPORTS.includes(transport as DeepResearchTransport);
+    (DEEP_RESEARCH_TRANSPORTS.includes(transport as DeepResearchTransport) &&
+      (transport !== 'github_copilot' || family === 'google'));
 }
 
 export interface ModelRoute {
@@ -403,7 +415,8 @@ export function assertWorkloadModelAllowed(
   const routes = DELEGATION_MATRIX[tier][role];
   const allowed = routes.some((route) =>
     MODEL_CATALOG[route.model].capabilities.some((capability) =>
-      capability.model === concreteModel && isTransportAllowedForRole(role, capability.transport)
+      capability.model === concreteModel &&
+      isTransportAllowedForRole(role, capability.transport, MODEL_CATALOG[route.model].family)
     )
   );
   if (!allowed) {

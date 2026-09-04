@@ -52,6 +52,11 @@ See **netscript-deno-toolchain** (canonical: command map + gotchas).
 
 ## Supervisor automation — `agentic:*` task family
 
+Copilot entry points: `agentic:copilot-preflight` attests an exact OpenCode connector model without
+inference; `agentic:copilot-task dispatch|preflight|status|watch` provides pure dry-run creation and
+read-only cloud inspection. Live creation is disabled. See the suite README's Copilot section for
+permissions, ledger reconciliation, and the separate cloud entitlement boundary.
+
 `.llm/tools/agentic/` is the **only** interface for driving Tier-D Codex and Tier-E OpenHands (never
 ad-hoc `wsl.exe`). Each tool is exposed as a `deno task`; run with `--help` for usage. Most take
 `--dry-run`.

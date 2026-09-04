@@ -37,3 +37,6 @@ export const GITHUB_API_BASE_URL = 'https://api.github.com';
 
 /** GitHub GraphQL API used for review-thread state unavailable from REST. */
 export const GITHUB_GRAPHQL_API_URL = 'https://api.github.com/graphql';
+
+/** Preview Agent Tasks collection path; interpolate encoded owner/repository segments. */
+export const COPILOT_AGENT_TASKS_PATH = '/agents/repos/{owner}/{repo}/tasks';

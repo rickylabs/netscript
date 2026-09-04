@@ -1,20 +1,27 @@
 import { type Effort, EFFORTS, PROVIDER_KINDS, type ProviderKind } from './contract.ts';
 import { CODEX_OPENROUTER_MODEL_PROVIDER_ID } from './provider-profiles.ts';
 
-export interface RequestedLaunchIdentity {
+export interface RequestedLaunchIdentity<E extends string = Effort> {
   readonly provider: ProviderKind;
   readonly model: string;
-  readonly effort: Effort;
+  readonly effort: E;
+  readonly transport?: string;
 }
 
 export interface ObservedLaunchIdentity {
   readonly provider: string | null;
   readonly model: string | null;
   readonly effort: string | null;
+  readonly transport?: string;
+  readonly catalog?: {
+    readonly model: string;
+    readonly present: boolean;
+    readonly capturedAt: string;
+  };
 }
 
-export interface LaunchIdentityEvidence {
-  readonly requested: RequestedLaunchIdentity;
+export interface LaunchIdentityEvidence<E extends string = Effort> {
+  readonly requested: RequestedLaunchIdentity<E>;
   readonly observed: ObservedLaunchIdentity;
   readonly status: 'matched' | 'pending' | 'mismatch';
   readonly mismatches: readonly ('provider' | 'model' | 'effort')[];
@@ -50,10 +57,10 @@ export function requestedLaunchIdentity(values: {
 }
 
 /** Produces secret-safe requested-versus-observed launch evidence. */
-export function compareLaunchIdentity(
-  requested: RequestedLaunchIdentity,
+export function compareLaunchIdentity<E extends string>(
+  requested: RequestedLaunchIdentity<E>,
   observed: ObservedLaunchIdentity,
-): LaunchIdentityEvidence {
+): LaunchIdentityEvidence<E> {
   const missing = observed.provider === null || observed.model === null || observed.effort === null;
   const mismatches: ('provider' | 'model' | 'effort')[] = [];
   const observedProvider = observed.provider?.toLowerCase() === CODEX_OPENROUTER_MODEL_PROVIDER_ID

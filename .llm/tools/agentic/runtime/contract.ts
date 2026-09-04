@@ -26,6 +26,7 @@ export const PROVIDER_KINDS = [
   'anthropic',
   'openai',
   'google',
+  'github_copilot',
   'opencode_go',
   'ollama',
   'openrouter',

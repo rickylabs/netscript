@@ -1,6 +1,8 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { COPILOT_CATALOG_FIXTURE } from '../runtime/test-fixtures.ts';
+import { evaluateCopilotExpense } from '../runtime/subscription-expense.ts';
 import {
   openCodeChildEnvironment,
   opencodeRunArguments,
@@ -9,6 +11,101 @@ import {
   resolveOpenCodeBinary,
   runOpenCode,
 } from './opencode-run.ts';
+
+Deno.test('Copilot launch reserves after attestation and writes pending identity without secrets', async () => {
+  const cwd = await Deno.makeTempDir();
+  const now = '2026-09-04T20:00:00Z';
+  const order: string[] = [];
+  try {
+    const result = await runOpenCode(
+      {
+        message: 'bounded test',
+        model: ROUTING_MODEL_IDS.gemini38FlashCopilot,
+        variant: 'provider_default',
+        workloadTier: 'feature',
+        workloadRole: 'deep_research',
+        cwd,
+        receiptPath: 'launch.jsonl',
+      },
+      true,
+      {
+        env: { HOME: cwd, GH_TOKEN: 'never-retain', OPENAI_API_KEY: 'never-retain' },
+        now: () => now,
+        repositoryIdentity: () => Promise.resolve({ branch: 'feat/test', head: 'a'.repeat(40) }),
+        listModels: () => {
+          order.push('catalog');
+          return Promise.resolve(COPILOT_CATALOG_FIXTURE);
+        },
+        reserveCopilot: (options) => {
+          order.push('reserve');
+          assertEquals(options.cap, 100);
+          return Promise.resolve(
+            evaluateCopilotExpense(
+              { schemaVersion: 1, month: '2026-09', updatedAt: now, usedCredits: 0 },
+              options.cap,
+              now,
+            ),
+          );
+        },
+        spawn: (_binary, options) => {
+          order.push('spawn');
+          assertEquals(options.clearEnv, true);
+          assertEquals(options.env?.GH_TOKEN, undefined);
+          assertEquals(options.env?.OPENAI_API_KEY, undefined);
+          assertEquals(options.args?.includes('--variant'), false);
+          assertEquals(JSON.stringify(options).includes('never-retain'), false);
+          return new Deno.Command(Deno.execPath(), {
+            args: ['eval', 'void 0'],
+            stdout: 'piped',
+            stderr: 'null',
+          }).spawn();
+        },
+      },
+    );
+    assertEquals(result.code, 0);
+    assertEquals(order, ['catalog', 'reserve', 'spawn']);
+    const source = await Deno.readTextFile(`${cwd}/launch.jsonl`);
+    assertEquals(source.includes('never-retain'), false);
+    const receipt = JSON.parse(source);
+    assertEquals(receipt.identity.requested.effort, 'provider_default');
+    assertEquals(receipt.identity.observed.catalog.present, true);
+    assertEquals(receipt.identity.status, 'pending');
+    assertEquals(receipt.head, 'a'.repeat(40));
+  } finally {
+    await Deno.remove(cwd, { recursive: true });
+  }
+});
+
+Deno.test('absent Copilot catalog never reserves credits or spawns inference', async () => {
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'no launch',
+          model: ROUTING_MODEL_IDS.gemini38FlashCopilot,
+          variant: 'provider_default',
+          cwd: '/work',
+          receiptPath: 'launch.jsonl',
+          workloadTier: 'feature',
+          workloadRole: 'deep_research',
+        },
+        false,
+        {
+          env: { HOME: '/home/test' },
+          repositoryIdentity: () => Promise.resolve({ branch: 'test', head: 'a'.repeat(40) }),
+          listModels: () => Promise.resolve(''),
+          reserveCopilot: () => {
+            throw new Error('must not reserve');
+          },
+          spawn: () => {
+            throw new Error('must not spawn');
+          },
+        },
+      ),
+    Error,
+    'catalog model absent',
+  );
+});
 
 Deno.test('OpenCode argv keeps the message before every flag', () => {
   assertEquals(
