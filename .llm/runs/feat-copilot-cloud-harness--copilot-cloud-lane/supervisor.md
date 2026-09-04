@@ -38,7 +38,10 @@
 | 2026-09-04T18:27Z | Muse Spark 1.3 xhigh / OpenRouter  | Provider rejected before inference: paid-training endpoint excluded by account privacy guardrail          | Owner account toggle or Go-window reset required |
 | 2026-09-04T19:15Z | GitHub Copilot connector preflight | Device OAuth succeeded; live catalog exposed exact Fable 5.1, Gemini 3.8 Flash, Kimi K3, and Grok 4.6 IDs | Plan fallback transport is available             |
 
-No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL remains blocked.
+The plan was generated in separate session `ses_f92227a5affeSmWoi4FJ4jgLm7` through the
+catalog-attested Copilot Fable fallback, then passed independent PLAN-EVAL at `c12796b85` in GLM 5.3
+session `ses_f9213f890ffelYPJ3h8zaNa8O4`. The evaluator's OpenCode Go transport failed closed with
+`provider_rate_limited`; the same logical model completed through OpenRouter.
 
 ## Owner routing ruling — 2026-09-04
 

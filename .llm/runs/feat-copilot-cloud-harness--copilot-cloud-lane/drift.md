@@ -32,3 +32,11 @@ Drift is append-only. No drift recorded at activation.
   `subscription-expense.ts`, `opencode-run.ts`, and the `openhands/` and `github/` helpers were not
   read during planning (survey stopped by the coordinator); paths are verified to exist and the plan
   instructs implementation to confirm exported names before editing (plan.md §4 note).
+
+## 2026-09-04 — PLAN-EVAL transport fallback
+
+- Requested logical evaluator: feature-tier GLM 5.3 at provider-default effort, separate Zhipu
+  family from the Fable generator.
+- OpenCode Go expense preflight failed closed before spawn with `provider_rate_limited`.
+- The same logical model completed through OpenRouter in session `ses_f9213f890ffelYPJ3h8zaNa8O4`;
+  exact plan head `c12796b85` received `PASS`.

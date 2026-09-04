@@ -48,14 +48,15 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Progress Log
 
-| Time              | Slice     | Step      | Notes                                                                                                                   |
-| ----------------- | --------- | --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-04T17:45Z | bootstrap | activated | Clean worktree from merged matrix head; feature row selected; deep research and PLAN-EVAL required.                     |
-| 2026-09-04T18:24Z | research  | generated | Gemini 3.8 Flash high completed the bounded research-only pass; no implementation files changed.                        |
-| 2026-09-04T18:25Z | research  | verified  | Primary-source sweep corrected unsupported quota, policy, API, and status claims.                                       |
-| 2026-09-04T18:28Z | plan      | blocked   | Fable limit, Go rate limit, then OpenRouter paid-training guardrail exhausted the declared plan route before inference. |
-| 2026-09-04T18:45Z | research  | ruling    | Owner made OpenCode Copilot the default for supported non-native families; device authorization started.                |
-| 2026-09-04T19:15Z | preflight | verified  | OpenCode Copilot OAuth succeeded; live catalog attested exact Fable 5.1, Kimi K3, and Grok 4.6 identifiers.             |
+| Time              | Slice     | Step      | Notes                                                                                                                                    |
+| ----------------- | --------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-04T17:45Z | bootstrap | activated | Clean worktree from merged matrix head; feature row selected; deep research and PLAN-EVAL required.                                      |
+| 2026-09-04T18:24Z | research  | generated | Gemini 3.8 Flash high completed the bounded research-only pass; no implementation files changed.                                         |
+| 2026-09-04T18:25Z | research  | verified  | Primary-source sweep corrected unsupported quota, policy, API, and status claims.                                                        |
+| 2026-09-04T18:28Z | plan      | blocked   | Fable limit, Go rate limit, then OpenRouter paid-training guardrail exhausted the declared plan route before inference.                  |
+| 2026-09-04T18:45Z | research  | ruling    | Owner made OpenCode Copilot the default for supported non-native families; device authorization started.                                 |
+| 2026-09-04T19:15Z | preflight | verified  | OpenCode Copilot OAuth succeeded; live catalog attested exact Fable 5.1, Kimi K3, and Grok 4.6 identifiers.                              |
+| 2026-09-04T19:42Z | plan-eval | pass      | GLM 5.3 separate session passed all eight Plan-Gate items at `c12796b85`; Go was rate-limited, so OpenRouter transported the same model. |
 
 ## Research receipts
 
@@ -85,5 +86,6 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
-Not run; plan generation is blocked on a declared route becoming available, and PLAN-EVAL remains
-pending.
+PLAN-EVAL: `PASS` at exact plan head `c12796b85`, session `ses_f9213f890ffelYPJ3h8zaNa8O4`. All
+eight Plan-Gate boxes passed; six bounded implementation notes are recorded in `plan-eval.md`.
+Implementation is authorized.

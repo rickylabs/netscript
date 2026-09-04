@@ -6,14 +6,15 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `feat-copilot-cloud-harness--copilot-cloud-lane` |
 | Branch         | `feat/copilot-cloud-harness`                     |
-| Current phase  | plan-eval (pending)                              |
+| Current phase  | implementation                                   |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs, GitHub workflow                            |
 
 ## Current State
 
 Harness run activated from `origin/main` at merge commit `1c9eeef1`. The owner requested research,
-plan, review, and then a harnessed Copilot integration. No implementation is authorized yet.
+plan, review, and then a harnessed Copilot integration. Independent PLAN-EVAL passed at `c12796b85`;
+implementation is authorized.
 
 ## Completed
 
@@ -35,14 +36,13 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 
 ## In Progress
 
-- PLAN-EVAL. `plan.md` is written (14 locked decisions, 10-item open-decision sweep, 12 slices, risk
-  register, gate set, jsr-audit N/A, deferred scope). `worklog.md` `## Design` is populated.
+- Execute S1-S12 from `plan.md`; incorporate the six bounded notes in `plan-eval.md` without
+  widening scope.
 
 ## Next Steps
 
-1. Run separate-session PLAN-EVAL on `glm_5_3@provider_default` (skip same-family Fable fallback);
-   max two cycles, evaluator repairs on cycle two.
-2. Implement only the ratified slices S1–S12 after `PASS`, committing per slice with PR comments.
+1. Dispatch feature implementation through Astra low, preserving per-slice commits and proof.
+2. Run the selected static, docs, and GitHub workflow gates, then separate-session IMPL-EVAL.
 3. Live Copilot canary only after static gates and explicit owner authorisation (`plan.md` D9).
 
 ## Drift and Debt
