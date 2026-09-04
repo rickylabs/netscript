@@ -162,7 +162,10 @@ Deno.test('phase currency revokes PLAN and IMPL spend when live opt-in was remov
     assertEquals(revoked.dispatch, false);
     assertStringIncludes(revoked.reason, 'revoked authorization');
     assertStringIncludes(revoked.reason, OPENHANDS_OPT_IN_LABEL);
-    assertStringIncludes(revoked.recovery, `Re-add ${OPENHANDS_OPT_IN_LABEL}`);
+    assertEquals(
+      revoked.recovery,
+      `Re-add ${OPENHANDS_OPT_IN_LABEL} to create a new deliberate generation.`,
+    );
   }
 });
 

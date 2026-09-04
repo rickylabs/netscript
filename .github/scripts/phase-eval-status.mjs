@@ -91,7 +91,7 @@ export function decidePhaseEvaluationCurrency(input) {
     return {
       dispatch: false,
       reason: `revoked authorization: ${OPENHANDS_OPT_IN_LABEL} is no longer present`,
-      recovery: `Re-add ${OPENHANDS_OPT_IN_LABEL}, then ${PHASE_EVAL_RECOVERY.toLowerCase()}`,
+      recovery: `Re-add ${OPENHANDS_OPT_IN_LABEL} to create a new deliberate generation.`,
     };
   }
   return { dispatch: true, reason: 'current', recovery: '' };
