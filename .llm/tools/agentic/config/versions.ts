@@ -68,6 +68,8 @@ export const OPENCODE_TOOL = {
   pinnedVersion: '1.17.20',
   defaultVariant: 'high',
   openRouterEnvRelativePath: '.config/netscript-agentic/openrouter.env',
+  openCodeGoEnvRelativePath: '.config/netscript-agentic/opencode-go.env',
+  ollamaEnvRelativePath: '.config/netscript-agentic/ollama.env',
   webDefaultHostname: '127.0.0.1',
   webDefaultPort: 0,
 } as const;

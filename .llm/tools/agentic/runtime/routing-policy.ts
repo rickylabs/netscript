@@ -116,6 +116,12 @@ const TRANSPORT_PROVIDER: Readonly<Record<ModelTransport, ProviderKind>> = {
   openrouter: 'openrouter',
 };
 
+const TRANSPORT_PROFILE = {
+  opencode_go: 'opencode-go',
+  ollama: 'opencode-ollama',
+  openrouter: 'opencode-openrouter',
+} as const;
+
 function concreteEffort(effort: ModelRoute['effort']): Effort {
   return effort === 'provider_default' ? OPENCODE_TOOL.defaultVariant : effort;
 }
@@ -143,6 +149,13 @@ function resolveRouteChain(
     return {
       agent: TRANSPORT_AGENT[capability.transport],
       provider: TRANSPORT_PROVIDER[capability.transport],
+      ...(capability.transport in TRANSPORT_PROFILE
+        ? {
+          profileId: TRANSPORT_PROFILE[
+            capability.transport as keyof typeof TRANSPORT_PROFILE
+          ],
+        }
+        : {}),
       model: capability.model,
       effort: concreteEffort(candidate.effort),
       worktree: request.worktree,

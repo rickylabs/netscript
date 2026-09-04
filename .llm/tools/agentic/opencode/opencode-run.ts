@@ -2,11 +2,19 @@
 
 import { OPENCODE_TOOL } from '../config/versions.ts';
 export { parseOpenRouterApiKey } from '../lib/openrouter-credential.ts';
-import { environmentWithOpenRouterApiKey } from '../lib/openrouter-credential.ts';
+import {
+  environmentWithOpenCodeCredential,
+  openCodeCredentialProviderForModel,
+} from '../lib/provider-credential.ts';
 import { dirname, resolve } from 'node:path';
 import { prepareOpenCodeProjectEnvironment } from './opencode-project-config.ts';
 import { preflightOpenCodeMcp } from './opencode-preflight.ts';
 import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+import {
+  evaluateSubscriptionExpense,
+  type ExpenseDecision,
+  parseExpenseUsageSnapshot,
+} from '../runtime/subscription-expense.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';
 
@@ -20,6 +28,8 @@ export interface OpenCodeRunOptions {
   readonly cwd?: string;
   readonly requiredMcp?: readonly string[];
   readonly receiptPath?: string;
+  readonly usageSnapshotPath?: string;
+  readonly estimatedCostUsd?: number;
 }
 
 export interface OpenCodeRunResult {
@@ -57,17 +67,59 @@ export function resolveOpenCodeBinary(env: Environment): string {
   return env.OPENCODE_BIN?.trim() || OPENCODE_TOOL.binary;
 }
 
-/** Returns a child environment with OpenRouter auth, without logging the key. */
+/** Returns a child environment with only the selected provider credential. */
 export async function openCodeChildEnvironment(
   env: Environment = Deno.env.toObject(),
   readTextFile: (path: string) => Promise<string> = Deno.readTextFile,
-  options: { readonly cwd?: string; readonly receiptPath?: string } = {},
+  options: {
+    readonly cwd?: string;
+    readonly receiptPath?: string;
+    readonly model?: string;
+    readonly stat?: (path: string) => Promise<Pick<Deno.FileInfo, 'mode'>>;
+  } = {},
 ): Promise<Record<string, string>> {
-  const credentialed = await environmentWithOpenRouterApiKey(env, readTextFile);
+  const inherited = Object.fromEntries(
+    Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined),
+  );
+  const credentialed = options.model
+    ? await environmentWithOpenCodeCredential(
+      options.model,
+      env,
+      readTextFile,
+      options.stat ?? Deno.stat,
+    )
+    : inherited;
   return await prepareOpenCodeProjectEnvironment(credentialed, {
     cwd: resolve(options.cwd ?? Deno.cwd()),
     receiptPath: options.receiptPath,
   });
+}
+
+/** Proves allowance before any paid OpenCode process is spawned. */
+export async function preflightOpenCodeExpense(
+  options: OpenCodeRunOptions,
+  readTextFile: (path: string) => Promise<string> = Deno.readTextFile,
+  now: () => string = () => new Date().toISOString(),
+): Promise<ExpenseDecision | null> {
+  const provider = openCodeCredentialProviderForModel(options.model);
+  if (!provider) return null;
+  if (!options.usageSnapshotPath || options.estimatedCostUsd === undefined) {
+    throw new Error(
+      `paid ${provider} route requires --usage-snapshot and --estimated-cost-usd`,
+    );
+  }
+  const cwd = resolve(options.cwd ?? Deno.cwd());
+  const source = await readTextFile(resolve(cwd, options.usageSnapshotPath));
+  const decision = evaluateSubscriptionExpense({
+    provider,
+    estimatedCostUsd: options.estimatedCostUsd,
+    snapshot: parseExpenseUsageSnapshot(source),
+    now: now(),
+  });
+  if (!decision.allowed) {
+    throw new Error(`expense guard blocked ${provider}: ${decision.reason}`);
+  }
+  return decision;
 }
 
 /** Executes OpenCode with either inherited output or captured stdout. */
@@ -77,12 +129,14 @@ export async function runOpenCode(
 ): Promise<OpenCodeRunResult> {
   const processEnv = Deno.env.toObject();
   const cwd = resolve(options.cwd ?? Deno.cwd());
+  await preflightOpenCodeExpense(options);
   if (options.receiptPath) {
     await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
   }
   const env = await openCodeChildEnvironment(processEnv, Deno.readTextFile, {
     cwd,
     receiptPath: options.receiptPath,
+    model: options.model,
   });
   if (options.requiredMcp?.length) {
     if (!options.receiptPath) {
@@ -130,6 +184,8 @@ function parse(args: readonly string[]): CliOptions {
   let session: string | undefined;
   let cwd: string | undefined;
   let receiptPath: string | undefined;
+  let usageSnapshotPath: string | undefined;
+  let estimatedCostUsd: number | undefined;
   const requiredMcp: string[] = [];
 
   for (let index = 0; index < args.length; index++) {
@@ -155,6 +211,14 @@ function parse(args: readonly string[]): CliOptions {
       requiredMcp.push(requiredValue(args, index++, argument));
     } else if (argument === '--receipt') {
       receiptPath = requiredValue(args, index++, argument);
+    } else if (argument === '--usage-snapshot') {
+      usageSnapshotPath = requiredValue(args, index++, argument);
+    } else if (argument === '--estimated-cost-usd') {
+      const value = Number(requiredValue(args, index++, argument));
+      if (!Number.isFinite(value) || value <= 0) {
+        throw new Error('--estimated-cost-usd must be a positive number');
+      }
+      estimatedCostUsd = value;
     } else if (!argument.startsWith('-') && !message) message = argument;
     else throw new Error(`Unknown or duplicate argument: ${argument}`);
   }
@@ -163,7 +227,9 @@ function parse(args: readonly string[]): CliOptions {
     throw new Error(
       'Usage: opencode-run <message>|--message <text> --model <provider/model> ' +
         '[--variant <effort>] [-s <session>] [--cwd <project>] [-f <path> ...] ' +
-        '[--require-mcp <server> ...] [--receipt <jsonl>] [--format default|json] [--capture]',
+        '[--require-mcp <server> ...] [--receipt <jsonl>] ' +
+        '[--usage-snapshot <json>] [--estimated-cost-usd <amount>] ' +
+        '[--format default|json] [--capture]',
     );
   }
   return {
@@ -177,6 +243,8 @@ function parse(args: readonly string[]): CliOptions {
     ...(cwd ? { cwd } : {}),
     ...(requiredMcp.length ? { requiredMcp } : {}),
     ...(receiptPath ? { receiptPath } : {}),
+    ...(usageSnapshotPath ? { usageSnapshotPath } : {}),
+    ...(estimatedCostUsd !== undefined ? { estimatedCostUsd } : {}),
   };
 }
 

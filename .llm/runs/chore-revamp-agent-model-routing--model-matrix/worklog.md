@@ -64,6 +64,7 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T16:29Z    | PLAN-EVAL | cycle 2        | Same OpenCode session `ses_f9338f842ffeT0E2CjAp7yu3KZ`, Grok 4.6 xhigh, returned `PASS` at repair head `372409ab6`.                                                      |
 | 2026-09-04T16:38Z    | S1        | implemented    | Added volatile model slugs, vendor-family catalog, five workload tiers, four coordinator tiers, exact eval policies, fallback composition, and fail-closed legacy lanes. |
 | 2026-09-04T16:49Z    | S2        | implemented    | Replaced the flat resolver with matrix-derived workload/coordinator resolution, provider precedence, selected-family skipping, and explicit legacy rejection.            |
+| 2026-09-04T17:07Z    | S3        | implemented    | Added OpenCode Go/Ollama/OpenRouter credential isolation, paid-route provider profiles, fail-closed structured subscription expense decisions, and CLI preflight.       |
 
 ## Gate Results
 
@@ -77,3 +78,5 @@ tests and documentation parity gate identify every required downstream update.
 | S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                       |
 | S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                          |
 | S2 tests             | PASS      | 28 passed across matrix, resolver, state rendering, and contract                 |
+| S3 check             | PASS      | 9 expense, credential, runner, profile, and CLI files checked; 0 diagnostics     |
+| S3 tests             | PASS      | 33 passed, 0 failed across expense, credential, runner, profile, and SSOT guards |

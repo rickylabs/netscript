@@ -16,13 +16,16 @@ Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`.
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
 have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they were repaired at
 `372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is committed at
-`605ae0e02`; S2's matrix-derived resolver is locally green and pending its atomic commit/push.
+`605ae0e02`; S2 is committed at `da80e6eec`. S3's subscription expense, credential isolation, and
+paid-provider profile implementation is focused-green and ready for its atomic commit.
 
 ## Accepted owner decisions
 
 - The 2026-09-04 matrix replaces every prior delegation ruling.
 - `gpt-6-astra` is target-available and is active, not provisional.
 - OpenCode Go and Ollama credentials are target-available through secure local provisioning.
+- OpenRouter paid-training participation is intentional and must not disqualify an otherwise legal
+  fallback endpoint.
 - Provider priority: Claude → Codex → Google → OpenCode Go → Ollama → OpenRouter.
 - The selected generator/evaluator pair must differ by vendor family; fallback composition must
   provide a legal evaluator for every generator candidate.
@@ -38,7 +41,7 @@ have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they
 
 ## Next Steps
 
-1. Implement S1–S4 with per-slice checks, commits, pushes, and PR comments.
+1. Commit S3, then align active docs/skills and parity tests in S4.
 2. Run bounded Go/Ollama live smokes and full focused gates.
 3. Run separate Grok 4.6 xhigh IMPL-EVAL.
 4. Promote the PR only after exact-head CI and review-thread gate.
@@ -54,15 +57,18 @@ have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they
 | `.llm/tools/agentic/runtime/routing-policy.ts`               | rewritten    | matrix-derived active route resolution                 |
 | `.llm/tools/agentic/runtime/contract.ts`                     | modified     | distinct Go and Ollama provider identities             |
 | `.llm/tools/agentic/runtime/cli/routing-state.ts`            | modified     | new matrix evaluator inspection output                 |
+| `.llm/tools/agentic/runtime/subscription-expense.ts`         | new          | fail-closed normalized allowance decisions             |
+| `.llm/tools/agentic/lib/provider-credential.ts`              | new          | mode-600 provider-scoped credential loading            |
+| `.llm/tools/agentic/opencode/opencode-run.ts`                | modified     | paid-route expense preflight before process spawn      |
 
 ## Gates
 
 | Gate family | Current status | Evidence                                |
 | ----------- | -------------- | --------------------------------------- |
 | Plan        | PASS cycle 2   | `plan-eval.md`, repair head `372409ab6` |
-| Static      | NOT_RUN        | implementation hard stop                |
+| Static      | PASS S1-S3     | per-slice structured checks             |
 | Fitness     | NOT_RUN        | implementation hard stop                |
-| Runtime     | NOT_RUN        | implementation hard stop                |
+| Runtime     | PASS S1-S3     | 72 focused tests across implemented code |
 | Consumer    | N/A            | no published package/plugin changes     |
 
 ## Drift and Debt

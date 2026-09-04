@@ -12,6 +12,9 @@ export const PROVIDER_PROFILE_IDS = [
   'codex-openai-native',
   'claude-openrouter',
   'codex-openrouter',
+  'opencode-go',
+  'opencode-ollama',
+  'opencode-openrouter',
   'claude-custom',
 ] as const;
 export type ProviderProfileId = typeof PROVIDER_PROFILE_IDS[number];
@@ -20,6 +23,8 @@ export const PROVIDER_CREDENTIAL_KEYS = [
   'ANTHROPIC_API_KEY',
   'ANTHROPIC_AUTH_TOKEN',
   'OPENAI_API_KEY',
+  'OPENCODE_API_KEY',
+  'OLLAMA_API_KEY',
   'OPENROUTER_API_KEY',
 ] as const;
 export type ProviderCredentialKey = typeof PROVIDER_CREDENTIAL_KEYS[number];
@@ -31,11 +36,14 @@ export const PROVIDER_ROUTE_KEYS = [
 ] as const;
 export type ProviderRouteKey = typeof PROVIDER_ROUTE_KEYS[number];
 
-export type ProviderEndpointKind = 'native' | 'openrouter' | 'custom';
+export type ProviderEndpointKind = 'native' | 'subscription' | 'openrouter' | 'custom';
 export interface ProviderProfile {
   readonly id: ProviderProfileId;
-  readonly agent: Extract<AgentKind, 'claude' | 'codex'>;
-  readonly provider: Extract<ProviderKind, 'anthropic' | 'openai' | 'openrouter' | 'custom'>;
+  readonly agent: Extract<AgentKind, 'claude' | 'codex' | 'opencode'>;
+  readonly provider: Extract<
+    ProviderKind,
+    'anthropic' | 'openai' | 'opencode_go' | 'ollama' | 'openrouter' | 'custom'
+  >;
   readonly endpointKind: ProviderEndpointKind;
   readonly credentialSourceKey: ProviderCredentialKey;
   readonly credentialTargetKey: ProviderCredentialKey;
@@ -90,6 +98,30 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
     'codex-openrouter': profile({
       id: 'codex-openrouter',
       agent: 'codex',
+      provider: 'openrouter',
+      endpointKind: 'openrouter',
+      credentialSourceKey: 'OPENROUTER_API_KEY',
+      credentialTargetKey: 'OPENROUTER_API_KEY',
+    }, ['OPENROUTER_API_KEY']),
+    'opencode-go': profile({
+      id: 'opencode-go',
+      agent: 'opencode',
+      provider: 'opencode_go',
+      endpointKind: 'subscription',
+      credentialSourceKey: 'OPENCODE_API_KEY',
+      credentialTargetKey: 'OPENCODE_API_KEY',
+    }, ['OPENCODE_API_KEY']),
+    'opencode-ollama': profile({
+      id: 'opencode-ollama',
+      agent: 'opencode',
+      provider: 'ollama',
+      endpointKind: 'subscription',
+      credentialSourceKey: 'OLLAMA_API_KEY',
+      credentialTargetKey: 'OLLAMA_API_KEY',
+    }, ['OLLAMA_API_KEY']),
+    'opencode-openrouter': profile({
+      id: 'opencode-openrouter',
+      agent: 'opencode',
       provider: 'openrouter',
       endpointKind: 'openrouter',
       credentialSourceKey: 'OPENROUTER_API_KEY',
