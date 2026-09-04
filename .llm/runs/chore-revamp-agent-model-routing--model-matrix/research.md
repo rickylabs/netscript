@@ -18,9 +18,33 @@
 | complex                                  | Astra medium → Fable 5.1 medium  | Fable 5.1 medium → Muse Spark max    | Muse Spark max → Grok 4.6 high      | Muse Spark max → Muse Spark max     | Kimi K3 max → Gemini 3.8 Flash high          | Fable 5.1 medium → Qwen 3.8 Max             |
 | architecture / RFC / explicit escalation | Astra xhigh → Fable 5.1 xhigh    | Fable 5.1 xhigh → Muse Spark max     | Muse Spark max → Grok 4.6 xhigh     | Grok 4.6 xhigh → Muse Spark max     | Kimi K3 max → Fable 5.1 high                 | Fable 5.1 high → Qwen 3.8 Max               |
 
-The generator/evaluator family invariant applies to both primary routes and every fallback
-composition. Tier-specific evaluation round limits and escalation thresholds are part of the machine
-contract, not operator prose.
+The generator/evaluator family invariant applies to the selected routes after composing fallbacks.
+Tier-specific evaluation round limits and escalation thresholds are part of the machine contract,
+not operator prose.
+
+### Evaluation policy attached to the matrix
+
+| Tier / role                                   | Round policy         | Required action                                                                                                            |
+| --------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| simple PLAN-EVAL                              | N/A                  | no planning evaluator                                                                                                      |
+| simple IMPL-EVAL                              | unspecified by owner | do not invent a limit; harness default remains explicit at dispatch                                                        |
+| straightforward PLAN-EVAL                     | no roundtrip         | evaluator repairs a fixable plan in place immediately; complete rejection or a human-only decision is escalated            |
+| feature PLAN-EVAL                             | max 2                | on the second fixable failure the same evaluator repairs in flight; complete rejection or human-only decision is escalated |
+| complex PLAN-EVAL                             | max 3                | on the third fixable failure the same evaluator repairs in flight; complete rejection or human-only decision is escalated  |
+| architecture PLAN-EVAL                        | max 1                | second failure escalates to the human owner                                                                                |
+| straightforward / feature / complex IMPL-EVAL | max 5                | re-steer the same evaluator; notify the owner after 3 failures                                                             |
+| architecture IMPL-EVAL                        | max 3                | re-steer the same evaluator; notify the owner after 2 failures                                                             |
+| documentation                                 | max 2                | use the tier's IMPL-EVAL policy with the documentation roundtrip cap                                                       |
+
+### Family-composition rule
+
+Family means model-vendor family, not transport or the old undifferentiated `open` bucket: OpenAI
+(Astra/SOL/Luna), Anthropic (Fable/Opus), Google (Gemini), Meta (Muse), Zhipu (GLM), Alibaba (Qwen),
+MiniMax, DeepSeek, Moonshot (Kimi), and xAI (Grok). A declared fallback may share family with
+another role candidate; the selector skips an illegal selected pair and composes that role's
+remaining fallback(s) until it finds a different-family evaluator. Matrix construction proves that
+each generator candidate has at least one legal evaluator candidate, not that every cartesian pair
+is legal.
 
 ## Coordinator matrix
 
@@ -108,8 +132,9 @@ through OpenCode CLI.
 
 ## Open questions resolved in plan
 
-- Existing lane names are input compatibility aliases only; the new workload/coordinator matrix is
-  authoritative for new selection.
+- Existing lane names are persisted-input identifiers only. They are never mapped heuristically into
+  the replacement matrix: new selection through a legacy name fails closed and requires an explicit
+  workload tier and role.
 - Provider usage retrieval is an adapter boundary. The pure watcher consumes normalized snapshots,
   allowing official provider telemetry or locally accumulated OpenCode receipt data without coupling
   routing policy to one unstable endpoint.

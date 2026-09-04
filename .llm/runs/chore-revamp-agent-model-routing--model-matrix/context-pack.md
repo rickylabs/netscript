@@ -14,8 +14,9 @@
 
 Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`. The complete owner
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
-have been inventoried, and implementation is stopped at the required separate-session PLAN-EVAL
-gate.
+have been inventoried, and implementation is stopped at PLAN-EVAL cycle 1 `FAIL_PLAN`. Its bounded
+family-composition, round-policy, and legacy-lane findings are repaired in the working tree; cycle 2
+must evaluate the committed repair before implementation.
 
 ## Accepted owner decisions
 
@@ -23,7 +24,8 @@ gate.
 - `gpt-6-astra` is target-available and is active, not provisional.
 - OpenCode Go and Ollama credentials are target-available through secure local provisioning.
 - Provider priority: Claude → Codex → Google → OpenCode Go → Ollama → OpenRouter.
-- Generator/evaluator model families must differ across all primary/fallback combinations.
+- The selected generator/evaluator pair must differ by vendor family; fallback composition must
+  provide a legal evaluator for every generator candidate.
 
 ## Locked architecture
 
@@ -36,9 +38,9 @@ gate.
 
 ## Next Steps
 
-1. Commit/push the locked plan and update PR #1989 to `status:plan-eval`.
-2. Run separate Muse Spark 1.3 max PLAN-EVAL and record the exact verdict.
-3. Implement S1–S4 with per-slice checks and pushes.
+1. Commit/push the bounded cycle-1 plan repair.
+2. Re-steer the same Grok 4.6 xhigh evaluator session for PLAN-EVAL cycle 2.
+3. On PASS, implement S1–S4 with per-slice checks and pushes.
 4. Run bounded Go/Ollama live smokes, full focused gates, and Grok 4.6 xhigh IMPL-EVAL.
 5. Promote the PR only after exact-head CI and review-thread gate.
 
@@ -50,13 +52,13 @@ gate.
 
 ## Gates
 
-| Gate family | Current status | Evidence                            |
-| ----------- | -------------- | ----------------------------------- |
-| Plan        | PENDING        | committed PLAN-EVAL packet next     |
-| Static      | NOT_RUN        | implementation hard stop            |
-| Fitness     | NOT_RUN        | implementation hard stop            |
-| Runtime     | NOT_RUN        | implementation hard stop            |
-| Consumer    | N/A            | no published package/plugin changes |
+| Gate family | Current status    | Evidence                            |
+| ----------- | ----------------- | ----------------------------------- |
+| Plan        | FAIL_PLAN cycle 1 | bounded repair awaiting cycle 2     |
+| Static      | NOT_RUN           | implementation hard stop            |
+| Fitness     | NOT_RUN           | implementation hard stop            |
+| Runtime     | NOT_RUN           | implementation hard stop            |
+| Consumer    | N/A               | no published package/plugin changes |
 
 ## Drift and Debt
 

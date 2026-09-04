@@ -41,3 +41,16 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
 - **Action:** fix in S3; fail closed on unknown/stale usage and prevent implicit overflow spending.
 - **Evidence:** focused scan of `.llm/tools/agentic/runtime`, OpenCode runner, CLI task map, and
   tests.
+
+## 2026-09-04 — PLAN-EVAL transport and family-composition correction
+
+- **What:** Muse Spark 1.3 max was rejected before a turn by the current OpenRouter paid-training
+  privacy setting, so cycle 1 used the matrix-declared Grok 4.6 xhigh fallback. The owner stated
+  paid-training participation is allowed and must not be a harness blocker.
+- **Finding:** The initial plan incorrectly rejected every same-family cartesian fallback pair and
+  omitted exact evaluation round policies.
+- **Severity:** significant plan defect, caught before production implementation.
+- **Action:** compose evaluator fallbacks at selection time using vendor-level family; prove at
+  least one legal evaluator per generator; encode exact owner round/repair/notification values; keep
+  legacy lanes fail-closed for new selection.
+- **Evidence:** `plan-eval.md`, cycle 1 `FAIL_PLAN`; no production file changed.

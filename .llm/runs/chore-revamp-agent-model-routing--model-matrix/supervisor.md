@@ -27,3 +27,7 @@
 - This already-running Codex task remains the bootstrap coordinator because the task transport
   cannot self-migrate. It may not self-evaluate; PLAN-EVAL and IMPL-EVAL require fresh, cross-family
   sessions.
+- PLAN-EVAL cycle 1 requested OpenCode/OpenRouter Muse Spark 1.3 contributor max, but the provider
+  rejected the route before a model turn under the current paid-training privacy setting. The
+  matrix-declared fallback ran as OpenCode/OpenRouter Grok 4.6 xhigh. Re-steer that same evaluator
+  session for cycle 2; do not create a new evaluator identity.

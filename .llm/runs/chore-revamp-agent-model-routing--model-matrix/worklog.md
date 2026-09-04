@@ -53,17 +53,20 @@ tests and documentation parity gate identify every required downstream update.
 
 ## Progress Log
 
-| Time                 | Slice     | Step           | Notes                                                                                                                    |
-| -------------------- | --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 2026-09-04T13:58:23Z | bootstrap | activated      | Read owner matrix first; selected Archetype 6 plus docs overlay; created isolated run.                                   |
-| 2026-09-04T13:59:30Z | bootstrap | draft PR       | Pushed `f16ae59a5`; opened draft PR #1989.                                                                               |
-| 2026-09-04T14:00Z    | research  | provider facts | Re-derived Astra, OpenCode Go, Ollama, provider catalog, current code surfaces, and limits from official/live sources.   |
-| 2026-09-04T14:20Z    | design    | locked         | Chose typed matrix, logical/provider model split, exhaustive cross-family validation, and pre-spend fail-closed watcher. |
+| Time                 | Slice     | Step           | Notes                                                                                                                                   |
+| -------------------- | --------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-04T13:58:23Z | bootstrap | activated      | Read owner matrix first; selected Archetype 6 plus docs overlay; created isolated run.                                                  |
+| 2026-09-04T13:59:30Z | bootstrap | draft PR       | Pushed `f16ae59a5`; opened draft PR #1989.                                                                                              |
+| 2026-09-04T14:00Z    | research  | provider facts | Re-derived Astra, OpenCode Go, Ollama, provider catalog, current code surfaces, and limits from official/live sources.                  |
+| 2026-09-04T14:20Z    | design    | locked         | Chose typed matrix, logical/provider model split, exhaustive cross-family validation, and pre-spend fail-closed watcher.                |
+| 2026-09-04T16:22Z    | PLAN-EVAL | cycle 1        | Muse Spark was rejected before a turn by the current OpenRouter privacy setting; declared Grok 4.6 xhigh fallback returned `FAIL_PLAN`. |
+| 2026-09-04T16:24Z    | design    | bounded repair | Locked vendor-level family composition, exact per-tier evaluation limits, and fail-closed legacy-lane behavior.                         |
 
 ## Gate Results
 
-| Gate                 | Status  | Evidence                                                                      |
-| -------------------- | ------- | ----------------------------------------------------------------------------- |
-| PLAN-EVAL            | PENDING | separate Muse Spark 1.3 max session to be launched at the committed plan head |
-| implementation gates | NOT_RUN | hard stop until PLAN-EVAL PASS                                                |
-| IMPL-EVAL            | NOT_RUN | required after implementation                                                 |
+| Gate                 | Status    | Evidence                                                                         |
+| -------------------- | --------- | -------------------------------------------------------------------------------- |
+| PLAN-EVAL cycle 1    | FAIL_PLAN | `plan-eval.md`; three bounded design fixes, no production implementation started |
+| PLAN-EVAL cycle 2    | PENDING   | same Grok 4.6 xhigh evaluator session will be re-steered after repair commit     |
+| implementation gates | NOT_RUN   | hard stop until PLAN-EVAL PASS                                                   |
+| IMPL-EVAL            | NOT_RUN   | required after implementation                                                    |

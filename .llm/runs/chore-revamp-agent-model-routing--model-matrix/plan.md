@@ -27,11 +27,19 @@ printing or committing credentials.
 3. **Fallback is a declared chain.** Claude → Codex → Google → OpenCode Go → Ollama → OpenRouter is
    the global provider preference. Per-cell model fallbacks remain exactly those in the owner
    matrix; provider precedence chooses a supported transport for that model, not a different model.
-4. **Cross-family is exhaustive.** For each tier, every PLAN/IMPL evaluator candidate is checked
-   against every implementer/plan candidate. Equal model family is a construction error. Separate
-   sessions remain mandatory.
-5. **Evaluation limits are data.** PLAN/IMPL maximum rounds, evaluator-in-place repair points, and
-   owner-notification thresholds live beside the tier, with explicit state transitions.
+4. **Cross-family selection composes fallbacks.** Model family is vendor-level: OpenAI, Anthropic,
+   Google, Meta, Zhipu, Alibaba, MiniMax, DeepSeek, Moonshot, or xAI. For a selected generator,
+   same-family evaluator candidates are skipped and the evaluator fallback chain continues. Matrix
+   construction proves every generator candidate has at least one legal evaluator candidate; it does
+   not reject the owner's declared matrix merely because one unselected cartesian pair would
+   conflict. Separate sessions remain mandatory.
+5. **Evaluation limits are data.** The following exact owner values live beside each tier:
+   straightforward PLAN has no roundtrip and immediate in-flight repair; feature PLAN max 2 with
+   repair on 2; complex PLAN max 3 with repair on 3; architecture PLAN max 1 and escalates the
+   second failure to the owner. Straightforward, feature, and complex IMPL max 5 and notify after 3;
+   architecture IMPL max 3 and notify after 2. Every iteration re-steers the same evaluator.
+   Documentation uses the tier's IMPL policy capped at 2. Simple IMPL is explicitly
+   `unspecified_by_owner`, not assigned an invented limit.
 6. **Paid dispatch fails closed.** OpenCode Go, Ollama Cloud, and OpenRouter require a fresh
    normalized allowance snapshot. Missing/stale/unknown tier or an exceeded window selects the next
    declared fallback; it never silently consumes Go Zen balance or Ollama extra balance.
@@ -39,7 +47,8 @@ printing or committing credentials.
    env files in `~/.config/netscript-agentic/`, bind only the selected provider key into the child,
    clear rival keys, and expose key names—not values—in errors/receipts.
 8. **Old routes are migration inputs only.** Persisted legacy IDs/lanes remain readable where
-   needed, but no new launch resolves through the superseded policy.
+   needed, but no new launch resolves or heuristically maps a legacy lane. A new-selection request
+   carrying an old lane fails closed and asks for explicit workload tier and role.
 
 ## Public surface and vocabulary
 
@@ -64,7 +73,8 @@ No `packages/` or `plugins/` export changes.
 - Encode all five workload tiers and four coordinator tiers.
 - Add table-driven tests for every matrix cell, effort, fallback, evaluator limit, and provider
   order.
-- Add an exhaustive primary/fallback cross-product self-certification test.
+- Add a coverage proof that every generator candidate can compose at least one opposite-family
+  evaluator candidate, plus selection tests that skip each illegal same-family pairing.
 - **Files:** `config/models.ts`, new `runtime/delegation-matrix.ts`, and
   `runtime/delegation-matrix_test.ts`.
 - **Proof:** focused structured check/test plus `config/no-hardcoded-volatile_test.ts`.
@@ -121,28 +131,28 @@ No `packages/` or `plugins/` export changes.
 
 ## Open-decision sweep
 
-| Question                                                           | Resolution                                                       |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| Is Astra target-active or capability-gated?                        | Target-active per owner; no provisional fallback comment.        |
-| Which provider wins when multiple subscriptions expose a model?    | The owner’s ordered provider preference.                         |
-| Can a fallback evaluator share family with any generator fallback? | No; all cross-products are rejected.                             |
-| May Go fall through to separately funded Zen balance?              | No, fail closed at the subscription allowance.                   |
-| Which Ollama tier should be assumed?                               | None; resolve from account/local config, otherwise fail closed.  |
-| Should historical run artifacts be rewritten?                      | No; `.llm/runs/**` are retained evidence. Only this run changes. |
-| Does this require package doctrine/public-surface gates?           | No; internal harness/tooling only.                               |
+| Question                                                        | Resolution                                                                        |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Is Astra target-active or capability-gated?                     | Target-active per owner; no provisional fallback comment.                         |
+| Which provider wins when multiple subscriptions expose a model? | The owner’s ordered provider preference.                                          |
+| Can declared fallback candidates share a family?                | Yes; skip an illegal selected pair and require another legal evaluator candidate. |
+| May Go fall through to separately funded Zen balance?           | No, fail closed at the subscription allowance.                                    |
+| Which Ollama tier should be assumed?                            | None; resolve from account/local config, otherwise fail closed.                   |
+| Should historical run artifacts be rewritten?                   | No; `.llm/runs/**` are retained evidence. Only this run changes.                  |
+| Does this require package doctrine/public-surface gates?        | No; internal harness/tooling only.                                                |
 
 ## Risk register
 
-| Risk                                                | Severity | Mitigation / proof                                                                           |
-| --------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| A provider slug differs across Go/Ollama/OpenRouter | high     | Logical IDs plus explicit capability map; no synthesized slugs; catalog smoke.               |
-| Same-family fallback accidentally self-certifies    | critical | Exhaustive cross-product invariant at construction and in tests.                             |
-| Unknown usage silently spends overflow balance      | critical | Fresh snapshot required; fail closed before child spawn.                                     |
-| Credential leaks into receipt/error/argv            | critical | file parser tests, rival-key clearing, value-free diagnostics, no key argv.                  |
-| Legacy callers silently keep old matrix             | high     | active policy derived from new matrix; legacy records accepted only at deserialize boundary. |
-| Human policy drifts from code                       | high     | machine-readable markers and parity test.                                                    |
-| Provider publishes changed limits                   | medium   | source date in config, explicit revalidation cadence, stale-policy warning.                  |
-| Ollama subscription tier is guessed incorrectly     | high     | dynamic/explicit tier resolution; unresolved tier blocks.                                    |
+| Risk                                                  | Severity | Mitigation / proof                                                                           |
+| ----------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| A provider slug differs across Go/Ollama/OpenRouter   | high     | Logical IDs plus explicit capability map; no synthesized slugs; catalog smoke.               |
+| Same-family selected pair accidentally self-certifies | critical | Vendor-family comparison at selection plus coverage proof for every generator candidate.     |
+| Unknown usage silently spends overflow balance        | critical | Fresh snapshot required; fail closed before child spawn.                                     |
+| Credential leaks into receipt/error/argv              | critical | file parser tests, rival-key clearing, value-free diagnostics, no key argv.                  |
+| Legacy callers silently keep old matrix               | high     | active policy derived from new matrix; legacy records accepted only at deserialize boundary. |
+| Human policy drifts from code                         | high     | machine-readable markers and parity test.                                                    |
+| Provider publishes changed limits                     | medium   | source date in config, explicit revalidation cadence, stale-policy warning.                  |
+| Ollama subscription tier is guessed incorrectly       | high     | dynamic/explicit tier resolution; unresolved tier blocks.                                    |
 
 ## Gate plan
 
