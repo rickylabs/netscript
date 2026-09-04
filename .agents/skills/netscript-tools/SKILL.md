@@ -191,6 +191,17 @@ The desired-state runtime controller is the default health/repair entry point:
 session-safe Codex daemon repair. `deno task agentic:routing-state` reads the persisted
 quota-fallback routing state.
 
+Read model routing through `deno task agentic:matrix`, never by shell-scraping the TypeScript
+authority. Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a direct
+evaluator lookup, `--role deep-research` for the dedicated research role, `--fallback-of
+<logical-model>` to list every context-sensitive fallback, and `--json` for structured consumption.
+The full table includes separate Deep Research default and fallback columns.
+
+Pure UI/UX specialist routing is an explicit `ui_ux` role; incidental UI changes stay on the normal
+implementation role. Owner overrides require the typed override record and the exact grant in a
+repo-relative `.llm/runs/**/worklog.md`. Never bypass the launcher directly: the override does not
+waive separate-session or different-family evaluation.
+
 The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `codex-watch`,
 `dispatch-openhands`, `openhands-status`, `gh-pr`) is indexed in `.llm/harness/workflow/tooling.md`.
 `.llm/tools/agentic/` is the **only** interface for driving Codex — never ad-hoc `wsl.exe`. The

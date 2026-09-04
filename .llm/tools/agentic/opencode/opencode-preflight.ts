@@ -29,7 +29,7 @@ if (import.meta.main) {
     if (args.includes('--help')) {
       await Deno.stdout.write(
         new TextEncoder().encode(
-          'copilot-preflight --model <exact-connector-id> [--cwd <worktree>]\nRead-only model catalog; never runs inference.\n',
+          'copilot-preflight --model <exact-connector-id> [--variant <effort>] [--cwd <worktree>]\nRead-only model catalog; never runs inference.\n',
         ),
       );
     } else {
@@ -37,16 +37,17 @@ if (import.meta.main) {
       for (let i = 0; i < args.length; i += 2) {
         const flag = args[i];
         const value = args[i + 1];
-        if (!['--model', '--cwd'].includes(flag) || !value || flags.has(flag)) {
+        if (!['--model', '--variant', '--cwd'].includes(flag) || !value || flags.has(flag)) {
           throw new Error('invalid preflight arguments');
         }
         flags.set(flag, value);
       }
       const receipt = await preflightCopilotCatalog(flags.get('--model') ?? '', {
         cwd: flags.get('--cwd') ?? Deno.cwd(),
+        variant: flags.get('--variant') ?? 'provider_default',
       });
       await Deno.stdout.write(new TextEncoder().encode(JSON.stringify(receipt) + '\n'));
-      if (!receipt.present) Deno.exit(2);
+      if (!receipt.present || !receipt.variantPresent) Deno.exit(2);
     }
   } catch {
     await Deno.stderr.write(new TextEncoder().encode('Copilot catalog preflight failed\n'));
@@ -73,7 +74,25 @@ interface McpStatus {
 export interface CopilotCatalogAttestation {
   readonly model: string;
   readonly present: boolean;
+  readonly variant: string;
+  readonly variantPresent: boolean;
   readonly capturedAt: string;
+}
+
+function catalogModelMetadata(model: string, catalog: string): unknown {
+  const normalized = catalog.replaceAll('\r\n', '\n');
+  const marker = `${model}\n`;
+  const from = normalized.indexOf(marker);
+  if (from < 0) return undefined;
+  const metadataFrom = from + marker.length;
+  const next = normalized.indexOf('\ngithub-copilot/', metadataFrom);
+  const source = normalized.slice(metadataFrom, next < 0 ? undefined : next).trim();
+  if (!source.startsWith('{')) return undefined;
+  try {
+    return JSON.parse(source);
+  } catch {
+    return undefined;
+  }
 }
 
 /** Matches an explicit model against complete catalog lines without substring acceptance. */
@@ -81,14 +100,27 @@ export function attestCopilotCatalog(
   model: string,
   catalog: string,
   capturedAt: string,
+  variant = 'provider_default',
 ): CopilotCatalogAttestation {
   if (!/^github-copilot\/[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(model)) {
     throw new Error('Copilot catalog requires an explicit connector model');
   }
   if (!Number.isFinite(Date.parse(capturedAt))) throw new Error('invalid catalog timestamp');
+  const present = catalog.split(/\r?\n/).some((line) => line.trim() === model);
+  const metadata = variant === 'provider_default'
+    ? undefined
+    : catalogModelMetadata(model, catalog);
+  const variants = metadata && typeof metadata === 'object' && !Array.isArray(metadata)
+    ? (metadata as { variants?: unknown }).variants
+    : undefined;
+  const variantPresent = present && (variant === 'provider_default' ||
+    (!!variants && typeof variants === 'object' && !Array.isArray(variants) &&
+      Object.hasOwn(variants, variant)));
   return {
     model,
-    present: catalog.split(/\r?\n/).some((line) => line.trim() === model),
+    present,
+    variant,
+    variantPresent,
     capturedAt,
   };
 }
@@ -97,7 +129,11 @@ export function attestCopilotCatalog(
 export function copilotCatalogAvailability(
   attestation: CopilotCatalogAttestation,
 ): RouteAvailability {
-  return { unavailableTransports: attestation.present ? [] : ['github_copilot'] };
+  return {
+    unavailableTransports: attestation.present && attestation.variantPresent
+      ? []
+      : ['github_copilot'],
+  };
 }
 
 /** Reads OpenCode's catalog without starting a model turn or inspecting its OAuth store. */
@@ -105,17 +141,23 @@ export async function preflightCopilotCatalog(
   model: string,
   options: {
     readonly cwd: string;
+    readonly variant?: string;
     readonly env?: Environment;
     readonly now?: () => string;
     readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
   },
 ): Promise<CopilotCatalogAttestation> {
   const capturedAt = (options.now ?? (() => new Date().toISOString()))();
-  attestCopilotCatalog(model, '', capturedAt);
+  const variant = options.variant ?? 'provider_default';
+  attestCopilotCatalog(model, '', capturedAt, variant);
   const env = await environmentWithOpenCodeCredential(model, options.env ?? Deno.env.toObject());
   const binary = resolveBinary(env);
   const command: Deno.CommandOptions = {
-    args: ['models', 'github-copilot'],
+    args: [
+      'models',
+      'github-copilot',
+      ...(variant === 'provider_default' ? [] : ['--verbose']),
+    ],
     cwd: options.cwd,
     env,
     clearEnv: true,
@@ -135,7 +177,7 @@ export async function preflightCopilotCatalog(
   } catch {
     throw new Error('Copilot catalog unavailable; mark github_copilot transport unavailable');
   }
-  return attestCopilotCatalog(model, catalog, capturedAt);
+  return attestCopilotCatalog(model, catalog, capturedAt, variant);
 }
 
 function safeServerName(value: string): boolean {

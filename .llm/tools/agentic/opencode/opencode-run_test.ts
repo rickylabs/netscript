@@ -3,6 +3,7 @@ import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import { COPILOT_CATALOG_FIXTURE } from '../runtime/test-fixtures.ts';
 import { evaluateCopilotExpense } from '../runtime/subscription-expense.ts';
+import { ownerMatrixOverrideWorklogEntry } from '../runtime/delegation-matrix.ts';
 import {
   openCodeChildEnvironment,
   opencodeRunArguments,
@@ -21,7 +22,7 @@ Deno.test('Copilot launch reserves after attestation and writes pending identity
       {
         message: 'bounded test',
         model: ROUTING_MODEL_IDS.gemini38FlashCopilot,
-        variant: 'provider_default',
+        variant: 'high',
         workloadTier: 'feature',
         workloadRole: 'deep_research',
         cwd,
@@ -34,7 +35,10 @@ Deno.test('Copilot launch reserves after attestation and writes pending identity
         repositoryIdentity: () => Promise.resolve({ branch: 'feat/test', head: 'a'.repeat(40) }),
         listModels: () => {
           order.push('catalog');
-          return Promise.resolve(COPILOT_CATALOG_FIXTURE);
+          return Promise.resolve(
+            `${ROUTING_MODEL_IDS.gemini38FlashCopilot}\n` +
+              JSON.stringify({ variants: { low: {}, medium: {}, high: {} } }),
+          );
         },
         reserveCopilot: (options) => {
           order.push('reserve');
@@ -52,7 +56,7 @@ Deno.test('Copilot launch reserves after attestation and writes pending identity
           assertEquals(options.clearEnv, true);
           assertEquals(options.env?.GH_TOKEN, undefined);
           assertEquals(options.env?.OPENAI_API_KEY, undefined);
-          assertEquals(options.args?.includes('--variant'), false);
+          assertEquals(options.args?.slice(-2), ['--variant', 'high']);
           assertEquals(JSON.stringify(options).includes('never-retain'), false);
           return new Deno.Command(Deno.execPath(), {
             args: ['eval', 'void 0'],
@@ -67,7 +71,7 @@ Deno.test('Copilot launch reserves after attestation and writes pending identity
     const source = await Deno.readTextFile(`${cwd}/launch.jsonl`);
     assertEquals(source.includes('never-retain'), false);
     const receipt = JSON.parse(source);
-    assertEquals(receipt.identity.requested.effort, 'provider_default');
+    assertEquals(receipt.identity.requested.effort, 'high');
     assertEquals(receipt.identity.observed.catalog.present, true);
     assertEquals(receipt.identity.status, 'pending');
     assertEquals(receipt.head, 'a'.repeat(40));
@@ -103,7 +107,7 @@ Deno.test('absent Copilot catalog never reserves credits or spawns inference', a
         },
       ),
     Error,
-    'catalog model absent',
+    'catalog model or variant absent',
   );
 });
 
@@ -115,6 +119,24 @@ Deno.test('OpenCode argv keeps the message before every flag', () => {
       variant: 'max',
     }),
     ['run', 'inspect this design', '-m', 'caller/model', '--variant', 'max'],
+  );
+});
+
+Deno.test('Copilot Kimi forwards a catalog-attestable reasoning variant', () => {
+  assertEquals(
+    opencodeRunArguments({
+      message: 'implement heavy UI',
+      model: ROUTING_MODEL_IDS.kimiK3Copilot,
+      variant: 'max',
+    }),
+    [
+      'run',
+      'implement heavy UI',
+      '-m',
+      ROUTING_MODEL_IDS.kimiK3Copilot,
+      '--variant',
+      'max',
+    ],
   );
 });
 
@@ -253,6 +275,124 @@ Deno.test('paid OpenCode Go route accepts a fresh live allowance decision', asyn
     },
   );
   assertEquals(decision?.allowed, true);
+});
+
+Deno.test('owner matrix override requires the exact durable worklog grant before spend', async () => {
+  const ownerMatrixOverride = {
+    authorizer: 'owner' as const,
+    rationale: 'Owner requested Kimi for this bounded implementation.',
+    worklogPath: '.llm/runs/override-test/worklog.md',
+    route: { model: 'kimi_k3' as const, effort: 'high' as const },
+  };
+  const options = {
+    message: 'do work',
+    model: ROUTING_MODEL_IDS.kimiK3Copilot,
+    variant: 'high',
+    cwd: '/work',
+    receiptPath: 'launch.jsonl',
+    workloadTier: 'straightforward' as const,
+    workloadRole: 'implementation' as const,
+    ownerMatrixOverride,
+  };
+  let reservations = 0;
+  const dependencies = {
+    now: () => '2026-09-04T16:00:00.000Z',
+    reserveCopilot: () => {
+      reservations++;
+      return Promise.resolve(evaluateCopilotExpense(
+        {
+          schemaVersion: 1 as const,
+          month: '2026-09',
+          updatedAt: '2026-09-04T16:00:00.000Z',
+          usedCredits: 0,
+        },
+        100,
+        '2026-09-04T16:00:00.000Z',
+      ));
+    },
+  };
+
+  await assertRejects(
+    () =>
+      preflightOpenCodeExpense(options, {
+        ...dependencies,
+        readTextFile: () => Promise.resolve('# Worklog\n'),
+      }),
+    Error,
+    'missing its exact harness worklog entry',
+  );
+  assertEquals(reservations, 0);
+
+  const decision = await preflightOpenCodeExpense(options, {
+    ...dependencies,
+    readTextFile: () =>
+      Promise.resolve(
+        '# Worklog\n\n' +
+          ownerMatrixOverrideWorklogEntry(
+            options.workloadTier,
+            options.workloadRole,
+            ownerMatrixOverride,
+          ) + '\n',
+      ),
+  });
+  assertEquals(decision?.allowed, true);
+  assertEquals(reservations, 1);
+});
+
+Deno.test('matrix and owner override effort mismatches fail before credit reservation', async () => {
+  let reservations = 0;
+  const reserveCopilot = () => {
+    reservations++;
+    throw new Error('reservation must remain unreachable');
+  };
+  await assertRejects(
+    () =>
+      preflightOpenCodeExpense({
+        message: 'do work',
+        model: ROUTING_MODEL_IDS.kimiK3Copilot,
+        variant: 'high',
+        workloadTier: 'complex',
+        workloadRole: 'ui_ux',
+        privilegedTierAuthorization: {
+          authorizer: 'owner',
+          rationale: 'Heavy UI/UX work explicitly requested by the owner.',
+        },
+      }, { reserveCopilot }),
+    Error,
+    'does not match complex/ui_ux effort max',
+  );
+
+  const ownerMatrixOverride = {
+    authorizer: 'owner' as const,
+    rationale: 'Owner requested Kimi high for this bounded implementation.',
+    worklogPath: '.llm/runs/override-test/worklog.md',
+    route: { model: 'kimi_k3' as const, effort: 'high' as const },
+  };
+  await assertRejects(
+    () =>
+      preflightOpenCodeExpense({
+        message: 'do work',
+        model: ROUTING_MODEL_IDS.kimiK3Copilot,
+        variant: 'max',
+        cwd: '/work',
+        workloadTier: 'straightforward',
+        workloadRole: 'implementation',
+        ownerMatrixOverride,
+      }, {
+        reserveCopilot,
+        readTextFile: () =>
+          Promise.resolve(
+            ownerMatrixOverrideWorklogEntry(
+              'straightforward',
+              'implementation',
+              ownerMatrixOverride,
+            ),
+          ),
+      }),
+    Error,
+    'does not match straightforward/implementation effort high in the recorded owner override',
+  );
+  assertEquals(reservations, 0);
 });
 
 Deno.test('denied paid-route expense decision prevents OpenCode process spawn', async () => {

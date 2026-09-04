@@ -11,6 +11,7 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:wsl-foundation': 'wsl/wsl-foundation.ts',
   'agentic:runtime': 'runtime/cli/agentic-runtime.ts',
   'agentic:routing-state': 'runtime/cli/routing-state.ts',
+  'agentic:matrix': 'runtime/cli/delegation-matrix-table.ts',
   'agentic:expense-watch': 'runtime/cli/expense-watch.ts',
   'agentic:leak-check': 'teardown/leak-check.ts',
   'agentic:teardown': 'teardown/teardown.ts',
@@ -77,7 +78,7 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
     ...PERMISSIVE_AGENTIC_TASKS,
   ].sort();
   assertEquals(surveyedTasks, actualTasks);
-  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 29);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 30);
   for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
     assert(
       denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),
