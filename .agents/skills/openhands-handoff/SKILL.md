@@ -8,9 +8,9 @@ description: >
 This skill is the routing card for OpenHands handoffs: comments and labels start cloud work, and the
 required summary artifacts keep local and cloud agents synchronized.
 
-> **Current route (2026-08-30):** generic OpenHands dispatch is fail-closed to the approved open
-> evaluator set: Qwen 3.8 Flash for PLAN-EVAL and GLM 5.3 Flash for IMPL/default work. Keep one
-> trigger per PR and use the phase route below.
+> **Current route (2026-09-04):** OpenHands is an explicitly selected cloud compatibility surface,
+> not part of the active local provider chain. New local generator/evaluator selection comes only
+> from the workload matrix in `workflow/lane-policy.md`.
 
 ## When to Use
 
@@ -27,49 +27,18 @@ required summary artifacts keep local and cloud agents synchronized.
   this skill only for the OpenHands trigger/handoff mechanics.
 - For JSR publish readiness, use `jsr-audit`.
 
-## Routing policy — READ FIRST (open models + cloud only)
+## Routing policy — read first
 
-OpenHands is **not** the evaluator for local runs. Two hard rules:
+OpenHands is not selected by the active local matrix. Use it only when a run is explicitly
+cloud-driven or when maintaining the existing GitHub workflow. For local work, select workload tier
+and role through `workflow/lane-policy.md`; preserve separate generator/evaluator sessions,
+different vendor families, provider precedence, and paid-route expense proof.
 
-1. **OpenHands runs OPEN models only** — Qwen 3.8 Flash for PLAN-EVAL and GLM 5.3 Flash for
-   IMPL-EVAL/default work. NEVER dispatch OpenHands
-   with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed models on
-   OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the owner's balance
-   — this is prohibited.
-2. **OpenHands is for CLOUD-driven runs only** — small GitHub-Copilot-style tasks the owner wants
-   reviewed fully in the cloud with adversarial agents. OpenHands remains the **default automated
-   cloud agent**; nothing below changes that. For any run on the **local machine**, do NOT dispatch
-   cloud OpenHands at all — use the local evaluator transport named below. On cloud-driven PRs the
-   repository phase workflow owns dispatch: `openhands` + `status:plan-eval` starts PLAN-EVAL;
-   draft→ready starts IMPL-EVAL unless `impl-eval:skip` is present. Orchestrators select an optional
-   `eval:model:*` label before the transition and must NEVER duplicate it with a manual trigger.
-
-### Local evaluator transport (owner revision, 2026-08-08)
-
-The normal local PLAN-EVAL / IMPL-EVAL route is now a fresh **native opposite-family session**:
-Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work. PLAN-EVAL
-is conditional for complex or decision-heavy work; IMPL-EVAL remains mandatory unless the owner
-explicitly waives it. Generator and evaluator sessions must always differ.
-
-OpenRouter is no longer the primary local evaluator. Use the bound Qwen 3.8 Flash PLAN preset or
-GLM 5.3 Flash IMPL preset only when a third opinion is genuinely required or the native
-opposite-family route is quota-blocked. If that OpenRouter escalation is itself limited, use a fresh
-AGY Gemini 3.6 Flash high session on the Google subscription. Rule 1 still applies to OpenRouter and
-OpenHands: only approved open models may use those paid relay surfaces.
-
-**Local Claude/OpenRouter capability:** both approved open models return a **real reasoning
-trace** and have a **verified agentic turn** (real tool calls) on this transport. Both bound
-evaluation presets can therefore run gates and their `effort` is genuine — not nominal. The
-zero-reasoning behaviour is **specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a
-client-wide gap: never cite "GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that
-caveat as a property of the transport or of the evaluator lane.
-
-OpenHands itself cannot currently attest reasoning effort because its adapter does not expose that
-capability. Always state that limitation in OpenHands handoffs and summaries; never claim `max` for
-an OpenHands run even though the local Claude/OpenRouter presets are bound to `max`.
-
-If neither an approved local route nor an authorized cloud run can be launched, record the gap in
-`drift.md` and let the supervisor decide — never self-certify.
+For an explicitly cloud-driven phase, repository automation owns dispatch: `openhands` plus
+`status:plan-eval` starts PLAN-EVAL; draft→ready starts IMPL-EVAL unless `impl-eval:skip` is
+present. Choose at most one supported `eval:model:*` override before transition and never duplicate
+the automatic trigger manually. OpenHands cannot attest reasoning effort, so record that limitation
+and never claim an observed effort it cannot prove.
 
 ## Key Concepts
 
@@ -77,7 +46,7 @@ If neither an approved local route nor an authorized cloud run can be launched, 
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | OPEN models only: Qwen 3.8 Flash (PLAN) and GLM 5.3 Flash (IMPL/default). OpenHands effort is not attestable. Closed models are PROHIBITED.                              |
+| Model profile    | Explicit cloud-workflow profile only; not inferred from the local workload matrix. OpenHands effort is not attestable.                                                       |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |

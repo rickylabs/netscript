@@ -59,9 +59,9 @@ ad-hoc `wsl.exe`). Each tool is exposed as a `deno task`; run with `--help` for 
 The suite is concern-grouped — `codex/`, `opencode/`, `openhands/`, `github/`, `wsl/`, `claude/`,
 the runtime controller `runtime/` + its `runtime/cli/` entry points, and `lib/`; its `README.md` is
 the map. Everything volatile is centralized in `.llm/tools/agentic/config/` (model ids, tool
-versions, endpoints), with the routing lane→model bindings in `runtime/routing-policy.ts`
-referencing those ids; change a model/version/endpoint only there. See the suite README's
-"Maintenance map".
+versions, endpoints, subscription limits), with the workload/coordinator matrix in
+`runtime/delegation-matrix.ts` and its resolver in `runtime/routing-policy.ts`; change a
+model/version/endpoint only at its documented authority. See the suite README's "Maintenance map".
 
 **Symptom: “my PR is green but should not merge yet.”** Run
 `deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The
@@ -84,7 +84,8 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | `agentic:claude-hook-log`           | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
 | `agentic:check-claude`              | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
 | `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
-| `agentic:opencode`                  | `opencode-run.ts`                         | run a general native OpenCode turn; message-first argv protects repeated `-f` inputs               |
+| `agentic:opencode`                  | `opencode-run.ts`                         | run a general OpenCode turn; paid routes require fresh usage proof before spawn                    |
+| `agentic:expense-watch`             | `runtime/cli/expense-watch.ts`            | emit a structured, fail-closed Go/Ollama/OpenRouter allowance decision                             |
 | `agentic:opencode-eval`             | `opencode-eval.ts`                        | capture canonical Kimi vision evidence from one or more native WSL image paths                     |
 | `agentic:opencode-web`              | `opencode-web.ts`                         | host OpenCode's browser UI; loopback default, password required for LAN/mDNS exposure              |
 | `agentic:runtime`                   | `runtime/cli/agentic-runtime.ts`          | desired-state controller: `doctor` / `status` / `repair codex-remote` (inspect-first; `--dry-run`) |

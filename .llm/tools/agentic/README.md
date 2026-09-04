@@ -73,20 +73,19 @@ thread id plus a secret-safe requested-vs-observed route identity.
 # Dry-run the whole plan — validates brief + git safety, stages nothing, launches nothing:
 deno run --allow-read --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts \
   --brief <win-path> --worktree <wsl-path> --branch <branch> --slug <slug> \
-  --slice-dir <win-path> --provider openai --model gpt-5.6-sol --effort medium --dry-run
+  --slice-dir <win-path> --provider openai --model <model-id> --effort <effort> --dry-run
 ```
 
-The `--model gpt-5.6-sol` above is an **illustrative literal** for a runnable example — it is not a
-source of truth. Pick the real provider/model/effort from `.llm/harness/workflow/lane-policy.md`
-(whose bindings live in `runtime/routing-policy.ts`, referencing the ids in `config/models.ts`);
-prose in the brief is not launch authority. Drop `--dry-run` for the real launch; it fails closed
-unless the observed provider/model/effort match what you requested. The launcher uses the v2
-app-server JSONL protocol directly because Codex CLI 0.144.1's `debug app-server send-message-v2`
-helper does not propagate `-c model_reasoning_effort` to the child turn. Pass
-`--allow-route-mismatch` only for an explicit operator-approved exception; otherwise a pending or
-mismatched route exits non-zero with a `BLOCKED:` operator action. Exit: `0` ok/dry-run/parse-log ·
-`1` stage failed · `2` watcher heartbeat · `3` brief contract violation · `4` git-safety violation
-(e.g. inherited upstream) · `5` worktree not found.
+Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; the typed bindings live in
+`runtime/delegation-matrix.ts`, the resolver lives in `runtime/routing-policy.ts`, and concrete ids
+live in `config/models.ts`. Prose in the brief is not launch authority. Drop `--dry-run` for the
+real launch; it fails closed unless the observed provider/model/effort match what you requested. The
+launcher uses the v2 app-server JSONL protocol directly because Codex CLI 0.144.1's
+`debug app-server send-message-v2` helper does not propagate `-c model_reasoning_effort` to the
+child turn. Pass `--allow-route-mismatch` only for an explicit operator-approved exception;
+otherwise a pending or mismatched route exits non-zero with a `BLOCKED:` operator action. Exit: `0`
+ok/dry-run/parse-log · `1` stage failed · `2` watcher heartbeat · `3` brief contract violation · `4`
+git-safety violation (e.g. inherited upstream) · `5` worktree not found.
 
 ### 2. Watch it — `codex/codex-watch.ts` (runs **inside** WSL)
 
@@ -559,6 +558,7 @@ Measured runs can require real attachment before the product prompt:
 ```bash
 deno task agentic:opencode --message "Inspect the project" --model <provider/model> \
   --variant <effort> --cwd /path/to/project \
+  --usage-snapshot .llm/tmp/usage/<provider>.json --estimated-cost-usd <amount> \
   --require-mcp netscript --require-mcp aspire \
   --receipt .netscript/agent/opencode-receipt.jsonl
 ```
@@ -575,9 +575,24 @@ immediately before every provider conversion (including compaction), removes emp
 assistant text/reasoning fragments, preserves all tool parts and ordering, and is idempotent across
 repeated resume. Unsafe signed-reasoning boundaries fail with only a safe local event identity.
 
-OpenRouter requires `OPENROUTER_API_KEY`. An already-exported value wins; otherwise the launcher
-loads only that assignment from `$HOME/.config/netscript-agentic/openrouter.env` and never prints
-it.
+OpenCode Go, Ollama Cloud, and OpenRouter use provider-scoped credentials. An already-exported
+selected key wins; otherwise the launcher reads only that provider's assignment from its mode-600
+file under `$HOME/.config/netscript-agentic/`. Rival provider keys are cleared from the child. The
+value is never printed, persisted, or added to argv.
+
+Every paid route requires `--usage-snapshot` and `--estimated-cost-usd`. Generate or refresh the
+normalized snapshot outside Git, then inspect the decision before launching:
+
+```bash
+deno task agentic:expense-watch -- --provider <opencode_go|ollama|openrouter> \
+  --snapshot .llm/tmp/usage/<provider>.json --estimated-cost-usd <amount> --pretty
+```
+
+The command exits zero only when the requested spend fits every applicable allowance and concurrency
+boundary. Missing, stale, mismatched, exhausted, or unresolved usage fails closed. Go never silently
+falls into a separately funded Zen balance; Ollama never guesses the subscription tier or consumes
+extra balance implicitly. OpenRouter paid-training eligibility is an owner-approved route property
+and is not filtered out.
 
 For browser access, `agentic:opencode-web` wraps the native
 [`opencode web`](https://opencode.ai/docs/web/) server:
@@ -620,28 +635,29 @@ The invariants worth internalizing:
 - **Fail-closed, anchored repair.** Destructive recovery only ever touches a `codex
   app-server`
   PID below `$HOME/.codex/` and the one known control socket — never a broad `pkill`.
-- **Opposite-family evaluation.** The routing policy refuses to select a fallback in the same model
-  family as the author for an evaluation purpose.
+- **Different-family evaluation.** The routing policy skips evaluator candidates in the selected
+  generator's vendor family and requires a separate evaluator session.
 - **Dated overrides expire.** `resolveCanonicalRoute` will not silently retain an expired temporary
   owner override past its `effectiveThrough` date.
 
 ## Maintenance map: change one thing in one place
 
-Everything that moves over time lives in `config/`. This is the monthly-maintenance surface — edit
-the one obvious place and every doctor, probe, installer, and test picks it up. A guard test
+Volatile values live in `config/`; typed routing bindings live in the delegation matrix. Edit the
+one documented authority and every doctor, probe, installer, and test picks it up. A guard test
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is ever hardcoded
 again outside `config/`.
 
-| To change a…                                        | Edit                                                   | Notes                                                                                                                                                                                            |
-| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
-| **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                            |
-| **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
-| **Endpoint / host / installer URL**                 | `config/endpoints.ts`                                  | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
-| **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
-| **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                                        |
-| **Agent / provider vocabulary**                     | `runtime/contract.ts`                                  | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                      |
-| **Deps**                                            | root `deno.json` import map + `deno.lock`              | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                           |
+| To change a…                                               | Edit                                                          | Notes                                                                                                                                                                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Model id**                                               | `config/models.ts`                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
+| **Routing binding** (tier + role → logical model + effort) | `runtime/delegation-matrix.ts`                                | The matrix authority rendered by `.llm/harness/workflow/lane-policy.md`; concrete ids remain in `config/models.ts`.                                                                              |
+| **Tool version**                                           | `config/versions.ts`                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
+| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
+| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
+| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                   | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                     |
+| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts` | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                           |
+| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                         | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                      |
+| **Deps**                                                   | root `deno.json` import map + `deno.lock`                     | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                           |
 
 ## Environment overrides
 
@@ -649,13 +665,15 @@ The suite ships portable: every machine-specific default is read through an env 
 fallback is the historical value, so with nothing set the behavior is byte-identical to before.
 Reads are permission-guarded — a tool without `--allow-env` simply falls back.
 
-| Env var                    | Overrides                                             | Default                        |
-| -------------------------- | ----------------------------------------------------- | ------------------------------ |
-| `NETSCRIPT_WSL_USER`       | The WSL Linux user the suite drives Codex under.      | `codex`                        |
-| `NETSCRIPT_WSL_HOME`       | The WSL home dir (brief dest, sessions-dir fallback). | `/home/<NETSCRIPT_WSL_USER>`   |
-| `OPENCODE_BIN`             | The native OpenCode executable or executable name.    | Configured `opencode` name     |
-| `OPENROUTER_API_KEY`       | OpenRouter credential inherited by OpenCode.          | Configured user env file       |
-| `OPENCODE_SERVER_PASSWORD` | Enables authenticated non-loopback/mDNS web access.   | Unset; remote exposure refused |
+| Env var                    | Overrides                                                          | Default                        |
+| -------------------------- | ------------------------------------------------------------------ | ------------------------------ |
+| `NETSCRIPT_WSL_USER`       | The WSL Linux user the suite drives Codex under.                   | `codex`                        |
+| `NETSCRIPT_WSL_HOME`       | The WSL home dir (brief dest, sessions-dir fallback).              | `/home/<NETSCRIPT_WSL_USER>`   |
+| `OPENCODE_BIN`             | The native OpenCode executable or executable name.                 | Configured `opencode` name     |
+| `OPENCODE_API_KEY`         | OpenCode Go credential inherited only by selected OpenCode child.  | Configured mode-600 env file   |
+| `OLLAMA_API_KEY`           | Ollama Cloud credential inherited only by selected OpenCode child. | Configured mode-600 env file   |
+| `OPENROUTER_API_KEY`       | OpenRouter credential inherited only by selected OpenCode child.   | Configured mode-600 env file   |
+| `OPENCODE_SERVER_PASSWORD` | Enables authenticated non-loopback/mDNS web access.                | Unset; remote exposure refused |
 
 The `wslUser()` / `wslHome()` helpers in `lib/agentic-lib.ts` are the single source of truth;
 per-tool `--user` flags still override at call time.

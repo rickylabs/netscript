@@ -16,8 +16,8 @@ Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`.
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
 have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they were repaired at
 `372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is committed at
-`605ae0e02`; S2 is committed at `da80e6eec`. S3's subscription expense, credential isolation, and
-paid-provider profile implementation is focused-green and ready for its atomic commit.
+`605ae0e02`; S2 is committed at `da80e6eec`; S3 is committed at `b2d3106f0`. S4 replaces active
+stale routing prose with typed-matrix policy and its exact table parity gate; focused gates pass.
 
 ## Accepted owner decisions
 
@@ -41,10 +41,9 @@ paid-provider profile implementation is focused-green and ready for its atomic c
 
 ## Next Steps
 
-1. Commit S3, then align active docs/skills and parity tests in S4.
-2. Run bounded Go/Ollama live smokes and full focused gates.
-3. Run separate Grok 4.6 xhigh IMPL-EVAL.
-4. Promote the PR only after exact-head CI and review-thread gate.
+1. Commit S4, then run bounded Go/Ollama live smokes and full focused/repository gates.
+2. Run separate Grok 4.6 xhigh IMPL-EVAL.
+3. Promote the PR only after exact-head CI and review-thread gate.
 
 ## Files Changed
 
@@ -60,6 +59,9 @@ paid-provider profile implementation is focused-green and ready for its atomic c
 | `.llm/tools/agentic/runtime/subscription-expense.ts`         | new          | fail-closed normalized allowance decisions             |
 | `.llm/tools/agentic/lib/provider-credential.ts`              | new          | mode-600 provider-scoped credential loading            |
 | `.llm/tools/agentic/opencode/opencode-run.ts`                | modified     | paid-route expense preflight before process spawn      |
+| `.llm/harness/workflow/lane-policy.md`                       | rewritten    | exact human view of workload/coordinator matrix        |
+| `.llm/harness/evaluator/{plan-protocol,protocol}.md`         | rewritten    | tier-specific evaluation selection and loop policy     |
+| `.agents/skills/{netscript-harness,claude-manager}/SKILL.md` | modified     | new routing and paid-provider operating contract       |
 
 ## Gates
 
@@ -69,6 +71,7 @@ paid-provider profile implementation is focused-green and ready for its atomic c
 | Static      | PASS S1-S3     | per-slice structured checks             |
 | Fitness     | NOT_RUN        | implementation hard stop                |
 | Runtime     | PASS S1-S3     | 72 focused tests across implemented code |
+| Docs parity | PASS S4        | typed table parity plus stale-policy scan |
 | Consumer    | N/A            | no published package/plugin changes     |
 
 ## Drift and Debt
