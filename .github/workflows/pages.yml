@@ -92,20 +92,17 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt
         run: |
-          diff_file="$(mktemp)"
           error_file="$(mktemp)"
-          trap 'rm -f "$diff_file" "$error_file"' EXIT
-          if ! git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$diff_file" 2> "$error_file"; then
+          trap 'rm -f "$error_file"' EXIT
+          if ! git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$CHANGED_NAME_STATUS_FILE" 2> "$error_file"; then
             cat "$error_file" >&2
             echo "diff_unavailable=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           {
             echo "diff_unavailable=false"
-            echo "changed<<__EOF__"
-            cat "$diff_file"
-            echo "__EOF__"
           } >> "$GITHUB_OUTPUT"
       - name: Extract root deno.json
         id: rootcfg
@@ -127,7 +124,7 @@ jobs:
         if: github.event_name != 'pull_request' || steps.diff.outputs.diff_unavailable != 'true'
         env:
           EVENT_NAME: ${{ github.event_name }}
-          CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
+          CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
           ROOT_DENO_JSON_BASE: ${{ steps.rootcfg.outputs.base }}
           ROOT_DENO_JSON_HEAD: ${{ steps.rootcfg.outputs.head }}

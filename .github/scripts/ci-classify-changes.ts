@@ -49,8 +49,9 @@
  * true. The classifier NEVER skips because it failed to classify. Non-PR
  * events (no diff) and empty diffs also force everything.
  *
- * This module is pure (`decide`) plus a thin CLI. The CLI reads inputs from
- * env and appends job outputs to `$GITHUB_OUTPUT`. It is exercised by
+ * This module is pure (`decide`) plus a thin CLI. The CLI reads small inputs
+ * from env, reads the potentially large rename-aware diff from a file, and
+ * appends job outputs to `$GITHUB_OUTPUT`. It is exercised by
  * `ci-classify-changes.test.ts` and run as a self-check step in each
  * consuming workflow's classify job.
  */
@@ -569,6 +570,15 @@ export function parseNameStatus(raw: string | undefined): string[] {
   return paths;
 }
 
+/** Load a rename-aware diff without placing an unbounded payload in argv/env. */
+export async function readNameStatusInput(
+  filePath: string | undefined,
+  inline: string | undefined,
+  readTextFile: (path: string) => Promise<string> = Deno.readTextFile,
+): Promise<string | undefined> {
+  return filePath ? await readTextFile(filePath) : inline;
+}
+
 /**
  * Make the reason safe to transport through `$GITHUB_OUTPUT` and job outputs:
  * strip control characters (incl. newlines, which a crafted filename could use
@@ -584,8 +594,17 @@ export function sanitizeReason(reason: string): string {
 
 async function main(): Promise<void> {
   const eventName = Deno.env.get('EVENT_NAME') ?? 'pull_request';
+  // A single Linux argv/env entry is limited to 128 KiB. Large cleanup PRs
+  // can exceed that even while remaining far below GitHub's diff limits, so
+  // workflows pass the rename-aware diff by file instead of one env value.
+  const nameStatusPath = eventName === 'pull_request'
+    ? Deno.env.get('CHANGED_NAME_STATUS_FILE')
+    : undefined;
+  const nameStatus = await readNameStatusInput(
+    nameStatusPath,
+    Deno.env.get('CHANGED_NAME_STATUS'),
+  );
   // Prefer the rename-aware name-status form; fall back to a plain file list.
-  const nameStatus = Deno.env.get('CHANGED_NAME_STATUS');
   const files = nameStatus !== undefined && nameStatus.trim().length > 0
     ? parseNameStatus(nameStatus)
     : parseFiles(Deno.env.get('CHANGED_FILES'));

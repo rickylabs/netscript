@@ -43,22 +43,14 @@ jobs:
           .github/scripts/ci-classify-changes.test.ts
 
       - name: Compute changed files (merge-base diff, rename-aware)
-        id: diff
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt
         # `--name-status -M` so renames/copies report BOTH sides (see
         # e2e-cli.yml).
-        run: |
-          diff_file="$(mktemp)"
-          trap 'rm -f "$diff_file"' EXIT
-          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$diff_file"
-          {
-            echo "changed<<__EOF__"
-            cat "$diff_file"
-            echo "__EOF__"
-          } >> "$GITHUB_OUTPUT"
+        run: git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$CHANGED_NAME_STATUS_FILE"
 
       # No root deno.json extraction here: `needs_surface` is independent of
       # the tasks-only discrimination (the root config never lives under
@@ -67,7 +59,7 @@ jobs:
         id: decide
         env:
           EVENT_NAME: ${{ github.event_name }}
-          CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
+          CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
         run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
 
