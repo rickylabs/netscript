@@ -46,3 +46,6 @@ matrix model except the OpenAI and Anthropic families. OpenAI remains native Cod
 Anthropic remains native Claude. Kimi K3 and Grok 4.6 are confirmed priority savings targets. The
 connector's live model catalog must be attested after device authorization; absent models fail over
 through the pre-existing provider chain rather than being guessed.
+
+For `deep_research`, the ruling admits only the dedicated Copilot transport for Gemini 3.8 Flash; it
+does not admit generic OpenCode Go, Ollama, OpenRouter, or Claude transports.

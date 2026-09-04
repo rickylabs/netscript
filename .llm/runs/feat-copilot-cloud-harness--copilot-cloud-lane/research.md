@@ -72,6 +72,11 @@ subscription. This selection is an explicit cost-allocation policy; it does not 
 model in GitHub's catalog is exposed by the installed OpenCode connector, so launch-time catalog
 discovery must fail closed.
 
+This owner ruling also applies when the selected role is `deep_research`: Gemini 3.8 Flash may use
+the dedicated Copilot transport ahead of native `agy`. It does **not** reopen generic OpenCode Go,
+Ollama, OpenRouter, or Claude deep-research routing; the new capability must be represented as its
+own transport so those existing safety exclusions remain enforceable.
+
 GitHub's current supported-model catalog includes Gemini 3.8 Flash, Kimi K3, and Grok 4.6 in
 addition to OpenAI and Anthropic families. Kimi K3 and Grok 4.6 are therefore the immediate
 high-cost savings targets for Copilot-first routing. Qwen, GLM, Muse, MiniMax, and DeepSeek are
