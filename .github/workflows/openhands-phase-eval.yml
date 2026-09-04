@@ -4,8 +4,10 @@ run-name: Phase eval PR #${{ github.event.pull_request.number }} · ${{ github.e
 # Phase dispatcher. The generic OpenHands workflow remains the runner; this workflow owns the
 # harness state machine and posts exactly one trusted trigger for each deliberate phase transition.
 #
-# Initial IMPL-EVAL: make a draft PR ready for review. `impl-eval:skip` is the attributed escape
-# hatch. Rerun: move away from `status:impl-eval`, then add it again.
+# Initial IMPL-EVAL: add `openhands`, then make a draft PR ready for review. PR readiness alone is
+# deliberately zero-spend. `impl-eval:skip` remains the attributed escape hatch for an explicitly
+# opted-in transition. Rerun: move away from `status:impl-eval`, then add it again while `openhands`
+# remains present.
 # PLAN-EVAL: add `openhands`, then add `status:plan-eval` (either label may complete the pair).
 # Rerun by moving away from and back to `status:plan-eval`.
 
@@ -25,14 +27,18 @@ concurrency:
 jobs:
   dispatch:
     if: >-
-      github.event.action == 'ready_for_review' ||
+      (github.event.action == 'ready_for_review' &&
+       contains(github.event.pull_request.labels.*.name, 'openhands')) ||
       (github.event.action == 'labeled' &&
        ((github.event.label.name == 'status:plan-eval' &&
          contains(github.event.pull_request.labels.*.name, 'openhands')) ||
         (github.event.label.name == 'openhands' &&
          contains(github.event.pull_request.labels.*.name, 'status:plan-eval')) ||
         (github.event.pull_request.draft == false &&
-         github.event.label.name == 'status:impl-eval')))
+         contains(github.event.pull_request.labels.*.name, 'openhands') &&
+         (github.event.label.name == 'status:impl-eval' ||
+          (github.event.label.name == 'openhands' &&
+           contains(github.event.pull_request.labels.*.name, 'status:impl-eval'))))))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
