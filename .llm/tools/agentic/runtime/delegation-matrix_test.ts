@@ -1,7 +1,9 @@
 import { assertEquals, assertThrows } from '@std/assert';
+import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
   COORDINATOR_MATRIX,
   DELEGATION_MATRIX,
+  MODEL_CATALOG,
   MODEL_TRANSPORT_PRIORITY,
   modelFamily,
   rejectLegacyLaneForNewSelection,
@@ -51,6 +53,23 @@ Deno.test('provider priority puts subscriptions before metered OpenRouter', () =
     'ollama',
     'openrouter',
   ]);
+});
+
+Deno.test('provider capability catalog pins dispatchable Claude and Ollama ids', () => {
+  assertEquals(MODEL_CATALOG.fable_5_1.capabilities[0]?.model, ROUTING_MODEL_IDS.fable51Native);
+  assertEquals(MODEL_CATALOG.opus_5.capabilities[0]?.model, ROUTING_MODEL_IDS.opus5Native);
+  assertEquals(ROUTING_MODEL_IDS.fable51Native.startsWith('claude-fable-'), true);
+  assertEquals(ROUTING_MODEL_IDS.opus5Native.startsWith('claude-opus-'), true);
+  assertEquals(
+    MODEL_CATALOG.deepseek_v4_flash.capabilities.find((entry) => entry.transport === 'ollama')
+      ?.model.endsWith(':0731'),
+    true,
+  );
+  assertEquals(
+    MODEL_CATALOG.deepseek_v4_pro.capabilities.find((entry) => entry.transport === 'ollama')
+      ?.model.endsWith(':0813'),
+    true,
+  );
 });
 
 Deno.test('vendor families distinguish open-model vendors', () => {

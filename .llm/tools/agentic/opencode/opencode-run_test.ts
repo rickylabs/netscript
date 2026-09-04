@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import {
@@ -7,6 +7,7 @@ import {
   parseOpenRouterApiKey,
   preflightOpenCodeExpense,
   resolveOpenCodeBinary,
+  runOpenCode,
 } from './opencode-run.ts';
 
 Deno.test('OpenCode argv keeps the message before every flag', () => {
@@ -152,4 +153,40 @@ Deno.test('paid OpenCode route accepts a fresh structured allowance decision', a
     () => '2026-09-04T16:00:00.000Z',
   );
   assertEquals(decision?.allowed, true);
+});
+
+Deno.test('denied paid-route expense decision prevents OpenCode process spawn', async () => {
+  let spawnCalls = 0;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'do not dispatch',
+          model: ROUTING_MODEL_IDS.glm53FlashGo,
+          variant: 'high',
+          cwd: '/work',
+          usageSnapshotPath: 'usage.json',
+          estimatedCostUsd: 1,
+        },
+        false,
+        {
+          readTextFile: () =>
+            Promise.resolve(JSON.stringify({
+              provider: 'opencode_go',
+              capturedAt: '2026-09-04T15:55:00.000Z',
+              rollingFiveHoursUsedUsd: 12,
+              weeklyUsedUsd: 20,
+              monthlyUsedUsd: 40,
+            })),
+          now: () => '2026-09-04T16:00:00.000Z',
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('spawn must remain unreachable');
+          },
+        },
+      ),
+    Error,
+    'expense guard blocked opencode_go: allowance_exhausted',
+  );
+  assertEquals(spawnCalls, 0);
 });

@@ -637,8 +637,9 @@ The invariants worth internalizing:
   PID below `$HOME/.codex/` and the one known control socket — never a broad `pkill`.
 - **Different-family evaluation.** The routing policy skips evaluator candidates in the selected
   generator's vendor family and requires a separate evaluator session.
-- **Dated overrides expire.** `resolveCanonicalRoute` will not silently retain an expired temporary
-  owner override past its `effectiveThrough` date.
+- **New selection is matrix-derived.** `resolveWorkloadRoute` and `resolveCoordinatorRoute` select
+  only typed workload/coordinator routes, skip same-family evaluators, and reject legacy lane names
+  rather than translating historical state into a new dispatch.
 
 ## Maintenance map: change one thing in one place
 

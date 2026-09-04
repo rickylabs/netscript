@@ -54,3 +54,26 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
   least one legal evaluator per generator; encode exact owner round/repair/notification values; keep
   legacy lanes fail-closed for new selection.
 - **Evidence:** `plan-eval.md`, cycle 1 `FAIL_PLAN`; no production file changed.
+
+## 2026-09-04 — IMPL-EVAL cycle 1 found live dispatch-id and proof gaps
+
+- **What:** The typed matrix was structurally correct, but two native Claude ids and two Ollama
+  DeepSeek ids were not the concrete strings accepted by their current CLIs/catalogs. The S3 test
+  proved the expense decision in isolation but did not observe the process-spawn boundary.
+- **Severity:** significant bounded implementation defect.
+- **Action:** fixed the four provider spellings in the central model catalog, added an injectable
+  OpenCode spawn seam with a zero-call assertion on allowance exhaustion, and replaced the deleted
+  resolver name in active tooling documentation.
+- **Continuity:** IMPL-EVAL cycle 2 must resume OpenCode session
+  `ses_f93062116ffe1eRZWsVs5ukzqK`; generator/evaluator vendor and session separation remains intact.
+- **Evidence:** `evaluate.md` cycle 1 plus the structured focused check/test/format results in
+  `worklog.md`.
+
+## 2026-09-04 — Toolchain inventory reconciled without widening routing scope
+
+- **What:** The host operator reports opencode `1.18.27`, Codex `0.153.2`, Claude `2.1.260`, agy
+  `1.1.26` (self-updating in-run), Claude Desktop `1.44121.2`, ChatGPT Desktop `26.901.31953`, and
+  OpenCode Desktop `1.18.27` as current.
+- **Action:** record as live substrate evidence for this run. The routing repair does not restart
+  agents or turn the model-matrix PR into a general toolchain-upgrade change.
+- **Evidence:** owner message and PR #1989 live-substrate review comment.

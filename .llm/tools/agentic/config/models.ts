@@ -38,8 +38,8 @@ export const ROUTING_MODEL_IDS = {
   lunaGo: 'opencode-go/gpt-5.6-luna',
   solNative: 'gpt-5.6-sol',
   astraNative: 'gpt-6-astra',
-  fable51Native: 'fable-5-1',
-  opus5Native: 'opus-5',
+  fable51Native: 'claude-fable-5-1',
+  opus5Native: 'claude-opus-5',
   gemini38FlashNative: 'gemini-3.8-flash',
   qwen38FlashNextGo: 'opencode-go/qwen3.8-flash',
   qwen38FlashNextOpenRouter: 'openrouter/qwen/qwen3.8-flash',
@@ -57,12 +57,12 @@ export const ROUTING_MODEL_IDS = {
   minimaxM3Ollama: 'ollama-cloud/minimax-m3',
   minimaxM3OpenRouter: 'openrouter/minimax/minimax-m3',
   deepseekV4FlashGo: 'opencode-go/deepseek-v4-flash',
-  deepseekV4FlashOllama: 'ollama-cloud/deepseek-v4-flash',
+  deepseekV4FlashOllama: 'ollama-cloud/deepseek-v4-flash:0731',
   deepseekV4FlashOpenRouter: 'openrouter/deepseek/deepseek-v4-flash-0731',
   deepseekV4FlashVisionGo: 'opencode-go/deepseek-v4-flash-vision-exp',
   deepseekV4FlashVisionOpenRouter: 'openrouter/deepseek/deepseek-v4-flash-vision-exp',
   deepseekV4ProGo: 'opencode-go/deepseek-v4-pro',
-  deepseekV4ProOllama: 'ollama-cloud/deepseek-v4-pro',
+  deepseekV4ProOllama: 'ollama-cloud/deepseek-v4-pro:0813',
   deepseekV4ProOpenRouter: 'openrouter/deepseek/deepseek-v4-pro-0813',
   kimiK3Go: 'opencode-go/kimi-k3',
   kimiK3Ollama: 'ollama-cloud/kimi-k3',
@@ -74,8 +74,8 @@ export const ROUTING_MODEL_IDS = {
 /**
  * Native-provider model ids in the CLI-argument spelling the rollout canary
  * passes to `provider-canary` (`claude`/`codex` `--model` args). These use the
- * provider CLIs' own dashed spelling, distinct from the routing ids in
- * `MODEL_IDS` (e.g. `claude-opus-5` vs the routing id `opus-5`).
+ * provider CLIs' own dashed spelling. Matrix capabilities now use these same
+ * dispatchable CLI ids; this table remains the provider-canary argument set.
  */
 export const NATIVE_CANARY_MODEL_ARGS = {
   claudeOpus: 'claude-opus-5',

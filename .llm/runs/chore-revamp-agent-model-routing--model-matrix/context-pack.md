@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Current phase  | `implementation`                                 |
+| Current phase  | `impl-eval repair`                               |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
 
@@ -18,7 +18,10 @@ have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they
 `372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is committed at
 `605ae0e02`; S2 is committed at `da80e6eec`; S3 is committed at `b2d3106f0`; S4 is committed at
 `e4bf9dd8c`. S5 live catalog discovery corrected nonexistent Ollama capabilities for Qwen 3.8
-Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go turn pass.
+Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go turn pass. Independent
+IMPL-EVAL cycle 1 in session `ses_f93062116ffe1eRZWsVs5ukzqK` returned a bounded `FAIL_FIX` at
+`9f8ee61a6`. The repair corrects native Claude and dated Ollama ids, proves an expense denial cannot
+spawn OpenCode, and updates the stale README resolver claim. Focused repair gates pass.
 
 ## Accepted owner decisions
 
@@ -42,9 +45,9 @@ Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go tu
 
 ## Next Steps
 
-1. Commit the S5 catalog/gate checkpoint.
-2. Run separate Grok 4.6 xhigh IMPL-EVAL.
-3. Promote the PR only after exact-head CI and review-thread gate.
+1. Commit and push the bounded IMPL-EVAL cycle-1 repair with the evaluator artifact.
+2. Post the missing S4/S5 phase comments and re-steer the same evaluator session for cycle 2.
+3. Promote the PR only after cycle-2 PASS, exact-head CI, and the review-thread gate.
 
 ## Files Changed
 
@@ -70,12 +73,13 @@ Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go tu
 | ----------- | -------------- | --------------------------------------------------------------------------- |
 | Plan        | PASS cycle 2   | `plan-eval.md`, repair head `372409ab6`                                     |
 | Static      | PASS S1-S3     | per-slice structured checks                                                 |
-| Fitness     | NOT_RUN        | implementation hard stop                                                    |
-| Runtime     | PASS S1-S5     | 570 agentic tests plus guarded OpenCode Go live turn                        |
+| Fitness     | PASS repair    | injected command-spawn denial proof                                          |
+| Runtime     | PASS repair    | 572 agentic tests plus guarded OpenCode Go live turn                        |
 | Docs parity | PASS S4        | typed table parity plus stale-policy scan                                   |
 | Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
+| IMPL-EVAL   | FAIL_FIX C1    | `evaluate.md`; bounded repair implemented, cycle 2 pending                   |
 
 ## Drift and Debt
 

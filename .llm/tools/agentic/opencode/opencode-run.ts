@@ -37,6 +37,15 @@ export interface OpenCodeRunResult {
   readonly stdout?: string;
 }
 
+export interface OpenCodeRunDependencies {
+  readonly readTextFile?: (path: string) => Promise<string>;
+  readonly now?: () => string;
+  readonly spawn?: (
+    binary: string,
+    options: Deno.CommandOptions,
+  ) => Deno.ChildProcess;
+}
+
 interface CliOptions extends OpenCodeRunOptions {
   readonly capture: boolean;
 }
@@ -126,18 +135,27 @@ export async function preflightOpenCodeExpense(
 export async function runOpenCode(
   options: OpenCodeRunOptions,
   capture = false,
+  dependencies: OpenCodeRunDependencies = {},
 ): Promise<OpenCodeRunResult> {
   const processEnv = Deno.env.toObject();
   const cwd = resolve(options.cwd ?? Deno.cwd());
-  await preflightOpenCodeExpense(options);
+  await preflightOpenCodeExpense(
+    options,
+    dependencies.readTextFile ?? Deno.readTextFile,
+    dependencies.now ?? (() => new Date().toISOString()),
+  );
   if (options.receiptPath) {
     await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
   }
-  const env = await openCodeChildEnvironment(processEnv, Deno.readTextFile, {
-    cwd,
-    receiptPath: options.receiptPath,
-    model: options.model,
-  });
+  const env = await openCodeChildEnvironment(
+    processEnv,
+    dependencies.readTextFile ?? Deno.readTextFile,
+    {
+      cwd,
+      receiptPath: options.receiptPath,
+      model: options.model,
+    },
+  );
   if (options.requiredMcp?.length) {
     if (!options.receiptPath) {
       throw new Error('--receipt is required when --require-mcp is used');
@@ -151,14 +169,18 @@ export async function runOpenCode(
       receiptPath: options.receiptPath,
     });
   }
-  const child = new Deno.Command(resolveOpenCodeBinary(processEnv), {
+  const binary = resolveOpenCodeBinary(processEnv);
+  const commandOptions: Deno.CommandOptions = {
     args: opencodeRunArguments(options),
     cwd,
     env,
     stdin: 'null',
     stdout: capture ? 'piped' : 'inherit',
     stderr: 'inherit',
-  }).spawn();
+  };
+  const child = dependencies.spawn
+    ? dependencies.spawn(binary, commandOptions)
+    : new Deno.Command(binary, commandOptions).spawn();
   const stdout = capture ? new Response(child.stdout).text() : undefined;
   const status = await child.status;
   return {

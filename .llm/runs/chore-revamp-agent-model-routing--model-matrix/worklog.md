@@ -67,6 +67,9 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T14:47Z    | S3        | implemented    | Added OpenCode Go/Ollama/OpenRouter credential isolation, paid-route provider profiles, fail-closed structured subscription expense decisions, and CLI preflight.        |
 | 2026-09-04T14:57Z    | S4        | implemented    | Replaced stale named-lane prose with workload/coordinator matrix policy across active harness, evaluator, manager, remote, OpenHands, docs-audit, and tooling surfaces.  |
 | 2026-09-04T15:10Z    | S5        | live/gates     | Proved all three auth registrations, live Go/Ollama/OpenRouter catalogs, corrected three nonexistent Ollama capabilities, and completed one guarded OpenCode Go turn.    |
+| 2026-09-04T15:25Z    | IMPL-EVAL | cycle 1        | Separate OpenCode Go / Grok 4.6 xhigh session `ses_f93062116ffe1eRZWsVs5ukzqK` returned `FAIL_FIX` at `9f8ee61a6` with five bounded findings.                         |
+| 2026-09-04T15:32Z    | repair    | implemented    | Corrected native Claude and dated Ollama dispatch ids, added the pre-spawn expense-denial seam/test, and replaced the stale README resolver claim.                         |
+| 2026-09-04T15:32Z    | reconcile | live review    | Reconciled owner live-substrate comments: Astra remains active as instructed; paid training remains eligible; external CLI/desktop toolchain is current.                  |
 
 ## Gate Results
 
@@ -75,7 +78,12 @@ tests and documentation parity gate identify every required downstream update.
 | PLAN-EVAL cycle 1    | FAIL_PLAN | `plan-eval.md`; three bounded design fixes, no production implementation started                                           |
 | PLAN-EVAL cycle 2    | PASS      | `plan-eval.md`; same evaluator session, repair head `372409ab6`                                                            |
 | implementation gates | NOT_RUN   | hard stop until PLAN-EVAL PASS                                                                                             |
-| IMPL-EVAL            | NOT_RUN   | required after implementation                                                                                              |
+| IMPL-EVAL cycle 1    | FAIL_FIX  | `evaluate.md`; catalog spellings, spawn-denial proof, README wording, and S4/S5 comment trail                               |
+| Repair check         | PASS      | 4 changed TS files, 1 batch, 0 diagnostics                                                                                 |
+| Repair tests         | PASS      | 18 passed, 0 failed; includes expense denial before the injected process-spawn seam                                        |
+| Repair format        | PASS      | structured formatter selected/processed 4 files, 0 findings                                                               |
+| Agentic repair check | PASS      | 185 files, 2 batches, 0 diagnostics                                                                                        |
+| Agentic repair tests | PASS      | 572 passed, 0 failed after cycle-1 repair                                                                                  |
 | S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                                                           |
 | S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                                                                 |
 | S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                                                                    |
