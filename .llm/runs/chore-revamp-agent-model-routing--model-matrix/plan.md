@@ -65,6 +65,9 @@ No `packages/` or `plugins/` export changes.
 - Add table-driven tests for every matrix cell, effort, fallback, evaluator limit, and provider
   order.
 - Add an exhaustive primary/fallback cross-product self-certification test.
+- **Files:** `config/models.ts`, new `runtime/delegation-matrix.ts`, and
+  `runtime/delegation-matrix_test.ts`.
+- **Proof:** focused structured check/test plus `config/no-hardcoded-volatile_test.ts`.
 
 ### S2 — resolver and legacy boundary
 
@@ -72,6 +75,10 @@ No `packages/` or `plugins/` export changes.
 - Make the typed matrix drive the active canonical policy and routing-state human output.
 - Retain only explicit persisted-state compatibility for old lane/model identifiers.
 - Update selection tests for no silent effort/model/provider drift.
+- **Files:** `runtime/routing-policy.ts`, `runtime/routing-policy_test.ts`,
+  `runtime/cli/routing-state.ts`, `runtime/cli/routing-state_test.ts`, and the route contract only
+  where the two provider kinds require it.
+- **Proof:** focused structured check/test, including all legacy-input and active-output assertions.
 
 ### S3 — secure OpenCode providers and expense watcher
 
@@ -80,6 +87,12 @@ No `packages/` or `plugins/` export changes.
 - Add fixed OpenCode Go limits and dynamic Ollama tier policies.
 - Add structured `agentic:expense-watch` preflight with stale/unknown/exceeded fail-closed states.
 - Gate paid OpenCode execution before spawning the child process.
+- **Files:** `config/subscriptions.ts`, `runtime/subscription-expense.ts`,
+  `runtime/subscription-expense_test.ts`, `runtime/provider-profiles.ts` and its test,
+  `lib/provider-credential.ts` and its test, `opencode/opencode-run.ts` and its test, the expense
+  CLI, and `deno.json`.
+- **Proof:** focused structured check/test; fake-value credential isolation; table tests for every
+  allowance boundary; a command-spawn spy proving denied expense decisions never spawn OpenCode.
 
 ### S4 — docs, skills, and parity
 
@@ -88,6 +101,11 @@ No `packages/` or `plugins/` export changes.
 - Add/check machine markers so human policy cannot drift from the typed matrix.
 - State provisioning, allowance snapshot, provider precedence, and operator recovery without any
   secret path/value in tracked artifacts.
+- **Files:** `.llm/harness/workflow/lane-policy.md`, evaluator plan/implementation protocols,
+  `.agents/skills/netscript-harness/SKILL.md`, `.agents/skills/claude-manager/SKILL.md`,
+  `.llm/tools/agentic/README.md`, `.llm/harness/workflow/tooling.md`, and the policy parity test.
+- **Proof:** documentation parity test, focused Markdown format check, and stale active-policy term
+  scan excluding `.llm/runs/**`.
 
 ### S5 — smoke, migration, and evaluation
 
@@ -96,6 +114,10 @@ No `packages/` or `plugins/` export changes.
 - Run live model/provider smoke through the checked-in launcher with bounded prompts and structured
   receipts after local provisioning; never print credentials.
 - Run separate-session, cross-family IMPL-EVAL and address findings within the matrix round limit.
+- **Files:** this run's `worklog.md`, `context-pack.md`, `drift.md`, `evaluate.md`, and receipt
+  files only; production files change only if a gate/evaluator finding requires a bounded fix.
+- **Proof:** exact commands/exit codes and separate evaluator identity recorded in run artifacts and
+  PR comments.
 
 ## Open-decision sweep
 
@@ -137,6 +159,15 @@ No `packages/` or `plugins/` export changes.
 | Repo check/test       | `deno task check`, `deno task test` (CI/runtime classifier may natively skip unrelated suites) | before ready |
 | IMPL-EVAL             | separate cross-family Grok 4.6 xhigh; max 3, notify after 2                                    | before ready |
 | PR lifecycle          | exact-head CI, review-thread gate, status/milestone                                            | before merge |
+
+### Archetype-gate applicability
+
+This is repository-internal agentic tooling, not an Archetype-6 package and not a release cut. The
+Archetype-6 structural/package publish gates (F-CLI folder shape, JSR surface, `publish:dry-run`,
+consumer import, Aspire, browser, scaffold, and release gates) are `N/A`: no `packages/**`,
+`plugins/**`, scaffold output, or published CLI surface changes. Applicable universal properties are
+covered by the repository check/test/lint/fmt gates, SSOT guard, focused CLI argument/environment
+tests, and manual adapter-boundary review. `jsr-audit` is `N/A` for the same reason.
 
 ## Non-goals
 
