@@ -13,6 +13,7 @@ type PhaseDecision = 'dispatch-plan' | 'dispatch-impl' | 'skip-impl' | 'ignore';
 
 function decision(event: Event): PhaseDecision {
   if (event.action === 'ready_for_review') {
+    if (!event.labels.includes('openhands')) return 'ignore';
     return event.labels.includes('impl-eval:skip') ? 'skip-impl' : 'dispatch-impl';
   }
   if (event.action !== 'labeled') return 'ignore';
@@ -21,7 +22,10 @@ function decision(event: Event): PhaseDecision {
     (event.label === 'status:plan-eval' ||
       (event.label === 'openhands' && event.labels.includes('status:plan-eval')));
   if (completesPlanPair) return 'dispatch-plan';
-  return !event.draft && event.label === 'status:impl-eval' ? 'dispatch-impl' : 'ignore';
+  const completesImplPair = hasOpenHands && !event.draft &&
+    (event.label === 'status:impl-eval' ||
+      (event.label === 'openhands' && event.labels.includes('status:impl-eval')));
+  return completesImplPair ? 'dispatch-impl' : 'ignore';
 }
 
 const MODELS = new Map([
@@ -53,9 +57,21 @@ function nextStatus(
 }
 
 Deno.test('phase evaluator event matrix dispatches only deliberate transitions', () => {
-  assertEquals(decision({ action: 'ready_for_review', labels: [] }), 'dispatch-impl');
+  assertEquals(decision({ action: 'ready_for_review', labels: [] }), 'ignore');
   assertEquals(
     decision({ action: 'ready_for_review', labels: ['impl-eval:skip'] }),
+    'ignore',
+  );
+  assertEquals(
+    decision({ action: 'ready_for_review', labels: ['status:impl-eval', 'eval:model:glm'] }),
+    'ignore',
+  );
+  assertEquals(
+    decision({ action: 'ready_for_review', labels: ['openhands'] }),
+    'dispatch-impl',
+  );
+  assertEquals(
+    decision({ action: 'ready_for_review', labels: ['openhands', 'impl-eval:skip'] }),
     'skip-impl',
   );
   assertEquals(
@@ -85,6 +101,24 @@ Deno.test('phase evaluator event matrix dispatches only deliberate transitions',
       action: 'labeled',
       label: 'status:impl-eval',
       labels: ['status:impl-eval'],
+      draft: false,
+    }),
+    'ignore',
+  );
+  assertEquals(
+    decision({
+      action: 'labeled',
+      label: 'status:impl-eval',
+      labels: ['status:impl-eval', 'openhands'],
+      draft: false,
+    }),
+    'dispatch-impl',
+  );
+  assertEquals(
+    decision({
+      action: 'labeled',
+      label: 'openhands',
+      labels: ['status:impl-eval', 'openhands'],
       draft: false,
     }),
     'dispatch-impl',
@@ -142,6 +176,10 @@ Deno.test('workflow source encodes trusted, exactly-once phase dispatch', async 
   const runner = await Deno.readTextFile('.github/workflows/openhands-agent.yml');
   assertStringIncludes(phase, 'types: [labeled, ready_for_review]');
   assert(!phase.includes('synchronize'));
+  assertStringIncludes(
+    phase,
+    "github.event.action == 'ready_for_review' &&\n       contains(github.event.pull_request.labels.*.name, 'openhands')",
+  );
   assertStringIncludes(phase, "contains(github.event.pull_request.labels.*.name, 'openhands')");
   assertStringIncludes(
     phase,

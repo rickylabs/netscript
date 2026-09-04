@@ -6,6 +6,7 @@ import {
   decidePhaseEvaluationCurrency,
   decideStatusTransition,
   IMPL_EVAL_STATUS,
+  OPENHANDS_OPT_IN_LABEL,
   PHASE_EVAL_RECOVERY,
 } from './phase-eval-status.mjs';
 
@@ -124,7 +125,7 @@ Deno.test('phase currency fails closed without spend for stale head or phase', (
     eventHead: 'a'.repeat(40),
     liveHead: 'a'.repeat(40),
     expectedStatus: IMPL_EVAL_STATUS,
-    liveLabels: [IMPL_EVAL_STATUS],
+    liveLabels: [IMPL_EVAL_STATUS, OPENHANDS_OPT_IN_LABEL],
   });
   assertEquals(current, { dispatch: true, reason: 'current', recovery: '' });
 
@@ -134,18 +135,37 @@ Deno.test('phase currency fails closed without spend for stale head or phase', (
         eventHead: 'a'.repeat(40),
         liveHead: 'b'.repeat(40),
         expectedStatus: IMPL_EVAL_STATUS,
-        liveLabels: [IMPL_EVAL_STATUS],
+        liveLabels: [IMPL_EVAL_STATUS, OPENHANDS_OPT_IN_LABEL],
       }),
       decidePhaseEvaluationCurrency({
         eventHead: 'a'.repeat(40),
         liveHead: 'a'.repeat(40),
         expectedStatus: IMPL_EVAL_STATUS,
-        liveLabels: ['status:impl'],
+        liveLabels: ['status:impl', OPENHANDS_OPT_IN_LABEL],
       }),
     ]
   ) {
     assertEquals(stale.dispatch, false);
     assertStringIncludes(stale.recovery, PHASE_EVAL_RECOVERY);
+  }
+});
+
+Deno.test('phase currency revokes PLAN and IMPL spend when live opt-in was removed', () => {
+  for (const expectedStatus of ['status:plan-eval', IMPL_EVAL_STATUS]) {
+    const revoked = decidePhaseEvaluationCurrency({
+      eventHead: 'a'.repeat(40),
+      liveHead: 'a'.repeat(40),
+      expectedStatus,
+      liveLabels: [expectedStatus],
+    });
+
+    assertEquals(revoked.dispatch, false);
+    assertStringIncludes(revoked.reason, 'revoked authorization');
+    assertStringIncludes(revoked.reason, OPENHANDS_OPT_IN_LABEL);
+    assertEquals(
+      revoked.recovery,
+      `Re-add ${OPENHANDS_OPT_IN_LABEL} to create a new deliberate generation.`,
+    );
   }
 });
 

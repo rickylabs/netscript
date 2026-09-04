@@ -42,10 +42,10 @@ Use this workflow note when a harness run needs:
 Preferred formal-phase triggers:
 
 - PLAN-EVAL: `openhands` + `status:plan-eval`, with at most one optional `eval:model:*` override,
-- IMPL-EVAL: draft→ready, with at most one optional `eval:model:*` override or the attributed
-  `impl-eval:skip` waiver,
-- phase rerun: move away from and back to the phase's eval status (`openhands` remains required only
-  for PLAN-EVAL),
+- IMPL-EVAL: `openhands` + draft→ready, with at most one optional `eval:model:*` override or the
+  attributed `impl-eval:skip` waiver; readiness without `openhands` is zero-spend,
+- phase rerun: move away from and back to the phase's eval status (`openhands` remains required for
+  both phases),
 
 Manual/non-phase compatibility triggers:
 
@@ -54,6 +54,10 @@ Manual/non-phase compatibility triggers:
   prose prompt on the next line,
 - commit message `[openhands model=<provider/model> output=<mode>] ...`,
 - manual `OpenHands Agent` workflow dispatch.
+
+OpenHands is an explicit fallback for cloud-driven Claude/Copilot/Codex lanes and local machines
+without the full agent CLI swarm. It remains available for those environments, but never supersedes
+the native-first workload matrix or follows from ordinary PR readiness.
 
 Manual comment grammar is intentionally strict: the command token must be the first token of the
 first line, every remaining first-line field must be a unique recognized `name=value` argument, and

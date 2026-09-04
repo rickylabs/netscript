@@ -4,6 +4,9 @@ export const STATUS_PREFIX = 'status:';
 /** Terminal status entered before dispatching IMPL-EVAL. */
 export const IMPL_EVAL_STATUS = 'status:impl-eval';
 
+/** Explicit authorization required at the final live-state check before evaluator spend. */
+export const OPENHANDS_OPT_IN_LABEL = 'openhands';
+
 /** GitHub's exact response message when a label is absent from an issue. */
 export const MISSING_LABEL_MESSAGE = 'Label does not exist';
 
@@ -82,6 +85,13 @@ export function decidePhaseEvaluationCurrency(input) {
       dispatch: false,
       reason: `stale phase: ${input.expectedStatus} is no longer current`,
       recovery: PHASE_EVAL_RECOVERY,
+    };
+  }
+  if (!input.liveLabels.includes(OPENHANDS_OPT_IN_LABEL)) {
+    return {
+      dispatch: false,
+      reason: `revoked authorization: ${OPENHANDS_OPT_IN_LABEL} is no longer present`,
+      recovery: `Re-add ${OPENHANDS_OPT_IN_LABEL} to create a new deliberate generation.`,
     };
   }
   return { dispatch: true, reason: 'current', recovery: '' };

@@ -295,10 +295,11 @@ evaluator read):
 - Open multi-slice work as a **draft** PR; per-commit CI (Phase C tier 1) runs on drafts but is
   non-blocking.
 - Flip to **ready for review** only when the slice checklist is complete and IMPL-EVAL is expected
-  to pass. That transition triggers one automatic OpenHands IMPL-EVAL and enters `status:impl-eval`
+  to pass. Readiness alone never triggers OpenHands. For an explicitly cloud-driven fallback, add
+  `openhands` before the transition; automation then enters `status:impl-eval` and dispatches once
   unless `impl-eval:skip` is present. Before the transition, select at most one optional
-  `eval:model:minimax`, `eval:model:deepseek`, or `eval:model:qwen` override. Do not also dispatch a
-  manual `@openhands-agent` run for the same head.
+  `eval:model:qwen` or `eval:model:glm` override. Do not also dispatch a manual `@openhands-agent`
+  run for the same head.
 
 ## Label taxonomy (namespaced — Phase D)
 
@@ -312,10 +313,11 @@ a board column reflect reality.
   `kv`, `sdk`, `service`, `config`, `telemetry`, `ai-core`, `plugin-ai`, `docs`
 - `priority:` — `p0` (release blocker), `p1`, `p2`, `p3`
 - `ci:` — `skip-e2e`, `skip-scaffold`, `full` (manual overrides for the path-filtered CI);
-  `impl-eval:skip` — attributed escape hatch for automatic ready-for-review IMPL-EVAL;
-  `eval:model:minimax`, `eval:model:deepseek`, `eval:model:qwen` — mutually exclusive override for
-  the next status-driven OpenHands phase; `docs-eval:skip` is a deprecated compatibility label;
-  `gate:` — `e2e`, `jsr`
+  `impl-eval:skip` — attributed escape hatch for an opted-in ready-for-review IMPL-EVAL;
+  `eval:model:qwen`, `eval:model:glm` — mutually exclusive override for the next status-driven
+  OpenHands phase; `docs-eval:skip` is a deprecated compatibility label; `gate:` — `e2e`, `jsr`
+- OpenHands fallback — `openhands` explicitly opts into the cloud runner; PR readiness never
+  implies it.
 - `epic:` — groups every issue/PR belonging to a program epic (e.g. `epic:ai-stack`,
   `epic:deployment`); the epic's own umbrella issue carries `type:umbrella`.
 - `wave:` — scheduling band that drives the **milestone** (see below): `v1`, `v1-min`, `defer`.
