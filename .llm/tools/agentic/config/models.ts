@@ -14,6 +14,15 @@
  * (enforced by `config/no-hardcoded-volatile_test.ts`).
  */
 
+/** Preview Agent Tasks create catalog; never infer these from connector capabilities. */
+export const COPILOT_AGENT_TASK_MODEL_IDS = [
+  'claude-sonnet-4.6',
+  'claude-opus-4.6',
+  'gpt-5.2-codex',
+  'gpt-5.3-codex',
+  'gpt-5.4',
+] as const;
+
 /** First-party (native provider) model ids used by the canonical route policy. */
 export const MODEL_IDS = {
   /** OpenAI/Codex balanced default. */

@@ -86,6 +86,18 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S8 + S9 — dry-run/read-only Agent Tasks contract
+
+- S7 pushed `c43e6fc22`, PR comment `5545882786` posted.
+- Combined client/contract implements exact dry-run body, distinct centralized cloud model enum,
+  eight state parser, session/PR normalization, read-only permission preflight, status, and bounded
+  watch. Unknown states/IDs fail closed; CI approval remains `human_approval_required`.
+- Live creation is deliberately not implemented: all live requests fail before token/network.
+  Future enablement requires validated Business/Enterprise entitlement plus owner authority; Pro+
+  or unknown entitlement cannot authorize it. Read capability is not create permission evidence.
+- Structured tests PASS 9/9 including guard (`.llm/tmp/copilot-s89-test.json`); Tier-A review PASS.
+- Reconcile: coordinator-approved consolidation and entitlement correction only, no scope growth.
+
 ### S7 — guarded launch and truthful identity
 
 - S6 pushed `a7e6b7e78`, PR comment `5545840442` posted.

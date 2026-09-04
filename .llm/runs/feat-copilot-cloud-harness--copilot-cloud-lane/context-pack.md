@@ -36,6 +36,9 @@ implementation is authorized.
 
 ## In Progress
 
+- S8/S9 dry-run/status/watch/read-preflight implemented, tests PASS 9/9 incl guard. Tier-A review PASS.
+  No live POST exists; future eligibility validation is required before any enablement.
+
 - S7 guarded launch implemented; tests PASS 26/26, check PASS, Tier-A review PASS.
 - Coordinator-approved closeout combines S8/S9 and S10/S11/S12; no live tasks or extra research.
 
