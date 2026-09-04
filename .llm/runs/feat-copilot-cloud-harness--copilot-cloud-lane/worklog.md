@@ -86,6 +86,19 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### IMPL-EVAL — PASS
+
+- Separate evaluator session `ses_f91eab379ffemMwLhQi30rc9wB`, Muse Spark 1.3 Contributor (`xhigh`,
+  Meta family), evaluated implementation head `64e664867` and returned PASS with no blocking
+  findings.
+- OpenRouter was attempted first and failed before inference on its account training guard. The same
+  logical evaluator completed through OpenCode Go; this is a transport fallback, not an evaluation
+  cycle failure.
+- Evaluator independently confirmed check 190/0, lint 190/0, fmt 190/0, tests 602/602 and all plan
+  decisions. Four non-blocking advisories are dispositioned in `evaluate.md`.
+- Because this tracked report follows the evaluated implementation commit, the coordinator must
+  obtain a same-session exact-head re-attestation after this documentation commit before merge.
+
 ### S10 + S11 + S12 — integration, instructions, and implementation closeout
 
 - Added strict `agentic:copilot-task` and `agentic:copilot-preflight` task aliases, their inventory

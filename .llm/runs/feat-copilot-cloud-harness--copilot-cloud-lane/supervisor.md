@@ -19,8 +19,8 @@
 | Deep research         | Google subscription / Gemini 3.8 Flash / high / native `agy` | Copilot product, CLI, API, quota, and cloud-agent research |
 | Plan                  | Claude subscription / Fable 5.1 / low                        | Convert research into a bounded integration plan           |
 | PLAN-EVAL             | Matrix-selected opposite-family open evaluator               | Adversarial review before implementation                   |
-| Implementation        | Codex / gpt-6-astra / low / `/root/copilot_harness_impl`       | Implement only the ratified slices                         |
-| IMPL-EVAL             | Separate matrix-selected evaluator                           | Final independent verification                             |
+| Implementation        | Codex / gpt-6-astra / low / `/root/copilot_harness_impl`     | Implement only the ratified slices                         |
+| IMPL-EVAL             | Muse Spark 1.3 / xhigh / OpenCode Go                         | PASS in separate Meta-family session                       |
 
 ## Recorded lane/eval overrides
 
@@ -48,6 +48,11 @@ The plan was generated in separate session `ses_f92227a5affeSmWoi4FJ4jgLm7` thro
 catalog-attested Copilot Fable fallback, then passed independent PLAN-EVAL at `c12796b85` in GLM 5.3
 session `ses_f9213f890ffelYPJ3h8zaNa8O4`. The evaluator's OpenCode Go transport failed closed with
 `provider_rate_limited`; the same logical model completed through OpenRouter.
+
+IMPL-EVAL used Muse Spark 1.3 Contributor at `xhigh` in separate Meta-family session
+`ses_f91eab379ffemMwLhQi30rc9wB`. OpenRouter first failed before inference because its account
+training guard excluded the endpoint; the same matrix model completed through OpenCode Go and
+returned PASS at implementation head `64e664867`.
 
 ## Owner routing ruling — 2026-09-04
 

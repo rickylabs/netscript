@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `feat-copilot-cloud-harness--copilot-cloud-lane` |
 | Branch         | `feat/copilot-cloud-harness`                     |
-| Current phase  | implementation evaluation                        |
+| Current phase  | merge readiness                                  |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs, GitHub workflow                            |
 
@@ -35,6 +35,11 @@ implementation is authorized.
   native Claude subscription returned its terminal limit; it does not change the default route.
 
 ## In Progress
+
+- IMPL-EVAL PASS at implementation head `64e664867` in separate Muse Spark 1.3 session
+  `ses_f91eab379ffemMwLhQi30rc9wB`. After the tracked evaluator report is committed, the same
+  evaluator session must re-attest the final exact head; then update PR lifecycle and merge on
+  relevant CI green.
 
 - S10/S11/S12 implementation is complete and Tier-A reviewed. Full scoped gates PASS: check 190/0,
   lint 190/0, fmt 190/0, tests 602/602. Final atomic implementation commit/push and independent
