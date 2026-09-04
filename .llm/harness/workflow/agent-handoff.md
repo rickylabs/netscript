@@ -1,5 +1,29 @@
 # Agent Handoff
 
+## Copilot peer boundary
+
+OpenCode Copilot is a local subscription transport, distinct from GitHub cloud Agent Tasks. Native
+Claude/Codex/agy defaults remain; exact catalog-attested non-native models prefer Copilot. Deep
+research uses agy Gemini, then attested Copilot Gemini, then native Luna.
+
+Use `agentic:copilot-preflight --model <exact-id>` for non-inference catalog evidence.
+`agentic:copilot-task dispatch` only renders a request; `preflight`, `status`, and `watch` are
+GET-only. Read capability does not establish create permission or entitlement. Current GitHub REST
+documentation restricts Start a task to Business/Enterprise; this Pro+ integration contains no live
+POST path. Future enablement requires validated eligible entitlement and explicit owner authority,
+not a plan flag or repository assignability. Cloud model IDs are separate from connector IDs.
+
+The deferred canary sequence is: static gates → validated entitlement → owner authorization → one
+small exact-head task → record task/session/model/base/head/PR, elapsed time, AI-credit estimate and
+Actions minutes separately, hygiene, explicit human CI approval, and independent-family IMPL-EVAL.
+No canary is authorized or required for this PR. Cancellation stays UI-only; steering stays an
+explicit human session/PR-comment action. Do not change repository policy or remove OpenHands.
+
+Local Copilot launches reserve the full cap in the owner's external credit ledger. Same-month
+accounting older than 15 minutes blocks: the owner must reconcile `usedCredits`, `month`, and
+`updatedAt` against GitHub billing before retrying. No silent initialization, timestamp refresh,
+refund, or overage assumption. Valid prior-month accounting resets at the UTC month boundary.
+
 Harness work can be delegated between local agents, OpenHands in GitHub Actions, and OpenHands on
 the VPS through GitHub PR/issue comments.
 

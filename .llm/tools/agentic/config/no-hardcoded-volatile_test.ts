@@ -144,13 +144,15 @@ Deno.test('config exports resolve to a non-trivial forbidden set', () => {
 });
 
 Deno.test('Copilot model and endpoint constants participate in the exact guard', () => {
-  for (const value of [
-    config.ROUTING_MODEL_IDS.gemini38FlashCopilot,
-    config.ROUTING_MODEL_IDS.kimiK3Copilot,
-    config.ROUTING_MODEL_IDS.grok46Copilot,
-    config.ROUTING_MODEL_IDS.fable51Copilot,
-    config.COPILOT_AGENT_TASKS_PATH,
-  ]) assert(EXACT_FORBIDDEN.includes(value));
+  for (
+    const value of [
+      config.ROUTING_MODEL_IDS.gemini38FlashCopilot,
+      config.ROUTING_MODEL_IDS.kimiK3Copilot,
+      config.ROUTING_MODEL_IDS.grok46Copilot,
+      config.ROUTING_MODEL_IDS.fable51Copilot,
+      config.COPILOT_AGENT_TASKS_PATH,
+    ]
+  ) assert(EXACT_FORBIDDEN.includes(value));
 });
 
 Deno.test('Layer A — no config value is hardcoded outside config/ (exact, derived)', async () => {

@@ -14,6 +14,10 @@ required summary artifacts keep local and cloud agents synchronized.
 
 ## When to Use
 
+Copilot is a separate bounded peer, not an OpenHands replacement. For its read-only task commands,
+entitlement boundary, and deferred canary protocol, see
+[Agent Handoff](../../../.llm/harness/workflow/agent-handoff.md#copilot-peer-boundary).
+
 - The user asks to trigger, configure, review, or debug OpenHands in this repo.
 - A task mentions `@openhands-agent`, `agent:<model>`, `fix-me`, `[openhands ...]`, or OpenHands
   output modes.

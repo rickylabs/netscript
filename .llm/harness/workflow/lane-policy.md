@@ -53,11 +53,10 @@ Never infer a slug by string concatenation.
 Deep research uses its dedicated matrix column, with Gemini 3.8 Flash at `low`, `medium`, or `high`
 according to the lane's scope and surface coverage. Luna at `max` is the only model fallback.
 Because deep-research sessions can accumulate unusually large context windows and outputs, this role
-uses native Google `agy` first, catalog-attested GitHub Copilot Gemini second, and native Codex
-Luna last. Copilot is allowed only for the `google` family in this role. Claude, OpenCode
-Go, Ollama, and OpenRouter transports are forbidden for deep research even when they expose a model
-with the same logical identity. The resolver and concrete-model guard both fail closed on that
-boundary.
+uses native Google `agy` first, catalog-attested GitHub Copilot Gemini second, and native Codex Luna
+last. Copilot is allowed only for the `google` family in this role. Claude, OpenCode Go, Ollama, and
+OpenRouter transports are forbidden for deep research even when they expose a model with the same
+logical identity. The resolver and concrete-model guard both fail closed on that boundary.
 
 Selecting `complex` or `architecture` for deep research remains subject to the privileged-row
 authorization below; the research role does not grant itself a higher tier.

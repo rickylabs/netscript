@@ -40,6 +40,47 @@ token. It is safe to read any one of them in isolation.
 
 ## Folder map
 
+`copilot/` owns the bounded cloud Agent Tasks contract and read-only CLI. OpenCode Copilot catalog
+attestation and local guarded inference remain under `opencode/`; neither replaces `openhands/`.
+
+### Copilot operations
+
+- `deno task agentic:copilot-preflight --model <exact-connector-id> --cwd <worktree>` reads the
+  connector catalog, with no inference. It needs read/env/run permissions; OAuth stays
+  OpenCode-owned.
+- `deno task agentic:opencode --message <brief> --model <exact-id> --variant provider_default
+  --workload-tier <tier> --workload-role <role> --cwd <worktree> --receipt <jsonl>`
+  requires Git branch/head, live catalog attestation, and a full-cap ledger reservation before
+  inference. `--max-ai-credits <positive-integer>` overrides the configured tier cap. It is
+  accounting, not a provider-enforced token ceiling. Unproven variants and inference-based MCP
+  preflight are refused. Receipts distinguish catalog evidence from unobserved runtime identity
+  (`pending`).
+- `deno task agentic:copilot-task dispatch --repo <owner/name> --prompt <text> --model
+  <cloud-model-id> --base-ref <branch>`
+  is pure dry-run. No token or network is used.
+- `deno task agentic:copilot-task preflight --repo <owner/name>` proves read access only.
+  `status --repo <owner/name> --task-id <id>` and `watch` use GET-only requests. Optional
+  `--timeout-ms` is bounded to 59 minutes. Watch exits: 0 completed, 10 failed, 12 human action, 13
+  cancelled/task timeout, 2 local timeout/error. CI approval remains a human gate.
+
+Cloud reads need read/run/env and network access to GitHub API; token resolution is reused from the
+GitHub suite and never logs a token. Live creation is disabled for this Pro+ integration; future
+enablement requires validated Business/Enterprise entitlement and owner authority. Cloud-task model
+IDs are a separate catalog, never derived from OpenCode connector models.
+
+The ledger is `$HOME/.config/netscript-agentic/copilot-credits.json`, outside the repository, with
+`schemaVersion: 1`, UTC `month` (`YYYY-MM`), ISO `updatedAt`, and nonnegative integer `usedCredits`.
+The owner must initialize/reconcile it against GitHub billing, with private permissions. Same-month
+state older than 15 minutes requires owner reconciliation of all three accounting fields; the
+launcher never merely refreshes stale timestamps. Valid prior-month state resets to zero. Missing,
+malformed, stale, future, over-budget, or concurrently locked state blocks. Full caps are reserved
+without refund; no overage or authoritative live-balance claim. Unknown locks require owner review.
+
+Maintenance has one home per value: connector and cloud model IDs in `config/models.ts`; included
+credit envelope and tier caps in `config/subscriptions.ts`; Agent Tasks path in
+`config/endpoints.ts`; precedence and family gates in `runtime/delegation-matrix.ts` and
+`runtime/routing-policy.ts`. Do not duplicate these values in adapters or docs.
+
 | Folder         | What lives there                                                                                                                                                                                                                    |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `runtime/`     | The desired-state controller: `contract.ts`, `state.ts`, `ports.ts`, pure `planner.ts`, `controller.ts`, `output.ts`, the routing/rollout policy, provider profiles, and `adapters/` (the only home for `Deno.env`/`Deno.Command`). |

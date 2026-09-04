@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `feat-copilot-cloud-harness--copilot-cloud-lane` |
 | Branch         | `feat/copilot-cloud-harness`                     |
-| Current phase  | implementation                                   |
+| Current phase  | implementation evaluation                        |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs, GitHub workflow                            |
 
@@ -36,8 +36,12 @@ implementation is authorized.
 
 ## In Progress
 
-- S8/S9 dry-run/status/watch/read-preflight implemented, tests PASS 9/9 incl guard. Tier-A review PASS.
-  No live POST exists; future eligibility validation is required before any enablement.
+- S10/S11/S12 implementation is complete and Tier-A reviewed. Full scoped gates PASS: check 190/0,
+  lint 190/0, fmt 190/0, tests 602/602. Final atomic implementation commit/push and independent
+  exact-head IMPL-EVAL are next; unrelated framework/runtime gates are N/A.
+
+- S8/S9 dry-run/status/watch/read-preflight implemented, tests PASS 9/9 incl guard. Tier-A review
+  PASS. No live POST exists; future eligibility validation is required before any enablement.
 
 - S7 guarded launch implemented; tests PASS 26/26, check PASS, Tier-A review PASS.
 - Coordinator-approved closeout combines S8/S9 and S10/S11/S12; no live tasks or extra research.
@@ -53,17 +57,19 @@ implementation is authorized.
 - S1 pushed as `f4afe80c0`, PR comment posted; config tests PASS (5/5).
 - S2 pushed as `38f213c8f`, matrix tests PASS (12/12), coordinator review PASS.
 - S3/S4 combined with coordinator approval; resolver, profile, credential and parity tests green;
-  substantive review PASS and tests 53/53. S5 catalog attestation is next. Implementation session `/root/copilot_harness_impl`
-  (`gpt-6-astra`, low), starting head `ea31286ab`.
+  substantive review PASS and tests 53/53. S5 catalog attestation is next. Implementation session
+  `/root/copilot_harness_impl` (`gpt-6-astra`, low), starting head `ea31286ab`.
 
 - Execute S1-S12 from `plan.md`; incorporate the six bounded notes in `plan-eval.md` without
   widening scope.
 
 ## Next Steps
 
-1. Dispatch feature implementation through Astra low, preserving per-slice commits and proof.
-2. Run the selected static, docs, and GitHub workflow gates, then separate-session IMPL-EVAL.
-3. Live Copilot canary only after static gates and explicit owner authorisation (`plan.md` D9).
+1. Commit and push the final integration/docs/run closeout atomically.
+2. Run separate-session, different-family IMPL-EVAL at that exact head.
+3. Update the PR DoD and lifecycle, verify relevant exact-head CI, then merge immediately on green.
+4. A live Copilot canary remains deferred: this Pro+ environment is ineligible for the documented
+   Agent Tasks create endpoint, and no live canary is a merge gate.
 
 ## Drift and Debt
 

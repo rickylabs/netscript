@@ -109,6 +109,8 @@
     "agentic:gh-pr": "deno run --no-lock --allow-read --allow-write=.llm/tmp/agentic/gh-pr --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts",
     "agentic:gh-watch": "deno run --no-lock --allow-env --allow-net .llm/tools/agentic/github/gh-watch.ts",
     "agentic:gh-token": "deno run --no-lock --allow-run --allow-env --allow-net .llm/tools/agentic/github/gh-token.ts",
+    "agentic:copilot-task": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/copilot/copilot-agent-task.ts",
+    "agentic:copilot-preflight": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-preflight.ts",
     "agentic:review-threads": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/github/review-threads.ts",
     "agentic:pr-checks": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/github/pr-checks.ts",
     "agentic:claude-hook-log": "deno run --no-lock --no-prompt --allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID --allow-write=.llm/tmp/claude/hooks .llm/tools/agentic/claude/claude-hook-log.ts",

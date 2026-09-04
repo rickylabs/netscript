@@ -1,7 +1,7 @@
 /** Authenticated, value-free subscription usage acquisition for paid providers. */
 
 import { OPENCODE_GO_USAGE_URL } from '../config/endpoints.ts';
-import { dirname, isAbsolute, relative, resolve } from '@std/path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import {
   type CopilotCreditLedger,
   evaluateCopilotExpense,

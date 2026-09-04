@@ -86,15 +86,33 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S10 + S11 + S12 — integration, instructions, and implementation closeout
+
+- Added strict `agentic:copilot-task` and `agentic:copilot-preflight` task aliases, their inventory
+  assertions, the suite maintenance map, and bounded operator documentation.
+- Added canonical `.github/copilot-instructions.md`; it points to `AGENTS.md` and the one
+  authoritative `.agents/skills` tree. No skills, custom agents, credentials, workflow policies, or
+  OpenHands implementation were copied or removed.
+- Documented the exact Pro+ boundary, read-only Agent Tasks lifecycle, deferred eligible-entitlement
+  canary, catalog-versus-runtime identity distinction, external ledger reconciliation, and human CI
+  approval requirement.
+- Full scoped structured gates at the final working tree: check 190 files / 0 findings; lint 190 /
+  0; format 190 / 0; agentic tests 602/602 PASS. Receipts:
+  `.llm/tmp/copilot-full-{check,lint,fmt,test}.json` (operational, ignored).
+- Framework/package/Aspire/Docker/scaffold/E2E/publication gates: N/A by Archetype 6 classification;
+  this PR changes only internal agentic tooling, harness prose, and repository instructions.
+- Tier-A substantive review PASS. No live Copilot model turn or Agent Task was launched by this
+  slice. Independent exact-head IMPL-EVAL remains the only implementation gate before ready-merge.
+
 ### S8 + S9 — dry-run/read-only Agent Tasks contract
 
 - S7 pushed `c43e6fc22`, PR comment `5545882786` posted.
 - Combined client/contract implements exact dry-run body, distinct centralized cloud model enum,
   eight state parser, session/PR normalization, read-only permission preflight, status, and bounded
   watch. Unknown states/IDs fail closed; CI approval remains `human_approval_required`.
-- Live creation is deliberately not implemented: all live requests fail before token/network.
-  Future enablement requires validated Business/Enterprise entitlement plus owner authority; Pro+
-  or unknown entitlement cannot authorize it. Read capability is not create permission evidence.
+- Live creation is deliberately not implemented: all live requests fail before token/network. Future
+  enablement requires validated Business/Enterprise entitlement plus owner authority; Pro+ or
+  unknown entitlement cannot authorize it. Read capability is not create permission evidence.
 - Structured tests PASS 9/9 including guard (`.llm/tmp/copilot-s89-test.json`); Tier-A review PASS.
 - Reconcile: coordinator-approved consolidation and entitlement correction only, no scope growth.
 
@@ -104,12 +122,13 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 - Copilot launch requires receipt, Git branch/head, exact catalog, and atomic credit reservation
   before inference. Missing catalog blocks without reservation/spawn. Child `clearEnv` enforces
   credential deletion. Untested inference-based MCP preflight is refused for this route.
-- Effort must explicitly be `provider_default`; no unproven variant flag is passed. Identity
-  retains catalog evidence but leaves actual runtime model/effort unknown (`pending`), rather than
-  claiming catalog listing proves inference identity. Native identity typing remains unchanged.
+- Effort must explicitly be `provider_default`; no unproven variant flag is passed. Identity retains
+  catalog evidence but leaves actual runtime model/effort unknown (`pending`), rather than claiming
+  catalog listing proves inference identity. Native identity typing remains unchanged.
 - Structured tests PASS 26/26 (`.llm/tmp/copilot-s7-test.json`), check PASS 2 production files.
-- Reconcile: owner requests efficient closeout; coordinator authorizes combined S8/S9 and S10/S11/S12
-  if coherent and under 30 files. No new research or optional expansion. S7 Tier-A review PASS.
+- Reconcile: owner requests efficient closeout; coordinator authorizes combined S8/S9 and
+  S10/S11/S12 if coherent and under 30 files. No new research or optional expansion. S7 Tier-A
+  review PASS.
 
 ### S6 — fail-closed local credit reservations
 
@@ -130,8 +149,8 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 - S3/S4 pushed `45f553bc1`, PR comment `5545785827` posted.
 - Non-inference `opencode models github-copilot` probe validates exact full IDs, isolates child
   environment, bounds catalog command lifetime, and retains only model/presence/timestamp.
-- Missing capability feeds `RouteAvailability.unavailableTransports`; test proves Gemini proceeds
-  to native Luna after unavailable agy/Copilot without guessing a model.
+- Missing capability feeds `RouteAvailability.unavailableTransports`; test proves Gemini proceeds to
+  native Luna after unavailable agy/Copilot without guessing a model.
 - Structured preflight/config tests PASS 10/10, `.llm/tmp/copilot-s5-test.json`, exit 0.
 - Reconcile: fresh Agent Tasks docs contradict Pro+ create entitlement; coordinator ruling and
   corrected response shape recorded in drift. OpenCode routing is unaffected. Tier-A review PASS.
@@ -145,18 +164,20 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
   API keys and GitHub token overrides without reading any credential store.
 - Lane-policy provider order, paid allowance, and deep-research prose updated (PLAN-EVAL note 3).
 - Structured resolver/parity/profile/environment/credential/launcher/config wrapper: PASS 53/53,
-  exit 0 (`.llm/tmp/copilot-s34-test.json`); coordinator independently reran 53/53 and reviewed PASS.
+  exit 0 (`.llm/tmp/copilot-s34-test.json`); coordinator independently reran 53/53 and reviewed
+  PASS.
 - Scoped structured check and fmt PASS (4 production files). Lint initially refused all-excluded
   root config; explicit empty scratch config `.llm/tmp/copilot-lint.json` restored complete
   selection coverage and passed (4/4 files). No raw output was substituted for a gate.
-- Reconcile: no change to native family defaults, existing OpenHands, or approved live-task boundary.
+- Reconcile: no change to native family defaults, existing OpenHands, or approved live-task
+  boundary.
 
 ### S2 — typed Copilot matrix
 
 - S1 pushed as `f4afe80c0`; PR IMPL comment `5545703862` posted.
 - Added exactly four attested capabilities and priority after native `agy`, before Go.
-- Deep research permits Copilot only for Google; absent family fails closed. Existing matrix
-  routes and evaluator-family rules are unchanged.
+- Deep research permits Copilot only for Google; absent family fails closed. Existing matrix routes
+  and evaluator-family rules are unchanged.
 - Structured matrix tests PASS: 12/12, exit 0, `.llm/tmp/copilot-s2-test.json`.
 - Tier-A substantive review PASS, no findings. Reconcile: no scope or owner-routing changes;
   resolver exhaustive bindings and family propagation remain S3.
@@ -165,13 +186,13 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 - Implementation identity: `/root/copilot_harness_impl`, Codex `gpt-6-astra`, effort `low`, exact
   start `ea31286ab`; scoped worktree recorded in `supervisor.md`.
-- Added four attested connector IDs, included-credit envelope, per-tier reservation caps, and
-  Agent Tasks collection path in `config/`; guard explicitly verifies inclusion of new strings.
-- Structured test wrapper over `.llm/tools/agentic/config`: PASS, 5 tests, exit 0;
-  report `.llm/tmp/copilot-s1-test.json`.
+- Added four attested connector IDs, included-credit envelope, per-tier reservation caps, and Agent
+  Tasks collection path in `config/`; guard explicitly verifies inclusion of new strings.
+- Structured test wrapper over `.llm/tools/agentic/config`: PASS, 5 tests, exit 0; report
+  `.llm/tmp/copilot-s1-test.json`.
 - Reconcile: approved decisions unchanged; coordinator substantive review PASS (four config diffs
-  and structured receipt verified, no findings). No live
-  dispatch, installation, repository policy change, or OpenHands edit.
+  and structured receipt verified, no findings). No live dispatch, installation, repository policy
+  change, or OpenHands edit.
 - Host continuity: NAS project worktree only; runtimes via `mise exec`; Docker, if needed, is the
   project DinD sandbox only. Secrets stay outside git and run artifacts.
 

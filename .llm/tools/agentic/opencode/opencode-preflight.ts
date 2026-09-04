@@ -4,6 +4,7 @@ import { appendFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { LOOPBACK_HOST, LOOPBACK_HTTP_PROTOCOL } from '../config/endpoints.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { environmentWithOpenCodeCredential } from '../lib/provider-credential.ts';
 import type { RouteAvailability } from '../runtime/routing-policy.ts';
 import {
@@ -20,6 +21,37 @@ export interface OpenCodePreflightReceipt {
   readonly expectedToolCount: number;
   readonly mcpCallCount: 1;
   readonly documentationLookup: 'passed';
+}
+
+if (import.meta.main) {
+  try {
+    const args = normalizeTaskArguments(Deno.args);
+    if (args.includes('--help')) {
+      await Deno.stdout.write(
+        new TextEncoder().encode(
+          'copilot-preflight --model <exact-connector-id> [--cwd <worktree>]\nRead-only model catalog; never runs inference.\n',
+        ),
+      );
+    } else {
+      const flags = new Map<string, string>();
+      for (let i = 0; i < args.length; i += 2) {
+        const flag = args[i];
+        const value = args[i + 1];
+        if (!['--model', '--cwd'].includes(flag) || !value || flags.has(flag)) {
+          throw new Error('invalid preflight arguments');
+        }
+        flags.set(flag, value);
+      }
+      const receipt = await preflightCopilotCatalog(flags.get('--model') ?? '', {
+        cwd: flags.get('--cwd') ?? Deno.cwd(),
+      });
+      await Deno.stdout.write(new TextEncoder().encode(JSON.stringify(receipt) + '\n'));
+      if (!receipt.present) Deno.exit(2);
+    }
+  } catch {
+    await Deno.stderr.write(new TextEncoder().encode('Copilot catalog preflight failed\n'));
+    Deno.exit(2);
+  }
 }
 
 export interface OpenCodePreflightOptions {
