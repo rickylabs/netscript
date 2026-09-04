@@ -86,6 +86,20 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S1 — centralized Copilot configuration
+
+- Implementation identity: `/root/copilot_harness_impl`, Codex `gpt-6-astra`, effort `low`, exact
+  start `ea31286ab`; scoped worktree recorded in `supervisor.md`.
+- Added four attested connector IDs, included-credit envelope, per-tier reservation caps, and
+  Agent Tasks collection path in `config/`; guard explicitly verifies inclusion of new strings.
+- Structured test wrapper over `.llm/tools/agentic/config`: PASS, 5 tests, exit 0;
+  report `.llm/tmp/copilot-s1-test.json`.
+- Reconcile: approved decisions unchanged; coordinator substantive review PASS (four config diffs
+  and structured receipt verified, no findings). No live
+  dispatch, installation, repository policy change, or OpenHands edit.
+- Host continuity: NAS project worktree only; runtimes via `mise exec`; Docker, if needed, is the
+  project DinD sandbox only. Secrets stay outside git and run artifacts.
+
 PLAN-EVAL: `PASS` at exact plan head `c12796b85`, session `ses_f9213f890ffelYPJ3h8zaNa8O4`. All
 eight Plan-Gate boxes passed; six bounded implementation notes are recorded in `plan-eval.md`.
 Implementation is authorized.

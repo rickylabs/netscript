@@ -5,6 +5,24 @@ import { ROUTING_MODEL_IDS } from './models.ts';
 export const EXPENSE_SNAPSHOT_MAX_AGE_MS: number = 15 * 60 * 1000;
 export const EXPENSE_WARNING_RATIO: number = 0.9;
 
+/** Included Copilot Pro+ allowance; local reservations are not a live balance. */
+export const COPILOT_PRO_PLUS_LIMITS = {
+  monthlyCredits: 7000,
+  baseCredits: 3900,
+  flexCredits: 3100,
+  creditUsd: 0.01,
+  resetUtcDay: 1,
+} as const;
+
+/** Conservative reservation caps, not provider-enforced token ceilings. */
+export const COPILOT_LAUNCH_CREDIT_CAPS = {
+  simple: 40,
+  straightforward: 60,
+  feature: 100,
+  complex: 150,
+  architecture: 200,
+} as const;
+
 /** Official OpenCode Go allowance windows, re-verified 2026-09-04. */
 export const OPENCODE_GO_LIMITS_USD = {
   rollingFiveHours: 12,

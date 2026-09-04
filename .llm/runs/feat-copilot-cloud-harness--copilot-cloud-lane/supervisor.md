@@ -19,10 +19,16 @@
 | Deep research         | Google subscription / Gemini 3.8 Flash / high / native `agy` | Copilot product, CLI, API, quota, and cloud-agent research |
 | Plan                  | Claude subscription / Fable 5.1 / low                        | Convert research into a bounded integration plan           |
 | PLAN-EVAL             | Matrix-selected opposite-family open evaluator               | Adversarial review before implementation                   |
-| Implementation        | Matrix-selected feature route                                | Implement only the ratified slices                         |
+| Implementation        | Codex / gpt-6-astra / low / `/root/copilot_harness_impl`       | Implement only the ratified slices                         |
 | IMPL-EVAL             | Separate matrix-selected evaluator                           | Final independent verification                             |
 
 ## Recorded lane/eval overrides
+
+- Implementation session: Codex collaboration task `/root/copilot_harness_impl`, model
+  `gpt-6-astra`, effort `low`; worktree
+  `/home/agent/projects/netscript/worktrees/copilot-cloud-harness`; exact starting head `ea31286ab`.
+  This separate implementation session does not self-certify; coordinator owns slice review and
+  separate-family IMPL-EVAL dispatch.
 
 - The already-running Codex desktop task is the bootstrap coordinator because it cannot self-migrate
   and cannot attest an exact model identity. It may integrate but may not self-evaluate.
