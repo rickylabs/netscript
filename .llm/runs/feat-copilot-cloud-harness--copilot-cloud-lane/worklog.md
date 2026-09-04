@@ -86,6 +86,20 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S6 — fail-closed local credit reservations
+
+- S5 pushed `52338f416`, PR comment `5545806096` posted.
+- Pure Copilot decision rejects missing/malformed/future/stale ledger, invalid integer caps, and
+  included-envelope overflow. A valid prior UTC month re-zeros; malformed chronology never does
+  (PLAN-EVAL note 2). Same-month freshness uses the existing snapshot max-age configuration.
+- Operational ledger resolves outside the repository. Exclusive create-new lock plus atomic
+  replacement reserves the entire cap, mode 0600; concurrent/unknown locks fail closed. Missing
+  ledger is not silently initialized. No observed-usage refund or overage assumption.
+- Structured tests PASS 20/20 (`.llm/tmp/copilot-s6-test.json`), check/lint PASS 2 production files.
+- Reconcile: no new paid call, scope unchanged; Tier-A review PASS. Coordinator explicitly accepts
+  same-month 15-minute freshness; after longer idle, owner reconciliation must update accounting
+  from GitHub billing. S10/S11 docs must state this operational boundary.
+
 ### S5 — exact connector catalog attestation
 
 - S3/S4 pushed `45f553bc1`, PR comment `5545785827` posted.

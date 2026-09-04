@@ -1,6 +1,7 @@
 /** Pure, credential-free subscription allowance decisions made before dispatch. */
 
 import {
+  COPILOT_PRO_PLUS_LIMITS,
   EXPENSE_SNAPSHOT_MAX_AGE_MS,
   EXPENSE_WARNING_RATIO,
   OLLAMA_SUBSCRIPTION_LIMITS,
@@ -8,7 +9,7 @@ import {
   openCodeGoEffectiveLimits,
 } from '../config/subscriptions.ts';
 
-export const EXPENSE_PROVIDERS = ['opencode_go', 'ollama', 'openrouter'] as const;
+export const EXPENSE_PROVIDERS = ['github_copilot', 'opencode_go', 'ollama', 'openrouter'] as const;
 export type ExpenseProvider = typeof EXPENSE_PROVIDERS[number];
 
 export type ExpenseUsageWindowId = 'rolling_five_hours' | 'weekly' | 'monthly';
@@ -140,6 +141,7 @@ function percentageWindowDecision(
 
 /** Returns a value-free pre-dispatch decision; unknown/stale usage always fails closed. */
 export function evaluateSubscriptionExpense(request: ExpenseRequest): ExpenseDecision {
+  if (request.provider === 'github_copilot') return blocked(request, 'usage_unproven', null);
   if (!finiteNonNegative(request.estimatedCostUsd) || request.estimatedCostUsd === 0) {
     return blocked(request, 'invalid_request', null);
   }
@@ -250,6 +252,68 @@ export function evaluateSubscriptionExpense(request: ExpenseRequest): ExpenseDec
     snapshotAgeMs,
     windows,
     ...(concurrency ? { concurrency } : {}),
+  };
+}
+
+/** Owner-reconciled local accounting, not a GitHub-reported balance. */
+export interface CopilotCreditLedger {
+  readonly schemaVersion: 1;
+  readonly month: string;
+  readonly updatedAt: string;
+  readonly usedCredits: number;
+}
+
+/** Validates ledger chronology and reserves only inside the included monthly envelope. */
+export function evaluateCopilotExpense(
+  value: unknown,
+  cap: number,
+  now: string,
+): ExpenseDecision {
+  const request: ExpenseRequest = {
+    provider: 'github_copilot',
+    estimatedCostUsd: cap * COPILOT_PRO_PLUS_LIMITS.creditUsd,
+    now,
+    snapshot: { provider: 'github_copilot', capturedAt: now },
+  };
+  const current = Date.parse(now);
+  if (!Number.isSafeInteger(cap) || cap <= 0 || !Number.isFinite(current)) {
+    return blocked(request, 'invalid_request', null);
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return blocked(request, 'usage_unproven', null);
+  }
+  const ledger = value as Partial<CopilotCreditLedger>;
+  const updated = typeof ledger.updatedAt === 'string' ? Date.parse(ledger.updatedAt) : NaN;
+  if (
+    ledger.schemaVersion !== 1 || typeof ledger.month !== 'string' ||
+    !/^\d{4}-(0[1-9]|1[0-2])$/.test(ledger.month) || !Number.isFinite(updated) ||
+    updated > current ||
+    new Date(updated).toISOString().slice(0, 7) !== ledger.month ||
+    !Number.isSafeInteger(ledger.usedCredits) || (ledger.usedCredits ?? -1) < 0
+  ) {
+    return blocked(request, 'usage_unproven', null);
+  }
+  const month = new Date(current).toISOString().slice(0, 7);
+  const rolledOver = ledger.month < month;
+  const age = current - updated;
+  if (!rolledOver && age > EXPENSE_SNAPSHOT_MAX_AGE_MS) return blocked(request, 'usage_stale', age);
+  const usedCredits = rolledOver ? 0 : ledger.usedCredits!;
+  const window = windowDecision(
+    'monthly',
+    COPILOT_PRO_PLUS_LIMITS.monthlyCredits * COPILOT_PRO_PLUS_LIMITS.creditUsd,
+    usedCredits * COPILOT_PRO_PLUS_LIMITS.creditUsd,
+    request.estimatedCostUsd,
+  );
+  if (usedCredits + cap > COPILOT_PRO_PLUS_LIMITS.monthlyCredits) {
+    return blocked(request, 'allowance_exhausted', age, [window]);
+  }
+  return {
+    allowed: true,
+    provider: 'github_copilot',
+    reason: 'allowed',
+    snapshotAgeMs: age,
+    warning: (usedCredits + cap) / COPILOT_PRO_PLUS_LIMITS.monthlyCredits >= EXPENSE_WARNING_RATIO,
+    windows: [window],
   };
 }
 

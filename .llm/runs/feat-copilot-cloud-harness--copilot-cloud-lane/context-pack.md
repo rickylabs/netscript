@@ -36,6 +36,9 @@ implementation is authorized.
 
 ## In Progress
 
+- S6 credit decision/reservation implemented; tests PASS 20/20, check/lint PASS; Tier-A review PASS.
+  Ledger lives outside the repository and valid prior-month accounting resets to zero.
+
 - S5 exact catalog preflight implemented, scoped tests PASS 10/10, Tier-A review PASS.
 - Fresh API entitlement correction: Agent Tasks live create is not available to Pro+ under current
   docs; coordinator requires Pro+/unknown to fail closed before network. Generic dry-run/status
