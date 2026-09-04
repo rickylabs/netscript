@@ -36,6 +36,7 @@
 | 2026-09-04T18:25Z | Fable 5.1 low / native Claude      | HTTP 429 before inference; 0 input/output tokens; monthly spend limit                            | Declared model fallback selected                 |
 | 2026-09-04T18:26Z | Muse Spark 1.3 xhigh / OpenCode Go | Expense watcher blocked before spawn: `provider_rate_limited`                                    | Same-model transport fallback selected           |
 | 2026-09-04T18:27Z | Muse Spark 1.3 xhigh / OpenRouter  | Provider rejected before inference: paid-training endpoint excluded by account privacy guardrail | Owner account toggle or Go-window reset required |
+| 2026-09-04T19:15Z | GitHub Copilot connector preflight | Device OAuth succeeded; live catalog exposed exact Fable 5.1, Kimi K3, and Grok 4.6 identifiers  | Plan fallback transport is available             |
 
 No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL remains blocked.
 
@@ -50,3 +51,7 @@ guessed.
 
 The `deep_research` route remains native Gemini 3.8 Flash through `agy`, with native Luna as the
 only model fallback. Copilot is not admitted to that role.
+
+The native Claude subscription remains the default Fable route. Because the plan attempt returned a
+terminal subscription-limit response before inference, `github-copilot/claude-fable-5.1` is allowed
+only as the same-model fallback for this plan attempt; this does not change the family default.

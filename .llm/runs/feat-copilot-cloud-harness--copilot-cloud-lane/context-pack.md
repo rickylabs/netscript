@@ -27,6 +27,10 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
   except OpenAI, Anthropic, and Gemini; those remain on native Codex/ChatGPT, Claude, and Google
   `agy` subscriptions. Cloud Agent Tasks remains a measured implementation canary; no immediate
   OpenHands removal.
+- OpenCode GitHub Copilot device OAuth is complete. Live catalog attestation exposed exact IDs
+  `github-copilot/claude-fable-5.1`, `github-copilot/kimi-k3`, and `github-copilot/grok-4.6`. Fable
+  through Copilot is a same-model plan fallback only after the native Claude subscription returned
+  its terminal limit; it does not change the default route.
 
 ## In Progress
 
@@ -36,9 +40,8 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 
 ## Next Steps
 
-1. Complete the one-time OpenCode GitHub Copilot device authorization, attest the exposed catalog,
-   and resume plan generation through the newly owner-ratified Copilot transport if the selected
-   model is available.
+1. Resume plan generation with catalog-attested `github-copilot/claude-fable-5.1` as the same-model
+   fallback after the native Claude subscription limit.
 2. Run separate-session PLAN-EVAL before implementation.
 3. Implement only the ratified slices after `PASS`.
 

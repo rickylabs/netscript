@@ -23,7 +23,8 @@ returns `PASS`.
 | 2026-09-04T18:24Z | research  | generated | Gemini 3.8 Flash high completed the bounded research-only pass; no implementation files changed.                        |
 | 2026-09-04T18:25Z | research  | verified  | Primary-source sweep corrected unsupported quota, policy, API, and status claims.                                       |
 | 2026-09-04T18:28Z | plan      | blocked   | Fable limit, Go rate limit, then OpenRouter paid-training guardrail exhausted the declared plan route before inference. |
-| 2026-09-04T18:45Z | research  | ruling    | Owner made OpenCode Copilot the default for supported non-OpenAI/non-Anthropic models; device authorization started.    |
+| 2026-09-04T18:45Z | research  | ruling    | Owner made OpenCode Copilot the default for supported non-native families; device authorization started.                |
+| 2026-09-04T19:15Z | preflight | verified  | OpenCode Copilot OAuth succeeded; live catalog attested exact Fable 5.1, Kimi K3, and Grok 4.6 identifiers.             |
 
 ## Research receipts
 
@@ -43,6 +44,9 @@ returns `PASS`.
 - Owner correction at 2026-09-04T19:07Z: Gemini remains on the native Google subscription through
   `agy` for every role, including deep research. Copilot-first routing applies to supported
   non-native families such as Kimi K3 and Grok 4.6; the prior broader wording is superseded.
+- OpenCode credential inventory reports GitHub Copilot OAuth without exposing secret material. The
+  live connector catalog contains `github-copilot/claude-fable-5.1`, `github-copilot/kimi-k3`, and
+  `github-copilot/grok-4.6`; no model slug was inferred.
 
 ## Gate Results
 
