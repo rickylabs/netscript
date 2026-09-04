@@ -157,7 +157,8 @@ run's `TRACE_DIR` (`.llm/runs/<run-id>/trace/`).
 
 ## Workflow
 
-1. Read `AGENTS-handoff.md` for trigger syntax and token rules.
+1. Read `.llm/harness/workflow/agent-handoff.md` for the harness output and execution-surface
+   contract.
 2. If the prompt says `use harness`, load `netscript-harness` and follow its evaluator separation.
    **Every dispatch prompt you author MUST begin with `use harness` and include a `## SKILL`
    chapter** — a bullet list naming each relevant repo skill for the cloud agent to activate
@@ -224,7 +225,6 @@ run's `TRACE_DIR` (`.llm/runs/<run-id>/trace/`).
 
 | File                                     | Load when                                    |
 | ---------------------------------------- | -------------------------------------------- |
-| `AGENTS-handoff.md`                      | Any OpenHands trigger or handoff task        |
 | `.github/workflows/openhands-agent.yml`  | Debugging or changing the Actions workflow   |
 | `.openhands/setup.sh`                    | Adjusting cloud bootstrap/toolchain setup    |
 | `.openhands/microagents/repo.md`         | Updating OpenHands repo context              |

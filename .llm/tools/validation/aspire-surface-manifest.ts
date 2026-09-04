@@ -14,14 +14,15 @@
  * then fail on every remaining stale literal; every other row → phase 2 fail on a stale literal.
  *
  * Run from the repository root:
- *   deno run --allow-run=git --allow-write=.llm/runs/research-aspire-13.5-adoption--0.0.7 \
- *     .llm/runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts
- * Output: aspire-surface-manifest.tsv (sorted by path; columns: path, class, owner, disposition).
+ *   deno run --allow-read --allow-run=git --allow-write=.llm/tools/validation/fixtures \
+ *     .llm/tools/validation/aspire-surface-manifest.ts
+ * Output: the maintained fixture `fixtures/aspire-surface-manifest.tsv` (sorted by path; columns:
+ * path, class, owner, disposition).
  */
 
-import { isTransientAspireScanPath } from '../../../tools/validation/aspire-scan-scope.ts';
+import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
-const RUN_DIR = '.llm/runs/research-aspire-13.5-adoption--0.0.7';
+const RUN_DIR = '.llm/tools/validation/fixtures';
 
 type Rule = {
   readonly test: (p: string) => boolean;

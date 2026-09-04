@@ -6,11 +6,11 @@
  * in CI until the S13 slice.
  */
 import { SCAFFOLD_VERSIONS } from '../../../packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts';
-import { buildAspireSurfaceManifest } from '../../runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts';
+import { buildAspireSurfaceManifest } from './aspire-surface-manifest.ts';
 import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
 
 export const ASPIRE_SURFACE_MANIFEST_PATH =
-  '.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv';
+  '.llm/tools/validation/fixtures/aspire-surface-manifest.tsv';
 
 export type ParityPhase = 1 | 2;
 export type FindingStatus = 'fail' | 'deferred' | 'info';

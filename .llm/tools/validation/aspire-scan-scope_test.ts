@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { isTransientAspireScanPath } from './aspire-scan-scope.ts';
-import { buildAspireSurfaceManifest } from '../../runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts';
+import { buildAspireSurfaceManifest } from './aspire-surface-manifest.ts';
 
 Deno.test('live manifest excludes every harness run and transient copy, including its owning run', async () => {
   const manifest = await buildAspireSurfaceManifest();
