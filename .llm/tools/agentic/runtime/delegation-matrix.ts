@@ -282,11 +282,11 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
     plan_evaluation: [],
     implementation_evaluation: [
       route('minimax_m3', 'provider_default'),
-      route('deepseek_v4_flash', 'max'),
+      route('deepseek_v4_flash', 'provider_default'),
     ],
     vision_evaluation: [
       route('minimax_m3', 'provider_default'),
-      route('deepseek_v4_flash_vision', 'high'),
+      route('deepseek_v4_flash_vision', 'provider_default'),
     ],
     documentation: [route('gemini_3_8_flash', 'medium'), route('opus_5', 'low')],
     planPolicy: policy({ maxRounds: 'none' }),
@@ -302,10 +302,10 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
     ],
     implementation_evaluation: [
       route('glm_5_3_flash', 'provider_default'),
-      route('deepseek_v4_pro', 'max'),
+      route('deepseek_v4_pro', 'provider_default'),
     ],
     vision_evaluation: [
-      route('deepseek_v4_flash_vision', 'max'),
+      route('deepseek_v4_flash_vision', 'provider_default'),
       route('kimi_k3', 'low'),
     ],
     documentation: [

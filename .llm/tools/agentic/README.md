@@ -435,6 +435,10 @@ alternative for local evaluator and review turns. It wraps `claude-print.ts` and
 steps that were previously manual: it resolves the OpenRouter credential, applies the canonical
 `claude-openrouter` provider profile, and always enables the evaluator model guard.
 
+This compatibility transport is not selected by the active workload matrix. Matrix-driven OpenRouter
+turns use the OpenCode transport; invoke this command only for an explicitly selected legacy/local
+compatibility turn using one of its guarded evaluator models.
+
 Because it is a credential-owning boundary it does not define its own environment rules. It
 materializes the profile policy from `runtime/provider-profiles.ts` and spawns with `clearEnv`, so
 the child keeps only `ANTHROPIC_AUTH_TOKEN`, has every rival provider/route key cleared, and runs

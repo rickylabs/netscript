@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Current phase  | `critical post-eval repair`                      |
+| Current phase  | `cycle-3 bounded repair`                         |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
 
@@ -25,7 +25,11 @@ spawn OpenCode, and updates the stale README resolver claim. IMPL-EVAL cycle 2 i
 returned a historical `PASS` at exact head `8740b16de` through the OpenRouter/Grok provider
 fallback. Subsequent owner cost-dashboard evidence and the live Go usage API supersede that PASS for
 merge readiness: the old watcher used flat 12/30/60 USD limits and the coordinator selected the
-privileged `architecture` row without recorded authority. Repair is active; PR #1989 remains draft.
+privileged `architecture` row without recorded authority. The critical repair is green. Fresh
+feature-tier IMPL-EVAL cycle 3 then found four DeepSeek cells with invented high/max effort where
+the owner source left effort unstated. Those cells now use `provider_default`, are directly pinned
+by tests, and the compatibility-only Claude/OpenRouter boundary is documented. PR #1989 remains
+draft pending the next exact-head evaluator verdict.
 
 ## Accepted owner decisions
 
@@ -52,9 +56,10 @@ privileged `architecture` row without recorded authority. Repair is active; PR #
 
 ## Next Steps
 
-1. Commit and push the exact-head repository gate ledger.
-2. Run a new separate-session, different-family feature-tier IMPL-EVAL without OpenCode Go while it
-   is rate-limited; only then return to exact-head CI/review.
+1. Commit and push the cycle-3 bounded repair and exact green receipts.
+2. Re-steer the same independent native Claude Opus 5 xhigh feature-tier evaluator at that immutable
+   repair head; correct the obsolete Muse/Meta brief identity and do not widen to a privileged row.
+3. On `PASS`, finalize PR metadata, verify exact-head CI and review threads, and promote the draft.
 
 ## Files Changed
 
@@ -86,8 +91,8 @@ privileged `architecture` row without recorded authority. Repair is active; PR #
 | Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
-| IMPL-EVAL   | SUPERSEDED     | historical C2 PASS at `8740b16de`; new live evidence requires another cycle |
-| Repair gate | PASS           | 3,140 checked / 0 diagnostics; 5,278 tests passed / 0 failed / 19 ignored   |
+| IMPL-EVAL   | FAIL_FIX C3    | four unstated DeepSeek efforts plus one compatibility-doc gap; repaired     |
+| Repair gate | PASS           | 59 focused tests; 187 checked / 0 diagnostics; 2 TS files format clean      |
 
 ## Drift and Debt
 

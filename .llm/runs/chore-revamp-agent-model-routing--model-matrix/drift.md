@@ -112,3 +112,19 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
   occurs before both usage fetch (missing tier authority) and process spawn.
 - **Live receipt:** `agentic:expense-watch` returned exit 4 with `provider_rate_limited`, Grok
   effective limits $3/$7.50/$15, and no model process was launched.
+
+## 2026-09-04 — Cycle-3 source-fidelity repair
+
+- **What:** Independent feature-tier IMPL-EVAL found that four DeepSeek fallback cells whose source
+  matrix did not state an effort were encoded as `high` or `max`, while the other unstated cells
+  correctly used `provider_default`.
+- **Why it matters:** This run exists to prevent inferred tier/effort escalation. A paid fallback
+  must not receive an invented effort, even when its workload tier itself is unprivileged.
+- **Action:** Changed all four cells to `provider_default`, added direct owner-matrix assertions for
+  each cell, regenerated the human table, and documented that the guarded Claude/OpenRouter command
+  is a compatibility surface rather than an active matrix transport.
+- **Evidence:** IMPL-EVAL cycle 3 `FAIL_FIX`; structured focused tests 59/59; 187-file agentic check
+  with zero diagnostics; changed TypeScript format clean.
+- **Provenance correction:** Cycle 3 ran on native Claude Opus 5 xhigh (Anthropic family). Its
+  launch prompt overrode an obsolete Muse/Meta sentence in the committed brief; evaluator metadata
+  is being corrected in the same evaluator session before the next cycle.

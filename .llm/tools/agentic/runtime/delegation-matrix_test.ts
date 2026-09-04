@@ -25,6 +25,22 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     { model: 'luna', effort: 'max' },
     { model: 'qwen_3_8_flash_next', effort: 'provider_default' },
   ]);
+  assertEquals(DELEGATION_MATRIX.simple.implementation_evaluation[1], {
+    model: 'deepseek_v4_flash',
+    effort: 'provider_default',
+  });
+  assertEquals(DELEGATION_MATRIX.simple.vision_evaluation[1], {
+    model: 'deepseek_v4_flash_vision',
+    effort: 'provider_default',
+  });
+  assertEquals(DELEGATION_MATRIX.straightforward.implementation_evaluation[1], {
+    model: 'deepseek_v4_pro',
+    effort: 'provider_default',
+  });
+  assertEquals(DELEGATION_MATRIX.straightforward.vision_evaluation[0], {
+    model: 'deepseek_v4_flash_vision',
+    effort: 'provider_default',
+  });
   assertEquals(DELEGATION_MATRIX.feature.implementation[0], { model: 'astra', effort: 'low' });
   assertEquals(DELEGATION_MATRIX.complex.implementation[0], {
     model: 'astra',
@@ -89,7 +105,7 @@ Deno.test('every generator candidate composes at least one different-family eval
 Deno.test('same-family primary evaluator is skipped in favor of the declared fallback', () => {
   assertEquals(selectEvaluator('straightforward', 'implementation', 'glm_5_3_flash'), {
     model: 'deepseek_v4_pro',
-    effort: 'max',
+    effort: 'provider_default',
   });
   assertEquals(
     selectEvaluator('complex', 'plan', 'muse_spark_1_3', {
