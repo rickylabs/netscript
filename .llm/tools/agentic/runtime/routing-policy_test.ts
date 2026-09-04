@@ -16,7 +16,7 @@ const privilegedTierAuthorization = {
 };
 
 Deno.test('canonical inspection policy is derived from all matrix cells', () => {
-  assertEquals(CANONICAL_ROUTE_POLICY.length, 56);
+  assertEquals(CANONICAL_ROUTE_POLICY.length, 66);
   assertEquals(
     CANONICAL_ROUTE_POLICY.filter((entry) =>
       entry.tier === 'architecture' && entry.role === 'implementation'
@@ -114,6 +114,42 @@ Deno.test('provider capability resolution honors subscription-first order', () =
   });
   assertEquals(ollama.logicalModel, 'opus_5');
   assertEquals(ollama.transport, 'claude');
+});
+
+Deno.test('deep research uses Gemini by coverage and only native Luna as fallback', () => {
+  const primary = resolveWorkloadRoute({
+    tier: 'straightforward',
+    role: 'deep_research',
+    worktree,
+  });
+  assertEquals(
+    [primary.logicalModel, primary.transport, primary.model, primary.requestedEffort],
+    ['gemini_3_8_flash', 'agy', ROUTING_MODEL_IDS.gemini38FlashNative, 'medium'],
+  );
+
+  const fallback = resolveWorkloadRoute({
+    tier: 'feature',
+    role: 'deep_research',
+    unavailableModels: ['gemini_3_8_flash'],
+    worktree,
+  });
+  assertEquals(
+    [fallback.logicalModel, fallback.transport, fallback.model, fallback.requestedEffort],
+    ['luna', 'codex', ROUTING_MODEL_IDS.lunaNative, 'max'],
+  );
+
+  assertThrows(
+    () =>
+      resolveWorkloadRoute({
+        tier: 'feature',
+        role: 'deep_research',
+        unavailableModels: ['gemini_3_8_flash'],
+        unavailableTransports: ['codex'],
+        worktree,
+      }),
+    Error,
+    'no available route in the declared fallback chain',
+  );
 });
 
 Deno.test('same-family evaluator candidates are skipped before provider selection', () => {

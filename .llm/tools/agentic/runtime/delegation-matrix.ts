@@ -239,8 +239,21 @@ export const DELEGATION_ROLES = [
   'implementation_evaluation',
   'vision_evaluation',
   'documentation',
+  'deep_research',
 ] as const;
 export type DelegationRole = typeof DELEGATION_ROLES[number];
+
+/** Deep research stays on native subscriptions; accumulated context makes metered fallback unsafe. */
+export const DEEP_RESEARCH_TRANSPORTS = ['agy', 'codex'] as const;
+export type DeepResearchTransport = typeof DEEP_RESEARCH_TRANSPORTS[number];
+
+export function isTransportAllowedForRole(
+  role: DelegationRole,
+  transport: ModelTransport,
+): boolean {
+  return role !== 'deep_research' ||
+    DEEP_RESEARCH_TRANSPORTS.includes(transport as DeepResearchTransport);
+}
 
 export interface ModelRoute {
   readonly model: LogicalModelId;
@@ -262,6 +275,7 @@ export interface DelegationCell {
   readonly implementation_evaluation: readonly ModelRoute[];
   readonly vision_evaluation: readonly ModelRoute[];
   readonly documentation: readonly ModelRoute[];
+  readonly deep_research: readonly ModelRoute[];
   readonly planPolicy: EvaluationPolicy;
   readonly implementationPolicy: EvaluationPolicy;
   readonly documentationPolicy: EvaluationPolicy;
@@ -289,6 +303,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('deepseek_v4_flash_vision', 'provider_default'),
     ],
     documentation: [route('gemini_3_8_flash', 'medium'), route('opus_5', 'low')],
+    deep_research: [route('gemini_3_8_flash', 'low'), route('luna', 'max')],
     planPolicy: policy({ maxRounds: 'none' }),
     implementationPolicy: policy({ maxRounds: 'unspecified_by_owner' }),
     documentationPolicy: policy({ maxRounds: 2 }),
@@ -312,6 +327,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('gemini_3_8_flash', 'high'),
       route('qwen_3_8_flash_next', 'provider_default'),
     ],
+    deep_research: [route('gemini_3_8_flash', 'medium'), route('luna', 'max')],
     planPolicy: policy({ maxRounds: 0, repairInFlightAt: 'immediate' }),
     implementationPolicy: policy({ maxRounds: 5, notifyOwnerAfter: 3 }),
     documentationPolicy: policy({ maxRounds: 2, notifyOwnerAfter: 2 }),
@@ -332,6 +348,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('qwen_3_8_max', 'provider_default'),
       route('glm_5_3_flash', 'provider_default'),
     ],
+    deep_research: [route('gemini_3_8_flash', 'high'), route('luna', 'max')],
     planPolicy: policy({ maxRounds: 2, repairInFlightAt: 2 }),
     implementationPolicy: policy({ maxRounds: 5, notifyOwnerAfter: 3 }),
     documentationPolicy: policy({ maxRounds: 2, notifyOwnerAfter: 2 }),
@@ -352,6 +369,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('fable_5_1', 'medium'),
       route('qwen_3_8_max', 'provider_default'),
     ],
+    deep_research: [route('gemini_3_8_flash', 'high'), route('luna', 'max')],
     planPolicy: policy({ maxRounds: 3, repairInFlightAt: 3 }),
     implementationPolicy: policy({ maxRounds: 5, notifyOwnerAfter: 3 }),
     documentationPolicy: policy({ maxRounds: 2, notifyOwnerAfter: 2 }),
@@ -369,6 +387,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('fable_5_1', 'high'),
       route('qwen_3_8_max', 'provider_default'),
     ],
+    deep_research: [route('gemini_3_8_flash', 'high'), route('luna', 'max')],
     planPolicy: policy({ maxRounds: 1, escalateToOwnerAt: 2 }),
     implementationPolicy: policy({ maxRounds: 3, notifyOwnerAfter: 2 }),
     documentationPolicy: policy({ maxRounds: 2, notifyOwnerAfter: 2 }),
@@ -383,7 +402,9 @@ export function assertWorkloadModelAllowed(
 ): void {
   const routes = DELEGATION_MATRIX[tier][role];
   const allowed = routes.some((route) =>
-    MODEL_CATALOG[route.model].capabilities.some((capability) => capability.model === concreteModel)
+    MODEL_CATALOG[route.model].capabilities.some((capability) =>
+      capability.model === concreteModel && isTransportAllowedForRole(role, capability.transport)
+    )
   );
   if (!allowed) {
     throw new Error(`${concreteModel} is not declared for ${tier}/${role}`);

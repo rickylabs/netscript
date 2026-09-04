@@ -41,3 +41,7 @@
   `4f37cff5-ef4e-4c22-b462-007ea368d18a` (Anthropic family). Cycle 3 found the bounded effort/doc
   defects; cycle 4 independently executed the repair gates and returned `PASS` at implementation
   head `74c6299b006c8662514e9f1f2a77e970681b0ade`.
+- The owner then added a dedicated deep-research role before merge: native `agy` Gemini 3.8 Flash
+  low/medium/high by tier, with native Codex Luna max as its only fallback. Claude and every
+  OpenCode transport, including OpenRouter, are forbidden. This bounded post-PASS amendment requires
+  cycle-5 review in the same separate evaluator session.

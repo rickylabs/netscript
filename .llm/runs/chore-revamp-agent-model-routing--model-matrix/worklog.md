@@ -82,6 +82,8 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T16:41Z    | repair    | matrix fidelity  | Restored all four unstated DeepSeek efforts to `provider_default`, pinned them in the owner-matrix test, and documented that Claude/OpenRouter is outside active matrix selection.   |
 | 2026-09-04T16:41Z    | repair    | focused gates    | Structured focused suite passed 59/59 after the repair; agentic TypeScript check selected 187 files / 2 batches / 0 diagnostics; changed TS format clean.                            |
 | 2026-09-04T16:49Z    | IMPL-EVAL | cycle 4          | Same native Claude Opus 5 xhigh evaluator session independently returned `PASS` at real implementation head `74c6299b006c866`; every bounded finding closed.                         |
+| 2026-09-04T17:15Z    | amendment | deep research    | Owner added a dedicated Gemini 3.8 Flash low/medium/high → Luna max route and prohibited Claude/OpenCode Go/Ollama/OpenRouter transports for accumulated-context research.           |
+| 2026-09-04T17:22Z    | amendment | focused gates    | Added resolver and concrete-model denial proofs; matrix/parity suite passed 25/25 and changed-file formatting is clean.                                                              |
 
 ## Gate Results
 
@@ -107,6 +109,7 @@ tests and documentation parity gate identify every required downstream update.
 | Cycle-3 repair check    | PASS       | 187 files / 2 batches / 0 diagnostics                                                                                      |
 | Cycle-3 repair format   | PASS       | 2 changed TypeScript files processed / 0 findings                                                                          |
 | IMPL-EVAL cycle 4       | PASS       | 187-file check; 583/583 agentic; 23/23 matrix/parity; 49/49 expense/credential/runner/SSOT; changed-file format clean      |
+| Deep-research amendment | PASS*      | 25/25 focused; 187 files checked / 0 diagnostics; 585/585 agentic tests; cycle-5 IMPL-EVAL remains before promotion        |
 | S1 check                | PASS       | structured check selected 2 files; 0 diagnostics                                                                           |
 | S1 tests                | PASS       | 11 passed, 0 failed across matrix and volatile-value guard                                                                 |
 | S2 check                | PASS       | 5 changed routing/contract files checked, 0 diagnostics                                                                    |

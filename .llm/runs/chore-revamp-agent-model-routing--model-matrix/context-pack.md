@@ -31,6 +31,9 @@ the owner source left effort unstated. Those cells now use `provider_default`, a
 by tests, and the compatibility-only Claude/OpenRouter boundary is documented. PR #1989 remains
 draft. The same native Claude Opus 5 xhigh evaluator session independently executed the repair gates
 and returned cycle-4 `PASS` at exact implementation head `74c6299b006c8662514e9f1f2a77e970681b0ade`.
+After that PASS, the owner added a final deep-research column: Gemini 3.8 Flash low/medium/high by
+tier, Luna max fallback, native `agy`/Codex transports only. The PR was returned to draft while this
+bounded amendment receives fresh exact-head gates and cycle-5 IMPL-EVAL.
 
 ## Accepted owner decisions
 
@@ -44,6 +47,8 @@ and returned cycle-4 `PASS` at exact implementation head `74c6299b006c8662514e9f
   provide a legal evaluator for every generator candidate.
 - `complex` and `architecture` may be selected only with explicit owner or milestone-coordinator
   authority and a recorded rationale; otherwise selection is capped at `feature`.
+- Deep research uses Gemini 3.8 Flash by tier and Luna max only; Claude, OpenCode Go, Ollama, and
+  OpenRouter transports are forbidden for that role.
 
 ## Locked architecture
 
@@ -57,9 +62,9 @@ and returned cycle-4 `PASS` at exact implementation head `74c6299b006c8662514e9f
 
 ## Next Steps
 
-1. Commit and push the cycle-4 evaluator verdict and corrected exact SHA.
-2. Rewrite the stale PR body, replace `status:plan-eval` with `status:ready-merge`, and promote the
-   draft only after exact-head CI and review threads are green.
+1. Commit and push the bounded deep-research amendment and its exact-head evaluator brief.
+2. Resume the same separate Opus evaluator for cycle 5, then promote and merge only after exact-head
+   CI and review threads are green.
 
 ## Files Changed
 
@@ -92,7 +97,7 @@ and returned cycle-4 `PASS` at exact implementation head `74c6299b006c8662514e9f
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
 | IMPL-EVAL   | PASS C4        | independently executed at implementation head `74c6299b006c866`             |
-| Repair gate | PASS           | 59 focused tests; 187 checked / 0 diagnostics; 2 TS files format clean      |
+| Repair gate | PASS           | deep-research amendment: 25 focused; 187 checked; 585 agentic; format clean |
 
 ## Drift and Debt
 

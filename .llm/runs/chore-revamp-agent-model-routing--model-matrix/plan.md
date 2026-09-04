@@ -56,6 +56,10 @@ printing or committing credentials.
    authorization or a milestone-coordinator authorization with a recorded non-empty rationale.
    Complexity inference, file count, or evaluator role alone cannot select them; absent authority,
    dispatch is capped at `feature`.
+10. **Deep research is native-only.** The dedicated role routes Gemini 3.8 Flash at low for simple,
+    medium for straightforward, and high for feature/complex/architecture, with Luna max as its only
+    fallback. Its accumulated context/output cost forbids Claude, OpenCode Go, Ollama, and
+    OpenRouter transports. Both route resolution and manual concrete-model validation fail closed.
 
 ## Public surface and vocabulary
 
@@ -65,7 +69,7 @@ Internal-only TypeScript surface under `.llm/tools/agentic/`:
 - `CoordinatorTier`: `small_project | project | framework | milestone`
 - `LogicalModelId`, `ModelFamily`, `ProviderCapability`
 - `DelegationCell`: implementer, plan, plan evaluator, implementation evaluator, vision evaluator,
-  documentation writer, plus fallback and evaluation policy
+  documentation writer, deep researcher, plus fallback and evaluation policy
 - `SubscriptionBudgetPolicy`, `UsageSnapshot`, `ExpenseDecision`
 - provider kinds `opencode_go` and `ollama` in addition to existing native/OpenRouter identities
 

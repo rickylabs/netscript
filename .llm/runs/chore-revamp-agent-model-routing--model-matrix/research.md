@@ -22,6 +22,21 @@ The generator/evaluator family invariant applies to the selected routes after co
 Tier-specific evaluation round limits and escalation thresholds are part of the machine contract,
 not operator prose.
 
+### Owner amendment — deep research
+
+| Workload tier   | Deep-research route                |
+| --------------- | ---------------------------------- |
+| simple          | Gemini 3.8 Flash low → Luna max    |
+| straightforward | Gemini 3.8 Flash medium → Luna max |
+| feature         | Gemini 3.8 Flash high → Luna max   |
+| complex         | Gemini 3.8 Flash high → Luna max   |
+| architecture    | Gemini 3.8 Flash high → Luna max   |
+
+Deep research may use only native Google `agy` for Gemini or native Codex for Luna. Claude, OpenCode
+Go, Ollama, and OpenRouter transports are forbidden for this role because accumulated research
+context and output can make metered or scarce subscription routes disproportionately expensive. The
+existing explicit authorization requirement still applies to `complex` and `architecture` research.
+
 ### Evaluation policy attached to the matrix
 
 | Tier / role                                   | Round policy         | Required action                                                                                                            |

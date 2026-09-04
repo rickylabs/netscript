@@ -128,3 +128,16 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
 - **Provenance correction:** Cycle 3 ran on native Claude Opus 5 xhigh (Anthropic family). Its
   launch prompt overrode an obsolete Muse/Meta sentence in the committed brief; evaluator metadata
   is being corrected in the same evaluator session before the next cycle.
+
+## 2026-09-04 — Post-PASS deep-research matrix amendment
+
+- **What:** The owner added the previously omitted deep-research role before merge.
+- **Route:** Gemini 3.8 Flash low/medium/high by workload tier and surface coverage, then Luna max.
+- **Boundary:** Only native `agy` and native Codex transports are legal. Claude, OpenCode Go,
+  Ollama, and OpenRouter are rejected even if they expose a matching logical model.
+- **Why:** Deep research can accumulate large context windows and output; paid and scarce fallback
+  routes must not silently absorb that cost.
+- **Authorization:** `complex` and `architecture` remain privileged and require the existing owner
+  or milestone-coordinator record.
+- **Action:** Reopened PR #1989 as draft, extended typed policy/docs/guards/tests, and require a new
+  separate-session IMPL-EVAL plus exact-head CI before promotion.

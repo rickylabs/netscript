@@ -3,6 +3,7 @@ import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
   assertWorkloadModelAllowed,
   COORDINATOR_MATRIX,
+  DEEP_RESEARCH_TRANSPORTS,
   DELEGATION_MATRIX,
   MODEL_CATALOG,
   MODEL_TRANSPORT_PRIORITY,
@@ -59,6 +60,18 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     { model: 'fable_5_1', effort: 'medium' },
     { model: 'opus_5', effort: 'xhigh' },
   ]);
+  assertEquals(DEEP_RESEARCH_TRANSPORTS, ['agy', 'codex']);
+  assertEquals(DELEGATION_MATRIX.simple.deep_research, [
+    { model: 'gemini_3_8_flash', effort: 'low' },
+    { model: 'luna', effort: 'max' },
+  ]);
+  assertEquals(DELEGATION_MATRIX.straightforward.deep_research[0].effort, 'medium');
+  for (const tier of ['feature', 'complex', 'architecture'] as const) {
+    assertEquals(DELEGATION_MATRIX[tier].deep_research, [
+      { model: 'gemini_3_8_flash', effort: 'high' },
+      { model: 'luna', effort: 'max' },
+    ]);
+  }
 });
 
 Deno.test('provider priority puts subscriptions before metered OpenRouter', () => {
@@ -152,6 +165,24 @@ Deno.test('a concrete provider model must belong to the selected matrix cell', (
     Error,
     'is not declared for feature/implementation_evaluation',
   );
+});
+
+Deno.test('deep research rejects every non-native, Claude, and OpenRouter capability', () => {
+  assertWorkloadModelAllowed('simple', 'deep_research', ROUTING_MODEL_IDS.gemini38FlashNative);
+  assertWorkloadModelAllowed('simple', 'deep_research', ROUTING_MODEL_IDS.lunaNative);
+  for (
+    const forbidden of [
+      ROUTING_MODEL_IDS.lunaGo,
+      ROUTING_MODEL_IDS.opus5Native,
+      ROUTING_MODEL_IDS.glm53FlashOpenRouter,
+    ]
+  ) {
+    assertThrows(
+      () => assertWorkloadModelAllowed('simple', 'deep_research', forbidden),
+      Error,
+      'is not declared for simple/deep_research',
+    );
+  }
 });
 
 Deno.test('evaluation limits preserve exact owner thresholds', () => {

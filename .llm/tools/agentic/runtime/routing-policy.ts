@@ -14,6 +14,7 @@ import {
   type CoordinatorTier,
   DELEGATION_MATRIX,
   type DelegationRole,
+  isTransportAllowedForRole,
   type LegacyRoutingLane,
   type LogicalModelId,
   MODEL_CATALOG,
@@ -133,6 +134,7 @@ function concreteEffort(effort: ModelRoute['effort']): Effort {
 function resolveRouteChain(
   candidates: readonly ModelRoute[],
   request: RouteAvailability & {
+    readonly role?: DelegationRole;
     readonly generatorModel?: LogicalModelId;
     readonly worktree: string;
     readonly mobileRequired?: boolean;
@@ -148,7 +150,10 @@ function resolveRouteChain(
     const capability = definition.capabilities.toSorted((left, right) =>
       MODEL_TRANSPORT_PRIORITY.indexOf(left.transport) -
       MODEL_TRANSPORT_PRIORITY.indexOf(right.transport)
-    ).find((entry) => !unavailableTransports.has(entry.transport));
+    ).find((entry) =>
+      !unavailableTransports.has(entry.transport) &&
+      (!request.role || isTransportAllowedForRole(request.role, entry.transport))
+    );
     if (!capability) continue;
     return {
       agent: TRANSPORT_AGENT[capability.transport],
@@ -188,7 +193,7 @@ export function resolveWorkloadRoute(request: WorkloadRouteRequest): ResolvedDel
     throw new Error(`${request.role} requires the selected generator model`);
   }
   return {
-    ...resolveRouteChain(candidates, request),
+    ...resolveRouteChain(candidates, { ...request, role: request.role }),
     ...(request.privilegedTierAuthorization
       ? { privilegedTierAuthorization: request.privilegedTierAuthorization }
       : {}),

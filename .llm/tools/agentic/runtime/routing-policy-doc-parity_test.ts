@@ -29,7 +29,16 @@ function tableCells(rows: readonly string[]): string[][] {
 Deno.test('lane-policy workload table exactly matches the typed matrix', async () => {
   const source = await Deno.readTextFile('.llm/harness/workflow/lane-policy.md');
   const expected = [
-    ['Tier', 'Implementation', 'Plan', 'PLAN-EVAL', 'IMPL-EVAL', 'Vision', 'Documentation'],
+    [
+      'Tier',
+      'Implementation',
+      'Plan',
+      'PLAN-EVAL',
+      'IMPL-EVAL',
+      'Vision',
+      'Documentation',
+      'Deep research',
+    ],
     ...WORKLOAD_TIERS.map((tier): string[] => {
       const cell = DELEGATION_MATRIX[tier];
       return [
@@ -40,6 +49,7 @@ Deno.test('lane-policy workload table exactly matches the typed matrix', async (
         routes(cell.implementation_evaluation),
         routes(cell.vision_evaluation),
         routes(cell.documentation),
+        routes(cell.deep_research),
       ];
     }),
   ];
