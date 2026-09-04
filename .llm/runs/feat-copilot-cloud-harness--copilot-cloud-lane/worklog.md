@@ -44,9 +44,13 @@ returns `PASS`.
 - Owner correction at 2026-09-04T19:07Z: Gemini remains on the native Google subscription through
   `agy` for every role, including deep research. Copilot-first routing applies to supported
   non-native families such as Kimi K3 and Grok 4.6; the prior broader wording is superseded.
+- Owner clarification at 2026-09-04T19:17Z: a catalog-attested Copilot Gemini route is allowed as a
+  same-model fallback after native `agy`. For deep research it precedes the native Luna fallback;
+  the default remains native `agy`.
 - OpenCode credential inventory reports GitHub Copilot OAuth without exposing secret material. The
-  live connector catalog contains `github-copilot/claude-fable-5.1`, `github-copilot/kimi-k3`, and
-  `github-copilot/grok-4.6`; no model slug was inferred.
+  live connector catalog contains `github-copilot/claude-fable-5.1`,
+  `github-copilot/gemini-3.8-flash`, `github-copilot/kimi-k3`, and `github-copilot/grok-4.6`; no
+  model slug was inferred.
 
 ## Gate Results
 

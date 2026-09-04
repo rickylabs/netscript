@@ -31,12 +31,12 @@
 
 ## Plan route attempts
 
-| Time              | Requested route                    | Observed result                                                                                  | Disposition                                      |
-| ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| 2026-09-04T18:25Z | Fable 5.1 low / native Claude      | HTTP 429 before inference; 0 input/output tokens; monthly spend limit                            | Declared model fallback selected                 |
-| 2026-09-04T18:26Z | Muse Spark 1.3 xhigh / OpenCode Go | Expense watcher blocked before spawn: `provider_rate_limited`                                    | Same-model transport fallback selected           |
-| 2026-09-04T18:27Z | Muse Spark 1.3 xhigh / OpenRouter  | Provider rejected before inference: paid-training endpoint excluded by account privacy guardrail | Owner account toggle or Go-window reset required |
-| 2026-09-04T19:15Z | GitHub Copilot connector preflight | Device OAuth succeeded; live catalog exposed exact Fable 5.1, Kimi K3, and Grok 4.6 identifiers  | Plan fallback transport is available             |
+| Time              | Requested route                    | Observed result                                                                                           | Disposition                                      |
+| ----------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| 2026-09-04T18:25Z | Fable 5.1 low / native Claude      | HTTP 429 before inference; 0 input/output tokens; monthly spend limit                                     | Declared model fallback selected                 |
+| 2026-09-04T18:26Z | Muse Spark 1.3 xhigh / OpenCode Go | Expense watcher blocked before spawn: `provider_rate_limited`                                             | Same-model transport fallback selected           |
+| 2026-09-04T18:27Z | Muse Spark 1.3 xhigh / OpenRouter  | Provider rejected before inference: paid-training endpoint excluded by account privacy guardrail          | Owner account toggle or Go-window reset required |
+| 2026-09-04T19:15Z | GitHub Copilot connector preflight | Device OAuth succeeded; live catalog exposed exact Fable 5.1, Gemini 3.8 Flash, Kimi K3, and Grok 4.6 IDs | Plan fallback transport is available             |
 
 No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL remains blocked.
 
@@ -44,13 +44,14 @@ No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL
 
 OpenCode's native GitHub Copilot provider becomes the first transport for every Copilot-supported
 matrix model except the OpenAI, Anthropic, and Gemini families. OpenAI remains native Codex/ChatGPT;
-Anthropic remains native Claude; Gemini remains native Google `agy`. Kimi K3 and Grok 4.6 are the
-confirmed priority savings targets. The connector's live model catalog must be attested after device
-authorization; absent models fail over through the pre-existing provider chain rather than being
-guessed.
+Anthropic remains native Claude; Gemini remains native Google `agy`, with catalog-attested Copilot
+Gemini allowed as a same-model fallback. Kimi K3 and Grok 4.6 are the confirmed priority savings
+targets. The connector's live model catalog must be attested after device authorization; absent
+models fail over through the pre-existing provider chain rather than being guessed.
 
-The `deep_research` route remains native Gemini 3.8 Flash through `agy`, with native Luna as the
-only model fallback. Copilot is not admitted to that role.
+The `deep_research` route is native Gemini 3.8 Flash through `agy`, then catalog-attested Copilot
+Gemini 3.8 Flash, then native Luna. Generic OpenCode Go, Ollama, OpenRouter, and Claude are not
+admitted to that role.
 
 The native Claude subscription remains the default Fable route. Because the plan attempt returned a
 terminal subscription-limit response before inference, `github-copilot/claude-fable-5.1` is allowed

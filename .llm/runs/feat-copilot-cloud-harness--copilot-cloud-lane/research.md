@@ -68,19 +68,20 @@ OpenCode documents GitHub Copilot as a subscription provider and stores its own 
 credential after `/connect`. On 2026-09-04 the owner selected this as the default transport for
 every matrix model actually exposed by Copilot Pro+, except OpenAI, Anthropic, and Google Gemini
 models. OpenAI continues through the native Codex/ChatGPT subscription, Anthropic through the native
-Claude subscription, and Gemini through the native Google `agy` subscription. This selection is an
-explicit cost-allocation policy; it does not imply that every model in GitHub's catalog is exposed
-by the installed OpenCode connector, so launch-time catalog discovery must fail closed.
+Claude subscription, and Gemini first through the native Google `agy` subscription. If native `agy`
+is unavailable, a catalog-attested Copilot Gemini is an allowed same-model fallback. This selection
+is an explicit cost-allocation policy; it does not imply that every model in GitHub's catalog is
+exposed by the installed OpenCode connector, so launch-time catalog discovery must fail closed.
 
-The existing `deep_research` restriction is therefore unchanged: Gemini 3.8 Flash stays on native
-`agy`, with Luna through native Codex as its only model fallback. Copilot, generic OpenCode Go,
-Ollama, OpenRouter, and Claude remain forbidden for deep research.
+The `deep_research` restriction remains narrow: Gemini 3.8 Flash on native `agy`, then the
+catalog-attested Copilot Gemini 3.8 Flash route, then Luna through native Codex. Generic OpenCode
+Go, Ollama, OpenRouter, and Claude remain forbidden for deep research.
 
 GitHub's current supported-model catalog includes Gemini 3.8 Flash, Kimi K3, and Grok 4.6 in
-addition to OpenAI and Anthropic families. Gemini remains explicitly pinned to native `agy`; Kimi K3
-and Grok 4.6 are the immediate high-cost savings targets for Copilot-first routing. Qwen, GLM, Muse,
-MiniMax, and DeepSeek are absent from that catalog and retain their existing OpenCode
-Go/Ollama/OpenRouter routes.
+addition to OpenAI and Anthropic families. Gemini remains explicitly pinned to native `agy` as its
+primary route and may fall back to Copilot; Kimi K3 and Grok 4.6 are the immediate high-cost savings
+targets for Copilot-first routing. Qwen, GLM, Muse, MiniMax, and DeepSeek are absent from that
+catalog and retain their existing OpenCode Go/Ollama/OpenRouter routes.
 
 ### 3. Pro+ cost and quota facts
 
@@ -153,8 +154,9 @@ Add Copilot in two bounded stages, without immediately deleting OpenHands:
 1. **OpenCode GitHub Copilot transport first.** Add a typed `copilot` transport capability and place
    it before OpenCode Go/Ollama/OpenRouter for every Copilot-supported model outside the OpenAI,
    Anthropic, and Gemini families. Preserve native Codex, Claude, and `agy` as the subscription
-   defaults for their respective families. Discover and attest actual connector model IDs rather
-   than deriving them from GitHub display names.
+   defaults for their respective families; permit catalog-attested Copilot Gemini only after native
+   `agy` is unavailable. Discover and attest actual connector model IDs rather than deriving them
+   from GitHub display names.
 2. **Keep the native Copilot CLI as a distinct optional surface.** It offers explicit model/effort,
    JSONL, tool permissions, continuation bounds, session identity, and an AI-credit cap, but it must
    not bypass the owner's OpenCode-first transport policy.
@@ -182,7 +184,8 @@ repository-policy boundaries, and no live canary receipt exists yet.
 
 The plan generator must verify exact paths rather than assuming all are needed:
 
-- typed Copilot transport/provider capability catalog with OpenAI/Anthropic/Gemini exclusions;
+- typed Copilot transport/provider capability catalog with native-family precedence and a bounded
+  Gemini same-model fallback;
 - subscription allowance and expense policy for Copilot Pro+;
 - OpenCode Copilot launcher/catalog preflight/receipt, plus an optional native CLI launcher/JSONL
   normalizer/status receipt if the plan can keep it bounded;
@@ -212,4 +215,5 @@ package/plugin surface. Revisit only if the ratified plan touches an exported pa
    current product docs advise that useful limits are generally above 30 credits.
 4. Resolved by owner on 2026-09-04: OpenCode's GitHub Copilot provider is the first implementation
    slice and the default for supported models outside OpenAI, Anthropic, and Gemini. Native Codex,
-   Claude, and `agy` remain the family-specific defaults.
+   Claude, and `agy` remain the family-specific defaults; Gemini may use Copilot as an attested
+   fallback after native `agy` is unavailable.

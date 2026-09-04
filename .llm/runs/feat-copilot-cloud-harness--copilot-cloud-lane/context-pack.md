@@ -25,12 +25,13 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 - Copilot cloud capability preflight passed: `copilot-swe-agent` is assignable to this repository.
 - Owner-ratified route: OpenCode GitHub Copilot first for every Copilot-supported matrix model
   except OpenAI, Anthropic, and Gemini; those remain on native Codex/ChatGPT, Claude, and Google
-  `agy` subscriptions. Cloud Agent Tasks remains a measured implementation canary; no immediate
-  OpenHands removal.
+  `agy` subscriptions by default. Catalog-attested Copilot Gemini is allowed only after native `agy`
+  is unavailable. Cloud Agent Tasks remains a measured implementation canary; no immediate OpenHands
+  removal.
 - OpenCode GitHub Copilot device OAuth is complete. Live catalog attestation exposed exact IDs
-  `github-copilot/claude-fable-5.1`, `github-copilot/kimi-k3`, and `github-copilot/grok-4.6`. Fable
-  through Copilot is a same-model plan fallback only after the native Claude subscription returned
-  its terminal limit; it does not change the default route.
+  `github-copilot/claude-fable-5.1`, `github-copilot/gemini-3.8-flash`, `github-copilot/kimi-k3`,
+  and `github-copilot/grok-4.6`. Fable through Copilot is a same-model plan fallback only after the
+  native Claude subscription returned its terminal limit; it does not change the default route.
 
 ## In Progress
 
