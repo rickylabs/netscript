@@ -15,8 +15,8 @@
 Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`. The complete owner
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
 have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they were repaired at
-`372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 implementation may
-begin.
+`372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is implemented and
+locally green, pending its atomic commit/push.
 
 ## Accepted owner decisions
 
@@ -48,6 +48,9 @@ begin.
 | Path                                                         | Status       | Notes                                                  |
 | ------------------------------------------------------------ | ------------ | ------------------------------------------------------ |
 | `.llm/runs/chore-revamp-agent-model-routing--model-matrix/*` | modified/new | research, plan, design, continuity, and drift evidence |
+| `.llm/tools/agentic/config/models.ts`                        | modified     | current provider model slugs only                      |
+| `.llm/tools/agentic/runtime/delegation-matrix.ts`            | new          | authoritative matrix and family composition            |
+| `.llm/tools/agentic/runtime/delegation-matrix_test.ts`       | new          | exact owner-matrix and invariant coverage              |
 
 ## Gates
 

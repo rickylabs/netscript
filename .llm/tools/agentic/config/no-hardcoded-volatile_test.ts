@@ -110,6 +110,7 @@ const README_ILLUSTRATIVE_ALLOWLIST = new Set<string>([
   config.NATIVE_CANARY_MODEL_ARGS.codex,
   config.OPENROUTER_MODEL_IDS.planEvaluator,
   config.OPENCODE_MODEL_IDS.visionEval,
+  config.ROUTING_MODEL_IDS.qwen38FlashNextOpenRouter,
   OPENCODE_TOOL.openRouterEnvRelativePath,
 ]);
 

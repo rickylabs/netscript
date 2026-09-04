@@ -53,15 +53,16 @@ tests and documentation parity gate identify every required downstream update.
 
 ## Progress Log
 
-| Time                 | Slice     | Step           | Notes                                                                                                                                   |
-| -------------------- | --------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-04T13:58:23Z | bootstrap | activated      | Read owner matrix first; selected Archetype 6 plus docs overlay; created isolated run.                                                  |
-| 2026-09-04T13:59:30Z | bootstrap | draft PR       | Pushed `f16ae59a5`; opened draft PR #1989.                                                                                              |
-| 2026-09-04T14:00Z    | research  | provider facts | Re-derived Astra, OpenCode Go, Ollama, provider catalog, current code surfaces, and limits from official/live sources.                  |
-| 2026-09-04T14:20Z    | design    | locked         | Chose typed matrix, logical/provider model split, exhaustive cross-family validation, and pre-spend fail-closed watcher.                |
-| 2026-09-04T16:22Z    | PLAN-EVAL | cycle 1        | Muse Spark was rejected before a turn by the current OpenRouter privacy setting; declared Grok 4.6 xhigh fallback returned `FAIL_PLAN`. |
-| 2026-09-04T16:24Z    | design    | bounded repair | Locked vendor-level family composition, exact per-tier evaluation limits, and fail-closed legacy-lane behavior.                         |
-| 2026-09-04T16:29Z    | PLAN-EVAL | cycle 2        | Same OpenCode session `ses_f9338f842ffeT0E2CjAp7yu3KZ`, Grok 4.6 xhigh, returned `PASS` at repair head `372409ab6`.                     |
+| Time                 | Slice     | Step           | Notes                                                                                                                                                                    |
+| -------------------- | --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-09-04T13:58:23Z | bootstrap | activated      | Read owner matrix first; selected Archetype 6 plus docs overlay; created isolated run.                                                                                   |
+| 2026-09-04T13:59:30Z | bootstrap | draft PR       | Pushed `f16ae59a5`; opened draft PR #1989.                                                                                                                               |
+| 2026-09-04T14:00Z    | research  | provider facts | Re-derived Astra, OpenCode Go, Ollama, provider catalog, current code surfaces, and limits from official/live sources.                                                   |
+| 2026-09-04T14:20Z    | design    | locked         | Chose typed matrix, logical/provider model split, exhaustive cross-family validation, and pre-spend fail-closed watcher.                                                 |
+| 2026-09-04T16:22Z    | PLAN-EVAL | cycle 1        | Muse Spark was rejected before a turn by the current OpenRouter privacy setting; declared Grok 4.6 xhigh fallback returned `FAIL_PLAN`.                                  |
+| 2026-09-04T16:24Z    | design    | bounded repair | Locked vendor-level family composition, exact per-tier evaluation limits, and fail-closed legacy-lane behavior.                                                          |
+| 2026-09-04T16:29Z    | PLAN-EVAL | cycle 2        | Same OpenCode session `ses_f9338f842ffeT0E2CjAp7yu3KZ`, Grok 4.6 xhigh, returned `PASS` at repair head `372409ab6`.                                                      |
+| 2026-09-04T16:38Z    | S1        | implemented    | Added volatile model slugs, vendor-family catalog, five workload tiers, four coordinator tiers, exact eval policies, fallback composition, and fail-closed legacy lanes. |
 
 ## Gate Results
 
@@ -71,3 +72,5 @@ tests and documentation parity gate identify every required downstream update.
 | PLAN-EVAL cycle 2    | PASS      | `plan-eval.md`; same evaluator session, repair head `372409ab6`                  |
 | implementation gates | NOT_RUN   | hard stop until PLAN-EVAL PASS                                                   |
 | IMPL-EVAL            | NOT_RUN   | required after implementation                                                    |
+| S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                 |
+| S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                       |
