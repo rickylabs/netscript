@@ -28,3 +28,13 @@
   and cannot attest an exact model identity. It may integrate but may not self-evaluate.
 - The user explicitly requested a research pass, a plan, and review, so PLAN-EVAL is selected even
   though the workload stays in the unprivileged `feature` row.
+
+## Plan route attempts
+
+| Time              | Requested route                    | Observed result                                                                                  | Disposition                                      |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| 2026-09-04T18:25Z | Fable 5.1 low / native Claude      | HTTP 429 before inference; 0 input/output tokens; monthly spend limit                            | Declared model fallback selected                 |
+| 2026-09-04T18:26Z | Muse Spark 1.3 xhigh / OpenCode Go | Expense watcher blocked before spawn: `provider_rate_limited`                                    | Same-model transport fallback selected           |
+| 2026-09-04T18:27Z | Muse Spark 1.3 xhigh / OpenRouter  | Provider rejected before inference: paid-training endpoint excluded by account privacy guardrail | Owner account toggle or Go-window reset required |
+
+No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL remains blocked.

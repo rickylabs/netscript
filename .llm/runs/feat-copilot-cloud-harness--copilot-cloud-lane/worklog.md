@@ -17,11 +17,12 @@ returns `PASS`.
 
 ## Progress Log
 
-| Time              | Slice     | Step      | Notes                                                                                               |
-| ----------------- | --------- | --------- | --------------------------------------------------------------------------------------------------- |
-| 2026-09-04T17:45Z | bootstrap | activated | Clean worktree from merged matrix head; feature row selected; deep research and PLAN-EVAL required. |
-| 2026-09-04T18:24Z | research  | generated | Gemini 3.8 Flash high completed the bounded research-only pass; no implementation files changed.    |
-| 2026-09-04T18:41Z | research  | verified  | Primary-source sweep corrected unsupported quota, policy, API, and status claims.                   |
+| Time              | Slice     | Step      | Notes                                                                                                                   |
+| ----------------- | --------- | --------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-04T17:45Z | bootstrap | activated | Clean worktree from merged matrix head; feature row selected; deep research and PLAN-EVAL required.                     |
+| 2026-09-04T18:24Z | research  | generated | Gemini 3.8 Flash high completed the bounded research-only pass; no implementation files changed.                        |
+| 2026-09-04T18:25Z | research  | verified  | Primary-source sweep corrected unsupported quota, policy, API, and status claims.                                       |
+| 2026-09-04T18:28Z | plan      | blocked   | Fable limit, Go rate limit, then OpenRouter paid-training guardrail exhausted the declared plan route before inference. |
 
 ## Research receipts
 
@@ -34,7 +35,10 @@ returns `PASS`.
 - OpenCode documents a native GitHub Copilot device-login provider; Claude Code documents no such
   provider.
 - No billable Copilot task, repository policy mutation, or tool installation occurred in research.
+- Plan attempts consumed no useful model tokens. The OpenCode expense watcher and OpenRouter
+  guardrail both failed closed before plan generation.
 
 ## Gate Results
 
-Not run; plan and PLAN-EVAL remain pending.
+Not run; plan generation is blocked on a declared route becoming available, and PLAN-EVAL remains
+pending.

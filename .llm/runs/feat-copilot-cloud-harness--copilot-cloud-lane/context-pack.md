@@ -28,15 +28,19 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 
 ## In Progress
 
-- Fable 5.1 low plan generation in a separate session.
+- Plan generation. The declared feature-plan chain was exhausted before inference: Fable 5.1 hit its
+  monthly spend limit, OpenCode Go rejected Muse Spark 1.3 while rate-limited, and OpenRouter's
+  account privacy guardrail excluded Muse's paid-training endpoint.
 
 ## Next Steps
 
-1. Generate the bounded plan and Design checkpoint.
+1. Enable paid-model training for the OpenRouter account used by the configured key, or wait for
+   OpenCode Go's rolling window to reset; then resume Muse Spark 1.3 xhigh plan generation.
 2. Run separate-session PLAN-EVAL before implementation.
 3. Implement only the ratified slices after `PASS`.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: declared Fable→Muse plan route is temporarily unavailable; no model/tier substitution was
+  made.
 - Debt: none accepted.
