@@ -36,6 +36,9 @@ implementation is authorized.
 
 ## In Progress
 
+- S7 guarded launch implemented; tests PASS 26/26, check PASS, Tier-A review PASS.
+- Coordinator-approved closeout combines S8/S9 and S10/S11/S12; no live tasks or extra research.
+
 - S6 credit decision/reservation implemented; tests PASS 20/20, check/lint PASS; Tier-A review PASS.
   Ledger lives outside the repository and valid prior-month accounting resets to zero.
 

@@ -86,6 +86,19 @@ Design checkpoint recorded 2026-09-04 by the separate Fable 5.1 (low) plan gener
 
 ## Gate Results
 
+### S7 — guarded launch and truthful identity
+
+- S6 pushed `a7e6b7e78`, PR comment `5545840442` posted.
+- Copilot launch requires receipt, Git branch/head, exact catalog, and atomic credit reservation
+  before inference. Missing catalog blocks without reservation/spawn. Child `clearEnv` enforces
+  credential deletion. Untested inference-based MCP preflight is refused for this route.
+- Effort must explicitly be `provider_default`; no unproven variant flag is passed. Identity
+  retains catalog evidence but leaves actual runtime model/effort unknown (`pending`), rather than
+  claiming catalog listing proves inference identity. Native identity typing remains unchanged.
+- Structured tests PASS 26/26 (`.llm/tmp/copilot-s7-test.json`), check PASS 2 production files.
+- Reconcile: owner requests efficient closeout; coordinator authorizes combined S8/S9 and S10/S11/S12
+  if coherent and under 30 files. No new research or optional expansion. S7 Tier-A review PASS.
+
 ### S6 — fail-closed local credit reservations
 
 - S5 pushed `52338f416`, PR comment `5545806096` posted.
