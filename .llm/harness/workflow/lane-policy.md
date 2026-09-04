@@ -41,15 +41,23 @@ phase.
 
 <!-- generated-workload-matrix:start -->
 
-| Tier            | Implementation                                  | Plan                                        | PLAN-EVAL                                            | IMPL-EVAL                                                         | Vision                                                                  | Documentation                                                  | Deep research                      |
-| --------------- | ----------------------------------------------- | ------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| simple          | luna@max → qwen_3_8_flash_next@provider_default | —                                           | —                                                    | minimax_m3@provider_default → deepseek_v4_flash@provider_default  | minimax_m3@provider_default → deepseek_v4_flash_vision@provider_default | gemini_3_8_flash@medium → opus_5@low                           | gemini_3_8_flash@low → luna@max    |
-| straightforward | sol@medium → glm_5_3_flash@provider_default     | sol@medium → glm_5_3_flash@provider_default | opus_5@medium → qwen_3_8_flash_next@provider_default | glm_5_3_flash@provider_default → deepseek_v4_pro@provider_default | deepseek_v4_flash_vision@provider_default → kimi_k3@low                 | gemini_3_8_flash@high → qwen_3_8_flash_next@provider_default   | gemini_3_8_flash@medium → luna@max |
-| feature         | astra@low → muse_spark_1_3@xhigh                | fable_5_1@low → muse_spark_1_3@xhigh        | glm_5_3@provider_default → fable_5_1@low             | muse_spark_1_3@xhigh → opus_5@xhigh                               | gemini_3_8_flash@high → muse_spark_1_3@xhigh                            | qwen_3_8_max@provider_default → glm_5_3_flash@provider_default | gemini_3_8_flash@high → luna@max   |
-| complex         | astra@medium → fable_5_1@medium                 | fable_5_1@medium → muse_spark_1_3@max       | muse_spark_1_3@max → grok_4_6@high                   | muse_spark_1_3@max → muse_spark_1_3@max                           | kimi_k3@max → gemini_3_8_flash@high                                     | fable_5_1@medium → qwen_3_8_max@provider_default               | gemini_3_8_flash@high → luna@max   |
-| architecture    | astra@xhigh → fable_5_1@xhigh                   | fable_5_1@xhigh → muse_spark_1_3@max        | muse_spark_1_3@max → grok_4_6@xhigh                  | grok_4_6@xhigh → muse_spark_1_3@max                               | kimi_k3@max → fable_5_1@high                                            | fable_5_1@high → qwen_3_8_max@provider_default                 | gemini_3_8_flash@high → luna@max   |
+| Tier            | Implementation                                  | UI/UX                                                  | Plan                                        | PLAN-EVAL                                            | IMPL-EVAL                                                         | Vision                                                                  | Documentation                                                  | Deep research                      |
+| --------------- | ----------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| simple          | luna@max → qwen_3_8_flash_next@provider_default | kimi_k3@low → minimax_m3@provider_default              | —                                           | —                                                    | minimax_m3@provider_default → deepseek_v4_flash@provider_default  | minimax_m3@provider_default → deepseek_v4_flash_vision@provider_default | gemini_3_8_flash@medium → opus_5@low                           | gemini_3_8_flash@low → luna@max    |
+| straightforward | sol@medium → glm_5_3_flash@provider_default     | kimi_k3@high → gemini_3_8_flash@high                   | sol@medium → glm_5_3_flash@provider_default | opus_5@medium → qwen_3_8_flash_next@provider_default | glm_5_3_flash@provider_default → deepseek_v4_pro@provider_default | deepseek_v4_flash_vision@provider_default → kimi_k3@low                 | gemini_3_8_flash@high → qwen_3_8_flash_next@provider_default   | gemini_3_8_flash@medium → luna@max |
+| feature         | astra@low → muse_spark_1_3@xhigh                | kimi_k3@high → gemini_3_8_flash@high                   | fable_5_1@low → muse_spark_1_3@xhigh        | glm_5_3@provider_default → fable_5_1@low             | muse_spark_1_3@xhigh → opus_5@xhigh                               | gemini_3_8_flash@high → muse_spark_1_3@xhigh                            | qwen_3_8_max@provider_default → glm_5_3_flash@provider_default | gemini_3_8_flash@high → luna@max   |
+| complex         | astra@medium → fable_5_1@medium                 | kimi_k3@max → fable_5_1@medium                         | fable_5_1@medium → muse_spark_1_3@max       | muse_spark_1_3@max → grok_4_6@high                   | muse_spark_1_3@max → muse_spark_1_3@max                           | kimi_k3@max → gemini_3_8_flash@high                                     | fable_5_1@medium → qwen_3_8_max@provider_default               | gemini_3_8_flash@high → luna@max   |
+| architecture    | astra@xhigh → fable_5_1@xhigh                   | kimi_k3@max → fable_5_1@medium                         | fable_5_1@xhigh → muse_spark_1_3@max        | muse_spark_1_3@max → grok_4_6@xhigh                  | grok_4_6@xhigh → muse_spark_1_3@max                               | kimi_k3@max → fable_5_1@high                                            | fable_5_1@high → qwen_3_8_max@provider_default                 | gemini_3_8_flash@high → luna@max   |
 
 <!-- generated-workload-matrix:end -->
+
+The `ui_ux` role is selected only when the owner explicitly requests a pure UI/UX specialist. A
+normal implementation with incidental interface work stays on `implementation`. The UI/UX role
+scales Kimi K3 from `low` for extremely simple work, through `high` for medium work, to `max` for
+heavy work. Its declared fallbacks are MiniMax M3, Gemini 3.8 Flash high, and Fable 5.1 medium,
+respectively. UI/UX review uses `vision_evaluation`; if Kimi generated the work, the resolver skips
+Kimi there and selects that row's different-family fallback. Vision evaluation follows the tier's
+IMPL-EVAL loop policy.
 
 The typed catalog maps these logical identities to provider-specific slugs and vendor families.
 Never infer a slug by string concatenation.
@@ -75,6 +83,15 @@ The dispatch record must name the authorizer and preserve a non-empty rationale.
 cross-package scope, a formal evaluator role, or an agent's own complexity inference is not
 authorization. Without that record, selection fails closed at the resolver; ordinary work is capped
 at `feature`.
+
+### Owner matrix override
+
+The repository owner may explicitly override any tier/role model cell. This is never an inferred
+escape hatch: the request must name the logical model, effort, and rationale, and the exact grant
+must already appear in a repo-relative `.llm/runs/**/worklog.md` before a paid launcher can reserve
+allowance or start inference. The resolved route and launch receipt retain the same override record.
+An owner override may change the model cell and transport restrictions, but it never waives the
+separate-session or different-vendor-family evaluator rules.
 
 ## Coordinator matrix
 
@@ -122,14 +139,18 @@ re-steers the same evaluator session; do not discard its context by launching a 
 6. A missing legal evaluator is a recorded blocker, never permission for same-family review.
 7. PLAN-EVAL and IMPL-EVAL follow their tier-specific loop policies above; no global two-failure
    rule may override those explicit limits.
+8. Owner-selected matrix overrides cite their exact harness worklog; an undocumented bypass fails
+   before provider spend.
 
 ## Paid-route expense and credentials
 
 GitHub Copilot requires an exact live connector catalog attestation and a positive per-launch
-AI-credit reservation against a local monthly ledger. Missing or malformed state and exhausted
-included allowance block; a valid prior-month ledger rolls over at the UTC reset. Caps reserve
-credits conservatively but are not a provider-enforced token ceiling or authoritative remaining
-balance. Reconcile the ledger against GitHub billing; never assume overage is enabled.
+AI-credit reservation against a local monthly ledger. Non-default effort also requires the exact
+variant to appear in the connector's verbose model metadata before dispatch. Missing or malformed
+state and exhausted included allowance block; a valid prior-month ledger rolls over at the UTC
+reset. Caps reserve credits conservatively but are not a provider-enforced token ceiling or
+authoritative remaining balance. Reconcile the ledger against GitHub billing; never assume overage
+is enabled.
 
 OpenCode owns Copilot device OAuth. Launchers do not read its credential store or inject a Copilot
 key and clear rival provider keys. Native Claude, Codex, and `agy` remain their family defaults;

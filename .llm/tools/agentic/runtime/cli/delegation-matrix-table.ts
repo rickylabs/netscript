@@ -16,6 +16,7 @@ import {
   WORKLOAD_TIERS,
   type WorkloadTier,
 } from '../delegation-matrix.ts';
+import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 export interface MatrixOptions {
   tier?: WorkloadTier;
@@ -43,6 +44,7 @@ interface TransportPresentation {
 
 const ROLE_LABELS: Readonly<Record<DelegationRole, string>> = {
   implementation: 'Implementation',
+  ui_ux: 'UI/UX implementation',
   plan: 'Plan',
   plan_evaluation: 'PLAN-EVAL',
   implementation_evaluation: 'IMPL-EVAL',
@@ -55,6 +57,9 @@ const ROLE_ALIASES: Readonly<Record<string, DelegationRole>> = {
   implementation: 'implementation',
   implementer: 'implementation',
   impl: 'implementation',
+  ui: 'ui_ux',
+  ux: 'ui_ux',
+  ui_ux: 'ui_ux',
   plan: 'plan',
   plan_eval: 'plan_evaluation',
   plan_evaluation: 'plan_evaluation',
@@ -136,6 +141,8 @@ const MAIN_HEADERS = [
   'Tier / complexity',
   'Implementer (default)',
   'Implementer (fallback)',
+  'UI/UX (default)',
+  'UI/UX (fallback)',
   'Plan (default)',
   'Plan (fallback)',
   'Plan eval (default)',
@@ -182,18 +189,16 @@ function parseModel(raw: string): LogicalModelId {
 }
 
 export function parseMatrixArgs(args: readonly string[]): MatrixOptions {
+  const normalizedArgs = normalizeTaskArguments(args);
   const options: MatrixOptions = { json: false, help: false };
-  for (let index = 0; index < args.length; index++) {
-    const arg = args[index];
+  for (let index = 0; index < normalizedArgs.length; index++) {
+    const arg = normalizedArgs[index];
     switch (arg) {
-      case '--':
-        // `deno task <name> -- <args>` forwards the conventional delimiter.
-        break;
       case '--tier':
-        options.tier = parseTier(requireValue(args, ++index, arg));
+        options.tier = parseTier(requireValue(normalizedArgs, ++index, arg));
         break;
       case '--role':
-        options.role = parseRole(requireValue(args, ++index, arg));
+        options.role = parseRole(requireValue(normalizedArgs, ++index, arg));
         break;
       case '--plan-evaluator':
         options.role = 'plan_evaluation';
@@ -203,7 +208,7 @@ export function parseMatrixArgs(args: readonly string[]): MatrixOptions {
         break;
       case '--fallback':
       case '--fallback-of':
-        options.fallback = parseModel(requireValue(args, ++index, arg));
+        options.fallback = parseModel(requireValue(normalizedArgs, ++index, arg));
         break;
       case '--json':
         options.json = true;
@@ -241,6 +246,8 @@ function workloadRow(tier: WorkloadTier): string[] {
     `${tier}<br>${WORKLOAD_TIER_DESCRIPTIONS[tier]}`,
     displayRoute(cell.implementation[0]),
     fallbackRoutes(cell.implementation),
+    displayRoute(cell.ui_ux[0]),
+    fallbackRoutes(cell.ui_ux),
     displayRoute(cell.plan[0]),
     fallbackRoutes(cell.plan),
     displayRoute(cell.plan_evaluation[0]),
@@ -259,7 +266,9 @@ function workloadRow(tier: WorkloadTier): string[] {
 function policyForRole(tier: WorkloadTier, role: DelegationRole): EvaluationPolicy | undefined {
   const cell = DELEGATION_MATRIX[tier];
   if (role === 'plan_evaluation') return cell.planPolicy;
-  if (role === 'implementation_evaluation') return cell.implementationPolicy;
+  if (role === 'implementation_evaluation' || role === 'vision_evaluation') {
+    return cell.implementationPolicy;
+  }
   if (role === 'documentation') return cell.documentationPolicy;
   return undefined;
 }
@@ -369,7 +378,9 @@ export function renderFullMatrix(tiers: readonly WorkloadTier[] = WORKLOAD_TIERS
     '## Hard routing rules',
     '',
     '- Generator and evaluator must use different vendor families and separate sessions.',
+    '- `ui_ux` is owner-selected pure UI/UX specialization; incidental UI work stays on `implementation`.',
     '- `complex` and `architecture` require explicit owner or milestone-coordinator authority.',
+    '- Owner matrix overrides require an exact `.llm/runs/**/worklog.md` entry and never waive evaluator independence.',
     '- Deep research uses Gemini 3.8 Flash by tier, with Luna max as its only model fallback; Claude, OpenCode Go, Ollama, and OpenRouter are forbidden for that role.',
   ].join('\n');
 }
@@ -527,7 +538,7 @@ function helpText(): string {
     '  --json                        Emit the selected view as structured JSON',
     '  --help                        Show this help',
     '',
-    'Role aliases: impl, plan, plan-eval, impl-eval, vision-eval, docs, deep-research.',
+    'Role aliases: impl, ui-ux, plan, plan-eval, impl-eval, vision-eval, docs, deep-research.',
   ].join('\n');
 }
 

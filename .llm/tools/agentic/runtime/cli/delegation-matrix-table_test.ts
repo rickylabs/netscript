@@ -12,6 +12,8 @@ Deno.test('full matrix renders every role including deep-research default and fa
   for (
     const heading of [
       'Implementer (default)',
+      'UI/UX (default)',
+      'UI/UX (fallback)',
       'Plan eval (fallback)',
       'Impl eval (default)',
       'Deep research (default)',
@@ -27,6 +29,21 @@ Deno.test('full matrix renders every role including deep-research default and fa
   assertStringIncludes(output, 'Luna max');
   assertStringIncludes(output, 'GitHub Copilot Pro+');
   assertStringIncludes(output, 'OpenRouter');
+});
+
+Deno.test('UI/UX role query exposes the owner-selected specialist progression', () => {
+  const simple = renderMatrixQuery(parseMatrixArgs(['--tier', 'simple', '--role', 'ui-ux']));
+  assertStringIncludes(simple, 'Kimi K3 low');
+  assertStringIncludes(simple, 'MiniMax M3 provider default');
+
+  const heavy = renderMatrixQuery(parseMatrixArgs(['--tier', 'complex', '--role', 'ui-ux']));
+  assertStringIncludes(heavy, 'Kimi K3 max');
+  assertStringIncludes(heavy, 'Fable 5.1 medium');
+
+  const review = renderMatrixQuery(
+    parseMatrixArgs(['--tier', 'complex', '--role', 'vision-eval']),
+  );
+  assertStringIncludes(review, 'max 5 roundtrips');
 });
 
 Deno.test('tier query renders only one readable workload row', () => {

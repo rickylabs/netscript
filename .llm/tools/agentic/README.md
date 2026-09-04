@@ -393,16 +393,22 @@ Render the typed routing authority without shell-scraping its TypeScript source:
 ```console
 $ deno task agentic:matrix
 $ deno task agentic:matrix -- --tier standard
+$ deno task agentic:matrix -- --tier feature --role ui-ux
 $ deno task agentic:matrix -- --tier feature --plan-evaluator
 $ deno task agentic:matrix -- --tier feature --impl-evaluator
 $ deno task agentic:matrix -- --fallback-of astra
 $ deno task agentic:matrix -- --json
 ```
 
-The full view separates default and fallback columns for implementation, planning, PLAN-EVAL,
-IMPL-EVAL, vision, documentation, and Deep Research, followed by evaluation policies, coordinator
-routes, and CLI/provider precedence. Focused queries preserve the same typed source; fallback
-queries list every matching context because a model has no context-free fallback.
+The full view separates default and fallback columns for implementation, opt-in UI/UX work,
+planning, PLAN-EVAL, IMPL-EVAL, vision, documentation, and Deep Research, followed by evaluation
+policies, coordinator routes, and CLI/provider precedence. Focused queries preserve the same typed
+source; fallback queries list every matching context because a model has no context-free fallback.
+
+The owner may bypass a model cell only through a typed `ownerMatrixOverride`. The grant names its
+model, effort, rationale, and repo-relative `.llm/runs/**/worklog.md`; paid OpenCode dispatch reads
+that worklog and requires the exact human-readable override entry before allowance reservation.
+Evaluator session and vendor-family independence remain mandatory.
 
 ### `runtime/cli/provider-canary.ts` and `rollout-canary-cli.ts` — prove before you fan out
 

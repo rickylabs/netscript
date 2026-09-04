@@ -277,6 +277,7 @@ export function assertPrivilegedTierAuthorization(
 
 export const DELEGATION_ROLES = [
   'implementation',
+  'ui_ux',
   'plan',
   'plan_evaluation',
   'implementation_evaluation',
@@ -305,6 +306,44 @@ export interface ModelRoute {
   readonly effort: Effort | 'provider_default';
 }
 
+/** Owner-only escape hatch. The exact grant must also exist in the named harness worklog. */
+export interface OwnerMatrixOverride {
+  readonly authorizer: 'owner';
+  readonly rationale: string;
+  readonly worklogPath: string;
+  readonly route: ModelRoute;
+}
+
+export function ownerMatrixOverrideWorklogEntry(
+  tier: WorkloadTier,
+  role: DelegationRole,
+  override: OwnerMatrixOverride,
+): string {
+  assertOwnerMatrixOverride(tier, role, override);
+  return `- **Owner matrix override:** owner authorized \`${tier}/${role}\` → ` +
+    `\`${override.route.model}@${override.route.effort}\` because ${override.rationale}`;
+}
+
+export function assertOwnerMatrixOverride(
+  _tier: WorkloadTier,
+  _role: DelegationRole,
+  override: OwnerMatrixOverride,
+): void {
+  if (override.authorizer !== 'owner') throw new Error('matrix override requires owner authority');
+  if (!override.rationale.trim() || /[\r\n]/.test(override.rationale)) {
+    throw new Error('matrix override requires a single-line owner rationale');
+  }
+  const path = override.worklogPath.replaceAll('\\', '/');
+  const segments = path.split('/');
+  if (
+    path.startsWith('/') || segments[0] !== '.llm' || segments[1] !== 'runs' ||
+    segments.length < 4 || segments.at(-1) !== 'worklog.md' ||
+    segments.some((segment) => !segment || segment === '.' || segment === '..')
+  ) {
+    throw new Error('matrix override must cite a repo-relative .llm/runs/**/worklog.md');
+  }
+}
+
 export interface EvaluationPolicy {
   readonly maxRounds: number | 'none' | 'unspecified_by_owner';
   readonly notifyOwnerAfter?: number;
@@ -315,6 +354,7 @@ export interface EvaluationPolicy {
 
 export interface DelegationCell {
   readonly implementation: readonly ModelRoute[];
+  readonly ui_ux: readonly ModelRoute[];
   readonly plan: readonly ModelRoute[];
   readonly plan_evaluation: readonly ModelRoute[];
   readonly implementation_evaluation: readonly ModelRoute[];
@@ -337,6 +377,7 @@ const policy = (
 export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> = {
   simple: {
     implementation: [route('luna', 'max'), route('qwen_3_8_flash_next', 'provider_default')],
+    ui_ux: [route('kimi_k3', 'low'), route('minimax_m3', 'provider_default')],
     plan: [],
     plan_evaluation: [],
     implementation_evaluation: [
@@ -355,6 +396,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
   },
   straightforward: {
     implementation: [route('sol', 'medium'), route('glm_5_3_flash', 'provider_default')],
+    ui_ux: [route('kimi_k3', 'high'), route('gemini_3_8_flash', 'high')],
     plan: [route('sol', 'medium'), route('glm_5_3_flash', 'provider_default')],
     plan_evaluation: [
       route('opus_5', 'medium'),
@@ -379,6 +421,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
   },
   feature: {
     implementation: [route('astra', 'low'), route('muse_spark_1_3', 'xhigh')],
+    ui_ux: [route('kimi_k3', 'high'), route('gemini_3_8_flash', 'high')],
     plan: [route('fable_5_1', 'low'), route('muse_spark_1_3', 'xhigh')],
     plan_evaluation: [route('glm_5_3', 'provider_default'), route('fable_5_1', 'low')],
     implementation_evaluation: [
@@ -400,6 +443,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
   },
   complex: {
     implementation: [route('astra', 'medium'), route('fable_5_1', 'medium')],
+    ui_ux: [route('kimi_k3', 'max'), route('fable_5_1', 'medium')],
     plan: [route('fable_5_1', 'medium'), route('muse_spark_1_3', 'max')],
     plan_evaluation: [route('muse_spark_1_3', 'max'), route('grok_4_6', 'high')],
     implementation_evaluation: [
@@ -421,6 +465,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
   },
   architecture: {
     implementation: [route('astra', 'xhigh'), route('fable_5_1', 'xhigh')],
+    ui_ux: [route('kimi_k3', 'max'), route('fable_5_1', 'medium')],
     plan: [route('fable_5_1', 'xhigh'), route('muse_spark_1_3', 'max')],
     plan_evaluation: [route('muse_spark_1_3', 'max'), route('grok_4_6', 'xhigh')],
     implementation_evaluation: [
@@ -444,16 +489,21 @@ export function assertWorkloadModelAllowed(
   tier: WorkloadTier,
   role: DelegationRole,
   concreteModel: string,
+  override?: OwnerMatrixOverride,
 ): void {
-  const routes = DELEGATION_MATRIX[tier][role];
+  if (override) assertOwnerMatrixOverride(tier, role, override);
+  const routes = override ? [override.route] : DELEGATION_MATRIX[tier][role];
   const allowed = routes.some((route) =>
     MODEL_CATALOG[route.model].capabilities.some((capability) =>
-      capability.model === concreteModel &&
-      isTransportAllowedForRole(role, capability.transport, MODEL_CATALOG[route.model].family)
+      capability.model === concreteModel && (override !== undefined ||
+        isTransportAllowedForRole(role, capability.transport, MODEL_CATALOG[route.model].family))
     )
   );
   if (!allowed) {
-    throw new Error(`${concreteModel} is not declared for ${tier}/${role}`);
+    throw new Error(
+      `${concreteModel} is not declared for ${tier}/${role}` +
+        (override ? ' by the recorded owner override' : ''),
+    );
   }
 }
 
@@ -510,13 +560,15 @@ export function modelFamily(model: LogicalModelId): ModelVendorFamily {
 /** Selects the first evaluator that differs from the already-selected generator family. */
 export function selectEvaluator(
   tier: WorkloadTier,
-  phase: 'plan' | 'implementation',
+  phase: 'plan' | 'implementation' | 'vision',
   generator: LogicalModelId,
   authorization?: PrivilegedTierAuthorization,
 ): ModelRoute {
   assertPrivilegedTierAuthorization(tier, authorization);
   const candidates = phase === 'plan'
     ? DELEGATION_MATRIX[tier].plan_evaluation
+    : phase === 'vision'
+    ? DELEGATION_MATRIX[tier].vision_evaluation
     : DELEGATION_MATRIX[tier].implementation_evaluation;
   const selected = candidates.find((candidate) =>
     modelFamily(candidate.model) !== modelFamily(generator)
@@ -538,6 +590,13 @@ export function validateDelegationMatrix(): readonly string[] {
           modelFamily(candidate.model) !== modelFamily(generator.model)
         )
       ) errors.push(`${tier}/implementation/${generator.model}`);
+    }
+    for (const generator of cell.ui_ux) {
+      if (
+        !cell.vision_evaluation.some((candidate) =>
+          modelFamily(candidate.model) !== modelFamily(generator.model)
+        )
+      ) errors.push(`${tier}/ui_ux/${generator.model}`);
     }
     for (const generator of cell.plan) {
       if (

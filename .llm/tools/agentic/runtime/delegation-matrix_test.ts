@@ -27,6 +27,21 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     { model: 'luna', effort: 'max' },
     { model: 'qwen_3_8_flash_next', effort: 'provider_default' },
   ]);
+  assertEquals(DELEGATION_MATRIX.simple.ui_ux, [
+    { model: 'kimi_k3', effort: 'low' },
+    { model: 'minimax_m3', effort: 'provider_default' },
+  ]);
+  assertEquals(DELEGATION_MATRIX.straightforward.ui_ux, [
+    { model: 'kimi_k3', effort: 'high' },
+    { model: 'gemini_3_8_flash', effort: 'high' },
+  ]);
+  assertEquals(DELEGATION_MATRIX.feature.ui_ux, DELEGATION_MATRIX.straightforward.ui_ux);
+  for (const tier of ['complex', 'architecture'] as const) {
+    assertEquals(DELEGATION_MATRIX[tier].ui_ux, [
+      { model: 'kimi_k3', effort: 'max' },
+      { model: 'fable_5_1', effort: 'medium' },
+    ]);
+  }
   assertEquals(DELEGATION_MATRIX.simple.implementation_evaluation[1], {
     model: 'deepseek_v4_flash',
     effort: 'provider_default',
@@ -136,6 +151,20 @@ Deno.test('same-family primary evaluator is skipped in favor of the declared fal
     model: 'glm_5_3',
     effort: 'provider_default',
   });
+  assertEquals(
+    selectEvaluator('complex', 'vision', 'kimi_k3', {
+      authorizer: 'owner',
+      rationale: 'Heavy UI/UX review requested by the owner.',
+    }),
+    { model: 'gemini_3_8_flash', effort: 'high' },
+  );
+  assertEquals(
+    selectEvaluator('architecture', 'vision', 'kimi_k3', {
+      authorizer: 'owner',
+      rationale: 'Architecture-grade UI/UX review requested by the owner.',
+    }),
+    { model: 'fable_5_1', effort: 'high' },
+  );
 });
 
 Deno.test('complex and architecture rows require explicit owner or milestone authority', () => {

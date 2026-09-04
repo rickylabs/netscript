@@ -3,6 +3,7 @@ import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import { COPILOT_CATALOG_FIXTURE } from '../runtime/test-fixtures.ts';
 import { evaluateCopilotExpense } from '../runtime/subscription-expense.ts';
+import { ownerMatrixOverrideWorklogEntry } from '../runtime/delegation-matrix.ts';
 import {
   openCodeChildEnvironment,
   opencodeRunArguments,
@@ -103,7 +104,7 @@ Deno.test('absent Copilot catalog never reserves credits or spawns inference', a
         },
       ),
     Error,
-    'catalog model absent',
+    'catalog model or variant absent',
   );
 });
 
@@ -115,6 +116,24 @@ Deno.test('OpenCode argv keeps the message before every flag', () => {
       variant: 'max',
     }),
     ['run', 'inspect this design', '-m', 'caller/model', '--variant', 'max'],
+  );
+});
+
+Deno.test('Copilot Kimi forwards a catalog-attestable reasoning variant', () => {
+  assertEquals(
+    opencodeRunArguments({
+      message: 'implement heavy UI',
+      model: ROUTING_MODEL_IDS.kimiK3Copilot,
+      variant: 'max',
+    }),
+    [
+      'run',
+      'implement heavy UI',
+      '-m',
+      ROUTING_MODEL_IDS.kimiK3Copilot,
+      '--variant',
+      'max',
+    ],
   );
 });
 
@@ -253,6 +272,68 @@ Deno.test('paid OpenCode Go route accepts a fresh live allowance decision', asyn
     },
   );
   assertEquals(decision?.allowed, true);
+});
+
+Deno.test('owner matrix override requires the exact durable worklog grant before spend', async () => {
+  const ownerMatrixOverride = {
+    authorizer: 'owner' as const,
+    rationale: 'Owner requested Kimi for this bounded implementation.',
+    worklogPath: '.llm/runs/override-test/worklog.md',
+    route: { model: 'kimi_k3' as const, effort: 'high' as const },
+  };
+  const options = {
+    message: 'do work',
+    model: ROUTING_MODEL_IDS.kimiK3Copilot,
+    variant: 'provider_default',
+    cwd: '/work',
+    receiptPath: 'launch.jsonl',
+    workloadTier: 'straightforward' as const,
+    workloadRole: 'implementation' as const,
+    ownerMatrixOverride,
+  };
+  let reservations = 0;
+  const dependencies = {
+    now: () => '2026-09-04T16:00:00.000Z',
+    reserveCopilot: () => {
+      reservations++;
+      return Promise.resolve(evaluateCopilotExpense(
+        {
+          schemaVersion: 1 as const,
+          month: '2026-09',
+          updatedAt: '2026-09-04T16:00:00.000Z',
+          usedCredits: 0,
+        },
+        100,
+        '2026-09-04T16:00:00.000Z',
+      ));
+    },
+  };
+
+  await assertRejects(
+    () =>
+      preflightOpenCodeExpense(options, {
+        ...dependencies,
+        readTextFile: () => Promise.resolve('# Worklog\n'),
+      }),
+    Error,
+    'missing its exact harness worklog entry',
+  );
+  assertEquals(reservations, 0);
+
+  const decision = await preflightOpenCodeExpense(options, {
+    ...dependencies,
+    readTextFile: () =>
+      Promise.resolve(
+        '# Worklog\n\n' +
+          ownerMatrixOverrideWorklogEntry(
+            options.workloadTier,
+            options.workloadRole,
+            ownerMatrixOverride,
+          ) + '\n',
+      ),
+  });
+  assertEquals(decision?.allowed, true);
+  assertEquals(reservations, 1);
 });
 
 Deno.test('denied paid-route expense decision prevents OpenCode process spawn', async () => {

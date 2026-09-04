@@ -32,6 +32,7 @@ Deno.test('lane-policy workload table exactly matches the typed matrix', async (
     [
       'Tier',
       'Implementation',
+      'UI/UX',
       'Plan',
       'PLAN-EVAL',
       'IMPL-EVAL',
@@ -44,6 +45,7 @@ Deno.test('lane-policy workload table exactly matches the typed matrix', async (
       return [
         tier,
         routes(cell.implementation),
+        routes(cell.ui_ux),
         routes(cell.plan),
         routes(cell.plan_evaluation),
         routes(cell.implementation_evaluation),

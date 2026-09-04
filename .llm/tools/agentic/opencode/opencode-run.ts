@@ -19,14 +19,20 @@ import {
 } from '../runtime/subscription-expense.ts';
 import { fetchOpenCodeGoUsageSnapshot, reserveCopilotCredits } from '../runtime/provider-usage.ts';
 import {
+  assertOwnerMatrixOverride,
   assertPrivilegedTierAuthorization,
   assertWorkloadModelAllowed,
   DELEGATION_ROLES,
   type DelegationRole,
+  LOGICAL_MODEL_IDS,
+  type LogicalModelId,
+  type OwnerMatrixOverride,
+  ownerMatrixOverrideWorklogEntry,
   type PrivilegedTierAuthorization,
   WORKLOAD_TIERS,
   type WorkloadTier,
 } from '../runtime/delegation-matrix.ts';
+import { type Effort, EFFORTS } from '../runtime/contract.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';
 
@@ -46,6 +52,7 @@ export interface OpenCodeRunOptions {
   readonly workloadTier?: WorkloadTier;
   readonly workloadRole?: DelegationRole;
   readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
+  readonly ownerMatrixOverride?: OwnerMatrixOverride;
 }
 
 export interface OpenCodeRunResult {
@@ -94,15 +101,12 @@ async function repositoryIdentity(cwd: string): Promise<{ branch: string; head: 
  */
 export function opencodeRunArguments(options: OpenCodeRunOptions): string[] {
   const copilot = openCodeCredentialProviderForModel(options.model) === 'github_copilot';
-  if (copilot && options.variant !== 'provider_default') {
-    throw new Error('Copilot variant is unproven; use provider_default');
-  }
   return [
     'run',
     options.message,
     '-m',
     options.model,
-    ...(!copilot ? ['--variant', options.variant] : []),
+    ...(!copilot || options.variant !== 'provider_default' ? ['--variant', options.variant] : []),
     ...(options.session ? ['--session', options.session] : []),
     ...(options.files ?? []).flatMap((file) => ['-f', file]),
     ...(options.format === 'json' ? ['--format', 'json'] : []),
@@ -155,8 +159,33 @@ export async function preflightOpenCodeExpense(
   if (!options.workloadRole) {
     throw new Error(`paid ${provider} route requires --workload-role`);
   }
-  assertPrivilegedTierAuthorization(options.workloadTier, options.privilegedTierAuthorization);
-  assertWorkloadModelAllowed(options.workloadTier, options.workloadRole, options.model);
+  if (options.ownerMatrixOverride) {
+    assertOwnerMatrixOverride(
+      options.workloadTier,
+      options.workloadRole,
+      options.ownerMatrixOverride,
+    );
+    const cwd = resolve(options.cwd ?? Deno.cwd());
+    const worklog = await (dependencies.readTextFile ?? Deno.readTextFile)(
+      resolve(cwd, options.ownerMatrixOverride.worklogPath),
+    );
+    const expected = ownerMatrixOverrideWorklogEntry(
+      options.workloadTier,
+      options.workloadRole,
+      options.ownerMatrixOverride,
+    );
+    if (!worklog.includes(expected)) {
+      throw new Error('owner matrix override is missing its exact harness worklog entry');
+    }
+  } else {
+    assertPrivilegedTierAuthorization(options.workloadTier, options.privilegedTierAuthorization);
+  }
+  assertWorkloadModelAllowed(
+    options.workloadTier,
+    options.workloadRole,
+    options.model,
+    options.ownerMatrixOverride,
+  );
   if (provider === 'github_copilot') {
     if (options.usageSnapshotPath) {
       throw new Error('Copilot requires its operational ledger, not --usage-snapshot');
@@ -232,13 +261,16 @@ export async function runOpenCode(
   const attestation = copilot
     ? await preflightCopilotCatalog(options.model, {
       cwd,
+      variant: options.variant,
       env: processEnv,
       now: dependencies.now,
       listModels: dependencies.listModels,
     })
     : undefined;
-  if (attestation && !attestation.present) {
-    throw new Error('Copilot catalog model absent; mark github_copilot transport unavailable');
+  if (attestation && (!attestation.present || !attestation.variantPresent)) {
+    throw new Error(
+      'Copilot catalog model or variant absent; mark github_copilot transport unavailable',
+    );
   }
   const expense = await preflightOpenCodeExpense(options, dependencies);
   if (options.receiptPath) {
@@ -248,7 +280,7 @@ export async function runOpenCode(
         provider: 'github_copilot',
         transport: 'github_copilot',
         model: options.model,
-        effort: 'provider_default',
+        effort: options.variant,
       }, {
         provider: 'github_copilot',
         model: null,
@@ -269,6 +301,7 @@ export async function runOpenCode(
           cwd,
           ...gitIdentity,
           session: options.session ?? null,
+          ownerMatrixOverride: options.ownerMatrixOverride ?? null,
         }) + '\n',
         { append: true, mode: 0o600 },
       );
@@ -342,6 +375,10 @@ function parse(args: readonly string[]): CliOptions {
   let workloadRole: DelegationRole | undefined;
   let privilegedAuthorizer: PrivilegedTierAuthorization['authorizer'] | undefined;
   let privilegedRationale: string | undefined;
+  let overrideModel: LogicalModelId | undefined;
+  let overrideEffort: Effort | 'provider_default' | undefined;
+  let overrideRationale: string | undefined;
+  let overrideWorklog: string | undefined;
   const requiredMcp: string[] = [];
 
   for (let index = 0; index < args.length; index++) {
@@ -402,6 +439,22 @@ function parse(args: readonly string[]): CliOptions {
       privilegedAuthorizer = value;
     } else if (argument === '--privileged-rationale') {
       privilegedRationale = requiredValue(args, index++, argument);
+    } else if (argument === '--owner-override-model') {
+      const value = requiredValue(args, index++, argument);
+      if (!LOGICAL_MODEL_IDS.includes(value as LogicalModelId)) {
+        throw new Error('--owner-override-model must be a declared logical model');
+      }
+      overrideModel = value as LogicalModelId;
+    } else if (argument === '--owner-override-effort') {
+      const value = requiredValue(args, index++, argument);
+      if (value !== 'provider_default' && !EFFORTS.includes(value as Effort)) {
+        throw new Error('--owner-override-effort must be provider_default or a declared effort');
+      }
+      overrideEffort = value as Effort | 'provider_default';
+    } else if (argument === '--owner-override-rationale') {
+      overrideRationale = requiredValue(args, index++, argument);
+    } else if (argument === '--owner-override-worklog') {
+      overrideWorklog = requiredValue(args, index++, argument);
     } else if (!argument.startsWith('-') && !message) message = argument;
     else throw new Error(`Unknown or duplicate argument: ${argument}`);
   }
@@ -415,6 +468,8 @@ function parse(args: readonly string[]): CliOptions {
         '[--workload-tier <tier> --workload-role <role> ' +
         '--privileged-authorizer <authority> ' +
         '--privileged-rationale <text>] ' +
+        '[--owner-override-model <logical-model> --owner-override-effort <effort> ' +
+        '--owner-override-rationale <text> --owner-override-worklog <path>] ' +
         '[--format default|json] [--capture]',
     );
   }
@@ -422,6 +477,13 @@ function parse(args: readonly string[]): CliOptions {
     (privilegedAuthorizer && !privilegedRationale) || (!privilegedAuthorizer && privilegedRationale)
   ) {
     throw new Error('--privileged-authorizer and --privileged-rationale must be supplied together');
+  }
+  const overrideValues = [overrideModel, overrideEffort, overrideRationale, overrideWorklog];
+  if (
+    overrideValues.some((value) => value !== undefined) &&
+    overrideValues.some((value) => value === undefined)
+  ) {
+    throw new Error('all --owner-override-* arguments must be supplied together');
   }
   return {
     message,
@@ -444,6 +506,16 @@ function parse(args: readonly string[]): CliOptions {
         privilegedTierAuthorization: {
           authorizer: privilegedAuthorizer,
           rationale: privilegedRationale,
+        },
+      }
+      : {}),
+    ...(overrideModel && overrideEffort && overrideRationale && overrideWorklog
+      ? {
+        ownerMatrixOverride: {
+          authorizer: 'owner',
+          rationale: overrideRationale,
+          worklogPath: overrideWorklog,
+          route: { model: overrideModel, effort: overrideEffort },
         },
       }
       : {}),

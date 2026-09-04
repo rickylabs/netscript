@@ -9,6 +9,7 @@ import type {
   SessionIdentity,
 } from './contract.ts';
 import {
+  assertOwnerMatrixOverride,
   assertPrivilegedTierAuthorization,
   COORDINATOR_MATRIX,
   type CoordinatorTier,
@@ -22,6 +23,7 @@ import {
   modelFamily,
   type ModelRoute,
   type ModelTransport,
+  type OwnerMatrixOverride,
   type PrivilegedTierAuthorization,
   rejectLegacyLaneForNewSelection,
   WORKLOAD_TIERS,
@@ -87,6 +89,7 @@ export interface WorkloadRouteRequest extends RouteAvailability {
   readonly worktree: string;
   readonly mobileRequired?: boolean;
   readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
+  readonly ownerMatrixOverride?: OwnerMatrixOverride;
 }
 
 export interface CoordinatorRouteRequest extends RouteAvailability {
@@ -101,6 +104,7 @@ export interface ResolvedDelegationRoute extends RouteIdentity {
   readonly transport: ModelTransport;
   readonly requestedEffort: ModelRoute['effort'];
   readonly privilegedTierAuthorization?: PrivilegedTierAuthorization;
+  readonly ownerMatrixOverride?: OwnerMatrixOverride;
 }
 
 const TRANSPORT_AGENT: Readonly<Record<ModelTransport, AgentKind>> = {
@@ -184,22 +188,32 @@ function resolveRouteChain(
 
 /** Resolves a workload role without consulting the retired flat lane table. */
 export function resolveWorkloadRoute(request: WorkloadRouteRequest): ResolvedDelegationRoute {
-  assertPrivilegedTierAuthorization(request.tier, request.privilegedTierAuthorization);
+  if (request.ownerMatrixOverride) {
+    assertOwnerMatrixOverride(request.tier, request.role, request.ownerMatrixOverride);
+  } else {
+    assertPrivilegedTierAuthorization(request.tier, request.privilegedTierAuthorization);
+  }
   const cell = DELEGATION_MATRIX[request.tier];
-  const candidates = cell[request.role];
+  const candidates = request.ownerMatrixOverride
+    ? [request.ownerMatrixOverride.route]
+    : cell[request.role];
   if (candidates.length === 0) {
     throw new Error(`${request.tier}/${request.role} is not applicable`);
   }
   const evaluation = request.role === 'plan_evaluation' ||
-    request.role === 'implementation_evaluation';
+    request.role === 'implementation_evaluation' || request.role === 'vision_evaluation';
   if (evaluation && !request.generatorModel) {
     throw new Error(`${request.role} requires the selected generator model`);
   }
   return {
-    ...resolveRouteChain(candidates, { ...request, role: request.role }),
+    ...resolveRouteChain(candidates, {
+      ...request,
+      role: request.ownerMatrixOverride ? undefined : request.role,
+    }),
     ...(request.privilegedTierAuthorization
       ? { privilegedTierAuthorization: request.privilegedTierAuthorization }
       : {}),
+    ...(request.ownerMatrixOverride ? { ownerMatrixOverride: request.ownerMatrixOverride } : {}),
   };
 }
 
@@ -236,5 +250,6 @@ export {
   type LogicalModelId,
   MODEL_CATALOG,
   type ModelTransport,
+  type OwnerMatrixOverride,
   type WorkloadTier,
 };

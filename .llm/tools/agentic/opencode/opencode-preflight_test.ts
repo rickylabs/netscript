@@ -15,6 +15,8 @@ Deno.test('Copilot catalog exact attestation rejects absent and substring IDs', 
   assertEquals(attestCopilotCatalog(model, COPILOT_CATALOG_FIXTURE, now), {
     model,
     present: true,
+    variant: 'provider_default',
+    variantPresent: true,
     capturedAt: now,
   });
   const missing = attestCopilotCatalog(model, `${model}-other`, now);
@@ -29,6 +31,20 @@ Deno.test('Copilot catalog exact attestation rejects absent and substring IDs', 
     ],
   });
   assertEquals(route.model, ROUTING_MODEL_IDS.lunaNative);
+});
+
+Deno.test('Copilot catalog attests an exact model variant from verbose metadata', () => {
+  const model = ROUTING_MODEL_IDS.kimiK3Copilot;
+  const now = '2026-09-04T20:00:00Z';
+  const catalog = `${model}\n${JSON.stringify({ variants: { low: {}, high: {}, max: {} } })}`;
+  assertEquals(attestCopilotCatalog(model, catalog, now, 'max'), {
+    model,
+    present: true,
+    variant: 'max',
+    variantPresent: true,
+    capturedAt: now,
+  });
+  assertEquals(attestCopilotCatalog(model, catalog, now, 'xhigh').variantPresent, false);
 });
 
 Deno.test('Copilot catalog probe uses a non-inference command with isolated environment', async () => {

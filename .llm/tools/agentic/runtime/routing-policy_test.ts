@@ -35,6 +35,7 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
   const kimi = resolveWorkloadRoute({
     tier: 'complex',
     role: 'vision_evaluation',
+    generatorModel: 'astra',
     worktree,
     privilegedTierAuthorization,
   });
@@ -57,7 +58,7 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
 });
 
 Deno.test('canonical inspection policy is derived from all matrix cells', () => {
-  assertEquals(CANONICAL_ROUTE_POLICY.length, 66);
+  assertEquals(CANONICAL_ROUTE_POLICY.length, 76);
   assertEquals(
     CANONICAL_ROUTE_POLICY.filter((entry) =>
       entry.tier === 'architecture' && entry.role === 'implementation'
@@ -212,6 +213,83 @@ Deno.test('same-family evaluator candidates are skipped before provider selectio
   });
   assertEquals(plan.logicalModel, 'grok_4_6');
   assertEquals(plan.effort, 'high');
+});
+
+Deno.test('UI/UX routes use Kimi while vision evaluation skips the Kimi family', () => {
+  const implementation = resolveWorkloadRoute({
+    tier: 'complex',
+    role: 'ui_ux',
+    worktree,
+    privilegedTierAuthorization,
+  });
+  assertEquals(
+    [implementation.logicalModel, implementation.requestedEffort, implementation.transport],
+    ['kimi_k3', 'max', 'github_copilot'],
+  );
+
+  const evaluation = resolveWorkloadRoute({
+    tier: 'complex',
+    role: 'vision_evaluation',
+    generatorModel: implementation.logicalModel,
+    worktree,
+    privilegedTierAuthorization,
+  });
+  assertEquals(
+    [evaluation.logicalModel, evaluation.requestedEffort, evaluation.transport],
+    ['gemini_3_8_flash', 'high', 'agy'],
+  );
+});
+
+Deno.test('owner override bypasses a matrix cell but not evaluator-family independence', () => {
+  const ownerMatrixOverride = {
+    authorizer: 'owner' as const,
+    rationale: 'Owner selected Kimi for this bounded implementation.',
+    worklogPath: '.llm/runs/routing-test/worklog.md',
+    route: { model: 'kimi_k3' as const, effort: 'high' as const },
+  };
+  const route = resolveWorkloadRoute({
+    tier: 'straightforward',
+    role: 'implementation',
+    worktree,
+    ownerMatrixOverride,
+  });
+  assertEquals(route.logicalModel, 'kimi_k3');
+  assertEquals(route.ownerMatrixOverride, ownerMatrixOverride);
+
+  assertThrows(
+    () =>
+      resolveWorkloadRoute({
+        tier: 'feature',
+        role: 'implementation_evaluation',
+        generatorModel: 'astra',
+        worktree,
+        ownerMatrixOverride: {
+          ...ownerMatrixOverride,
+          route: { model: 'luna', effort: 'max' },
+        },
+      }),
+    Error,
+    'no available opposite openai route',
+  );
+});
+
+Deno.test('owner override requires a durable harness worklog path', () => {
+  assertThrows(
+    () =>
+      resolveWorkloadRoute({
+        tier: 'straightforward',
+        role: 'implementation',
+        worktree,
+        ownerMatrixOverride: {
+          authorizer: 'owner',
+          rationale: 'Unrecorded shortcut.',
+          worklogPath: '.llm/tmp/override.md',
+          route: { model: 'kimi_k3', effort: 'high' },
+        },
+      }),
+    Error,
+    'must cite a repo-relative .llm/runs/**/worklog.md',
+  );
 });
 
 Deno.test('complex rows fail closed without recorded privileged-tier authority', () => {
