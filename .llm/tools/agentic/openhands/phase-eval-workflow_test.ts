@@ -63,6 +63,10 @@ Deno.test('phase evaluator event matrix dispatches only deliberate transitions',
     'ignore',
   );
   assertEquals(
+    decision({ action: 'ready_for_review', labels: ['status:impl-eval', 'eval:model:glm'] }),
+    'ignore',
+  );
+  assertEquals(
     decision({ action: 'ready_for_review', labels: ['openhands'] }),
     'dispatch-impl',
   );

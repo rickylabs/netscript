@@ -158,10 +158,12 @@ skill holds no routing. The orchestrator's delegation judgement, beyond routing:
   stop; git activity is not that signal **[observed — #1120 learnings]**.
 - **Let phase automation own OpenHands [observed — #1120 learnings].** For PLAN-EVAL, add
   `openhands` and transition the draft PR to `status:plan-eval`. For IMPL-EVAL, choose at most one
-  `eval:model:*` override while draft, then make the PR ready once; automation enters
-  `status:impl-eval` and dispatches exactly once. Never also post `@openhands-agent` manually for
-  that head. A deliberate rerun moves away from and back to the relevant eval status. Local native
-  evaluator sessions remain available when the run explicitly selects the local transport.
+  `eval:model:*` override while draft, add `openhands`, then make the PR ready once; automation
+  enters `status:impl-eval` and dispatches exactly once. Never also post `@openhands-agent`
+  manually for that head. Readiness without `openhands` never spends. A deliberate rerun moves away
+  from and back to the relevant eval status while `openhands` remains present. OpenHands is an
+  explicit fallback for cloud lanes or machines without the full local CLI swarm; native evaluator
+  sessions remain the default when the local matrix can run them.
 
 ## Merge authority
 

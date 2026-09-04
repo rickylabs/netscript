@@ -35,10 +35,13 @@ and role through `workflow/lane-policy.md`; preserve separate generator/evaluato
 different vendor families, provider precedence, and paid-route expense proof.
 
 For an explicitly cloud-driven phase, repository automation owns dispatch: `openhands` plus
-`status:plan-eval` starts PLAN-EVAL; draft→ready starts IMPL-EVAL unless `impl-eval:skip` is
-present. Choose at most one supported `eval:model:*` override before transition and never duplicate
-the automatic trigger manually. OpenHands cannot attest reasoning effort, so record that limitation
-and never claim an observed effort it cannot prove.
+`status:plan-eval` starts PLAN-EVAL; `openhands` plus draft→ready starts IMPL-EVAL unless
+`impl-eval:skip` is present. Readiness without `openhands` is always zero-spend. This explicit
+fallback serves cloud-driven Claude/Copilot/Codex lanes and machines without the full local agent
+CLI swarm; it does not replace the native-first workload matrix. Choose at most one supported
+`eval:model:*` override before transition and never duplicate the automatic trigger manually.
+OpenHands cannot attest reasoning effort, so record that limitation and never claim an observed
+effort it cannot prove.
 
 ## Key Concepts
 
@@ -62,8 +65,9 @@ Use one of these from GitHub mobile, a local agent, or another cloud agent:
 
 - PLAN-EVAL: add `openhands`, optionally add one `eval:model:*` label, then enter `status:plan-eval`
   (either label may complete the pair).
-- IMPL-EVAL: optionally add one `eval:model:*` label while draft, then make the PR ready. Use
-  `impl-eval:skip` only for an owner-approved waiver.
+- IMPL-EVAL: add `openhands`, optionally add one `eval:model:*` label while draft, then make the PR
+  ready. Use `impl-eval:skip` only for an owner-approved waiver. A ready transition without
+  `openhands` does not dispatch.
 - Rerun PLAN by moving away from and back to `status:plan-eval` while `openhands` remains present;
   rerun IMPL by moving away from and back to `status:impl-eval`. Do not comment-trigger the same
   head while its automatic run is queued or active.

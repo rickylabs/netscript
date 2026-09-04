@@ -184,9 +184,11 @@ attach. `--dry-run` emits a deterministic simulated transcript and writes/sends 
 ## The everyday flow: evaluating with OpenHands
 
 Implementation is only half the loop. Cloud evaluation normally runs through the phase workflow:
-`openhands` + `status:plan-eval` for PLAN-EVAL, or draft→ready for IMPL-EVAL. Choose at most one
-one-shot `eval:model:*` override before the transition. Do not also post a manual trigger for the
-same phase/head.
+`openhands` + `status:plan-eval` for PLAN-EVAL, or `openhands` + draft→ready for IMPL-EVAL.
+Readiness without `openhands` does not dispatch or spend. Use this explicit fallback for
+cloud-driven Claude/Copilot/Codex lanes or machines without the full local CLI swarm; native-first
+matrix routing remains the default. Choose at most one one-shot `eval:model:*` override before the
+transition. Do not also post a manual trigger for the same phase/head.
 
 ### Dispatch — `openhands/dispatch-openhands.ts`
 
