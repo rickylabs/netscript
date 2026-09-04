@@ -77,3 +77,17 @@ selection and retains old IDs/lanes only at explicit persisted-state compatibili
 - **Action:** record as live substrate evidence for this run. The routing repair does not restart
   agents or turn the model-matrix PR into a general toolchain-upgrade change.
 - **Evidence:** owner message and PR #1989 live-substrate review comment.
+
+## 2026-09-04 — IMPL-EVAL provider fallback and account settings
+
+- **What:** Two Grok 4.6 xhigh turns through OpenCode Go stalled before producing a response. The
+  matrix-declared Muse fallback reached Go but reported that its contributor-training opt-in was
+  disabled. The same evaluator session then completed Grok 4.6 xhigh through OpenRouter and returned
+  `PASS` at `8740b16de`.
+- **Action:** treat Go/Grok as a bounded transport failure for this cycle; preserve logical model,
+  xAI family, xhigh effort, and evaluator session while moving to the next capable provider. No
+  implementation file changed during evaluation.
+- **Resolution:** the owner subsequently enabled both OpenCode provider settings, so training-enabled
+  and China-hosted model routes are now eligible. This is operational state, not committed policy.
+- **Evidence:** OpenCode session `ses_f93062116ffe1eRZWsVs5ukzqK`, `evaluate.md` cycle 2, and owner
+  confirmation with settings screenshot.

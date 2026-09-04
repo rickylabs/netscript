@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Current phase  | `impl-eval repair`                               |
+| Current phase  | `review / exact-head CI`                         |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
 
@@ -21,7 +21,10 @@ have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they
 Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go turn pass. Independent
 IMPL-EVAL cycle 1 in session `ses_f93062116ffe1eRZWsVs5ukzqK` returned a bounded `FAIL_FIX` at
 `9f8ee61a6`. The repair corrects native Claude and dated Ollama ids, proves an expense denial cannot
-spawn OpenCode, and updates the stale README resolver claim. Focused repair gates pass.
+spawn OpenCode, and updates the stale README resolver claim. IMPL-EVAL cycle 2 in the same session
+returned `PASS` at exact head `8740b16de` through the OpenRouter/Grok provider fallback. Both
+OpenCode provider settings are now enabled for subsequent contributor-training and China-hosted
+model routes.
 
 ## Accepted owner decisions
 
@@ -45,9 +48,9 @@ spawn OpenCode, and updates the stale README resolver claim. Focused repair gate
 
 ## Next Steps
 
-1. Commit and push the bounded IMPL-EVAL cycle-1 repair with the evaluator artifact.
-2. Post the missing S4/S5 phase comments and re-steer the same evaluator session for cycle 2.
-3. Promote the PR only after cycle-2 PASS, exact-head CI, and the review-thread gate.
+1. Commit and push the cycle-2 PASS plus final run ledger.
+2. Update the PR body/phase comment to the exact passing head.
+3. Keep the PR available for owner review while exact-head CI and review-thread gates settle.
 
 ## Files Changed
 
@@ -79,7 +82,7 @@ spawn OpenCode, and updates the stale README resolver claim. Focused repair gate
 | Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
-| IMPL-EVAL   | FAIL_FIX C1    | `evaluate.md`; bounded repair implemented, cycle 2 pending                   |
+| IMPL-EVAL   | PASS C2        | `evaluate.md`; all five cycle-1 findings closed at `8740b16de`               |
 
 ## Drift and Debt
 

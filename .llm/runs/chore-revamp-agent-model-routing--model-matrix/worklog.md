@@ -70,6 +70,8 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T15:25Z    | IMPL-EVAL | cycle 1        | Separate OpenCode Go / Grok 4.6 xhigh session `ses_f93062116ffe1eRZWsVs5ukzqK` returned `FAIL_FIX` at `9f8ee61a6` with five bounded findings.                         |
 | 2026-09-04T15:32Z    | repair    | implemented    | Corrected native Claude and dated Ollama dispatch ids, added the pre-spawn expense-denial seam/test, and replaced the stale README resolver claim.                         |
 | 2026-09-04T15:32Z    | reconcile | live review    | Reconciled owner live-substrate comments: Astra remains active as instructed; paid training remains eligible; external CLI/desktop toolchain is current.                  |
+| 2026-09-04T15:52Z    | IMPL-EVAL | cycle 2        | Same evaluator session passed via Grok 4.6 xhigh on the OpenRouter provider fallback after two Go transport stalls; all five findings independently closed.               |
+| 2026-09-04T15:53Z    | reconcile | provider state | Owner enabled both OpenCode provider settings, so contributor-training and China-hosted routes are eligible for subsequent dispatches.                                   |
 
 ## Gate Results
 
@@ -84,6 +86,7 @@ tests and documentation parity gate identify every required downstream update.
 | Repair format        | PASS      | structured formatter selected/processed 4 files, 0 findings                                                               |
 | Agentic repair check | PASS      | 185 files, 2 batches, 0 diagnostics                                                                                        |
 | Agentic repair tests | PASS      | 572 passed, 0 failed after cycle-1 repair                                                                                  |
+| IMPL-EVAL cycle 2    | PASS      | same session; exact head `8740b16de`; 185-file check, 43 focused tests, 4-file format, all five findings closed            |
 | S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                                                           |
 | S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                                                                 |
 | S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                                                                    |
