@@ -1,0 +1,2355 @@
+[0m[32mTask[0m [0m[36magentic:opencode[0m deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts '--message' 'Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING.' '--model' 'openrouter/tencent/hy4-preview' '--variant' 'max' '--cwd' '/home/agent/projects/netscript/wave7-design' '--require-mcp' 'netscript' '--require-mcp' 'aspire' '--receipt' '.netscript/agent/design-receipt.jsonl' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md'
+[0m
+> build · tencent/hy4-preview
+[0m
+[0m$ [0mpwd && rtk git status --short | head -40 && echo "---BRANCH---" && rtk git branch --show-current
+/home/agent/projects/netscript/worktrees/007-aspire
+/bin/bash: line 1: rtk: command not found
+---BRANCH---
+/bin/bash: line 1: rtk: command not found
+[0m
+[0m$ [0mls /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/
+AUDIT-HOWTO.md
+CONSTRUCTION-REFERENCE.md
+DESIGN-REFERENCES.md
+ENVIRONMENT.md
+PRODUCT-DEFINITION.md
+PUBLISHING.md
+audits
+auto-steer.sh
+beat-this.md
+brief.md
+continue.md
+coord-loop.sh
+design-brief.md
+design-critic-brief.md
+design-critique-1.md
+design-references
+design-steer-2-report.md
+design-steer-2.md
+evaluator
+keepalive.sh
+kickoff.md
+logs
+mcp-ask.ts
+publishing-contract.md
+quality-bar-eis-chat.md
+receipts
+steer-2.md
+steer-3.md
+steer-4.md
+steer-5.md
+steer-6.md
+steer-7.md
+steer-8.md
+steer-9.md
+steer-loop.sh
+steer-watch.sh
+supervisor.md
+watch.sh
+[0m
+I'll start by orienting myself in the worktree and checking prior state.
+[0m$ [0mgit status --short | head -60; echo "---BRANCH---"; git branch --show-current; echo "---LOG---"; git log --oneline -15
+?? .llm/runs/wave7-billing-run--0.0.7/
+---BRANCH---
+research/aspire-13.5-0.0.7
+---LOG---
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+2609e8b5b chore(aspire-13.5): #1975 IMPL-EVAL PASS recorded; manifest repair at 8e54ccfa1
+4bf5c75d0 chore(aspire-13.5): leaf-1881-fix GREEN 0650f6f7b on #1975; IMPL-EVAL dispatched
+4113c0863 chore(aspire-13.5): brief addendum (fail-closed install root) and corrected post-merge proof dispatch
+f5cbafe0b chore(aspire-13.5): Canary 9 exact red (README cmd 1 install collision); dispatch install-root isolation repair
+3c429dff0 chore(aspire-13.5): epic closure pre-flight; residuals R1 (parity phase-2 literals) and R2 (receipt path)
+ce7a1f7da chore(aspire-13.5): #1965 shipped at b6b9df966; preserve #1881 evaluator artefacts; Canary 9 admission watch
+5c9605020 chore(aspire-13.5): #1952 shipped (gate 2 complete); #1965 converged at 9cff705f5, D-335 close-gate decision
+0d8e80aa5 chore(aspire-13.5): #1952 exact-head packet at 1a759ea34
+dcc92acc9 chore(aspire-13.5): Canary 8 recorded; #1952 converged to 1a759ea34; #1965 open for #1881
+fe8d17e27 chore(aspire-13.5): #1952 convergence 1a759ea34 staged locally; push gated on Canary 8
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-report.md
+A prior report exists. Let me check it and the current repo state.
+[0m
+[0m$ [0mls -la /home/agent/projects/netscript/ 2>&1 | head -30
+total 58
+drwxr-xr-x 10 node node  11 Sep  4 11:18 .
+drwxr-xr-x  4 node node   4 Aug 30 07:07 ..
+drwx------  8 node node  10 Sep  4 12:28 .aspire
+drwxr-xr-x  3 node node   3 Sep  1 09:23 .config
+-rw-r--r--  1 node node 182 Aug 30 10:39 .mise.toml
+drwxr-xr-x  3 node node   3 Aug 30 07:07 handoff
+drwxr-xr-x 17 node node  36 Sep  3 02:21 repo
+drwxr-xr-x 22 node node  37 Sep  4 12:16 wave7-billing
+drwxr-xr-x 21 node node  40 Sep  4 12:35 wave7-design
+drwxr-xr-x  4 node node   4 Sep  3 22:11 wave7-preflight
+drwxr-xr-x 26 node node  26 Sep  3 21:58 worktrees
+[0m
+[0m$ [0mwhich rtk || ls /home/agent/.local/bin 2>/dev/null | head; echo "---"; deno --version 2>&1 | head -3
+agent-archiver
+agy
+agy.1788514940684021271.old
+claude
+claude-wrapper
+codex
+codex-daemon-up
+docker
+herdr
+mise
+---
+deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)
+v8 15.0.245.2-rusty
+typescript 6.0.3
+[0m
+The report says the work was already done — but in a *different* worktree (`wave7-design`, branch `design/ledgerline-ui`), while I'm in `worktrees/007-aspire` on `research/aspire-13.5-0.0.7`. Let me verify the actual state.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git branch --show-current && echo "---LOG---" && git log --oneline -8 && echo "---STATUS---" && git status --short | head -20
+design/ledgerline-ui
+---LOG---
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+24cccd5 Design: money + status contract layer, tested
+a110230 Frontend 1/8: Ledgerline token identity — paper/ink/ledger-green/rust ramps, money + status tokens, tabular numerals, green-tinted shadows, distinct dark theme (tokens.json is the source, tokens.css generated)
+4a4a54f Shared run-console stream schema — producer and browser island import one contract (client-safe module)
+8452f25 Frontend 3/8: delete the scaffold fiction — routes/dashboard.tsx, routes/examples/**, routes/api/**; product router surface (runs/invoices/customers)
+ae8fd78 Frontend 2/8: export Avatar, ChartBlock, CodeBlock, Donut, Dropzone from the ui barrel — the gallery now renders both charts
+290a0b9 Run record: steer-6 resume — framework defect ledger, live refund proofs, MCP/docs ledger
+44298da Migration: create plugin tables (sagas store, workers, triggers) — declared in schema but never migrated
+---STATUS---
+?? .llm/tmp/component-contract.md
+?? .netscript/agent/design-receipt.jsonl
+?? AUDIT-HOWTO.md
+?? CONSTRUCTION-REFERENCE.md
+?? DESIGN-REFERENCES.md
+?? design-critique-1.md
+?? design-references/
+?? mcp-ask.ts
+[0m
+[0m$ [0mls /home/agent/.local/bin/ /usr/local/bin/ 2>/dev/null | grep -i rtk; find / -name "rtk" -type f -maxdepth 6 2>/dev/null | head -5
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== COMMIT CONTENTS ===" && git show --stat 2da2189 | head -40
+=== COMMIT CONTENTS ===
+commit 2da2189c5b40c298aa0b9d7bf545e001b081ee60
+Author: wave7-agent <agent@rickylabs.dev>
+Date:   Fri Sep 4 12:36:14 2026 +0200
+
+    Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+    
+    Ranked items 1-6 of design-steer-2, in the order the critic ranked them.
+    
+    Buttons (1): every `3px 3px 0` offset shadow and its `translate(1px,1px)`
+    nudge is gone, along with the same fingerprint in toast.css and
+    desktop-update-prompt.css. Elevation is diffuse and token-driven; a new
+    `pill` variant gives the reference cards' hairline capsule action.
+    
+    New components (2, 3, 5, 6), each with its own stylesheet:
+      · DeltaChip      — tinted pill + directional glyph, rendered on the hero
+                         number's own baseline instead of in the card header.
+      · SemicircularGauge — 180° two-tone arc, `stroke-linecap="butt"` so the
+                         terminals are flat cuts flush with the baseline and the
+                         segment junction is a crisp radial cut.
+      · SegmentedControl  — the selected cell is a filled pill (C4), never a
+                         border change; buttons for local state, links for a range
+                         that lives in the URL.
+      · ComparisonAreaChart — hand-authored SVG, comparison period as a
+                         translucent layer under a stroked current series (H5),
+                         CSS-only crosshair + dark pointer bubble (H4).
+      · FooterColumns  — N equal columns divided by hairline rules (C5).
+      · WidgetCard     — the 5-band compound card; the header row is restored
+                         through the `class` seam, not a fork (T4).
+      · MoneyText      — the one renderer for an amount. Formats nothing itself:
+                         every digit comes from moneyParts(). `100` renders
+                         $100.00 and the currency is a prefix in its own element,
+                         never concatenated as `100.00USD`.
+    
+    Tokens (T1: json is the source, css generated, both edited together):
+    radius-3xl 24px for the containing card, shadow-ambient for its diffuse
+    elevation, tip-bg/tip-fg so a chart readout inverts against the card in both
+    themes, destructive-hover and control-thumb so no component touches a ramp
+    step. That last point is the fix for the dark-mode defect: the paper ramp
+    inverts, so `--ns-paper-12` is near-black in light and near-white in dark.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web 2>/dev/null && ls components/ui/ && echo "=== ASSETS/UI ===" && ls assets/ui/ && echo "=== ASSETS/BLOCKS ===" && ls assets/blocks/ 2>/dev/null
+alert.tsx
+avatar.tsx
+badge.tsx
+breadcrumb.tsx
+button.tsx
+card.tsx
+chart-block.tsx
+checkbox.tsx
+code-block.tsx
+comparison-area-chart.tsx
+control-props.ts
+data-table.tsx
+delta-chip.tsx
+desktop-dialog.tsx
+desktop-notification.tsx
+desktop-tray-menu.tsx
+desktop-update-prompt.tsx
+desktop-window-chrome.tsx
+detail-layout.tsx
+donut.tsx
+dropzone.tsx
+empty-state.tsx
+filter-form.tsx
+footer-columns.tsx
+form-field.tsx
+icon-button.tsx
+inline-notice.tsx
+input.tsx
+label.tsx
+mod.ts
+money-text.tsx
+page-header.tsx
+pagination.tsx
+panel.tsx
+progress.tsx
+responsive-table.tsx
+section-divider.tsx
+segmented-control.tsx
+select.tsx
+semicircular-gauge.tsx
+separator.tsx
+sidebar-shell.tsx
+skeleton.tsx
+spinner.tsx
+stats-grid.tsx
+switch.tsx
+textarea.tsx
+widget-card.tsx
+=== ASSETS/UI ===
+alert-styles.css
+alert.css
+avatar.css
+badge.css
+button.css
+card.css
+chart-block.css
+checkbox.css
+choice-styles.css
+code-block.css
+comparison-area-chart.css
+data-table.css
+delta-chip.css
+desktop-dialog.css
+desktop-notification.css
+desktop-tray-menu.css
+desktop-update-prompt.css
+desktop-window-chrome.css
+detail-layout.css
+donut.css
+dropzone.css
+empty-state.css
+filter-form.css
+floating.css
+footer-columns.css
+form-control-styles.css
+form-field.css
+inline-notice.css
+label.css
+money-text.css
+page-header.css
+pagination.css
+panel.css
+progress.css
+responsive-table.css
+section-divider.css
+segmented-control.css
+semicircular-gauge.css
+separator.css
+sheet.css
+skeleton.css
+spinner.css
+stats-grid.css
+surface-styles.css
+switch.css
+textarea.css
+theme-toggle.css
+toast.css
+=== ASSETS/BLOCKS ===
+widget-card.css
+[0m
+The report claims the work is already committed as `2da2189` in `wave7-design` (branch `design/ledgerline-ui`). I won't take that at face value — let me verify every claim against the actual files.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== OFFSET SHADOW FINGERPRINT (should be EMPTY) ===" && grep -rn -E "box-shadow:[^;]*[0-9]+px [0-9]+px 0" assets/ components/ || echo "CLEAN: no offset brutalist shadows"
+=== OFFSET SHADOW FINGERPRINT (should be EMPTY) ===
+CLEAN: no offset brutalist shadows
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== RAMP-STEP LEAKS in dark-inverting paper ramp ===" && grep -rn -- "--ns-paper-12\|--ns-paper-11" assets/ components/ | grep -v "tokens.css" || echo "CLEAN"
+=== RAMP-STEP LEAKS in dark-inverting paper ramp ===
+assets/tokens.json:108:      "cssVar": "--ns-paper-11",
+assets/tokens.json:118:      "cssVar": "--ns-paper-12",
+assets/tokens.json:426:      "value": "var(--ns-paper-12)",
+assets/tokens.json:471:      "value": "var(--ns-paper-12)",
+assets/tokens.json:534:      "value": "var(--ns-paper-12)",
+assets/tokens.json:597:      "value": "var(--ns-paper-12)",
+assets/tokens.json:633:      "value": "var(--ns-paper-12)",
+assets/tokens.json:669:      "value": "var(--ns-paper-12)",
+assets/tokens.json:984:      "value": "var(--ns-paper-12)",
+assets/tokens.json:1835:        "cssVar": "--ns-paper-11",
+assets/tokens.json:1845:        "cssVar": "--ns-paper-12",
+assets/tokens.json:1863:        "value": "var(--ns-paper-12)",
+assets/tokens.json:1908:        "value": "var(--ns-paper-12)",
+assets/tokens.json:2160:        "value": "var(--ns-paper-12)",
+assets/tokens.json:2340:        "value": "var(--ns-paper-12)",
+[0m
+All five components exist. Now let me verify the *substance*, not just filenames — starting with the fixes the critic ranked highest.
+[0m→ [0mRead apps/ledgerline-web/components/ui/semicircular-gauge.tsx
+[0m→ [0mRead apps/ledgerline-web/components/ui/delta-chip.tsx
+Offset shadows are gone and no component CSS touches the inverting paper ramp. Now let me verify the components actually match the critique's literal visual specs.
+[0m→ [0mRead apps/ledgerline-web/components/ui/money-text.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== SCAFFOLD STRINGS (should be GONE) ===" && grep -rn "api-gateway\|eu-west\|v2\.4\.1" routes/ components/ 2>/dev/null || echo "CLEAN: no scaffold fiction" ; echo "=== GALLERY REGISTRATION ===" && grep -n "DeltaChip\|SemicircularGauge\|SegmentedControl\|ComparisonAreaChart\|FooterColumns\|WidgetCard\|MoneyText" "routes/(design)/design/(_components)/components-view.tsx" | head -30
+=== SCAFFOLD STRINGS (should be GONE) ===
+routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:30:                    <Panel.Title>api-gateway</Panel.Title>
+routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:31:                    <Panel.Description>v2.4.1 promoted to production</Panel.Description>
+routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:88:            eu-west has headroom for two more canary services before autoscale raises the floor.
+=== GALLERY REGISTRATION ===
+10:  ComparisonAreaChart,
+12:  DeltaChip,
+21:  FooterColumns,
+27:  MoneyText,
+35:  SegmentedControl,
+37:  SemicircularGauge,
+44:  WidgetCard,
+208:    cell: (row) => <MoneyText value={row.total.replace(/[$,]/g, '')} currency='USD' size='sm' />,
+229:            <MoneyText value='1240500' currency='USD' size='hero' />
+230:            <DeltaChip value='+14.2%' direction='up' />
+233:            <MoneyText value='842000' currency='USD' />
+234:            <MoneyText value='-12400' currency='USD' signed tone='direction' />
+235:            <MoneyText value='0' currency='USD' />
+236:            <MoneyText value={null} currency='USD' />
+239:            <MoneyText value='0.0015' currency='USD' size='sm' />
+240:            <MoneyText value='1240500' currency='USD' compact size='sm' />
+241:            <MoneyText value='2400000' currency='USD' compact size='sm' />
+253:            <DeltaChip value='+2.1%' direction='up' />
+254:            <DeltaChip value='-1.2%' direction='down' />
+255:            <DeltaChip value='0.0%' direction='flat' />
+256:            <DeltaChip value='+2.1%' direction='up' glyph='none' />
+257:            <DeltaChip direction='absent' value='' />
+260:            <DeltaChip value='+14.2%' direction='up' note='vs prior run' />
+261:            <DeltaChip value='-$1,204.00' direction='down' note='refunded this period' />
+262:            <DeltaChip direction='absent' value='' note='no prior period' />
+269:          <SegmentedControl
+279:          <SegmentedControl
+290:          <SegmentedControl
+304:          <WidgetCard class='ns-gallery-widget'>
+305:            <WidgetCard.Header>
+[0m
+Gauge and DeltaChip match the critique's literal specs (viewBox 200×110, r=80, stroke 18, `linecap="butt"`, flat baseline; pill chip with optional glyph). Now the money fix and gallery.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing && git branch --show-current && echo "---STATUS (uncommitted work?)---" && git status --short | head -30 && echo "---LOG---" && git log --oneline -3
+master
+---STATUS (uncommitted work?)---
+ M .netscript/agent/opencode-receipt.jsonl
+ M apps/ledgerline-web/routes/customers/[id].tsx
+ M apps/ledgerline-web/routes/customers/index.tsx
+ M apps/ledgerline-web/routes/invoices/[id].tsx
+ M apps/ledgerline-web/routes/invoices/index.tsx
+ M aspire/.helpers/register-background.mts
+---LOG---
+7738093 chore: remove web-agent probe scratch from .llm/tmp/web-probe (swept into a shared commit by accident)
+7a7dae1 Web 4 (nit): drop the dangling ns-status-badge class — the chip hooks .ns-badge[data-status] only, zero ns-*-undefined classes
+806a6bc Web 4: scaffold fiction deleted, truthful home, ledgerline identity in _app, minor skin debt
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== exception-badge in DESIGN tree? ===" && grep -rn -- "--ns-rust-6" assets/ components/ 2>/dev/null || echo "CLEAN in design tree"; echo "=== rust-6 usages anywhere ==="; grep -rln -- "--ns-rust-6" . 2>/dev/null | head
+=== exception-badge in DESIGN tree? ===
+assets/tokens.json:218:      "cssVar": "--ns-rust-6",
+assets/tokens.json:804:      "value": "var(--ns-rust-6)",
+assets/tokens.json:849:      "value": "var(--ns-rust-6)",
+assets/tokens.json:930:      "value": "var(--ns-rust-6)",
+assets/tokens.css:30:  --ns-rust-6: oklch(54.5% 0.145 38);
+assets/tokens.css:101:  --ns-money-neg: var(--ns-rust-6);
+assets/tokens.css:107:  --ns-status-failed: var(--ns-rust-6);
+assets/tokens.css:120:  --ns-series-4: var(--ns-rust-6);
+=== rust-6 usages anywhere ===
+./_fresh/server/tokens.mjs
+./_fresh/client/assets/client-entry-Do92ktIu.css
+./assets/tokens.json
+./assets/tokens.css
+[0m
+MoneyText is correct (uses `moneyParts`, currency as a separate prefix element, no float conversion). But I found a residual gap — let me confirm and check the billing tree.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing/apps/ledgerline-web && echo "=== BILLING money-text.tsx: float conversion present? ===" && grep -n "Number(\|Intl.NumberFormat\|minimumFractionDigits\|maximumFractionDigits\|money-pos\|money-neg" components/product/money-text.tsx 2>/dev/null | head -20
+=== BILLING money-text.tsx: float conversion present? ===
+5: * @description The money correctness component: tabular numerals, money-pos/neg/flat color, em dash on absence.
+23:  const parsed = Number(text);
+26:  return new Intl.NumberFormat('en-US', {
+27:    minimumFractionDigits: Math.min(decimals, 6),
+28:    maximumFractionDigits: Math.min(Math.max(decimals, 2), 6),
+48:  const amount = Number(value);
+[0m
+Billing tree is on `master` with live uncommitted work (another agent's). Let me confirm the handoff defects are still unfixed there.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing/apps/ledgerline-web && echo "=== rust-6 in exception-badge ===" && grep -n -- "--ns-rust-6" assets/ui/exception-badge.css components/product/exception-badge.tsx 2>/dev/null | head; echo "=== offset brutalist shadows ===" && grep -rn -E "box-shadow:[^;]*[0-9]+px [0-9]+px 0" assets/ components/ | head; echo "=== paper-12 in component css ===" && grep -rn -- "--ns-paper-12" assets/ui/ components/ | head
+=== rust-6 in exception-badge ===
+assets/ui/exception-badge.css:7:  color: var(--ns-rust-6);
+assets/ui/exception-badge.css:8:  background: color-mix(in srgb, var(--ns-rust-6) 10%, transparent);
+assets/ui/exception-badge.css:9:  border: 1px solid color-mix(in srgb, var(--ns-rust-6) 24%, transparent);
+=== offset brutalist shadows ===
+assets/ui/desktop-update-prompt.css:62:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:54:  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:60:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:65:  box-shadow: 1px 1px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:73:  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
+assets/ui/button.css:80:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
+assets/ui/button.css:85:  box-shadow: 1px 1px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
+assets/ui/button.css:104:  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ns-border-hover) 35%, transparent);
+assets/ui/button.css:111:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-border-hover) 35%, transparent);
+assets/ui/button.css:116:  box-shadow: 1px 1px 0 color-mix(in srgb, var(--ns-border-hover) 35%, transparent);
+=== paper-12 in component css ===
+assets/ui/sheet.css:14:    -8px 0 30px color-mix(in srgb, var(--ns-paper-12) 35%, transparent),
+assets/ui/sheet.css:15:    0 0 0 1px color-mix(in srgb, var(--ns-paper-12) 10%, transparent);
+assets/ui/desktop-update-prompt.css:62:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:54:  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:60:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:65:  box-shadow: 1px 1px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-paper-12));
+assets/ui/button.css:124:  box-shadow: 3px 3px 0 color-mix(in srgb, var(--ns-destructive) 60%, var(--ns-paper-12));
+assets/ui/button.css:130:  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-destructive) 60%, var(--ns-paper-12));
+assets/ui/button.css:135:  box-shadow: 1px 1px 0 color-mix(in srgb, var(--ns-destructive) 60%, var(--ns-paper-12));
+assets/ui/switch.css:27:  background: var(--ns-paper-12);
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7 && echo "=== ENVIRONMENT.md ===" && head -40 ENVIRONMENT.md 2>/dev/null; echo; echo "=== brief.md (head) ===" && head -30 brief.md 2>/dev/null
+=== ENVIRONMENT.md ===
+# Environment facts you cannot discover from inside, and the design guidance
+
+## 1. Docker is a remote daemon. This is why your ports are unreachable.
+
+`DOCKER_HOST=tcp://netscript-dind:2375`. Containers do **not** run in your container — they run
+inside a separate Docker-in-Docker host. Aspire publishes container ports bound to `127.0.0.1`
+**inside that dind host**, so:
+
+- `localhost:<port>` from your shell reaches nothing.
+- The container bridge IPs (`172.18.0.x`) are inside dind and are not routable from here.
+- `netscript-dind:<published port>` is also closed, because the binding is `127.0.0.1`, not
+  `0.0.0.0`.
+
+This is an environment topology fact, not a NetScript or Aspire defect. **Do not record it as a
+framework defect**, and do not spend more time probing it.
+
+**Proven workaround** (verified by the supervisor before being handed to you): run a forwarder
+inside the dind host on its host network, then reach it by hostname.
+
+```bash
+# publish 127.0.0.1:<dind-port> out onto the dind host's interfaces as <new-port>
+docker run -d --name fwd-pg --network host alpine/socat \
+  TCP-LISTEN:<new-port>,fork,reuseaddr TCP:127.0.0.1:<dind-port>
+# then connect from your container to netscript-dind:<new-port>
+```
+
+Verified working: a forwarder for the Postgres container made `netscript-dind:39379` reachable when
+`localhost:29379` and the bridge IP both failed. Use a distinct `<new-port>` per service, name every
+forwarder you create, and remove the ones you created when you are done. Point your app's connection
+string at `netscript-dind:<new-port>`.
+
+If a service only needs to be reached by *other containers*, it does not need a forwarder at all —
+containers reach each other over the dind bridge normally.
+
+## 2. Design guidance — build it the way a design team would
+
+Two practices worth adopting wholesale, adapted from how Vercel teaches its agents product design.
+
+### Write a `DESIGN.md` in your repository, and build against it
+
+
+=== brief.md (head) ===
+# Build the billing run — NetScript 0.0.7 stable
+
+You are building a real product with **NetScript**, then writing about what building it taught you,
+under your own name, in your own voice. You are the sole author of both. Nobody will fix your work
+and credit you for it.
+
+This is not a demo and not a game. Aim at something that could be shipped as a real product.
+
+---
+
+## 0. Version gate — do this first, and record it
+
+NetScript **0.0.7 stable** was published **today**. That matters mechanically:
+
+```bash
+deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@0.0.7
+```
+
+The `--minimum-dependency-age=0` flag is **required**, not decorative — Deno refuses dependencies
+published in the last 24 hours by default. The generated workspace handles its own packages via
+`minimumDependencyAge.exclude`, so you should not need the flag again inside the project. If you hit
+an age error anywhere else (a `deno x` child process is the known risk), **record it as a finding**.
+
+Read the complete Quickstart first: <https://rickylabs.github.io/netscript/quickstart/>
+Reading it is Step 0. Do not skim it or plan while sections remain unread.
+
+Record the requested version, the specifier actually used, and the resolved NetScript package graph.
+They must agree. Every `@netscript/*` must resolve at `0.0.7`.
+
+Two known environment notes, already observed: the generated `package.json` pins `engines.deno`
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7 && echo "=== continue.md ===" && head -50 continue.md 2>/dev/null
+=== continue.md ===
+Product owner. Pace check — you are 12 hours in and there is still no product screen pushed.
+
+DONE and verified by me: token identity (paper/ledger/ink/brass, +191/-182 css, +1347/-894 json),
+chart exports, scaffold routes deleted. Good — that is items 1-3 of steer #6.
+
+**The next push must contain a working screen.** Not scaffolding for one, a screen. Priority order,
+and push after EACH:
+
+1. `/runs` — the run console. `.withResource` + `.withLayer({loader, fallback, staleTime, partial})`
+   reading `runsQueries`, a thin `QueryIsland` boundary, inner `useLiveQuery` over your durable
+   stream. Two tabs, same run advancing, no reload.
+2. `/invoices` + `/invoices/[id]` — `paginationSearchSchema` typed search, `DataGrid` imported from
+   `@netscript/fresh-ui`.
+3. `/customers` + detail, `/webhooks` with the delivery log.
+
+Every screen ships its reachable states in the same push: draft, issued, paid, part-paid, failed,
+retrying, refunded, partially refunded, voided, in-flight, empty, loading, permission-denied.
+Absence is an em dash, never a zero.
+
+Parallelise — fan out sub-agents across screens and keep backend seams advancing at the same time.
+Do not serialise on my steers. Ask the MCP before hand-rolling. Push after each screen so I can see
+real state, and in your final message report DONE vs REMAINING against this list.
+[0m
+Confirmed: the entire cross-worktree handoff is still unfixed. Let me check the run's scoping docs to see which trees this run owns before editing anything.
+[0m$ [0mcd /home/agent/projects/netscript/repo && git worktree list 2>/dev/null; echo "=== remotes ==="; for d in /home/agent/projects/netscript/wave7-billing /home/agent/projects/netscript/wave7-design /home/agent/projects/netscript/worktrees/007-aspire; do echo -n "$d: "; git -C $d remote get-url origin 2>/dev/null; done
+/home/agent/projects/netscript/repo                                      08f581e83 [main]
+/home/agent/projects/netscript/worktrees/007-aspire                      cf528cbd3 [research/aspire-13.5-0.0.7]
+/home/agent/projects/netscript/worktrees/007-canary10-cleanup-proof      e677ac3c8 [test/readme-canary10-cleanup-proof]
+/home/agent/projects/netscript/worktrees/007-conv-1756                   b607bfe26 [salvage/1756-current-base]
+/home/agent/projects/netscript/worktrees/007-conv-1808                   78be0e032 [verify-1777]
+/home/agent/projects/netscript/worktrees/007-docs                        55d435394 [orchestrator/release-0.0.7-docs]
+/home/agent/projects/netscript/worktrees/007-features                    043e53c22 [orchestrator/release-0.0.7-features]
+/home/agent/projects/netscript/worktrees/007-final-harness-integration   2158b8611 [chore/final-0.0.7-harness-integration]
+/home/agent/projects/netscript/worktrees/007-fixes                       d274246fc [orchestrator/release-0.0.7-fixes]
+/home/agent/projects/netscript/worktrees/007-hotfix-phase-b-sol          d64682bb0 [fix/canary6-phase-b-follow-observer-sol]
+/home/agent/projects/netscript/worktrees/007-internals                   fabdae4f7 [orchestrator/release-0.0.7-internals]
+/home/agent/projects/netscript/worktrees/007-leaf-1349-audit             49d076c02 [chore/sdk-client-1349-acceptance-audit]
+/home/agent/projects/netscript/worktrees/007-leaf-1857                   b66e52cbc [verify-merged]
+/home/agent/projects/netscript/worktrees/007-leaf-1870                   7b5a31a80 [fix/readiness-fixture-cache-discovery]
+/home/agent/projects/netscript/worktrees/007-leaf-1877                   bb5fd4ad3 [fix/workers-runtime-ready-markers]
+/home/agent/projects/netscript/worktrees/007-leaf-1898                   438ed4f60 [fix/readiness-fixture-app-identifier-collision]
+/home/agent/projects/netscript/worktrees/007-leaf-adoptA                 dd80f5554 [verify]
+/home/agent/projects/netscript/worktrees/007-leaf-sdk-contrib            76beee792 [feat/sdk-client-contributions-plan]
+/home/agent/projects/netscript/worktrees/007-primary                     36c76edb5 [chore/release-0.0.7-orchestration]
+/home/agent/projects/netscript/worktrees/007-repair-1970-handler-freeze  ad5a74e76 [repair/pr1970-handler-freeze]
+/home/agent/projects/netscript/worktrees/007-s7-reexpress                6f4da15b6 [fix/aspire-s7-reexpress]
+/home/agent/projects/netscript/worktrees/007-s8-repair                   f855d2428 [fix/aspire-s8-workers-post-migration]
+/home/agent/projects/netscript/worktrees/007-s9-auth-audit               6d2148996 [fix/aspire-s9-authenticated-telemetry-coauthor]
+/home/agent/projects/netscript/worktrees/007-salvage                     729f45248 [chore/preserve-orphaned-run-artifacts]
+/home/agent/projects/netscript/worktrees/007-stable-fixture-repair       6884b7548 [fix/cli-prepublish-test-fixture]
+=== remotes ===
+/home/agent/projects/netscript/wave7-billing: https://github.com/rickylabs/ledgerline.git
+/home/agent/projects/netscript/wave7-design: https://github.com/rickylabs/ledgerline.git
+/home/agent/projects/netscript/worktrees/007-aspire: https://github.com/rickylabs/netscript.git
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing && git log --oneline -1 && echo "=== is design branch present here? ===" && git branch -a | grep -i "design\|ledgerline" | head; echo "=== does billing tree have the 5 components? ===" && ls apps/ledgerline-web/components/ui/ | grep -E "delta-chip|semicircular|segmented|comparison-area|footer-columns|widget-card|money-text"
+521d4b5 Wire NETSCRIPT_SAGA_STORE=prisma into the sagas runner — KV store drops transitions under contention (database is locked); RECORD gap 7
+=== is design branch present here? ===
++ design/ledgerline-ui
+=== does billing tree have the 5 components? ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing && echo "=== mtimes of modified files (now: $(date)) ===" && ls -la --time-style=full-iso apps/ledgerline-web/routes/customers/\[id\].tsx apps/ledgerline-web/routes/invoices/\[id\].tsx aspire/.helpers/register-background.mts 2>/dev/null; echo "=== recent git activity / reflog ==="; git reflog -5 --date=relative 2>/dev/null
+=== mtimes of modified files (now: Fri Sep  4 12:40:04 CEST 2026) ===
+-rw-r--r-- 1 node node  3875 2026-09-04 12:30:52.129036108 +0200 apps/ledgerline-web/routes/customers/[id].tsx
+-rw-r--r-- 1 node node  2624 2026-09-04 12:30:52.129036108 +0200 apps/ledgerline-web/routes/invoices/[id].tsx
+-rw-r--r-- 1 node node 14645 2026-09-04 12:39:39.115533681 +0200 aspire/.helpers/register-background.mts
+=== recent git activity / reflog ===
+c896ea4 HEAD@{17 seconds ago}: commit: Live drive: effector path proved end to end (8 issued / 3 declined / counters correct); KV saga store lock recorded as defect — prisma backend selection not honoured by runner
+2f0dc3f HEAD@{19 seconds ago}: commit: Sagas store: NETSCRIPT_SAGA_STORE=prisma via appsettings env (generator maps it); regen aspire
+521d4b5 HEAD@{43 seconds ago}: commit: Wire NETSCRIPT_SAGA_STORE=prisma into the sagas runner — KV store drops transitions under contention (database is locked); RECORD gap 7
+7738093 HEAD@{7 minutes ago}: commit: chore: remove web-agent probe scratch from .llm/tmp/web-probe (swept into a shared commit by accident)
+7a7dae1 HEAD@{8 minutes ago}: commit: Web 4 (nit): drop the dangling ns-status-badge class — the chip hooks .ns-badge[data-status] only, zero ns-*-undefined classes
+[0m
+[0m$ [0mps aux 2>/dev/null | grep -iE "opencode|claude|codex|deno task|coord-loop|steer-loop|watch" | grep -v grep | head -20; echo "=== recent file mtimes in billing tree ==="; find /home/agent/projects/netscript/wave7-billing -newermt "-30 minutes" -type f -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null | head -20
+node         659  0.0  0.0   3940  2128 pts/1    Ss+  Sep03   0:00 bash -c while true; do claude remote-control --spawn=same-dir --permission-mode bypassPermissions; sleep 10; done
+node         661  0.5  0.1 5560180 148676 pts/1  Sl+  Sep03   9:23 claude remote-control --spawn=same-dir --permission-mode bypassPermissions
+node         702  0.3  0.2 747148 270320 ?       Ssl  Sep03   6:17 /home/agent/.codex/packages/standalone/current/codex app-server --remote-control --listen unix://
+node         726  0.0  0.0 550136 28964 ?        Ssl  Sep03   0:07 /home/agent/.codex/packages/standalone/current/codex app-server daemon pid-update-loop
+node         782  1.1  0.2 5615468 210440 pts/1  Sl+  Sep03  19:05 /home/agent/.local/share/claude/versions/2.1.259 --print --sdk-url https://api.anthropic.com/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj --session-id cse_01WSh13irWVfvT6VRZxQzeLj --input-format stream-json --output-format stream-json --replay-user-messages --resume=https://api.anthropic.com/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj --permission-mode bypassPermissions --model claude-opus-5[1m]
+node         928  0.0  0.0   3940  2092 pts/4    Ss+  Sep03   0:00 bash -c /home/agent/.local/bin/codex-daemon-up 2>&1 | tee -a /home/agent/observability/codex-daemon.log
+node         930  0.0  0.0   3940  2172 pts/4    S+   Sep03   0:00 /bin/bash /home/agent/.local/bin/codex-daemon-up
+node         931  0.0  0.0   2504   992 pts/4    S+   Sep03   0:00 tee -a /home/agent/observability/codex-daemon.log
+node        1913  0.0  0.0 1448949824 19308 ?    Sl   Sep03   0:06 /home/agent/.codex/packages/standalone/releases/0.153.0-x86_64-unknown-linux-musl/bin/codex-code-mode-host
+node        8729  1.0  0.3 5616288 341756 pts/6  Ssl+ Sep03  17:06 claude --resume 8a722f0a-74b2-4f82-b822-88be00fc9eae --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-features use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Only remaining owned issue #1354 via PR #1958. Coordinator already resumed exact Codex thread 01a06424-38fe-7893-ba59-6064b0dd616e at 007-leaf-1354-g; do not duplicate that writer. Latest head 5c7c105b84b788f4bc17e97d06289c0dd5babe05. Both hosted tiers 33719217078 fail behavior.app-reference loading preview state. Supervise that bounded diagnosis/repair and exact gates, then hand off to coordinator for merge.
+node        8792  1.0  0.3 5615716 320592 pts/7  Ssl+ Sep03  16:42 claude --resume 6b1bf71b-f57e-4f03-9b05-34cc62cadd3c --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-fixes use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Coordinator already resumed #1970 thread 01a06201-d0b9-7cb1-afe6-8b071ca28012 in 007-leaf-1970 and #1945 thread 01a06322-7bb5-7d80-badf-3068fb4942eb in 007-leaf-1481. Do not send duplicate starts. #1970 must integrate prepared ad5a74e764c6ed85d7b7d165ce62c9bed7d70d32 handler-freeze repair and main. #1945 must integrate #1956 current main and repair observed exact runtime red. Independently audit #1844 post-fix soak evidence: owner did not authorize dropping acceptance; propose evidence-backed closure or one bounded missing observation, not an invented host blocker. #1971 acceptance follows #1945. #1974/#1978/#1979 already merged.
+node        8855  0.9  0.3 5615716 306880 pts/8  Ssl+ Sep03  15:30 claude --resume 98833bca-9714-4f63-8230-2e3929f6b103 --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-internals use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Internals owns zero open implementation issues. Perform one bounded read-only audit of surviving exact CI/structured-output recovery needs, report actionable findings to owning lanes. Do not create work, merge, or launch polling/report-only loops. Coordinator is repairing transport and central recovery checkpoint; do not write central ledger.
+node        8918  0.9  0.3 5616232 310884 pts/9  Ssl+ Sep03  15:46 claude --resume 1e88fa17-749f-4294-9ee8-07ab1fa5555e --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-docs use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Docs owns zero remaining milestone issues. One bounded read-only release-note audit: current main vs Canary9, verify user-facing #1664 and #1956 plus #1960 are accurately represented. Send exact omissions to coordinator, no unrelated code/PR work, no polling loops.
+node        8981  1.9  0.6 6665800 653340 pts/10 Ssl+ Sep03  31:23 claude --resume baff9670-5104-412c-9041-01307926d4cc --model claude-fable-5-1 --effort medium --permission-mode bypassPermissions --remote-control netscript-007-aspire use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Aspire S1-S13 implementation is merged. Remaining #1881/#863/#1712 depend on honest published README/scaffold acceptance. Canary9 exists, no Canary10 yet. #1975 and #1980 merged; #1981 at bdb5de2bd fixes service-health ordering/curl timeout and has scoped independent PASS+check-test PASS, but quality fails only manifest:freshness. Coordinator owns that bounded manifest regeneration now; do not duplicate writer or launch another evaluator. Prepare version-coherent published acceptance packet after it lands; current-runner --client users is newer than immutable Canary9, do not misattribute that skew to package defect. No runtime lease; await explicit release writer dispatch; independently audit remaining epic acceptance using merged SHAs.
+node      381104  0.0  0.0 581156 20428 ?        Ssl  Sep03   0:04 codex app-server proxy
+node     1209460 11.2  0.6 75543324 611540 ?     Sl   10:24  15:19 /home/agent/.opencode/bin/opencode run Product owner steer #6. **STOP ALL BACKEND WORK. Frontend only until it ships.**  Eleven hours in. The backend is genuinely strong ??? sagas, transactions, auth enforcement, contract derivation, the prefix fix. The frontend does not exist. Measured against your tree right now:  | | | | --- | --- | | `tokens.css` diff vs scaffold | **0 lines** | | `tokens.json` diff vs scaffold | **0 lines** | | Product routes | **0** ??? `routes/` is entirely scaffold, untouched for 11 hours | | Product islands | **0** | | Charts exported from `components/ui/mod.ts` | **0 of 5 already on disk** | | `(design)/???/registry.ts` diff | **0 lines** |  `routes/` still contains `dashboard.tsx` shipping the scaffold's fake `api-gateway / 184ms` row, plus `examples/` and an `api/` folder. That is what a reviewer opens first.  **This is exactly how all three prior builds of this assignment failed** ??? deep backend, default frontend ??? and it is the single thing that decides whether this reads as a product or a demo. A tenth backend refinement is worth nothing next to one real screen.  ## The bar, restated as numbers  `rickylabs/eis-chat` is the standard and it is not aspirational, it is measured: **156 design tokens** in its own token source, **35 dark-mode semantic overrides**, a `/design` sub-app of **1,694 lines**, **50 UI primitives**, **19 raw hex values across 16,734 lines of CSS**. Its token source *is* the design ??? brand-derived ramps, green-tinted shadows, tokenised layout.  `CONSTRUCTION-REFERENCE.md` (attached, read it first) has the full vertical slice of a real screen: route module under ~70 lines, layers split by cost profile, the `{Settled, Fallback, Failed}` region triple, cache-only page loaders with authoritative partials, two-tier invalidation, small islands fed by props, and hand-authored SVG charts over tokens.  ## Do these, in this order, and commit after each  1. **Rewrite the token source.** Both `assets/tokens.css` **and** `assets/tokens.json` ??? they must    diverge, ???40 entries, provable by `git diff`. Ledgerline is a finance product: pick a real    identity (paper/ink, ledger-green money-in, rust for reversals), a tabular-numeral font for money    columns, your own radius and shadow scales. Check `(_shared)/tokens.ts` `RAMP_ORDER` ??? it    hardcodes the stock ramp names, so renaming a ramp without updating it silently drops it from    `/design/tokens`. Light and dark must both work and be genuinely different images. 2. **Export the five components already sitting in `components/ui/`** ??? `chart-block`, `donut`,    `dropzone`, `avatar`, `code-block`. Five lines in `mod.ts`. Your gallery renders neither chart    today because of those five missing lines. 3. **Delete the scaffold fiction**: `routes/dashboard.tsx`, `routes/examples/**`, `routes/api/**`. 4. **Ship the run console** ??? the product's whole thesis, and the screen a reviewer will judge.    `.withResource` + `.withLayer({ loader, fallback, staleTime, partial })`, reading through    `billingQueries` / `runsQueries`. A thin `QueryIsland` boundary with an inner `useLiveQuery`    subscriber over your existing durable-stream producer. **Two tabs, same run advancing, no reload.** 5. **Ship `/invoices` and an invoice detail route** with `paginationSearchSchema` typed search state    and `DataGrid` (imported from `@netscript/fresh-ui`, never `ui:add`). 6. **Register ???6 of your own components** in `(design)/???/registry.ts` and render them in the gallery    in your skin. All three prior builds shipped that file byte-identical; that is the fingerprint of    a themed scaffold. 7. **Design every reachable state**: draft, issued, paid, part-paid, failed, retrying, refunded,    partially refunded, voided, in-flight, empty, loading, permission-denied. A screen that renders    only the happy path is not done. Absence is an em dash, never a zero ??? a `0.00` where you meant    "not measured" is a false statement about money. 8. **Mutations through the managed form surface** ??? `.withForm()`, `Form` from `@netscript/fresh/form`,    carrying `getSubmissionHiddenInputProps()` into the `IdempotencyKey` table you already built, so a    double-click is one charge. Optimistic UI via `createQueryCollection` + `collection.update()` ???    that is the documented path; there is no optimistic helper in `@netscript/fresh`.  ## Rules that still bind  Ask the MCP before hand-rolling anything ??? that rule produced three defects already. No raw `fetch`, no polling, no `BroadcastChannel`. Customize through the seams: token source, `data-*` attributes the component already emits, a `class` prop merged by `cn()`, a per-surface block file. Never fork a component, never a parallel stylesheet, never `!important`.  Commit and push after each numbered item. If you must cut something, cut backend polish ??? never a screen, and never a state. -m openrouter/z-ai/glm-5.3-flash --variant max --session ses_f953b4ae2ffe77TVWQQYTutRlv -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/CONSTRUCTION-REFERENCE.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/quality-bar-eis-chat.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/audits/web-design-audit.md
+node     1215170 14.1  0.7 75479388 691072 ?     Sl   10:29  18:26 /home/agent/.opencode/bin/opencode run Product owner correction to steer #6 ??? **the hard stop is lifted.**  Do **not** freeze backend work. Parallelise: fan out sub-agents and advance frontend and backend at once. Steer #6's frontend list stays exactly as written and remains the highest priority, because it is the part that does not exist ??? but it is a priority, not an exclusion.  **Both halves must be enterprise grade and NetScript-idiomatic.** The bar is the same on each side: no hand-rolled solution where the framework ships a seam, no claim the diff cannot support, and every reachable state designed.  The rule that governs both, restated because it has already produced four defects in this build: **ask the MCP how NetScript expresses a thing before you write it by hand ??? even when you are confident.** `find_guidance {"intent":"<the thing in plain words>"}`. Those four were the `@database/zod` barrel you hand-mirrored, the authorizer you declared and never wired, the `/api/v1` prefix the mount already adds, and the framework contract primitives you replaced with raw zod. Every one was one call away.  Per-seam, the idiomatic surface you are accountable for:  - **Contract** ??? derived from `@database/zod`, `baseContract` error map, `@netscript/contracts/query`   pagination helpers, no hardcoded prefix. - **Service** ??? `defineService` with `db` passed and `auth: { authn, authz }` wired, `context.db`   injection rather than a module singleton, typed `errors.*` instead of bare `Error`. - **Domain** ??? one module per resource, transactional money writes, one money seam. - **Durable** ??? sagas with `.correlate()` and terminal `sagaFail`, typed jobs, scheduled triggers,   the HMAC verifier not `memory`, proof read back from the sagas instances API. - **Streams** ??? producer plus the browser half via `@netscript/fresh/streams`, durable storage set. - **Web** ??? `.withResource`/`.withLayer`, region triples, cache-only page loaders with authoritative   partials, two-tier invalidation, typed path and search params, small islands fed by props,   `.withForm()` with CSRF and submission id, `createQueryCollection` for optimistic UI. - **Design** ??? token source rewritten in both files, your components registered in the gallery,   overrides through `data-*`/`class`/per-surface CSS, never a fork or a parallel stylesheet. - **Observability** ??? `createJobTools`, `withChildSpan`, `traceparent` through the saga, JSON logs. - **Tests** ??? every mutating procedure, ???15 negative-authorization, and the compensation.  I am running continuous MCP-backed seam audits against your tree and will send findings as they land. Keep committing and pushing after each unit of work so the audits see real state. -m openrouter/z-ai/glm-5.3-flash --variant max --session ses_f953b4ae2ffe77TVWQQYTutRlv -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/steer-6.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/CONSTRUCTION-REFERENCE.md
+node     1313329  0.0  0.0 17375588 24404 ?      Ssl  11:26   0:00 deno task agentic:opencode --message Product owner steer #9 ??? web-seam audit. I re-verified every item against your live tree; the type errors and the missing `QueryIsland` were already fixed while the audit ran, so they are dropped.  **First, credit, because this is now the best design layer this build series has produced.** `tokens.css` (287 declarations) and `tokens.json` (170 cssVars) are in **exact** sync ??? zero present in one and missing from the other ??? with 61 dark overrides matching the manifest and **zero value mismatches**. Against the stock theme: **48 changed values, 53 net-new product tokens, 38 stock tokens dropped**, and the ~69 you kept are spacing/radius/motion geometry, which is the right thing to inherit. `RAMP_ORDER` matches your six real ramps, so nothing silently vanishes from the gallery. No raw `fetch`, no `setInterval`, no `BroadcastChannel`, no hand-rolled `EventSource` ??? the live path correctly reaches for `@netscript/fresh/streams`, and the stream schema is one shared module imported by both producer and island. Route modules are 55/42/63/111 lines against eis-chat's 62-line median. Failure-as-data is done properly. **Do not regress any of that.**  ## THE ONE THING ??? your deferred layers are decoration  `partialName` appears **0 times in the entire app**. The docs are explicit: *"a layer with no `partial` renders inline as usual."*  So on both runs pages the three-layer split buys nothing. The page blocks on the slowest service call. `RunsTableSkeleton`, `RunSummarySkeleton` and `RunItemsTableSkeleton` are **unreachable dead code**. `staleReloadMode: 'background'` resolves to a prewarm strategy with nothing to prewarm. And because the loaders return domain shapes rather than `{ data, cachedAt }`, `staleTime: 15_000` computes no freshness window at all ??? three cache-config keys that are inert text.  It is also why `getCachedEntry` appears **0 times** and why `[id].tsx` reaches past `runsQueries` to the bare client: with no partial to do the authoritative read, the page loader has to, so the cache tier has nowhere to live.  **Fix:** add `routes/partials/runs/list.tsx` and `???/console.tsx` via `definePartial`, set `partial:` + `partialName` on each layer, return `{ data, cachedAt }` from page loaders, and switch page loaders to `getCachedEntry` with the partial doing the authoritative read. Four other findings collapse with this one.  ## Blockers  - **`/invoices` and `/customers` are 404s linked from your own nav.** `_layout.tsx:53` renders an   Invoices button and the landing page renders "Open invoices"/"Open customers" cards, all pointing   at `createRouteReference` stubs with no route module behind them. - **Three copies of `@tanstack/db`** resolve in `node_modules/.deno` (0.6.17, 0.7.0, 0.8.6). Your app   pins `^0.6.8`; `@netscript/fresh@0.0.7` resolves another. Pin one across the workspace before it   bites again. - **`router.ts:20-24` uses `{id}` where Fresh requires `[id]`.** Empirically in your workspace,   `createRouteReference('/runs/{id}').href({path:{id:'run_42'}})` returns the literal `"/runs/{id}"` ???   a dead link that **type-checks**, because the pattern infers no params. Delete `appRoutes.run` /   `appRoutes.invoice` and use the generated `routes.runs.$id.$route`. Also   `runs-table.tsx:52` hand-builds the href with a template literal.  ## Major  - **Typed search params are parsed then thrown away.** You build `paginationSearchSchema` and pass   only `{status, limit}` ??? `offset`, `page`, `sortBy`, `sortOrder` are dropped, so `?page=3` returns   page 1, and `Pagination` is rendered nowhere. - **Zero mutations.** `withForm`, `Form`, `createQueryCollection`, `mutationOptions` = 0 occurrences.   Meanwhile your schema has `IdempotencyKey` and `Payment.idempotencyKey @unique`, and your contracts   declare `409 IDEMPOTENCY_CONFLICT`. The docs: *"pass `ctx.form.submissionId` to a write that treats   it as an idempotency key."* **A billing console with no compute/approve/exclude/issue/retry/void   action is a viewer, not a product.** - **Product pages render with no chrome.** `_layout.tsx:13` gates the topbar, nav and theme toggle on   `pathname === homeHref`, so `/runs` renders bare ??? while `SidebarShell` (151 lines, installed) is   used only by the design gallery. **Your gallery has a better shell than your product.** - **Five components exported, rendered nowhere.** Commit `ae8fd78` says *"the gallery now renders both   charts"*. It does not ??? `components-view.tsx` imports 33 components and not those five;   `ChartBlock`/`Donut` have **0 hits** outside `components/ui/`. ~500 lines of chart CSS ship on every   page for charts that render nowhere. **Fix the code or fix the commit message.** - **Your four product components are in no gallery entry.** `registryCatalog` is still a verbatim   mirror of upstream. `StatusBadge`, `MoneyText`, `ExceptionBadge`, `TransitionFeed` ??? the only part   of the design system that is actually yours ??? have no reference page. - **Six product CSS classes are referenced and defined nowhere** (`ns-money-text`,   `ns-exception-badge`, `ns-transition-feed`, ???), so the components compensate with **inline   `style={}`** ??? override path zero. They already emit `data-money`/`data-status`/`data-exception`;   move the rules into `assets/ui/*.css` keyed off those attributes and delete the inline styles. - **Status coverage: 19 of ~30 domain literals.** `APPLIED`, `TRIALING`, `ACTIVE`, `PAST_DUE`,   `ENDED`, `RETIRED` are missing and fall through to `status-draft` ??? so an **ACTIVE subscription   renders with the draft colour**, while the JSDoc claims unknowns fall back to ink. Four states are   not enum values and must be derived: part-paid, partially refunded, retrying, in-flight. - **Currency is never rendered.** `MoneyText` takes a `currency` prop and all five call sites omit it,   while `Invoice.currency` is per-row. A multi-currency ledger showing bare numbers is a false   statement about money ??? same class as a fabricated `0.00`. (Your em-dash-for-absence handling is   excellent and better than I asked for.) - **Scaffold fiction still ships.** `dashboard-view.tsx` is 165 orphaned lines of fabricated   telemetry (`612ms` P95, `Progress value={64}`) imported by nothing. `home-view.tsx` states three   falsehoods including `Routes value='6'` naming deleted routes and `Theme value='NS One'`.   `_app.tsx:14` still describes the app as *"NetScript starter scaffold"*.  ## Minor worth doing while you are there  `tokens.json` claims `generatedBy: apps/ledgerline-web/tokens.build.ts` ??? **that file does not exist**; hand-maintained while claiming a generator is how a 170/170 sync rots. 12 tokens (`size`, `layout`, `label` groups) have no accessor in `(_shared)/tokens.ts` so they can never render on `/design/tokens`. One raw hex remains: `assets/ui/switch.css:27`. `transition-feed.tsx:27` formats a time on both SSR and hydration ??? mismatch; format server-side. `routes/index.tsx:7-8` calls `.withRoute()` twice. `_app.tsx:8` hardcodes `data-theme='dark'` before the init script reads localStorage.  **Note:** `defineRegion` is **not** a NetScript export ??? the Settled/Fallback/Failed triple is an app-owned convention you write yourself. Your skeletons are the Fallback halves, sitting unpaired.  Keep parallelising. Partials first, then `/invoices` + `/customers`, then mutations. --model openrouter/z-ai/glm-5.3-flash --variant max --cwd /home/agent/projects/netscript/wave7-billing --session ses_f953b4ae2ffe77TVWQQYTutRlv --require-mcp netscript --require-mcp aspire --receipt .netscript/agent/opencode-receipt.jsonl -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/steer-8.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/CONSTRUCTION-REFERENCE.md
+node     1313337  0.0  0.0 18384928 47360 ?      Sl   11:26   0:00 /home/agent/.local/share/mise/installs/deno/2.9.5/bin/deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts --message Product owner steer #9 ??? web-seam audit. I re-verified every item against your live tree; the type errors and the missing `QueryIsland` were already fixed while the audit ran, so they are dropped.  **First, credit, because this is now the best design layer this build series has produced.** `tokens.css` (287 declarations) and `tokens.json` (170 cssVars) are in **exact** sync ??? zero present in one and missing from the other ??? with 61 dark overrides matching the manifest and **zero value mismatches**. Against the stock theme: **48 changed values, 53 net-new product tokens, 38 stock tokens dropped**, and the ~69 you kept are spacing/radius/motion geometry, which is the right thing to inherit. `RAMP_ORDER` matches your six real ramps, so nothing silently vanishes from the gallery. No raw `fetch`, no `setInterval`, no `BroadcastChannel`, no hand-rolled `EventSource` ??? the live path correctly reaches for `@netscript/fresh/streams`, and the stream schema is one shared module imported by both producer and island. Route modules are 55/42/63/111 lines against eis-chat's 62-line median. Failure-as-data is done properly. **Do not regress any of that.**  ## THE ONE THING ??? your deferred layers are decoration  `partialName` appears **0 times in the entire app**. The docs are explicit: *"a layer with no `partial` renders inline as usual."*  So on both runs pages the three-layer split buys nothing. The page blocks on the slowest service call. `RunsTableSkeleton`, `RunSummarySkeleton` and `RunItemsTableSkeleton` are **unreachable dead code**. `staleReloadMode: 'background'` resolves to a prewarm strategy with nothing to prewarm. And because the loaders return domain shapes rather than `{ data, cachedAt }`, `staleTime: 15_000` computes no freshness window at all ??? three cache-config keys that are inert text.  It is also why `getCachedEntry` appears **0 times** and why `[id].tsx` reaches past `runsQueries` to the bare client: with no partial to do the authoritative read, the page loader has to, so the cache tier has nowhere to live.  **Fix:** add `routes/partials/runs/list.tsx` and `???/console.tsx` via `definePartial`, set `partial:` + `partialName` on each layer, return `{ data, cachedAt }` from page loaders, and switch page loaders to `getCachedEntry` with the partial doing the authoritative read. Four other findings collapse with this one.  ## Blockers  - **`/invoices` and `/customers` are 404s linked from your own nav.** `_layout.tsx:53` renders an   Invoices button and the landing page renders "Open invoices"/"Open customers" cards, all pointing   at `createRouteReference` stubs with no route module behind them. - **Three copies of `@tanstack/db`** resolve in `node_modules/.deno` (0.6.17, 0.7.0, 0.8.6). Your app   pins `^0.6.8`; `@netscript/fresh@0.0.7` resolves another. Pin one across the workspace before it   bites again. - **`router.ts:20-24` uses `{id}` where Fresh requires `[id]`.** Empirically in your workspace,   `createRouteReference('/runs/{id}').href({path:{id:'run_42'}})` returns the literal `"/runs/{id}"` ???   a dead link that **type-checks**, because the pattern infers no params. Delete `appRoutes.run` /   `appRoutes.invoice` and use the generated `routes.runs.$id.$route`. Also   `runs-table.tsx:52` hand-builds the href with a template literal.  ## Major  - **Typed search params are parsed then thrown away.** You build `paginationSearchSchema` and pass   only `{status, limit}` ??? `offset`, `page`, `sortBy`, `sortOrder` are dropped, so `?page=3` returns   page 1, and `Pagination` is rendered nowhere. - **Zero mutations.** `withForm`, `Form`, `createQueryCollection`, `mutationOptions` = 0 occurrences.   Meanwhile your schema has `IdempotencyKey` and `Payment.idempotencyKey @unique`, and your contracts   declare `409 IDEMPOTENCY_CONFLICT`. The docs: *"pass `ctx.form.submissionId` to a write that treats   it as an idempotency key."* **A billing console with no compute/approve/exclude/issue/retry/void   action is a viewer, not a product.** - **Product pages render with no chrome.** `_layout.tsx:13` gates the topbar, nav and theme toggle on   `pathname === homeHref`, so `/runs` renders bare ??? while `SidebarShell` (151 lines, installed) is   used only by the design gallery. **Your gallery has a better shell than your product.** - **Five components exported, rendered nowhere.** Commit `ae8fd78` says *"the gallery now renders both   charts"*. It does not ??? `components-view.tsx` imports 33 components and not those five;   `ChartBlock`/`Donut` have **0 hits** outside `components/ui/`. ~500 lines of chart CSS ship on every   page for charts that render nowhere. **Fix the code or fix the commit message.** - **Your four product components are in no gallery entry.** `registryCatalog` is still a verbatim   mirror of upstream. `StatusBadge`, `MoneyText`, `ExceptionBadge`, `TransitionFeed` ??? the only part   of the design system that is actually yours ??? have no reference page. - **Six product CSS classes are referenced and defined nowhere** (`ns-money-text`,   `ns-exception-badge`, `ns-transition-feed`, ???), so the components compensate with **inline   `style={}`** ??? override path zero. They already emit `data-money`/`data-status`/`data-exception`;   move the rules into `assets/ui/*.css` keyed off those attributes and delete the inline styles. - **Status coverage: 19 of ~30 domain literals.** `APPLIED`, `TRIALING`, `ACTIVE`, `PAST_DUE`,   `ENDED`, `RETIRED` are missing and fall through to `status-draft` ??? so an **ACTIVE subscription   renders with the draft colour**, while the JSDoc claims unknowns fall back to ink. Four states are   not enum values and must be derived: part-paid, partially refunded, retrying, in-flight. - **Currency is never rendered.** `MoneyText` takes a `currency` prop and all five call sites omit it,   while `Invoice.currency` is per-row. A multi-currency ledger showing bare numbers is a false   statement about money ??? same class as a fabricated `0.00`. (Your em-dash-for-absence handling is   excellent and better than I asked for.) - **Scaffold fiction still ships.** `dashboard-view.tsx` is 165 orphaned lines of fabricated   telemetry (`612ms` P95, `Progress value={64}`) imported by nothing. `home-view.tsx` states three   falsehoods including `Routes value='6'` naming deleted routes and `Theme value='NS One'`.   `_app.tsx:14` still describes the app as *"NetScript starter scaffold"*.  ## Minor worth doing while you are there  `tokens.json` claims `generatedBy: apps/ledgerline-web/tokens.build.ts` ??? **that file does not exist**; hand-maintained while claiming a generator is how a 170/170 sync rots. 12 tokens (`size`, `layout`, `label` groups) have no accessor in `(_shared)/tokens.ts` so they can never render on `/design/tokens`. One raw hex remains: `assets/ui/switch.css:27`. `transition-feed.tsx:27` formats a time on both SSR and hydration ??? mismatch; format server-side. `routes/index.tsx:7-8` calls `.withRoute()` twice. `_app.tsx:8` hardcodes `data-theme='dark'` before the init script reads localStorage.  **Note:** `defineRegion` is **not** a NetScript export ??? the Settled/Fallback/Failed triple is an app-owned convention you write yourself. Your skeletons are the Fallback halves, sitting unpaired.  Keep parallelising. Partials first, then `/invoices` + `/customers`, then mutations. --model openrouter/z-ai/glm-5.3-flash --variant max --cwd /home/agent/projects/netscript/wave7-billing --session ses_f953b4ae2ffe77TVWQQYTutRlv --require-mcp netscript --require-mcp aspire --receipt .netscript/agent/opencode-receipt.jsonl -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/steer-8.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/CONSTRUCTION-REFERENCE.md
+node     1314187 16.0  0.7 75626752 696312 ?     Sl   11:26  11:48 /home/agent/.opencode/bin/opencode run Product owner steer #9 ??? web-seam audit. I re-verified every item against your live tree; the type errors and the missing `QueryIsland` were already fixed while the audit ran, so they are dropped.  **First, credit, because this is now the best design layer this build series has produced.** `tokens.css` (287 declarations) and `tokens.json` (170 cssVars) are in **exact** sync ??? zero present in one and missing from the other ??? with 61 dark overrides matching the manifest and **zero value mismatches**. Against the stock theme: **48 changed values, 53 net-new product tokens, 38 stock tokens dropped**, and the ~69 you kept are spacing/radius/motion geometry, which is the right thing to inherit. `RAMP_ORDER` matches your six real ramps, so nothing silently vanishes from the gallery. No raw `fetch`, no `setInterval`, no `BroadcastChannel`, no hand-rolled `EventSource` ??? the live path correctly reaches for `@netscript/fresh/streams`, and the stream schema is one shared module imported by both producer and island. Route modules are 55/42/63/111 lines against eis-chat's 62-line median. Failure-as-data is done properly. **Do not regress any of that.**  ## THE ONE THING ??? your deferred layers are decoration  `partialName` appears **0 times in the entire app**. The docs are explicit: *"a layer with no `partial` renders inline as usual."*  So on both runs pages the three-layer split buys nothing. The page blocks on the slowest service call. `RunsTableSkeleton`, `RunSummarySkeleton` and `RunItemsTableSkeleton` are **unreachable dead code**. `staleReloadMode: 'background'` resolves to a prewarm strategy with nothing to prewarm. And because the loaders return domain shapes rather than `{ data, cachedAt }`, `staleTime: 15_000` computes no freshness window at all ??? three cache-config keys that are inert text.  It is also why `getCachedEntry` appears **0 times** and why `[id].tsx` reaches past `runsQueries` to the bare client: with no partial to do the authoritative read, the page loader has to, so the cache tier has nowhere to live.  **Fix:** add `routes/partials/runs/list.tsx` and `???/console.tsx` via `definePartial`, set `partial:` + `partialName` on each layer, return `{ data, cachedAt }` from page loaders, and switch page loaders to `getCachedEntry` with the partial doing the authoritative read. Four other findings collapse with this one.  ## Blockers  - **`/invoices` and `/customers` are 404s linked from your own nav.** `_layout.tsx:53` renders an   Invoices button and the landing page renders "Open invoices"/"Open customers" cards, all pointing   at `createRouteReference` stubs with no route module behind them. - **Three copies of `@tanstack/db`** resolve in `node_modules/.deno` (0.6.17, 0.7.0, 0.8.6). Your app   pins `^0.6.8`; `@netscript/fresh@0.0.7` resolves another. Pin one across the workspace before it   bites again. - **`router.ts:20-24` uses `{id}` where Fresh requires `[id]`.** Empirically in your workspace,   `createRouteReference('/runs/{id}').href({path:{id:'run_42'}})` returns the literal `"/runs/{id}"` ???   a dead link that **type-checks**, because the pattern infers no params. Delete `appRoutes.run` /   `appRoutes.invoice` and use the generated `routes.runs.$id.$route`. Also   `runs-table.tsx:52` hand-builds the href with a template literal.  ## Major  - **Typed search params are parsed then thrown away.** You build `paginationSearchSchema` and pass   only `{status, limit}` ??? `offset`, `page`, `sortBy`, `sortOrder` are dropped, so `?page=3` returns   page 1, and `Pagination` is rendered nowhere. - **Zero mutations.** `withForm`, `Form`, `createQueryCollection`, `mutationOptions` = 0 occurrences.   Meanwhile your schema has `IdempotencyKey` and `Payment.idempotencyKey @unique`, and your contracts   declare `409 IDEMPOTENCY_CONFLICT`. The docs: *"pass `ctx.form.submissionId` to a write that treats   it as an idempotency key."* **A billing console with no compute/approve/exclude/issue/retry/void   action is a viewer, not a product.** - **Product pages render with no chrome.** `_layout.tsx:13` gates the topbar, nav and theme toggle on   `pathname === homeHref`, so `/runs` renders bare ??? while `SidebarShell` (151 lines, installed) is   used only by the design gallery. **Your gallery has a better shell than your product.** - **Five components exported, rendered nowhere.** Commit `ae8fd78` says *"the gallery now renders both   charts"*. It does not ??? `components-view.tsx` imports 33 components and not those five;   `ChartBlock`/`Donut` have **0 hits** outside `components/ui/`. ~500 lines of chart CSS ship on every   page for charts that render nowhere. **Fix the code or fix the commit message.** - **Your four product components are in no gallery entry.** `registryCatalog` is still a verbatim   mirror of upstream. `StatusBadge`, `MoneyText`, `ExceptionBadge`, `TransitionFeed` ??? the only part   of the design system that is actually yours ??? have no reference page. - **Six product CSS classes are referenced and defined nowhere** (`ns-money-text`,   `ns-exception-badge`, `ns-transition-feed`, ???), so the components compensate with **inline   `style={}`** ??? override path zero. They already emit `data-money`/`data-status`/`data-exception`;   move the rules into `assets/ui/*.css` keyed off those attributes and delete the inline styles. - **Status coverage: 19 of ~30 domain literals.** `APPLIED`, `TRIALING`, `ACTIVE`, `PAST_DUE`,   `ENDED`, `RETIRED` are missing and fall through to `status-draft` ??? so an **ACTIVE subscription   renders with the draft colour**, while the JSDoc claims unknowns fall back to ink. Four states are   not enum values and must be derived: part-paid, partially refunded, retrying, in-flight. - **Currency is never rendered.** `MoneyText` takes a `currency` prop and all five call sites omit it,   while `Invoice.currency` is per-row. A multi-currency ledger showing bare numbers is a false   statement about money ??? same class as a fabricated `0.00`. (Your em-dash-for-absence handling is   excellent and better than I asked for.) - **Scaffold fiction still ships.** `dashboard-view.tsx` is 165 orphaned lines of fabricated   telemetry (`612ms` P95, `Progress value={64}`) imported by nothing. `home-view.tsx` states three   falsehoods including `Routes value='6'` naming deleted routes and `Theme value='NS One'`.   `_app.tsx:14` still describes the app as *"NetScript starter scaffold"*.  ## Minor worth doing while you are there  `tokens.json` claims `generatedBy: apps/ledgerline-web/tokens.build.ts` ??? **that file does not exist**; hand-maintained while claiming a generator is how a 170/170 sync rots. 12 tokens (`size`, `layout`, `label` groups) have no accessor in `(_shared)/tokens.ts` so they can never render on `/design/tokens`. One raw hex remains: `assets/ui/switch.css:27`. `transition-feed.tsx:27` formats a time on both SSR and hydration ??? mismatch; format server-side. `routes/index.tsx:7-8` calls `.withRoute()` twice. `_app.tsx:8` hardcodes `data-theme='dark'` before the init script reads localStorage.  **Note:** `defineRegion` is **not** a NetScript export ??? the Settled/Fallback/Failed triple is an app-owned convention you write yourself. Your skeletons are the Fallback halves, sitting unpaired.  Keep parallelising. Partials first, then `/invoices` + `/customers`, then mutations. -m openrouter/z-ai/glm-5.3-flash --variant max --session ses_f953b4ae2ffe77TVWQQYTutRlv -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/steer-8.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/CONSTRUCTION-REFERENCE.md
+=== recent file mtimes in billing tree ===
+/home/agent/projects/netscript/wave7-billing/.data/streams/metadata.lmdb-lock
+/home/agent/projects/netscript/wave7-billing/.data/streams/metadata.lmdb
+/home/agent/projects/netscript/wave7-billing/.data/streams/streams/L3YxL3N0cmVhbS9uZXRzY3JpcHQvd29ya2Vycy9leGVjdXRpb25z~mtms8ixp~5b9ff4aa.log
+/home/agent/projects/netscript/wave7-billing/.data/streams/streams/L3YxL3N0cmVhbS9uZXRzY3JpcHQvdjEvc3RyZWFtcy9ydW5zL2NvbnNvbGU~mtmsg6ql~15874d46.log
+/home/agent/projects/netscript/wave7-billing/.netscript/agent/opencode-receipt.jsonl
+/home/agent/projects/netscript/wave7-billing/aspire/package-lock.json
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/register-background.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/register-infrastructure.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/index.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/register-plugins.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/db-cli-mode.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/register-services.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/register-apps.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.helpers/register-tools.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.aspire/integrations/apphosts/b8be8fd2e849/appsettings.json
+/home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/transport.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/base.mts
+/home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/.codegen-hash
+/home/agent/projects/netscript/wave7-billing/aspire/.aspire/modules/aspire.mts
+/home/agent/projects/netscript/wave7-billing/deno.lock
+[0m
+Now the topology is clear: `007-aspire` is the **netscript** repo (run docs only); the design work lives in the **ledgerline** repo (`wave7-design` + `wave7-billing`). Let me check whether another agent is actively working in the billing tree before I touch it.
+[0m$ [0mfor p in 1209460 1215170 1314187; do echo -n "PID $p cwd: "; sudo ls -l /proc/$p/cwd 2>/dev/null | sed 's/.*-> //' || readlink /proc/$p/cwd 2>/dev/null || echo "(unreadable)"; done
+PID 1209460 cwd: PID 1215170 cwd: PID 1314187 cwd:
+[0m
+[0m$ [0mecho "=== any processes with cwd in wave7-design? ==="; for p in $(pgrep -f "opencode run" 2>/dev/null); do echo -n "$p: "; readlink /proc/$p/cwd 2>/dev/null || echo "?"; done
+=== any processes with cwd in wave7-design? ===
+1209460: /home/agent/projects/netscript/wave7-billing
+1215170: /home/agent/projects/netscript/wave7-billing
+1305796: /home/agent/projects/netscript/wave7-billing
+1314187: /home/agent/projects/netscript/wave7-billing
+1514486: /home/agent/projects/netscript/wave7-design
+1520608: /home/agent/projects/netscript/worktrees/007-aspire
+1520609: ?
+[0m
+**Critical finding:** an opencode agent (PID 1314187) is *actively running right now* with `--cwd /home/agent/projects/netscript/wave7-billing`, committing every ~20 seconds (reflog shows commits 17s ago). Let me check which trees the live agents own before I touch anything.
+[0m$ [0mecho "=== PID 1514486 (design tree) ==="; tr '\0' ' ' < /proc/1514486/cmdline 2>/dev/null | cut -c1-400; echo; echo "--- state:"; ps -o pid,stat,etime,pcpu -p 1514486 2>/dev/null
+=== PID 1514486 (design tree) ===
+/home/agent/.opencode/bin/opencode run Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register eve
+
+--- state:
+    PID STAT     ELAPSED %CPU
+1514486 Rl         02:50 27.0
+[0m
+[0m$ [0mecho "=== PID 1520608 (007-aspire) ==="; tr '\0' ' ' < /proc/1520608/cmdline 2>/dev/null | cut -c1-300; echo; echo "=== recent writes in wave7-design ==="; find /home/agent/projects/netscript/wave7-design -newermt "-20 minutes" -type f -not -path "*/.git/*" -not -path "*/node_modules/*" -not -path "*/_fresh/*" 2>/dev/null | head -20
+=== PID 1520608 (007-aspire) ===
+/bin/bash: line 1: /proc/1520608/cmdline: No such file or directory
+
+=== recent writes in wave7-design ===
+/home/agent/projects/netscript/wave7-design/deno.lock
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/islands/ui/RangeControlDemo.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/mod.ts
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/money-text.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/widget-card.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/semicircular-gauge.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/segmented-control.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/toast.css
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/sheet.css
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/switch.css
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/design.css
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/tokens.json
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/tokens.css
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_shared)/collection-ranges.ts
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+/home/agent/projects/netscript/wave7-design/DESIGN.md
+/home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+/home/agent/projects/netscript/wave7-design/.netscript/agent/design-receipt.jsonl
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git branch --show-current && git status --short | grep -v "^??" | head -5; echo "=== clean besides untracked? ==="; echo "=== deno.json tasks ===" && cat deno.json 2>/dev/null | head -40
+design/ledgerline-ui
+=== clean besides untracked? ===
+=== deno.json tasks ===
+{
+  "workspace": [
+    "./apps/ledgerline-web",
+    "./contracts",
+    "./database/postgres",
+    "./plugins",
+    "./plugins/*",
+    "./services/billing",
+    "./services/runs",
+    "./services/webhooks"
+  ],
+  "catalog": {
+    "zod": "^4.4.3"
+  },
+  "imports": {
+    "@netscript/database": "jsr:@netscript/database@0.0.7",
+    "@netscript/config": "jsr:@netscript/config@0.0.7",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.7",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.7",
+    "@netscript/mcp": "jsr:@netscript/mcp@0.0.7",
+    "@database/zod": "./database/postgres/schema/.generated/zod/crud.ts",
+    "@ledgerline/contracts": "./contracts/mod.ts",
+    "@ledgerline/db": "./database/postgres/mod.ts",
+    "@shared/": "./services/_shared/",
+    "@durable-streams/client": "npm:@durable-streams/client@^0.2.6",
+    "@durable-streams/server": "npm:@durable-streams/server@^0.3.7",
+    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
+    "@netscript/cron": "jsr:@netscript/cron@0.0.7",
+    "@netscript/kv/kvdex": "jsr:@netscript/kv@0.0.7/kvdex",
+    "@netscript/plugin/contract-base": "jsr:@netscript/plugin@0.0.7/contract-base",
+    "@netscript/plugin/loader": "jsr:@netscript/plugin@0.0.7/loader",
+    "@netscript/plugin/sdk": "jsr:@netscript/plugin@0.0.7/sdk",
+    "@netscript/plugin/service": "jsr:@netscript/plugin@0.0.7/service",
+    "@netscript/plugin-auth-core/config": "jsr:@netscript/plugin-auth-core@0.0.7/config",
+    "@netscript/plugin-auth-core/contracts/v1": "jsr:@netscript/plugin-auth-core@0.0.7/contracts/v1",
+    "@netscript/plugin-auth-core/domain": "jsr:@netscript/plugin-auth-core@0.0.7/domain",
+    "@netscript/plugin-auth-core/ports": "jsr:@netscript/plugin-auth-core@0.0.7/ports",
+    "@netscript/plugin-auth-core/streams": "jsr:@netscript/plugin-auth-core@0.0.7/streams",
+[0m
+Now I have the full picture. **PID 1514486 is my own process** — its cwd is `/home/agent/projects/netscript/wave7-design`, so that's my actual working tree (the env's `007-aspire` path holds only the run docs). And **4 live opencode agents are actively committing in `wave7-billing`** (commits seconds ago), with a documented history of edits being "swept into a shared commit by accident."
+
+Let me verify the design tree's committed work actually passes gates rather than trusting the report.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 300 deno check . 2>&1 | tail -20
+[0m[32mCheck[0m routes/(design)/design/(_components)/components-view.tsx
+[0m[32mCheck[0m routes/(design)/design/(_components)/composition-view.tsx
+[0m[32mCheck[0m routes/(design)/design/(_components)/tokens-view.tsx
+[0m[32mCheck[0m routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+[0m[32mCheck[0m routes/(design)/design/(_islands)/TokenClipboard.tsx
+[0m[32mCheck[0m routes/(design)/design/(_shared)/collection-ranges.ts
+[0m[32mCheck[0m routes/(design)/design/(_shared)/registry.ts
+[0m[32mCheck[0m routes/(design)/design/(_shared)/tokens.ts
+[0m[32mCheck[0m routes/(design)/design/_layout.tsx
+[0m[32mCheck[0m routes/(design)/design/_middleware.ts
+[0m[32mCheck[0m routes/(design)/design/components.tsx
+[0m[32mCheck[0m routes/(design)/design/composition.tsx
+[0m[32mCheck[0m routes/(design)/design/index.tsx
+[0m[32mCheck[0m routes/(design)/design/tokens.tsx
+[0m[32mCheck[0m routes/_app.tsx
+[0m[32mCheck[0m routes/_layout.tsx
+[0m[32mCheck[0m routes/health.tsx
+[0m[32mCheck[0m routes/index.tsx
+[0m[32mCheck[0m utils.ts
+[0m[32mCheck[0m vite.config.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && ls tests/ 2>/dev/null && echo "=== RUN TESTS ===" && timeout 300 deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -25
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== LINT ===" && timeout 300 deno lint 2>&1 | tail -15; echo "=== FMT (my files only) ===" && timeout 300 deno fmt --check components/ui/delta-chip.tsx components/ui/semicircular-gauge.tsx components/ui/segmented-control.tsx components/ui/comparison-area-chart.tsx components/ui/footer-columns.tsx components/ui/widget-card.tsx components/ui/money-text.tsx 2>&1 | tail -10
+=== LINT ===
+Checked 89 files
+=== FMT (my files only) ===
+Checked 7 files
+[0m
+`deno check` is clean. Let me run the tests and lint.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && find . -name "*_test.ts" -not -path "*/node_modules/*" -not -path "*/_fresh/*" 2>/dev/null | head -20
+./tests/refund-flow_test.ts
+./tests/status_test.ts
+./tests/sagas_test.ts
+./tests/money_test.ts
+./tests/design_contract_test.ts
+./tests/negative-auth_test.ts
+[0m
+Lint and fmt are clean. Let me locate and run the tests.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 300 deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -25
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(432µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(234µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(160µs)[0m
+[0m[38;5;245mrunning 12 tests from ./tests/money_test.ts[0m
+absence is an em dash, never a zero ... [0m[32mok[0m [0m[38;5;245m(944µs)[0m
+a real zero is not absence ... [0m[32mok[0m [0m[38;5;245m(8ms)[0m
+direction maps to the money tokens ... [0m[32mok[0m [0m[38;5;245m(168µs)[0m
+signs are explicit ... [0m[32mok[0m [0m[38;5;245m(162µs)[0m
+amounts are grouped and carry two fraction digits by default ... [0m[32mok[0m [0m[38;5;245m(134µs)[0m
+precision is never flattened — a metered unit price keeps its decimals ... [0m[32mok[0m [0m[38;5;245m(207µs)[0m
+currency is carried as a symbol and separated from the amount ... [0m[32mok[0m [0m[38;5;245m(795µs)[0m
+no float artefacts: string decimals survive the round trip ... [0m[32mok[0m [0m[38;5;245m(131µs)[0m
+a ratio with no supportable denominator is null, not zero ... [0m[32mok[0m [0m[38;5;245m(153µs)[0m
+percentages render an em dash for an undefined rate ... [0m[32mok[0m [0m[38;5;245m(124µs)[0m
+compact money keeps the sign and degrades to the em dash ... [0m[32mok[0m [0m[38;5;245m(384µs)[0m
+rounding is half-up on the decimal digits, never float-dependent ... [0m[32mok[0m [0m[38;5;245m(169µs)[0m
+[0m[38;5;245mrunning 5 tests from ./tests/status_test.ts[0m
+every schema enum member has a presentation ... [0m[32mok[0m [0m[38;5;245m(929µs)[0m
+labels are human, never raw enum members ... [0m[32mok[0m [0m[38;5;245m(88µs)[0m
+in-flight states are marked live so they never rely on colour alone ... [0m[32mok[0m [0m[38;5;245m(35µs)[0m
+derived states are declared, so a reader knows they are computed ... [0m[32mok[0m [0m[38;5;245m(29µs)[0m
+an unknown status surfaces instead of vanishing ... [0m[32mok[0m [0m[38;5;245m(47µs)[0m
+
+[0m[32mok[0m | 28 passed | 0 failed [0m[38;5;245m(135ms)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== scaffold fiction sweep (design app) ===" && grep -rn "api-gateway\|eu-west\|v2\.4\.1\|NetScript starter\|NS One\|NS-One\|184ms\|612ms" apps/ledgerline-web/routes/ apps/ledgerline-web/components/ apps/ledgerline-web/islands/ 2>/dev/null | grep -v node_modules | head -20
+=== scaffold fiction sweep (design app) ===
+apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts:97:      'NS One theme: DTCG-generated token artifacts plus base element styles. Components consume only the semantic --ns-* vocabulary this theme provides.',
+apps/ledgerline-web/routes/(design)/design/_layout.tsx:67:          <span class='ns-dashboard__sidebar-env-label'>NS One theme</span>
+apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:30:                    <Panel.Title>api-gateway</Panel.Title>
+apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:31:                    <Panel.Description>v2.4.1 promoted to production</Panel.Description>
+apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:88:            eu-west has headroom for two more canary services before autoscale raises the floor.
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:107:      'The theme and the plumbing everything else depends on: NS One token artifacts, the class-merge helper, shared types, and form/toast support.',
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:771:            value='184ms'
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:1018:          <Badge variant='primary'>NS One</Badge>
+apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx:359:          <Badge variant='primary'>NS One</Badge>
+apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx:115:          <Badge variant='primary'>NS One</Badge>
+apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx:187:              lede='Components are theme-blind. NS One is the first theme, not the system.'
+apps/ledgerline-web/routes/(_components)/home-view.tsx:62:          value='NS One'
+apps/ledgerline-web/routes/(_components)/dashboard-view.tsx:122:          value='612ms'
+apps/ledgerline-web/routes/_app.tsx:14:          content='NetScript starter scaffold with Fresh 2, Aspire orchestration, contracts, and enterprise UI primitives.'
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== rules enforced by design_contract_test ===" && grep -n "^Deno.test\|^  Deno.test\|R[0-9]\|H[0-9]\|C[0-9]\|M[0-9]\|T[0-9]" tests/design_contract_test.ts | head -40
+=== rules enforced by design_contract_test ===
+40:Deno.test('T2a — no component reaches for a ramp step', async () => {
+59:Deno.test('T2 — no raw colour literal in a component stylesheet', async () => {
+70:Deno.test('C8 — no hard offset shadow survives', async () => {
+80:Deno.test('M8 — only lib/money turns a decimal into text', async () => {
+105:Deno.test('T1 — tokens.json and tokens.css declare the same custom properties', async () => {
+125:Deno.test('T1 — every token a component uses is declared', async () => {
+144:Deno.test('T6 — every component stylesheet is imported by styles.css', async () => {
+154:Deno.test('R1 — every component module is exported from the barrel', async () => {
+166:Deno.test('R3 — every Ledgerline catalogue entry has a gallery demo', async () => {
+182:Deno.test('R3 — the upstream registry count is not inflated by app-owned widgets', async () => {
+198:Deno.test('H8 — gauge arcs terminate with a flat cut', async () => {
+[0m
+All 28 tests pass, including `H8 — gauge arcs terminate with a flat cut`. The committed work is genuine. Now let me hunt for the residual gap I spotted — scaffold fiction still shipping in the gallery.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== DESIGN.md rule 8 ===" && grep -n -A6 -i "rule 8\|scaffold fiction\|no fiction" DESIGN.md 2>/dev/null | head -40
+=== DESIGN.md rule 8 ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== theme name / identity ===" && grep -n -i "ledgerline\|ns one\|NS-One" DESIGN.md 2>/dev/null | head -20; echo "=== tokens.css theme marker ==="; grep -n -i "ledgerline\|ns one" apps/ledgerline-web/assets/tokens.css | head -5
+=== theme name / identity ===
+1:# Ledgerline — design
+7:**Ledgerline** is the close-the-month product: customers sit on versioned plans, usage accrues on
+90:rounds the digits themselves. `(2.675).toFixed(2)` is `'2.67'` in JavaScript; Ledgerline renders
+343:**R3. Ledgerline's own components are catalogued separately from the upstream registry.**
+344:`ledgerlineCatalog` holds the components this product owns; `registryCatalog` and `registryMeta.total`
+346:gallery's headline number a lie. Every entry in `ledgerlineCatalog` must have a `case` in
+369:8. **Placeholder copy and lorem.** Refused: every demo string in the gallery is a real Ledgerline
+=== tokens.css theme marker ===
+1:/* Ledgerline design tokens — GENERATED from tokens.json. Do not edit by hand. */
+[0m
+The prior report **overclaimed**: it said "gallery scaffold strings replaced" but `FloatingSurfaceDemo.tsx` still ships all three strings the critic named. Let me check `DESIGN.md` rule 8 and the theme's real name before fixing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && sed -n '360,380p' DESIGN.md
+coloured glyph from one set.
+3. **Purple-blue gradient accents with a generic sans.** The default SaaS palette. Refused: this
+   product's identity is paper/ink/ledger-green/brass, and a gradient is not a design decision.
+4. **Rounded-everything and uniform elevation.** Every surface the same radius and the same soft
+   shadow, so nothing is structural. Refused: radius and elevation encode containment.
+5. **The centred empty state with a big illustration.** Refused in dense operational surfaces: an
+   audit trail that is empty says so in one line inside its own frame, and does not borrow a hero.
+6. **A charting dependency.** Refused: see H1. It also drags its own colours in, which breaks T2.
+7. **A modal to confirm a modal.** Refused: see L1 — the button names the action instead.
+8. **Placeholder copy and lorem.** Refused: every demo string in the gallery is a real Ledgerline
+   value — a real invoice number, a real plan name, a real decline reason.
+9. **`0.00` where the truth is "not measured".** Refused: see M1. In billing this is correctness.
+10. **A status colour decided at the call site.** Refused: see S1.
+11. **Everything interactive.** Refused: see I1. A surface that hydrates to render text is paying a
+    cost for nothing.
+12. **Responsive by shrinking alone.** Refused: dense tables collapse into labelled cells
+    (`responsive-table`), they do not shrink to illegibility.
+13. **A badge doing a delta's job.** A boxed uppercase monospace tag parked in the card header is not
+    a delta: the movement belongs in a tinted pill on the hero number's own baseline (C3). Refused
+    because a reader scanning the header learns the movement before learning the number.
+14. **A hard offset shadow, or any shadow mixed from a ramp step.** Refused: elevation is diffuse and
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== was FloatingSurfaceDemo touched by 2da2189? ===" && git log --oneline -3 -- "apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx"; echo "=== which files DID 2da2189 change (design routes)? ==="; git show --stat 2da2189 | grep -i "design\|gallery\|components-view\|Floating" | head
+=== was FloatingSurfaceDemo touched by 2da2189? ===
+3bdce8e Scaffold NetScript 0.0.7 workspace (ledgerline)
+=== which files DID 2da2189 change (design routes)? ===
+    Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+    Ranked items 1-6 of design-steer-2, in the order the critic ranked them.
+    Gallery: the seven new items have their own `ledgerlineCatalog` rather than
+    Every scaffold string in the gallery (api-gateway, eu-west, v2.4.1) is
+    DESIGN.md gains the rules this work had to decide: M8/M9 (one money
+    tests/design_contract_test.ts makes the checkable ones run: it caught two
+ DESIGN.md                                          | 315 +++++++++++++
+ apps/ledgerline-web/assets/design.css              |   8 +
+ .../design/(_components)/components-view.tsx       | 495 ++++++++++++++++-----
+ .../(design)/design/(_shared)/collection-ranges.ts | 208 +++++++++
+[0m
+`DESIGN.md` rule 8 explicitly names `api-gateway` and `eu-west` as refused — so this is a confirmed, still-open violation. Let me read the rule in full.
+[0m# [0mTodos
+[✓] Verify committed design work (5 components, fixes, gallery) is real and passes gates
+[•] Fix residual scaffold fiction in FloatingSurfaceDemo.tsx (api-gateway/eu-west/v2.4.1) — rule 8
+[ ] Fix remaining fabricated values: components-view 184ms, dashboard-view 612ms, home-view NS One, _app.tsx scaffold description
+[ ] Re-run check/lint/fmt/test and commit
+[ ] Report DONE vs REMAINING incl. billing-tree handoff blocked by live agents
+[0m
+[0m→ [0mRead apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+Confirmed: `FloatingSurfaceDemo.tsx` was **never touched**, yet the commit message claims every scaffold string is gone. That's a claim the diff can't support. Let me read the files.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== real ids/values already used ===" && grep -rhoE "INV-[0-9A-Z-]+|run_[0-9a-z]+|cus_[0-9a-z]+|inv_[0-9a-z]+" routes/ components/ 2>/dev/null | sort | uniq -c | sort -rn | head -15
+=== real ids/values already used ===
+      5 INV-2026-07-0142
+      2 INV-2026-07-0144
+      2 INV-2026-07-0143
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== customer / plan / decline vocabulary ===" && grep -rhoE "Acme [A-Za-z]+|Northwind[A-Za-z]*|[A-Z][a-z]+ (annual|monthly)|card_declined|insufficient_funds|do_not_honor" routes/ components/ 2>/dev/null | sort | uniq -c | sort -rn | head -20
+=== customer / plan / decline vocabulary ===
+      4 Northwind
+      1 Acme Freight
+[0m
+Let me learn the real Ledgerline vocabulary already used in the gallery so my replacements are consistent.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== context around INV- usage ===" && grep -rn "INV-2026-07-0142" routes/ components/ | head -5; echo; echo "=== Northwind / Acme Freight context ===" && grep -rn "Northwind\|Acme Freight" routes/ components/ | head -6
+=== context around INV- usage ===
+routes/(design)/design/(_components)/components-view.tsx:145:    invoice: 'INV-2026-07-0142',
+routes/(design)/design/(_components)/components-view.tsx:517:            placeholder='Reason for the credit note on INV-2026-07-0142…'
+routes/(design)/design/(_components)/components-view.tsx:587:              <Card.Title>INV-2026-07-0142</Card.Title>
+routes/(design)/design/(_components)/components-view.tsx:705:            { label: 'INV-2026-07-0142' },
+routes/(design)/design/(_components)/components-view.tsx:817:              { name: 'INV-2026-07-0142', status: 'paid', when: '2m ago' },
+
+=== Northwind / Acme Freight context ===
+routes/(design)/design/(_components)/components-view.tsx:146:    customer: 'Northwind Robotics',
+routes/(design)/design/(_components)/components-view.tsx:154:    customer: 'Acme Freight',
+routes/(design)/design/(_components)/components-view.tsx:569:              placeholder='Northwind Robotics'
+routes/(design)/design/(_components)/components-view.tsx:588:              <Card.Description>Northwind Robotics · issued 4 minutes ago</Card.Description>
+routes/(design)/design/(_components)/components-view.tsx:667:            Update the card on Northwind Robotics before 30 September.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== decline reasons / failure vocabulary in contracts ===" && grep -rhoE "card_declined|insufficient_funds|do_not_honor|expired_card|processing_error|[A-Z_]{4,}" contracts/mod.ts 2>/dev/null | sort -u | head -30
+=== decline reasons / failure vocabulary in contracts ===
+[0m
+[0m← [0mEdit apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+@@ -14,9 +14,9 @@
+ <Sheet.Content>
+   <div class='ns-sheet__header'>
+     <div>
+       <Sheet.Title class='text-base font-semibold text-ns-fg'>
+-        Deployment inspector
++        Run item inspector
+       </Sheet.Title>
+       <Sheet.Description class='mt-1 text-sm text-ns-muted-fg'>
+         Side-docked panel styled by the sheet-styles registry item.
+       </Sheet.Description>
+
+[0m
+Real vocabulary: `INV-2026-07-0142`, `Northwind Robotics`, `Acme Freight`. Now let me replace the fake product values.
+[0m← [0mEdit apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+@@ -26,15 +26,15 @@
+ <div class='ns-sheet__body'>
+   <div class='ns-gallery-stack'>
+     <Panel tone='muted'>
+       <Panel.Header>
+-        <Panel.Title>api-gateway</Panel.Title>
+-        <Panel.Description>v2.4.1 promoted to production</Panel.Description>
++        <Panel.Title>INV-2026-07-0142</Panel.Title>
++        <Panel.Description>Northwind Robotics · Enterprise annual</Panel.Description>
+       </Panel.Header>
+       <Panel.Body>
+         <div class='ns-gallery-row'>
+-          <Badge variant='success'>healthy</Badge>
+-          <Badge variant='muted'>12 checks</Badge>
++          <Badge variant='success'>paid</Badge>
++          <Badge variant='muted'>3 line items</Badge>
+         </div>
+       </Panel.Body>
+     </Panel>
+     <InlineNotice variant='info'>
+
+[0m
+[0m← [0mEdit apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+@@ -82,14 +82,14 @@
+ <div class='ns-floating-demo'>
+   <Popover.Root placement='bottom-start'>
+     <Popover.Trigger class='ns-btn ns-btn--secondary'>Open popover</Popover.Trigger>
+     <Popover.Content class='ns-floating-card'>
+-      <Popover.Title class='ns-floating-card__title'>Region capacity</Popover.Title>
++      <Popover.Title class='ns-floating-card__title'>Dunning headroom</Popover.Title>
+       <Popover.Description class='ns-floating-card__body'>
+-        eu-west has headroom for two more canary services before autoscale raises the floor.
++        Northwind Robotics has two retries left before INV-2026-07-0142 is written off.
+       </Popover.Description>
+       <div class='ns-gallery-row'>
+-        <Badge variant='warning'>82%</Badge>
++        <Badge variant='warning'>2 retries left</Badge>
+         <Popover.Close class='ns-btn ns-btn--ghost ns-btn--sm'>Close</Popover.Close>
+       </div>
+     </Popover.Content>
+   </Popover.Root>
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== FloatingSurfaceDemo now clean? ===" && grep -n "api-gateway\|eu-west\|v2\.4\.1" "routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx" || echo "CLEAN"; echo; echo "=== components-view.tsx:765-780 ==="; sed -n '765,780p' "routes/(design)/design/(_components)/components-view.tsx"
+=== FloatingSurfaceDemo now clean? ===
+CLEAN
+
+=== components-view.tsx:765-780 ===
+            value='1.2M'
+            detail='Past 24 hours'
+            badge={<Badge variant='success'>+8%</Badge>}
+          />
+          <StatsGrid.Card
+            label='P95 latency'
+            value='184ms'
+            detail='All regions'
+            badge={<Badge variant='warning'>watch</Badge>}
+          />
+        </StatsGrid>
+      );
+    case 'detail-layout':
+      return (
+        <DetailLayout>
+          <DetailLayout.Main>
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== dashboard-view.tsx:112-130 ==="; sed -n '112,130p' "routes/(_components)/dashboard-view.tsx"; echo; echo "=== home-view.tsx:52-70 ==="; sed -n '52,70p' "routes/(_components)/home-view.tsx"; echo; echo "=== _app.tsx:8-20 ==="; sed -n '8,20p' routes/_app.tsx
+=== dashboard-view.tsx:112-130 ===
+          badge={<Badge variant='success'>ok</Badge>}
+        />
+        <StatsGrid.Card
+          label='Queued'
+          value='1'
+          detail='Background work awaiting capacity'
+          badge={<Badge variant='secondary'>watch</Badge>}
+        />
+        <StatsGrid.Card
+          label='P95 high'
+          value='612ms'
+          detail='Use your telemetry source here'
+          badge={<Badge variant='warning'>trace</Badge>}
+        />
+      </StatsGrid>
+
+      <div class='ns-grid ns-grid--2'>
+        <Card>
+          <Card.Header>
+
+=== home-view.tsx:52-70 ===
+          value='6'
+          detail='Home, dashboard, health, examples, CRUD, design'
+        />
+        <StatsGrid.Card
+          label='UI source'
+          value='app-owned'
+          detail='Installed from @netscript/fresh-ui registry'
+        />
+        <StatsGrid.Card
+          label='Theme'
+          value='NS One'
+          detail='Light/dark tokens from copied artifacts'
+        />
+        <StatsGrid.Card label='Mode' value='local' detail='Generated by the maintainer scaffold' />
+      </StatsGrid>
+
+      <div class='ns-grid ns-grid--3'>
+        {routes.map((route) => (
+          <Card key={route.href}>
+
+=== _app.tsx:8-20 ===
+    <html lang='en' data-theme='dark'>
+      <head>
+        <meta charSet='utf-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        <meta
+          name='description'
+          content='NetScript starter scaffold with Fresh 2, Aspire orchestration, contracts, and enterprise UI primitives.'
+        />
+        <title>ledgerline — ledgerline-web</title>
+        <link rel='icon' href='data:,' />
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
+        <link
+[0m
+Now let me handle the remaining fabricated values. Let me read them in context.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== components-view.tsx 745-775 ==="; sed -n '745,775p' "routes/(design)/design/(_components)/components-view.tsx"; echo; echo "=== are dashboard-view / home-view imported? ==="; grep -rn "dashboard-view\|home-view" routes/ | grep -v "^routes/(_components)/dashboard-view\|^routes/(_components)/home-view" | head
+=== components-view.tsx 745-775 ===
+              <Select
+                id='gallery-filter-period'
+                name='period'
+                aria-label='Period filter'
+                placeholder='Any period'
+                options={PERIOD_OPTIONS}
+              />
+            </FormField>
+            <FilterForm.Actions>
+              <Button type='submit' variant='secondary'>Apply</Button>
+              <Button type='reset' variant='ghost'>Clear</Button>
+            </FilterForm.Actions>
+          </FilterForm.Body>
+        </FilterForm>
+      );
+    case 'stats-grid':
+      return (
+        <StatsGrid>
+          <StatsGrid.Card
+            label='Requests'
+            value='1.2M'
+            detail='Past 24 hours'
+            badge={<Badge variant='success'>+8%</Badge>}
+          />
+          <StatsGrid.Card
+            label='P95 latency'
+            value='184ms'
+            detail='All regions'
+            badge={<Badge variant='warning'>watch</Badge>}
+          />
+        </StatsGrid>
+
+=== are dashboard-view / home-view imported? ===
+routes/index.tsx:1:import HomeView from './(_components)/home-view.tsx';
+[0m
+`home-view.tsx` is live (imported by `routes/index.tsx`); `dashboard-view.tsx` appears orphaned. Let me verify before deciding.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== any import of DashboardView / dashboard-view ==="; grep -rn "dashboard-view\|DashboardView" --include=*.tsx --include=*.ts . 2>/dev/null | grep -v node_modules | grep -v "_fresh" | head; echo "--- result count:"; grep -rn "dashboard-view\|DashboardView" --include=*.tsx --include=*.ts . 2>/dev/null | grep -v node_modules | grep -v "_fresh" | wc -l
+=== any import of DashboardView / dashboard-view ===
+./routes/(_components)/dashboard-view.tsx:24:interface DashboardViewProps {
+./routes/(_components)/dashboard-view.tsx:76:export default function DashboardView({ projectName, appName, services }: DashboardViewProps) {
+--- result count:
+2
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && sed -n '1,60p' components/ui/stats-grid.tsx
+import type { JSX, VNode } from 'preact';
+import { Card } from './card.tsx';
+import { cn } from '../../lib/cn.ts';
+import type { Renderable } from '../../lib/public-types.ts';
+
+interface StatsGridProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  children: Renderable;
+  class?: string;
+}
+
+/**
+ * Summary metric card content.
+ */
+export interface StatsCardProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  /** Small uppercase label above the metric value. */
+  label: Renderable;
+  /** Primary metric value. */
+  value: Renderable;
+  /** Optional supporting detail below the metric. */
+  detail?: Renderable;
+  /** Optional badge rendered beside the label. */
+  badge?: Renderable;
+  class?: string;
+}
+
+type StatsGridComponent = ((props: StatsGridProps) => VNode) & {
+  Card: (props: StatsCardProps) => VNode;
+};
+
+function StatsGridRoot({ children, class: className, ...props }: StatsGridProps): VNode {
+  return (
+    <div {...props} class={cn('ns-stats-grid', className)}>
+      {children}
+    </div>
+  );
+}
+
+function StatsGridCard(
+  { label, value, detail, badge, class: className, ...props }: StatsCardProps,
+): VNode {
+  return (
+    <Card {...props} class={cn('ns-stats-grid__card', className)}>
+      <Card.Body class='ns-stack ns-stack--sm ns-stats-grid__body'>
+        <div class='ns-stats-grid__header'>
+          <span class='ns-stats-grid__label'>{label}</span>
+          {badge}
+        </div>
+        <p class='ns-stats-grid__value'>{value}</p>
+        {detail && <p class='ns-stats-grid__detail'>{detail}</p>}
+      </Card.Body>
+    </Card>
+  );
+}
+
+/**
+ * Responsive summary metric grid with a shared metric-card sub-seam.
+ */
+export const StatsGrid: StatsGridComponent = Object.assign(StatsGridRoot, {
+  Card: StatsGridCard,
+[0m
+`dashboard-view.tsx` has zero importers — dead code with fabricated telemetry. Let me check `StatsGrid.Card`'s prop types before rewriting its demo.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== was stats-grid changed by 2da2189? ==="; git show --stat 2da2189 | grep -i "stats-grid" || echo "NOT CHANGED by 2da2189"; echo; echo "=== stats-grid.css ==="; cat apps/ledgerline-web/assets/ui/stats-grid.css 2>/dev/null | head -50
+=== was stats-grid changed by 2da2189? ===
+NOT CHANGED by 2da2189
+
+=== stats-grid.css ===
+/* StatsGrid block styles. Container-adaptive: the column count derives from
+   available width (auto-fit), not viewport breakpoints, so the grid behaves
+   in narrow rails, split panes, and embedded canvases alike. */
+
+.ns-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: var(--ns-space-4);
+}
+
+.ns-stats-grid__card {
+  overflow: hidden;
+}
+
+.ns-stats-grid__body {
+  min-width: 0;
+}
+
+.ns-stats-grid__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-3);
+}
+
+.ns-stats-grid__label {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ns-muted-fg);
+}
+
+.ns-stats-grid__value {
+  font-size: var(--ns-text-3xl);
+  font-weight: 600;
+  letter-spacing: var(--ns-tracking-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--ns-fg);
+}
+
+.ns-stats-grid__detail {
+  font-size: var(--ns-text-sm);
+  line-height: var(--ns-leading-relaxed);
+  color: var(--ns-muted-fg);
+}
+[0m
+`value`/`badge` are `Renderable`, so they accept VNodes. But note: `badge` renders **beside the label** in the header — the exact anti-pattern the critic named. Let me check whether ranked item 2 fully landed.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== StatsGrid.Card call sites ==="; grep -rn "StatsGrid.Card\|StatsGrid\.Card" --include=*.tsx . | grep -v node_modules | head -20; echo "--- count:"; grep -rn "StatsGrid.Card" --include=*.tsx . | grep -v node_modules | wc -l
+=== StatsGrid.Card call sites ===
+./routes/(design)/design/(_components)/components-view.tsx:763:          <StatsGrid.Card
+./routes/(design)/design/(_components)/components-view.tsx:769:          <StatsGrid.Card
+./routes/(_components)/home-view.tsx:50:        <StatsGrid.Card
+./routes/(_components)/home-view.tsx:55:        <StatsGrid.Card
+./routes/(_components)/home-view.tsx:60:        <StatsGrid.Card
+./routes/(_components)/home-view.tsx:65:        <StatsGrid.Card label='Mode' value='local' detail='Generated by the maintainer scaffold' />
+./routes/(_components)/dashboard-view.tsx:107:        <StatsGrid.Card label='Services' value={services.length} detail='Seeded operational rows' />
+./routes/(_components)/dashboard-view.tsx:108:        <StatsGrid.Card
+./routes/(_components)/dashboard-view.tsx:114:        <StatsGrid.Card
+./routes/(_components)/dashboard-view.tsx:120:        <StatsGrid.Card
+--- count:
+10
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== does any page use StatsGrid (product routes)? ==="; grep -rn "StatsGrid" --include=*.tsx routes/ | grep -v "(design)" | head; echo "=== Renderable type ==="; cat lib/public-types.ts 2>/dev/null | head -20
+=== does any page use StatsGrid (product routes)? ===
+routes/(_components)/home-view.tsx:1:import { Badge, Button, Card, PageHeader, StatsGrid } from '@app/components/ui/mod.ts';
+routes/(_components)/home-view.tsx:49:      <StatsGrid>
+routes/(_components)/home-view.tsx:50:        <StatsGrid.Card
+routes/(_components)/home-view.tsx:55:        <StatsGrid.Card
+routes/(_components)/home-view.tsx:60:        <StatsGrid.Card
+routes/(_components)/home-view.tsx:65:        <StatsGrid.Card label='Mode' value='local' detail='Generated by the maintainer scaffold' />
+routes/(_components)/home-view.tsx:66:      </StatsGrid>
+routes/(_components)/dashboard-view.tsx:12:  StatsGrid,
+routes/(_components)/dashboard-view.tsx:106:      <StatsGrid>
+routes/(_components)/dashboard-view.tsx:107:        <StatsGrid.Card label='Services' value={services.length} detail='Seeded operational rows' />
+=== Renderable type ===
+import type { VNode } from 'preact';
+
+/**
+ * Public renderable content accepted by the `@netscript/fresh-ui` package surface.
+ */
+export type Renderable =
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
+  | VNode
+  | readonly Renderable[];
+
+/**
+ * Public component result used by the `@netscript/fresh-ui` package surface.
+ */
+export type ComponentResult = VNode | null;
+[0m
+**Real gap found:** `StatsGrid` was never changed — it still parks the delta in the header beside the label, which is exactly what ranked item 2 asked to fix ("render the delta chip in a flex row directly beside the hero value"). Let me check all call sites.
+[0m← [0mEdit apps/ledgerline-web/components/ui/stats-grid.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/stats-grid.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/stats-grid.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/stats-grid.tsx
+@@ -20,8 +20,14 @@
+   /** Optional supporting detail below the metric. */
+   detail?: Renderable;
+   /** Optional badge rendered beside the label. */
+   badge?: Renderable;
++  /**
++   * Movement against the comparison period. Rendered on the value's own row,
++   * not beside the label — a reader learns the number before learning how it
++   * moved (C3). Pass a `DeltaChip`; a `Badge` here would be refusal 13.
++   */
++  delta?: Renderable;
+   class?: string;
+ }
+ 
+ type StatsGridComponent = ((props: StatsGridProps) => VNode) & {
+
+[0m
+Confirmed scope. Let me add the `delta` slot to `StatsGrid` (backwards compatible) so the delta sits on the value's row.
+[0m← [0mEdit apps/ledgerline-web/components/ui/stats-grid.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/stats-grid.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/stats-grid.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/stats-grid.tsx
+@@ -42,18 +42,21 @@
+   );
+ }
+ 
+ function StatsGridCard(
+-  { label, value, detail, badge, class: className, ...props }: StatsCardProps,
++  { label, value, detail, badge, delta, class: className, ...props }: StatsCardProps,
+ ): VNode {
+   return (
+     <Card {...props} class={cn('ns-stats-grid__card', className)}>
+       <Card.Body class='ns-stack ns-stack--sm ns-stats-grid__body'>
+         <div class='ns-stats-grid__header'>
+           <span class='ns-stats-grid__label'>{label}</span>
+           {badge}
+         </div>
+-        <p class='ns-stats-grid__value'>{value}</p>
++        <div class='ns-stats-grid__figure'>
++          <p class='ns-stats-grid__value'>{value}</p>
++          {delta}
++        </div>
+         {detail && <p class='ns-stats-grid__detail'>{detail}</p>}
+       </Card.Body>
+     </Card>
+   );
+
+[0m
+[0m→ [0mRead apps/ledgerline-web/assets/ui/stats-grid.css
+[0m
+[0m← [0mEdit apps/ledgerline-web/assets/ui/stats-grid.css
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/stats-grid.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/stats-grid.css
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/stats-grid.css
+@@ -30,8 +30,19 @@
+   letter-spacing: 0.16em;
+   color: var(--ns-muted-fg);
+ }
+ 
++/* The delta rides on the value's own row, optically centred on the number.
++   Parking it beside the label inverts the reading order: the eye lands on the
++   movement in the corner before it reaches the number (C3, refusal 13). */
++.ns-stats-grid__figure {
++  display: flex;
++  align-items: center;
++  gap: var(--ns-space-2);
++  flex-wrap: wrap;
++  min-width: 0;
++}
++
+ .ns-stats-grid__value {
+   font-size: var(--ns-text-3xl);
+   font-weight: 600;
+   letter-spacing: var(--ns-tracking-tight);
+
+[0m
+[0m→ [0mRead apps/ledgerline-web/assets/ui/delta-chip.css
+Let me verify `DeltaChip`'s direction semantics before I pick values — a *decrease* in failures is good, which a naive `down` would colour red.
+[0m→ [0mRead apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx[90m [offset=758, limit=20][0m
+Confirmed: `DeltaChip` colours purely by `direction` (no "a decrease is good" inversion). I'll pick metrics where direction maps honestly rather than render a misleading colour.
+[0m
+[0m← [0mEdit apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+@@ -760,18 +760,18 @@
+ case 'stats-grid':
+   return (
+     <StatsGrid>
+       <StatsGrid.Card
+-        label='Requests'
+-        value='1.2M'
+-        detail='Past 24 hours'
+-        badge={<Badge variant='success'>+8%</Badge>}
++        label='Collected this period'
++        value={<MoneyText value='1240500' currency='USD' />}
++        detail='318 invoices across 4 plans'
++        delta={<DeltaChip value='+14.2%' direction='up' />}
+       />
+       <StatsGrid.Card
+-        label='P95 latency'
+-        value='184ms'
+-        detail='All regions'
+-        badge={<Badge variant='warning'>watch</Badge>}
++        label='Collection rate'
++        value='96.4%'
++        detail='Write-offs counted against the period'
++        delta={<DeltaChip value='-1.2%' direction='down' />}
+       />
+     </StatsGrid>
+   );
+ case 'detail-layout':
+
+[0m
+[0m→ [0mRead apps/ledgerline-web/routes/(_components)/home-view.tsx
+Now the live landing page (`home-view.tsx`) and `_app.tsx`, which still describe the app as a scaffold.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== routes/ tree ==="; ls routes/; echo "=== dashboard route exists? ==="; ls routes/dashboard.tsx 2>/dev/null || echo "NO dashboard.tsx -> /dashboard is a 404"; echo "=== what does index.tsx pass to HomeView? ==="; cat routes/index.tsx
+=== routes/ tree ===
+(_components)
+(_shared)
+(design)
+_app.tsx
+_layout.tsx
+health.tsx
+index.tsx
+=== dashboard route exists? ===
+NO dashboard.tsx -> /dashboard is a 404
+=== what does index.tsx pass to HomeView? ===
+import HomeView from './(_components)/home-view.tsx';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+import { routes } from '@app/.generated/routes.ts';
+
+export const homePage = definePage()
+  .withRoute(routes.$route)
+  .withRoute(appRoutes.home)
+  .withMeta(() => ({
+    title: 'Ledgerline — close the month with the number defensible',
+    description:
+      'Billing runs you can inspect, pause and resume. Every number settled or provisional.',
+  }))
+  .withLayer('home', HomeView, () => ({
+    projectName: 'ledgerline',
+    appName: 'ledgerline-web',
+    designHref: appRoutes.design.href(),
+    compositionHref: appRoutes.designComposition.href(),
+    routes: [
+      {
+        title: 'Billing runs',
+        href: appRoutes.runs.href(),
+        description:
+          'Draft → compute → review → issue, with per-item decisions, exceptions and terminal compensation.',
+        cta: 'Open the run console',
+        badge: 'product',
+      },
+      {
+        title: 'Invoices',
+        href: appRoutes.invoices.href(),
+        description: 'Invoice ledger with typed search and drill-down to lines, payments and notes.',
+        cta: 'Open invoices',
+        badge: 'product',
+      },
+      {
+        title: 'Customers',
+        href: appRoutes.customers.href(),
+        description: 'Customer accounts with credit balance, open invoices and subscriptions.',
+        cta: 'Open customers',
+        badge: 'product',
+      },
+      {
+        title: 'Design reference',
+        href: appRoutes.design.href(),
+        description: 'Living index for the Ledgerline tokens, components, and composition rules.',
+        cta: 'Open design',
+        badge: 'design',
+      },
+    ],
+  }))
+  .withLayout((slots) => slots.home())
+  .build();
+
+export const { default: page } = homePage;
+export { page as default };
+[0m
+`home-view.tsx` links to `/dashboard`, but commit `8452f25` deleted `routes/dashboard.tsx`. Let me verify that's a dead link.
+[0m← [0mEdit apps/ledgerline-web/routes/(_components)/home-view.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
+@@ -29,14 +29,13 @@
+ </PageHeader.Badges>
+ <PageHeader.Intro>
+   <h1>{projectName}</h1>
+   <p class='ns-lede'>
+-    A generated NetScript workspace with app-owned UI copies, design reference routes, and
+-    operational examples ready to adapt.
++    Billing runs you can inspect, pause and resume — every number either settled or
++    marked provisional, never silently rounded.
+   </p>
+ </PageHeader.Intro>
+ <PageHeader.Actions>
+-  <Button type='link' href='/dashboard'>Open dashboard</Button>
+   <Button type='link' href={designHref} variant='outline'>
+     Browse design
+   </Button>
+   <Button type='link' href={compositionHref} variant='ghost'>
+
+[0m
+`/dashboard` is a **404** (`routes/dashboard.tsx` was deleted) yet the landing page still links to it, and the StatsGrid hardcodes `Routes value='6'` naming deleted routes. Let me fix these.
+[0m← [0mEdit apps/ledgerline-web/routes/(_components)/home-view.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
+@@ -45,24 +45,30 @@
+   </PageHeader.Main>
+ </PageHeader>
+ 
+ <StatsGrid>
++  {/* The route count is derived, never hardcoded: a literal here went
++      stale the moment the scaffold routes were deleted. */}
+   <StatsGrid.Card
+-    label='Routes'
+-    value='6'
+-    detail='Home, dashboard, health, examples, CRUD, design'
++    label='Product surfaces'
++    value={routes.length}
++    detail={routes.map((route) => route.title).join(' · ')}
+   />
+   <StatsGrid.Card
+     label='UI source'
+     value='app-owned'
+     detail='Installed from @netscript/fresh-ui registry'
+   />
+   <StatsGrid.Card
+     label='Theme'
+-    value='NS One'
+-    detail='Light/dark tokens from copied artifacts'
++    value='Ledgerline'
++    detail='Paper and ink, ledger-green in, rust for reversals — light and dark'
+   />
+-  <StatsGrid.Card label='Mode' value='local' detail='Generated by the maintainer scaffold' />
++  <StatsGrid.Card
++    label='Money'
++    value='2dp'
++    detail='One formatter. Absence is an em dash, never a 0.00.'
++  />
+ </StatsGrid>
+ 
+ <div class='ns-grid ns-grid--3'>
+   {routes.map((route) => (
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && for f in "routes/(design)/design/(_shared)/registry.ts:97" "routes/(design)/design/_layout.tsx:67" "routes/(design)/design/(_components)/components-view.tsx:107" "routes/(design)/design/(_components)/components-view.tsx:1018" "routes/(design)/design/(_components)/tokens-view.tsx:359" "routes/(design)/design/(_components)/composition-view.tsx:115" "routes/(design)/design/(_components)/composition-view.tsx:187"; do file="${f%:*}"; line="${f##*:}"; echo "--- $f"; sed -n "$((line-2)),$((line+1))p" "$file"; done
+--- routes/(design)/design/(_shared)/registry.ts:97
+    layer: null,
+    description:
+      'NS One theme: DTCG-generated token artifacts plus base element styles. Components consume only the semantic --ns-* vocabulary this theme provides.',
+  },
+--- routes/(design)/design/_layout.tsx:67
+        <div class='ns-dashboard__sidebar-env'>
+          <span class='ns-dot-active' />
+          <span class='ns-dashboard__sidebar-env-label'>NS One theme</span>
+        </div>
+--- routes/(design)/design/(_components)/components-view.tsx:107
+    kinds: ['theme', 'lib', 'support'],
+    lede:
+      'The theme and the plumbing everything else depends on: NS One token artifacts, the class-merge helper, shared types, and form/toast support.',
+  },
+--- routes/(design)/design/(_components)/components-view.tsx:1018
+        <div class='ns-cluster ns-cluster--md'>
+          <h1>Components</h1>
+          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='muted'>
+--- routes/(design)/design/(_components)/tokens-view.tsx:359
+        <div class='ns-cluster ns-cluster--md'>
+          <h1>Tokens</h1>
+          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='muted'>manifest v{tokenManifestMeta.version}</Badge>
+--- routes/(design)/design/(_components)/composition-view.tsx:115
+        <div class='ns-cluster ns-cluster--md'>
+          <h1>Composition</h1>
+          <Badge variant='primary'>NS One</Badge>
+          <Badge variant='muted'>L0 contract</Badge>
+--- routes/(design)/design/(_components)/composition-view.tsx:187
+              id='tokens'
+              title='The token rule'
+              lede='Components are theme-blind. NS One is the first theme, not the system.'
+            />
+[0m
+Now `_app.tsx` and the stale "NS One" theme name (tokens are now branded "Ledgerline"). Let me see each context.
+[0m→ [0mRead apps/ledgerline-web/routes/_app.tsx[90m [limit=14, offset=8][0m
+All seven are the stale scaffold theme name. Let me fix `_app.tsx` (flatly calls Ledgerline a "starter scaffold") and rename the theme mechanically.
+[0m
+[0m← [0mEdit apps/ledgerline-web/routes/_app.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/_app.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/_app.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/_app.tsx
+@@ -10,9 +10,9 @@
+ <meta charSet='utf-8' />
+ <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+ <meta
+   name='description'
+-  content='NetScript starter scaffold with Fresh 2, Aspire orchestration, contracts, and enterprise UI primitives.'
++  content='Ledgerline — close the month with the number defensible. Billing runs you can inspect, pause and resume.'
+ />
+ <title>ledgerline — ledgerline-web</title>
+ <link rel='icon' href='data:,' />
+ <link rel='preconnect' href='https://fonts.googleapis.com' />
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && for f in "routes/(design)/design/(_shared)/registry.ts" "routes/(design)/design/_layout.tsx" "routes/(design)/design/(_components)/components-view.tsx" "routes/(design)/design/(_components)/tokens-view.tsx" "routes/(design)/design/(_components)/composition-view.tsx"; do sed -i 's/NS One/Ledgerline/g' "$f"; done; echo "=== remaining NS One ==="; grep -rn "NS One" routes/ components/ 2>/dev/null | head; echo "=== new Ledgerline theme refs ==="; grep -rn "Ledgerline theme\|Ledgerline token artifacts\|is the first theme" routes/ | head
+=== remaining NS One ===
+=== new Ledgerline theme refs ===
+routes/(design)/design/(_shared)/registry.ts:97:      'Ledgerline theme: DTCG-generated token artifacts plus base element styles. Components consume only the semantic --ns-* vocabulary this theme provides.',
+routes/(design)/design/_layout.tsx:67:          <span class='ns-dashboard__sidebar-env-label'>Ledgerline theme</span>
+routes/(design)/design/(_components)/components-view.tsx:107:      'The theme and the plumbing everything else depends on: Ledgerline token artifacts, the class-merge helper, shared types, and form/toast support.',
+routes/(design)/design/(_components)/composition-view.tsx:187:              lede='Components are theme-blind. Ledgerline is the first theme, not the system.'
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== any dynamic/string ref to dashboard ==="; grep -rn "'/dashboard'\|\"/dashboard\"\|/dashboard" --include=*.ts --include=*.tsx . 2>/dev/null | grep -v node_modules | grep -v _fresh | head; echo "--- (empty = safe)"
+=== any dynamic/string ref to dashboard ===
+--- (empty = safe)
+[0m
+Now the orphaned `dashboard-view.tsx`. Let me confirm no dynamic reference before deleting.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && git rm "routes/(_components)/dashboard-view.tsx" && echo "--- deleted ---" && ls routes/(_components)/
+/bin/bash: -c: line 1: syntax error near unexpected token `('
+/bin/bash: -c: line 1: `cd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && git rm "routes/(_components)/dashboard-view.tsx" && echo "--- deleted ---" && ls routes/(_components)/'
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && git rm "routes/(_components)/dashboard-view.tsx" && echo "--- deleted ---" && ls routes/'"'"'(_components)'"'"'/
+rm 'apps/ledgerline-web/routes/(_components)/dashboard-view.tsx'
+--- deleted ---
+ls: cannot access 'routes/"'\''(_components)'\''"/': No such file or directory
+[0m
+[0m✗ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-design/tests/design_contract_test.ts failed
+[91m[1mError: [0mFile not found: /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-design/tests/design_contract_test.ts
+`git rm` succeeded. Now let me add a regression test — this repo's established pattern is to make each fix un-regressable (as it did for T2a and C8). Let me read the test file's style.
+[0m→ [0mRead tests/design_contract_test.ts
+[0m
+[0m← [0mEdit tests/design_contract_test.ts
+Index: /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
++++ /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+@@ -36,8 +36,28 @@
+ async function read(path: string): Promise<string> {
+   return await Deno.readTextFile(new URL(path, APP));
+ }
+ 
++/** Every app source file that can put text in front of a reader. */
++async function appSources(): Promise<string[]> {
++  const files: string[] = [];
++
++  async function walk(dir: string): Promise<void> {
++    try {
++      for await (const entry of Deno.readDir(new URL(`./${dir}/`, APP))) {
++        const rel = `${dir}/${entry.name}`;
++        if (entry.isDirectory) await walk(rel);
++        else if (/\.tsx?$/.test(entry.name)) files.push(rel);
++      }
++    } catch {
++      // A root that does not exist in this branch contributes nothing.
++    }
++  }
++
++  for (const root of ['routes', 'components', 'islands', 'lib']) await walk(root);
++  return files.sort();
++}
++
+ Deno.test('T2a — no component reaches for a ramp step', async () => {
+   // The paper ramp inverts in dark: paper-12 is near-black in light and
+   // near-white in dark. A ramp step in a component is a broken dark theme.
+   const rampStep = /var\(--ns-(?:paper|ledger|rust|ink|brass|amber)-\d+\)/;
+
+[0m
+Now let me add a regression test for rule 8, in the file's established style.
+[0m← [0mEdit tests/design_contract_test.ts
+Index: /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
++++ /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+@@ -222,4 +222,45 @@
+     'a gauge arc must declare stroke-linecap="butt"; a round cap bulges past the baseline',
+   );
+   assert(!gauge.includes("stroke-linecap='round'"), 'a gauge arc must not use a round cap');
+ });
++
++Deno.test('R8 — no scaffold fiction ships', async () => {
++  // Rule 8. The scaffold's cloud/DevOps vocabulary is the fingerprint of a
++  // themed starter, and the gallery is the file a reviewer opens first. Every
++  // demo string is a real Ledgerline value: an invoice number, a customer, a
++  // plan, a money amount, a decline reason.
++  const fiction = [
++    'api-gateway',
++    'eu-west',
++    'v2.4.1',
++    'NS One',
++    'starter scaffold',
++    'maintainer scaffold',
++    'lorem ipsum',
++  ];
++
++  for (const file of await appSources()) {
++    const source = await read(`./${file}`);
++    for (const term of fiction) {
++      assert(
++        !source.includes(term),
++        `${file} ships scaffold fiction ("${term}") — every demo string is a real Ledgerline value`,
++      );
++    }
++  }
++});
++
++Deno.test('R8 — a dead route is not linked from the landing page', async () => {
++  // A hardcoded href is a promise the router has to keep. `/dashboard` was
++  // deleted with the scaffold routes but stayed linked, so the landing page
++  // shipped a 404.
++  const home = await read('./routes/(_components)/home-view.tsx');
++  for (const match of home.matchAll(/href='(\/[^']*)'/g)) {
++    const href = match[1];
++    const route = href === '/' ? 'index.tsx' : `${href.replace(/^\//, '').replace(/\/$/, '')}.tsx`;
++    assert(
++      await Deno.stat(new URL(`./routes/${route}`, APP)).then(() => true).catch(() => false),
++      `home-view links ${href}, but routes/${route} does not exist — a dead link`,
++    );
++  }
++});
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 300 deno test --allow-all tests/design_contract_test.ts 2>&1 | tail -30
+[0m[32mCheck[0m tests/design_contract_test.ts
+[0m[38;5;245mrunning 13 tests from ./tests/design_contract_test.ts[0m
+T2a — no component reaches for a ramp step ... [0m[32mok[0m [0m[38;5;245m(4ms)[0m
+T2 — no raw colour literal in a component stylesheet ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+C8 — no hard offset shadow survives ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+M8 — only lib/money turns a decimal into text ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+T1 — tokens.json and tokens.css declare the same custom properties ... [0m[32mok[0m [0m[38;5;245m(671µs)[0m
+T1 — every token a component uses is declared ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+T6 — every component stylesheet is imported by styles.css ... [0m[32mok[0m [0m[38;5;245m(230µs)[0m
+R1 — every component module is exported from the barrel ... [0m[32mok[0m [0m[38;5;245m(240µs)[0m
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(358µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(223µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(69µs)[0m
+R8 — no scaffold fiction ships ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+R8 — a dead route is not linked from the landing page ... [0m[32mok[0m [0m[38;5;245m(223µs)[0m
+
+[0m[32mok[0m | 13 passed | 0 failed [0m[38;5;245m(22ms)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== hrefs in home-view.tsx ==="; grep -n "href" "routes/(_components)/home-view.tsx"
+=== hrefs in home-view.tsx ===
+5:  readonly href: string;
+38:            <Button type='link' href={designHref} variant='outline'>
+41:            <Button type='link' href={compositionHref} variant='ghost'>
+75:          <Card key={route.href}>
+84:              <Button type='link' href={route.href} variant='outline'>{route.cta}</Button>
+[0m
+All 13 pass. But let me verify the new dead-link test isn't **vacuously** passing — a test that can't fail is worse than no test.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== string-literal hrefs across app ==="; grep -rnoE "href='[^'{][^']*'" --include=*.tsx routes/ components/ islands/ 2>/dev/null | head -20; echo "--- count:"; grep -rnoE "href='[^'{][^']*'" --include=*.tsx routes/ components/ islands/ 2>/dev/null | wc -l
+=== string-literal hrefs across app ===
+routes/(design)/design/_layout.tsx:52:href='/'
+routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx:104:href='/design/composition'
+routes/(design)/design/(_components)/components-view.tsx:486:href='/design/tokens'
+routes/(design)/design/(_components)/components-view.tsx:966:href='/design/tokens'
+routes/(design)/design/(_components)/composition-view.tsx:214:href='/design/tokens'
+routes/(design)/design/(_components)/composition-view.tsx:217:href='/design/components'
+routes/_app.tsx:17:href='data:,'
+routes/_app.tsx:18:href='https://fonts.googleapis.com'
+routes/_app.tsx:19:href='https://fonts.gstatic.com'
+routes/_app.tsx:21:href='https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap'
+routes/_app.tsx:27:href='#main-content'
+--- count:
+11
+[0m
+Confirmed — **every** `href` in home-view is a JSX expression, so my regex matched zero hrefs and the test passed vacuously. Let me check whether string-literal hrefs exist anywhere so the test can be made meaningful.
+[0m← [0mEdit tests/design_contract_test.ts
+Index: /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
++++ /home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+@@ -249,18 +249,44 @@
+     }
+   }
+ });
+ 
+-Deno.test('R8 — a dead route is not linked from the landing page', async () => {
+-  // A hardcoded href is a promise the router has to keep. `/dashboard` was
+-  // deleted with the scaffold routes but stayed linked, so the landing page
+-  // shipped a 404.
+-  const home = await read('./routes/(_components)/home-view.tsx');
+-  for (const match of home.matchAll(/href='(\/[^']*)'/g)) {
+-    const href = match[1];
+-    const route = href === '/' ? 'index.tsx' : `${href.replace(/^\//, '').replace(/\/$/, '')}.tsx`;
+-    assert(
+-      await Deno.stat(new URL(`./routes/${route}`, APP)).then(() => true).catch(() => false),
+-      `home-view links ${href}, but routes/${route} does not exist — a dead link`,
+-    );
++Deno.test('R8 — an internal link is not a dead end', async () => {
++  // A string-literal href is a promise the router has to keep. `/dashboard`
++  // was deleted with the scaffold routes but stayed linked, so the landing
++  // page shipped a 404. Only literals are checkable here — the hrefs a page
++  // receives as props are resolved by whoever renders it.
++  const literal = /href='(\/[^']*)'/g;
++
++  let checked = 0;
++  for (const file of await appSources()) {
++    const source = await read(`./${file}`);
++
++    for (const match of source.matchAll(literal)) {
++      const path = match[1].replace(/\/+$/, '');
++      const candidates = path === ''
++        ? ['routes/index.tsx']
++        : [
++          `routes/${path}.tsx`,
++          `routes/${path}/index.tsx`,
++          ...(path.startsWith('/design/')
++            ? [`routes/(design)/design/${path.slice('/design/'.length)}.tsx`]
++            : []),
++        ];
++
++      const resolved = await Promise.all(
++        candidates.map((candidate) =>
++          Deno.stat(new URL(`./${candidate}`, APP)).then(() => true).catch(() => false)
++        ),
++      );
++      checked += 1;
++      assert(
++        resolved.some(Boolean),
++        `${file} links ${match[1]}, but no route module resolves for it — a dead link`,
++      );
++    }
+   }
++
++  // Guard against the check going quietly vacuous: a rewrite that moves every
++  // href into a prop would leave this test passing while proving nothing.
++  assert(checked > 0, 'no internal href literals found — this assertion has stopped testing');
+ });
+
+[0m
+Six internal string-literal hrefs do exist, so a whole-app scan is meaningful. Let me replace the vacuous test with a real one that also asserts it checked something.
+Now let me prove the test actually fails on a dead link (the only way to trust it) rather than just passing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 300 deno test --allow-all tests/design_contract_test.ts 2>&1 | tail -8
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(403µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(279µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(73µs)[0m
+R8 — no scaffold fiction ships ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(5ms)[0m
+
+[0m[32mok[0m | 13 passed | 0 failed [0m[38;5;245m(31ms)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && cp "routes/(_components)/home-view.tsx" /tmp/home-view.bak && sed -i "s|href={designHref} variant='outline'|href='/dashboard' variant='outline'|" "routes/(_components)/home-view.tsx" && echo "=== injected dead /dashboard link ===" && grep -n "href='/dashboard'" "routes/(_components)/home-view.tsx" && cd /home/agent/projects/netscript/wave7-design && timeout 300 deno test --allow-all tests/design_contract_test.ts 2>&1 | grep -E "R8 — an internal|passed|failed" | head -5
+=== injected dead /dashboard link ===
+38:            <Button type='link' href='/dashboard' variant='outline'>
+R8 — an internal link is not a dead end ... [0m[31mFAILED[0m [0m[38;5;245m(3ms)[0m
+R8 — an internal link is not a dead end [0m[38;5;245m=> ./tests/design_contract_test.ts:253:6[0m
+R8 — an internal link is not a dead end [0m[38;5;245m=> ./tests/design_contract_test.ts:253:6[0m
+[0m[31mFAILED[0m | 12 passed | 1 failed [0m[38;5;245m(27ms)[0m
+[0m[1m[31merror[0m: Test failed
+[0m
+The test correctly **fails** on the injected dead link — it's meaningful. Let me revert the injection.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && cp /tmp/home-view.bak "routes/(_components)/home-view.tsx" && rm /tmp/home-view.bak && echo "=== restored ===" && grep -n "href=" "routes/(_components)/home-view.tsx" && cd /home/agent/projects/netscript/wave7-design && timeout 300 deno test --allow-all tests/design_contract_test.ts 2>&1 | tail -4
+=== restored ===
+38:            <Button type='link' href={designHref} variant='outline'>
+41:            <Button type='link' href={compositionHref} variant='ghost'>
+84:              <Button type='link' href={route.href} variant='outline'>{route.cta}</Button>
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(4ms)[0m
+
+[0m[32mok[0m | 13 passed | 0 failed [0m[38;5;245m(29ms)[0m
+[0m
+[0m# [0mTodos
+[✓] Verify committed design work (5 components, fixes, gallery) is real and passes gates
+[✓] Fix residual scaffold fiction in FloatingSurfaceDemo.tsx (api-gateway/eu-west/v2.4.1) — rule 8
+[✓] Fix StatsGrid delta placement (ranked item 2 partial gap: delta was still beside the label)
+[✓] Fix fabricated values: components-view 184ms, home-view NS One/route count, _app description, dead /dashboard link, delete orphaned dashboard-view
+[✓] Add R8 regression tests (scaffold fiction + dead links), prove non-vacuous
+[•] Run full validation (check/lint/fmt/test/build) and commit
+[ ] Report DONE vs REMAINING incl. billing-tree handoff blocked by live agents
+[0m
+Restored and green. Now full validation.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== CHECK ==="; timeout 400 deno check . 2>&1 | grep -iE "error|TS[0-9]" | head -10 || echo "clean"; echo "=== LINT ==="; timeout 300 deno lint 2>&1 | tail -5
+=== CHECK ===
+=== LINT ===
+Checked 88 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== FMT (my touched files) ==="; timeout 300 deno fmt --check tests/design_contract_test.ts apps/ledgerline-web/components/ui/stats-grid.tsx apps/ledgerline-web/assets/ui/stats-grid.css apps/ledgerline-web/routes/_app.tsx "apps/ledgerline-web/routes/(_components)/home-view.tsx" "apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx" "apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx" 2>&1 | tail -10
+=== FMT (my touched files) ===
+270[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m          `routes/${path}/index.tsx`,[0m
+272[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m          ? [`routes/(design)/design/${path.slice('/design/'.length)}.tsx`][0m
+271[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m          ...(path.startsWith('/design/')[0m
+273[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m          : []),[0m
+272[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m            ? [`routes/(design)/design/${path.slice('/design/'.length)}.tsx`][0m
+274[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m      ];[0m
+273[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m            : []),[0m
+274[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m        ];[0m
+
+[0m[1m[31merror[0m: Found 2 not formatted files in 7 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== ALL TESTS ==="; timeout 400 deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -6
+=== ALL TESTS ===
+in-flight states are marked live so they never rely on colour alone ... [0m[32mok[0m [0m[38;5;245m(28µs)[0m
+derived states are declared, so a reader knows they are computed ... [0m[32mok[0m [0m[38;5;245m(18µs)[0m
+an unknown status surfaces instead of vanishing ... [0m[32mok[0m [0m[38;5;245m(39µs)[0m
+
+[0m[32mok[0m | 30 passed | 0 failed [0m[38;5;245m(143ms)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && for f in tests/design_contract_test.ts apps/ledgerline-web/components/ui/stats-grid.tsx apps/ledgerline-web/assets/ui/stats-grid.css apps/ledgerline-web/routes/_app.tsx "apps/ledgerline-web/routes/(_components)/home-view.tsx" "apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx" "apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx"; do r=$(timeout 120 deno fmt --check "$f" 2>&1 | grep -c "not formatted"); echo "$r  $f"; done
+1  tests/design_contract_test.ts
+0  apps/ledgerline-web/components/ui/stats-grid.tsx
+0  apps/ledgerline-web/assets/ui/stats-grid.css
+0  apps/ledgerline-web/routes/_app.tsx
+1  apps/ledgerline-web/routes/(_components)/home-view.tsx
+0  apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+0  apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+[0m
+30 tests pass. `fmt` flags 2 files — let me identify them so I only format my own changes, not pre-existing drift.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 200 deno fmt tests/design_contract_test.ts "apps/ledgerline-web/routes/(_components)/home-view.tsx" 2>&1 | tail -5; echo "=== re-check ==="; timeout 200 deno fmt --check tests/design_contract_test.ts "apps/ledgerline-web/routes/(_components)/home-view.tsx" 2>&1 | tail -3
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/(_components)/home-view.tsx
+/home/agent/projects/netscript/wave7-design/tests/design_contract_test.ts
+Checked 2 files
+=== re-check ===
+Checked 2 files
+[0m
+Both unformatted files are mine. Let me format just those two (not the repo-wide task).
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git status --short | grep -v "^??"
+M apps/ledgerline-web/assets/ui/stats-grid.css
+ M apps/ledgerline-web/components/ui/stats-grid.tsx
+D  apps/ledgerline-web/routes/(_components)/dashboard-view.tsx
+ M apps/ledgerline-web/routes/(_components)/home-view.tsx
+ M apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+ M apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+ M apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx
+ M apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+ M apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts
+ M apps/ledgerline-web/routes/(design)/design/_layout.tsx
+ M apps/ledgerline-web/routes/_app.tsx
+ M tests/design_contract_test.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== TESTS after fmt ==="; timeout 300 deno test --allow-all tests/design_contract_test.ts 2>&1 | tail -4; echo "=== CHECK ==="; cd apps/ledgerline-web && timeout 400 deno check . 2>&1 | grep -iE "error" | head -5 || echo "clean"
+=== TESTS after fmt ===
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+
+[0m[32mok[0m | 13 passed | 0 failed [0m[38;5;245m(26ms)[0m
+
+=== CHECK ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && grep -A15 '"tasks"' deno.json 2>/dev/null | head -20; echo "=== lock status ==="; cd /home/agent/projects/netscript/wave7-design && git status --short deno.lock apps/ledgerline-web/deno.lock 2>/dev/null; echo "(empty above = lock untouched)"
+"tasks": {
+    "check": "deno fmt --check . && deno lint . && deno check",
+    "deps:closure": "deno run --allow-read .netscript/verify-dependency-closure.ts",
+    "dev": "deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native",
+    "build": "deno task deps:closure && deno run -A npm:vite build",
+    "serve": "deno run -A npm:vite preview",
+    "start": "deno serve -A _fresh/server.js",
+    "update": "deno run -A -r jsr:@fresh/update ."
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "fresh",
+        "recommended"
+      ]
+    }
+=== lock status ===
+(empty above = lock untouched)
+[0m
+All green, and `deno.lock` is untouched (lock hygiene preserved). Let me confirm a build still succeeds after the file deletion.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 500 deno run -A npm:vite build 2>&1 | tail -15
+in "../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/util.js (330:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 579 modules transformed.
+rendering chunks...
+_fresh/server/.vite/manifest.json            0.93 kB
+_fresh/server/_fresh-route___health.mjs      2.36 kB
+_fresh/server/_fresh-route___index.mjs       4.23 kB
+_fresh/server/mod.mjs                      105.59 kB
+_fresh/server/server-entry.mjs           1,001.73 kB
+✓ built in 4.50s
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== lock untouched? ==="; git status --short | grep -i lock || echo "OK: no lock churn"; echo; echo "=== DIFFSTAT ==="; git diff HEAD --stat
+=== lock untouched? ===
+OK: no lock churn
+
+=== DIFFSTAT ===
+ apps/ledgerline-web/assets/ui/stats-grid.css       |  11 ++
+ apps/ledgerline-web/components/ui/stats-grid.tsx   |  13 +-
+ .../routes/(_components)/dashboard-view.tsx        | 165 ---------------------
+ .../routes/(_components)/home-view.tsx             |  25 ++--
+ .../design/(_components)/components-view.tsx       |  20 +--
+ .../design/(_components)/composition-view.tsx      |   4 +-
+ .../(design)/design/(_components)/tokens-view.tsx  |   2 +-
+ .../design/(_islands)/FloatingSurfaceDemo.tsx      |  16 +-
+ .../routes/(design)/design/(_shared)/registry.ts   |   2 +-
+ .../routes/(design)/design/_layout.tsx             |   2 +-
+ apps/ledgerline-web/routes/_app.tsx                |   2 +-
+ tests/design_contract_test.ts                      |  89 ++++++++++-
+ 12 files changed, 150 insertions(+), 201 deletions(-)
+[0m
+Build succeeds. Let me verify lock hygiene held and review the full diff before committing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git diff HEAD -- apps/ledgerline-web/components/ui/stats-grid.tsx "apps/ledgerline-web/routes/(_components)/home-view.tsx"
+diff --git a/apps/ledgerline-web/components/ui/stats-grid.tsx b/apps/ledgerline-web/components/ui/stats-grid.tsx
+index 7d7c287..497a438 100644
+--- a/apps/ledgerline-web/components/ui/stats-grid.tsx
++++ b/apps/ledgerline-web/components/ui/stats-grid.tsx
+@@ -21,6 +21,12 @@ export interface StatsCardProps
+   detail?: Renderable;
+   /** Optional badge rendered beside the label. */
+   badge?: Renderable;
++  /**
++   * Movement against the comparison period. Rendered on the value's own row,
++   * not beside the label — a reader learns the number before learning how it
++   * moved (C3). Pass a `DeltaChip`; a `Badge` here would be refusal 13.
++   */
++  delta?: Renderable;
+   class?: string;
+ }
+ 
+@@ -37,7 +43,7 @@ function StatsGridRoot({ children, class: className, ...props }: StatsGridProps)
+ }
+ 
+ function StatsGridCard(
+-  { label, value, detail, badge, class: className, ...props }: StatsCardProps,
++  { label, value, detail, badge, delta, class: className, ...props }: StatsCardProps,
+ ): VNode {
+   return (
+     <Card {...props} class={cn('ns-stats-grid__card', className)}>
+@@ -46,7 +52,10 @@ function StatsGridCard(
+           <span class='ns-stats-grid__label'>{label}</span>
+           {badge}
+         </div>
+-        <p class='ns-stats-grid__value'>{value}</p>
++        <div class='ns-stats-grid__figure'>
++          <p class='ns-stats-grid__value'>{value}</p>
++          {delta}
++        </div>
+         {detail && <p class='ns-stats-grid__detail'>{detail}</p>}
+       </Card.Body>
+     </Card>
+diff --git a/apps/ledgerline-web/routes/(_components)/home-view.tsx b/apps/ledgerline-web/routes/(_components)/home-view.tsx
+index 2899a55..09f92c2 100644
+--- a/apps/ledgerline-web/routes/(_components)/home-view.tsx
++++ b/apps/ledgerline-web/routes/(_components)/home-view.tsx
+@@ -30,12 +30,11 @@ export default function HomeView(
+           <PageHeader.Intro>
+             <h1>{projectName}</h1>
+             <p class='ns-lede'>
+-              A generated NetScript workspace with app-owned UI copies, design reference routes, and
+-              operational examples ready to adapt.
++              Billing runs you can inspect, pause and resume — every number either settled or marked
++              provisional, never silently rounded.
+             </p>
+           </PageHeader.Intro>
+           <PageHeader.Actions>
+-            <Button type='link' href='/dashboard'>Open dashboard</Button>
+             <Button type='link' href={designHref} variant='outline'>
+               Browse design
+             </Button>
+@@ -47,10 +46,14 @@ export default function HomeView(
+       </PageHeader>
+ 
+       <StatsGrid>
++        {
++          /* The route count is derived, never hardcoded: a literal here went
++            stale the moment the scaffold routes were deleted. */
++        }
+         <StatsGrid.Card
+-          label='Routes'
+-          value='6'
+-          detail='Home, dashboard, health, examples, CRUD, design'
++          label='Product surfaces'
++          value={routes.length}
++          detail={routes.map((route) => route.title).join(' · ')}
+         />
+         <StatsGrid.Card
+           label='UI source'
+@@ -59,10 +62,14 @@ export default function HomeView(
+         />
+         <StatsGrid.Card
+           label='Theme'
+-          value='NS One'
+-          detail='Light/dark tokens from copied artifacts'
++          value='Ledgerline'
++          detail='Paper and ink, ledger-green in, rust for reversals — light and dark'
++        />
++        <StatsGrid.Card
++          label='Money'
++          value='2dp'
++          detail='One formatter. Absence is an em dash, never a 0.00.'
+         />
+-        <StatsGrid.Card label='Mode' value='local' detail='Generated by the maintainer scaffold' />
+       </StatsGrid>
+ 
+       <div class='ns-grid ns-grid--3'>
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git add -A && git commit -q -F - <<'EOF'
+Design: finish design-steer-2 — the gaps the prior pass claimed closed
+
+The previous commit's message said "every scaffold string in the gallery
+(api-gateway, eu-west, v2.4.1) is gone". It was not: FloatingSurfaceDemo.tsx
+was never touched, and it still carried all three. A claim the diff cannot
+support is worse than no claim, so this pass re-reads the tree rather than
+trusting the record.
+
+Rule 8 (no placeholder copy):
+  · FloatingSurfaceDemo — api-gateway/v2.4.1/eu-west become INV-2026-07-0142,
+    Northwind Robotics, and a dunning-retry count. The sheet is a run item
+    inspector, not a deployment inspector.
+  · components-view — the StatsGrid demo's "1.2M requests / 184ms P95" is
+    cloud telemetry in a billing product; it is now collected-this-period and
+    collection rate, with the value rendered through MoneyText.
+  · home-view — "NS One" theme, a hardcoded Routes='6' naming deleted
+    routes, and a lede describing "a generated NetScript workspace". The
+    route count is now derived from the props it is handed.
+  · _app.tsx — the meta description called Ledgerline a "starter scaffold".
+  · "NS One" is replaced by the theme's real name across the design views.
+  · dashboard-view.tsx is deleted: 165 lines with zero importers, carrying a
+    fabricated "612ms".
+
+Ranked item 2 was only half done. DeltaChip existed, but StatsGrid still
+parked it in the header beside the label — the exact placement the critic
+refused. StatsGrid.Card gains a `delta` slot that rides on the value's own
+row (C3); `badge` stays for the header. Existing call sites are unaffected.
+
+A dead link: home-view linked /dashboard, but routes/dashboard.tsx was
+deleted with the scaffold routes. The button is gone.
+
+Both defects are now mechanically checkable, because the previous record of
+them was wrong. R8 — no scaffold fiction ships, and R8 — an internal link is
+not a dead end. The second asserts it found hrefs at all: its first draft
+matched zero of them, because every href in home-view is a JSX expression,
+and it passed while proving nothing. It was verified by reintroducing
+/dashboard and watching it fail.
+
+Verification: deno check clean, deno lint clean, deno fmt clean on the
+touched files, 30 tests pass (13 in the design contract, including both new
+R8s), vite build succeeds. deno.lock untouched.
+EOF
+git log --oneline -1
+a827892 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+[0m
+Diff is clean and focused. Let me commit.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== TREE STATE ==="; git status --short | grep -v "^??" || echo "clean (only untracked run docs remain)"; echo; echo "=== COMMIT ==="; git show --stat HEAD | head -6; git show --stat HEAD | tail -3
+=== TREE STATE ===
+ M .netscript/agent/design-receipt.jsonl
+
+=== COMMIT ===
+commit a8278923d8de6b39b393376e9bff67b1a8883ead
+Author: wave7-agent <agent@rickylabs.dev>
+Date:   Fri Sep 4 12:52:15 2026 +0200
+
+    Design: finish design-steer-2 — the gaps the prior pass claimed closed
+    
+ mcp-ask.ts                                         |  20 +
+ tests/design_contract_test.ts                      |  89 ++++-
+ 21 files changed, 1432 insertions(+), 201 deletions(-)
+[0m
+Committed. Let me do a final post-commit verification.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== FINAL: all tests ==="; timeout 400 deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -3; echo "=== FINAL: check ==="; cd apps/ledgerline-web && timeout 400 deno check . 2>&1 | grep -icE "error" | xargs -I{} echo "errors: {}"
+=== FINAL: all tests ===
+
+[0m[32mok[0m | 30 passed | 0 failed [0m[38;5;245m(139ms)[0m
+
+=== FINAL: check ===
+errors: 0
+[0m
+The commit swept in 21 files, not my intended 12 — `git add -A` picked up untracked run docs. Let me inspect.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git show --stat HEAD | sed -n '8,40p'
+(api-gateway, eu-west, v2.4.1) is gone". It was not: FloatingSurfaceDemo.tsx
+    was never touched, and it still carried all three. A claim the diff cannot
+    support is worse than no claim, so this pass re-reads the tree rather than
+    trusting the record.
+    
+    Rule 8 (no placeholder copy):
+      · FloatingSurfaceDemo — api-gateway/v2.4.1/eu-west become INV-2026-07-0142,
+        Northwind Robotics, and a dunning-retry count. The sheet is a run item
+        inspector, not a deployment inspector.
+      · components-view — the StatsGrid demo's "1.2M requests / 184ms P95" is
+        cloud telemetry in a billing product; it is now collected-this-period and
+        collection rate, with the value rendered through MoneyText.
+      · home-view — "NS One" theme, a hardcoded Routes='6' naming deleted
+        routes, and a lede describing "a generated NetScript workspace". The
+        route count is now derived from the props it is handed.
+      · _app.tsx — the meta description called Ledgerline a "starter scaffold".
+      · "NS One" is replaced by the theme's real name across the design views.
+      · dashboard-view.tsx is deleted: 165 lines with zero importers, carrying a
+        fabricated "612ms".
+    
+    Ranked item 2 was only half done. DeltaChip existed, but StatsGrid still
+    parked it in the header beside the label — the exact placement the critic
+    refused. StatsGrid.Card gains a `delta` slot that rides on the value's own
+    row (C3); `badge` stays for the header. Existing call sites are unaffected.
+    
+    A dead link: home-view linked /dashboard, but routes/dashboard.tsx was
+    deleted with the scaffold routes. The button is gone.
+    
+    Both defects are now mechanically checkable, because the previous record of
+    them was wrong. R8 — no scaffold fiction ships, and R8 — an internal link is
+    not a dead end. The second asserts it found hrefs at all: its first draft
+    matched zero of them, because every href in home-view is a JSX expression,
+    and it passed while proving nothing. It was verified by reintroducing
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== ALL FILES IN COMMIT ==="; git show --name-status HEAD | tail -25
+=== ALL FILES IN COMMIT ===
+    Verification: deno check clean, deno lint clean, deno fmt clean on the
+    touched files, 30 tests pass (13 in the design contract, including both new
+    R8s), vite build succeeds. deno.lock untouched.
+
+A	.llm/tmp/component-contract.md
+A	.netscript/agent/design-receipt.jsonl
+A	AUDIT-HOWTO.md
+A	CONSTRUCTION-REFERENCE.md
+A	DESIGN-REFERENCES.md
+M	apps/ledgerline-web/assets/ui/stats-grid.css
+M	apps/ledgerline-web/components/ui/stats-grid.tsx
+D	apps/ledgerline-web/routes/(_components)/dashboard-view.tsx
+M	apps/ledgerline-web/routes/(_components)/home-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts
+M	apps/ledgerline-web/routes/(design)/design/_layout.tsx
+M	apps/ledgerline-web/routes/_app.tsx
+A	design-critique-1.md
+A	design-references/finance-3.png
+A	design-references/marketing-3.png
+A	mcp-ask.ts
+M	tests/design_contract_test.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git reset --mixed HEAD~1 -q && echo "=== reset; branch not pushed so this is safe ===" && git log --oneline -1 && echo "=== now staging ONLY my 12 files ==="
+=== reset; branch not pushed so this is safe ===
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+=== now staging ONLY my 12 files ===
+[0m
+`git add -A` swept in 9 harness run artifacts (reference images, `CONSTRUCTION-REFERENCE.md`, receipts) that were deliberately left untracked. Let me fix that — reset and commit only my 12 files.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git add \
+  apps/ledgerline-web/assets/ui/stats-grid.css \
+  apps/ledgerline-web/components/ui/stats-grid.tsx \
+  apps/ledgerline-web/routes/_app.tsx \
+  tests/design_contract_test.ts && git add \
+  "apps/ledgerline-web/routes/(_components)/dashboard-view.tsx" \
+  "apps/ledgerline-web/routes/(_components)/home-view.tsx" \
+  "apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx" \
+  "apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx" \
+  "apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx" \
+  "apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx" \
+  "apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts" \
+  "apps/ledgerline-web/routes/(design)/design/_layout.tsx" && echo "=== STAGED ===" && git diff --cached --name-status
+=== STAGED ===
+M	apps/ledgerline-web/assets/ui/stats-grid.css
+M	apps/ledgerline-web/components/ui/stats-grid.tsx
+D	apps/ledgerline-web/routes/(_components)/dashboard-view.tsx
+M	apps/ledgerline-web/routes/(_components)/home-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts
+M	apps/ledgerline-web/routes/(design)/design/_layout.tsx
+M	apps/ledgerline-web/routes/_app.tsx
+M	tests/design_contract_test.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git commit -q -F - <<'EOF'
+Design: finish design-steer-2 — the gaps the prior pass claimed closed
+
+The previous commit's message said "every scaffold string in the gallery
+(api-gateway, eu-west, v2.4.1) is gone". It was not: FloatingSurfaceDemo.tsx
+was never touched, and it still carried all three. A claim the diff cannot
+support is worse than no claim, so this pass re-reads the tree rather than
+trusting the record.
+
+Rule 8 (no placeholder copy):
+  · FloatingSurfaceDemo — api-gateway/v2.4.1/eu-west become INV-2026-07-0142,
+    Northwind Robotics, and a dunning-retry count. The sheet is a run item
+    inspector, not a deployment inspector.
+  · components-view — the StatsGrid demo's "1.2M requests / 184ms P95" is
+    cloud telemetry in a billing product; it is now collected-this-period and
+    collection rate, with the value rendered through MoneyText.
+  · home-view — "NS One" theme, a hardcoded Routes='6' naming deleted routes,
+    and a lede describing "a generated NetScript workspace". The route count
+    is now derived from the props it is handed.
+  · _app.tsx — the meta description called Ledgerline a "starter scaffold".
+  · "NS One" is replaced by the theme's real name across the design views.
+  · dashboard-view.tsx is deleted: 165 lines with zero importers, carrying a
+    fabricated "612ms".
+
+Ranked item 2 was only half done. DeltaChip existed, but StatsGrid still
+parked it in the header beside the label — the exact placement the critic
+refused. StatsGrid.Card gains a `delta` slot that rides on the value's own
+row (C3); `badge` stays for the header. Existing call sites are unaffected.
+
+A dead link: home-view linked /dashboard, but routes/dashboard.tsx was
+deleted with the scaffold routes. The button is gone.
+
+Both defects are now mechanically checkable, because the previous record of
+them was wrong. R8 — no scaffold fiction ships, and R8 — an internal link is
+not a dead end. The second asserts it found hrefs at all: its first draft
+matched zero of them, because every href in home-view is a JSX expression,
+and it passed while proving nothing. It was verified by reintroducing
+/dashboard and watching it fail.
+
+Verification: deno check clean, deno lint clean, deno fmt clean on the
+touched files, 30 tests pass (13 in the design contract, including both new
+R8s), vite build succeeds. deno.lock untouched.
+EOF
+echo "=== COMMIT ==="; git log --oneline -2; echo "=== FILES ==="; git show --name-status HEAD | tail -13; echo "=== UNTRACKED (intentionally left) ==="; git status --short | grep "^??"
+=== COMMIT ===
+b8ae695 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+=== FILES ===
+
+M	apps/ledgerline-web/assets/ui/stats-grid.css
+M	apps/ledgerline-web/components/ui/stats-grid.tsx
+D	apps/ledgerline-web/routes/(_components)/dashboard-view.tsx
+M	apps/ledgerline-web/routes/(_components)/home-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+M	apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts
+M	apps/ledgerline-web/routes/(design)/design/_layout.tsx
+M	apps/ledgerline-web/routes/_app.tsx
+M	tests/design_contract_test.ts
+=== UNTRACKED (intentionally left) ===
+?? .llm/tmp/component-contract.md
+?? .netscript/agent/design-receipt.jsonl
+?? AUDIT-HOWTO.md
+?? CONSTRUCTION-REFERENCE.md
+?? DESIGN-REFERENCES.md
+?? design-critique-1.md
+?? design-references/
+?? mcp-ask.ts
+[0m
+Exactly my 12 files. Re-committing.
+Clean commit `b8ae695` with exactly my 12 files; run artifacts left untracked as they were. Final validation:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== TESTS ==="; timeout 400 deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -3; echo "=== CHECK ==="; cd apps/ledgerline-web && timeout 400 deno check . 2>&1 | grep -icE "error" | xargs -I{} echo "errors: {}"; echo "=== LINT ==="; timeout 300 deno lint 2>&1 | tail -2; echo "=== LOCK ==="; cd .. && git status --short | grep -i lock || echo "untouched"
+=== TESTS ===
+
+[0m[32mok[0m | 30 passed | 0 failed [0m[38;5;245m(144ms)[0m
+
+=== CHECK ===
+errors: 0
+=== LINT ===
+Checked 88 files
+=== LOCK ===
+untouched
+[0m
+[0m# [0mTodos
+[✓] Verify committed design work (5 components, fixes, gallery) is real and passes gates
+[✓] Fix residual scaffold fiction in FloatingSurfaceDemo.tsx (api-gateway/eu-west/v2.4.1) — rule 8
+[✓] Fix StatsGrid delta placement (ranked item 2 partial gap: delta was still beside the label)
+[✓] Fix fabricated values: components-view 184ms, home-view NS One/route count, _app description, dead /dashboard link, delete orphaned dashboard-view
+[✓] Add R8 regression tests (scaffold fiction + dead links), prove non-vacuous
+[✓] Run full validation (check/lint/fmt/test/build) and commit
+[✓] Report DONE vs REMAINING incl. billing-tree handoff blocked by live agents
+[0m
+## DONE vs REMAINING
+
+**Tree:** `wave7-design` · branch `design/ledgerline-ui` · commit `b8ae695` (not pushed — you review and merge).
+
+### First: the five components were already built
+
+They landed in `2da2189` before this turn. I verified rather than rebuilt: all five exist, `SemicircularGauge` matches the critique's literal spec (viewBox `0 0 200 110`, r=80, stroke 18, `stroke-linecap="butt"`, flat baseline cuts), and `des-check`/lint/30 tests/build were green. Rebuilding them would have been churn.
+
+### What I found by re-reading instead of trusting the record
+
+The prior report said *"every scaffold string in the gallery (api-gateway, eu-west, v2.4.1) is gone."* **It was not.** `FloatingSurfaceDemo.tsx` had never been touched and still carried all three. A claim the diff can't support is worse than no claim, so this pass re-read the tree:
+
+- **Rule 8 fiction** — `FloatingSurfaceDemo` now uses `INV-2026-07-0142` / `Northwind Robotics` / a dunning-retry count; `components-view`'s `1.2M requests / 184ms P95` (cloud telemetry in a billing product) became collected-this-period and collection rate; `home-view`'s `NS One` theme and hardcoded `Routes='6'` naming deleted routes are now `Ledgerline` and a derived count; `_app.tsx` no longer calls Ledgerline a "starter scaffold". `NS One` → `Ledgerline` across the design views.
+- **`dashboard-view.tsx` deleted** — 165 lines, **zero importers**, carrying a fabricated `612ms`.
+- **A 404 shipped** — `home-view` linked `/dashboard`, but `routes/dashboard.tsx` was deleted with the scaffold routes.
+
+### Ranked item 2 was only half done
+
+`DeltaChip` existed, but `StatsGrid` still parked it in the header beside the label — the exact placement the critic refused (`stats-grid.tsx` was untouched by `2da2189`). Added a `delta` slot that rides on the value's own row; `badge` stays for the header, so existing call sites are unaffected.
+
+### On the test I nearly shipped broken
+
+My first dead-link test **matched zero hrefs** — every `href` in `home-view` is a JSX expression — so it passed while proving nothing. I caught it, rewrote it to scan the whole app, and verified by reintroducing `/dashboard` and watching it fail. It now also asserts it checked something, so future refactors can't make it quietly vacuous. Both new rules (`R8`) follow your pattern of making each fix un-regressable — which is what caught this class of overclaim in the first place.
+
+Verified: `deno check` 0 errors, lint clean, fmt clean, **30 tests pass**, `vite build` succeeds, **`deno.lock` untouched**.
+
+### REMAINING — one thing I deliberately did not do
+
+**The `wave7-billing` handoff is blocked, and I stopped rather than force it.** Four opencode agents are live in that tree right now (commits seconds apart), and one is mid-refactor on the *exact* files this task names — steer #9 is rewriting `MoneyText` and moving `ns-exception-badge` rules into `assets/ui/*.css`. There's also a recorded incident in this repo of edits being "swept into a shared commit by accident." Editing there would have collided or been silently absorbed.
+
+Still unfixed there, exactly as reported: `money-text.tsx` (`Number(text)` → `$100` not `$100.00`; `100.00USD` with no separator), `exception-badge.css:7-9` (`--ns-rust-6` at 45.5% L on a 21.5% dark card), plus the offset shadows in `button.css`, `desktop-update-prompt.css`, and the `paper-12` leaks in `sheet.css`/`switch.css`. All are already fixed on this branch and apply unchanged once those agents settle.
+
+**One design gap worth your call:** `DeltaChip` colours purely by `direction`, so it has no "a decrease is good" tone — *failed payments −3.1%* renders red, which is a false statement in the same family as `0.00` for "not measured". I picked metrics where direction maps honestly rather than ship a lying colour, but this needs a real fix for a billing product.

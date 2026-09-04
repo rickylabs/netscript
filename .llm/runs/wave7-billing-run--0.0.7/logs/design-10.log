@@ -1,0 +1,2947 @@
+[0m[32mTask[0m [0m[36magentic:opencode[0m deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts '--message' 'Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING.' '--model' 'openrouter/tencent/hy4-preview' '--variant' 'max' '--cwd' '/home/agent/projects/netscript/wave7-design' '--require-mcp' 'netscript' '--require-mcp' 'aspire' '--receipt' '.netscript/agent/design-receipt.jsonl' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md'
+[0m
+> build · tencent/hy4-preview
+[0m
+[0m$ [0mpwd && ls -la
+/home/agent/projects/netscript/worktrees/007-aspire
+total 314
+drwxr-xr-x 16 node node     36 Aug 30 08:24 .
+drwxr-xr-x 26 node node     26 Sep  3 21:58 ..
+drwxr-xr-x  6 node node      6 Aug 30 08:12 .agents
+drwxr-xr-x  3 node node      4 Aug 30 08:13 .claude
+-rw-r--r--  1 node node     70 Aug 30 08:12 .git
+-rw-r--r--  1 node node    779 Aug 30 08:12 .gitattributes
+drwxr-xr-x  5 node node     11 Aug 30 08:12 .github
+-rw-r--r--  1 node node    902 Aug 30 08:12 .gitignore
+-rw-r--r--  1 node node    100 Aug 30 08:12 .gitleaks.toml
+drwxr-xr-x  7 node node     21 Aug 30 08:12 .llm
+drwxr-xr-x  3 node node      5 Aug 30 08:12 .openhands
+drwxr-xr-x  2 node node      5 Aug 30 08:12 .zed
+-rw-r--r--  1 node node   2220 Aug 30 08:12 AGENTS-handoff.md
+-rw-r--r--  1 node node  13398 Aug 30 08:12 AGENTS.md
+-rw-r--r--  1 node node   3089 Aug 30 08:12 CLAUDE.md
+-rw-r--r--  1 node node   5706 Aug 30 08:12 CODE_OF_CONDUCT.md
+-rw-r--r--  1 node node   6925 Aug 30 08:12 CONTRIBUTING.md
+-rw-r--r--  1 node node   1339 Aug 30 08:12 GOVERNANCE.md
+-rw-r--r--  1 node node  11360 Aug 30 08:12 LICENSE
+-rw-r--r--  1 node node    269 Aug 30 08:12 NOTICE
+-rw-r--r--  1 node node  28557 Aug 30 08:12 README.md
+-rw-r--r--  1 node node   8697 Aug 30 08:12 ROLLOUT.md
+-rw-r--r--  1 node node   2119 Aug 30 08:12 SECURITY.md
+-rw-r--r--  1 node node   1387 Aug 30 08:12 SUPPORT.md
+-rw-r--r--  1 node node  18473 Aug 30 08:12 deno.json
+-rw-r--r--  1 node node 175222 Aug 30 08:12 deno.lock
+drwxr-xr-x  4 node node      5 Aug 30 08:12 docs
+-rw-r--r--  1 node node   2065 Aug 30 08:12 jsr-package-settings.json
+-rw-r--r--  1 node node   5981 Aug 30 08:12 notes.md
+drwxr-xr-x  3 node node      3 Aug 30 08:12 ops
+drwxr-xr-x 32 node node     32 Aug 30 08:12 packages
+drwxr-xr-x  8 node node      8 Aug 30 08:12 plugins
+drwxr-xr-x  3 node node      3 Aug 30 08:12 resources
+drwxr-xr-x  2 node node     14 Aug 30 08:12 rfcs
+drwxr-xr-x  7 node node      9 Aug 30 08:12 skills
+drwxr-xr-x  3 node node      3 Aug 30 08:12 tools
+[0m
+[0m$ [0mrtk git status 2>/dev/null | head -50
+(no output)
+[0m
+[0m$ [0mls /home/agent/projects/netscript/ 2>/dev/null; echo "---"; ls .llm/runs/wave7-billing-run--0.0.7/ 2>/dev/null
+handoff
+repo
+wave7-billing
+wave7-billing-steer2
+wave7-design
+wave7-preflight
+worktrees
+---
+AUDIT-HOWTO.md
+CONSTRUCTION-REFERENCE.md
+DESIGN-REFERENCES.md
+ENVIRONMENT.md
+PRODUCT-DEFINITION.md
+PUBLISHING.md
+audits
+auto-steer.sh
+beat-this.md
+brief.md
+continue.md
+coord-loop.sh
+design-brief.md
+design-critic-brief.md
+design-critique-1.md
+design-references
+design-steer-2-continuation.md
+design-steer-2-pass3.md
+design-steer-2-pass4.md
+design-steer-2-pass5.md
+design-steer-2-report.md
+design-steer-2.md
+evaluator
+keepalive.sh
+kickoff.md
+logs
+mcp-ask.ts
+publishing-contract.md
+quality-bar-eis-chat.md
+receipts
+steer-2.md
+steer-3.md
+steer-4.md
+steer-5.md
+steer-6.md
+steer-7.md
+steer-8.md
+steer-9.md
+steer-loop.sh
+steer-watch.sh
+supervisor.md
+watch.sh
+[0m
+[0m$ [0mgit branch --show-current && git log --oneline -5
+research/aspire-13.5-0.0.7
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+[0m
+[0m$ [0mls -la .llm/runs/wave7-billing-run--0.0.7/ | head -60
+total 322
+drwxr-xr-x   7 node node    44 Sep  4 14:52 .
+drwxr-xr-x 181 node node   181 Sep  3 21:56 ..
+-rw-r--r--   1 node node  2006 Sep  4 07:02 AUDIT-HOWTO.md
+-rw-r--r--   1 node node 11790 Sep  4 07:16 CONSTRUCTION-REFERENCE.md
+-rw-r--r--   1 node node  6701 Sep  4 11:32 DESIGN-REFERENCES.md
+-rw-r--r--   1 node node  4352 Sep  3 23:26 ENVIRONMENT.md
+-rw-r--r--   1 node node  7852 Sep  4 00:26 PRODUCT-DEFINITION.md
+-rw-r--r--   1 node node  3396 Sep  3 22:32 PUBLISHING.md
+drwxr-xr-x   2 node node     3 Sep  4 07:11 audits
+-rw-r--r--   1 node node   599 Sep  4 00:26 auto-steer.sh
+-rw-r--r--   1 node node  4213 Sep  3 22:07 beat-this.md
+-rw-r--r--   1 node node 13994 Sep  3 22:32 brief.md
+-rw-r--r--   1 node node  1351 Sep  4 11:13 continue.md
+-rw-r--r--   1 node node  1965 Sep  4 12:03 coord-loop.sh
+-rw-r--r--   1 node node  8319 Sep  4 11:25 design-brief.md
+-rw-r--r--   1 node node  4014 Sep  4 11:33 design-critic-brief.md
+-rw-r--r--   1 node node 26660 Sep  4 11:52 design-critique-1.md
+drwxr-xr-x   2 node node     4 Sep  4 11:32 design-references
+-rw-r--r--   1 node node  7372 Sep  4 13:17 design-steer-2-continuation.md
+-rw-r--r--   1 node node  7610 Sep  4 13:50 design-steer-2-pass3.md
+-rw-r--r--   1 node node  7976 Sep  4 14:22 design-steer-2-pass4.md
+-rw-r--r--   1 node node  8270 Sep  4 14:52 design-steer-2-pass5.md
+-rw-r--r--   1 node node  6600 Sep  4 12:36 design-steer-2-report.md
+-rw-r--r--   1 node node  4004 Sep  4 11:52 design-steer-2.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 evaluator
+-rw-r--r--   1 node node   831 Sep  4 11:13 keepalive.sh
+-rw-r--r--   1 node node  1294 Sep  3 23:05 kickoff.md
+drwxr-xr-x   2 node node    36 Sep  4 14:54 logs
+-rw-r--r--   1 node node  1529 Sep  4 07:02 mcp-ask.ts
+-rw-r--r--   1 node node  3396 Sep  3 22:03 publishing-contract.md
+-rw-r--r--   1 node node  2960 Sep  3 22:02 quality-bar-eis-chat.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 receipts
+-rw-r--r--   1 node node  3195 Sep  4 06:52 steer-2.md
+-rw-r--r--   1 node node  7799 Sep  4 07:14 steer-3.md
+-rw-r--r--   1 node node  8061 Sep  4 07:17 steer-4.md
+-rw-r--r--   1 node node  2642 Sep  4 08:02 steer-5.md
+-rw-r--r--   1 node node  4862 Sep  4 10:23 steer-6.md
+-rw-r--r--   1 node node  2704 Sep  4 10:27 steer-7.md
+-rw-r--r--   1 node node  5245 Sep  4 11:22 steer-8.md
+-rw-r--r--   1 node node  7360 Sep  4 11:26 steer-9.md
+-rw-r--r--   1 node node   829 Sep  4 07:17 steer-loop.sh
+-rw-r--r--   1 node node   599 Sep  4 00:27 steer-watch.sh
+-rw-r--r--   1 node node  2300 Sep  3 21:56 supervisor.md
+-rw-r--r--   1 node node   760 Sep  3 23:06 watch.sh
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass5.md
+[0m
+[0m$ [0mls /home/agent/projects/netscript/wave7-billing-steer2 2>/dev/null | head; echo "--- git ---"; git -C /home/agent/projects/netscript/wave7-billing-steer2 status --short 2>&1 | head -20; echo "--- branch ---"; git -C /home/agent/projects/netscript/wave7-billing-steer2 branch --show-current 2>&1; echo "--- log ---"; git -C /home/agent/projects/netscript/wave7-billing-steer2 log --oneline -12 2>&1
+AGENTS.md
+DESIGN.md
+MARKET-RESEARCH.md
+README.md
+RECORD.md
+apps
+appsettings.json
+aspire
+aspire-export-20260904-113855.zip
+aspire-export-20260904-113857.zip
+--- git ---
+--- branch ---
+fix/steer2-consolidated
+--- log ---
+37d1c25 Make the design gallery type-check, and the app lint clean
+50b1f55 Mount SegmentedControl on the invoice status filter
+908d513 Mount DeltaChip on the runs index against the preceding run
+f6e1f72 Mount ComparisonAreaChart on the run console over computed vs prior
+f904592 Mount SemicircularGauge on the run console as the run-progress hero
+ba37797 Delete the scaffold fiction the gallery was still wearing
+460f040 Give the destructive button's hover a role instead of a ramp step
+fc20122 Add FooterColumns — hairline rules, not gaps
+5ceb1eb Add ComparisonAreaChart — billed versus collected as two layers
+c81a7b5 Add SegmentedControl — range selection by filling, not by bordering
+bd061f7 Add SemicircularGauge — the 180° two-tone run-progress arc
+bee83d5 Add WidgetCard — the one five-band card grammar
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git rev-parse --show-toplevel --git-common-dir 2>&1; echo "--- remotes ---"; git remote -v 2>&1 | head -4
+/home/agent/projects/netscript/wave7-billing-steer2
+/home/agent/projects/netscript/wave7-billing/.git
+--- remotes ---
+origin	https://github.com/rickylabs/ledgerline.git (fetch)
+origin	https://github.com/rickylabs/ledgerline.git (push)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && ls apps/ledgerline-web/components/ui/ && echo "--- product ---" && ls apps/ledgerline-web/components/product/ 2>/dev/null
+alert.tsx
+avatar.tsx
+badge.tsx
+breadcrumb.tsx
+button.tsx
+card.tsx
+chart-block.tsx
+checkbox.tsx
+code-block.tsx
+comparison-area-chart.tsx
+control-props.ts
+data-table.tsx
+delta-chip.tsx
+desktop-dialog.tsx
+desktop-notification.tsx
+desktop-tray-menu.tsx
+desktop-update-prompt.tsx
+desktop-window-chrome.tsx
+detail-layout.tsx
+donut.tsx
+dropzone.tsx
+empty-state.tsx
+filter-form.tsx
+footer-columns.tsx
+form-field.tsx
+icon-button.tsx
+inline-notice.tsx
+input.tsx
+label.tsx
+mod.ts
+page-header.tsx
+pagination.tsx
+panel.tsx
+progress.tsx
+responsive-table.tsx
+section-divider.tsx
+segmented-control.tsx
+select.tsx
+semicircular-gauge.tsx
+separator.tsx
+sidebar-shell.tsx
+skeleton.tsx
+spinner.tsx
+stats-grid.tsx
+switch.tsx
+textarea.tsx
+widget-card.tsx
+--- product ---
+exception-badge.tsx
+mod.ts
+money-text.tsx
+provisional-tag.tsx
+run-state-stepper.tsx
+status-badge.tsx
+transition-feed.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== 3px offset shadows ==="; grep -rn "3px 3px 0" assets components routes 2>/dev/null || echo "none"; echo "=== money-text ==="; grep -n "moneyParts\|Number(text)\|Intl.NumberFormat" components/product/money-text.tsx; echo "=== exception-badge ==="; grep -n "rust-6\|money-neg\|destructive" components/product/exception-badge.tsx
+=== 3px offset shadows ===
+none
+=== money-text ===
+8: * `moneyParts().direction`, and absence is an em dash.
+13:import { ABSENT, type MoneyDirection, moneyParts, type MoneyValue } from '../../lib/money.ts';
+23: * `moneyParts` direction -> the `data-money-sign` this component's stylesheet
+37: * Every digit and the direction both come from one `moneyParts()` call. This
+48:  const parts = moneyParts(value, { currency });
+=== exception-badge ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rn "DeltaChip\|SemicircularGauge\|SegmentedControl\|ComparisonAreaChart\|FooterColumns" "routes/(design)/design/(_components)/components-view.tsx" | head -30
+13:  ComparisonAreaChart,
+15:  DeltaChip,
+27:  FooterColumns,
+43:  SegmentedControl,
+45:  SemicircularGauge,
+267:            <DeltaChip value='+2.1%' direction='up' />
+268:            <DeltaChip value='-1.2%' direction='down' />
+269:            <DeltaChip value='0.0%' direction='flat' />
+270:            <DeltaChip value='+2.1%' direction='up' glyph='none' />
+271:            <DeltaChip direction='absent' value='' />
+274:            <DeltaChip value='+14.2%' direction='up' note='vs prior run' />
+275:            <DeltaChip value='-$1,204.00' direction='down' note='refunded this period' />
+276:            <DeltaChip direction='absent' value='' note='no prior period' />
+283:          <ComparisonAreaChart
+316:          <SegmentedControl
+326:          <SegmentedControl
+337:          <SegmentedControl
+359:              <SemicircularGauge
+371:              <FooterColumns
+389:              <SemicircularGauge
+404:          <FooterColumns
+411:          <FooterColumns
+436:              <SegmentedControl
+450:              <DeltaChip value='+14.2%' direction='up' note='vs prior run' />
+459:              <FooterColumns
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/product/exception-badge.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git log --oneline master -3 2>&1; echo "--- behind/ahead ---"; git rev-list --left-right --count master...HEAD 2>&1
+c5d57c6 Webhooks screen: /webhooks with endpoints table + delivery log (live island states, em-dash absence, REPLAYED chips), bearer-bearing client, nav entry
+1cd0f34 Webhooks: real contract (endpoints + delivery log + admin replay), DB-backed domain, authz enforcement — replaces the CLI placeholder fiction
+38f4aee Backend D: terminal compensation proved — instances API + refund + run rows
+--- behind/ahead ---
+2	20
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && cat apps/ledgerline-web/assets/ui/exception-badge.css 2>/dev/null | head -40
+/* ns-exception-badge — components/product/exception-badge.tsx
+   Rust-tinted chip for a run item's exception bucket. Presence and absence
+   are distinguished by the data-exception attribute: 'none' renders the em
+   dash so "no exception" never reads like a flagged item. */
+
+/* A component never reaches into a ramp step, because the ramp is theme-variant
+   and this chip has to hold its contrast on both grounds. `--ns-rust-6` is a
+   mid red: legible on paper, but roughly 3.4:1 against a dark card, under the
+   4.5:1 a chip's small text needs. These three are semantic and the theme
+   re-steps them — `--ns-money-neg` moves rust-6 to rust-4 in dark and the
+   tint/border pair steps 10/20% up to 12/24% — so one rule covers both
+   themes instead of a dark-mode override that drifts. */
+.ns-exception-badge[data-exception]:not([data-exception='none']) {
+  color: var(--ns-money-neg);
+  background: var(--ns-destructive-subtle);
+  border: 1px solid var(--ns-destructive-border);
+}
+
+.ns-exception-badge[data-exception='none'] {
+  color: var(--ns-muted-fg);
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 -c "
+import json
+d=json.load(open('deno.json'))
+for k,v in d.get('tasks',{}).items(): print(k,'=',v)
+" 2>&1 | head -40
+dev = deno task deps:closure && deno task deps:verify && deno run --allow-all apps/ledgerline-web/main.ts
+deps:closure = deno task --cwd apps/ledgerline-web deps:closure
+deps:verify = deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts
+aspire:start = cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start
+aspire:start:isolated = cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated
+aspire:otel = deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts otel
+aspire:export = deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export
+check = deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check
+lint = deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint
+fmt:check = deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check
+fmt = deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write
+test = deno test --allow-all
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task check 2>&1 | tail -20
+"files": [
+        "aspire/.helpers/_aspire-compat.mts",
+        "aspire/.helpers/config-schema.mts",
+        "aspire/.helpers/configure-dashboard.mts",
+        "aspire/.helpers/db-cli-mode.mts",
+        "aspire/.helpers/index.mts",
+        "aspire/.helpers/register-apps.mts",
+        "aspire/.helpers/register-background.mts",
+        "aspire/.helpers/register-infrastructure.mts",
+        "aspire/.helpers/register-plugins.mts",
+        "aspire/.helpers/register-services.mts",
+        "aspire/.helpers/register-tools.mts",
+        "aspire/apphost.mts"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Warning: config file file:///home/agent/projects/netscript/wave7-billing-steer2/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/wave7-billing-steer2/. Ignoring the parent workspace config.\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Unable to load /home/agent/projects/netscript/wave7-billing-steer2/aspire/node_modules/typescript/bin/tsc\n\nCaused by:\n    No such file or directory (os error 2)\n"
+    }
+  ]
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task check 2>&1 | python3 -c "
+import sys,json
+raw=sys.stdin.read()
+try:
+    d=json.loads(raw[raw.index('{'):])
+except Exception as e:
+    print(raw[:3000]); sys.exit()
+def walk(o):
+    if isinstance(o,dict):
+        if 'exitCode' in o and 'files' in o:
+            print(o.get('name','?'), '->', o['exitCode'], len(o.get('files',[])),'files')
+            if o['exitCode']!=0: print('   stderr:', (o.get('stderr') or '')[:300].replace(chr(10),' | '))
+        for v in o.values(): walk(v)
+    elif isinstance(o,list):
+        for v in o: walk(v)
+walk(d)
+print('KEYS', list(d.keys()))
+" 2>&1 | head -40
+? -> 0 200 files
+? -> 0 15 files
+? -> 1 12 files
+   stderr: Warning: config file file:///home/agent/projects/netscript/wave7-billing-steer2/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/wave7-billing-steer2/. Ignoring the parent workspace config. | [0m[1m[31merror[0m: Unable to load /home/agent/projects/netsc
+KEYS ['ok', 'mode', 'selection', 'batches']
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task lint 2>&1 | python3 -c "
+import sys,json
+raw=sys.stdin.read()
+try: d=json.loads(raw[raw.index('{'):])
+except Exception: print(raw[:2000]); sys.exit()
+print('ok:',d.get('ok'))
+for b in d.get('batches',[]):
+    print(b.get('name','?'),b.get('exitCode'), len(b.get('files',[])),'files')
+    if b.get('exitCode'): print('  ',(b.get('stdout') or '')[:800])
+"
+ok: False
+? 1 200 files
+   
+? 1 27 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task lint 2>&1 | head -c 4000
+[0m[32mTask[0m [0m[36mlint[0m deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint
+{
+  "ok": false,
+  "mode": "lint",
+  "selection": {
+    "filesSelected": 227,
+    "files": [
+      ".netscript/aspire-cli.ts",
+      ".netscript/quality-runner.ts",
+      ".netscript/relay.ts",
+      ".netscript/verify-node-modules.ts",
+      "apps/ledgerline-web/.netscript/verify-dependency-closure.ts",
+      "apps/ledgerline-web/client.ts",
+      "apps/ledgerline-web/components/product/exception-badge.tsx",
+      "apps/ledgerline-web/components/product/mod.ts",
+      "apps/ledgerline-web/components/product/money-text.tsx",
+      "apps/ledgerline-web/components/product/provisional-tag.tsx",
+      "apps/ledgerline-web/components/product/run-state-stepper.tsx",
+      "apps/ledgerline-web/components/product/status-badge.tsx",
+      "apps/ledgerline-web/components/product/transition-feed.tsx",
+      "apps/ledgerline-web/components/ui/alert.tsx",
+      "apps/ledgerline-web/components/ui/avatar.tsx",
+      "apps/ledgerline-web/components/ui/badge.tsx",
+      "apps/ledgerline-web/components/ui/breadcrumb.tsx",
+      "apps/ledgerline-web/components/ui/button.tsx",
+      "apps/ledgerline-web/components/ui/card.tsx",
+      "apps/ledgerline-web/components/ui/chart-block.tsx",
+      "apps/ledgerline-web/components/ui/checkbox.tsx",
+      "apps/ledgerline-web/components/ui/code-block.tsx",
+      "apps/ledgerline-web/components/ui/comparison-area-chart.tsx",
+      "apps/ledgerline-web/components/ui/control-props.ts",
+      "apps/ledgerline-web/components/ui/data-table.tsx",
+      "apps/ledgerline-web/components/ui/delta-chip.tsx",
+      "apps/ledgerline-web/components/ui/desktop-dialog.tsx",
+      "apps/ledgerline-web/components/ui/desktop-notification.tsx",
+      "apps/ledgerline-web/components/ui/desktop-tray-menu.tsx",
+      "apps/ledgerline-web/components/ui/desktop-update-prompt.tsx",
+      "apps/ledgerline-web/components/ui/desktop-window-chrome.tsx",
+      "apps/ledgerline-web/components/ui/detail-layout.tsx",
+      "apps/ledgerline-web/components/ui/donut.tsx",
+      "apps/ledgerline-web/components/ui/dropzone.tsx",
+      "apps/ledgerline-web/components/ui/empty-state.tsx",
+      "apps/ledgerline-web/components/ui/filter-form.tsx",
+      "apps/ledgerline-web/components/ui/footer-columns.tsx",
+      "apps/ledgerline-web/components/ui/form-field.tsx",
+      "apps/ledgerline-web/components/ui/icon-button.tsx",
+      "apps/ledgerline-web/components/ui/inline-notice.tsx",
+      "apps/ledgerline-web/components/ui/input.tsx",
+      "apps/ledgerline-web/components/ui/label.tsx",
+      "apps/ledgerline-web/components/ui/mod.ts",
+      "apps/ledgerline-web/components/ui/page-header.tsx",
+      "apps/ledgerline-web/components/ui/pagination.tsx",
+      "apps/ledgerline-web/components/ui/panel.tsx",
+      "apps/ledgerline-web/components/ui/progress.tsx",
+      "apps/ledgerline-web/components/ui/responsive-table.tsx",
+      "apps/ledgerline-web/components/ui/section-divider.tsx",
+      "apps/ledgerline-web/components/ui/segmented-control.tsx",
+      "apps/ledgerline-web/components/ui/select.tsx",
+      "apps/ledgerline-web/components/ui/semicircular-gauge.tsx",
+      "apps/ledgerline-web/components/ui/separator.tsx",
+      "apps/ledgerline-web/components/ui/sidebar-shell.tsx",
+      "apps/ledgerline-web/components/ui/skeleton.tsx",
+      "apps/ledgerline-web/components/ui/spinner.tsx",
+      "apps/ledgerline-web/components/ui/stats-grid.tsx",
+      "apps/ledgerline-web/components/ui/switch.tsx",
+      "apps/ledgerline-web/components/ui/textarea.tsx",
+      "apps/ledgerline-web/components/ui/widget-card.tsx",
+      "apps/ledgerline-web/islands/ui/DesktopOnly.tsx",
+      "apps/ledgerline-web/islands/ui/RangeControlDemo.tsx",
+      "apps/ledgerline-web/islands/ui/SidebarToggle.tsx",
+      "apps/ledgerline-web/islands/ui/ThemeToggle.tsx",
+      "apps/ledgerline-web/islands/ui/Toast.tsx",
+      "apps/ledgerline-web/lib/billing.ts",
+      "apps
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 300 deno lint 2>&1 | tail -30
+[0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+
+[0m[1m[31merror[no-slow-types][0m: [0m[1mmissing explicit type in the public API[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/database/postgres/schema/.generated/zod/schemas/variants/result/WebhookEndpoint.result.ts[0m[0m[33m:3:14[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0mexport const WebhookEndpointResultSchema = z.object({
+ [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+ [0m[38;5;12m | [0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+
+[0m[1m[31merror[no-slow-types][0m: [0m[1mmissing explicit type in the public API[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/database/postgres/schema/.generated/zod/schemas/variants/result/WrapperType.result.ts[0m[0m[33m:3:14[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0mexport const WrapperTypeResultSchema = z.object({
+ [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+ [0m[38;5;12m | [0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+
+Found 327 problems
+Checked 243 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git log --oneline -2 -- database/postgres/schema/.generated/zod/schemas/variants/result/WebhookEndpoint.result.ts; echo "=== is it in HEAD tree? ==="; git cat-file -e HEAD:database/postgres/schema/.generated/zod/schemas/variants/result/WebhookEndpoint.result.ts && echo yes || echo no; echo "=== count files ==="; ls database/postgres/schema/.generated/zod/schemas/variants/result/ | head -20
+33e4be2 Product schema migrated (26 tables, 18 enums); idempotent seed; headless-migrate workaround in prisma.config
+=== is it in HEAD tree? ===
+yes
+=== count files ===
+AuditEvent.result.ts
+AuthAccount.result.ts
+AuthSession.result.ts
+AuthUser.result.ts
+AuthVerification.result.ts
+BillingRun.result.ts
+CreditLedgerEntry.result.ts
+CreditNote.result.ts
+CreditNoteApplication.result.ts
+Customer.result.ts
+EntitlementGrant.result.ts
+IdempotencyKey.result.ts
+Invoice.result.ts
+InvoiceLine.result.ts
+JobDefinition.result.ts
+JobExecutionHistory.result.ts
+Meter.result.ts
+OutboundEvent.result.ts
+Payment.result.ts
+PaymentAttempt.result.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 300 deno lint 2>&1 | grep -oE "^error\[[a-z-]+\]" | sort | uniq -c; echo "=== per dir ==="; timeout 300 deno lint 2>&1 | grep -oE "\-\-> [^ ]+" | sed 's|/[^/]*$||' | sort | uniq -c | sort -rn | head -20
+=== per dir ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task lint 2>&1 | tail -c 2500
+steer2/sagas/runtime.ts\u001b[0m\u001b[0m\u001b[33m:8:10\u001b[0m\n \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m8 | \u001b[0mimport { db } from '@ledgerline/db';\n \u001b[0m\u001b[38;5;12m | \u001b[0m         \u001b[0m\u001b[1m\u001b[31m^^\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: If this is intentional, alias it with an underscore like `db as _db`\n\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://docs.deno.com/lint/rules/no-unused-vars\n\n\nFound 3 problems\nChecked 200 files\n"
+    },
+    {
+      "files": [
+        "services/runs/src/routers/v1.ts",
+        "services/webhooks/src/main.ts",
+        "services/webhooks/src/router.ts",
+        "services/webhooks/src/routers/health.ts",
+        "services/webhooks/src/routers/v1.ts",
+        "streams/mod.ts",
+        "streams/notifications-stream.ts",
+        "streams/plugin.ts",
+        "streams/run-console-schema.ts",
+        "tests/design_contract_test.ts",
+        "tests/money_test.ts",
+        "tests/negative-auth_test.ts",
+        "tests/refund-flow_test.ts",
+        "tests/sagas_test.ts",
+        "triggers/daily-maintenance.ts",
+        "triggers/incoming-file-watch.ts",
+        "triggers/mod.ts",
+        "triggers/plugin.ts",
+        "triggers/runtime.ts",
+        "workers/jobs/health-check.ts",
+        "workers/jobs/payment-refund.ts",
+        "workers/jobs/period-close-check.ts",
+        "workers/jobs/run-item-issue.ts",
+        "workers/mod.ts",
+        "workers/plugin.ts",
+        "workers/runtime.ts",
+        "workers/tasks/validate-payload.ts"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "\u001b[0m\u001b[1m\u001b[31merror[require-await]\u001b[0m: \u001b[0m\u001b[1mAsync arrow function has no 'await' expression or 'await using' declaration.\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36m/home/agent/projects/netscript/wave7-billing-steer2/triggers/daily-maintenance.ts\u001b[0m\u001b[0m\u001b[33m:27:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m27 | \u001b[0m  async () => {\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^^^^^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: Remove 'async' keyword from the function or use 'await' expression or 'await using' declaration inside.\n\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://docs.deno.com/lint/rules/require-await\n\n\nFound 1 problem\nChecked 27 files\n"
+    }
+  ]
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task lint 2>&1 | python3 -c "
+import sys,json,re
+raw=sys.stdin.read()
+d=json.loads(raw[raw.index('{'):])
+for b in d['batches']:
+    out=(b.get('stdout') or '')+(b.get('stderr') or '')
+    out=re.sub(r'\x1b\[[0-9;]*m','',out)
+    print('=== batch', b['exitCode'],'===')
+    for line in out.splitlines():
+        if 'error[' in line or '-->' in line: print(' ',line.strip())
+"
+=== batch 1 ===
+  error[no-unused-vars]: `db` is never used
+  --> /home/agent/projects/netscript/wave7-billing-steer2/sagas/runtime.ts:8:10
+  error[no-unused-vars]: `buildViteEnvVarName` is never used
+  --> /home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts:10:3
+  error[no-unused-vars]: `getResourceEndpoint` is never used
+  --> /home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts:19:16
+=== batch 1 ===
+  error[require-await]: Async arrow function has no 'await' expression or 'await using' declaration.
+  --> /home/agent/projects/netscript/wave7-billing-steer2/triggers/daily-maintenance.ts:27:3
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && for f in sagas/runtime.ts aspire/.helpers/register-apps.mts triggers/daily-maintenance.ts; do echo "-- $f"; git log --oneline -1 -- "$f"; done; echo "=== files touched by steer branch (ba37797..HEAD) ==="; git diff --name-only ba37797 HEAD | head -60
+-- sagas/runtime.ts
+8e76bc2 Fix: saga runner store binding — the 0.0.7 runner never reads NETSCRIPT_SAGA_STORE; the composition now passes the prisma store explicitly when declared (KvSagaStore 'database is locked' under contention recorded)
+-- aspire/.helpers/register-apps.mts
+9dc24ab Backend B: run-issue saga — guarded state machine, correlate by runItemId, compensation executes the refund then sagaFail (terminal)
+-- triggers/daily-maintenance.ts
+ec079c3 Saga fix 2/3: cleanup — guarded self-heal job, restored load-bearing Aspire wiring, RECORD dedup
+=== files touched by steer branch (ba37797..HEAD) ===
+apps/ledgerline-web/components/ui/segmented-control.tsx
+apps/ledgerline-web/lib/money.ts
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+apps/ledgerline-web/routes/invoices/(_components)/invoice-list.tsx
+apps/ledgerline-web/routes/runs/(_components)/billed-summary.tsx
+apps/ledgerline-web/routes/runs/(_components)/run-comparison.tsx
+apps/ledgerline-web/routes/runs/(_components)/run-progress.tsx
+apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+apps/ledgerline-web/routes/runs/(_islands)/saga-instances.tsx
+apps/ledgerline-web/routes/runs/[id].tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 900 deno test --allow-all 2>&1 | tail -25
+billing /api/entitlements/{customerId} without a credential is 401 ... [0m[32mok[0m [0m[38;5;245m(161µs)[0m
+billing /api/api/v1/invoices (old doubled path) is denied, not served ... [0m[32mok[0m [0m[38;5;245m(170µs)[0m
+runs contract health is public (200, no credential) ... [0m[32mok[0m [0m[38;5;245m(657µs)[0m
+runs /api/runs without a credential is 401 ... [0m[32mok[0m [0m[38;5;245m(117µs)[0m
+runs POST /api/runs without a credential is 401 ... [0m[32mok[0m [0m[38;5;245m(142µs)[0m
+runs POST /api/runs/{id}/issue without a credential is 401 ... [0m[32mok[0m [0m[38;5;245m(156µs)[0m
+runs POST /api/runs/{id}/issue with a bogus credential is 401 ... [0m[32mok[0m [0m[38;5;245m(222µs)[0m
+runs /api/runs with a bogus credential is 401 ... [0m[32mok[0m [0m[38;5;245m(169µs)[0m
+runs POST /api/runs/{id}/compute without a credential is 401 ... [0m[32mok[0m [0m[38;5;245m(113µs)[0m
+[0m[38;5;245mrunning 4 tests from ./tests/refund-flow_test.ts[0m
+refund flow: capture, refund credit note, apply — payment reaches REFUNDED once ... [0m[32mok[0m [0m[38;5;245m(316ms)[0m
+refund flow: compensation voids the note and leaves the payment SUCCEEDED ... [0m[32mok[0m [0m[38;5;245m(204ms)[0m
+refund flow: refund idempotency replays the stored response and rejects mismatches ... [0m[32mok[0m [0m[38;5;245m(646ms)[0m
+refund flow: capturing a non-OPEN invoice is refused (state guard) ... [0m[32mok[0m [0m[38;5;245m(78ms)[0m
+[0m[38;5;245mrunning 7 tests from ./tests/sagas_test.ts[0m
+run-issue runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(10ms)[0m
+run-issue runtime: compensation terminalises with persisted FAILED ... [0m[32mok[0m [0m[38;5;245m(895µs)[0m
+run-issue runtime: pre-money failure persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(186µs)[0m
+run-issue runtime: duplicate Started mid-flight does not advance ... [0m[32mok[0m [0m[38;5;245m(157µs)[0m
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(262µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(227µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(164µs)[0m
+
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(1s)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno task fmt:check 2>&1 | python3 -c "
+import sys,json,re
+raw=sys.stdin.read()
+try: d=json.loads(raw[raw.index('{'):])
+except Exception: print(raw[:1500]); sys.exit()
+print('ok',d.get('ok'))
+for b in d.get('batches',[]):
+    out=re.sub(r'\x1b\[[0-9;]*m','',(b.get('stdout') or '')+(b.get('stderr') or ''))
+    print('batch exit',b.get('exitCode'))
+    print(out[:2500])
+"
+ok False
+batch exit 1
+
+from /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/invoices/index.tsx:
+28 | -  .withRouteContract({ $route: routePatterns.invoices.$route, searchSchema: INVOICES_SEARCH_SCHEMA })
+28 | +  .withRouteContract({
+29 | +    $route: routePatterns.invoices.$route,
+30 | +    searchSchema: INVOICES_SEARCH_SCHEMA,
+31 | +  })
+
+
+from /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/customers/index.tsx:
+27 | -  .withRouteContract({ $route: routePatterns.customers.$route, searchSchema: CUSTOMERS_SEARCH_SCHEMA })
+27 | +  .withRouteContract({
+28 | +    $route: routePatterns.customers.$route,
+29 | +    searchSchema: CUSTOMERS_SEARCH_SCHEMA,
+30 | +  })
+
+
+from /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/invoices/[id].tsx:
+32 | -  .withRouteContract({ $route: routePatterns.invoices.$id.$route, pathSchema: z.object({ id: z.string() }) })
+32 | +  .withRouteContract({
+33 | +    $route: routePatterns.invoices.$id.$route,
+34 | +    pathSchema: z.object({ id: z.string() }),
+35 | +  })
+
+
+from /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/customers/[id].tsx:
+ 39 | -  .withRouteContract({ $route: routePatterns.customers.$id.$route, pathSchema: z.object({ id: z.string() }) })
+ 39 | +  .withRouteContract({
+ 40 | +    $route: routePatterns.customers.$id.$route,
+ 41 | +    pathSchema: z.object({ id: z.string() }),
+ 42 | +  })
+
+
+from /home/agent/projects/netscript/wave7-billing-steer2/services/runs/src/lib/stream.ts:
+22 | -  runConsoleStreamSchema,
+   | ...
+23 | +  runConsoleStreamSchema,
+
+error: Found 5 not formatted files in 200 files
+
+batch exit 1
+
+from /home/agent/projects/netscript/wave7-billing-steer2/streams/run-console-schema.ts:
+46 | -});
+   | \ No newline at end of file
+46 | +});
+
+error: Found 1 not formatted file in 27 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== invoice-list.tsx (mounted SegmentedControl) ==="; cat routes/invoices/\(_components\)/invoice-list.tsx 2>/dev/null | head -80
+=== invoice-list.tsx (mounted SegmentedControl) ===
+/**
+ * Invoice list table — server component for the `/invoices` list layer.
+ *
+ * Renders through the registry DataGrid (import-only — the grid is a package
+ * runtime component, never ui:add'd). Money columns use the `num` cell
+ * variant plus MoneyText's `data-money` marker; absence is an em dash.
+ */
+
+import { DataGrid } from '@netscript/fresh-ui';
+import {
+  Badge,
+  Card,
+  EmptyState,
+  InlineNotice,
+  MoneyText,
+  Pagination,
+  SegmentedControl,
+  type SegmentedControlOption,
+  Skeleton,
+  StatusBadge,
+} from '@app/components/ui/mod.ts';
+import { routes } from '@app/router.ts';
+import type { InvoiceV1 } from '@ledgerline/contracts';
+import type { VNode } from 'preact';
+
+export interface InvoiceListProps {
+  items: readonly InvoiceV1[];
+  total: number;
+  unavailable?: boolean;
+  denied?: boolean;
+  status?: 'DRAFT' | 'OPEN' | 'PAID' | 'VOID' | 'UNCOLLECTIBLE';
+  page: number;
+  limit: number;
+}
+
+export function InvoiceListSkeleton(): VNode {
+  return (
+    <Card>
+      <Card.Body class='ns-stack ns-stack--md'>
+        <Skeleton variant='table' rows={8} columns={6} />
+      </Card.Body>
+    </Card>
+  );
+}
+
+function formatDate(iso: string | null): string {
+  return iso ? iso.slice(0, 10) : '—';
+}
+
+function pageHref(page: number, status: InvoiceListProps['status']): string {
+  const params = new URLSearchParams({ page: String(page) });
+  if (status) params.set('status', status);
+  return `/invoices?${params.toString()}`;
+}
+
+const INVOICE_STATUSES = ['DRAFT', 'OPEN', 'PAID', 'VOID', 'UNCOLLECTIBLE'] as const;
+
+function statusHref(status?: string): string {
+  return status ? `/invoices?status=${status}` : '/invoices';
+}
+
+/**
+ * Status filter row — every cell is a reachable URL state of the page.
+ *
+ * This was a row of bare links carrying `aria-current` and nothing else, so
+ * the selected status was announced but never shown. The segmented control
+ * fills the selected cell, which is the whole point of a range control (C4):
+ * selection is a fill, not a border and not a colour.
+ */
+function InvoiceStatusFilter({ active }: { active?: string }): VNode {
+  const options: readonly SegmentedControlOption[] = [
+    { value: 'all', label: 'All', href: statusHref() },
+    ...INVOICE_STATUSES.map((status) => ({
+      value: status,
+      label: status.toLowerCase(),
+      href: statusHref(status),
+    })),
+  ];
+
+  return (
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== runs-table.tsx ==="; cat routes/runs/\(_components\)/runs-table.tsx
+=== runs-table.tsx ===
+/**
+ * Run list table — server component for the `/runs` list layer.
+ *
+ * Every read failure arrives as data (`unavailable`/`denied`), so this
+ * component renders the reachable states instead of throwing: unavailable
+ * service, permission denied, empty ledger, and per-run rows.
+ */
+
+import BilledSummary from './billed-summary.tsx';
+import {
+  Card,
+  EmptyState,
+  InlineNotice,
+  MoneyText,
+  ResponsiveTable,
+  type ResponsiveTableColumn,
+  Skeleton,
+  StatusBadge,
+} from '@app/components/ui/mod.ts';
+import { routes } from '@app/router.ts';
+import type { RunV1 } from '@ledgerline/contracts';
+import type { VNode } from 'preact';
+
+export interface RunsTableProps {
+  runs: readonly RunV1[];
+  unavailable?: boolean;
+  denied?: boolean;
+  status?: (typeof RUN_STATUSES)[number];
+}
+
+const RUN_STATUSES = [
+  'DRAFT',
+  'COMPUTING',
+  'REVIEW',
+  'ISSUING',
+  'ISSUED',
+  'FAILED',
+  'COMPENSATED',
+  'CANCELED',
+] as const;
+
+function statusHref(status?: string): string {
+  return status ? `/runs?status=${status}` : '/runs';
+}
+
+/** Status filter row — every chip is a reachable URL state of the page. */
+export function RunStatusFilter(
+  { active }: { active?: string },
+): VNode {
+  return (
+    <nav class='ns-cluster ns-cluster--sm' aria-label='Filter runs by status' data-run-filter>
+      <a
+        href={statusHref()}
+        f-client-nav
+        class='text-xs'
+        aria-current={active === undefined ? 'true' : undefined}
+      >
+        All
+      </a>
+      {RUN_STATUSES.map((status) => (
+        <a
+          key={status}
+          href={statusHref(status)}
+          f-client-nav
+          class='text-xs'
+          aria-current={active === status ? 'true' : undefined}
+        >
+          {status.toLowerCase()}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+export function RunsTableSkeleton(): VNode {
+  return (
+    <Card>
+      <Card.Body class='ns-stack ns-stack--md'>
+        <Skeleton variant='table' rows={6} columns={5} />
+      </Card.Body>
+    </Card>
+  );
+}
+
+function formatPeriod(run: RunV1): string {
+  return `${run.periodStart.slice(0, 10)} → ${run.periodEnd.slice(0, 10)}`;
+}
+
+function formatTimestamp(iso: string): string {
+  return iso.slice(0, 16).replace('T', ' ');
+}
+
+const COLUMNS: readonly ResponsiveTableColumn<RunV1>[] = [
+  {
+    key: 'id',
+    label: 'Run',
+    priority: 'primary',
+    cell: (run) => (
+      <a
+        href={routes.runs.$id.$route.href({ path: { id: run.id } })}
+        f-client-nav
+        class='font-mono text-xs text-ns-fg'
+      >
+        {run.id}
+      </a>
+    ),
+  },
+  {
+    key: 'period',
+    label: 'Period',
+    cell: (run) => <span class='text-xs text-ns-muted-fg'>{formatPeriod(run)}</span>,
+  },
+  {
+    key: 'status',
+    label: 'Status',
+    cell: (run) => (
+      <StatusBadge
+        status={run.status === 'ISSUING' ? 'in-flight' : run.status}
+      />
+    ),
+  },
+  {
+    key: 'createdAt',
+    label: 'Created',
+    cell: (run) => (
+      <span class='font-mono text-xs text-ns-muted-fg'>{formatTimestamp(run.createdAt)}</span>
+    ),
+  },
+  {
+    key: 'counts',
+    label: 'Issued / failed',
+    cell: (run) => (
+      <span class='tabular-nums text-xs'>
+        <span class='text-ns-fg'>{run.issuedCount}</span>
+        <span class='text-ns-muted-fg'>/</span>
+        <span class={run.failedCount > 0 ? 'text-ns-money-neg' : 'text-ns-muted-fg'}>
+          {run.failedCount}
+        </span>
+      </span>
+    ),
+  },
+  {
+    key: 'total',
+    label: 'Total',
+    align: 'end',
+    // Run money aggregates invoices that carry the billing schema's USD
+    // default — the domain default is real here, not a guess.
+    cell: (run) => <MoneyText value={run.total} currency='USD' />,
+  },
+];
+
+export default function RunsTable({ runs, unavailable, denied, status }: RunsTableProps): VNode {
+  return (
+    <div class='ns-stack ns-stack--md'>
+      <BilledSummary runs={runs} />
+      <RunStatusFilter active={status} />
+      {tableFor({ runs, unavailable, denied })}
+    </div>
+  );
+}
+
+function tableFor(
+  { runs, unavailable, denied }: Omit<RunsTableProps, 'status'>,
+): VNode {
+  if (denied) {
+    return (
+      <Card>
+        <Card.Body>
+          <InlineNotice title='Permission denied' variant='destructive'>
+            The console's service token does not carry the runs:read scope. Ask a finance admin to
+            grant access.
+          </InlineNotice>
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  if (unavailable) {
+    return (
+      <Card>
+        <Card.Body>
+          <InlineNotice title='Runs service unavailable' variant='destructive'>
+            The runs service did not answer. The console stays read-only until it is back; nothing
+            was queued in the meantime.
+          </InlineNotice>
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  if (runs.length === 0) {
+    return (
+      <Card>
+        <Card.Body>
+          <EmptyState heading='No billing runs yet'>
+            Create the first run to compute charges for a billing period.
+          </EmptyState>
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <ResponsiveTable
+        caption='Billing runs'
+        columns={COLUMNS}
+        rows={runs}
+        getRowKey={(run) => run.id}
+        summary={
+          <span>
+            {runs.length} run{runs.length === 1 ? '' : 's'} · newest first
+          </span>
+        }
+      />
+    </Card>
+  );
+}
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && cat assets/ui/segmented-control.css 2>/dev/null
+/* SegmentedControl — range selection by filling, not by bordering (C4).
+
+   The container is the capsule; the selected cell is a raised pill inside it
+   with the surface's own background, so light and dark both read without a
+   theme-specific rule (T3). Dividers are hairlines between cells only — never
+   a border around the whole control competing with the card's. */
+
+.ns-segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: var(--ns-space-0-5);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-muted);
+}
+
+.ns-segmented--block {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: 100%;
+}
+
+.ns-segmented__cell {
+  appearance: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ns-space-1-5) var(--ns-space-3);
+  border: 0;
+  border-radius: var(--ns-radius-full);
+  background: transparent;
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-xs);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ns-muted-fg);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--ns-ease-normal), color var(--ns-ease-normal);
+}
+
+.ns-segmented--sm .ns-segmented__cell {
+  padding: var(--ns-space-1) var(--ns-space-2-5);
+  font-size: var(--ns-text-2xs);
+}
+
+/* Hairline divider between cells, drawn on the leading edge of every cell but
+   the first so it never doubles up and never sits on the capsule's edge. */
+.ns-segmented__cell + .ns-segmented__cell::before {
+  content: '';
+  position: absolute;
+  inset-block: 25%;
+  inset-inline-start: 0;
+  width: 1px;
+  background: var(--ns-border);
+}
+
+.ns-segmented__cell:hover:not(.is-selected):not(:disabled) {
+  color: var(--ns-fg);
+}
+
+.ns-segmented__cell.is-selected {
+  background: var(--ns-card);
+  color: var(--ns-fg);
+  font-weight: 600;
+  box-shadow: var(--ns-shadow-xs);
+}
+
+/* A selected cell swallows the divider that would run into it. */
+.ns-segmented__cell.is-selected::before,
+.ns-segmented__cell.is-selected + .ns-segmented__cell::before {
+  background: transparent;
+}
+
+.ns-segmented__cell:disabled,
+.ns-segmented__cell[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ns-segmented__cell:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-segmented__cell {
+    transition: none;
+  }
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && cat tests/design_contract_test.ts | head -120
+/**
+ * Design contract tests.
+ *
+ * DESIGN.md states several rules as mechanically checkable — "fails if" a ramp
+ * step appears in a component, an offset shadow survives in a stylesheet, or a
+ * catalogue entry has no demo. These tests are that check. They read the files,
+ * because a rule that is not run is a rule that rots.
+ */
+
+import { assert, assertEquals } from '@std/assert';
+
+const APP = new URL('../apps/ledgerline-web/', import.meta.url);
+const ASSETS = new URL('./assets/', APP);
+const COMPONENTS = new URL('./components/', APP);
+
+/** Every CSS file an installed component owns. */
+async function componentStylesheets(): Promise<string[]> {
+  const files: string[] = [];
+  for (const dir of ['ui', 'blocks']) {
+    for await (const entry of Deno.readDir(new URL(`./${dir}/`, ASSETS))) {
+      if (entry.isFile && entry.name.endsWith('.css')) files.push(`${dir}/${entry.name}`);
+    }
+  }
+  return files.sort();
+}
+
+/** Every component module in the app-owned UI barrel directory. */
+async function componentModules(): Promise<string[]> {
+  return await modulesIn('./ui/');
+}
+
+/** Product components — the Ledgerline domain layer over the copied kit. */
+async function productComponentModules(): Promise<string[]> {
+  return await modulesIn('./product/');
+}
+
+/** Every `.tsx` module directly under a components subdirectory. */
+async function modulesIn(dir: string): Promise<string[]> {
+  const files: string[] = [];
+  try {
+    for await (const entry of Deno.readDir(new URL(dir, COMPONENTS))) {
+      if (entry.isFile && entry.name.endsWith('.tsx')) files.push(entry.name);
+    }
+  } catch {
+    // A root that does not exist in this branch contributes nothing.
+  }
+  return files.sort();
+}
+
+async function read(path: string): Promise<string> {
+  return await Deno.readTextFile(new URL(path, APP));
+}
+
+/**
+ * Source with its comments removed, so a rule about the text a reader sees
+ * does not fire on the prose that documents the code. `components/ui/mod.ts`
+ * legitimately names `netscript ui:init` — that is provenance, not demo copy.
+ * A `//` directly after a colon is a URL scheme, not a comment.
+ */
+function withoutComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(?<!:)\/\/[^\n]*/g, '');
+}
+
+/** Every app source file that can put text in front of a reader. */
+async function appSources(): Promise<string[]> {
+  const files: string[] = [];
+
+  async function walk(dir: string): Promise<void> {
+    try {
+      for await (const entry of Deno.readDir(new URL(`./${dir}/`, APP))) {
+        const rel = `${dir}/${entry.name}`;
+        if (entry.isDirectory) await walk(rel);
+        else if (/\.tsx?$/.test(entry.name)) files.push(rel);
+      }
+    } catch {
+      // A root that does not exist in this branch contributes nothing.
+    }
+  }
+
+  for (const root of ['routes', 'components', 'islands', 'lib']) await walk(root);
+  return files.sort();
+}
+
+Deno.test('T2a — no component reaches for a ramp step', async () => {
+  // The paper ramp inverts in dark: paper-12 is near-black in light and
+  // near-white in dark. A ramp step in a component is a broken dark theme.
+  const rampStep = /var\(--ns-(?:paper|ledger|rust|ink|brass|amber)-\d+\)/;
+
+  for (const sheet of await componentStylesheets()) {
+    const css = await read(`./assets/${sheet}`);
+    assert(!rampStep.test(css), `${sheet} references a ramp step; use the semantic role instead`);
+  }
+
+  for (const name of await componentModules()) {
+    const source = await read(`./components/ui/${name}`);
+    assert(
+      !rampStep.test(source),
+      `components/ui/${name} references a ramp step; use the semantic role instead`,
+    );
+  }
+});
+
+Deno.test('T2 — no raw colour literal in a component stylesheet', async () => {
+  for (const sheet of await componentStylesheets()) {
+    const css = await read(`./assets/${sheet}`);
+    assert(
+      !/#[0-9a-fA-F]{3,8}\b/.test(css),
+      `${sheet} contains a hex literal outside the token files`,
+    );
+    assert(!/\brgba?\(/.test(css), `${sheet} contains an rgb()/rgba() literal`);
+  }
+});
+
+Deno.test('C8 — no hard offset shadow survives', async () => {
+  for (const sheet of await componentStylesheets()) {
+    const css = await read(`./assets/${sheet}`);
+    assert(
+      !/box-shadow:[^;]*\d+px\s+\d+px\s+0/.test(css),
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && head -60 RECORD.md; echo "=== DESIGN.md rules ==="; sed -n '1,80p' apps/ledgerline-web/DESIGN.md 2>/dev/null || sed -n '1,80p' DESIGN.md
+# Running record — Ledgerline (wave7 billing run, NetScript 0.0.7)
+
+Started 2026-09-03 ~23:05 UTC. Sole agent: opencode/z-ai/glm-5.3-flash. This file is appended as
+problems happen; nothing reconstructed at the end.
+
+## Version gate (§0)
+
+- Quickstart read in full before any action: https://rickylabs.github.io/netscript/quickstart/ (docs
+  edition "0.0.x", page states it is verified against CLI source and walked end-to-end on Linux/Deno
+  2.x).
+- CLI installed with the exact documented command, including the required
+  `--minimum-dependency-age=0`:
+  `deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@0.0.7`
+  → "Successfully installed netscript", 53 packages installed. No dependency-age error anywhere
+  during install; the generated workspace's `deno.json` imports and `deno.lock` resolved every
+  `@netscript/*` at exactly `0.0.7` (verified by grep over both; 13 distinct packages, zero
+  non-0.0.7 pins).
+- `netscript --version` → `0.0.7`. MCP handshake: `@netscript/mcp` 0.0.7 and `aspire-mcp-server`
+  13.5.3 both answered a JSON-RPC `initialize` + `tools/list` over stdio.
+- Environment note from the brief said this host runs Deno 2.9.6; it actually runs **2.9.5**, so the
+  scaffold's `engines.deno: "2.9.5"` pin matches exactly — the expected warning never fired.
+
+## Problems encountered (in order)
+
+### P1 — GitHub push rejected: PAT lacks `workflow` scope (environment, not framework)
+
+- Exact command: `gh repo create rickylabs/ledgerline --private --source . --push ...`
+- Exact output:
+  `! [remote rejected] HEAD -> master (refusing to allow a Personal Access Token to create or update workflow '.github/workflows/deploy-bare-metal.yml' without 'workflow' scope)`
+- Resolution: removed the three scaffold deploy workflows (`git rm -r .github`) — they target deploy
+  paths (bare-metal Windows service, GHCR compose, Deno Deploy) this product does not use, and bar 7
+  wants zero scaffold leftovers. Repo was created; push succeeded after removal.
+- Classification: _I did not know the token's scopes ahead of time_; `gh auth status` prints the
+  missing scope, so this was discoverable. Not a framework defect.
+
+### P2 — Postgres container port unreachable from the sandbox netns (environment, ~45 min)
+
+The docker daemon here is **remote** (`DOCKER_HOST=tcp://netscript-dind:2375`). Aspire publishes
+container ports to the daemon's `127.0.0.1`, which is the dind host's loopback — unreachable from
+this sandbox. Evidence chain:
+
+- `netscript db init --db postgres --name init` →
+  `Error: Database resource postgres did not become healthy within 300 seconds (aspire wait exit 17)`
+- `aspire describe` health: `postgres_check: Unhealthy — Failed to connect to 127.0.0.1:29379`
+  (`Npgsql ... Connection refused`), `postgres_listener: Unhealthy — ECONNREFUSED`.
+- `docker port postgres-cb583538` → `5432/tcp -> 127.0.0.1:29379`; container-internal `pg_isready` →
+  accepting connections. Nothing in `/proc/net/tcp` on my host bound port 29379.
+- Container bridge IPs (172.18.x.x) also unreachable — the docker bridge lives on the dind host.
+
+Fix (three hops, all outside product code):
+
+1. socat relay containers in dind with `--network host`:
+   `docker run -d --name pg-relay --network host alpine/socat tcp-listen:31111,fork,reuseaddr,bind=0.0.0.0 tcp:127.0.0.1:29379`
+2. Local relay in the sandbox netns (`.netscript/relay.ts`, ~35 lines of Deno): 127.0.0.1:29379 →
+   `netscript-dind:31111`.
+3. Postgres startup answered through the chain (SSLRequest → byte `N`), then `netscript db init`
+   succeeded, `db generate` + `db seed` succeeded, `aspire describe` shows `postgres_check=Healthy`,
+   `ledgerline-db_check=Healthy`.
+
+Classification: environment topology problem, **not** a NetScript defect. A future-visitor note for
+=== DESIGN.md rules ===
+# Ledgerline — design
+
+The billing run a subscription business closes its month with, built on NetScript 0.0.7.
+
+## Product shape
+
+**Ledgerline** is the close-the-month product: customers sit on versioned plans, usage accrues on
+meters, and finance runs a **billing run** — draft → compute → review → issue — watching a live
+console that answers, at any moment, exactly what has been charged and what has not.
+
+## Domain model (database/postgres/schema/*.prisma)
+
+DB-level enums: `SubscriptionStatus`, `InvoiceStatus`, `RunStatus`, `RunItemStatus`,
+`ExceptionBucket`, `RunDecision`, `PaymentStatus`, `PaymentAttemptOutcome`, `ProrationMode`,
+`CreditNoteType`, `CreditNoteStatus`, `EntitlementSource`, `LedgerEntryKind`, `WebhookEventStatus`,
+`UsageAggregation`.
+
+Models (target ≥20): `Customer`, `PaymentMethod`, `Plan`, `PlanVersion`, `PlanComponent`
+(fixed + metered pricing per version), `Meter`, `Subscription`, `SubscriptionChange` (staged +
+applied, with proration preview lines), `UsageEvent` (unique `idempotencyKey` per meter),
+`BillingRun`, `RunItem` (per-subscription: status, exception bucket, skip reason, decision),
+`RunDecision` (approve/exclude, actor, idempotency key), `Invoice`, `InvoiceLine` (frozen
+derivation JSON: proration linkage, meter aggregation, unit price), `CreditNote` (+ type),
+`CreditNoteApplication`, `CreditLedgerEntry` (append-only: grant/deduction/adjustment), 
+`EntitlementGrant`, `Payment`, `PaymentAttempt` (retry log), `WebhookEndpoint`,
+`WebhookDelivery` (+ attempts JSON, status incl. replayed), `OutboundEvent` (typed billing
+events), `AuditEvent` (actor, action, target, metadata), `IdempotencyKey` (Stripe-grade:
+key, request hash, response code/body, lockedAt, recoveryPoint).
+
+## Services (contract-first, CLI-generated)
+
+- **`billing`** — customers, plans, subscriptions + mid-cycle change with proration preview,
+  invoices (draft/issue/void/finalize-freeze), credit notes, payments + retries, credit ledger,
+  entitlements, usage ingestion (idempotent). The money module: every mutating procedure has a
+  failing test.
+- **`runs`** — billing run create/compute/decisions/issue/console reads; publishes stream updates.
+- **`webhooks`** — endpoint management, delivery logs, replay.
+- (scaffold `users` example service removed — zero scaffold leftovers.)
+
+## Durable machinery
+
+- **Sagas** (`plugins/sagas/`, prisma store): `run-issue` saga — per approved run item:
+  finalize invoice → charge → record; failure mid-issue → compensation reaching **terminal**
+  state; every state transition persisted (saga store backend `prisma`).
+- **Workers** (`plugins/workers/`): `run-compute` (materialize draft invoices + lines with
+  derivations), `charge-payment` (idempotency-keyed), `webhook-deliver` (HMAC-signed POST,
+  exponential retry), `dunning-retry` (decline-aware schedule), `usage-rollup`.
+- **Triggers** (`plugins/triggers/`): `defineWebhook` (hmac-sha256 verified ingress — the
+  shipping-webhook pattern) for inbound payment-processor callbacks; `defineScheduledTrigger`
+  cron for the nightly draft-compute and the dunning retry tick.
+- **Streams** (`plugins/streams/`): run-console durable stream (per-run items + totals) powering
+  the two-tab live update via `useLiveQuery`.
+- **Auth** (`plugins/auth/`, better-auth backend, email+password): sign-up/sign-in page, session
+  cookie, contract-declared `access` metadata on every procedure, role-based authorization
+  (`finance:operator` vs `finance:admin`), ≥15 negative-authorization tests.
+
+## Web surface (Fresh app, ≥12 pages incl. ≥4 detail routes)
+
+`/` overview (charts), `/customers` + detail, `/subscriptions` + detail (plan change w/ proration
+preview), `/invoices` + detail (lines + derivations, payments, credit notes), `/runs` + detail
+(the live run console), `/usage` (meters + events), `/payments` (dunning console),
+`/webhooks` (endpoints + deliveries + replay), `/audit`, `/sign-in` (+ sign-up), `/design/*`
+(tokens, components gallery with registered product components).
+
+## Visual identity
+
+Custom token source (both `tokens.css` and `tokens.json` diverge ≥40 entries): warm-paper light
+theme / deep-ink dark theme, ledger-green primary for money-in, rust for reversals, IBM Plex
+Mono-style tabular numerals for amounts, hairline rules; product components registered in the
+design gallery.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '120,400p' tests/design_contract_test.ts
+!/box-shadow:[^;]*\d+px\s+\d+px\s+0/.test(css),
+      `${sheet} uses an offset brutalist shadow; elevation is diffuse and token-driven`,
+    );
+  }
+});
+
+Deno.test('M8 — only lib/money turns a decimal into text', async () => {
+  const formatters = /\bNumber\s*\(|\.toFixed\s*\(|\bIntl\.NumberFormat/;
+  const moneyModule = await read('./lib/money.ts');
+  const allowed = new Set(['money-text.tsx']);
+
+  for (const name of await componentModules()) {
+    if (allowed.has(name)) continue;
+    const source = await read(`./components/ui/${name}`);
+    assert(
+      !formatters.test(source),
+      `components/ui/${name} formats a value itself; render it through MoneyText instead`,
+    );
+  }
+
+  // The product layer renders money too, so it is under the same rule. This is
+  // where the defect actually lived: `components/product/money-text.tsx` used to
+  // call `Number(text)` and `Intl.NumberFormat` with a dynamic fraction count,
+  // which printed `$100` where the contract requires `$100.00`.
+  for (const name of await productComponentModules()) {
+    const source = await read(`./components/product/${name}`);
+    assert(
+      !formatters.test(source),
+      `components/product/${name} formats a value itself; render it through lib/money instead`,
+    );
+  }
+
+  // And the one component that is allowed to touch money must not format either.
+  const moneyText = await read('./components/product/money-text.tsx');
+  assert(
+    !formatters.test(moneyText),
+    'money-text.tsx must not call Number/toFixed/Intl — it resolves through moneyParts()',
+  );
+  // …but it must actually use the module, not shadow it.
+  assert(moneyText.includes('moneyParts'), 'money-text.tsx must resolve values through moneyParts');
+  assert(moneyModule.includes('export function moneyParts'));
+});
+
+Deno.test('T1 — tokens.json and tokens.css declare the same custom properties', async () => {
+  const manifest = JSON.parse(await read('./assets/tokens.json')) as {
+    tokens: Record<string, { cssVar: string }>;
+    themes: { dark: Record<string, { cssVar: string }> };
+  };
+  const css = await read('./assets/tokens.css');
+  const [light, dark] = css.split("[data-theme='dark']");
+  assert(light !== undefined && dark !== undefined, 'tokens.css must declare a dark theme block');
+
+  for (const token of Object.values(manifest.tokens)) {
+    assert(light.includes(token.cssVar), `${token.cssVar} is in tokens.json but not in tokens.css`);
+  }
+  for (const token of Object.values(manifest.themes.dark)) {
+    assert(
+      dark.includes(token.cssVar),
+      `${token.cssVar} has a dark override in tokens.json but not in tokens.css`,
+    );
+  }
+});
+
+Deno.test('T1 — every token a component uses is declared', async () => {
+  const css = await read('./assets/tokens.css');
+  const declared = new Set([...css.matchAll(/(--ns-[a-z0-9-]+)\s*:/g)].map((match) => match[1]));
+  // Custom properties a component sets or receives at runtime from its own
+  // script rather than from the theme. `--ns-floating-*` is the anchor-
+  // positioning seam: the floating runtime writes those values inline.
+  const runtime = /^--ns-floating-/;
+
+  for (const sheet of await componentStylesheets()) {
+    const source = await read(`./assets/${sheet}`);
+    for (const match of source.matchAll(/var\((--ns-[a-z0-9-]+)/g)) {
+      assert(
+        declared.has(match[1]) || runtime.test(match[1]),
+        `${sheet} uses ${
+          match[1]
+        }, which tokens.css does not declare — a typo here renders nothing`,
+      );
+    }
+  }
+});
+
+Deno.test('T6 — every component stylesheet is imported by styles.css', async () => {
+  const styles = await read('./assets/styles.css');
+  for (const sheet of await componentStylesheets()) {
+    assert(
+      styles.includes(`./${sheet}`),
+      `assets/${sheet} is not imported by assets/styles.css — the component is unreachable`,
+    );
+  }
+});
+
+Deno.test('R1 — every component module is exported from the barrel', async () => {
+  const barrel = await read('./components/ui/mod.ts');
+  for (const name of await componentModules()) {
+    const stem = name.replace(/\.tsx$/, '');
+    assert(
+      barrel.includes(`'./${name}'`),
+      `components/ui/${name} is not exported from components/ui/mod.ts — it is invisible`,
+    );
+    assert(stem.length > 0);
+  }
+});
+
+Deno.test('R3 — every Ledgerline catalogue entry has a gallery demo', async () => {
+  const registry = await read('./routes/(design)/design/(_shared)/registry.ts');
+  const gallery = await read('./routes/(design)/design/(_components)/components-view.tsx');
+
+  const catalog = registry.split('ledgerlineCatalog')[1] ?? '';
+  const names = [...catalog.matchAll(/^\s{4}name: '([a-z-]+)',$/gm)].map((match) => match[1]);
+  assertEquals(names.length > 0, true, 'ledgerlineCatalog must declare entries');
+
+  for (const name of names) {
+    assert(
+      gallery.includes(`case '${name}':`),
+      `${name} is catalogued but has no renderDemo case — unregistered work does not exist`,
+    );
+  }
+});
+
+Deno.test('R3 — the upstream registry count is not inflated by app-owned widgets', async () => {
+  const registry = await read('./routes/(design)/design/(_shared)/registry.ts');
+  const declared = /total:\s*(\d+),\s*\n\} as const;/.exec(registry.split('registryMeta')[1]);
+  assert(declared !== null, 'registryMeta must declare a total');
+
+  const upstream = registry
+    .split('export const registryCatalog')[1]
+    .split('export const registryCollections')[0];
+  const itemCount = [...upstream.matchAll(/^\s{4}name: '/gm)].length;
+  assertEquals(
+    Number(declared[1]),
+    itemCount,
+    'registryMeta.total must equal the number of upstream items, not the app-owned ones',
+  );
+});
+
+Deno.test('H8 — gauge arcs terminate with a flat cut', async () => {
+  const gauge = await read('./components/ui/semicircular-gauge.tsx');
+  assert(
+    gauge.includes("stroke-linecap='butt'"),
+    'a gauge arc must declare stroke-linecap="butt"; a round cap bulges past the baseline',
+  );
+  assert(!gauge.includes("stroke-linecap='round'"), 'a gauge arc must not use a round cap');
+});
+
+Deno.test('R8 — no scaffold fiction ships', async () => {
+  // Rule 8. The scaffold's cloud/DevOps vocabulary is the fingerprint of a
+  // themed starter, and the gallery is the file a reviewer opens first. Every
+  // demo string is a real Ledgerline value: an invoice number, a customer, a
+  // plan, a money amount, a decline reason.
+  const fiction = [
+    'api-gateway',
+    'eu-west',
+    'v2.4.1',
+    'NS One',
+    'starter scaffold',
+    'maintainer scaffold',
+    'lorem ipsum',
+  ];
+
+  // A denylist only catches what someone already thought to name: this file
+  // shipped "No services yet / run netscript service:add" straight through a
+  // green R8, because "service" was never on the list. These patterns catch
+  // the *shape* of the fiction instead — the scaffold talking about itself in
+  // the product's own voice.
+  const fictionPatterns: ReadonlyArray<readonly [RegExp, string]> = [
+    // The CLI invocation form (`netscript service:add`) is the framework
+    // addressing the reader. A billing UI never instructs anyone to run it.
+    [/netscript\s+\w+:\w+/, 'a netscript CLI command'],
+    [/scaffold your first/i, 'an instruction to scaffold'],
+  ];
+
+  for (const file of await appSources()) {
+    const source = withoutComments(await read(`./${file}`));
+    for (const term of fiction) {
+      assert(
+        !source.includes(term),
+        `${file} ships scaffold fiction ("${term}") — every demo string is a real Ledgerline value`,
+      );
+    }
+    for (const [pattern, what] of fictionPatterns) {
+      const hit = source.match(pattern);
+      const found = hit?.[0] ?? '';
+      assert(
+        hit === null,
+        `${file} ships scaffold fiction ("${found}" is ${what}) — every demo string is a real Ledgerline value`,
+      );
+    }
+  }
+});
+
+Deno.test('R8 — an internal link is not a dead end', async () => {
+  // A string-literal href is a promise the router has to keep. `/dashboard`
+  // was deleted with the scaffold routes but stayed linked, so the landing
+  // page shipped a 404. Only literals are checkable here — the hrefs a page
+  // receives as props are resolved by whoever renders it.
+  const literal = /href='(\/[^']*)'/g;
+
+  let checked = 0;
+  for (const file of await appSources()) {
+    const source = await read(`./${file}`);
+
+    for (const match of source.matchAll(literal)) {
+      const path = match[1].replace(/\/+$/, '');
+      const candidates = path === '' ? ['routes/index.tsx'] : [
+        `routes/${path}.tsx`,
+        `routes/${path}/index.tsx`,
+        ...(path.startsWith('/design/')
+          ? [`routes/(design)/design/${path.slice('/design/'.length)}.tsx`]
+          : []),
+      ];
+
+      const resolved = await Promise.all(
+        candidates.map((candidate) =>
+          Deno.stat(new URL(`./${candidate}`, APP)).then(() => true).catch(() => false)
+        ),
+      );
+      checked += 1;
+      assert(
+        resolved.some(Boolean),
+        `${file} links ${match[1]}, but no route module resolves for it — a dead link`,
+      );
+    }
+  }
+
+  // Guard against the check going quietly vacuous: a rewrite that moves every
+  // href into a prop would leave this test passing while proving nothing.
+  assert(checked > 0, 'no internal href literals found — this assertion has stopped testing');
+});
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "name: '" "routes/(design)/design/(_shared)/registry.ts" | sed -n '1,200p' | grep -iE "delta|gauge|segment|area|footer|widget|chart|donut|stat" ; echo "=== ledgerlineCatalog ==="; python3 - <<'EOF'
+import re
+src=open('routes/(design)/design/(_shared)/registry.ts').read()
+i=src.index('ledgerlineCatalog')
+print(src[i:i+3000])
+EOF
+130:    name: 'textarea',
+220:    name: 'chart-block',
+227:    name: 'donut',
+341:    name: 'stats-grid',
+374:    name: 'empty-state',
+457:    name: 'mcp-ui-widget',
+624:  name: 'ledgerline-widgets',
+631:    name: 'status-badge',
+645:    name: 'delta-chip',
+652:    name: 'semicircular-gauge',
+659:    name: 'segmented-control',
+666:    name: 'comparison-area-chart',
+673:    name: 'footer-columns',
+680:    name: 'run-state-stepper',
+708:    name: 'widget-card',
+=== ledgerlineCatalog ===
+ledgerlineCatalog: readonly RegistryCatalogItem[] = [
+  {
+    name: 'status-badge',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Ledgerline lifecycle chip colored through the status-* token family; carries data-status so surfaces can style specific states.',
+  },
+  {
+    name: 'money-text',
+    kind: 'component',
+    layer: 2,
+    description:
+      'The one renderer for a money amount. Formats nothing itself — every digit comes from lib/money.ts, direction comes from moneyParts(), and absence is an em dash.',
+  },
+  {
+    name: 'delta-chip',
+    kind: 'component',
+    layer: 2,
+    description:
+      'The one "up or down versus last period" in the product: a tinted pill with a directional glyph, rendered beside the number it qualifies.',
+  },
+  {
+    name: 'semicircular-gauge',
+    kind: 'component',
+    layer: 2,
+    description:
+      '180° two-tone run-progress arc with flat baseline cuts and a centre hero amount. Hand-authored SVG over the series cycle; no charting library.',
+  },
+  {
+    name: 'segmented-control',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Range selection as one full-width capsule whose selected cell is a filled pill. Renders as buttons for local state or as links when the range lives in the URL.',
+  },
+  {
+    name: 'comparison-area-chart',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Two-layer area chart — billed versus collected. The comparison period is the same geometry at reduced opacity, never a second axis. CSS-only crosshair readout.',
+  },
+  {
+    name: 'footer-columns',
+    kind: 'component',
+    layer: 2,
+    description:
+      'The bottom band of a widget card: N equal columns of label and amount, divided by hairline rules rather than gaps.',
+  },
+  {
+    name: 'run-state-stepper',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Run lifecycle stepper — draft → computing → review → issuing → issued with current-state emphasis; failed/compensated/canceled render as rust terminal states.',
+  },
+  {
+    name: 'exception-badge',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Run-item exception bucket chip with plain-language labels; NONE renders an em dash so unflagged items never read as flagged.',
+  },
+  {
+    name: 'transition-feed',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Recency-first run transition feed — the same component renders server-loaded history and live durable-stream updates.',
+  },
+  {
+    name: 'provisional-tag',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Marks figures that still depend on unresolved run items, so a moving number is never mistaken for a booked one.',
+  },
+  {
+    name: 'widget-card',
+    kind: 'block',
+    layer: 3,
+    description:
+      'The one composed-widget card. Five bands in order: header · range · hero · body · footer columns or a full-width CTA.',
+  },
+];
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "radius" assets/tokens.css | head -20; echo "=== space tokens ==="; grep -n -- "--ns-space-0-5\|--ns-space-1-5\|--ns-space-2-5\|--ns-space-3:" assets/tokens.css | head
+216:  --ns-radius-sm: 4px;
+217:  --ns-radius-md: 6px;
+218:  --ns-radius-lg: 8px;
+219:  --ns-radius-xl: 12px;
+220:  --ns-radius-2xl: 16px;
+221:  /* The containing card is the largest radius on the page; a panel inside it
+222:     steps down to --ns-radius-xl and every control inside those is a full pill.
+223:     Nothing shares a radius with the thing it sits inside (C7). */
+224:  --ns-radius-3xl: 24px;
+225:  --ns-radius-full: 9999px;
+=== space tokens ===
+182:  --ns-space-0-5: 0.125rem;
+184:  --ns-space-1-5: 0.375rem;
+186:  --ns-space-3: 0.75rem;
+195:  --ns-space-2-5: 0.625rem;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,60p' routes/runs/index.tsx
+/**
+ * `/runs` — the run console list.
+ *
+ * Typed search via the pagination contract (status filter + page/limit).
+ * The `list` layer is a deferred partial: the page loader renders from the
+ * query cache (`getCachedEntry`) and the `/partials/runs/list` route carries
+ * the authoritative read in the background (`staleReloadMode: 'background'`).
+ * A cache miss renders the layer's fallback skeleton, never a blocked page.
+ */
+
+import { paginationSearchSchema } from '@netscript/fresh/route';
+import { z } from 'zod';
+import { definePage } from '@app/utils.ts';
+import { runsClient, runsQueries } from '@app/lib/runs.ts';
+import CreateRunForm from './(_components)/create-run-form.tsx';
+import RunsTable, { RunsTableSkeleton } from './(_components)/runs-table.tsx';
+import { routePatterns } from '@app/.generated/manifest.ts';
+
+const RUN_STATUSES = [
+  'DRAFT',
+  'COMPUTING',
+  'REVIEW',
+  'ISSUING',
+  'ISSUED',
+  'FAILED',
+  'COMPENSATED',
+  'CANCELED',
+] as const;
+
+const RUNS_SEARCH_SCHEMA = paginationSearchSchema({
+  defaultSort: 'createdAt',
+  defaultOrder: 'desc',
+}).extend({
+  status: z.enum(RUN_STATUSES).optional().catch(undefined),
+});
+
+export const runsIndexPage = definePage()
+  .withRouteContract({ $route: routePatterns.runs.$route, searchSchema: RUNS_SEARCH_SCHEMA })
+  .withMeta(() => ({
+    title: 'Runs — ledgerline',
+    description: 'Billing run console: compute, review, and issue charges.',
+  }))
+  .withLayer('list', RunsTable, {
+    loader: async (ctx) => {
+      const entry = await runsQueries.list.getCachedEntry({
+        status: ctx.search.status,
+        limit: Math.min(ctx.search.limit, 100),
+      });
+      return entry ? { data: { runs: entry.data.items }, cachedAt: entry.cachedAt } : undefined;
+    },
+    fallback: <RunsTableSkeleton />,
+    staleTime: 15_000,
+    staleReloadMode: 'background',
+    partial: '/partials/runs/list',
+    partialName: 'runs-list',
+  })
+  .withForm('createRun', CreateRunForm, {
+    schema: z.object({
+      periodStart: z.string().datetime(),
+      periodEnd: z.string().datetime(),
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rn "RunStatusFilter\|InvoiceStatusFilter" routes/ | head
+routes/invoices/(_components)/invoice-list.tsx:70:function InvoiceStatusFilter({ active }: { active?: string }): VNode {
+routes/invoices/(_components)/invoice-list.tsx:139:      <InvoiceStatusFilter active={status} />
+routes/runs/(_components)/runs-table.tsx:47:export function RunStatusFilter(
+routes/runs/(_components)/runs-table.tsx:156:      <RunStatusFilter active={status} />
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '300,350p' "routes/(design)/design/(_components)/components-view.tsx"
+[210000, 226000, 221500, 238000],
+            )}
+          />
+          <InlineNotice title='Hover is CSS'>
+            The crosshair, the point marker and the dark pointer bubble all reveal on{' '}
+            <code>
+              :hover
+            </code>{' '}
+            of a column — no hydration cost, no first-paint mismatch.
+          </InlineNotice>
+          <RangeControlDemo ranges={COLLECTION_RANGES} initial='3M' />
+        </div>
+      );
+    case 'segmented-control':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <SegmentedControl
+            label='Collection period'
+            options={[
+              { value: '1M', label: '1M' },
+              { value: '3M', label: '3M' },
+              { value: '6M', label: '6M' },
+              { value: '1Y', label: '1Y' },
+            ]}
+            value='3M'
+          />
+          <SegmentedControl
+            label='Run window'
+            size='sm'
+            options={[
+              { value: 'draft', label: 'Draft' },
+              { value: 'computed', label: 'Computed' },
+              { value: 'issued', label: 'Issued' },
+              { value: 'closed', label: 'Closed', disabled: true },
+            ]}
+            value='computed'
+          />
+          <SegmentedControl
+            label='Invoice ledger'
+            options={[
+              { value: 'open', label: 'Open', href: '/design/components' },
+              { value: 'paid', label: 'Paid', href: '/design/components' },
+              { value: 'void', label: 'Void', href: '/design/components' },
+            ]}
+            value='open'
+          />
+        </div>
+      );
+    case 'semicircular-gauge':
+      return (
+        <div class='ns-gallery-row ns-gallery-row--start'>
+[0m
+[0m# [0mTodos
+[•] Add wrap modifier to SegmentedControl (CSS + prop)
+[ ] Mount SegmentedControl on RunStatusFilter so the active status is visible
+[ ] Register the wrapped variant in the design gallery
+[ ] Format the 6 files deno fmt flags (4 route files + services/runs stream + streams schema)
+[ ] Verify: check, lint, test, fmt:check, render proof
+[ ] Write design-steer-2-pass6.md and report DONE vs REMAINING
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/segmented-control.css[90m [limit=30][0m
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/segmented-control.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/segmented-control.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/segmented-control.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/segmented-control.css
+@@ -21,8 +21,28 @@
+   grid-auto-columns: 1fr;
+   width: 100%;
+ }
+ 
++/* A capsule is a one-line shape. A filter over eight run statuses is not four
++   range options, and nowrap cells would rather overflow the card than shrink
++   to fit it, so this modifier lets the group wrap instead. Two consequences
++   follow from the wrap, and both are here rather than left to the caller:
++   the container steps down to a panel radius, because fully-rounded ends read
++   as two unrelated pills once there is more than one line; and the inter-cell
++   hairlines go away, because a wrapped row would otherwise open with a
++   divider hanging off its leading edge where the previous row used to be. */
++.ns-segmented--wrap {
++  display: flex;
++  flex-wrap: wrap;
++  width: 100%;
++  gap: var(--ns-space-0-5);
++  border-radius: var(--ns-radius-lg);
++}
++
++.ns-segmented--wrap .ns-segmented__cell::before {
++  display: none;
++}
++
+ .ns-segmented__cell {
+   appearance: none;
+   position: relative;
+   display: inline-flex;
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+@@ -40,8 +40,16 @@
+ size?: 'sm' | 'md';
+ /** Stretch to the container width. The reference control is full-width. */
+ block?: boolean;
+ /**
++ * Let the cells wrap onto more than one line instead of stretching to fill
++ * one. A capsule is a one-line shape, so this also steps the container down
++ * to a panel radius and drops the inter-cell hairlines — reach for it when
++ * the options outgrow a line, the way a filter over eight run statuses does
++ * against a range control's four.
++ */
++wrap?: boolean;
++/**
+  * Let link options navigate client-side. A range that lives in the URL is
+  * usually a filter, and a filter that reloads the whole page is a slower
+  * version of the same navigation.
+  */
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+@@ -71,8 +71,9 @@
+   value = null,
+   onSelect,
+   size = 'md',
+   block = true,
++  wrap = false,
+   clientNav = false,
+   class: className,
+   ...props
+ }: SegmentedControlProps): VNode {
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+@@ -84,9 +84,10 @@
+ {...props}
+ class={cn(
+   'ns-segmented',
+   size === 'sm' && 'ns-segmented--sm',
+-  block && 'ns-segmented--block',
++  block && !wrap && 'ns-segmented--block',
++  wrap && 'ns-segmented--wrap',
+   className,
+ )}
+ role={asLinks ? 'group' : 'tablist'}
+ aria-label={label}
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/segmented-control.tsx
+@@ -3,9 +3,10 @@
+  * @layer 2
+  * @depends theme-seed
+  * @description Range selection as one full-width capsule: N equal cells, the
+  * selected one a filled pill. Never a border change (C4). Renders as buttons
+- * for client-side selection, or as links when the range is a route.
++ * for client-side selection, or as links when the range is a route, and wraps
++ * onto further lines when the options outgrow one.
+  */
+ 
+ import type { JSX, VNode } from 'preact';
+ import { cn } from '../../lib/cn.ts';
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+@@ -13,8 +13,10 @@
+   InlineNotice,
+   MoneyText,
+   ResponsiveTable,
+   type ResponsiveTableColumn,
++  SegmentedControl,
++  type SegmentedControlOption,
+   Skeleton,
+   StatusBadge,
+ } from '@app/components/ui/mod.ts';
+ import { routes } from '@app/router.ts';
+
+[0m
+Now mount it on the runs status filter.
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+@@ -44,34 +44,39 @@
+ function statusHref(status?: string): string {
+   return status ? `/runs?status=${status}` : '/runs';
+ }
+ 
+-/** Status filter row — every chip is a reachable URL state of the page. */
+-export function RunStatusFilter(
+-  { active }: { active?: string },
+-): VNode {
++/**
++ * Status filter — every cell is a reachable URL state of the page.
++ *
++ * This was a row of bare links carrying `aria-current` and nothing else, so
++ * the selected status was announced to assistive tech and invisible to
++ * everyone reading the page. The invoices filter had the same defect; it is
++ * six statuses and took the capsule, while this one is nine, which is why the
++ * control wraps here: nine nowrap cells in a stretched row would overflow a
++ * narrow card rather than share it. The labels, the hrefs and the page's
++ * `?status=` contract are unchanged — nothing about how the filter is
++ * addressed moved, only how the selected one is drawn.
++ */
++export function RunStatusFilter({ active }: { active?: string }): VNode {
++  const options: readonly SegmentedControlOption[] = [
++    { value: 'all', label: 'All', href: statusHref() },
++    ...RUN_STATUSES.map((status) => ({
++      value: status,
++      label: status.toLowerCase(),
++      href: statusHref(status),
++    })),
++  ];
++
+   return (
+-    <nav class='ns-cluster ns-cluster--sm' aria-label='Filter runs by status' data-run-filter>
+-      <a
+-        href={statusHref()}
+-        f-client-nav
+-        class='text-xs'
+-        aria-current={active === undefined ? 'true' : undefined}
+-      >
+-        All
+-      </a>
+-      {RUN_STATUSES.map((status) => (
+-        <a
+-          key={status}
+-          href={statusHref(status)}
+-          f-client-nav
+-          class='text-xs'
+-          aria-current={active === status ? 'true' : undefined}
+-        >
+-          {status.toLowerCase()}
+-        </a>
+-      ))}
+-    </nav>
++    <SegmentedControl
++      label='Filter runs by status'
++      options={options}
++      value={active ?? 'all'}
++      size='sm'
++      wrap
++      clientNav
++    />
+   );
+ }
+ 
+ export function RunsTableSkeleton(): VNode {
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rn "data-run-filter\|ns-cluster--sm" assets/ components/ routes/ tests/ 2>/dev/null | head
+assets/layouts.css:67:.ns-cluster--sm {
+components/ui/pagination.tsx:31:  return <div {...props} class={cn('ns-cluster ns-cluster--sm', className)}>{children}</div>;
+routes/invoices/(_components)/invoice-header.tsx:78:          <div class='ns-cluster ns-cluster--sm'>
+routes/invoices/(_components)/invoice-header.tsx:90:          <div class='ns-cluster ns-cluster--sm text-xs text-ns-muted-fg'>
+routes/runs/(_components)/run-actions.tsx:88:        <div class='ns-cluster ns-cluster--sm'>
+routes/runs/(_components)/run-actions.tsx:186:                  <div class='ns-cluster ns-cluster--sm'>
+routes/runs/(_components)/run-summary.tsx:84:          <div class='ns-cluster ns-cluster--sm'>
+routes/customers/(_components)/customer-header.tsx:66:        <div class='ns-cluster ns-cluster--sm'>
+routes/customers/(_components)/customer-header.tsx:71:        <div class='ns-cluster ns-cluster--sm'>
+routes/_layout.tsx:60:          <div class='ns-cluster ns-cluster--sm'>
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+@@ -342,8 +342,32 @@
+           { value: 'void', label: 'Void', href: '/design/components' },
+         ]}
+         value='open'
+       />
++      <InlineNotice title='Nine cells wrap'>
++        The runs console filters on nine URL states — all plus eight run
++        statuses. Nine cells will not share one line with a narrow card, so
++        the control wraps and steps down from a capsule to a panel radius:
++        fully-rounded ends read as two unrelated pills once the group has
++        more than one line.
++      </InlineNotice>
++      <SegmentedControl
++        label='Run status'
++        size='sm'
++        wrap
++        options={[
++          { value: 'all', label: 'All', href: '/design/components' },
++          { value: 'DRAFT', label: 'draft', href: '/design/components' },
++          { value: 'COMPUTING', label: 'computing', href: '/design/components' },
++          { value: 'REVIEW', label: 'review', href: '/design/components' },
++          { value: 'ISSUING', label: 'issuing', href: '/design/components' },
++          { value: 'ISSUED', label: 'issued', href: '/design/components' },
++          { value: 'FAILED', label: 'failed', href: '/design/components' },
++          { value: 'COMPENSATED', label: 'compensated', href: '/design/components' },
++          { value: 'CANCELED', label: 'canceled', href: '/design/components' },
++        ]}
++        value='REVIEW'
++      />
+     </div>
+   );
+ case 'semicircular-gauge':
+   return (
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 600 deno check apps/ledgerline-web/main.ts "apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx" 2>&1 | tail -20
+[0m[32mCheck[0m apps/ledgerline-web/main.ts
+[0m[32mCheck[0m apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 -c "
+import json;d=json.load(open('deno.json'));print(json.dumps({k:v for k,v in d.items() if k in ('imports','compilerOptions','tasks','nodeModulesDir')},indent=1)[:2500])"
+{
+ "tasks": {
+  "check": "deno fmt --check . && deno lint . && deno check",
+  "deps:closure": "deno run --allow-read .netscript/verify-dependency-closure.ts",
+  "dev": "deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native",
+  "build": "deno task deps:closure && deno run -A npm:vite build",
+  "serve": "deno run -A npm:vite preview",
+  "start": "deno serve -A _fresh/server.js",
+  "update": "deno run -A -r jsr:@fresh/update ."
+ },
+ "imports": {
+  "@app/": "./",
+  "@ledgerline/contracts": "../../contracts/mod.ts",
+  "@netscript/fresh": "jsr:@netscript/fresh@0.0.7",
+  "@netscript/fresh/defer/island": "jsr:@netscript/fresh@0.0.7/defer/island",
+  "@netscript/fresh-ui": "jsr:@netscript/fresh-ui@0.0.7",
+  "@netscript/sdk": "jsr:@netscript/sdk@0.0.7",
+  "@netscript/plugin-auth-core/sdk": "jsr:@netscript/plugin-auth-core@0.0.7/sdk",
+  "@netscript/mcp": "jsr:@netscript/mcp@0.0.7",
+  "fresh": "jsr:@fresh/core@^2.3.3",
+  "@orpc/client": "npm:@orpc/client@^1.15.0",
+  "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+  "@orpc/openapi": "npm:@orpc/openapi@^1.15.0",
+  "@orpc/server": "npm:@orpc/server@^1.15.0",
+  "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.15.0",
+  "@orpc/zod": "npm:@orpc/zod@^1.15.0",
+  "preact": "npm:preact@^10.29.2",
+  "@preact/signals": "npm:@preact/signals@2.9.2",
+  "@tanstack/db": "npm:@tanstack/db@0.7.0",
+  "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.101.0",
+  "@tanstack/query-core": "npm:@tanstack/query-core@^5.101.0",
+  "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@1.2.2",
+  "@tanstack/react-db": "npm:@tanstack/react-db@^0.1.95",
+  "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
+  "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.12",
+  "tailwindcss": "npm:tailwindcss@^4.2.2",
+  "vite": "npm:vite@7.2.2",
+  "zod": "npm:zod@^4.4.3",
+  "clsx": "npm:clsx@^2.1.1",
+  "tailwind-merge": "npm:tailwind-merge@^3.5.0",
+  "@streams/": "../../streams/"
+ },
+ "compilerOptions": {
+  "lib": [
+   "dom",
+   "dom.asynciterable",
+   "dom.iterable",
+   "deno.ns",
+   "deno.unstable"
+  ],
+  "jsx": "precompile",
+  "jsxImportSource": "preact",
+  "jsxPrecompileSkipElements": [
+   "a",
+   "img",
+   "source",
+   "body",
+   "html",
+   "head",
+   "title",
+   "meta",
+   "script",
+   "link",
+   "style",
+   "base",
+   "noscript",
+   "template"
+  ],
+  "types": [
+   "vite/client"
+  ]
+ }
+}
+[0m
+[0m$ [0mls /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp 2>/dev/null; ls /home/agent/projects/netscript/wave7-billing-steer2/.llm 2>/dev/null | head; find /home/agent/projects/netscript/wave7-billing-steer2 -maxdepth 3 -name "*render*" -not -path "*/node_modules/*" 2>/dev/null | head
+dev-tokens.env
+probe-defect.ts
+probe-defect2.ts
+probe-defect3.ts
+receipts
+tmp
+tools
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/.render-check.tsx
+Wrote file successfully.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 300 deno run -A --no-lock .render-check.tsx 2>&1 | tail -45
+--- RunStatusFilter active=REVIEW ---
+cells: 9
+               href=/runs                  selected=false aria-current=false
+               href=/runs?status=DRAFT     selected=false aria-current=false
+               href=/runs?status=COMPUTING selected=false aria-current=false
+               href=/runs?status=REVIEW    selected=true aria-current=true
+               href=/runs?status=ISSUING   selected=false aria-current=false
+               href=/runs?status=ISSUED    selected=false aria-current=false
+               href=/runs?status=FAILED    selected=false aria-current=false
+               href=/runs?status=COMPENSATED selected=false aria-current=false
+               href=/runs?status=CANCELED  selected=false aria-current=false
+  container wrapped: true
+  container block: false
+  client-nav: 9
+--- RunStatusFilter no filter ---
+cells: 9
+               href=/runs                  selected=true aria-current=true
+               href=/runs?status=DRAFT     selected=false aria-current=false
+               href=/runs?status=COMPUTING selected=false aria-current=false
+               href=/runs?status=REVIEW    selected=false aria-current=false
+               href=/runs?status=ISSUING   selected=false aria-current=false
+               href=/runs?status=ISSUED    selected=false aria-current=false
+               href=/runs?status=FAILED    selected=false aria-current=false
+               href=/runs?status=COMPENSATED selected=false aria-current=false
+               href=/runs?status=CANCELED  selected=false aria-current=false
+  container wrapped: true
+  container block: false
+  client-nav: 9
+--- wrapped gallery control (9 cells) ---
+cells: 9
+               href=/runs                  selected=false aria-current=false
+               href=/runs?status=DRAFT     selected=false aria-current=false
+               href=/runs?status=COMPUTING selected=false aria-current=false
+               href=/runs?status=REVIEW    selected=true aria-current=true
+               href=/runs?status=ISSUING   selected=false aria-current=false
+               href=/runs?status=ISSUED    selected=false aria-current=false
+               href=/runs?status=FAILED    selected=false aria-current=false
+               href=/runs?status=COMPENSATED selected=false aria-current=false
+               href=/runs?status=CANCELED  selected=false aria-current=false
+  container wrapped: true
+  container block: false
+  client-nav: 0
+--- block control still one line (default) ---
+  wrap: false block: true
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && rm apps/ledgerline-web/.render-check.tsx && deno fmt --check services/runs/src/lib/stream.ts streams/run-console-schema.ts 2>&1 | head -30
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-billing-steer2/services/runs/src/lib/stream.ts:
+22[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m  runConsoleStreamSchema,[0m
+  [0m[38;5;245m |[0m [0m[38;5;245m...[0m
+23[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m  runConsoleStreamSchema,[0m
+
+
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-billing-steer2/streams/run-console-schema.ts:
+46[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m});[0m
+  [0m[38;5;245m |[0m [0m[38;5;245m\ No newline at end of file[0m
+46[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m});[0m
+
+[0m[1m[31merror[0m: Found 2 not formatted files in 2 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && rtk git diff --stat
+/bin/bash: line 1: rtk: command not found
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff --stat && git diff -- apps/ledgerline-web/components/ui/segmented-control.tsx
+.../ledgerline-web/assets/ui/segmented-control.css | 20 ++++++++
+ .../components/ui/segmented-control.tsx            | 15 +++++-
+ .../design/(_components)/components-view.tsx       | 24 +++++++++
+ .../routes/runs/(_components)/runs-table.tsx       | 57 ++++++++++++----------
+ 4 files changed, 89 insertions(+), 27 deletions(-)
+diff --git a/apps/ledgerline-web/components/ui/segmented-control.tsx b/apps/ledgerline-web/components/ui/segmented-control.tsx
+index 0cb7121..af2fb75 100644
+--- a/apps/ledgerline-web/components/ui/segmented-control.tsx
++++ b/apps/ledgerline-web/components/ui/segmented-control.tsx
+@@ -4,7 +4,8 @@
+  * @depends theme-seed
+  * @description Range selection as one full-width capsule: N equal cells, the
+  * selected one a filled pill. Never a border change (C4). Renders as buttons
+- * for client-side selection, or as links when the range is a route.
++ * for client-side selection, or as links when the range is a route, and wraps
++ * onto further lines when the options outgrow one.
+  */
+ 
+ import type { JSX, VNode } from 'preact';
+@@ -40,6 +41,14 @@ export interface SegmentedControlProps
+   size?: 'sm' | 'md';
+   /** Stretch to the container width. The reference control is full-width. */
+   block?: boolean;
++  /**
++   * Let the cells wrap onto more than one line instead of stretching to fill
++   * one. A capsule is a one-line shape, so this also steps the container down
++   * to a panel radius and drops the inter-cell hairlines — reach for it when
++   * the options outgrow a line, the way a filter over eight run statuses does
++   * against a range control's four.
++   */
++  wrap?: boolean;
+   /**
+    * Let link options navigate client-side. A range that lives in the URL is
+    * usually a filter, and a filter that reloads the whole page is a slower
+@@ -64,6 +73,7 @@ export function SegmentedControl({
+   onSelect,
+   size = 'md',
+   block = true,
++  wrap = false,
+   clientNav = false,
+   class: className,
+   ...props
+@@ -76,7 +86,8 @@ export function SegmentedControl({
+       class={cn(
+         'ns-segmented',
+         size === 'sm' && 'ns-segmented--sm',
+-        block && 'ns-segmented--block',
++        block && !wrap && 'ns-segmented--block',
++        wrap && 'ns-segmented--wrap',
+         className,
+       )}
+       role={asLinks ? 'group' : 'tablist'}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git add -A && git commit -q -F - <<'EOF' && git log --oneline -1
+Mount SegmentedControl on the runs status filter — the selected status is now drawn
+
+The filter was a row of bare links carrying aria-current and nothing else, so
+the selected status was announced to assistive tech and invisible to everyone
+reading the page. The invoices filter had the same defect and took the capsule;
+this one is nine URL states against six and will not share one line with a
+narrow card, so the control gains a wrap modifier: cells wrap to further lines,
+the container steps from a capsule down to a panel radius because fully-rounded
+ends read as two unrelated pills once there is more than one line, and the
+inter-cell hairlines go away because a wrapped row would otherwise open with a
+divider hanging off its leading edge.
+
+The labels, the hrefs and the page's ?status= contract are unchanged. Nothing
+about how the filter is addressed moved; only how the selected one is drawn.
+EOF
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && deno fmt apps/ledgerline-web/routes/customers/index.tsx "apps/ledgerline-web/routes/customers/[id].tsx" apps/ledgerline-web/routes/invoices/index.tsx "apps/ledgerline-web/routes/invoices/[id].tsx" services/runs/src/lib/stream.ts streams/run-console-schema.ts 2>&1 | tail -8 && git diff --stat
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/invoices/index.tsx
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/invoices/[id].tsx
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/customers/index.tsx
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/customers/[id].tsx
+/home/agent/projects/netscript/wave7-billing-steer2/services/runs/src/lib/stream.ts
+/home/agent/projects/netscript/wave7-billing-steer2/streams/run-console-schema.ts
+Checked 6 files
+ apps/ledgerline-web/routes/customers/[id].tsx  | 5 ++++-
+ apps/ledgerline-web/routes/customers/index.tsx | 5 ++++-
+ apps/ledgerline-web/routes/invoices/[id].tsx   | 5 ++++-
+ apps/ledgerline-web/routes/invoices/index.tsx  | 5 ++++-
+ services/runs/src/lib/stream.ts                | 2 +-
+ streams/run-console-schema.ts                  | 2 +-
+ 6 files changed, 18 insertions(+), 6 deletions(-)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff -- services/runs/src/lib/stream.ts streams/run-console-schema.ts && git add -A && git commit -q -F - <<'EOF' && git log --oneline -1
+Format the six files deno fmt flags, so the repo's fmt:check gate is green
+
+Four of these are the customers and invoices list/detail routes, last touched
+by 521d4b5 and wanting the same withRouteContract object expanded onto multiple
+lines. The other two were not in the earlier count: services/runs stream.ts
+carries an import block deno fmt reorders, and streams/run-console-schema.ts
+has no newline at its end.
+
+All six predate this branch and none of them is a design file, but a branch
+that leaves a repo-wide gate red is a branch that cannot merge, and six
+mechanical lines is the whole of the cost.
+EOF
+diff --git a/services/runs/src/lib/stream.ts b/services/runs/src/lib/stream.ts
+index 6193178..232118d 100644
+--- a/services/runs/src/lib/stream.ts
++++ b/services/runs/src/lib/stream.ts
+@@ -19,8 +19,8 @@ import {
+   type DurableStreamProducer,
+ } from '@netscript/plugin-streams-core';
+ import {
+-  runConsoleStreamSchema,
+   type RunConsoleStreamDefinition,
++  runConsoleStreamSchema,
+ } from '../../../../streams/run-console-schema.ts';
+ 
+ export { runConsoleStreamSchema };
+diff --git a/streams/run-console-schema.ts b/streams/run-console-schema.ts
+index 000c257..67f207d 100644
+--- a/streams/run-console-schema.ts
++++ b/streams/run-console-schema.ts
+@@ -43,4 +43,4 @@ export const runConsoleStreamSchema: StateSchema<RunConsoleStreamDefinition> = d
+       at: z.string().datetime(),
+     }),
+   },
+-});
+\ No newline at end of file
++});
+08c52da Format the six files deno fmt flags, so the repo's fmt:check gate is green
+[0m
+[0m# [0mTodos
+[✓] Add wrap modifier to SegmentedControl (CSS + prop)
+[✓] Mount SegmentedControl on RunStatusFilter so the active status is visible
+[✓] Register the wrapped variant in the design gallery
+[✓] Format the 6 files deno fmt flags (4 route files + services/runs stream + streams schema)
+[•] Verify: check, lint, test, fmt:check
+[ ] Write design-steer-2-pass6.md and report DONE vs REMAINING
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 900 deno task fmt:check 2>&1 | python3 -c "
+import sys,json,re
+raw=sys.stdin.read(); d=json.loads(raw[raw.index('{'):])
+print('fmt:check ok =',d.get('ok'))
+for b in d['batches']: print('  batch',b['exitCode'], re.sub(r'\x1b\[[0-9;]*m','',(b.get('stdout') or '')+(b.get('stderr') or ''))[:300])
+"
+fmt:check ok = False
+  batch 1 
+from /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:
+ 347 | -            The runs console filters on nine URL states — all plus eight run
+ 347 | +            The runs console filters on nine URL states — all plus eigh
+  batch 0 Checked 27 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && deno fmt "apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx" 2>&1 | tail -2 && git diff --stat
+/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+Checked 1 file
+ .../routes/(design)/design/(_components)/components-view.tsx     | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff
+diff --git a/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx b/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+index bb53de6..b7edcc9 100644
+--- a/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
++++ b/apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+@@ -344,11 +344,10 @@ function renderDemo(name: string): VNode | null {
+             value='open'
+           />
+           <InlineNotice title='Nine cells wrap'>
+-            The runs console filters on nine URL states — all plus eight run
+-            statuses. Nine cells will not share one line with a narrow card, so
+-            the control wraps and steps down from a capsule to a panel radius:
+-            fully-rounded ends read as two unrelated pills once the group has
+-            more than one line.
++            The runs console filters on nine URL states — all plus eight run statuses. Nine cells
++            will not share one line with a narrow card, so the control wraps and steps down from a
++            capsule to a panel radius: fully-rounded ends read as two unrelated pills once the group
++            has more than one line.
+           </InlineNotice>
+           <SegmentedControl
+             label='Run status'
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git add -A && git commit -q --amend --no-edit && git log --oneline -3 && git show --stat --oneline HEAD | head -10
+d74b9ad Format the six files deno fmt flags, so the repo's fmt:check gate is green
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+37d1c25 Make the design gallery type-check, and the app lint clean
+d74b9ad Format the six files deno fmt flags, so the repo's fmt:check gate is green
+ .../routes/(design)/design/(_components)/components-view.tsx     | 9 ++++-----
+ apps/ledgerline-web/routes/customers/[id].tsx                    | 5 ++++-
+ apps/ledgerline-web/routes/customers/index.tsx                   | 5 ++++-
+ apps/ledgerline-web/routes/invoices/[id].tsx                     | 5 ++++-
+ apps/ledgerline-web/routes/invoices/index.tsx                    | 5 ++++-
+ services/runs/src/lib/stream.ts                                  | 2 +-
+ streams/run-console-schema.ts                                    | 2 +-
+ 7 files changed, 22 insertions(+), 11 deletions(-)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git commit -q --amend -F - <<'EOF' && git log --oneline -1
+Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+
+Six of them predate this branch. Four are the customers and invoices
+list/detail routes, last touched by 521d4b5 and wanting the same
+withRouteContract object expanded onto multiple lines. Two were missing from
+the earlier count: services/runs stream.ts carries an import block deno fmt
+reorders, and streams/run-console-schema.ts has no newline at its end.
+
+The seventh is mine — the gallery's wrapped-control notice went in on the
+previous commit at a line width deno fmt rewraps, so this folds that in rather
+than leaving a one-line follow-up commit behind.
+
+None of these is a behavioural change, but a branch that leaves a repo-wide
+gate red is a branch that cannot merge, and mechanical lines are the whole of
+the cost.
+EOF
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 900 deno task fmt:check 2>&1 | python3 -c "
+import sys,json,re
+raw=sys.stdin.read(); d=json.loads(raw[raw.index('{'):])
+print('fmt:check ok =',d.get('ok'))
+for b in d['batches']: print('  batch',b['exitCode'], re.sub(r'\x1b\[[0-9;]*m','',(b.get('stdout') or '')+(b.get('stderr') or ''))[:300])
+"
+fmt:check ok = True
+  batch 0 Checked 200 files
+
+  batch 0 Checked 27 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 900 deno task check 2>&1 | python3 -c "
+import sys,json,re
+raw=sys.stdin.read(); d=json.loads(raw[raw.index('{'):])
+print('check ok =',d.get('ok'))
+for b in d['batches']: print('  batch',b['exitCode'],len(b.get('files',[])),'files', re.sub(r'\x1b\[[0-9;]*m','',(b.get('stderr') or ''))[:200])
+"
+check ok = False
+  batch 0 200 files Check .netscript/aspire-cli.ts
+Check .netscript/quality-runner.ts
+Check .netscript/relay.ts
+Check .netscript/verify-node-modules.ts
+Check aspire/.helpers/run-tool.mts
+Check contracts/mod.ts
+Check cont
+  batch 0 15 files 
+  batch 1 12 files Warning: config file file:///home/agent/projects/netscript/wave7-billing-steer2/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/wave7-billing-steer2/. Ign
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 900 deno task test 2>&1 | tail -6; echo "=== lint ==="; timeout 900 deno task lint 2>&1 | python3 -c "
+import sys,json,re
+raw=sys.stdin.read(); d=json.loads(raw[raw.index('{'):])
+print('lint ok =',d.get('ok'))
+for b in d['batches']:
+    o=re.sub(r'\x1b\[[0-9;]*m','',(b.get('stdout') or '')+(b.get('stderr') or ''))
+    print('  batch',b['exitCode'], [l.strip() for l in o.splitlines() if 'error[' in l or '-->' in l])
+"
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(258µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(205µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(157µs)[0m
+
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(1s)[0m
+
+=== lint ===
+lint ok = False
+  batch 1 ['error[no-unused-vars]: `db` is never used', '--> /home/agent/projects/netscript/wave7-billing-steer2/sagas/runtime.ts:8:10', 'error[no-unused-vars]: `buildViteEnvVarName` is never used', '--> /home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts:10:3', 'error[no-unused-vars]: `getResourceEndpoint` is never used', '--> /home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts:19:16']
+  batch 1 ["error[require-await]: Async arrow function has no 'await' expression or 'await using' declaration.", '--> /home/agent/projects/netscript/wave7-billing-steer2/triggers/daily-maintenance.ts:27:3']
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && head -20 aspire/.helpers/register-apps.mts; echo "=== provenance ==="; git log --oneline -1 -- aspire/.helpers/ ; grep -rn "helpers" .gitignore 2>/dev/null | head -3
+// register-apps.mts — GENERATED BY @netscript/cli. DO NOT EDIT.
+// Re-run `netscript generate` to regenerate after config changes.
+
+import type { DistributedApplicationBuilder } from '../.aspire/modules/aspire.mts';
+import { OtlpProtocol } from '../.aspire/modules/aspire.mts';
+import type { NetScriptConfig } from './_aspire-compat.mts';
+import type { InfrastructureContext } from './register-infrastructure.mts';
+import {
+  buildOtelEnvVars,
+  buildViteEnvVarName,
+  resolveWorkspacePath,
+  withCacheReference as _withCacheReference,
+} from './_aspire-compat.mts';
+
+interface EndpointProvider {
+  getEndpoint(protocol: string): Promise<string | undefined> | string | undefined;
+}
+
+async function getResourceEndpoint(
+  resource: unknown,
+=== provenance ===
+2f0dc3f Sagas store: NETSCRIPT_SAGA_STORE=prisma via appsettings env (generator maps it); regen aspire
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '1,45p' triggers/daily-maintenance.ts; echo "=== sagas/runtime.ts head ==="; sed -n '1,20p' sagas/runtime.ts
+import { defineScheduledTrigger, enqueueJob } from '@netscript/plugin-triggers-core/builders';
+import type {
+  ScheduledTriggerDefinition,
+  ScheduledTriggerPayload,
+  TriggerContext,
+  TriggerEvent,
+} from '@netscript/plugin-triggers-core/domain';
+import type { JobDefinition } from '@netscript/plugin-workers-core';
+
+/** The job definition this trigger enqueues (workers/jobs/period-close-check.ts). */
+const periodCloseCheckJob = {
+  id: 'period-close-check' as JobDefinition<'period-close-check'>['id'],
+  name: 'Period close check',
+  topic: 'default',
+} satisfies JobDefinition<'period-close-check'>;
+
+/**
+ * The unattended close guard: a billing product whose period never closes on
+ * its own has no product. This scheduled trigger enqueues the
+ * `period-close-check` job nightly; the job is idempotent and bounded.
+ */
+export const dailyMaintenanceTrigger: ScheduledTriggerDefinition<
+  'daily-maintenance',
+  TriggerEvent<'scheduled', ScheduledTriggerPayload>,
+  TriggerContext
+> = defineScheduledTrigger(
+  async () => {
+    return [
+      enqueueJob<'period-close-check', Record<string, never>>(periodCloseCheckJob, {
+        payload: {},
+        priority: 50,
+      }),
+    ];
+  },
+  {
+    id: 'daily-maintenance',
+    cron: '0 3 * * *',
+  },
+);
+
+export default dailyMaintenanceTrigger;
+=== sagas/runtime.ts head ===
+/** Runtime glue emitted into generated projects for the sagas background process.
+ *
+ * @module
+ */
+
+import '@netscript/kv/redis';
+import { startSagaRunner } from '@netscript/plugin-sagas/runtime';
+import { db } from '@ledgerline/db';
+
+if (import.meta.main) {
+  // The appsettings-declared prisma saga store is NOT honoured by the runner
+  // itself (framework defect: NETSCRIPT_SAGA_STORE env is unconsumed), so this
+  // glue reads it and passes the prisma backend + workspace client explicitly.
+  // The KV default drops transitions under multi-process contention
+  // ('database is locked' — RECORD.md framework defect 7).
+  const backend = Deno.env.get('NETSCRIPT_SAGA_STORE');
+  const runtimeOptions = backend === 'prisma'
+    ? {
+      native: {
+        backend: 'prisma' as const,
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 900 deno run -A npm:vite --configLoader native build 2>&1 | tail -12
+_fresh/server/runs.mjs                                      6.12 kB
+_fresh/server/_fresh-route___runs_index.mjs                 6.41 kB
+_fresh/server/_fresh-route___invoices_index.mjs             7.08 kB
+_fresh/server/data-grid.mjs                                 8.12 kB
+_fresh/server/_fresh-route___customers_id_.mjs              8.89 kB
+_fresh/server/_fresh-route___invoices_id_.mjs              10.25 kB
+_fresh/server/billing.mjs                                  16.83 kB
+_fresh/server/_fresh-route___runs_id_.mjs                  34.40 kB
+_fresh/server/mod.mjs                                     105.59 kB
+_fresh/server/service-auth.mjs                            223.88 kB
+_fresh/server/server-entry.mjs                          1,742.94 kB
+✓ built in 7.34s
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -l "ns-segmented--wrap" _fresh/server/*.mjs _fresh/client/*.js 2>/dev/null; echo "--- in emitted css ---"; grep -o "ns-segmented--wrap[^{]*{[^}]*}" _fresh/client/*.css 2>/dev/null | head -3; ls _fresh/client/*.css 2>/dev/null | head
+_fresh/server/server-entry.mjs
+--- in emitted css ---
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && find _fresh -name "*.css" | head -5; echo "---"; grep -rlo "ns-segmented--wrap" _fresh --include="*.css" --include="*.mjs" --include="*.js" | head
+_fresh/client/assets/client-entry-BVINwOTM.css
+---
+_fresh/client/assets/client-entry-BVINwOTM.css
+_fresh/client/fresh-island__RangeControlDemo.mjs
+_fresh/server/server-entry.mjs
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git status --short | head -10; echo "--- untracked count ---"; git status --porcelain | wc -l
+M apps/ledgerline-web/routes/customers/[id].tsx
+ M apps/ledgerline-web/routes/customers/index.tsx
+ M apps/ledgerline-web/routes/invoices/[id].tsx
+ M apps/ledgerline-web/routes/invoices/index.tsx
+ M apps/ledgerline-web/routes/runs/[id].tsx
+--- untracked count ---
+5
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff --stat && echo "=== diff ===" && git diff | head -60
+apps/ledgerline-web/routes/customers/[id].tsx  | 5 +----
+ apps/ledgerline-web/routes/customers/index.tsx | 5 +----
+ apps/ledgerline-web/routes/invoices/[id].tsx   | 5 +----
+ apps/ledgerline-web/routes/invoices/index.tsx  | 5 +----
+ apps/ledgerline-web/routes/runs/[id].tsx       | 5 +----
+ 5 files changed, 5 insertions(+), 20 deletions(-)
+=== diff ===
+diff --git a/apps/ledgerline-web/routes/customers/[id].tsx b/apps/ledgerline-web/routes/customers/[id].tsx
+index 3010601..595535f 100644
+--- a/apps/ledgerline-web/routes/customers/[id].tsx
++++ b/apps/ledgerline-web/routes/customers/[id].tsx
+@@ -36,10 +36,7 @@ function isNotFound(error: unknown): boolean {
+ }
+ 
+ export const customerDetailPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.customers.$id.$route,
+-    pathSchema: z.object({ id: z.string() }),
+-  })
++  .withRouteContract({ $route: routePatterns.customers.$id.$route, pathSchema: z.object({ id: z.string() }) })
+   .withMeta(() => ({
+     title: 'Customer — ledgerline',
+     description: 'A customer account with its credit ledger and invoices.',
+diff --git a/apps/ledgerline-web/routes/customers/index.tsx b/apps/ledgerline-web/routes/customers/index.tsx
+index 6615977..6abe29a 100644
+--- a/apps/ledgerline-web/routes/customers/index.tsx
++++ b/apps/ledgerline-web/routes/customers/index.tsx
+@@ -24,10 +24,7 @@ const CUSTOMERS_SEARCH_SCHEMA = paginationSearchSchema({
+ });
+ 
+ export const customersIndexPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.customers.$route,
+-    searchSchema: CUSTOMERS_SEARCH_SCHEMA,
+-  })
++  .withRouteContract({ $route: routePatterns.customers.$route, searchSchema: CUSTOMERS_SEARCH_SCHEMA })
+   .withMeta(() => ({
+     title: 'Customers — ledgerline',
+     description: 'Customer accounts: billing contacts and ledger drill-down.',
+diff --git a/apps/ledgerline-web/routes/invoices/[id].tsx b/apps/ledgerline-web/routes/invoices/[id].tsx
+index 80649ca..4b887fa 100644
+--- a/apps/ledgerline-web/routes/invoices/[id].tsx
++++ b/apps/ledgerline-web/routes/invoices/[id].tsx
+@@ -29,10 +29,7 @@ function isNotFound(error: unknown): boolean {
+ }
+ 
+ export const invoiceDetailPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.invoices.$id.$route,
+-    pathSchema: z.object({ id: z.string() }),
+-  })
++  .withRouteContract({ $route: routePatterns.invoices.$id.$route, pathSchema: z.object({ id: z.string() }) })
+   .withMeta(() => ({
+     title: 'Invoice — ledgerline',
+     description: 'A single invoice with its lines, payments, and credit notes.',
+diff --git a/apps/ledgerline-web/routes/invoices/index.tsx b/apps/ledgerline-web/routes/invoices/index.tsx
+index 2d5db82..69d80e8 100644
+--- a/apps/ledgerline-web/routes/invoices/index.tsx
++++ b/apps/ledgerline-web/routes/invoices/index.tsx
+@@ -25,10 +25,7 @@ const INVOICES_SEARCH_SCHEMA = paginationSearchSchema({
+ });
+ 
+ export const invoicesIndexPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.invoices.$route,
+-    searchSchema: INVOICES_SEARCH_SCHEMA,
+-  })
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git log --oneline -4 && echo "=== HEAD now ===" && git rev-parse --short HEAD && echo "=== mtimes ===" && ls -l --time-style=full-iso apps/ledgerline-web/routes/customers/index.tsx apps/ledgerline-web/routes/runs/\[id\].tsx apps/ledgerline-web/components/ui/segmented-control.tsx && echo "=== now ===" && date -u
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+37d1c25 Make the design gallery type-check, and the app lint clean
+50b1f55 Mount SegmentedControl on the invoice status filter
+=== HEAD now ===
+4d743c5
+=== mtimes ===
+-rw-r--r-- 1 node node 4405 2026-09-04 15:00:19.042606174 +0200 apps/ledgerline-web/components/ui/segmented-control.tsx
+-rw-r--r-- 1 node node 2337 2026-09-04 15:03:59.546372598 +0200 apps/ledgerline-web/routes/customers/index.tsx
+-rw-r--r-- 1 node node 9151 2026-09-04 15:03:59.546372598 +0200 apps/ledgerline-web/routes/runs/[id].tsx
+=== now ===
+Fri Sep  4 13:04:44 UTC 2026
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff -- apps/ledgerline-web/routes/runs/\[id\].tsx; echo "=== does it still mount the gauge? ==="; grep -c "RunProgress\|ns-gauge\|SemicircularGauge" "apps/ledgerline-web/routes/runs/[id].tsx"
+diff --git a/apps/ledgerline-web/routes/runs/[id].tsx b/apps/ledgerline-web/routes/runs/[id].tsx
+index 89db0e8..07f8e64 100644
+--- a/apps/ledgerline-web/routes/runs/[id].tsx
++++ b/apps/ledgerline-web/routes/runs/[id].tsx
+@@ -51,10 +51,7 @@ function isNotFound(error: unknown): boolean {
+ }
+ 
+ export const runDetailPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.runs.$id.$route,
+-    pathSchema: z.object({ id: z.string() }),
+-  })
++  .withRouteContract({ $route: routePatterns.runs.$id.$route, pathSchema: z.object({ id: z.string() }) })
+   .withMeta(() => ({
+     title: 'Run console — ledgerline',
+     description: 'Live console for a single billing run.',
+=== does it still mount the gauge? ===
+3
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git worktree list 2>&1; echo "=== other agents' recent activity (repo-wide) ==="; for d in /home/agent/projects/netscript/wave7-billing /home/agent/projects/netscript/wave7-billing-steer2; do echo "-- $d"; git -C $d log --oneline -3 2>&1; done; echo "=== run logs ==="; ls -t .llm/runs/wave7-billing-run--0.0.7/logs 2>/dev/null | head
+/home/agent/projects/netscript/wave7-billing         c5d57c6 [master]
+/home/agent/projects/netscript/wave7-billing-steer2  4d743c5 [fix/steer2-consolidated]
+/home/agent/projects/netscript/wave7-design          310a123 [design/ledgerline-ui]
+=== other agents' recent activity (repo-wide) ===
+-- /home/agent/projects/netscript/wave7-billing
+c5d57c6 Webhooks screen: /webhooks with endpoints table + delivery log (live island states, em-dash absence, REPLAYED chips), bearer-bearing client, nav entry
+1cd0f34 Webhooks: real contract (endpoints + delivery log + admin replay), DB-backed domain, authz enforcement — replaces the CLI placeholder fiction
+38f4aee Backend D: terminal compensation proved — instances API + refund + run rows
+-- /home/agent/projects/netscript/wave7-billing-steer2
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+37d1c25 Make the design gallery type-check, and the app lint clean
+=== run logs ===
+[0m
+[0m$ [0mps aux 2>/dev/null | grep -iE "deno|opencode|codex|claude|node" | grep -v grep | head -20
+root           1  0.0  0.0   2488  1040 ?        Ss   Sep03   0:03 tini -- ttyd -p 7681 -W runuser -u node -- tmux new-session -A -s main -c /workspace
+node         653  0.0  0.0   6024  3232 ?        Ss   Sep03   0:55 tmux new-session -d -s maint -c /home/agent while true; do bash ~/.local/bin/toolchain-maintain; sleep 86400; done
+node         654  0.0  0.0   3940  2076 pts/0    Ss+  Sep03   0:00 bash -c while true; do bash ~/.local/bin/toolchain-maintain; sleep 86400; done
+node         659  0.0  0.0   3940  2128 pts/1    Ss+  Sep03   0:00 bash -c while true; do claude remote-control --spawn=same-dir --permission-mode bypassPermissions; sleep 10; done
+node         661  0.5  0.1 5560180 149904 pts/1  Sl+  Sep03  10:12 claude remote-control --spawn=same-dir --permission-mode bypassPermissions
+node         702  0.3  0.2 745044 270208 ?       Ssl  Sep03   6:24 /home/agent/.codex/packages/standalone/current/codex app-server --remote-control --listen unix://
+node         726  0.0  0.0 550140 28988 ?        Ssl  Sep03   0:08 /home/agent/.codex/packages/standalone/current/codex app-server daemon pid-update-loop
+node         782  1.1  0.2 5615468 207564 pts/1  Sl+  Sep03  20:45 /home/agent/.local/share/claude/versions/2.1.259 --print --sdk-url https://api.anthropic.com/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj --session-id cse_01WSh13irWVfvT6VRZxQzeLj --input-format stream-json --output-format stream-json --replay-user-messages --resume=https://api.anthropic.com/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj --permission-mode bypassPermissions --model claude-opus-5[1m]
+node         918  0.0  0.0   3940  2120 pts/2    Ss+  Sep03   0:00 bash -c while true; do herdr; sleep 10; done
+node         920  0.1  0.0  27512  4188 pts/2    Sl+  Sep03   2:35 herdr
+node         922  0.1  0.0  69872 10488 ?        Ssl  Sep03   3:24 /home/agent/.local/bin/herdr server
+node         924  0.0  0.0   4336  2848 pts/3    Ss+  Sep03   0:00 -bash
+node         928  0.0  0.0   3940  2092 pts/4    Ss+  Sep03   0:00 bash -c /home/agent/.local/bin/codex-daemon-up 2>&1 | tee -a /home/agent/observability/codex-daemon.log
+node         930  0.0  0.0   3940  2172 pts/4    S+   Sep03   0:00 /bin/bash /home/agent/.local/bin/codex-daemon-up
+node         931  0.0  0.0   2504   992 pts/4    S+   Sep03   0:00 tee -a /home/agent/observability/codex-daemon.log
+root         932  0.0  0.0   1580   516 ?        S    Sep03   0:00 ttyd -p 7681 -W runuser -u node -- tmux new-session -A -s main -c /workspace
+node        1017  0.0  0.0   2500  1028 pts/4    S+   Sep03   0:00 sleep infinity
+node        1018  0.0  0.0   4336  2744 pts/5    Ss+  Sep03   0:00 /bin/bash
+node        1913  0.0  0.0 1448949824 19308 ?    Sl   Sep03   0:06 /home/agent/.codex/packages/standalone/releases/0.153.0-x86_64-unknown-linux-musl/bin/codex-code-mode-host
+node        8729  1.0  0.3 5616288 341260 pts/6  Ssl+ Sep03  18:34 claude --resume 8a722f0a-74b2-4f82-b822-88be00fc9eae --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-features use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Only remaining owned issue #1354 via PR #1958. Coordinator already resumed exact Codex thread 01a06424-38fe-7893-ba59-6064b0dd616e at 007-leaf-1354-g; do not duplicate that writer. Latest head 5c7c105b84b788f4bc17e97d06289c0dd5babe05. Both hosted tiers 33719217078 fail behavior.app-reference loading preview state. Supervise that bounded diagnosis/repair and exact gates, then hand off to coordinator for merge.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && deno fmt apps/ledgerline-web/routes/customers/index.tsx >/dev/null 2>&1 && echo "after fmt: $(grep -c 'withRouteContract({' apps/ledgerline-web/routes/customers/index.tsx) multi-line-block" && git diff --stat -- apps/ledgerline-web/routes/customers/index.tsx
+after fmt: 1 multi-line-block
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 900 deno run -A npm:vite --configLoader native build >/dev/null 2>&1; echo "build exit=$?"; cd .. && git status --short
+build exit=0
+ M ledgerline-web/routes/customers/[id].tsx
+ M ledgerline-web/routes/customers/index.tsx
+ M ledgerline-web/routes/invoices/[id].tsx
+ M ledgerline-web/routes/invoices/index.tsx
+ M ledgerline-web/routes/runs/[id].tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git checkout -- apps/ledgerline-web/routes/customers/index.tsx "apps/ledgerline-web/routes/customers/[id].tsx" apps/ledgerline-web/routes/invoices/index.tsx "apps/ledgerline-web/routes/invoices/[id].tsx" "apps/ledgerline-web/routes/runs/[id].tsx" && git status --short && echo "tree clean? $(git status --porcelain | wc -l) entries"
+tree clean? 0 entries
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && grep -n "^## \|^### " RECORD.md | tail -25; echo "=== last 30 lines ==="; tail -30 RECORD.md
+348:## Steer-5 landed — the hardcoded /api/v1 prefix is gone (31 routes)
+355:## MCP ledger — steer-4/5 lookups and what each changed
+378:## Steer-4 — enforcement, atomicity, typed errors, domain layer (all landed)
+413:## Steer-5 — the REST prefix (third instance of "the framework had already decided")
+441:## Negative-authorization suite (test file, not a curl transcript)
+451:## Steer-4 — auth enforcement, atomic money, typed errors, domain modules (2026-09-04)
+453:### A1 — The contract now enforces its own access metadata (blocker fixed)
+464:### A2 — Money mutations are atomic (blocker fixed)
+478:### A3 — Errors speak the contract's vocabulary
+486:### A4 — Domain modules + one money seam
+501:### A5 — Negative-authorization tests (the bar's "test file, not a curl transcript")
+511:## Steer-5 — hardcoded `/api/v1` stripped (defect + lesson)
+520:### MCP ledger — steer-4/5 lookups and what each changed
+541:## Steer-6 — resume: terminal compensation (P0 #7) + run-issue effector (P0 #1)
+552:### Framework defects found while resuming (each live-confirmed, not guessed)
+599:### Live proofs (persisted state on the running stack, not tests)
+614:### MCP/docs ledger — steer-6 lookups and what each changed
+637:## Framework defect — compensation effects are never persisted (plugin-sagas-core@0.0.7)
+690:## Live drive (steer-8) — what the runtime proved, and the next environment defect
+719:### Drive 2 (post prisma-store wiring) — same store binding
+733:### Store-binding root cause located (for the next session)
+750:## Terminal compensation — proved (2026-09-04, backend D)
+760:### The money truth after the chaos drive (persisted rows)
+772:### Framework defects found on this drive (each live-confirmed)
+804:### What "terminal" means here, mechanically
+=== last 30 lines ===
+   correct once the authz tree matches.
+2. **The workers queue storm: `Task 'undefined' failed: Workers KV key contains
+   unsupported part: undefined`** (36+ occurrences). Job executions enqueue a
+   task message whose `taskId` arrives undefined at `processWorkerTask`; the
+   KV claim throws. `job_execution_history` stays EMPTY (persist never
+   completes), and the single worker slot is starved by retries — the resume
+   batch's jobs drained in minutes while the DB rows never moved. Blocked the
+   worker-driven items; the chaos item was driven by the SAME handler code
+   (identical module, identical payload contract) to complete the proof.
+3. **Sagas live delivery remains dead (Steer-6 #9 recurs).** Publishes are
+   accepted (`{ published: true }`, 5 run-issue instances materialized), but
+   after the runner's startup catch-up nothing is consumed live; two runner
+   restarts did not advance instances, and the third restart returned an empty
+   instance list (KV vs prisma store split). Instance-level terminality is
+   proved deterministically instead: the saga tests drive the frozen
+   definitions' own handlers (forward path → `sagaComplete`; money-lost →
+   `sagaFail`; redeliveries no-ops), and the persisted-state shape was verified
+   in the engine source — the compensator never persists state, so `.on()` is
+   the only path that terminalises (Saga fix 1/3, commit 9d569e4).
+
+### What "terminal" means here, mechanically
+
+The undo is executed by the effector (durable, retried, keyed
+`refund:${runItemId}`), the run item is stamped COMPENSATED in the same
+transaction that folds it into `failedCount`, and the saga instance is
+terminalised from `.on('RunItemChargeRecordFailed')` via `sagaFail` — the
+engine persists `failed`. The instance can never rest `compensating`: the
+compensation handler is registered as a routing no-op and the `.on()` handler
+guards replay. Zero double-refund is a property of the keys, not of anyone
+behaving: the refund key replays a stored REFUNDED response.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && tail -c 300 RECORD.md | cat -A | tail -5
+il` M-bM-^@M-^T the$
+engine persists `failed`. The instance can never rest `compensating`: the$
+compensation handler is registered as a routing no-op and the `.on()` handler$
+guards replay. Zero double-refund is a property of the keys, not of anyone$
+behaving: the refund key replays a stored REFUNDED response.$
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && cat >> RECORD.md <<'EOF'
+
+## Framework defect — the vite build rewrites `withRouteContract`, so `deno fmt` and the build disagree
+
+**Found 2026-09-04 (design steer #2, pass 6).** Five route files carry a
+`.withRouteContract({ ... })` call on one line that runs past `deno fmt`'s width —
+`routes/customers/index.tsx`, `routes/customers/[id].tsx`, `routes/invoices/index.tsx`,
+`routes/invoices/[id].tsx`, `routes/runs/[id].tsx`. Formatting them is not the end
+of it:
+
+1. `deno fmt <those files>` → the call expands onto several lines, `deno task
+   fmt:check` is green (227 files, both batches).
+2. `deno run -A npm:vite --configLoader native build` — the app's own build
+   (`@fresh/plugin-vite`) → all five are rewritten back onto one line and
+   `git status` is dirty again.
+
+Reproduced twice. The decisive run: at `4d743c5` `routes/runs/[id].tsx` is clean,
+nobody edits it, a build runs, and it is dirty — so the writer is the generator's
+codegen, not a person and not another agent.
+
+Consequences for the next session:
+
+- The committed source is the **formatted** form; that is what the repo's
+  `fmt:check` gate wants, and it is what pass 6 committed (`4d743c5`).
+- A build re-dirties the tree. `git checkout --` the five files afterwards; do not
+  commit the generator's one-line version, and do not re-run `deno fmt` expecting
+  it to hold across a build.
+- The fix belongs in the generator (emit output at `deno fmt`'s width), which lives
+  upstream, not in this tree.
+EOF
+git add -A && git commit -q -F - <<'EOF' && git log --oneline -1
+Record the build-vs-fmt conflict on withRouteContract before it bites again
+
+deno fmt expands the call; the app's own vite build rewrites all five route files
+back onto one line. Proven by building with a clean tree: routes/runs/[id].tsx
+goes dirty without anyone editing it, so the writer is codegen. The formatted
+form is what stays committed; the tree needs a checkout after any build until
+the generator emits formatted output.
+EOF
+2550ac2 Record the build-vs-fmt conflict on withRouteContract before it bites again
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 900 deno task fmt:check 2>&1 | python3 -c "
+import sys,json
+raw=sys.stdin.read(); d=json.loads(raw[raw.index('{'):])
+print('fmt:check ok =',d.get('ok'), [b['exitCode'] for b in d['batches']])
+"; timeout 900 deno task test 2>&1 | tail -2; git status --porcelain | wc -l
+fmt:check ok = True [0, 0]
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(1s)[0m
+
+0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git log --oneline 37d1c25..HEAD && echo "=== behind master ===" && git rev-list --left-right --count master...HEAD
+2550ac2 Record the build-vs-fmt conflict on withRouteContract before it bites again
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+=== behind master ===
+2	23
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass6.md
+Wrote file successfully.
+[0m
+[0m# [0mTodos
+[✓] Add wrap modifier to SegmentedControl (CSS + prop)
+[✓] Mount SegmentedControl on RunStatusFilter so the active status is visible
+[✓] Register the wrapped variant in the design gallery
+[✓] Format the 6 files deno fmt flags (4 route files + services/runs stream + streams schema)
+[✓] Verify: check, lint, test, fmt:check
+[✓] Write design-steer-2-pass6.md and report DONE vs REMAINING
+[0m
+Pass 6 landed on `fix/steer2-consolidated` (worktree `wave7-billing-steer2`), 3 commits: `9037887`, `4d743c5`, `2550ac2`.
+
+**The five components were already built and mounted** — I verified that rather than rebuilding it. All five are in `components/ui/`, catalogued in `ledgerlineCatalog`, demoed in the gallery (the R3 test fails a catalogue entry with no demo), mounted on product routes, no `3px 3px 0` shadow survives, `money-text.tsx` resolves through `moneyParts`, and the exception badge uses semantic tokens.
+
+**DONE this pass**
+- **Runs status filter** — the last invisible selection. `SegmentedControl` gained a wrap modifier (9 cells overflow a narrow card; the container steps from capsule to `--ns-radius-lg` and drops the leading-edge hairlines that would hang off wrapped rows). Labels, hrefs and the `?status=` contract unchanged. Registered in the gallery. Proven by render and by `ns-segmented--wrap` reaching the emitted client CSS + server chunk.
+- **`deno task fmt:check` green repo-wide** — six pre-existing files, not the four pass 5 counted (also `services/runs/src/lib/stream.ts`, `streams/run-console-schema.ts`).
+- **`vite build` rewrites `withRouteContract` onto one line** — discovered because my formatting reverted itself. `routes/runs/[id].tsx` goes dirty from a build with nobody editing it, so it's codegen. Recorded in `RECORD.md` with the reproduction; formatted form stays committed.
+
+**REMAINING**
+1. Not merged — 23 ahead, 2 behind master (webhooks). No rebase; owner's call.
+2. `deno task lint` red: 4 problems, none in the app, none in files this branch touched — and 2 are in `aspire/.helpers/register-apps.mts`, which says *"GENERATED BY @netscript/cli. DO NOT EDIT."* Half is unfixable here; pass 5's "lint clean" was app-scoped.
+3. Five route files re-dirty on every build until the generator emits formatted output.
+4. `aspire/node_modules` absent — aspire check group can't load `tsc`.
+5. `MoneyText`'s richer API still lives in the Wave 7 design tree.
+
+Verification: check green (app batches), fmt green (227 files), 55 tests pass, tree clean, `deno.lock` untouched. Full write-up: `.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass6.md`.

@@ -1,0 +1,3763 @@
+[0m[32mTask[0m [0m[36magentic:opencode[0m deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts '--message' '# Design steer #3 — the bar just moved. Read DESIGN-AMBITION.md first.
+
+The owner saw the product and called the design **"absolutely hideous"** and **"multiple leagues
+behind"**. Important context so you calibrate correctly: **he was looking at the build tree, which
+had none of your work merged into it.** Your 46 components and all five widgets existed only on this
+branch. That was a coordination failure on my side, not a verdict on your components.
+
+But the new bar is real and it is higher than anything asked so far:
+
+> **"I want a SaaS product that looks BETTER than Stripe."**
+
+Not competitive with. Better. `DESIGN-AMBITION.md` (attached) says what that means concretely and
+where Stripe is actually beatable — it is weak on *in-between* states, and this product is entirely
+about a run that advances over time. That is the opening.
+
+## What to do now
+
+1. **Assume your components are about to be merged into the build tree.** They are. Stop building in
+   isolation and start making them look like a product.
+2. **Compose real surfaces, not a gallery.** The gallery proves the vocabulary exists. It does not
+   prove the product looks good. Build the actual screen compositions — run console, invoice detail,
+   overview — as composed blocks under `components/blocks/`, so the build lane can drop them in.
+3. **One card anatomy, everywhere.** Header with glyph + title and an action affordance on the right,
+   optional segmented control, hero metric roughly 3× the label with a delta chip beside it, body
+   visualisation, then footer columns or a full-width CTA. Every card in the owner'"'"'s reference sheets
+   obeys this. **That consistency is the polish** — it is what makes eight different widgets read as
+   one product.
+4. **Nothing renders bare.** A screen without the app shell — nav, breadcrumb, theme toggle — reads
+   as broken, and that is literally what the owner saw. Make the shell unavoidable.
+5. **Design the in-between states properly**, because that is where you beat Stripe: retrying,
+   part-paid, partially refunded, in-flight, reconciling, provisional-vs-settled. Stripe shows a
+   zero; you show the truth, and in finance that reads as confidence.
+6. **Commit to the identity completely.** Paper, ink, ledger-green, brass. Distinctive display type
+   where it earns attention, real elevation, generous radii, the green-tinted shadow. **A screenshot
+   with the logo cropped out should still be identifiable as this product.**
+7. **Motion where it means something** — the gauge fills, a row resolves, a total counts up. Never
+   decorative.
+
+## The test
+
+Put your run console beside Stripe'"'"'s billing dashboard. A stranger should prefer yours and be able to
+say why in one sentence. If the honest answer is "Stripe looks more finished", keep going.
+
+Commit frequently. I merge to the build lane continuously from now on, so nothing sits unmerged
+again.' '--model' 'openrouter/tencent/hy4-preview' '--variant' 'max' '--cwd' '/home/agent/projects/netscript/wave7-design' '--require-mcp' 'netscript' '--require-mcp' 'aspire' '--receipt' '.netscript/agent/design-receipt.jsonl' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/DESIGN-AMBITION.md' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/DESIGN-REFERENCES.md'
+[0m
+> build · tencent/hy4-preview
+[0m
+[0m$ [0mls /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/
+ARTICLE-BAR.md
+ARTICLE-BOUNDARY.md
+AUDIT-HOWTO.md
+CONSTRUCTION-REFERENCE.md
+DESIGN-AMBITION.md
+DESIGN-REFERENCES.md
+ENVIRONMENT.md
+PRODUCT-DEFINITION.md
+PUBLISHING.md
+article-skills
+audits
+auto-steer.sh
+beat-this.md
+brief.md
+continue.md
+coord-loop.sh
+design-brief.md
+design-critic-brief.md
+design-critique-1.md
+design-references
+design-steer-2-continuation.md
+design-steer-2-pass10.md
+design-steer-2-pass11.md
+design-steer-2-pass3.md
+design-steer-2-pass4.md
+design-steer-2-pass5.md
+design-steer-2-pass6.md
+design-steer-2-pass7.md
+design-steer-2-pass8.md
+design-steer-2-pass9.md
+design-steer-2-report.md
+design-steer-2.md
+design-steer-3.md
+evaluator
+keepalive.sh
+kickoff.md
+logs
+mcp-ask.ts
+publishing-contract.md
+quality-bar-eis-chat.md
+receipts
+screenshot-brief.md
+shot-watch.sh
+steer-10.md
+steer-2.md
+steer-3.md
+steer-4.md
+steer-5.md
+steer-6.md
+steer-7.md
+steer-8.md
+steer-9.md
+steer-loop.sh
+steer-merge.md
+steer-watch.sh
+supervisor.md
+watch.sh
+[0m
+[0m$ [0mrtk git status --short 2>/dev/null | head -50; echo "---BRANCH---"; rtk git branch --show-current
+---BRANCH---
+/bin/bash: line 1: rtk: command not found
+[0m
+I'll start by loading the design system context and getting oriented in the run.
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire && git status --short | head -60; echo "---BRANCH---"; git branch --show-current; echo "---LOG---"; git log --oneline -12
+?? .llm/runs/wave7-billing-run--0.0.7/
+---BRANCH---
+research/aspire-13.5-0.0.7
+---LOG---
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+2609e8b5b chore(aspire-13.5): #1975 IMPL-EVAL PASS recorded; manifest repair at 8e54ccfa1
+4bf5c75d0 chore(aspire-13.5): leaf-1881-fix GREEN 0650f6f7b on #1975; IMPL-EVAL dispatched
+4113c0863 chore(aspire-13.5): brief addendum (fail-closed install root) and corrected post-merge proof dispatch
+f5cbafe0b chore(aspire-13.5): Canary 9 exact red (README cmd 1 install collision); dispatch install-root isolation repair
+3c429dff0 chore(aspire-13.5): epic closure pre-flight; residuals R1 (parity phase-2 literals) and R2 (receipt path)
+ce7a1f7da chore(aspire-13.5): #1965 shipped at b6b9df966; preserve #1881 evaluator artefacts; Canary 9 admission watch
+5c9605020 chore(aspire-13.5): #1952 shipped (gate 2 complete); #1965 converged at 9cff705f5, D-335 close-gate decision
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/brief.md
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7 && ls -la | head -70
+total 422
+drwxr-xr-x   8 node node    59 Sep  4 17:09 .
+drwxr-xr-x 181 node node   181 Sep  3 21:56 ..
+-rw-r--r--   1 node node  5353 Sep  4 16:14 ARTICLE-BAR.md
+-rw-r--r--   1 node node  2181 Sep  4 16:24 ARTICLE-BOUNDARY.md
+-rw-r--r--   1 node node  2006 Sep  4 07:02 AUDIT-HOWTO.md
+-rw-r--r--   1 node node 11790 Sep  4 07:16 CONSTRUCTION-REFERENCE.md
+-rw-r--r--   1 node node  3979 Sep  4 17:09 DESIGN-AMBITION.md
+-rw-r--r--   1 node node  6701 Sep  4 11:32 DESIGN-REFERENCES.md
+-rw-r--r--   1 node node  4352 Sep  3 23:26 ENVIRONMENT.md
+-rw-r--r--   1 node node  7852 Sep  4 00:26 PRODUCT-DEFINITION.md
+-rw-r--r--   1 node node  3396 Sep  3 22:32 PUBLISHING.md
+drwxr-xr-x   2 node node     5 Sep  4 16:34 article-skills
+drwxr-xr-x   2 node node     3 Sep  4 07:11 audits
+-rw-r--r--   1 node node   599 Sep  4 00:26 auto-steer.sh
+-rw-r--r--   1 node node  4213 Sep  3 22:07 beat-this.md
+-rw-r--r--   1 node node 13994 Sep  3 22:32 brief.md
+-rw-r--r--   1 node node  4237 Sep  4 16:13 continue.md
+-rw-r--r--   1 node node  1965 Sep  4 12:03 coord-loop.sh
+-rw-r--r--   1 node node  8319 Sep  4 11:25 design-brief.md
+-rw-r--r--   1 node node  4014 Sep  4 11:33 design-critic-brief.md
+-rw-r--r--   1 node node 26660 Sep  4 11:52 design-critique-1.md
+drwxr-xr-x   2 node node     4 Sep  4 11:32 design-references
+-rw-r--r--   1 node node  7372 Sep  4 13:17 design-steer-2-continuation.md
+-rw-r--r--   1 node node  8953 Sep  4 16:19 design-steer-2-pass10.md
+-rw-r--r--   1 node node 10882 Sep  4 16:42 design-steer-2-pass11.md
+-rw-r--r--   1 node node  7610 Sep  4 13:50 design-steer-2-pass3.md
+-rw-r--r--   1 node node  7976 Sep  4 14:22 design-steer-2-pass4.md
+-rw-r--r--   1 node node  8270 Sep  4 14:52 design-steer-2-pass5.md
+-rw-r--r--   1 node node  8123 Sep  4 15:07 design-steer-2-pass6.md
+-rw-r--r--   1 node node  7254 Sep  4 15:24 design-steer-2-pass7.md
+-rw-r--r--   1 node node  9766 Sep  4 15:39 design-steer-2-pass8.md
+-rw-r--r--   1 node node 10731 Sep  4 16:08 design-steer-2-pass9.md
+-rw-r--r--   1 node node  6600 Sep  4 12:36 design-steer-2-report.md
+-rw-r--r--   1 node node  4004 Sep  4 11:52 design-steer-2.md
+-rw-r--r--   1 node node  2903 Sep  4 17:09 design-steer-3.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 evaluator
+-rw-r--r--   1 node node   831 Sep  4 11:13 keepalive.sh
+-rw-r--r--   1 node node  1294 Sep  3 23:05 kickoff.md
+drwxr-xr-x   2 node node    50 Sep  4 17:09 logs
+-rw-r--r--   1 node node  1529 Sep  4 07:02 mcp-ask.ts
+-rw-r--r--   1 node node  3396 Sep  3 22:03 publishing-contract.md
+-rw-r--r--   1 node node  2960 Sep  3 22:02 quality-bar-eis-chat.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 receipts
+-rw-r--r--   1 node node  5415 Sep  4 16:43 screenshot-brief.md
+-rw-r--r--   1 node node   404 Sep  4 16:14 shot-watch.sh
+-rw-r--r--   1 node node  4237 Sep  4 16:12 steer-10.md
+-rw-r--r--   1 node node  3195 Sep  4 06:52 steer-2.md
+-rw-r--r--   1 node node  7799 Sep  4 07:14 steer-3.md
+-rw-r--r--   1 node node  8061 Sep  4 07:17 steer-4.md
+-rw-r--r--   1 node node  2642 Sep  4 08:02 steer-5.md
+-rw-r--r--   1 node node  4862 Sep  4 10:23 steer-6.md
+-rw-r--r--   1 node node  2704 Sep  4 10:27 steer-7.md
+-rw-r--r--   1 node node  5245 Sep  4 11:22 steer-8.md
+-rw-r--r--   1 node node  7360 Sep  4 11:26 steer-9.md
+-rw-r--r--   1 node node   829 Sep  4 07:17 steer-loop.sh
+-rw-r--r--   1 node node  2951 Sep  4 17:05 steer-merge.md
+-rw-r--r--   1 node node   599 Sep  4 00:27 steer-watch.sh
+-rw-r--r--   1 node node  2300 Sep  3 21:56 supervisor.md
+-rw-r--r--   1 node node   760 Sep  3 23:06 watch.sh
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire && find .llm/runs/wave7-billing-run--0.0.7 -iname "*locked*" -o -iname "*slice*" | head -30
+(no output)
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass11.md
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-3.md
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/steer-merge.md
+[0m
+[0m$ [0mls -d /home/agent/projects/netscript/*/ 2>/dev/null; echo "---WT---"; cd /home/agent/projects/netscript/worktrees/007-aspire && git worktree list 2>/dev/null
+/home/agent/projects/netscript/handoff/
+/home/agent/projects/netscript/repo/
+/home/agent/projects/netscript/wave7-billing-steer2/
+/home/agent/projects/netscript/wave7-billing/
+/home/agent/projects/netscript/wave7-design/
+/home/agent/projects/netscript/wave7-preflight/
+/home/agent/projects/netscript/worktrees/
+---WT---
+/home/agent/projects/netscript/repo                                      08f581e83 [main]
+/home/agent/projects/netscript/worktrees/007-aspire                      cf528cbd3 [research/aspire-13.5-0.0.7]
+/home/agent/projects/netscript/worktrees/007-canary10-cleanup-proof      e677ac3c8 [test/readme-canary10-cleanup-proof]
+/home/agent/projects/netscript/worktrees/007-conv-1756                   b607bfe26 [salvage/1756-current-base]
+/home/agent/projects/netscript/worktrees/007-conv-1808                   78be0e032 [verify-1777]
+/home/agent/projects/netscript/worktrees/007-docs                        55d435394 [orchestrator/release-0.0.7-docs]
+/home/agent/projects/netscript/worktrees/007-features                    043e53c22 [orchestrator/release-0.0.7-features]
+/home/agent/projects/netscript/worktrees/007-final-harness-integration   2158b8611 [chore/final-0.0.7-harness-integration]
+/home/agent/projects/netscript/worktrees/007-fixes                       d274246fc [orchestrator/release-0.0.7-fixes]
+/home/agent/projects/netscript/worktrees/007-hotfix-phase-b-sol          d64682bb0 [fix/canary6-phase-b-follow-observer-sol]
+/home/agent/projects/netscript/worktrees/007-internals                   fabdae4f7 [orchestrator/release-0.0.7-internals]
+/home/agent/projects/netscript/worktrees/007-leaf-1349-audit             49d076c02 [chore/sdk-client-1349-acceptance-audit]
+/home/agent/projects/netscript/worktrees/007-leaf-1857                   b66e52cbc [verify-merged]
+/home/agent/projects/netscript/worktrees/007-leaf-1870                   7b5a31a80 [fix/readiness-fixture-cache-discovery]
+/home/agent/projects/netscript/worktrees/007-leaf-1877                   bb5fd4ad3 [fix/workers-runtime-ready-markers]
+/home/agent/projects/netscript/worktrees/007-leaf-1898                   438ed4f60 [fix/readiness-fixture-app-identifier-collision]
+/home/agent/projects/netscript/worktrees/007-leaf-adoptA                 dd80f5554 [verify]
+/home/agent/projects/netscript/worktrees/007-leaf-sdk-contrib            76beee792 [feat/sdk-client-contributions-plan]
+/home/agent/projects/netscript/worktrees/007-primary                     36c76edb5 [chore/release-0.0.7-orchestration]
+/home/agent/projects/netscript/worktrees/007-repair-1970-handler-freeze  ad5a74e76 [repair/pr1970-handler-freeze]
+/home/agent/projects/netscript/worktrees/007-s7-reexpress                6f4da15b6 [fix/aspire-s7-reexpress]
+/home/agent/projects/netscript/worktrees/007-s8-repair                   f855d2428 [fix/aspire-s8-workers-post-migration]
+/home/agent/projects/netscript/worktrees/007-s9-auth-audit               6d2148996 [fix/aspire-s9-authenticated-telemetry-coauthor]
+/home/agent/projects/netscript/worktrees/007-salvage                     729f45248 [chore/preserve-orphaned-run-artifacts]
+/home/agent/projects/netscript/worktrees/007-stable-fixture-repair       6884b7548 [fix/cli-prepublish-test-fixture]
+/home/agent/projects/netscript/worktrees/model-routing-revamp            1f02dde27 [chore/revamp-agent-model-routing]
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 2>/dev/null && git branch --show-current && git log --oneline -5 && echo "---STATUS---" && git status --short | head -20
+fix/steer2-consolidated
+e5698dc Record pass 11: the display step, the contrast the critique misattributed, and one correction
+76988c4 Fix: the em dash was the one fact in the product nobody could read
+a48a861 Fix: give the page a hero one step above the card hero
+dd49441 Fix: two pre-existing lint errors the design passes kept inheriting as red
+7e1687c Record pass 9: three defects eight passes did not find, and one correction
+---STATUS---
+ M tests/design_contract_test.ts
+?? apps/ledgerline-web/.render-proof.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && ls && echo "===BRANCHES===" && git branch -a && echo "===AHEAD===" && git rev-list --left-right --count master...HEAD 2>/dev/null
+AGENTS.md
+DESIGN.md
+MARKET-RESEARCH.md
+README.md
+RECORD.md
+apps
+appsettings.json
+aspire
+aspire-export-20260904-113855.zip
+aspire-export-20260904-113857.zip
+auth
+contracts
+database
+deno.json
+deno.lock
+netscript.config.ts
+node_modules
+package.json
+plugins
+sagas
+services
+streams
+tests
+triggers
+tsconfig.json
+workers
+===BRANCHES===
+  backend/d-compensation-proof
++ design/ledgerline-ui
+* fix/steer2-consolidated
+  fix/steer2-product-defects
+  fix/steer2-provisional-tag-contrast
++ master
+  remotes/origin/master
+===AHEAD===
+5	35
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && find . -path ./node_modules -prune -o -type d -name blocks -print 2>/dev/null; echo "===COMPONENTS==="; ls components/ 2>/dev/null; echo "===UI==="; ls components/ui/ 2>/dev/null | head -60
+./apps/ledgerline-web/assets/blocks
+===COMPONENTS===
+===UI===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && ls && echo "===COMPONENTS===" && ls components/ && echo "===UI COUNT===" && ls components/ui/ | wc -l && ls components/ui/ | head -60
+AGENTS.md
+README.md
+WEB-LAYER.md
+_fresh
+assets
+client.ts
+components
+deno.json
+islands
+lib
+main.ts
+router.ts
+routes
+static
+tsconfig.json
+utils.ts
+vite.config.ts
+===COMPONENTS===
+product
+ui
+===UI COUNT===
+47
+alert.tsx
+avatar.tsx
+badge.tsx
+breadcrumb.tsx
+button.tsx
+card.tsx
+chart-block.tsx
+checkbox.tsx
+code-block.tsx
+comparison-area-chart.tsx
+control-props.ts
+data-table.tsx
+delta-chip.tsx
+desktop-dialog.tsx
+desktop-notification.tsx
+desktop-tray-menu.tsx
+desktop-update-prompt.tsx
+desktop-window-chrome.tsx
+detail-layout.tsx
+donut.tsx
+dropzone.tsx
+empty-state.tsx
+filter-form.tsx
+footer-columns.tsx
+form-field.tsx
+icon-button.tsx
+inline-notice.tsx
+input.tsx
+label.tsx
+mod.ts
+page-header.tsx
+pagination.tsx
+panel.tsx
+progress.tsx
+responsive-table.tsx
+section-divider.tsx
+segmented-control.tsx
+select.tsx
+semicircular-gauge.tsx
+separator.tsx
+sidebar-shell.tsx
+skeleton.tsx
+spinner.tsx
+stats-grid.tsx
+switch.tsx
+textarea.tsx
+widget-card.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "===BLOCKS===" && ls assets/blocks/ components/blocks/ 2>/dev/null; echo "===ROUTES==="; find routes -name "*.tsx" | head -50
+===BLOCKS===
+assets/blocks/:
+widget-card.css
+===ROUTES===
+routes/_app.tsx
+routes/invoices/(_components)/invoice-list.tsx
+routes/invoices/(_components)/invoice-header.tsx
+routes/invoices/(_components)/invoice-body.tsx
+routes/invoices/[id].tsx
+routes/invoices/index.tsx
+routes/runs/(_islands)/saga-instances.tsx
+routes/runs/(_islands)/run-console-live.tsx
+routes/runs/(_components)/run-actions.tsx
+routes/runs/(_components)/run-comparison.tsx
+routes/runs/(_components)/create-run-form.tsx
+routes/runs/(_components)/run-summary.tsx
+routes/runs/(_components)/runs-table.tsx
+routes/runs/(_components)/run-progress.tsx
+routes/runs/(_components)/run-items-table.tsx
+routes/runs/(_components)/billed-summary.tsx
+routes/runs/index.tsx
+routes/runs/[id].tsx
+routes/customers/(_components)/customer-list.tsx
+routes/customers/(_components)/customer-invoices.tsx
+routes/customers/(_components)/customer-header.tsx
+routes/customers/(_components)/customer-ledger.tsx
+routes/customers/[id].tsx
+routes/customers/index.tsx
+routes/partials/runs/console.tsx
+routes/partials/runs/list.tsx
+routes/(_components)/home-view.tsx
+routes/(_components)/health-view.tsx
+routes/health.tsx
+routes/(design)/design/tokens.tsx
+routes/(design)/design/(_islands)/TokenClipboard.tsx
+routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+routes/(design)/design/(_components)/composition-view.tsx
+routes/(design)/design/(_components)/components-view.tsx
+routes/(design)/design/(_components)/tokens-view.tsx
+routes/(design)/design/composition.tsx
+routes/(design)/design/components.tsx
+routes/(design)/design/_layout.tsx
+routes/(design)/design/index.tsx
+routes/index.tsx
+routes/_layout.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && ls components/product/ && echo "===ASSETS===" && ls assets/ && echo "===BLOCKS CSS===" && wc -l assets/blocks/*.css
+exception-badge.tsx
+mod.ts
+money-text.tsx
+provisional-tag.tsx
+run-state-stepper.tsx
+status-badge.tsx
+transition-feed.tsx
+===ASSETS===
+blocks
+design.css
+layouts.css
+styles.css
+theme-bridge.css
+tokens.css
+tokens.json
+ui
+===BLOCKS CSS===
+120 assets/blocks/widget-card.css
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/widget-card.tsx
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/[id].tsx
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_layout.tsx
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/sidebar-shell.tsx
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/run-summary.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && wc -l routes/runs/\(_components\)/*.tsx routes/invoices/\(_components\)/*.tsx routes/customers/\(_components\)/*.tsx components/product/*.tsx
+68 routes/runs/(_components)/billed-summary.tsx
+  101 routes/runs/(_components)/create-run-form.tsx
+  216 routes/runs/(_components)/run-actions.tsx
+  208 routes/runs/(_components)/run-comparison.tsx
+  161 routes/runs/(_components)/run-items-table.tsx
+  169 routes/runs/(_components)/run-progress.tsx
+  160 routes/runs/(_components)/run-summary.tsx
+  225 routes/runs/(_components)/runs-table.tsx
+  235 routes/invoices/(_components)/invoice-body.tsx
+  112 routes/invoices/(_components)/invoice-header.tsx
+  223 routes/invoices/(_components)/invoice-list.tsx
+   81 routes/customers/(_components)/customer-header.tsx
+  136 routes/customers/(_components)/customer-invoices.tsx
+   48 routes/customers/(_components)/customer-ledger.tsx
+  163 routes/customers/(_components)/customer-list.tsx
+   49 components/product/exception-badge.tsx
+   74 components/product/money-text.tsx
+   30 components/product/provisional-tag.tsx
+   62 components/product/run-state-stepper.tsx
+   89 components/product/status-badge.tsx
+   65 components/product/transition-feed.tsx
+ 2675 total
+[0m
+[0m$ [0mfor d in wave7-billing wave7-design wave7-billing-steer2; do echo "=== $d ==="; cd /home/agent/projects/netscript/$d && git branch --show-current && git log --oneline -3 && git rev-list --left-right --count origin/master...HEAD 2>/dev/null; done
+=== wave7-billing ===
+master
+69a569a Runtime evidence: doctor + resource graph captured; workers token + sagas-api wiring fixes; charge replay-before-state-guard; queue wedge recorded
+d1ce423 Fix: charge replay by key BEFORE the invoice-state guard — a crash-era PAID invoice must replay the stored outcome, not fabricate a validation failure (Stripe semantics)
+fc68dc1 Fix: saga runner store binding — backend/prisma belong at the TOP level of the durable runtime options (resolveStoreResources reads options.backend, not options.native.backend)
+0	0
+=== wave7-design ===
+design/ledgerline-ui
+734f4e2 Design: in-flight work before merge to build lane
+f82a8f4 Design: the two files that keep the root fmt gate red
+91dc1b2 Design: a null footer column renders in the absent tone
+44	10
+=== wave7-billing-steer2 ===
+fix/steer2-consolidated
+e5698dc Record pass 11: the display step, the contrast the critique misattributed, and one correction
+76988c4 Fix: the em dash was the one fact in the product nobody could read
+a48a861 Fix: give the page a hero one step above the card hero
+5	35
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== components dirs ===" && ls components/ && echo "=== mod.ts exports ===" && cat components/ui/mod.ts | head -80
+=== components dirs ===
+product
+ui
+=== mod.ts exports ===
+/**
+ * App-owned UI barrel. These modules are installed with `netscript ui:init`
+ * from the @netscript/fresh-ui registry and are owned by the scaffolded app.
+ */
+export { Alert, type AlertVariant } from './alert.tsx';
+export { Avatar, type AvatarPresence, type AvatarSize } from './avatar.tsx';
+export { ChartBlock, type ChartDatum, type ChartTone } from './chart-block.tsx';
+export {
+  AREA_CHART_TICK_RATIOS,
+  areaChartMax,
+  type AreaChartPoint,
+  type AreaSeries,
+  ComparisonAreaChart,
+} from './comparison-area-chart.tsx';
+export { CodeBlock } from './code-block.tsx';
+export { Donut, type DonutDatum, type DonutTone } from './donut.tsx';
+export {
+  Dropzone,
+  type DropzoneIngestDetails,
+  type DropzoneProps,
+  type DropzoneRejectedFile,
+} from './dropzone.tsx';
+export { Badge, type BadgeVariant } from './badge.tsx';
+export { Breadcrumb, type BreadcrumbItem } from './breadcrumb.tsx';
+export { Button, type ButtonElementType, type ButtonSize, type ButtonVariant } from './button.tsx';
+export { Card } from './card.tsx';
+export { Checkbox, type CheckboxProps } from './checkbox.tsx';
+export { DataTable } from './data-table.tsx';
+export { DeltaChip, type DeltaDirection, type DeltaGlyph } from './delta-chip.tsx';
+export { DetailLayout } from './detail-layout.tsx';
+export { DesktopDialog, type DesktopDialogRequest } from './desktop-dialog.tsx';
+export { DesktopNotification } from './desktop-notification.tsx';
+export { DesktopTrayMenu } from './desktop-tray-menu.tsx';
+export { DesktopUpdatePrompt } from './desktop-update-prompt.tsx';
+export { DesktopWindowChrome } from './desktop-window-chrome.tsx';
+export { EmptyState } from './empty-state.tsx';
+export { FilterForm } from './filter-form.tsx';
+export { type FooterColumn, FooterColumns } from './footer-columns.tsx';
+export { FormField } from './form-field.tsx';
+export { getInputProps, getSelectProps, getTextareaProps } from './control-props.ts';
+export { IconButton } from './icon-button.tsx';
+export { InlineNotice, type InlineNoticeVariant } from './inline-notice.tsx';
+export { Input } from './input.tsx';
+export { Label } from './label.tsx';
+export { PageHeader } from './page-header.tsx';
+export { Pagination } from './pagination.tsx';
+export { Panel, type PanelTone } from './panel.tsx';
+export { Progress, type ProgressSize, type ProgressVariant } from './progress.tsx';
+export {
+  ResponsiveTable,
+  type ResponsiveTableColumn,
+  type ResponsiveTableProps,
+} from './responsive-table.tsx';
+export { SectionDivider } from './section-divider.tsx';
+export { type GaugeSegment, type GaugeSeries, SemicircularGauge } from './semicircular-gauge.tsx';
+export { Select, type SelectOption } from './select.tsx';
+export {
+  SegmentedControl,
+  type SegmentedControlOption,
+  type SegmentedControlProps,
+} from './segmented-control.tsx';
+export { Separator } from './separator.tsx';
+export { type SidebarNavItem, type SidebarNavSection, SidebarShell } from './sidebar-shell.tsx';
+export { Skeleton } from './skeleton.tsx';
+export { Spinner, type SpinnerSize } from './spinner.tsx';
+export { StatsGrid } from './stats-grid.tsx';
+export { Switch, type SwitchProps } from './switch.tsx';
+export { Textarea } from './textarea.tsx';
+export { WidgetCard } from './widget-card.tsx';
+
+// Product components — Ledgerline domain layer over the copied kit.
+export {
+  ExceptionBadge,
+  MoneyText,
+  ProvisionalTag,
+  RunStateStepper,
+  StatusBadge,
+  TransitionFeed,
+  type TransitionItem,
+} from '../product/mod.ts';
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && echo "design merged into steer2? " && git merge-base --is-ancestor design/ledgerline-ui HEAD && echo YES || echo NO; echo "master merged into design? "; git merge-base --is-ancestor master design/ledgerline-ui && echo YES || echo NO; echo "=== design/ledgerline-ui log ==="; git log --oneline design/ledgerline-ui -10
+design merged into steer2? 
+NO
+master merged into design? 
+NO
+=== design/ledgerline-ui log ===
+734f4e2 Design: in-flight work before merge to build lane
+f82a8f4 Design: the two files that keep the root fmt gate red
+91dc1b2 Design: a null footer column renders in the absent tone
+433caf9 Design: clip the area chart's hover bands to the frame
+809b130 Design: make the app's own check gate green
+310a123 Design: format the status contract test this branch introduced
+4261c92 Design: finish the gallery scaffold sweep the prior pass reported closed
+b8ae695 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+24cccd5 Design: money + status contract layer, tested
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/run-progress.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== animation/keyframes ===" && grep -rn "@keyframes\|animation:\|transition:" assets/*.css assets/ui/*.css assets/blocks/*.css 2>/dev/null | head -40; echo "=== count ==="; grep -rln "@keyframes" assets/ | head
+=== animation/keyframes ===
+assets/design.css:33:  transition: color var(--ns-ease-fast), border-color var(--ns-ease-fast);
+assets/design.css:117:  transition: border-color var(--ns-ease-fast), background var(--ns-ease-fast);
+assets/design.css:222:  transition: flex-grow var(--ns-ease-normal);
+assets/design.css:816:    transition: none;
+assets/layouts.css:336:  transition: transform var(--ns-ease-fast);
+assets/layouts.css:460:  transition: background-color 140ms ease, color 140ms ease;
+assets/layouts.css:560:  transition: color 120ms ease, background-color 120ms ease;
+assets/layouts.css:630:    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+assets/layouts.css:643:    transition: opacity 200ms ease;
+assets/layouts.css:869:  animation: ns-fade-in var(--ns-ease-normal);
+assets/layouts.css:872:@keyframes ns-fade-in {
+assets/styles.css:83:    transition: background-color 0.2s ease, color 0.2s ease;
+assets/ui/button.css:14:  transition:
+assets/ui/card.css:8:  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
+assets/ui/chart-block.css:47:  transition: width var(--ns-ease-normal);
+assets/ui/chart-block.css:109:  transition: height var(--ns-ease-normal);
+assets/ui/chart-block.css:142:    transition: none;
+assets/ui/checkbox.css:11:  transition:
+assets/ui/code-block.css:44:  transition: color var(--ns-ease-fast), border-color var(--ns-ease-fast);
+assets/ui/comparison-area-chart.css:178:  transition: opacity var(--ns-ease-fast);
+assets/ui/comparison-area-chart.css:413:    transition: none;
+assets/ui/desktop-dialog.css:38:  transition: opacity var(--ns-ease-fast);
+assets/ui/desktop-notification.css:43:  transition: background-color var(--ns-ease-fast);
+assets/ui/desktop-tray-menu.css:52:  transition: background-color var(--ns-ease-fast);
+assets/ui/desktop-update-prompt.css:54:  transition:
+assets/ui/desktop-update-prompt.css:83:    transition: none;
+assets/ui/desktop-window-chrome.css:58:  transition:
+assets/ui/desktop-window-chrome.css:86:    transition: none;
+assets/ui/donut.css:17:  transition: stroke-dasharray var(--ns-ease-normal);
+assets/ui/donut.css:90:    transition: none;
+assets/ui/dropzone.css:14:  transition: border-color var(--ns-ease-fast), background-color var(--ns-ease-fast);
+assets/ui/dropzone.css:67:    transition: none;
+assets/ui/form-control-styles.css:12:  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
+assets/ui/progress.css:31:  transition: width var(--ns-ease-normal);
+assets/ui/progress.css:52:  animation: ns-progress-indeterminate 1.2s ease-in-out infinite;
+assets/ui/progress.css:55:@keyframes ns-progress-indeterminate {
+assets/ui/progress.css:72:    animation: none;
+assets/ui/segmented-control.css:63:  transition: background var(--ns-ease-normal), color var(--ns-ease-normal);
+assets/ui/segmented-control.css:112:    transition: none;
+assets/ui/semicircular-gauge.css:34:  transition: stroke-dasharray var(--ns-ease-normal);
+=== count ===
+assets/layouts.css
+assets/ui/progress.css
+assets/ui/toast.css
+assets/ui/sheet.css
+assets/ui/spinner.css
+assets/ui/skeleton.css
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== Breadcrumb usage ===" && grep -rn "Breadcrumb" routes/ components/ | head -20; echo "=== fonts/type ==="; grep -n "font-family\|--ns-font" assets/tokens.css | head -20
+=== Breadcrumb usage ===
+routes/(design)/design/(_components)/components-view.tsx:7:  Breadcrumb,
+routes/(design)/design/(_components)/components-view.tsx:825:        <Breadcrumb
+routes/(design)/design/_layout.tsx:1:import { Badge, Breadcrumb, SidebarShell } from '@app/components/ui/mod.ts';
+routes/(design)/design/_layout.tsx:34:function buildDesignBreadcrumbs(pathname: string) {
+routes/(design)/design/_layout.tsx:60:          <Breadcrumb items={buildDesignBreadcrumbs(url.pathname)} />
+components/ui/breadcrumb.tsx:6: * Breadcrumb step metadata for route context navigation.
+components/ui/breadcrumb.tsx:8:export interface BreadcrumbItem {
+components/ui/breadcrumb.tsx:17:interface BreadcrumbProps extends Omit<JSX.HTMLAttributes<HTMLElement>, 'class' | 'children'> {
+components/ui/breadcrumb.tsx:18:  items: readonly BreadcrumbItem[];
+components/ui/breadcrumb.tsx:25:export function Breadcrumb({ items, class: className, ...props }: BreadcrumbProps): VNode | null {
+components/ui/breadcrumb.tsx:29:    <nav {...props} aria-label='Breadcrumb' class={cn('ns-breadcrumb', className)}>
+components/ui/mod.ts:24:export { Breadcrumb, type BreadcrumbItem } from './breadcrumb.tsx';
+=== fonts/type ===
+161:  --ns-font-sans: "Inter", "SF Pro Text", system-ui, sans-serif;
+162:  --ns-font-mono: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+163:  --ns-font-numeric: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,200p' assets/tokens.css
+/* Ledgerline design tokens — GENERATED from tokens.json. Do not edit by hand. */
+
+:root {
+  color-scheme: light;
+
+  /* Primitive ramps */
+  --ns-paper-1: oklch(98.5% 0.009 95);
+  --ns-paper-2: oklch(94.5% 0.009 95);
+  --ns-paper-3: oklch(88.5% 0.009 95);
+  --ns-paper-4: oklch(80.5% 0.009 95);
+  --ns-paper-5: oklch(73.5% 0.009 95);
+  --ns-paper-6: oklch(59.5% 0.009 95);
+  --ns-paper-7: oklch(47% 0.009 95);
+  --ns-paper-8: oklch(37% 0.009 95);
+  --ns-paper-9: oklch(27% 0.009 95);
+  --ns-paper-10: oklch(21.5% 0.009 95);
+  --ns-paper-11: oklch(17.5% 0.009 95);
+  --ns-paper-12: oklch(13.5% 0.009 95);
+
+  --ns-ledger-1: oklch(95.5% 0.09 155);
+  --ns-ledger-2: oklch(87.5% 0.11 155);
+  --ns-ledger-3: oklch(78.5% 0.11 155);
+  --ns-ledger-4: oklch(70.5% 0.11 155);
+  --ns-ledger-5: oklch(61% 0.11 155);
+  --ns-ledger-6: oklch(53.5% 0.11 155);
+  --ns-ledger-7: oklch(45.5% 0.105 155);
+
+  --ns-rust-4: oklch(70.5% 0.145 38);
+  --ns-rust-5: oklch(62.5% 0.145 38);
+  --ns-rust-6: oklch(54.5% 0.145 38);
+  --ns-rust-7: oklch(45.5% 0.145 38);
+
+  --ns-ink-1: oklch(96.5% 0.016 255);
+  --ns-ink-2: oklch(89.5% 0.016 255);
+  --ns-ink-3: oklch(79% 0.016 255);
+  --ns-ink-4: oklch(70.5% 0.016 255);
+  --ns-ink-5: oklch(61.5% 0.016 255);
+  --ns-ink-6: oklch(52.5% 0.016 255);
+  --ns-ink-7: oklch(43.5% 0.016 255);
+
+  --ns-brass-1: oklch(95.5% 0.025 85);
+  --ns-brass-2: oklch(88.5% 0.068 85);
+  --ns-brass-3: oklch(81.5% 0.105 85);
+  --ns-brass-4: oklch(74.5% 0.105 85);
+  --ns-brass-5: oklch(69.5% 0.105 85);
+  --ns-brass-6: oklch(63.5% 0.105 85);
+  --ns-brass-7: oklch(55.5% 0.105 85);
+  --ns-brass-8: oklch(47% 0.105 85);
+
+  --ns-amber-4: oklch(81.5% 0.125 78);
+  --ns-amber-5: oklch(73.5% 0.125 78);
+  --ns-amber-6: oklch(65.5% 0.125 78);
+  --ns-amber-7: oklch(57.5% 0.125 78);
+  --ns-amber-8: oklch(49.5% 0.125 78);
+
+  /* Semantic aliases */
+  --ns-bg: var(--ns-paper-1);
+  --ns-fg: var(--ns-paper-12);
+  --ns-surface: var(--ns-paper-2);
+  --ns-surface-raised: #ffffff;
+  --ns-overlay: rgba(0, 0, 0, 0.4);
+
+  --ns-card: #ffffff;
+  --ns-card-fg: var(--ns-paper-12);
+
+  --ns-primary: var(--ns-ledger-6);
+  --ns-primary-fg: var(--ns-paper-1);
+  --ns-primary-hover: var(--ns-ledger-7);
+  --ns-primary-subtle: color-mix(in oklab, var(--ns-ledger-6) 10%, transparent);
+  --ns-primary-border: color-mix(in oklab, var(--ns-ledger-6) 25%, transparent);
+
+  --ns-secondary: var(--ns-ink-5);
+  --ns-secondary-fg: var(--ns-paper-12);
+  --ns-secondary-hover: var(--ns-ink-6);
+  --ns-secondary-subtle: color-mix(in oklab, var(--ns-ink-5) 10%, transparent);
+  --ns-secondary-border: color-mix(in oklab, var(--ns-ink-5) 20%, transparent);
+
+  --ns-muted: var(--ns-paper-3);
+  --ns-muted-fg: var(--ns-paper-7);
+
+  --ns-accent: var(--ns-brass-6);
+  --ns-accent-fg: var(--ns-paper-12);
+  --ns-accent-subtle: color-mix(in oklab, var(--ns-brass-6) 8%, transparent);
+  --ns-accent-border: color-mix(in oklab, var(--ns-brass-6) 18%, transparent);
+
+  --ns-success: var(--ns-ledger-5);
+  --ns-success-fg: var(--ns-paper-12);
+  --ns-success-subtle: color-mix(in oklab, var(--ns-ledger-5) 10%, transparent);
+  --ns-success-border: color-mix(in oklab, var(--ns-ledger-5) 20%, transparent);
+
+  --ns-warning: var(--ns-amber-5);
+  /* Text on a tinted warning chip. Not `--ns-warning`: amber-5 is the fill
+     role and measures 2.9:1 as small text on paper. The 4.5:1 a chip's label
+     needs starts at amber-8 in light (5.75:1) and amber-5 in dark (6.00:1). */
+  --ns-warning-text: var(--ns-amber-8);
+  --ns-warning-fg: var(--ns-paper-12);
+  --ns-warning-subtle: color-mix(in oklab, var(--ns-amber-5) 10%, transparent);
+  --ns-warning-border: color-mix(in oklab, var(--ns-amber-5) 20%, transparent);
+
+  --ns-destructive: var(--ns-rust-5);
+  --ns-destructive-fg: #ffffff;
+  /* Hover goes darker on a light ground and lighter on a dark one, so the pair
+     has to be a role the theme re-steps. A component that hardcodes rust-7 for
+     hover is a component whose hover is invisible on one ground (T2a). */
+  --ns-destructive-hover: var(--ns-rust-7);
+  --ns-destructive-subtle: color-mix(in oklab, var(--ns-rust-5) 10%, transparent);
+  --ns-destructive-border: color-mix(in oklab, var(--ns-rust-5) 20%, transparent);
+
+  --ns-money-pos: var(--ns-ledger-6);
+  --ns-money-neg: var(--ns-rust-6);
+  --ns-money-flat: var(--ns-paper-7);
+
+  --ns-status-draft: var(--ns-ink-5);
+  --ns-status-issued: var(--ns-brass-6);
+  --ns-status-paid: var(--ns-ledger-6);
+  --ns-status-failed: var(--ns-rust-6);
+  --ns-status-refunded: var(--ns-brass-5);
+  --ns-status-void: var(--ns-paper-6);
+  --ns-status-review: var(--ns-ink-6);
+  --ns-status-compensated: var(--ns-ledger-5);
+
+  /* Chart series cycle — fixed order, so a series keeps its colour across
+     renders and across routes. The cycle is keyed by index, never by data
+     order, so a sort cannot re-colour a series (H3). */
+  --ns-series-1: var(--ns-ledger-6);
+  --ns-series-2: var(--ns-brass-8);
+  --ns-series-3: var(--ns-ink-6);
+  --ns-series-4: var(--ns-rust-6);
+  --ns-series-5: var(--ns-amber-6);
+  --ns-series-6: var(--ns-paper-7);
+  --ns-chart-grid: rgba(31, 26, 20, 0.07);
+  --ns-chart-axis: var(--ns-paper-6);
+
+  /* The em dash's own tone. Absence is a fact the reader has to be able to
+     see, so this is the floor, not a decoration: measured against the card it
+     was 2.35:1 at paper-5, under the 3:1 that even a large glyph needs.
+     paper-6 clears that floor at 4.03:1 and stays quieter than every value it
+     sits beside — money-pos measures 4.90:1 here, so a step that reached the
+     4.5:1 small-text bar would out-shout the real amounts it is standing in
+     for. Light is the binding theme: it is the money ramp, not the paper one,
+     that runs out of headroom first. */
+  --ns-absent: var(--ns-paper-6);
+
+  /* The chart tooltip inverts against the card in both themes, so no component
+     has to ask which theme is active (T3). */
+  --ns-tip-bg: var(--ns-paper-12);
+  --ns-tip-fg: var(--ns-paper-1);
+
+  --ns-border: rgba(31, 26, 20, 0.08);
+  --ns-border-hover: rgba(31, 26, 20, 0.14);
+  --ns-border-strong: rgba(31, 26, 20, 0.22);
+
+  --ns-input-border: var(--ns-paper-4);
+  --ns-ring: var(--ns-ledger-5);
+
+  /* A switch thumb stays light in both themes. It cannot be a ramp step: the
+     paper ramp inverts, so `paper-12` is near-black in light and near-white in
+     dark — a component that reaches for it directly breaks one theme. */
+  --ns-control-thumb: #ffffff;
+
+  --ns-font-sans: "Inter", "SF Pro Text", system-ui, sans-serif;
+  --ns-font-mono: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+  --ns-font-numeric: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+  --ns-numeric-tabular: tabular-nums;
+
+  --ns-text-xs: 0.75rem;
+  --ns-text-sm: 0.875rem;
+  --ns-text-base: 1rem;
+  --ns-text-lg: 1.125rem;
+  --ns-text-xl: 1.25rem;
+  --ns-text-2xl: 1.5rem;
+  --ns-text-3xl: 1.875rem;
+  --ns-text-4xl: 2.25rem;
+  /* The page's one answer, above every card's own hero. `--ns-text-4xl` is
+     the card hero, so a page that needs a figure larger than the cards beside
+     it used to have nowhere to step: the widget hero and the page hero were
+     the same size, which is what makes a console read as a grid of equal
+     tiles rather than as a page with a headline. Sizes are theme-invariant,
+     so there is no dark override for this one. */
+  --ns-text-display: 3rem;
+  --ns-text-3xs: 0.625rem;
+  --ns-text-2xs: 0.6875rem;
+  --ns-text-chat: 0.9375rem;
+  --ns-text-money: 0.9375rem;
+
+  --ns-leading-tight: 1.1;
+  --ns-leading-snug: 1.3;
+  --ns-leading-normal: 1.5;
+  --ns-leading-relaxed: 1.7;
+
+  --ns-tracking-tight: -0.02em;
+  --ns-tracking-normal: 0;
+  --ns-tracking-wide: 0.12em;
+
+  --ns-space-0: 0;
+  --ns-space-px: 1px;
+  --ns-space-0-5: 0.125rem;
+  --ns-space-1: 0.25rem;
+  --ns-space-1-5: 0.375rem;
+  --ns-space-2: 0.5rem;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "shadow\|radius" assets/tokens.css | head -40; echo "=== DARK OVERRIDES COUNT ==="; grep -c "" assets/tokens.css; echo "=== dark blocks ==="; grep -n "data-theme\|^}" assets/tokens.css | head -20
+231:  --ns-radius-sm: 4px;
+232:  --ns-radius-md: 6px;
+233:  --ns-radius-lg: 8px;
+234:  --ns-radius-xl: 12px;
+235:  --ns-radius-2xl: 16px;
+236:  /* The containing card is the largest radius on the page; a panel inside it
+237:     steps down to --ns-radius-xl and every control inside those is a full pill.
+238:     Nothing shares a radius with the thing it sits inside (C7). */
+239:  --ns-radius-3xl: 24px;
+240:  --ns-radius-full: 9999px;
+242:  --ns-shadow-xs: 0 1px 2px rgba(23, 58, 44, 0.08);
+243:  --ns-shadow-sm: 0 1px 3px rgba(23, 58, 44, 0.1), 0 1px 2px rgba(23, 58, 44, 0.06);
+244:  --ns-shadow-md: 0 4px 6px rgba(23, 58, 44, 0.09), 0 2px 4px rgba(23, 58, 44, 0.06);
+245:  --ns-shadow-lg: 0 10px 15px rgba(23, 58, 44, 0.09), 0 4px 6px rgba(23, 58, 44, 0.05);
+246:  --ns-shadow-xl: 0 20px 25px rgba(23, 58, 44, 0.18), 0 10px 10px rgba(23, 58, 44, 0.08);
+248:     Never a hard offset — an offset shadow reads as a toy, and mixed from a
+250:  --ns-shadow-ambient: 0 10px 30px -12px rgba(23, 58, 44, 0.16), 0 2px 6px -2px rgba(23, 58, 44, 0.06);
+251:  --ns-shadow-drawer: -8px 0 30px rgba(23, 58, 44, 0.18);
+365:  --ns-shadow-xs: 0 1px 2px rgba(4, 12, 9, 0.4);
+366:  --ns-shadow-sm: 0 1px 3px rgba(4, 12, 9, 0.35), 0 1px 2px rgba(4, 12, 9, 0.24);
+367:  --ns-shadow-md: 0 4px 6px rgba(4, 12, 9, 0.3), 0 2px 4px rgba(4, 12, 9, 0.2);
+368:  --ns-shadow-lg: 0 10px 15px rgba(4, 12, 9, 0.3), 0 4px 6px rgba(4, 12, 9, 0.14);
+369:  --ns-shadow-xl: 0 20px 25px rgba(4, 12, 9, 0.44), 0 10px 10px rgba(4, 12, 9, 0.22);
+370:  --ns-shadow-ambient: 0 10px 30px -12px rgba(4, 12, 9, 0.55), 0 2px 6px -2px rgba(4, 12, 9, 0.3);
+371:  --ns-shadow-drawer: -8px 0 30px rgba(4, 12, 9, 0.5);
+=== DARK OVERRIDES COUNT ===
+372
+=== dark blocks ===
+264:}
+266:[data-theme='dark'] {
+372:}
+[0m
+[0m# [0mTodos
+[•] Audit identity gaps: font stack vs loaded fonts, token coverage
+[ ] Fix type identity: display face + correct sans stack in tokens.json/tokens.css
+[ ] Create components/blocks/ — composed run console, invoice detail, overview blocks
+[ ] Make shell unavoidable: breadcrumbs on every product route
+[ ] Motion that means something: gauge fill, row resolve, total count-up
+[ ] In-between states audit: retrying, part-paid, partially refunded, reconciling
+[ ] Verify: deno check, tests, dev-server render of composed blocks
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/product/status-badge.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== font refs anywhere ===" && grep -rn "Inter\|DM Sans\|DM Mono\|fonts.googleapis" --include="*.tsx" --include="*.ts" --include="*.css" --include="*.json" --include="*.html" . 2>/dev/null | grep -v node_modules | grep -v _fresh | head -20
+=== font refs anywhere ===
+./components/ui/desktop-notification.tsx:16:  readonly requireInteraction?: boolean;
+./assets/tokens.css:161:  --ns-font-sans: "Inter", "SF Pro Text", system-ui, sans-serif;
+./assets/tokens.css:162:  --ns-font-mono: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+./assets/tokens.css:163:  --ns-font-numeric: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+./assets/tokens.json:1022:      "value": "\"Inter\", \"SF Pro Text\", system-ui, sans-serif",
+./assets/tokens.json:1031:      "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace",
+./assets/tokens.json:1040:      "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace",
+./routes/_app.tsx:24:        <link rel='preconnect' href='https://fonts.googleapis.com' />
+./routes/_app.tsx:27:          href='https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap'
+./routes/(design)/design/(_components)/composition-view.tsx:28:      'Interactive primitives (accordion, tabs, drawer, tooltip) that centralize keyboard interaction, focus management, and ARIA. L1 emits data attributes, refs, and handlers — never ns-* component classes.',
+./routes/(design)/design/(_components)/composition-view.tsx:294:              lede='Interactive state is expressed with platform attributes, so styling and behavior stay decoupled.'
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 -c "
+import json
+d=json.load(open('assets/tokens.json'))
+print(list(d.keys()))
+print('---typography---')
+print(json.dumps(d.get('typography', d), indent=1)[:3000])
+"
+['version', 'generatedBy', 'tokens', 'themes']
+---typography---
+{
+ "version": 1,
+ "generatedBy": "hand-maintained (see RECORD.md)",
+ "tokens": {
+  "paper-1": {
+   "type": "color",
+   "value": "oklch(98.5% 0.009 95)",
+   "cssVar": "--ns-paper-1",
+   "path": [
+    "color",
+    "paper",
+    "1"
+   ]
+  },
+  "paper-2": {
+   "type": "color",
+   "value": "oklch(94.5% 0.009 95)",
+   "cssVar": "--ns-paper-2",
+   "path": [
+    "color",
+    "paper",
+    "2"
+   ]
+  },
+  "paper-3": {
+   "type": "color",
+   "value": "oklch(88.5% 0.009 95)",
+   "cssVar": "--ns-paper-3",
+   "path": [
+    "color",
+    "paper",
+    "3"
+   ]
+  },
+  "paper-4": {
+   "type": "color",
+   "value": "oklch(80.5% 0.009 95)",
+   "cssVar": "--ns-paper-4",
+   "path": [
+    "color",
+    "paper",
+    "4"
+   ]
+  },
+  "paper-5": {
+   "type": "color",
+   "value": "oklch(73.5% 0.009 95)",
+   "cssVar": "--ns-paper-5",
+   "path": [
+    "color",
+    "paper",
+    "5"
+   ]
+  },
+  "paper-6": {
+   "type": "color",
+   "value": "oklch(59.5% 0.009 95)",
+   "cssVar": "--ns-paper-6",
+   "path": [
+    "color",
+    "paper",
+    "6"
+   ]
+  },
+  "paper-7": {
+   "type": "color",
+   "value": "oklch(47% 0.009 95)",
+   "cssVar": "--ns-paper-7",
+   "path": [
+    "color",
+    "paper",
+    "7"
+   ]
+  },
+  "paper-8": {
+   "type": "color",
+   "value": "oklch(37% 0.009 95)",
+   "cssVar": "--ns-paper-8",
+   "path": [
+    "color",
+    "paper",
+    "8"
+   ]
+  },
+  "paper-9": {
+   "type": "color",
+   "value": "oklch(27% 0.009 95)",
+   "cssVar": "--ns-paper-9",
+   "path": [
+    "color",
+    "paper",
+    "9"
+   ]
+  },
+  "paper-10": {
+   "type": "color",
+   "value": "oklch(21.5% 0.009 95)",
+   "cssVar": "--ns-paper-10",
+   "path": [
+    "color",
+    "paper",
+    "10"
+   ]
+  },
+  "paper-11": {
+   "type": "color",
+   "value": "oklch(17.5% 0.009 95)",
+   "cssVar": "--ns-paper-11",
+   "path": [
+    "color",
+    "paper",
+    "11"
+   ]
+  },
+  "paper-12": {
+   "type": "color",
+   "value": "oklch(13.5% 0.009 95)",
+   "cssVar": "--ns-paper-12",
+   "path": [
+    "color",
+    "paper",
+    "12"
+   ]
+  },
+  "ledger-1": {
+   "type": "color",
+   "value": "oklch(95.5% 0.09 155)",
+   "cssVar": "--ns-ledger-1",
+   "path": [
+    "color",
+    "ledger",
+    "1"
+   ]
+  },
+  "ledger-2": {
+   "type": "color",
+   "value": "oklch(87.5% 0.11 155)",
+   "cssVar": "--ns-ledger-2",
+   "path": [
+    "color",
+    "ledger",
+    "2"
+   ]
+  },
+  "ledger-3": {
+   "type": "color",
+   "value": "oklch(78.5% 0.11 155)",
+   "cssVar": "--ns-ledger-3",
+   "path": [
+    "color",
+    "ledger",
+    "3"
+   ]
+  },
+  "ledger-4": {
+   "type": "color",
+   "value": "oklch(70.5% 0.11 155)",
+   "cssVar": "--ns-ledger-4",
+   "path": [
+    "color",
+    "ledger",
+    "4"
+   ]
+  },
+  "ledger-5": {
+   "type": "color",
+   "value": "oklch(61% 0.11 155)",
+   "cssVar": "--ns-ledger-5",
+   "path": [
+    "color",
+    "ledger",
+    "5"
+   ]
+  },
+  "ledger-6": {
+   "type": "color",
+   "value": "oklch(53.5% 0.11 155)",
+   "cssVar": "--ns-ledger-6",
+   "path": [
+    "color",
+    "ledger",
+    "6"
+   ]
+  },
+  "ledger-7": {
+   "type": "color",
+   "value": "oklch(4
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 -c "
+import json
+d=json.load(open('assets/tokens.json'))
+t=d['tokens']
+for k in t:
+    if 'font' in k or 'display' in k:
+        print(k, json.dumps(t[k]))
+"
+font-sans {"type": "fontFamily", "value": "\"Inter\", \"SF Pro Text\", system-ui, sans-serif", "cssVar": "--ns-font-sans", "path": ["font", "sans"]}
+font-mono {"type": "fontFamily", "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace", "cssVar": "--ns-font-mono", "path": ["font", "mono"]}
+font-numeric {"type": "font", "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace", "cssVar": "--ns-font-numeric", "path": ["font", "numeric"]}
+text-display {"type": "dimension", "value": "3rem", "cssVar": "--ns-text-display", "path": ["text", "display"]}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 -c "
+import json
+d=json.load(open('deno.json'))
+print(json.dumps(d.get('tasks',{}), indent=1))
+"
+{
+ "check": "deno fmt --check . && deno lint . && deno check",
+ "deps:closure": "deno run --allow-read .netscript/verify-dependency-closure.ts",
+ "dev": "deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native",
+ "build": "deno task deps:closure && deno run -A npm:vite build",
+ "serve": "deno run -A npm:vite preview",
+ "start": "deno serve -A _fresh/server.js",
+ "update": "deno run -A -r jsr:@fresh/update ."
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && echo "=== files on master under routes/runs ===" && git ls-tree -r --name-only master -- apps/ledgerline-web/routes | head -60
+=== files on master under routes/runs ===
+apps/ledgerline-web/routes/(_components)/health-view.tsx
+apps/ledgerline-web/routes/(_components)/home-view.tsx
+apps/ledgerline-web/routes/(_shared)/health.ts
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+apps/ledgerline-web/routes/(design)/design/(_islands)/TokenClipboard.tsx
+apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts
+apps/ledgerline-web/routes/(design)/design/(_shared)/tokens.ts
+apps/ledgerline-web/routes/(design)/design/_layout.tsx
+apps/ledgerline-web/routes/(design)/design/_middleware.ts
+apps/ledgerline-web/routes/(design)/design/components.tsx
+apps/ledgerline-web/routes/(design)/design/composition.tsx
+apps/ledgerline-web/routes/(design)/design/index.tsx
+apps/ledgerline-web/routes/(design)/design/tokens.tsx
+apps/ledgerline-web/routes/_app.tsx
+apps/ledgerline-web/routes/_layout.tsx
+apps/ledgerline-web/routes/customers/(_components)/customer-header.tsx
+apps/ledgerline-web/routes/customers/(_components)/customer-invoices.tsx
+apps/ledgerline-web/routes/customers/(_components)/customer-ledger.tsx
+apps/ledgerline-web/routes/customers/(_components)/customer-list.tsx
+apps/ledgerline-web/routes/customers/[id].tsx
+apps/ledgerline-web/routes/customers/index.tsx
+apps/ledgerline-web/routes/health.tsx
+apps/ledgerline-web/routes/index.tsx
+apps/ledgerline-web/routes/invoices/(_components)/invoice-body.tsx
+apps/ledgerline-web/routes/invoices/(_components)/invoice-header.tsx
+apps/ledgerline-web/routes/invoices/(_components)/invoice-list.tsx
+apps/ledgerline-web/routes/invoices/[id].tsx
+apps/ledgerline-web/routes/invoices/index.tsx
+apps/ledgerline-web/routes/partials/runs/console.tsx
+apps/ledgerline-web/routes/partials/runs/list.tsx
+apps/ledgerline-web/routes/runs/(_components)/create-run-form.tsx
+apps/ledgerline-web/routes/runs/(_components)/run-actions.tsx
+apps/ledgerline-web/routes/runs/(_components)/run-items-table.tsx
+apps/ledgerline-web/routes/runs/(_components)/run-summary.tsx
+apps/ledgerline-web/routes/runs/(_components)/runs-table.tsx
+apps/ledgerline-web/routes/runs/(_islands)/run-console-live.tsx
+apps/ledgerline-web/routes/runs/(_islands)/saga-instances.tsx
+apps/ledgerline-web/routes/runs/[id].tsx
+apps/ledgerline-web/routes/runs/index.tsx
+apps/ledgerline-web/routes/webhooks/(_components)/webhooks-view.tsx
+apps/ledgerline-web/routes/webhooks/index.tsx
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/(_components)/home-view.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && echo "=== services ===" && ls services/ && echo "=== contracts ===" && ls contracts/ && find contracts -name "*.ts" | head -20
+=== services ===
+_shared
+billing
+runs
+webhooks
+=== contracts ===
+deno.json
+mod.ts
+versions
+contracts/versions/v1/billing.contract.ts
+contracts/versions/v1/webhooks.contract.ts
+contracts/versions/v1/mod.ts
+contracts/versions/v1/runs.contract.ts
+contracts/mod.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== lib ===" && ls lib/ && echo "=== islands ===" && ls islands/ islands/ui 2>/dev/null
+=== lib ===
+billing.ts
+cn.ts
+money.ts
+public-types.ts
+runs.ts
+sagas.ts
+service-auth.ts
+ui
+webhooks.ts
+=== islands ===
+islands/:
+ui
+
+islands/ui:
+DesktopOnly.tsx
+RangeControlDemo.tsx
+SidebarToggle.tsx
+ThemeToggle.tsx
+Toast.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && grep -n "^\s*\(get\|list\|create\|update\|delete\|compute\|issue\|decide\|attempt\|refund\|void\|apply\|replay\|summary\|overview\|stats\)[A-Za-z]*\s*:" contracts/versions/v1/billing.contract.ts contracts/versions/v1/runs.contract.ts contracts/versions/v1/webhooks.contract.ts | head -60
+contracts/versions/v1/billing.contract.ts:68:    createdAt: true,
+contracts/versions/v1/billing.contract.ts:74:    createdAt: IsoDateTimeSchemaV1,
+contracts/versions/v1/billing.contract.ts:305:    issuedAt: true,
+contracts/versions/v1/billing.contract.ts:316:    issuedAt: IsoDateTimeSchemaV1.nullable(),
+contracts/versions/v1/billing.contract.ts:372:    replayed: z.boolean().describe('True when an idempotency key replayed a stored response'),
+contracts/versions/v1/billing.contract.ts:403:    createdAt: true,
+contracts/versions/v1/billing.contract.ts:408:    createdAt: IsoDateTimeSchemaV1,
+contracts/versions/v1/billing.contract.ts:423:    createdAt: true,
+contracts/versions/v1/billing.contract.ts:427:    createdAt: IsoDateTimeSchemaV1,
+contracts/versions/v1/billing.contract.ts:468:    list: baseContract
+contracts/versions/v1/billing.contract.ts:473:    get: baseContract
+contracts/versions/v1/billing.contract.ts:478:    create: baseContract
+contracts/versions/v1/billing.contract.ts:486:    list: baseContract
+contracts/versions/v1/billing.contract.ts:494:    list: baseContract
+contracts/versions/v1/billing.contract.ts:502:    list: baseContract
+contracts/versions/v1/billing.contract.ts:507:    get: baseContract
+contracts/versions/v1/billing.contract.ts:512:    create: baseContract
+contracts/versions/v1/billing.contract.ts:540:    applyChange: baseContract
+contracts/versions/v1/billing.contract.ts:555:    summary: baseContract
+contracts/versions/v1/billing.contract.ts:563:    list: baseContract
+contracts/versions/v1/billing.contract.ts:568:    get: baseContract
+contracts/versions/v1/billing.contract.ts:573:    issue: baseContract
+contracts/versions/v1/billing.contract.ts:578:    void: baseContract
+contracts/versions/v1/billing.contract.ts:598:    refund: baseContract
+contracts/versions/v1/billing.contract.ts:617:    createDraft: baseContract
+contracts/versions/v1/billing.contract.ts:627:        created: z.boolean(),
+contracts/versions/v1/billing.contract.ts:641:    create: baseContract
+contracts/versions/v1/billing.contract.ts:659:    list: baseContract
+contracts/versions/v1/billing.contract.ts:667:    list: baseContract
+contracts/versions/v1/runs.contract.ts:59:    issuedCount: true,
+contracts/versions/v1/runs.contract.ts:62:    createdAt: true,
+contracts/versions/v1/runs.contract.ts:68:    createdAt: IsoDateTimeSchemaV1,
+contracts/versions/v1/runs.contract.ts:83:    computedTotal: true,
+contracts/versions/v1/runs.contract.ts:86:    decidedBy: true,
+contracts/versions/v1/runs.contract.ts:90:    computedTotal: MoneySchemaV1.nullable(),
+contracts/versions/v1/runs.contract.ts:149:    computed: MoneySchemaV1,
+contracts/versions/v1/runs.contract.ts:150:    issued: MoneySchemaV1,
+contracts/versions/v1/runs.contract.ts:166:  list: baseContract
+contracts/versions/v1/runs.contract.ts:172:  get: baseContract
+contracts/versions/v1/runs.contract.ts:178:  create: baseContract
+contracts/versions/v1/runs.contract.ts:184:  compute: baseContract
+contracts/versions/v1/runs.contract.ts:190:  decide: baseContract
+contracts/versions/v1/runs.contract.ts:196:  issue: baseContract
+contracts/versions/v1/webhooks.contract.ts:30:  summary: z.string().min(1).describe('Short record summary'),
+contracts/versions/v1/webhooks.contract.ts:32:  createdAt: z.string().datetime().describe('ISO creation timestamp'),
+contracts/versions/v1/webhooks.contract.ts:79:  list: oc
+contracts/versions/v1/webhooks.contract.ts:83:  updateStatus: oc
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "^export" lib/billing.ts | head -40; echo "=== webhooks lib ==="; grep -n "^export" lib/webhooks.ts | head -30
+6:export const billingName = 'billing';
+7:export const billingRouterName = 'billing';
+8:export const billingContract = BillingContractV1;
+10:export const billingClient = createServiceClient<
+30:export const billingQueryUtils = createServiceQueryUtils(billingClient, {
+=== webhooks lib ===
+5:export const webhooksName = 'webhooks';
+6:export const webhooksRouterName = 'webhooks';
+7:export const webhooksContract = WebhooksContractV1;
+9:export const webhooksClient = createServiceClient<typeof webhooksContract>({
+15:export const webhooksQueries = createQueryFactories({
+22:export const webhooksListInvalidation = { queryKey: webhooksQueries.list.clientKey() } as const;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '520,575p' contracts/versions/v1/billing.contract.ts
+id: z.string(),
+        targetPlanVersionId: z.string().min(1),
+        effectiveAt: IsoDateTimeSchemaV1.optional(),
+      }))
+      .output(ChangePreviewOutputSchemaV1)
+      .meta({ access: Roles.read }),
+    changePlan: baseContract
+      .route({ method: 'POST', path: '/subscriptions/{id}/changes' })
+      .input(z.object({
+        id: z.string(),
+        targetPlanVersionId: z.string().min(1),
+        effectiveAt: IsoDateTimeSchemaV1.optional(),
+      }))
+      .output(
+        z.object({
+          change: z.object({ id: z.string(), appliedAt: IsoDateTimeSchemaV1.nullable() }),
+          preview: ChangePreviewOutputSchemaV1,
+        }),
+      )
+      .meta({ access: Roles.write }),
+    applyChange: baseContract
+      .route({ method: 'POST', path: '/subscriptions/{id}/changes/{changeId}/apply' })
+      .input(z.object({ id: z.string(), changeId: z.string() }))
+      .output(ChangeApplyOutputSchemaV1)
+      .meta({ access: Roles.write }),
+  },
+
+  usage: {
+    ingest: baseContract
+      .route({ method: 'POST', path: '/usage/events' })
+      .input(UsageIngestInputSchemaV1)
+      .output(UsageIngestOutputSchemaV1)
+      .meta({
+        access: { authentication: 'required', authorization: { scopes: ['usage:ingest'] } },
+      }),
+    summary: baseContract
+      .route({ method: 'GET', path: '/usage/summary' })
+      .input(UsageSummaryInputSchemaV1)
+      .output(UsageSummaryOutputSchemaV1)
+      .meta({ access: Roles.read }),
+  },
+
+  invoices: {
+    list: baseContract
+      .route({ method: 'GET', path: '/invoices' })
+      .input(InvoiceListInputSchemaV1)
+      .output(InvoiceListOutputSchemaV1)
+      .meta({ access: Roles.read }),
+    get: baseContract
+      .route({ method: 'GET', path: '/invoices/{id}' })
+      .input(z.object({ id: z.string() }))
+      .output(InvoiceDetailSchemaV1)
+      .meta({ access: Roles.read }),
+    issue: baseContract
+      .route({ method: 'POST', path: '/invoices/{id}/issue' })
+      .input(z.object({ id: z.string() }))
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '140,200p' contracts/versions/v1/runs.contract.ts
+resumed: z.number().int().nonnegative(),
+  message: z.string(),
+});
+
+/** Computed projection: the run console read model with its monotonic revision. */
+export const RunConsoleOutputSchemaV1 = z.object({
+  run: RunSchemaV1,
+  items: z.array(RunItemSchemaV1),
+  totals: z.object({
+    computed: MoneySchemaV1,
+    issued: MoneySchemaV1,
+    pendingCount: z.number().int().nonnegative(),
+    failedCount: z.number().int().nonnegative(),
+  }),
+  version: z.number().int().nonnegative().describe('Monotonic console revision for live diffing'),
+});
+
+export const RunsContractV1 = {
+  health: {
+    check: baseContract
+      .route({ method: 'GET', path: '/runs/health' })
+      .input(z.object({}).optional())
+      .output(z.object({ status: z.string(), service: z.string() }))
+      .meta({ access: { authentication: 'none' } }),
+  },
+
+  list: baseContract
+    .route({ method: 'GET', path: '/runs' })
+    .input(RunListInputSchemaV1)
+    .output(RunListOutputSchemaV1)
+    .meta({ access: Roles.read }),
+
+  get: baseContract
+    .route({ method: 'GET', path: '/runs/{id}' })
+    .input(z.object({ id: z.string() }))
+    .output(RunSchemaV1)
+    .meta({ access: Roles.read }),
+
+  create: baseContract
+    .route({ method: 'POST', path: '/runs' })
+    .input(RunCreateInputSchemaV1)
+    .output(RunSchemaV1)
+    .meta({ access: Roles.write }),
+
+  compute: baseContract
+    .route({ method: 'POST', path: '/runs/{id}/compute' })
+    .input(z.object({ id: z.string() }))
+    .output(RunSchemaV1)
+    .meta({ access: Roles.write }),
+
+  decide: baseContract
+    .route({ method: 'POST', path: '/runs/{id}/decisions' })
+    .input(RunDecisionInputSchemaV1)
+    .output(RunItemSchemaV1)
+    .meta({ access: Roles.write }),
+
+  issue: baseContract
+    .route({ method: 'POST', path: '/runs/{id}/issue' })
+    .input(RunIssueInputSchemaV1)
+    .output(RunIssueOutputSchemaV1)
+    .errors({
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 - <<'EOF'
+import re
+s=open('contracts/versions/v1/billing.contract.ts').read()
+i=s.find('export const BillingContractV1')
+print(s[i:i+120])
+# top level keys: lines with exactly 2 spaces indent ending in ': {'
+for m in re.finditer(r'^  ([a-zA-Z]+): \{', s, re.M):
+    print(' -', m.group(1))
+EOF
+export const BillingContractV1 = {
+  health: {
+    check: baseContract
+      .route({ method: 'GET', path: '/billing/hea
+ - read
+ - write
+ - admin
+ - health
+ - customers
+ - plans
+ - meters
+ - subscriptions
+ - usage
+ - invoices
+ - creditNotes
+ - ledger
+ - entitlements
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '1,60p' apps/ledgerline-web/lib/billing.ts; echo "=== runs lib ==="; sed -n '1,60p' apps/ledgerline-web/lib/runs.ts
+import { createServiceClient } from '@netscript/sdk/client';
+import { createServiceQueryUtils } from '@netscript/sdk/query-client';
+import { BillingContractV1 } from '@ledgerline/contracts';
+import { serviceBearer } from './service-auth.ts';
+
+export const billingName = 'billing';
+export const billingRouterName = 'billing';
+export const billingContract = BillingContractV1;
+
+export const billingClient = createServiceClient<
+  typeof billingContract,
+  readonly [typeof serviceBearer]
+>({
+  contract: billingContract,
+  serviceName: billingName,
+  routerName: billingRouterName,
+  contributions: [serviceBearer] as const,
+});
+
+/**
+ * Typed TanStack query utils over the billing contract.
+ *
+ * The billing contract nests procedures under resource groups
+ * (`billing.invoices.list`), and `createQueryFactories` only exposes flat
+ * contracts, so the billing data layer uses the thin oRPC/TanStack remap —
+ * `queryOptions({ input })` / `.key()` / `.mutationOptions()` with the full
+ * nested inference. Runs/webhooks keep `createQueryFactories` (flat
+ * contracts) in their own lib modules.
+ */
+export const billingQueryUtils = createServiceQueryUtils(billingClient, {
+  path: ['billing'],
+});
+=== runs lib ===
+import { createServiceClient } from '@netscript/sdk/client';
+import { createQueryFactories } from '@netscript/sdk/query';
+import { RunsContractV1 } from '@ledgerline/contracts';
+import { serviceBearer } from './service-auth.ts';
+
+export const runsName = 'runs';
+export const runsRouterName = 'runs';
+export const runsContract = RunsContractV1;
+
+export const runsClient = createServiceClient<
+  typeof runsContract,
+  readonly [typeof serviceBearer]
+>({
+  contract: runsContract,
+  serviceName: runsName,
+  routerName: runsRouterName,
+  contributions: [serviceBearer] as const,
+});
+
+export const runsQueries = createQueryFactories({
+  runs: {
+    contract: runsContract,
+    client: runsClient,
+  },
+}).runs;
+
+export const runsListInvalidation = { queryKey: runsQueries.list.clientKey() } as const;
+
+export { isServiceAuthError, readService, type ServiceRead } from './service-auth.ts';
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1010,1050p' assets/tokens.json
+},
+    "tip-fg": {
+      "type": "color",
+      "value": "var(--ns-paper-1)",
+      "cssVar": "--ns-tip-fg",
+      "path": [
+        "semantic",
+        "tip-fg"
+      ]
+    },
+    "font-sans": {
+      "type": "fontFamily",
+      "value": "\"Inter\", \"SF Pro Text\", system-ui, sans-serif",
+      "cssVar": "--ns-font-sans",
+      "path": [
+        "font",
+        "sans"
+      ]
+    },
+    "font-mono": {
+      "type": "fontFamily",
+      "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace",
+      "cssVar": "--ns-font-mono",
+      "path": [
+        "font",
+        "mono"
+      ]
+    },
+    "font-numeric": {
+      "type": "font",
+      "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace",
+      "cssVar": "--ns-font-numeric",
+      "path": [
+        "font",
+        "numeric"
+      ]
+    },
+    "text-xs": {
+      "type": "dimension",
+      "value": "0.75rem",
+      "cssVar": "--ns-text-xs",
+[0m
+Now I'll fix the highest-severity defect I found: the product declares `Inter` in its token source but loads `DM Sans` — so every screen renders in the browser's fallback system font.
+[0m✗ [0mEdit /home/agent/projects/netscript/worktrees/007-aspire/../wave7-billing-steer2/apps/ledgerline-web/assets/tokens.json failed
+[91m[1mError: [0mFile /home/agent/projects/netscript/worktrees/007-aspire/../wave7-billing-steer2/apps/ledgerline-web/assets/tokens.json not found
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.json
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.json
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.json
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.json
+@@ -1018,15 +1018,24 @@
+   ]
+ },
+ "font-sans": {
+   "type": "fontFamily",
+-  "value": "\"Inter\", \"SF Pro Text\", system-ui, sans-serif",
++  "value": "\"DM Sans\", \"SF Pro Text\", system-ui, sans-serif",
+   "cssVar": "--ns-font-sans",
+   "path": [
+     "font",
+     "sans"
+   ]
+ },
++"font-display": {
++  "type": "fontFamily",
++  "value": "\"Fraunces\", \"Iowan Old Style\", Georgia, \"Times New Roman\", serif",
++  "cssVar": "--ns-font-display",
++  "path": [
++    "font",
++    "display"
++  ]
++},
+ "font-mono": {
+   "type": "fontFamily",
+   "value": "\"DM Mono\", ui-monospace, \"SF Mono\", \"Cascadia Code\", monospace",
+   "cssVar": "--ns-font-mono",
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/tokens.css
+@@ -157,9 +157,19 @@
+    paper ramp inverts, so `paper-12` is near-black in light and near-white in
+    dark — a component that reaches for it directly breaks one theme. */
+ --ns-control-thumb: #ffffff;
+ 
+---ns-font-sans: "Inter", "SF Pro Text", system-ui, sans-serif;
++/* The UI face is DM Sans, and DM Sans is what `_app.tsx` actually loads.
++   It used to be declared here as "Inter" — a family this app never requests,
++   so every screen silently fell through to `system-ui`. The token layer was
++   naming a typeface the product did not have. */
++--ns-font-sans: "DM Sans", "SF Pro Text", system-ui, sans-serif;
++/* The voice. A warm old-style serif, spent only where a heading has to be
++   read as a sentence rather than scanned as a field: the wordmark, page and
++   section headings, and the empty-state line that has to be read at all.
++   It never touches a figure — money, ids and every tabular column stay in
++   the numeric face, because a serif digit is a trust problem, not a style. */
++--ns-font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
+ --ns-font-mono: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+ --ns-font-numeric: "DM Mono", ui-monospace, "SF Mono", "Cascadia Code", monospace;
+ --ns-numeric-tabular: tabular-nums;
+ 
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+@@ -22,9 +22,20 @@
+ <title>ledgerline — ledgerline-web</title>
+ <link rel='icon' href='data:,' />
+ <link rel='preconnect' href='https://fonts.googleapis.com' />
+ <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
++{/*
++  Two stylesheets, deliberately. The display face is the product's voice
++  and the UI face is what every field, label and button is set in — a
++  single combined request means one bad axis spec from the font CDN
++  costs both, and the app falls back to `system-ui` with no error. Split,
++  a failure degrades to a sans-only product that still reads as designed.
++*/}
+ <link
++  href='https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap'
++  rel='stylesheet'
++/>
++<link
+   href='https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap'
+   rel='stylesheet'
+ />
+ <script>{THEME_INIT_SCRIPT}</script>
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rn "ns-topbar__brand" assets/*.css | head; echo "=== headings ==="; grep -rn "^h1\|^h2\|^h3\|h1,\|h1 {" assets/*.css | head -20; echo "=== empty-state heading ==="; grep -rn "empty-state" assets/ui/*.css assets/*.css | head -10
+assets/layouts.css:251:.ns-topbar__brand {
+assets/layouts.css:264:.ns-topbar__brand em {
+=== headings ===
+assets/layouts.css:281:.ns-page-header h1 {
+assets/styles.css:91:  h1,
+=== empty-state heading ===
+assets/ui/empty-state.css:3:.ns-empty-state {
+assets/ui/empty-state.css:11:.ns-empty-state__heading {
+assets/styles.css:34:@import './ui/empty-state.css';
+assets/tokens.css:168:     section headings, and the empty-state line that has to be read at all.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '245,300p' assets/layouts.css; echo "=== styles.css 80-115 ==="; sed -n '80,115p' assets/styles.css; echo "=== empty-state 1-30 ==="; sed -n '1,30p' assets/ui/empty-state.css
+justify-content: space-between;
+  gap: var(--ns-space-4);
+  padding-inline: var(--ns-space-8);
+  border-bottom: 1px solid var(--ns-border);
+}
+
+.ns-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  min-width: 0;
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-sm);
+  font-weight: 500;
+  color: inherit;
+  letter-spacing: var(--ns-tracking-tight);
+  text-decoration: none;
+}
+
+.ns-topbar__brand em {
+  font-style: normal;
+}
+
+.ns-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-5);
+  padding-block: var(--ns-space-6) var(--ns-space-8);
+}
+
+/* The status/meta line reads as a footnote to the header: extra breathing
+   room above it so it never hugs the action buttons (and their shadows). */
+.ns-page-header > .ns-status-bar {
+  margin-block-start: var(--ns-space-1);
+}
+
+.ns-page-header h1 {
+  font-size: var(--ns-text-4xl);
+  font-weight: 700;
+  letter-spacing: var(--ns-tracking-tight);
+  line-height: var(--ns-leading-tight);
+  color: var(--ns-fg);
+}
+
+.ns-page-header .ns-lede {
+  font-size: 0.925rem;
+  line-height: var(--ns-leading-relaxed);
+  color: var(--ns-muted-fg);
+  max-width: 62ch;
+}
+
+.ns-status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ns-space-2);
+=== styles.css 80-115 ===
+    @apply bg-ns-bg text-ns-fg font-sans;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: var(--ns-primary-border);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  a,
+  button {
+    touch-action: manipulation;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight leading-tight;
+    text-wrap: balance;
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* App-specific custom styles below. */
+=== empty-state 1-30 ===
+/* EmptyState block styles. */
+
+.ns-empty-state {
+  border: 1px dashed var(--ns-border);
+  border-radius: var(--ns-radius-md);
+  padding: var(--ns-space-4);
+  font-size: var(--ns-text-sm);
+  color: var(--ns-muted-fg);
+}
+
+.ns-empty-state__heading {
+  font-weight: 600;
+  color: var(--ns-fg);
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '98,200p' assets/styles.css; echo "=== section-title classes ==="; grep -rn "ns-section-title\|ns-section-heading\|ns-h2" assets/*.css | head
+}
+}
+
+/* App-specific custom styles below. */
+=== section-title classes ===
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+@@ -98,4 +98,66 @@
+   }
+ }
+ 
+ /* App-specific custom styles below. */
++
++/*
++ * The display face is spent on prose, never on data.
++ *
++ * A heading has to be read as a sentence; a label has to be scanned as a
++ * field. So the serif goes on the wordmark, page and section headings, and
++ * the empty-state line that exists to be read, and it is taken back off every
++ * surface that carries a value — card titles, table headers, badge text and
++ * anything explicitly monospaced. A date range like `2026-08-01 → 2026-08-31`
++ * is data even when it sits in an `h1`, so `.ns-widget__title` opts out.
++ *
++ * Fallback stack matters here: if Fraunces does not arrive, this degrades to
++ * Georgia, which is still a deliberate serif, rather than to the sans default.
++ */
++.ns-topbar__brand,
++.ns-page-header h1,
++.ns-section-heading,
++.ns-section-heading h2,
++.ns-section-heading h3,
++.ns-empty-state__heading,
++.ns-display {
++  font-family: var(--ns-font-display);
++  font-optical-sizing: auto;
++  font-variant-ligatures: common-ligatures;
++}
++
++.ns-page-header h1 {
++  font-weight: 600;
++  letter-spacing: -0.015em;
++}
++
++.ns-empty-state__heading {
++  font-size: var(--ns-text-base);
++}
++
++/*
++ * Opt-outs. Every one of these is a label or a value, so each keeps the UI
++ * face regardless of the element it happens to be rendered as.
++ */
++.ns-widget__title,
++.ns-card__title,
++.ns-table th,
++.ns-badge,
++.ns-delta-chip,
++.ns-money,
++.font-mono,
++[class*='font-mono'] {
++  font-family: var(--ns-font-sans);
++}
++
++.ns-widget__title,
++.ns-card__title {
++  font-weight: 600;
++}
++
++/* Money keeps the numeric face wherever the display rules above could reach
++   it — a tabular figure set in a proportional serif is not the same number. */
++.ns-money,
++[class*='font-mono'] {
++  font-family: var(--ns-font-numeric);
++  font-variant-numeric: var(--ns-numeric-tabular);
++}
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && for c in "ns-card__title" "ns-table" "ns-money" "ns-widget__title" "ns-delta-chip" "ns-badge"; do printf "%-20s " "$c"; grep -rl "$c" assets/ components/ | grep -v node_modules | head -3 | tr '\n' ' '; echo; done
+ns-card__title       assets/styles.css assets/ui/surface-styles.css components/ui/card.tsx 
+ns-table             assets/styles.css 
+ns-money             assets/theme-bridge.css assets/tokens.css assets/tokens.json 
+ns-widget__title     assets/styles.css assets/blocks/widget-card.css components/ui/widget-card.tsx 
+ns-delta-chip        assets/styles.css assets/ui/delta-chip.css components/ui/delta-chip.tsx 
+ns-badge             assets/styles.css assets/ui/badge.css assets/ui/status-badge.css
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== money-text classes ===" && grep -n "class=" components/product/money-text.tsx | head -20; echo "=== table classes ==="; grep -rn "ns-responsive-table\|ns-table\|ns-data-table" components/ui/responsive-table.tsx components/ui/data-table.tsx 2>/dev/null | head -10
+=== money-text classes ===
+52:      <span class={cn('ns-money-text', className)} data-money='absent' data-currency={currency}>
+54:        <span class='sr-only'>not measured</span>
+61:      class={cn('ns-money-text', className)}
+70:      {parts.currency !== null && <span class='ns-money-text__currency'>{parts.currency}</span>}
+=== table classes ===
+components/ui/responsive-table.tsx:49:      class={cn('ns-responsive-table', className)}
+components/ui/responsive-table.tsx:52:      <div class='ns-responsive-table__scroller'>
+components/ui/responsive-table.tsx:53:        <table class='ns-responsive-table__table'>
+components/ui/responsive-table.tsx:54:          {caption && <caption class='ns-responsive-table__caption'>{caption}</caption>}
+components/ui/responsive-table.tsx:55:          <thead class='ns-responsive-table__head'>
+components/ui/responsive-table.tsx:56:            <tr class='ns-responsive-table__row ns-responsive-table__row--head'>
+components/ui/responsive-table.tsx:60:                  class={cn('ns-responsive-table__header', column.headerClass)}
+components/ui/responsive-table.tsx:69:          <tbody class='ns-responsive-table__body'>
+components/ui/responsive-table.tsx:72:                <tr class='ns-responsive-table__row'>
+components/ui/responsive-table.tsx:73:                  <td class='ns-responsive-table__empty' colSpan={columns.length}>
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "class=" components/ui/data-table.tsx | head -12; echo "=== surface-styles card title ==="; grep -n "ns-card__title\|ns-card__header" assets/ui/surface-styles.css | head
+33:  return <Card {...props} class={cn('ns-data-table', className)}>{children}</Card>;
+38:    <Card.Header {...props} class={cn('ns-data-table__header', className)}>
+45:  return <div {...props} class={cn('ns-data-table__body', className)}>{children}</div>;
+55:    <div {...props} style={gridStyle} class={cn('ns-data-table__row', className)}>
+63:    <div {...props} class={cn('ns-data-table__footer', className)}>
+=== surface-styles card title ===
+22:.ns-card__header,
+32:.ns-card__title,
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+@@ -139,25 +139,29 @@
+  * face regardless of the element it happens to be rendered as.
+  */
+ .ns-widget__title,
+ .ns-card__title,
+-.ns-table th,
++.ns-data-table__header,
++.ns-responsive-table__header,
+ .ns-badge,
+ .ns-delta-chip,
+-.ns-money,
+-.font-mono,
+-[class*='font-mono'] {
++.ns-money-text {
+   font-family: var(--ns-font-sans);
+ }
+ 
+ .ns-widget__title,
+ .ns-card__title {
+   font-weight: 600;
+ }
+ 
+-/* Money keeps the numeric face wherever the display rules above could reach
+-   it — a tabular figure set in a proportional serif is not the same number. */
+-.ns-money,
+-[class*='font-mono'] {
++/*
++ * Money, ids and every tabular column keep the numeric face wherever the
++ * display rules above could otherwise reach them: a tabular figure set in a
++ * proportional serif is not the same number, and `ns-money-text` renders the
++ * currency as its own span precisely so the two can never collide.
++ */
++.ns-money-text,
++.ns-money-text__currency,
++.font-mono {
+   font-family: var(--ns-font-numeric);
+   font-variant-numeric: var(--ns-numeric-tabular);
+ }
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 300 deno check 2>&1 | tail -20; echo "EXIT=$?"
+[0m[32mCheck[0m routes/invoices/(_components)/invoice-header.tsx
+[0m[32mCheck[0m routes/invoices/(_components)/invoice-list.tsx
+[0m[32mCheck[0m routes/invoices/[id].tsx
+[0m[32mCheck[0m routes/invoices/index.tsx
+[0m[32mCheck[0m routes/partials/runs/console.tsx
+[0m[32mCheck[0m routes/partials/runs/list.tsx
+[0m[32mCheck[0m routes/runs/(_components)/billed-summary.tsx
+[0m[32mCheck[0m routes/runs/(_components)/create-run-form.tsx
+[0m[32mCheck[0m routes/runs/(_components)/run-actions.tsx
+[0m[32mCheck[0m routes/runs/(_components)/run-comparison.tsx
+[0m[32mCheck[0m routes/runs/(_components)/run-items-table.tsx
+[0m[32mCheck[0m routes/runs/(_components)/run-progress.tsx
+[0m[32mCheck[0m routes/runs/(_components)/run-summary.tsx
+[0m[32mCheck[0m routes/runs/(_components)/runs-table.tsx
+[0m[32mCheck[0m routes/runs/(_islands)/run-console-live.tsx
+[0m[32mCheck[0m routes/runs/(_islands)/saga-instances.tsx
+[0m[32mCheck[0m routes/runs/[id].tsx
+[0m[32mCheck[0m routes/runs/index.tsx
+[0m[32mCheck[0m utils.ts
+[0m[32mCheck[0m vite.config.ts
+EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt --check . 2>&1 | tail -20; echo "FMT_EXIT=$?"
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/.render-proof.tsx:
+26[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m    `${name.padEnd(24)} catalogued=${inCatalog} demo=${demo.length > 0 ? 'yes' : 'NO'} demoStart=${demo.replace(/\s+/g, ' ').slice(0, 70)}`,[0m
+26[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m    `${name.padEnd(24)} catalogued=${inCatalog} demo=${demo.length > 0 ? 'yes' : 'NO'} demoStart=${[0m
+27[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m      demo.replace(/\s+/g, ' ').slice(0, 70)[0m
+28[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m    }`,[0m
+
+
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx:
+26[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m        {/*[0m
+26[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m        {[0m
+27[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m          /*[0m
+  [0m[38;5;245m |[0m [0m[38;5;245m...[0m
+32[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m        */}[0m
+33[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m        */[0m
+34[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m        }[0m
+
+[0m[1m[31merror[0m: Found 2 not formatted files in 186 files
+FMT_EXIT=0
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/_app.tsx
+@@ -22,15 +22,9 @@
+ <title>ledgerline — ledgerline-web</title>
+ <link rel='icon' href='data:,' />
+ <link rel='preconnect' href='https://fonts.googleapis.com' />
+ <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
+-{/*
+-  Two stylesheets, deliberately. The display face is the product's voice
+-  and the UI face is what every field, label and button is set in — a
+-  single combined request means one bad axis spec from the font CDN
+-  costs both, and the app falls back to `system-ui` with no error. Split,
+-  a failure degrades to a sans-only product that still reads as designed.
+-*/}
++{/* Two stylesheets: a bad axis spec on one face must not cost the other. */}
+ <link
+   href='https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap'
+   rel='stylesheet'
+ />
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git status --short && echo "=== render-proof tracked? ===" && git ls-files apps/ledgerline-web/.render-proof.tsx
+M apps/ledgerline-web/assets/styles.css
+ M apps/ledgerline-web/assets/tokens.css
+ M apps/ledgerline-web/assets/tokens.json
+ M apps/ledgerline-web/routes/_app.tsx
+ M tests/design_contract_test.ts
+?? apps/ledgerline-web/.render-proof.tsx
+=== render-proof tracked? ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git diff --stat tests/design_contract_test.ts && git diff tests/design_contract_test.ts | head -60
+tests/design_contract_test.ts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+diff --git a/tests/design_contract_test.ts b/tests/design_contract_test.ts
+index f2440ec..3f3fb78 100644
+--- a/tests/design_contract_test.ts
++++ b/tests/design_contract_test.ts
+@@ -288,7 +288,9 @@ Deno.test('M1 — the absent tone is visible and stays quieter than a real amoun
+     // ramp steps up far enough to leave the room; see the note in tokens.css.
+     assert(
+       absent >= 3,
+-      `--ns-absent is ${absent.toFixed(2)}:1 against the card in ${name} — the em dash is unreadable`,
++      `--ns-absent is ${
++        absent.toFixed(2)
++      }:1 against the card in ${name} — the em dash is unreadable`,
+     );
+     // The ceiling, and the constraint that makes light the binding theme:
+     // absence stands in for an amount, so it must never out-shout a real one.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && mkdir -p .llm/tmp && mv apps/ledgerline-web/.render-proof.tsx .llm/tmp/render-proof.tsx && echo "moved" && ls .llm/tmp/
+moved
+band-geometry.tsx
+dev-tokens.env
+hero-proof.tsx
+money-proof.tsx
+pass11-lint.json
+pass11-test-baseline.log
+probe-defect.ts
+probe-defect2.ts
+probe-defect3.ts
+render-proof.tsx
+run-summary-proof.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 400 deno fmt --check . 2>&1 | tail -5; echo "---LINT---"; timeout 300 deno lint . 2>&1 | tail -5
+Checked 185 files
+---LINT---
+Checked 120 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 400 deno test --allow-all 2>&1 | tail -15
+refund flow: capture, refund credit note, apply — payment reaches REFUNDED once ... [0m[32mok[0m [0m[38;5;245m(520ms)[0m
+refund flow: compensation voids the note and leaves the payment SUCCEEDED ... [0m[32mok[0m [0m[38;5;245m(207ms)[0m
+refund flow: refund idempotency replays the stored response and rejects mismatches ... [0m[32mok[0m [0m[38;5;245m(223ms)[0m
+refund flow: capturing a non-OPEN invoice is refused (state guard) ... [0m[32mok[0m [0m[38;5;245m(123ms)[0m
+[0m[38;5;245mrunning 7 tests from ./tests/sagas_test.ts[0m
+run-issue runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(15ms)[0m
+run-issue runtime: compensation terminalises with persisted FAILED ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+run-issue runtime: pre-money failure persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(188µs)[0m
+run-issue runtime: duplicate Started mid-flight does not advance ... [0m[32mok[0m [0m[38;5;245m(146µs)[0m
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(265µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(248µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(185µs)[0m
+
+[0m[32mok[0m | 56 passed | 0 failed [0m[38;5;245m(1s)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '1,60p' tests/design_contract_test.ts; echo "..."; grep -n "^Deno.test" tests/design_contract_test.ts
+/**
+ * Design contract tests.
+ *
+ * DESIGN.md states several rules as mechanically checkable — "fails if" a ramp
+ * step appears in a component, an offset shadow survives in a stylesheet, or a
+ * catalogue entry has no demo. These tests are that check. They read the files,
+ * because a rule that is not run is a rule that rots.
+ */
+
+import { assert, assertEquals } from '@std/assert';
+
+const APP = new URL('../apps/ledgerline-web/', import.meta.url);
+const ASSETS = new URL('./assets/', APP);
+const COMPONENTS = new URL('./components/', APP);
+
+/** Every CSS file an installed component owns. */
+async function componentStylesheets(): Promise<string[]> {
+  const files: string[] = [];
+  for (const dir of ['ui', 'blocks']) {
+    for await (const entry of Deno.readDir(new URL(`./${dir}/`, ASSETS))) {
+      if (entry.isFile && entry.name.endsWith('.css')) files.push(`${dir}/${entry.name}`);
+    }
+  }
+  return files.sort();
+}
+
+/** Every component module in the app-owned UI barrel directory. */
+async function componentModules(): Promise<string[]> {
+  return await modulesIn('./ui/');
+}
+
+/** Product components — the Ledgerline domain layer over the copied kit. */
+async function productComponentModules(): Promise<string[]> {
+  return await modulesIn('./product/');
+}
+
+/** Every `.tsx` module directly under a components subdirectory. */
+async function modulesIn(dir: string): Promise<string[]> {
+  const files: string[] = [];
+  try {
+    for await (const entry of Deno.readDir(new URL(dir, COMPONENTS))) {
+      if (entry.isFile && entry.name.endsWith('.tsx')) files.push(entry.name);
+    }
+  } catch {
+    // A root that does not exist in this branch contributes nothing.
+  }
+  return files.sort();
+}
+
+async function read(path: string): Promise<string> {
+  return await Deno.readTextFile(new URL(path, APP));
+}
+
+/**
+ * Source with its comments removed, so a rule about the text a reader sees
+ * does not fire on the prose that documents the code. `components/ui/mod.ts`
+ * legitimately names `netscript ui:init` — that is provenance, not demo copy.
+ * A `//` directly after a colon is a URL scheme, not a comment.
+ */
+function withoutComments(source: string): string {
+...
+86:Deno.test('T2a — no component reaches for a ramp step', async () => {
+105:Deno.test('T2 — no raw colour literal in a component stylesheet', async () => {
+116:Deno.test('C8 — no hard offset shadow survives', async () => {
+126:Deno.test('M8 — only lib/money turns a decimal into text', async () => {
+163:Deno.test('T1 — tokens.json and tokens.css declare the same custom properties', async () => {
+183:Deno.test('T1 — every token a component uses is declared', async () => {
+216:Deno.test('M1 — the absent tone is visible and stays quieter than a real amount', async () => {
+306:Deno.test('T6 — every component stylesheet is imported by styles.css', async () => {
+316:Deno.test('R1 — every component module is exported from the barrel', async () => {
+328:Deno.test('R3 — every Ledgerline catalogue entry has a gallery demo', async () => {
+344:Deno.test('R3 — the upstream registry count is not inflated by app-owned widgets', async () => {
+360:Deno.test('H8 — gauge arcs terminate with a flat cut', async () => {
+369:Deno.test('R8 — no scaffold fiction ships', async () => {
+436:Deno.test('R8 — an internal link is not a dead end', async () => {
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && sed -n '155,216p' tests/design_contract_test.ts
+!formatters.test(moneyText),
+    'money-text.tsx must not call Number/toFixed/Intl — it resolves through moneyParts()',
+  );
+  // …but it must actually use the module, not shadow it.
+  assert(moneyText.includes('moneyParts'), 'money-text.tsx must resolve values through moneyParts');
+  assert(moneyModule.includes('export function moneyParts'));
+});
+
+Deno.test('T1 — tokens.json and tokens.css declare the same custom properties', async () => {
+  const manifest = JSON.parse(await read('./assets/tokens.json')) as {
+    tokens: Record<string, { cssVar: string }>;
+    themes: { dark: Record<string, { cssVar: string }> };
+  };
+  const css = await read('./assets/tokens.css');
+  const [light, dark] = css.split("[data-theme='dark']");
+  assert(light !== undefined && dark !== undefined, 'tokens.css must declare a dark theme block');
+
+  for (const token of Object.values(manifest.tokens)) {
+    assert(light.includes(token.cssVar), `${token.cssVar} is in tokens.json but not in tokens.css`);
+  }
+  for (const token of Object.values(manifest.themes.dark)) {
+    assert(
+      dark.includes(token.cssVar),
+      `${token.cssVar} has a dark override in tokens.json but not in tokens.css`,
+    );
+  }
+});
+
+Deno.test('T1 — every token a component uses is declared', async () => {
+  const css = await read('./assets/tokens.css');
+  const declared = new Set([...css.matchAll(/(--ns-[a-z0-9-]+)\s*:/g)].map((match) => match[1]));
+  // Custom properties a component sets or receives at runtime from its own
+  // script rather than from the theme. `--ns-floating-*` is the anchor-
+  // positioning seam: the floating runtime writes those values inline.
+  const runtime = /^--ns-floating-/;
+
+  for (const sheet of await componentStylesheets()) {
+    const source = await read(`./assets/${sheet}`);
+    for (const match of source.matchAll(/var\((--ns-[a-z0-9-]+)/g)) {
+      assert(
+        declared.has(match[1]) || runtime.test(match[1]),
+        `${sheet} uses ${
+          match[1]
+        }, which tokens.css does not declare — a typo here renders nothing`,
+      );
+    }
+  }
+});
+
+/**
+ * The quietest text in the product is the em dash, and it was invisible.
+ *
+ * `--ns-absent` at paper-5 measured 2.35:1 against a light card — under the
+ * 3:1 that even a large glyph needs — so every "not measured" in the product
+ * was a fact the reader could not see. The fix is measured, not eyeballed:
+ * this converts the numbers into a rule, because a tone that is only checked
+ * once drifts back the next time the paper ramp is touched.
+ *
+ * OKLCH → sRGB → WCAG relative luminance. `oklch(% C H)` is the only form the
+ * ramp uses; hex covers `--ns-card`, which is `#ffffff` in light.
+ */
+Deno.test('M1 — the absent tone is visible and stays quieter than a real amount', async () => {
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts[90m [offset=300, limit=40][0m
+Now I'll add a contract test so this defect can't silently return.
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
+Index: /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
++++ /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
+@@ -302,8 +302,63 @@
+     );
+   }
+ });
+ 
++/**
++ * The type the product declares is the type it loads.
++ *
++ * `--ns-font-sans` named "Inter" while `_app.tsx` requested DM Sans. Neither
++ * is a runtime error: the family simply is not there, so the browser walks the
++ * stack to `system-ui` and the whole product renders in whatever the host
++ * happens to have. Nothing crashes, nothing logs, and every screen is one
++ * step short of designed — which is exactly why it survived eleven passes of
++ * review that all read the file.
++ *
++ * The rule is mechanical: every family the token layer names must be a family
++ * the document requests, and the display face must be a face with a serif
++ * fallback, so losing the webfont degrades to Georgia rather than to the sans.
++ */
++Deno.test('F1 — the token layer names only typefaces the document loads', async () => {
++  const css = await read('./assets/tokens.css');
++  const app = await read('./routes/_app.tsx');
++
++  const requested = new Set(
++    [...app.matchAll(/family=([^&:"']+)/g)].flatMap((match) =>
++      decodeURIComponent(match[1]).split('&')[0].split('+')
++    ),
++  );
++  const loaded = new Set([...requested].flatMap((family) => [family, family.replaceAll('+', ' ')]));
++
++  const fontTokens = [...css.matchAll(/--ns-font-(sans|display|mono|numeric):\s*([^;]+);/g)];
++  assert(fontTokens.length >= 4, 'tokens.css must declare the sans, display, mono and numeric faces');
++
++  for (const [, name, stack] of fontTokens) {
++    const families = [...stack.matchAll(/"([^"]+)"/g)].map((match) => match[1]);
++    const first = families[0];
++    assert(first !== undefined, `--ns-font-${name} must name at least one family`);
++
++    // Generic families are always available and are never webfont requests.
++    const generic = /^(serif|sans-serif|monospace|system-ui|cursive|fantasy)$/;
++    if (generic.test(first)) continue;
++
++    assert(
++      loaded.has(first) || loaded.has(first.replaceAll(' ', '+')),
++      `--ns-font-${name} names "${first}", which _app.tsx never requests — the browser ` +
++        'falls through to the next entry in the stack and the product silently renders ' +
++        'in another face',
++    );
++  }
++
++  // The voice has to survive the CDN. A serif fallback is what makes that true.
++  const display = fontTokens.find(([, name]) => name === 'display');
++  assert(display !== undefined, 'tokens.css must declare --ns-font-display');
++  assert(
++    /serif/.test(display[2]),
++    '--ns-font-display must end in a generic serif, so losing the webfont degrades to ' +
++      'a serif rather than to the UI face',
++  );
++});
++
+ Deno.test('T6 — every component stylesheet is imported by styles.css', async () => {
+   const styles = await read('./assets/styles.css');
+   for (const sheet of await componentStylesheets()) {
+     assert(
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 200 deno test --allow-all tests/design_contract_test.ts 2>&1 | tail -25
+F1 — the token layer names only typefaces the document loads ... [0m[31mFAILED[0m [0m[38;5;245m(1ms)[0m
+T6 — every component stylesheet is imported by styles.css ... [0m[32mok[0m [0m[38;5;245m(537µs)[0m
+R1 — every component module is exported from the barrel ... [0m[32mok[0m [0m[38;5;245m(470µs)[0m
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(487µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(177µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(67µs)[0m
+R8 — no scaffold fiction ships ... [0m[32mok[0m [0m[38;5;245m(6ms)[0m
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(4ms)[0m
+
+[0m[1m[37m[41m ERRORS [0m
+
+F1 — the token layer names only typefaces the document loads [0m[38;5;245m=> ./tests/design_contract_test.ts:320:6[0m
+[0m[1m[31merror[0m: AssertionError: --ns-font-sans names "DM Sans", which _app.tsx never requests — the browser falls through to the next entry in the stack and the product silently renders in another face
+    throw new AssertionError(msg);
+[0m[31m          ^[0m
+    at [0m[1m[3massert[0m ([0m[36mhttps://jsr.io/@std/assert/1.0.19/assert.ts[0m:[0m[33m22[0m:[0m[33m11[0m)
+    at [0m[2m[38;5;245mfile:///home/agent/projects/netscript/wave7-billing-steer2/[0m[0m[36mtests/design_contract_test.ts[0m:[0m[33m343[0m:[0m[33m5[0m
+
+[0m[1m[37m[41m FAILURES [0m
+
+F1 — the token layer names only typefaces the document loads [0m[38;5;245m=> ./tests/design_contract_test.ts:320:6[0m
+
+[0m[31mFAILED[0m | 14 passed | 1 failed [0m[38;5;245m(33ms)[0m
+
+[0m[1m[31merror[0m: Test failed
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
+Index: /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
++++ /home/agent/projects/netscript/wave7-billing-steer2/tests/design_contract_test.ts
+@@ -320,11 +320,13 @@
+ Deno.test('F1 — the token layer names only typefaces the document loads', async () => {
+   const css = await read('./assets/tokens.css');
+   const app = await read('./routes/_app.tsx');
+ 
++  // `css2?family=Fraunces:opsz,wght@9..144,500&display=swap` — everything from
++  // the colon onward is the axis spec, not part of the family name.
+   const requested = new Set(
+-    [...app.matchAll(/family=([^&:"']+)/g)].flatMap((match) =>
+-      decodeURIComponent(match[1]).split('&')[0].split('+')
++    [...app.matchAll(/[?&]family=([^&"'<>\s]+)/g)].map((match) =>
++      decodeURIComponent(match[1]).split(':')[0]
+     ),
+   );
+   const loaded = new Set([...requested].flatMap((family) => [family, family.replaceAll('+', ' ')]));
+ 
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 200 deno test --allow-all tests/design_contract_test.ts 2>&1 | tail -8
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(425µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(185µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(83µs)[0m
+R8 — no scaffold fiction ships ... [0m[32mok[0m [0m[38;5;245m(6ms)[0m
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(5ms)[0m
+
+[0m[32mok[0m | 15 passed | 0 failed [0m[38;5;245m(30ms)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && cp assets/tokens.css /tmp/tokens.css.bak && python3 - <<'EOF'
+p='assets/tokens.css'
+s=open(p).read()
+s=s.replace('"DM Sans", "SF Pro Text"','"Inter", "SF Pro Text"')
+open(p,'w').write(s)
+EOF
+cd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 120 deno test --allow-all tests/design_contract_test.ts --filter "F1" 2>&1 | grep -E "FAILED|ok \||names" | head -5; cd apps/ledgerline-web && cp /tmp/tokens.css.bak assets/tokens.css && echo "RESTORED"
+F1 — the token layer names only typefaces the document loads ... [0m[31mFAILED[0m [0m[38;5;245m(1ms)[0m
+F1 — the token layer names only typefaces the document loads [0m[38;5;245m=> ./tests/design_contract_test.ts:320:6[0m
+[0m[1m[31merror[0m: AssertionError: --ns-font-sans names "Inter", which _app.tsx never requests — the browser falls through to the next entry in the stack and the product silently renders in another face
+F1 — the token layer names only typefaces the document loads [0m[38;5;245m=> ./tests/design_contract_test.ts:320:6[0m
+[0m[31mFAILED[0m | 0 passed | 1 failed | 14 filtered out [0m[38;5;245m(7ms)[0m
+RESTORED
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git add apps/ledgerline-web/assets/styles.css apps/ledgerline-web/assets/tokens.css apps/ledgerline-web/assets/tokens.json apps/ledgerline-web/routes/_app.tsx tests/design_contract_test.ts && git status --short
+M  apps/ledgerline-web/assets/styles.css
+M  apps/ledgerline-web/assets/tokens.css
+M  apps/ledgerline-web/assets/tokens.json
+M  apps/ledgerline-web/routes/_app.tsx
+M  tests/design_contract_test.ts
+[0m
+Test verified non-vacuous (fails on the pre-fix value, passes on the fix). Committing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && git commit -F - <<'EOF'
+Fix: every screen was rendering in a fallback font
+
+`--ns-font-sans` named "Inter". `_app.tsx` requests DM Sans. Neither file
+is wrong on its own, which is why this survived eleven passes that all read
+both: the browser asks for Inter, does not have it, walks the stack to
+`system-ui`, and renders the entire product in whatever the host happens to
+ship. No error, no failing test, no visible symptom except that nothing
+looks designed.
+
+Two changes, and the rule that keeps the second one honest:
+
+1. The token layer names the face the document loads. `--ns-font-sans` is
+   DM Sans; every screen that was inheriting a system fallback now renders
+   in the typeface the project already pays to download.
+
+2. `--ns-font-display` is new, and it is the product's voice. A warm
+   old-style serif (Fraunces, degrading to Georgia) spent only where a
+   heading is read as a sentence: the wordmark, page and section headings,
+   and the empty-state line that exists to be read. It never touches a
+   figure — card titles, table headers, badges and every money span opt
+   back out to the sans and numeric faces, because a date range or an
+   amount set in a proportional serif is a trust problem, not a style.
+
+The webfonts are now two `<link>` elements rather than one. The display
+face and the UI face are different risks: a bad axis spec from the font
+CDN on a combined request costs both and degrades silently to `system-ui`.
+Split, a failure costs the voice and keeps the product.
+
+`F1` in the design contract test makes this mechanical: every family the
+token layer names must be a family `_app.tsx` requests, and the display
+face must end in a generic serif. Verified non-vacuous — at the old value
+it fails with `--ns-font-sans names "Inter", which _app.tsx never
+requests`.
+EOF
+git log --oneline -1
+[fix/steer2-consolidated 5ba414d] Fix: every screen was rendering in a fallback font
+ 5 files changed, 152 insertions(+), 3 deletions(-)
+5ba414d Fix: every screen was rendering in a fallback font
+[0m
+[0m# [0mTodos
+[✓] Audit identity gaps: font stack vs loaded fonts, token coverage
+[✓] Fix type identity: display face + correct sans stack in tokens.json/tokens.css
+[•] Create components/blocks/ — composed overview/run console/invoice detail blocks
+[ ] Replace the link-list landing at / with the billing overview
+[ ] Make shell unavoidable: breadcrumbs on every product route
+[ ] Motion that means something: gauge fill, row resolve, total count-up
+[ ] Verify: deno check, tests, dev-server render of composed blocks
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 - <<'EOF'
+import re
+s=open('contracts/versions/v1/billing.contract.ts').read()
+for m in re.finditer(r'export const (\w+SchemaV1) = z\.object\(\{(.*?)\n\}\);', s, re.S):
+    name, body = m.group(1), m.group(2)
+    if any(k in name for k in ('Invoice','Payment','Plan','Subscription','Ledger','Meter')):
+        fields=re.findall(r'^\s{4}(\w+):', body, re.M)
+        print(name, '->', ', '.join(fields))
+EOF
+PlansListOutputSchemaV1 -> 
+MetersListOutputSchemaV1 -> 
+SubscriptionListInputSchemaV1 -> 
+SubscriptionListOutputSchemaV1 -> 
+SubscriptionCreateInputSchemaV1 -> 
+InvoiceListInputSchemaV1 -> 
+InvoiceListOutputSchemaV1 -> 
+InvoiceIdempotentMutationInputSchemaV1 -> 
+InvoiceVoidInputSchemaV1 -> 
+PaymentInputSchemaV1 -> 
+LedgerListOutputSchemaV1 ->
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 - <<'EOF'
+import re
+s=open('contracts/versions/v1/billing.contract.ts').read()
+for name in ('InvoiceListOutputSchemaV1','SubscriptionListOutputSchemaV1','PlansListOutputSchemaV1','LedgerListOutputSchemaV1','InvoiceDetailSchemaV1'):
+    i=s.find('export const '+name)
+    if i<0: print(name,'NOT FOUND'); continue
+    j=s.find('\n});', i)
+    print('=== '+name+' ===')
+    print(s[i:j+4][:1400])
+EOF
+=== InvoiceListOutputSchemaV1 ===
+export const InvoiceListOutputSchemaV1 = z.object({
+  items: z.array(InvoiceSchemaV1),
+  total: z.number().int().nonnegative(),
+});
+=== SubscriptionListOutputSchemaV1 ===
+export const SubscriptionListOutputSchemaV1 = z.object({
+  items: z.array(SubscriptionSchemaV1),
+  total: z.number().int().nonnegative(),
+});
+=== PlansListOutputSchemaV1 ===
+export const PlansListOutputSchemaV1 = z.object({
+  items: z.array(PlanSchemaV1),
+});
+=== LedgerListOutputSchemaV1 ===
+export const LedgerListOutputSchemaV1 = z.object({
+  items: z.array(LedgerEntrySchemaV1),
+  balance: MoneySchemaV1,
+});
+=== InvoiceDetailSchemaV1 ===
+export const InvoiceDetailSchemaV1 = InvoiceSchemaV1.extend({
+  lines: z.array(InvoiceLineSchemaV1),
+  payments: z.array(InvoicePaymentSchemaV1),
+  creditNotes: z.array(InvoiceCreditNoteSchemaV1),
+});
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 - <<'EOF'
+import re
+s=open('contracts/versions/v1/billing.contract.ts').read()
+for name in ('InvoiceSchemaV1','InvoicePaymentSchemaV1','PlanSchemaV1','SubscriptionSchemaV1','LedgerEntrySchemaV1','InvoiceListInputSchemaV1'):
+    i=s.find('export const '+name)
+    if i<0: print(name,'NOT FOUND'); continue
+    j=s.find('\n});', i)
+    print('=== '+name+' ===')
+    print(s[i:j+4][:1200])
+EOF
+=== InvoiceSchemaV1 ===
+export const InvoiceSchemaV1 = DatabaseInvoiceSchema
+  .pick({
+    id: true,
+    number: true,
+    customerId: true,
+    subscriptionId: true,
+    status: true,
+    currency: true,
+    subtotal: true,
+    total: true,
+    periodStart: true,
+    periodEnd: true,
+    finalizedAt: true,
+    issuedAt: true,
+    dueAt: true,
+    paidAt: true,
+  })
+  .extend({
+    subscriptionId: z.string().nullable(),
+    subtotal: MoneySchemaV1,
+    total: MoneySchemaV1,
+    periodStart: IsoDateTimeSchemaV1,
+    periodEnd: IsoDateTimeSchemaV1,
+    finalizedAt: IsoDateTimeSchemaV1.nullable(),
+    issuedAt: IsoDateTimeSchemaV1.nullable(),
+    dueAt: IsoDateTimeSchemaV1.nullable(),
+    paidAt: IsoDateTimeSchemaV1.nullable(),
+  });
+
+export const InvoiceListInputSchemaV1 = z.object({
+  limit: z.number().int().min(1).max(100).default(25),
+  offset: z.number().int().nonnegative().optional(),
+  customerId: z.string().optional(),
+  status: InvoiceStatusV1Schema.optional(),
+});
+=== InvoicePaymentSchemaV1 ===
+export const InvoicePaymentSchemaV1 = DatabasePaymentSchema
+  .pick({ id: true, status: true, amount: true, processedAt: true })
+  .extend({
+    amount: MoneySchemaV1,
+    processedAt: IsoDateTimeSchemaV1.nullable(),
+  });
+
+export const InvoiceCreditNoteSchemaV1 = DatabaseCreditNoteSchema
+  .pick({ id: true, type: true, amount: true, reason: true })
+  .extend({
+    amount: MoneySchemaV1,
+  });
+
+/** Computed projection: line items, payment summaries, credit-note summaries. */
+export const InvoiceDetailSchemaV1 = InvoiceSchemaV1.extend({
+  lines: z.array(InvoiceLineSchemaV1),
+  payments: z.array(InvoicePaymentSchemaV1),
+  creditNotes: z.array(InvoiceCreditNoteSchemaV1),
+});
+=== PlanSchemaV1 ===
+export const PlanSchemaV1 = DatabasePlanSchema
+  .pick({ id: true, key: true, name: true, description: true })
+  .extend({
+    description: z.string().nullable(),
+    versions: z.array(PlanVersionSchemaV1),
+  });
+
+export const PlansListOutputSchemaV1 = z.object({
+  items: z.array(PlanSchemaV1),
+});
+=== SubscriptionSchemaV1 ===
+export const SubscriptionSchemaV1 = DatabaseSubscriptionSchema
+  .pick({
+    id: true,
+    customerId: true,
+    planVersionId: true,
+    status: true,
+    billingAnchor: true,
+    startedAt: true,
+    endedAt: true,
+  })
+  .extend({
+    billingAnchor: IsoDateTimeSchemaV1,
+    startedAt: IsoDateTimeSchemaV1,
+    endedAt: IsoDateTimeSchemaV1.nullable(),
+    pendingChangeId: z.string().nullable().describe('Projection: open subscription change'),
+  });
+
+export const SubscriptionListInputSchemaV1 = z.object({
+  limit: z.number().int().min(1).max(100).default(25),
+  offset: z.number().int().nonnegative().optional(),
+  customerId: z.string().optional(),
+  status: SubscriptionStatusV1Schema.optional(),
+});
+=== LedgerEntrySchemaV1 ===
+export const LedgerEntrySchemaV1 = DatabaseCreditLedgerEntrySchema
+  .pick({
+    id: true,
+    kind: true,
+    amount: true,
+    currency: true,
+    reason: true,
+    actorId: true,
+    createdAt: true,
+  })
+  .extend({
+    amount: MoneySchemaV1,
+    createdAt: IsoDateTimeSchemaV1,
+  });
+
+export const LedgerListOutputSchemaV1 = z.object({
+  items: z.array(LedgerEntrySchemaV1),
+  balance: MoneySchemaV1,
+});
+=== InvoiceListInputSchemaV1 ===
+export const InvoiceListInputSchemaV1 = z.object({
+  limit: z.number().int().min(1).max(100).default(25),
+  offset: z.number().int().nonnegative().optional(),
+  customerId: z.string().optional(),
+  status: InvoiceStatusV1Schema.optional(),
+});
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/(_components)/billed-summary.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "^export \(function\|const\|type\|interface\)" lib/money.ts
+17:export const ABSENT = '\u2014';
+23:export type MoneyValue = string | number | null | undefined;
+30:export type MoneyDirection = 'in' | 'out' | 'flat' | 'absent';
+32:export interface MoneyFormatOptions {
+170:export interface MoneyParts {
+191:export function moneyParts(value: MoneyValue, options: MoneyFormatOptions = {}): MoneyParts {
+233:export function formatMoney(value: MoneyValue, options: MoneyFormatOptions = {}): string {
+238:export function moneyDirection(value: MoneyValue): MoneyDirection {
+252:export function formatMoneyWithCurrency(
+272:export function sumMoney(values: readonly MoneyValue[]): MoneyValue {
+305:export function ratio(numerator: MoneyValue, denominator: MoneyValue): number | null {
+315:export function formatPercent(
+331:export interface MoneyMovement {
+345:export function movement(current: MoneyValue, prior: MoneyValue): MoneyMovement {
+375:export function formatMoneyCompact(
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '330,380p' lib/money.ts
+*/
+export interface MoneyMovement {
+  /** Signed percentage, or the em dash when there is nothing to compare. */
+  readonly label: string;
+  readonly direction: 'up' | 'down' | 'flat' | 'absent';
+}
+
+/**
+ * The movement from `prior` to `current`.
+ *
+ * `ratio` answers "what fraction"; a movement answers "which way, and by how
+ * much". They part company on the case that matters most: with no prior amount
+ * there is no movement at all, which is not a movement of zero. A run with
+ * nothing before it has not held steady — it has not been compared (M1).
+ */
+export function movement(current: MoneyValue, prior: MoneyValue): MoneyMovement {
+  const change = ratio(current, prior);
+  if (change === null || !Number.isFinite(change)) return { label: ABSENT, direction: 'absent' };
+
+  const delta = change - 1;
+  return {
+    label: formatPercent(delta, { signed: true }),
+    direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat',
+  };
+}
+
+/** Moves the decimal point left by `shift` digits, on the digit string. */
+function shiftLeft(parsed: ParsedDecimal, shift: number): ParsedDecimal {
+  if (shift === 0) return parsed;
+  let digits = `${parsed.int}${parsed.frac}`;
+  let point = parsed.int.length - shift;
+  if (point <= 0) {
+    digits = `${'0'.repeat(1 - point)}${digits}`;
+    point = 1;
+  }
+  return { negative: parsed.negative, int: digits.slice(0, point), frac: digits.slice(point) };
+}
+
+/**
+ * Compact money for dense surfaces and chart ticks: `$12.4k`, `1.2M`.
+ *
+ * Rounds half-up on the decimal digits, like every other amount. Absent stays
+ * the em dash. Charts use this for ticks only — a chart never formats a value
+ * it was handed; it receives preformatted labels.
+ */
+export function formatMoneyCompact(
+  value: MoneyValue,
+  options: MoneyFormatOptions = {},
+): string {
+  const parsed = parseDecimal(value);
+  if (!parsed) return ABSENT;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && cat contracts/versions/v1/mod.ts && echo "=== mod.ts ===" && cat contracts/mod.ts | head -30 && echo "=== webhooks ===" && sed -n '1,80p' contracts/versions/v1/webhooks.contract.ts
+/**
+ * @module contracts/versions/v1
+ *
+ * Version 1 contract definitions.
+ *
+ * Each service exposes its surface through this aggregate so that
+ * generated clients and service routers reference `v1.<service>...`
+ * without knowing how the contract file is laid out.
+ */
+
+import { BillingContractV1, BillingV1 } from './billing.contract.ts';
+import { RunsContractV1, RunsV1 } from './runs.contract.ts';
+import { WebhooksContractV1, WebhooksV1 } from './webhooks.contract.ts';
+
+export { BillingContractV1, RunsContractV1, WebhooksContractV1 };
+export * from './billing.contract.ts';
+export * from './runs.contract.ts';
+export * from './webhooks.contract.ts';
+
+export const v1 = {
+  billing: BillingV1,
+  runs: RunsV1,
+  webhooks: WebhooksV1,
+};
+=== mod.ts ===
+/**
+ * @module contracts
+ *
+ * Shared contract definitions for the workspace.
+ * Re-exports all versioned contracts.
+ */
+
+export * from './versions/v1/mod.ts';
+=== webhooks ===
+/**
+ * Webhooks contract — Version 1
+ *
+ * Shared type surface between the webhooks service and any caller.
+ * Using `@orpc/contract` here means the server-side handler and any
+ * generated client will automatically stay in type-lockstep.
+ */
+
+import { z } from 'zod';
+import { oc } from '@orpc/contract';
+import { implement } from '@orpc/server';
+
+export const WebhooksHealthSchemaV1 = z.object({
+  status: z.enum(['healthy', 'unhealthy', 'degraded']).describe('Service health status'),
+  service: z.string().describe('Service name'),
+  version: z.string().describe('Service version'),
+  timestamp: z.string().datetime().describe('ISO timestamp'),
+  uptime: z.number().int().nonnegative().optional().describe('Uptime in seconds'),
+});
+
+export const WebhooksStatusSchemaV1 = z.enum([
+  'active',
+  'draft',
+  'archived',
+]);
+
+export const WebhooksListItemSchemaV1 = z.object({
+  id: z.number().int().positive().describe('Stable identifier'),
+  name: z.string().min(1).describe('Display name'),
+  summary: z.string().min(1).describe('Short record summary'),
+  status: WebhooksStatusSchemaV1.describe('Record lifecycle status'),
+  createdAt: z.string().datetime().describe('ISO creation timestamp'),
+});
+
+export const WebhooksListInputSchemaV1 = z.object({
+  limit: z.number().int().positive().describe('Number of records to return'),
+  offset: z.number().int().nonnegative().describe('Starting offset'),
+  search: z.string().min(1).optional().describe('Optional record name search'),
+});
+
+export const WebhooksListResponseSchemaV1 = z.object({
+  items: z.array(WebhooksListItemSchemaV1).describe('Returned service records'),
+  total: z.number().int().nonnegative().describe('Total matching records'),
+  limit: z.number().int().positive().describe('Requested page size'),
+  offset: z.number().int().nonnegative().describe('Requested offset'),
+  hasMore: z.boolean().describe('Whether more records are available'),
+});
+
+export const WebhooksUpdateStatusInputSchemaV1 = z.object({
+  id: z.number().int().positive().describe('Stable identifier'),
+  status: WebhooksStatusSchemaV1.describe('Next lifecycle status'),
+});
+
+export const WebhooksUpdateStatusResponseSchemaV1 = WebhooksListItemSchemaV1;
+
+export type WebhooksHealthV1 = z.infer<typeof WebhooksHealthSchemaV1>;
+export type WebhooksListItemV1 = z.infer<typeof WebhooksListItemSchemaV1>;
+export type WebhooksListInputV1 = z.infer<typeof WebhooksListInputSchemaV1>;
+export type WebhooksListResponseV1 = z.infer<typeof WebhooksListResponseSchemaV1>;
+export type WebhooksUpdateStatusInputV1 = z.infer<
+  typeof WebhooksUpdateStatusInputSchemaV1
+>;
+export type WebhooksUpdateStatusResponseV1 = z.infer<
+  typeof WebhooksUpdateStatusResponseSchemaV1
+>;
+
+/**
+ * Webhooks contract — Version 1.
+ *
+ * Extend this with your own procedures as the service grows.
+ */
+export const WebhooksContractV1 = {
+  health: {
+    check: oc
+      .route({ method: 'GET' })
+      .input(z.object({}).optional())
+      .output(WebhooksHealthSchemaV1),
+  },
+  list: oc
+    .route({ method: 'POST' })
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -rn "searchSchema\|searchParams" --include="*.tsx" --include="*.ts" routes/ utils.ts | head -20; echo "=== InvoiceV1 type ==="; cd /home/agent/projects/netscript/wave7-billing-steer2 && grep -n "export type Invoice.*V1 = \|export type RunV1 = \|export type InvoiceStatusV1" contracts/versions/v1/billing.contract.ts contracts/versions/v1/runs.contract.ts | head
+routes/invoices/index.tsx:30:    searchSchema: INVOICES_SEARCH_SCHEMA,
+routes/runs/index.tsx:38:  .withRouteContract({ $route: routePatterns.runs.$route, searchSchema: RUNS_SEARCH_SCHEMA })
+routes/customers/index.tsx:29:    searchSchema: CUSTOMERS_SEARCH_SCHEMA,
+routes/partials/runs/console.tsx:19:    const id = ctx.url.searchParams.get('id');
+routes/partials/runs/list.tsx:30:    const parsed = LIST_SEARCH_SCHEMA.safeParse(Object.fromEntries(ctx.url.searchParams));
+=== InvoiceV1 type ===
+contracts/versions/v1/billing.contract.ts:679:export type InvoiceV1 = z.infer<typeof InvoiceSchemaV1>;
+contracts/versions/v1/billing.contract.ts:680:export type InvoiceDetailV1 = z.infer<typeof InvoiceDetailSchemaV1>;
+contracts/versions/v1/billing.contract.ts:681:export type InvoiceLineV1 = z.infer<typeof InvoiceLineSchemaV1>;
+contracts/versions/v1/runs.contract.ts:235:export type RunV1 = z.infer<typeof RunSchemaV1>;
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/runs/index.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && grep -n "InvoiceStatusV1Schema\|PaymentStatusV1Schema" contracts/versions/v1/billing.contract.ts | head -5; echo "---"; python3 - <<'EOF'
+import re
+s=open('contracts/versions/v1/billing.contract.ts').read()
+for n in ('InvoiceStatusV1Schema','PaymentStatusV1Schema'):
+    i=s.find('export const '+n)
+    j=s.find('\n);',i)
+    print(s[i:j+3])
+EOF
+273:export const InvoiceStatusV1Schema = z.enum(
+325:  status: InvoiceStatusV1Schema.optional(),
+---
+export const InvoiceStatusV1Schema = z.enum(
+  DatabaseInvoiceSchema.shape.status.removeDefault().options,
+);
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && grep -rn "InvoiceStatus\|PaymentStatus" database/prisma/schema.prisma | head -20
+grep: database/prisma/schema.prisma: No such file or directory
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && find database -name "*.prisma" | head && python3 - <<'EOF'
+import re,glob
+for p in glob.glob('database/**/*.prisma', recursive=True):
+    s=open(p).read()
+    for m in re.finditer(r'enum\s+(\w+)\s*\{([^}]*)\}', s):
+        if 'Invoice' in m.group(1) or 'Payment' in m.group(1) or 'Status' in m.group(1):
+            print(m.group(1), '->', ' '.join(m.group(2).split()))
+EOF
+database/postgres/schema/schema.prisma
+database/postgres/schema/plugins/workers/workers.prisma
+database/postgres/schema/plugins/triggers/triggers.prisma
+database/postgres/schema/plugins/auth/auth.prisma
+database/postgres/schema/plugins/sagas/sagas.prisma
+PlanVersionStatus -> DRAFT ACTIVE RETIRED
+PaymentMethodKind -> CARD SEPA ACH INVOICE
+SubscriptionStatus -> TRIALING ACTIVE PAST_DUE CANCELED ENDED
+InvoiceStatus -> DRAFT OPEN PAID VOID UNCOLLECTIBLE
+CreditNoteStatus -> ISSUED APPLIED VOID
+PaymentStatus -> PENDING SUCCEEDED FAILED REFUNDED
+PaymentAttemptOutcome -> APPROVED DECLINED_SOFT DECLINED_HARD
+RunStatus -> DRAFT COMPUTING REVIEW ISSUING ISSUED FAILED COMPENSATED CANCELED
+RunItemStatus -> PENDING COMPUTED APPROVED EXCLUDED ISSUING ISSUED FAILED COMPENSATED SKIPPED
+WebhookEventStatus -> PENDING DELIVERED FAILED RETRYING REPLAYED DISABLED
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,80p' components/ui/comparison-area-chart.tsx
+/**
+ * @component ComparisonAreaChart
+ * @layer 2
+ * @depends theme-seed
+ * @description Two-layer area chart — billed versus collected. The current
+ * period is a stroked area; the comparison period is the same geometry at
+ * reduced opacity underneath it (H5), never a second axis. Hand-authored SVG
+ * over the series cycle, with a CSS-only crosshair readout (H4).
+ */
+
+import type { JSX, VNode } from 'preact';
+import { useId } from 'preact/hooks';
+import { cn } from '../../lib/cn.ts';
+
+/** Series slot in the fixed `--ns-series-1..6` cycle (H3). */
+export type AreaSeries = 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * One plotted point.
+ *
+ * `value` is geometry and is never rendered; `display` is the preformatted
+ * string the readout shows (H2). The chart never formats a number.
+ */
+export interface AreaChartPoint {
+  readonly value: number;
+  /** Point name for the readout and, by default, the x-axis. */
+  readonly label: string;
+  /** Preformatted value for the readout. */
+  readonly display: string;
+}
+
+export interface ComparisonAreaChartProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  points: readonly AreaChartPoint[];
+  /** The comparison period. Same geometry, translucent, no stroke. */
+  comparison?: readonly AreaChartPoint[] | null;
+  /** Name for the comparison layer, e.g. `Previous period`. */
+  comparisonLabel?: string;
+  /** Name for the current layer, e.g. `This period`. */
+  seriesLabel?: string;
+  /**
+   * Y-axis ticks, topmost first and preformatted, spread evenly from the top
+   * gridline to the baseline. The topmost carries the currency (H6); the rest
+   * are bare magnitudes. Omit for a chrome-free chart.
+   */
+  ticks?: readonly string[];
+  /** X-axis labels. Defaults to each point's `label`. */
+  xLabels?: readonly string[];
+  /** Series slot for the current period. Defaults to 1. */
+  series?: AreaSeries;
+  /** Copy for the labelled empty frame. */
+  emptyLabel?: string;
+  class?: string;
+}
+
+/** viewBox units. The frame is drawn in CSS, so the plot can bleed to the edge. */
+const VB_WIDTH = 320;
+const VB_HEIGHT = 120;
+/** Headroom inside the plot so a peak stroke never clips the frame. */
+const VB_TOP = 10;
+const VB_BASELINE = 120;
+/** Horizontal inset so an end-point marker stays inside the frame. */
+const VB_INSET = 6;
+const GRID_LINES = 4;
+
+const PLOT_HEIGHT = VB_BASELINE - VB_TOP;
+
+/** Axis steps worth landing on. Denser than 1/2/5 so a peak keeps headroom. */
+const NICE_STEPS = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 9, 10] as const;
+
+/**
+ * The axis maximum a chart will scale to for these values.
+ *
+ * Exported because a caller has to build its own tick labels from the same
+ * number the gridlines sit on — a tick that disagrees with its gridline is a
+ * lie about the scale — while still doing all the formatting itself (H2).
+ */
+export function areaChartMax(values: readonly number[]): number {
+  const value = Math.max(0, ...values);
+  if (!Number.isFinite(value) || value <= 0) return 1;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,60p' components/ui/segmented-control.tsx && echo "=== gauge props ===" && sed -n '1,56p' components/ui/semicircular-gauge.tsx
+/**
+ * @component SegmentedControl
+ * @layer 2
+ * @depends theme-seed
+ * @description Range selection as one full-width capsule: N equal cells, the
+ * selected one a filled pill. Never a border change (C4). Renders as buttons
+ * for client-side selection, or as links when the range is a route, and wraps
+ * onto further lines when the options outgrow one.
+ */
+
+import type { JSX, VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
+
+export interface SegmentedControlOption {
+  /** Range key — `1D`, `1W`, `1M`, `3M`, `1Y`, or a product range id. */
+  readonly value: string;
+  /** Preformatted cell label. */
+  readonly label: string;
+  /** Render the cell as a link, so the range lives in the URL. */
+  readonly href?: string;
+  readonly disabled?: boolean;
+}
+
+/**
+ * An anchor that opts into Fresh's client-side navigation. The framework's own
+ * link attribute is not in Preact's anchor attribute set.
+ */
+interface ClientNavAnchorAttributes extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
+  'f-client-nav'?: boolean;
+}
+
+export interface SegmentedControlProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children' | 'onSelect'> {
+  /** Accessible name for the group, e.g. `Billing period`. */
+  label: string;
+  options: readonly SegmentedControlOption[];
+  /** The selected option's `value`. Omit only when nothing is selected. */
+  value?: string | null;
+  /** Called with the chosen `value`. Required unless every option has an `href`. */
+  onSelect?: (value: string) => void;
+  size?: 'sm' | 'md';
+  /** Stretch to the container width. The reference control is full-width. */
+  block?: boolean;
+  /**
+   * Let the cells wrap onto more than one line instead of stretching to fill
+   * one. A capsule is a one-line shape, so this also steps the container down
+   * to a panel radius and drops the inter-cell hairlines — reach for it when
+   * the options outgrow a line, the way a filter over eight run statuses does
+   * against a range control's four.
+   */
+  wrap?: boolean;
+  /**
+   * Let link options navigate client-side. A range that lives in the URL is
+   * usually a filter, and a filter that reloads the whole page is a slower
+   * version of the same navigation.
+   */
+  clientNav?: boolean;
+  class?: string;
+}
+
+=== gauge props ===
+/**
+ * @component SemicircularGauge
+ * @layer 2
+ * @depends theme-seed
+ * @description 180° two-tone gauge — the run-progress widget. Hand-authored
+ * SVG over the fixed series cycle: a grey unallocated track, then one arc per
+ * segment, terminated with flat baseline cuts. Centre carries a quiet label
+ * over the hero amount.
+ */
+
+import type { JSX, VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
+
+/** Series slot in the fixed `--ns-series-1..6` cycle (H3). */
+export type GaugeSeries = 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * One arc of the gauge.
+ *
+ * `value` is geometry only — it is never rendered (H2). The label the reader
+ * sees arrives as `display`, already formatted by the caller.
+ */
+export interface GaugeSegment {
+  readonly value: number;
+  /** Legend name, e.g. `Issued`. */
+  readonly label: string;
+  /** Preformatted amount for the legend, e.g. `$842,000.00`. */
+  readonly display: string;
+  /** Series slot. Defaults to the segment's index in the cycle. */
+  readonly series?: GaugeSeries;
+}
+
+export interface SemicircularGaugeProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  segments: readonly GaugeSegment[];
+  /**
+   * The denominator — every item the run covers, including the ones no segment
+   * accounts for. Omitted means the segments are the whole. `null` means the
+   * total was not measured, which renders the empty frame (H7, M1).
+   */
+  total?: number | null;
+  /** Quiet uppercase label above the centre amount, e.g. `ISSUED`. */
+  label: string;
+  /** The preformatted centre amount. */
+  value: string;
+  /** Quiet line under the centre amount. */
+  caption?: string;
+  /** Show the inline dot legend below the rule (C6). Defaults to true. */
+  legend?: boolean;
+  /** Copy for the labelled empty frame. */
+  emptyLabel?: string;
+  /** Tighten the centre amount for narrow rails. */
+  compact?: boolean;
+  class?: string;
+}
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/blocks/overview.tsx
+Wrote file successfully.
+[0m
+Now the main deliverable — a composed billing overview under `components/blocks/`.
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/blocks/mod.ts
+Wrote file successfully.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,60p' assets/styles.css
+@import 'tailwindcss';
+@import './tokens.css';
+@import './theme-bridge.css';
+
+/* Per-item CSS - ui:init writes these @import lines. */
+@import './ui/sheet.css';
+@import './ui/spinner.css';
+@import './ui/button.css';
+@import './ui/form-control-styles.css';
+@import './ui/textarea.css';
+@import './ui/choice-styles.css';
+@import './ui/checkbox.css';
+@import './ui/switch.css';
+@import './ui/label.css';
+@import './ui/form-field.css';
+@import './ui/surface-styles.css';
+@import './ui/card.css';
+@import './ui/panel.css';
+@import './ui/badge.css';
+@import './ui/separator.css';
+@import './ui/alert-styles.css';
+@import './ui/alert.css';
+@import './ui/inline-notice.css';
+@import './ui/progress.css';
+@import './layouts.css';
+@import './ui/skeleton.css';
+@import './ui/page-header.css';
+@import './ui/filter-form.css';
+@import './ui/stats-grid.css';
+@import './ui/detail-layout.css';
+@import './ui/data-table.css';
+@import './ui/responsive-table.css';
+@import './ui/pagination.css';
+@import './ui/empty-state.css';
+@import './ui/section-divider.css';
+@import './ui/theme-toggle.css';
+@import './ui/toast.css';
+@import './ui/avatar.css';
+@import './ui/code-block.css';
+@import './ui/chart-block.css';
+@import './ui/donut.css';
+@import './ui/dropzone.css';
+@import './ui/desktop-tray-menu.css';
+@import './ui/desktop-dialog.css';
+@import './ui/desktop-notification.css';
+@import './ui/desktop-window-chrome.css';
+@import './ui/desktop-update-prompt.css';
+@import './ui/floating.css';
+
+/* Product component skins — Ledgerline domain layer over the copied kit.
+   Attribute-keyed off the data-* markers the components emit. */
+@import './ui/status-badge.css';
+@import './ui/money-text.css';
+@import './ui/exception-badge.css';
+@import './ui/transition-feed.css';
+@import './ui/run-state-stepper.css';
+@import './ui/provisional-tag.css';
+
+/* Widget vocabulary — the composed-card grammar and the five bands it owns. */
+@import './ui/delta-chip.css';
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '60,82p' assets/styles.css
+@import './ui/delta-chip.css';
+@import './blocks/widget-card.css';
+@import './ui/semicircular-gauge.css';
+@import './ui/segmented-control.css';
+@import './ui/comparison-area-chart.css';
+@import './ui/footer-columns.css';
+@layer base {
+  html {
+    @apply bg-ns-bg text-ns-fg;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: dark;
+    min-height: 100%;
+  }
+
+  html[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-ns-bg text-ns-fg font-sans;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: var(--ns-primary-border);
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+Wrote file successfully.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,50p' assets/ui/status-badge.css
+/* ns-status-badge — components/product/status-badge.tsx
+   Lifecycle chip. The color comes from the status-* token family, selected
+   per literal through the data-status attribute, so a new theme re-skins it
+   without component edits. Derived states (not enum values) carry their own
+   data-status keys. */
+
+.ns-badge[data-status] {
+  color: var(--status-color, var(--ns-status-draft));
+  background: color-mix(in srgb, var(--status-color, var(--ns-status-draft)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-color, var(--ns-status-draft)) 28%,
+    transparent);
+}
+
+/* Billing run lifecycle */
+.ns-badge[data-status='DRAFT'] {
+  --status-color: var(--ns-status-draft);
+}
+.ns-badge[data-status='COMPUTING'] {
+  --status-color: var(--ns-status-review);
+}
+.ns-badge[data-status='REVIEW'] {
+  --status-color: var(--ns-status-review);
+}
+.ns-badge[data-status='ISSUING'] {
+  --status-color: var(--ns-status-issued);
+}
+.ns-badge[data-status='ISSUED'] {
+  --status-color: var(--ns-status-issued);
+}
+.ns-badge[data-status='FAILED'] {
+  --status-color: var(--ns-status-failed);
+}
+.ns-badge[data-status='COMPENSATED'] {
+  --status-color: var(--ns-status-compensated);
+}
+.ns-badge[data-status='CANCELED'] {
+  --status-color: var(--ns-status-void);
+}
+
+/* Run item lifecycle */
+.ns-badge[data-status='PENDING'] {
+  --status-color: var(--ns-status-draft);
+}
+.ns-badge[data-status='COMPUTED'] {
+  --status-color: var(--ns-status-review);
+}
+.ns-badge[data-status='APPROVED'] {
+  --status-color: var(--ns-status-paid);
+}
+.ns-badge[data-status='EXCLUDED'] {
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+@@ -177,12 +177,34 @@
+   width: 0.5rem;
+   height: 0.5rem;
+   margin-inline-end: var(--ns-space-2);
+   border-radius: var(--ns-radius-full);
+-  background: var(--ns-status-draft);
++  background: var(--status-color, var(--ns-status-draft));
+   vertical-align: baseline;
+ }
+ 
++/*
++ * The glyph's tone is the row's status, taken from the same token family the
++ * badge uses. It is not a second mapping: `InvoiceStatus` is a closed set of
++ * five, and each one here names the token `status-badge.css` already assigns
++ * it, so a theme change moves both or neither.
++ */
++.ns-overview-table__glyph[data-status='OPEN'] {
++  --status-color: var(--ns-status-issued);
++}
++.ns-overview-table__glyph[data-status='PAID'] {
++  --status-color: var(--ns-status-paid);
++}
++.ns-overview-table__glyph[data-status='DRAFT'] {
++  --status-color: var(--ns-status-draft);
++}
++.ns-overview-table__glyph[data-status='VOID'] {
++  --status-color: var(--ns-status-void);
++}
++.ns-overview-table__glyph[data-status='UNCOLLECTIBLE'] {
++  --status-color: var(--ns-status-failed);
++}
++
+ .ns-overview-table__link {
+   font-family: var(--ns-font-numeric);
+   color: var(--ns-fg);
+   text-decoration: none;
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+@@ -97,8 +97,35 @@
+   background: var(--ns-series-1);
+ }
+ 
+ /*
++ * Series slots are fixed by index, never by data order, so a sort cannot
++ * re-colour a slice (H3). The block assigns the slot; this maps it.
++ */
++[data-series='1'] {
++  --series-color: var(--ns-series-1);
++}
++[data-series='2'] {
++  --series-color: var(--ns-series-2);
++}
++[data-series='3'] {
++  --series-color: var(--ns-series-3);
++}
++[data-series='4'] {
++  --series-color: var(--ns-series-4);
++}
++[data-series='5'] {
++  --series-color: var(--ns-series-5);
++}
++[data-series='6'] {
++  --series-color: var(--ns-series-6);
++}
++
++[data-series] {
++  background: var(--series-color, var(--ns-series-1));
++}
++
++/*
+  * The legend is inline dots, never a boxed key — a key asks the reader to
+  * look away from the thing it explains (C6).
+  */
+ .ns-share__legend {
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+@@ -93,35 +93,37 @@
+ 
+ .ns-share__slice {
+   min-width: 0.125rem;
+   border-radius: var(--ns-radius-full);
+-  background: var(--ns-series-1);
+ }
+ 
+ /*
+  * Series slots are fixed by index, never by data order, so a sort cannot
+- * re-colour a slice (H3). The block assigns the slot; this maps it.
++ * re-colour a slice (H3). The block assigns the slot; this maps it. Scoped to
++ * the share bar's own elements — a bare `[data-series]` would reach into any
++ * component that happens to emit the same attribute.
+  */
+-[data-series='1'] {
++.ns-share [data-series='1'] {
+   --series-color: var(--ns-series-1);
+ }
+-[data-series='2'] {
++.ns-share [data-series='2'] {
+   --series-color: var(--ns-series-2);
+ }
+-[data-series='3'] {
++.ns-share [data-series='3'] {
+   --series-color: var(--ns-series-3);
+ }
+-[data-series='4'] {
++.ns-share [data-series='4'] {
+   --series-color: var(--ns-series-4);
+ }
+-[data-series='5'] {
++.ns-share [data-series='5'] {
+   --series-color: var(--ns-series-5);
+ }
+-[data-series='6'] {
++.ns-share [data-series='6'] {
+   --series-color: var(--ns-series-6);
+ }
+ 
+-[data-series] {
++.ns-share__slice,
++.ns-share__dot {
+   background: var(--series-color, var(--ns-series-1));
+ }
+ 
+ /*
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+@@ -149,9 +149,8 @@
+ .ns-share__dot {
+   width: 0.5rem;
+   height: 0.5rem;
+   border-radius: var(--ns-radius-full);
+-  background: var(--ns-series-1);
+ }
+ 
+ .ns-share__legend-label {
+   color: var(--ns-muted-fg);
+
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/styles.css
+@@ -58,8 +58,9 @@
+ 
+ /* Widget vocabulary — the composed-card grammar and the five bands it owns. */
+ @import './ui/delta-chip.css';
+ @import './blocks/widget-card.css';
++@import './blocks/overview.css';
+ @import './ui/semicircular-gauge.css';
+ @import './ui/segmented-control.css';
+ @import './ui/comparison-area-chart.css';
+ @import './ui/footer-columns.css';
+
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+Wrote file successfully.
+[0m
+Now wire the overview into `/` so it is actually the screen avisitor lands on.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && python3 - <<'EOF'
+import re
+s=open('contracts/versions/v1/runs.contract.ts').read()
+i=s.find('export const RunListInputSchemaV1'); j=s.find('\n});',i); print(s[i:j+4])
+i=s.find('export const RunListOutputSchemaV1'); j=s.find('\n});',i); print(s[i:j+4])
+i=s.find('export const RunSchemaV1'); j=s.find('\n});',i); print(s[i:j+4][:900])
+EOF
+export const RunListInputSchemaV1 = z.object({
+  limit: z.number().int().min(1).max(100).default(25),
+  status: RunStatusV1Schema.optional(),
+});
+export const RunListOutputSchemaV1 = z.object({
+  items: z.array(RunSchemaV1),
+});
+export const RunSchemaV1 = DatabaseBillingRunSchema
+  .pick({
+    id: true,
+    periodStart: true,
+    periodEnd: true,
+    status: true,
+    expectedCount: true,
+    issuedCount: true,
+    failedCount: true,
+    notes: true,
+    createdAt: true,
+  })
+  .extend({
+    periodStart: IsoDateTimeSchemaV1,
+    periodEnd: IsoDateTimeSchemaV1,
+    notes: z.string().nullable(),
+    createdAt: IsoDateTimeSchemaV1,
+    /** Projection: serialized run total (the table's totalCents column). */
+    total: MoneySchemaV1,
+  });
+
+export const RunItemSchemaV1 = DatabaseRunItemSchema
+  .pick({
+    id: true,
+    runId: true,
+    subscriptionId: true,
+    customerId: true,
+    status: true,
+    exceptionBucket: true,
+    skipReason: true,
+    draftInvoiceId: true,
+    computedTotal: true,
+    priorTotal: true,
+    decision: true,
+    decidedBy: true,
+    sagaState: true,
+  })
+  .extend({
+    computedTotal: Mo
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+Wrote file successfully.
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/blocks/overview.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/blocks/overview.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/blocks/overview.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/blocks/overview.tsx
+@@ -483,23 +483,22 @@
+   );
+ }
+ 
+ const settled = run.issuedCount;
++const excepted = run.failedCount;
+ const total = run.expectedCount;
+-const open = Math.max(total - settled, 0);
++const open = Math.max(total - settled - excepted, 0);
+ 
++// Two-tone: what settled, then what did not. The remainder is the track by
++// construction, not by subtraction — the three always account for the whole.
+ const segments: readonly GaugeSegment[] = [
+-  {
+-    label: 'Issued',
+-    value: settled,
+-    display: `${settled} of ${total} items`,
+-    series: 1,
+-  },
++  { label: 'Issued', value: settled, display: `${settled} items`, series: 1 },
++  { label: 'Exceptions', value: excepted, display: `${excepted} items`, series: 4 },
+ ];
+ 
+ const columns: readonly FooterColumn[] = [
+   { label: 'Issued', value: String(settled) },
+-  { label: 'Expected', value: String(total) },
++  { label: 'Excepted', value: String(excepted) },
+   { label: 'Open', value: String(open) },
+ ];
+ 
+ return (
+
+[0m
+Now fixing the gauge to use the run's real `failedCount` rather than only issued:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 300 deno check 2>&1 | grep -iE "error|TS[0-9]+" | head -30; echo "EXIT=${PIPESTATUS[0]}"
+[0m[1mTS2322 [0m[ERROR]: Type 'false' is not assignable to type 'DeltaGlyph | undefined'.
+[0m[1mTS2322 [0m[ERROR]: Type '{ children: string; type: "link"; href: string; variant: "outline"; block: true; }' is not assignable to type 'IntrinsicAttributes & ButtonProps'.
+[0m[1mTS2322 [0m[ERROR]: Type '{ children: string; type: "link"; href: string; variant: "outline"; block: true; }' is not assignable to type 'IntrinsicAttributes & ButtonProps'.
+[0m[1mTS2322 [0m[ERROR]: Type 'RouteReference<EmptySegment, SearchParamInput>' is not assignable to type 'string'.
+Found 4 errors.
+[0m[1m[31merror[0m: Type checking failed.
+EXIT=1
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "DeltaGlyph" components/ui/delta-chip.tsx | head -5; echo "=== Button props ==="; grep -n "block\|variant\|ButtonVariant" components/ui/button.tsx | head -20
+18:export type DeltaGlyph = 'arrow' | 'none';
+30:  glyph?: DeltaGlyph;
+=== Button props ===
+14:  variant?: ButtonVariant;
+28: * Visual variants for the shared button primitive.
+30:export type ButtonVariant =
+38: * Size variants for the shared button primitive.
+72:const VARIANT_CLASSES: Record<NonNullable<ButtonProps['variant']>, string> = {
+98:    variant = 'primary',
+108:    VARIANT_CLASSES[variant],
+131:      variant: _variant,
+163:    variant: _variant,
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '28,45p' components/ui/button.tsx
+* Visual variants for the shared button primitive.
+ */
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'destructive'
+  | 'pill';
+/**
+ * Size variants for the shared button primitive.
+ */
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+/**
+ * Native button `type` values supported by the shared primitive.
+ */
+export type ButtonElementType = 'button' | 'submit' | 'reset';
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && grep -n "block" assets/ui/button.css | head -5; echo "=== manifest routePatterns keys ==="; grep -n "routePatterns" .generated/manifest.ts | head -5; grep -n "home" .generated/manifest.ts | head -10
+=== manifest routePatterns keys ===
+4:export const routePatterns = {
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -n '1,40p' .generated/manifest.ts
+// This file is auto-generated by @netscript/fresh/vite.
+// Do not edit manually; route patterns are derived from the app routes tree.
+
+export const routePatterns = {
+  design: {
+    components: {
+      $route: "/design/components"
+    },
+    composition: {
+      $route: "/design/composition"
+    },
+    $route: "/design",
+    tokens: {
+      $route: "/design/tokens"
+    }
+  },
+  customers: {
+    $id: {
+      $route: "/customers/[id]"
+    },
+    $route: "/customers"
+  },
+  health: {
+    $route: "/health"
+  },
+  $route: "/",
+  invoices: {
+    $id: {
+      $route: "/invoices/[id]"
+    },
+    $route: "/invoices"
+  },
+  partials: {
+    runs: {
+      console: {
+        $route: "/partials/runs/console"
+      },
+      list: {
+        $route: "/partials/runs/list"
+      }
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 - <<'PY'
+import re
+p='routes/index.tsx'
+s=open(p).read()
+s=s.replace("import { routes } from '@app/.generated/routes.ts';","import { routePatterns } from '@app/.generated/manifest.ts';")
+s=s.replace("{ $route: routes.$route, searchSchema: OVERVIEW_SEARCH_SCHEMA }","{ $route: routePatterns.$route, searchSchema: OVERVIEW_SEARCH_SCHEMA }")
+open(p,'w').write(s)
+
+p='components/blocks/overview.tsx'
+s=open(p).read()
+s=s.replace("              glyph={false}\n","              glyph='none'\n")
+s=s.replace("""        <Button type='link' href={href} variant='outline' block>View all invoices</Button>""","""        <Button type='link' href={href} variant='outline' class='ns-btn--block'>
+          View all invoices
+        </Button>""")
+s=s.replace("""        <Button type='link' href='/runs' variant='outline' block>Open the run console</Button>""","""        <Button type='link' href='/runs' variant='outline' class='ns-btn--block'>
+          Open the run console
+        </Button>""")
+open(p,'w').write(s)
+print("patched")
+PY
+patched
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/blocks/overview.css
+@@ -243,8 +243,19 @@
+   color: var(--ns-primary);
+   border-bottom-color: var(--ns-primary);
+ }
+ 
++/*
++ * The card's closing action spans the footer. The reference sheet's CTA is
++ * full-width and the primitive has no `block` variant, so the block owns it —
++ * a button that stops halfway across its own card reads as an unfinished row.
++ */
++.ns-btn--block {
++  display: flex;
++  width: 100%;
++  justify-content: center;
++}
++
+ /* A narrow rail stacks the paired cards rather than squeezing them. */
+ @container (max-width: 48rem) {
+   .ns-overview :is(.ns-grid--2) {
+     grid-template-columns: minmax(0, 1fr);
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && timeout 300 deno check 2>&1 | grep -iE "error|TS[0-9]+" | head -30; echo "DONE"
+DONE
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt . >/dev/null 2>&1; deno fmt --check . 2>&1 | tail -3; echo "---LINT---"; deno lint . 2>&1 | tail -20
+Checked 188 files
+---LINT---
+[0m[1m[31merror[no-unused-vars][0m: [0m[1m`OVERVIEW_RANGES` is never used[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx[0m[0m[33m:24:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m24 | [0m  OVERVIEW_RANGES,
+  [0m[38;5;12m | [0m  [0m[1m[31m^^^^^^^^^^^^^^^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: If this is intentional, alias it with an underscore like `OVERVIEW_RANGES as _OVERVIEW_RANGES`
+
+  [0m[38;5;12mdocs[0m: https://docs.deno.com/lint/rules/no-unused-vars
+
+
+Found 1 problem
+Checked 122 files
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+@@ -29,13 +29,23 @@
+ import { routePatterns } from '@app/.generated/manifest.ts';
+ 
+ /**
+  * The range is a route, not client state: a window someone wants to send a
+- * colleague is a URL. Derived from `OVERVIEW_RANGES` so a new window cannot be
+- * added to the control without becoming selectable here.
++ * colleague is a URL.
+  */
+-const RANGE_VALUES = ['3m', '6m', '12m'] as const satisfies readonly OverviewRange[];
++const RANGE_VALUES: readonly [OverviewRange, ...OverviewRange[]] = ['3m', '6m', '12m'];
+ 
++/**
++ * Every window the range control offers must be selectable here.
++ *
++ * `RANGE_VALUES` is annotated rather than cast, so the compiler checks each
++ * entry is a real range but cannot notice one that is missing. This closes
++ * that half: add a window to `OVERVIEW_RANGES` without adding it above and the
++ * type stops being `never`, which does not compile.
++ */
++type MissingRange = Exclude<OverviewRange, (typeof RANGE_VALUES)[number]>;
++type _EveryRangeIsSelectable = MissingRange extends never ? true : ['unhandled range', MissingRange];
++
+ const OVERVIEW_SEARCH_SCHEMA = z.object({
+   range: z.enum(RANGE_VALUES).catch('6m'),
+ });
+ 
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && sed -i "s/^  OVERVIEW_RANGES,$//" routes/index.tsx && timeout 300 deno check 2>&1 | grep -iE "error|TS[0-9]+" | head -20; echo "---LINT---"; deno lint . 2>&1 | tail -10
+---LINT---
+Checked 122 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && cp components/blocks/overview.tsx /tmp/ov.bak && python3 - <<'PY'
+p='components/blocks/overview.tsx'
+s=open(p).read()
+s=s.replace("  { value: '12m', label: '12M', months: 12 },","  { value: '12m', label: '12M', months: 12 },\n  { value: '24m', label: '24M', months: 24 },")
+open(p,'w').write(s)
+PY
+timeout 300 deno check 2>&1 | grep -iE "error|TS[0-9]+" | head -5; echo "^^^ expected a failure"; cp /tmp/ov.bak components/blocks/overview.tsx && echo RESTORED
+^^^ expected a failure
+RESTORED
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+@@ -39,12 +39,17 @@
+  *
+  * `RANGE_VALUES` is annotated rather than cast, so the compiler checks each
+  * entry is a real range but cannot notice one that is missing. This closes
+  * that half: add a window to `OVERVIEW_RANGES` without adding it above and the
+- * type stops being `never`, which does not compile.
++ * assertion below stops being `true`, which does not compile.
++ *
++ * The check is wrapped in a tuple because `never extends never` distributes
++ * over `never` and yields `never` — the guard would pass whether or not a
++ * range was missing.
+  */
+ type MissingRange = Exclude<OverviewRange, (typeof RANGE_VALUES)[number]>;
+-type _EveryRangeIsSelectable = MissingRange extends never ? true : ['unhandled range', MissingRange];
++type RangesAreSelectable = [MissingRange] extends [never] ? true : false;
++const _everyRangeIsSelectable: RangesAreSelectable = true;
+ 
+ const OVERVIEW_SEARCH_SCHEMA = z.object({
+   range: z.enum(RANGE_VALUES).catch('6m'),
+ });
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== baseline ===" && timeout 300 deno check 2>&1 | grep -icE "error" ; echo "=== with an unhandled range ===" && cp components/blocks/overview.tsx /tmp/ov.bak && python3 - <<'PY'
+p='components/blocks/overview.tsx'
+s=open(p).read()
+s=s.replace("  { value: '12m', label: '12M', months: 12 },","  { value: '12m', label: '12M', months: 12 },\n  { value: '24m', label: '24M', months: 24 },")
+open(p,'w').write(s)
+PY
+timeout 300 deno check 2>&1 | grep -iE "error|TS[0-9]+" | head -4; cp /tmp/ov.bak components/blocks/overview.tsx && echo RESTORED
+=== baseline ===
+0
+=== with an unhandled range ===
+RESTORED
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && python3 - <<'PY'
+p='components/blocks/overview.tsx'
+s=open(p).read()
+s=s.replace("  { value: '12m', label: '12M', months: 12 },","  { value: '12m', label: '12M', months: 12 },\n  { value: '24m', label: '24M', months: 24 },")
+open(p,'w').write(s)
+PY
+timeout 300 deno check routes/index.tsx 2>&1 | tail -20; echo "EXIT=$?"; cp /tmp/ov.bak components/blocks/overview.tsx
+[0m[32mCheck[0m routes/index.tsx
+EXIT=0
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/routes/index.tsx
+@@ -31,25 +31,27 @@
+ /**
+  * The range is a route, not client state: a window someone wants to send a
+  * colleague is a URL.
+  */
+-const RANGE_VALUES: readonly [OverviewRange, ...OverviewRange[]] = ['3m', '6m', '12m'];
++const RANGE_VALUES = ['3m', '6m', '12m'] as const;
+ 
+ /**
+- * Every window the range control offers must be selectable here.
++ * Every window the range control offers must be selectable here, and nothing
++ * that is not a window may be.
+  *
+- * `RANGE_VALUES` is annotated rather than cast, so the compiler checks each
+- * entry is a real range but cannot notice one that is missing. This closes
+- * that half: add a window to `OVERVIEW_RANGES` without adding it above and the
+- * assertion below stops being `true`, which does not compile.
++ * The array is `as const` so its element type stays the literal union —
++ * annotating it as `readonly OverviewRange[]` widens it back to the union and
++ * both checks below become vacuous, which is the mistake this replaces.
+  *
+- * The check is wrapped in a tuple because `never extends never` distributes
+- * over `never` and yields `never` — the guard would pass whether or not a
+- * range was missing.
++ * The checks are wrapped in tuples because `never extends never` distributes
++ * over `never` and yields `never`: unwrapped, a missing range would pass.
+  */
+-type MissingRange = Exclude<OverviewRange, (typeof RANGE_VALUES)[number]>;
+-type RangesAreSelectable = [MissingRange] extends [never] ? true : false;
+-const _everyRangeIsSelectable: RangesAreSelectable = true;
++type RangesAreReal = [(typeof RANGE_VALUES)[number] extends OverviewRange ? true : false];
++type RangesAreSelectable = [
++  Exclude<OverviewRange, (typeof RANGE_VALUES)[number]> extends never ? true : false,
++];
++const _rangesAreReal: RangesAreReal = [true];
++const _rangesAreSelectable: RangesAreSelectable = [true];
+ 
+ const OVERVIEW_SEARCH_SCHEMA = z.object({
+   range: z.enum(RANGE_VALUES).catch('6m'),
+ });
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && echo "=== baseline ===" && timeout 300 deno check 2>&1 | grep -cE "TS[0-9]+"; echo "=== unhandled range (expect fail) ===" && python3 - <<'PY'
+p='components/blocks/overview.tsx'
+s=open(p).read()
+s=s.replace("  { value: '12m', label: '12M', months: 12 },","  { value: '12m', label: '12M', months: 12 },\n  { value: '24m', label: '24M', months: 24 },")
+open(p,'w').write(s)
+PY
+timeout 300 deno check 2>&1 | grep -E "TS[0-9]+|error:" | head -4; cp /tmp/ov.bak components/blocks/overview.tsx && echo RESTORED
+=== baseline ===
+0
+=== unhandled range (expect fail) ===
+[0m[1mTS2322 [0m[ERROR]: Type 'true' is not assignable to type 'false'.
+RESTORED
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web && deno fmt . >/dev/null 2>&1 && deno fmt --check . 2>&1 | tail -2 && echo "---LINT---" && deno lint . 2>&1 | tail -5 && echo "---CHECK---" && timeout 300 deno check 2>&1 | grep -cE "TS[0-9]+"
+Checked 188 files
+---LINT---
+Checked 122 files
+---CHECK---
+0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2 && timeout 400 deno test --allow-all 2>&1 | tail -6
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(256µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(205µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(150µs)[0m
+
+[0m[32mok[0m | 57 passed | 0 failed [0m[38;5;245m(1s)[0m
+[0m

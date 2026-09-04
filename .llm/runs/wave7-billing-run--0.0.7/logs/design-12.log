@@ -1,0 +1,3187 @@
+[0m[32mTask[0m [0m[36magentic:opencode[0m deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts '--message' 'Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING.' '--model' 'openrouter/tencent/hy4-preview' '--variant' 'max' '--cwd' '/home/agent/projects/netscript/wave7-design' '--require-mcp' 'netscript' '--require-mcp' 'aspire' '--receipt' '.netscript/agent/design-receipt.jsonl' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md'
+[0m
+> build · tencent/hy4-preview
+[0m
+[0m$ [0mpwd && git status --short | head -40 && ls
+/home/agent/projects/netscript/worktrees/007-aspire
+?? .llm/runs/wave7-billing-run--0.0.7/
+AGENTS-handoff.md
+AGENTS.md
+CLAUDE.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+GOVERNANCE.md
+LICENSE
+NOTICE
+README.md
+ROLLOUT.md
+SECURITY.md
+SUPPORT.md
+deno.json
+deno.lock
+docs
+jsr-package-settings.json
+notes.md
+ops
+packages
+plugins
+resources
+rfcs
+skills
+tools
+[0m
+[0m$ [0mls apps/ledgerline-web/components/ui/ apps/ledgerline-web/assets/ui/ apps/ledgerline-web/lib/
+ls: cannot access 'apps/ledgerline-web/components/ui/': No such file or directory
+ls: cannot access 'apps/ledgerline-web/assets/ui/': No such file or directory
+ls: cannot access 'apps/ledgerline-web/lib/': No such file or directory
+[0m
+I'll start by orienting myself in the worktree and locating the files the critique names.
+[0m$ [0mls /home/agent/projects/netscript/ 2>&1; echo "---HANDOFF---"; cat AGENTS-handoff.md 2>/dev/null | head -80
+handoff
+repo
+wave7-billing
+wave7-billing-steer2
+wave7-design
+wave7-preflight
+worktrees
+---HANDOFF---
+# Agent Handoff Protocol
+
+This repo treats GitHub PR and issue comments as the shared message bus between local agents and
+OpenHands (GitHub Actions and the VPS Web UI). This file is a **thin pointer** — the handoff spec is
+maintained in two canonical homes so it is not duplicated (and cannot contradict itself):
+
+- **`.agents/skills/openhands-handoff/SKILL.md`** — the operational routing card: trigger syntax
+  (`fix-me`/`openhands` labels, `agent:<profile>`, `@openhands-agent …`, `[openhands …]` commit
+  tokens, manual dispatch), the **model precedence** order and the provider→secret inference table,
+  the **output modes** (`pr-comment` / `respond-comments` / `thread-replies` / `summary-only`), the
+  **token rule** (`PAT_TOKEN`/GitHub App token for chained cloud events), the operational gotchas
+  (eval lock-churn, stale summary comment, per-PR concurrency-cancel), and the `.llm/tools/agentic/`
+  dispatch/status suite.
+- **`.llm/harness/workflow/agent-handoff.md`** — the **harness output contract**: for a harness run
+  the OpenHands evaluator's verdict and trace live in the **tracked** run dir — `OPENHANDS_RUN_DIR`
+  (`.llm/runs/<run-id>/`, where `plan-eval.md`/`evaluate.md` is committed) and `TRACE_DIR`
+  (`trace/` beneath it, env `OPENHANDS_TRACE_DIR`). This **replaces** the legacy git-ignored
+  `.llm/tmp/run/openhands/…` and `.llm/tmp/openhands/summary.md` scratch paths, which are never the
+  verdict of record.
+
+For anything about triggering, model selection, output modes, or the token rule, read the
+`openhands-handoff` SKILL. For where a harness run's artifacts and verdict must land, read
+`.llm/harness/workflow/agent-handoff.md`. Do not re-specify either here.
+
+## Long-Running VPS Sessions
+
+The only handoff fact unique to this doc: choose the surface by run length.
+
+- **Actions workflow** — short PR/issue fixups, evaluator passes, small research tasks, mobile
+  triggers.
+- **VPS Web UI/SDK session** — long-running implementation, planning with checkpoints, or work
+  needing a human-in-the-loop review before continuing. Deploy from
+  `ops/openhands/docker-compose.yml` (Dokploy). Leave a PR/issue comment linking the session outcome
+  back to the GitHub thread.
+[0m
+[0m$ [0mgit log --oneline -8; git branch --show-current; echo "---"; git worktree list
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+2609e8b5b chore(aspire-13.5): #1975 IMPL-EVAL PASS recorded; manifest repair at 8e54ccfa1
+4bf5c75d0 chore(aspire-13.5): leaf-1881-fix GREEN 0650f6f7b on #1975; IMPL-EVAL dispatched
+4113c0863 chore(aspire-13.5): brief addendum (fail-closed install root) and corrected post-merge proof dispatch
+research/aspire-13.5-0.0.7
+---
+/home/agent/projects/netscript/repo                                      08f581e83 [main]
+/home/agent/projects/netscript/worktrees/007-aspire                      cf528cbd3 [research/aspire-13.5-0.0.7]
+/home/agent/projects/netscript/worktrees/007-canary10-cleanup-proof      e677ac3c8 [test/readme-canary10-cleanup-proof]
+/home/agent/projects/netscript/worktrees/007-conv-1756                   b607bfe26 [salvage/1756-current-base]
+/home/agent/projects/netscript/worktrees/007-conv-1808                   78be0e032 [verify-1777]
+/home/agent/projects/netscript/worktrees/007-docs                        55d435394 [orchestrator/release-0.0.7-docs]
+/home/agent/projects/netscript/worktrees/007-features                    043e53c22 [orchestrator/release-0.0.7-features]
+/home/agent/projects/netscript/worktrees/007-final-harness-integration   2158b8611 [chore/final-0.0.7-harness-integration]
+/home/agent/projects/netscript/worktrees/007-fixes                       d274246fc [orchestrator/release-0.0.7-fixes]
+/home/agent/projects/netscript/worktrees/007-hotfix-phase-b-sol          d64682bb0 [fix/canary6-phase-b-follow-observer-sol]
+/home/agent/projects/netscript/worktrees/007-internals                   fabdae4f7 [orchestrator/release-0.0.7-internals]
+/home/agent/projects/netscript/worktrees/007-leaf-1349-audit             49d076c02 [chore/sdk-client-1349-acceptance-audit]
+/home/agent/projects/netscript/worktrees/007-leaf-1857                   b66e52cbc [verify-merged]
+/home/agent/projects/netscript/worktrees/007-leaf-1870                   7b5a31a80 [fix/readiness-fixture-cache-discovery]
+/home/agent/projects/netscript/worktrees/007-leaf-1877                   bb5fd4ad3 [fix/workers-runtime-ready-markers]
+/home/agent/projects/netscript/worktrees/007-leaf-1898                   438ed4f60 [fix/readiness-fixture-app-identifier-collision]
+/home/agent/projects/netscript/worktrees/007-leaf-adoptA                 dd80f5554 [verify]
+/home/agent/projects/netscript/worktrees/007-leaf-sdk-contrib            76beee792 [feat/sdk-client-contributions-plan]
+/home/agent/projects/netscript/worktrees/007-primary                     36c76edb5 [chore/release-0.0.7-orchestration]
+/home/agent/projects/netscript/worktrees/007-repair-1970-handler-freeze  ad5a74e76 [repair/pr1970-handler-freeze]
+/home/agent/projects/netscript/worktrees/007-s7-reexpress                6f4da15b6 [fix/aspire-s7-reexpress]
+/home/agent/projects/netscript/worktrees/007-s8-repair                   f855d2428 [fix/aspire-s8-workers-post-migration]
+/home/agent/projects/netscript/worktrees/007-s9-auth-audit               6d2148996 [fix/aspire-s9-authenticated-telemetry-coauthor]
+/home/agent/projects/netscript/worktrees/007-salvage                     729f45248 [chore/preserve-orphaned-run-artifacts]
+/home/agent/projects/netscript/worktrees/007-stable-fixture-repair       6884b7548 [fix/cli-prepublish-test-fixture]
+[0m
+The worktree is the core NetScript repo, not the Ledgerline app. Let me find where that app actually lives.
+[0m$ [0mls -la /home/agent/projects/netscript/wave7-billing-steer2/ 2>&1 | head -30; echo "=== WAVE7-DESIGN ==="; ls /home/agent/projects/netscript/wave7-design/ 2>&1 | head -20; echo "=== WAVE7-BILLING ==="; ls /home/agent/projects/netscript/wave7-billing/ 2>&1 | head -20
+total 366
+drwxr-xr-x 20 node node     36 Sep  4 13:45 .
+drwxr-xr-x 11 node node     12 Sep  4 13:42 ..
+drwxr-xr-x  3 node node      3 Sep  4 13:42 .agents
+drwxr-xr-x  3 node node      3 Sep  4 13:42 .claude
+drwxr-xr-x  2 node node      3 Sep  4 13:42 .config
+-rw-r--r--  1 node node     89 Sep  4 13:42 .git
+-rw-r--r--  1 node node    200 Sep  4 13:42 .gitignore
+drwxr-xr-x  5 node node      5 Sep  4 13:42 .llm
+-rw-r--r--  1 node node    623 Sep  4 13:42 .mcp.json
+drwxr-xr-x  5 node node      9 Sep  4 13:42 .netscript
+-rw-r--r--  1 node node   3614 Sep  4 13:42 AGENTS.md
+-rw-r--r--  1 node node   4358 Sep  4 13:42 DESIGN.md
+-rw-r--r--  1 node node  12884 Sep  4 13:42 MARKET-RESEARCH.md
+-rw-r--r--  1 node node   6689 Sep  4 13:42 README.md
+-rw-r--r--  1 node node  57745 Sep  4 15:06 RECORD.md
+drwxr-xr-x  3 node node      3 Sep  4 13:42 apps
+-rw-r--r--  1 node node   7185 Sep  4 13:42 appsettings.json
+drwxr-xr-x  3 node node      8 Sep  4 13:42 aspire
+-rw-r--r--  1 node node  40908 Sep  4 13:42 aspire-export-20260904-113855.zip
+-rw-r--r--  1 node node  40892 Sep  4 13:42 aspire-export-20260904-113857.zip
+drwxr-xr-x  2 node node      6 Sep  4 13:42 auth
+drwxr-xr-x  3 node node      5 Sep  4 13:42 contracts
+drwxr-xr-x  3 node node      4 Sep  4 13:42 database
+-rw-r--r--  1 node node  10533 Sep  4 13:42 deno.json
+-rw-r--r--  1 node node 191027 Sep  4 13:42 deno.lock
+-rw-r--r--  1 node node    589 Sep  4 13:42 netscript.config.ts
+drwxr-xr-x 17 node node     43 Sep  4 15:02 node_modules
+-rw-r--r--  1 node node     62 Sep  4 13:42 package.json
+drwxr-xr-x  2 node node      4 Sep  4 13:42 plugins
+=== WAVE7-DESIGN ===
+AGENTS.md
+AUDIT-HOWTO.md
+CONSTRUCTION-REFERENCE.md
+DESIGN-REFERENCES.md
+DESIGN.md
+MARKET-RESEARCH.md
+README.md
+RECORD.md
+apps
+appsettings.json
+aspire
+auth
+contracts
+database
+deno.json
+deno.lock
+design-critique-1.md
+design-references
+mcp-ask.ts
+netscript.config.ts
+=== WAVE7-BILLING ===
+AGENTS.md
+DESIGN.md
+MARKET-RESEARCH.md
+README.md
+RECORD.md
+apps
+appsettings.json
+aspire
+aspire-export-20260904-113855.zip
+aspire-export-20260904-113857.zip
+auth
+contracts
+database
+deno.json
+deno.lock
+netscript.config.ts
+node_modules
+package.json
+plugins
+sagas
+[0m
+[0m$ [0mls -la /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/
+total 339
+drwxr-xr-x   7 node node    46 Sep  4 15:24 .
+drwxr-xr-x 181 node node   181 Sep  3 21:56 ..
+-rw-r--r--   1 node node  2006 Sep  4 07:02 AUDIT-HOWTO.md
+-rw-r--r--   1 node node 11790 Sep  4 07:16 CONSTRUCTION-REFERENCE.md
+-rw-r--r--   1 node node  6701 Sep  4 11:32 DESIGN-REFERENCES.md
+-rw-r--r--   1 node node  4352 Sep  3 23:26 ENVIRONMENT.md
+-rw-r--r--   1 node node  7852 Sep  4 00:26 PRODUCT-DEFINITION.md
+-rw-r--r--   1 node node  3396 Sep  3 22:32 PUBLISHING.md
+drwxr-xr-x   2 node node     3 Sep  4 07:11 audits
+-rw-r--r--   1 node node   599 Sep  4 00:26 auto-steer.sh
+-rw-r--r--   1 node node  4213 Sep  3 22:07 beat-this.md
+-rw-r--r--   1 node node 13994 Sep  3 22:32 brief.md
+-rw-r--r--   1 node node  1351 Sep  4 11:13 continue.md
+-rw-r--r--   1 node node  1965 Sep  4 12:03 coord-loop.sh
+-rw-r--r--   1 node node  8319 Sep  4 11:25 design-brief.md
+-rw-r--r--   1 node node  4014 Sep  4 11:33 design-critic-brief.md
+-rw-r--r--   1 node node 26660 Sep  4 11:52 design-critique-1.md
+drwxr-xr-x   2 node node     4 Sep  4 11:32 design-references
+-rw-r--r--   1 node node  7372 Sep  4 13:17 design-steer-2-continuation.md
+-rw-r--r--   1 node node  7610 Sep  4 13:50 design-steer-2-pass3.md
+-rw-r--r--   1 node node  7976 Sep  4 14:22 design-steer-2-pass4.md
+-rw-r--r--   1 node node  8270 Sep  4 14:52 design-steer-2-pass5.md
+-rw-r--r--   1 node node  8123 Sep  4 15:07 design-steer-2-pass6.md
+-rw-r--r--   1 node node  7254 Sep  4 15:24 design-steer-2-pass7.md
+-rw-r--r--   1 node node  6600 Sep  4 12:36 design-steer-2-report.md
+-rw-r--r--   1 node node  4004 Sep  4 11:52 design-steer-2.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 evaluator
+-rw-r--r--   1 node node   831 Sep  4 11:13 keepalive.sh
+-rw-r--r--   1 node node  1294 Sep  3 23:05 kickoff.md
+drwxr-xr-x   2 node node    39 Sep  4 15:25 logs
+-rw-r--r--   1 node node  1529 Sep  4 07:02 mcp-ask.ts
+-rw-r--r--   1 node node  3396 Sep  3 22:03 publishing-contract.md
+-rw-r--r--   1 node node  2960 Sep  3 22:02 quality-bar-eis-chat.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 receipts
+-rw-r--r--   1 node node  3195 Sep  4 06:52 steer-2.md
+-rw-r--r--   1 node node  7799 Sep  4 07:14 steer-3.md
+-rw-r--r--   1 node node  8061 Sep  4 07:17 steer-4.md
+-rw-r--r--   1 node node  2642 Sep  4 08:02 steer-5.md
+-rw-r--r--   1 node node  4862 Sep  4 10:23 steer-6.md
+-rw-r--r--   1 node node  2704 Sep  4 10:27 steer-7.md
+-rw-r--r--   1 node node  5245 Sep  4 11:22 steer-8.md
+-rw-r--r--   1 node node  7360 Sep  4 11:26 steer-9.md
+-rw-r--r--   1 node node   829 Sep  4 07:17 steer-loop.sh
+-rw-r--r--   1 node node   599 Sep  4 00:27 steer-watch.sh
+-rw-r--r--   1 node node  2300 Sep  3 21:56 supervisor.md
+-rw-r--r--   1 node node   760 Sep  3 23:06 watch.sh
+[0m
+There's a `wave7-billing-steer2` directory that looks like the actual work location. Let me check it and the run artifacts.
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass7.md
+[0m
+[0m$ [0mcat /home/agent/projects/netscript/wave7-billing-steer2/.git; echo "=== STATUS ==="; git status --short 2>&1 | head -40; echo "=== LOG ==="; git log --oneline -15 2>&1
+gitdir: /home/agent/projects/netscript/wave7-billing/.git/worktrees/wave7-billing-steer2
+=== STATUS ===
+=== LOG ===
+2550ac2 Record the build-vs-fmt conflict on withRouteContract before it bites again
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+37d1c25 Make the design gallery type-check, and the app lint clean
+50b1f55 Mount SegmentedControl on the invoice status filter
+908d513 Mount DeltaChip on the runs index against the preceding run
+f6e1f72 Mount ComparisonAreaChart on the run console over computed vs prior
+f904592 Mount SemicircularGauge on the run console as the run-progress hero
+ba37797 Delete the scaffold fiction the gallery was still wearing
+460f040 Give the destructive button's hover a role instead of a ramp step
+fc20122 Add FooterColumns — hairline rules, not gaps
+5ceb1eb Add ComparisonAreaChart — billed versus collected as two layers
+c81a7b5 Add SegmentedControl — range selection by filling, not by bordering
+bd061f7 Add SemicircularGauge — the 180° two-tone run-progress arc
+bee83d5 Add WidgetCard — the one five-band card grammar
+[0m
+Substantial prior work exists — passes 3-7 already. Let me read the latest pass and check the actual work repo state.
+[0m$ [0mecho "=== wave7-design ==="; git branch --show-current; git status --short | head -20; git log --oneline -6; echo; echo "=== wave7-billing-steer2 ==="; git branch --show-current; git status --short | head -20; git log --oneline -6
+=== wave7-design ===
+research/aspire-13.5-0.0.7
+?? .llm/runs/wave7-billing-run--0.0.7/
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+2609e8b5b chore(aspire-13.5): #1975 IMPL-EVAL PASS recorded; manifest repair at 8e54ccfa1
+
+=== wave7-billing-steer2 ===
+research/aspire-13.5-0.0.7
+?? .llm/runs/wave7-billing-run--0.0.7/
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+2609e8b5b chore(aspire-13.5): #1975 IMPL-EVAL PASS recorded; manifest repair at 8e54ccfa1
+[0m
+[0m$ [0mecho "=== worktrees of wave7-design ==="; git worktree list 2>&1; echo; echo "=== worktrees of wave7-billing ==="; git worktree list 2>&1
+=== worktrees of wave7-design ===
+/home/agent/projects/netscript/wave7-billing         c5d57c6 [master]
+/home/agent/projects/netscript/wave7-billing-steer2  2550ac2 [fix/steer2-consolidated]
+/home/agent/projects/netscript/wave7-design          f82a8f4 [design/ledgerline-ui]
+
+=== worktrees of wave7-billing ===
+/home/agent/projects/netscript/wave7-billing         c5d57c6 [master]
+/home/agent/projects/netscript/wave7-billing-steer2  2550ac2 [fix/steer2-consolidated]
+/home/agent/projects/netscript/wave7-design          f82a8f4 [design/ledgerline-ui]
+[0m
+Two trees have steer-2 work. Let me map both before deciding where to continue.
+[0m$ [0mecho "=== design/ledgerline-ui ==="; git log --oneline master..design/ledgerline-ui | cat; echo; echo "=== fix/steer2-consolidated ==="; git log --oneline master..fix/steer2-consolidated | cat; echo; echo "=== files changed: design ==="; git diff --stat master..design/ledgerline-ui | tail -30
+=== design/ledgerline-ui ===
+f82a8f4 Design: the two files that keep the root fmt gate red
+91dc1b2 Design: a null footer column renders in the absent tone
+433caf9 Design: clip the area chart's hover bands to the frame
+809b130 Design: make the app's own check gate green
+310a123 Design: format the status contract test this branch introduced
+4261c92 Design: finish the gallery scaffold sweep the prior pass reported closed
+b8ae695 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+24cccd5 Design: money + status contract layer, tested
+
+=== fix/steer2-consolidated ===
+2550ac2 Record the build-vs-fmt conflict on withRouteContract before it bites again
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+9037887 Mount SegmentedControl on the runs status filter — the selected status is now drawn
+37d1c25 Make the design gallery type-check, and the app lint clean
+50b1f55 Mount SegmentedControl on the invoice status filter
+908d513 Mount DeltaChip on the runs index against the preceding run
+f6e1f72 Mount ComparisonAreaChart on the run console over computed vs prior
+f904592 Mount SemicircularGauge on the run console as the run-progress hero
+ba37797 Delete the scaffold fiction the gallery was still wearing
+460f040 Give the destructive button's hover a role instead of a ramp step
+fc20122 Add FooterColumns — hairline rules, not gaps
+5ceb1eb Add ComparisonAreaChart — billed versus collected as two layers
+c81a7b5 Add SegmentedControl — range selection by filling, not by bordering
+bd061f7 Add SemicircularGauge — the 180° two-tone run-progress arc
+bee83d5 Add WidgetCard — the one five-band card grammar
+31a4fed Add DeltaChip — one component for every "versus last period"
+cc4c774 Stop counting Ledgerline's own components as upstream registry items
+fcdebb3 Give the product tree the tokens the widget vocabulary needs
+7f044c1 Fix: the last two ramp-step/shadow leaks need token-layer names
+7d299b2 Merge the parallel provisional-chip contrast fix into the steer #2 billing branch
+27b8950 Fix: the provisional chip's label failed contrast on paper
+58a79aa Fix: drop the brutalist offset shadows, add the pill action
+e291f0c Fix: the exception chip went unreadable in dark mode
+
+=== files changed: design ===
+ sagas/payment-refund-saga.ts                       |  69 +-
+ sagas/run-issue-saga.ts                            | 264 +++---
+ sagas/run-issue.config.ts                          |   8 +-
+ sagas/runtime.ts                                   |  18 +-
+ sagas/user-registration-saga.ts                    |  44 +
+ sagas/user-registration.config.ts                  |  17 +
+ services/_shared/billing-client.ts                 |  23 -
+ services/billing/src/auth.ts                       |   7 +-
+ services/billing/src/domain/payments.ts            | 136 ----
+ services/billing/src/domain/probe-contrib2.ts      |  18 +
+ services/billing/src/routers/v1.ts                 |  14 +-
+ services/runs/src/lib/stream.ts                    |   2 +-
+ services/webhooks/deno.json                        |   1 -
+ services/webhooks/src/auth.ts                      |  46 --
+ services/webhooks/src/domain/webhooks.ts           |  95 ---
+ services/webhooks/src/main.ts                      |  12 +-
+ services/webhooks/src/routers/raise.ts             |  55 --
+ services/webhooks/src/routers/v1.ts                | 130 ++-
+ streams/run-console-schema.ts                      |   2 +-
+ tests/design_contract_test.ts                      | 324 ++++++++
+ tests/sagas_test.ts                                | 574 +++++++------
+ tests/status_test.ts                               | 136 ++++
+ triggers/daily-maintenance.ts                      |  22 +-
+ triggers/generic-inbound-webhook.ts                |  44 +
+ triggers/mod.ts                                    |   1 +
+ workers/jobs/payment-refund.ts                     |  41 +-
+ workers/jobs/period-close-check.ts                 | 104 ---
+ workers/jobs/run-item-issue.ts                     | 546 ++++---------
+ workers/mod.ts                                     |   1 -
+ 139 files changed, 5596 insertions(+), 7458 deletions(-)
+[0m
+[0m$ [0mecho "=== files changed: steer2 ==="; git diff --stat master..fix/steer2-consolidated | tail -40
+=== files changed: steer2 ===
+ .../components/ui/segmented-control.tsx            | 134 +++++++
+ .../components/ui/semicircular-gauge.tsx           | 180 +++++++++
+ apps/ledgerline-web/components/ui/widget-card.tsx  | 125 ++++++
+ .../ledgerline-web/islands/ui/RangeControlDemo.tsx | 133 +++++++
+ apps/ledgerline-web/lib/money.ts                   |  88 +++++
+ apps/ledgerline-web/lib/webhooks.ts                |   7 +-
+ .../design/(_components)/components-view.tsx       | 417 +++++++++++++++++----
+ .../design/(_components)/composition-view.tsx      |   4 +-
+ .../(design)/design/(_components)/tokens-view.tsx  |   2 +-
+ .../design/(_islands)/FloatingSurfaceDemo.tsx      |   6 +-
+ .../(design)/design/(_shared)/collection-ranges.ts | 232 ++++++++++++
+ .../routes/(design)/design/(_shared)/registry.ts   | 163 +++++---
+ .../routes/(design)/design/_layout.tsx             |   2 +-
+ apps/ledgerline-web/routes/_layout.tsx             |   1 -
+ apps/ledgerline-web/routes/customers/[id].tsx      |   5 +-
+ apps/ledgerline-web/routes/customers/index.tsx     |   5 +-
+ .../routes/invoices/(_components)/invoice-list.tsx |  52 +--
+ apps/ledgerline-web/routes/invoices/[id].tsx       |   5 +-
+ apps/ledgerline-web/routes/invoices/index.tsx      |   5 +-
+ .../routes/runs/(_components)/billed-summary.tsx   |  64 ++++
+ .../routes/runs/(_components)/run-comparison.tsx   | 208 ++++++++++
+ .../routes/runs/(_components)/run-progress.tsx     | 169 +++++++++
+ .../routes/runs/(_components)/runs-table.tsx       |  59 +--
+ .../routes/runs/(_islands)/saga-instances.tsx      |   1 -
+ apps/ledgerline-web/routes/runs/[id].tsx           |  35 +-
+ .../webhooks/(_components)/webhooks-view.tsx       | 163 --------
+ apps/ledgerline-web/routes/webhooks/index.tsx      |  65 ----
+ appsettings.json                                   |   7 +-
+ aspire/.helpers/register-services.mts              |  10 -
+ contracts/versions/v1/webhooks.contract.ts         | 165 +++-----
+ services/runs/src/lib/stream.ts                    |   2 +-
+ services/webhooks/deno.json                        |   1 -
+ services/webhooks/src/auth.ts                      |  46 ---
+ services/webhooks/src/domain/webhooks.ts           |  95 -----
+ services/webhooks/src/main.ts                      |  12 +-
+ services/webhooks/src/routers/raise.ts             |  55 ---
+ services/webhooks/src/routers/v1.ts                | 130 +++----
+ streams/run-console-schema.ts                      |   2 +-
+ tests/design_contract_test.ts                      | 350 +++++++++++++++++
+ 64 files changed, 4358 insertions(+), 887 deletions(-)
+[0m
+Both are worktrees of one repo, on two branches doing the same work. Let me see how far each got and how they differ.
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass6.md
+[0m
+[0m$ [0mecho "=== merge-base design ==="; git merge-base master design/ledgerline-ui | cat; git log --oneline -1 $(git merge-base master design/ledgerline-ui) | cat; echo; echo "=== merge-base steer2 ==="; git log --oneline -1 $(git merge-base master fix/steer2-consolidated) | cat; echo; echo "=== master ahead/behind ==="; git rev-list --left-right --count master...design/ledgerline-ui | cat; git rev-list --left-right --count master...fix/steer2-consolidated | cat
+=== merge-base design ===
+a11023035ed56516991ad8a8a334b74a64e9fca2
+a110230 Frontend 1/8: Ledgerline token identity — paper/ink/ledger-green/rust ramps, money + status tokens, tabular numerals, green-tinted shadows, distinct dark theme (tokens.json is the source, tokens.css generated)
+
+=== merge-base steer2 ===
+38f4aee Backend D: terminal compensation proved — instances API + refund + run rows
+
+=== master ahead/behind ===
+41	9
+2	23
+[0m
+Let me read the recent passes and check how the two branches relate to master.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== ui components ==="; ls components/ui/; echo; echo "=== assets/ui ==="; ls assets/ui/ 2>/dev/null; echo; echo "=== product ==="; ls components/product/ 2>/dev/null; echo; echo "=== lib ==="; ls lib/
+=== ui components ===
+alert.tsx
+avatar.tsx
+badge.tsx
+breadcrumb.tsx
+button.tsx
+card.tsx
+chart-block.tsx
+checkbox.tsx
+code-block.tsx
+comparison-area-chart.tsx
+control-props.ts
+data-table.tsx
+delta-chip.tsx
+desktop-dialog.tsx
+desktop-notification.tsx
+desktop-tray-menu.tsx
+desktop-update-prompt.tsx
+desktop-window-chrome.tsx
+detail-layout.tsx
+donut.tsx
+dropzone.tsx
+empty-state.tsx
+filter-form.tsx
+footer-columns.tsx
+form-field.tsx
+icon-button.tsx
+inline-notice.tsx
+input.tsx
+label.tsx
+mod.ts
+page-header.tsx
+pagination.tsx
+panel.tsx
+progress.tsx
+responsive-table.tsx
+section-divider.tsx
+segmented-control.tsx
+select.tsx
+semicircular-gauge.tsx
+separator.tsx
+sidebar-shell.tsx
+skeleton.tsx
+spinner.tsx
+stats-grid.tsx
+switch.tsx
+textarea.tsx
+widget-card.tsx
+
+=== assets/ui ===
+alert-styles.css
+alert.css
+avatar.css
+badge.css
+button.css
+card.css
+chart-block.css
+checkbox.css
+choice-styles.css
+code-block.css
+comparison-area-chart.css
+data-table.css
+delta-chip.css
+desktop-dialog.css
+desktop-notification.css
+desktop-tray-menu.css
+desktop-update-prompt.css
+desktop-window-chrome.css
+detail-layout.css
+donut.css
+dropzone.css
+empty-state.css
+exception-badge.css
+filter-form.css
+floating.css
+footer-columns.css
+form-control-styles.css
+form-field.css
+inline-notice.css
+label.css
+money-text.css
+page-header.css
+pagination.css
+panel.css
+progress.css
+provisional-tag.css
+responsive-table.css
+run-state-stepper.css
+section-divider.css
+segmented-control.css
+semicircular-gauge.css
+separator.css
+sheet.css
+skeleton.css
+spinner.css
+stats-grid.css
+status-badge.css
+surface-styles.css
+switch.css
+textarea.css
+theme-toggle.css
+toast.css
+transition-feed.css
+
+=== product ===
+exception-badge.tsx
+mod.ts
+money-text.tsx
+provisional-tag.tsx
+run-state-stepper.tsx
+status-badge.tsx
+transition-feed.tsx
+
+=== lib ===
+billing.ts
+cn.ts
+money.ts
+public-types.ts
+runs.ts
+sagas.ts
+service-auth.ts
+ui
+webhooks.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== brutalist shadows ==="; grep -rn "3px 3px 0" apps/ledgerline-web/ 2>/dev/null; echo "(exit $?)"; echo; echo "=== rust-6 hardcoded ==="; grep -rn "ns-rust-6" apps/ledgerline-web/ 2>/dev/null; echo; echo "=== Number( / toFixed / Intl in money-text ==="; grep -rn "Number(\|toFixed\|Intl\." apps/ledgerline-web/components/product/money-text.tsx 2>/dev/null; echo; echo "=== moneyParts usage ==="; grep -rn "moneyParts" apps/ledgerline-web/ | head
+...output truncated...
+
+Full output saved to: /home/agent/.local/share/opencode/tool-output/tool_06c9a12d3001PZQdiIhGS3UBNm
+
+ax(0,1fr)}.ns-token-zplate{margin-left:0;margin-top:var(--ns-space-2)}}@media (prefers-reduced-motion: reduce){.ns-token-ramp__step,.ns-token-motion-chip,.ns-tokens-rail__link,.ns-token-copy{transition:none}.ns-token-ramp__step:hover{flex-grow:1}.ns-token-motion-chip:hover{transform:none}}
+apps/ledgerline-web/assets/tokens.css:30:  --ns-rust-6: oklch(54.5% 0.145 38);
+apps/ledgerline-web/assets/tokens.css:110:  --ns-money-neg: var(--ns-rust-6);
+apps/ledgerline-web/assets/tokens.css:116:  --ns-status-failed: var(--ns-rust-6);
+apps/ledgerline-web/assets/tokens.css:128:  --ns-series-4: var(--ns-rust-6);
+apps/ledgerline-web/assets/tokens.json:218:      "cssVar": "--ns-rust-6",
+apps/ledgerline-web/assets/tokens.json:833:      "value": "var(--ns-rust-6)",
+apps/ledgerline-web/assets/tokens.json:878:      "value": "var(--ns-rust-6)",
+apps/ledgerline-web/assets/tokens.json:950:      "value": "var(--ns-rust-6)",
+apps/ledgerline-web/assets/ui/button.css:117:/* Hover is a role, not a ramp step. `--ns-rust-6` is 54.5% lightness: on a
+apps/ledgerline-web/assets/ui/exception-badge.css:7:   and this chip has to hold its contrast on both grounds. `--ns-rust-6` is a
+
+=== Number( / toFixed / Intl in money-text ===
+
+=== moneyParts usage ===
+apps/ledgerline-web/components/product/money-text.tsx:8: * `moneyParts().direction`, and absence is an em dash.
+apps/ledgerline-web/components/product/money-text.tsx:13:import { ABSENT, type MoneyDirection, moneyParts, type MoneyValue } from '../../lib/money.ts';
+apps/ledgerline-web/components/product/money-text.tsx:23: * `moneyParts` direction -> the `data-money-sign` this component's stylesheet
+apps/ledgerline-web/components/product/money-text.tsx:37: * Every digit and the direction both come from one `moneyParts()` call. This
+apps/ledgerline-web/components/product/money-text.tsx:48:  const parts = moneyParts(value, { currency });
+apps/ledgerline-web/_fresh/server/server-entry.mjs:12209:function moneyParts(value2, options2 = {}) {
+apps/ledgerline-web/_fresh/server/server-entry.mjs:12240:  return moneyParts(value2).direction;
+apps/ledgerline-web/_fresh/server/server-entry.mjs:12243:  const parts = moneyParts(value2, options2);
+apps/ledgerline-web/_fresh/server/server-entry.mjs:12266:  const top = moneyParts(numerator).value;
+apps/ledgerline-web/_fresh/server/server-entry.mjs:12267:  const bottom = moneyParts(denominator).value;
+[0m
+Now I have the picture. Let me verify the current state of the near-master branch (`fix/steer2-consolidated`, 2 behind master) rather than inherit prior claims.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== 3px 3px 0 shadows (source, excl build) ==="; grep -rn --include=*.css --include=*.tsx --include=*.ts "3px 3px 0" . 2>/dev/null | grep -v _fresh | grep -v node_modules; echo "exit=$?"; echo; echo "=== hit-x (pass7 band clipping) ==="; grep -rn "hit-x" --include=*.tsx --include=*.css . | grep -v _fresh; echo; echo "=== exception-badge.css ==="; cat assets/ui/exception-badge.css
+=== 3px 3px 0 shadows (source, excl build) ===
+exit=1
+
+=== hit-x (pass7 band clipping) ===
+
+=== exception-badge.css ===
+/* ns-exception-badge — components/product/exception-badge.tsx
+   Rust-tinted chip for a run item's exception bucket. Presence and absence
+   are distinguished by the data-exception attribute: 'none' renders the em
+   dash so "no exception" never reads like a flagged item. */
+
+/* A component never reaches into a ramp step, because the ramp is theme-variant
+   and this chip has to hold its contrast on both grounds. `--ns-rust-6` is a
+   mid red: legible on paper, but roughly 3.4:1 against a dark card, under the
+   4.5:1 a chip's small text needs. These three are semantic and the theme
+   re-steps them — `--ns-money-neg` moves rust-6 to rust-4 in dark and the
+   tint/border pair steps 10/20% up to 12/24% — so one rule covers both
+   themes instead of a dark-mode override that drifts. */
+.ns-exception-badge[data-exception]:not([data-exception='none']) {
+  color: var(--ns-money-neg);
+  background: var(--ns-destructive-subtle);
+  border: 1px solid var(--ns-destructive-border);
+}
+
+.ns-exception-badge[data-exception='none'] {
+  color: var(--ns-muted-fg);
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== gallery registry: catalog entries ==="; grep -n "id:\|name:" routes/\(design\)/design/\(_shared\)/registry.ts 2>/dev/null | head -60
+=== gallery registry: catalog entries ===
+18:  readonly name: string;
+25:  readonly name: string;
+30:  name: 'fresh-ui-foundation',
+43:    name: 'cn',
+49:    name: 'public-types',
+55:    name: 'control-props',
+61:    name: 'form-control-styles',
+67:    name: 'choice-styles',
+73:    name: 'surface-styles',
+79:    name: 'sheet-styles',
+85:    name: 'floating-styles',
+92:    name: 'alert-styles',
+98:    name: 'theme-seed',
+105:    name: 'layout-objects',
+112:    name: 'button',
+118:    name: 'icon-button',
+124:    name: 'input',
+130:    name: 'textarea',
+136:    name: 'checkbox',
+142:    name: 'switch',
+148:    name: 'label',
+154:    name: 'select',
+160:    name: 'form-field',
+166:    name: 'card',
+173:    name: 'panel',
+179:    name: 'badge',
+185:    name: 'avatar',
+192:    name: 'citation-chip',
+199:    name: 'code-block',
+206:    name: 'model-selector',
+213:    name: 'tool-call-card',
+220:    name: 'chart-block',
+227:    name: 'donut',
+234:    name: 'prompt-input',
+241:    name: 'message',
+248:    name: 'markdown',
+255:    name: 'command-palette',
+262:    name: 'search',
+269:    name: 'dropzone',
+276:    name: 'separator',
+282:    name: 'alert',
+289:    name: 'inline-notice',
+295:    name: 'spinner',
+301:    name: 'progress',
+308:    name: 'skeleton',
+314:    name: 'breadcrumb',
+320:    name: 'sidebar-shell',
+327:    name: 'page-header',
+334:    name: 'filter-form',
+341:    name: 'stats-grid',
+348:    name: 'detail-layout',
+355:    name: 'data-table',
+361:    name: 'responsive-table',
+368:    name: 'pagination',
+374:    name: 'empty-state',
+381:    name: 'section-divider',
+387:    name: 'theme-toggle',
+393:    name: 'sidebar-toggle',
+399:    name: 'toast-support',
+405:    name: 'toast',
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -n "ledgerlineCatalog" routes/\(design\)/design/\(_shared\)/registry.ts | head; echo "---"; awk '/ledgerlineCatalog/,0' routes/\(design\)/design/\(_shared\)/registry.ts | grep -n "name:\|renderDemo\|id:" | head -60
+629:export const ledgerlineCatalog: readonly RegistryCatalogItem[] = [
+---
+3:    name: 'status-badge',
+10:    name: 'money-text',
+17:    name: 'delta-chip',
+24:    name: 'semicircular-gauge',
+31:    name: 'segmented-control',
+38:    name: 'comparison-area-chart',
+45:    name: 'footer-columns',
+52:    name: 'run-state-stepper',
+59:    name: 'exception-badge',
+66:    name: 'transition-feed',
+73:    name: 'provisional-tag',
+80:    name: 'widget-card',
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+`--hit-x` (pass 7's band-clipping fix) is absent here — a real gap. Let me confirm the gallery catalogue and inspect the chart's hover bands.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== hit CSS ==="; grep -n -A12 "ns-areachart__hit {" assets/ui/comparison-area-chart.css; echo; echo "=== hit:hover / crosshair / dot / tip ==="; grep -n -A6 "ns-areachart__hit:hover\|ns-areachart__crosshair {\|ns-areachart__dot {\|ns-areachart__tip {" assets/ui/comparison-area-chart.css
+=== hit CSS ===
+162:.ns-areachart__hit {
+163-  position: absolute;
+164-  top: 0;
+165-  bottom: 0;
+166-  transform: translateX(-50%);
+167-}
+168-
+169-.ns-areachart__crosshair,
+170-.ns-areachart__dot,
+171-.ns-areachart__tip {
+172-  opacity: 0;
+173-  transition: opacity var(--ns-ease-fast);
+174-  pointer-events: none;
+
+=== hit:hover / crosshair / dot / tip ===
+171:.ns-areachart__tip {
+172-  opacity: 0;
+173-  transition: opacity var(--ns-ease-fast);
+174-  pointer-events: none;
+175-}
+176-
+177-/* The crosshair drops from the point marker to the baseline — downward, never
+--
+179:.ns-areachart__crosshair {
+180-  position: absolute;
+181-  top: var(--hit-dot);
+182-  bottom: 0;
+183-  left: 50%;
+184-  border-inline-start: 1px dashed var(--ns-chart-axis);
+185-}
+--
+187:.ns-areachart__dot {
+188-  position: absolute;
+189-  top: var(--hit-dot);
+190-  left: 50%;
+191-  width: var(--ns-space-2);
+192-  height: var(--ns-space-2);
+193-  transform: translate(-50%, -50%);
+--
+222:.ns-areachart__tip {
+223-  position: absolute;
+224-  bottom: calc(100% - var(--hit-dot));
+225-  left: 50%;
+226-  transform: translate(-50%, calc(-1 * var(--ns-space-3)));
+227-  display: flex;
+228-  flex-direction: column;
+--
+263:.ns-areachart__hit:hover > .ns-areachart__crosshair,
+264:.ns-areachart__hit:hover > .ns-areachart__dot,
+265:.ns-areachart__hit:hover > .ns-areachart__tip {
+266-  opacity: 1;
+267-}
+268-
+269-/* Axes sit outside the bounded plot (H6), positioned from the same geometry
+270-   the SVG used, so a tick cannot drift from its gridline. */
+271-.ns-areachart__yaxis {
+--
+407:  .ns-areachart__tip {
+408-    transition: none;
+409-  }
+410-}
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/footer-columns.tsx
+Confirmed the gap. Let me check the CSS and footer-columns, and establish a green baseline before changing anything.
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== footer-columns.css ==="; cat assets/ui/footer-columns.css
+=== footer-columns.css ===
+/* FooterColumns — the bottom band of a widget card (C5).
+
+   Columns are equal-width and divided by hairline *rules*, not by gaps: a gap
+   reads as two separate facts, a rule reads as one strip of related facts. The
+   divider is drawn on the leading edge of every column but the first so it
+   never doubles and never sits on the strip's own outer edge. */
+
+.ns-footer-cols {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-xl);
+  overflow: hidden;
+}
+
+.ns-footer-cols__col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ns-space-1);
+  min-width: 0;
+  padding: var(--ns-space-3) var(--ns-space-2);
+  text-align: center;
+}
+
+.ns-footer-cols__col + .ns-footer-cols__col::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--ns-space-2);
+  inset-inline-start: 0;
+  width: 1px;
+  background: var(--ns-border);
+}
+
+.ns-footer-cols__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ns-space-6);
+  height: var(--ns-space-6);
+  margin-bottom: var(--ns-space-1);
+  border-radius: var(--ns-radius-lg);
+  background: color-mix(in srgb, var(--ns-primary) 12%, transparent);
+  color: var(--ns-primary);
+  font-size: var(--ns-text-sm);
+}
+
+.ns-footer-cols__label {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ns-tracking-wide);
+  color: var(--ns-muted-fg);
+  white-space: nowrap;
+}
+
+.ns-footer-cols__value {
+  font-family: var(--ns-font-numeric);
+  font-variant-numeric: var(--ns-numeric-tabular);
+  font-size: var(--ns-text-sm);
+  font-weight: 600;
+  color: var(--ns-fg);
+  white-space: nowrap;
+}
+
+/* M5: direction selects the money token; the call site never picks a colour. */
+.ns-footer-cols__col[data-direction='in'] .ns-footer-cols__value {
+  color: var(--ns-money-pos);
+}
+
+.ns-footer-cols__col[data-direction='out'] .ns-footer-cols__value {
+  color: var(--ns-money-neg);
+}
+
+.ns-footer-cols__col[data-direction='flat'] .ns-footer-cols__value {
+  color: var(--ns-money-flat);
+}
+
+/* M1: a null column is "not measured", and says so in the absent tone. */
+.ns-footer-cols__col[data-direction='absent'] .ns-footer-cols__value {
+  color: var(--ns-absent);
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; echo "=== pass7 footer fix (91dc1b2) ==="; git show 91dc1b2 --stat | cat; echo; git show 91dc1b2 | cat
+=== pass7 footer fix (91dc1b2) ===
+commit 91dc1b2f3977083de570eeb277d309681dcafcfe
+Author: wave7-agent <agent@rickylabs.dev>
+Date:   Fri Sep 4 15:21:40 2026 +0200
+
+    Design: a null footer column renders in the absent tone
+    
+    `FooterColumns` renders the em dash for a `null` value, but the tone is carried
+    by `data-direction`, and a `null` value with no explicit direction emitted
+    `inherit`, which no stylesheet rule matches — so the em dash painted in the
+    full-contrast foreground and read as a value rather than as "not recorded".
+    The gallery ships exactly that case: the Wire column.
+    
+    Absence now wins over a caller-supplied direction, because once the value is
+    null there is no amount for a direction to qualify.
+
+ apps/ledgerline-web/components/ui/footer-columns.tsx | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit 91dc1b2f3977083de570eeb277d309681dcafcfe
+Author: wave7-agent <agent@rickylabs.dev>
+Date:   Fri Sep 4 15:21:40 2026 +0200
+
+    Design: a null footer column renders in the absent tone
+    
+    `FooterColumns` renders the em dash for a `null` value, but the tone is carried
+    by `data-direction`, and a `null` value with no explicit direction emitted
+    `inherit`, which no stylesheet rule matches — so the em dash painted in the
+    full-contrast foreground and read as a value rather than as "not recorded".
+    The gallery ships exactly that case: the Wire column.
+    
+    Absence now wins over a caller-supplied direction, because once the value is
+    null there is no amount for a direction to qualify.
+
+diff --git a/apps/ledgerline-web/components/ui/footer-columns.tsx b/apps/ledgerline-web/components/ui/footer-columns.tsx
+index 52e020a..a428897 100644
+--- a/apps/ledgerline-web/components/ui/footer-columns.tsx
++++ b/apps/ledgerline-web/components/ui/footer-columns.tsx
+@@ -50,7 +50,10 @@ export function FooterColumns({ columns, class: className, ...props }: FooterCol
+           <div
+             key={column.label}
+             class='ns-footer-cols__col'
+-            data-direction={column.direction ?? 'inherit'}
++            // `absent` wins over a caller-supplied direction: once the value is
++            // null there is no amount for a direction to qualify, and the em
++            // dash has to land in the absent tone or it reads as data.
++            data-direction={absent ? 'absent' : (column.direction ?? 'inherit')}
+           >
+             {column.glyph && <span class='ns-footer-cols__glyph'>{column.glyph}</span>}
+             <span class='ns-footer-cols__label'>{column.label}</span>
+[0m
+Two real defects confirmed. Let me check the CSS and see how the design tree already fixed the footer one.
+[0m# [0mTodos
+[•] Establish green baseline in wave7-billing-steer2 (fix/steer2-consolidated): tests, check, fmt, lint
+[ ] Fix FooterColumns: absence wins over caller-supplied direction (null renders in absent tone)
+[ ] Fix ComparisonAreaChart hover bands: clip end bands to frame via --hit-x
+[ ] Reconcile MoneyText API divergence between the two trees
+[ ] Verify by rendering + full gate suite; commit each fix separately
+[ ] Record the two-tree canonicalisation decision in RECORD.md
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; echo "=== pass7 band fix (433caf9) ==="; git show 433caf9 --stat | cat; echo "=== DIFF ==="; git show 433caf9 | cat
+=== pass7 band fix (433caf9) ===
+commit 433caf984ab830af87f1defeac79669d2759352d
+Author: wave7-agent <agent@rickylabs.dev>
+Date:   Fri Sep 4 15:21:33 2026 +0200
+
+    Design: clip the area chart's hover bands to the frame
+    
+    The chart renders correctly, but its hover layer was measured wrong at the two
+    ends. Each band was centred on its point with `translateX(-50%)` and given a
+    full step of width, so the first and last bands hung outside the frame by half
+    a step: on the gallery's four-point chart that is ~14% of the frame's width,
+    which is enough that hovering the y-axis gutter pops the first readout.
+    
+    An end band cannot simply be clipped, though — the crosshair, the dot and the
+    tooltip all sit at `50%` of their band, so clipping would draw them off the
+    point they name. The band now reports the point's x back out as `--hit-x`, a
+    percentage of its own box: 50% for every interior band, and off-centre only
+    where an end band was clipped. Tiling is unaffected because adjacent bands
+    still meet exactly at the midpoint between their points.
+    
+    Verified by rendering: four points give the bands 0–17.92, 17.92–50, 50–82.08
+    and 82.08–100, with every marker landing on its own x-tick (1.875, 33.958,
+    66.042, 98.125).
+
+ .../assets/ui/comparison-area-chart.css            | 12 +++--
+ .../components/ui/comparison-area-chart.tsx        | 58 +++++++++++++++-------
+ 2 files changed, 49 insertions(+), 21 deletions(-)
+=== DIFF ===
+commit 433caf984ab830af87f1defeac79669d2759352d
+Author: wave7-agent <agent@rickylabs.dev>
+Date:   Fri Sep 4 15:21:33 2026 +0200
+
+    Design: clip the area chart's hover bands to the frame
+    
+    The chart renders correctly, but its hover layer was measured wrong at the two
+    ends. Each band was centred on its point with `translateX(-50%)` and given a
+    full step of width, so the first and last bands hung outside the frame by half
+    a step: on the gallery's four-point chart that is ~14% of the frame's width,
+    which is enough that hovering the y-axis gutter pops the first readout.
+    
+    An end band cannot simply be clipped, though — the crosshair, the dot and the
+    tooltip all sit at `50%` of their band, so clipping would draw them off the
+    point they name. The band now reports the point's x back out as `--hit-x`, a
+    percentage of its own box: 50% for every interior band, and off-centre only
+    where an end band was clipped. Tiling is unaffected because adjacent bands
+    still meet exactly at the midpoint between their points.
+    
+    Verified by rendering: four points give the bands 0–17.92, 17.92–50, 50–82.08
+    and 82.08–100, with every marker landing on its own x-tick (1.875, 33.958,
+    66.042, 98.125).
+
+diff --git a/apps/ledgerline-web/assets/ui/comparison-area-chart.css b/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+index 398f252..a496e84 100644
+--- a/apps/ledgerline-web/assets/ui/comparison-area-chart.css
++++ b/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+@@ -159,11 +159,15 @@
+   inset: 0;
+ }
+ 
++/* `left`/`width` are set inline and already name the band's own box, so there
++   is no centring transform to undo. `--hit-x` is the point's x as a percentage
++   of *this band* — 50% for every interior band, and off-centre only where an
++   end band had to be clipped to the frame. */
+ .ns-areachart__hit {
++  --hit-x: 50%;
+   position: absolute;
+   top: 0;
+   bottom: 0;
+-  transform: translateX(-50%);
+ }
+ 
+ .ns-areachart__crosshair,
+@@ -180,14 +184,14 @@
+   position: absolute;
+   top: var(--hit-dot);
+   bottom: 0;
+-  left: 50%;
++  left: var(--hit-x);
+   border-inline-start: 1px dashed var(--ns-chart-axis);
+ }
+ 
+ .ns-areachart__dot {
+   position: absolute;
+   top: var(--hit-dot);
+-  left: 50%;
++  left: var(--hit-x);
+   width: var(--ns-space-2);
+   height: var(--ns-space-2);
+   transform: translate(-50%, -50%);
+@@ -222,7 +226,7 @@
+ .ns-areachart__tip {
+   position: absolute;
+   bottom: calc(100% - var(--hit-dot));
+-  left: 50%;
++  left: var(--hit-x);
+   transform: translate(-50%, calc(-1 * var(--ns-space-3)));
+   display: flex;
+   flex-direction: column;
+diff --git a/apps/ledgerline-web/components/ui/comparison-area-chart.tsx b/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+index e882359..18f2488 100644
+--- a/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ b/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -114,6 +114,26 @@ function percentStep(count: number): number {
+   return ((VB_WIDTH - VB_INSET * 2) / (count - 1) / VB_WIDTH) * 100;
+ }
+ 
++/**
++ * The hover band for point `index`, as percentages of the drawn frame.
++ *
++ * The band is centred on its point but clipped to the frame, and it carries the
++ * point's own x back out as `x` (a percentage of the band) for `--hit-x`. Both
++ * halves matter: an unclipped end band hangs outside the frame by half a step,
++ * which is far enough that hovering the y-axis gutter pops the first readout,
++ * while a clipped band whose marker still sat at `50%` would draw the dot and
++ * the crosshair off the point they name. Clipping is safe for tiling because
++ * adjacent bands still meet exactly at the midpoint between their points.
++ */
++function hitBand(index: number, count: number): { left: number; width: number; x: number } {
++  const centre = percentX(index, count);
++  const half = percentStep(count) / 2;
++  const left = Math.max(0, centre - half);
++  const right = Math.min(100, centre + half);
++  const width = right - left;
++  return { left, width, x: width > 0 ? ((centre - left) / width) * 100 : 50 };
++}
++
+ function percentY(value: number, max: number): number {
+   return (yAt(value, max) / VB_HEIGHT) * 100;
+ }
+@@ -272,24 +292,28 @@ export function ComparisonAreaChart({
+             and no first-paint mismatch (H4). */
+         }
+         <div class='ns-areachart__hits' aria-hidden='true'>
+-          {points.map((point, index) => (
+-            <span
+-              key={point.label}
+-              class='ns-areachart__hit'
+-              style={{
+-                left: `${percentX(index, points.length)}%`,
+-                width: `${percentStep(points.length)}%`,
+-                '--hit-dot': `${percentY(point.value, max)}%`,
+-              } as JSX.CSSProperties}
+-            >
+-              <span class='ns-areachart__crosshair' />
+-              <span class='ns-areachart__dot' data-series={series} />
+-              <span class='ns-areachart__tip'>
+-                <span class='ns-areachart__tip-label'>{point.label}</span>
+-                <span class='ns-areachart__tip-value'>{point.display}</span>
++          {points.map((point, index) => {
++            const band = hitBand(index, points.length);
++            return (
++              <span
++                key={point.label}
++                class='ns-areachart__hit'
++                style={{
++                  left: `${band.left}%`,
++                  width: `${band.width}%`,
++                  '--hit-x': `${band.x}%`,
++                  '--hit-dot': `${percentY(point.value, max)}%`,
++                } as JSX.CSSProperties}
++              >
++                <span class='ns-areachart__crosshair' />
++                <span class='ns-areachart__dot' data-series={series} />
++                <span class='ns-areachart__tip'>
++                  <span class='ns-areachart__tip-label'>{point.label}</span>
++                  <span class='ns-areachart__tip-value'>{point.display}</span>
++                </span>
+               </span>
+-            </span>
+-          ))}
++            );
++          })}
+         </div>
+       </div>
+[0m
+Now I have both defects confirmed and the prior fix to port. Let me set up tracking and establish a baseline.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; deno --version 2>&1 | head -2; echo "=== tasks ==="; deno task 2>&1 | head -30
+deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)
+v8 15.0.245.2-rusty
+=== tasks ===
+[0m[32mAvailable tasks:[0m
+- [0m[36mdev[0m
+    deno task deps:closure && deno task deps:verify && deno run --allow-all apps/ledgerline-web/main.ts
+- [0m[36mdeps:closure[0m
+    deno task --cwd apps/ledgerline-web deps:closure
+- [0m[36mdeps:verify[0m
+    deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts
+- [0m[36maspire:start[0m
+    cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start
+- [0m[36maspire:start:isolated[0m
+    cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated
+- [0m[36maspire:otel[0m
+    deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts otel
+- [0m[36maspire:export[0m
+    deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export
+- [0m[36mcheck[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check
+- [0m[36mlint[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint
+- [0m[36mfmt:check[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check
+- [0m[36mfmt[0m
+    deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write
+- [0m[36mtest[0m
+    deno test --allow-all
+[0m
+Both fixes are precisely known. Let me establish the baseline gates before touching anything.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== git status ==="; git status --porcelain | head -20; echo "(end)"; echo "=== fmt:check ==="; timeout 300 deno task fmt:check 2>&1 | tail -20; echo "EXIT=$?"
+=== git status ===
+(end)
+=== fmt:check ===
+        "triggers/daily-maintenance.ts",
+        "triggers/incoming-file-watch.ts",
+        "triggers/mod.ts",
+        "triggers/plugin.ts",
+        "triggers/runtime.ts",
+        "workers/jobs/health-check.ts",
+        "workers/jobs/payment-refund.ts",
+        "workers/jobs/period-close-check.ts",
+        "workers/jobs/run-item-issue.ts",
+        "workers/mod.ts",
+        "workers/plugin.ts",
+        "workers/runtime.ts",
+        "workers/tasks/validate-payload.ts"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "Checked 27 files\n"
+    }
+  ]
+}
+EXIT=0
+[0m
+Tree clean, fmt green. Let me run the test suite and lint baseline.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 600 deno task lint 2>&1 | tail -30; echo "EXIT=${PIPESTATUS[0]}"
+"services/webhooks/src/routers/v1.ts",
+        "streams/mod.ts",
+        "streams/notifications-stream.ts",
+        "streams/plugin.ts",
+        "streams/run-console-schema.ts",
+        "tests/design_contract_test.ts",
+        "tests/money_test.ts",
+        "tests/negative-auth_test.ts",
+        "tests/refund-flow_test.ts",
+        "tests/sagas_test.ts",
+        "triggers/daily-maintenance.ts",
+        "triggers/incoming-file-watch.ts",
+        "triggers/mod.ts",
+        "triggers/plugin.ts",
+        "triggers/runtime.ts",
+        "workers/jobs/health-check.ts",
+        "workers/jobs/payment-refund.ts",
+        "workers/jobs/period-close-check.ts",
+        "workers/jobs/run-item-issue.ts",
+        "workers/mod.ts",
+        "workers/plugin.ts",
+        "workers/runtime.ts",
+        "workers/tasks/validate-payload.ts"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "\u001b[0m\u001b[1m\u001b[31merror[require-await]\u001b[0m: \u001b[0m\u001b[1mAsync arrow function has no 'await' expression or 'await using' declaration.\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36m/home/agent/projects/netscript/wave7-billing-steer2/triggers/daily-maintenance.ts\u001b[0m\u001b[0m\u001b[33m:27:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m27 | \u001b[0m  async () => {\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^^^^^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: Remove 'async' keyword from the function or use 'await' expression or 'await using' declaration inside.\n\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://docs.deno.com/lint/rules/require-await\n\n\nFound 1 problem\nChecked 27 files\n"
+    }
+  ]
+}
+EXIT=1
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 600 deno task test --allow-all 2>&1 | tail -15; echo "EXIT=${PIPESTATUS[0]}"
+refund flow: capture, refund credit note, apply — payment reaches REFUNDED once ... [0m[32mok[0m [0m[38;5;245m(400ms)[0m
+refund flow: compensation voids the note and leaves the payment SUCCEEDED ... [0m[32mok[0m [0m[38;5;245m(275ms)[0m
+refund flow: refund idempotency replays the stored response and rejects mismatches ... [0m[32mok[0m [0m[38;5;245m(244ms)[0m
+refund flow: capturing a non-OPEN invoice is refused (state guard) ... [0m[32mok[0m [0m[38;5;245m(102ms)[0m
+[0m[38;5;245mrunning 7 tests from ./tests/sagas_test.ts[0m
+run-issue runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(10ms)[0m
+run-issue runtime: compensation terminalises with persisted FAILED ... [0m[32mok[0m [0m[38;5;245m(930µs)[0m
+run-issue runtime: pre-money failure persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(181µs)[0m
+run-issue runtime: duplicate Started mid-flight does not advance ... [0m[32mok[0m [0m[38;5;245m(155µs)[0m
+payment-refund runtime: forward path persists terminal COMPLETED ... [0m[32mok[0m [0m[38;5;245m(230µs)[0m
+payment-refund runtime: failure then compensated message persists terminal FAILED ... [0m[32mok[0m [0m[38;5;245m(209µs)[0m
+payment-refund runtime: redelivered compensated message is a guarded no-op ... [0m[32mok[0m [0m[38;5;245m(152µs)[0m
+
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(1s)[0m
+
+EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 600 deno task lint 2>&1 | grep -o '"exitCode": [0-9]*\|Found [0-9]* problem\|Checked [0-9]* files' | head -20; echo "---"; timeout 600 deno task lint 2>&1 | grep -o '\-\-> [^ ]*' | head
+"exitCode": 1
+Found 3 problem
+Checked 200 files
+"exitCode": 1
+Found 1 problem
+Checked 27 files
+---
+[0m
+Baseline: fmt ✅, tests 55/55 ✅, lint exit 1 (1 problem). Let me confirm the lint scope and run `check`.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 900 deno task check 2>&1 | grep -o '"exitCode": [0-9]*\|Checked [0-9]* files\|error:.*' | head -30; echo "EXIT=${PIPESTATUS[0]}"
+"exitCode": 0
+"exitCode": 0
+"exitCode": 1
+EXIT=1
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 600 deno task lint 2>&1 | tr '\\' '\n' | grep -o 'error\[[a-z-]*\].*\|--> [^ ]*' | head -30
+error[no-unused-vars]
+error[no-unused-vars]
+error[no-unused-vars]
+error[require-await]
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 600 deno task lint > /tmp/lint-out.txt 2>&1; python3 -c "
+import json,re
+s=open('/tmp/lint-out.txt').read()
+s=re.sub(r'\x1b\[[0-9;]*m','',s)
+# find the json blob
+i=s.find('{')
+d=json.loads(s[i:])
+for b in d['batches'] if 'batches' in d else d.get('results',[]):
+    print(b.get('group'), b.get('exitCode'))
+" 2>&1 | head -20
+None 1
+None 1
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; python3 -c "
+import json,re
+s=open('/tmp/lint-out.txt').read()
+s=re.sub(r'\x1b\[[0-9;]*m','',s)
+i=s.find('{')
+d=json.loads(s[i:])
+print('TOP KEYS:', list(d.keys()))
+for k,v in d.items():
+    if isinstance(v,list):
+        print(k,'-> list len',len(v))
+        if v and isinstance(v[0],dict): print('   item keys:', list(v[0].keys()))
+"
+TOP KEYS: ['ok', 'mode', 'selection', 'batches']
+batches -> list len 2
+   item keys: ['files', 'exitCode', 'stdout', 'stderr']
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; python3 -c "
+import json,re
+s=open('/tmp/lint-out.txt').read()
+s=re.sub(r'\x1b\[[0-9;]*m','',s)
+d=json.loads(s[s.find('{'):])
+for n,b in enumerate(d['batches']):
+    err=b['stderr']
+    print('=== batch',n,'exit',b['exitCode'],'files',len(b['files']))
+    for line in err.splitlines():
+        if '-->' in line or line.startswith('error') or 'Found' in line or 'Checked' in line:
+            print('   ',line.strip())
+"
+=== batch 0 exit 1 files 200
+    [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/sagas/runtime.ts[0m[0m[33m:8:10[0m
+    [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts[0m[0m[33m:10:3[0m
+    [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts[0m[0m[33m:19:16[0m
+    Found 3 problems
+    Checked 200 files
+=== batch 1 exit 1 files 27
+    [0m[38;5;12m-->[0m [0m[36m/home/agent/projects/netscript/wave7-billing-steer2/triggers/daily-maintenance.ts[0m[0m[33m:27:3[0m
+    Found 1 problem
+    Checked 27 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; for f in sagas/runtime.ts aspire/.helpers/register-apps.mts triggers/daily-maintenance.ts; do echo "=== $f ==="; echo -n "  touched by branch? "; git diff --name-only master..fix/steer2-consolidated -- "$f" | head -1; echo "  (empty = untouched)"; done
+=== sagas/runtime.ts ===
+  touched by branch?   (empty = untouched)
+=== aspire/.helpers/register-apps.mts ===
+  touched by branch?   (empty = untouched)
+=== triggers/daily-maintenance.ts ===
+  touched by branch?   (empty = untouched)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; echo "=== does master also fail lint on these? ==="; git stash list >/dev/null 2>&1; cd /home/agent/projects/netscript/wave7-billing; timeout 300 deno lint sagas/runtime.ts aspire/.helpers/register-apps.mts triggers/daily-maintenance.ts 2>&1 | grep -o 'error\[[a-z-]*\]\|Checked [0-9]* files\|Found [0-9]* problem' | head
+=== does master also fail lint on these? ===
+error[require-await]
+error[no-unused-vars]
+error[no-unused-vars]
+error[no-unused-vars]
+Found 4 problem
+Checked 3 files
+[0m
+Confirmed the 4 lint problems pass 6 named. Let me verify they're genuinely pre-existing on master rather than inherit the claim.
+[0m# [0mTodos
+[✓] Establish green baseline in wave7-billing-steer2 (fix/steer2-consolidated): tests, check, fmt, lint
+[•] Fix FooterColumns: absence wins over caller-supplied direction (null renders in absent tone)
+[ ] Fix ComparisonAreaChart hover bands: clip end bands to frame via --hit-x
+[ ] Reconcile MoneyText API divergence between the two trees
+[ ] Verify by rendering + full gate suite; commit each fix separately
+[ ] Record the two-tree canonicalisation decision in RECORD.md
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/footer-columns.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/footer-columns.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/footer-columns.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/footer-columns.tsx
+@@ -49,9 +49,12 @@
+ return (
+   <div
+     key={column.label}
+     class='ns-footer-cols__col'
+-    data-direction={column.direction ?? 'inherit'}
++    // `absent` wins over a caller-supplied direction: once the value is
++    // null there is no amount for a direction to qualify, and the em
++    // dash has to land in the absent tone or it reads as data.
++    data-direction={absent ? 'absent' : (column.direction ?? 'inherit')}
+   >
+     {column.glyph && <span class='ns-footer-cols__glyph'>{column.glyph}</span>}
+     <span class='ns-footer-cols__label'>{column.label}</span>
+     <span class='ns-footer-cols__value'>
+
+[0m
+Baseline confirmed: 4 lint problems are pre-existing on master and in files this branch never touched. Now applying fix 1.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -rn "Wire" routes/\(design\)/design/\(_shared\)/collection-ranges.ts | head -10; echo "=== absent/ns-absent token ==="; grep -n "ns-absent" assets/tokens.css | head -5; echo "=== preact-render-to-string ==="; ls node_modules/preact-render-to-string/ 2>/dev/null | head -3; ls /home/agent/projects/netscript/wave7-billing-steer2/node_modules/ 2>/dev/null | head -5
+=== absent/ns-absent token ===
+134:  --ns-absent: var(--ns-paper-5);
+340:  --ns-absent: var(--ns-paper-6);
+=== preact-render-to-string ===
+@babel
+@durable-streams
+@multiformats
+@opentelemetry
+@orpc
+[0m
+Let me confirm the gallery ships the null case, then build a render harness to prove the fix.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -rn "FooterColumns\|footer-columns" routes/ components/ --include=*.tsx --include=*.ts | grep -v _fresh | head -20
+routes/runs/(_components)/run-comparison.tsx:25:  FooterColumns,
+routes/runs/(_components)/run-comparison.tsx:177:        <FooterColumns columns={columns} />
+routes/runs/(_components)/run-progress.tsx:19:  FooterColumns,
+routes/runs/(_components)/run-progress.tsx:165:        <FooterColumns columns={columns} />
+routes/(design)/design/(_components)/components-view.tsx:27:  FooterColumns,
+routes/(design)/design/(_components)/components-view.tsx:394:              <FooterColumns
+routes/(design)/design/(_components)/components-view.tsx:424:    case 'footer-columns':
+routes/(design)/design/(_components)/components-view.tsx:427:          <FooterColumns
+routes/(design)/design/(_components)/components-view.tsx:434:          <FooterColumns
+routes/(design)/design/(_components)/components-view.tsx:482:              <FooterColumns
+routes/(design)/design/(_shared)/registry.ts:673:    name: 'footer-columns',
+components/ui/footer-columns.tsx:2: * @component FooterColumns
+components/ui/footer-columns.tsx:29:export interface FooterColumnsProps
+components/ui/footer-columns.tsx:42:export function FooterColumns({ columns, class: className, ...props }: FooterColumnsProps): VNode {
+components/ui/mod.ts:38:export { type FooterColumn, FooterColumns } from './footer-columns.tsx';
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; ls .llm/tmp/ 2>/dev/null; echo "=== design tree render harness ==="; ls /home/agent/projects/netscript/wave7-design/.llm/tmp/ 2>/dev/null; ls /home/agent/projects/netscript/wave7-design/.llm/tmp/render-proof.tsx 2>/dev/null && head -40 /home/agent/projects/netscript/wave7-design/.llm/tmp/render-proof.tsx
+dev-tokens.env
+probe-defect.ts
+probe-defect2.ts
+probe-defect3.ts
+=== design tree render harness ===
+component-contract.md
+dev-tokens.env
+render-proof.tsx
+/home/agent/projects/netscript/wave7-design/.llm/tmp/render-proof.tsx
+/** Scratch: render the five steer-#2 widgets and print the spec-critical markup. */
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import {
+  ComparisonAreaChart,
+  DeltaChip,
+  FooterColumns,
+  SegmentedControl,
+  SemicircularGauge,
+  WidgetCard,
+} from '../apps/ledgerline-web/components/ui/mod.ts';
+
+function show(title: string, vnode: unknown): void {
+  const html = render(vnode as never);
+  console.log(`\n===== ${title} =====`);
+  console.log(html);
+}
+
+show('DeltaChip up', <DeltaChip value='+2.1%' direction='up' />);
+show('DeltaChip absent', <DeltaChip value='' direction='absent' />);
+
+show(
+  'SemicircularGauge',
+  <SemicircularGauge
+    label='Issued'
+    value='$1,240,500.00'
+    caption='of 412 run items'
+    total={412}
+    segments={[
+      { label: 'Issued', value: 318, display: '$1,240,500.00' },
+      { label: 'In review', value: 47, display: '$183,400.00' },
+    ]}
+  />,
+);
+
+show(
+  'SegmentedControl',
+  <SegmentedControl
+    label='Collection period'
+    options={[{ value: '1M', label: '1M' }, { value: '3M', label: '3M' }, { value: '1Y', label: '1Y' }]}
+    value='3M'
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; sed -n '388,500p' routes/\(design\)/design/\(_components\)/components-view.tsx
+{ label: 'Issued', value: 318, display: '$1,240,500.00' },
+                  { label: 'In review', value: 47, display: '$183,400.00' },
+                ]}
+              />
+            </WidgetCard.Body>
+            <WidgetCard.Footer>
+              <FooterColumns
+                columns={[
+                  { label: 'Approved', value: '318', direction: 'in' },
+                  { label: 'Excepted', value: '47', direction: 'out' },
+                  { label: 'Excluded', value: '0', direction: 'flat' },
+                ]}
+              />
+            </WidgetCard.Footer>
+          </WidgetCard>
+
+          <WidgetCard class='ns-gallery-widget'>
+            <WidgetCard.Header>
+              <WidgetCard.Title>Run 2026-08</WidgetCard.Title>
+              <WidgetCard.Action>
+                <Button variant='pill' size='sm'>Review</Button>
+              </WidgetCard.Action>
+            </WidgetCard.Header>
+            <WidgetCard.Body>
+              <SemicircularGauge
+                label='Issued'
+                value='—'
+                total={null}
+                segments={[]}
+                emptyLabel='This run has not been computed yet'
+                compact
+              />
+            </WidgetCard.Body>
+          </WidgetCard>
+        </div>
+      );
+    case 'footer-columns':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <FooterColumns
+            columns={[
+              { label: 'Approved', value: '$842,000.00', direction: 'in' },
+              { label: 'Excepted', value: '$12,400.00', direction: 'out' },
+              { label: 'Excluded', value: '$0.00', direction: 'flat' },
+            ]}
+          />
+          <FooterColumns
+            columns={[
+              { label: 'Card', value: '$612,400.00' },
+              { label: 'ACH', value: '$205,100.00' },
+              { label: 'Wire', value: null },
+              { label: 'Unassigned', value: '$24,500.00' },
+            ]}
+          />
+          <InlineNotice title='A null column is not a zero column'>
+            Payment by wire has not been recorded for this period, so the column renders the em dash
+            — a fabricated `0.00` in a footer is a false statement about money (M1).
+          </InlineNotice>
+        </div>
+      );
+    case 'widget-card':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <WidgetCard>
+            <WidgetCard.Header>
+              <WidgetCard.Title>Collected cash</WidgetCard.Title>
+              <WidgetCard.Action>
+                <Button variant='pill' size='sm'>Report</Button>
+              </WidgetCard.Action>
+            </WidgetCard.Header>
+            <WidgetCard.Range>
+              <SegmentedControl
+                label='Collection period'
+                size='sm'
+                options={[
+                  { value: '1M', label: '1M' },
+                  { value: '3M', label: '3M' },
+                  { value: '6M', label: '6M' },
+                  { value: '1Y', label: '1Y' },
+                ]}
+                value='6M'
+              />
+            </WidgetCard.Range>
+            <WidgetCard.Hero>
+              <MoneyText value='4158250.50' currency='USD' />
+              <DeltaChip value='+14.2%' direction='up' note='vs prior run' />
+            </WidgetCard.Hero>
+            <WidgetCard.Body>
+              <p class='text-sm text-ns-muted-fg'>
+                Band four is the visualisation. Band five below is either equal hairline columns or
+                a full-width call to action — never both.
+              </p>
+            </WidgetCard.Body>
+            <WidgetCard.Footer>
+              <FooterColumns
+                columns={[
+                  { label: 'Invoiced', value: '$4,513,500.00' },
+                  { label: 'Attempted', value: '$4,381,200.00' },
+                  { label: 'Collected', value: '$4,158,250.50', direction: 'in' },
+                ]}
+              />
+            </WidgetCard.Footer>
+          </WidgetCard>
+
+          <WidgetCard>
+            <WidgetCard.Header>
+              <WidgetCard.Title>Webhook deliveries</WidgetCard.Title>
+              <WidgetCard.Action>
+                <Button variant='pill' size='sm'>Replay</Button>
+              </WidgetCard.Action>
+            </WidgetCard.Header>
+            <WidgetCard.Body>
+              <p class='text-sm text-ns-muted-fg'>
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx
+Wrote file successfully.
+[0m
+Gallery ships exactly the null case (`Wire`). Let me build a render harness to prove fix 1.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 300 deno run --allow-all --no-lock .llm/tmp/render-proof.tsx 2>&1 | tail -60
+[0m[1m[31merror[0m: Module not found "file:///home/agent/projects/netscript/wave7-billing-steer2/.llm/apps/ledgerline-web/components/ui/mod.ts".
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx[0m:[0m[33m3[0m:[0m[33m52[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; sed -i "s|'../apps/ledgerline-web/components/ui/mod.ts'|'../../apps/ledgerline-web/components/ui/mod.ts'|" .llm/tmp/render-proof.tsx && timeout 300 deno run --allow-all --no-lock .llm/tmp/render-proof.tsx 2>&1 | tail -60
+########## DEFECT 1: null footer column tone ##########
+[0m[1m[31merror[0m: Uncaught (in promise) ReferenceError: React is not defined
+  <FooterColumns
+[0m[31m  ^[0m
+    at [0m[2m[38;5;245mfile:///home/agent/projects/netscript/wave7-billing-steer2/[0m[0m[36m.llm/tmp/render-proof.tsx[0m:[0m[33m15[0m:[0m[33m3[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== root deno.json jsx ==="; grep -n "jsx\|preact" deno.json | head -10; echo "=== app deno.json jsx ==="; grep -n "jsx\|preact" apps/ledgerline-web/deno.json | head -10; echo "=== preact version ==="; grep -n '"preact"' deno.json apps/ledgerline-web/deno.json 2>/dev/null | head
+=== root deno.json jsx ===
+=== app deno.json jsx ===
+41:    "preact": "npm:preact@^10.29.2",
+42:    "@preact/signals": "npm:@preact/signals@2.9.2",
+44:    "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.101.0",
+65:    "jsx": "precompile",
+66:    "jsxImportSource": "preact",
+67:    "jsxPrecompileSkipElements": [
+=== preact version ===
+apps/ledgerline-web/deno.json:41:    "preact": "npm:preact@^10.29.2",
+apps/ledgerline-web/deno.json:66:    "jsxImportSource": "preact",
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx
+@@ -1,4 +1,5 @@
++/** @jsxImportSource preact */
+ /** Scratch: prove the two steer-#2 defects this pass repairs, by rendering markup. */
+ import { render } from 'npm:preact-render-to-string@^6.7.0';
+ import { ComparisonAreaChart, FooterColumns } from '../../apps/ledgerline-web/components/ui/mod.ts';
+ 
+
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 300 deno run --allow-all --no-lock .llm/tmp/render-proof.tsx 2>&1 | tail -60
+[0m[1m[31merror[0m: Import "preact/jsx-runtime" not a dependency and not in import map from "file:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx"
+  [0m[36mhint:[0m If you want to use the npm package, try running `deno add npm:preact/jsx-runtime`
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx[0m:[0m[33m1[0m:[0m[33m22[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== root .gitignore ==="; cat .gitignore; echo "=== app .gitignore ==="; cat apps/ledgerline-web/.gitignore 2>/dev/null; echo "=== tmp dir used by passes ==="; ls -d .llm/tmp apps/ledgerline-web/.llm 2>/dev/null
+=== root .gitignore ===
+# Dependencies
+node_modules/
+
+# Build artifacts
+.deploy/
+*.exe
+.data/
+.netscript/agent/diagnostics/
+
+# IDE
+.idea/
+
+# Aspire
+.aspire/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.llm/tmp/
+=== app .gitignore ===
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Fresh build directory
+_fresh/
+# npm + other dependencies
+node_modules/
+vendor/
+
+=== tmp dir used by passes ===
+.llm/tmp
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 300 deno run --allow-all --no-lock --config apps/ledgerline-web/deno.json .llm/tmp/render-proof.tsx 2>&1 | tail -40
+[0m[1m[31merror[0m: Import "preact/jsx-runtime" not a dependency and not in import map from "file:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx"
+  [0m[36mhint:[0m If you want to use the npm package, try running `deno add npm:preact/jsx-runtime`
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-billing-steer2/.llm/tmp/render-proof.tsx[0m:[0m[33m1[0m:[0m[33m22[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; mkdir -p apps/ledgerline-web/.llm/tmp && sed "s|'../../apps/ledgerline-web/components/ui/mod.ts'|'../../components/ui/mod.ts'|" .llm/tmp/render-proof.tsx > apps/ledgerline-web/.llm/tmp/render-proof.tsx && git check-ignore -v apps/ledgerline-web/.llm/tmp/render-proof.tsx && echo "IGNORED-OK"
+(no output)
+[0m
+The config only applies within its directory tree. Let me move the harness into the app.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== root deno.json: workspace + imports ==="; python3 -c "
+import json
+d=json.load(open('deno.json'))
+print('workspace:', d.get('workspace'))
+print('imports:', json.dumps(d.get('imports',{}))[:600])
+"; echo; echo "=== app deno.json imports (preact) ==="; python3 -c "
+import json
+d=json.load(open('apps/ledgerline-web/deno.json'))
+i=d.get('imports',{})
+print({k:v for k,v in i.items() if 'preact' in k})
+print('jsx:', d.get('compilerOptions'))
+"
+=== root deno.json: workspace + imports ===
+workspace: ['./apps/ledgerline-web', './contracts', './database/postgres', './plugins', './plugins/*', './services/billing', './services/runs', './services/webhooks']
+imports: {"@netscript/database": "jsr:@netscript/database@0.0.7", "@netscript/config": "jsr:@netscript/config@0.0.7", "@netscript/contracts": "jsr:@netscript/contracts@0.0.7", "@netscript/kv": "jsr:@netscript/kv@0.0.7", "@netscript/plugin": "jsr:@netscript/plugin@0.0.7", "@netscript/mcp": "jsr:@netscript/mcp@0.0.7", "@database/zod": "./database/postgres/schema/.generated/zod/crud.ts", "@ledgerline/contracts": "./contracts/mod.ts", "@ledgerline/db": "./database/postgres/mod.ts", "@shared/": "./services/_shared/", "@durable-streams/client": "npm:@durable-streams/client@^0.2.6", "@durable-streams/server":
+
+=== app deno.json imports (preact) ===
+{'preact': 'npm:preact@^10.29.2', '@preact/signals': 'npm:@preact/signals@2.9.2', '@tanstack/preact-query': 'npm:@tanstack/preact-query@^5.101.0'}
+jsx: {'lib': ['dom', 'dom.asynciterable', 'dom.iterable', 'deno.ns', 'deno.unstable'], 'jsx': 'precompile', 'jsxImportSource': 'preact', 'jsxPrecompileSkipElements': ['a', 'img', 'source', 'body', 'html', 'head', 'title', 'meta', 'script', 'link', 'style', 'base', 'noscript', 'template'], 'types': ['vite/client']}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 300 deno run --allow-all --no-lock apps/ledgerline-web/.llm/tmp/render-proof.tsx 2>&1 | tail -55
+########## DEFECT 1: null footer column tone ##########
+
+===== FooterColumns — Wire null, others bare =====
+<div class="ns-footer-cols"><div  class="ns-footer-cols__col" data-direction="inherit"><span class="ns-footer-cols__label">Card</span><span class="ns-footer-cols__value">$612,400.00</span></div><div  class="ns-footer-cols__col" data-direction="inherit"><span class="ns-footer-cols__label">ACH</span><span class="ns-footer-cols__value">$205,100.00</span></div><div  class="ns-footer-cols__col" data-direction="absent"><span class="ns-footer-cols__label">Wire</span><span class="ns-footer-cols__value"><span aria-hidden="true">—</span><span class="sr-only">not recorded</span></span></div><div  class="ns-footer-cols__col" data-direction="inherit"><span class="ns-footer-cols__label">Unassigned</span><span class="ns-footer-cols__value">$24,500.00</span></div></div>
+
+===== FooterColumns — null value carrying direction "in" =====
+<div class="ns-footer-cols"><div  class="ns-footer-cols__col" data-direction="in"><span class="ns-footer-cols__label">Measured</span><span class="ns-footer-cols__value">$10.00</span></div><div  class="ns-footer-cols__col" data-direction="absent"><span class="ns-footer-cols__label">NullButIn</span><span class="ns-footer-cols__value"><span aria-hidden="true">—</span><span class="sr-only">not recorded</span></span></div></div>
+
+########## DEFECT 2: hover band geometry ##########
+
+===== ComparisonAreaChart — four points =====
+<div class="ns-areachart"><ul class="ns-areachart__yaxis" aria-hidden="true"><li class="ns-areachart__ytick" style="top:8.333333333333332%;">$100</li><li class="ns-areachart__ytick" style="top:31.25%;">$75</li><li class="ns-areachart__ytick" style="top:54.166666666666664%;">$50</li><li class="ns-areachart__ytick" style="top:77.08333333333334%;">$25</li><li class="ns-areachart__ytick" style="top:100%;">$0</li></ul><div class="ns-areachart__frame"><svg class="ns-areachart__svg" viewBox="0 0 320 120" role="img" aria-label="This period against Previous period, 4 periods"><defs><linearGradient id="P0-0" x1="0" y1="0" x2="0" y2="1"><stop class="ns-areachart__stop-top" data-series="1" offset="0%"></stop><stop class="ns-areachart__stop-bottom" data-series="1" offset="100%"></stop></linearGradient></defs><g class="ns-areachart__grid" aria-hidden="true"><line  class="ns-areachart__gridline" x1="6" y1="10" x2="314" y2="10"></line><line  class="ns-areachart__gridline" x1="6" y1="37.5" x2="314" y2="37.5"></line><line  class="ns-areachart__gridline" x1="6" y1="65" x2="314" y2="65"></line><line  class="ns-areachart__gridline" x1="6" y1="92.5" x2="314" y2="92.5"></line><line class="ns-areachart__baseline" x1="0" y1="120" x2="320" y2="120"></line></g><path class="ns-areachart__comparison" data-series="1" d="M 6 83.33333333333334 C 40.22222222222222 83.33333333333334 74.44444444444446 52.77777777777777 108.66666666666667 52.77777777777777 C 142.88888888888889 52.77777777777777 177.11111111111111 65 211.33333333333334 65 C 245.55555555555557 65 279.77777777777777 34.44444444444444 314 34.44444444444444 L 314 120 L 6 120 Z"></path><path class="ns-areachart__area" data-series="1" d="M 6 71.11111111111111 C 40.22222222222222 71.11111111111111 74.44444444444446 40.55555555555556 108.66666666666667 40.55555555555556 C 142.88888888888889 40.55555555555556 177.11111111111111 58.888888888888886 211.33333333333334 58.888888888888886 C 245.55555555555557 58.888888888888886 279.77777777777777 10 314 10 L 314 120 L 6 120 Z" fill="url(#P0-0)"></path><path class="ns-areachart__line" data-series="1" d="M 6 71.11111111111111 C 40.22222222222222 71.11111111111111 74.44444444444446 40.55555555555556 108.66666666666667 40.55555555555556 C 142.88888888888889 40.55555555555556 177.11111111111111 58.888888888888886 211.33333333333334 58.888888888888886 C 245.55555555555557 58.888888888888886 279.77777777777777 10 314 10" fill="none"></path></svg><div class="ns-areachart__hits" aria-hidden="true"><span  class="ns-areachart__hit" style="left:1.875%;width:32.083333333333336%;--hit-dot:59.25925925925927%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">FEB</span><span class="ns-areachart__tip-value">$40.00</span></span></span><span  class="ns-areachart__hit" style="left:33.958333333333336%;width:32.083333333333336%;--hit-dot:33.7962962962963%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">MAR</span><span class="ns-areachart__tip-value">$65.00</span></span></span><span  class="ns-areachart__hit" style="left:66.04166666666667%;width:32.083333333333336%;--hit-dot:49.07407407407407%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">APR</span><span class="ns-areachart__tip-value">$50.00</span></span></span><span  class="ns-areachart__hit" style="left:98.125%;width:32.083333333333336%;--hit-dot:8.333333333333332%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">MAY</span><span class="ns-areachart__tip-value">$90.00</span></span></span></div></div><ul class="ns-areachart__xaxis" aria-hidden="true"><li class="ns-areachart__xtick" style="left:1.875%;">FEB</li><li class="ns-areachart__xtick" style="left:33.958333333333336%;">MAR</li><li class="ns-areachart__xtick" style="left:66.04166666666667%;">APR</li><li class="ns-areachart__xtick" style="left:98.125%;">MAY</li></ul><ul class="ns-areachart__legend"><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch" data-series="1" aria-hidden="true"></span>This period</li><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch ns-areachart__swatch--ghost" data-series="1" aria-hidden="true"></span>Previous period</li></ul><ul class="sr-only"><li >FEB: $40.00</li><li >MAR: $65.00</li><li >APR: $50.00</li><li >MAY: $90.00</li></ul></div>
+
+===== band geometry, as percentages of the frame =====
+  band 0: [1.88 .. 33.96]  width 32.08  marker NaN
+  band 1: [33.96 .. 66.04]  width 32.08  marker NaN
+  band 2: [66.04 .. 98.13]  width 32.08  marker NaN
+  band 3: [98.13 .. 130.21]  width 32.08  marker NaN
+
+  every band inside the frame : FAIL
+  bands tile with no seam     : PASS
+  bands cover 0..100          : FAIL
+
+===== marker vs its own x-tick =====
+  point 0: tick 1.875  marker NaN  OFF
+  point 1: tick 33.958  marker NaN  OFF
+  point 2: tick 66.042  marker NaN  OFF
+  point 3: tick 98.125  marker NaN  OFF
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; sed -n '1,60p' assets/ui/comparison-area-chart.css; echo "......"; sed -n '140,175p' assets/ui/comparison-area-chart.css
+/* ComparisonAreaChart — two-layer area chart, current period over the
+   comparison period (H5).
+
+   Geometry is SVG and only SVG; the hover readout and both axes are an HTML
+   layer over it, so labels are real text at token type sizes. The two meet
+   through custom properties the component sets as percentages of the drawn
+   chart box — geometry, not formatting (H2).
+
+   Layout: the y-axis gutter is column 1 and is only rendered when the chart
+   is given ticks, so a chrome-free chart loses the gutter and its gap with it. */
+
+.ns-areachart {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: var(--ns-space-2);
+  column-gap: 0;
+}
+
+/* One hairline frame around the plot. Never a border per series, never four
+   axis lines — chrome stays minimal (H6). */
+.ns-areachart__frame {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-xl);
+  background: var(--ns-card);
+}
+
+.ns-areachart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ns-areachart__gridline {
+  stroke: var(--ns-chart-grid);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.ns-areachart__baseline {
+  stroke: var(--ns-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The comparison period: same hue, no stroke, reduced opacity. It is a shadow
+   of the current period, not a second series to be told apart by colour. */
+.ns-areachart__comparison {
+  fill: color-mix(in srgb, var(--ns-series-1) 18%, transparent);
+  stroke: none;
+}
+
+.ns-areachart__comparison[data-series='2'] {
+  fill: color-mix(in srgb, var(--ns-series-2) 18%, transparent);
+}
+
+.ns-areachart__comparison[data-series='3'] {
+......
+}
+
+.ns-areachart__stop-bottom[data-series='4'] {
+  stop-color: var(--ns-series-4);
+}
+
+.ns-areachart__stop-bottom[data-series='5'] {
+  stop-color: var(--ns-series-5);
+}
+
+.ns-areachart__stop-bottom[data-series='6'] {
+  stop-color: var(--ns-series-6);
+}
+
+/* Hover layer: one column per point, tiled so there is no dead zone. Hovering
+   the column — not a 4px dot — is what reveals the readout, so the reader aims
+   at an x rather than at a target. */
+.ns-areachart__hits {
+  position: absolute;
+  inset: 0;
+}
+
+.ns-areachart__hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+.ns-areachart__crosshair,
+.ns-areachart__dot,
+.ns-areachart__tip {
+  opacity: 0;
+  transition: opacity var(--ns-ease-fast);
+  pointer-events: none;
+}
+[0m
+Harness works and proves defect 1. For defect 2 I must account for `translateX(-50%)`. Let me check whether the frame clips.
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -113,8 +113,29 @@
+   if (count <= 1) return 100;
+   return ((VB_WIDTH - VB_INSET * 2) / (count - 1) / VB_WIDTH) * 100;
+ }
+ 
++/**
++ * The hover band for point `index`, as percentages of the drawn frame.
++ *
++ * The band is centred on its point but clipped to the frame, and it carries the
++ * point's own x back out as `x` (a percentage of the band) for `--hit-x`. Both
++ * halves matter: an unclipped end band hangs outside the frame by half a step,
++ * and the frame does not clip — so the first band reaches into the y-axis
++ * gutter and hovering a tick label pops a readout for a point it is not on.
++ * A clipped band whose marker still sat at `50%` would draw the dot and the
++ * crosshair off the point they name. Clipping is safe for tiling because
++ * adjacent bands still meet exactly at the midpoint between their points.
++ */
++function hitBand(index: number, count: number): { left: number; width: number; x: number } {
++  const centre = percentX(index, count);
++  const half = percentStep(count) / 2;
++  const left = Math.max(0, centre - half);
++  const right = Math.min(100, centre + half);
++  const width = right - left;
++  return { left, width, x: width > 0 ? ((centre - left) / width) * 100 : 50 };
++}
++
+ function percentY(value: number, max: number): number {
+   return (yAt(value, max) / VB_HEIGHT) * 100;
+ }
+ 
+
+[0m
+Confirmed: `.ns-areachart__frame` has **no `overflow: hidden`**, and bands overhang by 14.17% each end — into the y-axis gutter. Applying the fix now.
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -292,26 +292,30 @@
+       crosshair, point marker and tooltip reveal on :hover with no script
+       and no first-paint mismatch (H4). */
+   }
+   <div class='ns-areachart__hits' aria-hidden='true'>
+-    {points.map((point, index) => (
+-      <span
+-        key={point.label}
+-        class='ns-areachart__hit'
+-        style={{
+-          left: `${percentX(index, points.length)}%`,
+-          width: `${percentStep(points.length)}%`,
+-          '--hit-dot': `${percentY(point.value, max)}%`,
+-        } as JSX.CSSProperties}
+-      >
+-        <span class='ns-areachart__crosshair' />
+-        <span class='ns-areachart__dot' data-series={series} />
+-        <span class='ns-areachart__tip'>
+-          <span class='ns-areachart__tip-label'>{point.label}</span>
+-          <span class='ns-areachart__tip-value'>{point.display}</span>
++    {points.map((point, index) => {
++      const band = hitBand(index, points.length);
++      return (
++        <span
++          key={point.label}
++          class='ns-areachart__hit'
++          style={{
++            left: `${band.left}%`,
++            width: `${band.width}%`,
++            '--hit-x': `${band.x}%`,
++            '--hit-dot': `${percentY(point.value, max)}%`,
++          } as JSX.CSSProperties}
++        >
++          <span class='ns-areachart__crosshair' />
++          <span class='ns-areachart__dot' data-series={series} />
++          <span class='ns-areachart__tip'>
++            <span class='ns-areachart__tip-label'>{point.label}</span>
++            <span class='ns-areachart__tip-value'>{point.display}</span>
++          </span>
+         </span>
+-      </span>
+-    ))}
++      );
++    })}
+   </div>
+ </div>
+ 
+ <ul class='ns-areachart__xaxis' aria-hidden='true'>
+
+[0m
+Now the render site:
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/comparison-area-chart.css
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+@@ -158,13 +158,18 @@
+   position: absolute;
+   inset: 0;
+ }
+ 
++/* `left`/`width` are set inline and already name the band's own box, so there
++   is no centring transform to undo — and so a band can never hang outside the
++   frame, which does not clip. `--hit-x` is the point's x as a percentage of
++   *this band*: 50% for every interior band, and off-centre only where an end
++   band had to be clipped, so the marker stays on the point it names. */
+ .ns-areachart__hit {
++  --hit-x: 50%;
+   position: absolute;
+   top: 0;
+   bottom: 0;
+-  transform: translateX(-50%);
+ }
+ 
+ .ns-areachart__crosshair,
+ .ns-areachart__dot,
+
+[0m
+Now the CSS — remove the centring transform and drive the marker off `--hit-x`:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; python3 - <<'PY'
+import re,io
+p='assets/ui/comparison-area-chart.css'
+s=open(p).read()
+# Within the crosshair / dot / tip rules, swap left:50% for left:var(--hit-x)
+before=s.count('left: 50%;')
+s=s.replace("""  top: var(--hit-dot);
+  bottom: 0;
+  left: 50%;
+  border-inline-start: 1px dashed var(--ns-chart-axis);""","""  top: var(--hit-dot);
+  bottom: 0;
+  left: var(--hit-x);
+  border-inline-start: 1px dashed var(--ns-chart-axis);""")
+s=s.replace("""  top: var(--hit-dot);
+  left: 50%;
+  width: var(--ns-space-2);""","""  top: var(--hit-dot);
+  left: var(--hit-x);
+  width: var(--ns-space-2);""")
+s=s.replace("""  bottom: calc(100% - var(--hit-dot));
+  left: 50%;""","""  bottom: calc(100% - var(--hit-dot));
+  left: var(--hit-x);""")
+open(p,'w').write(s)
+print('left:50% before:',before,'after:',s.count('left: 50%;'))
+print('--hit-x uses:',s.count('var(--hit-x)'))
+PY
+left:50% before: 4 after: 1
+--hit-x uses: 3
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -n -B6 "left: 50%;" assets/ui/comparison-area-chart.css
+242-}
+243-
+244-.ns-areachart__tip::after {
+245-  content: '';
+246-  position: absolute;
+247-  top: 100%;
+248:  left: 50%;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; sed -n '222,258p' assets/ui/comparison-area-chart.css
+}
+
+/* Dark bubble with a downward pointer, centred over the node. `--ns-tip-*`
+   inverts against the card in both themes, so no component asks which theme
+   is active (T3). */
+.ns-areachart__tip {
+  position: absolute;
+  bottom: calc(100% - var(--hit-dot));
+  left: var(--hit-x);
+  transform: translate(-50%, calc(-1 * var(--ns-space-3)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-0-5);
+  padding: var(--ns-space-1-5) var(--ns-space-2-5);
+  border-radius: var(--ns-radius-md);
+  background: var(--ns-tip-bg);
+  color: var(--ns-tip-fg);
+  box-shadow: var(--ns-shadow-md);
+  white-space: nowrap;
+  z-index: var(--ns-z-dropdown);
+}
+
+.ns-areachart__tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: var(--ns-space-1) solid transparent;
+  border-top-color: var(--ns-tip-bg);
+}
+
+.ns-areachart__tip-label {
+  font-size: var(--ns-text-3xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ns-tracking-wide);
+  opacity: 0.72;
+[0m
+The remaining `left: 50%` is the tooltip arrow, which is relative to the tip box (already centred on `--hit-x`) — correct as-is. Let me confirm and re-run the harness.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; python3 - <<'PY'
+p='apps/ledgerline-web/.llm/tmp/render-proof.tsx'
+s=open(p).read()
+s=s.replace("""    return { left, width, right: left + width, marker: left + (Number(hitX) / 100) * width };""",
+"""    return { left, width, right: left + width, marker: left + (Number(hitX) / 100) * width };""")
+open(p,'w').write(s)
+print('harness geometry now reads the real box (no translateX)')
+PY
+timeout 300 deno run --allow-all --no-lock apps/ledgerline-web/.llm/tmp/render-proof.tsx 2>&1 | sed -n '/band geometry/,$p'
+harness geometry now reads the real box (no translateX)
+########## DEFECT 2: hover band geometry ##########
+
+===== ComparisonAreaChart — four points =====
+<div class="ns-areachart"><ul class="ns-areachart__yaxis" aria-hidden="true"><li class="ns-areachart__ytick" style="top:8.333333333333332%;">$100</li><li class="ns-areachart__ytick" style="top:31.25%;">$75</li><li class="ns-areachart__ytick" style="top:54.166666666666664%;">$50</li><li class="ns-areachart__ytick" style="top:77.08333333333334%;">$25</li><li class="ns-areachart__ytick" style="top:100%;">$0</li></ul><div class="ns-areachart__frame"><svg class="ns-areachart__svg" viewBox="0 0 320 120" role="img" aria-label="This period against Previous period, 4 periods"><defs><linearGradient id="P0-0" x1="0" y1="0" x2="0" y2="1"><stop class="ns-areachart__stop-top" data-series="1" offset="0%"></stop><stop class="ns-areachart__stop-bottom" data-series="1" offset="100%"></stop></linearGradient></defs><g class="ns-areachart__grid" aria-hidden="true"><line  class="ns-areachart__gridline" x1="6" y1="10" x2="314" y2="10"></line><line  class="ns-areachart__gridline" x1="6" y1="37.5" x2="314" y2="37.5"></line><line  class="ns-areachart__gridline" x1="6" y1="65" x2="314" y2="65"></line><line  class="ns-areachart__gridline" x1="6" y1="92.5" x2="314" y2="92.5"></line><line class="ns-areachart__baseline" x1="0" y1="120" x2="320" y2="120"></line></g><path class="ns-areachart__comparison" data-series="1" d="M 6 83.33333333333334 C 40.22222222222222 83.33333333333334 74.44444444444446 52.77777777777777 108.66666666666667 52.77777777777777 C 142.88888888888889 52.77777777777777 177.11111111111111 65 211.33333333333334 65 C 245.55555555555557 65 279.77777777777777 34.44444444444444 314 34.44444444444444 L 314 120 L 6 120 Z"></path><path class="ns-areachart__area" data-series="1" d="M 6 71.11111111111111 C 40.22222222222222 71.11111111111111 74.44444444444446 40.55555555555556 108.66666666666667 40.55555555555556 C 142.88888888888889 40.55555555555556 177.11111111111111 58.888888888888886 211.33333333333334 58.888888888888886 C 245.55555555555557 58.888888888888886 279.77777777777777 10 314 10 L 314 120 L 6 120 Z" fill="url(#P0-0)"></path><path class="ns-areachart__line" data-series="1" d="M 6 71.11111111111111 C 40.22222222222222 71.11111111111111 74.44444444444446 40.55555555555556 108.66666666666667 40.55555555555556 C 142.88888888888889 40.55555555555556 177.11111111111111 58.888888888888886 211.33333333333334 58.888888888888886 C 245.55555555555557 58.888888888888886 279.77777777777777 10 314 10" fill="none"></path></svg><div class="ns-areachart__hits" aria-hidden="true"><span  class="ns-areachart__hit" style="left:0%;width:17.916666666666668%;--hit-x:10.465116279069766%;--hit-dot:59.25925925925927%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">FEB</span><span class="ns-areachart__tip-value">$40.00</span></span></span><span  class="ns-areachart__hit" style="left:17.916666666666668%;width:32.08333333333333%;--hit-x:50.000000000000014%;--hit-dot:33.7962962962963%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">MAR</span><span class="ns-areachart__tip-value">$65.00</span></span></span><span  class="ns-areachart__hit" style="left:50%;width:32.08333333333334%;--hit-x:50%;--hit-dot:49.07407407407407%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">APR</span><span class="ns-areachart__tip-value">$50.00</span></span></span><span  class="ns-areachart__hit" style="left:82.08333333333333%;width:17.91666666666667%;--hit-x:89.53488372093024%;--hit-dot:8.333333333333332%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">MAY</span><span class="ns-areachart__tip-value">$90.00</span></span></span></div></div><ul class="ns-areachart__xaxis" aria-hidden="true"><li class="ns-areachart__xtick" style="left:1.875%;">FEB</li><li class="ns-areachart__xtick" style="left:33.958333333333336%;">MAR</li><li class="ns-areachart__xtick" style="left:66.04166666666667%;">APR</li><li class="ns-areachart__xtick" style="left:98.125%;">MAY</li></ul><ul class="ns-areachart__legend"><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch" data-series="1" aria-hidden="true"></span>This period</li><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch ns-areachart__swatch--ghost" data-series="1" aria-hidden="true"></span>Previous period</li></ul><ul class="sr-only"><li >FEB: $40.00</li><li >MAR: $65.00</li><li >APR: $50.00</li><li >MAY: $90.00</li></ul></div>
+
+===== band geometry, as percentages of the frame =====
+  band 0: [0.00 .. 17.92]  width 17.92  marker 1.875
+  band 1: [17.92 .. 50.00]  width 32.08  marker 33.958
+  band 2: [50.00 .. 82.08]  width 32.08  marker 66.042
+  band 3: [82.08 .. 100.00]  width 17.92  marker 98.125
+
+  every band inside the frame : PASS
+  bands tile with no seam     : PASS
+  bands cover 0..100          : PASS
+
+===== marker vs its own x-tick =====
+  point 0: tick 1.875  marker 1.875  ON
+  point 1: tick 33.958  marker 33.958  ON
+  point 2: tick 66.042  marker 66.042  ON
+  point 3: tick 98.125  marker 98.125  ON
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/.llm/tmp/band-geometry.tsx
+Wrote file successfully.
+[0m
+Verified — exact pass-7 geometry, every marker on its x-tick. But the component is generic, so let me prove tiling holds for all point counts, not just four.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 300 deno run --allow-all --no-lock apps/ledgerline-web/.llm/tmp/band-geometry.tsx 2>&1 | tail -20
+count | in-frame | tiles | covers | marker-on-tick
+  1   |    Y     |   Y   |   Y    | Y
+  2   |    Y     |   Y   |   Y    | Y
+  3   |    Y     |   Y   |   Y    | Y
+  4   |    Y     |   Y   |   Y    | Y
+  5   |    Y     |   Y   |   Y    | Y
+  6   |    Y     |   Y   |   Y    | Y
+  7   |    Y     |   Y   |   Y    | Y
+  8   |    Y     |   Y   |   Y    | Y
+
+ALL PASS
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== app check ==="; timeout 600 deno task check 2>&1 | tail -12
+=== app check ===
+41[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m    }    | ${onTick ? 'Y' : 'N'}` +[0m
+
+
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/.llm/tmp/render-proof.tsx:
+93[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m  console.log(`  point ${i}: tick ${t.toFixed(3)}  marker ${m.toFixed(3)}  ${Math.abs(t - m) < 0.001 ? 'ON' : 'OFF'}`);[0m
+93[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m  console.log([0m
+94[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m    `  point ${i}: tick ${t.toFixed(3)}  marker ${m.toFixed(3)}  ${[0m
+95[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m      Math.abs(t - m) < 0.001 ? 'ON' : 'OFF'[0m
+96[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m    }`,[0m
+97[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m  );[0m
+
+[0m[1m[31merror[0m: Found 2 not formatted files in 187 files
+[0m
+All counts pass. Now the gates before committing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== fmt:check ==="; timeout 300 deno task fmt:check 2>&1 | grep -o '"exitCode": [0-9]*\|Found [0-9]* file'; echo "=== test ==="; timeout 600 deno test --allow-all 2>&1 | tail -3
+=== fmt:check ===
+"exitCode": 0
+"exitCode": 0
+=== test ===
+
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(2s)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; cp apps/ledgerline-web/.llm/tmp/render-proof.tsx apps/ledgerline-web/.llm/tmp/band-geometry.tsx .llm/tmp/ 2>/dev/null; rm -rf apps/ledgerline-web/.llm; echo "--- app tree clean? ---"; git status --porcelain; echo "(end)"; echo "--- root tmp ignored? ---"; git check-ignore -v .llm/tmp/render-proof.tsx
+--- app tree clean? ---
+ M apps/ledgerline-web/assets/ui/comparison-area-chart.css
+ M apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+ M apps/ledgerline-web/components/ui/footer-columns.tsx
+(end)
+--- root tmp ignored? ---
+.gitignore:23:.llm/tmp/	.llm/tmp/render-proof.tsx
+[0m
+My scratch harnesses polluted the app gate (that path isn't gitignored). Moving them to the ignored root tmp and re-running.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== app check (fmt+lint+check) ==="; timeout 600 deno task --cwd apps/ledgerline-web check 2>&1 | tail -8; echo "EXIT=${PIPESTATUS[0]}"
+=== app check (fmt+lint+check) ===
+[0m[32mCheck[0m routes/runs/(_components)/run-summary.tsx
+[0m[32mCheck[0m routes/runs/(_components)/runs-table.tsx
+[0m[32mCheck[0m routes/runs/(_islands)/run-console-live.tsx
+[0m[32mCheck[0m routes/runs/(_islands)/saga-instances.tsx
+[0m[32mCheck[0m routes/runs/[id].tsx
+[0m[32mCheck[0m routes/runs/index.tsx
+[0m[32mCheck[0m utils.ts
+[0m[32mCheck[0m vite.config.ts
+EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== root fmt:check ==="; timeout 300 deno task fmt:check 2>&1 | grep -o '"exitCode": [0-9]*'; echo "=== root check ==="; timeout 900 deno task check 2>&1 | grep -o '"exitCode": [0-9]*'
+=== root fmt:check ===
+"exitCode": 0
+"exitCode": 0
+=== root check ===
+"exitCode": 0
+"exitCode": 0
+"exitCode": 1
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; timeout 900 deno task check > /tmp/check-out.txt 2>&1; python3 -c "
+import json,re
+s=open('/tmp/check-out.txt').read()
+s=re.sub(r'\x1b\[[0-9;]*m','',s)
+d=json.loads(s[s.find('{'):])
+for n,b in enumerate(d['batches']):
+    if b['exitCode']!=0:
+        print('batch',n,'exit',b['exitCode'],'files',len(b['files']))
+        print('  stderr:', b['stderr'][:400].replace(chr(10),' | '))
+"; echo "--- aspire node_modules present? ---"; ls aspire/node_modules 2>&1 | head -2
+batch 2 exit 1 files 12
+  stderr: Warning: config file file:///home/agent/projects/netscript/wave7-billing-steer2/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/wave7-billing-steer2/. Ignoring the parent workspace config. | [0m[1m[31merror[0m: Unable to load /home/agent/projects/netscript/wave7-billing-steer2/aspire/node_modules/typescript/bin/tsc |  | Caused by: |     No such file or dir
+--- aspire node_modules present? ---
+ls: cannot access 'aspire/node_modules': No such file or directory
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git add apps/ledgerline-web/components/ui/footer-columns.tsx && git commit -q -F - <<'EOF'
+Fix: a null footer column renders in the absent tone
+
+FooterColumns renders the em dash for a `null` value, but the tone is carried by
+`data-direction`, and a `null` value with no explicit direction emitted
+`inherit`, which no stylesheet rule matches — so the em dash painted in the
+full-contrast foreground and read as a value rather than as "not recorded".
+
+The gallery ships exactly that case: the Wire column of the second
+footer-columns demo.
+
+Absence now wins over a caller-supplied direction, because once the value is
+null there is no amount for a direction to qualify. Verified by rendering:
+`{ value: null }` and `{ value: null, direction: 'in' }` both emit
+`data-direction="absent"`, while a measured value keeps its own direction.
+EOF
+git log --oneline -1 | cat
+fcc88e3 Fix: a null footer column renders in the absent tone
+[0m
+Confirmed environmental (missing `aspire/node_modules`), identical on master. Committing each fix separately.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git add apps/ledgerline-web/components/ui/comparison-area-chart.tsx apps/ledgerline-web/assets/ui/comparison-area-chart.css && git commit -q -F - <<'EOF'
+Fix: clip the area chart's hover bands to the frame
+
+Each hover band was centred on its point with `translateX(-50%)` and given a
+full step of width, so the first and last bands hung outside the frame by half a
+step. `.ns-areachart__frame` has no `overflow: hidden`, so on the gallery's
+four-point chart that overhung ~14% of the frame's width on each side — far
+enough that hovering the y-axis gutter popped the first point's readout.
+
+An end band cannot simply be clipped, though: the crosshair, the dot and the
+tooltip all sat at `50%` of their band, so a clipped band would draw them off
+the point they name. The band now reports the point's x back out as `--hit-x`,
+a percentage of its own box — 50% for every interior band, off-centre only
+where an end band was clipped — and the `translateX(-50%)` is gone, since
+`left`/`width` inline now name the band's real box.
+
+Verified by rendering every point count from 1 to 8: bands tile with no seam,
+cover 0..100, stay inside the frame, and every marker lands on its own x-tick.
+Four points give 0-17.92, 17.92-50, 50-82.08, 82.08-100 against ticks
+1.875, 33.958, 66.042, 98.125.
+EOF
+git log --oneline -2 | cat
+b0b8612 Fix: clip the area chart's hover bands to the frame
+fcc88e3 Fix: a null footer column renders in the absent tone
+[0m
+[0m# [0mTodos
+[✓] Establish green baseline in wave7-billing-steer2 (fix/steer2-consolidated): tests, check, fmt, lint
+[✓] Fix FooterColumns: absence wins over caller-supplied direction (null renders in absent tone)
+[✓] Fix ComparisonAreaChart hover bands: clip end bands to frame via --hit-x
+[•] Reconcile MoneyText API divergence between the two trees
+[•] Verify by rendering + full gate suite; commit each fix separately
+[ ] Record the two-tree canonicalisation decision in RECORD.md
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; echo "=== steer2 MoneyText props ==="; sed -n '1,60p' wave7-billing-steer2/apps/ledgerline-web/components/product/money-text.tsx 2>/dev/null || git show fix/steer2-consolidated:apps/ledgerline-web/components/product/money-text.tsx | sed -n '1,60p'
+=== steer2 MoneyText props ===
+/**
+ * @component MoneyText
+ * @layer 2
+ * @kind product
+ * @depends lib/money
+ * @description The one renderer for a money amount. It formats nothing itself:
+ * every digit comes from `lib/money.ts`, direction comes from
+ * `moneyParts().direction`, and absence is an em dash.
+ */
+
+import type { VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
+import { ABSENT, type MoneyDirection, moneyParts, type MoneyValue } from '../../lib/money.ts';
+
+interface MoneyTextProps {
+  /** String-encoded decimal from the contract; null/undefined = not measured. */
+  value: MoneyValue;
+  currency?: string;
+  class?: string;
+}
+
+/**
+ * `moneyParts` direction -> the `data-money-sign` this component's stylesheet
+ * keys off. Absent is styled by `data-money='absent'`, so it lands on `flat`
+ * here and never reaches this map.
+ */
+const SIGN: Readonly<Record<MoneyDirection, string>> = {
+  in: 'pos',
+  out: 'neg',
+  flat: 'flat',
+  absent: 'flat',
+};
+
+/**
+ * Renders money with the money-* semantic colors and tabular numerals.
+ *
+ * Every digit and the direction both come from one `moneyParts()` call. This
+ * component does no arithmetic of its own: the float round-trip it used to
+ * make is what printed `$100` where the ledger requires `$100.00`, and the
+ * sign it used to re-derive with `amount > 0` is a fact the money layer
+ * already resolves — including the case where rounding a small negative to
+ * two digits makes it a flat zero rather than a negative amount.
+ *
+ * Absence (`null`/`undefined`/unparseable) renders an em dash — never `0.00`,
+ * because in a ledger "not measured" and "zero" are different facts.
+ */
+export function MoneyText({ value, currency, class: className }: MoneyTextProps): VNode {
+  const parts = moneyParts(value, { currency });
+
+  if (parts.absent) {
+    return (
+      <span class={cn('ns-money-text', className)} data-money='absent' data-currency={currency}>
+        <span aria-hidden='true'>{ABSENT}</span>
+        <span class='sr-only'>not measured</span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+[0m
+Both fixes committed. Now the MoneyText API divergence.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; git show design/ledgerline-ui:apps/ledgerline-web/components/product/money-text.tsx 2>/dev/null | sed -n '1,80p'
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== WidgetCard.Hero ==="; grep -n -A25 "function Hero\|Hero(" components/ui/widget-card.tsx | head -50
+=== WidgetCard.Hero ===
+92:function WidgetCardHero({ children, size = 'md', class: className, ...props }: HeroProps): VNode {
+93-  return (
+94-    <div
+95-      {...props}
+96-      class={cn('ns-widget__hero', size === 'lg' && 'ns-widget__hero--lg', className)}
+97-    >
+98-      {children}
+99-    </div>
+100-  );
+101-}
+102-
+103-/** Band 4. The visualisation. */
+104-function WidgetCardBody({ children, class: className, ...props }: BandProps): VNode {
+105-  return <Card.Body {...props} class={cn('ns-widget__body', className)}>{children}</Card.Body>;
+106-}
+107-
+108-/** Band 5. Footer columns, a full-width CTA, or a note. */
+109-function WidgetCardFooter({ children, class: className, ...props }: BandProps): VNode {
+110-  return <Card.Footer {...props} class={cn('ns-widget__footer', className)}>{children}
+111-  </Card.Footer>;
+112-}
+113-
+114-/**
+115- * A composed widget card with one slot per band, in document order.
+116- */
+117-export const WidgetCard: WidgetCardComponent = Object.assign(WidgetCardRoot, {
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; echo "=== money-text in design tree? ==="; git ls-tree -r --name-only design/ledgerline-ui | grep -i "money" ; echo "=== MoneyText usages in design tree ==="; git grep -n "MoneyText" design/ledgerline-ui -- '*.tsx' 2>/dev/null | head -10
+=== money-text in design tree? ===
+apps/ledgerline-web/assets/ui/money-text.css
+apps/ledgerline-web/components/ui/money-text.tsx
+apps/ledgerline-web/lib/money.ts
+services/_shared/money.ts
+tests/money_test.ts
+=== MoneyText usages in design tree ===
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:2: * @component MoneyText
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:33:export type MoneyTextSize = 'sm' | 'md' | 'lg' | 'hero';
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:35:export interface MoneyTextProps
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:51:  size?: MoneyTextSize;
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:55:const SIZE_CLASSES: Record<MoneyTextSize, string | undefined> = {
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:69:export function MoneyText({
+design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx:80:}: MoneyTextProps): VNode {
+design/ledgerline-ui:apps/ledgerline-web/islands/ui/RangeControlDemo.tsx:25:  MoneyText,
+design/ledgerline-ui:apps/ledgerline-web/islands/ui/RangeControlDemo.tsx:111:        <MoneyText value={range.collected} currency='USD' size='hero' />
+design/ledgerline-ui:apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx:27:  MoneyText,
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing; git show design/ledgerline-ui:apps/ledgerline-web/components/ui/money-text.tsx | sed -n '28,110p'
+*   signed rows, and any cell whose sign is the fact being conveyed.
+ */
+export type MoneyTone = 'inherit' | 'direction';
+
+/** Type sizes an amount is rendered at, from table cell to card hero. */
+export type MoneyTextSize = 'sm' | 'md' | 'lg' | 'hero';
+
+export interface MoneyTextProps
+  extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
+  /** String-encoded decimal, or a number for already-normalised derived values. */
+  value: MoneyValue;
+  /** ISO 4217 code. Omitted leaves the amount bare — see M7, currency once per surface. */
+  currency?: string;
+  /** Render an explicit `+` on amounts towards us. Deltas want this; cells do not. */
+  signed?: boolean;
+  /** Force a fraction-digit count. Derived precision already guarantees at least 2. */
+  precision?: number;
+  /** Compact form for dense surfaces and chart ticks: `$12.4k`. */
+  compact?: boolean;
+  /** BCP-47 locale for grouping and separators. Defaults to `en-US`. */
+  locale?: string;
+  /** Colour treatment. Defaults to `inherit`; see {@link MoneyTone}. */
+  tone?: MoneyTone;
+  size?: MoneyTextSize;
+  class?: string;
+}
+
+const SIZE_CLASSES: Record<MoneyTextSize, string | undefined> = {
+  sm: 'ns-money--sm',
+  md: undefined,
+  lg: 'ns-money--lg',
+  hero: 'ns-money--hero',
+};
+
+/**
+ * Renders a money amount: currency, sign, grouped digits, and direction.
+ *
+ * The component never formats and never decides an amount's sign. It resolves
+ * the value once through `moneyParts` and renders the parts it is handed, so
+ * there is exactly one place in the product where a decimal becomes text.
+ */
+export function MoneyText({
+  value,
+  currency,
+  signed = false,
+  precision,
+  compact = false,
+  locale,
+  tone = 'inherit',
+  size = 'md',
+  class: className,
+  ...props
+}: MoneyTextProps): VNode {
+  const options: MoneyFormatOptions = {
+    currency,
+    signed,
+    locale,
+    ...(precision === undefined ? {} : { precision }),
+  };
+  const parts = moneyParts(value, options);
+
+  return (
+    <span
+      {...props}
+      class={cn('ns-money', SIZE_CLASSES[size], className)}
+      data-direction={parts.direction}
+      data-tone={tone}
+    >
+      {compact ? <span class='ns-money__amount'>{formatMoneyCompact(value, options)}</span> : (
+        <>
+          {parts.currency !== null && <span class='ns-money__currency'>{parts.currency}</span>}
+          <span class='ns-money__amount'>
+            {parts.absent
+              ? (
+                <>
+                  <span aria-hidden='true'>{ABSENT}</span>
+                  <span class='sr-only'>not recorded</span>
+                </>
+              )
+              : parts.text}
+          </span>
+        </>
+      )}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== steer2 money-text.css ==="; cat assets/ui/money-text.css; echo "=== ns-widget__hero CSS ==="; grep -n -A12 "ns-widget__hero" assets/ui/widget-card.css 2>/dev/null | head -40
+=== steer2 money-text.css ===
+/* ns-money-text — components/product/money-text.tsx
+   Token-driven money rendering: tabular numerals over the numeric font,
+   pos/neg/flat intent via data-money-sign, muted currency prefix, and an em
+   dash for absence (never a fabricated zero). */
+
+.ns-money-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--ns-space-px);
+  color: var(--ns-money-flat);
+  font-family: var(--ns-font-numeric);
+  font-variant-numeric: var(--ns-numeric-tabular);
+  font-size: var(--ns-text-money);
+  line-height: var(--ns-leading-tight);
+  /* A column of figures aligns on the decimal point, so an amount never
+     breaks across lines. */
+  white-space: nowrap;
+}
+
+.ns-money-text[data-money-sign='pos'] {
+  color: var(--ns-money-pos);
+}
+
+.ns-money-text[data-money-sign='neg'] {
+  color: var(--ns-money-neg);
+}
+
+.ns-money-text[data-money-sign='flat'],
+.ns-money-text[data-money='absent'] {
+  color: var(--ns-money-flat);
+}
+
+/* A currency symbol is a prefix, not a suffix, and it lives in its own element
+   so it can never concatenate onto the digits as `100.00USD`. */
+.ns-money-text__currency {
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+  font-size: 0.75em;
+}
+=== ns-widget__hero CSS ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; ls assets/ui/ | grep -i widget; echo "--- widget card stylesheet? ---"; grep -rn "ns-widget" assets/*.css assets/ui/*.css 2>/dev/null | head -5; echo "--- widget-card.tsx imports ---"; grep -n "import\|css" components/ui/widget-card.tsx | head -10
+--- widget card stylesheet? ---
+--- widget-card.tsx imports ---
+12:import type { JSX, VNode } from 'preact';
+13:import { cn } from '../../lib/cn.ts';
+14:import type { Renderable } from '../../lib/public-types.ts';
+15:import { Card } from './card.tsx';
+64: * `assets/blocks/widget-card.css` is imported after `surface-styles.css` and
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -n -B3 -A18 "ns-widget__hero" assets/blocks/widget-card.css | head -70
+69-   repeat a size prop at every call site. Roughly 3x the band's own label —
+70-   a hero the same size as the title above it is what makes a widget read as a
+71-   list item rather than a card (C2). */
+72:.ns-widget__hero .ns-money-text {
+73-  font-size: var(--ns-text-4xl);
+74-  font-weight: 600;
+75-  line-height: var(--ns-leading-tight);
+76-  letter-spacing: var(--ns-tracking-tight);
+77-}
+78-
+79-/* M9 — a hero states a balance, not a movement, so it does not take the
+80-   direction colour. In the reference cards the hero number is plain and only
+81-   the delta beside it is green; colouring the figure green *because it is
+82-   positive* is the failure this rule names. The DeltaChip on the same baseline
+83-   is what carries direction. */
+84:.ns-widget__hero .ns-money-text[data-money-sign] {
+85-  color: var(--ns-fg);
+86-}
+87-
+88:.ns-widget__hero--lg .ns-money-text {
+89-  font-size: var(--ns-text-4xl);
+90-}
+91-
+92:.ns-widget__hero--lg {
+93-  padding-block-start: var(--ns-space-1);
+94-}
+95-
+96-/* Band 4 */
+97-.ns-widget__body {
+98-  padding-block: var(--ns-space-2) var(--ns-space-5);
+99-}
+100-
+101-.ns-widget__body:empty {
+102-  display: none;
+103-}
+104-
+105-/* Band 5 — the footer carries no tinted bar of its own; the columns inside it
+106-   are the strip. A CTA fills the width instead. */
+107-.ns-widget__footer {
+108-  display: flex;
+109-  flex-direction: column;
+110-  gap: var(--ns-space-3);
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== Hero size usage ==="; grep -rn "WidgetCard.Hero\|<Hero" routes/ components/ islands/ 2>/dev/null | grep -v _fresh | head -20; echo; echo "=== size='lg' / size=\"lg\" ==="; grep -rn "size='lg'\|size=\"lg\"" routes/ components/ islands/ 2>/dev/null | grep -v _fresh | head
+=== Hero size usage ===
+routes/runs/(_components)/run-comparison.tsx:161:      <WidgetCard.Hero>
+routes/runs/(_components)/run-comparison.tsx:164:      </WidgetCard.Hero>
+routes/runs/(_components)/billed-summary.tsx:48:      <WidgetCard.Hero>
+routes/runs/(_components)/billed-summary.tsx:55:      </WidgetCard.Hero>
+routes/(design)/design/(_components)/components-view.tsx:471:            <WidgetCard.Hero>
+routes/(design)/design/(_components)/components-view.tsx:474:            </WidgetCard.Hero>
+islands/ui/RangeControlDemo.tsx:88:      <WidgetCard.Hero>
+islands/ui/RangeControlDemo.tsx:99:      </WidgetCard.Hero>
+
+=== size='lg' / size="lg" ===
+routes/(design)/design/(_components)/components-view.tsx:516:          <Avatar name='Settlement Bot' agent size='lg' />
+routes/(design)/design/(_components)/components-view.tsx:591:            <Button size='lg' variant='secondary'>Large</Button>
+routes/(design)/design/(_components)/components-view.tsx:782:          <Spinner size='lg' />
+[0m
+Found a third real defect: `--lg` sets the *same* size as the base hero. Let me check whether it's actually used.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; sed -n '55,130p' components/ui/widget-card.tsx
+<Card {...props} interactive={interactive} class={cn('ns-widget', className)}>
+      {children}
+    </Card>
+  );
+}
+
+/**
+ * Band 1. The header is a row — glyph and title left, one action pinned right.
+ * The base card header is a column built for a title plus a description;
+ * `assets/blocks/widget-card.css` is imported after `surface-styles.css` and
+ * restores the row on the `.ns-widget__header` seam (T4).
+ */
+function WidgetCardHeader({ children, class: className, ...props }: BandProps): VNode {
+  return (
+    <Card.Header {...props} class={cn('ns-widget__header', className)}>
+      {children}
+    </Card.Header>
+  );
+}
+
+function WidgetCardTitle({ children, class: className, ...props }: TitleProps): VNode {
+  return <Card.Title {...props} class={cn('ns-widget__title', className)}>{children}</Card.Title>;
+}
+
+function WidgetCardAction({ children, class: className, ...props }: BandProps): VNode {
+  return <div {...props} class={cn('ns-widget__action', className)}>{children}</div>;
+}
+
+/** Band 2. The range control, when the card has one. */
+function WidgetCardRange({ children, class: className, ...props }: BandProps): VNode {
+  return <div {...props} class={cn('ns-widget__range', className)}>{children}</div>;
+}
+
+/**
+ * Band 3. The hero row: the amount and its delta chip on one baseline, so the
+ * chip is optically centred on the figure rather than parked in a corner.
+ */
+function WidgetCardHero({ children, size = 'md', class: className, ...props }: HeroProps): VNode {
+  return (
+    <div
+      {...props}
+      class={cn('ns-widget__hero', size === 'lg' && 'ns-widget__hero--lg', className)}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** Band 4. The visualisation. */
+function WidgetCardBody({ children, class: className, ...props }: BandProps): VNode {
+  return <Card.Body {...props} class={cn('ns-widget__body', className)}>{children}</Card.Body>;
+}
+
+/** Band 5. Footer columns, a full-width CTA, or a note. */
+function WidgetCardFooter({ children, class: className, ...props }: BandProps): VNode {
+  return <Card.Footer {...props} class={cn('ns-widget__footer', className)}>{children}
+  </Card.Footer>;
+}
+
+/**
+ * A composed widget card with one slot per band, in document order.
+ */
+export const WidgetCard: WidgetCardComponent = Object.assign(WidgetCardRoot, {
+  Header: WidgetCardHeader,
+  Title: WidgetCardTitle,
+  Action: WidgetCardAction,
+  Range: WidgetCardRange,
+  Hero: WidgetCardHero,
+  Body: WidgetCardBody,
+  Footer: WidgetCardFooter,
+});
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -n "ns-text-3xl\|ns-text-4xl\|ns-text-5xl\|ns-text-6xl" assets/tokens.css | head
+164:  --ns-text-3xl: 1.875rem;
+165:  --ns-text-4xl: 2.25rem;
+[0m
+Confirmed dead: `size` is never passed, and `--lg` duplicates the base font-size. Let me read the component to treat this cleanly.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; sed -n '1,54p' components/ui/widget-card.tsx
+/**
+ * @component WidgetCard
+ * @layer 3
+ * @depends theme-seed, card
+ * @description The one composed-widget card. Five bands, in order: header
+ * (glyph + title left, one pill action right) · range control · hero metric
+ * with its delta chip · body visualisation · footer columns or a full-width
+ * CTA. Every widget on a page obeys it, which is what makes the page read as
+ * one system (C1).
+ */
+
+import type { JSX, VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
+import type { Renderable } from '../../lib/public-types.ts';
+import { Card } from './card.tsx';
+
+interface BandProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  children: Renderable;
+  class?: string;
+}
+
+interface WidgetCardProps extends BandProps {
+  interactive?: boolean;
+}
+
+interface HeroProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+  children: Renderable;
+  /**
+   * Hero size. `md` is the default card hero (~3× its label, C2); `lg` is for
+   * the one number on a page that outranks every other.
+   */
+  size?: 'md' | 'lg';
+  class?: string;
+}
+
+interface TitleProps extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
+  children: Renderable;
+  class?: string;
+}
+
+type WidgetCardComponent = ((props: WidgetCardProps) => VNode) & {
+  Header: (props: BandProps) => VNode;
+  Title: (props: TitleProps) => VNode;
+  Action: (props: BandProps) => VNode;
+  Range: (props: BandProps) => VNode;
+  Hero: (props: HeroProps) => VNode;
+  Body: (props: BandProps) => VNode;
+  Footer: (props: BandProps) => VNode;
+};
+
+function WidgetCardRoot(
+  { children, class: className, interactive = false, ...props }: WidgetCardProps,
+): VNode {
+  return (
+[0m
+`--ns-text-4xl` (2.25rem) is the largest token, so `lg` cannot be a real size step. Removing the dead prop rather than inventing a token.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== all text size tokens ==="; grep -n -- "--ns-text-[0-9a-z]*: " assets/tokens.css | head -30; echo; echo "=== any display/hero token ==="; grep -ni -- "--ns-\(display\|hero\|numeric\)[^:]*:" assets/tokens.css | head
+=== all text size tokens ===
+158:  --ns-text-xs: 0.75rem;
+159:  --ns-text-sm: 0.875rem;
+160:  --ns-text-base: 1rem;
+161:  --ns-text-lg: 1.125rem;
+162:  --ns-text-xl: 1.25rem;
+163:  --ns-text-2xl: 1.5rem;
+164:  --ns-text-3xl: 1.875rem;
+165:  --ns-text-4xl: 2.25rem;
+166:  --ns-text-3xs: 0.625rem;
+167:  --ns-text-2xs: 0.6875rem;
+168:  --ns-text-chat: 0.9375rem;
+169:  --ns-text-money: 0.9375rem;
+
+=== any display/hero token ===
+156:  --ns-numeric-tabular: tabular-nums;
+[0m
+The `lg` intent is grounded in the critique (§5: "no large hero number commands the page"). Let me check whether a larger token exists before deleting it.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== refs to hero--lg ==="; grep -rn "hero--lg" --include=*.ts --include=*.tsx --include=*.css . 2>/dev/null | grep -v _fresh | grep -v node_modules; echo "(end)"; echo "=== Hero in design_contract_test ==="; grep -n "Hero\|widget" tests/design_contract_test.ts | head -20
+=== refs to hero--lg ===
+./apps/ledgerline-web/components/ui/widget-card.tsx:96:      class={cn('ns-widget__hero', size === 'lg' && 'ns-widget__hero--lg', className)}
+./apps/ledgerline-web/assets/blocks/widget-card.css:88:.ns-widget__hero--lg .ns-money-text {
+./apps/ledgerline-web/assets/blocks/widget-card.css:92:.ns-widget__hero--lg {
+(end)
+=== Hero in design_contract_test ===
+242:Deno.test('R3 — the upstream registry count is not inflated by app-owned widgets', async () => {
+[0m
+[0m← [0mEdit /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/widget-card.tsx
+Index: /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/widget-card.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/widget-card.tsx
++++ /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web/components/ui/widget-card.tsx
+@@ -22,18 +22,8 @@
+ interface WidgetCardProps extends BandProps {
+   interactive?: boolean;
+ }
+ 
+-interface HeroProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+-  children: Renderable;
+-  /**
+-   * Hero size. `md` is the default card hero (~3× its label, C2); `lg` is for
+-   * the one number on a page that outranks every other.
+-   */
+-  size?: 'md' | 'lg';
+-  class?: string;
+-}
+-
+ interface TitleProps extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
+   children: Renderable;
+   class?: string;
+ }
+
+[0m
+No test or call site depends on it. Removing the dead prop.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; python3 - <<'PY'
+p='components/ui/widget-card.tsx'
+s=open(p).read()
+s=s.replace("""/**
+ * Band 3. The hero row: the amount and its delta chip on one baseline, so the
+ * chip is optically centred on the figure rather than parked in a corner.
+ */
+function WidgetCardHero({ children, size = 'md', class: className, ...props }: HeroProps): VNode {
+  return (
+    <div
+      {...props}
+      class={cn('ns-widget__hero', size === 'lg' && 'ns-widget__hero--lg', className)}
+    >
+      {children}
+    </div>
+  );
+}""","""/**
+ * Band 3. The hero row: the amount and its delta chip on one baseline, so the
+ * chip is optically centred on the figure rather than parked in a corner.
+ *
+ * There is deliberately no size variant. A `--lg` step used to exist, but its
+ * rule set the same `--ns-text-4xl` as the base hero — the largest type token
+ * there is — so it changed nothing but a padding, and no call site ever passed
+ * it. Making it mean something needs a display-size token, which is a
+ * token-layer decision, not a variant on this band.
+ */
+function WidgetCardHero({ children, class: className, ...props }: BandProps): VNode {
+  return <div {...props} class={cn('ns-widget__hero', className)}>{children}</div>;
+}""")
+s=s.replace("  Hero: (props: HeroProps) => VNode;","  Hero: (props: BandProps) => VNode;")
+open(p,'w').write(s)
+print('HeroProps refs left:', s.count('HeroProps'))
+PY
+HeroProps refs left: 0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; python3 - <<'PY'
+p='assets/blocks/widget-card.css'
+s=open(p).read()
+dead="""
+.ns-widget__hero--lg .ns-money-text {
+  font-size: var(--ns-text-4xl);
+}
+
+.ns-widget__hero--lg {
+  padding-block-start: var(--ns-space-1);
+}
+"""
+assert dead in s, 'dead block not found verbatim'
+s=s.replace(dead,"")
+open(p,'w').write(s)
+print('removed; hero--lg refs now:', s.count('hero--lg'))
+PY
+sed -n '64,95p' assets/blocks/widget-card.css
+removed; hero--lg refs now: 0
+
+/* Band 3 — hero amount and its delta chip share one baseline.
+
+   The hero's size belongs to this band, not to the amount component: any
+   amount dropped in here becomes the card's answer, so a caller does not
+   repeat a size prop at every call site. Roughly 3x the band's own label —
+   a hero the same size as the title above it is what makes a widget read as a
+   list item rather than a card (C2). */
+.ns-widget__hero .ns-money-text {
+  font-size: var(--ns-text-4xl);
+  font-weight: 600;
+  line-height: var(--ns-leading-tight);
+  letter-spacing: var(--ns-tracking-tight);
+}
+
+/* M9 — a hero states a balance, not a movement, so it does not take the
+   direction colour. In the reference cards the hero number is plain and only
+   the delta beside it is green; colouring the figure green *because it is
+   positive* is the failure this rule names. The DeltaChip on the same baseline
+   is what carries direction. */
+.ns-widget__hero .ns-money-text[data-money-sign] {
+  color: var(--ns-fg);
+}
+
+/* Band 4 */
+.ns-widget__body {
+  padding-block: var(--ns-space-2) var(--ns-space-5);
+}
+
+.ns-widget__body:empty {
+  display: none;
+}
+[0m
+Now the two dead CSS rules:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; mkdir -p apps/ledgerline-web/.llm/tmp && cat > apps/ledgerline-web/.llm/tmp/hero-proof.tsx <<'EOF'
+/** @jsxImportSource preact */
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { DeltaChip, WidgetCard } from '../../components/ui/mod.ts';
+import { MoneyText } from '../../components/product/money-text.tsx';
+
+const html = render(
+  <WidgetCard>
+    <WidgetCard.Header>
+      <WidgetCard.Title>Collected cash</WidgetCard.Title>
+    </WidgetCard.Header>
+    <WidgetCard.Hero>
+      <MoneyText value='4158250.50' currency='USD' />
+      <DeltaChip value='+14.2%' direction='up' note='vs prior run' />
+    </WidgetCard.Hero>
+  </WidgetCard>,
+);
+console.log(html);
+console.log('\nhero--lg present :', html.includes('hero--lg') ? 'FAIL (dead class emitted)' : 'PASS');
+console.log('hero band present:', html.includes('ns-widget__hero') ? 'PASS' : 'FAIL');
+console.log('money rendered   :', /\$?4,158,250\.50/.test(html.replace(/&#36;/g,'$')) || html.includes('4,158,250.50') ? 'PASS' : 'FAIL');
+EOF
+timeout 300 deno run --allow-all --no-lock apps/ledgerline-web/.llm/tmp/hero-proof.tsx 2>&1 | tail -8
+<div class="ns-card ns-widget"><div class="ns-card__header ns-widget__header"><p class="ns-card__title ns-widget__title">Collected cash</p></div><div class="ns-widget__hero"><span class="ns-money-text" data-money data-money-sign="pos" data-currency="USD"><span class="ns-money-text__currency">$</span>4,158,250.50</span><span class="ns-delta-chip"><span class="ns-delta-chip__pill" data-direction="up"><span class="ns-delta-chip__glyph" aria-hidden="true">↑</span><span class="ns-delta-chip__value">+14.2%</span></span><span class="ns-delta-chip__note">vs prior run</span></span></div></div>
+
+hero--lg present : PASS
+hero band present: PASS
+money rendered   : PASS
+[0m
+Hero renders correctly — currency as a separate prefixed element, delta chip inline on the same baseline. Cleaning up scratch and running gates.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; cp apps/ledgerline-web/.llm/tmp/hero-proof.tsx .llm/tmp/ 2>/dev/null; rm -rf apps/ledgerline-web/.llm; echo "=== git status ==="; git status --porcelain; echo "=== app check ==="; timeout 600 deno task --cwd apps/ledgerline-web check 2>&1 | tail -3; echo "EXIT=${PIPESTATUS[0]}"
+=== git status ===
+ M apps/ledgerline-web/assets/blocks/widget-card.css
+ M apps/ledgerline-web/components/ui/widget-card.tsx
+=== app check ===
+[0m[32mCheck[0m routes/runs/index.tsx
+[0m[32mCheck[0m utils.ts
+[0m[32mCheck[0m vite.config.ts
+EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== fmt:check ==="; timeout 300 deno task fmt:check 2>&1 | grep -o '"exitCode": [0-9]*'; echo "=== test ==="; timeout 600 deno test --allow-all 2>&1 | tail -3; echo "=== lint ==="; timeout 600 deno task lint > /tmp/l2.txt 2>&1; python3 -c "
+import json,re
+s=re.sub(r'\x1b\[[0-9;]*m','',open('/tmp/l2.txt').read())
+d=json.loads(s[s.find('{'):])
+tot=0
+for n,b in enumerate(d['batches']):
+    if b['exitCode']!=0:
+        for line in b['stderr'].splitlines():
+            if '-->' in line: print('  ', re.sub(r'\x1b\[[0-9;]*m','',line).strip()); tot+=1
+print('lint problems:',tot)
+"
+=== fmt:check ===
+"exitCode": 0
+"exitCode": 0
+=== test ===
+
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(1s)[0m
+
+=== lint ===
+   --> /home/agent/projects/netscript/wave7-billing-steer2/sagas/runtime.ts:8:10
+   --> /home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts:10:3
+   --> /home/agent/projects/netscript/wave7-billing-steer2/aspire/.helpers/register-apps.mts:19:16
+   --> /home/agent/projects/netscript/wave7-billing-steer2/triggers/daily-maintenance.ts:27:3
+lint problems: 4
+[0m
+Same 4 pre-existing lint problems, no new ones. Committing.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git add apps/ledgerline-web/components/ui/widget-card.tsx apps/ledgerline-web/assets/blocks/widget-card.css && git commit -q -F - <<'EOF'
+Fix: drop the hero size variant that could not change the size
+
+`WidgetCard.Hero` took a `size` prop, and its `--lg` rule set
+`--ns-text-4xl` — exactly the value the base `.ns-widget__hero .ns-money-text`
+rule already sets. So `lg` changed nothing but a padding-block-start, no call
+site ever passed it, and `4xl` is the largest type token in `tokens.css`, so
+there was no step for it to step to.
+
+A variant whose name promises a size and whose stylesheet cannot deliver one is
+worse than no variant: the next caller would read the prop, pass `'lg'`, and
+get the default back. Removed, with a note at the band recording that a bigger
+page-level hero needs a display-size token first — a token-layer decision, not
+a modifier on this band.
+
+The base hero is unchanged and still renders at 4xl; verified by rendering a
+composed card: hero band present, amount at `$4,158,250.50` with the currency
+as its own prefixed element, delta chip on the same baseline.
+EOF
+git log --oneline -3 | cat
+0d8fe41 Fix: drop the hero size variant that could not change the size
+b0b8612 Fix: clip the area chart's hover bands to the frame
+fcc88e3 Fix: a null footer column renders in the absent tone
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== pill variant (button) ==="; grep -n "pill" components/ui/button.tsx | head; grep -n -A6 "ns-btn--pill" assets/ui/button.css | head -20; echo; echo "=== scaffold fiction in gallery? ==="; grep -rn "api-gateway\|eu-west\|v2\.4\.1" routes/\(design\)/design/ 2>/dev/null | head; echo "(none above = clean)"
+=== pill variant (button) ===
+36:  | 'pill';
+82:  pill: 'ns-btn--pill',
+97:.ns-btn--pill {
+98-  background: var(--ns-card);
+99-  color: var(--ns-fg);
+100-  border-color: var(--ns-border);
+101-  border-radius: var(--ns-radius-full);
+102-  padding-inline: var(--ns-space-4);
+103-}
+--
+105:.ns-btn--pill:hover {
+106-  background: color-mix(in srgb, var(--ns-fg) 4%, var(--ns-card));
+107-  border-color: var(--ns-border-strong);
+108-}
+109-
+110-/* Destructive — reversal, so it is the only rust-filled surface on a card */
+111-.ns-btn--destructive {
+--
+131:.ns-btn--pill:active,
+132-.ns-btn--destructive:active {
+133-  filter: brightness(0.96);
+134-}
+
+=== scaffold fiction in gallery? ===
+(none above = clean)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== semicircular gauge spec ==="; grep -n "viewBox\|stroke-linecap\|stroke-width" components/ui/semicircular-gauge.tsx | head; echo; echo "=== segmented control a11y ==="; grep -n "role=\|aria-selected\|tablist" components/ui/segmented-control.tsx | head
+=== semicircular gauge spec ===
+57:/** viewBox: the arc is 160 wide and 100 tall, plus room for the 18-wide stroke. */
+123:          viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
+132:            stroke-width={STROKE}
+133:            stroke-linecap='butt'
+143:              stroke-width={STROKE}
+144:              stroke-linecap='butt'
+
+=== segmented control a11y ===
+93:      role={asLinks ? 'group' : 'tablist'}
+120:            role='tab'
+122:            // aria-selected reads as false to assistive tech, which would leave
+124:            aria-selected={selected ? 'true' : 'false'}
+[0m
+Three fixes committed. Now a comprehensive verification of every steer item in this tree, rather than inheriting prior claims.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; grep -n "VIEW_WIDTH\|VIEW_HEIGHT\|STROKE\|RADIUS" components/ui/semicircular-gauge.tsx | head -8
+58:const VIEW_WIDTH = 200;
+59:const VIEW_HEIGHT = 110;
+60:const RADIUS = 80;
+61:const STROKE = 18;
+65:const ARC = `M ${CENTRE_X - RADIUS} ${BASELINE_Y} A ${RADIUS} ${RADIUS} 0 0 1 ${
+66:  CENTRE_X + RADIUS
+123:          viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
+132:            stroke-width={STROKE}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; mkdir -p apps/ledgerline-web/.llm/tmp && cat > apps/ledgerline-web/.llm/tmp/money-proof.tsx <<'EOF'
+/** @jsxImportSource preact */
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { MoneyText } from '../../components/product/money-text.tsx';
+
+// The critique's exact defect: "100" must render $100.00, not $100.
+for (const v of ['100', '100.5', '-100', '0', '4158250.5', null, 'abc']) {
+  const h = render(<MoneyText value={v as never} currency='USD' />);
+  const text = h.replace(/<[^>]*>/g, '|');
+  console.log(`value ${String(v).padEnd(10)} -> ${text}`);
+}
+console.log('\n--- no-currency ---');
+console.log(render(<MoneyText value='100' />).replace(/<[^>]*>/g, '|'));
+EOF
+timeout 300 deno run --allow-all --no-lock apps/ledgerline-web/.llm/tmp/money-proof.tsx 2>&1 | tail -15
+value 100        -> ||$|100.00|
+value 100.5      -> ||$|100.50|
+value -100       -> ||$|-100.00|
+value 0          -> ||$|0.00|
+value 4158250.5  -> ||$|4,158,250.50|
+value null       -> ||—||not measured||
+value abc        -> ||—||not measured||
+
+--- no-currency ---
+|100.00|
+[0m
+Money formatting is exactly right (`100` → `$100.00`, null → em dash, currency as its own element). Let me clean up and verify the fix reaches the built CSS bundle.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; cp apps/ledgerline-web/.llm/tmp/money-proof.tsx .llm/tmp/ 2>/dev/null; rm -rf apps/ledgerline-web/.llm; echo "=== status pre-build ==="; git status --porcelain; echo "(clean if empty)"; echo "=== build ==="; timeout 600 deno task --cwd apps/ledgerline-web build 2>&1 | tail -6; echo "EXIT=${PIPESTATUS[0]}"
+=== status pre-build ===
+(clean if empty)
+=== build ===
+_fresh/server/billing.mjs                                  16.83 kB
+_fresh/server/_fresh-route___runs_id_.mjs                  34.40 kB
+_fresh/server/mod.mjs                                     105.59 kB
+_fresh/server/service-auth.mjs                            223.88 kB
+_fresh/server/server-entry.mjs                          1,743.30 kB
+✓ built in 7.36s
+EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2/apps/ledgerline-web; echo "=== --hit-x in emitted client CSS? ==="; grep -l -r "hit-x" _fresh/client/assets/*.css 2>/dev/null && grep -o "\-\-hit-x:[^;}]*" _fresh/client/assets/*.css 2>/dev/null | head -3; echo "--- in server entry? ---"; grep -c "hit-x" _fresh/server/server-entry.mjs; echo; echo "=== widget/five component classes in client CSS ==="; for c in ns-delta-chip ns-gauge ns-areachart ns-footer-cols ns-segmented ns-widget; do printf "%-18s %s\n" "$c" "$(grep -o "\.$c" _fresh/client/assets/*.css 2>/dev/null | head -1 | wc -l)"; done; echo "=== hero--lg gone from bundle? ==="; grep -c "hero--lg" _fresh/client/assets/*.css _fresh/server/server-entry.mjs 2>/dev/null
+=== --hit-x in emitted client CSS? ===
+_fresh/client/assets/client-entry-CSCgopQt.css
+--hit-x:50%
+--- in server entry? ---
+1
+
+=== widget/five component classes in client CSS ===
+ns-delta-chip      1
+ns-gauge           1
+ns-areachart       1
+ns-footer-cols     1
+ns-segmented       1
+ns-widget          1
+=== hero--lg gone from bundle? ===
+_fresh/client/assets/client-entry-CSCgopQt.css:0
+_fresh/server/server-entry.mjs:0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== dirty after build ==="; git status --porcelain; echo "(end)"
+=== dirty after build ===
+ M apps/ledgerline-web/routes/customers/[id].tsx
+ M apps/ledgerline-web/routes/customers/index.tsx
+ M apps/ledgerline-web/routes/invoices/[id].tsx
+ M apps/ledgerline-web/routes/invoices/index.tsx
+ M apps/ledgerline-web/routes/runs/[id].tsx
+(end)
+[0m
+`--hit-x` reaches the bundle and `hero--lg` is fully gone. Checking for the known build-dirties-routes issue.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git diff --stat; echo "=== sample diff ==="; git diff apps/ledgerline-web/routes/customers/index.tsx | head -20
+apps/ledgerline-web/routes/customers/[id].tsx  | 5 +----
+ apps/ledgerline-web/routes/customers/index.tsx | 5 +----
+ apps/ledgerline-web/routes/invoices/[id].tsx   | 5 +----
+ apps/ledgerline-web/routes/invoices/index.tsx  | 5 +----
+ apps/ledgerline-web/routes/runs/[id].tsx       | 5 +----
+ 5 files changed, 5 insertions(+), 20 deletions(-)
+=== sample diff ===
+diff --git a/apps/ledgerline-web/routes/customers/index.tsx b/apps/ledgerline-web/routes/customers/index.tsx
+index 6615977..6abe29a 100644
+--- a/apps/ledgerline-web/routes/customers/index.tsx
++++ b/apps/ledgerline-web/routes/customers/index.tsx
+@@ -24,10 +24,7 @@ const CUSTOMERS_SEARCH_SCHEMA = paginationSearchSchema({
+ });
+ 
+ export const customersIndexPage = definePage()
+-  .withRouteContract({
+-    $route: routePatterns.customers.$route,
+-    searchSchema: CUSTOMERS_SEARCH_SCHEMA,
+-  })
++  .withRouteContract({ $route: routePatterns.customers.$route, searchSchema: CUSTOMERS_SEARCH_SCHEMA })
+   .withMeta(() => ({
+     title: 'Customers — ledgerline',
+     description: 'Customer accounts: billing contacts and ledger drill-down.',
+[0m
+Exactly the 5 documented files. Let me confirm it's only the codegen reformat, then restore.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git checkout -- apps/ledgerline-web/routes/customers/\[id\].tsx apps/ledgerline-web/routes/customers/index.tsx apps/ledgerline-web/routes/invoices/\[id\].tsx apps/ledgerline-web/routes/invoices/index.tsx apps/ledgerline-web/routes/runs/\[id\].tsx; echo "=== status ==="; git status --porcelain; echo "(clean if empty)"; echo "=== deno.lock touched? ==="; git diff --stat deno.lock apps/ledgerline-web/deno.lock 2>/dev/null; echo "(clean if empty)"
+=== status ===
+(clean if empty)
+=== deno.lock touched? ===
+(clean if empty)
+[0m
+Purely the codegen collapsing `withRouteContract` onto one line — no semantic change. Restoringper the documented procedure.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; wc -l RECORD.md; echo "=== head ==="; sed -n '1,25p' RECORD.md; echo "=== tail ==="; tail -35 RECORD.md
+841 RECORD.md
+=== head ===
+# Running record — Ledgerline (wave7 billing run, NetScript 0.0.7)
+
+Started 2026-09-03 ~23:05 UTC. Sole agent: opencode/z-ai/glm-5.3-flash. This file is appended as
+problems happen; nothing reconstructed at the end.
+
+## Version gate (§0)
+
+- Quickstart read in full before any action: https://rickylabs.github.io/netscript/quickstart/ (docs
+  edition "0.0.x", page states it is verified against CLI source and walked end-to-end on Linux/Deno
+  2.x).
+- CLI installed with the exact documented command, including the required
+  `--minimum-dependency-age=0`:
+  `deno install --global --allow-all --name netscript --minimum-dependency-age=0 jsr:@netscript/cli@0.0.7`
+  → "Successfully installed netscript", 53 packages installed. No dependency-age error anywhere
+  during install; the generated workspace's `deno.json` imports and `deno.lock` resolved every
+  `@netscript/*` at exactly `0.0.7` (verified by grep over both; 13 distinct packages, zero
+  non-0.0.7 pins).
+- `netscript --version` → `0.0.7`. MCP handshake: `@netscript/mcp` 0.0.7 and `aspire-mcp-server`
+  13.5.3 both answered a JSON-RPC `initialize` + `tools/list` over stdio.
+- Environment note from the brief said this host runs Deno 2.9.6; it actually runs **2.9.5**, so the
+  scaffold's `engines.deno: "2.9.5"` pin matches exactly — the expected warning never fired.
+
+## Problems encountered (in order)
+
+### P1 — GitHub push rejected: PAT lacks `workflow` scope (environment, not framework)
+=== tail ===
+`refund:${runItemId}`), the run item is stamped COMPENSATED in the same
+transaction that folds it into `failedCount`, and the saga instance is
+terminalised from `.on('RunItemChargeRecordFailed')` via `sagaFail` — the
+engine persists `failed`. The instance can never rest `compensating`: the
+compensation handler is registered as a routing no-op and the `.on()` handler
+guards replay. Zero double-refund is a property of the keys, not of anyone
+behaving: the refund key replays a stored REFUNDED response.
+
+## Framework defect — the vite build rewrites `withRouteContract`, so `deno fmt` and the build disagree
+
+**Found 2026-09-04 (design steer #2, pass 6).** Five route files carry a
+`.withRouteContract({ ... })` call on one line that runs past `deno fmt`'s width —
+`routes/customers/index.tsx`, `routes/customers/[id].tsx`, `routes/invoices/index.tsx`,
+`routes/invoices/[id].tsx`, `routes/runs/[id].tsx`. Formatting them is not the end
+of it:
+
+1. `deno fmt <those files>` → the call expands onto several lines, `deno task
+   fmt:check` is green (227 files, both batches).
+2. `deno run -A npm:vite --configLoader native build` — the app's own build
+   (`@fresh/plugin-vite`) → all five are rewritten back onto one line and
+   `git status` is dirty again.
+
+Reproduced twice. The decisive run: at `4d743c5` `routes/runs/[id].tsx` is clean,
+nobody edits it, a build runs, and it is dirty — so the writer is the generator's
+codegen, not a person and not another agent.
+
+Consequences for the next session:
+
+- The committed source is the **formatted** form; that is what the repo's
+  `fmt:check` gate wants, and it is what pass 6 committed (`4d743c5`).
+- A build re-dirties the tree. `git checkout --` the five files afterwards; do not
+  commit the generator's one-line version, and do not re-run `deno fmt` expecting
+  it to hold across a build.
+- The fix belongs in the generator (emit output at `deno fmt`'s width), which lives
+  upstream, not in this tree.
+[0m
+Tree clean, lock hygiene intact. Now recording the canonicalisation decision. Let me check RECORD.md's conventions.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; date -u '+%Y-%m-%d %H:%M UTC'; git log --oneline -1 | cat
+2026-09-04 13:38 UTC
+0d8fe41 Fix: drop the hero size variant that could not change the size
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; cat >> RECORD.md <<'EOF'
+
+## Two trees, one component set — which copy is canonical (design steer #2, pass 8)
+
+**Found 2026-09-04 13:38 UTC.** Design steer #2 was worked in parallel in two
+worktrees of this same repo, and both now contain the five widget components:
+
+| Branch | Worktree | vs `master` at the time |
+| :-- | :-- | :-- |
+| `design/ledgerline-ui` | `/home/agent/projects/netscript/wave7-design` | 9 ahead, **41 behind** |
+| `fix/steer2-consolidated` | `/home/agent/projects/netscript/wave7-billing-steer2` | 25 ahead, **2 behind** |
+
+`design/ledgerline-ui` branched from `a110230` ("Frontend 1/8: Ledgerline token
+identity"), before 41 commits of backend work landed on master. `fix/steer2-consolidated`
+branched from `38f4aee` ("Backend D: terminal compensation proved") and has kept
+up. Merging the design tree first would drag that 41-commit divergence along with
+it, so **`fix/steer2-consolidated` is the canonical line** and pass 8 worked
+there. The design tree is not deleted; it is the source of one API worth
+salvaging (below).
+
+Consequences for the next session:
+
+- Do not build in `wave7-design` expecting it to converge. Its `SegmentedControl`
+  lacks the `--wrap` modifier the runs status filter needs (nine cells overflow a
+  narrow card), so it is the weaker copy of that component.
+- Do not assume a component exists "because a pass closed it" — check which tree
+  that pass was in. Pass 7 ran in the design tree and its two real fixes (chart
+  hover bands, null footer tone) were **not** present here; pass 8 ported and
+  verified both (`b0b8612`, `fcc88e3`).
+- `MoneyText` still has two shapes. Here it is `components/product/money-text.tsx`
+  with `{ value, currency, class }` and hero typography owned by
+  `.ns-widget__hero .ns-money-text`. In the design tree it is
+  `components/ui/money-text.tsx` and carries `size`/`signed`/`tone`/`compact`.
+  When the trees converge, the card-owns-typography shape is the one to keep —
+  a component that sets its own size cannot be re-scaled by the band it sits in —
+  and `signed`/`tone`/`compact` are the parts worth porting onto it.
+
+## Dead API — `WidgetCard.Hero`'s `size` prop could not change the size
+
+**Found 2026-09-04 (design steer #2, pass 8).** `WidgetCard.Hero` accepted
+`size?: 'md' | 'lg'`, and `--lg`'s rule set `font-size: var(--ns-text-4xl)` —
+the same value the base `.ns-widget__hero .ns-money-text` rule already sets. No
+call site ever passed it. `--ns-text-4xl` (2.25rem) is the largest type token in
+`tokens.css`, so there was no step for `lg` to step to; its only distinct effect
+was a `padding-block-start`.
+
+Removed (`0d8fe41`) rather than left in place, because a variant whose name
+promises a size and whose stylesheet cannot deliver one is worse than no variant
+— the next caller reads the prop, passes `'lg'`, and silently gets the default.
+A page-level hero that outranks every other number is still wanted (the vision
+critique §5 asks for exactly it); it needs a display-size token added at the
+token layer first, and `tokens.json` is the source for that, not this band.
+EOF
+echo "appended; new length:"; wc -l RECORD.md
+appended; new length:
+892 RECORD.md
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass8.md
+Wrote file successfully.
+[0m
+Now the pass document, then commit.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git add RECORD.md && git commit -q -F - <<'EOF'
+Record which tree is canonical, and the hero size variant that was not one
+
+Steer #2 was built in two worktrees of this repo at once. `design/ledgerline-ui`
+is 41 commits behind master; `fix/steer2-consolidated` is 2 behind, so this is
+the line to keep — merging the other first would drag that divergence along.
+Records the salvage list too: the design tree's `SegmentedControl` lacks the
+`--wrap` modifier the nine-cell runs filter needs, and its `MoneyText` carries
+`signed`/`tone`/`compact` worth porting onto this tree's shape.
+
+Also records the `WidgetCard.Hero` `size` prop removed above, and the third
+reproduction of the build rewriting the five `withRouteContract` route files.
+EOF
+echo "=== log ==="; git log --oneline -4 | cat; echo "=== status ==="; git status --porcelain; echo "(clean if empty)"
+=== log ===
+e868cc2 Record which tree is canonical, and the hero size variant that was not one
+0d8fe41 Fix: drop the hero size variant that could not change the size
+b0b8612 Fix: clip the area chart's hover bands to the frame
+fcc88e3 Fix: a null footer column renders in the absent tone
+=== status ===
+(clean if empty)
+[0m
+Final gate run at the end state.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; echo "=== fmt:check ==="; timeout 300 deno task fmt:check 2>&1 | grep -o '"exitCode": [0-9]*'; echo "=== test ==="; timeout 600 deno test --allow-all 2>&1 | tail -2; echo "=== app check ==="; timeout 600 deno task --cwd apps/ledgerline-web check >/dev/null 2>&1; echo "exit=$?"; echo "=== root check ==="; timeout 900 deno task check 2>&1 | grep -o '"exitCode": [0-9]*'
+=== fmt:check ===
+"exitCode": 0
+"exitCode": 0
+=== test ===
+[0m[32mok[0m | 55 passed | 0 failed [0m[38;5;245m(2s)[0m
+
+=== app check ===
+exit=0
+=== root check ===
+"exitCode": 0
+"exitCode": 0
+"exitCode": 1
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing-steer2; git status --porcelain; echo "(clean if empty)"; echo "=== final log ==="; git log --oneline master..fix/steer2-consolidated | head -6 | cat
+(clean if empty)
+=== final log ===
+e868cc2 Record which tree is canonical, and the hero size variant that was not one
+0d8fe41 Fix: drop the hero size variant that could not change the size
+b0b8612 Fix: clip the area chart's hover bands to the frame
+fcc88e3 Fix: a null footer column renders in the absent tone
+2550ac2 Record the build-vs-fmt conflict on withRouteContract before it bites again
+4d743c5 Format the seven files deno fmt flags, so the repo's fmt:check gate is green
+[0m
+[0m# [0mTodos
+[✓] Establish green baseline in wave7-billing-steer2 (fix/steer2-consolidated): tests, check, fmt, lint
+[✓] Fix FooterColumns: absence wins over caller-supplied direction (null renders in absent tone)
+[✓] Fix ComparisonAreaChart hover bands: clip end bands to frame via --hit-x
+[✓] Reconcile MoneyText API divergence between the two trees
+[✓] Verify by rendering + full gate suite; commit each fix separately
+[✓] Record the two-tree canonicalisation decision in RECORD.md
+[0m
+Pass 8 done. Written up in `design-steer-2-pass8.md`.
+
+## The thing that changed the shape of this pass
+
+Steer #2 was being built in **two worktrees at once**. `design/ledgerline-ui` (where passes 3–7 ran) is **41 commits behind master**; `fix/steer2-consolidated` is **2 behind**. So I worked in the latter and treated the former as a salvage source. That matters because pass 7's "DONE" was claimed in the *other* tree — neither of its two real fixes was present here.
+
+## DONE — 4 commits, `2550ac2` → `e868cc2`
+
+| Commit | What |
+| :-- | :-- |
+| `fcc88e3` | `null` footer column renders in the absent tone |
+| `b0b8612` | Chart hover bands clipped to the frame |
+| `0d8fe41` | Dead `WidgetCard.Hero` `size` prop removed |
+| `e868cc2` | Canonical-tree decision recorded in `RECORD.md` |
+
+The bands bug was worse than "measured wrong": `.ns-areachart__frame` has **no `overflow: hidden`**, so the ~14% overhang reached into the y-axis gutter — hovering a tick label popped the first point's readout. Fixed via `--hit-x` (point's x as a % of its own band), verified across **all point counts 1–8**, not just the gallery's four.
+
+I also found a third defect while reconciling `MoneyText`: `Hero`'s `size='lg'` set `--ns-text-4xl`, the *same* value as the base rule, and `4xl` is the largest token that exists — so the prop could not do what its name promised. Removed it rather than leave a trap.
+
+I got one thing wrong and rendering corrected me: I was convinced 2 points would overlap the bands. Counts 1–8 disproved it — the step is 96.25%, not 100%.
+
+**Verified, not inherited:** money (`100`→`$100.00`, `null`→em dash, currency as its own span, so no `100.00USD`), no `3px 3px 0` shadows, pill variant, gauge at `viewBox 0 0 200 110 / r=80 / stroke 18 / linecap butt`, exception badge on semantic tokens, no scaffold strings.
+
+## REMAINING
+
+1. **Not pushed** — no upstream; 25 ahead, 2 behind master. Not rebased (owner's call).
+2. **Two `MoneyText` shapes** — recorded with a recommendation (keep card-owned typography, port `signed`/`tone`/`compact`). Deliberately not done: it changes call sites in both trees.
+3. **`deno task lint` red at repo scope** — 4 problems, all pre-existing. I checked master's own copies of those 3 files: same 4. Two are in a *"DO NOT EDIT"* generated file and return on the next `netscript generate`.
+4. **aspire check batch exits 1** — missing `aspire/node_modules`, identical on master.
+5. **Build re-dirties 5 route files** — reproduced a third time, whitespace-only, restored.
+6. **Not verified against the reference images** — I can't see them. This proves the code matches the critique's numbers, not that the numbers match the images.
+
+Gates: fmt ✅ · tests 55/55 ✅ · app check ✅ · root check 2/3 ✅ (aspire environmental). Build emits `--hit-x` and `hero--lg` is at **0** in the bundle. Tree clean, lock untouched.
+
+One trap worth flagging: `apps/ledgerline-web/.llm/` is **not** gitignored (root's `.llm/tmp/` is anchored), so a scratch harness left there turns the app's own `check` gate red — it bit me mid-pass.

@@ -1,0 +1,2484 @@
+[0m[32mTask[0m [0m[36magentic:opencode[0m deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts '--message' 'Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING.' '--model' 'openrouter/tencent/hy4-preview' '--variant' 'max' '--cwd' '/home/agent/projects/netscript/wave7-design' '--require-mcp' 'netscript' '--require-mcp' 'aspire' '--receipt' '.netscript/agent/design-receipt.jsonl' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md' '-f' '/home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md'
+[0m
+> build · tencent/hy4-preview
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire && rtk git status 2>/dev/null | head -40; rtk git log --oneline -5
+/bin/bash: line 1: rtk: command not found
+[0m
+[0m$ [0mls /home/agent/projects/netscript/worktrees/007-aspire/ && ls /home/agent/projects/netscript/ | head -30
+AGENTS-handoff.md
+AGENTS.md
+CLAUDE.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+GOVERNANCE.md
+LICENSE
+NOTICE
+README.md
+ROLLOUT.md
+SECURITY.md
+SUPPORT.md
+deno.json
+deno.lock
+docs
+jsr-package-settings.json
+notes.md
+ops
+packages
+plugins
+resources
+rfcs
+skills
+tools
+handoff
+repo
+wave7-billing
+wave7-billing-steer2
+wave7-design
+wave7-preflight
+worktrees
+[0m
+I'll start by inspecting the current state of the design worktree.
+[0m$ [0mcd /home/agent/projects/netscript/worktrees/007-aspire && git status --short | head -40 && echo "---LOG---" && git log --oneline -8 && echo "---BRANCH---" && git branch --show-current
+?? .llm/runs/wave7-billing-run--0.0.7/
+---LOG---
+cf528cbd3 chore(aspire-13.5): #1984 ready-merge packet at 6884b7548; canary-pair inheritance blocker recorded
+b005c5a9e chore(aspire-13.5): dispatch README min-dep-age repair (coordinator ruling on run 33708533076)
+d8232ae4e chore(aspire-13.5): prod run 33708533076 diagnosis — minimum-dependency-age, isolation proven
+bf91d3cf8 chore(aspire-13.5): #1975 merged 3149d18e1; watching prod run 33708533076
+5b700acac chore(aspire-13.5): #1975 ready-merge packet at 8e54ccfa1
+2609e8b5b chore(aspire-13.5): #1975 IMPL-EVAL PASS recorded; manifest repair at 8e54ccfa1
+4bf5c75d0 chore(aspire-13.5): leaf-1881-fix GREEN 0650f6f7b on #1975; IMPL-EVAL dispatched
+4113c0863 chore(aspire-13.5): brief addendum (fail-closed install root) and corrected post-merge proof dispatch
+---BRANCH---
+research/aspire-13.5-0.0.7
+[0m
+[0m$ [0mls /home/agent/projects/netscript/wave7-design/ && echo "---" && ls /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/
+AGENTS.md
+AUDIT-HOWTO.md
+CONSTRUCTION-REFERENCE.md
+DESIGN-REFERENCES.md
+DESIGN.md
+MARKET-RESEARCH.md
+README.md
+RECORD.md
+apps
+appsettings.json
+aspire
+auth
+contracts
+database
+deno.json
+deno.lock
+design-critique-1.md
+design-references
+mcp-ask.ts
+netscript.config.ts
+node_modules
+package.json
+plugins
+sagas
+services
+streams
+tests
+triggers
+tsconfig.json
+workers
+---
+AGENTS.md
+README.md
+WEB-LAYER.md
+_fresh
+assets
+client.ts
+components
+deno.json
+islands
+lib
+main.ts
+router.ts
+routes
+static
+tsconfig.json
+utils.ts
+vite.config.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git branch --show-current && git log --oneline -5 && echo "---STATUS---" && git status --short | head -30
+design/ledgerline-ui
+310a123 Design: format the status contract test this branch introduced
+4261c92 Design: finish the gallery scaffold sweep the prior pass reported closed
+b8ae695 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+24cccd5 Design: money + status contract layer, tested
+---STATUS---
+?? .llm/tmp/component-contract.md
+?? .netscript/agent/design-receipt.jsonl
+?? AUDIT-HOWTO.md
+?? CONSTRUCTION-REFERENCE.md
+?? DESIGN-REFERENCES.md
+?? design-critique-1.md
+?? design-references/
+?? mcp-ask.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing && git branch --show-current && git log --oneline -5 && echo "---STATUS---" && git status --short | head -30
+master
+c5d57c6 Webhooks screen: /webhooks with endpoints table + delivery log (live island states, em-dash absence, REPLAYED chips), bearer-bearing client, nav entry
+1cd0f34 Webhooks: real contract (endpoints + delivery log + admin replay), DB-backed domain, authz enforcement — replaces the CLI placeholder fiction
+38f4aee Backend D: terminal compensation proved — instances API + refund + run rows
+40f91d6 Fix: the product's money renderer printed $100 and 100.00USD
+dc54d95 Fix: give the product tree the money contract layer it never had
+---STATUS---
+ M .netscript/agent/opencode-receipt.jsonl
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && ls components/ui/ && echo "---ASSETS UI---" && ls assets/ui/ && echo "---COMPONENTS---" && ls components/
+alert.tsx
+avatar.tsx
+badge.tsx
+breadcrumb.tsx
+button.tsx
+card.tsx
+chart-block.tsx
+checkbox.tsx
+code-block.tsx
+comparison-area-chart.tsx
+control-props.ts
+data-table.tsx
+delta-chip.tsx
+desktop-dialog.tsx
+desktop-notification.tsx
+desktop-tray-menu.tsx
+desktop-update-prompt.tsx
+desktop-window-chrome.tsx
+detail-layout.tsx
+donut.tsx
+dropzone.tsx
+empty-state.tsx
+filter-form.tsx
+footer-columns.tsx
+form-field.tsx
+icon-button.tsx
+inline-notice.tsx
+input.tsx
+label.tsx
+mod.ts
+money-text.tsx
+page-header.tsx
+pagination.tsx
+panel.tsx
+progress.tsx
+responsive-table.tsx
+section-divider.tsx
+segmented-control.tsx
+select.tsx
+semicircular-gauge.tsx
+separator.tsx
+sidebar-shell.tsx
+skeleton.tsx
+spinner.tsx
+stats-grid.tsx
+switch.tsx
+textarea.tsx
+widget-card.tsx
+---ASSETS UI---
+alert-styles.css
+alert.css
+avatar.css
+badge.css
+button.css
+card.css
+chart-block.css
+checkbox.css
+choice-styles.css
+code-block.css
+comparison-area-chart.css
+data-table.css
+delta-chip.css
+desktop-dialog.css
+desktop-notification.css
+desktop-tray-menu.css
+desktop-update-prompt.css
+desktop-window-chrome.css
+detail-layout.css
+donut.css
+dropzone.css
+empty-state.css
+filter-form.css
+floating.css
+footer-columns.css
+form-control-styles.css
+form-field.css
+inline-notice.css
+label.css
+money-text.css
+page-header.css
+pagination.css
+panel.css
+progress.css
+responsive-table.css
+section-divider.css
+segmented-control.css
+semicircular-gauge.css
+separator.css
+sheet.css
+skeleton.css
+spinner.css
+stats-grid.css
+surface-styles.css
+switch.css
+textarea.css
+theme-toggle.css
+toast.css
+---COMPONENTS---
+ui
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && ls routes/ && echo "---DESIGN---" && ls "routes/(design)/design/" 2>/dev/null && ls "routes/(design)/design/(_components)/" 2>/dev/null
+(_components)
+(_shared)
+(design)
+_app.tsx
+_layout.tsx
+health.tsx
+index.tsx
+---DESIGN---
+(_components)
+(_islands)
+(_shared)
+_layout.tsx
+_middleware.ts
+components.tsx
+composition.tsx
+index.tsx
+tokens.tsx
+components-view.tsx
+composition-view.tsx
+tokens-view.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && wc -l components/ui/delta-chip.tsx components/ui/semicircular-gauge.tsx components/ui/segmented-control.tsx components/ui/comparison-area-chart.tsx components/ui/footer-columns.tsx components/ui/widget-card.tsx components/ui/mod.ts assets/ui/delta-chip.css assets/ui/semicircular-gauge.css assets/ui/segmented-control.css assets/ui/comparison-area-chart.css assets/ui/footer-columns.css
+81 components/ui/delta-chip.tsx
+  180 components/ui/semicircular-gauge.tsx
+  107 components/ui/segmented-control.tsx
+  333 components/ui/comparison-area-chart.tsx
+   72 components/ui/footer-columns.tsx
+  125 components/ui/widget-card.tsx
+   86 components/ui/mod.ts
+   60 assets/ui/delta-chip.css
+  192 assets/ui/semicircular-gauge.css
+   94 assets/ui/segmented-control.css
+  410 assets/ui/comparison-area-chart.css
+   84 assets/ui/footer-columns.css
+ 1824 total
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && cat apps/ledgerline-web/deno.json && echo "=== ROOT TASKS ===" && cat deno.json | head -60
+{
+  "name": "@ledgerline/ledgerline-web",
+  "version": "0.0.0",
+  "exports": "./main.ts",
+  "tasks": {
+    "check": "deno fmt --check . && deno lint . && deno check",
+    "deps:closure": "deno run --allow-read .netscript/verify-dependency-closure.ts",
+    "dev": "deno task deps:closure && deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native",
+    "build": "deno task deps:closure && deno run -A npm:vite build",
+    "serve": "deno run -A npm:vite preview",
+    "start": "deno serve -A _fresh/server.js",
+    "update": "deno run -A -r jsr:@fresh/update ."
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "fresh",
+        "recommended"
+      ]
+    }
+  },
+  "exclude": [
+    "**/_fresh/*"
+  ],
+  "imports": {
+    "@app/": "./",
+    "@ledgerline/contracts": "../../contracts/mod.ts",
+    "@netscript/fresh": "jsr:@netscript/fresh@0.0.7",
+    "@netscript/fresh/defer/island": "jsr:@netscript/fresh@0.0.7/defer/island",
+    "@netscript/fresh-ui": "jsr:@netscript/fresh-ui@0.0.7",
+    "@netscript/sdk": "jsr:@netscript/sdk@0.0.7",
+    "@netscript/mcp": "jsr:@netscript/mcp@0.0.7",
+    "fresh": "jsr:@fresh/core@^2.3.3",
+    "@orpc/client": "npm:@orpc/client@^1.15.0",
+    "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+    "@orpc/openapi": "npm:@orpc/openapi@^1.15.0",
+    "@orpc/server": "npm:@orpc/server@^1.15.0",
+    "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.15.0",
+    "@orpc/zod": "npm:@orpc/zod@^1.15.0",
+    "preact": "npm:preact@^10.29.2",
+    "@preact/signals": "npm:@preact/signals@2.9.2",
+    "@tanstack/db": "npm:@tanstack/db@^0.6.8",
+    "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.101.0",
+    "@tanstack/query-core": "npm:@tanstack/query-core@^5.101.0",
+    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@^1.2.1",
+    "@tanstack/react-db": "npm:@tanstack/react-db@^0.1.95",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.12",
+    "tailwindcss": "npm:tailwindcss@^4.2.2",
+    "vite": "npm:vite@7.2.2",
+    "zod": "npm:zod@^4.4.3",
+    "clsx": "npm:clsx@^2.1.1",
+    "tailwind-merge": "npm:tailwind-merge@^3.5.0",
+    "@streams/": "../../../streams/"
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns",
+      "deno.unstable"
+    ],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
+    ],
+    "types": [
+      "vite/client"
+    ]
+  }
+}=== ROOT TASKS ===
+{
+  "workspace": [
+    "./apps/ledgerline-web",
+    "./contracts",
+    "./database/postgres",
+    "./plugins",
+    "./plugins/*",
+    "./services/billing",
+    "./services/runs",
+    "./services/webhooks"
+  ],
+  "catalog": {
+    "zod": "^4.4.3"
+  },
+  "imports": {
+    "@netscript/database": "jsr:@netscript/database@0.0.7",
+    "@netscript/config": "jsr:@netscript/config@0.0.7",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.7",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.7",
+    "@netscript/mcp": "jsr:@netscript/mcp@0.0.7",
+    "@database/zod": "./database/postgres/schema/.generated/zod/crud.ts",
+    "@ledgerline/contracts": "./contracts/mod.ts",
+    "@ledgerline/db": "./database/postgres/mod.ts",
+    "@shared/": "./services/_shared/",
+    "@durable-streams/client": "npm:@durable-streams/client@^0.2.6",
+    "@durable-streams/server": "npm:@durable-streams/server@^0.3.7",
+    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
+    "@netscript/cron": "jsr:@netscript/cron@0.0.7",
+    "@netscript/kv/kvdex": "jsr:@netscript/kv@0.0.7/kvdex",
+    "@netscript/plugin/contract-base": "jsr:@netscript/plugin@0.0.7/contract-base",
+    "@netscript/plugin/loader": "jsr:@netscript/plugin@0.0.7/loader",
+    "@netscript/plugin/sdk": "jsr:@netscript/plugin@0.0.7/sdk",
+    "@netscript/plugin/service": "jsr:@netscript/plugin@0.0.7/service",
+    "@netscript/plugin-auth-core/config": "jsr:@netscript/plugin-auth-core@0.0.7/config",
+    "@netscript/plugin-auth-core/contracts/v1": "jsr:@netscript/plugin-auth-core@0.0.7/contracts/v1",
+    "@netscript/plugin-auth-core/domain": "jsr:@netscript/plugin-auth-core@0.0.7/domain",
+    "@netscript/plugin-auth-core/ports": "jsr:@netscript/plugin-auth-core@0.0.7/ports",
+    "@netscript/plugin-auth-core/streams": "jsr:@netscript/plugin-auth-core@0.0.7/streams",
+    "@netscript/plugin-auth-core/telemetry": "jsr:@netscript/plugin-auth-core@0.0.7/telemetry",
+    "@netscript/plugin-sagas-core/contracts/v1": "jsr:@netscript/plugin-sagas-core@0.0.7/contracts/v1",
+    "@netscript/plugin-sagas-core/domain": "jsr:@netscript/plugin-sagas-core@0.0.7/domain",
+    "@netscript/plugin-sagas-core/integration/publisher": "jsr:@netscript/plugin-sagas-core@0.0.7/integration/publisher",
+    "@netscript/plugin-sagas-core/runtime": "jsr:@netscript/plugin-sagas-core@0.0.7/runtime",
+    "@netscript/plugin-sagas-core/stores": "jsr:@netscript/plugin-sagas-core@0.0.7/stores",
+    "@netscript/plugin-sagas-core/streams": "jsr:@netscript/plugin-sagas-core@0.0.7/streams",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.7",
+    "@netscript/plugin-triggers-core/adapters": "jsr:@netscript/plugin-triggers-core@0.0.7/adapters",
+    "@netscript/plugin-triggers-core/builders": "jsr:@netscript/plugin-triggers-core@0.0.7/builders",
+    "@netscript/plugin-triggers-core/config": "jsr:@netscript/plugin-triggers-core@0.0.7/config",
+    "@netscript/plugin-triggers-core/contracts/v1": "jsr:@netscript/plugin-triggers-core@0.0.7/contracts/v1",
+    "@netscript/plugin-triggers-core/domain": "jsr:@netscript/plugin-triggers-core@0.0.7/domain",
+    "@netscript/plugin-triggers-core/ports": "jsr:@netscript/plugin-triggers-core@0.0.7/ports",
+    "@netscript/plugin-triggers-core/runtime": "jsr:@netscript/plugin-triggers-core@0.0.7/runtime",
+    "@netscript/plugin-triggers-core/stores": "jsr:@netscript/plugin-triggers-core@0.0.7/stores",
+    "@netscript/plugin-triggers-core/telemetry": "jsr:@netscript/plugin-triggers-core@0.0.7/telemetry",
+    "@netscript/plugin-workers-core/executor": "jsr:@netscript/plugin-workers-core@0.0.7/executor",
+    "@netscript/plugin-workers-core/registry": "jsr:@netscript/plugin-workers-core@0.0.7/registry",
+    "@netscript/plugin-workers-core/runtime": "jsr:@netscript/plugin-workers-core@0.0.7/runtime",
+[0m
+[0m→ [0mRead apps/ledgerline-web/components/ui/delta-chip.tsx
+[0m→ [0mRead apps/ledgerline-web/assets/ui/delta-chip.css
+[0m→ [0mRead apps/ledgerline-web/components/ui/semicircular-gauge.tsx
+[0m→ [0mRead apps/ledgerline-web/components/ui/segmented-control.tsx
+[0m→ [0mRead apps/ledgerline-web/components/ui/mod.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && grep -rn "comparison-area-chart\|semicircular-gauge\|segmented-control\|footer-columns\|delta-chip\|widget-card" --include="*.ts" --include="*.tsx" --include="*.css" . | grep -v "^./components/ui/\(comparison-area-chart\|semicircular-gauge\|segmented-control\|footer-columns\|delta-chip\|widget-card\)" | grep -v "^./assets/ui/\(comparison-area-chart\|semicircular-gauge\|segmented-control\|footer-columns\|delta-chip\)"
+...output truncated...
+
+Full output saved to: /home/agent/.local/share/opencode/tool-output/tool_06c8a74fc001rK218rB5haKBvl
+
+./components/ui/mod.ts:16:} from './comparison-area-chart.tsx';
+./components/ui/mod.ts:22:} from './delta-chip.tsx';
+./components/ui/mod.ts:44:export { type FooterColumn, FooterColumns, type FooterColumnsProps } from './footer-columns.tsx';
+./components/ui/mod.ts:72:} from './segmented-control.tsx';
+./components/ui/mod.ts:78:} from './semicircular-gauge.tsx';
+./components/ui/mod.ts:86:export { WidgetCard } from './widget-card.tsx';
+./assets/styles.css:50:/* Ledgerline widgets. The widget-card block is imported after surface-styles
+./assets/styles.css:54:@import './ui/delta-chip.css';
+./assets/styles.css:55:@import './ui/segmented-control.css';
+./assets/styles.css:56:@import './ui/semicircular-gauge.css';
+./assets/styles.css:57:@import './ui/comparison-area-chart.css';
+./assets/styles.css:58:@import './ui/footer-columns.css';
+./assets/styles.css:59:@import './blocks/widget-card.css';
+./routes/(design)/design/(_shared)/registry.ts:630:    name: 'delta-chip',
+./routes/(design)/design/(_shared)/registry.ts:637:    name: 'segmented-control',
+./routes/(design)/design/(_shared)/registry.ts:644:    name: 'semicircular-gauge',
+./routes/(design)/design/(_shared)/registry.ts:651:    name: 'comparison-area-chart',
+./routes/(design)/design/(_shared)/registry.ts:658:    name: 'footer-columns',
+./routes/(design)/design/(_shared)/registry.ts:665:    name: 'widget-card',
+./routes/(design)/design/(_components)/components-view.tsx:249:    case 'delta-chip':
+./routes/(design)/design/(_components)/components-view.tsx:266:    case 'segmented-control':
+./routes/(design)/design/(_components)/components-view.tsx:301:    case 'semicircular-gauge':
+./routes/(design)/design/(_components)/components-view.tsx:354:    case 'comparison-area-chart':
+./routes/(design)/design/(_components)/components-view.tsx:387:    case 'footer-columns':
+./routes/(design)/design/(_components)/components-view.tsx:407:    case 'widget-card':
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== BUTTON SHADOWS ===" && grep -n "box-shadow\|translate\|border-radius" assets/ui/button.css
+=== BUTTON SHADOWS ===
+11:  border-radius: var(--ns-radius-md);
+18:    box-shadow var(--ns-ease-normal),
+34:  box-shadow: none;
+101:  border-radius: var(--ns-radius-full);
+138:  border-radius: var(--ns-radius-sm);
+147:  border-radius: var(--ns-radius-lg);
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== TOKENS ===" && grep -n "space-0-5\|space-1:\|space-2:\|text-xs\|radius-full\|radius-3xl\|radius-2xl\|radius-xl\|shadow-xs\|radius-md\|radius-sm" assets/tokens.css
+=== TOKENS ===
+151:  --ns-text-xs: 0.75rem;
+175:  --ns-space-0-5: 0.125rem;
+176:  --ns-space-1: 0.25rem;
+178:  --ns-space-2: 0.5rem;
+209:  --ns-radius-sm: 4px;
+210:  --ns-radius-md: 6px;
+212:  --ns-radius-xl: 12px;
+213:  --ns-radius-2xl: 16px;
+214:  --ns-radius-3xl: 24px;
+215:  --ns-radius-full: 9999px;
+217:  --ns-shadow-xs: 0 1px 2px rgba(23, 58, 44, 0.08);
+330:  --ns-shadow-xs: 0 1px 2px rgba(4, 12, 9, 0.4);
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== SCAFFOLD STRINGS ===" && grep -rn "api-gateway\|eu-west\|v2\.4\.1" --include="*.tsx" --include="*.ts" . | head -20
+=== SCAFFOLD STRINGS ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-billing/apps/ledgerline-web && echo "=== EXCEPTION BADGE ===" && cat components/product/exception-badge.tsx 2>/dev/null | head -60; echo "=== MONEY TEXT (billing) ==="; cat components/product/money-text.tsx 2>/dev/null | head -70
+=== EXCEPTION BADGE ===
+/**
+ * @component ExceptionBadge
+ * @layer 2
+ * @kind product
+ * @description Labeled chip for a run item's exception bucket; absence renders an em dash.
+ */
+
+import type { VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
+
+const DASH = '—';
+
+const EXCEPTION_LABELS: Readonly<Record<string, string>> = {
+  NONE: '',
+  FIRST_INVOICE: 'First invoice',
+  AMOUNT_DELTA: 'Amount delta',
+  NO_PAYMENT_METHOD: 'No payment method',
+  HARD_DECLINE: 'Hard decline',
+  PAST_DUE: 'Past due',
+};
+
+interface ExceptionBadgeProps {
+  bucket: string | null | undefined;
+  class?: string;
+}
+
+/**
+ * Renders an exception bucket as a rust-tinted chip. `NONE`/absence renders
+ * an em dash so "no exception" never reads like a flagged item. The rust
+ * treatment lives in `assets/ui/exception-badge.css`, keyed off the
+ * `data-exception` attribute.
+ */
+export function ExceptionBadge({ bucket, class: className }: ExceptionBadgeProps): VNode {
+  if (!bucket || bucket === 'NONE' || !(bucket in EXCEPTION_LABELS)) {
+    return (
+      <span class={cn('ns-exception-badge', className)} data-exception='none'>
+        {DASH}
+      </span>
+    );
+  }
+  return (
+    <span
+      class={cn('ns-badge', 'ns-exception-badge', className)}
+      data-exception={bucket}
+    >
+      {EXCEPTION_LABELS[bucket]}
+    </span>
+  );
+}
+=== MONEY TEXT (billing) ===
+/**
+ * @component MoneyText
+ * @layer 2
+ * @kind product
+ * @depends lib/money
+ * @description The one renderer for a money amount. It formats nothing itself:
+ * every digit comes from `lib/money.ts`, direction comes from
+ * `moneyParts().direction`, and absence is an em dash.
+ */
+
+import type { VNode } from 'preact';
+import { cn } from '../../lib/cn.ts';
+import { ABSENT, type MoneyDirection, moneyParts, type MoneyValue } from '../../lib/money.ts';
+
+interface MoneyTextProps {
+  /** String-encoded decimal from the contract; null/undefined = not measured. */
+  value: MoneyValue;
+  currency?: string;
+  class?: string;
+}
+
+/**
+ * `moneyParts` direction -> the `data-money-sign` this component's stylesheet
+ * keys off. Absent is styled by `data-money='absent'`, so it lands on `flat`
+ * here and never reaches this map.
+ */
+const SIGN: Readonly<Record<MoneyDirection, string>> = {
+  in: 'pos',
+  out: 'neg',
+  flat: 'flat',
+  absent: 'flat',
+};
+
+/**
+ * Renders money with the money-* semantic colors and tabular numerals.
+ *
+ * Every digit and the direction both come from one `moneyParts()` call. This
+ * component does no arithmetic of its own: the float round-trip it used to
+ * make is what printed `$100` where the ledger requires `$100.00`, and the
+ * sign it used to re-derive with `amount > 0` is a fact the money layer
+ * already resolves — including the case where rounding a small negative to
+ * two digits makes it a flat zero rather than a negative amount.
+ *
+ * Absence (`null`/`undefined`/unparseable) renders an em dash — never `0.00`,
+ * because in a ledger "not measured" and "zero" are different facts.
+ */
+export function MoneyText({ value, currency, class: className }: MoneyTextProps): VNode {
+  const parts = moneyParts(value, { currency });
+
+  if (parts.absent) {
+    return (
+      <span class={cn('ns-money-text', className)} data-money='absent' data-currency={currency}>
+        <span aria-hidden='true'>{ABSENT}</span>
+        <span class='sr-only'>not measured</span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      class={cn('ns-money-text', className)}
+      data-money
+      data-money-sign={SIGN[parts.direction]}
+      data-currency={currency}
+    >
+      {
+        /* Currency leads as its own element, so it is a prefix the layout can
+          space — never a code concatenated onto the digits as `100.00USD`. */
+      }
+      {parts.currency !== null && <span class='ns-money-text__currency'>{parts.currency}</span>}
+[0m
+[0m→ [0mRead apps/ledgerline-web/components/ui/widget-card.tsx
+[0m→ [0mRead apps/ledgerline-web/components/ui/footer-columns.tsx
+[0m→ [0mRead apps/ledgerline-web/assets/ui/surface-styles.css
+[0m→ [0mRead apps/ledgerline-web/assets/ui/card.css
+[0m→ [0mRead apps/ledgerline-web/assets/blocks/widget-card.css
+[0m→ [0mRead apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && which deno && deno --version
+/home/agent/.local/share/mise/installs/deno/2.9.5/bin/deno
+deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)
+v8 15.0.245.2-rusty
+typescript 6.0.3
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && sed -n '600,700p' apps/ledgerline-web/routes/\(design\)/design/\(_shared\)/registry.ts
+'desktop-window-chrome',
+      'desktop-update-prompt',
+      'desktop-only',
+    ],
+  },
+];
+
+/**
+ * Ledgerline's own component catalog.
+ *
+ * These are not in the `@netscript/fresh-ui` registry — they exist because this
+ * product exists. They are catalogued alongside the upstream items rather than
+ * folded into `registryMeta.total`, because that number is a fact about the
+ * upstream package and inflating it would make the gallery lie (R2).
+ */
+export const ledgerlineMeta = {
+  name: 'ledgerline-widgets',
+  packageName: '@ledgerline/web',
+  total: 7,
+} as const;
+
+export const ledgerlineCatalog: readonly RegistryCatalogItem[] = [
+  {
+    name: 'money-text',
+    kind: 'component',
+    layer: 2,
+    description:
+      'The one renderer for a money amount. Formats nothing itself — every digit comes from lib/money.ts, direction comes from moneyParts(), and absence is an em dash.',
+  },
+  {
+    name: 'delta-chip',
+    kind: 'component',
+    layer: 2,
+    description:
+      'The one "up or down versus last period" in the product: a tinted pill with a directional glyph, rendered beside the number it qualifies.',
+  },
+  {
+    name: 'segmented-control',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Range selection as one full-width capsule whose selected cell is a filled pill. Renders as buttons for local state or as links when the range lives in the URL.',
+  },
+  {
+    name: 'semicircular-gauge',
+    kind: 'component',
+    layer: 2,
+    description:
+      '180° two-tone run-progress arc with flat baseline cuts and a centre hero amount. Hand-authored SVG over the series cycle; no charting library.',
+  },
+  {
+    name: 'comparison-area-chart',
+    kind: 'component',
+    layer: 2,
+    description:
+      'Two-layer area chart — billed versus collected. The comparison period is the same geometry at reduced opacity, never a second axis. CSS-only crosshair readout.',
+  },
+  {
+    name: 'footer-columns',
+    kind: 'component',
+    layer: 2,
+    description:
+      'The bottom band of a widget card: N equal columns of label and amount, divided by hairline rules rather than gaps.',
+  },
+  {
+    name: 'widget-card',
+    kind: 'block',
+    layer: 3,
+    description:
+      'The one composed-widget card. Five bands in order: header · range · hero · body · footer columns or a full-width CTA.',
+  },
+];
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 600 deno fmt --check . 2>&1 | tail -30
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/deno.json:
+86[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m}[0m
+  [0m[38;5;245m |[0m [0m[38;5;245m\ No newline at end of file[0m
+86[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m}[0m
+
+
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/router.ts:
+46[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41mexport type AppRouter = typeof appRouter;[0m
+  [0m[38;5;245m |[0m [0m[38;5;245m\ No newline at end of file[0m
+46[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42mexport type AppRouter = typeof appRouter;[0m
+
+
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/index.tsx:
+31[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41m        description: 'Invoice ledger with typed search and drill-down to lines, payments and notes.',[0m
+31[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m        description:[0m
+32[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42m          'Invoice ledger with typed search and drill-down to lines, payments and notes.',[0m
+
+
+[0m[1mfrom[0m /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/README.md:
+ 3[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41mYour new Fresh project is ready to go. You can follow the Fresh "Getting[0m
+ 3[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42mYour new Fresh project is ready to go. You can follow the Fresh "Getting Started" guide here:[0m
+ 4[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41mStarted" guide here: https://fresh.deno.dev/docs/getting-started[0m
+ 4[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42mhttps://fresh.deno.dev/docs/getting-started[0m
+  [0m[38;5;245m |[0m [0m[38;5;245m...[0m
+ 8[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41mMake sure to install Deno:[0m
+ 8[0m[38;5;245m |[0m [0m[1m[32m+[0m[0m[30m[42mMake sure to install Deno: https://docs.deno.com/runtime/getting_started/installation[0m
+ 9[0m[38;5;245m |[0m [0m[1m[31m-[0m[0m[37m[41mhttps://docs.deno.com/runtime/getting_started/installation[0m
+
+[0m[1m[31merror[0m: Found 4 not formatted files in 148 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 600 deno fmt --check . 2>&1 | grep -E "^\s*from |from /home" | head -20
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 600 deno fmt --check . 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -n "wave7-design" | head -20
+2:from /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/deno.json:
+8:from /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/router.ts:
+14:from /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/index.tsx:
+20:from /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/README.md:
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git log --oneline --name-only -3 | head -60
+310a123 Design: format the status contract test this branch introduced
+tests/status_test.ts
+4261c92 Design: finish the gallery scaffold sweep the prior pass reported closed
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+tests/design_contract_test.ts
+b8ae695 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+apps/ledgerline-web/assets/ui/stats-grid.css
+apps/ledgerline-web/components/ui/stats-grid.tsx
+apps/ledgerline-web/routes/(_components)/dashboard-view.tsx
+apps/ledgerline-web/routes/(_components)/home-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_components)/components-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_components)/tokens-view.tsx
+apps/ledgerline-web/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+apps/ledgerline-web/routes/(design)/design/(_shared)/registry.ts
+apps/ledgerline-web/routes/(design)/design/_layout.tsx
+apps/ledgerline-web/routes/_app.tsx
+tests/design_contract_test.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 900 deno lint . 2>&1 | tail -20
+Checked 88 files
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 900 deno check 2>&1 | tail -25
+(no output)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && python3 -c "
+import json,sys
+d=json.load(open('deno.json'))
+print(json.dumps(d.get('tasks',{}),indent=2))
+" 2>/dev/null; echo "=== TESTS ==="; ls tests/
+{
+  "dev": "deno task deps:closure && deno task deps:verify && deno run --allow-all apps/ledgerline-web/main.ts",
+  "deps:closure": "deno task --cwd apps/ledgerline-web deps:closure",
+  "deps:verify": "deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts",
+  "aspire:start": "cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start",
+  "aspire:start:isolated": "cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated",
+  "aspire:otel": "deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts otel",
+  "aspire:export": "deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export",
+  "check": "deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check",
+  "lint": "deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint",
+  "fmt:check": "deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check",
+  "fmt": "deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write",
+  "test": "deno test --allow-all"
+}
+=== TESTS ===
+design_contract_test.ts
+money_test.ts
+negative-auth_test.ts
+refund-flow_test.ts
+sagas_test.ts
+status_test.ts
+[0m
+[0m→ [0mRead tests/design_contract_test.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 600 deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -30
+T1 — every token a component uses is declared ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+T6 — every component stylesheet is imported by styles.css ... [0m[32mok[0m [0m[38;5;245m(248µs)[0m
+R1 — every component module is exported from the barrel ... [0m[32mok[0m [0m[38;5;245m(249µs)[0m
+R3 — every Ledgerline catalogue entry has a gallery demo ... [0m[32mok[0m [0m[38;5;245m(375µs)[0m
+R3 — the upstream registry count is not inflated by app-owned widgets ... [0m[32mok[0m [0m[38;5;245m(270µs)[0m
+H8 — gauge arcs terminate with a flat cut ... [0m[32mok[0m [0m[38;5;245m(72µs)[0m
+R8 — no scaffold fiction ships ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+R8 — an internal link is not a dead end ... [0m[32mok[0m [0m[38;5;245m(3ms)[0m
+[0m[38;5;245mrunning 12 tests from ./tests/money_test.ts[0m
+absence is an em dash, never a zero ... [0m[32mok[0m [0m[38;5;245m(1ms)[0m
+a real zero is not absence ... [0m[32mok[0m [0m[38;5;245m(8ms)[0m
+direction maps to the money tokens ... [0m[32mok[0m [0m[38;5;245m(175µs)[0m
+signs are explicit ... [0m[32mok[0m [0m[38;5;245m(155µs)[0m
+amounts are grouped and carry two fraction digits by default ... [0m[32mok[0m [0m[38;5;245m(115µs)[0m
+precision is never flattened — a metered unit price keeps its decimals ... [0m[32mok[0m [0m[38;5;245m(187µs)[0m
+currency is carried as a symbol and separated from the amount ... [0m[32mok[0m [0m[38;5;245m(789µs)[0m
+no float artefacts: string decimals survive the round trip ... [0m[32mok[0m [0m[38;5;245m(142µs)[0m
+a ratio with no supportable denominator is null, not zero ... [0m[32mok[0m [0m[38;5;245m(157µs)[0m
+percentages render an em dash for an undefined rate ... [0m[32mok[0m [0m[38;5;245m(118µs)[0m
+compact money keeps the sign and degrades to the em dash ... [0m[32mok[0m [0m[38;5;245m(357µs)[0m
+rounding is half-up on the decimal digits, never float-dependent ... [0m[32mok[0m [0m[38;5;245m(167µs)[0m
+[0m[38;5;245mrunning 5 tests from ./tests/status_test.ts[0m
+every schema enum member has a presentation ... [0m[32mok[0m [0m[38;5;245m(472µs)[0m
+labels are human, never raw enum members ... [0m[32mok[0m [0m[38;5;245m(100µs)[0m
+in-flight states are marked live so they never rely on colour alone ... [0m[32mok[0m [0m[38;5;245m(56µs)[0m
+derived states are declared, so a reader knows they are computed ... [0m[32mok[0m [0m[38;5;245m(19µs)[0m
+an unknown status surfaces instead of vanishing ... [0m[32mok[0m [0m[38;5;245m(58µs)[0m
+
+[0m[32mok[0m | 30 passed | 0 failed [0m[38;5;245m(141ms)[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && sed -n '240,440p' "routes/(design)/design/(_components)/components-view.tsx"
+<MoneyText value='1240500' currency='USD' compact size='sm' />
+            <MoneyText value='2400000' currency='USD' compact size='sm' />
+          </div>
+          <InlineNotice title='Two decimals, always'>
+            `100` renders as $100.00 and `0.0015` keeps its metered precision. Absence is the em
+            dash; only a real zero prints `0.00`.
+          </InlineNotice>
+        </div>
+      );
+    case 'delta-chip':
+      return (
+        <div class='ns-gallery-stack'>
+          <div class='ns-gallery-row'>
+            <DeltaChip value='+2.1%' direction='up' />
+            <DeltaChip value='-1.2%' direction='down' />
+            <DeltaChip value='0.0%' direction='flat' />
+            <DeltaChip value='+2.1%' direction='up' glyph='none' />
+            <DeltaChip direction='absent' value='' />
+          </div>
+          <div class='ns-gallery-row'>
+            <DeltaChip value='+14.2%' direction='up' note='vs prior run' />
+            <DeltaChip value='-$1,204.00' direction='down' note='refunded this period' />
+            <DeltaChip direction='absent' value='' note='no prior period' />
+          </div>
+        </div>
+      );
+    case 'segmented-control':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <SegmentedControl
+            label='Collection period'
+            options={[
+              { value: '1M', label: '1M' },
+              { value: '3M', label: '3M' },
+              { value: '6M', label: '6M' },
+              { value: '1Y', label: '1Y' },
+            ]}
+            value='3M'
+          />
+          <SegmentedControl
+            label='Run window'
+            size='sm'
+            options={[
+              { value: 'draft', label: 'Draft' },
+              { value: 'computed', label: 'Computed' },
+              { value: 'issued', label: 'Issued' },
+              { value: 'closed', label: 'Closed', disabled: true },
+            ]}
+            value='computed'
+          />
+          <SegmentedControl
+            label='Invoice ledger'
+            options={[
+              { value: 'open', label: 'Open', href: '/design/components' },
+              { value: 'paid', label: 'Paid', href: '/design/components' },
+              { value: 'void', label: 'Void', href: '/design/components' },
+            ]}
+            value='open'
+          />
+        </div>
+      );
+    case 'semicircular-gauge':
+      return (
+        <div class='ns-gallery-row ns-gallery-row--start'>
+          <WidgetCard class='ns-gallery-widget'>
+            <WidgetCard.Header>
+              <WidgetCard.Title>Run 2026-07</WidgetCard.Title>
+              <WidgetCard.Action>
+                <Button variant='pill' size='sm'>Review</Button>
+              </WidgetCard.Action>
+            </WidgetCard.Header>
+            <WidgetCard.Body>
+              <SemicircularGauge
+                label='Issued'
+                value='$1,240,500.00'
+                caption='of 412 run items'
+                total={412}
+                segments={[
+                  { label: 'Issued', value: 318, display: '$1,240,500.00' },
+                  { label: 'In review', value: 47, display: '$183,400.00' },
+                ]}
+              />
+            </WidgetCard.Body>
+            <WidgetCard.Footer>
+              <FooterColumns
+                columns={[
+                  { label: 'Approved', value: '318', direction: 'in' },
+                  { label: 'Excepted', value: '47', direction: 'out' },
+                  { label: 'Excluded', value: '0', direction: 'flat' },
+                ]}
+              />
+            </WidgetCard.Footer>
+          </WidgetCard>
+
+          <WidgetCard class='ns-gallery-widget'>
+            <WidgetCard.Header>
+              <WidgetCard.Title>Run 2026-08</WidgetCard.Title>
+              <WidgetCard.Action>
+                <Button variant='pill' size='sm'>Review</Button>
+              </WidgetCard.Action>
+            </WidgetCard.Header>
+            <WidgetCard.Body>
+              <SemicircularGauge
+                label='Issued'
+                value='—'
+                total={null}
+                segments={[]}
+                emptyLabel='This run has not been computed yet'
+                compact
+              />
+            </WidgetCard.Body>
+          </WidgetCard>
+        </div>
+      );
+    case 'comparison-area-chart':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <ComparisonAreaChart
+            points={[
+              { value: 182400, label: '10 AUG', display: '$182,400.00' },
+              { value: 214800, label: '17 AUG', display: '$214,800.00' },
+              { value: 198250.5, label: '24 AUG', display: '$198,250.50' },
+              { value: 241300, label: '31 AUG', display: '$241,300.00' },
+            ]}
+            comparison={[
+              { value: 210000, label: '10 JUL', display: '$210,000.00' },
+              { value: 226000, label: '17 JUL', display: '$226,000.00' },
+              { value: 221500, label: '24 JUL', display: '$221,500.00' },
+              { value: 238000, label: '31 JUL', display: '$238,000.00' },
+            ]}
+            seriesLabel='Collected'
+            comparisonLabel='Billed'
+            ticks={compactTicks(
+              [182400, 214800, 198250.5, 241300],
+              [210000, 226000, 221500, 238000],
+            )}
+          />
+          <InlineNotice title='Hover is CSS'>
+            The crosshair, the point marker and the dark pointer bubble all reveal on{' '}
+            <code>
+              :hover
+            </code>{' '}
+            of a column — no hydration cost, no first-paint mismatch.
+          </InlineNotice>
+          <RangeControlDemo ranges={COLLECTION_RANGES} initial='3M' />
+        </div>
+      );
+    case 'footer-columns':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <FooterColumns
+            columns={[
+              { label: 'Approved', value: '$842,000.00', direction: 'in' },
+              { label: 'Excepted', value: '$12,400.00', direction: 'out' },
+              { label: 'Excluded', value: '$0.00', direction: 'flat' },
+            ]}
+          />
+          <FooterColumns
+            columns={[
+              { label: 'Card', value: '$612,400.00', glyph: '\u2022' },
+              { label: 'ACH', value: '$205,100.00', glyph: '\u2022' },
+              { label: 'Wire', value: null },
+              { label: 'Unassigned', value: '$24,500.00', glyph: '\u2022' },
+            ]}
+          />
+        </div>
+      );
+    case 'widget-card':
+      return (
+        <div class='ns-gallery-stack ns-gallery-stack--wide'>
+          <WidgetCard>
+            <WidgetCard.Header>
+              <WidgetCard.Title>Collection rate</WidgetCard.Title>
+              <WidgetCard.Action>
+                <Button variant='pill' size='sm'>Details</Button>
+              </WidgetCard.Action>
+            </WidgetCard.Header>
+            <WidgetCard.Range>
+              <SegmentedControl
+                label='Collection period'
+                size='sm'
+                options={[
+                  { value: '1M', label: '1M' },
+                  { value: '3M', label: '3M' },
+                  { value: '6M', label: '6M' },
+                  { value: '1Y', label: '1Y' },
+                ]}
+                value='6M'
+              />
+            </WidgetCard.Range>
+            <WidgetCard.Hero>
+              <MoneyText value='92.4' currency='USD' size='hero' />
+              <DeltaChip value='+2.1%' direction='up' note='vs last week' />
+            </WidgetCard.Hero>
+            <WidgetCard.Body>
+              <p class='text-sm text-ns-muted-fg'>
+                Band four is the visualisation. Band five below is either equal hairline columns or
+                a full-width call to action — never both.
+              </p>
+            </WidgetCard.Body>
+            <WidgetCard.Footer>
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== BUTTON TRANSFORMS ===" && grep -n "transform\|translate" assets/ui/button.css; echo "=== PILL VARIANT ==="; sed -n '90,160p' assets/ui/button.css
+=== BUTTON TRANSFORMS ===
+19:    transform var(--ns-ease-normal);
+35:  transform: none;
+=== PILL VARIANT ===
+
+.ns-btn--outline:hover {
+  background: color-mix(in srgb, var(--ns-fg) 4%, transparent);
+  border-color: var(--ns-border-strong);
+}
+
+/* Pill — the reference-card action affordance: full capsule, hairline border */
+.ns-btn--pill {
+  background: var(--ns-card);
+  color: var(--ns-fg);
+  border-color: var(--ns-border);
+  border-radius: var(--ns-radius-full);
+  padding-inline: var(--ns-space-4);
+}
+
+.ns-btn--pill:hover {
+  background: color-mix(in srgb, var(--ns-fg) 4%, var(--ns-card));
+  border-color: var(--ns-border-strong);
+}
+
+/* Destructive — reversal, so it is the only rust-filled surface on a card */
+.ns-btn--destructive {
+  background: var(--ns-destructive);
+  color: var(--ns-destructive-fg);
+  border-color: var(--ns-destructive);
+}
+
+.ns-btn--destructive:hover {
+  background: var(--ns-destructive-hover);
+  border-color: var(--ns-destructive-hover);
+}
+
+.ns-btn--primary:active,
+.ns-btn--secondary:active,
+.ns-btn--outline:active,
+.ns-btn--pill:active,
+.ns-btn--destructive:active {
+  filter: brightness(0.96);
+}
+
+/* Sizes. The radius override skips the pill variant: a size must not be able
+   to un-round the one control whose whole identity is its capsule. */
+.ns-btn--sm {
+  font-size: var(--ns-text-xs);
+  padding: var(--ns-space-1-5) var(--ns-space-3);
+}
+
+.ns-btn--sm:not(.ns-btn--pill) {
+  border-radius: var(--ns-radius-sm);
+}
+
+.ns-btn--lg {
+  font-size: var(--ns-text-base);
+  padding: var(--ns-space-3) var(--ns-space-6);
+}
+
+.ns-btn--lg:not(.ns-btn--pill) {
+  border-radius: var(--ns-radius-lg);
+}
+
+.ns-btn--icon {
+  padding: var(--ns-space-2);
+  aspect-ratio: 1;
+  /* The visually-hidden label span is still a flex item; without this the
+     inherited gap pushes the glyph ~4px off center. */
+  gap: 0;
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== NEW COMPONENTS IN APP ROUTES ===" && grep -rln "SemicircularGauge\|ComparisonAreaChart\|DeltaChip\|SegmentedControl\|FooterColumns\|WidgetCard" routes/ islands/ | sort
+=== NEW COMPONENTS IN APP ROUTES ===
+islands/ui/RangeControlDemo.tsx
+routes/(design)/design/(_components)/components-view.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && ls "routes/(_components)/" "routes/(_shared)/" && echo "=== ROUTES TREE ===" && find routes -name "*.tsx" | sort
+routes/(_components)/:
+health-view.tsx
+home-view.tsx
+
+routes/(_shared)/:
+health.ts
+=== ROUTES TREE ===
+routes/(_components)/health-view.tsx
+routes/(_components)/home-view.tsx
+routes/(design)/design/(_components)/components-view.tsx
+routes/(design)/design/(_components)/composition-view.tsx
+routes/(design)/design/(_components)/tokens-view.tsx
+routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx
+routes/(design)/design/(_islands)/TokenClipboard.tsx
+routes/(design)/design/_layout.tsx
+routes/(design)/design/components.tsx
+routes/(design)/design/composition.tsx
+routes/(design)/design/index.tsx
+routes/(design)/design/tokens.tsx
+routes/_app.tsx
+routes/_layout.tsx
+routes/health.tsx
+routes/index.tsx
+[0m
+[0m→ [0mRead apps/ledgerline-web/routes/(design)/design/(_components)/composition-view.tsx
+[0m→ [0mRead apps/ledgerline-web/assets/ui/segmented-control.css
+[0m→ [0mRead apps/ledgerline-web/assets/ui/footer-columns.css
+[0m→ [0mRead apps/ledgerline-web/assets/ui/semicircular-gauge.css
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && grep -n "ns-areachart__frame\b" -A 12 assets/ui/comparison-area-chart.css | head -30; echo "=== GRID ==="; grep -n "gridline\|baseline\|chart-grid" -A 6 assets/ui/comparison-area-chart.css | head -40; echo "=== COMPARISON FILL ==="; grep -n "comparison" -A 8 assets/ui/comparison-area-chart.css | head -40
+21:.ns-areachart__frame {
+22-  grid-column: 2;
+23-  grid-row: 1;
+24-  position: relative;
+25-  border: 1px solid var(--ns-border);
+26-  border-radius: var(--ns-radius-xl);
+27-  background: var(--ns-card);
+28-}
+29-
+30-.ns-areachart__svg {
+31-  display: block;
+32-  width: 100%;
+33-  height: auto;
+--
+388:.ns-areachart__frame--empty {
+389-  display: flex;
+390-  align-items: center;
+391-  justify-content: center;
+392-  min-height: var(--ns-space-20);
+393-  padding: var(--ns-space-6);
+394-  border-style: dashed;
+395-}
+396-
+397-.ns-areachart__empty {
+398-  margin: 0;
+399-  font-size: var(--ns-text-sm);
+400-  color: var(--ns-muted-fg);
+=== GRID ===
+36:.ns-areachart__gridline {
+37:  stroke: var(--ns-chart-grid);
+38-  stroke-width: 1;
+39-  stroke-dasharray: 2 4;
+40-  vector-effect: non-scaling-stroke;
+41-}
+42-
+43:.ns-areachart__baseline {
+44-  stroke: var(--ns-border);
+45-  stroke-width: 1;
+46-  vector-effect: non-scaling-stroke;
+47-}
+48-
+49-/* The comparison period: same hue, no stroke, reduced opacity. It is a shadow
+--
+177:/* The crosshair drops from the point marker to the baseline — downward, never
+178-   up and out of the chart. */
+179-.ns-areachart__crosshair {
+180-  position: absolute;
+181-  top: var(--hit-dot);
+182-  bottom: 0;
+183-  left: 50%;
+--
+270:   the SVG used, so a tick cannot drift from its gridline. */
+271-.ns-areachart__yaxis {
+272-  grid-column: 1;
+273-  grid-row: 1;
+274-  position: relative;
+275-  width: max-content;
+276-  margin: 0;
+=== COMPARISON FILL ===
+2:   comparison period (H5).
+3-
+4-   Geometry is SVG and only SVG; the hover readout and both axes are an HTML
+5-   layer over it, so labels are real text at token type sizes. The two meet
+6-   through custom properties the component sets as percentages of the drawn
+7-   chart box — geometry, not formatting (H2).
+8-
+9-   Layout: the y-axis gutter is column 1 and is only rendered when the chart
+10-   is given ticks, so a chrome-free chart loses the gutter and its gap with it. */
+--
+49:/* The comparison period: same hue, no stroke, reduced opacity. It is a shadow
+50-   of the current period, not a second series to be told apart by colour. */
+51:.ns-areachart__comparison {
+52-  fill: color-mix(in srgb, var(--ns-series-1) 18%, transparent);
+53-  stroke: none;
+54-}
+55-
+56:.ns-areachart__comparison[data-series='2'] {
+57-  fill: color-mix(in srgb, var(--ns-series-2) 18%, transparent);
+58-}
+59-
+60:.ns-areachart__comparison[data-series='3'] {
+61-  fill: color-mix(in srgb, var(--ns-series-3) 18%, transparent);
+62-}
+63-
+64:.ns-areachart__comparison[data-series='4'] {
+65-  fill: color-mix(in srgb, var(--ns-series-4) 18%, transparent);
+66-}
+67-
+68:.ns-areachart__comparison[data-series='5'] {
+69-  fill: color-mix(in srgb, var(--ns-series-5) 18%, transparent);
+70-}
+71-
+72:.ns-areachart__comparison[data-series='6'] {
+73-  fill: color-mix(in srgb, var(--ns-series-6) 18%, transparent);
+74-}
+75-
+76-.ns-areachart__line {
+77-  stroke: var(--ns-series-1);
+78-  stroke-width: 2;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git log --oneline | head -30 && echo "=== DIFF STAT vs merge-base ===" && git log --oneline --all | grep -i master | head -3
+310a123 Design: format the status contract test this branch introduced
+4261c92 Design: finish the gallery scaffold sweep the prior pass reported closed
+b8ae695 Design: finish design-steer-2 — the gaps the prior pass claimed closed
+2da2189 Design: act on the vision critique — widget vocabulary, money correctness, soft elevation
+24cccd5 Design: money + status contract layer, tested
+a110230 Frontend 1/8: Ledgerline token identity — paper/ink/ledger-green/rust ramps, money + status tokens, tabular numerals, green-tinted shadows, distinct dark theme (tokens.json is the source, tokens.css generated)
+4a4a54f Shared run-console stream schema — producer and browser island import one contract (client-safe module)
+8452f25 Frontend 3/8: delete the scaffold fiction — routes/dashboard.tsx, routes/examples/**, routes/api/**; product router surface (runs/invoices/customers)
+ae8fd78 Frontend 2/8: export Avatar, ChartBlock, CodeBlock, Donut, Dropzone from the ui barrel — the gallery now renders both charts
+290a0b9 Run record: steer-6 resume — framework defect ledger, live refund proofs, MCP/docs ledger
+44298da Migration: create plugin tables (sagas store, workers, triggers) — declared in schema but never migrated
+87fb661 Hand-wire workers->sagas-api endpoint injection: aspire generator canonicalizes the ref out of bg-processor PluginReferences (framework gap, recorded)
+66df42f Wire workers bg processor to sagas-api via config set (saga publisher discovery env)
+1181a14 Fix metered line unitAmount: tier summary string leaked into the Money field and crashed toDb; schedule moved to derivation.tierSchedule
+8804053 Grant runs:write to the runs-service credential: createDraft's contract demand was unsatisfiable by any issued credential
+95ad9c0 Replay stored idempotency FAILURES as errors (Stripe semantics): StoredOperationError; fixes live-captured replay-as-value bug
+ab27d89 Fix framework withTransaction detach-crash (bound-call tx seam); refund-flow DB tests (4); fingerprint refund reason in idempotency; drop scaffold test
+6668843 Drop unused issue call binding (lint)
+9ce1645 Run-issue saga + run-item-issue effector (P0 #1): item-derived idempotency keys, per-item saga progress, terminal compensation; runs resume procedure; deterministic saga tests (9)
+2e0d031 Terminal-compensation refund flow (P0 #7): payment-refund saga + effector job + billing refund procedure; lint debt + aspire refs (billing->workers-api, workers->sagas-api)
+137851f Refund contract procedure (P0 #7): POST /payments/{id}/refund, admin access, idempotency conflict errors
+62bc76f Auth enforcement + atomic money + typed errors + negative-auth suite (steer-4); /api prefix strip (steer-5)
+32b7390 Negative-authorization suite (19 in-process assertions) + steer-4/5 record
+b64f7a0 Steer-4/5: authz enforcement + live 401/403/200 proof, transactional money, typed errors, negative-auth test suite
+effe576 Negative-authorization suite (19 tests) + record updates
+9ef6640 Steer-5: strip hardcoded /api/v1 route prefixes (31 routes)
+8d2b279 Steer-5: strip hardcoded /api/v1 route prefixes — the REST mount adds /api at runtime
+1ddbbfd Steer-4: enforce contract authz, inject context.db, transactional money writes, typed errors, domain modules
+d4a612d Aspire refs: runs service (streams+workers-api, billing); workers bg processor (sagas-api, billing); JSON logging
+2dfd592 Fix steer-2 defect: derive billing/runs contracts from @database/zod; tree green
+=== DIFF STAT vs merge-base ===
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && for f in apps/ledgerline-web/deno.json apps/ledgerline-web/router.ts apps/ledgerline-web/routes/index.tsx apps/ledgerline-web/README.md; do echo "--- $f"; git log --oneline -1 -- "$f"; done
+--- apps/ledgerline-web/deno.json
+4a4a54f Shared run-console stream schema — producer and browser island import one contract (client-safe module)
+--- apps/ledgerline-web/router.ts
+8452f25 Frontend 3/8: delete the scaffold fiction — routes/dashboard.tsx, routes/examples/**, routes/api/**; product router surface (runs/invoices/customers)
+--- apps/ledgerline-web/routes/index.tsx
+8452f25 Frontend 3/8: delete the scaffold fiction — routes/dashboard.tsx, routes/examples/**, routes/api/**; product router surface (runs/invoices/customers)
+--- apps/ledgerline-web/README.md
+3bdce8e Scaffold NetScript 0.0.7 workspace (ledgerline)
+[0m
+[0m→ [0mRead apps/ledgerline-web/routes/(_components)/home-view.tsx
+[0m→ [0mRead apps/ledgerline-web/routes/(design)/design/index.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && grep -rn "TODO\|FIXME\|XXX\|not implemented\|placeholder" --include="*.tsx" --include="*.ts" --include="*.css" routes/ components/ lib/ assets/ | head -20; echo "(end)"
+routes/(design)/design/(_components)/components-view.tsx:507:          <Input placeholder='Search invoices…' aria-label='Search invoices' />
+routes/(design)/design/(_components)/components-view.tsx:509:          <Input placeholder='Locked by an issued invoice' disabled aria-label='Disabled input' />
+routes/(design)/design/(_components)/components-view.tsx:517:            placeholder='Reason for the credit note on INV-2026-07-0142…'
+routes/(design)/design/(_components)/components-view.tsx:553:            placeholder='Choose a period…'
+routes/(design)/design/(_components)/components-view.tsx:569:              placeholder='Northwind Robotics'
+routes/(design)/design/(_components)/components-view.tsx:742:              <Input id='gallery-filter-q' name='q' placeholder='Filter by customer or invoice…' />
+routes/(design)/design/(_components)/components-view.tsx:749:                placeholder='Any period'
+components/ui/control-props.ts:25:  readonly placeholder?: string;
+components/ui/control-props.ts:52:  readonly placeholder?: string;
+components/ui/control-props.ts:84:    placeholder: readString(props.placeholder),
+components/ui/control-props.ts:131:    placeholder: readString(props.placeholder),
+components/ui/select.tsx:28:  placeholder?: string;
+components/ui/select.tsx:40:  placeholder,
+components/ui/select.tsx:64:      {placeholder
+components/ui/select.tsx:65:        ? <option value='' selected={resolvedSelectedValues.size === 0}>{placeholder}</option>
+assets/ui/form-control-styles.css:15:.ns-input::placeholder,
+assets/ui/form-control-styles.css:16:.ns-textarea::placeholder {
+(end)
+[0m
+[0m$ [0mls -la /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/
+total 331
+drwxr-xr-x   7 node node    45 Sep  4 15:07 .
+drwxr-xr-x 181 node node   181 Sep  3 21:56 ..
+-rw-r--r--   1 node node  2006 Sep  4 07:02 AUDIT-HOWTO.md
+-rw-r--r--   1 node node 11790 Sep  4 07:16 CONSTRUCTION-REFERENCE.md
+-rw-r--r--   1 node node  6701 Sep  4 11:32 DESIGN-REFERENCES.md
+-rw-r--r--   1 node node  4352 Sep  3 23:26 ENVIRONMENT.md
+-rw-r--r--   1 node node  7852 Sep  4 00:26 PRODUCT-DEFINITION.md
+-rw-r--r--   1 node node  3396 Sep  3 22:32 PUBLISHING.md
+drwxr-xr-x   2 node node     3 Sep  4 07:11 audits
+-rw-r--r--   1 node node   599 Sep  4 00:26 auto-steer.sh
+-rw-r--r--   1 node node  4213 Sep  3 22:07 beat-this.md
+-rw-r--r--   1 node node 13994 Sep  3 22:32 brief.md
+-rw-r--r--   1 node node  1351 Sep  4 11:13 continue.md
+-rw-r--r--   1 node node  1965 Sep  4 12:03 coord-loop.sh
+-rw-r--r--   1 node node  8319 Sep  4 11:25 design-brief.md
+-rw-r--r--   1 node node  4014 Sep  4 11:33 design-critic-brief.md
+-rw-r--r--   1 node node 26660 Sep  4 11:52 design-critique-1.md
+drwxr-xr-x   2 node node     4 Sep  4 11:32 design-references
+-rw-r--r--   1 node node  7372 Sep  4 13:17 design-steer-2-continuation.md
+-rw-r--r--   1 node node  7610 Sep  4 13:50 design-steer-2-pass3.md
+-rw-r--r--   1 node node  7976 Sep  4 14:22 design-steer-2-pass4.md
+-rw-r--r--   1 node node  8270 Sep  4 14:52 design-steer-2-pass5.md
+-rw-r--r--   1 node node  8123 Sep  4 15:07 design-steer-2-pass6.md
+-rw-r--r--   1 node node  6600 Sep  4 12:36 design-steer-2-report.md
+-rw-r--r--   1 node node  4004 Sep  4 11:52 design-steer-2.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 evaluator
+-rw-r--r--   1 node node   831 Sep  4 11:13 keepalive.sh
+-rw-r--r--   1 node node  1294 Sep  3 23:05 kickoff.md
+drwxr-xr-x   2 node node    37 Sep  4 15:09 logs
+-rw-r--r--   1 node node  1529 Sep  4 07:02 mcp-ask.ts
+-rw-r--r--   1 node node  3396 Sep  3 22:03 publishing-contract.md
+-rw-r--r--   1 node node  2960 Sep  3 22:02 quality-bar-eis-chat.md
+drwxr-xr-x   2 node node     2 Sep  3 21:56 receipts
+-rw-r--r--   1 node node  3195 Sep  4 06:52 steer-2.md
+-rw-r--r--   1 node node  7799 Sep  4 07:14 steer-3.md
+-rw-r--r--   1 node node  8061 Sep  4 07:17 steer-4.md
+-rw-r--r--   1 node node  2642 Sep  4 08:02 steer-5.md
+-rw-r--r--   1 node node  4862 Sep  4 10:23 steer-6.md
+-rw-r--r--   1 node node  2704 Sep  4 10:27 steer-7.md
+-rw-r--r--   1 node node  5245 Sep  4 11:22 steer-8.md
+-rw-r--r--   1 node node  7360 Sep  4 11:26 steer-9.md
+-rw-r--r--   1 node node   829 Sep  4 07:17 steer-loop.sh
+-rw-r--r--   1 node node   599 Sep  4 00:27 steer-watch.sh
+-rw-r--r--   1 node node  2300 Sep  3 21:56 supervisor.md
+-rw-r--r--   1 node node   760 Sep  3 23:06 watch.sh
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass6.md
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/continue.md
+[0m
+[0m$ [0mls -la /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/logs/ && tail -40 /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/logs/*.log 2>/dev/null | tail -60
+total 1715
+drwxr-xr-x 2 node node     37 Sep  4 15:09 .
+drwxr-xr-x 7 node node     45 Sep  4 15:07 ..
+-rw-r--r-- 1 node node   7412 Sep  4 15:13 coord.log
+-rw-r--r-- 1 node node    207 Sep  4 11:40 critic-agy.log
+-rw-r--r-- 1 node node  26660 Sep  4 11:46 critic-agy2.log
+-rw-r--r-- 1 node node   2601 Sep  4 11:39 critic2.jsonl
+-rw-r--r-- 1 node node   3655 Sep  4 11:39 critic2.log
+-rw-r--r-- 1 node node 151236 Sep  4 11:46 design-1.log
+-rw-r--r-- 1 node node 141954 Sep  4 15:08 design-10.log
+-rw-r--r-- 1 node node  60182 Sep  4 15:14 design-11.log
+-rw-r--r-- 1 node node   1306 Sep  4 11:23 design-2.log
+-rw-r--r-- 1 node node 308036 Sep  4 12:37 design-3.log
+-rw-r--r-- 1 node node 181173 Sep  4 12:53 design-4.log
+-rw-r--r-- 1 node node 157845 Sep  4 13:17 design-5.log
+-rw-r--r-- 1 node node 108406 Sep  4 13:35 design-6.log
+-rw-r--r-- 1 node node 127124 Sep  4 13:50 design-7.log
+-rw-r--r-- 1 node node 514312 Sep  4 14:22 design-8.log
+-rw-r--r-- 1 node node 206117 Sep  4 14:53 design-9.log
+-rw-r--r-- 1 node node   2601 Sep  4 11:33 design-critic.jsonl
+-rw-r--r-- 1 node node   3661 Sep  4 11:33 design-critic.log
+-rw-r--r-- 1 node node    102 Sep  4 15:08 keepalive.log
+-rw-r--r-- 1 node node      0 Sep  4 07:17 steer-loop-4.log
+-rw-r--r-- 1 node node     49 Sep  4 07:14 steer-loop.log
+-rw-r--r-- 1 node node     55 Sep  4 08:18 steer-watch.log
+-rw-r--r-- 1 node node 435888 Sep  4 01:30 turn-1.log
+-rw-r--r-- 1 node node   6635 Sep  4 14:25 turn-10.log
+-rw-r--r-- 1 node node   6061 Sep  4 15:11 turn-11.log
+-rw-r--r-- 1 node node 192143 Sep  4 07:14 turn-2-agentic.log
+-rw-r--r-- 1 node node 628814 Sep  4 10:13 turn-2.log
+-rw-r--r-- 1 node node 217959 Sep  4 08:17 turn-3.log
+-rw-r--r-- 1 node node 157951 Sep  4 08:17 turn-4.log
+-rw-r--r-- 1 node node  32682 Sep  4 08:17 turn-5.log
+-rw-r--r-- 1 node node  39826 Sep  4 13:10 turn-6.log
+-rw-r--r-- 1 node node   3450 Sep  4 10:28 turn-7.log
+-rw-r--r-- 1 node node 207430 Sep  4 12:49 turn-7b.log
+-rw-r--r-- 1 node node   8419 Sep  4 13:24 turn-8.log
+-rw-r--r-- 1 node node  48448 Sep  4 13:47 turn-9.log
+[0m
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/logs/coord.log
+[0m→ [0mRead /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/coord-loop.sh
+[0m
+[0m$ [0mdate -u; echo "---"; ps aux | grep -i "opencode\|claude\|codex" | grep -v grep | head -20
+Fri Sep  4 13:14:20 UTC 2026
+---
+node         659  0.0  0.0   3940  2128 pts/1    Ss+  Sep03   0:00 bash -c while true; do claude remote-control --spawn=same-dir --permission-mode bypassPermissions; sleep 10; done
+node         661  0.5  0.1 5560180 151376 pts/1  Sl+  Sep03  10:15 claude remote-control --spawn=same-dir --permission-mode bypassPermissions
+node         702  0.3  0.2 745044 268216 ?       Ssl  Sep03   6:25 /home/agent/.codex/packages/standalone/current/codex app-server --remote-control --listen unix://
+node         726  0.0  0.0 550140 28988 ?        Ssl  Sep03   0:08 /home/agent/.codex/packages/standalone/current/codex app-server daemon pid-update-loop
+node         782  1.1  0.2 5615468 207624 pts/1  Sl+  Sep03  20:52 /home/agent/.local/share/claude/versions/2.1.259 --print --sdk-url https://api.anthropic.com/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj --session-id cse_01WSh13irWVfvT6VRZxQzeLj --input-format stream-json --output-format stream-json --replay-user-messages --resume=https://api.anthropic.com/v1/code/sessions/cse_01WSh13irWVfvT6VRZxQzeLj --permission-mode bypassPermissions --model claude-opus-5[1m]
+node         928  0.0  0.0   3940  2092 pts/4    Ss+  Sep03   0:00 bash -c /home/agent/.local/bin/codex-daemon-up 2>&1 | tee -a /home/agent/observability/codex-daemon.log
+node         930  0.0  0.0   3940  2172 pts/4    S+   Sep03   0:00 /bin/bash /home/agent/.local/bin/codex-daemon-up
+node         931  0.0  0.0   2504   992 pts/4    S+   Sep03   0:00 tee -a /home/agent/observability/codex-daemon.log
+node        1913  0.0  0.0 1448949824 19308 ?    Sl   Sep03   0:06 /home/agent/.codex/packages/standalone/releases/0.153.0-x86_64-unknown-linux-musl/bin/codex-code-mode-host
+node        8729  1.0  0.3 5616288 341304 pts/6  Ssl+ Sep03  18:40 claude --resume 8a722f0a-74b2-4f82-b822-88be00fc9eae --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-features use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Only remaining owned issue #1354 via PR #1958. Coordinator already resumed exact Codex thread 01a06424-38fe-7893-ba59-6064b0dd616e at 007-leaf-1354-g; do not duplicate that writer. Latest head 5c7c105b84b788f4bc17e97d06289c0dd5babe05. Both hosted tiers 33719217078 fail behavior.app-reference loading preview state. Supervise that bounded diagnosis/repair and exact gates, then hand off to coordinator for merge.
+node        8792  1.0  0.3 5615716 320736 pts/7  Ssl+ Sep03  18:12 claude --resume 6b1bf71b-f57e-4f03-9b05-34cc62cadd3c --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-fixes use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Coordinator already resumed #1970 thread 01a06201-d0b9-7cb1-afe6-8b071ca28012 in 007-leaf-1970 and #1945 thread 01a06322-7bb5-7d80-badf-3068fb4942eb in 007-leaf-1481. Do not send duplicate starts. #1970 must integrate prepared ad5a74e764c6ed85d7b7d165ce62c9bed7d70d32 handler-freeze repair and main. #1945 must integrate #1956 current main and repair observed exact runtime red. Independently audit #1844 post-fix soak evidence: owner did not authorize dropping acceptance; propose evidence-backed closure or one bounded missing observation, not an invented host blocker. #1971 acceptance follows #1945. #1974/#1978/#1979 already merged.
+node        8855  0.9  0.3 5615716 307804 pts/8  Ssl+ Sep03  16:54 claude --resume 98833bca-9714-4f63-8230-2e3929f6b103 --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-internals use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Internals owns zero open implementation issues. Perform one bounded read-only audit of surviving exact CI/structured-output recovery needs, report actionable findings to owning lanes. Do not create work, merge, or launch polling/report-only loops. Coordinator is repairing transport and central recovery checkpoint; do not write central ledger.
+node        8918  0.9  0.3 5616232 309492 pts/9  Ssl+ Sep03  17:11 claude --resume 1e88fa17-749f-4294-9ee8-07ab1fa5555e --model claude-fable-5-1 --effort low --permission-mode bypassPermissions --remote-control netscript-007-docs use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Docs owns zero remaining milestone issues. One bounded read-only release-note audit: current main vs Canary9, verify user-facing #1664 and #1956 plus #1960 are accurately represented. Send exact omissions to coordinator, no unrelated code/PR work, no polling loops.
+node        8981  1.9  0.6 6665800 623420 pts/10 Ssl+ Sep03  33:52 claude --resume baff9670-5104-412c-9041-01307926d4cc --model claude-fable-5-1 --effort medium --permission-mode bypassPermissions --remote-control netscript-007-aspire use harness ## SKILL Read /home/agent/AGENTS.md, repository AGENTS.md, netscript-harness/tools, your topic RESUME/context/worklog. OS restart killed all five topic tmux transports. Resume THIS exact native session, never old blocked job registry. Owner-selected model claude-fable-5-1; preserve effort as supplied. Main e14322c511bbf26018c617c12f639474b6092c32; 8 open issues, 5 open PRs. GitHub is authoritative, old context statements about #1736/#1664 being parked are obsolete. Coordinator sole merger. Use mise exec for pinned tools; DinD tcp://netscript-dind:2375. Host Aspire [] and Docker0 proved 07:50Z; NO new host runtime lease yet. Preserve all tracked harness runs and unrelated dirty files. Do not automatically change model on quota; report actual quota and retain session. Act only on concrete remaining work below; never poll repeatedly in model context.  Aspire S1-S13 implementation is merged. Remaining #1881/#863/#1712 depend on honest published README/scaffold acceptance. Canary9 exists, no Canary10 yet. #1975 and #1980 merged; #1981 at bdb5de2bd fixes service-health ordering/curl timeout and has scoped independent PASS+check-test PASS, but quality fails only manifest:freshness. Coordinator owns that bounded manifest regeneration now; do not duplicate writer or launch another evaluator. Prepare version-coherent published acceptance packet after it lands; current-runner --client users is newer than immutable Canary9, do not misattribute that skew to package defect. No runtime lease; await explicit release writer dispatch; independently audit remaining epic acceptance using merged SHAs.
+node      381104  0.0  0.0 581156 20428 ?        Ssl  Sep03   0:05 codex app-server proxy
+node     1735059  0.0  0.0 17375580 24528 ?      Ssl  15:09   0:00 deno task --config /home/agent/projects/netscript/worktrees/007-aspire/deno.json agentic:opencode --message Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING. --model openrouter/tencent/hy4-preview --variant max --cwd /home/agent/projects/netscript/wave7-design --require-mcp netscript --require-mcp aspire --receipt .netscript/agent/design-receipt.jsonl -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md
+node     1735067  0.0  0.0 18385144 47432 ?      Sl   15:09   0:00 /home/agent/.local/share/mise/installs/deno/2.9.5/bin/deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1 .llm/tools/agentic/opencode/opencode-run.ts --message Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING. --model openrouter/tencent/hy4-preview --variant max --cwd /home/agent/projects/netscript/wave7-design --require-mcp netscript --require-mcp aspire --receipt .netscript/agent/design-receipt.jsonl -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md
+node     1735621 25.6  0.5 75429812 515840 ?     Sl   15:09   1:17 /home/agent/.opencode/bin/opencode run Continue design steer #2. Build the five components in order: DeltaChip, SemicircularGauge, SegmentedRangeControl, ComparisonAreaChart, FooterColumns. Follow the visual specs in design-critique-1.md literally. Fix the brutalist button shadows, the money formatting ($100.00 not $100, space before currency), and the dark-mode exception-badge token. Register everything in the gallery. Commit after each component. Report DONE vs REMAINING. -m openrouter/tencent/hy4-preview --variant max -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-critique-1.md -f /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2.md
+[0m
+[0m→ [0mRead apps/ledgerline-web/components/ui/stats-grid.tsx
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && ls .llm/tmp/ 2>/dev/null; ls .netscript/ 2>/dev/null; find . -name "*render*" -not -path "*/node_modules/*" -not -path "./_fresh/*" 2>/dev/null | head -20
+component-contract.md
+dev-tokens.env
+agent
+aspire-cli.ts
+docs
+generated
+quality-runner.ts
+relay.ts
+verify-node-modules.ts
+[0m
+[0m→ [0mRead .llm/tmp/component-contract.md
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && grep -n "preact-render-to-string\|render-to-string" deno.json ../../deno.json ../../deno.lock 2>/dev/null | head -10; echo "---"; ls ../../node_modules/ 2>/dev/null | head -20
+../../deno.lock:151:    "npm:@preact/signals@2.9.2": "2.9.2_preact@10.29.8__preact-render-to-string@6.7.0",
+../../deno.lock:152:    "npm:@preact/signals@^2.5.1": "2.9.2_preact@10.29.8__preact-render-to-string@6.7.0",
+../../deno.lock:153:    "npm:@prefresh/vite@^2.4.8": "2.4.12_preact@10.29.8__preact-render-to-string@6.7.0_vite@7.2.2",
+../../deno.lock:164:    "npm:@tanstack/preact-query@^5.101.0": "5.102.8_preact@10.29.8__preact-render-to-string@6.7.0",
+../../deno.lock:189:    "npm:preact-render-to-string@^6.6.3": "6.7.0_preact@10.29.8",
+../../deno.lock:190:    "npm:preact-render-to-string@^6.7.0": "6.7.0_preact@10.29.8",
+../../deno.lock:191:    "npm:preact@^10.28.2": "10.29.8_preact-render-to-string@6.7.0",
+../../deno.lock:192:    "npm:preact@^10.29.1": "10.29.8_preact-render-to-string@6.7.0",
+../../deno.lock:193:    "npm:preact@^10.29.2": "10.29.8_preact-render-to-string@6.7.0",
+../../deno.lock:396:        "npm:preact-render-to-string@^6.6.3",
+---
+@babel
+@durable-streams
+@multiformats
+@opentelemetry
+@orpc
+@preact
+@prefresh
+@prisma
+@remix-run
+@tailwindcss
+@tanstack
+@types
+@workos-inc
+amqplib
+asn1js
+better-auth
+byte-encodings
+clsx
+dotenv
+es-toolkit
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && cat routes/index.tsx && echo "=== router.ts ===" && cat router.ts
+import HomeView from './(_components)/home-view.tsx';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+import { routes } from '@app/.generated/routes.ts';
+
+export const homePage = definePage()
+  .withRoute(routes.$route)
+  .withRoute(appRoutes.home)
+  .withMeta(() => ({
+    title: 'Ledgerline — close the month with the number defensible',
+    description:
+      'Billing runs you can inspect, pause and resume. Every number settled or provisional.',
+  }))
+  .withLayer('home', HomeView, () => ({
+    projectName: 'ledgerline',
+    appName: 'ledgerline-web',
+    designHref: appRoutes.design.href(),
+    compositionHref: appRoutes.designComposition.href(),
+    routes: [
+      {
+        title: 'Billing runs',
+        href: appRoutes.runs.href(),
+        description:
+          'Draft → compute → review → issue, with per-item decisions, exceptions and terminal compensation.',
+        cta: 'Open the run console',
+        badge: 'product',
+      },
+      {
+        title: 'Invoices',
+        href: appRoutes.invoices.href(),
+        description: 'Invoice ledger with typed search and drill-down to lines, payments and notes.',
+        cta: 'Open invoices',
+        badge: 'product',
+      },
+      {
+        title: 'Customers',
+        href: appRoutes.customers.href(),
+        description: 'Customer accounts with credit balance, open invoices and subscriptions.',
+        cta: 'Open customers',
+        badge: 'product',
+      },
+      {
+        title: 'Design reference',
+        href: appRoutes.design.href(),
+        description: 'Living index for the Ledgerline tokens, components, and composition rules.',
+        cta: 'Open design',
+        badge: 'design',
+      },
+    ],
+  }))
+  .withLayout((slots) => slots.home())
+  .build();
+
+export const { default: page } = homePage;
+export { page as default };
+=== router.ts ===
+import { createRouteReference } from '@netscript/fresh/route';
+import { routePatterns } from './.generated/manifest.ts';
+import { routes as generatedRoutes } from './.generated/routes.ts';
+
+/**
+ * App-local route entrypoint.
+ *
+ * Route consumers should import from this stable module instead of reaching into
+ * the generated files directly.
+ */
+export { routePatterns };
+
+export const routes = {
+  ...generatedRoutes,
+} as const;
+
+export const appRoutes = {
+  home: routes.$route,
+  health: routes.health.$route,
+  runs: createRouteReference('/runs', { id: 'runs.index', kind: 'page' }),
+  run: createRouteReference('/runs/{id}', { id: 'runs.detail', kind: 'page' }),
+  invoices: createRouteReference('/invoices', { id: 'invoices.index', kind: 'page' }),
+  invoice: createRouteReference('/invoices/{id}', { id: 'invoices.detail', kind: 'page' }),
+  customers: createRouteReference('/customers', { id: 'customers.index', kind: 'page' }),
+  design: routes.design.$route,
+  designTokens: createRouteReference('/design/tokens', {
+    id: 'design.tokens',
+    kind: 'page',
+  }),
+  designComponents: createRouteReference('/design/components', {
+    id: 'design.components',
+    kind: 'page',
+  }),
+  designComposition: createRouteReference('/design/composition', {
+    id: 'design.composition',
+    kind: 'page',
+  }),
+} as const;
+
+export const appRouter = {
+  routePatterns,
+  routes,
+  appRoutes,
+} as const;
+
+export type AppRouter = typeof appRouter;
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && deno fmt deno.json router.ts routes/index.tsx README.md 2>&1 | tail -5 && echo "=== RECHECK ===" && deno fmt --check . 2>&1 | tail -5
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/deno.json
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/router.ts
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/routes/index.tsx
+/home/agent/projects/netscript/wave7-design/apps/ledgerline-web/README.md
+Checked 4 files
+=== RECHECK ===
+Checked 148 files
+[0m
+Now I have the picture. Let me fix the one genuinely red gate I found — `deno fmt` on four files, two of which this branch edited.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git diff --stat && echo "=== DIFF ===" && git diff -- apps/ledgerline-web/routes/index.tsx
+apps/ledgerline-web/README.md        | 7 +++----
+ apps/ledgerline-web/deno.json        | 2 +-
+ apps/ledgerline-web/router.ts        | 2 +-
+ apps/ledgerline-web/routes/index.tsx | 3 ++-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+=== DIFF ===
+diff --git a/apps/ledgerline-web/routes/index.tsx b/apps/ledgerline-web/routes/index.tsx
+index 2de0b7a..ae8ce58 100644
+--- a/apps/ledgerline-web/routes/index.tsx
++++ b/apps/ledgerline-web/routes/index.tsx
+@@ -28,7 +28,8 @@ export const homePage = definePage()
+       {
+         title: 'Invoices',
+         href: appRoutes.invoices.href(),
+-        description: 'Invoice ledger with typed search and drill-down to lines, payments and notes.',
++        description:
++          'Invoice ledger with typed search and drill-down to lines, payments and notes.',
+         cta: 'Open invoices',
+         badge: 'product',
+       },
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git add apps/ledgerline-web/README.md apps/ledgerline-web/deno.json apps/ledgerline-web/router.ts apps/ledgerline-web/routes/index.tsx && git commit -q -F - <<'EOF'
+Design: make the app's own check gate green
+
+`deno task check` is `deno fmt --check . && deno lint . && deno check`, so four
+unformatted files made the whole gate red even though lint and check were clean.
+Two of them (router.ts, routes/index.tsx) were last written by this branch's
+frontend commits; the other two are scaffold drift it inherited.
+
+Formatter-only: a trailing newline on deno.json and router.ts, a rewrap of one
+over-long description string, and a prose rewrap in the scaffold README. No
+behaviour, no tokens, no component CSS.
+EOF
+git log --oneline -1
+809b130 Design: make the app's own check gate green
+[0m
+[0m$ [0mmkdir -p /home/agent/projects/netscript/wave7-design/.llm/tmp && cat > /home/agent/projects/netscript/wave7-design/.llm/tmp/render-proof.tsx <<'EOF'
+/** Scratch: render the five steer-#2 widgets and print the spec-critical markup. */
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import {
+  ComparisonAreaChart,
+  DeltaChip,
+  FooterColumns,
+  SegmentedControl,
+  SemicircularGauge,
+  WidgetCard,
+} from '../apps/ledgerline-web/components/ui/mod.ts';
+
+function show(title: string, vnode: unknown): void {
+  const html = render(vnode as never);
+  console.log(`\n===== ${title} =====`);
+  console.log(html);
+}
+
+show('DeltaChip up', <DeltaChip value='+2.1%' direction='up' />);
+show('DeltaChip absent', <DeltaChip value='' direction='absent' />);
+
+show(
+  'SemicircularGauge',
+  <SemicircularGauge
+    label='Issued'
+    value='$1,240,500.00'
+    caption='of 412 run items'
+    total={412}
+    segments={[
+      { label: 'Issued', value: 318, display: '$1,240,500.00' },
+      { label: 'In review', value: 47, display: '$183,400.00' },
+    ]}
+  />,
+);
+
+show(
+  'SegmentedControl',
+  <SegmentedControl
+    label='Collection period'
+    options={[{ value: '1M', label: '1M' }, { value: '3M', label: '3M' }, { value: '1Y', label: '1Y' }]}
+    value='3M'
+  />,
+);
+
+show(
+  'ComparisonAreaChart',
+  <ComparisonAreaChart
+    points={[{ value: 182400, label: '10 AUG', display: '$182,400.00' }, { value: 241300, label: '31 AUG', display: '$241,300.00' }]}
+    comparison={[{ value: 210000, label: '10 JUL', display: '$210,000.00' }, { value: 238000, label: '31 JUL', display: '$238,000.00' }]}
+    ticks={['$250,000.00', '$0.00']}
+  />,
+);
+
+show(
+  'FooterColumns',
+  <FooterColumns
+    columns={[
+      { label: 'Approved', value: '$842,000.00', direction: 'in' },
+      { label: 'Excepted', value: '$12,400.00', direction: 'out' },
+      { label: 'Excluded', value: null },
+    ]}
+  />,
+);
+
+show(
+  'WidgetCard five bands',
+  <WidgetCard>
+    <WidgetCard.Header>
+      <WidgetCard.Title>Collection rate</WidgetCard.Title>
+      <WidgetCard.Action><span>pill</span></WidgetCard.Action>
+    </WidgetCard.Header>
+    <WidgetCard.Range><span>1M 3M 1Y</span></WidgetCard.Range>
+    <WidgetCard.Hero><span>92.4%</span><DeltaChip value='+2.1%' direction='up' /></WidgetCard.Hero>
+    <WidgetCard.Body><span>band four</span></WidgetCard.Body>
+    <WidgetCard.Footer><span>band five</span></WidgetCard.Footer>
+  </WidgetCard>,
+);
+EOF
+cd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && deno run --no-lock --allow-all --no-check ../.llm/tmp/render-proof.tsx 2>&1 | tail -60
+[0m[32mInitialize[0m esbuild@0.25.12
+[0m[32mInitialize[0m @esbuild/linux-x64@0.25.12
+[0m[1m[31merror[0m: Module not found "file:///home/agent/projects/netscript/wave7-design/apps/.llm/tmp/render-proof.tsx".
+[0m
+Now the real verification — actually rendering the five components and checking the emitted markup against the critique's literal spec values.
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && deno run --no-lock --allow-all --no-check ../../.llm/tmp/render-proof.tsx 2>&1 | tail -55
+[0m[1m[31merror[0m: Module not found "file:///home/agent/projects/netscript/wave7-design/.llm/apps/ledgerline-web/components/ui/mod.ts".
+    at [0m[36mfile:///home/agent/projects/netscript/wave7-design/.llm/tmp/render-proof.tsx[0m:[0m[33m10[0m:[0m[33m8[0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && sed "s#'../apps/ledgerline-web/components/ui/mod.ts'#'./components/ui/mod.ts'#" ../../.llm/tmp/render-proof.tsx > .scratch-render-proof.tsx && deno run --no-lock --allow-all --no-check .scratch-render-proof.tsx 2>&1 | tail -50
+===== DeltaChip up =====
+<span class="ns-delta-chip"><span class="ns-delta-chip__pill" data-direction="up"><span class="ns-delta-chip__glyph" aria-hidden="true">↑</span><span class="ns-delta-chip__value">+2.1%</span></span></span>
+
+===== DeltaChip absent =====
+<span class="ns-delta-chip"><span class="ns-delta-chip__pill" data-direction="absent"><span class="ns-delta-chip__value"><span aria-hidden="true">—</span><span class="sr-only">no prior period</span></span></span></span>
+
+===== SemicircularGauge =====
+<div class="ns-gauge"><div class="ns-gauge__plot"><svg class="ns-gauge__svg" viewBox="0 0 200 110" role="img" aria-label="Issued $1,240,500.00 of 412 run items"><path class="ns-gauge__track" d="M 20 100 A 80 80 0 0 1 180 100" pathLength="100" fill="none" stroke-width="18" stroke-linecap="butt"></path><path  class="ns-gauge__seg" data-series="1" d="M 20 100 A 80 80 0 0 1 180 100" pathLength="100" fill="none" stroke-width="18" stroke-linecap="butt" stroke-dasharray="77.18446601941747 22.81553398058253" stroke-dashoffset="0"></path><path  class="ns-gauge__seg" data-series="2" d="M 20 100 A 80 80 0 0 1 180 100" pathLength="100" fill="none" stroke-width="18" stroke-linecap="butt" stroke-dasharray="11.407766990291263 88.59223300970874" stroke-dashoffset="-77.18446601941747"></path></svg><div class="ns-gauge__center"><span class="ns-gauge__label">Issued</span><span class="ns-gauge__value">$1,240,500.00</span><span class="ns-gauge__caption">of 412 run items</span></div></div><span class="ns-gauge__rule" aria-hidden="true"></span><ul class="ns-gauge__legend"><li  class="ns-gauge__legend-row"><span class="ns-gauge__dot" data-series="1" aria-hidden="true"></span><span class="ns-gauge__legend-label">Issued</span><span class="ns-gauge__legend-value">$1,240,500.00</span></li><li  class="ns-gauge__legend-row"><span class="ns-gauge__dot" data-series="2" aria-hidden="true"></span><span class="ns-gauge__legend-label">In review</span><span class="ns-gauge__legend-value">$183,400.00</span></li></ul></div>
+
+===== SegmentedControl =====
+<div class="ns-segmented ns-segmented--block" role="tablist" aria-label="Collection period"><button  type="button" class="ns-segmented__cell" role="tab" aria-selected="false"  >1M</button><button  type="button" class="ns-segmented__cell is-selected" role="tab" aria-selected="true"  >3M</button><button  type="button" class="ns-segmented__cell" role="tab" aria-selected="false"  >1Y</button></div>
+
+===== ComparisonAreaChart =====
+<div class="ns-areachart"><ul class="ns-areachart__yaxis" aria-hidden="true"><li class="ns-areachart__ytick" style="top:8.333333333333332%;">$250,000.00</li><li class="ns-areachart__ytick" style="top:100%;">$0.00</li></ul><div class="ns-areachart__frame"><svg class="ns-areachart__svg" viewBox="0 0 320 120" role="img" aria-label="This period against Previous period, 2 periods"><defs><linearGradient id="P0-0" x1="0" y1="0" x2="0" y2="1"><stop class="ns-areachart__stop-top" data-series="1" offset="0%"></stop><stop class="ns-areachart__stop-bottom" data-series="1" offset="100%"></stop></linearGradient></defs><g class="ns-areachart__grid" aria-hidden="true"><line  class="ns-areachart__gridline" x1="6" y1="10" x2="314" y2="10"></line><line  class="ns-areachart__gridline" x1="6" y1="37.5" x2="314" y2="37.5"></line><line  class="ns-areachart__gridline" x1="6" y1="65" x2="314" y2="65"></line><line  class="ns-areachart__gridline" x1="6" y1="92.5" x2="314" y2="92.5"></line><line class="ns-areachart__baseline" x1="0" y1="120" x2="320" y2="120"></line></g><path class="ns-areachart__comparison" data-series="1" d="M 6 27.60000000000001 C 108.66666666666667 27.60000000000001 211.33333333333331 15.280000000000001 314 15.280000000000001 L 314 120 L 6 120 Z"></path><path class="ns-areachart__area" data-series="1" d="M 6 39.744 C 108.66666666666667 39.744 211.33333333333331 13.828000000000003 314 13.828000000000003 L 314 120 L 6 120 Z" fill="url(#P0-0)"></path><path class="ns-areachart__line" data-series="1" d="M 6 39.744 C 108.66666666666667 39.744 211.33333333333331 13.828000000000003 314 13.828000000000003" fill="none"></path></svg><div class="ns-areachart__hits" aria-hidden="true"><span  class="ns-areachart__hit" style="left:1.875%;width:96.25%;--hit-dot:33.12%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">10 AUG</span><span class="ns-areachart__tip-value">$182,400.00</span></span></span><span  class="ns-areachart__hit" style="left:98.125%;width:96.25%;--hit-dot:11.523333333333335%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">31 AUG</span><span class="ns-areachart__tip-value">$241,300.00</span></span></span></div></div><ul class="ns-areachart__xaxis" aria-hidden="true"><li class="ns-areachart__xtick" style="left:1.875%;">10 AUG</li><li class="ns-areachart__xtick" style="left:98.125%;">31 AUG</li></ul><ul class="ns-areachart__legend"><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch" data-series="1" aria-hidden="true"></span>This period</li><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch ns-areachart__swatch--ghost" data-series="1" aria-hidden="true"></span>Previous period</li></ul><ul class="sr-only"><li >10 AUG: $182,400.00</li><li >31 AUG: $241,300.00</li></ul></div>
+
+===== FooterColumns =====
+<div class="ns-footer-cols"><div  class="ns-footer-cols__col" data-direction="in"><span class="ns-footer-cols__label">Approved</span><span class="ns-footer-cols__value">$842,000.00</span></div><div  class="ns-footer-cols__col" data-direction="out"><span class="ns-footer-cols__label">Excepted</span><span class="ns-footer-cols__value">$12,400.00</span></div><div  class="ns-footer-cols__col" data-direction="inherit"><span class="ns-footer-cols__label">Excluded</span><span class="ns-footer-cols__value"><span aria-hidden="true">—</span><span class="sr-only">not recorded</span></span></div></div>
+
+===== WidgetCard five bands =====
+<div class="ns-card ns-widget"><div class="ns-card__header ns-widget__header"><p class="ns-card__title ns-widget__title">Collection rate</p><div class="ns-widget__action"><span>pill</span></div></div><div class="ns-widget__range"><span>1M 3M 1Y</span></div><div class="ns-widget__hero"><span>92.4%</span><span class="ns-delta-chip"><span class="ns-delta-chip__pill" data-direction="up"><span class="ns-delta-chip__glyph" aria-hidden="true">↑</span><span class="ns-delta-chip__value">+2.1%</span></span></span></div><div class="ns-card__body ns-widget__body"><span>band four</span></div><div class="ns-card__footer ns-widget__footer"><span>band five</span></div></div>
+[0m
+[0m→ [0mRead apps/ledgerline-web/components/ui/comparison-area-chart.tsx[90m [offset=106, limit=14][0m
+Found two real defects by rendering. First: the area chart's hover columns are offset right by half a step and the last one overflows the frame.
+[0m
+[0m← [0mEdit apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -113,8 +113,27 @@
+   if (count <= 1) return 100;
+   return ((VB_WIDTH - VB_INSET * 2) / (count - 1) / VB_WIDTH) * 100;
+ }
+ 
++/**
++ * The hover band for point `index`: centred on the point, then clipped to the
++ * frame.
++ *
++ * This has to be centred rather than started at the point. A band that opens
++ * at its own point extends a full step to the right, so every readout is
++ * reached by hovering to the *right* of the marker it belongs to, and the last
++ * point's band sits entirely outside the frame. Clipping the two end bands to
++ * the frame is what keeps the tiling exact: the inner edge of an end band is
++ * still half a step from its point, and the outer edge lands on the frame.
++ */
++function hitBand(index: number, count: number): { left: number; width: number } {
++  const centre = percentX(index, count);
++  const half = percentStep(count) / 2;
++  const left = Math.max(0, centre - half);
++  const right = Math.min(100, centre + half);
++  return { left, width: right - left };
++}
++
+ function percentY(value: number, max: number): number {
+   return (yAt(value, max) / VB_HEIGHT) * 100;
+ }
+ 
+
+[0m
+[0m← [0mEdit apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -290,18 +290,20 @@
+     crosshair, point marker and tooltip reveal on :hover with no script
+     and no first-paint mismatch (H4). */
+ }
+ <div class='ns-areachart__hits' aria-hidden='true'>
+-  {points.map((point, index) => (
+-    <span
+-      key={point.label}
+-      class='ns-areachart__hit'
+-      style={{
+-        left: `${percentX(index, points.length)}%`,
+-        width: `${percentStep(points.length)}%`,
+-        '--hit-dot': `${percentY(point.value, max)}%`,
+-      } as JSX.CSSProperties}
+-    >
++  {points.map((point, index) => {
++    const band = hitBand(index, points.length);
++    return (
++      <span
++        key={point.label}
++        class='ns-areachart__hit'
++        style={{
++          left: `${band.left}%`,
++          width: `${band.width}%`,
++          '--hit-dot': `${percentY(point.value, max)}%`,
++        } as JSX.CSSProperties}
++      >
+       <span class='ns-areachart__crosshair' />
+       <span class='ns-areachart__dot' data-series={series} />
+       <span class='ns-areachart__tip'>
+         <span class='ns-areachart__tip-label'>{point.label}</span>
+
+[0m
+[0m→ [0mRead apps/ledgerline-web/components/ui/comparison-area-chart.tsx[90m [offset=284, limit=22][0m
+[0m→ [0mRead apps/ledgerline-web/components/ui/comparison-area-chart.tsx[90m [offset=305, limit=16][0m
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && sed -n '150,230p' assets/ui/comparison-area-chart.css
+.ns-areachart__stop-bottom[data-series='6'] {
+  stop-color: var(--ns-series-6);
+}
+
+/* Hover layer: one column per point, tiled so there is no dead zone. Hovering
+   the column — not a 4px dot — is what reveals the readout, so the reader aims
+   at an x rather than at a target. */
+.ns-areachart__hits {
+  position: absolute;
+  inset: 0;
+}
+
+.ns-areachart__hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+.ns-areachart__crosshair,
+.ns-areachart__dot,
+.ns-areachart__tip {
+  opacity: 0;
+  transition: opacity var(--ns-ease-fast);
+  pointer-events: none;
+}
+
+/* The crosshair drops from the point marker to the baseline — downward, never
+   up and out of the chart. */
+.ns-areachart__crosshair {
+  position: absolute;
+  top: var(--hit-dot);
+  bottom: 0;
+  left: 50%;
+  border-inline-start: 1px dashed var(--ns-chart-axis);
+}
+
+.ns-areachart__dot {
+  position: absolute;
+  top: var(--hit-dot);
+  left: 50%;
+  width: var(--ns-space-2);
+  height: var(--ns-space-2);
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--ns-card);
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-series-1);
+}
+
+.ns-areachart__dot[data-series='2'] {
+  background: var(--ns-series-2);
+}
+
+.ns-areachart__dot[data-series='3'] {
+  background: var(--ns-series-3);
+}
+
+.ns-areachart__dot[data-series='4'] {
+  background: var(--ns-series-4);
+}
+
+.ns-areachart__dot[data-series='5'] {
+  background: var(--ns-series-5);
+}
+
+.ns-areachart__dot[data-series='6'] {
+  background: var(--ns-series-6);
+}
+
+/* Dark bubble with a downward pointer, centred over the node. `--ns-tip-*`
+   inverts against the card in both themes, so no component asks which theme
+   is active (T3). */
+.ns-areachart__tip {
+  position: absolute;
+  bottom: calc(100% - var(--hit-dot));
+  left: 50%;
+  transform: translate(-50%, calc(-1 * var(--ns-space-3)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-0-5);
+  padding: var(--ns-space-1-5) var(--ns-space-2-5);
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git checkout -- apps/ledgerline-web/components/ui/comparison-area-chart.tsx && git status --short && rm -f apps/ledgerline-web/.scratch-render-proof.tsx
+?? .llm/tmp/component-contract.md
+?? .llm/tmp/render-proof.tsx
+?? .netscript/agent/design-receipt.jsonl
+?? AUDIT-HOWTO.md
+?? CONSTRUCTION-REFERENCE.md
+?? DESIGN-REFERENCES.md
+?? apps/ledgerline-web/.scratch-render-proof.tsx
+?? design-critique-1.md
+?? design-references/
+?? mcp-ask.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && sed -n '228,270p' assets/ui/comparison-area-chart.css
+flex-direction: column;
+  gap: var(--ns-space-0-5);
+  padding: var(--ns-space-1-5) var(--ns-space-2-5);
+  border-radius: var(--ns-radius-md);
+  background: var(--ns-tip-bg);
+  color: var(--ns-tip-fg);
+  box-shadow: var(--ns-shadow-md);
+  white-space: nowrap;
+  z-index: var(--ns-z-dropdown);
+}
+
+.ns-areachart__tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: var(--ns-space-1) solid transparent;
+  border-top-color: var(--ns-tip-bg);
+}
+
+.ns-areachart__tip-label {
+  font-size: var(--ns-text-3xs);
+  text-transform: uppercase;
+  letter-spacing: var(--ns-tracking-wide);
+  opacity: 0.72;
+}
+
+.ns-areachart__tip-value {
+  font-family: var(--ns-font-numeric);
+  font-variant-numeric: var(--ns-numeric-tabular);
+  font-size: var(--ns-text-xs);
+  font-weight: 600;
+}
+
+.ns-areachart__hit:hover > .ns-areachart__crosshair,
+.ns-areachart__hit:hover > .ns-areachart__dot,
+.ns-areachart__hit:hover > .ns-areachart__tip {
+  opacity: 1;
+}
+
+/* Axes sit outside the bounded plot (H6), positioned from the same geometry
+   the SVG used, so a tick cannot drift from its gridline. */
+[0m
+I was wrong — `.ns-areachart__hit` already centres itself with `translateX(-50%)`. Reverting my edit and re-reading the real geometry.
+[0m← [0mEdit apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -113,8 +113,28 @@
+   if (count <= 1) return 100;
+   return ((VB_WIDTH - VB_INSET * 2) / (count - 1) / VB_WIDTH) * 100;
+ }
+ 
++/**
++ * The hover band for point `index`, as percentages of the drawn frame.
++ *
++ * The band is centred on its point but clipped to the frame, and it carries the
++ * point's own x back out as `x` (a percentage of the band) for `--hit-x`. Both
++ * halves matter: an unclipped end band hangs outside the frame by half a step,
++ * which is far enough that hovering the y-axis gutter pops the first readout,
++ * while a clipped band whose marker still sat at `50%` would draw the dot and
++ * the crosshair off the point they name. Clipping is safe for tiling because
++ * adjacent bands still meet exactly at the midpoint between their points.
++ */
++function hitBand(index: number, count: number): { left: number; width: number; x: number } {
++  const centre = percentX(index, count);
++  const half = percentStep(count) / 2;
++  const left = Math.max(0, centre - half);
++  const right = Math.min(100, centre + half);
++  const width = right - left;
++  return { left, width, x: width > 0 ? ((centre - left) / width) * 100 : 50 };
++}
++
+ function percentY(value: number, max: number): number {
+   return (yAt(value, max) / VB_HEIGHT) * 100;
+ }
+ 
+
+[0m
+The real defect is narrower: the two end bands hang outside the frame by half a step, so hovering the y-axis gutter pops the first readout. Fixing that while keeping the marker on the point.
+[0m← [0mEdit apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+@@ -291,26 +291,30 @@
+       crosshair, point marker and tooltip reveal on :hover with no script
+       and no first-paint mismatch (H4). */
+   }
+   <div class='ns-areachart__hits' aria-hidden='true'>
+-    {points.map((point, index) => (
+-      <span
+-        key={point.label}
+-        class='ns-areachart__hit'
+-        style={{
+-          left: `${percentX(index, points.length)}%`,
+-          width: `${percentStep(points.length)}%`,
+-          '--hit-dot': `${percentY(point.value, max)}%`,
+-        } as JSX.CSSProperties}
+-      >
+-        <span class='ns-areachart__crosshair' />
+-        <span class='ns-areachart__dot' data-series={series} />
+-        <span class='ns-areachart__tip'>
+-          <span class='ns-areachart__tip-label'>{point.label}</span>
+-          <span class='ns-areachart__tip-value'>{point.display}</span>
++    {points.map((point, index) => {
++      const band = hitBand(index, points.length);
++      return (
++        <span
++          key={point.label}
++          class='ns-areachart__hit'
++          style={{
++            left: `${band.left}%`,
++            width: `${band.width}%`,
++            '--hit-x': `${band.x}%`,
++            '--hit-dot': `${percentY(point.value, max)}%`,
++          } as JSX.CSSProperties}
++        >
++          <span class='ns-areachart__crosshair' />
++          <span class='ns-areachart__dot' data-series={series} />
++          <span class='ns-areachart__tip'>
++            <span class='ns-areachart__tip-label'>{point.label}</span>
++            <span class='ns-areachart__tip-value'>{point.display}</span>
++          </span>
+         </span>
+-      </span>
+-    ))}
++      );
++    })}
+   </div>
+ </div>
+ 
+ <ul class='ns-areachart__xaxis' aria-hidden='true'>
+
+[0m
+[0m← [0mEdit apps/ledgerline-web/assets/ui/comparison-area-chart.css
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+@@ -158,13 +158,17 @@
+   position: absolute;
+   inset: 0;
+ }
+ 
++/* `left`/`width` are set inline and already name the band's own box, so there
++   is no centring transform to undo. `--hit-x` is the point's x as a percentage
++   of *this band* — 50% for every interior band, and off-centre only where an
++   end band had to be clipped to the frame. */
+ .ns-areachart__hit {
++  --hit-x: 50%;
+   position: absolute;
+   top: 0;
+   bottom: 0;
+-  transform: translateX(-50%);
+ }
+ 
+ .ns-areachart__crosshair,
+ .ns-areachart__dot,
+
+[0m
+Now the matching CSS, so the marker stays on the point where the band was clipped:
+[0m← [0mEdit apps/ledgerline-web/assets/ui/comparison-area-chart.css
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+@@ -183,9 +183,9 @@
+ .ns-areachart__crosshair {
+   position: absolute;
+   top: var(--hit-dot);
+   bottom: 0;
+-  left: 50%;
++  left: var(--hit-x);
+   border-inline-start: 1px dashed var(--ns-chart-axis);
+ }
+ 
+ .ns-areachart__dot {
+
+[0m
+[0m← [0mEdit apps/ledgerline-web/assets/ui/comparison-area-chart.css
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+@@ -190,9 +190,9 @@
+ 
+ .ns-areachart__dot {
+   position: absolute;
+   top: var(--hit-dot);
+-  left: 50%;
++  left: var(--hit-x);
+   width: var(--ns-space-2);
+   height: var(--ns-space-2);
+   transform: translate(-50%, -50%);
+   border: 2px solid var(--ns-card);
+
+[0m
+[0m← [0mEdit apps/ledgerline-web/assets/ui/comparison-area-chart.css
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/assets/ui/comparison-area-chart.css
+@@ -225,9 +225,9 @@
+    is active (T3). */
+ .ns-areachart__tip {
+   position: absolute;
+   bottom: calc(100% - var(--hit-dot));
+-  left: 50%;
++  left: var(--hit-x);
+   transform: translate(-50%, calc(-1 * var(--ns-space-3)));
+   display: flex;
+   flex-direction: column;
+   gap: var(--ns-space-0-5);
+
+[0m
+[0m← [0mEdit apps/ledgerline-web/components/ui/footer-columns.tsx
+Index: /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/footer-columns.tsx
+===================================================================
+--- /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/footer-columns.tsx
++++ /home/agent/projects/netscript/wave7-design/apps/ledgerline-web/components/ui/footer-columns.tsx
+@@ -49,9 +49,12 @@
+ return (
+   <div
+     key={column.label}
+     class='ns-footer-cols__col'
+-    data-direction={column.direction ?? 'inherit'}
++    // `absent` wins over a caller-supplied direction: once the value is
++    // null there is no amount for a direction to qualify, and the em
++    // dash has to land in the absent tone or it reads as data.
++    data-direction={absent ? 'absent' : (column.direction ?? 'inherit')}
+   >
+     {column.glyph && <span class='ns-footer-cols__glyph'>{column.glyph}</span>}
+     <span class='ns-footer-cols__label'>{column.label}</span>
+     <span class='ns-footer-cols__value'>
+
+[0m
+Now the second defect — a `null` footer column renders the em dash but never gets the absent tone, so it reads as data:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && sed "s#'../apps/ledgerline-web/components/ui/mod.ts'#'./components/ui/mod.ts'#" ../../.llm/tmp/render-proof.tsx > .scratch-render-proof.tsx && deno run --no-lock --allow-all --no-check .scratch-render-proof.tsx 2>&1 | grep -A 2 "ComparisonAreaChart\|FooterColumns" | head -20
+===== ComparisonAreaChart =====
+<div class="ns-areachart"><ul class="ns-areachart__yaxis" aria-hidden="true"><li class="ns-areachart__ytick" style="top:8.333333333333332%;">$250,000.00</li><li class="ns-areachart__ytick" style="top:100%;">$0.00</li></ul><div class="ns-areachart__frame"><svg class="ns-areachart__svg" viewBox="0 0 320 120" role="img" aria-label="This period against Previous period, 2 periods"><defs><linearGradient id="P0-0" x1="0" y1="0" x2="0" y2="1"><stop class="ns-areachart__stop-top" data-series="1" offset="0%"></stop><stop class="ns-areachart__stop-bottom" data-series="1" offset="100%"></stop></linearGradient></defs><g class="ns-areachart__grid" aria-hidden="true"><line  class="ns-areachart__gridline" x1="6" y1="10" x2="314" y2="10"></line><line  class="ns-areachart__gridline" x1="6" y1="37.5" x2="314" y2="37.5"></line><line  class="ns-areachart__gridline" x1="6" y1="65" x2="314" y2="65"></line><line  class="ns-areachart__gridline" x1="6" y1="92.5" x2="314" y2="92.5"></line><line class="ns-areachart__baseline" x1="0" y1="120" x2="320" y2="120"></line></g><path class="ns-areachart__comparison" data-series="1" d="M 6 27.60000000000001 C 108.66666666666667 27.60000000000001 211.33333333333331 15.280000000000001 314 15.280000000000001 L 314 120 L 6 120 Z"></path><path class="ns-areachart__area" data-series="1" d="M 6 39.744 C 108.66666666666667 39.744 211.33333333333331 13.828000000000003 314 13.828000000000003 L 314 120 L 6 120 Z" fill="url(#P0-0)"></path><path class="ns-areachart__line" data-series="1" d="M 6 39.744 C 108.66666666666667 39.744 211.33333333333331 13.828000000000003 314 13.828000000000003" fill="none"></path></svg><div class="ns-areachart__hits" aria-hidden="true"><span  class="ns-areachart__hit" style="left:0%;width:50%;--hit-x:3.75%;--hit-dot:33.12%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">10 AUG</span><span class="ns-areachart__tip-value">$182,400.00</span></span></span><span  class="ns-areachart__hit" style="left:50%;width:50%;--hit-x:96.25%;--hit-dot:11.523333333333335%;"><span class="ns-areachart__crosshair"></span><span class="ns-areachart__dot" data-series="1"></span><span class="ns-areachart__tip"><span class="ns-areachart__tip-label">31 AUG</span><span class="ns-areachart__tip-value">$241,300.00</span></span></span></div></div><ul class="ns-areachart__xaxis" aria-hidden="true"><li class="ns-areachart__xtick" style="left:1.875%;">10 AUG</li><li class="ns-areachart__xtick" style="left:98.125%;">31 AUG</li></ul><ul class="ns-areachart__legend"><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch" data-series="1" aria-hidden="true"></span>This period</li><li class="ns-areachart__legend-row"><span class="ns-areachart__swatch ns-areachart__swatch--ghost" data-series="1" aria-hidden="true"></span>Previous period</li></ul><ul class="sr-only"><li >10 AUG: $182,400.00</li><li >31 AUG: $241,300.00</li></ul></div>
+
+===== FooterColumns =====
+<div class="ns-footer-cols"><div  class="ns-footer-cols__col" data-direction="in"><span class="ns-footer-cols__label">Approved</span><span class="ns-footer-cols__value">$842,000.00</span></div><div  class="ns-footer-cols__col" data-direction="out"><span class="ns-footer-cols__label">Excepted</span><span class="ns-footer-cols__value">$12,400.00</span></div><div  class="ns-footer-cols__col" data-direction="absent"><span class="ns-footer-cols__label">Excluded</span><span class="ns-footer-cols__value"><span aria-hidden="true">—</span><span class="sr-only">not recorded</span></span></div></div>
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && cat > .scratch-4pt.tsx <<'EOF'
+import { render } from 'npm:preact-render-to-string@^6.7.0';
+import { ComparisonAreaChart } from './components/ui/mod.ts';
+const html = render(
+  <ComparisonAreaChart
+    points={[
+      { value: 182400, label: '10 AUG', display: '$182,400.00' },
+      { value: 214800, label: '17 AUG', display: '$214,800.00' },
+      { value: 198250.5, label: '24 AUG', display: '$198,250.50' },
+      { value: 241300, label: '31 AUG', display: '$241,300.00' },
+    ]}
+  />,
+);
+for (const m of html.matchAll(/class="ns-areachart__hit" style="([^"]+)"/g)) console.log(m[1]);
+console.log('ticks:', [...html.matchAll(/xtick" style="left:([\d.]+)%/g)].map((m) => m[1]).join(' '));
+EOF
+deno run --no-lock --allow-all --no-check .scratch-4pt.tsx 2>&1 | tail -8
+left:0%;width:17.916666666666668%;--hit-x:10.465116279069766%;--hit-dot:33.12%;
+left:17.916666666666668%;width:32.08333333333333%;--hit-x:50.000000000000014%;--hit-dot:21.240000000000002%;
+left:50%;width:32.08333333333334%;--hit-x:50%;--hit-dot:27.308149999999998%;
+left:82.08333333333333%;width:17.91666666666667%;--hit-x:89.53488372093024%;--hit-dot:11.523333333333335%;
+ticks: 1.875 33.958333333333336 66.04166666666667 98.125
+[0m
+Exact tiling `[0, 17.92, 50, 82.08, 100]`, no overflow, every marker landing on its x-tick. Now full validation:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && rm -f .scratch-render-proof.tsx .scratch-4pt.tsx && echo "=== FMT ===" && deno fmt --check . 2>&1 | tail -3 && echo "=== LINT ===" && deno lint . 2>&1 | tail -3 && echo "=== CHECK ===" && deno check 2>&1 | tail -5 && echo "check exit=$?"
+=== FMT ===
+Checked 148 files
+=== LINT ===
+Checked 88 files
+=== CHECK ===
+[0m[32mCheck[0m routes/_layout.tsx
+[0m[32mCheck[0m routes/health.tsx
+[0m[32mCheck[0m routes/index.tsx
+[0m[32mCheck[0m utils.ts
+[0m[32mCheck[0m vite.config.ts
+check exit=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && deno test --allow-all tests/design_contract_test.ts tests/money_test.ts tests/status_test.ts 2>&1 | tail -6 && echo "=== TREE ===" && git status --short
+in-flight states are marked live so they never rely on colour alone ... [0m[32mok[0m [0m[38;5;245m(27µs)[0m
+derived states are declared, so a reader knows they are computed ... [0m[32mok[0m [0m[38;5;245m(18µs)[0m
+an unknown status surfaces instead of vanishing ... [0m[32mok[0m [0m[38;5;245m(39µs)[0m
+
+[0m[32mok[0m | 30 passed | 0 failed [0m[38;5;245m(146ms)[0m
+
+=== TREE ===
+ M apps/ledgerline-web/assets/ui/comparison-area-chart.css
+ M apps/ledgerline-web/components/ui/comparison-area-chart.tsx
+ M apps/ledgerline-web/components/ui/footer-columns.tsx
+?? .llm/tmp/component-contract.md
+?? .llm/tmp/render-proof.tsx
+?? .netscript/agent/design-receipt.jsonl
+?? AUDIT-HOWTO.md
+?? CONSTRUCTION-REFERENCE.md
+?? DESIGN-REFERENCES.md
+?? design-critique-1.md
+?? design-references/
+?? mcp-ask.ts
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git add apps/ledgerline-web/assets/ui/comparison-area-chart.css apps/ledgerline-web/components/ui/comparison-area-chart.tsx && git commit -q -F - <<'EOF'
+Design: clip the area chart's hover bands to the frame
+
+The chart renders correctly, but its hover layer was measured wrong at the two
+ends. Each band was centred on its point with `translateX(-50%)` and given a
+full step of width, so the first and last bands hung outside the frame by half
+a step: on the gallery's four-point chart that is ~14% of the frame's width,
+which is enough that hovering the y-axis gutter pops the first readout.
+
+An end band cannot simply be clipped, though — the crosshair, the dot and the
+tooltip all sit at `50%` of their band, so clipping would draw them off the
+point they name. The band now reports the point's x back out as `--hit-x`, a
+percentage of its own box: 50% for every interior band, and off-centre only
+where an end band was clipped. Tiling is unaffected because adjacent bands
+still meet exactly at the midpoint between their points.
+
+Verified by rendering: four points give the bands 0–17.92, 17.92–50, 50–82.08
+and 82.08–100, with every marker landing on its own x-tick (1.875, 33.958,
+66.042, 98.125).
+EOF
+git log --oneline -1
+433caf9 Design: clip the area chart's hover bands to the frame
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git add apps/ledgerline-web/components/ui/footer-columns.tsx && git commit -q -F - <<'EOF'
+Design: a null footer column renders in the absent tone
+
+`FooterColumns` renders the em dash for a `null` value, but the tone is carried
+by `data-direction`, and a `null` value with no explicit direction emitted
+`inherit`, which no stylesheet rule matches — so the em dash painted in the
+full-contrast foreground and read as a value rather than as "not recorded".
+The gallery ships exactly that case: the Wire column.
+
+Absence now wins over a caller-supplied direction, because once the value is
+null there is no amount for a direction to qualify.
+EOF
+git log --oneline -1
+91dc1b2 Design: a null footer column renders in the absent tone
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && cat .gitignore 2>/dev/null | head -30; echo "=== generated tracked? ==="; git ls-files apps/ledgerline-web/.generated | head -5; echo "(none = untracked)"
+# Dependencies
+node_modules/
+
+# Build artifacts
+.deploy/
+*.exe
+.data/
+.netscript/agent/diagnostics/
+
+# IDE
+.idea/
+
+# Aspire
+.aspire/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+=== generated tracked? ===
+apps/ledgerline-web/.generated/manifest.ts
+apps/ledgerline-web/.generated/routes.ts
+(none = untracked)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && timeout 900 deno task build 2>&1 | tail -20; echo "BUILD EXIT=$?"
+../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/regexes.js (70:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/util.js (330:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "../../node_modules/.deno/zod@4.5.4/node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 579 modules transformed.
+rendering chunks...
+_fresh/server/.vite/manifest.json            0.93 kB
+_fresh/server/_fresh-route___health.mjs      2.36 kB
+_fresh/server/_fresh-route___index.mjs       4.23 kB
+_fresh/server/mod.mjs                      105.59 kB
+_fresh/server/server-entry.mjs           1,002.15 kB
+✓ built in 4.30s
+BUILD EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== TREE AFTER BUILD ===" && git status --short | grep -v "^??" ; echo "(empty = clean)"; echo "=== BUNDLE PROOF ==="; grep -o "hit-x\|ns-footer-cols__col\|ns-delta-chip__pill\|ns-gauge__seg\|ns-segmented__cell" apps/ledgerline-web/_fresh/server/server-entry.mjs 2>/dev/null | sort -u
+=== TREE AFTER BUILD ===
+(empty = clean)
+=== BUNDLE PROOF ===
+hit-x
+ns-delta-chip__pill
+ns-footer-cols__col
+ns-segmented__cell
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && echo "=== server-entry ===" && grep -c "ns-gauge__seg" _fresh/server/server-entry.mjs; grep -c "ns-areachart__hit" _fresh/server/server-entry.mjs; echo "=== client css ==="; ls _fresh/client/assets/ 2>/dev/null | head; for t in ns-gauge ns-areachart ns-footer-cols ns-delta-chip ns-segmented ns-widget; do printf "%s: " "$t"; grep -ho "$t[a-z_-]*" _fresh/client/assets/*.css 2>/dev/null | sort -u | wc -l; done
+=== server-entry ===
+0
+2
+=== client css ===
+client-entry-B7UxALSz.css
+ns-gauge: 18
+ns-areachart: 26
+ns-footer-cols: 5
+ns-delta-chip: 4
+ns-segmented: 4
+ns-widget: 9
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design/apps/ledgerline-web && grep -rl "ns-gauge__seg" _fresh/ 2>/dev/null | head -5; echo "--- hit-x in client css:"; grep -o "\-\-hit-x" _fresh/client/assets/*.css | head -3
+_fresh/client/assets/client-entry-B7UxALSz.css
+--- hit-x in client css:
+--hit-x
+--hit-x
+--hit-x
+[0m
+Let me get an honest repo-scope verdict for the tree I own, not just the app:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 900 deno task lint 2>&1 | tail -15; echo "LINT EXIT=$?"
+"triggers/runtime.ts",
+        "workers/jobs/health-check.ts",
+        "workers/jobs/payment-refund.ts",
+        "workers/jobs/run-item-issue.ts",
+        "workers/mod.ts",
+        "workers/plugin.ts",
+        "workers/runtime.ts",
+        "workers/tasks/validate-payload.ts"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "Checked 197 files\n"
+    }
+  ]
+}
+LINT EXIT=0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 900 deno task fmt:check 2>&1 | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+for b in d if isinstance(d,list) else d.get('batches',[]):
+    print(b.get('exitCode'), (b.get('stderr') or b.get('stdout') or '').strip().splitlines()[-1] if (b.get('stderr') or b.get('stdout')) else '')
+" 2>/dev/null || (cd /home/agent/projects/netscript/wave7-design && timeout 900 deno task fmt:check 2>&1 | tail -20)
+"triggers/daily-maintenance.ts",
+        "triggers/generic-inbound-webhook.ts",
+        "triggers/incoming-file-watch.ts",
+        "triggers/mod.ts",
+        "triggers/plugin.ts",
+        "triggers/runtime.ts",
+        "workers/jobs/health-check.ts",
+        "workers/jobs/payment-refund.ts",
+        "workers/jobs/run-item-issue.ts",
+        "workers/mod.ts",
+        "workers/plugin.ts",
+        "workers/runtime.ts",
+        "workers/tasks/validate-payload.ts"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "\n\u001b[0m\u001b[1mfrom\u001b[0m /home/agent/projects/netscript/wave7-design/services/runs/src/lib/stream.ts:\n22\u001b[0m\u001b[38;5;245m |\u001b[0m \u001b[0m\u001b[1m\u001b[31m-\u001b[0m\u001b[0m\u001b[37m\u001b[41m  runConsoleStreamSchema,\u001b[0m\n  \u001b[0m\u001b[38;5;245m |\u001b[0m \u001b[0m\u001b[38;5;245m...\u001b[0m\n23\u001b[0m\u001b[38;5;245m |\u001b[0m \u001b[0m\u001b[1m\u001b[32m+\u001b[0m\u001b[0m\u001b[30m\u001b[42m  runConsoleStreamSchema,\u001b[0m\n\n\n\u001b[0m\u001b[1mfrom\u001b[0m /home/agent/projects/netscript/wave7-design/streams/run-console-schema.ts:\n46\u001b[0m\u001b[38;5;245m |\u001b[0m \u001b[0m\u001b[1m\u001b[31m-\u001b[0m\u001b[0m\u001b[37m\u001b[41m});\u001b[0m\n  \u001b[0m\u001b[38;5;245m |\u001b[0m \u001b[0m\u001b[38;5;245m\\ No newline at end of file\u001b[0m\n46\u001b[0m\u001b[38;5;245m |\u001b[0m \u001b[0m\u001b[1m\u001b[32m+\u001b[0m\u001b[0m\u001b[30m\u001b[42m});\u001b[0m\n\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Found 2 not formatted files in 197 files\n"
+    }
+  ]
+}
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && deno fmt services/runs/src/lib/stream.ts streams/run-console-schema.ts && git diff --stat && echo "=== DIFF ===" && git diff
+/home/agent/projects/netscript/wave7-design/services/runs/src/lib/stream.ts
+/home/agent/projects/netscript/wave7-design/streams/run-console-schema.ts
+Checked 2 files
+ services/runs/src/lib/stream.ts | 2 +-
+ streams/run-console-schema.ts   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+=== DIFF ===
+diff --git a/services/runs/src/lib/stream.ts b/services/runs/src/lib/stream.ts
+index 6193178..232118d 100644
+--- a/services/runs/src/lib/stream.ts
++++ b/services/runs/src/lib/stream.ts
+@@ -19,8 +19,8 @@ import {
+   type DurableStreamProducer,
+ } from '@netscript/plugin-streams-core';
+ import {
+-  runConsoleStreamSchema,
+   type RunConsoleStreamDefinition,
++  runConsoleStreamSchema,
+ } from '../../../../streams/run-console-schema.ts';
+ 
+ export { runConsoleStreamSchema };
+diff --git a/streams/run-console-schema.ts b/streams/run-console-schema.ts
+index 000c257..67f207d 100644
+--- a/streams/run-console-schema.ts
++++ b/streams/run-console-schema.ts
+@@ -43,4 +43,4 @@ export const runConsoleStreamSchema: StateSchema<RunConsoleStreamDefinition> = d
+       at: z.string().datetime(),
+     }),
+   },
+-});
+\ No newline at end of file
++});
+[0m
+The app batch is green now; two non-app files still fail, the same two the sibling tree already formatted. Same zero-risk fix:
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && git add services/runs/src/lib/stream.ts streams/run-console-schema.ts && git commit -q -F - <<'EOF'
+Design: the two files that keep the root fmt gate red
+
+`deno task fmt:check` runs in two batches; the app batch has been green since
+the previous commit, and these two are the whole of the other one. Both are
+formatter-only and both predate this branch: an import block `deno fmt`
+reorders, and a missing trailing newline.
+EOF
+cd /home/agent/projects/netscript/wave7-design && timeout 900 deno task fmt:check 2>&1 | grep -c '"exitCode": 0'; timeout 900 deno task fmt:check 2>&1 | grep -c '"exitCode": 1'
+1
+0
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 900 deno task check 2>&1 | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+for b in d:
+    print('exit', b.get('exitCode'), '|', (b.get('stderr') or '').strip().splitlines()[-1][:160] if (b.get('stderr') or '').strip() else (b.get('stdout') or '').strip().splitlines()[-1][:160])
+"
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && timeout 900 deno task check 2>&1 | grep -E '"exitCode"|error|Error' | head -20
+"services/_shared/domain-errors.ts",
+      "services/billing/src/domain/errors.ts",
+        "services/_shared/domain-errors.ts",
+        "services/billing/src/domain/errors.ts",
+      "exitCode": 0,
+      "exitCode": 1,
+      "stderr": "Warning: config file file:///home/agent/projects/netscript/wave7-design/aspire/package.json is not a member of the workspace at file:///home/agent/projects/netscript/wave7-design/. Ignoring the parent workspace config.\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Unable to load /home/agent/projects/netscript/wave7-design/aspire/node_modules/typescript/bin/tsc\n\nCaused by:\n    No such file or directory (os error 2)\n"
+[0m
+[0m$ [0mcd /home/agent/projects/netscript/wave7-design && echo "=== STATUS ===" && git status --short | grep -v "^??"; echo "(empty=clean)"; echo "=== THIS PASS ==="; git log --oneline -4; echo "=== PUSH STATE ==="; git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>&1 | head -2; ls /home/agent/projects/netscript/wave7-design/aspire/node_modules 2>&1 | head -2
+=== STATUS ===
+(empty=clean)
+=== THIS PASS ===
+f82a8f4 Design: the two files that keep the root fmt gate red
+91dc1b2 Design: a null footer column renders in the absent tone
+433caf9 Design: clip the area chart's hover bands to the frame
+809b130 Design: make the app's own check gate green
+=== PUSH STATE ===
+fatal: no upstream configured for branch 'design/ledgerline-ui'
+ls: cannot access '/home/agent/projects/netscript/wave7-design/aspire/node_modules': No such file or directory
+[0m
+[0m← [0mWrite /home/agent/projects/netscript/worktrees/007-aspire/.llm/runs/wave7-billing-run--0.0.7/design-steer-2-pass7.md
+Wrote file successfully.
+[0m
+Now the pass report:
+**DONE** — the five components were already built and registered by earlier passes; rather than rebuild them, this pass rendered each one and checked the emitted markup against the critique's literal numbers. Verdict on the inherited claims:
+
+| Spec | Rendered check |
+|:--|:--|
+| `DeltaChip` | pill, `data-direction`, 2px/8px, 0.75rem/600, `color-mix` 12% ✓ |
+| `SemicircularGauge` | `viewBox 0 0 200 110`, r=80, stroke=18, `butt` on track+segments, centre label, baseline rule ✓ |
+| `SegmentedControl` | `tablist`, `aria-selected` per cell, filled active pill ✓ |
+| `ComparisonAreaChart` | SVG geometry, dashed gridlines, comparison at 18% no stroke, 2px line, CSS hover ✓ |
+| `FooterColumns` | equal columns, leading-edge hairlines, uppercase label, tabular amount ✓ |
+
+Plus: brutalist shadows gone (C8), money via `moneyParts` (M8), 7 catalogue entries all demoed (R3), no scaffold fiction (R8).
+
+**Fixed this pass** (4 commits, `809b130`→`f82a8f4`):
+1. **App `deno task check` was red** — 4 unformatted files; the task is `fmt && lint && check`, so lint/check being clean didn't matter. Now green.
+2. **Area chart hover bands hung outside the frame** by half a step (~14% of width on the 4-point gallery chart) — hovering the y-axis gutter popped the first readout. Clipped the end bands, and added `--hit-x` so the dot/crosshair/tooltip stay on the point a clipped band no longer centres on. Verified: bands `0–17.92 / 17.92–50 / 50–82.08 / 82.08–100`, markers landing exactly on their x-ticks.
+3. **A `null` footer column printed the em dash in full-contrast foreground** — `data-direction='inherit'` matches no rule, so "not recorded" read as a value. Absence now wins.
+4. Root `fmt:check` green — the last 2 files were outside the app.
+
+**REMAINING** (full detail in `design-steer-2-pass7.md`):
+- Branch has **no upstream and has never been pushed** — nothing is visible on a remote.
+- **The two trees have diverged on `SegmentedControl`**: the billing tree added `--wrap` in pass 6; this copy has only `--sm`/`--block`. Two copies of one component drifting apart is the exact failure passes 5 and 6 each had to repair.
+- `MoneyText`'s API is still two APIs across the trees (`size`/`signed`/`tone`/`compact` here vs hero size on `WidgetCard.Hero` there).
+- Root `deno task check`: aspire batch exits 1 — `aspire/node_modules` absent, needs `npm install`. Every other batch exits 0.
+- I cannot see the reference images; this pass proves the code matches the critique's *numbers*, not that those numbers match the images.
+
+Verification: fmt 0/0, lint 0 (197 files), tests 30 passed, `vite build` exit 0 with all five components' CSS in the emitted bundle, tree clean, `deno.lock` untouched.

@@ -1,0 +1,41 @@
+I am waiting for the screenshot capture task to complete and will inspect the newly captured images once finished.
+I will pause tool calls and wait for task completion notification.
+I will pause tool calls and wait for task-575 to complete.
+All publication-grade screenshots for the **Ledgerline** billing product (NetScript 0.0.7) have been captured, visually inspected, and documented in [`docs/screenshots/CAPTURES.md`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/CAPTURES.md).
+
+### Summary of Completed Captures
+
+All product surfaces were captured at desktop viewport **1440x900** in genuine **light** and **dark** pairs with `data-theme` attribute and `localStorage.setItem('ns-theme', ...)` initialized prior to paint:
+
+1. **Customers:**
+   - [`customer-directory-with-credit-balances-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/customer-directory-with-credit-balances-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/customer-directory-with-credit-balances-dark.png): 12-customer directory paginated ledger table displaying company names, contact emails, ISO country codes, and signup dates.
+   - [`customer-detail-with-credit-ledger-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/customer-detail-with-credit-ledger-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/customer-detail-with-credit-ledger-dark.png): Account view for *Harbor Analytics* showing live stat cards (**Credit balance: $186.00**, Open invoices: $0.00, Subscriptions: 1) and associated invoice history across PAID and DRAFT states.
+
+2. **Invoices:**
+   - [`invoice-ledger-across-lifecycle-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/invoice-ledger-across-lifecycle-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/invoice-ledger-across-lifecycle-dark.png): Complete billing invoice ledger with 28 invoices across lifecycle stages (PAID, DRAFT) with custom grid column formatting.
+   - [`invoice-detail-with-metered-lines-refund-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/invoice-detail-with-metered-lines-refund-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/invoice-detail-with-metered-lines-refund-dark.png): Invoice detail for `LL-2026-08-5AD65AB9` (OPEN) showing metered usage breakdown (Fixed fee: $49.00; Metered usage: 47,280 units @ $0.0035 = $102.104; Subtotal $151.104) and a processed REFUNDED payment record ($151.104).
+
+3. **Billing Runs Console:**
+   - [`run-console-authz-enforcement-boundary-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/run-console-authz-enforcement-boundary-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/run-console-authz-enforcement-boundary-dark.png): Run creation console and RPC service authorization boundary enforcement notice.
+   - [`run-detail-authz-enforcement-boundary-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/run-detail-authz-enforcement-boundary-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/run-detail-authz-enforcement-boundary-dark.png): Run detail console displaying guarded action controls and real-time durable stream island transition badges (`ISSUING 10:22:10Z`, `ISSUING 10:12:12Z`).
+
+4. **Webhooks:**
+   - [`webhook-delivery-log-credential-guard-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/webhook-delivery-log-credential-guard-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/webhook-delivery-log-credential-guard-dark.png): Webhook delivery log credential guard notice.
+
+5. **Design System & Component Registry:**
+   - [`design-token-system-paper-ink-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/design-token-system-paper-ink-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/design-token-system-paper-ink-dark.png): 170-token "paper and ink" palette rendering semantic roles from live CSS variables.
+   - [`design-component-catalog-registry-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/design-component-catalog-registry-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/design-component-catalog-registry-dark.png): 72-item `@netscript/fresh-ui` component catalog showing Layer-2 primitives (`button`, `icon-button`).
+   - [`design-composition-layout-rules-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/design-composition-layout-rules-light.png) & [`-dark.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/design-composition-layout-rules-dark.png): NetScript 5-layer composition ladder (L0 Platform contract to L4 Pages).
+
+6. **Operational Surfaces:**
+   - [`aspire-dashboard-resource-graph-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/aspire-dashboard-resource-graph-light.png): Complete live Aspire topology graph showing all 16 interconnected resources fitted into view without clipping.
+   - [`trace-issue-to-compensation-waterfall-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/trace-issue-to-compensation-waterfall-light.png): Correlated OpenTelemetry trace (`d066c0b13d97cdfc3e31bdeb68274eb6`) spanning 6 resources (`workers-api`, `sagas`, `workers`, `streams`, `sagas-api`), 16 levels of depth, and 122 spans over 1m 52s.
+   - [`scalar-api-reference-live-contract-light.png`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/scalar-api-reference-live-contract-light.png): Interactive Triggers API OpenAPI 3.1.1 documentation.
+
+---
+
+### Documented Runtime Boundaries & Gaps
+
+In [`docs/screenshots/CAPTURES.md`](file:///home/agent/projects/netscript/wave7-billing/docs/screenshots/CAPTURES.md), the runtime boundaries are documented plainly:
+- **Runs & Webhooks RPC Authorization Boundary (`authz.no-contract-procedure`):** In `services/runs/src/auth.ts` and `services/webhooks/src/auth.ts`, the contract authorizers were defined flat (`createContractAuthorizer(RunsContractV1)`) instead of nested under `{ v1: { runs: RunsContractV1 } }`. This causes oRPC requests on `/api/rpc/v1/runs/*` and `/api/rpc/v1/webhooks/*` to fail with HTTP 403 `authz.no-contract-procedure`. As application and contract code modifications are strictly reserved for the owning agent, this was preserved and captured as an authentic boundary failure. The live durable stream transition timestamps and end-to-end multi-service trace prove the underlying background orchestration.
+- **Durable Streams Island:** The run console live island maintains an active stream subscription to durable streams, requiring `domcontentloaded` wait conditions during browser automation to prevent premature timeouts.
