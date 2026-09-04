@@ -423,6 +423,8 @@ Deno.test('provider requires explicit issue 577 profiles and never exposes input
     'ANTHROPIC_API_KEY',
     'ANTHROPIC_AUTH_TOKEN',
     'OPENAI_API_KEY',
+    'OPENCODE_API_KEY',
+    'OLLAMA_API_KEY',
     'OPENROUTER_API_KEY',
   ]);
   const launch = planCodexCommand({

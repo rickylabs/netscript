@@ -3,10 +3,10 @@
  *
  * MONTHLY MAINTENANCE: change a model id HERE. Two authorities consume these
  * constants and remain the ONLY places that bind a model to a purpose:
- *  - `runtime/routing-policy.ts` `CANONICAL_ROUTE_POLICY` — the lane → agent →
+ *  - `runtime/delegation-matrix.ts` — the workload/coordinator role → logical
  *    model → effort bindings rendered by `.llm/harness/workflow/lane-policy.md`.
- *    That array is the single source for *routing*; this module is the single
- *    source for the *model-id strings* it (and the presets below) reference.
+ *    That matrix is the single source for routing; this module is the single
+ *    source for the model-id strings its capability catalog references.
  *  - `runtime/provider-profiles.ts` `OPENROUTER_PRESETS` — caller-selected
  *    OpenRouter presets, whose model ids come from `OPENROUTER_MODEL_IDS`.
  *
@@ -41,10 +41,9 @@ export const ROUTING_MODEL_IDS = {
   fable51Native: 'fable-5-1',
   opus5Native: 'opus-5',
   gemini38FlashNative: 'gemini-3.8-flash',
-  qwen38FlashNextOllama: 'ollama-cloud/qwen3.8-flash',
+  qwen38FlashNextGo: 'opencode-go/qwen3.8-flash',
   qwen38FlashNextOpenRouter: 'openrouter/qwen/qwen3.8-flash',
   qwen38MaxGo: 'opencode-go/qwen3.8-max',
-  qwen38MaxOllama: 'ollama-cloud/qwen3.8-max',
   qwen38MaxOpenRouter: 'openrouter/qwen/qwen3.8-max',
   glm53FlashGo: 'opencode-go/glm-5.3-flash',
   glm53FlashOllama: 'ollama-cloud/glm-5.3-flash',
@@ -69,7 +68,6 @@ export const ROUTING_MODEL_IDS = {
   kimiK3Ollama: 'ollama-cloud/kimi-k3',
   kimiK3OpenRouter: 'openrouter/moonshotai/kimi-k3',
   grok46Go: 'opencode-go/grok-4.6',
-  grok46Ollama: 'ollama-cloud/grok-4.6',
   grok46OpenRouter: 'openrouter/x-ai/grok-4.6',
 } as const;
 

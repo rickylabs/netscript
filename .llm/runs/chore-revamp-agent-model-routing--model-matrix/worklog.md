@@ -64,22 +64,30 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T16:29Z    | PLAN-EVAL | cycle 2        | Same OpenCode session `ses_f9338f842ffeT0E2CjAp7yu3KZ`, Grok 4.6 xhigh, returned `PASS` at repair head `372409ab6`.                                                      |
 | 2026-09-04T16:38Z    | S1        | implemented    | Added volatile model slugs, vendor-family catalog, five workload tiers, four coordinator tiers, exact eval policies, fallback composition, and fail-closed legacy lanes. |
 | 2026-09-04T16:49Z    | S2        | implemented    | Replaced the flat resolver with matrix-derived workload/coordinator resolution, provider precedence, selected-family skipping, and explicit legacy rejection.            |
-| 2026-09-04T17:07Z    | S3        | implemented    | Added OpenCode Go/Ollama/OpenRouter credential isolation, paid-route provider profiles, fail-closed structured subscription expense decisions, and CLI preflight.       |
-| 2026-09-04T17:20Z    | S4        | implemented    | Replaced stale named-lane prose with workload/coordinator matrix policy across active harness, evaluator, manager, remote, OpenHands, docs-audit, and tooling surfaces.   |
+| 2026-09-04T14:47Z    | S3        | implemented    | Added OpenCode Go/Ollama/OpenRouter credential isolation, paid-route provider profiles, fail-closed structured subscription expense decisions, and CLI preflight.        |
+| 2026-09-04T14:57Z    | S4        | implemented    | Replaced stale named-lane prose with workload/coordinator matrix policy across active harness, evaluator, manager, remote, OpenHands, docs-audit, and tooling surfaces.  |
+| 2026-09-04T15:10Z    | S5        | live/gates     | Proved all three auth registrations, live Go/Ollama/OpenRouter catalogs, corrected three nonexistent Ollama capabilities, and completed one guarded OpenCode Go turn.    |
 
 ## Gate Results
 
-| Gate                 | Status    | Evidence                                                                         |
-| -------------------- | --------- | -------------------------------------------------------------------------------- |
-| PLAN-EVAL cycle 1    | FAIL_PLAN | `plan-eval.md`; three bounded design fixes, no production implementation started |
-| PLAN-EVAL cycle 2    | PASS      | `plan-eval.md`; same evaluator session, repair head `372409ab6`                  |
-| implementation gates | NOT_RUN   | hard stop until PLAN-EVAL PASS                                                   |
-| IMPL-EVAL            | NOT_RUN   | required after implementation                                                    |
-| S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                 |
-| S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                       |
-| S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                          |
-| S2 tests             | PASS      | 28 passed across matrix, resolver, state rendering, and contract                 |
-| S3 check             | PASS      | 9 expense, credential, runner, profile, and CLI files checked; 0 diagnostics     |
-| S3 tests             | PASS      | 33 passed, 0 failed across expense, credential, runner, profile, and SSOT guards |
-| S4 parity            | PASS      | generated workload/coordinator tables exactly match typed matrix; 6 tests pass  |
-| S4 stale-policy scan | PASS      | no retired active routing claims in skills/harness/tooling (runs/debt excluded) |
+| Gate                 | Status    | Evidence                                                                                                                   |
+| -------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| PLAN-EVAL cycle 1    | FAIL_PLAN | `plan-eval.md`; three bounded design fixes, no production implementation started                                           |
+| PLAN-EVAL cycle 2    | PASS      | `plan-eval.md`; same evaluator session, repair head `372409ab6`                                                            |
+| implementation gates | NOT_RUN   | hard stop until PLAN-EVAL PASS                                                                                             |
+| IMPL-EVAL            | NOT_RUN   | required after implementation                                                                                              |
+| S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                                                           |
+| S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                                                                 |
+| S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                                                                    |
+| S2 tests             | PASS      | 28 passed across matrix, resolver, state rendering, and contract                                                           |
+| S3 check             | PASS      | 9 expense, credential, runner, profile, and CLI files checked; 0 diagnostics                                               |
+| S3 tests             | PASS      | 33 passed, 0 failed across expense, credential, runner, profile, and SSOT guards                                           |
+| S4 parity            | PASS      | generated workload/coordinator tables exactly match typed matrix; 6 tests pass                                             |
+| S4 stale-policy scan | PASS      | no retired active routing claims in skills/harness/tooling (runs/debt excluded)                                            |
+| Agentic full check   | PASS      | 185 files, 2 batches, 0 diagnostics                                                                                        |
+| Agentic full tests   | PASS      | 570 passed, 0 failed                                                                                                       |
+| Repository check     | PASS      | 3,140 files, 27 batches, 0 diagnostics                                                                                     |
+| Repository lint/fmt  | PASS      | 2,135 files, 37 batches each, 0 findings                                                                                   |
+| Repository tests     | PASS*     | 5,263 pass; 2 unchanged-main tests red only on no-exec `/ephemeral`; exact file rerun under executable `/tmp`: 31 pass     |
+| OpenCode Go smoke    | PASS      | structured allowance `allowed`; exact marker from guarded paid route                                                       |
+| Provider discovery   | PASS      | OpenCode lists OpenRouter, OpenCode Go, and Ollama Cloud auth plus 27 Go/22 Ollama models; selected OpenRouter ids present |

@@ -16,8 +16,9 @@ Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`.
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
 have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they were repaired at
 `372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 is committed at
-`605ae0e02`; S2 is committed at `da80e6eec`; S3 is committed at `b2d3106f0`. S4 replaces active
-stale routing prose with typed-matrix policy and its exact table parity gate; focused gates pass.
+`605ae0e02`; S2 is committed at `da80e6eec`; S3 is committed at `b2d3106f0`; S4 is committed at
+`e4bf9dd8c`. S5 live catalog discovery corrected nonexistent Ollama capabilities for Qwen 3.8
+Flash/Max and Grok 4.6; full agentic/static gates and the guarded OpenCode Go turn pass.
 
 ## Accepted owner decisions
 
@@ -41,7 +42,7 @@ stale routing prose with typed-matrix policy and its exact table parity gate; fo
 
 ## Next Steps
 
-1. Commit S4, then run bounded Go/Ollama live smokes and full focused/repository gates.
+1. Commit the S5 catalog/gate checkpoint.
 2. Run separate Grok 4.6 xhigh IMPL-EVAL.
 3. Promote the PR only after exact-head CI and review-thread gate.
 
@@ -65,14 +66,16 @@ stale routing prose with typed-matrix policy and its exact table parity gate; fo
 
 ## Gates
 
-| Gate family | Current status | Evidence                                |
-| ----------- | -------------- | --------------------------------------- |
-| Plan        | PASS cycle 2   | `plan-eval.md`, repair head `372409ab6` |
-| Static      | PASS S1-S3     | per-slice structured checks             |
-| Fitness     | NOT_RUN        | implementation hard stop                |
-| Runtime     | PASS S1-S3     | 72 focused tests across implemented code |
-| Docs parity | PASS S4        | typed table parity plus stale-policy scan |
-| Consumer    | N/A            | no published package/plugin changes     |
+| Gate family | Current status | Evidence                                                                    |
+| ----------- | -------------- | --------------------------------------------------------------------------- |
+| Plan        | PASS cycle 2   | `plan-eval.md`, repair head `372409ab6`                                     |
+| Static      | PASS S1-S3     | per-slice structured checks                                                 |
+| Fitness     | NOT_RUN        | implementation hard stop                                                    |
+| Runtime     | PASS S1-S5     | 570 agentic tests plus guarded OpenCode Go live turn                        |
+| Docs parity | PASS S4        | typed table parity plus stale-policy scan                                   |
+| Repo check  | PASS S5        | 3,140 files / 27 batches, no diagnostics                                    |
+| Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
+| Consumer    | N/A            | no published package/plugin changes                                         |
 
 ## Drift and Debt
 

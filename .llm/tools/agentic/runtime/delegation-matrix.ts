@@ -102,7 +102,7 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     id: 'qwen_3_8_flash_next',
     family: 'alibaba',
     capabilities: [
-      capability('ollama', ROUTING_MODEL_IDS.qwen38FlashNextOllama),
+      capability('opencode_go', ROUTING_MODEL_IDS.qwen38FlashNextGo),
       capability('openrouter', ROUTING_MODEL_IDS.qwen38FlashNextOpenRouter),
     ],
   },
@@ -111,7 +111,6 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     family: 'alibaba',
     capabilities: [
       capability('opencode_go', ROUTING_MODEL_IDS.qwen38MaxGo),
-      capability('ollama', ROUTING_MODEL_IDS.qwen38MaxOllama),
       capability('openrouter', ROUTING_MODEL_IDS.qwen38MaxOpenRouter),
     ],
   },
@@ -190,7 +189,6 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     family: 'xai',
     capabilities: [
       capability('opencode_go', ROUTING_MODEL_IDS.grok46Go),
-      capability('ollama', ROUTING_MODEL_IDS.grok46Ollama),
       capability('openrouter', ROUTING_MODEL_IDS.grok46OpenRouter),
     ],
   },
