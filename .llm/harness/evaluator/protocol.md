@@ -6,51 +6,30 @@ a separate, earlier pass governed by `plan-protocol.md`. Both passes are separat
 The evaluator is a separate session from the generator. Its job is to verify the approved plan
 against the changed state, not to continue implementation.
 
-**Evaluator surface (local vs cloud).** The invariant never changes: the generator session is never
-the evaluator session, and no lane self-certifies. The transport is how that invariant is realized.
+Select the evaluator from the run's workload tier in `workflow/lane-policy.md`. The typed resolver
+must skip any candidate from the selected generator's vendor family, then choose the first healthy,
+capable, allowance-proven transport in the canonical provider order. Never infer a model, effort,
+transport, or fallback from historical lane names.
 
-- **Local run (the default for harness work).** PLAN-EVAL and IMPL-EVAL run in fresh native
-  opposite-family sessions: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates
-  Claude-authored work. The **supervisor** triggers the evaluator; a sub-agent never
-  auto-dispatches one. PLAN-EVAL is conditional for complex/decision-heavy work, while IMPL-EVAL
-  remains mandatory unless the owner explicitly waives it.
-- **OpenRouter escalation.** Use the bound Qwen 3.8 Flash max PLAN preset or GLM 5.3 Flash max IMPL
-  preset only for a genuine third opinion or when the native opposite-family route is
-  quota-blocked. Approved open models only; never send Claude/GPT/Gemini through OpenRouter.
-- **Cloud run.** OpenHands is phase-driven and open-model-only. `openhands` plus `status:plan-eval`
-  dispatches PLAN-EVAL; draft→ready dispatches IMPL-EVAL unless `impl-eval:skip` is present. Select
-  at most one `eval:model:*` override before the transition. Orchestrators never also post a manual
-  trigger for that head. Dispatching a closed model (Claude/GPT/Gemini) through OpenHands is
-  prohibited — it burns paid OpenRouter credit.
-  OpenHands cannot currently attest reasoning effort because its adapter does not expose it; report
-  that limitation and never claim `max` for an OpenHands run.
-- **Ordinary (non-formal) review** — the slice review gate, code/PR review — remains
-  **opposite-family Claude ⇄ Codex**: a Codex session reviews Claude-authored work, a Claude session
-  reviews Codex-authored work, mixed authorship per slice or by both.
+`complex` and `architecture` are privileged rows. Do not select either from inferred complexity: the
+run must contain explicit owner or milestone-coordinator authorization and its rationale. When that
+evidence is absent, evaluation is capped at the `feature` row.
 
-Select the route from `workflow/lane-policy.md` and record it in `supervisor.md`/`drift.md`. See
-`.agents/skills/openhands-handoff/SKILL.md` "Routing policy" for the model rules, which are shared
-by both transports.
+The supervisor triggers the evaluator; a sub-agent never auto-dispatches one. Record the tier,
+phase, fallback reason, requested and observed route identity, session, exact head, and expense
+decision where a paid OpenCode route is selected. OpenRouter paid-training eligibility is allowed by
+owner preference and is not a routing blocker.
 
-If the OpenRouter escalation is blocked by an OpenRouter limit, use only the explicit
-owner-authorized fallback: a fresh separate Antigravity (`agy`) session on Google subscription,
-model `gemini-3.6-flash-high`, effort `high`. Record the block and requested/observed identity. This
-is not Gemini over OpenRouter and does not weaken evaluator independence.
+IMPL-EVAL remains mandatory unless the owner explicitly waives it. Re-steer the same evaluator
+session after a failure and obey the tier-specific loop limit:
 
-**Capability (verified, drift D-4 amended).** The evaluator lane is fully capable on this transport:
-both approved open models return a **real reasoning trace** and have a **verified agentic turn**
-(they make real tool calls through Claude Code), so both phase-bound evaluators **can run gates**
-and their `effort` is genuine — not nominal.
+- simple: the owner did not specify a maximum; record this explicitly rather than inventing one;
+- straightforward, feature, complex: maximum five, notify the owner after three;
+- architecture: maximum three, notify the owner after two;
+- documentation: use the tier's policy with a hard maximum of two.
 
-| Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn |
-| --------------------------------- | --------------- | ------------ |
-| `qwen/qwen3.8-flash`              | yes             | supported    |
-| `z-ai/glm-5.3-flash`              | yes             | supported    |
-| `z-ai/glm-5.2` (design lane only) | **none**        | —            |
-
-The missing-reasoning problem is **GLM-specific, not a client-wide gap**: only GLM 5.2 over
-OpenRouter returns zero thinking blocks. Never cite "GLM 5.2 · xhigh reasoning" as gate evidence.
-That caveat is scoped to the design-verification lane and does **not** apply to the evaluator lane.
+These notification points do not freeze unrelated work and do not replace a smaller explicit limit.
+The selected generator and evaluator must remain different vendor families in every cycle.
 
 ## Required Inputs
 

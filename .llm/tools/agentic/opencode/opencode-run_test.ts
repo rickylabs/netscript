@@ -1,10 +1,13 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
+import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import {
   openCodeChildEnvironment,
   opencodeRunArguments,
   parseOpenRouterApiKey,
+  preflightOpenCodeExpense,
   resolveOpenCodeBinary,
+  runOpenCode,
 } from './opencode-run.ts';
 
 Deno.test('OpenCode argv keeps the message before every flag', () => {
@@ -87,17 +90,216 @@ Deno.test('existing OpenRouter key wins without reading the config file', async 
       reads++;
       return Promise.resolve('OPENROUTER_API_KEY=from-file');
     },
+    { model: ROUTING_MODEL_IDS.glm53FlashOpenRouter },
   );
   assertEquals(env.OPENROUTER_API_KEY, 'already-exported');
   assertEquals(reads, 0);
 });
 
-Deno.test('OpenRouter key falls back to the configured user env file', async () => {
+Deno.test('OpenRouter key falls back to the configured mode-600 user env file', async () => {
   let requestedPath = '';
-  const env = await openCodeChildEnvironment({ HOME: '/home/test' }, (path) => {
-    requestedPath = path;
-    return Promise.resolve('OPENROUTER_API_KEY=from-file');
-  });
+  const env = await openCodeChildEnvironment(
+    { HOME: '/home/test' },
+    (path) => {
+      requestedPath = path;
+      return Promise.resolve('OPENROUTER_API_KEY=from-file');
+    },
+    {
+      model: ROUTING_MODEL_IDS.glm53FlashOpenRouter,
+      stat: () => Promise.resolve({ mode: 0o100600 }),
+    },
+  );
   assertEquals(requestedPath, `/home/test/${OPENCODE_TOOL.openRouterEnvRelativePath}`);
   assertEquals(env.OPENROUTER_API_KEY, 'from-file');
+});
+
+Deno.test('paid OpenCode route is blocked before dispatch when expense proof is absent', async () => {
+  let message = '';
+  try {
+    await preflightOpenCodeExpense({
+      message: 'do work',
+      model: ROUTING_MODEL_IDS.glm53FlashGo,
+      variant: 'high',
+      workloadTier: 'straightforward',
+      workloadRole: 'implementation',
+    });
+  } catch (error) {
+    message = error instanceof Error ? error.message : String(error);
+  }
+  assertEquals(
+    message,
+    'paid opencode_go route requires --estimated-cost-usd',
+  );
+});
+
+Deno.test('paid OpenCode Go route accepts a fresh live allowance decision', async () => {
+  const decision = await preflightOpenCodeExpense(
+    {
+      message: 'do work',
+      model: ROUTING_MODEL_IDS.glm53FlashGo,
+      variant: 'high',
+      workloadTier: 'straightforward',
+      workloadRole: 'implementation',
+      estimatedCostUsd: 0.01,
+    },
+    {
+      env: { OPENCODE_API_KEY: 'opaque' },
+      fetch: () =>
+        Promise.resolve(Response.json({
+          usage: {
+            rolling: { percent: 1, status: 'ok' },
+            weekly: { percent: 2, status: 'ok' },
+            monthly: { percent: 3, status: 'ok' },
+          },
+        })),
+      now: () => '2026-09-04T16:00:00.000Z',
+    },
+  );
+  assertEquals(decision?.allowed, true);
+});
+
+Deno.test('denied paid-route expense decision prevents OpenCode process spawn', async () => {
+  let spawnCalls = 0;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'do not dispatch',
+          model: ROUTING_MODEL_IDS.glm53FlashGo,
+          variant: 'high',
+          cwd: '/work',
+          workloadTier: 'feature',
+          workloadRole: 'documentation',
+          estimatedCostUsd: 1,
+        },
+        false,
+        {
+          env: { OPENCODE_API_KEY: 'opaque' },
+          fetch: () =>
+            Promise.resolve(Response.json({
+              usage: {
+                rolling: { percent: 104.5, status: 'rate-limited' },
+                weekly: { percent: 41.8, status: 'ok' },
+                monthly: { percent: 20.9, status: 'ok' },
+              },
+            })),
+          now: () => '2026-09-04T16:00:00.000Z',
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('spawn must remain unreachable');
+          },
+        },
+      ),
+    Error,
+    'expense guard blocked opencode_go: provider_rate_limited',
+  );
+  assertEquals(spawnCalls, 0);
+});
+
+Deno.test('unproven live Go usage prevents OpenCode process spawn', async () => {
+  for (
+    const response of [
+      () => Promise.reject(new Error('transport detail must remain private')),
+      () => Promise.resolve(new Response('', { status: 503 })),
+      () => Promise.resolve(Response.json({ usage: {} })),
+    ]
+  ) {
+    let spawnCalls = 0;
+    await assertRejects(
+      () =>
+        runOpenCode(
+          {
+            message: 'do not dispatch',
+            model: ROUTING_MODEL_IDS.grok46Go,
+            variant: 'xhigh',
+            workloadTier: 'architecture',
+            workloadRole: 'implementation_evaluation',
+            privilegedTierAuthorization: {
+              authorizer: 'owner',
+              rationale: 'Test-only authorized architecture expense-denial path.',
+            },
+            estimatedCostUsd: 0.1,
+          },
+          false,
+          {
+            env: { OPENCODE_API_KEY: 'opaque' },
+            fetch: response,
+            spawn: () => {
+              spawnCalls++;
+              throw new Error('spawn must remain unreachable');
+            },
+          },
+        ),
+      Error,
+    );
+    assertEquals(spawnCalls, 0);
+  }
+});
+
+Deno.test('privileged OpenCode workload cannot reach usage fetch or spawn without authority', async () => {
+  let fetchCalls = 0;
+  let spawnCalls = 0;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'misclassified architecture review',
+          model: ROUTING_MODEL_IDS.grok46Go,
+          variant: 'xhigh',
+          workloadTier: 'architecture',
+          workloadRole: 'implementation_evaluation',
+          estimatedCostUsd: 1,
+        },
+        false,
+        {
+          env: { OPENCODE_API_KEY: 'opaque' },
+          fetch: () => {
+            fetchCalls++;
+            return Promise.resolve(Response.json({}));
+          },
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('spawn must remain unreachable');
+          },
+        },
+      ),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+  assertEquals(fetchCalls, 0);
+  assertEquals(spawnCalls, 0);
+});
+
+Deno.test('model outside the selected matrix cell cannot reach usage fetch or spawn', async () => {
+  let fetchCalls = 0;
+  let spawnCalls = 0;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'do not relabel Grok as routine work',
+          model: ROUTING_MODEL_IDS.grok46Go,
+          variant: 'xhigh',
+          workloadTier: 'feature',
+          workloadRole: 'implementation_evaluation',
+          estimatedCostUsd: 1,
+        },
+        false,
+        {
+          env: { OPENCODE_API_KEY: 'opaque' },
+          fetch: () => {
+            fetchCalls++;
+            return Promise.resolve(Response.json({}));
+          },
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('spawn must remain unreachable');
+          },
+        },
+      ),
+    Error,
+    'is not declared for feature/implementation_evaluation',
+  );
+  assertEquals(fetchCalls, 0);
+  assertEquals(spawnCalls, 0);
 });

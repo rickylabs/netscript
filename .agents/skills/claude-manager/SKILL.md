@@ -9,10 +9,10 @@ description: >
 # Claude Manager
 
 Use this skill when the task involves Claude Code session orchestration rather than package code.
-Claude is the supervisor. WSL Codex implements harness slices that must be visible from Codex
-Desktop/mobile. Evaluation runs on the evaluator lane in `.llm/harness/workflow/lane-policy.md`:
-normally a fresh native opposite-family Claude/Codex session; OpenRouter is reserved for a third
-opinion or native-family quota exhaustion, and OpenHands for explicitly cloud-driven runs.
+Claude may be the supervisor when selected by the coordinator matrix. Implementation and evaluation
+use the workload-tier roles in `.llm/harness/workflow/lane-policy.md`; the evaluator is always a
+separate session from a different vendor family. Provider fallback follows the canonical
+subscription-first order and requires expense proof for paid OpenCode routes.
 
 ## Workflow
 
@@ -24,11 +24,9 @@ recorded, but must never be described as Remote Control or mobile-visible sessio
 custom; an interactive process staying alive is not attachment proof.
 
 `agentic:claude-hybrid` keeps that boundary intact. It starts a native, Anthropic-authenticated
-Remote Control supervisor and gives it the local `netscript-hybrid` MCP tool `delegate_openrouter`.
-A tool call delegates one bounded task to OpenCode/OpenRouter; the approved default is
-`z-ai/glm-5.3-flash` at `max`, with `qwen/qwen3.8-flash` also allowed. This is not transparent model
-substitution: Claude must still have enough native quota to take a turn and call the tool. At zero
-Claude quota, use the non-Remote-Control OpenRouter surface or OpenCode directly.
+Remote Control supervisor and exposes bounded OpenCode delegation. The selected workload matrix, not
+this skill, chooses the delegated model and effort. This is not transparent substitution: Claude
+must still have enough native quota to take a turn and call the tool.
 
 1. Re-baseline the worktree and branch first.
 2. If the user says `use harness`, read `.agents/skills/netscript-harness/SKILL.md`. If a native
@@ -46,7 +44,7 @@ Claude quota, use the non-Remote-Control OpenRouter surface or OpenCode directly
 7. Use `deno task agentic:claude-openrouter-gateway -- --resume <id> --fork-session` for an isolated
    alternate-model fork. The launcher rejects Remote Control flags by design.
 8. Use `deno task agentic:claude-hybrid -- --cwd <absolute-path> [--name <label>]` when the user
-   needs native Remote Control plus explicit GLM Flash delegation. Require the launcher's registry
+   needs native Remote Control plus bounded OpenCode delegation. Require the launcher's registry
    evidence (matching PID and cwd plus a non-empty `bridgeSessionId`) before claiming attachment.
    The requested label need not equal Claude's derived registry name.
 
@@ -54,8 +52,8 @@ Claude quota, use the non-Remote-Control OpenRouter surface or OpenCode directly
 
 - Claude supervisor sessions may gather state, write prompts, launch/check agents, and update
   harness artifacts.
-- PLAN-EVAL and IMPL-EVAL use separate opposite-family sessions selected from the canonical
-  `.llm/harness/workflow/lane-policy.md`; blocked routes are recorded in the run.
+- PLAN-EVAL and IMPL-EVAL use separate, different-vendor-family sessions selected from the workload
+  matrix in `.llm/harness/workflow/lane-policy.md`; blocked routes are recorded in the run.
 - Implementation slices use daemon-attached WSL Codex sessions with recorded thread id, worktree,
   daemon proof, and steering command.
 - Do not count Claude internal subagents or plugin helper agents as NetScript implementation agents.
@@ -82,11 +80,9 @@ outcome.
 - Do not use Claude workflows as the default NetScript implementation agent. WSL Codex remains the
   preferred implementation lane because it is daemon-attached, mobile-visible, and cheaper to steer
   slice-by-slice.
-- Keep the evaluator a separate session on the evaluator lane from
-  `.llm/harness/workflow/lane-policy.md` — normally native opposite-family Claude ⇄ Codex, with
-  OpenRouter only for a third opinion/native quota limit and OpenHands only for explicitly
-  cloud-driven work. Claude workflows may prepare evaluator inputs, but they do not replace
-  PLAN-EVAL or IMPL-EVAL, and no session self-certifies.
+- Keep the evaluator a separate, different-vendor-family session selected from
+  `.llm/harness/workflow/lane-policy.md`. Claude workflows may prepare inputs, but they do not
+  replace PLAN-EVAL or IMPL-EVAL and no session self-certifies.
 - Route every Claude workflow, supervisor, and review session through the canonical lane table in
   `.llm/harness/workflow/lane-policy.md`. Do not reproduce model/effort defaults here or infer a
   paid escalation from workflow prose.
@@ -127,8 +123,8 @@ session should be started.
 
 - [ ] Current branch/worktree is verified.
 - [ ] Harness skill was loaded for harnessed work.
-- [ ] Evaluator surface is the lane-policy route: native opposite-family locally; OpenRouter only
-      for third opinion/native quota limit; OpenHands only for explicitly cloud-driven runs.
+- [ ] Evaluator surface is the workload-tier route, separate and different-family, with any paid
+      fallback backed by a fresh expense decision.
 - [ ] Implementation surface is WSL Codex when slice work must be mobile-visible.
 - [ ] Claude remote-control or Codex daemon visibility is proven before claiming phone visibility.
 - [ ] Hybrid sessions are described as native Claude supervision plus explicit worker delegation,

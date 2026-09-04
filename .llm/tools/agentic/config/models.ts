@@ -3,10 +3,10 @@
  *
  * MONTHLY MAINTENANCE: change a model id HERE. Two authorities consume these
  * constants and remain the ONLY places that bind a model to a purpose:
- *  - `runtime/routing-policy.ts` `CANONICAL_ROUTE_POLICY` — the lane → agent →
+ *  - `runtime/delegation-matrix.ts` — the workload/coordinator role → logical
  *    model → effort bindings rendered by `.llm/harness/workflow/lane-policy.md`.
- *    That array is the single source for *routing*; this module is the single
- *    source for the *model-id strings* it (and the presets below) reference.
+ *    That matrix is the single source for routing; this module is the single
+ *    source for the model-id strings its capability catalog references.
  *  - `runtime/provider-profiles.ts` `OPENROUTER_PRESETS` — caller-selected
  *    OpenRouter presets, whose model ids come from `OPENROUTER_MODEL_IDS`.
  *
@@ -32,11 +32,50 @@ export const MODEL_IDS = {
   antigravityDocs: 'gemini-3.6-flash-high',
 } as const;
 
+/** Provider-specific model spellings used by the replacement delegation matrix. */
+export const ROUTING_MODEL_IDS = {
+  lunaNative: 'gpt-5.6-luna',
+  lunaGo: 'opencode-go/gpt-5.6-luna',
+  solNative: 'gpt-5.6-sol',
+  astraNative: 'gpt-6-astra',
+  fable51Native: 'claude-fable-5-1',
+  opus5Native: 'claude-opus-5',
+  gemini38FlashNative: 'gemini-3.8-flash',
+  qwen38FlashNextGo: 'opencode-go/qwen3.8-flash',
+  qwen38FlashNextOpenRouter: 'openrouter/qwen/qwen3.8-flash',
+  qwen38MaxGo: 'opencode-go/qwen3.8-max',
+  qwen38MaxOpenRouter: 'openrouter/qwen/qwen3.8-max',
+  glm53FlashGo: 'opencode-go/glm-5.3-flash',
+  glm53FlashOllama: 'ollama-cloud/glm-5.3-flash',
+  glm53FlashOpenRouter: 'openrouter/z-ai/glm-5.3-flash',
+  glm53Go: 'opencode-go/glm-5.3',
+  glm53Ollama: 'ollama-cloud/glm-5.3',
+  glm53OpenRouter: 'openrouter/z-ai/glm-5.3',
+  museSpark13Go: 'opencode-go/muse-spark-1.3-contributor',
+  museSpark13OpenRouter: 'openrouter/meta/muse-spark-1.3-contributor',
+  minimaxM3Go: 'opencode-go/minimax-m3',
+  minimaxM3Ollama: 'ollama-cloud/minimax-m3',
+  minimaxM3OpenRouter: 'openrouter/minimax/minimax-m3',
+  deepseekV4FlashGo: 'opencode-go/deepseek-v4-flash',
+  deepseekV4FlashOllama: 'ollama-cloud/deepseek-v4-flash:0731',
+  deepseekV4FlashOpenRouter: 'openrouter/deepseek/deepseek-v4-flash-0731',
+  deepseekV4FlashVisionGo: 'opencode-go/deepseek-v4-flash-vision-exp',
+  deepseekV4FlashVisionOpenRouter: 'openrouter/deepseek/deepseek-v4-flash-vision-exp',
+  deepseekV4ProGo: 'opencode-go/deepseek-v4-pro',
+  deepseekV4ProOllama: 'ollama-cloud/deepseek-v4-pro:0813',
+  deepseekV4ProOpenRouter: 'openrouter/deepseek/deepseek-v4-pro-0813',
+  kimiK3Go: 'opencode-go/kimi-k3',
+  kimiK3Ollama: 'ollama-cloud/kimi-k3',
+  kimiK3OpenRouter: 'openrouter/moonshotai/kimi-k3',
+  grok46Go: 'opencode-go/grok-4.6',
+  grok46OpenRouter: 'openrouter/x-ai/grok-4.6',
+} as const;
+
 /**
  * Native-provider model ids in the CLI-argument spelling the rollout canary
  * passes to `provider-canary` (`claude`/`codex` `--model` args). These use the
- * provider CLIs' own dashed spelling, distinct from the routing ids in
- * `MODEL_IDS` (e.g. `claude-opus-5` vs the routing id `opus-5`).
+ * provider CLIs' own dashed spelling. Matrix capabilities now use these same
+ * dispatchable CLI ids; this table remains the provider-canary argument set.
  */
 export const NATIVE_CANARY_MODEL_ARGS = {
   claudeOpus: 'claude-opus-5',

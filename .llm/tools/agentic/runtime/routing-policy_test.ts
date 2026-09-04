@@ -1,801 +1,307 @@
-import type { RouteIdentity } from './contract.ts';
+import { assertEquals, assertThrows } from '@std/assert';
+import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
+  assertEvaluatorIndependence,
+  CANONICAL_COORDINATOR_POLICY,
   CANONICAL_ROUTE_POLICY,
-  type FallbackCandidate,
-  resolveCanonicalFormalEvaluatorRoute,
-  resolveCanonicalOrdinaryReviewRoute,
-  resolveCanonicalRoute,
-  resolveCanonicalRouteEffort,
-  type RoutingPolicyContext,
-  selectFallbackCandidate,
+  resolveCoordinatorRoute,
+  resolveLegacyRouteForNewSelection,
+  resolveWorkloadRoute,
 } from './routing-policy.ts';
-import { MODEL_IDS, OPENCODE_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
-import { assertEquals as equal, assertThrows } from '@std/assert';
 
-const worktree = '/home/codex/repos/routing-policy';
-const session = { agent: 'codex', sessionId: 'session-1', worktree, boundary: 'new' } as const;
-function route(agent: 'claude' | 'codex', mobileRequired = true): RouteIdentity {
-  return {
-    agent,
-    provider: agent === 'claude' ? 'anthropic' : 'openai',
-    model: `${agent}-model`,
-    effort: 'low',
-    worktree,
-    mobileRequired,
-  };
-}
-function candidate(values: Partial<FallbackCandidate> = {}): FallbackCandidate {
-  return {
-    route: route('claude'),
-    family: 'anthropic',
-    purpose: 'orchestration',
-    available: true,
-    subscriptionState: 'included',
-    requiresExplicitApproval: false,
-    higherEffortEscalation: false,
-    priority: 1,
-    ...values,
-  };
-}
-function context(values: Partial<RoutingPolicyContext> = {}): RoutingPolicyContext {
-  return {
-    purpose: 'orchestration',
-    session,
-    explicitPaidApproval: false,
-    explicitEffortEscalation: false,
-    fallbackDepth: 0,
-    maxFallbackDepth: 3,
-    ...values,
-  };
-}
+const worktree = '/home/agent/projects/netscript/worktrees/routing-test';
+const privilegedTierAuthorization = {
+  authorizer: 'milestone_coordinator' as const,
+  rationale: 'Recorded cross-package milestone escalation.',
+};
 
-Deno.test('policy selects by explicit priority and reports mobile visibility changes', () => {
-  const selected = selectFallbackCandidate([
-    candidate({ priority: 2 }),
-    candidate({ route: route('claude', false), priority: 1 }),
-  ], context({ explicitPaidApproval: true }));
-  equal(selected.status, 'selected');
-  if (selected.status === 'selected') equal(selected.notificationRequired, true);
-});
-
-Deno.test('active slices and maximum fallback depth block without selecting', () => {
-  equal(
-    selectFallbackCandidate(
-      [candidate()],
-      context({ session: { ...session, boundary: 'active' } }),
+Deno.test('canonical inspection policy is derived from all matrix cells', () => {
+  assertEquals(CANONICAL_ROUTE_POLICY.length, 66);
+  assertEquals(
+    CANONICAL_ROUTE_POLICY.filter((entry) =>
+      entry.tier === 'architecture' && entry.role === 'implementation'
     ),
-    { status: 'blocked', reason: 'turn_boundary_required' },
-  );
-  equal(
-    selectFallbackCandidate([candidate()], context({ fallbackDepth: 3 })),
-    { status: 'blocked', reason: 'fallback_depth_exceeded' },
-  );
-});
-
-Deno.test('evaluation blocks rather than selecting the author model family', () => {
-  const sameFamily = candidate({ purpose: 'evaluation', family: 'openai', route: route('codex') });
-  equal(
-    selectFallbackCandidate(
-      [sameFamily],
-      context({ purpose: 'evaluation', authorFamily: 'openai' }),
-    ),
-    { status: 'blocked', reason: 'opposite_family_unavailable' },
-  );
-  const opposite = candidate({ purpose: 'evaluation', family: 'anthropic' });
-  const selected = selectFallbackCandidate(
-    [sameFamily, opposite],
-    context({ purpose: 'evaluation', authorFamily: 'openai' }),
-  );
-  equal(selected.status, 'selected');
-  if (selected.status === 'selected') equal(selected.candidate.family, 'anthropic');
-});
-
-Deno.test('outside-plan and higher-effort Fable-shaped policy requires explicit approvals', () => {
-  const fable = candidate({
-    subscriptionState: 'outside_plan',
-    requiresExplicitApproval: true,
-    higherEffortEscalation: true,
-  });
-  equal(selectFallbackCandidate([fable], context()), {
-    status: 'blocked',
-    reason: 'approval_required',
-  });
-  equal(
-    selectFallbackCandidate([fable], context({ explicitPaidApproval: true })),
-    { status: 'blocked', reason: 'approval_required' },
-  );
-  equal(
-    selectFallbackCandidate(
-      [fable],
-      context({
-        explicitPaidApproval: true,
-        explicitEffortEscalation: true,
-      }),
-    ).status,
-    'selected',
-  );
-});
-
-Deno.test('orchestrator defaults to Opus 5 high and deep analysis to Fable 5 medium', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  for (
-    const [lane, model, effort] of [
-      ['planning_decisions', 'opus-5', 'high'],
-      ['deep_analysis', 'fable-5', 'medium'],
-    ] as const
-  ) {
-    const selected = resolveCanonicalRoute(lane, at);
-    equal([selected.agent, selected.provider, selected.model, selected.effort], [
-      'claude',
-      'anthropic',
-      model,
-      effort,
-    ]);
-    equal(selected.subscriptionState, 'included');
-    equal(selected.requiresExplicitApproval ?? false, false);
-  }
-});
-
-Deno.test('Fable 5 is back on the subscription: every Fable route is in-plan and auto-selectable', () => {
-  const fableRoutes = CANONICAL_ROUTE_POLICY.filter((route) => route.model === 'fable-5');
-  equal(fableRoutes.length > 0, true);
-  for (const route of fableRoutes) {
-    equal(route.subscriptionState ?? 'included', 'included');
-    equal(route.requiresExplicitApproval ?? false, false);
-  }
-});
-
-Deno.test('there is no mobile_orchestration lane — the orchestrator session owns /rc', () => {
-  equal(
-    CANONICAL_ROUTE_POLICY.some((route) => (route.lane as string) === 'mobile_orchestration'),
-    false,
-  );
-});
-
-Deno.test('implementation stays Codex GPT-5.6 Sol — medium normal, high complex', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  const normal = resolveCanonicalRoute('normal_implementation', at);
-  equal([normal.agent, normal.provider, normal.model, normal.effort], [
-    'codex',
-    'openai',
-    'gpt-5.6-sol',
-    'medium',
-  ]);
-  const complex = resolveCanonicalRoute('complex_implementation', at);
-  equal([complex.agent, complex.provider, complex.model, complex.effort], [
-    'codex',
-    'openai',
-    'gpt-5.6-sol',
-    'high',
-  ]);
-});
-
-Deno.test('adversarial review of Codex work is Fable, opposite-family, paired to effort', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  const normal = resolveCanonicalRoute('review_codex', at);
-  equal([normal.agent, normal.provider, normal.model, normal.effort], [
-    'claude',
-    'anthropic',
-    'fable-5',
-    'low',
-  ]);
-  const complex = resolveCanonicalRoute('review_codex_complex', at);
-  equal([complex.agent, complex.provider, complex.model, complex.effort], [
-    'claude',
-    'anthropic',
-    'fable-5',
-    'medium',
-  ]);
-  // The token-limit fallback for a Codex review stays Claude-family (Opus), never
-  // the Codex author's own OpenAI family — opposite-family review is preserved.
-  for (const lane of ['review_codex', 'review_codex_complex'] as const) {
-    const fallback = CANONICAL_ROUTE_POLICY.find((route) =>
-      route.lane === lane && route.condition === 'token_limit_fallback'
-    );
-    equal(fallback?.provider, 'anthropic');
-    equal(fallback?.model, 'opus-5');
-  }
-});
-
-Deno.test('delegated chores: docs/cleanup on Sonnet 5 high, code chores on Opus 5 medium', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  const docs = resolveCanonicalRoute('documentation_review', at);
-  equal([docs.agent, docs.provider, docs.model, docs.effort], [
-    'claude',
-    'anthropic',
-    'sonnet-5',
-    'high',
-  ]);
-  const code = resolveCanonicalRoute('chore_code', at);
-  equal([code.agent, code.provider, code.model, code.effort], [
-    'claude',
-    'anthropic',
-    'opus-5',
-    'medium',
-  ]);
-});
-
-Deno.test('orchestrator and deep-analysis lanes carry a Codex Sol high token-limit fallback', () => {
-  for (
-    const [lane, condition] of [
-      ['planning_decisions', 'fallback_on_opus_token_limit'],
-      ['deep_analysis', 'fallback_on_fable_token_limit'],
-    ] as const
-  ) {
-    const fallback = CANONICAL_ROUTE_POLICY.find((route) =>
-      route.lane === lane && route.condition === condition
-    );
-    equal([fallback?.agent, fallback?.provider, fallback?.model, fallback?.effort], [
-      'codex',
-      'openai',
-      'gpt-5.6-sol',
-      'high',
-    ]);
-  }
-});
-
-Deno.test('Claude Code workflow lane stays Opus 5 low', () => {
-  const route = resolveCanonicalRoute('claude_workflow', new Date('2026-07-16T00:00:00Z'));
-  equal([route.agent, route.provider, route.model, route.effort], [
-    'claude',
-    'anthropic',
-    'opus-5',
-    'low',
-  ]);
-});
-
-Deno.test('major UI/UX work is GLM-led or receives the mandatory GLM adversarial pass', () => {
-  const at = new Date('2026-07-12T00:00:00Z');
-  const lead = resolveCanonicalRoute('major_ui_ux_design', at);
-  const adversarial = resolveCanonicalRoute('major_ui_ux_adversarial_review', at);
-  for (const route of [lead, adversarial]) {
-    equal([
-      route.agent,
-      route.provider,
-      route.profileId,
-      route.presetId,
-      route.effort,
-    ], [
-      'claude',
-      'openrouter',
-      'claude-openrouter',
-      'claude-design-glm-5-2',
-      'xhigh',
-    ]);
-  }
-  equal(lead.condition, 'lead_route_for_major_ui_ux_work');
-  equal(adversarial.condition, 'required_before_merge_when_glm_not_lead');
-});
-
-Deno.test('OpenCode vision evaluation complements the mandatory GLM design pass', () => {
-  const route = resolveCanonicalRoute('adversarial_design_eval', new Date('2026-07-14T00:00:00Z'));
-  equal([route.agent, route.provider, route.model, route.effort], [
-    'opencode',
-    'openrouter',
-    OPENCODE_MODEL_IDS.visionEval,
-    'high',
-  ]);
-  equal(route.condition, 'vision_evidence_complements_required_glm_design_review');
-});
-
-Deno.test('deep-analysis Fable fallback requires classified Codex quota exhaustion', () => {
-  const fable = candidate({ purpose: 'analysis', requiresCodexQuotaExhaustion: true });
-  for (const failureCode of [undefined, 'rate_limited', 'provider_unavailable'] as const) {
-    equal(selectFallbackCandidate([fable], context({ purpose: 'analysis', failureCode })), {
-      status: 'blocked',
-      reason: 'route_unavailable',
-    });
-  }
-  equal(
-    selectFallbackCandidate(
-      [fable],
-      context({ purpose: 'analysis', failureCode: 'quota_exhausted' }),
-    ).status,
-    'selected',
-  );
-});
-
-Deno.test('canonical research and documentation-authoring lanes use Gemini 3.6 Flash through Antigravity', () => {
-  const route = resolveCanonicalRoute('research_extraction', new Date('2026-07-10T00:00:00Z'));
-  equal([route.agent, route.provider, route.model], [
-    'antigravity',
-    'google',
-    MODEL_IDS.antigravityDocs,
-  ]);
-  const documentationRoute = resolveCanonicalRoute(
-    'documentation_authoring',
-    new Date('2026-08-03T00:00:00Z'),
-  );
-  equal([documentationRoute.agent, documentationRoute.provider, documentationRoute.model], [
-    'antigravity',
-    'google',
-    MODEL_IDS.antigravityDocs,
-  ]);
-});
-
-Deno.test('documentation authoring is not bound to an OpenRouter provider', () => {
-  const route = resolveCanonicalRoute(
-    'documentation_authoring',
-    new Date('2026-08-03T00:00:00Z'),
-  );
-  equal([
-    route.purpose,
-    route.agent,
-    route.provider,
-    route.profileId,
-    route.presetId,
-    route.model,
-    route.effort,
-    route.evaluatorModelPolicy,
-  ], [
-    'documentation',
-    'antigravity',
-    'google',
-    undefined,
-    undefined,
-    MODEL_IDS.antigravityDocs,
-    'low',
-    undefined,
-  ]);
-});
-
-Deno.test('Claude review stays opposite-family on GPT-5.6 Sol xhigh', () => {
-  const route = resolveCanonicalRoute('review_claude', new Date('2026-07-10T00:00:00Z'));
-  equal([route.agent, route.provider, route.model, route.effort], [
-    'codex',
-    'openai',
-    'gpt-5.6-sol',
-    'xhigh',
-  ]);
-});
-
-Deno.test('canonical evaluator lanes bind each authored family to its opposite-family route', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  const claudeReview = resolveCanonicalOrdinaryReviewRoute({
-    authorFamily: 'anthropic',
-    generatorSession: { ...session, agent: 'claude', sessionId: 'claude-generator' },
-    evaluatorSession: { ...session, agent: 'codex', sessionId: 'codex-evaluator' },
-  }, at);
-  const codexReview = resolveCanonicalOrdinaryReviewRoute({
-    authorFamily: 'openai',
-    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-    evaluatorSession: { ...session, agent: 'claude', sessionId: 'claude-evaluator' },
-  }, at);
-  equal([claudeReview.lane, claudeReview.model, claudeReview.effort], [
-    'review_claude',
-    'gpt-5.6-sol',
-    'xhigh',
-  ]);
-  equal([codexReview.lane, codexReview.model, codexReview.effort], [
-    'review_codex',
-    'fable-5',
-    'low',
-  ]);
-});
-
-Deno.test('canonical evaluator resolution rejects self-certification', () => {
-  const at = new Date('2026-07-13T00:00:00Z');
-  const generatorSession = { ...session, agent: 'codex', sessionId: 'generator' } as const;
-  assertThrows(() =>
-    resolveCanonicalOrdinaryReviewRoute({
-      authorFamily: 'openai',
-      generatorSession,
-      evaluatorSession: generatorSession,
-    }, at)
-  );
-  assertThrows(() =>
-    resolveCanonicalOrdinaryReviewRoute({
-      authorFamily: 'openai',
-      generatorSession,
-      evaluatorSession: { ...session, agent: 'codex', sessionId: 'same-family-evaluator' },
-    }, at)
-  );
-});
-
-Deno.test('formal evaluator defaults to a native opposite-family session', () => {
-  for (const phase of ['plan', 'impl'] as const) {
-    const codexAuthored = resolveCanonicalFormalEvaluatorRoute({
-      phase,
-      authorFamily: 'openai',
-      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-      evaluatorSession: { ...session, agent: 'claude', sessionId: `${phase}-claude-evaluator` },
-    }, new Date('2026-08-08T00:00:00Z'));
-    equal([
-      codexAuthored.agent,
-      codexAuthored.provider,
-      codexAuthored.model,
-      codexAuthored.effort,
-      codexAuthored.evaluatesFamily,
-    ], ['claude', 'anthropic', MODEL_IDS.fable, 'medium', 'openai']);
-
-    const claudeAuthored = resolveCanonicalFormalEvaluatorRoute({
-      phase,
-      authorFamily: 'anthropic',
-      generatorSession: { ...session, agent: 'claude', sessionId: 'claude-generator' },
-      evaluatorSession: { ...session, agent: 'codex', sessionId: `${phase}-codex-evaluator` },
-    }, new Date('2026-08-08T00:00:00Z'));
-    equal([
-      claudeAuthored.agent,
-      claudeAuthored.provider,
-      claudeAuthored.model,
-      claudeAuthored.effort,
-      claudeAuthored.evaluatesFamily,
-    ], [
-      'codex',
-      'openai',
-      MODEL_IDS.codexSol,
-      phase === 'plan' ? 'high' : 'xhigh',
-      'anthropic',
-    ]);
-  }
-});
-
-Deno.test('formal evaluator uses Qwen Flash/GLM Flash only for explicit open-model routing', () => {
-  for (
-    const [phase, presetId, model, effort] of [
-      ['plan', 'claude-evaluator-qwen-3-8-flash', OPENROUTER_MODEL_IDS.planEvaluator, 'max'],
-      [
-        'impl',
-        'claude-evaluator-glm-5-3-flash',
-        OPENROUTER_MODEL_IDS.implEvaluator,
-        'max',
-      ],
-    ] as const
-  ) {
-    for (const fallbackReason of ['third_opinion', 'native_quota_limit'] as const) {
-      const route = resolveCanonicalFormalEvaluatorRoute({
-        phase,
-        authorFamily: 'openai',
-        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-        evaluatorSession: { ...session, agent: 'claude', sessionId: `${phase}-open-evaluator` },
-        fallbackReason,
-      }, new Date('2026-08-08T00:00:00Z'));
-      equal([
-        route.agent,
-        route.provider,
-        route.profileId,
-        route.presetId,
-        route.model,
-        route.effort,
-        route.evaluatorModelPolicy,
-      ], ['claude', 'openrouter', 'claude-openrouter', presetId, model, effort, 'open_only']);
-    }
-  }
-});
-
-Deno.test('formal evaluator falls back to AGY Gemini 3.6 Flash high only on explicit OpenRouter limit', () => {
-  const at = new Date('2026-08-06T00:00:00Z');
-  for (const phase of ['plan', 'impl'] as const) {
-    const route = resolveCanonicalFormalEvaluatorRoute({
-      phase,
-      authorFamily: 'openai',
-      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-      evaluatorSession: {
-        ...session,
-        agent: 'antigravity',
-        sessionId: `${phase}-agy-evaluator`,
-      },
-      fallbackReason: 'openrouter_limit',
-    }, at);
-    equal([
-      route.lane,
-      route.agent,
-      route.provider,
-      route.model,
-      route.effort,
-      route.condition,
-    ], [
-      phase === 'plan' ? 'formal_plan_evaluation' : 'formal_impl_evaluation',
-      'antigravity',
-      'google',
-      MODEL_IDS.antigravityDocs,
-      'high',
-      'fallback_on_openrouter_limit',
-    ]);
-  }
-
-  assertThrows(() =>
-    resolveCanonicalFormalEvaluatorRoute({
-      phase: 'impl',
-      authorFamily: 'openai',
-      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-      evaluatorSession: { ...session, agent: 'claude', sessionId: 'wrong-fallback-agent' },
-      fallbackReason: 'openrouter_limit',
-    }, at)
-  );
-});
-
-Deno.test('formal evaluator rejects wrong native family and reused generator sessions', () => {
-  const at = new Date('2026-07-13T00:00:00Z');
-  const generatorSession = { ...session, agent: 'codex', sessionId: 'codex-generator' } as const;
-  const evaluatorSession = { ...session, agent: 'claude', sessionId: 'claude-evaluator' } as const;
-  const route = resolveCanonicalRoute('formal_impl_evaluation', at);
-  assertThrows(() =>
-    resolveCanonicalFormalEvaluatorRoute({
-      phase: 'impl',
-      authorFamily: 'openai',
-      generatorSession,
-      evaluatorSession,
-      route: { ...route, evaluatesFamily: 'anthropic' },
-    }, at)
-  );
-  assertThrows(() =>
-    resolveCanonicalFormalEvaluatorRoute({
-      phase: 'impl',
-      authorFamily: 'openai',
-      generatorSession,
-      evaluatorSession: generatorSession,
-    }, at)
-  );
-});
-
-Deno.test('formal evaluator rejects cross-phase presets', () => {
-  const at = new Date('2026-07-13T00:00:00Z');
-  const common = {
-    authorFamily: 'openai' as const,
-    generatorSession: { ...session, agent: 'codex' as const, sessionId: 'codex-generator' },
-    evaluatorSession: { ...session, agent: 'claude' as const, sessionId: 'open-evaluator' },
-  };
-  assertThrows(() =>
-    resolveCanonicalFormalEvaluatorRoute({
-      ...common,
-      phase: 'plan',
-      fallbackReason: 'third_opinion',
-      route: CANONICAL_ROUTE_POLICY.find((entry) =>
-        entry.lane === 'formal_impl_evaluation' &&
-        entry.condition === 'open_model_route'
-      ),
-    }, at)
-  );
-  assertThrows(() =>
-    resolveCanonicalFormalEvaluatorRoute({
-      ...common,
-      phase: 'impl',
-      fallbackReason: 'third_opinion',
-      route: CANONICAL_ROUTE_POLICY.find((entry) =>
-        entry.lane === 'formal_plan_evaluation' &&
-        entry.condition === 'open_model_route'
-      ),
-    }, at)
-  );
-});
-
-Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
-  const at = new Date('2026-07-13T00:00:00Z');
-  const route = CANONICAL_ROUTE_POLICY.find((entry) =>
-    entry.lane === 'formal_impl_evaluation' &&
-    entry.condition === 'open_model_route'
-  )!;
-  assertThrows(
-    () =>
-      resolveCanonicalFormalEvaluatorRoute({
-        phase: 'impl',
-        authorFamily: 'openai',
-        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
-        fallbackReason: 'third_opinion',
-        route: { ...route, model: 'qwen/qwen3.7-max' },
-      }, at),
-    Error,
-    'formal impl evaluator requires its canonical OpenRouter escalation route',
-  );
-});
-
-Deno.test('formal IMPL evaluator ignores the retired complexity split and selects GLM Flash', () => {
-  const at = new Date('2026-08-06T00:00:00Z');
-  const route = resolveCanonicalFormalEvaluatorRoute({
-    phase: 'impl',
-    complexity: 'complex',
-    authorFamily: 'openai',
-    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-    evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
-    fallbackReason: 'third_opinion',
-  }, at);
-  equal([
-    route.presetId,
-    route.model,
-    route.effort,
-    route.condition,
-  ], [
-    'claude-evaluator-glm-5-3-flash',
-    OPENROUTER_MODEL_IDS.implEvaluator,
-    'max',
-    'open_model_route',
-  ]);
-});
-
-Deno.test('formal evaluator rejects the Gemini documentation-authoring generator lane', () => {
-  const at = new Date('2026-08-03T00:00:00Z');
-  const geminiGeneratorRoute = resolveCanonicalRoute('documentation_authoring', at);
-  assertThrows(
-    () =>
-      resolveCanonicalFormalEvaluatorRoute({
-        phase: 'impl',
-        authorFamily: 'openai',
-        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
-        fallbackReason: 'third_opinion',
-        route: geminiGeneratorRoute,
-      }, at),
-    Error,
-    'formal impl evaluator requires its canonical OpenRouter escalation route',
-  );
-});
-
-Deno.test('review-of-Codex ladder is effort-paired and Fable is reserved for medium+', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  // Small slices → Opus 5 high; normal/complex → Fable 5 (low/medium), in-plan and
-  // auto-selectable per PR #784 (Fable 5 restored); fast → Opus medium.
-  const expected: Record<string, [string, string]> = {
-    review_codex_light: ['opus-5', 'high'],
-    review_codex: ['fable-5', 'low'],
-    review_codex_complex: ['fable-5', 'medium'],
-    review_codex_fast: ['opus-5', 'medium'],
-  };
-  for (const [lane, [model, effort]] of Object.entries(expected)) {
-    const route = resolveCanonicalRoute(lane as Parameters<typeof resolveCanonicalRoute>[0], at);
-    equal([route.agent, route.provider, route.model, route.effort], [
-      'claude',
-      'anthropic',
-      model,
-      effort,
-    ]);
-  }
-});
-
-Deno.test('every review-of-Codex route is opposite-family (Claude); Fable primaries are in-plan and auto-selectable', () => {
-  const reviewLanes = new Set([
-    'review_codex_light',
-    'review_codex',
-    'review_codex_complex',
-    'review_codex_fast',
-  ]);
-  const routes = CANONICAL_ROUTE_POLICY.filter((route) => reviewLanes.has(route.lane));
-  equal(routes.length > 0, true);
-  for (const route of routes) {
-    equal([route.agent, route.provider], ['claude', 'anthropic']);
-    if (route.model === 'fable-5') {
-      // Fable 5 restored (PR #784): review primaries are included, ungated, unconditional.
-      equal(route.subscriptionState, 'included');
-      equal(route.requiresExplicitApproval, undefined);
-      equal(route.condition, undefined);
-    }
-  }
-  // The auto-selected reviewer for the two medium+ pairings is Fable.
-  const fablePairings = routes.filter((route) => route.model === 'fable-5').map((r) => r.lane);
-  equal(fablePairings.includes('review_codex'), true);
-  equal(fablePairings.includes('review_codex_complex'), true);
-});
-
-Deno.test('token-limit review fallbacks stay Claude-family and are never primary', () => {
-  const fallbacks = CANONICAL_ROUTE_POLICY.filter((route) =>
-    route.condition === 'token_limit_fallback'
-  );
-  equal(
-    fallbacks.map((r) => [r.lane, r.model, r.effort]).toSorted(),
     [
-      ['review_codex', 'opus-5', 'low'],
-      ['review_codex_complex', 'opus-5', 'medium'],
-      ['review_codex_fast', 'sonnet-5', 'high'],
-      ['review_codex_light', 'sonnet-5', 'high'],
-    ].toSorted(),
+      {
+        tier: 'architecture',
+        role: 'implementation',
+        priority: 0,
+        model: 'astra',
+        family: 'openai',
+        effort: 'xhigh',
+      },
+      {
+        tier: 'architecture',
+        role: 'implementation',
+        priority: 1,
+        model: 'fable_5_1',
+        family: 'anthropic',
+        effort: 'xhigh',
+      },
+    ],
   );
-  for (const route of fallbacks) {
-    equal([route.agent, route.provider], ['claude', 'anthropic']);
-    // A token-limit fallback is never returned as the canonical primary.
-    const primary = resolveCanonicalRoute(route.lane, new Date('2026-07-16T00:00:00Z'));
-    equal(primary.condition !== 'token_limit_fallback', true);
-  }
+  assertEquals(CANONICAL_COORDINATOR_POLICY.length, 9);
 });
 
-Deno.test('docs_audit is an opposite-family Codex Sol medium single pass with NO cross-family fallback', () => {
-  const at = new Date('2026-07-17T00:00:00Z');
-  const route = resolveCanonicalRoute('docs_audit', at);
-  equal([route.agent, route.provider, route.model, route.effort], [
-    'codex',
-    'openai',
-    'gpt-5.6-sol',
+Deno.test('Astra replaces SOL for feature and higher implementation tiers', () => {
+  assertEquals(
+    resolveWorkloadRoute({
+      tier: 'feature',
+      role: 'implementation',
+      worktree,
+    }),
+    {
+      agent: 'codex',
+      provider: 'openai',
+      model: ROUTING_MODEL_IDS.astraNative,
+      effort: 'low',
+      worktree,
+      mobileRequired: false,
+      logicalModel: 'astra',
+      family: 'openai',
+      transport: 'codex',
+      requestedEffort: 'low',
+    },
+  );
+  assertEquals(
+    resolveWorkloadRoute({
+      tier: 'complex',
+      role: 'implementation',
+      worktree,
+      privilegedTierAuthorization,
+    }).effort,
     'medium',
-  ]);
-  equal(route.purpose, 'docs_audit');
-  // The audit is defined by its opposite-family (Codex) transport reviewing
-  // Claude-generated docs, so there is exactly one docs_audit route and no fallback.
-  const auditRoutes = CANONICAL_ROUTE_POLICY.filter((entry) => entry.lane === 'docs_audit');
-  equal(auditRoutes.length, 1);
-  equal(auditRoutes.every((entry) => entry.agent === 'codex' && entry.provider === 'openai'), true);
-});
-
-Deno.test('docs_audit large-changeset high effort is declared policy data, not prose', () => {
-  const route = resolveCanonicalRoute('docs_audit', new Date('2026-07-17T00:00:00Z'));
-  // Default: the declared route effort.
-  equal(resolveCanonicalRouteEffort(route), 'medium');
-  // Declared escalation: large changesets audit at high on the SAME route.
-  equal(resolveCanonicalRouteEffort(route, 'large_changeset'), 'high');
-  equal(route.effortEscalations, [{ condition: 'large_changeset', effort: 'high' }]);
-  // Undeclared escalation conditions are rejected, not silently defaulted.
-  assertThrows(() => resolveCanonicalRouteEffort(route, 'because_i_felt_like_it'));
-});
-
-Deno.test('docs_audit fallback selection fails closed on any non-OpenAI-family candidate', () => {
-  // A Claude-family candidate must NEVER be selectable for docs_audit — the lane
-  // is defined by its opposite-family transport and has no cross-family fallback.
-  const claudeFallback = candidate({ purpose: 'docs_audit', family: 'anthropic' });
-  equal(
-    selectFallbackCandidate(
-      [claudeFallback],
-      context({ purpose: 'docs_audit', authorFamily: 'anthropic' }),
-    ),
-    { status: 'blocked', reason: 'route_unavailable' },
   );
-  // A same-family (OpenAI) Codex candidate remains selectable.
-  const codexFallback = candidate({
-    purpose: 'docs_audit',
-    family: 'openai',
-    route: route('codex'),
+  assertEquals(
+    resolveWorkloadRoute({
+      tier: 'complex',
+      role: 'implementation',
+      worktree,
+      privilegedTierAuthorization,
+    }).privilegedTierAuthorization,
+    privilegedTierAuthorization,
+  );
+  assertEquals(
+    resolveWorkloadRoute({
+      tier: 'architecture',
+      role: 'implementation',
+      worktree,
+      privilegedTierAuthorization,
+    }).effort,
+    'xhigh',
+  );
+});
+
+Deno.test('provider capability resolution honors subscription-first order', () => {
+  const go = resolveWorkloadRoute({
+    tier: 'feature',
+    role: 'implementation_evaluation',
+    generatorModel: 'astra',
+    worktree,
   });
-  equal(
-    selectFallbackCandidate(
-      [claudeFallback, codexFallback],
-      context({ purpose: 'docs_audit', authorFamily: 'anthropic' }),
-    ).status,
-    'selected',
+  assertEquals([go.transport, go.provider, go.model], [
+    'opencode_go',
+    'opencode_go',
+    ROUTING_MODEL_IDS.museSpark13Go,
+  ]);
+  const ollama = resolveWorkloadRoute({
+    tier: 'feature',
+    role: 'implementation_evaluation',
+    generatorModel: 'astra',
+    unavailableTransports: ['opencode_go'],
+    unavailableModels: ['muse_spark_1_3'],
+    worktree,
+  });
+  assertEquals(ollama.logicalModel, 'opus_5');
+  assertEquals(ollama.transport, 'claude');
+});
+
+Deno.test('deep research uses Gemini by coverage and only native Luna as fallback', () => {
+  const primary = resolveWorkloadRoute({
+    tier: 'straightforward',
+    role: 'deep_research',
+    worktree,
+  });
+  assertEquals(
+    [primary.logicalModel, primary.transport, primary.model, primary.requestedEffort],
+    ['gemini_3_8_flash', 'agy', ROUTING_MODEL_IDS.gemini38FlashNative, 'medium'],
+  );
+
+  const fallback = resolveWorkloadRoute({
+    tier: 'feature',
+    role: 'deep_research',
+    unavailableModels: ['gemini_3_8_flash'],
+    worktree,
+  });
+  assertEquals(
+    [fallback.logicalModel, fallback.transport, fallback.model, fallback.requestedEffort],
+    ['luna', 'codex', ROUTING_MODEL_IDS.lunaNative, 'max'],
+  );
+
+  assertThrows(
+    () =>
+      resolveWorkloadRoute({
+        tier: 'feature',
+        role: 'deep_research',
+        unavailableModels: ['gemini_3_8_flash'],
+        unavailableTransports: ['codex'],
+        worktree,
+      }),
+    Error,
+    'no available route in the declared fallback chain',
   );
 });
 
-Deno.test('docs_polish is Claude Fable 5 medium edit-only, with an ordered depth-2 fallback chain', () => {
-  const at = new Date('2026-07-17T00:00:00Z');
-  const route = resolveCanonicalRoute('docs_polish', at);
-  equal([route.agent, route.provider, route.model, route.effort], [
-    'claude',
-    'anthropic',
-    'fable-5',
-    'medium',
-  ]);
-  equal(route.purpose, 'docs_polish');
-  equal(route.subscriptionState, 'included');
-  equal(route.requiresExplicitApproval ?? false, false);
-  // The primary is never a fallback route.
-  equal(route.condition, 'edit_only_prose_polish_after_audit');
+Deno.test('same-family evaluator candidates are skipped before provider selection', () => {
+  const route = resolveWorkloadRoute({
+    tier: 'straightforward',
+    role: 'implementation_evaluation',
+    generatorModel: 'glm_5_3_flash',
+    worktree,
+  });
+  assertEquals(route.logicalModel, 'deepseek_v4_pro');
+  assertEquals(route.model, ROUTING_MODEL_IDS.deepseekV4ProGo);
 
-  // Fallback chain, in order: (1) token-limit → Opus 5 · xhigh (Claude-family),
-  // (2) no-Claude-surface → GLM 5.2 · xhigh over the claude-openrouter transport.
-  const chain = CANONICAL_ROUTE_POLICY.filter((entry) =>
-    entry.lane === 'docs_polish' && entry.condition !== 'edit_only_prose_polish_after_audit'
-  );
-  equal(chain.length, 2);
-  const [tokenLimit, noClaude] = chain;
-  equal(tokenLimit.condition, 'fallback_on_fable_token_limit');
-  equal([tokenLimit.agent, tokenLimit.provider, tokenLimit.model, tokenLimit.effort], [
-    'claude',
-    'anthropic',
-    'opus-5',
-    'xhigh',
-  ]);
-  equal(noClaude.condition, 'fallback_no_claude_surface');
-  equal([noClaude.agent, noClaude.provider, noClaude.model, noClaude.effort], [
-    'claude',
-    'openrouter',
-    OPENROUTER_MODEL_IDS.designGlm,
-    'xhigh',
-  ]);
-  // The last-resort GLM fallback rides the same design-lane claude-openrouter transport.
-  equal(noClaude.profileId, 'claude-openrouter');
+  const plan = resolveWorkloadRoute({
+    tier: 'complex',
+    role: 'plan_evaluation',
+    generatorModel: 'muse_spark_1_3',
+    worktree,
+    privilegedTierAuthorization,
+  });
+  assertEquals(plan.logicalModel, 'grok_4_6');
+  assertEquals(plan.effort, 'high');
 });
 
-Deno.test('implementation lanes are effort-tiered on GPT-5.6 Sol', () => {
-  const at = new Date('2026-07-16T00:00:00Z');
-  const expected: Record<string, string> = {
-    light_implementation: 'low',
-    normal_implementation: 'medium',
-    complex_implementation: 'high',
-  };
-  for (const [lane, effort] of Object.entries(expected)) {
-    const route = resolveCanonicalRoute(lane as Parameters<typeof resolveCanonicalRoute>[0], at);
-    equal([route.agent, route.provider, route.model, route.effort], [
-      'codex',
-      'openai',
-      'gpt-5.6-sol',
-      effort,
-    ]);
-  }
+Deno.test('complex rows fail closed without recorded privileged-tier authority', () => {
+  assertThrows(
+    () => resolveWorkloadRoute({ tier: 'complex', role: 'implementation', worktree }),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+  assertThrows(
+    () => resolveWorkloadRoute({ tier: 'architecture', role: 'implementation', worktree }),
+    Error,
+    'requires explicit owner or milestone-coordinator authorization',
+  );
+});
+
+Deno.test('provider-default effort resolves through the pinned OpenCode default', () => {
+  const route = resolveWorkloadRoute({
+    tier: 'feature',
+    role: 'plan_evaluation',
+    generatorModel: 'fable_5_1',
+    worktree,
+  });
+  assertEquals(route.requestedEffort, 'provider_default');
+  assertEquals(route.effort, 'high');
+});
+
+Deno.test('unavailable providers advance inside the model capability chain', () => {
+  const route = resolveWorkloadRoute({
+    tier: 'feature',
+    role: 'plan_evaluation',
+    generatorModel: 'astra',
+    unavailableTransports: ['opencode_go', 'ollama'],
+    worktree,
+  });
+  assertEquals(route.transport, 'openrouter');
+  assertEquals(route.model, ROUTING_MODEL_IDS.glm53OpenRouter);
+});
+
+Deno.test('coordinator routes follow the dedicated matrix', () => {
+  assertEquals(resolveCoordinatorRoute({ tier: 'framework', worktree }).logicalModel, 'astra');
+  assertEquals(
+    resolveCoordinatorRoute({
+      tier: 'framework',
+      unavailableModels: ['astra'],
+      worktree,
+    }).logicalModel,
+    'opus_5',
+  );
+  assertEquals(
+    resolveCoordinatorRoute({
+      tier: 'milestone',
+      unavailableModels: ['astra', 'fable_5_1'],
+      worktree,
+    }).logicalModel,
+    'opus_5',
+  );
+});
+
+Deno.test('evaluation requires a selected generator and a separate vendor/session', () => {
+  assertThrows(
+    () => resolveWorkloadRoute({ tier: 'feature', role: 'plan_evaluation', worktree }),
+    Error,
+    'requires the selected generator model',
+  );
+  assertThrows(
+    () =>
+      assertEvaluatorIndependence(
+        {
+          agent: 'codex',
+          sessionId: 'same',
+          worktree,
+          boundary: 'idle',
+          model: 'astra',
+        },
+        {
+          agent: 'opencode',
+          sessionId: 'same',
+          worktree,
+          boundary: 'new',
+          model: 'glm_5_3',
+        },
+      ),
+    Error,
+    'sessions must differ',
+  );
+  assertThrows(
+    () =>
+      assertEvaluatorIndependence(
+        {
+          agent: 'codex',
+          sessionId: 'generator',
+          worktree,
+          boundary: 'idle',
+          model: 'astra',
+        },
+        {
+          agent: 'codex',
+          sessionId: 'evaluator',
+          worktree,
+          boundary: 'new',
+          model: 'sol',
+        },
+      ),
+    Error,
+    'families must differ',
+  );
+});
+
+Deno.test('N/A roles and legacy active selection fail closed', () => {
+  assertThrows(
+    () => resolveWorkloadRoute({ tier: 'simple', role: 'plan', worktree }),
+    Error,
+    'not applicable',
+  );
+  assertThrows(
+    () => resolveLegacyRouteForNewSelection('normal_implementation'),
+    Error,
+    'deserialize-only',
+  );
+});
+
+Deno.test('empty capability chain reports a deterministic unavailable error', () => {
+  assertThrows(
+    () =>
+      resolveWorkloadRoute({
+        tier: 'feature',
+        role: 'implementation',
+        unavailableModels: ['astra', 'muse_spark_1_3'],
+        worktree,
+      }),
+    Error,
+    'no available route',
+  );
 });

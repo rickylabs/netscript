@@ -22,7 +22,15 @@ export type RuntimeCommandMode<K extends RuntimeCommandKind> = K extends 'doctor
   : 'plan' | 'apply';
 export const AGENT_KINDS = ['claude', 'codex', 'antigravity', 'opencode'] as const;
 export type AgentKind = typeof AGENT_KINDS[number];
-export const PROVIDER_KINDS = ['anthropic', 'openai', 'google', 'openrouter', 'custom'] as const;
+export const PROVIDER_KINDS = [
+  'anthropic',
+  'openai',
+  'google',
+  'opencode_go',
+  'ollama',
+  'openrouter',
+  'custom',
+] as const;
 export type ProviderKind = typeof PROVIDER_KINDS[number];
 export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'] as const;
 export type Effort = typeof EFFORTS[number];

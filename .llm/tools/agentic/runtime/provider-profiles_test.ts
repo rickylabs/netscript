@@ -55,6 +55,43 @@ Deno.test('provider profiles are finite, frozen, and clear every rival credentia
   }
 });
 
+Deno.test('OpenCode subscription profiles keep provider identities and credentials distinct', () => {
+  assertEquals(PROVIDER_PROFILES['opencode-go'], {
+    id: 'opencode-go',
+    agent: 'opencode',
+    provider: 'opencode_go',
+    endpointKind: 'subscription',
+    credentialSourceKey: 'OPENCODE_API_KEY',
+    credentialTargetKey: 'OPENCODE_API_KEY',
+    clearKeys: [
+      'ANTHROPIC_API_KEY',
+      'ANTHROPIC_AUTH_TOKEN',
+      'OPENAI_API_KEY',
+      'OLLAMA_API_KEY',
+      'OPENROUTER_API_KEY',
+      'ANTHROPIC_BASE_URL',
+      'OPENAI_BASE_URL',
+      'CLAUDE_CONFIG_DIR',
+    ],
+  });
+  assertEquals(
+    resolveProviderProfile(route({
+      agent: 'opencode',
+      provider: 'ollama',
+      profileId: 'opencode-ollama',
+    })),
+    PROVIDER_PROFILES['opencode-ollama'],
+  );
+  assertEquals(
+    resolveProviderProfile(route({
+      agent: 'opencode',
+      provider: 'openrouter',
+      profileId: 'opencode-openrouter',
+    })),
+    PROVIDER_PROFILES['opencode-openrouter'],
+  );
+});
+
 Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   assertEquals(OPENROUTER_PRESET_MODELS, [
     'qwen/qwen3.8-flash',

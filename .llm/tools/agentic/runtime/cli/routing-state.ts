@@ -6,17 +6,15 @@ import { CANONICAL_ROUTE_POLICY } from '../routing-policy.ts';
 import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 export function renderCanonicalEvaluatorRoutes(): string {
-  const routes = CANONICAL_ROUTE_POLICY.filter((route) => route.purpose === 'evaluation');
+  const routes = CANONICAL_ROUTE_POLICY.filter((route) =>
+    route.role === 'plan_evaluation' || route.role === 'implementation_evaluation' ||
+    route.role === 'vision_evaluation'
+  );
   return [
     'Canonical evaluator routes:',
-    ...routes.map((route) => {
-      const constraint = route.evaluatorModelPolicy
-        ? `policy=${route.evaluatorModelPolicy}`
-        : route.evaluatesFamily
-        ? `evaluates=${route.evaluatesFamily}`
-        : `condition=${route.condition ?? 'canonical'}`;
-      return `  ${route.lane}: ${constraint} route=${route.agent}/${route.provider}/${route.model} effort=${route.effort}`;
-    }),
+    ...routes.map((route) =>
+      `  ${route.tier}/${route.role}[${route.priority}]: family=${route.family} logical=${route.model} effort=${route.effort}`
+    ),
   ].join('\n');
 }
 

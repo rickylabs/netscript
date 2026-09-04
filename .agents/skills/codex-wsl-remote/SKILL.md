@@ -22,19 +22,19 @@ per-operator and per-machine. Fill in your own — put them in a git-ignored loc
 your values for the placeholders. **Nothing in this table is baked into the shipped prose.** The
 right-hand column is one operator's working example, not a required value.
 
-| Placeholder | What it is | How to obtain it | Example value |
-| ----------- | ---------- | ---------------- | ------------- |
-| `<WSL_DISTRO>` | WSL distro name | `wsl.exe -l -v` | `Ubuntu-24.04` |
-| `<WSL_USER>` | Linux username that runs Codex | your WSL login | `codex` |
-| `<WSL_HOME>` | that user's home dir | `echo $HOME` inside WSL | `/home/codex` |
-| `<CODEX_SSH_HOST>` | SSH host alias in `~/.ssh/config` | your `Host` block | `codex-wsl` |
-| `<SSH_PORT>` | port sshd listens on in WSL | your sshd config | `2222` |
-| `<SSH_IDENTITY>` | Windows path to the SSH key | your key location | `C:\Users\<you>\.ssh\codex_wsl_ed25519` |
-| `<HOST>` | device/server name remote-control reports | `serverName` in `remote-control start --json` | `YogaBook9i` |
-| `<ENV_ID>` | remote-control environment id | `environmentId` in `remote-control start --json` | `env_e_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
-| `<REPO_WSL>` | native ext4 worktree root for the branch family | `git worktree list` inside WSL | `/home/codex/repos/netscript-wave5-apps` |
-| `<THREAD_ID>` | a session thread uuid | printed by `send-message-v2` / `codex-status.ts` | `019ec234-4e7f-70c0-91a0-97de455702f8` |
-| `<CODEX_BIN_DIR>` | dir holding the `codex` binary | `command -v codex` inside a login shell (then take its dirname) | `$HOME/.local/bin` |
+| Placeholder        | What it is                                      | How to obtain it                                                | Example value                            |
+| ------------------ | ----------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------- |
+| `<WSL_DISTRO>`     | WSL distro name                                 | `wsl.exe -l -v`                                                 | `Ubuntu-24.04`                           |
+| `<WSL_USER>`       | Linux username that runs Codex                  | your WSL login                                                  | `codex`                                  |
+| `<WSL_HOME>`       | that user's home dir                            | `echo $HOME` inside WSL                                         | `/home/codex`                            |
+| `<CODEX_SSH_HOST>` | SSH host alias in `~/.ssh/config`               | your `Host` block                                               | `codex-wsl`                              |
+| `<SSH_PORT>`       | port sshd listens on in WSL                     | your sshd config                                                | `2222`                                   |
+| `<SSH_IDENTITY>`   | Windows path to the SSH key                     | your key location                                               | `C:\Users\<you>\.ssh\codex_wsl_ed25519`  |
+| `<HOST>`           | device/server name remote-control reports       | `serverName` in `remote-control start --json`                   | `YogaBook9i`                             |
+| `<ENV_ID>`         | remote-control environment id                   | `environmentId` in `remote-control start --json`                | `env_e_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| `<REPO_WSL>`       | native ext4 worktree root for the branch family | `git worktree list` inside WSL                                  | `/home/codex/repos/netscript-wave5-apps` |
+| `<THREAD_ID>`      | a session thread uuid                           | printed by `send-message-v2` / `codex-status.ts`                | `019ec234-4e7f-70c0-91a0-97de455702f8`   |
+| `<CODEX_BIN_DIR>`  | dir holding the `codex` binary                  | `command -v codex` inside a login shell (then take its dirname) | `$HOME/.local/bin`                       |
 
 Notes:
 
@@ -49,18 +49,18 @@ Notes:
 
 ### Launch model (the one rule that matters)
 
-| Goal | Command | Visibility |
-| ---- | ------- | ---------- |
-| **Start a new session** | `codex debug app-server send-message-v2 "<prompt>"` (in the worktree, against the managed daemon) | **Mobile + Desktop visible, steerable** |
-| **Steer an existing session** | `codex exec resume <thread-id> "<follow-up>"` | continues the same thread |
-| Headless one-off (no phone) | `codex exec ...` (standalone) | **Desktop sync only — never reaches mobile** |
+| Goal                          | Command                                                                                           | Visibility                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Start a new session**       | `codex debug app-server send-message-v2 "<prompt>"` (in the worktree, against the managed daemon) | **Mobile + Desktop visible, steerable**      |
+| **Steer an existing session** | `codex exec resume <thread-id> "<follow-up>"`                                                     | continues the same thread                    |
+| Headless one-off (no phone)   | `codex exec ...` (standalone)                                                                     | **Desktop sync only — never reaches mobile** |
 
-- `send-message-v2` registers a thread with the running remote-control daemon, so it appears on
-  your phone. This is the correct launcher for supervisor/implementation sessions.
-- **Never run two `send-message-v2` calls against the same worktree concurrently.** Each call
-  spawns a *new* thread; two live threads in one worktree fork rival agents that fight over the
-  same files and git index (race / clobber). One active send per worktree, sequential.
-- To continue or correct a running session, **resume it** (`codex exec resume`) — do *not* fire a
+- `send-message-v2` registers a thread with the running remote-control daemon, so it appears on your
+  phone. This is the correct launcher for supervisor/implementation sessions.
+- **Never run two `send-message-v2` calls against the same worktree concurrently.** Each call spawns
+  a _new_ thread; two live threads in one worktree fork rival agents that fight over the same files
+  and git index (race / clobber). One active send per worktree, sequential.
+- To continue or correct a running session, **resume it** (`codex exec resume`) — do _not_ fire a
   second `send-message-v2`, which forks a rival rather than steering the original.
 - Bare `codex exec` (no resume) spawns a standalone process the daemon does not manage; it is
   Desktop-sync only and never appears on mobile. Use it only for headless work you don't need to
@@ -73,32 +73,32 @@ inspecting Codex slices (and dispatching/reading OpenHands). It defends every la
 (PowerShell `<`/`$()` parse errors, CRLF-corrupted bash scripts, inherited-upstream push-to-main,
 rival concurrent sends, leaked tokens) and is unit-tested. Reach for these before writing a fresh
 `ssh.exe`/`wsl.exe` one-liner. **Used together they fully cover the supervision loop** — launch,
-progress, finish, steer, evaluate, merge — so you should rarely need a raw shell call. Full flags and
-exit codes: `.llm/tools/agentic/README.md`.
+progress, finish, steer, evaluate, merge — so you should rarely need a raw shell call. Full flags
+and exit codes: `.llm/tools/agentic/README.md`.
 
-| Phase | Need | Tool |
-| ----- | ---- | ---- |
-| **Launch** | Validate brief → push-safety gate → stage (CRLF-stripped) → launch a slice → record thread id | `launch-codex-slice.ts` (`--dry-run`, `--parse-log <log>`) |
-| **Inspect** | Read-only daemon health, worktree git state + logs path, recent session rollouts | `codex-status.ts` (`--worktree`, `--pretty`) |
-| **Watch — progress** | Wake on the worktree's next **git** event (commit/ref) — *slice made progress* | `codex-watch.ts --worktree <wt>` (**run inside WSL**) |
-| **Watch — finish** | Wake when the agent's **turn finishes** (rollout `task_complete`) — *agent is idle/done* | `codex-watch.ts --mode turn --thread-id <uuid>` (**run inside WSL**) |
-| **Steer** | Continue/correct an existing thread (never forks a rival) | `codex-resume.ts --thread-id <uuid> --message …` (`--dry-run`) |
-| **Evaluate** | Local PLAN/IMPL-EVAL normally uses a fresh native opposite-family Claude/Codex session (see `lane-policy.md`); OpenRouter is third-opinion/native-limit escalation, and OpenHands is only for explicitly cloud-driven work | native Claude/Codex launchers; `dispatch-openhands.ts`, `openhands-status.ts` (cloud only) |
-| **Merge** | Eval-gated, clean-gated, base-guarded leaf-PR lifecycle | `gh-pr.ts create\|verdict\|merge` |
+| Phase                | Need                                                                                                                               | Tool                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Launch**           | Validate brief → push-safety gate → stage (CRLF-stripped) → launch a slice → record thread id                                      | `launch-codex-slice.ts` (`--dry-run`, `--parse-log <log>`)                                                                |
+| **Inspect**          | Read-only daemon health, worktree git state + logs path, recent session rollouts                                                   | `codex-status.ts` (`--worktree`, `--pretty`)                                                                              |
+| **Watch — progress** | Wake on the worktree's next **git** event (commit/ref) — _slice made progress_                                                     | `codex-watch.ts --worktree <wt>` (**run inside WSL**)                                                                     |
+| **Watch — finish**   | Wake when the agent's **turn finishes** (rollout `task_complete`) — _agent is idle/done_                                           | `codex-watch.ts --mode turn --thread-id <uuid>` (**run inside WSL**)                                                      |
+| **Steer**            | Continue/correct an existing thread (never forks a rival)                                                                          | `codex-resume.ts --thread-id <uuid> --message …` (`--dry-run`)                                                            |
+| **Evaluate**         | Select the workload-tier evaluator, skip the generator's vendor family, and follow the provider/expense policy in `lane-policy.md` | native launchers or paid OpenCode route selected by policy; OpenHands only for explicitly cloud-driven compatibility work |
+| **Merge**            | Eval-gated, clean-gated, base-guarded leaf-PR lifecycle                                                                            | `gh-pr.ts create\|verdict\|merge`                                                                                         |
 
 **The watch distinction is the one that bites you.** `codex-watch` has two signals and they answer
 different questions:
 
-- `--mode git` (default) watches the worktree's gitdir `logs` and fires on the next commit/ref write.
-  It tells you the slice *progressed* — it does **not** tell you the agent stopped. A turn can commit
-  mid-flight and keep working, or finish a whole turn with no commit at all. Re-arm it after each
-  event to keep surfacing commits as the slice runs.
+- `--mode git` (default) watches the worktree's gitdir `logs` and fires on the next commit/ref
+  write. It tells you the slice _progressed_ — it does **not** tell you the agent stopped. A turn
+  can commit mid-flight and keep working, or finish a whole turn with no commit at all. Re-arm it
+  after each event to keep surfacing commits as the slice runs.
 - `--mode turn` watches the thread's session rollout `.jsonl` (`rollout-<ts>-<uuid>.jsonl` under
   `~/.codex/sessions`, resolved from `--thread-id`) and fires when the latest record is
-  `task_complete` — the daemon's end-of-turn marker. This is the **"agent finished / is idle"** signal.
-  If the thread is already idle when armed it returns at once with `alreadyIdle:true`. Use this to
-  know when a steered turn is actually done (vs. just having committed), and before deciding whether
-  the thread is free to steer again.
+  `task_complete` — the daemon's end-of-turn marker. This is the **"agent finished / is idle"**
+  signal. If the thread is already idle when armed it returns at once with `alreadyIdle:true`. Use
+  this to know when a steered turn is actually done (vs. just having committed), and before deciding
+  whether the thread is free to steer again.
 
 Run **both** in parallel when supervising: git-mode to narrate commits, turn-mode to detect idle.
 Both exit `0` on their event, `2` on the `--timeout-seconds` heartbeat (re-arm; a hung agent still
@@ -130,8 +130,8 @@ Every prompt/brief file passed to `send-message-v2` MUST:
 ## Verified Baseline
 
 The tool/config snapshot below is one verified machine's baseline (recorded on Codex `0.140.0`,
-2026-06-16). Re-verify per branch with the [Verification Commands](#verification-commands); treat the
-identifiers as your local-profile placeholders, not fixed values.
+2026-06-16). Re-verify per branch with the [Verification Commands](#verification-commands); treat
+the identifiers as your local-profile placeholders, not fixed values.
 
 - WSL distro: `<WSL_DISTRO>`
 - WSL user: `<WSL_USER>`
@@ -145,13 +145,14 @@ identifiers as your local-profile placeholders, not fixed values.
   `model_reasoning_summary = "auto"`, and `model_verbosity = "medium"`.
 - Native WSL worktree root: `<REPO_WSL>`
 - Deno toolchain: `2.8.x` (PR #44 upgrade). Other tool versions below are a captured snapshot —
-  re-verify per branch with the toolchain command in [Verification Commands](#verification-commands).
+  re-verify per branch with the toolchain command in
+  [Verification Commands](#verification-commands).
 - Snapshot toolchain: use the pinned versions in `.github/toolchain.env`.
 
 Model, provider, and effort are required launch identity. Select them from
-`.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table. Pinned
-tool versions are centralized in `.llm/tools/agentic/config/versions.ts` — treat version literals
-above as snapshots.
+`.llm/harness/workflow/lane-policy.md`; this skill does not carry a second effort table. Pinned tool
+versions are centralized in `.llm/tools/agentic/config/versions.ts` — treat version literals above
+as snapshots.
 
 For daemon/session health and repair, reach for the runtime controller **first**:
 `deno task agentic:runtime doctor` / `status --worktree <path>` are inspect-only, and
@@ -169,14 +170,14 @@ Run it from Windows PowerShell when transport needs restoration:
 powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\codex-wsl-remote\scripts\start-codex-wsl-remote.ps1"
 ```
 
-The helper starts a hidden WSL keepalive, restarts WSL `ssh.service`, verifies `ssh <CODEX_SSH_HOST>`,
-writes the full-access Codex app-server config with medium reasoning defaults, restarts the managed
-daemon, starts `codex remote-control`, and checks the toolchain.
+The helper starts a hidden WSL keepalive, restarts WSL `ssh.service`, verifies
+`ssh <CODEX_SSH_HOST>`, writes the full-access Codex app-server config with medium reasoning
+defaults, restarts the managed daemon, starts `codex remote-control`, and checks the toolchain.
 
 ## Native Worktree Rule
 
-Run full NetScript Deno/npm/Aspire gates from native WSL ext4 paths under `<WSL_HOME>/repos/`.
-Do not run full CLI E2E from `/mnt/c`: Deno's internal npm materialization can hit DrvFS
+Run full NetScript Deno/npm/Aspire gates from native WSL ext4 paths under `<WSL_HOME>/repos/`. Do
+not run full CLI E2E from `/mnt/c`: Deno's internal npm materialization can hit DrvFS
 `Operation not permitted (os error 1)` even when ordinary shell copy/write commands work.
 
 Known good full E2E smoke:
@@ -225,7 +226,7 @@ ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; codex app-server 
 A single `codex debug app-server send-message-v2` against a managed daemon is **safe** and leaves
 remote-control managed — verified 2026-06-16 on Codex `0.140.0`: a no-edit smoke completed and
 `codex app-server daemon version` still reported the same managed pid with `--remote-control` and
-the control socket intact. `send-message-v2` is the *launcher* for mobile-visible sessions, not a
+the control socket intact. `send-message-v2` is the _launcher_ for mobile-visible sessions, not a
 forbidden command.
 
 The real hazard is **concurrency, not the command**: two `send-message-v2` calls live against the
@@ -261,8 +262,8 @@ you later need to steer the session. Confirm the thread on your phone to prove m
 ## Launching Supervisor Or Implementation Sessions
 
 Start Desktop/mobile-visible Codex sessions from the native WSL worktree path for the relevant
-branch. A branch family keeps one native worktree per slice under `<WSL_HOME>/repos/`; list them with
-`git worktree list` inside WSL. For example, a multi-slice family looks like:
+branch. A branch family keeps one native worktree per slice under `<WSL_HOME>/repos/`; list them
+with `git worktree list` inside WSL. For example, a multi-slice family looks like:
 
 ```text
 <REPO_WSL>
@@ -282,10 +283,10 @@ ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; cd <native-worktr
 Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the push-safety gate,
 stages with CRLF stripped, launches, and records the thread id for you (see the table above).
 
-Supervise without polling: run `.llm/tools/harness/watch-run.ts <run-dir>` (run-artifact watcher), or
-`.llm/tools/agentic/codex/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
-activity (progress), and `--mode turn --thread-id <uuid>` to wake when the turn finishes (idle). The
-git event alone does not mean the agent stopped; pair the two. Steer only with
+Supervise without polling: run `.llm/tools/harness/watch-run.ts <run-dir>` (run-artifact watcher),
+or `.llm/tools/agentic/codex/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on
+git activity (progress), and `--mode turn --thread-id <uuid>` to wake when the turn finishes (idle).
+The git event alone does not mean the agent stopped; pair the two. Steer only with
 `.llm/tools/agentic/codex/codex-resume.ts` (or `codex exec resume <thread-id>`); never fire a second
 `send-message-v2` at the same worktree.
 
@@ -312,8 +313,8 @@ If mobile says connection is impossible or Desktop shows a failed SSH connection
    ssh.exe <CODEX_SSH_HOST> 'export PATH="<CODEX_BIN_DIR>:$PATH"; codex remote-control start --json; codex app-server daemon version'
    ```
 
-Before restarting app-server while implementation agents are running, check whether active work would
-be interrupted:
+Before restarting app-server while implementation agents are running, check whether active work
+would be interrupted:
 
 ```powershell
 ssh.exe <CODEX_SSH_HOST> 'ps -eo user,pid,ppid,stat,etime,cmd | grep -E "[d]eno|[d]otnet|[a]spire|[d]ocker compose|[n]pm|[n]ode|[g]it |[c]odex" | sed -n "1,200p"'
@@ -322,8 +323,8 @@ ssh.exe <CODEX_SSH_HOST> 'find ~/.codex/sessions -type f -name "*.jsonl" -printf
 
 If there are no active child jobs and the latest relevant session has completed, repair an unmanaged
 remote-control daemon by killing only the `<WSL_USER>` user's app-server processes by anchored PID
-match and then starting remote-control fresh (the anchored pattern is `^$HOME/.codex/…` so it matches
-only the real app-server binary; `$HOME` expands to `<WSL_HOME>` in the remote shell):
+match and then starting remote-control fresh (the anchored pattern is `^$HOME/.codex/…` so it
+matches only the real app-server binary; `$HOME` expands to `<WSL_HOME>` in the remote shell):
 
 ```powershell
 ssh.exe <CODEX_SSH_HOST> 'set -e; export PATH="<CODEX_BIN_DIR>:$PATH"; pids=$(pgrep -u <WSL_USER> -f "^$HOME/.codex/packages/standalone/current/codex app-server" || true); if [ -n "$pids" ]; then echo "killing app-server pids: $pids"; kill $pids; sleep 2; fi; rm -f ~/.codex/app-server-control/app-server-control.sock; codex remote-control start --json; codex app-server daemon version'
@@ -354,8 +355,8 @@ Symptoms:
 
 Safe recovery used:
 
-1. Confirmed the latest session had completed and no `deno`, `dotnet`, `aspire`, `node`, or
-   child worker commands were running.
+1. Confirmed the latest session had completed and no `deno`, `dotnet`, `aspire`, `node`, or child
+   worker commands were running.
 2. Killed only the `<WSL_USER>` user's app-server PIDs matched by
    `^<WSL_HOME>/.codex/packages/standalone/current/codex app-server`.
 3. Removed the stale app-server control socket.
@@ -363,9 +364,9 @@ Safe recovery used:
 5. Confirmed remote-control output returned `"status":"connected"` and
    `"remoteControlEnabled":true`.
 
-Corrected root cause (2026-06-16): the earlier write-up blamed the `send-message-v2` *command* for
+Corrected root cause (2026-06-16): the earlier write-up blamed the `send-message-v2` _command_ for
 the unmanaged state. That was wrong. A single send against a managed daemon is safe and stays
 managed (re-verified on `0.140.0`). The unmanaged state comes from **concurrent/duplicate sends to
 the same worktree** forking rival app-server turns. The rule is therefore one active send per
-worktree at a time, steer existing sessions with `codex exec resume`, and reserve the
-anchored-PID + socket-removal repair above for an actually-unmanaged daemon.
+worktree at a time, steer existing sessions with `codex exec resume`, and reserve the anchored-PID +
+socket-removal repair above for an actually-unmanaged daemon.

@@ -13,10 +13,11 @@ This skill coordinates harness-mode runs. The authoritative harness docs live un
 this skill tells you what to load and in what order.
 
 Agent lanes and their model bindings are configuration, not dogma — the single source of truth is
-[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Only two rules are hard:
-**generator-session ≠ evaluator-session**, and the **slice review gate** (no implementation lane
-self-certifies). Everything else is a per-run lane assignment recorded in the run dir's
-`supervisor.md`/`drift.md`.
+[`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Four rules are hard:
+**generator-session ≠ evaluator-session**, **generator vendor family ≠ evaluator vendor family**,
+the **slice review gate** (no implementation lane self-certifies), and **complex/architecture tier
+selection requires explicit owner or milestone-coordinator authority with a recorded rationale**.
+Workload tier, role, route, and fallbacks are recorded in the run dir's `supervisor.md`/`drift.md`.
 
 ## When to Use
 
@@ -39,7 +40,8 @@ self-certifies). Everything else is a per-run lane assignment recorded in the ru
 | **9-phase model**       | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close.                                                                              |
 | **PLAN-EVAL**           | Conditional pre-implementation pass for complex/decision-heavy work; hard stop when selected.                                                                                  |
 | **IMPL-EVAL**           | Mandatory final pass after implementation unless the owner explicitly waives it.                                                                                               |
-| **Tiered lanes**        | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.                                                                                            |
+| **Routing matrix**      | Five workload tiers and four coordinator tiers with role-specific routes; single source `workflow/lane-policy.md`.                                                             |
+| **Privileged tiers**    | `complex` and `architecture` fail closed unless the owner or milestone coordinator explicitly authorizes the row and records why.                                              |
 | **Slice review gate**   | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1).                                                             |
 | **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes).                                                                                  |
 | **Plan-Gate**           | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                                                                                                                      |
@@ -104,9 +106,8 @@ on one screen, consolidate and simplify before asking for coordination or review
 
 ## Agent Delegation Contract
 
-Lane assignments and model bindings are configuration. The tiered A–E model, the selection rules
-(source slices → Tier D, batch/parallel → Tier C with committed `workflow.js`, research/doc prose →
-Tier B), and the named model bindings are defined once in
+Lane assignments and model bindings are configuration. Operational execution tiers still describe
+how work is launched, while workload tiers and role bindings are defined once in
 [`workflow/lane-policy.md`](../../../.llm/harness/workflow/lane-policy.md). Do not restate lane
 routing here — defer to that file. The items below are the parts of the contract that hold as
 **invariants** regardless of which lane implements:
@@ -120,12 +121,13 @@ routing here — defer to that file. The items below are the parts of the contra
   for every implementation tier (B Opus sub-agents, C Workflow-generated slices, D WSL Codex); no
   lane self-certifies. See `workflow/lane-policy.md` for the rule and `workflow/run-loop.md` for the
   step placement.
-- **Evaluator route binding.** Select the evaluator route from `workflow/lane-policy.md` — the
-  open-model evaluator lane for a formal PLAN-EVAL/IMPL-EVAL, or the opposite-family route for
-  ordinary review — and record it in the run. PLAN-EVAL is risk-selected only for critical or
-  complex topics. After two consecutive terminal IMPL-EVAL failures, release the evaluator and
-  escalate the exact decision to the owner in the primary coordinator task; do not freeze the
-  canonical author or infer a third loop.
+- **Evaluator route binding.** Select the evaluator from the workload tier and phase in
+  `workflow/lane-policy.md`, skip candidates from the selected generator's vendor family, and record
+  the complete route in the run. PLAN-EVAL is risk-selected. Re-steer the same evaluator and obey
+  the tier-specific round/notification policy; do not substitute a global retry rule.
+- **Privileged-row authority.** `complex` and `architecture` require explicit owner or
+  milestone-coordinator authorization plus a recorded rationale. Never promote a task into either
+  row from complexity inference, file count, or evaluator role alone; cap it at `feature` otherwise.
 - **Tier-D mobile-visibility proof.** A Tier-D (WSL Codex) implementation slice is launched only via
   skills + `.llm/tools/agentic/` (never ad-hoc `wsl.exe`), and only when the run artifacts include
   the WSL worktree path, concrete Codex thread id, daemon-managed `remote-control` proof, and the
@@ -150,16 +152,10 @@ routing here — defer to that file. The items below are the parts of the contra
   PLAN-EVAL `PASS` is a process failure. Small/mechanical work records `PLAN-EVAL: N/A` first.
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
-- **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
-  **local-machine run**, PLAN-EVAL and IMPL-EVAL normally use a fresh native opposite-family
-  session: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work.
-  Use the phase-bound Qwen 3.8 Flash/GLM 5.3 Flash OpenRouter preset only for a genuine third
-  opinion or when the native opposite-family route is quota-blocked. If OpenRouter is then limited,
-  use a fresh AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved
-  for explicitly cloud-driven work. For cloud PRs, repository automation owns the phase trigger:
-  `openhands` plus `status:plan-eval` for PLAN-EVAL, and draft→ready for IMPL-EVAL. Supervisors
-  select labels and do not duplicate the automatic dispatch with a manual evaluator. Record every
-  blocked route, escalation, and requested/observed identity.
+- **Wrong evaluator route** — select from the workload tier and phase, preserve separate sessions,
+  and skip same-vendor-family candidates. Apply the provider order Claude → Codex → Google →
+  OpenCode Go → Ollama → OpenRouter only among capabilities for the selected logical model. Paid
+  routes require a fresh expense decision. Record every fallback and requested/observed identity.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
@@ -245,11 +241,9 @@ When external docs or examples matter:
 
 ## Evaluator Separation
 
-There are **two** separate-session evaluator passes. Both run on the evaluator lane selected from
-`workflow/lane-policy.md`. The normal local route is a **native opposite-family session**:
-Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work. OpenRouter
-is an escalation only for a third opinion or when the native evaluator family is quota-blocked;
-OpenHands is reserved for explicitly cloud-driven work. No lane may self-certify.
+There are **two** separate-session evaluator phases. Both use the workload tier's typed route from
+`workflow/lane-policy.md`, and both must differ from the generator by session and vendor family.
+Provider fallback is capability- and allowance-aware; no lane may self-certify.
 
 **PLAN-EVAL** (before implementation):
 
@@ -259,7 +253,7 @@ OpenHands is reserved for explicitly cloud-driven work. No lane may self-certify
 - Reads `research.md`, `plan.md`, and the `## Design` section.
 - Writes `plan-eval.md`.
 - Emits `PASS` or `FAIL_PLAN`.
-- Two `FAIL_PLAN` cycles, then escalate.
+- Follow the selected tier's PLAN-EVAL repair and escalation policy.
 
 **IMPL-EVAL** (final pass, after implementation):
 
@@ -269,9 +263,8 @@ OpenHands is reserved for explicitly cloud-driven work. No lane may self-certify
   draft-PR commit list + per-slice PR comments (the commit trail), selected archetype, overlays, and
   gate docs.
 - Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
-- Eval loop limit is two consecutive failures. The second failure releases the evaluator lease and
-  triggers an owner-facing decision in the primary coordinator task; it does not freeze the author
-  or authorize a third loop.
+- Re-steer the same evaluator and follow the selected tier's IMPL-EVAL maximum and
+  owner-notification point. Documentation is capped at two rounds.
 
 ## Commit Trail
 
@@ -334,24 +327,24 @@ User says "use harness"
 
 ## Reference Files
 
-| File                                            | Load when                                                                                     |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `.llm/harness/workflow/activation.md`           | Every harness run                                                                             |
-| `.llm/harness/workflow/run-loop.md`             | Every harness run                                                                             |
-| `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings                                                              |
-| `.llm/harness/workflow/doc-audit.md`            | Docs-changeset runs — opposite-family Sol audit + Fable prose polish of Claude-generated docs |
-| `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs                                                                   |
-| `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing)                |
-| `.llm/harness/workflow/milestone-run.md`        | Release milestone clusters from Step 0 through stable cut                                     |
-| `.llm/harness/workflow/milestone-reporting.md`  | Required coordinator status shape, cadence, ETA, scope, and orchestrator matrix               |
-| `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist                                                                           |
-| `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions                                                                        |
-| `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions                                                                        |
-| `.llm/harness/evaluator/verdict-definitions.md` | Verdict meanings                                                                              |
-| `.llm/harness/gates/archetype-gate-matrix.md`   | Gate selection                                                                                |
-| `.llm/harness/archetypes/README.md`             | Archetype selection                                                                           |
-| `.llm/harness/templates/`                       | Run artifact scaffolding                                                                      |
-| `.llm/harness/debt/arch-debt.md`                | Debt registry                                                                                 |
+| File                                            | Load when                                                                       |
+| ----------------------------------------------- | ------------------------------------------------------------------------------- |
+| `.llm/harness/workflow/activation.md`           | Every harness run                                                               |
+| `.llm/harness/workflow/run-loop.md`             | Every harness run                                                               |
+| `.llm/harness/workflow/lane-policy.md`          | Lane assignment + model bindings                                                |
+| `.llm/harness/workflow/doc-audit.md`            | Matrix-routed whole-changeset documentation audit and polish                    |
+| `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs                                                     |
+| `.llm/harness/workflow/seed-run.md`             | Planning-only board-seeding runs (discovery → roadmap → owner-ratified filing)  |
+| `.llm/harness/workflow/milestone-run.md`        | Release milestone clusters from Step 0 through stable cut                       |
+| `.llm/harness/workflow/milestone-reporting.md`  | Required coordinator status shape, cadence, ETA, scope, and orchestrator matrix |
+| `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist                                                             |
+| `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions                                                          |
+| `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions                                                          |
+| `.llm/harness/evaluator/verdict-definitions.md` | Verdict meanings                                                                |
+| `.llm/harness/gates/archetype-gate-matrix.md`   | Gate selection                                                                  |
+| `.llm/harness/archetypes/README.md`             | Archetype selection                                                             |
+| `.llm/harness/templates/`                       | Run artifact scaffolding                                                        |
+| `.llm/harness/debt/arch-debt.md`                | Debt registry                                                                   |
 
 ## Checklist
 
@@ -363,11 +356,11 @@ User says "use harness"
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
 - [ ] PLAN-EVAL returned `PASS` before implementation when selected, or a justified `PLAN-EVAL: N/A`
       was recorded first.
-- [ ] Any PLAN-EVAL used the recorded route, or the owner-authorized fallback was recorded.
+- [ ] Any PLAN-EVAL used the workload-tier route and recorded any fallback.
 - [ ] Tier-D (WSL Codex) slices recorded daemon-managed proof, thread id, worktree, and steering
       command.
 - [ ] The slice review gate was performed (Tier-A substantive review) before each sign-off commit;
       no lane self-certified.
 - [ ] Each implementation slice was committed, pushed, and commented on the draft PR.
 - [ ] IMPL-EVAL is a separate session from the generator.
-- [ ] IMPL-EVAL used the recorded evaluator route (open model), or the blocked launch was recorded.
+- [ ] IMPL-EVAL used the workload-tier route and recorded any blocked or fallback launch.

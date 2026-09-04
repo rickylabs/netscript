@@ -22,6 +22,9 @@ export const ANTIGRAVITY_INSTALLER_URL = 'https://antigravity.google/cli/install
 export const OPENROUTER_ANTHROPIC_BASE_URL = 'https://openrouter.ai/api';
 export const OPENROUTER_RESPONSES_BASE_URL = 'https://openrouter.ai/api/v1';
 
+/** Authenticated OpenCode Go subscription-usage endpoint. */
+export const OPENCODE_GO_USAGE_URL = 'https://opencode.ai/zen/go/v1/usage';
+
 /** Anthropic API base URL used for OAuth and Remote Control passthrough traffic. */
 export const ANTHROPIC_API_BASE_URL = 'https://api.anthropic.com';
 
