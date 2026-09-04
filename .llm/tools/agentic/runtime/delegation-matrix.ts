@@ -507,6 +507,39 @@ export function assertWorkloadModelAllowed(
   }
 }
 
+/**
+ * Refuses a launch whose concrete effort differs from the selected matrix route.
+ * A provider-default route may resolve to the launcher's pinned default, but an
+ * explicit matrix effort must always be requested explicitly.
+ */
+export function assertWorkloadEffortAllowed(
+  tier: WorkloadTier,
+  role: DelegationRole,
+  concreteModel: string,
+  launchEffort: Effort | 'provider_default',
+  providerDefaultEffort?: Effort,
+  override?: OwnerMatrixOverride,
+): void {
+  if (override) assertOwnerMatrixOverride(tier, role, override);
+  const routes = override ? [override.route] : DELEGATION_MATRIX[tier][role];
+  const matchingRoutes = routes.filter((candidate) =>
+    MODEL_CATALOG[candidate.model].capabilities.some((capability) =>
+      capability.model === concreteModel
+    )
+  );
+  const allowed = matchingRoutes.some((candidate) =>
+    candidate.effort === launchEffort ||
+    (candidate.effort === 'provider_default' && launchEffort === providerDefaultEffort)
+  );
+  if (!allowed) {
+    const expected = matchingRoutes.map((candidate) => candidate.effort).join(' or ') || 'none';
+    throw new Error(
+      `${concreteModel}@${launchEffort} does not match ${tier}/${role} effort ${expected}` +
+        (override ? ' in the recorded owner override' : ''),
+    );
+  }
+}
+
 export const COORDINATOR_TIERS = [
   'small_project',
   'project',

@@ -21,6 +21,7 @@ import { fetchOpenCodeGoUsageSnapshot, reserveCopilotCredits } from '../runtime/
 import {
   assertOwnerMatrixOverride,
   assertPrivilegedTierAuthorization,
+  assertWorkloadEffortAllowed,
   assertWorkloadModelAllowed,
   DELEGATION_ROLES,
   type DelegationRole,
@@ -184,6 +185,17 @@ export async function preflightOpenCodeExpense(
     options.workloadTier,
     options.workloadRole,
     options.model,
+    options.ownerMatrixOverride,
+  );
+  if (options.variant !== 'provider_default' && !EFFORTS.includes(options.variant as Effort)) {
+    throw new Error('OpenCode variant must be provider_default or a declared effort');
+  }
+  assertWorkloadEffortAllowed(
+    options.workloadTier,
+    options.workloadRole,
+    options.model,
+    options.variant as Effort | 'provider_default',
+    provider === 'github_copilot' ? undefined : OPENCODE_TOOL.defaultVariant,
     options.ownerMatrixOverride,
   );
   if (provider === 'github_copilot') {

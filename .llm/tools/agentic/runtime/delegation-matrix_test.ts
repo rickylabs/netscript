@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import {
+  assertWorkloadEffortAllowed,
   assertWorkloadModelAllowed,
   COORDINATOR_MATRIX,
   DEEP_RESEARCH_TRANSPORTS,
@@ -195,6 +196,33 @@ Deno.test('a concrete provider model must belong to the selected matrix cell', (
       ),
     Error,
     'is not declared for feature/implementation_evaluation',
+  );
+});
+
+Deno.test('matrix effort is bound to the concrete launch variant', () => {
+  assertWorkloadEffortAllowed(
+    'feature',
+    'ui_ux',
+    ROUTING_MODEL_IDS.kimiK3Copilot,
+    'high',
+  );
+  assertThrows(
+    () =>
+      assertWorkloadEffortAllowed(
+        'feature',
+        'ui_ux',
+        ROUTING_MODEL_IDS.kimiK3Copilot,
+        'max',
+      ),
+    Error,
+    'does not match feature/ui_ux effort high',
+  );
+  assertWorkloadEffortAllowed(
+    'simple',
+    'ui_ux',
+    ROUTING_MODEL_IDS.minimaxM3Go,
+    'high',
+    'high',
   );
 });
 
