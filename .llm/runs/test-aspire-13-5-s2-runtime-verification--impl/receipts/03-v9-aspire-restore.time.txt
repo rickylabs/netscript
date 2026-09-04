@@ -1,5 +1,0 @@
-command: cd /home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/v9-deno-projection && aspire restore --non-interactive --nologo
-started: 2026-08-30T00:52:59+02:00
-completed: 2026-08-30T00:53:12+02:00
-elapsed_ms: 13065
-exit_code: 0

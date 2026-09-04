@@ -4,6 +4,10 @@
   "supportFiles": ["consumer-tools.json", "README.md", "release.json"],
   "modules": [
     {
+      "source": ".llm/tools/validation/aspire-scan-scope.ts",
+      "path": "validation/aspire-scan-scope.ts"
+    },
+    {
       "source": ".llm/tools/docs/snippet-extractor.ts",
       "path": "docs/snippet-extractor.ts"
     }

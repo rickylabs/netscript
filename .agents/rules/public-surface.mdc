@@ -16,9 +16,9 @@ alwaysApply: false
   `docs/architecture/doctrine/02-public-surface.md`.
 - Keep `mod.ts` as a named-export manifest with no logic; split large surfaces into subpath exports
   instead of widening the root entrypoint.
-- Use the naming and `deno.json` standards in `docs/architecture/STANDARDS.md`, including lockstep
-  versioning and explicit publish include/exclude lists.
-- Choose API shapes from `docs/architecture/PUBLIC-SURFACE-PATTERNS.md`: function family, builder,
-  abstract base plus concrete default, DSL, or registry.
+- Use the package layout and `deno.json` standards in
+  `docs/architecture/doctrine/05-folder-structure.md`.
+- Choose API shapes from `docs/architecture/doctrine/02-public-surface.md`; apply the composition
+  and extension boundaries in `docs/architecture/doctrine/07-composition-and-extension.md`.
 - Do not re-export upstream packages or test fakes from the root surface; use documented subpaths
   such as `./testing` when callers should import them.

@@ -28,7 +28,7 @@ and is not attempted here.
 
 Every rule below is marked **[observed]** — recorded during the 0.0.4 execution, whether in the
 instrumented merge trace
-([`.llm/runs/release-0.0.4--orchestration/cut-trace.md`](../../runs/release-0.0.4--orchestration/cut-trace.md);
+([archived 0.0.4 cut trace](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/release-0.0.4--orchestration/cut-trace.md);
 11 PRs, 42 issues, 2026-08-03), in the issues that run filed, or in the ratified design doc's dated
 observations — with the specific source cited at the claim — or **[asserted]** — a reasoned proposal
 with no supporting observation yet. Asserted rules are the ones most likely to be wrong; attack them
@@ -163,11 +163,11 @@ whole milestone on a publish step. (What a failed canary means, and what to do a
 
 ## Reference
 
-| Surface                                                                 | Owns                                                                                        |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `.llm/tools/release/canary-label.ts` (`deno task release:canary-label`) | label derivation, payload computation, note rendering, drift gate                           |
-| `.agents/skills/netscript-release`                                      | all publish mechanics, the green canary pair, failed-canary doctrine, rollback              |
-| [`milestone-run.md`](./milestone-run.md)                                | the run shape that consumes this cadence; its cut checklist reads the canary notes manually |
-| `.agents/skills/agent-milestone-orchestrator`                           | the role that declares wave boundaries and decides when a canary goes out                   |
-| [`cut-trace.md`](../../runs/release-0.0.4--orchestration/cut-trace.md)  | the observed evidence base                                                                  |
-| #1149 · #1160 · #1119                                                   | live-canary exercise (0.0.5) · drift-scoping defect (fixed) · naming collision              |
+| Surface                                                                                                                                                              | Owns                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `.llm/tools/release/canary-label.ts` (`deno task release:canary-label`)                                                                                              | label derivation, payload computation, note rendering, drift gate                           |
+| `.agents/skills/netscript-release`                                                                                                                                   | all publish mechanics, the green canary pair, failed-canary doctrine, rollback              |
+| [`milestone-run.md`](./milestone-run.md)                                                                                                                             | the run shape that consumes this cadence; its cut checklist reads the canary notes manually |
+| `.agents/skills/agent-milestone-orchestrator`                                                                                                                        | the role that declares wave boundaries and decides when a canary goes out                   |
+| [Archived 0.0.4 cut trace](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/release-0.0.4--orchestration/cut-trace.md) | the observed evidence base                                                                  |
+| #1149 · #1160 · #1119                                                                                                                                                | live-canary exercise (0.0.5) · drift-scoping defect (fixed) · naming collision              |

@@ -14,12 +14,13 @@ The coordinator's recurring owner-facing status contract is
 machine-backed report; status publication is a control checkpoint and never pauses delivery.
 
 > **Provenance.** Derived from `release-0.0.4--orchestration`, the first real execution of the
-> milestone-orchestrator pattern (epic #1120, decision D2), whose instrumented merge record is
-> [`cut-trace.md`](../../runs/release-0.0.4--orchestration/cut-trace.md) — 11 PRs, 42 issues, ~6h40m
-> on 2026-08-03. Rules below are **[observed]** — recorded during that execution, in the trace
-> itself, in the issues the run filed, or in the ratified design doc's dated observations, with the
-> source cited at the claim — or **[asserted]** (proposed, unproven). Like `seed-run.md` and
-> `supervisor.md`, this freezes the **stage contracts**, not the exemplar's exact folder tree.
+> milestone-orchestrator pattern (epic #1120, decision D2), whose instrumented merge record is the
+> [archived 0.0.4 cut trace](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/release-0.0.4--orchestration/cut-trace.md)
+> — 11 PRs, 42 issues, ~6h40m on 2026-08-03. Rules below are **[observed]** — recorded during that
+> execution, in the trace itself, in the issues the run filed, or in the ratified design doc's dated
+> observations, with the source cited at the claim — or **[asserted]** (proposed, unproven). Like
+> `seed-run.md` and `supervisor.md`, this freezes the **stage contracts**, not the exemplar's exact
+> folder tree.
 
 ## When to use a milestone cluster
 
@@ -75,6 +76,13 @@ directories, if any, are deleted after the stable cut and may explicitly preserv
 later milestones. Before that ruling, every agent preserves the tracked run directories; no
 supervisor, evaluator, cleanup lane, or merge audit may infer retention from age, path shape, host
 metadata, or PR type.
+
+After the owner grants a post-release cleanup scope, preview it with
+`deno task harness:cleanup --all-unretained --pretty`. The command preserves every run belonging to
+the newest two release generations and any RFC-related run identified by its name, an `rfc.md` /
+`RFC-AUTHORITY.md` marker, or an `rfcs/` design directory. It also supports age-bounded `.llm/tmp`
+cleanup. Nothing is removed without `--apply`; `--all-unretained` is the explicit owner-controlled
+full sweep used after a stable cut.
 
 Create the five milestone artifacts from `templates/`, then run:
 
@@ -165,15 +173,15 @@ The empirical checklist the 0.0.4 orchestrator converged on, run per PR at stage
 what earned it a place — for most, a real firing; where the record shows something narrower, the row
 says exactly what is and is not yet demonstrated. Items 6 and 7 were added _after_ being burned:
 
-| # | Check                                                                                                | Firing evidence (the negative case)                                                                                                                                                                                                                                                                                                                                                                        | When it does not run                                                              |
-| - | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 1 | `close-gate` result is green                                                                         | red close-gates idled four supervisors in 0.0.4                                                                                                                                                                                                                                                                                                                                                            | a PR with no close-gate result is **unproven, not clean** — the result must exist |
-| 2 | zero unticked `- [ ]` on every issue the PR closes                                                   | 15 unchecked boxes across #1078's issues forced the mid-flight split of #1024/#1061                                                                                                                                                                                                                                                                                                                        | an unfetched issue body counts as unticked                                        |
-| 3 | no new `deno-lint-ignore` / `as unknown as` / `@ts-ignore` in the diff, **excluding `.llm/runs/**`** | two-part record: the exclusion fired in 0.0.4 (false positives from run artifacts and the scanner's own source), and the predicate itself is demonstrated on a synthetic diff — RED on a new ignore in publishable source, GREEN on excluded-path quotes (`release-0.0.4` follow-up demo: `.llm/runs/feat-milestone-orchestrator-artifacts--authoring/gate-demos.md` § Demo 1; #745 is the incident class) | a diff not scanned is a missing verdict, not a pass                               |
-| 4 | named expensive gates report `SUCCESS`, not `SKIPPED`/`CANCELLED`                                    | #778/#775 looked mergeable with every substantive check skipped, on a base dead since 17 July — **"clean" repeatedly meant "nothing ran"**                                                                                                                                                                                                                                                                 | this check _is_ the did-not-run detector; name the gates, don't count greens      |
-| 5 | the single decisive claim per issue, re-verified independently                                       | a `head -14` truncated log nearly auto-closed two issues with zero implementation; the raw log caught it                                                                                                                                                                                                                                                                                                   | an unverified claim stays a claim — record it as unverified                       |
-| 6 | changed-file audit for `packages/**`/`plugins/**` on docs-lane PRs                                   | #1079: a docs slice landed framework source (upstream cause: #1020 labelled `type:docs` with code acceptance)                                                                                                                                                                                                                                                                                              | an unaudited docs PR is unaudited — say so in the gate record                     |
-| 7 | the PR body's own checklist matches what shipped                                                     | #1088 merged asserting "implementation hard stop in force" while shipping the change (filed as #1105); `close-gate` validates _issue_ boxes, not _PR-body_ checklists                                                                                                                                                                                                                                      | not covered by close-gate — skipping this leaves the PR body unverified           |
+| # | Check                                                                                                | Firing evidence (the negative case)                                                                                                                                                                                                                                                                                                                                                                                                                                                      | When it does not run                                                              |
+| - | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1 | `close-gate` result is green                                                                         | red close-gates idled four supervisors in 0.0.4                                                                                                                                                                                                                                                                                                                                                                                                                                          | a PR with no close-gate result is **unproven, not clean** — the result must exist |
+| 2 | zero unticked `- [ ]` on every issue the PR closes                                                   | 15 unchecked boxes across #1078's issues forced the mid-flight split of #1024/#1061                                                                                                                                                                                                                                                                                                                                                                                                      | an unfetched issue body counts as unticked                                        |
+| 3 | no new `deno-lint-ignore` / `as unknown as` / `@ts-ignore` in the diff, **excluding `.llm/runs/**`** | two-part record: the exclusion fired in 0.0.4 (false positives from run artifacts and the scanner's own source), and the predicate itself is demonstrated on a synthetic diff — RED on a new ignore in publishable source, GREEN on excluded-path quotes ([archived follow-up demo](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/feat-milestone-orchestrator-artifacts--authoring/gate-demos.md) § Demo 1; #745 is the incident class) | a diff not scanned is a missing verdict, not a pass                               |
+| 4 | named expensive gates report `SUCCESS`, not `SKIPPED`/`CANCELLED`                                    | #778/#775 looked mergeable with every substantive check skipped, on a base dead since 17 July — **"clean" repeatedly meant "nothing ran"**                                                                                                                                                                                                                                                                                                                                               | this check _is_ the did-not-run detector; name the gates, don't count greens      |
+| 5 | the single decisive claim per issue, re-verified independently                                       | a `head -14` truncated log nearly auto-closed two issues with zero implementation; the raw log caught it                                                                                                                                                                                                                                                                                                                                                                                 | an unverified claim stays a claim — record it as unverified                       |
+| 6 | changed-file audit for `packages/**`/`plugins/**` on docs-lane PRs                                   | #1079: a docs slice landed framework source (upstream cause: #1020 labelled `type:docs` with code acceptance)                                                                                                                                                                                                                                                                                                                                                                            | an unaudited docs PR is unaudited — say so in the gate record                     |
+| 7 | the PR body's own checklist matches what shipped                                                     | #1088 merged asserting "implementation hard stop in force" while shipping the change (filed as #1105); `close-gate` validates _issue_ boxes, not _PR-body_ checklists                                                                                                                                                                                                                                                                                                                    | not covered by close-gate — skipping this leaves the PR body unverified           |
 
 ## Gate integrity rules
 
@@ -194,7 +202,8 @@ These govern every gate this profile names and every gate a milestone run adds:
   is observed (#1142), and both clauses of the rule are **demonstrated on live data**: merged PR
   #1155's rollup carries a post-merge `classify changes` FAILURE (+28s after merge) and a superseded
   pre-merge CANCELLED; applying the rule recovers the true pre-merge SUCCESS
-  (`.llm/runs/feat-milestone-orchestrator-artifacts--authoring/gate-demos.md` § Demo 2).
+  ([archived follow-up demo](https://github.com/rickylabs/netscript/blob/d8187e5a8656de8f9443f4e33f0a91ece56a7dd2/.llm/runs/feat-milestone-orchestrator-artifacts--authoring/gate-demos.md)
+  § Demo 2).
 - **Expensive gates are serialised across slices.** Three concurrent `scaffold.runtime` runs
   produced two failures that were contention, not defects **[observed]**.
 - **The honesty rule.** A criterion that cannot be truthfully ticked **moves with its issue to the
@@ -225,9 +234,9 @@ Per-PR evaluation composes what already triggers rather than spawning duplicate 
 `openhands` + draft→ready dispatches IMPL-EVAL. Readiness alone is zero-spend. The orchestrator
 selects an optional `eval:model:*` override before the transition, then watches the automatic run;
 it does not also comment-trigger OpenHands. This is an explicit fallback for cloud-driven lanes or
-machines without the full local CLI swarm, not the primary milestone evaluator route.
-The invariants that hold regardless (owned by `netscript-harness`/`lane-policy.md`, only their
-milestone-run application stated here):
+machines without the full local CLI swarm, not the primary milestone evaluator route. The invariants
+that hold regardless (owned by `netscript-harness`/`lane-policy.md`, only their milestone-run
+application stated here):
 
 - **Generator ≠ evaluator, and the supervisor is not the evaluator either** — #1113 was written by
   one family, supervised by a second, evaluated by a third before merge **[observed — run record,

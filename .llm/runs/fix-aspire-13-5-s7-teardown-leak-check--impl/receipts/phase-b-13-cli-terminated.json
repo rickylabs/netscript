@@ -1,8 +1,0 @@
-{
-  "schemaVersion": 1,
-  "phase": "S7 phase B rerun",
-  "status": "skipped",
-  "signalSent": false,
-  "target": null,
-  "reason": "No leased Aspire CLI process was started because preparation failed."
-}

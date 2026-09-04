@@ -1,5 +1,0 @@
-command: deno task agentic:teardown -- --slice-dir .llm/runs/test-aspire-13-5-s2-runtime-verification--impl --worktree /home/codex/repos/netscript-aspire-13-5-s2 --apply
-started: 2026-08-30T01:02:16+02:00
-completed: 2026-08-30T01:02:17+02:00
-elapsed_ms: 1474
-exit_code: 0

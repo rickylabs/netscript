@@ -181,13 +181,13 @@ See `.agents/skills/README.md` for the full scope table.
 
 ## Reference
 
-| Doc                                                                           | Why you'd read this                                                                  |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [Architecture Doctrine](../../docs/architecture/doctrine/)                    | The 10-file specification (A1–A14, archetypes, AP-1..AP-20, F-1..F-18).              |
-| [Public Surface Patterns](../../docs/architecture/PUBLIC-SURFACE-PATTERNS.md) | How to design exports, `mod.ts`, and READMEs for JSR.                                |
-| [Agent Rules](../rules/)                                                      | `.mdc` rule files for CLI, architecture, public surface, JSR, platform, and harness. |
-| [Archetype Gate Matrix](../../.llm/harness/gates/archetype-gate-matrix.md)    | Required gates per archetype.                                                        |
-| [Architecture Debt](../../.llm/harness/debt/arch-debt.md)                     | Persistent debt entries with owners and closing gates.                               |
+| Doc                                                                              | Why you'd read this                                                                  |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [Architecture Doctrine](../../docs/architecture/doctrine/)                       | The 10-file specification (A1–A14, archetypes, AP-1..AP-20, F-1..F-18).              |
+| [Public Surface Doctrine](../../docs/architecture/doctrine/02-public-surface.md) | How to design exports, `mod.ts`, and READMEs for JSR.                                |
+| [Agent Rules](../rules/)                                                         | `.mdc` rule files for CLI, architecture, public surface, JSR, platform, and harness. |
+| [Archetype Gate Matrix](../../.llm/harness/gates/archetype-gate-matrix.md)       | Required gates per archetype.                                                        |
+| [Architecture Debt](../../.llm/harness/debt/arch-debt.md)                        | Persistent debt entries with owners and closing gates.                               |
 
 ---
 

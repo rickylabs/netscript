@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 2,
-  "worktreeRoot": "/home/codex/repos/ns005-cachetiers",
-  "appHosts": [],
-  "containers": [],
-  "ownedRoots": [
-    "/home/codex/repos/ns005-cachetiers/.llm/tmp/fix-plugin-linking-seam-1189-live"
-  ]
-}

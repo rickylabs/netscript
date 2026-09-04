@@ -1,3 +1,0 @@
-# Drift Log
-
-No drift.

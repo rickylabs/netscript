@@ -1,5 +1,0 @@
-error: Uncaught (in promise) Error: consecutive AppHost starts reused the same database allocation: postgres://localhost:14428
-    throw new Error(
-          ^
-    at verifyLiveDbEndpoint (file:///home/codex/repos/netscript-aspire-13-5-s2/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts:67:11)
-    at async file:///home/codex/repos/netscript-aspire-13-5-s2/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts:59:23

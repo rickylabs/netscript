@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "phase": "S7 phase B rerun",
-  "status": "skipped",
-  "reason": "No phase-owned runtime resources existed after the pre-start preparation failure.",
-  "plannedCommands": [],
-  "foreignControlMutations": [],
-  "supervisorRelayMutations": []
-}

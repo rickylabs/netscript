@@ -9,6 +9,7 @@ import {
   parseFiles,
   parseLabels,
   parseNameStatus,
+  readNameStatusInput,
   sanitizeReason,
 } from './ci-classify-changes.ts';
 
@@ -99,6 +100,23 @@ Deno.test('parseNameStatus: unrecognisable line degrades to a bare path (forces 
 Deno.test('parseNameStatus: empty/undefined input', () => {
   assertEquals(parseNameStatus(''), []);
   assertEquals(parseNameStatus(undefined), []);
+});
+
+Deno.test('large rename-aware diffs are loaded from a file, not one env value', async () => {
+  const path = await Deno.makeTempFile();
+  try {
+    const diff = Array.from(
+      { length: 4_000 },
+      (_, index) => `D\t.llm/runs/stale-${index}/context-pack.md`,
+    ).join('\n');
+    await Deno.writeTextFile(path, diff);
+    assertEquals(diff.length > 128 * 1_024, true);
+    const loaded = await readNameStatusInput(path, 'M\twrong.ts');
+    assertEquals(loaded, diff);
+    assertEquals(parseNameStatus(loaded).length, 4_000);
+  } finally {
+    await Deno.remove(path);
+  }
 });
 
 // ── reason sanitization (adversarial review, defect 3) ───────────────────────
@@ -641,6 +659,30 @@ Deno.test('core CI bounds browser and docs-only quality sub-lanes', async () => 
     core.includes("if: always() && env.RUN == 'true'"),
     true,
   );
+});
+
+Deno.test('classify workflows transport changed paths through a bounded file', async () => {
+  for (
+    const path of [
+      '.github/workflows/ci.yml',
+      '.github/workflows/e2e-cli.yml',
+      '.github/workflows/fresh-ui-quality.yml',
+      '.github/workflows/pages.yml',
+      '.github/workflows/surface-diff.yml',
+    ]
+  ) {
+    const workflow = await Deno.readTextFile(path);
+    assertEquals(
+      workflow.includes('CHANGED_NAME_STATUS_FILE: ${{ runner.temp }}/changed-name-status.txt'),
+      true,
+      path,
+    );
+    assertEquals(
+      workflow.includes('CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}'),
+      false,
+      path,
+    );
+  }
 });
 
 // ── decide: aggregate + labels ───────────────────────────────────────────────

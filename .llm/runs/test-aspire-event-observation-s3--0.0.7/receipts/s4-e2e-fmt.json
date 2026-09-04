@@ -1,1 +1,0 @@
-{"command":"deno fmt --check","cwd":"/home/agent/projects/netscript/worktrees/007-leaf-1906","mode":"check","summary":{"filesSelected":236,"batches":3,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":236,"filesProcessed":236,"droppedFiles":[],"refusals":[]},"findings":[]}

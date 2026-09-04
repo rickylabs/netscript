@@ -17,8 +17,8 @@ enumerable set of places, and the behaviors NetScript depends on are pinned by r
 gates that must be re-recorded or re-run against the new release — never re-asserted from release
 notes.
 
-The 13.4.6 -> 13.5.3 adoption (epic #1712, run `research-aspire-13.5-adoption--0.0.7`) is the worked
-example; every rule below was paid for there.
+The 13.4.6 -> 13.5.3 adoption (epic #1712) is the worked example; every rule below was paid for
+there.
 
 ## When to Use
 
@@ -47,7 +47,7 @@ example; every rule below was paid for there.
 | Host toolchain (external)    | `<project-root>/.mise.toml` (`aspire = "…"`) — **not tracked** in the repo; each host (NAS/WSL) pins its own CLI beside the checkout                                                        | The CLI every local agent runs; keep it equal to the CI pin by hand                                                         |
 | CI toolchain                 | `.github/workflows/e2e-cli.yml`, `e2e-cli-prod.yml`, `e2e-cli-prod-local.yml` (`dotnet tool install Aspire.Cli --version …`, NuGet cache key `nuget-aspire-*-<ver>-v1`, the `13.5.*` guard) | The CLI the runtime tiers run                                                                                               |
 | CI toolchain policy          | `.github/toolchain.env` (Aspire CLI/SDK pins) + `.github/scripts/aspire-nuget-cache-policy.test.ts` (cache-key version literal) — both enforced by the parity gate                          |                                                                                                                             |
-| Parity gate                  | `.llm/tools/validation/check-aspire-version-parity.ts` (`PHASE_TWO_COMPAT_VERSION`) + `.llm/runs/research-aspire-13.5-adoption--0.0.7/aspire-surface-manifest.tsv`                          | The expected version and the 900+ path manifest with per-path owner and disposition                                         |
+| Parity gate                  | `.llm/tools/validation/check-aspire-version-parity.ts` (`PHASE_TWO_COMPAT_VERSION`) + `.llm/tools/validation/fixtures/aspire-surface-manifest.tsv`                                          | The expected version and the 900+ path manifest with per-path owner and disposition                                         |
 | Recorded surfaces (fixtures) | see "Fixtures that must be re-recorded"                                                                                                                                                     | CLI/MCP/dashboard output shapes at the pinned version                                                                       |
 | Prose                        | `skills/aspire/SKILL.md`, `.agents/skills/aspire/SKILL.md`, docs site `reference/aspire`, `explanation/aspire`, `quickstart/aspire`                                                         | Version-tagged evidence keys (S2-Vn, S9-…) and literal version mentions                                                     |
 
@@ -118,7 +118,7 @@ exact-head dual-green, and keep the head immutable once it is green.
    `git grep -n '<old>'` over the tree; every remaining hit is either archival (documented in the
    manifest) or a miss.
 4. **Regenerate the manifest and run parity**:
-   `deno run --allow-read --allow-run=git --allow-write .llm/runs/research-aspire-13.5-adoption--0.0.7/tools/aspire-surface-manifest.ts`
+   `deno run --allow-read --allow-run=git --allow-write=.llm/tools/validation/fixtures .llm/tools/validation/aspire-surface-manifest.ts`
    then `deno task check:aspire-version-parity`. Update `PHASE_TWO_COMPAT_VERSION` in the same
    commit. Findings with `status: deferred` name an owner — resolve or re-own them, do not silence.
 5. **Regenerate carriers** in chain order on a clean tree; `check:assets-barrel`,
@@ -160,16 +160,14 @@ exact-head dual-green, and keep the head immutable once it is green.
 
 ## Reference Files
 
-| File                                                                                                                              | Load when                                                            |
-| --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `.llm/runs/research-aspire-13.5-adoption--0.0.7/research.md` (run evidence on branch `research/aspire-13.5-0.0.7`; not on `main`) | Building the capability matrix for a minor/major                     |
-| `.llm/runs/research-aspire-13.5-adoption--0.0.7/plan.md` (run evidence on branch `research/aspire-13.5-0.0.7`; not on `main`)     | Slicing an adoption epic (S1–S13 DAG, canary points, rollback)       |
-| `.llm/runs/research-aspire-13.5-adoption--0.0.7/drift.md` (run evidence on branch `research/aspire-13.5-0.0.7`; not on `main`)    | Checking whether a surprise was already met and ruled on (D-1…D-330) |
-| `.llm/tools/validation/check-aspire-version-parity.ts`                                                                            | Parity gate red, or changing the expected version                    |
-| `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts`                                             | Re-recording `describe --follow` fixtures                            |
-| `packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api.ts`                                                         | Reading telemetry through the secured dashboard API                  |
-| `packages/mcp/tests/fixtures/telemetry/README.md`                                                                                 | Re-recording the dashboard telemetry fixture                         |
-| `skills/aspire/SKILL.md`                                                                                                          | Re-verifying the version-tagged evidence keys                        |
+| File                                                                                  | Load when                                            |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `.llm/tools/validation/check-aspire-version-parity.ts`                                | Parity gate red, or changing the expected version    |
+| `.llm/tools/validation/aspire-surface-manifest.ts`                                    | Rebuilding the owned Aspire-version surface manifest |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime/evidence/describe-follow.ts` | Re-recording `describe --follow` fixtures            |
+| `packages/cli/e2e/src/application/gates/scaffold/aspire-dashboard-api.ts`             | Reading telemetry through the secured dashboard API  |
+| `packages/mcp/tests/fixtures/telemetry/README.md`                                     | Re-recording the dashboard telemetry fixture         |
+| `skills/aspire/SKILL.md`                                                              | Re-verifying the version-tagged evidence keys        |
 
 ## Checklist
 

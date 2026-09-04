@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 2,
-  "worktreeRoot": "/home/codex/repos/netscript-aspire-13-5-s2",
-  "appHosts": [],
-  "containers": [],
-  "ownedRoots": [
-    "/home/codex/repos/netscript-aspire-13-5-s2/.llm/tmp/aspire-13-5-s2/aspire-13-5-postgres"
-  ]
-}

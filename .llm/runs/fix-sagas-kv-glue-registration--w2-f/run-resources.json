@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 2,
-  "worktreeRoot": "/home/codex/repos/ns005-sagas",
-  "appHosts": [],
-  "containers": [],
-  "ownedRoots": [
-    "/home/codex/repos/ns005-sagas/.llm/tmp/1184-joint/redis-local/saga-joint-redis-local"
-  ]
-}

@@ -79,7 +79,15 @@ For harness work, prefer `.llm/tools/agentic/openhands/dispatch-openhands.ts` wi
 provider, model, and effort selected from `workflow/lane-policy.md`. The legacy triggers above are
 transport syntax, not canonical routing policy.
 
-The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
+The operational trigger and routing details live in `.agents/skills/openhands-handoff/SKILL.md`.
+
+## Choosing the execution surface
+
+- **Actions workflow** — short PR/issue fixups, evaluator passes, small research tasks, and mobile
+  triggers.
+- **VPS Web UI/SDK session** — long-running implementation, checkpointed planning, or work needing
+  human review before continuing. Deploy from `ops/openhands/docker-compose.yml` and leave a
+  PR/issue comment linking the session outcome back to the GitHub thread.
 
 ## Harness Rules
 

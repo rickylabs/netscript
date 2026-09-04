@@ -1,5 +1,0 @@
-command: rg -n withBrowserLogs <generated module and helper>
-completed: 2026-08-30T00:55:56+02:00
-exit_code: 0
-86:    await aspire_13_5_postgres_web.withBrowserLogs();
-16379:    withBrowserLogs(options?: WithBrowserLogsOptions): ContainerResourcePromise;
