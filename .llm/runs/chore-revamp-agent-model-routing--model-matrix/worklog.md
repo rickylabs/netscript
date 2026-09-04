@@ -23,7 +23,7 @@ pure expense-watcher boundary evaluates normalized usage before a paid OpenCode 
 ```text
 workload tier + role
         ↓
-owner matrix cell ── checks every generator/evaluator family cross-product
+owner matrix cell ── composes a different-family evaluator for the selected generator
         ↓
 logical model + effort + evaluation policy
         ↓
@@ -61,12 +61,13 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T14:20Z    | design    | locked         | Chose typed matrix, logical/provider model split, exhaustive cross-family validation, and pre-spend fail-closed watcher.                |
 | 2026-09-04T16:22Z    | PLAN-EVAL | cycle 1        | Muse Spark was rejected before a turn by the current OpenRouter privacy setting; declared Grok 4.6 xhigh fallback returned `FAIL_PLAN`. |
 | 2026-09-04T16:24Z    | design    | bounded repair | Locked vendor-level family composition, exact per-tier evaluation limits, and fail-closed legacy-lane behavior.                         |
+| 2026-09-04T16:29Z    | PLAN-EVAL | cycle 2        | Same OpenCode session `ses_f9338f842ffeT0E2CjAp7yu3KZ`, Grok 4.6 xhigh, returned `PASS` at repair head `372409ab6`.                     |
 
 ## Gate Results
 
 | Gate                 | Status    | Evidence                                                                         |
 | -------------------- | --------- | -------------------------------------------------------------------------------- |
 | PLAN-EVAL cycle 1    | FAIL_PLAN | `plan-eval.md`; three bounded design fixes, no production implementation started |
-| PLAN-EVAL cycle 2    | PENDING   | same Grok 4.6 xhigh evaluator session will be re-steered after repair commit     |
+| PLAN-EVAL cycle 2    | PASS      | `plan-eval.md`; same evaluator session, repair head `372409ab6`                  |
 | implementation gates | NOT_RUN   | hard stop until PLAN-EVAL PASS                                                   |
 | IMPL-EVAL            | NOT_RUN   | required after implementation                                                    |

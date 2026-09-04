@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `chore-revamp-agent-model-routing--model-matrix` |
 | Branch         | `chore/revamp-agent-model-routing`               |
-| Current phase  | `plan-eval`                                      |
+| Current phase  | `implementation`                                 |
 | Archetype      | `6 - CLI / Tooling`                              |
 | Scope overlays | docs                                             |
 
@@ -14,9 +14,9 @@
 
 Draft PR #1989 is open from baseline `a2d7f5f6f686115b5c31bab085692df6e1582aa7`. The complete owner
 matrix has been normalized into the plan, active code surfaces and official subscription contracts
-have been inventoried, and implementation is stopped at PLAN-EVAL cycle 1 `FAIL_PLAN`. Its bounded
-family-composition, round-policy, and legacy-lane findings are repaired in the working tree; cycle 2
-must evaluate the committed repair before implementation.
+have been inventoried. PLAN-EVAL cycle 1 found three bounded design issues; they were repaired at
+`372409ab6`, and cycle 2 in the same Grok 4.6 xhigh session returned `PASS`. S1 implementation may
+begin.
 
 ## Accepted owner decisions
 
@@ -38,11 +38,10 @@ must evaluate the committed repair before implementation.
 
 ## Next Steps
 
-1. Commit/push the bounded cycle-1 plan repair.
-2. Re-steer the same Grok 4.6 xhigh evaluator session for PLAN-EVAL cycle 2.
-3. On PASS, implement S1–S4 with per-slice checks and pushes.
-4. Run bounded Go/Ollama live smokes, full focused gates, and Grok 4.6 xhigh IMPL-EVAL.
-5. Promote the PR only after exact-head CI and review-thread gate.
+1. Implement S1–S4 with per-slice checks, commits, pushes, and PR comments.
+2. Run bounded Go/Ollama live smokes and full focused gates.
+3. Run separate Grok 4.6 xhigh IMPL-EVAL.
+4. Promote the PR only after exact-head CI and review-thread gate.
 
 ## Files Changed
 
@@ -52,13 +51,13 @@ must evaluate the committed repair before implementation.
 
 ## Gates
 
-| Gate family | Current status    | Evidence                            |
-| ----------- | ----------------- | ----------------------------------- |
-| Plan        | FAIL_PLAN cycle 1 | bounded repair awaiting cycle 2     |
-| Static      | NOT_RUN           | implementation hard stop            |
-| Fitness     | NOT_RUN           | implementation hard stop            |
-| Runtime     | NOT_RUN           | implementation hard stop            |
-| Consumer    | N/A               | no published package/plugin changes |
+| Gate family | Current status | Evidence                                |
+| ----------- | -------------- | --------------------------------------- |
+| Plan        | PASS cycle 2   | `plan-eval.md`, repair head `372409ab6` |
+| Static      | NOT_RUN        | implementation hard stop                |
+| Fitness     | NOT_RUN        | implementation hard stop                |
+| Runtime     | NOT_RUN        | implementation hard stop                |
+| Consumer    | N/A            | no published package/plugin changes     |
 
 ## Drift and Debt
 
