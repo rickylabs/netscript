@@ -56,8 +56,8 @@ and repository. No billable task was launched during research.
 
 | Client             | Copilot subscription support                                 | Conclusion                                                                                                       |
 | ------------------ | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| GitHub Copilot CLI | Native GitHub OAuth/token authentication                     | Supported and preferred for local Copilot execution                                                              |
-| OpenCode           | Native `GitHub Copilot` provider through GitHub device login | Supported; can consume the Pro+ entitlement inside OpenCode                                                      |
+| GitHub Copilot CLI | Native GitHub OAuth/token authentication                     | Supported as a Copilot-specific local surface                                                                    |
+| OpenCode           | Native `GitHub Copilot` provider through GitHub device login | Supported; owner-ratified primary client for Copilot-backed matrix models                                        |
 | Claude Code        | No documented GitHub Copilot authentication/provider surface | Do not route Copilot credentials through Claude Code. Model catalog overlap is not subscription interoperability |
 
 The research does **not** claim that every third-party proxy is contractually prohibited, nor that
@@ -65,9 +65,17 @@ using one necessarily causes suspension. The safe harness rule is narrower and t
 only documented native authentication paths; never extract or translate Copilot session tokens.
 
 OpenCode documents GitHub Copilot as a subscription provider and stores its own authenticated
-credential after `/connect`. That makes OpenCode a possible local client for Copilot-backed models,
-but the native Copilot CLI remains the stronger first target because it exposes Copilot-specific
-credit caps, effort, permissions, session identity, and JSONL directly.
+credential after `/connect`. On 2026-09-04 the owner selected this as the default transport for
+every matrix model actually exposed by Copilot Pro+, except OpenAI and Anthropic models. OpenAI
+continues through the native Codex/ChatGPT subscription and Anthropic through the native Claude
+subscription. This selection is an explicit cost-allocation policy; it does not imply that every
+model in GitHub's catalog is exposed by the installed OpenCode connector, so launch-time catalog
+discovery must fail closed.
+
+GitHub's current supported-model catalog includes Gemini 3.8 Flash, Kimi K3, and Grok 4.6 in
+addition to OpenAI and Anthropic families. Kimi K3 and Grok 4.6 are therefore the immediate
+high-cost savings targets for Copilot-first routing. Qwen, GLM, Muse, MiniMax, and DeepSeek are
+absent from that catalog and retain their existing OpenCode Go/Ollama/OpenRouter routes.
 
 ### 3. Pro+ cost and quota facts
 
@@ -122,25 +130,30 @@ not broaden secrets or network access merely to prove transport viability.
 
 ### 6. Comparison with the existing OpenHands lane
 
-| Dimension       | OpenHands today                                                | Copilot opportunity / gap                                                                       |
-| --------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Dispatch/status | Repository wrappers, Actions run IDs, phase labels             | Agent Tasks API supplies a cleaner task/state object                                            |
-| Model/effort    | Requested model recorded; effort cannot be attested by adapter | Local CLI exposes model and supported effort; cloud task exposes model but not reasoning effort |
-| Receipts        | Committed metadata, summary, logs, and formal verdict line     | Local CLI JSONL can be normalized; cloud API provides status metadata but not a harness verdict |
-| Evaluation      | Existing PLAN/IMPL evaluator protocol and parser               | Copilot must not self-certify; evaluator-family independence still applies                      |
-| CI              | Normal workflow integration                                    | Cloud PR workflows require approval by default or a deliberate repository policy change         |
-| Cancellation    | Actions API/concurrency cancellation                           | Cloud public API does not currently document stop; UI stop only                                 |
-| Cost guard      | Provider expense preflight                                     | Copilot has a native per-session CLI credit cap but no authoritative personal balance API       |
-| Environment     | Harness-controlled Actions job                                 | Cloud agent sandbox is managed, firewalled, single-repo, and capped at 59 minutes               |
+| Dimension       | OpenHands today                                                | Copilot opportunity / gap                                                                                                                        |
+| --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Dispatch/status | Repository wrappers, Actions run IDs, phase labels             | Agent Tasks API supplies a cleaner task/state object                                                                                             |
+| Model/effort    | Requested model recorded; effort cannot be attested by adapter | Local CLI exposes model and supported effort; cloud task exposes model but not reasoning effort                                                  |
+| Receipts        | Committed metadata, summary, logs, and formal verdict line     | Local CLI JSONL can be normalized; cloud API provides status metadata but not a harness verdict                                                  |
+| Evaluation      | Existing PLAN/IMPL evaluator protocol and parser               | Copilot must not self-certify; evaluator-family independence still applies                                                                       |
+| CI              | Normal workflow integration                                    | Cloud PR workflows require approval by default or a deliberate repository policy change                                                          |
+| Cancellation    | Actions API/concurrency cancellation                           | Cloud public API does not currently document stop; UI stop only                                                                                  |
+| Cost guard      | Provider expense preflight                                     | Copilot CLI has a native per-session credit cap; OpenCode's connector still needs local accounting because no personal balance API is documented |
+| Environment     | Harness-controlled Actions job                                 | Cloud agent sandbox is managed, firewalled, single-repo, and capped at 59 minutes                                                                |
 
 ### 7. Recommendation
 
 Add Copilot in two bounded stages, without immediately deleting OpenHands:
 
-1. **Local Copilot CLI transport first.** It has the best deterministic harness seams: explicit
-   model/effort, JSONL, tool permissions, continuation bound, session ID, and AI-credit cap. Map it
-   into the typed matrix as a transport, never as a model family.
-2. **Cloud Agent Tasks as a canary implementation lane.** Add typed dispatch/status/watch support
+1. **OpenCode GitHub Copilot transport first.** Add a typed `copilot` transport capability and place
+   it before OpenCode Go/Ollama/OpenRouter for every Copilot-supported non-OpenAI/non-Anthropic
+   model. Preserve native Codex and Claude as the first subscription defaults for their respective
+   families. Discover and attest actual connector model IDs rather than deriving them from GitHub
+   display names.
+2. **Keep the native Copilot CLI as a distinct optional surface.** It offers explicit model/effort,
+   JSONL, tool permissions, continuation bounds, session identity, and an AI-credit cap, but it must
+   not bypass the owner's OpenCode-first transport policy.
+3. **Cloud Agent Tasks as a canary implementation lane.** Add typed dispatch/status/watch support
    and run a small, non-critical task. Keep OpenHands as the established cloud evaluator/peer until
    the canary proves CI propagation, receipts, hygiene, and cost accounting.
 
@@ -164,9 +177,10 @@ repository-policy boundaries, and no live canary receipt exists yet.
 
 The plan generator must verify exact paths rather than assuming all are needed:
 
-- typed model transport/provider capability catalog;
+- typed Copilot transport/provider capability catalog with OpenAI/Anthropic exclusions;
 - subscription allowance and expense policy for Copilot Pro+;
-- local CLI launcher/JSONL normalizer/status receipt;
+- OpenCode Copilot launcher/catalog preflight/receipt, plus an optional native CLI launcher/JSONL
+  normalizer/status receipt if the plan can keep it bounded;
 - cloud Agent Tasks dispatcher/status/watcher;
 - GitHub token capability preflight without printing credentials;
 - repository Copilot instructions/custom agent that reuse `AGENTS.md` and `.agents/skills`;
@@ -184,11 +198,13 @@ package/plugin surface. Revisit only if the ratified plan touches an exported pa
 
 ## Open decisions for PLAN-EVAL
 
-1. Whether the first PR should implement both local CLI and cloud Agent Tasks, or land the local
-   transport and cloud typed client behind a no-dispatch canary flag.
+1. Whether the first PR should implement OpenCode Copilot routing, native Copilot CLI, and cloud
+   Agent Tasks together, or defer the native CLI while landing the primary OpenCode transport and
+   cloud typed client behind a no-dispatch canary flag.
 2. Whether CI approval remains an explicit human gate for the first canary (recommended) or whether
    repository settings may be relaxed. Relaxing it is a security decision and must not be inferred.
 3. The initial per-task AI-credit caps by workload row. They must be conservative and positive;
    current product docs advise that useful limits are generally above 30 credits.
-4. Whether OpenCode's Copilot provider is in the first slice or deferred after native CLI receipts.
-   Native CLI first is recommended because it exposes stronger Copilot-specific controls.
+4. Resolved by owner on 2026-09-04: OpenCode's GitHub Copilot provider is the first implementation
+   slice and the default for Copilot-supported non-OpenAI/non-Anthropic models. Native Codex and
+   Claude remain the family-specific defaults.

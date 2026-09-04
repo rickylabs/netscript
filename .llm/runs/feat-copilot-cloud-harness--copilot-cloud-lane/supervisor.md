@@ -38,3 +38,11 @@
 | 2026-09-04T18:27Z | Muse Spark 1.3 xhigh / OpenRouter  | Provider rejected before inference: paid-training endpoint excluded by account privacy guardrail | Owner account toggle or Go-window reset required |
 
 No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL remains blocked.
+
+## Owner routing ruling — 2026-09-04
+
+OpenCode's native GitHub Copilot provider becomes the first transport for every Copilot-supported
+matrix model except the OpenAI and Anthropic families. OpenAI remains native Codex/ChatGPT;
+Anthropic remains native Claude. Kimi K3 and Grok 4.6 are confirmed priority savings targets. The
+connector's live model catalog must be attested after device authorization; absent models fail over
+through the pre-existing provider chain rather than being guessed.

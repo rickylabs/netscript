@@ -23,8 +23,9 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 - Research generated in a separate native `agy` session, then corrected against current primary
   GitHub and OpenCode documentation.
 - Copilot cloud capability preflight passed: `copilot-swe-agent` is assignable to this repository.
-- Research recommendation: native Copilot CLI transport first; Cloud Agent Tasks as a measured
-  implementation canary; no immediate OpenHands removal.
+- Owner-ratified route: OpenCode GitHub Copilot first for every Copilot-supported matrix model
+  except OpenAI and Anthropic; those remain on native Codex/ChatGPT and Claude subscriptions. Cloud
+  Agent Tasks remains a measured implementation canary; no immediate OpenHands removal.
 
 ## In Progress
 
@@ -34,8 +35,9 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
 
 ## Next Steps
 
-1. Enable paid-model training for the OpenRouter account used by the configured key, or wait for
-   OpenCode Go's rolling window to reset; then resume Muse Spark 1.3 xhigh plan generation.
+1. Complete the one-time OpenCode GitHub Copilot device authorization, attest the exposed catalog,
+   and resume plan generation through the newly owner-ratified Copilot transport if the selected
+   model is available.
 2. Run separate-session PLAN-EVAL before implementation.
 3. Implement only the ratified slices after `PASS`.
 

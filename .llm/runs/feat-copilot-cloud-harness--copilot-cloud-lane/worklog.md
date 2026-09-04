@@ -23,6 +23,7 @@ returns `PASS`.
 | 2026-09-04T18:24Z | research  | generated | Gemini 3.8 Flash high completed the bounded research-only pass; no implementation files changed.                        |
 | 2026-09-04T18:25Z | research  | verified  | Primary-source sweep corrected unsupported quota, policy, API, and status claims.                                       |
 | 2026-09-04T18:28Z | plan      | blocked   | Fable limit, Go rate limit, then OpenRouter paid-training guardrail exhausted the declared plan route before inference. |
+| 2026-09-04T18:45Z | research  | ruling    | Owner made OpenCode Copilot the default for supported non-OpenAI/non-Anthropic models; device authorization started.    |
 
 ## Research receipts
 
@@ -37,6 +38,8 @@ returns `PASS`.
 - No billable Copilot task, repository policy mutation, or tool installation occurred in research.
 - Plan attempts consumed no useful model tokens. The OpenCode expense watcher and OpenRouter
   guardrail both failed closed before plan generation.
+- GitHub's current catalog confirms Gemini 3.8 Flash, Kimi K3, and Grok 4.6 are Copilot models. Kimi
+  and Grok are the immediate high-cost routes displaced by the Copilot entitlement.
 
 ## Gate Results
 
