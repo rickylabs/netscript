@@ -77,6 +77,7 @@ tests and documentation parity gate identify every required downstream update.
 | 2026-09-04T16:06Z    | repair    | live expense   | Replaced caller-provided Go usage with authenticated live percentage windows and model-weighted limits; real no-spawn smoke returned exit 4 / `provider_rate_limited`.     |
 | 2026-09-04T16:09Z    | repair    | focused gates  | 52 focused routing/expense/provider/runner/parity/SSOT tests passed; changed TypeScript roots type-check and format clean.                                                |
 | 2026-09-04T16:12Z    | repair    | agentic gates  | Structured agentic check selected 187 files / 2 batches with 0 diagnostics; full agentic suite passed 583 / failed 0.                                                    |
+| 2026-09-04T16:20Z    | repair    | repository gates | Repository check selected 3,140 files / 27 batches / 0 diagnostics; full suite passed 5,278, failed 0, ignored 19 under executable `/tmp`.                              |
 
 ## Gate Results
 
@@ -96,6 +97,7 @@ tests and documentation parity gate identify every required downstream update.
 | Live Go expense smoke | PASS      | watcher exited 4 with structured `provider_rate_limited`; effective Grok windows $3/$7.50/$15; no paid model spawned      |
 | Focused repair tests | PASS      | 52 passed, 0 failed; includes missing-authority/model-cell denial before fetch/spawn and live usage failures before spawn  |
 | Agentic repair suite | PASS      | 187 files checked / 0 diagnostics; 583 tests passed / 0 failed                                                            |
+| Repository repair suite | PASS   | 3,140 files checked / 0 diagnostics; 5,278 tests passed / 0 failed / 19 ignored                                            |
 | S1 check             | PASS      | structured check selected 2 files; 0 diagnostics                                                                           |
 | S1 tests             | PASS      | 11 passed, 0 failed across matrix and volatile-value guard                                                                 |
 | S2 check             | PASS      | 5 changed routing/contract files checked, 0 diagnostics                                                                    |

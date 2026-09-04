@@ -52,9 +52,8 @@ privileged `architecture` row without recorded authority. Repair is active; PR #
 
 ## Next Steps
 
-1. Finish full agentic and repository gates for the live-usage / privileged-tier repair.
-2. Commit, push, and post the value-free blocked live receipt to draft PR #1989.
-3. Run a new separate-session, different-family feature-tier IMPL-EVAL without OpenCode Go while it
+1. Commit and push the exact-head repository gate ledger.
+2. Run a new separate-session, different-family feature-tier IMPL-EVAL without OpenCode Go while it
    is rate-limited; only then return to exact-head CI/review.
 
 ## Files Changed
@@ -88,6 +87,7 @@ privileged `architecture` row without recorded authority. Repair is active; PR #
 | Repo test   | PASS* S5       | 5,263 pass; two unchanged browser fixtures pass when moved off no-exec temp |
 | Consumer    | N/A            | no published package/plugin changes                                         |
 | IMPL-EVAL   | SUPERSEDED     | historical C2 PASS at `8740b16de`; new live evidence requires another cycle |
+| Repair gate | PASS           | 3,140 checked / 0 diagnostics; 5,278 tests passed / 0 failed / 19 ignored   |
 
 ## Drift and Debt
 
