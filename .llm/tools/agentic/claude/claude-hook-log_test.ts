@@ -7,10 +7,7 @@ const HOOK_LOG_ROOT = '.llm/tmp/claude/hooks';
 const DECOY_MARKER = 'NETSCRIPT_HOOK_DECOY_REACHED';
 const DECOY_EXIT_CODE = 73;
 const PROJECT_ROOT = fromFileUrl(new URL('../../../../', import.meta.url));
-const NESTED_RUN_CWD = join(
-  PROJECT_ROOT,
-  '.llm/runs/fix-claude-hook-log-cwd--1774',
-);
+const RUN_FIXTURE_ROOT = join(PROJECT_ROOT, '.llm/runs');
 
 type HookEvent = (typeof HOOK_EVENTS)[number];
 
@@ -181,7 +178,15 @@ for (const event of HOOK_EVENTS) {
   });
 
   Deno.test(`${event} configured hook succeeds from a nested run cwd`, async () => {
-    await assertConfiguredSuccess(event, NESTED_RUN_CWD, 'nested-run-cwd');
+    const nestedRunCwd = await Deno.makeTempDir({
+      dir: RUN_FIXTURE_ROOT,
+      prefix: 'claude-hook-log-test-',
+    });
+    try {
+      await assertConfiguredSuccess(event, nestedRunCwd, 'nested-run-cwd');
+    } finally {
+      await Deno.remove(nestedRunCwd, { recursive: true });
+    }
   });
 
   Deno.test(`${event} configured hook distinguishes launch root from a cwd decoy`, async () => {
