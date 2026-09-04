@@ -42,10 +42,11 @@ No generator produced plan content, so `plan.md` remains untouched and PLAN-EVAL
 ## Owner routing ruling — 2026-09-04
 
 OpenCode's native GitHub Copilot provider becomes the first transport for every Copilot-supported
-matrix model except the OpenAI and Anthropic families. OpenAI remains native Codex/ChatGPT;
-Anthropic remains native Claude. Kimi K3 and Grok 4.6 are confirmed priority savings targets. The
-connector's live model catalog must be attested after device authorization; absent models fail over
-through the pre-existing provider chain rather than being guessed.
+matrix model except the OpenAI, Anthropic, and Gemini families. OpenAI remains native Codex/ChatGPT;
+Anthropic remains native Claude; Gemini remains native Google `agy`. Kimi K3 and Grok 4.6 are the
+confirmed priority savings targets. The connector's live model catalog must be attested after device
+authorization; absent models fail over through the pre-existing provider chain rather than being
+guessed.
 
-For `deep_research`, the ruling admits only the dedicated Copilot transport for Gemini 3.8 Flash; it
-does not admit generic OpenCode Go, Ollama, OpenRouter, or Claude transports.
+The `deep_research` route remains native Gemini 3.8 Flash through `agy`, with native Luna as the
+only model fallback. Copilot is not admitted to that role.

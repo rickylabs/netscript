@@ -40,6 +40,9 @@ returns `PASS`.
   guardrail both failed closed before plan generation.
 - GitHub's current catalog confirms Gemini 3.8 Flash, Kimi K3, and Grok 4.6 are Copilot models. Kimi
   and Grok are the immediate high-cost routes displaced by the Copilot entitlement.
+- Owner correction at 2026-09-04T19:07Z: Gemini remains on the native Google subscription through
+  `agy` for every role, including deep research. Copilot-first routing applies to supported
+  non-native families such as Kimi K3 and Grok 4.6; the prior broader wording is superseded.
 
 ## Gate Results
 

@@ -24,8 +24,9 @@ plan, review, and then a harnessed Copilot integration. No implementation is aut
   GitHub and OpenCode documentation.
 - Copilot cloud capability preflight passed: `copilot-swe-agent` is assignable to this repository.
 - Owner-ratified route: OpenCode GitHub Copilot first for every Copilot-supported matrix model
-  except OpenAI and Anthropic; those remain on native Codex/ChatGPT and Claude subscriptions. Cloud
-  Agent Tasks remains a measured implementation canary; no immediate OpenHands removal.
+  except OpenAI, Anthropic, and Gemini; those remain on native Codex/ChatGPT, Claude, and Google
+  `agy` subscriptions. Cloud Agent Tasks remains a measured implementation canary; no immediate
+  OpenHands removal.
 
 ## In Progress
 
