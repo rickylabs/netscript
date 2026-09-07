@@ -39,11 +39,15 @@ describe('generateRegisterBackground', () => {
 
   it('should export registerBackgroundProcessors async function', () => {
     const output = generateRegisterBackground(emptyOptions);
-    assertStringIncludes(output, 'export async function registerBackgroundProcessors(');
+    assertStringIncludes(output, 'export function registerBackgroundProcessors(');
+    assertStringIncludes(output, 'Promise<Map<string, ExecutableResource>>');
   });
 
   it('should import buildOtelEnvVars and resolvePermissions', () => {
-    const output = generateRegisterBackground(emptyOptions);
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: { workers: fixtures.MINIMAL_BACKGROUND },
+    });
     assertStringIncludes(output, 'buildOtelEnvVars,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
@@ -277,7 +281,7 @@ describe('generateRegisterBackground', () => {
 
   it('should handle empty processors', () => {
     const output = generateRegisterBackground(emptyOptions);
-    assertStringIncludes(output, '// No background processors configured');
+    assertStringIncludes(output, 'Promise.resolve(new Map<string, ExecutableResource>())');
   });
 });
 // generateRegisterApps

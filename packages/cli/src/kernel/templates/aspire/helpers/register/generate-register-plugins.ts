@@ -44,6 +44,16 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   const { plugins, version: _version, denoDefaults, databaseEngine } = options;
   const entries = Object.entries(plugins);
 
+  if (entries.length === 0) {
+    return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireEmptyRegistration, {
+      header: fileHeader('register-plugins.mts'),
+      sdk: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
+      compat: SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT,
+      functionName: 'registerPlugins',
+      pluginParameter: '',
+    });
+  }
+
   // --- Pass 1 blocks: create all plugin resources ---
   const pass1Blocks: string[] = [];
 

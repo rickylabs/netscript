@@ -33,6 +33,16 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
   const { processors, version: _version, denoDefaults, databaseEngine } = options;
   const entries = Object.entries(processors);
 
+  if (entries.length === 0) {
+    return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireEmptyRegistration, {
+      header: fileHeader('register-background.mts'),
+      sdk: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS,
+      compat: SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT,
+      functionName: 'registerBackgroundProcessors',
+      pluginParameter: '  _plugins: Map<string, ExecutableResource>,\n',
+    });
+  }
+
   const registrationBlocks: string[] = [];
 
   for (const [processorIndex, [name, entry]] of entries.entries()) {
