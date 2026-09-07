@@ -10,3 +10,9 @@ export {
   REMOTE_SESSION_REJECTIONS,
   RemoteSessionVerificationError,
 } from '@netscript/plugin-auth-core/authenticator';
+export type {
+  AuthenticatorPort,
+  AuthnRequest,
+  AuthnResult,
+  Principal,
+} from '@netscript/plugin-auth-core/authenticator';

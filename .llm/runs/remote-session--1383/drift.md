@@ -83,3 +83,9 @@ Drift is append-only.
 - No NetScript stable, canary, tag push or publication is authorized by implementation or dry-run evidence. Every release requires explicit owner approval.
 - Milestone 25 remains unfinished. Any canary proposal must identify a meaningful backlog payload and executable evidence; the Cockpit prerequisite fixes alone do not establish release significance.
 - Continue code and verification without treating unpublished source as an installed consumer artifact.
+
+## 2026-09-08 — Complete canonical type signature on authenticator leaf
+
+- Documentation lint identified private-type references from the plugin leaf to canonical service AuthenticatorPort/AuthnRequest, then their AuthnResult/Principal dependencies.
+- Re-export those four existing service types through both authenticator leaves. No type restatement or new runtime behavior. This expands the reviewed five-symbol leaf only to expose its existing signature; implementation review must assess it.
+- Direct leaf documentation probe now passes. Combined package documentation lint still reports other private-type references; baseline comparison and disposition remain required.

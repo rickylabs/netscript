@@ -83,6 +83,7 @@ retains no principal cache. Authorization remains a separate service policy.
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `createAuthServiceAuthenticator` | function | Verify an active, unexpired session through the native auth SDK. |
+| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type | Canonical service authentication types re-exported for the complete public signature. |
 | `AuthServiceAuthenticatorOptions` | interface | Required discovery name and timeout, optional router/protocol and explicit cleartext policy. |
 | `readBearerCredential` | function | Read a single strict bearer credential; reject ambiguous headers. |
 | `REMOTE_SESSION_REJECTIONS` | constant | Stable missing, unauthorized, inactive and expired denial reasons. |
