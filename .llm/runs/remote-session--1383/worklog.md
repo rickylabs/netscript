@@ -217,3 +217,7 @@ Review-thread gate PASS (zero threads/unanswered); CI at75d0e0475 is running, no
 ## 2026-09-08 — CI-generated Aspire manifest correction
 
 CI run34169705578 quality job101887589407 failed only at Aspire phase1 manifest freshness after preceding quality steps passed. Native aspire-surface-manifest.ts adds exactly two newly Aspire-mentioning paths: auth-core README and authenticator source. No manual rule/version change. [observed - aspire-parity-repair.json] parity now exits0, manifest fresh. Product implementation unchanged from independent PASS; generated manifest repair retained for reviewer/CI. Runtime exec59257 passed AppHost startup with disclosed relay and is executing database.init, no overall verdict.
+
+## 2026-09-08 — Runtime suite terminal result and cleanup
+
+Original runtime exec59257 exited1:90 gates PASS, one failure behavior.app-reference because its fixed browser locator does not include installed Playwright Chromium. AppHost cleanup PASS. Relay cleanup executed with exact owner/source IDs; original relay exec3540 completed exit0. No runtime-suite PASS; browser prerequisite remedy and remaining gates still required. Existing browser path found under user cache, no installation/restart yet. runtime-suite-result.json retains bounded result and topology.

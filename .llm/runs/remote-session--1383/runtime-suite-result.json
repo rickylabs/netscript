@@ -1,0 +1,16 @@
+{
+  "headAtStart": "d51a0a91e9f6639992c5d48aeb34207b016b8acd",
+  "suite": "scaffold.runtime",
+  "exitCode": 1,
+  "passed": 90,
+  "failed": 1,
+  "skipped": 0,
+  "failedGate": "behavior.app-reference",
+  "reason": "Browser locator excludes existing Playwright chromium installation; no executable found in fixed candidate paths",
+  "existingBrowser": "/home/agent/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
+  "apphostCleanup": "PASS",
+  "relayExec": 3540,
+  "relayExitCode": 0,
+  "relayCleanup": "Completed using exact owner cockpit-auth-smoke registry/source IDs",
+  "topology": "Owner-authorized remote DinD loopback relay for three exact generated infrastructure containers"
+}
