@@ -1,5 +1,6 @@
 /** Browser acceptance probe for the generated canonical app reference. */
 
+import { selectBrowserExecutable } from '../service-client-browser-probe.ts';
 import { generatedAppHomeUrlsFromAppHost, readPinnedAppPort } from '../generated-app-endpoint.ts';
 
 export interface BrowserViewport {
@@ -138,30 +139,7 @@ async function renderWithHeadlessChrome(
 }
 
 export async function findBrowserExecutable(): Promise<string> {
-  const candidates = [
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe',
-    '/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-  ];
-  for (const candidate of candidates) {
-    try {
-      const stat = await Deno.stat(candidate);
-      if (stat.isFile) return candidate;
-    } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error;
-    }
-  }
-  throw new Error(
-    `No supported headless Chrome/Chromium executable found. Checked: ${candidates.join(', ')}`,
-  );
+  return (await selectBrowserExecutable()).path;
 }
 
 if (import.meta.main) {

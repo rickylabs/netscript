@@ -89,3 +89,9 @@ Drift is append-only.
 - Documentation lint identified private-type references from the plugin leaf to canonical service AuthenticatorPort/AuthnRequest, then their AuthnResult/Principal dependencies.
 - Re-export those four existing service types through both authenticator leaves. No type restatement or new runtime behavior. This expands the reviewed five-symbol leaf only to expose its existing signature; implementation review must assess it.
 - Direct leaf documentation probe now passes. Combined package documentation lint still reports other private-type references; baseline comparison and disposition remain required.
+
+## 2026-09-08 — Runtime browser gate reuses native selector
+
+The reference/island browser probe's fixed-system-path lookup bypassed the existing service-client selectBrowserExecutable and NETSCRIPT_E2E_BROWSER_EXECUTABLE policy. Its failed gate prevented completion despite installed Chromium. Replace duplicate locator with a call to that existing bounded executable/version validator; no new discovery policy, dependency, browser installation or auth behavior. One wiring regression rejects an explicitly empty override. Independent re-review required for this added gate-only fix.
+
+Existing Chromium151.0.7922.34 runs with LD_LIBRARY_PATH=/home/agent/.local/lib/chrome-deps. Shared resolver tests initially failed because /ephemeral/tmp disallows fixture executable spawn. Owned worktree TMPDIR yields35PASS; both receipts retained.
