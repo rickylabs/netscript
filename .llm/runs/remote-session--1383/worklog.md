@@ -207,3 +207,9 @@ Retry uses existing /home/agent/.local/share/mise/installs/dotnet/10.0.400 on PA
 ## 2026-09-08 — Independent implementation PASS
 
 Original evaluator exec16492 completed exit0. impl-eval.md records independent Muse PASS, including rerun checks/57 focused tests/lint/format and explicit acceptance of canonical type re-exports, claim forwarding and inherited doc diagnostics. Identity/cost receipt retained; no self-certification. Runtime exec59257 remains live, with production exclusion, service-client contracts, resource rerun, plugin negative behavior and Aspire restore passed. Runtime and exact-head CI still required before merge.
+
+## 2026-09-08 — Runtime DinD loopback topology support
+
+Aspire describe of exact generated AppHost showed Postgres/Redis/Garnet unhealthy; native Postgres logs reported ready for connections. Docker publishes those owned resources on remote loopback:4b2dc6f7023a:30864, bd00457c6d2a:32779,19f964a178e9:32780. Reused owner-authorized Cockpit quickstart relay unchanged, exact source-ID allowlist, owner cockpit-auth-smoke; no AppHost edits/foreign targets. Registry /tmp/cockpit-auth-smoke-relay.json, exec3540, PID1287054; all three mappings created. Runtime exec59257 still live, no final verdict. This topology support must be disclosed with runtime evidence. Cleanup after suite termination through the same tool cleanup mode and exact owner/registry/source IDs; do not leave relay running.
+
+Review-thread gate PASS (zero threads/unanswered); CI at75d0e0475 is running, not terminal green.

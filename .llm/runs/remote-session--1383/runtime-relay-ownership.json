@@ -1,0 +1,27 @@
+{
+  "owner": "cockpit-auth-smoke",
+  "pid": 1287054,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.34",
+  "since": "2026-09-07T23:00:00.000Z",
+  "relays": [
+    {
+      "port": 30864,
+      "container": "relay-cockpit-auth-smoke-30864",
+      "source": "postgres-64fdfbef",
+      "startedAt": "2026-09-07T23:22:50.306Z"
+    },
+    {
+      "port": 32780,
+      "container": "relay-cockpit-auth-smoke-32780",
+      "source": "garnet-jyxwhpzw",
+      "startedAt": "2026-09-07T23:22:50.779Z"
+    },
+    {
+      "port": 32779,
+      "container": "relay-cockpit-auth-smoke-32779",
+      "source": "redis-qkkcssun",
+      "startedAt": "2026-09-07T23:22:51.283Z"
+    }
+  ]
+}
