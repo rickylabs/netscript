@@ -133,3 +133,7 @@ Not run — planning only. S0 populates baseline counts before S1.
 
 - PLAN-EVAL: start at `plan.md` L6/L9/L12/L13 and the S3 test list; spot-check F18 by grepping
   `currentAuthRequest` call sites and rerunning `planner-http-session-probe.ts` (it stops its own listener).
+
+## Coordinator full baseline receipt
+
+At product source3330d6f9c (run-only head4e8bc5ed9), structured run-deno-test wrapper over packages/plugin-auth-core, plugins/auth/tests and packages/service/tests/auth completed exit0:97 passed,0 failed,0 ignored. Receipt baseline-full-auth-tests.json. This completes the scoped baseline measurement; it is not new remote-verifier acceptance or independent plan PASS. No product files changed.
