@@ -1,4 +1,4 @@
-# Worklog: remote session-verifying AuthenticatorPort (#1383 partial)
+# Worklog: remote session-verifying AuthenticatorPort + native `/session` bearer support (#1383 partial)
 
 ## Run Metadata
 
@@ -6,97 +6,104 @@
 | -------------- | ----- |
 | Run ID         | `remote-session--1383` |
 | Branch         | `feat/remote-session-authenticator` @ baseline `3330d6f9c` |
-| Archetype      | 2 — Integration (auth-core), 5 — Plugin (re-export) |
+| Archetype      | 2 — Integration (auth-core adapter); 5 — Plugin (leaf + `session()` handler) |
 | Scope overlays | `SCOPE-service.md` |
 
 ## PLAN-EVAL: SELECTED (hard stop)
 
-Reason: public-contract decision on a shared, security-sensitive authentication boundary spanning two
-packages, with three unresolved decisions (OQ1–OQ3) that a wrong answer would force rework on.
-Complex-row authority: milestone coordinator (`coordinator-dispatch.json`). Route:
-`muse_spark_1_3@max → grok_4_6@high`, separate session, non-Anthropic family. No implementation
-file may be created before `plan-eval.md` reads `PASS`.
+Reason: public-contract decision on a shared, security-sensitive authentication boundary across two
+packages plus a change to the auth plugin service's session handler. Complex-row authority: milestone
+coordinator (`coordinator-dispatch.json`). Plan author: Fable 5.1 (Anthropic). Plan evaluator: different
+vendor family and session (`muse_spark_1_3@max → grok_4_6@high`). No implementation file may exist
+before `plan-eval.md` reads `PASS`.
+
+Implementation generator (per coordinator): Astra medium. IMPL-EVAL identity is resolved at dispatch
+from a fresh `agentic:matrix --tier complex --impl-evaluator` relative to Astra's family and session.
 
 ## Design
 
 ### Public Surface
 
-- `@netscript/plugin-auth-core/authenticator` → `createRemoteSessionAuthenticator(options): AuthenticatorPort`,
-  `RemoteSessionAuthenticatorOptions`, `REMOTE_SESSION_REJECTIONS`, `RemoteSessionVerificationError`.
-- `@netscript/plugin-auth/authenticator` → `createAuthServiceAuthenticator(options): AuthenticatorPort`
-  plus the three re-exports above.
+- `@netscript/plugin-auth-core/authenticator`: `createAuthServiceAuthenticator(options): AuthenticatorPort`,
+  `AuthServiceAuthenticatorOptions`, `readBearerCredential(request)`, `REMOTE_SESSION_REJECTIONS`,
+  `RemoteSessionVerificationError`.
+- `@netscript/plugin-auth/authenticator`: the same five names re-exported; nothing added.
+- No new public surface on the auth service; handlers receive `context.request` through the existing bridge and `GET /session` gains bearer resolution (behaviour only).
 
-### Domain Vocabulary (all imported, none redefined)
+### Domain Vocabulary (imported, none redefined)
 
-- `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` — `@netscript/service/auth`
-  (already re-exported by auth-core `domain`).
+- `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` — `@netscript/service/auth`.
 - `authContract`, `SessionResponse`, `SessionResponseSchema`, `AUTH_SESSION_STATES` —
   `@netscript/plugin-auth-core/contracts/v1`.
-- `RemoteSessionAuthenticatorOptions` — new, options only (see `plan.md` § Public API).
+- `AuthSessionLookup.token` — `@netscript/plugin-auth-core/ports` (already "id, token, or request-derived").
+- `AuthServiceAuthenticatorOptions` — new, options only (`plan.md` § Public API).
 
 ### Ports
 
-- Consumed: `AuthenticatorPort` (implemented), SDK `ServiceClient<AuthContract>` (composed via
-  `createServiceClient`), `createBearerSdkClientContribution` (composed). No new port is declared;
-  the SDK client is the external-system seam and the tests exercise it over real HTTP.
+- Implemented: `AuthenticatorPort`. Composed: SDK `ServiceClient<AuthContract>` via
+  `createServiceClient`; `createBearerSdkClientContribution`. Consumed by the handler change:
+  `AuthSessionStorePort.getSession` with `token`. No new port.
 
 ### Constants
 
-- `REMOTE_SESSION_REJECTIONS` = `{ bearerMissing, unauthorized, notActive, expired }` (typed
-  `Readonly<{...}>`, mirrors `AUTH_SESSION_STATES`).
-- `DEFAULT_REMOTE_SESSION_ROUTER_NAME = 'auth'` (F9).
-- `DEFAULT_REMOTE_SESSION_TIMEOUT_MS` — value per OQ2.
-- Bearer context key `accessToken` (contribution context `{ accessToken: 'required' }`).
+- `REMOTE_SESSION_REJECTIONS` = `{ bearerMissing, unauthorized, notActive, expired }` (typed `Readonly<{…}>`).
+- `DEFAULT_AUTH_ROUTER_NAME = 'auth'` (router namespace, F9 — not a discovery default).
+- Error codes: `'discovery' | 'transport' | 'timeout' | 'malformed_response' | 'remote_error'`.
+- Bearer context key `accessToken`.
+- `timeoutMs` bounds: integer, `1 … 2_147_483_647`.
 
 ### Commit Slices
 
-See `plan.md` § Commit Slices (S0 baseline evidence, S1 core adapter + unit tests, S2 real-HTTP
-typed-SDK tests + middleware integration, S3 plugin-auth re-export, S4 surface carriers).
+See `plan.md` § Commit Slices: S0 baseline evidence, S1 core adapter + unit tests, S2 request propagation + native
+`session()` bearer support with real-HTTP precedence/isolation tests, S3 real-HTTP acceptance (native service +
+in-memory kv-oauth) + fault fixture + middleware integration, S4 plugin leaf, S5 carriers.
 
 ### Deferred Scope
 
-- Everything in `plan.md` § Non-Scope; notably OQ3 (auth service bearer → `lookup.token`) and the
-  factory/adoption/scaffold steps of #1383.
+- `plan.md` § Non-Scope; notably the request-blind `me`/`signout` bridge (F18) and #1383 steps 1–2, 4–5.
 
 ### Contributor Path
 
-A contributor adding another remote verifier (for example a `/me`-based identity reader) copies
-`packages/plugin-auth-core/src/adapters/remote-session-authenticator.ts`: build the SDK client with the
-published contract and the bearer contribution, validate with the published response schema, map to
-`AuthnResult`, and throw `RemoteSessionVerificationError` for anything that is not a definite
-rejection. Export it from `src/adapters/mod.ts`, add the entrypoint to `deno.json` `check`, and add
-the sub-path row to the reference page.
+To add another remote verifier, copy `packages/plugin-auth-core/src/adapters/auth-service-authenticator.ts`:
+build the SDK client with the published contract and bearer contribution, validate with the published
+response schema, map to `AuthnResult`, throw `RemoteSessionVerificationError` for anything that is not a
+definite rejection, export from `src/adapters/mod.ts`, add the entrypoint to `deno.json` `check`, add the
+reference-page row. To make another auth route honour a bearer, use `context.request` (now propagated for every handler) and pass `readBearerCredential(...)` as `token`, as `session()` does.
 
 ## Progress Log
 
 | Time (UTC) | Slice | Step | Notes |
 | ---------- | ----- | ---- | ----- |
-| 2026-09-07 23:46 | — | bootstrap | run dir created by coordinator (brief, matrix receipts, dispatch record) |
-| 2026-09-08 | — | research | skills, issue #1383, auth-core/sdk/service surfaces, Cockpit reference, generator evidence read; `find_guidance` run locally over `docs/site` |
-| 2026-09-08 | — | plan | `plan.md`, this Design checkpoint, `context-pack.md`, `drift.md` written; **no implementation** |
-| 2026-09-08 00:09 | S0 (partial, coordinator) | baseline | `baseline-auth-tests.json` (plugins/auth services tests: 10 pass at baseline, raw `deno test`) and `coordinator-bearer-probe.{ts,json}` (OQ3 reproduced: bearer → `authenticated:false`, cookie/direct → `true`) written by the coordinator; S0 still owes wrapper-sourced receipts for `packages/service/tests/auth` and `packages/plugin-auth-core` |
+| 2026-09-07 23:46 | — | bootstrap | run dir created by coordinator |
+| 2026-09-08 00:09 | S0 (partial, coordinator) | baseline | `baseline-auth-tests.json` (10 pass, raw `deno test`, exploratory); `coordinator-bearer-probe.{ts,json}` (handler level: direct/cookie true, bearer false; probe process retained a handle — exit 143, not a test) |
+| 2026-09-08 | — | plan rev 1 | rejected by coordinator scope review (7 points) |
+| 2026-09-08 22:15 | — | research add | `planner-http-session-probe.{ts,json,log}`: native service over real HTTP + typed SDK: direct true, cookie false, bearer false, bogus bearer false; listener stopped, exited via `Deno.exit` — evidence, not a test |
+| 2026-09-08 | — | plan rev 2 | all seven review points addressed; **no implementation** |
+| 2026-09-08 22:20 | — | plan rev 2.1 | folded coordinator `coordinator-request-context.md` + `coordinator-http-context-probe.json` (bridge read at context seam → cookie true, bearer false) and `coordinator-probe-cleanup.md` (`await using` KV ownership); L12/S2 updated |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
-| Adapter in auth-core, re-export in plugin-auth | thin-glue verdict; no new dependency edge; no cycle | doctrine 10; research F10/F12 |
-| Throw on unavailable/malformed, deny on rejected | native 503/401 split | PR #2001, F3 |
-| `direct-only` response cache, no memoisation | revocation must be re-observed | brief; F7 |
-| `serviceName` required in core | no discovery guessing | brief; OQ1 |
+| One core factory `createAuthServiceAuthenticator`, plugin leaf re-exports | issue name; thin glue; no new edge | #1383, F10/F12 |
+| `serviceName`/`timeoutMs` required, validated | no framework default invented | coordinator review 3 |
+| Principal `scheme:'bearer'`, no `sessionId`/`providerId` claims | session id is the bearer in kv-oauth | coordinator review 4; F6 |
+| Redacted error, no `cause`, `toJSON` limited | mirror SDK redaction shape | F21; review 5 |
+| `main.ts` context factory reads `currentAuthRequest()`; `session()` passes strict bearer as `token` | request never reached handlers; bearer never reached the lookup | F8/F18/F22; review 1; `coordinator-request-context.md` |
+| `me`/`signout` untouched | #1384 ownership | review 1 |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
-| Sibling family-reference repos unavailable | minor | yes |
-| `aspireify` skill absent from consumer bundle | minor | yes |
-| Docs `serviceName: 'auth-api'` vs generator `services__auth__http__0` | significant (OQ1) | yes |
-| Auth service `/session` ignores bearer (OQ3) | significant (adoption dependency) | yes |
+| Rev-1 false claim that sibling references were missing | minor | yes (corrected) |
+| Docs `auth-api` vs generator `services__auth__http__0` | minor now (no default chosen) | yes |
+| Request bridge unread → all handlers request-blind over HTTP | significant (fixed at the seam by L12) | yes |
+| In-memory KV expiration timer retained by probes | minor (test-ownership rule) | yes |
 
 ## Gate Results
 
-Not run — planning only. S0 will populate the static-gate table with baseline counts before S1.
+Not run — planning only. S0 populates baseline counts before S1.
 
 ### Static Gates
 
@@ -114,16 +121,15 @@ Not run — planning only. S0 will populate the static-gate table with baseline 
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Aspire/runtime | `N/A` | — | no service/AppHost change |
+| Native plugin service over HTTP + in-memory kv-oauth (ARCHETYPE-5 runtime, no Aspire session, no IdP) | `NOT_RUN` | S3 | required because a plugin service handler changes |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| `plugins/auth` import surface, middleware integration test | `NOT_RUN` | — | S2/S3 |
+| `plugins/auth` import surface, middleware integration | `NOT_RUN` | S3/S4 | — |
 
 ## Handoff Notes
 
-- PLAN-EVAL: start with `plan.md` § Open-Decision Sweep (OQ1–OQ4) and § Locked Decisions L5/L6; spot-check
-  research F8 (auth service ignores bearer) and F9 (discovery key) against the tree.
-- The plan deliberately does not answer OQ1/OQ2 with invented defaults; the coordinator owns them.
+- PLAN-EVAL: start at `plan.md` L6/L9/L12/L13 and the S3 test list; spot-check F18 by grepping
+  `currentAuthRequest` call sites and rerunning `planner-http-session-probe.ts` (it stops its own listener).

@@ -1,4 +1,4 @@
-# Context Pack: remote session-verifying AuthenticatorPort (#1383 partial)
+# Context Pack: remote session-verifying AuthenticatorPort + native `/session` bearer support (#1383 partial)
 
 ## Run Metadata
 
@@ -6,24 +6,24 @@
 | -------------- | ----- |
 | Run ID         | `remote-session--1383` |
 | Branch         | `feat/remote-session-authenticator` (baseline `3330d6f9c`, HEAD `4adb5ef95` = run dir only) |
-| Current phase  | `plan` — awaiting PLAN-EVAL in a separate non-Anthropic session |
-| Archetype      | 2 (auth-core adapter) + 5 (plugin re-export) |
+| Current phase  | `plan` (revision 2) — awaiting PLAN-EVAL in a separate non-Anthropic session |
+| Archetype      | 2 (auth-core adapter) + 5 (plugin leaf and `session()` handler) |
 | Scope overlays | service |
 
 ## Current State
 
-Plan artifacts are complete; no product code exists on the branch. The plan places the remote
-session authenticator in `packages/plugin-auth-core/src/adapters/` (export `./authenticator`) with a
-thin `@netscript/plugin-auth/authenticator` re-export named `createAuthServiceAuthenticator`, uses
-the typed SDK client + bearer contribution (`direct-only`), validates with `SessionResponseSchema`,
-denies rejected/expired/inconsistent sessions, and throws on unavailable/malformed remote answers so
-the #2001 middleware returns a redacted 503.
+Plan revision 2 is complete after coordinator review; no product code exists. The slice now covers
+both halves of a working end state: the reusable `createAuthServiceAuthenticator` (auth-core, thin
+plugin-auth leaf) and the minimum change that makes the native auth service honour request credentials over HTTP (existing
+`currentAuthRequest()` bridge read at the existing context seam in `main.ts`) and `GET /session` honour a
+strict bearer (`token` lookup). Acceptance is real typed-SDK HTTP → native plugin service → in-memory kv-oauth, no IdP.
 
 ## Completed
 
-- Research (`research.md`, F1–F17; F8/F17 carry the coordinator's baseline probe and test receipt) including dependency-cycle facts and generator discovery-key evidence.
-- Plan with locked decisions L1–L11, open-decision sweep, slices S0–S4, validation plan, IMPL-EVAL scope.
-- Design checkpoint in `worklog.md`; drift log.
+- Research F1–F22 including two runtime probes (handler-level by the coordinator, HTTP-level by the
+  planner) that both show bearer verification returns `authenticated:false` at baseline.
+- Plan with locked decisions L1–L13, closed decision sweep, slices S0–S5, validation plan, evaluation
+  routing, IMPL-EVAL scope. Design checkpoint in `worklog.md`; drift log with rev-1 correction.
 
 ## In Progress
 
@@ -31,26 +31,25 @@ the #2001 middleware returns a redacted 503.
 
 ## Next Steps
 
-1. Coordinator dispatches PLAN-EVAL (`muse_spark_1_3@max → grok_4_6@high`, separate session) reading
-   `research.md`, `plan.md`, `worklog.md` § Design, `gates/plan-gate.md`.
-2. Coordinator answers OQ1 (default discovery name), OQ2 (timeout default), and records OQ3 as a
-   step-4 dependency on #1383.
-3. On `PASS`: open the draft PR (`Part of #1383`, no closing keyword, milestone 0.0.8, labels per L10),
-   then implement S0→S4 on the implementation route (`astra@medium → fable_5_1@medium`).
+1. Coordinator dispatches PLAN-EVAL (`muse_spark_1_3@max → grok_4_6@high`, separate session, different
+   family from Fable).
+2. On `PASS`: open the draft PR (`Part of #1383`, no closing keyword, milestone 0.0.8, labels per L10),
+   then implement S0→S5 on the Astra medium lane; resolve IMPL-EVAL from a fresh matrix relative to Astra.
 
 ## Key Decisions
 
 | Decision | Source | Notes |
 | -------- | ------ | ----- |
-| Owner package = auth-core; plugin-auth re-exports | doctrine verdict, F10/F12 | no new edge, no cycle |
-| Throw → 503, deny → 401 | #2001 (`64e6c4c74`) | never relabel outage as bad credential |
-| `serviceName` required; no invented default | brief | OQ1 pending |
+| One factory in auth-core, leaf re-export | F12, review 6 | no new edge, no cycle (F10) |
+| Required `serviceName`/`timeoutMs` | review 3 | no invented defaults |
+| `scheme:'bearer'`, no `sessionId` claim | review 4 | session id is the bearer in kv-oauth |
+| Request propagated at the `main.ts` context seam; `session()` bearer via `token` | review 1, `coordinator-request-context.md`, F18/F22 | `me`/`signout` code untouched |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | ---- | ------ | ----- |
-| `.llm/runs/remote-session--1383/*.md` | new | planning artifacts only |
+| `.llm/runs/remote-session--1383/*` | new/updated | planning artifacts and probe evidence only |
 
 ## Gates
 
@@ -58,17 +57,17 @@ the #2001 middleware returns a redacted 503.
 | ----------- | -------------- | -------- |
 | Static | NOT_RUN | — |
 | Fitness | NOT_RUN | — |
-| Runtime | N/A | no runtime change |
+| Runtime | NOT_RUN (required: native service over HTTP, in-memory kv-oauth) | S3 |
 | Consumer | NOT_RUN | — |
 
 ## Open Questions
 
-- OQ1 default `serviceName` (`auth` vs `auth-api`); OQ2 timeout default; OQ3 auth service bearer
-  mapping on `/session`; OQ4 principal scheme confirmation.
+- None blocking. `me`/`signout` code is untouched; they now receive the request by design and no
+  behaviour is claimed for them (#1384 owns signout).
 
 ## Drift and Debt
 
-- Drift: see `drift.md` (4 entries). Debt: none created.
+- Drift: `drift.md` (5 entries incl. one correction). Debt: none created.
 
 ## Commits
 
