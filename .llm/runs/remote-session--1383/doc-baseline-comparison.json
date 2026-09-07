@@ -1,0 +1,158 @@
+{
+  "baseline": "3330d6f9c9c4fcbf123b434c7cf8733648c44d87",
+  "current": "31e630dec829ac7682dc5b8819cef2e327b2e4c8",
+  "packages": {
+    "core": {
+      "baseline": {
+        "exitCode": 1,
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 3,
+          "totalPrivateTypeRef": 3,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "files": [
+          {
+            "path": "packages/plugin-streams-core/src/domain/stream-schema.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "packages/plugin-auth-core/src/contracts/v1/auth.contract.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          }
+        ]
+      },
+      "current": {
+        "exitCode": 1,
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 3,
+          "totalPrivateTypeRef": 3,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "files": [
+          {
+            "path": "packages/plugin-streams-core/src/domain/stream-schema.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "packages/plugin-auth-core/src/contracts/v1/auth.contract.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          }
+        ]
+      },
+      "sameDiagnostics": true
+    },
+    "plugin": {
+      "baseline": {
+        "exitCode": 1,
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 12,
+          "totalPrivateTypeRef": 12,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "files": [
+          {
+            "path": "packages/plugin-streams-core/src/application/create-durable-stream.ts",
+            "privateTypeRef": 4,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 4
+          },
+          {
+            "path": "packages/plugin-streams-core/src/ports/stream-producer-port.ts",
+            "privateTypeRef": 4,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 4
+          },
+          {
+            "path": "packages/plugin-streams-core/src/domain/stream-schema.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "packages/plugin-auth-core/src/contracts/v1/auth.contract.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          },
+          {
+            "path": "plugins/auth/src/public/mod.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          }
+        ]
+      },
+      "current": {
+        "exitCode": 1,
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 12,
+          "totalPrivateTypeRef": 12,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "files": [
+          {
+            "path": "packages/plugin-streams-core/src/application/create-durable-stream.ts",
+            "privateTypeRef": 4,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 4
+          },
+          {
+            "path": "packages/plugin-streams-core/src/ports/stream-producer-port.ts",
+            "privateTypeRef": 4,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 4
+          },
+          {
+            "path": "packages/plugin-streams-core/src/domain/stream-schema.ts",
+            "privateTypeRef": 2,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 2
+          },
+          {
+            "path": "packages/plugin-auth-core/src/contracts/v1/auth.contract.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          },
+          {
+            "path": "plugins/auth/src/public/mod.ts",
+            "privateTypeRef": 1,
+            "missingJSDoc": 0,
+            "other": 0,
+            "total": 1
+          }
+        ]
+      },
+      "sameDiagnostics": true
+    }
+  }
+}

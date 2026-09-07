@@ -177,3 +177,9 @@ Documented both authenticator export leaves, explicit discovery/timeout, indepen
 Quality/architecture command completed exit 0 (existing warnings retained in /tmp/cockpit-auth-quality.log). Package doc wrappers failed with private-type references; receipts retained. New leaf gaps repaired by re-exporting canonical service signature types, no copied types. [observed - factory-leaf-doc.json] Plugin authenticator leaf passes structured doc lint, zero errors. Other package diagnostics still require baseline comparison; no package-wide doc PASS.
 
 Native prose generation succeeded from 7bb219d81; generated prose/provenance remain uncommitted while refreshing after the canonical signature documentation change. MCP corpus generation rerun after commit 66b12bd22 succeeded; remaining generated carriers/gates and independent evaluation pending.
+
+## 2026-09-08 — Baseline documentation comparison and generated assets
+
+[observed - doc-baseline-comparison.json] Clean detached baseline 3330d6f9c and current 31e630dec have identical combined package documentation diagnostics: core 3, plugin 12, same source files and counts. New leaf is clean; inherited diagnostics remain failures, not a package-wide PASS. Independent evaluation must assess this scoped non-regression disposition.
+
+[observed - factory-core-publish-dry-run.log; factory-plugin-publish-dry-run.log] Both package simulations exited 0 and include the new leaf, exclude test fixtures. No publication occurred. Native prose, assets barrel and publish-assets generators succeeded; generated changes committed as derived output. Remaining: generator check gates, package audits, final regression/format and independent review.

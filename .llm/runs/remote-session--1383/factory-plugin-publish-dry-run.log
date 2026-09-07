@@ -1,0 +1,67 @@
+Check mod.ts
+Check src/public/mod.ts
+Check contracts/v1/mod.ts
+Check scaffold.ts
+Check cli.ts
+Check services/src/main.ts
+Check streams/mod.ts
+Check streams/server.ts
+Check src/public/authenticator.ts
+Checking for slow types in the public API...
+Check mod.ts
+Check src/public/mod.ts
+Check contracts/v1/mod.ts
+Check scaffold.ts
+Check cli.ts
+Check services/src/main.ts
+Check streams/mod.ts
+Check streams/server.ts
+Check src/public/authenticator.ts
+warning[unanalyzable-dynamic-import]: unable to analyze dynamic import
+   --> /home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/main.ts:125:34
+    | 
+125 |   const bootstrap = await import(bootstrapModule);
+    |                                  ^^^^^^^^^^^^^^^ the unanalyzable dynamic import
+    | 
+
+  info: after publishing this package, imports from the local import map / package.json do not work
+  info: dynamic imports that can not be analyzed at publish time will not be rewritten automatically
+  info: make sure the dynamic import is resolvable at runtime without an import map / package.json
+
+Simulating publish of @netscript/plugin-auth@0.0.7 with files:
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/README.md (8.23KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/cli.ts (480B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/contracts/v1/mod.ts (304B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/database/auth.prisma (2.49KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/deno.json (2.64KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/mod.ts (236B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/package.json (200B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/scaffold.plugin.json (1.62KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/scaffold.ts (635B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/backend-registry.ts (10.56KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/init.ts (3.7KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/main.ts (5.11KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/request-context.ts (1005B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/router.ts (624B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/routers/router-context.ts (1.48KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/routers/v1-handlers.ts (14.42KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/routers/v1-helpers.ts (4.24KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/routers/v1-types.ts (4.56KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/services/src/routers/v1.ts (328B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/adapter/plugin.ts (2.1KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/adapter/resources/barrel/barrel.stub.ts (1.73KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/adapter/resources/barrel/barrel.ts (906B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/adapter/resources/input.ts (294B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/adapter/resources/mod.ts (333B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/adapter/resources/sdk-client.ts (1.88KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/constants.ts (1.01KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/package-metadata.generated.ts (219B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/public/authenticator.ts (496B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/src/public/mod.ts (2.31KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/streams/factory.ts (1.78KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/streams/mod.ts (551B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/streams/producer.ts (8.66KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/streams/schema.ts (3.25KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/streams/server.ts (842B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/plugins/auth/verify-plugin.ts (1.08KB)
+Success Dry run complete
