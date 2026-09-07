@@ -235,3 +235,9 @@ Original follow-up exec77152 exited0. browser-repair-eval.md PASS confirms minim
 ## 2026-09-08 — Final rerun reached AppHost startup
 
 Runtime exec19082 passed generated quality-negative and all generated type/lint/format checks. Exact new AppHost: .llm/tmp/cli-e2e/plugin-smoke-20260908-013220/aspire/apphost.mts. Native describe and Docker readback identify only5dc24a3ef8a9 (Garnet),0b6b576020d9 (Postgres),eabc3f47d9a6 (Redis). Reused unchanged owner-approved relay, owner cockpit-auth-final, registry /tmp/cockpit-auth-final-relay.json, exec85670. Must clean this relay after suite termination. No other source IDs or resources targeted. CI still live at4de7f03a7, no new failures observed.
+
+## 2026-09-08 — Restricted browser launch and permission review
+
+Real browser launch under --allow-read --allow-run --allow-env=NETSCRIPT_E2E_BROWSER_EXECUTABLE passed with rendered marker (browser-restricted-launch.json); no generated-app acceptance inferred. Third implementation-review pass disclosed to owner per notifyAfter3 policy. Fresh matrix retained; same independent Muse max session via native AGENTIC, exec51435, $1 conservative previous-cost basis plus live guard. No override.
+
+Canonical full runtime rerun after terminal/cleaned previous suite uses current82f14a809 and same scoped SDK/browser prerequisites, exec88383, log /tmp/cockpit-auth-scaffold-runtime-permission.log. Relay not yet started: observe new generated containers before selecting exact source IDs. Both processes require original-handle observation, not restart on timeout.
