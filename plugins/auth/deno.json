@@ -12,7 +12,8 @@
     "./adapter-cli": "./cli.ts",
     "./services": "./services/src/main.ts",
     "./streams": "./streams/mod.ts",
-    "./streams/server": "./streams/server.ts"
+    "./streams/server": "./streams/server.ts",
+    "./authenticator": "./src/public/authenticator.ts"
   },
   "imports": {
     "@netscript/contracts": "jsr:@netscript/contracts@0.0.7",
@@ -28,11 +29,11 @@
     "zod": "catalog:"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts scaffold.ts cli.ts src/public/mod.ts src/adapter/plugin.ts src/adapter/resources/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "check": "deno check --unstable-kv mod.ts scaffold.ts cli.ts src/public/mod.ts src/adapter/plugin.ts src/adapter/resources/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts src/public/authenticator.ts",
     "test": "deno test --unstable-kv --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
-    "doc-lint": "deno doc --lint mod.ts scaffold.ts cli.ts src/public/mod.ts src/adapter/plugin.ts src/adapter/resources/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
+    "doc-lint": "deno doc --lint mod.ts scaffold.ts cli.ts src/public/mod.ts src/adapter/plugin.ts src/adapter/resources/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts src/public/authenticator.ts",
     "publish:dry-run": "deno publish --dry-run --allow-dirty",
     "verify": "deno run --allow-read verify-plugin.ts"
   },

@@ -141,3 +141,15 @@ At product source3330d6f9c (run-only head4e8bc5ed9), structured run-deno-test wr
 ## First implementation slice
 
 Independent plan PASS retained; evaluator ses_f82065586ffeLljGd8IO7l8SLt, source4c020c538, wrapperexit0. Fresh implementation matrix selects the coordinator Astra medium. Implemented strict bearer reader, main request propagation and native session lookup; real HTTP native-router/SDK test proves valid/invalid bearer, cookie compatibility and revocation re-observation with owned cleanup. Scoped check:71files,1batch,0failed; tests:12passed,0failed. Receipts slice-check.json/slice-tests.json. Factory, fault matrix, carriers and IMPL-EVAL remain pending; not merge-ready. S2 prerequisite implemented before the full S1 adapter because it is required for a real successful verifier call. No release action.
+
+## 2026-09-08 — Core verifier and public leaf implementation checkpoint
+
+Implemented the native SDK-backed remote session authenticator, explicit discovery/timeout policy, schema validation, active/expiry checks, unchanged native claims and redacted verifier errors. Added the thin plugin public leaf and identity import test. The real native HTTP test exercises this factory before and after backend revocation.
+
+[observed - factory-public-tests.json] Focused wrapper: 16 passed, zero failed/ignored; denied environment/network permissions prove missing/malformed bearer does not attempt discovery or transport. Missing discovery is a thrown redacted transport error, not credential denial. Initial incorrect claim-absence assertion retained in factory-initial-claim-failure.json; corrected to native claim equality as the reviewed plan requires.
+
+Remaining: fault-injected remote error/malformed/timeout and middleware status cases, credential precedence/concurrency coverage, docs/generated carriers, full gates and independent implementation review. No merge-readiness, consumer installed-artifact, release or live IdP claim.
+
+## 2026-09-08 — HTTP fault boundary checkpoint
+
+[observed - factory-fault-tests.json] Five adapter tests pass with sanitizers enabled, including the contract-implemented HTTP fault fixture: UNAUTHORIZED maps to denial; AUTH_PROVIDER_ERROR throws a redacted remote error; authenticated-without-session denies; a deliberately held handler times out and its owned pending promise/listener are released in finally. Public ORPCError is used in the fixture because the auth implementer's typed error factory does not expose these entries precisely. Native positive acceptance remains separate. Malformed wire data, middleware status integration and remaining plan gates are still pending.

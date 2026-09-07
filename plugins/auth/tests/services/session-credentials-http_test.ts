@@ -1,3 +1,8 @@
+import {
+  createAuthServiceAuthenticator,
+  REMOTE_SESSION_REJECTIONS,
+} from '@netscript/plugin-auth-core/authenticator';
+import { toAuthnRequest } from '../../services/src/routers/v1-helpers.ts';
 import { assert, assertEquals } from '@std/assert';
 import { MemoryKvAdapter } from '@netscript/kv';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
@@ -78,7 +83,8 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
       routerName: 'auth',
       propagateTraceContext: false,
     });
-    assertEquals((await plain.session({ sessionId })).authenticated, true);
+    const nativeSession = await plain.session({ sessionId });
+    assertEquals(nativeSession.authenticated, true);
     // Exercise the browser cookie transport separately; SDK bearer calls remain typed.
     const cookieResponse = await fetch(
       `http://127.0.0.1:${running.addr.port}/api/rpc/v1/auth/session`,
@@ -112,7 +118,24 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
         .authenticated,
       false,
     );
+    const authenticator = createAuthServiceAuthenticator({ serviceName, timeoutMs: 1000 });
+    const request = toAuthnRequest({
+      url: authTestUrl('/api/private'),
+      headers: new Headers({ authorization: `Bearer ${sessionId}` }),
+    });
+    const verified = await authenticator.authenticate(request);
+    assert(verified.ok);
+    assertEquals(verified.principal.scheme, 'bearer');
+    assertEquals(verified.principal.claims, nativeSession.session?.claims);
+    assertEquals(await authenticator.authenticate(toAuthnRequest(undefined)), {
+      ok: false,
+      reason: REMOTE_SESSION_REJECTIONS.bearerMissing,
+    });
     await registry.resolveBackend().sessions.revokeSession(sessionId);
+    assertEquals(await authenticator.authenticate(request), {
+      ok: false,
+      reason: REMOTE_SESSION_REJECTIONS.notActive,
+    });
     assertEquals(
       (await bearerClient.session(undefined, { context: { accessToken: sessionId } }))
         .authenticated,

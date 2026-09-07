@@ -68,3 +68,18 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept as a test rule — formal tests construct and close their own adapter and stop every
   listener in `finally`; probes are evidence, never copied as tests.
+
+## 2026-09-08 — SDK error discrimination and native claim preservation
+
+- **Observed:** native SDK discovery failures expose generic errors, not a public discovery discriminator; the session client safe-result defined-error branch narrows to `never`.
+- **Action:** classify untyped failures as transport failures, and use the public `ORPCError` class guard and `defined` property for remote errors. Do not parse error messages.
+- **Source:** `deno doc --filter ORPCError npm:@orpc/contract@1.15.0`; factory check receipt `/tmp/cockpit-auth-factory-check.json`; SDK client discovery implementation.
+- **Observed:** the real native KV-OAuth session already includes `sessionId` in claims. A test requiring its absence was incorrect.
+- **Action:** assert exact native claim preservation; the adapter adds no credential or provider metadata. This matches the reviewed plan's claim-forwarding decision.
+- **Source:** focused test receipt `/tmp/cockpit-auth-factory-tests.json` (11 passed, 1 failed before assertion correction); `plugins/auth/tests/services/session-credentials-http_test.ts`.
+
+## 2026-09-08 — Owner release authority reaffirmed
+
+- No NetScript stable, canary, tag push or publication is authorized by implementation or dry-run evidence. Every release requires explicit owner approval.
+- Milestone 25 remains unfinished. Any canary proposal must identify a meaningful backlog payload and executable evidence; the Cockpit prerequisite fixes alone do not establish release significance.
+- Continue code and verification without treating unpublished source as an installed consumer artifact.
