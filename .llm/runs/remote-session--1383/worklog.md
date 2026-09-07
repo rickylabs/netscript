@@ -241,3 +241,7 @@ Runtime exec19082 passed generated quality-negative and all generated type/lint/
 Real browser launch under --allow-read --allow-run --allow-env=NETSCRIPT_E2E_BROWSER_EXECUTABLE passed with rendered marker (browser-restricted-launch.json); no generated-app acceptance inferred. Third implementation-review pass disclosed to owner per notifyAfter3 policy. Fresh matrix retained; same independent Muse max session via native AGENTIC, exec51435, $1 conservative previous-cost basis plus live guard. No override.
 
 Canonical full runtime rerun after terminal/cleaned previous suite uses current82f14a809 and same scoped SDK/browser prerequisites, exec88383, log /tmp/cockpit-auth-scaffold-runtime-permission.log. Relay not yet started: observe new generated containers before selecting exact source IDs. Both processes require original-handle observation, not restart on timeout.
+
+## 2026-09-08 — Permission integration independent PASS
+
+Original evaluator exec51435 completed exit0. browser-permission-eval.md PASS covers67 rerun tests and actual restricted subprocess negative/positive permission checks, including empty override and unrecognized-version refusal. Prior narrower PASS omission remains documented. Runtime exec88383 remains live after native scaffold/plugin/codegen passes, no full runtime verdict. Push reviewed repair and receipts to CI; no release.
