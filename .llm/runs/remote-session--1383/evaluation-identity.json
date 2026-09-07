@@ -1,0 +1,11 @@
+{
+  "sessionId": "ses_f82065586ffeLljGd8IO7l8SLt",
+  "model": "opencode-go/muse-spark-1.3-contributor",
+  "requestedEffort": "max",
+  "phase": "plan_evaluation",
+  "verdict": "PASS",
+  "reviewedHead": "4c020c538",
+  "wrapperExitCode": 0,
+  "reportedCostUsd": 0.03963772,
+  "source": "/tmp/cockpit-remote-auth-plan-eval-muse.log"
+}

@@ -14,7 +14,7 @@ import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
 import { type AuthPluginServiceContext, initializeAuthService } from './init.ts';
-import { withAuthRequest } from './request-context.ts';
+import { currentAuthRequest, withAuthRequest } from './request-context.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
@@ -82,7 +82,7 @@ export default async function createAuthService(
     docs: {},
     database: { context: toDbContext(dbClient) },
     middleware: [withAuthRequest],
-    context: () => ({ registry, telemetry }),
+    context: () => ({ registry, telemetry, request: currentAuthRequest() }),
     traceContext: true,
   }).serve();
 }

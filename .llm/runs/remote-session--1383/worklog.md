@@ -137,3 +137,7 @@ Not run — planning only. S0 populates baseline counts before S1.
 ## Coordinator full baseline receipt
 
 At product source3330d6f9c (run-only head4e8bc5ed9), structured run-deno-test wrapper over packages/plugin-auth-core, plugins/auth/tests and packages/service/tests/auth completed exit0:97 passed,0 failed,0 ignored. Receipt baseline-full-auth-tests.json. This completes the scoped baseline measurement; it is not new remote-verifier acceptance or independent plan PASS. No product files changed.
+
+## First implementation slice
+
+Independent plan PASS retained; evaluator ses_f82065586ffeLljGd8IO7l8SLt, source4c020c538, wrapperexit0. Fresh implementation matrix selects the coordinator Astra medium. Implemented strict bearer reader, main request propagation and native session lookup; real HTTP native-router/SDK test proves valid/invalid bearer, cookie compatibility and revocation re-observation with owned cleanup. Scoped check:71files,1batch,0failed; tests:12passed,0failed. Receipts slice-check.json/slice-tests.json. Factory, fault matrix, carriers and IMPL-EVAL remain pending; not merge-ready. S2 prerequisite implemented before the full S1 adapter because it is required for a real successful verifier call. No release action.

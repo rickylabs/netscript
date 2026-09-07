@@ -1,3 +1,4 @@
+import { readBearerCredential } from '@netscript/plugin-auth-core/authenticator';
 import { getParentContextFromHeaders } from '@netscript/telemetry/context';
 import type { PluginCapabilities } from '@netscript/plugin/contract-base';
 import type {
@@ -249,9 +250,11 @@ export async function session(
     async (audit) => {
       let resolved: AuthSession | undefined;
       try {
+        const request = toAuthnRequest(context.request, input?.sessionId);
         resolved = await backend.sessions.getSession({
           sessionId: input?.sessionId,
-          request: toAuthnRequest(context.request, input?.sessionId),
+          token: readBearerCredential(request),
+          request,
         });
       } catch (error) {
         const authError = providerFailure(error, backend.name);
