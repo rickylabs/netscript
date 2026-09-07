@@ -245,3 +245,7 @@ Canonical full runtime rerun after terminal/cleaned previous suite uses current8
 ## 2026-09-08 — Permission integration independent PASS
 
 Original evaluator exec51435 completed exit0. browser-permission-eval.md PASS covers67 rerun tests and actual restricted subprocess negative/positive permission checks, including empty override and unrecognized-version refusal. Prior narrower PASS omission remains documented. Runtime exec88383 remains live after native scaffold/plugin/codegen passes, no full runtime verdict. Push reviewed repair and receipts to CI; no release.
+
+## 2026-09-08 — Startup attempt disposition
+
+Runtime88383 is terminal exit1:43 passed, runtime.aspire-start failed, cleanup.aspire-stop passed. Exact captured resources retained in runtime-permission-attempt.json. This attempt omitted the authorized DinD relay; no browser or full-runtime PASS follows. Repeating the unchanged source with scoped relay supervision (runtime23732). No release/tag/publication authorized or performed.

@@ -1,0 +1,15 @@
+{
+  "sourceHead": "7a93702051a2c19d95e19d4d30219155d6fca037",
+  "suite": "scaffold.runtime",
+  "processHandle": 88383,
+  "exitCode": 1,
+  "passed": 43,
+  "failed": 1,
+  "skipped": 0,
+  "failedGate": "runtime.aspire-start",
+  "apphostCleanup": "PASS",
+  "relayStarted": false,
+  "observed": "Captured Aspire events show PostgreSQL, Redis and Garnet Running/Unhealthy; dependent auth, workers, sagas and application services Waiting. No relay was attached during this attempt.",
+  "nextAction": "Repeat unchanged suite with the previously owner-authorized relay bound to exact newly generated container IDs. Startup recovery must be observed, not assumed.",
+  "evidence": ".llm/tmp/cli-e2e/plugin-smoke-20260908-014500/.netscript/e2e/aspire-describe.ndjson"
+}
