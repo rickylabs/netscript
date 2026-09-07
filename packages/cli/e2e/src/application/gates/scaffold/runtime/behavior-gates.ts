@@ -1,3 +1,4 @@
+import { BROWSER_EXECUTABLE_ENV } from '../service-client-browser-probe.ts';
 import { GATE, GATE_PHASE } from '../../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine } from '../../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../../domain/gate-definition.ts';
@@ -307,6 +308,7 @@ export function createRuntimeBehaviorGates(
         'run',
         '--allow-read',
         '--allow-run',
+        `--allow-env=${BROWSER_EXECUTABLE_ENV}`,
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-app-reference.ts`,
         context.project.projectRoot,
         generatedAppName(context),
@@ -348,6 +350,7 @@ export function createRuntimeBehaviorGates(
         '--allow-read',
         '--allow-write',
         '--allow-run',
+        `--allow-env=${BROWSER_EXECUTABLE_ENV}`,
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/runtime/probe-island-hydration.ts`,
         context.project.projectRoot,
         generatedAppName(context),

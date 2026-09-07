@@ -95,3 +95,7 @@ Drift is append-only.
 The reference/island browser probe's fixed-system-path lookup bypassed the existing service-client selectBrowserExecutable and NETSCRIPT_E2E_BROWSER_EXECUTABLE policy. Its failed gate prevented completion despite installed Chromium. Replace duplicate locator with a call to that existing bounded executable/version validator; no new discovery policy, dependency, browser installation or auth behavior. One wiring regression rejects an explicitly empty override. Independent re-review required for this added gate-only fix.
 
 Existing Chromium151.0.7922.34 runs with LD_LIBRARY_PATH=/home/agent/.local/lib/chrome-deps. Shared resolver tests initially failed because /ephemeral/tmp disallows fixture executable spawn. Owned worktree TMPDIR yields35PASS; both receipts retained.
+
+## 2026-09-08 — Gate permission integration missed in selector repair
+
+Second full runtime terminated at browser reference: native selector reads NETSCRIPT_E2E_BROWSER_EXECUTABLE but reference/hydration gate argv lacked env permission. This is a real integration omission in9ef919aa1, not an environmental excuse; bounded previous evaluation did not cover production gate permissions. Add only --allow-env for the existing selector's exported variable to those two gates and update canonical argv assertions.67 tests pass. AppHost cleanup and exact-owner relay cleanup completed; original runtime19082/relay85670 terminal. Re-review and full runtime completion remain required.
