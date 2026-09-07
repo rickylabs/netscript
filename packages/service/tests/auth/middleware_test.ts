@@ -1,5 +1,5 @@
-import { assertEquals } from '@std/assert';
-import { Hono } from 'hono';
+import { assertEquals, assertRejects } from '@std/assert';
+import { type Context, Hono } from 'hono';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../../src/auth/auth-middleware.ts';
 import type { ProcedurePolicyResolver } from '../../src/auth/contract-policy.ts';
 import type { AuthenticatorPort, AuthorizerPort, Principal } from '../../src/auth/types.ts';
@@ -64,6 +64,26 @@ Deno.test('authn preserves downstream error-handler ownership after authenticati
   const response = await app.request('/api/users');
   assertEquals(response.status, 502);
   assertEquals(await response.json(), { error: 'downstream-owned' });
+});
+
+Deno.test('authn does not catch a downstream next rejection', async () => {
+  const app = new Hono<AuthTestEnv>();
+  let captured: Context | undefined;
+  app.get('/api/users', (c) => {
+    captured = c;
+    return c.json({ captured: true });
+  });
+  await app.request('/api/users');
+  const middleware = createAuthnMiddleware({
+    authenticator: { authenticate: () => ({ ok: true, principal }) },
+  });
+  await assertRejects(
+    async () => {
+      await middleware(captured!, () => Promise.reject(new Error('downstream-owned')));
+    },
+    Error,
+    'downstream-owned',
+  );
 });
 
 Deno.test('authn middleware returns 401 for guarded path rejection', async () => {
