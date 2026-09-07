@@ -1,0 +1,15 @@
+{
+  "generator": "gpt-6-astra",
+  "generatorEffort": "medium",
+  "evaluatorSession": "ses_f82065586ffeLljGd8IO7l8SLt",
+  "requestedModel": "opencode-go/muse-spark-1.3-contributor",
+  "requestedEffort": "max",
+  "matrixReceipt": "matrix-implementation-evaluator.json",
+  "execSession": 16492,
+  "exitCode": 0,
+  "verdict": "PASS",
+  "verdictPath": "impl-eval.md",
+  "reportedStepFinishCostUsd": 0.024979349999999997,
+  "capturedJsonEvents": 120,
+  "scope": "independent implementation evaluation; full runtime and exact-head CI pending"
+}
