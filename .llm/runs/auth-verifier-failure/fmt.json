@@ -1,0 +1,14 @@
+{
+  "command": "deno fmt --check",
+  "cwd": "/home/agent/repos/netscript-auth-failure",
+  "mode": "check",
+  "summary": {
+    "filesSelected": 48,
+    "batches": 1,
+    "failedBatches": 0,
+    "findings": 0,
+    "ignoredFindings": 0
+  },
+  "coverage": { "filesSelected": 48, "filesProcessed": 48, "droppedFiles": [], "refusals": [] },
+  "findings": []
+}

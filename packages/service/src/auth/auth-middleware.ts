@@ -24,7 +24,7 @@ import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
 import type { AuthnOptions, AuthzOptions } from './options.ts';
 import type { ProcedurePolicyResolution, ProcedurePolicyResolver } from './contract-policy.ts';
-import type { AuthnRequest, Principal } from './types.ts';
+import type { AuthnRequest, AuthnResult, Principal } from './types.ts';
 
 /** Default path prefixes guarded by auth middleware. */
 export const DEFAULT_PROTECTED_PREFIXES: readonly string[] = ['/api'];
@@ -45,39 +45,43 @@ export function createAuthnMiddleware(options: AuthnMiddlewareOptions): Middlewa
   const guard = normalizeGuard(options);
 
   return async (c, next) => {
-    try {
-      const policy = resolvePolicy(options.policyResolver, c);
-      if (!requiresAuthentication(c.req.path, guard, policy)) {
-        return await next();
-      }
-
-      const result = await options.authenticator.authenticate(toAuthnRequest(c));
-      if (!result.ok) {
-        await logAuthDecision(c, {
-          stage: 'authn',
-          decision: 'deny',
-          reason: result.reason,
-        });
-        return unauthorized(c, result.reason);
-      }
-
-      c.set('principal', result.principal);
-      applyAuthnResponse(c, result.responseHeaders, result.setCookies);
-      await logAuthDecision(c, {
-        stage: 'authn',
-        decision: 'allow',
-        principal: result.principal,
-      });
+    const policy = resolvePolicy(options.policyResolver, c);
+    if (!requiresAuthentication(c.req.path, guard, policy)) {
       return await next();
-    } catch (error) {
-      const reason = error instanceof Error ? error.message : 'authentication-failed';
+    }
+
+    let result: AuthnResult;
+    try {
+      result = await options.authenticator.authenticate(toAuthnRequest(c));
+    } catch {
       await logAuthDecision(c, {
         stage: 'authn',
         decision: 'deny',
         reason: 'authn.error',
       });
-      return unauthorized(c, reason);
+      return c.json({
+        error: 'SERVICE_UNAVAILABLE',
+        message: 'Authentication service unavailable',
+      }, 503);
     }
+
+    if (!result.ok) {
+      await logAuthDecision(c, {
+        stage: 'authn',
+        decision: 'deny',
+        reason: result.reason,
+      });
+      return unauthorized(c, result.reason);
+    }
+
+    c.set('principal', result.principal);
+    applyAuthnResponse(c, result.responseHeaders, result.setCookies);
+    await logAuthDecision(c, {
+      stage: 'authn',
+      decision: 'allow',
+      principal: result.principal,
+    });
+    return await next();
   };
 }
 
