@@ -37,9 +37,12 @@ generate-register-background.ts at baseline]
 - `deno task quality:gate`: exit 0, existing warnings retained.
 - `deno task gen:assets-barrel`: exit 0; generated barrel changed only through this command.
 - Native maintainer `service generate --project-root <consumer> --force` regenerated the consumer's
-  13 helpers; only the two empty helper files differ. Consumer root check, lint, test and format
-  all pass, including 14 behavioral tests and actual MCP verification. This is source-generator
-  compatibility evidence, not a claim that a corrected CLI release is published.
+  13 helpers; only the two empty helper files differ. Consumer root lint, test and format pass,
+  including 14 behavioral tests and actual MCP verification. Consumer AppHost TypeScript passes,
+  but its Deno check batch fails because the init-seeded PrismaClient has no `operation` delegate.
+  The same four TS2339 errors are present in the pre-repair check receipt. An earlier summary
+  incorrectly read the last successful AppHost batch as overall PASS; the full JSON has `ok:false`.
+  This is a source-generator lint repair, not a full consumer build or published-release PASS.
 
 Independent evaluation is still required before merge. The intended consumer review could not run:
 OpenCode Go reported provider-rate-limited; the guarded OpenRouter route reached the provider but
