@@ -12,7 +12,7 @@ import {
 
 // Fault fixture only. Native KV-OAuth acceptance lives in the auth plugin HTTP test.
 Deno.test('remote verifier distinguishes contract denial, provider failure and timeout over HTTP', async () => {
-  let mode: 'denied' | 'provider' | 'timeout' | 'contradictory' = 'denied';
+  let mode: 'denied' | 'provider' | 'timeout' | 'contradictory' | 'expired' = 'denied';
   let calls = 0;
   let release: (() => void) | undefined;
   const running = await createPluginService({
@@ -28,6 +28,22 @@ Deno.test('remote verifier distinguishes contract denial, provider failure and t
               status: 502,
               data: { reason: 'synthetic-secret' },
             });
+          }
+          if (mode === 'expired') {
+            return {
+              authenticated: true,
+              session: {
+                id: 'synthetic-session',
+                userId: 'synthetic-user',
+                subject: 'synthetic-user',
+                state: 'active',
+                scopes: [],
+                roles: [],
+                claims: {},
+                issuedAt: '2020-01-01T00:00:00.000Z',
+                expiresAt: '2020-01-02T00:00:00.000Z',
+              },
+            };
           }
           if (mode === 'timeout') {
             await new Promise<void>((resolve) => {
@@ -80,6 +96,12 @@ Deno.test('remote verifier distinguishes contract denial, provider failure and t
       ok: false,
       reason: REMOTE_SESSION_REJECTIONS.notActive,
     });
+    mode = 'expired';
+    assertEquals(await verifier.authenticate(request), {
+      ok: false,
+      reason: REMOTE_SESSION_REJECTIONS.expired,
+    });
+    assertEquals((await app.request('/api/private', { headers })).status, 401);
     mode = 'timeout';
     const timeoutError = await assertRejects(
       async () => await verifier.authenticate(request),

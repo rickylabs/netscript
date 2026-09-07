@@ -159,3 +159,9 @@ Remaining: fault-injected remote error/malformed/timeout and middleware status c
 [observed - factory-middleware-tests.json] 18 focused tests pass. Native createService authentication middleware returns 401 for missing/denied credentials, 503 for provider errors and malformed HTTP data, and public health makes zero remote calls. Responses exclude synthetic credential/body markers.
 
 [observed - factory-full-regression.json] Complete planned auth regression scope passes: 105 tests, zero failed/ignored, up from the 97-test source baseline. Remaining scope is precedence/concurrency/expiry coverage, docs/carriers and required quality/independent evaluation gates. No broad merge-readiness claim.
+
+## 2026-09-08 — Credential precedence, concurrent isolation and expiry
+
+[observed - factory-precedence-expiry-tests.json] 18 focused tests pass after expanding real native KV-OAuth HTTP coverage: two separately minted sessions, explicit ID over bearer, bearer over cookie, malformed bearer cookie fallback, lowercase bearer, and 12 interleaved cookie/bearer requests with exact expected session identities. Fault fixture additionally proves an active-labelled but time-expired session is denied with the expiry reason and middleware 401.
+
+[observed - factory-current-check.json] Current auth-core and auth plugin source/type-test selection: 75 files, one batch, zero failed batches or type diagnostics. This supersedes the earlier 71-file pre-factory check; it is not the remaining documentation/publish/independent-review gate set.

@@ -8,7 +8,10 @@ import { MemoryKvAdapter } from '@netscript/kv';
 import { createPluginService } from '../../../../packages/plugin/src/service/mod.ts';
 import { createServiceClient } from '../../../../packages/sdk/src/client/mod.ts';
 import { createBearerSdkClientContribution } from '../../../../packages/plugin-auth-core/src/sdk/mod.ts';
-import { authContract } from '../../../../packages/plugin-auth-core/src/contracts/v1/mod.ts';
+import {
+  authContract,
+  SessionResponseSchema,
+} from '../../../../packages/plugin-auth-core/src/contracts/v1/mod.ts';
 import { createAuthServiceBackendRegistry } from '../../services/src/backend-registry.ts';
 import { callback, signin } from '../../services/src/routers/v1-handlers.ts';
 import { router } from '../../services/src/router.ts';
@@ -44,27 +47,31 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
         ),
       ),
   });
-  const started = await signin({ redirectTo: '/d' }, {
-    registry,
-    request: {
-      url: authTestUrl('/v1/auth/signin'),
-      headers: new Headers({ 'x-forwarded-proto': 'https' }),
-    },
-  });
-  assert(started.redirectUrl);
-  const redirect = new URL(started.redirectUrl);
-  const completed = await callback({
-    code: 'c',
-    state: redirect.searchParams.get('state') ?? undefined,
-  }, {
-    registry,
-    request: {
-      url: authTestUrl(`/v1/auth/callback?txn=${redirect.searchParams.get('txn')}`),
-      headers: new Headers({ 'x-forwarded-proto': 'https' }),
-    },
-  });
-  assert(completed.sessionId);
-  const sessionId = completed.sessionId;
+  async function mintSession(): Promise<string> {
+    const started = await signin({ redirectTo: '/d' }, {
+      registry,
+      request: {
+        url: authTestUrl('/v1/auth/signin'),
+        headers: new Headers({ 'x-forwarded-proto': 'https' }),
+      },
+    });
+    assert(started.redirectUrl);
+    const redirect = new URL(started.redirectUrl);
+    const completed = await callback({
+      code: 'c',
+      state: redirect.searchParams.get('state') ?? undefined,
+    }, {
+      registry,
+      request: {
+        url: authTestUrl(`/v1/auth/callback?txn=${redirect.searchParams.get('txn')}`),
+        headers: new Headers({ 'x-forwarded-proto': 'https' }),
+      },
+    });
+    assert(completed.sessionId);
+    return completed.sessionId;
+  }
+  const sessionId = await mintSession();
+  const otherSessionId = await mintSession();
 
   const running = await createPluginService(router, {
     name: 'auth',
@@ -118,6 +125,55 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
         .authenticated,
       false,
     );
+    async function httpSession(headers: HeadersInit, input: { sessionId?: string } = {}) {
+      const response = await fetch(
+        `http://127.0.0.1:${running.addr.port}/api/rpc/v1/auth/session`,
+        {
+          method: 'POST',
+          headers: new Headers({
+            'content-type': 'application/json',
+            ...Object.fromEntries(new Headers(headers)),
+          }),
+          body: JSON.stringify({ json: input }),
+        },
+      );
+      assertEquals(response.status, 200);
+      return SessionResponseSchema.parse((await response.json()).json);
+    }
+    const competingHeaders = {
+      authorization: `Bearer ${sessionId}`,
+      cookie: `__Host-ns_session=${otherSessionId}`,
+    };
+    assertEquals((await httpSession(competingHeaders)).session?.id, sessionId);
+    assertEquals(
+      (await httpSession(competingHeaders, { sessionId: otherSessionId })).session?.id,
+      otherSessionId,
+    );
+    for (const authorization of ['Bearer', 'Basic credential', 'Bearer a b', 'Bearer a,b']) {
+      assertEquals(
+        (await httpSession({
+          authorization,
+          cookie: `__Host-ns_session=${otherSessionId}`,
+        })).session?.id,
+        otherSessionId,
+      );
+    }
+    assertEquals(
+      (await httpSession({ authorization: `bearer ${sessionId}` })).session?.id,
+      sessionId,
+    );
+    // Interleave cookie and bearer requests against one request-context bridge.
+    const ids = await Promise.all(Array.from({ length: 12 }, async (_, index) => {
+      const expected = index % 2 === 0 ? sessionId : otherSessionId;
+      const observed = await httpSession(
+        index % 3 === 0
+          ? { cookie: `__Host-ns_session=${expected}` }
+          : { authorization: `Bearer ${expected}` },
+      );
+      assertEquals(observed.session?.id, expected);
+      return observed.session?.id;
+    }));
+    assertEquals(new Set(ids).size, 2);
     const authenticator = createAuthServiceAuthenticator({ serviceName, timeoutMs: 1000 });
     const request = toAuthnRequest({
       url: authTestUrl('/api/private'),
