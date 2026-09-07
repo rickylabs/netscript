@@ -197,3 +197,9 @@ Harness dependency reconciled: #205 comment5576393024 reports plan PASS at89933b
 Fresh complex --impl-evaluator matrix output retained at175e7748a selects Muse Spark1.3 max, different family from implementation generator Astra medium. Existing independent evaluator session ses_f82065586ffeLljGd8IO7l8SLt resumed through native AGENTIC opencode-run, implementation_evaluation role, complex authorization rationale in argv and bounded $1 estimated cost. Basis: previous full comparable implementation reviews reported at most $0.02485 and plan review $0.03964; estimate is conservative against those observations and launcher live expense guard remains authoritative (no override).
 
 Original exec handle16492 polled live; output capture pending. Brief evaluate-implementation-brief.md names exact source, signature/claim deviations, required security checks and uncompleted runtime/CI merge gates. No independent PASS asserted. Continue observing this exact handle; do not restart due to empty capture.
+
+## 2026-09-08 — Full scaffold runtime gate active
+
+Initial canonical scaffold.runtime --cleanup failed preflight because this worktree shell omitted installed mise dotnet from PATH; Docker28.5.2 passed. runtime-preflight-initial.json retains bounded diagnostic disposition. No generated AppHost existed on that failed attempt, so its automatic cleanup also reported missing path.
+
+Retry uses existing /home/agent/.local/share/mise/installs/dotnet/10.0.400 on PATH and DOTNET_ROOT plus DOCKER_HOST=tcp://netscript-dind:2375. Original retry exec59257 remains live, log /tmp/cockpit-auth-scaffold-runtime-path.log. Observed preflight, scaffold generation, second service/client reconciliation, agent init and worker install PASS; remaining suite not yet adjudicated. Independent evaluator exec16492 separately polled live. No replacement or duplicate process.
