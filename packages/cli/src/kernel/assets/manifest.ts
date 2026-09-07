@@ -1,5 +1,6 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
+  generatedAspireEmptyRegistration: 'generated/aspire/helpers/empty-registration.ts.template',
   appClient: 'app/client.ts.template',
   appAssetsDesignCss: 'app/assets/design.css.template',
   appComponentsUiMod: 'app/components/ui/mod.ts.template',

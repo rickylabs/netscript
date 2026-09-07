@@ -263,9 +263,10 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'register-plugins.mts');
   });
 
-  it('should export registerPlugins async function', () => {
+  it('should export registerPlugins with an asynchronous return contract', () => {
     const output = generateRegisterPlugins(emptyOptions);
-    assertStringIncludes(output, 'export async function registerPlugins(');
+    assertStringIncludes(output, 'export function registerPlugins(');
+    assertStringIncludes(output, 'Promise<Map<string, ExecutableResource>>');
   });
 
   it('should generate two-pass registration structure', () => {
@@ -496,11 +497,7 @@ describe('generateRegisterPlugins', () => {
 
   it('should handle empty plugins', () => {
     const output = generateRegisterPlugins(emptyOptions);
-    assertStringIncludes(output, '// No plugins configured');
-    assertStringIncludes(
-      output,
-      '// No plugin\u2192plugin cross-references to wire.',
-    );
+    assertStringIncludes(output, 'Promise.resolve(new Map<string, ExecutableResource>())');
     assert(!output.includes('builder.addExecutable('));
     assert(!output.includes('/services'));
   });

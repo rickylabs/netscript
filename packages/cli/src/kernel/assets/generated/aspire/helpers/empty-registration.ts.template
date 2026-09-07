@@ -1,0 +1,18 @@
+{{header}}
+
+import type { DistributedApplicationBuilder } from '{{sdk}}';
+import type { NetScriptConfig } from '{{compat}}';
+import type { InfrastructureContext } from './register-infrastructure.mts';
+
+type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+
+/** No contributions are configured; preserve the asynchronous registration contract. */
+export function {{functionName}}(
+  _builder: DistributedApplicationBuilder,
+  _config: NetScriptConfig,
+  _infrastructure: InfrastructureContext,
+  _services: Map<string, ExecutableResource>,
+{{pluginParameter}}  _appHostDir: string,
+): Promise<Map<string, ExecutableResource>> {
+  return Promise.resolve(new Map<string, ExecutableResource>());
+}
