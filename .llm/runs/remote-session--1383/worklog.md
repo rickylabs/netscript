@@ -231,3 +231,7 @@ First browser-configured rerun stopped before scaffold because global LD_LIBRARY
 ## 2026-09-08 — Browser repair independent PASS
 
 Original follow-up exec77152 exited0. browser-repair-eval.md PASS confirms minimal reuse, no import cycle, strict override failure and35 independently rerun tests; prior auth PASS preserved. Identity/cost retained. Full runtime rerun exec19082 is live at production design exclusion after scaffold/plugin/runtime-schema/codegen gates passed. New source head will trigger fresh CI; no aggregate/runtime/consumer PASS.
+
+## 2026-09-08 — Final rerun reached AppHost startup
+
+Runtime exec19082 passed generated quality-negative and all generated type/lint/format checks. Exact new AppHost: .llm/tmp/cli-e2e/plugin-smoke-20260908-013220/aspire/apphost.mts. Native describe and Docker readback identify only5dc24a3ef8a9 (Garnet),0b6b576020d9 (Postgres),eabc3f47d9a6 (Redis). Reused unchanged owner-approved relay, owner cockpit-auth-final, registry /tmp/cockpit-auth-final-relay.json, exec85670. Must clean this relay after suite termination. No other source IDs or resources targeted. CI still live at4de7f03a7, no new failures observed.

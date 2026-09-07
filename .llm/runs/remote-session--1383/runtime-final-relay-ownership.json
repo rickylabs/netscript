@@ -1,0 +1,27 @@
+{
+  "owner": "cockpit-auth-final",
+  "pid": 1392479,
+  "dindHost": "netscript-dind",
+  "dindIp": "10.4.12.34",
+  "since": "2026-09-07T23:30:00.000Z",
+  "relays": [
+    {
+      "port": 13136,
+      "container": "relay-cockpit-auth-final-13136",
+      "source": "postgres-425d1d0d",
+      "startedAt": "2026-09-07T23:37:12.461Z"
+    },
+    {
+      "port": 32782,
+      "container": "relay-cockpit-auth-final-32782",
+      "source": "garnet-pzzjsuvt",
+      "startedAt": "2026-09-07T23:37:12.909Z"
+    },
+    {
+      "port": 32781,
+      "container": "relay-cockpit-auth-final-32781",
+      "source": "redis-nhsbghnc",
+      "startedAt": "2026-09-07T23:37:13.357Z"
+    }
+  ]
+}
