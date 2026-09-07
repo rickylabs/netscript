@@ -153,3 +153,9 @@ Remaining: fault-injected remote error/malformed/timeout and middleware status c
 ## 2026-09-08 — HTTP fault boundary checkpoint
 
 [observed - factory-fault-tests.json] Five adapter tests pass with sanitizers enabled, including the contract-implemented HTTP fault fixture: UNAUTHORIZED maps to denial; AUTH_PROVIDER_ERROR throws a redacted remote error; authenticated-without-session denies; a deliberately held handler times out and its owned pending promise/listener are released in finally. Public ORPCError is used in the fixture because the auth implementer's typed error factory does not expose these entries precisely. Native positive acceptance remains separate. Malformed wire data, middleware status integration and remaining plan gates are still pending.
+
+## 2026-09-08 — Native middleware and full auth regression
+
+[observed - factory-middleware-tests.json] 18 focused tests pass. Native createService authentication middleware returns 401 for missing/denied credentials, 503 for provider errors and malformed HTTP data, and public health makes zero remote calls. Responses exclude synthetic credential/body markers.
+
+[observed - factory-full-regression.json] Complete planned auth regression scope passes: 105 tests, zero failed/ignored, up from the 97-test source baseline. Remaining scope is precedence/concurrency/expiry coverage, docs/carriers and required quality/independent evaluation gates. No broad merge-readiness claim.
