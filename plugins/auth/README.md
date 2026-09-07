@@ -142,10 +142,20 @@ remains application-owned and per call; bearer headers default to HTTPS plus loc
 | `./streams/server` | Server-side session-stream emit helpers                              |
 | `./contracts`      | The versioned auth API contract generated registries bind against    |
 | `./scaffold`       | The plugin-owned scaffolder `netscript plugin install auth` executes |
+| `./authenticator` | Remote session verifier, options, bearer reader and redacted failure vocabulary |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-auth@<version>`](https://jsr.io/@netscript/plugin-auth/doc) (pin
 `<version>` on the pre-release line, as above).
+
+## Remote verification
+
+`@netscript/plugin-auth/authenticator` re-exports the auth-core remote verifier without another
+implementation. Use `createAuthServiceAuthenticator({ serviceName, timeoutMs })` with native
+`createService(...).withAuthn(...)`. The consuming service needs discovery wiring to the auth
+service, not its provider secrets or backend storage. See the
+[auth-core verification guide](../../packages/plugin-auth-core/README.md#verify-sessions-in-another-service)
+for denial versus unavailability, transport policy and backend limits.
 
 ## Docs
 
