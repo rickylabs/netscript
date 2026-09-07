@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"/home/agent/repos/netscript-remote-session-authenticator","mode":"check","summary":{"filesSelected":75,"batches":2,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":75,"filesProcessed":75,"droppedFiles":[],"refusals":[]},"findings":[]}

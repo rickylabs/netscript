@@ -183,3 +183,11 @@ Native prose generation succeeded from 7bb219d81; generated prose/provenance rem
 [observed - doc-baseline-comparison.json] Clean detached baseline 3330d6f9c and current 31e630dec have identical combined package documentation diagnostics: core 3, plugin 12, same source files and counts. New leaf is clean; inherited diagnostics remain failures, not a package-wide PASS. Independent evaluation must assess this scoped non-regression disposition.
 
 [observed - factory-core-publish-dry-run.log; factory-plugin-publish-dry-run.log] Both package simulations exited 0 and include the new leaf, exclude test fixtures. No publication occurred. Native prose, assets barrel and publish-assets generators succeeded; generated changes committed as derived output. Remaining: generator check gates, package audits, final regression/format and independent review.
+
+## 2026-09-08 — Final generated-output and regression gates
+
+Current source a8d0e236d: auth regression 105 PASS; format 75 files clean; MCP export corpus, documented export drift, prose bundle, dependency checks, assets-barrel and publish-assets checks all exit 0. Receipts retained under final-*. Package audits exit 0 with warnings: both flag the publish output's slow-type check heading; plugin additionally flags existing 13-child directory cardinality. These are not warning-free claims.
+
+Repository-wide JSDoc example checker remains live in original exec session 43937, output /tmp/cockpit-auth-jsdoc-examples.log; latest handle poll returned running, no restart or terminal verdict.
+
+Harness dependency reconciled: #205 comment5576393024 reports plan PASS at89933b6 and active standalone governance decoder/CLI implementation, not publication. Current Cockpit adoption boundary remains unchanged until a versioned artifact and installed consumer receipt arrive.
