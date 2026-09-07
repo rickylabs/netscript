@@ -18,6 +18,54 @@ const principal: Principal = {
   claims: {},
 };
 
+for (const asynchronous of [false, true]) {
+  Deno.test(`authn verifier ${asynchronous ? 'rejection' : 'throw'} is redacted 503, not invalid credentials`, async () => {
+    let reached = false;
+    const app = new Hono<AuthTestEnv>();
+    app.use(
+      '*',
+      createAuthnMiddleware({
+        authenticator: {
+          authenticate: () => {
+            const error = new Error('synthetic-private-verifier-detail');
+            if (asynchronous) return Promise.reject(error);
+            throw error;
+          },
+        },
+      }),
+    );
+    app.get('/api/users', (c) => {
+      reached = true;
+      return c.json({ reached });
+    });
+    const response = await app.request('/api/users');
+    assertEquals(response.status, 503);
+    assertEquals(await response.json(), {
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Authentication service unavailable',
+    });
+    assertEquals(reached, false);
+    assertEquals(response.headers.has('set-cookie'), false);
+  });
+}
+
+Deno.test('authn preserves downstream error-handler ownership after authentication', async () => {
+  const app = new Hono<AuthTestEnv>();
+  app.use(
+    '*',
+    createAuthnMiddleware({
+      authenticator: { authenticate: () => ({ ok: true, principal }) },
+    }),
+  );
+  app.onError((_error, c) => c.json({ error: 'downstream-owned' }, 502));
+  app.get('/api/users', () => {
+    throw new Error('downstream failure');
+  });
+  const response = await app.request('/api/users');
+  assertEquals(response.status, 502);
+  assertEquals(await response.json(), { error: 'downstream-owned' });
+});
+
 Deno.test('authn middleware returns 401 for guarded path rejection', async () => {
   const authenticator: AuthenticatorPort = {
     authenticate: () => ({ ok: false, reason: 'invalid-credential' }),

@@ -142,18 +142,26 @@ const running = await createService(router, { name: 'orders', version: '1.0.0' }
 await running.stop();
 ```
 
+Authentication rejection and verifier failure have different HTTP meanings. An authenticator that
+returns `{ ok: false, reason }` produces `401 UNAUTHORIZED`. An authenticator that throws or rejects
+produces `503 SERVICE_UNAVAILABLE` with the fixed message `Authentication service unavailable`;
+exception details are not sent to the caller. The protected handler does not run in either case.
+Clients should not clear a session merely because its verifier is unavailable. Errors from
+downstream handlers remain owned by the application's error handler, outside the authentication
+catch boundary.
+
 This migration is opt-in. Existing unguarded services, generated scaffolds, and services that use
 `createScopeAuthorizer()` by itself keep their current behavior. Fail-closed contract enforcement
 begins only when the application supplies the result of
 `createContractAuthorizer(contract, { fallback? })` to `.withAuthz()`.
 
-Contract metadata is authoritative. For a request that matches a contract procedure, a
-match-aware fallback is consulted only when that procedure has no access metadata. If neither the
-metadata nor a fallback rule matches, the request is denied even when the fallback's standalone
-`denyByDefault` setting would otherwise allow it. A fallback can neither make a declared public
-procedure private nor weaken declared scopes or roles. The builder binds one resolver to its actual
-REST path, RPC path, RPC aliases, and deprecated RPC route aliases, then shares that resolver with
-both authentication and authorization middleware.
+Contract metadata is authoritative. For a request that matches a contract procedure, a match-aware
+fallback is consulted only when that procedure has no access metadata. If neither the metadata nor a
+fallback rule matches, the request is denied even when the fallback's standalone `denyByDefault`
+setting would otherwise allow it. A fallback can neither make a declared public procedure private
+nor weaken declared scopes or roles. The builder binds one resolver to its actual REST path, RPC
+path, RPC aliases, and deprecated RPC route aliases, then shares that resolver with both
+authentication and authorization middleware.
 
 `createScopeAuthorizer()` remains supported and is not deprecated. Use it standalone for a legacy
 path-prefix policy, or pass it as the match-aware migration fallback for procedures that do not yet
@@ -180,12 +188,12 @@ const authorizer = createContractAuthorizer(OrdersContractV1, {
 
 `authentication: 'optional'` is declared for future support, currently rejected. Construction of
 `createContractAuthorizer()` throws
-`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>`; the
-error is raised while the contract is traversed, not on the first request.
+`[netscript.service.contract-policy] optional authentication is unsupported: <procedure>`; the error
+is raised while the contract is traversed, not on the first request.
 
 The `defineService()` preset accepts the same ports through its `auth` option. The following legacy
-path-prefix form remains valid and behavior-compatible; new services should prefer contract
-metadata plus `createContractAuthorizer()` as shown above:
+path-prefix form remains valid and behavior-compatible; new services should prefer contract metadata
+plus `createContractAuthorizer()` as shown above:
 
 ```ts
 import { defineService, type ServiceRouter } from '@netscript/service';
@@ -232,23 +240,23 @@ TypeScript auth typestate.
 
 `createOpenAPISpec()` projects declared contract access without rewriting other operation fields:
 
-| Contract declaration | OpenAPI operation |
-| --- | --- |
-| `authentication: 'none'` | `security: []` |
-| `authentication: 'required'` | `security: [{ bearerAuth: scopes }]` |
-| Required `authorization.roles` | `x-netscript-roles: roles` |
-| `authentication: 'optional'` | `security: [{}, { bearerAuth: [] }]` |
-| No authentication declaration | No generated operation-level `security` field |
+| Contract declaration           | OpenAPI operation                             |
+| ------------------------------ | --------------------------------------------- |
+| `authentication: 'none'`       | `security: []`                                |
+| `authentication: 'required'`   | `security: [{ bearerAuth: scopes }]`          |
+| Required `authorization.roles` | `x-netscript-roles: roles`                    |
+| `authentication: 'optional'`   | `security: [{}, { bearerAuth: [] }]`          |
+| No authentication declaration  | No generated operation-level `security` field |
 
 The generated `bearerAuth` component is `{ type: 'http', scheme: 'bearer' }`. Optional remains
 visible in documentation even though the first runtime adapter rejects it at construction.
 
 ## API at a glance
 
-| Entry    | What it gives you                                                                                                                                     |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Entry    | What it gives you                                                                                                                                                                                                    |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `.`      | `defineService`, `createService`, `createRuntimeHost`, `Principal`, `ServiceHandlerContext`, `healthChecks`, `HEALTH_STATUS`, and handler factories (`createRPCHandler`, `createOpenAPISpec`, `createScalarDocs`, …) |
-| `./auth` | `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createContractAuthorizer`, `createScopeAuthorizer`, and the authn/authz and contract-policy types |
+| `./auth` | `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createContractAuthorizer`, `createScopeAuthorizer`, and the authn/authz and contract-policy types                                        |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/service@<version>`](https://jsr.io/@netscript/service/doc).
