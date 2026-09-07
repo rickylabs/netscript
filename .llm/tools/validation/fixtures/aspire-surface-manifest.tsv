@@ -710,6 +710,8 @@ packages/mcp/tests/service-endpoint-source-fixtures.ts	compat-fixture	S3	inline 
 packages/mcp/tests/service-endpoint-sources_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/telemetry-endpoint_test.ts	mcp:fixtures	S3	add 13.5.3 describe/telemetry fixtures; keep 13.4.6 as compat
 packages/mcp/tests/telemetry-live-fixture_test.ts	compat-fixture	S3	inline 13.4.6 fixture case kept as compat; S3 adds the 13.5.3 case beside it; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6
+packages/plugin-auth-core/README.md	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
+packages/plugin-auth-core/src/adapters/auth-service-authenticator.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/create-durable-stream.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/create-service-stream-producer.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected
 packages/plugin-streams-core/src/application/stream-url-resolver.ts	package:other	S4	mention only (service discovery/env helpers); grep-verified, no change expected

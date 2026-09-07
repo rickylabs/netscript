@@ -213,3 +213,7 @@ Original evaluator exec16492 completed exit0. impl-eval.md records independent M
 Aspire describe of exact generated AppHost showed Postgres/Redis/Garnet unhealthy; native Postgres logs reported ready for connections. Docker publishes those owned resources on remote loopback:4b2dc6f7023a:30864, bd00457c6d2a:32779,19f964a178e9:32780. Reused owner-authorized Cockpit quickstart relay unchanged, exact source-ID allowlist, owner cockpit-auth-smoke; no AppHost edits/foreign targets. Registry /tmp/cockpit-auth-smoke-relay.json, exec3540, PID1287054; all three mappings created. Runtime exec59257 still live, no final verdict. This topology support must be disclosed with runtime evidence. Cleanup after suite termination through the same tool cleanup mode and exact owner/registry/source IDs; do not leave relay running.
 
 Review-thread gate PASS (zero threads/unanswered); CI at75d0e0475 is running, not terminal green.
+
+## 2026-09-08 — CI-generated Aspire manifest correction
+
+CI run34169705578 quality job101887589407 failed only at Aspire phase1 manifest freshness after preceding quality steps passed. Native aspire-surface-manifest.ts adds exactly two newly Aspire-mentioning paths: auth-core README and authenticator source. No manual rule/version change. [observed - aspire-parity-repair.json] parity now exits0, manifest fresh. Product implementation unchanged from independent PASS; generated manifest repair retained for reviewer/CI. Runtime exec59257 passed AppHost startup with disclosed relay and is executing database.init, no overall verdict.
