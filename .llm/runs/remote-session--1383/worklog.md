@@ -227,3 +227,7 @@ Original runtime exec59257 exited1:90 gates PASS, one failure behavior.app-refer
 Fresh matrix-browser-repair-review.json selects Muse max; original evaluator session resumed through AGENTIC, exec77152, receipt browser-repair-review-launch.jsonl. Same $1 conservative observed-cost basis and live expense guard; no override. Bounded follow-up covers9ef919aa1 browser selector reuse plus generated manifest correction; prior auth PASS preserved.
 
 First browser-configured rerun stopped before scaffold because global LD_LIBRARY_PATH is incompatible with Deno restricted --allow-run subprocesses. No permission weakening: scoped run-owned shell launcher sets that library path only for Chromium and passes through argv; --version returns151.0.7922.34. Rerun uses native NETSCRIPT_E2E_BROWSER_EXECUTABLE pointing at .llm/tmp/browser-executable, existing dotnet PATH/DOTNET_ROOT, explicit Docker endpoint and executable TMPDIR. Previous suite/relay are terminal and cleaned; new generated container IDs must be observed before starting any relay.
+
+## 2026-09-08 — Browser repair independent PASS
+
+Original follow-up exec77152 exited0. browser-repair-eval.md PASS confirms minimal reuse, no import cycle, strict override failure and35 independently rerun tests; prior auth PASS preserved. Identity/cost retained. Full runtime rerun exec19082 is live at production design exclusion after scaffold/plugin/runtime-schema/codegen gates passed. New source head will trigger fresh CI; no aggregate/runtime/consumer PASS.
