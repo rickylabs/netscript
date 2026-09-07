@@ -171,3 +171,9 @@ Remaining: fault-injected remote error/malformed/timeout and middleware status c
 Documented both authenticator export leaves, explicit discovery/timeout, independent authz policy, claim sensitivity, provider-specific bearer limitations and 401/503 semantics in package READMEs and reference pages. [observed - factory-corpus-generation.log] Native generator succeeded from committed source: 35 packages, 275 subpaths, 7,879 symbols; corpus digest 013d8535f85e3dda201f691809093a019fea5b2befd470722cd278be2d96ed64. This is a workspace-derived corpus, not publication of version 0.0.7.
 
 [observed - factory-current-lint.json] 75 files lint clean after moving the test-local helper from a nested declaration to a const function expression. Generated prose/assets, docs lint, quality, publish dry runs and independent evaluation remain pending.
+
+## 2026-09-08 — Documentation gate findings and repair
+
+Quality/architecture command completed exit 0 (existing warnings retained in /tmp/cockpit-auth-quality.log). Package doc wrappers failed with private-type references; receipts retained. New leaf gaps repaired by re-exporting canonical service signature types, no copied types. [observed - factory-leaf-doc.json] Plugin authenticator leaf passes structured doc lint, zero errors. Other package diagnostics still require baseline comparison; no package-wide doc PASS.
+
+Native prose generation succeeded from 7bb219d81; generated prose/provenance remain uncommitted while refreshing after the canonical signature documentation change. MCP corpus generation rerun after commit 66b12bd22 succeeded; remaining generated carriers/gates and independent evaluation pending.
