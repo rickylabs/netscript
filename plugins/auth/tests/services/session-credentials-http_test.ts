@@ -125,7 +125,7 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
         .authenticated,
       false,
     );
-    async function httpSession(headers: HeadersInit, input: { sessionId?: string } = {}) {
+    const httpSession = async (headers: HeadersInit, input: { sessionId?: string } = {}) => {
       const response = await fetch(
         `http://127.0.0.1:${running.addr.port}/api/rpc/v1/auth/session`,
         {
@@ -139,7 +139,7 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
       );
       assertEquals(response.status, 200);
       return SessionResponseSchema.parse((await response.json()).json);
-    }
+    };
     const competingHeaders = {
       authorization: `Bearer ${sessionId}`,
       cookie: `__Host-ns_session=${otherSessionId}`,

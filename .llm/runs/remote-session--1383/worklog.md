@@ -165,3 +165,9 @@ Remaining: fault-injected remote error/malformed/timeout and middleware status c
 [observed - factory-precedence-expiry-tests.json] 18 focused tests pass after expanding real native KV-OAuth HTTP coverage: two separately minted sessions, explicit ID over bearer, bearer over cookie, malformed bearer cookie fallback, lowercase bearer, and 12 interleaved cookie/bearer requests with exact expected session identities. Fault fixture additionally proves an active-labelled but time-expired session is denied with the expiry reason and middleware 401.
 
 [observed - factory-current-check.json] Current auth-core and auth plugin source/type-test selection: 75 files, one batch, zero failed batches or type diagnostics. This supersedes the earlier 71-file pre-factory check; it is not the remaining documentation/publish/independent-review gate set.
+
+## 2026-09-08 — Public documentation and MCP export corpus
+
+Documented both authenticator export leaves, explicit discovery/timeout, independent authz policy, claim sensitivity, provider-specific bearer limitations and 401/503 semantics in package READMEs and reference pages. [observed - factory-corpus-generation.log] Native generator succeeded from committed source: 35 packages, 275 subpaths, 7,879 symbols; corpus digest 013d8535f85e3dda201f691809093a019fea5b2befd470722cd278be2d96ed64. This is a workspace-derived corpus, not publication of version 0.0.7.
+
+[observed - factory-current-lint.json] 75 files lint clean after moving the test-local helper from a nested declaration to a const function expression. Generated prose/assets, docs lint, quality, publish dry runs and independent evaluation remain pending.
