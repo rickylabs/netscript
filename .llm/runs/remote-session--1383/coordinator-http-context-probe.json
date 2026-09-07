@@ -1,0 +1,11 @@
+{
+  "source": "3330d6f9c9c4fcbf123b434c7cf8733648c44d87",
+  "scope": "diagnostic composition using existing request bridge, real plugin router + typed SDK + native KV-OAuth; no product patch or IdP",
+  "directSessionId": true,
+  "cookieStatus": 200,
+  "cookieAuthenticated": true,
+  "bearerAuthenticated": false,
+  "bearerBogusAuthenticated": false,
+  "exitCode": 0,
+  "cleanup": "native RunningService.stop and MemoryKvAdapter Symbol.asyncDispose"
+}
