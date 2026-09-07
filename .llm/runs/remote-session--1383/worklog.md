@@ -221,3 +221,9 @@ CI run34169705578 quality job101887589407 failed only at Aspire phase1 manifest 
 ## 2026-09-08 — Runtime suite terminal result and cleanup
 
 Original runtime exec59257 exited1:90 gates PASS, one failure behavior.app-reference because its fixed browser locator does not include installed Playwright Chromium. AppHost cleanup PASS. Relay cleanup executed with exact owner/source IDs; original relay exec3540 completed exit0. No runtime-suite PASS; browser prerequisite remedy and remaining gates still required. Existing browser path found under user cache, no installation/restart yet. runtime-suite-result.json retains bounded result and topology.
+
+## 2026-09-08 — Browser repair independent follow-up and rerun
+
+Fresh matrix-browser-repair-review.json selects Muse max; original evaluator session resumed through AGENTIC, exec77152, receipt browser-repair-review-launch.jsonl. Same $1 conservative observed-cost basis and live expense guard; no override. Bounded follow-up covers9ef919aa1 browser selector reuse plus generated manifest correction; prior auth PASS preserved.
+
+First browser-configured rerun stopped before scaffold because global LD_LIBRARY_PATH is incompatible with Deno restricted --allow-run subprocesses. No permission weakening: scoped run-owned shell launcher sets that library path only for Chromium and passes through argv; --version returns151.0.7922.34. Rerun uses native NETSCRIPT_E2E_BROWSER_EXECUTABLE pointing at .llm/tmp/browser-executable, existing dotnet PATH/DOTNET_ROOT, explicit Docker endpoint and executable TMPDIR. Previous suite/relay are terminal and cleaned; new generated container IDs must be observed before starting any relay.
