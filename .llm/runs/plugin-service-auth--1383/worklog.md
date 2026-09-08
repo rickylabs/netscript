@@ -104,3 +104,10 @@ native assembled-contract example and explicitpublichealth example. Exact readme
 checked,7baseline errors,5baseline READMEs,0exemptions; no gatepolicy changed. Need regenMCPexportcorpus
 and same implementation-evaluator session round3 recertification after CI repairs. Runtime production
 source unchanged, full104PASS retained. No release authority.
+
+Full root check48693 TERMINAL exit0:3159files27batches0failed0findings; ci-full-check.json.
+Production source unchanged; a25fc594d pushed. PRstatusimpl during CIrepair, phasecomment5578294512.
+Full deno task test90237 LIVE, capture/tmp/cockpit-ci-full-tests.json (wrapper emits terminal result).
+No evaluator currently running. Next poll90237, preserve exact outcome, fresh matrix and SAMEsession
+ses_f8132eca6ffesLYPOVzN00L3HB round3 reviewing README+2fixturepostures (evaluate-3.md), then finalCI.
+Prior PASS evaluate-2.md applies pre-CIrepair source; do not claim it certifies newdiff. No release.

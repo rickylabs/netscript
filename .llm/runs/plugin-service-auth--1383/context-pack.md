@@ -56,3 +56,10 @@ Fixed test-onlypublicpostures and self-contained README nativeexample. Focused3P
 PASS within unchanged7errorbaseline. Fullrootcheck48693 running, outputci-full-check.json.
 Next commit/regenerateMCPcorpus, same evaluator session ses_f8132eca6ffesLYPOVzN00L3HB round3 viafresh
 matrix (write evaluate-3.md), then finalCI andclosegate. Productionruntime unchanged. No release.
+
+Full root check48693 TERMINAL exit0:3159files27batches0failed0findings; ci-full-check.json.
+Production source unchanged; a25fc594d pushed. PRstatusimpl during CIrepair, phasecomment5578294512.
+Full deno task test90237 LIVE, capture/tmp/cockpit-ci-full-tests.json (wrapper emits terminal result).
+No evaluator currently running. Next poll90237, preserve exact outcome, fresh matrix and SAMEsession
+ses_f8132eca6ffesLYPOVzN00L3HB round3 reviewing README+2fixturepostures (evaluate-3.md), then finalCI.
+Prior PASS evaluate-2.md applies pre-CIrepair source; do not claim it certifies newdiff. No release.
