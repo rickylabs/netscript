@@ -1,0 +1,60 @@
+Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts '--root' 'packages/service' '--pretty'
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/service",
+    "entrypoints": [
+      "./mod.ts",
+      "./src/auth/mod.ts",
+      "./src/primitives/rpc-path.ts"
+    ],
+    "exitCode": 0
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 0,
+    "totalPrivateTypeRef": 0,
+    "totalMissingJSDoc": 0,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/service",
+      "dir": "packages/service",
+      "entrypoints": [
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/auth/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        },
+        {
+          "path": "./src/primitives/rpc-path.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 0
+        }
+      ],
+      "files": [],
+      "combinedTotal": 0,
+      "combinedPrivateTypeRef": 0,
+      "combinedMissingJSDoc": 0,
+      "combinedOther": 0,
+      "combinedExitCode": 0,
+      "entrypointExitCodes": {
+        "./mod.ts": 0,
+        "./src/auth/mod.ts": 0,
+        "./src/primitives/rpc-path.ts": 0
+      }
+    }
+  ]
+}

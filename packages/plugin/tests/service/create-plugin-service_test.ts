@@ -45,6 +45,7 @@ Deno.test('createPluginService preserves typed custom context and identity re-ex
   type CustomContext = { readonly tenant: 'alpha' };
 
   const config = {
+    auth: { public: true, reason: 'Fixture for explicit public service behavior' },
     name: 'sample',
     context: () => ({ tenant: 'alpha' as const }),
   } satisfies PluginServiceConfig<CustomContext>;
@@ -65,6 +66,7 @@ Deno.test('createPluginService preserves typed custom context and identity re-ex
 
 Deno.test('createPluginService serves health, service info, and the describe oRPC route', async () => {
   const app = createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for explicit public service behavior' },
     name: 'sample',
     version: '9.9.9',
     openApi: { title: 'Sample Plugin API' },
@@ -102,6 +104,7 @@ Deno.test('createPluginService runs onStartup hooks on serve()', async () => {
   let started = false;
 
   const running = await createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for explicit public service behavior' },
     name: 'sample',
     version: '9.9.9',
     onStartup: [

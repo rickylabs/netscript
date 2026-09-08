@@ -1,0 +1,15 @@
+{
+  "source": "72dbf3cf2",
+  "matrixReceipt": "matrix-binding-repair.json",
+  "role": "plan",
+  "tier": "complex",
+  "model": "claude-fable-5-1",
+  "effort": "medium",
+  "session": "7930bfda-966a-4a1c-aa82-53c07cd8116b",
+  "processHandle": 84113,
+  "transport": "AGENTIC claude-print resumed existing session",
+  "output": "/tmp/cockpit-binding-repair-planner.jsonl",
+  "status": "running at dispatch; poll exact handle for terminal state",
+  "authority": "milestone_coordinator",
+  "rationale": "Resolve native generated plugin route-to-auth-policy binding defect without duplicate authority"
+}

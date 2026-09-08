@@ -17,6 +17,7 @@ export type NetscriptPackage =
   | 'mcp'
   | 'plugin'
   | 'plugin-workers'
+  | 'plugin-auth'
   | 'plugin-auth-core'
   | 'auth-workos'
   | 'auth-better-auth'
@@ -59,6 +60,7 @@ export const JSR_SPECIFIERS: Readonly<Record<NetscriptPackage, string>> = {
   mcp: netscriptJsrSpecifier('mcp'),
   plugin: netscriptJsrSpecifier('plugin'),
   'plugin-workers': netscriptJsrSpecifier('plugin-workers'),
+  'plugin-auth': netscriptJsrSpecifier('plugin-auth'),
   'plugin-auth-core': netscriptJsrSpecifier('plugin-auth-core'),
   'auth-workos': netscriptJsrSpecifier('auth-workos'),
   'auth-better-auth': netscriptJsrSpecifier('auth-better-auth'),

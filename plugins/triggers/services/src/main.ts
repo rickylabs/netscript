@@ -242,6 +242,11 @@ export function createTriggersService(
     return listTriggerEvents(c, resolvedContext.eventStore);
   };
   return createPluginService(router, {
+    auth: {
+      public: true,
+      reason:
+        'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
+    },
     name: TRIGGERS_API_SERVICE_NAME,
     routerName: 'triggers',
     version: VERSION,

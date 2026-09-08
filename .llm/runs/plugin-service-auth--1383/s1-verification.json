@@ -1,0 +1,25 @@
+{
+  "slice": "S1 shared service auth policy",
+  "baseline": "b717887cc",
+  "productFiles": {
+    "packages/service/src/auth/options.ts": "a8c4524b9bfd9a5bea36a74b3ad63105dbc5916af24e4b59c4a62c35ea606794",
+    "packages/service/src/auth/mod.ts": "98fc50cb978c05531038d9fc869d2566c438ef38d75bbb5200edccb8fe6ae7c6",
+    "packages/service/src/auth/service-auth-policy.ts": "a40802c14a7770c04c40825d54eb0619f0357bbbc0c83b7439d92c89c9af2b74",
+    "packages/service/mod.ts": "4d857909ca2731debf1c699b6481fa52a1ddaaed4b1746fe23f2ac17c41b4104",
+    "packages/service/tests/auth/service-auth-policy_test.ts": "03bea967a7e365542c264aeba9ae16a09d881ad6583a9fa5b39b4a7330b4497d",
+    "packages/service/tests/auth/service-auth-policy-soundness_test.ts": "d741b1779fd223f89f50e2e457e89aede151ad8126b02b17ad36e77b989b3e20",
+    "docs/site/reference/service/index.md": "19028a71524b8a3f86e3fdb0316a28579bef32a3c4c6065d36aff240c1540bea"
+  },
+  "tests": {
+    "baselinePassed": 39,
+    "passed": 78,
+    "failed": 0,
+    "ignored": 0
+  },
+  "qualityGateExitCode": 0,
+  "limits": [
+    "Factory adoption and generated connector not implemented yet",
+    "Full scaffold.runtime and independent implementation evaluation remain required",
+    "No release or installed-consumer proof"
+  ]
+}

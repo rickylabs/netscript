@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all"
+  ],
+  "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+  "exitCode": 1,
+  "durationMs": 459716,
+  "summary": {
+    "passed": 5382,
+    "failed": 4,
+    "ignored": 19,
+    "totalResults": 5405,
+    "uniqueFailures": 4
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Expected error message to include \"version probe timed out after 25 ms\", but got \"failed to start version probe: Failed to spawn '/ephemeral/tmp/netscript-browser-version-88543475ecf585e4/timed-out': Permission denied (os error 13)\".\n    at assertIsError (https://jsr.io/@std/assert/1.0.19/is_error.ts:<line>:<column>)\n    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "browser version probe distinguishes path and process failure classes",
+          "file": "./packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts",
+          "line": 610
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      \"preflight.deno\",\n      \"scaffold.init\",\n      \"scaffold.plugin.worker\",\n      \"scaffold.plugin.saga\",\n      \"scaffold.plugin.trigger\",\n      \"scaffold.plugin.stream\",\n      \"scaffold.plugin.auth\",\n      \"scaffold.plugin.ai\",\n      \"scaffold.plugin.ai.mcp\",\n      \"scaffold.plugin.ai.lifecycle\",\n      \"scaffold.plugin-list\",\n      \"behavior.plugins-unhealthy\",\n      \"generated.plugins-check\",\n      \"generated.workers-registry\",\n      \"generated.sagas-registry\",\n      \"behavior.plugins-health\",\n      \"behavior.package-backed-plugin-doctor\",\n-     \"behavior.generated-guarded-plugin\",\n    ]\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/e2e/tests/presentation/suite-registry_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "plugin suite includes all official plugin and generated-check gates",
+          "file": "./packages/cli/e2e/tests/presentation/suite-registry_test.ts",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   8\n+   6\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/quality/scan-code-quality_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "all six repository soundness fixtures retain their explicit scanner exemption",
+          "file": "./.llm/tools/quality/scan-code-quality_test.ts",
+          "line": 375
+        }
+      ]
+    },
+    {
+      "message": "Error: NETSCRIPT_E2E_BROWSER_EXECUTABLE browser executable \"/ephemeral/tmp/netscript-browser-startup-31408b147b261d10/version-then-fail\": failed to start version probe: Failed to spawn '/ephemeral/tmp/netscript-browser-startup-31408b147b261d10/version-then-fail': Permission denied (os error 13)\n    at selectBrowserExecutable (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>\nCaused by: Error: failed to start version probe: Failed to spawn '/ephemeral/tmp/netscript-browser-startup-31408b147b261d10/version-then-fail': Permission denied (os error 13)\n    at probeBrowserVersion (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\n    at async selectBrowserExecutable (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>\nCaused by: PermissionDenied: Failed to spawn '/ephemeral/tmp/netscript-browser-startup-31408b147b261d10/version-then-fail': Permission denied (os error 13)\n    at spawnChildInner (ext:deno_process/40_process.js:<line>:<column>)\n    at spawnChild (ext:deno_process/40_process.js:<line>:<column>)\n    at Command.spawn (ext:deno_process/40_process.js:<line>:<column>)\n    at probeBrowserVersion (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\n    at async selectBrowserExecutable (file://<cwd>/packages/cli/e2e/src/application/gates/scaffold/service-client-browser-probe.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "browser startup reports early status and bounded stderr instead of a target timeout",
+          "file": "./packages/cli/e2e/tests/application/gates/service-client-runtime-probe_test.ts",
+          "line": 680
+        }
+      ]
+    }
+  ]
+}

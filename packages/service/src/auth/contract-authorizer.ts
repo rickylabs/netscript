@@ -207,8 +207,12 @@ function remapDeprecatedRpcPath(
 ): string {
   for (const alias of binding.deprecatedRpcRoutes ?? []) {
     const pathPrefix = normalizePath(alias.pathPrefix);
+    const replacementPrefix = normalizePath(alias.replacementPrefix);
+    // The canonical destination may be nested beneath the deprecated prefix.
+    // Match the RPC transport's distinction between canonical and legacy paths.
+    if (isWithinPrefix(path, replacementPrefix)) continue;
     if (path === pathPrefix || path.startsWith(`${pathPrefix}/`)) {
-      return `${normalizePath(alias.replacementPrefix)}${path.slice(pathPrefix.length)}`;
+      return `${replacementPrefix}${path.slice(pathPrefix.length)}`;
     }
   }
   return path;

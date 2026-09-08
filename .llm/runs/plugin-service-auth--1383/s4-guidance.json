@@ -1,0 +1,80 @@
+{
+  "intent": "Generate a guarded feature plugin using native baseContract access metadata, createContractAuthorizer and createAuthServiceAuthenticator; preserve REST and RPC procedure authorization and plugin withDependencies auth discovery.",
+  "confidence": "high",
+  "recommendations": [
+    {
+      "stage": "implementation",
+      "slug": "pages/orchestration-runtime/how-to/author-a-plugin",
+      "section": "author-a-plugin",
+      "heading": "Author a plugin",
+      "why": "Matches the task through: generate, feature, plugin, metadata.",
+      "excerpt": "**Scope.** This recipe shows how to author a *new* custom plugin from scratch \u2014 its canonical location, the manifest it exports through `definePlugin(...)`, the contribution shape the kernel reads, and the generated registry that makes those contributions discoverable at runtime. It is the advanced companion to Add a first-party plugin, which only *installs* one of the four official plugins (`workers`, `sagas`, `triggers`, `streams`). If you just want a worker or a saga, install it there. Come here when you need a capability NetScript does not ship. A NetScript plugin is **two packages**: a JS",
+      "code": [
+        {
+          "language": "sh",
+          "code": "netscript plugin new notifier",
+          "source": {
+            "slug": "pages/orchestration-runtime/how-to/author-a-plugin",
+            "section": "author-a-plugin",
+            "heading": "Author a plugin"
+          }
+        },
+        {
+          "language": "text",
+          "code": "packages/plugin-notifier-core/\n\u251c\u2500\u2500 deno.json                          # strict; exports . ./contracts/v1 ./domain ./ports ./testing\n\u251c\u2500\u2500 mod.ts                             # curated builders + domain type re-exports\n\u251c\u2500\u2500 README.md\n\u251c\u2500\u2500 src/domain/mod.ts                  # domain entities and ids\n\u251c\u2500\u2500 src/ports/mod.ts                   # the engine's ports (the seam adapters implement)\n\u251c\u2500\u2500 src/application/mod.ts             # application orchestration (define<Name>)\n\u251c\u2500\u2500 src/contracts/v1/notifier.contract.ts  # the v1 oRPC contract, extends the base plugin contract\n\u251c\u2500\u2500 src/contracts/v1/mod.ts            # contract barrel\n\u251c\u2500\u2500 src/testing/mod.ts                 # in-memory port doubles for tests\n\u2514\u2500\u2500 tests/contracts/notifier-contract-soundness_test.ts",
+          "source": {
+            "slug": "pages/orchestration-runtime/how-to/author-a-plugin",
+            "section": "author-a-plugin",
+            "heading": "Author a plugin"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/orchestration-runtime/how-to/author-a-plugin",
+      "section": "a-real-multi-package-exemplar-the-auth-plugin",
+      "heading": "A real multi-package exemplar: the auth plugin",
+      "why": "Matches the task through: plugin, and, auth.",
+      "excerpt": "When your plugin grows beyond a single package \u2014 a core seam plus swappable adapters plus one service \u2014 the **auth plugin** is the production reference to copy. It is built from five units: **Auth plugin topology (a multi-package plugin)** | Name | Type | Description | | --- | --- | --- | | `@netscript/plugin-auth-core` | `core seam` | Defines AuthBackendPort, domain types, contracts/v1, and stream events. Adapters depend on it; it depends on no adapter. | | `@netscript/auth-kv-oauth` | `backend adapter` | Interactive OAuth/OIDC backend (the only backend with an interactive sign-in flow). Defa",
+      "code": []
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/tutorials/live-dashboard/03-sdk-cache-first-query",
+      "section": "sdk-client-and-cache-first-query",
+      "heading": "SDK client and cache-first query",
+      "why": "Matches the task through: metadata, and, procedure, discovery.",
+      "excerpt": "In chapter 2 you served an `orders.list` read-model on port **3002**. Now you will read it from the Fresh app. The SDK gives you a typed client built from the same contract, and a query factory that wraps every procedure in a KV-backed stale-while-revalidate cache. For an operations screen that posture matters: the queue paints instantly from the last-known rows \u2014 even while the `orders` service is mid-redeploy \u2014 and refreshes in the background instead of blocking the person watching it. That SWR behavior belongs to the callable procedure action (for example, `await ordersQueries.list(input)`)",
+      "code": [
+        {
+          "language": "sh",
+          "code": "curl 'http://localhost:3002/api/v1/orders/list?limit=1&offset=0'",
+          "source": {
+            "slug": "pages/tutorials/live-dashboard/03-sdk-cache-first-query",
+            "section": "sdk-client-and-cache-first-query",
+            "heading": "SDK client and cache-first query"
+          }
+        },
+        {
+          "language": "ts",
+          "code": "// apps/dashboard/lib/orders.ts\nimport { ordersContract } from '@my-dashboard/contracts';\nimport { createServiceClient } from '@netscript/sdk/client';\nimport { createQueryFactories } from '@netscript/sdk/query';\n\nexport const ordersClient = createServiceClient<typeof ordersContract>({\n  contract: ordersContract,\n  serviceName: 'orders',\n});",
+          "source": {
+            "slug": "pages/tutorials/live-dashboard/03-sdk-cache-first-query",
+            "section": "sdk-client-and-cache-first-query",
+            "heading": "SDK client and cache-first query"
+          }
+        }
+      ]
+    }
+  ],
+  "related": [
+    {
+      "relation": "related",
+      "slug": "pages/orchestration-runtime/how-to/author-a-plugin",
+      "section": "step-1-scaffold-the-two-tier-skeleton",
+      "heading": "Step 1 \u2014 Scaffold the two-tier skeleton"
+    }
+  ],
+  "truncated": true
+}

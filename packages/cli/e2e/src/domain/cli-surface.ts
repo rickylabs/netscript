@@ -174,6 +174,7 @@ export const GATE = {
   BEHAVIOR_STREAMS_PRODUCER_RECONNECT: 'behavior.streams.producer-reconnect',
   BEHAVIOR_AI_CHAT_ROUTE: 'behavior.ai-chat-route',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
+  BEHAVIOR_GENERATED_GUARDED_PLUGIN: 'behavior.generated-guarded-plugin',
   BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR: 'behavior.package-backed-plugin-doctor',
   DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',
   DEPLOY_COMPOSE_RESOLUTION: 'deploy.compose-resolution',

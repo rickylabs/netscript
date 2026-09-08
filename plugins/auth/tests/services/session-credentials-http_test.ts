@@ -74,6 +74,7 @@ Deno.test('native auth service verifies bearer sessions through the SDK and pres
   const otherSessionId = await mintSession();
 
   const running = await createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'auth',
     version: '0.0.0',
     port: 0,

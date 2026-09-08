@@ -33,7 +33,15 @@
  */
 
 export type { ServiceEnv, ServiceVariables } from './hono-context.ts';
-export type { AuthnOptions, AuthzOptions, ContractAuthorizerOptions } from './options.ts';
+export type {
+  AuthnOptions,
+  AuthzOptions,
+  ContractAuthorizerOptions,
+  ServiceAuthPolicy,
+  ServiceGuardedAuthPolicy,
+  ServicePublicAuthPolicy,
+} from './options.ts';
+export { assertServiceAuthPolicy } from './service-auth-policy.ts';
 export type {
   ContractAuthorizerFactory,
   ContractPolicyAuthorizerPort,

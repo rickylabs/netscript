@@ -41,6 +41,7 @@ Deno.test('HTTP saga publish fails within its deadline when delivery never settl
     publishTimeoutMs: 10,
   } as SagaServiceContext;
   const app = createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'sagas-publish-boundary-test',
     context: () => context,
   }).build();
@@ -101,6 +102,7 @@ Deno.test('HTTP saga publish reaches the runner, persists, projects, and schedul
   });
   const publisher = createSagaDeliveryPublisher({ queue });
   const app = createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'sagas-delivery-boundary-test',
     context: () => ({ db: emptyDatabase, sagaRuntime: publisher, publishTimeoutMs: 100 }),
   }).build();

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all"
+  ],
+  "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+  "exitCode": 0,
+  "durationMs": 413081,
+  "summary": {
+    "passed": 5386,
+    "failed": 0,
+    "ignored": 19,
+    "totalResults": 5405,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

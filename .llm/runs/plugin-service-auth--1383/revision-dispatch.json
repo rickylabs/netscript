@@ -1,0 +1,17 @@
+{
+  "pr": 2003,
+  "sourceHead": "f2faf5dac",
+  "role": "complex.plan",
+  "matrixQuery": "deno task agentic:matrix --tier complex --json",
+  "matrixReceipt": "matrix-plan-revision.json",
+  "selectedModel": "fable_5_1",
+  "requestedEffort": "medium",
+  "privilegedAuthorizer": "milestone_coordinator",
+  "rationale": "Required security policy on shared plugin factory and CLI-generated consumers",
+  "transport": "AGENTIC claude-print same-session resume",
+  "session": "7930bfda-966a-4a1c-aa82-53c07cd8116b",
+  "execHandle": 91482,
+  "output": "plan.md",
+  "implementationAuthorized": false,
+  "releaseAuthorized": false
+}

@@ -2378,3 +2378,31 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   service-name extraction), and normalize every non-reconciler pre-apply failure to `CliExitError`;
   focused resource-command tests, the full CLI unit suite, structured CLI check, `arch:check`,
   `quality:gate`, and CLI publish dry-run must all remain green.
+
+## packages/plugin contract mount — upstream oRPC doc-lint visibility
+
+- **Reason:** `mountPluginContract` references the actual upstream `AnyContractRouter` and
+  `EnhancedContractRouter` types. Deno doc-lint reports two `privateTypeRef` findings on this
+  signature, although package publish dry-run passes without `--allow-slow-types` and native
+  contract/authorizer type checks pass. Erasing the types, re-exporting upstream types solely to
+  appease the checker, or suppressing lint is not accepted. Independent evaluation found no verified
+  sound repair and returned FAIL_DEBT for this exact delta.
+- **Owner:** Cockpit milestone coordinator, NetScript issue #1383 / PR #2003.
+- **Target:** Re-evaluate at the next oRPC contract dependency change or Deno doc-lint upgrade,
+  whichever occurs first; keep the measured baseline comparison in subsequent public-surface work.
+- **Linked plan:** `.llm/runs/plugin-service-auth--1383/binding-repair-plan.md`; independent
+  disposition D2 in `.llm/runs/plugin-service-auth--1383/evaluate.md`.
+- **Created:** 2026-09-08.
+- **Status:** open, DEBT_ACCEPTED by the milestone coordinator following independent D2 analysis;
+  acceptance is limited to these two checker findings and does not certify PR merge readiness.
+- **Gate:** The raw package doc-lint result remains FAIL (17, including the prior 15). The scoped
+  fitness exception permits exactly the two cited upstream-type findings at
+  `src/contract-base/domain/contract-mount.ts`, with no new missing-JSDoc/other findings or increase
+  elsewhere. Publish dry-run must continue to pass without `--allow-slow-types`.
+- **Closing gate:** Both named findings disappear without type erasure, upstream re-export solely
+  for lint, or suppression; compare file/category deltas against the original 15-finding receipt.
+  Merely resetting the baseline to 17 or reducing unrelated findings does not close this debt.
+- **Evidence:** `s6-doclint-comparison.json`, `s6-doclint-qualified-types.json`, and
+  `s6-generation-receipt.json` in the linked run; evaluator independently reproduced the two
+  diagnostics and successful publish analysis. [observed - evaluate.md D2; contract-mount.ts public
+  signature; docs/architecture/doctrine/02-public-surface.md public types and oRPC boundary]

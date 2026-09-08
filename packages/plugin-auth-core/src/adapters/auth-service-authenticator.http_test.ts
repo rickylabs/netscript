@@ -54,7 +54,12 @@ Deno.test('remote verifier distinguishes contract denial, provider failure and t
         }),
       },
     },
-  }, { name: 'auth-fault-fixture', version: '0.0.0', traceContext: false }).serve({ port: 0 });
+  }, {
+    name: 'auth-fault-fixture',
+    version: '0.0.0',
+    traceContext: false,
+    auth: { public: true, reason: 'Synthetic session-discovery server for verifier failure tests' },
+  }).serve({ port: 0 });
   const serviceName = `auth-fault-${crypto.randomUUID()}`;
   const key = `services__${serviceName}__http__0`;
   Deno.env.set(key, `http://127.0.0.1:${running.addr.port}`);

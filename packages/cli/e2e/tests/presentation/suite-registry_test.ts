@@ -86,6 +86,7 @@ Deno.test('plugin suite includes all official plugin and generated-check gates',
     GATE.GENERATED_SAGAS_REGISTRY,
     GATE.BEHAVIOR_PLUGINS_HEALTH,
     GATE.BEHAVIOR_PACKAGE_BACKED_PLUGIN_DOCTOR,
+    GATE.BEHAVIOR_GENERATED_GUARDED_PLUGIN,
   ]);
 });
 

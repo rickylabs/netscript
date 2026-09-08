@@ -124,6 +124,17 @@ holds only the manifest, adapters, and service wiring, re-exporting the core's c
 register; author capability changes in the core package and integration changes in the connector.
 {{ /comp }}
 
+### Preserve the generated authorization boundary
+
+The current source generator emits a guarded service, an auth-plugin dependency, and required
+`<name>:read` scopes. Configure auth and obtain a scoped session before reading; older CLI releases
+may not include this wiring.
+
+Keep the generated `PluginContractMount` constant shared between router assembly and
+`createContractAuthorizer(mountPluginContract(contract, mount))`. This aligns REST paths and RPC
+keys without changing contract metadata. Missing scopes remain denied; public health is not proof
+of authorized reads. See the [plugin authentication reference](/reference/plugin/#plugin-service-authentication-posture).
+
 ## Step 2 — Write the manifest descriptor (`scaffold.plugin.json`)
 
 `scaffold.plugin.json` is the static descriptor the CLI and kernel read to understand your plugin's

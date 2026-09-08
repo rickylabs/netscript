@@ -15,6 +15,7 @@ import {
 
 import { IoError, UsageError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
+import { JSR_SPECIFIERS } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
 
 /** Package version stamped onto generated plugin tiers. */
@@ -95,7 +96,10 @@ export async function createNewPlugin(
   dependencies: NewPluginDependencies,
 ): Promise<NewPluginResult> {
   const descriptor = resolveNewPluginDescriptor(options);
-  const artifacts = buildArtifacts(descriptor);
+  const localSource = await dependencies.fs.exists(
+    join(options.projectRoot, 'packages/cli/deno.json'),
+  );
+  const artifacts = buildArtifacts(descriptor, localSource);
   const filesCreated: string[] = [];
   const filesSkipped: string[] = [];
 
@@ -126,17 +130,26 @@ export async function createNewPlugin(
   return { descriptor, filesCreated, filesSkipped };
 }
 
-function buildArtifacts(descriptor: NewPluginDescriptor): readonly ScaffoldArtifact[] {
+function buildArtifacts(
+  descriptor: NewPluginDescriptor,
+  localSource: boolean,
+): readonly ScaffoldArtifact[] {
   return [
-    ...buildCoreArtifacts(descriptor),
-    ...buildConnectorArtifacts(descriptor),
+    ...buildCoreArtifacts(descriptor, localSource),
+    ...buildConnectorArtifacts(descriptor, localSource),
   ];
 }
 
-function buildCoreArtifacts(descriptor: NewPluginDescriptor): readonly ScaffoldArtifact[] {
+function buildCoreArtifacts(
+  descriptor: NewPluginDescriptor,
+  localSource: boolean,
+): readonly ScaffoldArtifact[] {
   const root = `packages/plugin-${descriptor.name}-core`;
   return [
-    textArtifact(`${root}/deno.json`, `${JSON.stringify(coreDenoJson(descriptor), null, 2)}\n`),
+    textArtifact(
+      `${root}/deno.json`,
+      `${JSON.stringify(coreDenoJson(descriptor, localSource), null, 2)}\n`,
+    ),
     textArtifact(`${root}/mod.ts`, coreRootSource(descriptor)),
     textArtifact(`${root}/README.md`, coreReadme(descriptor)),
     textArtifact(`${root}/src/domain/mod.ts`, coreDomainSource(descriptor)),
@@ -158,12 +171,15 @@ function buildCoreArtifacts(descriptor: NewPluginDescriptor): readonly ScaffoldA
   ];
 }
 
-function buildConnectorArtifacts(descriptor: NewPluginDescriptor): readonly ScaffoldArtifact[] {
+function buildConnectorArtifacts(
+  descriptor: NewPluginDescriptor,
+  localSource: boolean,
+): readonly ScaffoldArtifact[] {
   const root = `plugins/${descriptor.name}`;
   return [
     textArtifact(
       `${root}/deno.json`,
-      `${JSON.stringify(connectorDenoJson(descriptor), null, 2)}\n`,
+      `${JSON.stringify(connectorDenoJson(descriptor, localSource), null, 2)}\n`,
     ),
     textArtifact(
       `${root}/package.json`,
@@ -201,7 +217,10 @@ function buildConnectorArtifacts(descriptor: NewPluginDescriptor): readonly Scaf
   ];
 }
 
-function coreDenoJson(descriptor: NewPluginDescriptor): Record<string, unknown> {
+function coreDenoJson(
+  descriptor: NewPluginDescriptor,
+  localSource: boolean,
+): Record<string, unknown> {
   return {
     name: descriptor.corePackage,
     version: GENERATED_PLUGIN_VERSION,
@@ -215,7 +234,10 @@ function coreDenoJson(descriptor: NewPluginDescriptor): Record<string, unknown> 
       './testing': './src/testing/mod.ts',
     },
     imports: {
-      '@netscript/plugin': `jsr:@netscript/plugin@${GENERATED_PLUGIN_VERSION}`,
+      ...(localSource ? {} : {
+        '@netscript/plugin': JSR_SPECIFIERS.plugin,
+        '@netscript/contracts': JSR_SPECIFIERS.contracts,
+      }),
       '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
       '@orpc/server': 'npm:@orpc/server@^1.14.6',
       '@std/assert': 'jsr:@std/assert@^1',
@@ -239,7 +261,10 @@ function coreDenoJson(descriptor: NewPluginDescriptor): Record<string, unknown> 
   };
 }
 
-function connectorDenoJson(descriptor: NewPluginDescriptor): Record<string, unknown> {
+function connectorDenoJson(
+  descriptor: NewPluginDescriptor,
+  localSource: boolean,
+): Record<string, unknown> {
   return {
     name: descriptor.connectorPackage,
     version: GENERATED_PLUGIN_VERSION,
@@ -254,9 +279,13 @@ function connectorDenoJson(descriptor: NewPluginDescriptor): Record<string, unkn
       './scaffold': './scaffold.ts',
     },
     imports: {
-      '@netscript/aspire': `jsr:@netscript/aspire@${GENERATED_PLUGIN_VERSION}`,
-      '@netscript/plugin': `jsr:@netscript/plugin@${GENERATED_PLUGIN_VERSION}`,
-      [descriptor.corePackage]: `jsr:${descriptor.corePackage}@${GENERATED_PLUGIN_VERSION}`,
+      ...(localSource ? {} : {
+        '@netscript/aspire': JSR_SPECIFIERS.aspire,
+        '@netscript/plugin': JSR_SPECIFIERS.plugin,
+        '@netscript/service': JSR_SPECIFIERS.service,
+        '@netscript/plugin-auth': JSR_SPECIFIERS['plugin-auth'],
+        [descriptor.corePackage]: `jsr:${descriptor.corePackage}@${GENERATED_PLUGIN_VERSION}`,
+      }),
       '@std/assert': 'jsr:@std/assert@^1',
     },
     tasks: {
@@ -372,32 +401,28 @@ function coreApplicationSource(descriptor: NewPluginDescriptor): string {
 
 function coreContractSource(descriptor: NewPluginDescriptor): string {
   return [
-    "import { oc } from '@orpc/contract';",
+    "import { baseContract as nativeBaseContract, type BaseContractMeta } from '@netscript/contracts';",
     'import type {',
     '  AnySchema,',
     '  ContractProcedureBuilderWithOutput,',
-    '  ErrorMap,',
-    '  MergedErrorMap,',
     "} from '@orpc/contract';",
     "import { implement } from '@orpc/server';",
     "import { z } from 'zod';",
     'import {',
-    '  BASE_PLUGIN_CONTRACT_ROUTES,',
+    '  PluginCapabilitiesSchema,',
     '  BASE_PLUGIN_ERRORS,',
     '  type BasePluginContract,',
     "} from '@netscript/plugin/contract-base';",
     '',
-    'const baseContract: ReturnType<typeof oc.errors> = oc.errors(',
-    '  { ...BASE_PLUGIN_ERRORS } as unknown as Parameters<typeof oc.errors>[0],',
-    ');',
+    'const baseContract = nativeBaseContract.errors({ ...BASE_PLUGIN_ERRORS });',
     '',
-    'type BaseErrors = MergedErrorMap<Record<never, never>, ErrorMap>;',
+    "type BaseErrors = typeof baseContract['~orpc']['errorMap'];",
     '',
     'type OutputRoute<TOut extends AnySchema> = ContractProcedureBuilderWithOutput<',
     '  AnySchema,',
     '  TOut,',
     '  BaseErrors,',
-    '  Record<never, never>',
+    '  BaseContractMeta',
     '>;',
     '',
     `export const ${descriptor.camelName}Schema: z.ZodObject<{ id: z.ZodString; title: z.ZodString }> = z.object({`,
@@ -408,12 +433,13 @@ function coreContractSource(descriptor: NewPluginDescriptor): string {
     `const list${descriptor.pascalName}sOutput: z.ZodArray<typeof ${descriptor.camelName}Schema> = z.array(${descriptor.camelName}Schema);`,
     '',
     `export interface ${descriptor.pascalName}ContractDefinition extends BasePluginContract {`,
+    '  readonly describe: OutputRoute<typeof PluginCapabilitiesSchema>;',
     `  readonly list${descriptor.pascalName}s: OutputRoute<typeof list${descriptor.pascalName}sOutput>;`,
     '}',
     '',
     `export const ${descriptor.camelName}ContractDefinition: ${descriptor.pascalName}ContractDefinition = {`,
-    '  ...BASE_PLUGIN_CONTRACT_ROUTES,',
-    `  list${descriptor.pascalName}s: baseContract.route({ method: 'GET', path: '/${descriptor.name}' }).output(list${descriptor.pascalName}sOutput),`,
+    `  describe: baseContract.route({ method: 'GET', path: '/describe' }).output(PluginCapabilitiesSchema).meta({ access: { authentication: 'required', authorization: { scopes: ['${descriptor.name}:read'] } } }),`,
+    `  list${descriptor.pascalName}s: baseContract.route({ method: 'GET', path: '/${descriptor.name}' }).output(list${descriptor.pascalName}sOutput).meta({ access: { authentication: 'required', authorization: { scopes: ['${descriptor.name}:read'] } } }),`,
     '};',
     '',
     `export const ${descriptor.camelName}ContractV1: ReturnType<typeof implement<${descriptor.pascalName}ContractDefinition>> = implement(`,
@@ -464,11 +490,13 @@ function connectorRootSource(descriptor: NewPluginDescriptor): string {
     '  inspectPlugin,',
     '  type PluginManifest,',
     "} from '@netscript/plugin';",
+    "import { authPlugin } from '@netscript/plugin-auth';",
     '',
     `export const ${descriptor.camelName}Plugin: PluginManifest = definePlugin(`,
     `  '${descriptor.connectorPackage}',`,
     `  '${GENERATED_PLUGIN_VERSION}',`,
     ')',
+    '  .withDependencies({ auth: authPlugin })',
     `  .withDisplayName('${descriptor.pascalName}')`,
     `  .withDescription('NetScript ${descriptor.name} plugin connector.')`,
     "  .withContractVersions([{ version: 'v1', loader: './contracts/v1.ts' }])",
@@ -659,8 +687,11 @@ function connectorServiceHandlersSource(descriptor: NewPluginDescriptor): string
   return [
     "import { bindPluginContract } from '@netscript/plugin/service';",
     "import type { BoundPluginContract } from '@netscript/plugin/service';",
+    "import type { PluginContractMount } from '@netscript/plugin/contract-base';",
     `import { ${descriptor.camelName}ContractV1 } from '${descriptor.corePackage}/contracts/v1';`,
     `import type { ${descriptor.pascalName}RequestContext } from './context.ts';`,
+    '',
+    `export const ${descriptor.camelName}ContractMount: PluginContractMount = { version: 'v1', namespace: '${descriptor.name}' };`,
     '',
     `type ${descriptor.pascalName}Router = ReturnType<typeof ${descriptor.camelName}ContractV1.$context<${descriptor.pascalName}RequestContext>>;`,
     '',
@@ -681,8 +712,7 @@ function connectorServiceHandlersSource(descriptor: NewPluginDescriptor): string
     '',
     `export const ${descriptor.camelName}Router: ReturnType<typeof bound${descriptor.pascalName}Contract.assemble> = bound${descriptor.pascalName}Contract`,
     '  .assemble({',
-    "    version: 'v1',",
-    `    namespace: '${descriptor.name}',`,
+    `    ...${descriptor.camelName}ContractMount,`,
     `    handlers: ${descriptor.camelName}Handlers,`,
     '  });',
     '',
@@ -692,10 +722,18 @@ function connectorServiceHandlersSource(descriptor: NewPluginDescriptor): string
 function connectorServiceMainSource(descriptor: NewPluginDescriptor): string {
   return [
     "import { createPluginService } from '@netscript/plugin/service';",
-    `import { ${descriptor.camelName}Router } from './handlers.ts';`,
+    "import { mountPluginContract } from '@netscript/plugin/contract-base';",
+    "import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';",
+    "import { createContractAuthorizer } from '@netscript/service/auth';",
+    `import { ${descriptor.camelName}ContractDefinition } from '${descriptor.corePackage}/contracts/v1';`,
+    `import { ${descriptor.camelName}Router, ${descriptor.camelName}ContractMount } from './handlers.ts';`,
     '',
     `export const ${descriptor.camelName}Service: ReturnType<typeof createPluginService<typeof ${descriptor.camelName}Router>> =`,
     `  createPluginService(${descriptor.camelName}Router, {`,
+    '    auth: {',
+    "      authn: { authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }) },",
+    `      authz: { authorizer: createContractAuthorizer(mountPluginContract(${descriptor.camelName}ContractDefinition, ${descriptor.camelName}ContractMount)) },`,
+    '    },',
     `    name: '${descriptor.name}',`,
     `    version: '${GENERATED_PLUGIN_VERSION}',`,
     "    openApi: { title: '" + descriptor.pascalName + " API' },",
@@ -716,6 +754,7 @@ function connectorManifestTestSource(descriptor: NewPluginDescriptor): string {
     `Deno.test('${descriptor.name} plugin manifest carries package identity', () => {`,
     `  assertEquals(${descriptor.camelName}Plugin.name, '${descriptor.connectorPackage}');`,
     `  assertEquals(${descriptor.camelName}Plugin.version, '${GENERATED_PLUGIN_VERSION}');`,
+    `  assertEquals(${descriptor.camelName}Plugin.dependencies?.auth?.name, '@netscript/plugin-auth');`,
     '});',
     '',
   ].join('\n');

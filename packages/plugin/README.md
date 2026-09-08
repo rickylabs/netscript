@@ -173,3 +173,70 @@ the NetScript hosts that consume them.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Explicit service authentication
+
+`createPluginService` requires `auth`. Guarded services pass native service-auth options;
+JavaScript callers receive a `TypeError` for missing or ambiguous policies before a builder is
+constructed. TypeScript callers must migrate their service configuration.
+
+```ts
+import { assemblePluginContractRouter, createPluginService } from '@netscript/plugin/service';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createContractAuthorizer } from '@netscript/service/auth';
+import { mountPluginContract } from '@netscript/plugin/contract-base';
+import { baseContract, SuccessSchema } from '@netscript/contracts';
+import { implement } from '@orpc/server';
+
+const contract = {
+  list: baseContract.route({ method: 'GET', path: '/reports' }).output(SuccessSchema)
+    .meta({ access: { authentication: 'required', authorization: { scopes: ['reports:read'] } } }),
+};
+const contractMount = { version: 'v1', namespace: 'reports' };
+const implementation = implement(contract);
+const router = assemblePluginContractRouter(implementation, {
+  ...contractMount,
+  handlers: { list: implementation.list.handler(() => ({ success: true })) },
+});
+
+const service = createPluginService(router, {
+  name: 'reports',
+  auth: {
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: { authorizer: createContractAuthorizer(mountPluginContract(contract, contractMount)) },
+  },
+});
+```
+
+The contract must declare the required access metadata, and the plugin must declare its auth
+service dependency. The builder resolves procedure policy across REST and RPC; do not infer a
+procedure's required scope from the transport's HTTP method.
+
+`contractMount` is the same `{ version, namespace }` value used to assemble the router.
+`mountPluginContract` prefixes REST paths and nests RPC keys without changing the source contract,
+its access metadata, or its errors. Passing the flat contract to the authorizer would deny mounted
+requests because their paths differ. The generator exports one mount constant in `handlers.ts`
+and shares it with the authorizer; preserve that single authority when adapting the scaffold.
+
+For a deliberately public service, record the reason instead:
+
+```ts
+import { createPluginService } from '@netscript/plugin/service';
+
+const service = createPluginService({}, {
+  name: 'public-health',
+  auth: { public: true, reason: 'Public health service without protected operations' },
+});
+```
+
+Never combine public and guarded fields. Public reasons must be nonblank. Options pass through
+unchanged: a custom nonempty `allowAnonymous` list replaces the native default. The builder's
+built-in health routes remain public because they are registered before auth middleware; raw
+routes are installed after it and follow the configured guards.
+
+The existing first-party public declarations record unfinished adoption, not proof that those
+services are guarded. Their credential propagation, session seeding, per-service access policy
+and auth discovery work remain under #1383; auth signout authorization remains under #1384.
+This source change does not imply availability in an existing published package.

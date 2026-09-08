@@ -1,0 +1,148 @@
+{
+  "intent": "Implement the reviewed shared ServiceAuthPolicy guarded or explicit public union and runtime assertion in NetScript service auth, preserving native AuthnOptions AuthzOptions without a parallel middleware policy. Find native public API and test conventions.",
+  "confidence": "high",
+  "recommendations": [
+    {
+      "stage": "implementation",
+      "slug": "pages/services-sdk/services",
+      "section": "service-layer-authn-authz-middleware",
+      "heading": "Service-layer authn / authz middleware",
+      "why": "Matches the task through: the, shar, or, and.",
+      "excerpt": "The service builder ships a **provider-agnostic** authentication and authorization seam in `@netscript/service/auth`. It is a thin Hono-middleware layer over the request pipeline \u2014 deliberately **distinct from the auth plugin**, which composes a sign-in/session backend (kv-oauth, WorkOS, better-auth). Use this seam when a service needs to gate its own routes \u2014 verify a credential, trust an upstream identity header, or check a scope \u2014 without taking on an interactive identity provider. Two stages wrap the request: `.withAuthn()` resolves a `Principal` (authentication) via an `AuthenticatorPort`",
+      "code": [
+        {
+          "language": "ts",
+          "code": "// Gate a service with a static credential + scope check\nimport { createService } from '@netscript/service';\nimport {\n  createStaticCredentialAuthenticator,\n  createScopeAuthorizer,\n} from '@netscript/service/auth';\nimport { router } from './router.ts';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: {\n    [Deno.env.get('SERVICE_API_KEY') ?? '']: {\n      subject: 'service:ci',\n      scopes: ['users:write'],\n    },\n  },\n});\nconst authorizer = createScopeAuthorizer({\n  rules: [{ match: () => true, requireScopes: ['users:write'] }],\n  denyByDefault: true,\n});\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 }) // note: your scaffold's port will differ\n  .withRPC()\n  .withAuthn({ authenticator })\n  .withAuthz({ authorizer })\n  .withHealth() // /health stays anonymous\n  .serve();",
+          "source": {
+            "slug": "pages/services-sdk/services",
+            "section": "service-layer-authn-authz-middleware",
+            "heading": "Service-layer authn / authz middleware"
+          }
+        },
+        {
+          "language": "ts",
+          "code": "// Trust identity asserted by an upstream proxy/gateway\nimport { createTrustedHeaderAuthenticator } from '@netscript/service/auth';\n\n// The Principal is assembled internally from these header NAMES \u2014 point at the\n// headers your gateway sets; you do not map values yourself.\nconst authenticator = createTrustedHeaderAuthenticator({\n  subjectHeader: 'x-forwarded-user',\n  scopesHeader: 'x-forwarded-scopes', // optional; space/comma-separated\n});\n\n// then: .withAuthn({ authenticator })",
+          "source": {
+            "slug": "pages/services-sdk/services",
+            "section": "service-layer-authn-authz-middleware",
+            "heading": "Service-layer authn / authz middleware"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/services-sdk/services",
+      "section": "headline-api-two-ways-to-construct-a-service",
+      "heading": "Headline API: two ways to construct a service",
+      "why": "Matches the task through: implement, the, guard, or.",
+      "excerpt": "NetScript ships **two** service-construction APIs, and the example project uses both. Workspace services use the one-call `defineService(router, options)` \u2014 the right default for the 80% case. Plugin API services (workers, sagas, auth) use the fluent `createService(router, options).with*().serve()` builder when they need to add CORS, OpenAPI, a database client, auth middleware, or custom context step by step. Both stand up the same Hono + oRPC runtime; `defineService` is a curated preset over the same builder. Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; t",
+      "code": [
+        {
+          "language": "ts",
+          "code": "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});",
+          "source": {
+            "slug": "pages/services-sdk/services",
+            "section": "headline-api-two-ways-to-construct-a-service",
+            "heading": "Headline API: two ways to construct a service"
+          }
+        },
+        {
+          "language": "ts",
+          "code": "// plugins/workers/services/src/main.ts \u2014 step-by-step composition\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDocs()\n  .withDatabase(dbClient)\n  .withContext(() => ({ workers: runtime }))\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .withServiceInfo()\n  .onStartup(async () => {/* seed, warm caches */})\n  .serve();",
+          "source": {
+            "slug": "pages/services-sdk/services",
+            "section": "headline-api-two-ways-to-construct-a-service",
+            "heading": "Headline API: two ways to construct a service"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/services-sdk/services",
+      "section": "services-contracts",
+      "heading": "Services & contracts",
+      "why": "Matches the task through: implement, the, shar, guard.",
+      "excerpt": "**Establish the public contract once; the handler, typed client, and OpenAPI surface are all derived from it \u2014 so an agent (or a teammate) never spends a turn keeping them in sync.** A NetScript **service** is a typed HTTP runtime that *implements* an `@orpc/contract` definition. You establish the versioned public contract (route + Zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting router on a Hono + oRPC runtime. The contract object is the single source of truth: the same object a typed client imports is the one the server implements, so caller and server **canno",
+      "code": [
+        {
+          "language": "ts",
+          "code": "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\n\nexport const UsersContractV1 = {\n  health: oc.route({ method: 'GET' }).input(z.object({}).optional()).output(UsersHealthSchemaV1),\n  list: oc.route({ method: 'POST' }).input(UsersListInputSchemaV1).output(UsersListResponseSchemaV1),\n  updateStatus: oc.route({ method: 'POST' }).input(UsersUpdateStatusInputSchemaV1).output(UsersUpdateStatusResponseSchemaV1),\n};\n\n// `implement()` produces the .handler()-bindable object the service router consumes.\nexport const UsersV1 = implement(UsersContractV1);",
+          "source": {
+            "slug": "pages/services-sdk/services",
+            "section": "services-contracts",
+            "heading": "Services & contracts"
+          }
+        },
+        {
+          "language": "ts",
+          "code": "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});",
+          "source": {
+            "slug": "pages/services-sdk/services",
+            "section": "services-contracts",
+            "heading": "Services & contracts"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/tutorials/live-dashboard/04-definePage-QueryIsland",
+      "section": "the-page-builder-and-the-query-island",
+      "heading": "The page builder and the query island",
+      "why": "Matches the task through: the, shar, or, explicit.",
+      "excerpt": "This is the heaviest chapter in the track, and the most rewarding. You will render the orders table with NetScript's `definePage` builder \u2014 its **layer / partial / island** triad \u2014 and hydrate a TanStack Query island so the table reads and mutates on the client. By the end the dashboard renders instantly from cache and refetches in the background. We flag where the surface is conceptually dense. 1. 1 \u00b7 Scaffold 2. 2 \u00b7 Contract to service 3. 3 \u00b7 Cache-first query 4. 4 \u00b7 definePage + island 5. 5 \u00b7 Live stream 6. 6 \u00b7 Deploy ## What you will build An `/dashboard/orders/` route that renders a filte",
+      "code": [
+        {
+          "language": "sh",
+          "code": "deno check apps/dashboard/lib/orders.ts --unstable-kv",
+          "source": {
+            "slug": "pages/tutorials/live-dashboard/04-definePage-QueryIsland",
+            "section": "the-page-builder-and-the-query-island",
+            "heading": "The page builder and the query island"
+          }
+        },
+        {
+          "language": "ts",
+          "code": "// apps/dashboard/routes/(dashboard)/dashboard/orders/index.route.ts\nimport { defineRouteContract, fallback, paginationSearchSchema } from '@netscript/fresh/route';\nimport { z } from 'zod';\n\nconst ORDERS_SEARCH_SCHEMA = paginationSearchSchema({\n  defaultSort: 'createdAt',\n  defaultOrder: 'desc',\n}).extend({\n  search: fallback(z.string(), ''),\n  status: fallback(z.enum([\n    'pending', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'failed',\n  ]).optional(), undefined),\n});\n\nexport default defineRouteContract({ searchSchema: ORDERS_SEARCH_SCHEMA });\n\n// The parsed shape every loader and island receives \u2014 page, limit, offset, sortBy,\n// sortOrder, plus the search/status fields the schema extends with.\nexport type OrdersSearch = ReturnType<typeof ORDERS_SEARCH_SCHEMA.parse>;",
+          "source": {
+            "slug": "pages/tutorials/live-dashboard/04-definePage-QueryIsland",
+            "section": "the-page-builder-and-the-query-island",
+            "heading": "The page builder and the query island"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/web-layer/builders",
+      "section": "pages-and-the-define-page-builder",
+      "heading": "Pages and the define-page builder",
+      "why": "Matches the task through: the, shar, guard, or.",
+      "excerpt": "`@netscript/fresh` exposes a fluent builder for declaring pages. You start a chain with `definePage()`, layer on resources, params, render layers, handlers, and metadata, and finish with `build()` to produce a Fresh-compatible page definition. The same module also defines framework-owned partial routes through `definePartial()` and `defineStatsPartial()`. Reach for this surface whenever you author a route module and want a typed pipeline rather than hand-wired loaders and handlers. Route contracts themselves \u2014 the generated route references passed to `withRoute()` \u2014 live on `@netscript/fresh/r",
+      "code": [
+        {
+          "language": "tsx",
+          "code": "import { definePage } from \"@netscript/fresh/builders\";\nimport { z } from \"zod\";\nimport { MetricChart, MetricChartSkeleton } from \"../components/MetricChart.tsx\";\nimport { EditOrderForm } from \"../components/EditOrderForm.tsx\";\n\nconst orderPage = definePage()\n  .withRouteContract({\n    $route: \"/orders/[id]\",\n    pathSchema: z.object({ id: z.string() }),\n    searchSchema: z.object({ tab: z.string().optional() }),\n  })\n  .withResource(\"metrics\", async (ctx) => {\n    return await loadOrderMetrics(ctx.path.id);\n  })\n  .withPolicy(\"balanced\")\n  .withTelemetry({ enabled: true, spanName: \"order-detail-page\" })\n  .withLayer(\"chart\", MetricChart, {\n    loader: async (ctx) => ({ points: await ctx.resource(\"metrics\") }),\n    partial: \"/partials/orders/chart\",\n    partialName: \"orders-chart\",\n    fallback: <MetricChartSkeleton />,\n    staleTime: 15_000,\n    staleReloadMode: \"background\",\n  })\n  .withForm(\"editOrder\", EditOrderForm, {\n    schema: z.object({ status: z.string() }),\n    mutate: async (values, ctx) => {\n      await updateOrderStatus(ctx.path.id, values.status);\n    },\n  })\n  .withLayout((slots, _ctx) => (\n    <div class=\"layout\">\n      <aside>{slots.chart()}</aside>\n      <section>{slots.editOrder()}</section>\n    </div>\n  ))\n  .withHeader(\"x-page-type\", \"order-detail\")\n  .withStatus(200)\n  .build();\n\nexport default orderPage.default;",
+          "source": {
+            "slug": "pages/web-layer/builders",
+            "section": "pages-and-the-define-page-builder",
+            "heading": "Pages and the define-page builder"
+          }
+        },
+        {
+          "language": "ts",
+          "code": "import { definePage } from \"@netscript/fresh/builders\";\n\nconst page = definePage()\n  .withResource(\"metrics\", async () => {\n    return await loadMetrics();\n  })\n  .withStatus(200)\n  .withMeta((ctx) => ({ title: \"Dashboard\" }))\n  .build();\n\nexport default page.default;",
+          "source": {
+            "slug": "pages/web-layer/builders",
+            "section": "pages-and-the-define-page-builder",
+            "heading": "Pages and the define-page builder"
+          }
+        }
+      ]
+    }
+  ],
+  "related": [],
+  "truncated": true
+}

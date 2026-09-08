@@ -10,11 +10,13 @@
  */
 
 import {
+  assertServiceAuthPolicy,
   type ContextFactory,
   type CorsOptions,
   createService,
   type DbContext,
   type HealthCheck,
+  type ServiceAuthPolicy,
   type ServiceBuilder,
   type ServiceConfig,
   type ServiceHandler,
@@ -63,6 +65,8 @@ export interface PluginRawRoute {
 export interface PluginServiceConfig<
   TCustom extends object = Record<never, never>,
 > extends ServiceConfig {
+  /** Required native guards or an explicit public opt-out with a nonblank reason. */
+  readonly auth: ServiceAuthPolicy;
   /** Forwarded to `withRPC({ traceContext })`; defaults to `true`. */
   readonly traceContext?: boolean;
   /** API version used in the canonical RPC mount path; defaults to `v1`. */
@@ -109,7 +113,7 @@ export interface PluginServiceConfig<
  * Builds a plugin service builder with the mandated chain pre-applied.
  *
  * The chain order is fixed: cors → logger → openapi → docs → database →
- * use(middleware) → context → withRPC(optional) → withHealth → withServiceInfo →
+ * use(middleware) → context → auth → withRPC(optional) → withHealth → withServiceInfo →
  * route(rawRoutes) → onStartup(hooks) → onShutdown(hooks). The caller receives a
  * ready {@link ServiceBuilder} and only calls `.serve()`.
  *
@@ -124,6 +128,7 @@ export interface PluginServiceConfig<
  *
  * const running = await createPluginService(router, {
  *   name: 'workers',
+ *   auth: { authn: { authenticator } },
  *   version: '1.0.0',
  *   openApi: { title: 'Workers API' },
  * }).serve({ port: 3000 });
@@ -138,6 +143,7 @@ export function createPluginService<
   router: TRouter,
   config: PluginServiceConfig<TCustom>,
 ): ServiceBuilder<TRouter, TCustom> {
+  assertServiceAuthPolicy(config.auth);
   const { name, version, port } = config;
   let builder: ServiceBuilder<TRouter, TCustom> = createService<TRouter>(router, {
     name,
@@ -169,6 +175,13 @@ export function createPluginService<
 
   if (config.context !== undefined) {
     builder = builder.withContext(config.context);
+  }
+
+  if (config.auth.public !== true) {
+    builder = builder.withAuthn(config.auth.authn);
+    if (config.auth.authz !== undefined) {
+      builder = builder.withAuthz(config.auth.authz);
+    }
   }
 
   if (config.serveRpc !== false) {

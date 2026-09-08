@@ -1,0 +1,7 @@
+# Complete cycle-three in-flight repair
+
+Resume same evaluator session, not a fourth plan review cycle. Fresh matrix-binding-inflight.json selects complex plan_evaluation first candidate and repairInFlightAt3. Native .llm/harness/evaluator/plan-protocol.md says the evaluator edits a fixable plan on cycle3. The prior brief's blanket no-plan-edit restriction was coordinator error; this scoped authorization supersedes it for the two findings only.
+
+Read binding-repair-eval.md. Your native source/type/geometry review confirmed the technical repair, with only F1/F2 remaining. Edit binding-repair-plan.md in place for exactly F1 (preserve s5-runtime-finding.json; add separately named success receipt) and F2 (explicit no-new-doc-lint-findings comparison against15 baseline findings, by file/count; keep full doc-lint FAIL truthful). Do not change technical scope or implementation. Preserve existing verdict file; write binding-inflight-eval.md certifying the edited amendment, with exact changed text/sha256 and PASS if the two findings are resolved. This is sanctioned evaluator in-flight plan repair, not self-certification of product code.
+
+Original planner Anthropic and implementation/coordinator OpenAI; remain outside both families/session. Follow evaluation-brief.md skills and source citations; NetScript CLI/MCP first. No code, commits, GitHub, dispatch, runtime, release or publication. Use --no-lock for inspection to avoid lock drift. No owner question needed for these two mechanical corrections. Preserve prior reviews and failure evidence.

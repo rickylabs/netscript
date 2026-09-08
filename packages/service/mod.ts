@@ -78,7 +78,15 @@ export {
   type HealthStatus,
 } from './src/primitives/health.ts';
 
-export type { AuthnOptions, AuthzOptions, ContractAuthorizerOptions } from './src/auth/options.ts';
+export type {
+  AuthnOptions,
+  AuthzOptions,
+  ContractAuthorizerOptions,
+  ServiceAuthPolicy,
+  ServiceGuardedAuthPolicy,
+  ServicePublicAuthPolicy,
+} from './src/auth/options.ts';
+export { assertServiceAuthPolicy } from './src/auth/service-auth-policy.ts';
 export type {
   ContractAuthorizerFactory,
   ContractPolicyAuthorizerPort,

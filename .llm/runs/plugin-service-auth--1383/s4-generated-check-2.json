@@ -1,0 +1,1 @@
+{"source":{"mode":"selection","cwd":"/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring-samples"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":21,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}

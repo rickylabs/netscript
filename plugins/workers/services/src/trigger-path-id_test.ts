@@ -31,6 +31,7 @@ function buildApp(
   } as unknown as WorkersServiceRuntime;
 
   return createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'workers',
     version: '1.0.0',
     openApi: {

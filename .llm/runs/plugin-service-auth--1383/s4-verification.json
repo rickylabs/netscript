@@ -1,0 +1,17 @@
+{
+  "baseline": "b77f15f1c",
+  "productSha256": {
+    "packages/cli/src/kernel/constants/jsr-specifiers.ts": "f95cd93c6bae6643633ad6ebd31d0e3a4d78692845333c6e5cfca56cb4c9e686",
+    "packages/cli/src/public/features/plugins/new/new-plugin-command.ts": "098810f49885f8cc3e4ace5e617af84a6d0e16d39508051df9d60b58794b50bf",
+    "packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts": "7ef073126e19e150b09a9982d3e796f452d042503fbd56a4d2f87fa20e1dddc3",
+    "packages/cli/src/public/features/plugins/new/new-plugin_test.ts": "34dc320252994f7f7a207d2cc346caca1cc50a63b7520f482190dfc568978622"
+  },
+  "generatedProjectRoot": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring-samples",
+  "generator": "deno run -A packages/cli/bin/netscript.ts plugin new guarded-fixture --project-root <generatedProjectRoot> --force",
+  "registry": "deno run -A packages/cli/bin/netscript-dev.ts generate plugins --project-root <generatedProjectRoot>",
+  "generatedCheckedFiles": 21,
+  "generatedTestsPassed": 2,
+  "generatorTestsPassed": 7,
+  "scaffoldPluginsPassed": 17,
+  "scopeLimit": "Source compile and generated manifest/contract tests only; no live auth/SDK proof yet"
+}

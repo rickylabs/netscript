@@ -1,0 +1,18 @@
+preflight.deno	preflight	Deno CLI is available
+scaffold.init	scaffold	Scaffold generated project
+scaffold.plugin.worker	scaffold	Install official worker plugin
+scaffold.plugin.saga	scaffold	Install official saga plugin
+scaffold.plugin.trigger	scaffold	Install official trigger plugin
+scaffold.plugin.stream	scaffold	Install official stream plugin
+scaffold.plugin.auth	scaffold	Install official auth plugin
+scaffold.plugin.ai	scaffold	Install official ai plugin
+scaffold.plugin.ai.mcp	scaffold	Install official AI plugin with MCP skill tool
+scaffold.plugin.ai.lifecycle	scaffold	Add and self-wire an AI tool through the plugin CLI
+scaffold.plugin-list	scaffold	List configured plugins
+behavior.plugins-unhealthy	behavior	Reject missing workers and sagas registries
+generated.plugins-check	database	Generate plugin registries from discovered manifests
+generated.workers-registry	database	Compile workers registry through plugin CLI
+generated.sagas-registry	database	Generate sagas registry through plugin CLI
+behavior.plugins-health	behavior	Check installed plugin health
+behavior.package-backed-plugin-doctor	behavior	Validate package-backed plugin doctor truth
+behavior.generated-guarded-plugin	behavior	Authorize CLI-generated plugin reads through REST and native SDK

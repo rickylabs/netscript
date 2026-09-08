@@ -56,6 +56,11 @@ export default async function createWorkersService(
   console.log(`[Workers Plugin] ${describeGeneratedJobRegistry(generated)}`);
 
   const running = await createPluginService(router, {
+    auth: {
+      public: true,
+      reason:
+        'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
+    },
     name: 'workers',
     version: '1.0.0',
     port,

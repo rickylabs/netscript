@@ -374,7 +374,7 @@ This entrypoint also re-exports the root/config symbols `BackgroundProcessorCont
 | `createPluginService` | function | Build a plugin service with the mandated middleware and route chain pre-applied. |
 | `PluginDatabaseConfig` | interface | Options forwarded to the service builder's database configuration. |
 | `PluginRawRoute` | interface | Raw HTTP route mounted directly on a plugin service. |
-| `PluginServiceConfig` | interface | Data-only description of a plugin service. |
+| `PluginServiceConfig` | interface | Data-only description of a plugin service; requires native guarded auth or a public opt-out with a nonblank reason. |
 | `BoundPluginContract` | interface | Context-bound contract helpers produced by `bindPluginContract`. |
 | `PluginContractAssemblyConfig` | interface | Data required to mount a bound contract under `/vN/<plugin>`. |
 | `PluginContractBinder` | interface | Contract binder used before selecting a request context. |
@@ -392,3 +392,26 @@ from `@netscript/service`.
 ---
 
 Back to the [reference overview](/reference/).
+
+### Plugin service authentication posture
+
+`@netscript/plugin/contract-base` exports `mountPluginContract(contract, mount)` and the
+`PluginContractMount` type. The mount contains non-empty `version` and `namespace` segments without
+slashes; invalid segments throw `TypeError`. Supply the same mount value to router assembly and
+`createContractAuthorizer(mountPluginContract(contract, mount))`. The returned contract has nested
+version/namespace RPC keys and prefixed REST paths while preserving procedure metadata and errors.
+The source contract is unchanged. Canonical RPC paths remain canonical; deprecated flat paths use
+the existing compatibility mapping.
+
+`createPluginService(router, { name, auth })` requires an explicit posture:
+`auth: { authn: { authenticator }, authz: { authorizer } }` installs native guards, while
+`auth: { public: true, reason: 'Public status API' }` records a deliberate public service.
+The canonical `ServiceAuthPolicy`, `ServiceGuardedAuthPolicy` and `ServicePublicAuthPolicy`
+types come from `@netscript/service/auth` and are re-exported by `@netscript/plugin/service`.
+Missing, malformed and mixed postures throw before service construction. See the
+[service auth reference](/reference/service/#explicit-service-posture) for the validation boundary.
+
+The factory passes native auth options unchanged and installs them after context, before RPC.
+The builder installs auth middleware before deferred RPC, REST and raw routes. Its built-in health
+routes retain their native public behavior. A custom nonempty anonymous-prefix list replaces the
+default; the factory does not merge another policy into it.
