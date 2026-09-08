@@ -4,18 +4,12 @@
  * Public `netscript plugin new` command.
  */
 
-import { Command } from "@cliffy/command";
+import { Command } from '@cliffy/command';
 
-import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
-import {
-  type ProjectRootResolver,
-  requireProjectRoot,
-} from "../../../presentation/support.ts";
-import {
-  createNewPlugin,
-  type NewPluginDependencies,
-} from "./new-plugin-use-case.ts";
-import type { PluginWorkspaceMutator } from "../../../../kernel/adapters/plugin/workspace-mutator.ts";
+import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
+import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
+import { createNewPlugin, type NewPluginDependencies } from './new-plugin-use-case.ts';
+import type { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 
 /** Dependencies for the public plugin new command. */
 export interface NewPluginCommandDependencies {
@@ -47,19 +41,19 @@ export function createNewPluginCommand(
 ) {
   const print = dependencies.print ?? outputText;
   return new Command()
-    .name("new")
-    .description("Generate a dual-tier NetScript plugin")
-    .arguments("<name:string>")
-    .option("--project-root <path:string>", "Project root directory")
-    .option("--feature", "Generate route-backed feature defaults", {
+    .name('new')
+    .description('Generate a dual-tier NetScript plugin')
+    .arguments('<name:string>')
+    .option('--project-root <path:string>', 'Project root directory')
+    .option('--feature', 'Generate route-backed feature defaults', {
       default: false,
     })
-    .option("--force", "Overwrite generated files if they already exist", {
+    .option('--force', 'Overwrite generated files if they already exist', {
       default: false,
     })
     .option(
-      "--register",
-      "Register the generated plugin in netscript.config.ts",
+      '--register',
+      'Register the generated plugin in netscript.config.ts',
       {
         default: true,
       },
@@ -73,11 +67,14 @@ export function createNewPluginCommand(
         const result = await createNewPlugin({
           name,
           projectRoot,
-          kind: options.feature ? "feature" : "proxy",
+          kind: options.feature ? 'feature' : 'proxy',
           overwrite: options.force ?? false,
         }, dependencies.newPluginDependencies);
 
         if (options.register !== false) {
+          await dependencies.workspaceMutator.ensureWorkspaceMember(projectRoot, [
+            `packages/plugin-${result.descriptor.name}-core`,
+          ]);
           await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
             projectRoot,
             result.descriptor.name,

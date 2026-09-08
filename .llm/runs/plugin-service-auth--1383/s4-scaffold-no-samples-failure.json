@@ -1,0 +1,578 @@
+{
+  "ok": false,
+  "suiteId": "scaffold.plugins",
+  "projectRoot": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+  "startedAt": "2026-09-08T01:25:38.834Z",
+  "durationMs": 16323,
+  "steps": [
+    {
+      "id": "preflight.deno",
+      "title": "Deno CLI is available",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "preflight.deno attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "--version"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "deno 2.9.6 (stable, release, x86_64-unknown-linux-gnu)\nv8 15.0.245.2-rusty\ntypescript 6.0.3\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 6,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 6
+    },
+    {
+      "id": "scaffold.init",
+      "title": "Scaffold generated project",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.init attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "init",
+              "guarded-authoring",
+              "--path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e",
+              "--db",
+              "postgres",
+              "--service",
+              "--service-name",
+              "users",
+              "--ci",
+              "--yes",
+              "--no-git",
+              "--force"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "╔═════════════════════════════════════════════════════════════╗\n║              NetScript — Scaffold New Project               ║\n╚═════════════════════════════════════════════════════════════╝\n\n📁 Creating project \"guarded-authoring\"...\n   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)\n   ✓ Aspire orchestration (TypeScript AppHost, .helpers/, package.json)\n   ✓ Database workspace (postgres)\n   ✓ Frontend app \"guarded-authoring-web\" (Fresh framework)\n   ✓ Contracts (v1 with users stub)\n   ✓ Example service \"users\" (oRPC handler, Aspire assigns its port)\n   ✓ Plugins (empty registry)\n   ✓ Output formatted (deno fmt)\n\n✅ Project scaffolded successfully in 0.8s\n\n  Created: 207 files, 48 directories\n\nNext steps:\n  1. cd guarded-authoring\n  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace\n  3. aspire restore  # download TypeScript AppHost SDK modules (run once)\n  4. cd ..\n  5. deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed\n  6. deno run -A packages/cli/bin/netscript-dev.ts db init --name init\n  7. deno run -A packages/cli/bin/netscript-dev.ts db generate\n  8. deno run -A packages/cli/bin/netscript-dev.ts db seed\n  9. # oRPC service \"users\" at the URL shown for it in the Aspire dashboard, path /api/rpc\n  10. # Postgres provisioned by Aspire (see \"Databases\" in appsettings.json)\n\nMaintainer scaffold root: /home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring\nMonorepo root: /home/agent/repos/netscript-plugin-service-auth-policy\nCopied 28 local packages.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 3981,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 3981
+    },
+    {
+      "id": "scaffold.plugin.worker",
+      "title": "Install official worker plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.worker attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "worker",
+              "--name",
+              "workers",
+              "--project-root",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+              "--no-samples",
+              "--force",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/workers"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed worker plugin \"workers\" on port 63730.\nCreated 3 plugin files.\nRegenerated 9 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1274,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1274
+    },
+    {
+      "id": "scaffold.plugin.saga",
+      "title": "Install official saga plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.saga attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "saga",
+              "--name",
+              "sagas",
+              "--project-root",
+              ".",
+              "--no-samples",
+              "--force",
+              "--saga-store-backend",
+              "kv",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/sagas"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed saga plugin \"sagas\" on port 59600.\nCreated 3 plugin files.\nRegenerated 9 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 2260,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 2260
+    },
+    {
+      "id": "scaffold.plugin.trigger",
+      "title": "Install official trigger plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.trigger attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "trigger",
+              "--name",
+              "triggers",
+              "--project-root",
+              ".",
+              "--no-samples",
+              "--force",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/triggers"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed trigger plugin \"triggers\" on port 52024.\nCreated 3 plugin files.\nRegenerated 9 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 845,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 846
+    },
+    {
+      "id": "scaffold.plugin.stream",
+      "title": "Install official stream plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.stream attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "stream",
+              "--name",
+              "streams",
+              "--project-root",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+              "--no-samples",
+              "--force",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/streams"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed stream plugin \"streams\" on port 62609.\nCreated 2 plugin files.\nRegenerated 9 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 809,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 809
+    },
+    {
+      "id": "scaffold.plugin.auth",
+      "title": "Install official auth plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.auth attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "auth",
+              "--name",
+              "auth",
+              "--project-root",
+              ".",
+              "--no-samples",
+              "--force",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/auth"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed auth plugin \"auth\" on port 53894.\nCreated 3 plugin files.\nRegenerated 9 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 781,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 781
+    },
+    {
+      "id": "scaffold.plugin.ai",
+      "title": "Install official ai plugin",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "ai",
+              "--name",
+              "ai",
+              "--project-root",
+              ".",
+              "--no-samples",
+              "--force",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/ai"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed ai plugin \"ai\" on port 64934.\nCreated 6 plugin files.\nRegenerated 8 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1122,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1122
+    },
+    {
+      "id": "scaffold.plugin.ai.mcp",
+      "title": "Install official AI plugin with MCP skill tool",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai.mcp attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "install",
+              "ai",
+              "--name",
+              "ai",
+              "--project-root",
+              ".",
+              "--no-samples",
+              "--force",
+              "--mcp",
+              "--local-path",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/ai"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Installed ai plugin \"ai\" on port 64934.\nCreated 1 plugin files.\nRegenerated 8 Aspire helper files.\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 805,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 805
+    },
+    {
+      "id": "scaffold.plugin.ai.lifecycle",
+      "title": "Add and self-wire an AI tool through the plugin CLI",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin.ai.lifecycle attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/plugins/ai/cli.ts",
+              "add",
+              "tool",
+              "e2e-tool",
+              "--workspaceRoot=/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "{\"code\":0,\"message\":\"add tool: 1 artifact(s).\",\"data\":{\"status\":\"applied\",\"createdFiles\":[\"ai/tools/e2e-tool.ts\"],\"modifiedFiles\":[],\"databaseMigrationsAdded\":false,\"uiRegistryItems\":[\"markdown\"]}}\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 89,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 89
+    },
+    {
+      "id": "scaffold.plugin-list",
+      "title": "List configured plugins",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "scaffold.plugin-list attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "list",
+              "--project-root",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 0,
+            "timedOut": false,
+            "stdoutTail": "Name\tDisplayName\tType\tEnabled\tWorkdir\tService\tPort\tAxis\tContributions\nai\tAI Chat\tutility\ttrue\tai\t-\t-\t-\t0\nauth\tAuth\tutility\ttrue\tauth\tservices/src/main.ts\t-\t-\t0\nsagas\tSaga Orchestrator\tbackground-processor\ttrue\tsagas\tservices/src/main.ts\t-\tsagas\t0\nstreams\tDurable Streams\tutility\ttrue\tstreams\tservices/src/main.ts\t-\t-\t0\ntriggers\tTrigger Processor\tbackground-processor\ttrue\ttriggers\tservices/src/main.ts\t-\ttriggers\t0\nworkers\tBackground Worker\tbackground-processor\ttrue\tworkers\tservices/src/main.ts\t-\tjobs\t0\n",
+            "stderrTail": ""
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1722,
+          "exitCode": 0
+        }
+      ],
+      "retried": false,
+      "durationMs": 1722
+    },
+    {
+      "id": "behavior.plugins-unhealthy",
+      "title": "Reject missing workers and sagas registries",
+      "critical": true,
+      "verdict": "passed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "behavior.plugins-unhealthy attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "plugin",
+              "doctor",
+              "--project-root",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "Plugin\tStatus\tCheck\tMessage\napphost\twarning\tAspire AppHost running\tNo AppHost is running for this project. Start it and rerun plugin doctor.\nworkspace\terror\tRuntime registry inspection\tInstalled plugin \"@netscript/plugin-sagas\" produced no registrable runtime items.\nworkers\thealthy\tConfigured module resolves\t./workers/plugin.ts\nworkers\thealthy\tConfigured module exports manifest\t./workers/plugin.ts\nworkers\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-workers@0.0.7/services\nworkers\thealthy\tManifest resolved\tBackground Worker\nworkers\thealthy\tWorkspace directory\tworkers\nworkers\thealthy\tPermission metadata\t--unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run\nworkers\terror\tgenerated job registry exists\tMissing .netscript/generated/plugin-workers/job-registry.ts. Run: deno run -A jsr:@netscript/plugin-workers@0.0.7/cli compile-registry\nworkers\terror\tgenerated job registry is non-empty\tNo generated jobs are registered. Run: deno run -A jsr:@netscript/plugin-workers@0.0.7/cli compile-registry\nworkers\terror\tevery declared job is registered\tRegistry is incomplete for worker processors. Run: deno run -A jsr:@netscript/plugin-workers@0.0.7/cli compile-registry\nsagas\thealthy\tConfigured module resolves\t./sagas/plugin.ts\nsagas\thealthy\tConfigured module exports manifest\t./sagas/plugin.ts\nsagas\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-sagas@0.0.7/services\nsagas\thealthy\tManifest resolved\tSaga Orchestrator\nsagas\thealthy\tWorkspace directory\tsagas\nsagas\thealthy\tPermission metadata\t--unstable-kv --allow-all\nsagas\terror\tgenerated saga registry exists\tMissing .netscript/generated/plugin-sagas/sagas.registry.ts. Run: deno run -A jsr:@netscript/plugin-sagas@0.0.7/cli generate-registry\nsagas\terror\tgenerated saga registry is non-empty\tNo generated sagas are registered. Run: deno run -A jsr:@netscript/plugin-sagas@0.0.7/cli generate-registry\nsagas\terror\tevery declared saga is registered\tRegistry is incomplete for saga runners. Run: deno run -A jsr:@netscript/plugin-sagas@0.0.7/cli generate-registry\ntriggers\thealthy\tConfigured module resolves\t./triggers/plugin.ts\ntriggers\thealthy\tConfigured module exports manifest\t./triggers/plugin.ts\ntriggers\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-triggers@0.0.7/services\ntriggers\thealthy\tManifest resolved\tTrigger Processor\ntriggers\thealthy\tWorkspace directory\ttriggers\ntriggers\thealthy\tPermission metadata\t--unstable-kv --allow-all\nstreams\thealthy\tConfigured module resolves\t./streams/plugin.ts\nstreams\thealthy\tConfigured module exports manifest\t./streams/plugin.ts\nstreams\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-streams@0.0.7/services\nstreams\thealthy\tManifest resolved\tDurable Streams\nstreams\thealthy\tWorkspace directory\tstreams\nstreams\thealthy\tPermission metadata\t--allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi\nauth\thealthy\tConfigured module resolves\t./auth/plugin.ts\nauth\thealthy\tConfigured module exports manifest\t./auth/plugin.ts\nauth\thealthy\tService entrypoint resolves\tjsr:@netscript/plugin-auth@0.0.7/services\nauth\thealthy\tManifest resolved\tAuth\nauth\thealthy\tWorkspace directory\tauth\nauth\thealthy\tPermission metadata\t--unstable-kv --allow-net --allow-env --allow-read --allow-sys --allow-ffi\nai\thealthy\tConfigured module resolves\t./ai/plugin.ts\nai\thealthy\tConfigured module exports manifest\t./ai/plugin.ts\nai\thealthy\tManifest resolved\tAI Chat\nai\thealthy\tWorkspace directory\tai\nai\thealthy\tPermission metadata\t--allow-net --allow-env --allow-read\nPlugin doctor failed: workspace, workers, sagas. Follow the remediation commands above.\n",
+            "stderrTail": "Error: Plugin doctor failed: workspace, workers, sagas. Follow the remediation commands above.\n  plugins: workspace, workers, sagas\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "passed",
+          "durationMs": 1991,
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "durationMs": 1991
+    },
+    {
+      "id": "generated.plugins-check",
+      "title": "Generate plugin registries from discovered manifests",
+      "critical": true,
+      "verdict": "failed",
+      "evidence": [
+        {
+          "kind": "command",
+          "label": "generated.plugins-check attempt 1",
+          "data": {
+            "command": [
+              "deno",
+              "run",
+              "-A",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/packages/cli/bin/netscript-dev.ts",
+              "generate",
+              "plugins",
+              "--project-root",
+              "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring"
+            ],
+            "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+            "code": 1,
+            "timedOut": false,
+            "stdoutTail": "",
+            "stderrTail": "Error: Installed plugin \"@netscript/plugin-sagas\" produced no registrable runtime items.\n"
+          }
+        }
+      ],
+      "attempts": [
+        {
+          "attempt": 1,
+          "verdict": "failed",
+          "durationMs": 611,
+          "failureClass": "assertion",
+          "exitCode": 1
+        }
+      ],
+      "retried": false,
+      "error": "Command exited 1; expected 0.",
+      "durationMs": 611
+    }
+  ],
+  "summary": {
+    "passed": 12,
+    "failed": 1,
+    "skipped": 0
+  }
+}
