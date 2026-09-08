@@ -1,0 +1,20 @@
+{
+  "purpose": "Planning-only next coherent PR within existing issue1383; no new implementation WIP",
+  "sourceHead": "e1430881bc41235cf98d5c4fa5258d13bff0dde5",
+  "matrixQuery": "deno task agentic:matrix --tier complex --json",
+  "matrixReceipt": "matrix-factory-followup.json",
+  "selectedRole": "complex.plan",
+  "selectedModel": "fable_5_1",
+  "effort": "medium",
+  "privilegedAuthorizer": "milestone_coordinator",
+  "rationale": "Security-sensitive factory policy affects all plugin services and generated consumers",
+  "transport": "AGENTIC claude-print same-session resume",
+  "session": "7930bfda-966a-4a1c-aa82-53c07cd8116b",
+  "execHandle": 46627,
+  "runtimeInitializationModel": "claude-fable-5-1",
+  "runtimeEffortAttestation": "requested medium; native initialization confirms model and session, not effort",
+  "writes": [
+    "factory-followup-plan.md"
+  ],
+  "releaseAuthorization": false
+}
