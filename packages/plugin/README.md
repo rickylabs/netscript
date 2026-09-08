@@ -184,7 +184,8 @@ constructed. TypeScript callers must migrate their service configuration.
 import { createPluginService } from '@netscript/plugin/service';
 import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
 import { createContractAuthorizer } from '@netscript/service/auth';
-import { contract, router } from './router.ts';
+import { mountPluginContract } from '@netscript/plugin/contract-base';
+import { contract, contractMount, router } from './router.ts';
 
 const service = createPluginService(router, {
   name: 'reports',
@@ -192,7 +193,7 @@ const service = createPluginService(router, {
     authn: {
       authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
     },
-    authz: { authorizer: createContractAuthorizer(contract) },
+    authz: { authorizer: createContractAuthorizer(mountPluginContract(contract, contractMount)) },
   },
 });
 ```
@@ -200,6 +201,12 @@ const service = createPluginService(router, {
 The contract must declare the required access metadata, and the plugin must declare its auth
 service dependency. The builder resolves procedure policy across REST and RPC; do not infer a
 procedure's required scope from the transport's HTTP method.
+
+`contractMount` is the same `{ version, namespace }` value used to assemble the router.
+`mountPluginContract` prefixes REST paths and nests RPC keys without changing the source contract,
+its access metadata, or its errors. Passing the flat contract to the authorizer would deny mounted
+requests because their paths differ. The generator exports one mount constant in `handlers.ts`
+and shares it with the authorizer; preserve that single authority when adapting the scaffold.
 
 For a deliberately public service, record the reason instead:
 

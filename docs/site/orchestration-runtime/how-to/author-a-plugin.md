@@ -124,6 +124,23 @@ holds only the manifest, adapters, and service wiring, re-exporting the core's c
 register; author capability changes in the core package and integration changes in the connector.
 {{ /comp }}
 
+### Preserve the generated authorization boundary
+
+The current source generator emits a guarded service and an explicit auth-plugin dependency.
+Its contract declares required authentication and a `<name>:read` scope on the generated read
+procedures. The connector uses the native auth-service authenticator and contract authorizer;
+configure the auth service and obtain a session with the declared scope before exercising reads.
+These source capabilities do not imply availability in an older installed CLI release.
+
+The generated `services/src/handlers.ts` exports one `PluginContractMount` value containing
+`version` and `namespace`. Router assembly and
+`createContractAuthorizer(mountPluginContract(contract, mount))` share that value. Keep it shared:
+the authorizer needs both the mounted REST paths and version/namespace RPC keys. The helper comes
+from `@netscript/plugin/contract-base` and preserves the core contract's metadata and errors.
+Unmatched procedures and missing scopes remain denied. Deliberately public services require an
+explicit `auth: { public: true, reason: '...' }` posture; a public health endpoint does not prove
+protected reads work. See the [plugin authentication reference](/reference/plugin/#plugin-service-authentication-posture).
+
 ## Step 2 — Write the manifest descriptor (`scaffold.plugin.json`)
 
 `scaffold.plugin.json` is the static descriptor the CLI and kernel read to understand your plugin's

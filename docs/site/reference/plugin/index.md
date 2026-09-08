@@ -395,6 +395,14 @@ Back to the [reference overview](/reference/).
 
 ### Plugin service authentication posture
 
+`@netscript/plugin/contract-base` exports `mountPluginContract(contract, mount)` and the
+`PluginContractMount` type. The mount contains non-empty `version` and `namespace` segments without
+slashes; invalid segments throw `TypeError`. Supply the same mount value to router assembly and
+`createContractAuthorizer(mountPluginContract(contract, mount))`. The returned contract has nested
+version/namespace RPC keys and prefixed REST paths while preserving procedure metadata and errors.
+The source contract is unchanged. Canonical RPC paths remain canonical; deprecated flat paths use
+the existing compatibility mapping.
+
 `createPluginService(router, { name, auth })` requires an explicit posture:
 `auth: { authn: { authenticator }, authz: { authorizer } }` installs native guards, while
 `auth: { public: true, reason: 'Public status API' }` records a deliberate public service.
