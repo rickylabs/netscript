@@ -45,3 +45,7 @@ New native-session probe type-checks22 generated files but read-scoped REST retu
 ## 2026-09-08 — S5 gate registration while binding repair runs
 
 Added critical behavior.generated-guarded-plugin to scaffold.plugins, backed by the committed native-session probe. Source-only fixture explicitly skips78 for a non-local workspace, never a published compatibility PASS. e2e gates lists the new gate;6 source files check and lint PASS;3 existing suite-builder tests PASS. Actual generated read still FAIL until binding repair lands; no suite runtime PASS inferred from registration. Original planner process84113 confirmed live, no restart. Harness owner publication279 remains OPEN with no new receipt.
+
+## 2026-09-08 — binding amendment returned
+
+Original planner84113 terminal exit0; binding-repair-plan.md returned native contract-side mount with shared coordinates. File arrived during gate-registration commit96c902b11; terminal read confirms complete plan, no later file delta. New public helper requires independent bounded amendment review. Third plan-evaluation turn preserves prior history and matrix repair policy. Coordinator requires retaining original failure receipt and honest15-finding doc-lint baseline comparison. No helper implementation admitted yet.
