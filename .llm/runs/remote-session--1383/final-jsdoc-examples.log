@@ -1,0 +1,4 @@
+Task docs:jsdoc-examples deno run --allow-read --allow-write --allow-run .llm/tools/docs/check-jsdoc-examples.ts
+jsdoc examples: PASS members=35 files=2065 examples=365 candidates=364 checked=364 exempt=0 non_ts=1 unfenced=0 malformed=0 failures=0
+enforcedFailureCensus={"badSpecifier":0,"unfenced":0,"malformed":0}
+deferredCensus={"unboundName":116,"typeError":14}

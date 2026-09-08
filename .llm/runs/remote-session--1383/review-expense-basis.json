@@ -1,0 +1,18 @@
+{
+  "correction": "allowance_exhausted was projected against a5USD estimate, not zero remaining allowance",
+  "liveWeeklyRemainingBeforeDispatchUsd": 4.2,
+  "priorObservedReportedCostsUsd": {
+    "originReview": 0.021816214,
+    "authFailureReview": 0.024849976,
+    "clientReview": 0.017293816
+  },
+  "sourceLogs": [
+    "/tmp/cockpit-origin-review-output.jsonl",
+    "/tmp/netscript-auth-failure-review-output.jsonl",
+    "/tmp/cockpit-client-review-output.jsonl"
+  ],
+  "method": "sum step_finish.part.cost; provider-reported cost, not independently billed dollars",
+  "newEstimateUsd": 1,
+  "rationale": "bounded plan-only review; estimate exceeds largest observed comparable full implementation review by40x; live expense guard must independently allow",
+  "copilotAttempt": "refused usage_unproven; no evaluator started"
+}

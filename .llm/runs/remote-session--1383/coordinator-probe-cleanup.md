@@ -1,0 +1,3 @@
+# Probe cleanup resolved
+
+The repeat of coordinator-bearer-probe.ts exits0 in727ms using caller-owned MemoryKvAdapter via await using and createAuthServiceBackendRegistry. Native MemoryKvAdapter has Symbol.asyncDispose -> close; discovered with deno doc --filter MemoryKvAdapter packages/kv/mod.ts. Provider configuration mirrors the existing synthetic fixture. No Deno.exit, disabled sanitizers, timer bypass or foreign-resource stop. The same observation remains: direct:true, cookie:true, bearer:false. This is a native handler reproduction, not HTTP/live-provider or product authorization PASS. Keep first terminated attempt in lifecycle history. Formal tests can use this native ownership pattern and must close their listeners as well.

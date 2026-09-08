@@ -1,0 +1,11 @@
+22:17:06.650 INF netscript·services·auth Service listening
+22:17:06.661 INF netscript·services·auth HTTP request started
+22:17:06.667 INF netscript·services·auth HTTP request completed
+22:17:06.670 INF netscript·services·auth HTTP request started
+22:17:06.671 INF netscript·services·auth HTTP request completed
+22:17:06.675 INF netscript·services·auth HTTP request started
+22:17:06.676 INF netscript·services·auth HTTP request completed
+22:17:06.680 INF netscript·services·auth HTTP request started
+22:17:06.680 INF netscript·services·auth HTTP request completed
+22:17:06.682 INF netscript·services·auth Service shutdown completed
+{"source":"3330d6f9c9c4fcbf123b434c7cf8733648c44d87","scope":"diagnostic composition using existing request bridge, real plugin router + typed SDK + native KV-OAuth; no product patch or IdP","directSessionId":true,"cookieStatus":200,"cookieAuthenticated":true,"bearerAuthenticated":false,"bearerBogusAuthenticated":false}

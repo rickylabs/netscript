@@ -1,0 +1,10 @@
+# @netscript/plugin-auth-core@0.0.7
+  root: packages/plugin-auth-core
+  exports: ., ./sdk, ./domain, ./ports, ./contracts/v1, ./telemetry, ./streams, ./config, ./presets, ./testing, ./authenticator
+  files=34 loc=4006
+  docs: README=true(188L) docs/=false desc=120c
+  tests: 14 files
+  surface: .=1, ./sdk=1, ./domain=13, ./ports=20, ./contracts/v1=14, ./telemetry=3, ./streams=9, ./config=7, ./presets=7, ./testing=5, ./authenticator=4
+  dry-run: OK slowTypeWarnings=1
+  findings: 1
+    WARN F-JSR-7 slow-types: Checking for slow types in the public API...

@@ -2,6 +2,7 @@ import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 
 import {
   assertReferenceDom,
+  findBrowserExecutable,
   probeAppReference,
   REFERENCE_EXPECTATIONS,
   REFERENCE_VIEWPORTS,
@@ -76,4 +77,15 @@ Deno.test('reference probe reports a missing semantic marker from the rendered b
     Error,
     'did not render',
   );
+});
+
+Deno.test('reference browser lookup honors the shared explicit override without fallback', async () => {
+  const previous = Deno.env.get('NETSCRIPT_E2E_BROWSER_EXECUTABLE');
+  Deno.env.set('NETSCRIPT_E2E_BROWSER_EXECUTABLE', '');
+  try {
+    await assertRejects(findBrowserExecutable, Error, 'value is empty');
+  } finally {
+    if (previous === undefined) Deno.env.delete('NETSCRIPT_E2E_BROWSER_EXECUTABLE');
+    else Deno.env.set('NETSCRIPT_E2E_BROWSER_EXECUTABLE', previous);
+  }
 });

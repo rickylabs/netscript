@@ -1,0 +1,7 @@
+# Follow-up review: browser gate permission integration
+
+Continue same independent session and implementation protocol; original evaluate-implementation-brief.md SKILL/safety rules still apply. Fresh matrix-browser-permission-review.json selects Muse max relative to Astra medium generator. Review82f14a809: the prior browser repair omitted allow-env on actual reference/hydration command invocations. Full runtime proved failure reading NETSCRIPT_E2E_BROWSER_EXECUTABLE, after90 prior gates, then cleanup completed. Assess this omission honestly; prior narrow PASS did not cover gate permissions.
+
+Fix adds only --allow-env for existing BROWSER_EXECUTABLE_ENV constant to two gate argvs, updates canonical assertions.67 focused tests pass. Coordinator real restricted browser launch with existing executable wrapper emitted marker and exit0 (browser-restricted-launch.json), prerequisite only. Independently test exact gate permission contract and selector integration as feasible, ensure no broad env grant or permission bypass. Check source imports/cycles and actual permission flags rather than only mocked tests. Use own executable temporary directory for script fixtures because default /ephemeral/tmp is noexec.
+
+Write browser-permission-eval.md; preserve earlier verdicts. No product edits, commits, AppHost/resource mutation, publication or release. Full runtime/CI remains coordinator-owned. Third implementation-review pass is disclosed to owner under loop notification policy. Return explicit verdict with source evidence and unresolved limitations.

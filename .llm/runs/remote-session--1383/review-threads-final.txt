@@ -1,0 +1,2 @@
+Task agentic:review-threads deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/github/review-threads.ts '--' '--repo' 'rickylabs/netscript' '--pr' '2002' '--pretty'
+review-threads PASS rickylabs/netscript#2002 threads=0 unanswered=0

@@ -74,6 +74,26 @@ package's public surface reported by `deno doc`.
 | `CreateBearerSdkClientContributionOptions` | interface | Context resolver, cache policy, unmarked-route policy, and cleartext opt-in for the bearer contribution. |
 | `NetScriptAuthenticationRequirement` | type alias | Authentication metadata vocabulary: `none`, `optional`, or `required`. |
 
+## Remote session verification
+
+Import these symbols from the `./authenticator` leaf. The factory requires `serviceName` and
+`timeoutMs`; it returns the native `AuthenticatorPort`. It forwards bearer credentials only and
+retains no principal cache. Authorization remains a separate service policy.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createAuthServiceAuthenticator` | function | Verify an active, unexpired session through the native auth SDK. |
+| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type | Canonical service authentication types re-exported for the complete public signature. |
+| `AuthServiceAuthenticatorOptions` | interface | Required discovery name and timeout, optional router/protocol and explicit cleartext policy. |
+| `readBearerCredential` | function | Read a single strict bearer credential; reject ambiguous headers. |
+| `REMOTE_SESSION_REJECTIONS` | constant | Stable missing, unauthorized, inactive and expired denial reasons. |
+| `RemoteSessionVerificationError` | class | Redacted transport, timeout, malformed response or remote error diagnostics. |
+
+Native middleware returns 401 for denial and 503 for verifier unavailability. Native claims are
+preserved and can contain sensitive session metadata; do not log them wholesale. Backend bearer
+support is provider-dependent; KV-OAuth and WorkOS accept token lookup, while better-auth retains
+its own request-header resolution.
+
 ## Sub-path exports
 
 | Export | Path | Purpose |
@@ -88,5 +108,6 @@ package's public surface reported by `deno doc`.
 | `@netscript/plugin-auth-core/config` | `./src/config/mod.ts` | Runtime config schemas and backend resolution helpers. |
 | `@netscript/plugin-auth-core/presets` | `./src/presets/mod.ts` | Backend preset registry helpers. |
 | `@netscript/plugin-auth-core/testing` | `./src/testing/mod.ts` | Testing primitives for auth adapters and plugins. |
+| `@netscript/plugin-auth-core/authenticator` | `./src/adapters/mod.ts` | Server-side remote session verification through the native SDK. |
 
 Back to the [auth reference hub](/reference/auth/).

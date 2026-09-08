@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","--unstable-kv","packages/plugin-auth-core/src/adapters","plugins/auth/tests/services"],"cwd":"/home/agent/repos/netscript-remote-session-authenticator","exitCode":0,"durationMs":4710,"summary":{"passed":16,"failed":0,"ignored":0,"totalResults":16,"uniqueFailures":0},"failures":[]}

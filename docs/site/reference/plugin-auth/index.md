@@ -28,6 +28,26 @@ inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 | `AUTH_API_SERVICE_NAME` | `"auth-api"` | Service name contributed by the auth plugin. |
 | `AUTH_API_DEFAULT_PORT` | `8094` | Default auth-api service port. |
 
+## Remote session verification
+
+Import these symbols from the `./authenticator` leaf. The factory requires `serviceName` and
+`timeoutMs`; it returns the native `AuthenticatorPort`. It forwards bearer credentials only and
+retains no principal cache. Authorization remains a separate service policy.
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createAuthServiceAuthenticator` | function | Verify an active, unexpired session through the native auth SDK. |
+| `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, `Principal` | type | Canonical service authentication types re-exported for the complete public signature. |
+| `AuthServiceAuthenticatorOptions` | interface | Required discovery name and timeout, optional router/protocol and explicit cleartext policy. |
+| `readBearerCredential` | function | Read a single strict bearer credential; reject ambiguous headers. |
+| `REMOTE_SESSION_REJECTIONS` | constant | Stable missing, unauthorized, inactive and expired denial reasons. |
+| `RemoteSessionVerificationError` | class | Redacted transport, timeout, malformed response or remote error diagnostics. |
+
+Native middleware returns 401 for denial and 503 for verifier unavailability. Native claims are
+preserved and can contain sensitive session metadata; do not log them wholesale. Backend bearer
+support is provider-dependent; KV-OAuth and WorkOS accept token lookup, while better-auth retains
+its own request-header resolution.
+
 ## Sub-path exports
 
 | Export | Path | Purpose |
@@ -41,5 +61,6 @@ inspection is provided by `inspectPlugin` from `@netscript/plugin`.
 | `@netscript/plugin-auth/services` | `./services/src/main.ts` | Auth service contribution entrypoint. |
 | `@netscript/plugin-auth/streams` | `./streams/mod.ts` | Auth stream contribution entrypoint. |
 | `@netscript/plugin-auth/streams/server` | `./streams/server.ts` | Server-side auth stream helpers. |
+| `@netscript/plugin-auth/authenticator` | `./src/public/authenticator.ts` | Server-side remote session verification through the native SDK. |
 
 Back to the [auth reference hub](/reference/auth/).

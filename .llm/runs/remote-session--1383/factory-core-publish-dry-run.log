@@ -1,0 +1,47 @@
+Check mod.ts
+Check src/sdk/mod.ts
+Check src/domain/mod.ts
+Check src/ports/mod.ts
+Check src/contracts/v1/mod.ts
+Check src/telemetry/mod.ts
+Check src/streams/mod.ts
+Check src/config/mod.ts
+Check src/presets/mod.ts
+Check src/testing/mod.ts
+Check src/adapters/mod.ts
+Checking for slow types in the public API...
+Check mod.ts
+Check src/sdk/mod.ts
+Check src/domain/mod.ts
+Check src/ports/mod.ts
+Check src/contracts/v1/mod.ts
+Check src/telemetry/mod.ts
+Check src/streams/mod.ts
+Check src/config/mod.ts
+Check src/presets/mod.ts
+Check src/testing/mod.ts
+Check src/adapters/mod.ts
+Simulating publish of @netscript/plugin-auth-core@0.0.7 with files:
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/README.md (9.88KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/deno.json (1.6KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/mod.ts (499B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/adapters/auth-service-authenticator.ts (5.54KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/adapters/bearer-credential.ts (624B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/adapters/mod.ts (438B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/config/mod.ts (3.02KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/contracts/v1/auth.contract.ts (18.16KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/contracts/v1/base-error-adapter.ts (1.12KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/contracts/v1/mod.ts (828B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/domain/mod.ts (5.56KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/ports/mod.ts (12KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/presets/mod.ts (1.58KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/public/mod.ts (2.8KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/sdk/bearer-contribution.ts (3.72KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/sdk/mod.ts (473B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/streams/mod.ts (2.79KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/telemetry/attributes.ts (4.26KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/telemetry/instrumentation.ts (12.22KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/telemetry/mod.ts (640B)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/telemetry/redaction.ts (3.17KB)
+   file:///home/agent/repos/netscript-remote-session-authenticator/packages/plugin-auth-core/src/testing/mod.ts (1.68KB)
+Success Dry run complete

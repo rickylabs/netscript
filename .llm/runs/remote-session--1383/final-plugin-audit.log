@@ -1,0 +1,11 @@
+# @netscript/plugin-auth@0.0.7
+  root: plugins/auth
+  exports: ., ./public, ./plugin, ./contracts, ./scaffold, ./adapter-cli, ./services, ./streams, ./streams/server, ./authenticator
+  files=41 loc=3780
+  docs: README=true(182L) docs/=false desc=121c
+  tests: 10 files
+  surface: .=5, ./public=5, ./plugin=5, ./contracts=2, ./scaffold=0, ./adapter-cli=0, ./services=3, ./streams=5, ./streams/server=10, ./authenticator=4
+  dry-run: OK slowTypeWarnings=1
+  findings: 2
+    WARN F-DOCT-5 cardinality: directory has 13 immediate children; doctrine cap is 12
+    WARN F-JSR-7 slow-types: Checking for slow types in the public API...

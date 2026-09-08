@@ -101,6 +101,7 @@ const session = await backend.sessions.getSession({ token: 'opaque-session-token
 | `./telemetry`    | `createAuthTelemetry`, span names, and `redactAuthPrincipal`                |
 | `./presets`      | Provider and backend preset registry                                        |
 | `./testing`      | Fixtures for exercising backends and contracts in tests                     |
+| `./authenticator` | Remote session verifier, options, bearer reader and redacted failure vocabulary |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-auth-core@<version>`](https://jsr.io/@netscript/plugin-auth-core/doc)
@@ -121,6 +122,50 @@ as the partition because cache keys may appear in diagnostics and developer tool
 Credentials are sent over HTTPS and local-development loopback origins by default. Enabling
 `allowInsecureTransport` for another cleartext origin is an explicit security exception and should be
 limited to controlled development environments.
+
+## Verify sessions in another service
+
+The server-side `./authenticator` leaf returns the native service `AuthenticatorPort`. Supply the
+actual Aspire discovery resource name and an explicit timeout at your composition root:
+
+```typescript
+import { createService } from '@netscript/service';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth-core/authenticator';
+
+declare const authServiceName: string;
+const app = createService({}, { name: 'protected-api' })
+  .withAuthn({
+    authenticator: createAuthServiceAuthenticator({
+      serviceName: authServiceName,
+      timeoutMs: 10_000,
+    }),
+  })
+  .build();
+```
+
+The discovery name must match the generated resource reference, which supplies
+`services__<name>__http__0` (or the HTTPS equivalent). The example timeout is application policy;
+the factory requires an integer from 1 through 2,147,483,647 milliseconds. `routerName` defaults to
+`auth`; `protocol` follows SDK discovery defaults. No provider secret or backend instance belongs
+in the consuming service.
+
+Each request verifies its bearer through the native typed SDK. Missing or malformed bearer is
+rejected before discovery. Inactive, revoked and expired sessions are rejected. Verification has
+no principal or response cache, so revocation is checked again on the next request. The principal
+preserves the auth service's subject, scopes, roles and claims; claims may contain sensitive native
+session metadata and must not be logged wholesale.
+
+A defined remote `UNAUTHORIZED` response is credential denial. Discovery, transport, timeout,
+provider and malformed-response failures throw `RemoteSessionVerificationError` with a fixed
+message and bounded diagnostics, never the raw response or credential. Native service middleware
+maps denial to 401 and verifier failure to a redacted 503. Discovery failures use the `transport`
+code because the SDK exposes no typed discovery discriminator.
+
+The verifier does not forward cookies. On the auth service itself, KV-OAuth resolves explicit
+session ID before bearer before cookie; WorkOS resolves bearer before cookie. Better-auth retains
+its own request-header behavior, so this factory does not promise bearer support for every provider.
+HTTPS and loopback HTTP are accepted by default; other cleartext transport requires explicit
+`allowInsecureTransport`. This API does not add authorization rules or repair signout ownership.
 
 ## Docs
 

@@ -1,0 +1,14 @@
+{
+  "head": "d51a0a91e9f6639992c5d48aeb34207b016b8acd",
+  "suiteExitCode": 1,
+  "failedChecks": [
+    {
+      "name": "dotnet-sdk",
+      "message": ".NET SDK not found"
+    }
+  ],
+  "docker": [
+    "Docker v28.5.2: running (auto-detected (default)) \u2190 active"
+  ],
+  "disposition": "Existing mise dotnet10.0.400 was not on PATH. Retry with explicit PATH and DOTNET_ROOT; no installation or resident restart."
+}

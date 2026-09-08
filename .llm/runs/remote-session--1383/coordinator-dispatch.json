@@ -1,0 +1,22 @@
+{
+  "baseline": "3330d6f9c9c4fcbf123b434c7cf8733648c44d87",
+  "blockedAttempt": {
+    "tool": "opencode-run.ts",
+    "route": "complex.plan muse_spark_1_3 max",
+    "result": "expense guard blocked opencode_go: allowance_exhausted",
+    "exitCode": 2,
+    "agentStarted": false
+  },
+  "activeAttempt": {
+    "tool": "claude/claude-print.ts",
+    "route": "complex.plan fable_5_1 medium",
+    "matrixReceipt": "matrix-plan-native.json",
+    "sessionId": "7930bfda-966a-4a1c-aa82-53c07cd8116b",
+    "observedModel": "claude-fable-5-1",
+    "execHandle": 45839,
+    "phase": "planning",
+    "terminalResult": "not yet observed"
+  },
+  "releaseAuthorization": false,
+  "coordinatorModelUnchanged": true
+}
