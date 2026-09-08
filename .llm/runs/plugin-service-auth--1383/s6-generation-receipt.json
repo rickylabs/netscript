@@ -1,0 +1,26 @@
+{
+  "source": "de8b2e765",
+  "commands": [
+    {
+      "log": "/tmp/cockpit-s6-plugin-publish-dry-run.log",
+      "exitCode": 0,
+      "sha256": "2f305f11059f8ea8cb254580e5fa409721ae79d6e49d5962f4368b93b9e6b28c"
+    },
+    {
+      "log": "/tmp/cockpit-s6-export-generation-2.log",
+      "exitCode": 0,
+      "sha256": "83e5a1fead75fa540fe489a625b3105abc69e4fe2d553e8175134734d5307452"
+    },
+    {
+      "log": "/tmp/cockpit-s6-prose-generation-2.log",
+      "exitCode": 0,
+      "sha256": "c8dea54eebbfc9517b8d8af427268846f4b2037deb5811363c720f33863183b4"
+    },
+    {
+      "log": "/tmp/cockpit-s6-publish-assets-2.log",
+      "exitCode": 0,
+      "sha256": "dca6031798e099e5ec5cfd26a34e8c9407d96af7041ba3483288facc302a46a0"
+    }
+  ],
+  "limits": "Package dry-run only, no publication. Doc-lint comparison FAIL remains separate; runtime ongoing."
+}

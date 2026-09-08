@@ -23,3 +23,10 @@ Reused generated workspace retained an old framework copy and failed export chec
 No release, tag, canary or publication authorized. Full runtime, doc-lint baseline comparison, generated documentation carriers, independent IMPL-EVAL and exact-headCI remain required. No Cockpit installed artifact or live attention/Mobile compatibility is claimed.
 
 Processes56221/73016 TERMINAL exit0. Fresh scaffold.plugins18/18 PASS, check11filesPASS, scopedlintPASS. Durable success s5-runtime-PASS.json; original failure preserved. S6 documentation/carriers/doc-lint baseline, full runtime, independent implementation review and exact-headCI remain next.
+
+## S6 checkpoint
+Documentation updated in c73a85ff4/de8b2e765. Export corpus, prose bundle and publish assets generated; initial dirty-source refusal and422-byte embedded-doc budget excess were corrected by committing sources and shortening duplicate authoring prose, without changing the budget. quality gate, exports drift, JSDoc examples and publish-assets freshness PASS. Package publish dry-run (no allow-slow-types) PASS. Doc-lint comparison FAIL:17 versus15, exactly2 new upstream oRPC privateTypeRef findings at contract-mount.ts. Qualified-import experiment unchanged17, reverted. No exception accepted; independent evaluator must assess this explicit deviation from plan's zero-new bar.
+
+Full runtime is LIVE process42889 log/tmp/cockpit-s6-runtime.log; generated root .llm/tmp/cli-e2e/plugin-smoke-20260908-040707. AppHost described with actual resources. Exact three source containers identified by own mount path/sharedDCPcreator:3beb03accf79 postgres,3c588e2933d6 redis,ae93e84203a4 garnet. Owner-authorized exact-ID relay LIVE24562, ownercockpit-policy-s6-0908, registry/tmp/cockpit-policy-s6-relay.json, log/tmp/cockpit-policy-s6-relay.log, --since2026-09-08T02:10:54Z fromDockercreatedtime. Stop/cleanup only this relay after suite terminal; retain foreign resources. No final runtime verdict yet.
+
+Fresh matrix-implementation-evaluator.json captured, but NO evaluator dispatched yet; query again immediately before dispatch. No release authorized.

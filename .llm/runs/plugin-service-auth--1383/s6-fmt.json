@@ -1,0 +1,1 @@
+{"command":"deno fmt --check","cwd":"/home/agent/repos/netscript-plugin-service-auth-policy","mode":"check","summary":{"filesSelected":10,"batches":2,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":10,"filesProcessed":10,"droppedFiles":[],"refusals":[]},"findings":[]}

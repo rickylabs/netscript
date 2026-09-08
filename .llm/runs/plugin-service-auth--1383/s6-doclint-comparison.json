@@ -1,0 +1,22 @@
+{
+  "verdict": "FAIL",
+  "baseline": {
+    "packages/plugin/src/contract-base/domain/base-contract.ts": 10,
+    "packages/plugin/src/service/presentation/create-plugin-service.ts": 2,
+    "packages/plugin/src/service/presentation/plugin-contract-binder.ts": 2,
+    "packages/plugin/src/contract-base/domain/base-errors.ts": 1
+  },
+  "current": {
+    "packages/plugin/src/contract-base/domain/base-contract.ts": 10,
+    "packages/plugin/src/contract-base/domain/contract-mount.ts": 2,
+    "packages/plugin/src/service/presentation/create-plugin-service.ts": 2,
+    "packages/plugin/src/service/presentation/plugin-contract-binder.ts": 2,
+    "packages/plugin/src/contract-base/domain/base-errors.ts": 1
+  },
+  "delta": {
+    "packages/plugin/src/contract-base/domain/contract-mount.ts": 2
+  },
+  "baselineTotal": 15,
+  "currentTotal": 17,
+  "reason": "Two upstream oRPC public types are reported as private references; no exception accepted. Qualified import spelling reproduces same17 and was reverted."
+}
