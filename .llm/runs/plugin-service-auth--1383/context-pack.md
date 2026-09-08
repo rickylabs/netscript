@@ -16,7 +16,7 @@ CI quality101920037513 failed stale generated agent-docs barrel (ci-assets-barre
 
 ## Live handles — poll, do not restart
 
-- Full local test rerun11409 LIVE, /tmp/cockpit-ci-full-tests-3.json, TMPDIR=/home/agent/cockpit-test-temp-1383 (outside git, executable). Previous10433 TERMINALFAIL25 due fixture isolation violated by TMPDIR inside workspace; receipt ci-full-tests-workspace-temp-failure.json. All157tests across14 failing files plus browser pass with external temp (ci-isolated-temp-recheck.json). No product/assertion changes. Poll11409, not10433.
+- Full local suite11409 TERMINALPASS5386passed0failed19ignored, ci-full-tests-PASS.json. External executable TMPDIR /home/agent/cockpit-test-temp-1383. Earlier failures preserved. No local test process remains running.
 - Independent implementation round4 evaluator58605 TERMINAL exit0, evaluate-4.md PASS at2e8c4cf54035ba2480d9072dd3261599d7e3ab2d. SAME session ses_f8132eca6ffesLYPOVzN00L3HB, /tmp/cockpit-implementation-final-recheck.jsonl. Fresh matrix-implementation-final-recheck.json selected MuseSpark1.3max; AGENTIC launcher performs allowance guard. Independently reproduced81testsPASS and asset-barrel stability; no runtime-source drift. No full-suite inference. Prior verdicts preserved.
 - Current CI b59bbc252 run34181840677: quality101922471771 SUCCESS; check-test101922471786 is in repo-wide test after check passed. Closegate101922399577 pending finalDoD. Review-thread gate PASS0unanswered. PR reviewPASS relay comment5578418646. Refresh exact-head results before final gate decision.
 
