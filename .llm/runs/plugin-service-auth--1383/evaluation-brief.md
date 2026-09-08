@@ -27,3 +27,8 @@ Output only plan-eval.md in this run directory: verdict PASS, FAIL_FIX or FAIL_R
 - Verify ambiguous policy handling: both public and authn, empty/blank reason, malformed authn or authz, unknown public marker. Required auth must never become an accidental public fallback. Require source-backed runtime rejection and appropriate soundness tests, not just the omitted-field case.
 - The proposed generated rule GET=>read, otherwise=>write may classify a read procedure differently over REST and RPC. Inspect the actual generated SDK/RPC transport and require the same read-only session to reach the generated read procedure through native SDK/RPC and REST. A GET-only happy path plus POST403 could hide a broken read client. Do not assume this finding without checking source.
 - New specifier/generator changes must be confined to this feature's required native imports and proved in generated output. Resolve any contradiction in S9 against the actual public helper/union.
+
+
+## Second evaluation input
+
+Read plan.md together with plan-amendment-1.md; the amendment explicitly supersedes conflicting revision2 details. Preserve plan-eval.md as the first FAIL_FIX. Write the new verdict to plan-eval-2.md only. Check all four first-round corrections, especially actual RPC read behavior, the complete rejection table and shared-validator shape. Both original planner and coordinator authored the composite plan; evaluator independence must hold against both. No implementation is authorized.
