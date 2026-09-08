@@ -15,3 +15,9 @@ Evaluator handle93058 exited0 with FAIL_FIX in plan-eval.md: RPC read proof/poli
 ## 2026-09-08 — independent round two PASS and implementation admission
 
 Round two reviewed b3576e116, resolved all four FAIL_FIX findings and returned PASS. Evaluator process36944 exited0; original and second verdicts preserved. Coordinator admits the composite plan into implementation, starting S0/S1. PR2003 remains partial issue1383 work; no release, publication, or downstream adoption permission.
+
+## 2026-09-08 — S0 baseline and S1 shared policy code
+
+Baseline auth wrappers:39 passed. Added native ServiceAuthPolicy types and assertion, runtime rejection/redaction tests and type-soundness fixture. Auth suite78 passed/0 failed/0 ignored;51 files check/lint/fmt passed; package doc-lint0 errors; quality:gate exit0 (existing warnings retained). Receipts s1-*. Source rationale: native options.ts/types.ts, doctrine public-surface and modules/helpers, MCP service-layer-authn-authz-middleware guidance; independent plan-eval-2 PASS.
+
+Board phase moved through REST after gh pr edit's missing read:org failure. Generic NetScript board check before/after remains exit1/incomplete at500 items (existing unrelated anomalies), not a global board PASS. Only PR2003 phase changed to impl; Cockpit child WIP unchanged. Phase evidence comment5577541326. No source tests or gates bypassed. S2 factory integration next; generated output/runtime/independent review still required.

@@ -179,10 +179,35 @@ match-aware migration fallback; it is not deprecated.
 `[netscript.service.contract-policy] optional authentication is unsupported: <procedure>` during
 construction, before any request.
 
+### Explicit service posture
+
+`ServiceAuthPolicy` records either native guards (`{ authn, authz? }`) or a deliberate
+public opt-out (`{ public: true, reason }`). `ServiceGuardedAuthPolicy` and
+`ServicePublicAuthPolicy` are mutually exclusive; a public reason must be nonblank.
+`assertServiceAuthPolicy(value)` rejects absent or ambiguous postures and malformed callable
+ports with a redacted `TypeError`. It preserves the original options: a custom
+`allowAnonymous` list replaces the native default; the assertion does not add `/health`.
+It validates configuration only and does not authenticate requests or install middleware.
+The existing `defineService` preset has not yet adopted this required posture contract.
+
+```ts
+import { assertServiceAuthPolicy, type ServiceAuthPolicy } from '@netscript/service/auth';
+
+const policy: ServiceAuthPolicy = {
+  public: true,
+  reason: 'Public status service with no protected operations',
+};
+assertServiceAuthPolicy(policy);
+```
+
 ### `@netscript/service/auth` surface
 
 | Symbol | Description |
 | --- | --- |
+| `ServiceAuthPolicy` | Native guarded posture or an explicit public opt-out. |
+| `ServiceGuardedAuthPolicy` | Native authentication with optional authorization; excludes public fields. |
+| `ServicePublicAuthPolicy` | Literal public opt-out with a nonblank reason; excludes guard fields. |
+| `assertServiceAuthPolicy` | Validates an explicit posture and required callable ports without changing options. |
 | `createContractAuthorizer` | Traverses a metadata-bearing contract and returns an opt-in authorizer bound by the service builder. |
 | `createScopeAuthorizer` | Ordered scope/role rules usable standalone or as a match-aware legacy fallback. |
 | `createStaticCredentialAuthenticator` | Maps configured credentials to principals. |
