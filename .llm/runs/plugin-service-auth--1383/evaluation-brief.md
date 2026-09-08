@@ -19,3 +19,11 @@ Follow the skills and reference-only sibling paths in initial-brief.md: NetScrip
 7. Are remaining forks real owner preferences or already authorized technical choices? Return precise sourced conflicts; do not invent an approval flow. A breaking change must meet the source-backed RFC/migration process, not assume it is waived.
 
 Output only plan-eval.md in this run directory: verdict PASS, FAIL_FIX or FAIL_RESCOPE; exact reviewed HEAD; observations and executable checks; bounded correction list; limits. Do not edit the plan or product source, commit, push, change GitHub, dispatch other agents or start an AppHost. Cheap read-only probes or existing focused tests may substantiate a finding; no full runtime rerun for a plan-only change. All release/tag/publication is owner-reserved and unauthorized.
+
+
+## Coordinator review questions on revision 2
+
+- The plan calls packages/service changes "types only" while adding isPublicAuthPolicy, a runtime function. Is that extra public runtime surface needed, properly placed and validated, or an unnecessary helper?
+- Verify ambiguous policy handling: both public and authn, empty/blank reason, malformed authn or authz, unknown public marker. Required auth must never become an accidental public fallback. Require source-backed runtime rejection and appropriate soundness tests, not just the omitted-field case.
+- The proposed generated rule GET=>read, otherwise=>write may classify a read procedure differently over REST and RPC. Inspect the actual generated SDK/RPC transport and require the same read-only session to reach the generated read procedure through native SDK/RPC and REST. A GET-only happy path plus POST403 could hide a broken read client. Do not assume this finding without checking source.
+- New specifier/generator changes must be confined to this feature's required native imports and proved in generated output. Resolve any contradiction in S9 against the actual public helper/union.
