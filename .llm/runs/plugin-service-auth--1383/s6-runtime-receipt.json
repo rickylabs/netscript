@@ -1,0 +1,17 @@
+{
+  "verdict": "PASS",
+  "sourceCommit": "6b25dc4fc",
+  "documentationHead": "95048d20b",
+  "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+  "exitCode": 0,
+  "gates": {
+    "passed": 104,
+    "failed": 0,
+    "skipped": 0
+  },
+  "generatedRoot": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/plugin-smoke-20260908-040707",
+  "log": "/tmp/cockpit-s6-runtime.log",
+  "logSha256": "459c9675987221b1b88e6b56f548151f75715a64a4291b13492a55e505f3e330",
+  "topology": "Owner-authorized exact-ID DinD loopback relay; source containers3beb03accf79,3c588e2933d6,ae93e84203a4",
+  "limits": "Local-source full runtime, not published artifact or Cockpit attention/Mobile live proof."
+}

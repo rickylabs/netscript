@@ -30,3 +30,8 @@ Documentation updated in c73a85ff4/de8b2e765. Export corpus, prose bundle and pu
 Full runtime is LIVE process42889 log/tmp/cockpit-s6-runtime.log; generated root .llm/tmp/cli-e2e/plugin-smoke-20260908-040707. AppHost described with actual resources. Exact three source containers identified by own mount path/sharedDCPcreator:3beb03accf79 postgres,3c588e2933d6 redis,ae93e84203a4 garnet. Owner-authorized exact-ID relay LIVE24562, ownercockpit-policy-s6-0908, registry/tmp/cockpit-policy-s6-relay.json, log/tmp/cockpit-policy-s6-relay.log, --since2026-09-08T02:10:54Z fromDockercreatedtime. Stop/cleanup only this relay after suite terminal; retain foreign resources. No final runtime verdict yet.
 
 Fresh matrix-implementation-evaluator.json captured, but NO evaluator dispatched yet; query again immediately before dispatch. No release authorized.
+
+## Runtime and review checkpoint
+Full scaffold.runtime42889 TERMINAL exit0:104passed0failed0skipped. Receipt s6-runtime-receipt.json. AppHost shutdown gatepassed. Relay24562 TERMINAL exit0 after SIGTERM to verified own registryPID; dockerps confirms all three source containers and this relay removed, foreign resident resources untouched.
+
+Independent implementation evaluator LIVE40319, NEW session via AGENTIC OpenCode, fresh matrix-implementation-evaluator-launch.json selected MuseSpark1.3max independently of OpenAI implementation. Capture/tmp/cockpit-implementation-evaluator.jsonl, launchertrace implementation-evaluator-launch.jsonl, brief implementation-evaluation-brief.md. SessionID not yet emitted in terminal capture; do not invent it or restart. Output evaluate.md. Known doc-lint17vs15FAIL is explicitly in brief; no waiver. Full runtime receipt now available to reviewer. No release authorized.
