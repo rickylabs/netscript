@@ -111,3 +111,13 @@ Full deno task test90237 LIVE, capture/tmp/cockpit-ci-full-tests.json (wrapper e
 No evaluator currently running. Next poll90237, preserve exact outcome, fresh matrix and SAMEsession
 ses_f8132eca6ffesLYPOVzN00L3HB round3 reviewing README+2fixturepostures (evaluate-3.md), then finalCI.
 Prior PASS evaluate-2.md applies pre-CIrepair source; do not claim it certifies newdiff. No release.
+
+## Owner release boundary and terminal verification — 2026-09-08
+
+Owner explicitly prohibits any NetScript release cut or publication, stable or canary, without prior approval. No approval exists. A potential canary must combine meaningful milestone backlog deliveries and present their significance and executable verification for owner review before any cut/dispatch. Do not treat source merge, dry-run, evaluator PASS, or consumer dependency pressure as release authority. [observed - owner correction in existing Cockpit thread, repeated 2026-09-08]
+
+GitHub milestone25 read now: 0.0.8, OPEN, 43 open and11 closed items; updated2026-09-08T00:39:48Z. This count is a snapshot, not a release-completeness claim. [observed - gh api repos/rickylabs/netscript/milestones/25]
+
+Implementation recheck17893 TERMINAL exit0; evaluate-3.md PASS at83e6f9b60 for bounded README/two-fixture repair. Full test90237 TERMINAL exit1:5382passed4failed19ignored; exact structured receipt ci-full-tests-failure.json. Failures: generated plugin suite census lacks new guarded gate in expectation; scanner fixture census8vs6; two browser fixture executable permission failures under /ephemeral/tmp. These require attribution and correction or a supported environment recheck; no full-suite or merge PASS. Earlier runtime104PASS remains separately scoped. Next: inspect these four failures against current CI and source, repair the stale suite expectation, preserve independent review gates. No release action.
+
+CI repair follow-through: suite expectation now includes BEHAVIOR_GENERATED_GUARDED_PLUGIN; scanner census is8, matching six original fixtures plus two new policy soundness fixtures. No exemption rule changed. Browser failures reproduced execution refusal on /ephemeral mounted noexec; TMPDIR set only for test process to run-owned .llm/tmp/ci-executable-temp on executable /home/agent. All81tests in three affected files PASS, unchanged browser assertions, receipt ci-four-failures-recheck.json. CI quality job101920037513 failed assets-barrel drift: prose bundle carriers changed but generated agent-docs carrier was stale. Ran native gen:assets-barrel. Original CI failure preserved ci-assets-barrel-failure.json. Requires assets-barrel stability check, full suite rerun and independent review of these incremental repairs before merge.

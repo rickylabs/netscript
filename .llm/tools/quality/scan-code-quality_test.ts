@@ -372,7 +372,7 @@ Deno.test('soundness fixtures exempt negative-type directives but no other quali
   }]);
 });
 
-Deno.test('all six repository soundness fixtures retain their explicit scanner exemption', async () => {
+Deno.test('all eight repository soundness fixtures retain their explicit scanner exemption', async () => {
   const soundnessFiles: string[] = [];
   for (const root of ['packages', 'plugins']) {
     for await (const entry of Deno.readDir(root)) {
@@ -391,7 +391,7 @@ Deno.test('all six repository soundness fixtures retain their explicit scanner e
     }
   }
 
-  assertEquals(soundnessFiles.length, 6);
+  assertEquals(soundnessFiles.length, 8);
   assertEquals(await scanCodeQuality(soundnessFiles), []);
 });
 
