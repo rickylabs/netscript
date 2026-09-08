@@ -11,3 +11,7 @@ Draft PR2003 opened at f2faf5dac with status:plan, milestone0.0.8 and unchecked 
 ## 2026-09-08 — Independent plan FAIL_FIX and bounded amendment
 
 Evaluator handle93058 exited0 with FAIL_FIX in plan-eval.md: RPC read proof/policy, ambiguous shapes, runtime-helper placement, risk register. No implementation. Coordinator queried MCP and inspected native createContractAuthorizer docs/tutorial/source, then recorded plan-amendment-1.md rather than rewriting the original plan. Native metadata now owns transport-independent requirements; complete union rejection table and risk register added. Second evaluation remains required.
+
+## 2026-09-08 — independent round two PASS and implementation admission
+
+Round two reviewed b3576e116, resolved all four FAIL_FIX findings and returned PASS. Evaluator process36944 exited0; original and second verdicts preserved. Coordinator admits the composite plan into implementation, starting S0/S1. PR2003 remains partial issue1383 work; no release, publication, or downstream adoption permission.
