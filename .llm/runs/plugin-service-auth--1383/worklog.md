@@ -49,3 +49,7 @@ Added critical behavior.generated-guarded-plugin to scaffold.plugins, backed by 
 ## 2026-09-08 — binding amendment returned
 
 Original planner84113 terminal exit0; binding-repair-plan.md returned native contract-side mount with shared coordinates. File arrived during gate-registration commit96c902b11; terminal read confirms complete plan, no later file delta. New public helper requires independent bounded amendment review. Third plan-evaluation turn preserves prior history and matrix repair policy. Coordinator requires retaining original failure receipt and honest15-finding doc-lint baseline comparison. No helper implementation admitted yet.
+
+## 2026-09-08 — cycle-three in-flight repair correction
+
+Evaluator55971 terminal exit0; binding-repair-eval FAIL_FIX confirms technical repair, only receipt preservation and explicit15-finding doc-lint comparison remain. Coordinator prior brief incorrectly prohibited the matrix-mandated fixable-plan edit on cycle3. Returning same evaluator for scoped in-flight F1/F2 repair and certification, not resetting/incrementing a fourth review cycle. Owner informed in commentary. Two inspection-only lock entries (exactcontract1.15.0,zod4) preserved as patch and removed; no dependency change intended, no broad lock reset.
