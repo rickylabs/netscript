@@ -1,0 +1,27 @@
+{
+  "source": "6b400f643",
+  "generatedProjectRoot": "/home/agent/repos/netscript-plugin-service-auth-policy/.llm/tmp/cli-e2e/guarded-authoring-samples",
+  "probe": "packages/cli/e2e/src/application/gates/scaffold/probe-generated-guarded-plugin.ts",
+  "observed": {
+    "compile": {
+      "files": 22,
+      "passed": true
+    },
+    "nativeSessionReadREST": {
+      "expected": 200,
+      "actual": 403
+    },
+    "directAssembledRouterExperiment": {
+      "compilePassed": false,
+      "code": "TS2345",
+      "reason": "AnyRouter permits lazy routers not assignable to ContractPolicyContract",
+      "reverted": true
+    }
+  },
+  "cause": "Flat core contract policy paths omit the version/namespace applied by assemblePluginContractRouter. Native builder binds /api and /api/rpc prefixes only.",
+  "rawEvidence": {
+    "/tmp/cockpit-s5-probe-2.log": "6411ef39b581024e8864234857f6849448934867c24e81c3e9ec7d40804eaa43",
+    "/tmp/cockpit-s5-probe-3.log": "a17769f63d498b11cc6d964897b5f94266774d198618922edc192b37a6387293"
+  },
+  "acceptance": "FAIL; no live authorized read, no recovery/API/client PASS"
+}

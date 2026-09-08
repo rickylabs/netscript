@@ -1,0 +1,74 @@
+{
+  "intent": "createPluginService generated plugin authorization: flat core contract lacks version/namespace REST and RPC prefixes; assemblePluginContractRouter returns AnyRouter with lazy types incompatible with createContractAuthorizer ContractPolicyContract. What native contract projection or binder should derive the authorizer from the same assembled routes without casts or duplicate path tables?",
+  "confidence": "high",
+  "recommendations": [
+    {
+      "stage": "implementation",
+      "slug": "pages/explanation/plugin-system",
+      "section": "what-a-plugin-contributes-the-manifest",
+      "heading": "What a plugin contributes: the manifest",
+      "why": "Matches the task through: plugin, contract, version, and.",
+      "excerpt": "A plugin describes itself with a typed **manifest**, assembled through the `definePlugin()` builder in @netscript/plugin . The manifest is a *declaration*, not executable wiring: `definePlugin(name, version)` returns a builder, and each chained `.with*()` call adds a **contribution** along a well-defined **extension axis**. The builder exposes a *fixed* set of contribution axes \u2014 the vocabulary every host understands. The most load-bearing ones: **Builder methods, each declaring one kind of contribution** | Builder method | Contributes | Used for | | --- | --- | --- | | `.withService(\u2026)` | An ",
+      "code": [
+        {
+          "language": "ts",
+          "code": "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here \u2014\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"0.0.7\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\", port: 8091 /* note: your scaffold's port will differ */ })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();",
+          "source": {
+            "slug": "pages/explanation/plugin-system",
+            "section": "what-a-plugin-contributes-the-manifest",
+            "heading": "What a plugin contributes: the manifest"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/web-layer/route",
+      "section": "routing-and-route-contracts",
+      "heading": "Routing and route contracts",
+      "why": "Matches the task through: generat, plugin, contract, version.",
+      "excerpt": "A URL is two things at once: an input the server parses, and an output the UI constructs. Bare Fresh gives you the first as strings and leaves the second to template literals, so the same route pattern ends up written twice \u2014 once as a directory path, once as `/orders/${id}?page=${page}` \u2014 with nothing checking that the two still agree. A **route contract** is the schema half of that pair: it owns a route's path and search schemas independently of any concrete URL. Binding it to a pattern produces a **route reference** \u2014 one object that parses a request *and* builds hrefs, from the same schema",
+      "code": [
+        {
+          "language": "tsx",
+          "code": "// routes/orders/[status].tsx \u2014 bare Fresh\nexport const handler = define.handlers({\n  async GET(ctx) {\n    const status = ctx.params.status; // string \u2014 any string\n    if (status !== 'open' && status !== 'closed') return new Response('Not found', { status: 404 });\n\n    const rawPage = ctx.url.searchParams.get('page'); // string | null\n    const page = Math.max(Number.parseInt(rawPage ?? '1', 10) || 1, 1);\n    const rawLimit = ctx.url.searchParams.get('limit');\n    const limit = Math.min(Math.max(Number.parseInt(rawLimit ?? '25', 10) || 25, 1), 100);\n    const offset = (page - 1) * limit;\n\n    return { data: await listOrders({ status, limit, offset }) };\n  },\n});",
+          "source": {
+            "slug": "pages/web-layer/route",
+            "section": "routing-and-route-contracts",
+            "heading": "Routing and route contracts"
+          }
+        },
+        {
+          "language": "tsx",
+          "code": "<a href={`/orders/${status}?page=${page + 1}&limit=${limit}`}>Next</a>",
+          "source": {
+            "slug": "pages/web-layer/route",
+            "section": "routing-and-route-contracts",
+            "heading": "Routing and route contracts"
+          }
+        }
+      ]
+    },
+    {
+      "stage": "implementation",
+      "slug": "pages/explanation/contracts",
+      "section": "serving-the-router-where-the-contract-meets-http",
+      "heading": "Serving the router: where the contract meets HTTP",
+      "why": "Matches the task through: plugin, contract, version, rest.",
+      "excerpt": "A local service hands the router to `defineService(...)`, which wires CORS, request logging, OpenAPI, RPC, and health endpoints in one call and binds a port. The contract's shapes become the service's validation and its published OpenAPI document at the same time \u2014 one definition, two artifacts. Aspire injects `PORT` at runtime, so the entrypoint reads it from the environment; the typed source of truth is your `netscript.config.ts` `services.<name>.port` field, which the scaffold wires as the fallback default \u2014 set the port there rather than editing this line. The `users` service listens on it",
+      "code": [
+        {
+          "language": "ts",
+          "code": "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});\n// Serves /api/v1/users/* (OpenAPI) and /api/rpc/v1/... (typed RPC) on its assigned port.",
+          "source": {
+            "slug": "pages/explanation/contracts",
+            "section": "serving-the-router-where-the-contract-meets-http",
+            "heading": "Serving the router: where the contract meets HTTP"
+          }
+        }
+      ]
+    }
+  ],
+  "related": [],
+  "truncated": true
+}
