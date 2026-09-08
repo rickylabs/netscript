@@ -1,0 +1,1 @@
+{"schemaVersion":1,"command":["deno","test","--reporter=tap","--allow-all","packages/cli/e2e/tests/application/builders/suite-builder_test.ts"],"cwd":"/home/agent/repos/netscript-plugin-service-auth-policy","exitCode":0,"durationMs":934,"summary":{"passed":3,"failed":0,"ignored":0,"totalResults":3,"uniqueFailures":0},"failures":[]}

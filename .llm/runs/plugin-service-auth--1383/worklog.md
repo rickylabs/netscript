@@ -41,3 +41,7 @@ S5 remains: commit a repeatable CLI-generated native-auth HTTP/SDK probe into sc
 ## 2026-09-08 — S5 executable defect, not a PASS
 
 New native-session probe type-checks22 generated files but read-scoped REST returned403 instead of200. Flat core policy geometry differs from plugin binder version/namespace geometry. Direct assembled-router input fails TS2345 on its broad/lazy type and was reverted. Native guidance requested; exact source-backed repair returned to original planner. No passing runtime/client claim. Probe source and sanitized failure receipt retained; no changed goal or owner preference fork.
+
+## 2026-09-08 — S5 gate registration while binding repair runs
+
+Added critical behavior.generated-guarded-plugin to scaffold.plugins, backed by the committed native-session probe. Source-only fixture explicitly skips78 for a non-local workspace, never a published compatibility PASS. e2e gates lists the new gate;6 source files check and lint PASS;3 existing suite-builder tests PASS. Actual generated read still FAIL until binding repair lands; no suite runtime PASS inferred from registration. Original planner process84113 confirmed live, no restart. Harness owner publication279 remains OPEN with no new receipt.
