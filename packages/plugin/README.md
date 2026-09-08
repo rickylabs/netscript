@@ -173,3 +173,49 @@ the NetScript hosts that consume them.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Explicit service authentication
+
+`createPluginService` requires `auth`. Guarded services pass native service-auth options;
+JavaScript callers receive a `TypeError` for missing or ambiguous policies before a builder is
+constructed. TypeScript callers must migrate their service configuration.
+
+```ts
+import { createPluginService } from '@netscript/plugin/service';
+import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
+import { createContractAuthorizer } from '@netscript/service/auth';
+import { contract, router } from './router.ts';
+
+const service = createPluginService(router, {
+  name: 'reports',
+  auth: {
+    authn: {
+      authenticator: createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 }),
+    },
+    authz: { authorizer: createContractAuthorizer(contract) },
+  },
+});
+```
+
+The contract must declare the required access metadata, and the plugin must declare its auth
+service dependency. The builder resolves procedure policy across REST and RPC; do not infer a
+procedure's required scope from the transport's HTTP method.
+
+For a deliberately public service, record the reason instead:
+
+```ts
+const service = createPluginService(router, {
+  name: 'public-status',
+  auth: { public: true, reason: 'Public status API without protected operations' },
+});
+```
+
+Never combine public and guarded fields. Public reasons must be nonblank. Options pass through
+unchanged: a custom nonempty `allowAnonymous` list replaces the native default. The builder's
+built-in health routes remain public because they are registered before auth middleware; raw
+routes are installed after it and follow the configured guards.
+
+The existing first-party public declarations record unfinished adoption, not proof that those
+services are guarded. Their credential propagation, session seeding, per-service access policy
+and auth discovery work remain under #1383; auth signout authorization remains under #1384.
+This source change does not imply availability in an existing published package.

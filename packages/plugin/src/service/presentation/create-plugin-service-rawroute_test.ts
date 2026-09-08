@@ -10,6 +10,7 @@ Deno.test('proxy/passthrough mode: serveRpc=false routes everything through the 
   const running = await createPluginService(
     {},
     {
+      auth: { public: true, reason: 'Fixture for explicit public service behavior' },
       name: 'proxy-test',
       serveRpc: false,
       rawRoutes: [
@@ -48,6 +49,7 @@ Deno.test('mixed mode: a raw webhook route coexists with the default withRPC wir
   const running = await createPluginService(
     {},
     {
+      auth: { public: true, reason: 'Fixture for explicit public service behavior' },
       name: 'webhook-test',
       // serveRpc defaults to true here; withRPC is wired alongside the raw route.
       openApi: { title: 'Webhook Test API' },

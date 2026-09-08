@@ -11,7 +11,7 @@
  * ```ts
  * import { createPluginService } from '@netscript/plugin/service';
  *
- * const running = await createPluginService(router, { name: 'workers' }).serve({ port: 3000 });
+ * const running = await createPluginService(router, { name: 'workers', auth: { authn: { authenticator } } }).serve({ port: 3000 });
  * await running.stop();
  * ```
  */
@@ -43,15 +43,26 @@ export {
 // re-exposing it would drag that package's internal builder option types into
 // this surface.
 export type {
+  AuthenticatorPort,
+  AuthnOptions,
+  AuthnRequest,
+  AuthnResult,
+  AuthorizerPort,
+  AuthzDecision,
+  AuthzOptions,
+  AuthzRequest,
   ContextFactory,
   CorsOptions,
   DbContext,
   HealthCheck,
   Principal,
+  ServiceAuthPolicy,
   ServiceConfig,
+  ServiceGuardedAuthPolicy,
   ServiceHandler,
   ServiceHandlerContext,
   ServiceMiddleware,
+  ServicePublicAuthPolicy,
   ServiceRouteMethod,
   ServiceRouter,
 } from '@netscript/service';

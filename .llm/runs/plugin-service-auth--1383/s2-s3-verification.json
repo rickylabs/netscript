@@ -1,0 +1,49 @@
+{
+  "baseline": "af516969f",
+  "scope": "Combined S2 factory and S3 first-party declarations working tree; committed sequentially",
+  "sha256": {
+    "docs/site/reference/plugin/index.md": "3042c229c7f78281d8fb95f5871440179a23e96b6e65c5708fcb07799c3b138b",
+    "packages/plugin/README.md": "4a921f0c6830fadc2a98cc1ae16421f272632f56dadc6ce7ca23f77e64126621",
+    "packages/plugin/src/service/mod.ts": "46a868eafe172cf9d9ab95ac11adec0c07884be255cf7fbb5cbd1de953d95569",
+    "packages/plugin/src/service/presentation/create-plugin-service-rawroute_test.ts": "208074537ca3e73211eb08413e9ef38bf862b1ceaf2c0107b5910afbf28c9945",
+    "packages/plugin/src/service/presentation/create-plugin-service.ts": "024c9940fb6be6334fb4af0cc41e0bc95de2fa681bc08f59bb8666db2f270eab",
+    "packages/plugin/tests/service/create-plugin-service_test.ts": "61962f8b6b1a52a3421dbdb439b5e4eaca5da1f77e313bc4ef6de29da172e77c",
+    "plugins/auth/services/src/main.ts": "1c4abff94860dfac8960f796743eeca1d341f21bdb748effbfff90ca54526f3d",
+    "plugins/auth/tests/services/session-credentials-http_test.ts": "1fb89a72336595809e0922bb525df61c3d2cfe978bc25c3b0622b26377844ec9",
+    "plugins/sagas/services/src/main.ts": "86d12e29926c64823401717b96ef1685f5e15afba7a6b24eb5bfcccb16a776e6",
+    "plugins/sagas/tests/services/publish-http-boundary_test.ts": "a9bb1be08be54fb07ef419494f4d1e7d631d3c7051f9d8516fca59846e01307c",
+    "plugins/streams/services/src/main.ts": "9771e948e7314bba8fd427684ff9a743f5c2b3beb0ba4e1c4531e214b28266e1",
+    "plugins/streams/services/src/main_test.ts": "bff39b1dfdf5c4e02e4a17842bc1f73bdc23caabb423daa6d1cd84e73aa24b0e",
+    "plugins/streams/services/src/proxy_test.ts": "5dcc9788d0f21b30ec4d9d2f07fff6138616aebc3113929bf8740ff4cdd59d7a",
+    "plugins/streams/services/src/sse-contract_conformance_test.ts": "94c2cc90117d19658ca8146ffaa6aa3f923ff09e0c84708ceafb33666e5599ee",
+    "plugins/triggers/services/src/main.ts": "ddc942895680f9ece2a43275208fe4705aed5df58f1234b09a3804cc798a3b74",
+    "plugins/workers/services/src/describe-route_test.ts": "1d622185e2b9a60b7f376365924fad57c85546164e3f384df69b13fd41126a5f",
+    "plugins/workers/services/src/main.ts": "839740512adcb53879979faa9abe6150e7b15296d73712c55bf634fa904bd418",
+    "plugins/workers/services/src/trigger-path-id_test.ts": "c15ce0f693bc789009db26837a05c563b030257eb3d14c7dff4b2ddc55d12701",
+    "packages/plugin/tests/service/create-plugin-service-auth_test.ts": "7dfa907a1aee3cab3fe4febe642fb9f4ace743f0b90b4d81019ad4ebb713cd9e",
+    "packages/plugin/tests/service/create-plugin-service-soundness_test.ts": "b90d6a71720364f9c8b053ce7e1bbb4ba0e923625a1329bc41ecd5351d339bfd"
+  },
+  "focusedTests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "regressions": {
+    "passed": 337,
+    "failed": 0,
+    "ignored": 13
+  },
+  "checkFiles": 522,
+  "qualityGateExitCode": 0,
+  "docLint": {
+    "exitCode": 1,
+    "baselineFindings": 15,
+    "currentFindings": 15,
+    "sameFilesAndCounts": true
+  },
+  "limits": [
+    "Generated connector not yet migrated",
+    "Full scaffold/runtime and independent implementation evaluation outstanding",
+    "Public declarations are not guarded adoption",
+    "No release or publication"
+  ]
+}
