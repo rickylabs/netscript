@@ -1,0 +1,25 @@
+{
+  "suiteHandle": 23732,
+  "sourceHead": "7a93702051a2c19d95e19d4d30219155d6fca037",
+  "apphost": ".llm/tmp/cli-e2e/plugin-smoke-20260908-015549/aspire/apphost.mts",
+  "relayHandle": 7913,
+  "relayOwner": "cockpit-auth-relayed",
+  "relayRegistry": "/tmp/cockpit-auth-relayed-registry.json",
+  "sourceIds": [
+    "3de09133adb5",
+    "64429c4763ad",
+    "c66ba4afe47c"
+  ],
+  "dockerCreatedLowerBound": "2026-09-07T23:59:30Z",
+  "state": "TERMINAL",
+  "clockCorrection": "The scaffold directory timestamp was not Docker UTC. Initial empty relay handle83921 cleaned and exited0; replacement uses the exact inspected Docker creation interval with the same explicit IDs.",
+  "cleanupRequired": false,
+  "exitCode": 1,
+  "passed": 90,
+  "failed": 1,
+  "skipped": 0,
+  "failedGate": "behavior.app-reference",
+  "failure": "Chromium exit134: Unix singleton socket path exceeds limit under long worktree TMPDIR",
+  "apphostCleanup": "PASS",
+  "relayCleanup": "PASS; relay handle7913 terminal exit0"
+}

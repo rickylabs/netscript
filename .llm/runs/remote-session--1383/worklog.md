@@ -249,3 +249,7 @@ Original evaluator exec51435 completed exit0. browser-permission-eval.md PASS co
 ## 2026-09-08 — Startup attempt disposition
 
 Runtime88383 is terminal exit1:43 passed, runtime.aspire-start failed, cleanup.aspire-stop passed. Exact captured resources retained in runtime-permission-attempt.json. This attempt omitted the authorized DinD relay; no browser or full-runtime PASS follows. Repeating the unchanged source with scoped relay supervision (runtime23732). No release/tag/publication authorized or performed.
+
+## 2026-09-08 — Relayed runtime and browser environment diagnosis
+
+Runtime23732 terminated90PASS/1FAIL at behavior.app-reference: Chromium134 reports its Unix singleton socket path too long under the worktree TMPDIR. Startup, native DB lifecycle, worker/saga/trigger/auth API checks and correlated live-DB telemetry passed. AppHost cleanup passed; exact-owner relay cleanup completed and handle7913 exited0. No complete runtime PASS. Browser wrapper now sets only its subprocess TMPDIR to owned /tmp/cockpit-auth-chrome while retaining its scoped library path; the native selector/restricted launch marker probe exits0. Product source is unchanged; full suite rerun remains required. CI on pushed7a9370205 passed all applicable checks and review-threads reports0 unanswered.
