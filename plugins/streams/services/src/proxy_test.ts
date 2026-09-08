@@ -63,6 +63,7 @@ async function startFront(
 ): Promise<Awaited<ReturnType<ReturnType<typeof createPluginService>['serve']>>> {
   const front = await getAvailablePort();
   return await createPluginService({}, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'streams',
     version: '0.0.0-test',
     port: front,

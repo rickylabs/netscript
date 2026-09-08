@@ -60,6 +60,11 @@ export default async function createSagasService(
   const sagaPublisher = createSagaDeliveryPublisher();
 
   const service = await createPluginService(router, {
+    auth: {
+      public: true,
+      reason:
+        'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
+    },
     name: 'sagas',
     version: '1.0.0',
     port,

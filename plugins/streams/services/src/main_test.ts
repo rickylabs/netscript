@@ -51,6 +51,7 @@ Deno.test('streams connector: health, proxy, and service-info delta', async () =
 
   const front = await getAvailablePort();
   const running = await createPluginService({}, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'streams',
     version: '0.0.0-test',
     port: front,

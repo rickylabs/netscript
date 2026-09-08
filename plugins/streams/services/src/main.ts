@@ -86,6 +86,11 @@ const proxyHandler = createStreamsProxyHandler({ internalPort });
 // `serve()` owns the front listener and graceful SIGINT/SIGTERM/SIGBREAK
 // shutdown; the upstream server stop runs as an onShutdown hook.
 const running = await createPluginService({}, {
+  auth: {
+    public: true,
+    reason:
+      'Guarded adoption awaits caller credentials, runtime session seeding, per-service access policy and auth discovery references (#1383).',
+  },
   name: 'streams',
   version: VERSION,
   port,

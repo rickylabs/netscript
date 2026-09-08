@@ -9,6 +9,7 @@ import { router } from './router.ts';
 // database/runtime wiring is required.
 Deno.test('workers service serves GET /describe with a capabilities document', async () => {
   const app = createPluginService(router, {
+    auth: { public: true, reason: 'Fixture for existing public service behavior' },
     name: 'workers',
     version: '1.0.0',
     openApi: {

@@ -72,6 +72,7 @@ Deno.test({
     await upstream.start();
     const frontPort = await getAvailablePort();
     const front = await createPluginService({}, {
+      auth: { public: true, reason: 'Fixture for existing public service behavior' },
       name: 'streams-sse-contract',
       version: '0.0.0-test',
       port: frontPort,

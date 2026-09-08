@@ -72,6 +72,11 @@ export default async function createAuthService(
   // is preserved. The registry is resolved above (via `initializeAuthService`)
   // and captured by the context closure; no startup work is deferred.
   return await createPluginService(router, {
+    auth: {
+      public: true,
+      reason:
+        'Unauthenticated session discovery is public; guarded adoption and signout authorization remain in #1383/#1384.',
+    },
     name: 'auth',
     version: AUTH_PLUGIN_VERSION,
     port,
