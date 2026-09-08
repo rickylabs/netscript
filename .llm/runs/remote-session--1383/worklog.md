@@ -253,3 +253,7 @@ Runtime88383 is terminal exit1:43 passed, runtime.aspire-start failed, cleanup.a
 ## 2026-09-08 — Relayed runtime and browser environment diagnosis
 
 Runtime23732 terminated90PASS/1FAIL at behavior.app-reference: Chromium134 reports its Unix singleton socket path too long under the worktree TMPDIR. Startup, native DB lifecycle, worker/saga/trigger/auth API checks and correlated live-DB telemetry passed. AppHost cleanup passed; exact-owner relay cleanup completed and handle7913 exited0. No complete runtime PASS. Browser wrapper now sets only its subprocess TMPDIR to owned /tmp/cockpit-auth-chrome while retaining its scoped library path; the native selector/restricted launch marker probe exits0. Product source is unchanged; full suite rerun remains required. CI on pushed7a9370205 passed all applicable checks and review-threads reports0 unanswered.
+
+## 2026-09-08 — Full runtime PASS
+
+Canonical scaffold.runtime completed at source 09c6f6b764c9496a7c9ce9a3122daa228d58277f:104 passed,0 failed,0 skipped,exit0. Desktop/mobile browser reference, island hydration, resource refetch, stream consumption/reconnect and correlated telemetry passed. Exact gate list and log digest are in runtime-full-pass.json. AppHost cleanup passed; exact-owner relay cleanup completed and original handle33258 exited0. No product source changes after the independent review; the short browser-only temporary path resolved the measured socket-path limit. Final-head CI remains a merge gate; no release or Cockpit live compatibility is inferred.

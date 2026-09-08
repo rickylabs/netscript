@@ -1,0 +1,648 @@
+{
+  "sourceHead": "09c6f6b764c9496a7c9ce9a3122daa228d58277f",
+  "command": "deno task e2e:cli run scaffold.runtime --cleanup --format pretty",
+  "exitCode": 0,
+  "passed": 104,
+  "failed": 0,
+  "skipped": 0,
+  "rawLogSha256": "7912bf51310937c315e55f35426a85532c381a0f9b6641aeb30d26d3d0421c48",
+  "apphost": ".llm/tmp/cli-e2e/plugin-smoke-20260908-020728/aspire/apphost.mts",
+  "runtimeHandle": 26200,
+  "relayHandle": 33258,
+  "relayExitCode": 0,
+  "relayCleanup": "PASS",
+  "relayOwner": "cockpit-auth-short-temp",
+  "relaySourceIds": [
+    "349688afb829",
+    "a9e01d63e0ce",
+    "054efbc78084"
+  ],
+  "environment": "Owner-authorized exact-ID remote DinD relay; pinned installed dotnet PATH; existing Chromium wrapper with browser-only short TMPDIR and library path; no browser install or generated-app source edit",
+  "scope": "In-tree NetScript scaffold runtime. No release, installed Cockpit adoption, live provider login or product attention/client compatibility claim.",
+  "gates": [
+    {
+      "gate": "preflight.deno",
+      "description": "Deno CLI is available",
+      "verdict": "PASS",
+      "durationMs": 5
+    },
+    {
+      "gate": "preflight.aspire",
+      "description": "Aspire CLI doctor is healthy",
+      "verdict": "PASS",
+      "durationMs": 4781
+    },
+    {
+      "gate": "scaffold.init",
+      "description": "Scaffold generated project",
+      "verdict": "PASS",
+      "durationMs": 1271
+    },
+    {
+      "gate": "scaffold.service-client-add",
+      "description": "Add a second service with typed client helpers",
+      "verdict": "PASS",
+      "durationMs": 1223
+    },
+    {
+      "gate": "scaffold.service-client-generate",
+      "description": "Reconcile service client and Aspire output",
+      "verdict": "PASS",
+      "durationMs": 741
+    },
+    {
+      "gate": "scaffold.agent-init",
+      "description": "Install generated Claude agent integration",
+      "verdict": "PASS",
+      "durationMs": 1383
+    },
+    {
+      "gate": "scaffold.plugin.worker",
+      "description": "Install official worker plugin",
+      "verdict": "PASS",
+      "durationMs": 893
+    },
+    {
+      "gate": "scaffold.plugin.saga",
+      "description": "Install official saga plugin",
+      "verdict": "PASS",
+      "durationMs": 764
+    },
+    {
+      "gate": "scaffold.plugin.trigger",
+      "description": "Install official trigger plugin",
+      "verdict": "PASS",
+      "durationMs": 765
+    },
+    {
+      "gate": "scaffold.plugin.stream",
+      "description": "Install official stream plugin",
+      "verdict": "PASS",
+      "durationMs": 1210
+    },
+    {
+      "gate": "scaffold.plugin.auth",
+      "description": "Install official auth plugin",
+      "verdict": "PASS",
+      "durationMs": 794
+    },
+    {
+      "gate": "scaffold.plugin.ai",
+      "description": "Install official ai plugin",
+      "verdict": "PASS",
+      "durationMs": 876
+    },
+    {
+      "gate": "scaffold.plugin.ai.mcp",
+      "description": "Install official AI plugin with MCP skill tool",
+      "verdict": "PASS",
+      "durationMs": 814
+    },
+    {
+      "gate": "scaffold.plugin.ai.lifecycle",
+      "description": "Add and self-wire an AI tool through the plugin CLI",
+      "verdict": "PASS",
+      "durationMs": 90
+    },
+    {
+      "gate": "scaffold.plugin-list",
+      "description": "List configured plugins",
+      "verdict": "PASS",
+      "durationMs": 1993
+    },
+    {
+      "gate": "scaffold.plugin.ai.appsettings",
+      "description": "Reject synthesized service configuration for the AI plugin",
+      "verdict": "PASS",
+      "durationMs": 252
+    },
+    {
+      "gate": "scaffold.ui-add-ai",
+      "description": "Install the Fresh UI AI collection",
+      "verdict": "PASS",
+      "durationMs": 335
+    },
+    {
+      "gate": "scaffold.ui-local-source",
+      "description": "Map the unpublished AI dependency to the local workspace member",
+      "verdict": "PASS",
+      "durationMs": 257
+    },
+    {
+      "gate": "generated.runtime-schemas",
+      "description": "Generate runtime schemas from all configured plugin modules",
+      "verdict": "PASS",
+      "durationMs": 986
+    },
+    {
+      "gate": "database.codegen",
+      "description": "Generate database clients (standalone, no Aspire)",
+      "verdict": "PASS",
+      "durationMs": 4399
+    },
+    {
+      "gate": "scaffold.design-production-exclusion",
+      "description": "Prove production builds exclude the developer design routes",
+      "verdict": "PASS",
+      "durationMs": 62075
+    },
+    {
+      "gate": "generated.service-client-contract",
+      "description": "Prove idempotent two-service client and cache-key output",
+      "verdict": "PASS",
+      "durationMs": 3942
+    },
+    {
+      "gate": "scaffold.resource-generate",
+      "description": "Generate a typed Fresh resource slice",
+      "verdict": "PASS",
+      "durationMs": 913
+    },
+    {
+      "gate": "scaffold.resource-rerun",
+      "description": "Rerun the resource slice with zero writes",
+      "verdict": "PASS",
+      "durationMs": 1315
+    },
+    {
+      "gate": "scaffold.ui-data-screen",
+      "description": "Scaffold a generated Fresh data screen",
+      "verdict": "PASS",
+      "durationMs": 318
+    },
+    {
+      "gate": "behavior.project-boundary-dev",
+      "description": "Start the generated Fresh dev server below a hostile parent tsconfig",
+      "verdict": "PASS",
+      "durationMs": 14482
+    },
+    {
+      "gate": "behavior.plugins-unhealthy",
+      "description": "Reject missing workers and sagas registries",
+      "verdict": "PASS",
+      "durationMs": 1886
+    },
+    {
+      "gate": "generated.plugins-check",
+      "description": "Generate plugin registries from discovered manifests",
+      "verdict": "PASS",
+      "durationMs": 1306
+    },
+    {
+      "gate": "generated.workers-registry",
+      "description": "Compile workers registry through plugin CLI",
+      "verdict": "PASS",
+      "durationMs": 148
+    },
+    {
+      "gate": "generated.sagas-registry",
+      "description": "Generate sagas registry through plugin CLI",
+      "verdict": "PASS",
+      "durationMs": 85
+    },
+    {
+      "gate": "behavior.plugin-doctor-missing-module",
+      "description": "Reject a configured plugin whose module has been removed",
+      "verdict": "PASS",
+      "durationMs": 3549
+    },
+    {
+      "gate": "runtime.aspire-restore",
+      "description": "Restore Aspire TypeScript SDK",
+      "verdict": "PASS",
+      "durationMs": 4255
+    },
+    {
+      "gate": "runtime.service-env-fixture",
+      "description": "Declare service environment and regenerate on the consumer path",
+      "verdict": "PASS",
+      "durationMs": 1574
+    },
+    {
+      "gate": "generated.quality-negative",
+      "description": "Prove every generated quality surface with deliberate failures",
+      "verdict": "PASS",
+      "durationMs": 61651
+    },
+    {
+      "gate": "generated.deno-check",
+      "description": "Run the generated workspace type-check task",
+      "verdict": "PASS",
+      "durationMs": 3019
+    },
+    {
+      "gate": "generated.deno-lint",
+      "description": "Run the generated workspace lint task",
+      "verdict": "PASS",
+      "durationMs": 176
+    },
+    {
+      "gate": "generated.deno-fmt-check",
+      "description": "Run the generated workspace format-check task",
+      "verdict": "PASS",
+      "durationMs": 400
+    },
+    {
+      "gate": "generated.ui-ai-check",
+      "description": "Type-check copied Fresh UI AI files",
+      "verdict": "PASS",
+      "durationMs": 661
+    },
+    {
+      "gate": "generated.ai-namespace-check",
+      "description": "Type-check the complete generated AI namespace",
+      "verdict": "PASS",
+      "durationMs": 3330
+    },
+    {
+      "gate": "runtime.auth-smoke-env",
+      "description": "Wire auth smoke environment",
+      "verdict": "PASS",
+      "durationMs": 1802
+    },
+    {
+      "gate": "runtime.flow-b-fixture",
+      "description": "Wire real Flow-B callback fixture",
+      "verdict": "PASS",
+      "durationMs": 2061
+    },
+    {
+      "gate": "runtime.readiness-fixture",
+      "description": "Wire dead-port readiness fixture",
+      "verdict": "PASS",
+      "durationMs": 87
+    },
+    {
+      "gate": "runtime.aspire-start",
+      "description": "Start generated Aspire AppHost",
+      "verdict": "PASS",
+      "durationMs": 77493
+    },
+    {
+      "gate": "database.init",
+      "description": "Initialize generated database",
+      "verdict": "PASS",
+      "durationMs": 11047
+    },
+    {
+      "gate": "database.migration-artifacts",
+      "description": "Create and verify headless and TTY migration artifacts",
+      "verdict": "PASS",
+      "durationMs": 31335
+    },
+    {
+      "gate": "database.generate",
+      "description": "Generate database clients",
+      "verdict": "PASS",
+      "durationMs": 5991
+    },
+    {
+      "gate": "database.seed",
+      "description": "Seed generated database",
+      "verdict": "PASS",
+      "durationMs": 2373
+    },
+    {
+      "gate": "runtime.capture-db-allocation-first",
+      "description": "Capture first live database allocation",
+      "verdict": "PASS",
+      "durationMs": 627
+    },
+    {
+      "gate": "runtime.aspire-restart-after-db",
+      "description": "Exercise typed database command and refresh background runtimes",
+      "verdict": "PASS",
+      "durationMs": 4495
+    },
+    {
+      "gate": "runtime.capture-db-allocation-second",
+      "description": "Capture second live database allocation",
+      "verdict": "PASS",
+      "durationMs": 623
+    },
+    {
+      "gate": "runtime.aspire-describe",
+      "description": "Refresh generated topology after database commands",
+      "verdict": "PASS",
+      "durationMs": 352
+    },
+    {
+      "gate": "runtime.wait.postgres",
+      "description": "Assert postgres listener health",
+      "verdict": "PASS",
+      "durationMs": 75
+    },
+    {
+      "gate": "runtime.wait.garnet",
+      "description": "Assert garnet listener health",
+      "verdict": "PASS",
+      "durationMs": 76
+    },
+    {
+      "gate": "runtime.wait.workers-api",
+      "description": "Assert workers-api convergence",
+      "verdict": "PASS",
+      "durationMs": 72
+    },
+    {
+      "gate": "runtime.wait.workers",
+      "description": "Assert workers convergence",
+      "verdict": "PASS",
+      "durationMs": 78
+    },
+    {
+      "gate": "runtime.wait.sagas-api",
+      "description": "Assert sagas-api convergence",
+      "verdict": "PASS",
+      "durationMs": 81
+    },
+    {
+      "gate": "runtime.wait.sagas",
+      "description": "Assert sagas convergence",
+      "verdict": "PASS",
+      "durationMs": 73
+    },
+    {
+      "gate": "runtime.wait.triggers-api",
+      "description": "Assert triggers-api convergence",
+      "verdict": "PASS",
+      "durationMs": 71
+    },
+    {
+      "gate": "runtime.wait.triggers",
+      "description": "Assert triggers convergence",
+      "verdict": "PASS",
+      "durationMs": 73
+    },
+    {
+      "gate": "runtime.wait.auth",
+      "description": "Assert auth convergence",
+      "verdict": "PASS",
+      "durationMs": 75
+    },
+    {
+      "gate": "runtime.wait.streams",
+      "description": "Assert streams convergence",
+      "verdict": "PASS",
+      "durationMs": 73
+    },
+    {
+      "gate": "runtime.wait.app",
+      "description": "Wait for the project-derived Fresh app",
+      "verdict": "PASS",
+      "durationMs": 76
+    },
+    {
+      "gate": "agent.aspire-mcp-smoke",
+      "description": "Verify Aspire MCP tool, visibility, and redaction contract",
+      "verdict": "PASS",
+      "durationMs": 15121
+    },
+    {
+      "gate": "runtime.health.listener-unreachable",
+      "description": "Backing-service listeners fail unhealthy and recover",
+      "verdict": "PASS",
+      "durationMs": 35974
+    },
+    {
+      "gate": "runtime.typed-db-phase-b",
+      "description": "Verify typed database commands and bounded unhealthy wait",
+      "verdict": "PASS",
+      "durationMs": 43250
+    },
+    {
+      "gate": "behavior.db-status-preserves-apphost",
+      "description": "DB status preserves resident AppHost identity",
+      "verdict": "PASS",
+      "durationMs": 8565
+    },
+    {
+      "gate": "behavior.endpoint-readiness",
+      "description": "Endpoint-bearing process requires readiness evidence",
+      "verdict": "PASS",
+      "durationMs": 593
+    },
+    {
+      "gate": "behavior.workers-health",
+      "description": "Workers API health",
+      "verdict": "PASS",
+      "durationMs": 352
+    },
+    {
+      "gate": "behavior.workers-jobs",
+      "description": "List worker jobs",
+      "verdict": "PASS",
+      "durationMs": 360
+    },
+    {
+      "gate": "behavior.workers-tasks",
+      "description": "List worker tasks",
+      "verdict": "PASS",
+      "durationMs": 356
+    },
+    {
+      "gate": "behavior.workers-seed",
+      "description": "Seed worker demo data through API",
+      "verdict": "PASS",
+      "durationMs": 361
+    },
+    {
+      "gate": "behavior.workers-trigger-health-job",
+      "description": "Trigger workers plugin health job",
+      "verdict": "PASS",
+      "durationMs": 359
+    },
+    {
+      "gate": "behavior.workers-executions",
+      "description": "List recent worker executions",
+      "verdict": "PASS",
+      "durationMs": 353
+    },
+    {
+      "gate": "behavior.mcp-endpoint-directory",
+      "description": "Follow the documented MCP OpenAPI discovery path",
+      "verdict": "PASS",
+      "durationMs": 5557
+    },
+    {
+      "gate": "behavior.service-health",
+      "description": "Users service health",
+      "verdict": "PASS",
+      "durationMs": 29464
+    },
+    {
+      "gate": "behavior.service-env",
+      "description": "The AppHost-started service process observes its declared environment",
+      "verdict": "PASS",
+      "durationMs": 617
+    },
+    {
+      "gate": "behavior.live-db-endpoint",
+      "description": "Users service uses the live second-start Postgres allocation with correlated telemetry",
+      "verdict": "PASS",
+      "durationMs": 10852
+    },
+    {
+      "gate": "behavior.sagas-health",
+      "description": "Sagas API health",
+      "verdict": "PASS",
+      "durationMs": 371
+    },
+    {
+      "gate": "behavior.sagas-list",
+      "description": "List saga definitions",
+      "verdict": "PASS",
+      "durationMs": 363
+    },
+    {
+      "gate": "behavior.sagas-instances",
+      "description": "List saga instances",
+      "verdict": "PASS",
+      "durationMs": 358
+    },
+    {
+      "gate": "behavior.triggers-health",
+      "description": "Triggers API health",
+      "verdict": "PASS",
+      "durationMs": 350
+    },
+    {
+      "gate": "behavior.triggers-webhook",
+      "description": "Accept generic trigger webhook",
+      "verdict": "PASS",
+      "durationMs": 355
+    },
+    {
+      "gate": "behavior.triggers-events",
+      "description": "List trigger events",
+      "verdict": "PASS",
+      "durationMs": 366
+    },
+    {
+      "gate": "behavior.auth-live",
+      "description": "Auth API liveness",
+      "verdict": "PASS",
+      "durationMs": 358
+    },
+    {
+      "gate": "behavior.auth-ready",
+      "description": "Auth API readiness",
+      "verdict": "PASS",
+      "durationMs": 354
+    },
+    {
+      "gate": "behavior.auth-session",
+      "description": "Read auth session route",
+      "verdict": "PASS",
+      "durationMs": 358
+    },
+    {
+      "gate": "behavior.ai-chat-route",
+      "description": "Import generated AI chat route",
+      "verdict": "PASS",
+      "durationMs": 473
+    },
+    {
+      "gate": "behavior.app-home",
+      "description": "Generated app serves its home page",
+      "verdict": "PASS",
+      "durationMs": 401
+    },
+    {
+      "gate": "behavior.app-dynamic-route",
+      "description": "Generated app binds a dynamic route in plain and partial requests",
+      "verdict": "PASS",
+      "durationMs": 379
+    },
+    {
+      "gate": "behavior.app-reference",
+      "description": "Render canonical app reference states in desktop and mobile browsers",
+      "verdict": "PASS",
+      "durationMs": 20569
+    },
+    {
+      "gate": "behavior.island-served-surface",
+      "description": "Serve the generated route-local island marker and client modules",
+      "verdict": "PASS",
+      "durationMs": 377
+    },
+    {
+      "gate": "behavior.island-hydration",
+      "description": "Hydrate the generated route-local resource QueryIsland",
+      "verdict": "PASS",
+      "durationMs": 2727
+    },
+    {
+      "gate": "behavior.service-client-refetch",
+      "description": "Invalidate the generated resource query and refetch its list once",
+      "verdict": "PASS",
+      "durationMs": 2108
+    },
+    {
+      "gate": "behavior.ui-render",
+      "description": "Render safe nested and fallback generative UI output",
+      "verdict": "PASS",
+      "durationMs": 132
+    },
+    {
+      "gate": "behavior.mcp-widget-roundtrip",
+      "description": "Round-trip an MCP UI resource through the widget renderer",
+      "verdict": "PASS",
+      "durationMs": 1307
+    },
+    {
+      "gate": "behavior.plugins-health",
+      "description": "Check installed plugin health",
+      "verdict": "PASS",
+      "durationMs": 2116
+    },
+    {
+      "gate": "behavior.package-backed-plugin-doctor",
+      "description": "Validate package-backed plugin doctor truth",
+      "verdict": "PASS",
+      "durationMs": 3334
+    },
+    {
+      "gate": "behavior.otel.webhook",
+      "description": "Fire webhook for OTEL trace capture",
+      "verdict": "PASS",
+      "durationMs": 364
+    },
+    {
+      "gate": "behavior.otel.stream-consumer",
+      "description": "Consume real Flow-B stream with fan-in links",
+      "verdict": "PASS",
+      "durationMs": 2165
+    },
+    {
+      "gate": "behavior.otel.traces",
+      "description": "Validate OTEL trace chain via Aspire MCP",
+      "verdict": "PASS",
+      "durationMs": 405
+    },
+    {
+      "gate": "behavior.streams.producer-reconnect",
+      "description": "Recover buffered stream producer writes with correlated OTEL",
+      "verdict": "PASS",
+      "durationMs": 11696
+    },
+    {
+      "gate": "behavior.otel.task-traces",
+      "description": "Validate generated detached Aspire telemetry task",
+      "verdict": "PASS",
+      "durationMs": 1822
+    },
+    {
+      "gate": "runtime.resource-command",
+      "description": "Exercise Aspire resource commands",
+      "verdict": "PASS",
+      "durationMs": 11115
+    },
+    {
+      "gate": "cleanup.aspire-stop",
+      "description": "Stop generated Aspire AppHost",
+      "verdict": "PASS",
+      "durationMs": 6694
+    }
+  ]
+}
