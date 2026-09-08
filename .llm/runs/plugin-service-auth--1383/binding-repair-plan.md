@@ -150,3 +150,18 @@ deno task e2e:cli run scaffold.runtime --cleanup --format pretty      # merge re
 - No owner decision is required: the correction is a technical binding fix inside already-accepted scope
   (#1383 target 5 guarded generation; amendment's contract-authorizer choice). Release, tag and publication
   remain owner-reserved and unauthorized.
+
+
+## Post-implementation dispositions (2026-09-08)
+
+Independent implementation review `evaluate.md` accepted D1: the canonical replacement-prefix
+exemption in `packages/service/src/auth/contract-authorizer.ts` supersedes the test-only source
+restriction for this bounded correction. The native SDK probe's explicit POST method override
+preserves the acceptance assertions and is accepted by that review.
+
+D2 is a coordinator-accepted, narrowly recorded fitness exception in
+`.llm/harness/debt/arch-debt.md`, "packages/plugin contract mount — upstream oRPC doc-lint visibility".
+It supersedes the zero-new-findings requirement only for the two measured upstream privateTypeRef
+findings. The raw doc-lint comparison stays FAIL17vs15. No suppression, type erasure, package publish
+exception or release permission is introduced. The closing gate removes both exact findings;
+a baseline reset cannot satisfy it. Independent final recertification remains required.

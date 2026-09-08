@@ -1,0 +1,46 @@
+# Independent implementation evaluation — PR2003 (issue #1383)
+
+- Evaluator: Muse Spark (`opencode-go/muse-spark-1.3-contributor`), new independent session — not planner family/session (Anthropic), not coordinator/author (OpenAI), not the cycle-3 binding evaluator's repair session.
+- Reviewed HEAD: `62bcb7ed15cbbf98dae4af0a7a1bc6747d8d32d8` (working tree clean apart from two untracked launcher files; no source changes or runtime mutations by evaluator).
+- Base: `6d6b3057f28e5edf1b55ff911c131c71c64dc919`. Plan composite: `plan.md` (rev.2) + `plan-amendment-1.md` + `binding-repair-plan.md` as repaired in `binding-inflight-eval.md` (final `PASS`).
+- Scope evaluated: shared guarded/public policy, mandatory factory configuration, explicit first-party public migration, guarded greenfield CLI generation. Not first-party guarded adoption, not Cockpit/Mobile delivery, not release/publication.
+
+## Verdict
+
+**FAIL_DEBT** — behaviorally complete and correct at HEAD; one plan gate is honestly unmet (doc-lint 15→17 on the touched surface) with no verified sound fix, requiring a narrowly recorded debt entry (specified below) before merge. No source repair needed for behavior; debt acceptance is coordinator/owner authority.
+
+## Independent test receipts (evaluator-run at HEAD, no mutations)
+
+| Check | Result |
+| --- | --- |
+| `run-deno-check.ts` over `packages/service/src/auth`, `packages/plugin/src/contract-base`, `packages/plugin/src/service` | 21 files, 0 findings |
+| `run-deno-test.ts` `packages/service/tests/auth` + mount/factory-auth/soundness/policy tests | 88 passed, 0 failed |
+| `run-deno-test.ts` `packages/cli/src/public/features/plugins/new` | 7 passed, 0 failed |
+| `run-deno-lint.ts` / `run-deno-fmt.ts` same roots | 0 findings |
+| `deno publish --dry-run` `packages/plugin` (no `--allow-slow-types`) | Success |
+| `deno doc --lint ./src/contract-base/mod.ts` | reproduces exactly the 2 new `private-type-ref` findings (upstream `AnyContractRouter`, `EnhancedContractRouter`) |
+| `deno doc --lint` `packages/service` wrapper | 0 errors |
+
+Adopted coordinator receipts (read, not re-run): `s5-runtime-PASS.json` (18/18 scaffold.plugins, all 7 probe assertions), `s6-runtime-receipt.json` (104/104 scaffold.runtime at source `6b25dc4fc`, exit 0), `s5a-regression-tests.json` (94 passed), `s2-s3-verification.json` (337 passed, doc-lint 15=15 at that stage), `s6-generation-receipt.json` (publish dry-run + all carriers exit 0). Post-runtime product diff `6b25dc4fc..HEAD` is only generated carriers (`export-surface-corpus.generated.ts`, `publish-assets.generated.ts`) and `packages/plugin/README.md` — no runtime-source drift under the runtime receipt. No duplicate expensive suite started.
+
+## Findings (all source-backed)
+
+1. **Mandatory policy + native passthrough — MET.** `PluginServiceConfig.auth` is required; `assertServiceAuthPolicy(config.auth)` runs before build/listen and guarded options pass to `withAuthn`/`withAuthz` unchanged after `withContext`, before `withRPC` [observed - `packages/plugin/src/service/presentation/create-plugin-service.ts:146,176-199`]. The 35-row rejection table (missing/malformed/mixed shapes, non-literal `public`, `authn: undefined` keys, non-callable ports, whitespace reasons, no serialized caller data) is tested through the shared validator, the JS `deno eval` boundary, and soundness fixtures [observed - `packages/service/tests/auth/service-auth-policy_test.ts:28-80`, `.../create-plugin-service-auth_test.ts:160-196`].
+2. **Guard ordering / health / raw-route semantics — MET and truthful.** Health stays anonymous via native builder order (health registered before `installAuth`); raw routes install after and are guarded; OpenAPI is 401 by default with native replace-semantics test [observed - factory test `preserves native health routes and anonymous-prefix replacement`]. Guard-ordering regression (authenticator called, handler not entered) and redacted 503 verifier failure covered [observed - same file].
+3. **Procedure metadata, not HTTP method — MET.** Generated contract annotates `describe` and `list` with `access: { authentication: 'required', authorization: { scopes: ['<name>:read'] } }` on canonical `baseContract` metadata types; generated main uses `createContractAuthorizer` over the mounted contract; no method→scope inference [observed - `new-plugin-use-case.ts` `coreContractSource`/`connectorServiceMainSource`]. Probe proves same read session 200 over REST GET and native SDK RPC with `transportPolicy.method` pinned to POST and asserts the actual RPC path `/api/rpc/v1/guarded-fixture/listGuardedFixtures` + POST method — strengthened, not relaxed [observed - `guarded-plugin-probe-source.ts:80-110`]. Write-only session 403, invalid/revoked 401, verifier-down 503, health 200 all asserted.
+4. **Mount geometry — MET.** One `<CAMEL>_CONTRACT_MOUNT` constant feeds both `.assemble({...mount, handlers})` and `mountPluginContract(definition, mount)`; `PluginContractAssemblyConfig extends PluginContractMount` gives one coordinate authority [observed - `new-plugin-use-case.ts:connectorServiceHandlersSource`, `plugin-contract-binder.ts:50-55`]. Generated connector uses native specifiers (`plugin-auth` key added to `JSR_SPECIFIERS`), native session authenticator, manifest `auth` dependency with test assertion. Canonical + deprecated RPC alignment covered incl. negative paths; unmatched stays denied [observed - `contract-authorizer_test.ts` new case].
+5. **First-party migration — MET as recorded opt-out, not guarded acceptance.** All five mains declare `{ public: true, reason }` naming the pending guarantees; reasons do not certify signout/guarded posture [observed - `plugins/{auth,workers,sagas,triggers,streams}/services/src/main.ts`]. README/reference/authoring docs carry both-posture migration snippets, native `allowAnonymous` replace semantics, and source-vs-published limits [observed - `packages/plugin/README.md` new section].
+6. **Carriers/freshness — MET except the debt item.** exports-drift PASS, corpus check PASS, publish-assets PASS, jsdoc-examples PASS (366/366), quality gate clean (no ERROR/FAILED; `FAIL=` hits are `FAIL=0` census strings), root lock/deps/versions untouched [observed - `s6-quality.txt`, `s6-exports-drift.txt`, `s6-generation-receipt.json`, empty lock diff].
+
+## Deviation dispositions
+
+**D1. `remapDeprecatedRpcPath` canonical-prefix exemption — ACCEPT (correct, fail-closed, must supersede the amendment's "test-only" line).** Executable evidence showed canonical `/api/rpc/v1/sample/list` rewritten to `/api/rpc/v1/sample/sample/list` because deprecated `pathPrefix /api/rpc/v1/` string-prefix-matches the mounted canonical path. The fix skips remap when the path is within `replacementPrefix`, mirroring the native transport's own canonical-vs-legacy distinction [observed - `packages/service/src/builder/service-rpc.ts:69-77` vs `contract-authorizer.ts:204-219`]. Security: the change only *prevents* a rewrite; unmatched paths still resolve `{ matched: false }` → deny. `isWithinPrefix` is segment-boundary-safe (`/api/rpc/v1/sample-other/list` is not within `/api/rpc/v1/sample/`), and both collision negatives are asserted in the new unit test. This exposes a latent defect in shared service auth code (first real consumer), so the amendment's "no source change in `packages/service`" is superseded for this 4-line hunk only. No new permission or fallback semantics added.
+
+**D2. Doc-lint 15→17 — NO verified sound fix; narrow debt required (the FAIL_DEBT item).** The 2 new `privateTypeRef` findings name actual upstream oRPC public types (`AnyContractRouter`, `EnhancedContractRouter`) referenced by `mountPluginContract`'s signature [observed - `deno doc --lint` output, `s6-doclint-comparison.json` delta on `contract-mount.ts` only]. Coordinator's sound-fix attempt (qualified import spelling) reproduced 17 and was reverted [observed - `s6-doclint-qualified-types.json`, worklog S6]. Remaining alternatives all violate standing rules: type erasure (loses the `ContractPolicyContract` assignability the binding fix exists for), upstream re-export (pollutes the contract-base surface), lint suppression (forbidden). Publish is unblocked (`publish --dry-run` passes without `--allow-slow-types`). The plan's no-new-findings gate is therefore not met and is not waived. Required debt entry (unaccepted — coordinator/owner to record):
+   - reason: upstream oRPC contract types lack doc-visible public alias classification; findings are checker-visibility, not API unsoundness; same category as the 15 accepted baseline findings;
+   - owner: milestone coordinator; target: re-check on oRPC contract minor bump or doc-lint baseline reset, whichever first;
+   - closing gate: `packages/plugin` doc-lint delta ≤ 0 vs the 17 finding set with no suppression/erasure, or removal of `contract-mount.ts` from the public entrypoint graph.
+
+## Limits
+
+Local-source verification only — no published-artifact or installed-consumer proof; first-party services remain recorded-public; #1382 (`defineService`), #1384 (signout authorization), core `access` metadata, and guarded adoption stay open per plan §7. Release/publication unauthorized regardless of verdict. Final certification additionally needs the recorded D2 debt acceptance; nothing else is missing.
