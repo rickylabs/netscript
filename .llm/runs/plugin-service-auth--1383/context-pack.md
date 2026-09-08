@@ -50,3 +50,9 @@ evaluate-2.md PASS at34ba48245. Confirms no product-source drift; accepts narrow
 supersede. PR ready-for-review (draftfalse), statusimpl-eval until final CI/DoD settlement.
 Next commit verdict/receipt/matrix, run native current-head CI/thread gates, complete truthfulDoD,
 move ready-merge only after gates and merge under owner standing authorization. No release.
+
+CI34180424785 failed rootcheck two missed fixtureauth configurations and README snippets3newerrors.
+Fixed test-onlypublicpostures and self-contained README nativeexample. Focused3PASS/readme77checked
+PASS within unchanged7errorbaseline. Fullrootcheck48693 running, outputci-full-check.json.
+Next commit/regenerateMCPcorpus, same evaluator session ses_f8132eca6ffesLYPOVzN00L3HB round3 viafresh
+matrix (write evaluate-3.md), then finalCI andclosegate. Productionruntime unchanged. No release.

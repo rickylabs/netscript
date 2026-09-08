@@ -181,11 +181,23 @@ JavaScript callers receive a `TypeError` for missing or ambiguous policies befor
 constructed. TypeScript callers must migrate their service configuration.
 
 ```ts
-import { createPluginService } from '@netscript/plugin/service';
+import { assemblePluginContractRouter, createPluginService } from '@netscript/plugin/service';
 import { createAuthServiceAuthenticator } from '@netscript/plugin-auth/authenticator';
 import { createContractAuthorizer } from '@netscript/service/auth';
 import { mountPluginContract } from '@netscript/plugin/contract-base';
-import { contract, contractMount, router } from './router.ts';
+import { baseContract, SuccessSchema } from '@netscript/contracts';
+import { implement } from '@orpc/server';
+
+const contract = {
+  list: baseContract.route({ method: 'GET', path: '/reports' }).output(SuccessSchema)
+    .meta({ access: { authentication: 'required', authorization: { scopes: ['reports:read'] } } }),
+};
+const contractMount = { version: 'v1', namespace: 'reports' };
+const implementation = implement(contract);
+const router = assemblePluginContractRouter(implementation, {
+  ...contractMount,
+  handlers: { list: implementation.list.handler(() => ({ success: true })) },
+});
 
 const service = createPluginService(router, {
   name: 'reports',
@@ -211,9 +223,11 @@ and shares it with the authorizer; preserve that single authority when adapting 
 For a deliberately public service, record the reason instead:
 
 ```ts
-const service = createPluginService(router, {
-  name: 'public-status',
-  auth: { public: true, reason: 'Public status API without protected operations' },
+import { createPluginService } from '@netscript/plugin/service';
+
+const service = createPluginService({}, {
+  name: 'public-health',
+  auth: { public: true, reason: 'Public health service without protected operations' },
 });
 ```
 

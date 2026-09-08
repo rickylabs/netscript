@@ -58,7 +58,13 @@ function clientOrigin(hostname: string, port: number): string {
 
 Deno.test('createServiceClient RPC path reaches a plugin-workers triggerJob route', async () => {
   const router = createWorkersStyleRouter();
-  const running = await createPluginService(router.server, { name: ROUTER_NAME }).serve({
+  const running = await createPluginService(router.server, {
+    name: ROUTER_NAME,
+    auth: {
+      public: true,
+      reason: 'Synthetic workers router testing SDK transport rather than access policy',
+    },
+  }).serve({
     port: 0,
   });
   const envKey = createServerServiceEnvKey(SERVICE_NAME);

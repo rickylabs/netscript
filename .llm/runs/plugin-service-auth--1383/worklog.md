@@ -94,3 +94,13 @@ evaluate-2.md PASS at34ba48245. Confirms no product-source drift; accepts narrow
 supersede. PR ready-for-review (draftfalse), statusimpl-eval until final CI/DoD settlement.
 Next commit verdict/receipt/matrix, run native current-head CI/thread gates, complete truthfulDoD,
 move ready-merge only after gates and merge under owner standing authorization. No release.
+
+CI34180424785 at8d34fdfc4 failed real check-test and quality. Downloaded authoritative check.report:
+3159files, two TS2345: SDK workers-trigger RPC fixture and auth-core HTTP verifier fixture omitted
+new requiredauth. Added explicitpublic reasons solely to synthetic test servers. Focused3testsPASS.
+Root check48693 running; receipt ci-full-check.json oncompletion. READMEfences failed10errorsvs7baseline:
+newexamples referenced absentrouter.ts/unboundpublicsnippet variables. Replaced with self-contained
+native assembled-contract example and explicitpublichealth example. Exact readme-fences gatePASS77
+checked,7baseline errors,5baseline READMEs,0exemptions; no gatepolicy changed. Need regenMCPexportcorpus
+and same implementation-evaluator session round3 recertification after CI repairs. Runtime production
+source unchanged, full104PASS retained. No release authority.
