@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "command": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all"
+  ],
+  "cwd": "/home/agent/repos/netscript-plugin-service-auth-policy",
+  "exitCode": 1,
+  "durationMs": 440242,
+  "summary": {
+    "passed": 5361,
+    "failed": 25,
+    "ignored": 19,
+    "totalResults": 5405,
+    "uniqueFailures": 23
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   2\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/run-deno-fmt_test.ts:<line>:<column>",
+      "count": 2,
+      "tests": [
+        {
+          "name": "CLI skips only a marked subtree and still selects its unmarked sibling",
+          "file": "./.llm/tools/run-deno-fmt_test.ts",
+          "line": 303
+        },
+        {
+          "name": "CLI atomically persists its structured format report",
+          "file": "./.llm/tools/run-deno-fmt_test.ts",
+          "line": 481
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   2\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/run-deno-lint_test.ts:<line>:<column>",
+      "count": 2,
+      "tests": [
+        {
+          "name": "CLI skips only a marked subtree and still selects its unmarked sibling",
+          "file": "./.llm/tools/run-deno-lint_test.ts",
+          "line": 215
+        },
+        {
+          "name": "CLI atomically persists its structured lint report",
+          "file": "./.llm/tools/run-deno-lint_test.ts",
+          "line": 388
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Expected error message to include \"candidate count 0 is below floor 35\", but got \"services-sdk/sdk.md: Tier-1 page missing from <cwd>/.llm/tmp/ci-executable-temp/e1ad9061c6436de/docs/site\".\n    at assertIsError (https://jsr.io/@std/assert/1.0.19/is_error.ts:<line>:<column>)\n    at assertRejects (https://jsr.io/@std/assert/1.0.19/rejects.ts:<line>:<column>)\n    at async file://<cwd>/.llm/tools/docs/snippet-extractor_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "real corpus census recognizes TS aliases and enforces Tier-1 invariants",
+          "file": "./.llm/tools/docs/snippet-extractor_test.ts",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: sandbox must not live under .llm/tmp\n    at assert (https://jsr.io/@std/assert/1.0.19/assert.ts:<line>:<column>)\n    at file://<cwd>/packages/bench/tests/local-workspace_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "sandbox seeds agent-visible files but excludes tests/ and reference/",
+          "file": "./packages/bench/tests/local-workspace_test.ts",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal: error: No target files found.\n\n\n\n    [Diff] Actual / Expected\n\n\n-   1\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/plugins/workers/src/adapter/resources/resources.test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "workers install starter job is deno fmt clean",
+          "file": "./plugins/workers/src/adapter/resources/resources.test.ts",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal: missing writer output deno.lock\n\n\n    [Diff] Actual / Expected\n\n\n-   false\n+   true\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/release/github-release_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "version-only diff accepts a realistic coordinated release cut and rejects source drift",
+          "file": "./.llm/tools/release/github-release_test.ts",
+          "line": 482
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/apps/dashboard/deno.json\",\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/deno.json\",\n+     \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/deno.lock\",\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/examples/storefront/deno.json\",\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/packages/cli/e2e/deno.json\",\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/packages/contracts/deno.json\",\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/plugins/workers/deno.json\",\n      \"<cwd>/.llm/tmp/ci-executable-temp/netscript-release-cut-561fac4e9eb9b2d9/plugins/workers/scaffold.plugin.json\",\n    ]\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/release/cut_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "release cut bump coordinator updates root members and lock with no residue",
+          "file": "./.llm/tools/release/cut_test.ts",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n-     \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-stream-order-2c5e87756ea0d3c1/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n-     \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-stream-order-2c5e87756ea0d3c1/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n      \"Error reporting is unavailable in this environment.\",\n    ]\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool selects failure-shaped diagnostics in observed cross-stream order",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-diagnostics-budget_test.ts",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n      actionableStderr: [\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-cross-stream-7ece03e43d5ec8c1/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-cross-stream-7ece03e43d5ec8c1/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n        \"Loaded command configuration from tool.config.ts.\",\n      ],\n      actionableStdout: [\n        \"This headless session could not execute the requested operation.\",\n      ],\n      message: \"This headless session could not execute the requested operation.\",\n      success: false,\n    }\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool promotes a retained stdout failure after a stderr preamble",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
+          "line": 316
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n      actionableStderr: [\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-preamble-d382a18a4c1fb479/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-preamble-d382a18a4c1fb479/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n        \"Loaded command configuration from tool.config.ts.\",\n        \"Error: migration command is not supported in this execution mode.\",\n      ],\n      actionableStdout: [],\n      message: \"Error: migration command is not supported in this execution mode.\",\n      success: false,\n    }\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool promotes a real error after an informational preamble",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
+          "line": 258
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n      actionableStderr: [\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-result-eb654eba97e2b738/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-result-eb654eba97e2b738/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n        \"Seed cause: required fixture users.json was not found.\",\n      ],\n      actionableStdout: [],\n      message: \"Seed cause: required fixture users.json was not found.\",\n      success: false,\n    }\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool request mode writes the bounded typed-command result record",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n-     actionableStderr: [\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-task-operation-b7c07daa790c9a85/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n-       \"Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-task-operation-b7c07daa790c9a85/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\",\n-     ],\n+     actionableStderr: [],\n      actionableStdout: [],\n      message: \"Database migrate completed successfully.\",\n      success: true,\n    }\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool separates the public database action from its task operation",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
+          "line": 213
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   0\n+   1\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/workspace/quality-runner_test.ts:<line>:<column>\n    at async withTempRoots (file://<cwd>/packages/cli/src/kernel/templates/workspace/quality-runner_test.ts:<line>:<column>)\n    at async file://<cwd>/packages/cli/src/kernel/templates/workspace/quality-runner_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "generated quality runner propagates a selected TypeScript failure",
+          "file": "./packages/cli/src/kernel/templates/workspace/quality-runner_test.ts",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   2\n+   0\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/run-deno-check_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "runner atomically persists its structured report and emits a compact pointer",
+          "file": "./.llm/tools/run-deno-check_test.ts",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   false\n+   true\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/deps/bump-version_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "discoverVersionFiles falls back to existing locks outside a Git worktree",
+          "file": "./.llm/tools/deps/bump-version_test.ts",
+          "line": 323
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-ansi-3c6a0a594ac7ac9e/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config./n\n-   Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-ansi-3c6a0a594ac7ac9e/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config./n\n    Seed cause: required fixture users.json was not found.\n\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool persists actionable seed stderr after an ANSI task banner",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   Warning: config file file://<cwd>/.llm/tmp/ci-executable-temp/netscript-run-tool-structured-db4a3606358631ad/deno.json is not a member of the workspace at file://<cwd>/. Ignoring the parent workspace config.\n+   Error: database seed failed\n\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "run-tool retains structured identifiers beyond the actionable stderr head",
+          "file": "./packages/cli/src/kernel/templates/aspire/helpers/tests/run-tool-template_test.ts",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n+   [\n+     \"<cwd>/.llm/tmp/ci-executable-temp/b309b36d5940c208/.llm/assets/agent-docs/provenance.json\",\n+   ]\n-   []\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/generate-publish-assets_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "release asset regeneration removes prior-version provenance residue",
+          "file": "./.llm/tools/generate-publish-assets_test.ts",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n+   [\n+     \"<cwd>/.llm/tmp/ci-executable-temp/ns-fixture-residue-c8b9d2b8b50783ca/stale.json\",\n+   ]\n-   []\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/deps/bump-version_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "findVersionResidue excludes test fixtures that pin prior published releases",
+          "file": "./.llm/tools/deps/bump-version_test.ts",
+          "line": 404
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n+   [\n+     \"<cwd>/.llm/tmp/ci-executable-temp/ns-generated-residue-92d83c07d79abff8/packages/example/src/assets.generated.ts\",\n+   ]\n-   []\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/deps/bump-version_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "findVersionResidue reports stale generated TypeScript and retains deliberate exclusions",
+          "file": "./.llm/tools/deps/bump-version_test.ts",
+          "line": 429
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n+   [\n+     \"<cwd>/.llm/tmp/ci-executable-temp/ns-nested-lock-residue-a8f347133e40a499/packages/example/deno.lock\",\n+   ]\n-   []\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/deps/bump-version_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "findVersionResidue reports a prior release retained in a nested member lock",
+          "file": "./.llm/tools/deps/bump-version_test.ts",
+          "line": 347
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n+   [\n+     \"<cwd>/.llm/tmp/ci-executable-temp/ns-same-core-canary-residue-1c0b0e7c282f037d/stale.json\",\n+   ]\n-   []\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/deps/bump-version_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "findVersionResidue ignores a same-core canary and reports an exact stable residue",
+          "file": "./.llm/tools/deps/bump-version_test.ts",
+          "line": 365
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n+   [\n+     {\n+       line: 1,\n+       path: \"README.md\",\n+     },\n+     {\n+       line: 2,\n+       path: \"docs/reference/nested/api.md\",\n+     },\n+     {\n+       line: 1,\n+       path: \"docs/site/guide.md\",\n+     },\n+   ]\n-   []\n\n    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:<line>:<column>)\n    at file://<cwd>/.llm/tools/release/preflight-release_test.ts:<line>:<column>",
+      "count": 1,
+      "tests": [
+        {
+          "name": "markdown preflight blocks stale normal and prerelease pins across docs",
+          "file": "./.llm/tools/release/preflight-release_test.ts",
+          "line": 70
+        }
+      ]
+    }
+  ]
+}
