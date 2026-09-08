@@ -6,6 +6,7 @@
 
 import { type AnyRouter, os } from '@orpc/server';
 import type { ServiceRouter } from '@netscript/service';
+import type { PluginContractMount } from '../../contract-base/domain/contract-mount.ts';
 
 const pluginRpcRouters = new WeakMap<object, ServiceRouter>();
 
@@ -49,11 +50,7 @@ export type PluginContractHandlers<
 export interface PluginContractAssemblyConfig<
   TRouter extends PluginContractRouter,
   TRoute extends PluginContractRouteKey<TRouter>,
-> {
-  /** Contract version label without a leading slash, for example `v1`. */
-  readonly version: string;
-  /** Plugin route segment mounted below the version, for example `workers`. */
-  readonly namespace: string;
+> extends PluginContractMount {
   /** Contract-bound handler map. */
   readonly handlers: PluginContractHandlers<TRouter, TRoute>;
 }

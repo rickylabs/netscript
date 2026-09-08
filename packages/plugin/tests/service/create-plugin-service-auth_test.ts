@@ -3,6 +3,7 @@ import { baseContract, SuccessSchema } from '@netscript/contracts';
 import { implement, os } from '@orpc/server';
 import {
   type AuthenticatorPort,
+  createContractAuthorizer,
   createScopeAuthorizer,
   createStaticCredentialAuthenticator,
 } from '@netscript/service/auth';
@@ -11,6 +12,41 @@ import {
   createPluginService,
   type PluginServiceConfig,
 } from '../../src/service/mod.ts';
+import { mountPluginContract } from '../../src/contract-base/mod.ts';
+
+Deno.test('mounted contract authorizes assembled REST, RPC and compatibility RPC from procedure scopes', async () => {
+  const definition = {
+    list: baseContract.route({ method: 'GET', path: '/items' }).output(SuccessSchema)
+      .meta({ access: { authentication: 'required', authorization: { scopes: ['sample:read'] } } }),
+  };
+  const mount = { version: 'v1', namespace: 'sample' };
+  const implementation = implement(definition);
+  const handlers = { list: implementation.list.handler(() => ({ success: true })) };
+  const router = assemblePluginContractRouter(implementation, { ...mount, handlers });
+  const app = createPluginService(router, {
+    name: 'sample',
+    auth: {
+      authn: { authenticator },
+      authz: { authorizer: createContractAuthorizer(mountPluginContract(definition, mount)) },
+    },
+  }).build();
+  for (
+    const [path, method] of [
+      ['/api/v1/sample/items', 'GET'],
+      ['/api/rpc/v1/sample/list', 'POST'],
+      ['/api/rpc/v1/list', 'POST'],
+    ]
+  ) {
+    for (const [token, status] of [['read', 200], ['write', 403]] as const) {
+      const response = await app.request(path, {
+        method,
+        headers: { authorization: `Bearer ${token}` },
+      });
+      assertEquals(response.status, status, `${method} ${path} ${token}`);
+      await response.arrayBuffer();
+    }
+  }
+});
 
 const contract = {
   list: baseContract.route({ method: 'GET', path: '/items' }).output(SuccessSchema),

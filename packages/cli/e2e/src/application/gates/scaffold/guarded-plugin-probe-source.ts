@@ -81,6 +81,7 @@ try {
       contract: guardedFixtureContractDefinition,
       serviceName: 'guarded-fixture', routerName: 'guarded-fixture',
       propagateTraceContext: false, contributions: [bearer] as const,
+      transportPolicy: { method: () => 'POST' },
     });
     const read = (accessToken: string) => client.listGuardedFixtures(undefined, { context: { accessToken } });
     const rest = async (token: string | undefined, expected: number) => {

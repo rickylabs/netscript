@@ -16,6 +16,38 @@ const principal: Principal = {
   claims: {},
 };
 
+Deno.test('contract resolver preserves canonical mounted RPC paths and remaps only legacy paths', () => {
+  const flat = {
+    list: baseContract.route({ method: 'GET', path: '/items' }).output(SuccessSchema)
+      .meta({ access: { authentication: 'required', authorization: { scopes: ['items:read'] } } }),
+  };
+  const resolver = createContractAuthorizer({
+    v1: { sample: baseContract.prefix('/v1/sample').router(flat) },
+  })
+    .bind({
+      apiPath: '/api',
+      rpcPath: '/api/rpc',
+      deprecatedRpcRoutes: [{
+        pathPrefix: '/api/rpc/v1/',
+        replacementPrefix: '/api/rpc/v1/sample/',
+      }],
+    });
+  const expected: ProcedurePolicyResolution = {
+    matched: true,
+    policy: { authentication: 'required', requiredScopes: ['items:read'], requiredRoles: [] },
+  };
+  for (
+    const [path, method] of [
+      ['/api/v1/sample/items', 'GET'],
+      ['/api/rpc/v1/sample/list', 'POST'],
+      ['/api/rpc/v1/list', 'POST'],
+    ]
+  ) assertEquals(resolver.resolve({ path, method }), expected, path);
+  for (const path of ['/api/rpc/v1/sample/missing', '/api/rpc/v1/sample-other/list']) {
+    assertEquals(resolver.resolve({ path, method: 'POST' }), { matched: false });
+  }
+});
+
 function request(
   path: string,
   principalOverride: Principal = principal,

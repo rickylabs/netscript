@@ -121,8 +121,9 @@ The future evaluator must be independent of both the Anthropic planner and the O
 5. **S5 probe unchanged**: regenerate with the public CLI, `generate plugins`, scoped check of the 22 files,
    then the native session lifecycle: REST 200 and typed-SDK RPC 200 with the `guarded-fixture:read` session
    (asserting the RPC request path/method), 403 for the write-only session on both, 401 anonymous/invalid/
-   revoked, 503 with the auth service stopped, `/health` 200. Receipt replaces `s5-runtime-finding.json`
-   with a PASS record only if every assertion holds.
+   revoked, 503 with the auth service stopped, `/health` 200. On success write the PASS record to a
+   separately named receipt `s5-runtime-PASS.json`; `s5-runtime-finding.json` (the FAIL record) is
+   preserved unmodified and never overwritten — only if every assertion holds.
 
 ```text
 deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin --root packages/service --root packages/cli/src/public/features/plugins/new --ext ts
@@ -130,6 +131,12 @@ deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- -
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin --ext ts && deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin --ext ts
 deno task quality:gate && deno task check:netscript-jsr-specifiers
 deno task doc:lint --root packages/plugin --pretty && (cd packages/plugin && deno publish --dry-run --allow-dirty)
+# Doc-lint baseline comparison (required, honest): full `packages/plugin` doc-lint currently reports 15
+# baseline findings (`s2-doclint-baseline.json`: totalErrors 15, all privateTypeRef). After the change,
+# re-run the same wrapper and compare finding counts by file/count against that baseline receipt: PASS
+# requires no new findings on the touched surface (`contract-base/domain/contract-mount.ts`, `mod.ts`,
+# `plugin-contract-binder.ts`) and no increase in the package total. The pre-existing 15 baseline findings
+# stay FAIL-truthful — this gate never claims a whole-package doc-lint PASS.
 deno task gen:mcp-export-corpus && deno task check:mcp-export-corpus && deno task docs:exports-drift && deno task docs:jsdoc-examples
 deno task e2e:cli run scaffold.plugins --cleanup --format pretty      # carries the S5 generated guarded-plugin probe
 deno task e2e:cli run scaffold.runtime --cleanup --format pretty      # merge readiness, unchanged requirement

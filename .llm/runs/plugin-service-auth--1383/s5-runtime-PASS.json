@@ -1,0 +1,31 @@
+{
+  "verdict": "PASS",
+  "scope": "local-source generated guarded plugin; not published-artifact or Cockpit/Mobile integration",
+  "command": "DOCKER_HOST=tcp://netscript-dind:2375 deno task e2e:cli run scaffold.plugins --cleanup --format pretty",
+  "exitCode": 0,
+  "gates": {
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0
+  },
+  "logPath": "/tmp/cockpit-s5-scaffold-plugins-2.log",
+  "logSha256": "b2038fa08991acff1e6c7ee9e6369614e1c291f2a330402a2c3044669df344b8",
+  "sourceSha256": {
+    "packages/plugin/src/contract-base/domain/contract-mount.ts": "56c3db071c44a9060981e9b9a5206fde099038a5e1e8b72e64b5511ccc828fc8",
+    "packages/plugin/src/contract-base/mod.ts": "cefd90e0d84e7c88668592e1e5a2d6528ebbd47ed7b5db4eb45a44fe133da8cd",
+    "packages/plugin/src/service/presentation/plugin-contract-binder.ts": "64b64cb4a3a87f81614630769939cbc91d3fbda9440a98ce5e6b5d5813a1194a",
+    "packages/service/src/auth/contract-authorizer.ts": "6f51f028c31c31977106d1ab60925e521d75a73b58c713352d05739788fcff33",
+    "packages/cli/src/public/features/plugins/new/new-plugin-use-case.ts": "0bbddc1f364686cb0cc01d257d89d85916982e4e7ac9ff840bb7220b6d187f1b",
+    "packages/cli/e2e/src/application/gates/scaffold/guarded-plugin-probe-source.ts": "cc1bfd2e9bdd73e415011c516b46ec0e289d4ea021846ff5f0bd18d4fcb839c2"
+  },
+  "assertions": [
+    "REST reader200",
+    "native SDK POST reader200",
+    "invalid401",
+    "write-only403",
+    "revoked401",
+    "verifier unavailable503",
+    "health200"
+  ],
+  "priorFailurePreserved": "s5-runtime-finding.json"
+}

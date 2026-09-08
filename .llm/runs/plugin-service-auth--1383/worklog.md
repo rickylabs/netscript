@@ -53,3 +53,17 @@ Original planner84113 terminal exit0; binding-repair-plan.md returned native con
 ## 2026-09-08 — cycle-three in-flight repair correction
 
 Evaluator55971 terminal exit0; binding-repair-eval FAIL_FIX confirms technical repair, only receipt preservation and explicit15-finding doc-lint comparison remain. Coordinator prior brief incorrectly prohibited the matrix-mandated fixable-plan edit on cycle3. Returning same evaluator for scoped in-flight F1/F2 repair and certification, not resetting/incrementing a fourth review cycle. Owner informed in commentary. Two inspection-only lock entries (exactcontract1.15.0,zod4) preserved as patch and removed; no dependency change intended, no broad lock reset.
+
+## Binding implementation checkpoint — 2026-09-08
+
+Independent cycle-three in-flight plan repair PASS is in binding-inflight-eval.md; prior FAIL_FIX remains preserved. Implemented contract-side mount, shared assembly coordinates and generated constant.
+
+Executable evidence discovered a plan assumption was false: authorizer remapDeprecatedRpcPath rewrote canonical /api/rpc/v1/sample/list to /api/rpc/v1/sample/sample/list. New assembled-router test initially passed 7 and failed 1 (RPC403 vs200). The bounded correction excludes the canonical replacement prefix, matching the native transport distinction in packages/service/src/builder/service-rpc.ts:70-75. This expands the amendment's test-only service scope to a small runtime fix; independent implementation review must explicitly inspect this deviation. No new permission or fallback semantics. [observed - packages/service/src/auth/contract-authorizer.ts remapDeprecatedRpcPath; packages/plugin/tests/service/create-plugin-service-auth_test.ts mounted contract case]
+
+The service test's first compile failed because @orpc/contract is not a service dependency (s5a-binding-tests.json). Reused existing baseContract.prefix instead, with no dependency addition. Focused14 tests PASS (s5a-binding-tests-2.json), broader94 tests PASS (s5a-regression-tests.json).
+
+Reused generated workspace retained an old framework copy and failed export checking (/tmp/cockpit-s5-probe-4.log). Fresh native scaffold.plugins passed17/failed1: authorized REST and SDK reads succeeded, but probe expected POST while native contract-derived method was GET. Probe now explicitly sets native transportPolicy.method to POST, preserving every assertion. Source authority packages/sdk/src/internal/transport-policy.ts and packages/sdk/tests/transport-policy_test.ts. No SDK product change. Full fresh suite rerun process56221, log /tmp/cockpit-s5-scaffold-plugins-2.log. Typecheck process73016. Poll these exact handles, never infer completion.
+
+No release, tag, canary or publication authorized. Full runtime, doc-lint baseline comparison, generated documentation carriers, independent IMPL-EVAL and exact-headCI remain required. No Cockpit installed artifact or live attention/Mobile compatibility is claimed.
+
+Processes56221/73016 TERMINAL exit0. Fresh scaffold.plugins18/18 PASS, check11filesPASS, scopedlintPASS. Durable success s5-runtime-PASS.json; original failure preserved. S6 documentation/carriers/doc-lint baseline, full runtime, independent implementation review and exact-headCI remain next.

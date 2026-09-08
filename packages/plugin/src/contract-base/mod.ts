@@ -39,3 +39,4 @@ export {
   type BasePluginDescribeProcedure,
   type BasePluginDescribeRoute,
 } from './domain/base-contract.ts';
+export { mountPluginContract, type PluginContractMount } from './domain/contract-mount.ts';

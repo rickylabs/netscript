@@ -163,7 +163,16 @@ for (const localSource of [false, true]) {
       main,
       "createAuthServiceAuthenticator({ serviceName: 'auth', timeoutMs: 10_000 })",
     );
-    assertStringIncludes(main, 'createContractAuthorizer(billingContractDefinition)');
+    assertStringIncludes(
+      main,
+      'createContractAuthorizer(mountPluginContract(billingContractDefinition, billingContractMount))',
+    );
+    const handlers = await fs.readFile('/workspace/app/plugins/billing/services/src/handlers.ts');
+    assertStringIncludes(
+      handlers,
+      "billingContractMount: PluginContractMount = { version: 'v1', namespace: 'billing' }",
+    );
+    assertStringIncludes(handlers, '...billingContractMount,');
     const manifest = await fs.readFile('/workspace/app/plugins/billing/mod.ts');
     assertStringIncludes(manifest, '.withDependencies({ auth: authPlugin })');
     const contract = await fs.readFile(
