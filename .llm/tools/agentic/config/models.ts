@@ -66,6 +66,7 @@ export const ROUTING_MODEL_IDS = {
   glm53OpenRouter: 'openrouter/z-ai/glm-5.3',
   museSpark13Go: 'opencode-go/muse-spark-1.3-contributor',
   museSpark13OpenRouter: 'openrouter/meta/muse-spark-1.3-contributor',
+  museSpark13StandardOpenRouter: 'openrouter/meta/muse-spark-1.3',
   minimaxM3Go: 'opencode-go/minimax-m3',
   minimaxM3Ollama: 'ollama-cloud/minimax-m3',
   minimaxM3OpenRouter: 'openrouter/minimax/minimax-m3',

@@ -168,6 +168,11 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     capabilities: [
       capability('opencode_go', ROUTING_MODEL_IDS.museSpark13Go),
       capability('openrouter', ROUTING_MODEL_IDS.museSpark13OpenRouter),
+      // The contributor tier is described by its vendor as suited to
+      // experimentation and early-stage work; the standard tier is the one
+      // described for long-running agentic and coding workflows. Both are
+      // declared so a route can pick deliberately rather than by price alone.
+      capability('openrouter', ROUTING_MODEL_IDS.museSpark13StandardOpenRouter),
     ],
   },
   minimax_m3: {
