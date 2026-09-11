@@ -18,6 +18,7 @@ export const LOGICAL_MODEL_IDS = [
   'minimax_m3',
   'deepseek_v4_flash',
   'deepseek_v4_1_flash',
+  'grok_4_20',
   'deepseek_v4_flash_vision',
   'deepseek_v4_pro',
   'kimi_k3',
@@ -41,6 +42,7 @@ export const LOGICAL_MODEL_LABELS: Readonly<Record<LogicalModelId, string>> = {
   minimax_m3: 'MiniMax M3',
   deepseek_v4_flash: 'DeepSeek V4 Flash',
   deepseek_v4_1_flash: 'DeepSeek V4.1 Flash',
+  grok_4_20: 'Grok 4.20',
   deepseek_v4_flash_vision: 'DeepSeek V4 Flash Vision',
   deepseek_v4_pro: 'DeepSeek V4 Pro',
   kimi_k3: 'Kimi K3',
@@ -191,6 +193,13 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
       capability('opencode_go', ROUTING_MODEL_IDS.deepseekV4FlashGo),
       capability('ollama', ROUTING_MODEL_IDS.deepseekV4FlashOllama),
       capability('openrouter', ROUTING_MODEL_IDS.deepseekV4FlashOpenRouter),
+    ],
+  },
+  grok_4_20: {
+    id: 'grok_4_20',
+    family: 'xai',
+    capabilities: [
+      capability('openrouter', ROUTING_MODEL_IDS.grok420OpenRouter),
     ],
   },
   deepseek_v4_1_flash: {
