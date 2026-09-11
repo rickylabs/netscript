@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import { COPILOT_CATALOG_FIXTURE } from '../runtime/test-fixtures.ts';
@@ -539,4 +539,30 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
   );
   assertEquals(fetchCalls, 0);
   assertEquals(spawnCalls, 0);
+});
+
+Deno.test('opencodeRunArguments forwards --dir so the lane runs in the target repository', () => {
+  const args = opencodeRunArguments({
+    message: 'work',
+    model: 'openrouter/deepseek/deepseek-v4.1-flash',
+    variant: 'provider_default',
+    cwd: '/home/agent/projects/autocorner/worktrees/example',
+  });
+
+  // The spawn already sets cwd; OpenCode resolves its own project root and
+  // ignores it, so a launch aimed at another repository silently ran against
+  // the launcher's repository instead.
+  const index = args.indexOf('--dir');
+  assert(index !== -1, '--dir must be forwarded');
+  assertEquals(args[index + 1], '/home/agent/projects/autocorner/worktrees/example');
+});
+
+Deno.test('opencodeRunArguments omits --dir when no working directory is given', () => {
+  const args = opencodeRunArguments({
+    message: 'work',
+    model: 'openrouter/deepseek/deepseek-v4.1-flash',
+    variant: 'provider_default',
+  });
+
+  assertEquals(args.includes('--dir'), false);
 });

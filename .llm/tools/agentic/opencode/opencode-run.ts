@@ -107,6 +107,10 @@ export function opencodeRunArguments(options: OpenCodeRunOptions): string[] {
     options.message,
     '-m',
     options.model,
+    // The spawn sets `cwd`, but OpenCode resolves its project root itself and
+    // ignores the process working directory — without this a launch aimed at
+    // another repository runs against whichever project OpenCode picks.
+    ...(options.cwd ? ['--dir', options.cwd] : []),
     ...(!copilot || options.variant !== 'provider_default' ? ['--variant', options.variant] : []),
     ...(options.session ? ['--session', options.session] : []),
     ...(options.files ?? []).flatMap((file) => ['-f', file]),
