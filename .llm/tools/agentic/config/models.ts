@@ -72,6 +72,7 @@ export const ROUTING_MODEL_IDS = {
   deepseekV4FlashGo: 'opencode-go/deepseek-v4-flash',
   deepseekV4FlashOllama: 'ollama-cloud/deepseek-v4-flash:0731',
   deepseekV4FlashOpenRouter: 'openrouter/deepseek/deepseek-v4-flash-0731',
+  deepseekV41FlashOpenRouter: 'openrouter/deepseek/deepseek-v4.1-flash',
   deepseekV4FlashVisionGo: 'opencode-go/deepseek-v4-flash-vision-exp',
   deepseekV4FlashVisionOpenRouter: 'openrouter/deepseek/deepseek-v4-flash-vision-exp',
   deepseekV4ProGo: 'opencode-go/deepseek-v4-pro',

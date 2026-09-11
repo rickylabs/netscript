@@ -17,6 +17,7 @@ export const LOGICAL_MODEL_IDS = [
   'muse_spark_1_3',
   'minimax_m3',
   'deepseek_v4_flash',
+  'deepseek_v4_1_flash',
   'deepseek_v4_flash_vision',
   'deepseek_v4_pro',
   'kimi_k3',
@@ -39,6 +40,7 @@ export const LOGICAL_MODEL_LABELS: Readonly<Record<LogicalModelId, string>> = {
   muse_spark_1_3: 'Muse Spark 1.3',
   minimax_m3: 'MiniMax M3',
   deepseek_v4_flash: 'DeepSeek V4 Flash',
+  deepseek_v4_1_flash: 'DeepSeek V4.1 Flash',
   deepseek_v4_flash_vision: 'DeepSeek V4 Flash Vision',
   deepseek_v4_pro: 'DeepSeek V4 Pro',
   kimi_k3: 'Kimi K3',
@@ -184,6 +186,13 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
       capability('opencode_go', ROUTING_MODEL_IDS.deepseekV4FlashGo),
       capability('ollama', ROUTING_MODEL_IDS.deepseekV4FlashOllama),
       capability('openrouter', ROUTING_MODEL_IDS.deepseekV4FlashOpenRouter),
+    ],
+  },
+  deepseek_v4_1_flash: {
+    id: 'deepseek_v4_1_flash',
+    family: 'deepseek',
+    capabilities: [
+      capability('openrouter', ROUTING_MODEL_IDS.deepseekV41FlashOpenRouter),
     ],
   },
   deepseek_v4_flash_vision: {
