@@ -57,7 +57,7 @@ export const ROUTING_MODEL_IDS = {
   qwen38FlashNextGo: 'opencode-go/qwen3.8-flash',
   qwen38FlashNextOpenRouter: 'openrouter/qwen/qwen3.8-flash',
   qwen38MaxGo: 'opencode-go/qwen3.8-max',
-  qwen38MaxOpenRouter: 'openrouter/qwen/qwen3.8-max',
+  qwen38MaxOpenRouter: 'openrouter/qwen/qwen3.8-max-0902',
   glm53FlashGo: 'opencode-go/glm-5.3-flash',
   glm53FlashOllama: 'ollama-cloud/glm-5.3-flash',
   glm53FlashOpenRouter: 'openrouter/z-ai/glm-5.3-flash',
