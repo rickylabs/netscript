@@ -157,6 +157,15 @@ export async function createKvOAuthBackend(
   };
 }
 
+/**
+ * Bounded compare-and-set attempts for a revocation that keeps losing to concurrent writers.
+ *
+ * Revocation is the operator's intent to end a session, so it re-reads and retries instead of
+ * conceding to a concurrent refresh. The bound keeps a pathological writer from looping forever;
+ * exhausting it raises `revoke_conflict` rather than acknowledging an unpersisted revocation.
+ */
+const REVOKE_MAX_ATTEMPTS = 5;
+
 function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegistryPort {
   const descriptor = describeProvider(provider);
   return {
@@ -213,22 +222,41 @@ function createSessionStore(
       };
       const rotated = await store.rotateSession(sessionId, { ...record, session: refreshed });
       if (!rotated) {
-        throw new Error(`Session ${sessionId} could not be refreshed due to a concurrent update.`);
+        throw new KvOAuthError(
+          'refresh_failed',
+          `Session ${sessionId} could not be refreshed due to a concurrent update.`,
+        );
       }
       return refreshed;
     },
     async revokeSession(sessionId: string): Promise<AuthSession> {
-      const record = await store.getSession(sessionId);
-      if (!record) {
-        throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
+      let observed: AuthSession | undefined;
+      for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
+        const record = await store.getSession(sessionId);
+        if (!record) {
+          if (!observed) {
+            throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
+          }
+          // The record was deleted while revoking; no authority survives, so report the revocation.
+          return { ...observed, state: 'revoked', revokedAt: new Date().toISOString() };
+        }
+        if (record.session.state === 'revoked') {
+          return record.session;
+        }
+        observed = record.session;
+        const revoked: AuthSession = {
+          ...record.session,
+          state: 'revoked',
+          revokedAt: new Date().toISOString(),
+        };
+        if (await store.rotateSession(sessionId, { ...record, session: revoked })) {
+          return revoked;
+        }
       }
-      const revoked: AuthSession = {
-        ...record.session,
-        state: 'revoked',
-        revokedAt: new Date().toISOString(),
-      };
-      await store.rotateSession(sessionId, { ...record, session: revoked });
-      return revoked;
+      throw new KvOAuthError(
+        'revoke_conflict',
+        `Session ${sessionId} could not be revoked after ${REVOKE_MAX_ATTEMPTS} attempts because concurrent updates kept winning the compare-and-set.`,
+      );
     },
   };
 }
