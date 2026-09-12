@@ -18,6 +18,7 @@ export type KvOAuthErrorCode =
   | 'token_exchange_failed'
   | 'refresh_failed'
   | 'refresh_reuse_detected'
+  | 'revoke_conflict'
   | 'return_to_not_allowed'
   | 'session_not_found'
   | 'configuration_error'

@@ -28,6 +28,10 @@ plaintext tokens are never written.
 - **KV-backed sessions** — `createKvOAuthStore()` persists transactions and sessions in
   `@netscript/kv` `WatchableKv` using typed key tuples, TTLs, and atomic CAS for refresh-on-read
   rotation.
+- **Revocation that agrees with the store** — `revokeSession()` re-reads and retries a compare-and-set
+  that a concurrent refresh won, so a returned revoked session is always the persisted one. A
+  concurrent revocation is reported as-is, and an exhausted retry bound throws
+  `KvOAuthError` with code `revoke_conflict` instead of acknowledging an unpersisted revocation.
 - **Encrypted token storage** — `createKvOAuthCrypto()` seals token sets with AES-256-GCM and
   prefixes sealed values with a key id, enabling key rotation; token plaintext is never written to
   KV.
