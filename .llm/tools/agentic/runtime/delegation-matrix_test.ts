@@ -236,7 +236,7 @@ Deno.test('deep research allows only native and Google Copilot capabilities', ()
   for (
     const forbidden of [
       ROUTING_MODEL_IDS.lunaGo,
-      ROUTING_MODEL_IDS.fable51Copilot,
+      ROUTING_MODEL_IDS.fable51Native,
       ROUTING_MODEL_IDS.opus5Native,
       ROUTING_MODEL_IDS.glm53FlashOpenRouter,
     ]
@@ -249,14 +249,13 @@ Deno.test('deep research allows only native and Google Copilot capabilities', ()
   }
 });
 
-Deno.test('Copilot catalog contains exactly the four attested capabilities', () => {
+Deno.test('Copilot catalog contains exactly the three attested capabilities', () => {
   assertEquals(
     Object.values(MODEL_CATALOG).flatMap((model) =>
       model.capabilities.filter((entry) => entry.transport === 'github_copilot')
         .map((entry) => entry.model)
     ).sort(),
     [
-      ROUTING_MODEL_IDS.fable51Copilot,
       ROUTING_MODEL_IDS.gemini38FlashCopilot,
       ROUTING_MODEL_IDS.kimiK3Copilot,
       ROUTING_MODEL_IDS.grok46Copilot,

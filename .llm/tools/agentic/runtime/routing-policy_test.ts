@@ -28,9 +28,11 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
   );
   const plan = { tier: 'feature' as const, role: 'plan' as const, worktree };
   assertEquals(resolveWorkloadRoute(plan).transport, 'claude');
+  // Fable 5.1 is Claude-only, so losing that transport drops feature/plan to
+  // the matrix's own fallback rather than to a Copilot-hosted Fable.
   assertEquals(
     resolveWorkloadRoute({ ...plan, unavailableTransports: ['claude'] }).model,
-    ROUTING_MODEL_IDS.fable51Copilot,
+    ROUTING_MODEL_IDS.museSpark13Go,
   );
   const kimi = resolveWorkloadRoute({
     tier: 'complex',

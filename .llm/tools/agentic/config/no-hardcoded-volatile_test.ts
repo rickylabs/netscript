@@ -149,7 +149,6 @@ Deno.test('Copilot model and endpoint constants participate in the exact guard',
       config.ROUTING_MODEL_IDS.gemini38FlashCopilot,
       config.ROUTING_MODEL_IDS.kimiK3Copilot,
       config.ROUTING_MODEL_IDS.grok46Copilot,
-      config.ROUTING_MODEL_IDS.fable51Copilot,
       config.COPILOT_AGENT_TASKS_PATH,
     ]
   ) assert(EXACT_FORBIDDEN.includes(value));

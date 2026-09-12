@@ -544,7 +544,7 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
 Deno.test('opencodeRunArguments forwards --dir so the lane runs in the target repository', () => {
   const args = opencodeRunArguments({
     message: 'work',
-    model: 'openrouter/deepseek/deepseek-v4.1-flash',
+    model: ROUTING_MODEL_IDS.deepseekV41FlashOpenRouter,
     variant: 'provider_default',
     cwd: '/home/agent/projects/autocorner/worktrees/example',
   });
@@ -560,7 +560,7 @@ Deno.test('opencodeRunArguments forwards --dir so the lane runs in the target re
 Deno.test('opencodeRunArguments omits --dir when no working directory is given', () => {
   const args = opencodeRunArguments({
     message: 'work',
-    model: 'openrouter/deepseek/deepseek-v4.1-flash',
+    model: ROUTING_MODEL_IDS.deepseekV41FlashOpenRouter,
     variant: 'provider_default',
   });
 

@@ -54,7 +54,6 @@ export const ROUTING_MODEL_IDS = {
   kimiK3Copilot: 'github-copilot/kimi-k3',
   grok46Copilot: 'github-copilot/grok-4.6',
   grok420OpenRouter: 'openrouter/x-ai/grok-4.20',
-  fable51Copilot: 'github-copilot/claude-fable-5.1',
   qwen38FlashNextGo: 'opencode-go/qwen3.8-flash',
   qwen38FlashNextOpenRouter: 'openrouter/qwen/qwen3.8-flash',
   qwen38MaxGo: 'opencode-go/qwen3.8-max',

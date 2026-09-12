@@ -4,7 +4,6 @@ import { ROUTING_MODEL_IDS } from '../config/models.ts';
 
 /** Attested connector fixture uses centralized spellings, never derived slugs. */
 export const COPILOT_CATALOG_FIXTURE: string = [
-  ROUTING_MODEL_IDS.fable51Copilot,
   ROUTING_MODEL_IDS.gemini38FlashCopilot,
   ROUTING_MODEL_IDS.kimiK3Copilot,
   ROUTING_MODEL_IDS.grok46Copilot,

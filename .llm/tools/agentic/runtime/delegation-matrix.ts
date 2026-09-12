@@ -112,10 +112,9 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
   fable_5_1: {
     id: 'fable_5_1',
     family: 'anthropic',
-    capabilities: [
-      capability('claude', ROUTING_MODEL_IDS.fable51Native),
-      capability('github_copilot', ROUTING_MODEL_IDS.fable51Copilot),
-    ],
+    // Fable never runs outside the Claude Code subscription; GitHub Copilot
+    // carries only third-party models such as Grok 4.6, Kimi K3 and Gemini.
+    capabilities: [capability('claude', ROUTING_MODEL_IDS.fable51Native)],
   },
   opus_5: {
     id: 'opus_5',
