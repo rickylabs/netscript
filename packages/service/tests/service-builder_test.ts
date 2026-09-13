@@ -1,4 +1,4 @@
-import { assertEquals, assertNotStrictEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertNotStrictEquals, assertRejects } from '@std/assert';
 import { createService } from '../mod.ts';
 
 interface RpcContextBuilder {
@@ -169,5 +169,57 @@ Deno.test('onShutdown hooks run when a handled signal fires', async () => {
   } finally {
     Deno.addSignalListener = originalAdd;
     Deno.removeSignalListener = originalRemove;
+  }
+});
+
+Deno.test('the service info banner advertises a route mounted through route()', async () => {
+  const app = createService({}, { name: 'users' })
+    .withServiceInfo()
+    .route('get', '/api/v1/openapi.json', (c) => c.json({ openapi: '3.1.0' }))
+    .build();
+
+  const banner = await app.request('/');
+  assertEquals(banner.status, 200, 'the banner itself must be served');
+  const body = await banner.json();
+
+  // Paired against the same built app: the path must be advertised AND reachable.
+  // Advertised-but-unmounted and mounted-but-unadvertised are the two ways this
+  // banner has been wrong, and each renders as success when checked on its own.
+  const advertised = Object.values(body.endpoints as Record<string, string>);
+  assert(
+    advertised.includes('/api/v1/openapi.json'),
+    `banner omits the mounted route: ${JSON.stringify(body.endpoints)}`,
+  );
+  assertEquals(
+    (await app.request('/api/v1/openapi.json')).status,
+    200,
+    'the advertised path is not mounted',
+  );
+});
+
+Deno.test('the banner does not depend on where withServiceInfo() sits in the chain', async () => {
+  // `route()` defers until `build()`, so no call order lets a map captured when
+  // `withServiceInfo()` runs observe a custom route. Both orders must work, and
+  // checking only one would pass for a fix that merely reordered the stages.
+  const routeFirst = createService({}, { name: 'users' })
+    .route('post', '/webhooks/github', (c) => c.json({ ok: true }))
+    .withServiceInfo()
+    .build();
+  const infoFirst = createService({}, { name: 'users' })
+    .withServiceInfo()
+    .route('post', '/webhooks/github', (c) => c.json({ ok: true }))
+    .build();
+
+  for (
+    const [label, app] of [['route() first', routeFirst], [
+      'withServiceInfo() first',
+      infoFirst,
+    ]] as const
+  ) {
+    const body = await (await app.request('/')).json();
+    assert(
+      Object.values(body.endpoints as Record<string, string>).includes('/webhooks/github'),
+      `${label}: ${JSON.stringify(body.endpoints)}`,
+    );
   }
 });
