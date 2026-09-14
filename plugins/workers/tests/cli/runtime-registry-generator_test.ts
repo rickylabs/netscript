@@ -336,7 +336,12 @@ export type JobPayloadOf<TDefinition> = TDefinition extends {
 export type JobPayloadMap<TRegistry extends Readonly<Record<string, unknown>>> = Readonly<{
   [TId in keyof TRegistry]: JobPayloadOf<TRegistry[TId]>;
 }>;
-export type RegisterJobInput = Readonly<Record<string, unknown> & { id?: string }>;
+export type RegisterJobInput = Readonly<
+  Record<string, unknown> & {
+    id?: string;
+    payloadSchema?: JobPayloadSchema<unknown>;
+  }
+>;
 export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
 `,
     );
@@ -360,7 +365,10 @@ export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
       : 'registry.get("transcribe-image")!';
     await write(
       join(projectRoot, 'payload-consumer.ts'),
-      `import { ${importedRegistry} } from './${REGISTRY_PATH}';
+      `import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import { ${importedRegistry}, type GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+
+createWorkersContract<GeneratedJobPayloadMap>();
 
 const transcribeImage = ${transcribeHandler};
 const job = { id: 'transcribe-image' };
@@ -503,6 +511,9 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
           '@netscript/config': toFileUrl(join(REPOSITORY_ROOT, 'packages/config/mod.ts')).href,
           '@netscript/plugin-workers-core/config': toFileUrl(
             join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/config/mod.ts'),
+          ).href,
+          '@netscript/plugin-workers-core/contracts/v1': toFileUrl(
+            join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/contracts/v1/mod.ts'),
           ).href,
           '@netscript/plugin-workers-core/runtime': toFileUrl(
             join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/runtime/mod.ts'),

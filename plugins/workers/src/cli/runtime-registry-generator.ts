@@ -256,7 +256,7 @@ function createRegistryHeader(target: RuntimeRegistryTarget): string[] {
     ' */',
     '',
     target.kind === 'workers-job'
-      ? `import type { JobPayloadMap, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
+      ? `import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
       : `import type { ${target.typeImport.name} } from '${target.typeImport.from}';`,
     '',
   ];
@@ -393,7 +393,7 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
     '',
     'type SchemaBackedJobHandler =',
     '  & ((...args: never[]) => unknown)',
-    '  & Readonly<{ payloadSchema: unknown }>;',
+    '  & Readonly<{ payloadSchema: JobPayloadSchema<unknown> }>;',
     '',
     'type GeneratedJobDefinition<',
     '  TId extends string,',
