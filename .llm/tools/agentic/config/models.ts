@@ -107,6 +107,10 @@ export const OPENROUTER_MODEL_IDS = {
   /** Creative-design route retained independently of evaluator routing. */
   designGlm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
+  /** Architecture-tier IMPL-EVAL/PLAN-EVAL route named by the delegation matrix. */
+  grok46: 'x-ai/grok-4.6',
+  /** Architecture- and complex-tier evaluator route named by the delegation matrix. */
+  museSpark13: 'meta/muse-spark-1.3',
 } as const;
 
 /**
