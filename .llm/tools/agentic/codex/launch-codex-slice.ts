@@ -236,6 +236,15 @@ function parseArgs(args: string[]): Options | null {
   return o;
 }
 
+/**
+ * Absolute path to `app-server-message-cli.ts`, resolved from this module.
+ *
+ * Exported so a test can assert it does not depend on the target worktree.
+ */
+export function clientCliPath(moduleUrl: string = import.meta.url): string {
+  return new URL('./app-server-message-cli.ts', moduleUrl).pathname;
+}
+
 async function main(): Promise<void> {
   let o: Options | null;
   try {
@@ -345,7 +354,12 @@ async function main(): Promise<void> {
   // which derives the agent's worktree from the ambient cwd) in the wrong
   // directory. See wslCd in agentic-lib.ts.
   const routeFlags = `--model ${sq(requested.model)} --effort ${sq(requested.effort)}`;
-  const clientPath = `${o.worktree}/.llm/tools/agentic/codex/app-server-message-cli.ts`;
+  // The client ships with THIS launcher, not with the target worktree. Resolving
+  // it under `o.worktree` only works when the worktree happens to be a netscript
+  // checkout; against any other repository the path does not exist and the
+  // launch dies with a bare "No such file or directory" after every safety check
+  // has already passed. Resolve it from the launcher's own module URL instead.
+  const clientPath = clientCliPath();
   const home = profilePlan ? ` CODEX_HOME=${sq(profilePlan.home)}` : '';
   const profileScript = `export PATH="$HOME/.local/bin:$PATH"${home}; msg="$(cat ${
     sq(dest)

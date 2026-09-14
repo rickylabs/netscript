@@ -3,7 +3,7 @@ import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { CODEX_OPENROUTER_PROFILE_NAME } from '../runtime/adapters/codex-profile-adapter.ts';
 import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
 import { newSenderOwnershipRecord } from '../runtime/sender-ownership.ts';
-import { existingSenderLaunchBlocker } from './launch-codex-slice.ts';
+import { existingSenderLaunchBlocker, clientCliPath } from './launch-codex-slice.ts';
 import { launcherExitCode, planLauncherProfile } from './launcher-route.ts';
 
 const requested = {
@@ -116,4 +116,15 @@ Deno.test('launcher distinguishes repair-required ownership without evicting it'
     foreign?.operatorAction,
     'run deno task agentic:runtime repair sender-lease --worktree /home/codex/repos/other',
   );
+});
+
+Deno.test('clientCliPath resolves beside the launcher, not inside the target worktree', () => {
+  // The launcher is routinely pointed at worktrees that are NOT netscript
+  // checkouts — another repository's slice worktree has no `.llm/tools`. The
+  // client ships with the launcher, so its path must come from the launcher's
+  // own module URL. Previously it was built from `--worktree`, and every safety
+  // check passed before the launch died on a missing file.
+  const resolved = clientCliPath('file:///opt/netscript/.llm/tools/agentic/codex/launch-codex-slice.ts');
+  assertEquals(resolved, '/opt/netscript/.llm/tools/agentic/codex/app-server-message-cli.ts');
+  assert(!resolved.includes('worktree'), 'must not be derived from the target worktree');
 });
