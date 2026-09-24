@@ -26,7 +26,7 @@ export const COPILOT_AGENT_TASK_MODEL_IDS = [
 /** First-party (native provider) model ids used by the canonical route policy. */
 export const MODEL_IDS = {
   /** OpenAI/Codex balanced default. */
-  codexSol: 'gpt-5.6-sol',
+  codexSol: 'gpt-6-sol',
   /** OpenAI/Codex fast-iteration model. */
   codexLuna: 'gpt-5.6-luna',
   /** Anthropic/Claude most-capable model. */
@@ -45,7 +45,7 @@ export const MODEL_IDS = {
 export const ROUTING_MODEL_IDS = {
   lunaNative: 'gpt-5.6-luna',
   lunaGo: 'opencode-go/gpt-5.6-luna',
-  solNative: 'gpt-5.6-sol',
+  solNative: 'gpt-6-sol',
   astraNative: 'gpt-6-astra',
   fable51Native: 'claude-fable-5-1',
   opus5Native: 'claude-opus-5',
