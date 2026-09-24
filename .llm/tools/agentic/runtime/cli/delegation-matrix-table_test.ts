@@ -38,7 +38,7 @@ Deno.test('UI/UX role query exposes the owner-selected specialist progression', 
 
   const heavy = renderMatrixQuery(parseMatrixArgs(['--tier', 'complex', '--role', 'ui-ux']));
   assertStringIncludes(heavy, 'Kimi K3 max');
-  assertStringIncludes(heavy, 'Fable 5.1 medium');
+  assertStringIncludes(heavy, 'Opus 5.5 medium');
 
   const review = renderMatrixQuery(
     parseMatrixArgs(['--tier', 'complex', '--role', 'vision-eval']),
@@ -69,7 +69,7 @@ Deno.test('role aliases select focused plan and implementation evaluator views',
   const plan = renderMatrixQuery(parseMatrixArgs(['--tier', 'feature', '--plan-evaluator']));
   assertStringIncludes(plan, '# PLAN-EVAL routes');
   assertStringIncludes(plan, 'GLM 5.3 provider default');
-  assertStringIncludes(plan, 'Fable 5.1 low');
+  assertStringIncludes(plan, 'Opus 5.5 low');
   assertStringIncludes(plan, 'max 2 roundtrips');
 
   const implementation = renderMatrixQuery(

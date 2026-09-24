@@ -9,6 +9,7 @@ export const LOGICAL_MODEL_IDS = [
   'astra',
   'fable_5_1',
   'opus_5',
+  'opus_5_5',
   'gemini_3_8_flash',
   'qwen_3_8_flash_next',
   'qwen_3_8_max',
@@ -33,6 +34,7 @@ export const LOGICAL_MODEL_LABELS: Readonly<Record<LogicalModelId, string>> = {
   astra: 'Astra',
   fable_5_1: 'Fable 5.1',
   opus_5: 'Opus 5',
+  opus_5_5: 'Opus 5.5',
   gemini_3_8_flash: 'Gemini 3.8 Flash',
   qwen_3_8_flash_next: 'Qwen 3.8 Flash Next',
   qwen_3_8_max: 'Qwen 3.8 Max',
@@ -120,6 +122,13 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     id: 'opus_5',
     family: 'anthropic',
     capabilities: [capability('claude', ROUTING_MODEL_IDS.opus5Native)],
+  },
+  opus_5_5: {
+    id: 'opus_5_5',
+    family: 'anthropic',
+    // Supersedes Opus 5 everywhere and Fable 5.1 everywhere except the
+    // architecture tier, where Fable 5.1 stays by owner decision.
+    capabilities: [capability('claude', ROUTING_MODEL_IDS.opus55Native)],
   },
   gemini_3_8_flash: {
     id: 'gemini_3_8_flash',
@@ -410,7 +419,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('minimax_m3', 'provider_default'),
       route('deepseek_v4_flash_vision', 'provider_default'),
     ],
-    documentation: [route('gemini_3_8_flash', 'medium'), route('opus_5', 'low')],
+    documentation: [route('gemini_3_8_flash', 'medium'), route('opus_5_5', 'low')],
     deep_research: [route('gemini_3_8_flash', 'low'), route('luna', 'max')],
     planPolicy: policy({ maxRounds: 'none' }),
     implementationPolicy: policy({ maxRounds: 'unspecified_by_owner' }),
@@ -421,7 +430,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
     ui_ux: [route('kimi_k3', 'high'), route('gemini_3_8_flash', 'high')],
     plan: [route('sol', 'medium'), route('glm_5_3_flash', 'provider_default')],
     plan_evaluation: [
-      route('opus_5', 'medium'),
+      route('opus_5_5', 'medium'),
       route('qwen_3_8_flash_next', 'provider_default'),
     ],
     implementation_evaluation: [
@@ -444,11 +453,11 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
   feature: {
     implementation: [route('astra', 'low'), route('muse_spark_1_3', 'xhigh')],
     ui_ux: [route('kimi_k3', 'high'), route('gemini_3_8_flash', 'high')],
-    plan: [route('fable_5_1', 'low'), route('muse_spark_1_3', 'xhigh')],
-    plan_evaluation: [route('glm_5_3', 'provider_default'), route('fable_5_1', 'low')],
+    plan: [route('opus_5_5', 'low'), route('muse_spark_1_3', 'xhigh')],
+    plan_evaluation: [route('glm_5_3', 'provider_default'), route('opus_5_5', 'low')],
     implementation_evaluation: [
       route('muse_spark_1_3', 'xhigh'),
-      route('opus_5', 'xhigh'),
+      route('opus_5_5', 'xhigh'),
     ],
     vision_evaluation: [
       route('gemini_3_8_flash', 'high'),
@@ -464,9 +473,9 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
     documentationPolicy: policy({ maxRounds: 2, notifyOwnerAfter: 2 }),
   },
   complex: {
-    implementation: [route('astra', 'medium'), route('fable_5_1', 'medium')],
-    ui_ux: [route('kimi_k3', 'max'), route('fable_5_1', 'medium')],
-    plan: [route('fable_5_1', 'medium'), route('muse_spark_1_3', 'max')],
+    implementation: [route('astra', 'medium'), route('opus_5_5', 'medium')],
+    ui_ux: [route('kimi_k3', 'max'), route('opus_5_5', 'medium')],
+    plan: [route('opus_5_5', 'medium'), route('muse_spark_1_3', 'max')],
     plan_evaluation: [route('muse_spark_1_3', 'max'), route('grok_4_6', 'high')],
     implementation_evaluation: [
       route('muse_spark_1_3', 'max'),
@@ -477,7 +486,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
       route('gemini_3_8_flash', 'high'),
     ],
     documentation: [
-      route('fable_5_1', 'medium'),
+      route('opus_5_5', 'medium'),
       route('qwen_3_8_max', 'provider_default'),
     ],
     deep_research: [route('gemini_3_8_flash', 'high'), route('luna', 'max')],
@@ -571,14 +580,10 @@ export const COORDINATOR_TIERS = [
 export type CoordinatorTier = typeof COORDINATOR_TIERS[number];
 
 export const COORDINATOR_MATRIX: Readonly<Record<CoordinatorTier, readonly ModelRoute[]>> = {
-  small_project: [route('luna', 'max'), route('opus_5', 'low')],
-  project: [route('sol', 'medium'), route('opus_5', 'medium')],
-  framework: [route('astra', 'low'), route('opus_5', 'xhigh')],
-  milestone: [
-    route('astra', 'medium'),
-    route('fable_5_1', 'medium'),
-    route('opus_5', 'xhigh'),
-  ],
+  small_project: [route('luna', 'max'), route('opus_5_5', 'low')],
+  project: [route('sol', 'medium'), route('opus_5_5', 'medium')],
+  framework: [route('astra', 'low'), route('opus_5_5', 'xhigh')],
+  milestone: [route('astra', 'medium'), route('opus_5_5', 'xhigh')],
 } as const;
 
 export const LEGACY_ROUTING_LANES = [

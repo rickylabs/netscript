@@ -37,12 +37,15 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     { model: 'gemini_3_8_flash', effort: 'high' },
   ]);
   assertEquals(DELEGATION_MATRIX.feature.ui_ux, DELEGATION_MATRIX.straightforward.ui_ux);
-  for (const tier of ['complex', 'architecture'] as const) {
-    assertEquals(DELEGATION_MATRIX[tier].ui_ux, [
-      { model: 'kimi_k3', effort: 'max' },
-      { model: 'fable_5_1', effort: 'medium' },
-    ]);
-  }
+  // Opus 5.5 supersedes Fable 5.1 everywhere except the architecture tier.
+  assertEquals(DELEGATION_MATRIX.complex.ui_ux, [
+    { model: 'kimi_k3', effort: 'max' },
+    { model: 'opus_5_5', effort: 'medium' },
+  ]);
+  assertEquals(DELEGATION_MATRIX.architecture.ui_ux, [
+    { model: 'kimi_k3', effort: 'max' },
+    { model: 'fable_5_1', effort: 'medium' },
+  ]);
   assertEquals(DELEGATION_MATRIX.simple.implementation_evaluation[1], {
     model: 'deepseek_v4_flash',
     effort: 'provider_default',
@@ -70,12 +73,11 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
   });
   assertEquals(COORDINATOR_MATRIX.framework, [
     { model: 'astra', effort: 'low' },
-    { model: 'opus_5', effort: 'xhigh' },
+    { model: 'opus_5_5', effort: 'xhigh' },
   ]);
   assertEquals(COORDINATOR_MATRIX.milestone, [
     { model: 'astra', effort: 'medium' },
-    { model: 'fable_5_1', effort: 'medium' },
-    { model: 'opus_5', effort: 'xhigh' },
+    { model: 'opus_5_5', effort: 'xhigh' },
   ]);
   assertEquals(DEEP_RESEARCH_TRANSPORTS, ['agy', 'github_copilot', 'codex']);
   assertEquals(DELEGATION_MATRIX.simple.deep_research, [
@@ -106,6 +108,7 @@ Deno.test('provider priority puts subscriptions before metered OpenRouter', () =
 Deno.test('provider capability catalog pins dispatchable Claude and Ollama ids', () => {
   assertEquals(MODEL_CATALOG.fable_5_1.capabilities[0]?.model, ROUTING_MODEL_IDS.fable51Native);
   assertEquals(MODEL_CATALOG.opus_5.capabilities[0]?.model, ROUTING_MODEL_IDS.opus5Native);
+  assertEquals(MODEL_CATALOG.opus_5_5.capabilities[0]?.model, ROUTING_MODEL_IDS.opus55Native);
   assertEquals(ROUTING_MODEL_IDS.fable51Native.startsWith('claude-fable-'), true);
   assertEquals(ROUTING_MODEL_IDS.opus5Native.startsWith('claude-opus-'), true);
   assertEquals(

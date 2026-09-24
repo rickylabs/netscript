@@ -28,7 +28,7 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
   );
   const plan = { tier: 'feature' as const, role: 'plan' as const, worktree };
   assertEquals(resolveWorkloadRoute(plan).transport, 'claude');
-  // Fable 5.1 is Claude-only, so losing that transport drops feature/plan to
+  // Opus 5.5 is Claude-only, so losing that transport drops feature/plan to
   // the matrix's own fallback rather than to a Copilot-hosted Fable.
   assertEquals(
     resolveWorkloadRoute({ ...plan, unavailableTransports: ['claude'] }).model,
@@ -84,7 +84,8 @@ Deno.test('canonical inspection policy is derived from all matrix cells', () => 
       },
     ],
   );
-  assertEquals(CANONICAL_COORDINATOR_POLICY.length, 9);
+  // Milestone lost its Fable 5.1 step when Opus 5.5 superseded it: 9 -> 8.
+  assertEquals(CANONICAL_COORDINATOR_POLICY.length, 8);
 });
 
 Deno.test('Astra replaces SOL for feature and higher implementation tiers', () => {
@@ -156,7 +157,7 @@ Deno.test('provider capability resolution honors subscription-first order', () =
     unavailableModels: ['muse_spark_1_3'],
     worktree,
   });
-  assertEquals(ollama.logicalModel, 'opus_5');
+  assertEquals(ollama.logicalModel, 'opus_5_5');
   assertEquals(ollama.transport, 'claude');
 });
 
@@ -338,15 +339,15 @@ Deno.test('coordinator routes follow the dedicated matrix', () => {
       unavailableModels: ['astra'],
       worktree,
     }).logicalModel,
-    'opus_5',
+    'opus_5_5',
   );
   assertEquals(
     resolveCoordinatorRoute({
       tier: 'milestone',
-      unavailableModels: ['astra', 'fable_5_1'],
+      unavailableModels: ['astra'],
       worktree,
     }).logicalModel,
-    'opus_5',
+    'opus_5_5',
   );
 });
 
