@@ -85,7 +85,7 @@ Deno.test('canonical inspection policy is derived from all matrix cells', () => 
   assertEquals(CANONICAL_COORDINATOR_POLICY.length, 9);
 });
 
-Deno.test('Astra replaces SOL for feature and higher implementation tiers', () => {
+Deno.test('SOL handles feature implementation while Astra stays on privileged tiers', () => {
   assertEquals(
     resolveWorkloadRoute({
       tier: 'feature',
@@ -95,14 +95,14 @@ Deno.test('Astra replaces SOL for feature and higher implementation tiers', () =
     {
       agent: 'codex',
       provider: 'openai',
-      model: ROUTING_MODEL_IDS.astraNative,
-      effort: 'low',
+      model: ROUTING_MODEL_IDS.solNative,
+      effort: 'high',
       worktree,
       mobileRequired: false,
-      logicalModel: 'astra',
+      logicalModel: 'sol',
       family: 'openai',
       transport: 'codex',
-      requestedEffort: 'low',
+      requestedEffort: 'high',
     },
   );
   assertEquals(
@@ -329,11 +329,16 @@ Deno.test('unavailable providers advance inside the model capability chain', () 
 });
 
 Deno.test('coordinator routes follow the dedicated matrix', () => {
-  assertEquals(resolveCoordinatorRoute({ tier: 'framework', worktree }).logicalModel, 'astra');
+  for (const tier of ['small_project', 'project', 'milestone'] as const) {
+    const route = resolveCoordinatorRoute({ tier, worktree });
+    assertEquals([route.logicalModel, route.effort], ['sol', 'medium']);
+  }
+  const framework = resolveCoordinatorRoute({ tier: 'framework', worktree });
+  assertEquals([framework.logicalModel, framework.effort], ['sol', 'high']);
   assertEquals(
     resolveCoordinatorRoute({
       tier: 'framework',
-      unavailableModels: ['astra'],
+      unavailableModels: ['sol'],
       worktree,
     }).logicalModel,
     'opus_5',
@@ -341,7 +346,7 @@ Deno.test('coordinator routes follow the dedicated matrix', () => {
   assertEquals(
     resolveCoordinatorRoute({
       tier: 'milestone',
-      unavailableModels: ['astra', 'fable_5_1'],
+      unavailableModels: ['sol', 'fable_5_1'],
       worktree,
     }).logicalModel,
     'opus_5',
@@ -417,7 +422,7 @@ Deno.test('empty capability chain reports a deterministic unavailable error', ()
       resolveWorkloadRoute({
         tier: 'feature',
         role: 'implementation',
-        unavailableModels: ['astra', 'muse_spark_1_3'],
+        unavailableModels: ['sol', 'muse_spark_1_3'],
         worktree,
       }),
     Error,
