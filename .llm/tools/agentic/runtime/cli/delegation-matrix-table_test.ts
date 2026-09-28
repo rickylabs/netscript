@@ -50,7 +50,7 @@ Deno.test('tier query renders only one readable workload row', () => {
   const output = renderMatrixQuery(parseMatrixArgs(['--tier', 'standard']));
 
   assertStringIncludes(output, 'straightforward<br>Straightforward implementations');
-  assertStringIncludes(output, 'SOL medium');
+  assertStringIncludes(output, 'SOL high');
   assertStringIncludes(output, 'DeepSeek V4 Pro provider default');
   assertEquals(output.includes('architecture<br>'), false);
   assertEquals(output.includes('## Evaluation policies'), false);
@@ -81,17 +81,16 @@ Deno.test('role aliases select focused plan and implementation evaluator views',
   assertStringIncludes(implementation, 'notify owner after 2');
 });
 
-Deno.test('fallback query lists every matching context rather than guessing one', () => {
+Deno.test('Astra fallback query is limited to privileged implementation tiers', () => {
   const output = renderMatrixQuery(parseMatrixArgs(['--fallback-of', 'Astra']));
   const matches = fallbackMatches('astra');
 
-  assertEquals(matches.length, 5);
+  assertEquals(matches.length, 2);
   assertStringIncludes(output, 'Fallbacks are context-sensitive');
-  assertStringIncludes(output, 'feature');
-  assertStringIncludes(output, 'Astra low');
-  assertStringIncludes(output, 'Muse Spark 1.3 xhigh');
-  assertStringIncludes(output, 'framework');
-  assertStringIncludes(output, 'milestone');
+  assertStringIncludes(output, 'complex');
+  assertStringIncludes(output, 'Astra medium');
+  assertStringIncludes(output, 'architecture');
+  assertStringIncludes(output, 'Astra xhigh');
 });
 
 Deno.test('fallback query composes tier and role filters', () => {

@@ -395,9 +395,9 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
     documentationPolicy: policy({ maxRounds: 2 }),
   },
   straightforward: {
-    implementation: [route('sol', 'medium'), route('glm_5_3_flash', 'provider_default')],
+    implementation: [route('sol', 'high'), route('glm_5_3_flash', 'provider_default')],
     ui_ux: [route('kimi_k3', 'high'), route('gemini_3_8_flash', 'high')],
-    plan: [route('sol', 'medium'), route('glm_5_3_flash', 'provider_default')],
+    plan: [route('sol', 'high'), route('glm_5_3_flash', 'provider_default')],
     plan_evaluation: [
       route('opus_5', 'medium'),
       route('qwen_3_8_flash_next', 'provider_default'),
@@ -420,7 +420,7 @@ export const DELEGATION_MATRIX: Readonly<Record<WorkloadTier, DelegationCell>> =
     documentationPolicy: policy({ maxRounds: 2, notifyOwnerAfter: 2 }),
   },
   feature: {
-    implementation: [route('astra', 'low'), route('muse_spark_1_3', 'xhigh')],
+    implementation: [route('sol', 'high'), route('muse_spark_1_3', 'xhigh')],
     ui_ux: [route('kimi_k3', 'high'), route('gemini_3_8_flash', 'high')],
     plan: [route('fable_5_1', 'low'), route('muse_spark_1_3', 'xhigh')],
     plan_evaluation: [route('glm_5_3', 'provider_default'), route('fable_5_1', 'low')],
@@ -549,11 +549,11 @@ export const COORDINATOR_TIERS = [
 export type CoordinatorTier = typeof COORDINATOR_TIERS[number];
 
 export const COORDINATOR_MATRIX: Readonly<Record<CoordinatorTier, readonly ModelRoute[]>> = {
-  small_project: [route('luna', 'max'), route('opus_5', 'low')],
+  small_project: [route('sol', 'medium'), route('opus_5', 'low')],
   project: [route('sol', 'medium'), route('opus_5', 'medium')],
-  framework: [route('astra', 'low'), route('opus_5', 'xhigh')],
+  framework: [route('sol', 'high'), route('opus_5', 'xhigh')],
   milestone: [
-    route('astra', 'medium'),
+    route('sol', 'medium'),
     route('fable_5_1', 'medium'),
     route('opus_5', 'xhigh'),
   ],

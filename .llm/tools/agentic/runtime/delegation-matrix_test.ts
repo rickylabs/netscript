@@ -28,6 +28,12 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     { model: 'luna', effort: 'max' },
     { model: 'qwen_3_8_flash_next', effort: 'provider_default' },
   ]);
+  const straightforwardRoute = [
+    { model: 'sol', effort: 'high' },
+    { model: 'glm_5_3_flash', effort: 'provider_default' },
+  ] as const;
+  assertEquals(DELEGATION_MATRIX.straightforward.implementation, straightforwardRoute);
+  assertEquals(DELEGATION_MATRIX.straightforward.plan, straightforwardRoute);
   assertEquals(DELEGATION_MATRIX.simple.ui_ux, [
     { model: 'kimi_k3', effort: 'low' },
     { model: 'minimax_m3', effort: 'provider_default' },
@@ -59,7 +65,10 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     model: 'deepseek_v4_flash_vision',
     effort: 'provider_default',
   });
-  assertEquals(DELEGATION_MATRIX.feature.implementation[0], { model: 'astra', effort: 'low' });
+  assertEquals(DELEGATION_MATRIX.feature.implementation, [
+    { model: 'sol', effort: 'high' },
+    { model: 'muse_spark_1_3', effort: 'xhigh' },
+  ]);
   assertEquals(DELEGATION_MATRIX.complex.implementation[0], {
     model: 'astra',
     effort: 'medium',
@@ -68,12 +77,20 @@ Deno.test('owner matrix binds the five implementation tiers and coordinator rout
     model: 'astra',
     effort: 'xhigh',
   });
+  assertEquals(COORDINATOR_MATRIX.small_project, [
+    { model: 'sol', effort: 'medium' },
+    { model: 'opus_5', effort: 'low' },
+  ]);
+  assertEquals(COORDINATOR_MATRIX.project, [
+    { model: 'sol', effort: 'medium' },
+    { model: 'opus_5', effort: 'medium' },
+  ]);
   assertEquals(COORDINATOR_MATRIX.framework, [
-    { model: 'astra', effort: 'low' },
+    { model: 'sol', effort: 'high' },
     { model: 'opus_5', effort: 'xhigh' },
   ]);
   assertEquals(COORDINATOR_MATRIX.milestone, [
-    { model: 'astra', effort: 'medium' },
+    { model: 'sol', effort: 'medium' },
     { model: 'fable_5_1', effort: 'medium' },
     { model: 'opus_5', effort: 'xhigh' },
   ]);
