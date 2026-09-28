@@ -26,13 +26,13 @@ export const COPILOT_AGENT_TASK_MODEL_IDS = [
 /** First-party (native provider) model ids used by the canonical route policy. */
 export const MODEL_IDS = {
   /** OpenAI/Codex balanced default. */
-  codexSol: 'gpt-5.6-sol',
+  codexSol: 'gpt-6-sol',
   /** OpenAI/Codex fast-iteration model. */
-  codexLuna: 'gpt-5.6-luna',
+  codexLuna: 'gpt-6-luna',
   /** Anthropic/Claude most-capable model. */
-  fable: 'fable-5',
+  fable: 'claude-fable-5-1',
   /** Anthropic/Claude orchestration, review, documentation, and workflow model. */
-  opus: 'opus-5',
+  opus: 'claude-opus-5-5',
   /** Anthropic/Claude cost-efficient docs, chores, and token-limit review fallback. */
   sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
@@ -43,9 +43,9 @@ export const MODEL_IDS = {
 
 /** Provider-specific model spellings used by the replacement delegation matrix. */
 export const ROUTING_MODEL_IDS = {
-  lunaNative: 'gpt-5.6-luna',
+  lunaNative: 'gpt-6-luna',
   lunaGo: 'opencode-go/gpt-5.6-luna',
-  solNative: 'gpt-5.6-sol',
+  solNative: 'gpt-6-sol',
   astraNative: 'gpt-6-astra',
   fable51Native: 'claude-fable-5-1',
   opus5Native: 'claude-opus-5',
@@ -92,8 +92,8 @@ export const ROUTING_MODEL_IDS = {
  * dispatchable CLI ids; this table remains the provider-canary argument set.
  */
 export const NATIVE_CANARY_MODEL_ARGS = {
-  claudeOpus: 'claude-opus-5',
-  codex: 'gpt-5.6',
+  claudeOpus: 'claude-opus-5-5',
+  codex: 'gpt-6-sol',
 } as const;
 
 /**

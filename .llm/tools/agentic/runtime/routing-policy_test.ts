@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import { ROUTING_MODEL_IDS } from '../config/models.ts';
+import { MODEL_IDS, NATIVE_CANARY_MODEL_ARGS, ROUTING_MODEL_IDS } from '../config/models.ts';
 import { DELEGATION_MATRIX } from './delegation-matrix.ts';
 import {
   assertEvaluatorIndependence,
@@ -15,6 +15,29 @@ const privilegedTierAuthorization = {
   authorizer: 'milestone_coordinator' as const,
   rationale: 'Recorded cross-package milestone escalation.',
 };
+
+Deno.test('native routes and rollout canaries use the current harness model IDs', () => {
+  assertEquals(MODEL_IDS.codexSol, 'gpt-6-sol');
+  assertEquals(MODEL_IDS.codexLuna, 'gpt-6-luna');
+  assertEquals(MODEL_IDS.fable, 'claude-fable-5-1');
+  assertEquals(MODEL_IDS.opus, 'claude-opus-5-5');
+  assertEquals(ROUTING_MODEL_IDS.solNative, MODEL_IDS.codexSol);
+  assertEquals(ROUTING_MODEL_IDS.lunaNative, MODEL_IDS.codexLuna);
+  assertEquals(ROUTING_MODEL_IDS.astraNative, 'gpt-6-astra');
+  assertEquals(ROUTING_MODEL_IDS.fable51Native, MODEL_IDS.fable);
+  assertEquals(ROUTING_MODEL_IDS.opus55Native, MODEL_IDS.opus);
+  assertEquals(NATIVE_CANARY_MODEL_ARGS.codex, MODEL_IDS.codexSol);
+  assertEquals(NATIVE_CANARY_MODEL_ARGS.claudeOpus, MODEL_IDS.opus);
+
+  assertEquals(
+    resolveWorkloadRoute({ tier: 'simple', role: 'implementation', worktree }).model,
+    MODEL_IDS.codexLuna,
+  );
+  assertEquals(
+    resolveWorkloadRoute({ tier: 'feature', role: 'implementation', worktree }).model,
+    MODEL_IDS.codexSol,
+  );
+});
 
 Deno.test('Copilot preserves native-family precedence and wins for attested non-native models', () => {
   const request = { tier: 'feature' as const, role: 'deep_research' as const, worktree };
