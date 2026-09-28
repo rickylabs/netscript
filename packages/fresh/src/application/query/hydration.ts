@@ -112,8 +112,12 @@ function normalizeDehydratedQuery(value: unknown): TanStackDehydratedQuery | und
   if (meta !== undefined && !isRecord(meta)) return undefined;
   const queryType = value.queryType;
   if (queryType !== undefined && queryType !== 'infinite') return undefined;
+  // `dehydrate()` has stamped every query with `dehydratedAt` since @tanstack/query-core 5.76.2, and
+  // 5.103.0 made the field required and dropped the fallback for entries without it (upstream
+  // TanStack/query#11436). A missing stamp would reach `hydrate()` as `undefined` and corrupt
+  // `dataUpdatedAt`, so reject the entry like any other malformed field.
   const dehydratedAt = value.dehydratedAt;
-  if (dehydratedAt !== undefined && typeof dehydratedAt !== 'number') return undefined;
+  if (typeof dehydratedAt !== 'number') return undefined;
 
   return {
     queryHash: value.queryHash,
