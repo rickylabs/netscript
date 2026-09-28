@@ -58,7 +58,9 @@ Deno.test('hydrateFromDehydrated rejects the evaluator guard-attack cases withou
       status: 'success',
       fetchStatus: 'idle',
     },
+    dehydratedAt: 1,
   };
+  const { dehydratedAt: _omitted, ...unstampedQuery } = validQuery;
   const attacks: readonly {
     readonly name: string;
     readonly state: DehydratedState;
@@ -80,6 +82,16 @@ Deno.test('hydrateFromDehydrated rejects the evaluator guard-attack cases withou
         mutations: [],
         queries: [{ ...validQuery, state: { ...validQuery.state, status: 'settled' } }],
       },
+      message: 'Invalid dehydrated query at index 0',
+    },
+    {
+      name: 'query without a dehydratedAt stamp',
+      state: { mutations: [], queries: [unstampedQuery] },
+      message: 'Invalid dehydrated query at index 0',
+    },
+    {
+      name: 'non-number dehydratedAt stamp',
+      state: { mutations: [], queries: [{ ...validQuery, dehydratedAt: '1' }] },
       message: 'Invalid dehydrated query at index 0',
     },
     {
