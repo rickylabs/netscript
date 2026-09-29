@@ -1,5 +1,6 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
+import { DELEGATION_MATRIX } from './delegation-matrix.ts';
 import {
   assertEvaluatorIndependence,
   CANONICAL_COORDINATOR_POLICY,
@@ -271,6 +272,30 @@ Deno.test('owner override bypasses a matrix cell but not evaluator-family indepe
     Error,
     'no available opposite openai route',
   );
+});
+
+Deno.test('owner override resolves Claude Opus 5.5 high without changing a matrix cell', () => {
+  const selected = resolveWorkloadRoute({
+    tier: 'straightforward',
+    role: 'implementation',
+    worktree,
+    ownerMatrixOverride: {
+      authorizer: 'owner',
+      rationale: 'A bounded Claude proof.',
+      worklogPath: '.llm/runs/claude-proof/worklog.md',
+      route: { model: 'opus_5_5', effort: 'high' },
+    },
+  });
+  assertEquals([selected.logicalModel, selected.model, selected.transport, selected.effort], [
+    'opus_5_5',
+    ROUTING_MODEL_IDS.opus55Native,
+    'claude',
+    'high',
+  ]);
+  assertEquals(DELEGATION_MATRIX.straightforward.implementation[0], {
+    model: 'sol',
+    effort: 'high',
+  });
 });
 
 Deno.test('owner override requires a durable harness worklog path', () => {

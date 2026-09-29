@@ -123,6 +123,9 @@ Deno.test('provider priority puts subscriptions before metered OpenRouter', () =
 Deno.test('provider capability catalog pins dispatchable Claude and Ollama ids', () => {
   assertEquals(MODEL_CATALOG.fable_5_1.capabilities[0]?.model, ROUTING_MODEL_IDS.fable51Native);
   assertEquals(MODEL_CATALOG.opus_5.capabilities[0]?.model, ROUTING_MODEL_IDS.opus5Native);
+  assertEquals(MODEL_CATALOG.opus_5_5.capabilities[0]?.model, ROUTING_MODEL_IDS.opus55Native);
+  assertEquals(MODEL_CATALOG.opus_5_5.capabilities[0]?.transport, 'claude');
+  assertEquals(ROUTING_MODEL_IDS.opus55Native, 'claude-opus-5-5');
   assertEquals(ROUTING_MODEL_IDS.fable51Native.startsWith('claude-fable-'), true);
   assertEquals(ROUTING_MODEL_IDS.opus5Native.startsWith('claude-opus-'), true);
   assertEquals(

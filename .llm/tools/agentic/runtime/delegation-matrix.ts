@@ -9,6 +9,7 @@ export const LOGICAL_MODEL_IDS = [
   'astra',
   'fable_5_1',
   'opus_5',
+  'opus_5_5',
   'gemini_3_8_flash',
   'qwen_3_8_flash_next',
   'qwen_3_8_max',
@@ -31,6 +32,7 @@ export const LOGICAL_MODEL_LABELS: Readonly<Record<LogicalModelId, string>> = {
   astra: 'Astra',
   fable_5_1: 'Fable 5.1',
   opus_5: 'Opus 5',
+  opus_5_5: 'Opus 5.5',
   gemini_3_8_flash: 'Gemini 3.8 Flash',
   qwen_3_8_flash_next: 'Qwen 3.8 Flash Next',
   qwen_3_8_max: 'Qwen 3.8 Max',
@@ -117,6 +119,11 @@ export const MODEL_CATALOG: Readonly<Record<LogicalModelId, LogicalModelDefiniti
     id: 'opus_5',
     family: 'anthropic',
     capabilities: [capability('claude', ROUTING_MODEL_IDS.opus5Native)],
+  },
+  opus_5_5: {
+    id: 'opus_5_5',
+    family: 'anthropic',
+    capabilities: [capability('claude', ROUTING_MODEL_IDS.opus55Native)],
   },
   gemini_3_8_flash: {
     id: 'gemini_3_8_flash',
