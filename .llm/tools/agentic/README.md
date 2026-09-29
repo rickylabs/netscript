@@ -310,13 +310,12 @@ to re-wake the supervisor — a token-free re-wake with no polling loop kept in 
 Credential Manager), printing only source and login; `gh-token.ts store` persists one stdin PAT to
 Windows GCM and WSL `gh` so future sessions resolve it automatically.
 
-### `github/review-threads.ts` — when a green PR still should not merge
+### Review-thread gate (moved)
 
-Run `deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty` when
-checks are green but review findings may be silent. It lists every thread with author, location,
-severity when present, and answered/unanswered state, then exits non-zero for any current thread
-without a reply. Resolution clicks are irrelevant; a reasoned decline is a reply, and outdated
-threads never block. The command is read-only and is also enforced in CI's `close-gate` job.
+The answered review-thread gate is a repository merge gate, not part of this suite. It lives at
+`.llm/tools/validation/check-review-threads.ts` and runs as
+`deno task check:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`, the same
+command CI's `close-gate` job enforces.
 
 ## The brain: the runtime controller
 

@@ -30,7 +30,6 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:gh-pr': 'github/gh-pr.ts',
   'agentic:gh-watch': 'github/gh-watch.ts',
   'agentic:gh-token': 'github/gh-token.ts',
-  'agentic:review-threads': 'github/review-threads.ts',
   'agentic:pr-checks': 'github/pr-checks.ts',
   'agentic:claude-openrouter': 'claude/openrouter-run.ts',
   'agentic:opencode': 'opencode/opencode-run.ts',
@@ -78,7 +77,7 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
     ...PERMISSIVE_AGENTIC_TASKS,
   ].sort();
   assertEquals(surveyedTasks, actualTasks);
-  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 30);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 29);
   for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
     assert(
       denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),

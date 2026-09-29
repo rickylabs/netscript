@@ -69,9 +69,9 @@ and the NetScript resolver in `runtime/routing-policy.ts`; change a model/versio
 its documented authority. See the suite README's "Maintenance map".
 
 **Symptom: “my PR is green but should not merge yet.”** Run
-`deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The
-read-only gate exposes silent review findings before merge: a reply or reasoned decline counts as
-answered, UI resolution is irrelevant, and outdated threads are listed but do not block.
+`deno task check:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The read-only
+gate exposes silent review findings before merge: a reply or reasoned decline counts as answered, UI
+resolution is irrelevant, and outdated threads are listed but do not block.
 
 | Task                                | Tool                                      | Use                                                                                                |
 | ----------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -85,7 +85,6 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | `agentic:gh-pr`                     | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
 | `agentic:gh-watch`                  | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
 | `agentic:gh-token`                  | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
-| `agentic:review-threads`            | `review-threads.ts`                       | list all PR review threads and fail while a current thread has no reply                            |
 | `agentic:claude-hook-log`           | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
 | `agentic:check-claude`              | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
 | `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
