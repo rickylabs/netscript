@@ -11,7 +11,7 @@ import {
   githubRequest,
   type GitHubResponse,
   resolveGithubToken,
-} from '../agentic/lib/agentic-lib.ts';
+} from './github-api.ts';
 import { mustRun, prepareRelease } from './prepare-release.ts';
 
 export interface ReleaseCutOptions {

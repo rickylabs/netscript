@@ -5,3 +5,6 @@ export const JSR_API_BASE_URL = 'https://api.jsr.io';
 
 /** Public JSR registry metadata used for immutable version discovery. */
 export const JSR_REGISTRY_BASE_URL = 'https://jsr.io';
+
+/** GitHub REST API used to open release PRs, publish releases, and read commit statuses. */
+export const GITHUB_API_BASE_URL = 'https://api.github.com';

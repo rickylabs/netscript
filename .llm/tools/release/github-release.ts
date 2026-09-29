@@ -39,7 +39,7 @@ import {
   githubRequest,
   type GitHubResponse,
   resolveGithubToken,
-} from '../agentic/lib/agentic-lib.ts';
+} from './github-api.ts';
 import {
   discoverPreparedReleaseFiles,
   PREPARED_RELEASE_GENERATED_OUTPUTS,
