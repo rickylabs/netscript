@@ -88,7 +88,7 @@ suite.
 | `agentic:openhands-status`          | `openhands-status.ts`                     | read an OpenHands run's verdict (local trace or remote comment)                                    |
 | `agentic:gh-pr`                     | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
 | `agentic:gh-watch`                  | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
-| `agentic:gh-token`                  | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
+| `maint:gh-token`                    | `maint/gh-token.ts`                       | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
 | `maint:claude-hook-log`             | `maint/claude/claude-hook-log.ts`         | append Claude Code hook events to the run's hook log                                               |
 | `maint:check-claude`                | `maint/claude/validate-claude-surface.ts` | validate Claude config, the single repo-skill bridge, and hooks                                    |
 | `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
