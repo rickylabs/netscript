@@ -28,7 +28,7 @@ import {
   rejectLegacyLaneForNewSelection,
   WORKLOAD_TIERS,
   type WorkloadTier,
-} from './delegation-matrix.ts';
+} from '@harness/matrix';
 
 export interface CanonicalRoutePolicy {
   readonly tier: WorkloadTier;

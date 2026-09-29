@@ -5,7 +5,7 @@ import {
   DELEGATION_MATRIX,
   type ModelRoute,
   WORKLOAD_TIERS,
-} from './delegation-matrix.ts';
+} from '@harness/matrix';
 
 function routes(items: readonly ModelRoute[]): string {
   return items.length ? items.map((route) => `${route.model}@${route.effort}`).join(' → ') : '—';

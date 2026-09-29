@@ -192,11 +192,12 @@ session-safe Codex daemon repair. `deno task agentic:routing-state` reads the pe
 quota-fallback routing state.
 
 Read the pinned Harness fleet routing through `deno task agentic:matrix`, never by shell-scraping
-TypeScript. NetScript's internal launch resolver remains local until its separate migration.
-Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a direct
-evaluator lookup, `--role deep-research` for the dedicated research role, `--fallback-of
-<logical-model>` to list every context-sensitive fallback, and `--json` for structured consumption.
-The full table includes separate Deep Research default and fallback columns.
+TypeScript. NetScript's internal launch resolver and paid OpenCode guard read the same pinned
+Harness matrix. Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a
+direct evaluator lookup, `--role deep-research` for the dedicated research role,
+`--fallback-of
+<logical-model>` to list every context-sensitive fallback, and `--json` for
+structured consumption. The full table includes separate Deep Research default and fallback columns.
 
 Pure UI/UX specialist routing is an explicit `ui_ux` role; incidental UI changes stay on the normal
 implementation role. Owner overrides require the typed override record and the exact grant in a

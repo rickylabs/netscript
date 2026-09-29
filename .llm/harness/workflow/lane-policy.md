@@ -1,21 +1,22 @@
 # Lane Policy — Canonical Model Routing
 
-This document is the human-facing view of the owner-ratified 2026-09-04 delegation matrix. The
-fleet authority is pinned Harness `packages/routing/matrix/`. NetScript's internal legacy matrix
-and resolver remain at `../../tools/agentic/runtime/delegation-matrix.ts` and
-`../../tools/agentic/runtime/routing-policy.ts` until their separate migration. Earlier named
-lanes are persisted-state vocabulary only and must not be selected for new work.
+This document is the human-facing view of the owner-ratified 2026-09-04 delegation matrix. The fleet
+authority is pinned Harness `packages/routing/matrix/`. NetScript's internal resolver at
+`../../tools/agentic/runtime/routing-policy.ts` also reads that pinned matrix. The old local
+`delegation-matrix.ts` is retained only for legacy tests until its dependent tools are migrated.
+Earlier named lanes are persisted-state vocabulary only and must not be selected for new work.
 
-Inspect the pinned Harness authority through `deno task agentic:matrix`. Use `--tier <tier>` for one row,
-`--tier <tier> --plan-evaluator|--impl-evaluator` for direct evaluator lookup, `--role
+Inspect the pinned Harness authority through `deno task agentic:matrix`. Use `--tier <tier>` for one
+row, `--tier <tier> --plan-evaluator|--impl-evaluator` for direct evaluator lookup,
+`--role
 deep-research` for that dedicated role, `--fallback-of <model>` for every context-sensitive
 fallback, and `--json` for automation. Do not reconstruct the matrix with `sed`/`grep`/`awk`; the
 built-in renderer includes the Deep Research default and fallback columns.
 
-Fleet model strings live in Harness `packages/routing/matrix/models.ts`; the legacy NetScript
-runtime still uses `../../tools/agentic/config/models.ts`. Subscription limits remain in
-`../../tools/agentic/config/subscriptions.ts`. Keep local runtime edits separate from the fleet
-authority; the parity gate identifies stale prose here.
+Route model strings live in Harness `packages/routing/matrix/models.ts`; NetScript's
+`../../tools/agentic/config/models.ts` still serves local canaries and provider tools. Subscription
+limits remain in `../../tools/agentic/config/subscriptions.ts`. Keep local runtime edits separate
+from the fleet authority; the parity gate identifies stale prose here.
 
 ## Provider order
 
@@ -43,13 +44,13 @@ phase.
 
 <!-- generated-workload-matrix:start -->
 
-| Tier            | Implementation                                  | UI/UX                                                  | Plan                                        | PLAN-EVAL                                            | IMPL-EVAL                                                         | Vision                                                                  | Documentation                                                  | Deep research                      |
-| --------------- | ----------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| simple          | luna@max → qwen_3_8_flash_next@provider_default | kimi_k3@low → minimax_m3@provider_default              | —                                           | —                                                    | minimax_m3@provider_default → deepseek_v4_flash@provider_default  | minimax_m3@provider_default → deepseek_v4_flash_vision@provider_default | gemini_3_8_flash@medium → opus_5@low                           | gemini_3_8_flash@low → luna@max    |
-| straightforward | sol@high → glm_5_3_flash@provider_default       | kimi_k3@high → gemini_3_8_flash@high                   | sol@high → glm_5_3_flash@provider_default   | opus_5@medium → qwen_3_8_flash_next@provider_default | glm_5_3_flash@provider_default → deepseek_v4_pro@provider_default | deepseek_v4_flash_vision@provider_default → kimi_k3@low                 | gemini_3_8_flash@high → qwen_3_8_flash_next@provider_default   | gemini_3_8_flash@medium → luna@max |
-| feature         | sol@high → muse_spark_1_3@xhigh                 | kimi_k3@high → gemini_3_8_flash@high                   | fable_5_1@low → muse_spark_1_3@xhigh        | glm_5_3@provider_default → fable_5_1@low             | muse_spark_1_3@xhigh → opus_5@xhigh                               | gemini_3_8_flash@high → muse_spark_1_3@xhigh                            | qwen_3_8_max@provider_default → glm_5_3_flash@provider_default | gemini_3_8_flash@high → luna@max   |
-| complex         | astra@medium → fable_5_1@medium                 | kimi_k3@max → fable_5_1@medium                         | fable_5_1@medium → muse_spark_1_3@max       | muse_spark_1_3@max → grok_4_6@high                   | muse_spark_1_3@max → muse_spark_1_3@max                           | kimi_k3@max → gemini_3_8_flash@high                                     | fable_5_1@medium → qwen_3_8_max@provider_default               | gemini_3_8_flash@high → luna@max   |
-| architecture    | astra@xhigh → fable_5_1@xhigh                   | kimi_k3@max → fable_5_1@medium                         | fable_5_1@xhigh → muse_spark_1_3@max        | muse_spark_1_3@max → grok_4_6@xhigh                  | grok_4_6@xhigh → muse_spark_1_3@max                               | kimi_k3@max → fable_5_1@high                                            | fable_5_1@high → qwen_3_8_max@provider_default                 | gemini_3_8_flash@high → luna@max   |
+| Tier            | Implementation                                  | UI/UX                                     | Plan                                      | PLAN-EVAL                                            | IMPL-EVAL                                                         | Vision                                                                  | Documentation                                                  | Deep research                      |
+| --------------- | ----------------------------------------------- | ----------------------------------------- | ----------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| simple          | luna@max → qwen_3_8_flash_next@provider_default | kimi_k3@low → minimax_m3@provider_default | —                                         | —                                                    | minimax_m3@provider_default → deepseek_v4_flash@provider_default  | minimax_m3@provider_default → deepseek_v4_flash_vision@provider_default | gemini_3_8_flash@medium → opus_5@low                           | gemini_3_8_flash@low → luna@max    |
+| straightforward | sol@high → glm_5_3_flash@provider_default       | kimi_k3@high → gemini_3_8_flash@high      | sol@high → glm_5_3_flash@provider_default | opus_5@medium → qwen_3_8_flash_next@provider_default | glm_5_3_flash@provider_default → deepseek_v4_pro@provider_default | deepseek_v4_flash_vision@provider_default → kimi_k3@low                 | gemini_3_8_flash@high → qwen_3_8_flash_next@provider_default   | gemini_3_8_flash@medium → luna@max |
+| feature         | sol@high → muse_spark_1_3@xhigh                 | kimi_k3@high → gemini_3_8_flash@high      | fable_5_1@low → muse_spark_1_3@xhigh      | glm_5_3@provider_default → fable_5_1@low             | muse_spark_1_3@xhigh → opus_5@xhigh                               | gemini_3_8_flash@high → muse_spark_1_3@xhigh                            | qwen_3_8_max@provider_default → glm_5_3_flash@provider_default | gemini_3_8_flash@high → luna@max   |
+| complex         | astra@medium → fable_5_1@medium                 | kimi_k3@max → fable_5_1@medium            | fable_5_1@medium → muse_spark_1_3@max     | muse_spark_1_3@max → grok_4_6@high                   | muse_spark_1_3@max → muse_spark_1_3@max                           | kimi_k3@max → gemini_3_8_flash@high                                     | fable_5_1@medium → qwen_3_8_max@provider_default               | gemini_3_8_flash@high → luna@max   |
+| architecture    | astra@xhigh → fable_5_1@xhigh                   | kimi_k3@max → fable_5_1@medium            | fable_5_1@xhigh → muse_spark_1_3@max      | muse_spark_1_3@max → grok_4_6@xhigh                  | grok_4_6@xhigh → muse_spark_1_3@max                               | kimi_k3@max → fable_5_1@high                                            | fable_5_1@high → qwen_3_8_max@provider_default                 | gemini_3_8_flash@high → luna@max   |
 
 <!-- generated-workload-matrix:end -->
 
@@ -99,12 +100,12 @@ separate-session or different-vendor-family evaluator rules.
 
 <!-- generated-coordinator-matrix:start -->
 
-| Scope         | Coordinator route                              |
-| ------------- | ---------------------------------------------- |
-| small_project | sol@medium → opus_5@low                        |
-| project       | sol@medium → opus_5@medium                     |
-| framework     | sol@high → opus_5@xhigh                        |
-| milestone     | sol@medium → fable_5_1@medium → opus_5@xhigh   |
+| Scope         | Coordinator route                            |
+| ------------- | -------------------------------------------- |
+| small_project | sol@medium → opus_5@low                      |
+| project       | sol@medium → opus_5@medium                   |
+| framework     | sol@high → opus_5@xhigh                      |
+| milestone     | sol@medium → fable_5_1@medium → opus_5@xhigh |
 
 <!-- generated-coordinator-matrix:end -->
 
