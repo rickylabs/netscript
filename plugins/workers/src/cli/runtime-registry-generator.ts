@@ -458,7 +458,7 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
   );
   if (entries.some((entry) => entry.source === 'plugin' && entry.policy)) {
     lines.push(
-      'function assertJobHandlerId(handler: SchemaBackedJobHandler & Readonly<{ id: string }>, expectedId: string, path: string): string {\n  if (handler.id !== expectedId) {\n    throw new Error(`Workers config id "${expectedId}" does not match discovered plugin handler id "${String(handler.id)}" at ${path}.`);\n  }\n  return expectedId;\n}',
+      'function assertJobHandlerId<TId extends string>(handler: SchemaBackedJobHandler & Readonly<{ id: string }>, expectedId: TId, path: string): TId {\n  if (handler.id !== expectedId) {\n    throw new Error(`Workers config id "${expectedId}" does not match discovered plugin handler id "${String(handler.id)}" at ${path}.`);\n  }\n  return expectedId;\n}',
       '',
     );
   }

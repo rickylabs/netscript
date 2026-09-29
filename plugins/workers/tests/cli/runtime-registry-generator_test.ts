@@ -1,7 +1,9 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 import { type WorkersConfigData, WorkersConfigSchema } from '@netscript/plugin-workers-core/config';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
 import { writeOfficialSampleConfiguration } from '../../src/cli/official-sample-configuration.ts';
+import { compileWorkersRegistry } from '../../src/cli/registry-compiler.ts';
 import { generateRuntimeRegistries } from '../../src/cli/runtime-registry-generator.ts';
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../..', import.meta.url));
@@ -308,7 +310,7 @@ export default Object.assign(async () => undefined, {
 Deno.test('generated registry preserves literal job payload types at the consumer boundary', async () => {
   await withTempProject(async (projectRoot) => {
     await writeProjectDenoConfig(projectRoot);
-    await writeWorkersManifest(projectRoot);
+    await writeWorkersManifest(projectRoot, true);
     await writeTypedJob(
       projectRoot,
       'embed-document.ts',
@@ -319,8 +321,19 @@ Deno.test('generated registry preserves literal job payload types at the consume
       'transcribe-image.ts',
       'Readonly<{ imageUrl: string; language?: string }>',
     );
+    await writeTypedPluginJob(projectRoot, 'configured-plugin.ts', 'configured-plugin');
+    await writeTypedPluginJob(projectRoot, 'unconfigured-plugin.ts', 'unconfigured-plugin');
 
-    await generateRuntimeRegistries(generatorOptions(projectRoot));
+    const workers = WorkersConfigSchema.parse({
+      jobsDir: './workers/jobs',
+      jobs: [{
+        id: 'configured-plugin',
+        name: 'Configured plugin',
+        entrypoint: '../../plugins/workers/jobs/configured-plugin.ts',
+        source: 'plugin',
+      }],
+    });
+    await generateRuntimeRegistries(generatorOptions(projectRoot, workers));
     const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
     assertStringIncludes(registrySource, 'export const jobHandlersById');
     await write(
@@ -333,7 +346,11 @@ createWorkersContract<GeneratedJobPayloadMap>();
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 const exactPayload: Equal<GeneratedJobPayloadMap['transcribe-image'], Readonly<{ imageUrl: string; language?: string }>> = true;
+const exactConfiguredPlugin: Equal<GeneratedJobPayloadMap['configured-plugin'], Readonly<{ value: string }>> = true;
+const exactUnconfiguredPlugin: Equal<GeneratedJobPayloadMap['unconfigured-plugin'], Readonly<{ value: string }>> = true;
 void exactPayload;
+void exactConfiguredPlugin;
+void exactUnconfiguredPlugin;
 // @ts-expect-error - a different job's payload must not type as this trigger
 const wrongTrigger: JobTriggerInput<GeneratedJobPayloadMap> = { id: 'transcribe-image', payload: { documentId: 'doc-1', text: 'content' } };
 void wrongTrigger;
@@ -353,6 +370,8 @@ await transcribeImage({
   // @ts-expect-error - embed-document payload must not compile for transcribe-image
   payload: { documentId: 'doc-1', text: 'content' },
 });
+
+
 `,
     );
 
@@ -370,6 +389,37 @@ await transcribeImage({
     }).output();
     const stderr = new TextDecoder().decode(output.stderr);
     assertEquals(output.code, 0, stderr);
+  });
+});
+
+Deno.test('compile-registry output type-checks with real schema-backed handlers and literal payloads', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeProjectDenoConfig(projectRoot);
+    await writeTypedJob(projectRoot, 'transcribe-image.ts', 'Readonly<{ imageUrl: string }>');
+    await compileWorkersRegistry(new LocalProjectFiles(projectRoot));
+    await write(
+      join(projectRoot, 'compiled-consumer.ts'),
+      `import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import type { GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+const exact: Equal<GeneratedJobPayloadMap['transcribe-image'], Readonly<{ imageUrl: string }>> = true;
+void exact;
+createWorkersContract<GeneratedJobPayloadMap>();
+`,
+    );
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'check',
+        '--no-lock',
+        '--config',
+        join(projectRoot, 'deno.json'),
+        join(projectRoot, 'compiled-consumer.ts'),
+      ],
+      cwd: projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   });
 });
 
@@ -556,6 +606,24 @@ const handler: JobHandlerDefinition<Payload> = Object.assign(
   { payloadSchema },
 );
 export default handler;
+`,
+  );
+}
+
+async function writeTypedPluginJob(projectRoot: string, file: string, id: string): Promise<void> {
+  await write(
+    join(projectRoot, 'plugins/workers/jobs', file),
+    `import type { JobHandlerDefinition, JobPayloadSchema } from '@netscript/plugin-workers-core/runtime';
+
+type Payload = Readonly<{ value: string }>;
+const payloadSchema: JobPayloadSchema<Payload> = {
+  '~standard': { version: 1, vendor: 'test', validate: (value) => ({ value: value as Payload }) },
+};
+const handler: JobHandlerDefinition<Payload> = Object.assign(
+  async () => ({ success: true as const }),
+  { payloadSchema },
+);
+export default Object.assign(handler, { id: ${JSON.stringify(id)} as const });
 `,
   );
 }
