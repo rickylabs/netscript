@@ -149,12 +149,23 @@ export async function createKvOAuthBackend(
           setCookies = [buildCookieHeader(session.id, request, cookie)];
         } catch (error) {
           if (error instanceof KvOAuthError && error.code === 'refresh_failed') {
-            const current = await store.getSession(sessionId);
-            if (!current || current.session.state !== 'active') {
+            const current = await store.getSessionEntry(sessionId);
+            if (!current || current.record.session.state !== 'active') {
               return { ok: false, reason: 'kv_oauth_session_not_found' };
             }
+            // Another request may have refreshed this still-active session first.
+            // Its persisted version is authoritative; the cookie keeps the same id.
+            if (
+              current.versionstamp !== entry!.versionstamp &&
+              Date.parse(current.record.session.expiresAt) > Date.now()
+            ) {
+              session = current.record.session;
+            } else {
+              throw error;
+            }
+          } else {
+            throw error;
           }
-          throw error;
         }
       }
 

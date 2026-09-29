@@ -353,3 +353,63 @@ Deno.test('authenticate refresh cannot restore authority after revocation', asyn
     }
   });
 });
+
+Deno.test('parallel authenticate refreshes keep a valid session available', async () => {
+  await withRevocationHarness(async ({ backend, store }) => {
+    const session = await createFixtureSession(backend);
+    await store.putSession({
+      session,
+      tokens: { accessToken: 'access', refreshToken: 'refresh', expiresAt: session.expiresAt },
+    });
+    let successfulWrites = 0;
+    const countedStore: KvOAuthStore = {
+      ...store,
+      async rotateSession(...args: Parameters<KvOAuthStore['rotateSession']>) {
+        const ok = await store.rotateSession(...args);
+        if (ok) successfulWrites += 1;
+        return ok;
+      },
+    };
+    const bothEntered = Promise.withResolvers<void>();
+    const released = Promise.withResolvers<void>();
+    let calls = 0;
+    try {
+      const refreshing = await createKvOAuthBackend({
+        provider: fixtureProvider(),
+        store: countedStore,
+        refreshMode: 'always',
+        fetch: async () => {
+          calls += 1;
+          if (calls === 2) bothEntered.resolve();
+          await released.promise;
+          return new Response(
+            JSON.stringify({ access_token: 'new-access', token_type: 'Bearer', expires_in: 3600 }),
+            { status: 200, headers: { 'content-type': 'application/json' } },
+          );
+        },
+      });
+      const first = refreshing.authenticate(sessionRequest(session.id));
+      const second = refreshing.authenticate(sessionRequest(session.id));
+      await bothEntered.promise;
+      released.resolve();
+      const [a, b] = await Promise.all([first, second]);
+      assertEquals(a.ok, true);
+      assertEquals(b.ok, true);
+      assertEquals(successfulWrites, 1, 'only one refresh CAS may commit');
+      assertEquals((await store.getSession(session.id))?.session.state, 'active');
+    } finally {
+      released.resolve();
+    }
+  });
+});
+
+Deno.test('rotating a deleted session without an observed version does not recreate it', async () => {
+  await withRevocationHarness(async ({ backend, store }) => {
+    const session = await createFixtureSession(backend);
+    const record = await store.getSession(session.id);
+    if (!record) throw new Error('Fixture session was not stored');
+    await store.deleteSession(session.id);
+    assertEquals(await store.rotateSession(session.id, record), false);
+    assertEquals(await store.getSession(session.id), null);
+  });
+});
