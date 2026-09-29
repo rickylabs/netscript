@@ -7,9 +7,9 @@ import {
   parseDoneContract,
   remainingBudgetDelay,
 } from './run-codex-slice-lib.ts';
-import { runLeakCheck } from '../teardown/leak-check.ts';
-import { readRunResources } from '../teardown/run-resources.ts';
-import { runTeardown } from '../teardown/teardown.ts';
+import { runLeakCheck } from '../../maint/teardown/leak-check.ts';
+import { readRunResources } from '../../maint/teardown/run-resources.ts';
+import { runTeardown } from '../../maint/teardown/teardown.ts';
 import { parseThreadInfo, requireValue, UUID } from '../lib/agentic-lib.ts';
 import { LocalSenderOwnershipAdapter } from '../runtime/adapters/local-sender-ownership-adapter.ts';
 

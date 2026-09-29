@@ -67,15 +67,15 @@ command map.
 
 ## Full CLI E2E
 
-## Run resource hygiene (`agentic/teardown/`)
+## Run resource hygiene (`maint/teardown/`)
 
 When a run failed and you do not know what is still running, `behavior.service-health` timed out,
 ports are already in use, or a `postgres-*` container appeared that you did not start:
 
-- `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>` is read-only. It
+- `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>` is read-only. It
   writes `leak-report.md` and emits JSON for every Aspire survivor, including foreign and
   unknown-owner resources.
-- `deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>` is a dry run.
+- `deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree>` is a dry run.
 - Add `--apply` only to stop resources positively proven to belong to that run. AppHosts are stopped
   one path at a time; containers are re-inspected and removed one id at a time.
 

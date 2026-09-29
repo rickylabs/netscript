@@ -81,16 +81,16 @@ Aspire 13.5.3 lifecycle receipts establish these operating facts:
 Use the read-only command first:
 
 ```bash
-deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
 ```
 
 After reviewing every reported owner and the exact planned argv, apply only to positively proven
 resources:
 
 ```bash
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply --force-persistent
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply --force-persistent
 ```
 
 ## 2. Concern-folder taxonomy (the restructure)

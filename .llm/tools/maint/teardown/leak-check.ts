@@ -9,7 +9,7 @@ import {
 import { probeResourceReport, type ProbeStatus } from './probes.ts';
 import { type CommandPort, type FilePort, systemCommands, systemFiles } from './ports.ts';
 import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
-import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+import { normalizeTaskArguments } from '../task-arguments.ts';
 
 export const STALE_AFTER_MS: number = 2 * 60 * 60 * 1000;
 
