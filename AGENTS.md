@@ -97,7 +97,7 @@ If your PR is green but should not merge yet because review findings may have go
 the read-only thread gate before pushing again:
 
 ```text
-deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty
+deno task check:review-threads -- --repo rickylabs/netscript --pr <number> --pretty
 ```
 
 It lists every thread with author, location, severity when present, and answered/unanswered state;

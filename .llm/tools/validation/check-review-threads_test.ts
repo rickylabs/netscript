@@ -1,9 +1,10 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import {
   assessReviewThreads,
   fetchReviewThreads,
+  parseReviewThreadArgs,
   type ReviewThreadNode,
-} from './review-threads.ts';
+} from './check-review-threads.ts';
 
 function thread(values: Partial<ReviewThreadNode> = {}): ReviewThreadNode {
   return {
@@ -126,9 +127,25 @@ Deno.test('review-thread GraphQL reader returns every paginated thread', async (
 
 Deno.test('CI close-gate invokes the answered review-thread task with read-only token access', async () => {
   const workflow = await Deno.readTextFile(
-    new URL('../../../../.github/workflows/ci.yml', import.meta.url),
+    new URL('../../../.github/workflows/ci.yml', import.meta.url),
   );
   assertEquals(workflow.includes('name: Answered review-thread gate'), true);
-  assertEquals(workflow.includes('deno task agentic:review-threads'), true);
+  assertEquals(workflow.includes('deno task check:review-threads'), true);
+  assertEquals(workflow.includes('agentic:review-threads'), false);
   assertEquals(workflow.includes('GITHUB_TOKEN: ${{ github.token }}'), true);
+});
+
+Deno.test('review-thread gate accepts one leading task separator and rejects later ones', () => {
+  assertEquals(parseReviewThreadArgs(['--', '--repo', 'o/r', '--pr', '7', '--pretty']), {
+    repo: 'o/r',
+    pr: 7,
+    token: undefined,
+    pretty: true,
+  });
+  assertThrows(
+    () => parseReviewThreadArgs(['--repo', 'o/r', '--pr', '7', '--']),
+    Error,
+    'Unknown argument: --',
+  );
+  assertThrows(() => parseReviewThreadArgs(['--repo', 'o/r', '--pr', '0']), Error, '--pr');
 });
