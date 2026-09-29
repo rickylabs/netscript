@@ -85,8 +85,8 @@ resolution is irrelevant, and outdated threads are listed but do not block.
 | `agentic:gh-pr`                     | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
 | `agentic:gh-watch`                  | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
 | `agentic:gh-token`                  | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
-| `agentic:claude-hook-log`           | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
-| `agentic:check-claude`              | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
+| `maint:claude-hook-log`             | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
+| `maint:check-claude`                | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
 | `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
 | `agentic:opencode`                  | `opencode-run.ts`                         | run a general OpenCode turn; paid routes require fresh usage proof before spawn                    |
 | `agentic:expense-watch`             | `runtime/cli/expense-watch.ts`            | emit a structured, fail-closed Go/Ollama/OpenRouter allowance decision                             |

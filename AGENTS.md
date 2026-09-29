@@ -81,7 +81,7 @@ ad-hoc shell orchestration:
 
 ## Resource hygiene
 
-Dogfood the consumer-facing agent bundle with `deno task agentic:dogfood-skills`; it installs the
+Dogfood the consumer-facing agent bundle with `deno task maint:dogfood-skills`; it installs the
 current local CLI bundle under `.agents/generated/consumer-skills/`. Use that generated surface when
 present, plus the internal `.agents/skills/aspire` diagnostic skill.
 

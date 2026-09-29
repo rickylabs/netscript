@@ -24,7 +24,7 @@ try {
     const stale = await diffTrees(generated, destination);
     console.log(
       JSON.stringify({
-        gate: 'agentic:dogfood-skills',
+        gate: 'maint:dogfood-skills',
         status: stale.length ? 'FAIL' : 'OK',
         stale,
       }),

@@ -14,8 +14,8 @@
 - Repository skills have one authoritative home: `.agents/skills/`. Before invoking a repo skill by
   name, read `.agents/skills/<name>/SKILL.md` directly. The lone
   `.claude/skills/repo-skills/SKILL.md` entry is discovery guidance, not a copy of that tree.
-- Use `.llm/tools/agentic/claude/validate-claude-surface.ts` when Claude configuration, skills,
-  hooks, or agent orchestration docs change.
+- Use `.llm/tools/maint/claude/validate-claude-surface.ts` when Claude configuration, skills, hooks,
+  or agent orchestration docs change.
 - Never copy or synchronize repository skills into `.claude/skills/`; update only the authoritative
   `.agents/skills/` source.
 
