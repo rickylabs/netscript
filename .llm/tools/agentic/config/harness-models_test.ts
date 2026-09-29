@@ -7,12 +7,19 @@ import { OPENCODE_GO_MODEL_MONTHLY_INCLUDED_USD } from './subscriptions.ts';
 Deno.test('the local routing catalog is the same pinned Harness module', async () => {
   const config = JSON.parse(await Deno.readTextFile('deno.json')) as Readonly<{
     imports: Readonly<Record<string, string>>;
+    tasks: Readonly<Record<string, string>>;
   }>;
   const matrix = config.imports['@harness/matrix'];
   const models = config.imports['@harness/models'];
   assertEquals(
     models,
     matrix.replace(/delegation-matrix\.ts$/, 'models.ts'),
+  );
+  // The matrix viewer is Harness code at the same commit, so it always shows the matrix
+  // NetScript routes with.
+  assertEquals(
+    config.tasks['agentic:matrix'],
+    `deno run --no-lock ${matrix.replace(/delegation-matrix\.ts$/, 'cli/matrix-view.ts')}`,
   );
   assertStrictEquals(ROUTING_MODEL_IDS, HARNESS_MODEL_IDS);
   assertEquals(MODEL_IDS.codexSol, HARNESS_MODEL_IDS.solNative);

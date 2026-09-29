@@ -11,7 +11,6 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:wsl-foundation': 'wsl/wsl-foundation.ts',
   'agentic:runtime': 'runtime/cli/agentic-runtime.ts',
   'agentic:routing-state': 'runtime/cli/routing-state.ts',
-  'agentic:matrix': 'runtime/cli/delegation-matrix-table.ts',
   'agentic:expense-watch': 'runtime/cli/expense-watch.ts',
   'agentic:leak-check': 'teardown/leak-check.ts',
   'agentic:teardown': 'teardown/teardown.ts',
@@ -45,6 +44,10 @@ const PERMISSIVE_AGENTIC_TASKS = [
   'agentic:claude-hook-log',
 ] as const;
 
+// Tasks whose entry point is Harness code at the pinned commit. Their argv rules, including the
+// single leading task separator, are tested in Harness (config/harness-models_test.ts pins the URL).
+const HARNESS_AGENTIC_TASKS = ['agentic:matrix'] as const;
+
 interface CommandResult {
   readonly code: number;
   readonly output: string;
@@ -75,9 +78,10 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
   const surveyedTasks = [
     ...Object.keys(STRICT_AGENTIC_TASKS),
     ...PERMISSIVE_AGENTIC_TASKS,
+    ...HARNESS_AGENTIC_TASKS,
   ].sort();
   assertEquals(surveyedTasks, actualTasks);
-  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 29);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 28);
   for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
     assert(
       denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),

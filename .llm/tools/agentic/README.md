@@ -386,11 +386,12 @@ transitions — no credentials, prompts, or account identity. Fallback and resto
 decisions only_, and only at an idle turn or session boundary; an active/critical slice blocks. This
 command is strictly read-only.
 
-### `runtime/cli/delegation-matrix-table.ts` — pinned Harness matrix, readable
+### `agentic:matrix` — pinned Harness matrix, readable
 
-Render the pinned Harness routing authority without shell-scraping its TypeScript source. This
-viewer imports Harness commit `948919ef323164e8230cb6df12c9c554b5ecad58` over an immutable public
-source URL; it needs network on a cold cache and fails closed when that source is unavailable.
+Render the pinned Harness routing authority without shell-scraping its TypeScript source. The task
+runs Harness's own viewer, `packages/routing/matrix/cli/matrix-view.ts`, at the same immutable
+commit as the `@harness/matrix` import in `deno.json`; `config/harness-models_test.ts` fails if the
+two pins diverge. It needs network on a cold cache and fails closed when that source is unavailable.
 NetScript's own launch resolver and paid OpenCode launch guard also read this pinned matrix:
 
 ```console

@@ -89,7 +89,6 @@ const STRUCTURAL_ALLOWLIST: Readonly<Record<string, readonly string[]>> = {};
  */
 const TESTS_ALLOWED_TO_PIN_CONTRACT_LITERALS = new Set<string>([
   // Pins the Harness viewer's physical Sol and Luna ids independently of the local catalog.
-  'runtime/cli/delegation-matrix-table_test.ts',
   'wsl/wsl-foundation_test.ts',
   'runtime/launch-route-identity_test.ts',
   'runtime/provider-profiles_test.ts',
