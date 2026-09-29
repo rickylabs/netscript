@@ -89,28 +89,34 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
   }
 });
 
-Deno.test('Harness-owned tasks run one pinned Harness file without extra permissions', async () => {
+Deno.test('Harness-owned tasks run one pinned Harness file with exactly their reviewed flags', async () => {
   const denoConfig = JSON.parse(await Deno.readTextFile(`${repo}/deno.json`)) as {
     tasks: Record<string, string>;
   };
-  const expected: Record<(typeof HARNESS_AGENTIC_TASKS)[number], string> = {
-    'agentic:matrix': 'packages/routing/matrix/cli/matrix-view.ts',
-    'agentic:pr-checks': 'packages/board/src/pr-checks.ts',
+  // Changing a file or a permission here is a reviewed decision, not drift.
+  const expected: Record<
+    (typeof HARNESS_AGENTIC_TASKS)[number],
+    Readonly<{ flags: string; file: string }>
+  > = {
+    'agentic:matrix': { flags: '', file: 'packages/routing/matrix/cli/matrix-view.ts' },
+    'agentic:pr-checks': {
+      flags: '--allow-read --allow-run --allow-env --allow-net=api.github.com ',
+      file: 'packages/board/src/pr-checks.ts',
+    },
   };
   for (const task of HARNESS_AGENTIC_TASKS) {
-    const command = denoConfig.tasks[task] ?? '';
+    const { flags, file } = expected[task];
+    const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     assertMatch(
-      command,
+      denoConfig.tasks[task] ?? '',
       new RegExp(
-        `^deno run --no-lock (--allow-[a-z]+(=[^ ]+)? )*https://raw\\.githubusercontent\\.com/rickylabs/harness/[0-9a-f]{40}/${
-          expected[task].replaceAll('.', '\\.')
-        }$`,
+        `^deno run --no-lock ${
+          escape(flags)
+        }https://raw\\.githubusercontent\\.com/rickylabs/harness/[0-9a-f]{40}/${escape(file)}$`,
       ),
-      `${task} must run ${expected[task]} from a full-SHA Harness commit`,
-    );
-    assert(
-      !command.includes('--allow-all') && !/ -A( |$)/.test(command),
-      `${task} must not grant all permissions`,
+      `${task} must run ${file} from a full-SHA Harness commit with exactly: ${
+        flags || '(no flags)'
+      }`,
     );
   }
 });
