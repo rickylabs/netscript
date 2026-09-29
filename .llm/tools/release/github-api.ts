@@ -85,6 +85,17 @@ export function buildWslGhTokenCommand(
   return actual === user ? { bin: 'bash', args: ['-lc', WSL_GH_TOKEN_SCRIPT] } : null;
 }
 
+/**
+ * {@link buildWslGhTokenCommand} for the running process. On Linux, when the
+ * environment does not name the account, ask `id -un` before deciding the source
+ * does not apply.
+ */
+export async function resolveWslGhTokenCommand(user: string): Promise<CommandPlan | null> {
+  if (Deno.build.os !== 'linux') return buildWslGhTokenCommand(user);
+  const actual = currentUsername() ?? await runCapture('id', ['-un']);
+  return buildWslGhTokenCommand(user, { os: 'linux', currentUser: actual });
+}
+
 function objectRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -338,10 +349,13 @@ export async function resolveGithubToken(
     let r = await accept(ghWin, 'gh:windows');
     if (r) return r;
 
-    const ghWslPlan = buildWslGhTokenCommand(resolvedWslUser);
-    const ghWsl = ghWslPlan ? await runCapture(ghWslPlan.bin, ghWslPlan.args) : null;
-    r = await accept(ghWsl, 'gh:wsl');
-    if (r) return r;
+    const ghWslPlan = await resolveWslGhTokenCommand(resolvedWslUser);
+    if (ghWslPlan) {
+      r = await accept(await runCapture(ghWslPlan.bin, ghWslPlan.args), 'gh:wsl');
+      if (r) return r;
+    } else {
+      tried.push(`gh:wsl (skipped: current account is not ${resolvedWslUser})`);
+    }
 
     const hostsPath = `${wslHome()}/.config/gh/hosts.yml`;
     const hostsToken = await readGithubHostsToken(hostsPath);
