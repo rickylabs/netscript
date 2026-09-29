@@ -101,8 +101,9 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
   name: 'every declared job is registered',
   async run(context) {
     const source = await readWorkersRegistry(context);
-    const declared = source?.match(/import (?:\* as )?job\d+ (?:from )?/g)?.length ?? 0;
-    const compiledHandlers = source?.match(/resolveJobHandler\(job\d+,/g)?.length ?? 0;
+    const declared = source?.match(/^import (?:\* as )?(?:job\d+|\w+Handler) from /gm)
+      ?.length ?? 0;
+    const compiledHandlers = source?.match(/\bresolveJobHandler\(/g)?.length ?? 0;
     const generatedHandlers = source?.match(/\[job\d+\.id, job\d+\]/g)?.length ?? 0;
     const definitions =
       source?.match(/(?:[:,])\s*create(?:Local|Configured|Plugin)JobDefinition\(/g)?.length ?? 0;

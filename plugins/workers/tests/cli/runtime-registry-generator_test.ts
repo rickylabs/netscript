@@ -360,6 +360,26 @@ Deno.test('generated registry preserves literal job payload types at the consume
     await generateRuntimeRegistries(generatorOptions(projectRoot, workers));
     const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
     assertStringIncludes(registrySource, 'export const jobHandlersById');
+    const doctor = await runDoctorCommand({
+      plugin: workersAdapterPlugin,
+      context: {
+        workspaceRoot: projectRoot,
+        options: {},
+        config: { WORKERS_API_URL: 'http://localhost:9181' },
+        dryRun: true,
+        fileSystem: {
+          exists: () => Promise.resolve(true),
+          readText: () => Promise.resolve(registrySource),
+          writeText: () => Promise.reject(new Error('read only')),
+        },
+      },
+    });
+    assertEquals(
+      doctor.checks.filter((check) =>
+        check.name.startsWith('generated') || check.name.startsWith('every')
+      ).every((check) => check.ok),
+      true,
+    );
     await write(
       join(projectRoot, 'payload-consumer.ts'),
       `import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
