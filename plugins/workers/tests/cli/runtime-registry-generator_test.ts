@@ -2,6 +2,8 @@ import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 import { type WorkersConfigData, WorkersConfigSchema } from '@netscript/plugin-workers-core/config';
 import { LocalProjectFiles } from '@netscript/plugin/cli';
+import { runDoctorCommand } from '@netscript/plugin/adapter';
+import { workersAdapterPlugin } from '../../src/adapter/plugin.ts';
 import { writeOfficialSampleConfiguration } from '../../src/cli/official-sample-configuration.ts';
 import { compileWorkersRegistry } from '../../src/cli/registry-compiler.ts';
 import { generateRuntimeRegistries } from '../../src/cli/runtime-registry-generator.ts';
@@ -73,6 +75,28 @@ Deno.test('entry generator loads real config, preserves normalized policy, and g
     const result = await runEntryGenerator(projectRoot);
     assertEquals(result.code, 0, result.stderr);
     assertStringIncludes(result.stderr, 'wholly shadows flat workers.jobs[0]');
+
+    const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
+    const doctor = await runDoctorCommand({
+      plugin: workersAdapterPlugin,
+      context: {
+        workspaceRoot: projectRoot,
+        options: {},
+        config: { WORKERS_API_URL: 'http://localhost:9181' },
+        dryRun: true,
+        fileSystem: {
+          exists: () => Promise.resolve(true),
+          readText: () => Promise.resolve(registrySource),
+          writeText: () => Promise.reject(new Error('read only')),
+        },
+      },
+    });
+    assertEquals(
+      doctor.checks.filter((check) =>
+        check.name.startsWith('generated') || check.name.startsWith('every')
+      ).every((check) => check.ok),
+      true,
+    );
 
     const module = await importRegistry(projectRoot, 'entry-policy');
     assertEquals(module.registry.has('configured-id'), true);
