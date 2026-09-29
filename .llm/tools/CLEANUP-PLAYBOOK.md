@@ -49,7 +49,7 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
 
 ## Aspire 13.5 teardown semantics
 
-The agentic leak reporter and teardown controller deliberately separate **relevance** from
+The maintainer leak reporter and teardown controller deliberately separate **relevance** from
 **ownership**. Aspire 13.5 can leave DCP helpers and `aspire-managed` descendants re-parented to PID
 1 after the launching CLI exits. A process is relevant when its edge-captured facts contain a DCP
 environment path, an exact `--apphost <path>` argument, or a Unix socket opened by that PID whose

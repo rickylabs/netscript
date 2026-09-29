@@ -35,10 +35,14 @@ Deno.test('maint: tasks run maintainer code only', async () => {
   assertEquals(offenders, []);
 });
 
-Deno.test('agentic: tasks never run maintainer code', async () => {
+// Tasks whose entry point is Harness code at the pinned commit (config/harness-models_test.ts).
+const HARNESS_AGENTIC_TASKS = new Set(['agentic:matrix']);
+
+Deno.test('agentic: tasks run agentic code only, never maintainer code', async () => {
   const offenders = Object.entries(await tasks())
-    .filter(([name, command]) =>
-      name.startsWith('agentic:') && command.includes('.llm/tools/maint/')
+    .filter(([name]) => name.startsWith('agentic:') && !HARNESS_AGENTIC_TASKS.has(name))
+    .filter(([, command]) =>
+      !command.includes('.llm/tools/agentic/') || command.includes('.llm/tools/maint/')
     )
     .map(([name]) => name);
   assertEquals(offenders, []);
@@ -47,10 +51,17 @@ Deno.test('agentic: tasks never run maintainer code', async () => {
 Deno.test('maintainer code imports nothing from the agentic tree', async () => {
   const offenders: string[] = [];
   for (const path of await sources(maintRoot)) {
-    const source = await Deno.readTextFile(path);
-    for (const match of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
-      if (/(^|\/)agentic\//.test(match[1])) {
-        offenders.push(`${path.slice(repo.length + 1)} imports ${match[1]}`);
+    // Comments may name the old location; only static, side-effect and dynamic imports count.
+    const code = (await Deno.readTextFile(path)).split('\n')
+      .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line)).join('\n');
+    const specifiers = [
+      ...code.matchAll(/\bfrom\s+['"]([^'"]+)['"]/g),
+      ...code.matchAll(/\bimport\s+['"]([^'"]+)['"]/g),
+      ...code.matchAll(/\bimport\(\s*['"]([^'"]+)['"]/g),
+    ].map((match) => match[1]);
+    for (const specifier of specifiers) {
+      if (/(^|\/)agentic\//.test(specifier)) {
+        offenders.push(`${path.slice(repo.length + 1)} imports ${specifier}`);
       }
     }
   }
