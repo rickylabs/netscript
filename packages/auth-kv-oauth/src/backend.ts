@@ -126,7 +126,8 @@ export async function createKvOAuthBackend(
       if (!sessionId) {
         return { ok: false, reason: 'kv_oauth_session_missing' };
       }
-      const record = await store.getSession(sessionId);
+      const entry = await store.getSessionEntry(sessionId);
+      const record = entry?.record;
       if (!record || record.session.state !== 'active') {
         return { ok: false, reason: 'kv_oauth_session_not_found' };
       }
@@ -142,9 +143,30 @@ export async function createKvOAuthBackend(
         (options.refreshMode ?? 'always') === 'always' &&
         Date.parse(session.expiresAt) - now <= (options.refreshSkewMs ?? 5 * 60 * 1000)
       ) {
-        const refreshed = await refreshRecord(provider, store, record, options);
-        session = refreshed.session;
-        setCookies = [buildCookieHeader(session.id, request, cookie)];
+        try {
+          const refreshed = await refreshRecord(provider, store, entry!, options);
+          session = refreshed.session;
+          setCookies = [buildCookieHeader(session.id, request, cookie)];
+        } catch (error) {
+          if (error instanceof KvOAuthError && error.code === 'refresh_failed') {
+            const current = await store.getSessionEntry(sessionId);
+            if (!current || current.record.session.state !== 'active') {
+              return { ok: false, reason: 'kv_oauth_session_not_found' };
+            }
+            // Another request may have refreshed this still-active session first.
+            // Its persisted version is authoritative; the cookie keeps the same id.
+            if (
+              current.versionstamp !== entry!.versionstamp &&
+              Date.parse(current.record.session.expiresAt) > Date.now()
+            ) {
+              session = current.record.session;
+            } else {
+              throw error;
+            }
+          } else {
+            throw error;
+          }
+        }
       }
 
       const mapping = principalMapper.mapSessionToPrincipal(session);
@@ -156,6 +178,15 @@ export async function createKvOAuthBackend(
     signOut: flow.signOut,
   };
 }
+
+/**
+ * Bounded compare-and-set attempts for a revocation that keeps losing to concurrent writers.
+ *
+ * Revocation is the operator's intent to end a session, so it re-reads and retries instead of
+ * conceding to a concurrent refresh. The bound keeps a pathological writer from looping forever;
+ * exhausting it raises `revoke_conflict` rather than acknowledging an unpersisted revocation.
+ */
+const REVOKE_MAX_ATTEMPTS = 5;
 
 function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegistryPort {
   const descriptor = describeProvider(provider);
@@ -203,7 +234,8 @@ function createSessionStore(
       return session;
     },
     async refreshSession(sessionId: string): Promise<AuthSession> {
-      const record = await store.getSession(sessionId);
+      const entry = await store.getSessionEntry(sessionId);
+      const record = entry?.record;
       if (!record) {
         throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
       }
@@ -211,24 +243,50 @@ function createSessionStore(
         ...record.session,
         refreshedAt: new Date().toISOString(),
       };
-      const rotated = await store.rotateSession(sessionId, { ...record, session: refreshed });
+      const rotated = await store.rotateSession(
+        sessionId,
+        { ...record, session: refreshed },
+        entry!.versionstamp,
+      );
       if (!rotated) {
-        throw new Error(`Session ${sessionId} could not be refreshed due to a concurrent update.`);
+        throw new KvOAuthError(
+          'refresh_failed',
+          `Session ${sessionId} could not be refreshed due to a concurrent update.`,
+        );
       }
       return refreshed;
     },
     async revokeSession(sessionId: string): Promise<AuthSession> {
-      const record = await store.getSession(sessionId);
-      if (!record) {
-        throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
+      let observed: AuthSession | undefined;
+      for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
+        const entry = await store.getSessionEntry(sessionId);
+        const record = entry?.record;
+        if (!record) {
+          if (!observed) {
+            throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
+          }
+          // The record was deleted while revoking; no authority survives, so report the revocation.
+          return { ...observed, state: 'revoked', revokedAt: new Date().toISOString() };
+        }
+        if (record.session.state === 'revoked') {
+          return record.session;
+        }
+        observed = record.session;
+        const revoked: AuthSession = {
+          ...record.session,
+          state: 'revoked',
+          revokedAt: new Date().toISOString(),
+        };
+        if (
+          await store.rotateSession(sessionId, { ...record, session: revoked }, entry!.versionstamp)
+        ) {
+          return revoked;
+        }
       }
-      const revoked: AuthSession = {
-        ...record.session,
-        state: 'revoked',
-        revokedAt: new Date().toISOString(),
-      };
-      await store.rotateSession(sessionId, { ...record, session: revoked });
-      return revoked;
+      throw new KvOAuthError(
+        'revoke_conflict',
+        `Session ${sessionId} could not be revoked after ${REVOKE_MAX_ATTEMPTS} attempts because concurrent updates kept winning the compare-and-set.`,
+      );
     },
   };
 }
@@ -260,9 +318,10 @@ function createPrincipalMapper(): AuthPrincipalMapperPort {
 async function refreshRecord(
   provider: OAuthProviderConfig,
   store: KvOAuthStore,
-  record: NonNullable<Awaited<ReturnType<KvOAuthStore['getSession']>>>,
+  entry: NonNullable<Awaited<ReturnType<KvOAuthStore['getSessionEntry']>>>,
   options: Pick<CreateKvOAuthBackendOptions, 'allowInsecureRequests' | 'fetch'>,
 ): Promise<{ session: AuthSession }> {
+  const { record } = entry;
   const tokenSet = await store.openTokens(record.tokens);
   if (!tokenSet.refreshToken) {
     throw new KvOAuthError(
@@ -325,7 +384,7 @@ async function refreshRecord(
         ? await hashToken(nextTokens.refreshToken)
         : undefined,
     };
-    if (!await store.rotateSession(record.session.id, next)) {
+    if (!await store.rotateSession(record.session.id, next, entry.versionstamp)) {
       throw new KvOAuthError(
         'refresh_failed',
         `Session ${record.session.id} could not be refreshed due to a concurrent update.`,

@@ -102,7 +102,11 @@ export interface KvOAuthStore {
   ): Promise<KvOAuthSessionRecord>;
   /** Reads a session record by id. */
   getSession(id: string): Promise<KvOAuthSessionRecord | null>;
-  /** Replaces a session record using optimistic concurrency; `expectedVersionstamp` is the CAS guard. */
+  /** Reads a session record together with the KV version needed for a later compare-and-set. */
+  getSessionEntry(
+    id: string,
+  ): Promise<Readonly<{ record: KvOAuthSessionRecord; versionstamp: string }> | null>;
+  /** Replaces a session using the observed KV version. Omission reads the current version and never creates a missing session; explicit `null` checks for absence. */
   rotateSession(
     id: string,
     next: KvOAuthSessionRecord,
@@ -166,11 +170,18 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
       const entry = await kv.get<KvOAuthSessionRecord>(sessionKey(id));
       return entry?.value ?? null;
     },
+    async getSessionEntry(id) {
+      const entry = await kv.get<KvOAuthSessionRecord>(sessionKey(id));
+      return entry?.value && entry.versionstamp
+        ? { record: entry.value, versionstamp: entry.versionstamp }
+        : null;
+    },
     async rotateSession(id, next, expectedVersionstamp): Promise<boolean> {
       const key = sessionKey(id);
       const entry = expectedVersionstamp === undefined
         ? await kv.get<KvOAuthSessionRecord>(key)
         : undefined;
+      if (expectedVersionstamp === undefined && !entry?.versionstamp) return false;
       const versionstamp = expectedVersionstamp === undefined
         ? entry?.versionstamp ?? null
         : expectedVersionstamp;
