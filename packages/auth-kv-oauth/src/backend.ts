@@ -126,7 +126,8 @@ export async function createKvOAuthBackend(
       if (!sessionId) {
         return { ok: false, reason: 'kv_oauth_session_missing' };
       }
-      const record = await store.getSession(sessionId);
+      const entry = await store.getSessionEntry(sessionId);
+      const record = entry?.record;
       if (!record || record.session.state !== 'active') {
         return { ok: false, reason: 'kv_oauth_session_not_found' };
       }
@@ -142,9 +143,19 @@ export async function createKvOAuthBackend(
         (options.refreshMode ?? 'always') === 'always' &&
         Date.parse(session.expiresAt) - now <= (options.refreshSkewMs ?? 5 * 60 * 1000)
       ) {
-        const refreshed = await refreshRecord(provider, store, record, options);
-        session = refreshed.session;
-        setCookies = [buildCookieHeader(session.id, request, cookie)];
+        try {
+          const refreshed = await refreshRecord(provider, store, entry!, options);
+          session = refreshed.session;
+          setCookies = [buildCookieHeader(session.id, request, cookie)];
+        } catch (error) {
+          if (error instanceof KvOAuthError && error.code === 'refresh_failed') {
+            const current = await store.getSession(sessionId);
+            if (!current || current.session.state !== 'active') {
+              return { ok: false, reason: 'kv_oauth_session_not_found' };
+            }
+          }
+          throw error;
+        }
       }
 
       const mapping = principalMapper.mapSessionToPrincipal(session);
@@ -212,7 +223,8 @@ function createSessionStore(
       return session;
     },
     async refreshSession(sessionId: string): Promise<AuthSession> {
-      const record = await store.getSession(sessionId);
+      const entry = await store.getSessionEntry(sessionId);
+      const record = entry?.record;
       if (!record) {
         throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
       }
@@ -220,7 +232,11 @@ function createSessionStore(
         ...record.session,
         refreshedAt: new Date().toISOString(),
       };
-      const rotated = await store.rotateSession(sessionId, { ...record, session: refreshed });
+      const rotated = await store.rotateSession(
+        sessionId,
+        { ...record, session: refreshed },
+        entry!.versionstamp,
+      );
       if (!rotated) {
         throw new KvOAuthError(
           'refresh_failed',
@@ -232,7 +248,8 @@ function createSessionStore(
     async revokeSession(sessionId: string): Promise<AuthSession> {
       let observed: AuthSession | undefined;
       for (let attempt = 0; attempt < REVOKE_MAX_ATTEMPTS; attempt += 1) {
-        const record = await store.getSession(sessionId);
+        const entry = await store.getSessionEntry(sessionId);
+        const record = entry?.record;
         if (!record) {
           if (!observed) {
             throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
@@ -249,7 +266,9 @@ function createSessionStore(
           state: 'revoked',
           revokedAt: new Date().toISOString(),
         };
-        if (await store.rotateSession(sessionId, { ...record, session: revoked })) {
+        if (
+          await store.rotateSession(sessionId, { ...record, session: revoked }, entry!.versionstamp)
+        ) {
           return revoked;
         }
       }
@@ -288,9 +307,10 @@ function createPrincipalMapper(): AuthPrincipalMapperPort {
 async function refreshRecord(
   provider: OAuthProviderConfig,
   store: KvOAuthStore,
-  record: NonNullable<Awaited<ReturnType<KvOAuthStore['getSession']>>>,
+  entry: NonNullable<Awaited<ReturnType<KvOAuthStore['getSessionEntry']>>>,
   options: Pick<CreateKvOAuthBackendOptions, 'allowInsecureRequests' | 'fetch'>,
 ): Promise<{ session: AuthSession }> {
+  const { record } = entry;
   const tokenSet = await store.openTokens(record.tokens);
   if (!tokenSet.refreshToken) {
     throw new KvOAuthError(
@@ -353,7 +373,7 @@ async function refreshRecord(
         ? await hashToken(nextTokens.refreshToken)
         : undefined,
     };
-    if (!await store.rotateSession(record.session.id, next)) {
+    if (!await store.rotateSession(record.session.id, next, entry.versionstamp)) {
       throw new KvOAuthError(
         'refresh_failed',
         `Session ${record.session.id} could not be refreshed due to a concurrent update.`,

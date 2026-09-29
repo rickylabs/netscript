@@ -102,6 +102,10 @@ export interface KvOAuthStore {
   ): Promise<KvOAuthSessionRecord>;
   /** Reads a session record by id. */
   getSession(id: string): Promise<KvOAuthSessionRecord | null>;
+  /** Reads a session record together with the KV version needed for a later compare-and-set. */
+  getSessionEntry(
+    id: string,
+  ): Promise<Readonly<{ record: KvOAuthSessionRecord; versionstamp: string }> | null>;
   /** Replaces a session record using optimistic concurrency; `expectedVersionstamp` is the CAS guard. */
   rotateSession(
     id: string,
@@ -165,6 +169,12 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
     async getSession(id): Promise<KvOAuthSessionRecord | null> {
       const entry = await kv.get<KvOAuthSessionRecord>(sessionKey(id));
       return entry?.value ?? null;
+    },
+    async getSessionEntry(id) {
+      const entry = await kv.get<KvOAuthSessionRecord>(sessionKey(id));
+      return entry?.value && entry.versionstamp
+        ? { record: entry.value, versionstamp: entry.versionstamp }
+        : null;
     },
     async rotateSession(id, next, expectedVersionstamp): Promise<boolean> {
       const key = sessionKey(id);

@@ -1,10 +1,10 @@
 /**
  * Deterministic native-store coverage for `revokeSession` compare-and-set races.
  *
- * Every case runs the real backend over a disposable Deno KV database file, so each CAS outcome is
- * produced by Deno KV itself. The barrier adapter only delays the first atomic commit; it never
- * fakes a result. The encryption key is generated in memory, the injected fetch forbids network
- * access, and the disposable database is closed and removed in `finally`.
+ * Every case runs the real backend over a disposable Deno KV database file. The barrier adapter
+ * delays an atomic commit; separate store gates delay calls before CAS. Two bounded-conflict tests
+ * stub rotateSession to return false. The encryption key is generated in memory, injected fetches
+ * never contact the network, and the database is closed and removed in `finally`.
  */
 
 import { assertEquals, assertRejects } from '@std/assert';
@@ -255,4 +255,101 @@ Deno.test('refreshSession raises a structured conflict when its compare-and-set 
     },
     (store) => ({ ...store, rotateSession: () => Promise.resolve(false) }),
   );
+});
+
+Deno.test('a refresh begun before revocation cannot reactivate the stored session', async () => {
+  const entered = Promise.withResolvers<void>();
+  const released = Promise.withResolvers<void>();
+  let hold = true;
+  try {
+    await withRevocationHarness(async ({ backend, store }) => {
+      const session = await createFixtureSession(backend);
+      const refresh = backend.sessions.refreshSession(session.id);
+      await entered.promise;
+      const revoked = await backend.sessions.revokeSession(session.id);
+      assertEquals(revoked.state, 'revoked');
+      released.resolve();
+      const error = await assertRejects(() => Promise.resolve(refresh), KvOAuthError);
+      assertEquals(error.code, 'refresh_failed');
+      assertEquals((await store.getSession(session.id))?.session.state, 'revoked');
+      assertEquals((await backend.authenticate(sessionRequest(session.id))).ok, false);
+    }, (store) => ({
+      ...store,
+      async rotateSession(...args: Parameters<KvOAuthStore['rotateSession']>) {
+        if (hold) {
+          hold = false;
+          entered.resolve();
+          await released.promise;
+        }
+        return await store.rotateSession(...args);
+      },
+    }));
+  } finally {
+    released.resolve();
+  }
+});
+
+Deno.test('deleting a session during revocation cannot resurrect it', async () => {
+  const entered = Promise.withResolvers<void>();
+  const released = Promise.withResolvers<void>();
+  let hold = true;
+  try {
+    await withRevocationHarness(async ({ backend, store }) => {
+      const session = await createFixtureSession(backend);
+      const revoke = backend.sessions.revokeSession(session.id);
+      await entered.promise;
+      await store.deleteSession(session.id);
+      released.resolve();
+      assertEquals((await revoke).state, 'revoked');
+      assertEquals(await store.getSession(session.id), null);
+      assertEquals((await backend.authenticate(sessionRequest(session.id))).ok, false);
+    }, (store) => ({
+      ...store,
+      async rotateSession(...args: Parameters<KvOAuthStore['rotateSession']>) {
+        if (hold) {
+          hold = false;
+          entered.resolve();
+          await released.promise;
+        }
+        return await store.rotateSession(...args);
+      },
+    }));
+  } finally {
+    released.resolve();
+  }
+});
+
+Deno.test('authenticate refresh cannot restore authority after revocation', async () => {
+  await withRevocationHarness(async ({ backend, store }) => {
+    const session = await createFixtureSession(backend);
+    await store.putSession({
+      session,
+      tokens: { accessToken: 'access', refreshToken: 'refresh', expiresAt: session.expiresAt },
+    });
+    const entered = Promise.withResolvers<void>();
+    const released = Promise.withResolvers<void>();
+    try {
+      const refreshing = await createKvOAuthBackend({
+        provider: fixtureProvider(),
+        store,
+        refreshMode: 'always',
+        fetch: async () => {
+          entered.resolve();
+          await released.promise;
+          return new Response(
+            JSON.stringify({ access_token: 'new-access', token_type: 'Bearer', expires_in: 3600 }),
+            { status: 200, headers: { 'content-type': 'application/json' } },
+          );
+        },
+      });
+      const authenticate = refreshing.authenticate(sessionRequest(session.id));
+      await entered.promise;
+      assertEquals((await backend.sessions.revokeSession(session.id)).state, 'revoked');
+      released.resolve();
+      assertEquals((await authenticate).ok, false);
+      assertEquals((await store.getSession(session.id))?.session.state, 'revoked');
+    } finally {
+      released.resolve();
+    }
+  });
 });
