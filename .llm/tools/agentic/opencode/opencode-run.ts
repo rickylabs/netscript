@@ -32,7 +32,7 @@ import {
   type PrivilegedTierAuthorization,
   WORKLOAD_TIERS,
   type WorkloadTier,
-} from '../runtime/delegation-matrix.ts';
+} from '@harness/matrix';
 import { type Effort, EFFORTS } from '../runtime/contract.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';

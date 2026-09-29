@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { MODEL_IDS, NATIVE_CANARY_MODEL_ARGS, ROUTING_MODEL_IDS } from '../config/models.ts';
-import { DELEGATION_MATRIX } from './delegation-matrix.ts';
+import { DELEGATION_MATRIX } from '@harness/matrix';
 import {
   assertEvaluatorIndependence,
   CANONICAL_COORDINATOR_POLICY,
@@ -15,6 +15,20 @@ const privilegedTierAuthorization = {
   authorizer: 'milestone_coordinator' as const,
   rationale: 'Recorded cross-package milestone escalation.',
 };
+
+Deno.test('active route and paid-launch policy read the pinned Harness matrix', async () => {
+  for (
+    const path of [
+      '.llm/tools/agentic/runtime/routing-policy.ts',
+      '.llm/tools/agentic/opencode/opencode-run.ts',
+    ]
+  ) {
+    const source = await Deno.readTextFile(path);
+    assertEquals(source.includes("from '@harness/matrix';"), true, path);
+    assertEquals(source.includes('runtime/delegation-matrix.ts'), false, path);
+    assertEquals(source.includes("from './delegation-matrix.ts';"), false, path);
+  }
+});
 
 Deno.test('native routes and rollout canaries use the current harness model IDs', () => {
   assertEquals(MODEL_IDS.codexSol, 'gpt-6-sol');
