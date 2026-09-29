@@ -49,6 +49,7 @@ export const ROUTING_MODEL_IDS = {
   astraNative: 'gpt-6-astra',
   fable51Native: 'claude-fable-5-1',
   opus5Native: 'claude-opus-5',
+  opus55Native: 'claude-opus-5-5',
   gemini38FlashNative: 'gemini-3.8-flash',
   gemini38FlashCopilot: 'github-copilot/gemini-3.8-flash',
   kimiK3Copilot: 'github-copilot/kimi-k3',
