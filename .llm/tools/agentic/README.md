@@ -76,10 +76,11 @@ launcher never merely refreshes stale timestamps. Valid prior-month state resets
 malformed, stale, future, over-budget, or concurrently locked state blocks. Full caps are reserved
 without refund; no overage or authoritative live-balance claim. Unknown locks require owner review.
 
-Maintenance has one home per value: connector and cloud model IDs in `config/models.ts`; included
+NetScript's remaining internal runtime has one home per value: connector and cloud model IDs in `config/models.ts`; included
 credit envelope and tier caps in `config/subscriptions.ts`; Agent Tasks path in
 `config/endpoints.ts`; precedence and family gates in `runtime/delegation-matrix.ts` and
-`runtime/routing-policy.ts`. Do not duplicate these values in adapters or docs.
+`runtime/routing-policy.ts`. The fleet authority and model catalog have moved to pinned Harness;
+the matrix viewer below reads that source. Do not duplicate either set in adapters or docs.
 
 | Folder         | What lives there                                                                                                                                                                                                                    |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -117,7 +118,7 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts
   --slice-dir <win-path> --provider openai --model <model-id> --effort <effort> --dry-run
 ```
 
-Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; the typed bindings live in
+Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; NetScript's legacy typed bindings live in
 `runtime/delegation-matrix.ts`, the resolver lives in `runtime/routing-policy.ts`, and concrete ids
 live in `config/models.ts`. Prose in the brief is not launch authority. Drop `--dry-run` for the
 real launch; it fails closed unless the observed provider/model/effort match what you requested. The
@@ -386,9 +387,12 @@ transitions — no credentials, prompts, or account identity. Fallback and resto
 decisions only_, and only at an idle turn or session boundary; an active/critical slice blocks. This
 command is strictly read-only.
 
-### `runtime/cli/delegation-matrix-table.ts` — routing matrix, readable
+### `runtime/cli/delegation-matrix-table.ts` — pinned Harness matrix, readable
 
-Render the typed routing authority without shell-scraping its TypeScript source:
+Render the pinned Harness routing authority without shell-scraping its TypeScript source. This
+viewer imports Harness commit `948919ef323164e8230cb6df12c9c554b5ecad58` over an immutable
+public source URL; it needs network on a cold cache and fails closed when that source is unavailable.
+NetScript's own launch resolver still uses its local legacy matrix pending a separate migration:
 
 ```console
 $ deno task agentic:matrix
@@ -733,7 +737,7 @@ again outside `config/`.
 | To change a…                                               | Edit                                                          | Notes                                                                                                                                                                                            |
 | ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Model id**                                               | `config/models.ts`                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
-| **Routing binding** (tier + role → logical model + effort) | `runtime/delegation-matrix.ts`                                | Inspect with `deno task agentic:matrix`; the command renders the authority without parsing source. Concrete ids remain in `config/models.ts`.                                                    |
+| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for the fleet; `runtime/delegation-matrix.ts` for the remaining NetScript resolver | `deno task agentic:matrix` renders the pinned Harness source. NetScript's local resolver/catalog remain until their own migration. |
 | **Tool version**                                           | `config/versions.ts`                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
 | **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
 | **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |

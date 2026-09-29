@@ -1,3 +1,5 @@
+// The fleet's matrix authority moved to Harness. Keep this viewer's rich query
+// surface while NetScript's launch resolver is retired in a separate PR.
 import {
   COORDINATOR_MATRIX,
   COORDINATOR_TIERS,
@@ -15,7 +17,7 @@ import {
   WORKLOAD_TIER_DESCRIPTIONS,
   WORKLOAD_TIERS,
   type WorkloadTier,
-} from '../delegation-matrix.ts';
+} from '@harness/matrix';
 import { normalizeTaskArguments } from '../../lib/task-arguments.ts';
 
 export interface MatrixOptions {

@@ -6,6 +6,21 @@ import {
   renderMatrixQuery,
 } from './delegation-matrix-table.ts';
 
+Deno.test('matrix viewer is pinned to Harness rather than the legacy local matrix', async () => {
+  const source = await Deno.readTextFile(new URL('./delegation-matrix-table.ts', import.meta.url));
+  const denoConfig = JSON.parse(
+    await Deno.readTextFile(new URL('../../../../../deno.json', import.meta.url)),
+  );
+  const pinned =
+    'https://raw.githubusercontent.com/rickylabs/harness/948919ef323164e8230cb6df12c9c554b5ecad58/packages/routing/matrix/delegation-matrix.ts';
+  assertStringIncludes(source, "from '@harness/matrix'");
+  assertEquals(denoConfig.imports['@harness/matrix'], pinned);
+  assertEquals(source.includes("from '../delegation-matrix.ts'"), false);
+  const harness = await import('@harness/matrix');
+  assertEquals(harness.MODEL_CATALOG.sol.capabilities[0].model, 'gpt-6-sol');
+  assertEquals(harness.MODEL_CATALOG.luna.capabilities[0].model, 'gpt-6-luna');
+});
+
 Deno.test('full matrix renders every role including deep-research default and fallback', () => {
   const output = renderFullMatrix();
 

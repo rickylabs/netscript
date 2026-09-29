@@ -41,16 +41,17 @@ required sessions and models) lives in `.agents/skills/netscript-harness` and `.
 Multi-agent work in this repo runs on the epic #574 agentic runtime system by default — not on
 ad-hoc shell orchestration:
 
-- **Routing is data, not prose.** Select every lane's provider/model/effort from
-  `.llm/harness/workflow/lane-policy.md`; its machine bindings live in
-  `.llm/tools/agentic/runtime/routing-policy.ts`. Inspect the live matrix with
-  `deno task agentic:matrix` and its row, evaluator, fallback, or JSON filters; do not shell-scrape
-  the TypeScript, restate routes, or invent model fallbacks. Pure UI/UX specialization uses the
+- **Routing is data, not prose.** The fleet matrix authority is the pinned Harness
+  `packages/routing/matrix/`; inspect it through `deno task agentic:matrix` and its row,
+  evaluator, fallback, or JSON filters. NetScript's internal launch resolver still lives in
+  `.llm/tools/agentic/runtime/routing-policy.ts` during migration. Do not shell-scrape
+  TypeScript, restate routes, or invent model fallbacks. Pure UI/UX specialization uses the
   owner-requested `ui_ux` role. Any owner matrix override must be recorded verbatim in a harness
   `.llm/runs/**/worklog.md`; it never bypasses evaluator session/family independence.
-- **Volatile values have one home.** Model ids, tool versions, and endpoints live only in
-  `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`); a guard test fails the
-  suite if they are hardcoded elsewhere.
+- **Volatile values have one home per runtime.** The fleet model catalog is in pinned Harness;
+  the remaining NetScript internal runtime keeps its model ids, tool versions, and endpoints in
+  `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`). A guard test fails
+  if NetScript's internal values are hardcoded elsewhere.
 - **Drive lanes through the agentic suite.** `.llm/tools/agentic/` (exposed as
   `deno task
   agentic:*`) is the only interface for launching/watching/steering Codex, dispatching

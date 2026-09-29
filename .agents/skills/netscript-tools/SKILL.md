@@ -191,8 +191,9 @@ The desired-state runtime controller is the default health/repair entry point:
 session-safe Codex daemon repair. `deno task agentic:routing-state` reads the persisted
 quota-fallback routing state.
 
-Read model routing through `deno task agentic:matrix`, never by shell-scraping the TypeScript
-authority. Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a direct
+Read the pinned Harness fleet routing through `deno task agentic:matrix`, never by shell-scraping
+TypeScript. NetScript's internal launch resolver remains local until its separate migration.
+Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a direct
 evaluator lookup, `--role deep-research` for the dedicated research role, `--fallback-of
 <logical-model>` to list every context-sensitive fallback, and `--json` for structured consumption.
 The full table includes separate Deep Research default and fallback columns.

@@ -177,6 +177,7 @@
     "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots"
   },
   "imports": {
+    "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/948919ef323164e8230cb6df12c9c554b5ecad58/packages/routing/matrix/delegation-matrix.ts",
     "@std/assert": "jsr:@std/assert@1",
     "@std/path": "jsr:@std/path@1"
   },
