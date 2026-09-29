@@ -105,7 +105,7 @@ const TESTS_ALLOWED_TO_PIN_CONTRACT_LITERALS = new Set<string>([
 /**
  * The suite README, scanned by Layer A with an explicit illustrative allowlist.
  * `codexSol` is the marked illustrative `--model` example; `codex`
- * (`gpt-5.6`) is only ever present as a substring of that same example.
+ * (`gpt-6-sol`) is the same value as that illustrative example.
  */
 const README_ILLUSTRATIVE_ALLOWLIST = new Set<string>([
   MODEL_IDS.codexSol,
