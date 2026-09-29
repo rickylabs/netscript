@@ -87,6 +87,7 @@ export class ServiceBuilderImpl<
   private openApiOptions: { title?: string; description?: string } | null = null;
   private docsOptions: { specUrl?: string } | null = null;
   private deferredRoutes: DeferredRoute[] = [];
+  private installedRoutes: readonly DeferredRoute[] = [];
   private deferredRoutesInstalled = false;
 
   constructor(router: TRouter, config: ServiceConfig) {
@@ -428,16 +429,27 @@ export class ServiceBuilderImpl<
         service: this.config.name,
         version: this.config.version ?? '1.0.0',
         message: 'NetScript service is running. Open /api/docs for the oRPC playground.',
-        endpoints: {
-          rpc: '/api/rpc/*',
-          openapi: '/api/*',
-          spec: '/api/openapi.json',
-          docs: '/api/docs',
-          playground: '/api/docs',
-          health: '/health',
-        },
+        endpoints: this.serviceInfoEndpoints(),
       }));
     return this;
+  }
+
+  /** Advertise custom routes mounted by build(), not routes added afterward. */
+  private serviceInfoEndpoints(): Record<string, string> {
+    const endpoints: Record<string, string> = {
+      rpc: '/api/rpc/*',
+      openapi: '/api/*',
+      spec: '/api/openapi.json',
+      docs: '/api/docs',
+      playground: '/api/docs',
+      health: '/health',
+    };
+
+    for (const route of this.installedRoutes) {
+      endpoints[`${route.method.toUpperCase()} ${route.path}`] = route.path;
+    }
+
+    return endpoints;
   }
 
   /**
@@ -522,13 +534,15 @@ export class ServiceBuilderImpl<
       );
     }
 
-    for (const route of this.deferredRoutes) {
+    const routes = [...this.deferredRoutes];
+    for (const route of routes) {
       if (route.method === 'all') {
         this.app.all(route.path, route.handler);
       } else {
         this.app[route.method](route.path, route.handler);
       }
     }
+    this.installedRoutes = routes;
   }
 
   /**
