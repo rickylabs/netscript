@@ -77,7 +77,7 @@
     "agentic:wsl-foundation": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=nodejs.org,registry.npmjs.org,antigravity.google .llm/tools/agentic/wsl/wsl-foundation.ts",
     "agentic:runtime": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/agentic-runtime.ts",
     "agentic:routing-state": "deno run --no-lock --allow-read --allow-env .llm/tools/agentic/runtime/cli/routing-state.ts",
-    "agentic:matrix": "deno run --no-lock .llm/tools/agentic/runtime/cli/delegation-matrix-table.ts",
+    "agentic:matrix": "deno run --no-lock https://raw.githubusercontent.com/rickylabs/harness/3a37fe74e904b5fee75f64a422d0c73563b1e6f1/packages/routing/matrix/cli/matrix-view.ts",
     "agentic:expense-watch": "deno run --no-lock --allow-read --allow-env --allow-net=opencode.ai .llm/tools/agentic/runtime/cli/expense-watch.ts",
     "agentic:leak-check": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/leak-check.ts",
     "agentic:teardown": "deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/agentic/teardown/teardown.ts",
@@ -177,8 +177,8 @@
     "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots"
   },
   "imports": {
-    "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/948919ef323164e8230cb6df12c9c554b5ecad58/packages/routing/matrix/delegation-matrix.ts",
-    "@harness/models": "https://raw.githubusercontent.com/rickylabs/harness/948919ef323164e8230cb6df12c9c554b5ecad58/packages/routing/matrix/models.ts",
+    "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/3a37fe74e904b5fee75f64a422d0c73563b1e6f1/packages/routing/matrix/delegation-matrix.ts",
+    "@harness/models": "https://raw.githubusercontent.com/rickylabs/harness/3a37fe74e904b5fee75f64a422d0c73563b1e6f1/packages/routing/matrix/models.ts",
     "@std/assert": "jsr:@std/assert@1",
     "@std/path": "jsr:@std/path@1"
   },
