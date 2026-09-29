@@ -3,10 +3,10 @@
  *
  * MONTHLY MAINTENANCE: change a model id HERE. Two authorities consume these
  * constants and remain the ONLY places that bind a model to a purpose:
- *  - `runtime/delegation-matrix.ts` — the workload/coordinator role → logical
- *    model → effort bindings rendered by `.llm/harness/workflow/lane-policy.md`.
- *    That matrix is the single source for routing; this module is the single
- *    source for the model-id strings its capability catalog references.
+ *  - Pinned Harness `@harness/matrix` — the workload/coordinator role →
+ *    logical model → effort bindings rendered by `.llm/harness/workflow/lane-policy.md`.
+ *    Harness owns the fleet matrix and capability catalog; this module keeps
+ *    only the model-id strings needed by transitional local provider tools.
  *  - `runtime/provider-profiles.ts` `OPENROUTER_PRESETS` — caller-selected
  *    OpenRouter presets, whose model ids come from `OPENROUTER_MODEL_IDS`.
  *
