@@ -87,6 +87,7 @@ export class ServiceBuilderImpl<
   private openApiOptions: { title?: string; description?: string } | null = null;
   private docsOptions: { specUrl?: string } | null = null;
   private deferredRoutes: DeferredRoute[] = [];
+  private installedRoutes: readonly DeferredRoute[] = [];
   private deferredRoutesInstalled = false;
 
   constructor(router: TRouter, config: ServiceConfig) {
@@ -433,27 +434,7 @@ export class ServiceBuilderImpl<
     return this;
   }
 
-  /**
-   * The endpoint map the root banner advertises.
-   *
-   * The framework's own routes are the base; every route registered through
-   * `route()` is added under a `METHOD /path` key.
-   *
-   * This is computed per request rather than captured when `withServiceInfo()`
-   * runs, and that is the whole point. `route()` appends to `deferredRoutes`,
-   * which `installDeferredRoutes()` does not drain, and that installation
-   * happens inside `build()` — after every builder stage. So at the moment
-   * `withServiceInfo()` executes, no custom route exists yet whatever order the
-   * caller chose, and a map built there could not observe one. A map built when
-   * the request arrives always can, and it keeps the banner's registration
-   * position unchanged, so a service that mounts its own `/` still wins exactly
-   * as it did before.
-   *
-   * A banner that names a path the service does not serve returns a real 200 on
-   * a real document from the wrong place, which is indistinguishable from a
-   * correct answer at the point of reading it. Deriving the map is what makes a
-   * mounted route unable to be absent rather than merely unlikely to be.
-   */
+  /** Advertise custom routes mounted by build(), not routes added afterward. */
   private serviceInfoEndpoints(): Record<string, string> {
     const endpoints: Record<string, string> = {
       rpc: '/api/rpc/*',
@@ -464,7 +445,7 @@ export class ServiceBuilderImpl<
       health: '/health',
     };
 
-    for (const route of this.deferredRoutes) {
+    for (const route of this.installedRoutes) {
       endpoints[`${route.method.toUpperCase()} ${route.path}`] = route.path;
     }
 
@@ -553,13 +534,15 @@ export class ServiceBuilderImpl<
       );
     }
 
-    for (const route of this.deferredRoutes) {
+    const routes = [...this.deferredRoutes];
+    for (const route of routes) {
       if (route.method === 'all') {
         this.app.all(route.path, route.handler);
       } else {
         this.app[route.method](route.path, route.handler);
       }
     }
+    this.installedRoutes = routes;
   }
 
   /**

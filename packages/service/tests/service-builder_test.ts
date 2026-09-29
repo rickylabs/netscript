@@ -223,3 +223,18 @@ Deno.test('the banner does not depend on where withServiceInfo() sits in the cha
     );
   }
 });
+
+Deno.test('the service info banner does not advertise routes added after build()', async () => {
+  const builder = createService({}, { name: 'users' })
+    .withServiceInfo()
+    .route('get', '/ready', (c) => c.json({ ok: true }));
+  const app = builder.build();
+  builder.route('get', '/late', (c) => c.json({ ok: true }));
+
+  const body = await (await app.request('/')).json();
+  const endpoints = body.endpoints as Record<string, string>;
+  assertEquals(endpoints['GET /ready'], '/ready');
+  assertEquals(endpoints['GET /late'], undefined);
+  assertEquals((await app.request('/ready')).status, 200);
+  assertEquals((await app.request('/late')).status, 404);
+});
