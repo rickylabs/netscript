@@ -180,8 +180,8 @@ contract without copying or comparing skill trees.
 The rest of the suite (Codex launch/watch/resume, OpenHands dispatch/status/verdict, GitHub
 PR/watch/ token, the WSL foundation, and the runtime doctor/repair/canaries) is documented per-tool
 in the suite [`README`](./agentic/README.md) and indexed in `.llm/harness/workflow/tooling.md`.
-`claude/validate-claude-surface.ts` is the F1 fitness gate for any change to Claude configuration,
-skills, hooks, or agent-orchestration docs (see `CLAUDE.md`).
+`maint/claude/validate-claude-surface.ts` is the F1 fitness gate for any change to Claude
+configuration, skills, hooks, or agent-orchestration docs (see `CLAUDE.md`).
 
 ## Supervisor watch (`watch-run.ts`)
 

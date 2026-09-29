@@ -238,7 +238,7 @@ deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-check.ts --root 
 deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root <folder> --ext ts,tsx   # 0 findings
 deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root <folder> --ext ts,tsx   # 0 findings
 deno test --no-lock -A <folder>/                                                                        # 0 failed
-deno task maint:check-claude                                                                          # ok (if the folder touches the Claude surface)
+deno task maint:check-claude                                                                            # ok (if the folder touches the Claude surface)
 git diff --check                                                                                        # clean
 git diff --stat deno.lock                                                                               # empty, OR only the sanctioned @std workspace-dep additions
 ```

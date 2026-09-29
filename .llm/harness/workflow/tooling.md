@@ -73,6 +73,10 @@ its documented authority. See the suite README's "Maintenance map".
 gate exposes silent review findings before merge: a reply or reasoned decline counts as answered, UI
 resolution is irrelevant, and outdated threads are listed but do not block.
 
+`maint:` rows are NetScript maintainer tools under `.llm/tools/maint/` (Decision M keeps them in
+NetScript); their Tool column gives the path from `.llm/tools/`. The other rows are the agentic
+suite.
+
 | Task                                | Tool                                      | Use                                                                                                |
 | ----------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `agentic:launch-codex-slice`        | `launch-codex-slice.ts`                   | stage + safety-check + launch a WSL Codex slice; records the thread id                             |
@@ -85,8 +89,8 @@ resolution is irrelevant, and outdated threads are listed but do not block.
 | `agentic:gh-pr`                     | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
 | `agentic:gh-watch`                  | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
 | `agentic:gh-token`                  | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
-| `maint:claude-hook-log`             | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
-| `maint:check-claude`                | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
+| `maint:claude-hook-log`             | `maint/claude/claude-hook-log.ts`         | append Claude Code hook events to the run's hook log                                               |
+| `maint:check-claude`                | `maint/claude/validate-claude-surface.ts` | validate Claude config, the single repo-skill bridge, and hooks                                    |
 | `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
 | `agentic:opencode`                  | `opencode-run.ts`                         | run a general OpenCode turn; paid routes require fresh usage proof before spawn                    |
 | `agentic:expense-watch`             | `runtime/cli/expense-watch.ts`            | emit a structured, fail-closed Go/Ollama/OpenRouter allowance decision                             |

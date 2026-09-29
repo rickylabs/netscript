@@ -778,7 +778,7 @@ deno test --no-lock -A .llm/tools/agentic/                                      
 deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root .llm/tools/agentic --ext ts,tsx
-deno task maint:check-claude                                                          # Claude surface gate
+deno task maint:check-claude                                                            # Claude surface gate
 ```
 
 Unit tests use a local throw-based `assert`/`assertEquals` because the repo's import map is empty
