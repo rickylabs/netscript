@@ -41,7 +41,7 @@ export const MODEL_IDS = {
   antigravityDocs: 'gemini-3.6-flash-high',
 } as const;
 
-/** Provider-specific model spellings used by the replacement delegation matrix. */
+/** Transitional provider-specific model spellings used by local launch tools and tests. */
 export const ROUTING_MODEL_IDS = {
   lunaNative: 'gpt-6-luna',
   lunaGo: 'opencode-go/gpt-5.6-luna',

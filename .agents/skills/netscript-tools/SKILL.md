@@ -212,10 +212,11 @@ suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, 
 
 **Monthly maintenance (single source):** everything volatile lives in `.llm/tools/agentic/config/` —
 model ids in `config/models.ts`, tool versions in `config/versions.ts`, endpoints in
-`config/endpoints.ts`; routing lane→model bindings stay in `runtime/routing-policy.ts` (referencing
-the config ids). The "Maintenance map" table in the suite README says exactly where to change a
-model, version, policy, agent, or dep. A guard test (`config/no-hardcoded-volatile_test.ts`) fails
-the suite if any of these values is hardcoded outside `config/`.
+`config/endpoints.ts`; workload and coordinator bindings live in pinned Harness, while
+`runtime/routing-policy.ts` resolves local provider availability. The "Maintenance map" table in the
+suite README says exactly where to change a model, version, policy, agent, or dep. A guard test
+(`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is hardcoded outside
+`config/`.
 
 ## Lock Hygiene
 
