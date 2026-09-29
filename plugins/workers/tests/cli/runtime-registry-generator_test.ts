@@ -308,43 +308,7 @@ export default Object.assign(async () => undefined, {
 Deno.test('generated registry preserves literal job payload types at the consumer boundary', async () => {
   await withTempProject(async (projectRoot) => {
     await writeProjectDenoConfig(projectRoot);
-    await writeWorkersManifest(projectRoot, false, true);
-    await write(
-      join(projectRoot, 'registry-types.ts'),
-      `export type JobContext<TPayload> = Readonly<{
-  id: string;
-  job: Readonly<{ id: string }>;
-  payload: TPayload;
-}>;
-export type JobHandler<TPayload = unknown> = (
-  context: JobContext<TPayload>,
-) => unknown | Promise<unknown>;
-export type JobPayloadSchema<TPayload> = Readonly<{
-  '~standard': Readonly<{
-    version: 1;
-    vendor: string;
-    validate(value: unknown): { value: TPayload };
-    types?: Readonly<{ input: unknown; output: TPayload }>;
-  }>;
-}>;
-export type JobHandlerDefinition<TPayload = unknown, _TResult = unknown> =
-  & JobHandler<TPayload>
-  & Readonly<{ payloadSchema: JobPayloadSchema<TPayload> }>;
-export type JobPayloadOf<TDefinition> = TDefinition extends {
-  readonly payloadSchema: JobPayloadSchema<infer TPayload>;
-} ? TPayload : never;
-export type JobPayloadMap<TRegistry extends Readonly<Record<string, unknown>>> = Readonly<{
-  [TId in keyof TRegistry]: JobPayloadOf<TRegistry[TId]>;
-}>;
-export type RegisterJobInput = Readonly<
-  Record<string, unknown> & {
-    id?: string;
-    payloadSchema?: JobPayloadSchema<unknown>;
-  }
->;
-export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
-`,
-    );
+    await writeWorkersManifest(projectRoot);
     await writeTypedJob(
       projectRoot,
       'embed-document.ts',
@@ -358,19 +322,23 @@ export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
 
     await generateRuntimeRegistries(generatorOptions(projectRoot));
     const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
-    const hasLiteralRegistry = registrySource.includes('export const jobHandlersById');
-    const importedRegistry = hasLiteralRegistry ? 'jobHandlersById' : 'registry';
-    const transcribeHandler = hasLiteralRegistry
-      ? 'jobHandlersById["transcribe-image"]'
-      : 'registry.get("transcribe-image")!';
+    assertStringIncludes(registrySource, 'export const jobHandlersById');
     await write(
       join(projectRoot, 'payload-consumer.ts'),
       `import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
-import { ${importedRegistry}, type GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+import { jobHandlersById, type GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+import type { JobTriggerInput } from '@netscript/plugin-workers-core/contracts/v1';
 
 createWorkersContract<GeneratedJobPayloadMap>();
 
-const transcribeImage = ${transcribeHandler};
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+const exactPayload: Equal<GeneratedJobPayloadMap['transcribe-image'], Readonly<{ imageUrl: string; language?: string }>> = true;
+void exactPayload;
+// @ts-expect-error - a different job's payload must not type as this trigger
+const wrongTrigger: JobTriggerInput<GeneratedJobPayloadMap> = { id: 'transcribe-image', payload: { documentId: 'doc-1', text: 'content' } };
+void wrongTrigger;
+
+const transcribeImage = jobHandlersById['transcribe-image'];
 const job = { id: 'transcribe-image' };
 
 await transcribeImage({
@@ -498,6 +466,8 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
   const telemetry = JSON.parse(
     await Deno.readTextFile(join(REPOSITORY_ROOT, 'packages/telemetry/deno.json')),
   ) as { imports?: Readonly<Record<string, string>> };
+  const otelApiVersion = rootConfig.catalog?.['@opentelemetry/api'];
+  if (!otelApiVersion) throw new Error('Root catalog has no @opentelemetry/api version');
   await write(
     join(projectRoot, 'deno.json'),
     `${
@@ -508,6 +478,7 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
           ...configPackage.imports,
           ...workersCore.imports,
           ...telemetry.imports,
+          '@opentelemetry/api': `npm:@opentelemetry/api@${otelApiVersion}`,
           '@netscript/config': toFileUrl(join(REPOSITORY_ROOT, 'packages/config/mod.ts')).href,
           '@netscript/plugin-workers-core/config': toFileUrl(
             join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/config/mod.ts'),
@@ -527,7 +498,6 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
 async function writeWorkersManifest(
   projectRoot: string,
   includePluginDir = false,
-  widenHandlersToAny = false,
 ): Promise<void> {
   await write(
     join(projectRoot, 'scaffold.runtime.json'),
@@ -543,16 +513,8 @@ async function writeWorkersManifest(
           varPrefix: 'job',
           typeImport: {
             name: 'JobHandler',
-            from: widenHandlersToAny
-              ? '../../../registry-types.ts'
-              : '@netscript/plugin-workers-core/runtime',
+            from: '@netscript/plugin-workers-core/runtime',
           },
-          ...(widenHandlersToAny
-            ? {
-              mapValueType: 'JobHandler<any>',
-              preamble: ['// deno-lint-ignore-file no-explicit-any'],
-            }
-            : {}),
           ...(includePluginDir
             ? {
               pluginDirs: [{
@@ -578,7 +540,7 @@ async function writeTypedJob(
 ): Promise<void> {
   await write(
     join(projectRoot, 'workers/jobs', file),
-    `import type { JobHandlerDefinition, JobPayloadSchema } from '../../registry-types.ts';
+    `import type { JobHandlerDefinition, JobPayloadSchema } from '@netscript/plugin-workers-core/runtime';
 
 type Payload = ${payloadType};
 const payloadSchema: JobPayloadSchema<Payload> = {
@@ -590,7 +552,7 @@ const payloadSchema: JobPayloadSchema<Payload> = {
 };
 
 const handler: JobHandlerDefinition<Payload> = Object.assign(
-  async () => ({ success: true }),
+  async () => ({ success: true as const }),
   { payloadSchema },
 );
 export default handler;
