@@ -210,9 +210,9 @@ The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `c
 suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` +
 `runtime/cli/`, `lib/`); its `README.md` is the canonical map.
 
-**Monthly maintenance (single source):** everything volatile lives in `.llm/tools/agentic/config/` —
-model ids in `config/models.ts`, tool versions in `config/versions.ts`, endpoints in
-`config/endpoints.ts`; workload and coordinator bindings live in pinned Harness, while
+**Monthly maintenance:** fleet route model IDs live in pinned Harness; transitional local provider
+presets live in `.llm/tools/agentic/config/models.ts`, tool versions in `config/versions.ts`,
+endpoints in `config/endpoints.ts`; workload and coordinator bindings live in pinned Harness, while
 `runtime/routing-policy.ts` resolves local provider availability. The "Maintenance map" table in the
 suite README says exactly where to change a model, version, policy, agent, or dep. A guard test
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is hardcoded outside

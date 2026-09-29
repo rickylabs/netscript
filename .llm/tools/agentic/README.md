@@ -76,11 +76,11 @@ launcher never merely refreshes stale timestamps. Valid prior-month state resets
 malformed, stale, future, over-budget, or concurrently locked state blocks. Full caps are reserved
 without refund; no overage or authoritative live-balance claim. Unknown locks require owner review.
 
-NetScript's remaining internal runtime has one home per value: connector and cloud model IDs in
-`config/models.ts`; included credit envelope and tier caps in `config/subscriptions.ts`; Agent Tasks
-path in `config/endpoints.ts`; precedence and family gates in the pinned Harness matrix and
-`runtime/routing-policy.ts`. The fleet authority and model catalog live in Harness; the matrix
-viewer below reads that source. Do not duplicate either set in adapters or docs.
+Harness owns provider-specific route model IDs and matrix policy. NetScript's remaining local
+provider presets live in `config/models.ts`; included credit envelope and tier caps in
+`config/subscriptions.ts`; Agent Tasks path in `config/endpoints.ts`; local provider availability in
+`runtime/routing-policy.ts`. The matrix viewer reads the pinned Harness source. Do not duplicate
+either set in adapters or docs.
 
 | Folder         | What lives there                                                                                                                                                                                                                    |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -729,22 +729,22 @@ The invariants worth internalizing:
 
 ## Maintenance map: change one thing in one place
 
-Volatile values live in `config/`; typed routing bindings live in the delegation matrix. Edit the
-one documented authority and every doctor, probe, installer, and test picks it up. A guard test
+Fleet route IDs and typed bindings live in pinned Harness. Transitional local provider settings live
+in `config/`. Edit the documented authority for each value. A guard test
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is ever hardcoded
 again outside `config/`.
 
-| To change a…                                               | Edit                                                                          | Notes                                                                                                                                                                                                           |
-| ---------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model id**                                               | `config/models.ts`                                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                                           |
-| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for fleet and NetScript runtime resolution | `deno task agentic:matrix`, `runtime/routing-policy.ts` and the paid OpenCode launch guard read the same pin. The local duplicate and its legacy tests were removed after active consumers switched to the pin. |
-| **Tool version**                                           | `config/versions.ts`                                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                                          |
-| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync.                |
-| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                                        |
-| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                                   | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                                    |
-| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts`                 | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                                          |
-| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                                         | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                                     |
-| **Deps**                                                   | root `deno.json` import map + `deno.lock`                                     | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                                          |
+| To change a…                                               | Edit                                                                                            | Notes                                                                                                                                                                                                           |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Model id**                                               | Harness `packages/routing/matrix/models.ts` for route IDs; `config/models.ts` for local presets | `ROUTING_MODEL_IDS` is re-exported from the same Harness pin as the matrix. Native/canary IDs derive from it; local OpenRouter and OpenCode presets remain transitional.                                        |
+| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for fleet and NetScript runtime resolution                   | `deno task agentic:matrix`, `runtime/routing-policy.ts` and the paid OpenCode launch guard read the same pin. The local duplicate and its legacy tests were removed after active consumers switched to the pin. |
+| **Tool version**                                           | `config/versions.ts`                                                                            | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                                          |
+| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                                                           | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync.                |
+| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                                                  | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                                        |
+| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                                                     | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                                    |
+| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts`                                   | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                                          |
+| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                                                           | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                                     |
+| **Deps**                                                   | root `deno.json` import map + `deno.lock`                                                       | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                                          |
 
 ## Environment overrides
 

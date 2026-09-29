@@ -1,10 +1,10 @@
 /**
- * Central config barrel for the agentic suite — the ONE place volatile values
- * live. See `config/README.md` for the monthly-maintenance map (where to change
- * a model, a version, a policy, an endpoint, a dep).
+ * Transitional config barrel for the local agentic suite. Harness owns fleet
+ * model IDs and routing bindings; this module re-exports that pinned catalog
+ * alongside local provider settings.
  *
  * Concern → module:
- *  - models    → `config/models.ts`    (+ routing bindings in `runtime/routing-policy.ts`)
+ *  - models    → pinned Harness routing IDs + local provider presets
  *  - versions  → `config/versions.ts`
  *  - endpoints → `config/endpoints.ts`
  */
