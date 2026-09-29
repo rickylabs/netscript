@@ -2,9 +2,10 @@
 
 This document is the human-facing view of the owner-ratified 2026-09-04 delegation matrix. The fleet
 authority is pinned Harness `packages/routing/matrix/`. NetScript's internal resolver at
-`../../tools/agentic/runtime/routing-policy.ts` also reads that pinned matrix. The old local
-`delegation-matrix.ts` is retained only for legacy tests until its dependent tools are migrated.
-Earlier named lanes are persisted-state vocabulary only and must not be selected for new work.
+`../../tools/agentic/runtime/routing-policy.ts` also reads that pinned matrix. The inactive local
+matrix copy and its legacy tests were removed after the active resolver and paid launch guard
+switched to this Harness pin. Earlier named lanes are persisted-state vocabulary only and must not
+be selected for new work.
 
 Inspect the pinned Harness authority through `deno task agentic:matrix`. Use `--tier <tier>` for one
 row, `--tier <tier> --plan-evaluator|--impl-evaluator` for direct evaluator lookup,

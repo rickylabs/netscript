@@ -158,12 +158,13 @@ The agent-orchestration suite the supervisor uses to drive other agents. It is c
 a flat folder: `runtime/` is the desired-state controller ("brain"); `runtime/cli/` are its entry
 points; `codex/`, `openhands/`, `github/`, `wsl/`, `claude/` are the execution lanes; `lib/` holds
 shared primitives; and **`config/` is the single source for everything volatile** (model ids in
-`config/models.ts`, tool versions in `config/versions.ts`, endpoints in `config/endpoints.ts`, with
-the routing lane→model bindings in `runtime/routing-policy.ts` referencing those ids). A guard test
-(`config/no-hardcoded-volatile_test.ts`) fails the suite if any of those values is hardcoded outside
-`config/`. The suite follows the `@std`-first rule (AGENTS.md rule 3): tests use `@std/assert`, path
-work uses `@std/path`. Read the suite [`README`](./agentic/README.md) for the full map and the
-"Maintenance map" that says exactly where to change a model, version, policy, or dep.
+`config/models.ts`, tool versions in `config/versions.ts`, and endpoints in `config/endpoints.ts`).
+Workload and coordinator bindings live in pinned Harness; `runtime/routing-policy.ts` resolves local
+provider availability against that pin. A guard test (`config/no-hardcoded-volatile_test.ts`) fails
+the suite if any of those values is hardcoded outside `config/`. The suite follows the `@std`-first
+rule (AGENTS.md rule 3): tests use `@std/assert`, path work uses `@std/path`. Read the suite
+[`README`](./agentic/README.md) for the full map and the "Maintenance map" that says exactly where
+to change a model, version, policy, or dep.
 
 The Claude-surface subset keeps the Claude Code project honest. Repository skills live only in
 `.agents/skills/`; `.claude/skills/` contains one discovery bridge. The operating rule lives in

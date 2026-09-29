@@ -64,9 +64,9 @@ ad-hoc `wsl.exe`). Each tool is exposed as a `deno task`; run with `--help` for 
 The suite is concern-grouped — `codex/`, `opencode/`, `openhands/`, `github/`, `wsl/`, `claude/`,
 the runtime controller `runtime/` + its `runtime/cli/` entry points, and `lib/`; its `README.md` is
 the map. Everything volatile is centralized in `.llm/tools/agentic/config/` (model ids, tool
-versions, endpoints, subscription limits), with the workload/coordinator matrix in
-`runtime/delegation-matrix.ts` and its resolver in `runtime/routing-policy.ts`; change a
-model/version/endpoint only at its documented authority. See the suite README's "Maintenance map".
+versions, endpoints, subscription limits), with the workload/coordinator matrix pinned from Harness
+and the NetScript resolver in `runtime/routing-policy.ts`; change a model/version/endpoint only at
+its documented authority. See the suite README's "Maintenance map".
 
 **Symptom: “my PR is green but should not merge yet.”** Run
 `deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The

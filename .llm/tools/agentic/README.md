@@ -78,9 +78,9 @@ without refund; no overage or authoritative live-balance claim. Unknown locks re
 
 NetScript's remaining internal runtime has one home per value: connector and cloud model IDs in
 `config/models.ts`; included credit envelope and tier caps in `config/subscriptions.ts`; Agent Tasks
-path in `config/endpoints.ts`; precedence and family gates in `runtime/delegation-matrix.ts` and
-`runtime/routing-policy.ts`. The fleet authority and model catalog have moved to pinned Harness; the
-matrix viewer below reads that source. Do not duplicate either set in adapters or docs.
+path in `config/endpoints.ts`; precedence and family gates in the pinned Harness matrix and
+`runtime/routing-policy.ts`. The fleet authority and model catalog live in Harness; the matrix
+viewer below reads that source. Do not duplicate either set in adapters or docs.
 
 | Folder         | What lives there                                                                                                                                                                                                                    |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -118,12 +118,12 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts
   --slice-dir <win-path> --provider openai --model <model-id> --effort <effort> --dry-run
 ```
 
-Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; NetScript's legacy typed
-bindings live in `runtime/delegation-matrix.ts`, the resolver lives in `runtime/routing-policy.ts`,
-and concrete ids live in `config/models.ts`. Prose in the brief is not launch authority. Drop
-`--dry-run` for the real launch; it fails closed unless the observed provider/model/effort match
-what you requested. The `complex` and `architecture` rows additionally require explicit owner or
-milestone-coordinator authorization with a rationale recorded in the run and passed to the route
+Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; the typed matrix lives in
+pinned Harness, the NetScript resolver lives in `runtime/routing-policy.ts`, and local provider ids
+used by transition tools live in `config/models.ts`. Prose in the brief is not launch authority.
+Drop `--dry-run` for the real launch; it fails closed unless the observed provider/model/effort
+match what you requested. The `complex` and `architecture` rows additionally require explicit owner
+or milestone-coordinator authorization with a rationale recorded in the run and passed to the route
 resolver. Inferred complexity cannot select them. The launcher uses the v2 app-server JSONL protocol
 directly because Codex CLI 0.144.1's `debug app-server send-message-v2` helper does not propagate
 `-c model_reasoning_effort` to the child turn. Pass `--allow-route-mismatch` only for an explicit
@@ -734,17 +734,17 @@ one documented authority and every doctor, probe, installer, and test picks it u
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is ever hardcoded
 again outside `config/`.
 
-| To change a…                                               | Edit                                                                          | Notes                                                                                                                                                                                            |
-| ---------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Model id**                                               | `config/models.ts`                                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
-| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for fleet and NetScript runtime resolution | `deno task agentic:matrix`, `runtime/routing-policy.ts` and the paid OpenCode launch guard read the same pin. The local duplicate remains only for legacy tests until removal.                   |
-| **Tool version**                                           | `config/versions.ts`                                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
-| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
-| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
-| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                                   | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                     |
-| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts`                 | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                           |
-| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                                         | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                      |
-| **Deps**                                                   | root `deno.json` import map + `deno.lock`                                     | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                           |
+| To change a…                                               | Edit                                                                          | Notes                                                                                                                                                                                                           |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Model id**                                               | `config/models.ts`                                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                                           |
+| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for fleet and NetScript runtime resolution | `deno task agentic:matrix`, `runtime/routing-policy.ts` and the paid OpenCode launch guard read the same pin. The local duplicate and its legacy tests were removed after active consumers switched to the pin. |
+| **Tool version**                                           | `config/versions.ts`                                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                                          |
+| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync.                |
+| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                                        |
+| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                                   | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                                    |
+| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts`                 | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                                          |
+| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                                         | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                                     |
+| **Deps**                                                   | root `deno.json` import map + `deno.lock`                                     | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                                          |
 
 ## Environment overrides
 
