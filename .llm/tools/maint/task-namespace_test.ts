@@ -36,7 +36,7 @@ Deno.test('maint: tasks run maintainer code only', async () => {
 });
 
 // Tasks whose entry point is Harness code at the pinned commit (config/harness-models_test.ts).
-const HARNESS_AGENTIC_TASKS = new Set(['agentic:matrix']);
+const HARNESS_AGENTIC_TASKS = new Set(['agentic:matrix', 'agentic:pr-checks']);
 
 Deno.test('agentic: tasks run agentic code only, never maintainer code', async () => {
   const offenders = Object.entries(await tasks())
