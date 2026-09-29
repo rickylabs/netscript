@@ -76,7 +76,7 @@ Decide the class from the **upstream what's-new page**, not from the semver digi
 | `packages/cli/e2e/tests/application/gates/fixtures/aspire-<ver>-describe-postgres.json`, `aspire-describe-follow-<ver>*.ndjson` | `describe --follow` stream incl. `healthReports`                    | one leased AppHost start, captured through `describe-follow.ts` |
 | `packages/cli/e2e/tests/fixtures/aspire-<ver>-mcp-recorded.json`                                                                | the Aspire MCP tool list (14 tools incl. `refresh_tools` at 13.5.3) | an AppHost-less stdio MCP session (`aspire mcp start`)          |
 | `packages/mcp/tests/fixtures/telemetry/aspire-<ver>-fixture.ts` (+ README)                                                      | dashboard telemetry API span/trace/log JSON                         | a leased AppHost with OTLP traffic; procedure in that README    |
-| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-<ver>.json`, `process-tree-<ver>-*.json`                                    | `aspire ps` + process tree for ownership probes                     | the leased start above                                          |
+| `.llm/tools/maint/teardown/__fixtures__/aspire-ps-<ver>.json`, `process-tree-<ver>-*.json`                                      | `aspire ps` + process tree for ownership probes                     | the leased start above                                          |
 
 Keep the previous version's fixture beside the new one where a test asserts a compat branch
 (`aspire-13.4.6-fixture.ts` stays next to `aspire-13.5.3-fixture.ts`); retire it only when the

@@ -5,7 +5,7 @@ import {
   parseDoneContract,
   remainingBudgetDelay,
 } from './run-codex-slice-lib.ts';
-import type { LeakReport } from '../teardown/leak-check.ts';
+import type { LeakReport } from '../../maint/teardown/leak-check.ts';
 
 Deno.test('done contract accepts only the final exact marker', () => {
   assertEquals(parseDoneContract('work complete\nDONE\n'), { state: 'done' });
@@ -52,6 +52,12 @@ Deno.test('teardown enforcement makes owned survival load-bearing', () => {
     assert(result.reason.startsWith('teardown:'));
     assert(result.reason.includes("aspire stop --apphost '/worktree/apphost.mts'"));
   }
+});
+
+Deno.test('a report with no survivors, as when every probe is unavailable, never blocks done', () => {
+  assertEquals(enforceTeardown({ state: 'done' }, { ...leaks('owned'), survivors: [] }), {
+    state: 'done',
+  });
 });
 
 Deno.test('foreign and unproven survival never fail a sibling run', () => {

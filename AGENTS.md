@@ -90,7 +90,7 @@ Start from the symptom. If your run failed and you do not know what is still run
 you did not start, run the read-only reporter:
 
 ```text
-deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>
+deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>
 ```
 
 If your PR is green but should not merge yet because review findings may have gone unanswered, run
@@ -105,7 +105,7 @@ unanswered current threads exit non-zero. A reply—including a reasoned decline
 resolution is not required, and outdated threads do not block.
 
 Review every foreign/unknown-owner entry and leave it alone. To preview run-owned cleanup use
-`deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>`; mutation requires the
+`deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree>`; mutation requires the
 explicit `--apply` flag and remains scoped to positively proven resources.
 
 If your run starts resources from a directory outside its worktree — clean-clone verification is the

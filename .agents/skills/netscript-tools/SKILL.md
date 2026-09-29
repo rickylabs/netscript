@@ -161,8 +161,8 @@ When posting automation requests, specify:
 
 If a run failed and you do not know what is still running, `behavior.service-health` timed out,
 ports are already in use, or a `postgres-*` container exists that you did not start, begin with the
-read-only `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. It reports
-owned, foreign, and unknown-owner resources. `deno task agentic:teardown -- ...` is dry-run by
+read-only `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. It reports
+owned, foreign, and unknown-owner resources. `deno task maint:teardown -- ...` is dry-run by
 default; `--apply` is explicit and can act only on positively proven run-owned resources.
 
 Use `deno task agentic:dogfood-skills` to install the local CLI's current consumer bundle into

@@ -1,5 +1,4 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { enforceTeardown } from '../codex/run-codex-slice-lib.ts';
 import { buildLeakReport, renderLeakReport, runLeakCheck } from './leak-check.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { emptyRunResources } from './run-resources.ts';
@@ -89,7 +88,6 @@ Deno.test('unavailable probes report no survivors and never block done', async (
     assertEquals(report.probes.docker.state, 'unavailable');
     assertEquals(report.probes.volumes.state, 'unavailable');
     assertEquals(report.probes.networks.state, 'unavailable');
-    assertEquals(enforceTeardown({ state: 'done' }, report), { state: 'done' });
     assertStringIncludes(renderLeakReport(report), 'Aspire probe: unavailable');
     assertStringIncludes(renderLeakReport(report), 'Docker probe: unavailable');
     assertStringIncludes(renderLeakReport(report), 'Volumes probe: unavailable');

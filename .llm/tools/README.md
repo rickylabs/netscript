@@ -142,8 +142,8 @@ Start from the symptom: if a run failed and you do not know what is still runnin
 you did not start, run:
 
 ```text
-deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>
+deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree>
 ```
 
 The first command is always read-only. The second is also non-mutating unless `--apply` is supplied.

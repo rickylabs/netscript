@@ -219,8 +219,8 @@ phase is a no-op.
 
 1. If the run failed and you do not know what is still running, `behavior.service-health` timed out,
    ports are already in use, or a `postgres-*` container appeared that you did not start, run
-   `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. Report foreign and
-   unknown-owner resources; never mutate them. Preview owned cleanup with `agentic:teardown` and add
+   `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. Report foreign and
+   unknown-owner resources; never mutate them. Preview owned cleanup with `maint:teardown` and add
    `--apply` only when positive ownership proof is present.
 2. Update `context-pack.md`.
 3. Update `debt/arch-debt.md` for any created or closed debt entries.

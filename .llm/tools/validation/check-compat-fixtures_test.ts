@@ -12,7 +12,7 @@ interface CompatFixtureExpectation {
 // attempt 3, 2026-08-30; see packages/mcp/tests/fixtures/telemetry/README.md).
 const COMPAT_FIXTURES: readonly CompatFixtureExpectation[] = [
   {
-    path: '.llm/tools/agentic/teardown/probes_test.ts',
+    path: '.llm/tools/maint/teardown/probes_test.ts',
     state: 'required',
   },
   {

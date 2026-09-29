@@ -12,8 +12,6 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:runtime': 'runtime/cli/agentic-runtime.ts',
   'agentic:routing-state': 'runtime/cli/routing-state.ts',
   'agentic:expense-watch': 'runtime/cli/expense-watch.ts',
-  'agentic:leak-check': 'teardown/leak-check.ts',
-  'agentic:teardown': 'teardown/teardown.ts',
   'agentic:antigravity-evidence': 'runtime/cli/antigravity-evidence-cli.ts',
   'agentic:provider-canary': 'runtime/cli/provider-canary.ts',
   'agentic:rollout-canary': 'runtime/cli/rollout-canary-cli.ts',
@@ -81,7 +79,7 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
     ...HARNESS_AGENTIC_TASKS,
   ].sort();
   assertEquals(surveyedTasks, actualTasks);
-  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 28);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 26);
   for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
     assert(
       denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),
