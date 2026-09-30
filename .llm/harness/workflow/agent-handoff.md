@@ -4,7 +4,7 @@
 
 OpenCode Copilot is a local subscription transport, distinct from GitHub cloud Agent Tasks. Native
 Claude/Codex/agy defaults remain; exact catalog-attested non-native models prefer Copilot. Deep
-research uses agy Gemini, then attested Copilot Gemini, then native Luna.
+research uses agy Gemini, then attested Copilot Gemini, then native Sol 6.1 at low effort.
 
 Use `agentic:copilot-preflight --model <exact-id>` for non-inference catalog evidence.
 `agentic:copilot-task dispatch` only renders a request; `preflight`, `status`, and `watch` are

@@ -30,7 +30,8 @@ Deno.test('Copilot catalog exact attestation rejects absent and substring IDs', 
       ...copilotCatalogAvailability(missing).unavailableTransports ?? [],
     ],
   });
-  assertEquals(route.model, ROUTING_MODEL_IDS.lunaNative);
+  assertEquals(route.model, ROUTING_MODEL_IDS.solNative);
+  assertEquals(route.effort, 'low');
 });
 
 Deno.test('Copilot catalog attests an exact model variant from verbose metadata', () => {
