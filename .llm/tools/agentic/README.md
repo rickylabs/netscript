@@ -391,9 +391,18 @@ command is strictly read-only.
 
 Render the pinned Harness routing authority without shell-scraping its TypeScript source. The task
 runs Harness's own viewer, `packages/routing/matrix/cli/matrix-view.ts`, at the same immutable
-commit as the `@harness/matrix` import in `deno.json`; `config/harness-models_test.ts` fails if the
-two pins diverge. It needs network on a cold cache and fails closed when that source is unavailable.
-NetScript's own launch resolver and paid OpenCode launch guard also read this pinned matrix:
+commit as every `@harness/` import in `deno.json`; `config/harness-pins_test.ts` fails if any
+import or the viewer task diverges. It needs network on a cold cache and fails closed when that source is unavailable.
+NetScript's resolver re-exports Harness's resolver, and the local model aliases project the same
+routing document. Before an OpenCode turn, the launcher checks its selected complete model ID in
+the dispatch host's catalog. Missing configured IDs fail with `launcher-model-absent` before expense
+checks, MCP inference or dispatch; catalog failures use `launcher-catalog-unavailable`. A different
+provider or contributor ID cannot satisfy this check. Copilot also retains its variant attestation.
+Catalog membership leaves quota, reachability, requested effort support and evaluator session/family
+certification to their separate guards. The raw-source bridge still consumes shipped JSON; a local
+configuration loader and remaining native/legacy presets are interim under Harness #270.
+
+Inspect the shared matrix with:
 
 ```console
 $ deno task agentic:matrix
