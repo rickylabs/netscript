@@ -21,7 +21,7 @@ export const AI_PROVIDERS = {
 
 /** Default \`provider:model-id\` refs resolved by \`@netscript/ai\` \`getModel\`. */
 export const AI_MODELS = {
-  chat: 'anthropic:claude-sonnet-4-5',
+  chat: 'anthropic:claude-sonnet-5-5',
   fast: 'anthropic:claude-haiku-4-5',
 } as const;
 

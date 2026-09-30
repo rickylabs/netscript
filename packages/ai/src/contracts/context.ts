@@ -44,7 +44,7 @@
  * const loop = createAgentLoop({ modelProvider, tools });
  * for await (
  *   const chunk of loop.run({
- *     model: "anthropic:claude-sonnet-4-5",
+ *     model: "anthropic:claude-sonnet-5-5",
  *     messages: [{ role: "user", content: "Summarize what I just uploaded." }],
  *     // Reaches middleware and tool handlers; never the model.
  *     context: { documentIds: ["doc_41", "doc_42"], tenantId: "acme" },

@@ -2,6 +2,8 @@ import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl, join } from '@std/path';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { aiAdapterPlugin, aiStarterResources } from '../plugin.ts';
+import '@netscript/ai/anthropic';
+import { getModel } from '@netscript/ai';
 import {
   agentScaffolder,
   mcpToolScaffolder,
@@ -62,6 +64,21 @@ Deno.test('ai starter resources cover the current emitters', () => {
     'stream-proxy',
     'chat-route',
   ]);
+});
+
+Deno.test('ai generated chat default resolves to Sonnet 5.5 through the model registry', async () => {
+  const models = collectInstallArtifacts(aiAdapterPlugin).find((artifact) =>
+    artifact.path === 'ai/models.ts'
+  );
+  assert(models);
+  const emitted = await import(
+    `data:application/typescript,${encodeURIComponent(artifactText(models))}`
+  );
+  assertEquals(emitted.DEFAULT_CHAT_MODEL, 'anthropic:claude-sonnet-5-5');
+  assertEquals(emitted.AI_MODELS.fast, 'anthropic:claude-haiku-4-5');
+  const handle = await getModel(emitted.DEFAULT_CHAT_MODEL);
+  assertEquals(handle.providerId, 'anthropic');
+  assertEquals(handle.descriptor.id, 'claude-sonnet-5-5');
 });
 
 Deno.test('ai scaffold emitters have focused golden content', () => {
