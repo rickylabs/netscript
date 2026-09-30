@@ -579,22 +579,23 @@ failure.
 
 ## The Claude surface — `claude/`
 
-`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks. Both `PreToolUse` and
-`Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a nested turn cwd cannot change
-which checked-in logger runs. Claude defines that variable as the session launch root; it does not
-follow `EnterWorktree`, and this hook deliberately writes the event log back to that launch root at
-`.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude script/task invocation falls back
-to `Deno.cwd()` only when the variable is absent.
+`claude-hook-log.ts` and `validate-claude-surface.ts` are NetScript maintainer tools and live in
+`.llm/tools/maint/claude/`. `claude-hook-log.ts` is the sink wired into `.claude/settings.json`
+hooks. Both `PreToolUse` and `Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a
+nested turn cwd cannot change which checked-in logger runs. Claude defines that variable as the
+session launch root; it does not follow `EnterWorktree`, and this hook deliberately writes the event
+log back to that launch root at `.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude
+script/task invocation falls back to `Deno.cwd()` only when the variable is absent.
 
 The configured process reads exactly `CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, and
 `CLAUDE_SESSION_ID`, writes only below the launch-root hook-log subtree, and needs no runtime read
 permission. `--no-lock` keeps the hook from disturbing `deno.lock`; `--no-prompt` prevents a future
 TTY-attached invocation from prompting. Repository skills live only in `.agents/skills/`; the lone
 `.claude/skills/repo-skills/SKILL.md` file points Claude to that source.
-`validate-claude-surface.ts` (the `agentic:check-claude` gate) checks the whole surface in one pass:
+`validate-claude-surface.ts` (the `maint:check-claude` gate) checks the whole surface in one pass:
 
 ```console
-$ deno task agentic:check-claude --pretty
+$ deno task maint:check-claude --pretty
 OK CLAUDE.md: contains @AGENTS.md
 OK CLAUDE.md: contains .agents/skills/<name>/SKILL.md
 OK .claude/settings.json: valid JSON
@@ -777,7 +778,7 @@ deno test --no-lock -A .llm/tools/agentic/                                      
 deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root .llm/tools/agentic --ext ts,tsx
-deno task agentic:check-claude                                                          # Claude surface gate
+deno task maint:check-claude                                                            # Claude surface gate
 ```
 
 Unit tests use a local throw-based `assert`/`assertEquals` because the repo's import map is empty
