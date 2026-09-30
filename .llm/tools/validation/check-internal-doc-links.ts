@@ -19,7 +19,7 @@
  * architecture doctrine (docs/architecture/doctrine/), agent-skill source
  * (.agents/skills/), and the root agent-surface files (AGENTS.md, CLAUDE.md,
  * README.md, CONTRIBUTING.md). The `.claude/skills/repo-skills/SKILL.md` discovery bridge is
- * validated by `deno task agentic:check-claude`; repository skill content is scanned only from
+ * validated by `deno task maint:check-claude`; repository skill content is scanned only from
  * its authoritative `.agents/skills/` source. The user/external doc site is out of scope.
  *
  * External links (http(s)://, mailto:) are skipped. Relative link targets are
@@ -36,7 +36,7 @@
  * Exit code: 0 when no enforced violation is found, 1 otherwise. Broken links and
  * broken anchors are always enforced; orphans are enforced only with --check-orphans.
  * This is wired into `deno task docs:maintenance` alongside the Claude-surface check
- * (`agentic:check-claude`).
+ * (`maint:check-claude`).
  */
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
 import { parseArgs } from 'jsr:@std/cli@^1.0.0/parse-args';

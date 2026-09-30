@@ -34,11 +34,7 @@ const STRICT_AGENTIC_TASKS = {
 } as const;
 
 const PERMISSIVE_AGENTIC_TASKS = [
-  'agentic:check-claude',
-  'agentic:dogfood-skills',
-  'agentic:dogfood-skills:check',
   'agentic:smoke-claude-remote',
-  'agentic:claude-hook-log',
 ] as const;
 
 // Tasks whose entry point is Harness code at the pinned commit. Their argv rules, including the

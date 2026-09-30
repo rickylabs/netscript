@@ -165,7 +165,7 @@ read-only `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <workt
 owned, foreign, and unknown-owner resources. `deno task maint:teardown -- ...` is dry-run by
 default; `--apply` is explicit and can act only on positively proven run-owned resources.
 
-Use `deno task agentic:dogfood-skills` to install the local CLI's current consumer bundle into
+Use `deno task maint:dogfood-skills` to install the local CLI's current consumer bundle into
 `.agents/generated/consumer-skills/`; never fork that bundle by hand.
 
 The supervisor drives Tier-D Codex and Tier-E OpenHands through `.llm/tools/agentic/*`, each exposed

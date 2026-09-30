@@ -321,7 +321,7 @@ const RULES: readonly Rule[] = [
     test: starts('.agents/generated/'),
     cls: 'skill:dogfood-bundle',
     owner: 'S9',
-    disposition: 'regenerate via agentic:dogfood-skills',
+    disposition: 'regenerate via maint:dogfood-skills',
   },
   {
     test: re(/^\.(agents|claude)\/skills\/aspire\//),
