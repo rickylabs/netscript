@@ -27,7 +27,6 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:gh-pr': 'github/gh-pr.ts',
   'agentic:gh-watch': 'github/gh-watch.ts',
   'agentic:gh-token': 'github/gh-token.ts',
-  'agentic:pr-checks': 'github/pr-checks.ts',
   'agentic:claude-openrouter': 'claude/openrouter-run.ts',
   'agentic:opencode': 'opencode/opencode-run.ts',
   'agentic:opencode-eval': 'opencode/opencode-eval.ts',
@@ -39,8 +38,8 @@ const PERMISSIVE_AGENTIC_TASKS = [
 ] as const;
 
 // Tasks whose entry point is Harness code at the pinned commit. Their argv rules, including the
-// single leading task separator, are tested in Harness (config/harness-models_test.ts pins the URL).
-const HARNESS_AGENTIC_TASKS = ['agentic:matrix'] as const;
+// single leading task separator, are tested in Harness. Each runs one file from a full-SHA commit URL.
+const HARNESS_AGENTIC_TASKS = ['agentic:matrix', 'agentic:pr-checks'] as const;
 
 interface CommandResult {
   readonly code: number;
@@ -75,7 +74,7 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
     ...HARNESS_AGENTIC_TASKS,
   ].sort();
   assertEquals(surveyedTasks, actualTasks);
-  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 26);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 25);
   for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
     assert(
       denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),
@@ -83,6 +82,38 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
     );
     const source = await Deno.readTextFile(`${repo}/.llm/tools/agentic/${entry}`);
     assert(source.includes('normalizeTaskArguments('), `${task} does not normalize task argv`);
+  }
+});
+
+Deno.test('Harness-owned tasks run one pinned Harness file with exactly their reviewed flags', async () => {
+  const denoConfig = JSON.parse(await Deno.readTextFile(`${repo}/deno.json`)) as {
+    tasks: Record<string, string>;
+  };
+  // Changing a file or a permission here is a reviewed decision, not drift.
+  const expected: Record<
+    (typeof HARNESS_AGENTIC_TASKS)[number],
+    Readonly<{ flags: string; file: string }>
+  > = {
+    'agentic:matrix': { flags: '', file: 'packages/routing/matrix/cli/matrix-view.ts' },
+    'agentic:pr-checks': {
+      flags: '--allow-read --allow-run --allow-env --allow-net=api.github.com ',
+      file: 'packages/board/src/pr-checks.ts',
+    },
+  };
+  for (const task of HARNESS_AGENTIC_TASKS) {
+    const { flags, file } = expected[task];
+    const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assertMatch(
+      denoConfig.tasks[task] ?? '',
+      new RegExp(
+        `^deno run --no-lock ${
+          escape(flags)
+        }https://raw\\.githubusercontent\\.com/rickylabs/harness/[0-9a-f]{40}/${escape(file)}$`,
+      ),
+      `${task} must run ${file} from a full-SHA Harness commit with exactly: ${
+        flags || '(no flags)'
+      }`,
+    );
   }
 });
 

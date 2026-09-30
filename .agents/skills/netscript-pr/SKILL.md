@@ -141,7 +141,7 @@ use its one-based `box-index` when copying a long box would be unwieldy:
 issue: 1170
 entries:
   - box: "Exit code is non-zero only when a current failure exists"
-    evidence: "pr-checks_test.ts fixture; report.ok gate"
+    evidence: "check-close-gate_test.ts fixture; report.ok gate"
   - box-index: 2
     evidence: "CI run URL"
 ```
