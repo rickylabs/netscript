@@ -1,7 +1,9 @@
-// Shell-free command plans for maintainer tools that act on a WSL account (for example
-// `maint:gh-token store`). Everything runs through `Deno.Command(bin, { args })`, an argv array
-// no shell parses, so `<`, `>` and `$(...)` inside a script stay inert. On Linux the "WSL" user
-// must be the current account; elsewhere the plan goes through `wsl.exe -u <user>`.
+// Command plans for maintainer tools that act on a WSL account (for example
+// `maint:gh-token store`). The plan runs through `Deno.Command(bin, { args })`, an argv array
+// no host shell (such as PowerShell) parses. The script itself is executed by `bash -lc`, which
+// does interpret `<`, `>`, `$(...)` and quotes, so callers must quote untrusted values before
+// embedding them. On Linux the "WSL" user must be the current account; elsewhere the plan goes
+// through `wsl.exe -u <user>`.
 
 export interface CommandResult {
   code: number;
