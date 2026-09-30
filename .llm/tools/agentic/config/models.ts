@@ -25,20 +25,20 @@ export const MODEL_IDS: Readonly<{
   codexLuna: typeof ROUTING_MODEL_IDS.lunaNative;
   fable: typeof ROUTING_MODEL_IDS.fable51Native;
   opus: typeof ROUTING_MODEL_IDS.opus55Native;
-  sonnet: 'sonnet-5';
+  sonnet: 'claude-sonnet-5-5';
   antigravity: 'agy';
   antigravityDocs: 'gemini-3.6-flash-high';
 }> = {
-  /** OpenAI/Codex balanced default. */
+  /** OpenAI/Codex default for ordinary work; former Luna cells use low, other Sol cells use xhigh. */
   codexSol: ROUTING_MODEL_IDS.solNative,
-  /** OpenAI/Codex fast-iteration model. */
+  /** OpenAI/Codex compatibility capability; no longer the simple-task default. */
   codexLuna: ROUTING_MODEL_IDS.lunaNative,
   /** Anthropic/Claude most-capable model. */
   fable: ROUTING_MODEL_IDS.fable51Native,
   /** Anthropic/Claude orchestration, review, documentation, and workflow model. */
   opus: ROUTING_MODEL_IDS.opus55Native,
   /** Anthropic/Claude cost-efficient docs, chores, and token-limit review fallback. */
-  sonnet: 'sonnet-5',
+  sonnet: 'claude-sonnet-5-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
   /** Google/Antigravity documentation and evidence model. */
