@@ -302,13 +302,14 @@ run directory; never use a workspace-shared scratch filename.
 Exit: `0` ok/PASS · `1` API failure · `2` usage · `4` missing token · `6` base-`main` guard · `7`
 not mergeable · `10` eval FAIL · `11` eval pending · `12` no eval comment.
 
-### `github/gh-watch.ts` and `github/gh-token.ts`
+### `github/gh-watch.ts` (and `maint:gh-token`)
 
 `gh-watch.ts` blocks in the background until a PR's IMPL/PLAN-EVAL verdict is terminal, then exits
 to re-wake the supervisor — a token-free re-wake with no polling loop kept in the agent's context.
-`gh-token.ts check` validates a token from any healthy source (env → `gh auth token` → Git
-Credential Manager), printing only source and login; `gh-token.ts store` persists one stdin PAT to
-Windows GCM and WSL `gh` so future sessions resolve it automatically.
+The token helper is NetScript maintainer tooling at `.llm/tools/maint/gh-token.ts`:
+`maint:gh-token check` validates a token from any healthy source (env → `gh auth token` → Git
+Credential Manager), printing only source and login; `maint:gh-token store` persists one stdin PAT
+to Windows GCM and WSL `gh` so future sessions resolve it automatically.
 
 ### Review-thread gate (moved)
 

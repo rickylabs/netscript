@@ -178,7 +178,7 @@ Two are durable GitHub infra utilities worth calling out:
   supervisor turn without a polling loop kept in context. Exit codes: `0` PASS · `10` FAIL · `12`
   final-no-verdict · `13` action-run-failed · `2` timeout · `4` no-token. Use it whenever you have
   dispatched an evaluator and must wait for the verdict.
-- **`gh-token.ts`** (`deno task agentic:gh-token check|store`) — durable GitHub-token
+- **`maint/gh-token.ts`** (`deno task maint:gh-token check|store`) — durable GitHub-token
   resolver/store. `check` resolves a token from any healthy source (env candidates → `gh auth token`
   Windows/WSL → bounded GCM `git credential fill`), validates it against `GET /user`, and reports
   only the source + login (never the token). `store` reads ONE PAT from stdin and persists it to
