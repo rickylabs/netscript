@@ -107,12 +107,15 @@ function input(secret = 'fixture-secret-never-persist'): Parameters<typeof runAs
   };
 }
 
-function passingPrimary(secret = 'fixture-secret-never-persist'): AspireMcpTransport {
+function passingPrimary(
+  secret = 'fixture-secret-never-persist',
+  doctor: unknown = fixture.doctor,
+): AspireMcpTransport {
   return transport(
     fixture.tools,
     {
       list_apphosts: fixture.apphosts,
-      doctor: fixture.doctor,
+      doctor,
       list_resources: fixture.resources,
       'list_console_logs:postgres-cli': fixture.excludedConsole,
       'list_console_logs:users': fixture.usersConsole,
@@ -120,6 +123,54 @@ function passingPrimary(secret = 'fixture-secret-never-persist'): AspireMcpTrans
     },
     [...fixture.transcript, { secretObserved: false, literal: secret.replaceAll(/./g, '*') }],
   );
+}
+
+function doctorResult(status: string, currentVersion = '13.5.3', failed = 0): unknown {
+  return {
+    checks: [{
+      name: 'cli-version',
+      status,
+      metadata: { currentVersion, latestVersion: '13.6.0' },
+    }],
+    summary: { passed: 6, warnings: status === 'warning' ? 1 : 0, failed },
+  };
+}
+
+Deno.test('doctor update advisory preserves the pinned CLI and the warning receipt', async () => {
+  const receipt = await runAspireMcpSmoke(
+    input(),
+    dependencies(
+      passingPrimary(undefined, doctorResult('warning')),
+      transport(fixture.dashboardTools, {}),
+    ),
+  );
+  assertEquals(receipt.doctor.cliVersion, 'warning');
+  assertEquals(receipt.doctor.currentVersion, '13.5.3');
+  assertEquals(receipt.doctor.summary.failed, 0);
+});
+
+for (
+  const [name, status, version, failed, message] of [
+    ['failed CLI', 'fail', '13.5.3', 0, 'cli-version'],
+    ['unknown CLI status', 'unknown', '13.5.3', 0, 'cli-version'],
+    ['wrong CLI pin', 'warning', '13.6.0', 0, 'doctor currentVersion'],
+    ['failed environment check', 'warning', '13.5.3', 1, 'reported failed checks'],
+  ] as const
+) {
+  Deno.test(`doctor rejects ${name} despite update-advisory handling`, async () => {
+    await assertRejects(
+      () =>
+        runAspireMcpSmoke(
+          input(),
+          dependencies(
+            passingPrimary(undefined, doctorResult(status, version, failed)),
+            transport(fixture.dashboardTools, {}),
+          ),
+        ),
+      Error,
+      message,
+    );
+  });
 }
 
 Deno.test('Aspire MCP expected set is the ratified 14-tool 13.5.3 baseline', () => {

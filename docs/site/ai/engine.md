@@ -67,7 +67,7 @@ until you need it.
 Three registries sit at the root — models, embeddings, and vision — each with the
 same register / get / list / reset shape. Models are addressed by reference: a
 `ModelRef` is `string | ModelSelector`, and the string form is
-`"<provider>:<model>"`, e.g. `"anthropic:claude-sonnet-4-5"`. Errors are a small
+`"<provider>:<model>"`, e.g. `"anthropic:claude-sonnet-5-5"`. Errors are a small
 hierarchy rooted at `AiError`; the two you will actually catch are
 `AiNotConfiguredError` (you called a capability whose port was never injected) and
 `ModelProviderNotFoundError` (the reference names a provider that never
@@ -158,13 +158,14 @@ takes:
 ```ts
 import "@netscript/ai/anthropic"; // self-registers the "anthropic" provider
 
-const model = await getModel("anthropic:claude-sonnet-4-5");
+const model = await getModel("anthropic:claude-sonnet-5-5");
 ```
 
 Choosing between them is mostly a question of where your models live:
 
-- **`./anthropic`** talks to Anthropic directly, catalog taken verbatim from
-  `@tanstack/ai-anthropic`, `apiKey` defaulting to `ANTHROPIC_API_KEY`.
+- **`./anthropic`** talks to Anthropic directly, combining the
+  `@tanstack/ai-anthropic` catalog with Sonnet 5.5 through TanStack's model
+  extension API. `apiKey` defaults to `ANTHROPIC_API_KEY`.
 - **`./openai-compatible`** is the workhorse for any endpoint that speaks the
   OpenAI API: no fixed catalog (the remote endpoint owns its model list), and it
   throws `AiNotConfiguredError` rather than guessing when `baseURL` / `apiKey`
