@@ -180,3 +180,21 @@ Deno.test('unavailable or oversized catalog returns only a fixed named refusal',
     assertEquals(error.message.includes('private-host-detail'), false);
   }
 });
+
+Deno.test('invalid model input never reaches catalog or echoes host details', async () => {
+  for (const model of ['/private/host/model', 'provider/model\nprivate-detail', 'x'.repeat(257)]) {
+    const error = await assertRejects(
+      () =>
+        preflightConfiguredOpenCodeModel(model, {
+          cwd: '.',
+          env: {},
+          listModels: () => {
+            throw new Error('must not list');
+          },
+        }),
+      Error,
+      'safe exact configured ID',
+    );
+    assertEquals(error.message.includes(model), false);
+  }
+});

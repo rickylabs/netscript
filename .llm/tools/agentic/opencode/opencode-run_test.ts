@@ -1,7 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
-import { COPILOT_CATALOG_FIXTURE } from '../runtime/test-fixtures.ts';
 import { evaluateCopilotExpense } from '../runtime/subscription-expense.ts';
 import { ownerMatrixOverrideWorklogEntry } from '@harness/matrix';
 import {

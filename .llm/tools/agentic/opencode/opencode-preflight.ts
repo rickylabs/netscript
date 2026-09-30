@@ -192,6 +192,11 @@ async function readConfiguredCatalog(
   options: Deno.CommandOptions,
 ): Promise<string> {
   const child = new Deno.Command(binary, options).spawn();
+  const deadline = setTimeout(() => {
+    try {
+      child.kill('SIGKILL');
+    } catch { /* already exited */ }
+  }, 15_000);
   const reader = child.stdout.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
@@ -212,6 +217,7 @@ async function readConfiguredCatalog(
     }
     return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   } finally {
+    clearTimeout(deadline);
     reader.releaseLock();
     try {
       child.kill('SIGKILL');
@@ -229,6 +235,9 @@ export async function preflightConfiguredOpenCodeModel(
     readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
   },
 ): Promise<Launchability> {
+  if (model.length > 256 || !/^[a-z][a-z0-9-]*\/[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(model)) {
+    throw new Error('OpenCode catalog requires a safe exact configured ID');
+  }
   const logicalModel = Object.values(MODEL_CATALOG).find((entry) =>
     entry.capabilities.some((capability) =>
       capability.model === model &&
