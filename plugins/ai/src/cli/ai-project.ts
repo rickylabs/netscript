@@ -163,7 +163,7 @@ async function readModels(files: LocalProjectFiles): Promise<ModelsState> {
   );
   return {
     providers: providers.length ? [...new Set(providers)] : ['anthropic'],
-    models: Object.keys(models).length ? models : { chat: 'anthropic:claude-sonnet-4-5' },
+    models: Object.keys(models).length ? models : { chat: 'anthropic:claude-sonnet-5-5' },
   };
 }
 

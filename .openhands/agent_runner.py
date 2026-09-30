@@ -164,7 +164,7 @@ def main() -> int:
         return 2
 
     llm_config: dict[str, object] = {
-        "model": os.getenv("LLM_MODEL", "anthropic/claude-sonnet-4"),
+        "model": os.getenv("LLM_MODEL", "anthropic/claude-sonnet-5-5"),
         "api_key": api_key,
         "usage_id": "netscript-openhands-agent",
         "drop_params": True,

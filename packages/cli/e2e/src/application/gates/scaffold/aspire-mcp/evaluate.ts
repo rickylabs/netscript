@@ -197,8 +197,12 @@ export async function runAspireMcpSmoke(
     doctor = doctorEvidence(
       await callPrimary('doctor', {}),
     );
-    if (doctor.cliVersion !== 'pass') throw new Error('Aspire MCP doctor cli-version did not pass');
+    // An available upstream update is advisory when the running CLI still matches the pin.
+    if (doctor.cliVersion !== 'pass' && doctor.cliVersion !== 'warning') {
+      throw new Error('Aspire MCP doctor cli-version did not pass');
+    }
     assertVersion('doctor currentVersion', doctor.currentVersion, input.scaffoldPin);
+    if (doctor.summary.failed !== 0) throw new Error('Aspire MCP doctor reported failed checks');
     if (toolsMissing.length > 0) {
       throw new Error(`Aspire MCP tools missing: ${toolsMissing.join(', ')}`);
     }

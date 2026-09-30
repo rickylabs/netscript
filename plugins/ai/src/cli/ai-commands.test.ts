@@ -80,9 +80,58 @@ Deno.test('AI CLI manages providers/models and emits compiling configuration sha
       (listed.data as { models: Record<string, string> }).models.reasoning,
       'openrouter:openai/gpt-5',
     );
+    assertEquals(
+      (listed.data as { models: Record<string, string> }).models.chat,
+      'anthropic:claude-sonnet-5-5',
+    );
     const source = await Deno.readTextFile(`${root}/ai/models.ts`);
     assertStringIncludes(source, "import '@netscript/ai/openrouter';");
     assertStringIncludes(source, '"reasoning": "openrouter:openai/gpt-5"');
+  });
+});
+
+Deno.test('AI CLI defaults missing configuration to Sonnet 5.5 and preserves explicit models', async () => {
+  await withProject(async (root, cli) => {
+    const list = () =>
+      cli({ command: 'model', values: ['list'], flags: { workspaceRoot: root, json: true } });
+    assertEquals((await list()).data, {
+      providers: ['anthropic'],
+      models: { chat: 'anthropic:claude-sonnet-5-5' },
+    });
+    assertEquals(
+      (await cli({
+        command: 'provider',
+        values: ['add', 'openrouter'],
+        flags: { workspaceRoot: root },
+      }))
+        .code,
+      0,
+    );
+    assertEquals((await list()).data, {
+      providers: ['anthropic', 'openrouter'],
+      models: { chat: 'anthropic:claude-sonnet-5-5' },
+    });
+    assertEquals(
+      (await cli({
+        command: 'model',
+        values: ['add', 'chat', 'anthropic:app-pinned-model'],
+        flags: { workspaceRoot: root },
+      })).code,
+      0,
+    );
+    assertEquals(
+      (await cli({
+        command: 'provider',
+        values: ['add', 'ollama'],
+        flags: { workspaceRoot: root },
+      }))
+        .code,
+      0,
+    );
+    assertEquals((await list()).data, {
+      providers: ['anthropic', 'ollama', 'openrouter'],
+      models: { chat: 'anthropic:app-pinned-model' },
+    });
   });
 });
 

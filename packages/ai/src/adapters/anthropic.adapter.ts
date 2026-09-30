@@ -12,6 +12,7 @@
  * @module
  */
 
+import { createModel, extendAdapter } from '@tanstack/ai';
 import { ANTHROPIC_MODELS, anthropicText, createAnthropicChat } from '@tanstack/ai-anthropic';
 
 import type { GenerationOptions } from '../contracts/generation.ts';
@@ -87,12 +88,21 @@ export interface AnthropicModelProviderConfig {
 
 const INPUT_MODALITIES = ['text', 'image', 'document'] as const;
 
+// The API serves Sonnet 5.5 before the wrapped adapter's catalog includes it.
+// Use TanStack's model extension seam to pass this exact id to the native SDK.
+const ADDITIONAL_MODELS = [createModel('claude-sonnet-5-5', INPUT_MODALITIES)] as const;
+const MODEL_IDS = [
+  ...new Set([...ANTHROPIC_MODELS, ...ADDITIONAL_MODELS.map((model) => model.name)]),
+];
+const anthropicTextWithModels = extendAdapter(anthropicText, ADDITIONAL_MODELS);
+const createAnthropicChatWithModels = extendAdapter(createAnthropicChat, ADDITIONAL_MODELS);
+
 /**
  * A {@linkcode ModelProviderPort} backed by `@tanstack/ai-anthropic`.
  *
- * The model catalog is taken verbatim from the wrapped package's
- * `ANTHROPIC_MODELS`, so it stays in lockstep with the upstream adapter rather
- * than duplicating a model list. Streaming clients created by
+ * The model catalog combines the wrapped package's `ANTHROPIC_MODELS` with
+ * Sonnet 5.5, whose API id is supported through TanStack's model extension seam.
+ * Streaming clients created by
  * {@linkcode AnthropicModelProvider.createChatClient} are cancelled by passing
  * an `AbortController` to the TanStack `chat()` / `chatStream()` call — the
  * documented stop path for long-lived streams (F-13).
@@ -102,7 +112,7 @@ const INPUT_MODALITIES = ['text', 'image', 'document'] as const;
  * import '@netscript/ai/anthropic'; // self-registers the provider
  * import { getModel } from '@netscript/ai';
  *
- * const handle = await getModel('anthropic:claude-sonnet-4-5');
+ * const handle = await getModel('anthropic:claude-sonnet-5-5');
  * ```
  */
 export class AnthropicModelProvider implements ModelProviderPort {
@@ -116,10 +126,10 @@ export class AnthropicModelProvider implements ModelProviderPort {
   }
 
   /**
-   * List every model exposed by the wrapped TanStack Anthropic adapter.
+   * List the wrapped TanStack Anthropic catalog plus Sonnet 5.5.
    */
   listModels(): Promise<readonly ModelDescriptor[]> {
-    return Promise.resolve(ANTHROPIC_MODELS.map((id) => describeAnthropicModel(id)));
+    return Promise.resolve(MODEL_IDS.map((id) => describeAnthropicModel(id)));
   }
 
   /**
@@ -143,7 +153,7 @@ export class AnthropicModelProvider implements ModelProviderPort {
 
   /** Whether `modelId` is a member of the Anthropic catalog. */
   supports(modelId: ModelId): boolean {
-    return (ANTHROPIC_MODELS as readonly string[]).includes(modelId);
+    return (MODEL_IDS as readonly string[]).includes(modelId);
   }
 
   /**
@@ -163,7 +173,7 @@ export class AnthropicModelProvider implements ModelProviderPort {
    * @example Stream one turn with cancellation
    * ```ts
    * const provider = new AnthropicModelProvider({ apiKey });
-   * const client = provider.createChatClient('claude-sonnet-4-5');
+   * const client = provider.createChatClient('claude-sonnet-5-5');
    * const abort = new AbortController();
    * setTimeout(() => abort.abort(), 5_000);
    * for await (const event of client.stream({ messages }, { signal: abort.signal })) {
@@ -174,7 +184,7 @@ export class AnthropicModelProvider implements ModelProviderPort {
   createChatClient(model: ModelId): ChatClientPort {
     // Narrow the owned string id against the runtime catalog so no
     // `@tanstack/ai-anthropic` type appears in the public signature (D3).
-    const resolved = ANTHROPIC_MODELS.find((candidate) => candidate === model);
+    const resolved = MODEL_IDS.find((candidate) => candidate === model);
     if (resolved === undefined) {
       throw new AiError(
         `Model "${model}" is not offered by the "${ANTHROPIC_PROVIDER_ID}" provider.`,
@@ -185,8 +195,8 @@ export class AnthropicModelProvider implements ModelProviderPort {
       const baseURL = nonEmpty(connection?.baseURL) ?? nonEmpty(this.#config.baseURL);
       const clientConfig = baseURL === undefined ? undefined : { baseURL };
       return apiKey === undefined
-        ? anthropicText(resolved, clientConfig)
-        : createAnthropicChat(resolved, apiKey, clientConfig);
+        ? anthropicTextWithModels(resolved, clientConfig)
+        : createAnthropicChatWithModels(resolved, apiKey, clientConfig);
     }, {
       name: ANTHROPIC_PROVIDER_ID,
       kind: 'text',
