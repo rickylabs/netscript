@@ -41,12 +41,12 @@ function renderRegistrySource(
       }: ResolvedJobHandler<typeof ${alias}>;`,
     ],
     header: [
-      "import type { JobPayloadMap, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
+      "import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
     ],
     body: (entries) => [
       'type SchemaBackedJobHandler =',
       '  & ((...args: never[]) => unknown)',
-      '  & Readonly<{ payloadSchema: unknown }>;',
+      '  & Readonly<{ payloadSchema: JobPayloadSchema<unknown> }>;',
       '',
       'type ResolvedJobHandler<TModule> =',
       '  TModule extends { readonly default: infer TDefault }',

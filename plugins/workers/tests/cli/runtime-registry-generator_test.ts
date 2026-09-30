@@ -1,7 +1,11 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 import { type WorkersConfigData, WorkersConfigSchema } from '@netscript/plugin-workers-core/config';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
+import { runDoctorCommand } from '@netscript/plugin/adapter';
+import { workersAdapterPlugin } from '../../src/adapter/plugin.ts';
 import { writeOfficialSampleConfiguration } from '../../src/cli/official-sample-configuration.ts';
+import { compileWorkersRegistry } from '../../src/cli/registry-compiler.ts';
 import { generateRuntimeRegistries } from '../../src/cli/runtime-registry-generator.ts';
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../..', import.meta.url));
@@ -71,6 +75,28 @@ Deno.test('entry generator loads real config, preserves normalized policy, and g
     const result = await runEntryGenerator(projectRoot);
     assertEquals(result.code, 0, result.stderr);
     assertStringIncludes(result.stderr, 'wholly shadows flat workers.jobs[0]');
+
+    const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
+    const doctor = await runDoctorCommand({
+      plugin: workersAdapterPlugin,
+      context: {
+        workspaceRoot: projectRoot,
+        options: {},
+        config: { WORKERS_API_URL: 'http://localhost:9181' },
+        dryRun: true,
+        fileSystem: {
+          exists: () => Promise.resolve(true),
+          readText: () => Promise.resolve(registrySource),
+          writeText: () => Promise.reject(new Error('read only')),
+        },
+      },
+    });
+    assertEquals(
+      doctor.checks.filter((check) =>
+        check.name.startsWith('generated') || check.name.startsWith('every')
+      ).every((check) => check.ok),
+      true,
+    );
 
     const module = await importRegistry(projectRoot, 'entry-policy');
     assertEquals(module.registry.has('configured-id'), true);
@@ -308,38 +334,7 @@ export default Object.assign(async () => undefined, {
 Deno.test('generated registry preserves literal job payload types at the consumer boundary', async () => {
   await withTempProject(async (projectRoot) => {
     await writeProjectDenoConfig(projectRoot);
-    await writeWorkersManifest(projectRoot, false, true);
-    await write(
-      join(projectRoot, 'registry-types.ts'),
-      `export type JobContext<TPayload> = Readonly<{
-  id: string;
-  job: Readonly<{ id: string }>;
-  payload: TPayload;
-}>;
-export type JobHandler<TPayload = unknown> = (
-  context: JobContext<TPayload>,
-) => unknown | Promise<unknown>;
-export type JobPayloadSchema<TPayload> = Readonly<{
-  '~standard': Readonly<{
-    version: 1;
-    vendor: string;
-    validate(value: unknown): { value: TPayload };
-    types?: Readonly<{ input: unknown; output: TPayload }>;
-  }>;
-}>;
-export type JobHandlerDefinition<TPayload = unknown, _TResult = unknown> =
-  & JobHandler<TPayload>
-  & Readonly<{ payloadSchema: JobPayloadSchema<TPayload> }>;
-export type JobPayloadOf<TDefinition> = TDefinition extends {
-  readonly payloadSchema: JobPayloadSchema<infer TPayload>;
-} ? TPayload : never;
-export type JobPayloadMap<TRegistry extends Readonly<Record<string, unknown>>> = Readonly<{
-  [TId in keyof TRegistry]: JobPayloadOf<TRegistry[TId]>;
-}>;
-export type RegisterJobInput = Readonly<Record<string, unknown> & { id?: string }>;
-export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
-`,
-    );
+    await writeWorkersManifest(projectRoot, true);
     await writeTypedJob(
       projectRoot,
       'embed-document.ts',
@@ -350,19 +345,61 @@ export type StaticJobRegistry = ReadonlyMap<string, JobHandler<never>>;
       'transcribe-image.ts',
       'Readonly<{ imageUrl: string; language?: string }>',
     );
+    await writeTypedPluginJob(projectRoot, 'configured-plugin.ts', 'configured-plugin');
+    await writeTypedPluginJob(projectRoot, 'unconfigured-plugin.ts', 'unconfigured-plugin');
 
-    await generateRuntimeRegistries(generatorOptions(projectRoot));
+    const workers = WorkersConfigSchema.parse({
+      jobsDir: './workers/jobs',
+      jobs: [{
+        id: 'configured-plugin',
+        name: 'Configured plugin',
+        entrypoint: '../../plugins/workers/jobs/configured-plugin.ts',
+        source: 'plugin',
+      }],
+    });
+    await generateRuntimeRegistries(generatorOptions(projectRoot, workers));
     const registrySource = await Deno.readTextFile(join(projectRoot, REGISTRY_PATH));
-    const hasLiteralRegistry = registrySource.includes('export const jobHandlersById');
-    const importedRegistry = hasLiteralRegistry ? 'jobHandlersById' : 'registry';
-    const transcribeHandler = hasLiteralRegistry
-      ? 'jobHandlersById["transcribe-image"]'
-      : 'registry.get("transcribe-image")!';
+    assertStringIncludes(registrySource, 'export const jobHandlersById');
+    const doctor = await runDoctorCommand({
+      plugin: workersAdapterPlugin,
+      context: {
+        workspaceRoot: projectRoot,
+        options: {},
+        config: { WORKERS_API_URL: 'http://localhost:9181' },
+        dryRun: true,
+        fileSystem: {
+          exists: () => Promise.resolve(true),
+          readText: () => Promise.resolve(registrySource),
+          writeText: () => Promise.reject(new Error('read only')),
+        },
+      },
+    });
+    assertEquals(
+      doctor.checks.filter((check) =>
+        check.name.startsWith('generated') || check.name.startsWith('every')
+      ).every((check) => check.ok),
+      true,
+    );
     await write(
       join(projectRoot, 'payload-consumer.ts'),
-      `import { ${importedRegistry} } from './${REGISTRY_PATH}';
+      `import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import { jobHandlersById, type GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+import type { JobTriggerInput } from '@netscript/plugin-workers-core/contracts/v1';
 
-const transcribeImage = ${transcribeHandler};
+createWorkersContract<GeneratedJobPayloadMap>();
+
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+const exactPayload: Equal<GeneratedJobPayloadMap['transcribe-image'], Readonly<{ imageUrl: string; language?: string }>> = true;
+const exactConfiguredPlugin: Equal<GeneratedJobPayloadMap['configured-plugin'], Readonly<{ value: string }>> = true;
+const exactUnconfiguredPlugin: Equal<GeneratedJobPayloadMap['unconfigured-plugin'], Readonly<{ value: string }>> = true;
+void exactPayload;
+void exactConfiguredPlugin;
+void exactUnconfiguredPlugin;
+// @ts-expect-error - a different job's payload must not type as this trigger
+const wrongTrigger: JobTriggerInput<GeneratedJobPayloadMap> = { id: 'transcribe-image', payload: { documentId: 'doc-1', text: 'content' } };
+void wrongTrigger;
+
+const transcribeImage = jobHandlersById['transcribe-image'];
 const job = { id: 'transcribe-image' };
 
 await transcribeImage({
@@ -377,6 +414,8 @@ await transcribeImage({
   // @ts-expect-error - embed-document payload must not compile for transcribe-image
   payload: { documentId: 'doc-1', text: 'content' },
 });
+
+
 `,
     );
 
@@ -394,6 +433,37 @@ await transcribeImage({
     }).output();
     const stderr = new TextDecoder().decode(output.stderr);
     assertEquals(output.code, 0, stderr);
+  });
+});
+
+Deno.test('compile-registry output type-checks with real schema-backed handlers and literal payloads', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeProjectDenoConfig(projectRoot);
+    await writeTypedJob(projectRoot, 'transcribe-image.ts', 'Readonly<{ imageUrl: string }>');
+    await compileWorkersRegistry(new LocalProjectFiles(projectRoot));
+    await write(
+      join(projectRoot, 'compiled-consumer.ts'),
+      `import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import type { GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+const exact: Equal<GeneratedJobPayloadMap['transcribe-image'], Readonly<{ imageUrl: string }>> = true;
+void exact;
+createWorkersContract<GeneratedJobPayloadMap>();
+`,
+    );
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'check',
+        '--no-lock',
+        '--config',
+        join(projectRoot, 'deno.json'),
+        join(projectRoot, 'compiled-consumer.ts'),
+      ],
+      cwd: projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
   });
 });
 
@@ -490,6 +560,8 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
   const telemetry = JSON.parse(
     await Deno.readTextFile(join(REPOSITORY_ROOT, 'packages/telemetry/deno.json')),
   ) as { imports?: Readonly<Record<string, string>> };
+  const otelApiVersion = rootConfig.catalog?.['@opentelemetry/api'];
+  if (!otelApiVersion) throw new Error('Root catalog has no @opentelemetry/api version');
   await write(
     join(projectRoot, 'deno.json'),
     `${
@@ -500,9 +572,13 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
           ...configPackage.imports,
           ...workersCore.imports,
           ...telemetry.imports,
+          '@opentelemetry/api': `npm:@opentelemetry/api@${otelApiVersion}`,
           '@netscript/config': toFileUrl(join(REPOSITORY_ROOT, 'packages/config/mod.ts')).href,
           '@netscript/plugin-workers-core/config': toFileUrl(
             join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/config/mod.ts'),
+          ).href,
+          '@netscript/plugin-workers-core/contracts/v1': toFileUrl(
+            join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/contracts/v1/mod.ts'),
           ).href,
           '@netscript/plugin-workers-core/runtime': toFileUrl(
             join(REPOSITORY_ROOT, 'packages/plugin-workers-core/src/runtime/mod.ts'),
@@ -516,7 +592,6 @@ async function writeProjectDenoConfig(projectRoot: string): Promise<void> {
 async function writeWorkersManifest(
   projectRoot: string,
   includePluginDir = false,
-  widenHandlersToAny = false,
 ): Promise<void> {
   await write(
     join(projectRoot, 'scaffold.runtime.json'),
@@ -532,16 +607,8 @@ async function writeWorkersManifest(
           varPrefix: 'job',
           typeImport: {
             name: 'JobHandler',
-            from: widenHandlersToAny
-              ? '../../../registry-types.ts'
-              : '@netscript/plugin-workers-core/runtime',
+            from: '@netscript/plugin-workers-core/runtime',
           },
-          ...(widenHandlersToAny
-            ? {
-              mapValueType: 'JobHandler<any>',
-              preamble: ['// deno-lint-ignore-file no-explicit-any'],
-            }
-            : {}),
           ...(includePluginDir
             ? {
               pluginDirs: [{
@@ -567,7 +634,7 @@ async function writeTypedJob(
 ): Promise<void> {
   await write(
     join(projectRoot, 'workers/jobs', file),
-    `import type { JobHandlerDefinition, JobPayloadSchema } from '../../registry-types.ts';
+    `import type { JobHandlerDefinition, JobPayloadSchema } from '@netscript/plugin-workers-core/runtime';
 
 type Payload = ${payloadType};
 const payloadSchema: JobPayloadSchema<Payload> = {
@@ -579,10 +646,28 @@ const payloadSchema: JobPayloadSchema<Payload> = {
 };
 
 const handler: JobHandlerDefinition<Payload> = Object.assign(
-  async () => ({ success: true }),
+  async () => ({ success: true as const }),
   { payloadSchema },
 );
 export default handler;
+`,
+  );
+}
+
+async function writeTypedPluginJob(projectRoot: string, file: string, id: string): Promise<void> {
+  await write(
+    join(projectRoot, 'plugins/workers/jobs', file),
+    `import type { JobHandlerDefinition, JobPayloadSchema } from '@netscript/plugin-workers-core/runtime';
+
+type Payload = Readonly<{ value: string }>;
+const payloadSchema: JobPayloadSchema<Payload> = {
+  '~standard': { version: 1, vendor: 'test', validate: (value) => ({ value: value as Payload }) },
+};
+const handler: JobHandlerDefinition<Payload> = Object.assign(
+  async () => ({ success: true as const }),
+  { payloadSchema },
+);
+export default Object.assign(handler, { id: ${JSON.stringify(id)} as const });
 `,
   );
 }
