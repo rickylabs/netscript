@@ -263,6 +263,7 @@ Deno.test('paid OpenCode Go route accepts a fresh live allowance decision', asyn
     },
     {
       env: { OPENCODE_API_KEY: 'opaque' },
+      listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
       fetch: () =>
         Promise.resolve(Response.json({
           usage: {
@@ -412,6 +413,7 @@ Deno.test('denied paid-route expense decision prevents OpenCode process spawn', 
         false,
         {
           env: { OPENCODE_API_KEY: 'opaque' },
+          listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
           fetch: () =>
             Promise.resolve(Response.json({
               usage: {
@@ -447,7 +449,7 @@ Deno.test('unproven live Go usage prevents OpenCode process spawn', async () => 
         runOpenCode(
           {
             message: 'do not dispatch',
-            model: ROUTING_MODEL_IDS.grok46Go,
+            model: ROUTING_MODEL_IDS.grok47Go,
             variant: 'xhigh',
             workloadTier: 'architecture',
             workloadRole: 'implementation_evaluation',
@@ -460,6 +462,7 @@ Deno.test('unproven live Go usage prevents OpenCode process spawn', async () => 
           false,
           {
             env: { OPENCODE_API_KEY: 'opaque' },
+            listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
             fetch: response,
             spawn: () => {
               spawnCalls++;
@@ -481,7 +484,7 @@ Deno.test('privileged OpenCode workload cannot reach usage fetch or spawn withou
       runOpenCode(
         {
           message: 'misclassified architecture review',
-          model: ROUTING_MODEL_IDS.grok46Go,
+          model: ROUTING_MODEL_IDS.grok47Go,
           variant: 'xhigh',
           workloadTier: 'architecture',
           workloadRole: 'implementation_evaluation',
@@ -490,6 +493,7 @@ Deno.test('privileged OpenCode workload cannot reach usage fetch or spawn withou
         false,
         {
           env: { OPENCODE_API_KEY: 'opaque' },
+          listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
           fetch: () => {
             fetchCalls++;
             return Promise.resolve(Response.json({}));
@@ -515,7 +519,7 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
       runOpenCode(
         {
           message: 'do not relabel Grok as routine work',
-          model: ROUTING_MODEL_IDS.grok46Go,
+          model: ROUTING_MODEL_IDS.grok47Go,
           variant: 'xhigh',
           workloadTier: 'feature',
           workloadRole: 'implementation_evaluation',
@@ -524,6 +528,7 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
         false,
         {
           env: { OPENCODE_API_KEY: 'opaque' },
+          listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
           fetch: () => {
             fetchCalls++;
             return Promise.resolve(Response.json({}));
@@ -538,5 +543,48 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
     'is not declared for feature/implementation_evaluation',
   );
   assertEquals(fetchCalls, 0);
+  assertEquals(spawnCalls, 0);
+});
+
+Deno.test('missing configured evaluator catalog never reaches expense or inference', async () => {
+  let expenseCalls = 0;
+  let spawnCalls = 0;
+  const model = ROUTING_MODEL_IDS.museSpark13StandardOpenRouter;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'do not launch',
+          model,
+          variant: 'max',
+          workloadTier: 'feature',
+          workloadRole: 'implementation_evaluation',
+          estimatedCostUsd: 0.1,
+          usageSnapshotPath: 'usage.json',
+          cwd: '.',
+        },
+        false,
+        {
+          env: { OPENROUTER_API_KEY: 'test-only', GH_TOKEN: 'do-not-forward' },
+          listModels: (_binary, options) => {
+            assertEquals(options.env?.GH_TOKEN, 'do-not-forward');
+            // Provider credential isolation and dispatch environment sanitization remain separate guards.
+            assertEquals(options.env?.OPENAI_API_KEY, undefined);
+            return Promise.resolve(ROUTING_MODEL_IDS.museSpark13OpenRouter);
+          },
+          readTextFile: () => {
+            expenseCalls++;
+            throw new Error('must not reach expense');
+          },
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('must not launch');
+          },
+        },
+      ),
+    Error,
+    'launcher-model-absent',
+  );
+  assertEquals(expenseCalls, 0);
   assertEquals(spawnCalls, 0);
 });

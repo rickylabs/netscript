@@ -1,7 +1,14 @@
 import { assertEquals, assertStrictEquals } from '@std/assert';
 import { MODEL_CATALOG } from '@harness/matrix';
 import { ROUTING_MODEL_IDS as HARNESS_MODEL_IDS } from '@harness/models';
-import { MODEL_IDS, NATIVE_CANARY_MODEL_ARGS, ROUTING_MODEL_IDS } from './models.ts';
+import {
+  LEGACY_OPENROUTER_MODEL_IDS,
+  MODEL_IDS,
+  NATIVE_CANARY_MODEL_ARGS,
+  OPENCODE_MODEL_IDS,
+  OPENROUTER_MODEL_IDS,
+  ROUTING_MODEL_IDS,
+} from './models.ts';
 import { OPENCODE_GO_MODEL_MONTHLY_INCLUDED_USD } from './subscriptions.ts';
 
 Deno.test('the local routing catalog is the same pinned Harness module', async () => {
@@ -40,4 +47,24 @@ Deno.test('local OpenCode Go allowance caps cover the pinned Harness catalog exa
     ),
   ].sort();
   assertEquals(Object.keys(OPENCODE_GO_MODEL_MONTHLY_INCLUDED_USD).sort(), goModels);
+});
+
+Deno.test('local API approvals and evaluator aliases project the shared configuration', async () => {
+  const { OPENROUTER_LAUNCHER_MODEL_IDS } = await import('@harness/openrouter-launcher-policy');
+  assertStrictEquals(OPENROUTER_MODEL_IDS, OPENROUTER_LAUNCHER_MODEL_IDS);
+  assertEquals(OPENROUTER_MODEL_IDS.grok, OPENCODE_MODEL_IDS.grok.slice('openrouter/'.length));
+  assertEquals(
+    OPENROUTER_MODEL_IDS.museSpark,
+    OPENCODE_MODEL_IDS.museSpark.slice('openrouter/'.length),
+  );
+  assertEquals(
+    Object.values(OPENROUTER_MODEL_IDS).includes(LEGACY_OPENROUTER_MODEL_IDS.grok45),
+    false,
+  );
+  assertEquals(
+    Object.values(OPENROUTER_MODEL_IDS).includes(
+      ROUTING_MODEL_IDS.museSpark13OpenRouter.slice('openrouter/'.length),
+    ),
+    false,
+  );
 });

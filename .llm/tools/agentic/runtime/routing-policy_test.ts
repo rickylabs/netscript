@@ -112,7 +112,7 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
       worktree,
       privilegedTierAuthorization,
     }).model,
-    ROUTING_MODEL_IDS.grok46Copilot,
+    ROUTING_MODEL_IDS.grok47Go,
   );
 });
 
@@ -162,6 +162,12 @@ Deno.test('SOL handles feature implementation while Astra stays on privileged ti
       family: 'openai',
       transport: 'codex',
       requestedEffort: 'xhigh',
+      launchability: {
+        status: 'unverified',
+        launcher: 'codex',
+        model: ROUTING_MODEL_IDS.solNative,
+        reason: 'catalog-not-observed',
+      },
     },
   );
   assertEquals(
@@ -193,7 +199,7 @@ Deno.test('SOL handles feature implementation while Astra stays on privileged ti
   );
 });
 
-Deno.test('provider capability resolution honors subscription-first order', () => {
+Deno.test('standard Muse uses its verified provider without substituting a contributor', () => {
   const go = resolveWorkloadRoute({
     tier: 'feature',
     role: 'implementation_evaluation',
@@ -201,9 +207,9 @@ Deno.test('provider capability resolution honors subscription-first order', () =
     worktree,
   });
   assertEquals([go.transport, go.provider, go.model], [
-    'opencode_go',
-    'opencode_go',
-    ROUTING_MODEL_IDS.museSpark13Go,
+    'openrouter',
+    'openrouter',
+    ROUTING_MODEL_IDS.museSpark13StandardOpenRouter,
   ]);
   const ollama = resolveWorkloadRoute({
     tier: 'feature',
@@ -270,7 +276,7 @@ Deno.test('same-family evaluator candidates are skipped before provider selectio
     worktree,
     privilegedTierAuthorization,
   });
-  assertEquals(plan.logicalModel, 'grok_4_6');
+  assertEquals(plan.logicalModel, 'grok_4_7');
   assertEquals(plan.effort, 'high');
 });
 

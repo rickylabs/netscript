@@ -47,6 +47,7 @@ export const MODEL_IDS: Readonly<{
 
 /** Harness owns the typed provider-specific routing model catalog. */
 import { ROUTING_MODEL_IDS } from '@harness/models';
+import { OPENROUTER_LAUNCHER_MODEL_IDS } from '@harness/openrouter-launcher-policy';
 export { ROUTING_MODEL_IDS };
 
 /**
@@ -64,18 +65,12 @@ export const NATIVE_CANARY_MODEL_ARGS: Readonly<{
 } as const;
 
 /**
- * Current OpenRouter model ids approved for new route and preset selection.
- * Re-verified against the live OpenRouter catalog on 2026-08-30.
+ * API launcher approvals projected from the pinned Harness routing document.
+ * INTERIM #270: remaining native/legacy presets in this module still need the
+ * configuration/discovery boundary (https://github.com/rickylabs/harness/issues/270).
+ * Catalog membership alone never grants API spending or evaluation certification.
  */
-export const OPENROUTER_MODEL_IDS = {
-  /** Conditional formal PLAN-EVAL route. */
-  planEvaluator: 'qwen/qwen3.8-flash',
-  /** Formal IMPL-EVAL and hybrid/gateway default route. */
-  implEvaluator: 'z-ai/glm-5.3-flash',
-  /** Creative-design route retained independently of evaluator routing. */
-  designGlm: 'z-ai/glm-5.2',
-  grok: 'x-ai/grok-4.5',
-} as const;
+export const OPENROUTER_MODEL_IDS: Readonly<Record<string, string>> = OPENROUTER_LAUNCHER_MODEL_IDS;
 
 /**
  * Retired OpenRouter model ids accepted only while deserializing historical
@@ -85,6 +80,7 @@ export const LEGACY_OPENROUTER_MODEL_IDS = {
   minimaxM3: 'minimax/minimax-m3',
   deepseekV4Flash0731: 'deepseek/deepseek-v4-flash-0731',
   qwen38Max: 'qwen/qwen3.8-max',
+  grok45: 'x-ai/grok-4.5',
 } as const;
 
 /** OpenRouter models approved for explicit Claude hybrid delegation. */
@@ -115,7 +111,10 @@ export const OPEN_EVALUATOR_MODEL_IDS: readonly [
 export type OpenEvaluatorModelId = typeof OPEN_EVALUATOR_MODEL_IDS[number];
 
 /** OpenRouter model ids invoked through the native OpenCode lane. */
-export const OPENCODE_MODEL_IDS = {
+export const OPENCODE_MODEL_IDS: Readonly<Record<string, string>> = {
   /** Vision-capable adversarial design evaluator. */
-  visionEval: 'openrouter/moonshotai/kimi-k3',
+  visionEval: ROUTING_MODEL_IDS.kimiK3OpenRouter,
+  grok: ROUTING_MODEL_IDS.grok47OpenRouter,
+  grokGo: ROUTING_MODEL_IDS.grok47Go,
+  museSpark: ROUTING_MODEL_IDS.museSpark13StandardOpenRouter,
 } as const;
