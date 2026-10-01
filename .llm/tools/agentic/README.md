@@ -638,6 +638,16 @@ message is swallowed as another filename. Repeating `-f` passes native WSL paths
 Add `--format json` to the general launcher when structured event output is required; the evaluator
 captures default markdown.
 
+The runner observes stdout in both capture modes. A child exit of `0` with empty or
+whitespace-only output becomes exit `3`, with `opencode-empty-answer` naming the selected model.
+With `--format json`, only a nonblank `text` event whose part is text establishes an answer;
+step, tool, reasoning and error metadata cannot do so. Malformed UTF-8/JSON or an oversized JSON
+line fails with `opencode-output-malformed`; a pipe still open after the one-second post-exit
+read deadline fails with `opencode-output-incomplete`. Existing child failure codes are retained.
+Streamed output stays byte-for-byte, and capture returns the observed text. Output presence is a
+prerequisite for the separate evaluator-verdict parser and independent evaluation gate.
+The JSON event distinction follows the [OpenCode CLI implementation](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/cli/cmd/run.ts).
+
 Every OpenCode launch discovers the nearest generated `.mcp.json` without crossing the current
 project/git boundary, strictly translates its stdio declarations to OpenCode local MCP entries, and
 adds them through `OPENCODE_CONFIG_CONTENT`. Existing external config and inline provider, model,

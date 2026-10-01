@@ -1,5 +1,6 @@
 /** Runs one bounded, non-interactive OpenCode turn. */
 
+import { type OpenCodeOutputFailure, readOpenCodeOutput } from './opencode-answer.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
 import { copilotLaunchCreditCap } from '../config/subscriptions.ts';
 import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
@@ -63,9 +64,12 @@ export interface OpenCodeRunOptions {
 export interface OpenCodeRunResult {
   readonly code: number;
   readonly stdout?: string;
+  readonly failure?: OpenCodeOutputFailure;
 }
 
 export interface OpenCodeRunDependencies {
+  readonly writeStdout?: (bytes: Uint8Array) => Promise<number>;
+  readonly reportOutputFailure?: (message: string) => void;
   readonly repositoryIdentity?: (cwd: string) => Promise<{ branch: string; head: string }>;
   readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
   readonly reserveCopilot?: typeof reserveCopilotCredits;
@@ -366,18 +370,23 @@ export async function runOpenCode(
     env,
     clearEnv: true,
     stdin: 'null',
-    stdout: capture ? 'piped' : 'inherit',
+    stdout: 'piped',
     stderr: 'inherit',
   };
   const child = dependencies.spawn
     ? dependencies.spawn(binary, commandOptions)
     : new Deno.Command(binary, commandOptions).spawn();
-  const stdout = capture ? new Response(child.stdout).text() : undefined;
-  const status = await child.status;
-  return {
-    code: status.code,
-    ...(stdout ? { stdout: await stdout } : {}),
-  };
+  const result = await readOpenCodeOutput(child, {
+    capture,
+    format: options.format ?? 'default',
+    writeStdout: dependencies.writeStdout ?? ((bytes) => Deno.stdout.write(bytes)),
+  });
+  if (result.failure) {
+    (dependencies.reportOutputFailure ?? console.error)(
+      `opencode-${result.failure}: model ${options.model} produced no verified answer output`,
+    );
+  }
+  return result;
 }
 
 function requiredValue(args: readonly string[], index: number, flag: string): string {
