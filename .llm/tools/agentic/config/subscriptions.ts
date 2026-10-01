@@ -23,6 +23,14 @@ export const COPILOT_LAUNCH_CREDIT_CAPS = {
   architecture: 200,
 } as const;
 
+/** Unknown configurable tiers have no implicit paid credit cap. */
+export function copilotLaunchCreditCap(tier: string): number {
+  if (!Object.hasOwn(COPILOT_LAUNCH_CREDIT_CAPS, tier)) {
+    throw new Error('unclassified workload tier has no Copilot credit cap');
+  }
+  return COPILOT_LAUNCH_CREDIT_CAPS[tier as keyof typeof COPILOT_LAUNCH_CREDIT_CAPS];
+}
+
 /** Official OpenCode Go allowance windows, re-verified 2026-09-04. */
 export const OPENCODE_GO_LIMITS_USD = {
   rollingFiveHours: 12,
@@ -37,6 +45,8 @@ export const OPENCODE_GO_LIMITS_USD = {
  */
 export const OPENCODE_GO_MODEL_MONTHLY_INCLUDED_USD: Readonly<Record<string, number>> = {
   [ROUTING_MODEL_IDS.grok46Go]: 15,
+  // Official Go monthly inclusion for the newly configured evaluator (2026-09-30).
+  [ROUTING_MODEL_IDS.grok47Go]: 15,
   [ROUTING_MODEL_IDS.lunaGo]: 15,
   [ROUTING_MODEL_IDS.glm53FlashGo]: 15,
   [ROUTING_MODEL_IDS.glm53Go]: 15,

@@ -4078,9 +4078,16 @@
     "https://deno.land/std@0.224.0/assert/assertion_error.ts": "ba8752bd27ebc51f723702fac2f54d3e94447598f54264a6653d6413738a8917",
     "https://deno.land/std@0.224.0/jsonc/mod.ts": "1756f094e00894ec27416b4fcccbcf445e73892a83cf1937de3aad7de2d5da7c",
     "https://deno.land/std@0.224.0/jsonc/parse.ts": "06fbe10f0bb0cba684f7902bf7de5126b16eb0e5a82220c98a4b86675c7f9cff",
-    "https://raw.githubusercontent.com/rickylabs/harness/36b204d69ed3e15526d08289dd0f8baed4e0115b/packages/routing/matrix/contract.ts": "4c293763adfaa03711f63981b246f6dff821f765b2855d0113d9b52723d7c2ce",
-    "https://raw.githubusercontent.com/rickylabs/harness/36b204d69ed3e15526d08289dd0f8baed4e0115b/packages/routing/matrix/delegation-matrix.ts": "f3a943a0d046c0a7fa4f30ca5557c05a542e6a2a64b96a0cfeabd899f8b7dc98",
-    "https://raw.githubusercontent.com/rickylabs/harness/36b204d69ed3e15526d08289dd0f8baed4e0115b/packages/routing/matrix/models.ts": "43d5272637403437c497e552cbda0c2ed0c647204e23766d596f32f5f8a551b9"
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/config/matrix-aliases.v1.json": "a0717c943bdc850916b447f15847af3ce31d6cac64f3b6d7f93ea3abcc221214",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/config/routing.fleet.v2.json": "03cb956b4f82c8ee059369438ff26fc4d888036986264321b5f21f347aa9e69f",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/configuration-contract.ts": "5b91070ad2317acd3b74ca928c31b072acc1ba7e4bbca29d29a6721c13520725",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/contract.ts": "4c293763adfaa03711f63981b246f6dff821f765b2855d0113d9b52723d7c2ce",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/delegation-matrix.ts": "f254eb10f06d942fbd84b4a189b4f553cd6db72dd1cbe695f82708d48b2042da",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/launchability.ts": "51dfad45f2921b29908f0ab23e8609d252c55985319d3f9b009a13cdb5076a36",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/models.ts": "7139215d5df1864116bfb14c0303623cf2240ec097f83348d5bdbf247baf63fb",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/openrouter-launcher-policy.ts": "99c770084786f3d20ca948d19135718bd36de5ef98e2526509f106b1d6e14fdb",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/routing-policy.ts": "b8ab2e731789092542e158ceeb51b87ad4410567e94c9c4eb0554a726bd6ad73",
+    "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/versions.ts": "43155c8272a95ba6f1f5e2c43cad35e7b51872d0542b49f8150f7efa22426249"
   },
   "workspace": {
     "dependencies": [

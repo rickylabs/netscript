@@ -12,6 +12,7 @@ import {
 } from './provider-profiles.ts';
 import { validateProviderRoute } from './adapters/provider-adapter.ts';
 import type { ObservedRuntimeState } from './state.ts';
+import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { assert, assertEquals } from '@std/assert';
 
 const worktree = '/home/codex/repos/provider-profile-test';
@@ -108,7 +109,7 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
     'qwen/qwen3.8-flash',
     'z-ai/glm-5.3-flash',
     'z-ai/glm-5.2',
-    'x-ai/grok-4.5',
+    ROUTING_MODEL_IDS.grok47OpenRouter.slice('openrouter/'.length),
   ]);
   assertEquals(matchOpenRouterPreset(route()), OPENROUTER_PRESETS['codex-design-glm-5-2']);
   assertEquals(OPENROUTER_PRESETS['codex-design-glm-5-2'].agenticTurn, 'unsupported');

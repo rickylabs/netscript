@@ -7,6 +7,12 @@ import { OPENCODE_TOOL } from '../config/versions.ts';
 import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import { environmentWithOpenCodeCredential } from '../lib/provider-credential.ts';
 import type { RouteAvailability } from '../runtime/routing-policy.ts';
+import { MODEL_CATALOG } from '@harness/matrix';
+import {
+  assertRouteLaunchable,
+  type Launchability,
+  RouteLaunchError,
+} from '@harness/launchability';
 import {
   discoverOpenCodeProjectAttachment,
   type Environment,
@@ -178,6 +184,92 @@ export async function preflightCopilotCatalog(
     throw new Error('Copilot catalog unavailable; mark github_copilot transport unavailable');
   }
   return attestCopilotCatalog(model, catalog, capturedAt, variant);
+}
+
+/** Read bounded catalog output under the same isolated environment used for dispatch. */
+async function readConfiguredCatalog(
+  binary: string,
+  options: Deno.CommandOptions,
+): Promise<string> {
+  const child = new Deno.Command(binary, options).spawn();
+  const deadline = setTimeout(() => {
+    try {
+      child.kill('SIGKILL');
+    } catch { /* already exited */ }
+  }, 15_000);
+  const reader = child.stdout.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.length;
+      if (size > 1024 * 1024) throw new Error('catalog oversized');
+      chunks.push(value);
+    }
+    if (!(await child.status).success) throw new Error('catalog unavailable');
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } finally {
+    clearTimeout(deadline);
+    reader.releaseLock();
+    try {
+      child.kill('SIGKILL');
+    } catch { /* already exited */ }
+    await child.status;
+  }
+}
+
+/** Exact configured ID admission; does not attest quota, effort support or I2. */
+export async function preflightConfiguredOpenCodeModel(
+  model: string,
+  options: {
+    readonly cwd: string;
+    readonly env: Environment;
+    readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
+  },
+): Promise<Launchability> {
+  if (model.length > 256 || !/^[a-z][a-z0-9-]*\/[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(model)) {
+    throw new Error('OpenCode catalog requires a safe exact configured ID');
+  }
+  const logicalModel = Object.values(MODEL_CATALOG).find((entry) =>
+    entry.capabilities.some((capability) =>
+      capability.model === model &&
+      ['opencode_go', 'ollama', 'openrouter', 'github_copilot'].includes(capability.transport)
+    )
+  )?.id;
+  if (!logicalModel) throw new RouteLaunchError('launcher-model-unconfigured', model);
+  let catalog: string;
+  try {
+    catalog = await (options.listModels ?? readConfiguredCatalog)(resolveBinary(options.env), {
+      args: ['models', model.split('/')[0]],
+      cwd: options.cwd,
+      env: Object.fromEntries(
+        Object.entries(options.env).filter((entry): entry is [string, string] =>
+          entry[1] !== undefined
+        ),
+      ),
+      clearEnv: true,
+      stdin: 'null',
+      stdout: 'piped',
+      stderr: 'null',
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (new TextEncoder().encode(catalog).length > 1024 * 1024) {
+      throw new Error('catalog oversized');
+    }
+  } catch {
+    throw new RouteLaunchError('launcher-catalog-unavailable', model);
+  }
+  return assertRouteLaunchable({ agent: 'opencode', model, logicalModel }, {
+    opencode: catalog.split(/\r?\n/).map((line) => line.trim()),
+  });
 }
 
 function safeServerName(value: string): boolean {

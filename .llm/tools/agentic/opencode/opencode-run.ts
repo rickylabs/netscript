@@ -1,7 +1,7 @@
 /** Runs one bounded, non-interactive OpenCode turn. */
 
 import { OPENCODE_TOOL } from '../config/versions.ts';
-import { COPILOT_LAUNCH_CREDIT_CAPS } from '../config/subscriptions.ts';
+import { copilotLaunchCreditCap } from '../config/subscriptions.ts';
 import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
 export { parseOpenRouterApiKey } from '../lib/openrouter-credential.ts';
 import {
@@ -10,7 +10,11 @@ import {
 } from '../lib/provider-credential.ts';
 import { dirname, resolve } from 'node:path';
 import { prepareOpenCodeProjectEnvironment } from './opencode-project-config.ts';
-import { preflightCopilotCatalog, preflightOpenCodeMcp } from './opencode-preflight.ts';
+import {
+  preflightConfiguredOpenCodeModel,
+  preflightCopilotCatalog,
+  preflightOpenCodeMcp,
+} from './opencode-preflight.ts';
 import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import {
   evaluateSubscriptionExpense,
@@ -203,7 +207,7 @@ export async function preflightOpenCodeExpense(
       throw new Error('Copilot requires its operational ledger, not --usage-snapshot');
     }
     const decision = await (dependencies.reserveCopilot ?? reserveCopilotCredits)({
-      cap: options.maxAiCredits ?? COPILOT_LAUNCH_CREDIT_CAPS[options.workloadTier],
+      cap: options.maxAiCredits ?? copilotLaunchCreditCap(options.workloadTier),
       now: (dependencies.now ?? (() => new Date().toISOString()))(),
       worktree: resolve(options.cwd ?? Deno.cwd()),
       env: dependencies.env,
@@ -284,6 +288,19 @@ export async function runOpenCode(
       'Copilot catalog model or variant absent; mark github_copilot transport unavailable',
     );
   }
+  if (!copilot) {
+    const catalogEnv = await environmentWithOpenCodeCredential(
+      options.model,
+      processEnv,
+      dependencies.readTextFile ?? Deno.readTextFile,
+      dependencies.stat ?? Deno.stat,
+    );
+    await preflightConfiguredOpenCodeModel(options.model, {
+      cwd,
+      env: catalogEnv,
+      listModels: dependencies.listModels,
+    });
+  }
   const expense = await preflightOpenCodeExpense(options, dependencies);
   if (options.receiptPath) {
     await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
@@ -308,7 +325,7 @@ export async function runOpenCode(
           expense,
           observationSource: 'connector_catalog',
           requestedCreditCap: options.maxAiCredits ??
-            (options.workloadTier ? COPILOT_LAUNCH_CREDIT_CAPS[options.workloadTier] : null),
+            (options.workloadTier ? copilotLaunchCreditCap(options.workloadTier) : null),
           providerEnforcedCap: false,
           cwd,
           ...gitIdentity,

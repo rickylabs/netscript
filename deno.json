@@ -76,7 +76,7 @@
     "agentic:wsl-foundation": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=nodejs.org,registry.npmjs.org,antigravity.google .llm/tools/agentic/wsl/wsl-foundation.ts",
     "agentic:runtime": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/agentic-runtime.ts",
     "agentic:routing-state": "deno run --no-lock --allow-read --allow-env .llm/tools/agentic/runtime/cli/routing-state.ts",
-    "agentic:matrix": "deno run --no-lock https://raw.githubusercontent.com/rickylabs/harness/36b204d69ed3e15526d08289dd0f8baed4e0115b/packages/routing/matrix/cli/matrix-view.ts",
+    "agentic:matrix": "deno run --no-lock https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/cli/matrix-view.ts",
     "agentic:expense-watch": "deno run --no-lock --allow-read --allow-env --allow-net=opencode.ai .llm/tools/agentic/runtime/cli/expense-watch.ts",
     "agentic:antigravity-evidence": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/antigravity-evidence-cli.ts",
     "agentic:provider-canary": "deno run --no-lock --allow-run --allow-env .llm/tools/agentic/runtime/cli/provider-canary.ts",
@@ -107,7 +107,7 @@
     "agentic:gh-watch": "deno run --no-lock --allow-env --allow-net .llm/tools/agentic/github/gh-watch.ts",
     "agentic:copilot-task": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/copilot/copilot-agent-task.ts",
     "agentic:copilot-preflight": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-preflight.ts",
-    "agentic:pr-checks": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com https://raw.githubusercontent.com/rickylabs/harness/e54a3705d9ef6696ce3f7a6190b55fcb80bff297/packages/board/src/pr-checks.ts",
+    "agentic:pr-checks": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/board/src/pr-checks.ts",
     "agentic:claude-openrouter": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net .llm/tools/agentic/claude/openrouter-run.ts",
     "agentic:opencode": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net=127.0.0.1,opencode.ai .llm/tools/agentic/opencode/opencode-run.ts",
     "agentic:opencode-eval": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-eval.ts",
@@ -177,8 +177,11 @@
     "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots"
   },
   "imports": {
-    "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/36b204d69ed3e15526d08289dd0f8baed4e0115b/packages/routing/matrix/delegation-matrix.ts",
-    "@harness/models": "https://raw.githubusercontent.com/rickylabs/harness/36b204d69ed3e15526d08289dd0f8baed4e0115b/packages/routing/matrix/models.ts",
+    "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/delegation-matrix.ts",
+    "@harness/models": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/models.ts",
+    "@harness/routing-policy": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/routing-policy.ts",
+    "@harness/launchability": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/launchability.ts",
+    "@harness/openrouter-launcher-policy": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/openrouter-launcher-policy.ts",
     "@std/assert": "jsr:@std/assert@1",
     "@std/path": "jsr:@std/path@1"
   },
