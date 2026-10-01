@@ -58,7 +58,7 @@ Deno.test('Copilot launch reserves after attestation and writes pending identity
           assertEquals(options.args?.slice(-2), ['--variant', 'high']);
           assertEquals(JSON.stringify(options).includes('never-retain'), false);
           return new Deno.Command(Deno.execPath(), {
-            args: ['eval', 'void 0'],
+            args: ['eval', 'console.log("fixture answer")'],
             stdout: 'piped',
             stderr: 'null',
           }).spawn();
@@ -586,4 +586,89 @@ Deno.test('missing configured evaluator catalog never reaches expense or inferen
   );
   assertEquals(expenseCalls, 0);
   assertEquals(spawnCalls, 0);
+});
+
+Deno.test('configured Go evaluator refuses rc0 empty/whitespace/metadata output in both capture modes', async () => {
+  const cwd = await Deno.makeTempDir();
+  const model = ROUTING_MODEL_IDS.grok47Go;
+  try {
+    for (const capture of [false, true]) {
+      for (
+        const [format, output, expected] of [
+          ['default', '', 3],
+          ['default', ' \t\n', 3],
+          ['default', 'fixture answer\n', 0],
+          ['json', JSON.stringify({ type: 'step_finish', part: { reason: 'stop' } }) + '\n', 3],
+          [
+            'json',
+            JSON.stringify({ type: 'text', part: { type: 'text', text: 'Verdict: PASS' } }) + '\n',
+            0,
+          ],
+        ] as const
+      ) {
+        const diagnostics: string[] = [];
+        const forwarded: number[] = [];
+        const result = await runOpenCode(
+          {
+            message: 'synthetic evaluator only',
+            model,
+            variant: 'xhigh',
+            cwd,
+            format,
+            workloadTier: 'architecture',
+            workloadRole: 'implementation_evaluation',
+            estimatedCostUsd: 0.1,
+            privilegedTierAuthorization: {
+              authorizer: 'owner',
+              rationale: 'Synthetic guarded output test only',
+            },
+          },
+          capture,
+          {
+            env: { HOME: cwd, OPENCODE_API_KEY: 'fixture-credential' },
+            now: () => '2026-10-01T00:00:00.000Z',
+            listModels: () => Promise.resolve(model + '\n'),
+            fetch: () =>
+              Promise.resolve(Response.json({
+                usage: {
+                  rolling: { percent: 1, status: 'ok' },
+                  weekly: { percent: 1, status: 'ok' },
+                  monthly: { percent: 1, status: 'ok' },
+                },
+              })),
+            writeStdout: (bytes) => {
+              forwarded.push(...bytes);
+              return Promise.resolve(bytes.length);
+            },
+            reportOutputFailure: (message) => diagnostics.push(message),
+            spawn: (_binary, options) => {
+              assertEquals(options.stdout, 'piped');
+              return new Deno.Command(Deno.execPath(), {
+                args: [
+                  'eval',
+                  `await Deno.stdout.write(new TextEncoder().encode(${JSON.stringify(output)}))`,
+                ],
+                stdout: 'piped',
+                stderr: 'null',
+              }).spawn();
+            },
+          },
+        );
+        assertEquals(result.code, expected);
+        assertEquals(result.stdout, capture ? output : undefined);
+        assertEquals(new TextDecoder().decode(new Uint8Array(forwarded)), capture ? '' : output);
+        assertEquals(diagnostics.length, expected === 0 ? 0 : 1);
+        if (expected !== 0) {
+          assertEquals(result.failure, 'empty-answer');
+          assertEquals(
+            diagnostics[0],
+            `opencode-empty-answer: model ${model} produced no verified answer output`,
+          );
+          assertEquals(diagnostics[0].includes('fixture-credential'), false);
+        }
+      }
+    }
+  } finally {
+    await Deno.remove(cwd, { recursive: true });
+  }
 });
