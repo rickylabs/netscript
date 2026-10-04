@@ -28,6 +28,9 @@ not.
   `healthChecks.database`, `.kv`, `.service`, and `.custom` cover common dependencies.
 - **Graceful lifecycle** — `onShutdown()` registers LIFO teardown hooks; `serve()` drains in-flight
   requests, installs `SIGINT`/`SIGTERM` handlers, and accepts an external `AbortSignal`.
+- **Explicit bind address** — `serve({ hostname })` and `defineService(router, { hostname })` bind
+  one interface, such as `'127.0.0.1'` for a loopback-only listener, on both the plain and the TLS
+  listener; omitting it keeps the all-interfaces default.
 - **One app-wide budget** — `createRuntimeHost()` invokes existing service, worker, queue, and
   database drains in deterministic phase order and returns one aggregate report.
 - **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
