@@ -118,6 +118,41 @@ const provider = getModelProvider('anthropic', { apiKey: Deno.env.get('ANTHROPIC
 const client = provider.createChatClient?.('claude-sonnet-5-5');
 ```
 
+The Anthropic provider also accepts `models?: readonly string[]` for API IDs released ahead of its
+bundled SDK catalog. The same instance uses those IDs in `supports`, `listModels`, `getModel`, and
+`createChatClient`; unconfigured unknown IDs still reject. Discovery and construction require no
+network access. Configuration is copied per instance and never changes the SDK catalog. Added IDs
+carry no inferred vision, reasoning, or token-limit metadata.
+
+```typescript
+import { AnthropicModelProvider } from '@netscript/ai/anthropic';
+
+const anthropic = new AnthropicModelProvider({
+  apiKey: Deno.env.get('ANTHROPIC_API_KEY'),
+  models: ['claude-opus-5-5', 'claude-fable-5-1'],
+});
+const opus = anthropic.createChatClient('claude-opus-5-5');
+```
+
+For the exact Opus 5.5 and Fable 5.1 IDs, adaptive thinking remains on: neutral
+`reasoningEffort: 'off'` emits no disabling field. Sonnet 5.5 maps `off` to
+`thinking: { type: 'between_tools' }`, its supported mode without up-front reasoning. Other IDs
+retain the generic mapping. Use `output_config.effort` in `providerOptions` or per-call
+`modelOptions` for Anthropic's native effort levels, including `xhigh` and `max`. The final merged
+options are checked before IO; disabled/manual thinking, forced tool choices and non-default
+sampling reject for those three IDs. Sonnet's `between_tools` cannot be combined with `xhigh`/`max`
+or extra thinking fields. See
+[Anthropic's thinking modes](https://platform.claude.com/docs/en/build-with-claude/thinking) and
+[Opus migration guide](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide).
+
+This configuration requires a release containing this change; published `@netscript/ai@0.0.7`
+does not expose it. The source regression graph uses `@tanstack/ai@0.52.3` with
+`@tanstack/ai-anthropic@0.18.3`, retaining the compatible dependency family. When the fix is
+published, pin the exact stable NetScript release and use the configuration above; do not upgrade
+only the Anthropic adapter into the older peer graph. Mocked Messages tests establish transport
+compatibility; paid live inference and validation against a newly published package remain release
+acceptance steps.
+
 The OpenAI-compatible provider reaches any endpoint that speaks the OpenAI Chat Completions or
 Responses API — point `baseURL` at DeepSeek, Together, vLLM, or a local gateway; with no `models`
 configured the remote endpoint is the authority on its own catalog. Streaming is cancelled by

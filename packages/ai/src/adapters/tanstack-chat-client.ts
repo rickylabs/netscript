@@ -22,7 +22,7 @@
  * @module
  */
 
-import { chat, EventType, fromSpecTokenUsage } from '@tanstack/ai';
+import { chat, EventType, fromSpecTokenUsage, maxIterations } from '@tanstack/ai';
 import type {
   AnyTextAdapter,
   AnyTool,
@@ -120,18 +120,17 @@ export function resolveModelOptions(
   request: ChatClientRequest,
   options?: ChatClientCallOptions,
 ): Readonly<Record<string, unknown>> | undefined {
-  if (options?.modelOptions !== undefined) {
-    meta.validateModelOptions?.(options.modelOptions);
-  }
   const perTurn = request.options !== undefined
     ? meta.mapModelOptions?.(request.options)
     : undefined;
-  return mergeModelOptions(
+  const merged = mergeModelOptions(
     meta.modelOptions,
     perTurn,
     request.options?.providerOptions,
     options?.modelOptions,
   );
+  if (merged !== undefined) meta.validateModelOptions?.(merged);
+  return merged;
 }
 
 /**
@@ -156,14 +155,13 @@ export function toTanstackChatClient(
       if (external?.aborted) {
         return;
       }
+      const modelOptions = resolveModelOptions(meta, request, options);
       const controller = new AbortController();
       const forwardAbort = () => controller.abort();
       external?.addEventListener('abort', forwardAbort, { once: true });
 
       const { systemPrompts, messages } = toTanstackMessages(request);
       const tools = toTanstackTools(request.tools);
-
-      const modelOptions = resolveModelOptions(meta, request, options);
 
       // Accumulate streamed tool-call fragments keyed by call id.
       const pending = new Map<string, { name: string; args: string }>();
@@ -194,6 +192,10 @@ export function toTanstackChatClient(
           systemPrompts,
           tools,
           abortController: controller,
+          // This port owns one model turn; the NetScript agent loop executes
+          // tools and supplies their results in the next call. TanStack's
+          // default loop otherwise retries client tools with placeholder results.
+          agentLoopStrategy: maxIterations(1),
           // `AnyTextAdapter` erases the provider-options type to `any`, so this
           // owned `Record` threads into `modelOptions` without a cast (D3-safe).
           modelOptions,
