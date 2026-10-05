@@ -81,7 +81,15 @@ async function collect(
   return events;
 }
 
-function messageStream(model: string, withTool = false): Response {
+function messageStream(
+  model: string,
+  withTool = false,
+  usageFrames: {
+    readonly start?: Readonly<Record<string, unknown>> | null;
+    readonly interim?: Readonly<Record<string, unknown>>;
+    readonly final?: Readonly<Record<string, unknown>> | null;
+  } = {},
+): Response {
   const frames: Readonly<Record<string, unknown>>[] = [
     {
       type: 'message_start',
@@ -93,7 +101,9 @@ function messageStream(model: string, withTool = false): Response {
         content: [],
         stop_reason: null,
         stop_sequence: null,
-        usage: { input_tokens: 3, output_tokens: 0 },
+        usage: usageFrames.start === undefined
+          ? { input_tokens: 3, output_tokens: 1 }
+          : usageFrames.start ?? undefined,
       },
     },
     { type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '' } },
@@ -132,11 +142,20 @@ function messageStream(model: string, withTool = false): Response {
       { type: 'content_block_stop', index: 2 },
     );
   }
+  if (usageFrames.interim !== undefined) {
+    frames.push({
+      type: 'message_delta',
+      delta: { stop_reason: null, stop_sequence: null },
+      usage: usageFrames.interim,
+    });
+  }
   frames.push(
     {
       type: 'message_delta',
       delta: { stop_reason: withTool ? 'tool_use' : 'end_turn', stop_sequence: null },
-      usage: { input_tokens: 3, output_tokens: 8 },
+      usage: usageFrames.final === undefined
+        ? { output_tokens: 8 }
+        : usageFrames.final ?? undefined,
     },
     { type: 'message_stop' },
   );
@@ -154,10 +173,16 @@ async function withMessagesTransport(
   const originalFetch = globalThis.fetch;
   const originalLog = console.log;
   const originalError = console.error;
+  const originalDebug = console.debug;
+  const originalInfo = console.info;
+  const originalWarn = console.warn;
   const requests: WireRequest[] = [];
   const logs: unknown[][] = [];
   console.log = (...args) => logs.push(args);
   console.error = (...args) => logs.push(args);
+  console.debug = (...args) => logs.push(args);
+  console.info = (...args) => logs.push(args);
+  console.warn = (...args) => logs.push(args);
   globalThis.fetch = async (input, init) => {
     const request = new Request(input, init);
     const wire = {
@@ -178,6 +203,9 @@ async function withMessagesTransport(
     globalThis.fetch = originalFetch;
     console.log = originalLog;
     console.error = originalError;
+    console.debug = originalDebug;
+    console.info = originalInfo;
+    console.warn = originalWarn;
   }
 }
 
@@ -224,6 +252,70 @@ Deno.test({
       }
       assertEquals(requests.length, 4);
     });
+  },
+});
+
+Deno.test({
+  name: 'anthropic: split cumulative usage preserves caches and remains isolated per turn',
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn() {
+    await withMessagesTransport(
+      async () => {
+        const client = new AnthropicModelProvider({
+          apiKey: 'test-static-key',
+          models: ['claude-opus-5-5'],
+        }).createChatClient('claude-opus-5-5');
+        const first = (await collect(client)).find((event) => event.type === 'finish');
+        assert(first?.type === 'finish');
+        assertEquals(first.usage, {
+          promptTokens: 6,
+          completionTokens: 8,
+          totalTokens: 14,
+          promptTokensDetails: { cacheWriteTokens: 4, cachedTokens: 7 },
+          providerUsageDetails: {
+            serverToolUse: { webSearchRequests: 2, webFetchRequests: 1 },
+          },
+        });
+        const second = (await collect(client)).find((event) => event.type === 'finish');
+        assert(second?.type === 'finish');
+        assertEquals(second.usage, { promptTokens: 9, completionTokens: 4, totalTokens: 13 });
+        const third = (await collect(client)).find((event) => event.type === 'finish');
+        assert(third?.type === 'finish');
+        assertEquals(third.usage, undefined);
+      },
+      (() => {
+        let turn = 0;
+        return (wire) => {
+          turn++;
+          return messageStream(
+            String(wire.body.model),
+            false,
+            turn === 1
+              ? {
+                start: {
+                  input_tokens: 3,
+                  output_tokens: 1,
+                  cache_creation_input_tokens: 4,
+                  cache_read_input_tokens: 5,
+                  server_tool_use: { web_search_requests: 1, web_fetch_requests: 1 },
+                  unrelated: 'test-usage-field-must-not-escape',
+                },
+                interim: {
+                  input_tokens: 6,
+                  output_tokens: 4,
+                  cache_read_input_tokens: 7,
+                  server_tool_use: { web_search_requests: 2 },
+                },
+                final: { output_tokens: 8 },
+              }
+              : turn === 2
+              ? { start: { input_tokens: 9, output_tokens: 1 }, final: { output_tokens: 4 } }
+              : { start: null, final: null },
+          );
+        };
+      })(),
+    );
   },
 });
 

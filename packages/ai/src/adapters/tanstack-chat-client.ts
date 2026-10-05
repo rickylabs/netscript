@@ -54,6 +54,14 @@ export type ChatAdapterResolver = (
   connection: ChatClientConnectionOptions | undefined,
 ) => AnyTextAdapter;
 
+/** Per-turn projection of provider frames onto the owned usage contract. */
+export interface ProviderUsageObserver {
+  /** Inspect a frame without retaining or logging its message/credential fields. */
+  readonly observe: (frame: unknown) => void;
+  /** Read cumulative reported usage, or undefined when the provider reported none. */
+  readonly read: () => Usage | undefined;
+}
+
 /** Identifying metadata for the wrapped client, surfaced on the owned port. */
 export interface ChatClientMeta {
   /** Provider name (e.g. `"anthropic"`). */
@@ -87,6 +95,8 @@ export interface ChatClientMeta {
   readonly validateModelOptions?: (
     options: Readonly<Record<string, unknown>>,
   ) => void;
+  /** Preserve raw reported usage when the SDK drops fields during normalization. */
+  readonly createUsageObserver?: () => ProviderUsageObserver;
 }
 
 /**
@@ -166,6 +176,7 @@ export function toTanstackChatClient(
       // Accumulate streamed tool-call fragments keyed by call id.
       const pending = new Map<string, { name: string; args: string }>();
       const rawUsageByRunId = new Map<string, TanstackTokenUsage>();
+      const usageObserver = meta.createUsageObserver?.();
       const preserveUsageIdentity: ChatMiddleware<Readonly<Record<string, unknown>>> = {
         name: 'netscript-preserve-usage-identity',
         onChunk(_context, chunk) {
@@ -212,6 +223,26 @@ export function toTanstackChatClient(
           context: request.context ?? {},
           metadata: request.context,
           middleware: [preserveUsageIdentity],
+          // The public Logger seam exposes provider frames before adapter
+          // normalization. Keep this observer silent and enable only that
+          // category: raw prompts, credentials and error objects never log.
+          debug: usageObserver === undefined ? undefined : {
+            provider: true,
+            output: false,
+            middleware: false,
+            tools: false,
+            agentLoop: false,
+            config: false,
+            errors: false,
+            request: false,
+            sandbox: false,
+            logger: {
+              debug: (_message, data) => usageObserver.observe(data?.chunk),
+              info: () => {},
+              warn: () => {},
+              error: () => {},
+            },
+          },
         });
         for await (const chunk of streamed) {
           if (external?.aborted) {
@@ -219,7 +250,9 @@ export function toTanstackChatClient(
           }
           const event = translateChunk(chunk, pending, rawUsageByRunId);
           if (event) {
-            yield event;
+            yield event.type === 'finish' && usageObserver !== undefined
+              ? { ...event, usage: usageObserver.read() ?? event.usage }
+              : event;
           }
         }
       } catch (cause) {

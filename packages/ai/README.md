@@ -151,8 +151,10 @@ does not expose it. Workspace regressions pass with `@tanstack/ai@0.52.0` and
 `@tanstack/ai@0.52.3` and `@tanstack/ai-anthropic@0.18.3`, retaining the compatible dependency family. When the fix is
 published, pin the exact stable NetScript release and use the configuration above; do not upgrade
 only the Anthropic adapter into the older peer graph. Mocked Messages tests establish transport
-compatibility; paid live inference and validation against a newly published package remain release
-acceptance steps.
+compatibility. Input and cache usage from `message_start` are retained when later cumulative deltas
+report only output counts; a fresh silent usage observer is created per turn. Reported fields replace
+earlier values instead of adding cumulative counts. Paid live inference and validation against a newly
+published package remain release acceptance steps.
 
 The OpenAI-compatible provider reaches any endpoint that speaks the OpenAI Chat Completions or
 Responses API — point `baseURL` at DeepSeek, Together, vLLM, or a local gateway; with no `models`

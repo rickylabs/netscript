@@ -171,7 +171,9 @@ Choosing between them is mostly a question of where your models live:
   provider factory accepts the same configuration. Exact Opus 5.5/Fable 5.1 IDs retain mandatory
   adaptive thinking when neutral effort is `off`; Sonnet 5.5 uses `between_tools`. Native option
   validation runs after merging all request/call layers. This seam requires a release containing
-  the fix and is unavailable in published NetScript 0.0.7.
+  the fix and is unavailable in published NetScript 0.0.7. Streaming usage retains input/cache counts
+  from `message_start` when cumulative `message_delta` frames report only output counts; counters
+  reset per turn and the observer emits no provider logs.
 - **`./openai-compatible`** is the workhorse for any endpoint that speaks the
   OpenAI API: no fixed catalog (the remote endpoint owns its model list), and it
   throws `AiNotConfiguredError` rather than guessing when `baseURL` / `apiKey`

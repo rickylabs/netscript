@@ -20,7 +20,7 @@ import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.t
 import { AiError, InvalidModelOptionsError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
 import type { ChatClientPort } from '../ports/chat-client.ts';
-import { toTanstackChatClient } from './tanstack-chat-client.ts';
+import { type ProviderUsageObserver, toTanstackChatClient } from './tanstack-chat-client.ts';
 
 /**
  * Registry id under which {@linkcode AnthropicModelProvider} self-registers.
@@ -280,8 +280,79 @@ export class AnthropicModelProvider implements ModelProviderPort {
       kind: 'text',
       mapModelOptions: (options) => anthropicGenerationModelOptions(options, resolved),
       validateModelOptions: (options) => validateAnthropicModelOptions(options, resolved),
+      createUsageObserver: createAnthropicUsageObserver,
     });
   }
+}
+
+/** Preserve cumulative Messages usage spanning message_start and message_delta. */
+function createAnthropicUsageObserver(): ProviderUsageObserver {
+  const counts: Record<string, number> = {};
+  const serverCounts: Record<string, number> = {};
+  const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+  const recordCounts = (
+    source: Readonly<Record<string, unknown>>,
+    keys: readonly string[],
+    target: Record<string, number>,
+  ): void => {
+    for (const key of keys) {
+      const count = source[key];
+      if (typeof count === 'number' && Number.isSafeInteger(count) && count >= 0) {
+        target[key] = count;
+      }
+    }
+  };
+  return {
+    observe(frame) {
+      if (!isRecord(frame)) return;
+      const reported = frame.type === 'message_start' && isRecord(frame.message)
+        ? frame.message.usage
+        : frame.type === 'message_delta'
+        ? frame.usage
+        : undefined;
+      if (!isRecord(reported)) return;
+      // Deltas are cumulative snapshots, not increments. Later reported
+      // fields replace earlier ones; omitted input/cache fields retain start.
+      recordCounts(reported, [
+        'input_tokens',
+        'output_tokens',
+        'cache_creation_input_tokens',
+        'cache_read_input_tokens',
+      ], counts);
+      if (isRecord(reported.server_tool_use)) {
+        recordCounts(reported.server_tool_use, [
+          'web_search_requests',
+          'web_fetch_requests',
+        ], serverCounts);
+      }
+    },
+    read() {
+      if (Object.keys(counts).length === 0) return undefined;
+      const promptTokens = counts.input_tokens ?? 0;
+      const completionTokens = counts.output_tokens ?? 0;
+      const promptTokensDetails = {
+        ...(counts.cache_creation_input_tokens !== undefined &&
+          { cacheWriteTokens: counts.cache_creation_input_tokens }),
+        ...(counts.cache_read_input_tokens !== undefined &&
+          { cachedTokens: counts.cache_read_input_tokens }),
+      };
+      const serverToolUse = {
+        ...(serverCounts.web_search_requests !== undefined &&
+          { webSearchRequests: serverCounts.web_search_requests }),
+        ...(serverCounts.web_fetch_requests !== undefined &&
+          { webFetchRequests: serverCounts.web_fetch_requests }),
+      };
+      return {
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+        ...(Object.keys(promptTokensDetails).length > 0 && { promptTokensDetails }),
+        ...(Object.keys(serverToolUse).length > 0 &&
+          { providerUsageDetails: { serverToolUse } }),
+      };
+    },
+  };
 }
 
 function nonEmpty(value: string | undefined): string | undefined {
