@@ -146,8 +146,9 @@ or extra thinking fields. See
 [Opus migration guide](https://platform.claude.com/docs/en/models/opus-5-5/migration-guide).
 
 This configuration requires a release containing this change; published `@netscript/ai@0.0.7`
-does not expose it. The source regression graph uses `@tanstack/ai@0.52.3` with
-`@tanstack/ai-anthropic@0.18.3`, retaining the compatible dependency family. When the fix is
+does not expose it. Workspace regressions pass with `@tanstack/ai@0.52.0` and
+`@tanstack/ai-anthropic@0.18.3`; the same regressions also pass with the reported consumer graph
+`@tanstack/ai@0.52.3` and `@tanstack/ai-anthropic@0.18.3`, retaining the compatible dependency family. When the fix is
 published, pin the exact stable NetScript release and use the configuration above; do not upgrade
 only the Anthropic adapter into the older peer graph. Mocked Messages tests establish transport
 compatibility; paid live inference and validation against a newly published package remain release
