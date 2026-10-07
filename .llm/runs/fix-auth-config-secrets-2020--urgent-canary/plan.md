@@ -2,7 +2,7 @@
 
 ## Locked decisions
 
-Existing auth writer owns .env and appsettings; existing Aspire partition owns literal refusal. Keep credentials and provider settings solely in .env; tracked canonical NetScript.Plugins.auth.Environment contains NETSCRIPT_AUTH_BACKEND only. Reconciliation removes legacy upper/lower top-level auth environment/backend duplicates and plugin Env alias while preserving unrelated fields. Show reads canonical plugin selector after .env, then legacy backend fallback.
+Existing auth writer owns .env and appsettings; existing Aspire partition owns literal refusal. Keep credentials and provider settings solely in .env; tracked canonical NetScript.Plugins.auth.Environment receives only NETSCRIPT_AUTH_BACKEND from provider input. Preserve already-declared unrelated non-credential environment keys, merging legacy Env aliases into canonical Environment as PLAN-EVAL explicitly advises; managed auth/provider namespaces and credential-shaped keys are pruned. Reconciliation removes legacy upper/lower top-level auth environment/backend duplicates and plugin Env alias while preserving unrelated fields. Show reads canonical plugin selector after .env, then legacy backend fallback.
 
 Render each auth assignment as a POSIX literal with single-quote escaping; reject NUL before any write. Frame generated multi-line assignments without executing input, replace every duplicate occurrence of keys being reconciled, preserve unrelated entries/comments. Backend reader accepts new quoted and old plain selector. Do not parse arbitrary shell programs or rewrite unrelated environment entries.
 

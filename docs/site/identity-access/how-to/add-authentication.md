@@ -105,8 +105,8 @@ netscript plugin auth backend show
 netscript plugin doctor
 ```
 
-The command reconciles `NETSCRIPT_AUTH_BACKEND` in the project `.env`, so scaffolded service tasks
-boot without a shell-specific export. Directly setting the environment variable or the
+The command reconciles `NETSCRIPT_AUTH_BACKEND` in the project `.env` and the canonical plugin
+selector in appsettings. Export the environment before starting the AppHost, as shown in Step 4. Directly setting the environment variable or the
 `auth.backend` / `Auth.Backend` appsettings key remains an escape hatch for deployment systems that
 own configuration externally.
 
@@ -155,29 +155,47 @@ Each backend reads its own environment block. The auth CLI owns the normal setup
 same project `.env` seam as Step 2. For GitHub on `kv-oauth`:
 
 ```sh
-# Generate the boot key through the CLI and persist it with the provider config
-KV_OAUTH_KEY="$(netscript plugin auth secret generate kv-oauth-key)"
+# Your credential source exports NETSCRIPT_AUTH_CLIENT_SECRET.
+# Keep generated encryption material in the process environment too.
+export NETSCRIPT_AUTH_KV_OAUTH_KEY="$(netscript plugin auth secret generate kv-oauth-key)"
 netscript plugin auth provider set \
   --preset github \
-  --client-id your-client-id \
-  --client-secret your-client-secret \
-  --redirect-uri http://localhost:8094/api/v1/auth/callback \
-  --kv-oauth-key "$KV_OAUTH_KEY"
+  --client-id "$NETSCRIPT_AUTH_CLIENT_ID" \
+  --redirect-uri "$NETSCRIPT_AUTH_REDIRECT_URI"
+
+set -a
+. ./.env
+set +a
 ```
+
+Provider credentials and settings are written only to the project `.env`, which must stay outside
+version control. Tracked appsettings receives the non-secret backend selector; reconciliation prunes
+legacy credential copies and retains unrelated benign environment settings. Aspire refuses declared
+credential-shaped keys as source literals, so generated helpers do not carry their values. Earlier
+provider configuration copied credentials into tracked files; remove those copies and rotate any
+credential that was committed.
+
+Generated auth assignments are POSIX shell literals. Source and export the file before starting
+Aspire so its executable resources inherit the exact values. Apostrophes, substitutions, backticks,
+backslashes and embedded newlines remain data. Deno's direct `--env-file` loader accepts simple
+quoted values and scopes but does not implement all POSIX quoting; for hostile values, use the
+source/export path above. Provider credential environment bindings avoid putting secrets in CLI
+arguments. Explicit credential flags remain supported for compatibility.
 
 Tenant presets such as `okta`, `auth0`, `azure-ad`, `aws-cognito`, `logto`, and `clerk` additionally
 accept `--issuer`. The non-interactive variants use their boot-native credential names:
 
 ```sh
-netscript plugin auth provider set --preset workos \
-  --api-key sk_... --client-id client_... --cookie-password "$(netscript plugin auth secret generate workos-cookie)"
+# Your credential source exports WORKOS_API_KEY and WORKOS_COOKIE_PASSWORD.
+netscript plugin auth provider set --preset workos --client-id "$WORKOS_CLIENT_ID"
 
-netscript plugin auth provider set --preset better-auth \
-  --secret "$(netscript plugin auth secret generate better-auth)"
+export BETTER_AUTH_SECRET="$(netscript plugin auth secret generate better-auth)"
+netscript plugin auth provider set --preset better-auth
 ```
 
+
 The explicit exports below are the escape hatch for CI/deployment systems that inject environment
-variables themselves; they are no longer required for ordinary workspace setup.
+variables themselves. Ordinary workspace setup uses the source/export step above.
 
 {{ comp.tabbedCode({ tabs: [
   {
