@@ -1,6 +1,6 @@
-# C1 implementation evidence — S2 review handoff
+# C1 implementation evidence — S3 review handoff
 
-Current state: S1 supervisor sign-off committed at `5023427004b37a561570a1a23bb4b7e21faf0c51`; S2 implemented and frozen for review; S3 pending. Read [S2 handoff](./s2-implementation.md), [S2 gates](./s2-gate-evidence.json), [S2 mutations](./s2-mutation-evidence.json) and [S2 hashes](./s2-source-manifest.json). This artifact provides implementation evidence, not an evaluator verdict or whole-C1 completion claim. The separate-family whole-chain PLAN-EVAL PASS remains untouched. The following S1 evidence is retained as historical slice detail.
+Current state: S1 and S2 supervisor signed off; S2 commit `f9d0ccc99f1ecf98de4d8778196be99b4d795c1b`. S3 is complete and frozen for substantive review. Read [S3 handoff](./s3-implementation.md), [S3 gates](./s3-gate-evidence.json), [clean consumers](./s3-consumer-evidence.json), [S3 production mutations](./s3-mutation-evidence.json) and [JSR audit](./s3-jsr-audit.json). Independent C1 IMPL-EVAL remains pending. Read [S2 handoff](./s2-implementation.md), [S2 gates](./s2-gate-evidence.json), [S2 mutations](./s2-mutation-evidence.json) and [S2 hashes](./s2-source-manifest.json). This artifact provides implementation evidence, not an evaluator verdict or whole-C1 completion claim. The separate-family whole-chain PLAN-EVAL PASS remains untouched. The following S1 evidence is retained as historical slice detail.
 
 ## Product files
 

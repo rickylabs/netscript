@@ -1,0 +1,243 @@
+{
+  "slice": "S3 / C1 final implementation review",
+  "headBeforeSignoff": "f9d0ccc99f1ecf98de4d8778196be99b4d795c1b",
+  "files": [
+    {
+      "path": "deno.lock",
+      "bytes": 175902,
+      "sha256": "75404ed4a3b7733c6311b926ea0438686754e3caa2df6c82581f1479de964aa4"
+    },
+    {
+      "path": "docs/site/reference/contracts/index.md",
+      "bytes": 29578,
+      "sha256": "88e477ad4c1ea0cb668b4a7292711b6eceec9793d7306d5bc51f325831e9e202"
+    },
+    {
+      "path": "docs/site/reference/service/index.md",
+      "bytes": 17106,
+      "sha256": "1daaa2dae46e76000302630067c0395dc2518534772ab6f4bd179c85bba3f6d1"
+    },
+    {
+      "path": "packages/contracts/README.md",
+      "bytes": 9666,
+      "sha256": "49b8fe568da80cdf2eb57183ea511e2cfbf2fe59d0fc8f2260ead2ec03e7dec1"
+    },
+    {
+      "path": "packages/contracts/commands.ts",
+      "bytes": 1130,
+      "sha256": "4c4586a597259563c009329ab6352aecdcfee443092f207e34b3351f67c3d455"
+    },
+    {
+      "path": "packages/contracts/deno.json",
+      "bytes": 1102,
+      "sha256": "628a068a4f1391ac9cd6c87e79b2e7071c4b5c901aa2f31f8814224fb2504e2f"
+    },
+    {
+      "path": "packages/contracts/src/application/command-contract.ts",
+      "bytes": 3407,
+      "sha256": "fe5bf667eab1886660ab448104f299a98348d335868ad90f382b90c5366ae7bf"
+    },
+    {
+      "path": "packages/contracts/src/domain/command-errors.ts",
+      "bytes": 3549,
+      "sha256": "32140dfbe5de1bf5dec14dbb3ef7e60c1c535bc1e2597f3d6fc92308c523cdf2"
+    },
+    {
+      "path": "packages/contracts/tests/commands-type_test.ts",
+      "bytes": 11278,
+      "sha256": "fd245ead6bc276dd9a91bf61ca6ed3a0bc0c77120264e05df6d21cacb042b763"
+    },
+    {
+      "path": "packages/service/README.md",
+      "bytes": 17854,
+      "sha256": "ea183dc6678daa230a03839c90ae3ee1c5de4c665042004981b3fa31b25dea5a"
+    },
+    {
+      "path": "packages/service/commands.ts",
+      "bytes": 1500,
+      "sha256": "27b43aa2277ce506d549448bd2a85cbbd1e7b19301d94792173729094d6b6821"
+    },
+    {
+      "path": "packages/service/deno.json",
+      "bytes": 1362,
+      "sha256": "be14460b3e3379917b06ebec397f162800034bd58e1e5dd2d72c5fdc05d8573d"
+    },
+    {
+      "path": "packages/service/src/commands/application/canonical-json.ts",
+      "bytes": 7300,
+      "sha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e"
+    },
+    {
+      "path": "packages/service/src/commands/application/define-command.ts",
+      "bytes": 4601,
+      "sha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38"
+    },
+    {
+      "path": "packages/service/src/commands/application/json-codec.ts",
+      "bytes": 2230,
+      "sha256": "62cca1b795b28da23e0968b98822dc836ac5cff0e41040347b48b6a382c0c862"
+    },
+    {
+      "path": "packages/service/src/commands/domain/codec.ts",
+      "bytes": 788,
+      "sha256": "816baf72cfced191b3a46f5ce7aadb6b804856f4319339dbc5cf27e0fbf3f9a8"
+    },
+    {
+      "path": "packages/service/src/commands/domain/definition.ts",
+      "bytes": 4215,
+      "sha256": "593d7d4f964cfe536d0c061861932aebdc87981add4a20ad164ebf940c48cf6b"
+    },
+    {
+      "path": "packages/service/src/commands/domain/failure.ts",
+      "bytes": 4373,
+      "sha256": "f96abc2ba0a149cd56e427500b383f2d8b6663637a07c6fde370d0059aaaca63"
+    },
+    {
+      "path": "packages/service/src/commands/domain/values.ts",
+      "bytes": 908,
+      "sha256": "128f94a106ecc657faa50a145b519b3c766c8bd7802254e79a196395bfc7f00a"
+    },
+    {
+      "path": "packages/service/tests/commands-codec_test.ts",
+      "bytes": 14190,
+      "sha256": "e7682c8a916c702d7ba3b65279bdbdbdd0b218a35c0aabdb04f12724ed368e83"
+    },
+    {
+      "path": "packages/service/tests/commands-consumer_test.ts",
+      "bytes": 2354,
+      "sha256": "ecdb7f0743c8617c84db366f97e328ca51536fad5da071858bcd527403b3efc3"
+    },
+    {
+      "path": "packages/service/tests/type-fixtures/commands_type.ts",
+      "bytes": 3315,
+      "sha256": "c7e8f5d62ad324e5f8c987a519610b98e646d1e01a35639cefaa2327158ade6e"
+    }
+  ],
+  "consumerConfigs": [
+    {
+      "profile": "source",
+      "config": {
+        "workspace": [],
+        "imports": {
+          "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+          "zod": "npm:zod@^4.4.3",
+          "hono": "jsr:@hono/hono@4.12.24",
+          "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+          "hono/logger": "jsr:@hono/hono@4.12.24/logger",
+          "@orpc/server": "npm:@orpc/server@^1.15.0",
+          "@orpc/openapi": "npm:@orpc/openapi@^1.15.0",
+          "@orpc/client": "npm:@orpc/client@^1.15.0",
+          "@orpc/zod": "npm:@orpc/zod@^1.15.0",
+          "@std/assert": "jsr:@std/assert@^1",
+          "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+          "@netscript/database": "jsr:@netscript/database@0.0.7",
+          "@netscript/contracts": "./packages/contracts/mod.ts",
+          "@netscript/contracts/commands": "./packages/contracts/commands.ts",
+          "@netscript/service/commands": "./packages/service/commands.ts",
+          "@netscript/sdk/client": "jsr:@netscript/sdk@0.0.7/client"
+        },
+        "compilerOptions": {
+          "strict": true,
+          "noImplicitAny": true,
+          "noImplicitReturns": true,
+          "isolatedDeclarations": true,
+          "lib": [
+            "dom",
+            "dom.iterable",
+            "deno.ns",
+            "deno.unstable"
+          ]
+        }
+      },
+      "configSha256": "881c1f1040892cba60bec79dbc4673b73ea417cdf3a5d8629313cd77eada3125",
+      "lockSha256": "7f92ef8c5fdf21676198ca40b882dd9bba45ed0efdae2b2b984a1d2c720d11da"
+    },
+    {
+      "profile": "declaration",
+      "config": {
+        "workspace": [],
+        "imports": {
+          "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+          "zod": "npm:zod@^4.4.3",
+          "hono": "jsr:@hono/hono@4.12.24",
+          "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+          "hono/logger": "jsr:@hono/hono@4.12.24/logger",
+          "@orpc/server": "npm:@orpc/server@^1.15.0",
+          "@orpc/openapi": "npm:@orpc/openapi@^1.15.0",
+          "@orpc/client": "npm:@orpc/client@^1.15.0",
+          "@orpc/zod": "npm:@orpc/zod@^1.15.0",
+          "@std/assert": "jsr:@std/assert@^1",
+          "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+          "@netscript/database": "jsr:@netscript/database@0.0.7",
+          "@netscript/contracts": "./packages/contracts/mod.d.ts",
+          "@netscript/contracts/commands": "./packages/contracts/commands.d.ts",
+          "@netscript/service/commands": "./packages/service/commands.d.ts",
+          "@netscript/sdk/client": "jsr:@netscript/sdk@0.0.7/client",
+          "./packages/contracts/commands.js": "./packages/contracts/commands.d.ts",
+          "./packages/contracts/crud/create-crud-contract.js": "./packages/contracts/crud/create-crud-contract.d.ts",
+          "./packages/contracts/crud.js": "./packages/contracts/crud.d.ts",
+          "./packages/contracts/mod.js": "./packages/contracts/mod.d.ts",
+          "./packages/contracts/query.js": "./packages/contracts/query.d.ts",
+          "./packages/contracts/schemas/filters.js": "./packages/contracts/schemas/filters.d.ts",
+          "./packages/contracts/schemas/pagination.js": "./packages/contracts/schemas/pagination.d.ts",
+          "./packages/contracts/src/application/command-contract.js": "./packages/contracts/src/application/command-contract.d.ts",
+          "./packages/contracts/src/application/contract-primitives.js": "./packages/contracts/src/application/contract-primitives.d.ts",
+          "./packages/contracts/src/application/paginated-query.js": "./packages/contracts/src/application/paginated-query.d.ts",
+          "./packages/contracts/src/application/transform-helpers.js": "./packages/contracts/src/application/transform-helpers.d.ts",
+          "./packages/contracts/src/application/zod-helpers.js": "./packages/contracts/src/application/zod-helpers.d.ts",
+          "./packages/contracts/src/diagnostics/inspection.js": "./packages/contracts/src/diagnostics/inspection.d.ts",
+          "./packages/contracts/src/domain/command-errors.js": "./packages/contracts/src/domain/command-errors.d.ts",
+          "./packages/contracts/src/domain/constants.js": "./packages/contracts/src/domain/constants.d.ts",
+          "./packages/contracts/src/domain/errors.js": "./packages/contracts/src/domain/errors.d.ts",
+          "./packages/contracts/src/domain/procedure-meta.js": "./packages/contracts/src/domain/procedure-meta.d.ts",
+          "./packages/contracts/src/domain/result.js": "./packages/contracts/src/domain/result.d.ts",
+          "./packages/contracts/src/domain/schema-types.js": "./packages/contracts/src/domain/schema-types.d.ts",
+          "./packages/contracts/src/domain/schemas.js": "./packages/contracts/src/domain/schemas.d.ts",
+          "./packages/contracts/src/public/mod.js": "./packages/contracts/src/public/mod.d.ts",
+          "./packages/contracts/transform.js": "./packages/contracts/transform.d.ts",
+          "./packages/service/commands.js": "./packages/service/commands.d.ts",
+          "./packages/service/mod.js": "./packages/service/mod.d.ts",
+          "./packages/service/src/auth/contract-authorizer.js": "./packages/service/src/auth/contract-authorizer.d.ts",
+          "./packages/service/src/auth/contract-policy.js": "./packages/service/src/auth/contract-policy.d.ts",
+          "./packages/service/src/auth/hono-context.js": "./packages/service/src/auth/hono-context.d.ts",
+          "./packages/service/src/auth/mod.js": "./packages/service/src/auth/mod.d.ts",
+          "./packages/service/src/auth/options.js": "./packages/service/src/auth/options.d.ts",
+          "./packages/service/src/auth/scope-authorizer.js": "./packages/service/src/auth/scope-authorizer.d.ts",
+          "./packages/service/src/auth/service-auth-policy.js": "./packages/service/src/auth/service-auth-policy.d.ts",
+          "./packages/service/src/auth/static-credential-authenticator.js": "./packages/service/src/auth/static-credential-authenticator.d.ts",
+          "./packages/service/src/auth/trusted-header-authenticator.js": "./packages/service/src/auth/trusted-header-authenticator.d.ts",
+          "./packages/service/src/auth/types.js": "./packages/service/src/auth/types.d.ts",
+          "./packages/service/src/builder/service-builder.js": "./packages/service/src/builder/service-builder.d.ts",
+          "./packages/service/src/commands/application/canonical-json.js": "./packages/service/src/commands/application/canonical-json.d.ts",
+          "./packages/service/src/commands/application/define-command.js": "./packages/service/src/commands/application/define-command.d.ts",
+          "./packages/service/src/commands/application/json-codec.js": "./packages/service/src/commands/application/json-codec.d.ts",
+          "./packages/service/src/commands/domain/codec.js": "./packages/service/src/commands/domain/codec.d.ts",
+          "./packages/service/src/commands/domain/definition.js": "./packages/service/src/commands/domain/definition.d.ts",
+          "./packages/service/src/commands/domain/failure.js": "./packages/service/src/commands/domain/failure.d.ts",
+          "./packages/service/src/commands/domain/values.js": "./packages/service/src/commands/domain/values.d.ts",
+          "./packages/service/src/presets/define-service.js": "./packages/service/src/presets/define-service.d.ts",
+          "./packages/service/src/primitives/handlers.js": "./packages/service/src/primitives/handlers.d.ts",
+          "./packages/service/src/primitives/health.js": "./packages/service/src/primitives/health.d.ts",
+          "./packages/service/src/primitives/openapi.js": "./packages/service/src/primitives/openapi.d.ts",
+          "./packages/service/src/primitives/rpc-path.js": "./packages/service/src/primitives/rpc-path.d.ts",
+          "./packages/service/src/runtime/runtime-host.js": "./packages/service/src/runtime/runtime-host.d.ts",
+          "./packages/service/src/types.js": "./packages/service/src/types.d.ts"
+        },
+        "compilerOptions": {
+          "strict": true,
+          "noImplicitAny": true,
+          "noImplicitReturns": true,
+          "isolatedDeclarations": true,
+          "lib": [
+            "dom",
+            "dom.iterable",
+            "deno.ns",
+            "deno.unstable"
+          ]
+        }
+      },
+      "configSha256": "cabfc7349b1dcd3875857e3eed41569e972cbfbcccdb2f70a0a1a11372c6bc03",
+      "lockSha256": "c687138a526c041e86c889b09c18047ef96931b9bd744a05241164507616e23b"
+    }
+  ]
+}
