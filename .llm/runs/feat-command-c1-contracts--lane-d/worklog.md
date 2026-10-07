@@ -85,3 +85,17 @@ Substantive supervisor review signs off S3 qualification and acceptance evidence
 ## C1 independent IMPL-EVAL and handoff
 
 Independent OpenCode Go / glm-5.3-flash session returned PASS and process exit 0 at exact product head `e64c841bc9c1a9f967afa357b54f454445807db8`. Requested CLI variant max; runtime effort remains unverified. Eight mutation controls were independently reproduced and remaining controls checked from actual receipts. Independent complete regressions: 180 passed, zero failed or ignored. See evaluate.md and evaluation-reconciliation.json. This artifact-only commit changes no implementation and certifies no different product head. All five C1 acceptance boxes now have concrete evidence; closing mapping, native mirror and close-gate are reconciled on PR #2082. No merge/publication performed.
+
+## C1 owned CI repair — frozen for substantive review
+
+Fresh UI frozen private-lock CI failure reproduced1 with unchanged lock, then package-owned native lock:update passed0. Only Fresh UI private lock changes outside run artifacts: two service dependency metadata entries, plus native peer identifier normalization. Complete semantic comparison preserves versions/integrities and resolved dependency bodies. All22 historical C1 product hashes and evaluate.md remain unchanged. See [repair handoff](./ci-repair.md), [actual gates](./ci-repair-gate-evidence.json), [semantic diff](./ci-repair-lock-diff.json) and [source/evaluator manifest](./ci-repair-source-manifest.json).
+
+Exact frozen CI check passes0 locally and on supervisor-verified exact Deno2.9.5, with lock hashes stable. Package lint, existing regression2tests, frozen Fresh UI tests172pass, quality/arch, nativepublish and rootfrozenprod-install all0. Direct lock-extension fmt probe selected no files/exit1; corrected explicit JSON stdin check passes0. No new tests, dependency upgrade, behavior or later-leaf product. Historical independent PASS at e64c841bc9c1a9f967afa357b54f454445807db8 retained; repaired head pending substantive supervisor signoff/commit/push/comment and same-session reevaluation. Closing claim withheld, C2 product paused. No implementation-lane self-certification or GitHub/commit/evaluator edits.
+
+## C1 CI repair supervisor signoff
+
+Substantive lock/source/evidence review signs off the owned private-lock repair. Exact CI2.9.5 frozen check and independent durable quality/architecture receipts pass; see ci-repair-supervisor-review.md. Historical evaluator is copied byte-exactly to evaluate-round-1.md. New head awaits same-session reevaluation; C2 product remains paused.
+
+## C1 same-session reevaluation PASS
+
+Independent evaluator returned PASS/process0 at repaired product head `17e9ad075e595aa591b12e3b009c6aed6c482fbf`. ExactCI2.9.5 stale1/restoredfrozen0 and native semantic dependency proof independently reproduced;172 FreshUI and2 lock regressions pass. All22 C1 product sources match round1. See current evaluate.md and preserved evaluate-round-1.md. Artifact-only reconciliation follows; no new product. Closing evidence validation and final CI are supervisor-owned; C2 S4 can begin only after prerequisite reconciliation.
