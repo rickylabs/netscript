@@ -76,3 +76,7 @@ real-provider and full scaffold qualification remain their locked later-stage ga
 ## S4 supervisor signoff
 
 Substantive source/mutation/consumer review is in s4-supervisor-review.md. Supervisor verifies all20 frozen product hashes and independently runs durable quality:scan/arch:check, both0. Focused current subpath consumers pass; inherited broad health declaration failure remains explicitly open for final S6. Slice footprint29files after supervisor review/registry, within fewer-than-thirty requirement. Commit/push/comment precede any next-slice release. C1 new generated-corpus repair360165b45ae07b1a87671b14d09e990769687380 is under same-session third review in a separate checkout; S5 awaits its qualification/prerequisite reconciliation.
+
+## Reviewed C1 generated prerequisite propagation
+
+Supervisor checked all22propagated files against exact C1E09 and all20S4 product hashes; all byte-identical. Native durable quality-scan/arch-check0. See c1-generated-prerequisite-review.json. No source/lock/test/tool change, no new test required. Ordinary commit/push/comment before next propagation slice. Main freshly fetched872df8e21 is unrelated stream-storage/dependency drift; no protected-PR mutation. S5 remains unreleased until final predecessor PASS artifacts propagated.

@@ -9,10 +9,10 @@
 | Plan & Design | complete | plan.md and Design below |
 | Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
 | Implement | S1–S3 signed off | Separate implementation lane; supervisor reviews before each sign-off commit |
-| Gate | not started | No implementation verdict claimed |
-| Evaluate | C1 PASS | Independent opposite-family evaluator at e64c841bc9c1a9f967afa357b54f454445807db8; later leaves pending |
+| Gate | native product/corpus/content gates pass; transitive copies signed off, postcommit/CI pending | S1–S3, lock repair and docs-repair-gate-evidence.json |
+| Evaluate | historical rounds1/2 PASS; round3 pending | Byte-exact prior reports preserved; native corpus repair awaits same evaluator |
 | Release | N/A | No merge, publication or release authorized |
-| Close | C1 evidence complete; chain pending | Closing evidence reconciliation and six-leaf handoff |
+| Close | C1 closing claim withheld pending repaired-head review/CI; chain pending | Native generated consumer freshness repair |
 
 ## Design
 
@@ -99,3 +99,15 @@ Substantive lock/source/evidence review signs off the owned private-lock repair.
 ## C1 same-session reevaluation PASS
 
 Independent evaluator returned PASS/process0 at repaired product head `17e9ad075e595aa591b12e3b009c6aed6c482fbf`. ExactCI2.9.5 stale1/restoredfrozen0 and native semantic dependency proof independently reproduced;172 FreshUI and2 lock regressions pass. All22 C1 product sources match round1. See current evaluate.md and preserved evaluate-round-1.md. Artifact-only reconciliation follows; no new product. Closing evidence validation and final CI are supervisor-owned; C2 S4 can begin only after prerequisite reconciliation.
+
+## C1 generated consumer CI repair — supervisor signed off
+
+Full CI revealed owned stale prose/MCP corpora; scoped checks had omitted these generated consumers. Native baseline checks reproduce1 and native refresh/freshness pass0 on exactCI2.9.5. Only three generated assets change, all6151 other tracked files unchanged. Prose changes only owned contracts/service pages and corresponding llms-full; MCP adds two command surfaces/39symbols, preserving7908 existing entries. Supervisor decoded/integrity/content audit and independent native MCP/quality/arch gates pass0. Existing safe4+6+5regressions pass; seven unchanged committed-worktree fixtures/full coreCI pending after commit. No test/tool/lock edit or bypass. See docs-repair evidence and substantive review. Historical report2 copied byte-exact; same-session third evaluation required at new qualification head, closing claim withheld.
+
+## C1 native transitive consumer repair — supervisor signed off
+
+CI confirmed the prior two corpus checks, then rejected stale CLI embedded docs. Native publish fallback similarly had stale sourceCommit. Exactly two generated copies change; all6158other tracked files remain identical. Native whole declared generated-chain inventory and independent embedded byte/provenance/MCP audit establish ownership. Native stale1/generation0/content0/publishcheck0 controls,12existing tests, specifier andCLI/MCP publish0 retained. Supervisor quality/arch0. Actual Git-diff-based barrel0 requires this supervisor commit and immediate native check; fullCI pending. Historical reports unchanged. First third-round attempt143/noverdict was interrupted after directory-moved read remained pending; same session resumes originaldirectory at completed repair.
+
+## Postcommit native generated-chain qualification
+
+Actual durable check:assets-barrel atddcd62d25253142ffa3a55b5ddb396440c1d7ffb passes0 under exactCI2.9.5 and leaves checkout clean. Receipt recorded in transitive-assets-gate-evidence.json by an artifact-only followup, no product changes. Complete generated-chain native qualification now passes locally; same-session third review/full current-head CI remain pending.

@@ -1,0 +1,244 @@
+{
+  "semantic": {
+    "schemaVersion": 1,
+    "cliEmbeddedGzipMatchesSharedBytes": true,
+    "cliEmbeddedProvenanceMatchesShared": true,
+    "cliCorpusChangedEntries": [
+      "llms-full.txt",
+      "pages/reference/contracts/index.md",
+      "pages/reference/service/index.md"
+    ],
+    "cliCorpusAddedEntries": [],
+    "cliCorpusRemovedEntries": [],
+    "cliChangedProvenanceFields": [
+      "sourceCommit",
+      "extractionTimestamp",
+      "uncompressedBytes",
+      "compressedBytes",
+      "sha256"
+    ],
+    "cliChangedExportPackages": [
+      "@netscript/contracts",
+      "@netscript/service"
+    ],
+    "cliExportChanges": [
+      {
+        "package": "@netscript/contracts",
+        "before": [
+          ".",
+          "./crud",
+          "./query",
+          "./transform"
+        ],
+        "after": [
+          ".",
+          "./commands",
+          "./crud",
+          "./query",
+          "./transform"
+        ]
+      },
+      {
+        "package": "@netscript/service",
+        "before": [
+          ".",
+          "./auth",
+          "./rpc-path"
+        ],
+        "after": [
+          ".",
+          "./auth",
+          "./commands",
+          "./rpc-path"
+        ]
+      }
+    ],
+    "mcpDocumentsPreserved": true,
+    "mcpReadmePreserved": true,
+    "mcpVersionPreserved": true,
+    "mcpChangedProvenanceFields": [
+      "sourceCommit"
+    ],
+    "mcpSourceCommitMatchesShared": true
+  },
+  "generatedChain": {
+    "schemaVersion": 1,
+    "allSevenBarrelTargetsNativeContentChecked": true,
+    "barrelTargets": [
+      {
+        "file": "packages/cli/src/kernel/assets/embedded.generated.ts",
+        "beforeSha256": "03de04487738b7c6ead0bb9fb89a8ccc238602009cf3de5f935c24ba0f2db46f",
+        "candidateSha256": "03de04487738b7c6ead0bb9fb89a8ccc238602009cf3de5f935c24ba0f2db46f",
+        "changed": false
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/skills.generated.ts",
+        "beforeSha256": "aff614b382dead23a232828c8dba74d48fe2e8e0da8e592e34c8098398eb9060",
+        "candidateSha256": "aff614b382dead23a232828c8dba74d48fe2e8e0da8e592e34c8098398eb9060",
+        "changed": false
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/agent-tools.generated.ts",
+        "beforeSha256": "e98048a90dda52536ce757e7f5dfd3d251ef03aa2b56dbdb92c12f4c543b3e83",
+        "candidateSha256": "e98048a90dda52536ce757e7f5dfd3d251ef03aa2b56dbdb92c12f4c543b3e83",
+        "changed": false
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+        "beforeSha256": "81af965f1cac5f9a2be7f93e25b7f6d9ca72a5c14a90c02cb5c38f191e624d24",
+        "candidateSha256": "ab45d2db002889607b234a03074a858b7235eb1c6eb664156181528bab47a63d",
+        "changed": true
+      },
+      {
+        "file": "packages/plugin/src/kernel/assets/embedded.generated.ts",
+        "beforeSha256": "2e3e44e45ace92dba89126c0de8085736cc90fad6bfb88f70c6b1e52d6a782e4",
+        "candidateSha256": "2e3e44e45ace92dba89126c0de8085736cc90fad6bfb88f70c6b1e52d6a782e4",
+        "changed": false
+      },
+      {
+        "file": "packages/fresh-ui/registry.generated.ts",
+        "beforeSha256": "8317a7c32fe6b2e3a8f3e4a46211f64a53375abea97f37bd98cd596d12bd3606",
+        "candidateSha256": "8317a7c32fe6b2e3a8f3e4a46211f64a53375abea97f37bd98cd596d12bd3606",
+        "changed": false
+      },
+      {
+        "file": "packages/service/src/primitives/scalar.generated.ts",
+        "beforeSha256": "38e7fd81fe48a98fb58a73c35966987857bd26aab5f44fc478ed5d4fc84ebdf2",
+        "candidateSha256": "38e7fd81fe48a98fb58a73c35966987857bd26aab5f44fc478ed5d4fc84ebdf2",
+        "changed": false
+      }
+    ],
+    "declaredPublishAssetOutputs": [
+      {
+        "file": ".llm/assets/agent-docs/prose.json.gz",
+        "changed": false
+      },
+      {
+        "file": ".llm/assets/agent-docs/provenance.json",
+        "changed": false
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/agent-tools.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+        "changed": true
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/embedded.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/skills.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/plugin/src/kernel/assets/embedded.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/fresh-ui/registry.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/service/src/primitives/scalar.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/mcp/src/publish-assets.generated.ts",
+        "changed": true
+      },
+      {
+        "file": "packages/cli/src/kernel/assets/publish-assets.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/fresh-ui/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/plugin-sagas-core/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "packages/plugin-streams-core/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "plugins/ai/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "plugins/auth/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "plugins/sagas/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "plugins/streams/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "plugins/triggers/src/package-metadata.generated.ts",
+        "changed": false
+      },
+      {
+        "file": "plugins/workers/src/package-metadata.generated.ts",
+        "changed": false
+      }
+    ],
+    "chain": [
+      {
+        "inputs": "native Lume rendered site plus preserved non-site context",
+        "generator": "build-agent-docs-bundle.ts",
+        "outputs": [
+          ".llm/assets/agent-docs/prose.json.gz",
+          ".llm/assets/agent-docs/provenance.json"
+        ],
+        "status": "unchanged in this slice; prior committed repair passed CI freshness"
+      },
+      {
+        "inputs": "package/plugin export maps and Deno documentation surfaces",
+        "generator": "generate-export-surface-corpus.ts",
+        "outputs": [
+          "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+        ],
+        "status": "unchanged in this slice; prior committed repair passed CI freshness"
+      },
+      {
+        "inputs": "shared selected prose, provenance, package versions and MCP README",
+        "generator": "generate-publish-assets.ts",
+        "outputs": [
+          "packages/mcp/src/publish-assets.generated.ts"
+        ],
+        "status": "native check1 -> generation0 -> actual check0; only MCP sourceCommit changed"
+      },
+      {
+        "inputs": "shared compressed prose, provenance, all public export maps plus unrelated template/skill/tool/registry inputs",
+        "generator": "generate-cli-assets-barrel.ts",
+        "outputs": [
+          "packages/cli/src/kernel/assets/embedded.generated.ts",
+          "packages/cli/src/kernel/assets/skills.generated.ts",
+          "packages/cli/src/kernel/assets/agent-tools.generated.ts",
+          "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+          "packages/plugin/src/kernel/assets/embedded.generated.ts",
+          "packages/fresh-ui/registry.generated.ts",
+          "packages/service/src/primitives/scalar.generated.ts"
+        ],
+        "status": "native content --check0 all seven; only CLI docs output changed; actual Git-diff freshness pending commit"
+      },
+      {
+        "inputs": "CLI embedded docs and MCP prose/export-surface embedded constants",
+        "consumers": [
+          "packages/cli/src/public/adapters/agent/deno-agent-docs-generator.ts",
+          "packages/mcp/src/infrastructure/release-embedded-docs-corpus.ts",
+          "packages/mcp/src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts"
+        ],
+        "status": "runtime consumers; no further generated artifact in the inspected chain"
+      }
+    ]
+  }
+}

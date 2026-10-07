@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "headBeforeSignoff": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+  "runtime": "Deno2.9.5 except explicit2.9.7 compatibility check",
+  "gates": [
+    {
+      "gate": "runtime",
+      "command": [
+        "deno",
+        "--version"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463"
+    },
+    {
+      "gate": "baseline-agent-docs-freshness",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "agent-docs-prose",
+        "--id",
+        "c1-docs-before",
+        "--output",
+        "<isolated-c1>-evidence/before-receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 1,
+      "rawLogSha256": "99ef115cb7afae385df2e0fd9765df653a6bb30c03b5aeef80ca65e2bdbb2337"
+    },
+    {
+      "gate": "native-site-bundle-refresh",
+      "command": [
+        "deno",
+        "run",
+        "--no-lock",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run=git",
+        ".llm/tools/docs/build-agent-docs-bundle.ts",
+        "--site-dir",
+        "docs/site/_site"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "ea9a042c2544eea3837b9b63130967a16d6a426f8edae03e61099cc49c765afa"
+    },
+    {
+      "gate": "full-agent-docs-freshness",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "agent-docs-prose",
+        "--id",
+        "c1-docs-after",
+        "--output",
+        "<isolated-c1>-evidence/after-receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "513a65a103f03f749cd7edd680943c8f68fc3ba9208d87e5b3ab3ad7459fd5f9"
+    },
+    {
+      "gate": "bundle-regressions",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<isolated-c1>-evidence/bundle-tests.json",
+        "--",
+        "--allow-read",
+        "--allow-write",
+        ".llm/tools/docs/build-agent-docs-bundle_test.ts"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "5ec38c2ea0621cd6bc4ee880917a131376762a03b17a696d9dedb85774b4f136"
+    },
+    {
+      "gate": "docs-source-format-regressions",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<isolated-c1>-evidence/source-tests.json",
+        "--",
+        "--no-lock",
+        "--allow-read",
+        "--allow-write",
+        "docs/site/_plugins/check-source-format_test.ts"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "317f652993114a3c36abd77d36f48fab97c720261a4cd13163f7d1f176bbaa5e"
+    },
+    {
+      "gate": "rendered-output",
+      "command": [
+        "deno",
+        "task",
+        "--cwd",
+        "docs/site",
+        "check:rendered-output"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "8e99487309d6a32cbab3ed27e87e6bce273ff2979274531972326102aa6d4e7d"
+    },
+    {
+      "gate": "diff-whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "mcp-baseline-ci",
+      "command": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 1,
+      "rawLogSha256": "ca8102e094595ed03b5e1af693e96f817b7e4b9c93aeef41935a3ae613aed5d6"
+    },
+    {
+      "gate": "mcp-native-refresh-ci",
+      "command": [
+        "deno",
+        "task",
+        "gen:mcp-export-corpus"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "456d2fb42fc5655630b887af68f3cccdbfa94023d240f2e1c12354421afbd271"
+    },
+    {
+      "gate": "mcp-freshness-ci",
+      "command": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "b99bdf8597bfea820df9adb8c67866bda5886a3935373a13098a5d629ef2d5a0"
+    },
+    {
+      "gate": "mcp-local-runtime",
+      "command": [
+        "deno",
+        "--version"
+      ],
+      "runtime": "2.9.7",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463"
+    },
+    {
+      "gate": "mcp-freshness-local",
+      "command": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "runtime": "2.9.7",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "b99bdf8597bfea820df9adb8c67866bda5886a3935373a13098a5d629ef2d5a0"
+    },
+    {
+      "gate": "mcp-generator-safe-regressions",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<evidence>/mcp-tests.json",
+        "--",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--allow-run",
+        "--filter",
+        "/^(normalizer consumes|generated payload is deterministic|renderer covers|colour-forcing variables|nested deno doc output)/",
+        ".llm/tools/docs/generate-export-surface-corpus_test.ts"
+      ],
+      "runtime": "2.9.5",
+      "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+      "exitCode": 0,
+      "rawLogSha256": "5241ede064e166fd2d76a18bd5cdf19f2b821f9b4448cc79cb5eb883150637b8"
+    },
+    {
+      "gate": "mcp-freshness",
+      "command": [
+        "deno",
+        "task",
+        "check:mcp-export-corpus"
+      ],
+      "exitCode": 0,
+      "runtime": "Deno2.9.5"
+    },
+    {
+      "gate": "quality-scan",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "quality-scan",
+        "--id",
+        "c1-docs-supervisor-quality",
+        "--output",
+        "<private-evidence>/supervisor-quality.receipt.json"
+      ],
+      "exitCode": 0,
+      "runtime": "Deno2.9.5"
+    },
+    {
+      "gate": "arch-check",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "arch-check",
+        "--id",
+        "c1-docs-supervisor-arch",
+        "--output",
+        "<private-evidence>/supervisor-arch.receipt.json"
+      ],
+      "exitCode": 0,
+      "runtime": "Deno2.9.5"
+    }
+  ],
+  "existingTests": {
+    "bundle": {
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 4,
+      "uniqueFailures": 0
+    },
+    "sourceFormat": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 6,
+      "uniqueFailures": 0
+    },
+    "mcpWithoutWorktreeFixtures": {
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "totalResults": 5,
+      "uniqueFailures": 0
+    }
+  },
+  "existingCommittedWorktreeFixtures": "Seven unchanged tests pending committed-head native repository CI; local temporary worktrees prohibited by supplied layout rule.",
+  "baselineCi": {
+    "schemaVersion": 1,
+    "sourceHead": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+    "exitCode": 1,
+    "summary": {
+      "passed": 5435,
+      "failed": 2,
+      "ignored": 14,
+      "totalResults": 5451,
+      "uniqueFailures": 2
+    },
+    "failures": [
+      {
+        "tests": [
+          {
+            "name": "--check remains freshness-only when the generator read set is dirty",
+            "file": "./.llm/tools/docs/generate-export-surface-corpus_test.ts",
+            "line": 320
+          }
+        ],
+        "category": "stale generated corpus"
+      },
+      {
+        "tests": [
+          {
+            "name": "write mode generates the artifact from a clean committed tree",
+            "file": "./.llm/tools/docs/generate-export-surface-corpus_test.ts",
+            "line": 264
+          }
+        ],
+        "category": "assertion diff allocation after stale corpus mismatch"
+      }
+    ]
+  }
+}

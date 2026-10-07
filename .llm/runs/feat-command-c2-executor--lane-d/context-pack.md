@@ -28,3 +28,7 @@ npm-completeness claim. Supervisor must review/sign off, commit, push and commen
 ## Current supervisor state
 
 S4 product frozen, substantively signed off; supervisor actual quality/arch0 and all20 hash verification pass. Review/gate/consumer/mutation evidence committed with slice. S5 remains unreleased pending C1 corpus repair360165b45ae07b1a87671b14d09e990769687380 same-session third review and ordinary prerequisite propagation. FinalS6 all-export packed health prerequisite and generated corpus checks remain open, with no weakened final bar.
+
+## C1 generated prerequisite propagation checkpoint
+
+Exactly22files propagated byte-exact from reviewed C1E09; S4product hashes unchanged. Supervisor durable quality/arch0. Ordinary signoff commit/push/comment precedes final C1 report propagation in a separate slice to remain under30files. Third C1PASS is complete atE09, final8b6e89artifact-only. Fresh main872df8e21 has unrelated bounded-stream storage and dependency-lock drift; protected PRs untouched, native audit mechanism assessed privately. C2 S5 stays unreleased until final predecessor reconciliation is committed/pushed/commented. These C1 assets do not qualify C2 generated content; final C2 corpus gates remain S6.

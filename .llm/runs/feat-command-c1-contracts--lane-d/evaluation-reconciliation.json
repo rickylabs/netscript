@@ -44,5 +44,15 @@
     "failed": 0
   },
   "c1RegressionEvidence": "Round1 independently ran180 affected package tests; round2 confirms all C1 sources identical.",
-  "ciState": "Local exact-CI runtime proof passes; final ready-for-review CI pending."
+  "ciState": "Complete generated chain passes local native qualification, including committed-head actual assets-barrel0; full exact-head CI pending.",
+  "currentQualificationState": "Historical round2 PASS retained; complete generated consumer repair needs same-session third review. Interrupted continuation had no verdict.",
+  "historicalRound2Report": "evaluate-round-2.md",
+  "interruptedThirdRoundAttempt": {
+    "head": "360165b45ae07b1a87671b14d09e990769687380",
+    "processExit": 143,
+    "verdict": null,
+    "sessionPreserved": true,
+    "reason": "Read stayed pending after checkout directory changed; interrupted before verdict and resume from original directory."
+  },
+  "transitiveProductHead": "ddcd62d25253142ffa3a55b5ddb396440c1d7ffb"
 }

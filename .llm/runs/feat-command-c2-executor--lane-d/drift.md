@@ -24,3 +24,5 @@ regenerate that bundle or claim full leaf evaluation/readiness.
   (TS2300/TS7008). Retained C1 and current C2 emitted health declarations are byte-identical.
   Supervisor explicitly directed no unrelated health source edit in S4; focused S4 consumers pass,
   while final S6 full clean-consumer qualification remains open. No tool-output handpatch or waiver.
+
+- C1 complete generated prerequisite propagation is split from final independent-PASS reconciliation to keep each supervisor slice strictly under30files. Exactly22C1E09 files copied; S4hashes stable, durablequality/arch0. Freshmain872df8e21 includes unrelated bounded stream storage and root dependency-lock repair; no protected-PR writes and no implicit stack rebase/merge.
