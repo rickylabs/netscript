@@ -11,3 +11,5 @@ Reference server is already in the current lock/root dev catalog: @durable-strea
 Issue prose also asks an inspectable liveness signal. Include named readonly status in the default owned handle; optional in the interface so existing alternate adapters remain compatible. No UI or raw error exposure required.
 
 Implementation probe: final stream closed flag causes native closed to settle before subscription callback; startup checkpoint/subscriber-failure regressions failed. Public json() is awaited consumption and rejects parse errors directly. stream-api appends public params to first request after offset, so live=long-poll plus live:false enables finite long-poll reads supervised outside the native one-shot consumer. Revision requires second PLAN-EVAL before replacing the WIP source.
+
+Further seam clarification: native shouldContinueLive returns false whenever live:false, independent of upToDate. Thus finite json() consumes one HTTP response; owned supervisor repeats catch-up batches until upToDate, then injects long-poll. This preserves per-response memory shape rather than aggregating the whole retained log.
