@@ -21,7 +21,7 @@
 import { getAvailablePort } from '@std/net';
 import { healthChecks } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
-import { DurableStreamTestServer } from '@durable-streams/server';
+import { createStreamsServer } from './bounded-file-store.ts';
 import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 import { createStreamsProxyHandler } from './proxy.ts';
 import { describeStorageDurability } from './durability.ts';
@@ -47,7 +47,7 @@ const internalPort = await getAvailablePort({
   preferredPort: preferredInternalPort,
 });
 
-const server = new DurableStreamTestServer({
+const server = createStreamsServer({
   port: internalPort,
   host: '127.0.0.1',
   dataDir,

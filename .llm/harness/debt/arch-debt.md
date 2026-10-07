@@ -2406,3 +2406,23 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `s6-generation-receipt.json` in the linked run; evaluator independently reproduced the two
   diagnostics and successful publish analysis. [observed - evaluate.md D2; contract-mount.ts public
   signature; docs/architecture/doctrine/02-public-surface.md public types and oRPC boundary]
+
+## plugins/streams/services/src/bounded-file-store.ts — A11 upstream storage extension seam
+
+- **ID:** `STREAMS-BOUNDED-NATIVE-IO-HOOKS`
+- **Reason:** Native durable-streams/server buffers full append logs during recovery and suffix reads,
+  but exposes neither protected segment I/O hooks nor store injection. The NetScript adapter replaces
+  exactly two TS-private virtual hooks on its own subclass before native constructor recovery. No
+  upstream prototype is modified. Retaining the native store preserves LMDB/protocol/fork semantics.
+- **Owner:** NetScript streams maintainers.
+- **Target:** The upstream bounded-I/O/store-injection release tracked by
+  https://github.com/durable-streams/durable-streams/issues/420.
+- **Linked plan:** `.llm/runs/orch-divybot-636--bounded-stream-storage/plan.md`; NetScript #2080.
+- **Created:** 2026-10-07
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
+  fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory ceiling.
+- **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
+  checks fail on missing hooks; integration and negative-control tests detect behavioral drift. The
+  bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
+  storage migration or persistent index.
