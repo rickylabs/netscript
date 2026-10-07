@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "phase": "IMPL-EVAL",
   "verdict": "PASS",
-  "evaluatedProductHead": "17e9ad075e595aa591b12e3b009c6aed6c482fbf",
+  "evaluatedProductHead": "e09a5692360d7c157032e04f97b51c81d43d16f8",
   "evaluatorRoute": {
     "session": "ses_ee7c10f05ffeRL0hBLJncQXoUR",
     "requestedModel": "opencode-go/glm-5.3-flash",
@@ -32,10 +32,10 @@
     "contractsRawExit": 1,
     "sanction": "Existing doctrine public-surface oRPC builder sanction; baseline 9 and head 17 upstream private references."
   },
-  "supervisorFactCorrection": "Live issue #1482 and PR #2082 both have milestone 0.0.8; evaluator metadata saying no milestone is a readout error, not a change to its product verdict.",
-  "ownerRemainder": "Review and merge in dependency order when desired. No merge or registry upload performed. Native npm-format type-only dependency metadata limitation remains outside the claimed JSR qualification.",
+  "supervisorFactCorrection": "Live issue/PR milestone0.0.8. Third evaluator says draft; live PR had already become ready for review. Incidental metadata corrected without changing verdict.",
+  "ownerRemainder": "Inherited proxy-addr critical advisory blocks green full CI. No narrow native fix proven, no broader upgrade or audit waiver introduced. Review remains unmerged. Native npm-format type-only metadata limitation is outside claimed JSR qualification.",
   "historicalProductHead": "e64c841bc9c1a9f967afa357b54f454445807db8",
-  "round": 2,
+  "round": 3,
   "historicalReport": "evaluate-round-1.md",
   "qualificationRepair": "Only downstream Fresh UI private-lock metadata; unchanged versions/integrities and all22 C1 source hashes.",
   "newIndependentTests": {
@@ -44,8 +44,8 @@
     "failed": 0
   },
   "c1RegressionEvidence": "Round1 independently ran180 affected package tests; round2 confirms all C1 sources identical.",
-  "ciState": "Complete generated chain passes local native qualification, including committed-head actual assets-barrel0; full exact-head CI pending.",
-  "currentQualificationState": "Historical round2 PASS retained; complete generated consumer repair needs same-session third review. Interrupted continuation had no verdict.",
+  "ciState": "Repo-wide check/test5437pass0fail14ignored plus6browserpass. Earlier quality gates pass; inherited audit-critical fails. Close-gate refresh pending current body reconciliation.",
+  "currentQualificationState": "Third same-session independent PASS; artifact-only evidence correction/closure reconciliation. Product identical to evaluated head.",
   "historicalRound2Report": "evaluate-round-2.md",
   "interruptedThirdRoundAttempt": {
     "head": "360165b45ae07b1a87671b14d09e990769687380",
@@ -54,5 +54,9 @@
     "sessionPreserved": true,
     "reason": "Read stayed pending after checkout directory changed; interrupted before verdict and resume from original directory."
   },
-  "transitiveProductHead": "ddcd62d25253142ffa3a55b5ddb396440c1d7ffb"
+  "transitiveProductHead": "ddcd62d25253142ffa3a55b5ddb396440c1d7ffb",
+  "reportSha256": "dd04f3b42068c300f315036ff9028b24ab25073f2ff7686cce8f72fcaf956f1d",
+  "historicalRound3Report": "evaluate-round-3.md",
+  "qualificationCorrection": "Two runtime rows relabeled actual2.9.5; direct2.9.7gzip-only variance recorded. No source/generator/dependency changes.",
+  "finalQualificationEvidence": "final-qualification-evidence.json"
 }

@@ -4,7 +4,7 @@ One chain PLAN-EVAL controls all six leaves. There is no umbrella implementation
 
 | Leaf | Ordered slices | Status | PR | Evaluated head |
 | --- | --- | --- | --- | --- |
-| #1482 | S1-S3 | S1–S3, lock, corpora and transitive copies signed off; historical rounds1/2 PASS, round3/CI pending | #2082 | product: 17e9ad075e595aa591b12e3b009c6aed6c482fbf |
+| #1482 | S1-S3 | Complete third independent PASS; full check-test pass, inherited audit-critical red | #2082 | e09a5692360d7c157032e04f97b51c81d43d16f8 |
 | #1483 | S4-S6 | S4 signed off in separate C2 checkout; S5/S6 unreleased | #2084 | none |
 | #1484 | S7-S9 | not started | none | none |
 | #1485 | S10 | not started | none | none |

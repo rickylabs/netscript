@@ -1,3 +1,11 @@
+# C1 current checkpoint — complete independent PASS
+
+Third same-session opposite-family IMPL-EVAL PASS attests qualification head `e09a5692360d7c157032e04f97b51c81d43d16f8`. Process0; immutable report copied byte-exact to evaluate-round-3.md, earlier rounds unchanged. Native full CI checks/tests5437pass0fail14ignored plus6browserpass, including unchanged worktree fixtures executed only in CI. Shared corpora/all generated consumers/publication and code/FreshUI quality pass. Current CI remains red at inherited proxy-addr critical advisory; no waiver/upgrade. Evidence runtime mislabels are corrected with original hashes/exits retained; direct2.9.7MCP1 is gzip-only variance, CI2.9.5MCP0 and canonical contents identical. See final-qualification-evidence.json and supervisor review.
+
+This commit changes run artifacts only; product identical to exact evaluated SHA. Acceptance/DoD/closing mapping and status:ci-fail are reconciled after commit/push. C2 S4f62f0200557a0ece40a1c1cfe001171095b0d6bc signed off; ordinary C1 prerequisite propagation precedes S5 release. Later leaves incomplete; wholechain PLAN-EVAL PASS; protectedPRs untouched; all writes task-local; no merge/publication.
+
+## Previous checkpoint retained
+
 # C1 native corpus and transitive copies — review pending
 
 S1–S3/lock/corpus repairs are signed off. Independent historical rounds1/2 remain byte-exact; current evaluate.md still attests17e9ad075e595aa591b12e3b009c6aed6c482fbf. The new shared corpus checks pass exact-head CI, but their CLI embedded copy and MCP fallback provenance needed native regeneration. See transitive-assets handoff/gates/source/semantic-chain proof and supervisor review. Exactly two generated copies change in this latest slice, all implementation/locks/tools/tests and other shared/generated assets unchanged.
