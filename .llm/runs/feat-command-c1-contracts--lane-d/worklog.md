@@ -107,3 +107,7 @@ Full CI revealed owned stale prose/MCP corpora; scoped checks had omitted these 
 ## C1 native transitive consumer repair — supervisor signed off
 
 CI confirmed the prior two corpus checks, then rejected stale CLI embedded docs. Native publish fallback similarly had stale sourceCommit. Exactly two generated copies change; all6158other tracked files remain identical. Native whole declared generated-chain inventory and independent embedded byte/provenance/MCP audit establish ownership. Native stale1/generation0/content0/publishcheck0 controls,12existing tests, specifier andCLI/MCP publish0 retained. Supervisor quality/arch0. Actual Git-diff-based barrel0 requires this supervisor commit and immediate native check; fullCI pending. Historical reports unchanged. First third-round attempt143/noverdict was interrupted after directory-moved read remained pending; same session resumes originaldirectory at completed repair.
+
+## Postcommit native generated-chain qualification
+
+Actual durable check:assets-barrel atddcd62d25253142ffa3a55b5ddb396440c1d7ffb passes0 under exactCI2.9.5 and leaves checkout clean. Receipt recorded in transitive-assets-gate-evidence.json by an artifact-only followup, no product changes. Complete generated-chain native qualification now passes locally; same-session third review/full current-head CI remain pending.

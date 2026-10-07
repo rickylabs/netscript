@@ -249,5 +249,28 @@
     "totalResults": 12,
     "uniqueFailures": 0
   },
-  "actualGitDiffFreshness": "check:assets-barrel requires committed target; pending immediate supervisor postcommit native gate. Native seven-target content --check already passes."
+  "actualGitDiffFreshness": "Actual committed-head check:assets-barrel passes0; generator leaves checkout clean.",
+  "postcommitActualNativeGitDiffGate": {
+    "schemaVersion": 1,
+    "head": "ddcd62d25253142ffa3a55b5ddb396440c1d7ffb",
+    "gate": "assets-barrel",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "assets-barrel",
+      "--id",
+      "c1-transitive-postcommit-assets",
+      "--output",
+      "<private-evidence>/postcommit-assets.receipt.json"
+    ],
+    "exitCode": 0,
+    "runtime": "Deno2.9.5",
+    "cleanAfter": true
+  }
 }
