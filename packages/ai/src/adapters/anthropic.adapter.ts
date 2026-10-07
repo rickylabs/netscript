@@ -90,9 +90,9 @@ export function validateAnthropicModelOptions(
     ? outputConfig.effort
     : options.effort;
   if (
-    effort !== undefined &&
+    effort !== undefined && effort !== null &&
     (typeof effort !== 'string' || !['low', 'medium', 'high', 'xhigh', 'max'].includes(effort))
-  ) reject('This model accepts output_config.effort low, medium, high, xhigh or max.');
+  ) reject('This model accepts output_config.effort low, medium, high, xhigh, max or null.');
 
   if (thinking !== undefined) {
     if (typeof thinking !== 'object' || thinking === null || !('type' in thinking)) {
@@ -118,7 +118,8 @@ export function validateAnthropicModelOptions(
   if (toolChoice !== undefined && toolType !== 'auto' && toolType !== 'none') {
     reject('This model accepts only auto or none tool_choice.');
   }
-  for (const [key, defaultValue] of [['temperature', 1], ['top_p', 1], ['top_k', 0]] as const) {
+  if (options.top_k !== undefined) reject('This model requires omitted top_k.');
+  for (const [key, defaultValue] of [['temperature', 1], ['top_p', 1]] as const) {
     if (options[key] !== undefined && options[key] !== defaultValue) {
       reject('This model requires omitted or default sampling parameters.');
     }

@@ -344,7 +344,7 @@ Deno.test({
             : undefined,
         );
         if (model !== FUTURE_MODEL) {
-          for (const effort of ['low', 'medium', 'high', 'xhigh', 'max']) {
+          for (const effort of ['low', 'medium', 'high', 'xhigh', 'max', null]) {
             await collect(client, undefined, {
               modelOptions: {
                 thinking: { type: 'adaptive' },
@@ -355,6 +355,11 @@ Deno.test({
             assertEquals(requests.at(-1)!.body.output_config, { effort });
             assertEquals(requests.at(-1)!.body.thinking, { type: 'adaptive' });
             assertEquals(requests.at(-1)!.body.tool_choice, { type: 'none' });
+            await collect(client, {
+              messages: [{ role: 'user', content: 'hello' }],
+              options: { providerOptions: { output_config: { effort } } },
+            });
+            assertEquals(requests.at(-1)!.body.output_config, { effort });
           }
         }
       }
@@ -375,6 +380,7 @@ Deno.test('anthropic: effective options reject incompatible current-model settin
       { temperature: 0.5 },
       { top_p: 0.5 },
       { top_k: 3 },
+      { top_k: 0 },
     ];
     for (const model of ['claude-opus-5-5', 'claude-fable-5-1', 'claude-sonnet-5-5']) {
       const client = new AnthropicModelProvider({ apiKey: 'test-static-key', models: [model] })

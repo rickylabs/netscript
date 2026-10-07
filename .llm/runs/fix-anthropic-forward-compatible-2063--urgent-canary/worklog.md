@@ -13,3 +13,7 @@ Public API/export/dependency graph unchanged. Correct effective option guard in 
 7 IMPL-EVAL: mandatory external vendor/session pending.
 8 Review: actual source-linked replies pending.
 9 Close: current-head CI required; no merge.
+
+Slice implemented. Native nullable effort preserved on request and call surfaces; supplied top_k zero rejected pre-IO for each exact current model. Baseline null and zero assertions each exit 1. Explicit isolated reverted-guard mutations each exit 1; source restored byte-for-byte. Full affected AI/plugin selection: 176 passed, exit 0. No real inference, endpoints, credential values or dependency edits added.
+
+Scoped AI check/lint/fmt exit 0, restored regression selection exit 0, quality:gate exit 0, publish dry-run exit 0, all four carrier freshness tasks exit 0. Doc lint returns 1 for pre-existing private-type references while combined exported source has zero errors; no entrypoint/type surface changed. Shared critical audit was independently established for the unchanged baseline lock in preceding runs.
