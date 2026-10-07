@@ -131,3 +131,67 @@ Open-decision sweep: regression host must resolve now, selected exported graph-i
 JSR rubric before slices: exported AI/Fresh public contracts remain owned/native; AbortSignal, message/tool/usage port types stay unchanged. Upstream-derived bridge typings/re-exports can change under upgrade, creating private references/slow types or incompatible consumer contracts; all-export deno doc --lint, publish dry-run and audit-jsr-package run for AI/Fresh, and Fresh UI consumer checks/publication where touched. Re-audit any shifted public surface and rescope rather than publish an unqualified break. Existing baseline AI private-type documentation debt is explicitly accepted only by independent evaluator; never declare doc-lint green from a zero combined summary. Native fixture imports and production bundle also check consumer resolution.
 
 Independent amendment PLAN-EVAL PASS at `46ec3293b5f5474ab7816786d5221af536cae50f`; all five plan findings remediated, default-age-qualified family independently verified. Source implementation unblocked. Original IMPL-EVAL remains superseded.
+
+Gate `amendment-refresh-root`: raw exit `0`. Command: `deno cache --frozen=false packages/ai/anthropic.ts packages/ai/openai-compatible.ts packages/fresh/src/runtime/ai/mod.ts`. Full raw output retained privately.
+
+Gate `amendment-refresh-fresh-ui`: raw exit `0`. Command: `deno task --cwd packages/fresh-ui lock:update`. Full raw output retained privately.
+
+Gate `amendment-peer-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `amendment-frozen-fresh-ui-check`: raw exit `0`. Command: `deno task --cwd packages/fresh-ui check`. Full raw output retained privately.
+
+Gate `amendment-frozen-source-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/ai --root packages/fresh --ext ts,tsx`. Full raw output retained privately.
+
+Gate `amendment-mutation-selection`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `amendment-mutation-policy`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `amendment-restored-peer-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-ai-peers_test.ts`. Full raw output retained privately.
+
+Gate `amendment-frozen-source-explicit`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/ai --root packages/fresh --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `amendment-cold-full-peer-guard`: raw exit `0`. Command: `deno task deps:check:ai-peers`. Full raw output retained privately.
+
+Gate `amendment-provider-suite`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/ai/tests plugins/ai/tests`. Full raw output retained privately.
+
+Gate `amendment-bundle`: raw exit `0`. Command: `deno bundle --frozen --platform deno --minify --outdir <private-evidence> packages/ai/anthropic.ts packages/ai/openai-compatible.ts`. Full raw output retained privately.
+
+Gate `amendment-jsr-ai`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/ai --text`. Full raw output retained privately.
+
+Gate `amendment-doc-ai`: raw exit `1`. Command: `deno task doc:lint --root packages/ai`. Full raw output retained privately.
+
+Gate `amendment-publish-ai`: raw exit `0`. Command: `deno task --cwd packages/ai publish:dry-run`. Full raw output retained privately.
+
+Gate `amendment-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `amendment-lint`: raw exit `2`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --config <private-evidence>`. Full raw output retained privately.
+
+Gate `amendment-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --file packages/ai/README.md`. Full raw output retained privately.
+
+Gate `amendment-guard-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `amendment-jsr-fresh`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/fresh --text`. Full raw output retained privately.
+
+Gate `amendment-doc-fresh`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
+
+Gate `amendment-publish-fresh`: raw exit `0`. Command: `deno publish --dry-run --allow-dirty --config packages/fresh/deno.json`. Full raw output retained privately.
+
+Gate `amendment-fresh-doc-baseline`: raw exit `1`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts --root <private-evidence>`. Full raw output retained privately.
+
+Gate `amendment-lint-corrected`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file .llm/tools/deps/check-ai-peers.ts --file .llm/tools/deps/check-ai-peers_test.ts --config <private-evidence>`. Full raw output retained privately.
+
+Gate `amendment-carrier-freshness`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `amendment-fresh-doc-baseline-corrected`: raw exit `1`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts --root <private-evidence>`. Full raw output retained privately.
+
+Gate `amendment-fresh-doc-baseline-workspace`: raw exit `1`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-doc-lint.ts --root <private-evidence>`. Full raw output retained privately.
+
+## Amendment source qualification
+
+Qualified exact family core 0.65.0, Anthropic 0.19.5, OpenAI 0.27.0, MCP 0.8.0, Preact 0.19.5; full cold inventory passes with one core and all resolved core-peer holders considered, no prefix filtering. Two regressions pass; prefix-selection mutation kills the new inventory test and disabled peer-policy kills assertions; restored pair passes. Provider/plugin suite 165 pass, zero fail. Explicit frozen AI/Fresh source and Fresh UI private lock checks pass, as do production provider bundles, quality/architecture, lint/fmt, JSR audits, AI/Fresh publish dry-runs and carrier freshness. No owning bridge change needed after qualified upgrade.
+
+Both locks preserve every unrelated version. Native metadata refresh/pruning was selectively restored; added MCP v2/jose/AG-UI graph edges belong to the AI upgrade. Existing jose 6.2.3 retained and dependency edges qualified alongside new 6.2.12. Lock ordering and compact platform arrays retained.
+
+AI doc-lint has exact same per-entry diagnostics as original baseline. Fresh doc-lint also has identical per-entry counts and exits on a complete source baseline archive preserving workspace globs; preliminary incomplete-archive probes were invalid and are superseded by the valid comparison. Fresh AI exports have zero doc errors. Explicit fresh-doc-baseline-2036 records the unchanged F-7 finding for evaluator adjudication. Missing private lint config attempt failed before lint and corrected config passed. No false-green combined doc summary claim.
+
+Original IMPL-EVAL superseded; a fresh independent amendment evaluation is required next. Publication and successful fixed published consumer remain open.

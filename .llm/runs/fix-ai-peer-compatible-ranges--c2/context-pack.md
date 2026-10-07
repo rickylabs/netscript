@@ -1,3 +1,3 @@
 # Context
 
-PR #2087 source complete; independent IMPL-EVAL PASS at `987048499e80d42b8f8aa65905d8f8558c818672`, unchanged baseline doc debt accepted. Source tree `b03385dc31cfee4df098639d5c22cd616db38d00`. Published release qualification remains open. Ready for source review and CI; no merge.
+PR #2087 amended source qualification complete, independent IMPL-EVAL pending. Independent PLAN-EVAL PASS at 46ec3293b5f5474ab7816786d5221af536cae50f. Current qualified family and explicit selection/policy mutations described in worklog; source checks/provider/bundle/publication audits pass, unchanged AI/Fresh documentation debt remains for independent adjudication. Do not merge or publish; fixed published consumer acceptance remains open.

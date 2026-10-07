@@ -2436,3 +2436,12 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
 - **Status:** Open, existing baseline finding recorded for independent source-slice adjudication; no blanket green documentation claim.
 - **Gate:** F-7; full-export `deno task doc:lint --root packages/ai` must pass when resolved.
+
+## packages/fresh — unchanged all-export doc lint (`fresh-doc-baseline-2036`)
+
+- **Reason:** Current main and AI-family amendment have identical all-export per-entry diagnostics and exits: builders 3 private references, query 8, route 8 plus 17 missing JSDoc, streams 11; other exports including AI have zero diagnostics. Combined-summary zeros do not supersede failing native exits. The previously resolved June row does not describe this newer baseline.
+- **Owner:** Fresh framework maintainers.
+- **Target:** Before stable release readiness is claimed.
+- **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
+- **Status:** Open, unchanged baseline recorded for independent F-7 adjudication; this dependency amendment introduces no doc diagnostic.
+- **Gate:** All-export `deno task doc:lint --root packages/fresh` must pass at resolution.

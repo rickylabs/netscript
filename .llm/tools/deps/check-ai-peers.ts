@@ -31,6 +31,17 @@ export function findAiPeerConflicts(
   return conflicts;
 }
 
+/** Inventory exact resolved releases, including transitive holders outside adapter names. */
+export function resolvedNpmSpecifiers(packageIds: readonly string[]): string[] {
+  return [
+    ...new Set(packageIds.map((id) => {
+      const delimiter = id.indexOf('@', 1);
+      if (delimiter < 1) throw new Error(`Malformed resolved npm package: ${id}`);
+      return `${id.slice(0, delimiter)}@${id.slice(delimiter + 1).split('_')[0]}`;
+    })),
+  ];
+}
+
 async function registryVersions(specifier: string): Promise<AiAdapterPeer[]> {
   const output = await new Deno.Command('npm', {
     args: ['view', specifier, 'version', 'peerDependencies', '--json'],
@@ -99,11 +110,14 @@ async function coldResolution(
     if (core.length !== 1) {
       throw new Error('Cold consumer must resolve exactly one AI core version.');
     }
-    const adapters = await Promise.all(
-      packages.filter((name) => name.startsWith('@tanstack/ai-'))
-        .map((name) => registryVersions(name.split('_')[0]!)),
-    );
-    const conflicts = findAiPeerConflicts(core, adapters.flat());
+    const releases = resolvedNpmSpecifiers(packages);
+    const adapters: AiAdapterPeer[] = [];
+    // Registry subprocesses stay bounded even for a large published consumer graph.
+    for (let index = 0; index < releases.length; index += 8) {
+      const batch = await Promise.all(releases.slice(index, index + 8).map(registryVersions));
+      adapters.push(...batch.flat());
+    }
+    const conflicts = findAiPeerConflicts(core, adapters);
     if (conflicts.length) throw new Error(conflicts.join('\n'));
     return core;
   } finally {

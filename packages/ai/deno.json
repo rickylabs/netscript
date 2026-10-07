@@ -28,10 +28,10 @@
   "imports": {
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@std/assert": "jsr:@std/assert@^1",
-    "@tanstack/ai": "npm:@tanstack/ai@0.52.3",
-    "@tanstack/ai-anthropic": "npm:@tanstack/ai-anthropic@0.18.3",
-    "@tanstack/ai-mcp": "npm:@tanstack/ai-mcp@0.3.8",
-    "@tanstack/ai-openai": "npm:@tanstack/ai-openai@0.22.3"
+    "@tanstack/ai": "npm:@tanstack/ai@0.65.0",
+    "@tanstack/ai-anthropic": "npm:@tanstack/ai-anthropic@0.19.5",
+    "@tanstack/ai-mcp": "npm:@tanstack/ai-mcp@0.8.0",
+    "@tanstack/ai-openai": "npm:@tanstack/ai-openai@0.27.0"
   },
   "publish": {
     "include": [
