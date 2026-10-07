@@ -15,6 +15,7 @@ adapter, the JSON extension helpers, and the OTEL instrumentation toggle. The re
 sub-path exports carry the per-driver adapters, the Prisma extensions, the schema/codegen
 scripts, the tracing surface, and the test contract harness:
 
+- [`@netscript/database/commands`](#command-persistence) — bound command transactions and logical rows.
 - [`@netscript/database/ports`](#ports) — adapter contracts and shared types.
 - [`@netscript/database/adapters`](#adapters) — PostgreSQL adapter (default driver surface).
 - [`@netscript/database/adapters/postgres`](#postgresql-adapter) — PostgreSQL driver adapter.
@@ -199,8 +200,19 @@ documented in the sections above.
 | `@netscript/database/extensions` | `./extensions/mod.ts` | Prisma JSON serialization extensions. |
 | `@netscript/database/scripts` | `./scripts/mod.ts` | Prisma/Zod codegen and migration runners. |
 | `@netscript/database/tracing` | `./prisma-tracing.ts` | Prisma OpenTelemetry tracing helpers. |
+| `@netscript/database/commands` | `./commands.ts` | Bound command port and logical rows. |
 | `@netscript/database/testing` | `./testing/mod.ts` | Mock adapter and shared port contract tests. |
 
 ---
 
 Back to the [reference overview](/reference/).
+
+## Command persistence
+
+`@netscript/database/commands` exports `createCommandStoreCapabilities`, `CommandStoreCapabilities`,
+`CommandTransactionRequest`, `CommandStorePort`, `CommandTransaction`, `ReceiptClaim`,
+`ReceiptClaimResult`, `ReceiptCompletion`, `StoredCommandReceipt`, `CommandReceiptRow`,
+`StoredCommandAudit` and `StoredCommandOutbox`. The raw port has no service dependency. All
+side-record methods share the provider callback's business handle. The provider must construct that
+binding and invoke work at most once; capability metadata alone does not certify atomicity. Busy is
+terminal until rollback.

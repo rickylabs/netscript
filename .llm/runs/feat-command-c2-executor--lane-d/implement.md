@@ -8,7 +8,7 @@ Read .agents/skills/netscript-harness/SKILL.md first and follow retrieval/run-lo
 
 ## Boundaries
 
-Implement only locked C2 / issue #1483 slices S4–S6 on the supervisor-prepared branch. Supervisor consulted find_guidance/search_docs for C2; results are retained in ../D-private/c2-mcp-guidance.json and are general guidance. RFC 0003 remains the command-specific authority. Read live issue/comment snapshot ../D-private/c2-live-issue.json, RFC 0003 stage 2, approved whole-chain C1 run plan/plan-eval and current C1 focused modules. Whole-chain PLAN-EVAL PASS is authoritative; do not rerun it or implement C3/C4/C5/#1932. Keep every write/cache/temp under the task folder. Public files contain no operational hostnames, IPs, network ports, operator paths, credentials or usage. Bodies and commit messages via files; no commits, pushes, GitHub writes or evaluator edits by you.
+Implement only locked C2 / issue #1483 slices S4–S6 on the supervisor-prepared branch. Supervisor consulted find_guidance/search_docs for C2; results are retained in task-private guidance evidence and are general guidance. RFC 0003 remains the command-specific authority. Read the retained task-private live issue/comment snapshot, RFC 0003 stage 2, approved whole-chain C1 run plan/plan-eval and current C1 focused modules. Whole-chain PLAN-EVAL PASS is authoritative; do not rerun it or implement C3/C4/C5/#1932. Keep every write/cache/temp under the task folder. Public files contain no operational hostnames, IPs, network ports, operator paths, credentials or usage. Bodies and commit messages via files; no commits, pushes, GitHub writes or evaluator edits by you.
 
 Implement ONE slice at a time (<30 changed files including evidence), run its gates and meaningful production mutations for EVERY new named test, write actual evidence and source hashes in the new leaf run, then PAUSE and report the frozen slice to supervisor. Do not start the next slice until substantive review/signoff is committed, pushed and commented. No self-certification.
 
@@ -21,3 +21,23 @@ S6: testing-only CommandFaultController and executor/identity conformance. Produ
 ## Evidence and gates
 
 Use structured scoped check/test/lint/fmt wrappers and native durable quality-scan/arch-check receipts. Full export-map docs and native publish/pack/declared consumer qualification are actual gates, not wrapper assumptions. Contracts doc raw1 existing doctrine sanction is inherited, do not expand it. Changes to definition bindings require C1 regressions. Dependencies resolved via native latest/why/install tools, no lock/cache deletion/reload. Mutations restored byte-for-byte, each named failing test/diagnostic and real nonzero/restored0 exit recorded; compile errors unrelated to assertion do not count. Runtime dirs env task-local. Run artifacts include worklog/context/implement/drift and distinct sanitized gate/mutation/source manifest evidence. No unsafe casts/any/ignores/private first-party leaks/new debt. Do not certify public numpy/npm consumer completeness from workspace aliases. Final S6 runs complete affected packages and clean public consumers; supervisor triggers mandatory opposite-family IMPL-EVAL at signed-off head.
+
+## S4 review freeze
+
+This implementation turn is restricted to S4. The raw database store contract, capabilities,
+requests and logical rows precede the service testing-only memory store. The memory client contains
+only get/set/CAS; the callback-bound handle carries its own receipt/audit/outbox delegates. State,
+receipt reservations and barriers are per-instance. Busy revokes all delegates, incomplete claims
+cannot commit, stale drafts fail without retry, and timeout/cooperative abort rollback before
+settlement. Snapshot timestamps are detached so their mutable Date internals cannot change stored
+state. Test controls intentionally allow corrupt fixtures and outside-transaction negative writes.
+The adapter simulates sqlite/Serializable vocabulary and makes no real-provider claim.
+
+Supervisor authorized narrow inherited docs/public-type prerequisite repairs after actual gates
+exposed them. Five existing database files only export annotation dependency types or add missing
+module documentation. New focused manifests similarly re-export their first-party annotation types
+for independently clean documentation/declarations, without moving ownership out of database.
+The existing service-to-database dependency is retained; no lock update or dependency upgrade.
+
+The next action is substantive supervisor review of frozen S4 evidence and source hashes. No S5,
+commit, push, GitHub mutation, evaluator edit or agent-docs bundle generation is performed here.

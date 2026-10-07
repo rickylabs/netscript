@@ -344,3 +344,29 @@ boundary. Custom codecs must also return valid bounded I-JSON before persistence
 `jsonCodec()` requires synchronous validation that preserves canonical JSON identity. Neutral
 transforms are accepted; coercion, field stripping and value-changing transforms are rejected,
 preventing a response from changing when a stored receipt is decoded.
+
+## Command store testing
+
+`@netscript/service/commands/testing` exports `createMemoryCommandStore()` for semantic unit tests.
+Each store owns its state; business writes, receipt completion, audit and outbox intents share one
+commit. `snapshot()` returns detached frozen collections and detached timestamps.
+`holdBeforeCommit()` exposes a one-use boundary barrier. `seedReceipt()` and
+`writeBusinessOutsideTransaction()` are explicit corruption and atomicity negative controls. No
+testing control belongs in a production executor constructor.
+
+```ts
+import { createMemoryCommandStore } from '@netscript/service/commands/testing';
+const store = createMemoryCommandStore();
+await store.transaction({ receiptClaimWaitMs: 0 }, async ({ business }) => {
+  business.compareAndSet('version', undefined, '1');
+});
+const committed = store.snapshot();
+```
+
+No permissions are required. This fake simulates Serializable interactive transactions using the
+existing sqlite provider vocabulary; it certifies no SQLite or other real provider. Receipt
+contention returns immediate terminal busy (supported wait is zero). Stale drafts fail without
+retry, and bounded timeout/cooperative cancellation revoke the transaction handle before failure
+settles. Concurrent transactions touching disjoint rows may also conflict because the fake uses one
+revision for its complete state. Native providers require their own provider conformance. See
+`@netscript/database/commands` for the raw store contract.

@@ -222,6 +222,7 @@ The following entrypoints are published alongside the root export:
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
+| `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
 | `@netscript/service/commands` | `./commands.ts` | Opaque command definitions and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
@@ -265,3 +266,14 @@ identity to keep replay stable.
 ---
 
 Back to the [reference overview](/reference/).
+
+## Command testing
+
+`@netscript/service/commands/testing` exports `createMemoryCommandStore`, `MemoryCommandStore`,
+`MemoryCommandBusiness`, `MemoryCommandSnapshot`, `MemoryCommandStoreOptions` and
+`CommandStoreBarrier`. The store atomically commits business, receipt, audit and outbox drafts and
+exposes frozen detached snapshots. A one-use before-commit barrier controls concurrency. Explicit
+receipt seeding and outside-transaction business writes support corruption and rollback negative
+controls. These helpers require no permissions and certify no real provider. The fake supports
+Serializable isolation, zero claim wait, a bounded cooperative timeout, terminal busy and one
+callback attempt; it may reject disjoint concurrent drafts because it uses a global state revision.
