@@ -1,3 +1,3 @@
 # Context
 
-PR #2087, issue #2036. Source dependency pins, live peer guard and CI receipt gate implemented. Source and production bundle gates pass; one new regression has policy mutation proof plus a real manifest range mutation. Negative published 0.0.7 reproduction preserved privately. Existing AI doc-lint baseline is explicitly recorded as debt for reviewer adjudication. No fixed release or paid inference is claimed. Independent IMPL-EVAL pending; do not merge.
+PR #2087 source complete; independent IMPL-EVAL PASS at `987048499e80d42b8f8aa65905d8f8558c818672`, unchanged baseline doc debt accepted. Source tree `b03385dc31cfee4df098639d5c22cd616db38d00`. Published release qualification remains open. Ready for source review and CI; no merge.

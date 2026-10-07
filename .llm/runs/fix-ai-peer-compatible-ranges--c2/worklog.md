@@ -93,3 +93,11 @@ Final source check, package check, lint, format, provider/plugin suite (165 pass
 Doc lint exits 1 on both unchanged main and the changed branch, with identical per-entrypoint private-type diagnostics. This baseline finding is registered in arch-debt for independent review; no doc-lint pass is claimed.
 
 Reconcile: PR #2087 references #2036 without a closure claim because coordinated publication and consuming-release qualification are outstanding. S2 source/dependency implementation is complete; independent evaluation is next. Public implementation changes contain no operator identities or locations.
+
+Gate `peer-receipt-committed`: raw exit `1`. Command: `deno run --allow-all .llm/tools/gates/run-gate.ts --gate ai-peer-resolution --invocation c2-ai-peer-resolution-committed --output <private-evidence>`. Full raw output retained privately.
+
+Gate `peer-receipt-committed-corrected`: raw exit `0`. Command: `deno run --allow-all .llm/tools/gates/run-gate.ts --gate ai-peer-resolution --id c2-ai-peer-resolution-committed --output <private-evidence>`. Full raw output retained privately.
+
+## Completion
+
+Independent GLM IMPL-EVAL PASS at `987048499e80d42b8f8aa65905d8f8558c818672` (source `b03385dc31cfee4df098639d5c22cd616db38d00`), with explicit unchanged baseline documentation debt. A post-commit durable peer receipt now pins that evaluated head and passes; initial receipt CLI typo failed before execution and was corrected. Phases 5 implementation, 6 source gates, 7 independent evaluation and 9 source handoff complete. Phase 8 release remains owner work. No merge/publication.
