@@ -2,10 +2,11 @@
 
 | Slice | State |
 | --- | --- |
-| S4 | Signed offf62f020; C1 prerequisites854c013/a1eb16c reconciled, all20product hashes unchanged |
-| Main dependency prerequisite | Exact reviewed native metadata patch, bothaudits/frozeninstall/checks300tests0; supervisor commit/push/comment |
-| Health declaration prerequisite | Private candidate qualification underway, active source untouched |
-| S5 | Unreleased pending health prerequisite signoff |
-| S6 | Unreleased; full own generated chain/all-export consumers/independent evaluation required |
+| S4 | Signed off; all20product hashes unchanged through prerequisites |
+| C1 prerequisites | Complete predecessor assets/run/PASS evidence propagated ordinary854c013/a1eb16c |
+| Main dependency prerequisite | Signed off0af020a4e; bothaudits/frozenconsumers/300tests0 |
+| Health declaration prerequisite | Substantively reviewed/applied; native all-export declarations1→0, runtime/APIidentical, appliedquality/arch0; supervisor commit/push/comment |
+| S5 | Ready for explicit release after this prerequisite commit/push/comment |
+| S6 | Locked until S5checkpoint; full current generatedchain/all-exportconsumers/independent review required |
 
-Independent C2 IMPL-EVAL pending. Later leaves unreleased. Original wholechain independent PLAN-EVALPASS remains controlling.
+Later leaves unreleased. Original wholechain independent PLAN-EVALPASS remains controlling.

@@ -41,3 +41,7 @@ The existing service-to-database dependency is retained; no lock update or depen
 
 The next action is substantive supervisor review of frozen S4 evidence and source hashes. No S5,
 commit, push, GitHub mutation, evaluator edit or agent-docs bundle generation is performed here.
+
+## S5 release after native prerequisites
+
+Health annotation/native packed consumers are independently qualified with exactCI2.9.5; existing mutable API/executable initializer retained. Root owns substantive signoff/commit/push/comment, then releases only S5executor/identity/buffers. S6faultsuite/fullnativegeneratedchain/finalconsumers await S5checkpoint. Do not redo inherited prerequisites or claim final C2qualification from them.

@@ -12,8 +12,8 @@ Public surface: focused database commands raw port and rows; service commands ex
 | Research | Complete; live acceptance/comments and RFC reviewed |
 | Plan & Design | Locked inherited S4–S6 scope and design above |
 | Plan-Gate | Whole-chain independent PASS inherited |
-| Implement | S4 supervisor signed off; commit/push/comment next; S5/S6 unreleased |
-| Gate | S4 actual scoped/native gates pass; final S6 full consumer gate pending |
+| Implement | S4/C1/main-dependency/health prerequisites signed off; S5 next after health commit/push/comment, S6 locked |
+| Gate | S4/native prerequisites pass; health native complete consumers1→0; finalS6 complete current consumers/generatedchain pending |
 | Evaluate | Mandatory opposite-family C2 IMPL-EVAL pending |
 | Release | No merge/publication authorized; PR handoff pending |
 | Close | Acceptance/evidence and handoff pending |
@@ -88,3 +88,7 @@ C1 final8b6e89e9dfe786edf062e64228c8bb14fc45a110 artifact reconciliation propaga
 ## Fresh-main minimal security dependency prerequisite — supervisor signoff
 
 Separate lane freezes reviewed upstream/nativeproxy2.0.8record adoption in two locks; supervisor fullJSON/recordcomparison and all20S4hashes match. Independent applied-branch bothcriticalaudits0/frozenrootinstall0/FreshUI150check0; affectedAI/MCP221check+300tests0. See main-dependency-prerequisite-{diff,gates,review}. Only4insert/4delete, unrelated metadata stable. No new tests for this dependency metadata change; no all-native updater claim. Supervisor commit/push/comment before health prerequisite and S5. Final C2 CI/eval remain unclaimed.
+
+## Health declaration prerequisite — supervisor signoff
+
+Only mutable inline healthChecks annotation changes runtime source; original initializer/native executable JSbyte-identical. Separate actualCI2.9.5 all-export source0before/after, native packed baseline1(4TS2300+1TS7008)→candidate0 fresh/frozen, mutablefactory/options/returnsqualified. Nativepublish/pack/check65/lint/fmt/full-mapdocs/10existingregressions/quality/arch/exports/audit0. Supervisor frozenhash/archive checks and signature review, independent applied-sourcequality/arch0, all20S4hashes/currentreviewedlocks stable. See health-emission-supervisor-review.md and actualgates/consumers/source. No new namedtest for annotation-only metadata; no nativegeneratedoutput handpatch. Commit/push/comment precedes ONLYS5 release; S6and later leaves remainlocked.
