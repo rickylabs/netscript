@@ -195,3 +195,7 @@ Both locks preserve every unrelated version. Native metadata refresh/pruning was
 AI doc-lint has exact same per-entry diagnostics as original baseline. Fresh doc-lint also has identical per-entry counts and exits on a complete source baseline archive preserving workspace globs; preliminary incomplete-archive probes were invalid and are superseded by the valid comparison. Fresh AI exports have zero doc errors. Explicit fresh-doc-baseline-2036 records the unchanged F-7 finding for evaluator adjudication. Missing private lint config attempt failed before lint and corrected config passed. No false-green combined doc summary claim.
 
 Original IMPL-EVAL superseded; a fresh independent amendment evaluation is required next. Publication and successful fixed published consumer remain open.
+
+Gate `amendment-durable-peer-receipt`: raw exit `0`. Command: `deno run --allow-all .llm/tools/gates/run-gate.ts --gate ai-peer-resolution --id c2-ai-peer-amendment --output <private-evidence>`. Full raw output retained privately.
+
+Gate `amendment-published-negative`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts --published-version 0.0.7`. Full raw output retained privately.
