@@ -1,6 +1,6 @@
 # Resume
 
-Assignment harness #636 / NetScript #2080; branch orch/divybot-636; draft PR https://github.com/rickylabs/netscript/pull/2081. Baseline 6f6cbdf030d7595d1730272d0a74aedd66225069, initial design commit 795671066b660fc231d61efa17d663b866b26628. Implementation not yet committed pending independent review.
+Assignment harness #636 / NetScript #2080; branch orch/divybot-636; draft PR https://github.com/rickylabs/netscript/pull/2081. Baseline 6f6cbdf030d7595d1730272d0a74aedd66225069, initial design commit 795671066b660fc231d61efa17d663b866b26628. Implementation candidate committed/pushed as 6aa1676 (full SHA available in PR commit trail); independent final evaluation pending.
 
 Production: main.ts now composes createStreamsServer in bounded-file-store.ts. Local native store subclass installs exactly two guarded hooks before constructor recovery, preserves native LMDB and HTTP/producer/fork behavior. BoundedSegmentLog uses one 64 KiB window, fixed 32 × 128 boundary cache, frame-inclusive offsets and requested-payload chunk reads. New tests under services/src/tests/; worker excluded by existing test_utils publish rule. Upstream issue https://github.com/durable-streams/durable-streams/issues/420. Compatibility debt STREAMS-BOUNDED-NATIVE-IO-HOOKS recorded in shared debt registry.
 
@@ -9,3 +9,5 @@ Production: main.ts now composes createStreamsServer in bounded-file-store.ts. L
 Independent evaluator native claude-opus-5/xhigh (matrix-declared fallback) session 507f3317-ba68-4e62-b085-89eb707037de, running through repo-native claude-print. Primary Muse/OpenRouter launch preflight rejected missing allowance snapshot. Evaluator may write only evaluate.md. Same-session resume via claude-print --resume 507f3317-ba68-4e62-b085-89eb707037de --model claude-opus-5 --effort xhigh --prompt <file>. Logs under $TMPDIR/streams-evaluator-636.{jsonl,err}; do not commit complete session logs.
 
 Next: address substantive independent findings, commit/push scoped implementation+run, post slice evidence; final evaluator/PR body readiness and excluded final atomic report. Never commit .divybot-goal.md or incidental lock changes; no AI commit attribution. Final PR body must end exactly Closes rickylabs/harness#636; use Closes #2080 only for full resolution. Do not poll CI or wait for merge. Final canonical report uses .divybot-final-report.md via atomic tmp rename.
+
+CI alerts: current close-gate blocks pending independent review; quality failure was critical proxy-addr 2.0.7. Narrow native-derived 2.0.8 lock repair passes deno ci and audit-critical; see memory/ci-advisory-repair.md. Source still 6aa1676. Independent reviewer active.

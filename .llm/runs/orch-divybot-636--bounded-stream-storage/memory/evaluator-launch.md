@@ -1,0 +1,7 @@
+# Evaluator launch and attribution — 2026-10-07
+
+Feature-tier matrix implementation evaluation primary is Muse Spark 1.3 via OpenRouter, fallback Opus 5 native Claude. `opencode-run.ts` rejects primary paid launch without a current --usage-snapshot; do not invent allowance evidence. Use only the matrix-declared fallback. Native evaluator launched successfully through repo-native `.llm/tools/agentic/claude/claude-print.ts --model claude-opus-5 --effort xhigh --prompt <file>`, observed init model claude-opus-5, session 507f3317-ba68-4e62-b085-89eb707037de. Resume the same session with --resume <id>; never relaunch a fresh reviewer across repair rounds.
+
+Print-mode JSONL session logs may be large and contain full tool reads; keep them under $TMPDIR, retain only the final verdict and credential-free identity in the scoped run. Use `watch-run.ts <run-dir> --files evaluate.md --timeout-seconds 55 --quiet` as a background process for artifact wakeup rather than polling. High-effort native review includes long reasoning pauses; an empty CLI stdout while logs are redirected is not a crashed evaluator.
+
+Dispatcher said commit identity was preconfigured, but git commit initially failed with Author identity unknown. Existing Git author and authenticated gh user were rickylabs; set repo-local user.name rickylabs and user.email 129366361+rickylabs@users.noreply.github.com. Do not add AI/tool attribution footers.

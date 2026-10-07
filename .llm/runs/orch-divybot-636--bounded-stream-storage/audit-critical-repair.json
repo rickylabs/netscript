@@ -1,0 +1,36 @@
+{
+  "gateId": "audit-critical",
+  "invocationId": "streams-636-audit-repair",
+  "argv": [
+    "deno",
+    "task",
+    "audit:critical"
+  ],
+  "cwd": "/ephemeral/orch-work/issue-636",
+  "gitHead": "6aa1676a648917525deb86b1e66581a755c9325c",
+  "actualGitHead": "6aa1676a648917525deb86b1e66581a755c9325c",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2533895",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "0b4e8dbeba073155a87fb94d3ac319c3db9e2ecf09bbc950077bd29068a4e7a5",
+  "lifecycleId": "worker:2533895:streams-636-audit-repair:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-07T20:13:47.106Z",
+  "startedAt": "2026-10-07T20:13:47.108Z",
+  "finishedAt": "2026-10-07T20:13:47.462Z",
+  "durationMs": 355,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 75,
+    "sha256": "1d56105eca1d9a40887e9f9e30a26096bb41a6bb1bf11c9682a4448ade27ec98",
+    "tail": "Found 38 vulnerabilities\nSeverity: 3 low, 17 moderate, 18 high, 0 critical\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 48,
+    "sha256": "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9",
+    "tail": "Task audit:critical deno audit --level critical\n",
+    "truncated": false
+  }
+}
