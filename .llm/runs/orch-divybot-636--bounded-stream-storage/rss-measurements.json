@@ -1,0 +1,36 @@
+{
+  "logBytes": 1073746944,
+  "ceilingBytes": 536870912,
+  "oldRecovery": {
+    "mode": "old-recovery",
+    "baselineRss": 55250944,
+    "recoveryPeakRss": 2202705920,
+    "peakRss": 3277688832,
+    "ceiling": 536870912,
+    "logBytes": 1073746944,
+    "recoveredOffset": "0000000000000000_0000001073746944"
+  },
+  "oldTail": {
+    "mode": "old-tail",
+    "baselineRss": 54259712,
+    "recoveryPeakRss": 57901056,
+    "peakRss": 2204364800,
+    "ceiling": 536870912,
+    "logBytes": 1073746944,
+    "recoveredOffset": "0000000000000000_0000001073746944"
+  },
+  "bounded": {
+    "mode": "bounded",
+    "baselineRss": 54169600,
+    "recoveryPeakRss": 57720832,
+    "peakRss": 58802176,
+    "ceiling": 536870912,
+    "logBytes": 1073746944,
+    "recoveredOffset": "0000000000000000_0000001073746944"
+  },
+  "exitCodes": {
+    "oldRecovery": 1,
+    "oldTail": 1,
+    "bounded": 0
+  }
+}
