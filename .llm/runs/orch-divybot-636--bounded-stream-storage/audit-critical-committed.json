@@ -1,0 +1,36 @@
+{
+  "gateId": "audit-critical",
+  "invocationId": "streams-636-audit-committed",
+  "argv": [
+    "deno",
+    "task",
+    "audit:critical"
+  ],
+  "cwd": "<worktree>",
+  "gitHead": "c12a520b1f0b669ddc9acddeaef03c2cb7596d45",
+  "actualGitHead": "c12a520b1f0b669ddc9acddeaef03c2cb7596d45",
+  "timeoutMs": 1800000,
+  "runnerIdentity": "worker:2604074",
+  "attempt": 1,
+  "schemaVersion": 1,
+  "requestHash": "5a491911e1ca48a940e1c4e1286aa05f8b39d6cf6b123ce5ce86810078d94b8b",
+  "lifecycleId": "worker:2604074:streams-636-audit-committed:1",
+  "outcome": "PASS",
+  "claimedAt": "2026-10-07T20:16:27.085Z",
+  "startedAt": "2026-10-07T20:16:27.087Z",
+  "finishedAt": "2026-10-07T20:16:27.466Z",
+  "durationMs": 379,
+  "exitCode": 0,
+  "stdout": {
+    "bytes": 75,
+    "sha256": "1d56105eca1d9a40887e9f9e30a26096bb41a6bb1bf11c9682a4448ade27ec98",
+    "tail": "Found 38 vulnerabilities\nSeverity: 3 low, 17 moderate, 18 high, 0 critical\n",
+    "truncated": false
+  },
+  "stderr": {
+    "bytes": 48,
+    "sha256": "f07abc59413789c36d5deaadbe14116f18ba430d5c11b91a4c1e6619774681c9",
+    "tail": "Task audit:critical deno audit --level critical\n",
+    "truncated": false
+  }
+}
