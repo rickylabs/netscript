@@ -10,7 +10,7 @@
 | Baseline          | `6f6cbdf030d7595d1730272d0a74aedd66225069` (freshly fetched main)                                                             |
 | Archetype         | 3 — runtime/behavior; frontend consumer contract overlay (browser gates N/A, no page/component change)                        |
 | Workload tier     | feature (max five re-steers, notify after three)                                                                              |
-| Evaluator         | opencode CLI session `ses_ee7be024dffeJ5HAlcs9qY7M49`, 2026-10-07; requested `opencode-go/glm-5.3-flash` effort max (owner-explicit route per `supervisor.md`), observed `opencode-go/glm-5.3-flash` — no fallback, no expense decision needed; distinct vendor family and session from generator (`gpt-6.1-sol` high, OpenAI family) |
+| Evaluator         | opencode CLI session `<session>`, 2026-10-07; requested `opencode-go/glm-5.3-flash` effort max (owner-explicit route per `supervisor.md`), observed `opencode-go/glm-5.3-flash` — no fallback, no expense decision needed; distinct vendor family and session from generator (`gpt-6.1-sol` high, OpenAI family) |
 | Evaluation window | Probe expansion stopped by supervisor after ~15 min per brief; final bounded pass: `git log -1`, `git diff HEAD^ HEAD`, worklog finals only |
 
 Evaluator separation: this evaluation is a separate session from the generator; evaluator vendor family (opencode-go/glm-5.3-flash) differs from generator (OpenAI). Re-steered in the same evaluator session per feature-tier policy.
