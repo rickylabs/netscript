@@ -1,0 +1,11 @@
+# @netscript/plugin-streams@0.0.7
+  root: plugins/streams
+  exports: ., ./scaffold, ./adapter-cli, ./cli, ./e2e, ./aspire, ./services
+  files=60 loc=5005
+  docs: README=true(186L) docs/=false desc=80c
+  tests: 18 files
+  surface: .=7, ./scaffold=0, ./adapter-cli=0, ./cli=2, ./e2e=1, ./aspire=1, ./services=0
+  dry-run: OK slowTypeWarnings=1
+  findings: 2
+    WARN F-DOCT-5 cardinality: directory has 14 immediate children; doctrine cap is 12 (services/src)
+    WARN F-JSR-7 slow-types: Checking for slow types in the public API...
