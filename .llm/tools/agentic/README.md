@@ -76,11 +76,11 @@ launcher never merely refreshes stale timestamps. Valid prior-month state resets
 malformed, stale, future, over-budget, or concurrently locked state blocks. Full caps are reserved
 without refund; no overage or authoritative live-balance claim. Unknown locks require owner review.
 
-NetScript's remaining internal runtime has one home per value: connector and cloud model IDs in `config/models.ts`; included
-credit envelope and tier caps in `config/subscriptions.ts`; Agent Tasks path in
-`config/endpoints.ts`; precedence and family gates in `runtime/delegation-matrix.ts` and
-`runtime/routing-policy.ts`. The fleet authority and model catalog have moved to pinned Harness;
-the matrix viewer below reads that source. Do not duplicate either set in adapters or docs.
+Harness owns provider-specific route model IDs and matrix policy. NetScript's remaining local
+provider presets live in `config/models.ts`; included credit envelope and tier caps in
+`config/subscriptions.ts`; Agent Tasks path in `config/endpoints.ts`; local provider availability in
+`runtime/routing-policy.ts`. The matrix viewer reads the pinned Harness source. Do not duplicate
+either set in adapters or docs.
 
 | Folder         | What lives there                                                                                                                                                                                                                    |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -118,14 +118,14 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/launch-codex-slice.ts
   --slice-dir <win-path> --provider openai --model <model-id> --effort <effort> --dry-run
 ```
 
-Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; NetScript's legacy typed bindings live in
-`runtime/delegation-matrix.ts`, the resolver lives in `runtime/routing-policy.ts`, and concrete ids
-live in `config/models.ts`. Prose in the brief is not launch authority. Drop `--dry-run` for the
-real launch; it fails closed unless the observed provider/model/effort match what you requested. The
-`complex` and `architecture` rows additionally require explicit owner or milestone-coordinator
-authorization with a rationale recorded in the run and passed to the route resolver. Inferred
-complexity cannot select them. The launcher uses the v2 app-server JSONL protocol directly because
-Codex CLI 0.144.1's `debug app-server send-message-v2` helper does not propagate
+Pick workload tier and role from `.llm/harness/workflow/lane-policy.md`; the typed matrix lives in
+pinned Harness, the NetScript resolver lives in `runtime/routing-policy.ts`, and local provider ids
+used by transition tools live in `config/models.ts`. Prose in the brief is not launch authority.
+Drop `--dry-run` for the real launch; it fails closed unless the observed provider/model/effort
+match what you requested. The `complex` and `architecture` rows additionally require explicit owner
+or milestone-coordinator authorization with a rationale recorded in the run and passed to the route
+resolver. Inferred complexity cannot select them. The launcher uses the v2 app-server JSONL protocol
+directly because Codex CLI 0.144.1's `debug app-server send-message-v2` helper does not propagate
 `-c model_reasoning_effort` to the child turn. Pass `--allow-route-mismatch` only for an explicit
 operator-approved exception; otherwise a pending or mismatched route exits non-zero with a
 `BLOCKED:` operator action. Exit: `0` ok/dry-run/parse-log · `1` stage failed · `2` watcher
@@ -302,21 +302,21 @@ run directory; never use a workspace-shared scratch filename.
 Exit: `0` ok/PASS · `1` API failure · `2` usage · `4` missing token · `6` base-`main` guard · `7`
 not mergeable · `10` eval FAIL · `11` eval pending · `12` no eval comment.
 
-### `github/gh-watch.ts` and `github/gh-token.ts`
+### `github/gh-watch.ts` (and `maint:gh-token`)
 
 `gh-watch.ts` blocks in the background until a PR's IMPL/PLAN-EVAL verdict is terminal, then exits
 to re-wake the supervisor — a token-free re-wake with no polling loop kept in the agent's context.
-`gh-token.ts check` validates a token from any healthy source (env → `gh auth token` → Git
-Credential Manager), printing only source and login; `gh-token.ts store` persists one stdin PAT to
-Windows GCM and WSL `gh` so future sessions resolve it automatically.
+The token helper is NetScript maintainer tooling at `.llm/tools/maint/gh-token.ts`:
+`maint:gh-token check` validates a token from any healthy source (env → `gh auth token` → Git
+Credential Manager), printing only source and login; `maint:gh-token store` persists one stdin PAT
+to Windows GCM and WSL `gh` so future sessions resolve it automatically.
 
-### `github/review-threads.ts` — when a green PR still should not merge
+### Review-thread gate (moved)
 
-Run `deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty` when
-checks are green but review findings may be silent. It lists every thread with author, location,
-severity when present, and answered/unanswered state, then exits non-zero for any current thread
-without a reply. Resolution clicks are irrelevant; a reasoned decline is a reply, and outdated
-threads never block. The command is read-only and is also enforced in CI's `close-gate` job.
+The answered review-thread gate is a repository merge gate, not part of this suite. It lives at
+`.llm/tools/validation/check-review-threads.ts` and runs as
+`deno task check:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`, the same
+command CI's `close-gate` job enforces.
 
 ## The brain: the runtime controller
 
@@ -387,12 +387,22 @@ transitions — no credentials, prompts, or account identity. Fallback and resto
 decisions only_, and only at an idle turn or session boundary; an active/critical slice blocks. This
 command is strictly read-only.
 
-### `runtime/cli/delegation-matrix-table.ts` — pinned Harness matrix, readable
+### `agentic:matrix` — pinned Harness matrix, readable
 
-Render the pinned Harness routing authority without shell-scraping its TypeScript source. This
-viewer imports Harness commit `948919ef323164e8230cb6df12c9c554b5ecad58` over an immutable
-public source URL; it needs network on a cold cache and fails closed when that source is unavailable.
-NetScript's own launch resolver still uses its local legacy matrix pending a separate migration:
+Render the pinned Harness routing authority without shell-scraping its TypeScript source. The task
+runs Harness's own viewer, `packages/routing/matrix/cli/matrix-view.ts`, at the same immutable
+commit as every `@harness/` import in `deno.json`; `config/harness-pins_test.ts` fails if any
+import or the viewer task diverges. It needs network on a cold cache and fails closed when that source is unavailable.
+NetScript's resolver re-exports Harness's resolver, and the local model aliases project the same
+routing document. Before an OpenCode turn, the launcher checks its selected complete model ID in
+the dispatch host's catalog. Missing configured IDs fail with `launcher-model-absent` before expense
+checks, MCP inference or dispatch; catalog failures use `launcher-catalog-unavailable`. A different
+provider or contributor ID cannot satisfy this check. Copilot also retains its variant attestation.
+Catalog membership leaves quota, reachability, requested effort support and evaluator session/family
+certification to their separate guards. The raw-source bridge still consumes shipped JSON; a local
+configuration loader and remaining native/legacy presets are interim under Harness #270.
+
+Inspect the shared matrix with:
 
 ```console
 $ deno task agentic:matrix
@@ -579,22 +589,23 @@ failure.
 
 ## The Claude surface — `claude/`
 
-`claude-hook-log.ts` is the sink wired into `.claude/settings.json` hooks. Both `PreToolUse` and
-`Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a nested turn cwd cannot change
-which checked-in logger runs. Claude defines that variable as the session launch root; it does not
-follow `EnterWorktree`, and this hook deliberately writes the event log back to that launch root at
-`.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude script/task invocation falls back
-to `Deno.cwd()` only when the variable is absent.
+`claude-hook-log.ts` and `validate-claude-surface.ts` are NetScript maintainer tools and live in
+`.llm/tools/maint/claude/`. `claude-hook-log.ts` is the sink wired into `.claude/settings.json`
+hooks. Both `PreToolUse` and `Stop` use exec-form arguments rooted at `${CLAUDE_PROJECT_DIR}`, so a
+nested turn cwd cannot change which checked-in logger runs. Claude defines that variable as the
+session launch root; it does not follow `EnterWorktree`, and this hook deliberately writes the event
+log back to that launch root at `.llm/tmp/claude/hooks/<run-id>/events.jsonl`. A direct non-Claude
+script/task invocation falls back to `Deno.cwd()` only when the variable is absent.
 
 The configured process reads exactly `CLAUDE_PROJECT_DIR`, `NETSCRIPT_RUN_ID`, and
 `CLAUDE_SESSION_ID`, writes only below the launch-root hook-log subtree, and needs no runtime read
 permission. `--no-lock` keeps the hook from disturbing `deno.lock`; `--no-prompt` prevents a future
 TTY-attached invocation from prompting. Repository skills live only in `.agents/skills/`; the lone
 `.claude/skills/repo-skills/SKILL.md` file points Claude to that source.
-`validate-claude-surface.ts` (the `agentic:check-claude` gate) checks the whole surface in one pass:
+`validate-claude-surface.ts` (the `maint:check-claude` gate) checks the whole surface in one pass:
 
 ```console
-$ deno task agentic:check-claude --pretty
+$ deno task maint:check-claude --pretty
 OK CLAUDE.md: contains @AGENTS.md
 OK CLAUDE.md: contains .agents/skills/<name>/SKILL.md
 OK .claude/settings.json: valid JSON
@@ -626,6 +637,16 @@ deliberately built **before every flag**: OpenCode's `-f` is an array flag, so a
 message is swallowed as another filename. Repeating `-f` passes native WSL paths through unchanged.
 Add `--format json` to the general launcher when structured event output is required; the evaluator
 captures default markdown.
+
+The runner observes stdout in both capture modes. A child exit of `0` with empty or
+whitespace-only output becomes exit `3`, with `opencode-empty-answer` naming the selected model.
+With `--format json`, only a nonblank `text` event whose part is text establishes an answer;
+step, tool, reasoning and error metadata cannot do so. Malformed UTF-8/JSON or an oversized JSON
+line fails with `opencode-output-malformed`; a pipe still open after the one-second post-exit
+read deadline fails with `opencode-output-incomplete`. Existing child failure codes are retained.
+Streamed output stays byte-for-byte, and capture returns the observed text. Output presence is a
+prerequisite for the separate evaluator-verdict parser and independent evaluation gate.
+The JSON event distinction follows the [OpenCode CLI implementation](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/cli/cmd/run.ts).
 
 Every OpenCode launch discovers the nearest generated `.mcp.json` without crossing the current
 project/git boundary, strictly translates its stdio declarations to OpenCode local MCP entries, and
@@ -729,22 +750,22 @@ The invariants worth internalizing:
 
 ## Maintenance map: change one thing in one place
 
-Volatile values live in `config/`; typed routing bindings live in the delegation matrix. Edit the
-one documented authority and every doctor, probe, installer, and test picks it up. A guard test
+Fleet route IDs and typed bindings live in pinned Harness. Transitional local provider settings live
+in `config/`. Edit the documented authority for each value. A guard test
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is ever hardcoded
 again outside `config/`.
 
-| To change a…                                               | Edit                                                          | Notes                                                                                                                                                                                            |
-| ---------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Model id**                                               | `config/models.ts`                                            | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
-| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for the fleet; `runtime/delegation-matrix.ts` for the remaining NetScript resolver | `deno task agentic:matrix` renders the pinned Harness source. NetScript's local resolver/catalog remain until their own migration. |
-| **Tool version**                                           | `config/versions.ts`                                          | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
-| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                         | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
-| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
-| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                   | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                     |
-| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts` | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                           |
-| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                         | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                      |
-| **Deps**                                                   | root `deno.json` import map + `deno.lock`                     | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                           |
+| To change a…                                               | Edit                                                                                            | Notes                                                                                                                                                                                                           |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Model id**                                               | Harness `packages/routing/matrix/models.ts` for route IDs; `config/models.ts` for local presets | `ROUTING_MODEL_IDS` is re-exported from the same Harness pin as the matrix. Native/canary IDs derive from it; local OpenRouter and OpenCode presets remain transitional.                                        |
+| **Routing binding** (tier + role → logical model + effort) | Harness `packages/routing/matrix/` for fleet and NetScript runtime resolution                   | `deno task agentic:matrix`, `runtime/routing-policy.ts` and the paid OpenCode launch guard read the same pin. The local duplicate and its legacy tests were removed after active consumers switched to the pin. |
+| **Tool version**                                           | `config/versions.ts`                                                                            | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                                          |
+| **Endpoint / host / installer URL**                        | `config/endpoints.ts`                                                                           | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync.                |
+| **Provider profile / paid OpenCode preset**                | `runtime/provider-profiles.ts`                                                                  | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                                        |
+| **Provider fallback resolver**                             | `runtime/routing-policy.ts`                                                                     | Provider capability/health selection, family skipping, and legacy rejection.                                                                                                                                    |
+| **Subscription allowance**                                 | `config/subscriptions.ts` + `runtime/subscription-expense.ts`                                   | Official numeric limits plus normalized fail-closed expense decisions.                                                                                                                                          |
+| **Agent / provider vocabulary**                            | `runtime/contract.ts`                                                                           | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                                     |
+| **Deps**                                                   | root `deno.json` import map + `deno.lock`                                                       | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                                          |
 
 ## Environment overrides
 
@@ -777,7 +798,7 @@ deno test --no-lock -A .llm/tools/agentic/                                      
 deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root .llm/tools/agentic --ext ts,tsx
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root .llm/tools/agentic --ext ts,tsx
-deno task agentic:check-claude                                                          # Claude surface gate
+deno task maint:check-claude                                                            # Claude surface gate
 ```
 
 Unit tests use a local throw-based `assert`/`assertEquals` because the repo's import map is empty

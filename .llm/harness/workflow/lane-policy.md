@@ -1,21 +1,29 @@
 # Lane Policy — Canonical Model Routing
 
-This document is the human-facing view of the owner-ratified 2026-09-04 delegation matrix. The
-fleet authority is pinned Harness `packages/routing/matrix/`. NetScript's internal legacy matrix
-and resolver remain at `../../tools/agentic/runtime/delegation-matrix.ts` and
-`../../tools/agentic/runtime/routing-policy.ts` until their separate migration. Earlier named
-lanes are persisted-state vocabulary only and must not be selected for new work.
+This document is the human-facing view of the owner-ratified delegation matrix, including the
+2026-09-30 Codex default update. The fleet authority is pinned Harness `packages/routing/matrix/`.
+NetScript's internal resolver at `../../tools/agentic/runtime/routing-policy.ts` also reads that
+pinned matrix. The inactive local matrix copy and its legacy tests were removed after the active
+resolver and paid launch guard switched to this Harness pin. Earlier named lanes are persisted-state
+vocabulary only and must not be selected for new work.
 
-Inspect the pinned Harness authority through `deno task agentic:matrix`. Use `--tier <tier>` for one row,
-`--tier <tier> --plan-evaluator|--impl-evaluator` for direct evaluator lookup, `--role
+Inspect the pinned Harness authority through `deno task agentic:matrix`. Use `--tier <tier>` for one
+row, `--tier <tier> --plan-evaluator|--impl-evaluator` for direct evaluator lookup,
+`--role
 deep-research` for that dedicated role, `--fallback-of <model>` for every context-sensitive
 fallback, and `--json` for automation. Do not reconstruct the matrix with `sed`/`grep`/`awk`; the
 built-in renderer includes the Deep Research default and fallback columns.
 
-Fleet model strings live in Harness `packages/routing/matrix/models.ts`; the legacy NetScript
-runtime still uses `../../tools/agentic/config/models.ts`. Subscription limits remain in
-`../../tools/agentic/config/subscriptions.ts`. Keep local runtime edits separate from the fleet
-authority; the parity gate identifies stale prose here.
+Route model strings live in Harness `packages/routing/matrix/models.ts`; NetScript's
+`../../tools/agentic/config/models.ts` still serves local canaries and provider tools. Subscription
+limits remain in `../../tools/agentic/config/subscriptions.ts`. Keep local runtime edits separate
+from the fleet authority; the parity gate identifies stale prose here.
+
+The Codex default is `gpt-6.1-sol` at `xhigh` for ordinary work and coordinator scopes. Former Luna
+cells, including trivial tasks and Codex research fallbacks, use Sol 6.1 at `low`. Complex and
+architecture implementation retain Astra at their existing efforts. Opus and Fable routing is
+unchanged; remaining native Sonnet defaults use `claude-sonnet-5-5`. Luna and earlier Sol model IDs
+remain catalog capabilities for compatibility.
 
 ## Provider order
 
@@ -43,13 +51,13 @@ phase.
 
 <!-- generated-workload-matrix:start -->
 
-| Tier            | Implementation                                  | UI/UX                                                  | Plan                                        | PLAN-EVAL                                            | IMPL-EVAL                                                         | Vision                                                                  | Documentation                                                  | Deep research                      |
-| --------------- | ----------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| simple          | luna@max → qwen_3_8_flash_next@provider_default | kimi_k3@low → minimax_m3@provider_default              | —                                           | —                                                    | minimax_m3@provider_default → deepseek_v4_flash@provider_default  | minimax_m3@provider_default → deepseek_v4_flash_vision@provider_default | gemini_3_8_flash@medium → opus_5@low                           | gemini_3_8_flash@low → luna@max    |
-| straightforward | sol@high → glm_5_3_flash@provider_default       | kimi_k3@high → gemini_3_8_flash@high                   | sol@high → glm_5_3_flash@provider_default   | opus_5@medium → qwen_3_8_flash_next@provider_default | glm_5_3_flash@provider_default → deepseek_v4_pro@provider_default | deepseek_v4_flash_vision@provider_default → kimi_k3@low                 | gemini_3_8_flash@high → qwen_3_8_flash_next@provider_default   | gemini_3_8_flash@medium → luna@max |
-| feature         | sol@high → muse_spark_1_3@xhigh                 | kimi_k3@high → gemini_3_8_flash@high                   | fable_5_1@low → muse_spark_1_3@xhigh        | glm_5_3@provider_default → fable_5_1@low             | muse_spark_1_3@xhigh → opus_5@xhigh                               | gemini_3_8_flash@high → muse_spark_1_3@xhigh                            | qwen_3_8_max@provider_default → glm_5_3_flash@provider_default | gemini_3_8_flash@high → luna@max   |
-| complex         | astra@medium → fable_5_1@medium                 | kimi_k3@max → fable_5_1@medium                         | fable_5_1@medium → muse_spark_1_3@max       | muse_spark_1_3@max → grok_4_6@high                   | muse_spark_1_3@max → muse_spark_1_3@max                           | kimi_k3@max → gemini_3_8_flash@high                                     | fable_5_1@medium → qwen_3_8_max@provider_default               | gemini_3_8_flash@high → luna@max   |
-| architecture    | astra@xhigh → fable_5_1@xhigh                   | kimi_k3@max → fable_5_1@medium                         | fable_5_1@xhigh → muse_spark_1_3@max        | muse_spark_1_3@max → grok_4_6@xhigh                  | grok_4_6@xhigh → muse_spark_1_3@max                               | kimi_k3@max → fable_5_1@high                                            | fable_5_1@high → qwen_3_8_max@provider_default                 | gemini_3_8_flash@high → luna@max   |
+| Tier            | Implementation                                 | UI/UX                                     | Plan                                       | PLAN-EVAL                                            | IMPL-EVAL                                                         | Vision                                                                  | Documentation                                                  | Deep research                     |
+| --------------- | ---------------------------------------------- | ----------------------------------------- | ------------------------------------------ | ---------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------- |
+| simple          | sol@low → qwen_3_8_flash_next@provider_default | kimi_k3@low → minimax_m3@provider_default | —                                          | —                                                    | minimax_m3@provider_default → deepseek_v4_flash@provider_default  | minimax_m3@provider_default → deepseek_v4_flash_vision@provider_default | gemini_3_8_flash@medium → opus_5@low                           | gemini_3_8_flash@low → sol@low    |
+| straightforward | sol@xhigh → glm_5_3_flash@provider_default     | kimi_k3@high → gemini_3_8_flash@high      | sol@xhigh → glm_5_3_flash@provider_default | opus_5@medium → qwen_3_8_flash_next@provider_default | glm_5_3_flash@provider_default → deepseek_v4_pro@provider_default | deepseek_v4_flash_vision@provider_default → kimi_k3@low                 | gemini_3_8_flash@high → qwen_3_8_flash_next@provider_default   | gemini_3_8_flash@medium → sol@low |
+| feature         | sol@xhigh → muse_spark_1_3@xhigh               | kimi_k3@high → gemini_3_8_flash@high      | fable_5_1@low → muse_spark_1_3@xhigh       | glm_5_3@provider_default → fable_5_1@low             | muse_spark_1_3@xhigh → opus_5@xhigh                               | gemini_3_8_flash@high → muse_spark_1_3@xhigh                            | qwen_3_8_max@provider_default → glm_5_3_flash@provider_default | gemini_3_8_flash@high → sol@low   |
+| complex         | astra@medium → fable_5_1@medium                | kimi_k3@max → fable_5_1@medium            | fable_5_1@medium → muse_spark_1_3@max      | muse_spark_1_3@max → grok_4_7@high                   | muse_spark_1_3@max → muse_spark_1_3@max                           | kimi_k3@max → gemini_3_8_flash@high                                     | fable_5_1@medium → qwen_3_8_max@provider_default               | gemini_3_8_flash@high → sol@low   |
+| architecture    | astra@xhigh → fable_5_1@xhigh                  | kimi_k3@max → fable_5_1@medium            | fable_5_1@xhigh → muse_spark_1_3@max       | muse_spark_1_3@max → grok_4_7@xhigh                  | grok_4_7@xhigh → muse_spark_1_3@max                               | kimi_k3@max → fable_5_1@high                                            | fable_5_1@high → qwen_3_8_max@provider_default                 | gemini_3_8_flash@high → sol@low   |
 
 <!-- generated-workload-matrix:end -->
 
@@ -67,12 +75,13 @@ Never infer a slug by string concatenation.
 ### Deep-research route
 
 Deep research uses its dedicated matrix column, with Gemini 3.8 Flash at `low`, `medium`, or `high`
-according to the lane's scope and surface coverage. Luna at `max` is the only model fallback.
+according to the lane's scope and surface coverage. Sol 6.1 at `low` is the only model fallback.
 Because deep-research sessions can accumulate unusually large context windows and outputs, this role
-uses native Google `agy` first, catalog-attested GitHub Copilot Gemini second, and native Codex Luna
-last. Copilot is allowed only for the `google` family in this role. Claude, OpenCode Go, Ollama, and
-OpenRouter transports are forbidden for deep research even when they expose a model with the same
-logical identity. The resolver and concrete-model guard both fail closed on that boundary.
+uses native Google `agy` first, catalog-attested GitHub Copilot Gemini second, and native Codex Sol
+6.1 at `low` last. Copilot is allowed only for the `google` family in this role. Claude, OpenCode
+Go, Ollama, and OpenRouter transports are forbidden for deep research even when they expose a model
+with the same logical identity. The resolver and concrete-model guard both fail closed on that
+boundary.
 
 Selecting `complex` or `architecture` for deep research remains subject to the privileged-row
 authorization below; the research role does not grant itself a higher tier.
@@ -99,12 +108,12 @@ separate-session or different-vendor-family evaluator rules.
 
 <!-- generated-coordinator-matrix:start -->
 
-| Scope         | Coordinator route                              |
-| ------------- | ---------------------------------------------- |
-| small_project | sol@medium → opus_5@low                        |
-| project       | sol@medium → opus_5@medium                     |
-| framework     | sol@high → opus_5@xhigh                        |
-| milestone     | sol@medium → fable_5_1@medium → opus_5@xhigh   |
+| Scope         | Coordinator route                           |
+| ------------- | ------------------------------------------- |
+| small_project | sol@xhigh → opus_5@low                      |
+| project       | sol@xhigh → opus_5@medium                   |
+| framework     | sol@xhigh → opus_5@xhigh                    |
+| milestone     | sol@xhigh → fable_5_1@medium → opus_5@xhigh |
 
 <!-- generated-coordinator-matrix:end -->
 

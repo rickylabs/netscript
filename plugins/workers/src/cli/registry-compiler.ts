@@ -1,3 +1,6 @@
+import type { JobConfig } from '@netscript/plugin-workers-core/config';
+import { resolveConfiguredJobPolicies } from './configured-job-policies.ts';
+import { loadWorkersConfig } from './load-workers-config.ts';
 import {
   type ProjectFileEntry,
   type ProjectFiles,
@@ -17,8 +20,22 @@ export async function compileWorkersRegistry(
   files: ProjectFiles,
   registryPath = '.netscript/generated/plugin-workers/job-registry.ts',
 ): Promise<CompileRegistryResult> {
-  const jobs = await files.listFiles('workers/jobs', ['.ts']);
-  const source = renderRegistrySource(registryPath, jobs);
+  const hasConfig = (await Promise.all(
+    ['ts', 'js', 'mjs'].map((extension) => files.readTextFile(`netscript.config.${extension}`)),
+  )).some((content) => content !== undefined);
+  const workers = hasConfig ? await loadWorkersConfig(files.projectRoot) : undefined;
+  const jobs = await files.listFiles(workers?.jobsDir ?? 'workers/jobs', ['.ts']);
+  const policies = workers
+    ? resolveConfiguredJobPolicies(
+      files.projectRoot,
+      jobs.map((job) => ({
+        path: job.relativePath,
+        source: 'local' as const,
+      })),
+      workers,
+    )
+    : new Map<string, JobConfig>();
+  const source = renderRegistrySource(registryPath, jobs, policies);
   await files.writeTextFile(registryPath, source);
   return Object.freeze({
     registryPath,
@@ -29,16 +46,16 @@ export async function compileWorkersRegistry(
 function renderRegistrySource(
   registryPath: string,
   jobs: readonly ProjectFileEntry[],
+  policies: ReadonlyMap<string, JobConfig>,
 ): string {
+  const jobId = (path: string): string => policies.get(path)?.id ?? toJobId(path);
   return renderRegistryModule({
     registryPath,
     items: jobs,
     alias: (index) => `job${index}`,
     renderImport: (alias, specifier) => `import * as ${alias} from ${JSON.stringify(specifier)};`,
     renderEntry: (alias, job) => [
-      `  readonly ${
-        JSON.stringify(toJobId(job.relativePath))
-      }: ResolvedJobHandler<typeof ${alias}>;`,
+      `  readonly ${JSON.stringify(jobId(job.relativePath))}: ResolvedJobHandler<typeof ${alias}>;`,
     ],
     header: [
       "import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';",
@@ -61,7 +78,7 @@ function renderRegistrySource(
       '',
       'export const jobHandlersById: GeneratedJobHandlerRegistry = Object.freeze({',
       ...jobs.map((job, index) =>
-        `  [${JSON.stringify(toJobId(job.relativePath))}]: resolveJobHandler(job${index}, ${
+        `  [${JSON.stringify(jobId(job.relativePath))}]: resolveJobHandler(job${index}, ${
           JSON.stringify(job.relativePath)
         }),`
       ),
@@ -73,7 +90,7 @@ function renderRegistrySource(
       '',
       'const entries: readonly [string, StaticJobHandler][] = [',
       ...jobs.map((job) => {
-        const id = JSON.stringify(toJobId(job.relativePath));
+        const id = JSON.stringify(jobId(job.relativePath));
         return `  [${id}, jobHandlersById[${id}]],`;
       }),
       '];',
@@ -92,7 +109,7 @@ function renderRegistrySource(
       '',
       'export type GeneratedJobDefinitionRegistry = Readonly<{',
       ...jobs.map((job) => {
-        const id = JSON.stringify(toJobId(job.relativePath));
+        const id = JSON.stringify(jobId(job.relativePath));
         return `  readonly ${id}: GeneratedJobDefinition<${id}, GeneratedJobHandlerRegistry[${id}]>;`;
       }),
       '}>;',
@@ -101,9 +118,14 @@ function renderRegistrySource(
       '',
       'export const jobDefinitionsById: GeneratedJobDefinitionRegistry = Object.freeze({',
       ...jobs.map((job) => {
-        const id = JSON.stringify(toJobId(job.relativePath));
+        const id = JSON.stringify(jobId(job.relativePath));
         const entrypoint = JSON.stringify(toJobEntrypoint(job.relativePath));
-        return `  [${id}]: createLocalJobDefinition(${id}, ${entrypoint}, jobHandlersById[${id}]),`;
+        const policy = policies.get(job.relativePath);
+        return `  [${id}]: createLocalJobDefinition(${id}, ${entrypoint}, jobHandlersById[${id}]${
+          policy
+            ? `, ${JSON.stringify({ ...policy, entrypoint: toJobEntrypoint(job.relativePath) })}`
+            : ''
+        }),`;
       }),
       '});',
       '',
@@ -117,6 +139,7 @@ function renderRegistrySource(
       '  id: TId,',
       '  entrypoint: string,',
       '  handler: THandler,',
+      '  policy?: RegisterJobInput & { readonly id: TId },',
       '): GeneratedJobDefinition<TId, THandler> {',
       '  return {',
       '    id,',
@@ -139,6 +162,7 @@ function renderRegistrySource(
       '    tags: [],',
       '    metadata: undefined,',
       '    retention: undefined,',
+      '    ...policy,',
       '    handler,',
       '    payloadSchema: handler.payloadSchema,',
       '  };',

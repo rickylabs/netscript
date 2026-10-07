@@ -91,7 +91,7 @@ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/lo
 deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/logger --ext md --pretty
 
 # Validate Claude Code project surface and generated skill mirror
-deno task agentic:check-claude
+deno task maint:check-claude
 ```
 
 ## Structured check/test/lint/fmt wrappers
@@ -142,24 +142,25 @@ Start from the symptom: if a run failed and you do not know what is still runnin
 you did not start, run:
 
 ```text
-deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>
+deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree>
 ```
 
 The first command is always read-only. The second is also non-mutating unless `--apply` is supplied.
 Even with apply, only positive path/identity-pair ownership proof authorizes a per-resource action;
 foreign and unknown-owner resources are reported and left alone.
 
-`deno task agentic:dogfood-skills` runs the local `netscript agent init` bundle into
+`deno task maint:dogfood-skills` runs the local `netscript agent init` bundle into
 `.agents/generated/consumer-skills/`. This generated consumer view follows the CLI bundle as it
 changes; do not copy or edit its skill content by hand.
 
 The agent-orchestration suite the supervisor uses to drive other agents. It is concern-grouped, not
 a flat folder: `runtime/` is the desired-state controller ("brain"); `runtime/cli/` are its entry
 points; `codex/`, `openhands/`, `github/`, `wsl/`, `claude/` are the execution lanes; `lib/` holds
-shared primitives; and **`config/` is the single source for everything volatile** (model ids in
-`config/models.ts`, tool versions in `config/versions.ts`, endpoints in `config/endpoints.ts`, with
-the routing lane→model bindings in `runtime/routing-policy.ts` referencing those ids). A guard test
+shared primitives; and **`config/` holds transitional local volatile values** (provider presets in
+`config/models.ts`, tool versions in `config/versions.ts`, and endpoints in `config/endpoints.ts`).
+Route IDs and workload/coordinator bindings live in pinned Harness; `runtime/routing-policy.ts`
+resolves local provider availability against that pin. A guard test
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of those values is hardcoded outside
 `config/`. The suite follows the `@std`-first rule (AGENTS.md rule 3): tests use `@std/assert`, path
 work uses `@std/path`. Read the suite [`README`](./agentic/README.md) for the full map and the
@@ -170,17 +171,17 @@ The Claude-surface subset keeps the Claude Code project honest. Repository skill
 [`CLAUDE.md`](../../CLAUDE.md) (Claude Supervisor Rules), and the surface check enforces that small
 contract without copying or comparing skill trees.
 
-| Task                          | Script                                      | Purpose                                                                                                                                                                                          | Flags                                                               |
-| ----------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `agentic:check-claude`        | `agentic/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, settings, gitignore, the single `.claude/skills/repo-skills` bridge, and hook lock hygiene. It does not copy or compare repository skills. Exits non-zero on any failure.  | `--pretty`                                                          |
-| `agentic:smoke-claude-remote` | `agentic/claude/claude-remote-smoke.ts`     | Fast Claude CLI / remote-control smoke (`--version`, `--help`, `remote-control --help`, `agents --help`); env-aware skip when `claude` is absent from PATH, with an optional live `--bg` launch. | `--env-aware`, `--live`, `--prompt <path>`, `--timeout`, `--pretty` |
-| (hook target)                 | `agentic/claude/claude-hook-log.ts`         | Reads a hook event from stdin and appends it as JSONL to `.llm/tmp/claude/hooks/$NETSCRIPT_RUN_ID/events.jsonl` (run/session scoped). Invoked by a Claude Code hook, not run by hand.            | (stdin; `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID` env)                |
+| Task                          | Script                                    | Purpose                                                                                                                                                                                          | Flags                                                               |
+| ----------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `maint:check-claude`          | `maint/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, settings, gitignore, the single `.claude/skills/repo-skills` bridge, and hook lock hygiene. It does not copy or compare repository skills. Exits non-zero on any failure.  | `--pretty`                                                          |
+| `agentic:smoke-claude-remote` | `agentic/claude/claude-remote-smoke.ts`   | Fast Claude CLI / remote-control smoke (`--version`, `--help`, `remote-control --help`, `agents --help`); env-aware skip when `claude` is absent from PATH, with an optional live `--bg` launch. | `--env-aware`, `--live`, `--prompt <path>`, `--timeout`, `--pretty` |
+| (hook target)                 | `maint/claude/claude-hook-log.ts`         | Reads a hook event from stdin and appends it as JSONL to `.llm/tmp/claude/hooks/$NETSCRIPT_RUN_ID/events.jsonl` (run/session scoped). Invoked by a Claude Code hook, not run by hand.            | (stdin; `NETSCRIPT_RUN_ID`, `CLAUDE_SESSION_ID` env)                |
 
 The rest of the suite (Codex launch/watch/resume, OpenHands dispatch/status/verdict, GitHub
 PR/watch/ token, the WSL foundation, and the runtime doctor/repair/canaries) is documented per-tool
 in the suite [`README`](./agentic/README.md) and indexed in `.llm/harness/workflow/tooling.md`.
-`claude/validate-claude-surface.ts` is the F1 fitness gate for any change to Claude configuration,
-skills, hooks, or agent-orchestration docs (see `CLAUDE.md`).
+`maint/claude/validate-claude-surface.ts` is the F1 fitness gate for any change to Claude
+configuration, skills, hooks, or agent-orchestration docs (see `CLAUDE.md`).
 
 ## Supervisor watch (`watch-run.ts`)
 
@@ -212,21 +213,21 @@ Defaults: `--files worklog.md`, `--timeout-seconds 1800`. See
 
 ## Tool index
 
-| Tool                                        | Use                                                                                                      |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `run-deno-doc-lint.ts`                      | Structured `deno doc --lint` runner with per-entrypoint + per-file attribution.                          |
-| `run-deno-check.ts`                         | Scoped `deno check` runner and parser for saved, stdin, or wrapped command output.                       |
-| `run-deno-lint.ts`                          | Scoped lint runner with grouped JSON findings.                                                           |
-| `run-deno-fmt.ts`                           | Scoped fmt runner with non-mutating `--check` default.                                                   |
-| `harness/watch-run.ts`                      | Background supervisor wake: exit on run-dir change, heartbeat on timeout.                                |
-| `git/git-commit-paths.ts`                   | Commit/push selected paths without Windows shell quoting issues.                                         |
-| `e2e/scaffold-e2e-test.ts`                  | Retained independent behavioral scaffold diagnostic; not a merge gate.                                   |
-| `deps/*.ts`                                 | Dependency-version, dead-import, audit, and prod-install decisions (see above).                          |
-| `agentic/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, the repo-skill bridge, and hook lock hygiene.          |
-| `agentic/claude/claude-hook-log.ts`         | Append Claude hook events as run-scoped JSONL (hook target).                                             |
-| `agentic/claude/claude-remote-smoke.ts`     | Fast Claude CLI/remote-control smoke, with env-aware skip and optional live `--bg` launch.               |
-| `agentic/config/*.ts`                       | Single source for volatile values (models, versions, endpoints); see the suite README's Maintenance map. |
-| `agentic/**` (rest)                         | Codex/OpenHands/GitHub lanes, WSL foundation, runtime controller — see `agentic/README.md`.              |
-| `CLEANUP-PLAYBOOK.md`                       | Operational spec to clean up any `.llm/tools/` folder to the agentic standard.                           |
+| Tool                                      | Use                                                                                                      |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `run-deno-doc-lint.ts`                    | Structured `deno doc --lint` runner with per-entrypoint + per-file attribution.                          |
+| `run-deno-check.ts`                       | Scoped `deno check` runner and parser for saved, stdin, or wrapped command output.                       |
+| `run-deno-lint.ts`                        | Scoped lint runner with grouped JSON findings.                                                           |
+| `run-deno-fmt.ts`                         | Scoped fmt runner with non-mutating `--check` default.                                                   |
+| `harness/watch-run.ts`                    | Background supervisor wake: exit on run-dir change, heartbeat on timeout.                                |
+| `git/git-commit-paths.ts`                 | Commit/push selected paths without Windows shell quoting issues.                                         |
+| `e2e/scaffold-e2e-test.ts`                | Retained independent behavioral scaffold diagnostic; not a merge gate.                                   |
+| `deps/*.ts`                               | Dependency-version, dead-import, audit, and prod-install decisions (see above).                          |
+| `maint/claude/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, the repo-skill bridge, and hook lock hygiene.          |
+| `maint/claude/claude-hook-log.ts`         | Append Claude hook events as run-scoped JSONL (hook target).                                             |
+| `agentic/claude/claude-remote-smoke.ts`   | Fast Claude CLI/remote-control smoke, with env-aware skip and optional live `--bg` launch.               |
+| `agentic/config/*.ts`                     | Single source for volatile values (models, versions, endpoints); see the suite README's Maintenance map. |
+| `agentic/**` (rest)                       | Codex/OpenHands/GitHub lanes, WSL foundation, runtime controller — see `agentic/README.md`.              |
+| `CLEANUP-PLAYBOOK.md`                     | Operational spec to clean up any `.llm/tools/` folder to the agentic standard.                           |
 
 See `.llm/tools/entry.md` for examples and selection notes.

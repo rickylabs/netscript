@@ -1,10 +1,11 @@
 /** Read-only review-thread reporter and unanswered-thread merge gate. */
 
-import { GITHUB_GRAPHQL_API_URL } from '../config/endpoints.ts';
-import { resolveGithubToken } from '../lib/agentic-lib.ts';
-import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+import { resolveGithubToken } from '../release/github-api.ts';
 
-interface Options {
+const GITHUB_GRAPHQL_API_URL = 'https://api.github.com/graphql';
+const TASK_SEPARATOR = '--';
+
+export interface ReviewThreadOptions {
   repo: string;
   pr: number;
   token?: string;
@@ -156,8 +157,10 @@ function extractSeverity(body: string): string | null {
     ?.toLowerCase() ?? null;
 }
 
-function parseArgs(args: readonly string[]): Options {
-  args = normalizeTaskArguments(args);
+/** Parse gate argv; accepts one leading task separator and rejects every later one. */
+export function parseReviewThreadArgs(argv: readonly string[]): ReviewThreadOptions {
+  const args = argv[0] === TASK_SEPARATOR ? argv.slice(1) : [...argv];
+  if (args.includes(TASK_SEPARATOR)) throw new Error(`Unknown argument: ${TASK_SEPARATOR}`);
   let repo = readEnv('GITHUB_REPOSITORY') ?? '';
   let pr = 0;
   let token: string | undefined;
@@ -218,7 +221,7 @@ function printReport(report: ReviewThreadReport, pretty: boolean): void {
 }
 
 async function main(): Promise<void> {
-  const options = parseArgs(Deno.args);
+  const options = parseReviewThreadArgs(Deno.args);
   const token = options.token ?? readEnv('GITHUB_TOKEN') ?? readEnv('GH_TOKEN') ??
     (await resolveGithubToken()).token;
   const threads = await fetchReviewThreads(options.repo, options.pr, token);

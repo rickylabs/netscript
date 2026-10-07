@@ -1,9 +1,8 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
-import { COPILOT_CATALOG_FIXTURE } from '../runtime/test-fixtures.ts';
 import { evaluateCopilotExpense } from '../runtime/subscription-expense.ts';
-import { ownerMatrixOverrideWorklogEntry } from '../runtime/delegation-matrix.ts';
+import { ownerMatrixOverrideWorklogEntry } from '@harness/matrix';
 import {
   openCodeChildEnvironment,
   opencodeRunArguments,
@@ -59,7 +58,7 @@ Deno.test('Copilot launch reserves after attestation and writes pending identity
           assertEquals(options.args?.slice(-2), ['--variant', 'high']);
           assertEquals(JSON.stringify(options).includes('never-retain'), false);
           return new Deno.Command(Deno.execPath(), {
-            args: ['eval', 'void 0'],
+            args: ['eval', 'console.log("fixture answer")'],
             stdout: 'piped',
             stderr: 'null',
           }).spawn();
@@ -263,6 +262,7 @@ Deno.test('paid OpenCode Go route accepts a fresh live allowance decision', asyn
     },
     {
       env: { OPENCODE_API_KEY: 'opaque' },
+      listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
       fetch: () =>
         Promise.resolve(Response.json({
           usage: {
@@ -412,6 +412,7 @@ Deno.test('denied paid-route expense decision prevents OpenCode process spawn', 
         false,
         {
           env: { OPENCODE_API_KEY: 'opaque' },
+          listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
           fetch: () =>
             Promise.resolve(Response.json({
               usage: {
@@ -447,7 +448,7 @@ Deno.test('unproven live Go usage prevents OpenCode process spawn', async () => 
         runOpenCode(
           {
             message: 'do not dispatch',
-            model: ROUTING_MODEL_IDS.grok46Go,
+            model: ROUTING_MODEL_IDS.grok47Go,
             variant: 'xhigh',
             workloadTier: 'architecture',
             workloadRole: 'implementation_evaluation',
@@ -460,6 +461,7 @@ Deno.test('unproven live Go usage prevents OpenCode process spawn', async () => 
           false,
           {
             env: { OPENCODE_API_KEY: 'opaque' },
+            listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
             fetch: response,
             spawn: () => {
               spawnCalls++;
@@ -481,7 +483,7 @@ Deno.test('privileged OpenCode workload cannot reach usage fetch or spawn withou
       runOpenCode(
         {
           message: 'misclassified architecture review',
-          model: ROUTING_MODEL_IDS.grok46Go,
+          model: ROUTING_MODEL_IDS.grok47Go,
           variant: 'xhigh',
           workloadTier: 'architecture',
           workloadRole: 'implementation_evaluation',
@@ -490,6 +492,7 @@ Deno.test('privileged OpenCode workload cannot reach usage fetch or spawn withou
         false,
         {
           env: { OPENCODE_API_KEY: 'opaque' },
+          listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
           fetch: () => {
             fetchCalls++;
             return Promise.resolve(Response.json({}));
@@ -515,7 +518,7 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
       runOpenCode(
         {
           message: 'do not relabel Grok as routine work',
-          model: ROUTING_MODEL_IDS.grok46Go,
+          model: ROUTING_MODEL_IDS.grok47Go,
           variant: 'xhigh',
           workloadTier: 'feature',
           workloadRole: 'implementation_evaluation',
@@ -524,6 +527,7 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
         false,
         {
           env: { OPENCODE_API_KEY: 'opaque' },
+          listModels: () => Promise.resolve(Object.values(ROUTING_MODEL_IDS).join('\n')),
           fetch: () => {
             fetchCalls++;
             return Promise.resolve(Response.json({}));
@@ -539,4 +543,132 @@ Deno.test('model outside the selected matrix cell cannot reach usage fetch or sp
   );
   assertEquals(fetchCalls, 0);
   assertEquals(spawnCalls, 0);
+});
+
+Deno.test('missing configured evaluator catalog never reaches expense or inference', async () => {
+  let expenseCalls = 0;
+  let spawnCalls = 0;
+  const model = ROUTING_MODEL_IDS.museSpark13StandardOpenRouter;
+  await assertRejects(
+    () =>
+      runOpenCode(
+        {
+          message: 'do not launch',
+          model,
+          variant: 'max',
+          workloadTier: 'feature',
+          workloadRole: 'implementation_evaluation',
+          estimatedCostUsd: 0.1,
+          usageSnapshotPath: 'usage.json',
+          cwd: '.',
+        },
+        false,
+        {
+          env: { OPENROUTER_API_KEY: 'test-only', GH_TOKEN: 'do-not-forward' },
+          listModels: (_binary, options) => {
+            assertEquals(options.env?.GH_TOKEN, 'do-not-forward');
+            // Provider credential isolation and dispatch environment sanitization remain separate guards.
+            assertEquals(options.env?.OPENAI_API_KEY, undefined);
+            return Promise.resolve(ROUTING_MODEL_IDS.museSpark13OpenRouter);
+          },
+          readTextFile: () => {
+            expenseCalls++;
+            throw new Error('must not reach expense');
+          },
+          spawn: () => {
+            spawnCalls++;
+            throw new Error('must not launch');
+          },
+        },
+      ),
+    Error,
+    'launcher-model-absent',
+  );
+  assertEquals(expenseCalls, 0);
+  assertEquals(spawnCalls, 0);
+});
+
+Deno.test('configured Go evaluator refuses rc0 empty/whitespace/metadata output in both capture modes', async () => {
+  const cwd = await Deno.makeTempDir();
+  const model = ROUTING_MODEL_IDS.grok47Go;
+  try {
+    for (const capture of [false, true]) {
+      for (
+        const [format, output, expected] of [
+          ['default', '', 3],
+          ['default', ' \t\n', 3],
+          ['default', 'fixture answer\n', 0],
+          ['json', JSON.stringify({ type: 'step_finish', part: { reason: 'stop' } }) + '\n', 3],
+          [
+            'json',
+            JSON.stringify({ type: 'text', part: { type: 'text', text: 'Verdict: PASS' } }) + '\n',
+            0,
+          ],
+        ] as const
+      ) {
+        const diagnostics: string[] = [];
+        const forwarded: number[] = [];
+        const result = await runOpenCode(
+          {
+            message: 'synthetic evaluator only',
+            model,
+            variant: 'xhigh',
+            cwd,
+            format,
+            workloadTier: 'architecture',
+            workloadRole: 'implementation_evaluation',
+            estimatedCostUsd: 0.1,
+            privilegedTierAuthorization: {
+              authorizer: 'owner',
+              rationale: 'Synthetic guarded output test only',
+            },
+          },
+          capture,
+          {
+            env: { HOME: cwd, OPENCODE_API_KEY: 'fixture-credential' },
+            now: () => '2026-10-01T00:00:00.000Z',
+            listModels: () => Promise.resolve(model + '\n'),
+            fetch: () =>
+              Promise.resolve(Response.json({
+                usage: {
+                  rolling: { percent: 1, status: 'ok' },
+                  weekly: { percent: 1, status: 'ok' },
+                  monthly: { percent: 1, status: 'ok' },
+                },
+              })),
+            writeStdout: (bytes) => {
+              forwarded.push(...bytes);
+              return Promise.resolve(bytes.length);
+            },
+            reportOutputFailure: (message) => diagnostics.push(message),
+            spawn: (_binary, options) => {
+              assertEquals(options.stdout, 'piped');
+              return new Deno.Command(Deno.execPath(), {
+                args: [
+                  'eval',
+                  `await Deno.stdout.write(new TextEncoder().encode(${JSON.stringify(output)}))`,
+                ],
+                stdout: 'piped',
+                stderr: 'null',
+              }).spawn();
+            },
+          },
+        );
+        assertEquals(result.code, expected);
+        assertEquals(result.stdout, capture ? output : undefined);
+        assertEquals(new TextDecoder().decode(new Uint8Array(forwarded)), capture ? '' : output);
+        assertEquals(diagnostics.length, expected === 0 ? 0 : 1);
+        if (expected !== 0) {
+          assertEquals(result.failure, 'empty-answer');
+          assertEquals(
+            diagnostics[0],
+            `opencode-empty-answer: model ${model} produced no verified answer output`,
+          );
+          assertEquals(diagnostics[0].includes('fixture-credential'), false);
+        }
+      }
+    }
+  } finally {
+    await Deno.remove(cwd, { recursive: true });
+  }
 });

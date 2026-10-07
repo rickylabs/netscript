@@ -11,6 +11,16 @@ import {
 } from './hybrid-launcher.ts';
 import { HYBRID_PROCESS_GROUP_BINARIES } from './hybrid-opencode-adapter.ts';
 
+function childDenoDir(): string {
+  const configured = Deno.env.get('DENO_DIR');
+  if (configured) return configured;
+  const cacheHome = Deno.env.get('XDG_CACHE_HOME');
+  if (cacheHome) return `${cacheHome}/deno`;
+  const home = Deno.env.get('HOME');
+  if (!home) throw new Error('HOME or DENO_DIR is required for the MCP test child');
+  return `${home}/.cache/deno`;
+}
+
 Deno.test('hybrid launcher parses only absolute cwd and bounded name', () => {
   assertEquals(parseHybridLaunchOptions(['--cwd', '/repo', '--name', 'loopback']), {
     cwd: '/repo',
@@ -83,7 +93,11 @@ Deno.test('generated MCP permission argv starts the real stdio server', async ()
     const definition = config.mcpServers['netscript-hybrid'];
     const child = new Deno.Command(definition.command, {
       args: definition.args,
-      env: { HOME: '/home/test', PATH: Deno.env.get('PATH') ?? '/usr/bin' },
+      env: {
+        HOME: '/home/test',
+        PATH: Deno.env.get('PATH') ?? '/usr/bin',
+        DENO_DIR: childDenoDir(),
+      },
       clearEnv: true,
       stdin: 'piped',
       stdout: 'piped',
@@ -128,6 +142,7 @@ Deno.test('exact MCP permissions cancel a stubborn worker group without an orpha
       env: {
         HOME: '/home/test',
         PATH: Deno.env.get('PATH') ?? '/usr/bin',
+        DENO_DIR: childDenoDir(),
         OPENROUTER_API_KEY: 'test-only-not-used',
         OPENCODE_BIN: fixture,
         OPENCODE_CONFIG: pidFile,

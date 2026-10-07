@@ -83,7 +83,7 @@ const RULES: readonly Rule[] = [
   },
   {
     test: re(
-      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|packages\/mcp\/tests\/fixtures\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/aspire-13\.5\.3-fixture\.ts|\.llm\/tools\/agentic\/teardown\/probes_test\.ts)$/,
+      /^(packages\/cli\/e2e\/src\/application\/gates\/scaffold\/service-env\/service-env-evidence_test\.ts|packages\/cli\/e2e\/tests\/application\/gates\/generated-app-endpoint_test\.ts|packages\/mcp\/tests\/service-endpoint-source-fixtures\.ts|packages\/mcp\/tests\/telemetry-live-fixture_test\.ts|packages\/mcp\/tests\/fixtures\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/README\.md|packages\/mcp\/tests\/fixtures\/telemetry\/aspire-13\.5\.3-fixture\.ts|\.llm\/tools\/maint\/teardown\/probes_test\.ts)$/,
     ),
     cls: 'compat-fixture',
     owner: 'S3',
@@ -103,7 +103,7 @@ const RULES: readonly Rule[] = [
       'validation test data: the 13.4.6 literals are fixtures the parity/compat checkers assert on, kept beside their 13.5.3 cases; parity phase 2 asserts the 13.5.3 case exists, not the absence of 13.4.6',
   },
   {
-    test: re(/^\.llm\/tools\/agentic\/teardown\/__fixtures__\/README\.md$/),
+    test: re(/^\.llm\/tools\/maint\/teardown\/__fixtures__\/README\.md$/),
     cls: 'compat-fixture',
     owner: 'S7',
     disposition:
@@ -321,7 +321,7 @@ const RULES: readonly Rule[] = [
     test: starts('.agents/generated/'),
     cls: 'skill:dogfood-bundle',
     owner: 'S9',
-    disposition: 'regenerate via agentic:dogfood-skills',
+    disposition: 'regenerate via maint:dogfood-skills',
   },
   {
     test: re(/^\.(agents|claude)\/skills\/aspire\//),
@@ -372,9 +372,9 @@ const RULES: readonly Rule[] = [
     owner: 'S1',
     disposition: 'toolchain.env pins / templates mention; parity phase 1 enforce for toolchain.env',
   },
-  // ---- agentic tooling ----
+  // ---- maintainer and agentic tooling ----
   {
-    test: starts('.llm/tools/agentic/teardown/'),
+    test: starts('.llm/tools/maint/teardown/'),
     cls: 'teardown',
     owner: 'S7',
     disposition: 'orphan cleanup, stop --force, descendants, MCP_COMMAND regex, 13.5.3 fixture',

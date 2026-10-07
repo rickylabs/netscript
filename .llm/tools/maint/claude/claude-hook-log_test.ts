@@ -198,7 +198,7 @@ for (const event of HOOK_EVENTS) {
     );
     const decoyLogger = join(
       decoyCwd,
-      '.llm/tools/agentic/claude/claude-hook-log.ts',
+      '.llm/tools/maint/claude/claude-hook-log.ts',
     );
     try {
       await Deno.mkdir(dirname(decoyLogger), { recursive: true });
@@ -228,7 +228,7 @@ for (const event of HOOK_EVENTS) {
     if (handler.args === undefined) {
       assertStringIncludes(
         handler.command,
-        '.llm/tools/agentic/claude/claude-hook-log.ts',
+        '.llm/tools/maint/claude/claude-hook-log.ts',
         `${event} current relative logger path`,
       );
       return;
@@ -240,7 +240,7 @@ for (const event of HOOK_EVENTS) {
       '--no-prompt',
       '--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID',
       '--allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks',
-      '${CLAUDE_PROJECT_DIR}/.llm/tools/agentic/claude/claude-hook-log.ts',
+      '${CLAUDE_PROJECT_DIR}/.llm/tools/maint/claude/claude-hook-log.ts',
     ]);
   });
 }
@@ -253,9 +253,9 @@ Deno.test('owned Claude hook files contain no host-specific home path', async ()
   const ownedFiles = [
     '.claude/settings.json',
     'deno.json',
-    '.llm/tools/agentic/claude/claude-hook-log.ts',
-    '.llm/tools/agentic/claude/claude-hook-log_test.ts',
-    '.llm/tools/agentic/claude/validate-claude-surface.ts',
+    '.llm/tools/maint/claude/claude-hook-log.ts',
+    '.llm/tools/maint/claude/claude-hook-log_test.ts',
+    '.llm/tools/maint/claude/validate-claude-surface.ts',
     '.llm/tools/agentic/README.md',
   ];
   for (const file of ownedFiles) {

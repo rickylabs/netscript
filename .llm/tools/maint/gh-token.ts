@@ -22,21 +22,17 @@
  * written to a tracked file, passed on argv, logged, or echoed.
  *
  * Usage:
- *   deno run --allow-run --allow-env --allow-net .llm/tools/agentic/github/gh-token.ts check
+ *   deno run --allow-run --allow-env --allow-net .llm/tools/maint/gh-token.ts check
  *   <pat-source> | deno run --allow-run --allow-env --allow-net \
- *     .llm/tools/agentic/github/gh-token.ts store [--wsl-user codex] [--skip-wsl] [--skip-gcm]
+ *     .llm/tools/maint/gh-token.ts store [--wsl-user codex] [--skip-wsl] [--skip-gcm]
  *
  * Exit codes: 0 = ok · 1 = no valid token / store failure · 2 = usage error ·
  * 3 = stdin token did not validate.
  */
 
-import {
-  resolveGithubToken,
-  resolveWslCommand,
-  validateGithubToken,
-  wslUser,
-} from '../lib/agentic-lib.ts';
-import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+import { resolveGithubToken, validateGithubToken, wslUser } from '../release/github-api.ts';
+import { normalizeTaskArguments } from './task-arguments.ts';
+import { resolveWslCommand } from './wsl-command.ts';
 
 type Sub = 'check' | 'store';
 

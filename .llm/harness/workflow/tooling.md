@@ -64,14 +64,18 @@ ad-hoc `wsl.exe`). Each tool is exposed as a `deno task`; run with `--help` for 
 The suite is concern-grouped — `codex/`, `opencode/`, `openhands/`, `github/`, `wsl/`, `claude/`,
 the runtime controller `runtime/` + its `runtime/cli/` entry points, and `lib/`; its `README.md` is
 the map. Everything volatile is centralized in `.llm/tools/agentic/config/` (model ids, tool
-versions, endpoints, subscription limits), with the workload/coordinator matrix in
-`runtime/delegation-matrix.ts` and its resolver in `runtime/routing-policy.ts`; change a
-model/version/endpoint only at its documented authority. See the suite README's "Maintenance map".
+versions, endpoints, subscription limits), with the workload/coordinator matrix pinned from Harness
+and the NetScript resolver in `runtime/routing-policy.ts`; change a model/version/endpoint only at
+its documented authority. See the suite README's "Maintenance map".
 
 **Symptom: “my PR is green but should not merge yet.”** Run
-`deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The
-read-only gate exposes silent review findings before merge: a reply or reasoned decline counts as
-answered, UI resolution is irrelevant, and outdated threads are listed but do not block.
+`deno task check:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The read-only
+gate exposes silent review findings before merge: a reply or reasoned decline counts as answered, UI
+resolution is irrelevant, and outdated threads are listed but do not block.
+
+`maint:` rows are NetScript maintainer tools under `.llm/tools/maint/` (Decision M keeps them in
+NetScript); their Tool column gives the path from `.llm/tools/`. The other rows are the agentic
+suite.
 
 | Task                                | Tool                                      | Use                                                                                                |
 | ----------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -84,10 +88,9 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | `agentic:openhands-status`          | `openhands-status.ts`                     | read an OpenHands run's verdict (local trace or remote comment)                                    |
 | `agentic:gh-pr`                     | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
 | `agentic:gh-watch`                  | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
-| `agentic:gh-token`                  | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
-| `agentic:review-threads`            | `review-threads.ts`                       | list all PR review threads and fail while a current thread has no reply                            |
-| `agentic:claude-hook-log`           | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
-| `agentic:check-claude`              | `validate-claude-surface.ts`              | validate Claude config, the single repo-skill bridge, and hooks                                    |
+| `maint:gh-token`                    | `maint/gh-token.ts`                       | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
+| `maint:claude-hook-log`             | `maint/claude/claude-hook-log.ts`         | append Claude Code hook events to the run's hook log                                               |
+| `maint:check-claude`                | `maint/claude/validate-claude-surface.ts` | validate Claude config, the single repo-skill bridge, and hooks                                    |
 | `agentic:smoke-claude-remote`       | `claude-remote-smoke.ts`                  | smoke the Claude remote launch path                                                                |
 | `agentic:opencode`                  | `opencode-run.ts`                         | run a general OpenCode turn; paid routes require fresh usage proof before spawn                    |
 | `agentic:expense-watch`             | `runtime/cli/expense-watch.ts`            | emit a structured, fail-closed Go/Ollama/OpenRouter allowance decision                             |
@@ -95,7 +98,7 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | `agentic:opencode-web`              | `opencode-web.ts`                         | host OpenCode's browser UI; loopback default, password required for LAN/mDNS exposure              |
 | `agentic:runtime`                   | `runtime/cli/agentic-runtime.ts`          | desired-state controller: `doctor` / `status` / `repair codex-remote` (inspect-first; `--dry-run`) |
 | `agentic:routing-state`             | `runtime/cli/routing-state.ts`            | read-only view of persisted quota-fallback routing state                                           |
-| `agentic:matrix`                    | `runtime/cli/delegation-matrix-table.ts`  | render/query the pinned Harness matrix by tier, role, fallback model, or structured JSON           |
+| `agentic:matrix`                    | Harness `matrix/cli/matrix-view.ts`       | render/query the pinned Harness matrix by tier, role, fallback model, or structured JSON           |
 | `agentic:antigravity-evidence`      | `runtime/cli/antigravity-evidence-cli.ts` | run/aggregate bounded Antigravity evidence-lane probes                                             |
 | `agentic:provider-canary`           | `runtime/cli/provider-canary.ts`          | statically validate every OpenRouter preset; `--live` opts into one bounded provider turn          |
 | `agentic:claude-openrouter`         | `claude/openrouter-run.ts`                | run the formal bounded Claude/OpenRouter print-turn transport                                      |

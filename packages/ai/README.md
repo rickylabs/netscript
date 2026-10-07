@@ -111,11 +111,11 @@ import '@netscript/ai/anthropic'; // side effect: registers 'anthropic'
 import { getModel, getModelProvider } from '@netscript/ai';
 
 // Resolve a model handle through the registry.
-const handle = await getModel('anthropic:claude-sonnet-4-5');
+const handle = await getModel('anthropic:claude-sonnet-5-5');
 
 // Or construct a configured provider (apiKey falls back to ANTHROPIC_API_KEY).
 const provider = getModelProvider('anthropic', { apiKey: Deno.env.get('ANTHROPIC_API_KEY') });
-const client = provider.createChatClient?.('claude-sonnet-4-5');
+const client = provider.createChatClient?.('claude-sonnet-5-5');
 ```
 
 The OpenAI-compatible provider reaches any endpoint that speaks the OpenAI Chat Completions or
@@ -145,7 +145,7 @@ const loop = createAgentLoop({
 const abort = new AbortController();
 for await (
   const chunk of loop.run(
-    { model: 'anthropic:claude-sonnet-4-5', messages },
+    { model: 'anthropic:claude-sonnet-5-5', messages },
     { signal: abort.signal, maxSteps: 8 },
   )
 ) {
@@ -182,7 +182,7 @@ declare const messages: Message[];
 
 for await (
   const chunk of createAgentLoop({ modelProvider, tools }).run({
-    model: 'anthropic:claude-sonnet-4-5',
+    model: 'anthropic:claude-sonnet-5-5',
     messages,
     context: { documentIds: ['doc_41', 'doc_42'], tenantId: 'acme' },
   })

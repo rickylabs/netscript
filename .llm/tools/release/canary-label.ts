@@ -1,5 +1,6 @@
 import { readRegistryVersions } from './canary.ts';
 import { runCommand } from './prepare-release.ts';
+import { GITHUB_API_BASE_URL } from './config/endpoints.ts';
 
 export const CANARY_LABEL_PREFIX = 'canary:';
 const CANARY_VERSION_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-canary\.(0|[1-9]\d*)$/;
@@ -420,7 +421,7 @@ class GitHubClient {
   }
 
   private async request<T = unknown>(method: string, path: string, body?: unknown): Promise<T> {
-    const response = await fetch(`https://api.github.com${path}`, {
+    const response = await fetch(`${GITHUB_API_BASE_URL}${path}`, {
       method,
       headers: {
         accept: 'application/vnd.github+json',

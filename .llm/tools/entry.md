@@ -67,22 +67,22 @@ command map.
 
 ## Full CLI E2E
 
-## Run resource hygiene (`agentic/teardown/`)
+## Run resource hygiene (`maint/teardown/`)
 
 When a run failed and you do not know what is still running, `behavior.service-health` timed out,
 ports are already in use, or a `postgres-*` container appeared that you did not start:
 
-- `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>` is read-only. It
+- `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>` is read-only. It
   writes `leak-report.md` and emits JSON for every Aspire survivor, including foreign and
   unknown-owner resources.
-- `deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>` is a dry run.
+- `deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree>` is a dry run.
 - Add `--apply` only to stop resources positively proven to belong to that run. AppHosts are stopped
   one path at a time; containers are re-inspected and removed one id at a time.
 
 If ownership is `foreign` or `unproven`, leave the resource alone and use the report's exact command
 only after a human verifies the apparent owner.
 
-`deno task agentic:dogfood-skills` installs the local CLI's exact `agent init` consumer bundle under
+`deno task maint:dogfood-skills` installs the local CLI's exact `agent init` consumer bundle under
 `.agents/generated/consumer-skills/`; the generated surface follows the CLI bundle instead of
 forking its skill content.
 

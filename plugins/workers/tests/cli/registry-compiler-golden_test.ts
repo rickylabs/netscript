@@ -134,6 +134,7 @@ function createLocalJobDefinition<TId extends string, THandler extends SchemaBac
   id: TId,
   entrypoint: string,
   handler: THandler,
+  policy?: RegisterJobInput & { readonly id: TId },
 ): GeneratedJobDefinition<TId, THandler> {
   return {
     id,
@@ -156,6 +157,7 @@ function createLocalJobDefinition<TId extends string, THandler extends SchemaBac
     tags: [],
     metadata: undefined,
     retention: undefined,
+    ...policy,
     handler,
     payloadSchema: handler.payloadSchema,
   };

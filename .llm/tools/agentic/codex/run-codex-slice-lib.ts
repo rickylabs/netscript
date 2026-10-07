@@ -1,5 +1,5 @@
 import type { CodexFailure } from './classify-codex-failure.ts';
-import type { LeakReport } from '../teardown/leak-check.ts';
+import type { LeakReport } from '../../maint/teardown/leak-check.ts';
 
 export interface SliceBudgets {
   readonly maxTurns: number;

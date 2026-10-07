@@ -92,7 +92,7 @@ outcome.
 ## Commands
 
 ```powershell
-deno task agentic:check-claude
+deno task maint:check-claude
 deno task agentic:smoke-claude-remote -- --pretty
 deno task agentic:claude-openrouter-gateway -- --cwd <path> [--resume <id> --fork-session]
 deno task agentic:claude-hybrid -- --cwd <absolute-path> [--name <label>]

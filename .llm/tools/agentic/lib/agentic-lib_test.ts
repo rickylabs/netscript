@@ -13,23 +13,15 @@
 
 import {
   appendVerdictContractEpilogue,
-  buildGithubTokenResolutionError,
   buildMergeBody,
-  buildMissingGithubNetPermissionMessage,
   buildOpenHandsComment,
-  buildPullRequestBody,
-  buildWslCommand,
   evaluateCurrentHeadImplEvalGate,
   evaluateGitSafety,
   extractVerdict,
   extractVerdictResult,
-  formatGithubTokenAttempt,
-  GITHUB_NET_PERMISSION_FLAG,
   type GitInfo,
   inspectMachineVerdict,
-  isMissingGithubNetPermission,
   parseEvalVerdict,
-  parseGithubHostsOauthToken,
   parseOpenHandsStatusComment,
   parseRepoSlug,
   parseThreadInfo,
@@ -46,7 +38,6 @@ import {
 } from './agentic-lib.ts';
 import { assert, assertEquals, assertThrows } from '@std/assert';
 import { LEGACY_OPENROUTER_MODEL_IDS, OPENROUTER_MODEL_IDS } from '../config/models.ts';
-import { formatReleasePrCreationError } from '../../release/cut.ts';
 
 const here = new URL('.', import.meta.url).pathname;
 // On Windows the pathname is like /C:/...; strip the leading slash for Deno.readTextFile.
@@ -59,47 +50,6 @@ Deno.test('winToWsl maps a Windows path to /mnt', () => {
 });
 Deno.test('winToWsl passes through a POSIX path', () => {
   assertEquals(winToWsl('/home/codex/repos/wt'), '/home/codex/repos/wt');
-});
-
-// --- host-aware WSL command planning -------------------------------------
-Deno.test('buildWslCommand selects local bash argv on Linux', () => {
-  assertEquals(
-    buildWslCommand('codex', 'echo ok', { os: 'linux', currentUser: 'codex' }),
-    { bin: 'bash', args: ['-lc', 'echo ok'], cwd: undefined },
-  );
-});
-Deno.test('buildWslCommand preserves Windows wsl.exe argv', () => {
-  assertEquals(
-    buildWslCommand('codex', 'echo ok', { os: 'windows', currentUser: 'someone-else' }),
-    { bin: 'wsl.exe', args: ['-u', 'codex', '--', 'bash', '-lc', 'echo ok'] },
-  );
-});
-Deno.test('buildWslCommand maps cwd locally and to Windows --cd', () => {
-  assertEquals(
-    buildWslCommand('codex', 'pwd', {
-      os: 'linux',
-      currentUser: 'codex',
-      cwd: '/home/codex/repo',
-    }),
-    { bin: 'bash', args: ['-lc', 'pwd'], cwd: '/home/codex/repo' },
-  );
-  assertEquals(
-    buildWslCommand('codex', 'pwd', { os: 'windows', cwd: '/home/codex/repo' }),
-    {
-      bin: 'wsl.exe',
-      args: ['-u', 'codex', '--cd', '/home/codex/repo', '--', 'bash', '-lc', 'pwd'],
-    },
-  );
-});
-Deno.test('buildWslCommand rejects a local requested-user mismatch', () => {
-  let message = '';
-  try {
-    buildWslCommand('codex', 'true', { os: 'linux', currentUser: 'alice' });
-  } catch (error) {
-    message = (error as Error).message;
-  }
-  assert(message.includes('requested user "codex"'), message);
-  assert(message.includes('current Linux user is "alice"'), message);
 });
 
 // --- machine/env config seam ---------------------------------------------
@@ -132,47 +82,6 @@ Deno.test('NETSCRIPT_WSL_USER/HOME override the defaults', () => {
     if (prevHome !== undefined) Deno.env.set('NETSCRIPT_WSL_HOME', prevHome);
     else Deno.env.delete('NETSCRIPT_WSL_HOME');
   }
-});
-
-Deno.test('gh hosts fallback extracts only github.com oauth_token without exposing siblings', () => {
-  const synthetic = [
-    'example.com:',
-    '    oauth_token: not-the-token',
-    'github.com:',
-    '    git_protocol: https',
-    '    users:',
-    '        octocat:',
-    '    oauth_token: "synthetic-secret"',
-    '    user: octocat',
-  ].join('\n');
-  assertEquals(parseGithubHostsOauthToken(synthetic), 'synthetic-secret');
-  assertEquals(parseGithubHostsOauthToken(synthetic, 'missing.example'), null);
-  assertEquals(parseGithubHostsOauthToken('github.com:\n    oauth_token:'), null);
-});
-
-Deno.test('missing GitHub net permission is classified and rendered without auth advice', () => {
-  const permissionError = new Deno.errors.NotCapable(
-    'Requires net access to "api.github.com:443", run again with the --allow-net flag',
-  );
-  assert(isMissingGithubNetPermission(permissionError));
-  assert(!isMissingGithubNetPermission(new Deno.errors.NotCapable('Requires read access')));
-  assert(!isMissingGithubNetPermission(new Error('Requires net access to api.github.com')));
-
-  const message = buildMissingGithubNetPermissionMessage(permissionError);
-  const rendered = formatReleasePrCreationError(new Error(message));
-  assert(rendered.startsWith('release:cut could not create the release PR:'));
-  assert(rendered.includes(GITHUB_NET_PERMISSION_FLAG));
-  assert(rendered.includes(permissionError.message));
-  assert(!rendered.includes('401'));
-  assert(!rendered.includes('gh auth login'));
-});
-
-Deno.test('genuinely rejected GitHub credentials retain 401 diagnostics and auth remedy', () => {
-  const attempt = formatGithubTokenAttempt('env:GH_TOKEN', null);
-  assertEquals(attempt, 'env:GH_TOKEN (401)');
-  const message = buildGithubTokenResolutionError([attempt], 'codex');
-  assert(message.includes('(401)'));
-  assert(message.includes('gh auth login'));
 });
 
 // --- sq (bash single-quoting) --------------------------------------------
@@ -561,26 +470,7 @@ Deno.test('current-head selector fails closed for malformed or ambiguous markers
   );
 });
 
-// --- buildPullRequestBody / buildMergeBody --------------------------------
-Deno.test('buildPullRequestBody carries the core fields and omits draft when unset', () => {
-  const b = buildPullRequestBody({
-    title: 'S3',
-    head: 'feat/x',
-    base: 'feat/umbrella',
-    body: 'why',
-  });
-  assertEquals(b.title, 'S3');
-  assertEquals(b.head, 'feat/x');
-  assertEquals(b.base, 'feat/umbrella');
-  assertEquals(b.body, 'why');
-  assert(!('draft' in b), 'no draft key when unset');
-});
-Deno.test('buildPullRequestBody sets draft when requested', () => {
-  assertEquals(
-    buildPullRequestBody({ title: 't', head: 'h', base: 'b', body: '', draft: true }).draft,
-    true,
-  );
-});
+// --- buildMergeBody -------------------------------------------------------
 Deno.test('buildMergeBody passes method and pins the head sha', () => {
   const b = buildMergeBody({ method: 'merge', title: 'S3 merge', sha: 'deadbee' });
   assertEquals(b.merge_method, 'merge');

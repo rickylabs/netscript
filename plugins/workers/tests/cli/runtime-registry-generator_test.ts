@@ -467,6 +467,66 @@ createWorkersContract<GeneratedJobPayloadMap>();
   });
 });
 
+Deno.test('compile-registry loads grouped policy without dropping configured job settings', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeProjectDenoConfig(projectRoot);
+    await writeTypedJob(projectRoot, 'configured-job.ts', 'Readonly<{ value: string }>');
+    await write(
+      join(projectRoot, 'netscript.config.ts'),
+      `export default {
+      name: 'compiler-policy', databases: { config: [] },
+      workers: {
+        groups: [{ topic: 'grouped', jobs: [{ id: 'configured-id', name: 'Configured',
+          entrypoint: './configured-job.ts', source: 'local', maxRetries: 0,
+          maxConcurrency: 0, timeout: 4321, enabled: false, persist: false,
+          tags: ['retained'], metadata: { owner: 'test' },
+        }] }],
+        jobs: [{ id: 'configured-id', name: 'Flat', entrypoint: './configured-job.ts',
+          source: 'local', maxRetries: 7 }],
+      },
+    };`,
+    );
+    await compileWorkersRegistry(new LocalProjectFiles(projectRoot));
+    const module = await importRegistry(projectRoot, 'compiler-policy');
+    const definition = module.jobDefinitions.get('configured-id');
+    assertEquals(module.registry.has('configured-job'), false);
+    assertEquals(module.registry.has('configured-id'), true);
+    assertEquals(definition?.topic, 'grouped');
+    assertEquals(definition?.maxRetries, 0);
+    assertEquals(definition?.maxConcurrency, 0);
+    assertEquals(definition?.timeout, 4321);
+    assertEquals(definition?.enabled, false);
+    assertEquals(definition?.persist, false);
+    assertEquals(definition?.tags, ['retained']);
+    assertEquals(definition?.metadata, { owner: 'test' });
+    await write(
+      join(projectRoot, 'compiler-consumer.ts'),
+      `
+import { createWorkersContract } from '@netscript/plugin-workers-core/contracts/v1';
+import type { GeneratedJobPayloadMap } from './${REGISTRY_PATH}';
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+const exact: Equal<GeneratedJobPayloadMap['configured-id'], Readonly<{ value: string }>> = true;
+void exact;
+createWorkersContract<GeneratedJobPayloadMap>();
+`,
+    );
+    const output = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'check',
+        '--unstable-kv',
+        '--no-lock',
+        '--config',
+        join(projectRoot, 'deno.json'),
+        join(projectRoot, 'compiler-consumer.ts'),
+      ],
+      cwd: projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+  });
+});
+
 function jobPolicy(id: string, entrypoint: string): Readonly<Record<string, unknown>> {
   return { id, name: id, entrypoint, source: 'local' };
 }

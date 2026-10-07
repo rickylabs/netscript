@@ -138,10 +138,10 @@ Deno 2.9 makes two `deno task` features first-class; the repo uses both in root 
 6. "Any advisories?" → `deps:audit --level critical`.
 7. "My run failed and I do not know what is still running", "`behavior.service-health` timed out",
    "ports are already in use", or "there is a `postgres-*` container I did not start" → the
-   read-only `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>`; preview
-   positively owned cleanup with `deno task agentic:teardown -- ...` and require `--apply` to
+   read-only `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>`; preview
+   positively owned cleanup with `deno task maint:teardown -- ...` and require `--apply` to
    mutate.
-8. Dogfood the current consumer agent bundle → `deno task agentic:dogfood-skills`; output is owned
+8. Dogfood the current consumer agent bundle → `deno task maint:dogfood-skills`; output is owned
    by the local CLI under `.agents/generated/consumer-skills/`, not hand-authored here.
 
 For repo-native validation wrappers, gate evidence, and git ground-truth, see the

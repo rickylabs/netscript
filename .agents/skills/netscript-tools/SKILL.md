@@ -161,11 +161,11 @@ When posting automation requests, specify:
 
 If a run failed and you do not know what is still running, `behavior.service-health` timed out,
 ports are already in use, or a `postgres-*` container exists that you did not start, begin with the
-read-only `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. It reports
-owned, foreign, and unknown-owner resources. `deno task agentic:teardown -- ...` is dry-run by
+read-only `deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. It reports
+owned, foreign, and unknown-owner resources. `deno task maint:teardown -- ...` is dry-run by
 default; `--apply` is explicit and can act only on positively proven run-owned resources.
 
-Use `deno task agentic:dogfood-skills` to install the local CLI's current consumer bundle into
+Use `deno task maint:dogfood-skills` to install the local CLI's current consumer bundle into
 `.agents/generated/consumer-skills/`; never fork that bundle by hand.
 
 The supervisor drives Tier-D Codex and Tier-E OpenHands through `.llm/tools/agentic/*`, each exposed
@@ -178,7 +178,7 @@ Two are durable GitHub infra utilities worth calling out:
   supervisor turn without a polling loop kept in context. Exit codes: `0` PASS · `10` FAIL · `12`
   final-no-verdict · `13` action-run-failed · `2` timeout · `4` no-token. Use it whenever you have
   dispatched an evaluator and must wait for the verdict.
-- **`gh-token.ts`** (`deno task agentic:gh-token check|store`) — durable GitHub-token
+- **`maint/gh-token.ts`** (`deno task maint:gh-token check|store`) — durable GitHub-token
   resolver/store. `check` resolves a token from any healthy source (env candidates → `gh auth token`
   Windows/WSL → bounded GCM `git credential fill`), validates it against `GET /user`, and reports
   only the source + login (never the token). `store` reads ONE PAT from stdin and persists it to
@@ -192,11 +192,12 @@ session-safe Codex daemon repair. `deno task agentic:routing-state` reads the pe
 quota-fallback routing state.
 
 Read the pinned Harness fleet routing through `deno task agentic:matrix`, never by shell-scraping
-TypeScript. NetScript's internal launch resolver remains local until its separate migration.
-Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a direct
-evaluator lookup, `--role deep-research` for the dedicated research role, `--fallback-of
-<logical-model>` to list every context-sensitive fallback, and `--json` for structured consumption.
-The full table includes separate Deep Research default and fallback columns.
+TypeScript. NetScript's internal launch resolver and paid OpenCode guard read the same pinned
+Harness matrix. Use `--tier <tier>` for one row, `--plan-evaluator` or `--impl-evaluator` for a
+direct evaluator lookup, `--role deep-research` for the dedicated research role,
+`--fallback-of
+<logical-model>` to list every context-sensitive fallback, and `--json` for
+structured consumption. The full table includes separate Deep Research default and fallback columns.
 
 Pure UI/UX specialist routing is an explicit `ui_ux` role; incidental UI changes stay on the normal
 implementation role. Owner overrides require the typed override record and the exact grant in a
@@ -209,12 +210,13 @@ The rest of the family (`launch-codex-slice`, `codex-resume`, `codex-status`, `c
 suite is concern-grouped (`codex/`, `openhands/`, `github/`, `wsl/`, `claude/`, `runtime/` +
 `runtime/cli/`, `lib/`); its `README.md` is the canonical map.
 
-**Monthly maintenance (single source):** everything volatile lives in `.llm/tools/agentic/config/` —
-model ids in `config/models.ts`, tool versions in `config/versions.ts`, endpoints in
-`config/endpoints.ts`; routing lane→model bindings stay in `runtime/routing-policy.ts` (referencing
-the config ids). The "Maintenance map" table in the suite README says exactly where to change a
-model, version, policy, agent, or dep. A guard test (`config/no-hardcoded-volatile_test.ts`) fails
-the suite if any of these values is hardcoded outside `config/`.
+**Monthly maintenance:** fleet route model IDs live in pinned Harness; transitional local provider
+presets live in `.llm/tools/agentic/config/models.ts`, tool versions in `config/versions.ts`,
+endpoints in `config/endpoints.ts`; workload and coordinator bindings live in pinned Harness, while
+`runtime/routing-policy.ts` resolves local provider availability. The "Maintenance map" table in the
+suite README says exactly where to change a model, version, policy, agent, or dep. A guard test
+(`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is hardcoded outside
+`config/`.
 
 ## Lock Hygiene
 

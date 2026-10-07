@@ -17,7 +17,7 @@
  *   history: slidingWindowHistory({ maxMessages: 12 }),
  * });
  *
- * for await (const chunk of loop.run({ model: "anthropic:claude-sonnet-4-5", messages })) {
+ * for await (const chunk of loop.run({ model: "anthropic:claude-sonnet-5-5", messages })) {
  *   if (chunk.type === "text") console.log(chunk.delta);
  *   if (chunk.type === "done") console.log(chunk.usage);
  * }

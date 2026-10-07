@@ -15,7 +15,7 @@ import {
 } from './probes.ts';
 import { type LeakEntry, type LeakReport, runLeakCheck } from './leak-check.ts';
 import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
-import { normalizeTaskArguments } from '../lib/task-arguments.ts';
+import { normalizeTaskArguments } from '../task-arguments.ts';
 
 export interface TeardownResult {
   readonly applied: boolean;

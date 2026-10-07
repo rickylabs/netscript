@@ -1,6 +1,6 @@
 /** Fail-closed CLI gate shared by stable publish entrypoints. */
 
-import { resolveGithubToken } from '../agentic/lib/agentic-lib.ts';
+import { resolveGithubToken } from './github-api.ts';
 import { CANARY_PAIR_STATUS_CONTEXT, verifyGreenCanaryPair } from './github-release.ts';
 
 const DEFAULT_REPO = 'rickylabs/netscript';

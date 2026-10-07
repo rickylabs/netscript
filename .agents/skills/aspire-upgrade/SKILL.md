@@ -76,7 +76,7 @@ Decide the class from the **upstream what's-new page**, not from the semver digi
 | `packages/cli/e2e/tests/application/gates/fixtures/aspire-<ver>-describe-postgres.json`, `aspire-describe-follow-<ver>*.ndjson` | `describe --follow` stream incl. `healthReports`                    | one leased AppHost start, captured through `describe-follow.ts` |
 | `packages/cli/e2e/tests/fixtures/aspire-<ver>-mcp-recorded.json`                                                                | the Aspire MCP tool list (14 tools incl. `refresh_tools` at 13.5.3) | an AppHost-less stdio MCP session (`aspire mcp start`)          |
 | `packages/mcp/tests/fixtures/telemetry/aspire-<ver>-fixture.ts` (+ README)                                                      | dashboard telemetry API span/trace/log JSON                         | a leased AppHost with OTLP traffic; procedure in that README    |
-| `.llm/tools/agentic/teardown/__fixtures__/aspire-ps-<ver>.json`, `process-tree-<ver>-*.json`                                    | `aspire ps` + process tree for ownership probes                     | the leased start above                                          |
+| `.llm/tools/maint/teardown/__fixtures__/aspire-ps-<ver>.json`, `process-tree-<ver>-*.json`                                      | `aspire ps` + process tree for ownership probes                     | the leased start above                                          |
 
 Keep the previous version's fixture beside the new one where a test asserts a compat branch
 (`aspire-13.4.6-fixture.ts` stays next to `aspire-13.5.3-fixture.ts`); retire it only when the
@@ -95,7 +95,7 @@ reads only `packages/`/`plugins/` doc surfaces and is not part of this chain. Ed
 `prose.json.gz` + `provenance.json`) -> barrel (`agent-docs.generated.ts`) -> `gen:publish-assets`
 (`packages/mcp/src/publish-assets.generated.ts`); run `check:agent-docs-prose` locally before
 pushing (D-331 cost one CI cycle). Regenerate in that order on a **clean tree** (the corpus
-generator refuses a dirty read set) and run `deno task agentic:dogfood-skills` for the consumer
+generator refuses a dirty read set) and run `deno task maint:dogfood-skills` for the consumer
 bundle. Never hand-edit a `*.generated.ts`.
 
 ### Runtime evidence is leased and serialized
@@ -122,7 +122,7 @@ exact-head dual-green, and keep the head immutable once it is green.
    then `deno task check:aspire-version-parity`. Update `PHASE_TWO_COMPAT_VERSION` in the same
    commit. Findings with `status: deferred` name an owner — resolve or re-own them, do not silence.
 5. **Regenerate carriers** in chain order on a clean tree; `check:assets-barrel`,
-   `check:mcp-export-corpus`, `check:publish-assets`, `agentic:dogfood-skills:check` all exit 0.
+   `check:mcp-export-corpus`, `check:publish-assets`, `maint:dogfood-skills:check` all exit 0.
 6. **Minor/major only: re-record fixtures** (table above) under one runtime lease, diff each against
    the previous recording, and re-verify each tagged evidence key in `skills/aspire/SKILL.md`; edit
    or retag the sentence when the behavior moved.

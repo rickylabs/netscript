@@ -42,16 +42,16 @@ Multi-agent work in this repo runs on the epic #574 agentic runtime system by de
 ad-hoc shell orchestration:
 
 - **Routing is data, not prose.** The fleet matrix authority is the pinned Harness
-  `packages/routing/matrix/`; inspect it through `deno task agentic:matrix` and its row,
-  evaluator, fallback, or JSON filters. NetScript's internal launch resolver still lives in
-  `.llm/tools/agentic/runtime/routing-policy.ts` during migration. Do not shell-scrape
-  TypeScript, restate routes, or invent model fallbacks. Pure UI/UX specialization uses the
-  owner-requested `ui_ux` role. Any owner matrix override must be recorded verbatim in a harness
+  `packages/routing/matrix/`; inspect it through `deno task agentic:matrix` and its row, evaluator,
+  fallback, or JSON filters. NetScript's internal launch resolver lives in
+  `.llm/tools/agentic/runtime/routing-policy.ts` and reads that same pinned Harness matrix. Do not
+  shell-scrape TypeScript, restate routes, or invent model fallbacks. Pure UI/UX specialization uses
+  the owner-requested `ui_ux` role. Any owner matrix override must be recorded verbatim in a harness
   `.llm/runs/**/worklog.md`; it never bypasses evaluator session/family independence.
-- **Volatile values have one home per runtime.** The fleet model catalog is in pinned Harness;
-  the remaining NetScript internal runtime keeps its model ids, tool versions, and endpoints in
-  `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`). A guard test fails
-  if NetScript's internal values are hardcoded elsewhere.
+- **Volatile values have one home per runtime.** The fleet model catalog is in pinned Harness; the
+  remaining NetScript internal runtime keeps its model ids, tool versions, and endpoints in
+  `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`). A guard test fails if
+  NetScript's internal values are hardcoded elsewhere.
 - **Drive lanes through the agentic suite.** `.llm/tools/agentic/` (exposed as
   `deno task
   agentic:*`) is the only interface for launching/watching/steering Codex, dispatching
@@ -81,7 +81,7 @@ ad-hoc shell orchestration:
 
 ## Resource hygiene
 
-Dogfood the consumer-facing agent bundle with `deno task agentic:dogfood-skills`; it installs the
+Dogfood the consumer-facing agent bundle with `deno task maint:dogfood-skills`; it installs the
 current local CLI bundle under `.agents/generated/consumer-skills/`. Use that generated surface when
 present, plus the internal `.agents/skills/aspire` diagnostic skill.
 
@@ -90,14 +90,14 @@ Start from the symptom. If your run failed and you do not know what is still run
 you did not start, run the read-only reporter:
 
 ```text
-deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>
+deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree>
 ```
 
 If your PR is green but should not merge yet because review findings may have gone unanswered, run
 the read-only thread gate before pushing again:
 
 ```text
-deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty
+deno task check:review-threads -- --repo rickylabs/netscript --pr <number> --pretty
 ```
 
 It lists every thread with author, location, severity when present, and answered/unanswered state;
@@ -105,7 +105,7 @@ unanswered current threads exit non-zero. A reply—including a reasoned decline
 resolution is not required, and outdated threads do not block.
 
 Review every foreign/unknown-owner entry and leave it alone. To preview run-owned cleanup use
-`deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>`; mutation requires the
+`deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree>`; mutation requires the
 explicit `--apply` flag and remains scoped to positively proven resources.
 
 If your run starts resources from a directory outside its worktree — clean-clone verification is the
@@ -176,10 +176,10 @@ Aspire static checks target maintained framework source, shipped resources, and 
 Exclude `.llm/runs/**` (including the checker-owning run), `.llm/tmp/**`, generated agent working
 copies under `.agents/generated/**`, and transient cache/dependency/runtime state through the shared
 Aspire scan-scope policy. These exclusions do not remove or untrack the retained harness evidence.
-Do not exempt shipped generated framework source or replace functional release/runtime gates with
-a repository text sweep.
-An explicit generated-project acceptance scan uses `check-aspire-host-ports --generated-project`
-so its scaffold is still tested even when created under scratch; internal run/temp files stay excluded.
+Do not exempt shipped generated framework source or replace functional release/runtime gates with a
+repository text sweep. An explicit generated-project acceptance scan uses
+`check-aspire-host-ports --generated-project` so its scaffold is still tested even when created
+under scratch; internal run/temp files stay excluded.
 
 Run the smallest validation that proves the change. For targeted `deno check` commands that touch
 workspace code, include `--unstable-kv`.

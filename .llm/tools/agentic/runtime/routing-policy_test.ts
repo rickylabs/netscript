@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import { MODEL_IDS, NATIVE_CANARY_MODEL_ARGS, ROUTING_MODEL_IDS } from '../config/models.ts';
-import { DELEGATION_MATRIX } from './delegation-matrix.ts';
+import { DELEGATION_MATRIX } from '@harness/matrix';
 import {
   assertEvaluatorIndependence,
   CANONICAL_COORDINATOR_POLICY,
@@ -16,11 +16,26 @@ const privilegedTierAuthorization = {
   rationale: 'Recorded cross-package milestone escalation.',
 };
 
+Deno.test('active route and paid-launch policy read the pinned Harness matrix', async () => {
+  for (
+    const path of [
+      '.llm/tools/agentic/runtime/routing-policy.ts',
+      '.llm/tools/agentic/opencode/opencode-run.ts',
+    ]
+  ) {
+    const source = await Deno.readTextFile(path);
+    assertEquals(source.includes("from '@harness/matrix';"), true, path);
+    assertEquals(source.includes('runtime/delegation-matrix.ts'), false, path);
+    assertEquals(source.includes("from './delegation-matrix.ts';"), false, path);
+  }
+});
+
 Deno.test('native routes and rollout canaries use the current harness model IDs', () => {
-  assertEquals(MODEL_IDS.codexSol, 'gpt-6-sol');
+  assertEquals(MODEL_IDS.codexSol, 'gpt-6.1-sol');
   assertEquals(MODEL_IDS.codexLuna, 'gpt-6-luna');
   assertEquals(MODEL_IDS.fable, 'claude-fable-5-1');
   assertEquals(MODEL_IDS.opus, 'claude-opus-5-5');
+  assertEquals(MODEL_IDS.sonnet, 'claude-sonnet-5-5');
   assertEquals(ROUTING_MODEL_IDS.solNative, MODEL_IDS.codexSol);
   assertEquals(ROUTING_MODEL_IDS.lunaNative, MODEL_IDS.codexLuna);
   assertEquals(ROUTING_MODEL_IDS.astraNative, 'gpt-6-astra');
@@ -31,12 +46,32 @@ Deno.test('native routes and rollout canaries use the current harness model IDs'
 
   assertEquals(
     resolveWorkloadRoute({ tier: 'simple', role: 'implementation', worktree }).model,
-    MODEL_IDS.codexLuna,
+    MODEL_IDS.codexSol,
   );
   assertEquals(
     resolveWorkloadRoute({ tier: 'feature', role: 'implementation', worktree }).model,
     MODEL_IDS.codexSol,
   );
+});
+
+Deno.test('Codex uses Sol 6.1 low for trivial work, xhigh otherwise, and unchanged Astra', () => {
+  for (const tier of ['simple', 'straightforward', 'feature'] as const) {
+    const route = resolveWorkloadRoute({ tier, role: 'implementation', worktree: '.' });
+    assertEquals(
+      [route.model, route.effort],
+      ['gpt-6.1-sol', tier === 'simple' ? 'low' : 'xhigh'],
+      tier,
+    );
+  }
+  for (const [tier, effort] of [['complex', 'medium'], ['architecture', 'xhigh']] as const) {
+    const route = resolveWorkloadRoute({
+      tier,
+      role: 'implementation',
+      worktree: '.',
+      privilegedTierAuthorization,
+    });
+    assertEquals([route.model, route.effort], ['gpt-6-astra', effort], tier);
+  }
 });
 
 Deno.test('Copilot preserves native-family precedence and wins for attested non-native models', () => {
@@ -48,7 +83,7 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
   );
   assertEquals(
     resolveWorkloadRoute({ ...request, unavailableTransports: ['agy', 'github_copilot'] }).model,
-    ROUTING_MODEL_IDS.lunaNative,
+    ROUTING_MODEL_IDS.solNative,
   );
   const plan = { tier: 'feature' as const, role: 'plan' as const, worktree };
   assertEquals(resolveWorkloadRoute(plan).transport, 'claude');
@@ -77,7 +112,7 @@ Deno.test('Copilot preserves native-family precedence and wins for attested non-
       worktree,
       privilegedTierAuthorization,
     }).model,
-    ROUTING_MODEL_IDS.grok46Copilot,
+    ROUTING_MODEL_IDS.grok47Go,
   );
 });
 
@@ -120,13 +155,19 @@ Deno.test('SOL handles feature implementation while Astra stays on privileged ti
       agent: 'codex',
       provider: 'openai',
       model: ROUTING_MODEL_IDS.solNative,
-      effort: 'high',
+      effort: 'xhigh',
       worktree,
       mobileRequired: false,
       logicalModel: 'sol',
       family: 'openai',
       transport: 'codex',
-      requestedEffort: 'high',
+      requestedEffort: 'xhigh',
+      launchability: {
+        status: 'unverified',
+        launcher: 'codex',
+        model: ROUTING_MODEL_IDS.solNative,
+        reason: 'catalog-not-observed',
+      },
     },
   );
   assertEquals(
@@ -158,7 +199,7 @@ Deno.test('SOL handles feature implementation while Astra stays on privileged ti
   );
 });
 
-Deno.test('provider capability resolution honors subscription-first order', () => {
+Deno.test('standard Muse uses its verified provider without substituting a contributor', () => {
   const go = resolveWorkloadRoute({
     tier: 'feature',
     role: 'implementation_evaluation',
@@ -166,9 +207,9 @@ Deno.test('provider capability resolution honors subscription-first order', () =
     worktree,
   });
   assertEquals([go.transport, go.provider, go.model], [
-    'opencode_go',
-    'opencode_go',
-    ROUTING_MODEL_IDS.museSpark13Go,
+    'openrouter',
+    'openrouter',
+    ROUTING_MODEL_IDS.museSpark13StandardOpenRouter,
   ]);
   const ollama = resolveWorkloadRoute({
     tier: 'feature',
@@ -182,7 +223,7 @@ Deno.test('provider capability resolution honors subscription-first order', () =
   assertEquals(ollama.transport, 'claude');
 });
 
-Deno.test('deep research uses Gemini by coverage and only native Luna as fallback', () => {
+Deno.test('deep research uses Gemini by coverage and only native Sol 6.1 low as fallback', () => {
   const primary = resolveWorkloadRoute({
     tier: 'straightforward',
     role: 'deep_research',
@@ -201,7 +242,7 @@ Deno.test('deep research uses Gemini by coverage and only native Luna as fallbac
   });
   assertEquals(
     [fallback.logicalModel, fallback.transport, fallback.model, fallback.requestedEffort],
-    ['luna', 'codex', ROUTING_MODEL_IDS.lunaNative, 'max'],
+    ['sol', 'codex', ROUTING_MODEL_IDS.solNative, 'low'],
   );
 
   assertThrows(
@@ -235,7 +276,7 @@ Deno.test('same-family evaluator candidates are skipped before provider selectio
     worktree,
     privilegedTierAuthorization,
   });
-  assertEquals(plan.logicalModel, 'grok_4_6');
+  assertEquals(plan.logicalModel, 'grok_4_7');
   assertEquals(plan.effort, 'high');
 });
 
@@ -317,7 +358,7 @@ Deno.test('owner override resolves Claude Opus 5.5 high without changing a matri
   ]);
   assertEquals(DELEGATION_MATRIX.straightforward.implementation[0], {
     model: 'sol',
-    effort: 'high',
+    effort: 'xhigh',
   });
 });
 
@@ -379,10 +420,10 @@ Deno.test('unavailable providers advance inside the model capability chain', () 
 Deno.test('coordinator routes follow the dedicated matrix', () => {
   for (const tier of ['small_project', 'project', 'milestone'] as const) {
     const route = resolveCoordinatorRoute({ tier, worktree });
-    assertEquals([route.logicalModel, route.effort], ['sol', 'medium']);
+    assertEquals([route.logicalModel, route.effort], ['sol', 'xhigh']);
   }
   const framework = resolveCoordinatorRoute({ tier: 'framework', worktree });
-  assertEquals([framework.logicalModel, framework.effort], ['sol', 'high']);
+  assertEquals([framework.logicalModel, framework.effort], ['sol', 'xhigh']);
   assertEquals(
     resolveCoordinatorRoute({
       tier: 'framework',

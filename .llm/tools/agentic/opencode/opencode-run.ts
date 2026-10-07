@@ -1,7 +1,8 @@
 /** Runs one bounded, non-interactive OpenCode turn. */
 
+import { type OpenCodeOutputFailure, readOpenCodeOutput } from './opencode-answer.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
-import { COPILOT_LAUNCH_CREDIT_CAPS } from '../config/subscriptions.ts';
+import { copilotLaunchCreditCap } from '../config/subscriptions.ts';
 import { compareLaunchIdentity } from '../runtime/launch-route-identity.ts';
 export { parseOpenRouterApiKey } from '../lib/openrouter-credential.ts';
 import {
@@ -10,7 +11,11 @@ import {
 } from '../lib/provider-credential.ts';
 import { dirname, resolve } from 'node:path';
 import { prepareOpenCodeProjectEnvironment } from './opencode-project-config.ts';
-import { preflightCopilotCatalog, preflightOpenCodeMcp } from './opencode-preflight.ts';
+import {
+  preflightConfiguredOpenCodeModel,
+  preflightCopilotCatalog,
+  preflightOpenCodeMcp,
+} from './opencode-preflight.ts';
 import { normalizeTaskArguments } from '../lib/task-arguments.ts';
 import {
   evaluateSubscriptionExpense,
@@ -32,7 +37,7 @@ import {
   type PrivilegedTierAuthorization,
   WORKLOAD_TIERS,
   type WorkloadTier,
-} from '../runtime/delegation-matrix.ts';
+} from '@harness/matrix';
 import { type Effort, EFFORTS } from '../runtime/contract.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';
@@ -59,9 +64,12 @@ export interface OpenCodeRunOptions {
 export interface OpenCodeRunResult {
   readonly code: number;
   readonly stdout?: string;
+  readonly failure?: OpenCodeOutputFailure;
 }
 
 export interface OpenCodeRunDependencies {
+  readonly writeStdout?: (bytes: Uint8Array) => Promise<number>;
+  readonly reportOutputFailure?: (message: string) => void;
   readonly repositoryIdentity?: (cwd: string) => Promise<{ branch: string; head: string }>;
   readonly listModels?: (binary: string, options: Deno.CommandOptions) => Promise<string>;
   readonly reserveCopilot?: typeof reserveCopilotCredits;
@@ -203,7 +211,7 @@ export async function preflightOpenCodeExpense(
       throw new Error('Copilot requires its operational ledger, not --usage-snapshot');
     }
     const decision = await (dependencies.reserveCopilot ?? reserveCopilotCredits)({
-      cap: options.maxAiCredits ?? COPILOT_LAUNCH_CREDIT_CAPS[options.workloadTier],
+      cap: options.maxAiCredits ?? copilotLaunchCreditCap(options.workloadTier),
       now: (dependencies.now ?? (() => new Date().toISOString()))(),
       worktree: resolve(options.cwd ?? Deno.cwd()),
       env: dependencies.env,
@@ -284,6 +292,19 @@ export async function runOpenCode(
       'Copilot catalog model or variant absent; mark github_copilot transport unavailable',
     );
   }
+  if (!copilot) {
+    const catalogEnv = await environmentWithOpenCodeCredential(
+      options.model,
+      processEnv,
+      dependencies.readTextFile ?? Deno.readTextFile,
+      dependencies.stat ?? Deno.stat,
+    );
+    await preflightConfiguredOpenCodeModel(options.model, {
+      cwd,
+      env: catalogEnv,
+      listModels: dependencies.listModels,
+    });
+  }
   const expense = await preflightOpenCodeExpense(options, dependencies);
   if (options.receiptPath) {
     await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
@@ -308,7 +329,7 @@ export async function runOpenCode(
           expense,
           observationSource: 'connector_catalog',
           requestedCreditCap: options.maxAiCredits ??
-            (options.workloadTier ? COPILOT_LAUNCH_CREDIT_CAPS[options.workloadTier] : null),
+            (options.workloadTier ? copilotLaunchCreditCap(options.workloadTier) : null),
           providerEnforcedCap: false,
           cwd,
           ...gitIdentity,
@@ -349,18 +370,23 @@ export async function runOpenCode(
     env,
     clearEnv: true,
     stdin: 'null',
-    stdout: capture ? 'piped' : 'inherit',
+    stdout: 'piped',
     stderr: 'inherit',
   };
   const child = dependencies.spawn
     ? dependencies.spawn(binary, commandOptions)
     : new Deno.Command(binary, commandOptions).spawn();
-  const stdout = capture ? new Response(child.stdout).text() : undefined;
-  const status = await child.status;
-  return {
-    code: status.code,
-    ...(stdout ? { stdout: await stdout } : {}),
-  };
+  const result = await readOpenCodeOutput(child, {
+    capture,
+    format: options.format ?? 'default',
+    writeStdout: dependencies.writeStdout ?? ((bytes) => Deno.stdout.write(bytes)),
+  });
+  if (result.failure) {
+    (dependencies.reportOutputFailure ?? console.error)(
+      `opencode-${result.failure}: model ${options.model} produced no verified answer output`,
+    );
+  }
+  return result;
 }
 
 function requiredValue(args: readonly string[], index: number, flag: string): string {

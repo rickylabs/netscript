@@ -12,8 +12,8 @@
  *   <hook-json> | deno run --no-lock --no-prompt \
  *     --allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID \
  *     --allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks \
- *     ${CLAUDE_PROJECT_DIR}/.llm/tools/agentic/claude/claude-hook-log.ts
- *   deno run .llm/tools/agentic/claude/claude-hook-log.ts --help
+ *     ${CLAUDE_PROJECT_DIR}/.llm/tools/maint/claude/claude-hook-log.ts
+ *   deno run .llm/tools/maint/claude/claude-hook-log.ts --help
  *
  * Perms: read the three named env keys and write only the launch-root hook-log
  * subtree. No runtime read permission is required. Exit 0 on success.
@@ -81,7 +81,7 @@ if (import.meta.main) {
         '  <hook-json> | deno run --no-lock --no-prompt \\',
         '    --allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID \\',
         '    --allow-write=${CLAUDE_PROJECT_DIR}/.llm/tmp/claude/hooks \\',
-        '    ${CLAUDE_PROJECT_DIR}/.llm/tools/agentic/claude/claude-hook-log.ts',
+        '    ${CLAUDE_PROJECT_DIR}/.llm/tools/maint/claude/claude-hook-log.ts',
         '',
         'Perms: the three named env keys and the launch-root hook-log subtree;',
         'no runtime read permission is required.',

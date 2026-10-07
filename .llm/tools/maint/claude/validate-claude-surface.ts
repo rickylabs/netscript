@@ -21,7 +21,7 @@ if (pretty) {
     console.log(`${result.ok ? 'OK' : 'FAIL'} ${result.name}: ${result.detail}`);
   }
 } else {
-  console.log(JSON.stringify({ gate: 'agentic:check-claude', ok, results }));
+  console.log(JSON.stringify({ gate: 'maint:check-claude', ok, results }));
 }
 
 Deno.exit(ok ? 0 : 1);
@@ -99,12 +99,12 @@ async function runHookLockCheck(): Promise<CheckResult> {
         '--no-prompt',
         '--allow-env=CLAUDE_PROJECT_DIR,NETSCRIPT_RUN_ID,CLAUDE_SESSION_ID',
         `--allow-write=${projectRoot}/.llm/tmp/claude/hooks`,
-        `${projectRoot}/.llm/tools/agentic/claude/claude-hook-log.ts`,
+        `${projectRoot}/.llm/tools/maint/claude/claude-hook-log.ts`,
       ],
       env: {
         CLAUDE_PROJECT_DIR: projectRoot,
-        NETSCRIPT_RUN_ID: 'agentic-check-claude',
-        CLAUDE_SESSION_ID: 'agentic-check-claude',
+        NETSCRIPT_RUN_ID: 'maint-check-claude',
+        CLAUDE_SESSION_ID: 'maint-check-claude',
       },
       stdin: 'piped',
       stdout: 'piped',

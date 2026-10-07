@@ -10,7 +10,7 @@
 
 import type { ContentModality } from './content.ts';
 
-/** Opaque provider-scoped model identifier (e.g. `claude-sonnet-4`). */
+/** Opaque provider-scoped model identifier (e.g. `claude-sonnet-5-5`). */
 export type ModelId = string;
 
 /**

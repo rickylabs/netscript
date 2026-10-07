@@ -97,7 +97,11 @@ The model precedence is:
 3. `agent=<profile>` in a comment or commit message,
 4. `agent:<profile-or-literal>` label,
 5. repository variable `OPENHANDS_DEFAULT_MODEL`,
-6. `anthropic/claude-sonnet-4`.
+6. `openrouter/z-ai/glm-5.3-flash` (the GitHub workflow's approved-model fallback).
+
+The standalone SDK runner and Compose deployment default to `anthropic/claude-sonnet-5-5`.
+The GitHub workflow uses its separate approved open-evaluator model set; the standalone runner
+default does not expand that workflow allowlist.
 
 The workflow infers the provider from the selected model prefix unless `provider=...` is present:
 

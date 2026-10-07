@@ -28,6 +28,6 @@ Deno.test('routing state human edge renders evaluator routes derived from the ne
   );
   assertStringIncludes(
     rendered,
-    'architecture/implementation_evaluation[0]: family=xai logical=grok_4_6 effort=xhigh',
+    'architecture/implementation_evaluation[0]: family=xai logical=grok_4_7 effort=xhigh',
   );
 });

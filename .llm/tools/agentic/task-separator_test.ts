@@ -11,10 +11,7 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:wsl-foundation': 'wsl/wsl-foundation.ts',
   'agentic:runtime': 'runtime/cli/agentic-runtime.ts',
   'agentic:routing-state': 'runtime/cli/routing-state.ts',
-  'agentic:matrix': 'runtime/cli/delegation-matrix-table.ts',
   'agentic:expense-watch': 'runtime/cli/expense-watch.ts',
-  'agentic:leak-check': 'teardown/leak-check.ts',
-  'agentic:teardown': 'teardown/teardown.ts',
   'agentic:antigravity-evidence': 'runtime/cli/antigravity-evidence-cli.ts',
   'agentic:provider-canary': 'runtime/cli/provider-canary.ts',
   'agentic:rollout-canary': 'runtime/cli/rollout-canary-cli.ts',
@@ -29,9 +26,6 @@ const STRICT_AGENTIC_TASKS = {
   'agentic:openhands-status': 'openhands/openhands-status.ts',
   'agentic:gh-pr': 'github/gh-pr.ts',
   'agentic:gh-watch': 'github/gh-watch.ts',
-  'agentic:gh-token': 'github/gh-token.ts',
-  'agentic:review-threads': 'github/review-threads.ts',
-  'agentic:pr-checks': 'github/pr-checks.ts',
   'agentic:claude-openrouter': 'claude/openrouter-run.ts',
   'agentic:opencode': 'opencode/opencode-run.ts',
   'agentic:opencode-eval': 'opencode/opencode-eval.ts',
@@ -39,12 +33,12 @@ const STRICT_AGENTIC_TASKS = {
 } as const;
 
 const PERMISSIVE_AGENTIC_TASKS = [
-  'agentic:check-claude',
-  'agentic:dogfood-skills',
-  'agentic:dogfood-skills:check',
   'agentic:smoke-claude-remote',
-  'agentic:claude-hook-log',
 ] as const;
+
+// Tasks whose entry point is Harness code at the pinned commit. Their argv rules, including the
+// single leading task separator, are tested in Harness. Each runs one file from a full-SHA commit URL.
+const HARNESS_AGENTIC_TASKS = ['agentic:matrix', 'agentic:pr-checks'] as const;
 
 interface CommandResult {
   readonly code: number;
@@ -76,9 +70,10 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
   const surveyedTasks = [
     ...Object.keys(STRICT_AGENTIC_TASKS),
     ...PERMISSIVE_AGENTIC_TASKS,
+    ...HARNESS_AGENTIC_TASKS,
   ].sort();
   assertEquals(surveyedTasks, actualTasks);
-  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 30);
+  assertEquals(Object.keys(STRICT_AGENTIC_TASKS).length, 24);
   for (const [task, entry] of Object.entries(STRICT_AGENTIC_TASKS)) {
     assert(
       denoConfig.tasks[task]?.includes(`.llm/tools/agentic/${entry}`),
@@ -86,6 +81,38 @@ Deno.test('survey accounts for every agentic task and every strict entry normali
     );
     const source = await Deno.readTextFile(`${repo}/.llm/tools/agentic/${entry}`);
     assert(source.includes('normalizeTaskArguments('), `${task} does not normalize task argv`);
+  }
+});
+
+Deno.test('Harness-owned tasks run one pinned Harness file with exactly their reviewed flags', async () => {
+  const denoConfig = JSON.parse(await Deno.readTextFile(`${repo}/deno.json`)) as {
+    tasks: Record<string, string>;
+  };
+  // Changing a file or a permission here is a reviewed decision, not drift.
+  const expected: Record<
+    (typeof HARNESS_AGENTIC_TASKS)[number],
+    Readonly<{ flags: string; file: string }>
+  > = {
+    'agentic:matrix': { flags: '', file: 'packages/routing/matrix/cli/matrix-view.ts' },
+    'agentic:pr-checks': {
+      flags: '--allow-read --allow-run --allow-env --allow-net=api.github.com ',
+      file: 'packages/board/src/pr-checks.ts',
+    },
+  };
+  for (const task of HARNESS_AGENTIC_TASKS) {
+    const { flags, file } = expected[task];
+    const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assertMatch(
+      denoConfig.tasks[task] ?? '',
+      new RegExp(
+        `^deno run --no-lock ${
+          escape(flags)
+        }https://raw\\.githubusercontent\\.com/rickylabs/harness/[0-9a-f]{40}/${escape(file)}$`,
+      ),
+      `${task} must run ${file} from a full-SHA Harness commit with exactly: ${
+        flags || '(no flags)'
+      }`,
+    );
   }
 });
 

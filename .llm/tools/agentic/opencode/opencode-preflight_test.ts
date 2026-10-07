@@ -1,8 +1,9 @@
-import { assertEquals, assertThrows } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { validateOpenCodeMcpAttachment } from './opencode-preflight.ts';
 import {
   attestCopilotCatalog,
   copilotCatalogAvailability,
+  preflightConfiguredOpenCodeModel,
   preflightCopilotCatalog,
 } from './opencode-preflight.ts';
 import { ROUTING_MODEL_IDS } from '../config/models.ts';
@@ -30,7 +31,8 @@ Deno.test('Copilot catalog exact attestation rejects absent and substring IDs', 
       ...copilotCatalogAvailability(missing).unavailableTransports ?? [],
     ],
   });
-  assertEquals(route.model, ROUTING_MODEL_IDS.lunaNative);
+  assertEquals(route.model, ROUTING_MODEL_IDS.solNative);
+  assertEquals(route.effort, 'low');
 });
 
 Deno.test('Copilot catalog attests an exact model variant from verbose metadata', () => {
@@ -108,4 +110,91 @@ Deno.test('MCP preflight diagnostics reject unsafe generated server identities',
     Error,
     'safe server identities',
   );
+});
+
+Deno.test('configured evaluator preflight accepts complete measured IDs only', async () => {
+  for (
+    const model of [
+      ROUTING_MODEL_IDS.grok47Go,
+      ROUTING_MODEL_IDS.grok47OpenRouter,
+      ROUTING_MODEL_IDS.museSpark13StandardOpenRouter,
+    ]
+  ) {
+    const receipt = await preflightConfiguredOpenCodeModel(model, {
+      cwd: '.',
+      env: {},
+      listModels: (_binary, options) => {
+        assertEquals(options.args, ['models', model.split('/')[0]]);
+        assertEquals(options.clearEnv, true);
+        assertEquals(options.stderr, 'null');
+        return Promise.resolve(`${model}\n`);
+      },
+    });
+    assertEquals(receipt, { status: 'launchable', launcher: 'opencode', model });
+  }
+});
+
+Deno.test('missing exact standard evaluator ID refuses without a contributor substitution', async () => {
+  const model = ROUTING_MODEL_IDS.museSpark13StandardOpenRouter;
+  for (
+    const catalog of [
+      '',
+      ROUTING_MODEL_IDS.museSpark13OpenRouter,
+      `${model}-suffix`,
+      model.replace('openrouter/', 'other/'),
+    ]
+  ) {
+    const error = await assertRejects(
+      () =>
+        preflightConfiguredOpenCodeModel(model, {
+          cwd: '.',
+          env: {},
+          listModels: () => Promise.resolve(catalog),
+        }),
+      Error,
+      'launcher-model-absent',
+    );
+    assertEquals((error as { model?: string }).model, model);
+    assertEquals((error as { launcher?: string }).launcher, 'opencode');
+  }
+});
+
+Deno.test('unavailable or oversized catalog returns only a fixed named refusal', async () => {
+  const model = ROUTING_MODEL_IDS.grok47OpenRouter;
+  for (
+    const listModels of [
+      () => Promise.reject(new Error('private-host-detail')),
+      () => Promise.resolve('x'.repeat(1024 * 1024 + 1)),
+    ]
+  ) {
+    const error = await assertRejects(
+      () =>
+        preflightConfiguredOpenCodeModel(model, {
+          cwd: '.',
+          env: {},
+          listModels,
+        }),
+      Error,
+      'launcher-catalog-unavailable',
+    );
+    assertEquals(error.message.includes('private-host-detail'), false);
+  }
+});
+
+Deno.test('invalid model input never reaches catalog or echoes host details', async () => {
+  for (const model of ['/private/host/model', 'provider/model\nprivate-detail', 'x'.repeat(257)]) {
+    const error = await assertRejects(
+      () =>
+        preflightConfiguredOpenCodeModel(model, {
+          cwd: '.',
+          env: {},
+          listModels: () => {
+            throw new Error('must not list');
+          },
+        }),
+      Error,
+      'safe exact configured ID',
+    );
+    assertEquals(error.message.includes(model), false);
+  }
 });

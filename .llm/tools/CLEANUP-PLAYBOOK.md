@@ -49,7 +49,7 @@ checklist, not a narrative — execute the phases in order, honor every guardrai
 
 ## Aspire 13.5 teardown semantics
 
-The agentic leak reporter and teardown controller deliberately separate **relevance** from
+The maintainer leak reporter and teardown controller deliberately separate **relevance** from
 **ownership**. Aspire 13.5 can leave DCP helpers and `aspire-managed` descendants re-parented to PID
 1 after the launching CLI exits. A process is relevant when its edge-captured facts contain a DCP
 environment path, an exact `--apphost <path>` argument, or a Unix socket opened by that PID whose
@@ -81,16 +81,16 @@ Aspire 13.5.3 lifecycle receipts establish these operating facts:
 Use the read-only command first:
 
 ```bash
-deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+deno task maint:leak-check -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root>
 ```
 
 After reviewing every reported owner and the exact planned argv, apply only to positively proven
 resources:
 
 ```bash
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply
-deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply --force-persistent
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply
+deno task maint:teardown -- --slice-dir <run-dir> --worktree <worktree> --owned-root <root> --apply --force-persistent
 ```
 
 ## 2. Concern-folder taxonomy (the restructure)
@@ -238,7 +238,7 @@ deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-check.ts --root 
 deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-lint.ts  --root <folder> --ext ts,tsx   # 0 findings
 deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-fmt.ts   --root <folder> --ext ts,tsx   # 0 findings
 deno test --no-lock -A <folder>/                                                                        # 0 failed
-deno task agentic:check-claude                                                                          # ok (if the folder touches the Claude surface)
+deno task maint:check-claude                                                                            # ok (if the folder touches the Claude surface)
 git diff --check                                                                                        # clean
 git diff --stat deno.lock                                                                               # empty, OR only the sanctioned @std workspace-dep additions
 ```

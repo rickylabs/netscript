@@ -81,7 +81,7 @@ export interface AgentLoop extends AgentLoopPort {
  *
  * const loop = createAgentLoop({ modelProvider, tools });
  * const abort = new AbortController();
- * for await (const chunk of loop.run({ model: "anthropic:claude-sonnet-4-5", messages }, {
+ * for await (const chunk of loop.run({ model: "anthropic:claude-sonnet-5-5", messages }, {
  *   signal: abort.signal,
  *   maxSteps: 6,
  * })) {
