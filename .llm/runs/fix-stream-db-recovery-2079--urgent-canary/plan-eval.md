@@ -52,6 +52,8 @@ N/A — all boxes checked.
 
 ## Notes
 
+- Revision observed mid-evaluation: `plan.md` and `research.md` were updated by the generator while this evaluation was in progress (added owned readonly `status` getter on the named lifecycle union with `idle` added, named `idle` state, concrete `DurableStreamTestServer` dataDir-backed killed-child fixture, and a direct `@durable-streams/client` import declaration). This evaluation covers that revised state; the revisions strengthen the plan and introduce no unchecked box. Feature-tier cycle counting is unaffected (single cycle, no FAIL_PLAN emitted).
+- Revision spot-checks: `packages/fresh` currently has zero `@durable-streams/client` imports (verified — the import-map declaration is genuinely required, and state 0.3.1 does not re-export `DurableStream`); root catalog pins `@durable-streams/client@^0.2.6` with lock resolution `0.2.6`, matching state 0.3.1's dependency edge, so the declared import is version-consistent, additive, and violates no lock-hygiene rule ("matching lock workspace metadata, no dependency version changes" verified feasible). The status getter is a supplied-by-default, interface-optional owned type through the existing streams export barrel — covered by the plan's jsr-audit paragraph.
 - Hard stop respected: no source files modified, no branch/worktree/PR changes made during this evaluation; workspace clean apart from run artifacts.
 - PLAN-EVAL repair policy (feature tier): cycle 1 of max 2; PASS on first cycle, no plan edits needed; nothing preserved-corrected.
 - Implementation must not begin before the generator picks this verdict up; IMPL-EVAL remains mandatory and independent (slice 3 names it; owner explicit route noted in `supervisor.md`).
