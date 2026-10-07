@@ -44,7 +44,14 @@
     "failed": 0
   },
   "c1RegressionEvidence": "Round1 independently ran180 affected package tests; round2 confirms all C1 sources identical.",
-  "ciState": "Full CI atb4ee failed owned generated corpora; three-asset repair signed off, committed coreCI pending.",
-  "currentQualificationState": "Historical round2 PASS retained; docs repair requires same-session round3 at its new signed-off SHA.",
-  "historicalRound2Report": "evaluate-round-2.md"
+  "ciState": "Prior shared corpus checks passCI; native transitive copies signed off, actual postcommit barrel/fullCI pending.",
+  "currentQualificationState": "Historical round2 PASS retained; complete generated consumer repair needs same-session third review. Interrupted continuation had no verdict.",
+  "historicalRound2Report": "evaluate-round-2.md",
+  "interruptedThirdRoundAttempt": {
+    "head": "360165b45ae07b1a87671b14d09e990769687380",
+    "processExit": 143,
+    "verdict": null,
+    "sessionPreserved": true,
+    "reason": "Read stayed pending after checkout directory changed; interrupted before verdict and resume from original directory."
+  }
 }

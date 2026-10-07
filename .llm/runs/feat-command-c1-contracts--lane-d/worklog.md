@@ -9,7 +9,7 @@
 | Plan & Design | complete | plan.md and Design below |
 | Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
 | Implement | S1–S3 signed off | Separate implementation lane; supervisor reviews before each sign-off commit |
-| Gate | native product and repaired corpus gates pass; committed CI pending | S1–S3, lock repair and docs-repair-gate-evidence.json |
+| Gate | native product/corpus/content gates pass; transitive copies signed off, postcommit/CI pending | S1–S3, lock repair and docs-repair-gate-evidence.json |
 | Evaluate | historical rounds1/2 PASS; round3 pending | Byte-exact prior reports preserved; native corpus repair awaits same evaluator |
 | Release | N/A | No merge, publication or release authorized |
 | Close | C1 closing claim withheld pending repaired-head review/CI; chain pending | Native generated consumer freshness repair |
@@ -103,3 +103,7 @@ Independent evaluator returned PASS/process0 at repaired product head `17e9ad075
 ## C1 generated consumer CI repair — supervisor signed off
 
 Full CI revealed owned stale prose/MCP corpora; scoped checks had omitted these generated consumers. Native baseline checks reproduce1 and native refresh/freshness pass0 on exactCI2.9.5. Only three generated assets change, all6151 other tracked files unchanged. Prose changes only owned contracts/service pages and corresponding llms-full; MCP adds two command surfaces/39symbols, preserving7908 existing entries. Supervisor decoded/integrity/content audit and independent native MCP/quality/arch gates pass0. Existing safe4+6+5regressions pass; seven unchanged committed-worktree fixtures/full coreCI pending after commit. No test/tool/lock edit or bypass. See docs-repair evidence and substantive review. Historical report2 copied byte-exact; same-session third evaluation required at new qualification head, closing claim withheld.
+
+## C1 native transitive consumer repair — supervisor signed off
+
+CI confirmed the prior two corpus checks, then rejected stale CLI embedded docs. Native publish fallback similarly had stale sourceCommit. Exactly two generated copies change; all6158other tracked files remain identical. Native whole declared generated-chain inventory and independent embedded byte/provenance/MCP audit establish ownership. Native stale1/generation0/content0/publishcheck0 controls,12existing tests, specifier andCLI/MCP publish0 retained. Supervisor quality/arch0. Actual Git-diff-based barrel0 requires this supervisor commit and immediate native check; fullCI pending. Historical reports unchanged. First third-round attempt143/noverdict was interrupted after directory-moved read remained pending; same session resumes originaldirectory at completed repair.
