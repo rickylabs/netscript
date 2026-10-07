@@ -4,8 +4,8 @@ One chain PLAN-EVAL controls all six leaves. There is no umbrella implementation
 
 | Leaf | Ordered slices | Status | PR | Evaluated head |
 | --- | --- | --- | --- | --- |
-| #1482 | S1-S3 | S1–S3 and CI lock repair signed off; repaired-head IMPL-EVAL PASS | #2082 | product: 17e9ad075e595aa591b12e3b009c6aed6c482fbf |
-| #1483 | S4-S6 | planning draft; S4 unreleased | #2084 | none |
+| #1482 | S1-S3 | S1–S3, lock and generated-corpus repair signed off; historical rounds1/2 PASS, round3/CI pending | #2082 | product: 17e9ad075e595aa591b12e3b009c6aed6c482fbf |
+| #1483 | S4-S6 | S4 active in separate C2 checkout; S5/S6 unreleased | #2084 | none |
 | #1484 | S7-S9 | not started | none | none |
 | #1485 | S10 | not started | none | none |
 | #1486 | S11-S14 | not started | none | none |
