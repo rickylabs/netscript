@@ -95,3 +95,7 @@ Exact frozen CI check passes0 locally and on supervisor-verified exact Deno2.9.5
 ## C1 CI repair supervisor signoff
 
 Substantive lock/source/evidence review signs off the owned private-lock repair. Exact CI2.9.5 frozen check and independent durable quality/architecture receipts pass; see ci-repair-supervisor-review.md. Historical evaluator is copied byte-exactly to evaluate-round-1.md. New head awaits same-session reevaluation; C2 product remains paused.
+
+## C1 same-session reevaluation PASS
+
+Independent evaluator returned PASS/process0 at repaired product head `17e9ad075e595aa591b12e3b009c6aed6c482fbf`. ExactCI2.9.5 stale1/restoredfrozen0 and native semantic dependency proof independently reproduced;172 FreshUI and2 lock regressions pass. All22 C1 product sources match round1. See current evaluate.md and preserved evaluate-round-1.md. Artifact-only reconciliation follows; no new product. Closing evidence validation and final CI are supervisor-owned; C2 S4 can begin only after prerequisite reconciliation.
