@@ -1,0 +1,3 @@
+# Plan
+
+PLAN-EVAL: N/A. Bounded corrections to documented upstream validation, no architecture or new public API decision. One slice: preserve native nullable effort; reject every supplied top_k on exact current IDs; expand existing native-wire and pre-IO rejection regressions on both effective option surfaces. Each new assertion gets isolated reverted-guard mutation proof. Scoped wrappers, AI/plugin suites, quality, publication and carrier freshness, then mandatory independent evaluation; answer both review threads with actual fix evidence. Stable publication remains outside source PR; use Refs only.
