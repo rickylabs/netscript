@@ -27,3 +27,7 @@ Correction to preceding doc note: the changed streams entrypoint has eleven priv
 Final docs accuracy and all carrier checks exit 0 after committing generated output. JSDoc example gate exits 1 because exact member native imports conflict with ranged root catalog aliases. Correction aligns the canonical catalog to the already-locked compatible state/client pair and declares direct client dependency through the existing package catalog seam. No resolution upgrade. Independent implementation session ses_ee7be024dffeJ5HAlcs9qY7M49 reproduced runtime and mutation results; supervisor interrupted its expanding version probes (launcher 130) and re-steers the same session for bounded final verdict after correction. Critical audit receipt at ae927ce45369aff10506a53f19552660b95a796f records actual exit 1.
 
 Catalog correction: dependency cache, full JSDoc example gate and streams public consumer all exit 0. Locked npm/JSR/remote resolution maps are byte-equivalent as parsed JSON; only canonical specifier/workspace metadata changed.
+
+7 Evaluate: independent IMPL-EVAL PASS at 85203ec419dbdc692278a09cbca4ebd4df85c8e3, GLM session ses_ee7be024dffeJ5HAlcs9qY7M49, final launcher exit 0. Runtime source untouched by catalog correction; independent reviewer retained its restored nine-test and mutation evidence.
+8 Release: no publication or deployment; shared critical dependency maintenance requires separate owner decision.
+9 Close: source acceptance complete, draft retained pending owner dependency repair and full current-head CI. No merge.
