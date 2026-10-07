@@ -78,7 +78,16 @@ Deno.test('bounded segment log: complete frames, zero payload, split headers and
     frameOffset(files.bytes.length),
   ]);
   assertEquals(messages.map((m) => m.data), [new Uint8Array(), new TextEncoder().encode('tail')]);
-  assertEquals(files.closed, 2);
+  const largePayload = Uint8Array.from(
+    { length: SEGMENT_IO_BYTES * 3 + 19 },
+    (_, i) => (i * 17 + 31) % 256,
+  );
+  const largeFrame = frame(largePayload);
+  files.bytes = largeFrame;
+  files.identity = 'multi-chunk';
+  assertEquals(log.scan('log'), frameOffset(largeFrame.length));
+  assertEquals(log.read('log', 0, 0).map((m) => m.data), [largePayload]);
+  assertEquals(files.closed, 4);
   assert(files.maxRequest <= SEGMENT_IO_BYTES);
 });
 
@@ -130,6 +139,17 @@ Deno.test('bounded segment log: tail seeks from recent boundaries and skips reta
   const files = new MemorySegments(bytes);
   const log = new BoundedSegmentLog(files);
   log.scan('log');
+  // The fixed capacity drops every earlier boundary. Observe the seek rather
+  // than exposing cache internals: just below the oldest retained boundary
+  // requires a cold scan, while that boundary itself remains directly usable.
+  const oldestRetained = count - MAX_SEGMENT_CHECKPOINTS + 1;
+  for (const index of [oldestRetained - 1, oldestRetained]) {
+    files.reads = [];
+    const offset = one.length * index;
+    const slice = log.read('log', offset, 0, offset + one.length);
+    assertEquals(slice.map((m) => m.offset), [frameOffset(offset + one.length)]);
+    assertEquals(files.reads[0], index < oldestRetained ? 0 : offset);
+  }
   files.readBytes = 0;
   files.reads = [];
   const start = one.length * (count - 1);
@@ -164,6 +184,23 @@ Deno.test('bounded segment log: append, truncation and replacement invalidate st
   files.bytes = frame(new TextEncoder().encode('dd'));
   files.modified++;
   assertEquals(new TextDecoder().decode(log.read('log', 1, 0)[0].data), 'dd');
+
+  const oldFrame = frame(new Uint8Array(SEGMENT_IO_BYTES).fill(97));
+  for (const change of ['same-size rewrite', 'replacement', 'shrink']) {
+    const files = new MemorySegments(concat(oldFrame, oldFrame));
+    const log = new BoundedSegmentLog(files);
+    log.scan('log');
+    // Reframe so the old mid-file boundary is now inside a payload, below
+    // the requested offset. Keeping it would parse payload bytes as a header.
+    const size = files.bytes.length - (change === 'shrink' ? 17 : 0);
+    const payload = new Uint8Array(size - 5).fill(98);
+    files.bytes = frame(payload);
+    if (change === 'replacement') files.identity = 'new-incarnation';
+    else files.modified++;
+    files.reads = [];
+    assertEquals(log.read('log', oldFrame.length + 11, 0).map((m) => m.data), [payload]);
+    assertEquals(files.reads[0], 0);
+  }
 });
 
 Deno.test('bounded segment log: read failure closes the descriptor and cannot fabricate a result', () => {

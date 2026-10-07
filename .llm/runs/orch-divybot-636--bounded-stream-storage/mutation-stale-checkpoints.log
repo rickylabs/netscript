@@ -1,0 +1,36 @@
+running 6 tests from ../../tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts
+bounded segment log: complete frames, zero payload, split headers and short reads ... ok (10ms)
+bounded segment log: partial header, payload and missing trailer never advance recovery ... ok (461µs)
+bounded segment log: arbitrary offsets, fork bases/caps and reads at/past end ... ok (180µs)
+bounded segment log: tail seeks from recent boundaries and skips retained payloads ... ok (20ms)
+bounded segment log: append, truncation and replacement invalidate stale boundaries ... FAILED (123ms)
+bounded segment log: read failure closes the descriptor and cannot fabricate a result ... ok (849µs)
+
+ ERRORS 
+
+bounded segment log: append, truncation and replacement invalidate stale boundaries => ../../tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts:169:6
+error: RangeError: Maximum call stack size exceeded
+  messages.push(...(stringDiff ? [diffMessages.join("")] : diffMessages), "");
+           ^
+    at buildMessage (https://jsr.io/@std/internal/1.0.14/build_message.ts:145:12)
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:64:19)
+    at file:///ephemeral/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts:201:5
+
+ FAILURES 
+
+bounded segment log: append, truncation and replacement invalidate stale boundaries => ../../tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts:169:6
+
+FAILED | 5 passed | 1 failed (160ms)
+
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.7
+│  npm:msgpackr-extract@3.0.4
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+Check ../../tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts
+error: Test failed

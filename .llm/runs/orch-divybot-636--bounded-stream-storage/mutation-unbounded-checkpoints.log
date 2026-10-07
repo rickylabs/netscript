@@ -1,0 +1,43 @@
+running 6 tests from ../../tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts
+bounded segment log: complete frames, zero payload, split headers and short reads ... ok (10ms)
+bounded segment log: partial header, payload and missing trailer never advance recovery ... ok (518µs)
+bounded segment log: arbitrary offsets, fork bases/caps and reads at/past end ... ok (253µs)
+bounded segment log: tail seeks from recent boundaries and skips retained payloads ... FAILED (22ms)
+bounded segment log: append, truncation and replacement invalidate stale boundaries ... ok (1ms)
+bounded segment log: read failure closes the descriptor and cannot fabricate a result ... ok (979µs)
+
+ ERRORS 
+
+bounded segment log: tail seeks from recent boundaries and skips retained payloads => ../../tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts:134:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   1048656
++   0
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///ephemeral/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts:151:5
+
+ FAILURES 
+
+bounded segment log: tail seeks from recent boundaries and skips retained payloads => ../../tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts:134:6
+
+FAILED | 5 passed | 1 failed (37ms)
+
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.7
+│  npm:msgpackr-extract@3.0.4
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+Check ../../tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts
+error: Test failed

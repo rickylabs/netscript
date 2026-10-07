@@ -10,6 +10,47 @@ import { frameOffset } from '../bounded-segment-log.ts';
 const encode = (value: string): Uint8Array => new TextEncoder().encode(value);
 const decode = (data: Uint8Array): string => new TextDecoder().decode(data);
 
+Deno.test({
+  name: 'bounded native store: unreadable recovery preserves metadata instead of fabricating zero',
+  // POSIX mode bits cannot make a file unreadable to root or on Windows.
+  ignore: Deno.build.os === 'windows' || Deno.uid() === 0,
+  async fn() {
+    const dir = await Deno.makeTempDir({ prefix: 'streams-unreadable-' });
+    let store = createBoundedFileBackedStreamStore(dir);
+    let segment: string | undefined;
+    try {
+      await store.create('/protected', { contentType: 'text/plain' });
+      await store.append('/protected', encode('preserved'));
+      const expected = store.getCurrentOffset('/protected');
+      assert(expected);
+      assert(expected !== frameOffset(0));
+      await store.close();
+      const entry = Array.from(Deno.readDirSync(`${dir}/streams`)).find((e) =>
+        e.name.startsWith(`${encodeStreamPath('/protected')}~`)
+      );
+      assert(entry);
+      segment = `${dir}/streams/${entry.name}`;
+      await Deno.chmod(segment, 0o000);
+      store = createBoundedFileBackedStreamStore(dir);
+      assertEquals(store.getCurrentOffset('/protected'), expected);
+      await store.close();
+      // The unchanged native recovery swallows this same I/O failure and
+      // persists a fabricated reset, proving this fixture binds the repair.
+      store = new FileBackedStreamStore({ dataDir: dir });
+      assertEquals(store.getCurrentOffset('/protected'), frameOffset(0));
+      await store.close();
+      await Deno.chmod(segment, 0o600);
+      store = createBoundedFileBackedStreamStore(dir);
+      assertEquals(store.getCurrentOffset('/protected'), expected);
+      assertEquals(store.read('/protected').messages.map((m) => decode(m.data)), ['preserved']);
+    } finally {
+      if (segment) await Deno.chmod(segment, 0o600);
+      await store.close();
+      await Deno.remove(dir, { recursive: true });
+    }
+  },
+});
+
 Deno.test('bounded native store: recovery reconciles incomplete frames without changing fork offsets', async () => {
   const dir = await Deno.makeTempDir({ prefix: 'streams-framing-' });
   let store = createBoundedFileBackedStreamStore(dir);

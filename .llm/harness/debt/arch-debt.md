@@ -2410,7 +2410,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## plugins/streams/services/src/bounded-file-store.ts — A11 upstream storage extension seam
 
 - **ID:** `STREAMS-BOUNDED-NATIVE-IO-HOOKS`
-- **Reason:** Native durable-streams/server buffers full append logs during recovery and suffix reads,
+- **Reason:** `AP-4` cross-package implementation inheritance / `A11` dependency coupling. Native
+  durable-streams/server buffers full append logs during recovery and suffix reads,
   but exposes neither protected segment I/O hooks nor store injection. The NetScript adapter replaces
   exactly two TS-private virtual hooks on its own subclass before native constructor recovery. No
   upstream prototype is modified. Retaining the native store preserves LMDB/protocol/fork semantics.
@@ -2423,6 +2424,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Remove the compatibility bridge when a native supported seam passes complete-frame,
   fork/cap/sub-offset, restart/producer-state and >=1 GiB RSS regressions at the same memory ceiling.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
-  checks fail on missing hooks; integration and negative-control tests detect behavioral drift. The
-  bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
+  checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
+  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
   storage migration or persistent index.
