@@ -9,10 +9,10 @@
 | Plan & Design | complete | plan.md and Design below |
 | Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
 | Implement | S1–S3 signed off | Separate implementation lane; supervisor reviews before each sign-off commit |
-| Gate | native product/corpus/content gates pass; transitive copies signed off, postcommit/CI pending | S1–S3, lock repair and docs-repair-gate-evidence.json |
-| Evaluate | historical rounds1/2 PASS; round3 pending | Byte-exact prior reports preserved; native corpus repair awaits same evaluator |
+| Gate | product/generated native gates and full check-test pass; inherited critical audit red | final-qualification-evidence.json; actual CI by head/merge provenance |
+| Evaluate | same-session round3 PASS at e09a5692360d7c157032e04f97b51c81d43d16f8 | evaluate.md/evaluate-round-3.md; all historical reports byte-exact |
 | Release | N/A | No merge, publication or release authorized |
-| Close | C1 closing claim withheld pending repaired-head review/CI; chain pending | Native generated consumer freshness repair |
+| Close | C1 acceptance complete; CI advisory remains owner blocker, no merge; later leaves pending | independent PASS and artifact-only reconciliation |
 
 ## Design
 
@@ -111,3 +111,7 @@ CI confirmed the prior two corpus checks, then rejected stale CLI embedded docs.
 ## Postcommit native generated-chain qualification
 
 Actual durable check:assets-barrel atddcd62d25253142ffa3a55b5ddb396440c1d7ffb passes0 under exactCI2.9.5 and leaves checkout clean. Receipt recorded in transitive-assets-gate-evidence.json by an artifact-only followup, no product changes. Complete generated-chain native qualification now passes locally; same-session third review/full current-head CI remain pending.
+
+## C1 third independent PASS and supervisor reconciliation
+
+Same-session GLM process0/third PASS at `e09a5692360d7c157032e04f97b51c81d43d16f8`. See evaluate.md (byte-exact historical copy evaluate-round-3.md), final-qualification-evidence.json and final-qualification-supervisor-review.md. The real CI check-test runs5437pass0fail14ignored plus6browserpass, including unchanged committed-worktree fixtures. Native generated/publication gates and code/FreshUIquality pass. Critical audit is inherited from main; scoped native fix/update probes change nothing and no broader dependency repair or waiver is introduced. Corrected two runtime labels and unsupported local2.9.7 sentence: shim actually dispatched2.9.5; direct2.9.7gzip-only variance is recorded. All product unchanged, no new tests needed for artifact accuracy correction. Supervisor commits/pushes/comments this reconciliation before C2 prerequisite propagation and S5 release. No merge or publication.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "headBeforeSignoff": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
-  "runtime": "Deno2.9.5 except explicit2.9.7 compatibility check",
+  "runtime": "Deno2.9.5; earlier local2.9.7 labels corrected by direct-binary qualification",
   "gates": [
     {
       "gate": "runtime",
@@ -187,10 +187,12 @@
         "deno",
         "--version"
       ],
-      "runtime": "2.9.7",
+      "runtime": "2.9.5",
       "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
       "exitCode": 0,
-      "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463"
+      "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463",
+      "previouslyClaimedRuntime": "2.9.7",
+      "runtimeCorrection": "Retained raw runtime log identifies2.9.5. Mise shim under CI-prefixed PATH dispatched2.9.5; this receipt is not2.9.7 qualification."
     },
     {
       "gate": "mcp-freshness-local",
@@ -199,10 +201,12 @@
         "task",
         "check:mcp-export-corpus"
       ],
-      "runtime": "2.9.7",
+      "runtime": "2.9.5",
       "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
       "exitCode": 0,
-      "rawLogSha256": "b99bdf8597bfea820df9adb8c67866bda5886a3935373a13098a5d629ef2d5a0"
+      "rawLogSha256": "b99bdf8597bfea820df9adb8c67866bda5886a3935373a13098a5d629ef2d5a0",
+      "previouslyClaimedRuntime": "2.9.7",
+      "runtimeCorrection": "Retained raw runtime log identifies2.9.5. Mise shim under CI-prefixed PATH dispatched2.9.5; this receipt is not2.9.7 qualification."
     },
     {
       "gate": "mcp-generator-safe-regressions",
@@ -337,5 +341,6 @@
         "category": "assertion diff allocation after stale corpus mismatch"
       }
     ]
-  }
+  },
+  "qualificationCorrection": "See final-qualification-evidence.json: direct2.9.5 freshness0, direct2.9.7 freshness1, identical canonical plaintext with runtime-dependent gzip transport. Original exits/log hashes unchanged."
 }
