@@ -1,0 +1,3 @@
+# Resume
+
+Implement harness #636 / NetScript #2080 on orch/divybot-636, baseline 6f6cbdf030d7595d1730272d0a74aedd66225069. Read plan.md and worklog.md. Native storage has two full-file private virtual hooks; compose a local bounded subclass before recovery, retain native server and LMDB. Need >=1 GiB temp fixture, measured RSS ceiling and real old-native-store negative control, upstream dependency issue, independent matrix implementation evaluation, structured gates and full CLI E2E. Never commit .divybot-goal.md or incidental deno.lock changes. Final canonical report uses excluded .divybot-final-report.md, no direct final-comment posting.
