@@ -1,0 +1,7 @@
+# Reviewed main security dependency prerequisite
+
+Fresh main `872df8e21e0a8bf06cd0796c7808068dd67e2c4e` already contains the reviewed single-package security patch for proxy-addr. The separate implementation lane independently generates the native patched record, compares it with upstream, and freezes a two-lock candidate. Supervisor substantively compares full pre/post JSON and native/main record equality, applies the exact patch preserving all unrelated workspace/dependency metadata, and reruns both critical audits, frozen root installation and package-owned FreshUIcheck: all0. Every20S4product hash is unchanged. Agent affected frozen AI/MCPcheck221files0 and complete300tests0, no failed/ignored.
+
+Only version key2.0.7→2.0.8/native integrity change in each root/private lock,4insert/4delete total; all other graph sections/records/dependency arrays unchanged. This is reviewed adoption of native-generated upstream metadata, transparently curated; not an all-native transitive updater result. Earlier no-op/failing updater probes remain historical. No manifest pin, broad upgrade, reload, lock deletion, audit ignore, unsafe type suppression, protected-PR mutation, merge or force push.
+
+No new test is warranted for this dependency metadata prerequisite; existing actual affected consumers/regressions and frozen audits prove it. S5 stays paused only for separately reviewed health declaration prerequisite. Final C2 generated-chain, all consumers and independent IMPL-EVAL remain open; current CI is not certified by these scoped local gates.

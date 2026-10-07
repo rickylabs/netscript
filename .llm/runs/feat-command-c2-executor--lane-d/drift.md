@@ -28,3 +28,5 @@ regenerate that bundle or claim full leaf evaluation/readiness.
 - C1 complete generated prerequisite propagation is split from final independent-PASS reconciliation to keep each supervisor slice strictly under30files. Exactly22C1E09 files copied; S4hashes stable, durablequality/arch0. Freshmain872df8e21 includes unrelated bounded stream storage and root dependency-lock repair; no protected-PR writes and no implicit stack rebase/merge.
 
 - Final predecessor independent-PASS/evidence correction propagated byte-exact; entire C1 run and five generated assets match8b6e89. This ordinary artifact-only slice changes no S4 product. Fresh-main reviewed critical dependency patch is assessed separately, never labeled an all-native transitive update.
+
+- Freshmain872df8e21 owns the exact minimal proxy security patch. Earlier supervisor restriction against curated metadata was a scope choice; routine reviewed prerequisite adoption is now authorized and independently native-qualified. Two locks only/version+integrity, no unrelated upgrade/pin/cachedelete/reload/audit waiver. Bothaudits0/frozeninstall/privatecheck0, affected300regressions0; no protected-PR writes.

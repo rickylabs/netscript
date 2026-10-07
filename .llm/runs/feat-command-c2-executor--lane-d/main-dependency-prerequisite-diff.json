@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "authorization": "Supervisor explicitly authorized exact reviewed main/native record adoption into root and FreshUI locks.",
+  "method": "Curated two-field adoption: version key and native integrity; transparently not an all-native transitive update.",
+  "files": [
+    {
+      "file": "deno.lock",
+      "onlyChangedSection": "npm",
+      "removedRecords": [
+        "proxy-addr@2.0.7"
+      ],
+      "addedRecords": [
+        "proxy-addr@2.0.8"
+      ],
+      "allOtherNpmBodiesAndLockSectionsUnchanged": true,
+      "patchedRecordMatchesExactMainAndNative": true,
+      "dependenciesUnchanged": [
+        "forwarded",
+        "ipaddr.js"
+      ],
+      "beforeSha256": "75404ed4a3b7733c6311b926ea0438686754e3caa2df6c82581f1479de964aa4",
+      "candidateSha256": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493"
+    },
+    {
+      "file": "packages/fresh-ui/deno.lock",
+      "onlyChangedSection": "npm",
+      "removedRecords": [
+        "proxy-addr@2.0.7"
+      ],
+      "addedRecords": [
+        "proxy-addr@2.0.8"
+      ],
+      "allOtherNpmBodiesAndLockSectionsUnchanged": true,
+      "patchedRecordMatchesExactMainAndNative": true,
+      "dependenciesUnchanged": [
+        "forwarded",
+        "ipaddr.js"
+      ],
+      "beforeSha256": "81453e4fe24855516b3f0309490cf71b0665efbde3150c264b0d07bb3d46f80e",
+      "candidateSha256": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    }
+  ],
+  "generatorQualificationHead": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+  "appliedC2BaselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+  "upstreamMain": "872df8e21e0a8bf06cd0796c7808068dd67e2c4e",
+  "supervisorVerification": "Exact native-generated record matches upstream main; active pre/post complete-lock JSON differs only by approved proxy version key/integrity. All20S4product hashes unchanged."
+}

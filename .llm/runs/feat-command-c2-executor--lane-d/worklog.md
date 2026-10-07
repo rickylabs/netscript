@@ -84,3 +84,7 @@ Supervisor checked all22propagated files against exact C1E09 and all20S4 product
 ## Complete C1 prerequisite signoff
 
 C1 final8b6e89e9dfe786edf062e64228c8bb14fc45a110 artifact reconciliation propagated verbatim; exact evaluatedE09 third opposite-familyPASS. All C1 run/asset bytes match current predecessor, all20S4 hashes unchanged. This second slice is artifacts only; no new test required. Separate fresh-main proxy patch candidate is under private native qualification before S5 release. Wholechain plan remains locked.
+
+## Fresh-main minimal security dependency prerequisite — supervisor signoff
+
+Separate lane freezes reviewed upstream/nativeproxy2.0.8record adoption in two locks; supervisor fullJSON/recordcomparison and all20S4hashes match. Independent applied-branch bothcriticalaudits0/frozenrootinstall0/FreshUI150check0; affectedAI/MCP221check+300tests0. See main-dependency-prerequisite-{diff,gates,review}. Only4insert/4delete, unrelated metadata stable. No new tests for this dependency metadata change; no all-native updater claim. Supervisor commit/push/comment before health prerequisite and S5. Final C2 CI/eval remain unclaimed.

@@ -1,3 +1,11 @@
+# C2 current checkpoint
+
+S4signed offf62f0200557a0ece40a1c1cfe001171095b0d6bc; reviewed C1 generated/PASS artifacts propagated854c013/a1eb16c, all C1 run/assets match8b6e89, actual third C1PASS atE09. Fresh main872df8e21 owns minimal critical dependency patch; separate lane/supervisor qualify exact two-lock adoption here. Bothaudits0/frozenrootinstall0/FreshUI150check0; affectedAI/MCP221check+300tests0; all20S4product hashes unchanged. See main-dependency-prerequisite evidence/review. Only proxy version/integrity changes, transparently curated native metadata, no unrelated upgrade/bypass.
+
+S5awaits only separate health declaration-emission prerequisite; no executor code begun. FinalS6 native full generated-chain/all-export consumers/independent C2 review remain open. All task writes confined; no merges/force pushes/protectedPRchanges. Wholechain planPASS unchanged.
+
+## Historical checkpoints retained
+
 # C2 context
 
 Branch feat/command-c2-executor. Fresh main 6f6cbdf030d7595d1730272d0a74aedd66225069; stacked predecessor C1 108b6930f455a2023e3abb7dbb2c91ab46380e6d because not merged. Scope S4–S6/#1483 only. Whole-chain PLAN-EVAL PASS before implementation. Owner Eric complex-tier authority recorded. Implementation lane pauses after every slice; root supervisor owns substantive signoff and commit/push/comment, then independent opposite-family IMPL-EVAL before next leaf. All writes stay task-local; public artifacts sanitized. Protected PRs untouched. Start with implementation brief and RFC.
