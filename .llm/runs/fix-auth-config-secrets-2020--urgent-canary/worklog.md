@@ -15,3 +15,5 @@ Existing writer, filesystem port, canonical plugin backend selector, native Clif
 9 Close: draft until source acceptance and required gates proven; no merge.
 
 Owner model override: HARNESS.md requests generator gpt-6.1-sol high and opencode-go/glm-5.3-flash max external review for every change. Preserve separate session/vendor family. Exact launch/head and verdict recorded.
+
+4 Plan-Gate: independent GLM PLAN-EVAL PASS at f9fd12ce00a97fd810016bd4d7712d7b940fc67d. External launcher exit 0. No implementation preceded PASS. See independent report for observed session and selector compatibility note.
