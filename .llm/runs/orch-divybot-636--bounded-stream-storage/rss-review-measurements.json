@@ -1,0 +1,36 @@
+{
+  "logBytes": 1073746944,
+  "ceilingBytes": 536870912,
+  "oldRecovery": {
+    "mode": "old-recovery",
+    "baselineRss": 55595008,
+    "recoveryPeakRss": 2204196864,
+    "peakRss": 3279417344,
+    "ceiling": 536870912,
+    "logBytes": 1073746944,
+    "recoveredOffset": "0000000000000000_0000001073746944"
+  },
+  "oldTail": {
+    "mode": "old-tail",
+    "baselineRss": 55562240,
+    "recoveryPeakRss": 59170816,
+    "peakRss": 2205429760,
+    "ceiling": 536870912,
+    "logBytes": 1073746944,
+    "recoveredOffset": "0000000000000000_0000001073746944"
+  },
+  "bounded": {
+    "mode": "bounded",
+    "baselineRss": 55443456,
+    "recoveryPeakRss": 59441152,
+    "peakRss": 60530688,
+    "ceiling": 536870912,
+    "logBytes": 1073746944,
+    "recoveredOffset": "0000000000000000_0000001073746944"
+  },
+  "exitCodes": {
+    "oldRecovery": 1,
+    "oldTail": 1,
+    "bounded": 0
+  }
+}

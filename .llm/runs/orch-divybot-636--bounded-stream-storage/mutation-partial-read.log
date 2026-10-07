@@ -1,0 +1,38 @@
+running 6 tests from ../../tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts
+bounded segment log: complete frames, zero payload, split headers and short reads ... FAILED (187ms)
+bounded segment log: partial header, payload and missing trailer never advance recovery ... ok (898µs)
+bounded segment log: arbitrary offsets, fork bases/caps and reads at/past end ... ok (189µs)
+bounded segment log: tail seeks from recent boundaries and skips retained payloads ... ok (18ms)
+bounded segment log: append, truncation and replacement invalidate stale boundaries ... ok (2ms)
+bounded segment log: read failure closes the descriptor and cannot fabricate a result ... ok (585µs)
+
+ ERRORS 
+
+bounded segment log: complete frames, zero payload, split headers and short reads => ../../tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts:67:6
+error: RangeError: Array buffer allocation failed
+  const routes = new Uint32Array((M * N + length + 1) * 2);
+                 ^
+    at new ArrayBuffer (<anonymous>)
+    at new Uint32Array (<anonymous>)
+    at diff (https://jsr.io/@std/internal/1.0.14/diff.ts:270:18)
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:63:7)
+    at file://<ephemeral>/tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts:89:3
+
+ FAILURES 
+
+bounded segment log: complete frames, zero payload, split headers and short reads => ../../tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts:67:6
+
+FAILED | 5 passed | 1 failed (216ms)
+
+╭ Warning
+│
+│  Ignored build scripts for packages:
+│  npm:lmdb@3.5.7
+│  npm:msgpackr-extract@3.0.4
+│
+│  Lifecycle scripts are only supported when using a `node_modules` directory.
+│  Enable it in your deno config file:
+│  "nodeModulesDir": "auto"
+╰─
+Check ../../tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts
+error: Test failed
