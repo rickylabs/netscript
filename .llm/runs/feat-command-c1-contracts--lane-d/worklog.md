@@ -7,8 +7,8 @@
 | Bootstrap | complete | Skills, harness workflow, gate matrix, owner authority and baseline recorded |
 | Research | complete for plan | research.md; complete live issue snapshots retained privately |
 | Plan & Design | ready for independent evaluation | plan.md and Design below |
-| Plan-Gate | pending | Separate-family evaluation required before product edits |
-| Implement | not started | Hard stop pending PLAN-EVAL PASS |
+| Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
+| Implement | S1 active | Separate implementation lane; supervisor reviews before each sign-off commit |
 | Gate | not started | No implementation verdict claimed |
 | Evaluate | not started | Per-leaf IMPL-EVAL required |
 | Release | N/A | No merge, publication or release authorized |
@@ -36,3 +36,11 @@ Contributor path: start with the focused public entrypoint and README, follow do
 - Read all six live issues and comments and closed prerequisites #1350/#1455: exit 0.
 - MCP find_guidance(intent): succeeded; search_docs(query): succeeded. No specific command implementation guidance was returned; accepted RFC and focused source are authoritative.
 - No product code, tests or mutation checks have been introduced yet.
+
+## PLAN-EVAL receipt
+
+Requested route: OpenCode Go / glm-5.3-flash / max, independent headless evaluator session. Observed model id was opencode-go/glm-5.3-flash; runtime effort was not independently attested. No fallback was used. Evaluator reviewed exact head 359d17f426592d58a6f6388a9522bc3afbc45dde and wrote plan-eval.md with PASS for all eight Plan-Gate items. This is a planning verdict only; no implementation gate is certified. The owner-required whole-chain pass releases implementation of the six leaves.
+
+Draft PR #2082 contains the bootstrap/plan commit. Research and Plan phase comments link that commit. The opening documentation labels intentionally skip scaffold/E2E and will be removed when product slices land. Initial checkout lacked git author identity; configured an agent identity locally in this clone and committed successfully; no global settings changed.
+
+Implementation lane: c1_implementation, requested gpt-6.1-sol high, separate session from supervisor. S1 is active; no lane self-certifies. Exact product changes will be substantively reviewed before the supervisor sign-off commit, then pushed/commented before S2 starts.
