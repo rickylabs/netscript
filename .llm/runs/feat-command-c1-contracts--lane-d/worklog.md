@@ -8,11 +8,11 @@
 | Research | complete for plan | research.md; complete live issue snapshots retained privately |
 | Plan & Design | complete | plan.md and Design below |
 | Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
-| Implement | S1/S2 signed off; S3 pending | Separate implementation lane; supervisor reviews before each sign-off commit |
+| Implement | S1–S3 signed off | Separate implementation lane; supervisor reviews before each sign-off commit |
 | Gate | not started | No implementation verdict claimed |
-| Evaluate | not started | Per-leaf IMPL-EVAL required |
+| Evaluate | C1 PASS | Independent opposite-family evaluator at e64c841bc9c1a9f967afa357b54f454445807db8; later leaves pending |
 | Release | N/A | No merge, publication or release authorized |
-| Close | pending | Handoff after evaluation or chain completion |
+| Close | C1 evidence complete; chain pending | Closing evidence reconciliation and six-leaf handoff |
 
 ## Design
 
@@ -81,3 +81,7 @@ One cross-package consumer test added, with meaningful named production-mutant f
 ## S3 supervisor signoff
 
 Substantive supervisor review signs off S3 qualification and acceptance evidence 1–4. All twenty-two product hashes verified; independent durable quality/architecture receipts exit 0. See s3-supervisor-review.md. Commit/push/comment reconciliation precedes opposite-family C1 IMPL-EVAL; later leaves remain pending.
+
+## C1 independent IMPL-EVAL and handoff
+
+Independent OpenCode Go / glm-5.3-flash session returned PASS and process exit 0 at exact product head `e64c841bc9c1a9f967afa357b54f454445807db8`. Requested CLI variant max; runtime effort remains unverified. Eight mutation controls were independently reproduced and remaining controls checked from actual receipts. Independent complete regressions: 180 passed, zero failed or ignored. See evaluate.md and evaluation-reconciliation.json. This artifact-only commit changes no implementation and certifies no different product head. All five C1 acceptance boxes now have concrete evidence; closing mapping, native mirror and close-gate are reconciled on PR #2082. No merge/publication performed.

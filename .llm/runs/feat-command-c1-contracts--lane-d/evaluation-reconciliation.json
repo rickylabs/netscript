@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "phase": "IMPL-EVAL",
+  "verdict": "PASS",
+  "evaluatedProductHead": "e64c841bc9c1a9f967afa357b54f454445807db8",
+  "evaluatorRoute": {
+    "session": "ses_ee7c10f05ffeRL0hBLJncQXoUR",
+    "requestedModel": "opencode-go/glm-5.3-flash",
+    "requestedVariant": "max",
+    "observed": [
+      {
+        "modelID": "glm-5.3-flash",
+        "providerID": "opencode-go",
+        "mode": "build",
+        "agent": "build",
+        "variant": "max"
+      }
+    ],
+    "effort": "not independently attested",
+    "fallback": false
+  },
+  "processExit": 0,
+  "report": "evaluate.md",
+  "artifactOnlyCommitPolicy": "This commit records the independent verdict and closure evidence; no product changes since the attested head.",
+  "independentTests": {
+    "passed": 180,
+    "failed": 0,
+    "ignored": 0
+  },
+  "docs": {
+    "serviceExit": 0,
+    "contractsRawExit": 1,
+    "sanction": "Existing doctrine public-surface oRPC builder sanction; baseline 9 and head 17 upstream private references."
+  },
+  "supervisorFactCorrection": "Live issue #1482 and PR #2082 both have milestone 0.0.8; evaluator metadata saying no milestone is a readout error, not a change to its product verdict.",
+  "ownerRemainder": "Review and merge in dependency order when desired. No merge or registry upload performed. Native npm-format type-only dependency metadata limitation remains outside the claimed JSR qualification."
+}

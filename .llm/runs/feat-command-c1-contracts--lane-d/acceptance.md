@@ -1,6 +1,6 @@
 # Acceptance evidence plan
 
-C1 boxes1–4 now have concrete implementation evidence below, substantively reviewed by the supervisor; independent evaluation remains pending. Box5 and later leaves remain pending. Evidence status is not an evaluator verdict. Every newly added named test has a meaningful production mutation failure and restored pass.
+C1 boxes1–4 now have concrete implementation evidence below, substantively reviewed by the supervisor; independent evaluation remains pending. Box5 now passes; later leaves remain pending. Evidence status is not an evaluator verdict. Every newly added named test has a meaningful production mutation failure and restored pass.
 
 ## #1482
 
@@ -10,7 +10,7 @@ C1 boxes1–4 now have concrete implementation evidence below, substantively rev
 | 2 | Canonical JCS/codec behavior is deterministic and versioned. | [S2 normative vectors, strict negatives and replay-stability law](./s2-implementation.md), [all ten production controls](./s2-mutation-evidence.json), [complete package regression gates](./s3-gate-evidence.json) | [x] Implementation evidence recorded; S3 supervisor signed off |
 | 3 | Positive and negative type fixtures use real exports. | [S1 real SDK/client controls](./s1-mutation-evidence.json), [S2 opacity/invariance fixture controls](./s2-mutation-evidence.json), [clean source and emitted declaration fixture receipts](./s3-consumer-evidence.json), [production-to-declaration mutation](./s3-mutation-evidence.json) | [x] Implementation evidence recorded; S3 supervisor signed off |
 | 4 | Runtime codec negatives and isolated-declaration/publish gates pass. | [S2 codec negatives](./s2-gate-evidence.json), [180 passing affected package tests, frozen prod install and native publish/pack gates](./s3-gate-evidence.json), [JSR/declaration inventories](./s3-jsr-audit.json), [frozen consumer checks](./s3-consumer-evidence.json) | [x] Implementation evidence recorded; S3 supervisor signed off |
-| 5 | IMPL-EVAL passes. | C1 separate-family IMPL-EVAL exact signed-off head; not yet executed | Pending |
+| 5 | IMPL-EVAL passes. | [Independent C1 PASS](./evaluate.md) at `e64c841bc9c1a9f967afa357b54f454445807db8` | [x] PASS |
 
 ## #1483
 
