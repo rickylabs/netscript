@@ -78,14 +78,14 @@ Task doc:lint deno run --allow-read --allow-write --allow-run .llm/tools/run-den
       ],
       "files": [
         {
-          "path": "/ephemeral/orch-work/issue-636/plugins/streams/src/cli/streams-cli.ts",
+          "path": "<worktree>/plugins/streams/src/cli/streams-cli.ts",
           "privateTypeRef": 0,
           "missingJSDoc": 2,
           "other": 0,
           "total": 2
         },
         {
-          "path": "/ephemeral/orch-work/issue-636/packages/plugin/src/config/domain/plugin-contributions.ts",
+          "path": "<worktree>/packages/plugin/src/config/domain/plugin-contributions.ts",
           "privateTypeRef": 1,
           "missingJSDoc": 0,
           "other": 0,

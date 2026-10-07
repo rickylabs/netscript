@@ -21,7 +21,7 @@ error: AssertionError: Values are not equal.
   throw new AssertionError(message);
         ^
     at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
-    at file:///ephemeral/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts:151:5
+    at file://<ephemeral>/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts:151:5
 
  FAILURES 
 

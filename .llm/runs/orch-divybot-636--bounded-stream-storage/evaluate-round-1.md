@@ -8,7 +8,7 @@
 | Target         | `plugins/streams/services/src/**` (bounded native append-log I/O at the streams service seam)                        |
 | Archetype      | `5 — Plugin Package` (service scope overlay; dependency-specific adapter, not a framework convention)                |
 | Scope overlays | `service`                                                                                                           |
-| Evaluator      | native Claude Opus 5 (`claude-opus-5`, xhigh), session `507f3317-ba68-4e62-b085-89eb707037de`, 2026-10-07            |
+| Evaluator      | native Claude Opus 5 (`claude-opus-5`, xhigh), session `<evaluator-session>`, 2026-10-07            |
 | Generator      | Codex `sol` (separate vendor family and session) — independence satisfied                                            |
 | Heads reviewed | source content identical to commit `6aa1676` (sha256-pinned below); repo head at completion `c12a520`                |
 | Phase          | IMPL-EVAL, feature tier, round 1                                                                                     |

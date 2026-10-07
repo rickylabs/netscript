@@ -9,8 +9,8 @@
       "--no-lock",
       "--allow-all",
       "--config",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/deno.json",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts"
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/deno.json",
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts"
     ]
   },
   {
@@ -23,8 +23,8 @@
       "--no-lock",
       "--allow-all",
       "--config",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/deno.json",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts"
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/deno.json",
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/unbounded-checkpoints/tests/bounded-segment-log_test.ts"
     ]
   },
   {
@@ -37,8 +37,8 @@
       "--no-lock",
       "--allow-all",
       "--config",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/partial-read/deno.json",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts"
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/partial-read/deno.json",
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts"
     ]
   },
   {
@@ -51,8 +51,8 @@
       "--no-lock",
       "--allow-all",
       "--config",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/fabricated-reset/deno.json",
-      "/ephemeral/tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts"
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/fabricated-reset/deno.json",
+      "<ephemeral>/tmp/streams-review-controls-wrh_bq8h/fabricated-reset/tests/bounded-file-store_test.ts"
     ]
   }
 ]

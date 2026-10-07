@@ -1,8 +1,8 @@
-Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/maint/teardown/leak-check.ts '--' '--slice-dir' '.llm/runs/orch-divybot-636--bounded-stream-storage' '--worktree' '/ephemeral/orch-work/issue-636'
+Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run .llm/tools/maint/teardown/leak-check.ts '--' '--slice-dir' '.llm/runs/orch-divybot-636--bounded-stream-storage' '--worktree' '<worktree>'
 {
   "schemaVersion": 1,
   "generatedAt": "2026-10-07T19:51:51.142Z",
-  "worktreeRoot": "/ephemeral/orch-work/issue-636",
+  "worktreeRoot": "<worktree>",
   "probes": {
     "aspire": {
       "state": "ok"
@@ -26,22 +26,22 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
   "survivors": [
     {
       "kind": "apphost",
-      "identity": "/home/agent/projects/deploy-85d15ee/repo/aspire/apphost.ts (pid 992)",
+      "identity": "<operator-home>/projects/deploy-85d15ee/repo/aspire/apphost.ts (pid 992)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": null,
       "stale": false,
-      "command": "aspire stop --apphost '/home/agent/projects/deploy-85d15ee/repo/aspire/apphost.ts' --non-interactive --nologo",
+      "command": "aspire stop --apphost '<operator-home>/projects/deploy-85d15ee/repo/aspire/apphost.ts' --non-interactive --nologo",
       "atRiskFromUpstream": false,
       "resource": {
         "kind": "apphost",
-        "appHostPath": "/home/agent/projects/deploy-85d15ee/repo/aspire/apphost.ts",
+        "appHostPath": "<operator-home>/projects/deploy-85d15ee/repo/aspire/apphost.ts",
         "appHostPid": 992
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire run --non-interactive --apphost /home/agent/projects/deploy-85d15ee/repo/aspire/apphost.ts --log-file /home/agent/.aspire/logs/cli_20261007T130942030_detach-child_4040e64870284f47b08ec39befdd0c33.log (pid 973)",
+      "identity": "<operator-home>/.local/share/mise/installs/aspire/13.5.3/aspire run --non-interactive --apphost <operator-home>/projects/deploy-85d15ee/repo/aspire/apphost.ts --log-file <operator-home>/.aspire/logs/cli_20261007T130942030_detach-child_4040e64870284f47b08ec39befdd0c33.log (pid 973)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24128000,
@@ -53,18 +53,18 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 973,
         "ppid": 1,
         "observedAgeMs": 24128000,
-        "commandLine": "/home/agent/.local/share/mise/installs/aspire/13.5.3/aspire run --non-interactive --apphost /home/agent/projects/deploy-85d15ee/repo/aspire/apphost.ts --log-file /home/agent/.aspire/logs/cli_20261007T130942030_detach-child_4040e64870284f47b08ec39befdd0c33.log",
+        "commandLine": "<operator-home>/.local/share/mise/installs/aspire/13.5.3/aspire run --non-interactive --apphost <operator-home>/projects/deploy-85d15ee/repo/aspire/apphost.ts --log-file <operator-home>/.aspire/logs/cli_20261007T130942030_detach-child_4040e64870284f47b08ec39befdd0c33.log",
         "evidence": [
           {
             "kind": "apphost-argv",
-            "path": "/home/agent/projects/deploy-85d15ee/repo/aspire/apphost.ts"
+            "path": "<operator-home>/projects/deploy-85d15ee/repo/aspire/apphost.ts"
           }
         ]
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed server --contentRoot /home/agent/projects/deploy-85d15ee/repo/aspire/.aspire/integrations/apphosts/6d028ea97706 (pid 992)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed server --contentRoot <operator-home>/projects/deploy-85d15ee/repo/aspire/.aspire/integrations/apphosts/6d028ea97706 (pid 992)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24128000,
@@ -76,18 +76,18 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 992,
         "ppid": 973,
         "observedAgeMs": 24128000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed server --contentRoot /home/agent/projects/deploy-85d15ee/repo/aspire/.aspire/integrations/apphosts/6d028ea97706",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed server --contentRoot <operator-home>/projects/deploy-85d15ee/repo/aspire/.aspire/integrations/apphosts/6d028ea97706",
         "evidence": [
           {
             "kind": "content-root-argv",
-            "path": "/home/agent/projects/deploy-85d15ee/repo/aspire/.aspire/integrations/apphosts/6d028ea97706"
+            "path": "<operator-home>/projects/deploy-85d15ee/repo/aspire/.aspire/integrations/apphosts/6d028ea97706"
           }
         ]
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp start-apiserver --monitor 992 --kubeconfig /ephemeral/tmp/aspire-dcpVYBKDG/kubeconfig --tls-cert-thumbprint B61BC460D594D5C0EF406F52A03D4577A49D1DFC --tls-cert-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.crt --tls-key-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.key (pid 1329)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp start-apiserver --monitor 992 --kubeconfig <ephemeral>/tmp/aspire-dcpVYBKDG/kubeconfig --tls-cert-thumbprint B61BC460D594D5C0EF406F52A03D4577A49D1DFC --tls-cert-file <operator-home>/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.crt --tls-key-file <operator-home>/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.key (pid 1329)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -99,13 +99,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1329,
         "ppid": 1,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp start-apiserver --monitor 992 --kubeconfig /ephemeral/tmp/aspire-dcpVYBKDG/kubeconfig --tls-cert-thumbprint B61BC460D594D5C0EF406F52A03D4577A49D1DFC --tls-cert-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.crt --tls-key-file /home/agent/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.key",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp start-apiserver --monitor 992 --kubeconfig <ephemeral>/tmp/aspire-dcpVYBKDG/kubeconfig --tls-cert-thumbprint B61BC460D594D5C0EF406F52A03D4577A49D1DFC --tls-cert-file <operator-home>/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.crt --tls-key-file <operator-home>/.aspire/dev-certs/https/6F03282E49E0C2CE1D973527276E709279C362F311F2F0A59C955B8F2174A329.key",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp run-controllers --kubeconfig /ephemeral/tmp/aspire-dcpVYBKDG/kubeconfig --notification-socket /home/agent/.cache/dcp/dcp-notify-sock-pclwfutb --monitor 1329 --monitor-identity-time 0001-01-01T00:03:08.100Z (pid 1359)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp run-controllers --kubeconfig <ephemeral>/tmp/aspire-dcpVYBKDG/kubeconfig --notification-socket <operator-home>/.cache/dcp/dcp-notify-sock-pclwfutb --monitor 1329 --monitor-identity-time 0001-01-01T00:03:08.100Z (pid 1359)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -117,13 +117,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1359,
         "ppid": 1329,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp run-controllers --kubeconfig /ephemeral/tmp/aspire-dcpVYBKDG/kubeconfig --notification-socket /home/agent/.cache/dcp/dcp-notify-sock-pclwfutb --monitor 1329 --monitor-identity-time 0001-01-01T00:03:08.100Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp run-controllers --kubeconfig <ephemeral>/tmp/aspire-dcpVYBKDG/kubeconfig --notification-socket <operator-home>/.cache/dcp/dcp-notify-sock-pclwfutb --monitor 1329 --monitor-identity-time 0001-01-01T00:03:08.100Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1479 --child-identity-time 0001-01-01T00:03:08.530Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1481)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1479 --child-identity-time 0001-01-01T00:03:08.530Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1481)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -135,13 +135,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1481,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1479 --child-identity-time 0001-01-01T00:03:08.530Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1479 --child-identity-time 0001-01-01T00:03:08.530Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1539 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1541)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1539 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1541)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -153,13 +153,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1541,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1539 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1539 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1538 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1543)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1538 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1543)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -171,13 +171,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1543,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1538 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1538 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed dashboard (pid 1544)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed dashboard (pid 1544)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -189,13 +189,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1544,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed dashboard",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/managed/aspire-managed dashboard",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1544 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1547)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1544 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1547)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -207,13 +207,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1547,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1544 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1544 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1548 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1560)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1548 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1560)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -225,13 +225,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1560,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1548 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1548 --child-identity-time 0001-01-01T00:03:08.630Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1564 --child-identity-time 0001-01-01T00:03:08.640Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1572)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1564 --child-identity-time 0001-01-01T00:03:08.640Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 1572)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24121000,
@@ -243,13 +243,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 1572,
         "ppid": 1359,
         "observedAgeMs": 24121000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1564 --child-identity-time 0001-01-01T00:03:08.640Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 1564 --child-identity-time 0001-01-01T00:03:08.640Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID d6cda5669d01fbb0abb33ee4749766497233cb0dcad82867975f7a808e02cb81 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 2116)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID d6cda5669d01fbb0abb33ee4749766497233cb0dcad82867975f7a808e02cb81 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 2116)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24116000,
@@ -261,13 +261,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 2116,
         "ppid": 1359,
         "observedAgeMs": 24116000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID d6cda5669d01fbb0abb33ee4749766497233cb0dcad82867975f7a808e02cb81 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID d6cda5669d01fbb0abb33ee4749766497233cb0dcad82867975f7a808e02cb81 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID f4d6b3caab3a23cd25c9b2f8dea5fbe47693a9e7ed3246c0bfcbd20d293c71d4 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 2212)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID f4d6b3caab3a23cd25c9b2f8dea5fbe47693a9e7ed3246c0bfcbd20d293c71d4 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 2212)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24115000,
@@ -279,13 +279,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 2212,
         "ppid": 1359,
         "observedAgeMs": 24115000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID f4d6b3caab3a23cd25c9b2f8dea5fbe47693a9e7ed3246c0bfcbd20d293c71d4 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-container --containerID f4d6b3caab3a23cd25c9b2f8dea5fbe47693a9e7ed3246c0bfcbd20d293c71d4 --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25975 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 25976)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25975 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 25976)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24099000,
@@ -297,13 +297,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 25976,
         "ppid": 1359,
         "observedAgeMs": 24099000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25975 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25975 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25974 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 25977)",
+      "identity": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25974 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z (pid 25977)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 24099000,
@@ -315,13 +315,13 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 25977,
         "ppid": 1359,
         "observedAgeMs": 24099000,
-        "commandLine": "/home/agent/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25974 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
+        "commandLine": "<operator-home>/.aspire/versions/13.5.3_b5f143315ffb6968ea939a9978797a5b20e4c688-9c44730df5df187c/dcp/dcp monitor-process --child 25974 --child-identity-time 0001-01-01T00:03:30.260Z --monitor 1359 --monitor-identity-time 0001-01-01T00:03:08.170Z",
         "evidence": []
       }
     },
     {
       "kind": "process",
-      "identity": "/home/agent/.local/aspire/aspire ps --format Json (pid 2173155)",
+      "identity": "<operator-home>/.local/aspire/aspire ps --format Json (pid 2173155)",
       "ownership": "unproven",
       "owner": "unknown",
       "ageMs": 0,
@@ -333,7 +333,7 @@ Task maint:leak-check deno run --no-lock --allow-read --allow-write --allow-run 
         "pid": 2173155,
         "ppid": 2173125,
         "observedAgeMs": 0,
-        "commandLine": "/home/agent/.local/aspire/aspire ps --format Json",
+        "commandLine": "<operator-home>/.local/aspire/aspire ps --format Json",
         "evidence": []
       }
     }

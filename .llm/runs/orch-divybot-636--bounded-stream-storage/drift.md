@@ -4,7 +4,7 @@
 
 2026-10-07: committed lock actually resolves durable-streams/server 0.3.7; initial 0.3.8 inspection upgraded only exploratory lock state, subsequently restored. Tests use --frozen and run against the committed dependency. Both versions contain the same offending private hooks.
 
-2026-10-07: implementation evaluator primary muse_spark_1_3 unavailable without a current OpenRouter allowance snapshot; repository preflight exited 2. Selected only matrix-declared fallback opus_5 via the native Claude print wrapper, observed model claude-opus-5, session 507f3317-ba68-4e62-b085-89eb707037de. Same-session re-steering will be used.
+2026-10-07: implementation evaluator primary muse_spark_1_3 unavailable without a current OpenRouter allowance snapshot; repository preflight exited 2. Selected only matrix-declared fallback opus_5 via the native Claude print wrapper, observed model claude-opus-5, session <evaluator-session>. Same-session re-steering will be used.
 
 2026-10-07: JSR audit initially reported services/src cardinality 14 (cap 12). Consolidated new regressions under services/src/tests/ with excluded test_utils worker, restoring cardinality within the existing doctrine cap. Publish surface unchanged.
 

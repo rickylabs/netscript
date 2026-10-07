@@ -14,7 +14,7 @@ error: RangeError: Maximum call stack size exceeded
            ^
     at buildMessage (https://jsr.io/@std/internal/1.0.14/build_message.ts:145:12)
     at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:64:19)
-    at file:///ephemeral/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts:201:5
+    at file://<ephemeral>/tmp/streams-review-controls-wrh_bq8h/stale-checkpoints/tests/bounded-segment-log_test.ts:201:5
 
  FAILURES 
 

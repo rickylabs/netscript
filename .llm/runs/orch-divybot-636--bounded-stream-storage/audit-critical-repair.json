@@ -6,7 +6,7 @@
     "task",
     "audit:critical"
   ],
-  "cwd": "/ephemeral/orch-work/issue-636",
+  "cwd": "<worktree>",
   "gitHead": "6aa1676a648917525deb86b1e66581a755c9325c",
   "actualGitHead": "6aa1676a648917525deb86b1e66581a755c9325c",
   "timeoutMs": 1800000,

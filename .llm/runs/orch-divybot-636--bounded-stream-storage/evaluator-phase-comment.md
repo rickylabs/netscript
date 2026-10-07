@@ -9,7 +9,7 @@ GitHub. Everything in it was verified by the evaluator session named inside it.
 
 **Independence.** Independent implementation evaluation, separate vendor family and separate session
 from the generator in every cycle: generator Codex `sol` (OpenAI family); evaluator native Claude
-Opus 5 (`claude-opus-5`, effort xhigh), session `507f3317-ba68-4e62-b085-89eb707037de`, matrix-
+Opus 5 (`claude-opus-5`, effort xhigh), session `<evaluator-session>`, matrix-
 declared `opus_5` fallback after the primary `muse_spark_1_3` route failed preflight for a missing
 OpenRouter allowance snapshot (recorded in `supervisor.md`/`drift.md`). This is not self-certification
 by the generator. Three rounds in one evaluator session: round 1 `FAIL_FIX` (`evaluate-round-1.md`),

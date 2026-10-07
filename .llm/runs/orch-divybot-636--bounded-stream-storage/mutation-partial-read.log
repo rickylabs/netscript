@@ -16,7 +16,7 @@ error: RangeError: Array buffer allocation failed
     at new Uint32Array (<anonymous>)
     at diff (https://jsr.io/@std/internal/1.0.14/diff.ts:270:18)
     at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:63:7)
-    at file:///ephemeral/tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts:89:3
+    at file://<ephemeral>/tmp/streams-review-controls-wrh_bq8h/partial-read/tests/bounded-segment-log_test.ts:89:3
 
  FAILURES 
 

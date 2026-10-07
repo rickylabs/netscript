@@ -10,7 +10,7 @@ Round 1 is preserved verbatim in `evaluate-round-1.md`; the F1–F5 repair revie
 | Run ID | `orch-divybot-636--bounded-stream-storage` |
 | Target | `plugins/streams/services/src/**` — bounded native append-log I/O at the streams service seam |
 | Archetype | `5 — Plugin Package`, service scope overlay (dependency-specific adapter, not a framework convention) |
-| Evaluator | native Claude Opus 5 (`claude-opus-5`, xhigh), session `507f3317-ba68-4e62-b085-89eb707037de` |
+| Evaluator | native Claude Opus 5 (`claude-opus-5`, xhigh), session `<evaluator-session>` |
 | Generator | Codex `sol` (OpenAI family) — **different vendor family and different session in every cycle**; this is an independent review, not self-certification |
 | Rounds | round 1 `FAIL_FIX` → repair checkpoint (interim, no verdict) → round 2 FINAL, same evaluator session throughout |
 | Final candidate head | `48aa35fd8f854df6f6140844d96bbfefb70ad45f` |

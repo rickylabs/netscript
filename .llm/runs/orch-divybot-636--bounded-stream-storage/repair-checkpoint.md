@@ -10,7 +10,7 @@ verdict will be issued in this same evaluator session once the F6 off-worker
 | ----- | ----- |
 | Run ID | `orch-divybot-636--bounded-stream-storage` |
 | Phase | IMPL-EVAL round 1 → round 2 interim checkpoint |
-| Evaluator | native Claude Opus 5 (`claude-opus-5`, xhigh), session `507f3317-ba68-4e62-b085-89eb707037de`, same session as round 1 |
+| Evaluator | native Claude Opus 5 (`claude-opus-5`, xhigh), session `<evaluator-session>`, same session as round 1 |
 | Reviewed head | `48aa35f` (`test(streams): bind cache and recovery invariants to regressions`) |
 | Round-1 reviewed source | `6aa1676` |
 | Scope of this checkpoint | F1–F5 repairs only; F6 remains open by design |

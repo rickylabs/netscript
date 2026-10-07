@@ -6,7 +6,7 @@
     "task",
     "quality:gate"
   ],
-  "cwd": "/ephemeral/orch-work/issue-636",
+  "cwd": "<worktree>",
   "gitHead": "795671066b660fc231d61efa17d663b866b26628",
   "actualGitHead": "795671066b660fc231d61efa17d663b866b26628",
   "timeoutMs": 1800000,
