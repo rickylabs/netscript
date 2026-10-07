@@ -147,6 +147,7 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
+        `--env-file=${context.project.projectRoot}/.env`,
         '--allow-env',
         '--allow-read',
         '--allow-write',
