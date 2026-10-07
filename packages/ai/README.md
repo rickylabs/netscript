@@ -337,3 +337,21 @@ the environment when not passed explicitly (`--allow-env`). The real telemetry a
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+### Qualified TanStack dependency family
+
+The provider bridge and Fresh AI client are qualified together on AI core `0.52.3`,
+Anthropic adapter `0.18.3`, OpenAI adapter `0.22.3`, MCP adapter `0.3.8`, and
+Preact adapter `0.14.4`. Adapter patch releases can change their AI core peer
+requirements, so these imports use exact versions. Update the family together.
+
+Run `deno task deps:check:ai-peers` before changing these declarations. The guard
+checks every currently admitted adapter version against admitted core versions,
+then resolves a consumer without the workspace lock or configuration and checks
+the resolved peers. CI includes this gate in `ci:quality`. To qualify a released
+artifact, append `--published-version <exact-version>`; this resolves the public
+Anthropic and OpenAI provider exports without consumer dependency overrides.
+
+This framework repair makes EIS-Chat's application-level TanStack AI compatibility
+pins removable once the coordinated framework release passes published-consumer
+qualification. A source PR or dry-run alone does not establish that release.

@@ -140,13 +140,11 @@
     "npm:@prisma/instrumentation-contract@^7.8.0": "7.8.0_@opentelemetry+api@1.9.1",
     "npm:@remix-run/node-fetch-server@0.12": "0.12.0",
     "npm:@saga-bus/core@~0.2.2": "0.2.2_typescript@7.0.2",
-    "npm:@tanstack/ai-anthropic@~0.18.3": "0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-mcp@~0.3.8": "0.3.8_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-openai@~0.22.3": "0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai-preact@0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2",
-    "npm:@tanstack/ai-preact@~0.14.4": "0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2",
-    "npm:@tanstack/ai@0.52": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
-    "npm:@tanstack/ai@0.52.0": "0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3",
+    "npm:@tanstack/ai-anthropic@0.18.3": "0.18.3_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
+    "npm:@tanstack/ai-mcp@0.3.8": "0.3.8_@opentelemetry+api@1.9.1_zod@4.4.3",
+    "npm:@tanstack/ai-openai@0.22.3": "0.22.3_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3",
+    "npm:@tanstack/ai-preact@0.14.4": "0.14.4_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3",
+    "npm:@tanstack/ai@0.52.3": "0.52.3_@opentelemetry+api@1.9.1_zod@4.4.3",
     "npm:@tanstack/db@~0.6.8": "0.6.17_typescript@7.0.2",
     "npm:@tanstack/preact-query@^5.101.0": "5.101.0_preact@10.29.2",
     "npm:@tanstack/query-core@^5.101.0": "5.101.0",
@@ -1986,7 +1984,7 @@
     "@standard-schema/spec@1.1.0": {
       "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
     },
-    "@tanstack/ai-anthropic@0.18.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-anthropic@0.18.3_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-j9w/duqgvSkszp9s9i7Qgf4TqKMDMK4QC8wgtNnJlSqL980M7zk+p6S+GSaWBPeqcA+dZk0BQGM3zdnDNEWUWg==",
       "dependencies": [
         "@anthropic-ai/sdk",
@@ -1994,7 +1992,7 @@
         "@tanstack/ai-utils"
       ]
     },
-    "@tanstack/ai-client@0.29.2": {
+    "@tanstack/ai-client@0.29.2_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-SciysncXh5R5MHQ1GoF3kHfaygRFljUO1yVRvH97elR5l7Xjx9VYVB0KLnW7g11SIwxUrpODlLynlxEJSL2USg==",
       "dependencies": [
         "@tanstack/ai",
@@ -2002,8 +2000,8 @@
         "@tanstack/ai-utils"
       ]
     },
-    "@tanstack/ai-event-client@0.11.2": {
-      "integrity": "sha512-SlBC0jzlsjcdwYZqbvd7Wjny7GkGJGOZepHyJShDsfaiFNFUzGSP4SjOwV49YPfKwsFmR8hX67jQtBAmsnZWqQ==",
+    "@tanstack/ai-event-client@0.11.3": {
+      "integrity": "sha512-K5Nw05TG2NPJNunV7LI/5m7S97XHHdxN7vwTYcbKbmA5txlToaiF4wCfYBT406m7BOeGlLHZJpr3m1M6Vaai4g==",
       "dependencies": [
         "@tanstack/devtools-event-client"
       ]
@@ -2016,7 +2014,7 @@
       ],
       "bin": true
     },
-    "@tanstack/ai-openai@0.22.3_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/ai-openai@0.22.3_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-h/pIG+O1JZdrXq2AmCLLyf4Kr3VF8K8Hycj4yN23JIwJ+6HTp8LoAG9w8CRcL8wTGhWpuzDbMgdBExRNg9ZORQ==",
       "dependencies": [
         "@tanstack/ai",
@@ -2025,7 +2023,7 @@
         "openai"
       ]
     },
-    "@tanstack/ai-preact@0.14.4_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2": {
+    "@tanstack/ai-preact@0.14.4_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_preact@10.29.2_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-odY4lGCqOwwJez3aE9hDmHenP+ZR93ripnLxsGlp4zs7b0xkK3M/RSE02C1rgoK523LMf1eG4xusk0W4SpXyiA==",
       "dependencies": [
         "@tanstack/ai",
@@ -2033,11 +2031,11 @@
         "preact"
       ]
     },
-    "@tanstack/ai-utils@0.4.0": {
-      "integrity": "sha512-xqvAgPJkIuGk1m+jZKyb7vBTQIaBmUD9EVzlPkDWWMp80n69uwL0TnBZCVk+OwL9goTQiFy648dnBfLsiJgl6A=="
+    "@tanstack/ai-utils@0.4.1": {
+      "integrity": "sha512-B3PGn2WYiRtivZCt7MUN2iXeoK9fwZhgdbrPIz5hPqVR8r8sNDZMmMqtiOkp7sxzPvVlCBItFVHw7QpZ9g6e9w=="
     },
-    "@tanstack/ai@0.52.0_@opentelemetry+api@1.9.1_zod@4.4.3": {
-      "integrity": "sha512-a2a+A+QguzZ3b8D7dqaA94A+CT42WUgxGYfscLrKJ+e2gHuEI8VNFGLq17KFuJI60A481bGpoGZ17fKpJF7q1A==",
+    "@tanstack/ai@0.52.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+      "integrity": "sha512-Rzv27opAN0jkoEwD1lxG2XTGfva+o6nKnBTD+KaK65b30u+y6lTH8Hw5KET6E/gh6KOLdcWgk5kVAeHEP8vKQg==",
       "dependencies": [
         "@ag-ui/core",
         "@opentelemetry/api",
@@ -2071,7 +2069,7 @@
       "integrity": "sha512-6T5Yop/793YI+H+5J8Hsyj4kCih9sl4t3ElLgKioW5hk3ocn+ZdSJ94tT7vL7uabxSugWYBZlOTMPzEw2puvQw==",
       "bin": true
     },
-    "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.0__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
+    "@tanstack/openai-base@0.10.8_@tanstack+ai@0.52.3__@opentelemetry+api@1.9.1__zod@4.4.3_@opentelemetry+api@1.9.1_zod@4.4.3": {
       "integrity": "sha512-fNEKKuve6IJmAEzaGwRNwa8ypXSvjgbyezUZG0VRs8HUXfrdfSwoCVDpDeIEVIfP+a3UiiMUTa7uNyKUkgkVzw==",
       "dependencies": [
         "@tanstack/ai",
@@ -4092,17 +4090,18 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
-      "jsr:@std/path@1"
+      "jsr:@std/path@1",
+      "jsr:@std/semver@1"
     ],
     "members": {
       "packages/ai": {
         "dependencies": [
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
-          "npm:@tanstack/ai-anthropic@~0.18.3",
-          "npm:@tanstack/ai-mcp@~0.3.8",
-          "npm:@tanstack/ai-openai@~0.22.3",
-          "npm:@tanstack/ai@0.52"
+          "npm:@tanstack/ai-anthropic@0.18.3",
+          "npm:@tanstack/ai-mcp@0.3.8",
+          "npm:@tanstack/ai-openai@0.22.3",
+          "npm:@tanstack/ai@0.52.3"
         ]
       },
       "packages/aspire": {
@@ -4240,8 +4239,8 @@
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
           "npm:@orpc/server@^1.15.0",
           "npm:@preact/signals@2.9.2",
-          "npm:@tanstack/ai-preact@~0.14.4",
-          "npm:@tanstack/ai@0.52",
+          "npm:@tanstack/ai-preact@0.14.4",
+          "npm:@tanstack/ai@0.52.3",
           "npm:@tanstack/preact-query@^5.101.0",
           "npm:@tanstack/query-core@^5.101.0",
           "npm:@tanstack/react-db@~0.1.95",

@@ -2427,3 +2427,12 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
   storage migration or persistent index.
+
+## packages/ai — existing doc-lint private references (`ai-doc-private-ref-baseline-2036`)
+
+- **Reason:** Single-entrypoint doc lint returns private-type references on unchanged main and on the peer-compatibility slice. All per-entrypoint diagnostic counts and exits match; source public contracts are unchanged. Combined-summary zero counts do not override those failing exits.
+- **Owner:** AI framework maintainers.
+- **Target:** Before stable release readiness is claimed.
+- **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
+- **Status:** Open, existing baseline finding recorded for independent source-slice adjudication; no blanket green documentation claim.
+- **Gate:** F-7; full-export `deno task doc:lint --root packages/ai` must pass when resolved.
