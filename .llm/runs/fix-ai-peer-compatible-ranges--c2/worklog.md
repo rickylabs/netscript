@@ -101,3 +101,11 @@ Gate `peer-receipt-committed-corrected`: raw exit `0`. Command: `deno run --allo
 ## Completion
 
 Independent GLM IMPL-EVAL PASS at `987048499e80d42b8f8aa65905d8f8558c818672` (source `b03385dc31cfee4df098639d5c22cd616db38d00`), with explicit unchanged baseline documentation debt. A post-commit durable peer receipt now pins that evaluated head and passes; initial receipt CLI typo failed before execution and was corrected. Phases 5 implementation, 6 source gates, 7 independent evaluation and 9 source handoff complete. Phase 8 release remains owner work. No merge/publication.
+
+# AI peer correction plan
+
+CI reveals Fresh UI private lock stale after manifest changes and reports @tanstack/openai-base@0.10.16 peer ^0.59.0 against core 0.52.3. The first guard wrongly selected only @tanstack/ai-* packages, omitting openai-base. The first source PASS is superseded for final scope.
+
+Use the latest exact peer-coherent family: core 0.65.1, Anthropic 0.19.5, OpenAI 0.27.0, MCP 0.8.0 (its actual core dependency ^0.65.0), Preact 0.20.0. Transitive openai-base 0.12.4 peers ^0.65.0, ai-client 0.38.0 aligns. Inspect public upstream API through package source; adapt only owning bridge if changed. Provider behavior regressions must still pass; no release claims. Pins alone cannot freeze future transitive patches, so live guard examines every npm package with an AI core peer, independent of name prefix, plus enforces exactly one core. Add the missing transitive package regression to existing meaningful policy test or new graph-selection regression, with causal mutations.
+
+Refresh root and Fresh UI private lock only required graph edges and preserve unrelated versions where native update refreshes metadata; do not accept new advisory baseline. Run both frozen provider/Fresh/FreshUI checks after selective refresh, provider suite, production bundles, all required quality/JSR/publish gates. Update documented family and guard description. Independent PLAN-EVAL required because this amendment upgrades multiple upstream APIs. After PASS implement, then a new independent IMPL-EVAL on final source. Refs #2036 until a fixed published consumer exists.
