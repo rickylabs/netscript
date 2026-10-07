@@ -1,3 +1,45 @@
+# C2 current checkpoint — S5 supervisor approved
+
+S5 frozen product aggregate e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e verified; final supervisor durable quality/arch PASS0. All 202 affected tests, 18 meaningful mutations for 14 named tests, individual export-map docs and native publication/clean consumers pass. Slice footprint26 files. Supervisor ordinary commit/push/comment precedes ONLYS6 release. S6, final clean-committed generated-consumer wave and independent C2 IMPL-EVAL remain required.
+
+## Previous checkpoints retained
+
+# C2 current checkpoint — S5 frozen for supervisor review
+
+S5 alone is implemented at baseline7dbdc6127b8c0e7c499c3648538cb866adab8325. Fifteen package/docs
+files plus nine run artifacts form a24file slice. Product aggregate SHA256 is `e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e`.
+Read s5-source-manifest.json, s5-gate-evidence.json, s5-consumer-evidence.json and
+s5-mutation-evidence.json. Exact CI Deno2.9.5: 202affectedtests0, 99filecheck/lint/fmt0;
+all five service and eleven database individual doc entrypoints0; native durable quality/arch/
+exports, JSR audits, publish/pack and isolated source/packed consumers0. All14newnamed tests
+have18meaningful production controls with actual failure1 and byte-restored pass0.
+
+Executor validates/freeze-detaches identity before once-only callbacks, uses exact canonical
+request and separate key digest, authentic C1 binding, a finite transaction timeout and one callback.
+Aggregate full side-row bytes/count/required/forbidden policies precede bound ordered flush.
+Replay validates receipt material and performs no handler/side writes. Busy is private until
+rollback; cancellation checkpoints rollback before typed results. Business errors retain identity;
+new database-owned CommandStoreError maps explicitly typed provider failures without driver-text
+inference. Focused service signature dependencies are type-only database re-exports. Root APIs,
+existing definition binding, store, dependency metadata and locks are unchanged.
+
+Supervisor substantive review/commit/push/comment is next. S6 remains locked; seven fault seams,
+shared semantic/determinism conformance, final C2 generated corpus/current-tree consumers and
+independent IMPL-EVAL remain required. No production fault option, hidden retry, provider/OTel
+implementation claim, commit/push/GitHub/evaluator write or final generated asset wave by this lane.
+
+## Previous checkpoints retained
+
+# C2 current checkpoint — S5 implementation
+
+Supervisor explicitly released only S5 at clean7dbdc6127b8c0e7c499c3648538cb866adab8325.
+The health prerequisite is signed off/pushed/commented. Implement executor/identity/buffers with
+exact CI Deno2.9.5 and task-private runtime state. Add a narrow database-owned raw provider
+failure protocol per supervisor review; no driver-text classification. S6 and final generated/
+consumer/evaluator wave stay locked. Freeze fewer than30files for substantive supervisor review.
+
+## Previous checkpoints retained
+
 # C2 current checkpoint — S5 next
 
 S4signed off; complete C1 thirdPASS/prerequisites propagated; minimal reviewed upstream/native proxy metadata patch0af020a4e has bothaudits/frozenconsumers0 and300affectedtests0. The narrow health annotation prerequisite is substantively reviewed/applied: native packed full-export baseline1→candidate0, source0before/after, all four factories mutable and runtimeJSbody identical. Appliedsourcequality/arch0; all20S4hashes and reviewedlocks unchanged. See health-emission evidence/supervisor review. Supervisor commits/pushes/comments this slice, then explicitly releases ONLYS5. FinalS6 owngeneratedchain/all-exportconsumer/independentC2review remain required. All writes task-local; no merges/force/protectedPRwrites; wholechain planPASS unchanged.

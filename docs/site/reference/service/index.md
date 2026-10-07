@@ -223,14 +223,15 @@ The following entrypoints are published alongside the root export:
 | --- | --- | --- |
 | `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
 | `@netscript/service/commands/testing` | `./commands-testing.ts` | Atomic memory store and explicit test controls. |
-| `@netscript/service/commands` | `./commands.ts` | Opaque command definitions and codecs. |
+| `@netscript/service/commands` | `./commands.ts` | Opaque command definitions, once-only executor and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
 
 ## Command definitions and codecs
 
 `@netscript/service/commands` defines immutable command policies and bounded canonical codecs
-without executing handlers. It requires no permissions. JSON uses the versioned `jcs-v1` protocol
+without executing handlers. Importing, defining and encoding require no permissions; execution
+uses the explicitly supplied store/business operations and their permissions. JSON uses `jcs-v1`
 with RFC 8785 ordering and numeric/string serialization. Default limits are depth 64, 10,000
 aggregate values/keys and 1 MiB UTF-8 bytes; options may only tighten these bounds. Stored text must
 match canonical serialization exactly. Synchronous schema validation must preserve canonical JSON
@@ -247,7 +248,7 @@ identity to keep replay stable.
 | `CommandJson`               | type alias       | Readonly recursive I-JSON values.                                 |
 | `CommandActor`              | type alias       | Principal or system identity, excluding roles and claims.         |
 | `CommandEnvelope`           | type alias       | Input, actor and transport fields with string version tokens.     |
-| `CommandTraceContext`       | type alias       | Optional trace and baggage context.                               |
+| `CommandTraceContext`       | type alias       | Validated W3C traceparent and optional tracestate.                               |
 | `CommandAuditInput`         | type alias       | Redacted audit intent.                                            |
 | `CommandContext`            | interface        | Transaction handle and synchronous side-record operations.        |
 | `CommandDefinition`         | interface        | Opaque immutable identity, replay policy and record requirements. |
@@ -277,3 +278,31 @@ receipt seeding and outside-transaction business writes support corruption and r
 controls. These helpers require no permissions and certify no real provider. The fake supports
 Serializable isolation, zero claim wait, a bounded cooperative timeout, terminal busy and one
 callback attempt; it may reject disjoint concurrent drafts because it uses a global state revision.
+
+## Command executor
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `createCommandExecutor` | function | Compose once-only execution over a bound same-commit store. |
+| `CommandExecutor` | interface | Execute a genuine definition and await the store boundary. |
+| `CommandExecution` | type alias | Decoded value, applied/replayed outcome, idempotency state and original correlation. |
+| `CommandExecutorOptions` | type alias | Store, optional clock/IDs/telemetry, claim wait and tighten-only record limits. |
+| `CommandRecordLimits` | type alias | 64 audit/64 outbox defaults; aggregate canonical side-row byte default 64 KiB. |
+| `CommandClock` | interface | Injected valid Date source, detached by the executor. |
+| `CommandIdSource` | interface | Fresh bounded identifiers. |
+| `CommandTelemetryPort` | interface | Once-only tracing extension preserving values and errors. |
+| `CommandTelemetrySpan` | interface | Finish with finite outcome/count vocabulary after the boundary. |
+| `CommandTelemetryStart` | type alias | Name/version, requested or default isolation, provider and keyed state. |
+| `CommandTelemetryResult` | type alias | Finite outcome/idempotency/counts and optional bounded failure kind. |
+
+The executor freezes detached bounded I-JSON input before the two identity callbacks, each called
+once. Required keys are 16–256 UTF-8 bytes; scope and other identity/header strings are bounded to
+1–256 bytes. Identity uses exact canonical semantic material and a separate key digest, excluding
+scheme, correlation and W3C transport fields. Buffers include full side-row metadata in their shared
+byte budget; limits only tighten published defaults. Transactions receive a five-second timeout.
+
+Replay validates receipt material without handler/side writes. Busy and cancellation surface only
+after rollback; arbitrary business errors retain identity. Provider failures use the database-owned
+`CommandStoreError` contract. Audit, outbox and receipt completion share the winning receipt ID and
+flush in that order. Optional unkeyed attempts skip receipts. The telemetry port prepares the later
+adapter; no transport, hidden retry or production fault option is provided.

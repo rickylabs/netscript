@@ -128,3 +128,9 @@ constructs all delegates from the actual transaction callback. Root lifecycle an
 methods stay outside the business handle. The boundary invokes work once; a busy claim requires
 rollback before an error surfaces. A capability declaration validates and freezes metadata; it
 cannot certify an adapter's physical guarantees. This contract subpath requires no permissions.
+
+`CommandStoreError` and `CommandStoreFailure` provide database-owned bounded provider failure
+classification. Adapters classify acquisition, driver and boundary failures themselves; driver
+codes/messages stay solely in the trusted cause. The service translates this class and preserves
+arbitrary callback business errors. `busy` remains a terminal receipt-claim result requiring
+rollback, rather than a retry of the transaction callback.

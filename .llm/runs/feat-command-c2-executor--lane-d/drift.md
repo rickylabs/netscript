@@ -32,3 +32,23 @@ regenerate that bundle or claim full leaf evaluation/readiness.
 - Freshmain872df8e21 owns the exact minimal proxy security patch. Earlier supervisor restriction against curated metadata was a scope choice; routine reviewed prerequisite adoption is now authorized and independently native-qualified. Two locks only/version+integrity, no unrelated upgrade/pin/cachedelete/reload/audit waiver. Bothaudits0/frozeninstall/privatecheck0, affected300regressions0; no protected-PR writes.
 
 - Inherited nativehealth.d.ts inference putsreadonlybeforefourJSDocmembers, yieldingTS2300/TS7008. Explicit mutable inline annotation repairs native emission without newroottypes/runtime change. Originalinitializer/nativeJSbody identical, fullnative packed consumer1→0, mutable APIqualified. Separate prerequisite under supervisor review/commit/push/comment before S5; finalS6consumer/generatedchain bar unchanged.
+
+- S5 explicitly released at7dbdc612 after reviewed prerequisites. Supervisor approved64/64 row
+  defaults and64KiB aggregate full canonical side-row bytes, tighten-only options,256byte remaining
+  string policy and explicit5000ms transaction timeout. These bounded policy choices do not weaken
+  RFC key/scope/JCS/store guarantees or narrow definition generic types.
+- Supervisor requested a database-owned typed provider failure protocol for the later adapter.
+  CommandStoreError is raw, bounded and service-independent; typed operation/boundary translations
+  preserve retryability, while unrelated callback errors remain identical. No driver-code guess,
+  new transaction architecture, dependency or debt. Actual database publication/docs/type gates0.
+- Primary W3C review corrected initial over-restriction of future traceparent fields and empty
+  tracestate headers/members. Positive and negative runtime fixtures plus three meaningful production
+  controls qualify the correction; no broader telemetry implementation is claimed.
+- Actual individual service command docs found six DB private annotation references although the
+  combined graph was0. Needed dependency types are re-exported type-only from their database owner;
+  both full maps now qualify individually as well as combined. Module permissions describe explicit
+  execution operations separately from import/definition/encoding. No tool, output or gate waiver.
+- S5 updates two reference pages but does not regenerate agent-docs assets. Inherited C1 assets are
+  not fresh C2 corpus evidence. S6 final generated-chain/full-current-consumer/evaluator bar remains
+  open and unchanged. All native artifacts are retained without handpatch; no remote/npm-complete
+  certification or real-provider guarantee. Source frozen; supervisor review precedes S6 release.

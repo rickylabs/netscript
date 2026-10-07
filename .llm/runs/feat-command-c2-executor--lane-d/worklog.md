@@ -1,3 +1,60 @@
+# Current S5 review handoff
+
+S5 is frozen for substantive supervisor review at the explicit release baseline
+7dbdc6127b8c0e7c499c3648538cb866adab8325. The slice has24files including evidence; two supervisor
+review/evidence files can be added while preserving fewer than30. No S6 release or implementation.
+
+| Gate | Actual result |
+| --- | --- |
+| Structured affected package check/lint/format | 0;99files, no dropped files |
+| Full database/service runtime suites including C1 regressions | 0;202passed,0failed |
+| New focused S5 named tests | 14passed;18production mutants each cause named runtime failure1 and byte-restored pass0 |
+| Full export-map documentation | Separate maps0; each of five service and eleven database entries0 and combined0 |
+| Durable native quality/architecture/export receipts | 0; exact request/verdict/output hashes retained |
+| Native materialized publish, native pack and JSR audits | 0 for both packages; exact inventories and archives preserved |
+| Isolated expanded source/packed declarations | 0 unfrozen/frozen; new executor/raw-error API compiler qualification0 |
+| Isolated public source executor application/replay smoke | 0 |
+| Internal documentation links and native site build | 0; no generated agent-docs bundle refreshed |
+| Dependency metadata/root/private locks/root exports | Unchanged; no new declared dependency |
+
+Implementation follows the RFC local transaction algorithm. Input and narrow actor are detached,
+validated and frozen before scope/fingerprint, each called once. Exact JCS request material includes
+command/version/scope/selected input/actor kind+subject/expectedVersion or null; key SHA256 is
+separate. Transport scheme/correlation/W3C/raw key are excluded. Keys and scope obey RFC UTF-8
+bounds; other identity/row strings use the documented256byte policy. W3C known fields are validated
+without parsing opaque future fields; empty tracestate headers/members are accepted. Three distinct
+production W3C controls prove those positives.
+
+One bound transaction receives a5000ms timeout. Policies enforce64audit/64outbox and64KiB aggregate
+full canonical side-row bytes by default, with tighten-only options. Recorders do no IO and detach
+JSON text immediately. All validation/encoding precedes audit→outbox→receipt completion. Receipt ID
+is the shared side-row execution ID; optional unkeyed attempts create an ID and skip claim/completion.
+Replay checks hash/version/completeness/canonical text/decode without handler or side writes; it
+preserves the stored correlation. Terminal busy makes no later query and uses a private sentinel
+until rollback. Abort checkpoints await rollback before typed results. Arbitrary business values,
+including null/undefined and driver-looking objects, retain identity; no callback or handler retry.
+
+Supervisor requested the narrow database-owned CommandStoreError protocol for later adapters.
+It carries only bounded phase/retryability, abort or corruption; driver diagnostics stay solely in
+cause. Service translates this class for operation and boundary failures; meaningful constructor
+retryability and service translation mutants fail the actual provider test. Database full-map docs,
+native publication/pack and isolated type qualification cover the new class. Individual service
+docs exposed six private annotation dependencies; needed raw dependencies are type-only re-exports
+from the focused database owner, preserving layering/root budget. Module permissions now distinguish
+permission-free import/definition/encoding from explicit store/business execution permissions.
+
+The final manifest documentation-only correction followed the202-test behavior qualification.
+Final scoped/static/native docs/publication/consumer and site gates were refreshed afterward;
+executable/test source and all mutant restoration hashes were unchanged. Source manifest captures
+exact final module-doc bytes, exports, all15package/docs hashes and the aggregate. Raw logs/receipts
+remain private; public evidence contains safe verdicts and hashes. Final C2 generated corpus and
+consumer/conformance/evaluator gates remain S6 work. No complete npm or remote publication claim.
+
+Reconcile: current live acceptance was read; whole-chain PLAN-EVAL stays authoritative. Supervisor
+owns substantive signoff, commit/push/comment, phase release and later independent evaluation.
+
+## Previous checkpoints retained
+
 # C2 worklog
 
 ## Design
@@ -92,3 +149,7 @@ Separate lane freezes reviewed upstream/nativeproxy2.0.8record adoption in two l
 ## Health declaration prerequisite — supervisor signoff
 
 Only mutable inline healthChecks annotation changes runtime source; original initializer/native executable JSbyte-identical. Separate actualCI2.9.5 all-export source0before/after, native packed baseline1(4TS2300+1TS7008)→candidate0 fresh/frozen, mutablefactory/options/returnsqualified. Nativepublish/pack/check65/lint/fmt/full-mapdocs/10existingregressions/quality/arch/exports/audit0. Supervisor frozenhash/archive checks and signature review, independent applied-sourcequality/arch0, all20S4hashes/currentreviewedlocks stable. See health-emission-supervisor-review.md and actualgates/consumers/source. No new namedtest for annotation-only metadata; no nativegeneratedoutput handpatch. Commit/push/comment precedes ONLYS5 release; S6and later leaves remainlocked.
+
+## S5 supervisor signoff
+
+Verified all24 frozen files and158 raw evidence files, exact final source/consumer hashes and18 actual named production mutation assertion failures/restored passes. Substantive layering/identity/busy/replay/flush/abort/retry review approved; no remote/global transaction, hidden store singleton or production fault option. Final independent native supervisor quality-scan/arch-check PASS0 at frozen15-file package/docs aggregate; provisional pre-manifest receipts superseded. All202 affected tests; scoped99-file checks; five service/eleven database docs individually+combined; JSR/publish/pack/clean source+dts consumers and docs site/links pass. See s5-supervisor-{review,evidence}. Signed footprint26 files; ordinary commit/push/comment before ONLYS6 release. Final corpus wave/leaf IMPL-EVAL remain open. C1 current-head CI is now SUCCESS with fresh-main dependency patch in native merge composition; its prior red receipt remains historical.

@@ -286,7 +286,8 @@ JSR with cryptographically verified provenance.
 
 `@netscript/service/commands` defines immutable commands without executing them. Their handlers
 remain privately bound to the exact original definition, and copied or forged definitions are
-refused. The focused subpath requires no permissions; defining a command starts no resource.
+refused. Importing, defining and encoding commands require no permissions and start no resource.
+Execution delegates to the explicitly supplied store and business operations and their permissions.
 
 ```typescript
 import { defineCommand, jsonCodec } from '@netscript/service/commands';
@@ -344,6 +345,65 @@ boundary. Custom codecs must also return valid bounded I-JSON before persistence
 `jsonCodec()` requires synchronous validation that preserves canonical JSON identity. Neutral
 transforms are accepted; coercion, field stripping and value-changing transforms are rejected,
 preventing a response from changing when a stored receipt is decoded.
+
+## Command execution
+
+Compose `createCommandExecutor({ store, clock?, ids?, telemetry?, receiptClaimWaitMs?, limits? })`
+with a database-owned `CommandStorePort<TTx>`. The focused `/commands` export keeps the root
+surface unchanged. Execution performs one local interactive transaction; it never retries its
+handler or sends buffered messages. Authorize the actor before calling it and keep remote effects
+outside the handler. The testing store demonstrates semantics and certifies no real provider.
+
+```typescript
+import { createCommandExecutor, defineCommand, jsonCodec } from '@netscript/service/commands';
+import type { CommandStorePort } from '@netscript/database/commands';
+import { z } from 'zod';
+
+type Business = { update(id: string): Promise<void> };
+declare const store: CommandStorePort<Business>;
+const update = defineCommand<'items.update', { id: string }, { updated: boolean }, Business>({
+  name: 'items.update', definitionVersion: 1,
+  idempotency: {
+    scope: () => 'items', fingerprint: (input) => input,
+    response: jsonCodec(z.object({ updated: z.boolean() })),
+  },
+  records: { audit: 'required', outbox: 'optional' },
+  handle: async (ctx) => {
+    await ctx.tx.update(ctx.envelope.input.id);
+    ctx.audit({ action: 'updated', subject: { type: 'item', id: ctx.envelope.input.id } });
+    return { updated: true };
+  },
+});
+const executor = createCommandExecutor({ store });
+const result = await executor.execute(update, {
+  input: { id: 'item' }, actor: { kind: 'system', subject: 'maintenance' },
+  correlationId: 'update', idempotencyKey: 'fixture-key-00001',
+});
+result.value;
+```
+
+The executor validates, detaches and deeply freezes bounded I-JSON input and a narrowed actor
+before calling scope and fingerprint once. Request SHA-256 covers command, definitionVersion,
+scope, selected input, actor kind/subject and expectedVersion or null. A separate SHA-256 hashes
+the key. Scheme, correlation, W3C context and raw key are excluded from request material. Keys
+are 16–256 UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context
+uses W3C known-field validation, retains opaque future fields, and permits empty tracestate members.
+
+Defaults are 64 audit intents, 64 delivery intents and 64 KiB **aggregate** canonical side-row
+bytes, including persisted metadata. Configuration only tightens those ceilings. Each transaction
+receives a finite five-second timeout and validated provider claim-wait policy. Recorders perform
+no IO and detach canonical JSON immediately. Required/forbidden/count/byte policy and response
+codec validation all precede flush. Audit, outbox and receipt completion flush in that order using
+one bound handle; their execution ID is the winning receipt ID. Optional unkeyed attempts still
+have an execution ID but skip claim/completion.
+
+Replay rechecks hash, version, completeness, canonical text and decoding, then returns the original
+correlation and performs no handler or side writes. Busy issues no later query and surfaces
+`in_progress` only after rollback. Abort checkpoints likewise await the store's rollback result.
+Application errors preserve identity; typed database `CommandStoreError` classifications translate
+to bounded service failures without reading driver text. Successful values and optional finite
+telemetry completion are reported only after commit. `CommandTelemetryPort` is an extension seam;
+this package supplies no OpenTelemetry implementation or production fault controls.
 
 ## Command store testing
 

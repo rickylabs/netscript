@@ -1,3 +1,14 @@
+# Current implementation boundary — S5 complete, frozen
+
+Supervisor explicitly released only S5 at7dbdc612. Executor/identity/buffers and narrowly requested
+database raw failure classification are complete with actual gates and18meaningful controls for
+14named tests. Read current worklog/context and the s5 evidence/source manifest. Fifteen package/
+docs files and nine run artifacts stay below30. Preserve frozen source for supervisor review;
+no commit/push/GitHub/evaluator writes, S6, final generated assets or later leaf. Production options
+contain no fault controls. Existing C1 binding/root exports/metadata/locks remain unchanged.
+
+## Previous instructions retained
+
 # C2 implementation lane — S4–S6
 
 use harness

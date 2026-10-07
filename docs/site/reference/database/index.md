@@ -216,3 +216,8 @@ Back to the [reference overview](/reference/).
 side-record methods share the provider callback's business handle. The provider must construct that
 binding and invoke work at most once; capability metadata alone does not certify atomicity. Busy is
 terminal until rollback.
+
+`CommandStoreError` is the exported raw provider failure class, with `CommandStoreFailure` carrying
+bounded store phase/retryability, cancellation or receipt corruption. It has no dependency on
+service errors. Its JSON form omits cause, message and stack; adapters keep driver-specific codes
+and messages solely in the trusted cause and preserve arbitrary callback errors.

@@ -34,3 +34,5 @@ export type {
   IsolationLevel,
   TransactionOptions,
 } from './ports/database-client.ts';
+
+export { CommandStoreError, type CommandStoreFailure } from './ports/command-store-error.ts';
