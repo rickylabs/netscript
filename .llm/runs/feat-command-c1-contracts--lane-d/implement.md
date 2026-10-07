@@ -13,3 +13,5 @@ Implement locked C1 slices S1–S3 only after the independent whole-chain PLAN-E
 S1 preserves live BaseContractMeta and the six base codes, adds three opt-in command codes, validates safe failure payloads structurally and rethrows every unrecognized error unchanged. Real public export fixtures prove builder/client/safe/isDefinedError literals, metadata and undeclared-code rejection. Each new test receives a reversible meaningful mutation with named failure, nonzero exit and restored pass.
 
 MCP find_guidance and search_docs consulted for C1 command errors; recommendations were general contracts/builders guidance. RFC 0003 and current public declarations govern the specific command contract.
+
+S1 supervisor sign-off is committed; S2 is implemented and frozen for review. See s2-implementation.md and its distinct evidence. S3 must await supervisor S2 sign-off/push/comment. Replay-stable jsonCodec validation compares pre-schema canonical input with validated canonical output; first-party IsolationLevel is type-re-exported from the focused subpath. No runtime capability export or root enlargement.

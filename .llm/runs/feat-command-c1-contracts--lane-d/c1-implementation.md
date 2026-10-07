@@ -1,6 +1,6 @@
-# C1 implementation evidence — S1 review handoff
+# C1 implementation evidence — S2 review handoff
 
-Scope: issue #1482, locked C1 slice S1. S2/S3 remain pending; this artifact is implementation evidence for substantive supervisor review, not an evaluator verdict or whole-C1 completion claim. Product files remain uncommitted at this handoff. Parent supervisor owns sign-off commit, push and draft-PR #2082 comment before S2 starts. The separate-family whole-chain PLAN-EVAL PASS remains untouched.
+Current state: S1 supervisor sign-off committed at `5023427004b37a561570a1a23bb4b7e21faf0c51`; S2 implemented and frozen for review; S3 pending. Read [S2 handoff](./s2-implementation.md), [S2 gates](./s2-gate-evidence.json), [S2 mutations](./s2-mutation-evidence.json) and [S2 hashes](./s2-source-manifest.json). This artifact provides implementation evidence, not an evaluator verdict or whole-C1 completion claim. The separate-family whole-chain PLAN-EVAL PASS remains untouched. The following S1 evidence is retained as historical slice detail.
 
 ## Product files
 
@@ -52,6 +52,6 @@ The materialized published file list includes `commands.ts` plus the two command
 
 An initial post-format check/test run exited1 because formatting split a negative fixture assignment and moved its expected-diagnostic comment above the assignment instead of the rejected property. The comment was moved onto the property. The final check/test/lint/fmt and mutation controls were rerun and pass as recorded; initial failures are retained in the evidence history.
 
-## Next supervisor action
+## Historical S1 next action
 
 Review S1 source and evidence substantively, sign off/commit/push/comment on draft PR #2082, then release S2 to this lane. Do not mark #1482 complete yet: service command value/opaque-definition/failure/codec implementation, deterministic bounded versioned JCS, S3 clean consumer/dependency/declaration/JSR gates and independent per-leaf IMPL-EVAL remain pending. No material deviation from the locked plan was needed.

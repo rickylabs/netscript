@@ -222,8 +222,45 @@ The following entrypoints are published alongside the root export:
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
+| `@netscript/service/commands` | `./commands.ts` | Opaque command definitions and codecs. |
 | `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
 | `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
+
+## Command definitions and codecs
+
+`@netscript/service/commands` defines immutable command policies and bounded canonical codecs
+without executing handlers. It requires no permissions. JSON uses the versioned `jcs-v1` protocol
+with RFC 8785 ordering and numeric/string serialization. Default limits are depth 64, 10,000
+aggregate values/keys and 1 MiB UTF-8 bytes; options may only tighten these bounds. Stored text must
+match canonical serialization exactly. Synchronous schema validation must preserve canonical JSON
+identity to keep replay stable.
+
+| Symbol                      | Kind             | Description                                                       |
+| --------------------------- | ---------------- | ----------------------------------------------------------------- |
+| `defineCommand`             | function         | Validates durable identity and freezes an opaque definition.      |
+| `jsonCodec`                 | function         | Synchronous Standard Schema validation with stable bounded JSON.  |
+| `canonicalCommandJson`      | function         | Produces bounded canonical JSON text.                             |
+| `parseCanonicalCommandJson` | function         | Accepts only bounded canonical stored text.                       |
+| `CommandCodec`              | type alias       | Typed response/payload encoding and decoding boundary.            |
+| `CommandJsonLimits`         | type alias       | Tighten-only depth, item and byte safeguards.                     |
+| `CommandJson`               | type alias       | Readonly recursive I-JSON values.                                 |
+| `CommandActor`              | type alias       | Principal or system identity, excluding roles and claims.         |
+| `CommandEnvelope`           | type alias       | Input, actor and transport fields with string version tokens.     |
+| `CommandTraceContext`       | type alias       | Optional trace and baggage context.                               |
+| `CommandAuditInput`         | type alias       | Redacted audit intent.                                            |
+| `CommandContext`            | interface        | Transaction handle and synchronous side-record operations.        |
+| `CommandDefinition`         | interface        | Opaque immutable identity, replay policy and record requirements. |
+| `CommandDefinitionSpec`     | type alias       | Construction specification with privately bound handler.          |
+| `commandDefinitionBinding`  | type-only symbol | Opaque marker; unavailable as a runtime export.                   |
+| `commandExecutorCapability` | type-only symbol | Private binding capability; unavailable as a runtime export.      |
+| `CommandIdempotency`        | type alias       | Frozen semantic scope, fingerprint and replay codec.              |
+| `CommandIdempotencyMode`    | type alias       | Required or optional key policy.                                  |
+| `CommandIdempotencySpec`    | type alias       | Construction policy defaulting to required keys.                  |
+| `CommandOutboxInput`        | type alias       | Delivery intent with typed codec.                                 |
+| `CommandRecordRequirement`  | type alias       | Required, optional or forbidden side-record policy.               |
+| `CommandError`              | class            | Frozen redacted failure with a trusted nonserialized cause.       |
+| `CommandFailure`            | type alias       | Bounded discriminated failure and retry vocabulary.               |
+| `IsolationLevel` | type alias | Database-owned transaction isolation vocabulary, re-exported as a type. |
 
 ---
 

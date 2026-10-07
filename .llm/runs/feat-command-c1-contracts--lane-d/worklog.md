@@ -6,9 +6,9 @@
 | --- | --- | --- |
 | Bootstrap | complete | Skills, harness workflow, gate matrix, owner authority and baseline recorded |
 | Research | complete for plan | research.md; complete live issue snapshots retained privately |
-| Plan & Design | ready for independent evaluation | plan.md and Design below |
+| Plan & Design | complete | plan.md and Design below |
 | Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
-| Implement | S1 signed off; S2 pending | Separate implementation lane; supervisor reviews before each sign-off commit |
+| Implement | S1/S2 signed off; S3 pending | Separate implementation lane; supervisor reviews before each sign-off commit |
 | Gate | not started | No implementation verdict claimed |
 | Evaluate | not started | Per-leaf IMPL-EVAL required |
 | Release | N/A | No merge, publication or release authorized |
@@ -43,11 +43,11 @@ Requested route: OpenCode Go / glm-5.3-flash / max, independent headless evaluat
 
 Draft PR #2082 contains the bootstrap/plan commit. Research and Plan phase comments link that commit. The opening documentation labels intentionally skip scaffold/E2E and will be removed when product slices land. Initial checkout lacked git author identity; configured an agent identity locally in this clone and committed successfully; no global settings changed.
 
-Implementation lane: c1_implementation, requested gpt-6.1-sol high, separate session from supervisor. S1 is active; no lane self-certifies. Exact product changes will be substantively reviewed before the supervisor sign-off commit, then pushed/commented before S2 starts.
+Implementation lane: c1_implementation, requested gpt-6.1-sol high, separate session from supervisor. S1/S2 are substantively signed off; S3 remains pending until the S2 commit/push/comment reconciliation. No lane self-certifies.
 
 ## S1 implementation evidence — supervisor signed off
 
-Implementation lane completed the locked S1 contract/error product files and real-export fixture, pending substantive supervisor review and sign-off commit. See [c1-implementation.md](./c1-implementation.md), [per-test mutations](./s1-mutation-evidence.json), [actual gates](./s1-gate-evidence.json) and [source hashes](./s1-source-manifest.json).
+Implementation lane completed the locked S1 contract/error product files and real-export fixture; supervisor signed off and committed/pushed/commented 5023427004b37a561570a1a23bb4b7e21faf0c51. See [c1-implementation.md](./c1-implementation.md), [per-test mutations](./s1-mutation-evidence.json), [actual gates](./s1-gate-evidence.json) and [source hashes](./s1-source-manifest.json).
 
 | Stable S1 gate | Actual exit | Evidence |
 | --- | --- | --- |
@@ -60,6 +60,14 @@ Implementation lane completed the locked S1 contract/error product files and rea
 
 Doc diagnostics use the existing sound-oRPC-contract sanction in doctrine/02-public-surface.md; the raw nonzero exit is retained, and publish passes independently. Initial post-format fixture directive placement caused check/test failures; placement corrected and final controls/gates rerun. No evaluator verdict was written or edited by this lane.
 
-Reconcile: S1 is awaiting supervisor review; draft PR #2082/issue #1482 remain owned by the supervisor for commit, push and comment reconciliation. No GitHub mutations or commits by this lane. S2/S3 are pending and no whole-C1 completion is claimed.
+Reconcile: S1 is signed off and committed/pushed/commented; draft PR #2082/issue #1482 remain owned by the supervisor for commit, push and comment reconciliation. No GitHub mutations or commits by this lane. S2/S3 are pending and no whole-C1 completion is claimed.
 
 Supervisor substantively reviewed all S1 source and evidence; see s1-supervisor-review.md. Sign-off commit and push/comment reconciliation precede S2. No whole-leaf evaluator verdict is claimed.
+
+## S2 implementation evidence — frozen for supervisor review
+
+S1 sign-off commit is 5023427004b37a561570a1a23bb4b7e21faf0c51. Locked S2 is implemented on the separate lane; substantive sign-off remains supervisor work. See [S2 handoff](./s2-implementation.md), [actual gates](./s2-gate-evidence.json), [per-test mutations](./s2-mutation-evidence.json) and [hashes](./s2-source-manifest.json).
+
+Stable service check61files/test14/lint/fmt/full-map docs/quality/architecture, whole-map docs inventory and materialized service publish exit0. All ten new runtime groups have distinct meaningful production-mutant named exit1 then restored exit0; two production type mutants also fail the real-export fixture then restore cleanly. Contracts docs retain unchanged S1 sanctioned17 references at raw exit1, missingJSDoc0/other0. Owned initial lint/docs findings were repaired and retained honestly. Exact already-pinned dependency mappings added, resolved dependency bodies unchanged under supervisor semantic review. StandardSchema stable freshness1.1.0 matches the pin. Replay-stability and why-wrapper limitations are recorded in drift. S2 is frozen; S3 must await substantive supervisor sign-off commit/push/comment. No leaf evaluator verdict, commit or GitHub action by this lane.
+
+Supervisor S2 sign-off: see s2-supervisor-review.md. Source hashes match, independent supervisor quality/architecture receipts exit0; full affected package regressions and consumer qualification remain S3 work. No final evaluator verdict is claimed.
