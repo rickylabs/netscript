@@ -50,7 +50,7 @@ Reconcile: exact implementation-head CI runtime workflow 37679143081 is green ac
 
 ## Final disposition
 
-IMPL-EVAL FAIL_FIX at 6a8a4de3e00d09237e0b3bbc1664f9a7c40afbe7, independent GLM 5.3 Flash session ses_ee80ac192ffeVIMc0cX6rw41Z0, requested/observed OpenCode Go max. Evaluator confirms both issue contracts complete. Its runtime snapshot predates the completed green CI runtime workflow linked in ci-evidence.md. F2 remains: critical proxy-addr dependency audit is red; evaluator requires separate dependency maintenance, outside the one-PR-per-item brief. Stop item for owner dependency-maintenance decision; no audit bypass, new dependency PR, merge or readiness claim. F3 folder-cardinality advisory is preserved for owner review, with no debt accepted.
+IMPL-EVAL FAIL_FIX at 6a8a4de3e00d09237e0b3bbc1664f9a7c40afbe7, independent GLM 5.3 Flash session <session>, requested/observed OpenCode Go max. Evaluator confirms both issue contracts complete. Its runtime snapshot predates the completed green CI runtime workflow linked in ci-evidence.md. F2 remains: critical proxy-addr dependency audit is red; evaluator requires separate dependency maintenance, outside the one-PR-per-item brief. Stop item for owner dependency-maintenance decision; no audit bypass, new dependency PR, merge or readiness claim. F3 folder-cardinality advisory is preserved for owner review, with no debt accepted.
 
 6. Gate: worker/consumer/static gates pass; runtime CI passes; audit-critical fails.
 7. Evaluate: separate-vendor FAIL_FIX recorded; no self-certification.
