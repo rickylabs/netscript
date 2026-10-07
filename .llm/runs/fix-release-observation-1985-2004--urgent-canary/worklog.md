@@ -14,3 +14,19 @@
 6 Gates: focused restored tests exit 0, full existing release-tool suite exit 0 with no failed/ignored cases. Initial full-suite invocation used a noncanonical TMPDIR containing parent-directory segments: fixture lexical/normalized path comparisons failed. Canonical realpath TMPDIR rerun resolves all failures without source changes. Scoped check/fmt exit 0; root lint excludes tooling (coverage refusal 2), derivative config retains canonical lint rules without selection exclusions and processes all four changed TypeScript files, exit 0. Bash syntax and full YAML parser exit 0; quality gate exit 0. All four generators exit 0, generated carriers unchanged. Eleven controls individually test-red, restored bytes; no compiler failures counted. Independent review next at exact source head.
 
 All four carrier freshness gates exit 0 at source 35408e2b6c4217810e1eb3a616d49785c67d3bba, carriers unchanged. Actual durable critical audit exit 1: shared pre-existing dependency advisory remains outside release-repair scope and requires owner maintenance.
+
+7 Evaluate: independent opencode-go/glm-5.3-flash max, session ses_ee77a1ae5ffeJZYbqzQvHgjv6U, source PASS at da7943381b496a1c1adc63f19732f2bc56d5d28f, actual command exit 0. Evaluator independently ran focused regressions and existing workflow consumer through canonical wrapper, exit 0; mutation receipts independently reviewed. Initial report contained unrelated prose; evaluator detected and rewrote it in the same session before returning final clean report. Raw supervisor log retained externally, final artifact inspected for factual owned-scope evidence and hygiene.
+
+| Gate | Actual result |
+| --- | --- |
+| Focused restored regressions / full existing release-tool suite | 0; no failures or ignored cases |
+| Matching isolated mutants | Each test red, no compiler error, original bytes restored |
+| Scoped check / actual-coverage lint / fmt | 0 |
+| Bash syntax / full YAML parse / quality | 0 |
+| All four generators and freshness checks | 0; carriers unchanged |
+| Independent focused plus existing workflow suite | 0 |
+| Independent evaluation launcher | 0; source PASS |
+| Actual critical dependency audit | 1; shared owner maintenance |
+
+8 Release: no-op per release-gates because this is tooling repair, not a release cut or published/scaffold shape change. No canary dispatch, immutable version/tag change, registry write or publication.
+9 Close: source contracts accepted independently. Draft retained; shared critical advisory requires owner-directed separate maintenance, so no full-CI/merge-readiness claim. Acceptance-evidence mappings link each issue box to regressions and existing immutable/source workflow guards, for normal mirroring once owner readiness is satisfied. Dated close record written; no architectural debt added. Final evidence-only commit leaves evaluated source identical.
