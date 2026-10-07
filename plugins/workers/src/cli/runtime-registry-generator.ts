@@ -1,7 +1,8 @@
 import { exists } from 'jsr:@std/fs@^1';
-import { basename, dirname, join, relative, resolve } from 'jsr:@std/path@^1';
+import { basename, dirname, join, relative } from 'jsr:@std/path@^1';
 import { toCamelCase } from 'jsr:@std/text@^1';
 import type { JobConfig, WorkersConfigData } from '@netscript/plugin-workers-core/config';
+import { resolveConfiguredJobPolicies } from './configured-job-policies.ts';
 
 export interface GenerateRuntimeRegistriesOptions {
   readonly manifestPath: string;
@@ -60,15 +61,6 @@ interface PluginEntry {
   readonly pluginId: string;
   readonly registryKey: string;
   readonly varName: string;
-}
-
-type DiscoveredJob = Readonly<{ path: string; source: 'local' | 'plugin' }>;
-
-interface ConfiguredJob {
-  readonly canonicalPath: string;
-  readonly grouped: boolean;
-  readonly origin: string;
-  readonly policy: JobConfig;
 }
 
 interface GeneratedJobEntry {
@@ -205,7 +197,10 @@ async function generateRuntimeRegistry(
 
   const pluginEntries = await appendPluginImports(projectRoot, target, registryDir, lines);
   const configuredPolicies = target.kind === 'workers-job' && workers
-    ? resolveConfiguredJobPolicies(projectRoot, target, files, pluginEntries, workers)
+    ? resolveConfiguredJobPolicies(projectRoot, [
+      ...files.map((file) => ({ path: `${target.dir}/${file}`, source: 'local' as const })),
+      ...pluginEntries.map((entry) => ({ path: entry.path, source: 'plugin' as const })),
+    ], workers)
     : undefined;
   const valueType = target.mapValueType ?? target.typeImport.name;
   if (target.kind === 'workers-job') {
@@ -256,7 +251,7 @@ function createRegistryHeader(target: RuntimeRegistryTarget): string[] {
     ' */',
     '',
     target.kind === 'workers-job'
-      ? `import type { JobPayloadMap, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
+      ? `import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '${target.typeImport.from}';`
       : `import type { ${target.typeImport.name} } from '${target.typeImport.from}';`,
     '',
   ];
@@ -393,7 +388,7 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
     '',
     'type SchemaBackedJobHandler =',
     '  & ((...args: never[]) => unknown)',
-    '  & Readonly<{ payloadSchema: unknown }>;',
+    '  & Readonly<{ payloadSchema: JobPayloadSchema<unknown> }>;',
     '',
     'type GeneratedJobDefinition<',
     '  TId extends string,',
@@ -458,7 +453,7 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
   );
   if (entries.some((entry) => entry.source === 'plugin' && entry.policy)) {
     lines.push(
-      'function assertJobHandlerId(handler: SchemaBackedJobHandler & Readonly<{ id: string }>, expectedId: string, path: string): string {\n  if (handler.id !== expectedId) {\n    throw new Error(`Workers config id "${expectedId}" does not match discovered plugin handler id "${String(handler.id)}" at ${path}.`);\n  }\n  return expectedId;\n}',
+      'function assertJobHandlerId<TId extends string>(handler: SchemaBackedJobHandler & Readonly<{ id: string }>, expectedId: TId, path: string): TId {\n  if (handler.id !== expectedId) {\n    throw new Error(`Workers config id "${expectedId}" does not match discovered plugin handler id "${String(handler.id)}" at ${path}.`);\n  }\n  return expectedId;\n}',
       '',
     );
   }
@@ -468,95 +463,6 @@ function appendJobDefinitions(entries: readonly GeneratedJobEntry[], lines: stri
     'function resolveJobHandler<TModule extends Record<string, unknown>>(module: TModule, path: string): ResolvedJobHandler<TModule> {\n  const candidate = module.default ?? module.handler;\n  if (typeof candidate !== "function" || !("payloadSchema" in candidate)) {\n    throw new Error(`Worker job module ${path} must export a schema-backed handler as default or handler.`);\n  }\n  return candidate as ResolvedJobHandler<TModule>;\n}',
     '',
   );
-}
-
-function resolveConfiguredJobPolicies(
-  projectRoot: string,
-  target: RuntimeRegistryTarget,
-  files: readonly string[],
-  pluginEntries: readonly PluginEntry[],
-  workers: WorkersConfigData,
-): ReadonlyMap<string, JobConfig> {
-  const discovered = new Map<string, DiscoveredJob>();
-  files.forEach((file) => addDiscovered(`${target.dir}/${file}`, 'local'));
-  pluginEntries.forEach((entry) => addDiscovered(entry.path, 'plugin'));
-  const configuredByPath = new Map<string, ConfiguredJob>();
-  const configuredById = new Map<string, ConfiguredJob>();
-  workers.groups.forEach((group, groupIndex) =>
-    group.jobs.forEach((policy, jobIndex) =>
-      addConfiguredJob(policy, `workers.groups[${groupIndex}].jobs[${jobIndex}]`, true)
-    )
-  );
-  workers.jobs.forEach((policy, index) =>
-    addConfiguredJob(policy, `workers.jobs[${index}]`, false)
-  );
-
-  const matched = new Map<string, JobConfig>();
-  for (const configured of configuredByPath.values()) {
-    const discoveredJob = discovered.get(configured.canonicalPath);
-    if (!discoveredJob) {
-      const available = [...discovered.values()].map((entry) => entry.path).join(', ') || '(none)';
-      throw new Error(
-        `Workers config ${configured.origin} declares id "${configured.policy.id}" at "${configured.policy.entrypoint}", which resolves to unmatched project path "${configured.canonicalPath}". Discovered worker job files: ${available}.`,
-      );
-    }
-    if (configured.policy.source !== discoveredJob.source) {
-      throw new Error(
-        `Workers config ${configured.origin} declares source "${configured.policy.source}" for id "${configured.policy.id}" at "${configured.canonicalPath}", but discovery identified that file as source "${discoveredJob.source}".`,
-      );
-    }
-    matched.set(discoveredJob.path, configured.policy);
-  }
-  return matched;
-
-  function addDiscovered(path: string, source: 'local' | 'plugin'): void {
-    const canonicalPath = canonicalProjectPath(projectRoot, path);
-    discovered.set(canonicalPath, { path, source });
-  }
-
-  function addConfiguredJob(policy: JobConfig, origin: string, grouped: boolean): void {
-    const canonicalPath = configuredProjectPath(projectRoot, workers.jobsDir, policy.entrypoint);
-    const configured = { canonicalPath, grouped, origin, policy } satisfies ConfiguredJob;
-    const samePath = configuredByPath.get(canonicalPath);
-    if (samePath) {
-      if (samePath.policy.id !== policy.id) {
-        throw new Error(
-          `Workers config path "${canonicalPath}" is paired with conflicting ids "${samePath.policy.id}" (${samePath.origin}) and "${policy.id}" (${origin}).`,
-        );
-      }
-      if (!grouped && samePath.grouped) {
-        console.warn(
-          `Workers config ${samePath.origin} wholly shadows flat ${origin} for id "${policy.id}" at "${canonicalPath}".`,
-        );
-        return;
-      }
-      throw new Error(
-        `Workers config contains duplicate policies for id "${policy.id}" at "${canonicalPath}" (${samePath.origin} and ${origin}).`,
-      );
-    }
-
-    const sameId = configuredById.get(policy.id);
-    if (sameId && sameId.canonicalPath !== canonicalPath) {
-      throw new Error(
-        `Workers config id "${policy.id}" is paired with conflicting paths "${sameId.canonicalPath}" (${sameId.origin}) and "${canonicalPath}" (${origin}).`,
-      );
-    }
-    configuredByPath.set(canonicalPath, configured);
-    configuredById.set(policy.id, configured);
-  }
-}
-
-function configuredProjectPath(projectRoot: string, jobsDir: string, entrypoint: string): string {
-  const absoluteJobsDir = resolve(projectRoot, jobsDir.replaceAll('\\', '/'));
-  return canonicalProjectPath(
-    projectRoot,
-    resolve(absoluteJobsDir, entrypoint.replaceAll('\\', '/')),
-  );
-}
-
-function canonicalProjectPath(projectRoot: string, path: string): string {
-  const absolute = resolve(projectRoot, path.replaceAll('\\', '/'));
-  return relative(resolve(projectRoot), absolute).replaceAll('\\', '/');
 }
 
 function toRelativeImport(fromDir: string, target: string): string {

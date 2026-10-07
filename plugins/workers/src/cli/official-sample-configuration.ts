@@ -413,6 +413,6 @@ const handler = defineJobHandler(CreateUserSettingsPayloadSchema, async (ctx) =>
   });
 });
 
-export default Object.assign(handler, { id: 'create-user-settings' });
+export default Object.assign(handler, { id: 'create-user-settings' as const });
 `;
 }
