@@ -1,0 +1,3 @@
+# Lane C workers close record
+
+PR https://github.com/rickylabs/netscript/pull/2035 . Run `.llm/runs/fix-workers-generated-schema-type--urgent-canary/`. Both issue source acceptance contracts and mutation controls are documented; full hosted E2E passed at https://github.com/rickylabs/netscript/actions/runs/37681074809 . Actual critical dependency audit remains red. Independent FAIL_FIX is retained, including owner maintenance blocker; later runtime evidence resolves pending runtime observation without claiming full CI green. Owner must direct separate dependency maintenance and resolve the recorded cardinality warning/debt path. No merge or publication. This session record adds no runtime source change.
