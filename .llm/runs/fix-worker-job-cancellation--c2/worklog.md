@@ -257,3 +257,13 @@ Gate `amendment-doc-plugin`: raw exit `1`. Command: `deno task doc:lint --root p
 Gate `amendment-carrier`: raw exit `1`. Command: `deno task agent:carrier:check`. Full raw output retained privately.
 
 S7 substantive review: D1-D5 correct the five verified review findings within the locked six source/test files. All eight new tests individually fail causal, compiling source mutations and pass after exact restoration. Initial constant-false mutation caused a type error and was replaced by a type-safe clock comparison; it does not count as proof. Reentrant promise assertion strengthened to strict identity after deep equality failed to kill the old implementation. Full owning suite 120 pass/0 fail/0 ignored; frozen source check, scoped lint/fmt, quality and architecture exit zero. Core/plugin publish dry-runs pass. Whole all-entrypoint core/plugin documentation JSON is byte-identical to the prior corrected baseline with raw exits one; plugin JSR retains only inherited doctor module-tag failure. Initial carrier invocation named nonexistent task, to be corrected by check:assets-barrel. No public signature or dependency delta. S7 source complete; clean-source corpus freshness S8 next, mandatory independent amendment IMPL S9 pending.
+
+Gate `amendment-corpus-fresh`: raw exit `0`. Command: `deno task check:mcp-export-corpus`. Full raw output retained privately.
+
+Gate `amendment-carrier-corrected`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `amendment-corpus-tests`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts packages/mcp/tests/embedded-export-surface-corpus_test.ts`. Full raw output retained privately.
+
+Gate `amendment-consumer`: raw exit `0`. Command: `deno run --frozen --config deno.json --allow-all <private-consumer>`. Full raw output retained privately.
+
+S8 qualification complete: canonical corpus freshness unchanged sha42f8c6a692ba7882afc7cfc4325fd77993815ea97b14d8ad26a3ee1909cf37a8,7920 symbols; no generated-source delta required. All14 generator/embedded corpus tests pass under test-scoped WT_ENFORCE=0 and task-local TMPDIR, corrected check:assets-barrel passes, native required-signal/deadline consumer executes. No dependency/lock/public signature/carrier changes. Full120-suite and unchanged complete per-entrypoint doc baselines retained. Source78f868ee4 complete; independent exact-head cancellation amendment IMPL next, source frozen until process exit.
