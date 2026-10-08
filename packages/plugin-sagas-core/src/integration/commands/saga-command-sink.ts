@@ -83,7 +83,7 @@ export function createSagaCommandOutboxSink(options: SagaCommandSinkOptions): Co
         if (
           receipt.published !== true || receipt.messageType !== delivery.topic ||
           !(receipt.acceptedAt instanceof Date) || !Number.isFinite(receipt.acceptedAt.getTime()) ||
-          (receipt.messageId !== undefined && !messageIdentity(receipt.messageId))
+          (receipt.messageId !== undefined && receipt.messageId !== delivery.id)
         ) throw new CommandRelayError('invalid_response');
         return Object.freeze({
           identity: receipt.messageId ?? delivery.id,

@@ -62,7 +62,9 @@ Deno.test('saga command sink uses checked publisher and stable outbox identity c
 });
 Deno.test('saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery', async () => {
   let calls = 0;
-  for (const mode of ['rejected', 'unavailable', 'mismatch', 'invalid-time', 'unchecked']) {
+  for (
+    const mode of ['rejected', 'unavailable', 'mismatch', 'invalid-time', 'unchecked', 'wrong-id']
+  ) {
     const publisher: SagaPublisherPort = {
       id: 'publisher',
       publish<T extends SagaMessage>(next: T): Promise<SagaPublisherResult<T['type']>> {
@@ -83,6 +85,7 @@ Deno.test('saga command sink refuses checked rejection unavailable malformed or 
         if (mode === 'mismatch') Reflect.set(receipt, 'messageType', 'wrong');
         if (mode === 'invalid-time') Reflect.set(receipt, 'acceptedAt', new Date(NaN));
         if (mode === 'unchecked') Reflect.set(receipt, 'published', 'unchecked');
+        if (mode === 'wrong-id') Reflect.set(receipt, 'messageId', 'foreign-message');
         return Promise.resolve(receipt);
       },
       publishMany() {

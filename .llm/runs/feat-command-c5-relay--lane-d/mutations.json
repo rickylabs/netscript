@@ -122,26 +122,6 @@
     "sourceSha256": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6"
   },
   {
-    "test": "saga command sink uses checked publisher and stable outbox identity correlation and W3C",
-    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
-    "mutation": "saga-stable-key",
-    "mutantExit": 1,
-    "restoredExit": 0,
-    "assertionFailure": true,
-    "restoredByteIdentical": true,
-    "sourceSha256": "829c673df10576fc7a5489bbacb6f0551f157f4b9f44ccf956528f567204bb25"
-  },
-  {
-    "test": "saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery",
-    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
-    "mutation": "saga-checked-receipt",
-    "mutantExit": 1,
-    "restoredExit": 0,
-    "assertionFailure": true,
-    "restoredByteIdentical": true,
-    "sourceSha256": "829c673df10576fc7a5489bbacb6f0551f157f4b9f44ccf956528f567204bb25"
-  },
-  {
     "test": "stream command sink waits delivered completion and forwards stable identity and correlation for upsert delete",
     "productionFile": "packages/plugin-streams-core/src/integration/commands/stream-command-sink.ts",
     "mutation": "stream-waits-delivery",
@@ -170,5 +150,35 @@
     "assertionFailure": true,
     "restoredByteIdentical": true,
     "sourceSha256": "f6118c4af1c3532a86f3dec7f5196fc9cb39479fc3dd550faccafdac11e6b449"
+  },
+  {
+    "test": "saga command sink uses checked publisher and stable outbox identity correlation and W3C",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-stable-key",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "db76e9c2b8f12cbc8a8b97e7f03d07c842ceda20ba1319267c6ce21266a1e336"
+  },
+  {
+    "test": "saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-checked-receipt",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "db76e9c2b8f12cbc8a8b97e7f03d07c842ceda20ba1319267c6ce21266a1e336"
+  },
+  {
+    "test": "saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-message-match",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "db76e9c2b8f12cbc8a8b97e7f03d07c842ceda20ba1319267c6ce21266a1e336"
   }
 ]
