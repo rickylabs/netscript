@@ -1,141 +1,125 @@
-### IMPL-EVAL Verdict: PASS (Round 2)
+# IMPL-EVAL Round 3 Verdict: PASS
+
+## 1. Evaluation Identity & Commit Lineage
 
 - **Verdict**: `PASS`
-- **Product Head**: `10286a1efe4d1574ad9d4b22a17f9a7082657e85`
-- **Current HEAD**: `b3a12f8545490c5775b6e0817f31803e0a6e57b4` (adds tracked harness artifacts only
-  to product head)
-- **Baseline**: `72cb3c9d706c6e6a02035c7d9ab124cb945155da` (`main`)
-- **Merged Main**: `6d1eaf5a221ce29fa55c0bfd10e3b5c7d66101e3` (preserves upstream authentication and
-  stream repairs)
-- **Evaluator Session Model**: Gemini 3.8 Flash (High) (harness-authorized Google fallback in the
-  same evaluation conversation)
+- **Product HEAD**: `5138748194002ef1afdb95edfb798ddd7f08bb1f`
+- **Evaluation HEAD**: `0691575ce7eceffc7b25b9355af19972b665466e`
+- **Prior Qualified Product HEAD**: `10286a1efe4d1574ad9d4b22a17f9a7082657e85` (Round 2 `PASS`)
+- **Baseline Git Identity**: `72cb3c9d706c6e6a02035c7d9ab124cb945155da` (`main`)
+- **Reconciled Upstream Main**: `6d1eaf5a221ce29fa55c0bfd10e3b5c7d66101e3` (`origin/main`)
+- **Evaluation Context**: Focused dependency-metadata delta verification pursuant to
+  `.llm/runs/feat-command-c3-postgres--lane-d/impl-eval-lock-resteer.md` using the authorized Google
+  fallback evaluator route.
 
 ---
 
-### Verification of Round 1 Findings and Repairs
+## 2. Dependency Metadata Delta & Semantic Review
 
-In Round 1, the implementation received `FAIL_FIX` due to:
+### 2.1 Git Delta Inspection
 
-1. 4 `private-type-ref` documentation lint errors in `packages/database/commands-postgres.ts` caused
-   by unexported referenced types (`TransactionOptions`, `CommandStoreCapabilities`,
-   `CommandTransactionRequest`, `CommandTransaction`).
-2. An inaccurate entry in `s9-qualification.json` reporting `"documentationExit": 0` when `doc:lint`
-   had exited `1`.
+Across the entire repository, the exact diff between prior qualified product
+`10286a1efe4d1574ad9d4b22a17f9a7082657e85` and product HEAD
+`5138748194002ef1afdb95edfb798ddd7f08bb1f` outside harness artifacts (`.llm/`) is strictly confined
+to `packages/fresh-ui/deno.lock`:
 
-Both issues have been resolved at product head `10286a1efe4d1574ad9d4b22a17f9a7082657e85`:
+- **Files Changed**: `packages/fresh-ui/deno.lock` (+1 insertion, 0 deletions)
+- **Inserted Entry**:
+  ```diff
+  diff --git a/packages/fresh-ui/deno.lock b/packages/fresh-ui/deno.lock
+  index 3ce37b8c0..d7a1e00f3 100644
+  --- a/packages/fresh-ui/deno.lock
+  +++ b/packages/fresh-ui/deno.lock
+  @@ -3772,6 +3772,7 @@
+               "npm:@prisma/adapter-mssql@^7.8.0",
+               "npm:@prisma/adapter-pg@^7.8.0",
+               "npm:@prisma/client@^7.8.0",
+  +            "npm:@prisma/driver-adapter-utils@^7.8.0",
+               "npm:@prisma/instrumentation-contract@^7.8.0",
+               "npm:pg@^8.21.0"
+             ]
+  ```
+- **Product Code Invariance**: Between product HEAD `5138748194002ef1afdb95edfb798ddd7f08bb1f` and
+  current evaluation HEAD `0691575ce7eceffc7b25b9355af19972b665466e`, non-harness product code is
+  100% byte-for-byte identical (`git diff` is empty).
 
-1. **Complete Public Annotation Graph Re-exported**:
-   - `packages/database/commands-postgres.ts` now re-exports the complete set of 14 contract types
-     from `./commands.ts`: `CommandReceiptRow`, `CommandStoreCapabilities`, `CommandStorePort`,
-     `CommandTransaction`, `CommandTransactionRequest`, `DatabaseProvider`, `IsolationLevel`,
-     `ReceiptClaim`, `ReceiptClaimResult`, `ReceiptCompletion`, `StoredCommandAudit`,
-     `StoredCommandOutbox`, `StoredCommandReceipt`, `TransactionClientPort`, and
-     `TransactionOptions`.
-   - Running `deno task doc:lint --root packages/database --pretty` now passes with exit code
-     **`0`**:
-     - `totalErrors`: 0
-     - `totalPrivateTypeRef`: 0
-     - Entrypoint `./commands-postgres.ts`: 0 errors (exit code 0)
-     - Combined package exit code: 0
-2. **Transparent Historical Correction and Requalification**:
-   - The historical round-1 qualification was corrected to record `documentationExit: 1` and
-     preserved in `evaluate-round-1.md`.
-   - `.llm/runs/feat-command-c3-postgres--lane-d/repair-qualification.json` documents the exact
-     product head `10286a1efe4d1574ad9d4b22a17f9a7082657e85`, the verified per-entrypoint
-     documentation exits, gate results, and matching SHA-256 digests across all modified files.
-3. **Generated Asset Synchronization**:
-   - All 4 generated consumer assets were regenerated with pinned Deno 2.9.5 from the clean source
-     readset:
-     - `check:assets-barrel`: passed (exit code 0, 0 diff)
-     - `check:publish-assets`: passed (exit code 0, 0 diff)
-     - `check:agent-docs-prose`: passed (exit code 0, 0 diff, 642 files generated, rendered output
-       OK)
-     - `check:mcp-export-corpus`: passed (exit code 0, matching provenance digest, 8,084 symbols
-       across 280 subpaths)
+### 2.2 Semantic Equality of Lockfile
 
----
+Semantic comparison of `packages/fresh-ui/deno.lock` confirms:
 
-### Comprehensive Gate and Conformance Verification
-
-| Gate / Requirement            | Command / Check                                                 | Exit Code / Result | Repo-Relative Evidence                                                                                                                  |
-| ----------------------------- | --------------------------------------------------------------- | :----------------: | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Root Check                    | `deno task check`                                               |        `0`         | 3,227 files selected across 27 batches; 0 occurrences / 0 errors. Verified locally and in `repair-check.log`.                           |
-| Root Lint                     | `deno task lint`                                                |        `0`         | 2,213 files selected across 37 batches; 0 rule violations. Verified locally and in `repair-lint.log`.                                   |
-| Root Format Check             | `deno task fmt:check`                                           |        `0`         | 2,213 files checked; 0 formatting findings. Verified locally and in `repair-fmt-check.log`.                                             |
-| Quality Scan                  | `deno task quality:scan`                                        |        `0`         | 0 unapproved findings (7 existing repository allowances retained). Verified locally and in `repair-quality-scan.log`.                   |
-| Architecture Fitness          | `deno task arch:check`                                          |        `0`         | 0 doctrine failures across all workspace members. Verified locally and in `repair-arch-check.log`.                                      |
-| Package Doc Lint              | `deno task doc:lint --root packages/database --pretty`          |        `0`         | All 12 entrypoints clean; 0 private-type-ref errors; 0 missing JSDocs. Verified locally and in `repair-doc-lint.log`.                   |
-| Package Publish Dry-Run       | `deno publish --dry-run --allow-dirty` (in `packages/database`) |        `0`         | Isolated declarations clean; 0 type errors; simulated package publish succeeded. Verified locally and in `repair-database-publish.log`. |
-| JSR Audit                     | `deno task deps:audit` / `jsr-audit`                            |        `0`         | 0 errors (2 expected warnings for directory cardinality and slow-types check). Verified in `repair-jsr-database.log`.                   |
-| Production Dependency Install | `deno task deps:prod-install`                                   |        `0`         | Production graph installation verified in 600ms. Verified locally and in `repair-deps-prod-install.log`.                                |
-| Database Unit Tests           | `deno test --allow-all packages/database/tests/`                |        `0`         | 13 passed, 0 failed, 1 ignored (conformance test requires dedicated provider socket). Verified locally.                                 |
-| Targeted Test Suite           | Service / Contracts / Database tests                            |        `0`         | 256 passed, 0 failed, 1 ignored. Verified in `repair-service-contracts-database-tests.log`.                                             |
-| Native PostgreSQL Conformance | 7 real-provider cases via `command-postgres-conformance.sh`     |        `0`         | 7 passed, 0 failed against native PostgreSQL with generated Prisma client. Verified in `repair-provider.log`.                           |
-| Pinned Asset Freshness        | Barrel, Prose, MCP Corpus, Publish Assets                       |        `0`         | All 4 checks pass cleanly with pinned Deno 2.9.5 toolchain.                                                                             |
+1. **Top-Level Structural Invariance**: The top-level keys `packages`, `remote`, and `npm` are
+   identical.
+2. **Resolution Invariance**: Zero package versions, remote descriptors, or integrity checksums were
+   added, updated, or removed.
+3. **Workspace Record Alignment**: `@prisma/driver-adapter-utils@7.8.0` was already pinned and
+   resolved transitively in `packages/fresh-ui/deno.lock`. The change strictly adds the missing
+   direct workspace membership declaration to
+   `workspace.members["packages/database"].packageJson.dependencies`, reconciling the package with
+   `packages/database/package.json`.
+4. **Lock Convergence**: Executing `deno task --cwd packages/fresh-ui lock:update` produces zero
+   subsequent modifications, confirming lockfile stability.
 
 ---
 
-### Core Behavioral & Architectural Invariants
+## 3. Independent Verification & Gate Evidence
 
-1. **Transaction Boundary & Type Continuity**:
-   - `TransactionClientPort<TTx>` in `packages/database/ports/transaction-client.ts` decouples the
-     callback transaction client from the root client without type erasure or artificial casts.
-   - `withTransaction<T, TTx>` in `packages/database/mod.ts` propagates `TTx` directly.
-   - The consumer-owned generated bridge in
-     `packages/database/tests/fixtures/command-store/command-store.ts.template` strips root-only
-     operations (`$transaction`, `$connect`, `$disconnect`, `$on`, `$use`, `$extends`) via `Omit`
-     and a runtime proxy, and rejects unsupported isolation levels like `Snapshot`.
-2. **Atomicity & Shared Callback Execution**:
-   - All persistence operations (`claimReceipt`, `completeReceipt`, `appendAudit`, `appendOutbox`)
-     in `packages/database/src/commands/adapters/create-postgres-command-store.ts` close over the
-     single `business` transaction client.
-   - The negative control test in `postgres-conformance.ts.template` proves that writes to the root
-     client outside the callback survive rollback, while writes to the transaction-bound client roll
-     back atomically.
-3. **Parameterized SQL & Static Identifiers**:
-   - Queries in `postgres-command-claim.ts` and `postgres-command-rows.ts` use static SQL
-     identifiers matching the reviewed migration and positional parameter binding (`$1`–`$13`). No
-     dynamic SQL string interpolation exists.
-4. **Consumer Schema Ownership**:
-   - Zero runtime DDL exists in framework code. Construction and module imports do not touch the
-     network or start connections.
-5. **Concurrency, Claim Locking & Winner Resolution**:
-   - `INSERT ... ON CONFLICT (scope, command_name, key_hash) DO NOTHING RETURNING id` acquires
-     claims safely.
-   - Conflict resolution uses an indexed read `WHERE scope=$1 AND command_name=$2 AND key_hash=$3`.
-     Matches return `{ kind: 'replay' }`, mismatches return `{ kind: 'mismatch' }`, and
-     uncompleted/corrupted rows throw non-retryable
-     `CommandStoreError({ kind: 'receipt_corrupt' })`.
-6. **Bounded Wait & Restoration**:
-   - Transaction-local `set_config('lock_timeout', $1, true)` bounds wait time (1–60,000ms; 0 is
-     rejected). Successful claims restore the prior setting.
-7. **Terminal Busy & Rollback**:
-   - Lock timeout error code `'55P03'` returns `{ kind: 'busy', retryAfterMs }` without
-     finally-block side queries.
-   - Busy aborts the transaction handle and forces physical rollback via internal error before
-     cleanly returning the busy result.
-8. **Error Classification & Business Identity**:
-   - Native error mapping in `postgres-command-errors.ts` maps `'40001'` (serialization failure) and
-     `'40P01'` (deadlock) to `retryable: true` without automatic callback retries.
-   - Physical commit failures (verified via an `INITIALLY DEFERRED` constraint) roll back rows and
-     classify with `phase: 'commit'`.
-   - Arbitrary non-engine business errors thrown by the user callback preserve their exact instance
-     and error identity.
-9. **Cooperative Cancellation**:
-   - `AbortSignal` checks occur before execution and at each step. Retained delegates throw
-     `CommandStoreError({ kind: 'aborted' })` after callback termination.
-10. **Semantic Mutation Verification**:
-    - All 10 semantic mutants (3 in S7, 6 in S8, 1 in S9) have recorded runtime assertion failures
-      and clean restored passes.
+### 3.1 Frozen Package Type-Check
+
+- **Command**: `deno task --cwd packages/fresh-ui check`
+- **Execution Arguments**: `--lock=deno.lock --frozen`
+- **Result**: Exit code `0`
+- **Summary**: 150 files selected across 2 batches, 0 failed batches, 0 type errors.
+
+### 3.2 Generated Asset Freshness
+
+All four repository-level generated asset checks were independently verified at current HEAD:
+
+- `deno task check:agent-docs-prose`: Exit code `0` (`"fresh": true`, `0` stale paths).
+- `deno task check:assets-barrel`: Exit code `0` (clean git status).
+- `deno task check:publish-assets`: Exit code `0` (clean git status).
+- `deno task check:mcp-export-corpus`: Exit code `0` (`35` packages, `280` subpaths, `8084` symbols
+  clean).
+
+### 3.3 Documentation Linting
+
+- **Command**: `deno task doc:lint --root packages/database --pretty`
+- **Result**: Exit code `0`
+- **Coverage**: All 12 entrypoints verified clean (`0` private type references, `0` missing JSDocs,
+  `0` documentation errors).
+
+### 3.4 Source Manifest Invariance
+
+Verification against `.llm/runs/feat-command-c3-postgres--lane-d/final-qualification.json`:
+
+- All 33 tracked source, test, fixture, and generated artifact paths match their exact recorded
+  SHA-256 hashes.
+- All product framework source files, test fixtures, and conformance templates are unchanged from
+  Round 2.
 
 ---
 
-### Conclusion
+## 4. Conformance & Regression Assessment
 
-The leaf implementation is complete, doctrine-compliant, and fully verified against the approved
-plan and Archetype 2 requirements. The Round 1 documentation lint failure and manifest discrepancies
-are resolved, and the branch is ready for current-head CI and subsequent merge workflows.
+1. **Prior Conformance Status**:
+   - The 10 semantic mutation probes (3 in S7, 6 in S8, 1 in S9) and the 7 physical PostgreSQL
+     provider test cases qualified in Round 2 remain fully applicable and unchanged.
+   - Adding workspace metadata for an already-pinned dependency in an isolated package lockfile
+     introduces zero functional drift or regression risk to `@netscript/database` command
+     persistence.
+2. **Current-Head Readiness**:
+   - The dependency metadata synchronization resolves the CI lock mismatch cleanly without
+     dependency upgrades.
+   - Native current-head full CI remains scheduled to run against this exact product commit.
 
-Evaluator metadata clarification: Google gemini-3.8-flash-high with high effort is the requested
-native fallback route. The launch does not independently attest runtime model or effort. Raw native
-metadata remains private. Current-head CI and final readiness follow this verdict.
+---
+
+## 5. Summary Finding
+
+The exact-head dependency metadata delta in `packages/fresh-ui/deno.lock` is minimal (+1 line),
+semantically sound, and preserves all resolved package versions and integrity checksums. Frozen
+package checks and generated asset freshness suites pass unconditionally. Round 3 evaluation verdict
+is **PASS**.
+
+Requested native route: Google gemini-3.8-flash-high, high effort. Runtime model/effort are not
+independently attested. Raw native metadata remains private. Final pushed follow-up changes harness
+artifacts only; current-head CI follows this verdict.
