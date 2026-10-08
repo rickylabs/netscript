@@ -49,3 +49,20 @@ EXIT workflow-concurrency-restored 0
 EXIT workflow-check 0
 EXIT workflow-lint-explicit 0
 EXIT workflow-fmt-owned 0
+
+EXIT latest-fresh-ui-frozen 0
+EXIT latest-workflow-tests 0
+EXIT latest-check 0
+EXIT latest-lint 0
+EXIT latest-fmt-check 0
+EXIT latest-quality-scan 0
+EXIT latest-arch-check 0
+EXIT latest-service-contracts-database-tests 0
+EXIT latest-check-agent-docs-prose 0
+EXIT latest-check-assets-barrel 0
+EXIT latest-check-publish-assets 0
+EXIT latest-check-mcp-export-corpus 0
+EXIT latest-doc-lint 0
+EXIT latest-jsr-database 0
+EXIT latest-database-publish 0
+EXIT latest-deps-prod-install 0

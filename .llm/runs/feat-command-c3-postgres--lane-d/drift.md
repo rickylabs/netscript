@@ -26,3 +26,8 @@ preserves it. Native full-suite failure exposed existing workflow inventory regi
 requirement. Register new provider workflow and a bounded per-ref concurrency group, retaining all
 complete-coverage assertions; semantic mutant/restored evidence added. No new C3
 architecture/dependency debt.
+
+Main advanced with merged AI repair while native CI ran. Normal reconciliation preserves it;
+generated carriers refreshed using pinned Deno. No C3 code or dependency resolution change. Latest
+exact-head local requalification passes; final same-session reconciliation review and current-head
+CI are required.

@@ -110,3 +110,14 @@ chat tests, every database documentation entrypoint, frozen Fresh UI package che
 generated consumers and exact 34-path source manifest. Native CLI exits 0. Final review follow-up is
 artifact-only. Current-head functional native CI, acceptance/DoD/status, zero open review threads
 and close-gate rerun remain handoff gates.
+
+## Latest-main reconciliation qualification
+
+Main 587be0dd7 merged independently qualified AI model/wire repair. Normal merge preserves all
+upstream source and records; five conflicting generated carriers take main then refresh Deno 2.9.5.
+Exact product 59d8a3b382d3996f26ed2e9ea93ffe5ca577c6f3: all
+root/scoped/docs/publish/JSR/install/frozen/workflow/generated gates exit 0. C3
+database/service/contracts/types/provider fixtures/tools/workflow/inventory and both locks unchanged
+from round-4 PASS. Earlier final pushed 1f39b2c10 passes native full repository tests and all
+browser/quality jobs; close-gate waits truthful final DoD. Same-session reconciliation review 5 and
+final native current-head CI pending.
