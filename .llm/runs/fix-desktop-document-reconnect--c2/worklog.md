@@ -83,3 +83,21 @@ Gate `sdk-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/t
 Gate `fresh-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/release/run-publish-dry-run.ts --member packages/fresh`. Full raw output retained privately.
 
 S3 supervisor review: seven owning source/config files add a mandatory actual native regression and strict existing native CI step before bounded packaging exception; packaging and CLI sources unchanged. Frozen production renderer/default SDK/native Fresh/oRPC host perform typed RPC, park old receive, real BrowserWindow.reload, typed RPC in new epoch, old CLOSED and idempotent teardown, one physical bind. Runner requires receipt independently of exit, uses compile/launch deadlines and finally removes only its scratch output. Actual native task passes; suppression of replacement produces one parsed native timeout FAIL then restored PASS. Native fixture initial isolated-declaration annotation failure retained and corrected using explicit actual oRPC Procedure/Schema types, no erasure/cast/suppression. Dedicated case avoids default discovery and is excluded with fixtures from Fresh publication; owning Fresh alias delegates to root strict task. Full SDK/Fresh suite 525 pass, zero failures/ignored; all scoped frozen static/quality/architecture/JSR/raw dry publication gates pass. Full SDK/Fresh doc reports byte-identical to baseline with raw exit one, every entrypoint preserved; proposed desktop-doc-baseline-2041 requires independent adjudication. S3 acceptance source behavior complete, S4 clean-source generated export corpus next.
+
+Gate `corpus-generate`: raw exit `0`. Command: `deno task gen:mcp-export-corpus`. Full raw output retained privately.
+
+Gate `carrier-fresh`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `corpus-tests`: raw exit `1`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts packages/mcp/tests/embedded-export-surface-corpus_test.ts`. Full raw output retained privately.
+
+Gate `corpus-fresh`: raw exit `0`. Command: `deno task check:mcp-export-corpus`. Full raw output retained privately.
+
+Gate `mcp-jsr`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/fitness/audit-jsr-package.ts --root packages/mcp --text`. Full raw output retained privately.
+
+Gate `mcp-doc`: raw exit `1`. Command: `deno task doc:lint --root packages/mcp`. Full raw output retained privately.
+
+Gate `mcp-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/release/run-publish-dry-run.ts --member packages/mcp`. Full raw output retained privately.
+
+Gate `corpus-tests-qualified`: raw exit `1`. Command: `deno run --frozen --allow-all .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts packages/mcp/tests/embedded-export-surface-corpus_test.ts`. Full raw output retained privately.
+
+S4 supervisor review: canonical generator ran against clean committed S3 source. Only two normalized corpus entries changed: Fresh DesktopBindableWindow optional third-argument signature/docs and SDK resolveDesktopBindingInvoke docs. Zero added/removed entries; checksum aaaf38dd723deed345e1574fbf9203d237e72a1e1b95bf21a5ba69553fd45b17, 7947 symbols. No handwritten generated edits. Canonical freshness and committed carrier pass. Initial generator worktree tests fail under global fixture guard, then test-scoped WT_ENFORCE=0 admits legitimate scratch fixtures; two remaining tests correctly report stale S3 committed corpus while regenerated data is uncommitted. Commit canonical output and require all 14 to pass against new HEAD. Owning MCP JSR and dry publication pass. MCP per-entrypoint doc raw failure also compared with pristine baseline; no new generated-source diagnostic.
