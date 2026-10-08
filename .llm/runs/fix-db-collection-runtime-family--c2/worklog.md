@@ -231,3 +231,5 @@ Repair integration validation: Deno 2.9.5 frozen structured check of SDK/Fresh s
 Production browser qualification restored PASS: actual locked production build, SSR, hydration, two worker stream updates, both viewport overflow checks, teardown zero subscribers and no browser errors. One test passed/zero failed/zero ignored. Initial environment sandbox failure remains private evidence. Original qualified CLI runtime receipt remains inherited for unchanged catalog/generator implementation; required final-head CI remains owner qualification, no local infrastructure false-green.
 
 Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
+
+Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
