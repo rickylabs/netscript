@@ -32,3 +32,19 @@ Restart eval now loads the generated smoke .env. Actual lifecycle script with a 
 ## S5 source completion
 Regenerated current docs prose, CLI asset barrel, publish assets and manifest after tracking the new tests. All freshness checks and emitted samples exit 0. Root check/lint/fmt:check/audit:critical and quality:gate exit 0. Explicit touched CLI lint/fmt pass with 8/8 selected files processed; root excludes CLI so the run config retains root rules without exclusions. doc:lint, jsr-audit (corrected output permission), docs:links exit 0. Full CLI rerun uses corrected tool environment after 106/106 affected baseline tests passed. Local scaffold.runtime preflight fails for unavailable Docker/.NET; full GitHub scaffold gate is the authorized runtime fallback.
 Reconcile: source repairs complete, coordinator CI checkbox untouched, no new public surface or debt. Gate/Evaluate/Close phases remain pending current-head evidence.
+
+Full CLI rerun: 1823 passed, 0 failed, 0 ignored; raw exit 0. All five brief gates now pass. Minimum available memory 40.1 GiB. The 12 initial failures were environmental and all disappear under corrected task environment.
+
+Thread closeout: all five replies posted with mutation evidence and all five threads resolved. check:review-threads exit 0, unanswered=0. Current-source quality CI passed in run 37729261626; SQLite scaffold runtime passed in run 37729329630. Initial CI close-gate ran before replies and is stale; rerun unavailable while other jobs are in progress. Independent GLM route exhausted; owner-authorized Google fallback actively reviewing.
+
+Full remote scaffold.runtime (Postgres + Docker) and scaffold.runtime.sqlite both PASS, run 37729329630, source head 8126d51083fce24d3a61bad5b373f4f206f974d9. check-test and quality CI both PASS at that head in run 37729261626; failed close-gate rerun requested after all five threads resolved.
+
+Current-source CI run 37729261626 is now SUCCESS after rerunning the stale close-gate. All its applicable jobs, including close-gate, check-test and quality, pass. Coordinator CI body checkbox remains unticked as explicitly requested.
+
+## Final phases and sign-off
+5. Implement: S0–S5 source complete, normal commits pushed and slice evidence posted.
+6. Gate: all five brief gates PASS; 1823 CLI tests pass with 0 ignored. Explicit CLI lint/fmt, quality, JSR/docs/freshness/parity and full remote Postgres/SQLite runtime gates PASS. Initial environment/tool permission failures retained honestly alongside corrected outcomes.
+7. Evaluate: independent native Google gemini-3.8-flash-high high PASS on exact source head 8126d51083fce24d3a61bad5b373f4f206f974d9; evaluate.md contains substantive per-slice, mutation, consumer and doctrine review. GLM Go was unavailable due usage limit; only the owner-authorized fallback used. No self-certification.
+8. Release: N/A; no merge, publish or release performed.
+9. Close: all five threads replied/resolved; live thread checker PASS; current-source CI including refreshed close-gate PASS. Final commit records evidence only, and its product tree must match the independently evaluated source head. REPORT.md reports final pushed head. The CI body checkbox is untouched for the coordinator.
+Debt: no delta. No repeated lesson is promoted without a separate owner decision.

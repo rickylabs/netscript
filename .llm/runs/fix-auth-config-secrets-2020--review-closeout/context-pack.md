@@ -1,7 +1,6 @@
-# Context
-PR #2085 closeout; baseline 86a01a6bd08ca6e216900491c6a437af9594b4f6.
-Five claims require independently proven regressions and mutation checks. Quality root cause: stale Aspire surface manifest. Main integration uses regenerated docs assets. No public API or dependency changes planned. Preserve coordinator CI checkbox.
-S2 Unicode comment fix and real execution regression complete; mutation red 1/restored 0. Full gate/evaluator pass remains.
-S3 comment and CR fixes complete; both independent mutations red 1/restored 0. Existing hostile literal tests remain green.
-S4 restart and recipe fixes complete with independent red/green mutations. S5 needs regenerated docs, manifest refresh after new tracked tests, full gates, separate GLM evaluation, thread replies/resolutions and report.
-S5 source assets regenerated and staged, freshness gates green. Static/quality/audit/JSR/docs gates green; full CLI rerun and remote scaffold runtime evidence pending due local prerequisites. Independent GLM review required at final source head.
+# Completed closeout
+PR #2085: all five findings real, fixed, behaviorally tested, mutation-checked (each red 1 / restored 0), replied and resolved.
+Source evaluated: 8126d51083fce24d3a61bad5b373f4f206f974d9.
+Independent Google Gemini 3.8 Flash High PASS; GLM Go usage limit triggered the explicitly authorized fallback.
+All brief gates passed; CLI tests 1823/1823, none ignored. Scoped CLI source lint/fmt 8/8. Quality/JSR/docs/generated freshness/parity green. Full Postgres and SQLite scaffold runtime PASS in remote run 37729329630; CI run 37729261626 including refreshed close-gate SUCCESS.
+Final follow-up commit contains run evidence only and leaves the evaluated product tree unchanged. Coordinator owns the unticked current-head CI body checkbox. No merge/release performed, no debt delta. REPORT.md in the task folder is the handoff report.
