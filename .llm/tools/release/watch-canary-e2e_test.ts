@@ -124,6 +124,9 @@ Deno.test('failed-pair descriptions distinguish actual conclusions from unknown 
       ['failure', 'failure', 'concluded failure'],
       ['failure', 'cancelled', 'concluded cancelled'],
       ['unknown', '', 'observation unknown'],
+      ['success', '', 'observation unknown'],
+      ['success', 'failure', 'observation unknown'],
+      ['unknown', 'success', 'observation unknown'],
       ['failure', 'unrecognized', 'observation unknown'],
       ['', '', 'observation unknown'],
     ]
@@ -136,4 +139,16 @@ Deno.test('failed-pair descriptions distinguish actual conclusions from unknown 
     assertEquals(result.code, 0);
     assertStringIncludes(new TextDecoder().decode(result.stdout), expected);
   }
+});
+
+Deno.test('failed-pair description preserves confirmed E2E success after a later step fails', async () => {
+  const expected = 'Canary publish complete; pinned production E2E succeeded; a later step failed';
+  const result = await new Deno.Command('bash', {
+    args: [describe],
+    clearEnv: true,
+    env: { E2E_STATE: 'success', E2E_CONCLUSION: 'success' },
+  }).output();
+  assertEquals(result.code, 0);
+  assertEquals(new TextDecoder().decode(result.stdout), `${expected}\n`);
+  assertEquals(expected.length <= 140, true, 'GitHub status descriptions must fit 140 characters');
 });
