@@ -1,8 +1,9 @@
 /**
- * Opaque command definitions, redacted failures and synchronous bounded canonical codecs.
+ * Opaque command definitions, once-only local execution, redacted failures and bounded codecs.
  *
- * Defining or encoding a command performs no transaction or transport work. This subpath
- * requires no permissions. Actor roles/claims stay outside durable envelopes.
+ * Importing, defining and encoding commands require no permissions and start no resource.
+ * Execution delegates to the explicitly supplied store and business operations and their
+ * permissions. Actor roles/claims stay outside durable envelopes.
  *
  * @example
  * ```ts
@@ -42,3 +43,33 @@ export type {
 } from './src/commands/domain/definition.ts';
 export { CommandError, type CommandFailure } from './src/commands/domain/failure.ts';
 export type { IsolationLevel } from '@netscript/database';
+
+export { createCommandExecutor } from './src/commands/application/create-command-executor.ts';
+export type {
+  CommandExecution,
+  CommandExecutor,
+  CommandRecordLimits,
+  CommandTelemetryResult,
+  CommandTelemetryStart,
+} from './src/commands/domain/execution.ts';
+export type {
+  CommandClock,
+  CommandExecutorOptions,
+  CommandIdSource,
+  CommandTelemetryPort,
+  CommandTelemetrySpan,
+} from './src/commands/ports/executor-ports.ts';
+export type {
+  CommandStoreCapabilities,
+  CommandStorePort,
+  CommandTransaction,
+  CommandTransactionRequest,
+  DatabaseProvider,
+  ReceiptClaim,
+  ReceiptClaimResult,
+  ReceiptCompletion,
+  StoredCommandAudit,
+  StoredCommandOutbox,
+  StoredCommandReceipt,
+  TransactionOptions,
+} from '@netscript/database/commands';

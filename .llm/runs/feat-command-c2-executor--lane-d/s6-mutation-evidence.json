@@ -1,0 +1,426 @@
+{
+  "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+  "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+  "records": [
+    {
+      "mutant": "boundary-before_transaction",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault before_transaction preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault before_transaction preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault before_transaction preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "0f075529f783a619e54f96d1c3866bff99c222b921664a04d2641d96bfd8989c",
+      "restoredReceiptSha256": "632c0aa2683850fecd3cd30485ef31e5c7c0975550f1af28f355674aa717dde1",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "boundary-after_claim",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault after_claim preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault after_claim preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault after_claim preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "959f1a76e27e10358a3324921a301417fc8bae5c6732ccf1222bd0455f7a0a8b",
+      "restoredReceiptSha256": "679fdf17c35e6ddc17b9ed3beae6b3d9f55d240378d1fe3466223bbb760e2a47",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "boundary-after_handler",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault after_handler preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault after_handler preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault after_handler preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "f8b1c53e5a54ab1d179700252c4a0f567044fab22dd30f825ce71120f326589f",
+      "restoredReceiptSha256": "f19435be7961a1c08e239a586c7a212d8a4aac2e3d60ba67db4bce585bcfc495",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "boundary-after_audit",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault after_audit preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault after_audit preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault after_audit preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "c0467b558d6b935ba12f66af7b8464a65f3de3b32543bf86ca5757aecfe4fc73",
+      "restoredReceiptSha256": "22670f4594302b37e80483a9b3cfc99c2aacde98d6e8b3225ffae087dafcca5c",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "boundary-after_outbox",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault after_outbox preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault after_outbox preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault after_outbox preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "b31f39f2c0d52d2bc18469a769db84df034e05c364c0b84bc07e2aaa00058d88",
+      "restoredReceiptSha256": "df48e75c55a6a5f3c278a0c8d07f27d26465b12d6840c2fc22972607605d83e6",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "boundary-after_receipt_complete",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault after_receipt_complete preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault after_receipt_complete preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault after_receipt_complete preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "db064d858e09023d1f0bce6822246805b2bee38a83c3482c0238d1ffc05f76b7",
+      "restoredReceiptSha256": "0fb3313134ab0a705fdbd82c0df563d3fd7301ff213c4b8dae7db6ce319003ac",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "boundary-after_commit_before_return",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command fault after_commit_before_return preserves atomic recovery",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command fault after_commit_before_return preserves atomic recovery"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure rejection\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async assertCommandFaultBoundary (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command fault after_commit_before_return preserves atomic recovery"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "2e5c8f504900ee84b65a1cb343020ca181e16fd9f8e3e411dbfd0ed5b2b98a0a",
+      "restoredReceiptSha256": "89be324f142e741b53ea76b6cf35ec28c9e8f81874d433337953053c6559b676",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "ordered-bound-flush",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command shared conformance qualifies the bound semantic matrix",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance qualifies the bound semantic matrix"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] bound flush ordering\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at runCommandConformance (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance qualifies the bound semantic matrix"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "a4e6cc163bc54c0c3bc5f06e3c794ca6b491da1e3b67f5b01eff14993cd79a50",
+      "restoredReceiptSha256": "0e3416a32349736e0c82c15f26c0b74a527de78de5d5f78c02133a37fd59cc8e",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "outside-business-corrupted",
+      "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+      "namedTest": "command shared conformance detects actual outside-transaction writes",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance detects actual outside-transaction writes"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   one-corrupted\n+   one\n\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance detects actual outside-transaction writes"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "49aa35c6d48e8a6384708d0bf87a467e433a3e8794dfaba2b2a080955a463f82",
+      "restoredReceiptSha256": "5929ba9beac3d3ea54bb179d91a785d0c327fecfba7998f5c00834458d8032ca",
+      "restoredSourceSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe"
+    },
+    {
+      "mutant": "unbounded-controller-history",
+      "productionFile": "packages/service/src/commands/testing/command-fault-controller.ts",
+      "namedTest": "command testing controllers are instance-bound and keep finite history",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command testing controllers are instance-bound and keep finite history"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   147\n+   128\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command testing controllers are instance-bound and keep finite history"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "240d0c020e693ebae8020c5aac65c0fef84aeef9789125735cadc4809b3c30ae",
+      "restoredReceiptSha256": "bde1faa0959c41a9cf5a9887d63536426af82d7b92c684344936458cd223e5c3",
+      "restoredSourceSha256": "bf323bc34a0eb435603ac5c74a7d62ce96a4433f0671b35a844cca9d49bbfe1d"
+    },
+    {
+      "mutant": "observer-replaces-business-failure",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command throwing telemetry cannot replace an inherited business error",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command throwing telemetry cannot replace an inherited business error"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   Error: observer sentinel\n-       at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>\n+   Error: business sentinel\n+       at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>\n        at innerWrapped (ext:cli/40_test.js:<line>:<column>)\n        at exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n        at outerWrapped (ext:cli/40_test.js:<line>:<column>)\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command throwing telemetry cannot replace an inherited business error"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "5d20158c41313c4fc6144764164f7c4ece115104dc2ecf8aa884b138d329c9d5",
+      "restoredReceiptSha256": "d16d25a1b05af0c77f102f2bfef9e148b93a303f199fa71aa0346f33a95cf831",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "busy-public-before-rollback",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command shared conformance qualifies the bound semantic matrix",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance qualifies the bound semantic matrix"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected in_progress\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async commandConformanceControls (file://<cwd>/packages/service/src/commands/testing/command-conformance-controls.ts:<line>:<column>)\n    at async runCommandConformance (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance qualifies the bound semantic matrix"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "7ff3273b977d912f5351e281881519a67ad4294da9e13c475ef9413f1bd3add8",
+      "restoredReceiptSha256": "3e0b48e1c72344cce8c712126fdc6c7eccc2a9a8fecd1d8fa8d45f0aa4e72d3b",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "callback-reentry-permitted",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command shared conformance qualifies the bound semantic matrix",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance qualifies the bound semantic matrix"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] callback re-entry refusal rollback\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at commandConformanceControls (file://<cwd>/packages/service/src/commands/testing/command-conformance-controls.ts:<line>:<column>)\n    at async runCommandConformance (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance qualifies the bound semantic matrix"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "50f3a4139909ccef05d58151d5e72f3dffaa44c5f00ebf5d06fdd3fcce305ea6",
+      "restoredReceiptSha256": "a6a96a2b7940fd1f0edfd86329530d53d1cb6e03284e276be6a58976778a1255",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "provider-retryable-lost",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command shared conformance qualifies the bound semantic matrix",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance qualifies the bound semantic matrix"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] expected store_failure\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at rejects (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at async runCommandConformance (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance qualifies the bound semantic matrix"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "54171d1acb9addef74d133211d014454849a1b115c0f6d34fd1c1c7fd3de2b04",
+      "restoredReceiptSha256": "d18dcf249b730968649f38e1516f92733a3d37839a7e2f8176825be884a4ff26",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "business-failure-identity-lost",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "command shared conformance qualifies the bound semantic matrix",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance qualifies the bound semantic matrix"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] business error identity\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at runCommandConformance (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance qualifies the bound semantic matrix"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "4aa6445f8d9a342e2e4eddd13ea380441f2950a46e93cb088a5abfaad0d2c91a",
+      "restoredReceiptSha256": "343006c415d6f68cf97b40672ab9442dff71ec137ba10680672e50419b1dcb25",
+      "restoredSourceSha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "mutant": "overlapping-active-claim-ignored",
+      "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+      "namedTest": "command shared conformance qualifies the bound semantic matrix",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command shared conformance qualifies the bound semantic matrix"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: [netscript.command.conformance] waiting follower replays\n    at ensure (file://<cwd>/packages/service/src/commands/testing/command-conformance-helpers.ts:<line>:<column>)\n    at commandConformanceControls (file://<cwd>/packages/service/src/commands/testing/command-conformance-controls.ts:<line>:<column>)\n    at async runCommandConformance (file://<cwd>/packages/service/src/commands/testing/command-conformance.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command shared conformance qualifies the bound semantic matrix"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "353fe2b4b004ea80373159384310dce34b0f160a5f4b47b59452634334e9e816",
+      "restoredReceiptSha256": "815691eca08c7f5205ce0bd92bc8a9a6de515ba0636a9700cc85d02767735ee6",
+      "restoredSourceSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe"
+    },
+    {
+      "mutant": "http-field-control-guard-removed",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor accepts opaque future trace fields but rejects HTTP control bytes",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor accepts opaque future trace fields but rejects HTTP control bytes"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: expected bounded failure\n    at failure (file://<cwd>/packages/service/tests/_fixtures/command-executor-fixture.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor accepts opaque future trace fields but rejects HTTP control bytes"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "0e0001dc07e79650222d859418308a45cb3a1b9dfbda329ef3c0066999f28026",
+      "restoredReceiptSha256": "0ac8efefa936117c18f2d09b9fd2db11b17fb195fe7d98a8c53125d6917b871d",
+      "restoredSourceSha256": "a7fe3e6e28984905beebf9e0f2f45272333814b606828b81512802b8066c30a4"
+    },
+    {
+      "mutant": "equivalent-input-not-frozen",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "command deterministic identity samples equivalent deeply frozen inputs",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command deterministic identity samples equivalent deeply frozen inputs"
+      ],
+      "failureSummary": [
+        {
+          "message": "CommandError: Command failure: codec_failure\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at assertCommandDeterminism (file://<cwd>/packages/service/src/commands/testing/command-determinism.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>\nCaused by: AssertionError\n    at assert (<dependency-source>\n    at Object.scope (file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>)\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at assertCommandDeterminism (file://<cwd>/packages/service/src/commands/testing/command-determinism.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command deterministic identity samples equivalent deeply frozen inputs"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "932995a4a14e9a36da398b23682f2cd97e7369f223f73ce77308abe4e972c617",
+      "restoredReceiptSha256": "5844edc913be8b15e1996736771fa685cbd72ea9652a17aa5e911f246e09b9ab",
+      "restoredSourceSha256": "a7fe3e6e28984905beebf9e0f2f45272333814b606828b81512802b8066c30a4"
+    },
+    {
+      "mutant": "scope-identity-drift-hidden",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "command determinism detects changing scope closures",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command determinism detects changing scope closures"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Expected function to reject.\n    at assertRejects (<dependency-source>\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command determinism detects changing scope closures"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "89f0c32dc54232edc76d28586b05d93820d832efe781a5af9fb878ec11017ca7",
+      "restoredReceiptSha256": "4374615014c95c963afd607da526aeaaf51974b925554ea0ee0df397b6c4fd72",
+      "restoredSourceSha256": "a7fe3e6e28984905beebf9e0f2f45272333814b606828b81512802b8066c30a4"
+    },
+    {
+      "mutant": "fingerprint-identity-drift-hidden",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "command determinism detects changing fingerprint closures",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "command determinism detects changing fingerprint closures"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Expected function to reject.\n    at assertRejects (<dependency-source>\n    at async file://<cwd>/packages/service/tests/commands-conformance_test.ts:<line>:<column>",
+          "tests": [
+            "command determinism detects changing fingerprint closures"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "519bbbb9a83e1765287a10ff1b1588ef15d41347a943537a282eb26b08092ab8",
+      "restoredReceiptSha256": "389b787755b5b0d2986c95ad82b00dece8acc28a4dcfb21986a53ea4dcb5d63d",
+      "restoredSourceSha256": "a7fe3e6e28984905beebf9e0f2f45272333814b606828b81512802b8066c30a4"
+    }
+  ]
+}

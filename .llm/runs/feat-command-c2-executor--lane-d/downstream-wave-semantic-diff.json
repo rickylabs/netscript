@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "generationHead": "2df7d9b393af7180bd318da6c6926d212e6344d6",
+  "cli": {
+    "compressedTransportIdenticalToShared": true,
+    "completeProvenanceIdenticalToShared": true,
+    "canonicalSha256": "a8fd9808d4b33cfaf881d2f19ffc5c3778ef57296cdbe778577a7fec061d0ba4",
+    "proseFiles": 182,
+    "compressedBytes": 1424353,
+    "uncompressedBytes": 4951983,
+    "sourceCommit": "4b8b7cb99",
+    "beforeSourceCommit": "b4ee0c343",
+    "packageCount": 35,
+    "subpathCount": 279,
+    "allExportSubpathsMatchUnchangedManifests": true,
+    "addedExports": [
+      [
+        "@netscript/database",
+        "./commands"
+      ],
+      [
+        "@netscript/service",
+        "./commands/testing"
+      ]
+    ],
+    "removedExports": []
+  },
+  "mcp": {
+    "selectedDocumentsIdentical": true,
+    "packageMetadataIdentical": true,
+    "onlyProvenanceSourceCommitChanged": true,
+    "beforeProvenance": {
+      "schemaVersion": 1,
+      "frameworkVersion": "0.0.7",
+      "sourceCommit": "b4ee0c343",
+      "paths": [
+        "llms.txt",
+        "pages/explanation/contracts/index.md",
+        "pages/explanation/plugin-system/index.md",
+        "pages/orchestration-runtime/how-to/author-a-plugin/index.md",
+        "pages/data-persistence/how-to/use-a-second-database/index.md",
+        "pages/services-sdk/services/index.md",
+        "pages/web-layer/builders/index.md",
+        "pages/web-layer/how-to/build-a-server-validated-form/index.md",
+        "pages/web-layer/query/index.md",
+        "pages/web-layer/route/index.md",
+        "pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md",
+        "pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md"
+      ],
+      "sourceBytes": 261980,
+      "documentCount": 12,
+      "sha256": "1a919388d35e1d1f8bf91ee82ec3aee498bbf2ff8de7b1b0363c8343313eb4e8"
+    },
+    "afterProvenance": {
+      "schemaVersion": 1,
+      "frameworkVersion": "0.0.7",
+      "sourceCommit": "4b8b7cb99",
+      "paths": [
+        "llms.txt",
+        "pages/explanation/contracts/index.md",
+        "pages/explanation/plugin-system/index.md",
+        "pages/orchestration-runtime/how-to/author-a-plugin/index.md",
+        "pages/data-persistence/how-to/use-a-second-database/index.md",
+        "pages/services-sdk/services/index.md",
+        "pages/web-layer/builders/index.md",
+        "pages/web-layer/how-to/build-a-server-validated-form/index.md",
+        "pages/web-layer/query/index.md",
+        "pages/web-layer/route/index.md",
+        "pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md",
+        "pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md"
+      ],
+      "sourceBytes": 261980,
+      "documentCount": 12,
+      "sha256": "1a919388d35e1d1f8bf91ee82ec3aee498bbf2ff8de7b1b0363c8343313eb4e8"
+    },
+    "exactSelectedSourcesMatchShared": true,
+    "canonicalIntegrityVerified": true,
+    "sourceBytes": 261980,
+    "budgetBytes": 262144
+  },
+  "firstWaveAssetsUnmodified": true,
+  "generatedOutputsHandPatched": false
+}

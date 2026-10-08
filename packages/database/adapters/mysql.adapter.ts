@@ -491,3 +491,10 @@ export function createMysqlAdapter<
 >(options: MysqlConnectionOptions): MysqlAdapter<TClient> {
   return new MysqlAdapter<TClient>(options);
 }
+
+export type {
+  DatabaseAdapter,
+  DatabaseConnectionOptions,
+  DatabaseConnectionStatus,
+  DatabaseProvider,
+} from '../ports/database-client.ts';

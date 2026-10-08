@@ -1,0 +1,89 @@
+{
+  "denoVersion": "2.9.5",
+  "head": "ee58d8276c6ff11c10552c7abbdec8618034ed81",
+  "gates": [
+    {
+      "gate": "check",
+      "exitCode": 0,
+      "rawSha256": "32f1376e0a4f7df432ac87b610d4fda679395762e477350abe8c8070bdd28f85"
+    },
+    {
+      "gate": "lint",
+      "exitCode": 0,
+      "rawSha256": "0dccd3513fbd9e8a5830914a0cf2718b5d164f30e02b71d7b45175f81c417112"
+    },
+    {
+      "gate": "fmt-check",
+      "exitCode": 0,
+      "rawSha256": "109b99e4160bc81290a2dafb8d92009505ae48bbf143164378997caf40d036d2"
+    },
+    {
+      "gate": "service-contracts-database-tests",
+      "exitCode": 0,
+      "rawSha256": "faca3816e5bca64a0e58fc98deeaafc3ede4349f347855cee31d385b0edefac7"
+    },
+    {
+      "gate": "check-agent-docs-prose",
+      "exitCode": 0,
+      "rawSha256": "ba0fb0adf46df980dedc5d18bde6b889168686978c7d598c186c42c9a473a7b0"
+    },
+    {
+      "gate": "check-assets-barrel",
+      "exitCode": 0,
+      "rawSha256": "6fc77d278be69f0dc20503a5435f98da17262e66cfb99a0b1b4cf25f75a8802d"
+    },
+    {
+      "gate": "check-publish-assets",
+      "exitCode": 0,
+      "rawSha256": "70bc4b06374ff6f561f02b223ee735b7bf25bb21e4a9811a8183d6279a83735b"
+    },
+    {
+      "gate": "check-mcp-export-corpus",
+      "exitCode": 0,
+      "rawSha256": "ca4a1c8ba5d72377b9ad3c4f650cf118fd841c77bc28a3aa7dd3cd3cceb4b9dc"
+    },
+    {
+      "gate": "quality-scan",
+      "exitCode": 0,
+      "rawSha256": "fa43517adf81a5c6b6f213ef76b901da304b63ac923db5e536064b676d8677f4"
+    },
+    {
+      "gate": "arch-check",
+      "exitCode": 0,
+      "rawSha256": "784d2a89aad5ca6610ca0092a169d0062c217e0ac020508f8d863456dcc80ed7"
+    },
+    {
+      "gate": "docs",
+      "exitCode": 0,
+      "rawSha256": "b219e3cce55ff96d4693352ca1f27c88e0254272d39a06c8d05404082dfc8379"
+    },
+    {
+      "gate": "jsr-service",
+      "exitCode": 0,
+      "rawSha256": "ba0cca38d4622415e29e2fb27e7b23e3692a4b7a1d68def1b6346a90d96f3f94"
+    },
+    {
+      "gate": "jsr-database",
+      "exitCode": 0,
+      "rawSha256": "667e5e9bcfd42716231d49c641725a40b49f3662b7d24cac89ab4c522eb8877d"
+    },
+    {
+      "gate": "database-native-publish",
+      "exitCode": 0,
+      "rawSha256": "473ef1bf43561c5b801c130de3fe8523065ca5b1b88f405cde0b4c2daa4e70b1"
+    }
+  ],
+  "tests": {
+    "passed": 253,
+    "failed": 0,
+    "ignored": 0
+  },
+  "typecheckFiles": 3208,
+  "lintFiles": 2199,
+  "notes": [
+    "All native gate outputs are retained privately; committed summaries contain no operator paths.",
+    "JSR helper retains sanctioned service slow-type informational banner and inherited database banner warning; native dry-run reports OK.",
+    "No new tests were introduced; existing meaningful mutation evidence is retained.",
+    "Independent native database publish dry-run with typecheck passes; helper warning is an informational banner match, not a slow-type diagnostic."
+  ]
+}

@@ -321,7 +321,7 @@ export const AUTHORITATIVE_MAPPING: readonly PackageMapping[] = [
     symbolCoverage: {
       mode: 'entrypoints-only',
       reason:
-        'The page guarantees all ten driver, extension, script, tracing, and testing entrypoints while its tables focus on primary contracts and runners.',
+        'The page guarantees all eleven driver, command, extension, script, tracing, and testing entrypoints while its tables focus on primary contracts and runners.',
     },
   },
   {
