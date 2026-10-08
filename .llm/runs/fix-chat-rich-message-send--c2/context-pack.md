@@ -1,3 +1,3 @@
 # Context
 
-PR2092 S2 rich send source and native consumer/identity proofs complete after selected PLAN PASS. Six owning files, no dependency/public upstream exports. Public type and runtime identity causal mutations fail/restoredPASS;20focused tests/scopedstatic/quality PASS. S3 actualdefaultnative HTTP/SSE test then full Fresh/docbaseline/JSR and S4canonicalpubliccorpus required before S5independentIMPL. No merge/release, Refs2068.
+PR2092 sourcecomplete after PLANPASS: actualdefaultnativeHTTP/SSE+richUI/Model/data/signals/onephysical passed, nativewire mutation killed/restored. All3contract/runtimegate mutations proved. FullFresh285/225static/quality/JSR/rawpub PASS; all17docentrypoint baselinebyteidentical withraw1, proposedexistingdebtawaitsindependentadjudication. Commitcleansourcebefore S4canonicalexportcorpus/carrier/MCP gates, then S5mandatoryindependentIMPL. UnmergedRefs2068 ownerpublication/publishedconsumer/livepaneandEISsingleSubscriberConnectionremoval.

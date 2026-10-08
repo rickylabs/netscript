@@ -49,3 +49,29 @@ Gate `chat-s2-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --all
 Gate `chat-s2-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
 
 S2 substantive review complete: six owning source/docs/test/fixture files introduce one documented NetScriptChatSendMessage structural union, public AI export and direct unchanged send array forwarding. Existing data/signal linkage, single hub, projection and intentional reduced server response formatting retained. Native declared UI/Model consumers compile without cast/new dependency, malformed shapes rejected. Public-type narrowing yields intended consumer TS2345 then restoredcheckPASS; compiling old-lossy-projection mutant kills exactly1identity/lifecycle runtime case thenrestorePASS. All20focused chat cases and scoped frozen check/lint/fmt/quality/architecture PASS. Existing fake durable lifecycle expectation changed only from synthesizedtextparts to exactoriginalModelmessage, preserving full optimism/reload/multibyte coverage as selectedPLAN requires. Newfixturecontains actualnative image/audio/video/document/tool/reasoning/metadata/structuredoutput fields. Pristine all17entrypoint baseline rawdoc1 with45combinedfindings retained; finalallentrycompare pending. No public upstream type reexports or lock churn. S3 actualdefaultnative HTTP/SSE regression next; source notqualifiedasnativewireyet.
+
+Gate `chat-s3-fmt-write`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts --write`. Full raw output retained privately.
+
+Gate `chat-s3-native`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter default native chat transport retains packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts`. Full raw output retained privately.
+
+Gate `mutant-native-http`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter default native chat transport retains packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts`. Full raw output retained privately.
+
+Gate `restored-native-http`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter default native chat transport retains packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts`. Full raw output retained privately.
+
+Gate `chat-final-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `chat-final-lint`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx`. Full raw output retained privately.
+
+Gate `chat-final-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx`. Full raw output retained privately.
+
+Gate `chat-final-suite`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --unstable-kv packages/fresh/src packages/fresh/tests`. Full raw output retained privately.
+
+Gate `chat-final-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `chat-final-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/fresh --text`. Full raw output retained privately.
+
+Gate `chat-final-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/release/run-publish-dry-run.ts --member packages/fresh`. Full raw output retained privately.
+
+Gate `chat-final-doc`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
+
+S3 actualnative qualification complete: defaultdurableStreamConnection, no createConnection injection, owningrealHTTP POST captures complete nativeUI andModelmultimodal/metadata/tool/reasoning/structuredoutput/date/nullcontent/futurefields plusdata. Native bootstrapJSON countedseparately, exactly1liveSSE sharedby2logicalreaders before/aftersend, caller+disposalabortactualinflightPOSTs and finalnativeSSEcancel/0active verified. Compilinglossymapper source mutant causes exactly1parsedwire mismatch FAIL, restoredPASS; nativefixture cleansowned streams/heldPOSTs/server in boundedfinally. Two new runtime regressions and1nativecompileconsumer each causalFAIL/restoredPASS. FullFresh285pass/0fail/0ignored,225file scopedfrozencheck/lint/fmt, quality/architecture,owningJSR/rawpublish PASS. All17entrypointdocJSON byte/semanticidentical to pristine mainbaseline rawexit1 (45combined:28private/17missing), no newdiagnostic. Proposedchat-send-doc-baseline-2068 recordedowner/target/closinggate forindependentDEBT_ACCEPTED; no false rawgreen. ExistingruntimeAI folder13children unchanged, no newsourcefile. Only1owningS3testfile, no dependencies/locks/hub/projection changes. S4cleansourcepubliccorpusnext; S5independentIMPLmandatory.

@@ -1,4 +1,8 @@
-import { assertEquals } from '@std/assert';
+import {
+  nativeModelMessage,
+  nativeUiMessage,
+} from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import {
   createNetScriptChatConnection,
   type NetScriptChatMessage,
@@ -168,4 +172,195 @@ Deno.test('durable chat lifecycle provides seed, optimism, live tokens, reload r
   tabA.dispose();
   tabB.dispose();
   reloadTab.dispose();
+});
+
+async function withinNative<T>(promise: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => reject(new Error('Native chat fixture did not settle.')), 4000);
+      }),
+    ]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+}
+async function waitForNative(predicate: () => boolean): Promise<void> {
+  const deadline = Date.now() + 4000;
+  while (!predicate()) {
+    if (Date.now() >= deadline) throw new Error('Native chat fixture condition did not settle.');
+    await new Promise<void>((resolve) => setTimeout(resolve, 1));
+  }
+}
+
+Deno.test('default native chat transport retains rich POST bodies and one live SSE with send aborts', async () => {
+  const posts: unknown[] = [];
+  let bootstrapRequests = 0;
+  let liveRequests = 0;
+  let activeLive = 0;
+  let maxActiveLive = 0;
+  let cancelledLive = 0;
+  let controller: ReadableStreamDefaultController<Uint8Array> | undefined;
+  let ended = false;
+  let holdNext = false;
+  let postEntered = Promise.withResolvers<void>();
+  let releasePost = Promise.withResolvers<void>();
+  const releases: (() => void)[] = [releasePost.resolve];
+  const liveReady = Promise.withResolvers<void>();
+  const encoder = new TextEncoder();
+  const server = Deno.serve({ port: 0, onListen() {} }, async (request) => {
+    if (request.method === 'POST') {
+      posts.push(await request.json());
+      postEntered.resolve();
+      if (holdNext) await releasePost.promise;
+      return new Response(null, { status: 204 });
+    }
+    const url = new URL(request.url);
+    if (url.searchParams.get('live') !== 'sse') {
+      bootstrapRequests++;
+      return new Response('[]', {
+        headers: {
+          'content-type': 'application/json',
+          'Stream-Next-Offset': '0',
+          'Stream-Up-To-Date': 'true',
+        },
+      });
+    }
+    liveRequests++;
+    activeLive++;
+    maxActiveLive = Math.max(maxActiveLive, activeLive);
+    return new Response(
+      new ReadableStream<Uint8Array>({
+        start(streamController) {
+          controller = streamController;
+          liveReady.resolve();
+        },
+        cancel() {
+          ended = true;
+          activeLive--;
+          cancelledLive++;
+        },
+      }),
+      { headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' } },
+    );
+  });
+  const baseUrl = `http://${server.addr.hostname}:${server.addr.port}`;
+  const connection = createNetScriptChatConnection({
+    target: { sessionId: 'native-rich-send', baseUrl },
+    initialOffset: '0',
+  });
+  const first = connection.subscribe()[Symbol.asyncIterator]();
+  const second = connection.subscribe()[Symbol.asyncIterator]();
+  const pendingFirst = first.next();
+  const pendingSecond = second.next();
+  const messages = [
+    { ...nativeUiMessage, futureMessageField: { preserved: true } },
+    nativeModelMessage,
+    {
+      id: 'future-native',
+      role: 'user' as const,
+      parts: [{ type: 'future-attachment', opaque: { preserved: true } }],
+    },
+    {
+      role: 'tool' as const,
+      content: null,
+      toolCallId: 'call-null',
+      metadata: { preserved: true },
+    },
+  ];
+  const data = { attachments: { labels: ['original', 'opaque'] }, options: { preserved: true } };
+  const emit = (value: unknown, offset: string): void => {
+    assert(controller);
+    controller.enqueue(
+      encoder.encode(
+        `event: data\ndata: ${JSON.stringify([value])}\n\nevent: control\ndata: ${
+          JSON.stringify({ streamNextOffset: offset, upToDate: true })
+        }\n\n`,
+      ),
+    );
+  };
+  try {
+    await withinNative(liveReady.promise);
+    const before = {
+      type: 'TEXT_MESSAGE_CONTENT',
+      messageId: 'live-before',
+      delta: 'Before rich send —',
+    };
+    emit(before, '1');
+    assertEquals((await withinNative(pendingFirst)).value, before);
+    assertEquals((await withinNative(pendingSecond)).value, before);
+    await withinNative(connection.send(messages, data));
+    assertEquals(posts[0], JSON.parse(JSON.stringify({ messages, data })));
+    assertEquals(bootstrapRequests, 1);
+    assertEquals(liveRequests, 1);
+    assertEquals(activeLive, 1);
+    assertEquals(maxActiveLive, 1);
+    const afterFirst = first.next();
+    const afterSecond = second.next();
+    const after = {
+      type: 'TEXT_MESSAGE_CONTENT',
+      messageId: 'live-after',
+      delta: 'After rich send…',
+    };
+    emit(after, '2');
+    assertEquals((await withinNative(afterFirst)).value, after);
+    assertEquals((await withinNative(afterSecond)).value, after);
+    holdNext = true;
+    postEntered = Promise.withResolvers<void>();
+    releasePost = Promise.withResolvers<void>();
+    releases.push(releasePost.resolve);
+    const caller = new AbortController();
+    const callerSend = connection.send(messages, data, caller.signal);
+    void callerSend.catch(() => undefined);
+    await withinNative(postEntered.promise);
+    caller.abort(new DOMException('Caller aborted native POST.', 'AbortError'));
+    await assertRejects(
+      () => withinNative(callerSend),
+      DOMException,
+      'Caller aborted native POST.',
+    );
+    assertEquals(posts[1], JSON.parse(JSON.stringify({ messages, data })));
+    releasePost.resolve();
+    assertEquals(activeLive, 1);
+    assertEquals(liveRequests, 1);
+    postEntered = Promise.withResolvers<void>();
+    releasePost = Promise.withResolvers<void>();
+    releases.push(releasePost.resolve);
+    const disposedSend = connection.send(messages, data);
+    void disposedSend.catch(() => undefined);
+    await withinNative(postEntered.promise);
+    const finalFirst = first.next();
+    const finalSecond = second.next();
+    connection.dispose();
+    connection.stop();
+    connection.close();
+    await assertRejects(() => withinNative(disposedSend), DOMException);
+    assertEquals(posts[2], JSON.parse(JSON.stringify({ messages, data })));
+    assertEquals((await withinNative(finalFirst)).done, true);
+    assertEquals((await withinNative(finalSecond)).done, true);
+    await waitForNative(() => activeLive === 0);
+    assertEquals(cancelledLive, 1);
+    assertEquals(liveRequests, 1);
+    assertEquals(maxActiveLive, 1);
+    await assertRejects(() => connection.send(messages, data), Error, 'already disposed');
+  } finally {
+    connection.dispose();
+    for (const release of releases) release();
+    if (controller && !ended) {
+      ended = true;
+      controller.close();
+    }
+    try {
+      await withinNative(Promise.allSettled([
+        pendingFirst,
+        pendingSecond,
+        first.return?.(undefined) ?? Promise.resolve({ done: true, value: undefined }),
+        second.return?.(undefined) ?? Promise.resolve({ done: true, value: undefined }),
+      ]));
+    } finally {
+      await withinNative(server.shutdown());
+    }
+  }
 });
