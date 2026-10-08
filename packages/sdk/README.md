@@ -390,3 +390,18 @@ exports or registers the cache engine; use `./cache` plus explicit registration 
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Supported Collection runtime
+
+SDK query collections and Fresh live queries share TanStack DB **0.6.17** with
+`@tanstack/query-db-collection` **1.2.1**, `@tanstack/react-db` **0.1.95**, and
+`@durable-streams/state` **0.3.1**. These exact declarations are intentional:
+compatible version ranges alone can admit different Collection constructors.
+Upgrade the family together and run `deno task deps:check:db`, which resolves
+both a mixed SDK/Fresh consumer and a Fresh-only consumer without a workspace
+lock or warm cache and rejects multiple complete DB identities, including peer
+resolution suffixes. The guard also rejects unresolved modules.
+
+After coordinated publication, qualify a fresh consumer of the fixed published
+SDK and Fresh versions with no application dependency overrides before removing
+downstream DB pins. Source qualification does not prove published resolution.
