@@ -1,3 +1,31 @@
+# Current supervisor checkpoint — downstream native wave APPROVED
+
+Exactly12 signed files comprise two generated modules, eight implementation artifacts and two root review/evidence files. Native asset aggregate `2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf` is approved at generation HEAD `2df7d9b393af7180bd318da6c6926d212e6344d6`, product source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Root verified10frozen files/87raw receipts, independently executed semantic reconciliation, verified exact two-asset native rules/options and coverage, and reran quality/architecture PASS0. Source and signed first-wave asset bytes remain unchanged.
+
+Ordinary commit/push/structured PR comment must precede final item3 qualification. The actual durable committed-barrel gate is still1 until the generated modules are committed; no green claim. Full committed-tree C2 qualification, technical CI and independent evaluation remain open. No C3 or later leaf is released.
+
+## Previous checkpoints retained
+
+# Current checkpoint — native downstream CLI wave FROZEN
+
+First native wave is signed, committed and pushed at `2df7d9b393af7180bd318da6c6926d212e6344d6`;
+product source remains signed S6 `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`.
+Only downstream native publish-assets then CLI assets-barrel is released. Both baseline expected-
+content checks actually returned stale exit 1. Native generation and refreshed expected-content
+checks return 0; the actual durable barrel gate returns 1 against committed HEAD before this
+wave's asset commit. Exactly two generated assets changed; all signed first-wave assets and all
+6,233 other tracked files stayed byte-identical through generation. All 16 existing downstream regressions, two-file check/lint/format, native CLI/MCP publication
+dry runs and durable quality/architecture gates pass. This 10-file wave is frozen for supervisor
+review; read downstream-wave-gate-evidence.json, downstream-wave-semantic-diff.json and
+downstream-wave-source-manifest.json. Root/member lint exclusion refusals remain retained;
+supervisor-authorized standalone selection preserves native rules/options and processes both files
+without refusal. No full CLI lint or committed-read barrel PASS is claimed. Final item3 qualification, actual
+native CI, independent opposite-family IMPL-EVAL and acceptance remain required and unreleased.
+No later leaf is released. Supervisor review/signoff/ordinary commit/push/comment precedes the
+next release; no implementation-lane commits, GitHub or evaluator writes.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — native first wave APPROVED
 
 First-wave native asset aggregate `e57bf615c18e401f05d4d2c6ceb1ed1765cbb2b0b9385a9286c99e8587d71c1c` is approved at clean generation source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Exactly13 signed files comprise3 native assets,8 implementation run artifacts and2 supervisor files. Root verified11 frozen files/53raw receipts, independently decoded both native payloads and reran quality/architecture PASS0. All existing symbols and unowned source bytes remain unchanged.

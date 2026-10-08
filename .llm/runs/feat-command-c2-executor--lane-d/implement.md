@@ -1,3 +1,23 @@
+# Current checkpoint — native downstream CLI wave FROZEN
+
+First native wave is signed, committed and pushed at `2df7d9b393af7180bd318da6c6926d212e6344d6`;
+product source remains signed S6 `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`.
+Only downstream native publish-assets then CLI assets-barrel is released. Both baseline expected-
+content checks actually returned stale exit 1. Native generation and refreshed expected-content
+checks return 0; the actual durable barrel gate returns 1 against committed HEAD before this
+wave's asset commit. Exactly two generated assets changed; all signed first-wave assets and all
+6,233 other tracked files stayed byte-identical through generation. All 16 existing downstream regressions, two-file check/lint/format, native CLI/MCP publication
+dry runs and durable quality/architecture gates pass. This 10-file wave is frozen for supervisor
+review; read downstream-wave-gate-evidence.json, downstream-wave-semantic-diff.json and
+downstream-wave-source-manifest.json. Root/member lint exclusion refusals remain retained;
+supervisor-authorized standalone selection preserves native rules/options and processes both files
+without refusal. No full CLI lint or committed-read barrel PASS is claimed. Final item3 qualification, actual
+native CI, independent opposite-family IMPL-EVAL and acceptance remain required and unreleased.
+No later leaf is released. Supervisor review/signoff/ordinary commit/push/comment precedes the
+next release; no implementation-lane commits, GitHub or evaluator writes.
+
+## Previous checkpoints retained
+
 # Current checkpoint — native generated first wave FROZEN
 
 S6 is signed, committed and pushed at `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Only first-wave

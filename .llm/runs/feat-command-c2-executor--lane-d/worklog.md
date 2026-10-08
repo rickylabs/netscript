@@ -1,3 +1,11 @@
+# Current supervisor checkpoint — downstream native wave APPROVED
+
+Exactly12 signed files comprise two generated modules, eight implementation artifacts and two root review/evidence files. Native asset aggregate `2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf` is approved at generation HEAD `2df7d9b393af7180bd318da6c6926d212e6344d6`, product source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Root verified10frozen files/87raw receipts, independently executed semantic reconciliation, verified exact two-asset native rules/options and coverage, and reran quality/architecture PASS0. Source and signed first-wave asset bytes remain unchanged.
+
+Ordinary commit/push/structured PR comment must precede final item3 qualification. The actual durable committed-barrel gate is still1 until the generated modules are committed; no green claim. Full committed-tree C2 qualification, technical CI and independent evaluation remain open. No C3 or later leaf is released.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — native first wave APPROVED
 
 First-wave native asset aggregate `e57bf615c18e401f05d4d2c6ceb1ed1765cbb2b0b9385a9286c99e8587d71c1c` is approved at clean generation source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Exactly13 signed files comprise3 native assets,8 implementation run artifacts and2 supervisor files. Root verified11 frozen files/53raw receipts, independently decoded both native payloads and reran quality/architecture PASS0. All existing symbols and unowned source bytes remain unchanged.
@@ -370,3 +378,30 @@ reconcile. No new tests or production changes require new mutation controls in t
 Native stale→fresh checks retain the actual negative baseline and raw failure diagnostics. Frozen
 11-file implementation slice reserves two supervisor review files. No downstream CLI asset
 generation, final acceptance, independent evaluation or later leaf is claimed.
+
+## Native downstream wave at first-wave committed `2df7d9b393af7180bd318da6c6926d212e6344d6`
+
+Captured all 6,235 tracked baseline hashes and direct Deno 2.9.5 version from a clean tree.
+Native publish-assets check and nonmutating CLI barrel expected-content baseline returned stale1;
+publish-assets then assets-barrel generation returned0, followed by both content freshness0.
+Actual durable barrel gate returned1 from its comparison with committed HEAD; its committed-read
+PASS awaits this wave's ordinary artifact commit. Exactly two outputs differ: MCP publish-assets
+and CLI embedded agent-docs. All three signed first-wave assets and 6,233 other tracked files
+remained byte-identical throughout generation. Root's explicit SKILL-chapter procedural repair
+covers S6 and first/downstream/final/evaluator-template briefs; unchanged six skills/routing/scope
+remain controlling, as-issued copies retained, no work waived. Updated downstream chapter reread.
+Qualification and frozen source/evidence receipts follow; final item3 remains unreleased.
+
+Downstream final qualification: eight existing generator cases plus eight MCP/CLI consumer cases
+pass (16/0). Native two-file check0. Initial root/member lint coverage refusals2 retained; root
+then explicitly authorized a task-private standalone scoped config preserving exact native lint
+rules/options and formatter settings. Structured lint and format both prove selected=processed=2,
+no refusal, exit0. Native durable quality/architecture and CLI/MCP publish dry runs pass0.
+Semantic reconciliation verifies CLI embeds byte-identical signed shared gzip and complete
+provenance (sourceCommit4b8b7cb99), all182prose entries and exact unchanged-manifest35package/
+279subpath export map. Two subpaths added, none removed. All12MCP fallback documents and package
+metadata remain identical; only fallback provenance sourceCommit changes to the signed source.
+MCP bounded source bytes/hash/counts match shared sources. No new tests or production changes;
+no new mutation controls required. Actual baseline stale1→fresh-content0 is retained; actual
+committed-read barrel1 awaits this wave's commit. Frozen10files reserve two supervisor files.
+Final item3 qualification, actual CI, independent evaluation and later leaves remain unreleased.

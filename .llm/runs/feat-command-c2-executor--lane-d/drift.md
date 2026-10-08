@@ -117,3 +117,25 @@ source/tool/manifest/lock/workflow change or generated-output handpatch. The fiv
 non-worktree generator cases are permitted locally; seven unchanged worktree-fixture cases remain
 required in actual repository CI after ready-for-review. Downstream CLI assets are not yet updated
 or claimed fresh and need their separately signed committed wave before final C2 qualification.
+
+## Downstream native wave and procedural brief repair
+
+Native publish-assets and CLI asset-barrel consume the committed signed first-wave read set.
+Native current-content freshness is distinct from the durable barrel's committed-diff check:
+expected content is fresh, while that actual committed-read gate remains 1 before this wave is
+committed. No workaround or false committed-read PASS. Native generators preserve all three
+first-wave bytes and every source/tool/manifest/lock/workflow. No generated-output handpatch.
+Root corrected the explicit SKILL chapter omitted from historical S6, first/downstream/final
+follow-up briefs and evaluator template, preserving as-issued copies privately. The six skills,
+routing, scope and review/evaluator separation had already been applied; this procedural repair
+changes no authorization and waives no work. The updated downstream SKILL chapter was reread.
+Historical signed run bodies and earlier gate-failure evidence remain verbatim.
+
+The actual root lint wrapper refused partial coverage2 because root policy excludes CLI. Explicit
+unchanged CLI member config also refused all-excluded2. Both receipts retained. Supervisor
+explicitly authorized a task-private standalone config for exactly the two changed generated
+assets. It copies every native lint rule/option and formatter setting; only include/exclude path
+selection is adapted, with no ancestor extends. Root config hash and standalone config hash are
+captured; structured wrappers prove selected=processed=2 and no refusals. Both lint and format
+pass0. This bounded validation neither changes repository policy nor claims full CLI lint. Native
+quality/architecture and CLI/MCP publish dry runs remain independently PASS0.
