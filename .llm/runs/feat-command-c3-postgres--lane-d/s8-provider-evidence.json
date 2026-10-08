@@ -1,0 +1,83 @@
+{
+  "mutations": [
+    {
+      "mutation": "rollback-error-swallowed",
+      "source": "packages/database/src/commands/adapters/create-postgres-command-store.ts",
+      "testFilter": "leader rollback",
+      "mutantExit": 1,
+      "assertionFailed": true,
+      "compileFailure": false
+    },
+    {
+      "mutation": "busy-not-recognized",
+      "source": "packages/database/src/commands/adapters/postgres-command-claim.ts",
+      "testFilter": "busy aborts",
+      "mutantExit": 1,
+      "assertionFailed": true,
+      "compileFailure": false
+    },
+    {
+      "mutation": "incomplete-claim-committed",
+      "source": "packages/database/src/commands/adapters/create-postgres-command-store.ts",
+      "testFilter": "all command rows",
+      "mutantExit": 1,
+      "assertionFailed": true,
+      "compileFailure": false
+    },
+    {
+      "mutation": "serialization-not-retryable",
+      "source": "packages/database/src/commands/adapters/postgres-command-errors.ts",
+      "testFilter": "serialization and deadlock",
+      "mutantExit": 1,
+      "assertionFailed": true,
+      "compileFailure": false
+    },
+    {
+      "mutation": "callback-skipped",
+      "source": "packages/database/src/commands/adapters/create-postgres-command-store.ts",
+      "testFilter": "actual root write",
+      "mutantExit": 1,
+      "assertionFailed": true,
+      "compileFailure": false
+    },
+    {
+      "mutation": "replay-replaced-by-mismatch",
+      "source": "packages/database/src/commands/adapters/postgres-command-claim.ts",
+      "testFilter": "leader commit",
+      "mutantExit": 1,
+      "assertionFailed": true,
+      "compileFailure": false
+    }
+  ],
+  "restoredExit": 0,
+  "provider": "PostgreSQL 15.19",
+  "prisma": "7.8.0",
+  "deno": "2.9.5",
+  "migrationSha256": "287b032a563debc07179d5479fd1400852e9967b515e0e5e666d44145e48fd8b",
+  "redExit": 1,
+  "sourceGates": {
+    "check": 0,
+    "lint": 0,
+    "format": 0,
+    "quality": 0,
+    "frozen-check": 0,
+    "isolated-provider-script": 0
+  },
+  "childCommand": [
+    "deno",
+    "test",
+    "--no-lock",
+    "--config",
+    "<ephemeral-consumer-config>",
+    "--allow-all",
+    "<generated-provider-fixture>"
+  ],
+  "qualifiedTests": [
+    "PostgreSQL leader commit replays one winner and follower remains usable",
+    "PostgreSQL leader rollback lets waiting follower execute without replaying callbacks",
+    "PostgreSQL busy aborts the whole callback and leaves a clean next transaction",
+    "PostgreSQL all command rows share commit and rollback and incomplete claims cannot commit",
+    "PostgreSQL serialization and deadlock surface retryable failures with one callback",
+    "PostgreSQL actual root write negative control survives a callback rollback"
+  ]
+}

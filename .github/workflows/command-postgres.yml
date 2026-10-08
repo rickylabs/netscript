@@ -1,0 +1,22 @@
+name: Command PostgreSQL conformance
+on:
+  pull_request:
+    paths:
+      - 'packages/database/**'
+      - '.llm/tools/command-postgres-conformance.sh'
+      - '.github/workflows/command-postgres.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  command-postgres:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.5'
+      - name: Install native PostgreSQL
+        run: sudo apt-get update -qq && sudo apt-get install -y postgresql
+      - name: Real generated-client PostgreSQL conformance
+        run: bash .llm/tools/command-postgres-conformance.sh

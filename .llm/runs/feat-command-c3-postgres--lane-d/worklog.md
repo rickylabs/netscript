@@ -18,3 +18,5 @@ Contributor path: implement the same callback-bound port and real-provider confo
 | Close | Pending evidence |
 
 S7: RED exit 1; scoped check/lint/fmt exit 0; true callback and generated type tests pass. Three semantic mutants fail their named tests, restored source passes. Schema/bridge/migration manually reviewed. Transient Prisma probes use separate consumer config because generated declarations do not support isolatedDeclarations. See s7-evidence.json.
+
+S8: real-provider RED exit 1; six generated Prisma/PostgreSQL cases and six semantic production mutations qualify safe claims, rollback, clean follow-up and retryability. Isolated provider CI script and structured source/quality gates exit 0. See s8-provider-evidence.json and s8-supervisor-review.md.

@@ -14,7 +14,8 @@
     "./scripts": "./scripts/mod.ts",
     "./tracing": "./prisma-tracing.ts",
     "./testing": "./testing/mod.ts",
-    "./commands": "./commands.ts"
+    "./commands": "./commands.ts",
+    "./commands/postgres": "./commands-postgres.ts"
   },
   "tasks": {
     "check": "deno check --unstable-kv ./mod.ts ./ports/mod.ts ./adapters/mod.ts ./adapters/postgres.adapter.ts ./adapters/mssql.adapter.ts ./adapters/mysql.adapter.ts ./extensions/mod.ts ./scripts/mod.ts ./prisma-tracing.ts ./testing/mod.ts commands.ts",
@@ -34,7 +35,9 @@
       "scripts/**/*.ts",
       "prisma-tracing.ts",
       "testing/**/*.ts",
-      "commands.ts"
+      "commands.ts",
+      "commands-postgres.ts",
+      "src/**/*.ts"
     ],
     "exclude": [
       "**/*_test.ts",

@@ -140,3 +140,13 @@ rollback, rather than a retry of the transaction callback.
 `withTransaction(root, work)` preserves a separate callback type through `TransactionClientPort<TTx>`. Bind Prisma through its actual callback; never assert a root client into the business handle. Consumers generate `CommandTransactionClient = Omit<Prisma.TransactionClient, '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'>`.
 
 The reviewed schema, migration and bridge samples in `tests/fixtures/command-store/` show the consumer-owned receipt unique key, completion check, audit fields and initial outbox lease fields. Generate a Prisma client and bind the callback explicitly. Apply the migration through the application's normal review workflow. CLI generation is deferred to RFC 0003 stage 8; importing the framework never creates tables or runs a migration.
+
+### PostgreSQL command store
+
+Import `createPostgresCommandStore` from `@netscript/database/commands/postgres`, pass the consumer's generated callback bridge, and configure `transactionTimeoutMs`. The store supports PostgreSQL ReadCommitted, ReadUncommitted (PostgreSQL treats it as ReadCommitted), RepeatableRead and Serializable. Receipt wait is an integer from 1 to 60,000 milliseconds; zero would disable PostgreSQL lock_timeout and is refused. The timeout is finite and cancellation is cooperative.
+
+Claims use the reviewed unique key with `INSERT ... ON CONFLICT DO NOTHING RETURNING`, then one indexed winner select. Successful claims restore the previous transaction-local lock timeout. A lock timeout produces terminal busy, rolls back the complete callback, and forbids subsequent side-record calls. Serialization/deadlock errors are retryable provider failures; the callback is never retried automatically. Each owned receipt must complete before commit. All audit/outbox SQL derives from the callback client; root business/lifecycle operations are refused.
+
+Prisma currently exposes nested transactions on its callback proxy. The consumer bridge sample hides root operations at runtime as well as in the generated alias. It preserves model delegates and uses the actual provider transaction for every side record. Table mappings match the reviewed sample migration; explicit mapping changes require a reviewed adapter/bridge migration.
+
+`bash .llm/tools/command-postgres-conformance.sh` runs the native generated-client provider gate with an isolated temporary Unix socket. The dedicated CI workflow uses Deno 2.9.5. A suite skipped without provider configuration never certifies PostgreSQL support. No database credentials, connection addresses or operational evidence belong in the public run artifacts.
