@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "phase": "IMPL-EVAL",
+  "verdict": "PASS",
+  "evaluatedProductHead": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+  "evaluatorRoute": {
+    "session": "<session>",
+    "requestedModel": "opencode-go/glm-5.3-flash",
+    "requestedVariant": "max",
+    "observed": [
+      {
+        "modelID": "glm-5.3-flash",
+        "providerID": "opencode-go",
+        "mode": "build",
+        "agent": "build",
+        "variant": "max"
+      }
+    ],
+    "effort": "not independently attested",
+    "fallback": false
+  },
+  "processExit": 0,
+  "report": "evaluate.md",
+  "artifactOnlyCommitPolicy": "This commit records the independent verdict and closure evidence; no product changes since the attested head.",
+  "independentTests": {
+    "passed": 180,
+    "failed": 0,
+    "ignored": 0
+  },
+  "docs": {
+    "serviceExit": 0,
+    "contractsRawExit": 1,
+    "sanction": "Existing doctrine public-surface oRPC builder sanction; baseline 9 and head 17 upstream private references."
+  },
+  "supervisorFactCorrection": "Live issue/PR milestone0.0.8. Third evaluator says draft; live PR had already become ready for review. Incidental metadata corrected without changing verdict.",
+  "ownerRemainder": "Inherited proxy-addr critical advisory blocks green full CI. No narrow native fix proven, no broader upgrade or audit waiver introduced. Review remains unmerged. Native npm-format type-only metadata limitation is outside claimed JSR qualification.",
+  "historicalProductHead": "e64c841bc9c1a9f967afa357b54f454445807db8",
+  "round": 3,
+  "historicalReport": "evaluate-round-1.md",
+  "qualificationRepair": "Only downstream Fresh UI private-lock metadata; unchanged versions/integrities and all22 C1 source hashes.",
+  "newIndependentTests": {
+    "freshUiPassed": 172,
+    "lockRegressionsPassed": 2,
+    "failed": 0
+  },
+  "c1RegressionEvidence": "Round1 independently ran180 affected package tests; round2 confirms all C1 sources identical.",
+  "ciState": "Repo-wide check/test5437pass0fail14ignored plus6browserpass. Earlier quality gates pass; inherited audit-critical fails. Close-gate refresh pending current body reconciliation.",
+  "currentQualificationState": "Third same-session independent PASS; artifact-only evidence correction/closure reconciliation. Product identical to evaluated head.",
+  "historicalRound2Report": "evaluate-round-2.md",
+  "interruptedThirdRoundAttempt": {
+    "head": "360165b45ae07b1a87671b14d09e990769687380",
+    "processExit": 143,
+    "verdict": null,
+    "sessionPreserved": true,
+    "reason": "Read stayed pending after checkout directory changed; interrupted before verdict and resume from original directory."
+  },
+  "transitiveProductHead": "ddcd62d25253142ffa3a55b5ddb396440c1d7ffb",
+  "reportSha256": "dd04f3b42068c300f315036ff9028b24ab25073f2ff7686cce8f72fcaf956f1d",
+  "historicalRound3Report": "evaluate-round-3.md",
+  "qualificationCorrection": "Two runtime rows relabeled actual2.9.5; direct2.9.7gzip-only variance recorded. No source/generator/dependency changes.",
+  "finalQualificationEvidence": "final-qualification-evidence.json"
+}

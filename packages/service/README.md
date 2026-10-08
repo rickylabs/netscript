@@ -28,6 +28,9 @@ not.
   `healthChecks.database`, `.kv`, `.service`, and `.custom` cover common dependencies.
 - **Graceful lifecycle** — `onShutdown()` registers LIFO teardown hooks; `serve()` drains in-flight
   requests, installs `SIGINT`/`SIGTERM` handlers, and accepts an external `AbortSignal`.
+- **Explicit bind address** — `serve({ hostname })` and `defineService(router, { hostname })` bind
+  one interface, such as `'127.0.0.1'` for a loopback-only listener, on both the plain and the TLS
+  listener; omitting it keeps the all-interfaces default.
 - **One app-wide budget** — `createRuntimeHost()` invokes existing service, worker, queue, and
   database drains in deterministic phase order and returns one aggregate report.
 - **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
@@ -281,3 +284,66 @@ KV health checks add the permissions of the client they probe.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Command definitions and canonical codecs
+
+`@netscript/service/commands` defines immutable commands without executing them. Their handlers
+remain privately bound to the exact original definition, and copied or forged definitions are
+refused. The focused subpath requires no permissions; defining a command starts no resource.
+
+```typescript
+import { defineCommand, jsonCodec } from '@netscript/service/commands';
+import { z } from 'zod';
+
+const updateItem = defineCommand({
+  name: 'items.update',
+  definitionVersion: 1,
+  idempotency: {
+    scope: () => 'items',
+    fingerprint: (input: { id: string }) => input,
+    response: jsonCodec(z.object({ updated: z.boolean() })),
+  },
+  records: { audit: 'required', outbox: 'optional' },
+  handle: async () => ({ updated: true }),
+});
+```
+
+Names use lowercase dot/hyphen segments, start with a letter, and contain 1–120 characters.
+`definitionVersion` is a positive safe integer and marks replay compatibility. Change it when
+identity, command meaning or response decoding changes. Changing a name or scope creates a new
+receipt namespace; retain the old definition through the retry window or migrate receipt keys before
+deploying that change. Required idempotency is the default; `mode: 'optional'` explicitly permits
+commands without a key. Audit and outbox policies are `required`, `optional` or `forbidden`.
+
+| Surface                                          | Purpose                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `CommandActor` / `CommandEnvelope<Input>`        | Narrow durable origin, input and transport identity; expected version uses a string  |
+| `CommandDefinition` / `CommandDefinitionSpec`    | Opaque result and definition-time handler specification                              |
+| `CommandContext`                                 | Transaction client, injected clock/IDs and synchronous audit/outbox intent recorders |
+| `CommandFailure` / `CommandError`                | Frozen safe failure vocabulary; serialized errors omit message, stack and cause      |
+| `CommandCodec<T>` / `jsonCodec(schema, limits?)` | Synchronous Standard Schema validation in both directions                            |
+| `canonicalCommandJson(value, limits?)`           | Deterministic RFC 8785 canonical text                                                |
+| `parseCanonicalCommandJson(text, limits?)`       | Bounded stored-text parsing with exact canonical round-trip verification             |
+
+Actor roles, scopes and claims stay outside the durable envelope. Authentication/authorization
+happen before execution. Credential scheme, correlation and trace are transport/audit data, excluded
+from semantic request identity. Application/business errors retain their existing mapping. Only the
+three client-actionable failures map through `@netscript/contracts/commands`; other failures use the
+application's validation/internal/service-unavailable handling.
+
+The internal canonical protocol is `jcs-v1`: ECMAScript number/string serialization, UTF-16
+lexicographic property order and no Unicode normalization. The default safeguards are 64 nested
+containers, 10,000 aggregate value nodes/object keys and 1 MiB of UTF-8 canonical text. Optional
+`depth`, `items` and `bytes` limits may only tighten those ceilings. Stored text is bounded before
+parsing and must reserialize exactly; duplicates, whitespace, alternative numeric spellings, escaped
+equivalents and different key order are refused as corrupt/noncanonical material.
+
+Codecs reject nonfinite numbers, lone surrogates in values or keys, sparse arrays, undefined,
+functions, symbols, BigInt, Date, class instances, cycles and accessors. A `jsonCodec` schema must
+validate synchronously: a returned Promise/thenable is refused with a synchronous-validation
+configuration diagnostic. No async validation result or unvalidated schema output crosses this codec
+boundary. Custom codecs must also return valid bounded I-JSON before persistence.
+
+`jsonCodec()` requires synchronous validation that preserves canonical JSON identity. Neutral
+transforms are accepted; coercion, field stripping and value-changing transforms are rejected,
+preventing a response from changing when a stored receipt is decoded.

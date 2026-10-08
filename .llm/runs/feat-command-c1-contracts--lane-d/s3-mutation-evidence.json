@@ -1,0 +1,158 @@
+[
+  {
+    "mutation": "cross-package-retry-hint",
+    "productionFile": "packages/service/src/commands/domain/failure.ts",
+    "before": "retryAfterMs: failure.retryAfterMs",
+    "after": "retryAfterMs: 0",
+    "test": "public command consumer composes receipt codecs with opt-in transport failures",
+    "originalSha256": "f96abc2ba0a149cd56e427500b383f2d8b6663637a07c6fde370d0059aaaca63",
+    "mutantSha256": "761d9e6d82edb3c0ddab484baa646674736e22a1125edd4ee7193a055aa99a5a",
+    "restoredSha256": "f96abc2ba0a149cd56e427500b383f2d8b6663637a07c6fde370d0059aaaca63",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "public command consumer composes receipt codecs with opt-in transport failures",
+        "packages/service/tests/commands-consumer_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 127,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n      code: \"COMMAND_IN_PROGRESS\",\n      data: {\n        kind: \"in_progress\",\n-       retryAfterMs: 0,\n+       retryAfterMs: 25,\n        retryable: true,\n      },\n    }\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-consumer_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "public command consumer composes receipt codecs with opt-in transport failures",
+              "file": "./packages/service/tests/commands-consumer_test.ts",
+              "line": 14
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "public command consumer composes receipt codecs with opt-in transport failures",
+        "packages/service/tests/commands-consumer_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 105,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "emitted-declaration-version-widening",
+    "productionFile": "packages/service/src/commands/domain/values.ts",
+    "before": "expectedVersion?: string;",
+    "after": "expectedVersion?: string | number;",
+    "fixture": "packages/service/tests/type-fixtures/commands_type.ts",
+    "originalSha256": "128f94a106ecc657faa50a145b519b3c766c8bd7802254e79a196395bfc7f00a",
+    "restoredSha256": "128f94a106ecc657faa50a145b519b3c766c8bd7802254e79a196395bfc7f00a",
+    "mutatedDeclarationSha256": "cb1a394d1203c8023992a1f04e50774ec59b9c4a07b26d9cd8e832eaa6373f08",
+    "restoredDeclarationSha256": "a723f7defe5bbf264c80b67c1842b37f1e5e9a4b627254cd099dbddbdb5612fc",
+    "mutantPackExit": 0,
+    "restoredPackExit": 0,
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<private-runtime>/s3-declaration-consumer"
+      },
+      "command": "deno check --unstable-kv --frozen <files>",
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 1
+      },
+      "summary": {
+        "totalOccurrences": 1,
+        "uniqueOccurrences": 1,
+        "uniqueCodes": 1,
+        "uniquePaths": 1
+      },
+      "groups": [
+        {
+          "code": "TS2578",
+          "message": "Unused '@ts-expect-error' directive.",
+          "count": 1,
+          "paths": [
+            {
+              "path": "<private-runtime>/s3-declaration-consumer/commands_type.ts",
+              "count": 1,
+              "locations": [
+                {
+                  "line": 72,
+                  "column": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<private-runtime>/s3-declaration-consumer"
+      },
+      "command": "deno check --unstable-kv --frozen <files>",
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s3-declaration-consumer",
+      "--file",
+      "commands_type.ts",
+      "--file",
+      "contract_types.ts",
+      "--deno-arg",
+      "--frozen"
+    ]
+  }
+]

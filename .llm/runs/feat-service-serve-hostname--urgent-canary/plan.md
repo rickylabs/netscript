@@ -1,0 +1,3 @@
+# Plan
+
+Finish PR #2075 for #2074. Archetype 4; runtime listener concern, no frontend overlay. Existing contract is fixed, so PLAN-EVAL N/A: bounded evidence refresh, no public design decision remaining. Locked: retain current implementation and branch history. S1 bootstrap/scoped service gates; S2 independent review and final evidence. Gates: service check/test/lint/fmt; doc-lint/publish; quality:gate; carrier freshness; authoritative runtime CI; full current-head CI. Open decision: owner-directed separate dependency maintenance before readiness. Risk: draft CI can skip full audit; explicit audit evidence required. Deferred: IPv6 banner cleanup, scaffold changes, dependency maintenance, merging. No new debt accepted.

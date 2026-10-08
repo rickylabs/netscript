@@ -7,14 +7,15 @@
     ".": "./mod.ts",
     "./crud": "./crud.ts",
     "./query": "./query.ts",
-    "./transform": "./transform.ts"
+    "./transform": "./transform.ts",
+    "./commands": "./commands.ts"
   },
   "imports": {
     "@orpc/contract": "npm:@orpc/contract@^1.15.0",
     "zod": "catalog:"
   },
   "tasks": {
-    "check": "deno check mod.ts crud.ts query.ts transform.ts",
+    "check": "deno check mod.ts crud.ts query.ts transform.ts commands.ts",
     "test": "deno test --allow-all",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
@@ -26,6 +27,7 @@
       "crud.ts",
       "query.ts",
       "transform.ts",
+      "commands.ts",
       "src/**/*.ts",
       "crud/**/*.ts",
       "schemas/**/*.ts"

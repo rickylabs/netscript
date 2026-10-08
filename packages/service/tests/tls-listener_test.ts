@@ -84,6 +84,14 @@ Deno.test('buildListenerBanner uses the http scheme without TLS', () => {
   assertEquals(banner.health, 'http://127.0.0.1:8080/health');
 });
 
+/** Subset of the `Deno.serve` options the listener tests assert on. */
+interface CapturedServeOptions {
+  hostname?: string;
+  cert?: string;
+  key?: string;
+  onListen?: (addr: Deno.NetAddr) => void;
+}
+
 /**
  * Captures the options passed to `Deno.serve` so the TLS branch can be asserted
  * without binding a real socket, mirroring how the runtime tests stub
@@ -91,14 +99,10 @@ Deno.test('buildListenerBanner uses the http scheme without TLS', () => {
  */
 function stubServe(): {
   readonly restore: () => void;
-  readonly capturedOptions: () =>
-    | { cert?: string; key?: string; onListen?: (addr: Deno.NetAddr) => void }
-    | null;
+  readonly capturedOptions: () => CapturedServeOptions | null;
 } {
   const originalServe = Deno.serve;
-  let captured:
-    | { cert?: string; key?: string; onListen?: (addr: Deno.NetAddr) => void }
-    | null = null;
+  let captured: CapturedServeOptions | null = null;
 
   const fakeServer = {
     addr: { hostname: '127.0.0.1', port: 8443, transport: 'tcp' } as Deno.NetAddr,
@@ -158,6 +162,52 @@ Deno.test('serve omits cert/key from Deno.serve when TLS is absent (http path)',
     await running.stop();
   } finally {
     serve.restore();
+    restoreEnv();
+  }
+});
+
+Deno.test('serve forwards hostname unchanged to Deno.serve on both branches', async () => {
+  const restoreEnv = withClearedTlsEnv();
+  try {
+    for (const tls of [undefined, { cert: SAMPLE_CERT, key: SAMPLE_KEY }]) {
+      const serve = stubServe();
+      try {
+        const running = await createService({}, { name: 'hostname-forward' })
+          .serve({ hostname: 'localhost', port: 0, handleSignals: false, tls });
+
+        const options = serve.capturedOptions();
+        assertEquals(options?.hostname, 'localhost');
+        assertEquals(options?.cert, tls?.cert);
+
+        await running.stop();
+      } finally {
+        serve.restore();
+      }
+    }
+  } finally {
+    restoreEnv();
+  }
+});
+
+Deno.test('serve leaves the Deno.serve hostname default when hostname is omitted', async () => {
+  const restoreEnv = withClearedTlsEnv();
+  try {
+    for (const tls of [undefined, { cert: SAMPLE_CERT, key: SAMPLE_KEY }]) {
+      const serve = stubServe();
+      try {
+        const running = await createService({}, { name: 'hostname-omitted' })
+          .serve({ port: 0, handleSignals: false, tls });
+
+        const options = serve.capturedOptions();
+        assertEquals(options?.hostname, undefined);
+        assertEquals(options?.cert, tls?.cert);
+
+        await running.stop();
+      } finally {
+        serve.restore();
+      }
+    }
+  } finally {
     restoreEnv();
   }
 });
