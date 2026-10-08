@@ -171,3 +171,15 @@ Mechanical follow-up slice review: README cancellation contract text unchanged, 
 Gate `review-corpus-regenerate`: raw exit `0`. Command: `deno task gen:mcp-export-corpus`. Full raw output retained privately.
 
 Owning gen:mcp-export-corpus exit 0 from clean committed read set; corpus refreshed for mandatory signal/deadline and documented queue port exports. Generated artifact only; no manual corpus editing. Commit before exercising committed-tree freshness regressions.
+
+Gate `review-corpus-tests`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts`. Full raw output retained privately.
+
+Gate `review-mcp-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `review-corpus-freshness`: raw exit `0`. Command: `deno task gen:mcp-export-corpus --check`. Full raw output retained privately.
+
+Gate `review-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `review-corpus-tests-corrected`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/docs/generate-export-surface-corpus_test.ts`. Full raw output retained privately.
+
+Corrected corpus fixture gate exit 0 (12 pass): the local Git shim had transparently relocated the test's requested temporary worktrees, breaking their expected paths. Owned failed fixtures removed; test-scoped WT_ENFORCE=0 preserves owner-requested task-folder confinement without editing the shim. TMPDIR remains inside task folder. Original relocation failure retained; corrected existing freshness/clean-tree suite passes. Corpus --check, generated selected type check and quality gate also exit 0. No new tests or runtime behavior delta; mandatory source runtime/mutation PASS remains da438b2f90abf95d7d9cbe39a3bc57c2bb7989b2. Independent exact-head mechanical delta IMPL-EVAL next.
