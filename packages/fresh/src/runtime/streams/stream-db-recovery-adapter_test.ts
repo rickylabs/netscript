@@ -242,3 +242,37 @@ Deno.test('StreamDB recovery keeps listener and controller counts flat across ba
     recovery.stop();
   }
 });
+
+Deno.test('StreamDB recovery consumes 200000 ordered catch-up events and resumes the checkpoint', async () => {
+  const count = 200_000;
+  const payload = JSON.stringify(Array.from({ length: count }, (_, id) => ({ id })));
+  const offsets: (string | null)[] = [];
+  const recovery = createStreamDBRecoveryAdapter(native((input) => {
+    offsets.push(new URL(String(input)).searchParams.get('offset'));
+    return Promise.resolve(
+      offsets.length === 1
+        ? new Response(payload, {
+          headers: {
+            'content-type': 'application/json',
+            'stream-next-offset': 'large-checkpoint',
+            'stream-up-to-date': 'true',
+          },
+        })
+        : closedBatch('end'),
+    );
+  }));
+  let consumed = 0;
+  try {
+    const response = await deadline(recovery.stream.stream<{ id: number }>());
+    response.subscribeJson((batch) => {
+      for (const event of batch.items) assertEquals(event.id, consumed++);
+    });
+    await deadline(response.closed);
+    assertEquals(consumed, count);
+    assertEquals(offsets, ['-1', 'large-checkpoint']);
+    assertEquals(response.offset, 'end');
+    assertEquals(recovery.status, 'stopped');
+  } finally {
+    recovery.stop();
+  }
+});

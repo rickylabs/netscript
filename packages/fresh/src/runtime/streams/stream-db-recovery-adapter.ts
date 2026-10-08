@@ -152,7 +152,11 @@ export function createStreamDBRecoveryAdapter(
         while (!signal.aborted) {
           let subscriberFailed = false;
           try {
-            const items = await session.json<T>();
+            // Native json() spreads the parsed array into push, exceeding V8's
+            // argument limit on large catch-up batches. text() keeps the same
+            // finite response boundary without accumulating via spread.
+            const parsed = JSON.parse((await session.text()).trim() || '[]');
+            const items: T[] = Array.isArray(parsed) ? parsed : [parsed];
             const batch: JsonBatch<T> = {
               items,
               offset: session.offset,

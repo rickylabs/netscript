@@ -55,3 +55,7 @@ Generated corpus was restored to baseline during the review's baseline/publish c
 ### S1 sign-off
 
 Independent slice review PASS; exact S1 snapshot focused tests exit 0, quality:scan exit 0, arch:check exit 0. Per-attempt signals are released on consumed batches, timeouts, failed connections and unsubscribe. Reconcile: remote PR head remains original baseline; four threads still open pending final evaluation/replies; no new scope or debt.
+
+### S2 sign-off
+
+Independent slice review PASS; exact S2 snapshot focused tests, quality:scan and arch:check exit 0. Finite text parse avoids V8 array spread limits; 200,000 events stay ordered and next request resumes large-checkpoint. Reversal mutation fails with RangeError. Malformed JSON remains terminal (SyntaxError rather than upstream PARSE_ERROR); network TypeError recovery unchanged. Reconcile: S1 pushed with phase evidence; threads remain pending final replies.
