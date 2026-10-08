@@ -1,0 +1,44 @@
+[
+  {
+    "test": "PostgreSQL relay claims are bounded disjoint due-only and preserve stable identity",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "due-only",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969"
+  },
+  {
+    "test": "PostgreSQL relay live-token publication atomically stores checked acceptance and refuses stale expiry",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "acceptance",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969"
+  },
+  {
+    "test": "PostgreSQL relay retries clear leases retain ids and terminal release fences every generation",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "retry-instant",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969"
+  },
+  {
+    "test": "real PostgreSQL generated-client relay-store conformance",
+    "productionFile": "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts",
+    "mutation": "due-only",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969",
+    "sharedMutation": "due-only",
+    "wrapperAssertsNativeChildExit": true
+  }
+]

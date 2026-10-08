@@ -13,3 +13,11 @@ Slices: S11 raw contracts/PostgreSQL/schema+physical conformance; S12 service de
 ## Gates
 
 Structured root check/lint/fmt, tests via run-deno-test, quality/architecture, full export docs, audits/dependency/publish, consumer import/type, physical PostgreSQL lease/CAS receipts and fault proofs, four Deno 2.9.5 regeneration/freshness gates, canonical full scaffold.runtime, native CI, exact-product independent IMPL-EVAL. Each actual EXIT recorded privately and summarized here.
+
+## S11 sign-off
+
+Raw port, true-callback PostgreSQL atomic SKIP LOCKED claim/live-token CAS, paired receipt fields and reviewed incremental migration implemented. Real generated PostgreSQL RED: EXIT 1, all three named inner tests fail assertions against absent behavior. GREEN: EXIT 0, all three pass. Every new named inner test plus native wrapper has semantic production mutation evidence and byte-identical restored PASS. One initial retry mutation produced a SQL type error and is explicitly not credited; repaired timestamp mutation reaches the intended assertion failure.
+
+Scoped database check/lint/fmt, quality/architecture EXIT 0. Full twelve-entrypoint docs initially EXIT 1 for a recursive constant export; repaired manifest makes every entrypoint EXIT 0. Audit EXIT 0. Combined existing command-store plus new relay native provider wrappers EXIT 0 (two wrappers, no ignored provider certification). Existing dedicated PostgreSQL CI script now executes both suites; no workflow mutation.
+
+Content review: database owns only raw rows/closed failure state; one parameterized statement claims bounded due rows under SKIP LOCKED; settlement includes id/token/live expiry and unpublished/nonterminal predicates. Acceptance validation precedes SQL and metadata shares publication CAS. Retry uses actual now distinct from future availability; terminal retains stable row. No queue/service import, runtime DDL, root writes, nested transaction or callback retry. No unrelated source/lock changes. Reconcile: fresh issue metadata milestone 0.0.8 retained; no new comments change locked scope. S11 complete; S12 next.

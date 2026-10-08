@@ -63,6 +63,8 @@ model NetScriptCommandOutbox {
   publishedAt DateTime? @map("published_at") @db.Timestamptz(3)
   terminalAt DateTime? @map("terminal_at") @db.Timestamptz(3)
   lastFailure String? @map("last_failure")
+  acceptanceIdentity String? @map("acceptance_identity") @db.VarChar(256)
+  acceptedAt DateTime? @map("accepted_at") @db.Timestamptz(3)
   @@index([availableAt], map: "command_outbox_due")
   @@map("netscript_command_outbox")
 }
