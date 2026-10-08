@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "head": "360165b45ae07b1a87671b14d09e990769687380",
+  "branch": "feat/command-c1-contracts",
+  "trackedFiles": 6160,
+  "unchangedFiles": 6158,
+  "changedFiles": [
+    "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+    "packages/mcp/src/publish-assets.generated.ts"
+  ],
+  "allHistoricalEvaluatorArtifactsUnchanged": true,
+  "allLocksManifestsToolsTestsWorkflowsUnchanged": true,
+  "sharedProseAndProvenanceUnchanged": true,
+  "semanticProofExitCode": 0,
+  "candidateFiles": [
+    {
+      "file": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "beforeSha256": "81af965f1cac5f9a2be7f93e25b7f6d9ca72a5c14a90c02cb5c38f191e624d24",
+      "candidateSha256": "ab45d2db002889607b234a03074a858b7235eb1c6eb664156181528bab47a63d",
+      "candidateBytes": 1908416
+    },
+    {
+      "file": "packages/mcp/src/publish-assets.generated.ts",
+      "beforeSha256": "89f37138c9f29312144e3a6190ea26018186e0d2e6144aec1de86e009f3a6ed9",
+      "candidateSha256": "5092ac34888cb1c83aabfa2963d430b3adb920f255f2ce01c70686c8c1abc456",
+      "candidateBytes": 291351
+    }
+  ]
+}
