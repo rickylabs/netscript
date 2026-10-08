@@ -109,11 +109,7 @@ Deno.test('durable chat lifecycle provides seed, optimism, live tokens, reload r
   // before the adapter's persistence promise needs to settle.
   assertEquals(optimisticA.at(-1), userTurn);
   await send;
-  const durableUserTurn = {
-    id: 'user-1',
-    role: 'user',
-    parts: [{ type: 'text', text: 'Explain naïve UTF-8 — briefly…' }],
-  };
+  const durableUserTurn = userTurn;
   assertEquals(await pendingA, durableUserTurn);
   assertEquals(await pendingB, durableUserTurn);
 

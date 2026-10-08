@@ -23,3 +23,29 @@ PLAN-EVAL: Selected independent PLAN-EVAL PASS against immutable current main 8a
 9. Close: pending source delivery and handoff; publication remains owner work.
 
 S1 Design checkpoint: D1-D4 locked in plan.md. Independent Google Gemini selected PLAN-EVAL PASS at immutable main8aad14940c52cd3a4db7efa57d56d50ae131df6c, all8boxes. Fresh fetch baseline equality confirmed before implementation. Model/session/vendor separated; owner-authorized fallback after primary provider stalled. Actual native data/signal already forwarded; only message mapper drops parts/metadata. Planned2runtime regressions plus native compile consumer, eachdistinctcausalmutant. Full owning doc baseline to be recorded before source and compared at everyentrypoint; proposed existing-debt acceptance requires independent IMPL ifrawfailed. S2 source stillpending.
+
+Gate `chat-doc-baseline`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
+
+Gate `chat-s2-fmt-write`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/src/runtime/ai --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --ext ts,tsx --write`. Full raw output retained privately.
+
+Gate `chat-s2-focused`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/fresh/src/runtime/ai/create-chat-connection_test.ts packages/fresh/src/runtime/ai/create-chat-connection_integration_test.ts`. Full raw output retained privately.
+
+Gate `chat-s2-consumer`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `mutant-native-consumer`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `restored-native-consumer`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `mutant-identity`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter rich native send preserves packages/fresh/src/runtime/ai/create-chat-connection_test.ts`. Full raw output retained privately.
+
+Gate `restored-identity`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter rich native send preserves packages/fresh/src/runtime/ai/create-chat-connection_test.ts`. Full raw output retained privately.
+
+Gate `chat-s2-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/src/runtime/ai --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `chat-s2-lint`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh/src/runtime/ai --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --ext ts,tsx`. Full raw output retained privately.
+
+Gate `chat-s2-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/src/runtime/ai --file packages/fresh/tests/type-fixtures/chat-send-consumer_type.ts --ext ts,tsx`. Full raw output retained privately.
+
+Gate `chat-s2-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+S2 substantive review complete: six owning source/docs/test/fixture files introduce one documented NetScriptChatSendMessage structural union, public AI export and direct unchanged send array forwarding. Existing data/signal linkage, single hub, projection and intentional reduced server response formatting retained. Native declared UI/Model consumers compile without cast/new dependency, malformed shapes rejected. Public-type narrowing yields intended consumer TS2345 then restoredcheckPASS; compiling old-lossy-projection mutant kills exactly1identity/lifecycle runtime case thenrestorePASS. All20focused chat cases and scoped frozen check/lint/fmt/quality/architecture PASS. Existing fake durable lifecycle expectation changed only from synthesizedtextparts to exactoriginalModelmessage, preserving full optimism/reload/multibyte coverage as selectedPLAN requires. Newfixturecontains actualnative image/audio/video/document/tool/reasoning/metadata/structuredoutput fields. Pristine all17entrypoint baseline rawdoc1 with45combinedfindings retained; finalallentrycompare pending. No public upstream type reexports or lock churn. S3 actualdefaultnative HTTP/SSE regression next; source notqualifiedasnativewireyet.
