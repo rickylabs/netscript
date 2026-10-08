@@ -199,3 +199,7 @@ Original IMPL-EVAL superseded; a fresh independent amendment evaluation is requi
 Gate `amendment-durable-peer-receipt`: raw exit `0`. Command: `deno run --allow-all .llm/tools/gates/run-gate.ts --gate ai-peer-resolution --id c2-ai-peer-amendment --output <private-evidence>`. Full raw output retained privately.
 
 Gate `amendment-published-negative`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/check-ai-peers.ts --published-version 0.0.7`. Full raw output retained privately.
+
+## Final amended evaluation
+
+Independent GLM max IMPL-EVAL PASS at source `f413a1f612683f054d44d74297627129987feff9`, actual evaluation head `d5c07c0874eb561f130957d1867bd84ff2c5dd6d`. Report `amendment-evaluate.md` supersedes the original source verdict. Reviewer independently reran both regressions (2 pass) and the live cold resolution guard (one core 0.65.0). Both unchanged doc baseline rows explicitly DEBT_ACCEPTED. Source phases 5–7 complete; review phase ready. No merge/publication; fixed published-consumer receipt remains owner work. Report-record commit reused the prior brief message after unavailable python alias; this follow-up correctly records completion.

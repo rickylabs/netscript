@@ -1,3 +1,3 @@
 # Context
 
-PR #2087 amended source qualification complete, independent IMPL-EVAL pending. Independent PLAN-EVAL PASS at 46ec3293b5f5474ab7816786d5221af536cae50f. Current qualified family and explicit selection/policy mutations described in worklog; source checks/provider/bundle/publication audits pass, unchanged AI/Fresh documentation debt remains for independent adjudication. Do not merge or publish; fixed published consumer acceptance remains open.
+Issue #2036, PR #2087; branch fix/ai-peer-compatible-ranges, baseline 872df8e21e0a8bf06cd0796c7808068dd67e2c4e. Final amended source f413a1f612683f054d44d74297627129987feff9; independent GLM max PASS at evaluation head d5c07c0874eb561f130957d1867bd84ff2c5dd6d. Read amendment-evaluate.md. Source and mutation gates complete; published-consumer qualification remains owner work. Non-closing source PR; do not merge.
