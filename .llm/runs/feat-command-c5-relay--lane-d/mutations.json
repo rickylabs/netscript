@@ -140,5 +140,35 @@
     "assertionFailure": true,
     "restoredByteIdentical": true,
     "sourceSha256": "829c673df10576fc7a5489bbacb6f0551f157f4b9f44ccf956528f567204bb25"
+  },
+  {
+    "test": "stream command sink waits delivered completion and forwards stable identity and correlation for upsert delete",
+    "productionFile": "packages/plugin-streams-core/src/integration/commands/stream-command-sink.ts",
+    "mutation": "stream-waits-delivery",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "d4eb66e1e03b322f845587725876af51119ffb1a8a6d1ed1adb2a2115286d53f"
+  },
+  {
+    "test": "stream command sink refuses rejected unknown cancelled malformed acceptance and invalid payload before publication",
+    "productionFile": "packages/plugin-streams-core/src/integration/commands/stream-command-sink.ts",
+    "mutation": "stream-refuses-rejection",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "d4eb66e1e03b322f845587725876af51119ffb1a8a6d1ed1adb2a2115286d53f"
+  },
+  {
+    "test": "stream command identity is serialized with correlation and stable producer tuple through native retry and duplicate acknowledgement",
+    "productionFile": "packages/plugin-streams-core/src/application/create-durable-stream.ts",
+    "mutation": "stream-wire-identity",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "f6118c4af1c3532a86f3dec7f5196fc9cb39479fc3dd550faccafdac11e6b449"
   }
 ]

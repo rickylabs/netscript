@@ -233,6 +233,10 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
     'plugin-triggers-core',
     '/telemetry',
   ),
+  '@netscript/plugin-streams-core/integration/commands': netscriptJsrSpecifier(
+    'plugin-streams-core',
+    '/integration/commands',
+  ),
   '@netscript/plugin-sagas-core/integration/commands': netscriptJsrSpecifier(
     'plugin-sagas-core',
     '/integration/commands',
