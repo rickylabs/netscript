@@ -2436,6 +2436,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** 2026-10-15.
 - **Linked plan:** `.llm/runs/fix-db-collection-runtime-family--c2/plan.md`; NetScript #2039.
 - **Created:** 2026-10-08.
-- **Status:** open, proposed DEBT pending independent IMPL-EVAL adjudication.
+- **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL PASS at 51d074443efa241af0d24153a6de608f78ef429b.
 - **Gate:** All-export doc lint must reach zero with existing types preserved. This change introduces no additional diagnostic or private reference at any entrypoint. Release requires qualified published consumer resolution; source qualification does not fulfill publication.
 - **Evidence:** Private baseline/current structured doc reports and complete per-entrypoint comparison; run worklog records both raw failing exits and unchanged baseline, never false green. Raw dry-run publication analysis gates the changed owning packages.

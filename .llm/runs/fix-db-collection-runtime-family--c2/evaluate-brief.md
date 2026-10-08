@@ -5,3 +5,12 @@ Independent IMPL-EVAL for issue #2039 / PR #2089. Read mandatory evaluator proto
 Sufficiency: verify claims against source and private raw receipts, run bounded independent checks/tests as useful. Browser/Deno toolchain is provisioned in inherited PATH; TMPDIR is task-scoped and test-scoped worktree enforcement exception supports legitimate corpus regression fixtures. No broad unrelated gates, source edits, branch switches, delegation, history/public writes or CI polling/sleeps. Work only checkout and sibling private task evidence, never EIS writes. All-export doc lint remains raw failing; baseline/current comparison preserves every entrypoint diagnostic and exit, plus combined diagnostics. Independently adjudicate explicit proposed db-doc-baseline-2039 DEBT rather than hiding it with combined-sweep counts. Qualified publication/published consumer are owner follow-ups (PLAN-EVAL accepted), do not claim full issue closure or manufacture release evidence. EIS DB pin/identity workaround is removable after qualified publication.
 
 Write evaluate.md with PASS or concrete FAIL_FIX/FAIL_RESCOPE/FAIL_DEBT, exact full evaluated HEAD/source, source/consumer/runtime/JSR/debt assessment, owning release follow-ups. Public report omits operational directory/host/IP/port/credentials/allowance information. Commit only later by generator after evaluator exits.
+
+## SKILL
+
+- netscript-harness — lifecycle, selected Plan-Gate, independent evaluator and gate evidence.
+- netscript-doctrine — existing SDK/Fresh integration shapes, public contracts and architecture debt.
+- netscript-pr — scoped slices, public review and unmerged delivery.
+- netscript-tools — structured scoped checks and tests.
+- deno-fresh — actual Fresh SSR, islands and browser lifecycle.
+- jsr-audit — public type, documentation and publish qualification.
