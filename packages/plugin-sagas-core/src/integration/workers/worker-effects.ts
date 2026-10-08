@@ -17,15 +17,17 @@ export type WorkerCommandEffectOptions = Readonly<{
   topic: string;
 }>;
 
-/** Pure selected-definition intent; payload and validator are privately snapshotted. */
-export type WorkerCommandEffect = Readonly<{
-  kind: 'worker-job' | 'worker-task';
-  targetId: string;
-  destination: string;
-  topic: string;
-}>;
+import type { WorkerCommandEffect } from '../../domain/saga-transition-effect.ts';
+export type { WorkerCommandEffect } from '../../domain/saga-transition-effect.ts';
 
-type Binding = Readonly<{ payload: unknown; schema: JobPayloadSchema<unknown> }>;
+type Binding = Readonly<
+  {
+    payload: unknown;
+    schema: JobPayloadSchema<unknown>;
+    originalJson?: string;
+    invalidJson: boolean;
+  }
+>;
 const bindings = new WeakMap<WorkerCommandEffect, Binding>();
 const codec = jsonCodec<unknown>({
   '~standard': { version: 1, vendor: 'netscript', validate: (value) => ({ value }) },
@@ -50,6 +52,13 @@ function effect(
       throw new TypeError('Durable worker effect requires bounded target and routing identifiers.');
     }
   }
+  let originalJson: string | undefined;
+  let invalidJson = false;
+  try {
+    originalJson = canonicalCommandJson(codec.encode(payload));
+  } catch {
+    invalidJson = true;
+  }
   const result: WorkerCommandEffect = Object.freeze({
     kind,
     targetId: definition.id,
@@ -57,7 +66,9 @@ function effect(
     topic: options.topic,
   });
   bindings.set(result, {
-    payload: structuredClone(payload),
+    payload: invalidJson ? undefined : structuredClone(payload),
+    originalJson,
+    invalidJson,
     schema: {
       '~standard': {
         version: 1,
@@ -91,10 +102,15 @@ export function workerTaskEffect<TId extends string, TPayload>(
 export async function encodeWorkerEffect(value: WorkerCommandEffect): Promise<string> {
   const binding = bindings.get(value);
   if (!binding) throw new TypeError('Foreign or forged durable worker effect.');
+  if (binding.invalidJson) throw new TypeError('Durable worker payload must be bounded I-JSON.');
   const payload = await validateJobPayload(
     binding.schema,
     structuredClone(binding.payload),
     value.targetId,
   );
-  return canonicalCommandJson(codec.encode(payload));
+  const encoded = canonicalCommandJson(codec.encode(payload));
+  if (encoded !== binding.originalJson) {
+    throw new TypeError('Durable worker schema must preserve canonical JSON identity.');
+  }
+  return encoded;
 }

@@ -36,8 +36,11 @@ export type {
   SagaStateEnvelope,
   SagaStateMetadata,
   SagaTransition,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
   SagaTransitionRecord,
   SignalDefinition,
+  WorkerCommandEffect,
 } from '../domain/mod.ts';
 export type {
   SagaBusPort,
@@ -84,3 +87,5 @@ export type {
 } from '../runtime/saga-scheduler.ts';
 export { createSagaBusBridge, SagaBusBridge } from './saga-bus-bridge.ts';
 export type { SagaBridgeCompensationResolver, SagaBusBridgeOptions } from './saga-bus-bridge.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

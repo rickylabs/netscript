@@ -24,7 +24,13 @@ Deno.test('worker effects validate the selected schema and privately snapshot pa
   const intent = workerJobEffect(job, payload, route);
   payload.documentId = 'changed';
   assertEquals(Object.isFrozen(intent), true);
-  assertEquals(await encodeWorkerEffect(intent), '{"documentId":"one"}');
+  assertEquals(
+    await encodeWorkerEffect(intent).then(
+      (value) => ({ accepted: true, value }),
+      () => ({ accepted: false }),
+    ),
+    { accepted: true, value: '{"documentId":"one"}' },
+  );
   await assertRejects(() =>
     Promise.resolve(task.handler?.({ id: 'task', payload: { documentId: 4 as unknown as string } }))
   );

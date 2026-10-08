@@ -2,6 +2,7 @@ import type { SagaDurabilityTier } from './constants.ts';
 import type { SagaId } from './ids.ts';
 import type { RetryPolicy } from './retry-policy.ts';
 import type { SagaCorrelationRule } from './saga-correlation.ts';
+import type { SagaTransitionHandler } from './saga-transition-effect.ts';
 import type { SagaHandler } from './saga-context.ts';
 import type { SagaMessage } from './saga-message.ts';
 import type { SagaState } from './saga-state.ts';
@@ -49,7 +50,7 @@ export type SagaDefinition<
   initialState: TState;
   handledMessageTypes: readonly TMessage['type'][];
   correlations: readonly SagaCorrelationRule<TMessage>[];
-  handlers: ReadonlyMap<TMessage['type'], SagaHandler<TState, TMessage>>;
+  handlers: ReadonlyMap<TMessage['type'], SagaTransitionHandler<TState, TMessage>>;
   compensations: ReadonlyMap<TMessage['type'], SagaHandler<TState, TMessage>>;
   signalHandlers: ReadonlyMap<string, SagaSignalHandler<TState>>;
   queryHandlers: ReadonlyMap<string, SagaQueryHandler<TState>>;

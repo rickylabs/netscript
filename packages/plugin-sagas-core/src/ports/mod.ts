@@ -37,8 +37,11 @@ export type {
   SagaStateEnvelope,
   SagaStateMetadata,
   SagaTransition,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
   SagaTransitionRecord,
   SignalDefinition,
+  WorkerCommandEffect,
 } from '../domain/mod.ts';
 export type {
   SagaIdempotencyReservation,
@@ -86,3 +89,5 @@ export type {
   SagaTransportPort,
   SagaTransportSubscription,
 } from './saga-transport-port.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

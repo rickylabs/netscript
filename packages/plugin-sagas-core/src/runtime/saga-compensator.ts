@@ -1,3 +1,4 @@
+import { assertLegacyCascade } from '../application/produce-worker-commands.ts';
 import type {
   CascadedMessage,
   SagaContext,
@@ -119,6 +120,7 @@ export class SagaCompensator {
         tracestate: spanContext?.tracestate ?? request.message.tracestate,
       };
       const cascaded = handler(saga, request.message, context);
+      for (const effect of cascaded) assertLegacyCascade(effect);
       if (span) {
         instrumentation?.recordCompensationCascadeSize(span, cascaded.length);
         instrumentation?.finishSpan(span, SagaTelemetryOutcomes.SUCCESS);

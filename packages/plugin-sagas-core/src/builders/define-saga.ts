@@ -11,6 +11,7 @@ import type {
   SagaQueryHandler,
   SagaSignalHandler,
   SagaState,
+  SagaTransitionHandler,
   SignalDefinition,
 } from '../domain/mod.ts';
 import { DEFAULT_SAGA_DURABILITY_TIER, SagasError } from '../domain/mod.ts';
@@ -61,7 +62,7 @@ export interface SagaBuilder<
     this: TPhase extends 'state-set' | 'handler-set' ? SagaBuilder<TId, TPhase, TState, TMessage>
       : never,
     eventType: TType,
-    handler: SagaHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
+    handler: SagaTransitionHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
   ): SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>;
   /** Register a compensation handler for a failed event type. */
   compensate<TType extends string, TPayload = unknown>(
@@ -96,7 +97,7 @@ type SagaBuilderData<TId extends string> = Readonly<{
   durableWorkerCommands?: boolean;
   initialState?: SagaState;
   correlations: readonly SagaCorrelationRule[];
-  handlers: ReadonlyMap<string, SagaHandler<SagaState, SagaMessage>>;
+  handlers: ReadonlyMap<string, SagaTransitionHandler<SagaState, SagaMessage>>;
   compensations: ReadonlyMap<string, SagaHandler<SagaState, SagaMessage>>;
   signalHandlers: ReadonlyMap<string, SagaSignalHandler<SagaState>>;
   queryHandlers: ReadonlyMap<string, SagaQueryHandler<SagaState>>;
@@ -175,14 +176,14 @@ class SagaBuilderImpl<
       ? SagaBuilderImpl<TId, TPhase, TState, TMessage>
       : never,
     eventType: TType,
-    handler: SagaHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
+    handler: SagaTransitionHandler<TState & SagaState, SagaEvent<TType, TPayload>>,
   ): SagaBuilder<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>> {
     assertNonEmpty(eventType, 'Saga event type must not be empty.');
     return new SagaBuilderImpl<TId, 'handler-set', TState, TMessage | SagaEvent<TType, TPayload>>({
       ...this.#data,
       handlers: new Map(this.#data.handlers).set(
         eventType,
-        handler as SagaHandler<SagaState, SagaMessage>,
+        handler as SagaTransitionHandler<SagaState, SagaMessage>,
       ),
     });
   }
@@ -253,7 +254,7 @@ class SagaBuilderImpl<
       correlations: Object.freeze([...this.#data.correlations]),
       handlers: new Map(this.#data.handlers) as ReadonlyMap<
         TMessage['type'],
-        SagaHandler<TState & SagaState, TMessage>
+        SagaTransitionHandler<TState & SagaState, TMessage>
       >,
       compensations: new Map(this.#data.compensations) as ReadonlyMap<
         TMessage['type'],
@@ -283,7 +284,7 @@ type InternalSagaDefinitionSpec<
   durableWorkerCommands?: boolean;
   initialState: TState;
   correlations: readonly SagaCorrelationRule<TMessage>[];
-  handlers: ReadonlyMap<TMessage['type'], SagaHandler<TState, TMessage>>;
+  handlers: ReadonlyMap<TMessage['type'], SagaTransitionHandler<TState, TMessage>>;
   compensations: ReadonlyMap<TMessage['type'], SagaHandler<TState, TMessage>>;
   signalHandlers: ReadonlyMap<string, SagaSignalHandler<TState>>;
   queryHandlers: ReadonlyMap<string, SagaQueryHandler<TState>>;

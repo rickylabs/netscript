@@ -1,3 +1,4 @@
+import type { SagaState } from '../domain/mod.ts';
 import {
   createSagaBusBridge,
   type SagaBridgeCompensationResolver,
@@ -52,7 +53,9 @@ export interface SagaRuntime<TAdapter extends SagaRuntimeAdapter = SagaRuntimeAd
   /** Stop runtime resources. */
   stop(reason?: string): Promise<void>;
   /** Register saga definitions with the runtime bus. */
-  register(definitions: readonly SagaDefinition[]): Promise<void>;
+  register<TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+    definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+  ): Promise<void>;
   /** Publish a saga message through the runtime bus. */
   publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void>;
   /** Dispatch cascaded messages through the runtime bus. */
@@ -125,7 +128,9 @@ function createRuntimeFacade<TAdapter extends SagaRuntimeAdapter>(
     bus,
     start: () => bus.start(),
     stop: (reason?: string) => bus.stop(reason),
-    register: (definitions: readonly SagaDefinition[]) => bus.register(definitions),
+    register: <TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+      definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+    ) => bus.register(definitions),
     publish: (message: SagaMessage, options?: SagaPublishOptions) => bus.publish(message, options),
     dispatchCascaded: (messages: readonly CascadedMessage[]) => bus.dispatchCascaded(messages),
     signal: <TPayload, TName extends string>(

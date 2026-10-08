@@ -39,6 +39,11 @@ export type {
   SagaQueryHandler,
   SagaSignalHandler,
   SagaState,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
+  WorkerCommandEffect,
 } from '../domain/mod.ts';
 export { sagaCompensate, sagaComplete, sagaFail, schedule, send, spawn } from './messages.ts';
 export type { SagaScheduleDelay, SendOptions, SpawnOptions } from './messages.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

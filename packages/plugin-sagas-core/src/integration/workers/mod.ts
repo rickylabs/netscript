@@ -27,3 +27,5 @@ export type {
   SagaWorkerTriggerOptions,
 } from './types.ts';
 export type { SagaWorkerTriggers } from './triggers.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../../domain/saga-transition-effect.ts';

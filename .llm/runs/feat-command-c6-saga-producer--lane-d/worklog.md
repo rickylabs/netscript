@@ -27,3 +27,144 @@ RED-first explicit effect test EXIT 1 with named AssertionError; task handler va
 Two named RED assertion failures before implementation. Explicit SagaTransitionCommitPort request/result/capability and definition durableWorkerCommands opt-in; memory whole-transition commit snapshots/validates all rows before one CAS and synchronous map mutation. Actual KV and unbound Prisma composition refuses with atomic transition/outbox diagnostic before I/O. Six semantic named AssertionError mutants, exact restoration and PASS. Scoped check 119 files, saga regression 92 PASS/0 FAIL/3 provider-dependent ignored; lint/format/quality/architecture and owned port/testing/root documentation EXIT 0. S16 signoff: PASS for contract/memory/refusal only. Engine serialization/replay/granular-path replacement remains S17; provider/C5/native consumer and final evaluation remain pending.
 
 S15 lock wording refinement: native Deno normalized already-locked peer identities and dependencies. No newly resolved npm versions/integrity values were introduced; no lock deletion/reload occurred. Already-locked transitive references can be unified, so the earlier shorthand no version upgrade is not a promise of unchanged dependency edges.
+
+## S17 implementation and Tier-A slice review
+
+Three named producer RED AssertionErrors before implementation; stricter canonical input/schema identity assertion separately RED. Ordinary handlers return a typed transition ledger; compensation/scheduled nested cascades refuse worker effects. Selected schema validates detached bounded JSON before writes, refuses transformations changing canonical identity, never invokes input getters, and emits stable SHA-256 versioned identities from original ledger ordinals. Engine makes one atomic commit; both eager engine and bridge reservations are bypassed for opted-in definitions. Failed commit remains retryable, restart replay returns base state with no worker/cascade duplicate. Existing C1 trace validation is reused through a focused service command export, with no new trace parser. Typed registration uses a runtime shape check at the heterogeneous registry boundary rather than unsafe double casts.
+
+Scoped check 204 files, regression 356 PASS/0 FAIL/3 provider-dependent ignored, lint/format/quality/architecture EXIT 0. Owned root, workers-integration, ports, testing and service command doc graphs EXIT 0. The existing saga runtime barrel retains seven private-type diagnostics; this is explicitly non-green legacy debt, not a new public-effect graph waiver. Eight current producer and five current constructor/task-handler semantic mutants fail named assertions and restore byte-identical/PASS (proof below). Provider, actual C5 consumer, progress/completion, full publication/runtime, independent evaluation and final CI remain pending. S17 signoff: PASS for this slice only.
+
+```json
+[
+  {
+    "name": "s17-ordinal",
+    "file": "packages/plugin-sagas-core/src/application/produce-worker-commands.ts",
+    "test": "durable saga commits pure worker effects once with stable original ordinal and context",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "b30ea6b9fafe8fe29be1594bd7c7c1f0952514fd17f8040793a1c553ab502f25",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-atomic-path",
+    "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+    "test": "durable saga commits pure worker effects once with stable original ordinal and context",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-replay-result",
+    "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+    "test": "durable saga commits pure worker effects once with stable original ordinal and context",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-selected-schema",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-json-boundary",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-bridge-reservation",
+    "file": "packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts",
+    "test": "durable bridge and engine replay remain retryable after failed commit and dedupe after restart",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "f1aa9acd3833bfcc43628d6043594b44e8528747c4f40ba13182dfa918d5fd6f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-engine-reservation",
+    "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+    "test": "durable bridge and engine replay remain retryable after failed commit and dedupe after restart",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s17-strict-trace",
+    "file": "packages/service/src/commands/application/command-identity.ts",
+    "test": "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "c7fbfb036056e5fc1ed2dcfcf084009565dc5d48d40b622949a196bb644eb184",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-tags",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "worker effects expose distinct explicit job and task constructors",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-snapshot",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "worker effects validate the selected schema and privately snapshot payload",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-schema-required",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "durable worker effects refuse legacy type-only definitions and non-JSON output",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-json-required",
+    "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+    "test": "durable worker effects refuse legacy type-only definitions and non-JSON output",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+    "bytesIdentical": true
+  },
+  {
+    "name": "s15-task-handler-schema",
+    "file": "packages/plugin-workers-core/src/builders/task-builder.ts",
+    "test": "worker effects validate the selected schema and privately snapshot payload",
+    "mutantExit": 1,
+    "namedAssertion": true,
+    "restoredExit": 0,
+    "restoredSha256": "52f888e5e56f71a7a77c49b9bee816aa66fafdecfeba3b61f2bc97d04f71a933",
+    "bytesIdentical": true
+  }
+]
+```

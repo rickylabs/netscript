@@ -1,3 +1,4 @@
+import type { SagaState } from '../domain/mod.ts';
 import type { CascadedMessage, SagaDefinition, SagaMessage } from '../domain/mod.ts';
 import type { SagaPublishOptions, SagaQueryDispatch, SagaSignalDispatch } from '../ports/mod.ts';
 import type { SagaRuntime } from '../runtime/mod.ts';
@@ -34,7 +35,9 @@ export function createTestSagaRuntime(options: TestSagaRuntimeOptions = {}): Tes
     clock,
     start: () => bus.start(),
     stop: (reason?: string) => bus.stop(reason),
-    register: (definitions: readonly SagaDefinition[]) => bus.register(definitions),
+    register: <TId extends string, TState extends SagaState, TMessage extends SagaMessage>(
+      definitions: readonly SagaDefinition<TId, TState, TMessage>[],
+    ) => bus.register(definitions),
     publish: (message: SagaMessage, publishOptions?: SagaPublishOptions) =>
       bus.publish(message, publishOptions),
     dispatchCascaded: (messages: readonly CascadedMessage[]) => bus.dispatchCascaded(messages),

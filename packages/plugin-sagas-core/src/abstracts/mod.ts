@@ -54,6 +54,8 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
   SagaTransition,
+  SagaTransitionEffect,
+  SagaTransitionHandler,
   SagaTransitionRecord,
   SagaTransportAck,
   SagaTransportHandler,
@@ -61,8 +63,11 @@ export type {
   SagaTransportPort,
   SagaTransportSubscription,
   SignalDefinition,
+  WorkerCommandEffect,
 } from '../ports/mod.ts';
 export { AbstractAgentRuntime } from './abstract-agent-runtime.ts';
 export { AbstractSagaBus } from './abstract-saga-bus.ts';
 export { AbstractSagaStore } from './abstract-saga-store.ts';
 export { AbstractSagaTransport } from './abstract-saga-transport.ts';
+
+export { WORKER_COMMAND_EFFECT_KINDS } from '../domain/mod.ts';

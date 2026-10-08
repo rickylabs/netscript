@@ -17,6 +17,7 @@
  */
 export { defineCommand } from './src/commands/application/define-command.ts';
 export { jsonCodec } from './src/commands/application/json-codec.ts';
+export { validateCommandTraceContext } from './src/commands/application/command-identity.ts';
 export {
   canonicalCommandJson,
   parseCanonicalCommandJson,
