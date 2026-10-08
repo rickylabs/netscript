@@ -63,7 +63,7 @@
     "deps:audit": "deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level low --pretty",
     "deps:prod-install": "deno run --allow-read --allow-write --allow-net --allow-run --allow-env .llm/tools/deps/prod-install.ts --pretty",
     "deps:census": "deno run --allow-read .llm/tools/deps/census.ts",
-    "deps:check": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod",
+    "deps:check": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod && deno task deps:check:db",
     "deps:check:zod": "deno run --allow-read .llm/tools/deps/check-zod-alignment.ts",
     "deps:check:npm-catalog": "deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts",
     "deps:check:jsr-centralization": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts",
@@ -175,7 +175,8 @@
     "docs:readme:check": "deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts --pretty",
     "docs:tagline:check": "deno run --no-lock --allow-read .llm/tools/validation/check-jsr-tagline-length.ts --pretty",
     "arch:check": "deno task deps:check && deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots",
-    "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots"
+    "arch:check:repo": "deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --all-roots",
+    "deps:check:db": "deno run --allow-read --allow-write --allow-env --allow-run .llm/tools/deps/check-db-alignment.ts"
   },
   "imports": {
     "@harness/matrix": "https://raw.githubusercontent.com/rickylabs/harness/bd02f966a42dd1029b4349a038c52d0928fac41f/packages/routing/matrix/delegation-matrix.ts",
@@ -255,11 +256,11 @@
     "@prisma/instrumentation-contract": "^7.8.0",
     "@workos-inc/node": "^10.4.0",
     "@saga-bus/core": "^0.2.2",
-    "@tanstack/db": "^0.6.8",
+    "@tanstack/db": "0.6.17",
     "@tanstack/preact-query": "^5.101.0",
     "@tanstack/query-core": "^5.101.0",
-    "@tanstack/query-db-collection": "^1.2.1",
-    "@tanstack/react-db": "^0.1.95",
+    "@tanstack/query-db-collection": "1.2.1",
+    "@tanstack/react-db": "0.1.95",
     "@tailwindcss/vite": "^4.3.1",
     "amqplib": "^2.0.1",
     "better-auth": "^1.6.20",
