@@ -240,3 +240,19 @@ own `deno doc` surface.
 ---
 
 Back to the [reference overview](/reference/).
+
+## Command telemetry
+
+`@netscript/telemetry/commands` exports `createOtelCommandTelemetryPort({ definitions, tracer? })`,
+a privacy-first adapter structurally compatible with `CommandTelemetryPort`. Register static
+name/version metadata (1–1024 unique pairs, names at most 120 characters) and pass it to the command
+executor. The attribute builders and closed vocabularies live in `@netscript/telemetry/attributes`.
+
+The fixed spans are INTERNAL `command.execute` and `command.outbox.relay`, and PRODUCER
+`command.outbox.publish`. Publication makes native context active so existing W3C injection can
+parent the consumer or create a deferred link. No queue implementation or metric instrument is
+created. Counts are bounded to 0–64 and appear only on applied/replayed outcomes. Only stable
+command failure kinds enter `error.type`; payloads, raw identities, hashes, correlation IDs,
+topics/destinations and exception text never enter command spans. Existing messaging/saga
+identifier conventions retain their separate ownership; command privacy policy deliberately
+supersedes their general correlation/exception floor.

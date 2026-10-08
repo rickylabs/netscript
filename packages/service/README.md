@@ -466,3 +466,10 @@ times (default four), each over equivalent detached deeply frozen input/actor ma
 scope or fingerprint closure changes that affect sampled identity, without executing the handler
 or store. Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee;
 command authors remain responsible for excluding clocks, randomness, mutable globals and IO.
+
+Command execution can use `createOtelCommandTelemetryPort` from `@netscript/telemetry/commands`,
+configured with the registered command definitions. Its structural port traces early rejected and
+cancelled attempts as well as committed/replayed attempts. Definitions are verified before tracing;
+validation and identity occur once within the observed operation. Completion observer failures do
+not replace committed results. Command spans join through native span context and deliberately
+exclude envelope identities, keys, hashes, payloads and correlation IDs.

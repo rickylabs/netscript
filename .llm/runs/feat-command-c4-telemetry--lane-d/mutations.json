@@ -1,0 +1,90 @@
+[
+  {
+    "mutation": "vocabulary-selection",
+    "file": "packages/telemetry/src/attributes/command.ts",
+    "namedTest": "command vocabulary selects exact",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "registration-membership",
+    "file": "packages/telemetry/src/attributes/command.ts",
+    "namedTest": "command vocabulary rejects",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "success-only-counts",
+    "file": "packages/telemetry/src/attributes/command.ts",
+    "namedTest": "command vocabulary emits counts",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "execute-kind",
+    "file": "packages/telemetry/src/adapters/commands/otel-command-telemetry.ts",
+    "namedTest": "command adapter creates native INTERNAL",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "publish-kind",
+    "file": "packages/telemetry/src/adapters/commands/otel-command-telemetry.ts",
+    "namedTest": "command publication creates native PRODUCER",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "span-end",
+    "file": "packages/telemetry/src/adapters/commands/otel-command-telemetry.ts",
+    "namedTest": "command adapter ends once",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "registration-cap",
+    "file": "packages/telemetry/src/adapters/commands/otel-command-telemetry.ts",
+    "namedTest": "command adapter bounds copies",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "observer-isolation",
+    "file": "packages/telemetry/src/adapters/commands/otel-command-telemetry.ts",
+    "namedTest": "command adapter isolates malformed",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "committed-counts",
+    "file": "packages/service/src/commands/application/create-command-executor.ts",
+    "namedTest": "command executor records applied",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "early-completion",
+    "file": "packages/service/src/commands/application/create-command-executor.ts",
+    "namedTest": "command executor traces early",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  },
+  {
+    "mutation": "committed-observer",
+    "file": "packages/service/src/commands/application/create-command-executor.ts",
+    "namedTest": "command executor committed success",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "restoredByteIdentical": true
+  }
+]
