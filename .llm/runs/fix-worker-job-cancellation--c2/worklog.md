@@ -153,3 +153,17 @@ S2a core source `81589373f2ef91bcc4bed6d10189b14f8fbe815d`; S2b final plugin sou
 ## Independent implementation verdict
 
 GLM max IMPL-EVAL PASS for final source da438b2f90abf95d7d9cbe39a3bc57c2bb7989b2, actual evaluated head cb66a3f13642e5581aef13d82f203533e814b439. Reviewer independently reran 16 runner/actual Worker/dispatcher cases, zero failures. F-7 unchanged baseline, F-JSR-2 unchanged doctor finding and F-16 bounded required adapter folder all explicitly DEBT_ACCEPTED; F-13 PENDING_SCRIPT with manual invariant evidence. Source phases complete, ready for review. Publication and released-consumer condition remain owner work; no merge.
+
+CI follow-up findings: tagline fails because new cancellation paragraph became README first paragraph; move unchanged prose to its own section. Existing generated payload consumer lacks now-required signal; update both legitimate and deliberately invalid payload calls plus fixture context stub, preserving payload-specific negative proof. Existing MCP corpus freshness tests fail because public context exports changed; owning corpus must be regenerated after clean source commit. PLAN-EVAL N/A for these mechanical contract-fixture and generated-document repairs; no behavior change/new test.
+
+Gate `review-docs-tagline`: raw exit `0`. Command: `deno task docs:tagline:check`. Full raw output retained privately.
+
+Gate `review-registry-tests`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all plugins/workers/tests/cli/runtime-registry-generator_test.ts`. Full raw output retained privately.
+
+Gate `review-fixture-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file plugins/workers/tests/cli/runtime-registry-generator_test.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `review-fixture-lint`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --file plugins/workers/tests/cli/runtime-registry-generator_test.ts`. Full raw output retained privately.
+
+Gate `review-fixture-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/workers/tests/cli/runtime-registry-generator_test.ts --file plugins/workers/README.md`. Full raw output retained privately.
+
+Mechanical follow-up slice review: README cancellation contract text unchanged, moved after introduction; required signal added to both generated fixture calls and its local context stub while negative payload @ts-expect-error remains. Existing registry suite and docs tagline plus selected check/lint/fmt exit 0. No production behavior or public-contract changes. Commit clean read set before owning export corpus regeneration.

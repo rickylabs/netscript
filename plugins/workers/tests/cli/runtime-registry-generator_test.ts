@@ -315,6 +315,7 @@ Deno.test('generated registry preserves literal job payload types at the consume
   id: string;
   job: Readonly<{ id: string }>;
   payload: TPayload;
+  signal: AbortSignal;
 }>;
 export type JobHandler<TPayload = unknown> = (
   context: JobContext<TPayload>,
@@ -368,12 +369,14 @@ const job = { id: 'transcribe-image' };
 await transcribeImage({
   id: 'execution-valid',
   job,
+  signal: new AbortController().signal,
   payload: { imageUrl: 'https://example.test/image.png' },
 });
 
 await transcribeImage({
   id: 'execution-invalid',
   job,
+  signal: new AbortController().signal,
   // @ts-expect-error - embed-document payload must not compile for transcribe-image
   payload: { documentId: 'doc-1', text: 'content' },
 });
