@@ -1,0 +1,32 @@
+[
+  {
+    "thread": "unicode",
+    "redExit": 1,
+    "redFailed": 1,
+    "restoredExit": 0
+  },
+  {
+    "thread": "comment",
+    "redExit": 1,
+    "redFailed": 1,
+    "restoredExit": 0
+  },
+  {
+    "thread": "cr",
+    "redExit": 1,
+    "redFailed": 1,
+    "restoredExit": 0
+  },
+  {
+    "thread": "restart",
+    "redExit": 1,
+    "redFailed": 1,
+    "restoredExit": 0
+  },
+  {
+    "thread": "recipe",
+    "redExit": 1,
+    "redFailed": 1,
+    "restoredExit": 0
+  }
+]

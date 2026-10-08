@@ -158,7 +158,7 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
     '.llm/tools/release/run-publish.ts\n',
     'deno task release:canary-label',
     'return_run_details=true',
-    'gh run watch "$E2E_RUN_ID" --exit-status',
+    'bash .llm/tools/release/watch-canary-e2e.sh "$E2E_RUN_ID"',
     '-f state=success',
   ];
   let previous = -1;
@@ -184,7 +184,9 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   assertStringIncludes(source, 'context=release/canary-pair');
   assertStringIncludes(source, "if: inputs.republish-version == ''");
   assertStringIncludes(source, 'Canary partial publish:');
-  assertStringIncludes(source, 'Canary publish complete; pinned production E2E failed');
+  assertStringIncludes(source, 'bash .llm/tools/release/canary-failure-description.sh');
+  assertStringIncludes(source, 'E2E_STATE: ${{ steps.e2e.outputs.state }}');
+  assertStringIncludes(source, 'E2E_CONCLUSION: ${{ steps.e2e.outputs.conclusion }}');
   assertStringIncludes(source, 'report-jsr-publish-outcome.ts');
   assertStringIncludes(source, 'git push origin --delete "$CANARY_BRANCH"');
   assertStringIncludes(source, 'republish-version:');

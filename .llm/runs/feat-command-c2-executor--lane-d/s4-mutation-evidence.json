@@ -1,0 +1,670 @@
+[
+  {
+    "mutant": "capability-granularity",
+    "productionFile": "packages/database/ports/command-store-capabilities.ts",
+    "invariant": "wait.maximumMs % wait.granularityMs !== 0",
+    "replacement": "false",
+    "test": "memory capabilities validate construction and immutable declarations",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "2fe1f02ae6399ce3e8c74206d2a15d1e91d51a07af0a6dd7061b6b398ec65a23",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory capabilities validate construction and immutable declarations",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 951,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to throw.\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory capabilities validate construction and immutable declarations",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 76
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory capabilities validate construction and immutable declarations",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 881,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "same-commit-root-write",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "draft.business.set(key, value);",
+    "replacement": "state.business.set(key, value);",
+    "test": "memory commits business receipt audit and outbox at one boundary",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory commits business receipt audit and outbox at one boundary",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 854,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n      audit: [],\n-     business: {\n-       counter: \"1\",\n-     },\n+     business: {},\n      outbox: [],\n      receipts: [],\n    }\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory commits business receipt audit and outbox at one boundary",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 110
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory commits business receipt audit and outbox at one boundary",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 102,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "rollback-leak",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "active = false;\n        clearTimeout(timer);",
+    "replacement": "if (dirty) state = draft;\n        active = false;\n        clearTimeout(timer);",
+    "test": "memory rollback preserves error identity and never retries work",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory rollback preserves error identity and never retries work",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 876,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n-     audit: [\n-       {\n-         action: \"updated\",\n-         actorKind: \"system\",\n-         actorSubject: \"fixture\",\n-         commandName: \"counter.update\",\n-         commandVersion: 1,\n-         correlationId: \"correlation\",\n-         executionId: \"receipt\",\n-         id: \"audit\",\n-         occurredAt: 2026-01-01T00:00:00.000Z,\n-         subjectId: \"counter\",\n-         subjectType: \"counter\",\n-       },\n-     ],\n-     business: {\n-       counter: \"1\",\n-     },\n-     outbox: [\n-       {\n-         availableAt: 2026-01-01T00:00:00.000Z,\n-         commandName: \"counter.update\",\n-         commandVersion: 1,\n-         correlationId: \"correlation\",\n-         dedupeKey: \"outbox\",\n-         destination: \"events\",\n-         executionId: \"receipt\",\n-         id: \"outbox\",\n-         payloadJson: \"{}\",\n-         topic: \"counter.updated\",\n-       },\n-     ],\n-     receipts: [\n-       {\n-         actorKind: \"system\",\n-         actorSubject: \"fixture\",\n-         commandName: \"counter.update\",\n-         commandVersion: 1,\n-         completedAt: 2026-01-01T00:00:00.000Z,\n-         correlationId: \"correlation\",\n-         createdAt: 2026-01-01T00:00:00.000Z,\n-         id: \"receipt\",\n-         keyHash: \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n-         requestHash: \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n-         responseJson: '{\"updated\":true}',\n-         scope: \"namespace\",\n-       },\n-     ],\n+     audit: [],\n+     business: {},\n+     outbox: [],\n+     receipts: [],\n    }\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory rollback preserves error identity and never retries work",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 132
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory rollback preserves error identity and never retries work",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 97,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "cas-zero-match",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "if (draft.business.get(key) !== expected) return false;",
+    "replacement": "if (false && draft.business.get(key) !== expected) return false;",
+    "test": "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 855,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   true\n+   false\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>\n    at Object.transaction (file://<cwd>/packages/service/src/commands/testing/memory-command-store.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 158
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 92,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "stale-draft-commit",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "if (dirty && revision !== startingRevision)",
+    "replacement": "if (false && dirty && revision !== startingRevision)",
+    "test": "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 974,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to reject.\n    at assertRejects (<dependency-reference><line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 158
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory CAS zero match and concurrent stale drafts cannot commit or retry",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 137,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "busy-query-allowed",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "if (!active || busy)",
+    "replacement": "if (!active)",
+    "test": "memory busy is terminal for every delegate and rolls back before surfacing",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory busy is terminal for every delegate and rolls back before surfacing",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 962,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not strictly equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   AssertionError: Expected function to throw.\n-       at assertThrows (<dependency-reference><line>:<column>)\n-       at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>\n-       at async Object.transaction (file://<cwd>/packages/service/src/commands/testing/memory-command-store.ts:<line>:<column>)\n-       at async assertRejects (<dependency-reference><line>:<column>)\n-       at async file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>\n+   Error: busy sentinel\n+       at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>\n        at async innerWrapped (ext:cli/40_test.js:<line>:<column>)\n        at async exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n        at async outerWrapped (ext:cli/40_test.js:<line>:<column>)\n\n    at assertStrictEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory busy is terminal for every delegate and rolls back before surfacing",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 185
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory busy is terminal for every delegate and rolls back before surfacing",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 100,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "snapshot-mutable",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "business: Object.freeze(Object.fromEntries(state.business))",
+    "replacement": "business: Object.fromEntries(state.business)",
+    "test": "memory snapshots detach dates and revoke bound handles after completion",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory snapshots detach dates and revoke bound handles after completion",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 861,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError\n    at assert (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory snapshots detach dates and revoke bound handles after completion",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 227
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory snapshots detach dates and revoke bound handles after completion",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 99,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "abort-leak",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "cancelled.reject(signal?.reason);",
+    "replacement": "state = draft; cancelled.reject(signal?.reason);",
+    "test": "memory cancellation timeout and unsupported requests rollback before settlement",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory cancellation timeout and unsupported requests rollback before settlement",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 1006,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   [\n-     {\n-       actorKind: \"system\",\n-       actorSubject: \"fixture\",\n-       commandName: \"counter.update\",\n-       commandVersion: 1,\n-       completedAt: 2026-01-01T00:00:00.000Z,\n-       correlationId: \"correlation\",\n-       createdAt: 2026-01-01T00:00:00.000Z,\n-       id: \"receipt\",\n-       keyHash: \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n-       requestHash: \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n-       responseJson: '{\"updated\":true}',\n-       scope: \"namespace\",\n-     },\n-   ]\n+   []\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory cancellation timeout and unsupported requests rollback before settlement",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 253
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory cancellation timeout and unsupported requests rollback before settlement",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 127,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "incomplete-commit",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "invariant": "if ([...owned].some((key) => draft.receipts.get(key)?.completedAt === null))",
+    "replacement": "if (false && [...owned].some((key) => draft.receipts.get(key)?.completedAt === null))",
+    "test": "memory receipt constraints replay mismatch corruption and duplicate side rows",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe",
+    "mutatedReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory receipt constraints replay mismatch corruption and duplicate side rows",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 970,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to reject.\n    at assertRejects (<dependency-reference><line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-memory_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "memory receipt constraints replay mismatch corruption and duplicate side rows",
+              "file": "./packages/service/tests/commands-memory_test.ts",
+              "line": 296
+            }
+          ]
+        }
+      ]
+    },
+    "restored": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "--filter",
+        "memory receipt constraints replay mismatch corruption and duplicate side rows",
+        "packages/service/tests/commands-memory_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 118,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutant": "root-client-type-widening",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "assertion": "BoundBusinessOnly",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "diagnostic": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":1,\"uniqueOccurrences\":1,\"uniqueCodes\":1,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'true' does not satisfy the constraint 'false'.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/service/tests/commands-memory_test.ts\",\"count\":1,\"locations\":[{\"line\":69,\"column\":3}]}]}]}\n",
+    "restored": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n",
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe"
+  },
+  {
+    "mutant": "root-transaction-port-widening",
+    "productionFile": "packages/database/ports/command-store.ts",
+    "assertion": "BoundTransactionOnly",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "diagnostic": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":1,\"uniqueOccurrences\":1,\"uniqueCodes\":1,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'true' does not satisfy the constraint 'false'.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/service/tests/commands-memory_test.ts\",\"count\":1,\"locations\":[{\"line\":73,\"column\":3}]}]}]}",
+    "restored": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}",
+    "restoredSha256": "37b59384759d45fda2f774abffd5643dd819274e6c57dcdf74312bcb94c18b78"
+  }
+]

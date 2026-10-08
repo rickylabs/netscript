@@ -23,6 +23,8 @@ export {
   type NetScriptStreamDBFactory,
   type NetScriptStreamDBFactoryInput,
   type NetScriptStreamDBOptions,
+  type NetScriptStreamDBReconnectOptions,
+  type NetScriptStreamDBStatus,
   type NetScriptStreamStateDefinition,
 } from './create-stream-db.ts';
 

@@ -1,0 +1,42 @@
+{
+  "privateLock": "packages/fresh-ui/deno.lock",
+  "headBeforeRepair": "108b6930f455a2023e3abb7dbb2c91ab46380e6d",
+  "beforeSha256": "c2bd52873cf21b6b2e840b7bddfc605ac5b0fa7ff65bf194a1cfbbf03c6041e5",
+  "afterSha256": "81453e4fe24855516b3f0309490cf71b0665efbde3150c264b0d07bb3d46f80e",
+  "changedSections": [
+    "npm",
+    "specifiers",
+    "workspace"
+  ],
+  "jsrResolvedBodiesIdentical": true,
+  "npmResolvedBodiesIdenticalAfterPeerKeyNormalization": true,
+  "specifierNamesAndResolvedVersionsIdentical": true,
+  "versionsAndIntegritiesUnchanged": true,
+  "workspaceChanges": [
+    {
+      "path": "/members/packages/service/dependencies",
+      "before": [
+        "jsr:@hono/hono@4.12.24",
+        "jsr:@std/assert@1",
+        "npm:@orpc/client@^1.15.0",
+        "npm:@orpc/openapi@^1.15.0",
+        "npm:@orpc/server@^1.15.0",
+        "npm:@orpc/zod@^1.15.0",
+        "npm:zod@^4.4.3"
+      ],
+      "after": [
+        "jsr:@hono/hono@4.12.24",
+        "jsr:@netscript/database@0.0.7",
+        "jsr:@standard-schema/spec@1.1.0",
+        "jsr:@std/assert@1",
+        "npm:@orpc/client@^1.15.0",
+        "npm:@orpc/openapi@^1.15.0",
+        "npm:@orpc/server@^1.15.0",
+        "npm:@orpc/zod@^1.15.0",
+        "npm:zod@^4.4.3"
+      ]
+    }
+  ],
+  "npmPeerKeysRenamed": 17,
+  "specifierPeerIdentifiersNormalized": 9
+}

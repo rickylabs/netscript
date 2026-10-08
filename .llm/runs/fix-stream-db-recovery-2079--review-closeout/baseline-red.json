@@ -1,0 +1,49 @@
+{
+  "exitCode": 1,
+  "durationMs": 1492,
+  "summary": {
+    "passed": 0,
+    "failed": 4,
+    "ignored": 0,
+    "totalResults": 4,
+    "uniqueFailures": 4
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Expected error to be instance of \"DOMException\", but was \"Error\".",
+      "count": 1,
+      "tests": [
+        {
+          "name": "createNetScriptStreamDB immediate stop and dispose settle pending preload on a healthy server"
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Retained abort listeners grew to 2.",
+      "count": 1,
+      "tests": [
+        {
+          "name": "StreamDB recovery keeps listener and controller counts flat across batches and timeouts"
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   connecting\n+   stopped\n\n",
+      "count": 1,
+      "tests": [
+        {
+          "name": "StreamDB recovery rejects reads after stop without changing terminal status"
+        }
+      ]
+    },
+    {
+      "message": "RangeError: Maximum call stack size exceeded",
+      "count": 1,
+      "tests": [
+        {
+          "name": "StreamDB recovery consumes 200000 ordered catch-up events and resumes the checkpoint"
+        }
+      ]
+    }
+  ]
+}

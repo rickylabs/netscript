@@ -128,6 +128,12 @@ export interface DefineServiceOptions extends ServiceConfig {
   /** Enable debug mode for verbose oRPC logging (default: NETSCRIPT_DEBUG env var) */
   debug?: boolean;
   /**
+   * Interface the listener binds to, forwarded to `serve({ hostname })`. Pass
+   * `'127.0.0.1'` to keep the service loopback-only. When omitted, the listener
+   * binds all IPv4 interfaces (`0.0.0.0`).
+   */
+  hostname?: string;
+  /**
    * Opt-in TLS material. When set, the service serves HTTPS and negotiates
    * HTTP/2 via ALPN. When omitted, the listener still honors the
    * `NETSCRIPT_TLS_CERT_FILE` / `NETSCRIPT_TLS_KEY_FILE` env pair before
@@ -275,5 +281,5 @@ export async function defineService<T extends ServiceRouter>(
     }
   }
 
-  return await builder.withHealth().serve(options.tls ? { tls: options.tls } : undefined);
+  return await builder.withHealth().serve({ hostname: options.hostname, tls: options.tls });
 }

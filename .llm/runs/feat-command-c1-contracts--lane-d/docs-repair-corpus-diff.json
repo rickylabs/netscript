@@ -1,0 +1,303 @@
+{
+  "prose": {
+    "schemaVersion": 1,
+    "beforeEntries": 182,
+    "afterEntries": 182,
+    "added": [],
+    "removed": [],
+    "changed": [
+      "llms-full.txt",
+      "pages/reference/contracts/index.md",
+      "pages/reference/service/index.md"
+    ],
+    "nonSiteEntries": 2,
+    "nonSitePreserved": true
+  },
+  "mcp": {
+    "schemaVersion": 1,
+    "beforeSymbolCount": 7908,
+    "afterSymbolCount": 7947,
+    "addedSurfaces": [
+      [
+        "@netscript/contracts",
+        "./commands"
+      ],
+      [
+        "@netscript/service",
+        "./commands"
+      ]
+    ],
+    "removedSurfaces": [],
+    "addedSymbols": [
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandConflictData",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandConflictSchema",
+        "variable"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandContractErrors",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandContractFailure",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandContractOutputRoute",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandContractRoute",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandErrorConstructors",
+        "interface"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandErrorMap",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandInProgressData",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "CommandInProgressSchema",
+        "variable"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "IdempotencyKeyReuseData",
+        "typeAlias"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "IdempotencyKeyReuseSchema",
+        "variable"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "commandBaseContract",
+        "variable"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "commandErrorMap",
+        "variable"
+      ],
+      [
+        "@netscript/contracts",
+        "./commands",
+        "throwCommandContractError",
+        "function"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandActor",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandAuditInput",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandCodec",
+        "interface"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandContext",
+        "interface"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandDefinition",
+        "interface"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandDefinitionSpec",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandEnvelope",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandError",
+        "class"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandFailure",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandIdempotency",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandIdempotencyMode",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandIdempotencySpec",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandJson",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandJsonLimits",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandOutboxInput",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandRecordRequirement",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "CommandTraceContext",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "IsolationLevel",
+        "typeAlias"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "canonicalCommandJson",
+        "function"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "commandDefinitionBinding",
+        "variable"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "commandExecutorCapability",
+        "variable"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "defineCommand",
+        "function"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "jsonCodec",
+        "function"
+      ],
+      [
+        "@netscript/service",
+        "./commands",
+        "parseCanonicalCommandJson",
+        "function"
+      ]
+    ],
+    "removedSymbols": [],
+    "changedExistingSymbols": [],
+    "unrelatedEntriesPreserved": true
+  },
+  "supervisor": {
+    "schemaVersion": 1,
+    "review": "supervisor independent semantic/content audit",
+    "headBeforeSignoff": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+    "onlyChangedTrackedFiles": [
+      ".llm/assets/agent-docs/prose.json.gz",
+      ".llm/assets/agent-docs/provenance.json",
+      "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+    ],
+    "proseChangedEntries": [
+      "llms-full.txt",
+      "pages/reference/contracts/index.md",
+      "pages/reference/service/index.md"
+    ],
+    "proseFileSetStable": true,
+    "nonSiteContextIdentical": true,
+    "proseIntegrityMatches": true,
+    "mcpExistingEntriesIdentical": 7908,
+    "mcpAddedSymbols": 39,
+    "mcpAddedSurfaces": [
+      [
+        "@netscript/contracts",
+        "./commands"
+      ],
+      [
+        "@netscript/service",
+        "./commands"
+      ]
+    ],
+    "allOtherTrackedSourcesUnchanged": true,
+    "taskOperationalDataAbsent": true
+  }
+}

@@ -60,14 +60,14 @@ function assertJobConfigKeysAreEmitted(source: string | undefined): void {
 }
 
 const EXPECTED_WORKERS_REGISTRY =
-  `import type { JobPayloadMap, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
+  `import type { JobPayloadMap, JobPayloadSchema, RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
 import * as job0 from "../../../workers/jobs/example-job.ts";
 import * as job1 from "../../../workers/jobs/health-check.ts";
 import * as job2 from "../../../workers/jobs/nested/deep-job.ts";
 
 type SchemaBackedJobHandler =
   & ((...args: never[]) => unknown)
-  & Readonly<{ payloadSchema: unknown }>;
+  & Readonly<{ payloadSchema: JobPayloadSchema<unknown> }>;
 
 type ResolvedJobHandler<TModule> =
   TModule extends { readonly default: infer TDefault }
@@ -134,6 +134,7 @@ function createLocalJobDefinition<TId extends string, THandler extends SchemaBac
   id: TId,
   entrypoint: string,
   handler: THandler,
+  policy?: RegisterJobInput & { readonly id: TId },
 ): GeneratedJobDefinition<TId, THandler> {
   return {
     id,
@@ -156,6 +157,7 @@ function createLocalJobDefinition<TId extends string, THandler extends SchemaBac
     tags: [],
     metadata: undefined,
     retention: undefined,
+    ...policy,
     handler,
     payloadSchema: handler.payloadSchema,
   };

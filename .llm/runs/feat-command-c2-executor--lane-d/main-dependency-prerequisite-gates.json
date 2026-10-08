@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "candidateGeneratorGates": [
+    {
+      "gate": "runtime",
+      "command": [
+        "deno",
+        "--version"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 0.007,
+      "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463"
+    },
+    {
+      "gate": "root-critical-audit",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "audit-critical",
+        "--id",
+        "c1-proxy-root-audit",
+        "--output",
+        "<evidence>/root-audit.receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 0.479,
+      "rawLogSha256": "09bcaa5d7219d1c27b82b8c88b456b42e2a50b626f812286eea625c82efa0940"
+    },
+    {
+      "gate": "private-critical-audit",
+      "command": [
+        "deno",
+        "audit",
+        "--lock",
+        "packages/fresh-ui/deno.lock",
+        "--level",
+        "critical"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 0.324,
+      "rawLogSha256": "5d916e74f304d0ac98d55ca38e0b90020655e9be7a25de9aa44a632b1240ba16"
+    },
+    {
+      "gate": "root-frozen-production-install",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-net",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/deps/prod-install.ts"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 0.701,
+      "rawLogSha256": "105554d9db0ff2e451d8ecdc75bb4604dfe5d917733b7b886c2cd16dadf35a7a"
+    },
+    {
+      "gate": "fresh-ui-frozen-check",
+      "command": [
+        "deno",
+        "task",
+        "--cwd",
+        "packages/fresh-ui",
+        "check"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 4.612,
+      "rawLogSha256": "ad613a970a22b143e1621d1ab7bf01b1e5e1b5261d44bc618a5eb2f4cb122eda"
+    },
+    {
+      "gate": "affected-frozen-ai-mcp-check",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-check.ts",
+        "--root",
+        "packages/ai",
+        "--root",
+        "packages/mcp",
+        "--ext",
+        "ts",
+        "--deno-arg",
+        "--frozen",
+        "--output",
+        "<evidence>/ai-mcp-check.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 3.46,
+      "rawLogSha256": "d626918c6231249c2048f5421320bdcbddbd933e9fd3ba56a48cdfd451e8c89a"
+    },
+    {
+      "gate": "affected-ai-mcp-regressions",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<evidence>/ai-mcp-tests.json",
+        "--",
+        "--allow-all",
+        "--frozen",
+        "--unstable-kv",
+        "packages/ai/tests/",
+        "packages/mcp/tests/"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 15.768,
+      "rawLogSha256": "d85b55718bbacc480dc8a162327fde7057c453657f675a5aac411d14aff42c73"
+    },
+    {
+      "gate": "proxy-native-provenance",
+      "command": [
+        "deno",
+        "why",
+        "proxy-addr"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 0.039,
+      "rawLogSha256": "7c783a462f516e54d4784439b4d1a0a5df96fe56330143b3aa894f7b80547cdf"
+    },
+    {
+      "gate": "diff-whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "runtime": "2.9.5",
+      "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+      "exitCode": 0,
+      "durationSeconds": 0.009,
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "candidateTests": {
+    "passed": 300,
+    "failed": 0,
+    "ignored": 0
+  },
+  "candidateCheckFiles": 221,
+  "candidateSourceProof": "Exactly2locks changed;6163of6165trackedfiles unchanged in separate generator clone.",
+  "appliedC2BaselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+  "supervisorGates": {
+    "gates": [
+      {
+        "gate": "runtime",
+        "command": [
+          "deno",
+          "--version"
+        ],
+        "exitCode": 0,
+        "runtime": "2.9.5",
+        "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463"
+      },
+      {
+        "gate": "root-critical-audit",
+        "command": [
+          "deno",
+          "audit",
+          "--level",
+          "critical"
+        ],
+        "exitCode": 0,
+        "runtime": "2.9.5",
+        "rawLogSha256": "1d56105eca1d9a40887e9f9e30a26096bb41a6bb1bf11c9682a4448ade27ec98"
+      },
+      {
+        "gate": "private-critical-audit",
+        "command": [
+          "deno",
+          "audit",
+          "--lock",
+          "packages/fresh-ui/deno.lock",
+          "--level",
+          "critical"
+        ],
+        "exitCode": 0,
+        "runtime": "2.9.5",
+        "rawLogSha256": "5d916e74f304d0ac98d55ca38e0b90020655e9be7a25de9aa44a632b1240ba16"
+      },
+      {
+        "gate": "frozen-root-install",
+        "command": [
+          "deno",
+          "run",
+          "--allow-read",
+          "--allow-write",
+          "--allow-net",
+          "--allow-run",
+          "--allow-env",
+          ".llm/tools/deps/prod-install.ts"
+        ],
+        "exitCode": 0,
+        "runtime": "2.9.5",
+        "rawLogSha256": "fe58b0c07e494cd00d2bfaf967dd3d6c651643d25eb6e1220deee90043a4c367"
+      },
+      {
+        "gate": "frozen-fresh-ui-check",
+        "command": [
+          "deno",
+          "task",
+          "--cwd",
+          "packages/fresh-ui",
+          "check"
+        ],
+        "exitCode": 0,
+        "runtime": "2.9.5",
+        "rawLogSha256": "2a7ce80ab5bafb899c27c6bdaf5ef1078aad0f7487eb155c340c71e4958eac31"
+      }
+    ],
+    "beforeLockHashes": {
+      "deno.lock": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493",
+      "packages/fresh-ui/deno.lock": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    },
+    "afterLockHashes": {
+      "deno.lock": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493",
+      "packages/fresh-ui/deno.lock": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    },
+    "lockBytesPreserved": true
+  },
+  "independentNativeMetadata": "Exact2.9.5 isolated installation record matches upstream and both replacement records. Native broad/selective-updater probes had failed/no-op; no all-native transitive-update claim."
+}

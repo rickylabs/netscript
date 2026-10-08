@@ -29,6 +29,20 @@ without provisioning any database.
 > [`@netscript/plugin-streams-core`](https://jsr.io/@netscript/plugin-streams-core) — this package
 > wires the streams service into a NetScript host.
 
+Durable recovery reads native frame headers through a reusable 64 KiB window. Tail reads seek from
+recent verified frame boundaries and allocate only the requested complete messages. The recent
+boundary cache has fixed capacity (32 segments, 128 checkpoints per segment), so retained history
+does not increase recovery or idle-tail memory. Responses still require memory for the payloads
+requested by the caller; cold historical offsets may scan earlier framing headers. Partial final
+headers, payloads, or trailers stop at the last complete native offset, including fork bases.
+
+The service composes the native LMDB store with a local bounded I/O adapter. It preserves the append
+log format, producer state, fork stitching and JSON response formatting. The adapter checks the two
+upstream I/O hooks at construction and changes only its own subclass. Upstream tracking:
+[durable-streams/durable-streams#420](https://github.com/durable-streams/durable-streams/issues/420).
+Contributors can start at `services/src/bounded-file-store.ts`; framing and the large-log RSS
+regression sit beside it.
+
 ## Why teams use it
 
 - **One manifest, whole capability** — `streamsPlugin` declares the Durable Streams service,

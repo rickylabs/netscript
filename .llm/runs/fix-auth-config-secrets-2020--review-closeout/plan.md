@@ -1,0 +1,8 @@
+# Plan
+Archetype 6 CLI/tooling + docs overlay; doctrine verdict Keep.
+Locked: escape Unicode line separators in refused-key diagnostics; keep POSIX literal persistence and recognize shell comments only outside quotes at token boundaries; match CR in assignment values; load generated smoke .env for restart eval; configure/export provider before first AppHost start and DB migration.
+Slices: S0 merge main/regenerate assets; S1 refresh Aspire manifest (parity gate); S2 refused-key isolation (real generated code execution); S3 dotenv comments and CR rotation (real shell plus duplicate/preservation assertions); S4 restart env and ordered recipe (fake Aspire process and extracted shell recipe); S5 regenerated docs + full gates and independent evaluation.
+Gate set: check, lint, fmt:check, touched CLI package/e2e tests, audit:critical; explicit CLI lint/fmt; quality:gate, jsr-audit/doc-lint, generated freshness, Aspire parity, docs links/build, canonical scaffold.runtime smoke.
+Risk: comments must retain literal # inside quoted/unquoted words; verify POSIX consumers. CR/multiline rotations must remove all old content and preserve unrelated assignments. Restart environment must reach child Aspire in both failure paths. Public outputs contain no operator paths/identifiers.
+Open decisions: none. Debt delta: none. Deferred: new auth backends, public API changes, release/publish/merge, coordinator CI checkbox.
+PLAN-EVAL: N/A — bounded parser/generation regressions and generated refresh with established acceptance; no architecture or contract choice, destructive action, release cut, or runtime lifecycle design change.

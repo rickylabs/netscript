@@ -323,6 +323,23 @@ const { data: items } = useLiveQuery((q) =>
 - `baseUrl` — optional override for the base stream server URL; defaults to the
   env-resolved `getStreamsUrl()`.
 - `createStreamDB` — optional factory port for tests or alternate stream DB adapters.
+- `reconnect` — optional finite outage policy: `maxRetries`, `initialDelayMs`, and
+  `maxDelayMs`. Defaults are five retries, an initial delay of one hundred
+  milliseconds, and a cap of five thousand milliseconds. Zero retries disables
+  recovery; a consumed batch resets the outage budget.
+
+Call `await db.preload?.()` to start the default consumer. The same collections
+remain mounted across network failures, missing-stream startup responses, rate
+limits, and server errors. Reads resume the last successfully consumed batch
+offset; they do not recreate the DB or silently replay the retained log.
+
+`db.status` exposes `idle`, `connecting`, `live`, `retrying`, `failed`, or `stopped`.
+Authentication, malformed payloads, subscriber failures, and invalid or expired
+retained offsets fail without retry. Exhausted startup recovery rejects preload;
+terminal failures after startup remain inspectable through status. Alternate
+factory adapters may omit these hooks. `db.stop?.()` and `db.dispose?.()` cancel
+active reads and pending backoff and can be called repeatedly.
+
 
 The returned `NetScriptStreamDB` exposes `collections` plus optional `stop` and
 `dispose` hooks for adapters that support tearing the connection down.

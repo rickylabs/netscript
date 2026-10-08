@@ -85,16 +85,16 @@ Deno.test('runtime preserves the AppHost after typed migrate and refreshes backg
   const command = gate.command(s8RuntimeContext());
 
   assertEquals(command.at(-1), DATABASE.POSTGRES);
-  assertEquals(command[2].includes('`${database}-cli`'), true);
-  assertEquals(command[2].includes('"migrate", "--timeout", "60"'), true);
+  assertEquals(command[3].includes('`${database}-cli`'), true);
+  assertEquals(command[3].includes('"migrate", "--timeout", "60"'), true);
   // #1720: a background processor started before the migration never runs the health-check
   // job, so the success path must refresh the KV-backed runtimes without restarting the
   // AppHost, and keep the full restart as the fallback.
-  assertEquals(command[2].includes('restartBackgroundRuntimes'), true);
-  assertEquals(command[2].includes('"resource", resource, "restart"'), true);
-  assertEquals(command[2].includes('using restart fallback'), true);
-  assertEquals(command[2].includes('"stop"'), true);
-  assertEquals(command[2].includes('"start"'), true);
+  assertEquals(command[3].includes('restartBackgroundRuntimes'), true);
+  assertEquals(command[3].includes('"resource", resource, "restart"'), true);
+  assertEquals(command[3].includes('using restart fallback'), true);
+  assertEquals(command[3].includes('"stop"'), true);
+  assertEquals(command[3].includes('"start"'), true);
 });
 
 Deno.test('typed database Phase-B gate stays outside the base runtime gate list', () => {
@@ -261,9 +261,9 @@ Deno.test('Aspire restart fallback binds aspire.config.json to the AppHost works
     }
 
     const command = gate.command(context);
-    assertEquals(command[3], '/workspace/app/aspire/apphost.mts');
-    assertEquals(command[4], '/workspace/app');
-    assertEquals(command[5], '/workspace/app/aspire/aspire.config.json');
+    assertEquals(command.at(-4), '/workspace/app/aspire/apphost.mts');
+    assertEquals(command.at(-3), '/workspace/app');
+    assertEquals(command.at(-2), '/workspace/app/aspire/aspire.config.json');
   }
 });
 

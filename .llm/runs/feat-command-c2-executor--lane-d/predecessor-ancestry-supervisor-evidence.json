@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "state": "SUPERVISOR_APPROVED",
+  "sliceFileCount": 8,
+  "verification": {
+    "observedAt": "2026-10-08T00:58:31.792812+00:00",
+    "signedHead": "65b4b27fc3fb73cf04c461414005a821fe545a8b",
+    "predecessorHead": "8b6e89e9dfe786edf062e64228c8bb14fc45a110",
+    "freezeRecordSha256": "a71ec96cc491234c5a66126d3ccdf1c17a410a1db76bcd2e1c9521719135a341",
+    "frozenPublicFilesVerified": 6,
+    "rawEvidenceHashesVerified": 95,
+    "tmpIndexHashesVerified": 2,
+    "publicEvidenceAggregateSha256": "1a2fda4d2dae60ab381dfc27c5f343ae027e98d2cc5980421f7882d1029c6cb4",
+    "unchangedNonMetadataTrackedFiles": 6240,
+    "nativeRootConflictExit": 1,
+    "nativeRootConflictCount": 5,
+    "independentlyResolvedCandidateTree": "a448793af72b9c5ee103a544003a35acc51775f9",
+    "signedTree": "a448793af72b9c5ee103a544003a35acc51775f9",
+    "all6245RecursiveTreeEntriesIdentical": true,
+    "activeIndexUnchanged": true,
+    "historicalRunBodiesPreservedVerbatim": true,
+    "sourceAssetsToolsLocksWorkflowsChanged": false,
+    "actualIntegrationPerformed": false,
+    "ciAndIndependentEvaluationPending": true
+  },
+  "newNamedTests": 0,
+  "qualificationReuse": "Signed final native technical product and asset bytes are identical; no repeated local test claim. Actual unchanged complete technical CI remains required.",
+  "localPredecessorIntegration": "Root will commit both existing parent inputs with the reviewed exact C2 asset resolution; no PR merge, rebase or force push.",
+  "ciEvaluationAcceptancePending": true
+}

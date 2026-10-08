@@ -1,0 +1,12 @@
+{
+  "exitCode": 0,
+  "durationMs": 21079,
+  "summary": {
+    "passed": 295,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 295,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}
