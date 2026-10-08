@@ -1,0 +1,1 @@
+Task test deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all

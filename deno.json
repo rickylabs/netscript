@@ -46,6 +46,7 @@
         ".llm/tools/run-deno-check.ts"
       ]
     },
+    "test:desktop-reload-native": "deno run --frozen --allow-all .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/fresh/tests/desktop-reload_native.ts",
     "check:desktop-native-fixture": "deno run --allow-all packages/cli/e2e/src/adapters/native-desktop/fixture-contract-driver.ts --repo-root . --check-only",
     "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
     "check:streams-types": "deno task --cwd packages/fresh check:streams-types",

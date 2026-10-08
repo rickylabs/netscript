@@ -1,5 +1,5 @@
 import type { ComponentChildren, JSX } from 'preact';
-import { readNavigationContext } from './context.ts';
+import { useNavigationContext } from './context.ts';
 import type { DefinePageNavigationContextValue } from './context.ts';
 import type {
   DefinePageRouteNav,
@@ -301,8 +301,6 @@ export function getBoundLinkProps<TTarget extends TypedRouteTarget<object, objec
   target: TTarget,
   input: BoundGetLinkPropsInput<TTarget>,
 ): FreshLinkAttributes & { href: ValidatedRouteHref } {
-  const navigationContext = readNavigationContext();
-
   return createResolvedLinkProps(
     {
       routePattern: target.routePattern,
@@ -310,7 +308,7 @@ export function getBoundLinkProps<TTarget extends TypedRouteTarget<object, objec
       searchSchema: target.searchSchema,
     },
     input,
-    navigationContext,
+    null,
   );
 }
 
@@ -318,7 +316,16 @@ export function Link<TTarget extends TypedRouteTarget<object, object>>(
   props: LinkProps<TTarget>,
 ): JSX.Element {
   const { to, children, ...linkInput } = props;
-  const resolvedAnchorProps = getBoundLinkProps(to, linkInput as BoundGetLinkPropsInput<TTarget>);
+  const navigationContext = useNavigationContext();
+  const resolvedAnchorProps = createResolvedLinkProps(
+    {
+      routePattern: to.routePattern,
+      pathSchema: to.pathSchema,
+      searchSchema: to.searchSchema,
+    },
+    linkInput,
+    navigationContext,
+  );
 
   return (
     <a

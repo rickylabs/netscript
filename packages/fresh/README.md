@@ -233,9 +233,9 @@ The always-current symbol list is
 ### Preserve server cache age during hydration
 
 When a loader supplies `initialData` to an island query, also pass the timestamp at which that
-snapshot was loaded as `initialDataUpdatedAt`. The public `useQuery` wrapper seeds both the value and
-that timestamp into the shared client, so `staleTime` is measured from the server load instead of
-from browser hydration:
+snapshot was loaded as `initialDataUpdatedAt`. The public `useQuery` wrapper seeds both the value
+and that timestamp into the shared client, so `staleTime` is measured from the server load instead
+of from browser hydration:
 
 ```tsx
 import { useQuery } from '@netscript/fresh/query';
@@ -289,13 +289,27 @@ types.
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
 
+### Pure route URL helpers
+
+Route `href`, `getLinkProps`, and paired `href`/`partialHref`/`getLinkProps` use their typed inputs
+and schema defaults without invoking hooks. They are safe in memo factories, callbacks, SSR and
+conditional lists. To preserve current search, call `page.hooks.useSearch()` at the component's top
+level and pass those values explicitly. `page.hooks.useRoute().getLinkProps` and bound `Link` retain
+contextual `preserveSearchParams` behavior. Utility calls keep accepting preserve flags but never
+read current context; migrate implicit preservation to those explicit capabilities.
+
+Desktop RPC keeps one native binding per window. With the matching SDK desktop adapter, a new
+browser document automatically retires its previous MessagePort before opening a new oRPC channel.
+Older document callbacks cannot close the replacement. Application shutdown still calls the
+binding's idempotent `close()` method. Custom two-argument invoke adapters keep their existing
+lifecycle; automatic document reconnection requires the coordinated SDK and Fresh release.
+
 ### StreamDB recovery
 
-The default `createNetScriptStreamDB` handle starts with `await db.preload?.()`.
-Its finite reconnect policy resumes the last consumed batch and retains the same
-reactive collections. `db.status` exposes liveness and terminal failure. Configure
-`reconnect.maxRetries`, `initialDelayMs`, and `maxDelayMs` to bound an outage;
-zero retries disables recovery. Authentication, malformed data, subscriber errors
-and invalid retained offsets fail without silently replaying the log. Stop or
-dispose cancels reads and backoff and is idempotent. Alternate factory adapters
-may omit these optional lifecycle hooks.
+The default `createNetScriptStreamDB` handle starts with `await db.preload?.()`. Its finite
+reconnect policy resumes the last consumed batch and retains the same reactive collections.
+`db.status` exposes liveness and terminal failure. Configure `reconnect.maxRetries`,
+`initialDelayMs`, and `maxDelayMs` to bound an outage; zero retries disables recovery.
+Authentication, malformed data, subscriber errors and invalid retained offsets fail without silently
+replaying the log. Stop or dispose cancels reads and backoff and is idempotent. Alternate factory
+adapters may omit these optional lifecycle hooks.

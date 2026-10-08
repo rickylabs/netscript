@@ -82,6 +82,7 @@ export {
   type NetScriptChatConnectionOptions,
   type NetScriptChatMessage,
   type NetScriptChatResponseOptions,
+  type NetScriptChatSendMessage,
   type NetScriptChatSessionTarget,
   type NetScriptChatSnapshot,
   type NetScriptChatSnapshotOptions,

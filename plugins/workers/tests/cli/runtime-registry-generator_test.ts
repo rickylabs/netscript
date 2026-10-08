@@ -405,12 +405,14 @@ const job = { id: 'transcribe-image' };
 await transcribeImage({
   id: 'execution-valid',
   job,
+  signal: new AbortController().signal,
   payload: { imageUrl: 'https://example.test/image.png' },
 });
 
 await transcribeImage({
   id: 'execution-invalid',
   job,
+  signal: new AbortController().signal,
   // @ts-expect-error - embed-document payload must not compile for transcribe-image
   payload: { documentId: 'doc-1', text: 'content' },
 });

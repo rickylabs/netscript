@@ -2,6 +2,7 @@ import { createSuccessResult } from '../domain/mod.ts';
 import type {
   JobContext,
   JobDefinition,
+  JobDispatchContext,
   JobHandler,
   JobResult,
   RuntimeWorkerPort,
@@ -62,7 +63,7 @@ export class MemoryWorker implements RuntimeWorkerPort {
   /** Dispatch a job through registered or inline handlers. */
   async dispatch<TPayload, TResult>(
     job: JobDefinition<string, TPayload, TResult>,
-    context: JobContext<TPayload, TResult>,
+    input: JobDispatchContext<TPayload, TResult>,
   ): Promise<JobResult<TResult>> {
     if (this.#stopped) {
       throw new Error(`Worker ${this.id} is stopped.`);
@@ -70,6 +71,11 @@ export class MemoryWorker implements RuntimeWorkerPort {
 
     const handler = (this.#handlers.get(job.id) as JobHandler<TPayload, TResult> | undefined) ??
       job.handler;
+    const context: JobContext<TPayload, TResult> = {
+      ...input,
+      signal: input.signal ?? new AbortController().signal,
+    };
+    context.signal.throwIfAborted();
     const result = handler ? await handler(context) : (this.#defaultResult as JobResult<TResult>);
     this.#dispatches.push(Object.freeze({ job, context, result }) as MemoryWorkerDispatch);
     return result as JobResult<TResult>;

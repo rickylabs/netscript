@@ -27,6 +27,7 @@ export async function executeWorkerJob(
       payload,
       traceHeaders,
       correlationId,
+      signal,
     );
   }
   return await executePolyglotTask(context, jobDef, payload, signal, traceHeaders);
@@ -39,7 +40,9 @@ async function executeDenoJob(
   payload: Record<string, unknown> | undefined,
   traceHeaders: Record<string, string>,
   correlationId?: string,
+  signal?: AbortSignal,
 ): Promise<WorkerJobResult> {
+  signal?.throwIfAborted();
   const entrypoint = resolveDenoEntrypoint(context, jobDef);
 
   console.log(
@@ -67,6 +70,7 @@ async function executeDenoJob(
     executionId,
     (percent, progressMessage) =>
       context.executionState.progress(executionId, percent, progressMessage).then(() => undefined),
+    signal,
   );
   const resultData = result.data ? result.data as Record<string, unknown> : undefined;
 
