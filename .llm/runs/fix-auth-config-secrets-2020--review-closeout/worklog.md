@@ -19,3 +19,6 @@ Deferred: public API/backends/releases. PLAN-EVAL: N/A as justified in plan.md.
 
 ## S0/S1
 Main integrated at a046fe336. Generated conflicts took main; prose/assets/publish regenerated, staged, then check:agent-docs-prose/check:assets-barrel/check:publish-assets all exit 0. Reproduced quality's stale manifest and regenerated it; check:aspire-version-parity exit 0. The manifest adds two missing tracked paths; no gate policy weakened. Reconcile: five current unanswered threads remain, coordinator CI checkbox untouched.
+
+## S2
+Confirmed actual code execution through both U+2028/U+2029: mutation runs generated code containing `throw Error(1)` and fails. Escape both separators in JSON diagnostic key text; no credential value emitted. New security regression passes for canonical and legacy declarations. Mutation reverted only this implementation: exit 1, one failed test; restored exit 0. Quality gate exit 0; reviewed pure generation change and unchanged partition behavior. Reconcile: no new scope/debt, five threads pending final replies.

@@ -144,7 +144,7 @@ export function renderDeclaredEnvironmentLines(entry: ResourceEnvironmentEntry):
     if (isCredentialEnvironmentKey(key)) {
       lines.push(
         `${BLOCK_INDENT}// Declared ${
-          JSON.stringify(key)
+          JSON.stringify(key).replaceAll('\u2028', '\\u2028').replaceAll('\u2029', '\\u2029')
         } is not applied: supply credentials through process environment.`,
       );
       continue;

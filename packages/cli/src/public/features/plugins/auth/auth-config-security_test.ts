@@ -176,6 +176,21 @@ Deno.test('auth NUL values fail before any persistence', async () => {
   assertEquals(fs.getFiles().size, 0);
 });
 
+Deno.test('Aspire refused keys cannot escape generated comments through Unicode separators', async () => {
+  for (const separator of ['\u2028', '\u2029']) {
+    const key = `AUTH_TOKEN${separator}throw Error(1);//`;
+    for (const alias of ['Environment', 'Env']) {
+      const generated = renderDeclaredEnvironmentLines({ [alias]: { [key]: 'private' } });
+      const child = await new Deno.Command(Deno.execPath(), {
+        args: ['eval', generated.join('\n')],
+      }).output();
+      assertEquals(child.code, 0, new TextDecoder().decode(child.stderr));
+      assertEquals(generated.join('\n').includes(separator), false);
+      assertEquals(generated.join('\n').includes('private'), false);
+    }
+  }
+});
+
 Deno.test('Aspire refuses credential literals for canonical and legacy environment declarations', () => {
   const sensitive = Object.fromEntries(
     [
