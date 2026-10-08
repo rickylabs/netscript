@@ -203,3 +203,5 @@ Gate `amendment-published-negative`: raw exit `1`. Command: `deno run --frozen -
 ## Final amended evaluation
 
 Independent GLM max IMPL-EVAL PASS at source `f413a1f612683f054d44d74297627129987feff9`, actual evaluation head `d5c07c0874eb561f130957d1867bd84ff2c5dd6d`. Report `amendment-evaluate.md` supersedes the original source verdict. Reviewer independently reran both regressions (2 pass) and the live cold resolution guard (one core 0.65.0). Both unchanged doc baseline rows explicitly DEBT_ACCEPTED. Source phases 5–7 complete; review phase ready. No merge/publication; fixed published-consumer receipt remains owner work. Report-record commit reused the prior brief message after unavailable python alias; this follow-up correctly records completion.
+
+Final B1–B3 independent PLAN-EVAL PASS at f9ba4e3515000c45f2ac7ec0456fe06ad8fe4590; fresh GLM max report review-plan-evaluate.md. Earlier reused-session review produced no applicable verdict and is discarded; no source implementation preceded this PASS. All bounded fixes and required one-pass scaffold gate obligations retained.
