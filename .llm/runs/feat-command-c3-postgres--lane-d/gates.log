@@ -25,3 +25,27 @@ EXIT lock-check:agent-docs-prose 0
 EXIT lock-check:assets-barrel 0
 EXIT lock-check:publish-assets 0
 EXIT lock-check:mcp-export-corpus 0
+
+EXIT main-fresh-ui-frozen 0
+EXIT main-fresh-chat-tests 0
+EXIT main-check 0
+EXIT main-lint 0
+EXIT main-fmt-check 0
+EXIT main-quality-scan 0
+EXIT main-arch-check 0
+EXIT main-service-contracts-database-tests 0
+EXIT main-check-agent-docs-prose 0
+EXIT main-check-assets-barrel 0
+EXIT main-check-publish-assets 0
+EXIT main-check-mcp-export-corpus 0
+EXIT main-doc-lint 0
+EXIT main-jsr-database 0
+EXIT main-database-publish 0
+EXIT main-deps-prod-install 0
+EXIT workflow-inventory-red 1
+EXIT workflow-inventory-green 0
+EXIT workflow-concurrency-mutation 1
+EXIT workflow-concurrency-restored 0
+EXIT workflow-check 0
+EXIT workflow-lint-explicit 0
+EXIT workflow-fmt-owned 0
