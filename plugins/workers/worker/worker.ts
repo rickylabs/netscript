@@ -210,8 +210,10 @@ export class Worker {
     if (!this.running && !this.hasRuntimeResources()) {
       return Promise.resolve();
     }
-    this.stopCompletion = this.drain();
-    return this.stopCompletion;
+    const completion = Promise.withResolvers<void>();
+    this.stopCompletion = completion.promise;
+    void this.drain().then(completion.resolve, completion.reject);
+    return completion.promise;
   }
 
   /** Drain once; concurrent stop callers share the same completion. */

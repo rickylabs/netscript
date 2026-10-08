@@ -66,6 +66,10 @@ export class InProcessJobRunner implements RuntimeWorkerPort {
       throw new RangeError('Effective deadline must be finite epoch milliseconds.');
     }
     const controller = new AbortController();
+    const parent = input.signal;
+    const onParentAbort = (): void => controller.abort(cancellationReason(parent?.reason));
+    if (parent?.aborted) onParentAbort();
+    else parent?.addEventListener('abort', onParentAbort, { once: true });
     // Record ownership before entering the dispatcher, including synchronous stop races.
     const completion = Promise.resolve().then(() =>
       this.execute(job, input, controller, deadlineAt)
@@ -76,6 +80,7 @@ export class InProcessJobRunner implements RuntimeWorkerPort {
       return await completion;
     } finally {
       this.#active.delete(active);
+      parent?.removeEventListener('abort', onParentAbort);
     }
   }
 
@@ -89,7 +94,7 @@ export class InProcessJobRunner implements RuntimeWorkerPort {
     await Promise.allSettled(active.map((execution) => execution.completion));
   }
 
-  /** Own deadline, parent linkage and bounded abort cleanup for one dispatch. */
+  /** Own deadline, handler/progress lifetime and bounded abort cleanup for one dispatch. */
   private async execute<TPayload, TResult>(
     job: JobDefinition<string, TPayload, TResult>,
     input: JobDispatchContext<TPayload, TResult>,
@@ -97,8 +102,6 @@ export class InProcessJobRunner implements RuntimeWorkerPort {
     deadlineAt: number | undefined,
   ): Promise<JobResult<TResult>> {
     const signal = controller.signal;
-    const onParentAbort = (): void => controller.abort(cancellationReason(input.signal?.reason));
-    if (input.signal?.aborted) onParentAbort();
     signal.throwIfAborted();
     if (deadlineAt !== undefined && deadlineAt <= this.#clock.now()) {
       controller.abort(new DOMException('Job deadline elapsed.', 'TimeoutError'));
@@ -124,33 +127,62 @@ export class InProcessJobRunner implements RuntimeWorkerPort {
       }
     };
     signal.addEventListener('abort', onAbort, { once: true });
-    input.signal?.addEventListener('abort', onParentAbort, { once: true });
     armDeadline();
+    let acceptsProgress = true;
+    let progressTail: Promise<void> = Promise.resolve();
+    const reportProgress = input.reportProgress;
+    const reconcileDeadline = (): void => {
+      if (!signal.aborted && deadlineAt !== undefined && deadlineAt <= this.#clock.now()) {
+        controller.abort(new DOMException('Job deadline elapsed.', 'TimeoutError'));
+      }
+    };
+    const settleProgress = async (): Promise<void> => {
+      acceptsProgress = false;
+      reconcileDeadline();
+      try {
+        await progressTail;
+      } finally {
+        reconcileDeadline();
+        signal.throwIfAborted();
+      }
+    };
     try {
       const handler = this.#dispatcher.dispatch(job, {
         ...input,
         signal,
         deadlineAt,
-        reportProgress: input.reportProgress === undefined ? undefined : (percent, message) => {
+        reportProgress: reportProgress === undefined ? undefined : (percent, message) => {
           signal.throwIfAborted();
-          return input.reportProgress!(percent, message);
+          if (!acceptsProgress) throw new Error('Job execution no longer accepts progress.');
+          const reported = Promise.resolve(reportProgress(percent, message));
+          // Observe even unawaited failures immediately and drain every invoked report in order.
+          void reported.catch(() => undefined);
+          progressTail = progressTail.then(
+            () => reported,
+            async (error: unknown) => {
+              await reported.catch(() => undefined);
+              throw error;
+            },
+          );
+          void progressTail.catch(() => undefined);
+          return reported;
         },
       }).then(
-        (result) => {
-          signal.throwIfAborted();
+        async (result) => {
+          await settleProgress();
           return result;
         },
-        (error: unknown) => {
-          signal.throwIfAborted();
+        async (error: unknown) => {
+          await settleProgress();
           throw error;
         },
       );
       return await Promise.race([handler, aborted.promise]);
     } finally {
+      acceptsProgress = false;
       disposeDeadline?.();
       disposeGrace?.();
       signal.removeEventListener('abort', onAbort);
-      input.signal?.removeEventListener('abort', onParentAbort);
     }
   }
 }

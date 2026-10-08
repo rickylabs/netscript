@@ -187,3 +187,73 @@ Corrected corpus fixture gate exit 0 (12 pass): the local Git shim had transpare
 ## Final exact-source delta IMPL-EVAL verdict
 
 Delta IMPL-EVAL PASS at dd6cea4bf99db07f6d7012f8f45ae0e7f96614d6 for final delta source 20484c8e7c2d48fa48ec5e6800d7ce855f9f35c5; original runtime PASS preserved for da438b2f90abf95d7d9cbe39a3bc57c2bb7989b2. Delta ead12a6c1..HEAD inspected commit-by-commit: README cancellation prose byte-identical relocation (verified programmatically), existing registry fixture gains required signal on both calls with payload @ts-expect-error retained, owning corpus regenerated as one payload line plus provenance (symbolCount 7908 to 7920). Independent reruns: registry suite 8/0 exit 0, corpus 12-test suite 12/0 exit 0, docs:tagline:check 36/0 exit 0, gen:mcp-export-corpus --check exit 0 with provenance sha matching committed corpus. Qualified Deno 2.9.5 directory, WT_ENFORCE=0 and task-folder TMPDIR from launch; no global shim/config change; working tree clean throughout. No new tests/mutation obligation; F-7/F-JSR-2/F-16 and F-13 treatment carried unchanged. Verdict in review-evaluate.md; no merge/publication claim.
+
+S7 review amendment Design checkpoint: D1-D5 locked in cancellation-review-plan.md. Independent Google Gemini selected PLAN-EVAL PASS at immutable 0023b8f193f2cdc8cc3e8f8f06ebeeb700228584 before implementation. Owner HARNESS fallback authorized after primary GLM provider stalled without verdict; private provider logs preserved. Three production files and three adjacent test files, no public contract/dependency changes. S7-S9 remain pending.
+
+Gate `review-focused`: raw exit `1`. Command: `deno run -A .llm/tools/run-deno-test.ts --path packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts --path packages/plugin-workers-core/tests/runtime/job-payload-contract_test.ts --path plugins/workers/worker/job-dispatcher_test.ts -- --frozen`. Full raw output retained privately.
+
+Gate `review-focused`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts packages/plugin-workers-core/tests/runtime/job-payload-contract_test.ts plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-schema`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter schema-backed async validation packages/plugin-workers-core/tests/runtime/job-payload-contract_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-schema`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter schema-backed async validation packages/plugin-workers-core/tests/runtime/job-payload-contract_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-preabort`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner preserves pre-aborted packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-preabort`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner preserves pre-aborted packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-overdue`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner reconciles overdue packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-overdue`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner reconciles overdue packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-overdue`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner reconciles overdue packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-core-progress`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner owns blocked progress packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-core-progress`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter runner owns blocked progress packages/plugin-workers-core/tests/runtime/job-cancellation_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-actual-progress-timeout`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker cancellation during unawaited progress drain retains timeout plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-actual-progress-timeout`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker cancellation during unawaited progress drain retains timeout plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-actual-progress-cancel`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker cancellation during unawaited progress drain retains cancel plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-actual-progress-cancel`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker cancellation during unawaited progress drain retains cancel plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-actual-progress-shutdown`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker cancellation during unawaited progress drain retains shutdown plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-actual-progress-shutdown`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker cancellation during unawaited progress drain retains shutdown plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-reentry`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker reentrant stop plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-reentry`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker reentrant stop plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-mutant-reentry`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker reentrant stop plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `review-restored-reentry`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all --filter Worker reentrant stop plugins/workers/worker/job-dispatcher_test.ts`. Full raw output retained privately.
+
+Gate `amendment-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `amendment-lint`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx`. Full raw output retained privately.
+
+Gate `amendment-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx`. Full raw output retained privately.
+
+Gate `amendment-suite`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all packages/plugin-workers-core/tests plugins/workers`. Full raw output retained privately.
+
+Gate `amendment-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `amendment-jsr-core`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-workers-core --text`. Full raw output retained privately.
+
+Gate `amendment-publish-core`: raw exit `0`. Command: `deno task --cwd packages/plugin-workers-core publish:dry-run`. Full raw output retained privately.
+
+Gate `amendment-doc-core`: raw exit `1`. Command: `deno task doc:lint --root packages/plugin-workers-core`. Full raw output retained privately.
+
+Gate `amendment-jsr-plugin`: raw exit `1`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/workers --text`. Full raw output retained privately.
+
+Gate `amendment-publish-plugin`: raw exit `0`. Command: `deno task --cwd plugins/workers publish:dry-run`. Full raw output retained privately.
+
+Gate `amendment-doc-plugin`: raw exit `1`. Command: `deno task doc:lint --root plugins/workers`. Full raw output retained privately.
+
+Gate `amendment-carrier`: raw exit `1`. Command: `deno task agent:carrier:check`. Full raw output retained privately.
+
+S7 substantive review: D1-D5 correct the five verified review findings within the locked six source/test files. All eight new tests individually fail causal, compiling source mutations and pass after exact restoration. Initial constant-false mutation caused a type error and was replaced by a type-safe clock comparison; it does not count as proof. Reentrant promise assertion strengthened to strict identity after deep equality failed to kill the old implementation. Full owning suite 120 pass/0 fail/0 ignored; frozen source check, scoped lint/fmt, quality and architecture exit zero. Core/plugin publish dry-runs pass. Whole all-entrypoint core/plugin documentation JSON is byte-identical to the prior corrected baseline with raw exits one; plugin JSR retains only inherited doctor module-tag failure. Initial carrier invocation named nonexistent task, to be corrected by check:assets-barrel. No public signature or dependency delta. S7 source complete; clean-source corpus freshness S8 next, mandatory independent amendment IMPL S9 pending.

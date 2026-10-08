@@ -1,4 +1,11 @@
-import { assert, assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
+import {
+  assert,
+  assertEquals,
+  assertInstanceOf,
+  assertRejects,
+  assertStrictEquals,
+  assertThrows,
+} from '@std/assert';
 import {
   InProcessJobRunner,
   type JobContext,
@@ -204,5 +211,110 @@ Deno.test('noncooperative handler drains only through grace and cannot report pr
     finish.resolve();
     await outcome;
     await runner.stop();
+  }
+});
+
+Deno.test('runner preserves pre-aborted parent cause before immediate stop', async () => {
+  const parent = new AbortController();
+  const reason = new DOMException('Earlier parent timeout.', 'TimeoutError');
+  parent.abort(reason);
+  let reached = false;
+  const job: JobDefinition = {
+    id: 'preaborted-stop',
+    handler: () => {
+      reached = true;
+      return { success: true };
+    },
+  };
+  const runner = new InProcessJobRunner();
+  const outcome = runner.dispatch(job, input(job, parent.signal)).catch((error: unknown) => error);
+  const stopped = runner.stop();
+  assertStrictEquals(await outcome, reason);
+  assertEquals(reached, false);
+  await stopped;
+});
+
+Deno.test('runner reconciles overdue clock before terminal success or error clears timer', async () => {
+  for (const rejects of [false, true]) {
+    const clock = new ManualClock();
+    const runner = new InProcessJobRunner({ clock });
+    let observed: JobContext | undefined;
+    const job: JobDefinition = {
+      id: 'synchronous-overrun',
+      timeout: 10,
+      handler: (context) => {
+        observed = context;
+        // Advance the owned clock while the event loop cannot run its deadline timer.
+        clock.time += 25;
+        if (rejects) throw new Error('Handler failed after deadline.');
+        return { success: true };
+      },
+    };
+    try {
+      const result = await runner.dispatch(job, input(job)).catch((error: unknown) => error);
+      assertCause(result, 'TimeoutError');
+      assert(observed);
+      assertCause(observed.signal.reason, 'TimeoutError');
+      assertEquals(observed.deadlineAt, 10010);
+      assertEquals(clock.timers.size, 0);
+    } finally {
+      await runner.stop();
+    }
+  }
+});
+
+Deno.test('runner owns blocked progress through cancellation timeout and shutdown grace', async () => {
+  for (const cause of ['cancel', 'timeout', 'shutdown'] as const) {
+    const clock = new ManualClock();
+    const runner = new InProcessJobRunner({ clock, abortGracePeriodMs: 5 });
+    const parent = new AbortController();
+    const progressEntered = Promise.withResolvers<void>();
+    const progress = Promise.withResolvers<void>();
+    let observed: JobContext | undefined;
+    let reports = 0;
+    const job: JobDefinition = {
+      id: 'blocked-progress',
+      timeout: cause === 'timeout' ? 20 : 1000,
+      handler: (context) => {
+        observed = context;
+        void context.reportProgress?.(10);
+        return { success: true };
+      },
+    };
+    const outcome = runner.dispatch(job, {
+      ...input(job, parent.signal),
+      reportProgress: () => {
+        reports++;
+        progressEntered.resolve();
+        return progress.promise;
+      },
+    }).catch((error: unknown) => error);
+    try {
+      await progressEntered.promise;
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      assert(observed);
+      assertThrows(() => observed?.reportProgress?.(20), Error, 'no longer accepts progress');
+      assertEquals(reports, 1);
+      let stopped: Promise<void> | undefined;
+      if (cause === 'cancel') parent.abort(new DOMException('Cancel progress.', 'AbortError'));
+      else if (cause === 'timeout') clock.advance(20);
+      else stopped = runner.stop();
+      assertEquals(observed.signal.aborted, true);
+      clock.advance(5);
+      assertCause(
+        await outcome,
+        cause === 'cancel' ? 'AbortError' : cause === 'timeout' ? 'TimeoutError' : 'ShutdownError',
+      );
+      if (stopped) await stopped;
+      // A sink can fail after grace; the retired execution must still observe its rejection.
+      progress.reject(new Error('Late progress rejection.'));
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      assertEquals(clock.timers.size, 0);
+      assertEquals(reports, 1);
+    } finally {
+      progress.resolve();
+      await outcome;
+      await runner.stop();
+    }
   }
 });

@@ -5,3 +5,5 @@ Model: gpt-6.1-sol high. Session: lane C2 implementation. Branch: `fix/worker-jo
 Routes: OpenAI implementation; independent Zhipu GLM evaluator via owner-selected OpenCode Go, `glm-5.3-flash`, max. Fallback: owner-selected Gemini via agy only if primary launch fails.
 
 Owner override: HARNESS.md requires “opencode run -m opencode-go/glm-5.3-flash --variant max --auto”; use that explicit route rather than the default matrix. Public operational identity excludes machine and absolute directory details by BRIEF-C2.md.
+
+Amendment evaluator route: owner HARNESS authorizes Google Gemini gemini-3.8-flash-high fallback; selected PLAN PASS in fresh independent session. Primary GLM requests stalled without verdict, with private exact-session recovery evidence retained. Mandatory independent amendment IMPL-EVAL pending.
