@@ -1,0 +1,14 @@
+EXIT check 0
+EXIT lint 0
+EXIT fmt-check 0
+EXIT service-contracts-database-tests 0
+EXIT check-agent-docs-prose 0
+EXIT check-assets-barrel 0
+EXIT check-publish-assets 0
+EXIT check-mcp-export-corpus 0
+EXIT quality-scan 0
+EXIT arch-check 0
+EXIT docs 0
+EXIT jsr-service 0
+EXIT jsr-database 0
+EXIT database-native-publish 0

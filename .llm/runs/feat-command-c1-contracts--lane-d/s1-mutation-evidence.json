@@ -1,0 +1,72 @@
+[
+  {
+    "name": "map-literal",
+    "file": "packages/contracts/src/domain/command-errors.ts",
+    "mutation": "message: 'The command no longer matches current state', -> message: 'Mutated conflict message',",
+    "test": "command contracts opt in to exact errors and preserve route metadata",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command contracts opt in to exact errors and preserve route metadata\"],\"cwd\":\"<checkout>\",\"exitCode\":1,\"durationMs\":183,\"summary\":{\"passed\":0,\"failed\":1,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n    [\\n      {\\n-       message: \\\"Mutated conflict message\\\",\\n+       message: \\\"The command no longer matches current state\\\",\\n        status: 409,\\n      },\\n      {\\n        message: \\\"The idempotency key was used for another request\\\",\\n        status: 409,\\n      },\\n      {\\n        message: \\\"An identical command is still in progress\\\",\\n        status: 409,\\n      },\\n    ]\\n\\n    at assertEquals (<dependency-module><line>:<column>)\\n    at file://<cwd>/packages/contracts/tests/commands-type_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"command contracts opt in to exact errors and preserve route metadata\",\"file\":\"./packages/contracts/tests/commands-type_test.ts\",\"line\":175}]}]}\n",
+    "restored": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command contracts opt in to exact errors and preserve route metadata\"],\"cwd\":\"<checkout>\",\"exitCode\":0,\"durationMs\":208,\"summary\":{\"passed\":1,\"failed\":0,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":0},\"failures\":[]}\n"
+  },
+  {
+    "name": "fractional-retry",
+    "file": "packages/contracts/src/domain/command-errors.ts",
+    "mutation": "z.number().int().nonnegative().optional() -> z.number().nonnegative().optional()",
+    "test": "command schemas reject malformed retry hints and preserve exact payloads",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command schemas reject malformed retry hints and preserve exact payloads\"],\"cwd\":\"<checkout>\",\"exitCode\":1,\"durationMs\":182,\"summary\":{\"passed\":0,\"failed\":1,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError\\n    at assert (<dependency-module><line>:<column>)\\n    at file://<cwd>/packages/contracts/tests/commands-type_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"command schemas reject malformed retry hints and preserve exact payloads\",\"file\":\"./packages/contracts/tests/commands-type_test.ts\",\"line\":206}]}]}\n",
+    "restored": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command schemas reject malformed retry hints and preserve exact payloads\"],\"cwd\":\"<checkout>\",\"exitCode\":0,\"durationMs\":172,\"summary\":{\"passed\":1,\"failed\":0,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":0},\"failures\":[]}\n"
+  },
+  {
+    "name": "wrong-mapping",
+    "file": "packages/contracts/src/application/command-contract.ts",
+    "mutation": "throw errors.COMMAND_CONFLICT({ data: failure }); -> throw errors.IDEMPOTENCY_KEY_REUSE({ data: failure });",
+    "test": "command error mapping forwards only validated safe payloads to declared constructors",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command error mapping forwards only validated safe payloads to declared constructors\"],\"cwd\":\"<checkout>\",\"exitCode\":1,\"durationMs\":231,\"summary\":{\"passed\":0,\"failed\":1,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: Values are not equal.\\n\\n\\n    [Diff] Actual / Expected\\n\\n\\n    {\\n-     code: \\\"IDEMPOTENCY_KEY_REUSE\\\",\\n+     code: \\\"COMMAND_CONFLICT\\\",\\n      data: {\\n        kind: \\\"optimistic_conflict\\\",\\n        retryable: false,\\n      },\\n    }\\n\\n    at assertEquals (<dependency-module><line>:<column>)\\n    at file://<cwd>/packages/contracts/tests/commands-type_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"command error mapping forwards only validated safe payloads to declared constructors\",\"file\":\"./packages/contracts/tests/commands-type_test.ts\",\"line\":236}]}]}\n",
+    "restored": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command error mapping forwards only validated safe payloads to declared constructors\"],\"cwd\":\"<checkout>\",\"exitCode\":0,\"durationMs\":196,\"summary\":{\"passed\":1,\"failed\":0,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":0},\"failures\":[]}\n"
+  },
+  {
+    "name": "unsafe-extra-fields",
+    "file": "packages/contracts/src/domain/command-errors.ts",
+    "mutation": "z.strictObject( -> z.object(",
+    "test": "command error mapping rethrows business operational and unsafe failures unchanged",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command error mapping rethrows business operational and unsafe failures unchanged\"],\"cwd\":\"<checkout>\",\"exitCode\":1,\"durationMs\":170,\"summary\":{\"passed\":0,\"failed\":1,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":1},\"failures\":[{\"message\":\"AssertionError: unrecognized failure must preserve original identity\\n    at assert (<dependency-module><line>:<column>)\\n    at file://<cwd>/packages/contracts/tests/commands-type_test.ts:<line>:<column>\",\"count\":1,\"tests\":[{\"name\":\"command error mapping rethrows business operational and unsafe failures unchanged\",\"file\":\"./packages/contracts/tests/commands-type_test.ts\",\"line\":258}]}]}\n",
+    "restored": "{\"schemaVersion\":1,\"command\":[\"deno\",\"test\",\"--reporter=tap\",\"--allow-all\",\"--no-check\",\"packages/contracts/tests/commands-type_test.ts\",\"--filter\",\"command error mapping rethrows business operational and unsafe failures unchanged\"],\"cwd\":\"<checkout>\",\"exitCode\":0,\"durationMs\":194,\"summary\":{\"passed\":1,\"failed\":0,\"ignored\":0,\"totalResults\":1,\"uniqueFailures\":0},\"failures\":[]}\n"
+  },
+  {
+    "name": "metadata-erasure",
+    "file": "packages/contracts/src/application/command-contract.ts",
+    "mutation": "  BaseContractMeta\n> = ->   Record<never, never>\n> =",
+    "test": "commands-type_test.ts compile-time exactness fixture",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":2,\"uniqueOccurrences\":2,\"uniqueCodes\":2,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'false' does not satisfy the constraint 'true'.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":33,\"column\":28}]}]},{\"code\":\"TS2578\",\"message\":\"Unused '@ts-expect-error' directive.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":91,\"column\":1}]}]}]}\n",
+    "restored": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n"
+  },
+  {
+    "name": "status-widening",
+    "file": "packages/contracts/src/domain/command-errors.ts",
+    "mutation": "status: 409; -> status: number;",
+    "test": "commands-type_test.ts compile-time exactness fixture",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":1,\"uniqueOccurrences\":1,\"uniqueCodes\":1,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'false' does not satisfy the constraint 'true'.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":34,\"column\":31}]}]}]}\n",
+    "restored": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n"
+  },
+  {
+    "name": "error-code-erasure",
+    "file": "packages/contracts/src/application/command-contract.ts",
+    "mutation": "MergedErrorMap<BaseContractErrors, CommandErrorMap> -> BaseContractErrors",
+    "test": "commands-type_test.ts compile-time exactness fixture",
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "failure": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":19,\"uniqueOccurrences\":19,\"uniqueCodes\":3,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'false' does not satisfy the constraint 'true'.\",\"count\":7,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":7,\"locations\":[{\"line\":32,\"column\":34},{\"line\":103,\"column\":28},{\"line\":105,\"column\":3},{\"line\":111,\"column\":3},{\"line\":117,\"column\":3},{\"line\":126,\"column\":30},{\"line\":146,\"column\":31}]}]},{\"code\":\"TS2339\",\"message\":\"Property 'data' does not exist on type 'never'.\",\"count\":4,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":4,\"locations\":[{\"line\":131,\"column\":35},{\"line\":136,\"column\":35},{\"line\":141,\"column\":35},{\"line\":149,\"column\":35}]}]},{\"code\":\"TS2339\",\"message\":\"Property 'COMMAND_CONFLICT' does not exist on type 'BaseContractErrors'.\",\"count\":2,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":2,\"locations\":[{\"line\":34,\"column\":59},{\"line\":37,\"column\":27}]}]},{\"code\":\"TS2367\",\"message\":\"This comparison appears to be unintentional because the types '\\\"NOT_FOUND\\\" | \\\"VALIDATION_ERROR\\\" | \\\"UNAUTHORIZED\\\" | \\\"FORBIDDEN\\\" | \\\"RATE_LIMITED\\\" | \\\"SERVICE_UNAVAILABLE\\\"' and '\\\"COMMAND_IN_PROGRESS\\\"' have no overlap.\",\"count\":2,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":2,\"locations\":[{\"line\":139,\"column\":9},{\"line\":147,\"column\":9}]}]},{\"code\":\"TS2339\",\"message\":\"Property 'COMMAND_IN_PROGRESS' does not exist on type 'BaseContractErrors'.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":49,\"column\":27}]}]},{\"code\":\"TS2339\",\"message\":\"Property 'IDEMPOTENCY_KEY_REUSE' does not exist on type 'BaseContractErrors'.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":43,\"column\":27}]}]},{\"code\":\"TS2367\",\"message\":\"This comparison appears to be unintentional because the types '\\\"NOT_FOUND\\\" | \\\"VALIDATION_ERROR\\\" | \\\"UNAUTHORIZED\\\" | \\\"FORBIDDEN\\\" | \\\"RATE_LIMITED\\\" | \\\"SERVICE_UNAVAILABLE\\\"' and '\\\"COMMAND_CONFLICT\\\"' have no overlap.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":129,\"column\":9}]}]},{\"code\":\"TS2367\",\"message\":\"This comparison appears to be unintentional because the types '\\\"NOT_FOUND\\\" | \\\"VALIDATION_ERROR\\\" | \\\"UNAUTHORIZED\\\" | \\\"FORBIDDEN\\\" | \\\"RATE_LIMITED\\\" | \\\"SERVICE_UNAVAILABLE\\\"' and '\\\"IDEMPOTENCY_KEY_REUSE\\\"' have no overlap.\",\"count\":1,\"paths\":[{\"path\":\"<checkout>/packages/contracts/tests/commands-type_test.ts\",\"count\":1,\"locations\":[{\"line\":134,\"column\":9}]}]}]}\n",
+    "restored": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<checkout>\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n"
+  }
+]

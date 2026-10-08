@@ -1,0 +1,81 @@
+{
+  "slice": "S2 / C1",
+  "headBeforeSignoff": "5023427004b37a561570a1a23bb4b7e21faf0c51",
+  "files": [
+    {
+      "path": "deno.lock",
+      "bytes": 175902,
+      "sha256": "75404ed4a3b7733c6311b926ea0438686754e3caa2df6c82581f1479de964aa4"
+    },
+    {
+      "path": "docs/site/reference/contracts/index.md",
+      "bytes": 29578,
+      "sha256": "88e477ad4c1ea0cb668b4a7292711b6eceec9793d7306d5bc51f325831e9e202"
+    },
+    {
+      "path": "docs/site/reference/service/index.md",
+      "bytes": 17106,
+      "sha256": "1daaa2dae46e76000302630067c0395dc2518534772ab6f4bd179c85bba3f6d1"
+    },
+    {
+      "path": "packages/service/README.md",
+      "bytes": 17854,
+      "sha256": "ea183dc6678daa230a03839c90ae3ee1c5de4c665042004981b3fa31b25dea5a"
+    },
+    {
+      "path": "packages/service/deno.json",
+      "bytes": 1362,
+      "sha256": "be14460b3e3379917b06ebec397f162800034bd58e1e5dd2d72c5fdc05d8573d"
+    },
+    {
+      "path": "packages/service/commands.ts",
+      "bytes": 1500,
+      "sha256": "27b43aa2277ce506d549448bd2a85cbbd1e7b19301d94792173729094d6b6821"
+    },
+    {
+      "path": "packages/service/src/commands/application/canonical-json.ts",
+      "bytes": 7300,
+      "sha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e"
+    },
+    {
+      "path": "packages/service/src/commands/application/define-command.ts",
+      "bytes": 4601,
+      "sha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38"
+    },
+    {
+      "path": "packages/service/src/commands/application/json-codec.ts",
+      "bytes": 2230,
+      "sha256": "62cca1b795b28da23e0968b98822dc836ac5cff0e41040347b48b6a382c0c862"
+    },
+    {
+      "path": "packages/service/src/commands/domain/codec.ts",
+      "bytes": 788,
+      "sha256": "816baf72cfced191b3a46f5ce7aadb6b804856f4319339dbc5cf27e0fbf3f9a8"
+    },
+    {
+      "path": "packages/service/src/commands/domain/definition.ts",
+      "bytes": 4215,
+      "sha256": "593d7d4f964cfe536d0c061861932aebdc87981add4a20ad164ebf940c48cf6b"
+    },
+    {
+      "path": "packages/service/src/commands/domain/failure.ts",
+      "bytes": 4373,
+      "sha256": "f96abc2ba0a149cd56e427500b383f2d8b6663637a07c6fde370d0059aaaca63"
+    },
+    {
+      "path": "packages/service/src/commands/domain/values.ts",
+      "bytes": 908,
+      "sha256": "128f94a106ecc657faa50a145b519b3c766c8bd7802254e79a196395bfc7f00a"
+    },
+    {
+      "path": "packages/service/tests/commands-codec_test.ts",
+      "bytes": 14190,
+      "sha256": "e7682c8a916c702d7ba3b65279bdbdbdd0b218a35c0aabdb04f12724ed368e83"
+    },
+    {
+      "path": "packages/service/tests/type-fixtures/commands_type.ts",
+      "bytes": 3315,
+      "sha256": "c7e8f5d62ad324e5f8c987a519610b98e646d1e01a35639cefaa2327158ade6e"
+    }
+  ]
+}

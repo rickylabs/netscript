@@ -388,7 +388,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(
       output,
-      'const configuredEnvironment = {"NETSCRIPT_AUTH_BACKEND":"kv-oauth","AUTH_SECRET":"test-secret"}',
+      'const configuredEnvironment = {"NETSCRIPT_AUTH_BACKEND":"kv-oauth"}',
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
   });

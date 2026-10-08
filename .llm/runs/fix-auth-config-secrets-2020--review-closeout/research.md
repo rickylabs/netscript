@@ -1,0 +1,5 @@
+# Research
+PR #2085 has five unanswered review threads at the original head. Current main has generated documentation conflicts only; take main and regenerate prose/assets/publish bundles, stage then run freshness checks. The failed quality job is 37699615958: aspire-version-parity fails only manifest freshness.
+MCP find_guidance and search_docs queried for auth dotenv/Aspire configuration before implementing. Existing auth security tests exercise real POSIX sourcing and generation; runtime scripts launch Aspire as child processes.
+Doctrine: CLI archetype 6, current verdict Keep; docs overlay. Preserve kernel/surface split and existing pure helpers. No new public exports, dependencies, ports or slow types. CLI export metadata and module documentation inspected under jsr-audit rubric; planned changes retain signatures and publish filters.
+Claims: JSON.stringify leaves U+2028/U+2029 in comments; quote scanner has no comment state; assignment regex dot misses CR; restart eval lacks env-file; recipe starts Aspire before auth configuration. Add behavioral reproductions before judging/fixing each.

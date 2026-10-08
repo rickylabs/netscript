@@ -1,0 +1,117 @@
+# Worklog
+
+## Phases
+
+| Phase | Status | Evidence |
+| --- | --- | --- |
+| Bootstrap | complete | Skills, harness workflow, gate matrix, owner authority and baseline recorded |
+| Research | complete for plan | research.md; complete live issue snapshots retained privately |
+| Plan & Design | complete | plan.md and Design below |
+| Plan-Gate | PASS | Independent GLM PLAN-EVAL at 359d17f426592d58a6f6388a9522bc3afbc45dde; plan-eval.md |
+| Implement | S1–S3 signed off | Separate implementation lane; supervisor reviews before each sign-off commit |
+| Gate | product/generated native gates and full check-test pass; inherited critical audit red | final-qualification-evidence.json; actual CI by head/merge provenance |
+| Evaluate | same-session round3 PASS at e09a5692360d7c157032e04f97b51c81d43d16f8 | evaluate.md/evaluate-round-3.md; all historical reports byte-exact |
+| Release | N/A | No merge, publication or release authorized |
+| Close | C1 acceptance complete; CI advisory remains owner blocker, no merge; later leaves pending | independent PASS and artifact-only reconciliation |
+
+## Design
+
+Public surface: opt-in contracts/commands; service/commands, commands/testing and commands/relay; database/commands, commands/testing and commands/adapters/postgres; telemetry/attributes additions; core-owned worker/saga/stream integration adapters. Existing package roots retain their export budgets. Every new public entrypoint has module docs and consumer examples.
+
+Domain vocabulary: RFC 0003 CommandJson, actor, envelope, opaque definition, codec, CommandFailure/CommandError, execution result, raw receipt/audit/outbox rows; relay claim/release and sink delivery; schema-bound worker-job/worker-task effects; atomic saga transition request and checked acceptance metadata. Finite values are named constants with derived unions.
+
+Ports: true CommandStorePort<TTx> and bound CommandTransaction<TTx>; clock/id and bounded telemetry seams; raw CommandOutboxRelayStore plus decoded CommandOutboxSink; explicit atomic saga-transition commit capability. No database port imports service values. No root client or ambient transaction participates in side-record writes.
+
+Lifecycle: command validation -> one callback -> one commit or rollback -> return; relay due -> leased -> published/retry/terminal, with compare-token settlement; stop prevents new claims and waits for in-flight work. Saga commands persist as part of a version-checked transition before relay publication. Clocks and identifiers are injected. AbortSignal crosses every async boundary.
+
+Commit slices: the ordered S1-S20 table in plan.md is the authoritative list, grouped into six leaf PRs. Each slice has files and proving gates and remains under 30 files. Each product slice gets supervisor review plus independent final per-leaf IMPL-EVAL.
+
+Deferred scope: other SQL adapters, SQLite command mode, CLI generators, generic command docs programme, queue reconciliation, product operation vocabulary, merge and release.
+
+Contributor path: start with the focused public entrypoint and README, follow domain -> ports -> application -> adapter; add provider/sink behavior through the published conformance suite rather than editing a dispatcher by sink name.
+
+## Commands and receipts
+
+- Fresh clone of the requested public repository: exit 0.
+- Read all six live issues and comments and closed prerequisites #1350/#1455: exit 0.
+- MCP find_guidance(intent): succeeded; search_docs(query): succeeded. No specific command implementation guidance was returned; accepted RFC and focused source are authoritative.
+- S1 product and mutation evidence now exists; subsequent slices remain pending.
+
+## PLAN-EVAL receipt
+
+Requested route: OpenCode Go / glm-5.3-flash / max, independent headless evaluator session. Observed model id was opencode-go/glm-5.3-flash; runtime effort was not independently attested. No fallback was used. Evaluator reviewed exact head 359d17f426592d58a6f6388a9522bc3afbc45dde and wrote plan-eval.md with PASS for all eight Plan-Gate items. This is a planning verdict only; no implementation gate is certified. The owner-required whole-chain pass releases implementation of the six leaves.
+
+Draft PR #2082 contains the bootstrap/plan commit. Research and Plan phase comments link that commit. The opening documentation labels intentionally skip scaffold/E2E and will be removed when product slices land. Initial checkout lacked git author identity; configured an agent identity locally in this clone and committed successfully; no global settings changed.
+
+Implementation lane: c1_implementation, requested gpt-6.1-sol high, separate session from supervisor. S1/S2 are substantively signed off; S3 remains pending until the S2 commit/push/comment reconciliation. No lane self-certifies.
+
+## S1 implementation evidence — supervisor signed off
+
+Implementation lane completed the locked S1 contract/error product files and real-export fixture; supervisor signed off and committed/pushed/commented 5023427004b37a561570a1a23bb4b7e21faf0c51. See [c1-implementation.md](./c1-implementation.md), [per-test mutations](./s1-mutation-evidence.json), [actual gates](./s1-gate-evidence.json) and [source hashes](./s1-source-manifest.json).
+
+| Stable S1 gate | Actual exit | Evidence |
+| --- | --- | --- |
+| Structured check / tests / lint / source fmt | 0 / 0 / 0 / 0 | Contracts check31 files; tests20 pass, including four new tests |
+| Full-map doc lint / baseline-map comparison | 1 / 1 | 17 combined upstream private-type-ref diagnostics versus baseline9; missingJSDoc0/other0 |
+| quality:scan / arch:check | 0 / 0 | Durable run-gate receipts; no new suppressions, baseline doctrine warnings |
+| Materialized contracts publish dry run | 0 | All five exports and new publish files checked; isolated slow-type analysis succeeds |
+| Four behavioral mutation controls | 1 then0 each | Each named new test fails on a production mutation, then passes after restoration |
+| Three real-export declaration mutation controls | 1 then0 each | Metadata erasure, status widening and code removal each fail the actual fixture, restored check passes |
+
+Doc diagnostics use the existing sound-oRPC-contract sanction in doctrine/02-public-surface.md; the raw nonzero exit is retained, and publish passes independently. Initial post-format fixture directive placement caused check/test failures; placement corrected and final controls/gates rerun. No evaluator verdict was written or edited by this lane.
+
+Reconcile: S1 is signed off and committed/pushed/commented; draft PR #2082/issue #1482 remain owned by the supervisor for commit, push and comment reconciliation. No GitHub mutations or commits by this lane. S2/S3 are pending and no whole-C1 completion is claimed.
+
+Supervisor substantively reviewed all S1 source and evidence; see s1-supervisor-review.md. Sign-off commit and push/comment reconciliation precede S2. No whole-leaf evaluator verdict is claimed.
+
+## S2 implementation evidence — frozen for supervisor review
+
+S1 sign-off commit is 5023427004b37a561570a1a23bb4b7e21faf0c51. Locked S2 is implemented on the separate lane; substantive sign-off remains supervisor work. See [S2 handoff](./s2-implementation.md), [actual gates](./s2-gate-evidence.json), [per-test mutations](./s2-mutation-evidence.json) and [hashes](./s2-source-manifest.json).
+
+Stable service check61files/test14/lint/fmt/full-map docs/quality/architecture, whole-map docs inventory and materialized service publish exit0. All ten new runtime groups have distinct meaningful production-mutant named exit1 then restored exit0; two production type mutants also fail the real-export fixture then restore cleanly. Contracts docs retain unchanged S1 sanctioned17 references at raw exit1, missingJSDoc0/other0. Owned initial lint/docs findings were repaired and retained honestly. Exact already-pinned dependency mappings added, resolved dependency bodies unchanged under supervisor semantic review. StandardSchema stable freshness1.1.0 matches the pin. Replay-stability and why-wrapper limitations are recorded in drift. S2 is frozen; S3 must await substantive supervisor sign-off commit/push/comment. No leaf evaluator verdict, commit or GitHub action by this lane.
+
+Supervisor S2 sign-off: see s2-supervisor-review.md. Source hashes match, independent supervisor quality/architecture receipts exit0; full affected package regressions and consumer qualification remain S3 work. No final evaluator verdict is claimed.
+
+## S3 implementation evidence — frozen for substantive review
+
+S2 sign-off is reconciled at f9d0ccc99f1ecf98de4d8778196be99b4d795c1b. Locked S3 now has complete affected-package regressions180pass; frozen check93files, lint/fmt, servicefull-mapdocs, quality/arch, whole-mapdocsdrift, rootfrozenprod-install and nativecontracts/servicepublish/pack all exit0. Contracts doclint remains unchanged sanctioned17/raw1, missingJSDoc0/other0. See [S3 handoff](./s3-implementation.md), [actual gates](./s3-gate-evidence.json), [clean consumer receipts](./s3-consumer-evidence.json), [production controls](./s3-mutation-evidence.json), [JSR audit](./s3-jsr-audit.json) and [22 C1 source hashes](./s3-source-manifest.json).
+
+One cross-package consumer test added, with meaningful named production-mutant failure1/restored0. Native emitted declaration version-widening also fails the actual negative fixture1 then restores0. Isolated consumers use only native published files and declared materialized maps, workspace:[], fresh locks then repeatedfrozenchecks with unchangedhashes. Native npm pack metadata/type-only limitation and companion declaration routing are recorded honestly. Acceptance C1 evidence boxes1–4 updated with concrete links; box5 independent IMPL-EVAL pending. S3 frozen for supervisorreview/sign-off/commit/push/comment, no self-certification or later leaves.
+
+## S3 supervisor signoff
+
+Substantive supervisor review signs off S3 qualification and acceptance evidence 1–4. All twenty-two product hashes verified; independent durable quality/architecture receipts exit 0. See s3-supervisor-review.md. Commit/push/comment reconciliation precedes opposite-family C1 IMPL-EVAL; later leaves remain pending.
+
+## C1 independent IMPL-EVAL and handoff
+
+Independent OpenCode Go / glm-5.3-flash session returned PASS and process exit 0 at exact product head `e64c841bc9c1a9f967afa357b54f454445807db8`. Requested CLI variant max; runtime effort remains unverified. Eight mutation controls were independently reproduced and remaining controls checked from actual receipts. Independent complete regressions: 180 passed, zero failed or ignored. See evaluate.md and evaluation-reconciliation.json. This artifact-only commit changes no implementation and certifies no different product head. All five C1 acceptance boxes now have concrete evidence; closing mapping, native mirror and close-gate are reconciled on PR #2082. No merge/publication performed.
+
+## C1 owned CI repair — frozen for substantive review
+
+Fresh UI frozen private-lock CI failure reproduced1 with unchanged lock, then package-owned native lock:update passed0. Only Fresh UI private lock changes outside run artifacts: two service dependency metadata entries, plus native peer identifier normalization. Complete semantic comparison preserves versions/integrities and resolved dependency bodies. All22 historical C1 product hashes and evaluate.md remain unchanged. See [repair handoff](./ci-repair.md), [actual gates](./ci-repair-gate-evidence.json), [semantic diff](./ci-repair-lock-diff.json) and [source/evaluator manifest](./ci-repair-source-manifest.json).
+
+Exact frozen CI check passes0 locally and on supervisor-verified exact Deno2.9.5, with lock hashes stable. Package lint, existing regression2tests, frozen Fresh UI tests172pass, quality/arch, nativepublish and rootfrozenprod-install all0. Direct lock-extension fmt probe selected no files/exit1; corrected explicit JSON stdin check passes0. No new tests, dependency upgrade, behavior or later-leaf product. Historical independent PASS at e64c841bc9c1a9f967afa357b54f454445807db8 retained; repaired head pending substantive supervisor signoff/commit/push/comment and same-session reevaluation. Closing claim withheld, C2 product paused. No implementation-lane self-certification or GitHub/commit/evaluator edits.
+
+## C1 CI repair supervisor signoff
+
+Substantive lock/source/evidence review signs off the owned private-lock repair. Exact CI2.9.5 frozen check and independent durable quality/architecture receipts pass; see ci-repair-supervisor-review.md. Historical evaluator is copied byte-exactly to evaluate-round-1.md. New head awaits same-session reevaluation; C2 product remains paused.
+
+## C1 same-session reevaluation PASS
+
+Independent evaluator returned PASS/process0 at repaired product head `17e9ad075e595aa591b12e3b009c6aed6c482fbf`. ExactCI2.9.5 stale1/restoredfrozen0 and native semantic dependency proof independently reproduced;172 FreshUI and2 lock regressions pass. All22 C1 product sources match round1. See current evaluate.md and preserved evaluate-round-1.md. Artifact-only reconciliation follows; no new product. Closing evidence validation and final CI are supervisor-owned; C2 S4 can begin only after prerequisite reconciliation.
+
+## C1 generated consumer CI repair — supervisor signed off
+
+Full CI revealed owned stale prose/MCP corpora; scoped checks had omitted these generated consumers. Native baseline checks reproduce1 and native refresh/freshness pass0 on exactCI2.9.5. Only three generated assets change, all6151 other tracked files unchanged. Prose changes only owned contracts/service pages and corresponding llms-full; MCP adds two command surfaces/39symbols, preserving7908 existing entries. Supervisor decoded/integrity/content audit and independent native MCP/quality/arch gates pass0. Existing safe4+6+5regressions pass; seven unchanged committed-worktree fixtures/full coreCI pending after commit. No test/tool/lock edit or bypass. See docs-repair evidence and substantive review. Historical report2 copied byte-exact; same-session third evaluation required at new qualification head, closing claim withheld.
+
+## C1 native transitive consumer repair — supervisor signed off
+
+CI confirmed the prior two corpus checks, then rejected stale CLI embedded docs. Native publish fallback similarly had stale sourceCommit. Exactly two generated copies change; all6158other tracked files remain identical. Native whole declared generated-chain inventory and independent embedded byte/provenance/MCP audit establish ownership. Native stale1/generation0/content0/publishcheck0 controls,12existing tests, specifier andCLI/MCP publish0 retained. Supervisor quality/arch0. Actual Git-diff-based barrel0 requires this supervisor commit and immediate native check; fullCI pending. Historical reports unchanged. First third-round attempt143/noverdict was interrupted after directory-moved read remained pending; same session resumes originaldirectory at completed repair.
+
+## Postcommit native generated-chain qualification
+
+Actual durable check:assets-barrel atddcd62d25253142ffa3a55b5ddb396440c1d7ffb passes0 under exactCI2.9.5 and leaves checkout clean. Receipt recorded in transitive-assets-gate-evidence.json by an artifact-only followup, no product changes. Complete generated-chain native qualification now passes locally; same-session third review/full current-head CI remain pending.
+
+## C1 third independent PASS and supervisor reconciliation
+
+Same-session GLM process0/third PASS at `e09a5692360d7c157032e04f97b51c81d43d16f8`. See evaluate.md (byte-exact historical copy evaluate-round-3.md), final-qualification-evidence.json and final-qualification-supervisor-review.md. The real CI check-test runs5437pass0fail14ignored plus6browserpass, including unchanged committed-worktree fixtures. Native generated/publication gates and code/FreshUIquality pass. Critical audit is inherited from main; scoped native fix/update probes change nothing and no broader dependency repair or waiver is introduced. Corrected two runtime labels and unsupported local2.9.7 sentence: shim actually dispatched2.9.5; direct2.9.7gzip-only variance is recorded. All product unchanged, no new tests needed for artifact accuracy correction. Supervisor commits/pushes/comments this reconciliation before C2 prerequisite propagation and S5 release. No merge or publication.

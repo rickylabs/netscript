@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "qualificationHead": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+  "baselineMain": "6f6cbdf030d7595d1730272d0a74aedd66225069",
+  "productUnchanged": true,
+  "nativeRuntimeCorrection": {
+    "priorLocal297Pass": "Invalid runtime label: mise shim under CI-prefixed PATH dispatched2.9.5. Prior raw receipts retained; direct-binary evidence supersedes that qualification.",
+    "directBinaryComparison": {
+      "schemaVersion": 1,
+      "runtime295": {
+        "sourceSha256": "9e9a35f20e7aab8527d0b92c318132af0e072e18ac11558814acf4d1578b9d1d",
+        "compressedBytes": 326917,
+        "compressedSha256": "84d7a3b82c97554c389c471acd3da598122265bfa9ad454421a2c1370d633559",
+        "canonicalBytes": 2237153,
+        "canonicalSha256": "aebbefe746369e677949bf6f6c503a4168ece53a200dcd4d5a6f7292a0583781"
+      },
+      "runtime297": {
+        "sourceSha256": "89c9707b04f4831b9f4038e90e5d2f06f96b90483f2221cd85533a17a4890754",
+        "compressedBytes": 326911,
+        "compressedSha256": "a03fccedd81c8c9dd3da7fd10745eaecdff66edb35362942648c609ee18fb4e5",
+        "canonicalBytes": 2237153,
+        "canonicalSha256": "aebbefe746369e677949bf6f6c503a4168ece53a200dcd4d5a6f7292a0583781"
+      },
+      "storedAsset": {
+        "sourceSha256": "9e9a35f20e7aab8527d0b92c318132af0e072e18ac11558814acf4d1578b9d1d",
+        "compressedBytes": 326917,
+        "compressedSha256": "84d7a3b82c97554c389c471acd3da598122265bfa9ad454421a2c1370d633559",
+        "canonicalBytes": 2237153,
+        "canonicalSha256": "aebbefe746369e677949bf6f6c503a4168ece53a200dcd4d5a6f7292a0583781"
+      },
+      "canonicalJsonBytesEqual": true,
+      "direct295NativeCheckExit": 0,
+      "direct297NativeCheckExit": 1,
+      "symbols": 7947,
+      "subpaths": 277,
+      "packages": 35,
+      "publicSurfaceChanges": [],
+      "fixedPointQualification": "Current committed asset equals exact CI runtime generation. Barrel/publish metadata refresh caused no semantic corpus delta. Refreshing with 2.9.7 would replace only gzip transport and fail 2.9.5 exact-source freshness."
+    }
+  },
+  "inheritedCriticalAudit": {
+    "baselineMain": "6f6cbdf030d7595d1730272d0a74aedd66225069",
+    "c1Head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+    "package": "proxy-addr",
+    "lockedVersion": "2.0.7",
+    "patchedVersion": "2.0.8",
+    "advisory": "GHSA-jqcg-44mw-7w3h",
+    "rootAndMainProxyBodyIdentical": true,
+    "rootAndPrivateProxyBodyIdentical": true,
+    "mainRootBodyHashes": {
+      "proxy-addr@2.0.7": "3776e2aa71cfe800fcea68ff6d64eb9f12d1b2320a9f2e47d97e3303568da284",
+      "express@5.2.1": "41f91203420214a52c9fb53f3c3a47ce9e617b10050418f78f770757706474cf"
+    },
+    "dependencyChains": [
+      "@tanstack/ai-mcp@~0.3.8 -> @modelcontextprotocol/sdk@1.30.0 -> express@5.2.1 -> proxy-addr@2.0.7",
+      "@tanstack/ai-mcp@~0.3.8 -> @modelcontextprotocol/sdk@1.30.0 -> express-rate-limit@8.7.0 -> express@5.2.1 -> proxy-addr@2.0.7"
+    ],
+    "rootNativeAuditExit": 1,
+    "privateNativeAuditExit": 1,
+    "nativeWhyExit": 0,
+    "wrapperWhyQualification": "Wrapper ignores native stderr and reports false removability; native graph is authoritative. No wrapper edits."
+  },
+  "nativeNarrowFixProbes": [
+    {
+      "command": "deno audit --fix --level critical",
+      "exitCode": 1,
+      "trackedDelta": []
+    },
+    {
+      "command": "deno update --recursive --lockfile-only proxy-addr",
+      "exitCode": 0,
+      "trackedDelta": []
+    },
+    {
+      "command": "deno update --recursive --lockfile-only @tanstack/ai-mcp@0.3.8",
+      "exitCode": 0,
+      "trackedDelta": []
+    }
+  ],
+  "ci": {
+    "run": "https://github.com/rickylabs/netscript/actions/runs/37697461269",
+    "head": "e09a5692360d7c157032e04f97b51c81d43d16f8",
+    "syntheticMergeHead": "30eb2a6791ce6ca86e4c0bc4b95bc801d3907e19",
+    "coreConclusion": "failure",
+    "checkTest": {
+      "conclusion": "success",
+      "job": "https://github.com/rickylabs/netscript/actions/runs/37697461269/job/113052726477",
+      "tests": {
+        "passed": 5437,
+        "failed": 0,
+        "ignored": 14
+      },
+      "browserTests": {
+        "passed": 6,
+        "failed": 0
+      },
+      "commitDependentMcpFixtures": "Executed unchanged in actual native repository suite; not locally executed because they create temporary git worktrees."
+    },
+    "quality": {
+      "conclusion": "failure",
+      "job": "https://github.com/rickylabs/netscript/actions/runs/37697461269/job/113052726415",
+      "failedGate": "audit-critical",
+      "earlierGates": "all pass, including shared prose/MCP freshness, asset barrel, publish assets and full native publication"
+    },
+    "closeGate": "Prior run fails only two deliberately unchecked current-review/reconciliation DoD boxes; refresh after verdict/body reconciliation.",
+    "codeQuality": "success",
+    "freshUiPackageQuality": "success"
+  },
+  "ownerRemainder": "Inherited proxy-addr critical advisory blocks green full CI. No narrow native fix proven, no broader upgrade or audit waiver introduced. Review remains unmerged."
+}

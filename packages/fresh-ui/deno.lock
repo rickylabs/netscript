@@ -87,9 +87,9 @@
     "jsr:@std/text@^1.0.19": "1.0.19",
     "jsr:@std/ulid@1": "1.0.0",
     "jsr:@std/uuid@^1.0.9": "1.1.1",
-    "npm:@durable-streams/client@~0.2.6": "0.2.6",
+    "npm:@durable-streams/client@0.2.6": "0.2.6",
     "npm:@durable-streams/server@~0.3.7": "0.3.7_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
-    "npm:@durable-streams/state@~0.3.1": "0.3.1_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
+    "npm:@durable-streams/state@0.3.1": "0.3.1_@tanstack+db@0.6.17__typescript@7.0.2_typescript@7.0.2",
     "npm:@durable-streams/tanstack-ai-transport@^0.0.8": "0.0.8",
     "npm:@multiformats/base-x@^4.0.1": "4.0.1",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
@@ -3166,8 +3166,8 @@
     "process@0.11.10": {
       "integrity": "sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A=="
     },
-    "proxy-addr@2.0.7": {
-      "integrity": "sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==",
+    "proxy-addr@2.0.8": {
+      "integrity": "sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==",
       "dependencies": [
         "forwarded",
         "ipaddr.js"
@@ -3824,7 +3824,8 @@
           "jsr:@std/http@1",
           "jsr:@std/path@1",
           "jsr:@std/text@1",
-          "npm:@durable-streams/state@~0.3.1",
+          "npm:@durable-streams/client@0.2.6",
+          "npm:@durable-streams/state@0.3.1",
           "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
           "npm:@orpc/server@^1.15.0",
           "npm:@preact/signals@2.9.2",
@@ -3840,7 +3841,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/client@0.2.6",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@preact/signals@2.9.2",
             "npm:@tanstack/preact-query@^5.101.0",
             "npm:@tanstack/query-core@^5.101.0",
@@ -3954,8 +3956,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/state@~0.3.1"
+            "npm:@durable-streams/client@0.2.6",
+            "npm:@durable-streams/state@0.3.1"
           ]
         }
       },
@@ -4058,6 +4060,8 @@
       "packages/service": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/database@0.0.7",
+          "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "npm:@orpc/client@^1.15.0",
           "npm:@orpc/openapi@^1.15.0",
@@ -4119,7 +4123,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/server@^1.15.0",
             "npm:@orpc/zod@^1.15.0",
@@ -4143,8 +4147,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/client@0.2.6",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",
@@ -4167,7 +4171,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@~0.2.6",
+            "npm:@durable-streams/client@0.2.6",
             "npm:@durable-streams/server@~0.3.7",
             "npm:@orpc/server@^1.15.0"
           ]
@@ -4191,7 +4195,7 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/server@^1.15.0"
           ]
@@ -4217,8 +4221,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@durable-streams/client@~0.2.6",
-            "npm:@durable-streams/state@~0.3.1",
+            "npm:@durable-streams/client@0.2.6",
+            "npm:@durable-streams/state@0.3.1",
             "npm:@orpc/contract@^1.15.0",
             "npm:@orpc/openapi@^1.15.0",
             "npm:@orpc/server@^1.15.0",

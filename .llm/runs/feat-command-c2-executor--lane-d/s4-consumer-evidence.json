@@ -1,0 +1,247 @@
+[
+  {
+    "gate": "source-consumer",
+    "frozen": false,
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s4-source-consumer",
+      "--file",
+      "consumer.ts"
+    ],
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-source-consumer\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+  },
+  {
+    "gate": "source-consumer",
+    "frozen": true,
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s4-source-consumer",
+      "--file",
+      "consumer.ts",
+      "--deno-arg",
+      "--frozen"
+    ],
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-source-consumer\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+  },
+  {
+    "gate": "declaration-consumer",
+    "frozen": false,
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s4-declaration-consumer",
+      "--file",
+      "consumer.ts"
+    ],
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-declaration-consumer\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+  },
+  {
+    "gate": "declaration-consumer",
+    "frozen": true,
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s4-declaration-consumer",
+      "--file",
+      "consumer.ts",
+      "--deno-arg",
+      "--frozen"
+    ],
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-declaration-consumer\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+  },
+  {
+    "gate": "source-consumer-runtime",
+    "exitCode": 0,
+    "command": [
+      "deno",
+      "run",
+      "--frozen",
+      "<private-runtime>/s4-source-consumer/smoke.ts"
+    ],
+    "output": ""
+  },
+  {
+    "gate": "native-packed-type-negative",
+    "productionFile": "packages/service/src/commands/testing/memory-command-store.ts",
+    "mutatedPackExit": 0,
+    "restoredPackExit": 0,
+    "mutatedExit": 1,
+    "restoredExit": 0,
+    "diagnostic": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-declaration-consumer\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":1,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":1,\"uniqueOccurrences\":1,\"uniqueCodes\":1,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2344\",\"message\":\"Type 'true' does not satisfy the constraint 'false'.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s4-declaration-consumer/consumer.ts\",\"count\":1,\"locations\":[{\"line\":7,\"column\":41}]}]}]}",
+    "restoredSha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe"
+  },
+  {
+    "gate": "expanded-all-export-consumer-qualification",
+    "results": [
+      {
+        "gate": "source-consumer",
+        "frozen": false,
+        "exitCode": 0,
+        "command": [
+          "deno",
+          "run",
+          "--allow-read",
+          "--allow-run",
+          "<checkout>/.llm/tools/run-deno-check.ts",
+          "--cwd",
+          "<private-runtime>/s4-source-consumer",
+          "--file",
+          "consumer.ts",
+          "--file",
+          "all-exports.ts"
+        ],
+        "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-source-consumer\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+      },
+      {
+        "gate": "source-consumer",
+        "frozen": true,
+        "exitCode": 0,
+        "command": [
+          "deno",
+          "run",
+          "--allow-read",
+          "--allow-run",
+          "<checkout>/.llm/tools/run-deno-check.ts",
+          "--cwd",
+          "<private-runtime>/s4-source-consumer",
+          "--file",
+          "consumer.ts",
+          "--file",
+          "all-exports.ts",
+          "--deno-arg",
+          "--frozen"
+        ],
+        "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-source-consumer\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}"
+      },
+      {
+        "gate": "declaration-consumer",
+        "frozen": false,
+        "exitCode": 1,
+        "command": [
+          "deno",
+          "run",
+          "--allow-read",
+          "--allow-run",
+          "<checkout>/.llm/tools/run-deno-check.ts",
+          "--cwd",
+          "<private-runtime>/s4-declaration-consumer",
+          "--file",
+          "consumer.ts",
+          "--file",
+          "all-exports.ts"
+        ],
+        "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s4-declaration-consumer\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":5,\"uniqueOccurrences\":5,\"uniqueCodes\":2,\"uniquePaths\":1},\"groups\":[{\"code\":\"TS2300\",\"message\":\"Duplicate identifier 'readonly'.\",\"count\":4,\"paths\":[{\"path\":\"<private-runtime>/s4-declaration-consumer/packages/service/src/primitives/health.d.ts\",\"count\":4,\"locations\":[{\"line\":74,\"column\":3},{\"line\":84,\"column\":3},{\"line\":92,\"column\":3},{\"line\":100,\"column\":3}]}]},{\"code\":\"TS7008\",\"message\":\"Member 'readonly' implicitly has an 'any' type.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s4-declaration-consumer/packages/service/src/primitives/health.d.ts\",\"count\":1,\"locations\":[{\"line\":74,\"column\":3}]}]}]}"
+      }
+    ],
+    "sourceVerdict": "PASS",
+    "packedDeclarationVerdict": "INHERITED_BASELINE_FAILURE",
+    "originalC1EmittedHealthSha256": "e582f76b8d658a927fd4456214bd30aac620e36844b754ff03e7e9198f705ec2",
+    "currentC2EmittedHealthSha256": "e582f76b8d658a927fd4456214bd30aac620e36844b754ff03e7e9198f705ec2",
+    "explanation": "Native pack emits readonly before member JSDoc in an unchanged health factory. Expanded declaration check fails TS2300/TS7008; focused S4 declarations remain green. Supervisor prohibits unrelated health edits in S4; final S6 clean consumer gate remains open."
+  },
+  {
+    "gate": "native-publication-inventories",
+    "packages": [
+      {
+        "package": "database",
+        "sourceFiles": [
+          "README.md",
+          "adapters/mod.ts",
+          "adapters/mssql.adapter.ts",
+          "adapters/mysql.adapter.ts",
+          "adapters/postgres.adapter.ts",
+          "commands.ts",
+          "deno.json",
+          "extensions/mod.ts",
+          "extensions/sql-json.extension.ts",
+          "mod.ts",
+          "ports/command-store-capabilities.ts",
+          "ports/command-store.ts",
+          "ports/database-client.ts",
+          "ports/mod.ts",
+          "prisma-tracing.ts",
+          "scripts/fix-zod-imports.ts",
+          "scripts/generate-zod.ts",
+          "scripts/migrate.ts",
+          "scripts/mod.ts",
+          "scripts/patch-prisma-client.ts",
+          "testing/mock-database.ts",
+          "testing/mod.ts"
+        ],
+        "archiveSha256": "a687ed2d9609d2672400312a8047320e214ab68af11e3a166c30bd024045a5f6",
+        "nativePublishExit": 0,
+        "nativePackExit": 0
+      },
+      {
+        "package": "service",
+        "sourceFiles": [
+          "README.md",
+          "commands-testing.ts",
+          "commands.ts",
+          "deno.json",
+          "mod.ts",
+          "src/adapters/runtime-host-budget-timer.ts",
+          "src/auth/auth-middleware.ts",
+          "src/auth/contract-authorizer.ts",
+          "src/auth/contract-policy.ts",
+          "src/auth/hono-context.ts",
+          "src/auth/mod.ts",
+          "src/auth/options.ts",
+          "src/auth/scope-authorizer.ts",
+          "src/auth/service-auth-policy.ts",
+          "src/auth/static-credential-authenticator.ts",
+          "src/auth/trusted-header-authenticator.ts",
+          "src/auth/types.ts",
+          "src/builder/service-builder-impl.ts",
+          "src/builder/service-builder.ts",
+          "src/builder/service-listener.ts",
+          "src/builder/service-rpc.ts",
+          "src/builder/service-shutdown.ts",
+          "src/commands/application/canonical-json.ts",
+          "src/commands/application/define-command.ts",
+          "src/commands/application/json-codec.ts",
+          "src/commands/domain/codec.ts",
+          "src/commands/domain/definition.ts",
+          "src/commands/domain/failure.ts",
+          "src/commands/domain/values.ts",
+          "src/commands/testing/memory-command-store.ts",
+          "src/diagnostics/database-connectivity.ts",
+          "src/presets/define-service.ts",
+          "src/primitives/handlers.ts",
+          "src/primitives/health.ts",
+          "src/primitives/openapi.ts",
+          "src/primitives/orpc-router.ts",
+          "src/primitives/rpc-path.ts",
+          "src/primitives/scalar.generated.ts",
+          "src/runtime/runtime-host.ts",
+          "src/types.ts"
+        ],
+        "archiveSha256": "797c5c63129fa2b5d94adec661cb6302db8983e0d890d25702356cc78d93501c",
+        "nativePublishExit": 0,
+        "nativePackExit": 0
+      }
+    ]
+  }
+]

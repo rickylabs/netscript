@@ -1,0 +1,7 @@
+# C1 final qualification and substantive reconciliation
+
+Supervisor reviewed the actual same-session third PASS report, native direct-binary comparison and baseline audit ownership. The report and historical rounds remain byte-exact. Independent native CI runs the unchanged commit-dependent MCP fixtures and passes5437tests,0failed,14ignored plus6browser regressions at qualification head `e09a5692360d7c157032e04f97b51c81d43d16f8` and its recorded merge composition. All earlier quality gates pass; audit-critical remains an inherited baseline failure. Current code/FreshUI quality pass. No audit waiver or broader dependency change is introduced.
+
+The two mislabeled runtime rows and unsupported prose/supervisor claim are corrected to their actual2.9.5 runtime, retaining original exits/log hashes and explicit previous labels. Direct2.9.5MCP0/direct2.9.7MCP1 produce identical canonical bytes/all7947symbols, differing only gzip transport. All product/locks/tools/tests/generators/assets remain byte-identical to the frozen evaluated qualification head. This artifact-only reconciliation records the exact evaluated head; it does not invent another product verdict.
+
+The evaluator readout says PR draft; the live PR was already ready for review during the third round. This incidental metadata correction changes neither evidence nor independent PASS. Owner remainder: inherited critical advisory remediation and review/merge in dependency order; no merge or publication. C2 S5 can proceed after ordinary reviewed-prerequisite propagation.

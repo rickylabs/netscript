@@ -1,0 +1,202 @@
+{
+  "label": "s5",
+  "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+  "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+  "packExit": 0,
+  "records": [
+    {
+      "profile": "source",
+      "frozen": false,
+      "exitCode": 0,
+      "report": {
+        "source": {
+          "mode": "selection"
+        },
+        "command": "deno check --unstable-kv <files>",
+        "selection": {
+          "filesSelected": 3,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueCodes": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "profile": "source",
+      "frozen": true,
+      "exitCode": 0,
+      "report": {
+        "source": {
+          "mode": "selection"
+        },
+        "command": "deno check --unstable-kv --frozen <files>",
+        "selection": {
+          "filesSelected": 3,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueCodes": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "profile": "declaration",
+      "frozen": false,
+      "exitCode": 0,
+      "report": {
+        "source": {
+          "mode": "selection"
+        },
+        "command": "deno check --unstable-kv <files>",
+        "selection": {
+          "filesSelected": 3,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueCodes": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "profile": "declaration",
+      "frozen": true,
+      "exitCode": 0,
+      "report": {
+        "source": {
+          "mode": "selection"
+        },
+        "command": "deno check --unstable-kv --frozen <files>",
+        "selection": {
+          "filesSelected": 3,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueCodes": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    }
+  ],
+  "sourceHealthSha256": "1ac94a31b16498192a41f66521418613663ccef78c34b545856b80dc63bc872e",
+  "emittedHealthSha256": "3554945ac725ef04898ff8c027331cc83da65435527a4684fc35977466cf7bcd",
+  "qualification": "Workspace-empty native published source and exact native packed declarations; all eleven database and five service exports, existing mutable health API and new executor/options/result/raw provider error API. Remaining first-party dependencies use declared public registry specifiers. Internal .js type resolution uses corresponding unmodified native .d.ts files.",
+  "executionSourceRuntimeExit": 0,
+  "executionSourceRuntimeSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "publicationScope": "Native materialized publish dry-run and native pack for both packages. No remote publication or complete npm consumer certification. Generated outputs, tarballs and extracted declarations are unchanged native bytes.",
+  "nativePublication": [
+    {
+      "member": "database",
+      "publishExit": 0,
+      "packExit": 0,
+      "archiveSha256": "71adfb0f0de0b5491e781fc6f962f731417ab1182c2a6d48e2b2b1db339fe262",
+      "inventorySha256": "37e4f6278504e0117b6293d6a7599215934acf601ffc3a17c0f868fdb38c17c7",
+      "inventory": [
+        "README.md",
+        "adapters/mod.ts",
+        "adapters/mssql.adapter.ts",
+        "adapters/mysql.adapter.ts",
+        "adapters/postgres.adapter.ts",
+        "commands.ts",
+        "deno.json",
+        "extensions/mod.ts",
+        "extensions/sql-json.extension.ts",
+        "mod.ts",
+        "ports/command-store-capabilities.ts",
+        "ports/command-store-error.ts",
+        "ports/command-store.ts",
+        "ports/database-client.ts",
+        "ports/mod.ts",
+        "prisma-tracing.ts",
+        "scripts/fix-zod-imports.ts",
+        "scripts/generate-zod.ts",
+        "scripts/migrate.ts",
+        "scripts/mod.ts",
+        "scripts/patch-prisma-client.ts",
+        "testing/mock-database.ts",
+        "testing/mod.ts"
+      ],
+      "publishStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "publishStderrSha256": "371407b04ea4e1321694e633126e3a5ef8ba5a2b82e14ddb888ab678b8a20a67",
+      "packStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "packStderrSha256": "b15d7e742c183628a90acda5b09685e9192314591d16cbbf6a5256edd70a2263"
+    },
+    {
+      "member": "service",
+      "publishExit": 0,
+      "packExit": 0,
+      "archiveSha256": "22de74b07aee86bbbf0fb69bad934a72961c46a4262f365ed709351a4f27423e",
+      "inventorySha256": "9ab156ea3c2a6df43fb2fba94ada718ab878fb7a804421523abdc43e4f46155e",
+      "inventory": [
+        "README.md",
+        "commands-testing.ts",
+        "commands.ts",
+        "deno.json",
+        "mod.ts",
+        "src/adapters/runtime-host-budget-timer.ts",
+        "src/auth/auth-middleware.ts",
+        "src/auth/contract-authorizer.ts",
+        "src/auth/contract-policy.ts",
+        "src/auth/hono-context.ts",
+        "src/auth/mod.ts",
+        "src/auth/options.ts",
+        "src/auth/scope-authorizer.ts",
+        "src/auth/service-auth-policy.ts",
+        "src/auth/static-credential-authenticator.ts",
+        "src/auth/trusted-header-authenticator.ts",
+        "src/auth/types.ts",
+        "src/builder/service-builder-impl.ts",
+        "src/builder/service-builder.ts",
+        "src/builder/service-listener.ts",
+        "src/builder/service-rpc.ts",
+        "src/builder/service-shutdown.ts",
+        "src/commands/application/canonical-json.ts",
+        "src/commands/application/command-identity.ts",
+        "src/commands/application/command-record-buffer.ts",
+        "src/commands/application/create-command-executor.ts",
+        "src/commands/application/define-command.ts",
+        "src/commands/application/json-codec.ts",
+        "src/commands/domain/codec.ts",
+        "src/commands/domain/definition.ts",
+        "src/commands/domain/execution.ts",
+        "src/commands/domain/failure.ts",
+        "src/commands/domain/values.ts",
+        "src/commands/ports/executor-ports.ts",
+        "src/commands/testing/memory-command-store.ts",
+        "src/diagnostics/database-connectivity.ts",
+        "src/presets/define-service.ts",
+        "src/primitives/handlers.ts",
+        "src/primitives/health.ts",
+        "src/primitives/openapi.ts",
+        "src/primitives/orpc-router.ts",
+        "src/primitives/rpc-path.ts",
+        "src/primitives/scalar.generated.ts",
+        "src/runtime/runtime-host.ts",
+        "src/types.ts"
+      ],
+      "publishStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "publishStderrSha256": "496fdeaef19fc5619d2cfe5f35e486f5a7e22f6d1f3443d2219b4ab54596e67c",
+      "packStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "packStderrSha256": "4c2684cb6b9e76441e1ef4ddcb02ac5c2a2d45289ec868ab11c915fb0365d118"
+    }
+  ]
+}

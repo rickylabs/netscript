@@ -1,0 +1,948 @@
+{
+  "schemaVersion": 1,
+  "state": "FROZEN_FOR_SUPERVISOR_REVIEW",
+  "qualificationHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+  "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+  "allGeneratedNativeConsumersPass": true,
+  "allTrackedBytesStableDuringGeneratedChecks": true,
+  "supervisorActualPostcommitBarrel": {
+    "head": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+    "gateId": "assets-barrel",
+    "outcome": "PASS",
+    "exitCode": 0,
+    "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+    "allTrackedBytesStable": true,
+    "rawReceiptSha256": "400e48b4a07ec14e4547ebb603c76c6fd7e02c453560dc4490299a1a6c6df4dc",
+    "rawLogSha256": "d158a50b997514bbf14c6de74d81a3db6a6f73f87238c6d68db7b56317dfb2c7"
+  },
+  "historicalPrecommitBarrelExit": 1,
+  "gates": [
+    {
+      "name": "prose-freshness",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 8374,
+      "stdoutSha256": "bf5c839b062e9761257ee7b3bba9344f2daba30c25dcc210cd37bb11dcf8e2d2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 20034,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "agent-docs-prose",
+        "invocationId": "c2-final-prose-freshness",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 8292
+      },
+      "nativeReceiptSha256": "ac54f3f3a94d6d73c8f42962979de8ab45c4945b09e93d97be12e61d72d51ebf"
+    },
+    {
+      "name": "mcp-freshness",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 6936,
+      "stdoutSha256": "63a3319119f62b7900a70b0a7cfcf58345524e721fb48123c131c8ba824974ce",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1328,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "mcp-export-corpus",
+        "invocationId": "c2-final-mcp-freshness",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 6856
+      },
+      "nativeReceiptSha256": "f2dfa87e17fd0a41d90b576d05263a4e515a446d2934395b7b8700a3c77d66a8"
+    },
+    {
+      "name": "publish-assets-freshness",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 474,
+      "stdoutSha256": "ddc49b9c79bdc9335d67eb0ec3d06b83f54cf053ceb3900783783f95ba778a18",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1139,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "publish-assets",
+        "invocationId": "c2-final-publish-assets-freshness",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 395
+      },
+      "nativeReceiptSha256": "bd09f1d0f31176ae772879b4e09783026ac94e6f3e0c13aa3627dd36e4f70c03"
+    },
+    {
+      "name": "committed-assets-barrel",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 718,
+      "stdoutSha256": "6e62c584f6fe7e206dbbdf8bcf39a4f629d1fdc78b19b5cc5f686b2fdf761f03",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1507,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "assets-barrel",
+        "invocationId": "c2-final-committed-assets-barrel",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 639
+      },
+      "nativeReceiptSha256": "83ac8a0b0e42a672ea2e9830692c321522f7a6b31a535883c432af269a1b2f0a"
+    },
+    {
+      "name": "check",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 190,
+      "stdoutSha256": "ba55e7568743879dec68867813a1b29ed1dde33a4370f338ca1fd4f7c2eaeec2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 184,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "4c18d5838bd87f06a9ad68c463fbee21e9b4d44dd848acf3992486bff5d226b5",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 107,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "name": "lint",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 326,
+      "stdoutSha256": "e956efaf5c76e0bc9358ae68c457542d8f0f1bbe0b853a34b3836bc25a5809a3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 183,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "9ea047925417ac62f46218f2c58b6b4f441c4c38ff615e8d532f63e4f9dd185c",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 107,
+        "batches": 2,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 107,
+        "filesProcessed": 107,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "name": "fmt",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 161,
+      "stdoutSha256": "733b3174f53b2469db32b14c3229913db5258a3549c6122cb559e00516cf064d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 190,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "43929c231a0c96f2e64faf637865c09824cce2f9731c59335a77517c03af45dc",
+      "summary": {
+        "filesSelected": 107,
+        "batches": 2,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 107,
+        "filesProcessed": 107,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "name": "full-package-tests",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 4796,
+      "stdoutSha256": "0c49df7ba05a2cd50564aec77678f3e907f076fc25ea8c12eec7561ca30c808d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 196,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "cd36a90cf7a9b08df66c369f809f17b1a512e8101925b6f1ce77d00ef4d2ae2f",
+      "summary": {
+        "passed": 217,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 217,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "docs-database",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 1066,
+      "stdoutSha256": "354aa04a679b5de7422c6b79345314f417135bad145a726da279cbecc02ac8ad",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 3158,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "doc-lint",
+        "invocationId": "c2-final-docs-database",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 977
+      },
+      "nativeReceiptSha256": "55b22a911effa0f192f4721c674e5689aa8ede4c39f3b14b7334017c68fa6a9a",
+      "docSummary": {
+        "totalPackages": 1,
+        "totalErrors": 0,
+        "totalPrivateTypeRef": 0,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "individualAndCombined": [
+        {
+          "name": "@netscript/database",
+          "entrypointExitCodes": {
+            "./adapters/mod.ts": 0,
+            "./adapters/mssql.adapter.ts": 0,
+            "./adapters/mysql.adapter.ts": 0,
+            "./adapters/postgres.adapter.ts": 0,
+            "./commands.ts": 0,
+            "./extensions/mod.ts": 0,
+            "./mod.ts": 0,
+            "./ports/mod.ts": 0,
+            "./prisma-tracing.ts": 0,
+            "./scripts/mod.ts": 0,
+            "./testing/mod.ts": 0
+          },
+          "combinedExitCode": 0,
+          "combinedTotal": 0
+        }
+      ]
+    },
+    {
+      "name": "docs-service",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 903,
+      "stdoutSha256": "5fe479b4a2bcfa20e82aaa5ffd78167bd08c1db298e89dcb057c029e3e2346ef",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 2242,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "doc-lint",
+        "invocationId": "c2-final-docs-service",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 824
+      },
+      "nativeReceiptSha256": "90afb1f81b6c26b70257b7cad96b95e3029f5624f261471d0b6c7b6bf7b1327a",
+      "docSummary": {
+        "totalPackages": 1,
+        "totalErrors": 0,
+        "totalPrivateTypeRef": 0,
+        "totalMissingJSDoc": 0,
+        "totalOther": 0
+      },
+      "individualAndCombined": [
+        {
+          "name": "@netscript/service",
+          "entrypointExitCodes": {
+            "./commands-testing.ts": 0,
+            "./commands.ts": 0,
+            "./mod.ts": 0,
+            "./src/auth/mod.ts": 0,
+            "./src/primitives/rpc-path.ts": 0
+          },
+          "combinedExitCode": 0,
+          "combinedTotal": 0
+        }
+      ]
+    },
+    {
+      "name": "quality-scan",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 3063,
+      "stdoutSha256": "8f1bcf1a4e700cd2cdbbd8f19b2b3eee55ff97f396e53492db545448bd00407e",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 5626,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "quality-scan",
+        "invocationId": "c2-final-quality-scan",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 2976
+      },
+      "nativeReceiptSha256": "9c55548efca636da85152d2ebd609b16566c5e5c756929e034fa630bdce8ace5"
+    },
+    {
+      "name": "arch-check",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 6075,
+      "stdoutSha256": "7bb8781fefe3296c34d34fa90070f85d5c9e77304fb79fa4629fc7aa8276119b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 17972,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "arch-check",
+        "invocationId": "c2-final-arch-check",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 5985
+      },
+      "nativeReceiptSha256": "4ae842c9e4c35cb51d93e5c67e041e0f7e8ccf333dabd7e29ce5c10d0427b7e1"
+    },
+    {
+      "name": "exports-drift",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 3288,
+      "stdoutSha256": "05cd727a1f8d5511b78299c9206281b60a7a5c1260f48aa8e5f5661727a621d9",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 14479,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "exports-drift",
+        "invocationId": "c2-final-exports-drift",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 3208
+      },
+      "nativeReceiptSha256": "68baa3b0e709dce48fc6f25f0bbbc13f94f8dec1bc05ce3f1cfc71e05d24ea81"
+    },
+    {
+      "name": "jsr-specifiers",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 974,
+      "stdoutSha256": "82e1ef5bbbfdb88b942eaf10e3ed46eda60c9e4301565e04a2154d1c0d245f73",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1305,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "netscript-jsr-specifiers",
+        "invocationId": "c2-final-jsr-specifiers",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 897
+      },
+      "nativeReceiptSha256": "19451c072b94591fdf9699d4c70d0defc3af2607e1d3384d0f00d981e71c32b5"
+    },
+    {
+      "name": "audit-critical",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 473,
+      "stdoutSha256": "78bf023c2b9b41ff113fb56b0f59bd8e36ea70e46a9621daff7dcf970f4c3a77",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1039,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "audit-critical",
+        "invocationId": "c2-final-audit-critical",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 394
+      },
+      "nativeReceiptSha256": "b55261668895fa8427c9b4ca36312bae50598ae379cbee73af81002cdf10e1c9"
+    },
+    {
+      "name": "publish-cli",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 7593,
+      "stdoutSha256": "d812edd15c719f97ce8a9d36764aa9121165e0df9ebcf973e6e012a5215c3b63",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 17416,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "publish-dry-run",
+        "invocationId": "c2-final-publish-cli",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 7514
+      },
+      "nativeReceiptSha256": "d540494b4b28dbf2af0fe981cc85e984cb2cdf15f0bdb1a47df9efb4d3807117"
+    },
+    {
+      "name": "publish-mcp",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 3137,
+      "stdoutSha256": "f7229fe41acf224434dad99cbb7ba4b00f274f552a06cc0c6a7c30abd2e60387",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 14683,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "nativeReceipt": {
+        "gateId": "publish-dry-run",
+        "invocationId": "c2-final-publish-mcp",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "actualGitHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "durationMs": 3048
+      },
+      "nativeReceiptSha256": "02bb72dec39636581196d7e1d0d1f72238a2ac7a2bcbf3579ee5ac81e5c0f417"
+    },
+    {
+      "name": "audit-database",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 239,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)"
+    },
+    {
+      "name": "audit-service",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 333,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)"
+    },
+    {
+      "name": "audit-cli",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 828,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)"
+    },
+    {
+      "name": "audit-mcp",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 236,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 0,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)"
+    },
+    {
+      "name": "docs-links",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 187,
+      "stdoutSha256": "4872847ea9d50ec92c797d10fb43ec2df2630c33bff98663b194d2ef17c31104",
+      "stderrSha256": "a789770265a6e1c50f2b2bb2891179d218dff314fb09ea60934b9b6b0f01520e",
+      "stdoutBytes": 199,
+      "stderrBytes": 107,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)"
+    },
+    {
+      "name": "prose-regressions",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 213,
+      "stdoutSha256": "e57d3c4db992ed079fdd9fa20dce4f2e9f72da65a35fcb3f11b30224cbd318d1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 191,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "e4107831badeb268d9b34b8ef9e25f19c3a6fc79a604934402b34dc896d127be",
+      "summary": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 4,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "mcp-generator-nonworktree",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 1113,
+      "stdoutSha256": "00473abb4b857821e0f5a939801c55d6fa29af9af8d0671199014b4fe9135000",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 199,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "f0c3c57d0ae79a00b9119cd60ee9af063f40867e64cfd91afd9ddfae6aac1588",
+      "summary": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 5,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "downstream-generator-regressions",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 447,
+      "stdoutSha256": "53a5ad807ff2c15156cf2d7c9617b5ed38d476dd73ee688b403275cbcc4c5c41",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 206,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "796133b8414ae401cfb54bb799d1bb3f1dd0122edff2f654a9d60cde20f0ab2d",
+      "summary": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 8,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "downstream-consumer-regressions",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 1439,
+      "stdoutSha256": "49f9a6ce0f6888ec4d1a337c1300faf08806752a9a901ce85e6dffec2d8fb0bf",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 207,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "6aae39b57ddeb7f0dc51f7553151aeb15509b930f14f5035d074dbe37d130b05",
+      "summary": {
+        "passed": 10,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 10,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "generated-check",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 111,
+      "stdoutSha256": "f65d6ec02e82c27cffdd43aa8edf1f4418c4e0f4bcfcceafc8b1339801d96fd7",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 194,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "0dff266e6816d668052aa8204e4e0d61894c176de8cedf3344babb457c9da773",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    {
+      "name": "generated-lint",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 71,
+      "stdoutSha256": "140ab3d094550904e01d7ced7e4ba573d7e6282fcbff8737b98ec1746fa7da34",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 193,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "e413461c7e35b90abff5d4e7d887e4923e4904fab018b667cb9d6e030a77203e",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    },
+    {
+      "name": "generated-fmt",
+      "exitCode": 0,
+      "sourceHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+      "durationMs": 74,
+      "stdoutSha256": "286b0b7db956df0514e2d02519015fcab1445a79639bd2143fa77967e683d43f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 198,
+      "stderrBytes": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "reportSha256": "656ce0516a9ee1df2b0c1d473b95a56833885782f7a196bffa0524d07c453890",
+      "summary": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      },
+      "coverage": {
+        "filesSelected": 2,
+        "filesProcessed": 2,
+        "droppedFiles": [],
+        "refusals": []
+      }
+    }
+  ],
+  "affectedPackageTests": 217,
+  "existingPermittedGeneratorCliMcpTests": 27,
+  "totalTestsPassed": 244,
+  "failed": 0,
+  "packageStaticScope": 107,
+  "generatedOnlyStandaloneScope": 2,
+  "generatedOnlyStandaloneProof": {
+    "rootConfigSha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf",
+    "standaloneConfigSha256": "dda325d5e2530ca5b16f725e6a479c1d654fce80011f68eb52cbdf886933c620",
+    "selectedPaths": [
+      "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "packages/mcp/src/publish-assets.generated.ts"
+    ],
+    "selectionOnlyAdapted": true,
+    "lintRulesAndOtherOptionsExact": true,
+    "formatOptionsExact": true,
+    "noAncestorExclusionsOrExtends": true,
+    "selectedAndProcessed": 2,
+    "refusals": 0,
+    "supervisorAuthorized": true
+  },
+  "jsrAudits": [
+    {
+      "name": "@netscript/database",
+      "version": "0.0.7",
+      "auditExit": 0,
+      "slowTypesOk": true,
+      "allExports": {
+        ".": "./mod.ts",
+        "./ports": "./ports/mod.ts",
+        "./adapters": "./adapters/mod.ts",
+        "./adapters/postgres": "./adapters/postgres.adapter.ts",
+        "./adapters/mssql": "./adapters/mssql.adapter.ts",
+        "./adapters/mysql": "./adapters/mysql.adapter.ts",
+        "./extensions": "./extensions/mod.ts",
+        "./scripts": "./scripts/mod.ts",
+        "./tracing": "./prisma-tracing.ts",
+        "./testing": "./testing/mod.ts",
+        "./commands": "./commands.ts"
+      },
+      "moduleTags": {
+        ".": true,
+        "./ports": true,
+        "./adapters": true,
+        "./adapters/postgres": true,
+        "./adapters/mssql": true,
+        "./adapters/mysql": true,
+        "./extensions": true,
+        "./scripts": true,
+        "./tracing": true,
+        "./testing": true,
+        "./commands": true
+      },
+      "findings": [
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "WARN",
+          "message": "Checking for slow types in the public API..."
+        }
+      ],
+      "rawAuditSha256": "9bb9ed291404f8d1f16c86d33826d35a948bc54423cb3699de55abcec003d7fd"
+    },
+    {
+      "name": "@netscript/service",
+      "version": "0.0.7",
+      "auditExit": 0,
+      "slowTypesOk": true,
+      "allExports": {
+        ".": "./mod.ts",
+        "./auth": "./src/auth/mod.ts",
+        "./rpc-path": "./src/primitives/rpc-path.ts",
+        "./commands": "./commands.ts",
+        "./commands/testing": "./commands-testing.ts"
+      },
+      "moduleTags": {
+        ".": true,
+        "./auth": true,
+        "./rpc-path": true,
+        "./commands": true,
+        "./commands/testing": true
+      },
+      "findings": [
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "INFO",
+          "message": "Checking for slow types in the public API... \u2014 sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)"
+        }
+      ],
+      "rawAuditSha256": "193b63224470996669b3c7753abaf6947ba058a7d8467471815e1f85a7122930"
+    },
+    {
+      "name": "@netscript/cli",
+      "version": "0.0.7",
+      "auditExit": 0,
+      "slowTypesOk": true,
+      "allExports": {
+        ".": "./mod.ts",
+        "./scaffolding": "./scaffolding.ts",
+        "./testing": "./testing.ts"
+      },
+      "moduleTags": {
+        ".": true,
+        "./scaffolding": true,
+        "./testing": true
+      },
+      "findings": [
+        {
+          "gate": "F-DOCT-4 vocabulary",
+          "level": "WARN",
+          "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) \u2014 needs migration plan + debt entry",
+          "path": "src/kernel/assets/generated/aspire/helpers"
+        },
+        {
+          "gate": "F-DOCT-4 vocabulary",
+          "level": "WARN",
+          "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) \u2014 needs migration plan + debt entry",
+          "path": "src/kernel/assets/aspire/helpers"
+        },
+        {
+          "gate": "F-DOCT-4 vocabulary",
+          "level": "WARN",
+          "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) \u2014 needs migration plan + debt entry",
+          "path": "src/kernel/templates/aspire/helpers"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": ""
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 64 immediate children; doctrine cap is 12",
+          "path": "e2e/src/application/gates/scaffold"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 23 immediate children; doctrine cap is 12",
+          "path": "e2e/src/application/gates/scaffold/runtime"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 16 immediate children; doctrine cap is 12",
+          "path": "src/kernel/assets"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 16 immediate children; doctrine cap is 12",
+          "path": "src/kernel/adapters"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/kernel/adapters/database"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 22 immediate children; doctrine cap is 12",
+          "path": "src/kernel/adapters/config"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/kernel/adapters/plugin"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 15 immediate children; doctrine cap is 12",
+          "path": "src/kernel/templates/workspace"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/kernel/application/scaffold"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/kernel/application/resource-slice"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 13 immediate children; doctrine cap is 12",
+          "path": "src/kernel/domain"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 24 immediate children; doctrine cap is 12",
+          "path": "src/kernel/domain/deploy"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 16 immediate children; doctrine cap is 12",
+          "path": "src/public/features/db"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/public/features/plugins"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 15 immediate children; doctrine cap is 12",
+          "path": "src/public/features/plugins/install"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/public/features/deploy"
+        },
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "WARN",
+          "message": "Checking for slow types in the public API..."
+        }
+      ],
+      "rawAuditSha256": "ea7f03ca3e6c3f6ac3496cd36fddd905ca7377affaaeaa9773ae123f656875ea"
+    },
+    {
+      "name": "@netscript/mcp",
+      "version": "0.0.7",
+      "auditExit": 0,
+      "slowTypesOk": true,
+      "allExports": {
+        ".": "./mod.ts",
+        "./cli": "./cli.ts",
+        "./openapi-projection": "./openapi-projection.ts"
+      },
+      "moduleTags": {
+        ".": true,
+        "./cli": true,
+        "./openapi-projection": true
+      },
+      "findings": [
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 16 immediate children; doctrine cap is 12",
+          "path": "src/application/flows"
+        },
+        {
+          "gate": "F-DOCT-5 cardinality",
+          "level": "WARN",
+          "message": "directory has 14 immediate children; doctrine cap is 12",
+          "path": "src/domain"
+        },
+        {
+          "gate": "F-JSR-7 slow-types",
+          "level": "WARN",
+          "message": "Checking for slow types in the public API..."
+        }
+      ],
+      "rawAuditSha256": "e6c3e67c77acf227336c6dd660737e52f68098b911764b836fbf02deb0c4ccd4"
+    }
+  ],
+  "auditLimit": "Generic CLI/MCP audits retain vocabulary/cardinality WARNs in unchanged existing folders. These report exits0 and slowTypesOk true; no warning-free full CLI or new debt certification is claimed.",
+  "earlierMutationEvidenceRetained": {
+    "s4": "signed phase evidence unchanged",
+    "s5": "signed phase evidence unchanged",
+    "s6EvidenceSha256": "c9b4c6c8dac917176e464e0bd5ff9da74341afcdfdb5eeff74cbda24b6a77d6c",
+    "s6Controls": 20,
+    "everyS6RestoredProductionHashMatchesCompletedSource": true,
+    "rerunRequiredBecauseProductChanged": false
+  },
+  "evaluatorPreparation": {
+    "ownerAuthority": "HARNESS.md separate session and vendor family; Google fallback explicitly authorized.",
+    "primaryRoute": "Native live preflight blocked before evaluator inference; private receipt retained by supervisor.",
+    "fallbackRequested": "Google agy / gemini-3.8-flash-high, high requested; exact model confirmed by native catalog.",
+    "transportCanary": "Separate read-only transport canary returned AGY_CANARY_OK, exit0.",
+    "evaluationLaunched": false,
+    "evaluationPassClaimed": false,
+    "exactRuntimeModelOrEffortIndependentlyAttested": false,
+    "next": "Supervisor plans independent fallback evaluation after actual technical CI.",
+    "canaryMetadataSha256": "aab99a08a230527b57efda6bfd069795aab6c5a9ea2b62754a8e5e55266a2a36",
+    "canaryLogSha256": "6e3b02292cd3f95a3ea9ad92037f0b87898f0e3ca46363ac5677ad129a207397"
+  },
+  "limits": [
+    "Seven unchanged MCP worktree generator fixtures were not run locally; the complete unchanged suite remains required in actual native CI.",
+    "Actual CI, independent opposite-family IMPL-EVAL, final acceptance and ready/closing state remain pending.",
+    "No remote publication, complete npm metadata or real-provider/relay/OTel certification.",
+    "Owner final whole-chain scaffold.runtime remains after the last leaf."
+  ],
+  "sourceAssetToolLockWorkflowChanges": false,
+  "newNamedTests": 0,
+  "newMutationControlsRequired": false
+}
