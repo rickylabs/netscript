@@ -33,3 +33,8 @@ EXIT deno task gen:publish-assets 0
 EXIT deno run --no-lock --allow-read --allow-env --allow-run .llm/tools/docs/generate-export-surface-corpus.ts --check 0
 EXIT deno task check:publish-assets 0
 EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts 0
+EXIT deno task check 0
+EXIT deno task lint 0
+EXIT deno task fmt:check 0
+EXIT deno task audit:critical 0
+EXIT deno task check:review-threads -- --repo rickylabs/netscript --pr 2083 --pretty 0

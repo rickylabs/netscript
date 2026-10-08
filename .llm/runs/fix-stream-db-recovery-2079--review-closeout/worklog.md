@@ -12,9 +12,9 @@ Public surface: existing NetScriptStreamDB preload/stop/dispose/status; no new e
 4. Plan-Gate: PLAN-EVAL N/A; bounded contract-preserving review repairs, no unresolved architectural decision.
 5. Implement: S1-S4 committed and pushed after independent substantive review and per-slice gates; S5 generated corpus restoration complete.
 6. Gate: five mandatory gates PASS; package quality/architecture/consumer/publication PASS; existing doclint baseline parity proven.
-7. Evaluate: independent slice review PASS; final exact-head IMPL-EVAL pending.
+7. Evaluate: final independent IMPL-EVAL PASS at 4d6d87f8aefd462576cbf7517fe584a6762cdf47.
 8. Release: N/A (no release cut).
-9. Close: pending report, normal push, replies and resolution.
+9. Close: all four threads replied and resolved; review-thread gate PASS (4 answered, 0 unanswered). Final evidence-only push and local report complete the handoff.
 
 ## Coordinator instructions
 
@@ -71,3 +71,11 @@ Independent slice review PASS; exact S4 snapshot focused tests, quality:scan and
 ### S5 sign-off
 
 Generator --check and publish-carrier check exit 0; structured MCP check exit 0. Supervisor inspected generator-controlled provenance (35 packages, 277 subpaths, 7,949 symbols), restoring the two lifecycle exports absent from main's corpus. This slice contains generator output and evidence only. No handwritten product implementation, fresh-ui lock change, or new debt. Reconcile: S1-S4 pushed; mandatory exact-head independent evaluation follows this source-final commit.
+
+## Final qualification and close
+
+Independent same-session Google IMPL-EVAL PASS at exact source-final head 4d6d87f8aefd462576cbf7517fe584a6762cdf47. S1-S4 source snapshots and regenerated corpus hashes preserved in source-manifest.json. Final full required gates all exit 0: check (3,188 files / 27 batches), lint, fmt:check, Fresh tests (295), audit:critical. Supplemental quality, architecture, consumer, publication and corpus freshness gates pass. Documentation audit remains exactly 43 before/after diagnostics.
+
+Posted one/two-sentence evidence replies to every original thread, then resolved all four through GraphQL. check:review-threads exits 0, threads=4, unanswered=0. No operator paths, real session IDs or hostnames in new public records. Fresh-ui lock unchanged from main. No memory threshold breach; all monitored gates/evaluator processes stayed above 6 GiB available.
+
+Evaluator prose qualification recorded without changing verdict: bounded listener/request-controller counts were measured; no whole-process heap/RSS flatness claim is made. Existing AI cardinality warning is outside changed folder scope. This final commit retains only run evidence; source is identical to the exact evaluated source head. No new architecture debt, no promotion beyond this single observed integration failure.
