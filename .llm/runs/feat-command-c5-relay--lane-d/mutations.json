@@ -120,5 +120,25 @@
     "assertionFailure": true,
     "restoredByteIdentical": true,
     "sourceSha256": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6"
+  },
+  {
+    "test": "saga command sink uses checked publisher and stable outbox identity correlation and W3C",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-stable-key",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "829c673df10576fc7a5489bbacb6f0551f157f4b9f44ccf956528f567204bb25"
+  },
+  {
+    "test": "saga command sink refuses checked rejection unavailable malformed or mismatched receipt and aborted delivery",
+    "productionFile": "packages/plugin-sagas-core/src/integration/commands/saga-command-sink.ts",
+    "mutation": "saga-checked-receipt",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "829c673df10576fc7a5489bbacb6f0551f157f4b9f44ccf956528f567204bb25"
   }
 ]
