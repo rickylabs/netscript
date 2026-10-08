@@ -283,3 +283,5 @@ Resolved registry test wrapper exit 0: 10 passed, no failures/ignored. Superviso
 Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
 
 Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
+
+Canonical gen:publish-assets exit 0. Generated carrier reviewed; no hand edits.
