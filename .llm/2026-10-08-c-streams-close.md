@@ -1,0 +1,3 @@
+# Lane C stream recovery close record
+
+PR https://github.com/rickylabs/netscript/pull/2083 . Run `.llm/runs/fix-stream-db-recovery-2079--urgent-canary/`. Bounded abortable reconnect uses upstream public finite JSON sessions and acknowledged resume checkpoints without replacing collections. Real persistent upstream server kill/restart regression and matched controls pass; final independent source PASS recorded. Catalog alignment preserves existing locked compatible dependency pair. Publication/quality/carrier gates pass; documented baseline private-reference doc-lint remains red and actual critical audit requires owner maintenance. Draft retained, no merge or publication. This session record adds no runtime source change.

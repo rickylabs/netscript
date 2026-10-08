@@ -1,0 +1,13 @@
+{
+  "evaluatedHead": "4d6d87f8aefd462576cbf7517fe584a6762cdf47",
+  "exitCode": 0,
+  "durationMs": 11849,
+  "summary": {
+    "passed": 295,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 295,
+    "uniqueFailures": 0
+  },
+  "failures": []
+}

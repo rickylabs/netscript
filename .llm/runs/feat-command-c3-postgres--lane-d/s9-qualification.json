@@ -19,7 +19,7 @@
   "providerGate": "bash .llm/tools/command-postgres-conformance.sh",
   "providerExit": 0,
   "staticScopedFinalExit": 0,
-  "documentationExit": 0,
+  "documentationExit": 1,
   "nativePublishExit": 0,
   "jsrAuditExit": 0,
   "prodInstallExit": 0,
@@ -63,5 +63,6 @@
     "packages/database/tests/type-fixtures/command-transaction_type.ts": "f16690a7e4c57784878840f4af6a0206ce3279415dde15cfa3bf2adfb79061f6",
     "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts": "1407c5693338f1f3cc3b8fa1bf3913f69ef3d124ad8e12f081974475f10986c2",
     "packages/mcp/src/publish-assets.generated.ts": "818c4efee49f40f53b4e4ac5ad8650e2593a42675ba3197ae2d2ecfcaab1a7a8"
-  }
+  },
+  "documentationCorrection": "Independent reviewer verified recursive private annotation references; previous zero claim was inaccurate. Historical qualification is FAIL_FIX until repaired and independently re-evaluated."
 }

@@ -18,5 +18,20 @@ export {
 } from './src/commands/adapters/create-postgres-command-store.ts';
 export type { PostgresCommandClient } from './src/commands/ports/postgres-command-client.ts';
 
-export type { TransactionClientPort } from './ports/transaction-client.ts';
-export type { CommandStorePort } from './ports/command-store.ts';
+export type {
+  CommandReceiptRow,
+  CommandStoreCapabilities,
+  CommandStorePort,
+  CommandTransaction,
+  CommandTransactionRequest,
+  DatabaseProvider,
+  IsolationLevel,
+  ReceiptClaim,
+  ReceiptClaimResult,
+  ReceiptCompletion,
+  StoredCommandAudit,
+  StoredCommandOutbox,
+  StoredCommandReceipt,
+  TransactionClientPort,
+  TransactionOptions,
+} from './commands.ts';

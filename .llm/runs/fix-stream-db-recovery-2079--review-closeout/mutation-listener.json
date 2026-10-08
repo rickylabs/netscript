@@ -1,0 +1,22 @@
+{
+  "exitCode": 1,
+  "durationMs": 1288,
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Retained abort listeners grew to 2.",
+      "count": 1,
+      "tests": [
+        {
+          "name": "StreamDB recovery keeps listener and controller counts flat across batches and timeouts"
+        }
+      ]
+    }
+  ]
+}
