@@ -101,13 +101,20 @@ export function createStreamDBRecoveryAdapter(
       }
     }
 
-    async function connect(): Promise<StreamResponse<TJson>> {
+    async function connect(): Promise<{ session: StreamResponse<TJson>; release(): void }> {
       while (true) {
         signal.throwIfAborted();
+        const attempt = new AbortController();
+        const abort = () => attempt.abort(signal.reason);
+        signal.addEventListener('abort', abort, { once: true });
+        const release = () => {
+          signal.removeEventListener('abort', abort);
+          attempt.abort();
+        };
         try {
           const session = await native.stream<TJson>({
             ...readOptions,
-            signal,
+            signal: attempt.signal,
             offset: state.offset,
             live: false,
             params: {
@@ -119,8 +126,9 @@ export function createStreamDBRecoveryAdapter(
           // Native closed may settle before consumption. Observe its rejection
           // without using it to decide whether a batch was parsed or committed.
           void session.closed.catch(() => {});
-          return session;
+          return { session, release };
         } catch (error) {
+          release();
           await retry(error);
         }
       }
@@ -138,7 +146,8 @@ export function createStreamDBRecoveryAdapter(
     function subscribeJson<T = TJson>(subscriber: (batch: JsonBatch<T>) => void | Promise<void>) {
       if (subscribed) throw new TypeError('StreamDB read already has a subscriber.');
       subscribed = true;
-      let session = first;
+      let current = first;
+      let session = current.session;
       async function consume(): Promise<void> {
         while (!signal.aborted) {
           let subscriberFailed = false;
@@ -177,8 +186,10 @@ export function createStreamDBRecoveryAdapter(
             await retry(error);
           } finally {
             session.cancel();
+            current.release();
           }
-          session = await connect();
+          current = await connect();
+          session = current.session;
         }
         state.status = 'stopped';
       }
@@ -187,10 +198,11 @@ export function createStreamDBRecoveryAdapter(
         lifetime.abort();
         state.status = 'stopped';
         session.cancel();
+        current.release();
       };
     }
 
-    return new Proxy(first, {
+    return new Proxy(first.session, {
       get(target, key) {
         if (key === 'closed') return closed;
         if (key === 'subscribeJson') return subscribeJson;
