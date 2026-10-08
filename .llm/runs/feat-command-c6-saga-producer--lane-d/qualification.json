@@ -142,8 +142,8 @@
     "environment": "Real owned provider containers; scoped transport forwarding, no mock services",
     "inputContinuity": "Runtime started at 2bfab9551; subsequent changes only public prose/run records/derived doc assets, never producer/store/worker/test/lock bytes. Final source head 25fc8a046; final native CI still required."
   },
-  "nativeCurrentHeadCI": "PENDING",
-  "independentEvaluation": "PENDING; genuine GLM provider_rate_limited; fresh Google fallback available",
+  "nativeCurrentHeadCI": "PENDING current repaired-head zero-failure native suite",
+  "independentEvaluation": "Round1 FAIL_FIX on 5d96eae8722c708371529ae3b89a243a91e86c2a; repaired, round2 pending in same native Google context; max3",
   "release": "N/A; no merge/publication requested; C5 prerequisite not yet landed",
   "providerMigrationDigests": {
     "packages/plugin-sagas-core/tests/fixtures/transition-store/command-replay-migration.sql": "00390bc18d0ecdb13a6e98908bd6d7cd931dad9fd62d7eaa3b125b9565820db8",
@@ -165,5 +165,28 @@
     "fallbackCanaryExit": 0,
     "context": "fresh C6 native context, independent of generator and earlier leaves",
     "reviewRoundsMaximum": 3
+  },
+  "repair": {
+    "inputHead": "2026303db",
+    "focusedPackagedRegistryAndAtomicSuite": {
+      "exit": 0
+    },
+    "redBeforeProduction": {
+      "exit": 1,
+      "namedAssertion": true
+    },
+    "mutationProofRows": 32,
+    "newNamedTests": 17,
+    "additionalExistingConsumerRegression": 1,
+    "nativeProviderExit": 0,
+    "staticQualityLintFormatExit": 0,
+    "localFullSuite": {
+      "exit": 1,
+      "passed": 5570,
+      "failed": 15,
+      "ignored": 22,
+      "classification": "unchanged executable temporary script/username/temporary worktree fixture prerequisites; configured native CI required, not relabeled green"
+    },
+    "fourPinnedGenerationExit": 0
   }
 }
