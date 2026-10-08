@@ -45,10 +45,59 @@
     "scope": "Preliminary full runtime; native exact final-head runtime currency remains required."
   },
   "freshUiConsumerRepair": "consumer-lock-review.json; native frozen check and existing lock-failure regressions pass.",
-  "nativeFinalHeadCI": "Pending current-head qualification. Close-gate intentionally remains pending independent PASS and live acceptance evidence.",
-  "independentEvaluation": "Pending authorized separate native Google fallback after live primary rate-limit refusal.",
+  "nativeFinalHeadCI": {
+    "productHead": "a2af12d90f569786f3668e35ad87a8527531f9a2",
+    "functionalJobsPassed": true,
+    "coreRun": "https://github.com/rickylabs/netscript/actions/runs/37802737351",
+    "runtimeRun": "https://github.com/rickylabs/netscript/actions/runs/37802737178",
+    "postgresConformanceRun": "https://github.com/rickylabs/netscript/actions/runs/37802737385",
+    "freshUiRun": "https://github.com/rickylabs/netscript/actions/runs/37802737163",
+    "closeGate": "Pending live acceptance closure; no release gate success inferred."
+  },
+  "independentEvaluation": {
+    "round": 1,
+    "verdict": "PASS",
+    "productHead": "a2af12d90f569786f3668e35ad87a8527531f9a2",
+    "generatorFamily": "OpenAI",
+    "evaluatorFamily": "Google",
+    "requestedFallbackModel": "gemini-3.8-flash-high",
+    "observedModel": "gemini-3.8-flash",
+    "primaryUnavailableBeforeInference": "provider_rate_limited",
+    "nativeRoute": "Separate native agy session; run-owned private receipt retained.",
+    "record": "evaluate.md"
+  },
   "actualGateInputRootLockSha256": "93397c7ea38687d15248b2a47d19daccdb6e5ad9284165c60e055fed9c6e4aa6",
   "canonicalFrozenProductionInstallExit": 0,
   "canonicalRootMatchesRetainedActualGateInput": true,
-  "consumerLockScopeCorrection": "Four declared imports only; prior manual member-range overrun corrected natively before independent review. Both workspace snapshots agree."
+  "consumerLockScopeCorrection": "Four declared imports only; prior manual member-range overrun corrected natively before independent review. Both workspace snapshots agree.",
+  "evaluatedProductHead": "a2af12d90f569786f3668e35ad87a8527531f9a2",
+  "nativeFullRuntime": [
+    {
+      "productHead": "a2af12d90f569786f3668e35ad87a8527531f9a2",
+      "provider": "PostgreSQL",
+      "summary": {
+        "passed": 104,
+        "failed": 0,
+        "skipped": 0
+      },
+      "rawReportSha256": "c4a01fb6c5643a2e228ad8e368b75b17963dcf7486eb45f0d229130fd4e11a05",
+      "runUrl": "https://github.com/rickylabs/netscript/actions/runs/37802737178"
+    },
+    {
+      "productHead": "a2af12d90f569786f3668e35ad87a8527531f9a2",
+      "provider": "SQLite",
+      "summary": {
+        "passed": 99,
+        "failed": 0,
+        "skipped": 0
+      },
+      "rawReportSha256": "a54a89d563366801226112387d26f97f0e1254a1e7f2bdf253e512f6f7eb0a2a",
+      "runUrl": "https://github.com/rickylabs/netscript/actions/runs/37802737178"
+    }
+  ],
+  "artifactOnlyFollowup": {
+    "trackedNonRunFiles": 4736,
+    "allBytesIdentical": true,
+    "noProductTestToolLockWorkflowOrGeneratedChanges": true
+  }
 }
