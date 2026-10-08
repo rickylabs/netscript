@@ -70,7 +70,7 @@ decisions remain locked, and no further PLAN-EVAL will run.
 | Consolidation            | Native Claude Code · Opus 5 · high           | `de518f07-68e0-4f77-9cb5-e59dc3e81ebc` | R1–R10 resolved; 11,205-word compact RFC committed and pushed as `5dfc4e8eb`.                     |
 | Root review              | Codex supervisor · personal full read        | `019ffbc7-133b-7852-905d-53a163fe9819` | `PASS_TO_FOCUSED_REVIEW`; Qwen 3.8 Max is next, but final acceptance has not been granted.        |
 | Qwen focused review      | OpenRouter · `qwen/qwen3.8-max` · max        | `3d1277dd-be6a-44af-9e98-4560d8aaf1b7` | Commit `5dfc4e8eb`; 2,181 words, no edits, `PASS_WITH_CHANGES`; QF-01–QF-05 open.                 |
-| Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `ses_003644aeaffeSm3UCAW9xUqRIK`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers.  |
+| Grok whole-RFC review    | OpenCode/OpenRouter · `x-ai/grok-4.6` · high | `<redacted-session-id>`       | Commit `5dfc4e8eb`, blob `f46040d8...`; no subagents/edits; `PASS_WITH_REFINEMENTS`, 0 blockers.  |
 | Author/editor checkpoint | Native Claude Code · Opus 5 · high           | completed session recorded in worklog  | Root corrections applied and pushed as `ad8effff9`; no later Opus use.                            |
 | Root semantic closure    | Codex supervisor + existing non-Claude lanes | current root session                   | TypeScript/API, JSR, and architecture verdicts `PASS`; pushed as `d28d8e779`.                     |
 | Final evaluator/refiner  | Native Claude Code · Fable 5 · high          | `3517a6d2-b0b5-47ec-a207-b3533657a90c` | Starting commit `a7a6887c2`; verdict **`PASS`**; one example refinement; gate `cc90ead70` pushed. |
@@ -132,7 +132,7 @@ descriptor couples both evidence tracks to canonical runtime snapshot identities
   and run it after the focused Qwen review. That Grok route completed; the later planned Fable route
   was temporarily cancelled, then explicitly reinstated once and completed at `cc90ead70`.
 - The completed Grok route requested and observed `x-ai/grok-4.6`, variant `high`, session
-  `ses_003644aeaffeSm3UCAW9xUqRIK`, with no subagents and no edits. It evaluated RFC commit
+  `<redacted-session-id>`, with no subagents and no edits. It evaluated RFC commit
   `5dfc4e8eb` / blob `f46040d8...` at HEAD `be83301c6` and returned `PASS_WITH_REFINEMENTS` with
   zero blockers.
 - Qwen integration-risk launch evidence: OpenRouter evaluator guard requested `qwen/qwen3.8-max` at

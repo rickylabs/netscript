@@ -1,6 +1,6 @@
 # Browser-repair-eval — remote-session--1383 (post-PASS gate repair)
 
-- Evaluator session: Muse Spark, same independent session as PLAN-EVAL/IMPL-EVAL (`ses_f82065586ffeLljGd8IO7l8SLt`), 2026-09-08. Generator: Astra medium. Route: `matrix-browser-repair-review.json`, `implementation_evaluation` tier `complex`, `muse_spark_1_3@max` — independent family/session preserved.
+- Evaluator session: Muse Spark, same independent session as PLAN-EVAL/IMPL-EVAL (`<redacted-session-id>`), 2026-09-08. Generator: Astra medium. Route: `matrix-browser-repair-review.json`, `implementation_evaluation` tier `complex`, `muse_spark_1_3@max` — independent family/session preserved.
 - Delta reviewed: `75d0e0475..9ef919aa1` — `2af28ec17` (Aspire surface manifest +2 rows, gate fixture only) and `9ef919aa1` (reference-probe browser-selector reuse + empty-override regression test). Prior `impl-eval.md` PASS preserved verbatim below; this file is additive.
 - Compliance: read-only review. No product edits, commits, releases, AppHost starts, or resource mutation. Re-ran focused wrappers with an owned `TMPDIR`; removed it afterwards. No global system edits. Full runtime/CI remains coordinator-owned, not claimed.
 

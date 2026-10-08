@@ -24,7 +24,7 @@ Recorded before any mutation from `$CLAUDE_JOB_DIR/state.json`
 | Field                 | Observed                                                                                                                               |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | sessionId             | `99fea668-e784-4438-a529-a72044913932`                                                                                                 |
-| bridgeSessionId       | `cse_01NVjLWd1SSvj1fAsUn17Eoh` (non-empty)                                                                                             |
+| bridgeSessionId       | `<redacted-session-id>` (non-empty)                                                                                             |
 | backend               | `daemon`                                                                                                                               |
 | respawnFlags          | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1663 IMPL-EVAL" --model claude-fable-5` |
 | providerEnv           | `{}`                                                                                                                                   |

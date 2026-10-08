@@ -1,0 +1,57 @@
+{
+  "slice": "S5",
+  "verdict": "SUPERVISOR_APPROVED",
+  "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+  "qualificationSourceAggregateSha256": "e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e",
+  "frozenSliceFilesBeforeSupervisor": 24,
+  "finalSliceFiles": 26,
+  "packageDocsFiles": 15,
+  "freezeVerification": {
+    "observedAt": "2026-10-07T23:41:42.624054+00:00",
+    "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+    "freezeRecordSha256": "12d7aa654aeaecc026eeac47d68594c58084b2998a8ebe246b9495a1038367d1",
+    "changedFiles": 24,
+    "packageDocsFiles": 15,
+    "rawEvidenceFilesVerified": 158,
+    "allSourceAndUnchangedHashesVerified": true,
+    "mutants": 18,
+    "newNamedTests": 14,
+    "allMutantsAssertionFailuresAndByteRestoredPassesVerified": true,
+    "allFinalGateOutputAndNativeReceiptHashesVerified": true,
+    "allConsumerExitsZero": true,
+    "rootManifestsAndLocksUnchanged": true,
+    "publicOperationalPathsAndTokensAbsent": true,
+    "sourceAggregateSha256": "e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e"
+  },
+  "finalSupervisorGates": {
+    "observedAt": "2026-10-07T23:42:05.277531+00:00",
+    "sourceAggregateSha256": "e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e",
+    "freezeRecordSha256": "12d7aa654aeaecc026eeac47d68594c58084b2998a8ebe246b9495a1038367d1",
+    "sourceStableThroughout": true,
+    "finalServiceManifestSha256": "7760bbe80aa295ab0ab60428b0a1b7a9a928e8637212c610601440624168f272",
+    "supersedesProvisionalPreManifestSupervisorReceipts": true,
+    "gates": [
+      {
+        "gate": "quality-scan",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+        "invocationId": "c2-s5-final-supervisor-quality-scan",
+        "rawLogSha256": "32124a37c98220722ef07490d585720acfab999b0d4affac7818d866cda3c5d9",
+        "rawReceiptSha256": "21e7d576edb799e582fc740c23157dfce44baec011aee8a7e130633f49a80e73"
+      },
+      {
+        "gate": "arch-check",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+        "invocationId": "c2-s5-final-supervisor-arch-check",
+        "rawLogSha256": "4993002224999944bb843230311c70e88f5254d7cce52efb30dcc04b5489c53a",
+        "rawReceiptSha256": "e462ada8b4cf5587448a6e41727cbfe12c407097b40872aca6aeafcddce78261"
+      }
+    ]
+  },
+  "independentLeafImplEval": "Required after S6 and final qualification; not claimed by supervisor signoff"
+}

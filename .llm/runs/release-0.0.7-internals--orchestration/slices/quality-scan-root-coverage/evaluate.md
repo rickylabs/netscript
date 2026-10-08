@@ -18,7 +18,7 @@
 | Field             | Value                                                                                                                                 |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Session ID        | `ee2825f2-a67f-4d65-8c7f-b1956f695ded`                                                                                                |
-| `bridgeSessionId` | `cse_01CiPTc5FQJLqr1JLGZZD3Hx` (`bridgeOutboundOnly: false`)                                                                          |
+| `bridgeSessionId` | `<redacted-session-id>` (`bridgeOutboundOnly: false`)                                                                          |
 | `daemonShort`     | `ee2825f2`                                                                                                                            |
 | PID               | `268042`                                                                                                                              |
 | cwd               | `/home/codex/repos/netscript-007-quality-root-coverage`                                                                               |

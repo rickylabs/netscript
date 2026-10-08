@@ -118,7 +118,7 @@ hand-rolled demo. Fixing only C … will not hold on the next lane."
 
 **Identity & transport** (`workflow-builder-.../MEASUREMENTS.md` §"Treatment and route"): route
 `openrouter/moonshotai/kimi-k3`, variant `max`, native Moonshot only, `allow_fallbacks:false`,
-output cap 16,384, OpenCode session `ses_02a153e8bfferwYM1Qu2umGukP`. Supervisor: Codex thread
+output cap 16,384, OpenCode session `<redacted-session-id>`. Supervisor: Codex thread
 `019fd5f0-a8fe-7400-a77a-938d9798dc4b`, `gpt-5.6-sol` medium, `approvalPolicy=Never`,
 `sandbox=DangerFullAccess` (`SUPERVISOR-HANDOFF-UPDATE.md`).
 
@@ -233,7 +233,7 @@ accounting (`MEASUREMENTS.md`).
 ### R3 — Billing Run ("Closebook") / Grok 4.5 high / canary.16
 
 **Identity & transport** (`billing-run-.../MEASUREMENTS.md` §"Treatment identity"): builder
-`openrouter/x-ai/grok-4.5` variant `high`, session `ses_0227c7a7dffevb0iYUvHk44ZZf`, bypass/full
+`openrouter/x-ai/grok-4.5` variant `high`, session `<redacted-session-id>`, bypass/full
 access, fallbacks disabled. Framework exact `0.0.5-canary.16`. **Formal separate-session evaluator:
 `deepseek/deepseek-v4-flash-0731` max**, session `c3219139-5707-4011-9c68-664df10e57e5`. Supervisor
 thread `019fdd7d-4aa7-7fb2-8704-520556b0a60f` (`README.md`).

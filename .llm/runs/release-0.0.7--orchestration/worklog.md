@@ -780,7 +780,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   zero failed in about 319 seconds; sign-off comment `5301628196`. The first Fable availability
   probe `e58c5f01` failed before inference with null tokens and no mutation, so it consumes zero
   evaluation cycles. The established native Opus 5/medium Remote Control fallback is active as
-  evaluator `740d2a3a-1677-459c-a6b1-a39398649d1a`, bridge `cse_01NVeBmZE7SwH3Nvu3ep51zV`, against
+  evaluator `740d2a3a-1677-459c-a6b1-a39398649d1a`, bridge `<redacted-session-id>`, against
   immutable head `f46d84630`.
 - Fixes #1661 IMPL-EVAL cycle 1 returned immutable pushed `FAIL_FIX` at `8d6b4726c`. Blocking F-1
   proves the registration startup signal was captured by every later registered tool call; the
@@ -802,7 +802,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   head `df0534416`; topic checkpoint `a6cb21f02` is pushed.
 - Per-topic evaluator serialization permits fixes and internals gates concurrently. The coordinator
   granted #1661 IMPL-EVAL cycle 2 and recorded fresh Fable 5/medium Remote Control evaluator
-  `eb7149da-1689-44af-970e-ddd6e78022fa`, bridge `cse_01CaAEKsH35CP2QgfNUVdXK1`, immutable source
+  `eb7149da-1689-44af-970e-ddd6e78022fa`, bridge `<redacted-session-id>`, immutable source
   `df0534416`, before any evaluator artifact mutation. The next fixes leaf remains queued.
 - Features #1293 S2 passed independent Tier-A at `47ad48c9d`: predicate coverage, notifier
   choke-point placement, duplicate-notification risk, raw `executeScript` rejection, callback
@@ -840,12 +840,12 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   only and must stop before implementation or either declared expensive gate.
 - Internals #1663 stopped clean at plan head `72d5aca66`, covering exactly six proposed
   product/config paths. Fresh Fable 5/medium Remote Control PLAN-EVAL
-  `9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be`, bridge `cse_0176qkbF4eKUt7TxJiEPdTrk`, is active on that
+  `9078ecb6-e8b3-4d4f-b85c-cb28a1cb34be`, bridge `<redacted-session-id>`, is active on that
   immutable head.
 - #1661 restored both optional TanStack computed specifiers in one file at `45aca4adc`; Tier-A
   `de8944011` independently passed the previous CLI failure, package publish proof, and the full
   repository suite (4152 passed, 0 failed, 19 ignored). Fresh proportionate evaluator
-  `8a0ff845-1d0a-43d6-ae3c-03b4158f7943`, bridge `cse_013K3BZ2ydVkYzXt6vgcxTJX`, is active.
+  `8a0ff845-1d0a-43d6-ae3c-03b4158f7943`, bridge `<redacted-session-id>`, is active.
 - #1663's first probe used invalid token `fable-5` from `/tmp` without Remote Control and failed
   before inference; a premature Opus fallback was stopped before repository mutation. The corrected
   canonical `claude-fable-5` launch is the only formal cycle.
@@ -888,7 +888,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   second network request plus server-confirmed DOM value, and hydration runs under one controlled
   clock. Fresh Tier-A passed at features topic `b52641ece`.
 - Granted and verified one native Fable 5/medium Remote Control PLAN-EVAL on that exact head:
-  session `176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge `cse_01TiYhwUCkdyjziEpFP3kgaS`. Neither
+  session `176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge `<redacted-session-id>`. Neither
   expensive gate is leased or running.
 - Intercepted #1663's unpushed repaired-plan commit `71e803807` because a marker under
   `doctor/broken` suppressed the whole doctor family: 115 to 110 removed the one broken fixture TS
@@ -920,14 +920,14 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 
 - #1664 cycle-2 PLAN-EVAL passed at pushed evaluator commit `c53726c69`, comment `5301997528`, under
   fresh native Fable 5/medium Remote Control session `8c756943-…`, bridge
-  `cse_01UrhsQgBYpLZWHKAhCvESi6`. Direct typed emission and both gate classes remain locked. Three
+  `<redacted-session-id>`. Direct typed emission and both gate classes remain locked. Three
   implementation constraints are carried into the first bounded author slice; neither expensive gate
   is leased or running.
 - #1663's final plan repair is clean/pushed at `df1d7a96d`: five run artifacts only. Tier-A passed
   after independently confirming the real fixture remains unformatted/unmutated, the marker is
   absent, the scratch proof selects 114 and is green, all four healthy files are observed selected,
   doctor is 4/4, and semantic/hash/negative-control restoration proofs hold. Fresh cycle-2 evaluator
-  `517ac0e7`, bridge `cse_01McQHBVtbuX4WYDsaVXEYAn`, is active on that immutable head.
+  `517ac0e7`, bridge `<redacted-session-id>`, is active on that immutable head.
 - #1665 opened draft at final handoff head `20e7aed41`, run artifacts only. Tier-A returned bounded
   `FAIL_FIX` at fixes topic `3fdf4b2c7`: define a span-time overflow deferral seam including the
   no-span composite site; stage invalidation entries so a rejected report cannot leak partial
@@ -966,7 +966,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 - Fresh Tier-A passed at fixes topic `318bd087c`, independently closing T-1 through T-4 and
   confirming exactly four declared plus five granted paths. Coordinator released one fresh native
   Fable 5/medium Remote Control PLAN-EVAL: session `0287ccbe-2740-45ee-b378-33d1c1c59429`, bridge
-  `cse_01GaNTjv6oY6MaxnKHH1ZfrB`, exact cwd and source head `ee1b44c6d`. No implementation or
+  `<redacted-session-id>`, exact cwd and source head `ee1b44c6d`. No implementation or
   expensive gate is authorized before its terminal verdict.
 
 ## 2026-08-15T11:51:00Z — #1665 implementation admitted; #1663 reaches owner boundary
@@ -1023,7 +1023,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   exact fail-loud/teardown boundaries, normalized provider-message/docs identity, mandatory-evidence
   JSDoc, exact six named red diagnostics, publish dry-run, quality, and architecture evidence. Its
   S3 Tier-A checkpoint is `aa4749da4`. One fresh native Fable 5/medium Remote Control IMPL-EVAL is
-  active as job `1fbb1c07-…`, bridge `cse_01JePyQuiERLe8GeWWKQp5wL`, bound to `9a26c107a`; evaluator
+  active as job `1fbb1c07-…`, bridge `<redacted-session-id>`, bound to `9a26c107a`; evaluator
   mutation is verdict-artifact-only.
 - #1664 S4 needed two honest stops. First, the formatter wrapper exposed a root-exclusion plus
   multi-batch interaction; the corrected CLI proof used the same neutral style in one 1000-file
@@ -1083,7 +1083,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 ## 2026-08-15T15:50:53Z — corpus fidelity passes; transitive barrel and zero-request baseline caught
 
 - #1665 repair `7549d9fc0` passed fresh fixes Tier-A at topic `7fe2f433e`. Fresh Fable 5/medium
-  Remote Control delta evaluator `08eb7184`, bridge `cse_01Jc8aRcLQFVyVWKogq6SaFC`, independently
+  Remote Control delta evaluator `08eb7184`, bridge `<redacted-session-id>`, independently
   regenerated and byte-compared the corpus, proved only query-bridge plus its aggregate changed,
   preserved the prior product verdict, and returned `PASS` at artifact head `72d57229f` with comment
   `5302983190`.
@@ -1145,7 +1145,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   `check:assets-barrel`, and `check:publish-assets` together on that immutable head in a detached
   worktree; all three exited 0 and all generators left the tree clean. Topic checkpoint `cbd32230e`
   records PASS and the honest lint coverage limits. Exactly one fresh native Fable 5/medium Remote
-  Control chain evaluator is active as `262ef8e1-…`, bridge `cse_01E3QfD1wkvb1naZKS6m7bp2`; its
+  Control chain evaluator is active as `262ef8e1-…`, bridge `<redacted-session-id>`; its
   mutation is artifact-only and readiness remains fenced until its terminal verdict.
 - #1664's cheap replay found that importing the parent runtime probe into a generated app pulls in
   parent-package import-map dependencies. The original Sol/high author widened only the internal
@@ -1217,7 +1217,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 ## 2026-08-15T16:49:14Z — #1666 enters formal plan evaluation; #1461 plan surfaces a second stale claim
 
 - Internals independently passed Tier-A on #1666 amended head `a3f6b87b5` and pushed topic
-  checkpoint `d5f5ea55a`. Separate evaluator job `68c31fcc`, bridge `cse_01DcmCJnvESF3a4nVDvUR8u8`,
+  checkpoint `d5f5ea55a`. Separate evaluator job `68c31fcc`, bridge `<redacted-session-id>`,
   is verified native Claude Fable 5/medium Remote Control and active artifact-only over that exact
   head. The rendered reference page makes the browser waiver a named risk, not evidence of absence;
   docs build/source gates remain binding and fresh-browser remains truthfully NOT_RUN.
@@ -1306,10 +1306,10 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 - #1461 T-1 repair `23db20f30` gives explicit dispositions for every matched claim on both
   authorized pages, including tutorial lines 13, 15, 32, 75, 76, 80, 94, 100, and 107. Fresh fixes
   Tier-A passed at `f71e860f9`. Separate native Fable 5/medium Remote Control evaluator job
-  `01f0eda8`, bridge `cse_01SWnk7LwvoLaamvEwR5WLfX`, is active over that immutable head.
+  `01f0eda8`, bridge `<redacted-session-id>`, is active over that immutable head.
 - #1666 cycle-2 session `580832d7...` completed re-derivation and was interrupted before writing an
   artifact. There was no verdict or mutation, so the same evaluator history resumed—rather than a
-  replacement cycle—as job `0e2d1e57`, bridge `cse_01K6SbsotG5MyjyjTd11SrfK`, still Fable 5/medium
+  replacement cycle—as job `0e2d1e57`, bridge `<redacted-session-id>`, still Fable 5/medium
   Remote Control over `80046696e`.
 - #1664 evidence head `09a771c8e` preserves the 32/1/0 result and clean host. Coordinator rejected a
   blanket pre-existing attribution based on one unchanged helper: the exact format red has twelve
@@ -1445,7 +1445,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   and audit, then run `fresh-browser` only on PASS and clean/audit again. No evaluator is
   authorized.
 - #1666 IMPL-EVAL is confirmed active as native Fable 5/medium Remote Control session
-  `3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, judging immutable
+  `3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `<redacted-session-id>`, judging immutable
   implementation `47ca22abe` plus evidence `d095c1260` artifact-only. #1669 has made exactly the
   approved one-line `!isFresh` predicate correction and continues the bounded S2 completion.
 
@@ -1746,7 +1746,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   `8c03d8629` and pass, the implementation set remains 14-of-17, and `deno.lock` is unchanged. Fresh
   internals Tier-A passed at topic `6658ad9c0`.
 - One fresh native Fable 5/medium Remote Control integration-delta evaluator is active as job
-  `be3774eb`, session `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`, over `8c03d8629` / `021c7ffc6`. The older
+  `be3774eb`, session `<redacted-session-id>`, over `8c03d8629` / `021c7ffc6`. The older
   `f281b8cf` lease was stale in the control plane and is now reconciled to its already-proven PASS
   at `0d4c82d6e`; lane-local serialization therefore remains one active evaluator, not two.
 
@@ -1797,7 +1797,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   `changed-files` invocation selected both edited paths, found zero issues, and exited 0. Focused
   tests, full drift/check/test, cascade/lock identity, and append-only evaluator history all hold.
 - One fresh separate native Fable 5/medium Remote Control delta evaluator is active as job
-  `dc433b8d`, bridge `cse_016v2se871QD9Q9Rd6YADAKC`, URL
+  `dc433b8d`, bridge `<redacted-session-id>`, URL
   `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`. State proves `bridgeOutboundOnly:false`
   and exact remote-control/model/effort flags. Readiness remains held.
 
@@ -1897,7 +1897,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
   `c7432d4c6`.
 - The one owner-authorized third and final evaluator is active as fresh native Fable 5/medium job
   `0f7c4fdf`, full session `0f7c4fdf-1023-43ce-8a4d-3c24fa16cd64`, bridge
-  `cse_012zvXzGwbKFLMTqNLRZVhBR`, URL `https://claude.ai/code/session_012zvXzGwbKFLMTqNLRZVhBR`.
+  `<redacted-session-id>`, URL `https://claude.ai/code/session_012zvXzGwbKFLMTqNLRZVhBR`.
   Daemon state proves `bridgeOutboundOnly:false` and exact model/effort/Remote Control flags. It is
   run-artifact-only; no product mutation is authorized. A terminal `FAIL_PLAN` returns to the owner
   and no fourth cycle exists.
@@ -2116,7 +2116,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 - #1709 formal PLAN-EVAL cycle 1 was dispatched through the preserved internals supervisor at topic
   checkpoint `7c164674212eeaffcc1974c11bfeceeb3d7dc7dd`. The opposite-family evaluator is native
   Claude Fable 5/medium with Remote Control, background job `1b7a1305`, session
-  `1b7a1305-a353-4c1d-a415-34ee8869ff6b`, and bridge `cse_012Nz3aE9mhoeyfaiGpKGvse` against
+  `1b7a1305-a353-4c1d-a415-34ee8869ff6b`, and bridge `<redacted-session-id>` against
   immutable source `d437db44d`. Its formatter batch-size-1 probe passed 2041/2041; the lint probe is
   still actively processing 2037 files.
 - #1112's same-author D12 amendment reached repaired head `34a6e3d9897`; a mandatory-run-artifact
@@ -2184,7 +2184,7 @@ is historical; complete inventory/DAG reconciliation before any new wave or cut.
 - Applied the narrowed evaluation policy explicitly. #1112 remains selected only because its
   published integration/generated-client architecture is complex; routine leaves will record
   `PLAN-EVAL: N/A`. Launched final cycle 2 through fresh Fable 5/medium Remote Control evaluator
-  `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `cse_01EQXNxAuAuhDuRKvGYBx5iY`, from pushed fixes
+  `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `<redacted-session-id>`, from pushed fixes
   dispatch checkpoint `4f2e263e2a663be3bdbdfeac2be736962d292d72`. No implementation/runtime lease
   was granted.
 - Reaffirmed the owner IMPL-EVAL boundary: after two consecutive terminal failures, release the

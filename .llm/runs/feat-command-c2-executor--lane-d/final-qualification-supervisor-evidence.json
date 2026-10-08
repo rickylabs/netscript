@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "state": "SUPERVISOR_APPROVED",
+  "qualificationHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+  "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "sliceFileCount": 12,
+  "newNamedTests": 0,
+  "verification": {
+    "observedAt": "2026-10-08T00:47:49.976795+00:00",
+    "qualificationHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+    "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+    "freezeRecordSha256": "e5ca4ee09e814eaac3720b9139aaa7201bdf0ed85f4ab662457485e2f2d5155f",
+    "frozenPublicFilesVerified": 10,
+    "rawEvidenceFilesVerified": 346,
+    "publicEvidenceAggregateSha256": "9a8d475f036f52132ada9dc65b2d0ced1de6bde6f865e6a07d471a4fae6deb02",
+    "unchangedNonEvidenceTrackedFiles": 6233,
+    "historicalRunBodiesVerbatim": true,
+    "allSignedProductAssetLockHashesVerified": true,
+    "all20S6MutantsMeaningfulAndRestoredSourceHashesVerified": true,
+    "actualNativeGateAndStructuredCoverageVerified": true,
+    "affectedAndPermittedTestsPassed": 244,
+    "nativeArchiveMemberBytesVerified": 133,
+    "nativePublishedSourceFilesVerified": 75,
+    "workspaceEmptyOwnLock16ExportSourceAndExactDeclarationConsumersVerified": true,
+    "nativeFullRuleStandaloneConfigVerified": true,
+    "primaryFallbackPreparationOnly": true,
+    "ciAndIndependentEvaluationPending": true
+  },
+  "freshNativeSupervisorGates": {
+    "observedAt": "2026-10-08T00:48:28.753912+00:00",
+    "qualificationHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+    "publicEvidenceAggregateSha256": "9a8d475f036f52132ada9dc65b2d0ced1de6bde6f865e6a07d471a4fae6deb02",
+    "freezeRecordSha256": "e5ca4ee09e814eaac3720b9139aaa7201bdf0ed85f4ab662457485e2f2d5155f",
+    "frozenBytesStableThroughout": true,
+    "gates": [
+      {
+        "gate": "quality-scan",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "invocationId": "c2-final-supervisor-quality-scan",
+        "rawLogSha256": "bef01818f77ff3f7919459b0d4345c9c1e770b653ac6bfae36e25cf42abd2268",
+        "rawReceiptSha256": "4d0279eed2d10304a6bd566e49814373afc881abe029d1a1489a7c3b7d461c9f"
+      },
+      {
+        "gate": "arch-check",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+        "invocationId": "c2-final-supervisor-arch-check",
+        "rawLogSha256": "807238f82fc3f50196f541d159707278e4efd4125dd98230020f03970b1193f9",
+        "rawReceiptSha256": "52aaec0b830a0a6d09a4890dcd3a27a97f1e84be5a1e1e417bb7af58d851c154"
+      }
+    ]
+  },
+  "limitations": [
+    "Executed native CI including seven unchanged temporary-worktree generator fixtures remains required.",
+    "Independent Google fallback implementation evaluation and final acceptance/ready state remain pending.",
+    "Existing unchanged CLI/MCP audit warning scopes remain disclosed; generated-only lint covers exactly two modules.",
+    "Complete npm metadata certification is not claimed.",
+    "Owner final whole-chain scaffold.runtime remains after the last leaf."
+  ]
+}

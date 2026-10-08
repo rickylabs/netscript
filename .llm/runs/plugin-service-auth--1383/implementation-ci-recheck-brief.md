@@ -1,6 +1,6 @@
 # Same-session implementation review, round3 — CI test/README repair
 
-Resume existing evaluator session ses_f8132eca6ffesLYPOVzN00L3HB. Preserve evaluate.md FAIL_DEBT and
+Resume existing evaluator session <redacted-session-id>. Preserve evaluate.md FAIL_DEBT and
 evaluate-2.md PASS. Review exact currentHEAD against34ba48245, especially the a25fc594d repair.
 Only production-adjacent differences are README examples and2 test fixture configs; verify that.
 

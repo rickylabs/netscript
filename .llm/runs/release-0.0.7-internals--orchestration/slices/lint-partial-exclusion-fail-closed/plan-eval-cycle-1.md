@@ -12,7 +12,7 @@
 | Field                    | Observed                                                                                                                                                   |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Session id               | `1b7a1305-a353-4c1d-a415-34ee8869ff6b` (`CLAUDE_CODE_SESSION_ID`; job `state.json` `sessionId` identical)                                                  |
-| bridgeSessionId          | `cse_012Nz3aE9mhoeyfaiGpKGvse` (non-empty; env `CLAUDE_CODE_BRIDGE_SESSION_ID=session_012Nz3aE9mhoeyfaiGpKGvse`)                                           |
+| bridgeSessionId          | `<redacted-session-id>` (non-empty; env `CLAUDE_CODE_BRIDGE_SESSION_ID=session_012Nz3aE9mhoeyfaiGpKGvse`)                                           |
 | Job `state.json` backend | `daemon`; `template: bg`                                                                                                                                   |
 | respawnFlags             | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1709 PLAN-EVAL" --model claude-fable-5`                     |
 | providerEnv              | `{}` — native Anthropic, no gateway                                                                                                                        |

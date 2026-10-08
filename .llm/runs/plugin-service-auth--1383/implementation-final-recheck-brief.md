@@ -1,6 +1,6 @@
 # Same-session implementation review, round 4 — final CI repairs
 
-Resume ses_f8132eca6ffesLYPOVzN00L3HB; preserve evaluate.md, evaluate-2.md and evaluate-3.md. Review current HEAD and code commit 7e5296b54 against the round3 reviewed83e6f9b60. Write evaluate-4.md with exact source, scoped verdict and evidence.
+Resume <redacted-session-id>; preserve evaluate.md, evaluate-2.md and evaluate-3.md. Review current HEAD and code commit 7e5296b54 against the round3 reviewed83e6f9b60. Write evaluate-4.md with exact source, scoped verdict and evidence.
 
 ## SKILL
 

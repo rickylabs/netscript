@@ -17,7 +17,7 @@
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Model                           | Anthropic Claude Fable 5 (`claude-fable-5`)                                                                                               |
 | Session ID                      | `517ac0e7-9951-40ec-ab48-d0175a6d7ebb`                                                                                                    |
-| `bridgeSessionId`               | `cse_01McQHBVtbuX4WYDsaVXEYAn` (Remote Control, non-empty)                                                                                |
+| `bridgeSessionId`               | `<redacted-session-id>` (Remote Control, non-empty)                                                                                |
 | Daemon short / job              | `517ac0e7` (`~/.claude/jobs/517ac0e7/state.json`, backend `daemon`)                                                                       |
 | PID                             | shell parent `795739` (`claude bg-spare`, spare claim `dc2413ce`); `state.json` carries no `pid` key                                      |
 | cwd                             | `/home/codex/repos/netscript-007-package-gate`                                                                                            |

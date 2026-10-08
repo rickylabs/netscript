@@ -1,6 +1,6 @@
 # IMPL-EVAL — remote-session--1383
 
-- Implementation evaluator session: Muse Spark (`opencode-go/muse-spark-1.3-contributor`), resumed independent session `ses_f82065586ffeLljGd8IO7l8SLt` (same session/family as PLAN-EVAL `PASS` at `4c020c538`; distinct from generator session/thread `01a07872-49d0-74e3-a8b1-a20a6e091064`), 2026-09-08
+- Implementation evaluator session: Muse Spark (`opencode-go/muse-spark-1.3-contributor`), resumed independent session `<redacted-session-id>` (same session/family as PLAN-EVAL `PASS` at `4c020c538`; distinct from generator session/thread `01a07872-49d0-74e3-a8b1-a20a6e091064`), 2026-09-08
 - Run: `remote-session--1383` (branch `feat/remote-session-authenticator`, baseline `3330d6f9c`)
 - Source reviewed: product diff `3330d6f9c..a8d0e236d` (implementation), receipts through `0be1e77ba`, HEAD `175e7748a` (run-dir only). PR #2002 reviewed by reference; no merge/publish/release performed.
 - Surface / archetype: Archetype 2 (auth-core adapter) + Archetype 5 (plugin leaf + `session()` handler); `SCOPE-service.md`

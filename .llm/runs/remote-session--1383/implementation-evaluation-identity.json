@@ -1,7 +1,7 @@
 {
   "generator": "gpt-6-astra",
   "generatorEffort": "medium",
-  "evaluatorSession": "ses_f82065586ffeLljGd8IO7l8SLt",
+  "evaluatorSession": "<redacted-session-id>",
   "requestedModel": "opencode-go/muse-spark-1.3-contributor",
   "requestedEffort": "max",
   "matrixReceipt": "matrix-implementation-evaluator.json",

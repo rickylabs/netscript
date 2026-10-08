@@ -81,7 +81,7 @@ Full scaffold.runtime42889 TERMINAL exit0:104passed0failed0skipped. Receipt s6-r
 Independent implementation evaluator LIVE40319, NEW session via AGENTIC OpenCode, fresh matrix-implementation-evaluator-launch.json selected MuseSpark1.3max independently of OpenAI implementation. Capture/tmp/cockpit-implementation-evaluator.jsonl, launchertrace implementation-evaluator-launch.jsonl, brief implementation-evaluation-brief.md. SessionID not yet emitted in terminal capture; do not invent it or restart. Output evaluate.md. Known doc-lint17vs15FAIL is explicitly in brief; no waiver. Full runtime receipt now available to reviewer. No release authorized.
 
 
-Implementation evaluator40319 TERMINAL exit0, new session ses_f8132eca6ffesLYPOVzN00L3HB.
+Implementation evaluator40319 TERMINAL exit0, new session <redacted-session-id>.
 evaluate.md verdict FAIL_DEBT at62bcb7ed1: behavior complete/correct; independently95tests and21-file
 check pass; accepts D1 service remap and SDK POST configuration. Sole finding D2 requires narrowly
 recorded debt. Coordinator accepts exactly2upstream doclint warnings, preserves rawFAIL17vs15 and
@@ -89,7 +89,7 @@ records stricter closing gate: remove both named warnings, not merely a baseline
 binding plan disposition amended; independent re-evaluation in SAMEsession required after fresh
 matrix query. No new source changes or release authority. Reviewed runtime104PASS stays valid.
 
-Implementation recheck88071 TERMINAL exit0, same session ses_f8132eca6ffesLYPOVzN00L3HB.
+Implementation recheck88071 TERMINAL exit0, same session <redacted-session-id>.
 evaluate-2.md PASS at34ba48245. Confirms no product-source drift; accepts narrow D2 debt and explicitD1
 supersede. PR ready-for-review (draftfalse), statusimpl-eval until final CI/DoD settlement.
 Next commit verdict/receipt/matrix, run native current-head CI/thread gates, complete truthfulDoD,
@@ -109,7 +109,7 @@ Full root check48693 TERMINAL exit0:3159files27batches0failed0findings; ci-full-
 Production source unchanged; a25fc594d pushed. PRstatusimpl during CIrepair, phasecomment5578294512.
 Full deno task test90237 LIVE, capture/tmp/cockpit-ci-full-tests.json (wrapper emits terminal result).
 No evaluator currently running. Next poll90237, preserve exact outcome, fresh matrix and SAMEsession
-ses_f8132eca6ffesLYPOVzN00L3HB round3 reviewing README+2fixturepostures (evaluate-3.md), then finalCI.
+<redacted-session-id> round3 reviewing README+2fixturepostures (evaluate-3.md), then finalCI.
 Prior PASS evaluate-2.md applies pre-CIrepair source; do not claim it certifies newdiff. No release.
 
 ## Owner release boundary and terminal verification — 2026-09-08

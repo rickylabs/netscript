@@ -18,7 +18,7 @@
 | Field                | Value                                                     |
 | -------------------- | --------------------------------------------------------- |
 | Claude session ID    | `2a8cf0a6-7529-4ca6-97ce-69edcca3f84d`                    |
-| Bridge session ID    | `cse_01Y48WxcCgzUAWfJmGmhBykc` (non-empty)                |
+| Bridge session ID    | `<redacted-session-id>` (non-empty)                |
 | Remote Control URL   | `https://claude.ai/code/session_01Y48WxcCgzUAWfJmGmhBykc` |
 | Remote Control state | attached; `bridgeOutboundOnly: false`                     |
 | Session PID          | `2718910` (pty host `2718869`, daemon `2429416`)          |

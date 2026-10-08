@@ -75,7 +75,7 @@ export const MCP_EMBEDDED_DOCS = [{
 export const MCP_EMBEDDED_DOCS_PROVENANCE = {
   'schemaVersion': 1,
   'frameworkVersion': '0.0.7',
-  'sourceCommit': 'a3adb0c68',
+  'sourceCommit': '9c2b9898e',
   'paths': [
     'llms.txt',
     'pages/explanation/contracts/index.md',

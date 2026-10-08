@@ -20,3 +20,10 @@ export {
 // Import them explicitly when needed:
 //   import { MssqlAdapter } from '@netscript/database/adapters/mssql';
 //   import { MysqlAdapter } from '@netscript/database/adapters/mysql';
+
+export type {
+  DatabaseAdapter,
+  DatabaseConnectionOptions,
+  DatabaseConnectionStatus,
+  DatabaseProvider,
+} from '../ports/database-client.ts';

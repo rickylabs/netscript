@@ -9,7 +9,7 @@ re-derived on a `git archive cfa055bb8` copy under `/home/codex/.claude/jobs/117
 | Field                 | Observed                                                                                                                                |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | sessionId             | `117c4b77-6f60-46db-bc60-753f376347b6`                                                                                                  |
-| bridgeSessionId       | `cse_019zkLsR33E3btXxgePrSxQH` (non-empty)                                                                                              |
+| bridgeSessionId       | `<redacted-session-id>` (non-empty)                                                                                              |
 | backend               | `daemon`                                                                                                                                |
 | respawnFlags          | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1663 DELTA-EVAL" --model claude-fable-5` |
 | providerEnv           | `{}`                                                                                                                                    |

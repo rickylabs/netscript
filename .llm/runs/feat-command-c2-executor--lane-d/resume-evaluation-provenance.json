@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS",
+  "evaluatedHead": "ee58d8276c6ff11c10552c7abbdec8618034ed81",
+  "requestedPrimary": "opencode-go/glm-5.3-flash max",
+  "primaryOutcome": "Provider limit before completed review",
+  "authorizedFallback": "agy gemini-3.8-flash-high high",
+  "runtimeModelEffort": "Requested invocation settings; not independently runtime-attested",
+  "vendorFamily": "Google, distinct from OpenAI generator",
+  "separateSession": true,
+  "sameConversationReportCorrection": true,
+  "productRepairs": false,
+  "originalReportSha256": "48a8b1c25dca92ba2cd6814a2b0c017b34d669449ace002413b9c85217a29f6a",
+  "correctedReportSha256": "ee096a702a38b81c46bc2f916fc0d44f2795e7245881f4d270659965b197109a"
+}

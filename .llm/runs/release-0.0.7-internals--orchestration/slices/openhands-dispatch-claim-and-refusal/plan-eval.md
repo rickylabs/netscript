@@ -12,7 +12,7 @@
 | Field | Value |
 | --- | --- |
 | Evaluator session ID | `7d544aec-22cc-4656-8483-6d957dbfbfda` |
-| `bridgeSessionId` | `cse_01N9zhX5ZDUvvrBxcwoAYBCm` |
+| `bridgeSessionId` | `<redacted-session-id>` |
 | PID | `360479` |
 | cwd | `/home/codex/repos/netscript-007-openhands-dispatch` |
 | Requested route | native Claude `claude-opus-5` · effort `medium` · `--remote-control` |
