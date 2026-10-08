@@ -237,3 +237,46 @@ Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
 Canonical gen:publish-assets exit 0. Generated carrier reviewed; no hand edits.
 
 Canonical gen:mcp-export-corpus exit 0. Generated carrier reviewed; no hand edits.
+
+## Gate — review repair
+Deno 2.9.5; exact-source gate reports retained privately.
+
+| Gate | Raw exit | Result |
+| --- | --- | --- |
+| check | 0 | PASS |
+| lint | 0 | PASS |
+| fmt | 0 | PASS |
+| tests | 0 | PASS |
+| quality-gate | 0 | PASS |
+| agent-docs-prose | 0 | PASS |
+| assets-barrel | 0 | PASS |
+| publish-assets | 0 | PASS |
+| mcp-export-corpus | 0 | PASS |
+| audit-fresh | 0 | PASS |
+| publish-fresh | 0 | PASS |
+| docs-fresh | 1 | Existing independently accepted baseline debt; raw failure retained |
+| audit-sdk | 0 | PASS |
+| publish-sdk | 0 | PASS |
+| docs-sdk | 1 | Existing independently accepted baseline debt; raw failure retained |
+| audit-mcp | 0 | PASS |
+| publish-mcp | 0 | PASS |
+| docs-mcp | 1 | Existing independently accepted baseline debt; raw failure retained |
+
+Owning tests: 542 passed, 0 failed, 0 ignored. Independent exact-head evaluation in progress. Release N/A; no source PR merge or publication.
+
+Additional required gates (raw evidence retained privately):
+
+| Gate | Raw exit | Result |
+| --- | --- | --- |
+| deps | 0 | PASS |
+| deps-db | 0 | PASS |
+| install-frozen | 0 | PASS |
+| ui-frozen | 0 | PASS |
+| ui-tests | 0 | PASS |
+| pr-tests | 0 | PASS |
+| owning-check | 0 | PASS |
+| streams | 0 | 15 passed/0 failed/0 ignored |
+| production-browser | 0 | 1 passed/0 failed/0 ignored |
+| carrier-tests | 0 | 21 passed/0 failed/0 ignored |
+
+Documentation debt retained under db-doc-baseline-2039 and inherited desktop/MCP baseline. Fresh combined 28 private references/17 missing docs; streams entrypoint 11 private references/0 missing docs. SDK combined 3 private references, with individual entrypoint failures unchanged. MCP combined zero but cli/mod individually 3 private references each; raw wrapper exit 1 retained. No new public source contract documentation diagnostic. JSR/publication checks remain zero. Original catalog/generator source is unchanged versus independently reviewed and CI-qualified source; final core CI remains owner qualification.
