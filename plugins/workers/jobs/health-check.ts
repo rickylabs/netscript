@@ -80,6 +80,10 @@ export type HealthCheckJobContext = Readonly<{
   id: string;
   job?: Readonly<{ id: string }>;
   payload: HealthCheckJobPayload;
+  /** Executor-owned cancellation signal. */
+  signal: AbortSignal;
+  /** Effective execution deadline in epoch milliseconds. */
+  deadlineAt?: number;
   correlationId?: string;
   traceparent?: string;
   tracestate?: string;
