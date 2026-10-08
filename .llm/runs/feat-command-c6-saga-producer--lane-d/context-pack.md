@@ -1,3 +1,5 @@
 # C6 context
 
 S15–S19 and S20a native consumer/publication input complete. Aggregate mutations.json records semantic production faults, named AssertionErrors, exact restoration/PASS. Physical native provider gate passes all C3/C6/C5 cases; actual durable worker progress/server restart and checked saga completion pass. Immutable C5 pin remains an external test prerequisite, no product copy. Full-map legacy diagnostics retained, owned new documentation graphs clean. Next: four Deno 2.9.5 generated consumers/freshness, canonical scaffold.runtime, final current-head CI, native separate-family IMPL-EVAL maximum three rounds. Final DoD/issue boxes remain unchecked; no readiness/verdict asserted. C3 coordinator-owned.
+
+First canonical runtime: 103 behavior steps PASS, final transient persistent-network cleanup FAIL. Exact-AppHost recovery EXIT 0, no owned survivors; unchanged full canonical rerun active. Native SQLite/static/desktop CI pass; PostgreSQL active. Public documentation terminology audit and docs:links pass; prose input refresh requires pinned consumer regeneration.

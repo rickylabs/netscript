@@ -193,15 +193,16 @@ limited to this protocol and does not close general Prisma idempotency parity de
 
 Migrate the shipped saga runtime/replay models and command outbox before selecting PostgreSQL.
 The host supplies the real generated interactive callback and owns resources; the database bound
-writer reuses the reviewed append SQL. No runtime DDL or new relay is added. Configure C5's worker
-sink topic map with the same selected definition id; routing is explicit host policy. C5 handles
+writer reuses the existing command-outbox append SQL. Configure the generic relay's worker
+sink topic map with the same selected definition id; routing is explicit host policy. The relay handles
 leases, bounded retries, drain, checked receipts and settlement. Delivery is at least once; one
 effective application additionally requires durable worker idempotency.
 
 The generated-client consumer example is
 `packages/plugin-sagas-core/tests/fixtures/transition-store/saga-relay-cohort.ts.template`. It uses
-the actual C5 relay/sink source pin with the current producer, native worker dispatcher, persisted
+the generic command-outbox relay and worker sink with the producer, native worker dispatcher, persisted
 Deno KV execution/applied state, first-party worker stream producer and file-backed Durable Streams
 server. Progress survives storage/server restart; completion uses `publishSagaOrThrow()`. No
-progress event is mirrored into command outbox rows. The reviewed fixture pin proves integration
-and is not a released cohort: C5 must land before publishing the producer capability.
+progress event is mirrored into command outbox rows. The example demonstrates source integration;
+deploy the capability only when the producer and its command-outbox relay prerequisites are
+available together in the application's pinned release.
