@@ -1,0 +1,12 @@
+{
+  "provider": "PostgreSQL 15.19",
+  "prisma": "7.8.0",
+  "deno": "2.9.5",
+  "case": "PostgreSQL physical commit failure rolls back all rows and preserves business error identity",
+  "mechanism": "consumer migration supplies deferred business unique constraint; callback completes but physical commit rejects duplicate rows",
+  "mutation": "commit failure mislabeled as begin",
+  "mutantExit": 1,
+  "restoredExit": 0,
+  "fullProviderExit": 0,
+  "migrationSha256": "27e03cfaa9137c518631ae130875d3914d72182eadb0d73cfbf8b17cd221499d"
+}

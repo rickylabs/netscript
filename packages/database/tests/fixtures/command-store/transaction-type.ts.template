@@ -1,0 +1,26 @@
+import type { CommandTransactionClient } from './command-store.ts';
+import { transactionClient } from './command-store.ts';
+import type { PrismaClient } from './.generated/client.ts';
+declare const root: PrismaClient;
+declare const tx: CommandTransactionClient;
+await tx.project.findMany();
+await tx.netScriptCommandReceipt.findMany();
+await tx.netScriptCommandAudit.findMany();
+await tx.netScriptCommandOutbox.findMany();
+// @ts-expect-error root connect rejected
+await tx.$connect();
+// @ts-expect-error root disconnect rejected
+await tx.$disconnect();
+// @ts-expect-error nested transaction rejected
+await tx.$transaction(async () => {});
+// @ts-expect-error root middleware rejected
+await tx.$use(() => {});
+// @ts-expect-error root extension rejected
+await tx.$extends({});
+// @ts-expect-error root event hook rejected
+await tx.$on('query', () => {});
+await transactionClient(root).$transaction(async (business) => {
+  await business.project.findMany();
+  // @ts-expect-error true callback excludes nested transaction
+  await business.$transaction(async () => {});
+});

@@ -236,6 +236,7 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
   assertEquals(workflowNames, [
     'ci.yml',
     'code-quality.yml',
+    'command-postgres.yml',
     'e2e-cli-prod-local.yml',
     'e2e-cli-prod.yml',
     'e2e-cli.yml',
@@ -263,6 +264,13 @@ Deno.test('all workflow concurrency mappings are classified and repo-wide litera
       workflow: 'ci.yml',
       scope: 'workflow',
       group: 'ci-${{ github.workflow }}-${{ github.ref }}',
+      classification: 'ref-templated',
+      cancelInProgress: true,
+    },
+    {
+      workflow: 'command-postgres.yml',
+      scope: 'workflow',
+      group: 'command-postgres-${{ github.workflow }}-${{ github.ref }}',
       classification: 'ref-templated',
       cancelInProgress: true,
     },

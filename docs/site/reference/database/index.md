@@ -200,6 +200,7 @@ documented in the sections above.
 | `@netscript/database/extensions` | `./extensions/mod.ts` | Prisma JSON serialization extensions. |
 | `@netscript/database/scripts` | `./scripts/mod.ts` | Prisma/Zod codegen and migration runners. |
 | `@netscript/database/tracing` | `./prisma-tracing.ts` | Prisma OpenTelemetry tracing helpers. |
+| `@netscript/database/commands/postgres` | `./commands-postgres.ts` | Callback-bound PostgreSQL command store. |
 | `@netscript/database/commands` | `./commands.ts` | Bound command port and logical rows. |
 | `@netscript/database/testing` | `./testing/mod.ts` | Mock adapter and shared port contract tests. |
 
@@ -221,3 +222,29 @@ terminal until rollback.
 bounded store phase/retryability, cancellation or receipt corruption. It has no dependency on
 service errors. Its JSON form omits cause, message and stack; adapters keep driver-specific codes
 and messages solely in the trusted cause and preserve arbitrary callback errors.
+
+
+### PostgreSQL command adapter
+
+`@netscript/database/commands` also exports `TransactionClientPort<TTx>`. `withTransaction`
+preserves this callback type independently of the root type without a root-client assertion.
+
+`@netscript/database/commands/postgres` exports `createPostgresCommandStore`,
+`PostgresCommandStoreOptions` and `PostgresCommandClient`. Supply the consumer's generated callback
+bridge and a finite `transactionTimeoutMs`. The consumer owns Prisma models, generated client,
+migrations and connections. The reviewed fixture in `packages/database/tests/fixtures/command-store/`
+provides the schema, SQL checks/indexes and explicit bridge; CLI generation remains RFC stage 8.
+The bridge excludes and hides nested transaction and root lifecycle methods.
+
+Every claim, completion, audit and outbox insert uses that same callback. Receipt claims use
+`ON CONFLICT DO NOTHING RETURNING` and one indexed winner read. Claim wait must be 1–60,000
+milliseconds; PostgreSQL's unbounded zero setting is refused. Successful claims restore local
+lock timeout; busy causes rollback with no later side query. A locally claimed receipt must be
+complete before commit. Serialization/deadlock failures are retryable without callback retries.
+Cooperative cancellation checks framework boundaries and the finite provider timeout bounds
+in-flight work. Raw diagnostics stay in the trusted cause.
+
+The isolated native provider command is `bash .llm/tools/command-postgres-conformance.sh`.
+Its dedicated CI workflow runs Deno 2.9.5 and exercises the real generated-client lock/fault matrix.
+A skipped provider suite is not provider conformance evidence. Package import/construction runs no
+DDL and has no queue dependency.
