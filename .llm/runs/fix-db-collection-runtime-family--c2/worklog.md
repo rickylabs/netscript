@@ -31,3 +31,31 @@ Gate `baseline-doc-sdk`: raw exit `1`. Command: `deno task doc:lint --root packa
 Gate `baseline-doc-fresh`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
 
 Phase 4 Plan-Gate complete: independent GLM max PLAN-EVAL PASS at 3ecd0c25729c5cc98dee3ebca2b9daf24781caea; mandatory hard stop satisfied before source. Refined S2-S5 authoritative. Phase 5 implementation begins after evaluator termination.
+
+Gate `db-lock`: raw exit `0`. Command: `deno cache --unstable-kv packages/sdk/mod.ts packages/fresh/src/runtime/streams/mod.ts packages/fresh/src/application/query/mod.ts`. Full raw output retained privately.
+
+Gate `db-cold-guard`: raw exit `0`. Command: `deno task deps:check:db`. Full raw output retained privately.
+
+Gate `db-policy-tests`: raw exit `0`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-db-alignment_test.ts`. Full raw output retained privately.
+
+Gate `db-policy-mutation`: raw exit `1`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-db-alignment_test.ts`. Full raw output retained privately.
+
+Gate `db-policy-restored`: raw exit `0`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-db-alignment_test.ts`. Full raw output retained privately.
+
+Gate `db-fmt-write`: raw exit `0`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/deps --include check-db-alignment* --ext ts --write`. Full raw output retained privately.
+
+Gate `db-policy-check`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/deps --include check-db-alignment --ext ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `db-policy-lint`: raw exit `2`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/deps --include check-db-alignment --ext ts`. Full raw output retained privately.
+
+Gate `db-quality`: raw exit `0`. Command: `deno task quality:gate`. Full raw output retained privately.
+
+Gate `db-policy-lint-scoped`: raw exit `1`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/deps --include check-db-alignment --ext ts --config <private-scoped-lint-config>`. Full raw output retained privately.
+
+Gate `db-policy-fmt`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/deps --include check-db-alignment --ext ts`. Full raw output retained privately.
+
+Gate `db-policy-lint-final`: raw exit `0`. Command: `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/deps --include check-db-alignment --ext ts --config <private-scoped-lint-config>`. Full raw output retained privately.
+
+Gate `db-policy-final`: raw exit `0`. Command: `deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --frozen --allow-all .llm/tools/deps/check-db-alignment_test.ts`. Full raw output retained privately.
+
+S2 substantive slice review: supported exact declarations flow through existing SDK/Fresh manifests and catalog consumers. Cold guard counts complete DB npm identities and rejects graph loader errors; Fresh-only optional peer probe remains one core without an added graph anchor. Identity-disabled mutation raw exit 1, restored regression raw exit 0. Scoped check/fmt and final scoped lint pass; initial lint all-excluded refusal preserved, followed by explicit narrow lint config (no rule exclusions); inline imports replaced by root aliases. quality:gate exit 0. Initial generated lock attempted unrelated React/use-sync-external-store peer upgrades; discarded those changes, preserving all npm and JSR package identities byte-semantically and changing only owning family specifiers/workspace declarations. Publication remains deferred, EIS application DB pins not yet removable.
