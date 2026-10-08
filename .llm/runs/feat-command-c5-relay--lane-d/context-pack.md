@@ -1,3 +1,3 @@
 # C5 context
 
-S11/S12 complete, ten named tests with semantic mutation/restored PASS. Raw physical provider and decoded lifecycle suites pass. Six service cases cover decoding, publication-before-settlement, crash/redelivery with explicit downstream idempotence, bounded retry/classification, stop/concurrency, observer privacy. Scoped gates/full docs/audits pass. PR #2096 remains draft; native current-head final qualification/evaluation pending. S13 core checked sinks next. Three round cap.
+S11/S12/S13a implemented and qualified, twelve named tests with production mutation/restoration. Worker sink checked receipt/propagation passes. New worker commands doc graph is clean; full worker graph has unchanged nine baseline combined findings proven byte-identical, not claimed green. Native provider CI passes. S13b saga and S13c stream next, then whole S14 gates/generated/full runtime and independent review (three rounds max). PR #2096 draft; no READY claim.

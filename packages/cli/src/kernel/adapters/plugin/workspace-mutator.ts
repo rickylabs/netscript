@@ -233,6 +233,10 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
     'plugin-triggers-core',
     '/telemetry',
   ),
+  '@netscript/plugin-workers-core/integration/commands': netscriptJsrSpecifier(
+    'plugin-workers-core',
+    '/integration/commands',
+  ),
   '@netscript/plugin-workers-core/executor': netscriptJsrSpecifier(
     'plugin-workers-core',
     '/executor',

@@ -173,3 +173,30 @@ and the runtime target Deno 2.9+ (Deno KV); the memory-backed defaults run with 
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Checked command relay sink
+
+`@netscript/plugin-workers-core/integration/commands` exports `createWorkerCommandOutboxSink`.
+Supply the existing explicit workers trigger client and a topic-to-branded job/task allowlist. The
+factory copies target registration, starts no resource and opens no queue. It forwards decoded
+payload, stable dedupe key, correlation and validated W3C fields. The supplied client's durable
+receipt must match job/task target, contain a nonempty bounded run identity and valid acceptedAt;
+a bare status/queue acknowledgement is refused. Only normalized identity/time reach publication
+settlement. Native worker progress remains in the execution stream, with no relay progress mirror.
+
+```ts
+import { defineJob } from '@netscript/plugin-workers-core';
+import { createWorkerCommandOutboxSink } from '@netscript/plugin-workers-core/integration/commands';
+import type { WorkerCommandClientPort, WorkerCommandTarget } from '@netscript/plugin-workers-core/integration/commands';
+const job = defineJob('send-email').entrypoint('jobs/send-email.ts').build();
+declare const workers: WorkerCommandClientPort;
+const targets = new Map<string, WorkerCommandTarget>([[job.id, { kind: 'job', id: job.id }]]);
+const sink = createWorkerCommandOutboxSink({ id: 'workers', workers, targets });
+```
+
+Worker applied keys provide at-least-once delivery with an applied-key guard window. A crash after
+an external effect and before `markApplied` can repeat that effect. One effective downstream
+application requires independently idempotent persistence; the claim/effect/mark window alone
+cannot provide it. The command relay publishes before settling, so its acceptance-to-mark crash
+also redelivers the stable key. Supplied clients own their network permissions and cancellation;
+imports/construction need none.

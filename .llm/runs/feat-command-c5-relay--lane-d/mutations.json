@@ -100,5 +100,25 @@
     "assertionFailure": true,
     "restoredByteIdentical": true,
     "sourceSha256": "303114dab177963479adba1220ea9438c495e50ddf11f431202ec40f480171d7"
+  },
+  {
+    "test": "worker command sink checks job and task acceptance and forwards stable key correlation and W3C",
+    "productionFile": "packages/plugin-workers-core/src/integration/commands/worker-command-sink.ts",
+    "mutation": "worker-stable-key",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6"
+  },
+  {
+    "test": "worker command sink refuses absent malformed mismatched or unchecked receipt and aborted delivery",
+    "productionFile": "packages/plugin-workers-core/src/integration/commands/worker-command-sink.ts",
+    "mutation": "worker-target-check",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "assertionFailure": true,
+    "restoredByteIdentical": true,
+    "sourceSha256": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6"
   }
 ]
