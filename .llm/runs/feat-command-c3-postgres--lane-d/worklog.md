@@ -65,3 +65,12 @@ Same Google fallback conversation returns PASS at exact product
 10286a1efe4d1574ad9d4b22a17f9a7082657e85. Native CLI exits 0. Round 1 and transparent correction
 retained. Final review-record follow-up changes harness artifacts only; current-head native CI and
 issue evidence/readiness are next.
+
+## Ready-state CI private lock repair
+
+Native Fresh UI quality detected stale private workspace dependency metadata: missing database
+direct driver-adapter-utils membership. Native Deno 2.9.5 lock:update produces exactly one added
+line. Semantic comparison proves all resolved versions and integrity records unchanged. Fresh UI
+frozen package check exits 0. No framework source, test, tool or generated consumer behavior
+changes. Same independent evaluator will verify this dependency-metadata delta against prior PASS;
+new current-head CI remains required.

@@ -16,3 +16,7 @@ the PostgreSQL entrypoint. The generator overlooked per-entrypoint nonzero docum
 the combined summary and incorrectly recorded zero. That historical manifest is corrected to 1;
 repairs must pass each entrypoint and a same-session independent review. Main advanced with merged
 #2085, creating only generated-carrier conflicts; ordinary merge and native regeneration follow.
+
+Ready-state CI exposed one missing private workspace dependency entry. Native lock update, semantic
+review and frozen package check repair it without dependency upgrades. Independent same-session
+delta review and current-head CI required.
