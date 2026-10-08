@@ -1,3 +1,39 @@
+# Current implementation boundary — S6 complete, frozen
+
+Only S6 was released at06cf02d75c140aa36f341ebeffed1c8e659e610e. Private per-instance seven-boundary
+construction seam, explicit testing controller/factory, generic22case conformance and finite sampled
+identity determinism are implemented and qualified. Read current worklog/context and s6 source/
+gate/consumer/mutation evidence.23files including evidence leave room for supervisor review.
+Production options/root exports/locks/C1binding are unchanged. Preserve frozen source; no commit/
+push/GitHub/evaluator or later leaf. Final clean-committed corpus/full leaf qualification remains
+a separately reviewed required follow-up after substantive S6signoff.
+
+## Previous instructions retained
+
+# Current implementation boundary — S6 complete, frozen
+
+Only S6 was released at06cf02d75c140aa36f341ebeffed1c8e659e610e. Private per-instance seven-boundary
+construction seam, explicit testing controller/factory, generic22case conformance and finite sampled
+identity determinism are implemented and qualified. Read current worklog/context and s6 source/
+gate/consumer/mutation evidence.21files including evidence leave room for supervisor review.
+Production options/root exports/locks/C1binding are unchanged. Preserve frozen source; no commit/
+push/GitHub/evaluator or later leaf. Final clean-committed corpus/full leaf qualification remains
+a separately reviewed required follow-up after substantive S6signoff.
+
+## Previous instructions retained
+
+# Current implementation boundary — S6 complete, frozen
+
+Only S6 was released at06cf02d75c140aa36f341ebeffed1c8e659e610e. Private per-instance seven-boundary
+construction seam, explicit testing controller/factory, generic22case conformance and finite sampled
+identity determinism are implemented and qualified. Read current worklog/context and s6 source/
+gate/consumer/mutation evidence.21files including evidence leave room for supervisor review.
+Production options/root exports/locks/C1binding are unchanged. Preserve frozen source; no commit/
+push/GitHub/evaluator or later leaf. Final clean-committed corpus/full leaf qualification remains
+a separately reviewed required follow-up after substantive S6signoff.
+
+## Previous instructions retained
+
 # Current implementation boundary — S5 complete, frozen
 
 Supervisor explicitly released only S5 at7dbdc612. Executor/identity/buffers and narrowly requested

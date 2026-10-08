@@ -52,3 +52,55 @@ regenerate that bundle or claim full leaf evaluation/readiness.
   not fresh C2 corpus evidence. S6 final generated-chain/full-current-consumer/evaluator bar remains
   open and unchanged. All native artifacts are retained without handpatch; no remote/npm-complete
   certification or real-provider guarantee. Source frozen; supervisor review precedes S6 release.
+
+## S6 bounded testing kit and qualification
+
+No scope expansion: only the released fault/semantic/determinism slice. The private observer type is
+application-owned and never imported from testing by production. Existing annotation dependencies
+needed focused testing type-only re-exports after actual individual doc diagnostics; final all-map
+individual and combined docs pass. Whole-chain PLAN-EVAL and historical predecessor/S4/S5 evidence
+are unchanged. The additional throwing-telemetry assertion/control qualifies inherited S5 behavior,
+not a new finisher fix. Finite semantic and identity samples make no universal purity or real-provider
+claim. Final clean-committed generated corpus/full C2 qualification and independent IMPL-EVAL stay
+required after supervisor review/signoff; no dirty-tree agent-docs generation or later leaf begun.
+
+## S6 bounded testing kit and qualification
+
+No scope expansion: only the released fault/semantic/determinism slice. Supervisor found that
+concurrent execute promises did not prove overlapping raw claims because identity hashing is async.
+The corrected case waits on the real bound second-claim invocation before releasing the leader;
+all scoped/native/runtime/consumer gates were refreshed. The active-claim suppression control fails
+the shared concurrency assertion. Transaction forwarding uses explicit bound delegates, supporting
+prototype-backed provider handles. Sequential rollback recovery is not real concurrent-provider
+certification. The private observer type is
+application-owned and never imported from testing by production. Existing annotation dependencies
+needed focused testing type-only re-exports after actual individual doc diagnostics; final all-map
+individual and combined docs pass. Whole-chain PLAN-EVAL and historical predecessor/S4/S5 evidence
+are unchanged. The additional throwing-telemetry assertion/control qualifies inherited S5 behavior,
+not a new finisher fix. Finite semantic and identity samples make no universal purity or real-provider
+claim. Final clean-committed generated corpus/full C2 qualification and independent IMPL-EVAL stay
+required after supervisor review/signoff; no dirty-tree agent-docs generation or later leaf begun.
+
+## S6 bounded testing kit and qualification
+
+Supervisor requested a narrowly reviewed traceparent HTTP field-value repair within S6. RFC9110
+section5.5 excludes CR/LF/NUL and other ASCII CTL bytes; W3C future fields remain opaque. The guard
+uses finite character-code inspection, with no lint waiver; the rejected-regex native lint1
+receipt is retained and hashed as failure history. Positive HTAB/SP/obs-text and existing
+empty tracestate cases are preserved, all32excluded bytes fail before a store call, and a predicate-
+removal mutant yields a named assertion failure. All affected/native/consumer gates were refreshed.
+No scope expansion: only the released fault/semantic/determinism slice. Supervisor found that
+concurrent execute promises did not prove overlapping raw claims because identity hashing is async.
+The corrected case waits on the real bound second-claim invocation before releasing the leader;
+all scoped/native/runtime/consumer gates were refreshed. The active-claim suppression control fails
+the shared concurrency assertion. Transaction forwarding uses explicit bound delegates, supporting
+prototype-backed provider handles. The wrapped fixture itself likewise uses explicit bound
+write/inspect/CAS/seed/outside-write delegates, preserving class/prototype methods. Sequential rollback recovery is not real concurrent-provider
+certification. The private observer type is
+application-owned and never imported from testing by production. Existing annotation dependencies
+needed focused testing type-only re-exports after actual individual doc diagnostics; final all-map
+individual and combined docs pass. Whole-chain PLAN-EVAL and historical predecessor/S4/S5 evidence
+are unchanged. The additional throwing-telemetry assertion/control qualifies inherited S5 behavior,
+not a new finisher fix. Finite semantic and identity samples make no universal purity or real-provider
+claim. Final clean-committed generated corpus/full C2 qualification and independent IMPL-EVAL stay
+required after supervisor review/signoff; no dirty-tree agent-docs generation or later leaf begun.

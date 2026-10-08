@@ -24,12 +24,21 @@ function invalid(
   throw new CommandError({ kind: 'invalid_envelope', retryable: false, reason });
 }
 
+function httpFieldValue(value: string): boolean {
+  for (let index = 0; index < value.length; index++) {
+    const code = value.charCodeAt(index);
+    if ((code < 0x20 && code !== 0x09) || code === 0x7f) return false;
+  }
+  return true;
+}
+
 function traceContext(trace: CommandTraceContext): CommandTraceContext {
   if (!trace || typeof trace !== 'object') invalid('trace_context');
   const parent = trace.traceparent;
   if (
     typeof parent !== 'string' ||
     !commandString(parent, 512) ||
+    !httpFieldValue(parent) ||
     !/^[0-9a-f]{2}-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}/.test(parent) ||
     parent.startsWith('ff-') || (parent.startsWith('00-') && parent.length !== 55) ||
     (parent.length > 55 && parent[55] !== '-') ||

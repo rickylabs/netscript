@@ -388,6 +388,8 @@ scope, selected input, actor kind/subject and expectedVersion or null. A separat
 the key. Scheme, correlation, W3C context and raw key are excluded from request material. Keys
 are 16–256 UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context
 uses W3C known-field validation, retains opaque future fields, and permits empty tracestate members.
+Traceparent rejects HTTP control bytes (including CR, LF, NUL and DEL), while preserving
+allowed HTAB, SP and opaque obs-text in unknown future fields.
 
 Defaults are 64 audit intents, 64 delivery intents and 64 KiB **aggregate** canonical side-row
 bytes, including persisted metadata. Configuration only tightens those ceilings. Each transaction
@@ -430,3 +432,34 @@ retry, and bounded timeout/cooperative cancellation revoke the transaction handl
 settles. Concurrent transactions touching disjoint rows may also conflict because the fake uses one
 revision for its complete state. Native providers require their own provider conformance. See
 `@netscript/database/commands` for the raw store contract.
+
+`createCommandFaultController()` arms one-use failures at the seven command boundaries.
+`createTestingCommandExecutor(options, controller)` runs the same executor algorithm through a
+private per-instance seam; a controller binds once and keeps only its latest 128 visits. Production
+`createCommandExecutor(options)` has no fault parameter or global hook. Precommit faults roll back
+business, receipt, audit and outbox together. `after_commit_before_return` models a lost response:
+all rows remain committed and the same-key retry replays without another handler or side record.
+
+`runCommandConformance(createFixture)` accepts a fresh `CommandConformanceFixture<TTx>` factory.
+The store and row types belong to the database package; the business handle stays generic. Supply
+bound write/CAS operations, detached committed inspection, corrupt receipt seeding and an explicit
+outside-write negative control. `createMemoryCommandConformanceFixture()` is the simulated default.
+The finite matrix covers named faults, replay/mismatch, scope/name/version changes, malformed replay,
+cancellation, CAS, callback re-entry, no retry, terminal busy, isolation, policies and ordered flush.
+It includes concurrent replay and recovery after a rolled-back leader. Replacing the fixture's bound
+write with its outside-write control must fail the same-commit assertion. Real adapters still need
+provider-specific driver, lock, timeout and pooled session qualification.
+
+```ts
+import {
+  createMemoryCommandConformanceFixture,
+  runCommandConformance,
+} from '@netscript/service/commands/testing';
+const report = await runCommandConformance(createMemoryCommandConformanceFixture);
+```
+
+`assertCommandDeterminism(definition, envelope, samples)` evaluates actual identity logic 2–32
+times (default four), each over equivalent detached deeply frozen input/actor material. It detects
+scope or fingerprint closure changes that affect sampled identity, without executing the handler
+or store. Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee;
+command authors remain responsible for excluding clocks, randomness, mutable globals and IO.

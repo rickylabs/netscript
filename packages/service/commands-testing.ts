@@ -1,8 +1,9 @@
 /**
- * In-process command store for semantic tests; provides no real database guarantees.
+ * Command fault, semantic and finite determinism fixtures; no real database certification.
  *
  * Every instance owns its state. Bound writes commit together, while explicit testing
- * controls allow corrupt fixtures and outside-transaction negative controls. No permissions.
+ * controls allow corrupt fixtures and outside-transaction negative controls. Imports and in-memory
+ * fixtures need no permissions; supplied provider operations use their own permissions.
  *
  * @example
  * ```ts
@@ -39,3 +40,57 @@ export type {
   StoredCommandReceipt,
   TransactionOptions,
 } from '@netscript/database/commands';
+
+export {
+  createCommandFaultController,
+  createTestingCommandExecutor,
+} from './src/commands/testing/command-fault-controller.ts';
+export type { CommandFaultController } from './src/commands/testing/command-fault-controller.ts';
+export type { CommandFaultBoundary } from './src/commands/application/executor-boundary.ts';
+export { assertCommandDeterminism } from './src/commands/testing/command-determinism.ts';
+export type { CommandDeterminismReport } from './src/commands/testing/command-determinism.ts';
+export { createMemoryCommandConformanceFixture } from './src/commands/testing/command-conformance-fixture.ts';
+export type {
+  CommandConformanceFixture,
+  CommandConformanceInspection,
+} from './src/commands/testing/command-conformance-fixture.ts';
+export {
+  assertCommandFaultBoundary,
+  runCommandConformance,
+} from './src/commands/testing/command-conformance.ts';
+export type {
+  CommandConformanceFactory,
+  CommandConformanceReport,
+} from './src/commands/testing/command-conformance.ts';
+export type {
+  CommandActor,
+  CommandCodec,
+  CommandDefinition,
+  CommandEnvelope,
+  CommandIdempotency,
+  CommandIdempotencyMode,
+  CommandJson,
+  CommandRecordRequirement,
+} from './commands.ts';
+export type {
+  CommandClock,
+  CommandExecution,
+  CommandExecutor,
+  CommandExecutorOptions,
+  CommandIdSource,
+  CommandRecordLimits,
+  CommandTelemetryPort,
+  CommandTelemetryResult,
+  CommandTelemetrySpan,
+  CommandTelemetryStart,
+} from './commands.ts';
+
+export type {
+  CommandContext,
+  commandDefinitionBinding,
+  commandExecutorCapability,
+  CommandFailure,
+  CommandTraceContext,
+} from './commands.ts';
+
+export type { CommandAuditInput, CommandOutboxInput } from './commands.ts';

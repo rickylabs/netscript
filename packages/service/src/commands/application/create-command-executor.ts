@@ -1,3 +1,4 @@
+import type { CommandBoundaryObserver } from './executor-boundary.ts';
 import { CommandStoreError, createCommandStoreCapabilities } from '@netscript/database/commands';
 import type { CommandStoreCapabilities, StoredCommandReceipt } from '@netscript/database/commands';
 import type { CommandDefinition } from '../domain/definition.ts';
@@ -157,6 +158,14 @@ function failed(error: unknown, keyed: boolean): CommandTelemetryResult {
 export function createCommandExecutor<TTx>(
   options: CommandExecutorOptions<TTx>,
 ): CommandExecutor<TTx> {
+  return constructCommandExecutor(options);
+}
+
+/** Internal per-instance construction seam; only the testing factory supplies an observer. */
+export function constructCommandExecutor<TTx>(
+  options: CommandExecutorOptions<TTx>,
+  boundary?: CommandBoundaryObserver,
+): CommandExecutor<TTx> {
   const store = options.store;
   const declared = capabilities(store.capabilities);
   const limits = recordLimits(options.limits);
@@ -237,6 +246,7 @@ export function createCommandExecutor<TTx>(
         let result: CommandExecution<TOutput>;
         try {
           checkpoint(signal);
+          boundary?.('before_transaction');
           const candidateId = newId();
           const createdAt = now();
           result = await store.transaction({
@@ -308,6 +318,7 @@ export function createCommandExecutor<TTx>(
                 }
                 if (!commandString(decision.receiptId)) corrupt();
                 executionId = decision.receiptId;
+                boundary?.('after_claim');
               }
               const buffers = commandRecordBuffer(command, identity.envelope, limits, now, newId);
               let value: TOutput;
@@ -328,6 +339,7 @@ export function createCommandExecutor<TTx>(
                 buffers.seal();
               }
               checkpoint(signal);
+              boundary?.('after_handler');
               const rows = buffers.rows(executionId);
               let responseJson: string;
               let decoded: TOutput;
@@ -354,8 +366,10 @@ export function createCommandExecutor<TTx>(
               const completedAt = now();
               checkpoint(signal);
               await raw('flush', () => transaction.appendAudit(rows.audit, signal));
+              boundary?.('after_audit');
               checkpoint(signal);
               await raw('flush', () => transaction.appendOutbox(rows.outbox, signal));
+              boundary?.('after_outbox');
               checkpoint(signal);
               if (identity.keyHash !== undefined) {
                 await raw('complete', () =>
@@ -363,6 +377,7 @@ export function createCommandExecutor<TTx>(
                     { receiptId: executionId, responseJson, completedAt },
                     signal,
                   ));
+                boundary?.('after_receipt_complete');
               }
               checkpoint(signal);
               counts = { auditCount: rows.audit.length, outboxCount: rows.outbox.length };
@@ -409,6 +424,7 @@ export function createCommandExecutor<TTx>(
           }
           throw error;
         }
+        boundary?.('after_commit_before_return');
         span?.finish(
           Object.freeze({ outcome: result.outcome, idempotency: result.idempotency, ...counts }),
         );

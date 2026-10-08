@@ -306,3 +306,31 @@ after rollback; arbitrary business errors retain identity. Provider failures use
 `CommandStoreError` contract. Audit, outbox and receipt completion share the winning receipt ID and
 flush in that order. Optional unkeyed attempts skip receipts. The telemetry port prepares the later
 adapter; no transport, hidden retry or production fault option is provided.
+
+### Command conformance fixtures
+
+The focused `@netscript/service/commands/testing` subpath provides an instance-bound
+`CommandFaultController`, `createTestingCommandExecutor()` and a generic
+`CommandConformanceFixture<TTx>`. Production executor options contain no fault controls. The testing
+factory uses the production algorithm and the exact seven command boundaries, including a
+postcommit response-loss boundary whose same-key retry must replay the original receipt.
+
+`runCommandConformance(createFixture)` checks atomic rollback and recovery, ordered side writes,
+replay/mismatch and namespace/version changes, corrupt replay, CAS, cancellation, busy, callback
+counts and retry refusal. `createMemoryCommandConformanceFixture()` supplies a simulated fixture.
+An outside-transaction business write is an explicit negative control: the shared suite must detect
+its surviving effect after rollback. Database-owned store/row types and the generic business handle
+allow provider adapters to supply their own inspection and fixture operations. This finite suite
+certifies no real driver, locking strategy or pooled session settings.
+
+`assertCommandDeterminism()` samples actual scope/fingerprint identity logic over equivalent frozen
+inputs and actor material, without a transaction or handler. Its bounded 2–32 samples (default four)
+can detect changing closure state in those invocations; `sampled_equivalence` is no universal purity
+proof. Supplied provider operations need their own permissions; imports and simulated fixtures do
+not.
+
+Future traceparent fields remain opaque after known W3C prefix validation, with a bounded HTTP
+field-value guard rejecting CR, LF, NUL and other ASCII control bytes except HTAB. SP, HTAB and
+obs-text remain accepted in the opaque suffix; empty tracestate positives are preserved. This follows
+[RFC9110 field values](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.5) and
+[W3C traceparent versioning](https://www.w3.org/TR/trace-context/#versioning-of-traceparent).

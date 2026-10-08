@@ -1,3 +1,110 @@
+# Current supervisor checkpoint — S6 APPROVED
+
+S6 final14-file product aggregate `d3d59597a3bcdb59a57faabc31c56ea0e6c9986f20c6cf2f6c10797239b4535c` is approved at signed S5baseline `06cf02d75c140aa36f341ebeffed1c8e659e610e`. The25-file signed slice includes23 frozen files and two supervisor review/evidence files. Root verified152raw evidence hashes,217affected tests,107-file scoped checks, native docs/publication/frozen consumers and20meaningful production controls covering all15newnamedtests. Root fresh durable quality/architecture both PASS/0; product stayed byte-identical.
+
+Commit/push/structured PR comment must precede release of ONLY the first clean-committed prose/provenance/MCP corpus qualification wave. Downstream CLI assets require that wave's separate committed signoff. Full C2 qualification, executed native CI, independent opposite-family evaluation and acceptance/ready state remain open. No C3 or later leaf released; no merge or publication.
+
+## Previous checkpoints retained
+
+# C2 current checkpoint — S6 frozen for supervisor review
+
+Only S6 is implemented at signed S5baseline `06cf02d75c140aa36f341ebeffed1c8e659e610e`.
+Fourteen package/docs files and nine run artifacts form a23file slice; two supervisor evidence files
+fit below30. Product aggregate SHA256 is `d3d59597a3bcdb59a57faabc31c56ea0e6c9986f20c6cf2f6c10797239b4535c`.
+Read s6-source-manifest.json, s6-gate-evidence.json, s6-consumer-evidence.json and
+s6-mutation-evidence.json. Exact CI Deno2.9.5: 217affectedtests0, 107filecheck/lint/fmt0;
+all five service and eleven database individual+combined doc entrypoints0; durable quality/arch/
+exports, JSR audits, native publish/pack, workspace-empty source/packed frozen consumers and
+public source execution/conformance runtime0. All15newnamedtests have20meaningful production
+controls with actual named assertion failure1 and byte-restored pass0. All20restoration hashes
+still match final production files.
+
+Supervisor review also closed a future traceparent production gap: a bounded HTTP field-value
+guard rejects CR/LF/NUL/DEL and all remaining ASCII controls except HTAB before interpreting
+known W3C fields. Opaque nonhex future fields, HTAB/SP/obs-text and empty tracestate remain valid.
+The new focused named test covers all32excluded bytes and preserved positives; removing the guard
+causes an actual named runtime failure and restored pass.
+
+Production constructors/options/root exports have no fault control. One private instance observer
+connects the explicit testing factory/controller to the same executor algorithm at all seven named
+boundaries. Precommit faults roll back all four collections; response loss after commit preserves
+one completed receipt and retry replays. Controllers bind once and retain128visits. Generic DB-owned
+store/row contracts and adapter-owned business handles support the22case finite conformance matrix,
+including signaled overlapping claims and an actual outside-write same-commit negative. Determinism uses2–32equivalent frozen
+identity samples and reports sampled_equivalence, never universal purity. Added throwing-telemetry
+assertion/control qualifies inherited S5 business-error preservation; that behavior was not changed.
+
+Freeze for substantive supervisor review and independent native gate/hash checks; no commit/push/
+GitHub/evaluator writes by this lane. After S6signoff, the separately reviewed clean-committed
+native generated corpus/full C2 qualification and opposite-family IMPL-EVAL remain required.
+No dirty-tree corpus refresh, real-provider/relay/OTel/scaffold certification or later leaf.
+
+## Previous checkpoints retained
+
+# C2 current checkpoint — S6 frozen for supervisor review
+
+Only S6 is implemented at signed S5baseline `06cf02d75c140aa36f341ebeffed1c8e659e610e`.
+Twelve package/docs files and nine run artifacts form a21file slice; two supervisor evidence files
+fit below30. Product aggregate SHA256 is `d84f2375f02aaaca62c052f7f6979a53a6a8cef0112e107d46f9ec04d999c3eb`.
+Read s6-source-manifest.json, s6-gate-evidence.json, s6-consumer-evidence.json and
+s6-mutation-evidence.json. Exact CI Deno2.9.5: 216affectedtests0, 107filecheck/lint/fmt0;
+all five service and eleven database individual+combined doc entrypoints0; durable quality/arch/
+exports, JSR audits, native publish/pack, workspace-empty source/packed frozen consumers and
+public source execution/conformance runtime0. All14newnamedtests have19meaningful production
+controls with actual named assertion failure1 and byte-restored pass0. All19restoration hashes
+still match final production files.
+
+Production constructors/options/root exports have no fault control. One private instance observer
+connects the explicit testing factory/controller to the same executor algorithm at all seven named
+boundaries. Precommit faults roll back all four collections; response loss after commit preserves
+one completed receipt and retry replays. Controllers bind once and retain128visits. Generic DB-owned
+store/row contracts and adapter-owned business handles support the22case finite conformance matrix,
+including signaled overlapping claims and an actual outside-write same-commit negative. Determinism uses2–32equivalent frozen
+identity samples and reports sampled_equivalence, never universal purity. Added throwing-telemetry
+assertion/control qualifies inherited S5 business-error preservation; that behavior was not changed.
+
+Freeze for substantive supervisor review and independent native gate/hash checks; no commit/push/
+GitHub/evaluator writes by this lane. After S6signoff, the separately reviewed clean-committed
+native generated corpus/full C2 qualification and opposite-family IMPL-EVAL remain required.
+No dirty-tree corpus refresh, real-provider/relay/OTel/scaffold certification or later leaf.
+
+## Previous checkpoints retained
+
+# C2 current checkpoint — S6 frozen for supervisor review
+
+Only S6 is implemented at signed S5baseline `06cf02d75c140aa36f341ebeffed1c8e659e610e`.
+Twelve package/docs files and nine run artifacts form a21file slice; two supervisor evidence files
+fit below30. Product aggregate SHA256 is `42f630327fb35ed1a3e0a39362cbc395517e0d304aed77febf7e30bea9673641`.
+Read s6-source-manifest.json, s6-gate-evidence.json, s6-consumer-evidence.json and
+s6-mutation-evidence.json. Exact CI Deno2.9.5: 216affectedtests0, 107filecheck/lint/fmt0;
+all five service and eleven database individual+combined doc entrypoints0; durable quality/arch/
+exports, JSR audits, native publish/pack, workspace-empty source/packed frozen consumers and
+public source execution/conformance runtime0. All14newnamedtests have18meaningful production
+controls with actual named assertion failure1 and byte-restored pass0. All18restoration hashes
+still match final production files.
+
+Production constructors/options/root exports have no fault control. One private instance observer
+connects the explicit testing factory/controller to the same executor algorithm at all seven named
+boundaries. Precommit faults roll back all four collections; response loss after commit preserves
+one completed receipt and retry replays. Controllers bind once and retain128visits. Generic DB-owned
+store/row contracts and adapter-owned business handles support the22case finite conformance matrix,
+including an actual outside-write same-commit negative. Determinism uses2–32equivalent frozen
+identity samples and reports sampled_equivalence, never universal purity. Added throwing-telemetry
+assertion/control qualifies inherited S5 business-error preservation; that behavior was not changed.
+
+Freeze for substantive supervisor review and independent native gate/hash checks; no commit/push/
+GitHub/evaluator writes by this lane. After S6signoff, the separately reviewed clean-committed
+native generated corpus/full C2 qualification and opposite-family IMPL-EVAL remain required.
+No dirty-tree corpus refresh, real-provider/relay/OTel/scaffold certification or later leaf.
+
+## Previous checkpoints retained
+
+# C2 current checkpoint — S6 implementation released
+
+Supervisor signed off, committed and pushed S5 at `06cf02d75c140aa36f341ebeffed1c8e659e610e`, with substantive review and final native gates. Only S6 is explicitly released: testing-only per-instance fault boundaries, reusable semantic/conformance fixtures and finite determinism checks. Production constructors stay free of fault controls. This slice freezes below30 files, leaving two for supervisor evidence. Final clean-committed generated corpus/full C2 qualification and opposite-family IMPL-EVAL remain separately required after S6 signoff.
+
+## Previous checkpoints retained
+
 # C2 current checkpoint — S5 supervisor approved
 
 S5 frozen product aggregate e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e verified; final supervisor durable quality/arch PASS0. All 202 affected tests, 18 meaningful mutations for 14 named tests, individual export-map docs and native publication/clean consumers pass. Slice footprint26 files. Supervisor ordinary commit/push/comment precedes ONLYS6 release. S6, final clean-committed generated-consumer wave and independent C2 IMPL-EVAL remain required.

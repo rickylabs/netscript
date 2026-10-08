@@ -260,3 +260,37 @@ Deno.test('executor accepts W3C future fields and empty tracestate members while
     assertEquals(events, []);
   }
 });
+
+Deno.test('executor accepts opaque future trace fields but rejects HTTP control bytes', async () => {
+  const store = createMemoryCommandStore();
+  const events: string[] = [];
+  const executor = createCommandExecutor({ store: tracked(store, events), ...ports() });
+  const definition = command();
+  const prefix = '01-11111111111111111111111111111111-2222222222222222-01';
+  for (const suffix of ['-opaque future=fields', '-opaque\tfields', '-opaque\x80\xfffields']) {
+    const result = await executor.execute(definition, {
+      ...envelope,
+      trace: { traceparent: prefix + suffix, tracestate: ' \t, vendor=value,\t ' },
+    });
+    assertEquals(result.value, 'one');
+  }
+  const calls = events.length;
+  // RFC9110 field-value excludes ASCII CTL except HTAB, even in unknown future fields.
+  for (let byte = 0; byte <= 0x7f; byte++) {
+    if (byte === 0x09 || (byte >= 0x20 && byte !== 0x7f)) continue;
+    const error = await failure(
+      executor.execute(definition, {
+        ...envelope,
+        trace: { traceparent: prefix + '-opaque' + String.fromCharCode(byte) + 'fields' },
+      }),
+      'invalid_envelope',
+    );
+    assertEquals(error.failure, {
+      kind: 'invalid_envelope',
+      retryable: false,
+      reason: 'trace_context',
+    });
+    assertEquals(events.length, calls);
+  }
+  assertEquals(store.snapshot().receipts.length, 1);
+});

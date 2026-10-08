@@ -1,3 +1,191 @@
+# Current supervisor checkpoint — S6 APPROVED
+
+S6 final14-file product aggregate `d3d59597a3bcdb59a57faabc31c56ea0e6c9986f20c6cf2f6c10797239b4535c` is approved at signed S5baseline `06cf02d75c140aa36f341ebeffed1c8e659e610e`. The25-file signed slice includes23 frozen files and two supervisor review/evidence files. Root verified152raw evidence hashes,217affected tests,107-file scoped checks, native docs/publication/frozen consumers and20meaningful production controls covering all15newnamedtests. Root fresh durable quality/architecture both PASS/0; product stayed byte-identical.
+
+Commit/push/structured PR comment must precede release of ONLY the first clean-committed prose/provenance/MCP corpus qualification wave. Downstream CLI assets require that wave's separate committed signoff. Full C2 qualification, executed native CI, independent opposite-family evaluation and acceptance/ready state remain open. No C3 or later leaf released; no merge or publication.
+
+## Previous checkpoints retained
+
+# Current S6 review handoff
+
+S6 is frozen at signed S5baseline06cf02d75c140aa36f341ebeffed1c8e659e610e with23changed files,
+including14package/docs files and9run artifacts. Two supervisor files fit below30. Scope ends here.
+
+| Gate | Actual result |
+| --- | --- |
+| Structured affected package check/lint/format | 0;107files, no dropped files |
+| Full database/service runtime suites, including inherited C1/S4/S5 | 0;217passed,0failed |
+| New focused S6 named tests | 15passed;20production controls each yield named assertion failure1/restored pass0 |
+| Full export-map docs | Each of five service and eleven database entries0 with no individual diagnostics; combined graphs0 |
+| Durable native quality/architecture/export drift | 0; request/verdict/raw output hashes retained |
+| Native materialized publish, native pack and JSR audits | 0 for both packages; exact inventories/archives retained |
+| Workspace-empty source and exact native packed declarations | 0 fresh/frozen; all exports and new generic testing API qualify |
+| Native public source executor and conformance runtime | 0; actual applied/replayed executor plus22case semantic matrix |
+| Internal docs links and native site build | 0; no committed-read-set agent corpus regenerated |
+| Root exports, production options, metadata and locks | Unchanged; no new dependency/fault configuration |
+
+Supervisor additionally required RFC9110 field-value validation before accepting opaque future
+traceparent fields. The bounded character-code guard excludes ASCII controls except HTAB, preserving
+opaque nonhex suffixes, SP/HTAB/obs-text and existing empty tracestate positives. One focused new
+named test covers all32excluded control bytes and positive fields; its production predicate-removal
+control fails before restoration. Required identity controls were refreshed after this source change.
+Primary references are RFC9110 section5.5 and W3C traceparent versioning, linked in the service
+reference page.
+
+The production executor diff only adds a private construction wrapper and per-instance observer
+calls at before_transaction, after_claim, after_handler, after_audit, after_outbox,
+after_receipt_complete and after_commit_before_return. No application-to-testing import or global
+hook. The testing-only factory binds a genuine controller once; one-use pending faults and the
+latest128visits are bounded. Before-transaction faults issue no store callback; all other precommit
+faults roll back business/receipt/audit/outbox. A postcommit lost response retains one completed
+receipt; same-key retry replays the original correlation with no handler or side-row duplication.
+
+CommandConformanceFixture<TTx> keeps store/rows database-owned and genuine business handles generic.
+Factories start empty and provide bound writes/CAS, committed inspection, corrupt receipt seeding
+and explicit outside-write controls. The22case runner covers seven fault recoveries, replay/mismatch,
+scope/name/version namespace changes, incomplete/noncanonical/invalid response/metadata replay,
+pre-begin/handler/between-flush cancellation, zero-match CAS, business identity, typed retryable
+provider boundary failure, callback re-entry refusal, terminal busy/clean subsequent query,
+unsupported/default isolation, zero/one/many side rows, policies/payload codec, concurrent duplicate
+replay and sequential rollback-leader recovery. The concurrent case waits for a signal emitted only
+after invoking the real bound second claim, then releases the leader; audit/outbox/receipt/business
+remain exactlyone and the handler runs once. No sleeps or polling. Real adapters still own driver/SQL/lock/timeout and pooled
+session qualification. The negative deliberately performs a real root business write: it survives
+after-handler rollback while all side rows are empty, so the shared same-commit assertion fails.
+Its mutation corrupts the actual root-write value and fails the named surviving-value assertion.
+
+assertCommandDeterminism invokes actual identity logic2–32times(default4), once per callback per
+sample, with detached deeply frozen equivalent input/actor material. Subsequent samples use the
+validated first envelope, so caller/closure mutation of the original input cannot alter equivalence.
+Changing scope/fingerprint closures fail; sampled_equivalence is finite evidence, not a purity proof.
+A focused telemetry test/control additionally qualifies inherited S5 error preservation when an
+observer throws; no S6 finisher behavior was changed. Mutations affect real executor/identity/memory/
+controller source, produce actual named runtime assertion failures and restore exact bytes. All20
+restoration hashes match final files, including the narrowed identity guard and unchanged memory source.
+
+Individual testing-entry doc qualification first exposed five private references, then two transitively
+required recorder types. Existing service annotation types are re-exported type-only through the
+focused testing entrypoint; no root or production commands export changed. Actual native inventory
+contains the new modules, and clean consumers preserve emitted declaration bytes and locks. No
+remote publication or npm-completeness claim. Required final clean-committed generated corpus/full
+C2 qualification and opposite-family IMPL-EVAL remain a separately reviewed post-signoff follow-up.
+
+## Previous worklog retained
+
+# Current S6 review handoff
+
+S6 is frozen at signed S5baseline06cf02d75c140aa36f341ebeffed1c8e659e610e with21changed files,
+including12package/docs files and9run artifacts. Two supervisor files fit below30. Scope ends here.
+
+| Gate | Actual result |
+| --- | --- |
+| Structured affected package check/lint/format | 0;107files, no dropped files |
+| Full database/service runtime suites, including inherited C1/S4/S5 | 0;216passed,0failed |
+| New focused S6 named tests | 14passed;19production controls each yield named assertion failure1/restored pass0 |
+| Full export-map docs | Each of five service and eleven database entries0 with no individual diagnostics; combined graphs0 |
+| Durable native quality/architecture/export drift | 0; request/verdict/raw output hashes retained |
+| Native materialized publish, native pack and JSR audits | 0 for both packages; exact inventories/archives retained |
+| Workspace-empty source and exact native packed declarations | 0 fresh/frozen; all exports and new generic testing API qualify |
+| Native public source executor and conformance runtime | 0; actual applied/replayed executor plus22case semantic matrix |
+| Internal docs links and native site build | 0; no committed-read-set agent corpus regenerated |
+| Root exports, production options, metadata and locks | Unchanged; no new dependency/fault configuration |
+
+The production executor diff only adds a private construction wrapper and per-instance observer
+calls at before_transaction, after_claim, after_handler, after_audit, after_outbox,
+after_receipt_complete and after_commit_before_return. No application-to-testing import or global
+hook. The testing-only factory binds a genuine controller once; one-use pending faults and the
+latest128visits are bounded. Before-transaction faults issue no store callback; all other precommit
+faults roll back business/receipt/audit/outbox. A postcommit lost response retains one completed
+receipt; same-key retry replays the original correlation with no handler or side-row duplication.
+
+CommandConformanceFixture<TTx> keeps store/rows database-owned and genuine business handles generic.
+Factories start empty and provide bound writes/CAS, committed inspection, corrupt receipt seeding
+and explicit outside-write controls. The22case runner covers seven fault recoveries, replay/mismatch,
+scope/name/version namespace changes, incomplete/noncanonical/invalid response/metadata replay,
+pre-begin/handler/between-flush cancellation, zero-match CAS, business identity, typed retryable
+provider boundary failure, callback re-entry refusal, terminal busy/clean subsequent query,
+unsupported/default isolation, zero/one/many side rows, policies/payload codec, concurrent duplicate
+replay and sequential rollback-leader recovery. The concurrent case waits for a signal emitted only
+after invoking the real bound second claim, then releases the leader; audit/outbox/receipt/business
+remain exactlyone and the handler runs once. No sleeps or polling. Real adapters still own driver/SQL/lock/timeout and pooled
+session qualification. The negative deliberately performs a real root business write: it survives
+after-handler rollback while all side rows are empty, so the shared same-commit assertion fails.
+Its mutation corrupts the actual root-write value and fails the named surviving-value assertion.
+
+assertCommandDeterminism invokes actual identity logic2–32times(default4), once per callback per
+sample, with detached deeply frozen equivalent input/actor material. Subsequent samples use the
+validated first envelope, so caller/closure mutation of the original input cannot alter equivalence.
+Changing scope/fingerprint closures fail; sampled_equivalence is finite evidence, not a purity proof.
+A focused telemetry test/control additionally qualifies inherited S5 error preservation when an
+observer throws; no S6 finisher behavior was changed. Mutations affect real executor/identity/memory/
+controller source, produce actual named runtime assertion failures and restore exact bytes. All19
+restoration hashes match final files, including unchanged inherited identity and memory source.
+
+Individual testing-entry doc qualification first exposed five private references, then two transitively
+required recorder types. Existing service annotation types are re-exported type-only through the
+focused testing entrypoint; no root or production commands export changed. Actual native inventory
+contains the new modules, and clean consumers preserve emitted declaration bytes and locks. No
+remote publication or npm-completeness claim. Required final clean-committed generated corpus/full
+C2 qualification and opposite-family IMPL-EVAL remain a separately reviewed post-signoff follow-up.
+
+## Previous worklog retained
+
+# Current S6 review handoff
+
+S6 is frozen at signed S5baseline06cf02d75c140aa36f341ebeffed1c8e659e610e with21changed files,
+including12package/docs files and9run artifacts. Two supervisor files fit below30. Scope ends here.
+
+| Gate | Actual result |
+| --- | --- |
+| Structured affected package check/lint/format | 0;107files, no dropped files |
+| Full database/service runtime suites, including inherited C1/S4/S5 | 0;216passed,0failed |
+| New focused S6 named tests | 14passed;18production controls each yield named assertion failure1/restored pass0 |
+| Full export-map docs | Each of five service and eleven database entries0 with no individual diagnostics; combined graphs0 |
+| Durable native quality/architecture/export drift | 0; request/verdict/raw output hashes retained |
+| Native materialized publish, native pack and JSR audits | 0 for both packages; exact inventories/archives retained |
+| Workspace-empty source and exact native packed declarations | 0 fresh/frozen; all exports and new generic testing API qualify |
+| Native public source executor and conformance runtime | 0; actual applied/replayed executor plus22case semantic matrix |
+| Internal docs links and native site build | 0; no committed-read-set agent corpus regenerated |
+| Root exports, production options, metadata and locks | Unchanged; no new dependency/fault configuration |
+
+The production executor diff only adds a private construction wrapper and per-instance observer
+calls at before_transaction, after_claim, after_handler, after_audit, after_outbox,
+after_receipt_complete and after_commit_before_return. No application-to-testing import or global
+hook. The testing-only factory binds a genuine controller once; one-use pending faults and the
+latest128visits are bounded. Before-transaction faults issue no store callback; all other precommit
+faults roll back business/receipt/audit/outbox. A postcommit lost response retains one completed
+receipt; same-key retry replays the original correlation with no handler or side-row duplication.
+
+CommandConformanceFixture<TTx> keeps store/rows database-owned and genuine business handles generic.
+Factories start empty and provide bound writes/CAS, committed inspection, corrupt receipt seeding
+and explicit outside-write controls. The22case runner covers seven fault recoveries, replay/mismatch,
+scope/name/version namespace changes, incomplete/noncanonical/invalid response/metadata replay,
+pre-begin/handler/between-flush cancellation, zero-match CAS, business identity, typed retryable
+provider boundary failure, callback re-entry refusal, terminal busy/clean subsequent query,
+unsupported/default isolation, zero/one/many side rows, policies/payload codec, concurrent duplicate
+replay and rollback-leader recovery. Real adapters still own driver/SQL/lock/timeout and pooled
+session qualification. The negative deliberately performs a real root business write: it survives
+after-handler rollback while all side rows are empty, so the shared same-commit assertion fails.
+Its mutation corrupts the actual root-write value and fails the named surviving-value assertion.
+
+assertCommandDeterminism invokes actual identity logic2–32times(default4), once per callback per
+sample, with detached deeply frozen equivalent input/actor material. Subsequent samples use the
+validated first envelope, so caller/closure mutation of the original input cannot alter equivalence.
+Changing scope/fingerprint closures fail; sampled_equivalence is finite evidence, not a purity proof.
+A focused telemetry test/control additionally qualifies inherited S5 error preservation when an
+observer throws; no S6 finisher behavior was changed. Mutations affect real executor/identity/memory/
+controller source, produce actual named runtime assertion failures and restore exact bytes. All18
+restoration hashes match final files, including unchanged inherited identity and memory source.
+
+Individual testing-entry doc qualification first exposed five private references, then two transitively
+required recorder types. Existing service annotation types are re-exported type-only through the
+focused testing entrypoint; no root or production commands export changed. Actual native inventory
+contains the new modules, and clean consumers preserve emitted declaration bytes and locks. No
+remote publication or npm-completeness claim. Required final clean-committed generated corpus/full
+C2 qualification and opposite-family IMPL-EVAL remain a separately reviewed post-signoff follow-up.
+
+## Previous worklog retained
+
 # Current S5 review handoff
 
 S5 is frozen for substantive supervisor review at the explicit release baseline
