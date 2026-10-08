@@ -1,0 +1,8 @@
+{
+  "change": "database workspace packageJson.dependencies adds existing pinned driver-adapter-utils direct membership",
+  "resolvedVersionsUnchanged": true,
+  "integritiesUnchanged": true,
+  "nativeLockUpdateExit": 0,
+  "diffInsertions": 1,
+  "diffDeletions": 0
+}
