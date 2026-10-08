@@ -1,0 +1,6 @@
+# C4 locked plan
+
+Reuse approved whole-chain decision 9 and slice S10 in ../feat-command-c1-contracts--lane-d/plan.md. Archetype 2 telemetry integration, service consumer. No new debt.
+Contract first: fixed CommandSpanNames/CommandAttributes and finite command start/result types/builders in telemetry/attributes. Adapter in telemetry/commands structurally fits service telemetry without production import cycle. Registration copies bounded definition name/version pairs; native OTel existing tracer/context helpers own parentage. Counts 0..64, name max120, 1..1024 registrations, fixed enum provider/isolation/outcomes/error kinds. Explicit field selection; no metrics or exceptions recorded.
+RED tests precede behavior. Native SDK tests prove active server INTERNAL child, exact outcomes/privacy, PRODUCER W3C consumers and deferred links, observer lifecycle and operation/error preservation. Repair early executor observation only after its new RED test; do not change store/identity protocol.
+Gates: structured check/test/lint/fmt; quality and architecture; all export doc lint; JSR audit/publish; isolated declaration/consumer; all four generated freshness checks under Deno 2.9.5; every test semantic mutation and restored PASS; separate-family IMPL-EVAL; current-head CI and evidence mirror. Full-chain scaffold.runtime remains approved S20 producer gate.
