@@ -19,7 +19,7 @@ Anti-pattern status values: `CLEAR`, `VIOLATION`, `DEBT_ACCEPTED`, `N/A`.
 | Field | Value |
 | --- | --- |
 | Session ID | `1afc9054-cc28-48a8-9fc4-86ae2e3bb28d` |
-| Bridge (remote-control) ID | `<redacted-session-id>` |
+| Bridge (remote-control) ID | `cse_011426qed3eW6SpmKxrMnzHN` |
 | Remote control | enabled at launch (`--remote-control`), `bridgeOutboundOnly: false` |
 | PID | `2430432` |
 | cwd | `/home/codex/repos/netscript-007-harness-evidence` |

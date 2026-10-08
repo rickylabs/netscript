@@ -12,7 +12,7 @@
 | Field | Value |
 | --- | --- |
 | Session ID | `97ef1950-cda3-450e-9451-052a15015b3a` |
-| `bridgeSessionId` | `<redacted-session-id>` |
+| `bridgeSessionId` | `cse_01BA2jJuyVsFhRJkVKoTMihe` |
 | `daemonShort` | `97ef1950` |
 | PID | `145718` |
 | cwd | `/home/codex/repos/netscript-007-quality-root-coverage` |
@@ -250,7 +250,7 @@ detail      = "There's an issue with the selected model (fable-5). It may not ex
 tokens      = None
 cliVersion  = None
 sessionId   = 'fdfe4f7c-f2a7-4ed1-b605-3d28c59fac7a'
-bridgeSessionId = '<redacted-session-id>'
+bridgeSessionId = 'cse_01DuK4jWPPEMMQmgLnqpknDA'
 cwd         = '/home/codex/repos/netscript-007-quality-root-coverage'
 respawnFlags= ['--effort','medium','--permission-mode','bypassPermissions','--remote-control','--name','NetScript 0.0.7 #1656 PLAN-EVAL','--model','fable-5']
 ```

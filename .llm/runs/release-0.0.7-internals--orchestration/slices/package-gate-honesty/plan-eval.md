@@ -20,7 +20,7 @@
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Model                           | Anthropic Claude Fable 5 (`claude-fable-5`)                                                                                                             |
 | Session ID                      | `0f7c4fdf-1023-43ce-8a4d-3c24fa16cd64`                                                                                                                  |
-| `bridgeSessionId`               | `<redacted-session-id>` (Remote Control, non-empty)                                                                                              |
+| `bridgeSessionId`               | `cse_012zvXzGwbKFLMTqNLRZVhBR` (Remote Control, non-empty)                                                                                              |
 | Job / backend                   | `~/.claude/jobs/0f7c4fdf/state.json`, `backend: "daemon"`, template `bg`                                                                                |
 | `respawnFlags`                  | `--effort medium --remote-control --permission-mode bypassPermissions --name "NetScript 0.0.7 #1663 PLAN-EVAL c3" --model claude-fable-5`               |
 | `providerEnv`                   | `{}` (native Anthropic, no gateway)                                                                                                                     |

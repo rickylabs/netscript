@@ -426,7 +426,7 @@ implementation thread.
 ## 2026-08-15T05:52:01Z — evaluator identity and evidence-integrity corrections
 
 - **Bridge identity:** #1656's evaluator artifact records the daemon/job alias
-  `<redacted-session-id>`, while the live bridge-status system event exposes the working
+  `cse_01BA2jJuyVsFhRJkVKoTMihe`, while the live bridge-status system event exposes the working
   owner URL as `session_01BA2jJuyVsFhRJkVKoTMihe`. Central state records the `session_…` form and
   retains the job artifact unchanged as historical evidence; no evaluator is relaunched for an
   attachment-prefix discrepancy.

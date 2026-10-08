@@ -19,7 +19,7 @@ readiness, checkbox, issue, or central-state change was made.
 | Field                | Value                                                                 |
 | -------------------- | --------------------------------------------------------------------- |
 | Evaluator session ID | `740d2a3a-1677-459c-a6b1-a39398649d1a`                                |
-| `bridgeSessionId`    | `<redacted-session-id>`                                        |
+| `bridgeSessionId`    | `cse_01NVeBmZE7SwH3Nvu3ep51zV`                                        |
 | PID                  | `609117`                                                              |
 | cwd                  | `/home/codex/repos/netscript-007-openhands-dispatch`                  |
 | Canonical route      | `formal_impl_evaluation` → native opposite-family Fable 5 · `medium`  |

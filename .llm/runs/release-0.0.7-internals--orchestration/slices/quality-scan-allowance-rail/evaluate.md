@@ -22,7 +22,7 @@ against independently produced results, never as the verdict source.
 | Field             | Value                                                                                                                                                |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Session ID        | `430d5f91-a073-4f4f-991a-8a7eefc7ddb3`                                                                                                               |
-| `bridgeSessionId` | `<redacted-session-id>`                                                                                                                       |
+| `bridgeSessionId` | `cse_01NFwTgbof8vAYdg9wex15fM`                                                                                                                       |
 | PID               | `2720067`                                                                                                                                            |
 | cwd               | `/home/codex/repos/netscript-007-quality-rail`                                                                                                       |
 | Requested route   | native Claude Opus 5, effort `high`, Remote Control enabled                                                                                          |

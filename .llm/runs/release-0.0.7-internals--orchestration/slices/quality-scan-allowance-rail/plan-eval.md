@@ -9,7 +9,7 @@ verdict and did not authorize implementation.
 | Field           | Value                                                           |
 | --------------- | --------------------------------------------------------------- |
 | Session ID      | `b6c48f02-cb56-4dae-abfd-e46bdec05bd5`                          |
-| Bridge ID       | `<redacted-session-id>`                                  |
+| Bridge ID       | `cse_01Et9Y4vPf8i9ZMTwiqykvXr`                                  |
 | Daemon short    | `b6c48f02`                                                      |
 | PID             | `2467808`                                                       |
 | cwd             | `/home/codex/repos/netscript-007-quality-rail`                  |

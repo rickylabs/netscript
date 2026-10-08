@@ -635,7 +635,7 @@ do not launch a duplicate.
 Resume from the authoritative `2026-08-15T09:41:25Z` checkpoint. Docs is exhausted and parked at
 topic `0ca4c489f`. Internals #1658 has final Tier-A PASS at `f46d84630` and exactly one active
 native Opus 5/medium Remote Control IMPL-EVAL, session `740d2a3a-1677-459c-a6b1-a39398649d1a`,
-bridge `<redacted-session-id>`. Its preceding Fable probe `e58c5f01` was a zero-token,
+bridge `cse_01NVeBmZE7SwH3Nvu3ep51zV`. Its preceding Fable probe `e58c5f01` was a zero-token,
 pre-inference availability failure and is not an evaluation cycle. Fixes #1661 cycle 1 is terminal
 `FAIL_FIX` at evaluator commit `8d6b4726c`; Tier-A was withdrawn at `1bdb09e13`, and the original
 Codex author is performing the bounded registration-signal lifetime repair before fresh Tier-A and
@@ -645,7 +645,7 @@ supervisors. Serialize within each topic only; no cluster-wide serialization and
 
 Newer exact transition at `2026-08-15T09:53:39Z`: #1661's repair is Tier-A PASS at `df0534416`, and
 fresh cycle-2 evaluator `eb7149da-1689-44af-970e-ddd6e78022fa` / Fable 5 medium / Remote Control is
-active on that immutable head, bridge `<redacted-session-id>`. Features #1293 S2 is Tier-A
+active on that immutable head, bridge `cse_01CaAEKsH35CP2QgfNUVdXK1`. Features #1293 S2 is Tier-A
 PASS at `47ad48c9d`; S3 content `3dee41263` is running exact-head structured receipts. Internals'
 Opus evaluator remains active independently. Do not serialize these three topics against each other.
 
@@ -693,7 +693,7 @@ selected and both real-source negative controls alive.
 Resume from the authoritative `2026-08-15T11:03:30Z` transition. Main remains
 `baf1cdf67a4e931af17b4772ddf6101f36152184`. #1664's repaired plan is immutable at
 `7f20a34fee4e99ac17edb6ed4de06a3ec9c1934b`; fresh native Fable 5/medium Remote Control PLAN-EVAL
-`176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge `<redacted-session-id>`, is the sole active
+`176aace4-b2a2-4b16-bdaa-9db687c7d132`, bridge `cse_01TiYhwUCkdyjziEpFP3kgaS`, is the sole active
 features evaluator. Do not lease or run `scaffold.runtime` or `fresh-browser` before plan PASS,
 implementation, cheap convergence, and a later explicit central grant. #1663's local-only
 `71e803807` plan repair is rejected and unpushed because its 115-to-110 parent skip hid four healthy
@@ -714,7 +714,7 @@ Resume from the authoritative `2026-08-15T11:25:08Z` transition. Main remains `b
 cycle 2 is terminal `PASS` at `c53726c69`; its original Codex author may execute only the next
 bounded implementation slice with C1-C3 carried, and both `scaffold.runtime` and `fresh-browser`
 remain unleased. #1663 is immutable at `df1d7a96d`; Tier-A passed and the sole fresh Fable 5/medium
-Remote Control cycle-2 evaluator is `517ac0e7`, bridge `<redacted-session-id>`; no product
+Remote Control cycle-2 evaluator is `517ac0e7`, bridge `cse_01McQHBVtbuX4WYDsaVXEYAn`; no product
 mutation before PASS. #1665 is draft at `20e7aed41`; Tier-A is `FAIL_FIX` and the same author is
 repairing the overflow-event ordering, rejected-report staging, and raw six-diagnostic doc-lint
 baseline. Exactly four README/test proof paths plus `docs/site/web-layer/query-bridge.md` are
@@ -734,7 +734,7 @@ inside each topic.
 Newer exact transition at `2026-08-15T11:44:15Z`: #1665's final repaired plan is clean/pushed at
 `ee1b44c6d`, Tier-A PASS at fixes topic `318bd087c`. Its sole fresh native Fable 5/medium Remote
 Control PLAN-EVAL is active as session `0287ccbe-2740-45ee-b378-33d1c1c59429`, bridge
-`<redacted-session-id>`, on that immutable head. Do not implement before verdict. #1664 S2
+`cse_01GaNTjv6oY6MaxnKHH1ZfrB`, on that immutable head. Do not implement before verdict. #1664 S2
 and #1663's bounded cycle-two repair remain active independently on their original Codex authors;
 neither has an expensive gate lease.
 
@@ -768,7 +768,7 @@ remains at the genuine owner-only exceptional-evaluator boundary.
 Resume from the authoritative `2026-08-15T15:12:31Z` transition. Main remains `baf1cdf67` and
 runtime ownership remains empty. #1665 implementation is complete through S3 at `9a26c107a`, fixes
 Tier-A `aa4749da4`; its sole fresh Fable 5/medium Remote Control IMPL-EVAL is active as
-`1fbb1c07-…`, bridge `<redacted-session-id>`, and may change only `impl-eval.md`. #1664 S4
+`1fbb1c07-…`, bridge `cse_01JePyQuiERLe8GeWWKQp5wL`, and may change only `impl-eval.md`. #1664 S4
 cheap convergence is Tier-A PASS at evidence head `1c1f45820`, content head `32ea23f50`, topic
 `84568f2ff`, with four renewed PASS receipts. Do not grant its S5 lease yet: coordinator finding F2
 proved the plan-required `payments` second-service, key-isolation, idempotent regeneration, and live
@@ -835,7 +835,7 @@ until that fourth link lands. #1663's owner-only decision remains unchanged.
 Resume from the authoritative `2026-08-15T16:14:20Z` transition. Runtime ownership remains empty.
 #1665 is clean/pushed at final cascade head `9a2c74c41`; fixes Tier-A PASS checkpoint `cbd32230e`
 independently proves all three freshness gates pass simultaneously and leave a clean generated tree.
-Fresh Fable 5/medium Remote Control evaluator `262ef8e1-…`, bridge `<redacted-session-id>`,
+Fresh Fable 5/medium Remote Control evaluator `262ef8e1-…`, bridge `cse_01E3QfD1wkvb1naZKS6m7bp2`,
 is active over only the full four-link asset-chain delta. Do not resume readiness until its
 artifact-only terminal verdict. #1664 pushed dependency-isolation plan amendment `c4a900adc` before
 creating the newly authorized internal primitive after generated-app replay proved the parent probe
@@ -885,7 +885,7 @@ max. Preserve every native Claude topic supervisor and the #1651 option-1 adapte
 
 Newer checkpoint `2026-08-15T16:49:14Z`: #1666 Tier-A PASS is pushed at topic `d5f5ea55a` and its
 single authorized native Fable 5/medium Remote Control PLAN-EVAL is active as job `68c31fcc`, bridge
-`<redacted-session-id>`, source `a3f6b87b5`, artifact-only. #1461 opened draft PR #1669 at
+`cse_01DcmCJnvESF3a4nVDvUR8u8`, source `a3f6b87b5`, artifact-only. #1461 opened draft PR #1669 at
 plan head `7e5be1514`; before PLAN-EVAL, fixes Tier-A must reconcile the raw doc-lint count and
 amend scope to include the second demonstrably false cache-refresh claim at
 `docs/site/tutorials/live-dashboard/03-sdk-cache-first-query.md`. No product mutation yet. #1664
@@ -937,10 +937,10 @@ complete generated-format attribution before any amendment or retry; no product 
 authorized under the released lease. #1666 cycle-2 evaluator remains active independently.
 
 Newer checkpoint `2026-08-15T17:29:40Z`: #1461 repaired plan `23db20f30` passed fixes Tier-A at
-`f71e860f9`; PLAN-EVAL job `01f0eda8`, bridge `<redacted-session-id>`, is active native Fable
+`f71e860f9`; PLAN-EVAL job `01f0eda8`, bridge `cse_01SWnk7LwvoLaamvEwR5WLfX`, is active native Fable
 5/medium Remote Control. #1666 cycle-2's initial session was interrupted after verification but
 before artifact/verdict; the same history is recovered as job `0e2d1e57`, bridge
-`<redacted-session-id>`, without consuming another cycle. #1664 evidence is pushed at
+`cse_01K6SbsotG5MyjyjTd11SrfK`, without consuming another cycle. #1664 evidence is pushed at
 `09a771c8e`; do not accept its blanket baseline attribution until fresh features Tier-A classifies
 all twelve unformatted generated paths, several of which are leaf-owned. No runtime lease is active.
 
@@ -1010,7 +1010,7 @@ Newer checkpoint `2026-08-15T18:30:23Z`: #1664 final F5 Tier-A is `PASS` at feat
 processes, no relevant listeners, and no competing lease. Attempt 4 now owns the singleton runtime
 lease: `scaffold.runtime` first, mandatory cleanup/audit, then `fresh-browser` only on PASS and a
 second cleanup/audit. #1666 IMPL-EVAL is active under native Fable 5/medium Remote Control session
-`3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `<redacted-session-id>`, artifact-only over
+`3882ca70-7857-46ca-aa24-8b1ae2664516`, bridge `cse_013RnnFDtHQhEbFhJCLbkEsD`, artifact-only over
 implementation `47ca22abe` and evidence `d095c1260`. #1669 has applied exactly the approved
 predicate correction while its two docs pages and query-factory test remain in the bounded S2 author
 turn.
@@ -1158,7 +1158,7 @@ append-only integration evidence is complete.
 Newer transition `2026-08-15T21:03:30Z`: #1666 current-main refresh is now clean/pushed at evidence
 `021c7ffc6` over merge content `8c03d8629`, with PR comment `5304205247`. Fresh internals Tier-A
 passed at `6658ad9c0`; one native Fable 5/medium Remote Control integration-delta evaluator is
-active as job `be3774eb`, bridge `<redacted-session-id>`. The prior `f281b8cf` lease is
+active as job `be3774eb`, bridge `cse_01RQ7Eb4N4NaQEuAA6zPtpxV`. The prior `f281b8cf` lease is
 terminal PASS and was reconciled from stale active state. Hold readiness, acceptance mirroring,
 close-gate, and merge until the integration evaluator is terminal. #1664 attempt 6 and #1671 S3
 remain active independently; #1663 remains at the owner-only exceptional third-evaluator boundary.
@@ -1186,7 +1186,7 @@ Newer transition `2026-08-15T21:36:48Z`: #1666 repair `e357938df` / comment `530
 both quality findings without allowances or scanner weakening and passes fresh internals Tier-A at
 `138ad7436`. The reviewer rejected its own repository-mode false green, then proved the exact
 changed-files mode selected both repaired paths with zero findings. Fresh cycle-5 Fable 5/medium
-Remote Control evaluator `dc433b8d` is active at bridge `<redacted-session-id>` / URL
+Remote Control evaluator `dc433b8d` is active at bridge `cse_016v2se871QD9Q9Rd6YADAKC` / URL
 `https://claude.ai/code/session_016v2se871QD9Q9Rd6YADAKC`; transport flags and bidirectional bridge
 are proven. Readiness remains held. #1664 F8 attribution and #1671 S4 continue independently.
 
@@ -1398,7 +1398,7 @@ any branch content.
 
 #1709 formal PLAN-EVAL cycle 1 is active on immutable plan head `d437db44d`. The fresh opposite-
 family evaluator is native Claude Fable 5/medium with Remote Control (`1b7a1305`, bridge
-`<redacted-session-id>`), dispatched from internals topic checkpoint `7c1646742`. Its exact
+`cse_012Nz3aE9mhoeyfaiGpKGvse`), dispatched from internals topic checkpoint `7c1646742`. Its exact
 batch-size-1 formatter probe passed 2041 selected files with zero findings; the 2037-file lint probe
 is still live and CPU-active, so it is not a stalled process. No implementation or runtime lease has
 been granted.
@@ -1457,7 +1457,7 @@ supervisors. No implementation or runtime lease is active.
 fixes Tier-A passed all five repaired architecture claims at topic `d0205087a`; the initial
 clean-checkout false green is closed without excluding the example or adding an eighth product path.
 Final risk-selected PLAN-EVAL cycle 2 is active in distinct native Claude Fable 5/medium Remote
-Control session `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `<redacted-session-id>`,
+Control session `18b66c8f-ebab-441e-9707-0d31a507dff8`, bridge `cse_01EQXNxAuAuhDuRKvGYBx5iY`,
 dispatched from clean pushed topic `4f2e263e2`. Scope is only repaired F1 plus the five fresh Tier-A
 claims. No implementation or runtime lease exists.
 

@@ -11,7 +11,7 @@ head `120859d5c…` / final head `04d431028…` is not re-litigated.
 | Field              | Value                                                                                  |
 | ------------------ | -------------------------------------------------------------------------------------- |
 | Claude session ID  | `e8cd9765-9f6c-4418-bbc2-4a24f221f2d4`                                                 |
-| Bridge session ID  | `<redacted-session-id>` (non-empty)                                             |
+| Bridge session ID  | `cse_01Cwg2ukqsMkwpuca5xhzVaG` (non-empty)                                             |
 | Remote Control URL | `https://claude.ai/code/session_01Cwg2ukqsMkwpuca5xhzVaG`                              |
 | PID                | `375750` (`claude bg-spare`), pty host `375647`                                        |
 | cwd                | `/home/codex/repos/netscript-007-features-1502`                                        |

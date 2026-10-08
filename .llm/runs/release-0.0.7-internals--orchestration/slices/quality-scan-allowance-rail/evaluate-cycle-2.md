@@ -29,7 +29,7 @@ verdict source.
 | Field             | Value                                                                                                                                                        |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Session ID        | `31c4cfa9-6610-4813-a4d2-482080fc562e`                                                                                                                       |
-| `bridgeSessionId` | `<redacted-session-id>`                                                                                                                               |
+| `bridgeSessionId` | `cse_01A8dNQhZgaysPzhnEDm2MrA`                                                                                                                               |
 | PID               | `27373`                                                                                                                                                      |
 | cwd               | `/home/codex/repos/netscript-007-quality-rail`                                                                                                               |
 | Requested route   | native Claude Opus 5, effort `high`, Remote Control enabled                                                                                                  |

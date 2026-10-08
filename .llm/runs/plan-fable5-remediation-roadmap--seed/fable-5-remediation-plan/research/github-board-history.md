@@ -176,7 +176,7 @@ adoption on 0.0.4 (0 MCP calls, 0 plugin doctor, 0 aspire otel, 0 skills across 
 and **#1090** ("does the shipped agent surface actually change agent behaviour?") is still open as an
 observational row. #1324/#1330 (OpenCode ignored generated MCP config; resume forwarded empty
 assistant turns) closed on canary.15 via PR #1344 — that PR's evidence is the first recorded
-non-zero NetScript MCP use in a measured session (`<redacted-session-id>`).
+non-zero NetScript MCP use in a measured session (`ses_023871aaeffehRNSqFc3I43Fvc`).
 
 ### 3.7 The #1340–#1346 PR train (post-canary.14)
 

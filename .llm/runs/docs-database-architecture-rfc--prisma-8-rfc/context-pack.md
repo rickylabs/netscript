@@ -48,7 +48,7 @@ frozen. Draft PR #1640 awaits owner review and stays draft.
   safety, and market/upstream claims. Its narrow failures affect TypeScript/API examples and one
   package/dependency example only.
 - Completed the Grok whole-RFC review through requested/observed `x-ai/grok-4.6`, variant `high`,
-  session `<redacted-session-id>`. It evaluated byte-identical blob `f46040d8...` from RFC
+  session `ses_003644aeaffeSm3UCAW9xUqRIK`. It evaluated byte-identical blob `f46040d8...` from RFC
   commit `5dfc4e8eb` at HEAD `be83301c6`, used no subagents, made no edits, and returned
   `PASS_WITH_REFINEMENTS`, zero blockers, and GR-01–GR-08.
 - Grok passed axes 2, 3, 4, and 6. Abstraction, public API/DX/types, and economy failed narrowly;

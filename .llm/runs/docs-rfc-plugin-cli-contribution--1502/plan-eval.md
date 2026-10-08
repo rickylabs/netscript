@@ -10,7 +10,7 @@ Cycle 1 is preserved verbatim at `plan-eval-cycle-1.md`. This file is the canoni
 | Route observed     | native Claude · Opus 5 (`claude-opus-5`) · effort `medium` · Remote Control active                                   |
 | Route source       | `briefs/reset-gates/dispatch.json` entry `order: 3` (`rfc-plugin-cli-contribution`)                                  |
 | Session ID         | `28cc8106-967b-4fb7-90f3-dd95054ae953`                                                                               |
-| Bridge session ID  | `<redacted-session-id>` (non-empty; `bridgeOutboundOnly: false`)                                              |
+| Bridge session ID  | `cse_01D7t8efMh88nwR2PazUPkC1` (non-empty; `bridgeOutboundOnly: false`)                                              |
 | Session PID        | `2463708` (pty host `2463625`, daemon `2429416`)                                                                     |
 | cwd                | `/home/codex/repos/netscript-007-features-1502`                                                                      |
 | Session name       | `NetScript 0.0.7 #1651 PLAN-EVAL cycle 2`                                                                            |
