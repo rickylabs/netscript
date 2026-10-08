@@ -6,14 +6,14 @@
   "requestedModel": "gemini-3.8-flash-high",
   "requestedEffort": "high",
   "runtimeModelEffortIndependentlyAttested": false,
-  "conversation": "61390913-370d-41e0-a133-50881e888cef",
+  "conversation": "<redacted-conversation-id>",
   "rounds": [
     {
       "round": 1,
       "head": "c177087fa175e51f19290150801da1db7d6812de",
       "processExitCode": 0,
       "responseStatus": "SUCCESS",
-      "conversation": "61390913-370d-41e0-a133-50881e888cef",
+      "conversation": "<redacted-conversation-id>",
       "reportSha256": "7181f6478fed9f9c4cb6b53bcecb1ac7daf69bfdfe8a71495c46a5292dbba705",
       "rawProcessSha256": "b50ba53ff93a27236299b8dd45fe398754c3454fb17c01f11787ff0eb449703d",
       "rawResponseSha256": "6465eadcfdd436e80130fdb1958099af59336f6811251691daacdd53be497817"
@@ -23,7 +23,7 @@
       "head": "c177087fa175e51f19290150801da1db7d6812de",
       "processExitCode": 0,
       "responseStatus": "SUCCESS",
-      "conversation": "61390913-370d-41e0-a133-50881e888cef",
+      "conversation": "<redacted-conversation-id>",
       "reportSha256": "4e45465f478326b6c74e619a957f47ba414548e94dad8bcc5d03721234e3ae58",
       "rawProcessSha256": "ca625ba68b4285da72b7eb40b14eee98d536797436a4007ff4e6585b49ba23ab",
       "rawResponseSha256": "fccc077c57fdad72e1b3f24ef444e9297949d450884df055db2c30e9316277c5"
@@ -33,7 +33,7 @@
       "head": "c177087fa175e51f19290150801da1db7d6812de",
       "processExitCode": 0,
       "responseStatus": "SUCCESS",
-      "conversation": "61390913-370d-41e0-a133-50881e888cef",
+      "conversation": "<redacted-conversation-id>",
       "reportSha256": "5e9fc1bcf072a3fc6af70ddc6a75eddad0f942cb07acdcb3ac701979442d08e7",
       "rawProcessSha256": "13816809c71199fec3612134d2da6da4a14f3040af21af05a5e2b7bfe1c1ced2",
       "rawResponseSha256": "716dd404e02eea36a82ccb45fcfa84972a25663d5ca6d36f9105aa7d8ed401a4"

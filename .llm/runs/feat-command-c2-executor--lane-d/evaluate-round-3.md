@@ -21,7 +21,7 @@ Anti-pattern status values: `CLEAR`, `VIOLATION`, `DEBT_ACCEPTED`, `N/A`.
 | Scope overlays | `SCOPE-service.md` |
 | Workload Tier | `complex` (Owner authorized per BRIEF-D.md) |
 | Evaluator Route Requested | Google `agy --model gemini-3.8-flash-high --effort high` (Owner HARNESS fallback) |
-| Evaluator Route Observed | Google vendor family via Antigravity CLI (conversation ID `61390913-370d-41e0-a133-50881e888cef`). Specific underlying model ID (`gemini-3.8-flash-high`) and high effort setting are requested invocation parameters, not independently attested by runtime response payload or external verification. |
+| Evaluator Route Observed | Google vendor family via Antigravity CLI (conversation ID `<redacted-conversation-id>`). Specific underlying model ID (`gemini-3.8-flash-high`) and high effort setting are requested invocation parameters, not independently attested by runtime response payload or external verification. |
 | Report Round | Round 3 (Same-Conversation Precise Source and Evidence Reconciliation; Rounds 1 and 2 preserved byte-exact) |
 | Historical Reports | `evaluate-round-1.md` (SHA-256 `7181f6478fed9f9c4cb6b53bcecb1ac7daf69bfdfe8a71495c46a5292dbba705`), `evaluate-round-2.md` (SHA-256 `4e45465f478326b6c74e619a957f47ba414548e94dad8bcc5d03721234e3ae58`) |
 | Evaluation Timestamp | 2026-10-08 |
