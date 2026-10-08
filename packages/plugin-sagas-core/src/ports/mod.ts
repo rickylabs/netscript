@@ -68,6 +68,13 @@ export type {
 export type { SagaIdempotencyPort } from './saga-idempotency-port.ts';
 export type { SagaOutboxPort, SagaOutboxRecord } from './saga-outbox-port.ts';
 export type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+  SagaTransitionStore,
+  StoredCommandOutbox,
+} from './saga-transition-commit-port.ts';
+export type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
   SagaStoreWriteOptions,

@@ -1,3 +1,4 @@
+import { requireSagaTransitionStore } from '../ports/saga-transition-commit-port.ts';
 import {
   type CascadedMessage,
   DEFAULT_RETRY_POLICY,
@@ -111,6 +112,9 @@ export class SagaEngine implements SagaBusPort {
 
   /** Register saga definitions and rebuild the dispatch index. */
   register(definitions: readonly SagaDefinition[]): Promise<void> {
+    for (const definition of definitions) {
+      if (definition.durableWorkerCommands) requireSagaTransitionStore(this.#store);
+    }
     for (const definition of definitions) {
       this.#definitions.set(definition.id, definition);
     }

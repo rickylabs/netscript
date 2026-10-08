@@ -48,6 +48,9 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
   SagaTransition,
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
   SagaTransitionRecord,
   SagaTransportAck,
   SagaTransportHandler,
@@ -55,6 +58,7 @@ export type {
   SagaTransportPort,
   SagaTransportSubscription,
   SignalDefinition,
+  StoredCommandOutbox,
 } from '../ports/mod.ts';
 export type { SagaRuntime, SagaRuntimeAdapter } from '../runtime/mod.ts';
 export { createTestSagaRuntime } from './create-test-saga-runtime.ts';

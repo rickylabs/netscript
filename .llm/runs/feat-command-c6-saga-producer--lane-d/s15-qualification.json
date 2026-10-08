@@ -29,5 +29,5 @@
   },
   "deno": "2.9.5",
   "rootLockSha256": "9ee641e3125f3f2f1aa0e8bfebbc754e1fcbc4aa727bbf6abfa7c0ed5e61607a",
-  "lockReview": "Native normalization only plus three declared saga dependencies. No lock deletion/reload/version upgrade."
+  "lockReview": "Native normalization plus three declared saga dependencies; no newly resolved npm versions/integrity values. Already-locked transitive peer references are unified. No lock deletion/reload."
 }

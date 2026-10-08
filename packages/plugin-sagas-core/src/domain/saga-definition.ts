@@ -44,6 +44,8 @@ export type SagaDefinition<
 > = Readonly<{
   id: SagaId<TId>;
   durability: SagaDurabilityTier;
+  /** Require atomic transition/outbox and replay participation at composition. */
+  durableWorkerCommands?: boolean;
   initialState: TState;
   handledMessageTypes: readonly TMessage['type'][];
   correlations: readonly SagaCorrelationRule<TMessage>[];

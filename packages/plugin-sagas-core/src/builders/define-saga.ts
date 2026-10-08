@@ -39,6 +39,8 @@ export interface SagaBuilder<
 > {
   /** Set the durability tier for this saga. Defaults to `'t1'`. */
   durability(tier: SagaDurabilityTier): SagaBuilder<TId, TPhase, TState, TMessage>;
+  /** Opt in to atomic durable worker-command transitions. */
+  durableWorkerCommands(): SagaBuilder<TId, TPhase, TState, TMessage>;
   /** Set the initial state. This must happen before registering handlers. */
   state<TNextState extends SagaState>(
     this: TPhase extends 'initial' ? SagaBuilder<TId, TPhase, TState, TMessage> : never,
@@ -91,6 +93,7 @@ export interface SagaBuilder<
 type SagaBuilderData<TId extends string> = Readonly<{
   id: TId;
   durability: SagaDurabilityTier;
+  durableWorkerCommands?: boolean;
   initialState?: SagaState;
   correlations: readonly SagaCorrelationRule[];
   handlers: ReadonlyMap<string, SagaHandler<SagaState, SagaMessage>>;
@@ -115,6 +118,10 @@ class SagaBuilderImpl<
 
   durability(tier: SagaDurabilityTier): SagaBuilder<TId, TPhase, TState, TMessage> {
     return new SagaBuilderImpl({ ...this.#data, durability: tier });
+  }
+
+  durableWorkerCommands(): SagaBuilder<TId, TPhase, TState, TMessage> {
+    return new SagaBuilderImpl({ ...this.#data, durableWorkerCommands: true });
   }
 
   state<TNextState extends SagaState>(
@@ -241,6 +248,7 @@ class SagaBuilderImpl<
     return createSagaDefinition({
       id: this.#data.id as SagaId<TId>,
       durability: this.#data.durability,
+      durableWorkerCommands: this.#data.durableWorkerCommands,
       initialState: initialState as TState & SagaState,
       correlations: Object.freeze([...this.#data.correlations]),
       handlers: new Map(this.#data.handlers) as ReadonlyMap<
@@ -272,6 +280,7 @@ type InternalSagaDefinitionSpec<
 > = Readonly<{
   id: SagaId<TId>;
   durability: SagaDurabilityTier;
+  durableWorkerCommands?: boolean;
   initialState: TState;
   correlations: readonly SagaCorrelationRule<TMessage>[];
   handlers: ReadonlyMap<TMessage['type'], SagaHandler<TState, TMessage>>;

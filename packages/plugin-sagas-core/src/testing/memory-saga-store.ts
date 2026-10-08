@@ -1,3 +1,10 @@
+import { snapshotTransitionCommit } from '../application/validate-transition-commit.ts';
+import type {
+  SagaTransitionCommitPort,
+  SagaTransitionCommitRequest,
+  SagaTransitionCommitResult,
+  StoredCommandOutbox,
+} from '../ports/saga-transition-commit-port.ts';
 import type {
   SagaCorrelationIndexEntry,
   SagaStorePort,
@@ -14,9 +21,17 @@ import type {
 import { SagasError } from '../domain/mod.ts';
 
 /** In-memory saga state store for deterministic tests. */
-export class MemorySagaStore implements SagaStorePort {
+export class MemorySagaStore implements SagaStorePort, SagaTransitionCommitPort {
   /** Stable store identifier. */
   readonly id: string;
+  /** Same-commit transition, replay and outbox participation in this deterministic store. */
+  readonly transitionCommitCapabilities: SagaTransitionCommitPort['transitionCommitCapabilities'] =
+    Object.freeze(
+      { transitionOutbox: 'same_commit', optimisticVersion: true, replay: 'same_commit' } as const,
+    );
+  readonly #commands = new Map<string, StoredCommandOutbox>();
+  readonly #applied = new Set<string>();
+  readonly #owners = new Map<string, SagaId>();
   readonly #states = new Map<string, SagaStateEnvelope>();
   readonly #correlations = new Map<string, SagaInstanceId>();
   readonly #transitions = new Map<string, SagaTransitionRecord[]>();
@@ -26,11 +41,70 @@ export class MemorySagaStore implements SagaStorePort {
     this.id = id;
   }
 
+  /** Atomically commit a complete optimistic transition, or replay without new writes. */
+  commitTransition(
+    request: SagaTransitionCommitRequest,
+    signal?: AbortSignal,
+  ): Promise<SagaTransitionCommitResult> {
+    try {
+      signal?.throwIfAborted();
+      const value = snapshotTransitionCommit(request);
+      const instanceId = value.envelope.metadata.instanceId;
+      const replay = value.appliedKeyHash === undefined
+        ? undefined
+        : JSON.stringify([instanceId, value.appliedKeyHash]);
+      if (replay !== undefined && this.#applied.has(replay)) {
+        return Promise.resolve(Object.freeze({ committed: false }));
+      }
+      const current = this.#states.get(instanceId);
+      if (
+        (value.expectedVersion === 0
+          ? current !== undefined
+          : current?.metadata.version !== value.expectedVersion) ||
+        (this.#owners.has(instanceId) && this.#owners.get(instanceId) !== value.correlation.sagaId)
+      ) {
+        throw SagasError.validationFailed('Atomic saga store version mismatch.');
+      }
+      const key = correlationIndexKey(value.correlation.sagaId, value.correlation.correlationKey);
+      const correlated = this.#correlations.get(key);
+      if (correlated !== undefined && correlated !== instanceId) {
+        throw SagasError.validationFailed(
+          'Atomic saga correlation already belongs to another instance.',
+        );
+      }
+      for (const command of value.commands) {
+        if (this.#commands.has(command.id)) {
+          throw SagasError.validationFailed('Atomic saga command identity already exists.');
+        }
+      }
+      // No await or caller callback occurs between the condition and these map mutations.
+      this.#states.set(instanceId, value.envelope);
+      this.#owners.set(instanceId, value.correlation.sagaId);
+      this.#correlations.set(key, instanceId);
+      this.#transitions.set(instanceId, [
+        ...(this.#transitions.get(instanceId) ?? []),
+        value.record,
+      ]);
+      for (const command of value.commands) this.#commands.set(command.id, command);
+      if (replay !== undefined) this.#applied.add(replay);
+      return Promise.resolve(Object.freeze({ committed: true }));
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /** Inspect snapshotted producer intents without implementing a second relay. */
+  commandIntents(): readonly StoredCommandOutbox[] {
+    return Object.freeze(structuredClone([...this.#commands.values()]));
+  }
+
   /** Load a saga state envelope by instance id. */
   load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {
-    return Promise.resolve(this.#states.get(instanceId) as SagaStateEnvelope<TState> | undefined);
+    return Promise.resolve(
+      structuredClone(this.#states.get(instanceId)) as SagaStateEnvelope<TState> | undefined,
+    );
   }
 
   /** Save a saga state envelope with optimistic version checking. */
@@ -91,12 +165,12 @@ export class MemorySagaStore implements SagaStorePort {
 
   /** Return all stored state envelopes. */
   entries(): readonly SagaStateEnvelope[] {
-    return Object.freeze([...this.#states.values()]);
+    return Object.freeze(structuredClone([...this.#states.values()]));
   }
 
   /** Return transition records for one instance. */
   transitions(instanceId: SagaInstanceId): readonly SagaTransitionRecord[] {
-    return Object.freeze([...(this.#transitions.get(instanceId) ?? [])]);
+    return Object.freeze(structuredClone([...(this.#transitions.get(instanceId) ?? [])]));
   }
 
   /** Clear all stored state, indexes, and transitions. */
@@ -104,9 +178,12 @@ export class MemorySagaStore implements SagaStorePort {
     this.#states.clear();
     this.#correlations.clear();
     this.#transitions.clear();
+    this.#commands.clear();
+    this.#applied.clear();
+    this.#owners.clear();
   }
 }
 
 function correlationIndexKey(sagaId: SagaId, correlationKey: SagaCorrelationKey): string {
-  return `${sagaId}:${correlationKey}`;
+  return JSON.stringify([sagaId, correlationKey]);
 }
