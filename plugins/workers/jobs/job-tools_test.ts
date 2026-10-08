@@ -25,6 +25,7 @@ Deno.test('createJobTools exports handler events, progress, and child spans', as
     await withSpan(getJobTracer(), 'job.handler', async () => {
       const tools = createJobTools({
         id: 'job.fixture',
+        signal: new AbortController().signal,
         payload: {},
         reportProgress: (percent, message) => {
           progressReports.push([percent, message]);

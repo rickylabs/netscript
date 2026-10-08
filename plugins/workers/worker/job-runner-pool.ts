@@ -14,6 +14,8 @@ export type WorkerPoolOptions = Readonly<{
   registry?: StaticJobRegistry;
   /** @deprecated The current runner is in-process and does not load a worker entry point. */
   workerUrl?: string;
+  /** Cleanup wait after abort; does not physically terminate an in-process handler. */
+  abortGracePeriodMs?: number;
 }>;
 
 type ProgressSink = (
@@ -30,6 +32,7 @@ export class WorkerPool {
     this.#runner = new InProcessJobRunner({
       fallbackToDynamicImport: true,
       registry: options.registry,
+      abortGracePeriodMs: options.abortGracePeriodMs,
     });
   }
 
@@ -43,7 +46,9 @@ export class WorkerPool {
     jobDef: JobDefinition,
     executionId: string,
     progressSink: ProgressSink,
+    signal?: AbortSignal,
   ): Promise<JobResult<unknown>> {
+    signal?.throwIfAborted();
     if (!this.#initialized) {
       throw new Error('WorkerPool not initialized. Call initialize() first.');
     }
@@ -99,6 +104,7 @@ export class WorkerPool {
       id: jobDef.id,
       job: jobDef,
       payload: message.payload,
+      signal,
       correlationId: message.correlationId,
       traceparent: message.traceparent,
       tracestate: message.tracestate,

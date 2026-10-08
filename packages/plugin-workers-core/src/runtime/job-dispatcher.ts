@@ -73,12 +73,14 @@ export class InProcessJobDispatcher {
     context: JobContext<TPayload, TResult>,
   ): Promise<JobResult<TResult>> {
     const resolution = await this.resolve(job);
+    context.signal.throwIfAborted();
     if (
       job.payloadSchema &&
       (!isJobHandlerDefinition(resolution.handler) ||
         resolution.handler.payloadSchema !== job.payloadSchema)
     ) {
       const payload = await validateJobPayload(job.payloadSchema, context.payload, job.id);
+      context.signal.throwIfAborted();
       return resolution.handler({ ...context, payload });
     }
     return resolution.handler(context);

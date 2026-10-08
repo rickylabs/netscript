@@ -33,6 +33,7 @@ export type {
   ExecutionRecord as RuntimeExecutionRecord,
   JobContext,
   JobDefinition,
+  JobDispatchContext,
   JobHandler,
   JobMessage,
   JobResult,

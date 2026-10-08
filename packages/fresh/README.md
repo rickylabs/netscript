@@ -303,6 +303,15 @@ After coordinated publication, qualify a fresh consumer of the fixed published S
 versions with no application dependency overrides before removing downstream DB pins. Source
 qualification does not prove published resolution.
 
+### Pure route URL helpers
+
+Route `href`, `getLinkProps`, and paired `href`/`partialHref`/`getLinkProps` use their typed inputs
+and schema defaults without invoking hooks. They are safe in memo factories, callbacks, SSR and
+conditional lists. To preserve current search, call `page.hooks.useSearch()` at the component's top
+level and pass those values explicitly. `page.hooks.useRoute().getLinkProps` and bound `Link` retain
+contextual `preserveSearchParams` behavior. Utility calls keep accepting preserve flags but never
+read current context; migrate implicit preservation to those explicit capabilities.
+
 Desktop RPC keeps one native binding per window. With the matching SDK desktop adapter, a new
 browser document automatically retires its previous MessagePort before opening a new oRPC channel.
 Older document callbacks cannot close the replacement. Application shutdown still calls the
