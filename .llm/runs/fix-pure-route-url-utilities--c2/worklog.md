@@ -166,3 +166,5 @@ Public surface and domain vocabulary remain those of the reviewed feature. Exist
 
 ## Implement — F1/F2 documentation repair
 Shortened duplicate migration prose, retained explicit top-level useSearch example, pure helper/default semantics, contextual Link/useRoute closure capabilities and paired search guidance. Existing MCP budget/path selection unchanged. Updated both public preserveSearchParams JSDoc mirrors and paired partial flag comments. No implementation, public signature, test or dependency changes. Supervisor source-alignment review compares existing getBoundLinkProps, Link and useRoute hook; contract unchanged. Canonical carrier regeneration follows committed documentation source.
+
+Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
