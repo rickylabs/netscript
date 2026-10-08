@@ -44,6 +44,60 @@ const noopRouter = os.router({
   ping: os.handler(() => 'pong'),
 });
 
+Deno.test('close unbinds synchronously and preserves a same-name replacement', async () => {
+  const window = new TestDesktopWindow();
+  const options = { window, router: noopRouter, context: {}, runtime: DESKTOP_RUNTIME };
+  const original = bindDesktopRpcWindow(options);
+  let replacement: ReturnType<typeof bindDesktopRpcWindow> | undefined;
+  try {
+    const closing = original.close();
+    assertEquals(window.unbindCalls, 1);
+    assertEquals(window.handler, undefined);
+    replacement = bindDesktopRpcWindow(options);
+    const replacementHandler = window.handler;
+    await closing;
+    assertEquals(window.handler, replacementHandler);
+    assertEquals(window.bindCalls, 2);
+    const client = createDesktopServiceClient({
+      contract: noopRouter,
+      invoke: window.invoke.bind(window),
+    });
+    assertEquals(await client.ping(undefined), 'pong');
+  } finally {
+    await original.close();
+    await replacement?.close();
+  }
+  assertEquals(window.unbindCalls, 2);
+});
+
+Deno.test('reentrant close shares pending asynchronous unbind completion', async () => {
+  const window = new TestDesktopWindow();
+  const completion = Promise.withResolvers<void>();
+  const binding = bindDesktopRpcWindow({
+    window,
+    router: noopRouter,
+    context: {},
+    runtime: DESKTOP_RUNTIME,
+  });
+  let reentrant: Promise<void> | undefined;
+  window.unbind = () => {
+    window.unbindCalls++;
+    reentrant = binding.close();
+    return completion.promise;
+  };
+  const closing = binding.close();
+  assertEquals(reentrant, closing);
+  assertEquals(binding.close(), closing);
+  let settled = false;
+  closing.then(() => settled = true);
+  await Promise.resolve();
+  assertEquals(settled, false);
+  completion.resolve();
+  await closing;
+  assertEquals(settled, true);
+  assertEquals(window.unbindCalls, 1);
+});
+
 Deno.test('browser and Aspire capability shapes disable Desktop RPC without binding', async () => {
   const browserWindow = new TestDesktopWindow();
   const browser = bindDesktopRpcWindow({

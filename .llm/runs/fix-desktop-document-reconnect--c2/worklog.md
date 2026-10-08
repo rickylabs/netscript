@@ -121,3 +121,6 @@ Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
 Canonical gen:publish-assets exit 0. Generated carrier reviewed; no hand edits.
 
 Canonical gen:mcp-export-corpus exit 0. Generated carrier reviewed; no hand edits.
+
+## Implement / Gate — F1 repair
+Uses Promise.withResolvers<void>; assigns promise before synchronous unbind and captures synchronous throws. New regression confirms immediate unbind, retained same-name replacement and actual typed ping. Additional regression verifies reentrant promise identity and asynchronous completion. Desktop tests: exit 0, 9 passed. Re-defer-unbind mutation: exit 1 on immediate unbind assertion. Restored: exit 0, 9 passed. Supervisor slice review: no new public signature, cast, suppression, dependency or abstraction. Both main README/debt additions retained; generated corpus regenerated canonically.

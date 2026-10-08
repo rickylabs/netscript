@@ -115,9 +115,13 @@ export function bindDesktopRpcWindow(
       isClosed = true;
       server.close();
       // Assign before calling unbind, including a synchronous throw or reentrant cleanup.
-      closePromise = Promise.resolve().then(() => options.window?.unbind?.(bindingName)).then(
-        () => undefined,
-      );
+      const unbound = Promise.withResolvers<void>();
+      closePromise = unbound.promise;
+      try {
+        unbound.resolve(options.window?.unbind?.(bindingName));
+      } catch (error) {
+        unbound.reject(error);
+      }
       return closePromise;
     },
   };
