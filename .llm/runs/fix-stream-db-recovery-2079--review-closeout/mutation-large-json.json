@@ -1,0 +1,22 @@
+{
+  "exitCode": 1,
+  "durationMs": 1192,
+  "summary": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "totalResults": 1,
+    "uniqueFailures": 1
+  },
+  "failures": [
+    {
+      "message": "RangeError: Maximum call stack size exceeded",
+      "count": 1,
+      "tests": [
+        {
+          "name": "StreamDB recovery consumes 200000 ordered catch-up events and resumes the checkpoint"
+        }
+      ]
+    }
+  ]
+}

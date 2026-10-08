@@ -1,0 +1,15 @@
+# Research
+
+Issue #2079 asks bounded restart/reconnect/backoff/resume at createNetScriptStreamDB, real server kill recovery and negative control. Consulted MCP find_guidance/search_docs; no applicable reconnect implementation returned. Loaded runtime doctrine and archetype/scope gates; inspected installed public upstream source and current main factory/test.
+
+Upstream state createStreamDB starts one consumer lazily through preload; the consumer latch never resets after failure and collections must remain stable for mounted queries. Public createStreamDB accepts a DurableStream instance. Public DurableStream.stream returns StreamResponse with subscribeJson, closed, offset and cancellation; read options accept offset. These public seams allow read-session recovery without rebuilding the dispatcher or collections. Upstream onError only wraps initial connection; it does not restart terminal read sessions. Upstream fetch defaults retry indefinitely; disable those inner retries so the owned supervisor can enforce one bounded budget.
+
+No upstream package implementation/private import or version upgrade required. Direct public client import requires declaring the already-resolved client in the fresh package import map; lock workspace metadata may need regeneration, without changing resolved versions. Current owned handle types omit preload although the default object has it; expose an optional owned preload hook for compatibility with existing custom factory ports. No UI rendering changes.
+
+Reference server is already in the current lock/root dev catalog: @durable-streams/server. DurableStreamTestServer public options include OS-allocated bind and dataDir-backed persistent storage. Use that genuine stream server in an isolated child for kill/restart testing; no hand-rolled stream protocol fixture or new dependency required. Config resolution is pinned state/client from existing package maps and lock; cache also contains other versions, which are not evidence of dependency changes.
+
+Issue prose also asks an inspectable liveness signal. Include named readonly status in the default owned handle; optional in the interface so existing alternate adapters remain compatible. No UI or raw error exposure required.
+
+Implementation probe: final stream closed flag causes native closed to settle before subscription callback; startup checkpoint/subscriber-failure regressions failed. Public json() is awaited consumption and rejects parse errors directly. stream-api appends public params to first request after offset, so live=long-poll plus live:false enables finite long-poll reads supervised outside the native one-shot consumer. Revision requires second PLAN-EVAL before replacing the WIP source.
+
+Further seam clarification: native shouldContinueLive returns false whenever live:false, independent of upToDate. Thus finite json() consumes one HTTP response; owned supervisor repeats catch-up batches until upToDate, then injects long-poll. This preserves per-response memory shape rather than aggregating the whole retained log.

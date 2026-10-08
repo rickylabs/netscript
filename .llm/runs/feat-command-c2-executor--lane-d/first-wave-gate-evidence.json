@@ -1,0 +1,375 @@
+{
+  "schemaVersion": 1,
+  "phase": "native-generated-first-wave",
+  "state": "FROZEN_FOR_SUPERVISOR_REVIEW",
+  "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "runtime": [
+    "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+    "v8 15.0.245.2-rusty",
+    "typescript 6.0.3"
+  ],
+  "baselineFreshness": "Both native durable checks actually failed stale at exit 1; native generation and refreshed freshness pass at exit 0.",
+  "gates": [
+    {
+      "name": "baseline-prose",
+      "exitCode": 1,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 8052,
+      "stdoutSha256": "41423ae5c2de4c842ae0dbe3e0ff928d6bee55da4181bed83fabc99f6a6a6eb3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 20357,
+      "stderrBytes": 0,
+      "nativeReceipt": {
+        "gateId": "agent-docs-prose",
+        "invocationId": "c2-first-wave-baseline-prose",
+        "outcome": "FAIL",
+        "exitCode": 1,
+        "gitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "actualGitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "durationMs": 7953
+      },
+      "nativeReceiptSha256": "54e38b65ea3637def1f781aab1510391938c52beb6e041ee2e1ec3973884765d"
+    },
+    {
+      "name": "baseline-mcp",
+      "exitCode": 1,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 7122,
+      "stdoutSha256": "25360143e7940ee0f0a924a0058509998d52246a2ccc65b4f082a381d63deb3a",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1421,
+      "stderrBytes": 0,
+      "nativeReceipt": {
+        "gateId": "mcp-export-corpus",
+        "invocationId": "c2-first-wave-baseline-mcp",
+        "outcome": "FAIL",
+        "exitCode": 1,
+        "gitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "actualGitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "durationMs": 7045
+      },
+      "nativeReceiptSha256": "00a1be7a604a32136610751c6685066949f7e9d17f6105814b34e8a9835f1620"
+    },
+    {
+      "name": "generate-prose",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 7973,
+      "stdoutSha256": "45ec2a5b83552f905b7955cc5a5944e312847c76c17aff9463e34aa348be049a",
+      "stderrSha256": "299c282c03fce563b842ff3102a44103c11e7a77aa237590c54a8e9aa3fbf560",
+      "stdoutBytes": 48280,
+      "stderrBytes": 2109
+    },
+    {
+      "name": "generate-mcp",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 7638,
+      "stdoutSha256": "5b9ec17752c18741e8933e43b98116900427b720c51f929a625dde2cf888533a",
+      "stderrSha256": "bd1adab093d7b17333d08715e968abb901e8b9c15871a046b8dfb1fe9ed00e13",
+      "stdoutBytes": 232,
+      "stderrBytes": 156
+    },
+    {
+      "name": "fresh-prose",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 9077,
+      "stdoutSha256": "6d3f24458847be3419cc3ded550a77cf6e23d127e0718103ed24b6b36061ff96",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 20032,
+      "stderrBytes": 0,
+      "nativeReceipt": {
+        "gateId": "agent-docs-prose",
+        "invocationId": "c2-first-wave-fresh-prose",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "actualGitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "durationMs": 8981
+      },
+      "nativeReceiptSha256": "788b9ddf189c124a118926866e95d8be1324112fb86550fd4accd3f609aba18d"
+    },
+    {
+      "name": "fresh-mcp",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 6746,
+      "stdoutSha256": "7f4533e629f6ab4bcd942ecbc54c4ac26b4d80d1af8b8173502a60cfa6b1fd3b",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 1330,
+      "stderrBytes": 0,
+      "nativeReceipt": {
+        "gateId": "mcp-export-corpus",
+        "invocationId": "c2-first-wave-fresh-mcp",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "actualGitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "durationMs": 6667
+      },
+      "nativeReceiptSha256": "3c465d96d0b98efbf688cfa76a211f00b60077be64cfe627d35497e932638c46"
+    },
+    {
+      "name": "prose-regressions",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 268,
+      "stdoutSha256": "9c5f4b690b3509d3606f4ca32353a264bb460cfb6781e94d1c2447f67d48d837",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 182,
+      "stderrBytes": 0,
+      "testSummary": {
+        "passed": 4,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 4,
+        "uniqueFailures": 0
+      },
+      "testReportSha256": "4c5aa9acda7e2c3a4e4572b16889388459f87e8963c63d9067092b618775db3c"
+    },
+    {
+      "name": "mcp-generator-regressions",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 1044,
+      "stdoutSha256": "78e0add76b0c871d6a4642260372668ae9c82d6a8b87dfe89105d2be1fc4da45",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 190,
+      "stderrBytes": 0,
+      "testSummary": {
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 5,
+        "uniqueFailures": 0
+      },
+      "testReportSha256": "e347ec3b2302d76c9982ef71d1c3c5f357eaaae0c06f9b6f1778c02b00ce67d2"
+    },
+    {
+      "name": "mcp-embedded-regressions",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 1139,
+      "stdoutSha256": "de2002a394f5849fba00866d5682ca898d3eb52c445c1f7cfed523ed2becb767",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 189,
+      "stderrBytes": 0,
+      "testSummary": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 2,
+        "uniqueFailures": 0
+      },
+      "testReportSha256": "9034871946483bbdc8a0f588bffcdf613438b74dcd47d972c0fd70d46a603e85"
+    },
+    {
+      "name": "mcp-check",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 1389,
+      "stdoutSha256": "0a2830a85877d461586fd6e2129a49d0fbae93ba4d79fb20a2fb85013852d0b1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 175,
+      "stderrBytes": 0
+    },
+    {
+      "name": "mcp-lint",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 238,
+      "stdoutSha256": "c160c717c54893e26adbc3cbd1fadd630b6c00ac711c992bc3f057b1faf58a9d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 174,
+      "stderrBytes": 0
+    },
+    {
+      "name": "mcp-fmt",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 180,
+      "stdoutSha256": "77bddc74039f32c5dc8c88498e9f962c49ebc89c036a3faa0c10e64500f847c4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 181,
+      "stderrBytes": 0
+    },
+    {
+      "name": "quality-scan",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 2671,
+      "stdoutSha256": "d058995638467d2780a712df9032f6e63db53e856ffa7aa3ec00f54caf6d2ef3",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 5636,
+      "stderrBytes": 0,
+      "nativeReceipt": {
+        "gateId": "quality-scan",
+        "invocationId": "c2-first-wave-quality-scan",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "actualGitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "durationMs": 2584
+      },
+      "nativeReceiptSha256": "27a5404b24247ea3e76bd118bf33531011fceac3360174a5de68a1f09c70d378"
+    },
+    {
+      "name": "arch-check",
+      "exitCode": 0,
+      "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+      "runtime": [
+        "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "v8 15.0.245.2-rusty",
+        "typescript 6.0.3"
+      ],
+      "durationMs": 5955,
+      "stdoutSha256": "26079677dccd8527f187135ac4a10401bd2e6f4a062485b07cf41ba8272cbf67",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdoutBytes": 17982,
+      "stderrBytes": 0,
+      "nativeReceipt": {
+        "gateId": "arch-check",
+        "invocationId": "c2-first-wave-arch-check",
+        "outcome": "PASS",
+        "exitCode": 0,
+        "gitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "actualGitHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "durationMs": 5872
+      },
+      "nativeReceiptSha256": "02eaf625983a70df21b71f291c3bfae102b8f27d3123bbd714172730877188a7"
+    }
+  ],
+  "staticReports": {
+    "check": {
+      "reportSha256": "0911d3bf419f5406eb4c79174749b0dfa22450d494223468cfe91a73e0f0e182",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 119,
+        "batches": 1,
+        "failedBatches": 0
+      }
+    },
+    "lint": {
+      "reportSha256": "744a372b7889b8b5bc2afb83d22f744842f94bf152555b5044b9a9e78a2fb35c",
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueRules": 0,
+        "uniquePaths": 0
+      },
+      "selection": {
+        "filesSelected": 118,
+        "batches": 2,
+        "failedBatches": 0
+      }
+    },
+    "fmt": {
+      "reportSha256": "a8609891dffdbfed348953d50943f38ddc55e976853288ca57df04d86a06617b",
+      "summary": {
+        "filesSelected": 118,
+        "batches": 2,
+        "failedBatches": 0,
+        "findings": 0,
+        "ignoredFindings": 0
+      }
+    }
+  },
+  "existingTests": {
+    "prose": 4,
+    "mcpGeneratorNonWorktree": 5,
+    "mcpEmbeddedCorpus": 2,
+    "passed": 11,
+    "failed": 0
+  },
+  "mcpGeneratorFilter": "/^(normalizer consumes|generated payload is deterministic|renderer covers|colour-forcing variables|nested deno doc output)/",
+  "limits": [
+    "Seven unchanged MCP worktree fixture tests are reserved for actual repository CI; their source was not modified.",
+    "Downstream publish/CLI asset generation requires committed first-wave signoff and explicit release.",
+    "Final C2 full qualification, actual native CI and independent opposite-family IMPL-EVAL remain required."
+  ],
+  "newNamedTests": 0,
+  "newMutationControlsRequired": false,
+  "generationProof": {
+    "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+    "trackedFiles": 6230,
+    "changedAssets": [
+      ".llm/assets/agent-docs/prose.json.gz",
+      ".llm/assets/agent-docs/provenance.json",
+      "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+    ],
+    "unchangedTrackedFiles": 6227,
+    "baselineSnapshotSha256": "876296d3dff517a21d0d56ef9a6befa833ed31f73f71bb2dc40c30923c880d29",
+    "readSetCleanBeforeMcp": true
+  }
+}

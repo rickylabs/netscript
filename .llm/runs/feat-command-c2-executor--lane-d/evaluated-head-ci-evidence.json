@@ -1,0 +1,274 @@
+{
+  "observedAt": "2026-10-08T01:16:56.664332+00:00",
+  "head": "c177087fa175e51f19290150801da1db7d6812de",
+  "run": 37710640920,
+  "runUrl": "https://github.com/rickylabs/netscript/actions/runs/37710640920",
+  "technicalJobsPassed": true,
+  "qualityNativeGatesPassed": 18,
+  "checkFiles": 3199,
+  "checkFailedBatches": 0,
+  "testsPassed": 5474,
+  "testsFailed": 0,
+  "testsIgnored": 14,
+  "browserPassed": 6,
+  "browserFailed": 0,
+  "fullUnchangedRepoSuiteExecuted": true,
+  "fullNativeTestCommand": [
+    "deno",
+    "test",
+    "--reporter=tap",
+    "--allow-all"
+  ],
+  "sevenWorktreeFixturesExecuted": true,
+  "fixtureCoverageEvidenceMethod": "Successful unfiltered recursive native root test command, unchanged matching fixture source with seven unignored worktree cases, no config exclusion for that file; native wrapper retains aggregate pass results rather than per-pass TAP events.",
+  "fixtureSourceSha256": "b9af69b0ccd5e3a027905d8aebf8cb1a82683d937fbdad1e96b6ad473fd08fa6",
+  "nativeDiscoveryPrimarySources": [
+    "https://docs.deno.com/runtime/test/",
+    "https://docs.deno.com/runtime/reference/cli/test/"
+  ],
+  "ciComposition": {
+    "observedAt": "2026-10-08T01:07:52.223941+00:00",
+    "head": "c177087fa175e51f19290150801da1db7d6812de",
+    "actualCiMergeHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc",
+    "actualCiMergeParents": [
+      "8b6e89e9dfe786edf062e64228c8bb14fc45a110",
+      "c177087fa175e51f19290150801da1db7d6812de"
+    ],
+    "actualCiMergeTree": "566a7ebacb633a13d45065e7c4621b86985042d7",
+    "localSignedTree": "566a7ebacb633a13d45065e7c4621b86985042d7",
+    "entireCiCheckoutTreeByteExactCurrentHead": true
+  },
+  "nativeReceipts": [
+    {
+      "gate": "check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc",
+      "rawReceiptSha256": "433ad46254de3ea18f04053b25363533d9c8cca816e66cc46c7127929414f325",
+      "rawReportSha256": "c957dc57d2cbd5ef262ca0e619020bb97d8a782c2a38d086208d2be57cedf741"
+    },
+    {
+      "gate": "test",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc",
+      "rawReceiptSha256": "7a077e81df3a590042a6c3bf3e6a96abb4a4b0a588549734ea738c3e2c58e69c",
+      "rawReportSha256": "f4d36162d55f41c2719044117f0bbee99606ff9c0ee2fd1de3bc58eed299d328"
+    }
+  ],
+  "browserReceiptSha256": "745b25d4a63052c19c9f0fcb9954cb5d76663f026f0d5fc951293227e57718dc",
+  "qualityReceipts": [
+    {
+      "file": "agent-docs-prose.json",
+      "gateId": "agent-docs-prose",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "aspire-version-parity.json",
+      "gateId": "aspire-version-parity",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "assets-barrel.json",
+      "gateId": "assets-barrel",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "audit-critical.json",
+      "gateId": "audit-critical",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "docs-accuracy.json",
+      "gateId": "docs-accuracy",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "docs-format-test.json",
+      "gateId": "docs-source-format-test",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "docs-format.json",
+      "gateId": "docs-source-format",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "docs-tagline.json",
+      "gateId": "docs-tagline",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "emitted-samples.json",
+      "gateId": "emitted-samples",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "fmt.receipt.json",
+      "gateId": "fmt-check",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "jsdoc-example-compile.json",
+      "gateId": "jsdoc-example-compile",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "jsr-specifiers.json",
+      "gateId": "netscript-jsr-specifiers",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "lint.receipt.json",
+      "gateId": "lint",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "mcp-export-corpus.json",
+      "gateId": "mcp-export-corpus",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "publish-assets.json",
+      "gateId": "publish-assets",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "publish-dry-run.json",
+      "gateId": "publish-dry-run",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "readme-fences.json",
+      "gateId": "readme-fences",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    },
+    {
+      "file": "scaffold-versions.json",
+      "gateId": "scaffold-versions",
+      "outcome": "PASS",
+      "exitCode": 0,
+      "actualGitHead": "58599ccc5b9566f5a5082eaf04c85534232eb7dc"
+    }
+  ],
+  "readyMerge": false,
+  "finalWholeChainScaffoldRuntimeClaimed": false,
+  "lifecycleAtTechnicalQualification": "Acceptance and independent report reconciliation pending; no close-gate waiver and no ready claim.",
+  "qualityReceiptFiles": [
+    {
+      "file": "agent-docs-prose.json",
+      "sha256": "8d9591927adc9e3d8db165ef463134528edc0fe1aa0ae7e67938f3b7c36c0344"
+    },
+    {
+      "file": "aspire-version-parity.json",
+      "sha256": "6cd34227529707c21fadeecf9b746eb1a3fd53564b19ee3d1c693699c14414b2"
+    },
+    {
+      "file": "assets-barrel.json",
+      "sha256": "112ab554544c9984fa34285cf098af133bd9ad104cb78a63c26438ef28dcd58e"
+    },
+    {
+      "file": "audit-critical.json",
+      "sha256": "24a687154c1d7e0126ba9d1e1116124ed9890ad59836a78e59e7d41097dc4203"
+    },
+    {
+      "file": "docs-accuracy.json",
+      "sha256": "3b72385b2ccc80683f6a5deef5e4e07107b5e0a5d2b05beb6ef1da9fa047a5ca"
+    },
+    {
+      "file": "docs-format-test.json",
+      "sha256": "7d772d024d90c3cc29d5a460c559e877ce2434bf23ddb32a2458c0ecf8e98aa2"
+    },
+    {
+      "file": "docs-format.json",
+      "sha256": "a4a34f987bf07c8e83515a8e7809e94710803390e6cb800deb3825f272099a3f"
+    },
+    {
+      "file": "docs-tagline.json",
+      "sha256": "cf7bd01047c9d88630dd4b43e1f5a3c60c4412092ad69c4934b40c305f24825a"
+    },
+    {
+      "file": "emitted-samples.json",
+      "sha256": "19b1140c74fe310ccebb701cc4f49e30900a5067445cc808c6a6ecd4dd4f3ea6"
+    },
+    {
+      "file": "fmt.receipt.json",
+      "sha256": "71b3c6fb34154a51e9fa8416a78e00d92e1fb5421a2e666f98f4095196674dba"
+    },
+    {
+      "file": "fmt.report.json",
+      "sha256": "d171c6d5effe774f113bc144592e1c668f77af5a989206bd927eac187538013c"
+    },
+    {
+      "file": "jsdoc-example-compile.json",
+      "sha256": "e3f02766d09a7c7c108bb051c746633d894cb6838da8b25706d0baeca7070e6e"
+    },
+    {
+      "file": "jsr-specifiers.json",
+      "sha256": "1fd5fbfe11699d633c7bc9c8cc5879bd7c99b8f55caae1b38ad2a0b920badaf5"
+    },
+    {
+      "file": "lint.receipt.json",
+      "sha256": "1fc47c5dd1f6fd5ddd7ccbbc431ac7800aa319ee6df01336f21460c55d6efb2b"
+    },
+    {
+      "file": "lint.report.json",
+      "sha256": "cb515de7fbb11f0212f7efc5d622fdd3c8f86255428c01b4342301e5f2ebec0d"
+    },
+    {
+      "file": "mcp-export-corpus.json",
+      "sha256": "9a675158c545c098f0c754c79e9cf4379623697fcc9acb28a5cab7129491a219"
+    },
+    {
+      "file": "publish-assets.json",
+      "sha256": "6e567958b5dfbeb5bc7be87dae31806383cd4d091dda0363f7555dfaa7d8696b"
+    },
+    {
+      "file": "publish-dry-run.json",
+      "sha256": "01eafa0d7b7eb4afa31198a8a9538f0378a4ee78bc9d2d7eabd76e7db4c950be"
+    },
+    {
+      "file": "readme-fences.json",
+      "sha256": "27fb024c81e02a222db606ed204b6110c0eb739cc0a0bdd2bbaade76546f86c4"
+    },
+    {
+      "file": "scaffold-versions.json",
+      "sha256": "f14273b2fecaa0fef9a0cf9bc7d8baf2bedd4665766a34d7d428786f208279bc"
+    }
+  ],
+  "reportOwnedByIndependentEvaluator": true
+}

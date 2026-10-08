@@ -1,0 +1,288 @@
+{
+  "minimumMemAvailableGiB": 39.98,
+  "gates": [
+    {
+      "name": "gen-prose",
+      "command": [
+        "deno",
+        "task",
+        "gen:agent-docs-prose"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "gen-assets",
+      "command": [
+        "deno",
+        "task",
+        "gen:assets-barrel"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "gen-publish",
+      "command": [
+        "deno",
+        "task",
+        "gen:publish-assets"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "gen-manifest",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run=git",
+        "--allow-write=.llm/tools/validation/fixtures",
+        ".llm/tools/validation/aspire-surface-manifest.ts"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "check",
+      "command": [
+        "deno",
+        "task",
+        "check"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "deno",
+        "task",
+        "lint"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "fmt-check",
+      "command": [
+        "deno",
+        "task",
+        "fmt:check"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "test",
+      "command": [
+        "deno",
+        "task",
+        "test",
+        "packages/cli"
+      ],
+      "exitCode": 1
+    },
+    {
+      "name": "audit-critical",
+      "command": [
+        "deno",
+        "task",
+        "audit:critical"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "quality-gate",
+      "command": [
+        "deno",
+        "task",
+        "quality:gate"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "aspire-version-parity",
+      "command": [
+        "deno",
+        "task",
+        "check:aspire-version-parity"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "agent-docs-prose",
+      "command": [
+        "deno",
+        "task",
+        "check:agent-docs-prose"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "assets-barrel",
+      "command": [
+        "deno",
+        "task",
+        "check:assets-barrel"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "publish-assets",
+      "command": [
+        "deno",
+        "task",
+        "check:publish-assets"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "emitted-samples",
+      "command": [
+        "deno",
+        "task",
+        "check:emitted-samples"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "cli-lint",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-lint.ts",
+        "--config",
+        ".llm/runs/fix-auth-config-secrets-2020--review-closeout/cli-quality-config.json",
+        "--file",
+        "packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts",
+        "--file",
+        "packages/cli/e2e/tests/application/builders/runtime-auth-env_test.ts",
+        "--file",
+        "packages/cli/e2e/tests/application/builders/runtime-gates_test.ts",
+        "--file",
+        "packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-env.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-env_test.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "cli-fmt",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-fmt.ts",
+        "--config",
+        ".llm/runs/fix-auth-config-secrets-2020--review-closeout/cli-quality-config.json",
+        "--file",
+        "packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts",
+        "--file",
+        "packages/cli/e2e/tests/application/builders/runtime-auth-env_test.ts",
+        "--file",
+        "packages/cli/e2e/tests/application/builders/runtime-gates_test.ts",
+        "--file",
+        "packages/cli/src/kernel/templates/aspire/helpers/register/resolve-resource-environment.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-config-security_test.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-env.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-env_test.ts",
+        "--file",
+        "packages/cli/src/public/features/plugins/auth/auth-recipe_test.ts"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "jsr-audit",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/fitness/audit-jsr-package.ts",
+        "--root",
+        "packages/cli",
+        "--out",
+        "runs/2026-10-08-review-closeout/jsr-audit.json"
+      ],
+      "exitCode": 1
+    },
+    {
+      "name": "doc-lint",
+      "command": [
+        "deno",
+        "task",
+        "doc:lint",
+        "--root",
+        "packages/cli",
+        "--pretty"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "docs-links",
+      "command": [
+        "deno",
+        "task",
+        "docs:links"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "scaffold-runtime",
+      "command": [
+        "deno",
+        "task",
+        "e2e:cli",
+        "run",
+        "scaffold.runtime",
+        "--cleanup",
+        "--format",
+        "pretty"
+      ],
+      "exitCode": 1
+    },
+    {
+      "name": "CLI tests corrected environment",
+      "command": [
+        "deno",
+        "task",
+        "test",
+        "packages/cli"
+      ],
+      "exitCode": 0,
+      "summary": {
+        "passed": 1823,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1823,
+        "uniqueFailures": 0
+      }
+    },
+    {
+      "name": "JSR audit corrected output permission",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/fitness/audit-jsr-package.ts",
+        "--root",
+        "packages/cli"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "runtimeStatus": "PASS: both Postgres and SQLite scaffold runtime suites in GitHub run 37729329630 at source head 8126d51083fce24d3a61bad5b373f4f206f974d9"
+}

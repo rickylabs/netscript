@@ -225,3 +225,10 @@ export function createPostgresAdapter<
 >(options: PostgresConnectionOptions): PostgresAdapter<TClient> {
   return new PostgresAdapter<TClient>(options);
 }
+
+export type {
+  DatabaseAdapter,
+  DatabaseConnectionOptions,
+  DatabaseConnectionStatus,
+  DatabaseProvider,
+} from '../ports/database-client.ts';

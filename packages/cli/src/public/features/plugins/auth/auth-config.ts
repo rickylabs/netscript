@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { isCredentialEnvironmentKey } from '../../../../kernel/templates/aspire/helpers/register/resolve-resource-environment.ts';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import {
@@ -8,6 +9,8 @@ import {
   type AuthProviderPreset,
   type AuthSecretKind,
 } from './auth-types.ts';
+
+import { readAuthEnvBackend, reconcileAuthEnv } from './auth-env.ts';
 
 const AUTH_ENV_FILE = '.env';
 const APPSETTINGS_FILE = 'appsettings.json';
@@ -68,16 +71,21 @@ export async function showAuthBackend(
   projectRoot: string,
   fs: FileSystemPort,
 ): Promise<AuthBackend> {
-  const env = await readEnv(join(projectRoot, AUTH_ENV_FILE), fs);
-  if (env.NETSCRIPT_AUTH_BACKEND) return parseAuthBackend(env.NETSCRIPT_AUTH_BACKEND);
+  const envPath = join(projectRoot, AUTH_ENV_FILE);
+  const backend = await fs.exists(envPath)
+    ? readAuthEnvBackend(await fs.readFile(envPath))
+    : undefined;
+  if (backend) return parseAuthBackend(backend);
 
   const appsettingsPath = join(projectRoot, APPSETTINGS_FILE);
   if (await fs.exists(appsettingsPath)) {
     const value = JSON.parse(await fs.readFile(appsettingsPath)) as {
       auth?: { backend?: unknown };
       Auth?: { Backend?: unknown };
+      NetScript?: { Plugins?: { auth?: { Environment?: { NETSCRIPT_AUTH_BACKEND?: unknown } } } };
     };
-    const configured = value.auth?.backend ?? value.Auth?.Backend;
+    const configured = value.NetScript?.Plugins?.auth?.Environment?.NETSCRIPT_AUTH_BACKEND ??
+      value.auth?.backend ?? value.Auth?.Backend;
     if (typeof configured === 'string') return parseAuthBackend(configured);
   }
   return 'kv-oauth';
@@ -163,18 +171,7 @@ async function writeAuthEnv(
 ): Promise<void> {
   const path = join(projectRoot, AUTH_ENV_FILE);
   const current = await fs.exists(path) ? await fs.readFile(path) : '';
-  const pending = new Map(Object.entries(values));
-  const lines = current.split(/\r?\n/).filter((line, index, all) =>
-    !(index === all.length - 1 && line === '')
-  ).map((line) => {
-    const match = /^([A-Za-z_][A-Za-z0-9_]*)=/.exec(line);
-    if (!match || !pending.has(match[1])) return line;
-    const next = `${match[1]}=${pending.get(match[1])}`;
-    pending.delete(match[1]);
-    return next;
-  });
-  for (const [key, value] of pending) lines.push(`${key}=${value}`);
-  await fs.writeFile(path, `${lines.join('\n')}\n`);
+  await fs.writeFile(path, reconcileAuthEnv(current, values));
 }
 
 async function writeAuthConfig(
@@ -187,44 +184,55 @@ async function writeAuthConfig(
   const current = await fs.exists(path)
     ? JSON.parse(await fs.readFile(path)) as Record<string, unknown>
     : {};
-  const auth = isRecord(current.Auth) ? current.Auth : {};
-  const environment = isStringRecord(auth.Environment) ? auth.Environment : {};
-  current.Auth = {
-    ...auth,
-    ...(values.NETSCRIPT_AUTH_BACKEND ? { Backend: values.NETSCRIPT_AUTH_BACKEND } : {}),
-    Environment: { ...environment, ...values },
-  };
+  const declaredEnvironment: Record<string, string> = {};
+  for (
+    const [name, keys] of [
+      ['Auth', ['Backend', 'Environment', 'Env']],
+      ['auth', ['backend', 'environment', 'env']],
+    ] as const
+  ) {
+    const legacy = current[name];
+    if (!isRecord(legacy)) continue;
+    Object.assign(
+      declaredEnvironment,
+      isRecord(legacy.Environment ?? legacy.environment ?? legacy.Env ?? legacy.env)
+        ? legacy.Environment ?? legacy.environment ?? legacy.Env ?? legacy.env
+        : {},
+    );
+    for (const key of keys) delete legacy[key];
+    if (Object.keys(legacy).length === 0) delete current[name];
+  }
   const netScript = isRecord(current.NetScript) ? current.NetScript : {};
   const plugins = isRecord(netScript.Plugins) ? netScript.Plugins : {};
   const authPlugin = isRecord(plugins.auth) ? plugins.auth : {};
-  const pluginEnvironment = isStringRecord(authPlugin.Environment) ? authPlugin.Environment : {};
+  Object.assign(
+    declaredEnvironment,
+    isRecord(authPlugin.Env) ? authPlugin.Env : {},
+    isRecord(authPlugin.Environment) ? authPlugin.Environment : {},
+  );
+  const unrelatedEnvironment = Object.fromEntries(
+    Object.entries(declaredEnvironment).filter(([key, value]) =>
+      typeof value === 'string' && !/^(?:NETSCRIPT_AUTH_|WORKOS_|BETTER_AUTH_)/.test(key) &&
+      !isCredentialEnvironmentKey(key)
+    ),
+  );
+  delete authPlugin.Env;
   current.NetScript = {
     ...netScript,
     Plugins: {
       ...plugins,
       auth: {
         ...authPlugin,
-        Environment: { ...pluginEnvironment, ...values },
+        Environment: {
+          ...unrelatedEnvironment,
+          NETSCRIPT_AUTH_BACKEND: values.NETSCRIPT_AUTH_BACKEND,
+        },
       },
     },
   };
   await fs.writeFile(path, `${JSON.stringify(current, null, 2)}\n`);
 }
 
-async function readEnv(path: string, fs: FileSystemPort): Promise<Record<string, string>> {
-  if (!await fs.exists(path)) return {};
-  const result: Record<string, string> = {};
-  for (const line of (await fs.readFile(path)).split(/\r?\n/)) {
-    const match = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/.exec(line);
-    if (match) result[match[1]] = match[2];
-  }
-  return result;
-}
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function isStringRecord(value: unknown): value is Record<string, string> {
-  return isRecord(value) && Object.values(value).every((entry) => typeof entry === 'string');
 }

@@ -1,0 +1,223 @@
+{
+  "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+  "implementationFrozenForSupervisorReview": true,
+  "productFiles": [
+    {
+      "path": "docs/site/reference/service/index.md",
+      "sha256": "ae28c4df822a815b1cffa92fdfc311436b14cf303f1189e36d2e5d85f424629d"
+    },
+    {
+      "path": "packages/service/README.md",
+      "sha256": "cae2ab1fdcf3949bb7b8f49889ae304fa6981786be7d452f3ab5aebcd48ff8a6"
+    },
+    {
+      "path": "packages/service/commands-testing.ts",
+      "sha256": "e45ecbeefee826e1cf44bdd3934bc6c0f2bfaa059d20443e00f26d1ec03f557b"
+    },
+    {
+      "path": "packages/service/src/commands/application/command-identity.ts",
+      "sha256": "a7fe3e6e28984905beebf9e0f2f45272333814b606828b81512802b8066c30a4"
+    },
+    {
+      "path": "packages/service/src/commands/application/create-command-executor.ts",
+      "sha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "path": "packages/service/src/commands/application/executor-boundary.ts",
+      "sha256": "1c1b246e113d13040a8bec1422682213558f75ae61f97be283a740612b8215db"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance-controls.ts",
+      "sha256": "99c8ad2592877a1351575b23e2f1d6caa7d8b7f2705e9224d388b53f5c8b4581"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance-fixture.ts",
+      "sha256": "2410b1dfba4e4760ad7a9c27e0dce68b23db8a4a70c970c71d09c78a3d01ff7a"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance-helpers.ts",
+      "sha256": "0a68e1894047c057fe70915b0d1843f124ef9866517219192c2e60ab34231791"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance.ts",
+      "sha256": "a399e4758356f23425e8514371af096b301a58b6c90d5e3560bd0a207b67521d"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-determinism.ts",
+      "sha256": "3a7832a60ce4e0db8a5dfc6913018231f5636e5e7ba1f2a5eeb246d26cace9b6"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-fault-controller.ts",
+      "sha256": "bf323bc34a0eb435603ac5c74a7d62ce96a4433f0671b35a844cca9d49bbfe1d"
+    },
+    {
+      "path": "packages/service/tests/commands-conformance_test.ts",
+      "sha256": "24fd185a989e8489093376253b0f403466e7cd444628d2fc0cd09ab0a85b7874"
+    },
+    {
+      "path": "packages/service/tests/commands-executor-identity_test.ts",
+      "sha256": "6c92b4582a9d8aca136e7a6b55be4a9d85a253d2b0ea9421074bade8cec14eb4"
+    }
+  ],
+  "aggregateSha256": "d3d59597a3bcdb59a57faabc31c56ea0e6c9986f20c6cf2f6c10797239b4535c",
+  "unchangedFiles": [
+    {
+      "path": "deno.json",
+      "sha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493"
+    },
+    {
+      "path": "packages/database/mod.ts",
+      "sha256": "e14755ec960acd13d18329ed1ac14266a3a41aefc93aa39ad955a2cf7ff89908"
+    },
+    {
+      "path": "packages/database/commands.ts",
+      "sha256": "55ca4d5c94bc89ff25c4ffd1bd98ae5b25acfa472c3879330b6f11c55ae47d8d"
+    },
+    {
+      "path": "packages/database/deno.json",
+      "sha256": "4e5aa31fc443cd8724f13ddaea3a00a573405fbab253182bafcf2c0712583cd9"
+    },
+    {
+      "path": "packages/service/mod.ts",
+      "sha256": "4d857909ca2731debf1c699b6481fa52a1ddaaed4b1746fe23f2ac17c41b4104"
+    },
+    {
+      "path": "packages/service/commands.ts",
+      "sha256": "7760bbe80aa295ab0ab60428b0a1b7a9a928e8637212c610601440624168f272"
+    },
+    {
+      "path": "packages/service/deno.json",
+      "sha256": "56101e0c9fa38f297dd8d81d5d473bbac667897ce43bf32720797a0e58193231"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    },
+    {
+      "path": "packages/service/src/commands/application/define-command.ts",
+      "sha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38"
+    },
+    {
+      "path": "packages/service/src/commands/domain/definition.ts",
+      "sha256": "593d7d4f964cfe536d0c061861932aebdc87981add4a20ad164ebf940c48cf6b"
+    },
+    {
+      "path": "packages/service/src/commands/ports/executor-ports.ts",
+      "sha256": "da73ceb4e60739f1e4347e73bb10c2f35ae23871f4482b1619b40f8076117a7f"
+    },
+    {
+      "path": "packages/service/src/commands/testing/memory-command-store.ts",
+      "sha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe"
+    },
+    {
+      "path": "packages/service/src/primitives/health.ts",
+      "sha256": "1ac94a31b16498192a41f66521418613663ccef78c34b545856b80dc63bc872e"
+    }
+  ],
+  "newRuntimeExports": {
+    "service/commands/testing": [
+      "createCommandFaultController",
+      "createTestingCommandExecutor",
+      "assertCommandDeterminism",
+      "createMemoryCommandConformanceFixture",
+      "assertCommandFaultBoundary",
+      "runCommandConformance"
+    ]
+  },
+  "newTestingTypes": [
+    "CommandFaultController",
+    "CommandFaultBoundary",
+    "CommandDeterminismReport",
+    "CommandConformanceFixture",
+    "CommandConformanceInspection",
+    "CommandConformanceFactory",
+    "CommandConformanceReport"
+  ],
+  "exactTestingExports": {
+    "runtime": [
+      "createMemoryCommandStore",
+      "createCommandFaultController",
+      "createTestingCommandExecutor",
+      "assertCommandDeterminism",
+      "createMemoryCommandConformanceFixture",
+      "assertCommandFaultBoundary",
+      "runCommandConformance"
+    ],
+    "typeOnly": [
+      "CommandStoreBarrier",
+      "MemoryCommandBusiness",
+      "MemoryCommandSnapshot",
+      "MemoryCommandStore",
+      "MemoryCommandStoreOptions",
+      "CommandReceiptRow",
+      "CommandStoreCapabilities",
+      "CommandStorePort",
+      "CommandTransaction",
+      "CommandTransactionRequest",
+      "DatabaseProvider",
+      "IsolationLevel",
+      "ReceiptClaim",
+      "ReceiptClaimResult",
+      "ReceiptCompletion",
+      "StoredCommandAudit",
+      "StoredCommandOutbox",
+      "StoredCommandReceipt",
+      "TransactionOptions",
+      "CommandFaultController",
+      "CommandFaultBoundary",
+      "CommandDeterminismReport",
+      "CommandConformanceFixture",
+      "CommandConformanceInspection",
+      "CommandConformanceFactory",
+      "CommandConformanceReport",
+      "CommandActor",
+      "CommandCodec",
+      "CommandDefinition",
+      "CommandEnvelope",
+      "CommandIdempotency",
+      "CommandIdempotencyMode",
+      "CommandJson",
+      "CommandRecordRequirement",
+      "CommandClock",
+      "CommandExecution",
+      "CommandExecutor",
+      "CommandExecutorOptions",
+      "CommandIdSource",
+      "CommandRecordLimits",
+      "CommandTelemetryPort",
+      "CommandTelemetryResult",
+      "CommandTelemetrySpan",
+      "CommandTelemetryStart",
+      "CommandContext",
+      "commandDefinitionBinding",
+      "commandExecutorCapability",
+      "CommandFailure",
+      "CommandTraceContext",
+      "CommandAuditInput",
+      "CommandOutboxInput"
+    ]
+  },
+  "testingModuleDocSha256": "de35284fc2815628dcfcc05e54a50abb432a6f44f482475e85413786575a9fa6",
+  "testingModuleDoc": "/**\n * Command fault, semantic and finite determinism fixtures; no real database certification.\n *\n * Every instance owns its state. Bound writes commit together, while explicit testing\n * controls allow corrupt fixtures and outside-transaction negative controls. Imports and in-memory\n * fixtures need no permissions; supplied provider operations use their own permissions.\n *\n * @example\n * ```ts\n * import { createMemoryCommandStore } from '@netscript/service/commands/testing';\n * const store = createMemoryCommandStore();\n * await store.transaction({ receiptClaimWaitMs: 0 }, async ({ business }) => {\n *   business.set('counter', '1');\n * });\n * store.snapshot();\n * ```\n * @module\n */",
+  "namedRuntimeTests": 15,
+  "productionMutationControls": 20,
+  "conformanceCases": 22,
+  "determinismSamples": {
+    "minimum": 2,
+    "default": 4,
+    "maximum": 32,
+    "assurance": "sampled_equivalence"
+  },
+  "controllerHistoryLimit": 128,
+  "newNamedCompileAssertions": 0,
+  "newDependencies": 0,
+  "rootExportsUnchanged": true,
+  "locksUnchanged": true,
+  "faultControlsInProductionOptions": false,
+  "identityDiffScope": "Narrow supervisor-requested RFC9110 field-value control-byte guard, preserving unknown future fields and HTAB/SP/obs-text.",
+  "executorDiffScope": "Private per-instance construction wrapper and seven boundary observer calls only; all pre-existing error translation/telemetry logic is byte-identical to the signed S5 baseline."
+}

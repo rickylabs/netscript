@@ -1,0 +1,74 @@
+{
+  "verdict": "SUPERVISOR_APPROVED",
+  "verifiedFreeze": {
+    "observedAt": "2026-10-08T00:21:11.304512+00:00",
+    "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+    "freezeSha256": "35f05c1c4dc3e48d9121b875931ffee236f9dc7533775953995c63baf8259527",
+    "frozenFilesVerified": 11,
+    "rawEvidenceFilesVerified": 53,
+    "allNonWaveTrackedFilesUnchanged": true,
+    "historicalRunBodiesVerbatim": true,
+    "nativeAssets": [
+      {
+        "path": ".llm/assets/agent-docs/prose.json.gz",
+        "sha256": "90ff54bf3176e72e3562abdb1764aae1d43442fb944383f652912fb6c377a8ec"
+      },
+      {
+        "path": ".llm/assets/agent-docs/provenance.json",
+        "sha256": "5fdb72d206cb4c60cb6be29d542691d488105c1b4a0a274823c8d744695a4d33"
+      },
+      {
+        "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+        "sha256": "3c9303301501785b9de57677d32adeda39977a30a0053dae87501e301f348920"
+      }
+    ],
+    "nativeAssetAggregateSha256": "e57bf615c18e401f05d4d2c6ceb1ed1765cbb2b0b9385a9286c99e8587d71c1c",
+    "actualStaleBaselinesThenFreshPassVerified": true,
+    "allGateOutputReceiptHashesVerified": true,
+    "semanticPayloadsIndependentlyDecoded": true,
+    "proseEntries": 182,
+    "proseChangedEntries": [
+      "llms-full.txt",
+      "pages/reference/database/index.md",
+      "pages/reference/service/index.md"
+    ],
+    "priorMcpSymbolsUnchanged": 7947,
+    "newMcpSymbols": 115,
+    "newMcpSurfaces": 2,
+    "removedOrChangedPriorMcpSymbols": 0,
+    "newNamedTests": 0,
+    "nativeAssetAggregateIndependentlyRecomputed": true,
+    "aggregateRecipe": "SHA256 of UTF8 compact JSON array of path/sha256 objects, sorted by path, object keys sorted, no trailing newline"
+  },
+  "independentFinalGates": {
+    "observedAt": "2026-10-08T00:21:24.903994+00:00",
+    "nativeAssetAggregateSha256": "e57bf615c18e401f05d4d2c6ceb1ed1765cbb2b0b9385a9286c99e8587d71c1c",
+    "freezeRecordSha256": "35f05c1c4dc3e48d9121b875931ffee236f9dc7533775953995c63baf8259527",
+    "sourceStableThroughout": true,
+    "gates": [
+      {
+        "gate": "quality-scan",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "invocationId": "c2-first-wave-final-supervisor-quality-scan",
+        "rawLogSha256": "fc0dc79330d31feca60cde2210a85878847f726f2974fd2f4fff9be163022466",
+        "rawReceiptSha256": "2d98bfa8862498bab9c3ac2b0ef1ba13c01e4fca30876f98c378a71d919bbdb3"
+      },
+      {
+        "gate": "arch-check",
+        "exitCode": 0,
+        "outcome": "PASS",
+        "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+        "baselineHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+        "invocationId": "c2-first-wave-final-supervisor-arch-check",
+        "rawLogSha256": "b9feed07c1504b3150ca6651f58fcbef24b3271620c851653ab331eb24f4a158",
+        "rawReceiptSha256": "b29f071ab66e7a3344d3e50d7f67f9b10d454940625de86054d8a2ef75df6dcb"
+      }
+    ]
+  },
+  "signedSliceFiles": 13,
+  "assetBytesStable": true,
+  "downstreamGenerationReleasedOnlyAfterCommittedSignoff": true
+}

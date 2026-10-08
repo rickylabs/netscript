@@ -1,6 +1,10 @@
 import { createStateSchema } from '@durable-streams/state';
 import { createStreamDB } from '@durable-streams/state/db';
 import { createNetScriptStreamDB, useLiveQuery } from '@netscript/fresh/streams';
+import type {
+  NetScriptStreamDBReconnectOptions,
+  NetScriptStreamDBStatus,
+} from '@netscript/fresh/streams';
 import { z } from 'zod';
 
 const personSchema = z.object({
@@ -44,3 +48,10 @@ void controlQuery;
 void wrappedQuery;
 void controlPerson;
 void wrappedPerson;
+
+const reconnect: NetScriptStreamDBReconnectOptions = { maxRetries: 2 };
+const status: NetScriptStreamDBStatus | undefined = wrapped.status;
+const preload: (() => Promise<void>) | undefined = wrapped.preload;
+void reconnect;
+void status;
+void preload;

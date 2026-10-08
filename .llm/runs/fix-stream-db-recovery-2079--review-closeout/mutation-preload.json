@@ -1,0 +1,31 @@
+{
+  "exitCode": 1,
+  "durationMs": 3424,
+  "summary": {
+    "passed": 0,
+    "failed": 2,
+    "ignored": 0,
+    "totalResults": 2,
+    "uniqueFailures": 2
+  },
+  "failures": [
+    {
+      "message": "AssertionError: Expected error to be instance of \"DOMException\", but was \"Error\".",
+      "count": 1,
+      "tests": [
+        {
+          "name": "createNetScriptStreamDB immediate stop and dispose settle pending preload on a healthy server"
+        }
+      ]
+    },
+    {
+      "message": "AssertionError: Expected error to be instance of \"DOMException\", but was \"Error\".",
+      "count": 1,
+      "tests": [
+        {
+          "name": "createNetScriptStreamDB stop settles concurrent preloads while response headers are pending"
+        }
+      ]
+    }
+  ]
+}
