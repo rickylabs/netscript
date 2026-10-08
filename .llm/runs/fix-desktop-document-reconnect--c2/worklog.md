@@ -124,3 +124,32 @@ Canonical gen:mcp-export-corpus exit 0. Generated carrier reviewed; no hand edit
 
 ## Implement / Gate — F1 repair
 Uses Promise.withResolvers<void>; assigns promise before synchronous unbind and captures synchronous throws. New regression confirms immediate unbind, retained same-name replacement and actual typed ping. Additional regression verifies reentrant promise identity and asynchronous completion. Desktop tests: exit 0, 9 passed. Re-defer-unbind mutation: exit 1 on immediate unbind assertion. Restored: exit 0, 9 passed. Supervisor slice review: no new public signature, cast, suppression, dependency or abstraction. Both main README/debt additions retained; generated corpus regenerated canonically.
+
+## Gate — exact-source review repair
+Source head: 37b8cd4af61b185f8d546aee69fbcf71be14380a; Deno 2.9.5.
+
+| Gate | Exit | Evidence |
+| --- | --- | --- |
+| check | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| lint | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| fmt | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| tests | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| quality-gate | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| agent-docs-prose | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| assets-barrel | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| publish-assets | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| mcp-export-corpus | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| audit-fresh | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| publish-fresh | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| docs-fresh | 1 | Existing accepted desktop-doc-baseline-2041; no new exported signature. |
+| audit-sdk | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| publish-sdk | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| docs-sdk | 1 | Existing accepted desktop-doc-baseline-2041; no new exported signature. |
+| audit-mcp | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| publish-mcp | 0 | Structured wrapper or canonical gate receipt; private raw evidence retained. |
+| docs-mcp | 1 | Existing accepted desktop-doc-baseline-2041; no new exported signature. |
+
+Owning SDK/Fresh tests: 541 passed, 0 failed, 0 ignored. Mutation re-defer exit 1, restored exit 0. Independent GLM IMPL-EVAL started at the exact source head. Native epoch protocol and fixture unchanged, original native evidence retained. Release phase N/A: no release/merge/scaffold changes.
+
+## Evaluate / Release / Close — review repair
+Independent Google Gemini 3.8 Flash High PASS at 37b8cd4af61b185f8d546aee69fbcf71be14380a in repair-evaluate.md after primary no-verdict. Release N/A. Report-only closeout preserves evaluated source. Reconcile: reviewer F1 fully addressed; nonblocking F2/F3 remain follow-up. No closing keyword or published-consumer claim changed. Final-head CI and coordinated publication remain owner gates.

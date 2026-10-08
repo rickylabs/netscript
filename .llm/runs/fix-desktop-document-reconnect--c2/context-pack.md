@@ -5,3 +5,5 @@ Issue #2041 / PR #2091 source complete. Source557351f4315c77df59089d35bb9583bf9a
 Review repair active: baseline verified, merge main before bounded F1 fix. Follow review repair plan; original native reload evidence remains applicable to unchanged epoch protocol.
 
 F1 source repair and regression implemented; mutation red/restored green. Exact-source owning gates and independent evaluation pending.
+
+F1 repair complete: independent Google PASS at 37b8cd4af61b185f8d546aee69fbcf71be14380a, full 541 tests, static/quality/asset/publication gates green, existing doc debt accepted. Causal regression mutation red, restored green. Closeout changes evidence only; final CI/publication remain owner work.
