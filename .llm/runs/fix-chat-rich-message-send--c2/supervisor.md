@@ -1,0 +1,11 @@
+# Supervisor
+
+Model: gpt-6.1-sol high. Session: lane C2 implementation. Branch: `fix/chat-rich-message-send`. Baseline: `8aad14940c52cd3a4db7efa57d56d50ae131df6c` (current main). Checkout: repository root. Run: `fix-chat-rich-message-send--c2`.
+
+Routes: OpenAI implementation; independent Zhipu GLM evaluator via owner-selected OpenCode Go, `glm-5.3-flash`, max. Fallback: owner-selected Gemini via agy when primary provider is blocked, as explicitly authorized by owner HARNESS.md.
+
+Owner override: HARNESS.md requires “opencode run -m opencode-go/glm-5.3-flash --variant max --auto”; use that explicit route rather than the default matrix. Public operational identity excludes machine and absolute directory details by BRIEF-C2.md.
+
+Selected PLAN-EVAL PASS via independent Google Gemini fresh session<redacted-session-id> with same-session report-only factual reconciliation. Immutable evaluated main equals fresh fetched branch baseline before source. Primary GLM provider stalled without verdict, evidence retained privately. Mandatory final independent fresh Google Gemini IMPL-EVAL planned.
+
+Final IMPL-EVAL PASS: independent Google Gemini session `<redacted-session-id>`, exact evaluated head `ffdb32a7d0bef56a8ecc37749d87e689beda6625`, report `evaluate.md`. Same-session scoped launch recovery and subsequent report-only factual reconciliation preserve the source verdict. Final record commit has no production delta. Source delivery remains unmerged and unpublished; owner adoption gates are explicit.
