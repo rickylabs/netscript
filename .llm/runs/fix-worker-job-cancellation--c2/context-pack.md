@@ -1,5 +1,3 @@
 # Context
 
-PR #2088 cancellation review amendment S7 source complete after independent selected PLAN PASS. D1-D5 implemented and eight causal regressions proved; full suite 120 pass with no skips, frozen static/quality and dry publications pass; full per-entrypoint documentation baseline unchanged, inherited doctor/layout debt retained. Original evaluations preserved. S8 clean-source corpus/carrier then S9 independent cancellation-review-evaluate.md pending; branch remains draft/unmerged.
-
-S8 corpus/carrier14tests and native consumer complete. No regeneration/public signature delta. Mandatory independent exact-head amendment evaluation pending; source remains78f868ee4.
+PR2088 source and five review corrections complete. Amendment independent Google Gemini PASS at 3c13a09530be4c76757df735adc3d40c41d50e13 for source 78f868ee4feb692b03c1089c43b53934afe7524a; cancellation-review-evaluate.md retained alongside original reports. Full120suite and25focused/222static/14corpus PASS, all8newmutants killed/restored, existing complete doc/doctor/layout baseline debt explicitly accepted. Report-only close, no source delta. Owner finalCI/publication/publishedconsumer/EIScreateJobAbortScope removal, unmerged Refs2066.
