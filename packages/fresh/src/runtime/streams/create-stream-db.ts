@@ -13,10 +13,32 @@
  * @module
  */
 
+import { abortable } from 'jsr:@std/async@^1/abortable';
 import { createStreamDB } from '@durable-streams/state/db';
 import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
 import type { StreamDB } from '@durable-streams/state/db';
+import { DurableStream } from '@durable-streams/client';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
+import { createStreamDBRecoveryAdapter } from './stream-db-recovery-adapter.ts';
+
+/** Lifecycle of the default StreamDB consumer, including terminal failures. */
+export type NetScriptStreamDBStatus =
+  | 'idle'
+  | 'connecting'
+  | 'live'
+  | 'retrying'
+  | 'stopped'
+  | 'failed';
+
+/** Finite retry policy for an outage; a consumed batch resets the budget. */
+export interface NetScriptStreamDBReconnectOptions {
+  /** Retries after the first failed read; zero disables recovery. Defaults to five. */
+  readonly maxRetries?: number;
+  /** Initial exponential backoff delay in milliseconds. Defaults to one hundred. */
+  readonly initialDelayMs?: number;
+  /** Maximum backoff delay in milliseconds. Defaults to five thousand. */
+  readonly maxDelayMs?: number;
+}
 
 /** NetScript-owned durable stream state definition. */
 export type NetScriptStreamStateDefinition = StreamStateDefinition;
@@ -28,6 +50,10 @@ export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = 
 export interface NetScriptStreamDB<TDef extends NetScriptStreamStateDefinition> {
   /** Reactive collections keyed by schema collection name. */
   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+  /** Start the lazy default consumer and wait until its collections are up to date. */
+  readonly preload?: () => Promise<void>;
+  /** Inspect the default consumer's liveness; alternate adapters may omit this hook. */
+  readonly status?: NetScriptStreamDBStatus;
   /** Optional stop hook exposed by compatible stream DB adapters. */
   readonly stop?: () => void | Promise<void>;
   /** Optional dispose hook exposed by compatible stream DB adapters. */
@@ -47,6 +73,8 @@ export interface NetScriptStreamDBFactoryInput<TDef extends NetScriptStreamState
   };
   /** State schema passed to the underlying stream DB adapter. */
   state: NetScriptStateSchema<TDef>;
+  /** Optional bounded reconnect policy understood by the default adapter. */
+  reconnect?: NetScriptStreamDBReconnectOptions;
 }
 
 /** Factory port used to create a durable stream DB handle. */
@@ -73,6 +101,8 @@ export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefin
   schema: NetScriptStateSchema<TDef>;
   /** Optional factory port for tests or alternate stream DB adapters. */
   createStreamDB?: NetScriptStreamDBFactory<TDef>;
+  /** Bounded reconnect policy; the default adapter resumes the last consumed batch. */
+  reconnect?: NetScriptStreamDBReconnectOptions;
 }
 
 /**
@@ -81,6 +111,11 @@ export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefin
  * The returned object has `.collections` — typed TanStack DB `Collection`
  * instances — that update reactively as events arrive from the durable
  * streams server.
+ * Call the default handle's `preload()` to start consumption. Recoverable
+ * outages use finite exponential backoff and resume the last consumed batch
+ * without replacing collections. Authentication, malformed data and invalid
+ * retained offsets enter `failed`; they never trigger a full-log replay.
+ * `stop()` and `dispose()` cancel reads and backoff and are idempotent.
  *
  * @example
  * ```ts
@@ -92,6 +127,7 @@ export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefin
  *   streamPath: '/my-service/my-stream',
  *   schema: myStreamSchema,
  * });
+ * await db.preload?.();
  *
  * // In a Preact island:
  * const { data: items } = useLiveQuery((q) =>
@@ -112,6 +148,7 @@ export function createNetScriptStreamDB<TDef extends NetScriptStreamStateDefinit
       headers: getStreamsAuth(),
     },
     state: options.schema,
+    ...(options.reconnect ? { reconnect: options.reconnect } : {}),
   });
 }
 
@@ -124,12 +161,32 @@ function defaultCreateStreamDB<TDef extends NetScriptStreamStateDefinition>(
     );
   }
 
-  return createStreamDB(
-    {
-      streamOptions: input.streamOptions,
-      state: input.state,
-    },
+  const recovery = createStreamDBRecoveryAdapter(
+    new DurableStream({
+      ...input.streamOptions,
+      backoffOptions: { initialDelay: 1, maxDelay: 1, multiplier: 1, maxRetries: 0 },
+    }),
+    input.reconnect,
   );
+  const db = createStreamDB({ stream: recovery.stream, state: input.state });
+  const lifetime = new AbortController();
+  const stop = () => {
+    lifetime.abort();
+    recovery.stop();
+    db.close();
+  };
+  return {
+    collections: db.collections,
+    async preload() {
+      lifetime.signal.throwIfAborted();
+      await abortable(db.preload(), lifetime.signal);
+    },
+    get status() {
+      return recovery.status;
+    },
+    stop,
+    dispose: stop,
+  };
 }
 
 function isDurableStateSchema(
