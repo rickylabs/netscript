@@ -227,6 +227,7 @@ own `deno doc` surface.
 | `@netscript/telemetry/config`          | `./config.ts`          | Telemetry configuration and OTEL env resolution.                    |
 | `@netscript/telemetry/tracer`          | `./tracer.ts`          | Tracer accessors and span helpers.                                  |
 | `@netscript/telemetry/context`         | `./context.ts`         | W3C trace-context propagation.                                      |
+| `@netscript/telemetry/commands` | `./commands.ts` | Privacy-first command adapter and native relationship wrappers. |
 | `@netscript/telemetry/attributes`      | `./attributes.ts`      | Semantic attribute and span-name constants.                         |
 | `@netscript/telemetry/instrumentation` | `./instrumentation.ts` | Worker/queue/scheduler/SSE instrumentation.                         |
 | `@netscript/telemetry/registry`        | `./registry.ts`        | Instrumentation lifecycle registry.                                 |
@@ -256,3 +257,23 @@ command failure kinds enter `error.type`; payloads, raw identities, hashes, corr
 topics/destinations and exception text never enter command spans. Existing messaging/saga
 identifier conventions retain their separate ownership; command privacy policy deliberately
 supersedes their general correlation/exception floor.
+
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `CommandSpanNames` | constant | Fixed execute, relay lifecycle and publication names. |
+| `CommandAttributes` | constant | The eight identifier-free RFC command attribute keys. |
+| `CommandOutcomes` | constant | Closed applied/replayed/conflict/rejected/failed/cancelled values. |
+| `CommandIdempotencyStates` | constant | Closed claimed/replayed/not_requested/missing/mismatch/busy values. |
+| `CommandIsolationLevels` | constant | Store isolation enums plus default. |
+| `CommandStoreProviders` | constant | Bounded postgres/mssql/mysql/sqlite values. |
+| `CommandErrorTypes` | constant | Nine stable command failure kinds, excluding exception text. |
+| `CommandTelemetryDefinition` | type | Static registered name/version pair. |
+| `OtelCommandTelemetryStart` | type | Finite definition/provider/isolation/idempotency observation. |
+| `OtelCommandTelemetryResult` | type | Finite outcome, counts and optional stable failure kind. |
+| `commandStartAttributes` | function | Validate configured definition membership and select initial attributes. |
+| `commandResultAttributes` | function | Validate completion and emit counts only for successful outcomes. |
+| `createOtelCommandTelemetryPort` | function | Copy registrations and compose the structural executor adapter. |
+| `CreateOtelCommandTelemetryPortOptions` | type | Construction-time registrations and optional native tracer. |
+| `OtelCommandTelemetryPort` | interface | Execute, relay and publication wrappers invoking operations once. |
+| `OtelCommandTelemetrySpan` | interface | Once-only finite completion observer. |
