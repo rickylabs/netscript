@@ -211,7 +211,7 @@ list. The `search` argument accepts an object or a function of the schema-defaul
 For a move relative to the current page, read current search through an explicit hook and supply it:
 
 ```tsx
-const current = useCurrentSearch(ordersRoute);
+const current = ordersPage.hooks.useSearch();
 const nextPage = ordersRoute.href({
   path: { status: 'open' },
   search: { ...current, page: current.page + 1 },
@@ -229,12 +229,12 @@ short URLs; that is the lever.
 
 **Current-search preservation is an explicit hook or component capability.** A bound `Link` with
 `preserveSearchParams: true` reads the matching route's parsed current search during its render.
-`usePageRoute().getLinkProps(...)` captures that context in an explicit hook and can also preserve it.
+`page.hooks.useRoute().getLinkProps(...)` captures that context in an explicit hook and can also preserve it.
 A `Link` targeting a different route uses that route's schema defaults.
 
 Migration: calls to `route.href()` or `route.getLinkProps()` with `preserveSearchParams` now use
 schema defaults plus explicit `search`; the flag remains accepted but these utilities never read
-context. Use `useCurrentSearch(route)` and pass the returned values explicitly, or call the link-props
+context. Use `page.hooks.useSearch()` and pass the returned values explicitly, or call the link-props
 closure returned by `usePageRoute()`. Call those hooks at the component's top level. Bound `Link`
 remains available for contextual rendering.
 

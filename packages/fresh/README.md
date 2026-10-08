@@ -293,7 +293,7 @@ JSR with cryptographically verified provenance.
 
 Route `href`, `getLinkProps`, and paired `href`/`partialHref`/`getLinkProps` use their typed inputs
 and schema defaults without invoking hooks. They are safe in memo factories, callbacks, SSR and
-conditional lists. To preserve current search, call `useCurrentSearch(route)` at the component's
-top level and pass those values explicitly. `usePageRoute().getLinkProps` and bound `Link` retain
+conditional lists. To preserve current search, call `page.hooks.useSearch()` at the component's
+top level and pass those values explicitly. `page.hooks.useRoute().getLinkProps` and bound `Link` retain
 contextual `preserveSearchParams` behavior. Utility calls keep accepting preserve flags but never
 read current context; migrate implicit preservation to those explicit capabilities.

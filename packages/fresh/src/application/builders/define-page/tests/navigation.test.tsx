@@ -355,8 +355,8 @@ Deno.test('route URL helpers consume no hooks while explicit search hooks and Li
 
   function Snapshot() {
     const beforeExplicit = hookCalls;
-    const currentSearch = useCurrentSearch(target);
-    const currentRoute = usePageRoute<typeof page>();
+    const currentSearch = page.hooks.useSearch();
+    const currentRoute = page.hooks.useRoute();
     assert(
       hookCalls > beforeExplicit,
       'Expected real explicit hooks to exercise the hook observer',
