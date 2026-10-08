@@ -1,0 +1,2 @@
+Task check:publish-assets deno task gen:publish-assets --check
+Task gen:publish-assets deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts '--check'

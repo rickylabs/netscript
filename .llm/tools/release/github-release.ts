@@ -768,7 +768,7 @@ export async function resolvePreviousTag(
 }
 
 /** GitHub's auto-generated "What's Changed" body (merged PRs + Full Changelog link). */
-async function generateWhatsChanged(
+export async function generateWhatsChanged(
   repo: string,
   token: string,
   tag: string,
@@ -791,7 +791,7 @@ async function generateWhatsChanged(
 }
 
 /** Issues (not PRs) closed since `since` (ISO timestamp), newest first. */
-async function fetchClosedIssues(
+export async function fetchClosedIssues(
   repo: string,
   token: string,
   since: string,
@@ -799,23 +799,59 @@ async function fetchClosedIssues(
 ): Promise<ClosedIssue[]> {
   const range = since ? ` closed:>${since}` : '';
   const query = `repo:${repo} is:issue is:closed${range}`;
-  const path = `/search/issues?q=${encodeURIComponent(query)}&per_page=100&sort=updated&order=desc`;
-  const res = await request('GET', path, token);
-  const items = githubField(res.body, 'items');
-  if (!res.ok || !Array.isArray(items)) {
-    return [];
-  }
+  const search = `/search/issues?q=${
+    encodeURIComponent(query)
+  }&per_page=100&sort=updated&order=desc`;
   const issues: ClosedIssue[] = [];
-  for (const item of items) {
-    // `is:issue` already excludes PRs, but guard against the `pull_request` field.
-    if (item?.pull_request) {
-      continue;
+  const seen = new Set<number>();
+  let received = 0;
+  let expected: number | undefined;
+  for (let page = 1; page <= 10; page++) {
+    const res = await request('GET', `${search}&page=${page}`, token);
+    if (!res.ok) throw new Error(`Closed-issue search page ${page} failed: HTTP ${res.status}.`);
+    const items = githubField(res.body, 'items');
+    const total = githubField(res.body, 'total_count');
+    const incomplete = githubField(res.body, 'incomplete_results');
+    if (
+      !Array.isArray(items) || items.length > 100 ||
+      typeof total !== 'number' || !Number.isSafeInteger(total) || total < 0 ||
+      typeof incomplete !== 'boolean'
+    ) throw new Error(`Closed-issue search page ${page} has malformed metadata.`);
+    if (incomplete) throw new Error(`Closed-issue search page ${page} reports incomplete results.`);
+    if (total >= 1000) {
+      throw new Error(
+        'Closed-issue search reached the 1000-result ceiling; narrow the release window.',
+      );
     }
-    if (typeof item?.number === 'number' && typeof item?.title === 'string') {
-      issues.push({ number: item.number, title: item.title });
+    if (expected !== undefined && total !== expected) {
+      throw new Error('Closed-issue search total changed during pagination; retry collection.');
+    }
+    expected = total;
+    received += items.length;
+    for (const item of items) {
+      // Count raw results before this guard so filtering never terminates pagination early.
+      if (githubField(item, 'pull_request')) continue;
+      const number = githubField(item, 'number');
+      const title = githubField(item, 'title');
+      if (
+        typeof number !== 'number' || !Number.isSafeInteger(number) || number <= 0 ||
+        typeof title !== 'string'
+      ) {
+        throw new Error(`Closed-issue search page ${page} contains a malformed issue.`);
+      }
+      if (!seen.has(number)) {
+        seen.add(number);
+        issues.push({ number, title });
+      }
+    }
+    if (received >= expected) return issues;
+    if (items.length < 100) {
+      throw new Error(
+        `Closed-issue search page ${page} ended before total_count; results incomplete.`,
+      );
     }
   }
-  return issues;
+  throw new Error('Closed-issue search pagination exhausted; results incomplete.');
 }
 
 export interface ReleaseNotesDependencies {

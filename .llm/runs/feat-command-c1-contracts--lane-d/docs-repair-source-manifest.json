@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "head": "b4ee0c34399cad78ef75aaf3f71fd6d5ac38196a",
+  "branch": "feat/command-c1-contracts",
+  "trackedFileCount": 6154,
+  "changedFiles": [
+    ".llm/assets/agent-docs/prose.json.gz",
+    ".llm/assets/agent-docs/provenance.json",
+    "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts"
+  ],
+  "unchangedTrackedFiles": 6151,
+  "allProductAndToolSourcesUnchanged": true,
+  "allDependencyManifestsAndLocksUnchanged": true,
+  "allHistoricalEvaluatorArtifactsUnchanged": true,
+  "diffCheckExitCode": 0,
+  "files": [
+    {
+      "file": ".llm/assets/agent-docs/prose.json.gz",
+      "beforeSha256": "2cebc26b2848ac975cc3966f437e86cb5d203067abe4e248263bca4f2f2e79e6",
+      "candidateSha256": "8172ab6d0d502c63c94a4aa2b0d797c45a9de1f71aa82d54c1fe284f42bbac60",
+      "candidateBytes": 1419827
+    },
+    {
+      "file": ".llm/assets/agent-docs/provenance.json",
+      "beforeSha256": "61da4715829ca0b511ae974cee7c7291559ee27536e13b92f1d46fca3f240bd9",
+      "candidateSha256": "6ce9e93ab4854750752c8d41834f59688203d0782fdfbc6ac146d28eb4cf3cb3",
+      "candidateBytes": 9052
+    },
+    {
+      "file": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "beforeSha256": "36209d6d42dd434d9a200e82baa52633d8f2d3b82b05c17a15fc24e6db927971",
+      "candidateSha256": "9e9a35f20e7aab8527d0b92c318132af0e072e18ac11558814acf4d1578b9d1d",
+      "candidateBytes": 436668
+    }
+  ],
+  "historicalRound2ReportSha256": "3363a72a4726b3dda700e3e2726469d9f4596892c1708b5aa04ffbd8b80f1f62",
+  "historicalRound2ProductHead": "17e9ad075e595aa591b12e3b009c6aed6c482fbf",
+  "evaluatorState": "Prior PASS preserved; new signed-off qualification head pending same-session third independent review."
+}

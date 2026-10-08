@@ -1,0 +1,8 @@
+{
+  "packages/contracts/commands.ts": "4c4586a597259563c009329ab6352aecdcfee443092f207e34b3351f67c3d455",
+  "packages/contracts/src/domain/command-errors.ts": "32140dfbe5de1bf5dec14dbb3ef7e60c1c535bc1e2597f3d6fc92308c523cdf2",
+  "packages/contracts/src/application/command-contract.ts": "fe5bf667eab1886660ab448104f299a98348d335868ad90f382b90c5366ae7bf",
+  "packages/contracts/tests/commands-type_test.ts": "fd245ead6bc276dd9a91bf61ca6ed3a0bc0c77120264e05df6d21cacb042b763",
+  "packages/contracts/README.md": "49b8fe568da80cdf2eb57183ea511e2cfbf2fe59d0fc8f2260ead2ec03e7dec1",
+  "packages/contracts/deno.json": "628a068a4f1391ac9cd6c87e79b2e7071c4b5c901aa2f31f8814224fb2504e2f"
+}

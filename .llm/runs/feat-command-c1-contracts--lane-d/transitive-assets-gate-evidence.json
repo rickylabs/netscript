@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "headBeforeSignoff": "360165b45ae07b1a87671b14d09e990769687380",
+  "runtime": "Deno2.9.5",
+  "gates": [
+    {
+      "gate": "runtime",
+      "command": [
+        "deno",
+        "--version"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "d039e486b975ac069a812d38bd09f185e624f124ab7459697a547e7e7dd28463"
+    },
+    {
+      "gate": "assets-barrel-baseline",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "assets-barrel",
+        "--id",
+        "c1-transitive-assets-before",
+        "--output",
+        "<evidence>/assets-baseline.receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 1,
+      "rawLogSha256": "f58da700dd2946a144337148e9d8249f088e04b4c90be62136c529750090a674"
+    },
+    {
+      "gate": "publish-assets-baseline",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "publish-assets",
+        "--id",
+        "c1-transitive-publish-before",
+        "--output",
+        "<evidence>/publish-baseline.receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 1,
+      "rawLogSha256": "731cbc46e7c4874f20ad694a9e387dd5a0244fc72e8a64c5bf0141d93d5c8173"
+    },
+    {
+      "gate": "publish-assets-native-refresh",
+      "command": [
+        "deno",
+        "task",
+        "gen:publish-assets"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "dca6031798e099e5ec5cfd26a34e8c9407d96af7041ba3483288facc302a46a0"
+    },
+    {
+      "gate": "assets-barrel-native-refresh",
+      "command": [
+        "deno",
+        "task",
+        "gen:assets-barrel"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "82ec599adefb683846c0275c7cd908960ebb427e476aba6100af8d33df5039ee"
+    },
+    {
+      "gate": "assets-barrel-native-content-check",
+      "command": [
+        "deno",
+        "task",
+        "gen:assets-barrel",
+        "--check"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "fe413ce25d4a9936468fa02a2407e9ed0d2f4e236407fe26a3fbf31bf850ba8b"
+    },
+    {
+      "gate": "publish-assets-final",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "publish-assets",
+        "--id",
+        "c1-transitive-publish-after",
+        "--output",
+        "<evidence>/publish-final.receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "b7d93048783937bd57d06131e4138a61dddc517717f1f790e339ef94ff4d8682"
+    },
+    {
+      "gate": "generator-and-cli-regressions",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<evidence>/tests.json",
+        "--",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/generate-cli-assets-barrel_test.ts",
+        ".llm/tools/generate-publish-assets_test.ts",
+        "packages/cli/src/public/adapters/agent/deno-agent-docs-generator_test.ts"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "daab65f427d745ab23f1206157d652977c4f676d34b49cb22474e3a76cc8fb8c"
+    },
+    {
+      "gate": "diff-whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "gate": "specifier-scan",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "netscript-jsr-specifiers",
+        "--id",
+        "c1-transitive-specifier-scan",
+        "--output",
+        "<evidence>/specifier-scan.receipt.json"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "4f5d0be6c5a0344b467b3975107bae1c35fdf17807e8e741d7fa15206885c50e"
+    },
+    {
+      "gate": "cli-publish",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "publish-dry-run",
+        "--id",
+        "c1-transitive-cli-publish",
+        "--output",
+        "<evidence>/cli-publish.receipt.json",
+        "--",
+        "--member",
+        "packages/cli"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "93b6211224e669ccace3d0e1ee2f30366d2e93d2254cf82f76ff1cae774c638c"
+    },
+    {
+      "gate": "mcp-publish",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "publish-dry-run",
+        "--id",
+        "c1-transitive-mcp-publish",
+        "--output",
+        "<evidence>/mcp-publish.receipt.json",
+        "--",
+        "--member",
+        "packages/mcp"
+      ],
+      "runtime": "2.9.5",
+      "head": "360165b45ae07b1a87671b14d09e990769687380",
+      "exitCode": 0,
+      "rawLogSha256": "b6c3a20bbe4edcdd42e1b0c19f19b67359deaa482cf827dd4a2b18db72e576b0"
+    }
+  ],
+  "supervisorChecks": [
+    {
+      "gate": "quality-scan",
+      "exitCode": 0
+    },
+    {
+      "gate": "arch-check",
+      "exitCode": 0
+    }
+  ],
+  "supervisorContent": {
+    "independentSupervisor": true,
+    "embeddedGzipExact": true,
+    "embeddedProvenanceExact": true,
+    "mcpSourceCommitExact": true
+  },
+  "existingTests": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0,
+    "totalResults": 12,
+    "uniqueFailures": 0
+  },
+  "actualGitDiffFreshness": "Actual committed-head check:assets-barrel passes0; generator leaves checkout clean.",
+  "postcommitActualNativeGitDiffGate": {
+    "schemaVersion": 1,
+    "head": "ddcd62d25253142ffa3a55b5ddb396440c1d7ffb",
+    "gate": "assets-barrel",
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      "--allow-env",
+      ".llm/tools/gates/run-gate.ts",
+      "--gate",
+      "assets-barrel",
+      "--id",
+      "c1-transitive-postcommit-assets",
+      "--output",
+      "<private-evidence>/postcommit-assets.receipt.json"
+    ],
+    "exitCode": 0,
+    "runtime": "Deno2.9.5",
+    "cleanAfter": true
+  }
+}

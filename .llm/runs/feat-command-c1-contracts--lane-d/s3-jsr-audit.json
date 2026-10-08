@@ -1,0 +1,344 @@
+{
+  "headBeforeSignoff": "f9d0ccc99f1ecf98de4d8778196be99b4d795c1b",
+  "materializer": ".llm/tools/release/publish-workspace.ts publishWorkspace dry-run with injected scoped native command runner",
+  "members": [
+    {
+      "name": "@netscript/contracts",
+      "version": "0.0.7",
+      "exports": {
+        ".": "./mod.ts",
+        "./crud": "./crud.ts",
+        "./query": "./query.ts",
+        "./transform": "./transform.ts",
+        "./commands": "./commands.ts"
+      },
+      "declaredImports": {
+        "@orpc/contract": "npm:@orpc/contract@^1.15.0",
+        "zod": "npm:zod@^4.4.3"
+      },
+      "publishExit": 0,
+      "packExit": 0,
+      "publishedSourceFiles": [
+        "README.md",
+        "commands.ts",
+        "crud.ts",
+        "crud/create-crud-contract.ts",
+        "deno.json",
+        "mod.ts",
+        "query.ts",
+        "schemas/filters.ts",
+        "schemas/pagination.ts",
+        "src/application/command-contract.ts",
+        "src/application/contract-primitives.ts",
+        "src/application/paginated-query.ts",
+        "src/application/transform-helpers.ts",
+        "src/application/zod-helpers.ts",
+        "src/diagnostics/inspection.ts",
+        "src/domain/command-errors.ts",
+        "src/domain/constants.ts",
+        "src/domain/errors.ts",
+        "src/domain/procedure-meta.ts",
+        "src/domain/result.ts",
+        "src/domain/schema-types.ts",
+        "src/domain/schemas.ts",
+        "src/public/mod.ts",
+        "transform.ts"
+      ],
+      "publishedSourceCount": 24,
+      "packedFileCount": 46,
+      "packedDeclarations": [
+        {
+          "path": "commands.d.ts",
+          "sha256": "cb9df476b032bacc5192c3a60b717e40bb0ce05ade1f7271f81c4419653435d0"
+        },
+        {
+          "path": "crud.d.ts",
+          "sha256": "ead229985e8d68f9a7ef21ba7fb1fdad453de77de46d336d53e2dee919eff38d"
+        },
+        {
+          "path": "crud/create-crud-contract.d.ts",
+          "sha256": "953cf4132a848ec2c01a2416c370944d6eb88ac17b7543d747b2dab986af40c5"
+        },
+        {
+          "path": "mod.d.ts",
+          "sha256": "8a43773c12f90a32692a8221d6652231318bf2ff78222121e2356eda4185b353"
+        },
+        {
+          "path": "query.d.ts",
+          "sha256": "d3a834ea8da19d061b029788b3cde08bc893cae07058d69a798ee5ffe0de8098"
+        },
+        {
+          "path": "schemas/filters.d.ts",
+          "sha256": "7a6aa588375dcd01123d713727a867499687b3af4842e8a124bcb84c145db70c"
+        },
+        {
+          "path": "schemas/pagination.d.ts",
+          "sha256": "22c454037629ec847d211cd68c1362a5b5737ddfa6cd3b754a259b3986edf126"
+        },
+        {
+          "path": "src/application/command-contract.d.ts",
+          "sha256": "3fa4b76bdecbe2265a806bbff28f92217475be1d939419eeaf6c8fba19258f0b"
+        },
+        {
+          "path": "src/application/contract-primitives.d.ts",
+          "sha256": "e48b5b5d2b637598843e69e4facf76a81544a2b927f1a8200f4861fe4c5bf016"
+        },
+        {
+          "path": "src/application/paginated-query.d.ts",
+          "sha256": "910acc75e440e553f30c41c686030aa3a673970098df706b0814798a0c24fb54"
+        },
+        {
+          "path": "src/application/transform-helpers.d.ts",
+          "sha256": "b3a607c246f625de218d342abfffddc4a2fb9d6b43b33fd199ba2d2caa57bec0"
+        },
+        {
+          "path": "src/application/zod-helpers.d.ts",
+          "sha256": "117555f38d8680a3d49623cff32f0b7f20a3b7efefac53564f20120548f5a451"
+        },
+        {
+          "path": "src/diagnostics/inspection.d.ts",
+          "sha256": "642295efa1e1d1bde6389385724fd3e5a43e77714d7aaf77c83d410b2f244058"
+        },
+        {
+          "path": "src/domain/command-errors.d.ts",
+          "sha256": "4c429cad604b6560d7d1af7ec3163c2b4cc30ae5d0248843b1a80b73e279a2c1"
+        },
+        {
+          "path": "src/domain/constants.d.ts",
+          "sha256": "dca3f97473dfcd8c96144ccc114a610dfba45ac1b2234ae4acd5d6dcb07365d7"
+        },
+        {
+          "path": "src/domain/errors.d.ts",
+          "sha256": "84cfeae969517a89289ac22656675c57dad99cc871e28db9dae36c67837e2ef6"
+        },
+        {
+          "path": "src/domain/procedure-meta.d.ts",
+          "sha256": "8c8030d2bec9c21fd54aae4c2f3cf26b6a43c34ea568aeec5c62bd78d9a0b761"
+        },
+        {
+          "path": "src/domain/result.d.ts",
+          "sha256": "c9952494d2fce979e818809e43e71b65c56d8fb48f97f084584f70fa4752588f"
+        },
+        {
+          "path": "src/domain/schema-types.d.ts",
+          "sha256": "032d22df48be2bc07b249d46d99fb5f2638fc453bd0dbd47415f71af0e9b051b"
+        },
+        {
+          "path": "src/domain/schemas.d.ts",
+          "sha256": "56d67d30cc297aa8429e4343d623c125d230fd04691f68f219ec683457b7d320"
+        },
+        {
+          "path": "src/public/mod.d.ts",
+          "sha256": "6cf3d6c0364f6f99f54ad29527fbf7640e9310cf5acaaf891d7a5ce23200cb24"
+        },
+        {
+          "path": "transform.d.ts",
+          "sha256": "ed7da3066ca4d1392f86ca25e95e519aa2387b1f0530508e56fa127af07d4e3a"
+        }
+      ],
+      "metadata": {
+        "scopedName": true,
+        "validExports": true,
+        "license": true,
+        "descriptionWithin250": true,
+        "rootEntrypointUnchanged": true
+      },
+      "packDependencyMetadata": {
+        "@orpc/contract": "^1.15.0",
+        "zod": "^4.4.3"
+      }
+    },
+    {
+      "name": "@netscript/service",
+      "version": "0.0.7",
+      "exports": {
+        ".": "./mod.ts",
+        "./auth": "./src/auth/mod.ts",
+        "./rpc-path": "./src/primitives/rpc-path.ts",
+        "./commands": "./commands.ts"
+      },
+      "declaredImports": {
+        "hono": "jsr:@hono/hono@4.12.24",
+        "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+        "hono/logger": "jsr:@hono/hono@4.12.24/logger",
+        "@orpc/server": "npm:@orpc/server@^1.15.0",
+        "@orpc/openapi": "npm:@orpc/openapi@^1.15.0",
+        "@orpc/client": "npm:@orpc/client@^1.15.0",
+        "@orpc/zod": "npm:@orpc/zod@^1.15.0",
+        "@std/assert": "jsr:@std/assert@^1",
+        "zod": "npm:zod@^4.4.3",
+        "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+        "@netscript/database": "jsr:@netscript/database@0.0.7"
+      },
+      "publishExit": 0,
+      "packExit": 0,
+      "publishedSourceFiles": [
+        "README.md",
+        "commands.ts",
+        "deno.json",
+        "mod.ts",
+        "src/adapters/runtime-host-budget-timer.ts",
+        "src/auth/auth-middleware.ts",
+        "src/auth/contract-authorizer.ts",
+        "src/auth/contract-policy.ts",
+        "src/auth/hono-context.ts",
+        "src/auth/mod.ts",
+        "src/auth/options.ts",
+        "src/auth/scope-authorizer.ts",
+        "src/auth/service-auth-policy.ts",
+        "src/auth/static-credential-authenticator.ts",
+        "src/auth/trusted-header-authenticator.ts",
+        "src/auth/types.ts",
+        "src/builder/service-builder-impl.ts",
+        "src/builder/service-builder.ts",
+        "src/builder/service-listener.ts",
+        "src/builder/service-rpc.ts",
+        "src/builder/service-shutdown.ts",
+        "src/commands/application/canonical-json.ts",
+        "src/commands/application/define-command.ts",
+        "src/commands/application/json-codec.ts",
+        "src/commands/domain/codec.ts",
+        "src/commands/domain/definition.ts",
+        "src/commands/domain/failure.ts",
+        "src/commands/domain/values.ts",
+        "src/diagnostics/database-connectivity.ts",
+        "src/presets/define-service.ts",
+        "src/primitives/handlers.ts",
+        "src/primitives/health.ts",
+        "src/primitives/openapi.ts",
+        "src/primitives/orpc-router.ts",
+        "src/primitives/rpc-path.ts",
+        "src/primitives/scalar.generated.ts",
+        "src/runtime/runtime-host.ts",
+        "src/types.ts"
+      ],
+      "publishedSourceCount": 38,
+      "packedFileCount": 65,
+      "packedDeclarations": [
+        {
+          "path": "commands.d.ts",
+          "sha256": "5813584261ae501a053475eab82253750d479d890bfa89ac03319ba277d7e4fa"
+        },
+        {
+          "path": "mod.d.ts",
+          "sha256": "39258539942668e4789c095c444a35a75a8fdae49600e5511b37519f30a29fa7"
+        },
+        {
+          "path": "src/auth/contract-authorizer.d.ts",
+          "sha256": "e1ccf9a142be2d15f53f03806e813b65539072bc41cc8196882e3326930af364"
+        },
+        {
+          "path": "src/auth/contract-policy.d.ts",
+          "sha256": "70bcd8e578ca4e7373a6bcadd83f0557cd61f19461814d4cfbfe314b3750a7bb"
+        },
+        {
+          "path": "src/auth/hono-context.d.ts",
+          "sha256": "f465180241c5f74e741cedc79ba13b3ad5991c169a42957a2452632957e2c8ac"
+        },
+        {
+          "path": "src/auth/mod.d.ts",
+          "sha256": "d4767f95c1d60c19fff456087a869b511a2726d9b4d31dc1fd48171af66ccc1a"
+        },
+        {
+          "path": "src/auth/options.d.ts",
+          "sha256": "ddc2a76b8225e984d363b81c956c3c20242db398d22caf76bde39a27a07ed294"
+        },
+        {
+          "path": "src/auth/scope-authorizer.d.ts",
+          "sha256": "81bf8ba435f66142734631f136dd4b5cb2ad036561bae32736253e67c71eb5f0"
+        },
+        {
+          "path": "src/auth/service-auth-policy.d.ts",
+          "sha256": "98600bb9ea48952b72f00650629cb46b0b9922ad61f42ea1ed53ff180d10b59e"
+        },
+        {
+          "path": "src/auth/static-credential-authenticator.d.ts",
+          "sha256": "7c3666e01843c71977ca87f6d65c2856f5cf75ca2caf81fea02ce411fb12bbbd"
+        },
+        {
+          "path": "src/auth/trusted-header-authenticator.d.ts",
+          "sha256": "69243667cc3ad6b8fb0d18971669c9e8c94fe01fa7b0c836ef3cd3452318e487"
+        },
+        {
+          "path": "src/auth/types.d.ts",
+          "sha256": "9b7013ff5eda87173401b89a3503a09ea1ff52c37e5440d26a5766d03436ed34"
+        },
+        {
+          "path": "src/builder/service-builder.d.ts",
+          "sha256": "e3aa6b9f586d491a280c46ddfe2bcc0e45d42c9afaba800bf032edc89e1ddb21"
+        },
+        {
+          "path": "src/commands/application/canonical-json.d.ts",
+          "sha256": "40ba85bcc7e7206bab83f8d312b81f3602d98086067ec582529561292d294033"
+        },
+        {
+          "path": "src/commands/application/define-command.d.ts",
+          "sha256": "d7d88fa07d0590280bc59ff97f504da5aff616e01f421e84724e4031388cc6fe"
+        },
+        {
+          "path": "src/commands/application/json-codec.d.ts",
+          "sha256": "76c183698e736d01ef582e4959b68f49eeeb5cb578364103e37a28cb77033fb0"
+        },
+        {
+          "path": "src/commands/domain/codec.d.ts",
+          "sha256": "cd70924453ad694b9591a83b34ed842dad1b94ac07f118f48a2ed8ec17ee2e80"
+        },
+        {
+          "path": "src/commands/domain/definition.d.ts",
+          "sha256": "7edde978aae5c3d0477923dd83979ba3004990baf08d14f64db9547e562513b8"
+        },
+        {
+          "path": "src/commands/domain/failure.d.ts",
+          "sha256": "c934801245dae5a152c5f749914b8979997f30694905c900bd22b97c1f029103"
+        },
+        {
+          "path": "src/commands/domain/values.d.ts",
+          "sha256": "a723f7defe5bbf264c80b67c1842b37f1e5e9a4b627254cd099dbddbdb5612fc"
+        },
+        {
+          "path": "src/presets/define-service.d.ts",
+          "sha256": "962323f82ce3062d05fd32580748e75c9d92df66e2cf44ba10193273b81af535"
+        },
+        {
+          "path": "src/primitives/handlers.d.ts",
+          "sha256": "3753905411a449073ac7a8ecb756155380606b3b05fac3f989b5ef429059cef0"
+        },
+        {
+          "path": "src/primitives/health.d.ts",
+          "sha256": "e582f76b8d658a927fd4456214bd30aac620e36844b754ff03e7e9198f705ec2"
+        },
+        {
+          "path": "src/primitives/openapi.d.ts",
+          "sha256": "64513583ab000e73bc91f248cafddc333ff5013c00b01c45a7dae40a129252fa"
+        },
+        {
+          "path": "src/primitives/rpc-path.d.ts",
+          "sha256": "ae28c6cfcd3bbbf61bebc2ec9bb1de8d38ad31beb8aa42b7213b044f8e03594b"
+        },
+        {
+          "path": "src/runtime/runtime-host.d.ts",
+          "sha256": "0c110bb5adadd94f47a3fa93b61a6e113727772b0fd3a7bb98837e35e44ca763"
+        },
+        {
+          "path": "src/types.d.ts",
+          "sha256": "d211170b567ed1d7914e136c1e737791f44cd2b2e516762c4d694395a2781a3c"
+        }
+      ],
+      "metadata": {
+        "scopedName": true,
+        "validExports": true,
+        "license": true,
+        "descriptionWithin250": true,
+        "rootEntrypointUnchanged": true
+      },
+      "packDependencyMetadata": {
+        "@jsr/hono__hono": "^4.12.24",
+        "@orpc/openapi": "^1.15.0",
+        "@orpc/server": "^1.15.0",
+        "@orpc/zod": "^1.15.0"
+      }
+    }
+  ],
+  "qualification": "JSR source/import maps and unmodified native emitted declarations. No npm release qualification.",
+  "packLimitation": "Native npm-format pack package.json omits type-only StandardSchema/database dependencies while declarations retain bare imports. Clean declaration checks explicitly use the declared JSR member dependency maps, and route generated relative .js specifiers to companion .d.ts without changing emitted files."
+}

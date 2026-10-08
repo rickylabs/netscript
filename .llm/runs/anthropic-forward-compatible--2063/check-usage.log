@@ -1,0 +1,4 @@
+Task check:desktop-native-fixture deno run --allow-all packages/cli/e2e/src/adapters/native-desktop/fixture-contract-driver.ts --repo-root . --check-only
+desktop fixture import map satisfies 15 reachable SDK modules; 0 unmapped specifiers.
+Task check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude "^(.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)"
+{"source":{"mode":"selection","cwd":"<worktree>"},"command":"deno check --unstable-kv <files>","selection":{"filesSelected":3162,"batches":27,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}

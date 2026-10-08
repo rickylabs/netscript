@@ -1,0 +1,466 @@
+{
+  "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+  "runtime": [
+    "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+    "v8 15.0.245.2-rusty",
+    "typescript 6.0.3"
+  ],
+  "gates": [
+    {
+      "gate": "service-check",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/run-deno-check.ts",
+        "--root",
+        "packages/service",
+        "--ext",
+        "ts",
+        "--deno-arg",
+        "--frozen"
+      ],
+      "summary": {
+        "source": {
+          "mode": "selection"
+        },
+        "command": "deno check --unstable-kv --frozen <files>",
+        "selection": {
+          "filesSelected": 65,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueCodes": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "gate": "existing-health-regressions",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<private-runtime>/health-prerequisite-candidate/health-tests.json",
+        "--",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "packages/service/tests/health_test.ts",
+        "packages/service/tests/_fixtures/readme-examples_test.ts"
+      ],
+      "summary": {
+        "summary": {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 10,
+          "uniqueFailures": 0
+        }
+      }
+    },
+    {
+      "gate": "service-lint",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/run-deno-lint.ts",
+        "--root",
+        "packages/service",
+        "--ext",
+        "ts"
+      ],
+      "summary": {
+        "source": {
+          "mode": "command",
+          "exitCode": 0
+        },
+        "selection": {
+          "filesSelected": 65,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "coverage": {
+          "filesSelected": 65,
+          "filesProcessed": 65,
+          "droppedFiles": [],
+          "refusals": []
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueRules": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "gate": "service-format",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/run-deno-fmt.ts",
+        "--root",
+        "packages/service",
+        "--ext",
+        "ts"
+      ],
+      "summary": {
+        "command": "deno fmt --check",
+        "mode": "check",
+        "summary": {
+          "filesSelected": 65,
+          "batches": 1,
+          "failedBatches": 0,
+          "findings": 0,
+          "ignoredFindings": 0
+        },
+        "coverage": {
+          "filesSelected": 65,
+          "filesProcessed": 65,
+          "droppedFiles": [],
+          "refusals": []
+        },
+        "findings": []
+      }
+    },
+    {
+      "gate": "service-full-map-docs",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "doc-lint",
+        "--id",
+        "c2-health-prerequisite-docs",
+        "--output",
+        "<private-runtime>/health-prerequisite-candidate/docs-receipt.json",
+        "--",
+        "--root",
+        "packages/service"
+      ],
+      "receipt": {
+        "gateId": "doc-lint",
+        "invocationId": "c2-health-prerequisite-docs",
+        "gitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "actualGitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "c12f4c0c5abf34f22841f1db524b4b74d3f2a4740ced9f40c2d61a1c40b8d6b5",
+        "outcome": "PASS",
+        "durationMs": 800,
+        "exitCode": 0,
+        "sha256": "bf7bb67fdb3eb6ecf1815254d2508456d6e9d61b8106d9512083f5b8d411f372",
+        "stdout": {
+          "bytes": 1058,
+          "sha256": "ca912e77e8dcc159dbdb53faa285651f9e0de17f1518b70019fa4e92da47d9ab",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 122,
+          "sha256": "b80c96ea9ec041fc23e0fce86b7d0c1fdeb2d8e0da001b59fc0aaa2727c7fea5",
+          "truncated": false
+        }
+      },
+      "docs": {
+        "source": {
+          "mode": "auto",
+          "root": "packages/service",
+          "entrypoints": [
+            "./commands-testing.ts",
+            "./commands.ts",
+            "./mod.ts",
+            "./src/auth/mod.ts",
+            "./src/primitives/rpc-path.ts"
+          ],
+          "exitCode": 0
+        },
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 0,
+          "totalPrivateTypeRef": 0,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "packages": [
+          {
+            "name": "@netscript/service",
+            "dir": "packages/service",
+            "entrypoints": [
+              {
+                "path": "./commands-testing.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./commands.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./src/auth/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./src/primitives/rpc-path.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              }
+            ],
+            "files": [],
+            "combinedTotal": 0,
+            "combinedPrivateTypeRef": 0,
+            "combinedMissingJSDoc": 0,
+            "combinedOther": 0,
+            "combinedExitCode": 0,
+            "entrypointExitCodes": {
+              "./commands-testing.ts": 0,
+              "./commands.ts": 0,
+              "./mod.ts": 0,
+              "./src/auth/mod.ts": 0,
+              "./src/primitives/rpc-path.ts": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "gate": "quality-scan",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "quality-scan",
+        "--id",
+        "c2-health-prerequisite-quality",
+        "--output",
+        "<private-runtime>/health-prerequisite-candidate/quality-receipt.json"
+      ],
+      "receipt": {
+        "gateId": "quality-scan",
+        "invocationId": "c2-health-prerequisite-quality",
+        "gitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "actualGitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "dda51d6c596fd823e5ee7c2803a671bd1443892c102eb56f56dcc0f22f772327",
+        "outcome": "PASS",
+        "durationMs": 3172,
+        "exitCode": 0,
+        "sha256": "765c5e757e6626b68ef968562a542849c2353c594c58a6a5be316724acea14c7",
+        "stdout": {
+          "bytes": 4092,
+          "sha256": "dce970190ae072970570b713c6947e32c1562c8b906239c14abd13809699bab7",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 270,
+          "sha256": "96006aba8e6f570d749f2b97c6fad5b678a80c510372ce7583dc0166e746886b",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "arch-check",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "arch-check",
+        "--id",
+        "c2-health-prerequisite-arch",
+        "--output",
+        "<private-runtime>/health-prerequisite-candidate/arch-receipt.json"
+      ],
+      "receipt": {
+        "gateId": "arch-check",
+        "invocationId": "c2-health-prerequisite-arch",
+        "gitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "actualGitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "51845e67f5af2336aa780aeb3dd38943bfd8e0926b8f716e3196c0bbea765a65",
+        "outcome": "PASS",
+        "durationMs": 6420,
+        "exitCode": 0,
+        "sha256": "2aa143045237b3de7cd0f221783e4e63228ef7a23b93366c84688a4d1e790b00",
+        "stdout": {
+          "bytes": 42726,
+          "sha256": "6e06474c8962473f27479f9ee042d416d1735bb7c7e3e0b0ab713aad798398a5",
+          "truncated": true
+        },
+        "stderr": {
+          "bytes": 485,
+          "sha256": "d383a582d1a3ab53409417a624b04062624331ae3ada6bd36a8fb15ed8e33cc6",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "exports-drift",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "exports-drift",
+        "--id",
+        "c2-health-prerequisite-exports",
+        "--output",
+        "<private-runtime>/health-prerequisite-candidate/exports-receipt.json"
+      ],
+      "receipt": {
+        "gateId": "exports-drift",
+        "invocationId": "c2-health-prerequisite-exports",
+        "gitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "actualGitHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "183cbe864ae1228564be2d71807cdaf75daad5ba7de4c776f02efae589b9b222",
+        "outcome": "PASS",
+        "durationMs": 3387,
+        "exitCode": 0,
+        "sha256": "35497ac7d89d17673ed3500c67646a548d3976a6b342e7f0ffa6a215c0571639",
+        "stdout": {
+          "bytes": 13340,
+          "sha256": "f52a0a796a0aff1c8cd69f89a8061b5c892695c4e7c2654073829a1ba45b0dc0",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 112,
+          "sha256": "6b3227ef695597fbc2c2bf0c3350f5ee5251e894020513f33412a26568c1294f",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "service-audit",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "deno",
+        "run",
+        "--allow-all",
+        ".llm/tools/fitness/audit-jsr-package.ts",
+        "--root",
+        "packages/service",
+        "--out",
+        "<private-runtime>/health-prerequisite-candidate/service-audit.json"
+      ],
+      "receiptSha256": "84412a1af9eb78aa455a3fd5d808ef14fa762dd7bdb1c4701327cdd52757c358",
+      "summary": {
+        "gates": [
+          {
+            "gate": "F-JSR-7 slow-types",
+            "level": "INFO",
+            "message": "Checking for slow types in the public API... \u2014 sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)"
+          }
+        ],
+        "slowTypesOk": true,
+        "moduleTags": {
+          ".": true,
+          "./auth": true,
+          "./rpc-path": true,
+          "./commands": true,
+          "./commands/testing": true
+        },
+        "exports": {
+          ".": "./mod.ts",
+          "./auth": "./src/auth/mod.ts",
+          "./rpc-path": "./src/primitives/rpc-path.ts",
+          "./commands": "./commands.ts",
+          "./commands/testing": "./commands-testing.ts"
+        }
+      }
+    },
+    {
+      "gate": "diff-whitespace",
+      "exitCode": 0,
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ]
+    }
+  ],
+  "rootLockSha256": "75404ed4a3b7733c6311b926ea0438686754e3caa2df6c82581f1479de964aa4",
+  "privateLockSha256": "81453e4fe24855516b3f0309490cf71b0665efbde3150c264b0d07bb3d46f80e",
+  "lockFilesUnchanged": true,
+  "nativeReceiptPolicy": "Exact private receipts are retained unchanged; public records preserve native verdict, request and output hashes without operational command tails."
+}

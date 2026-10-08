@@ -13,9 +13,10 @@ your code runs, and the same contract types the client that calls it. This page 
 the package's public surface reported by `deno doc`. For the full index of packages and plugins
 return to the [reference overview](/reference/).
 
-The root entrypoint (`@netscript/contracts`) carries the core contract primitives. Three
+The root entrypoint (`@netscript/contracts`) carries the core contract primitives. Four
 sub-path exports add higher-level builders:
 
+- [`@netscript/contracts/commands`](#command-contracts) — opt-in command error contracts.
 - [`@netscript/contracts/crud`](#sub-path-exports) — CRUD contract generators.
 - [`@netscript/contracts/query`](#sub-path-exports) — query, filter, and pagination helpers.
 - [`@netscript/contracts/transform`](#sub-path-exports) — typed transformer factories.
@@ -187,6 +188,7 @@ from their own `deno doc` surface.
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/contracts` | `./mod.ts` | Core contract surface (documented above). |
+| `@netscript/contracts/commands` | `./commands.ts` | Opt-in command transport errors. |
 | `@netscript/contracts/crud` | `./crud.ts` | CRUD contract generators. |
 | `@netscript/contracts/query` | `./query.ts` | Query, filter, and pagination helpers. |
 | `@netscript/contracts/transform` | `./transform.ts` | Typed transformer factories. |
@@ -352,6 +354,29 @@ export async function handleListUsersCursor(input: z.infer<typeof CursorPaginati
 | `TransformFn` | type alias | `type TransformFn<TInput, TOutput> = (input: TInput) => TOutput` | The underlying transform function signature. |
 | `PickTransformerFactory` | type alias | `type PickTransformerFactory<T> = (...keys) => Transformer<T, Pick<T, K>>` | Factory returned by `createPickTransformer`. |
 | `OmitTransformerFactory` | type alias | `type OmitTransformerFactory<T> = (...keys) => Transformer<T, Omit<T, K>>` | Factory returned by `createOmitTransformer`. |
+
+## Command contracts
+
+`@netscript/contracts/commands` adds three command codes to the six base errors while preserving
+procedure metadata. Importing the root contract keeps its existing error map.
+
+| Symbol                       | Kind       | Description                                         |
+| ---------------------------- | ---------- | --------------------------------------------------- |
+| `commandBaseContract`        | const      | Opt-in builder with exact base and command errors.  |
+| `CommandContractErrors`      | type alias | Nine-code error vocabulary of the opt-in builder.   |
+| `CommandContractRoute`       | type alias | Input route retaining exact errors and metadata.    |
+| `CommandContractOutputRoute` | type alias | Output route retaining exact errors and metadata.   |
+| `CommandErrorConstructors`   | type alias | Typed constructors for command transport failures.  |
+| `throwCommandContractError`  | function   | Maps three safe failures and rethrows other errors. |
+| `CommandConflictData`        | type alias | Redacted optimistic conflict data.                  |
+| `CommandConflictSchema`      | const      | Strict conflict data schema.                        |
+| `CommandContractFailure`     | type alias | Three failures supported by transport translation.  |
+| `CommandErrorMap`            | type alias | Exact command code, status, message and schema map. |
+| `commandErrorMap`            | const      | Three opt-in command error declarations.            |
+| `CommandInProgressData`      | type alias | Bounded retry information.                          |
+| `CommandInProgressSchema`    | const      | Strict in-progress data schema.                     |
+| `IdempotencyKeyReuseData`    | type alias | Redacted reused-key data.                           |
+| `IdempotencyKeyReuseSchema`  | const      | Strict reused-key data schema.                      |
 
 ---
 

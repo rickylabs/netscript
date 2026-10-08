@@ -190,7 +190,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           E2E_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
-        run: gh run watch "$E2E_RUN_ID" --exit-status
+        run: bash .llm/tools/release/watch-canary-e2e.sh "$E2E_RUN_ID"
 
       - name: Delete ephemeral canary branch
         id: cleanup
@@ -219,11 +219,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
+          E2E_STATE: ${{ steps.e2e.outputs.state }}
+          E2E_CONCLUSION: ${{ steps.e2e.outputs.conclusion }}
         run: |
           if [[ "${{ steps.publish-outcome.outputs.kind }}" == "partial" ]]; then
             description="Canary partial publish: ${{ steps.publish-outcome.outputs.published }} live, ${{ steps.publish-outcome.outputs.missing }} missing"
-          elif [[ "${{ steps.publish.outcome }}" == "success" && "${{ steps.e2e.outcome }}" == "failure" ]]; then
-            description='Canary publish complete; pinned production E2E failed'
+          elif [[ "${{ steps.publish.outcome }}" == "success" ]]; then
+            description="$(bash .llm/tools/release/canary-failure-description.sh)"
           else
             description='Canary publish failed before pinned production E2E'
           fi
