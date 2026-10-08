@@ -1,0 +1,28 @@
+// Consumer-owned bridge. Generate the schema client before checking this fixture.
+import type { Prisma, PrismaClient } from './.generated/client.ts';
+import type { TransactionClientPort } from '../../../commands.ts';
+
+export type CommandTransactionClient = Omit<
+  Prisma.TransactionClient,
+  '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
+>;
+
+export function transactionClient(
+  root: PrismaClient,
+): TransactionClientPort<CommandTransactionClient> {
+  return {
+    $transaction(work, options) {
+      if (options?.isolationLevel === 'Snapshot') throw new TypeError('PostgreSQL isolation unsupported');
+      return root.$transaction((tx) => work(new Proxy(tx, {
+        get(target, key, receiver) {
+          if (typeof key === 'string' && ['$transaction', '$connect', '$disconnect', '$on', '$use', '$extends'].includes(key)) return undefined;
+          return Reflect.get(target, key, receiver);
+        },
+        has(target, key) {
+          if (typeof key === 'string' && ['$transaction', '$connect', '$disconnect', '$on', '$use', '$extends'].includes(key)) return false;
+          return Reflect.has(target, key);
+        },
+      })), { ...options, isolationLevel: options?.isolationLevel });
+    },
+  };
+}

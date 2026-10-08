@@ -52,6 +52,8 @@ export interface NetScriptStreamDB<TDef extends NetScriptStreamStateDefinition> 
   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
   /** Start the lazy default consumer and wait until its collections are up to date. */
   readonly preload?: () => Promise<void>;
+  /** Close the consumer; compatible alternate adapters may omit this hook. */
+  readonly close?: () => void;
   /** Inspect the default consumer's liveness; alternate adapters may omit this hook. */
   readonly status?: NetScriptStreamDBStatus;
   /** Optional stop hook exposed by compatible stream DB adapters. */
@@ -184,6 +186,7 @@ function defaultCreateStreamDB<TDef extends NetScriptStreamStateDefinition>(
     get status() {
       return recovery.status;
     },
+    close: stop,
     stop,
     dispose: stop,
   };

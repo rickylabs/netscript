@@ -1,0 +1,11 @@
+{
+  "test": "all workflow concurrency mappings are classified and repo-wide literals are bounded",
+  "redExit": 1,
+  "greenSuiteExit": 0,
+  "mutation": "Production command-postgres workflow changes cancel-in-progress true to false",
+  "mutationExit": 1,
+  "namedAssertionFailure": true,
+  "restoredExit": 0,
+  "restoredBytesExact": true,
+  "invariant": "Registered per-ref concurrency group prevents duplicate provider jobs and remains fully classified"
+}

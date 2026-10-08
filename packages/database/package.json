@@ -5,6 +5,7 @@
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
     "@prisma/instrumentation-contract": "catalog:",
-    "pg": "catalog:"
+    "pg": "catalog:",
+    "@prisma/driver-adapter-utils": "catalog:"
   }
 }
