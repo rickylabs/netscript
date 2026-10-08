@@ -1,4 +1,5 @@
 import {
+  nativeActivityMessage,
   nativeModelMessage,
   nativeUiMessage,
 } from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
@@ -812,7 +813,8 @@ Deno.test('rich native send preserves identity data and linked cancellation with
     parts: [{ type: 'future-attachment', nativeField: { keep: true } }],
     metadata: { keep: true },
   };
-  const messages: readonly NetScriptChatSendMessage[] = [ui, nativeModelMessage, future];
+  const activity = { ...nativeActivityMessage, futureActivityField: { preserved: true } };
+  const messages: readonly NetScriptChatSendMessage[] = [ui, nativeModelMessage, future, activity];
   const data = { attachments: { labels: ['original', 'opaque'] }, options: { preserved: true } };
   const caller = new AbortController();
   assertEquals(probe.stats.subscribeCalls, 0);
@@ -827,6 +829,8 @@ Deno.test('rich native send preserves identity data and linked cancellation with
     assertStrictEquals(calls[0].messages[0], ui);
     assertStrictEquals(calls[0].messages[1], nativeModelMessage);
     assertStrictEquals(calls[0].messages[2], future);
+    assertStrictEquals(calls[0].messages[3], activity);
+    assertStrictEquals(activity.parts, nativeActivityMessage.parts);
     assertStrictEquals(calls[0].data, data);
     assert(calls[0].signal instanceof AbortSignal);
     const reason = new DOMException('Caller cancelled send.', 'AbortError');

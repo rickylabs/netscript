@@ -80,6 +80,17 @@ export const nativeModelMessage: ModelMessage = {
   createdAt: new Date('2026-10-08T00:00:00Z'),
 };
 
+export const nativeActivityMessage: UIMessage = {
+  id: 'native-activity',
+  role: 'activity',
+  parts: [{
+    type: 'activity',
+    activityType: 'progress',
+    content: { status: 'running', completed: 1, total: 2 },
+  }],
+  metadata: { application: { retained: true } },
+};
+
 export function consumeNativeMessages(
   connection: NetScriptChatConnection,
   ui: UIMessage,
@@ -87,11 +98,13 @@ export function consumeNativeMessages(
   data: unknown,
   signal: AbortSignal,
 ): Promise<void> {
-  const messages: readonly NetScriptChatSendMessage[] = [ui, model];
+  const messages: readonly NetScriptChatSendMessage[] = [ui, model, nativeActivityMessage];
   // @ts-expect-error A send input requires a valid parts or content representation.
   const missing: NetScriptChatSendMessage = { role: 'user' };
   // @ts-expect-error UI parts must be an array, not an arbitrary scalar.
   const invalid: NetScriptChatSendMessage = { id: 'bad', role: 'user', parts: 3 };
-  void [missing, invalid];
+  // @ts-expect-error Arbitrary roles are not native message roles.
+  const invalidRole: NetScriptChatSendMessage = { id: 'bad', role: 'invalid', parts: [] };
+  void [missing, invalid, invalidRole];
   return connection.send(messages, data, signal);
 }

@@ -1,4 +1,5 @@
 import {
+  nativeActivityMessage,
   nativeModelMessage,
   nativeUiMessage,
 } from '../../../tests/type-fixtures/chat-send-consumer_type.ts';
@@ -258,6 +259,7 @@ Deno.test('default native chat transport retains rich POST bodies and one live S
   const messages = [
     { ...nativeUiMessage, futureMessageField: { preserved: true } },
     nativeModelMessage,
+    { ...nativeActivityMessage, futureActivityField: { preserved: true } },
     {
       id: 'future-native',
       role: 'user' as const,

@@ -2426,28 +2426,35 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   ceiling.
 - **Cost:** Dependency upgrades require hook-shape and semantic compatibility verification. Runtime
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
-  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
-  storage migration or persistent index.
+  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
+  cold historical framing scans for fixed memory without a storage migration or persistent index.
 
 ## packages/ai — existing doc-lint private references (`ai-doc-private-ref-baseline-2036`)
 
-- **Reason:** Single-entrypoint doc lint returns private-type references on unchanged main and on the peer-compatibility slice. All per-entrypoint diagnostic counts and exits match; source public contracts are unchanged. Combined-summary zero counts do not override those failing exits.
+- **Reason:** Single-entrypoint doc lint returns private-type references on unchanged main and on
+  the peer-compatibility slice. All per-entrypoint diagnostic counts and exits match; source public
+  contracts are unchanged. Combined-summary zero counts do not override those failing exits.
 - **Owner:** AI framework maintainers.
 - **Target:** Before stable release readiness is claimed.
 - **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
-- **Status:** Open, existing baseline finding recorded for independent source-slice adjudication; no blanket green documentation claim.
+- **Status:** Open, existing baseline finding recorded for independent source-slice adjudication; no
+  blanket green documentation claim.
 - **Gate:** F-7; full-export `deno task doc:lint --root packages/ai` must pass when resolved.
 
 ## packages/fresh — unchanged all-export doc lint (`fresh-doc-baseline-2036`)
 
-- **Reason:** Current main and AI-family amendment have identical all-export per-entry diagnostics and exits: builders 3 private references, query 8, route 8 plus 17 missing JSDoc, streams 11; other exports including AI have zero diagnostics. Combined-summary zeros do not supersede failing native exits. The previously resolved June row does not describe this newer baseline.
+- **Reason:** Current main and AI-family amendment have identical all-export per-entry diagnostics
+  and exits: builders 3 private references, query 8, route 8 plus 17 missing JSDoc, streams 11;
+  other exports including AI have zero diagnostics. Combined-summary zeros do not supersede failing
+  native exits. The previously resolved June row does not describe this newer baseline.
 - **Owner:** Fresh framework maintainers.
 - **Target:** Before stable release readiness is claimed.
 - **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--c2/plan.md`; issue #2036.
-- **Status:** Open, unchanged baseline recorded for independent F-7 adjudication; this dependency amendment introduces no doc diagnostic.
-- **Gate:** All-export `deno task doc:lint --root packages/fresh` must pass at resolution.
-  RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades
-  cold historical framing scans for fixed memory without a storage migration or persistent index.
+- **Status:** Open, unchanged baseline recorded for independent F-7 adjudication; this dependency
+  amendment introduces no doc diagnostic.
+- **Gate:** All-export `deno task doc:lint --root packages/fresh` must pass at resolution. RSS
+  negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold
+  historical framing scans for fixed memory without a storage migration or persistent index.
 
 ## Fresh — unchanged documentation baseline during pure route utility repair
 
@@ -2547,3 +2554,24 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at
   `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits
   match pristine main; closing gate remains owner work.
+
+## Fresh AI — derived native chat send documentation references (`fresh-ai-native-send-doc-2087`)
+
+- **Reason:** PR #2087 requires deriving `NetScriptChatSendMessage` from installed TanStack 0.65
+  UI/Model types so native consumer messages compile without casts. Focused AI doc lint introduces
+  exactly two `private-type-ref` diagnostics (`UIMessage`, `ModelMessage`) at the derived alias.
+  Re-exporting vendor types conflicts with F-15; copying the role union repeats the drift that broke
+  CI. Keep the sound derived contract and report the failing doc gate openly; no lint suppression or
+  slow-types flag is introduced.
+- **Owner:** Fresh AI public-surface maintainers / PR #2087.
+- **Target:** Before stable Fresh AI publication readiness is claimed.
+- **Linked plan:** `.llm/runs/fix-ai-peer-compatible-ranges--ci-2087/plan.md`.
+- **Status:** Open; DEBT_ACCEPTED by independent GLM IMPL-EVAL for this CI repair (see linked run's
+  evaluate.md). No blanket green documentation or release claim.
+- **Gate:** Focused `deno doc --lint packages/fresh/src/runtime/ai/mod.ts` returns zero diagnostics
+  while native activity/UI/Model consumers compile without casts and opaque forward-compatible
+  payloads remain intact.
+- **Evidence:** Initial native check exit 1 with six role errors; derived contract check, Fresh
+  check, all 42 AI tests, peer guard, frozen install, Fresh lint and touched-source formatting
+  exit 0. Focused doc lint exit 1 with only the two named references. Project
+  runs/2026-10-08-fix-ai-peer-types/ai-doc-lint.log retains the raw failure.
