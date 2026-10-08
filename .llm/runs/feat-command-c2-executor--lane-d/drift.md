@@ -104,3 +104,16 @@ are unchanged. The additional throwing-telemetry assertion/control qualifies inh
 not a new finisher fix. Finite semantic and identity samples make no universal purity or real-provider
 claim. Final clean-committed generated corpus/full C2 qualification and independent IMPL-EVAL stay
 required after supervisor review/signoff; no dirty-tree agent-docs generation or later leaf begun.
+
+## Native first-wave release boundary
+
+The clean signed S6 head owns the first-wave generated read set. Native prose and MCP freshness were
+actually stale at baseline and pass after native generation; no stale result was manufactured.
+Generation changed only the prose bundle, its provenance and the MCP export corpus. All 7,947
+existing MCP symbol records remain identical; 115 additions are confined to database/service
+surfaces, including inherited reviewed adapter type exports. Prose changes only llms-full.txt and
+the database/service reference pages; both externally owned non-site entries remain identical. No
+source/tool/manifest/lock/workflow change or generated-output handpatch. The five existing
+non-worktree generator cases are permitted locally; seven unchanged worktree-fixture cases remain
+required in actual repository CI after ready-for-review. Downstream CLI assets are not yet updated
+or claimed fresh and need their separately signed committed wave before final C2 qualification.

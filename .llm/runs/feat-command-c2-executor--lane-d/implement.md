@@ -1,3 +1,20 @@
+# Current checkpoint — native generated first wave FROZEN
+
+S6 is signed, committed and pushed at `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Only first-wave
+native prose/provenance and MCP export-corpus refresh is released. Generation ran from that clean
+committed source using captured direct Deno 2.9.5. Actual baseline prose and MCP freshness both
+returned stale exit 1; both native generators and refreshed freshness checks returned 0. Exactly
+three native generated outputs changed; all other 6,227 tracked files stayed byte-identical through
+generation. Semantic reconciliation, all 11 permitted native regressions, 119-file MCP check and
+118-file lint/format checks and durable quality/architecture gates pass. This 11-file implementation
+wave is frozen for supervisor review; read first-wave-gate-evidence.json,
+first-wave-semantic-diff.json and first-wave-source-manifest.json. Downstream CLI/publish-asset
+generation needs this wave's separate supervisor signoff, commit, push and comment plus explicit
+release. Final full C2 qualification, actual native CI and independent opposite-family IMPL-EVAL
+remain required. No later leaf is released.
+
+## Previous checkpoints retained
+
 # Current implementation boundary — S6 complete, frozen
 
 Only S6 was released at06cf02d75c140aa36f341ebeffed1c8e659e610e. Private per-instance seven-boundary

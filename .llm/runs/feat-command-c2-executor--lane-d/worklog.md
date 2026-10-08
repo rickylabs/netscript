@@ -1,3 +1,11 @@
+# Current supervisor checkpoint — native first wave APPROVED
+
+First-wave native asset aggregate `e57bf615c18e401f05d4d2c6ceb1ed1765cbb2b0b9385a9286c99e8587d71c1c` is approved at clean generation source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Exactly13 signed files comprise3 native assets,8 implementation run artifacts and2 supervisor files. Root verified11 frozen files/53raw receipts, independently decoded both native payloads and reran quality/architecture PASS0. All existing symbols and unowned source bytes remain unchanged.
+
+Ordinary commit/push/structured PR comment must precede release of ONLY downstream native CLI publish-assets/asset-barrel against the committed read set. Full C2 qualification, executed CI and independent opposite-family evaluation remain open; no later leaf is released.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — S6 APPROVED
 
 S6 final14-file product aggregate `d3d59597a3bcdb59a57faabc31c56ea0e6c9986f20c6cf2f6c10797239b4535c` is approved at signed S5baseline `06cf02d75c140aa36f341ebeffed1c8e659e610e`. The25-file signed slice includes23 frozen files and two supervisor review/evidence files. Root verified152raw evidence hashes,217affected tests,107-file scoped checks, native docs/publication/frozen consumers and20meaningful production controls covering all15newnamedtests. Root fresh durable quality/architecture both PASS/0; product stayed byte-identical.
@@ -341,3 +349,24 @@ Only mutable inline healthChecks annotation changes runtime source; original ini
 ## S5 supervisor signoff
 
 Verified all24 frozen files and158 raw evidence files, exact final source/consumer hashes and18 actual named production mutation assertion failures/restored passes. Substantive layering/identity/busy/replay/flush/abort/retry review approved; no remote/global transaction, hidden store singleton or production fault option. Final independent native supervisor quality-scan/arch-check PASS0 at frozen15-file package/docs aggregate; provisional pre-manifest receipts superseded. All202 affected tests; scoped99-file checks; five service/eleven database docs individually+combined; JSR/publish/pack/clean source+dts consumers and docs site/links pass. See s5-supervisor-{review,evidence}. Signed footprint26 files; ordinary commit/push/comment before ONLYS6 release. Final corpus wave/leaf IMPL-EVAL remain open. C1 current-head CI is now SUCCESS with fresh-main dependency patch in native merge composition; its prior red receipt remains historical.
+
+## Native generated first wave at signed S6 `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`
+
+Captured all 6,230 tracked baseline hashes and the direct Deno 2.9.5 version from a clean tree.
+Native durable prose and MCP baseline freshness returned 1; docs-site/prose and MCP generation
+returned 0; refreshed durable freshness returned 0. MCP generation read set was clean before its
+native write. Actual outputs: shared prose/provenance and MCP generated export corpus. The 6,227
+remaining tracked files were byte-identical throughout native generation. Qualification/freeze
+receipts follow in first-wave evidence; CLI generation and later qualification remain gated.
+
+First-wave final qualification: four prose-builder regressions, five permitted non-worktree MCP
+generator regressions and two embedded MCP corpus regressions pass (11/0). Native MCP check selects
+119 files; lint/format select 118 TypeScript files; all pass; durable quality-scan and arch-check
+pass. Semantic diff: 182 prose entries retained, three content updates only; both non-site entries
+preserved. MCP 7947→8062 symbols, 277→279 subpaths, 35 packages unchanged; all prior symbols
+identical, no removal. 115 added symbols include the reviewed inherited adapter type exports and C2
+focused command/testing surfaces. Native output provenance and compressed/uncompressed hashes/counts
+reconcile. No new tests or production changes require new mutation controls in this asset-only wave.
+Native stale→fresh checks retain the actual negative baseline and raw failure diagnostics. Frozen
+11-file implementation slice reserves two supervisor review files. No downstream CLI asset
+generation, final acceptance, independent evaluation or later leaf is claimed.
