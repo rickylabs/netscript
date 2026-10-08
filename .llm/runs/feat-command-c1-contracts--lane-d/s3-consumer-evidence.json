@@ -1,0 +1,222 @@
+[
+  {
+    "gate": "source-consumer-check",
+    "frozen": false,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s3-source-consumer",
+      "--file",
+      "commands_type.ts",
+      "--file",
+      "contract_types.ts",
+      "--file",
+      "commands-consumer_test.ts"
+    ],
+    "exitCode": 0,
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s3-source-consumer\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":3,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n"
+  },
+  {
+    "gate": "source-consumer-check",
+    "frozen": true,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s3-source-consumer",
+      "--file",
+      "commands_type.ts",
+      "--file",
+      "contract_types.ts",
+      "--file",
+      "commands-consumer_test.ts",
+      "--deno-arg",
+      "--frozen"
+    ],
+    "exitCode": 0,
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s3-source-consumer\"},\"command\":\"deno check --unstable-kv --frozen <files>\",\"selection\":{\"filesSelected\":3,\"batches\":1,\"failedBatches\":0},\"summary\":{\"totalOccurrences\":0,\"uniqueOccurrences\":0,\"uniqueCodes\":0,\"uniquePaths\":0},\"groups\":[]}\n"
+  },
+  {
+    "gate": "declaration-consumer-check",
+    "frozen": false,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      "<checkout>/.llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s3-declaration-consumer",
+      "--file",
+      "commands_type.ts",
+      "--file",
+      "contract_types.ts"
+    ],
+    "exitCode": 1,
+    "output": "{\"source\":{\"mode\":\"selection\",\"cwd\":\"<private-runtime>/s3-declaration-consumer\"},\"command\":\"deno check --unstable-kv <files>\",\"selection\":{\"filesSelected\":2,\"batches\":1,\"failedBatches\":1},\"summary\":{\"totalOccurrences\":41,\"uniqueOccurrences\":41,\"uniqueCodes\":7,\"uniquePaths\":2},\"groups\":[{\"code\":\"TS2578\",\"message\":\"Unused '@ts-expect-error' directive.\",\"count\":14,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/commands_type.ts\",\"count\":10,\"locations\":[{\"line\":37,\"column\":3},{\"line\":39,\"column\":3},{\"line\":41,\"column\":3},{\"line\":43,\"column\":3},{\"line\":45,\"column\":3},{\"line\":48,\"column\":3},{\"line\":62,\"column\":3},{\"line\":72,\"column\":1},{\"line\":74,\"column\":1},{\"line\":76,\"column\":1}]},{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":4,\"locations\":[{\"line\":87,\"column\":1},{\"line\":89,\"column\":1},{\"line\":91,\"column\":1},{\"line\":95,\"column\":3}]}]},{\"code\":\"TS2339\",\"message\":\"Property 'code' does not exist on type 'never'.\",\"count\":6,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":6,\"locations\":[{\"line\":126,\"column\":56},{\"line\":129,\"column\":22},{\"line\":134,\"column\":22},{\"line\":139,\"column\":22},{\"line\":146,\"column\":57},{\"line\":147,\"column\":22}]}]},{\"code\":\"TS2344\",\"message\":\"Type 'false' does not satisfy the constraint 'true'.\",\"count\":6,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":6,\"locations\":[{\"line\":31,\"column\":31},{\"line\":32,\"column\":34},{\"line\":34,\"column\":31},{\"line\":36,\"column\":3},{\"line\":42,\"column\":3},{\"line\":48,\"column\":3}]}]},{\"code\":\"TS2339\",\"message\":\"Property 'data' does not exist on type 'never'.\",\"count\":4,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":4,\"locations\":[{\"line\":131,\"column\":35},{\"line\":136,\"column\":35},{\"line\":141,\"column\":35},{\"line\":149,\"column\":35}]}]},{\"code\":\"TS7006\",\"message\":\"Parameter 'options' implicitly has an 'any' type.\",\"count\":3,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":3,\"locations\":[{\"line\":170,\"column\":22},{\"line\":171,\"column\":27},{\"line\":172,\"column\":25}]}]},{\"code\":\"TS2305\",\"message\":\"Module '\\\"file://<private-runtime>/s3-declaration-consumer/packages/contracts/mod.d.ts\\\"' has no exported member 'baseContract'.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":1,\"locations\":[{\"line\":2,\"column\":10}]}]},{\"code\":\"TS2305\",\"message\":\"Module '\\\"file://<private-runtime>/s3-declaration-consumer/packages/contracts/mod.d.ts\\\"' has no exported member 'BaseContractErrors'.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":1,\"locations\":[{\"line\":2,\"column\":29}]}]},{\"code\":\"TS2305\",\"message\":\"Module '\\\"file://<private-runtime>/s3-declaration-consumer/packages/contracts/mod.d.ts\\\"' has no exported member 'BaseContractMeta'.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":1,\"locations\":[{\"line\":2,\"column\":54}]}]},{\"code\":\"TS2345\",\"message\":\"Argument of type '({ status, message }: { status: any; message: any; }) => { status: any; message: any; }' is not assignable to parameter of type '(value: unknown, index: number, array: unknown[]) => { status: any; message: any; }'.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/contract_types.ts\",\"count\":1,\"locations\":[{\"line\":199,\"column\":51}]}]},{\"code\":\"TS7006\",\"message\":\"Parameter 'input' implicitly has an 'any' type.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/commands_type.ts\",\"count\":1,\"locations\":[{\"line\":24,\"column\":19}]}]},{\"code\":\"TS7031\",\"message\":\"Binding element 'envelope' implicitly has an 'any' type.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/commands_type.ts\",\"count\":1,\"locations\":[{\"line\":28,\"column\":24}]}]},{\"code\":\"TS7031\",\"message\":\"Binding element 'input' implicitly has an 'any' type.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/commands_type.ts\",\"count\":1,\"locations\":[{\"line\":23,\"column\":15}]}]},{\"code\":\"TS7031\",\"message\":\"Binding element 'tx' implicitly has an 'any' type.\",\"count\":1,\"paths\":[{\"path\":\"<private-runtime>/s3-declaration-consumer/commands_type.ts\",\"count\":1,\"locations\":[{\"line\":28,\"column\":20}]}]}]}\n"
+  },
+  {
+    "gate": "source-consumer-check",
+    "attemptLabel": "final stable S3",
+    "frozen": true,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s3-source-consumer",
+      "--file",
+      "commands_type.ts",
+      "--file",
+      "contract_types.ts",
+      "--deno-arg",
+      "--frozen",
+      "--file",
+      "commands-consumer_test.ts"
+    ],
+    "exitCode": 0,
+    "lockBeforeSha256": "7f92ef8c5fdf21676198ca40b882dd9bba45ed0efdae2b2b984a1d2c720d11da",
+    "lockAfterSha256": "7f92ef8c5fdf21676198ca40b882dd9bba45ed0efdae2b2b984a1d2c720d11da",
+    "configSha256": "881c1f1040892cba60bec79dbc4673b73ea417cdf3a5d8629313cd77eada3125",
+    "report": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<private-runtime>/s3-source-consumer"
+      },
+      "command": "deno check --unstable-kv --frozen <files>",
+      "selection": {
+        "filesSelected": 3,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "routing": "Only native published source inventory; explicit declared member maps, no repository workspace aliases."
+  },
+  {
+    "gate": "declaration-consumer-check",
+    "attemptLabel": "final stable S3",
+    "frozen": true,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-run",
+      ".llm/tools/run-deno-check.ts",
+      "--cwd",
+      "<private-runtime>/s3-declaration-consumer",
+      "--file",
+      "commands_type.ts",
+      "--file",
+      "contract_types.ts",
+      "--deno-arg",
+      "--frozen"
+    ],
+    "exitCode": 0,
+    "lockBeforeSha256": "c687138a526c041e86c889b09c18047ef96931b9bd744a05241164507616e23b",
+    "lockAfterSha256": "c687138a526c041e86c889b09c18047ef96931b9bd744a05241164507616e23b",
+    "configSha256": "cabfc7349b1dcd3875857e3eed41569e972cbfbcccdb2f70a0a1a11372c6bc03",
+    "report": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<private-runtime>/s3-declaration-consumer"
+      },
+      "command": "deno check --unstable-kv --frozen <files>",
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    },
+    "routing": "Explicit routes from pack .js specifiers to unmodified companion .d.ts; dependency imports copied from declared member manifests."
+  },
+  {
+    "gate": "declaration-consumer-check",
+    "attemptLabel": "initial explicit companion routing",
+    "frozen": false,
+    "exitCode": 0,
+    "report": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<private-runtime>/s3-declaration-consumer"
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 2,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    }
+  },
+  {
+    "gate": "source-consumer-runtime",
+    "attemptLabel": "final stable S3",
+    "frozen": true,
+    "command": [
+      "deno",
+      "run",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run",
+      ".llm/tools/run-deno-test.ts",
+      "--cwd",
+      "<private-runtime>/s3-source-consumer",
+      "--output",
+      "<private-runtime>/s3-consumer-runtime.json",
+      "--",
+      "--frozen",
+      "commands-consumer_test.ts"
+    ],
+    "exitCode": 0,
+    "report": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--frozen",
+        "commands-consumer_test.ts"
+      ],
+      "cwd": "<private-runtime>/s3-source-consumer",
+      "exitCode": 0,
+      "durationMs": 969,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  }
+]

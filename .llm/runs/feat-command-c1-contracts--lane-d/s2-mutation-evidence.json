@@ -1,0 +1,837 @@
+[
+  {
+    "mutation": "utf16-order",
+    "productionFile": "packages/service/src/commands/application/canonical-json.ts",
+    "before": "names.sort();",
+    "after": "names.sort().reverse();",
+    "test": "canonical JSON matches RFC8785 number string and UTF16 ordering vectors",
+    "originalSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantSha256": "136056b0b45dac4d8165d1408c42bba0bb209443fae0e140fb9c53170118d5e6",
+    "restoredSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "canonical JSON matches RFC8785 number string and UTF16 ordering vectors",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 140,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   {\"\ufb33\":0,\"\ud83d\ude00\":1,\"\u20ac\":2,\"\u00f6\":3,\"\u0080\":4,\"1\":5,\"//r\":6}\n+   {\"//r\":6,\"1\":5,\"\u0080\":4,\"\u00f6\":3,\"\u20ac\":2,\"\ud83d\ude00\":1,\"\ufb33\":0}\n\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "canonical JSON matches RFC8785 number string and UTF16 ordering vectors",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 17
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "canonical JSON matches RFC8785 number string and UTF16 ordering vectors",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 100,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "finite-only",
+    "productionFile": "packages/service/src/commands/application/canonical-json.ts",
+    "before": "if (!Number.isFinite(current)) invalid();",
+    "after": "if (false && !Number.isFinite(current)) invalid();",
+    "test": "canonical JSON rejects non-IJSON values without invoking getters or toJSON",
+    "originalSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantSha256": "b0830c95bea40952ff0c8e26ecfd239bf17422d84984d36ca641aba952f01f5f",
+    "restoredSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "canonical JSON rejects non-IJSON values without invoking getters or toJSON",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 100,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to throw.\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "canonical JSON rejects non-IJSON values without invoking getters or toJSON",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 67
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "canonical JSON rejects non-IJSON values without invoking getters or toJSON",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 112,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "pre-parse-bounds",
+    "productionFile": "packages/service/src/commands/application/canonical-json.ts",
+    "before": "  preflight(text, bounds);",
+    "after": "  // preflight removed by reversible mutation",
+    "test": "canonical JSON enforces tighten-only depth item and UTF8 byte limits before parsing",
+    "originalSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantSha256": "5699e3a7f7c3fc60797a5f3c9224013de33edb2be9b688b8834b77066037765b",
+    "restoredSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "canonical JSON enforces tighten-only depth item and UTF8 byte limits before parsing",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 129,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected error to be instance of \"TypeError\", but was \"Error\".\n    at assertIsError (<dependency-reference><line>:<column>)\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "canonical JSON enforces tighten-only depth item and UTF8 byte limits before parsing",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 119
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "canonical JSON enforces tighten-only depth item and UTF8 byte limits before parsing",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 129,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "canonical-roundtrip",
+    "productionFile": "packages/service/src/commands/application/canonical-json.ts",
+    "before": "if (result.text !== text) invalid();",
+    "after": "if (false && result.text !== text) invalid();",
+    "test": "stored canonical JSON rejects duplicate keys alternate spellings and corrupt receipts",
+    "originalSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantSha256": "a139a9e55754b76915b1ce2e8843003f3fd80a9a5be8a5c5f1d2e11533014023",
+    "restoredSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "stored canonical JSON rejects duplicate keys alternate spellings and corrupt receipts",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 104,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to throw.\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "stored canonical JSON rejects duplicate keys alternate spellings and corrupt receipts",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 163
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "stored canonical JSON rejects duplicate keys alternate spellings and corrupt receipts",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 113,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "stable-schema-identity",
+    "productionFile": "packages/service/src/commands/application/json-codec.ts",
+    "before": "if (inputText !== canonicalCommandJson(output, bounds))",
+    "after": "if (false && inputText !== canonicalCommandJson(output, bounds))",
+    "test": "JSON codecs validate both directions and refuse invalid schema outputs",
+    "originalSha256": "62cca1b795b28da23e0968b98822dc836ac5cff0e41040347b48b6a382c0c862",
+    "mutantSha256": "db4758ba192c92162903a9921a3e128fda04a988ecb9c8274346078568014aa8",
+    "restoredSha256": "62cca1b795b28da23e0968b98822dc836ac5cff0e41040347b48b6a382c0c862",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "JSON codecs validate both directions and refuse invalid schema outputs",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 118,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to throw.\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "JSON codecs validate both directions and refuse invalid schema outputs",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 190
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "JSON codecs validate both directions and refuse invalid schema outputs",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 112,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "sync-schema-refusal",
+    "productionFile": "packages/service/src/commands/application/json-codec.ts",
+    "before": "      throw new TypeError('[netscript.command.codec] synchronous schema validation required');",
+    "after": "      // asynchronous schema refusal removed by reversible mutation",
+    "test": "JSON codecs require synchronous schema validation with a configuration diagnostic",
+    "originalSha256": "62cca1b795b28da23e0968b98822dc836ac5cff0e41040347b48b6a382c0c862",
+    "mutantSha256": "499c73b5a89311ca035f551f429fe8511739072833fd68b46a049d3988b64c84",
+    "restoredSha256": "62cca1b795b28da23e0968b98822dc836ac5cff0e41040347b48b6a382c0c862",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "JSON codecs require synchronous schema validation with a configuration diagnostic",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 110,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected error message to include \"synchronous schema validation required\", but got \"[netscript.command.codec] invalid or oversized jcs-v1 data\".\n    at assertIsError (<dependency-reference><line>:<column>)\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "JSON codecs require synchronous schema validation with a configuration diagnostic",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 214
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "JSON codecs require synchronous schema validation with a configuration diagnostic",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 117,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "deep-snapshot-freeze",
+    "productionFile": "packages/service/src/commands/application/canonical-json.ts",
+    "before": "return Object.freeze(result);",
+    "after": "return result;",
+    "test": "JSON codec encoding takes bounded immutable snapshots before schema work",
+    "originalSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantSha256": "ef1346b714eeb5965fd1a19725fa918e80b31ca7a1746fd12165bbeb7a670650",
+    "restoredSha256": "511f526f0869a113da434c9644908322f8d7a5c1732023828f299fac5e22ce2e",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "JSON codec encoding takes bounded immutable snapshots before schema work",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 108,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError\n    at assert (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "JSON codec encoding takes bounded immutable snapshots before schema work",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 236
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "JSON codec encoding takes bounded immutable snapshots before schema work",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 99,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "required-key-default",
+    "productionFile": "packages/service/src/commands/application/define-command.ts",
+    "before": "specification.idempotency.mode ?? 'required'",
+    "after": "specification.idempotency.mode ?? 'optional'",
+    "test": "command definitions validate durable identities and freeze policies without execution",
+    "originalSha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38",
+    "mutantSha256": "75551a4f9c02a4c458ceb86dd6a7a5bfab715e07e6b82569ad172214b3b7d72f",
+    "restoredSha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "command definitions validate durable identities and freeze policies without execution",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 122,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   optional\n+   required\n\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "command definitions validate durable identities and freeze policies without execution",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 281
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "command definitions validate durable identities and freeze policies without execution",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 132,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "original-object-binding",
+    "productionFile": "packages/service/src/commands/application/define-command.ts",
+    "before": "handlers.get(original)",
+    "after": "handlers.get(definition)",
+    "test": "private command bindings reject copied definitions and unauthenticated reflection callers",
+    "originalSha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38",
+    "mutantSha256": "6607f8e0ab53e9fc2cd9c09983b4d93461d016787bf668823aa8a5e96f60e50a",
+    "restoredSha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "private command bindings reject copied definitions and unauthenticated reflection callers",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 118,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Expected function to throw.\n    at assertThrows (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "private command bindings reject copied definitions and unauthenticated reflection callers",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 315
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "private command bindings reject copied definitions and unauthenticated reflection callers",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 106,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "failure-redaction",
+    "productionFile": "packages/service/src/commands/domain/failure.ts",
+    "before": "return this.failure;",
+    "after": "return { ...this.failure, cause: this.cause };",
+    "test": "command errors freeze redacted failure data and exclude trusted causes from serialization",
+    "originalSha256": "f96abc2ba0a149cd56e427500b383f2d8b6663637a07c6fde370d0059aaaca63",
+    "mutantSha256": "14909407210d016b7a7968a15370e51700d49cdf559c09498321c7bb9c073f15",
+    "restoredSha256": "f96abc2ba0a149cd56e427500b383f2d8b6663637a07c6fde370d0059aaaca63",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "command errors freeze redacted failure data and exclude trusted causes from serialization",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 1,
+      "durationMs": 128,
+      "summary": {
+        "passed": 0,
+        "failed": 1,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 1
+      },
+      "failures": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   {\"kind\":\"invalid_envelope\",\"retryable\":false,\"reason\":\"actor\",\"cause\":{}}\n+   {\"kind\":\"invalid_envelope\",\"retryable\":false,\"reason\":\"actor\"}\n\n\n    at assertEquals (<dependency-reference><line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-codec_test.ts:<line>:<column>",
+          "count": 1,
+          "tests": [
+            {
+              "name": "command errors freeze redacted failure data and exclude trusted causes from serialization",
+              "file": "./packages/service/tests/commands-codec_test.ts",
+              "line": 339
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "schemaVersion": 1,
+      "command": [
+        "deno",
+        "test",
+        "--reporter=tap",
+        "--no-check",
+        "--filter",
+        "command errors freeze redacted failure data and exclude trusted causes from serialization",
+        "packages/service/tests/commands-codec_test.ts"
+      ],
+      "cwd": "<checkout>",
+      "exitCode": 0,
+      "durationMs": 130,
+      "summary": {
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0,
+        "totalResults": 1,
+        "uniqueFailures": 0
+      },
+      "failures": []
+    }
+  },
+  {
+    "mutation": "string-version",
+    "productionFiles": [
+      "packages/service/src/commands/domain/values.ts"
+    ],
+    "before": "expectedVersion?: string;",
+    "after": "expectedVersion?: string | number;",
+    "fixture": "packages/service/tests/type-fixtures/commands_type.ts",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<checkout>"
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 1
+      },
+      "summary": {
+        "totalOccurrences": 1,
+        "uniqueOccurrences": 1,
+        "uniqueCodes": 1,
+        "uniquePaths": 1
+      },
+      "groups": [
+        {
+          "code": "TS2578",
+          "message": "Unused '@ts-expect-error' directive.",
+          "count": 1,
+          "paths": [
+            {
+              "path": "<checkout>/packages/service/tests/type-fixtures/commands_type.ts",
+              "count": 1,
+              "locations": [
+                {
+                  "line": 72,
+                  "column": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<checkout>"
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    }
+  },
+  {
+    "mutation": "private-capability",
+    "productionFiles": [
+      "packages/service/src/commands/domain/definition.ts",
+      "packages/service/src/commands/application/define-command.ts"
+    ],
+    "before": "capability: typeof commandExecutorCapability,",
+    "after": "capability: symbol,",
+    "fixture": "packages/service/tests/type-fixtures/commands_type.ts",
+    "mutantExit": 1,
+    "restoredExit": 0,
+    "mutantReport": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<checkout>"
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 1
+      },
+      "summary": {
+        "totalOccurrences": 1,
+        "uniqueOccurrences": 1,
+        "uniqueCodes": 1,
+        "uniquePaths": 1
+      },
+      "groups": [
+        {
+          "code": "TS2578",
+          "message": "Unused '@ts-expect-error' directive.",
+          "count": 1,
+          "paths": [
+            {
+              "path": "<checkout>/packages/service/tests/type-fixtures/commands_type.ts",
+              "count": 1,
+              "locations": [
+                {
+                  "line": 62,
+                  "column": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "restoredReport": {
+      "source": {
+        "mode": "selection",
+        "cwd": "<checkout>"
+      },
+      "command": "deno check --unstable-kv <files>",
+      "selection": {
+        "filesSelected": 1,
+        "batches": 1,
+        "failedBatches": 0
+      },
+      "summary": {
+        "totalOccurrences": 0,
+        "uniqueOccurrences": 0,
+        "uniqueCodes": 0,
+        "uniquePaths": 0
+      },
+      "groups": []
+    }
+  }
+]

@@ -284,3 +284,185 @@ KV health checks add the permissions of the client they probe.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Command definitions and canonical codecs
+
+`@netscript/service/commands` defines immutable commands without executing them. Their handlers
+remain privately bound to the exact original definition, and copied or forged definitions are
+refused. Importing, defining and encoding commands require no permissions and start no resource.
+Execution delegates to the explicitly supplied store and business operations and their permissions.
+
+```typescript
+import { defineCommand, jsonCodec } from '@netscript/service/commands';
+import { z } from 'zod';
+
+const updateItem = defineCommand({
+  name: 'items.update',
+  definitionVersion: 1,
+  idempotency: {
+    scope: () => 'items',
+    fingerprint: (input: { id: string }) => input,
+    response: jsonCodec(z.object({ updated: z.boolean() })),
+  },
+  records: { audit: 'required', outbox: 'optional' },
+  handle: async () => ({ updated: true }),
+});
+```
+
+Names use lowercase dot/hyphen segments, start with a letter, and contain 1–120 characters.
+`definitionVersion` is a positive safe integer and marks replay compatibility. Change it when
+identity, command meaning or response decoding changes. Changing a name or scope creates a new
+receipt namespace; retain the old definition through the retry window or migrate receipt keys before
+deploying that change. Required idempotency is the default; `mode: 'optional'` explicitly permits
+commands without a key. Audit and outbox policies are `required`, `optional` or `forbidden`.
+
+| Surface                                          | Purpose                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `CommandActor` / `CommandEnvelope<Input>`        | Narrow durable origin, input and transport identity; expected version uses a string  |
+| `CommandDefinition` / `CommandDefinitionSpec`    | Opaque result and definition-time handler specification                              |
+| `CommandContext`                                 | Transaction client, injected clock/IDs and synchronous audit/outbox intent recorders |
+| `CommandFailure` / `CommandError`                | Frozen safe failure vocabulary; serialized errors omit message, stack and cause      |
+| `CommandCodec<T>` / `jsonCodec(schema, limits?)` | Synchronous Standard Schema validation in both directions                            |
+| `canonicalCommandJson(value, limits?)`           | Deterministic RFC 8785 canonical text                                                |
+| `parseCanonicalCommandJson(text, limits?)`       | Bounded stored-text parsing with exact canonical round-trip verification             |
+
+Actor roles, scopes and claims stay outside the durable envelope. Authentication/authorization
+happen before execution. Credential scheme, correlation and trace are transport/audit data, excluded
+from semantic request identity. Application/business errors retain their existing mapping. Only the
+three client-actionable failures map through `@netscript/contracts/commands`; other failures use the
+application's validation/internal/service-unavailable handling.
+
+The internal canonical protocol is `jcs-v1`: ECMAScript number/string serialization, UTF-16
+lexicographic property order and no Unicode normalization. The default safeguards are 64 nested
+containers, 10,000 aggregate value nodes/object keys and 1 MiB of UTF-8 canonical text. Optional
+`depth`, `items` and `bytes` limits may only tighten those ceilings. Stored text is bounded before
+parsing and must reserialize exactly; duplicates, whitespace, alternative numeric spellings, escaped
+equivalents and different key order are refused as corrupt/noncanonical material.
+
+Codecs reject nonfinite numbers, lone surrogates in values or keys, sparse arrays, undefined,
+functions, symbols, BigInt, Date, class instances, cycles and accessors. A `jsonCodec` schema must
+validate synchronously: a returned Promise/thenable is refused with a synchronous-validation
+configuration diagnostic. No async validation result or unvalidated schema output crosses this codec
+boundary. Custom codecs must also return valid bounded I-JSON before persistence.
+
+`jsonCodec()` requires synchronous validation that preserves canonical JSON identity. Neutral
+transforms are accepted; coercion, field stripping and value-changing transforms are rejected,
+preventing a response from changing when a stored receipt is decoded.
+
+## Command execution
+
+Compose `createCommandExecutor({ store, clock?, ids?, telemetry?, receiptClaimWaitMs?, limits? })`
+with a database-owned `CommandStorePort<TTx>`. The focused `/commands` export keeps the root
+surface unchanged. Execution performs one local interactive transaction; it never retries its
+handler or sends buffered messages. Authorize the actor before calling it and keep remote effects
+outside the handler. The testing store demonstrates semantics and certifies no real provider.
+
+```typescript
+import { createCommandExecutor, defineCommand, jsonCodec } from '@netscript/service/commands';
+import type { CommandStorePort } from '@netscript/database/commands';
+import { z } from 'zod';
+
+type Business = { update(id: string): Promise<void> };
+declare const store: CommandStorePort<Business>;
+const update = defineCommand<'items.update', { id: string }, { updated: boolean }, Business>({
+  name: 'items.update', definitionVersion: 1,
+  idempotency: {
+    scope: () => 'items', fingerprint: (input) => input,
+    response: jsonCodec(z.object({ updated: z.boolean() })),
+  },
+  records: { audit: 'required', outbox: 'optional' },
+  handle: async (ctx) => {
+    await ctx.tx.update(ctx.envelope.input.id);
+    ctx.audit({ action: 'updated', subject: { type: 'item', id: ctx.envelope.input.id } });
+    return { updated: true };
+  },
+});
+const executor = createCommandExecutor({ store });
+const result = await executor.execute(update, {
+  input: { id: 'item' }, actor: { kind: 'system', subject: 'maintenance' },
+  correlationId: 'update', idempotencyKey: 'fixture-key-00001',
+});
+result.value;
+```
+
+The executor validates, detaches and deeply freezes bounded I-JSON input and a narrowed actor
+before calling scope and fingerprint once. Request SHA-256 covers command, definitionVersion,
+scope, selected input, actor kind/subject and expectedVersion or null. A separate SHA-256 hashes
+the key. Scheme, correlation, W3C context and raw key are excluded from request material. Keys
+are 16–256 UTF-8 bytes; scope and remaining identity/header strings are 1–256 bytes. Trace context
+uses W3C known-field validation, retains opaque future fields, and permits empty tracestate members.
+Traceparent rejects HTTP control bytes (including CR, LF, NUL and DEL), while preserving
+allowed HTAB, SP and opaque obs-text in unknown future fields.
+
+Defaults are 64 audit intents, 64 delivery intents and 64 KiB **aggregate** canonical side-row
+bytes, including persisted metadata. Configuration only tightens those ceilings. Each transaction
+receives a finite five-second timeout and validated provider claim-wait policy. Recorders perform
+no IO and detach canonical JSON immediately. Required/forbidden/count/byte policy and response
+codec validation all precede flush. Audit, outbox and receipt completion flush in that order using
+one bound handle; their execution ID is the winning receipt ID. Optional unkeyed attempts still
+have an execution ID but skip claim/completion.
+
+Replay rechecks hash, version, completeness, canonical text and decoding, then returns the original
+correlation and performs no handler or side writes. Busy issues no later query and surfaces
+`in_progress` only after rollback. Abort checkpoints likewise await the store's rollback result.
+Application errors preserve identity; typed database `CommandStoreError` classifications translate
+to bounded service failures without reading driver text. Successful values and optional finite
+telemetry completion are reported only after commit. `CommandTelemetryPort` is an extension seam;
+this package supplies no OpenTelemetry implementation or production fault controls.
+
+## Command store testing
+
+`@netscript/service/commands/testing` exports `createMemoryCommandStore()` for semantic unit tests.
+Each store owns its state; business writes, receipt completion, audit and outbox intents share one
+commit. `snapshot()` returns detached frozen collections and detached timestamps.
+`holdBeforeCommit()` exposes a one-use boundary barrier. `seedReceipt()` and
+`writeBusinessOutsideTransaction()` are explicit corruption and atomicity negative controls. No
+testing control belongs in a production executor constructor.
+
+```ts
+import { createMemoryCommandStore } from '@netscript/service/commands/testing';
+const store = createMemoryCommandStore();
+await store.transaction({ receiptClaimWaitMs: 0 }, async ({ business }) => {
+  business.compareAndSet('version', undefined, '1');
+});
+const committed = store.snapshot();
+```
+
+No permissions are required. This fake simulates Serializable interactive transactions using the
+existing sqlite provider vocabulary; it certifies no SQLite or other real provider. Receipt
+contention returns immediate terminal busy (supported wait is zero). Stale drafts fail without
+retry, and bounded timeout/cooperative cancellation revoke the transaction handle before failure
+settles. Concurrent transactions touching disjoint rows may also conflict because the fake uses one
+revision for its complete state. Native providers require their own provider conformance. See
+`@netscript/database/commands` for the raw store contract.
+
+`createCommandFaultController()` arms one-use failures at the seven command boundaries.
+`createTestingCommandExecutor(options, controller)` runs the same executor algorithm through a
+private per-instance seam; a controller binds once and keeps only its latest 128 visits. Production
+`createCommandExecutor(options)` has no fault parameter or global hook. Precommit faults roll back
+business, receipt, audit and outbox together. `after_commit_before_return` models a lost response:
+all rows remain committed and the same-key retry replays without another handler or side record.
+
+`runCommandConformance(createFixture)` accepts a fresh `CommandConformanceFixture<TTx>` factory.
+The store and row types belong to the database package; the business handle stays generic. Supply
+bound write/CAS operations, detached committed inspection, corrupt receipt seeding and an explicit
+outside-write negative control. `createMemoryCommandConformanceFixture()` is the simulated default.
+The finite matrix covers named faults, replay/mismatch, scope/name/version changes, malformed replay,
+cancellation, CAS, callback re-entry, no retry, terminal busy, isolation, policies and ordered flush.
+It includes concurrent replay and recovery after a rolled-back leader. Replacing the fixture's bound
+write with its outside-write control must fail the same-commit assertion. Real adapters still need
+provider-specific driver, lock, timeout and pooled session qualification.
+
+```ts
+import {
+  createMemoryCommandConformanceFixture,
+  runCommandConformance,
+} from '@netscript/service/commands/testing';
+const report = await runCommandConformance(createMemoryCommandConformanceFixture);
+```
+
+`assertCommandDeterminism(definition, envelope, samples)` evaluates actual identity logic 2–32
+times (default four), each over equivalent detached deeply frozen input/actor material. It detects
+scope or fingerprint closure changes that affect sampled identity, without executing the handler
+or store. Its `sampled_equivalence` report is finite evidence, not a universal purity guarantee;
+command authors remain responsible for excluding clocks, randomness, mutable globals and IO.

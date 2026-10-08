@@ -1,0 +1,384 @@
+{
+  "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+  "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+  "records": [
+    {
+      "mutant": "identity-transport-scheme",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor freezes detached identity and hashes exact semantic material once",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor freezes detached identity and hashes exact semantic material once"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   0f3e147e3157eb2c71e86926fb678d717934259b904e153967ef57b68aa3fc0c\n+   eed128a209355f5d2f15d0a5a8aac7c915c2ecd37d7daee42cd477bb2ad82d49\n\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor freezes detached identity and hashes exact semantic material once"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "8fce20dafaf62b7825c9138f37b5b96154f684abb77eaab3376d47d9be3417a8",
+      "restoredReceiptSha256": "4bb415a2b788d461a48a95ba091e45e55b4dcce5a769076e2ad9089957d4bb88",
+      "restoredSourceSha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    },
+    {
+      "mutant": "identity-deep-freeze",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor freezes detached identity and hashes exact semantic material once",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor freezes detached identity and hashes exact semantic material once"
+      ],
+      "failureSummary": [
+        {
+          "message": "CommandError: Command failure: codec_failure\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>\nCaused by: AssertionError\n    at assert (<dependency-source>\n    at Object.scope (file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>)\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor freezes detached identity and hashes exact semantic material once"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "6bf8c13b40b5a3fe136ff1e7c7dfddb7662122363b1e5a6fa2fd9989da15c35e",
+      "restoredReceiptSha256": "5c37a82aebeab37ea382d9bb6bea2d356fd8a53240a0a5f0e399b5b792f33dd8",
+      "restoredSourceSha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    },
+    {
+      "mutant": "flush-order",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor commits ordered bound rows and shares the receipt execution identity",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor commits ordered bound rows and shares the receipt execution identity"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      \"begin\",\n      \"claim\",\n-     \"outbox\",\n      \"audit\",\n+     \"outbox\",\n      \"complete\",\n    ]\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor commits ordered bound rows and shares the receipt execution identity"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "12e722dfa8fdb1be7c2a8c04dec54dacd19e1a8b84afee63ac673acc37705a81",
+      "restoredReceiptSha256": "d7d054efa60b4be1e61e4453e2ef46fffc21eaa6dcd55735cfe4ec4912027f70",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "receipt-hash-version",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor replay checks receipt hash version completeness canonical text and codec without writes",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor replay checks receipt hash version completeness canonical text and codec without writes"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError\n    at assert (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor replay checks receipt hash version completeness canonical text and codec without writes"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "b9b1fcc55550070cbcc5ad99fe8f47dfcdd1760f07cd6c9d96c4234b3fd4b46e",
+      "restoredReceiptSha256": "a638984def575e0525a9e2e289228051f3b345967ee30fe5d159f41c0290937e",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "busy-exposed-inside-callback",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor terminal busy performs no later query and surfaces only after rollback",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor terminal busy performs no later query and surfaces only after rollback"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError\n    at assert (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor terminal busy performs no later query and surfaces only after rollback"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "2b84e61001a38639136b43a098981c0ef943c4e3453d53cdfc98a2deee5bace0",
+      "restoredReceiptSha256": "eb619c387452a8a3e3432305e9f6e73a0d5ef77a45976c65e154bc2403354e8c",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "business-error-wrapped",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor preserves arbitrary business errors and rolls back conflicts without retry",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor preserves arbitrary business errors and rolls back conflicts without retry"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not strictly equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   CommandError: Command failure: store_failure\n-       at operation (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n-       at async Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n-       at async file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>\n-       at async innerWrapped (ext:cli/40_test.js:<line>:<column>)\n-       at async exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n-       at async outerWrapped (ext:cli/40_test.js:<line>:<column>) {\n-     [cause]: Error: application failure\n-         at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>\n-         at innerWrapped (ext:cli/40_test.js:<line>:<column>)\n-         at exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n-         at outerWrapped (ext:cli/40_test.js:<line>:<column>),\n-     failure: {\n-       kind: \"store_failure\",\n-       phase: \"commit\",\n-       retryable: false,\n-     },\n-   }\n+   Error: application failure\n+       at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>\n+       at innerWrapped (ext:cli/40_test.js:<line>:<column>)\n+       at exitSanitizer (ext:cli/40_test.js:<line>:<column>)\n+       at outerWrapped (ext:cli/40_test.js:<line>:<column>)\n\n    at assertStrictEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor preserves arbitrary business errors and rolls back conflicts without retry"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "0c823a58b505f560b705f254cc7d70b548383957603083ab2a8f4926e823ac20",
+      "restoredReceiptSha256": "69d868e179b953fc26057311eead6d8a02a788bfe8cbdf134730f289eabdf838",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "optional-key-forced-claim",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor optional no-key attempts create side identities without claim or completion",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor optional no-key attempts create side identities without claim or completion"
+      ],
+      "failureSummary": [
+        {
+          "message": "CommandError: Command failure: receipt_corrupt\n    at Object.transaction (file://<cwd>/packages/service/src/commands/testing/memory-command-store.ts:<line>:<column>)\n    at async Object.transaction (file://<cwd>/packages/service/tests/_fixtures/command-executor-fixture.ts:<line>:<column>)\n    at async operation (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at async Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor optional no-key attempts create side identities without claim or completion"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "e7da338815ba7df47e04a7908ec3bfe41786f1e99e2268d7d3aa67c44d5d9350",
+      "restoredReceiptSha256": "737baa2c80e375b797da5a30aedbda917ce09d3de94f3cd6371c429cb1a0084a",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "aggregate-byte-policy",
+      "productionFile": "packages/service/src/commands/application/command-record-buffer.ts",
+      "namedTest": "executor enforces required forbidden count and aggregate byte policies before flushing",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor enforces required forbidden count and aggregate byte policies before flushing"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: expected bounded failure\n    at failure (file://<cwd>/packages/service/tests/_fixtures/command-executor-fixture.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor enforces required forbidden count and aggregate byte policies before flushing"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "84764ac9d2ab56da518aa21e28255811c3b178bd6d20a5f7f74ffc3f2dec898f",
+      "restoredReceiptSha256": "a3750d85bd7398c04390d825db6896120c548d2f1f632bd1abe381c8aad3689b",
+      "restoredSourceSha256": "5d1e3f7ff66fecabc8895efc0583d48dabf042a7b2b3e9bf2e1789fded125d09"
+    },
+    {
+      "mutant": "prebegin-abort-checkpoint",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor cancellation checkpoints rollback before typed results and prevent later flush",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor cancellation checkpoints rollback before typed results and prevent later flush"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   [\n-     \"begin\",\n-     \"rollback\",\n-   ]\n+   []\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor cancellation checkpoints rollback before typed results and prevent later flush"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "4c5c0b3b82e1171dbca7ea5cac10467afe6578596821af0175690799fdcbdea8",
+      "restoredReceiptSha256": "1705c5a0396dc5c3aa96a339fa10feaaf0a506bc6ff257079d013d8b95497550",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "database-provider-retry-policy",
+      "productionFile": "packages/database/ports/command-store-error.ts",
+      "namedTest": "executor translates typed provider failures without guessing driver-looking business values",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor translates typed provider failures without guessing driver-looking business values"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n-   {\"kind\":\"store_failure\",\"retryable\":false,\"phase\":\"commit\"}\n+   {\"kind\":\"store_failure\",\"retryable\":true,\"phase\":\"commit\"}\n\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor translates typed provider failures without guessing driver-looking business values"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "e4e04ad150e4f0eaf47a405408b26036c7b380aa3c2cd657234b13cfdcb91f69",
+      "restoredReceiptSha256": "34fb74beb90cece9556f26eb2386ffae989ad06371d333475c8143f0c8bcdc59",
+      "restoredSourceSha256": "9350856cb6ffc2ff850956db223c720ff63129f129a6a1ec557c17301c7988fe"
+    },
+    {
+      "mutant": "service-provider-retry-translation",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor translates typed provider failures without guessing driver-looking business values",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor translates typed provider failures without guessing driver-looking business values"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    {\n      kind: \"store_failure\",\n      phase: \"commit\",\n-     retryable: false,\n+     retryable: true,\n    }\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor translates typed provider failures without guessing driver-looking business values"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "bdabbc0905dc163bb12c391bb5c4d49210466eefa32ce2a27bb807a409ca548d",
+      "restoredReceiptSha256": "245b5bcad6c4d2b340a96ac3ebc2c956d5ba734036fec43e16204438d0069737",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "envelope-key-minimum",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor validates authentic definitions envelope capabilities isolation and limits before begin",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor validates authentic definitions envelope capabilities isolation and limits before begin"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: expected bounded failure\n    at failure (file://<cwd>/packages/service/tests/_fixtures/command-executor-fixture.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor validates authentic definitions envelope capabilities isolation and limits before begin"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "5a71180c34357f0f1ddfb2798c99a5ed478cdce377b82fc971eb9655b8bc482e",
+      "restoredReceiptSha256": "de2a6b6b088e54b9e2a9baa2c14524a2fb6a79ddaf920d838f400ac296c6f1fe",
+      "restoredSourceSha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    },
+    {
+      "mutant": "response-codec-bypass",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor codec failures rollback response and side intent without partial writes",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor codec failures rollback response and side intent without partial writes"
+      ],
+      "failureSummary": [
+        {
+          "message": "Error: expected bounded failure\n    at failure (file://<cwd>/packages/service/tests/_fixtures/command-executor-fixture.ts:<line>:<column>)\n    at async file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor codec failures rollback response and side intent without partial writes"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "9f15728d4a1a7a8cb68dea67f028ea1467a4edb07b61d72b16c7aaeaba11b882",
+      "restoredReceiptSha256": "fa2c286bd967fc2084eaa25a4be322ca9edf7e15a40ff07e075448f35999a57f",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "provider-callback-retry",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor refuses a second provider callback without a second handler attempt",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor refuses a second provider callback without a second handler attempt"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      \"begin\",\n      \"claim\",\n      \"audit\",\n      \"outbox\",\n      \"complete\",\n-     \"claim\",\n-     \"commit\",\n+     \"rollback\",\n    ]\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor refuses a second provider callback without a second handler attempt"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "9d7b31856ed7852b78f8f3064aded858cec5a98d87de73bfcb983a96a0684b88",
+      "restoredReceiptSha256": "40a96a0b01429aeabce041e97087e724a740f7fef66ecb911a08d56e400cdb16",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "telemetry-row-counts",
+      "productionFile": "packages/service/src/commands/application/create-command-executor.ts",
+      "namedTest": "executor emits finite telemetry only after commit with default isolation and replay counts",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor emits finite telemetry only after commit with default isolation and replay counts"
+      ],
+      "failureSummary": [
+        {
+          "message": "AssertionError: Values are not equal.\n\n\n    [Diff] Actual / Expected\n\n\n    [\n      {\n-       auditCount: 0,\n+       auditCount: 1,\n        idempotency: \"claimed\",\n-       outboxCount: 0,\n+       outboxCount: 1,\n        outcome: \"applied\",\n      },\n      {\n        auditCount: 0,\n        idempotency: \"replayed\",\n        outboxCount: 0,\n        outcome: \"replayed\",\n      },\n    ]\n\n    at assertEquals (<dependency-source>\n    at file://<cwd>/packages/service/tests/commands-executor-effects_test.ts:<line>:<column>",
+          "tests": [
+            "executor emits finite telemetry only after commit with default isolation and replay counts"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "8ec918c3272077744a14d2956dc8c42b6f514d6eb89b0dd39c308a9f5d121e1a",
+      "restoredReceiptSha256": "bea6a9df238a35094cb5e2cfb4d6ecce418ac02e953d770c51f31c461dfc3c47",
+      "restoredSourceSha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "mutant": "w3c-future-field-restriction",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields"
+      ],
+      "failureSummary": [
+        {
+          "message": "CommandError: Command failure: invalid_envelope\n    at invalid (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at traceContext (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "19205a2a6a2de1d38057532432719edaf5fa7e1bcb9d1e8482084277e35b5d6e",
+      "restoredReceiptSha256": "60e2afa508ff40e9c2bf2286fc31ff43560e792c90a269b2ccf3103aa47ec9fd",
+      "restoredSourceSha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    },
+    {
+      "mutant": "w3c-empty-header-rejected",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields"
+      ],
+      "failureSummary": [
+        {
+          "message": "CommandError: Command failure: invalid_envelope\n    at invalid (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at traceContext (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "0fac679978e32878baa9f31967287f8f4600c7ad6a4b317c67844d96d7683e1c",
+      "restoredReceiptSha256": "edb23d871da9dd5aefe30a056812d08a46c1c768819ab4f36812517ac313dc28",
+      "restoredSourceSha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    },
+    {
+      "mutant": "w3c-empty-members-rejected",
+      "productionFile": "packages/service/src/commands/application/command-identity.ts",
+      "namedTest": "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields",
+      "mutatedExit": 1,
+      "restoredExit": 0,
+      "failedNames": [
+        "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields"
+      ],
+      "failureSummary": [
+        {
+          "message": "CommandError: Command failure: invalid_envelope\n    at invalid (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at traceContext (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at commandIdentity (file://<cwd>/packages/service/src/commands/application/command-identity.ts:<line>:<column>)\n    at Object.execute (file://<cwd>/packages/service/src/commands/application/create-command-executor.ts:<line>:<column>)\n    at file://<cwd>/packages/service/tests/commands-executor-identity_test.ts:<line>:<column>",
+          "tests": [
+            "executor accepts W3C future fields and empty tracestate members while rejecting malformed known fields"
+          ]
+        }
+      ],
+      "rawReceiptSha256": "e500e95d619ff651fc1770345d76f7146728e97d829d6607be1146052e8e39cd",
+      "restoredReceiptSha256": "01f509da52de07c7929507fbca941af4a709d1776a9ea9d640a80ef9574c5193",
+      "restoredSourceSha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    }
+  ]
+}

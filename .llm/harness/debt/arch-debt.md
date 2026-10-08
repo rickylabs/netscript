@@ -2439,3 +2439,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open, DEBT_ACCEPTED by independent IMPL-EVAL at dd452c4b1330044cfe12ebabef1a8bb345cb71d7.
 - **Gate:** All-export doc lint reaches zero with existing public types preserved. This repair introduces no additional entrypoint diagnostic. Publication and qualified published consumer remain owner release gates.
 - **Evidence:** Complete private baseline/current reports and entrypoint comparison; worklog retains both failing raw doc exits, passing owning JSR audit and actual publish dry-run.
+
+
+### Fresh rich send all-entrypoint documentation baseline (#2068)
+
+- **ID:** `chat-send-doc-baseline-2068`
+- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count and raw exit are unchanged after rich send; the new owned type is fully documented. MCP corpus ownership additionally retains an identical pristine-main report: combined zero, two entrypoints with three private-type diagnostics each and raw task exit one. Raw doc gates remain failed, no suppression.
+- **Owner:** Fresh and MCP package public-surface maintainers.
+- **Target:** Before the next stable Fresh release, no later than 2026-10-15.
+- **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export entrypoint.
+- **Status:** open; DEBT_ACCEPTED by independent Google Gemini IMPL-EVAL at `ffdb32a7d0bef56a8ecc37749d87e689beda6625`. Both complete documentation reports and raw exits match pristine main; closing gate remains owner work.

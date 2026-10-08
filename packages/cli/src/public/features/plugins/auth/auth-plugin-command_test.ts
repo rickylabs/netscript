@@ -45,7 +45,10 @@ Deno.test('auth backend set reconciles .env and show reports the active backend'
   assertEquals(await showAuthBackend('/workspace', fs), 'kv-oauth');
   assertEquals(
     await fs.readFile('/workspace/.env'),
-    '# keep me\nPORT=9184\nNETSCRIPT_AUTH_BACKEND=kv-oauth\n',
+    '# keep me\nPORT=9184\nNETSCRIPT_AUTH_BACKEND=kv-oauth\n'.replace(
+      'NETSCRIPT_AUTH_BACKEND=kv-oauth',
+      "NETSCRIPT_AUTH_BACKEND='kv-oauth'",
+    ),
   );
 });
 
@@ -100,7 +103,7 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
     kvOAuthKey,
   }, fs);
 
-  const env = await fs.readFile('/workspace/.env');
+  const env = (await fs.readFile('/workspace/.env')).replaceAll("'", '');
   assertMatch(env, /NETSCRIPT_AUTH_BACKEND=kv-oauth/);
   assertMatch(env, /NETSCRIPT_AUTH_PROVIDER_ID=github/);
   assertMatch(
@@ -110,13 +113,18 @@ Deno.test('github provider preset writes boot-ready OAuth environment', async ()
   assertMatch(env, /NETSCRIPT_AUTH_CLIENT_SECRET=client-secret/);
   assertMatch(env, new RegExp(`NETSCRIPT_AUTH_KV_OAUTH_KEY=${kvOAuthKey}`));
   const appsettings = JSON.parse(await fs.readFile('/workspace/appsettings.json'));
-  assertEquals(appsettings.Auth.Environment.NETSCRIPT_AUTH_PROVIDER_ID, 'github');
+  assertEquals(appsettings.Auth, undefined);
   assertEquals(
-    appsettings.NetScript.Plugins.auth.Environment.NETSCRIPT_AUTH_KV_OAUTH_KEY,
-    kvOAuthKey,
+    appsettings.NetScript.Plugins.auth.Environment,
+    { NETSCRIPT_AUTH_BACKEND: 'kv-oauth' },
   );
   const registry = await createAuthServiceBackendRegistry({
-    env: {},
+    env: Object.fromEntries(
+      env.trim().split('\n').map((line) => {
+        const separator = line.indexOf('=');
+        return [line.slice(0, separator), line.slice(separator + 1)];
+      }),
+    ),
     appsettings,
     kv: new MemoryKvAdapter(),
   });
@@ -132,14 +140,20 @@ Deno.test('workos and better-auth variants enforce their boot credential contrac
     clientId: 'client_test',
     cookiePassword: 'cookie-secret',
   }, fs);
-  assertMatch(await fs.readFile('/workspace/.env'), /WORKOS_COOKIE_PASSWORD=cookie-secret/);
+  assertMatch(
+    (await fs.readFile('/workspace/.env')).replaceAll("'", ''),
+    /WORKOS_COOKIE_PASSWORD=cookie-secret/,
+  );
 
   await setAuthProvider({
     projectRoot: '/workspace',
     preset: 'better-auth',
     secret: 'better-secret',
   }, fs);
-  assertMatch(await fs.readFile('/workspace/.env'), /BETTER_AUTH_SECRET=better-secret/);
+  assertMatch(
+    (await fs.readFile('/workspace/.env')).replaceAll("'", ''),
+    /BETTER_AUTH_SECRET=better-secret/,
+  );
   await assertRejects(
     () => setAuthProvider({ projectRoot: '/workspace', preset: 'workos' }, fs),
     Error,

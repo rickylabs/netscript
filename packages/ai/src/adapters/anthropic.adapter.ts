@@ -20,7 +20,7 @@ import type { ModelDescriptor, ModelHandle, ModelId } from '../contracts/model.t
 import { AiError, InvalidModelOptionsError } from '../contracts/errors.ts';
 import type { ModelProviderPort } from '../ports/model-provider.ts';
 import type { ChatClientPort } from '../ports/chat-client.ts';
-import { toTanstackChatClient } from './tanstack-chat-client.ts';
+import { type ProviderUsageObserver, toTanstackChatClient } from './tanstack-chat-client.ts';
 
 /**
  * Registry id under which {@linkcode AnthropicModelProvider} self-registers.
@@ -30,7 +30,9 @@ export const ANTHROPIC_PROVIDER_ID = 'anthropic' as const;
 /**
  * Map per-turn {@linkcode GenerationOptions} to Anthropic's native request-body
  * keys. A reasoning tier maps to the modern `output_config: { effort }` control;
- * `'off'` disables extended thinking via `thinking: { type: 'disabled' }`.
+ * `'off'` uses the selected model's supported mode: Sonnet 5.5 uses
+ * `between_tools`, Opus 5.5/Fable 5.1 retain mandatory adaptive thinking, and
+ * legacy or otherwise unknown models keep the generic disabled-thinking mapping.
  * `maxOutputTokens` maps to `max_tokens`. Returns `undefined` when nothing is
  * set.
  *
@@ -41,11 +43,16 @@ export const ANTHROPIC_PROVIDER_ID = 'anthropic' as const;
  */
 export function anthropicGenerationModelOptions(
   options: GenerationOptions,
+  model?: ModelId,
 ): Readonly<Record<string, unknown>> | undefined {
   const modelOptions: Record<string, unknown> = {};
   const effort = options.reasoningEffort;
   if (effort === 'off') {
-    modelOptions.thinking = { type: 'disabled' };
+    if (model === 'claude-sonnet-5-5') {
+      modelOptions.thinking = { type: 'between_tools' };
+    } else if (!hasMandatoryThinking(model)) {
+      modelOptions.thinking = { type: 'disabled' };
+    }
   } else if (effort !== undefined) {
     modelOptions.output_config = { effort };
   }
@@ -58,6 +65,7 @@ export function anthropicGenerationModelOptions(
 /** Reject Anthropic's deprecated fixed-budget thinking shape before transport. */
 export function validateAnthropicModelOptions(
   options: Readonly<Record<string, unknown>>,
+  model?: ModelId,
 ): void {
   const thinking = options.thinking;
   if (
@@ -71,6 +79,59 @@ export function validateAnthropicModelOptions(
         '`thinking: { type: "adaptive" }` with `output_config.effort`.',
     );
   }
+  if (!isCurrentClaude(model)) return;
+
+  const reject = (message: string): never => {
+    throw new InvalidModelOptionsError(ANTHROPIC_PROVIDER_ID, message);
+  };
+  const outputConfig = options.output_config;
+  const effort = typeof outputConfig === 'object' && outputConfig !== null &&
+      'effort' in outputConfig
+    ? outputConfig.effort
+    : options.effort;
+  if (
+    effort !== undefined && effort !== null &&
+    (typeof effort !== 'string' || !['low', 'medium', 'high', 'xhigh', 'max'].includes(effort))
+  ) reject('This model accepts output_config.effort low, medium, high, xhigh, max or null.');
+
+  if (thinking !== undefined) {
+    if (typeof thinking !== 'object' || thinking === null || !('type' in thinking)) {
+      return reject('Use an omitted thinking field or an adaptive thinking object.');
+    }
+    const betweenTools = model === 'claude-sonnet-5-5' && thinking.type === 'between_tools';
+    if (thinking.type !== 'adaptive' && !betweenTools) {
+      reject('This model rejects disabled and manual thinking; use adaptive thinking.');
+    }
+    if ('budget_tokens' in thinking) reject('Adaptive thinking does not accept a manual budget.');
+    if (
+      betweenTools &&
+      (effort === 'xhigh' || effort === 'max' || Object.keys(thinking).length !== 1)
+    ) reject('Sonnet between_tools accepts only type and requires high effort or below.');
+  }
+
+  const toolChoice = options.tool_choice;
+  const toolType = typeof toolChoice === 'string'
+    ? toolChoice
+    : typeof toolChoice === 'object' && toolChoice !== null && 'type' in toolChoice
+    ? toolChoice.type
+    : undefined;
+  if (toolChoice !== undefined && toolType !== 'auto' && toolType !== 'none') {
+    reject('This model accepts only auto or none tool_choice.');
+  }
+  if (options.top_k !== undefined) reject('This model requires omitted top_k.');
+  for (const [key, defaultValue] of [['temperature', 1], ['top_p', 1]] as const) {
+    if (options[key] !== undefined && options[key] !== defaultValue) {
+      reject('This model requires omitted or default sampling parameters.');
+    }
+  }
+}
+
+function hasMandatoryThinking(model: ModelId | undefined): boolean {
+  return model === 'claude-opus-5-5' || model === 'claude-fable-5-1';
+}
+
+function isCurrentClaude(model: ModelId | undefined): boolean {
+  return hasMandatoryThinking(model) || model === 'claude-sonnet-5-5';
 }
 
 /**
@@ -84,24 +145,26 @@ export interface AnthropicModelProviderConfig {
   readonly apiKey?: string;
   /** Override the API base URL (e.g. to route through a gateway/proxy). */
   readonly baseURL?: string;
+  /**
+   * Explicit additional API model IDs, merged with the bundled catalog.
+   * Discovery and construction stay offline; an ID alone supplies no unknown
+   * capabilities or token limits. The provider snapshots and deduplicates IDs.
+   */
+  readonly models?: readonly string[];
 }
 
 const INPUT_MODALITIES = ['text', 'image', 'document'] as const;
 
 // The API serves Sonnet 5.5 before the wrapped adapter's catalog includes it.
 // Use TanStack's model extension seam to pass this exact id to the native SDK.
-const ADDITIONAL_MODELS = [createModel('claude-sonnet-5-5', INPUT_MODALITIES)] as const;
-const MODEL_IDS = [
-  ...new Set([...ANTHROPIC_MODELS, ...ADDITIONAL_MODELS.map((model) => model.name)]),
-];
-const anthropicTextWithModels = extendAdapter(anthropicText, ADDITIONAL_MODELS);
-const createAnthropicChatWithModels = extendAdapter(createAnthropicChat, ADDITIONAL_MODELS);
+const BUNDLED_MODEL_IDS = [...ANTHROPIC_MODELS, 'claude-sonnet-5-5'];
 
 /**
  * A {@linkcode ModelProviderPort} backed by `@tanstack/ai-anthropic`.
  *
  * The model catalog combines the wrapped package's `ANTHROPIC_MODELS` with
- * Sonnet 5.5, whose API id is supported through TanStack's model extension seam.
+ * Sonnet 5.5 and explicitly configured API IDs through TanStack's public
+ * model extension seam. Additional IDs do not imply capability metadata.
  * Streaming clients created by
  * {@linkcode AnthropicModelProvider.createChatClient} are cancelled by passing
  * an `AbortController` to the TanStack `chat()` / `chatStream()` call — the
@@ -119,17 +182,28 @@ export class AnthropicModelProvider implements ModelProviderPort {
   /** Stable registry id (`"anthropic"`). */
   readonly id: string = ANTHROPIC_PROVIDER_ID;
   readonly #config: AnthropicModelProviderConfig;
+  readonly #modelIds: readonly string[];
 
   /** Construct a provider bound to the given `config` (defaults to `{}`). */
   constructor(config: AnthropicModelProviderConfig = {}) {
-    this.#config = config;
+    if (
+      config.models !== undefined &&
+      (!Array.isArray(config.models) ||
+        Array.from(config.models).some((id) =>
+          typeof id !== 'string' || id.length === 0 || id.trim() !== id
+        ))
+    ) {
+      throw new AiError('Anthropic models must be an array of non-empty, unpadded API model IDs.');
+    }
+    this.#config = { ...config };
+    this.#modelIds = [...new Set([...BUNDLED_MODEL_IDS, ...(config.models ?? [])])];
   }
 
   /**
-   * List the wrapped TanStack Anthropic catalog plus Sonnet 5.5.
+   * List the bundled catalog plus this provider's explicit additional IDs.
    */
   listModels(): Promise<readonly ModelDescriptor[]> {
-    return Promise.resolve(MODEL_IDS.map((id) => describeAnthropicModel(id)));
+    return Promise.resolve(this.#modelIds.map((id) => describeAnthropicModel(id)));
   }
 
   /**
@@ -153,7 +227,7 @@ export class AnthropicModelProvider implements ModelProviderPort {
 
   /** Whether `modelId` is a member of the Anthropic catalog. */
   supports(modelId: ModelId): boolean {
-    return (MODEL_IDS as readonly string[]).includes(modelId);
+    return this.#modelIds.includes(modelId);
   }
 
   /**
@@ -184,12 +258,17 @@ export class AnthropicModelProvider implements ModelProviderPort {
   createChatClient(model: ModelId): ChatClientPort {
     // Narrow the owned string id against the runtime catalog so no
     // `@tanstack/ai-anthropic` type appears in the public signature (D3).
-    const resolved = MODEL_IDS.find((candidate) => candidate === model);
+    const resolved = this.#modelIds.find((candidate) => candidate === model);
     if (resolved === undefined) {
       throw new AiError(
         `Model "${model}" is not offered by the "${ANTHROPIC_PROVIDER_ID}" provider.`,
       );
     }
+    const models = this.#modelIds.map((id) =>
+      createModel(id, BUNDLED_MODEL_IDS.includes(id) ? INPUT_MODALITIES : ['text'] as const)
+    );
+    const anthropicTextWithModels = extendAdapter(anthropicText, models);
+    const createAnthropicChatWithModels = extendAdapter(createAnthropicChat, models);
     return toTanstackChatClient((connection) => {
       const apiKey = nonEmpty(connection?.apiKey) ?? nonEmpty(this.#config.apiKey);
       const baseURL = nonEmpty(connection?.baseURL) ?? nonEmpty(this.#config.baseURL);
@@ -200,10 +279,81 @@ export class AnthropicModelProvider implements ModelProviderPort {
     }, {
       name: ANTHROPIC_PROVIDER_ID,
       kind: 'text',
-      mapModelOptions: anthropicGenerationModelOptions,
-      validateModelOptions: validateAnthropicModelOptions,
+      mapModelOptions: (options) => anthropicGenerationModelOptions(options, resolved),
+      validateModelOptions: (options) => validateAnthropicModelOptions(options, resolved),
+      createUsageObserver: createAnthropicUsageObserver,
     });
   }
+}
+
+/** Preserve cumulative Messages usage spanning message_start and message_delta. */
+function createAnthropicUsageObserver(): ProviderUsageObserver {
+  const counts: Record<string, number> = {};
+  const serverCounts: Record<string, number> = {};
+  const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+  const recordCounts = (
+    source: Readonly<Record<string, unknown>>,
+    keys: readonly string[],
+    target: Record<string, number>,
+  ): void => {
+    for (const key of keys) {
+      const count = source[key];
+      if (typeof count === 'number' && Number.isSafeInteger(count) && count >= 0) {
+        target[key] = count;
+      }
+    }
+  };
+  return {
+    observe(frame) {
+      if (!isRecord(frame)) return;
+      const reported = frame.type === 'message_start' && isRecord(frame.message)
+        ? frame.message.usage
+        : frame.type === 'message_delta'
+        ? frame.usage
+        : undefined;
+      if (!isRecord(reported)) return;
+      // Deltas are cumulative snapshots, not increments. Later reported
+      // fields replace earlier ones; omitted input/cache fields retain start.
+      recordCounts(reported, [
+        'input_tokens',
+        'output_tokens',
+        'cache_creation_input_tokens',
+        'cache_read_input_tokens',
+      ], counts);
+      if (isRecord(reported.server_tool_use)) {
+        recordCounts(reported.server_tool_use, [
+          'web_search_requests',
+          'web_fetch_requests',
+        ], serverCounts);
+      }
+    },
+    read() {
+      if (Object.keys(counts).length === 0) return undefined;
+      const promptTokens = counts.input_tokens ?? 0;
+      const completionTokens = counts.output_tokens ?? 0;
+      const promptTokensDetails = {
+        ...(counts.cache_creation_input_tokens !== undefined &&
+          { cacheWriteTokens: counts.cache_creation_input_tokens }),
+        ...(counts.cache_read_input_tokens !== undefined &&
+          { cachedTokens: counts.cache_read_input_tokens }),
+      };
+      const serverToolUse = {
+        ...(serverCounts.web_search_requests !== undefined &&
+          { webSearchRequests: serverCounts.web_search_requests }),
+        ...(serverCounts.web_fetch_requests !== undefined &&
+          { webFetchRequests: serverCounts.web_fetch_requests }),
+      };
+      return {
+        promptTokens,
+        completionTokens,
+        totalTokens: promptTokens + completionTokens,
+        ...(Object.keys(promptTokensDetails).length > 0 && { promptTokensDetails }),
+        ...(Object.keys(serverToolUse).length > 0 &&
+          { providerUsageDetails: { serverToolUse } }),
+      };
+    },
+  };
 }
 
 function nonEmpty(value: string | undefined): string | undefined {
@@ -216,11 +366,13 @@ function describeAnthropicModel(id: string): ModelDescriptor {
     id,
     provider: ANTHROPIC_PROVIDER_ID,
     displayName: id,
-    capabilities: {
-      streaming: true,
-      tools: true,
-      vision: true,
-      inputModalities: INPUT_MODALITIES,
-    },
+    capabilities: BUNDLED_MODEL_IDS.includes(id)
+      ? {
+        streaming: true,
+        tools: true,
+        vision: true,
+        inputModalities: INPUT_MODALITIES,
+      }
+      : undefined,
   };
 }

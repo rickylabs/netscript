@@ -102,6 +102,53 @@ export interface NetScriptChatMessage {
 }
 
 /**
+ * Complete client send input, structurally accepting native UI and Model messages.
+ *
+ * Parts, content, metadata and additional native fields are forwarded unchanged.
+ * This opaque transport boundary is separate from the reduced rendering projection
+ * {@link NetScriptChatMessage}; it does not validate or reconstruct native parts.
+ */
+export type NetScriptChatSendMessage =
+  | Readonly<{
+    /** Stable UI message identity. */
+    id: string;
+    /** Author role, including the existing tool-message compatibility. */
+    role: 'system' | 'user' | 'assistant' | 'tool';
+    /** Complete native parts, including attachments and tool fields. */
+    parts: readonly unknown[];
+    /** Optional native author name. */
+    name?: string;
+    /** Opaque native and application metadata. */
+    metadata?: unknown;
+    /** Native creation timestamp, forwarded without conversion. */
+    createdAt?: unknown;
+  }>
+  | Readonly<{
+    /** Optional stable Model message identity. */
+    id?: string;
+    /** Author role of the Model message. */
+    role: 'system' | 'user' | 'assistant' | 'tool';
+    /** Original text, null content or multimodal content parts. */
+    content: string | null | readonly unknown[];
+    /** Optional native author name. */
+    name?: string;
+    /** Complete native tool calls. */
+    toolCalls?: readonly unknown[];
+    /** Identity of the corresponding tool call. */
+    toolCallId?: string;
+    /** Opaque native reasoning content and signatures. */
+    thinking?: unknown;
+    /** Opaque native error information. */
+    error?: unknown;
+    /** Opaque native and application metadata. */
+    metadata?: unknown;
+    /** Complete native structured output. */
+    structuredOutput?: unknown;
+    /** Native creation timestamp, forwarded without conversion. */
+    createdAt?: unknown;
+  }>;
+
+/**
  * A minimal, NetScript-owned renderable unit emitted by the one-projection
  * reducer ({@link projectChatSnapshot}).
  *
@@ -216,9 +263,9 @@ export interface NetScriptChatConnection {
    * which may replay from `initialOffset`.
    */
   readonly subscribe: (signal?: AbortSignal) => AsyncIterable<unknown>;
-  /** Append client messages to the durable session stream. */
+  /** Append complete UI/Model messages and data unchanged, with linked cancellation. */
   readonly send: (
-    messages: readonly NetScriptChatMessage[],
+    messages: readonly NetScriptChatSendMessage[],
     data?: unknown,
     signal?: AbortSignal,
   ) => Promise<void>;
@@ -422,7 +469,7 @@ export function createNetScriptChatConnection(
     authorize: options.authorize,
     subscribe,
     send: (
-      messages: readonly NetScriptChatMessage[],
+      messages: readonly NetScriptChatSendMessage[],
       data?: unknown,
       signal?: AbortSignal,
     ): Promise<void> => {
@@ -431,7 +478,7 @@ export function createNetScriptChatConnection(
           new Error('createNetScriptChatConnection: connection already disposed'),
         );
       }
-      return upstream.send(messages.map(toDurableMessage), data, linkSignal(signal));
+      return upstream.send(messages, data, linkSignal(signal));
     },
     close: dispose,
     stop: dispose,

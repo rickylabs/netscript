@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "nativeGeneratedAssets": [
+    {
+      "path": ".llm/assets/agent-docs/prose.json.gz",
+      "beforeSha256": "8172ab6d0d502c63c94a4aa2b0d797c45a9de1f71aa82d54c1fe284f42bbac60",
+      "afterSha256": "90ff54bf3176e72e3562abdb1764aae1d43442fb944383f652912fb6c377a8ec"
+    },
+    {
+      "path": ".llm/assets/agent-docs/provenance.json",
+      "beforeSha256": "6ce9e93ab4854750752c8d41834f59688203d0782fdfbc6ac146d28eb4cf3cb3",
+      "afterSha256": "5fdb72d206cb4c60cb6be29d542691d488105c1b4a0a274823c8d744695a4d33"
+    },
+    {
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "beforeSha256": "9e9a35f20e7aab8527d0b92c318132af0e072e18ac11558814acf4d1578b9d1d",
+      "afterSha256": "3c9303301501785b9de57677d32adeda39977a30a0053dae87501e301f348920"
+    }
+  ],
+  "generationOnly": true,
+  "allTrackedBaselineFiles": 6230,
+  "allOtherTrackedFilesUnchangedThroughGeneration": 6227,
+  "unchangedTrackedHashMapSha256": "0db5105d193c82e6a2fded884b111cff7d465df12ee1c58645e6527fc61ded63",
+  "baselineHashReceiptSha256": "876296d3dff517a21d0d56ef9a6befa833ed31f73f71bb2dc40c30923c880d29",
+  "generationProofSha256": "53daaf7d0e7b3a8122fc50357edbe71a963acf2bfe3a037feef3555231670d38",
+  "nativeMcpReadSetClean": true,
+  "nativeProseSourceCommit": "4b8b7cb99",
+  "generatedOutputsHandPatched": false,
+  "sourceToolsManifestsLocksWorkflowsChanged": false,
+  "nativeGeneratorInputs": [
+    {
+      "path": "deno.json",
+      "sha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf"
+    },
+    {
+      "path": ".llm/tools/docs/build-agent-docs-bundle.ts",
+      "sha256": "ab1753f7054b380d8f2936becce8a27ff52e6895ce32bad79d37f3fd82bc6cf3"
+    },
+    {
+      "path": ".llm/tools/docs/build-agent-docs-bundle_test.ts",
+      "sha256": "e926365beef6230260a6c1a62b94b79262c89c97bed079163f3b180dea826761"
+    },
+    {
+      "path": ".llm/tools/docs/generate-export-surface-corpus.ts",
+      "sha256": "1599960ff818d9d3bc6b57aae5bf9a6f84875e155a5a073b511f15a574fc7884"
+    },
+    {
+      "path": ".llm/tools/docs/generate-export-surface-corpus_test.ts",
+      "sha256": "b9af69b0ccd5e3a027905d8aebf8cb1a82683d937fbdad1e96b6ad473fd08fa6"
+    },
+    {
+      "path": "docs/site/deno.json",
+      "sha256": "6ee7fa5da3d189e74af7be7d4c209b33258ef9235585d46b1fd9a31aa931fb3c"
+    },
+    {
+      "path": "packages/mcp/deno.json",
+      "sha256": "6b7e0750fc7788199d69f609cb2dedc23103f6afed7e62816c4ba8a0f8014c3b"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493"
+    },
+    {
+      "path": "docs/site/deno.lock",
+      "sha256": "32f9de401220c4c75c7de3d5820cd03139b0dcb9053285a7a853efbf1e2d35aa"
+    }
+  ]
+}

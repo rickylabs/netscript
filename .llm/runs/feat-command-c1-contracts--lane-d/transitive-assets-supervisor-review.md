@@ -1,0 +1,7 @@
+# C1 embedded consumer repair — supervisor signoff
+
+The supervisor reviews the separate lane's two generated-file candidate against360165b45ae07b1a87671b14d09e990769687380. Hash audit confirms6158other tracked files unchanged. Direct independent imports compare the CLI compressed bytes and provenance to their checked-in source and MCP sourceCommit to that source. Semantic proof shows only the three previously owned prose entries and two command export inventories incorporated into CLI; MCP changes only sourceCommit. Version, external context, unrelated documents/exports and every other generated target remain stable.
+
+The complete native chain now covers shared prose/provenance, MCP export corpus, publish assets, seven barrel outputs and actual runtime consumers. Both reproducing baselines1 are retained; generator/content/publish freshness0,12existing regressions0, JSRspecifiers0 and CLI/MCP nativepublish0 provide actual qualification. Supervisor separately runs durable quality:scan/arch:check0 and verifies exact candidate hashes. The Git-diff freshness gate still needs this commit before its final actual0; no uncommitted0 is claimed. Full CI is pending.
+
+Signed off for commit/push/comment and same-session independent third review of the complete qualification SHA. This signoff is not an IMPL-EVAL verdict. Restore the evaluator's original directory without merging or touching C2's signed-off source, preserve prior reports and record interrupted attempt without inventing a result. No next implementation slice is released here.

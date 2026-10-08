@@ -7,3 +7,5 @@ D2 access clarification from public-export scan: useCurrentSearch/usePageRoute a
 S6 CI found missing generated prose refresh for approved migration docs; bounded owning generator amendment, justified mechanical PLAN-EVAL N/A before source, independent amendment review required. Original source behavior/evaluation unchanged.
 
 Actual review comment4214143837 requires one remaining public migration sentence correction. Same PR; mechanical PLAN N/A. Owner HARNESS-authorized Google Gemini fallback after recorded primary GLM provider stall; separate fresh amendment evaluator required.
+
+Review repair: owner overrides evaluator route to GLM max and authorized Google fallback. Public artifacts omit hostnames, IPs, ports, operator paths, credentials and session identifiers. RTK unavailable; raw exits and structured wrappers used.

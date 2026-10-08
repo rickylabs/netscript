@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "generationHead": "2df7d9b393af7180bd318da6c6926d212e6344d6",
+  "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "nativeGeneratedAssets": [
+    {
+      "path": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "beforeSha256": "ab45d2db002889607b234a03074a858b7235eb1c6eb664156181528bab47a63d",
+      "afterSha256": "be5231ae171367ae34eb917a813013ae07a973baa1f85810b03ea7dc5ef51acd"
+    },
+    {
+      "path": "packages/mcp/src/publish-assets.generated.ts",
+      "beforeSha256": "5092ac34888cb1c83aabfa2963d430b3adb920f255f2ce01c70686c8c1abc456",
+      "afterSha256": "e34f53c84c537b09dac902827586cab38fa74bfa64f7c0fa4f70136b083a714e"
+    }
+  ],
+  "allTrackedBaselineFiles": 6235,
+  "allOtherTrackedFilesUnchangedThroughGeneration": 6233,
+  "unchangedTrackedHashMapSha256": "c45e231a9664b0285029651e0162c56feb3fc8755809217462fea17f42ad09ff",
+  "baselineHashReceiptSha256": "31ff2fbaa5b19fa20bb02e7c862d63721632c6a7ab1f69adacb3122489e254c0",
+  "generationProofSha256": "611fc3213a21a85abb96b7b7b95e89911bc645507ed199a8fee33339b3f9eaa9",
+  "firstWaveAssetsUnchanged": [
+    {
+      "path": ".llm/assets/agent-docs/prose.json.gz",
+      "sha256": "90ff54bf3176e72e3562abdb1764aae1d43442fb944383f652912fb6c377a8ec"
+    },
+    {
+      "path": ".llm/assets/agent-docs/provenance.json",
+      "sha256": "5fdb72d206cb4c60cb6be29d542691d488105c1b4a0a274823c8d744695a4d33"
+    },
+    {
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "3c9303301501785b9de57677d32adeda39977a30a0053dae87501e301f348920"
+    }
+  ],
+  "standaloneConfigurationProof": {
+    "rootConfigSha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf",
+    "standaloneConfigSha256": "dda325d5e2530ca5b16f725e6a479c1d654fce80011f68eb52cbdf886933c620",
+    "selectedPaths": [
+      "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "packages/mcp/src/publish-assets.generated.ts"
+    ],
+    "selectionOnlyAdapted": true,
+    "lintRulesAndOtherOptionsExact": true,
+    "formatOptionsExact": true,
+    "noAncestorExclusionsOrExtends": true,
+    "selectedAndProcessed": 2,
+    "refusals": 0,
+    "supervisorAuthorized": true
+  },
+  "repositoryConfigsChanged": false,
+  "sourceToolsManifestsLocksWorkflowsChanged": false,
+  "generatedOutputsHandPatched": false,
+  "nativeInputs": [
+    {
+      "path": "deno.json",
+      "sha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    },
+    {
+      "path": ".llm/tools/generate-publish-assets.ts",
+      "sha256": "a08e98685b9d63f1767e509e19e677c8013e4fccf251fe2d59279f805e0f8146"
+    },
+    {
+      "path": ".llm/tools/generate-publish-assets_test.ts",
+      "sha256": "1306bfedac92cf08effb23e3b5fed24ef0f83d04571c7b186089fd0d3ffeeb7a"
+    },
+    {
+      "path": ".llm/tools/generate-cli-assets-barrel.ts",
+      "sha256": "84966d46d44e2c9957d983763ca453147db3c98444e2b7f8dc5904a6e34209b3"
+    },
+    {
+      "path": ".llm/tools/generate-cli-assets-barrel_test.ts",
+      "sha256": "27324da4e4a98c25dc45ff8adff5db1d050a81b096a530b6d55a287d9d9c5de3"
+    },
+    {
+      "path": "packages/cli/deno.json",
+      "sha256": "5062536874327cecb474b424fcb77f2f8ae219277ebc8cfd67dffecd7647ff2c"
+    },
+    {
+      "path": "packages/mcp/deno.json",
+      "sha256": "6b7e0750fc7788199d69f609cb2dedc23103f6afed7e62816c4ba8a0f8014c3b"
+    },
+    {
+      "path": "packages/cli/src/public/adapters/agent/deno-agent-docs-generator_test.ts",
+      "sha256": "62088141f6752ddfc393b800ba3940a0609dbb48dbbb8bfeb02840fb4aaf126d"
+    },
+    {
+      "path": "packages/mcp/tests/release-embedded-docs-corpus_test.ts",
+      "sha256": "f804e186c6f1d405fe41d7c9fffc93f09e58103ab7181c057db125e3a0fa09cd"
+    }
+  ],
+  "nativeAssetAggregateSha256": "2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf",
+  "nativeAssetAggregateSerialization": "SHA256 of UTF-8 json.dumps([{path,sha256} for each native asset sorted by path],sort_keys=True,separators=(comma,colon)), with no spaces or trailing newline."
+}

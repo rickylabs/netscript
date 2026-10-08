@@ -1,0 +1,11 @@
+# Research
+
+Re-baselined source against freshly fetched main. MCP find_guidance and search_docs consulted before implementation; direct auth how-to and existing config/generator are load-bearing authority where broad retrieval is irrelevant.
+
+`auth-config.ts` copies all provider values into both Auth.Environment and NetScript.Plugins.auth.Environment. The generator's existing partition/render helper refuses PORT but embeds every other declared value. Auth service composition prefers runtime environment then legacy Auth/backend config. Normal Aspire plugin selector is the canonical plugin Environment key, so retain exactly that tracked selector; provider credentials belong in project .env. Show command must read canonical tracked fallback while retaining legacy read compatibility. Prune old duplicate auth environment blocks on reconciliation, preserve unrelated config.
+
+Existing deploy secrets renderer does not escape shell substitutions and is unsuitable for POSIX sourcing. Native Cliffy .env bindings with prefix implement environment input without bespoke process-environment reads; same-name CLI options retain precedence. No new secrets port required.
+
+Read-only hostile-value probes show POSIX single-quoted literal concatenation safely round-trips apostrophes, substitutions, backticks, backslashes, quotes and literal newlines. Deno's direct --env-file parser does not fully decode this shell grammar. User explicitly requires POSIX sourceability: supported hostile-value path is set -a, dot-source, set +a before starting the AppHost/service. Existing simple credentials and scopes remain directly parseable. Document this boundary instead of promising arbitrary dotenv-parser compatibility.
+
+Public CLI change adds env input bindings and safer persistence, not new commands or package exports. Named pure auth-env helper is consumed by writer/read path; no novel framework abstract. Aspire partition remains existing single rendering authority for both resources. Published API/slow-type risk bounded to existing command factory/config functions; canonical CLI dry-run and consumers required. Baseline AUTH-BACKEND-ENV-CENTRALIZATION debt concerns backend composition and remains untouched.
