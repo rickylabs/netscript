@@ -235,7 +235,7 @@ A `Link` targeting a different route uses that route's schema defaults.
 Migration: calls to `route.href()` or `route.getLinkProps()` with `preserveSearchParams` now use
 schema defaults plus explicit `search`; the flag remains accepted but these utilities never read
 context. Use `page.hooks.useSearch()` and pass the returned values explicitly, or call the link-props
-closure returned by `usePageRoute()`. Call those hooks at the component's top level. Bound `Link`
+`getLinkProps` closure returned by `page.hooks.useRoute()`. Call those hooks at the component's top level. Bound `Link`
 remains available for contextual rendering.
 
 Link props also default `f-client-nav` to `true`, so a reference-built anchor participates in Fresh
