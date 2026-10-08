@@ -1,0 +1,116 @@
+import { PrismaClient, type Prisma } from './.generated/client.ts';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1';
+import { z } from 'zod';
+import { createPrismaSagaTransitionStore } from '@netscript/plugin-sagas-core/stores';
+import { defineJob } from '@netscript/plugin-workers-core';
+import { defineSaga } from '@netscript/plugin-sagas-core';
+import { workerJobEffect } from '@netscript/plugin-sagas-core/integration/workers';
+import { SagaEngine } from 'REPO_URLpackages/plugin-sagas-core/src/runtime/saga-engine.ts';
+import { createPostgresCommandOutboxRelayStore } from '@c5/database/postgres';
+import { createWorkerCommandOutboxSink, type WorkerJobCommandRequest } from '@c5/workers/commands';
+import { createCommandOutboxRelay } from '@netscript/service/commands/relay';
+import type { CommandOutboxRelayStore } from '@netscript/database/commands';
+import type { PostgresCommandClient, TransactionClientPort } from '@netscript/database/commands/postgres';
+import type { SagaCorrelationKey, SagaInstanceId } from '@netscript/plugin-sagas-core/domain';
+
+type Tx = Omit<Prisma.TransactionClient, '$transaction'|'$connect'|'$disconnect'|'$on'|'$use'|'$extends'>;
+const root = new PrismaClient({ adapter: new PrismaPg({ host: Deno.env.get('COMMAND_POSTGRES_SOCKET'), database: 'postgres', user: Deno.env.get('PGUSER'), port: Number(Deno.env.get('PGPORT')) }) });
+const bridge: PostgresCommandClient & TransactionClientPort<Tx> = {
+  $queryRawUnsafe: root.$queryRawUnsafe.bind(root), $executeRawUnsafe: root.$executeRawUnsafe.bind(root),
+  $transaction(work, options) {
+    if (options?.isolationLevel === 'Snapshot') throw new TypeError('unsupported isolation');
+    return root.$transaction(tx => work(new Proxy(tx, { get(target,key,receiver) {
+      if (typeof key==='string' && ['$transaction','$connect','$disconnect','$on','$use','$extends'].includes(key)) return undefined;
+      return Reflect.get(target,key,receiver);
+    } })), { ...options, isolationLevel: options?.isolationLevel });
+  },
+};
+const schema=z.object({ documentId:z.string() });
+const job=defineJob('document-job').payload(schema).handler(() => ({ success:true })).build();
+const definition=defineSaga('document').durableWorkerCommands().state({ count:0 }).on('start',saga => {
+  saga.state={ count:saga.state.count+1 };
+  return [workerJobEffect(job,{documentId:'one'},{destination:'workers',topic:'document'})];
+}).build();
+const instanceId='document:one' as SagaInstanceId;
+const message={type:'start',payload:{},correlationKey:'one' as SagaCorrelationKey,idempotencyKey:'inbound-one',traceparent:'00-0123456789abcdef0123456789abcdef-0123456789abcdef-01',tracestate:'tenant=value'};
+let now=new Date(); let generation=0;
+const acceptedAt=new Date('2026-01-01T00:00:00Z');
+const requests: WorkerJobCommandRequest[]=[];
+async function reset() {
+  for (const table of ['saga_runtime_command_applied_key','netscript_command_outbox','saga_runtime_transition','saga_runtime_correlation','saga_runtime_state']) await root.$executeRawUnsafe(`DELETE FROM ${table}`);
+  // Fixture-owned downstream application ledger proves effective application independently of relay transport.
+  await root.$executeRawUnsafe('CREATE TABLE IF NOT EXISTS consumer_worker_application (command_key text PRIMARY KEY, run_id text NOT NULL, accepted_at timestamptz(3) NOT NULL)');
+  await root.$executeRawUnsafe('DELETE FROM consumer_worker_application');
+  requests.length=0;now=new Date();generation=0;
+}
+function rawRelay() { return createPostgresCommandOutboxRelayStore(bridge,{ transactionTimeoutMs:5000 }); }
+async function produce() {
+  const store=createPrismaSagaTransitionStore(bridge,{transactionTimeoutMs:5000});
+  const engine=new SagaEngine({store});engine.register([definition]);
+  await engine.start();
+  const result=await engine.handle(message);await engine.stop();
+  assertEquals(result[0].state.count,1);
+  assertEquals((await store.load(instanceId))?.metadata.version,1);
+  const rows=await root.$queryRawUnsafe<{id:string;dedupe_key:string;correlation_id:string;traceparent:string;tracestate:string}[]>('SELECT id,dedupe_key,correlation_id,traceparent,tracestate FROM netscript_command_outbox');
+  assertEquals(rows.length,1);assertEquals(rows[0].id,rows[0].dedupe_key);
+  assertEquals(rows[0].correlation_id,'one');assertEquals(rows[0].traceparent,message.traceparent);assertEquals(rows[0].tracestate,message.tracestate);
+  return rows[0];
+}
+async function apply(request: WorkerJobCommandRequest) {
+  requests.push(request);
+  assertEquals(request.jobId,job.id);assertEquals(schema.parse(request.payload),{documentId:'one'});
+  const rows=await root.$queryRawUnsafe<{run_id:string;accepted_at:Date}[]>(
+    'INSERT INTO consumer_worker_application (command_key,run_id,accepted_at) VALUES ($1,$2,$3) ON CONFLICT(command_key) DO UPDATE SET command_key=EXCLUDED.command_key RETURNING run_id,accepted_at',request.idempotencyKey,crypto.randomUUID(),acceptedAt,
+  );
+  return {jobId:job.id,runId:rows[0].run_id,acceptedAt:rows[0].accepted_at};
+}
+function sink(trigger: (request: WorkerJobCommandRequest) => Promise<unknown> =apply) {
+  return createWorkerCommandOutboxSink({id:'workers',targets:new Map([['document',{kind:'job' as const,id:job.id}]]),workers:{ triggerJob:trigger, async triggerTask() { throw new Error('unexpected task'); } }});
+}
+function relay(store:CommandOutboxRelayStore, workerSink= sink()) {
+  return createCommandOutboxRelay({store,sinks:new Map([['workers',workerSink]]),clock:{now:()=>new Date(now)},ids:{next:()=>`generation-${++generation}`},batchSize:1,concurrency:1,leaseMs:100,maxAttempts:5,maxRetryDelayMs:1000,classify:()=> 'unavailable',retryAt:(_attempt,instant)=>new Date(instant.getTime()+1)});
+}
+async function row() {
+  return (await root.$queryRawUnsafe<{published_at:Date|null;acceptance_identity:string|null;accepted_at:Date|null;claim_token:string|null;attempt_count:number;last_failure:string|null}[]>('SELECT published_at,acceptance_identity,accepted_at,claim_token,attempt_count,last_failure FROM netscript_command_outbox'))[0];
+}
+Deno.test('saga command restart and acceptance crash reuse C5 checked relay and worker sink',async()=>{
+  try {
+    await reset();const intent=await produce();assertEquals(requests.length,0);
+    // Restart the producer/store before any relay work; committed intent remains independently recoverable.
+    const restarted=new SagaEngine({store:createPrismaSagaTransitionStore(bridge,{transactionTimeoutMs:5000})});restarted.register([definition]);await restarted.start();await restarted.handle(message);await restarted.stop();
+    assertEquals((await root.netScriptCommandOutbox.count()),1);
+    const actual=rawRelay();let settlements=0;
+    const crashing:CommandOutboxRelayStore={claim:actual.claim.bind(actual),release:actual.release.bind(actual),async markPublished(){settlements++;throw new Error('crash after checked acceptance');}};
+    const interrupted=relay(crashing);now=new Date(now.getTime()+1000);
+    await assertRejects(()=>interrupted.drainOnce());await interrupted.stop();
+    assertEquals(settlements,1);assertEquals(requests.length,1);assertEquals((await row()).published_at,null);assert((await row()).claim_token);
+    now=new Date(now.getTime()+101);const recovered=relay(rawRelay());assertEquals(await recovered.drainOnce(),1);await recovered.stop();
+    assertEquals(requests.length,2);assertEquals(requests.map(r=>r.idempotencyKey),[intent.id,intent.id]);
+    assertEquals(requests.map(r=>r.correlationId),['one','one']);assertEquals(requests.map(r=>r.traceparent),[message.traceparent,message.traceparent]);
+    const applications=await root.$queryRawUnsafe<{count:bigint}[]>('SELECT count(*) AS count FROM consumer_worker_application');assertEquals(Number(applications[0].count),1);
+    const persisted=await row();assert(persisted.published_at instanceof Date);assert(persisted.acceptance_identity);assertEquals(persisted.accepted_at,acceptedAt);assertEquals(persisted.attempt_count,2);
+  } finally {await root.$disconnect();}
+});
+Deno.test('saga commands reuse C5 lease ownership malformed receipt retry and shutdown drain',async()=>{
+  try {
+    await reset();await produce();now=new Date(now.getTime()+1000);const actual=rawRelay();
+    const leased=await actual.claim({limit:1,leaseMs:100,now,claimToken:'first'});assertEquals(leased.length,1);
+    now=new Date(now.getTime()+101);const second=await actual.claim({limit:1,leaseMs:100,now,claimToken:'second'});assertEquals(second.length,1);assertEquals(second[0].id,leased[0].id);
+    assertEquals(await actual.markPublished({id:leased[0].id,claimToken:leased[0].claimToken,publishedAt:now,acceptance:{identity:'stale',acceptedAt}}),false);
+    assertEquals(await actual.release({id:second[0].id,claimToken:second[0].claimToken,now,failure:'unavailable',disposition:'retry',retryAt:new Date(now.getTime()+1)}),true);
+    now=new Date(now.getTime()+2);
+    const unchecked=relay(actual,sink(async request=>{requests.push(request);return {queued:true};}));assertEquals(await unchecked.drainOnce(),0);await unchecked.stop();
+    assertEquals((await row()).published_at,null);assertEquals((await row()).last_failure,'invalid_response');assertEquals((await row()).acceptance_identity,null);
+    now=new Date(now.getTime()+2);const checkedRetry=relay(actual);assertEquals(await checkedRetry.drainOnce(),1);await checkedRetry.stop();assert((await row()).acceptance_identity);
+    // A fresh producer intent exercises noncooperative acceptance while stop waits for the active drain.
+    await reset();await produce();now=new Date(now.getTime()+1000);
+    const entered=Promise.withResolvers<void>(),release=Promise.withResolvers<void>();
+    const active=relay(rawRelay(),sink(async request=>{entered.resolve();await release.promise;return await apply(request);}));
+    const draining=active.drainOnce();await entered.promise;let stopped=false;const stopping=active.stop().then(()=>{stopped=true;});await Promise.resolve();assertEquals(stopped,false);
+    release.resolve();await draining;await stopping;assertEquals(stopped,true);assertEquals((await row()).published_at,null);
+    now=new Date(now.getTime()+101);const recovery=relay(rawRelay());assertEquals(await recovery.drainOnce(),1);await recovery.stop();
+    assertEquals(new Set(requests.map(r=>r.idempotencyKey)).size,1);assertEquals(requests.length,2);assertEquals((await row()).published_at,now);
+    assertEquals(await recovery.drainOnce(),0);
+  } finally {await root.$disconnect();}
+});

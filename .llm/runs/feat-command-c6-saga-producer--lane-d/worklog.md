@@ -240,3 +240,47 @@ Static check, scoped regression, lint/format/quality/architecture and complete o
   }
 ]
 ```
+
+## S19 actual predecessor consumer and Tier-A slice review
+
+Current C6 producer/store and worker definitions target actual C5 production relay/worker sink. Immutable READY pin: 1a93a6acb127f58cb5bb622223180ca5e5e9925e. C5 remains unmerged; no C5 product copy/stack/release. Temporary archive removes only workspace configuration to avoid duplicate package registrations; production modules stay byte-identical, explicit consumer imports preserve current C6 APIs. Native fixture setup applies the actual C5 acceptance migration, never production runtime DDL.
+
+Restart recovers a committed intent. Crash after checked acceptance retains lease; expiry/restart redelivers the same id/dedupe/correlation/W3C. Independent durable SQL downstream applied key proves one effective application for two deliveries; normalized receipt identity/time settle together. Stale leases refuse settlement; malformed bare receipts remain unsettled and a bounded checked retry succeeds. Stop awaits noncooperative acceptance before recovery with the same stable key. At-least-once delivery only, no exactly-once transport claim. Two semantic current-producer mutants cover both inner named tests and outer wrapper; exact restoration/PASS. Native C3/C6/C5 provider gate EXIT 0, scoped check/lint/quality/architecture pass. No new relay/lease/retry/drain infrastructure. S19 signoff PASS for slice only; S20/final evaluator/CI pending.
+
+```json
+{
+  "cohort": "1a93a6acb127f58cb5bb622223180ca5e5e9925e",
+  "productionSourceSha256": {
+    "packages/service/src/commands/relay/create-command-outbox-relay.ts": "09276e5e050f69e390254c2cd1db5aeb2d11c9fa03bee2fd089a81c4b29c431d",
+    "packages/database/src/commands/adapters/create-postgres-command-outbox-relay-store.ts": "819c0fb746ebca97a08d8382df344670b09a77c43bb7275f8bfa1d0cf5f4b969",
+    "packages/plugin-workers-core/src/integration/commands/worker-command-sink.ts": "c3d91f5253d52fde539e3ebee7413a14968c7c801b349d2bba640d13d314adf6",
+    "packages/database/tests/fixtures/command-store/relay-acceptance-migration.sql": "01f3d5bba226e60e0830e68ef41fcec1e25d8e6dae5eccb739326f9f8df0bd31"
+  },
+  "mutations": [
+    {
+      "name": "s19-stable-dedupe",
+      "test": "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+      "innerTest": "saga command restart and acceptance crash reuse C5 checked relay and worker sink",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/application/produce-worker-commands.ts": "b30ea6b9fafe8fe29be1594bd7c7c1f0952514fd17f8040793a1c553ab502f25"
+      }
+    },
+    {
+      "name": "s19-due-intent",
+      "test": "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+      "innerTest": "saga commands reuse C5 lease ownership malformed receipt retry and shutdown drain",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/application/produce-worker-commands.ts": "b30ea6b9fafe8fe29be1594bd7c7c1f0952514fd17f8040793a1c553ab502f25"
+      }
+    }
+  ]
+}
+```
