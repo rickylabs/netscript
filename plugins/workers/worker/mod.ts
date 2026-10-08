@@ -15,13 +15,23 @@ export type {
   JobContext,
   JobDefinition,
   JobHandler,
+  JobMessage,
   JobResult,
   RuntimePermissions,
   RuntimePermissionValue,
   StaticJobRegistry,
   TaskDefinition,
   TaskExecutionOptions,
+  TaskMessage,
 } from '@netscript/plugin-workers-core/runtime';
+export type {
+  DeadLetterReason,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '@netscript/queue';
 export type {
   WorkerCronJob,
   WorkerCronScheduler,

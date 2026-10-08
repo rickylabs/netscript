@@ -1,5 +1,17 @@
 # @netscript/plugin-workers
 
+Job handlers receive an executor-owned `signal` and optional epoch-millisecond `deadlineAt` through
+the Deno job path. `Worker.cancel(executionId)` requests local cancellation of an active execution;
+it returns false for an absent or already-cancelled execution. `Worker.stop()` aborts jobs at drain
+start and waits for listener and runner cleanup. Timeout records `timeout`; shutdown and explicit
+cancel record `cancelled`, release the delivery claim and never record a false successful result.
+
+`workerPoolOptions.abortGracePeriodMs` defaults to 1000 milliseconds and bounds the wait for handler
+cleanup. An in-process handler that ignores cancellation may continue running; CPU-blocking work can
+delay timers. Forward `context.signal` to cancellable operations. Task-executor cancellation is a
+separate path. Optional `queue` and `taskQueue` dependencies use the existing `MessageQueue` ports;
+this worker owns and stops supplied queues as it does the defaults.
+
 [![JSR](https://jsr.io/badges/@netscript/plugin-workers)](https://jsr.io/@netscript/plugin-workers)
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)

@@ -9,11 +9,7 @@ import { createQueue, type MessageQueue } from '@netscript/queue';
 import type { WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
 import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
-import {
-  startWorkerSpan,
-  type TracedMessageContext,
-  type TracedQueue,
-} from '@netscript/telemetry/instrumentation';
+import { startWorkerSpan, type TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetry/config';
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
 import type { Span } from '@netscript/telemetry/tracer';
@@ -85,10 +81,12 @@ export class Worker {
   private readonly triggerQueues: MessageQueue<unknown>[] = [];
   private readonly listenerSupervisors: WorkerListenerSupervisor[] = [];
   private readonly activeJobs = new Map<string, JobExecutionContext>();
-  private queue: TracedQueue<JobMessage> | null = null;
+  private readonly suppliedQueue?: MessageQueue<JobMessage>;
+  private readonly suppliedTaskQueue?: MessageQueue<TaskMessage>;
+  private queue: MessageQueue<JobMessage> | null = null;
   private taskQueue: MessageQueue<TaskMessage> | null = null;
   private running = false;
-  private stopping = false;
+  private stopCompletion: Promise<void> | null = null;
   private abortController: AbortController | null = null;
   private workerSpan: Span | null = null;
 
@@ -96,6 +94,8 @@ export class Worker {
   constructor(options: WorkerOptions) {
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
+    this.suppliedQueue = options.queue;
+    this.suppliedTaskQueue = options.taskQueue;
     this.concurrency = options.concurrency ?? 1;
     this.registry = options.registry;
     this.executionState = options.executionState;
@@ -166,7 +166,7 @@ export class Worker {
       concurrency: this.concurrency,
     });
 
-    this.queue = createQueue<JobMessage>(this.queueName) as TracedQueue<JobMessage>;
+    this.queue = this.suppliedQueue ?? createQueue<JobMessage>(this.queueName);
 
     this.listenerSupervisors.push(...await startQueueTriggerListeners(this.queueContext()));
     this.listenerSupervisors.push(
@@ -196,20 +196,37 @@ export class Worker {
     }
   }
 
-  /** Stop the worker and wait briefly for active jobs to finish. */
-  async stop(): Promise<void> {
-    if (this.stopping) {
-      return;
-    }
-    if (!this.running && !this.hasRuntimeResources()) {
-      return;
-    }
+  /** Request cancellation of an active local execution; first cause wins. */
+  cancel(executionId: string): boolean {
+    const execution = this.activeJobs.get(executionId);
+    if (!execution || execution.abortController.signal.aborted) return false;
+    execution.abortController.abort(new DOMException('Job cancellation requested.', 'AbortError'));
+    return true;
+  }
 
-    this.stopping = true;
+  /** Abort jobs at drain start and await listeners plus the bounded runner cleanup. */
+  stop(): Promise<void> {
+    if (this.stopCompletion) return this.stopCompletion;
+    if (!this.running && !this.hasRuntimeResources()) {
+      return Promise.resolve();
+    }
+    this.stopCompletion = this.drain();
+    return this.stopCompletion;
+  }
+
+  /** Drain once; concurrent stop callers share the same completion. */
+  private async drain(): Promise<void> {
     console.log(`[Worker ${this.workerId}] Stopping...`);
     try {
-      this.abortController?.abort();
-      await Promise.all(this.listenerSupervisors.map((supervisor) => supervisor.stop()));
+      const shutdownReason = new DOMException('Worker shutdown began.', 'ShutdownError');
+      this.abortController?.abort(shutdownReason);
+      for (const execution of this.activeJobs.values()) {
+        execution.abortController.abort(shutdownReason);
+      }
+      await Promise.all([
+        this.workerPool.shutdown(),
+        ...this.listenerSupervisors.map((supervisor) => supervisor.stop()),
+      ]);
       this.listenerSupervisors.length = 0;
       await this.stopTriggerQueues();
       await this.waitForActiveJobs();
@@ -223,7 +240,6 @@ export class Worker {
         this.taskQueue = null;
       }
 
-      await this.workerPool.shutdown();
       this.workerSpan?.setAttribute(WorkerAttributes.WORKER_ACTIVE_JOBS, 0);
       this.workerSpan?.addEvent('worker.stopped');
       this.workerSpan?.end();
@@ -232,7 +248,7 @@ export class Worker {
       this.running = false;
       console.log(`[Worker ${this.workerId}] Stopped`);
     } finally {
-      this.stopping = false;
+      this.stopCompletion = null;
     }
   }
 
@@ -316,6 +332,7 @@ export class Worker {
       jobsDir: this.jobsDir,
       activeJobs: this.activeJobs,
       workerSpan: this.workerSpan,
+      shutdownSignal: this.abortController?.signal,
     };
   }
 
@@ -327,6 +344,7 @@ export class Worker {
       queueTriggers: this.queueTriggers,
       triggerQueues: this.triggerQueues,
       abortController: this.abortController,
+      taskQueue: this.suppliedTaskQueue,
       listenerMaxRestarts: this.listenerMaxRestarts,
       listenerInitialBackoffMs: this.listenerInitialBackoffMs,
       listenerMaxBackoffMs: this.listenerMaxBackoffMs,

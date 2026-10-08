@@ -130,6 +130,10 @@ export interface WorkerOptions {
   workerId: string;
   /** Queue name to consume from. */
   queueName?: string;
+  /** Optional job queue; this worker owns and stops the supplied queue. */
+  queue?: MessageQueue<JobMessage>;
+  /** Optional task queue; this worker owns and stops the supplied queue. */
+  taskQueue?: MessageQueue<TaskMessage>;
   /** Number of concurrent jobs to process. */
   concurrency?: number;
   /** Job registry instance. */
@@ -198,6 +202,8 @@ export interface WorkerDispatchContext {
   readonly jobsDir: string;
   readonly activeJobs: Map<string, JobExecutionContext>;
   readonly workerSpan: Span | null;
+  /** Shutdown signal also inherited by executions admitted while drain begins. */
+  readonly shutdownSignal?: AbortSignal;
 }
 
 /** Context required by queue-consumer helpers. */
@@ -207,6 +213,7 @@ export interface WorkerQueueContext {
   readonly queueTriggers: readonly QueueTriggerConfig[];
   readonly triggerQueues: MessageQueue<unknown>[];
   readonly abortController: AbortController | null;
+  readonly taskQueue?: MessageQueue<TaskMessage>;
   readonly processJob: (
     message: JobMessage,
     queueContext?: MessageContext,
