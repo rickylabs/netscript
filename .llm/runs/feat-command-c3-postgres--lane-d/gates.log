@@ -18,3 +18,10 @@ EXIT repair-doc-lint 0
 EXIT repair-jsr-database 0
 EXIT repair-database-publish 0
 EXIT repair-deps-prod-install 0
+
+EXIT fresh-ui-lock-update 0
+EXIT fresh-ui-frozen-check 0
+EXIT lock-check:agent-docs-prose 0
+EXIT lock-check:assets-barrel 0
+EXIT lock-check:publish-assets 0
+EXIT lock-check:mcp-export-corpus 0
