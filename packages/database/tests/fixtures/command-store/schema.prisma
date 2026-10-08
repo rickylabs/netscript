@@ -9,7 +9,7 @@ datasource db {
 model Project {
   id String @id
   version Int @default(0)
-  name String
+  name String @unique(map: "project_name_unique")
   @@map("project")
 }
 model NetScriptCommandReceipt {

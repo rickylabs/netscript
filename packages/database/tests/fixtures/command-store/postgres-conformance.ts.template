@@ -126,7 +126,7 @@ Deno.test('PostgreSQL all command rows share commit and rollback and incomplete 
 
 Deno.test('PostgreSQL serialization and deadlock surface retryable failures with one callback',async()=>{
   await reset();
-  await root.project.createMany({data:[{id:'a',name:'start'},{id:'b',name:'start'}]});
+  await root.project.createMany({data:[{id:'a',name:'start-a'},{id:'b',name:'start-b'}]});
   const ready=latch(); let entered=0,calls=0;
   const writer=(name:string)=>store.transaction({receiptClaimWaitMs:1000,options:{isolationLevel:'Serializable'}},async tx=>{
     calls++; await tx.business.project.findUniqueOrThrow({where:{id:'a'}});
@@ -148,6 +148,21 @@ Deno.test('PostgreSQL serialization and deadlock surface retryable failures with
   const victim=deadlocks.find(r=>r.status==='rejected');assert(victim?.status==='rejected');
   assert(victim.reason instanceof CommandStoreError);assertEquals(victim.reason.failure.retryable,true);
   await store.transaction(request,async tx=>{assertEquals((await tx.business.project.findMany()).length,2);});
+});
+
+Deno.test('PostgreSQL physical commit failure rolls back all rows and preserves business error identity',async()=>{
+  await reset();const input=claim('3');let calls=0;
+  const failure=await assertRejects(()=>store.transaction(request,async tx=>{
+    calls++;await tx.claimReceipt(input);
+    await tx.business.project.createMany({data:[{id:'a',name:'duplicate'},{id:'b',name:'duplicate'}]});
+    await complete(tx,input.id);
+  }),CommandStoreError);
+  assertEquals(failure.failure,{kind:'store_failure',retryable:false,phase:'commit'});
+  assertEquals(calls,1);
+  assertEquals(await Promise.all([root.project.count(),root.netScriptCommandReceipt.count()]),[0,0]);
+  const businessError=Object.assign(new Error('business'),{code:'40001',name:'PrismaClientKnownRequestError',meta:{code:'40001'}});
+  const caught=await store.transaction(request,async()=>{throw businessError;}).catch(error=>error);
+  assertEquals(caught,businessError);
 });
 
 Deno.test('PostgreSQL actual root write negative control survives a callback rollback',async()=>{

@@ -17,3 +17,6 @@ export {
   type PostgresCommandStoreOptions,
 } from './src/commands/adapters/create-postgres-command-store.ts';
 export type { PostgresCommandClient } from './src/commands/ports/postgres-command-client.ts';
+
+export type { TransactionClientPort } from './ports/transaction-client.ts';
+export type { CommandStorePort } from './ports/command-store.ts';

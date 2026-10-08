@@ -247,3 +247,5 @@ export function buildMssqlConnectionString(parts: {
 
   return `sqlserver://${server};${params.join(';')}`;
 }
+
+export type { TransactionClientPort } from './ports/transaction-client.ts';

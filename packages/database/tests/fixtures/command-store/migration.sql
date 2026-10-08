@@ -1,5 +1,5 @@
 -- Consumer-owned reviewed migration; apply through the application's migration workflow.
-CREATE TABLE project (id text PRIMARY KEY, version integer NOT NULL DEFAULT 0, name text NOT NULL);
+CREATE TABLE project (id text PRIMARY KEY, version integer NOT NULL DEFAULT 0, name text NOT NULL, CONSTRAINT project_name_unique UNIQUE(name) DEFERRABLE INITIALLY DEFERRED);
 CREATE TABLE netscript_command_receipt (
  id text PRIMARY KEY,
  scope varchar(256) NOT NULL,
