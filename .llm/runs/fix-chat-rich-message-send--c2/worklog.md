@@ -21,3 +21,5 @@ PLAN-EVAL: Selected independent PLAN-EVAL PASS against immutable current main 8a
 7. Evaluate: pending; independent different-vendor session mandatory.
 8. Release: N/A, owner explicitly requires unmerged PRs.
 9. Close: pending source delivery and handoff; publication remains owner work.
+
+S1 Design checkpoint: D1-D4 locked in plan.md. Independent Google Gemini selected PLAN-EVAL PASS at immutable main8aad14940c52cd3a4db7efa57d56d50ae131df6c, all8boxes. Fresh fetch baseline equality confirmed before implementation. Model/session/vendor separated; owner-authorized fallback after primary provider stalled. Actual native data/signal already forwarded; only message mapper drops parts/metadata. Planned2runtime regressions plus native compile consumer, eachdistinctcausalmutant. Full owning doc baseline to be recorded before source and compared at everyentrypoint; proposed existing-debt acceptance requires independent IMPL ifrawfailed. S2 source stillpending.
