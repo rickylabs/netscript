@@ -10,9 +10,9 @@ Public surface: existing NetScriptStreamDB preload/stop/dispose/status; no new e
 2. Research: claims checked against pinned code, MCP consulted, current main merged.
 3. Plan & Design: recorded before implementation.
 4. Plan-Gate: PLAN-EVAL N/A; bounded contract-preserving review repairs, no unresolved architectural decision.
-5. Implement: pending S1-S4.
-6. Gate: pending.
-7. Evaluate: independent evaluator pending.
+5. Implement: S1-S4 committed and pushed after independent substantive review and per-slice gates; S5 generated corpus restoration complete.
+6. Gate: five mandatory gates PASS; package quality/architecture/consumer/publication PASS; existing doclint baseline parity proven.
+7. Evaluate: independent slice review PASS; final exact-head IMPL-EVAL pending.
 8. Release: N/A (no release cut).
 9. Close: pending report, normal push, replies and resolution.
 
@@ -67,3 +67,7 @@ Independent slice review PASS; exact S3 snapshot focused tests, quality:scan and
 ### S4 sign-off
 
 Independent slice review PASS; exact S4 snapshot focused tests, quality:scan and arch:check exit 0. Read entry checks cancellation before assigning connecting, preserving stopped status and suppressing I/O after stop. Reverting just this guard fails the status assertion. Reconcile: S3 pushed with passing slice evidence; all four source repairs now match the independently reviewed final snapshots.
+
+### S5 sign-off
+
+Generator --check and publish-carrier check exit 0; structured MCP check exit 0. Supervisor inspected generator-controlled provenance (35 packages, 277 subpaths, 7,949 symbols), restoring the two lifecycle exports absent from main's corpus. This slice contains generator output and evidence only. No handwritten product implementation, fresh-ui lock change, or new debt. Reconcile: S1-S4 pushed; mandatory exact-head independent evaluation follows this source-final commit.

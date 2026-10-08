@@ -28,3 +28,8 @@ EXIT deno task arch:check 0
 EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all packages/fresh/src/runtime/streams/stream-db-recovery-adapter_test.ts packages/fresh/src/runtime/streams/create-stream-db_test.ts 0
 EXIT deno task quality:scan 0
 EXIT deno task arch:check 0
+EXIT deno run --no-lock --allow-read --allow-write --allow-env --allow-run .llm/tools/docs/generate-export-surface-corpus.ts 0
+EXIT deno task gen:publish-assets 0
+EXIT deno run --no-lock --allow-read --allow-env --allow-run .llm/tools/docs/generate-export-surface-corpus.ts --check 0
+EXIT deno task check:publish-assets 0
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts 0
