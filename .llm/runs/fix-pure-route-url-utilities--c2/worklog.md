@@ -151,3 +151,7 @@ Gate `doc-review-cli-jsr`: raw exit `0`. Command: `deno run --frozen --allow-rea
 Gate `doc-review-cli-publish`: raw exit `0`. Command: `deno task --cwd packages/cli publish:dry-run`. Full raw output retained privately.
 
 S8 canonical source qualification: gen:agent-docs-prose from clean committed S7 and existing CLI carrier generation change exactly route page plus llms-full aggregate; all182 keys retained, every other page byte-identical. Canonical freshness,8existing generator/embedded tests, export freshness, quality/architecture and owning CLI doc/JSR/raw dry publication pass. Initial carrier rawexit1 reflects expected uncommitted canonical delta and is retained; require committed carrier next. No new tests or runtime/export/dependency/source behavior change. Mandatory independent bounded amendment IMPL next.
+
+Gate `doc-review-carrier-committed`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+S8 committed carrier check exitszero at ded106152; exactly182 keys and2 changed content entries (pages/web-layer/route/index.md, llms-full.txt). Private comparison initially used source-page aliases instead of canonical extracted filenames; corrected comparison confirms intended exact delta, no additional regeneration/source change. All bounded gates complete. S9 independent Google Gemini fresh exact-head doc-review-evaluate.md review next, source/branch frozen until processexit. Original source/browser/carrier reports preserved.
