@@ -3,6 +3,7 @@ import type { AnyRouter } from '@orpc/server';
 import {
   createDesktopBindServerPort,
   DEFAULT_DESKTOP_RPC_BINDING,
+  DESKTOP_BIND_RESULT_STATUSES,
   DESKTOP_RPC_JSON_SERIALIZERS,
 } from '@netscript/sdk/desktop';
 import { DESKTOP_RPC_BINDING_STATUSES, DESKTOP_RPC_DISABLED_REASONS } from './constants.ts';
@@ -63,14 +64,41 @@ export function bindDesktopRpcWindow(
   if (bindingName.trim().length === 0) {
     throw new TypeError('Desktop binding name must not be empty');
   }
-  const server = createDesktopBindServerPort();
   const handler = new RPCHandler<Record<PropertyKey, unknown>>(options.router, {
     customJsonSerializers: DESKTOP_RPC_JSON_SERIALIZERS,
   });
-  handler.upgrade(server.port, { context: options.context });
+  const createServer = () => {
+    const next = createDesktopBindServerPort();
+    handler.upgrade(next.port, { context: options.context });
+    return next;
+  };
+  let server = createServer();
+  let documentEpoch: number | undefined;
+  let isClosed = false;
+  const closedResult = { status: DESKTOP_BIND_RESULT_STATUSES.CLOSED };
 
   try {
-    options.window.bind(bindingName, server.handler);
+    options.window.bind(bindingName, async (operation, payload, epoch): Promise<unknown> => {
+      if (isClosed) {
+        return closedResult;
+      }
+      if (epoch !== undefined) {
+        if (typeof epoch !== 'number' || !Number.isFinite(epoch) || epoch <= 0) {
+          throw new TypeError('Desktop document epoch must be finite and positive');
+        }
+        if (documentEpoch !== undefined && epoch < documentEpoch) {
+          return closedResult;
+        }
+        if (documentEpoch !== undefined && epoch > documentEpoch) {
+          server.close();
+          server = createServer();
+        }
+        documentEpoch = epoch;
+      }
+      // Capture the logical slot before an awaited RECEIVE can span a reload.
+      const current = server;
+      return await current.handler(operation, payload);
+    });
   } catch (error) {
     server.close();
     throw error;
@@ -84,8 +112,12 @@ export function bindDesktopRpcWindow(
       if (closePromise !== undefined) {
         return closePromise;
       }
+      isClosed = true;
       server.close();
-      closePromise = Promise.resolve(options.window?.unbind?.(bindingName)).then(() => undefined);
+      // Assign before calling unbind, including a synchronous throw or reentrant cleanup.
+      closePromise = Promise.resolve().then(() => options.window?.unbind?.(bindingName)).then(
+        () => undefined,
+      );
       return closePromise;
     },
   };
