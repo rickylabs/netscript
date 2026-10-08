@@ -1,0 +1,25 @@
+{
+  "headBeforeRepair": "108b6930f455a2023e3abb7dbb2c91ab46380e6d",
+  "historicalIndependentPassProductHead": "e64c841bc9c1a9f967afa357b54f454445807db8",
+  "historicalEvaluatorSha256": "83d3f9b63cc78ed88e30f9767415ea7f4a63d64885189217744c1be4a3f80837",
+  "historicalC1ProductHashesUnchanged": true,
+  "sourceFiles": [
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "81453e4fe24855516b3f0309490cf71b0665efbde3150c264b0d07bb3d46f80e"
+    },
+    {
+      "path": "packages/fresh-ui/deno.json",
+      "sha256": "8e59d60854710622a9db6919a52f4ed69f6cc40e36bdef63880039d696ce8225"
+    },
+    {
+      "path": ".github/workflows/fresh-ui-quality.yml",
+      "sha256": "6d9e1c6f3fd2bec5a3cd4b886abba4c3ca73f6e15a1ad68c2e82b07c1a8d55d3"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "75404ed4a3b7733c6311b926ea0438686754e3caa2df6c82581f1479de964aa4"
+    }
+  ],
+  "evaluationState": "Historical PASS retained for original product head; repaired head pending same-session reevaluation after supervisor signoff."
+}

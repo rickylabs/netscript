@@ -112,6 +112,7 @@ during construction, before the first request.
 | Entry         | What it gives you                                                                     |
 | ------------- | ------------------------------------------------------------------------------------- |
 | `.`           | `baseContract`, procedure metadata, error + pagination schemas, schema factories      |
+| `./commands`  | Opt-in command error schemas/map, `commandBaseContract`, typed routes and safe error mapping |
 | `./crud`      | `createCrudContract`, `createReadOnlyContract`, `createListOnlyContract`              |
 | `./query`     | Filter/search schemas, `buildPrismaWhere`, `createPaginatedOutput`, cursor pagination |
 | `./transform` | `createTransformer`, `composeTransformers`, pick/omit transformer factories           |
@@ -148,3 +149,37 @@ new field name with deprecation guidance or a semver-major release.
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
+
+## Opt-in command contracts
+
+Import `commandBaseContract` from `@netscript/contracts/commands` for a command route. It preserves
+`BaseContractMeta` and the six base codes, adding exactly `COMMAND_CONFLICT`,
+`IDEMPOTENCY_KEY_REUSE` and `COMMAND_IN_PROGRESS`. Ordinary `baseContract` routes retain the base
+vocabulary. The focused subpath requires no permissions and imports no service implementation.
+
+```typescript
+import { commandBaseContract } from '@netscript/contracts/commands';
+import { z } from 'zod';
+
+const updateItem = commandBaseContract
+  .route({ method: 'POST', path: '/items/update' })
+  .meta({ access: { authentication: 'required' }, policy: { cache: 'no-store' } })
+  .input(z.object({ id: z.string(), version: z.number().int() }))
+  .output(z.object({ updated: z.boolean() }));
+```
+
+| Code | HTTP status | Safe data |
+| --- | --- | --- |
+| `COMMAND_CONFLICT` | 409 | `kind: 'optimistic_conflict'`, `retryable: false` |
+| `IDEMPOTENCY_KEY_REUSE` | 409 | `kind: 'idempotency_key_reuse'`, `retryable: false` |
+| `COMMAND_IN_PROGRESS` | 409 | `kind: 'in_progress'`, `retryable: true`, optional nonnegative integer `retryAfterMs` |
+
+Use `CommandContractRoute<InputSchema, OutputSchema>` or `CommandContractOutputRoute<OutputSchema>`
+to annotate exported routes. `CommandErrorMap` and `CommandContractErrors` preserve code, status,
+message and data-schema literals through service clients and the SDK's `safe()`/`isDefinedError()`.
+
+Inside an implementing handler, `throwCommandContractError(error, errors)` maps only a structurally
+validated `.failure` containing one of the three safe payloads above. Extra fields, malformed
+retry hints and non-client command failures are rethrown unchanged for the application's existing
+validation/internal/service-unavailable handling. Business errors preserve their identity. The
+helper never forwards an error message, cause, request identity or operational detail.
