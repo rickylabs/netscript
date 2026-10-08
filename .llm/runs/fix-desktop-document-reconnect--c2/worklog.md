@@ -115,3 +115,5 @@ Verified required baseline; read owner harness, skills, retrieval order, run loo
 Public close(): Promise<void> unchanged; one terminal isClosed state and one shared close promise. Existing window unbind port remains synchronous invocation with async completion. Use native Promise.withResolvers; no abstraction or constants added. Slices: main merge; each asset generator commit; F1 runtime/test and mutation; independent evaluation; closeout. Adjacent desktop test is contributor path. Nonblocking review suggestions and published acceptance deferred.
 
 Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
+
+Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
