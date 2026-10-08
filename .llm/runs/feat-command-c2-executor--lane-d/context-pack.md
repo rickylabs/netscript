@@ -1,3 +1,23 @@
+# Current C2 checkpoint — independent evaluation PASS
+
+Independent Google PASS evaluates exact head `c177087fa175e51f19290150801da1db7d6812de`; actual conversation `61390913-370d-41e0-a133-50881e888cef`. Three actual turns retain the same verdict; later turns correct report facts only. Original reports are byte-exact, all evaluated tracked bytes unchanged, no product repair. Requested model/effort remain unattested exact runtime settings. Read `evaluate.md`, `evaluation-provenance.json`, `evaluated-head-ci-evidence.json` and `evaluation-supervisor-review.md`.
+
+| Phase | Current evidence/state |
+| --- | --- |
+| Bootstrap | Complete; owner-authorized complex C2 run and separate vendor family |
+| Research | Complete; fresh main, live issue/comments, MCP and package/publish baseline |
+| Plan & Design | Locked S4–S6 under the whole-chain plan; reviewed bounded slices |
+| Plan-Gate | Independent whole-chain PASS359d17f before implementation |
+| Implement | Complete signed S4/S5/S6 and reviewed native prerequisite/asset waves |
+| Gate | Completed-tree local qualification and evaluated-head full technical CI PASS; artifact-head CI pending |
+| Evaluate | Independent PASS at exactc177; three same-conversation report turns preserved |
+| Release | Root report/acceptance/CI reconciliation pending; owner forbids PR merge/publication |
+| Close | Final leaf handoff pending current ready/live close-gate; owner merge remains outstanding |
+
+Root signs an artifact-only reconciliation. Current head technical CI and live five-clause acceptance/close-gate must be observed before C2 is ready and C3 is released. No PR merge, force push, waiver, source change, new test or later-leaf implementation.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — predecessor ancestry APPROVED
 
 Root independently verifies6frozen files/95raw hashes/2temporary indexes and reproduces the exact candidate tree `a448793af72b9c5ee103a544003a35acc51775f9`, identical to signed65b C2 across6,245entries. Current predecessor8b is incorporated by ordinary local integration with the five exact already signed C2 asset blobs. The8file run-only signoff changes no product/source/generated/tool/lock/workflow bytes; prior native qualification remains applicable. No PR merge, rebase or force push.

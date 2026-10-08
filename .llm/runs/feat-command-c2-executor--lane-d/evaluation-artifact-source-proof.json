@@ -1,0 +1,27 @@
+{
+  "evaluatedHead": "c177087fa175e51f19290150801da1db7d6812de",
+  "trackedBaselineFiles": 6248,
+  "artifactOnlyAllowedPaths": [
+    ".llm/runs/feat-command-c2-executor--lane-d/context-pack.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluate-round-1.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluate-round-2.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluate-round-3.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluate.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluated-head-ci-evidence.json",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluation-provenance.json",
+    ".llm/runs/feat-command-c2-executor--lane-d/evaluation-supervisor-review.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/phase-registry.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/supervisor.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/worklog.md"
+  ],
+  "changedExistingPaths": [
+    ".llm/runs/feat-command-c2-executor--lane-d/context-pack.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/phase-registry.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/supervisor.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/worklog.md"
+  ],
+  "allOtherTrackedBytesStable": true,
+  "independentReportByteExact": true,
+  "historicalRound1And2ByteExact": true,
+  "productSourcesAssetsTestsToolsLocksWorkflowsUnchanged": true
+}
