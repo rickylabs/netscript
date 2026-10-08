@@ -74,11 +74,13 @@ export function createJobHandlerDefinition<TPayload, TResult = unknown>(
 ): JobHandlerDefinition<TPayload, TResult> {
   const definition = Object.assign(
     async (context: JobContext<TPayload, TResult>): Promise<JobResult<TResult>> => {
+      context.signal.throwIfAborted();
       const payload = await validateJobPayload(
         payloadSchema,
         context.payload,
         context.job?.id ?? context.id,
       );
+      context.signal.throwIfAborted();
       return await handler({ ...context, payload });
     },
     { payloadSchema },

@@ -205,8 +205,16 @@ const secondPage = { page: 2 };
 <ordersRoute.Link path={openOrders} search={secondPage}>Page 2</ordersRoute.Link>;
 ```
 
-The `search` argument accepts an object *or* a function of the base state, which is what makes
-relative moves (`page + 1`) expressible without threading the current page into the call.
+`href()` and `getLinkProps()` are hook-free and use arguments plus schema defaults. For current
+search, call the page hook at the component's top level and pass its result:
+
+```tsx
+const current = ordersPage.hooks.useSearch();
+const nextPage = ordersRoute.href({
+  path: { status: 'open' },
+  search: { ...current, page: current.page + 1 },
+});
+```
 
 Two behaviours here surprise people, and both follow from the schema being authoritative:
 
@@ -217,10 +225,9 @@ Two behaviours here surprise people, and both follow from the schema being autho
 including the derived `offset` and an empty `sortBy`. A contract whose schema is small produces
 short URLs; that is the lever.
 
-**`preserveSearchParams: true` only preserves inside the matching route.** It substitutes the current
-request's parsed search for the defaults, but only when the rendering page's route pattern equals
-the target's. Linking to a *different* route with the flag set falls back to that route's defaults —
-which is correct, since the two routes' search schemas need not share a single field.
+**Preservation requires a hook or component.** Only bound `Link` and
+`page.hooks.useRoute().getLinkProps` honor `preserveSearchParams`. A different route uses its defaults.
+Pure helpers still accept the flag but ignore it; migrate by passing current `search` as above.
 
 Link props also default `f-client-nav` to `true`, so a reference-built anchor participates in Fresh
 client navigation unless you opt out.
@@ -329,7 +336,8 @@ returning both plus the `f-partial` attribute Fresh uses to drive partial naviga
 params are supplied once and applied to both sides, with `partialPath`, `partialSearch`, and
 `partialPreserveSearchParams` for the cases where the partial's params legitimately differ.
 
-The partial on the other end of that link is [Partials](/web-layer/partials/).
+Paired helpers also ignore preservation flags; pass `search` and `partialSearch` explicitly.
+See [Partials](/web-layer/partials/) for the receiving route.
 
 ## What to watch for
 

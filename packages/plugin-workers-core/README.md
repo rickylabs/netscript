@@ -46,6 +46,31 @@ flowchart LR
     P --> K["KV-backed adapters<br/>(production)"]
 ```
 
+## Job cancellation and deadlines
+
+Every dispatched job handler receives `context.signal` and, when a job timeout or an explicit
+dispatch deadline is configured, `context.deadlineAt` in epoch milliseconds. The effective deadline
+is the earlier of the dispatch deadline and dispatch time plus `job.timeout`. Pass the signal to
+provider requests and other cancellable operations; use `signal.throwIfAborted()` at work
+boundaries.
+
+The first abort reason wins: `TimeoutError` means the deadline elapsed, `ShutdownError` means the
+runner began draining, and `AbortError` means caller cancellation. Dispatch accepts an optional
+parent signal while the runner supplies an isolated signal to each handler. A pre-aborted parent or
+expired deadline prevents handler invocation. Timeout and grace values must be finite and
+nonnegative; an explicit deadline must be finite epoch milliseconds.
+
+`InProcessJobRunner.stop()` stops admission, aborts active handlers immediately and waits for
+cleanup. `abortGracePeriodMs` defaults to 1000 milliseconds. After that grace the runtime stops
+waiting and rejects the dispatch; a handler cannot turn cancellation into successful completion.
+This runner executes JavaScript in process, so it cannot physically terminate a handler that ignores
+the signal, and CPU-blocking code can delay timers. Deadlines, grace timers and parent listeners are
+disposed when dispatch settles. Late calls to `reportProgress` reject after abort.
+
+Once a release contains this executor-driven signal and deadline, EIS's `createJobAbortScope`
+deadline/parent-signal workaround can be removed for job handlers. Source qualification alone does
+not establish that released-consumer deletion condition.
+
 ## Install
 
 ```bash
