@@ -1,0 +1,15 @@
+# Plan
+
+Issue #2040. Archetype: ARCHETYPE-2-integration + SCOPE-frontend. Scope: Pure typed route URL construction and explicit current-search hooks in Fresh. Existing doctrine/debt applies; no new abstraction or package is planned.
+
+Locked decision: D1 Pure URL helpers: getBoundLinkProps is an ordinary function passing null context to the existing validated URL builder. This repairs route.href, paired href/partialHref/getLinkProps together without duplicating route construction. No hook invocation or try/catch in utilities. Link calls a directly named useNavigationContext hook during component render; required hooks remain explicit. D2 Explicit search: existing useCurrentSearch(target) supplies current parsed values to pure href/getLinkProps; existing usePageRoute().getLinkProps captures its hook context once and supports preserveSearchParams. Pure helpers use schema defaults regardless of the context flag; retain input types and document migration. D3 Regression: adjacent pure-hook instrumentation and SSR paired/schema/encoding tests plus real production Fresh fixture: memoized send/read href before state/callback and native TanStack useChat, conditional/variable links, rerender/unmount, state identity, current search, A-to-B repeated back/forward navigation and live resume, no browser errors. Every new test has a causal source mutation and restored pass. D4 Gates: Fresh full unit suite, frozen scoped check/type fixtures/lint/fmt, quality/architecture, JSR/public dry-run, baseline per-entrypoint doc comparison if required, native production SSR/browser and generated carrier/corpus freshness. No release/scaffold/CLI changes, release gates N/A. Owner publication and qualified published consumer remain necessary; Refs #2040 until all acceptance including publication exists. EIS router href-to-nav.makeHref facade becomes removable after qualification. Workload feature capped by absent privileged-row authority; decision-heavy implicit-search semantics require selected independent PLAN-EVAL before implementation.
+
+Gates: structured scoped check/test/lint/fmt; mutation proof for every new regression; cold consumer evidence where dependency resolution changes; quality:scan, arch:check and JSR public/publish audit for changed packages. Runtime gates follow the selected archetype. No release cut or merge.
+
+PLAN-EVAL: Selected: implicit-search migration, paired helpers and production hook/navigation acceptance require independent PLAN-EVAL before source changes; workload capped at feature.
+
+Slices: S1 bootstrap/design; S2 issue-specific implementation and regression/mutation gates; S3 independent review/evaluation evidence.
+
+Risk: published-consumer acceptance depends on a coordinated release containing the fix. Do not claim shipment before that receipt exists. Defer only owner release acceptance, not source behavior or required tests.
+
+Open decisions: none unless findings change the contract; record and obtain PLAN-EVAL before implementing any changed material design.
