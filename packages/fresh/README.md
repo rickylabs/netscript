@@ -289,6 +289,13 @@ types.
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
 
+
+Desktop RPC keeps one native binding per window. With the matching SDK desktop adapter, a new
+browser document automatically retires its previous MessagePort before opening a new oRPC channel.
+Older document callbacks cannot close the replacement. Application shutdown still calls the binding's
+idempotent `close()` method. Custom two-argument invoke adapters keep their existing lifecycle;
+automatic document reconnection requires the coordinated SDK and Fresh release.
+
 ### StreamDB recovery
 
 The default `createNetScriptStreamDB` handle starts with `await db.preload?.()`.

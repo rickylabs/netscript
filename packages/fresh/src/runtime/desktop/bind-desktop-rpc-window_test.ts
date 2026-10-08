@@ -1,7 +1,7 @@
 import { assertEquals, assertInstanceOf, assertRejects, assertThrows } from '@std/assert';
 import { ORPCError, os } from '@orpc/server';
 import { createDesktopServiceClient } from '@netscript/sdk/desktop';
-import type { DESKTOP_BIND_OPERATIONS, DesktopBindingHandler } from '@netscript/sdk/desktop';
+import type { DESKTOP_BIND_OPERATIONS } from '@netscript/sdk/desktop';
 import { bindDesktopRpcWindow } from './bind-desktop-rpc-window.ts';
 import { DESKTOP_RPC_BINDING_STATUSES, DESKTOP_RPC_DISABLED_REASONS } from './constants.ts';
 import type { DesktopBindableWindow } from './types.ts';
@@ -9,12 +9,14 @@ import type { DesktopBindableWindow } from './types.ts';
 const DESKTOP_RUNTIME = { BrowserWindow: class BrowserWindow {} };
 
 class TestDesktopWindow implements DesktopBindableWindow {
-  handler: DesktopBindingHandler | undefined;
+  handler:
+    | ((operation: unknown, payload?: unknown, epoch?: unknown) => Promise<unknown>)
+    | undefined;
   bindCalls = 0;
   unbindCalls = 0;
   bindingName: string | undefined;
 
-  bind(name: string, handler: DesktopBindingHandler): void {
+  bind(name: string, handler: NonNullable<TestDesktopWindow['handler']>): void {
     this.bindCalls += 1;
     this.bindingName = name;
     this.handler = handler;
@@ -29,16 +31,71 @@ class TestDesktopWindow implements DesktopBindableWindow {
   async invoke(
     operation: typeof DESKTOP_BIND_OPERATIONS[keyof typeof DESKTOP_BIND_OPERATIONS],
     payload?: string | Uint8Array,
+    epoch?: unknown,
   ): Promise<unknown> {
     if (this.handler === undefined) {
       throw new Error('Desktop binding is not registered');
     }
-    return await this.handler(operation, payload);
+    return await this.handler(operation, payload, epoch);
   }
 }
 
 const noopRouter = os.router({
   ping: os.handler(() => 'pong'),
+});
+
+Deno.test('close unbinds synchronously and preserves a same-name replacement', async () => {
+  const window = new TestDesktopWindow();
+  const options = { window, router: noopRouter, context: {}, runtime: DESKTOP_RUNTIME };
+  const original = bindDesktopRpcWindow(options);
+  let replacement: ReturnType<typeof bindDesktopRpcWindow> | undefined;
+  try {
+    const closing = original.close();
+    assertEquals(window.unbindCalls, 1);
+    assertEquals(window.handler, undefined);
+    replacement = bindDesktopRpcWindow(options);
+    const replacementHandler = window.handler;
+    await closing;
+    assertEquals(window.handler, replacementHandler);
+    assertEquals(window.bindCalls, 2);
+    const client = createDesktopServiceClient({
+      contract: noopRouter,
+      invoke: window.invoke.bind(window),
+    });
+    assertEquals(await client.ping(undefined), 'pong');
+  } finally {
+    await original.close();
+    await replacement?.close();
+  }
+  assertEquals(window.unbindCalls, 2);
+});
+
+Deno.test('reentrant close shares pending asynchronous unbind completion', async () => {
+  const window = new TestDesktopWindow();
+  const completion = Promise.withResolvers<void>();
+  const binding = bindDesktopRpcWindow({
+    window,
+    router: noopRouter,
+    context: {},
+    runtime: DESKTOP_RUNTIME,
+  });
+  let reentrant: Promise<void> | undefined;
+  window.unbind = () => {
+    window.unbindCalls++;
+    reentrant = binding.close();
+    return completion.promise;
+  };
+  const closing = binding.close();
+  assertEquals(reentrant, closing);
+  assertEquals(binding.close(), closing);
+  let settled = false;
+  closing.then(() => settled = true);
+  await Promise.resolve();
+  assertEquals(settled, false);
+  completion.resolve();
+  await closing;
+  assertEquals(settled, true);
+  assertEquals(window.unbindCalls, 1);
 });
 
 Deno.test('browser and Aspire capability shapes disable Desktop RPC without binding', async () => {
@@ -190,4 +247,86 @@ Deno.test('procedure failures cross the Fresh binding as typed oRPC errors', asy
   assertEquals(error.name, 'Error');
   assertEquals(typeof error.stack, 'string');
   await binding.close();
+});
+
+Deno.test('new document closes pending receive and rebinds typed RPC without admitting stale calls', async () => {
+  const window = new TestDesktopWindow();
+  const otherWindow = new TestDesktopWindow();
+  const binding = bindDesktopRpcWindow({
+    window,
+    router: noopRouter,
+    context: {},
+    runtime: DESKTOP_RUNTIME,
+  });
+  const other = bindDesktopRpcWindow({
+    window: otherWindow,
+    router: noopRouter,
+    context: {},
+    runtime: DESKTOP_RUNTIME,
+  });
+  const pending = Promise.withResolvers<void>();
+  const retired = Promise.withResolvers<unknown>();
+  let receives = 0;
+  const old = createDesktopServiceClient({
+    contract: noopRouter,
+    invoke: async (op, payload) => {
+      const result = window.invoke(op, payload, 100);
+      if (op === 'receive' && ++receives === 2) {
+        pending.resolve();
+        result.then(retired.resolve, retired.reject);
+      }
+      return await result;
+    },
+  });
+  const isolated = createDesktopServiceClient({
+    contract: noopRouter,
+    invoke: (op, payload) => otherWindow.invoke(op, payload, 100),
+  });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('Document reconnect timed out')), 2000);
+  });
+  const retainedHandler = window.handler;
+  try {
+    await Promise.race([
+      (async () => {
+        assertEquals(await old.ping(undefined), 'pong');
+        await pending.promise;
+        const current = createDesktopServiceClient({
+          contract: noopRouter,
+          invoke: (op, payload) => window.invoke(op, payload, 200),
+        });
+
+        assertEquals(await current.ping(undefined), 'pong');
+        assertEquals(await retired.promise, { status: 'closed' });
+        for (const op of ['send', 'receive', 'close']) {
+          assertEquals(await retainedHandler?.(op, 'stale', 100), { status: 'closed' });
+        }
+        for (const epoch of [-1, 0, NaN, Infinity, 'epoch', null]) {
+          await assertRejects(() => window.invoke('close', undefined, epoch), TypeError);
+        }
+        assertEquals(await current.ping(undefined), 'pong');
+        assertEquals(await isolated.ping(undefined), 'pong');
+        await Promise.all([binding.close(), binding.close()]);
+        assertEquals(await retainedHandler?.('receive', undefined, 300), { status: 'closed' });
+        assertEquals(window.bindCalls, 1);
+        assertEquals(window.unbindCalls, 1);
+        // The same shared cleanup promise includes synchronous unbind failures.
+        otherWindow.unbind = () => {
+          otherWindow.unbindCalls++;
+          throw new Error('unbind failed');
+        };
+        const firstClose = other.close();
+        assertEquals(other.close(), firstClose);
+        await assertRejects(() => firstClose, Error, 'unbind failed');
+        await assertRejects(() => other.close(), Error, 'unbind failed');
+        assertEquals(otherWindow.unbindCalls, 1);
+      })(),
+      deadline,
+    ]);
+  } finally {
+    clearTimeout(timer);
+    await binding.close();
+    await other.close().catch(() => undefined);
+  }
 });
