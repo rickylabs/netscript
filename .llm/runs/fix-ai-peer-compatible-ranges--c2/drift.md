@@ -15,3 +15,5 @@ Refresh root and Fresh UI private lock only required graph edges and preserve un
 B follow-up: npm exact-release peerDependencies can be wrapped in a singleton array; normalize explicitly and fixture covers it. Local mandatory scaffold.runtime failed at infrastructure preflight/cleanup; keep raw failed gate names, no green runtime claim.
 
 Review repair: owner overrides evaluator route to GLM max and authorized Google fallback. Public artifacts omit hostnames, IPs, ports, operator paths, credentials and session identifiers. RTK unavailable; raw exits and structured wrappers used.
+
+Repair evaluator primary GLM produced no verdict in bounded three-minute run; owned evaluator terminated. Owner HARNESS authorizes separate Google fallback. No source mutation.

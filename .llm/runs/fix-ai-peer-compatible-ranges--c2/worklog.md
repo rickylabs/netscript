@@ -280,3 +280,21 @@ Public surface and domain vocabulary remain those of the reviewed feature. Exist
 
 ## Implement — root lock repair
 Started with current main lock. Focused native resolution used the reviewed AI manifests; first check supplied a nonexistent MCP path and exited 1, corrected full AI source/Fresh root wrapper exited 0 (103 files). Native resolution also pruned unused records, so its output was never accepted wholesale. Preserve every main specifier/JSR/npm/remote identity and all 37 workspace members; add only 15 required AI/MCP closure records and five exact AI aliases. Qualify formerly implicit dependency refs where AI adds a second version; main integrity and version pins preserved. Unrelated native peer-record reserialization and unrelated Babel update discarded. Final root has 585 npm records (570 main plus 15 required additions), retains Hono, MCP SDK/Zod4 and conversion/Zod4. No source, manifest or Fresh UI private lock change. Frozen install exit 0. Supervisor reviewed semantic lock diff; no deletion of caches or locks, no force push.
+
+## Gate — exact-source lock repair
+Deno 2.9.5 at da9b3a6670d93912fc86662fe8b04dceced57853.
+
+| Gate | Raw exit | Result |
+| --- | --- | --- |
+| deps-check | 0 | PASS |
+| ai-peers | 0 | PASS |
+| install-frozen | 0 | PASS |
+| fresh-ui-lock | 0 | PASS |
+| owning-check | 0 | PASS |
+| owning-tests | 0 | PASS |
+| quality-gate | 0 | PASS |
+
+AI/Fresh owning tests: 452 passed, 0 failed, 0 ignored. AI peer guard cold graph contains one 0.65.0 core. Main identities/integrities retained after all frozen gates. No public contract/documentation or carrier change; existing review publication and browser/scaffold qualification applies to unchanged source. Mandatory independent exact-head review follows.
+
+## Evaluate / Release / Close — review repair
+Independent evaluator PASS at da9b3a6670d93912fc86662fe8b04dceced57853 in repair-evaluate.md. Release N/A. Supervisor reviewed result and reconciled: Rebuilt root lock from main, retaining all 570 main npm identities and 37 workspace members with unchanged integrity, adding only 15 AI closure records. MCP SDK and zod-to-json-schema remain on Zod 4; deps check, AI peers, frozen install, Fresh UI private lock, frozen owning checks and 452 tests passed. Source unchanged by evidence-only closeout. Final CI/publication remain owner gates.
