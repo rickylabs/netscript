@@ -9,3 +9,5 @@ S6 CI found missing generated prose refresh for approved migration docs; bounded
 Actual review comment4214143837 requires one remaining public migration sentence correction. Same PR; mechanical PLAN N/A. Owner HARNESS-authorized Google Gemini fallback after recorded primary GLM provider stall; separate fresh amendment evaluator required.
 
 Review repair: owner overrides evaluator route to GLM max and authorized Google fallback. Public artifacts omit hostnames, IPs, ports, operator paths, credentials and session identifiers. RTK unavailable; raw exits and structured wrappers used.
+
+Repair evaluator primary GLM produced no verdict in bounded three-minute run; owned evaluator terminated. Owner HARNESS authorizes separate Google fallback. No source mutation.

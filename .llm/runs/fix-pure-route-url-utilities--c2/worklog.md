@@ -174,3 +174,31 @@ Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
 Canonical gen:publish-assets exit 0. Generated carrier reviewed; no hand edits.
 
 Canonical gen:mcp-export-corpus exit 0. Generated carrier reviewed; no hand edits.
+
+## Gate — review repair
+Deno 2.9.5; exact-source gate reports retained privately.
+
+| Gate | Raw exit | Result |
+| --- | --- | --- |
+| check | 0 | PASS |
+| lint | 0 | PASS |
+| fmt | 0 | PASS |
+| tests | 0 | PASS |
+| quality-gate | 0 | PASS |
+| agent-docs-prose | 0 | PASS |
+| assets-barrel | 0 | PASS |
+| publish-assets | 0 | PASS |
+| mcp-export-corpus | 0 | PASS |
+| audit-fresh | 0 | PASS |
+| publish-fresh | 0 | PASS |
+| docs-fresh | 1 | Existing independently accepted baseline debt; raw failure retained |
+| audit-mcp | 0 | PASS |
+| publish-mcp | 0 | PASS |
+| docs-mcp | 1 | Existing independently accepted baseline debt; raw failure retained |
+
+Owning tests: 298 passed, 0 failed, 0 ignored. Independent exact-head evaluation in progress. Release N/A; no source PR merge or publication.
+
+Owning prose/publish/CLI carrier and MCP corpus tests: structured wrapper exit 0, 21 passed. MCP fallback sourceBytes 262100 <= 262144, unchanged budget/path selection; generated docs include corrected pure helper migration.
+
+## Evaluate / Release / Close — review repair
+Independent evaluator PASS at eaebd281e40f48b2f46d554c5bfa1bbfd4adfb87 in repair-evaluate.md. Release N/A. Supervisor reviewed result and reconciled: F1: regenerated all carriers after compacting migration prose; publish freshness passes with 262100 bytes within the unchanged 262144-byte MCP budget. F2: corrected both public preserveSearchParams JSDoc mirrors and paired flags to distinguish contextual Link/useRoute callbacks from pure helpers; 298 Fresh and 21 carrier tests passed. Source unchanged by evidence-only closeout. Final CI/publication remain owner gates.
