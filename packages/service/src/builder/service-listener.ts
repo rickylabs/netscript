@@ -1,10 +1,10 @@
 /**
  * HTTP listener mechanics for the service builder.
  *
- * Owns the `Deno.serve` lifecycle: port resolution, abort-signal bridging, the
- * startup log banner, and the `stop()` teardown contract. Kept separate from the
- * builder class so the listener concern can evolve (e.g. TLS, clustering) without
- * touching the fluent API.
+ * Owns the `Deno.serve` lifecycle: port and bind-hostname resolution, abort-signal
+ * bridging, the startup log banner, and the `stop()` teardown contract. Kept
+ * separate from the builder class so the listener concern can evolve (e.g. TLS,
+ * clustering) without touching the fluent API.
  *
  * Per-request cancellation note (Deno 2.9, denoland/deno#29111): the request
  * handler returns the app's response directly so per-request teardown happens on
@@ -78,7 +78,7 @@ type RegisteredSignal =
  * @param app - The built service app (provides `fetch`).
  * @param serviceName - Service name used for the startup log banner.
  * @param defaultPort - Port to use when `options.port` is absent.
- * @param options - Serve options (port, external abort signal).
+ * @param options - Serve options (port, bind hostname, external abort signal, TLS).
  * @returns The running service handle with address and `stop()`.
  */
 export function startServiceListener(
@@ -90,6 +90,7 @@ export function startServiceListener(
 ): RunningService {
   const serviceLogger = createServiceLogger(serviceName);
   const port = options?.port ?? defaultPort;
+  const hostname = options?.hostname;
   const tls = resolveTlsConfig(options);
   const scheme = tls ? 'https' : 'http';
   const controller = new AbortController();
@@ -110,10 +111,11 @@ export function startServiceListener(
   const handler = (request: Request): Response | Promise<Response> => app.fetch(request);
 
   // Passing `cert`/`key` makes Deno serve HTTPS and auto-negotiate HTTP/2 via
-  // ALPN; the plain-TCP branch keeps the unchanged HTTP/1.1 default.
+  // ALPN; the plain-TCP branch keeps the unchanged HTTP/1.1 default. Both
+  // branches bind the same `hostname`; `undefined` keeps Deno's `0.0.0.0`.
   const server = tls
-    ? Deno.serve({ port, onListen, cert: tls.cert, key: tls.key }, handler)
-    : Deno.serve({ port, onListen }, handler);
+    ? Deno.serve({ hostname, port, onListen, cert: tls.cert, key: tls.key }, handler)
+    : Deno.serve({ hostname, port, onListen }, handler);
 
   const removeListeners = (): void => {
     if (listenersRemoved) return;

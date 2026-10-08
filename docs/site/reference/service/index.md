@@ -90,6 +90,29 @@ construction.
 | `HealthHandlerOptions` | interface | Options for `createHealthHandler`. |
 | `LoggerMiddlewareOptions` | interface | Options for the logger middleware (re-exported from `@netscript/logger/middleware`). |
 
+### Listener bind address
+
+`ServeOptions.hostname` and `DefineServiceOptions.hostname` choose the interface the listener binds.
+The value is forwarded unchanged to `Deno.serve` on both the plain and the TLS listener, and
+`RunningService.addr.hostname` reports the address that was bound. Omitting it keeps Deno's
+default, so the listener binds every IPv4 interface (`0.0.0.0`). Pass `'127.0.0.1'` to keep an
+endpoint, such as an unauthenticated local control surface, reachable only from the same machine.
+
+```ts
+import { createService } from '@netscript/service';
+
+const running = await createService({}, { name: 'control' })
+  .withHealth()
+  .serve({ hostname: '127.0.0.1', port: 0 }); // port 0: the OS picks a free port
+
+console.log(running.addr.hostname); // '127.0.0.1'
+await running.stop();
+```
+
+Generated service scaffolds leave `hostname` unset. Inside a container, a loopback-only bind makes
+the service unreachable through its published ports, so narrow the bind per service, where you know
+who must reach it.
+
 ## Service surface types
 
 | Symbol | Kind | Description |
