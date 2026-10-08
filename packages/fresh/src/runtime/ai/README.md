@@ -75,6 +75,7 @@ same `projectChatSnapshot` applied to the same session log.
 | `resolveChatSnapshot`           | function | Seed snapshot for SSR / first paint; routes through `projectChatSnapshot`.                     |
 | `projectChatSnapshot`           | function | The single projection reducer (`messages → { messages, renderParts }`). FB2 imports this.      |
 | `NetScriptChatSessionTarget`    | type     | Addresses one session: `{ sessionId, baseUrl?, headers? }`.                                    |
+| `NetScriptChatSendMessage`      | type     | Complete native UI parts or Model content, forwarded unchanged by `send`. |
 | `NetScriptChatMessage`          | type     | Projected message: `{ id, role, content }`.                                                    |
 | `RenderPart`                    | type     | Minimal renderable unit (`text` \| `tool` card) emitted by the reducer. FB2 widens it.         |
 | `NetScriptChatSnapshot`         | type     | `{ messages, renderParts, offset }` — the reducer's output plus the replay cursor.             |
@@ -226,3 +227,17 @@ export const streamHandler = createNetScriptChatStreamProxy({
 Seed (`resolveChatSnapshot`) and live (`createNetScriptChatConnection.subscribe`)
 share `projectChatSnapshot`, so tool cards rendered on first paint survive the
 first live chunk unchanged — the ONE-PROJECTION LAW in practice.
+
+
+## Complete client sends
+
+`connection.send(messages, data, signal)` accepts native UI messages with `parts` and
+native Model messages with `content`. Attachments, images, tool calls/results,
+reasoning, metadata and application fields pass unchanged to the existing durable
+transport. `data` is forwarded as supplied; the caller signal is linked with connection
+disposal. Sending does not open another subscription: logical readers continue sharing
+one physical stream through the existing subscription hub.
+
+`NetScriptChatSendMessage` owns the structural transport boundary, with opaque native
+parts. `NetScriptChatMessage` remains the reduced snapshot/rendering projection;
+`toNetScriptChatResponse` still converts its intentional reduced `newMessages` input.
