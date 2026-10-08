@@ -1,9 +1,10 @@
-import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
+import { assertEquals, assertInstanceOf, assertRejects, assertThrows } from '@std/assert';
 import type { SupportedMessagePort } from '@orpc/client/message-port';
 import {
   createDesktopBindClientPort,
   createDesktopBindServerPort,
   DesktopBindingProtocolError,
+  resolveDesktopBindingInvoke,
 } from '../../src/desktop/adapters/bind-channel.ts';
 import {
   DESKTOP_BIND_OPERATIONS,
@@ -163,5 +164,67 @@ Deno.test('queued runtime frames preserve FIFO order', async () => {
     assertEquals(await server.handler(DESKTOP_BIND_OPERATIONS.RECEIVE), 'second');
   } finally {
     server.close();
+  }
+});
+
+Deno.test('default native invoke captures one document epoch without changing explicit invoke', async () => {
+  const originalBindings = Object.getOwnPropertyDescriptor(globalThis, 'bindings');
+  const originalPerformance = Object.getOwnPropertyDescriptor(globalThis, 'performance');
+  const calls: unknown[][] = [];
+  let reads = 0;
+  const proxy = new Proxy({}, {
+    get(_target, name) {
+      if (name === 'rpc') {
+        return (...args: unknown[]) => {
+          calls.push(args);
+          return 'ok';
+        };
+      }
+      return undefined;
+    },
+  });
+  Object.defineProperty(globalThis, 'bindings', { configurable: true, value: proxy });
+  Object.defineProperty(globalThis, 'performance', {
+    configurable: true,
+    value: {
+      get timeOrigin() {
+        reads++;
+        return 100;
+      },
+    },
+  });
+  try {
+    const invoke = resolveDesktopBindingInvoke('rpc');
+    await invoke(DESKTOP_BIND_OPERATIONS.SEND, 'frame');
+    await invoke(DESKTOP_BIND_OPERATIONS.RECEIVE);
+    await invoke(DESKTOP_BIND_OPERATIONS.CLOSE);
+    assertEquals(reads, 1);
+    assertEquals(calls, [['send', 'frame', 100], ['receive', undefined, 100], [
+      'close',
+      undefined,
+      100,
+    ]]);
+    for (const epoch of [0, -1, NaN, Infinity]) {
+      Object.defineProperty(globalThis, 'performance', {
+        configurable: true,
+        value: { timeOrigin: epoch },
+      });
+      assertThrows(() => resolveDesktopBindingInvoke('rpc'), TypeError);
+    }
+    const explicitCalls: unknown[][] = [];
+    const explicit = createDesktopBindClientPort({
+      invoke: (...args) => {
+        explicitCalls.push(args);
+        return Promise.resolve({ status: 'closed' });
+      },
+    });
+    await explicit.closed;
+    assertEquals(explicitCalls, [['receive']]);
+    assertEquals(calls.length, 3);
+  } finally {
+    if (originalBindings) Object.defineProperty(globalThis, 'bindings', originalBindings);
+    else Reflect.deleteProperty(globalThis, 'bindings');
+    if (originalPerformance) Object.defineProperty(globalThis, 'performance', originalPerformance);
+    else Reflect.deleteProperty(globalThis, 'performance');
   }
 });

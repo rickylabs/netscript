@@ -86,7 +86,7 @@ export function normalizeDesktopBindingError(value: unknown): Error {
   return new Error('Deno Desktop binding failed', { cause: value });
 }
 
-/** Resolve a named function from Deno Desktop's dynamic webview `bindings` proxy. */
+/** Resolve a native binding and stamp its calls with this document's captured epoch. */
 export function resolveDesktopBindingInvoke(bindingName: string): DesktopBindingInvoke {
   const resolvedName = validateBindingName(bindingName);
   const bindings: unknown = Reflect.get(globalThis, 'bindings');
@@ -98,8 +98,13 @@ export function resolveDesktopBindingInvoke(bindingName: string): DesktopBinding
     throw new DesktopBindingUnavailableError(resolvedName);
   }
 
+  const documentEpoch = performance.timeOrigin;
+  if (!Number.isFinite(documentEpoch) || documentEpoch <= 0) {
+    throw new TypeError('Desktop document epoch must be finite and positive');
+  }
+
   return async (operation, payload): Promise<unknown> => {
-    const args: readonly unknown[] = payload === undefined ? [operation] : [operation, payload];
+    const args: readonly unknown[] = [operation, payload, documentEpoch];
     const result: unknown = Reflect.apply(binding, bindings, args);
     return await Promise.resolve(result);
   };
