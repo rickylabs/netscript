@@ -25,3 +25,9 @@ PLAN-EVAL: Selected: hard stop until independent PLAN-EVAL PASS; multiple owning
 ## Design details
 
 Public surface: unchanged SDK collection and Fresh query/factory APIs; additive optional native StreamDB preload/close on existing owned handle. Domain vocabulary: exact supported DB family and complete resolved npm identity; worker execution schema fixture; source Collection/subscriber lifecycle. Ports: existing NetScriptStreamDB and SDK query client/collection only; no new ports/classes/packages. Constants: supported versions only in owning manifests/catalog, test fixture witnesses qualified immutable family. Slices/files/gates locked in plan D1-D4/S2-S5. Contributor path: owning manifest update -> cold guard -> adjacent factory integration and production fixture -> independent source/publication consumer qualification. Deferred: coordinated release and exact published consumer, no source regression deferred. PLAN-EVAL selected and hard stop before any source implementation.
+
+Gate `baseline-doc-sdk`: raw exit `1`. Command: `deno task doc:lint --root packages/sdk`. Full raw output retained privately.
+
+Gate `baseline-doc-fresh`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
+
+Phase 4 Plan-Gate complete: independent GLM max PLAN-EVAL PASS at 3ecd0c25729c5cc98dee3ebca2b9daf24781caea; mandatory hard stop satisfied before source. Refined S2-S5 authoritative. Phase 5 implementation begins after evaluator termination.
