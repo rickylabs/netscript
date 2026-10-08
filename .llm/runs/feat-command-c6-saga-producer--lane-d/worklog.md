@@ -1,0 +1,19 @@
+# C6 worklog
+
+## Design
+
+Public flow: defineTask(id).payload(selectedSchema).handler(...).build(); workerJobEffect(definition, NoInfer payload, options) / workerTaskEffect(...) in integration/workers; defineSaga(id).durableWorkerCommands().state(...).on(...).build(); runtime registration requires explicit SagaTransitionCommitPort. A named createPrismaSagaTransitionStore consumes the true provider callback and a focused bound database outbox writer. No new saga relay.
+
+Vocabulary: WorkerCommandEffect / SagaTransitionEffect, selected worker schema, SagaTransitionCommitRequest/Result/Port, expected/next version, immutable raw StoredCommandOutbox intents, hashed inbound replay identity, existing saga lifecycle/status constants and worker-job/worker-task finite effect kind constants, versioned saga-worker namespace. Preserve original handler ordinals before removing worker effects from legacy dispatch. Existing send/compensation semantics stay legacy.
+
+Ports: existing SagaStorePort read/legacy paths; explicit atomic capability with same_commit guarantee; actual TransactionClientPort<PostgresCommandClient>; database-owned bound appendOutbox; existing C5 relay and checked WorkerCommandClientPort, existing worker native execution/progress and checked SagaPublisherPort. Clocks/IDs/relay policy remain their current owners. No composition-time resources, hidden timers or global queues. AbortSignal checked around schema/provider boundaries; C5 owns dispatch cancellation/drain.
+
+Slices: S15 worker task schema/type continuity + distinct immutable effects (worker builder/domain/public + saga integration/effect domain + tests/docs; <30 files). S16 opt-in definition/capability + memory atomic store/conformance and refusal (ports/domain/builder/runtime/testing + tests/docs; <30). S17 engine producer/precommit validation/stable identity/replay handling (runtime/application/integration + tests; <30). S18 focused database writer + true Prisma atomic store/reviewed schema/migration/physical fixture (database/saga stores/fixture/gate workflow/docs; <30). S19 actual C5 recovery/cohort consumer faults (consumer fixture/native wrapper/gate; <30). S20 native progress/checked completion example, public inventories/dependencies/pinned generation and whole-runtime qualification (example/fixture/docs/assets; <30).
+
+Risks: schema inference widening (NoInfer and compiler fixtures); false atomicity/root handle (physical generated-client callback and root negative control); eager replay suppression (atomic marker plus failed-message retry); initial/stale version races (exclusive absent-row CAS); mutable/invalid rows (precommit schema/codec/copy validation); duplicate effect (same stable identity with downstream idempotent persistence); unavailable unmerged predecessor (actual immutable external test pin, no product copy); publication slow/private types (complete recursive manifests and isolated/publication checks); legacy documentation debt (retain baseline truth, no false full-map green).
+
+Deferred: broader Prisma SagaIdempotencyPort parity, other providers, KV command outbox, schedule/compensation worker-command effects, generators owned by later command stages, release/version bumps, product concepts. Contributor path: integration/workers constructors -> worker effect vocabulary -> producer serialization -> SagaTransitionCommitPort -> named memory/Prisma adapters -> public consumer/fault fixture. Existing C5 owns all relay extension and lifecycle behavior.
+
+## Bootstrap / Research / Plan / Plan-Gate
+
+Fresh baseline 881d25e8c; C5 READY at 1a93a6acb. Issue/comments and native guidance consulted, doctrine/gate profiles and existing debt reviewed. Research/Design complete before product work. Approved whole-chain PLAN-EVAL PASS reused; no new evaluator run. No product/test file changed, no implementation verdict or readiness claim. Actual raw gates and operational receipts stay in private project runs.

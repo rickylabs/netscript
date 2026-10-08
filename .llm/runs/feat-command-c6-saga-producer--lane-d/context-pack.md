@@ -1,0 +1,3 @@
+# C6 context
+
+Activated directly from main 881d25e8c after C5 READY. Branch feat/command-c6-saga-producer; issue #1932, S15–S20, locked decisions 13–15. Whole-chain independent PLAN-EVAL PASS reused. Research/Design and explicit validation/replay/predecessor drift recorded. Draft PR opens with bootstrap commit before implementation. Next: RED-first S15 task schema continuity and immutable selected-definition effects, then ordered atomic store/engine/provider/C5 consumer/native progress-completion gates. Every named new test requires a meaningful production assertion mutant/restoration. No product work, IMPL-EVAL or READY yet; no merge/force push.

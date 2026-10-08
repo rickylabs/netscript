@@ -1,0 +1,3 @@
+# C6 supervisor
+
+Requested generator: gpt-6.1-sol high, OpenAI. Branch feat/command-c6-saga-producer. Current-main baseline 881d25e8c05b2546a080edc624857e0762b8db24. Complex tier explicitly owner-authorized 2026-10-07 because EIS Chat is blocked; BRIEF-D4 resumes work alone and headless. No implementation delegation. Separate-family IMPL-EVAL requires native GLM 5.3 Flash max with authorized native Google fallback only on observed unavailability. Fresh leaf context, reused across any repairs; maximum three unsuccessful review rounds. Whole-chain PLAN-EVAL already PASS and explicitly reused. Never merge or force push; operational details remain private.
