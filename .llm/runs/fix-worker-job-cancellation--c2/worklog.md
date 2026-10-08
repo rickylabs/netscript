@@ -167,3 +167,7 @@ Gate `review-fixture-lint`: raw exit `0`. Command: `deno run --frozen --allow-re
 Gate `review-fixture-fmt`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file plugins/workers/tests/cli/runtime-registry-generator_test.ts --file plugins/workers/README.md`. Full raw output retained privately.
 
 Mechanical follow-up slice review: README cancellation contract text unchanged, moved after introduction; required signal added to both generated fixture calls and its local context stub while negative payload @ts-expect-error remains. Existing registry suite and docs tagline plus selected check/lint/fmt exit 0. No production behavior or public-contract changes. Commit clean read set before owning export corpus regeneration.
+
+Gate `review-corpus-regenerate`: raw exit `0`. Command: `deno task gen:mcp-export-corpus`. Full raw output retained privately.
+
+Owning gen:mcp-export-corpus exit 0 from clean committed read set; corpus refreshed for mandatory signal/deadline and documented queue port exports. Generated artifact only; no manual corpus editing. Commit before exercising committed-tree freshness regressions.
