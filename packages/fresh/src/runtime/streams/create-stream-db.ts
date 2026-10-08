@@ -28,6 +28,10 @@ export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = 
 export interface NetScriptStreamDB<TDef extends NetScriptStreamStateDefinition> {
   /** Reactive collections keyed by schema collection name. */
   readonly collections: StreamDB<StateSchema<TDef>>['collections'];
+  /** Consume the initial stream snapshot through the native adapter when available. */
+  readonly preload?: () => Promise<void>;
+  /** Close the native stream connection when available. */
+  readonly close?: () => void;
   /** Optional stop hook exposed by compatible stream DB adapters. */
   readonly stop?: () => void | Promise<void>;
   /** Optional dispose hook exposed by compatible stream DB adapters. */

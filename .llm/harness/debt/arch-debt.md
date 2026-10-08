@@ -2427,3 +2427,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   checks fail on missing hooks; every dependency bump must re-run the native integration and >=1 GiB
   RSS negative-control suites to detect behavioral drift. The bounded recent-boundary cache trades cold historical framing scans for fixed memory without a
   storage migration or persistent index.
+
+## SDK/Fresh — unchanged public documentation baseline during Collection-family qualification
+
+- **ID:** `db-doc-baseline-2039`
+- **Reason:** F-JSR-7 existing public documentation residue predates the exact DB family and additive optional StreamDB lifecycle members. SDK combined doc sweep reports three private references; Fresh combined sweep reports 28 private references and 17 missing docs. Every individual export entrypoint diagnostic count and exit code exactly matches the baseline; combined sweep alone is not the evidence.
+- **Owner:** SDK/Fresh maintainers.
+- **Target:** 2026-10-15.
+- **Linked plan:** `.llm/runs/fix-db-collection-runtime-family--c2/plan.md`; NetScript #2039.
+- **Created:** 2026-10-08.
+- **Status:** open, proposed DEBT pending independent IMPL-EVAL adjudication.
+- **Gate:** All-export doc lint must reach zero with existing types preserved. This change introduces no additional diagnostic or private reference at any entrypoint. Release requires qualified published consumer resolution; source qualification does not fulfill publication.
+- **Evidence:** Private baseline/current structured doc reports and complete per-entrypoint comparison; run worklog records both raw failing exits and unchanged baseline, never false green. Raw dry-run publication analysis gates the changed owning packages.
