@@ -48,6 +48,7 @@ export async function processWorkerJob(
 
   let executionId: string | undefined;
   let claim: WorkerIdempotencyClaim | undefined;
+  let unlinkShutdown: (() => void) | undefined;
 
   try {
     const jobDef = await context.registry.get(jobId);
@@ -87,6 +88,12 @@ export async function processWorkerJob(
 
     executionId = execution.id;
     const abortController = new AbortController();
+    const onShutdown = (): void => {
+      abortController.abort(new DOMException('Worker shutdown began.', 'ShutdownError'));
+    };
+    if (context.shutdownSignal?.aborted) onShutdown();
+    else context.shutdownSignal?.addEventListener('abort', onShutdown, { once: true });
+    unlinkShutdown = () => context.shutdownSignal?.removeEventListener('abort', onShutdown);
 
     await traceJobExecution(
       {
@@ -179,6 +186,7 @@ export async function processWorkerJob(
     }
     await recordJobFailure(context, message, executionId, error);
   } finally {
+    unlinkShutdown?.();
     if (executionId) {
       context.activeJobs.delete(executionId);
       recordSharedWorkerMetrics(
@@ -313,8 +321,12 @@ async function recordJobFailure(
   error: unknown,
 ): Promise<void> {
   const errorMessage = error instanceof Error ? error.message : String(error);
-  const isTimeout = errorMessage.includes('timeout') || errorMessage.includes('Timeout');
-  const status = isTimeout ? 'timeout' : 'failed';
+  const cause = error instanceof Error ? error.name : undefined;
+  const status = cause === 'TimeoutError'
+    ? 'timeout'
+    : cause === 'ShutdownError' || cause === 'AbortError'
+    ? 'cancelled'
+    : 'failed';
   const topic = message.topic ?? DEFAULT_TOPIC;
 
   console.error(`[Worker ${context.workerId}] Job '${message.jobId}' ${status}:`, errorMessage);

@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { z } from 'zod';
 import { defineJob } from '../../src/builders/job-builder.ts';
+import { InProcessJobRunner } from '../../src/runtime/mod.ts';
 
 type EmbedDocumentPayload = Readonly<{
   documentId: string;
@@ -37,6 +38,7 @@ Deno.test('a malformed payload is rejected before the application job handler ru
     async () =>
       await job.handler!({
         id: 'execution-1',
+        signal: new AbortController().signal,
         job,
         payload: { imageUrl: 'https://example.test/image.png' } as unknown as EmbedDocumentPayload,
       }),
@@ -46,4 +48,35 @@ Deno.test('a malformed payload is rejected before the application job handler ru
   assertEquals(handlerReached, false);
   assertEquals(legacySchemaLessJob.id, 'legacy-handler');
   assertEquals(typeof assertPayloadOrderGuard, 'function');
+});
+
+Deno.test('schema-backed async validation never starts callback after cancellation', async () => {
+  const entered = Promise.withResolvers<void>();
+  const validation = Promise.withResolvers<void>();
+  let callbackStarted = false;
+  const schema = z.string().transform(async (value) => {
+    entered.resolve();
+    await validation.promise;
+    return value;
+  });
+  const job = defineJob('cancelled-validator').payload(schema).handler(() => {
+    callbackStarted = true;
+    return { success: true };
+  }).build();
+  const parent = new AbortController();
+  const runner = new InProcessJobRunner({ abortGracePeriodMs: 5 });
+  const outcome = runner.dispatch(job, { id: job.id, job, payload: 'valid', signal: parent.signal })
+    .catch((error: unknown) => error);
+  try {
+    await entered.promise;
+    parent.abort(new DOMException('Cancelled during validation.', 'AbortError'));
+    validation.resolve();
+    const result = await outcome;
+    assertEquals(result instanceof DOMException && result.name, 'AbortError');
+    assertEquals(callbackStarted, false);
+  } finally {
+    validation.resolve();
+    await outcome;
+    await runner.stop();
+  }
 });

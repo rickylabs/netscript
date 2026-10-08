@@ -51,7 +51,7 @@ export function startTaskQueueListener(
   queueContext: WorkerQueueContext,
   dispatchContext: WorkerDispatchContext,
 ): WorkerListenerSupervisor {
-  const taskQueue = createQueue<TaskMessage>('tasks');
+  const taskQueue = queueContext.taskQueue ?? createQueue<TaskMessage>('tasks');
   queueContext.setTaskQueue(taskQueue);
   const supervisor = createListenerSupervisor(queueContext, 'task:tasks', (signal) => {
     return taskQueue.listen(

@@ -2,10 +2,10 @@ import type { DESKTOP_RPC_BINDING_STATUSES, DESKTOP_RPC_DISABLED_REASONS } from 
 
 /** Minimal native-window surface consumed by the Fresh Desktop adapter. */
 export interface DesktopBindableWindow {
-  /** Register one promise-based native binding handler. */
+  /** Register a native handler; its optional epoch identifies the current browser document. */
   bind(
     name: string,
-    handler: (operation: unknown, payload?: unknown) => Promise<unknown>,
+    handler: (operation: unknown, payload?: unknown, documentEpoch?: unknown) => Promise<unknown>,
   ): void;
   /** Remove a binding during lifecycle cleanup when the runtime supports it. */
   unbind?(name: string): void | Promise<void>;

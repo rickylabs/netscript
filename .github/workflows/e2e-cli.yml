@@ -509,6 +509,12 @@ jobs:
         if: env.RUN == 'true'
         run: deno install
 
+      - name: Real document reload reconnects SDK and Fresh native RPC
+        if: env.RUN == 'true'
+        run: >-
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24"
+          deno task test:desktop-reload-native
+
       - name: Native desktop package, install, update, and rollback (one pass; #859 exception bounded below)
         id: native_suite
         if: env.RUN == 'true'
