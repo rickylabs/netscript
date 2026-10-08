@@ -21,3 +21,7 @@ PLAN-EVAL: Selected: hard stop until independent PLAN-EVAL PASS; multiple owning
 7. Evaluate: pending; independent different-vendor session mandatory.
 8. Release: N/A, owner explicitly requires unmerged PRs.
 9. Close: pending source delivery and handoff; publication remains owner work.
+
+## Design details
+
+Public surface: unchanged SDK collection and Fresh query/factory APIs; additive optional native StreamDB preload/close on existing owned handle. Domain vocabulary: exact supported DB family and complete resolved npm identity; worker execution schema fixture; source Collection/subscriber lifecycle. Ports: existing NetScriptStreamDB and SDK query client/collection only; no new ports/classes/packages. Constants: supported versions only in owning manifests/catalog, test fixture witnesses qualified immutable family. Slices/files/gates locked in plan D1-D4/S2-S5. Contributor path: owning manifest update -> cold guard -> adjacent factory integration and production fixture -> independent source/publication consumer qualification. Deferred: coordinated release and exact published consumer, no source regression deferred. PLAN-EVAL selected and hard stop before any source implementation.
