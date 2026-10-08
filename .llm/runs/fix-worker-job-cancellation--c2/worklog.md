@@ -287,3 +287,34 @@ Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
 Canonical gen:publish-assets exit 0. Generated carrier reviewed; no hand edits.
 
 Canonical gen:mcp-export-corpus exit 0. Generated carrier reviewed; no hand edits.
+
+## Gate — review repair
+Deno 2.9.5; exact-source gate reports retained privately.
+
+| Gate | Raw exit | Result |
+| --- | --- | --- |
+| check | 0 | PASS |
+| lint | 0 | PASS |
+| fmt | 0 | PASS |
+| tests | 0 | PASS |
+| quality-gate | 0 | PASS |
+| agent-docs-prose | 0 | PASS |
+| assets-barrel | 0 | PASS |
+| publish-assets | 0 | PASS |
+| mcp-export-corpus | 0 | PASS |
+| audit-plugin-workers-core | 0 | PASS |
+| publish-plugin-workers-core | 0 | PASS |
+| docs-plugin-workers-core | 1 | Existing independently accepted baseline debt; raw failure retained |
+| audit-..-plugins-workers | 1 | Existing independently accepted baseline debt; raw failure retained |
+| publish-..-plugins-workers | 0 | PASS |
+| docs-..-plugins-workers | 1 | Existing independently accepted baseline debt; raw failure retained |
+| audit-mcp | 0 | PASS |
+| publish-mcp | 0 | PASS |
+| docs-mcp | 1 | Existing independently accepted baseline debt; raw failure retained |
+
+Owning tests: 127 passed, 0 failed, 0 ignored. Independent exact-head evaluation in progress. Release N/A; no source PR merge or publication.
+
+MCP export-surface owning tests: structured wrapper exit 0, 8 passed, no failed/ignored; canonical generated corpus behavior qualified.
+
+## Evaluate / Release / Close — review repair
+Independent evaluator PASS at 509b0a9072615f7fea115250850afefbb7c1e7d4 in repair-evaluate.md. Release N/A. Supervisor reviewed result and reconciled: Kept main real-core and configured/unconfigured plugin registry fixtures, plus PR required signals and negative payload assertions; registry 10, owning 127 and corpus 8 tests passed. Source unchanged by evidence-only closeout. Final CI/publication remain owner gates.
