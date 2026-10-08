@@ -1,0 +1,4 @@
+acceptance-mirror DRY-RUN: no changes
+provenance: head=51c5db9d15d2e3bf73dadaee3e16889d0404c519 evaluated=2026-10-07T20:59:39.053Z
+snapshot: #2080 updated=2026-10-07T12:35:24Z bodySha256=3603490b9a481653dbc0f2d0db63d03cbc7b369157d5c04503640bcbe6079089
+notice: Closing reference #2080 classified as issue; retained for acceptance mirroring.

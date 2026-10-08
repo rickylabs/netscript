@@ -84,9 +84,10 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
     const hasLegacyEntries = source !== undefined &&
       /jobDefinitionEntries[\s\S]*?\[\s*\[/.test(source);
     const hasLiteralDefinitions = source !== undefined &&
-      /export const jobDefinitionsById[\s\S]*?\[[^\]]+\]\s*:\s*createLocalJobDefinition\(/.test(
-        source,
-      );
+      /export const jobDefinitionsById[\s\S]*?\[[^\]]+\]\s*:\s*create(?:Local|Configured|Plugin)JobDefinition\(/
+        .test(
+          source,
+        );
     const populated = hasLegacyEntries || hasLiteralDefinitions;
     return {
       name: 'generated job registry is non-empty',
@@ -100,10 +101,12 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
   name: 'every declared job is registered',
   async run(context) {
     const source = await readWorkersRegistry(context);
-    const declared = source?.match(/import (?:\* as )?job\d+ (?:from )?/g)?.length ?? 0;
-    const compiledHandlers = source?.match(/resolveJobHandler\(job\d+,/g)?.length ?? 0;
+    const declared = source?.match(/^import (?:\* as )?(?:job\d+|\w+Handler) from /gm)
+      ?.length ?? 0;
+    const compiledHandlers = source?.match(/\bresolveJobHandler\(/g)?.length ?? 0;
     const generatedHandlers = source?.match(/\[job\d+\.id, job\d+\]/g)?.length ?? 0;
-    const definitions = source?.match(/(?:[:,])\s*createLocalJobDefinition\(/g)?.length ?? 0;
+    const definitions =
+      source?.match(/(?:[:,])\s*create(?:Local|Configured|Plugin)JobDefinition\(/g)?.length ?? 0;
     const loadable = source !== undefined &&
       source.includes('export const jobDefinitions') &&
       source.includes('export const registry') &&

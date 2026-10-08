@@ -1,0 +1,14 @@
+{
+  "repo": "rickylabs/netscript",
+  "pr": 2081,
+  "headSha": "48aa35fd8f854df6f6140844d96bbfefb70ad45f",
+  "updatedAt": "2026-10-07T20:24:06Z",
+  "bodySha256": "33634b1e125e934d2ea586c20615058f341a303569401fd4d671e246cf8c4978",
+  "securitySliceDisclosed": true,
+  "serviceTestsDisclosed": true,
+  "finalInboxClosingLine": "Closes rickylabs/harness#636",
+  "statusLabels": [
+    "status:impl-eval"
+  ],
+  "mandatoryFinalEvaluationPending": true
+}

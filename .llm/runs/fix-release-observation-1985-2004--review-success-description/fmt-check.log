@@ -1,0 +1,2 @@
+Task fmt:check deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings
+{"command":"deno fmt --check","cwd":"[checkout]","mode":"check","summary":{"filesSelected":2158,"batches":37,"failedBatches":0,"findings":0,"ignoredFindings":0},"coverage":{"filesSelected":2158,"filesProcessed":2158,"droppedFiles":[],"refusals":[]},"findings":[]}

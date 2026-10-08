@@ -1,0 +1,10 @@
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/release/watch-canary-e2e_test.ts 0
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/release/watch-canary-e2e_test.ts 1
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/release/watch-canary-e2e_test.ts 0
+EXIT deno run --allow-read --allow-write --allow-run .llm/tools/run-deno-test.ts -- --allow-all .llm/tools/release 0
+EXIT deno task check 0
+EXIT deno task lint 0
+EXIT deno task fmt:check 0
+EXIT deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/release/watch-canary-e2e_test.ts --ext ts 2
+EXIT deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/release/watch-canary-e2e_test.ts --ext ts 0
+EXIT deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/release/watch-canary-e2e_test.ts --ext ts --config ../runs/2026-10-08-review-2086/lint.json 0

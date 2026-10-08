@@ -1,0 +1,10 @@
+{
+  "package": "proxy-addr",
+  "sourceUsed": false,
+  "sourceHitCount": 0,
+  "transitivelyPresent": false,
+  "likelyDeadImport": true,
+  "fullyRemovable": true,
+  "sourceHits": [],
+  "why": ""
+}
