@@ -8,17 +8,24 @@ interface Assignment {
 function hasOpenQuote(text: string): boolean {
   let quote = '';
   let escaped = false;
+  let atWordStart = true;
   for (const character of text) {
     if (quote === "'") {
       if (character === "'") quote = '';
     } else if (escaped) {
       escaped = false;
+    } else if (character === '#' && atWordStart && quote === '') {
+      return false;
     } else if (character === '\\') {
       escaped = true;
+      atWordStart = false;
     } else if (quote === '"') {
       if (character === '"') quote = '';
     } else if (character === "'" || character === '"') {
       quote = character;
+      atWordStart = false;
+    } else {
+      atWordStart = /[ \t\r\n]/.test(character);
     }
   }
   return quote !== '';
@@ -29,7 +36,7 @@ function assignments(content: string): Assignment[] {
   if (lines.at(-1) === '') lines.pop();
   const result: Assignment[] = [];
   for (let index = 0; index < lines.length; index++) {
-    const match = /^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/.exec(lines[index]);
+    const match = /^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/s.exec(lines[index]);
     let text = lines[index];
     if (match && /^["']/.test(match[2])) {
       while (hasOpenQuote(text.slice(text.indexOf('=') + 1)) && index + 1 < lines.length) {

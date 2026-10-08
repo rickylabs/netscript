@@ -22,3 +22,6 @@ Main integrated at a046fe336. Generated conflicts took main; prose/assets/publis
 
 ## S2
 Confirmed actual code execution through both U+2028/U+2029: mutation runs generated code containing `throw Error(1)` and fails. Escape both separators in JSON diagnostic key text; no credential value emitted. New security regression passes for canonical and legacy declarations. Mutation reverted only this implementation: exit 1, one failed test; restored exit 0. Quality gate exit 0; reviewed pure generation change and unchanged partition behavior. Reconcile: no new scope/debt, five threads pending final replies.
+
+## S3
+Trailing comments and CR findings are real. Scanner stops at an unquoted # starting a shell word and continues through literal # inside words/quotes; dotall assignment matching retains CR/multiline records for replacement. Tests preserve unrelated assignments/comments, source values into real sh/Deno, and repeat rotation with duplicate old entries. Each independent parser mutation exits 1 with one failed test; restore exits 0. Reviewed literal # and quote boundaries, exact CR preservation, and duplicate removal; quality gate exit 0. Reconcile: no public API/dependency/debt delta.
