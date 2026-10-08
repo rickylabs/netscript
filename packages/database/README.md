@@ -94,6 +94,8 @@ form above is for custom hosts and tests.
 | `./adapters/mysql`    | MySQL/MariaDB adapter over `@netscript/prisma-adapter-mysql`                                    |
 | `./extensions`        | JSON field registry and serialization utilities                                                 |
 | `./tracing`           | `enableInstrumentation` for Prisma OpenTelemetry spans                                          |
+| `./commands` | Bound command port, logical rows, store errors and true callback-client boundary |
+| `./commands/postgres` | `createPostgresCommandStore` over the consumer-owned schema and callback bridge |
 | `./testing`           | `runDatabaseAdapterContract`, `createMockDatabaseAdapter`                                       |
 
 The always-current symbol list is
