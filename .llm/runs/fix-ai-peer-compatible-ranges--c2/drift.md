@@ -13,3 +13,5 @@ Use the latest exact peer-coherent family: core 0.65.1, Anthropic 0.19.5, OpenAI
 Refresh root and Fresh UI private lock only required graph edges and preserve unrelated versions where native update refreshes metadata; do not accept new advisory baseline. Run both frozen provider/Fresh/FreshUI checks after selective refresh, provider suite, production bundles, all required quality/JSR/publish gates. Update documented family and guard description. Independent PLAN-EVAL required because this amendment upgrades multiple upstream APIs. After PASS implement, then a new independent IMPL-EVAL on final source. Refs #2036 until a fixed published consumer exists.
 
 B follow-up: npm exact-release peerDependencies can be wrapped in a singleton array; normalize explicitly and fixture covers it. Local mandatory scaffold.runtime failed at infrastructure preflight/cleanup; keep raw failed gate names, no green runtime claim.
+
+Review repair: owner overrides evaluator route to GLM max and authorized Google fallback. Public artifacts omit hostnames, IPs, ports, operator paths, credentials and session identifiers. RTK unavailable; raw exits and structured wrappers used.

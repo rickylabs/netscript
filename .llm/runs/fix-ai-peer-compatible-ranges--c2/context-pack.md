@@ -1,3 +1,5 @@
 # Context
 
 Issue #2036 / PR #2087. Final source 93220ff73c17c3edb66f22293c97ee9c1c2a0cb4, evaluation HEAD 3a71fbeab427df7b8aaacddc90f88b7705dc5d1a. Fresh GLM max independent PASS in review-evaluate.md; prior family verdict and explicit unchanged doc debt retained. Four guard and 28 CLI tests pass independently, new tests mutation-proven, live guard passes, both published negatives reject real conflicts. Required full scaffold.runtime now qualified by successful CI run 37709580435 at evaluation head: 104 pass/zero fail/zero skip, with static/SQLite/native jobs green too. Earlier local infrastructure failures retained. Final CI refresh needed; no merge/publication; Refs #2036 until exact fixed published consumer qualified.
+
+PR #2087 review repair active at baseline a7e3cc6a1ff950a085707ec47d6585413d8cda26. Scope: Rebuild pruned root lock from main, selectively restore the reviewed AI 0.65 graph, retain every main workspace/graph entry and MCP/Zod4 cluster; prove deps checks, frozen install and Fresh UI lock check.. Gates and independent evaluation pending; no release/merge.
