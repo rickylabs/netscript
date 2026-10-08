@@ -281,3 +281,5 @@ Conflict resolution: main now uses real workers core and includes configured/unc
 Resolved registry test wrapper exit 0: 10 passed, no failures/ignored. Supervisor reviewed conflict delta; cancellation runtime untouched and both payload/cancellation assertions preserved.
 
 Canonical gen:agent-docs-prose exit 0. Generated carrier reviewed; no hand edits.
+
+Canonical gen:assets-barrel exit 0. Generated carrier reviewed; no hand edits.
