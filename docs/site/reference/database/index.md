@@ -248,3 +248,14 @@ The isolated native provider command is `bash .llm/tools/command-postgres-confor
 Its dedicated CI workflow runs Deno 2.9.5 and exercises the real generated-client lock/fault matrix.
 A skipped provider suite is not provider conformance evidence. Package import/construction runs no
 DDL and has no queue dependency.
+
+### Bound PostgreSQL command writer
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `bindPostgresCommandOutbox` | function | Binds the existing reviewed outbox append SQL to a live callback client without a nested transaction. |
+| `PostgresCommandOutboxWriter` | interface | Detached outbox-only append boundary. |
+
+Atomic producers such as the saga transition store bind this writer inside their existing physical
+transaction. Root/lifecycle handles are refused. The consumer owns the callback lifetime and
+migration; import and construction perform no I/O or DDL.

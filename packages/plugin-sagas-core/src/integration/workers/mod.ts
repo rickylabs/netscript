@@ -1,5 +1,6 @@
 /**
- * Explicit workers-port helpers that trigger jobs and tasks outside synchronous saga handlers.
+ * Schema-bound pure worker effects for atomic saga transitions, plus explicit
+ * workers-port trigger helpers for callers outside synchronous handlers.
  *
  * @module
  */

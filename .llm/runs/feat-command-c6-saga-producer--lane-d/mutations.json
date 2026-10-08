@@ -1,0 +1,314 @@
+{
+  "protocol": "semantic production mutant; focused named AssertionError; exact-byte restore and PASS",
+  "rows": [
+    {
+      "name": "s15-tags",
+      "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+      "test": "worker effects expose distinct explicit job and task constructors",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s15-snapshot",
+      "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+      "test": "worker effects validate the selected schema and privately snapshot payload",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s15-schema-required",
+      "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+      "test": "durable worker effects refuse legacy type-only definitions and non-JSON output",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s15-json-required",
+      "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+      "test": "durable worker effects refuse legacy type-only definitions and non-JSON output",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s15-task-handler-schema",
+      "file": "packages/plugin-workers-core/src/builders/task-builder.ts",
+      "test": "worker effects validate the selected schema and privately snapshot payload",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "52f888e5e56f71a7a77c49b9bee816aa66fafdecfeba3b61f2bc97d04f71a933",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s16-version",
+      "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+      "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s16-replay",
+      "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+      "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s16-history",
+      "file": "packages/plugin-sagas-core/src/application/validate-transition-commit.ts",
+      "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "01e81b612b9a00b4f0a4baa3cf55d071f2a3c55b4159d4523358ad05a4cdb881",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s16-capability-refusal",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "atomic saga composition refuses KV and unbound Prisma before handler or storage work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "5669a40f09a1cbc90494bafe29fcf3e357c206e65481b3142c4b2e7ae9f0781a",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s16-correlation",
+      "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+      "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s16-intent-collision",
+      "file": "packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+      "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "87b1f4cefac5ecf16eccb696d2089909339d4b25a76677c2f573311b79a0c124",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-ordinal",
+      "file": "packages/plugin-sagas-core/src/application/produce-worker-commands.ts",
+      "test": "durable saga commits pure worker effects once with stable original ordinal and context",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "b30ea6b9fafe8fe29be1594bd7c7c1f0952514fd17f8040793a1c553ab502f25",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-atomic-path",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "durable saga commits pure worker effects once with stable original ordinal and context",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-replay-result",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "durable saga commits pure worker effects once with stable original ordinal and context",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-selected-schema",
+      "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+      "test": "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-json-boundary",
+      "file": "packages/plugin-sagas-core/src/integration/workers/worker-effects.ts",
+      "test": "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "67554b07389cecedb40495441db46cd719342ac70ad93c8b2ea815436df7946f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-bridge-reservation",
+      "file": "packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts",
+      "test": "durable bridge and engine replay remain retryable after failed commit and dedupe after restart",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "f1aa9acd3833bfcc43628d6043594b44e8528747c4f40ba13182dfa918d5fd6f",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-engine-reservation",
+      "file": "packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+      "test": "durable bridge and engine replay remain retryable after failed commit and dedupe after restart",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "3c9496d1b518ea9ed22966ca40f9851527c17fb3b0cbbe192d07889435c6a273",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s17-strict-trace",
+      "file": "packages/service/src/commands/application/command-identity.ts",
+      "test": "durable producer rejects selected payload and canonical JSON faults before writes without consuming replay",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "c7fbfb036056e5fc1ed2dcfcf084009565dc5d48d40b622949a196bb644eb184",
+      "bytesIdentical": true
+    },
+    {
+      "name": "s18-bound-root",
+      "test": "bound outbox rejects lifecycle and root clients before any write",
+      "innerTest": null,
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/database/src/commands/adapters/bind-postgres-command-outbox.ts": "bc989620a4939a76c69e0a6daa4d95a58c2e8fd99b15d0ee5b3fa50e34b1f567"
+      }
+    },
+    {
+      "name": "s18-atomic-root",
+      "test": "Prisma atomic adapter refuses root callback handles before writes",
+      "innerTest": null,
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/database/src/commands/adapters/bind-postgres-command-outbox.ts": "bc989620a4939a76c69e0a6daa4d95a58c2e8fd99b15d0ee5b3fa50e34b1f567"
+      }
+    },
+    {
+      "name": "s18-provider-cancel",
+      "test": "real PostgreSQL generated-client atomic saga transition conformance",
+      "innerTest": "PostgreSQL whole transition rolls back each row seam and retries the same inbound identity",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/stores/prisma-saga-transition-store.ts": "dfb5d3271b3e67e3775c6b658e89985f355397d62be570a1068f65987d0fbcf5"
+      }
+    },
+    {
+      "name": "s18-provider-replay",
+      "test": "real PostgreSQL generated-client atomic saga transition conformance",
+      "innerTest": "PostgreSQL stale saga writers and replay races commit one command set",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/stores/prisma-saga-transition-store.ts": "dfb5d3271b3e67e3775c6b658e89985f355397d62be570a1068f65987d0fbcf5"
+      }
+    },
+    {
+      "name": "s18-provider-root-escape",
+      "test": "real PostgreSQL generated-client atomic saga transition conformance",
+      "innerTest": "PostgreSQL whole transition rolls back each row seam and retries the same inbound identity",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/database/src/commands/adapters/bind-postgres-command-outbox.ts": "bc989620a4939a76c69e0a6daa4d95a58c2e8fd99b15d0ee5b3fa50e34b1f567",
+        "packages/plugin-sagas-core/src/stores/prisma-saga-transition-store.ts": "dfb5d3271b3e67e3775c6b658e89985f355397d62be570a1068f65987d0fbcf5"
+      }
+    },
+    {
+      "name": "s19-stable-dedupe",
+      "test": "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+      "innerTest": "saga command restart and acceptance crash reuse C5 checked relay and worker sink",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/application/produce-worker-commands.ts": "b30ea6b9fafe8fe29be1594bd7c7c1f0952514fd17f8040793a1c553ab502f25"
+      }
+    },
+    {
+      "name": "s19-due-intent",
+      "test": "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+      "innerTest": "saga commands reuse C5 lease ownership malformed receipt retry and shutdown drain",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/application/produce-worker-commands.ts": "b30ea6b9fafe8fe29be1594bd7c7c1f0952514fd17f8040793a1c553ab502f25"
+      }
+    },
+    {
+      "name": "s20-native-progress",
+      "test": "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+      "innerTest": "saga worker recovery observes native durable progress and checked completion",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "plugins/workers/worker/job-execution.ts": "06a6c6a912e425d08d4d8f75e666bcf5356d1832f78b51db6872e4b32ac6ac93"
+      }
+    },
+    {
+      "name": "s20-checked-completion",
+      "test": "real PostgreSQL saga commands consume the pinned C5 relay cohort",
+      "innerTest": "saga worker recovery observes native durable progress and checked completion",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "bytesIdentical": true,
+      "restoredSha256": {
+        "packages/plugin-sagas-core/src/integration/publisher/publish-saga-or-throw.ts": "d0a7958fd4087c1a688dc5d7bc47ba56e37129f9f8c943339c58fe7ef68fb679"
+      }
+    },
+    {
+      "name": "s20-original-state-json",
+      "file": "packages/plugin-sagas-core/src/application/validate-transition-commit.ts",
+      "test": "memory atomic transition commits all rows once and rolls back invalid stale or duplicate work",
+      "mutantExit": 1,
+      "namedAssertion": true,
+      "restoredExit": 0,
+      "restoredSha256": "9d75c1e68b0ff59c0d71f7fcd4be6b594f18ba20a46dd431e1055001a0e5791e",
+      "bytesIdentical": true
+    }
+  ]
+}

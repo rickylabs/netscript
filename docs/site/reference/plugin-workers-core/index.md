@@ -146,3 +146,10 @@ against the port before the effect runs.
 ---
 
 Back to the [reference overview](/reference/).
+
+### Runtime-schema tasks
+
+`defineTask(id).payload(selectedSchema).handler(...).build()` preserves the selected schema's
+payload type and validates input before the task handler. The legacy `.payload<T>()` overload keeps
+ordinary task compatibility but provides no runtime schema; durable saga worker-task effects refuse
+it. These task effects use the same selected-definition payload validation as job effects.

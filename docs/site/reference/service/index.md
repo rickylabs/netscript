@@ -265,6 +265,7 @@ identity to keep replay stable.
 | `defineCommand`             | function         | Validates durable identity and freezes an opaque definition.      |
 | `jsonCodec`                 | function         | Synchronous Standard Schema validation with stable bounded JSON.  |
 | `canonicalCommandJson`      | function         | Produces bounded canonical JSON text.                             |
+| `validateCommandTraceContext` | function | Reuses strict W3C parent/state validation at producer boundaries. |
 | `parseCanonicalCommandJson` | function         | Accepts only bounded canonical stored text.                       |
 | `CommandCodec`              | type alias       | Typed response/payload encoding and decoding boundary.            |
 | `CommandJsonLimits`         | type alias       | Tighten-only depth, item and byte safeguards.                     |

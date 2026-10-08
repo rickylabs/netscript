@@ -70,6 +70,26 @@ Deno.test('memory atomic transition commits all rows once and rolls back invalid
   const invalid = request();
   invalid.record.version = 9;
   await assertRejects(() => commit(store, invalid));
+  class NonJsonState {
+    [key: string]: unknown;
+    count = 1;
+  }
+  const prototypeState = request();
+  const nonJson = new NonJsonState();
+  prototypeState.envelope.state = nonJson;
+  prototypeState.record.transition.to = nonJson;
+  await assertRejects(() => commit(store, prototypeState));
+  let getters = 0;
+  const accessorState = request();
+  Object.defineProperty(accessorState.envelope.state, 'count', {
+    enumerable: true,
+    get() {
+      getters++;
+      return 1;
+    },
+  });
+  await assertRejects(() => commit(store, accessorState));
+  assertEquals(getters, 0);
   assertEquals(store.entries(), []);
   assertEquals(store.transitions(instanceId), []);
   assertEquals(

@@ -13,6 +13,10 @@ const stateCodec = jsonCodec<unknown>({
 export function snapshotTransitionCommit(
   request: SagaTransitionCommitRequest,
 ): SagaTransitionCommitRequest {
+  // Validate original state values before a clone can erase non-JSON prototypes or accessors.
+  stateCodec.encode(request.envelope.state);
+  stateCodec.encode(request.record.transition.from);
+  stateCodec.encode(request.record.transition.to);
   const copy = structuredClone(request);
   const { envelope, correlation, record, expectedVersion, commands, appliedKeyHash } = copy;
   if (

@@ -284,3 +284,17 @@ Restart recovers a committed intent. Crash after checked acceptance retains leas
   ]
 }
 ```
+
+- **Owner matrix override:** owner authorized `complex/implementation_evaluation` → `glm_5_3_flash@max` because HARNESS.md owner directive: independent GLM 5.3 Flash max; Google fallback only on unavailability. BRIEF-D4 limits unsuccessful review to three rounds.
+
+## S20a native consumer and publication input checkpoint
+
+The actual pinned C5 consumer now observes current native processWorkerJob execution/progress through KvExecutionState, real Deno KV idempotency storage and the first-party mutation hook/durable stream producer against the native durable-stream server with persistent backend. Progress is 25/75 and survives worker-store reopen/server restart; only the transition command is in the outbox. Checked publishSagaOrThrow completion advances the saga to completed without a mirrored progress command. Acceptance-before-mark restart delivers the same stable command identity; native worker idempotency and independently guarded durable SQL application each remain once. Rejected publisher, malformed/wrong-target receipt, invalid selected payload before every write and same-key valid retry are asserted. The typed job handler retains its existing id/payload API; native execution context owns progress. No queue/service replacement or relay fork.
+
+Two native progress/checked-publisher semantic production mutants fail named inner AssertionErrors and restored PASS. Original state validation now precedes structured cloning to retain prototype/accessor rejection; its named memory assertion fails the intentional omission mutant and passes exact restoration. Aggregate semantic receipts are mutations.json; invalid compilation attempts retain private logs and receive no credit.
+
+Root check EXIT 0 (3261 files, zero failed batches); regression EXIT 0, 535 passed/zero failed/seven ignored separately from dedicated native provider certification. Final native PostgreSQL gate EXIT 0 includes C3, atomic C6 and all three pinned-C5 cohort cases, zero ignored. Final lint/format/quality/architecture EXIT 0. Full export inventory EXIT 0. Native publication dry-runs and JSR audits for all four touched packages pass, as does saga plugin dry-run. Production install and frozen Fresh UI pass after native lock:update normalizes already-locked peer identities; no newly resolved npm integrity/version values, lock deletion or reload.
+
+Owned saga root/effect/port/testing/store and worker root documentation graphs EXIT 0; database/service command graphs already qualified. Entire saga export map EXIT 1 with eight legacy private-type diagnostics (original baseline eight, normalization temporarily nine; store curation removes one). Entire worker map EXIT 1 with seven (original baseline eight). Neither full-map run is claimed green. Public inventory uses native Deno doc JSON v2 and includes all new typed effects/capabilities/factory/bound writer/trace helper.
+
+S20a slice signoff PASS for consumer, validation and publication inputs only. Four generated assets/freshness, canonical full runtime, final current-head CI and independent IMPL-EVAL remain pending.
