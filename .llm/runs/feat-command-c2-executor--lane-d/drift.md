@@ -139,3 +139,26 @@ selection is adapted, with no ancestor extends. Root config hash and standalone 
 captured; structured wrappers prove selected=processed=2 and no refusals. Both lint and format
 pass0. This bounded validation neither changes repository policy nor claims full CLI lint. Native
 quality/architecture and CLI/MCP publish dry runs remain independently PASS0.
+
+## Final committed-tree evidence boundary
+
+The downstream committed read set now permits the actual assets-barrel committed-diff gate0;
+root's postcommit receipt and the implementation lane's current invocation are separately retained.
+This supersedes the pending committed-read status while preserving actual historical precommit1.
+Final qualification uses the clean completed asset/source head, separately identifies signed S6
+product source, and preserves every source/generated/tool/lock/workflow byte. Earlier generated-
+only standalone two-file validation copied native rules/options; it is not a full CLI lint claim.
+The unchanged seven MCP worktree-fixture tests remain required in actual native CI, with no local
+worktree, test-source edit or skip. Independent evaluation, ready/CI/acceptance and owner final
+whole-chain scaffold.runtime remain outside this evidence-only implementation release.
+
+Final generic JSR audits exit0 with slowTypesOk true for database/service/CLI/MCP. Existing CLI/MCP
+vocabulary/cardinality WARNs remain disclosed in unchanged folders; no new debt or warning-free
+full CLI certification is introduced. Signed S6 product14files and all20meaningful production
+control restoration hashes exactly match the completed source; earlier signed S4/S5 reports and
+failure histories remain unchanged. All244executed tests pass; no new tests require new mutants.
+Root's native primary evaluator route preflight blocked before inference. Owner HARNESS authorizes
+Google agy fallback; exact gemini-3.8-flash-high is catalog-confirmed and its separate read-only
+transport canary passed0. Independent evaluation has not launched; high is requested after actual
+technical CI, while exact runtime effort/model needs actual evaluation attestation. No usage
+numbers or private operational detail in public metadata; independent evaluation/acceptance pending.

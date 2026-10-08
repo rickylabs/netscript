@@ -1,3 +1,11 @@
+# Current supervisor checkpoint — C2 final native qualification APPROVED
+
+At qualification343f38c5/signed product4b8b7cb99, root verifies10frozen files/346raw hashes,6,233 unchanged non-evidence tracked files,133archive members/75published source files and all20S6restoration hashes. Native244tests0,107file static0,16export source/exact-declaration fresh/frozen consumers0 and all scoped docs/generated/publication/audit gates pass. Fresh root quality/arch PASS0, frozen bytes stable. See final-qualification-supervisor-review.md/evidence.json. Signed evidence-only slice12files.
+
+Ordinary commit/push/comment precedes ready-for-review and actual technical CI including seven unchanged worktree fixtures. Independent owner-authorized Google fallback evaluation, final acceptance/ready/live close-gate remain required; no later leaf is released. Current C1 predecessor8b6e89e9 has independent PASS/product reconciliation and actual currentCI SUCCESS. Final whole-chain scaffold.runtime remains after the last leaf.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — downstream native wave APPROVED
 
 Exactly12 signed files comprise two generated modules, eight implementation artifacts and two root review/evidence files. Native asset aggregate `2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf` is approved at generation HEAD `2df7d9b393af7180bd318da6c6926d212e6344d6`, product source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Root verified10frozen files/87raw receipts, independently executed semantic reconciliation, verified exact two-asset native rules/options and coverage, and reran quality/architecture PASS0. Source and signed first-wave asset bytes remain unchanged.
@@ -405,3 +413,31 @@ MCP bounded source bytes/hash/counts match shared sources. No new tests or produ
 no new mutation controls required. Actual baseline stale1→fresh-content0 is retained; actual
 committed-read barrel1 awaits this wave's commit. Frozen10files reserve two supervisor files.
 Final item3 qualification, actual CI, independent evaluation and later leaves remain unreleased.
+
+## Final committed-tree C2 qualification at `343f38c5af60e1f07d27715dfe92731df6b16af7`
+
+Read the complete final item3 brief and its explicit six-skill chapter; selected runtime/CLI
+archetypes and service/docs overlays retain the locked scope/review separation. Captured all6240
+tracked baseline hashes and direct Deno2.9.5 from a clean completed tree. Verified root's actual
+postcommit barrel receipt0 and raw receipt/log hashes. All four native generated freshness/
+consumer gates pass0 here; all tracked bytes unchanged through these native checks. Historical
+precommit barrel1 is preserved. Only evidence qualification is authorized; no product, generated
+assets, tools, lock or workflow changes, evaluation, GitHub writes, CI trigger or later leaf.
+
+Final qualification complete: all four native generated freshness/consumer gates0,217affected
+package tests0,27existing permitted generator/CLI/MCP regressions0;107-file check/lint/fmt0.
+Database11/service5 individual+combined doc entrypoints0; native quality/architecture/exports/
+JSR-specifier/critical audit0. Four-package generic JSR audits exit0 with slowTypesOk true; existing
+CLI/MCP unchanged-folder vocabulary/cardinality WARNs retained. Native CLI/MCP publish dry runs0;
+actual materialized database/service publish and pack0. Exact archives and all extracted bytes
+retained; all published source bytes except native materialized manifests match completed source.
+Fresh workspace-empty source and exact declaration consumers qualify all16exports, mutable health,
+executor/raw failure/testing APIs, fresh then frozen under their own locks. Service exact DB0.0.7
+pin and same-release paired mappings proven. Actual source apply/replay and shared22case conformance
+run0. No handpatch, cache reload/deletion, remote/npm-completeness or real-provider certification.
+Completed source/generated/tools/locks/workflows remain byte-identical. Signed S6 product14files
+and20restored mutant source hashes match current source; no new tests or mutation controls. Root
+transport canary for owner-authorized catalog-confirmed Google fallback passed0; actual independent
+evaluation, runtime model/effort attestation and final acceptance remain pending. Evidence-only
+10-file slice frozen for supervisor review before root commit/push/comment; no later leaf or
+whole-chain scaffold.runtime claim.

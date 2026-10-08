@@ -1,3 +1,32 @@
+# Current supervisor checkpoint — C2 final native qualification APPROVED
+
+At qualification343f38c5/signed product4b8b7cb99, root verifies10frozen files/346raw hashes,6,233 unchanged non-evidence tracked files,133archive members/75published source files and all20S6restoration hashes. Native244tests0,107file static0,16export source/exact-declaration fresh/frozen consumers0 and all scoped docs/generated/publication/audit gates pass. Fresh root quality/arch PASS0, frozen bytes stable. See final-qualification-supervisor-review.md/evidence.json. Signed evidence-only slice12files.
+
+Ordinary commit/push/comment precedes ready-for-review and actual technical CI including seven unchanged worktree fixtures. Independent owner-authorized Google fallback evaluation, final acceptance/ready/live close-gate remain required; no later leaf is released. Current C1 predecessor8b6e89e9 has independent PASS/product reconciliation and actual currentCI SUCCESS. Final whole-chain scaffold.runtime remains after the last leaf.
+
+## Previous checkpoints retained
+
+# Current checkpoint — final committed-tree C2 qualification FROZEN
+
+Downstream wave is signed, committed and pushed; only final evidence qualification is released at
+`343f38c5af60e1f07d27715dfe92731df6b16af7`. Signed product source remains
+`4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Captured direct Deno 2.9.5 and all 6,240 tracked
+baseline hashes from the clean completed tree. All four native generated consumers/freshness,
+including the actual committed-diff assets-barrel gate, pass0 with every tracked byte stable.
+Root's actual postcommit barrel receipt/hash proof was independently verified and is retained;
+the historical precommit1 remains unchanged. All217affected tests and27permitted generator/CLI/MCP regressions pass0, scoped107-file static
+pass0; DB/service all-map docs, native quality/architecture/exports/specifiers/critical audit and
+four-package JSR/publication gates pass. Actual native DB/service source+exact declarations qualify
+all16exports fresh/frozen under own workspace-empty locks; source apply/replay and22case shared
+conformance runtime0. Read final-qualification-gates.json, final-qualification-consumers.json and
+final-qualification-source.json. Generic CLI/MCP unchanged-folder audit WARNs are retained. The
+10-file evidence-only slice is frozen for substantive supervisor review. Source/assets/tools/locks/workflows are
+frozen; this slice changes evidence only. Seven unchanged worktree-fixture tests are reserved for
+actual native CI after root's ready transition. Final acceptance, actual CI, independent
+opposite-family IMPL-EVAL and whole-chain scaffold.runtime remain pending. No later leaf is released.
+
+## Previous checkpoints retained
+
 # Current supervisor checkpoint — downstream native wave APPROVED
 
 Exactly12 signed files comprise two generated modules, eight implementation artifacts and two root review/evidence files. Native asset aggregate `2cc6d09df60688fbd095a747ca6e60dd5caa22b15106dd6a489c9129d78964bf` is approved at generation HEAD `2df7d9b393af7180bd318da6c6926d212e6344d6`, product source `4b8b7cb99b62919198e04de5eabf1a35716c1b7e`. Root verified10frozen files/87raw receipts, independently executed semantic reconciliation, verified exact two-asset native rules/options and coverage, and reran quality/architecture PASS0. Source and signed first-wave asset bytes remain unchanged.

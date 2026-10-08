@@ -1,3 +1,23 @@
+# Current C2 prerequisite and technical checkpoint
+
+Current predecessor C1 is `8b6e89e9dfe786edf062e64228c8bb14fc45a110`, independent PASS at reviewed productE09 with artifact-only reconciliation and current native CI SUCCESS. C2 remains stacked because main lacks C1. Final native technical qualification is supervisor APPROVED at343f38c5/signed source4b8b7cb99; evidence-only slice12files, ordinary commit/push/comment then actual CI and independent Google fallback evaluation required. No C2 independent PASS/ready or later-leaf authorization is claimed.
+
+## Previous evaluator preparation retained
+
+# Current evaluator preparation — independent evaluation pending
+
+Native primary-route preflight blocked before evaluator inference. HARNESS.md explicitly authorizes
+Google agy / gemini-3.8-flash-high fallback; native catalog confirms that exact requested model.
+The separate read-only transport canary returned AGY_CANARY_OK, exit0. Root plans high effort via
+that authorized fallback after actual technical CI. Exact evaluator runtime model/effort is not
+independently attested unless its actual response/log supplies it. No independent C2 evaluation
+has launched, and no PASS is claimed. Private receipts retain operational detail; public metadata
+contains no allowance/usage numbers. Separate session/vendor-family and substantive slice review
+remain mandatory. Final technical qualification is frozen at343f38c5; acceptance/ready/CI/eval
+remain pending.
+
+## Previous supervisor identity retained
+
 # Supervisor Identity — Lane D command chain
 
 | Field | Value |
