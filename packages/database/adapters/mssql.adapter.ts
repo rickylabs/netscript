@@ -527,3 +527,11 @@ export function createMssqlAdapter<
 >(options: MssqlConnectionOptions): MssqlAdapter<TClient> {
   return new MssqlAdapter<TClient>(options);
 }
+
+export type {
+  DatabaseAdapter,
+  DatabaseConnectionOptions,
+  DatabaseConnectionStatus,
+  DatabaseProvider,
+  IsolationLevel,
+} from '../ports/database-client.ts';

@@ -1,0 +1,192 @@
+{
+  "baselineHead": "7dbdc6127b8c0e7c499c3648538cb866adab8325",
+  "implementationFrozenForSupervisorReview": true,
+  "productFiles": [
+    {
+      "path": "docs/site/reference/database/index.md",
+      "sha256": "6957b35f76abe3ed7f18548254ff3ba495a078f1550bad70e4bb70e9eac57bf2"
+    },
+    {
+      "path": "docs/site/reference/service/index.md",
+      "sha256": "744b224d7ebb794f47a666f618a10bcebc97ab50cfdfd121395c7efe8fc43116"
+    },
+    {
+      "path": "packages/database/README.md",
+      "sha256": "267607449b05bf1495daf58b20da87ac31e44cc4f6733267ce9973667cf63358"
+    },
+    {
+      "path": "packages/database/commands.ts",
+      "sha256": "55ca4d5c94bc89ff25c4ffd1bd98ae5b25acfa472c3879330b6f11c55ae47d8d"
+    },
+    {
+      "path": "packages/database/ports/command-store-error.ts",
+      "sha256": "9350856cb6ffc2ff850956db223c720ff63129f129a6a1ec557c17301c7988fe"
+    },
+    {
+      "path": "packages/service/README.md",
+      "sha256": "1a53884f9d5a1e70bc17c4eb7e7432b9031d6c8b4682d58de937fa6ecf9415c8"
+    },
+    {
+      "path": "packages/service/commands.ts",
+      "sha256": "7760bbe80aa295ab0ab60428b0a1b7a9a928e8637212c610601440624168f272"
+    },
+    {
+      "path": "packages/service/src/commands/application/command-identity.ts",
+      "sha256": "ae7c40fccce875515e40d8f429e917ebaf1b80e79046237b63f2ccdf06896a88"
+    },
+    {
+      "path": "packages/service/src/commands/application/command-record-buffer.ts",
+      "sha256": "5d1e3f7ff66fecabc8895efc0583d48dabf042a7b2b3e9bf2e1789fded125d09"
+    },
+    {
+      "path": "packages/service/src/commands/application/create-command-executor.ts",
+      "sha256": "07816aec1b05a6248039e8b201bd9506f7e0e26929987cc277d6aebb6ceb7b8c"
+    },
+    {
+      "path": "packages/service/src/commands/domain/execution.ts",
+      "sha256": "d8d6f112510fd8a60857ba9fe04fabc7da3db0188a99f7124ad394aa9eee60d9"
+    },
+    {
+      "path": "packages/service/src/commands/ports/executor-ports.ts",
+      "sha256": "da73ceb4e60739f1e4347e73bb10c2f35ae23871f4482b1619b40f8076117a7f"
+    },
+    {
+      "path": "packages/service/tests/_fixtures/command-executor-fixture.ts",
+      "sha256": "237d2377ad803aea5f561839016c0418bd949d809e5a3b307dce4140f5e69017"
+    },
+    {
+      "path": "packages/service/tests/commands-executor-effects_test.ts",
+      "sha256": "5924b4cb0c0e9cf5b4b6dd7bc81329a2a3896aba7f15e20353793378ec8eb94a"
+    },
+    {
+      "path": "packages/service/tests/commands-executor-identity_test.ts",
+      "sha256": "821097bed83e879318ae3dfd3dd2e38421f6449b9ec3b8c9c973bc3d8476da85"
+    }
+  ],
+  "aggregateSha256": "e179c006cf630e01102128ac954ce3f01a48cd837a4d058965a6a9012bd81e0e",
+  "unchangedFiles": [
+    {
+      "path": "deno.json",
+      "sha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf"
+    },
+    {
+      "path": "deno.lock",
+      "sha256": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493"
+    },
+    {
+      "path": "packages/database/mod.ts",
+      "sha256": "e14755ec960acd13d18329ed1ac14266a3a41aefc93aa39ad955a2cf7ff89908"
+    },
+    {
+      "path": "packages/database/deno.json",
+      "sha256": "4e5aa31fc443cd8724f13ddaea3a00a573405fbab253182bafcf2c0712583cd9"
+    },
+    {
+      "path": "packages/service/mod.ts",
+      "sha256": "4d857909ca2731debf1c699b6481fa52a1ddaaed4b1746fe23f2ac17c41b4104"
+    },
+    {
+      "path": "packages/service/deno.json",
+      "sha256": "56101e0c9fa38f297dd8d81d5d473bbac667897ce43bf32720797a0e58193231"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    },
+    {
+      "path": "packages/service/src/commands/application/define-command.ts",
+      "sha256": "a9d78f09470d95b5564034e09019a3cbab7cbb194a3dd4f997a2639ac7f59a38"
+    },
+    {
+      "path": "packages/service/src/commands/domain/definition.ts",
+      "sha256": "593d7d4f964cfe536d0c061861932aebdc87981add4a20ad164ebf940c48cf6b"
+    },
+    {
+      "path": "packages/service/src/commands/testing/memory-command-store.ts",
+      "sha256": "f799fa49b9b2f79b270674f288235741378cd27a2bdf98fc44a4351768a35cfe"
+    }
+  ],
+  "newRuntimeExports": {
+    "service/commands": [
+      "createCommandExecutor"
+    ],
+    "database/commands": [
+      "CommandStoreError"
+    ]
+  },
+  "newDatabaseTypeExport": [
+    "CommandStoreFailure"
+  ],
+  "exactServiceFocusedExportNames": [
+    "defineCommand",
+    "jsonCodec",
+    "canonicalCommandJson",
+    "parseCanonicalCommandJson",
+    "CommandCodec",
+    "CommandJsonLimits",
+    "CommandActor",
+    "CommandEnvelope",
+    "CommandJson",
+    "CommandTraceContext",
+    "CommandAuditInput",
+    "CommandContext",
+    "CommandDefinition",
+    "commandDefinitionBinding",
+    "CommandDefinitionSpec",
+    "commandExecutorCapability",
+    "CommandIdempotency",
+    "CommandIdempotencyMode",
+    "CommandIdempotencySpec",
+    "CommandOutboxInput",
+    "CommandRecordRequirement",
+    "CommandError",
+    "CommandFailure",
+    "IsolationLevel",
+    "createCommandExecutor",
+    "CommandExecution",
+    "CommandExecutor",
+    "CommandRecordLimits",
+    "CommandTelemetryResult",
+    "CommandTelemetryStart",
+    "CommandClock",
+    "CommandExecutorOptions",
+    "CommandIdSource",
+    "CommandTelemetryPort",
+    "CommandTelemetrySpan",
+    "CommandStoreCapabilities",
+    "CommandStorePort",
+    "CommandTransaction",
+    "CommandTransactionRequest",
+    "DatabaseProvider",
+    "ReceiptClaim",
+    "ReceiptClaimResult",
+    "ReceiptCompletion",
+    "StoredCommandAudit",
+    "StoredCommandOutbox",
+    "StoredCommandReceipt",
+    "TransactionOptions"
+  ],
+  "serviceTypeOnlyDatabaseDependencies": [
+    "CommandStoreCapabilities",
+    "CommandStorePort",
+    "CommandTransaction",
+    "CommandTransactionRequest",
+    "DatabaseProvider",
+    "TransactionOptions",
+    "ReceiptClaim",
+    "ReceiptClaimResult",
+    "ReceiptCompletion",
+    "StoredCommandReceipt",
+    "StoredCommandAudit",
+    "StoredCommandOutbox"
+  ],
+  "serviceModuleDocSha256": "bb4482c7bb980dc28931bd1be1e74ca80721f9d1bf0d43d6919e6ec3b0e988af",
+  "serviceModuleDoc": "/**\n * Opaque command definitions, once-only local execution, redacted failures and bounded codecs.\n *\n * Importing, defining and encoding commands require no permissions and start no resource.\n * Execution delegates to the explicitly supplied store and business operations and their\n * permissions. Actor roles/claims stay outside durable envelopes.\n *\n * @example\n * ```ts\n * import { canonicalCommandJson, jsonCodec } from '@netscript/service/commands';\n * import { z } from 'zod';\n * const codec = jsonCodec(z.object({ updated: z.boolean() }));\n * canonicalCommandJson(codec.encode({ updated: true }));\n * ```\n *\n * @module\n */",
+  "namedRuntimeTests": 14,
+  "productionMutationControls": 18,
+  "newNamedCompileAssertions": 0,
+  "newDependencies": 0,
+  "rootExportsUnchanged": true,
+  "locksUnchanged": true,
+  "faultControlsInProductionOptions": false
+}

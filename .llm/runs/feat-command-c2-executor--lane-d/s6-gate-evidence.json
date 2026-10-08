@@ -1,0 +1,859 @@
+{
+  "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+  "runtime": [
+    "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+    "v8 15.0.245.2-rusty",
+    "typescript 6.0.3"
+  ],
+  "gates": [
+    {
+      "gate": "check",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/run-deno-check.ts",
+        "--root",
+        "packages/database",
+        "--root",
+        "packages/service",
+        "--ext",
+        "ts",
+        "--deno-arg",
+        "--frozen"
+      ],
+      "rawOutputSha256": "4c18d5838bd87f06a9ad68c463fbee21e9b4d44dd848acf3992486bff5d226b5",
+      "report": {
+        "source": {
+          "mode": "selection"
+        },
+        "command": "deno check --unstable-kv --frozen <files>",
+        "selection": {
+          "filesSelected": 107,
+          "batches": 1,
+          "failedBatches": 0
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueCodes": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "gate": "full-package-tests",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        ".llm/tools/run-deno-test.ts",
+        "--output",
+        "<private-evidence>/s6/full-package-tests.json",
+        "--",
+        "--frozen",
+        "--allow-all",
+        "--unstable-kv",
+        "packages/database/tests",
+        "packages/service/tests"
+      ],
+      "rawOutputSha256": "bfcc3071c8c83970a7b038f1e7027966ca44386dfb77602f7f5d40cb993b02c5",
+      "report": {
+        "summary": {
+          "passed": 217,
+          "failed": 0,
+          "ignored": 0,
+          "totalResults": 217,
+          "uniqueFailures": 0
+        }
+      }
+    },
+    {
+      "gate": "lint",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/run-deno-lint.ts",
+        "--root",
+        "packages/database",
+        "--root",
+        "packages/service",
+        "--ext",
+        "ts"
+      ],
+      "rawOutputSha256": "9ea047925417ac62f46218f2c58b6b4f441c4c38ff615e8d532f63e4f9dd185c",
+      "report": {
+        "source": {
+          "mode": "command",
+          "exitCode": 0
+        },
+        "selection": {
+          "filesSelected": 107,
+          "batches": 2,
+          "failedBatches": 0
+        },
+        "coverage": {
+          "filesSelected": 107,
+          "filesProcessed": 107,
+          "droppedFiles": [],
+          "refusals": []
+        },
+        "summary": {
+          "totalOccurrences": 0,
+          "uniqueOccurrences": 0,
+          "uniqueRules": 0,
+          "uniquePaths": 0
+        },
+        "groups": []
+      }
+    },
+    {
+      "gate": "format",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-run",
+        ".llm/tools/run-deno-fmt.ts",
+        "--root",
+        "packages/database",
+        "--root",
+        "packages/service",
+        "--ext",
+        "ts"
+      ],
+      "rawOutputSha256": "43929c231a0c96f2e64faf637865c09824cce2f9731c59335a77517c03af45dc",
+      "report": {
+        "command": "deno fmt --check",
+        "mode": "check",
+        "summary": {
+          "filesSelected": 107,
+          "batches": 2,
+          "failedBatches": 0,
+          "findings": 0,
+          "ignoredFindings": 0
+        },
+        "coverage": {
+          "filesSelected": 107,
+          "filesProcessed": 107,
+          "droppedFiles": [],
+          "refusals": []
+        },
+        "findings": []
+      }
+    },
+    {
+      "gate": "docs-service",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "doc-lint",
+        "--id",
+        "c2-s6-final-docs-service",
+        "--output",
+        "<private-evidence>/s6/docs-service-receipt.json",
+        "--",
+        "--root",
+        "packages/service"
+      ],
+      "rawOutputSha256": "a7e498c151c4260dbf811b04626b8d70c6ecbd51d0b5c2da1a10ea58fade0366",
+      "receipt": {
+        "gateId": "doc-lint",
+        "invocationId": "c2-s6-final-docs-service",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "43e228743eb3d182d2470df5462c3362edf3c7619e14e8ecc4783b7a2d293035",
+        "outcome": "PASS",
+        "durationMs": 682,
+        "exitCode": 0,
+        "rawSha256": "d55774ddf9d840f99539c35cb89cf02361b05e9f802923012e137fe939d3868c",
+        "stdout": {
+          "bytes": 1058,
+          "sha256": "ca912e77e8dcc159dbdb53faa285651f9e0de17f1518b70019fa4e92da47d9ab",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 122,
+          "sha256": "b80c96ea9ec041fc23e0fce86b7d0c1fdeb2d8e0da001b59fc0aaa2727c7fea5",
+          "truncated": false
+        }
+      },
+      "report": {
+        "source": {
+          "mode": "auto",
+          "root": "packages/service",
+          "entrypoints": [
+            "./commands-testing.ts",
+            "./commands.ts",
+            "./mod.ts",
+            "./src/auth/mod.ts",
+            "./src/primitives/rpc-path.ts"
+          ],
+          "exitCode": 0
+        },
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 0,
+          "totalPrivateTypeRef": 0,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "packages": [
+          {
+            "name": "@netscript/service",
+            "dir": "packages/service",
+            "entrypoints": [
+              {
+                "path": "./commands-testing.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./commands.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./src/auth/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./src/primitives/rpc-path.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              }
+            ],
+            "files": [],
+            "combinedTotal": 0,
+            "combinedPrivateTypeRef": 0,
+            "combinedMissingJSDoc": 0,
+            "combinedOther": 0,
+            "combinedExitCode": 0,
+            "entrypointExitCodes": {
+              "./commands-testing.ts": 0,
+              "./commands.ts": 0,
+              "./mod.ts": 0,
+              "./src/auth/mod.ts": 0,
+              "./src/primitives/rpc-path.ts": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "gate": "docs-database",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "doc-lint",
+        "--id",
+        "c2-s6-final-docs-database",
+        "--output",
+        "<private-evidence>/s6/docs-database-receipt.json",
+        "--",
+        "--root",
+        "packages/database"
+      ],
+      "rawOutputSha256": "3487306d5d0ee5f686c05eaad58120fcfd7e86cbca7b77aae5faa57a8f76b7d1",
+      "receipt": {
+        "gateId": "doc-lint",
+        "invocationId": "c2-s6-final-docs-database",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "9db0684aa3311809530c4b61204d1161d8cae9896a340b63d4f11d4686298cf7",
+        "outcome": "PASS",
+        "durationMs": 922,
+        "exitCode": 0,
+        "rawSha256": "587ab2af77ef7a744bf2b609bf455aa6486430dfa65e9113482f5cd2ff501e95",
+        "stdout": {
+          "bytes": 1874,
+          "sha256": "b441b769ed1070376761f557b310598bab27845a477703e41841f2e82d10e550",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 123,
+          "sha256": "9927663b241f2032fb0a23369884ae92a52547723955c22509fdc3a79a5dc931",
+          "truncated": false
+        }
+      },
+      "report": {
+        "source": {
+          "mode": "auto",
+          "root": "packages/database",
+          "entrypoints": [
+            "./adapters/mod.ts",
+            "./adapters/mssql.adapter.ts",
+            "./adapters/mysql.adapter.ts",
+            "./adapters/postgres.adapter.ts",
+            "./commands.ts",
+            "./extensions/mod.ts",
+            "./mod.ts",
+            "./ports/mod.ts",
+            "./prisma-tracing.ts",
+            "./scripts/mod.ts",
+            "./testing/mod.ts"
+          ],
+          "exitCode": 0
+        },
+        "summary": {
+          "totalPackages": 1,
+          "totalErrors": 0,
+          "totalPrivateTypeRef": 0,
+          "totalMissingJSDoc": 0,
+          "totalOther": 0
+        },
+        "packages": [
+          {
+            "name": "@netscript/database",
+            "dir": "packages/database",
+            "entrypoints": [
+              {
+                "path": "./adapters/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./adapters/mssql.adapter.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./adapters/mysql.adapter.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./adapters/postgres.adapter.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./commands.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./extensions/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./ports/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./prisma-tracing.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./scripts/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              },
+              {
+                "path": "./testing/mod.ts",
+                "privateTypeRef": 0,
+                "missingJSDoc": 0,
+                "other": 0,
+                "total": 0
+              }
+            ],
+            "files": [],
+            "combinedTotal": 0,
+            "combinedPrivateTypeRef": 0,
+            "combinedMissingJSDoc": 0,
+            "combinedOther": 0,
+            "combinedExitCode": 0,
+            "entrypointExitCodes": {
+              "./adapters/mod.ts": 0,
+              "./adapters/mssql.adapter.ts": 0,
+              "./adapters/mysql.adapter.ts": 0,
+              "./adapters/postgres.adapter.ts": 0,
+              "./commands.ts": 0,
+              "./extensions/mod.ts": 0,
+              "./mod.ts": 0,
+              "./ports/mod.ts": 0,
+              "./prisma-tracing.ts": 0,
+              "./scripts/mod.ts": 0,
+              "./testing/mod.ts": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "gate": "quality",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "quality-scan",
+        "--id",
+        "c2-s6-final-quality",
+        "--output",
+        "<private-evidence>/s6/quality-receipt.json"
+      ],
+      "rawOutputSha256": "be3ed9cbb923cddf109126f6e88c74e4a46c9ef8d360bbb4abc9bfa8421a3c33",
+      "receipt": {
+        "gateId": "quality-scan",
+        "invocationId": "c2-s6-final-quality",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "bb2766be825e8b4fc4c295b2799504b303d4ede259a9b3d77d2174024775394d",
+        "outcome": "PASS",
+        "durationMs": 2761,
+        "exitCode": 0,
+        "rawSha256": "45420de4cb2c00ba1fdc87e8481fe732cb4a2d37e8facaa0dec958db5c996fa5",
+        "stdout": {
+          "bytes": 4092,
+          "sha256": "dce970190ae072970570b713c6947e32c1562c8b906239c14abd13809699bab7",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 270,
+          "sha256": "96006aba8e6f570d749f2b97c6fad5b678a80c510372ce7583dc0166e746886b",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "architecture",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "arch-check",
+        "--id",
+        "c2-s6-final-architecture",
+        "--output",
+        "<private-evidence>/s6/architecture-receipt.json"
+      ],
+      "rawOutputSha256": "e05c6a8c878e6a5d94749163b2e4787a23804ecc790b4fdc0f7683507c1e30ef",
+      "receipt": {
+        "gateId": "arch-check",
+        "invocationId": "c2-s6-final-architecture",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "9f2461e8ea4ef20c75b6b50a3c00c2c36a6e248a8a2c1b8d1cd6b00937cd848e",
+        "outcome": "PASS",
+        "durationMs": 6068,
+        "exitCode": 0,
+        "rawSha256": "f11363a940211d068345c6e675018288fa86decbf8c400231cae0580d117c073",
+        "stdout": {
+          "bytes": 42726,
+          "sha256": "9739573dcab2018574e14d1914b34d133921032ae2f2be6d3654d5ab22be98a9",
+          "truncated": true
+        },
+        "stderr": {
+          "bytes": 485,
+          "sha256": "d383a582d1a3ab53409417a624b04062624331ae3ada6bd36a8fb15ed8e33cc6",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "exports",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "exports-drift",
+        "--id",
+        "c2-s6-final-exports",
+        "--output",
+        "<private-evidence>/s6/exports-receipt.json"
+      ],
+      "rawOutputSha256": "16741449650c93a27c0672088f7b350b4cd423f4ecc29630f64f5f0fde5f83da",
+      "receipt": {
+        "gateId": "exports-drift",
+        "invocationId": "c2-s6-final-exports",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "65f6e82cc904144deaeffb857fa2ece6a7cec7d916bc66d8a8753d599cec8fde",
+        "outcome": "PASS",
+        "durationMs": 3200,
+        "exitCode": 0,
+        "rawSha256": "779c2aeccde32e7beb6d198d3dba2a945b3d69aa5d7c954e7404ead3d645ad53",
+        "stdout": {
+          "bytes": 13340,
+          "sha256": "f52a0a796a0aff1c8cd69f89a8061b5c892695c4e7c2654073829a1ba45b0dc0",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 112,
+          "sha256": "6b3227ef695597fbc2c2bf0c3350f5ee5251e894020513f33412a26568c1294f",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "publish-service",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "publish-dry-run",
+        "--id",
+        "c2-s6-final-publish-service",
+        "--output",
+        "<private-evidence>/s6/publish-service-receipt.json",
+        "--",
+        "--member",
+        "packages/service"
+      ],
+      "rawOutputSha256": "6a95f1aeae8f53cdd54f6c6cd12ac8b98c03c8ea588193a238c24da6bb28c6ab",
+      "receipt": {
+        "gateId": "publish-dry-run",
+        "invocationId": "c2-s6-final-publish-service",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "fcb44d902d2ccf809bb8104e7f1e3d13f25b6f9b117e015192d1f49811c095d5",
+        "outcome": "PASS",
+        "durationMs": 4274,
+        "exitCode": 0,
+        "rawSha256": "0e65cb056e518db7bf69bc306468f44aa4e1a1a7157b486689184d8888eca66b",
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 9015,
+          "sha256": "b06b14af5f2a408e22fb05e11595f992b28d65f94f482885cd512dce13f4d289",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "publish-database",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        ".llm/tools/gates/run-gate.ts",
+        "--gate",
+        "publish-dry-run",
+        "--id",
+        "c2-s6-final-publish-database",
+        "--output",
+        "<private-evidence>/s6/publish-database-receipt.json",
+        "--",
+        "--member",
+        "packages/database"
+      ],
+      "rawOutputSha256": "0dc2880cee9afa0912e1372da21460cf22ca5e10106eec2b1efb4a458bb5ccb9",
+      "receipt": {
+        "gateId": "publish-dry-run",
+        "invocationId": "c2-s6-final-publish-database",
+        "gitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "actualGitHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+        "attempt": 1,
+        "schemaVersion": 1,
+        "requestHash": "fc7c260edf40b4dee3384da50b58fde4856e3b40cbe87acc5be3717ed97eeeba",
+        "outcome": "PASS",
+        "durationMs": 3022,
+        "exitCode": 0,
+        "rawSha256": "c29137c2f9a00fd8c852ae7d09bb7bba55360f4cca5c530f8fc9174577a3c4a8",
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stderr": {
+          "bytes": 4469,
+          "sha256": "7c6f9f71c3fad5507c1ea9044b36676df785bf43136588413a0a5caa8f63d63e",
+          "truncated": false
+        }
+      }
+    },
+    {
+      "gate": "audit-database",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-all",
+        ".llm/tools/fitness/audit-jsr-package.ts",
+        "--root",
+        "packages/database",
+        "--out",
+        "<private-evidence>/s6/database-audit.json"
+      ],
+      "rawOutputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "audit": {
+        "gates": [
+          {
+            "gate": "F-JSR-7 slow-types",
+            "level": "WARN",
+            "message": "Checking for slow types in the public API..."
+          }
+        ],
+        "slowTypesOk": true,
+        "moduleTags": {
+          ".": true,
+          "./ports": true,
+          "./adapters": true,
+          "./adapters/postgres": true,
+          "./adapters/mssql": true,
+          "./adapters/mysql": true,
+          "./extensions": true,
+          "./scripts": true,
+          "./tracing": true,
+          "./testing": true,
+          "./commands": true
+        },
+        "exports": {
+          ".": "./mod.ts",
+          "./ports": "./ports/mod.ts",
+          "./adapters": "./adapters/mod.ts",
+          "./adapters/postgres": "./adapters/postgres.adapter.ts",
+          "./adapters/mssql": "./adapters/mssql.adapter.ts",
+          "./adapters/mysql": "./adapters/mysql.adapter.ts",
+          "./extensions": "./extensions/mod.ts",
+          "./scripts": "./scripts/mod.ts",
+          "./tracing": "./prisma-tracing.ts",
+          "./testing": "./testing/mod.ts",
+          "./commands": "./commands.ts"
+        }
+      }
+    },
+    {
+      "gate": "audit-service",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "run",
+        "--allow-all",
+        ".llm/tools/fitness/audit-jsr-package.ts",
+        "--root",
+        "packages/service",
+        "--out",
+        "<private-evidence>/s6/service-audit.json"
+      ],
+      "rawOutputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "audit": {
+        "gates": [
+          {
+            "gate": "F-JSR-7 slow-types",
+            "level": "INFO",
+            "message": "Checking for slow types in the public API... \u2014 sanctioned --allow-slow-types (oRPC-bound; see docs/architecture/doctrine/02-public-surface.md)"
+          }
+        ],
+        "slowTypesOk": true,
+        "moduleTags": {
+          ".": true,
+          "./auth": true,
+          "./rpc-path": true,
+          "./commands": true,
+          "./commands/testing": true
+        },
+        "exports": {
+          ".": "./mod.ts",
+          "./auth": "./src/auth/mod.ts",
+          "./rpc-path": "./src/primitives/rpc-path.ts",
+          "./commands": "./commands.ts",
+          "./commands/testing": "./commands-testing.ts"
+        }
+      }
+    },
+    {
+      "gate": "docs-links",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "task",
+        "docs:links"
+      ],
+      "rawOutputSha256": "7ad9702cef7ad4985baa6045f6ef604092fdb98a5e49edbfeb754d4c29a98275"
+    },
+    {
+      "gate": "docs-site-build",
+      "exitCode": 0,
+      "baselineHead": "06cf02d75c140aa36f341ebeffed1c8e659e610e",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "command": [
+        "deno",
+        "task",
+        "--cwd",
+        "docs/site",
+        "build"
+      ],
+      "rawOutputSha256": "e67ecdb2c8c99ef5e35a2bbf874211bb8220fa50ea12f5857d80a27cc6b147ea"
+    }
+  ],
+  "lockHashes": {
+    "deno.lock": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493",
+    "packages/fresh-ui/deno.lock": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+  },
+  "locksUnchanged": true,
+  "validationNotes": "All217tests,107-file scoped static, native docs/quality/architecture/export/publication/audits and docs links/site-build refreshed after the supervisor HTTP field-value repair and explicit fixture forwarding. Identity mutants were refreshed against the new guard bytes; all20restoration hashes match finalsource. Native clean consumers include corrected overlapping claims and the final identity guard.",
+  "documentationQualification": "Each of five service and eleven database entrypoints has individual exit0 and zero diagnostics; both combined graphs also0. The initial testing manifest had five private type references; transitive CommandContext exposed two more. Existing service-owned dependencies were re-exported type-only solely through the focused testing manifest.",
+  "initialFocusedDocumentationFindings": [
+    {
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "commandDefinitionBinding",
+        "commandExecutorCapability",
+        "CommandContext",
+        "CommandTraceContext",
+        "CommandFailure"
+      ],
+      "rawDiagnosticSha256": "5d1d9ee0b3ae3f9e04597ca26e2e0cde1ecd61745b6c586a8494819a2c015015"
+    },
+    {
+      "exitCode": 1,
+      "privateTypeRefs": [
+        "CommandAuditInput",
+        "CommandOutboxInput"
+      ],
+      "rawDiagnosticSha256": "0e14730e6791edadc08679de4ea0e6b53af281b8bacfee4baa27b1690963284b"
+    }
+  ],
+  "initialHttpGuardLintFinding": {
+    "exitCode": 1,
+    "rule": "no-control-regex",
+    "filesSelected": 107,
+    "location": {
+      "path": "packages/service/src/commands/application/command-identity.ts",
+      "line": 33,
+      "column": 5
+    },
+    "reproducedRejectedCandidateRawOutputSha256": "a5ae56c9f97991ff6593184c3ef64f64f05dcb60fded008d6cbced065612c8e9",
+    "history": "The first bounded regex attempt passed217tests but failed scoped lint1. Its exact rejected guard was reproduced for a retained actual107-file wrapper receipt, with final source restored byte-exact. The final bounded char-code guard passes native lint0 without suppression."
+  }
+}

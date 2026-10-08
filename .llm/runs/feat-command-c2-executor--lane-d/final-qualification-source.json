@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "qualificationHead": "343f38c5af60e1f07d27715dfe92731df6b16af7",
+  "productSourceHead": "4b8b7cb99b62919198e04de5eabf1a35716c1b7e",
+  "baselineClean": true,
+  "trackedBaselineFileCount": 6240,
+  "baselineTrackedReceiptSha256": "fe9d8efdd11f9776e5368eefc65a31b292d3ddaa9b68a4d146e17d6b07abe59b",
+  "evidenceOnly": true,
+  "sourceAssetsToolsLocksWorkflowsChanged": false,
+  "signedS6ProductFiles": [
+    {
+      "path": "docs/site/reference/service/index.md",
+      "sha256": "ae28c4df822a815b1cffa92fdfc311436b14cf303f1189e36d2e5d85f424629d"
+    },
+    {
+      "path": "packages/service/README.md",
+      "sha256": "cae2ab1fdcf3949bb7b8f49889ae304fa6981786be7d452f3ab5aebcd48ff8a6"
+    },
+    {
+      "path": "packages/service/commands-testing.ts",
+      "sha256": "e45ecbeefee826e1cf44bdd3934bc6c0f2bfaa059d20443e00f26d1ec03f557b"
+    },
+    {
+      "path": "packages/service/src/commands/application/command-identity.ts",
+      "sha256": "a7fe3e6e28984905beebf9e0f2f45272333814b606828b81512802b8066c30a4"
+    },
+    {
+      "path": "packages/service/src/commands/application/create-command-executor.ts",
+      "sha256": "3d1677af2d1347fea1badef5b2b174c4c95870c62108fc3ddaf1d91737bf785f"
+    },
+    {
+      "path": "packages/service/src/commands/application/executor-boundary.ts",
+      "sha256": "1c1b246e113d13040a8bec1422682213558f75ae61f97be283a740612b8215db"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance-controls.ts",
+      "sha256": "99c8ad2592877a1351575b23e2f1d6caa7d8b7f2705e9224d388b53f5c8b4581"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance-fixture.ts",
+      "sha256": "2410b1dfba4e4760ad7a9c27e0dce68b23db8a4a70c970c71d09c78a3d01ff7a"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance-helpers.ts",
+      "sha256": "0a68e1894047c057fe70915b0d1843f124ef9866517219192c2e60ab34231791"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-conformance.ts",
+      "sha256": "a399e4758356f23425e8514371af096b301a58b6c90d5e3560bd0a207b67521d"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-determinism.ts",
+      "sha256": "3a7832a60ce4e0db8a5dfc6913018231f5636e5e7ba1f2a5eeb246d26cace9b6"
+    },
+    {
+      "path": "packages/service/src/commands/testing/command-fault-controller.ts",
+      "sha256": "bf323bc34a0eb435603ac5c74a7d62ce96a4433f0671b35a844cca9d49bbfe1d"
+    },
+    {
+      "path": "packages/service/tests/commands-conformance_test.ts",
+      "sha256": "24fd185a989e8489093376253b0f403466e7cd444628d2fc0cd09ab0a85b7874"
+    },
+    {
+      "path": "packages/service/tests/commands-executor-identity_test.ts",
+      "sha256": "6c92b4582a9d8aca136e7a6b55be4a9d85a253d2b0ea9421074bade8cec14eb4"
+    }
+  ],
+  "signedS6ProductAggregateSha256": "d3d59597a3bcdb59a57faabc31c56ea0e6c9986f20c6cf2f6c10797239b4535c",
+  "allSignedS6ProductHashesUnchanged": true,
+  "all20S6RestorationHashesUnchanged": true,
+  "completedGeneratedAssets": [
+    {
+      "path": ".llm/assets/agent-docs/prose.json.gz",
+      "sha256": "90ff54bf3176e72e3562abdb1764aae1d43442fb944383f652912fb6c377a8ec"
+    },
+    {
+      "path": ".llm/assets/agent-docs/provenance.json",
+      "sha256": "5fdb72d206cb4c60cb6be29d542691d488105c1b4a0a274823c8d744695a4d33"
+    },
+    {
+      "path": "packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts",
+      "sha256": "3c9303301501785b9de57677d32adeda39977a30a0053dae87501e301f348920"
+    },
+    {
+      "path": "packages/mcp/src/publish-assets.generated.ts",
+      "sha256": "e34f53c84c537b09dac902827586cab38fa74bfa64f7c0fa4f70136b083a714e"
+    },
+    {
+      "path": "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "sha256": "be5231ae171367ae34eb917a813013ae07a973baa1f85810b03ea7dc5ef51acd"
+    }
+  ],
+  "locks": [
+    {
+      "path": "deno.lock",
+      "sha256": "12fd67276411d2d47cc9abe30ac207c3a5720f749ffc06ab25d428f2d0081493"
+    },
+    {
+      "path": "packages/fresh-ui/deno.lock",
+      "sha256": "9b79d08cbf0fdbcd9d92b782cc5f22d2bdf6cbf4b6f3086363506e67b0c53b07"
+    }
+  ],
+  "publicNativeConsumerInventoryCounts": {
+    "database": 23,
+    "service": 52
+  },
+  "generatedOnlyStandaloneProof": {
+    "rootConfigSha256": "3a83970533e46623b05b6ea510c83751bfee4dc605e4be992ac4d00e52d80faf",
+    "standaloneConfigSha256": "dda325d5e2530ca5b16f725e6a479c1d654fce80011f68eb52cbdf886933c620",
+    "selectedPaths": [
+      "packages/cli/src/kernel/assets/agent-docs.generated.ts",
+      "packages/mcp/src/publish-assets.generated.ts"
+    ],
+    "selectionOnlyAdapted": true,
+    "lintRulesAndOtherOptionsExact": true,
+    "formatOptionsExact": true,
+    "noAncestorExclusionsOrExtends": true,
+    "selectedAndProcessed": 2,
+    "refusals": 0,
+    "supervisorAuthorized": true
+  },
+  "consumerEvidenceSha256": "a1d7b012086337f0fab4e73ad13615fbf7e637e694631026e5abd2b47f2456ae",
+  "allNonEvidenceTrackedFilesUnchanged": 6233,
+  "allNonEvidenceTrackedHashMapSha256": "b707a2a0055eb802bb5c69027d2277ab4aba2839740e138315e3078a6f82410f",
+  "allTrackedBaselineHashProof": "Every tracked baseline byte unchanged except the seven explicitly named run metadata files; three new sanitized evidence files are the only untracked files.",
+  "finalPublicArtifactPaths": [
+    ".llm/runs/feat-command-c2-executor--lane-d/acceptance.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/context-pack.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/drift.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/final-qualification-consumers.json",
+    ".llm/runs/feat-command-c2-executor--lane-d/final-qualification-gates.json",
+    ".llm/runs/feat-command-c2-executor--lane-d/final-qualification-source.json",
+    ".llm/runs/feat-command-c2-executor--lane-d/implement.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/phase-registry.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/supervisor.md",
+    ".llm/runs/feat-command-c2-executor--lane-d/worklog.md"
+  ]
+}

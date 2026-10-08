@@ -1,0 +1,382 @@
+{
+  "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+  "runtime": [
+    "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+    "v8 15.0.245.2-rusty",
+    "typescript 6.0.3"
+  ],
+  "scope": "All eleven database and five service declared entrypoints, isolated workspace-empty source and exact native packed declarations. Other dependencies use declared public registry specifiers; no private first-party workspace alias. Declaration .js resolution points to the corresponding unmodified native .d.ts artifact.",
+  "qualification": "Each existing factory is assignable to its exact function signature; each property is reassigned. Default and explicit HealthCheckAdapterOptions calls produce HealthCheck values in both source snapshots and corrected native declarations. No new named tests.",
+  "publicationLimit": "Local native publish dry-run and pack, not a remote publication or complete npm consumer certification.",
+  "generatedOutputPolicy": "Tarballs and extracted generated contents are unchanged. No emitter or consumer-tool rewrite and no generated-output handpatch.",
+  "observations": [
+    {
+      "label": "baseline",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "packExit": 0,
+      "sourceHealthSha256": "b3c5a0c587fa6e1785003d2756aac492ab7fd9021da3b37f252749adda3a1bcb",
+      "emittedHealthSha256": "e582f76b8d658a927fd4456214bd30aac620e36844b754ff03e7e9198f705ec2",
+      "records": [
+        {
+          "profile": "source",
+          "frozen": false,
+          "exitCode": 0,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 0
+          },
+          "summary": {
+            "totalOccurrences": 0,
+            "uniqueOccurrences": 0,
+            "uniqueCodes": 0,
+            "uniquePaths": 0
+          },
+          "diagnostics": [],
+          "rawReportSha256": "d8f8d05f6ac7318b9cecef7d31acb11b27723a7fc3a5e52059c7f4e1981fa375"
+        },
+        {
+          "profile": "source",
+          "frozen": true,
+          "exitCode": 0,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 0
+          },
+          "summary": {
+            "totalOccurrences": 0,
+            "uniqueOccurrences": 0,
+            "uniqueCodes": 0,
+            "uniquePaths": 0
+          },
+          "diagnostics": [],
+          "rawReportSha256": "5c3f42f6d7ce7463c7a5e35bb035a926ff7b68d3c946611db4b6e43f26cb8a88"
+        },
+        {
+          "profile": "declaration",
+          "frozen": false,
+          "exitCode": 1,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 1
+          },
+          "summary": {
+            "totalOccurrences": 5,
+            "uniqueOccurrences": 5,
+            "uniqueCodes": 2,
+            "uniquePaths": 1
+          },
+          "diagnostics": [
+            {
+              "code": "TS2300",
+              "count": 4,
+              "message": "Duplicate identifier 'readonly'."
+            },
+            {
+              "code": "TS7008",
+              "count": 1,
+              "message": "Member 'readonly' implicitly has an 'any' type."
+            }
+          ],
+          "rawReportSha256": "4b6dce0c08dc6bcb23f471bcf29079b8f863332f02e1af922388f038357d6e0e"
+        },
+        {
+          "profile": "declaration",
+          "frozen": true,
+          "exitCode": 1,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 1
+          },
+          "summary": {
+            "totalOccurrences": 5,
+            "uniqueOccurrences": 5,
+            "uniqueCodes": 2,
+            "uniquePaths": 1
+          },
+          "diagnostics": [
+            {
+              "code": "TS2300",
+              "count": 4,
+              "message": "Duplicate identifier 'readonly'."
+            },
+            {
+              "code": "TS7008",
+              "count": 1,
+              "message": "Member 'readonly' implicitly has an 'any' type."
+            }
+          ],
+          "rawReportSha256": "8ca280aabde0e43cea3acca02dbb3b719a3feac892949ee902c64f46ef5e8c7e"
+        }
+      ],
+      "nativePublication": [
+        {
+          "member": "database",
+          "nativePublishExit": 0,
+          "nativePackExit": 0,
+          "archiveSha256": "7a91f1b335c7725e04a8af78748d38455c000f63d3996c3f901ded279f86d256",
+          "inventorySha256": "7828c48540cf39b7563a029a96630ee5eac84e36d44934684faf546dcee5def3",
+          "inventory": [
+            "README.md",
+            "adapters/mod.ts",
+            "adapters/mssql.adapter.ts",
+            "adapters/mysql.adapter.ts",
+            "adapters/postgres.adapter.ts",
+            "commands.ts",
+            "deno.json",
+            "extensions/mod.ts",
+            "extensions/sql-json.extension.ts",
+            "mod.ts",
+            "ports/command-store-capabilities.ts",
+            "ports/command-store.ts",
+            "ports/database-client.ts",
+            "ports/mod.ts",
+            "prisma-tracing.ts",
+            "scripts/fix-zod-imports.ts",
+            "scripts/generate-zod.ts",
+            "scripts/migrate.ts",
+            "scripts/mod.ts",
+            "scripts/patch-prisma-client.ts",
+            "testing/mock-database.ts",
+            "testing/mod.ts"
+          ],
+          "nativePublishStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePublishStderrSha256": "cf45bb674a417213e58f58e814133ea41284b5fa01d116d9a27ce1ab33df456a",
+          "nativePackStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePackStderrSha256": "297263bcaf66722009135cffb6ce3054b0f97441c9aee69392ec1df88e427980"
+        },
+        {
+          "member": "service",
+          "nativePublishExit": 0,
+          "nativePackExit": 0,
+          "archiveSha256": "9e4693198a2ddce06b659e3fe0058011ed6219a73b0c9aac7224774f6cb231aa",
+          "inventorySha256": "aa6a186b5bbf8b25db284ab289801de34d82cb244d16713980cad145588647ea",
+          "inventory": [
+            "README.md",
+            "commands-testing.ts",
+            "commands.ts",
+            "deno.json",
+            "mod.ts",
+            "src/adapters/runtime-host-budget-timer.ts",
+            "src/auth/auth-middleware.ts",
+            "src/auth/contract-authorizer.ts",
+            "src/auth/contract-policy.ts",
+            "src/auth/hono-context.ts",
+            "src/auth/mod.ts",
+            "src/auth/options.ts",
+            "src/auth/scope-authorizer.ts",
+            "src/auth/service-auth-policy.ts",
+            "src/auth/static-credential-authenticator.ts",
+            "src/auth/trusted-header-authenticator.ts",
+            "src/auth/types.ts",
+            "src/builder/service-builder-impl.ts",
+            "src/builder/service-builder.ts",
+            "src/builder/service-listener.ts",
+            "src/builder/service-rpc.ts",
+            "src/builder/service-shutdown.ts",
+            "src/commands/application/canonical-json.ts",
+            "src/commands/application/define-command.ts",
+            "src/commands/application/json-codec.ts",
+            "src/commands/domain/codec.ts",
+            "src/commands/domain/definition.ts",
+            "src/commands/domain/failure.ts",
+            "src/commands/domain/values.ts",
+            "src/commands/testing/memory-command-store.ts",
+            "src/diagnostics/database-connectivity.ts",
+            "src/presets/define-service.ts",
+            "src/primitives/handlers.ts",
+            "src/primitives/health.ts",
+            "src/primitives/openapi.ts",
+            "src/primitives/orpc-router.ts",
+            "src/primitives/rpc-path.ts",
+            "src/primitives/scalar.generated.ts",
+            "src/runtime/runtime-host.ts",
+            "src/types.ts"
+          ],
+          "nativePublishStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePublishStderrSha256": "eefabeb691ca9e2435c28768e91e94b6e78991cc890621ccdb6c39e84588aba8",
+          "nativePackStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePackStderrSha256": "4858a3ac9639e3b840c1ad81631a62a32e91b5243ba066ef152162fc5495d1f8"
+        }
+      ],
+      "nativePublicationReceiptSha256": "021289564654d164f0a635c2c2ae564259d52292843b926a89f7947aba894c70"
+    },
+    {
+      "label": "candidate",
+      "runtime": "deno 2.9.5 (stable, release, x86_64-unknown-linux-gnu)",
+      "baselineHead": "a1eb16cd33e8e1f52aaf9bceb88b1a97400e2fba",
+      "packExit": 0,
+      "sourceHealthSha256": "1ac94a31b16498192a41f66521418613663ccef78c34b545856b80dc63bc872e",
+      "emittedHealthSha256": "3554945ac725ef04898ff8c027331cc83da65435527a4684fc35977466cf7bcd",
+      "records": [
+        {
+          "profile": "source",
+          "frozen": false,
+          "exitCode": 0,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 0
+          },
+          "summary": {
+            "totalOccurrences": 0,
+            "uniqueOccurrences": 0,
+            "uniqueCodes": 0,
+            "uniquePaths": 0
+          },
+          "diagnostics": [],
+          "rawReportSha256": "49893b76b10a764fecd82dde7c042f2bfbd1662293be16e2dd7f9b7b48c8df01"
+        },
+        {
+          "profile": "source",
+          "frozen": true,
+          "exitCode": 0,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 0
+          },
+          "summary": {
+            "totalOccurrences": 0,
+            "uniqueOccurrences": 0,
+            "uniqueCodes": 0,
+            "uniquePaths": 0
+          },
+          "diagnostics": [],
+          "rawReportSha256": "5c3846c1442a556ec743130f0eebfbe429c4f3ea901c48c13f5ec32a1feeecf3"
+        },
+        {
+          "profile": "declaration",
+          "frozen": false,
+          "exitCode": 0,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 0
+          },
+          "summary": {
+            "totalOccurrences": 0,
+            "uniqueOccurrences": 0,
+            "uniqueCodes": 0,
+            "uniquePaths": 0
+          },
+          "diagnostics": [],
+          "rawReportSha256": "5f0d0c1d106cb723d664164bae2f6bf9d37e2f98b9173577b6bea19268083f4c"
+        },
+        {
+          "profile": "declaration",
+          "frozen": true,
+          "exitCode": 0,
+          "selection": {
+            "filesSelected": 2,
+            "batches": 1,
+            "failedBatches": 0
+          },
+          "summary": {
+            "totalOccurrences": 0,
+            "uniqueOccurrences": 0,
+            "uniqueCodes": 0,
+            "uniquePaths": 0
+          },
+          "diagnostics": [],
+          "rawReportSha256": "a45f97b717f1f53f20b09a73622bdb2c2bf046ab9951ac5ceab72530c174910a"
+        }
+      ],
+      "nativePublication": [
+        {
+          "member": "database",
+          "nativePublishExit": 0,
+          "nativePackExit": 0,
+          "archiveSha256": "e01d7b3eb549a1435631c677bdc510562c34f7c6ff155763dc7e6c4924c36201",
+          "inventorySha256": "7828c48540cf39b7563a029a96630ee5eac84e36d44934684faf546dcee5def3",
+          "inventory": [
+            "README.md",
+            "adapters/mod.ts",
+            "adapters/mssql.adapter.ts",
+            "adapters/mysql.adapter.ts",
+            "adapters/postgres.adapter.ts",
+            "commands.ts",
+            "deno.json",
+            "extensions/mod.ts",
+            "extensions/sql-json.extension.ts",
+            "mod.ts",
+            "ports/command-store-capabilities.ts",
+            "ports/command-store.ts",
+            "ports/database-client.ts",
+            "ports/mod.ts",
+            "prisma-tracing.ts",
+            "scripts/fix-zod-imports.ts",
+            "scripts/generate-zod.ts",
+            "scripts/migrate.ts",
+            "scripts/mod.ts",
+            "scripts/patch-prisma-client.ts",
+            "testing/mock-database.ts",
+            "testing/mod.ts"
+          ],
+          "nativePublishStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePublishStderrSha256": "371185926b6e193cbd0a674879770bd030aef2f01ec3fdcf1a7a1db780410ffa",
+          "nativePackStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePackStderrSha256": "bfe26c022fe167596bb4d93595b18312a3bf6cadf6aafbbdf9b278a6346b3c6a"
+        },
+        {
+          "member": "service",
+          "nativePublishExit": 0,
+          "nativePackExit": 0,
+          "archiveSha256": "7e1704feb39ba40532d017f6bf6b3138ba1f6c804a80f8e8604cd38ca343cf0e",
+          "inventorySha256": "aa6a186b5bbf8b25db284ab289801de34d82cb244d16713980cad145588647ea",
+          "inventory": [
+            "README.md",
+            "commands-testing.ts",
+            "commands.ts",
+            "deno.json",
+            "mod.ts",
+            "src/adapters/runtime-host-budget-timer.ts",
+            "src/auth/auth-middleware.ts",
+            "src/auth/contract-authorizer.ts",
+            "src/auth/contract-policy.ts",
+            "src/auth/hono-context.ts",
+            "src/auth/mod.ts",
+            "src/auth/options.ts",
+            "src/auth/scope-authorizer.ts",
+            "src/auth/service-auth-policy.ts",
+            "src/auth/static-credential-authenticator.ts",
+            "src/auth/trusted-header-authenticator.ts",
+            "src/auth/types.ts",
+            "src/builder/service-builder-impl.ts",
+            "src/builder/service-builder.ts",
+            "src/builder/service-listener.ts",
+            "src/builder/service-rpc.ts",
+            "src/builder/service-shutdown.ts",
+            "src/commands/application/canonical-json.ts",
+            "src/commands/application/define-command.ts",
+            "src/commands/application/json-codec.ts",
+            "src/commands/domain/codec.ts",
+            "src/commands/domain/definition.ts",
+            "src/commands/domain/failure.ts",
+            "src/commands/domain/values.ts",
+            "src/commands/testing/memory-command-store.ts",
+            "src/diagnostics/database-connectivity.ts",
+            "src/presets/define-service.ts",
+            "src/primitives/handlers.ts",
+            "src/primitives/health.ts",
+            "src/primitives/openapi.ts",
+            "src/primitives/orpc-router.ts",
+            "src/primitives/rpc-path.ts",
+            "src/primitives/scalar.generated.ts",
+            "src/runtime/runtime-host.ts",
+            "src/types.ts"
+          ],
+          "nativePublishStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePublishStderrSha256": "d3817224abffb187d6cbf09af79e9d7a413c8f4ed61884ab9f2d3b272e5cd854",
+          "nativePackStdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "nativePackStderrSha256": "1c82ecb51cecc28755c4e1892deea5a8b07a56bb863d106c717fbf8f7ff47290"
+        }
+      ],
+      "nativePublicationReceiptSha256": "021289564654d164f0a635c2c2ae564259d52292843b926a89f7947aba894c70"
+    }
+  ]
+}
