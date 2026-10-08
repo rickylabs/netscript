@@ -121,3 +121,9 @@ Gate `route-ci-cli-doc`: raw exit `0`. Command: `deno task doc:lint --root packa
 Gate `route-ci-cli-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/cli --text`. Full raw output retained privately.
 
 S6 substantive generated-data review: canonical gen:agent-docs-prose at clean committed 74c0a17b4 changes only route page prose and its llms-full aggregate; all other extracted pages byte-unchanged, no added/removed files. Bundle hash 03fcbe65897f5f8613886efe276088daedc46932908f440d429d9bc13c591071. Canonical generator also updates existing CLI embedded agent-docs carrier/provenance (same exports/shape). No handwritten generated data, runtime source, lock or dependency change. Canonical prose freshness and generator four tests + embedded consumer four tests pass; full quality/architecture and export corpus freshness pass. Initial check:assets-barrel generates the required carrier then reports raw exit one on its uncommitted expected delta; commit that canonical output, then require committed carrier/freshness pass. Additional owning CLI doc/JSR/publication dry-run gates selected for changed carrier. No command/scaffold/packaging output or public API change; release-class runtime gates remain N/A. Original route browser/source PASS and documentation debt unchanged; independent bounded generated amendment review required.
+
+Gate `route-ci-cli-publish`: raw exit `0`. Command: `deno task --cwd packages/cli publish:dry-run`. Full raw output retained privately.
+
+Gate `route-ci-committed-carrier`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `route-ci-committed-prose`: raw exit `0`. Command: `deno task check:agent-docs-prose`. Full raw output retained privately.
