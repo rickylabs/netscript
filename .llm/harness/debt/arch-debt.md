@@ -2432,8 +2432,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ### Fresh rich send all-entrypoint documentation baseline (#2068)
 
 - **ID:** `chat-send-doc-baseline-2068`
-- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count and raw exit are unchanged after rich send; the new owned type is fully documented. Raw doc gate remains failed, no suppression.
-- **Owner:** Fresh package public-surface maintainers.
+- **Reason:** Pristine current main retains 45 combined documentation findings (28 private-type references,17 missing JSDoc) across Fresh exports. Full structured reports, every entrypoint count and raw exit are unchanged after rich send; the new owned type is fully documented. MCP corpus ownership additionally retains an identical pristine-main report: combined zero, two entrypoints with three private-type diagnostics each and raw task exit one. Raw doc gates remain failed, no suppression.
+- **Owner:** Fresh and MCP package public-surface maintainers.
 - **Target:** Before the next stable Fresh release, no later than 2026-10-15.
-- **Closing gate:** F-7 full Fresh doc-lint has zero diagnostics across all17export entrypoints.
+- **Closing gate:** F-7 full Fresh and MCP doc-lint has zero diagnostics across every export entrypoint.
 - **Status:** open; independent evaluator must adjudicate DEBT_ACCEPTED for this unchanged baseline.

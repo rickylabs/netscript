@@ -75,3 +75,19 @@ Gate `chat-final-publish`: raw exit `0`. Command: `deno run --frozen --allow-all
 Gate `chat-final-doc`: raw exit `1`. Command: `deno task doc:lint --root packages/fresh`. Full raw output retained privately.
 
 S3 actualnative qualification complete: defaultdurableStreamConnection, no createConnection injection, owningrealHTTP POST captures complete nativeUI andModelmultimodal/metadata/tool/reasoning/structuredoutput/date/nullcontent/futurefields plusdata. Native bootstrapJSON countedseparately, exactly1liveSSE sharedby2logicalreaders before/aftersend, caller+disposalabortactualinflightPOSTs and finalnativeSSEcancel/0active verified. Compilinglossymapper source mutant causes exactly1parsedwire mismatch FAIL, restoredPASS; nativefixture cleansowned streams/heldPOSTs/server in boundedfinally. Two new runtime regressions and1nativecompileconsumer each causalFAIL/restoredPASS. FullFresh285pass/0fail/0ignored,225file scopedfrozencheck/lint/fmt, quality/architecture,owningJSR/rawpublish PASS. All17entrypointdocJSON byte/semanticidentical to pristine mainbaseline rawexit1 (45combined:28private/17missing), no newdiagnostic. Proposedchat-send-doc-baseline-2068 recordedowner/target/closinggate forindependentDEBT_ACCEPTED; no false rawgreen. ExistingruntimeAI folder13children unchanged, no newsourcefile. Only1owningS3testfile, no dependencies/locks/hub/projection changes. S4cleansourcepubliccorpusnext; S5independentIMPLmandatory.
+
+Gate `chat-corpus-generate`: raw exit `0`. Command: `deno task gen:mcp-export-corpus`. Full raw output retained privately.
+
+Gate `chat-carrier`: raw exit `0`. Command: `deno task check:assets-barrel`. Full raw output retained privately.
+
+Gate `chat-mcp-check`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts --deno-arg --frozen`. Full raw output retained privately.
+
+Gate `chat-mcp-jsr`: raw exit `0`. Command: `deno run --frozen --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/mcp --text`. Full raw output retained privately.
+
+Gate `chat-mcp-publish`: raw exit `0`. Command: `deno run --frozen --allow-all .llm/tools/release/run-publish-dry-run.ts --member packages/mcp`. Full raw output retained privately.
+
+Gate `chat-mcp-doc`: raw exit `1`. Command: `deno task doc:lint --root packages/mcp`. Full raw output retained privately.
+
+Gate `chat-corpus-fresh`: raw exit `0`. Command: `deno task check:mcp-export-corpus`. Full raw output retained privately.
+
+S4 canonical corpus generated from clean committed S3 source4f429df3a. A pristine main git archive was exported into task-local temporary storage (ordinary immutable files, not a branch/worktree) and read using the owning buildExportSurfaceCorpus API; comparison proves exactly one added Fresh AI type, NetScriptChatSendMessage, no removed or changed normalized declarations, unchanged277subpaths,7947to7948symbols. Main checked-in corpus predates current main public inventory; comparison uses canonical current-main output, never claims stale artifact as semantic baseline. Initial private archive extraction used a newer Python API unavailable here; corrected safe path-validated extraction and removed owned snapshot in finally. New compressed corpus sha1c1feb6b0b838298ffc52c67cd63fce6bd6685d81cace48d6ff9040cc8798546. Existing asset carrier and canonical freshness pass; owning MCP static/JSR/actualdrypublication pass. Complete MCP doc report byte-identical to pristine main baseline (combined0, two entrypoints3private each, rawtaskexit1), proposed same doc debt extended with explicit MCP owner/closinggate. No hand-edited generated source. Commit canonical output before committed-tree14corpus tests.
