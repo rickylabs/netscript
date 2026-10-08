@@ -272,14 +272,50 @@ Deno.test('a loopback listener stops when its external signal aborts', async () 
     .serve({ hostname: LOOPBACK, port: 0, handleSignals: false, signal: controller.signal });
   const origin = `http://${LOOPBACK}:${running.addr.port}`;
 
-  assertEquals(running.addr.hostname, LOOPBACK);
-  await assertHealthy(`${origin}/health`);
+  try {
+    assertEquals(running.addr.hostname, LOOPBACK);
+    await assertHealthy(`${origin}/health`, { signal: AbortSignal.timeout(10_000) });
 
-  controller.abort();
-  await running.stop();
+    controller.abort();
 
+    // There is no completion promise on RunningService. Observe closure before
+    // stop() can trigger the same shutdown and mask a missing abort handler.
+    const deadline = AbortSignal.timeout(10_000);
+    let closed = false;
+    while (!deadline.aborted) {
+      try {
+        const response = await fetch(`${origin}/health`, { signal: deadline });
+        await response.body?.cancel();
+      } catch (error) {
+        if (deadline.aborted) break;
+        assert(error instanceof TypeError, 'health fetch must fail because the listener closed');
+        closed = true;
+        break;
+      }
+      await new Promise<void>((resolve) => setTimeout(resolve, 25));
+    }
+    assert(closed && !deadline.aborted, 'external abort must close the listener within 10 seconds');
+
+    assertEquals(contexts, [{ reason: 'manual', signal: undefined }]);
+    await assertRejects(
+      () => fetch(`${origin}/health`, { signal: AbortSignal.timeout(10_000) }),
+      TypeError,
+    );
+  } finally {
+    // Also cleans up the still-running listener when the abort regression fails.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        running.stop(),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error('stop exceeded 10 seconds')), 10_000);
+        }),
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
   assertEquals(contexts, [{ reason: 'manual', signal: undefined }]);
-  await assertRejects(() => fetch(`${origin}/health`), TypeError);
 });
 
 Deno.test('a loopback listener installs, runs, and removes its OS signal handlers', async () => {
